@@ -1,13 +1,10 @@
-import {
-  asNonNegativeFiniteNumber,
-  isNonNegativeFiniteNumber,
-} from 'ts-data-forge';
+import { isNonNegativeFiniteNumber } from 'ts-data-forge';
 import { brand } from '../../../brand/index.mjs';
 import { number } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
 export const nonNegativeFiniteNumber = (
-  defaultValue: NonNegativeFiniteNumber = asNonNegativeFiniteNumber(0),
+  defaultValue: number = 0,
 ): Type<NonNegativeFiniteNumber> =>
   brand({
     baseType: number(defaultValue),

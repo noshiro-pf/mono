@@ -1,9 +1,9 @@
-import { asInt16, isInt16 } from 'ts-data-forge';
+import { isInt16 } from 'ts-data-forge';
 import { brand } from '../../../brand/index.mjs';
 import { number } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-export const int16 = (defaultValue: Int16 = asInt16(0)): Type<Int16> =>
+export const int16 = (defaultValue: number = 0): Type<Int16> =>
   brand({
     baseType: number(defaultValue),
     is: isInt16,

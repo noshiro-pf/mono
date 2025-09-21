@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/safe-uint.mts:6](https://github.com/nos
 
 ##### defaultValue
 
-`SafeUint` = `...`
+`number` = `0`
 
 #### Returns
 

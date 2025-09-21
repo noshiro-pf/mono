@@ -1,11 +1,9 @@
-import { asSafeUint, isSafeUint } from 'ts-data-forge';
+import { isSafeUint } from 'ts-data-forge';
 import { brand } from '../../../brand/index.mjs';
 import { number } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-export const safeUint = (
-  defaultValue: SafeUint = asSafeUint(0),
-): Type<SafeUint> =>
+export const safeUint = (defaultValue: number = 0): Type<SafeUint> =>
   brand({
     baseType: number(defaultValue),
     is: isSafeUint,

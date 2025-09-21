@@ -1,16 +1,10 @@
-import {
-  asPositiveInt,
-  expectType,
-  isNumber,
-  isPositiveInt,
-  Result,
-} from 'ts-data-forge';
+import { expectType, isNumber, isPositiveInt, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { positiveInt } from './positive-int.mjs';
 
 describe('positiveInt', () => {
-  const targetType = positiveInt(asPositiveInt(1));
+  const targetType = positiveInt(1);
 
   type TargetType = TypeOf<typeof targetType>;
 

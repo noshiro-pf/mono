@@ -8,22 +8,22 @@ import { email } from './email.mjs';
 
 const validSamples = [
   'foo@bar.com',
-  // 'x@x.au',
-  // 'foo@bar.com.au',
-  // 'foo+bar@bar.com',
+  'x@x.au',
+  'foo@bar.com.au',
+  'foo+bar@bar.com',
   // 'hans.m端ller@test.com',
   // 'hans@m端ller.com',
   // 'test|123@m端ller.com',
-  // 'test123+ext@gmail.com',
-  // 'some.name.midd.leNa.me.and.locality+extension@GoogleMail.com',
+  'test123+ext@gmail.com',
+  'some.name.midd.leNa.me.and.locality+extension@GoogleMail.com',
   // '"foobar"@example.com',
   // '"  foo  m端ller "@example.com',
   // '"foo\\@bar"@example.com',
-  // `${'a'.repeat(64)}@${'a'.repeat(63)}.com`,
-  // `${'a'.repeat(31)}@gmail.com`,
-  // 'test@gmail.com',
-  // 'test.1@gmail.com',
-  // 'test@1337.com',
+  `${'a'.repeat(64)}@${'a'.repeat(63)}.com`,
+  `${'a'.repeat(31)}@gmail.com`,
+  'test@gmail.com',
+  'test.1@gmail.com',
+  'test@1337.com',
 ] as const satisfies readonly string[];
 
 const invalidSamples = [
@@ -73,10 +73,10 @@ const invalidSamples = [
 describe('email', () => {
   const baseType = email();
 
-  type Iso8601Type = TypeOf<typeof baseType>;
+  type EmailType = TypeOf<typeof baseType>;
 
-  expectType<Iso8601Type, string>('<=');
-  expectType<typeof baseType.defaultValue, Iso8601Type>('=');
+  expectType<EmailType, string>('<=');
+  expectType<typeof baseType.defaultValue, EmailType>('=');
 
   test.each(validSamples)('should accept $0', (e) => {
     expect(baseType.is(e)).toBe(true);

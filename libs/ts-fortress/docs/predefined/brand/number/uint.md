@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/uint.mts:6](https://github.com/noshiro-
 
 ##### defaultValue
 
-`NonNegativeInt` = `...`
+`number` = `0`
 
 #### Returns
 

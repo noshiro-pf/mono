@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/uint16.mts:6](https://github.com/noshir
 
 ##### defaultValue
 
-`Uint16` = `...`
+`number` = `0`
 
 #### Returns
 

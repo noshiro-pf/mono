@@ -14,21 +14,9 @@ Re-exports [bigint](primitives/bigint.md#bigint)
 
 ---
 
-### bigintLiteral
-
-Re-exports [bigintLiteral](primitives/bigint.md#bigintliteral)
-
----
-
 ### boolean
 
 Re-exports [boolean](primitives/boolean.md#boolean)
-
----
-
-### booleanLiteral
-
-Re-exports [booleanLiteral](primitives/boolean.md#booleanliteral)
 
 ---
 
@@ -44,21 +32,9 @@ Re-exports [number](primitives/number.md#number)
 
 ---
 
-### numberLiteral
-
-Re-exports [numberLiteral](primitives/number.md#numberliteral)
-
----
-
 ### string
 
 Re-exports [string](primitives/string.md#string)
-
----
-
-### stringLiteral
-
-Re-exports [stringLiteral](primitives/string.md#stringliteral)
 
 ---
 

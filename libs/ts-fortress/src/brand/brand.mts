@@ -7,7 +7,7 @@ type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
   : A[number];
 
 export const brand = <
-  const A extends Primitive,
+  const A extends StrictExtract<Primitive, string | number | bigint | boolean>,
   const BrandTrueKeys extends readonly string[],
   const BrandFalseKeys extends readonly string[] = [],
 >({
@@ -22,11 +22,7 @@ export const brand = <
   is: (
     a: A,
   ) => a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
-  defaultValue: Brand<
-    A,
-    ArrayToUnion<BrandTrueKeys>,
-    ArrayToUnion<BrandFalseKeys>
-  >;
+  defaultValue: A;
   typeName?: string;
   brandKeys: BrandTrueKeys;
   brandFalseKeys?: BrandFalseKeys;
@@ -34,6 +30,12 @@ export const brand = <
   Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>
 > => {
   type T = Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
+
+  if (!is(defaultValue)) {
+    throw new Error(
+      `defaultValue ${defaultValue} doesn't pass \`is\` function`,
+    );
+  }
 
   const brandKeysStr = [
     ...brandKeys.map((s) => `"${s}"`),

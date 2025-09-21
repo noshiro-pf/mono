@@ -1,9 +1,9 @@
-import { asUint, isUint } from 'ts-data-forge';
+import { isUint } from 'ts-data-forge';
 import { brand } from '../../../brand/index.mjs';
 import { number } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-export const uint = (defaultValue: Uint = asUint(0)): Type<Uint> =>
+export const uint = (defaultValue: number = 0): Type<Uint> =>
   brand({
     baseType: number(defaultValue),
     is: isUint,

@@ -12,13 +12,13 @@
 
 > **nonNegativeFiniteNumber**(`defaultValue`): [`Type`](../../../type/README.md#type)\<`NonNegativeFiniteNumber`\>
 
-Defined in: [src/predefined/brand/number/non-negative-finite-number.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/number/non-negative-finite-number.mts#L9)
+Defined in: [src/predefined/brand/number/non-negative-finite-number.mts:6](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/number/non-negative-finite-number.mts#L6)
 
 #### Parameters
 
 ##### defaultValue
 
-`NonNegativeFiniteNumber` = `...`
+`number` = `0`
 
 #### Returns
 

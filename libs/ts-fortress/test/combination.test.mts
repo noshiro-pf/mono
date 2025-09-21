@@ -1,4 +1,4 @@
-import { asInt, expectType, Result } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import {
   array,
   arrayOfLength,
@@ -33,7 +33,7 @@ import {
 
 describe('nested record', () => {
   const nestedRecord = record({
-    xs: array(int(asInt(2))),
+    xs: array(int(2)),
     rec: pick(
       record({
         a: uintRange({ start: 0, end: 11, defaultValue: 0 }),

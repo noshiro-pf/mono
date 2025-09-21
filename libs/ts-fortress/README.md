@@ -723,9 +723,9 @@ type UserId = t.TypeOf<typeof UserId>; // Brand<string, 'UserId'>
 type Weight = t.TypeOf<typeof Weight>; // Brand<number, 'Weight'>
 
 // Rich number validation types
-const PositiveInt = t.positiveInt(t.asPositiveInt(1));
-const SafeInt = t.safeInt(t.asSafeInt(0));
-const UInt16 = t.uint16(t.asUint16(0));
+const PositiveInt = t.positiveInt(1);
+const SafeInt = t.safeInt(0);
+const UInt16 = t.uint16(0);
 
 // Usage
 const userIdResult = UserId.validate('user_123');

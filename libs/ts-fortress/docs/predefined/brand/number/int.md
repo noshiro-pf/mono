@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/int.mts:6](https://github.com/noshiro-p
 
 ##### defaultValue
 
-`Int` = `...`
+`number` = `0`
 
 #### Returns
 

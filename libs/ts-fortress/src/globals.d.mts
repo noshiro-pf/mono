@@ -11,7 +11,9 @@ type JsonString = Brand<string, 'JsonString'>;
 type UuidVersion = UintRangeInclusive<1, 8>;
 
 type UuidBaseString<V extends UuidVersion = UuidVersion> =
-  `${string}-${string}-${V}${string}-${string}-${string}`;
+  | `${string}-${string}-${V}${string}-${string}-${string}`
+  | '00000000-0000-0000-0000-000000000000'
+  | 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 
 type Uuid = Brand<UuidBaseString, 'Uuid'>;
 

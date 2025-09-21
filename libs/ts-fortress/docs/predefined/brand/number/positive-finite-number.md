@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/positive-finite-number.mts:6](https://g
 
 ##### defaultValue
 
-`PositiveFiniteNumber`
+`number`
 
 #### Returns
 

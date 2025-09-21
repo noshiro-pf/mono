@@ -22,55 +22,43 @@ describe('number', () => {
   expectType<typeof num.defaultValue, Num>('=');
 
   describe('is', () => {
-    test('truthy cases', () => {
-      const values = [
-        0,
-        42,
-        -42,
-        3.14,
-        -3.14,
-        Number.POSITIVE_INFINITY,
-        Number.NEGATIVE_INFINITY,
-        Number.NaN,
-      ];
-
-      for (const value of values) {
-        const v: unknown = value;
-
-        if (num.is(v)) {
-          expectType<typeof v, Num>('=');
-        } else {
-          expectType<typeof v, unknown>('=');
-        }
-
-        expect(num.is(v)).toBe(true);
+    test.each([
+      0,
+      42,
+      -42,
+      3.14,
+      -3.14,
+      Number.POSITIVE_INFINITY,
+      Number.NEGATIVE_INFINITY,
+      Number.NaN,
+    ])('num.is($0) should be true', (v: unknown) => {
+      if (num.is(v)) {
+        expectType<typeof v, Num>('=');
+      } else {
+        expectType<typeof v, unknown>('=');
       }
+
+      expect(num.is(v)).toBe(true);
     });
 
-    test('falsy cases', () => {
-      const values = [
-        '42',
-        '0',
-        true,
-        false,
-        null,
-        undefined,
-        {},
-        [],
-        Symbol('test'),
-      ];
-
-      for (const value of values) {
-        const v: unknown = value;
-
-        if (num.is(v)) {
-          expectType<typeof v, Num>('=');
-        } else {
-          expectType<typeof v, unknown>('=');
-        }
-
-        expect(num.is(v)).toBe(false);
+    test.each([
+      '42',
+      '0',
+      true,
+      false,
+      null,
+      undefined,
+      {},
+      [],
+      Symbol('test'),
+    ])('num.is($0) should be false', (v: unknown) => {
+      if (num.is(v)) {
+        expectType<typeof v, Num>('=');
+      } else {
+        expectType<typeof v, unknown>('=');
       }
+
+      expect(num.is(v)).toBe(false);
     });
   });
 

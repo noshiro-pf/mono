@@ -23,5 +23,9 @@ export const brandedNumber = <K extends string>({
     typeName,
   });
 
-/** Same as brandedNumber */
+/**
+ * Same as brandedNumber
+ *
+ * @deprecated use `brandedNumber`
+ */
 export const simpleBrandedNumber = brandedNumber;

@@ -23,5 +23,9 @@ export const brandedString = <K extends string>({
     typeName,
   });
 
-/** Same as brandedString */
+/**
+ * Same as brandedString
+ *
+ * @deprecated use `brandedString`
+ */
 export const simpleBrandedString = brandedString;

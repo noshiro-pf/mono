@@ -1,9 +1,9 @@
-import { asInt32, isInt32 } from 'ts-data-forge';
+import { isInt32 } from 'ts-data-forge';
 import { brand } from '../../../brand/index.mjs';
 import { number } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-export const int32 = (defaultValue: Int32 = asInt32(0)): Type<Int32> =>
+export const int32 = (defaultValue: number = 0): Type<Int32> =>
   brand({
     baseType: number(defaultValue),
     is: isInt32,

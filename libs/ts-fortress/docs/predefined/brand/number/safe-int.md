@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/safe-int.mts:6](https://github.com/nosh
 
 ##### defaultValue
 
-`SafeInt` = `...`
+`number` = `0`
 
 #### Returns
 

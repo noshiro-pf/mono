@@ -3,9 +3,7 @@ import { brand } from '../../../brand/index.mjs';
 import { number } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-export const nonZeroSafeInt = (
-  defaultValue: NonZeroSafeInt,
-): Type<NonZeroSafeInt> =>
+export const nonZeroSafeInt = (defaultValue: number): Type<NonZeroSafeInt> =>
   brand({
     baseType: number(defaultValue),
     is: isNonZeroSafeInt,

@@ -37,32 +37,18 @@ describe('undefinedType', () => {
       expect(undefinedType.is(value)).toBe(false);
     });
 
-    test('other values return false', () => {
-      const values = [
-        0,
-        '',
-        false,
-        Number.NaN,
-        {},
-        [],
-        'undefined',
-        42,
-        true,
-        null,
-      ];
-
-      for (const value of values) {
-        const v: unknown = value;
-
-        if (undefinedType.is(v)) {
-          expectType<typeof v, undefined>('=');
+    test.each([0, '', false, Number.NaN, {}, [], 'undefined', 42, true, null])(
+      'undefinedType.is($0) should be false',
+      (u: unknown) => {
+        if (undefinedType.is(u)) {
+          expectType<typeof u, undefined>('=');
         } else {
-          expectType<typeof v, {} | null>('=');
+          expectType<typeof u, {} | null>('=');
         }
 
-        expect(undefinedType.is(v)).toBe(false);
-      }
-    });
+        expect(undefinedType.is(u)).toBe(false);
+      },
+    );
   });
 
   describe('assertIs', () => {
@@ -95,15 +81,14 @@ describe('undefinedType', () => {
       }).toThrow('Expected <undefined>, got <object> type value `null`.');
     });
 
-    test('any non-undefined value throws error', () => {
-      const values = [0, '', false, null, 42, 'hello'];
-
-      for (const value of values) {
+    test.each([0, '', false, null, 42, 'hello'] as const)(
+      'undefinedType.cast($0) should throw error',
+      (v) => {
         expect(() => {
-          undefinedType.cast(value);
+          undefinedType.cast(v);
         }).toThrow(/^Expected <undefined>, got <.*> type value .+\.$/u);
-      }
-    });
+      },
+    );
   });
 
   describe('fill', () => {
@@ -119,14 +104,13 @@ describe('undefinedType', () => {
       expect(result).toBeUndefined();
     });
 
-    test('other values return default (undefined)', () => {
-      const values = [0, '', false, 42, 'hello', {}];
-
-      for (const value of values) {
-        const result = undefinedType.fill(value);
+    test.each([0, '', false, 42, 'hello', {}] as const)(
+      'undefinedType.fill($0) return default (undefined)',
+      (v) => {
+        const result = undefinedType.fill(v);
         expect(result).toBeUndefined();
-      }
-    });
+      },
+    );
   });
 
   describe('validate', () => {

@@ -1,16 +1,10 @@
-import {
-  asNonZeroInt,
-  expectType,
-  isNonZeroInt,
-  isNumber,
-  Result,
-} from 'ts-data-forge';
+import { expectType, isNonZeroInt, isNumber, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { nonZeroInt } from './non-zero-int.mjs';
 
 describe('nonZeroInt', () => {
-  const targetType = nonZeroInt(asNonZeroInt(1));
+  const targetType = nonZeroInt(1);
 
   type TargetType = TypeOf<typeof targetType>;
 

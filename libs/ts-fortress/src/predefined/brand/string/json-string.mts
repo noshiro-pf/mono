@@ -6,12 +6,13 @@ import { type Type } from '../../../type.mjs';
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators
  */
 export const jsonString = (
-  defaultValue: string = defaultJsonString,
+  options?: PartialReadonly<{
+    defaultValue: string;
+  }>,
 ): Type<JsonString> =>
   brandedString({
     is: isJsonString,
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    defaultValue: defaultValue as JsonString,
+    defaultValue: options?.defaultValue ?? defaultJsonString,
     typeName: 'JsonString',
   });
 

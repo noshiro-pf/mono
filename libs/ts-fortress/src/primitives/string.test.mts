@@ -22,58 +22,46 @@ describe('string', () => {
   expectType<typeof str.defaultValue, Str>('=');
 
   describe('is', () => {
-    test('truthy cases', () => {
-      const values = [
-        '',
-        'hello',
-        'world',
-        '123',
-        'true',
-        'false',
-        '   ',
-        '\n',
-        '\t',
-        '🎉',
-      ];
-
-      for (const value of values) {
-        const v: unknown = value;
-
-        if (str.is(v)) {
-          expectType<typeof v, Str>('=');
-        } else {
-          expectType<typeof v, unknown>('=');
-        }
-
-        expect(str.is(v)).toBe(true);
+    test.each([
+      '',
+      'hello',
+      'world',
+      '123',
+      'true',
+      'false',
+      '   ',
+      '\n',
+      '\t',
+      '🎉',
+    ])('str.is($0) should be true', (v: unknown) => {
+      if (str.is(v)) {
+        expectType<typeof v, Str>('=');
+      } else {
+        expectType<typeof v, unknown>('=');
       }
+
+      expect(str.is(v)).toBe(true);
     });
 
-    test('falsy cases', () => {
-      const values = [
-        42,
-        0,
-        true,
-        false,
-        null,
-        undefined,
-        {},
-        [],
-        Symbol('test'),
-        Number.NaN,
-      ];
-
-      for (const value of values) {
-        const v: unknown = value;
-
-        if (str.is(v)) {
-          expectType<typeof v, Str>('=');
-        } else {
-          expectType<typeof v, unknown>('=');
-        }
-
-        expect(str.is(v)).toBe(false);
+    test.each([
+      42,
+      0,
+      true,
+      false,
+      null,
+      undefined,
+      {},
+      [],
+      Symbol('test'),
+      Number.NaN,
+    ])('str.is($0) should be false', (v: unknown) => {
+      if (str.is(v)) {
+        expectType<typeof v, Str>('=');
+      } else {
+        expectType<typeof v, unknown>('=');
       }
+
+      expect(str.is(v)).toBe(false);
     });
   });
 

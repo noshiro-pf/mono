@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/non-zero-finite-number.mts:6](https://g
 
 ##### defaultValue
 
-`NonZeroFiniteNumber`
+`number`
 
 #### Returns
 

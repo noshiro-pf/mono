@@ -14,8 +14,7 @@ export const iso8601 = (options?: ISO8601ValidatorOption): Type<Iso8601> => {
 
   return brandedString({
     is,
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    defaultValue: filledOptions.defaultValue as Iso8601,
+    defaultValue: filledOptions.defaultValue,
     typeName: 'Iso8601',
   });
 };
@@ -32,7 +31,7 @@ const ISO8601ValidatorOption = record({
   strictSeparator: boolean(false),
 
   /**
-   * @default `new Date().toISOString()`
+   * @default new Date().toISOString()
    */
   defaultValue: string(new Date().toISOString()),
 });

@@ -1,16 +1,10 @@
-import {
-  asSafeUint,
-  expectType,
-  isNumber,
-  isSafeUint,
-  Result,
-} from 'ts-data-forge';
+import { expectType, isNumber, isSafeUint, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { safeUint } from './safe-uint.mjs';
 
 describe('safeUint', () => {
-  const targetType = safeUint(asSafeUint(0));
+  const targetType = safeUint(0);
 
   type TargetType = TypeOf<typeof targetType>;
 

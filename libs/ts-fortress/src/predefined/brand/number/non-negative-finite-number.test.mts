@@ -1,5 +1,4 @@
 import {
-  asNonNegativeFiniteNumber,
   expectType,
   isNonNegativeFiniteNumber,
   isNumber,
@@ -10,7 +9,7 @@ import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { nonNegativeFiniteNumber } from './non-negative-finite-number.mjs';
 
 describe('nonNegativeFiniteNumber', () => {
-  const targetType = nonNegativeFiniteNumber(asNonNegativeFiniteNumber(0));
+  const targetType = nonNegativeFiniteNumber(0);
 
   type TargetType = TypeOf<typeof targetType>;
 

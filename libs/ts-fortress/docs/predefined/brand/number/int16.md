@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/int16.mts:6](https://github.com/noshiro
 
 ##### defaultValue
 
-`Int16` = `...`
+`number` = `0`
 
 #### Returns
 

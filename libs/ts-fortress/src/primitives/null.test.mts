@@ -39,12 +39,9 @@ describe('nullType', () => {
       expect(nullType.is(value)).toBe(false);
     });
 
-    test('other values return false', () => {
-      const values = [0, '', false, Number.NaN, {}, [], 'null', 42, true];
-
-      for (const value of values) {
-        const v: unknown = value;
-
+    test.each([0, '', false, Number.NaN, {}, [], 'null', 42, true])(
+      'nullType.is($0) should be false',
+      (v: unknown) => {
         if (nullType.is(v)) {
           expectType<typeof v, Null>('=');
         } else {
@@ -52,8 +49,8 @@ describe('nullType', () => {
         }
 
         expect(nullType.is(v)).toBe(false);
-      }
-    });
+      },
+    );
   });
 
   describe('assertIs', () => {
@@ -86,15 +83,14 @@ describe('nullType', () => {
       );
     });
 
-    test('any non-null value throws error', () => {
-      const values = [0, '', false, undefined, 42, 'hello'];
-
-      for (const value of values) {
+    test.each([0, '', false, undefined, 42, 'hello'])(
+      'nullType.cast($0) should throw error',
+      (value) => {
         expect(() => nullType.cast(value)).toThrow(
           /Expected <null>, got <(number|string|boolean|undefined)> type value/u,
         );
-      }
-    });
+      },
+    );
   });
 
   describe('fill', () => {
@@ -110,14 +106,13 @@ describe('nullType', () => {
       expect(result).toBeNull();
     });
 
-    test('other values return default (null)', () => {
-      const values = [0, '', false, 42, 'hello', {}];
-
-      for (const value of values) {
+    test.each([0, '', false, 42, 'hello', {}])(
+      'nullType.fill($0) should be default (null)',
+      (value) => {
         const result = nullType.fill(value);
         expect(result).toBeNull();
-      }
-    });
+      },
+    );
   });
 
   describe('validate', () => {

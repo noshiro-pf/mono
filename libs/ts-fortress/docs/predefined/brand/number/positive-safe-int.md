@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/positive-safe-int.mts:6](https://github
 
 ##### defaultValue
 
-`PositiveSafeInt` = `...`
+`number` = `1`
 
 #### Returns
 

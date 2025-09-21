@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/non-zero-int.mts:6](https://github.com/
 
 ##### defaultValue
 
-`NonZeroInt` = `...`
+`number`
 
 #### Returns
 

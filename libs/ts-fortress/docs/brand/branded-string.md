@@ -8,11 +8,11 @@
 
 ## Variables
 
-### simpleBrandedString()
+### ~~simpleBrandedString()~~
 
 > `const` **simpleBrandedString**: \<`K`\>(`__namedParameters`) => [`Type`](../type/README.md#type)\<`Brand`\<`string`, `K`\>\> = `brandedString`
 
-Defined in: [src/brand/branded-string.mts:27](https://github.com/noshiro-pf/ts-fortress/blob/main/src/brand/branded-string.mts#L27)
+Defined in: [src/brand/branded-string.mts:31](https://github.com/noshiro-pf/ts-fortress/blob/main/src/brand/branded-string.mts#L31)
 
 Same as brandedString
 
@@ -31,6 +31,10 @@ Same as brandedString
 #### Returns
 
 [`Type`](../type/README.md#type)\<`Brand`\<`string`, `K`\>\>
+
+#### Deprecated
+
+use `brandedString`
 
 ## Functions
 

@@ -20,30 +20,22 @@ describe('uuid', () => {
     expect(baseType.defaultValue).toBe(nilUuid);
   });
 
-  test('accepts multiple UUID flavours by default', () => {
-    const validSamples = [
-      uuidV4Example,
-      uuidV6Example,
-      uuidV7Example,
-      nilUuid,
-      maxUuid,
-    ];
-
-    for (const sample of validSamples) {
-      expect(baseType.is(sample)).toBe(true);
-    }
+  test.each([
+    uuidV4Example,
+    uuidV6Example,
+    uuidV7Example,
+    nilUuid,
+    maxUuid,
+  ] as const)('accepts $0', (u) => {
+    expect(baseType.is(u)).toBe(true);
   });
 
-  test('rejects malformed identifiers', () => {
-    const invalidSamples = [
-      'not-a-uuid',
-      '550e8400e29b41d4a716446655440000',
-      '550e8400-e29b-41d4-a716-44665544000',
-    ];
-
-    for (const sample of invalidSamples) {
-      expect(baseType.is(sample)).toBe(false);
-    }
+  test.each([
+    'not-a-uuid',
+    '550e8400e29b41d4a716446655440000',
+    '550e8400-e29b-41d4-a716-44665544000',
+  ] as const)('rejects $0', (u) => {
+    expect(baseType.is(u)).toBe(false);
   });
 
   test('validate surfaces details for invalid strings', () => {

@@ -50,7 +50,7 @@ Defined in: [src/globals.d.mts:3](https://github.com/noshiro-pf/ts-fortress/blob
 
 > **Uuid** = `Brand`\<[`UuidBaseString`](#uuidbasestring), `"Uuid"`\>
 
-Defined in: [src/globals.d.mts:16](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L16)
+Defined in: [src/globals.d.mts:18](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L18)
 
 ---
 
@@ -58,7 +58,7 @@ Defined in: [src/globals.d.mts:16](https://github.com/noshiro-pf/ts-fortress/blo
 
 > **Uuid4** = `Brand`\<[`UuidBaseString`](#uuidbasestring)\<`4`\>, `"Uuid"`\>
 
-Defined in: [src/globals.d.mts:18](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L18)
+Defined in: [src/globals.d.mts:20](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L20)
 
 ---
 
@@ -66,7 +66,7 @@ Defined in: [src/globals.d.mts:18](https://github.com/noshiro-pf/ts-fortress/blo
 
 > **Uuid6** = `Brand`\<[`UuidBaseString`](#uuidbasestring)\<`6`\>, `"Uuid"`\>
 
-Defined in: [src/globals.d.mts:20](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L20)
+Defined in: [src/globals.d.mts:22](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L22)
 
 ---
 
@@ -74,13 +74,13 @@ Defined in: [src/globals.d.mts:20](https://github.com/noshiro-pf/ts-fortress/blo
 
 > **Uuid7** = `Brand`\<[`UuidBaseString`](#uuidbasestring)\<`7`\>, `"Uuid"`\>
 
-Defined in: [src/globals.d.mts:22](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L22)
+Defined in: [src/globals.d.mts:24](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L24)
 
 ---
 
 ### UuidBaseString\<V\>
 
-> **UuidBaseString**\<`V`\> = `` `${string}-${string}-${V}${string}-${string}-${string}` ``
+> **UuidBaseString**\<`V`\> = `` `${string}-${string}-${V}${string}-${string}-${string}` `` \| `"00000000-0000-0000-0000-000000000000"` \| `"ffffffff-ffff-ffff-ffff-ffffffffffff"`
 
 Defined in: [src/globals.d.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L13)
 

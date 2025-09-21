@@ -8,11 +8,11 @@
 
 ## Variables
 
-### simpleBrandedNumber()
+### ~~simpleBrandedNumber()~~
 
 > `const` **simpleBrandedNumber**: \<`K`\>(`__namedParameters`) => [`Type`](../type/README.md#type)\<`Brand`\<`number`, `K`\>\> = `brandedNumber`
 
-Defined in: [src/brand/branded-number.mts:27](https://github.com/noshiro-pf/ts-fortress/blob/main/src/brand/branded-number.mts#L27)
+Defined in: [src/brand/branded-number.mts:31](https://github.com/noshiro-pf/ts-fortress/blob/main/src/brand/branded-number.mts#L31)
 
 Same as brandedNumber
 
@@ -31,6 +31,10 @@ Same as brandedNumber
 #### Returns
 
 [`Type`](../type/README.md#type)\<`Brand`\<`number`, `K`\>\>
+
+#### Deprecated
+
+use `brandedNumber`
 
 ## Functions
 

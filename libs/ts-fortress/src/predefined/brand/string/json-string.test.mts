@@ -5,7 +5,7 @@ import { jsonString } from './json-string.mjs';
 
 describe('jsonString', () => {
   const baseType = jsonString();
-  const customDefault = jsonString('{"ok":true}');
+  const customDefault = jsonString({ defaultValue: '{"ok":true}' });
 
   type JsonStringType = TypeOf<typeof baseType>;
   expectType<JsonStringType, string>('<=');
@@ -16,21 +16,19 @@ describe('jsonString', () => {
     expect(customDefault.defaultValue).toBe('{"ok":true}');
   });
 
-  test('recognizes valid JSON objects and arrays', () => {
-    const samples = ['{"foo":1}', '{"nested":{"bar":[1,2]}}', '[]'];
+  test.each(['{"foo":1}', '{"nested":{"bar":[1,2]}}', '[]'] as const)(
+    'accepts $0',
+    (s) => {
+      expect(baseType.is(s)).toBe(true);
+    },
+  );
 
-    for (const sample of samples) {
-      expect(baseType.is(sample)).toBe(true);
-    }
-  });
-
-  test('rejects primitives and malformed JSON', () => {
-    const invalid = ['not-json', '{"unterminated"', '123', 'null'];
-
-    for (const sample of invalid) {
-      expect(baseType.is(sample)).toBe(false);
-    }
-  });
+  test.each(['not-json', '{"unterminated"', '123', 'null'] as const)(
+    'rejects $0',
+    (s) => {
+      expect(baseType.is(s)).toBe(false);
+    },
+  );
 
   test('validate yields detailed errors for invalid strings', () => {
     const result = baseType.validate('not-json');

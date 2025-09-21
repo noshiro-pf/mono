@@ -18,7 +18,7 @@ Defined in: [src/brand/brand.mts:9](https://github.com/noshiro-pf/ts-fortress/bl
 
 ##### A
 
-`A` _extends_ `Primitive`
+`A` _extends_ `string` \| `number` \| `bigint` \| `boolean`
 
 ##### BrandTrueKeys
 
@@ -32,7 +32,7 @@ Defined in: [src/brand/brand.mts:9](https://github.com/noshiro-pf/ts-fortress/bl
 
 ##### \_\_namedParameters
 
-`Readonly`\<\{ `baseType`: [`Type`](../type/README.md#type)\<`A`\>; `brandFalseKeys?`: `BrandFalseKeys`; `brandKeys`: `BrandTrueKeys`; `defaultValue`: `Brand`\<`A`, `ArrayToUnion`\<`BrandTrueKeys`\>, `ArrayToUnion`\<`BrandFalseKeys`\>\>; `is`: (`a`) => `a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>`; `typeName?`: `string`; \}\>
+`Readonly`\<\{ `baseType`: [`Type`](../type/README.md#type)\<`A`\>; `brandFalseKeys?`: `BrandFalseKeys`; `brandKeys`: `BrandTrueKeys`; `defaultValue`: `A`; `is`: (`a`) => `a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>`; `typeName?`: `string`; \}\>
 
 #### Returns
 

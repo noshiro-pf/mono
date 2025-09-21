@@ -1,10 +1,10 @@
-import { asInt, expectType, Result } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { int } from './int.mjs';
 
 describe('int', () => {
-  const targetType = int(asInt(0));
+  const targetType = int(0);
 
   type TargetType = TypeOf<typeof targetType>;
 

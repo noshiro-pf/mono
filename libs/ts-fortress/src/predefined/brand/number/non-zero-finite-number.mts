@@ -4,7 +4,7 @@ import { number } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
 export const nonZeroFiniteNumber = (
-  defaultValue: NonZeroFiniteNumber,
+  defaultValue: number,
 ): Type<NonZeroFiniteNumber> =>
   brand({
     baseType: number(defaultValue),

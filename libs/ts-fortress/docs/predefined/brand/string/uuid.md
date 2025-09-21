@@ -24,7 +24,7 @@ Defined in: [src/predefined/brand/string/uuid.mts:8](https://github.com/noshiro-
 
 ##### options?
 
-`Readonly`\<\{ `defaultValue?`: `string`; `typeName?`: `string`; `version?`: `V`; \}\>
+`Partial`\<`Readonly`\<\{ `defaultValue`: `string`; `typeName`: `string`; `version`: `V`; \}\>\>
 
 #### Returns
 
@@ -40,7 +40,7 @@ https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#val
 
 > **uuidV4**(`defaultValue?`): [`Type`](../../../type/README.md#type)\<[`Uuid4`](../../../globals.md#uuid4)\>
 
-Defined in: [src/predefined/brand/string/uuid.mts:48](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/string/uuid.mts#L48)
+Defined in: [src/predefined/brand/string/uuid.mts:47](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/string/uuid.mts#L47)
 
 #### Parameters
 
@@ -58,7 +58,7 @@ Defined in: [src/predefined/brand/string/uuid.mts:48](https://github.com/noshiro
 
 > **uuidV6**(`defaultValue?`): [`Type`](../../../type/README.md#type)\<[`Uuid6`](../../../globals.md#uuid6)\>
 
-Defined in: [src/predefined/brand/string/uuid.mts:51](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/string/uuid.mts#L51)
+Defined in: [src/predefined/brand/string/uuid.mts:53](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/string/uuid.mts#L53)
 
 #### Parameters
 
@@ -76,7 +76,7 @@ Defined in: [src/predefined/brand/string/uuid.mts:51](https://github.com/noshiro
 
 > **uuidV7**(`defaultValue?`): [`Type`](../../../type/README.md#type)\<[`Uuid7`](../../../globals.md#uuid7)\>
 
-Defined in: [src/predefined/brand/string/uuid.mts:54](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/string/uuid.mts#L54)
+Defined in: [src/predefined/brand/string/uuid.mts:59](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/string/uuid.mts#L59)
 
 #### Parameters
 

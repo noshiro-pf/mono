@@ -10,15 +10,15 @@
 
 ### email()
 
-> **email**(`defaultValue?`): [`Type`](../../../type/README.md#type)\<[`Email`](../../../globals.md#email)\>
+> **email**(`options?`): [`Type`](../../../type/README.md#type)\<[`Email`](../../../globals.md#email)\>
 
 Defined in: [src/predefined/brand/string/email.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/string/email.mts#L7)
 
 #### Parameters
 
-##### defaultValue?
+##### options?
 
-`string`
+`Partial`\<`Readonly`\<\{ `defaultValue`: `string`; \}\>\>
 
 #### Returns
 

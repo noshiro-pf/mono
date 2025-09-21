@@ -1,16 +1,10 @@
-import {
-  asPositiveSafeInt,
-  expectType,
-  isNumber,
-  isPositiveSafeInt,
-  Result,
-} from 'ts-data-forge';
+import { expectType, isNumber, isPositiveSafeInt, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { positiveSafeInt } from './positive-safe-int.mjs';
 
 describe('positiveSafeInt', () => {
-  const targetType = positiveSafeInt(asPositiveSafeInt(1));
+  const targetType = positiveSafeInt(1);
 
   type TargetType = TypeOf<typeof targetType>;
 

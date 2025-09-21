@@ -10,15 +10,15 @@
 
 ### jsonString()
 
-> **jsonString**(`defaultValue`): [`Type`](../../../type/README.md#type)\<[`JsonString`](../../../globals.md#jsonstring)\>
+> **jsonString**(`options?`): [`Type`](../../../type/README.md#type)\<[`JsonString`](../../../globals.md#jsonstring)\>
 
 Defined in: [src/predefined/brand/string/json-string.mts:8](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/brand/string/json-string.mts#L8)
 
 #### Parameters
 
-##### defaultValue
+##### options?
 
-`string` = `defaultJsonString`
+`Partial`\<`Readonly`\<\{ `defaultValue`: `string`; \}\>\>
 
 #### Returns
 

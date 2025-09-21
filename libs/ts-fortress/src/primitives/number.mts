@@ -4,11 +4,3 @@ import { createPrimitiveType } from '../utils/index.mjs';
 
 export const number = (defaultValue: number = 0): Type<number> =>
   createPrimitiveType({ typeName: 'number', defaultValue, is: isNumber });
-
-/** @deprecated Use `literal` instead. */
-export const numberLiteral = <L extends number>(literal: L): Type<L> =>
-  createPrimitiveType({
-    typeName: `numberLiteral(${literal})`,
-    defaultValue: literal,
-    is: (value: unknown): value is L => value === literal,
-  });

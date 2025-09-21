@@ -23,31 +23,3 @@ Defined in: [src/primitives/number.mts:5](https://github.com/noshiro-pf/ts-fortr
 #### Returns
 
 [`Type`](../type/README.md#type)\<`number`\>
-
----
-
-### ~~numberLiteral()~~
-
-> **numberLiteral**\<`L`\>(`literal`): [`Type`](../type/README.md#type)\<`L`\>
-
-Defined in: [src/primitives/number.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/primitives/number.mts#L9)
-
-#### Type Parameters
-
-##### L
-
-`L` _extends_ `number`
-
-#### Parameters
-
-##### literal
-
-`L`
-
-#### Returns
-
-[`Type`](../type/README.md#type)\<`L`\>
-
-#### Deprecated
-
-Use `literal` instead.

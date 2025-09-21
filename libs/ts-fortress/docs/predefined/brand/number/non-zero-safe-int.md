@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/non-zero-safe-int.mts:6](https://github
 
 ##### defaultValue
 
-`NonZeroSafeInt`
+`number`
 
 #### Returns
 

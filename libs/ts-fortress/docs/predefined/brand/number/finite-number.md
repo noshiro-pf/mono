@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/number/finite-number.mts:6](https://github.com
 
 ##### defaultValue
 
-`FiniteNumber` = `...`
+`number` = `0`
 
 #### Returns
 
