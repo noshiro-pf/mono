@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### RecordPathsWithIndex\<R\>
+### RecordPathsWithIndex
 
 > **RecordPathsWithIndex**\<`R`\> = [`RecordPathPrefixes`](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md#recordpathprefixes)\<[`RecordLeafPathsWithIndex`](#recordleafpathswithindex)\<`R`\>\>
 
@@ -39,7 +39,7 @@ type P = PathsWithIndex<Data>;
 
 ---
 
-### RecordPaths\<R\>
+### RecordPaths
 
 > **RecordPaths**\<`R`\> = [`RecordPathPrefixes`](../branded-types/brand/namespaces/TSTypeForgeInternals/README.md#recordpathprefixes)\<[`RecordLeafPaths`](#recordleafpaths)\<`R`\>\>
 
@@ -70,7 +70,7 @@ type P = Paths<Data>;
 
 ---
 
-### RecordPathAndValueTypeTuple\<R\>
+### RecordPathAndValueTypeTuple
 
 > **RecordPathAndValueTypeTuple**\<`R`\> = `TSTypeForgeInternals.AttachValueTypeAtPath`\<`R`, [`RecordPaths`](#recordpaths)\<`R`\>\>
 
@@ -104,7 +104,7 @@ type KPV = KeyPathAndValueTypeAtPathTuple<Data>;
 
 ---
 
-### RecordLeafPaths\<R\>
+### RecordLeafPaths
 
 > **RecordLeafPaths**\<`R`\> = `R` _extends_ readonly `unknown`[] ? `TSTypeForgeInternals.LeafPathsImplListCase`\<`R`, keyof `R`\> : `R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.LeafPathsImplRecordCase`\<`R`, keyof `R`\> : readonly \[\]
 
@@ -135,7 +135,7 @@ type LP = LeafPaths<Data>;
 
 ---
 
-### RecordLeafPathsWithIndex\<R\>
+### RecordLeafPathsWithIndex
 
 > **RecordLeafPathsWithIndex**\<`R`\> = `R` _extends_ readonly `unknown`[] ? `TSTypeForgeInternals.LeafPathsWithIndexImplListCase`\<`R`, keyof `R`\> : `R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.LeafPathsWithIndexImplRecordCase`\<`R`, keyof `R`\> : readonly \[\]
 
@@ -166,7 +166,7 @@ type LP = LeafPathsWithIndex<Data>;
 
 ---
 
-### RecordUpdated\<R, Path, ValueAfter\>
+### RecordUpdated
 
 > **RecordUpdated**\<`R`, `Path`, `ValueAfter`\> = `Path` _extends_ readonly \[\] ? `ValueAfter` : `R` _extends_ readonly `unknown`[] ? `TSTypeForgeInternals.RecordUpdatedImplTupleCase`\<`R`, `Path`, `ValueAfter`\> : `R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.RecordUpdatedImplRecordCase`\<`R`, `Path`, `ValueAfter`\> : `R`
 
@@ -210,7 +210,7 @@ type UpdatedRoot = RecordUpdated<Data, [], null>; // null
 
 ---
 
-### RecordValueAtPath\<R, Path\>
+### RecordValueAtPath
 
 > **RecordValueAtPath**\<`R`, `Path`\> = `Path` _extends_ readonly \[infer Head, `...(infer Rest)`\] ? `Head` _extends_ keyof `R` ? `Rest` _extends_ [`RecordPaths`](#recordpaths)\<`R`\[`Head`\]\> ? [`RecordValueAtPath`](#recordvalueatpath)\<`R`\[`Head`\], `Rest`\> : `never` : `never` : `R`
 
@@ -248,7 +248,7 @@ type V3 = RecordValueAtPath<Data, []>; // { a: { b: [string, boolean] } }
 
 ---
 
-### RecordValueAtPathWithIndex\<R, Path\>
+### RecordValueAtPathWithIndex
 
 > **RecordValueAtPathWithIndex**\<`R`, `Path`\> = `TSTypeForgeInternals.RecordValueAtPathWithIndexImpl`\<`R`, `Path`, `never`\>
 

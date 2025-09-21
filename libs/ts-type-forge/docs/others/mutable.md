@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Mutable\<T\>
+### Mutable
 
 > **Mutable**\<`T`\> = `{ -readonly [P in keyof T]: T[P] }`
 
@@ -54,7 +54,7 @@ type EditableConfig = Mutable<Config>; // { host: string; port: number; ssl: boo
 
 ---
 
-### ToMutableMap\<T\>
+### ToMutableMap
 
 > **ToMutableMap**\<`T`\> = `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `Map`\<`K`, `V`\> : `never`
 
@@ -91,7 +91,7 @@ const convertToMutable = (
 
 ---
 
-### ToMutableSet\<T\>
+### ToMutableSet
 
 > **ToMutableSet**\<`T`\> = `T` _extends_ `ReadonlySet`\<infer V\> ? `Set`\<`V`\> : `never`
 
@@ -126,7 +126,7 @@ const convertToMutable = (readonlySet: ReadonlySet<string>): Set<string> => {
 
 ---
 
-### MutableSet\<K\>
+### MutableSet
 
 > **MutableSet**\<`K`\> = `Set`\<`K`\>
 
@@ -154,7 +154,7 @@ tags.delete('react'); // ✓ allowed
 
 ---
 
-### MutableMap\<K, V\>
+### MutableMap
 
 > **MutableMap**\<`K`, `V`\> = `Map`\<`K`, `V`\>
 

@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Head\<T, D\>
+### Head
 
 > **Head**\<`T`, `D`\> = `Tuple.Head`\<`T`, `D`\>
 
@@ -47,7 +47,7 @@ type H4 = List.Head<[], 'default'>; // 'default'
 
 ---
 
-### Last\<T\>
+### Last
 
 > **Last**\<`T`\> = `Tuple.Last`\<`T`\>
 
@@ -79,7 +79,7 @@ type L4 = List.Last<[1]>; // 1
 
 ---
 
-### ButLast\<A\>
+### ButLast
 
 > **ButLast**\<`A`\> = `Tuple.ButLast`\<`A`\>
 
@@ -111,7 +111,7 @@ type BL4 = List.ButLast<[]>; // readonly []
 
 ---
 
-### Tail\<A\>
+### Tail
 
 > **Tail**\<`A`\> = `Tuple.Tail`\<`A`\>
 
@@ -143,7 +143,7 @@ type T4 = List.Tail<[]>; // readonly []
 
 ---
 
-### Reverse\<L\>
+### Reverse
 
 > **Reverse**\<`L`\> = `L` _extends_ readonly \[\] ? readonly \[\] : [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`L`\> _extends_ `true` ? `Tuple.Reverse`\<`L`\> : `L` _extends_ readonly \[`unknown`, `...readonly unknown[]`\] ? readonly \[`...Reverse<Tail<L>>`, [`Head`](#head)\<`L`\>\] : `Readonly`\<`L`\>
 
@@ -175,7 +175,7 @@ type R3 = List.Reverse<[]>; // readonly []
 
 ---
 
-### Take\<N, T\>
+### Take
 
 > **Take**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.Take`\<`N`, `T`\> : `T`
 
@@ -213,7 +213,7 @@ type TK3 = List.Take<2, readonly string[]>; // readonly string[]
 
 ---
 
-### Skip\<N, T\>
+### Skip
 
 > **Skip**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.Skip`\<`N`, `T`\> : `T`
 
@@ -251,7 +251,7 @@ type SK3 = List.Skip<1, readonly string[]>; // readonly string[]
 
 ---
 
-### TakeLast\<N, T\>
+### TakeLast
 
 > **TakeLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.TakeLast`\<`N`, `T`\> : `T`
 
@@ -289,7 +289,7 @@ type TL3 = List.TakeLast<2, readonly string[]>; // readonly string[]
 
 ---
 
-### SkipLast\<N, T\>
+### SkipLast
 
 > **SkipLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.SkipLast`\<`N`, `T`\> : `T`
 
@@ -327,7 +327,7 @@ type SL3 = List.SkipLast<1, readonly string[]>; // readonly string[]
 
 ---
 
-### SetAt\<T, I, V\>
+### SetAt
 
 > **SetAt**\<`T`, `I`, `V`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.SetAt`\<`T`, `I`, `V`\> : readonly (`T`\[`number`\] \| `V`)[]
 
@@ -371,7 +371,7 @@ type SA2 = List.SetAt<readonly number[], 1, 'x'>; // readonly (string | number)[
 
 ---
 
-### Flatten\<T\>
+### Flatten
 
 > **Flatten**\<`T`\> = `Tuple.Flatten`\<`T`\>
 
@@ -402,7 +402,7 @@ type F3 = List.Flatten<[[1], [2, [3]]]>; // readonly [1, 2, [3]] (only flattens 
 
 ---
 
-### Concat\<A, B\>
+### Concat
 
 > **Concat**\<`A`, `B`\> = `Tuple.Concat`\<`A`, `B`\>
 
@@ -439,7 +439,7 @@ type C3 = List.Concat<[1], readonly number[]>; // readonly [1, ...number[]]
 
 ---
 
-### Zip\<A, B\>
+### Zip
 
 > **Zip**\<`A`, `B`\> = `A` _extends_ readonly \[\] ? readonly \[\] : `B` _extends_ readonly \[\] ? readonly \[\] : `A` _extends_ [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? `B` _extends_ [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? readonly \[readonly \[[`Head`](#head)\<`A`\>, [`Head`](#head)\<`B`\>\], `...Zip<Tail<A>, Tail<B>>`\] : readonly \[readonly \[[`Head`](#head)\<`A`\>, `B`\[`number`\]\], `...Zip<Tail<A>, Tail<B>>`\] : `B` _extends_ [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? readonly \[readonly \[`A`\[`number`\], [`Head`](#head)\<`B`\>\], `...Zip<Tail<A>, Tail<B>>`\] : readonly readonly \[`A`\[`number`\], `B`\[`number`\]\][]
 
@@ -479,7 +479,7 @@ type Z5 = List.Zip<readonly number[], ['a', 'b']>; // readonly [[number, 'a'], [
 
 ---
 
-### Partition\<N, T\>
+### Partition
 
 > **Partition**\<`N`, `T`\> = `Tuple.Partition`\<`N`, `T`\>
 

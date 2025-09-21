@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### IndexOfTuple\<T\>
+### IndexOfTuple
 
 > **IndexOfTuple**\<`T`\> = `TSTypeForgeInternals.IndexOfTupleImpl`\<`T`, keyof `T`\>
 
@@ -41,7 +41,7 @@ type ReadonlyArrayIndices = IndexOfTuple<readonly number[]>; // number
 
 ---
 
-### NegativeIndexOfTuple\<T\>
+### NegativeIndexOfTuple
 
 > **NegativeIndexOfTuple**\<`T`\> = `TSTypeForgeInternals.MapIdx`\<[`RelaxedExclude`](../record/std.md#relaxedexclude)\<[`IndexOfTuple`](#indexoftuple)\<\[`...T`, `0`\]\>, `0`\>\>
 

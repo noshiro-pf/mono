@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### ToString\<A\>
+### ToString
 
 > **ToString**\<`A`\> = `A` _extends_ `number` ? `` `${A}` `` : `A`
 
@@ -33,7 +33,7 @@ type Bool = ToString<boolean>; // boolean
 
 ---
 
-### ToNumber\<S\>
+### ToNumber
 
 > **ToNumber**\<`S`\> = `S` _extends_ `` `${infer N extends number}` `` ? `N` : `never`
 
@@ -58,7 +58,7 @@ type Num = ToNumber<'456'>; // 456
 
 ---
 
-### ValueOf\<T\>
+### ValueOf
 
 > **ValueOf**\<`T`\> = `T`\[keyof `T`\]
 
@@ -82,7 +82,7 @@ type Values = ValueOf<{ a: string; b: number }>; // string | number
 
 ---
 
-### Length\<T\>
+### Length
 
 > **Length**\<`T`\> = `T`\[`"length"`\]
 
@@ -113,7 +113,7 @@ type StringLen = Length<'abc'>; // 3
 
 ---
 
-### FunctionType()\<A, B\>
+### FunctionType()
 
 > **FunctionType**\<`A`, `B`\> = (`arg`) => `B`
 
@@ -148,7 +148,7 @@ The return type.
 
 ---
 
-### Fn()\<A, B\>
+### Fn()
 
 > **Fn**\<`A`, `B`\> = (`arg`) => `B`
 
@@ -183,7 +183,7 @@ The return type.
 
 ---
 
-### MonoTypeFunction\<X\>
+### MonoTypeFunction
 
 > **MonoTypeFunction**\<`X`\> = [`Fn`](#fn)\<`X`, `X`\>
 
@@ -201,7 +201,7 @@ The argument and return type.
 
 ---
 
-### Reducer()\<S, A\>
+### Reducer()
 
 > **Reducer**\<`S`, `A`\> = (`state`, `action`) => `S`
 
@@ -240,7 +240,7 @@ The action type.
 
 ---
 
-### UnionToIntersection\<T\>
+### UnionToIntersection
 
 > **UnionToIntersection**\<`T`\> = `T` _extends_ `unknown` ? (`arg`) => `void` : `never` _extends_ (`arg`) => `void` ? `F` : `never`
 
@@ -264,7 +264,7 @@ type Inter = UnionToIntersection<{ a: string } | { b: number }>; // { a: string 
 
 ---
 
-### MergeIntersection\<R\>
+### MergeIntersection
 
 > **MergeIntersection**\<`R`\> = `{ [K in keyof R]: R[K] }`
 
@@ -289,7 +289,7 @@ type Merged = MergeIntersection<{ a: string } & { b: number }>; // { a: string; 
 
 ---
 
-### ExcludeFalsyValue\<A\>
+### ExcludeFalsyValue
 
 > **ExcludeFalsyValue**\<`A`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<`A`, [`FalsyValue`](../constants/falsy-value.md#falsyvalue)\>
 
@@ -308,7 +308,7 @@ The type to filter.
 
 ---
 
-### Intersection\<Types\>
+### Intersection
 
 > **Intersection**\<`Types`\> = `TSTypeForgeInternals.IntersectionImpl`\<`Types`\>
 

@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### IsNever\<T\>
+### IsNever
 
 > **IsNever**\<`T`\> = \[`T`\] _extends_ \[`never`\] ? `true` : `false`
 

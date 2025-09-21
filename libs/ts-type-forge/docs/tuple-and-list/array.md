@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### MutableNonEmptyArray\<A\>
+### MutableNonEmptyArray
 
 > **MutableNonEmptyArray**\<`A`\> = \[`A`, `...A[]`\]
 
@@ -35,7 +35,7 @@ const alsoValid: NA = ['hello', 'world'];
 
 ---
 
-### NonEmptyArray\<A\>
+### NonEmptyArray
 
 > **NonEmptyArray**\<`A`\> = readonly \[`A`, `...readonly A[]`\]
 
@@ -63,7 +63,7 @@ const alsoValid: NA = [1, 2, 3];
 
 ---
 
-### ArrayElement\<S\>
+### ArrayElement
 
 > **ArrayElement**\<`S`\> = `S` _extends_ readonly infer T[] ? `T` : `never`
 
@@ -95,7 +95,7 @@ type NotArray = ArrayElement<{ a: number }>; // never
 
 ---
 
-### ArrayOfLength\<N, Elm\>
+### ArrayOfLength
 
 > **ArrayOfLength**\<`N`, `Elm`\> = [`MakeTuple`](make-tuple.md#maketuple)\<`Elm`, `N`\>
 
@@ -131,7 +131,7 @@ type TupleOf0Numbers = ArrayOfLength<0, number>; // readonly []
 
 ---
 
-### MutableArrayOfLength\<N, Elm\>
+### MutableArrayOfLength
 
 > **MutableArrayOfLength**\<`N`, `Elm`\> = [`Mutable`](../others/mutable.md#mutable)\<[`ArrayOfLength`](#arrayoflength)\<`N`, `Elm`\>\>
 
@@ -165,7 +165,7 @@ type MutableTupleOf2Booleans = MutableArrayOfLength<2, boolean>; // [boolean, bo
 
 ---
 
-### MutableArrayAtLeastLen\<N, Elm\>
+### MutableArrayAtLeastLen
 
 > **MutableArrayAtLeastLen**\<`N`, `Elm`\> = [`Mutable`](../others/mutable.md#mutable)\<[`ArrayAtLeastLen`](#arrayatleastlen)\<`N`, `Elm`\>\>
 
@@ -202,7 +202,7 @@ const alsoValid: AtLeast2Numbers = [1, 2, 3, 4];
 
 ---
 
-### ArrayAtLeastLen\<N, Elm\>
+### ArrayAtLeastLen
 
 > **ArrayAtLeastLen**\<`N`, `Elm`\> = readonly \[`...MakeTuple<Elm, N>`, `...Elm[]`\]
 

@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### IsFixedLengthList\<T\>
+### IsFixedLengthList
 
 > **IsFixedLengthList**\<`T`\> = `number` _extends_ `T`\[`"length"`\] ? `false` : `true`
 
@@ -45,7 +45,7 @@ type IsTupleWithRest = IsFixedLengthList<[number, ...string[]]>; // false
 
 ---
 
-### IsNotFixedLengthList\<T\>
+### IsNotFixedLengthList
 
 > **IsNotFixedLengthList**\<`T`\> = `number` _extends_ `T`\[`"length"`\] ? `true` : `false`
 

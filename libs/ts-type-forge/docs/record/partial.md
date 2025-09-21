@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### PartiallyPartial\<T, K\>
+### PartiallyPartial
 
 > **PartiallyPartial**\<`T`, `K`\> = [`MergeIntersection`](../others/utils.md#mergeintersection)\<`Omit`\<`T`, `K`\> & `Partial`\<`Pick`\<`T`, `K`\>\>\>
 
@@ -45,7 +45,7 @@ type PartiallyPartialData = PartiallyPartial<Data, 'a' | 'b'>;
 
 ---
 
-### PartiallyOptional\<T, K\>
+### PartiallyOptional
 
 > **PartiallyOptional**\<`T`, `K`\> = [`PartiallyPartial`](#partiallypartial)\<`T`, `K`\>
 
@@ -81,7 +81,7 @@ type PartiallyOptionalData = PartiallyOptional<Data, 'a' | 'b'>;
 
 ---
 
-### PartiallyNullable\<T, K\>
+### PartiallyNullable
 
 > **PartiallyNullable**\<`T`, `K`\> = [`MergeIntersection`](../others/utils.md#mergeintersection)\<`Omit`\<`T`, `K`\> & \{ \[P in K\]: T\[P\] \| undefined \}\>
 
@@ -118,7 +118,7 @@ type PartiallyNullableData = PartiallyNullable<Data, 'a' | 'b'>;
 
 ---
 
-### PartiallyRequired\<T, K\>
+### PartiallyRequired
 
 > **PartiallyRequired**\<`T`, `K`\> = [`MergeIntersection`](../others/utils.md#mergeintersection)\<`Omit`\<`T`, `K`\> & `Required`\<`Pick`\<`T`, `K`\>\>\>
 
@@ -155,7 +155,7 @@ type PartiallyRequiredData = PartiallyRequired<Data, 'a' | 'b'>;
 
 ---
 
-### OptionalKeys\<R\>
+### OptionalKeys
 
 > **OptionalKeys**\<`R`\> = `PickUndefined`\<`MapToNever`\<`R`\>\>
 
@@ -192,7 +192,7 @@ type K = OptionalKeys<{
 
 ---
 
-### RequiredKeys\<R\>
+### RequiredKeys
 
 > **RequiredKeys**\<`R`\> = `Exclude`\<keyof `R`, [`OptionalKeys`](#optionalkeys)\<`R`\>\>
 

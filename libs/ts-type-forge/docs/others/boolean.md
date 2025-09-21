@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### BoolNot\<A\>
+### BoolNot
 
 > **BoolNot**\<`A`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> _extends_ `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> _extends_ `true` ? `true` : `never`
 
@@ -48,7 +48,7 @@ type Test2 = IsDisabled<{ enabled: false }>; // true
 
 ---
 
-### BoolAnd\<A, B\>
+### BoolAnd
 
 > **BoolAnd**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `false` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `false` : `never` : `never`
 
@@ -96,7 +96,7 @@ type HasBothFlags<T> = T extends { flagA: infer A; flagB: infer B }
 
 ---
 
-### BoolOr\<A, B\>
+### BoolOr
 
 > **BoolOr**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `true` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `false` : `never` : `never`
 
@@ -146,7 +146,7 @@ type HasAnyFlag<T> = T extends { flagA: infer A; flagB: infer B }
 
 ---
 
-### BoolEq\<A, B\>
+### BoolEq
 
 > **BoolEq**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `false` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `true` : `never` : `never`
 
@@ -180,7 +180,7 @@ type F_F = BoolEq<false, false>; // true
 
 ---
 
-### BoolNand\<A, B\>
+### BoolNand
 
 > **BoolNand**\<`A`, `B`\> = [`BoolNot`](#boolnot)\<[`BoolAnd`](#booland)\<`A`, `B`\>\>
 
@@ -213,7 +213,7 @@ type F_F = BoolNand<false, false>; // true
 
 ---
 
-### BoolNor\<A, B\>
+### BoolNor
 
 > **BoolNor**\<`A`, `B`\> = [`BoolNot`](#boolnot)\<[`BoolOr`](#boolor)\<`A`, `B`\>\>
 
@@ -246,7 +246,7 @@ type F_F = BoolNor<false, false>; // true
 
 ---
 
-### BoolNeq\<A, B\>
+### BoolNeq
 
 > **BoolNeq**\<`A`, `B`\> = [`BoolNot`](#boolnot)\<[`BoolEq`](#booleq)\<`A`, `B`\>\>
 

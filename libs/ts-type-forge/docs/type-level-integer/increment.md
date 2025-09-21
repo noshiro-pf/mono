@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Increment\<N\>
+### Increment
 
 > **Increment**\<`N`\> = readonly \[`0`, `...MakeTuple<0, N>`\]\[`"length"`\]
 
@@ -59,7 +59,7 @@ type OneToFive = Range<1, 5>; // 1 | 2 | 3 | 4 | 5
 
 ---
 
-### Decrement\<N\>
+### Decrement
 
 > **Decrement**\<`N`\> = [`Tail`](../tuple-and-list/list/namespaces/List.md#tail)\<[`MakeTuple`](../tuple-and-list/make-tuple.md#maketuple)\<`0`, `N`\>\>\[`"length"`\]
 

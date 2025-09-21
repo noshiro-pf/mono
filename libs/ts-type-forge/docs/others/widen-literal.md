@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### WidenLiteral\<T\>
+### WidenLiteral
 
 > **WidenLiteral**\<`T`\> = `T` _extends_ `string` ? `string` : `T` _extends_ `number` ? `number` : `T` _extends_ `boolean` ? `boolean` : `T` _extends_ `bigint` ? `bigint` : `T` _extends_ `symbol` ? `symbol` : `T`
 

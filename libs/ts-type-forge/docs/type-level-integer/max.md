@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Max\<N\>
+### Max
 
 > **Max**\<`N`\> = `TSTypeForgeInternals.MaxImpl`\<`N`, \[\]\>
 

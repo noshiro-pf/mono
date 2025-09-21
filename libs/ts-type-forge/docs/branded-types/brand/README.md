@@ -28,7 +28,7 @@ type MyBrand = Brand<string, 'validated', never>;
 
 ---
 
-### Brand\<T, TrueKeys, FalseKeys\>
+### Brand
 
 > **Brand**\<`T`, `TrueKeys`, `FalseKeys`\> = `T` & `TSTypeForgeInternals.BrandEncapsulated`\<\{ readonly \[key in FalseKeys \| TrueKeys\]: key extends TrueKeys ? true : false \}\>
 
@@ -75,7 +75,7 @@ type NonZeroInt = Brand<number, 'integer', 'zero'>;
 
 ---
 
-### UnwrapBrandTrueKeys\<B\>
+### UnwrapBrandTrueKeys
 
 > **UnwrapBrandTrueKeys**\<`B`\> = [`ExtractTrueKeys`](namespaces/TSTypeForgeInternals/README.md#extracttruekeys)\<`B`\>
 
@@ -104,7 +104,7 @@ type TrueKeys = UnwrapBrandTrueKeys<NonZeroInt>; // 'integer'
 
 ---
 
-### UnwrapBrandFalseKeys\<B\>
+### UnwrapBrandFalseKeys
 
 > **UnwrapBrandFalseKeys**\<`B`\> = [`ExtractFalseKeys`](namespaces/TSTypeForgeInternals/README.md#extractfalsekeys)\<`B`\>
 
@@ -133,7 +133,7 @@ type FalseKeys = UnwrapBrandFalseKeys<NonZeroInt>; // 'zero'
 
 ---
 
-### UnwrapBrandBooleanKeys\<B\>
+### UnwrapBrandBooleanKeys
 
 > **UnwrapBrandBooleanKeys**\<`B`\> = [`ExtractBooleanKeys`](namespaces/TSTypeForgeInternals/README.md#extractbooleankeys)\<`B`\>
 
@@ -165,7 +165,7 @@ type BooleanKeys = UnwrapBrandBooleanKeys<UnionBrand>; // 'key1' (since it's tru
 
 ---
 
-### UnwrapBrandKeys\<B\>
+### UnwrapBrandKeys
 
 > **UnwrapBrandKeys**\<`B`\> = [`UnwrapBrandBooleanKeys`](#unwrapbrandbooleankeys)\<`B`\> \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\>
 
@@ -194,7 +194,7 @@ type AllKeys = UnwrapBrandKeys<MyBrand>; // 'validated' | 'normalized' | 'empty'
 
 ---
 
-### GetBrandKeysPart\<B\>
+### GetBrandKeysPart
 
 > **GetBrandKeysPart**\<`B`\> = `Pick`\<`B`, [`UnwrapBrandKeys`](#unwrapbrandkeys)\<`B`\>\>
 
@@ -223,7 +223,7 @@ type KeysPart = GetBrandKeysPart<MyBrand>; // { validated: true }
 
 ---
 
-### GetBrandValuePart\<B\>
+### GetBrandValuePart
 
 > **GetBrandValuePart**\<`B`\> = `B` _extends_ [`Brand`](#brand)\<infer T, [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> ? `T` : `never`
 
@@ -255,7 +255,7 @@ type AgeValue = GetBrandValuePart<Age>; // number
 
 ---
 
-### ExtendBrand\<B, T, F\>
+### ExtendBrand
 
 > **ExtendBrand**\<`B`, `T`, `F`\> = [`IsNever`](../../condition/is-never.md#isnever)\<`F` & `T`\> _extends_ `true` ? [`Brand`](#brand)\<[`GetBrandValuePart`](#getbrandvaluepart)\<`B`\>, `T` \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, `F` \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> : `never`
 
@@ -304,7 +304,7 @@ type OptionalEmail = ExtendBrand<Email, 'optional', 'required'>;
 
 ---
 
-### ChangeBaseBrand\<B, T\>
+### ChangeBaseBrand
 
 > **ChangeBaseBrand**\<`B`, `T`\> = [`Brand`](#brand)\<`T`, [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\>
 
@@ -344,7 +344,7 @@ type ParsedData = ChangeBaseBrand<SerializedData, object>;
 
 ---
 
-### IntersectBrand\<B1, B2\>
+### IntersectBrand
 
 > **IntersectBrand**\<`B1`, `B2`\> = [`Brand`](#brand)\<[`GetBrandValuePart`](#getbrandvaluepart)\<`B1`\> & [`GetBrandValuePart`](#getbrandvaluepart)\<`B2`\>, `string` & [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B1`\> \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B2`\>, `string` & [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B1`\> \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B2`\>\>
 
@@ -387,7 +387,7 @@ type Person = IntersectBrand<Named, Aged>;
 
 ---
 
-### NormalizeBrandUnion\<B\>
+### NormalizeBrandUnion
 
 > **NormalizeBrandUnion**\<`B`\> = [`GetBrandValuePart`](#getbrandvaluepart)\<`B`\> & `TSTypeForgeInternals.BrandEncapsulated`\<`{ readonly [key in Exclude<UnwrapBrandKeys<B>, UnwrapBrandBooleanKeys<B>>]: B[key] }`\>
 

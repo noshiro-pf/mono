@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Index\<N\>
+### Index
 
 > **Index**\<`N`\> = [`IndexOfTuple`](../tuple-and-list/index-of-tuple.md#indexoftuple)\<[`MakeTuple`](../tuple-and-list/make-tuple.md#maketuple)\<`0`, `N`\>\>
 
@@ -40,7 +40,7 @@ type Idx1 = Index<1>; // 0
 
 ---
 
-### IndexInclusive\<N\>
+### IndexInclusive
 
 > **IndexInclusive**\<`N`\> = [`IndexOfTuple`](../tuple-and-list/index-of-tuple.md#indexoftuple)\<\[`...MakeTuple<0, N>`, `0`\]\>
 
@@ -71,7 +71,7 @@ type IdxInc0 = IndexInclusive<0>; // 0
 
 ---
 
-### NegativeIndex\<N\>
+### NegativeIndex
 
 > **NegativeIndex**\<`N`\> = `TSTypeForgeInternals.MapIdx`\<[`RelaxedExclude`](../record/std.md#relaxedexclude)\<[`IndexInclusive`](#indexinclusive)\<`N`\>, `0`\>\>
 

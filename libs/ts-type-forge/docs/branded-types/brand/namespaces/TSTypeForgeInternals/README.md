@@ -12,7 +12,7 @@
 
 ## Type Aliases
 
-### ExtractTrueKeys\<B\>
+### ExtractTrueKeys
 
 > **ExtractTrueKeys**\<`B`\> = [`ExtractBooleanKeysImpl`](#extractbooleankeysimpl)\<`B`, keyof `B`, `true`\>
 
@@ -26,7 +26,7 @@ Defined in: [src/branded-types/brand.d.mts:27](https://github.com/noshiro-pf/ts-
 
 ---
 
-### ExtractFalseKeys\<B\>
+### ExtractFalseKeys
 
 > **ExtractFalseKeys**\<`B`\> = [`ExtractBooleanKeysImpl`](#extractbooleankeysimpl)\<`B`, keyof `B`, `false`\>
 
@@ -40,7 +40,7 @@ Defined in: [src/branded-types/brand.d.mts:33](https://github.com/noshiro-pf/ts-
 
 ---
 
-### ExtractBooleanKeys\<B\>
+### ExtractBooleanKeys
 
 > **ExtractBooleanKeys**\<`B`\> = [`ExtractBooleanKeysImpl`](#extractbooleankeysimpl)\<`B`, keyof `B`, `boolean`\>
 
@@ -54,7 +54,7 @@ Defined in: [src/branded-types/brand.d.mts:39](https://github.com/noshiro-pf/ts-
 
 ---
 
-### ExtractBooleanKeysImpl\<B, K, Target\>
+### ExtractBooleanKeysImpl
 
 > **ExtractBooleanKeysImpl**\<`B`, `K`, `Target`\> = `K` _extends_ `K` ? [`TypeEq`](../../../../condition/eq.md#typeeq)\<`B`\[`K`\], `Target`\> _extends_ `true` ? `K` : `never` : `never`
 
@@ -100,7 +100,7 @@ Defined in: [src/branded-types/core.d.mts:48](https://github.com/noshiro-pf/ts-t
 
 ---
 
-### ExtendNumberBrand\<B, T, F\>
+### ExtendNumberBrand
 
 > **ExtendNumberBrand**\<`B`, `T`, `F`\> = [`Brand`](../../README.md#brand)\<[`GetBrandValuePart`](../../README.md#getbrandvaluepart)\<`B`\>, `T` \| [`UnwrapBrandTrueKeys`](../../README.md#unwrapbrandtruekeys)\<`B`\> & `string`, `F` \| [`UnwrapBrandFalseKeys`](../../README.md#unwrapbrandfalsekeys)\<`B`\> & `string`\>
 
@@ -130,7 +130,7 @@ Defined in: [src/branded-types/small-int.d.mts:119](https://github.com/noshiro-p
 
 ---
 
-### SmallPositiveInt\<MaxIndex\>
+### SmallPositiveInt
 
 > **SmallPositiveInt**\<`MaxIndex`\> = [`RelaxedExclude`](../../../../record/std.md#relaxedexclude)\<[`Index`](../../../../type-level-integer/index-type.md#index)\<`MaxIndex`\>, `0`\>
 
@@ -146,7 +146,7 @@ Integers in `[1, MaxIndex - 1]`
 
 ---
 
-### SmallNegativeInt\<MaxIndex\>
+### SmallNegativeInt
 
 > **SmallNegativeInt**\<`MaxIndex`\> = [`NegativeIndex`](../../../../type-level-integer/index-type.md#negativeindex)\<`MaxIndex`\>
 
@@ -162,7 +162,7 @@ Integers in `[-MaxIndex, -1]`
 
 ---
 
-### WithSmallIntImpl\<N, MaxIndex\>
+### WithSmallIntImpl
 
 > **WithSmallIntImpl**\<`N`, `MaxIndex`\> = `Exclude`\<[`SmallInt`](../../../small-int.md#smallint)\<`""`, `MaxIndex`\>, `N` _extends_ [`NegativeNumber`](../../../core.md#negativenumber) ? [`SmallInt`](../../../small-int.md#smallint)\<`">=0"`, `MaxIndex`\> : `never` \| `N` _extends_ [`NonNegativeNumber`](../../../core.md#nonnegativenumber) ? [`SmallInt`](../../../small-int.md#smallint)\<`"<0"`, `MaxIndex`\> : `never` \| `N` _extends_ [`NonZeroNumber`](../../../core.md#nonzeronumber) ? `0` : `never`\> \| `N`
 
@@ -180,7 +180,7 @@ Defined in: [src/branded-types/small-int.d.mts:129](https://github.com/noshiro-p
 
 ---
 
-### CastToInt\<T\>
+### CastToInt
 
 > **CastToInt**\<`T`\> = `T` _extends_ [`Int`](../../../int.md#int) ? `T` : `never`
 
@@ -211,7 +211,7 @@ type C = CastToInt<SafeInt>; // SafeInt (since SafeInt extends Int)
 
 ---
 
-### IntersectionImplSub\<Types\>
+### IntersectionImplSub
 
 > **IntersectionImplSub**\<`Types`\> = `Types` _extends_ readonly \[\] ? `unknown` : `Types` _extends_ readonly \[infer Head, `...(infer Tail)`\] ? `Head` & [`IntersectionImplSub`](#intersectionimplsub)\<`Tail`\> : `never`
 
@@ -225,7 +225,7 @@ Defined in: [src/others/utils.d.mts:119](https://github.com/noshiro-pf/ts-type-f
 
 ---
 
-### MergeIfRecords\<R\>
+### MergeIfRecords
 
 > **MergeIfRecords**\<`R`\> = \[`R`\] _extends_ \[[`UnknownRecord`](../../../../constants/record.md#unknownrecord)\] ? [`MergeIntersection`](../../../../others/utils.md#mergeintersection)\<`R`\> : `R`
 
@@ -239,7 +239,7 @@ Defined in: [src/others/utils.d.mts:126](https://github.com/noshiro-pf/ts-type-f
 
 ---
 
-### RecordPathPrefixes\<L\>
+### RecordPathPrefixes
 
 > **RecordPathPrefixes**\<`L`\> = `L` _extends_ readonly \[infer Head, `...(infer Rest)`\] ? readonly \[\] \| readonly \[`Head`, `...RecordPathPrefixes<Rest>`\] : readonly \[\]
 

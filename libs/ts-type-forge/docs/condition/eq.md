@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### TypeEq\<A, B\>
+### TypeEq
 
 > **TypeEq**\<`A`, `B`\> = \<`T`\>() => `T` _extends_ `A` ? `1` : `2` _extends_ \<`T`\>() => `T` _extends_ `B` ? `1` : `2` ? `true` : `false`
 

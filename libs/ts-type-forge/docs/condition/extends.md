@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### TypeExtends\<A, B\>
+### TypeExtends
 
 > **TypeExtends**\<`A`, `B`\> = \[`A`\] _extends_ \[`B`\] ? `true` : `false`
 

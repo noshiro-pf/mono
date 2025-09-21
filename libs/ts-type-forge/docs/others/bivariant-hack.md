@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### BivariantHack\<F\>
+### BivariantHack
 
 > **BivariantHack**\<`F`\> = `object`\[`"bivariantHack"`\]
 

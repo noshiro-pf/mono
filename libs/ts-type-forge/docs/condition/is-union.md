@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### IsUnion\<U\>
+### IsUnion
 
 > **IsUnion**\<`U`\> = `TSTypeForgeInternals.IsUnionImpl`\<`U`, `U`\>
 

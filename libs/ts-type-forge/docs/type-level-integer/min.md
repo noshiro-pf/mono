@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Min\<N\>
+### Min
 
 > **Min**\<`N`\> = `TSTypeForgeInternals.MinImpl`\<`N`, \[\]\>
 

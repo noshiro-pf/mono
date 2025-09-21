@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### StrictExtract\<T, U\>
+### StrictExtract
 
 > **StrictExtract**\<`T`, `U`\> = `T` _extends_ `U` ? `T` : `never`
 
@@ -45,7 +45,7 @@ type Extracted = StrictExtract<Union, 'a' | 'b'>; // 'a' | 'b'
 
 ---
 
-### RelaxedExtract\<T, U\>
+### RelaxedExtract
 
 > **RelaxedExtract**\<`T`, `U`\> = `T` _extends_ `U` ? `T` : `never`
 
@@ -82,7 +82,7 @@ type Numbers = RelaxedExtract<string | number | boolean, number>; // number
 
 ---
 
-### StrictPick\<T, K\>
+### StrictPick
 
 > **StrictPick**\<`T`, `K`\> = `{ [P in K]: T[P] }`
 
@@ -119,7 +119,7 @@ type BasicInfo = StrictPick<Person, 'name' | 'age'>; // { name: string; age: num
 
 ---
 
-### RelaxedPick\<T, K\>
+### RelaxedPick
 
 > **RelaxedPick**\<`T`, `K`\> = `Pick`\<`T`, [`RelaxedExtract`](#relaxedextract)\<keyof `T`, `K`\>\>
 
@@ -156,7 +156,7 @@ type Empty = RelaxedPick<Person, 'nonexistent'>; // {}
 
 ---
 
-### StrictExclude\<T, U\>
+### StrictExclude
 
 > **StrictExclude**\<`T`, `U`\> = `T` _extends_ `U` ? `never` : `T`
 
@@ -193,7 +193,7 @@ type Remaining = StrictExclude<Union, 'a' | 'b'>; // 'c'
 
 ---
 
-### RelaxedExclude\<T, U\>
+### RelaxedExclude
 
 > **RelaxedExclude**\<`T`, `U`\> = `T` _extends_ `U` ? `never` : `T`
 
@@ -230,7 +230,7 @@ type NonStrings = RelaxedExclude<string | number | boolean, string>; // number |
 
 ---
 
-### StrictOmit\<T, K\>
+### StrictOmit
 
 > **StrictOmit**\<`T`, `K`\> = `Pick`\<`T`, `Exclude`\<keyof `T`, `K`\>\>
 
@@ -267,7 +267,7 @@ type PublicInfo = StrictOmit<Person, 'email'>; // { name: string; age: number }
 
 ---
 
-### RelaxedOmit\<T, K\>
+### RelaxedOmit
 
 > **RelaxedOmit**\<`T`, `K`\> = `Pick`\<`T`, [`RelaxedExclude`](#relaxedexclude)\<keyof `T`, `K`\>\>
 
@@ -304,7 +304,7 @@ type Same = RelaxedOmit<Person, 'nonexistent'>; // { name: string; age: number; 
 
 ---
 
-### ReadonlyRecord\<K, T\>
+### ReadonlyRecord
 
 > **ReadonlyRecord**\<`K`, `T`\> = `{ readonly [P in K]: T }`
 
@@ -341,7 +341,7 @@ const settings: Config = { host: 'localhost', port: 3000 };
 
 ---
 
-### MutableRecord\<K, T\>
+### MutableRecord
 
 > **MutableRecord**\<`K`, `T`\> = `{ [P in K]: T }`
 

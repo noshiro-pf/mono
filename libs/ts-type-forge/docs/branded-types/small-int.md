@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### SmallInt\<T, MaxIndex\>
+### SmallInt
 
 > **SmallInt**\<`T`, `MaxIndex`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<=0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">=0"`\> _extends_ `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">0"`\> _extends_ `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"!=0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `""`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : `never`
 
@@ -67,7 +67,7 @@ const getItem = <T>(arr: readonly T[], i: Index) => arr[i];
 
 ---
 
-### WithSmallInt\<N, MaxIndex\>
+### WithSmallInt
 
 > **WithSmallInt**\<`N`, `MaxIndex`\> = [`WithSmallIntImpl`](brand/namespaces/TSTypeForgeInternals/README.md#withsmallintimpl)\<[`CastToInt`](brand/namespaces/TSTypeForgeInternals/README.md#casttoint)\<[`NormalizeBrandUnion`](brand/README.md#normalizebrandunion)\<`N`\>\>, `MaxIndex`\>
 
@@ -116,7 +116,7 @@ type SmallPositiveInt = WithSmallInt<PositiveInt>; // 1 to 39 | PositiveInt
 
 ---
 
-### ExcludeSmallInt\<N, MaxIndex\>
+### ExcludeSmallInt
 
 > **ExcludeSmallInt**\<`N`, `MaxIndex`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<`N`, [`SmallInt`](#smallint)\<`""`, `MaxIndex`\>\>
 

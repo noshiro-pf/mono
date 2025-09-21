@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Seq\<N\>
+### Seq
 
 > **Seq**\<`N`\> = `TSTypeForgeInternals.SeqImpl`\<[`MakeTuple`](../tuple-and-list/make-tuple.md#maketuple)\<`unknown`, `N`\>\>
 

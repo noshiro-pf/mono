@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### UintRange\<Start, End\>
+### UintRange
 
 > **UintRange**\<`Start`, `End`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<[`Index`](index-type.md#index)\<`End`\>, [`Index`](index-type.md#index)\<`Start`\>\>
 
@@ -45,7 +45,7 @@ type R3 = UintRange<5, 5>; // never
 
 ---
 
-### UintRangeInclusive\<MinValue, MaxValue\>
+### UintRangeInclusive
 
 > **UintRangeInclusive**\<`MinValue`, `MaxValue`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<[`IndexInclusive`](index-type.md#indexinclusive)\<`MaxValue`\>, [`Index`](index-type.md#index)\<`MinValue`\>\>
 

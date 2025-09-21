@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### MakeTuple\<Elm, N\>
+### MakeTuple
 
 > **MakeTuple**\<`Elm`, `N`\> = `TSTypeForgeInternals.MakeTupleInternals.MakeTupleImpl`\<`Elm`, `` `${N}` ``, \[\]\>
 

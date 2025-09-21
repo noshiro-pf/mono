@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### AbsoluteValue\<N\>
+### AbsoluteValue
 
 > **AbsoluteValue**\<`N`\> = `N` _extends_ `N` ? `` `${N}` `` _extends_ `` `-${infer P}` `` ? `P` _extends_ `` `${number}` `` ? [`ToNumber`](../others/utils.md#tonumber)\<`P`\> : `never` : `N` : `never`
 
@@ -42,7 +42,7 @@ type Union = AbsoluteValue<-1 | 2>; // 1 | 2
 
 ---
 
-### Abs\<N\>
+### Abs
 
 > **Abs**\<`N`\> = [`AbsoluteValue`](#absolutevalue)\<`N`\>
 
