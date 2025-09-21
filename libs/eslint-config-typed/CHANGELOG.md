@@ -1,3 +1,9 @@
+## [1.2.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.4...v1.2.5) (2025-09-21)
+
+### Bug Fixes
+
+- bump eslint-plugin-playwright from 2.2.0 to 2.2.2 ([#43](https://github.com/noshiro-pf/eslint-config-typed/issues/43)) ([b278663](https://github.com/noshiro-pf/eslint-config-typed/commit/b27866326915c7c079c4f894d771936de0556613))
+
 ## [1.2.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.3...v1.2.4) (2025-09-21)
 
 ### Bug Fixes
