@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### Result\<S, E\>
+### Result
 
 > **Result**\<`S`, `E`\> = [`Result`](entry-point/README.md#result)\<`S`, `E`\>
 

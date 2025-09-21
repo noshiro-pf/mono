@@ -16,7 +16,7 @@ Defined in: [src/functions/exec-async.mts:8](https://github.com/noshiro-pf/ts-re
 
 ---
 
-### ExecResult\<T\>
+### ExecResult
 
 > **ExecResult**\<`T`\> = [`Result`](../entry-point/README.md#result)\<`Readonly`\<\{ `stderr`: `T`; `stdout`: `T`; \}\>, `childProcess.ExecException`\>
 
