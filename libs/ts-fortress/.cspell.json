@@ -1,7 +1,7 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["noshiro", "testw", "tscw", "valueof"],
+  "words": ["brandable", "noshiro", "testw", "tscw", "valueof"],
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",

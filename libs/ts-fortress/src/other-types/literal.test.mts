@@ -342,7 +342,7 @@ describe('literal', () => {
         ]);
 
         expect(validationErrorsToMessages(resultError2)).toStrictEqual([
-          'Expected <literal(42n)>, got <bigint> type value `99`.',
+          'Expected <literal(42n)>, got <bigint> type value `99n`.',
         ]);
       });
 

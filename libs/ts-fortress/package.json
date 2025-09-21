@@ -64,7 +64,7 @@
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
-    "ts-data-forge": "^3.2.0",
+    "ts-data-forge": "^3.3.0",
     "ts-type-forge": "^2.2.0"
   },
   "devDependencies": {
