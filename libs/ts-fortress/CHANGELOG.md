@@ -1,3 +1,18 @@
+# [5.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.4.0...v5.0.0) (2025-09-21)
+
+### Features
+
+- **breaking:** allow passing a simple primitive value to the brand defaultValue ([#105](https://github.com/noshiro-pf/ts-fortress/issues/105)) ([a834937](https://github.com/noshiro-pf/ts-fortress/commit/a834937b664c5df1f97cc030fc6e37163693bf67))
+
+### BREAKING CHANGES
+
+- **breaking:** - Removed stringLiteral, booleanLiteral, numberLiteral, bigintLiteral
+
+* Limited brandable types from Primitive to string | number | bigint | boolean
+* Allow passing a simple primitive value to the brand defaultValue
+* Fixed regex of email
+* Deprecated simpleBrandedString and simpleBrandedNumber
+
 # [4.4.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.3.1...v4.4.0) (2025-09-21)
 
 ### Features
