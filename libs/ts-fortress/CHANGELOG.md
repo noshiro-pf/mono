@@ -1,3 +1,9 @@
+## [5.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v5.0.0...v5.0.1) (2025-09-21)
+
+### Bug Fixes
+
+- bump ts-data-forge from 3.2.0 to 3.3.0 ([#93](https://github.com/noshiro-pf/ts-fortress/issues/93)) ([5529987](https://github.com/noshiro-pf/ts-fortress/commit/5529987cdbbb4bf33681771a139f7959392f87cc))
+
 # [5.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v4.4.0...v5.0.0) (2025-09-21)
 
 ### Features
