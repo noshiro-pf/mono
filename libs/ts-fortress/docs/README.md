@@ -914,6 +914,7 @@ type ValidationError = Readonly<{
 - `t.nonEmptyArray(elementType)` - Non-empty array validation
 - `t.tuple([t1, t2, ..., tN])` - Fixed-length tuple validation
 - `t.arrayOfLength(size, elementType)` - Fixed-length array validation
+- `t.arrayAtLeastLength(size, elementType)` - Array validation with a minimum length
 
 ### Objects
 
@@ -968,6 +969,7 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](_media
 
 - [array](array.md)
 - [array/array](array/array.md)
+- [array/array-at-least-length](array/array-at-least-length.md)
 - [array/array-of-length](array/array-of-length.md)
 - [array/non-empty-array](array/non-empty-array.md)
 - [array/tuple](array/tuple.md)

@@ -9920,6 +9920,12 @@ Re-exports [array](../array/array.md#array)
 
 ---
 
+### arrayAtLeastLength
+
+Re-exports [arrayAtLeastLength](../array/array-at-least-length.md#arrayatleastlength)
+
+---
+
 ### arrayOfLength
 
 Re-exports [arrayOfLength](../array/array-of-length.md#arrayoflength)
