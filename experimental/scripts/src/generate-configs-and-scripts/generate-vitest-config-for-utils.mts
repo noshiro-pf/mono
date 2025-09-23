@@ -30,7 +30,7 @@ export const generateVitestConfigForUtils = async (
     '  test: {',
     '    globals: true,',
     "    dir: path.resolve(thisDir, '../src'),",
-    "    includeSource: [path.resolve(thisDir, '../src/**/*.mts')],",
+    "    includeSource: ['src/**/*.mts'],",
     '    typecheck: {',
     `      tsconfig: path.resolve(thisDir, '${tsconfigTestJsonName}'),`,
     '    },',
