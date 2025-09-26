@@ -1,3 +1,9 @@
+# [5.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v5.1.0...v5.2.0) (2025-09-26)
+
+### Features
+
+- add constraints option to string, number, bigint ([#107](https://github.com/noshiro-pf/ts-fortress/issues/107)) ([1f2da8a](https://github.com/noshiro-pf/ts-fortress/commit/1f2da8aa373672f93b109296cfd881a960a10c03))
+
 # [5.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v5.0.1...v5.1.0) (2025-09-23)
 
 ### Features
