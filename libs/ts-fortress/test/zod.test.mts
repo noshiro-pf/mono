@@ -45,3 +45,29 @@ test('WrongSchema', () => {
     new TypeError("Cannot read properties of undefined (reading 'traits')"),
   );
 });
+
+describe('api check', () => {
+  test('maxLength', () => {
+    const s = z.string().check(z.maxLength(5));
+
+    expect(s.safeParse('12').success).toBe(true);
+    expect(s.safeParse('1234').success).toBe(true);
+    expect(s.safeParse('123456').success).toBe(false);
+  });
+
+  test('maxLength2', () => {
+    const s = z.string().max(5);
+
+    expect(s.safeParse('12').success).toBe(true);
+    expect(s.safeParse('1234').success).toBe(true);
+    expect(s.safeParse('123456').success).toBe(false);
+  });
+
+  test('max and min', () => {
+    const s = z.string().min(3).max(5);
+
+    expect(s.safeParse('12').success).toBe(false);
+    expect(s.safeParse('1234').success).toBe(true);
+    expect(s.safeParse('123456').success).toBe(false);
+  });
+});

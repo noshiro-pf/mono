@@ -245,6 +245,82 @@ assert.deepStrictEqual(UserWithMetadata.defaultValue, {
 } satisfies t.TypeOf<typeof UserWithMetadata>);
 ```
 
+## Primitive Constraints
+
+`t.string()`, `t.number()`, and `t.bigint()` accept optional constraint objects that refine both runtime validation and the inferred TypeScript type. Constraints are verified when the schema is created—invalid defaults throw immediately—and on every `is()`, `validate()`, and `cast()` call.
+
+### String constraints
+
+```tsx
+import * as t from 'ts-fortress';
+
+const Slug = t.string('feature-flag', {
+    startsWith: 'feature',
+    includes: '-',
+    endsWith: 'flag',
+    nonempty: true,
+    minLength: 6,
+    maxLength: 32,
+    regex: /^[a-z-]+$/u,
+});
+
+Slug.is('feature-beta'); // true
+Slug.is('Feature-Flag'); // false (fails regex)
+
+type SlugType = t.TypeOf<typeof Slug>; // inferred as `feature${string}`
+```
+
+String constraints:
+
+- `startsWith`, `endsWith`, `includes`
+- `lowercase`, `uppercase`, `nonempty`
+- `minLength`, `maxLength`
+- `regex`
+
+A negative `minLength` is ignored so you can enable or disable the bound dynamically without branching.
+
+### Number constraints
+
+```tsx
+import * as t from 'ts-fortress';
+
+const Percentage = t.number(100, {
+    min: 0,
+    max: 100,
+    step: 5,
+    nonNegative: true,
+});
+
+Percentage.is(75); // true
+Percentage.is(72); // false (fails `step`)
+Percentage.is(-5); // false (fails `min`/`nonNegative`)
+```
+
+Numeric constraints cover:
+
+- Range: `gt`, `gte`, `min`, `lt`, `lte`, `max`
+- Sign helpers: `positive`, `nonNegative`, `negative`, `nonPositive`
+- Divisibility: `multipleOf`, `step`
+
+### Bigint constraints
+
+```tsx
+import * as t from 'ts-fortress';
+
+const PermissionsMask = t.bigint(0b11_1111n, {
+    gte: 0n,
+    lte: (1n << 6n) - 1n,
+    multipleOf: 1n << 2n,
+});
+
+PermissionsMask.is(0b10_1100n); // true
+PermissionsMask.is(0b10_1111n); // false (not divisible by 4)
+```
+
+Bigint constraints mirror the numeric API but operate on `bigint` literals. When `multipleOf` or `step` is `0n`, only `0n` passes the check.
+
+> **Tip:** If a default value violates its constraints, `ts-fortress` throws during construction. This guards against invalid schemas ever reaching production.
+
 ## Why ts-fortress over Zod and io-ts?
 
 While ts-fortress, [Zod](https://github.com/colinhacks/zod), and [io-ts](https://github.com/gcanti/io-ts) are all excellent TypeScript validation libraries, ts-fortress offers more readable and informative error messages than both, a more type-safe way of building validators than Zod, and addresses some critical runtime consistency issues found in io-ts.

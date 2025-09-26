@@ -1,5 +1,5 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type TypeOf } from '../type.mjs';
+import { type Type, type TypeOf } from '../type.mjs';
 import { number } from './number.mjs';
 
 describe('number', () => {
@@ -169,6 +169,287 @@ describe('number', () => {
       expect(Result.isOk(result)).toBe(true);
       const resultValue1 = Result.unwrapThrow(result);
       expect(resultValue1).toBe(input); // ✅ same reference
+    });
+  });
+});
+
+describe('number with constraints', () => {
+  describe('number constrained by gt', () => {
+    test('accepts valid default value', () => {
+      const type = number(10, { gt: 5 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(6)).toBe(true);
+      expect(type.is(5)).toBe(false);
+      expect(type.is(42)).toBe(true);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() => number(5, { gt: 5 })).toThrow('gt = 5');
+    });
+  });
+
+  describe('number constrained by gte', () => {
+    test('accepts valid default value', () => {
+      const type = number(5, { gte: 5 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(5)).toBe(true);
+      expect(type.is(4)).toBe(false);
+      expect(type.is(10)).toBe(true);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() => number(4, { gte: 5 })).toThrow('gte = 5');
+    });
+  });
+
+  describe('number constrained by min', () => {
+    test('accepts valid default value', () => {
+      const type = number(5, { min: 5 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(7)).toBe(true);
+      expect(type.is(4)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() => number(4, { min: 5 })).toThrow('min = 5');
+    });
+  });
+
+  describe('number constrained by lt', () => {
+    test('accepts valid default value', () => {
+      const type = number(4, { lt: 5 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(3)).toBe(true);
+      expect(type.is(5)).toBe(false);
+      expect(type.is(10)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() => number(5, { lt: 5 })).toThrow('lt = 5');
+    });
+  });
+
+  describe('number constrained by lte', () => {
+    test('accepts valid default value', () => {
+      const type = number(5, { lte: 5 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(4)).toBe(true);
+      expect(type.is(5)).toBe(true);
+      expect(type.is(6)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() => number(6, { lte: 5 })).toThrow('lte = 5');
+    });
+  });
+
+  describe('number constrained by max', () => {
+    test('accepts valid default value', () => {
+      const type = number(5, { max: 5 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(5)).toBe(true);
+      expect(type.is(6)).toBe(false);
+      expect(type.is(3)).toBe(true);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() => number(6, { max: 5 })).toThrow('max = 5');
+    });
+  });
+
+  describe('number constrained by positive', () => {
+    test('accepts valid default value', () => {
+      const type = number(1, { positive: true });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(10)).toBe(true);
+      expect(type.is(0)).toBe(false);
+      expect(type.is(-1)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 0 is not > 0 when positive is true
+        number(0, { positive: true }),
+      ).toThrow('positive = true');
+    });
+  });
+
+  describe('number constrained by nonNegative', () => {
+    test('accepts valid default value', () => {
+      const type = number(0, { nonNegative: true });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(5)).toBe(true);
+      expect(type.is(0)).toBe(true);
+      expect(type.is(-1)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error -1 is not >= 0 when nonNegative is true
+        number(-1, { nonNegative: true }),
+      ).toThrow('nonNegative = true');
+    });
+  });
+
+  describe('number constrained by negative', () => {
+    test('accepts valid default value', () => {
+      const type = number(-1, { negative: true });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(-5)).toBe(true);
+      expect(type.is(0)).toBe(false);
+      expect(type.is(1)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 0 is not < 0 when negative is true
+        number(0, { negative: true }),
+      ).toThrow('negative = true');
+    });
+  });
+
+  describe('number constrained by nonPositive', () => {
+    test('accepts valid default value', () => {
+      const type = number(0, { nonPositive: true });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(-5)).toBe(true);
+      expect(type.is(0)).toBe(true);
+      expect(type.is(1)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 1 is not <= 0 when nonPositive is true
+        number(1, { nonPositive: true }),
+      ).toThrow('nonPositive = true');
+    });
+  });
+
+  describe('number constrained by multipleOf', () => {
+    test('accepts valid default value', () => {
+      const type = number(6, { multipleOf: 3 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(9)).toBe(true);
+      expect(type.is(10)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() => number(7, { multipleOf: 3 })).toThrow('multipleOf = 3');
+    });
+  });
+
+  describe('number constrained by step', () => {
+    test('accepts valid default value', () => {
+      const type = number(8, { step: 2 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      expect(type.is(10)).toBe(true);
+      expect(type.is(11)).toBe(false);
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() => number(9, { step: 2 })).toThrow('step = 2');
+    });
+  });
+
+  describe('complex constraints', () => {
+    describe('number constrained by gt and lt', () => {
+      test('accepts valid default value', () => {
+        const type = number(5, { gt: 1, lt: 10 });
+
+        expectType<typeof type, Type<number>>('=');
+
+        expect(type.is(6)).toBe(true);
+        expect(type.is(1)).toBe(false);
+        expect(type.is(10)).toBe(false);
+      });
+
+      test('rejects invalid default value', () => {
+        expect(() => number(1, { gt: 1, lt: 10 })).toThrow('gt = 1');
+      });
+    });
+
+    describe('number constrained by gte and lte', () => {
+      test('accepts valid default value', () => {
+        const type = number(5, { gte: 5, lte: 10 });
+
+        expectType<typeof type, Type<number>>('=');
+
+        expect(type.is(5)).toBe(true);
+        expect(type.is(10)).toBe(true);
+        expect(type.is(4)).toBe(false);
+        expect(type.is(11)).toBe(false);
+      });
+
+      test('rejects invalid default value', () => {
+        expect(() => number(4, { gte: 5, lte: 10 })).toThrow('gte = 5');
+      });
+    });
+
+    describe('number constrained by positive and multipleOf', () => {
+      test('accepts valid default value', () => {
+        const type = number(6, { positive: true, multipleOf: 3 });
+
+        expectType<typeof type, Type<number>>('=');
+
+        expect(type.is(9)).toBe(true);
+        expect(type.is(3)).toBe(true);
+        expect(type.is(-3)).toBe(false);
+        expect(type.is(10)).toBe(false);
+      });
+
+      test('rejects invalid default value', () => {
+        expect(() => number(4, { positive: true, multipleOf: 3 })).toThrow(
+          'multipleOf = 3',
+        );
+      });
+    });
+
+    describe('number constrained by nonNegative, max, and step', () => {
+      test('accepts valid default value', () => {
+        const type = number(8, {
+          nonNegative: true,
+          max: 10,
+          step: 2,
+        });
+
+        expectType<typeof type, Type<number>>('=');
+
+        expect(type.is(10)).toBe(true);
+        expect(type.is(0)).toBe(true);
+        expect(type.is(11)).toBe(false);
+        expect(type.is(-2)).toBe(false);
+        expect(type.is(9)).toBe(false);
+      });
+
+      test('rejects invalid default value', () => {
+        expect(() =>
+          number(12, { nonNegative: true, max: 10, step: 2 }),
+        ).toThrow('max = 10');
+      });
     });
   });
 });
