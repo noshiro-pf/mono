@@ -1,3 +1,9 @@
+## [1.2.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.6...v1.2.7) (2025-09-27)
+
+### Bug Fixes
+
+- bump @typescript-eslint/type-utils from 8.43.0 to 8.44.1 ([#48](https://github.com/noshiro-pf/eslint-config-typed/issues/48)) ([048308f](https://github.com/noshiro-pf/eslint-config-typed/commit/048308fa8cc5febc4adadc2dbd28d3cd8bdac2de))
+
 ## [1.2.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.5...v1.2.6) (2025-09-21)
 
 ### Bug Fixes
