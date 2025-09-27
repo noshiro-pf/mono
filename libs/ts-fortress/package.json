@@ -98,7 +98,7 @@
     "semantic-release": "^24.2.9",
     "ts-repo-utils": "^7.7.0",
     "tslib": "^2.8.1",
-    "tsx": "^4.20.5",
+    "tsx": "^4.20.6",
     "typedoc": "^0.28.13",
     "typedoc-plugin-markdown": "^4.8.1",
     "typescript": "^5.9.2",
