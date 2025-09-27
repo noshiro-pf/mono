@@ -1,3 +1,9 @@
+## [1.2.8](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.7...v1.2.8) (2025-09-27)
+
+### Bug Fixes
+
+- bump eslint-plugin-prefer-arrow-functions from 3.6.2 to 3.8.1 ([#51](https://github.com/noshiro-pf/eslint-config-typed/issues/51)) ([ed68b18](https://github.com/noshiro-pf/eslint-config-typed/commit/ed68b18b6f699ba8c2bd511cd352c36a4ee22be7))
+
 ## [1.2.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.6...v1.2.7) (2025-09-27)
 
 ### Bug Fixes
