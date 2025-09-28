@@ -1,3 +1,9 @@
+## [7.7.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.7.0...v7.7.1) (2025-09-28)
+
+### Bug Fixes
+
+- bump ts-data-forge from 3.2.0 to 3.3.0 ([#159](https://github.com/noshiro-pf/ts-repo-utils/issues/159)) ([4cac5ca](https://github.com/noshiro-pf/ts-repo-utils/commit/4cac5ca136b07f3e93e57453e1ffc54dba78c98d))
+
 # [7.7.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.6.0...v7.7.0) (2025-09-17)
 
 ### Features
