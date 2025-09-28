@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### OptionalPropertyType\<T\>
+### OptionalPropertyType
 
 > **OptionalPropertyType**\<`T`\> = `T` & `PartiallyRequired`\<`T`, `"optional"`\>
 
@@ -22,7 +22,7 @@ Defined in: [src/record/optional.mts:3](https://github.com/noshiro-pf/ts-fortres
 
 ---
 
-### RequiredPropertyType\<T\>
+### RequiredPropertyType
 
 > **RequiredPropertyType**\<`T`\> = `PartiallyOptional`\<`T`, `"optional"`\>
 

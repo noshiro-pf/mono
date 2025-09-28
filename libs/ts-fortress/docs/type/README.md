@@ -12,7 +12,7 @@
 
 ## Type Aliases
 
-### ~~OptionalType\<A\>~~
+### ~~OptionalType~~
 
 > **OptionalType**\<`A`\> = `MergeIntersection`\<[`Type`](#type)\<`A`\> & `Readonly`\<\{ `optional`: `true`; \}\>\>
 
@@ -28,7 +28,7 @@ Defined in: [src/type.mts:30](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 ---
 
-### RecordType\<R\>
+### RecordType
 
 > **RecordType**\<`R`\> = [`Type`](#type)\<[`RecordTypeValue`](namespaces/TsFortressInternal.md#recordtypevalue)\<`R`\>\> & `Readonly`\<\{ `allowExcessProperties`: `boolean`; `shape`: `R`; \}\>
 
@@ -42,7 +42,7 @@ Defined in: [src/type.mts:34](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 ---
 
-### Type\<A\>
+### Type
 
 > **Type**\<`A`\> = `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is A`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is A`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`A`, readonly [`ValidationError`](../utils/validation-error.md#validationerror)[]\>; \}\>
 
@@ -65,7 +65,7 @@ Defined in: [src/type.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 ---
 
-### TypeOf\<A\>
+### TypeOf
 
 > **TypeOf**\<`A`\> = `A`\[`"defaultValue"`\]
 

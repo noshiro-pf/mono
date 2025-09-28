@@ -12,7 +12,7 @@
 
 ## Type Aliases
 
-### Result\<S, E\>
+### Result
 
 > **Result**\<`S`, `E`\> = `Ok_`\<`S`\> \| `Err_`\<`E`\>
 

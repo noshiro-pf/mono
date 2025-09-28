@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### RecordTypeValue\<R\>
+### RecordTypeValue
 
 > **RecordTypeValue**\<`R`\> = [`RecordTypeValueImpl`](#recordtypevalueimpl)\<`R`\>
 
@@ -22,7 +22,7 @@ Defined in: [src/type.mts:49](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 ---
 
-### RecordTypeValueImpl\<R\>
+### RecordTypeValueImpl
 
 > **RecordTypeValueImpl**\<`R`\> = `RecordTypeValueImplSub`\<`R`, `OptionalTypeKeys`\<`R`\>\>
 

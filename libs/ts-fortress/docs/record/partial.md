@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### PartialType\<R, KeysToBeOptional\>
+### PartialType
 
 > **PartialType**\<`R`, `KeysToBeOptional`\> = [`RecordType`](../type/README.md#recordtype)\<`PartialTypeShape`\<`R`, `KeysToBeOptional`\>\>
 

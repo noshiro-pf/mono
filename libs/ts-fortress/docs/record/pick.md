@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### PickedType\<R, KeysToPick\>
+### PickedType
 
 > **PickedType**\<`R`, `KeysToPick`\> = [`RecordType`](../type/README.md#recordtype)\<`Pick`\<`R`, `ArrayElement`\<`KeysToPick`\>\>\>
 

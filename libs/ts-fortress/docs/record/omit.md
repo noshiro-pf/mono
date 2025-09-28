@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### OmittedType\<R, KeysToOmit\>
+### OmittedType
 
 > **OmittedType**\<`R`, `KeysToOmit`\> = [`RecordType`](../type/README.md#recordtype)\<`Omit`\<`R`, `ArrayElement`\<`KeysToOmit`\>\>\>
 

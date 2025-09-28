@@ -22,7 +22,7 @@ Represents a `Result` with unknown success and error types.
 
 ---
 
-### Err\<E\>
+### Err
 
 > **Err**\<`E`\> = `Err_`\<`E`\>
 
@@ -40,7 +40,7 @@ The type of the error value.
 
 ---
 
-### NarrowToErr\<R\>
+### NarrowToErr
 
 > **NarrowToErr**\<`R`\> = `R` _extends_ [`Ok`](#ok)\<`unknown`\> ? `never` : `R`
 
@@ -59,7 +59,7 @@ The `Result.Base` type to narrow.
 
 ---
 
-### NarrowToOk\<R\>
+### NarrowToOk
 
 > **NarrowToOk**\<`R`\> = `R` _extends_ [`Err`](#err)\<`unknown`\> ? `never` : `R`
 
@@ -78,7 +78,7 @@ The `Result.Base` type to narrow.
 
 ---
 
-### Ok\<S\>
+### Ok
 
 > **Ok**\<`S`\> = `Ok_`\<`S`\>
 
@@ -96,7 +96,7 @@ The type of the success value.
 
 ---
 
-### UnwrapErr\<R\>
+### UnwrapErr
 
 > **UnwrapErr**\<`R`\> = `R` _extends_ [`Err`](#err)\<infer E\> ? `E` : `never`
 
@@ -115,7 +115,7 @@ The `Result.Base` type to unwrap.
 
 ---
 
-### UnwrapOk\<R\>
+### UnwrapOk
 
 > **UnwrapOk**\<`R`\> = `R` _extends_ [`Ok`](#ok)\<infer S\> ? `S` : `never`
 

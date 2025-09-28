@@ -8,7 +8,7 @@
 
 ## Type Aliases
 
-### RequiredType\<R, KeysToBeRequired\>
+### RequiredType
 
 > **RequiredType**\<`R`, `KeysToBeRequired`\> = [`RecordType`](../type/README.md#recordtype)\<`RequiredTypeShape`\<`R`, `KeysToBeRequired`\>\>
 

@@ -32,7 +32,7 @@ Defined in: [src/globals.d.mts:9](https://github.com/noshiro-pf/ts-fortress/blob
 
 ---
 
-### PartialReadonly\<T\>
+### PartialReadonly
 
 > **PartialReadonly**\<`T`\> = `Partial`\<`Readonly`\<`T`\>\>
 
@@ -78,7 +78,7 @@ Defined in: [src/globals.d.mts:24](https://github.com/noshiro-pf/ts-fortress/blo
 
 ---
 
-### UuidBaseString\<V\>
+### UuidBaseString
 
 > **UuidBaseString**\<`V`\> = `` `${string}-${string}-${V}${string}-${string}-${string}` `` \| `"00000000-0000-0000-0000-000000000000"` \| `"ffffffff-ffff-ffff-ffff-ffffffffffff"`
 
