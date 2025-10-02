@@ -1,5 +1,5 @@
 {
-  "import": ["../../../.cspell.json"],
+  "import": ["../../.cspell.json"],
   "version": "0.2",
   "language": "en",
   "words": [
