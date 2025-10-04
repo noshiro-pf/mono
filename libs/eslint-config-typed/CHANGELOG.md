@@ -1,3 +1,9 @@
+## [1.2.12](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.11...v1.2.12) (2025-10-04)
+
+### Bug Fixes
+
+- bump eslint-plugin-testing-library from 7.8.0 to 7.11.0 ([#53](https://github.com/noshiro-pf/eslint-config-typed/issues/53)) ([f6426a2](https://github.com/noshiro-pf/eslint-config-typed/commit/f6426a2e2b658bfc84ab52d0cfca6582faea765d))
+
 ## [1.2.11](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.10...v1.2.11) (2025-10-04)
 
 ### Bug Fixes
