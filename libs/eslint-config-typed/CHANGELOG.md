@@ -1,3 +1,9 @@
+## [1.2.10](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.9...v1.2.10) (2025-10-04)
+
+### Bug Fixes
+
+- bump eslint-plugin-react from 7.37.4 to 7.37.5 ([#54](https://github.com/noshiro-pf/eslint-config-typed/issues/54)) ([e9c5661](https://github.com/noshiro-pf/eslint-config-typed/commit/e9c5661c14213c23dba29e9a9fa542063ce75a73))
+
 ## [1.2.9](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.8...v1.2.9) (2025-10-04)
 
 ### Bug Fixes
