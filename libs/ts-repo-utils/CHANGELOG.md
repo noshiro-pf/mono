@@ -1,3 +1,9 @@
+## [7.7.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.7.1...v7.7.2) (2025-10-04)
+
+### Bug Fixes
+
+- bump tsx from 4.20.5 to 4.20.6 ([#168](https://github.com/noshiro-pf/ts-repo-utils/issues/168)) ([c629a1c](https://github.com/noshiro-pf/ts-repo-utils/commit/c629a1c81c2eceb85cc578d3a1c39f917bec35e3))
+
 ## [7.7.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.7.0...v7.7.1) (2025-09-28)
 
 ### Bug Fixes
