@@ -1,3 +1,9 @@
+# [1.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.12...v1.3.0) (2025-10-11)
+
+### Features
+
+- export defineKnownRules utility ([#63](https://github.com/noshiro-pf/eslint-config-typed/issues/63)) ([b977b05](https://github.com/noshiro-pf/eslint-config-typed/commit/b977b05553624c22d834539bbba205a56036808f))
+
 ## [1.2.12](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.11...v1.2.12) (2025-10-04)
 
 ### Bug Fixes
