@@ -579,7 +579,7 @@ namespace NoSkippedTest {
  *  | type           | suggestion |
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
- *  | recommended    | true       |
+ *  | recommended    | false      |
  *  ```
  */
 namespace NoSlowedTest {
@@ -629,7 +629,8 @@ namespace NoStandaloneExpect {
 }
 
 /**
- * Prevent unsafe variable references in page.evaluate()
+ * Prevent unsafe variable references in page.evaluate() and
+ * page.addInitScript()
  *
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-unsafe-references.md
  *
@@ -679,6 +680,24 @@ namespace NoUselessAwait {
  *  ```
  */
 namespace NoUselessNot {
+  export type RuleEntry = Linter.RuleSeverity;
+}
+
+/**
+ * Prevent usage of page.waitForNavigation()
+ *
+ * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-wait-for-navigation.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
+ *  ```
+ */
+namespace NoWaitForNavigation {
   export type RuleEntry = Linter.RuleSeverity;
 }
 
@@ -1217,6 +1236,90 @@ namespace ValidExpectInPromise {
 }
 
 /**
+ * Enforce valid tag format in Playwright test blocks
+ *
+ * ```md
+ * | key         | value   |
+ * | :---------- | :------ |
+ * | type        | problem |
+ * | deprecated  | false   |
+ * | recommended | true    |
+ * ```
+ */
+namespace ValidTestTags {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allowedTags": {
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "source": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "type": "object"
+   *             }
+   *           ]
+   *         },
+   *         "type": "array"
+   *       },
+   *       "disallowedTags": {
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "source": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "type": "object"
+   *             }
+   *           ]
+   *         },
+   *         "type": "array"
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly allowedTags?: readonly (
+      | string
+      | {
+          readonly source?: string;
+        }
+    )[];
+    readonly disallowedTags?: readonly (
+      | string
+      | {
+          readonly source?: string;
+        }
+    )[];
+  };
+
+  export type RuleEntry =
+    | Linter.StringSeverity
+    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
  * Enforce valid titles
  *
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/valid-title.md
@@ -1358,6 +1461,7 @@ export type EslintPlaywrightRules = {
   readonly 'playwright/no-unsafe-references': NoUnsafeReferences.RuleEntry;
   readonly 'playwright/no-useless-await': NoUselessAwait.RuleEntry;
   readonly 'playwright/no-useless-not': NoUselessNot.RuleEntry;
+  readonly 'playwright/no-wait-for-navigation': NoWaitForNavigation.RuleEntry;
   readonly 'playwright/no-wait-for-selector': NoWaitForSelector.RuleEntry;
   readonly 'playwright/no-wait-for-timeout': NoWaitForTimeout.RuleEntry;
   readonly 'playwright/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
@@ -1380,6 +1484,7 @@ export type EslintPlaywrightRules = {
   readonly 'playwright/valid-describe-callback': ValidDescribeCallback.RuleEntry;
   readonly 'playwright/valid-expect': ValidExpect.RuleEntry;
   readonly 'playwright/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
+  readonly 'playwright/valid-test-tags': ValidTestTags.RuleEntry;
   readonly 'playwright/valid-title': ValidTitle.RuleEntry;
 };
 
@@ -1398,5 +1503,6 @@ export type EslintPlaywrightRulesOption = {
   readonly 'playwright/require-hook': RequireHook.Options;
   readonly 'playwright/require-top-level-describe': RequireTopLevelDescribe.Options;
   readonly 'playwright/valid-expect': ValidExpect.Options;
+  readonly 'playwright/valid-test-tags': ValidTestTags.Options;
   readonly 'playwright/valid-title': ValidTitle.Options;
 };

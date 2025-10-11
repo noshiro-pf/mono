@@ -156,6 +156,23 @@ namespace NoIdenticalTests {
 }
 
 /**
+ * Disallow using the `meta.replacedBy` rule property
+ *
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-meta-replaced-by.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoMetaReplacedBy {
+  export type RuleEntry = Linter.RuleSeverity;
+}
+
+/**
  * Disallow rules `meta.schema` properties to include defaults
  *
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-meta-schema-default.md
@@ -165,7 +182,7 @@ namespace NoIdenticalTests {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | recommended | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace NoMetaSchemaDefault {
@@ -459,7 +476,7 @@ namespace ReportMessageFormat {
  *  | type        | suggestion |
  *  | deprecated  | false      |
  *  | fixable     | code       |
- *  | recommended | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace RequireMetaDefaultOptions {
@@ -680,7 +697,7 @@ namespace RequireMetaHasSuggestions {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | recommended | false      |
+ *  | recommended | true       |
  *  ```
  */
 namespace RequireMetaSchemaDescription {
@@ -843,6 +860,7 @@ export type EslintPluginRules = {
   readonly 'eslint-plugin/no-deprecated-context-methods': NoDeprecatedContextMethods.RuleEntry;
   readonly 'eslint-plugin/no-deprecated-report-api': NoDeprecatedReportApi.RuleEntry;
   readonly 'eslint-plugin/no-identical-tests': NoIdenticalTests.RuleEntry;
+  readonly 'eslint-plugin/no-meta-replaced-by': NoMetaReplacedBy.RuleEntry;
   readonly 'eslint-plugin/no-meta-schema-default': NoMetaSchemaDefault.RuleEntry;
   readonly 'eslint-plugin/no-missing-message-ids': NoMissingMessageIds.RuleEntry;
   readonly 'eslint-plugin/no-missing-placeholders': NoMissingPlaceholders.RuleEntry;

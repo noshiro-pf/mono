@@ -32,4 +32,5 @@ export const eslintTestingLibraryRules: EslintTestingLibraryRules = {
   'testing-library/prefer-implicit-assert': 'off',
   'testing-library/prefer-query-matchers': 'off',
   'testing-library/prefer-user-event': 'off',
+  'testing-library/no-test-id-queries': 'error',
 } as const;

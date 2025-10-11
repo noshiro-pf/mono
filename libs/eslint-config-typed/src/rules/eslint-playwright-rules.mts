@@ -60,4 +60,6 @@ export const eslintPlaywrightRules: EslintPlaywrightRules = {
   'playwright/prefer-web-first-assertions': 'error',
   'playwright/require-soft-assertions': 'error',
   'playwright/valid-expect-in-promise': 'error',
+  'playwright/no-wait-for-navigation': 'error',
+  'playwright/valid-test-tags': 'error',
 } as const;

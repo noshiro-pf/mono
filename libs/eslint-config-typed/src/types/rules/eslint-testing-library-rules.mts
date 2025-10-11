@@ -77,6 +77,7 @@ namespace AwaitAsyncEvents {
  *  | :--------- | :------ |
  *  | type       | problem |
  *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace AwaitAsyncQueries {
@@ -93,6 +94,7 @@ namespace AwaitAsyncQueries {
  *  | :--------- | :------ |
  *  | type       | problem |
  *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace AwaitAsyncUtils {
@@ -225,6 +227,7 @@ namespace NoAwaitSyncEvents {
  *  | :--------- | :------ |
  *  | type       | problem |
  *  | deprecated | false   |
+ *  | fixable    | code    |
  *  ```
  */
 namespace NoAwaitSyncQueries {
@@ -403,14 +406,14 @@ namespace NoNodeAccess {
    *       "allowContainerFirstChild": {
    *         "type": "boolean"
    *       }
-   *     }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
    */
   export type Options = {
     readonly allowContainerFirstChild?: boolean;
-    readonly [k: string]: unknown;
   };
 
   export type RuleEntry =
@@ -462,19 +465,35 @@ namespace NoRenderInLifecycle {
    *         ],
    *         "type": "string"
    *       }
-   *     }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
    */
   export type Options = {
     readonly allowTestingFrameworkSetupHook?: 'beforeAll' | 'beforeEach';
-    readonly [k: string]: unknown;
   };
 
   export type RuleEntry =
     | Linter.StringSeverity
     | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+}
+
+/**
+ * Ensure no `data-testid` queries are used
+ *
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-test-id-queries.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoTestIdQueries {
+  export type RuleEntry = Linter.RuleSeverity;
 }
 
 /**
@@ -501,14 +520,14 @@ namespace NoUnnecessaryAct {
    *       "isStrict": {
    *         "type": "boolean"
    *       }
-   *     }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
    */
   export type Options = {
     readonly isStrict?: boolean;
-    readonly [k: string]: unknown;
   };
 
   export type RuleEntry =
@@ -542,6 +561,7 @@ namespace NoWaitForMultipleAssertions {
  *  | :--------- | :--------- |
  *  | type       | suggestion |
  *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoWaitForSideEffects {
@@ -662,6 +682,7 @@ namespace PreferImplicitAssert {
  *  | :--------- | :--------- |
  *  | type       | suggestion |
  *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace PreferPresenceQueries {
@@ -749,7 +770,8 @@ namespace PreferQueryMatchers {
    *             "matcher": {
    *               "type": "string"
    *             }
-   *           }
+   *           },
+   *           "additionalProperties": false
    *         }
    *       }
    *     }
@@ -761,7 +783,6 @@ namespace PreferQueryMatchers {
     readonly validEntries?: readonly {
       readonly query?: 'get' | 'query';
       readonly matcher?: string;
-      readonly [k: string]: unknown;
     }[];
   };
 
@@ -810,14 +831,14 @@ namespace PreferUserEvent {
    *       "allowedMethods": {
    *         "type": "array"
    *       }
-   *     }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
    */
   export type Options = {
     readonly allowedMethods?: readonly unknown[];
-    readonly [k: string]: unknown;
   };
 
   export type RuleEntry =
@@ -856,6 +877,7 @@ export type EslintTestingLibraryRules = {
   readonly 'testing-library/no-node-access': NoNodeAccess.RuleEntry;
   readonly 'testing-library/no-promise-in-fire-event': NoPromiseInFireEvent.RuleEntry;
   readonly 'testing-library/no-render-in-lifecycle': NoRenderInLifecycle.RuleEntry;
+  readonly 'testing-library/no-test-id-queries': NoTestIdQueries.RuleEntry;
   readonly 'testing-library/no-unnecessary-act': NoUnnecessaryAct.RuleEntry;
   readonly 'testing-library/no-wait-for-multiple-assertions': NoWaitForMultipleAssertions.RuleEntry;
   readonly 'testing-library/no-wait-for-side-effects': NoWaitForSideEffects.RuleEntry;

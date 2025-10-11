@@ -32,4 +32,5 @@ export const eslintPluginRules: EslintPluginRules = {
   'eslint-plugin/test-case-shorthand-strings': 'error',
   'eslint-plugin/no-meta-schema-default': 'error',
   'eslint-plugin/require-meta-default-options': 'error',
+  'eslint-plugin/no-meta-replaced-by': 'error',
 } as const;

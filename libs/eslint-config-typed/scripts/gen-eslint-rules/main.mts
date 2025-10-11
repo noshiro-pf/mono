@@ -8,11 +8,11 @@ import { replaceRulesType } from './functions/replace-rules-type.mjs';
 
 const thisDir = import.meta.dirname;
 
-const outDir = path.resolve(thisDir, '../src/types/rules');
+const outDir = path.resolve(thisDir, '../../src/types/rules');
 
 const eslintConfigPath = path.resolve(thisDir, './eslint.config.gen.mjs');
 
-const formatCommand = 'npx prettier --write src/types/rules/*.mts';
+const formatCommand = 'npm exec -- prettier --write src/types/rules/*.mts';
 
 export const generateRulesType = async (): Promise<void> => {
   {
@@ -149,3 +149,7 @@ const runReplace = async (): Promise<
 
   return { type: 'ok' };
 };
+
+if (isDirectlyExecuted(import.meta.url)) {
+  await generateRulesType();
+}

@@ -36,7 +36,17 @@ namespace PreferArrowFunctions {
    *       },
    *       "allowNamedFunctions": {
    *         "default": false,
-   *         "type": "boolean"
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean"
+   *           },
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "only-expressions"
+   *             ]
+   *           }
+   *         ]
    *       },
    *       "allowObjectProperties": {
    *         "default": false,
@@ -67,7 +77,7 @@ namespace PreferArrowFunctions {
    */
   export type Options = {
     readonly allowedNames?: readonly string[];
-    readonly allowNamedFunctions?: boolean;
+    readonly allowNamedFunctions?: boolean | 'only-expressions';
     readonly allowObjectProperties?: boolean;
     readonly classPropertiesAllowed?: boolean;
     readonly disallowPrototype?: boolean;

@@ -31,9 +31,9 @@ const generatorOption: Readonly<{
   explicitRuleDefaultOption: false,
 } as const;
 
-const RuleSeverityWithDefaultOption = 'RuleSeverityWithDefaultOption';
+const RuleSeverityWithDefaultOption = 'Linter.Severity';
 
-const RuleSeverity = generatorOption.explicitRuleDefaultOption
+const RuleSeverityForNoOption = generatorOption.explicitRuleDefaultOption
   ? 'Linter.StringSeverity'
   : 'Linter.RuleSeverity';
 
@@ -46,7 +46,7 @@ const compilerConfig = {
 const normalizeToSchemaArray = (
   schema: DeepReadonly<JSONSchema4 | JSONSchema4[]> | undefined,
 ): DeepReadonly<JSONSchema4[]> =>
-  // schema が JSONSchema4 | JSONSchema4[] | undefined 型を満たしていない plugin があったためその問題を吸収する対応。
+  // Some plugins violate the JSONSchema4 | JSONSchema4[] | undefined contract, so absorb that inconsistency here.
   typeof schema !== 'object' ? [] : Arr.isArray(schema) ? schema : [schema];
 
 const removeMultiLineCommentCharacter = (str: string): string =>
@@ -162,12 +162,11 @@ const createResult = async (
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
     "import { type Linter } from 'eslint';",
-    "import { type RuleSeverityWithDefaultOption } from '../rule-severity-branded.mjs';",
     ...(schemaList.some(({ schema }) => schema.length === 1)
       ? [
           '',
-          `type SpreadOptionsIfIsArray<T extends readonly [${RuleSeverity}, unknown]> =`,
-          `T[1] extends readonly unknown[] ? readonly [${RuleSeverity}, ...T[1]] : T;`,
+          `type SpreadOptionsIfIsArray<T extends readonly [${RuleSeverityForNoOption}, unknown]> =`,
+          `T[1] extends readonly unknown[] ? readonly [${RuleSeverityForNoOption}, ...T[1]] : T;`,
         ]
       : []),
     '',
@@ -184,7 +183,9 @@ const createResult = async (
     } else {
       switch (schema.length) {
         case 0:
-          mut_resultToWrite.push(`  export type RuleEntry = ${RuleSeverity};`);
+          mut_resultToWrite.push(
+            `  export type RuleEntry = ${RuleSeverityForNoOption};`,
+          );
           break;
 
         case 1: {
@@ -196,7 +197,6 @@ const createResult = async (
           }
 
           /* e.g. "export type Options = { ... };" */
-
           const optionsType = await compile(
             // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             sc as JSONSchema4,
@@ -213,7 +213,7 @@ const createResult = async (
             generatorOption.explicitRuleDefaultOption
               ? `"off" | ${RuleSeverityWithDefaultOption}`
               : 'Linter.StringSeverity',
-            `   | SpreadOptionsIfIsArray<readonly [${RuleSeverity}, Options]>;`,
+            `   | SpreadOptionsIfIsArray<readonly [${RuleSeverityForNoOption}, Options]>;`,
           );
           break;
         }
@@ -222,7 +222,6 @@ const createResult = async (
           mut_resultToWrite.push(...rawSchemaToString(rawSchema));
 
           /* e.g. "export type Options = { ... };" */
-
           const optionsTypeList: readonly string[] = await Promise.all(
             schema.map((s, index) =>
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -246,7 +245,7 @@ const createResult = async (
             ...OptionsStrs.map(
               (_, i) =>
                 `   | readonly [${
-                  RuleSeverity
+                  RuleSeverityForNoOption
                 }, ${OptionsStrs.slice(0, i + 1).join(', ')}]`,
             ),
           );
@@ -376,7 +375,7 @@ export const generateRulesTypeCore = async (
     schema: normalizeToSchemaArray(
       falseToUndefined(
         pluginName === '@typescript-eslint/eslint-plugin'
-          ? // schema に入った変更で compile できなくなってしまったので暫定対応
+          ? // Temporary workaround because schema changes made the compilation fail
             deepReplace(meta?.schema, '#/items/0/', '#/')
           : meta?.schema,
       ),

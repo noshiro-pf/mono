@@ -7241,8 +7241,7 @@ namespace NoMisleadingCharacterClass {
    *     "type": "object",
    *     "properties": {
    *       "allowEscape": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -11880,7 +11879,6 @@ namespace PreserveCaughtError {
    *     "properties": {
    *       "requireCatchParameter": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Requires the catch blocks to always have the caught error parameter so it is not discarded."
    *       }
    *     },

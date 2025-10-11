@@ -1,4 +1,4 @@
 {
-  "extends": "../configs/tsconfig/tsconfig.build.json",
-  "include": ["../src/types/rules"]
+  "extends": "../../configs/tsconfig/tsconfig.build.json",
+  "include": ["../../src/types/rules"]
 }

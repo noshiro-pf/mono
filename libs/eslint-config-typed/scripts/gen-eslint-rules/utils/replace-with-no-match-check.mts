@@ -15,9 +15,9 @@ export const replaceWithNoMatchCheck =
     searchValue: RegExp | string,
     replaceValue: string,
     options?: Readonly<
-      // 検索文字列がそもそも見つからない場合には置換はスキップされるため、
-      // onNotFound（検索文字列が見つからない）であっても throw/warn しない場合には
-      // onNoChange（置換結果に変化が無い）でより強いエラーは出さない。
+      // When the search string is absent, the replacement is skipped entirely,
+      // so if onNotFound chooses not to throw or warn, we avoid escalating via
+      // onNoChange (no differences after replacement).
       | {
           onNotFound: 'off';
           onNoChange?: 'off';
