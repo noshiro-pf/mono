@@ -580,6 +580,7 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 - [rules/eslint-vitest-rules](rules/eslint-vitest-rules.md)
 - [rules/typescript-eslint-rules](rules/typescript-eslint-rules.md)
 - [types](types.md)
+- [types/define-known-rules](types/define-known-rules.md)
 - [types/flat-config](types/flat-config.md)
 - [types/rules](types/rules.md)
 - [types/rules/eslint-array-func-rules](types/rules/eslint-array-func-rules.md)

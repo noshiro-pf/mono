@@ -1,6 +1,6 @@
 import globals from 'globals';
 import { eslintCypressRules } from '../rules/index.mjs';
-import { type FlatConfig } from '../types/index.mjs';
+import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
 export const eslintFlatConfigForCypress = (
   files?: readonly string[],
@@ -15,7 +15,7 @@ export const eslintFlatConfigForCypress = (
         ...globals.node,
       },
     },
-    rules: {
+    rules: defineKnownRules({
       ...eslintCypressRules,
       'jest/consistent-test-it': 'off',
       'vitest/consistent-test-it': 'off',
@@ -23,5 +23,5 @@ export const eslintFlatConfigForCypress = (
       'vitest/expect-expect': 'off',
       'jest/valid-describe-callback': 'off',
       'vitest/valid-describe-callback': 'off',
-    },
+    }),
   }) as const;

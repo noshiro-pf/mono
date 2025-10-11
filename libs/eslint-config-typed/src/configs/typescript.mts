@@ -10,7 +10,7 @@ import {
   eslintUnicornRules,
   typescriptEslintRules,
 } from '../rules/index.mjs';
-import { type EslintImportsRules, type FlatConfig } from '../types/index.mjs';
+import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 import { eslintFlatConfigForTypeScriptWithoutRules } from './typescript-without-rules.mjs';
 
 export const eslintFlatConfigForTypeScript = ({
@@ -30,7 +30,7 @@ export const eslintFlatConfigForTypeScript = ({
   }),
   {
     files: files ?? ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
-    rules: {
+    rules: defineKnownRules({
       ...eslintArrayFuncRules,
       ...eslintFunctionalRules,
       ...eslintTotalFunctionsRules,
@@ -47,23 +47,22 @@ export const eslintFlatConfigForTypeScript = ({
         {
           packageDir: packageDirs,
         },
-      ] satisfies EslintImportsRules['import/no-extraneous-dependencies'],
-    },
+      ],
+    }),
   } satisfies FlatConfig,
   {
     files: ['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
-    rules: {
+    rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-var-requires': 'off',
       'import/no-internal-modules': 'off',
-    },
+    }),
   } satisfies FlatConfig,
   {
     files: ['**/*.d.ts', '**/*.d.mts', '**/*.d.cts'],
-    rules: {
+    rules: defineKnownRules({
       '@typescript-eslint/triple-slash-reference': 'off',
       'import/unambiguous': 'off',
-    },
+    }),
   } satisfies FlatConfig,
   {
     files: [
@@ -81,12 +80,12 @@ export const eslintFlatConfigForTypeScript = ({
       '**/playwright.config.ts',
       '**/playwright.config.mts',
     ],
-    rules: {
+    rules: defineKnownRules({
       '@typescript-eslint/no-restricted-imports': 'off',
       'import/no-default-export': 'off',
       'import/no-internal-modules': 'off',
       'import/no-named-as-default': 'off',
       'import/namespace': 'off',
-    },
+    }),
   } satisfies FlatConfig,
 ];

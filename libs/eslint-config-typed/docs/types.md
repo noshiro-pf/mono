@@ -8,6 +8,12 @@
 
 ## References
 
+### defineKnownRules
+
+Re-exports [defineKnownRules](types/define-known-rules.md#defineknownrules)
+
+---
+
 ### EslintArrayFuncRules
 
 Re-exports [EslintArrayFuncRules](types/rules/eslint-array-func-rules.md#eslintarrayfuncrules)

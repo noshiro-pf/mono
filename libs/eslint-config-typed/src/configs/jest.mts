@@ -1,6 +1,6 @@
 import globals from 'globals';
 import { eslintJestRules } from '../rules/index.mjs';
-import { type FlatConfig } from '../types/index.mjs';
+import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
 export const eslintFlatConfigForJest = (
   files?: readonly string[],
@@ -17,7 +17,7 @@ export const eslintFlatConfigForJest = (
         // ...globals.jest,
       },
     },
-    rules: {
+    rules: defineKnownRules({
       ...eslintJestRules,
-    },
+    }),
   }) as const satisfies FlatConfig;

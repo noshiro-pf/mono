@@ -1,6 +1,6 @@
 import globals from 'globals';
 import { eslintPlaywrightRules } from '../rules/index.mjs';
-import { type FlatConfig } from '../types/index.mjs';
+import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
 export const eslintFlatConfigForPlaywright = (
   files?: readonly string[],
@@ -15,7 +15,7 @@ export const eslintFlatConfigForPlaywright = (
         ...globals.node,
       },
     },
-    rules: {
+    rules: defineKnownRules({
       ...eslintPlaywrightRules,
       'jest/consistent-test-it': 'off',
       'vitest/consistent-test-it': 'off',
@@ -24,5 +24,5 @@ export const eslintFlatConfigForPlaywright = (
       'jest/valid-describe-callback': 'off',
       'vitest/valid-describe-callback': 'off',
       'vitest/consistent-test-filename': 'off',
-    },
+    }),
   }) as const;

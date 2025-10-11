@@ -32,6 +32,12 @@ Re-exports [createRule](plugins/total-functions/rules/common.md#createrule)
 
 ---
 
+### defineKnownRules
+
+Re-exports [defineKnownRules](types/define-known-rules.md#defineknownrules)
+
+---
+
 ### effects
 
 Re-exports [effects](plugins/total-functions/rules/fp-ts.md#effects)

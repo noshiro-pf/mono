@@ -7,7 +7,7 @@ import {
   eslintReactRules,
   restrictedGlobalsForFrontend,
 } from '../rules/index.mjs';
-import { type EslintRules, type FlatConfig } from '../types/index.mjs';
+import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
 export const eslintFlatConfigForReactBase = (
   files?: readonly string[],
@@ -26,16 +26,12 @@ export const eslintFlatConfigForReactBase = (
       },
       sourceType: 'module',
     },
-    rules: {
+    rules: defineKnownRules({
       ...eslintReactRules,
       ...eslintReactHooksRules,
       ...eslintReactRefreshRules,
       ...eslintJsxA11yRules,
       ...eslintReactPerfRules,
-
-      'no-restricted-globals': [
-        'error',
-        ...restrictedGlobalsForFrontend,
-      ] satisfies EslintRules['no-restricted-globals'],
-    },
+      'no-restricted-globals': ['error', ...restrictedGlobalsForFrontend],
+    }),
   }) as const;
