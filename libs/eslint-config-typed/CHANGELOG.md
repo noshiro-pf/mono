@@ -1,3 +1,9 @@
+# [1.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.4.0...v1.5.0) (2025-10-11)
+
+### Features
+
+- add withDefaultOption utility ([#64](https://github.com/noshiro-pf/eslint-config-typed/issues/64)) ([db82ba8](https://github.com/noshiro-pf/eslint-config-typed/commit/db82ba8ab7a250bbcde707a2e5c1e9f141a24a68))
+
 # [1.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.3.0...v1.4.0) (2025-10-11)
 
 ### Features
