@@ -12,7 +12,7 @@
 
 > **MessageId** = `"errorStringGeneric"`
 
-Defined in: [src/plugins/total-functions/rules/unsafe-assignment-rule.mts:10](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/unsafe-assignment-rule.mts#L10)
+Defined in: [src/plugins/total-functions/rules/unsafe-assignment-rule.mts:15](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/unsafe-assignment-rule.mts#L15)
 
 ## Functions
 
@@ -20,13 +20,13 @@ Defined in: [src/plugins/total-functions/rules/unsafe-assignment-rule.mts:10](ht
 
 > **createNoUnsafeAssignmentRule**(`isUnsafeAssignment`): (`context`) => `RuleListener`
 
-Defined in: [src/plugins/total-functions/rules/unsafe-assignment-rule.mts:13](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/unsafe-assignment-rule.mts#L13)
+Defined in: [src/plugins/total-functions/rules/unsafe-assignment-rule.mts:40](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/unsafe-assignment-rule.mts#L40)
 
 #### Parameters
 
 ##### isUnsafeAssignment
 
-(`checker`, `destinationType`, `sourceType`, `sourceNode`) => `"safe"` \| `"unsafe"`
+(`program`, `checker`, `destinationType`, `sourceType`, `sourceNode`) => `"safe"` \| `"unsafe"`
 
 #### Returns
 
@@ -41,3 +41,33 @@ Defined in: [src/plugins/total-functions/rules/unsafe-assignment-rule.mts:13](ht
 ##### Returns
 
 `RuleListener`
+
+---
+
+### getSafeTypeImmutability()
+
+> **getSafeTypeImmutability**(`program`, `_checker`, `target`, `overrides?`): `Immutability`
+
+Defined in: [src/plugins/total-functions/rules/unsafe-assignment-rule.mts:17](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/unsafe-assignment-rule.mts#L17)
+
+#### Parameters
+
+##### program
+
+`Program`
+
+##### \_checker
+
+`TypeChecker`
+
+##### target
+
+`Type`
+
+##### overrides?
+
+`ImmutabilityOverrides`
+
+#### Returns
+
+`Immutability`

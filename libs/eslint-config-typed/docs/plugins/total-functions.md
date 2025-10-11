@@ -50,6 +50,12 @@ Re-exports [FpTsEffectType](total-functions/rules/fp-ts.md#fptseffecttype)
 
 ---
 
+### getSafeTypeImmutability
+
+Re-exports [getSafeTypeImmutability](total-functions/rules/unsafe-assignment-rule.md#getsafetypeimmutability)
+
+---
+
 ### isLiteral
 
 Re-exports [isLiteral](total-functions/rules/common.md#isliteral)

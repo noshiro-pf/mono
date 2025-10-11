@@ -29,11 +29,11 @@ export const eslintTestingLibraryRules: EslintTestingLibraryRules = {
   'testing-library/prefer-query-by-disappearance': 'error',
   'testing-library/prefer-screen-queries': 'error',
   'testing-library/render-result-naming-convention': 'error',
+  'testing-library/no-test-id-queries': 'error',
 
   'testing-library/consistent-data-testid': 'off',
   'testing-library/prefer-explicit-assert': 'off',
   'testing-library/prefer-implicit-assert': 'off',
   'testing-library/prefer-query-matchers': 'off',
   'testing-library/prefer-user-event': 'off',
-  'testing-library/no-test-id-queries': 'error',
 } as const;

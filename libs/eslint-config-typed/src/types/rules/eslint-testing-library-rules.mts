@@ -556,6 +556,7 @@ namespace NoUnnecessaryAct {
  *  | :--------- | :--------- |
  *  | type       | suggestion |
  *  | deprecated | false      |
+ *  | fixable    | code       |
  *  ```
  */
 namespace NoWaitForMultipleAssertions {

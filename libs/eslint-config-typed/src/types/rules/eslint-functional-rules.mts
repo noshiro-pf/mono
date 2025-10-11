@@ -10,7 +10,7 @@ type SpreadOptionsIfIsArray<
 /**
  * Enforce functional parameters.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/functional-parameters.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/functional-parameters.md
  *
  *  ```md
  *  | key                  | value       |
@@ -689,7 +689,7 @@ namespace FunctionalParameters {
 /**
  * Enforce treating data as immutable.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/immutable-data.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/immutable-data.md
  *
  *  ```md
  *  | key                  | value       |
@@ -739,6 +739,9 @@ namespace ImmutableData {
    *             ]
    *           }
    *         ]
+   *       },
+   *       "ignoreMapsAndSets": {
+   *         "type": "boolean"
    *       },
    *       "ignoreImmediateMutation": {
    *         "type": "boolean"
@@ -1209,6 +1212,9 @@ namespace ImmutableData {
    *                     }
    *                   ]
    *                 },
+   *                 "ignoreMapsAndSets": {
+   *                   "type": "boolean"
+   *                 },
    *                 "ignoreImmediateMutation": {
    *                   "type": "boolean"
    *                 },
@@ -1251,6 +1257,7 @@ namespace ImmutableData {
     readonly ignoreIdentifierPattern?: string | readonly string[];
     readonly ignoreAccessorPattern?: string | readonly string[];
     readonly ignoreClasses?: boolean | 'fieldsOnly';
+    readonly ignoreMapsAndSets?: boolean;
     readonly ignoreImmediateMutation?: boolean;
     readonly ignoreNonConstDeclarations?:
       | boolean
@@ -1311,6 +1318,7 @@ namespace ImmutableData {
         readonly ignoreIdentifierPattern?: string | readonly string[];
         readonly ignoreAccessorPattern?: string | readonly string[];
         readonly ignoreClasses?: boolean | 'fieldsOnly';
+        readonly ignoreMapsAndSets?: boolean;
         readonly ignoreImmediateMutation?: boolean;
         readonly ignoreNonConstDeclarations?:
           | boolean
@@ -1332,7 +1340,7 @@ namespace ImmutableData {
 /**
  * Disallow classes.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-classes.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-classes.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1390,7 +1398,7 @@ namespace NoClasses {
 /**
  * Disallow inheritance in classes.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-class-inheritance.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-class-inheritance.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1448,7 +1456,7 @@ namespace NoClassInheritance {
 /**
  * Disallow conditional statements.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-conditional-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-conditional-statements.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1468,6 +1476,15 @@ namespace NoConditionalStatements {
    *   {
    *     "type": "object",
    *     "properties": {
+   *       "ignoreCodePattern": {
+   *         "type": [
+   *           "string",
+   *           "array"
+   *         ],
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
    *       "allowReturningBranches": {
    *         "oneOf": [
    *           {
@@ -1488,6 +1505,7 @@ namespace NoConditionalStatements {
    * ```
    */
   export type Options = {
+    readonly ignoreCodePattern?: string | readonly string[];
     readonly allowReturningBranches?: boolean | 'ifExhaustive';
   };
 
@@ -1500,7 +1518,7 @@ namespace NoConditionalStatements {
 /**
  * Disallow expression statements.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-expression-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-expression-statements.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1556,7 +1574,7 @@ namespace NoExpressionStatements {
 /**
  * Disallow mutable variables.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-let.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-let.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1612,7 +1630,7 @@ namespace NoLet {
 /**
  * Disallow imperative loops.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-loop-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-loop-statements.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1630,7 +1648,7 @@ namespace NoLoopStatements {
 /**
  * Restrict types so that only members of the same kind are allowed in them.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-mixed-types.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-mixed-types.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1676,7 +1694,7 @@ namespace NoMixedTypes {
 /**
  * Disallow rejecting promises.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-promise-reject.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-promise-reject.md
  *
  *  ```md
  *  | key                  | value      |
@@ -1694,7 +1712,7 @@ namespace NoPromiseReject {
 /**
  * Disallow functions that don't return anything.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-return-void.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-return-void.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1744,7 +1762,7 @@ namespace NoReturnVoid {
 /**
  * Disallow this access.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-this-expressions.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-this-expressions.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1762,7 +1780,7 @@ namespace NoThisExpressions {
 /**
  * Disallow throwing exceptions.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-throw-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-throw-statements.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1770,7 +1788,7 @@ namespace NoThisExpressions {
  *  | type                 | suggestion  |
  *  | deprecated           | false       |
  *  | recommended          | recommended |
- *  | requiresTypeChecking | false       |
+ *  | requiresTypeChecking | true        |
  *  ```
  */
 namespace NoThrowStatements {
@@ -1804,7 +1822,7 @@ namespace NoThrowStatements {
 /**
  * Disallow try-catch[-finally] and try-finally patterns.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/no-try-statements.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/no-try-statements.md
  *
  *  ```md
  *  | key                  | value       |
@@ -1850,7 +1868,7 @@ namespace NoTryStatements {
 /**
  * Require function parameters to be typed as certain immutability
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/prefer-immutable-types.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/prefer-immutable-types.md
  *
  *  ```md
  *  | key                  | value       |
@@ -3635,7 +3653,7 @@ namespace PreferImmutableTypes {
 /**
  * Prefer property signatures over method signatures.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/prefer-property-signatures.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/prefer-property-signatures.md
  *
  *  ```md
  *  | key                  | value       |
@@ -3678,7 +3696,7 @@ namespace PreferPropertySignatures {
 /**
  * Prefer readonly types over mutable types.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/prefer-readonly-type.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/prefer-readonly-type.md
  *
  *  ```md
  *  | key                  | value       |
@@ -3748,7 +3766,7 @@ namespace PreferReadonlyType {
 /**
  * Replaces `x => f(x)` with just `f`.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/prefer-tacit.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/prefer-tacit.md
  *
  *  ```md
  *  | key                  | value       |
@@ -3791,7 +3809,7 @@ namespace PreferTacit {
 /**
  * Require consistently using either `readonly` keywords or `Readonly<T>`
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/readonly-type.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/readonly-type.md
  *
  *  ```md
  *  | key                  | value       |
@@ -3830,7 +3848,7 @@ namespace ReadonlyType {
 /**
  * Enforce the immutability of types based on patterns.
  *
- * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v7.1.0/docs/rules/type-declaration-immutability.md
+ * @link https://github.com/eslint-functional/eslint-plugin-functional/blob/v9.0.2/docs/rules/type-declaration-immutability.md
  *
  *  ```md
  *  | key                  | value       |

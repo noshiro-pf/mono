@@ -8496,6 +8496,10 @@ namespace NoRestrictedImports {
    *                 "items": {
    *                   "type": "string"
    *                 }
+   *               },
+   *               "allowTypeImports": {
+   *                 "type": "boolean",
+   *                 "description": "Whether to allow type-only imports for a path."
    *               }
    *             },
    *             "additionalProperties": false,
@@ -8542,6 +8546,10 @@ namespace NoRestrictedImports {
    *                         "items": {
    *                           "type": "string"
    *                         }
+   *                       },
+   *                       "allowTypeImports": {
+   *                         "type": "boolean",
+   *                         "description": "Whether to allow type-only imports for a path."
    *                       }
    *                     },
    *                     "additionalProperties": false,
@@ -8607,6 +8615,10 @@ namespace NoRestrictedImports {
    *                       },
    *                       "caseSensitive": {
    *                         "type": "boolean"
+   *                       },
+   *                       "allowTypeImports": {
+   *                         "type": "boolean",
+   *                         "description": "Whether to allow type-only imports for a pattern."
    *                       }
    *                     },
    *                     "additionalProperties": false,
@@ -8675,6 +8687,8 @@ namespace NoRestrictedImports {
             readonly message?: string;
             readonly importNames?: readonly string[];
             readonly allowImportNames?: readonly string[];
+            /** Whether to allow type-only imports for a path. */
+            readonly allowTypeImports?: boolean;
           }
       )[]
     | readonly [
@@ -8686,6 +8700,8 @@ namespace NoRestrictedImports {
                 readonly message?: string;
                 readonly importNames?: readonly string[];
                 readonly allowImportNames?: readonly string[];
+                /** Whether to allow type-only imports for a path. */
+                readonly allowTypeImports?: boolean;
               }
           )[];
           readonly patterns?: readonly UnknownRecord[] | readonly string[];

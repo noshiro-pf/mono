@@ -44,6 +44,12 @@ Re-exports [FpTsEffectType](rules/fp-ts.md#fptseffecttype)
 
 ---
 
+### getSafeTypeImmutability
+
+Re-exports [getSafeTypeImmutability](rules/unsafe-assignment-rule.md#getsafetypeimmutability)
+
+---
+
 ### isLiteral
 
 Re-exports [isLiteral](rules/common.md#isliteral)

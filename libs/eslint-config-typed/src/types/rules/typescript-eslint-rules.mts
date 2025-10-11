@@ -159,39 +159,60 @@ namespace BanTsComment {
    *         "description": "A minimum character length for descriptions when `allow-with-description` is enabled."
    *       },
    *       "ts-check": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema"
+   *         "$ref": "#/items/0/$defs/directiveConfigSchema",
+   *         "description": "Whether allow ts-check directives, and with which restrictions."
    *       },
    *       "ts-expect-error": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema"
+   *         "$ref": "#/items/0/$defs/directiveConfigSchema",
+   *         "description": "Whether and when expect-error directives, and with which restrictions."
    *       },
    *       "ts-ignore": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema"
+   *         "$ref": "#/items/0/$defs/directiveConfigSchema",
+   *         "description": "Whether allow ts-ignore directives, and with which restrictions."
    *       },
    *       "ts-nocheck": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema"
+   *         "$ref": "#/items/0/$defs/directiveConfigSchema",
+   *         "description": "Whether allow ts-nocheck directives, and with which restrictions."
    *       }
    *     }
    *   }
    * ]
    * ```
    */
-  export type DirectiveConfigSchema =
-    | boolean
-    | 'allow-with-description'
-    | {
-        readonly descriptionFormat?: string;
-      };
-
   export type Options = {
     /**
      * A minimum character length for descriptions when `allow-with-description`
      * is enabled.
      */
     readonly minimumDescriptionLength?: number;
-    readonly 'ts-check'?: DirectiveConfigSchema;
-    readonly 'ts-expect-error'?: DirectiveConfigSchema;
-    readonly 'ts-ignore'?: DirectiveConfigSchema;
-    readonly 'ts-nocheck'?: DirectiveConfigSchema;
+    /** Whether allow ts-check directives, and with which restrictions. */
+    readonly 'ts-check'?:
+      | boolean
+      | 'allow-with-description'
+      | {
+          readonly descriptionFormat?: string;
+        };
+    /** Whether and when expect-error directives, and with which restrictions. */
+    readonly 'ts-expect-error'?:
+      | boolean
+      | 'allow-with-description'
+      | {
+          readonly descriptionFormat?: string;
+        };
+    /** Whether allow ts-ignore directives, and with which restrictions. */
+    readonly 'ts-ignore'?:
+      | boolean
+      | 'allow-with-description'
+      | {
+          readonly descriptionFormat?: string;
+        };
+    /** Whether allow ts-nocheck directives, and with which restrictions. */
+    readonly 'ts-nocheck'?:
+      | boolean
+      | 'allow-with-description'
+      | {
+          readonly descriptionFormat?: string;
+        };
   };
 
   export type RuleEntry =
@@ -988,19 +1009,24 @@ namespace ExplicitMemberAccessibility {
    *         "description": "Changes to required accessibility modifiers for specific kinds of class members.",
    *         "properties": {
    *           "accessors": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel"
+   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "description": "Which member accessibility modifier requirements to apply for accessors."
    *           },
    *           "constructors": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel"
+   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "description": "Which member accessibility modifier requirements to apply for constructors."
    *           },
    *           "methods": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel"
+   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "description": "Which member accessibility modifier requirements to apply for methods."
    *           },
    *           "parameterProperties": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel"
+   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "description": "Which member accessibility modifier requirements to apply for parameterProperties."
    *           },
    *           "properties": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel"
+   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "description": "Which member accessibility modifier requirements to apply for properties."
    *           }
    *         }
    *       }
@@ -1009,8 +1035,6 @@ namespace ExplicitMemberAccessibility {
    * ]
    * ```
    */
-  export type AccessibilityLevel = 'explicit' | 'no-public' | 'off';
-
   export type Options = {
     /** Which accessibility modifier is required to exist or not exist. */
     readonly accessibility?: 'explicit' | 'no-public' | 'off';
@@ -1021,11 +1045,28 @@ namespace ExplicitMemberAccessibility {
      * members.
      */
     readonly overrides?: {
-      readonly accessors?: AccessibilityLevel;
-      readonly constructors?: AccessibilityLevel;
-      readonly methods?: AccessibilityLevel;
-      readonly parameterProperties?: AccessibilityLevel;
-      readonly properties?: AccessibilityLevel;
+      /**
+       * Which member accessibility modifier requirements to apply for
+       * accessors.
+       */
+      readonly accessors?: 'explicit' | 'no-public' | 'off';
+      /**
+       * Which member accessibility modifier requirements to apply for
+       * constructors.
+       */
+      readonly constructors?: 'explicit' | 'no-public' | 'off';
+      /** Which member accessibility modifier requirements to apply for methods. */
+      readonly methods?: 'explicit' | 'no-public' | 'off';
+      /**
+       * Which member accessibility modifier requirements to apply for
+       * parameterProperties.
+       */
+      readonly parameterProperties?: 'explicit' | 'no-public' | 'off';
+      /**
+       * Which member accessibility modifier requirements to apply for
+       * properties.
+       */
+      readonly properties?: 'explicit' | 'no-public' | 'off';
     };
   };
 
@@ -1592,35 +1633,30 @@ namespace MemberOrdering {
    *     "additionalProperties": false,
    *     "properties": {
    *       "classes": {
-   *         "$ref": "#/items/0/$defs/baseConfig"
+   *         "$ref": "#/items/0/$defs/baseConfig",
+   *         "description": "Which ordering to enforce for classes."
    *       },
    *       "classExpressions": {
-   *         "$ref": "#/items/0/$defs/baseConfig"
+   *         "$ref": "#/items/0/$defs/baseConfig",
+   *         "description": "Which ordering to enforce for classExpressions."
    *       },
    *       "default": {
-   *         "$ref": "#/items/0/$defs/baseConfig"
+   *         "$ref": "#/items/0/$defs/baseConfig",
+   *         "description": "Which ordering to enforce for default."
    *       },
    *       "interfaces": {
-   *         "$ref": "#/items/0/$defs/typesConfig"
+   *         "$ref": "#/items/0/$defs/typesConfig",
+   *         "description": "Which ordering to enforce for interfaces."
    *       },
    *       "typeLiterals": {
-   *         "$ref": "#/items/0/$defs/typesConfig"
+   *         "$ref": "#/items/0/$defs/typesConfig",
+   *         "description": "Which ordering to enforce for typeLiterals."
    *       }
    *     }
    *   }
    * ]
    * ```
    */
-  export type BaseConfig =
-    | readonly (AllItems | readonly AllItems[])[]
-    | 'never'
-    | {
-        readonly memberTypes?:
-          | readonly (AllItems | readonly AllItems[])[]
-          | 'never';
-        readonly optionalityOrder?: OptionalityOrderOptions;
-        readonly order?: OrderOptions;
-      };
   export type AllItems =
     | '#private-accessor'
     | '#private-field'
@@ -1782,16 +1818,6 @@ namespace MemberOrdering {
     | 'as-written'
     | 'natural-case-insensitive'
     | 'natural';
-  export type TypesConfig =
-    | readonly (TypeItems | readonly TypeItems[])[]
-    | 'never'
-    | {
-        readonly memberTypes?:
-          | readonly (TypeItems | readonly TypeItems[])[]
-          | 'never';
-        readonly optionalityOrder?: OptionalityOrderOptions;
-        readonly order?: OrderOptions;
-      };
   export type TypeItems =
     | 'constructor'
     | 'field'
@@ -1801,11 +1827,61 @@ namespace MemberOrdering {
     | 'signature';
 
   export type Options = {
-    readonly classes?: BaseConfig;
-    readonly classExpressions?: BaseConfig;
-    readonly default?: BaseConfig;
-    readonly interfaces?: TypesConfig;
-    readonly typeLiterals?: TypesConfig;
+    /** Which ordering to enforce for classes. */
+    readonly classes?:
+      | readonly (AllItems | readonly AllItems[])[]
+      | 'never'
+      | {
+          readonly memberTypes?:
+            | readonly (AllItems | readonly AllItems[])[]
+            | 'never';
+          readonly optionalityOrder?: OptionalityOrderOptions;
+          readonly order?: OrderOptions;
+        };
+    /** Which ordering to enforce for classExpressions. */
+    readonly classExpressions?:
+      | readonly (AllItems | readonly AllItems[])[]
+      | 'never'
+      | {
+          readonly memberTypes?:
+            | readonly (AllItems | readonly AllItems[])[]
+            | 'never';
+          readonly optionalityOrder?: OptionalityOrderOptions;
+          readonly order?: OrderOptions;
+        };
+    /** Which ordering to enforce for default. */
+    readonly default?:
+      | readonly (AllItems | readonly AllItems[])[]
+      | 'never'
+      | {
+          readonly memberTypes?:
+            | readonly (AllItems | readonly AllItems[])[]
+            | 'never';
+          readonly optionalityOrder?: OptionalityOrderOptions;
+          readonly order?: OrderOptions;
+        };
+    /** Which ordering to enforce for interfaces. */
+    readonly interfaces?:
+      | readonly (TypeItems | readonly TypeItems[])[]
+      | 'never'
+      | {
+          readonly memberTypes?:
+            | readonly (TypeItems | readonly TypeItems[])[]
+            | 'never';
+          readonly optionalityOrder?: OptionalityOrderOptions;
+          readonly order?: OrderOptions;
+        };
+    /** Which ordering to enforce for typeLiterals. */
+    readonly typeLiterals?:
+      | readonly (TypeItems | readonly TypeItems[])[]
+      | 'never'
+      | {
+          readonly memberTypes?:
+            | readonly (TypeItems | readonly TypeItems[])[]
+            | 'never';
+          readonly optionalityOrder?: OptionalityOrderOptions;
+          readonly order?: OrderOptions;
+        };
   };
 
   export type RuleEntry =
@@ -1835,6 +1911,7 @@ namespace MethodSignatureStyle {
    * [
    *   {
    *     "type": "string",
+   *     "description": "The method signature style to enforce using.",
    *     "enum": [
    *       "property",
    *       "method"
@@ -1843,6 +1920,7 @@ namespace MethodSignatureStyle {
    * ]
    * ```
    */
+  /** The method signature style to enforce using. */
   export type Options = 'method' | 'property';
 
   export type RuleEntry =
@@ -4172,7 +4250,7 @@ namespace NoBaseToString {
    *       },
    *       "ignoredTypeNames": {
    *         "type": "array",
-   *         "description": "Stringified regular expressions of type names to ignore.",
+   *         "description": "Stringified type names to ignore.",
    *         "items": {
    *           "type": "string"
    *         }
@@ -4185,7 +4263,7 @@ namespace NoBaseToString {
   export type Options = {
     /** Whether to also check values of type `unknown` */
     readonly checkUnknown?: boolean;
-    /** Stringified regular expressions of type names to ignore. */
+    /** Stringified type names to ignore. */
     readonly ignoredTypeNames?: readonly string[];
   };
 
@@ -6804,10 +6882,12 @@ namespace NoUnnecessaryCondition {
    *         "description": "Whether to ignore constant loop conditions, such as `while (true)`.",
    *         "oneOf": [
    *           {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Always ignore or not ignore the loop conditions"
    *           },
    *           {
    *             "type": "string",
+   *             "description": "Which situations to ignore constant conditions in.",
    *             "enum": [
    *               "always",
    *               "never",
@@ -7158,7 +7238,33 @@ namespace NoUnsafeFunctionType {
  *  ```
  */
 namespace NoUnsafeMemberAccess {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allowOptionalChaining": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow `?.` optional chains on `any` values."
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /** Whether to allow `?.` optional chains on `any` values. */
+    readonly allowOptionalChaining?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -7294,6 +7400,7 @@ namespace NoUnusedVars {
    *     "oneOf": [
    *       {
    *         "type": "string",
+   *         "description": "Broad setting for unused variables to target.",
    *         "enum": [
    *           "all",
    *           "local"
@@ -7339,6 +7446,10 @@ namespace NoUnusedVars {
    *           "ignoreRestSiblings": {
    *             "type": "boolean",
    *             "description": "Whether to ignore sibling properties in `...` destructurings."
+   *           },
+   *           "ignoreUsingDeclarations": {
+   *             "type": "boolean",
+   *             "description": "Whether to ignore using or await using declarations."
    *           },
    *           "reportUsedIgnorePattern": {
    *             "type": "boolean",
@@ -7390,6 +7501,8 @@ namespace NoUnusedVars {
         readonly ignoreClassWithStaticInitBlock?: boolean;
         /** Whether to ignore sibling properties in `...` destructurings. */
         readonly ignoreRestSiblings?: boolean;
+        /** Whether to ignore using or await using declarations. */
+        readonly ignoreUsingDeclarations?: boolean;
         /**
          * Whether to report variables that match any of the valid ignore
          * pattern options if they have been used.
@@ -7429,6 +7542,7 @@ namespace NoUseBeforeDefine {
    *     "oneOf": [
    *       {
    *         "type": "string",
+   *         "description": "Broadly set functions and allowNamedExports to false.",
    *         "enum": [
    *           "nofunc"
    *         ]
@@ -10017,6 +10131,7 @@ export type TypeScriptEslintRulesOption = {
   readonly '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.Options;
   readonly '@typescript-eslint/no-unnecessary-condition': NoUnnecessaryCondition.Options;
   readonly '@typescript-eslint/no-unnecessary-type-assertion': NoUnnecessaryTypeAssertion.Options;
+  readonly '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.Options;
   readonly '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.Options;
   readonly '@typescript-eslint/no-unused-vars': NoUnusedVars.Options;
   readonly '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.Options;

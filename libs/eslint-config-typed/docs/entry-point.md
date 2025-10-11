@@ -512,6 +512,12 @@ Re-exports [FpTsEffectType](plugins/total-functions/rules/fp-ts.md#fptseffecttyp
 
 ---
 
+### getSafeTypeImmutability
+
+Re-exports [getSafeTypeImmutability](plugins/total-functions/rules/unsafe-assignment-rule.md#getsafetypeimmutability)
+
+---
+
 ### ignoredMutablePattern
 
 Re-exports [ignoredMutablePattern](rules/eslint-functional-rules.md#ignoredmutablepattern)

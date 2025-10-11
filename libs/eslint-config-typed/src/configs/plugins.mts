@@ -23,7 +23,6 @@ import eslintPluginTestingLibrary from 'eslint-plugin-testing-library';
 
 import eslintPluginPlaywright from 'eslint-plugin-playwright';
 
-// @ts-expect-error no type definition
 import eslintPluginCypress from 'eslint-plugin-cypress';
 
 import eslintPluginPreferArrowFunctions from 'eslint-plugin-prefer-arrow-functions';
@@ -33,7 +32,6 @@ import eslintPluginPromise from 'eslint-plugin-promise';
 
 import eslintPluginReact from 'eslint-plugin-react';
 
-// @ts-expect-error no type definition
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
 
 import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
@@ -86,7 +84,6 @@ export const plugins: Record<
   '@typescript-eslint': typescriptEslint,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'array-func': eslintPluginArrayFunc,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   cypress: eslintPluginCypress,
   playwright: eslintPluginPlaywright,
   functional: eslintPluginFunctional,
@@ -100,8 +97,8 @@ export const plugins: Record<
   promise: eslintPluginPromise,
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   react: eslintPluginReact as unknown as ESLintPlugin,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  'react-hooks': eslintPluginReactHooks,
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  'react-hooks': eslintPluginReactHooks as unknown as ESLintPlugin,
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   'react-refresh': eslintPluginReactRefresh as unknown as ESLintPlugin,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

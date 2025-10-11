@@ -12,4 +12,4 @@
 
 > `const` **plugins**: `Record`\<`"@typescript-eslint"` \| `"array-func"` \| `"cypress"` \| `"playwright"` \| `"functional"` \| `"import"` \| `"jest"` \| `"vitest"` \| `"jsx-a11y"` \| `"prefer-arrow-functions"` \| `"promise"` \| `"react"` \| `"react-hooks"` \| `"react-refresh"` \| `"react-perf"` \| `"security"` \| `"strict-dependencies"` \| `"testing-library"` \| `"total-functions"` \| `"unicorn"` \| `"tree-shakable"` \| `"eslint-plugin"` \| `"custom"`, `Omit`\<[`ESLintPlugin`](../types/flat-config.md#eslintplugin), `"configs"`\>\>
 
-Defined in: [src/configs/plugins.mts:60](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/plugins.mts#L60)
+Defined in: [src/configs/plugins.mts:58](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/plugins.mts#L58)

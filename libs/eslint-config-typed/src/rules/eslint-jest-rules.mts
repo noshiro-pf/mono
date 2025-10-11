@@ -81,4 +81,5 @@ export const eslintJestRules: EslintJestRules = {
   'jest/prefer-jest-mocked': 'error',
   'jest/unbound-method': withDefaultOption('error'),
   'jest/valid-expect-in-promise': 'error',
+  'jest/prefer-ending-with-an-expect': withDefaultOption('error'),
 } as const;

@@ -4,14 +4,18 @@ import {
   isTypeUnknownType,
 } from '@typescript-eslint/type-utils';
 import { type TSESTree } from '@typescript-eslint/utils';
+import { getDefaultOverrides, Immutability } from 'is-immutable-type';
 import {
-  getDefaultOverrides,
-  getTypeImmutability,
-  Immutability,
-} from 'is-immutable-type';
-import { type Type, type TypeChecker, TypeFlags } from 'typescript';
+  type Program,
+  type Type,
+  type TypeChecker,
+  TypeFlags,
+} from 'typescript';
 import { assignableTypePairs, createRule, isLiteral } from './common.mjs';
-import { createNoUnsafeAssignmentRule } from './unsafe-assignment-rule.mjs';
+import {
+  createNoUnsafeAssignmentRule,
+  getSafeTypeImmutability,
+} from './unsafe-assignment-rule.mjs';
 
 /** An ESLint rule to ban unsafe assignment from readonly to mutable types. */
 
@@ -30,6 +34,7 @@ export const noUnsafeReadonlyMutableAssignment = createRule({
   },
   create: createNoUnsafeAssignmentRule(
     (
+      program: Program,
       checker: TypeChecker,
       rawDestinationType: Type,
       rawSourceType: Type,
@@ -72,12 +77,14 @@ export const noUnsafeReadonlyMutableAssignment = createRule({
           return true;
         }
 
-        const destinationImmutability = getTypeImmutability(
+        const destinationImmutability = getSafeTypeImmutability(
+          program,
           checker,
           destinationType,
           overrides,
         );
-        const sourceImmutability = getTypeImmutability(
+        const sourceImmutability = getSafeTypeImmutability(
+          program,
           checker,
           sourceType,
           overrides,
