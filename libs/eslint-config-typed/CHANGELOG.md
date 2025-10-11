@@ -1,3 +1,9 @@
+# [1.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.6.0...v1.7.0) (2025-10-11)
+
+### Features
+
+- update eslint plugins ([#68](https://github.com/noshiro-pf/eslint-config-typed/issues/68)) ([646c7f0](https://github.com/noshiro-pf/eslint-config-typed/commit/646c7f0eeeb91c33d772187b3c1aff9fe91eef18))
+
 # [1.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.5.0...v1.6.0) (2025-10-11)
 
 ### Features
