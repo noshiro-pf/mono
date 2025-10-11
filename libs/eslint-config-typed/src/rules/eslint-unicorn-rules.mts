@@ -59,7 +59,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-abusive-eslint-disable': 'error',
   'unicorn/no-array-callback-reference': 'off',
   'unicorn/no-array-for-each': 'error',
-  'unicorn/no-array-method-this-argument': 'off', // not compatible with my Arr.map utility
+  'unicorn/no-array-method-this-argument': 'off', // not compatible with the Arr.map utility in ts-data-forge
   'unicorn/no-array-reduce': 'off',
   'unicorn/no-await-expression-member': 'error',
   'unicorn/no-console-spaces': 'off', // turned off to enable aligning output
@@ -89,7 +89,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/no-useless-spread': 'error',
   'unicorn/no-useless-undefined': 'off', // this conflicts with @typescript-eslint/init-declarations
   'unicorn/no-zero-fractions': 'error',
-  'unicorn/numeric-separators-style': withDefaultOption('error'),
+  'unicorn/numeric-separators-style': 'off',
   'unicorn/prefer-add-event-listener': withDefaultOption('error'),
   'unicorn/prefer-array-find': withDefaultOption('error'),
   'unicorn/prefer-array-flat': withDefaultOption('error'),
@@ -118,7 +118,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-modern-dom-apis': 'error',
   'unicorn/prefer-module': 'error',
   'unicorn/prefer-negative-index': 'error',
-  'unicorn/prefer-node-protocol': 'off', // TODO: enable this
+  'unicorn/prefer-node-protocol': 'error',
   'unicorn/prefer-number-properties': withDefaultOption('error'),
   'unicorn/prefer-object-from-entries': withDefaultOption('error'),
   'unicorn/prefer-optional-catch-binding': 'error',
@@ -129,7 +129,7 @@ export const eslintUnicornRules: EslintUnicornRules = {
   'unicorn/prefer-set-has': 'error',
   'unicorn/prefer-set-size': 'error',
   'unicorn/prefer-spread': 'off', // prefer array-func/prefer-array-from
-  // TODO: Enable this by default when targeting Node.js 16.
+  // TODO: Available for Node.js 16 and later
   'unicorn/prefer-string-replace-all': 'error',
   'unicorn/prefer-string-slice': 'error',
   'unicorn/prefer-string-starts-ends-with': 'error',
@@ -139,8 +139,8 @@ export const eslintUnicornRules: EslintUnicornRules = {
     { minimumCases: 2, emptyDefaultCase: 'no-default-case' },
   ],
   'unicorn/prefer-ternary': ['error', 'only-single-line'],
-  // TODO: Enable this by default when targeting Node.js 14.
-  'unicorn/prefer-top-level-await': 'off',
+  // NOTE: Available for Node.js 14 and later
+  'unicorn/prefer-top-level-await': 'error',
   'unicorn/prefer-type-error': 'error',
   'unicorn/prevent-abbreviations': 'off',
   'unicorn/relative-url-style': withDefaultOption('error'),
