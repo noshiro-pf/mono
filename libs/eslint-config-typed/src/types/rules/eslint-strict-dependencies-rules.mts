@@ -67,9 +67,10 @@ namespace StrictDependencies {
   };
 
   export type RuleEntry =
-    | Linter.RuleSeverity
-    | readonly [Linter.RuleSeverity, Options0, Options1]
-    | readonly [Linter.RuleSeverity, Options0];
+    | Linter.Severity
+    | readonly [Linter.StringSeverity, Options0, Options1]
+    | readonly [Linter.StringSeverity, Options0]
+    | 'off';
 }
 
 export type EslintStrictDependenciesRules = {

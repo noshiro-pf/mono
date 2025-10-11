@@ -12,4 +12,4 @@
 
 > `const` **eslintPlaywrightRules**: [`EslintPlaywrightRules`](../types/rules/eslint-playwright-rules.md#eslintplaywrightrules)
 
-Defined in: [src/rules/eslint-playwright-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-playwright-rules.mts#L3)
+Defined in: [src/rules/eslint-playwright-rules.mts:6](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-playwright-rules.mts#L6)

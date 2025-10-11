@@ -28,7 +28,7 @@ const isDeprecated = (
 const generatorOption: Readonly<{
   explicitRuleDefaultOption: boolean;
 }> = {
-  explicitRuleDefaultOption: false,
+  explicitRuleDefaultOption: true,
 } as const;
 
 const RuleSeverityWithDefaultOption = 'Linter.Severity';

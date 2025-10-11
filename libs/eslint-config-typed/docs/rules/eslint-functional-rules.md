@@ -12,7 +12,7 @@
 
 > `const` **eslintFunctionalRules**: [`EslintFunctionalRules`](../types/rules/eslint-functional-rules.md#eslintfunctionalrules)
 
-Defined in: [src/rules/eslint-functional-rules.mts:52](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L52)
+Defined in: [src/rules/eslint-functional-rules.mts:53](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L53)
 
 #### Link
 
@@ -22,7 +22,7 @@ Defined in: [src/rules/eslint-functional-rules.mts:52](https://github.com/noshir
 
 > `const` **ignoredMutablePattern**: `string`[]
 
-Defined in: [src/rules/eslint-functional-rules.mts:6](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L6)
+Defined in: [src/rules/eslint-functional-rules.mts:7](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L7)
 
 ---
 
@@ -30,7 +30,7 @@ Defined in: [src/rules/eslint-functional-rules.mts:6](https://github.com/noshiro
 
 > `const` **immutableDataOptions**: [`EslintFunctionalRulesOption`](../types/rules/eslint-functional-rules.md#eslintfunctionalrulesoption)\[`"functional/immutable-data"`\]
 
-Defined in: [src/rules/eslint-functional-rules.mts:13](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L13)
+Defined in: [src/rules/eslint-functional-rules.mts:14](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L14)
 
 ---
 
@@ -38,4 +38,4 @@ Defined in: [src/rules/eslint-functional-rules.mts:13](https://github.com/noshir
 
 > `const` **noLetOptions**: [`EslintFunctionalRulesOption`](../types/rules/eslint-functional-rules.md#eslintfunctionalrulesoption)\[`"functional/no-let"`\]
 
-Defined in: [src/rules/eslint-functional-rules.mts:34](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L34)
+Defined in: [src/rules/eslint-functional-rules.mts:35](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L35)

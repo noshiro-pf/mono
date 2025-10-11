@@ -12,7 +12,7 @@
 
 > `const` **banTypes**: [`TypeScriptEslintRulesOption`](../types/rules/typescript-eslint-rules.md#typescripteslintrulesoption)\[`"@typescript-eslint/no-restricted-types"`\]\[`"types"`\]
 
-Defined in: [src/rules/typescript-eslint-rules.mts:7](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/typescript-eslint-rules.mts#L7)
+Defined in: [src/rules/typescript-eslint-rules.mts:8](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/typescript-eslint-rules.mts#L8)
 
 ---
 
@@ -20,7 +20,7 @@ Defined in: [src/rules/typescript-eslint-rules.mts:7](https://github.com/noshiro
 
 > `const` **restrictedImportsOption**: [`RestrictedImportsOption`](../types/types.md#restrictedimportsoption)
 
-Defined in: [src/rules/typescript-eslint-rules.mts:16](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/typescript-eslint-rules.mts#L16)
+Defined in: [src/rules/typescript-eslint-rules.mts:17](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/typescript-eslint-rules.mts#L17)
 
 ---
 
@@ -28,4 +28,4 @@ Defined in: [src/rules/typescript-eslint-rules.mts:16](https://github.com/noshir
 
 > `const` **typescriptEslintRules**: [`TypeScriptEslintRules`](../types/rules/typescript-eslint-rules.md#typescripteslintrules)
 
-Defined in: [src/rules/typescript-eslint-rules.mts:37](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/typescript-eslint-rules.mts#L37)
+Defined in: [src/rules/typescript-eslint-rules.mts:38](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/typescript-eslint-rules.mts#L38)

@@ -1,4 +1,5 @@
 import {
+  withDefaultOption,
   type EslintFunctionalRules,
   type EslintFunctionalRulesOption,
 } from '../types/index.mjs';
@@ -53,7 +54,7 @@ export const eslintFunctionalRules: EslintFunctionalRules = {
   // No Mutations Rules
   'functional/immutable-data': ['error', immutableDataOptions],
   'functional/no-let': ['error', noLetOptions],
-  'functional/prefer-property-signatures': 'error',
+  'functional/prefer-property-signatures': withDefaultOption('error'),
   // 'functional/prefer-readonly-type': ['warn', preferReadonlyTypeOptions],
 
   // No Object-Orientation Rules
@@ -141,7 +142,7 @@ export const eslintFunctionalRules: EslintFunctionalRules = {
   //   },
   // ],
 
-  'functional/no-class-inheritance': 'error',
+  'functional/no-class-inheritance': withDefaultOption('error'),
 
   // deprecated
   'functional/prefer-readonly-type': 0,

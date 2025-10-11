@@ -12,7 +12,7 @@
 
 > **EslintPreferArrowFunctionRules** = `object`
 
-Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:93](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L93)
+Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:97](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L97)
 
 #### Properties
 
@@ -20,7 +20,7 @@ Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:93](https:/
 
 > `readonly` **prefer-arrow-functions/prefer-arrow-functions**: `PreferArrowFunctions.RuleEntry`
 
-Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:94](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L94)
+Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:98](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L98)
 
 ---
 
@@ -28,7 +28,7 @@ Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:94](https:/
 
 > **EslintPreferArrowFunctionRulesOption** = `object`
 
-Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:97](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L97)
+Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:101](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L101)
 
 #### Properties
 
@@ -36,4 +36,4 @@ Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:97](https:/
 
 > `readonly` **prefer-arrow-functions/prefer-arrow-functions**: `PreferArrowFunctions.Options`
 
-Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:98](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L98)
+Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:102](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L102)

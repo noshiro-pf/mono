@@ -12,7 +12,7 @@ import { type Linter } from 'eslint';
  * ```
  */
 namespace ImportStar {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintTreeShakableRules = {

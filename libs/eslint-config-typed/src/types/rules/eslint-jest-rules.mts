@@ -1,8 +1,11 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Enforce `test` and `it` usage conventions
@@ -52,8 +55,9 @@ namespace ConsistentTestIt {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -101,8 +105,9 @@ namespace ExpectExpect {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -141,8 +146,9 @@ namespace MaxExpects {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -181,8 +187,9 @@ namespace MaxNestedDescribe {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -199,7 +206,7 @@ namespace MaxNestedDescribe {
  *  ```
  */
 namespace NoAliasMethods {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -215,7 +222,7 @@ namespace NoAliasMethods {
  *  ```
  */
 namespace NoCommentedOutTests {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -231,7 +238,7 @@ namespace NoCommentedOutTests {
  *  ```
  */
 namespace NoConditionalExpect {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -247,7 +254,7 @@ namespace NoConditionalExpect {
  *  ```
  */
 namespace NoConditionalInTest {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -263,7 +270,7 @@ namespace NoConditionalInTest {
  *  ```
  */
 namespace NoConfusingSetTimeout {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -280,7 +287,7 @@ namespace NoConfusingSetTimeout {
  *  ```
  */
 namespace NoDeprecatedFunctions {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -296,7 +303,7 @@ namespace NoDeprecatedFunctions {
  *  ```
  */
 namespace NoDisabledTests {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -313,7 +320,7 @@ namespace NoDisabledTests {
  *  ```
  */
 namespace NoDoneCallback {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -329,7 +336,7 @@ namespace NoDoneCallback {
  *  ```
  */
 namespace NoDuplicateHooks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -345,7 +352,7 @@ namespace NoDuplicateHooks {
  *  ```
  */
 namespace NoExport {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -362,7 +369,7 @@ namespace NoExport {
  *  ```
  */
 namespace NoFocusedTests {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -406,8 +413,9 @@ namespace NoHooks {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -423,7 +431,7 @@ namespace NoHooks {
  *  ```
  */
 namespace NoIdenticalTitle {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -439,7 +447,7 @@ namespace NoIdenticalTitle {
  *  ```
  */
 namespace NoInterpolationInSnapshots {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -456,7 +464,7 @@ namespace NoInterpolationInSnapshots {
  *  ```
  */
 namespace NoJasmineGlobals {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -505,8 +513,9 @@ namespace NoLargeSnapshots {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -522,7 +531,7 @@ namespace NoLargeSnapshots {
  *  ```
  */
 namespace NoMocksImport {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -558,8 +567,9 @@ namespace NoRestrictedJestMethods {
   export type Options = Readonly<Record<string, string | null>>;
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -595,8 +605,9 @@ namespace NoRestrictedMatchers {
   export type Options = Readonly<Record<string, string | null>>;
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -637,8 +648,9 @@ namespace NoStandaloneExpect {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -655,7 +667,7 @@ namespace NoStandaloneExpect {
  *  ```
  */
 namespace NoTestPrefixes {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -671,7 +683,7 @@ namespace NoTestPrefixes {
  *  ```
  */
 namespace NoTestReturnStatement {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -688,7 +700,7 @@ namespace NoTestReturnStatement {
  *  ```
  */
 namespace NoUntypedMockFactory {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -705,7 +717,7 @@ namespace NoUntypedMockFactory {
  *  ```
  */
 namespace PaddingAroundAfterAllBlocks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -722,7 +734,7 @@ namespace PaddingAroundAfterAllBlocks {
  *  ```
  */
 namespace PaddingAroundAfterEachBlocks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -739,7 +751,7 @@ namespace PaddingAroundAfterEachBlocks {
  *  ```
  */
 namespace PaddingAroundAll {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -756,7 +768,7 @@ namespace PaddingAroundAll {
  *  ```
  */
 namespace PaddingAroundBeforeAllBlocks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -773,7 +785,7 @@ namespace PaddingAroundBeforeAllBlocks {
  *  ```
  */
 namespace PaddingAroundBeforeEachBlocks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -790,7 +802,7 @@ namespace PaddingAroundBeforeEachBlocks {
  *  ```
  */
 namespace PaddingAroundDescribeBlocks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -807,7 +819,7 @@ namespace PaddingAroundDescribeBlocks {
  *  ```
  */
 namespace PaddingAroundExpectGroups {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -824,7 +836,7 @@ namespace PaddingAroundExpectGroups {
  *  ```
  */
 namespace PaddingAroundTestBlocks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -840,7 +852,7 @@ namespace PaddingAroundTestBlocks {
  *  ```
  */
 namespace PreferCalledWith {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -857,7 +869,7 @@ namespace PreferCalledWith {
  *  ```
  */
 namespace PreferComparisonMatcher {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -873,7 +885,7 @@ namespace PreferComparisonMatcher {
  *  ```
  */
 namespace PreferEach {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -890,7 +902,7 @@ namespace PreferEach {
  *  ```
  */
 namespace PreferEqualityMatcher {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -937,8 +949,9 @@ namespace PreferExpectAssertions {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -955,7 +968,7 @@ namespace PreferExpectAssertions {
  *  ```
  */
 namespace PreferExpectResolves {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -971,7 +984,7 @@ namespace PreferExpectResolves {
  *  ```
  */
 namespace PreferHooksInOrder {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -987,7 +1000,7 @@ namespace PreferHooksInOrder {
  *  ```
  */
 namespace PreferHooksOnTop {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1044,8 +1057,9 @@ namespace PreferImportingJestGlobals {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1062,7 +1076,7 @@ namespace PreferImportingJestGlobals {
  *  ```
  */
 namespace PreferJestMocked {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1123,8 +1137,9 @@ namespace PreferLowercaseTitle {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1141,7 +1156,7 @@ namespace PreferLowercaseTitle {
  *  ```
  */
 namespace PreferMockPromiseShorthand {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1175,8 +1190,9 @@ namespace PreferSnapshotHint {
   export type Options = 'always' | 'multi';
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1193,7 +1209,7 @@ namespace PreferSnapshotHint {
  *  ```
  */
 namespace PreferSpyOn {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1210,7 +1226,7 @@ namespace PreferSpyOn {
  *  ```
  */
 namespace PreferStrictEqual {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1227,7 +1243,7 @@ namespace PreferStrictEqual {
  *  ```
  */
 namespace PreferToBe {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1244,7 +1260,7 @@ namespace PreferToBe {
  *  ```
  */
 namespace PreferToContain {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1261,7 +1277,7 @@ namespace PreferToContain {
  *  ```
  */
 namespace PreferToHaveLength {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1278,7 +1294,7 @@ namespace PreferToHaveLength {
  *  ```
  */
 namespace PreferTodo {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1319,8 +1335,9 @@ namespace RequireHook {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1336,7 +1353,7 @@ namespace RequireHook {
  *  ```
  */
 namespace RequireToThrowMessage {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1375,8 +1392,9 @@ namespace RequireTopLevelDescribe {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1417,8 +1435,9 @@ namespace UnboundMethod {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1434,7 +1453,7 @@ namespace UnboundMethod {
  *  ```
  */
 namespace ValidDescribeCallback {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1450,7 +1469,7 @@ namespace ValidDescribeCallback {
  *  ```
  */
 namespace ValidExpectInPromise {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -1507,8 +1526,9 @@ namespace ValidExpect {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -1614,8 +1634,9 @@ namespace ValidTitle {
   >;
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 export type EslintJestRules = {

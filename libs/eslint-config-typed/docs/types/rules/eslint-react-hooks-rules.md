@@ -12,7 +12,7 @@
 
 > **EslintReactHooksRules** = `object`
 
-Defined in: [src/types/rules/eslint-react-hooks-rules.mts:71](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L71)
+Defined in: [src/types/rules/eslint-react-hooks-rules.mts:75](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L75)
 
 #### Properties
 
@@ -20,13 +20,13 @@ Defined in: [src/types/rules/eslint-react-hooks-rules.mts:71](https://github.com
 
 > `readonly` **react-hooks/exhaustive-deps**: `ExhaustiveDeps.RuleEntry`
 
-Defined in: [src/types/rules/eslint-react-hooks-rules.mts:73](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L73)
+Defined in: [src/types/rules/eslint-react-hooks-rules.mts:77](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L77)
 
 ##### react-hooks/rules-of-hooks
 
 > `readonly` **react-hooks/rules-of-hooks**: `RulesOfHooks.RuleEntry`
 
-Defined in: [src/types/rules/eslint-react-hooks-rules.mts:72](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L72)
+Defined in: [src/types/rules/eslint-react-hooks-rules.mts:76](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L76)
 
 ---
 
@@ -34,7 +34,7 @@ Defined in: [src/types/rules/eslint-react-hooks-rules.mts:72](https://github.com
 
 > **EslintReactHooksRulesOption** = `object`
 
-Defined in: [src/types/rules/eslint-react-hooks-rules.mts:76](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L76)
+Defined in: [src/types/rules/eslint-react-hooks-rules.mts:80](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L80)
 
 #### Properties
 
@@ -42,4 +42,4 @@ Defined in: [src/types/rules/eslint-react-hooks-rules.mts:76](https://github.com
 
 > `readonly` **react-hooks/exhaustive-deps**: `ExhaustiveDeps.Options`
 
-Defined in: [src/types/rules/eslint-react-hooks-rules.mts:77](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L77)
+Defined in: [src/types/rules/eslint-react-hooks-rules.mts:81](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-hooks-rules.mts#L81)

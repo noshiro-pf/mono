@@ -725,3 +725,9 @@ Re-exports [TypeScriptEslintRulesOption](types/rules/typescript-eslint-rules.md#
 ### typeSymbolName
 
 Re-exports [typeSymbolName](plugins/total-functions/rules/common.md#typesymbolname)
+
+---
+
+### withDefaultOption
+
+Re-exports [withDefaultOption](types/rule-severity-with-default-option.md#withdefaultoption)

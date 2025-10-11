@@ -1,4 +1,8 @@
-import { type EslintRules, type EslintRulesOption } from '../types/index.mjs';
+import {
+  withDefaultOption,
+  type EslintRules,
+  type EslintRulesOption,
+} from '../types/index.mjs';
 
 export const restrictedSyntax = [
   {
@@ -127,7 +131,7 @@ export const eslintRules: EslintRules = {
   'no-unreachable': 'off', // ts(7027)
   'no-unsafe-negation': 'off', // ts(2365) & ts(2360) & ts(2358)
   'no-var': 'error', // ts transpiles let/const to var, so no need for vars any more
-  'prefer-const': 'error', // ts provides better types with const
+  'prefer-const': withDefaultOption('error'), // ts provides better types with const
   'prefer-rest-params': 'error', // ts provides better types with rest args over arguments
   'prefer-spread': 'error', // ts transpiles spread to apply, so no need for manual apply
   'valid-typeof': 'off', // ts(2367)
@@ -157,7 +161,7 @@ export const eslintRules: EslintRules = {
   'consistent-return': 'off',
 
   // customized
-  'accessor-pairs': 'error',
+  'accessor-pairs': withDefaultOption('error'),
 
   // When there is no default case for a switch statement, there is a false positive that reports an error without considering type information.
   'array-callback-return': 'off',
@@ -167,12 +171,12 @@ export const eslintRules: EslintRules = {
   camelcase: 'off', // disabled
   'capitalized-comments': 'off', // disabled
   complexity: 'off', // disabled
-  'consistent-this': 'error',
+  'consistent-this': withDefaultOption('error'),
   'default-case-last': 'error',
   'default-case': 'off', // disabled
   eqeqeq: ['error', 'always', { null: 'ignore' }],
   'for-direction': 'error',
-  'func-name-matching': 'error',
+  'func-name-matching': withDefaultOption('error'),
   'func-names': [
     'error',
     'always',
@@ -181,11 +185,11 @@ export const eslintRules: EslintRules = {
     },
   ],
   'func-style': 'off', // False positives with function overloads
-  'grouped-accessor-pairs': 'error',
+  'grouped-accessor-pairs': withDefaultOption('error'),
   'guard-for-in': 'error',
-  'id-denylist': 'error',
+  'id-denylist': withDefaultOption('error'),
   'id-length': 'off', // disabled
-  'id-match': 'error',
+  'id-match': withDefaultOption('error'),
   'logical-assignment-operators': [
     'error',
     'always',
@@ -195,7 +199,7 @@ export const eslintRules: EslintRules = {
   'max-depth': 'off', // disabled
   'max-lines-per-function': 'off', // disabled
   'max-lines': 'off', // disabled
-  'max-nested-callbacks': 'error',
+  'max-nested-callbacks': withDefaultOption('error'),
   'max-params': 'off', // disabled
   'max-statements': 'off', // disabled
   'new-cap': 'off', // disabled
@@ -207,10 +211,10 @@ export const eslintRules: EslintRules = {
   'no-case-declarations': 'error',
   'no-class-assign': 'error',
   'no-compare-neg-zero': 'error',
-  'no-cond-assign': 'error',
+  'no-cond-assign': withDefaultOption('error'),
   'no-console': 'off', // disabled
   'no-constant-binary-expression': 'error',
-  'no-constant-condition': 'error',
+  'no-constant-condition': withDefaultOption('error'),
   'no-constructor-return': 'error',
   'no-continue': 'off', // disabled
   'no-control-regex': 'error',
@@ -221,13 +225,13 @@ export const eslintRules: EslintRules = {
   'no-duplicate-case': 'error',
   'no-else-return': 'off', // disabled
   'no-empty-character-class': 'error',
-  'no-empty-pattern': 'error',
+  'no-empty-pattern': withDefaultOption('error'),
   'no-empty-static-block': 'error',
-  'no-empty': 'error',
+  'no-empty': withDefaultOption('error'),
   'no-eq-null': 'off', // off since eqeqeq allows null
-  'no-eval': 'error',
+  'no-eval': withDefaultOption('error'),
   'no-ex-assign': 'error',
-  'no-extend-native': 'error',
+  'no-extend-native': withDefaultOption('error'),
   'no-extra-bind': 'error',
   'no-extra-boolean-cast': [
     'error',
@@ -236,8 +240,8 @@ export const eslintRules: EslintRules = {
     },
   ],
   'no-extra-label': 'error',
-  'no-fallthrough': 'error',
-  'no-global-assign': 'error',
+  'no-fallthrough': withDefaultOption('error'),
+  'no-global-assign': withDefaultOption('error'),
   'no-implicit-coercion': [
     'error',
     {
@@ -248,18 +252,18 @@ export const eslintRules: EslintRules = {
       string: true,
     },
   ],
-  'no-implicit-globals': 'error',
+  'no-implicit-globals': withDefaultOption('error'),
   'no-inline-comments': 'off', // disabled
-  'no-inner-declarations': 'error',
-  'no-invalid-regexp': 'error',
-  'no-irregular-whitespace': 'error',
+  'no-inner-declarations': withDefaultOption('error'),
+  'no-invalid-regexp': withDefaultOption('error'),
+  'no-irregular-whitespace': withDefaultOption('error'),
   'no-iterator': 'error',
   'no-label-var': 'error',
-  'no-labels': 'error',
+  'no-labels': withDefaultOption('error'),
   'no-lone-blocks': 'off', // disabled
   'no-lonely-if': 'off', // disabled
-  'no-misleading-character-class': 'error',
-  'no-multi-assign': 'error',
+  'no-misleading-character-class': withDefaultOption('error'),
+  'no-multi-assign': withDefaultOption('error'),
   'no-multi-str': 'error',
   'no-negated-condition': 'off', // disabled
   'no-nested-ternary': 'off', // unicorn/no-nested-ternary
@@ -271,7 +275,7 @@ export const eslintRules: EslintRules = {
   'no-object-constructor': 'error',
   'no-octal-escape': 'error',
   'no-octal': 'error',
-  'no-param-reassign': 'error',
+  'no-param-reassign': withDefaultOption('error'),
 
   /**
    * Warn against using the value of expressions like `++x` or `x++` as they
@@ -284,13 +288,13 @@ export const eslintRules: EslintRules = {
     },
   ],
 
-  'no-promise-executor-return': 'error',
+  'no-promise-executor-return': withDefaultOption('error'),
   'no-proto': 'error',
   'no-prototype-builtins': 'error',
   'no-regex-spaces': 'error',
-  'no-restricted-exports': 'error',
+  'no-restricted-exports': withDefaultOption('error'),
   'no-restricted-globals': ['error', ...restrictedGlobals],
-  'no-restricted-properties': 'error',
+  'no-restricted-properties': withDefaultOption('error'),
 
   /**
    * Write restricted syntax here that is difficult to achieve with other rules.
@@ -301,12 +305,12 @@ export const eslintRules: EslintRules = {
    */
   'no-restricted-syntax': ['error', ...restrictedSyntax],
 
-  'no-return-assign': 'error',
+  'no-return-assign': withDefaultOption('error'),
   'no-script-url': 'error',
-  'no-self-assign': 'error',
+  'no-self-assign': withDefaultOption('error'),
   'no-self-compare': 'error',
-  'no-sequences': 'error',
-  'no-shadow-restricted-names': 'error',
+  'no-sequences': withDefaultOption('error'),
+  'no-shadow-restricted-names': withDefaultOption('error'),
   'no-sparse-arrays': 'error',
   'no-template-curly-in-string': 'error',
   'no-ternary': 'off', // disabled
@@ -314,34 +318,34 @@ export const eslintRules: EslintRules = {
   'no-undefined': 'off', // disabled
   'no-underscore-dangle': 'off', // disabled
   'no-unmodified-loop-condition': 'error',
-  'no-unneeded-ternary': 'error',
-  'no-unreachable-loop': 'error',
+  'no-unneeded-ternary': withDefaultOption('error'),
+  'no-unreachable-loop': withDefaultOption('error'),
   'no-unsafe-finally': 'error',
-  'no-unsafe-optional-chaining': 'error',
+  'no-unsafe-optional-chaining': withDefaultOption('error'),
   'no-unused-labels': 'error',
   'no-unused-private-class-members': 'error',
   'no-useless-backreference': 'error',
   'no-useless-call': 'error',
   'no-useless-catch': 'error',
-  'no-useless-computed-key': 'error',
+  'no-useless-computed-key': withDefaultOption('error'),
   'no-useless-concat': 'error',
-  'no-useless-escape': 'error',
-  'no-useless-rename': 'error',
+  'no-useless-escape': withDefaultOption('error'),
+  'no-useless-rename': withDefaultOption('error'),
   'no-useless-return': 'error',
-  'no-void': 'error',
+  'no-void': withDefaultOption('error'),
   'no-warning-comments': 'off', // disabled
   'no-with': 'error',
-  'object-shorthand': 'error',
+  'object-shorthand': withDefaultOption('error'),
   'one-var': 'off', // disabled
-  'operator-assignment': 'error',
-  'prefer-arrow-callback': 'error',
+  'operator-assignment': withDefaultOption('error'),
+  'prefer-arrow-callback': withDefaultOption('error'),
   'prefer-destructuring': 'off', // disabled
   'prefer-exponentiation-operator': 'error',
   'prefer-named-capture-group': 'off', // disabled
   'prefer-numeric-literals': 'error',
   'prefer-object-has-own': 'error',
   'prefer-object-spread': 'error',
-  'prefer-regex-literals': 'error',
+  'prefer-regex-literals': withDefaultOption('error'),
 
   /**
    * Used to avoid ambiguity with `+` operator. restrict-plus-operands limits
@@ -354,16 +358,16 @@ export const eslintRules: EslintRules = {
    */
   'prefer-template': 'error',
 
-  radix: 'error',
-  'require-atomic-updates': 'error',
-  'require-unicode-regexp': 'error',
+  radix: withDefaultOption('error'),
+  'require-atomic-updates': withDefaultOption('error'),
+  'require-unicode-regexp': withDefaultOption('error'),
   'require-yield': 'error',
   'sort-imports': 'off', // disabled
   'sort-keys': 'off', // disabled
   'sort-vars': 'off', // disabled
-  strict: 'error',
+  strict: withDefaultOption('error'),
   'symbol-description': 'off', // disabled
-  'use-isnan': 'error',
+  'use-isnan': withDefaultOption('error'),
   'vars-on-top': 'error',
   yoda: 'off', // disabled
 

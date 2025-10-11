@@ -1,8 +1,11 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
-type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
-  T[1] extends readonly unknown[] ? readonly [Linter.RuleSeverity, ...T[1]] : T;
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
 
 /**
  * Require screenshots to be preceded by an assertion
@@ -18,7 +21,7 @@ type SpreadOptionsIfIsArray<T extends readonly [Linter.RuleSeverity, unknown]> =
  *  ```
  */
 namespace AssertionBeforeScreenshot {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -35,7 +38,7 @@ namespace AssertionBeforeScreenshot {
  *  ```
  */
 namespace NoAssigningReturnValues {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -52,7 +55,7 @@ namespace NoAssigningReturnValues {
  *  ```
  */
 namespace NoAsyncBefore {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -69,7 +72,7 @@ namespace NoAsyncBefore {
  *  ```
  */
 namespace NoAsyncTests {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -86,7 +89,7 @@ namespace NoAsyncTests {
  *  ```
  */
 namespace NoChainedGet {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -103,7 +106,7 @@ namespace NoChainedGet {
  *  ```
  */
 namespace NoDebug {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -120,7 +123,7 @@ namespace NoDebug {
  *  ```
  */
 namespace NoForce {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -137,7 +140,7 @@ namespace NoForce {
  *  ```
  */
 namespace NoPause {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -154,7 +157,7 @@ namespace NoPause {
  *  ```
  */
 namespace NoUnnecessaryWaiting {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -171,7 +174,7 @@ namespace NoUnnecessaryWaiting {
  *  ```
  */
 namespace NoXpath {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -188,7 +191,7 @@ namespace NoXpath {
  *  ```
  */
 namespace RequireDataSelectors {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -233,8 +236,9 @@ namespace UnsafeToChainCommand {
   };
 
   export type RuleEntry =
-    | Linter.StringSeverity
-    | SpreadOptionsIfIsArray<readonly [Linter.RuleSeverity, Options]>;
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 export type EslintCypressRules = {

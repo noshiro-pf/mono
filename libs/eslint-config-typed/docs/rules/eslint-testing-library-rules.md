@@ -12,4 +12,4 @@
 
 > `const` **eslintTestingLibraryRules**: [`EslintTestingLibraryRules`](../types/rules/eslint-testing-library-rules.md#eslinttestinglibraryrules)
 
-Defined in: [src/rules/eslint-testing-library-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-testing-library-rules.mts#L3)
+Defined in: [src/rules/eslint-testing-library-rules.mts:6](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-testing-library-rules.mts#L6)

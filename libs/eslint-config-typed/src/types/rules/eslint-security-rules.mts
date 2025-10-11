@@ -16,7 +16,7 @@ import { type Linter } from 'eslint';
  *  ```
  */
 namespace DetectUnsafeRegex {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -34,7 +34,7 @@ namespace DetectUnsafeRegex {
  *  ```
  */
 namespace DetectNonLiteralRegexp {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -52,7 +52,7 @@ namespace DetectNonLiteralRegexp {
  *  ```
  */
 namespace DetectNonLiteralRequire {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -70,7 +70,7 @@ namespace DetectNonLiteralRequire {
  *  ```
  */
 namespace DetectNonLiteralFsFilename {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -88,7 +88,7 @@ namespace DetectNonLiteralFsFilename {
  *  ```
  */
 namespace DetectEvalWithExpression {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -106,7 +106,7 @@ namespace DetectEvalWithExpression {
  *  ```
  */
 namespace DetectPseudoRandomBytes {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -124,7 +124,7 @@ namespace DetectPseudoRandomBytes {
  *  ```
  */
 namespace DetectPossibleTimingAttacks {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -141,7 +141,7 @@ namespace DetectPossibleTimingAttacks {
  *  ```
  */
 namespace DetectNoCsrfBeforeMethodOverride {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -158,7 +158,7 @@ namespace DetectNoCsrfBeforeMethodOverride {
  *  ```
  */
 namespace DetectBufferNoassert {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -175,7 +175,7 @@ namespace DetectBufferNoassert {
  *  ```
  */
 namespace DetectChildProcess {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -193,7 +193,7 @@ namespace DetectChildProcess {
  *  ```
  */
 namespace DetectDisableMustacheEscape {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -210,7 +210,7 @@ namespace DetectDisableMustacheEscape {
  *  ```
  */
 namespace DetectObjectInjection {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -228,7 +228,7 @@ namespace DetectObjectInjection {
  *  ```
  */
 namespace DetectNewBuffer {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -246,7 +246,7 @@ namespace DetectNewBuffer {
  *  ```
  */
 namespace DetectBidiCharacters {
-  export type RuleEntry = Linter.RuleSeverity;
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintSecurityRules = {

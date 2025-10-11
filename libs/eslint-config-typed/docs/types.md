@@ -293,3 +293,9 @@ Re-exports [TypeScriptEslintRules](types/rules/typescript-eslint-rules.md#typesc
 ### TypeScriptEslintRulesOption
 
 Re-exports [TypeScriptEslintRulesOption](types/rules/typescript-eslint-rules.md#typescripteslintrulesoption)
+
+---
+
+### withDefaultOption
+
+Re-exports [withDefaultOption](types/rule-severity-with-default-option.md#withdefaultoption)

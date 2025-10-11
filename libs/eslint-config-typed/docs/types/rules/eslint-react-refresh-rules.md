@@ -12,7 +12,7 @@
 
 > **EslintReactRefreshRules** = `object`
 
-Defined in: [src/types/rules/eslint-react-refresh-rules.mts:52](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L52)
+Defined in: [src/types/rules/eslint-react-refresh-rules.mts:56](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L56)
 
 #### Properties
 
@@ -20,7 +20,7 @@ Defined in: [src/types/rules/eslint-react-refresh-rules.mts:52](https://github.c
 
 > `readonly` **react-refresh/only-export-components**: `OnlyExportComponents.RuleEntry`
 
-Defined in: [src/types/rules/eslint-react-refresh-rules.mts:53](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L53)
+Defined in: [src/types/rules/eslint-react-refresh-rules.mts:57](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L57)
 
 ---
 
@@ -28,7 +28,7 @@ Defined in: [src/types/rules/eslint-react-refresh-rules.mts:53](https://github.c
 
 > **EslintReactRefreshRulesOption** = `object`
 
-Defined in: [src/types/rules/eslint-react-refresh-rules.mts:56](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L56)
+Defined in: [src/types/rules/eslint-react-refresh-rules.mts:60](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L60)
 
 #### Properties
 
@@ -36,4 +36,4 @@ Defined in: [src/types/rules/eslint-react-refresh-rules.mts:56](https://github.c
 
 > `readonly` **react-refresh/only-export-components**: `OnlyExportComponents.Options`
 
-Defined in: [src/types/rules/eslint-react-refresh-rules.mts:57](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L57)
+Defined in: [src/types/rules/eslint-react-refresh-rules.mts:61](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L61)

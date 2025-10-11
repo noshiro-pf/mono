@@ -582,6 +582,7 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 - [types](types.md)
 - [types/define-known-rules](types/define-known-rules.md)
 - [types/flat-config](types/flat-config.md)
+- [types/rule-severity-with-default-option](types/rule-severity-with-default-option.md)
 - [types/rules](types/rules.md)
 - [types/rules/eslint-array-func-rules](types/rules/eslint-array-func-rules.md)
 - [types/rules/eslint-cypress-rules](types/rules/eslint-cypress-rules.md)

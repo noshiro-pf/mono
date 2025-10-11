@@ -12,4 +12,4 @@
 
 > `const` **eslintReactPerfRules**: [`EslintReactPerfRules`](../types/rules/eslint-react-perf-rules.md#eslintreactperfrules)
 
-Defined in: [src/rules/eslint-react-perf-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-react-perf-rules.mts#L3)
+Defined in: [src/rules/eslint-react-perf-rules.mts:6](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-react-perf-rules.mts#L6)
