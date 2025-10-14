@@ -1,3 +1,9 @@
+## [1.0.3](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.0.2...v1.0.3) (2025-10-14)
+
+### Bug Fixes
+
+- bump @octokit/core from 7.0.3 to 7.0.5 ([#22](https://github.com/noshiro-pf/octokit-safe-types/issues/22)) ([30db739](https://github.com/noshiro-pf/octokit-safe-types/commit/30db7397acccc9d0fe0aec60a036b2688fca1ae7))
+
 ## [1.0.2](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.0.1...v1.0.2) (2025-10-04)
 
 ### Bug Fixes
