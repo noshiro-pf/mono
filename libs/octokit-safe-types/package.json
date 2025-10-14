@@ -67,11 +67,11 @@
   },
   "dependencies": {
     "@octokit/core": "^7.0.5",
+    "@octokit/openapi-types": "^26.0.0",
     "ts-data-forge": "^3.2.0",
     "ts-fortress": "^5.2.0"
   },
   "devDependencies": {
-    "@octokit/openapi-types": "^26.0.0",
     "@rollup/plugin-replace": "^6.0.2",
     "@rollup/plugin-strip": "^3.0.4",
     "@rollup/plugin-typescript": "^12.1.4",
