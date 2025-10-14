@@ -1,3 +1,5 @@
+import { type components } from '@octokit/openapi-types';
+import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
 export const RepositoryRulesetConditions = t.strictRecord({
@@ -11,3 +13,8 @@ export const RepositoryRulesetConditions = t.strictRecord({
     }),
   ),
 });
+
+expectType<
+  t.TypeOf<typeof RepositoryRulesetConditions>,
+  DeepReadonly<components['schemas']['repository-ruleset-conditions']>
+>('=');

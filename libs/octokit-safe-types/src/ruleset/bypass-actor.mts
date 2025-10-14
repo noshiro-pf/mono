@@ -21,5 +21,5 @@ export const RepositoryRulesetBypassActor = t.strictRecord({
    * @default always
    * @enum {string}
    */
-  bypass_mode: t.optional(t.enumType(['always', 'pull_request'])),
+  bypass_mode: t.optional(t.enumType(['always', 'pull_request', 'exempt'])),
 });

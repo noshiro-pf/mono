@@ -1,3 +1,4 @@
+import { type components } from '@octokit/openapi-types';
 import { type EndpointKeys } from '@octokit/types';
 import { type UpdateRulesetRequest } from 'octokit-safe-types';
 import { castDeepMutable } from 'ts-data-forge';
@@ -25,7 +26,10 @@ export const updateRuleset = async ({
       enforcement,
       bypass_actors: castDeepMutable(bypass_actors),
       conditions: castDeepMutable(conditions),
-      rules: castDeepMutable(rules),
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      rules: castDeepMutable(
+        rules,
+      ) as components['schemas']['repository-rule'][],
     },
   );
 };

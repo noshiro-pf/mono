@@ -1,5 +1,7 @@
+import { type components } from '@octokit/openapi-types';
 import { type EndpointKeys, type OctokitResponse } from '@octokit/types';
 import { GetAllRulesetsResponse } from 'octokit-safe-types';
+import { expectType } from 'ts-data-forge';
 import 'ts-repo-utils';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
@@ -14,6 +16,50 @@ export const getAllRulesets = async (): Promise<GetAllRulesetsResponse> => {
       headers: octokitHeaders,
     },
   )) satisfies OctokitResponse<GetAllRulesetsResponse, 200>;
+
+  // type T =
+  //   (typeof getAllRulesetsResponse)['data'][number]['current_user_can_bypass'];
+
+  expectType<
+    DeepReadonly<typeof getAllRulesetsResponse>,
+    DeepReadonly<
+      OctokitResponse<
+        {
+          id: number;
+          name: string;
+          target?: 'branch' | 'tag' | 'push' | 'repository';
+          source_type?: 'Repository' | 'Organization' | 'Enterprise';
+          source: string;
+          enforcement: components['schemas']['repository-rule-enforcement'];
+          bypass_actors?: components['schemas']['repository-ruleset-bypass-actor'][];
+          current_user_can_bypass?:
+            | 'always'
+            | 'pull_requests_only'
+            | 'never'
+            | 'exempt';
+          node_id?: string;
+          _links?: {
+            self?: {
+              href?: string;
+            };
+            html?: {
+              href?: string;
+            } | null;
+          };
+          conditions?:
+            | (
+                | components['schemas']['repository-ruleset-conditions']
+                | components['schemas']['org-ruleset-conditions']
+              )
+            | null;
+          rules?: components['schemas']['repository-rule'][];
+          created_at?: string;
+          updated_at?: string;
+        }[],
+        200
+      >
+    >
+  >('=');
 
   assertGetAllRulesetsResponse(getAllRulesetsResponse.data);
 

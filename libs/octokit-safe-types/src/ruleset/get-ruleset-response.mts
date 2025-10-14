@@ -7,12 +7,16 @@ export const GetRulesetResponse = RepositoryRuleset;
 
 export type GetRulesetResponse = t.TypeOf<typeof GetRulesetResponse>;
 
+// TODO: Remove StrictOmit when `rules` type of @octokit/openapi-types is fixed.
 expectType<
   GetRulesetResponse,
-  DeepReadonly<
-    paths['/repos/{owner}/{repo}/rulesets/{ruleset_id}']['get']['responses']['200']['content']['application/json']
+  StrictOmit<
+    DeepReadonly<
+      paths['/repos/{owner}/{repo}/rulesets/{ruleset_id}']['get']['responses']['200']['content']['application/json']
+    >,
+    'rules'
   >
->('=');
+>('~=');
 
 expectType<
   components['schemas']['repository-ruleset'],

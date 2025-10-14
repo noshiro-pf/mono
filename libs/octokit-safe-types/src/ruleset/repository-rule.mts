@@ -386,6 +386,11 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-code-scanning']>
 >('=');
 
+// NOTE: This is not yet implemented in @octokit/openapi-types 26.0.0, but it exists in the actual API responses.
+const RepositoryRuleCopilotCodeReview = t.strictRecord({
+  type: t.literal('copilot_code_review'),
+});
+
 export const RepositoryRule = t.union([
   RepositoryRuleCreation,
   RepositoryRuleUpdate,
@@ -408,4 +413,15 @@ export const RepositoryRule = t.union([
   RepositoryRuleMaxFileSize,
   RepositoryRuleWorkflows,
   RepositoryRuleCodeScanning,
+  RepositoryRuleCopilotCodeReview,
 ]);
+
+expectType<
+  t.TypeOf<typeof RepositoryRule>,
+  DeepReadonly<
+    | components['schemas']['repository-rule']
+    | Readonly<{
+        type: 'copilot_code_review';
+      }>
+  >
+>('=');
