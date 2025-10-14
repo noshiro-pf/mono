@@ -1,3 +1,9 @@
+## [1.0.4](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.0.3...v1.0.4) (2025-10-14)
+
+### Bug Fixes
+
+- move @octokit/openapi-types from devDeps to deps ([#29](https://github.com/noshiro-pf/octokit-safe-types/issues/29)) ([7b845ff](https://github.com/noshiro-pf/octokit-safe-types/commit/7b845ffe178d6433884f63be79f3c3fc5c48c115))
+
 ## [1.0.3](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.0.2...v1.0.3) (2025-10-14)
 
 ### Bug Fixes
