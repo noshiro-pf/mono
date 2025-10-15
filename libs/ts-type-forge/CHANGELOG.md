@@ -1,3 +1,9 @@
+# [2.3.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.2.0...v2.3.0) (2025-10-15)
+
+### Features
+
+- AnyFn type ([#201](https://github.com/noshiro-pf/ts-type-forge/issues/201)) ([9f438de](https://github.com/noshiro-pf/ts-type-forge/commit/9f438de4f02d9351f09842ddfe0b806d86038af2))
+
 # [2.2.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.1.1...v2.2.0) (2025-08-12)
 
 ### Features
