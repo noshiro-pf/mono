@@ -41,6 +41,8 @@
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx ./scripts/cmd/embed-samples.mts",
+    "doc:preview": "vite preview --config ./configs/vite.doc.config.ts",
+    "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
     "fmt:full": "prettier --write .",
@@ -108,6 +110,7 @@
     "tslib": "^2.8.1",
     "tsx": "^4.20.6",
     "typedoc": "^0.28.13",
+    "typedoc-github-theme": "^0.3.1",
     "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"

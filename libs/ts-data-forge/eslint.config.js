@@ -9,7 +9,7 @@ const thisDir = import.meta.dirname;
 /** @returns {readonly import('eslint-config-typed').FlatConfig[]} */
 const defineConfig = () => [
   {
-    ignores: ['eslint.config.js', 'dist', 'coverage'],
+    ignores: ['eslint.config.js', 'dist', 'coverage', 'docs'],
   },
   ...eslintFlatConfigForTypeScript({
     tsconfigRootDir: thisDir,

@@ -32,6 +32,10 @@ This library offers a range of utilities, including:
 - **JSON Handling**: Type-safe JSON parsing and stringification.
 - **And more**: Including memoization, casting utilities, and other helpful tools.
 
+## Documentation
+
+- API reference: <https://noshiro-pf.github.io/ts-data-forge/>
+
 ## Installation
 
 ```bash
