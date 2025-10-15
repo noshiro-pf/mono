@@ -72,6 +72,9 @@ type MonoTypeFunction<X> = Fn<X, X>;
  */
 type Reducer<S, A> = (state: S, action: A) => S;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFn = (...args: readonly any[]) => any;
+
 /**
  * Converts a union type `T` into an intersection type.
  * @template T - The union type.

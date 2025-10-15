@@ -215,7 +215,7 @@ type C = CastToInt<SafeInt>; // SafeInt (since SafeInt extends Int)
 
 > **IntersectionImplSub**\<`Types`\> = `Types` _extends_ readonly \[\] ? `unknown` : `Types` _extends_ readonly \[infer Head, `...(infer Tail)`\] ? `Head` & [`IntersectionImplSub`](#intersectionimplsub)\<`Tail`\> : `never`
 
-Defined in: [src/others/utils.d.mts:119](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L119)
+Defined in: [src/others/utils.d.mts:122](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L122)
 
 #### Type Parameters
 
@@ -229,7 +229,7 @@ Defined in: [src/others/utils.d.mts:119](https://github.com/noshiro-pf/ts-type-f
 
 > **MergeIfRecords**\<`R`\> = \[`R`\] _extends_ \[[`UnknownRecord`](../../../../constants/record.md#unknownrecord)\] ? [`MergeIntersection`](../../../../others/utils.md#mergeintersection)\<`R`\> : `R`
 
-Defined in: [src/others/utils.d.mts:126](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L126)
+Defined in: [src/others/utils.d.mts:129](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L129)
 
 #### Type Parameters
 

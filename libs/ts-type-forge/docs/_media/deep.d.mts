@@ -16,8 +16,7 @@
  */
 type DeepReadonly<T> = T extends Primitive
   ? T
-  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    T extends (...args: readonly any[]) => any
+  : T extends AnyFn
     ? T
     : T extends MutableMap<infer K, infer V>
       ? ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>
@@ -46,8 +45,7 @@ type DeepReadonly<T> = T extends Primitive
  */
 type DeepMutable<T> = T extends Primitive
   ? T
-  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    T extends (...args: readonly any[]) => any
+  : T extends AnyFn
     ? T
     : T extends MutableMap<infer K, infer V>
       ? MutableMap<DeepMutable<K>, DeepMutable<V>>
@@ -83,8 +81,7 @@ type DeepMutable<T> = T extends Primitive
  */
 type DeepPartial<T> = T extends Primitive
   ? T
-  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    T extends (...args: readonly any[]) => any
+  : T extends AnyFn
     ? T
     : T extends MutableMap<infer K, infer V>
       ? MutableMap<DeepPartial<K>, DeepPartial<V>>
@@ -114,8 +111,7 @@ type DeepPartial<T> = T extends Primitive
  */
 type DeepRequired<T> = T extends Primitive
   ? T
-  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    T extends (...args: readonly any[]) => any
+  : T extends AnyFn
     ? T
     : T extends MutableMap<infer K, infer V>
       ? MutableMap<DeepRequired<K>, DeepRequired<V>>

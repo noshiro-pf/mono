@@ -240,11 +240,29 @@ The action type.
 
 ---
 
+### AnyFn()
+
+> **AnyFn** = (...`args`) => `any`
+
+Defined in: [src/others/utils.d.mts:76](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L76)
+
+#### Parameters
+
+##### args
+
+...readonly `any`[]
+
+#### Returns
+
+`any`
+
+---
+
 ### UnionToIntersection
 
 > **UnionToIntersection**\<`T`\> = `T` _extends_ `unknown` ? (`arg`) => `void` : `never` _extends_ (`arg`) => `void` ? `F` : `never`
 
-Defined in: [src/others/utils.d.mts:81](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L81)
+Defined in: [src/others/utils.d.mts:84](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L84)
 
 Converts a union type `T` into an intersection type.
 
@@ -268,7 +286,7 @@ type Inter = UnionToIntersection<{ a: string } | { b: number }>; // { a: string 
 
 > **MergeIntersection**\<`R`\> = `{ [K in keyof R]: R[K] }`
 
-Defined in: [src/others/utils.d.mts:94](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L94)
+Defined in: [src/others/utils.d.mts:97](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L97)
 
 Merges an intersection of object types `R` into a single object type with combined properties.
 Useful for making intersected types more readable in tooltips.
@@ -293,7 +311,7 @@ type Merged = MergeIntersection<{ a: string } & { b: number }>; // { a: string; 
 
 > **ExcludeFalsyValue**\<`A`\> = [`RelaxedExclude`](../record/std.md#relaxedexclude)\<`A`, [`FalsyValue`](../constants/falsy-value.md#falsyvalue)\>
 
-Defined in: [src/others/utils.d.mts:103](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L103)
+Defined in: [src/others/utils.d.mts:106](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L106)
 
 Excludes falsy values (false, 0, '', null, undefined) from type `A`.
 Note: Does not exclude `NaN` as it's not representable as a literal type.
@@ -312,7 +330,7 @@ The type to filter.
 
 > **Intersection**\<`Types`\> = `TSTypeForgeInternals.IntersectionImpl`\<`Types`\>
 
-Defined in: [src/others/utils.d.mts:111](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L111)
+Defined in: [src/others/utils.d.mts:114](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L114)
 
 Creates an intersection type from a tuple of types `Types`.
 
