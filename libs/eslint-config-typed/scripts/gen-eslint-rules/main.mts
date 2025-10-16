@@ -12,7 +12,7 @@ const outDir = path.resolve(thisDir, '../../src/types/rules');
 
 const eslintConfigPath = path.resolve(thisDir, './eslint.config.gen.mjs');
 
-const formatCommand = 'npm exec -- prettier --write src/types/rules/*.mts';
+const formatCommand = 'pnpm exec prettier --write src/types/rules/*.mts';
 
 export const generateRulesType = async (): Promise<void> => {
   {

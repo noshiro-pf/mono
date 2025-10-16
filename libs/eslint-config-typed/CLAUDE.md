@@ -6,20 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Testing:**
 
-- `npm test` - Run all tests with Vitest
-- `npm run testw` - Run tests in watch mode
-- `npm run test -- path/to/test.mts` - Run specific test file
+- `pnpm test` - Run all tests with Vitest
+- `pnpm run testw` - Run tests in watch mode
+- `pnpm run test path/to/test.mts` - Run specific test file
 
 **Build & Validation:**
 
-- `npm run build` - Full build pipeline (generates indexes, type-checks, bundles)
-- `npm run tsc` - Type checking only
-- `npm run check-all` - Comprehensive validation (lint, test, build)
+- `pnpm run build` - Full build pipeline (generates indexes, type-checks, bundles)
+- `pnpm run tsc` - Type checking only
+- `pnpm run check-all` - Comprehensive validation (lint, test, build)
 
 **Code Quality:**
 
-- `npm run lint` - ESLint checking
-- `npm run fmt` - Prettier formatting
+- `pnpm run lint` - ESLint checking
+- `pnpm run fmt` - Prettier formatting
 
 ## Important Instructions
 
@@ -116,8 +116,8 @@ This organization makes scripts easier to read and understand the execution flow
 
 After making changes, verify:
 
-- [ ] `npm run tsc` - Type checking
-- [ ] `npm run test` - Run all tests
-- [ ] `npm run lint` - ESLint validation
-- [ ] `npm run fmt` - Code formatting
-- [ ] `npm run build` - Full build pipeline
+- [ ] `pnpm run tsc` - Type checking
+- [ ] `pnpm run test` - Run all tests
+- [ ] `pnpm run lint` - ESLint validation
+- [ ] `pnpm run fmt` - Code formatting
+- [ ] `pnpm run build` - Full build pipeline

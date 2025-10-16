@@ -85,7 +85,7 @@ True if this expression is a literal, false otherwise.
 
 ##### sourceNode
 
-`undefined` | `Expression`
+`Expression` | `undefined`
 
 #### Returns
 
@@ -95,7 +95,7 @@ True if this expression is a literal, false otherwise.
 
 ### typeSymbolName()
 
-> **typeSymbolName**(`type`): `undefined` \| `string`
+> **typeSymbolName**(`type`): `string` \| `undefined`
 
 Defined in: [src/plugins/total-functions/rules/common.mts:13](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/common.mts#L13)
 
@@ -107,4 +107,4 @@ Defined in: [src/plugins/total-functions/rules/common.mts:13](https://github.com
 
 #### Returns
 
-`undefined` \| `string`
+`string` \| `undefined`

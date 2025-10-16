@@ -31,12 +31,12 @@ export const genDocs = async (): Promise<void> => {
 
   // Step 2: Format generated files
   echo('2. Formatting generated files...');
-  await runCmdStep('npm run fmt', 'Formatting failed');
+  await runCmdStep('pnpm run fmt', 'Formatting failed');
   echo('✓ Formatting completed\n');
 
   // Step 3: Lint markdown files
   echo('3. Linting markdown files...');
-  await runCmdStep('npm run md', 'Markdown linting failed');
+  await runCmdStep('pnpm run md', 'Markdown linting failed');
   echo('✓ Markdown linting completed\n');
 
   echo('✅ Documentation generation completed successfully!\n');

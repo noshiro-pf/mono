@@ -178,11 +178,11 @@ The available options are parser-dependent.
 
 ###### languageOptions.parserOptions.jsxFragmentName?
 
-> `readonly` `optional` **jsxFragmentName**: `null` \| `string`
+> `readonly` `optional` **jsxFragmentName**: `string` \| `null`
 
 ###### languageOptions.parserOptions.jsxPragma?
 
-> `readonly` `optional` **jsxPragma**: `null` \| `string`
+> `readonly` `optional` **jsxPragma**: `string` \| `null`
 
 ###### languageOptions.parserOptions.lib?
 
@@ -190,11 +190,11 @@ The available options are parser-dependent.
 
 ###### languageOptions.parserOptions.programs?
 
-> `readonly` `optional` **programs**: `null` \| readonly `object`[]
+> `readonly` `optional` **programs**: readonly `object`[] \| `null`
 
 ###### languageOptions.parserOptions.project?
 
-> `readonly` `optional` **project**: `null` \| `string` \| `boolean` \| readonly `string`[]
+> `readonly` `optional` **project**: `string` \| `boolean` \| readonly `string`[] \| `null`
 
 ###### languageOptions.parserOptions.projectFolderIgnoreList?
 
@@ -327,7 +327,7 @@ When `files` or `ignores` are specified, these rule configurations are only avai
 
 ###### Index Signature
 
-\[`key`: `string`\]: `undefined` \| `RuleLevel` \| readonly \[`RuleLevel`, `unknown`\]
+\[`key`: `string`\]: `RuleLevel` \| readonly \[`RuleLevel`, `unknown`\] \| `undefined`
 
 ##### settings?
 

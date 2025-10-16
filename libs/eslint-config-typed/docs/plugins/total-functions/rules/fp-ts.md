@@ -26,7 +26,7 @@ Defined in: [src/plugins/total-functions/rules/fp-ts.mts:6](https://github.com/n
 
 ### fpTsEffectType()
 
-> **fpTsEffectType**(`type`): `undefined` \| `Readonly`\<\{ `effectName`: `string`; `effectType`: `Type`; `effectTypeParameter`: `undefined` \| `Type`; \}\>
+> **fpTsEffectType**(`type`): `Readonly`\<\{ `effectName`: `string`; `effectType`: `Type`; `effectTypeParameter`: `Type` \| `undefined`; \}\> \| `undefined`
 
 Defined in: [src/plugins/total-functions/rules/fp-ts.mts:45](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/fp-ts.mts#L45)
 
@@ -38,4 +38,4 @@ Defined in: [src/plugins/total-functions/rules/fp-ts.mts:45](https://github.com/
 
 #### Returns
 
-`undefined` \| `Readonly`\<\{ `effectName`: `string`; `effectType`: `Type`; `effectTypeParameter`: `undefined` \| `Type`; \}\>
+`Readonly`\<\{ `effectName`: `string`; `effectType`: `Type`; `effectTypeParameter`: `Type` \| `undefined`; \}\> \| `undefined`
