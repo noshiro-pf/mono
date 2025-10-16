@@ -20,7 +20,9 @@
     "eslint.config.js",
     "./package-lock.json",
     "./pnpm-lock.yaml",
+    "./pnpm-workspace.yaml",
     "docs/**",
-    "BREAKING_CHANGE_GUIDE.md"
+    "BREAKING_CHANGE_GUIDE.md",
+    "github/**"
   ]
 }
