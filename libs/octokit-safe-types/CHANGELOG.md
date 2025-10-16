@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.0.4...v1.1.0) (2025-10-16)
+
+### Features
+
+- re-export some types in @octokit/types ([#35](https://github.com/noshiro-pf/octokit-safe-types/issues/35)) ([5c71e69](https://github.com/noshiro-pf/octokit-safe-types/commit/5c71e69d5883491e8b79d77b94c008065ad08349))
+
 ## [1.0.4](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.0.3...v1.0.4) (2025-10-14)
 
 ### Bug Fixes
