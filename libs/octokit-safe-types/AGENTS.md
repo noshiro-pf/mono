@@ -9,14 +9,14 @@
 
 ## Build, Test, and Development Commands
 
-- `npm run build` — builds to `dist/` via scripts in `scripts/cmd/`.
-- `npm test` — run Vitest once. `npm run testw` for watch, `npm run test:ui` for UI.
-- `npm run test:cov` — generate coverage; view with `npm run test:cov:ui` then open preview.
-- `npm run type-check` — strict TS type-check (no emit).
-- `npm run lint` / `lint:fix` — ESLint check/fix.
-- `npm run fmt` — format changed files; `fmt:full` for repo-wide format.
-- `npm run cspell` / `npm run md` — spellcheck and Markdown lint.
-- `npm run check-all` — run all quality gates.
+- `pnpm run build` — builds to `dist/` via scripts in `scripts/cmd/`.
+- `pnpm test` — run Vitest once. `pnpm run testw` for watch, `pnpm run test:ui` for UI.
+- `pnpm run test:cov` — generate coverage; view with `pnpm run test:cov:ui` then open preview.
+- `pnpm run type-check` — strict TS type-check (no emit).
+- `pnpm run lint` / `lint:fix` — ESLint check/fix.
+- `pnpm run fmt` — format changed files; `fmt:full` for repo-wide format.
+- `pnpm run cspell` / `pnpm run md` — spellcheck and Markdown lint.
+- `pnpm run check-all` — run all quality gates.
 
 ## Coding Style & Naming Conventions
 
@@ -30,7 +30,7 @@
 
 - Framework: Vitest (see `configs/vitest.config.ts`). Test targets `src/**/*.mts` and `test/**/*.mts`.
 - Place additional tests under `test/` mirroring `src/` paths. Name with clear intent.
-- Run `npm test` locally; aim for meaningful coverage on validators and type-level behavior.
+- Run `pnpm test` locally; aim for meaningful coverage on validators and type-level behavior.
 
 ## Commit & Pull Request Guidelines
 
@@ -40,7 +40,6 @@
 
 ## Security & Configuration Tips
 
-- Node `>=20.11.0`. Install with `npm ci`.
 - GitHub ruleset scripts require `.env` with `PERSONAL_ACCESS_TOKEN`. Do not commit `.env`; see `.env.example`.
 
 ## Agent-Specific Instructions

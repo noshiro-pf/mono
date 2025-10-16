@@ -9,6 +9,7 @@
   "ignorePaths": [
     "eslint.config.js",
     "./package-lock.json",
+    "./pnpm-lock.yaml",
     "docs/**",
     "BREAKING_CHANGE_GUIDE.md",
     "github/**"

@@ -25,7 +25,7 @@ export const backupRepositorySettings = async (fmt: boolean = true) => {
   );
 
   if (fmt) {
-    await $('npm run fmt');
+    await $('pnpm run fmt');
   }
 };
 

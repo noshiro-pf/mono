@@ -54,15 +54,15 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
-    "test": "npm run z:vitest -- run",
-    "test:cov": "npm run z:vitest -- run --coverage",
+    "test": "pnpm run z:vitest run",
+    "test:cov": "pnpm run z:vitest run --coverage",
     "test:cov:ui": "vite preview --outDir ./coverage",
-    "test:ui": "npm run z:vitest -- --ui",
-    "testw": "npm run z:vitest -- watch",
+    "test:ui": "pnpm run z:vitest --ui",
+    "testw": "pnpm run z:vitest watch",
     "tsc": "tsc --noEmit",
     "tscw": "tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "tsc --noEmit",
-    "update-packages": "npx npm-check-updates -u --install always",
+    "update-packages": "pnpm exec npm-check-updates -u --install always",
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
@@ -72,6 +72,7 @@
     "ts-fortress": "^5.2.0"
   },
   "devDependencies": {
+    "@octokit/types": "^15.0.0",
     "@rollup/plugin-replace": "^6.0.2",
     "@rollup/plugin-strip": "^3.0.4",
     "@rollup/plugin-typescript": "^12.1.4",
@@ -90,6 +91,7 @@
     "eslint": "^9.35.0",
     "eslint-config-typed": "^1.2.2",
     "fast-glob": "^3.3.3",
+    "markdownlint": "^0.39.0",
     "markdownlint-cli2": "^0.18.1",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.6.2",
