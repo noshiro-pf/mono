@@ -20,9 +20,6 @@ export const getAllRulesets = async (): Promise<GetAllRulesetsResponse> => {
     },
   )) satisfies OctokitResponse<GetAllRulesetsResponse, 200>;
 
-  // type T =
-  //   (typeof getAllRulesetsResponse)['data'][number]['current_user_can_bypass'];
-
   expectType<
     DeepReadonly<typeof getAllRulesetsResponse>,
     DeepReadonly<
