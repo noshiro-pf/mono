@@ -1,6 +1,9 @@
-import { type components } from '@octokit/openapi-types';
-import { type EndpointKeys, type OctokitResponse } from '@octokit/types';
-import { GetAllRulesetsResponse } from 'octokit-safe-types';
+import {
+  GetAllRulesetsResponse,
+  type components,
+  type EndpointKeys,
+  type OctokitResponse,
+} from 'octokit-safe-types';
 import { expectType } from 'ts-data-forge';
 import 'ts-repo-utils';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';

@@ -1,6 +1,8 @@
-import { type components } from '@octokit/openapi-types';
-import { type EndpointKeys } from '@octokit/types';
-import { type UpdateRulesetRequest } from 'octokit-safe-types';
+import {
+  type components,
+  type EndpointKeys,
+  type UpdateRulesetRequest,
+} from 'octokit-safe-types';
 import { castDeepMutable } from 'ts-data-forge';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
