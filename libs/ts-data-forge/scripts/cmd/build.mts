@@ -12,7 +12,7 @@ const build = async (): Promise<void> => {
   // Step 1: Validate file extensions
   {
     echo('1. Checking file extensions...');
-    await runCmdStep('npm run check:ext', 'Checking file extensions failed');
+    await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
     echo('✓ File extensions validated\n');
   }
 
@@ -34,7 +34,7 @@ const build = async (): Promise<void> => {
   // Step 3: Generate index files
   {
     echo('3. Generating index files...');
-    await runCmdStep('npm run gi', 'Generating index files failed');
+    await runCmdStep('pnpm run gi', 'Generating index files failed');
     echo('✓ Generating index files completed\n');
   }
 

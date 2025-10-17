@@ -8,7 +8,7 @@ const readmePlugin = path.resolve(
   './typedoc-readme-plugin.mjs',
 );
 
-/** @type { Partial<import("typedoc").TypeDocOptions & import("typedoc-plugin-markdown").PluginOptions>} */
+/** @type {Partial<import("typedoc").TypeDocOptions>} */
 const config = {
   plugin: ['typedoc-github-theme', readmePlugin],
   entryPoints: [`${srcDir}/**/*.mts`],

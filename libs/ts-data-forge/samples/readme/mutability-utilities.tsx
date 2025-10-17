@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { castMutable } from 'ts-data-forge';
 
 // Example: Material-UI Autocomplete
@@ -9,8 +10,27 @@ import { produce } from 'immer';
 export const SomeComponent: React.FC = () => (
   <Autocomplete
     options={castMutable(readonlyOptions)}
-    renderInput={(params) => (
-      <TextField {...params} placeholder="Select an option" />
+    renderInput={({
+      InputLabelProps,
+      InputProps,
+      disabled,
+      fullWidth,
+      id,
+      inputProps,
+      size,
+    }) => (
+      <TextField
+        slotProps={{
+          inputLabel: InputLabelProps,
+          input: InputProps,
+          htmlInput: inputProps,
+        }}
+        disabled={disabled}
+        fullWidth={fullWidth}
+        id={id}
+        size={size}
+        placeholder="Select an option"
+      />
     )}
   />
 );

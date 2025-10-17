@@ -8,41 +8,41 @@ const checkAll = async (): Promise<void> => {
 
   // Step 1: Install dependencies
   echo('1. Installing dependencies...');
-  await runCmdStep('npm i', 'Failed to install dependencies');
+  await runCmdStep('pnpm i', 'Failed to install dependencies');
   echo('✓ Dependencies installed\n');
 
   // Step 2: Spell check
   echo('2. Running spell check...');
-  await runCmdStep('npm run cspell -- --fail-fast', 'Spell check failed');
+  await runCmdStep('pnpm run cspell --fail-fast', 'Spell check failed');
   echo('✓ Spell check passed\n');
 
   // Step 3: Check file extensions
   echo('3. Checking file extensions...');
-  await runCmdStep('npm run check:ext', 'Checking file extensions failed');
+  await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
   echo('✓ File extensions validated\n');
 
   // Step 4: Run tests
   echo('4. Running tests...');
-  await runCmdStep('npm run test', 'Tests failed');
+  await runCmdStep('pnpm run test', 'Tests failed');
   echo('✓ Tests passed\n');
 
   // Step 5: Lint and check repo status
   echo('5. Running lint fixes...');
-  await runCmdStep('npm run lint:fix', 'Linting failed');
+  await runCmdStep('pnpm run lint:fix', 'Linting failed');
   echo('✓ Lint fixes applied\n');
 
   // Step 6: Build and check repo status
   echo('6. Building project...');
-  await runCmdStep('npm run build', 'Build failed');
+  await runCmdStep('pnpm run build', 'Build failed');
 
   // Step 7: Generate docs and check repo status
   echo('7. Generating documentation...');
-  await runCmdStep('npm run doc', 'Documentation generation failed');
+  await runCmdStep('pnpm run doc', 'Documentation generation failed');
 
   // Step 8: Backup repository settings
   echo('8. Backing up repository settings...');
   await runCmdStep(
-    'npm run gh:backup-all',
+    'pnpm run gh:backup-all',
     'Backing up repository settings failed',
   );
 

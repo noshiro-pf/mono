@@ -1,6 +1,9 @@
 {
   "version": "0.2",
   "language": "en",
+  "allowCompoundWords": true,
+  "caseSensitive": false,
+  "ignoreRandomStrings": true,
   "words": [
     "bivariant",
     "contravariance",
@@ -13,6 +16,7 @@
     "NAND",
     "noshiro",
     "nums",
+    "sindresorhus",
     "strs",
     "testw",
     "tscw",
@@ -26,8 +30,10 @@
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",
-    "./package-lock.json",
+    "./pnpm-lock.yaml",
+    "./pnpm-workspace.yaml",
     "docs/**",
-    "BREAKING_CHANGE_GUIDE.md"
+    "BREAKING_CHANGE_GUIDE.md",
+    "github/**"
   ]
 }
