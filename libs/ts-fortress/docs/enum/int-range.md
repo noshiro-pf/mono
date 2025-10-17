@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / enum/int-range
 
@@ -18,11 +18,11 @@ Defined in: [src/enum/int-range.mts:10](https://github.com/noshiro-pf/ts-fortres
 
 ##### Start
 
-`Start` _extends_ `Int8`
+`Start` *extends* `Int8`
 
 ##### End
 
-`End` _extends_ `128` \| `Int8`
+`End` *extends* `128` \| `Int8`
 
 #### Parameters
 

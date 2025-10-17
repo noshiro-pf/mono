@@ -1,6 +1,6 @@
 [**ts-fortress**](../../../README.md)
 
----
+***
 
 [ts-fortress](../../../README.md) / predefined/brand/string/uuid
 
@@ -18,7 +18,7 @@ Defined in: [src/predefined/brand/string/uuid.mts:8](https://github.com/noshiro-
 
 ##### V
 
-`V` _extends_ [`UuidVersion`](../../../globals.md#uuidversion) \| `UuidVersionAdditionalOption`
+`V` *extends* [`UuidVersion`](../../../globals.md#uuidversion) \| `UuidVersionAdditionalOption`
 
 #### Parameters
 
@@ -34,7 +34,7 @@ Defined in: [src/predefined/brand/string/uuid.mts:8](https://github.com/noshiro-
 
 https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators
 
----
+***
 
 ### uuidV4()
 
@@ -52,7 +52,7 @@ Defined in: [src/predefined/brand/string/uuid.mts:47](https://github.com/noshiro
 
 [`Type`](../../../type/README.md#type)\<[`Uuid4`](../../../globals.md#uuid4)\>
 
----
+***
 
 ### uuidV6()
 
@@ -70,7 +70,7 @@ Defined in: [src/predefined/brand/string/uuid.mts:53](https://github.com/noshiro
 
 [`Type`](../../../type/README.md#type)\<[`Uuid6`](../../../globals.md#uuid6)\>
 
----
+***
 
 ### uuidV7()
 

@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / utils/validation-error
 
@@ -16,7 +16,7 @@ Defined in: [src/utils/validation-error.mts:6](https://github.com/noshiro-pf/ts-
 
 Represents a validation error with structured information
 
----
+***
 
 ### ValidationErrorWithMessage
 
@@ -44,7 +44,7 @@ Creates a basic validation error for primitive type validation
 
 [`ValidationError`](#validationerror)
 
----
+***
 
 ### prependIndexToValidationErrors()
 
@@ -68,7 +68,7 @@ readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `pat
 
 readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]
 
----
+***
 
 ### prependPathToValidationErrors()
 
@@ -92,7 +92,7 @@ readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `pat
 
 readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]
 
----
+***
 
 ### validationErrorsToMessages()
 
@@ -117,7 +117,7 @@ readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `pat
 
 readonly `string`[]
 
----
+***
 
 ### validationErrorToMessage()
 

@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / compose/merge-records
 
@@ -18,7 +18,7 @@ Defined in: [src/compose/merge-records.mts:12](https://github.com/noshiro-pf/ts-
 
 ##### Types
 
-`Types` _extends_ readonly \[`Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\]
+`Types` *extends* readonly \[`Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is UnknownRecord`; `cast`: (`a`) => `A`; `defaultValue`: `A`; `fill`: (`a`) => `A`; `is`: (`a`) => `a is UnknownRecord`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`UnknownRecord`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\]
 
 #### Parameters
 

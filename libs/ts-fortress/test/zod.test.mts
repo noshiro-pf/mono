@@ -41,9 +41,7 @@ test('WrongSchema', () => {
 
   expect(
     () => WrongSchema.safeParse({ key1: 1, key2: 'string' }).success,
-  ).toThrow(
-    new TypeError("Cannot read properties of undefined (reading 'traits')"),
-  );
+  ).toThrow(new Error('Invalid element at key "key1": expected a Zod schema'));
 });
 
 describe('api check', () => {

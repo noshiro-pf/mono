@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / record/pick
 
@@ -18,11 +18,11 @@ Defined in: [src/record/pick.mts:28](https://github.com/noshiro-pf/ts-fortress/b
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, [`Type`](../type/README.md#type)\<`unknown`\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, [`Type`](../type/README.md#type)\<`unknown`\>\>
 
 ##### KeysToPick
 
-`KeysToPick` _extends_ readonly keyof `R`[]
+`KeysToPick` *extends* readonly keyof `R`[]
 
 ## Functions
 
@@ -38,11 +38,11 @@ Creates a record type with keys picked.
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 ##### KeysToPick
 
-`KeysToPick` _extends_ readonly keyof `R` & `string`[]
+`KeysToPick` *extends* readonly keyof `R` & `string`[]
 
 #### Parameters
 

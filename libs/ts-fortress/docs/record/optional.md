@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / record/optional
 
@@ -18,9 +18,9 @@ Defined in: [src/record/optional.mts:3](https://github.com/noshiro-pf/ts-fortres
 
 ##### T
 
-`T` _extends_ [`Type`](../type/README.md#type)\<`unknown`\>
+`T` *extends* [`Type`](../type/README.md#type)\<`unknown`\>
 
----
+***
 
 ### RequiredPropertyType
 
@@ -32,7 +32,7 @@ Defined in: [src/record/optional.mts:6](https://github.com/noshiro-pf/ts-fortres
 
 ##### T
 
-`T` _extends_ [`Type`](../type/README.md#type)\<`unknown`\>
+`T` *extends* [`Type`](../type/README.md#type)\<`unknown`\>
 
 ## Functions
 
@@ -46,7 +46,7 @@ Defined in: [src/record/optional.mts:18](https://github.com/noshiro-pf/ts-fortre
 
 ##### T
 
-`T` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+`T` *extends* `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 #### Parameters
 
@@ -58,7 +58,7 @@ Defined in: [src/record/optional.mts:18](https://github.com/noshiro-pf/ts-fortre
 
 `t is OptionalPropertyType<T>`
 
----
+***
 
 ### optional()
 
@@ -70,7 +70,7 @@ Defined in: [src/record/optional.mts:11](https://github.com/noshiro-pf/ts-fortre
 
 ##### T
 
-`T` _extends_ `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+`T` *extends* `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 #### Parameters
 

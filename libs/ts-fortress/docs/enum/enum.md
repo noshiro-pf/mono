@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / enum/enum
 
@@ -18,7 +18,7 @@ Defined in: [src/enum/enum.mts:10](https://github.com/noshiro-pf/ts-fortress/blo
 
 ##### Values
 
-`Values` _extends_ readonly \[`Primitive`, `Primitive`\]
+`Values` *extends* readonly \[`Primitive`, `Primitive`\]
 
 #### Parameters
 

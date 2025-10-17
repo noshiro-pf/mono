@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / record/omit
 
@@ -18,11 +18,11 @@ Defined in: [src/record/omit.mts:28](https://github.com/noshiro-pf/ts-fortress/b
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, [`Type`](../type/README.md#type)\<`unknown`\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, [`Type`](../type/README.md#type)\<`unknown`\>\>
 
 ##### KeysToOmit
 
-`KeysToOmit` _extends_ readonly keyof `R`[]
+`KeysToOmit` *extends* readonly keyof `R`[]
 
 ## Functions
 
@@ -38,11 +38,11 @@ Creates a record type with keys omitted.
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 ##### KeysToOmit
 
-`KeysToOmit` _extends_ readonly keyof `R` & `string`[]
+`KeysToOmit` *extends* readonly keyof `R` & `string`[]
 
 #### Parameters
 

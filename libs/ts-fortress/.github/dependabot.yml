@@ -7,7 +7,6 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-      day: 'saturday'
     target-branch: 'main'
     commit-message:
       prefix: 'fix'
@@ -17,7 +16,6 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-      day: 'saturday'
     target-branch: 'main'
     commit-message:
       prefix: 'chore'

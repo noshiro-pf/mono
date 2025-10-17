@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / utils/create-primitive-type
 
@@ -18,7 +18,7 @@ Defined in: [src/utils/create-primitive-type.mts:7](https://github.com/noshiro-p
 
 ##### A
 
-`A` _extends_ `Primitive`
+`A` *extends* `Primitive`
 
 #### Parameters
 

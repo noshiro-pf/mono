@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / entry-point
 
@@ -16,7 +16,7 @@
 
 > **Result**\<`S`, `E`\> = `Ok_`\<`S`\> \| `Err_`\<`E`\>
 
-Defined in: node_modules/ts-data-forge/dist/functional/result.d.mts:39
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:39
 
 Represents a value that can either be a success (`Ok`) or an error (`Err`).
 
@@ -40,7 +40,7 @@ The type of the error value.
 
 > `const` **asFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:48
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:48
 
 Casts a number to a FiniteNumber branded type.
 
@@ -52,7 +52,7 @@ that require finite numeric values.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -73,9 +73,9 @@ If the value is NaN, Infinity, or -Infinity
 #### Example
 
 ```typescript
-const x = asFiniteNumber(5.5); // FiniteNumber
-const y = asFiniteNumber(-10); // FiniteNumber
-const z = asFiniteNumber(0); // FiniteNumber
+const x = asFiniteNumber(5.5);   // FiniteNumber
+const y = asFiniteNumber(-10);   // FiniteNumber
+const z = asFiniteNumber(0);     // FiniteNumber
 
 // These throw TypeError:
 // asFiniteNumber(Infinity);     // Not finite
@@ -84,13 +84,13 @@ const z = asFiniteNumber(0); // FiniteNumber
 // asFiniteNumber(Math.sqrt(-1)); // Results in NaN
 ```
 
----
+***
 
 ### asInt()
 
 > `const` **asInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int.d.mts:46
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:46
 
 Casts a number to an Int branded type.
 
@@ -102,7 +102,7 @@ or is not a finite number.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -123,9 +123,9 @@ If the value is not an integer
 #### Example
 
 ```typescript
-const x = asInt(5); // Int
-const y = asInt(-10); // Int
-const z = asInt(0); // Int
+const x = asInt(5);    // Int
+const y = asInt(-10);  // Int
+const z = asInt(0);    // Int
 
 // These throw TypeError:
 // asInt(5.5);         // Not an integer
@@ -133,13 +133,13 @@ const z = asInt(0); // Int
 // asInt(Infinity);    // Not finite
 ```
 
----
+***
 
 ### asInt16()
 
 > `const` **asInt16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:21
 
 Casts a number to an Int16 type.
 
@@ -147,7 +147,7 @@ Casts a number to an Int16 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -174,13 +174,13 @@ const y = asInt16(-5000); // Int16
 // asInt16(1.5); // throws TypeError
 ```
 
----
+***
 
 ### asInt32()
 
 > `const` **asInt32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:21
 
 Casts a number to an Int32 type.
 
@@ -188,7 +188,7 @@ Casts a number to an Int32 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -215,13 +215,13 @@ const y = asInt32(-500000); // Int32
 // asInt32(1.5); // throws TypeError
 ```
 
----
+***
 
 ### asInt8()
 
 > `const` **asInt8**: (`x`) => `Int8`
 
-Defined in: node_modules/ts-data-forge/dist/number/enum/int8.d.mts:46
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:46
 
 Casts a number to an Int8 branded type.
 
@@ -247,10 +247,10 @@ If the value is not a valid 8-bit signed integer
 #### Example
 
 ```typescript
-const byte = asInt8(100); // Int8
-const max = asInt8(127); // Int8 (maximum value)
-const min = asInt8(-128); // Int8 (minimum value)
-const zero = asInt8(0); // Int8
+const byte = asInt8(100);     // Int8
+const max = asInt8(127);      // Int8 (maximum value)
+const min = asInt8(-128);     // Int8 (minimum value)
+const zero = asInt8(0);       // Int8
 
 // These throw TypeError:
 // asInt8(128);               // Exceeds maximum (127)
@@ -259,13 +259,13 @@ const zero = asInt8(0); // Int8
 // asInt8(NaN);               // Not a number
 ```
 
----
+***
 
 ### asNonNegativeFiniteNumber()
 
 > `const` **asNonNegativeFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:22
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:22
 
 Casts a number to a NonNegativeFiniteNumber type.
 
@@ -273,7 +273,7 @@ Casts a number to a NonNegativeFiniteNumber type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -300,13 +300,13 @@ const y = asNonNegativeFiniteNumber(0); // NonNegativeFiniteNumber
 // asNonNegativeFiniteNumber(Infinity); // throws TypeError
 ```
 
----
+***
 
 ### asNonNegativeInt16()
 
 > `const` **asNonNegativeInt16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:20
 
 Casts a number to a NonNegativeInt16 type.
 
@@ -314,7 +314,7 @@ Casts a number to a NonNegativeInt16 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -341,13 +341,13 @@ const y = asNonNegativeInt16(0); // NonNegativeInt16
 // asNonNegativeInt16(32768); // throws TypeError
 ```
 
----
+***
 
 ### asNonNegativeInt32()
 
 > `const` **asNonNegativeInt32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:20
 
 Casts a number to a NonNegativeInt32 type.
 
@@ -355,7 +355,7 @@ Casts a number to a NonNegativeInt32 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -382,13 +382,13 @@ const y = asNonNegativeInt32(0); // NonNegativeInt32
 // asNonNegativeInt32(2147483648); // throws TypeError
 ```
 
----
+***
 
 ### asNonZeroFiniteNumber()
 
 > `const` **asNonZeroFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:22
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:22
 
 Casts a number to a NonZeroFiniteNumber type.
 
@@ -396,7 +396,7 @@ Casts a number to a NonZeroFiniteNumber type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -423,13 +423,13 @@ const y = asNonZeroFiniteNumber(-3.2); // NonZeroFiniteNumber
 // asNonZeroFiniteNumber(Infinity); // throws TypeError
 ```
 
----
+***
 
 ### asNonZeroInt()
 
 > `const` **asNonZeroInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:21
 
 Casts a number to a NonZeroInt type.
 
@@ -437,7 +437,7 @@ Casts a number to a NonZeroInt type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -464,13 +464,13 @@ const y = asNonZeroInt(-3); // NonZeroInt
 // asNonZeroInt(1.5); // throws TypeError
 ```
 
----
+***
 
 ### asNonZeroInt16()
 
 > `const` **asNonZeroInt16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:21
 
 Casts a number to a NonZeroInt16 type.
 
@@ -478,7 +478,7 @@ Casts a number to a NonZeroInt16 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -505,13 +505,13 @@ const y = asNonZeroInt16(-1000); // NonZeroInt16
 // asNonZeroInt16(32768); // throws TypeError
 ```
 
----
+***
 
 ### asNonZeroInt32()
 
 > `const` **asNonZeroInt32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:21
 
 Casts a number to a NonZeroInt32 type.
 
@@ -519,7 +519,7 @@ Casts a number to a NonZeroInt32 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -546,13 +546,13 @@ const y = asNonZeroInt32(-1000); // NonZeroInt32
 // asNonZeroInt32(2147483648); // throws TypeError
 ```
 
----
+***
 
 ### asNonZeroSafeInt()
 
 > `const` **asNonZeroSafeInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:21
 
 Casts a number to a NonZeroSafeInt type.
 
@@ -560,7 +560,7 @@ Casts a number to a NonZeroSafeInt type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -587,13 +587,13 @@ const y = asNonZeroSafeInt(-1000); // NonZeroSafeInt
 // asNonZeroSafeInt(1.5); // throws TypeError
 ```
 
----
+***
 
 ### asNonZeroUint16()
 
 > `const` **asNonZeroUint16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:21
 
 Casts a number to a NonZeroUint16 type.
 
@@ -601,7 +601,7 @@ Casts a number to a NonZeroUint16 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -629,13 +629,13 @@ const y = asNonZeroUint16(65535); // NonZeroUint16
 // asNonZeroUint16(65536); // throws TypeError
 ```
 
----
+***
 
 ### asNonZeroUint32()
 
 > `const` **asNonZeroUint32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:21
 
 Casts a number to a NonZeroUint32 type.
 
@@ -643,7 +643,7 @@ Casts a number to a NonZeroUint32 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -671,13 +671,13 @@ const y = asNonZeroUint32(4294967295); // NonZeroUint32
 // asNonZeroUint32(4294967296); // throws TypeError
 ```
 
----
+***
 
 ### asPositiveFiniteNumber()
 
 > `const` **asPositiveFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:22
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:22
 
 Casts a number to a PositiveFiniteNumber type.
 
@@ -685,7 +685,7 @@ Casts a number to a PositiveFiniteNumber type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -712,13 +712,13 @@ const y = asPositiveFiniteNumber(0.001); // PositiveFiniteNumber
 // asPositiveFiniteNumber(-1); // throws TypeError
 ```
 
----
+***
 
 ### asPositiveInt()
 
 > `const` **asPositiveInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:45
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:45
 
 Casts a number to a PositiveInt branded type.
 
@@ -730,7 +730,7 @@ for operations that require strictly positive integer values.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -751,9 +751,9 @@ If the value is not a positive integer
 #### Example
 
 ```typescript
-const count = asPositiveInt(5); // PositiveInt
-const length = asPositiveInt(100); // PositiveInt
-const one = asPositiveInt(1); // PositiveInt (minimum valid)
+const count = asPositiveInt(5);      // PositiveInt
+const length = asPositiveInt(100);   // PositiveInt
+const one = asPositiveInt(1);        // PositiveInt (minimum valid)
 
 // These throw TypeError:
 // asPositiveInt(0);                 // Zero is not positive
@@ -762,13 +762,13 @@ const one = asPositiveInt(1); // PositiveInt (minimum valid)
 // asPositiveInt(Infinity);          // Not finite
 ```
 
----
+***
 
 ### asPositiveInt16()
 
 > `const` **asPositiveInt16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:21
 
 Casts a number to a PositiveInt16 type.
 
@@ -776,7 +776,7 @@ Casts a number to a PositiveInt16 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -804,13 +804,13 @@ const y = asPositiveInt16(32767); // PositiveInt16
 // asPositiveInt16(32768); // throws TypeError
 ```
 
----
+***
 
 ### asPositiveInt32()
 
 > `const` **asPositiveInt32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:21
 
 Casts a number to a PositiveInt32 type.
 
@@ -818,7 +818,7 @@ Casts a number to a PositiveInt32 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -846,13 +846,13 @@ const y = asPositiveInt32(2147483647); // PositiveInt32
 // asPositiveInt32(2147483648); // throws TypeError
 ```
 
----
+***
 
 ### asPositiveSafeInt()
 
 > `const` **asPositiveSafeInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:20
 
 Casts a number to a PositiveSafeInt type.
 
@@ -860,7 +860,7 @@ Casts a number to a PositiveSafeInt type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -887,13 +887,13 @@ const y = asPositiveSafeInt(1000); // PositiveSafeInt
 // asPositiveSafeInt(-1); // throws TypeError
 ```
 
----
+***
 
 ### asPositiveUint16()
 
 > `const` **asPositiveUint16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:21
 
 Casts a number to a PositiveUint16 type.
 
@@ -901,7 +901,7 @@ Casts a number to a PositiveUint16 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -929,13 +929,13 @@ const y = asPositiveUint16(65535); // PositiveUint16
 // asPositiveUint16(65536); // throws TypeError
 ```
 
----
+***
 
 ### asPositiveUint32()
 
 > `const` **asPositiveUint32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:21
 
 Casts a number to a PositiveUint32 type.
 
@@ -943,7 +943,7 @@ Casts a number to a PositiveUint32 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -971,13 +971,13 @@ const y = asPositiveUint32(4294967295); // PositiveUint32
 // asPositiveUint32(4294967296); // throws TypeError
 ```
 
----
+***
 
 ### asSafeInt()
 
 > `const` **asSafeInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:44
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:44
 
 Casts a number to a SafeInt branded type.
 
@@ -989,7 +989,7 @@ that require precise integer arithmetic.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -1010,9 +1010,9 @@ If the value is not a safe integer
 #### Example
 
 ```typescript
-const x = asSafeInt(5); // SafeInt
-const y = asSafeInt(-1000); // SafeInt
-const z = asSafeInt(2 ** 50); // SafeInt (within range)
+const x = asSafeInt(5);          // SafeInt
+const y = asSafeInt(-1000);      // SafeInt
+const z = asSafeInt(2**50);      // SafeInt (within range)
 
 // These throw TypeError:
 // asSafeInt(1.5);                      // Not an integer
@@ -1020,13 +1020,13 @@ const z = asSafeInt(2 ** 50); // SafeInt (within range)
 // asSafeInt(2**53);                    // Loss of precision
 ```
 
----
+***
 
 ### asSafeUint()
 
 > `const` **asSafeUint**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:20
 
 Casts a number to a SafeUint type.
 
@@ -1034,7 +1034,7 @@ Casts a number to a SafeUint type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -1061,13 +1061,13 @@ const y = asSafeUint(0); // SafeUint
 // asSafeUint(1.5); // throws TypeError
 ```
 
----
+***
 
 ### asUint()
 
 > `const` **asUint**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:20
 
 Casts a number to a Uint type.
 
@@ -1075,7 +1075,7 @@ Casts a number to a Uint type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -1102,13 +1102,13 @@ const y = asUint(0); // Uint
 // asUint(1.5); // throws TypeError
 ```
 
----
+***
 
 ### asUint16()
 
 > `const` **asUint16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:20
 
 Casts a number to a Uint16 type.
 
@@ -1116,7 +1116,7 @@ Casts a number to a Uint16 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -1143,13 +1143,13 @@ const y = asUint16(0); // Uint16
 // asUint16(70000); // throws TypeError
 ```
 
----
+***
 
 ### asUint32()
 
 > `const` **asUint32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:20
 
 Casts a number to a Uint32 type.
 
@@ -1157,7 +1157,7 @@ Casts a number to a Uint32 type.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 #### Parameters
 
@@ -1184,13 +1184,13 @@ const y = asUint32(0); // Uint32
 // asUint32(5000000000); // throws TypeError
 ```
 
----
+***
 
 ### asUint8()
 
 > `const` **asUint8**: (`x`) => `Uint8`
 
-Defined in: node_modules/ts-data-forge/dist/number/enum/uint8.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:21
 
 Casts a number to a Uint8 type.
 
@@ -1220,13 +1220,13 @@ const y = asUint8(0); // Uint8
 // asUint8(1.5); // throws TypeError
 ```
 
----
+***
 
 ### FiniteNumber
 
 > `const` **FiniteNumber**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:98
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:98
 
 Namespace providing type-safe operations for FiniteNumber branded types.
 
@@ -1235,7 +1235,6 @@ special values NaN, Infinity, and -Infinity. All operations are guaranteed
 to maintain the finite constraint when given finite inputs.
 
 This type is essential for:
-
 - Mathematical operations that require real numbers
 - Preventing NaN/Infinity propagation in calculations
 - Ensuring numeric stability in algorithms
@@ -1361,7 +1360,7 @@ FiniteNumber.div(a, b); // FiniteNumber (5.5)
 // With non-zero type guard
 const divisor = asFiniteNumber(userInput);
 if (Num.isNonZero(divisor)) {
-    const result = FiniteNumber.div(a, divisor);
+  const result = FiniteNumber.div(a, divisor);
 }
 ```
 
@@ -1441,8 +1440,8 @@ const a = asFiniteNumber(5.5);
 const b = asFiniteNumber(3.2);
 const c = asFiniteNumber(7.8);
 
-FiniteNumber.max(a, b); // FiniteNumber (7.8)
-FiniteNumber.max(a, b, c); // FiniteNumber (7.8)
+FiniteNumber.max(a, b);      // FiniteNumber (7.8)
+FiniteNumber.max(a, b, c);   // FiniteNumber (7.8)
 ```
 
 ##### min()
@@ -1472,8 +1471,8 @@ const a = asFiniteNumber(5.5);
 const b = asFiniteNumber(3.2);
 const c = asFiniteNumber(7.8);
 
-FiniteNumber.min(a, b); // FiniteNumber (3.2)
-FiniteNumber.min(a, b, c); // FiniteNumber (3.2)
+FiniteNumber.min(a, b);      // FiniteNumber (3.2)
+FiniteNumber.min(a, b, c);   // FiniteNumber (3.2)
 ```
 
 ##### mul()
@@ -1565,10 +1564,16 @@ A random FiniteNumber in the range [min, max]
 
 ```typescript
 // Random percentage (0-100)
-const pct = FiniteNumber.random(asFiniteNumber(0), asFiniteNumber(100));
+const pct = FiniteNumber.random(
+  asFiniteNumber(0),
+  asFiniteNumber(100)
+);
 
 // Random coordinate (-1 to 1)
-const coord = FiniteNumber.random(asFiniteNumber(-1), asFiniteNumber(1));
+const coord = FiniteNumber.random(
+  asFiniteNumber(-1),
+  asFiniteNumber(1)
+);
 ```
 
 ##### round()
@@ -1631,25 +1636,25 @@ FiniteNumber.sub(asFiniteNumber(8.7), asFiniteNumber(3.2)); // FiniteNumber (5.5
 
 ```typescript
 // Type validation
-FiniteNumber.is(3.14); // true
-FiniteNumber.is(Infinity); // false
-FiniteNumber.is(0 / 0); // false (NaN)
+FiniteNumber.is(3.14);       // true
+FiniteNumber.is(Infinity);   // false
+FiniteNumber.is(0/0);        // false (NaN)
 
 // Arithmetic with guaranteed finite results
 const a = asFiniteNumber(10.5);
 const b = asFiniteNumber(3.2);
 
-const sum = FiniteNumber.add(a, b); // FiniteNumber (13.7)
-const diff = FiniteNumber.sub(a, b); // FiniteNumber (7.3)
-const product = FiniteNumber.mul(a, b); // FiniteNumber (33.6)
+const sum = FiniteNumber.add(a, b);      // FiniteNumber (13.7)
+const diff = FiniteNumber.sub(a, b);     // FiniteNumber (7.3)
+const product = FiniteNumber.mul(a, b);  // FiniteNumber (33.6)
 const quotient = FiniteNumber.div(a, b); // FiniteNumber (3.28125)
 const power = FiniteNumber.pow(a, asFiniteNumber(2)); // FiniteNumber (110.25)
 
 // Rounding to integers
 const value = asFiniteNumber(5.7);
-const floored = FiniteNumber.floor(value); // Int (5)
-const ceiled = FiniteNumber.ceil(value); // Int (6)
-const rounded = FiniteNumber.round(value); // Int (6)
+const floored = FiniteNumber.floor(value);  // Int (5)
+const ceiled = FiniteNumber.ceil(value);    // Int (6)
+const rounded = FiniteNumber.round(value);  // Int (6)
 
 // Utility operations
 const absolute = FiniteNumber.abs(asFiniteNumber(-42.5)); // FiniteNumber (42.5)
@@ -1660,13 +1665,13 @@ const maximum = FiniteNumber.max(a, b, asFiniteNumber(5)); // FiniteNumber (10.5
 const rand = FiniteNumber.random(asFiniteNumber(0), asFiniteNumber(1)); // Random in [0, 1]
 ```
 
----
+***
 
 ### Int
 
 > `const` **Int**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int.d.mts:90
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:90
 
 Namespace providing type-safe operations for Int branded types.
 
@@ -1705,9 +1710,9 @@ The absolute value as a non-negative Int
 ###### Example
 
 ```typescript
-Int.abs(asInt(-5)); // Int (5)
-Int.abs(asInt(3)); // Int (3)
-Int.abs(asInt(-0)); // Int (0)
+Int.abs(asInt(-5));  // Int (5)
+Int.abs(asInt(3));   // Int (3)
+Int.abs(asInt(-0));  // Int (0)
 ```
 
 ##### add()
@@ -1767,12 +1772,12 @@ The integer quotient as an Int
 
 ```typescript
 // Positive division
-Int.div(asInt(10), asInt(3)); // Int (3)
-Int.div(asInt(9), asInt(3)); // Int (3)
+Int.div(asInt(10), asInt(3));   // Int (3)
+Int.div(asInt(9), asInt(3));    // Int (3)
 
 // Negative division (rounds toward -∞)
-Int.div(asInt(-10), asInt(3)); // Int (-4)
-Int.div(asInt(10), asInt(-3)); // Int (-4)
+Int.div(asInt(-10), asInt(3));  // Int (-4)
+Int.div(asInt(10), asInt(-3));  // Int (-4)
 Int.div(asInt(-10), asInt(-3)); // Int (3)
 ```
 
@@ -1821,7 +1826,7 @@ The largest value as an Int
 ###### Example
 
 ```typescript
-Int.max(asInt(5), asInt(3)); // Int (5)
+Int.max(asInt(5), asInt(3));           // Int (5)
 Int.max(asInt(-10), asInt(0), asInt(10)); // Int (10)
 ```
 
@@ -1848,7 +1853,7 @@ The smallest value as an Int
 ###### Example
 
 ```typescript
-Int.min(asInt(5), asInt(3)); // Int (3)
+Int.min(asInt(5), asInt(3));           // Int (3)
 Int.min(asInt(-10), asInt(0), asInt(10)); // Int (-10)
 ```
 
@@ -1982,22 +1987,22 @@ Int.sub(asInt(8), asInt(3)); // Int (5)
 
 ```typescript
 // Type validation
-Int.is(42); // true
-Int.is(3.14); // false
-Int.is(-0); // true (negative zero is an integer)
+Int.is(42);      // true
+Int.is(3.14);    // false
+Int.is(-0);      // true (negative zero is an integer)
 
 // Basic arithmetic
 const a = asInt(10);
 const b = asInt(3);
 
-const sum = Int.add(a, b); // Int (13)
-const diff = Int.sub(a, b); // Int (7)
-const product = Int.mul(a, b); // Int (30)
+const sum = Int.add(a, b);      // Int (13)
+const diff = Int.sub(a, b);     // Int (7)
+const product = Int.mul(a, b);  // Int (30)
 const quotient = Int.div(a, b); // Int (3) - floor division
-const power = Int.pow(a, b); // Int (1000)
+const power = Int.pow(a, b);    // Int (1000)
 
 // Utility operations
-const absolute = Int.abs(asInt(-42)); // Int (42)
+const absolute = Int.abs(asInt(-42));    // Int (42)
 const minimum = Int.min(a, b, asInt(5)); // Int (3)
 const maximum = Int.max(a, b, asInt(5)); // Int (10)
 
@@ -2005,13 +2010,13 @@ const maximum = Int.max(a, b, asInt(5)); // Int (10)
 const die = Int.random(asInt(1), asInt(6)); // Random Int in [1, 6]
 ```
 
----
+***
 
 ### Int16
 
 > `const` **Int16**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:62
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:62
 
 Namespace providing type-safe arithmetic operations for 16-bit signed integers.
 
@@ -2136,9 +2141,9 @@ Returns the larger of two Int16 values.
 
 The maximum value as an Int16.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 16-bit signed integer.
 
@@ -2160,9 +2165,9 @@ Returns the smaller of two Int16 values.
 
 The minimum value as an Int16.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `number`
+> `readonly` **MIN\_VALUE**: `number`
 
 The minimum value for a 16-bit signed integer.
 
@@ -2261,26 +2266,26 @@ const a = asInt16(30000);
 const b = asInt16(5000);
 
 // Arithmetic operations with automatic clamping
-const sum = Int16.add(a, b); // Int16 (32767 - clamped to MAX_VALUE)
-const diff = Int16.sub(a, b); // Int16 (25000)
-const product = Int16.mul(a, b); // Int16 (32767 - clamped due to overflow)
+const sum = Int16.add(a, b);      // Int16 (32767 - clamped to MAX_VALUE)
+const diff = Int16.sub(a, b);     // Int16 (25000)
+const product = Int16.mul(a, b);  // Int16 (32767 - clamped due to overflow)
 
 // Range operations
-const clamped = Int16.clamp(100000); // Int16 (32767)
-const minimum = Int16.min(a, b); // Int16 (5000)
-const maximum = Int16.max(a, b); // Int16 (30000)
+const clamped = Int16.clamp(100000);    // Int16 (32767)
+const minimum = Int16.min(a, b);        // Int16 (5000)
+const maximum = Int16.max(a, b);        // Int16 (30000)
 
 // Range constants
 const range = Int16.MAX_VALUE - Int16.MIN_VALUE + 1; // 65536
 ```
 
----
+***
 
 ### Int32
 
 > `const` **Int32**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:59
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:59
 
 Namespace providing type-safe arithmetic operations for 32-bit signed integers.
 
@@ -2405,9 +2410,9 @@ Returns the larger of two Int32 values.
 
 The maximum value as an Int32.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 32-bit signed integer.
 
@@ -2429,9 +2434,9 @@ Returns the smaller of two Int32 values.
 
 The minimum value as an Int32.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `number`
+> `readonly` **MIN\_VALUE**: `number`
 
 The minimum value for a 32-bit signed integer.
 
@@ -2530,27 +2535,27 @@ const a = asInt32(2000000000);
 const b = asInt32(500000000);
 
 // Arithmetic operations with automatic clamping
-const sum = Int32.add(a, b); // Int32 (2147483647 - clamped to MAX_VALUE)
-const diff = Int32.sub(a, b); // Int32 (1500000000)
-const product = Int32.mul(a, b); // Int32 (2147483647 - clamped due to overflow)
+const sum = Int32.add(a, b);      // Int32 (2147483647 - clamped to MAX_VALUE)
+const diff = Int32.sub(a, b);     // Int32 (1500000000)
+const product = Int32.mul(a, b);  // Int32 (2147483647 - clamped due to overflow)
 
 // Range operations
-const clamped = Int32.clamp(5000000000); // Int32 (2147483647)
-const minimum = Int32.min(a, b); // Int32 (500000000)
-const maximum = Int32.max(a, b); // Int32 (2000000000)
+const clamped = Int32.clamp(5000000000);    // Int32 (2147483647)
+const minimum = Int32.min(a, b);            // Int32 (500000000)
+const maximum = Int32.max(a, b);            // Int32 (2000000000)
 
 // Utility operations
 const absolute = Int32.abs(asInt32(-1000)); // Int32 (1000)
-const random = Int32.random(); // Int32 (random value in valid range)
+const random = Int32.random();              // Int32 (random value in valid range)
 ```
 
----
+***
 
 ### Int8
 
 > `const` **Int8**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/enum/int8.d.mts:88
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:88
 
 Namespace providing type-safe operations for Int8 (8-bit signed integer) branded types.
 
@@ -2559,7 +2564,6 @@ byte in many programming languages. All operations automatically clamp results
 to stay within this range, preventing overflow/underflow issues.
 
 This type is useful for:
-
 - Binary data processing (signed bytes)
 - Small integer values with known bounds
 - Embedded systems programming
@@ -2578,7 +2582,7 @@ Returns the absolute value of an Int8.
 
 ###### N
 
-`N` _extends_ `Int8`
+`N` *extends* `Int8`
 
 ###### Parameters
 
@@ -2702,9 +2706,9 @@ The largest value as an Int8
 Int8.max(asInt8(50), asInt8(-30), asInt8(100)); // Int8 (100)
 ```
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `127`
+> `readonly` **MAX\_VALUE**: `127`
 
 The maximum value for an 8-bit signed integer.
 
@@ -2734,9 +2738,9 @@ The smallest value as an Int8
 Int8.min(asInt8(50), asInt8(-30), asInt8(100)); // Int8 (-30)
 ```
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `-128`
+> `readonly` **MIN\_VALUE**: `-128`
 
 The minimum value for an 8-bit signed integer.
 
@@ -2819,7 +2823,7 @@ A random Int8 in the range [min, max]
 const randomByte = Int8.random(Int8.MIN_VALUE, Int8.MAX_VALUE);
 
 // Random small range
-const dice = Int8.random(asInt8(1), asInt8(6)); // 1-6
+const dice = Int8.random(asInt8(1), asInt8(6));  // 1-6
 
 // Random offset
 const offset = Int8.random(asInt8(-10), asInt8(10)); // -10 to 10
@@ -2855,38 +2859,37 @@ const a = asInt8(100);
 const b = asInt8(50);
 
 // Arithmetic with automatic clamping
-const sum = Int8.add(a, b); // Int8 (127) - clamped to maximum
-const diff = Int8.sub(a, b); // Int8 (50)
-const product = Int8.mul(a, b); // Int8 (127) - clamped due to overflow
-const quotient = Int8.div(a, b); // Int8 (2)
+const sum = Int8.add(a, b);        // Int8 (127) - clamped to maximum
+const diff = Int8.sub(a, b);       // Int8 (50)
+const product = Int8.mul(a, b);    // Int8 (127) - clamped due to overflow
+const quotient = Int8.div(a, b);   // Int8 (2)
 
 // Boundary handling
-const overflow = Int8.add(asInt8(127), asInt8(10)); // Int8 (127) - clamped
+const overflow = Int8.add(asInt8(127), asInt8(10));  // Int8 (127) - clamped
 const underflow = Int8.sub(asInt8(-128), asInt8(10)); // Int8 (-128) - clamped
 
 // Utility operations
-const clamped = Int8.clamp(200); // Int8 (127)
-const absolute = Int8.abs(asInt8(-100)); // Int8 (100)
-const minimum = Int8.min(a, b); // Int8 (50)
-const maximum = Int8.max(a, b); // Int8 (100)
+const clamped = Int8.clamp(200);          // Int8 (127)
+const absolute = Int8.abs(asInt8(-100));  // Int8 (100)
+const minimum = Int8.min(a, b);           // Int8 (50)
+const maximum = Int8.max(a, b);           // Int8 (100)
 
 // Random generation
-const die = Int8.random(asInt8(1), asInt8(6)); // Random 1-6
-const offset = Int8.random(asInt8(-10), asInt8(10)); // Random ±10
+const die = Int8.random(asInt8(1), asInt8(6));        // Random 1-6
+const offset = Int8.random(asInt8(-10), asInt8(10));  // Random ±10
 ```
 
----
+***
 
 ### isBigint()
 
 > `const` **isBigint**: (`u`) => `u is bigint`
 
-Defined in: node_modules/ts-data-forge/dist/guard/is-type.d.mts:171
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/guard/is-type.d.mts:171
 
 Type guard that checks if a value is a bigint.
 
 **Type Narrowing Behavior:**
-
 - Narrows `unknown` to `bigint` when `true`
 - Identifies values created with `BigInt()` constructor or `n` suffix
 
@@ -2903,7 +2906,7 @@ The value to check
 `u is bigint`
 
 `true` if `u` is a bigint, `false` otherwise.
-When `true`, TypeScript narrows the type to `bigint`.
+         When `true`, TypeScript narrows the type to `bigint`.
 
 #### Example
 
@@ -2911,19 +2914,19 @@ When `true`, TypeScript narrows the type to `bigint`.
 const userInput: unknown = parseInput();
 
 if (isBigint(userInput)) {
-    // userInput is now typed as bigint
-    console.log('BigInt value:', userInput.toString());
-    const doubled = userInput * 2n; // Safe bigint operations
+  // userInput is now typed as bigint
+  console.log('BigInt value:', userInput.toString());
+  const doubled = userInput * 2n; // Safe bigint operations
 }
 ```
 
----
+***
 
 ### isFiniteNumber()
 
 > `const` **isFiniteNumber**: (`a`) => `a is FiniteNumber`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:23
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:23
 
 Type guard that checks if a value is a finite number.
 
@@ -2945,22 +2948,22 @@ This is stricter than the standard number type, which includes these special val
 #### Example
 
 ```typescript
-isFiniteNumber(42); // true
-isFiniteNumber(3.14); // true
-isFiniteNumber(-0); // true
-isFiniteNumber(Infinity); // false
-isFiniteNumber(-Infinity); // false
-isFiniteNumber(NaN); // false
-isFiniteNumber(1 / 0); // false (Infinity)
+isFiniteNumber(42);          // true
+isFiniteNumber(3.14);        // true
+isFiniteNumber(-0);          // true
+isFiniteNumber(Infinity);    // false
+isFiniteNumber(-Infinity);   // false
+isFiniteNumber(NaN);         // false
+isFiniteNumber(1/0);         // false (Infinity)
 ```
 
----
+***
 
 ### isInt()
 
 > `const` **isInt**: (`a`) => `a is Int`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int.d.mts:22
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:22
 
 Type guard that checks if a value is an integer.
 
@@ -2983,21 +2986,21 @@ range, unlike SafeInt.
 #### Example
 
 ```typescript
-isInt(5); // true
-isInt(-10); // true
-isInt(0); // true
-isInt(5.5); // false
-isInt(NaN); // false
+isInt(5);        // true
+isInt(-10);      // true
+isInt(0);        // true
+isInt(5.5);      // false
+isInt(NaN);      // false
 isInt(Infinity); // false
 ```
 
----
+***
 
 ### isInt16()
 
 > `const` **isInt16**: (`a`) => `a is Int16`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:7
 
 Checks if a number is an Int16 (16-bit signed integer in the range [-2^15, 2^15)).
 
@@ -3013,13 +3016,13 @@ Checks if a number is an Int16 (16-bit signed integer in the range [-2^15, 2^15)
 
 `true` if the value is an Int16, `false` otherwise.
 
----
+***
 
 ### isInt32()
 
 > `const` **isInt32**: (`a`) => `a is Int32`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:7
 
 Checks if a number is an Int32 (32-bit signed integer in the range [-2^31, 2^31)).
 
@@ -3035,13 +3038,13 @@ Checks if a number is an Int32 (32-bit signed integer in the range [-2^31, 2^31)
 
 `true` if the value is an Int32, `false` otherwise.
 
----
+***
 
 ### isInt8()
 
 > `const` **isInt8**: (`x`) => `x is Int8`
 
-Defined in: node_modules/ts-data-forge/dist/number/enum/int8.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:21
 
 Type guard that checks if a value is an 8-bit signed integer.
 
@@ -3063,22 +3066,22 @@ values that fit in exactly 8 bits of memory.
 #### Example
 
 ```typescript
-isInt8(100); // true
-isInt8(-50); // true
-isInt8(127); // true (max value)
-isInt8(-128); // true (min value)
-isInt8(128); // false (exceeds max)
-isInt8(-129); // false (below min)
-isInt8(5.5); // false (not integer)
+isInt8(100);   // true
+isInt8(-50);   // true
+isInt8(127);   // true (max value)
+isInt8(-128);  // true (min value)
+isInt8(128);   // false (exceeds max)
+isInt8(-129);  // false (below min)
+isInt8(5.5);   // false (not integer)
 ```
 
----
+***
 
 ### isNonNegativeFiniteNumber()
 
 > `const` **isNonNegativeFiniteNumber**: (`a`) => `a is NonNegativeFiniteNumber`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:8
 
 Checks if a number is a NonNegativeFiniteNumber (a finite number >= 0).
 
@@ -3094,13 +3097,13 @@ Checks if a number is a NonNegativeFiniteNumber (a finite number >= 0).
 
 `true` if the value is a NonNegativeFiniteNumber, `false` otherwise.
 
----
+***
 
 ### isNonNegativeInt16()
 
 > `const` **isNonNegativeInt16**: (`a`) => `a is NonNegativeInt16`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:6
 
 Checks if a number is a NonNegativeInt16 (16-bit non-negative signed integer in the range [0, 2^15)).
 
@@ -3116,13 +3119,13 @@ Checks if a number is a NonNegativeInt16 (16-bit non-negative signed integer in 
 
 `true` if the value is a NonNegativeInt16, `false` otherwise.
 
----
+***
 
 ### isNonNegativeInt32()
 
 > `const` **isNonNegativeInt32**: (`a`) => `a is NonNegativeInt32`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:6
 
 Checks if a number is a NonNegativeInt32 (32-bit non-negative signed integer in the range [0, 2^31)).
 
@@ -3138,13 +3141,13 @@ Checks if a number is a NonNegativeInt32 (32-bit non-negative signed integer in 
 
 `true` if the value is a NonNegativeInt32, `false` otherwise.
 
----
+***
 
 ### isNonZeroFiniteNumber()
 
 > `const` **isNonZeroFiniteNumber**: (`a`) => `a is NonZeroFiniteNumber`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:8
 
 Checks if a number is a NonZeroFiniteNumber (a finite number that is not 0).
 
@@ -3160,13 +3163,13 @@ Checks if a number is a NonZeroFiniteNumber (a finite number that is not 0).
 
 `true` if the value is a NonZeroFiniteNumber, `false` otherwise.
 
----
+***
 
 ### isNonZeroInt()
 
 > `const` **isNonZeroInt**: (`a`) => `a is NonZeroInt`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:7
 
 Checks if a number is a NonZeroInt.
 
@@ -3182,13 +3185,13 @@ Checks if a number is a NonZeroInt.
 
 `true` if the value is a NonZeroInt, `false` otherwise.
 
----
+***
 
 ### isNonZeroInt16()
 
 > `const` **isNonZeroInt16**: (`a`) => `a is NonZeroInt16`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:7
 
 Checks if a number is a NonZeroInt16 (16-bit non-zero signed integer in the range [-2^15, 2^15) excluding 0).
 
@@ -3204,13 +3207,13 @@ Checks if a number is a NonZeroInt16 (16-bit non-zero signed integer in the rang
 
 `true` if the value is a NonZeroInt16, `false` otherwise.
 
----
+***
 
 ### isNonZeroInt32()
 
 > `const` **isNonZeroInt32**: (`a`) => `a is NonZeroInt32`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:7
 
 Checks if a number is a NonZeroInt32 (32-bit non-zero signed integer in the range [-2^31, 2^31) excluding 0).
 
@@ -3226,13 +3229,13 @@ Checks if a number is a NonZeroInt32 (32-bit non-zero signed integer in the rang
 
 `true` if the value is a NonZeroInt32, `false` otherwise.
 
----
+***
 
 ### isNonZeroSafeInt()
 
 > `const` **isNonZeroSafeInt**: (`a`) => `a is NonZeroSafeInt`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:7
 
 Checks if a number is a NonZeroSafeInt (a non-zero safe integer in the range [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] excluding 0).
 
@@ -3248,13 +3251,13 @@ Checks if a number is a NonZeroSafeInt (a non-zero safe integer in the range [MI
 
 `true` if the value is a NonZeroSafeInt, `false` otherwise.
 
----
+***
 
 ### isNonZeroUint16()
 
 > `const` **isNonZeroUint16**: (`a`) => `a is PositiveUint16`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:6
 
 Checks if a number is a NonZeroUint16 (16-bit non-zero unsigned integer in the range [1, 2^16)).
 
@@ -3270,13 +3273,13 @@ Checks if a number is a NonZeroUint16 (16-bit non-zero unsigned integer in the r
 
 `true` if the value is a NonZeroUint16, `false` otherwise.
 
----
+***
 
 ### isNonZeroUint32()
 
 > `const` **isNonZeroUint32**: (`a`) => `a is PositiveUint32`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:6
 
 Checks if a number is a NonZeroUint32 (32-bit non-zero unsigned integer in the range [1, 2^32)).
 
@@ -3292,13 +3295,13 @@ Checks if a number is a NonZeroUint32 (32-bit non-zero unsigned integer in the r
 
 `true` if the value is a NonZeroUint32, `false` otherwise.
 
----
+***
 
 ### isPositiveFiniteNumber()
 
 > `const` **isPositiveFiniteNumber**: (`a`) => `a is PositiveFiniteNumber`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:8
 
 Checks if a number is a PositiveFiniteNumber (a finite number > 0).
 
@@ -3314,13 +3317,13 @@ Checks if a number is a PositiveFiniteNumber (a finite number > 0).
 
 `true` if the value is a PositiveFiniteNumber, `false` otherwise.
 
----
+***
 
 ### isPositiveInt()
 
 > `const` **isPositiveInt**: (`a`) => `a is PositiveInt`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:20
 
 Type guard that checks if a value is a positive integer.
 
@@ -3342,21 +3345,21 @@ This excludes zero, negative numbers, and non-integers.
 #### Example
 
 ```typescript
-isPositiveInt(5); // true
-isPositiveInt(1); // true
-isPositiveInt(0); // false (zero is not positive)
-isPositiveInt(-1); // false (negative)
-isPositiveInt(5.5); // false (not an integer)
-isPositiveInt(NaN); // false
+isPositiveInt(5);    // true
+isPositiveInt(1);    // true
+isPositiveInt(0);    // false (zero is not positive)
+isPositiveInt(-1);   // false (negative)
+isPositiveInt(5.5);  // false (not an integer)
+isPositiveInt(NaN);  // false
 ```
 
----
+***
 
 ### isPositiveInt16()
 
 > `const` **isPositiveInt16**: (`a`) => `a is PositiveInt16`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:6
 
 Checks if a number is a PositiveInt16 (16-bit positive signed integer in the range [1, 2^15)).
 
@@ -3372,13 +3375,13 @@ Checks if a number is a PositiveInt16 (16-bit positive signed integer in the ran
 
 `true` if the value is a PositiveInt16, `false` otherwise.
 
----
+***
 
 ### isPositiveInt32()
 
 > `const` **isPositiveInt32**: (`a`) => `a is PositiveInt32`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:6
 
 Checks if a number is a PositiveInt32 (32-bit positive signed integer in the range [1, 2^31)).
 
@@ -3394,13 +3397,13 @@ Checks if a number is a PositiveInt32 (32-bit positive signed integer in the ran
 
 `true` if the value is a PositiveInt32, `false` otherwise.
 
----
+***
 
 ### isPositiveSafeInt()
 
 > `const` **isPositiveSafeInt**: (`a`) => `a is PositiveSafeInt`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:6
 
 Checks if a number is a PositiveSafeInt (a positive safe integer in the range [1, MAX_SAFE_INTEGER]).
 
@@ -3416,13 +3419,13 @@ Checks if a number is a PositiveSafeInt (a positive safe integer in the range [1
 
 `true` if the value is a PositiveSafeInt, `false` otherwise.
 
----
+***
 
 ### isPositiveUint16()
 
 > `const` **isPositiveUint16**: (`a`) => `a is PositiveUint16`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:6
 
 Checks if a number is a PositiveUint16 (16-bit positive unsigned integer in the range [1, 2^16)).
 
@@ -3438,13 +3441,13 @@ Checks if a number is a PositiveUint16 (16-bit positive unsigned integer in the 
 
 `true` if the value is a PositiveUint16, `false` otherwise.
 
----
+***
 
 ### isPositiveUint32()
 
 > `const` **isPositiveUint32**: (`a`) => `a is PositiveUint32`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:6
 
 Checks if a number is a PositiveUint32 (32-bit positive unsigned integer in the range [1, 2^32)).
 
@@ -3460,13 +3463,13 @@ Checks if a number is a PositiveUint32 (32-bit positive unsigned integer in the 
 
 `true` if the value is a PositiveUint32, `false` otherwise.
 
----
+***
 
 ### isSafeInt()
 
 > `const` **isSafeInt**: (`a`) => `a is SafeInt`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:20
 
 Type guard that checks if a value is a safe integer.
 
@@ -3488,20 +3491,20 @@ without precision loss. The range is [±(2^53 - 1)].
 #### Example
 
 ```typescript
-isSafeInt(42); // true
+isSafeInt(42);                    // true
 isSafeInt(Number.MAX_SAFE_INTEGER); // true
 isSafeInt(Number.MAX_SAFE_INTEGER + 1); // false
-isSafeInt(3.14); // false
-isSafeInt(NaN); // false
+isSafeInt(3.14);                  // false
+isSafeInt(NaN);                   // false
 ```
 
----
+***
 
 ### isSafeUint()
 
 > `const` **isSafeUint**: (`a`) => `a is SafeUint`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:6
 
 Checks if a number is a SafeUint.
 
@@ -3517,13 +3520,13 @@ Checks if a number is a SafeUint.
 
 `true` if the value is a SafeUint, `false` otherwise.
 
----
+***
 
 ### isUint()
 
 > `const` **isUint**: (`a`) => `a is NonNegativeInt`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:6
 
 Checks if a number is a Uint.
 
@@ -3539,13 +3542,13 @@ Checks if a number is a Uint.
 
 `true` if the value is a Uint, `false` otherwise.
 
----
+***
 
 ### isUint16()
 
 > `const` **isUint16**: (`a`) => `a is Uint16`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:6
 
 Checks if a number is a Uint16 (16-bit unsigned integer in the range [0, 2^16)).
 
@@ -3561,13 +3564,13 @@ Checks if a number is a Uint16 (16-bit unsigned integer in the range [0, 2^16)).
 
 `true` if the value is a Uint16, `false` otherwise.
 
----
+***
 
 ### isUint32()
 
 > `const` **isUint32**: (`a`) => `a is Uint32`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:6
 
 Checks if a number is a Uint32 (32-bit unsigned integer in the range [0, 2^32)).
 
@@ -3583,13 +3586,13 @@ Checks if a number is a Uint32 (32-bit unsigned integer in the range [0, 2^32)).
 
 `true` if the value is a Uint32, `false` otherwise.
 
----
+***
 
 ### isUint8()
 
 > `const` **isUint8**: (`x`) => `x is Uint8`
 
-Defined in: node_modules/ts-data-forge/dist/number/enum/uint8.d.mts:6
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:6
 
 Checks if a number is a Uint8 (8-bit unsigned integer in the range [0, 255]).
 
@@ -3605,13 +3608,13 @@ Checks if a number is a Uint8 (8-bit unsigned integer in the range [0, 255]).
 
 `true` if the value is a Uint8, `false` otherwise.
 
----
+***
 
 ### NonNegativeFiniteNumber
 
 > `const` **NonNegativeFiniteNumber**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:62
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:62
 
 Namespace providing type-safe arithmetic operations for non-negative finite numbers.
 
@@ -3777,9 +3780,9 @@ Returns the smaller of two NonNegativeFiniteNumber values.
 
 The minimum value as a NonNegativeFiniteNumber.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `0`
+> `readonly` **MIN\_VALUE**: `0`
 
 The minimum value for a non-negative finite number.
 
@@ -3898,29 +3901,29 @@ const distance = asNonNegativeFiniteNumber(5.5);
 const speed = asNonNegativeFiniteNumber(2.2);
 
 // Arithmetic operations with non-negative clamping
-const total = NonNegativeFiniteNumber.add(distance, speed); // NonNegativeFiniteNumber (7.7)
-const diff = NonNegativeFiniteNumber.sub(speed, distance); // NonNegativeFiniteNumber (0 - clamped)
-const area = NonNegativeFiniteNumber.mul(distance, speed); // NonNegativeFiniteNumber (12.1)
-const ratio = NonNegativeFiniteNumber.div(distance, speed); // NonNegativeFiniteNumber (2.5)
+const total = NonNegativeFiniteNumber.add(distance, speed);        // NonNegativeFiniteNumber (7.7)
+const diff = NonNegativeFiniteNumber.sub(speed, distance);        // NonNegativeFiniteNumber (0 - clamped)
+const area = NonNegativeFiniteNumber.mul(distance, speed);        // NonNegativeFiniteNumber (12.1)
+const ratio = NonNegativeFiniteNumber.div(distance, speed);       // NonNegativeFiniteNumber (2.5)
 
 // Range operations
-const clamped = NonNegativeFiniteNumber.clamp(-10.5); // NonNegativeFiniteNumber (0)
-const minimum = NonNegativeFiniteNumber.min(distance, speed); // NonNegativeFiniteNumber (2.2)
-const maximum = NonNegativeFiniteNumber.max(distance, speed); // NonNegativeFiniteNumber (5.5)
+const clamped = NonNegativeFiniteNumber.clamp(-10.5);             // NonNegativeFiniteNumber (0)
+const minimum = NonNegativeFiniteNumber.min(distance, speed);     // NonNegativeFiniteNumber (2.2)
+const maximum = NonNegativeFiniteNumber.max(distance, speed);     // NonNegativeFiniteNumber (5.5)
 
 // Rounding operations (return Uint)
-const pixels = NonNegativeFiniteNumber.round(distance); // Uint (6)
-const floorValue = NonNegativeFiniteNumber.floor(distance); // Uint (5)
-const ceilValue = NonNegativeFiniteNumber.ceil(distance); // Uint (6)
+const pixels = NonNegativeFiniteNumber.round(distance);           // Uint (6)
+const floorValue = NonNegativeFiniteNumber.floor(distance);       // Uint (5)
+const ceilValue = NonNegativeFiniteNumber.ceil(distance);         // Uint (6)
 ```
 
----
+***
 
 ### NonNegativeInt16
 
 > `const` **NonNegativeInt16**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:65
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:65
 
 Namespace providing type-safe arithmetic operations for 16-bit non-negative integers.
 
@@ -4028,9 +4031,9 @@ Returns the larger of two NonNegativeInt16 values.
 
 The maximum value as a NonNegativeInt16.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 16-bit non-negative integer.
 
@@ -4052,9 +4055,9 @@ Returns the smaller of two NonNegativeInt16 values.
 
 The minimum value as a NonNegativeInt16.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `0`
+> `readonly` **MIN\_VALUE**: `0`
 
 The minimum value for a 16-bit non-negative integer.
 
@@ -4153,31 +4156,28 @@ const a = asNonNegativeInt16(30000);
 const b = asNonNegativeInt16(5000);
 
 // Arithmetic operations with automatic clamping
-const sum = NonNegativeInt16.add(a, b); // NonNegativeInt16 (32767 - clamped to MAX_VALUE)
-const diff = NonNegativeInt16.sub(a, b); // NonNegativeInt16 (25000)
+const sum = NonNegativeInt16.add(a, b);       // NonNegativeInt16 (32767 - clamped to MAX_VALUE)
+const diff = NonNegativeInt16.sub(a, b);      // NonNegativeInt16 (25000)
 const reverseDiff = NonNegativeInt16.sub(b, a); // NonNegativeInt16 (0 - clamped to MIN_VALUE)
-const product = NonNegativeInt16.mul(a, b); // NonNegativeInt16 (32767 - clamped due to overflow)
+const product = NonNegativeInt16.mul(a, b);   // NonNegativeInt16 (32767 - clamped due to overflow)
 
 // Range operations
-const clamped = NonNegativeInt16.clamp(-100); // NonNegativeInt16 (0)
-const minimum = NonNegativeInt16.min(a, b); // NonNegativeInt16 (5000)
-const maximum = NonNegativeInt16.max(a, b); // NonNegativeInt16 (30000)
+const clamped = NonNegativeInt16.clamp(-100);     // NonNegativeInt16 (0)
+const minimum = NonNegativeInt16.min(a, b);       // NonNegativeInt16 (5000)
+const maximum = NonNegativeInt16.max(a, b);       // NonNegativeInt16 (30000)
 
 // Utility operations
-const random = NonNegativeInt16.random(); // NonNegativeInt16 (random value in [0, 32767])
-const power = NonNegativeInt16.pow(
-    asNonNegativeInt16(2),
-    asNonNegativeInt16(10),
-); // NonNegativeInt16 (1024)
+const random = NonNegativeInt16.random();         // NonNegativeInt16 (random value in [0, 32767])
+const power = NonNegativeInt16.pow(asNonNegativeInt16(2), asNonNegativeInt16(10)); // NonNegativeInt16 (1024)
 ```
 
----
+***
 
 ### NonNegativeInt32
 
 > `const` **NonNegativeInt32**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:63
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:63
 
 Namespace providing type-safe arithmetic operations for 32-bit non-negative integers.
 
@@ -4285,9 +4285,9 @@ Returns the larger of two NonNegativeInt32 values.
 
 The maximum value as a NonNegativeInt32.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 32-bit non-negative integer.
 
@@ -4309,9 +4309,9 @@ Returns the smaller of two NonNegativeInt32 values.
 
 The minimum value as a NonNegativeInt32.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `0`
+> `readonly` **MIN\_VALUE**: `0`
 
 The minimum value for a 32-bit non-negative integer.
 
@@ -4410,31 +4410,28 @@ const a = asNonNegativeInt32(2000000000);
 const b = asNonNegativeInt32(500000000);
 
 // Arithmetic operations with automatic clamping
-const sum = NonNegativeInt32.add(a, b); // NonNegativeInt32 (2147483647 - clamped to MAX_VALUE)
-const diff = NonNegativeInt32.sub(a, b); // NonNegativeInt32 (1500000000)
+const sum = NonNegativeInt32.add(a, b);       // NonNegativeInt32 (2147483647 - clamped to MAX_VALUE)
+const diff = NonNegativeInt32.sub(a, b);      // NonNegativeInt32 (1500000000)
 const reverseDiff = NonNegativeInt32.sub(b, a); // NonNegativeInt32 (0 - clamped to MIN_VALUE)
-const product = NonNegativeInt32.mul(a, b); // NonNegativeInt32 (2147483647 - clamped due to overflow)
+const product = NonNegativeInt32.mul(a, b);   // NonNegativeInt32 (2147483647 - clamped due to overflow)
 
 // Range operations
-const clamped = NonNegativeInt32.clamp(-1000); // NonNegativeInt32 (0)
-const minimum = NonNegativeInt32.min(a, b); // NonNegativeInt32 (500000000)
-const maximum = NonNegativeInt32.max(a, b); // NonNegativeInt32 (2000000000)
+const clamped = NonNegativeInt32.clamp(-1000);     // NonNegativeInt32 (0)
+const minimum = NonNegativeInt32.min(a, b);        // NonNegativeInt32 (500000000)
+const maximum = NonNegativeInt32.max(a, b);        // NonNegativeInt32 (2000000000)
 
 // Utility operations
-const random = NonNegativeInt32.random(); // NonNegativeInt32 (random value in [0, 2147483647])
-const power = NonNegativeInt32.pow(
-    asNonNegativeInt32(2),
-    asNonNegativeInt32(20),
-); // NonNegativeInt32 (1048576)
+const random = NonNegativeInt32.random();          // NonNegativeInt32 (random value in [0, 2147483647])
+const power = NonNegativeInt32.pow(asNonNegativeInt32(2), asNonNegativeInt32(20)); // NonNegativeInt32 (1048576)
 ```
 
----
+***
 
 ### NonZeroFiniteNumber
 
 > `const` **NonZeroFiniteNumber**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:61
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:61
 
 Namespace providing type-safe arithmetic operations for non-zero finite numbers.
 
@@ -4715,32 +4712,32 @@ const factor = asNonZeroFiniteNumber(2.5);
 const multiplier = asNonZeroFiniteNumber(-1.5);
 
 // Arithmetic operations that preserve non-zero constraint
-const result = NonZeroFiniteNumber.add(factor, multiplier); // NonZeroFiniteNumber (1.0)
-const difference = NonZeroFiniteNumber.sub(factor, multiplier); // NonZeroFiniteNumber (4.0)
-const product = NonZeroFiniteNumber.mul(factor, multiplier); // NonZeroFiniteNumber (-3.75)
-const quotient = NonZeroFiniteNumber.div(factor, multiplier); // NonZeroFiniteNumber (-1.666...)
+const result = NonZeroFiniteNumber.add(factor, multiplier);        // NonZeroFiniteNumber (1.0)
+const difference = NonZeroFiniteNumber.sub(factor, multiplier);    // NonZeroFiniteNumber (4.0)
+const product = NonZeroFiniteNumber.mul(factor, multiplier);       // NonZeroFiniteNumber (-3.75)
+const quotient = NonZeroFiniteNumber.div(factor, multiplier);      // NonZeroFiniteNumber (-1.666...)
 
 // Utility operations
-const absolute = NonZeroFiniteNumber.abs(multiplier); // NonZeroFiniteNumber (1.5)
-const minimum = NonZeroFiniteNumber.min(factor, multiplier); // NonZeroFiniteNumber (-1.5)
-const maximum = NonZeroFiniteNumber.max(factor, multiplier); // NonZeroFiniteNumber (2.5)
+const absolute = NonZeroFiniteNumber.abs(multiplier);              // NonZeroFiniteNumber (1.5)
+const minimum = NonZeroFiniteNumber.min(factor, multiplier);       // NonZeroFiniteNumber (-1.5)
+const maximum = NonZeroFiniteNumber.max(factor, multiplier);       // NonZeroFiniteNumber (2.5)
 
 // Rounding operations (return NonZeroInt)
-const rounded = NonZeroFiniteNumber.round(factor); // NonZeroInt (3)
-const floored = NonZeroFiniteNumber.floor(factor); // NonZeroInt (2)
-const ceiled = NonZeroFiniteNumber.ceil(factor); // NonZeroInt (3)
+const rounded = NonZeroFiniteNumber.round(factor);                 // NonZeroInt (3)
+const floored = NonZeroFiniteNumber.floor(factor);                 // NonZeroInt (2)
+const ceiled = NonZeroFiniteNumber.ceil(factor);                   // NonZeroInt (3)
 
 // Random generation
-const randomValue = NonZeroFiniteNumber.random(); // NonZeroFiniteNumber (random non-zero value)
+const randomValue = NonZeroFiniteNumber.random();                  // NonZeroFiniteNumber (random non-zero value)
 ```
 
----
+***
 
 ### NonZeroInt
 
 > `const` **NonZeroInt**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:56
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:56
 
 Namespace providing type-safe arithmetic operations for non-zero integers.
 
@@ -4960,13 +4957,13 @@ const a = asNonZeroInt(10);
 const b = asNonZeroInt(-5);
 
 // Arithmetic operations
-const sum = NonZeroInt.add(a, b); // NonZeroInt (5)
-const diff = NonZeroInt.sub(a, b); // NonZeroInt (15)
+const sum = NonZeroInt.add(a, b);     // NonZeroInt (5)
+const diff = NonZeroInt.sub(a, b);    // NonZeroInt (15)
 const product = NonZeroInt.mul(a, b); // NonZeroInt (-50)
 const quotient = NonZeroInt.div(a, b); // NonZeroInt (-2)
 
 // Utility operations
-const absolute = NonZeroInt.abs(b); // NonZeroInt (5)
+const absolute = NonZeroInt.abs(b);   // NonZeroInt (5)
 const power = NonZeroInt.pow(a, asNonZeroInt(2)); // NonZeroInt (100)
 const minimum = NonZeroInt.min(a, b); // NonZeroInt (-5)
 const maximum = NonZeroInt(a, b); // NonZeroInt (10)
@@ -4975,13 +4972,13 @@ const maximum = NonZeroInt(a, b); // NonZeroInt (10)
 const randomInt = NonZeroInt.random(); // NonZeroInt (random non-zero integer)
 ```
 
----
+***
 
 ### NonZeroInt16
 
 > `const` **NonZeroInt16**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:66
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:66
 
 Namespace providing type-safe arithmetic operations for 16-bit non-zero signed integers.
 
@@ -5107,9 +5104,9 @@ Returns the larger of two NonZeroInt16 values.
 
 The maximum value as a NonZeroInt16.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 16-bit non-zero signed integer.
 
@@ -5131,9 +5128,9 @@ Returns the smaller of two NonZeroInt16 values.
 
 The minimum value as a NonZeroInt16.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `number`
+> `readonly` **MIN\_VALUE**: `number`
 
 The minimum value for a 16-bit non-zero signed integer.
 
@@ -5232,28 +5229,28 @@ const a = asNonZeroInt16(30000);
 const b = asNonZeroInt16(-10000);
 
 // Arithmetic operations with automatic clamping and non-zero constraint
-const sum = NonZeroInt16.add(a, b); // NonZeroInt16 (20000)
-const diff = NonZeroInt16.sub(a, b); // NonZeroInt16 (32767 - clamped to MAX_VALUE)
-const product = NonZeroInt16.mul(a, b); // NonZeroInt16 (-32768 - clamped to MIN_VALUE)
+const sum = NonZeroInt16.add(a, b);       // NonZeroInt16 (20000)
+const diff = NonZeroInt16.sub(a, b);      // NonZeroInt16 (32767 - clamped to MAX_VALUE)
+const product = NonZeroInt16.mul(a, b);   // NonZeroInt16 (-32768 - clamped to MIN_VALUE)
 
 // Utility operations
-const absolute = NonZeroInt16.abs(b); // NonZeroInt16 (10000)
-const minimum = NonZeroInt16.min(a, b); // NonZeroInt16 (-10000)
-const maximum = NonZeroInt16.max(a, b); // NonZeroInt16 (30000)
+const absolute = NonZeroInt16.abs(b);         // NonZeroInt16 (10000)
+const minimum = NonZeroInt16.min(a, b);       // NonZeroInt16 (-10000)
+const maximum = NonZeroInt16.max(a, b);       // NonZeroInt16 (30000)
 
 // Range operations (avoiding zero)
-const clamped = NonZeroInt16.clamp(0); // NonZeroInt16 (1 or -1, avoiding zero)
-const random = NonZeroInt16.random(); // NonZeroInt16 (random non-zero value in range)
+const clamped = NonZeroInt16.clamp(0);        // NonZeroInt16 (1 or -1, avoiding zero)
+const random = NonZeroInt16.random();         // NonZeroInt16 (random non-zero value in range)
 const power = NonZeroInt16.pow(asNonZeroInt16(2), asNonZeroInt16(10)); // NonZeroInt16 (1024)
 ```
 
----
+***
 
 ### NonZeroInt32
 
 > `const` **NonZeroInt32**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:62
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:62
 
 Namespace providing type-safe arithmetic operations for 32-bit non-zero signed integers.
 
@@ -5379,9 +5376,9 @@ Returns the larger of two NonZeroInt32 values.
 
 The maximum value as a NonZeroInt32.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 32-bit non-zero signed integer.
 
@@ -5403,9 +5400,9 @@ Returns the smaller of two NonZeroInt32 values.
 
 The minimum value as a NonZeroInt32.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `number`
+> `readonly` **MIN\_VALUE**: `number`
 
 The minimum value for a 32-bit non-zero signed integer.
 
@@ -5504,28 +5501,28 @@ const a = asNonZeroInt32(2000000000);
 const b = asNonZeroInt32(-500000000);
 
 // Arithmetic operations with automatic clamping and non-zero constraint
-const sum = NonZeroInt32.add(a, b); // NonZeroInt32 (1500000000)
-const diff = NonZeroInt32.sub(a, b); // NonZeroInt32 (2147483647 - clamped to MAX_VALUE)
-const product = NonZeroInt32.mul(a, b); // NonZeroInt32 (-2147483648 - clamped to MIN_VALUE)
+const sum = NonZeroInt32.add(a, b);       // NonZeroInt32 (1500000000)
+const diff = NonZeroInt32.sub(a, b);      // NonZeroInt32 (2147483647 - clamped to MAX_VALUE)
+const product = NonZeroInt32.mul(a, b);   // NonZeroInt32 (-2147483648 - clamped to MIN_VALUE)
 
 // Utility operations
-const absolute = NonZeroInt32.abs(b); // NonZeroInt32 (500000000)
-const minimum = NonZeroInt32.min(a, b); // NonZeroInt32 (-500000000)
-const maximum = NonZeroInt32.max(a, b); // NonZeroInt32 (2000000000)
+const absolute = NonZeroInt32.abs(b);         // NonZeroInt32 (500000000)
+const minimum = NonZeroInt32.min(a, b);       // NonZeroInt32 (-500000000)
+const maximum = NonZeroInt32.max(a, b);       // NonZeroInt32 (2000000000)
 
 // Range operations (avoiding zero)
-const clamped = NonZeroInt32.clamp(0); // NonZeroInt32 (1 or -1, avoiding zero)
-const random = NonZeroInt32.random(); // NonZeroInt32 (random non-zero value in range)
+const clamped = NonZeroInt32.clamp(0);        // NonZeroInt32 (1 or -1, avoiding zero)
+const random = NonZeroInt32.random();         // NonZeroInt32 (random non-zero value in range)
 const power = NonZeroInt32.pow(asNonZeroInt32(2), asNonZeroInt32(20)); // NonZeroInt32 (1048576)
 ```
 
----
+***
 
 ### NonZeroSafeInt
 
 > `const` **NonZeroSafeInt**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:56
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:56
 
 Namespace providing type-safe arithmetic operations for non-zero safe integers.
 
@@ -5651,9 +5648,9 @@ Returns the larger of two NonZeroSafeInt values.
 
 The maximum value as a NonZeroSafeInt.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `SafeUint`
+> `readonly` **MAX\_VALUE**: `SafeUint`
 
 The maximum safe integer value (2^53 - 1).
 
@@ -5675,9 +5672,9 @@ Returns the smaller of two NonZeroSafeInt values.
 
 The minimum value as a NonZeroSafeInt.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `SafeInt`
+> `readonly` **MIN\_VALUE**: `SafeInt`
 
 The minimum safe integer value (-(2^53 - 1)).
 
@@ -5772,30 +5769,30 @@ Subtracts one NonZeroSafeInt from another.
 #### Example
 
 ```typescript
-const a = asNonZeroSafeInt(9007199254740000); // Near MAX_SAFE_INTEGER
+const a = asNonZeroSafeInt(9007199254740000);  // Near MAX_SAFE_INTEGER
 const b = asNonZeroSafeInt(-1000);
 
 // Arithmetic operations with non-zero safe range clamping
-const sum = NonZeroSafeInt.add(a, b); // NonZeroSafeInt (9007199254739000)
-const diff = NonZeroSafeInt.sub(a, b); // NonZeroSafeInt (clamped to MAX_SAFE_INTEGER)
-const product = NonZeroSafeInt.mul(a, b); // NonZeroSafeInt (clamped to MIN_SAFE_INTEGER)
+const sum = NonZeroSafeInt.add(a, b);          // NonZeroSafeInt (9007199254739000)
+const diff = NonZeroSafeInt.sub(a, b);         // NonZeroSafeInt (clamped to MAX_SAFE_INTEGER)
+const product = NonZeroSafeInt.mul(a, b);      // NonZeroSafeInt (clamped to MIN_SAFE_INTEGER)
 
 // Utility operations
-const absolute = NonZeroSafeInt.abs(b); // NonZeroSafeInt (1000)
-const minimum = NonZeroSafeInt.min(a, b); // NonZeroSafeInt (-1000)
-const maximum = NonZeroSafeInt.max(a, b); // NonZeroSafeInt (a)
+const absolute = NonZeroSafeInt.abs(b);            // NonZeroSafeInt (1000)
+const minimum = NonZeroSafeInt.min(a, b);          // NonZeroSafeInt (-1000)
+const maximum = NonZeroSafeInt.max(a, b);          // NonZeroSafeInt (a)
 
 // Random generation
-const random = NonZeroSafeInt.random(); // NonZeroSafeInt (random non-zero safe integer)
+const random = NonZeroSafeInt.random();            // NonZeroSafeInt (random non-zero safe integer)
 ```
 
----
+***
 
 ### NonZeroUint16
 
 > `const` **NonZeroUint16**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:66
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:66
 
 Namespace providing type-safe arithmetic operations for 16-bit non-zero unsigned integers.
 
@@ -5903,9 +5900,9 @@ Returns the larger of two NonZeroUint16 values.
 
 The maximum value as a NonZeroUint16.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 16-bit non-zero unsigned integer.
 
@@ -5927,9 +5924,9 @@ Returns the smaller of two NonZeroUint16 values.
 
 The minimum value as a NonZeroUint16.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `1`
+> `readonly` **MIN\_VALUE**: `1`
 
 The minimum value for a 16-bit non-zero unsigned integer.
 
@@ -6028,28 +6025,28 @@ const a = asNonZeroUint16(60000);
 const b = asNonZeroUint16(10000);
 
 // Arithmetic operations with automatic clamping and non-zero constraint
-const sum = NonZeroUint16.add(a, b); // NonZeroUint16 (65535 - clamped to MAX_VALUE)
-const diff = NonZeroUint16.sub(a, b); // NonZeroUint16 (50000)
+const sum = NonZeroUint16.add(a, b);       // NonZeroUint16 (65535 - clamped to MAX_VALUE)
+const diff = NonZeroUint16.sub(a, b);      // NonZeroUint16 (50000)
 const reverseDiff = NonZeroUint16.sub(b, a); // NonZeroUint16 (1 - clamped to MIN_VALUE)
-const product = NonZeroUint16.mul(a, b); // NonZeroUint16 (65535 - clamped due to overflow)
+const product = NonZeroUint16.mul(a, b);   // NonZeroUint16 (65535 - clamped due to overflow)
 
 // Range operations (maintaining non-zero constraint)
-const clamped = NonZeroUint16.clamp(-100); // NonZeroUint16 (1)
-const minimum = NonZeroUint16.min(a, b); // NonZeroUint16 (10000)
-const maximum = NonZeroUint16.max(a, b); // NonZeroUint16 (60000)
+const clamped = NonZeroUint16.clamp(-100);     // NonZeroUint16 (1)
+const minimum = NonZeroUint16.min(a, b);       // NonZeroUint16 (10000)
+const maximum = NonZeroUint16.max(a, b);       // NonZeroUint16 (60000)
 
 // Utility operations
-const random = NonZeroUint16.random(); // NonZeroUint16 (random value in [1, 65535])
+const random = NonZeroUint16.random();         // NonZeroUint16 (random value in [1, 65535])
 const power = NonZeroUint16.pow(asNonZeroUint16(2), asNonZeroUint16(10)); // NonZeroUint16 (1024)
 ```
 
----
+***
 
 ### NonZeroUint32
 
 > `const` **NonZeroUint32**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:64
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:64
 
 Namespace providing type-safe arithmetic operations for 32-bit non-zero unsigned integers.
 
@@ -6157,9 +6154,9 @@ Returns the larger of two NonZeroUint32 values.
 
 The maximum value as a NonZeroUint32.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 32-bit non-zero unsigned integer.
 
@@ -6181,9 +6178,9 @@ Returns the smaller of two NonZeroUint32 values.
 
 The minimum value as a NonZeroUint32.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `1`
+> `readonly` **MIN\_VALUE**: `1`
 
 The minimum value for a 32-bit non-zero unsigned integer.
 
@@ -6282,28 +6279,28 @@ const a = asNonZeroUint32(4000000000);
 const b = asNonZeroUint32(1000000000);
 
 // Arithmetic operations with automatic clamping and non-zero constraint
-const sum = NonZeroUint32.add(a, b); // NonZeroUint32 (4294967295 - clamped to MAX_VALUE)
-const diff = NonZeroUint32.sub(a, b); // NonZeroUint32 (3000000000)
+const sum = NonZeroUint32.add(a, b);       // NonZeroUint32 (4294967295 - clamped to MAX_VALUE)
+const diff = NonZeroUint32.sub(a, b);      // NonZeroUint32 (3000000000)
 const reverseDiff = NonZeroUint32.sub(b, a); // NonZeroUint32 (1 - clamped to MIN_VALUE)
-const product = NonZeroUint32.mul(a, b); // NonZeroUint32 (4294967295 - clamped due to overflow)
+const product = NonZeroUint32.mul(a, b);   // NonZeroUint32 (4294967295 - clamped due to overflow)
 
 // Range operations (maintaining non-zero constraint)
-const clamped = NonZeroUint32.clamp(-100); // NonZeroUint32 (1)
-const minimum = NonZeroUint32.min(a, b); // NonZeroUint32 (1000000000)
-const maximum = NonZeroUint32.max(a, b); // NonZeroUint32 (4000000000)
+const clamped = NonZeroUint32.clamp(-100);     // NonZeroUint32 (1)
+const minimum = NonZeroUint32.min(a, b);       // NonZeroUint32 (1000000000)
+const maximum = NonZeroUint32.max(a, b);       // NonZeroUint32 (4000000000)
 
 // Utility operations
-const random = NonZeroUint32.random(); // NonZeroUint32 (random value in [1, 4294967295])
+const random = NonZeroUint32.random();         // NonZeroUint32 (random value in [1, 4294967295])
 const power = NonZeroUint32.pow(asNonZeroUint32(2), asNonZeroUint32(20)); // NonZeroUint32 (1048576)
 ```
 
----
+***
 
 ### PositiveFiniteNumber
 
 > `const` **PositiveFiniteNumber**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:68
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:68
 
 Namespace providing type-safe arithmetic operations for positive finite numbers.
 
@@ -6470,9 +6467,9 @@ Returns the smaller of two PositiveFiniteNumber values.
 
 The minimum value as a PositiveFiniteNumber.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `number`
+> `readonly` **MIN\_VALUE**: `number`
 
 The minimum value for a positive finite number.
 
@@ -6591,33 +6588,33 @@ const probability = asPositiveFiniteNumber(0.75);
 const rate = asPositiveFiniteNumber(1.25);
 
 // Arithmetic operations with positive clamping
-const combined = PositiveFiniteNumber.add(probability, rate); // PositiveFiniteNumber (2.0)
-const difference = PositiveFiniteNumber.sub(rate, probability); // PositiveFiniteNumber (0.5)
-const scaled = PositiveFiniteNumber.mul(probability, rate); // PositiveFiniteNumber (0.9375)
-const ratio = PositiveFiniteNumber.div(rate, probability); // PositiveFiniteNumber (1.666...)
+const combined = PositiveFiniteNumber.add(probability, rate);        // PositiveFiniteNumber (2.0)
+const difference = PositiveFiniteNumber.sub(rate, probability);      // PositiveFiniteNumber (0.5)
+const scaled = PositiveFiniteNumber.mul(probability, rate);          // PositiveFiniteNumber (0.9375)
+const ratio = PositiveFiniteNumber.div(rate, probability);           // PositiveFiniteNumber (1.666...)
 
 // Range operations
-const clamped = PositiveFiniteNumber.clamp(-10.5); // PositiveFiniteNumber (MIN_VALUE)
-const minimum = PositiveFiniteNumber.min(probability, rate); // PositiveFiniteNumber (0.75)
-const maximum = PositiveFiniteNumber.max(probability, rate); // PositiveFiniteNumber (1.25)
+const clamped = PositiveFiniteNumber.clamp(-10.5);                  // PositiveFiniteNumber (MIN_VALUE)
+const minimum = PositiveFiniteNumber.min(probability, rate);         // PositiveFiniteNumber (0.75)
+const maximum = PositiveFiniteNumber.max(probability, rate);         // PositiveFiniteNumber (1.25)
 
 // Rounding operations (different return types based on operation)
-const ceiled = PositiveFiniteNumber.ceil(probability); // PositiveInt (1)
-const floored = PositiveFiniteNumber.floor(rate); // Uint (1)
-const rounded = PositiveFiniteNumber.round(rate); // Uint (1)
+const ceiled = PositiveFiniteNumber.ceil(probability);              // PositiveInt (1)
+const floored = PositiveFiniteNumber.floor(rate);                   // Uint (1)
+const rounded = PositiveFiniteNumber.round(rate);                   // Uint (1)
 
 // Utility operations
-const random = PositiveFiniteNumber.random(); // PositiveFiniteNumber (random positive value)
-const power = PositiveFiniteNumber.pow(rate, probability); // PositiveFiniteNumber (1.18...)
+const random = PositiveFiniteNumber.random();                       // PositiveFiniteNumber (random positive value)
+const power = PositiveFiniteNumber.pow(rate, probability);          // PositiveFiniteNumber (1.18...)
 ```
 
----
+***
 
 ### PositiveInt
 
 > `const` **PositiveInt**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:102
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:102
 
 Namespace providing type-safe operations for PositiveInt branded types.
 
@@ -6626,7 +6623,6 @@ All operations automatically clamp results to maintain the positive constraint,
 ensuring that arithmetic operations never produce zero or negative values.
 
 This type is essential for:
-
 - Array lengths and sizes (length >= 1)
 - Counts and quantities that must be positive
 - Denominators in division operations
@@ -6687,10 +6683,10 @@ The value clamped to >= 1 as a PositiveInt
 ###### Example
 
 ```typescript
-PositiveInt.clamp(5); // PositiveInt (5)
-PositiveInt.clamp(0); // PositiveInt (1) - clamped to minimum
-PositiveInt.clamp(-10); // PositiveInt (1) - clamped to minimum
-PositiveInt.clamp(100); // PositiveInt (100)
+PositiveInt.clamp(5);    // PositiveInt (5)
+PositiveInt.clamp(0);    // PositiveInt (1) - clamped to minimum
+PositiveInt.clamp(-10);  // PositiveInt (1) - clamped to minimum
+PositiveInt.clamp(100);  // PositiveInt (100)
 ```
 
 ##### div()
@@ -6722,9 +6718,9 @@ Performs mathematical floor division: `⌊a / b⌋`. If the result would be 0
 
 ```typescript
 PositiveInt.div(asPositiveInt(10), asPositiveInt(3)); // PositiveInt (3)
-PositiveInt.div(asPositiveInt(9), asPositiveInt(3)); // PositiveInt (3)
-PositiveInt.div(asPositiveInt(2), asPositiveInt(3)); // PositiveInt (1) - clamped
-PositiveInt.div(asPositiveInt(1), asPositiveInt(5)); // PositiveInt (1) - clamped
+PositiveInt.div(asPositiveInt(9), asPositiveInt(3));  // PositiveInt (3)
+PositiveInt.div(asPositiveInt(2), asPositiveInt(3));  // PositiveInt (1) - clamped
+PositiveInt.div(asPositiveInt(1), asPositiveInt(5));  // PositiveInt (1) - clamped
 ```
 
 ##### is()
@@ -6772,7 +6768,7 @@ The largest value as a PositiveInt
 ###### Example
 
 ```typescript
-PositiveInt.max(asPositiveInt(5), asPositiveInt(3)); // PositiveInt (5)
+PositiveInt.max(asPositiveInt(5), asPositiveInt(3));    // PositiveInt (5)
 PositiveInt.max(asPositiveInt(10), asPositiveInt(1), asPositiveInt(7)); // PositiveInt (10)
 ```
 
@@ -6802,13 +6798,13 @@ The smallest value as a PositiveInt
 ###### Example
 
 ```typescript
-PositiveInt.min(asPositiveInt(5), asPositiveInt(3)); // PositiveInt (3)
+PositiveInt.min(asPositiveInt(5), asPositiveInt(3));    // PositiveInt (3)
 PositiveInt.min(asPositiveInt(10), asPositiveInt(1), asPositiveInt(7)); // PositiveInt (1)
 ```
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `1`
+> `readonly` **MIN\_VALUE**: `1`
 
 The minimum value for a PositiveInt.
 
@@ -6938,49 +6934,49 @@ the positive integer constraint.
 ###### Example
 
 ```typescript
-PositiveInt.sub(asPositiveInt(8), asPositiveInt(3)); // PositiveInt (5)
-PositiveInt.sub(asPositiveInt(3), asPositiveInt(8)); // PositiveInt (1) - clamped
-PositiveInt.sub(asPositiveInt(5), asPositiveInt(5)); // PositiveInt (1) - clamped
+PositiveInt.sub(asPositiveInt(8), asPositiveInt(3));  // PositiveInt (5)
+PositiveInt.sub(asPositiveInt(3), asPositiveInt(8));  // PositiveInt (1) - clamped
+PositiveInt.sub(asPositiveInt(5), asPositiveInt(5));  // PositiveInt (1) - clamped
 ```
 
 #### Example
 
 ```typescript
 // Type validation
-PositiveInt.is(5); // true
-PositiveInt.is(1); // true (minimum value)
-PositiveInt.is(0); // false
-PositiveInt.is(-1); // false
+PositiveInt.is(5);    // true
+PositiveInt.is(1);    // true (minimum value)
+PositiveInt.is(0);    // false
+PositiveInt.is(-1);   // false
 
 // Automatic clamping in operations
 const a = asPositiveInt(10);
 const b = asPositiveInt(3);
 
-const sum = PositiveInt.add(a, b); // PositiveInt (13)
-const diff1 = PositiveInt.sub(a, b); // PositiveInt (7)
-const diff2 = PositiveInt.sub(b, a); // PositiveInt (1) - clamped!
-const product = PositiveInt.mul(a, b); // PositiveInt (30)
-const quotient = PositiveInt.div(a, b); // PositiveInt (3)
+const sum = PositiveInt.add(a, b);          // PositiveInt (13)
+const diff1 = PositiveInt.sub(a, b);        // PositiveInt (7)
+const diff2 = PositiveInt.sub(b, a);        // PositiveInt (1) - clamped!
+const product = PositiveInt.mul(a, b);      // PositiveInt (30)
+const quotient = PositiveInt.div(a, b);     // PositiveInt (3)
 
 // Edge case: division that would be < 1
 const small = PositiveInt.div(asPositiveInt(2), asPositiveInt(3)); // PositiveInt (1)
 
 // Range operations
-const minimum = PositiveInt.min(a, b); // PositiveInt (3)
-const maximum = PositiveInt.max(a, b); // PositiveInt (10)
+const minimum = PositiveInt.min(a, b);      // PositiveInt (3)
+const maximum = PositiveInt.max(a, b);      // PositiveInt (10)
 
 // Random generation
 const dice = PositiveInt.random(asPositiveInt(1), asPositiveInt(6)); // 1-6
 const id = PositiveInt.random(asPositiveInt(1000), asPositiveInt(9999)); // 4-digit ID
 ```
 
----
+***
 
 ### PositiveInt16
 
 > `const` **PositiveInt16**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:67
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:67
 
 Namespace providing type-safe arithmetic operations for 16-bit positive integers.
 
@@ -7088,9 +7084,9 @@ Returns the larger of two PositiveInt16 values.
 
 The maximum value as a PositiveInt16.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 16-bit positive integer.
 
@@ -7112,9 +7108,9 @@ Returns the smaller of two PositiveInt16 values.
 
 The minimum value as a PositiveInt16.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `1`
+> `readonly` **MIN\_VALUE**: `1`
 
 The minimum value for a 16-bit positive integer.
 
@@ -7213,28 +7209,28 @@ const a = asPositiveInt16(30000);
 const b = asPositiveInt16(5000);
 
 // Arithmetic operations with automatic clamping
-const sum = PositiveInt16.add(a, b); // PositiveInt16 (32767 - clamped to MAX_VALUE)
-const diff = PositiveInt16.sub(a, b); // PositiveInt16 (25000)
+const sum = PositiveInt16.add(a, b);       // PositiveInt16 (32767 - clamped to MAX_VALUE)
+const diff = PositiveInt16.sub(a, b);      // PositiveInt16 (25000)
 const reverseDiff = PositiveInt16.sub(b, a); // PositiveInt16 (1 - clamped to MIN_VALUE)
-const product = PositiveInt16.mul(a, b); // PositiveInt16 (32767 - clamped due to overflow)
+const product = PositiveInt16.mul(a, b);   // PositiveInt16 (32767 - clamped due to overflow)
 
 // Range operations
-const clamped = PositiveInt16.clamp(0); // PositiveInt16 (1)
-const minimum = PositiveInt16.min(a, b); // PositiveInt16 (5000)
-const maximum = PositiveInt16.max(a, b); // PositiveInt16 (30000)
+const clamped = PositiveInt16.clamp(0);        // PositiveInt16 (1)
+const minimum = PositiveInt16.min(a, b);       // PositiveInt16 (5000)
+const maximum = PositiveInt16.max(a, b);       // PositiveInt16 (30000)
 
 // Utility operations
-const random = PositiveInt16.random(); // PositiveInt16 (random value in [1, 32767])
+const random = PositiveInt16.random();         // PositiveInt16 (random value in [1, 32767])
 const power = PositiveInt16.pow(asPositiveInt16(2), asPositiveInt16(10)); // PositiveInt16 (1024)
 ```
 
----
+***
 
 ### PositiveInt32
 
 > `const` **PositiveInt32**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:65
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:65
 
 Namespace providing type-safe arithmetic operations for 32-bit positive integers.
 
@@ -7342,9 +7338,9 @@ Returns the larger of two PositiveInt32 values.
 
 The maximum value as a PositiveInt32.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 32-bit positive integer.
 
@@ -7366,9 +7362,9 @@ Returns the smaller of two PositiveInt32 values.
 
 The minimum value as a PositiveInt32.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `1`
+> `readonly` **MIN\_VALUE**: `1`
 
 The minimum value for a 32-bit positive integer.
 
@@ -7467,28 +7463,28 @@ const a = asPositiveInt32(2000000000);
 const b = asPositiveInt32(500000000);
 
 // Arithmetic operations with automatic clamping and positive constraint
-const sum = PositiveInt32.add(a, b); // PositiveInt32 (2147483647 - clamped to MAX_VALUE)
-const diff = PositiveInt32.sub(a, b); // PositiveInt32 (1500000000)
+const sum = PositiveInt32.add(a, b);       // PositiveInt32 (2147483647 - clamped to MAX_VALUE)
+const diff = PositiveInt32.sub(a, b);      // PositiveInt32 (1500000000)
 const reverseDiff = PositiveInt32.sub(b, a); // PositiveInt32 (1 - clamped to MIN_VALUE)
-const product = PositiveInt32.mul(a, b); // PositiveInt32 (2147483647 - clamped due to overflow)
+const product = PositiveInt32.mul(a, b);   // PositiveInt32 (2147483647 - clamped due to overflow)
 
 // Range operations (maintaining positive constraint)
-const clamped = PositiveInt32.clamp(-1000); // PositiveInt32 (1)
-const minimum = PositiveInt32.min(a, b); // PositiveInt32 (500000000)
-const maximum = PositiveInt32.max(a, b); // PositiveInt32 (2000000000)
+const clamped = PositiveInt32.clamp(-1000);     // PositiveInt32 (1)
+const minimum = PositiveInt32.min(a, b);        // PositiveInt32 (500000000)
+const maximum = PositiveInt32.max(a, b);        // PositiveInt32 (2000000000)
 
 // Utility operations
-const random = PositiveInt32.random(); // PositiveInt32 (random value in [1, 2147483647])
+const random = PositiveInt32.random();          // PositiveInt32 (random value in [1, 2147483647])
 const power = PositiveInt32.pow(asPositiveInt32(2), asPositiveInt32(20)); // PositiveInt32 (1048576)
 ```
 
----
+***
 
 ### PositiveSafeInt
 
 > `const` **PositiveSafeInt**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:61
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:61
 
 Namespace providing type-safe arithmetic operations for positive safe integers.
 
@@ -7596,9 +7592,9 @@ Returns the larger of two PositiveSafeInt values.
 
 The maximum value as a PositiveSafeInt.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `SafeUint`
+> `readonly` **MAX\_VALUE**: `SafeUint`
 
 The maximum safe integer value (2^53 - 1).
 
@@ -7620,9 +7616,9 @@ Returns the smaller of two PositiveSafeInt values.
 
 The minimum value as a PositiveSafeInt.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `1`
+> `readonly` **MIN\_VALUE**: `1`
 
 The minimum value for a positive safe integer.
 
@@ -7721,27 +7717,27 @@ const a = asPositiveSafeInt(1000000);
 const b = asPositiveSafeInt(2000000);
 
 // Arithmetic operations with positive safe range clamping
-const sum = PositiveSafeInt.add(a, b); // PositiveSafeInt (3000000)
-const diff = PositiveSafeInt.sub(a, b); // PositiveSafeInt (1 - clamped to MIN_VALUE)
-const product = PositiveSafeInt.mul(a, b); // PositiveSafeInt (2000000000000)
+const sum = PositiveSafeInt.add(a, b);          // PositiveSafeInt (3000000)
+const diff = PositiveSafeInt.sub(a, b);         // PositiveSafeInt (1 - clamped to MIN_VALUE)
+const product = PositiveSafeInt.mul(a, b);      // PositiveSafeInt (2000000000000)
 
 // Range operations
-const clamped = PositiveSafeInt.clamp(0); // PositiveSafeInt (1)
-const minimum = PositiveSafeInt.min(a, b); // PositiveSafeInt (1000000)
-const maximum = PositiveSafeInt.max(a, b); // PositiveSafeInt (2000000)
+const clamped = PositiveSafeInt.clamp(0);           // PositiveSafeInt (1)
+const minimum = PositiveSafeInt.min(a, b);          // PositiveSafeInt (1000000)
+const maximum = PositiveSafeInt.max(a, b);          // PositiveSafeInt (2000000)
 
 // Utility operations
-const random = PositiveSafeInt.random(); // PositiveSafeInt (random positive safe integer)
+const random = PositiveSafeInt.random();            // PositiveSafeInt (random positive safe integer)
 const power = PositiveSafeInt.pow(asPositiveSafeInt(2), asPositiveSafeInt(10)); // PositiveSafeInt (1024)
 ```
 
----
+***
 
 ### PositiveUint16
 
 > `const` **PositiveUint16**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:66
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:66
 
 Namespace providing type-safe arithmetic operations for 16-bit positive unsigned integers.
 
@@ -7849,9 +7845,9 @@ Returns the larger of two PositiveUint16 values.
 
 The maximum value as a PositiveUint16.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 16-bit positive unsigned integer.
 
@@ -7873,9 +7869,9 @@ Returns the smaller of two PositiveUint16 values.
 
 The minimum value as a PositiveUint16.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `1`
+> `readonly` **MIN\_VALUE**: `1`
 
 The minimum value for a 16-bit positive unsigned integer.
 
@@ -7974,28 +7970,28 @@ const a = asPositiveUint16(60000);
 const b = asPositiveUint16(10000);
 
 // Arithmetic operations with automatic clamping and positive constraint
-const sum = PositiveUint16.add(a, b); // PositiveUint16 (65535 - clamped to MAX_VALUE)
-const diff = PositiveUint16.sub(a, b); // PositiveUint16 (50000)
+const sum = PositiveUint16.add(a, b);       // PositiveUint16 (65535 - clamped to MAX_VALUE)
+const diff = PositiveUint16.sub(a, b);      // PositiveUint16 (50000)
 const reverseDiff = PositiveUint16.sub(b, a); // PositiveUint16 (1 - clamped to MIN_VALUE)
-const product = PositiveUint16.mul(a, b); // PositiveUint16 (65535 - clamped due to overflow)
+const product = PositiveUint16.mul(a, b);   // PositiveUint16 (65535 - clamped due to overflow)
 
 // Range operations (maintaining positive constraint)
-const clamped = PositiveUint16.clamp(-100); // PositiveUint16 (1)
-const minimum = PositiveUint16.min(a, b); // PositiveUint16 (10000)
-const maximum = PositiveUint16.max(a, b); // PositiveUint16 (60000)
+const clamped = PositiveUint16.clamp(-100);     // PositiveUint16 (1)
+const minimum = PositiveUint16.min(a, b);       // PositiveUint16 (10000)
+const maximum = PositiveUint16.max(a, b);       // PositiveUint16 (60000)
 
 // Utility operations
-const random = PositiveUint16.random(); // PositiveUint16 (random value in [1, 65535])
+const random = PositiveUint16.random();         // PositiveUint16 (random value in [1, 65535])
 const power = PositiveUint16.pow(asPositiveUint16(2), asPositiveUint16(10)); // PositiveUint16 (1024)
 ```
 
----
+***
 
 ### PositiveUint32
 
 > `const` **PositiveUint32**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:64
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:64
 
 Namespace providing type-safe arithmetic operations for 32-bit positive unsigned integers.
 
@@ -8103,9 +8099,9 @@ Returns the larger of two PositiveUint32 values.
 
 The maximum value as a PositiveUint32.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 32-bit positive unsigned integer.
 
@@ -8127,9 +8123,9 @@ Returns the smaller of two PositiveUint32 values.
 
 The minimum value as a PositiveUint32.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `1`
+> `readonly` **MIN\_VALUE**: `1`
 
 The minimum value for a 32-bit positive unsigned integer.
 
@@ -8228,28 +8224,28 @@ const a = asPositiveUint32(4000000000);
 const b = asPositiveUint32(1000000000);
 
 // Arithmetic operations with automatic clamping and positive constraint
-const sum = PositiveUint32.add(a, b); // PositiveUint32 (4294967295 - clamped to MAX_VALUE)
-const diff = PositiveUint32.sub(a, b); // PositiveUint32 (3000000000)
+const sum = PositiveUint32.add(a, b);       // PositiveUint32 (4294967295 - clamped to MAX_VALUE)
+const diff = PositiveUint32.sub(a, b);      // PositiveUint32 (3000000000)
 const reverseDiff = PositiveUint32.sub(b, a); // PositiveUint32 (1 - clamped to MIN_VALUE)
-const product = PositiveUint32.mul(a, b); // PositiveUint32 (4294967295 - clamped due to overflow)
+const product = PositiveUint32.mul(a, b);   // PositiveUint32 (4294967295 - clamped due to overflow)
 
 // Range operations (maintaining positive constraint)
-const clamped = PositiveUint32.clamp(-100); // PositiveUint32 (1)
-const minimum = PositiveUint32.min(a, b); // PositiveUint32 (1000000000)
-const maximum = PositiveUint32.max(a, b); // PositiveUint32 (4000000000)
+const clamped = PositiveUint32.clamp(-100);     // PositiveUint32 (1)
+const minimum = PositiveUint32.min(a, b);       // PositiveUint32 (1000000000)
+const maximum = PositiveUint32.max(a, b);       // PositiveUint32 (4000000000)
 
 // Utility operations
-const random = PositiveUint32.random(); // PositiveUint32 (random value in [1, 4294967295])
+const random = PositiveUint32.random();         // PositiveUint32 (random value in [1, 4294967295])
 const power = PositiveUint32.pow(asPositiveUint32(2), asPositiveUint32(20)); // PositiveUint32 (1048576)
 ```
 
----
+***
 
 ### SafeInt
 
 > `const` **SafeInt**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:93
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:93
 
 Namespace providing type-safe operations for SafeInt branded types.
 
@@ -8260,7 +8256,6 @@ approximately ±9 quadrillion.
 All operations automatically clamp results to stay within the safe range,
 preventing precision loss that occurs with larger integers. This makes SafeInt
 ideal for:
-
 - Financial calculations requiring exact cents
 - Database IDs and counters
 - Array indices and sizes
@@ -8292,8 +8287,8 @@ The absolute value as a SafeInt, clamped if necessary
 ###### Example
 
 ```typescript
-SafeInt.abs(asSafeInt(-42)); // SafeInt (42)
-SafeInt.abs(asSafeInt(42)); // SafeInt (42)
+SafeInt.abs(asSafeInt(-42));    // SafeInt (42)
+SafeInt.abs(asSafeInt(42));     // SafeInt (42)
 SafeInt.abs(SafeInt.MIN_VALUE); // SafeInt (MAX_SAFE_INTEGER)
 ```
 
@@ -8365,8 +8360,8 @@ The integer quotient as a SafeInt
 ###### Example
 
 ```typescript
-SafeInt.div(asSafeInt(10), asSafeInt(3)); // SafeInt (3)
-SafeInt.div(asSafeInt(-10), asSafeInt(3)); // SafeInt (-4)
+SafeInt.div(asSafeInt(10), asSafeInt(3));   // SafeInt (3)
+SafeInt.div(asSafeInt(-10), asSafeInt(3));  // SafeInt (-4)
 
 // Large number division
 const large = asSafeInt(1000000000000);
@@ -8419,13 +8414,13 @@ The largest value as a SafeInt
 ###### Example
 
 ```typescript
-SafeInt.max(asSafeInt(5), asSafeInt(3)); // SafeInt (5)
+SafeInt.max(asSafeInt(5), asSafeInt(3));        // SafeInt (5)
 SafeInt.max(asSafeInt(-10), asSafeInt(0), asSafeInt(10)); // SafeInt (10)
 ```
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `SafeUint`
+> `readonly` **MAX\_VALUE**: `SafeUint`
 
 The maximum safe integer value (2^53 - 1).
 
@@ -8452,13 +8447,13 @@ The smallest value as a SafeInt
 ###### Example
 
 ```typescript
-SafeInt.min(asSafeInt(5), asSafeInt(3)); // SafeInt (3)
+SafeInt.min(asSafeInt(5), asSafeInt(3));        // SafeInt (3)
 SafeInt.min(asSafeInt(-10), asSafeInt(0), asSafeInt(10)); // SafeInt (-10)
 ```
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `SafeInt`
+> `readonly` **MIN\_VALUE**: `SafeInt`
 
 The minimum safe integer value (-(2^53 - 1)).
 
@@ -8577,32 +8572,32 @@ const nearMax = asSafeInt(9007199254740990);
 const increment = asSafeInt(10);
 
 // Automatic clamping prevents precision loss
-const sum = SafeInt.add(nearMax, increment); // Clamped to MAX_SAFE_INTEGER
+const sum = SafeInt.add(nearMax, increment);    // Clamped to MAX_SAFE_INTEGER
 const product = SafeInt.mul(nearMax, increment); // Clamped to MAX_SAFE_INTEGER
 
 // Safe operations
 const a = asSafeInt(1000000);
 const b = asSafeInt(500);
 
-const diff = SafeInt.sub(a, b); // SafeInt (999500)
-const quotient = SafeInt.div(a, b); // SafeInt (2000)
+const diff = SafeInt.sub(a, b);        // SafeInt (999500)
+const quotient = SafeInt.div(a, b);    // SafeInt (2000)
 const power = SafeInt.pow(b, asSafeInt(2)); // SafeInt (250000)
 
 // Utility operations
 const absolute = SafeInt.abs(asSafeInt(-42)); // SafeInt (42)
-const clamped = SafeInt.clamp(2 ** 60); // SafeInt (MAX_SAFE_INTEGER)
+const clamped = SafeInt.clamp(2**60);         // SafeInt (MAX_SAFE_INTEGER)
 
 // Random generation
 const die = SafeInt.random(asSafeInt(1), asSafeInt(6)); // Random 1-6
 ```
 
----
+***
 
 ### SafeUint
 
 > `const` **SafeUint**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:60
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:60
 
 Namespace providing type-safe arithmetic operations for safe unsigned integers.
 
@@ -8710,9 +8705,9 @@ Returns the larger of two SafeUint values.
 
 The maximum value as a SafeUint.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `SafeUint`
+> `readonly` **MAX\_VALUE**: `SafeUint`
 
 The maximum safe integer value (2^53 - 1).
 
@@ -8734,9 +8729,9 @@ Returns the smaller of two SafeUint values.
 
 The minimum value as a SafeUint.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `0`
+> `readonly` **MIN\_VALUE**: `0`
 
 The minimum value for a safe unsigned integer.
 
@@ -8831,31 +8826,31 @@ Subtracts one SafeUint from another.
 #### Example
 
 ```typescript
-const a = asSafeUint(9007199254740000); // Near MAX_SAFE_INTEGER
+const a = asSafeUint(9007199254740000);  // Near MAX_SAFE_INTEGER
 const b = asSafeUint(1000);
 
 // Arithmetic operations with safe unsigned range clamping
-const sum = SafeUint.add(a, b); // SafeUint (clamped to MAX_SAFE_INTEGER)
-const diff = SafeUint.sub(b, a); // SafeUint (0 - clamped to MIN_VALUE)
-const product = SafeUint.mul(a, b); // SafeUint (clamped to MAX_SAFE_INTEGER)
+const sum = SafeUint.add(a, b);          // SafeUint (clamped to MAX_SAFE_INTEGER)
+const diff = SafeUint.sub(b, a);         // SafeUint (0 - clamped to MIN_VALUE)
+const product = SafeUint.mul(a, b);      // SafeUint (clamped to MAX_SAFE_INTEGER)
 
 // Range operations
-const clamped = SafeUint.clamp(-100); // SafeUint (0)
-const minimum = SafeUint.min(a, b); // SafeUint (1000)
-const maximum = SafeUint.max(a, b); // SafeUint (a)
+const clamped = SafeUint.clamp(-100);        // SafeUint (0)
+const minimum = SafeUint.min(a, b);          // SafeUint (1000)
+const maximum = SafeUint.max(a, b);          // SafeUint (a)
 
 // Utility operations
-const random = SafeUint.random(); // SafeUint (random safe unsigned integer)
+const random = SafeUint.random();            // SafeUint (random safe unsigned integer)
 const power = SafeUint.pow(asSafeUint(2), asSafeUint(20)); // SafeUint (1048576)
 ```
 
----
+***
 
 ### Uint
 
 > `const` **Uint**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:59
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:59
 
 Namespace providing type-safe arithmetic operations for unsigned integers.
 
@@ -8980,9 +8975,9 @@ Returns the smaller of two Uint values.
 
 The minimum value as a Uint.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `0`
+> `readonly` **MIN\_VALUE**: `0`
 
 The minimum value for an unsigned integer.
 
@@ -9081,28 +9076,28 @@ const a = asUint(100);
 const b = asUint(150);
 
 // Arithmetic operations with non-negative clamping
-const sum = Uint.add(a, b); // Uint (250)
-const diff = Uint.sub(a, b); // Uint (0 - clamped to MIN_VALUE)
-const product = Uint.mul(a, b); // Uint (15000)
-const quotient = Uint.div(b, a); // Uint (1)
+const sum = Uint.add(a, b);       // Uint (250)
+const diff = Uint.sub(a, b);      // Uint (0 - clamped to MIN_VALUE)
+const product = Uint.mul(a, b);   // Uint (15000)
+const quotient = Uint.div(b, a);  // Uint (1)
 
 // Range operations
-const clamped = Uint.clamp(-50); // Uint (0)
-const minimum = Uint.min(a, b); // Uint (100)
-const maximum = Uint.max(a, b); // Uint (150)
+const clamped = Uint.clamp(-50);      // Uint (0)
+const minimum = Uint.min(a, b);       // Uint (100)
+const maximum = Uint.max(a, b);       // Uint (150)
 
 // Utility operations
-const random = Uint.random(); // Uint (random non-negative integer)
+const random = Uint.random();         // Uint (random non-negative integer)
 const power = Uint.pow(asUint(2), asUint(8)); // Uint (256)
 ```
 
----
+***
 
 ### Uint16
 
 > `const` **Uint16**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:63
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:63
 
 Namespace providing type-safe arithmetic operations for 16-bit unsigned integers.
 
@@ -9210,9 +9205,9 @@ Returns the larger of two Uint16 values.
 
 The maximum value as a Uint16.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a 16-bit unsigned integer.
 
@@ -9234,9 +9229,9 @@ Returns the smaller of two Uint16 values.
 
 The minimum value as a Uint16.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `0`
+> `readonly` **MIN\_VALUE**: `0`
 
 The minimum value for a 16-bit unsigned integer.
 
@@ -9335,27 +9330,27 @@ const a = asUint16(60000);
 const b = asUint16(10000);
 
 // Arithmetic operations with automatic clamping
-const sum = Uint16.add(a, b); // Uint16 (65535 - clamped to MAX_VALUE)
-const diff = Uint16.sub(b, a); // Uint16 (0 - clamped to MIN_VALUE)
-const product = Uint16.mul(a, b); // Uint16 (65535 - clamped due to overflow)
+const sum = Uint16.add(a, b);       // Uint16 (65535 - clamped to MAX_VALUE)
+const diff = Uint16.sub(b, a);      // Uint16 (0 - clamped to MIN_VALUE)
+const product = Uint16.mul(a, b);   // Uint16 (65535 - clamped due to overflow)
 
 // Range operations
-const clamped = Uint16.clamp(-100); // Uint16 (0)
-const minimum = Uint16.min(a, b); // Uint16 (10000)
-const maximum = Uint16.max(a, b); // Uint16 (60000)
+const clamped = Uint16.clamp(-100);     // Uint16 (0)
+const minimum = Uint16.min(a, b);       // Uint16 (10000)
+const maximum = Uint16.max(a, b);       // Uint16 (60000)
 
 // Utility operations
-const random = Uint16.random(); // Uint16 (random value in [0, 65535])
+const random = Uint16.random();         // Uint16 (random value in [0, 65535])
 const power = Uint16.pow(asUint16(2), asUint16(10)); // Uint16 (1024)
 ```
 
----
+***
 
 ### Uint32
 
 > `const` **Uint32**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:67
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:67
 
 Utility functions for working with Uint32 (32-bit unsigned integer) branded types.
 Provides type-safe operations that ensure results remain within the valid range [0, 2^32).
@@ -9482,9 +9477,9 @@ The Uint32 values to compare
 
 The largest value as a Uint32
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `number`
+> `readonly` **MAX\_VALUE**: `number`
 
 The maximum value for a Uint32.
 
@@ -9508,9 +9503,9 @@ The Uint32 values to compare
 
 The smallest value as a Uint32
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `0`
+> `readonly` **MIN\_VALUE**: `0`
 
 The minimum value for a Uint32.
 
@@ -9650,13 +9645,13 @@ Uint32.clamp(asUint32(5000000000), Uint32.MIN_VALUE, Uint32.MAX_VALUE); // Uint3
 Uint32.random(); // Random Uint32
 ```
 
----
+***
 
 ### Uint8
 
 > `const` **Uint8**: `object`
 
-Defined in: node_modules/ts-data-forge/dist/number/enum/uint8.d.mts:50
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:50
 
 Namespace providing type-safe arithmetic operations for 8-bit unsigned integers.
 
@@ -9766,9 +9761,9 @@ The Uint8 values to compare.
 
 The maximum value as a Uint8.
 
-##### MAX_VALUE
+##### MAX\_VALUE
 
-> `readonly` **MAX_VALUE**: `255`
+> `readonly` **MAX\_VALUE**: `255`
 
 The maximum value for an 8-bit unsigned integer.
 
@@ -9792,9 +9787,9 @@ The Uint8 values to compare.
 
 The minimum value as a Uint8.
 
-##### MIN_VALUE
+##### MIN\_VALUE
 
-> `readonly` **MIN_VALUE**: `0`
+> `readonly` **MIN\_VALUE**: `0`
 
 The minimum value for an 8-bit unsigned integer.
 
@@ -9897,15 +9892,15 @@ const a = asUint8(200);
 const b = asUint8(100);
 
 // Arithmetic operations with automatic clamping
-const sum = Uint8.add(a, b); // Uint8 (255 - clamped to MAX_VALUE)
-const diff = Uint8.sub(a, b); // Uint8 (100)
+const sum = Uint8.add(a, b);       // Uint8 (255 - clamped to MAX_VALUE)
+const diff = Uint8.sub(a, b);      // Uint8 (100)
 const reverseDiff = Uint8.sub(b, a); // Uint8 (0 - clamped to MIN_VALUE)
-const product = Uint8.mul(a, b); // Uint8 (255 - clamped due to overflow)
+const product = Uint8.mul(a, b);   // Uint8 (255 - clamped due to overflow)
 
 // Range operations
-const clamped = Uint8.clamp(-10); // Uint8 (0)
-const minimum = Uint8.min(a, b); // Uint8 (100)
-const maximum = Uint8.max(a, b); // Uint8 (200)
+const clamped = Uint8.clamp(-10);     // Uint8 (0)
+const minimum = Uint8.min(a, b);      // Uint8 (100)
+const maximum = Uint8.max(a, b);      // Uint8 (200)
 
 // Utility operations
 const random = Uint8.random(asUint8(50), asUint8(150)); // Uint8 (random value in [50, 150])
@@ -9918,565 +9913,565 @@ const power = Uint8.pow(asUint8(2), asUint8(7)); // Uint8 (128)
 
 Re-exports [array](../array/array.md#array)
 
----
+***
 
 ### arrayAtLeastLength
 
 Re-exports [arrayAtLeastLength](../array/array-at-least-length.md#arrayatleastlength)
 
----
+***
 
 ### arrayOfLength
 
 Re-exports [arrayOfLength](../array/array-of-length.md#arrayoflength)
 
----
+***
 
 ### bigint
 
 Re-exports [bigint](../primitives/bigint.md#bigint)
 
----
+***
 
 ### boolean
 
 Re-exports [boolean](../primitives/boolean.md#boolean)
 
----
+***
 
 ### brand
 
 Re-exports [brand](../brand/brand.md#brand)
 
----
+***
 
 ### brandedNumber
 
 Re-exports [brandedNumber](../brand/branded-number.md#brandednumber)
 
----
+***
 
 ### brandedString
 
 Re-exports [brandedString](../brand/branded-string.md#brandedstring)
 
----
+***
 
 ### createAssertFn
 
 Re-exports [createAssertFn](../utils/create-assert-fn.md#createassertfn)
 
----
+***
 
 ### createCastFn
 
 Re-exports [createCastFn](../utils/create-cast-fn.md#createcastfn)
 
----
+***
 
 ### createIsFn
 
 Re-exports [createIsFn](../utils/create-is-fn.md#createisfn)
 
----
+***
 
 ### createPrimitiveType
 
 Re-exports [createPrimitiveType](../utils/create-primitive-type.md#createprimitivetype)
 
----
+***
 
 ### createPrimitiveValidationError
 
 Re-exports [createPrimitiveValidationError](../utils/validation-error.md#createprimitivevalidationerror)
 
----
+***
 
 ### createType
 
 Re-exports [createType](../utils/create-type.md#createtype)
 
----
+***
 
 ### email
 
 Re-exports [email](../predefined/brand/string/email.md#email)
 
----
+***
 
 ### enumType
 
 Re-exports [enumType](../enum/enum.md#enumtype)
 
----
+***
 
 ### finiteNumber
 
 Re-exports [finiteNumber](../predefined/brand/number/finite-number.md#finitenumber)
 
----
+***
 
 ### int
 
 Re-exports [int](../predefined/brand/number/int.md#int)
 
----
+***
 
 ### int16
 
 Re-exports [int16](../predefined/brand/number/int16.md#int16)
 
----
+***
 
 ### int32
 
 Re-exports [int32](../predefined/brand/number/int32.md#int32)
 
----
+***
 
 ### int8
 
 Re-exports [int8](../predefined/int8.md#int8)
 
----
+***
 
 ### intersection
 
 Re-exports [intersection](../compose/intersection.md#intersection)
 
----
+***
 
 ### intRange
 
 Re-exports [intRange](../enum/int-range.md#intrange)
 
----
+***
 
 ### iso8601
 
 Re-exports [iso8601](../predefined/brand/string/iso-8601.md#iso8601)
 
----
+***
 
 ### isOptionalProperty
 
 Re-exports [isOptionalProperty](../record/optional.md#isoptionalproperty)
 
----
+***
 
 ### JsonObject
 
 Re-exports [JsonObject](../predefined/json.md#jsonobject)
 
----
+***
 
 ### JsonPrimitive
 
 Re-exports [JsonPrimitive](../predefined/json.md#jsonprimitive)
 
----
+***
 
 ### jsonString
 
 Re-exports [jsonString](../predefined/brand/string/json-string.md#jsonstring)
 
----
+***
 
 ### JsonValue
 
 Re-exports [JsonValue](../predefined/json.md#jsonvalue)
 
----
+***
 
 ### keyof
 
 Re-exports [keyof](../record/keyof.md#keyof)
 
----
+***
 
 ### keyValueRecord
 
 Re-exports [keyValueRecord](../record/key-value-record.md#keyvaluerecord)
 
----
+***
 
 ### literal
 
 Re-exports [literal](../other-types/literal.md#literal)
 
----
+***
 
 ### MapType
 
 Re-exports [MapType](../other-types/map.md#maptype)
 
----
+***
 
 ### mergeRecords
 
 Re-exports [mergeRecords](../compose/merge-records.md#mergerecords)
 
----
+***
 
 ### nonEmptyArray
 
 Re-exports [nonEmptyArray](../array/non-empty-array.md#nonemptyarray)
 
----
+***
 
 ### nonNegativeFiniteNumber
 
 Re-exports [nonNegativeFiniteNumber](../predefined/brand/number/non-negative-finite-number.md#nonnegativefinitenumber)
 
----
+***
 
 ### nonZeroFiniteNumber
 
 Re-exports [nonZeroFiniteNumber](../predefined/brand/number/non-zero-finite-number.md#nonzerofinitenumber)
 
----
+***
 
 ### nonZeroInt
 
 Re-exports [nonZeroInt](../predefined/brand/number/non-zero-int.md#nonzeroint)
 
----
+***
 
 ### nonZeroSafeInt
 
 Re-exports [nonZeroSafeInt](../predefined/brand/number/non-zero-safe-int.md#nonzerosafeint)
 
----
+***
 
 ### nullable
 
 Re-exports [nullable](../predefined/nullable.md#nullable)
 
----
+***
 
 ### nullType
 
 Re-exports [nullType](../primitives/null.md#nulltype)
 
----
+***
 
 ### number
 
 Re-exports [number](../primitives/number.md#number)
 
----
+***
 
 ### omit
 
 Re-exports [omit](../record/omit.md#omit)
 
----
+***
 
 ### OmittedType
 
 Re-exports [OmittedType](../record/omit.md#omittedtype)
 
----
+***
 
 ### optional
 
 Re-exports [optional](../record/optional.md#optional)
 
----
+***
 
 ### OptionalPropertyType
 
 Re-exports [OptionalPropertyType](../record/optional.md#optionalpropertytype)
 
----
+***
 
 ### OptionalType
 
 Re-exports [OptionalType](../type/README.md#optionaltype)
 
----
+***
 
 ### partial
 
 Re-exports [partial](../record/partial.md#partial)
 
----
+***
 
 ### PartialType
 
 Re-exports [PartialType](../record/partial.md#partialtype)
 
----
+***
 
 ### pick
 
 Re-exports [pick](../record/pick.md#pick)
 
----
+***
 
 ### PickedType
 
 Re-exports [PickedType](../record/pick.md#pickedtype)
 
----
+***
 
 ### positiveFiniteNumber
 
 Re-exports [positiveFiniteNumber](../predefined/brand/number/positive-finite-number.md#positivefinitenumber)
 
----
+***
 
 ### positiveInt
 
 Re-exports [positiveInt](../predefined/brand/number/positive-int.md#positiveint)
 
----
+***
 
 ### positiveSafeInt
 
 Re-exports [positiveSafeInt](../predefined/brand/number/positive-safe-int.md#positivesafeint)
 
----
+***
 
 ### prependIndexToValidationErrors
 
 Re-exports [prependIndexToValidationErrors](../utils/validation-error.md#prependindextovalidationerrors)
 
----
+***
 
 ### prependPathToValidationErrors
 
 Re-exports [prependPathToValidationErrors](../utils/validation-error.md#prependpathtovalidationerrors)
 
----
+***
 
 ### record
 
 Re-exports [record](../record/record.md#record)
 
----
+***
 
 ### RecordType
 
 Re-exports [RecordType](../type/README.md#recordtype)
 
----
+***
 
 ### recursion
 
 Re-exports [recursion](../other-types/recursion.md#recursion)
 
----
+***
 
 ### refine
 
 Re-exports [refine](../other-types/refine.md#refine)
 
----
+***
 
 ### required
 
 Re-exports [required](../record/required.md#required)
 
----
+***
 
 ### RequiredPropertyType
 
 Re-exports [RequiredPropertyType](../record/optional.md#requiredpropertytype)
 
----
+***
 
 ### RequiredType
 
 Re-exports [RequiredType](../record/required.md#requiredtype)
 
----
+***
 
 ### safeInt
 
 Re-exports [safeInt](../predefined/brand/number/safe-int.md#safeint)
 
----
+***
 
 ### safeUint
 
 Re-exports [safeUint](../predefined/brand/number/safe-uint.md#safeuint)
 
----
+***
 
 ### SetType
 
 Re-exports [SetType](../other-types/set.md#settype)
 
----
+***
 
 ### simpleBrandedNumber
 
 Re-exports [simpleBrandedNumber](../brand/branded-number.md#simplebrandednumber)
 
----
+***
 
 ### simpleBrandedString
 
 Re-exports [simpleBrandedString](../brand/branded-string.md#simplebrandedstring)
 
----
+***
 
 ### strictRecord
 
 Re-exports [strictRecord](../record/record.md#strictrecord)
 
----
+***
 
 ### string
 
 Re-exports [string](../primitives/string.md#string)
 
----
+***
 
 ### symbol
 
 Re-exports [symbol](../primitives/symbol.md#symbol)
 
----
+***
 
 ### toIntersectionString
 
 Re-exports [toIntersectionString](../utils/to-union-string.md#tointersectionstring)
 
----
+***
 
 ### toUnionKeyString
 
 Re-exports [toUnionKeyString](../utils/to-union-string.md#tounionkeystring)
 
----
+***
 
 ### toUnionString
 
 Re-exports [toUnionString](../utils/to-union-string.md#tounionstring)
 
----
+***
 
 ### TsFortressInternal
 
 Re-exports [TsFortressInternal](../type/namespaces/TsFortressInternal.md)
 
----
+***
 
 ### tuple
 
 Re-exports [tuple](../array/tuple.md#tuple)
 
----
+***
 
 ### Type
 
 Re-exports [Type](../type/README.md#type)
 
----
+***
 
 ### TypeOf
 
 Re-exports [TypeOf](../type/README.md#typeof)
 
----
+***
 
 ### uint
 
 Re-exports [uint](../predefined/brand/number/uint.md#uint)
 
----
+***
 
 ### uint16
 
 Re-exports [uint16](../predefined/brand/number/uint16.md#uint16)
 
----
+***
 
 ### uint32
 
 Re-exports [uint32](../predefined/brand/number/uint32.md#uint32)
 
----
+***
 
 ### uint8
 
 Re-exports [uint8](../predefined/uint8.md#uint8)
 
----
+***
 
 ### uintRange
 
 Re-exports [uintRange](../enum/uint-range.md#uintrange)
 
----
+***
 
 ### undefinedType
 
 Re-exports [undefinedType](../primitives/undefined.md#undefinedtype)
 
----
+***
 
 ### union
 
 Re-exports [union](../compose/union.md#union)
 
----
+***
 
 ### unknown
 
 Re-exports [unknown](../other-types/unknown.md#unknown)
 
----
+***
 
 ### uuid
 
 Re-exports [uuid](../predefined/brand/string/uuid.md#uuid)
 
----
+***
 
 ### uuidV4
 
 Re-exports [uuidV4](../predefined/brand/string/uuid.md#uuidv4)
 
----
+***
 
 ### uuidV6
 
 Re-exports [uuidV6](../predefined/brand/string/uuid.md#uuidv6)
 
----
+***
 
 ### uuidV7
 
 Re-exports [uuidV7](../predefined/brand/string/uuid.md#uuidv7)
 
----
+***
 
 ### ValidationError
 
 Re-exports [ValidationError](../utils/validation-error.md#validationerror)
 
----
+***
 
 ### validationErrorsToMessages
 
 Re-exports [validationErrorsToMessages](../utils/validation-error.md#validationerrorstomessages)
 
----
+***
 
 ### validationErrorToMessage
 
 Re-exports [validationErrorToMessage](../utils/validation-error.md#validationerrortomessage)
 
----
+***
 
 ### ValidationErrorWithMessage
 
 Re-exports [ValidationErrorWithMessage](../utils/validation-error.md#validationerrorwithmessage)
 
----
+***
 
 ### valueof
 

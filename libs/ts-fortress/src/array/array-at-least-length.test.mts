@@ -10,11 +10,15 @@ import { arrayAtLeastLength } from './array-at-least-length.mjs';
 describe('arrayAtLeastLength', () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
-      expect(arrayAtLeastLength(3, number()).defaultValue).toStrictEqual([0, 0, 0]);
+      expect(arrayAtLeastLength(3, number()).defaultValue).toStrictEqual([
+        0, 0, 0,
+      ]);
     });
 
     test('with explicit element default value', () => {
-      expect(arrayAtLeastLength(2, number(5)).defaultValue).toStrictEqual([5, 5]);
+      expect(arrayAtLeastLength(2, number(5)).defaultValue).toStrictEqual([
+        5, 5,
+      ]);
     });
 
     test('with explicit default value override', () => {

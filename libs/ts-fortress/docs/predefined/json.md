@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / predefined/json
 
@@ -14,15 +14,15 @@
 
 Defined in: [src/predefined/json.mts:34](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/json.mts#L34)
 
----
+***
 
 ### JsonPrimitive
 
-> `const` **JsonPrimitive**: `Readonly`\<\{ `assertIs`: (`a`) => asserts a is null \| string \| number \| boolean; `cast`: (`a`) => `null` \| `string` \| `number` \| `boolean`; `defaultValue`: `null` \| `string` \| `number` \| `boolean`; `fill`: (`a`) => `null` \| `string` \| `number` \| `boolean`; `is`: (`a`) => a is null \| string \| number \| boolean; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`null` \| `string` \| `number` \| `boolean`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
+> `const` **JsonPrimitive**: `Readonly`\<\{ `assertIs`: (`a`) => asserts a is string \| number \| boolean \| null; `cast`: (`a`) => `string` \| `number` \| `boolean` \| `null`; `defaultValue`: `string` \| `number` \| `boolean` \| `null`; `fill`: (`a`) => `string` \| `number` \| `boolean` \| `null`; `is`: (`a`) => a is string \| number \| boolean \| null; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`string` \| `number` \| `boolean` \| `null`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>
 
 Defined in: [src/predefined/json.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/predefined/json.mts#L9)
 
----
+***
 
 ### JsonValue
 

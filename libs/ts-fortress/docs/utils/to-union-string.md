@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / utils/to-union-string
 
@@ -24,7 +24,7 @@ readonly `string`[]
 
 `string`
 
----
+***
 
 ### toUnionKeyString()
 
@@ -42,7 +42,7 @@ readonly `string`[]
 
 `string`
 
----
+***
 
 ### toUnionString()
 

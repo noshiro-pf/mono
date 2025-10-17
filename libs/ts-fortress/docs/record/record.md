@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / record/record
 
@@ -18,7 +18,7 @@ Defined in: [src/record/record.mts:17](https://github.com/noshiro-pf/ts-fortress
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 #### Parameters
 
@@ -34,7 +34,7 @@ Defined in: [src/record/record.mts:17](https://github.com/noshiro-pf/ts-fortress
 
 [`RecordType`](../type/README.md#recordtype)\<`R`\>
 
----
+***
 
 ### strictRecord()
 
@@ -49,7 +49,7 @@ This is an alias for `record(source, { allowExcessProperties: false })`.
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 #### Parameters
 
@@ -77,10 +77,10 @@ A Type that validates records without allowing excess properties
 import { strictRecord, string, number } from 'ts-fortress';
 
 const User = strictRecord({
-    name: string(),
-    age: number(),
+  name: string(),
+  age: number()
 });
 
-User.is({ name: 'John', age: 30 }); // true
-User.is({ name: 'John', age: 30, extra: 'not allowed' }); // false
+User.is({ name: "John", age: 30 }); // true
+User.is({ name: "John", age: 30, extra: "not allowed" }); // false
 ```

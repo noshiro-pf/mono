@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / primitives/number
 
@@ -36,11 +36,11 @@ Defined in: [src/primitives/number.mts:8](https://github.com/noshiro-pf/ts-fortr
 
 ###### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 ###### C
 
-`C` _extends_ `Partial`\<`Readonly`\<\{ `gt`: `number`; `gte`: `number`; `lt`: `number`; `lte`: `number`; `max`: `number`; `min`: `number`; `multipleOf`: `number`; `negative`: `boolean`; `nonNegative`: `boolean`; `nonPositive`: `boolean`; `positive`: `boolean`; `step`: `number`; \}\>\>
+`C` *extends* `Partial`\<`Readonly`\<\{ `gt`: `number`; `gte`: `number`; `lt`: `number`; `lte`: `number`; `max`: `number`; `min`: `number`; `multipleOf`: `number`; `negative`: `boolean`; `nonNegative`: `boolean`; `nonPositive`: `boolean`; `positive`: `boolean`; `step`: `number`; \}\>\>
 
 ##### Parameters
 

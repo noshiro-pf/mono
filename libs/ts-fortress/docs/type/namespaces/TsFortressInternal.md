@@ -1,6 +1,6 @@
 [**ts-fortress**](../../README.md)
 
----
+***
 
 [ts-fortress](../../README.md) / [type](../README.md) / TsFortressInternal
 
@@ -18,9 +18,9 @@ Defined in: [src/type.mts:49](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, [`Type`](../README.md#type)\<`unknown`\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, [`Type`](../README.md#type)\<`unknown`\>\>
 
----
+***
 
 ### RecordTypeValueImpl
 
@@ -32,4 +32,4 @@ Defined in: [src/type.mts:52](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, [`Type`](../README.md#type)\<`unknown`\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, [`Type`](../README.md#type)\<`unknown`\>\>

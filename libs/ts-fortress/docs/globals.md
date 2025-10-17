@@ -1,6 +1,6 @@
 [**ts-fortress**](README.md)
 
----
+***
 
 [ts-fortress](README.md) / globals
 
@@ -14,7 +14,7 @@
 
 Defined in: [src/globals.d.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L7)
 
----
+***
 
 ### Iso8601
 
@@ -22,7 +22,7 @@ Defined in: [src/globals.d.mts:7](https://github.com/noshiro-pf/ts-fortress/blob
 
 Defined in: [src/globals.d.mts:5](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L5)
 
----
+***
 
 ### JsonString
 
@@ -30,7 +30,7 @@ Defined in: [src/globals.d.mts:5](https://github.com/noshiro-pf/ts-fortress/blob
 
 Defined in: [src/globals.d.mts:9](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L9)
 
----
+***
 
 ### PartialReadonly
 
@@ -44,7 +44,7 @@ Defined in: [src/globals.d.mts:3](https://github.com/noshiro-pf/ts-fortress/blob
 
 `T`
 
----
+***
 
 ### Uuid
 
@@ -52,7 +52,7 @@ Defined in: [src/globals.d.mts:3](https://github.com/noshiro-pf/ts-fortress/blob
 
 Defined in: [src/globals.d.mts:18](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L18)
 
----
+***
 
 ### Uuid4
 
@@ -60,7 +60,7 @@ Defined in: [src/globals.d.mts:18](https://github.com/noshiro-pf/ts-fortress/blo
 
 Defined in: [src/globals.d.mts:20](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L20)
 
----
+***
 
 ### Uuid6
 
@@ -68,7 +68,7 @@ Defined in: [src/globals.d.mts:20](https://github.com/noshiro-pf/ts-fortress/blo
 
 Defined in: [src/globals.d.mts:22](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L22)
 
----
+***
 
 ### Uuid7
 
@@ -76,7 +76,7 @@ Defined in: [src/globals.d.mts:22](https://github.com/noshiro-pf/ts-fortress/blo
 
 Defined in: [src/globals.d.mts:24](https://github.com/noshiro-pf/ts-fortress/blob/main/src/globals.d.mts#L24)
 
----
+***
 
 ### UuidBaseString
 
@@ -88,9 +88,9 @@ Defined in: [src/globals.d.mts:13](https://github.com/noshiro-pf/ts-fortress/blo
 
 ##### V
 
-`V` _extends_ [`UuidVersion`](#uuidversion) = [`UuidVersion`](#uuidversion)
+`V` *extends* [`UuidVersion`](#uuidversion) = [`UuidVersion`](#uuidversion)
 
----
+***
 
 ### UuidVersion
 

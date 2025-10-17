@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / brand/brand
 
@@ -18,15 +18,15 @@ Defined in: [src/brand/brand.mts:9](https://github.com/noshiro-pf/ts-fortress/bl
 
 ##### A
 
-`A` _extends_ `string` \| `number` \| `bigint` \| `boolean`
+`A` *extends* `string` \| `number` \| `bigint` \| `boolean`
 
 ##### BrandTrueKeys
 
-`BrandTrueKeys` _extends_ readonly `string`[]
+`BrandTrueKeys` *extends* readonly `string`[]
 
 ##### BrandFalseKeys
 
-`BrandFalseKeys` _extends_ readonly `string`[] = \[\]
+`BrandFalseKeys` *extends* readonly `string`[] = \[\]
 
 #### Parameters
 

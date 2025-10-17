@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / primitives/bigint
 
@@ -36,11 +36,11 @@ Defined in: [src/primitives/bigint.mts:8](https://github.com/noshiro-pf/ts-fortr
 
 ###### B
 
-`B` _extends_ `bigint`
+`B` *extends* `bigint`
 
 ###### C
 
-`C` _extends_ `Partial`\<`Readonly`\<\{ `gt`: `bigint`; `gte`: `bigint`; `lt`: `bigint`; `lte`: `bigint`; `max`: `bigint`; `min`: `bigint`; `multipleOf`: `bigint`; `negative`: `boolean`; `nonNegative`: `boolean`; `nonPositive`: `boolean`; `positive`: `boolean`; `step`: `bigint`; \}\>\>
+`C` *extends* `Partial`\<`Readonly`\<\{ `gt`: `bigint`; `gte`: `bigint`; `lt`: `bigint`; `lte`: `bigint`; `max`: `bigint`; `min`: `bigint`; `multipleOf`: `bigint`; `negative`: `boolean`; `nonNegative`: `boolean`; `nonPositive`: `boolean`; `positive`: `boolean`; `step`: `bigint`; \}\>\>
 
 ##### Parameters
 

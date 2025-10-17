@@ -88,5 +88,5 @@ await updateRepository({
     str,
   );
 
-  await $('npm run fmt');
+  await $('pnpm run fmt');
 }

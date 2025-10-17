@@ -1,6 +1,6 @@
 [**ts-fortress**](../../../README.md)
 
----
+***
 
 [ts-fortress](../../../README.md) / predefined/brand/number/non-zero-finite-number
 

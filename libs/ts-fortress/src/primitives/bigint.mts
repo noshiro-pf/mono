@@ -200,9 +200,8 @@ type IsNonNegativeBigint<B extends bigint> =
 
 type IsZeroBigint<B extends bigint> = `${B}` extends '0' ? true : false;
 
-type IsPositiveBigint<B extends bigint> = IsZeroBigint<B> extends true
-  ? false
-  : IsNonNegativeBigint<B>;
+type IsPositiveBigint<B extends bigint> =
+  IsZeroBigint<B> extends true ? false : IsNonNegativeBigint<B>;
 
 type IsNonPositiveBigint<B extends bigint> =
   IsPositiveBigint<B> extends true ? false : true;

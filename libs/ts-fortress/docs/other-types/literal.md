@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / other-types/literal
 
@@ -18,7 +18,7 @@ Defined in: [src/other-types/literal.mts:5](https://github.com/noshiro-pf/ts-for
 
 ##### L
 
-`L` _extends_ `string` \| `number` \| `bigint` \| `boolean`
+`L` *extends* `string` \| `number` \| `bigint` \| `boolean`
 
 #### Parameters
 

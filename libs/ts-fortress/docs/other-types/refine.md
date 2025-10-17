@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / other-types/refine
 
@@ -18,11 +18,11 @@ Defined in: [src/other-types/refine.mts:9](https://github.com/noshiro-pf/ts-fort
 
 ##### Base
 
-`Base` _extends_ `string` \| `number` \| `bigint` \| `boolean`
+`Base` *extends* `string` \| `number` \| `bigint` \| `boolean`
 
 ##### R
 
-`R` _extends_ `string` \| `number` \| `bigint` \| `boolean`
+`R` *extends* `string` \| `number` \| `bigint` \| `boolean`
 
 #### Parameters
 

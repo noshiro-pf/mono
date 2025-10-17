@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / type
 
@@ -26,7 +26,7 @@ Defined in: [src/type.mts:30](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 #### Deprecated
 
----
+***
 
 ### RecordType
 
@@ -38,9 +38,9 @@ Defined in: [src/type.mts:34](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 ##### R
 
-`R` _extends_ `ReadonlyRecord`\<`string`, [`Type`](#type)\<`unknown`\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, [`Type`](#type)\<`unknown`\>\>
 
----
+***
 
 ### Type
 
@@ -63,7 +63,7 @@ Defined in: [src/type.mts:14](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 `A`
 
----
+***
 
 ### TypeOf
 
@@ -75,4 +75,4 @@ Defined in: [src/type.mts:27](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 ##### A
 
-`A` _extends_ [`Type`](#type)\<`unknown`\>
+`A` *extends* [`Type`](#type)\<`unknown`\>

@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / brand/branded-number
 
@@ -20,7 +20,7 @@ Same as brandedNumber
 
 ##### K
 
-`K` _extends_ `string`
+`K` *extends* `string`
 
 #### Parameters
 
@@ -48,7 +48,7 @@ Defined in: [src/brand/branded-number.mts:5](https://github.com/noshiro-pf/ts-fo
 
 ##### K
 
-`K` _extends_ `string`
+`K` *extends* `string`
 
 #### Parameters
 

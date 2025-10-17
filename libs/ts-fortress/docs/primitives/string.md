@@ -1,6 +1,6 @@
 [**ts-fortress**](../README.md)
 
----
+***
 
 [ts-fortress](../README.md) / primitives/string
 
@@ -36,11 +36,11 @@ Defined in: [src/primitives/string.mts:8](https://github.com/noshiro-pf/ts-fortr
 
 ###### S
 
-`S` _extends_ `string`
+`S` *extends* `string`
 
 ###### C
 
-`C` _extends_ `Partial`\<`Readonly`\<\{ `endsWith`: `string`; `includes`: `string`; `lowercase`: `boolean`; `maxLength`: `number`; `minLength`: `number`; `nonempty`: `boolean`; `regex`: \{ `dotAll`: `boolean`; `flags`: `string`; `global`: `boolean`; `hasIndices`: `boolean`; `ignoreCase`: `boolean`; `lastIndex`: `number`; `multiline`: `boolean`; `source`: `string`; `sticky`: `boolean`; `unicode`: `boolean`; `unicodeSets`: `boolean`; `[match]`: `null` \| `RegExpMatchArray`; `[matchAll]`: `RegExpStringIterator`\<`RegExpMatchArray`\>; `[replace]`: `string`; `[search]`: `number`; `[split]`: `string`[]; `compile`: `this`; `exec`: `null` \| `RegExpExecArray`; `test`: `boolean`; \}; `startsWith`: `string`; `uppercase`: `boolean`; \}\>\>
+`C` *extends* `Partial`\<`Readonly`\<\{ `endsWith`: `string`; `includes`: `string`; `lowercase`: `boolean`; `maxLength`: `number`; `minLength`: `number`; `nonempty`: `boolean`; `regex`: \{ `dotAll`: `boolean`; `flags`: `string`; `global`: `boolean`; `hasIndices`: `boolean`; `ignoreCase`: `boolean`; `lastIndex`: `number`; `multiline`: `boolean`; `source`: `string`; `sticky`: `boolean`; `unicode`: `boolean`; `unicodeSets`: `boolean`; `[match]`: `RegExpMatchArray` \| `null`; `[matchAll]`: `RegExpStringIterator`\<`RegExpMatchArray`\>; `[replace]`: `string`; `[search]`: `number`; `[split]`: `string`[]; `compile`: `this`; `exec`: `RegExpExecArray` \| `null`; `test`: `boolean`; \}; `startsWith`: `string`; `uppercase`: `boolean`; \}\>\>
 
 ##### Parameters
 
