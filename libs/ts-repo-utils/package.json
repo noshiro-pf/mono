@@ -106,7 +106,7 @@
     "cspell": "^9.2.1",
     "dedent": "^1.7.0",
     "eslint": "^9.37.0",
-    "eslint-config-typed": "^1.7.0",
+    "eslint-config-typed": "^1.7.1",
     "fast-glob": "^3.3.3",
     "markdownlint": "^0.39.0",
     "markdownlint-cli2": "^0.18.1",
