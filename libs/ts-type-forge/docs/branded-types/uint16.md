@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/uint16
 
@@ -21,13 +21,13 @@ Range: [0, 2^16 - 1] or [0, 65,535]
 
 ```ts
 const isUint16 = (x: number): x is Uint16 =>
-    Number.isSafeInteger(x) && x >= 0 && x <= 2 ** 16 - 1;
+  Number.isSafeInteger(x) && x >= 0 && x <= 2**16 - 1;
 
 const port = (num: Uint16) => ({ port: num });
 const characterCode = (code: Uint16) => String.fromCharCode(code);
 ```
 
----
+***
 
 ### PositiveUint16
 
@@ -42,12 +42,12 @@ Range: [1, 2^16 - 1] or [1, 65,535]
 
 ```ts
 const isPositiveUint16 = (x: number): x is PositiveUint16 =>
-    Number.isSafeInteger(x) && x > 0 && x <= 2 ** 16 - 1;
+  Number.isSafeInteger(x) && x > 0 && x <= 2**16 - 1;
 
 const tcpPort = (port: PositiveUint16) => ({ port });
 ```
 
----
+***
 
 ### NonZeroUint16
 
@@ -63,12 +63,12 @@ Range: [1, 2^16 - 1] or [1, 65,535]
 
 ```ts
 const isNonZeroUint16 = (x: number): x is NonZeroUint16 =>
-    Number.isSafeInteger(x) && x > 0 && x <= 2 ** 16 - 1;
+  Number.isSafeInteger(x) && x > 0 && x <= 2**16 - 1;
 
 const networkId = (id: NonZeroUint16) => ({ networkId: id });
 ```
 
----
+***
 
 ### Uint16WithSmallInt
 
@@ -79,7 +79,7 @@ Defined in: [src/branded-types/uint16.d.mts:52](https://github.com/noshiro-pf/ts
 16-bit unsigned integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | Uint16`
 
----
+***
 
 ### PositiveUint16WithSmallInt
 
@@ -90,7 +90,7 @@ Defined in: [src/branded-types/uint16.d.mts:58](https://github.com/noshiro-pf/ts
 Positive 16-bit unsigned integer type with small literal values included.
 Type: `1 | 2 | ... | 39 | PositiveUint16`
 
----
+***
 
 ### NonZeroUint16WithSmallInt
 

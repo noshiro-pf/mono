@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/int
 
@@ -22,18 +22,14 @@ Represents values that pass `Number.isInteger(x)` check.
 ```ts
 const isInt = (x: number): x is Int => Number.isInteger(x);
 
-const getArrayElement = <T>(
-    arr: readonly T[],
-    index: Int & NonNegativeNumber,
-) => arr[index];
+const getArrayElement = <T>(arr: readonly T[], index: Int & NonNegativeNumber) =>
+  arr[index];
 
 const factorial = (n: Int & NonNegativeNumber): Int =>
-    n === 0
-        ? (1 as Int)
-        : ((n * factorial((n - 1) as Int & NonNegativeNumber)) as Int);
+  n === 0 ? 1 as Int : (n * factorial((n - 1) as Int & NonNegativeNumber)) as Int;
 ```
 
----
+***
 
 ### NonZeroInt
 
@@ -48,16 +44,16 @@ Represents integers that are not equal to zero.
 
 ```ts
 const isNonZeroInt = (x: number): x is NonZeroInt =>
-    Number.isInteger(x) && x !== 0;
+  Number.isInteger(x) && x !== 0;
 
 const modulo = (a: Int, b: NonZeroInt) => a % b;
 const gcd = (a: NonZeroInt, b: NonZeroInt): NonZeroInt => {
-    // Euclidean algorithm implementation
-    return (b === 0 ? a : gcd(b, (a % b) as NonZeroInt)) as NonZeroInt;
+  // Euclidean algorithm implementation
+  return (b === 0 ? a : gcd(b, (a % b) as NonZeroInt)) as NonZeroInt;
 };
 ```
 
----
+***
 
 ### NonNegativeInt
 
@@ -72,13 +68,13 @@ Represents integers greater than or equal to zero.
 
 ```ts
 const isNonNegativeInt = (x: number): x is NonNegativeInt =>
-    Number.isInteger(x) && x >= 0;
+  Number.isInteger(x) && x >= 0;
 
 const arrayIndex = (arr: readonly unknown[], i: NonNegativeInt) => arr[i];
 const count = (items: NonNegativeInt) => ({ count: items });
 ```
 
----
+***
 
 ### Uint
 
@@ -93,14 +89,16 @@ Represents integers greater than or equal to zero.
 #### Example
 
 ```ts
-const isUint = (x: number): x is Uint => Number.isInteger(x) && x >= 0;
+const isUint = (x: number): x is Uint =>
+  Number.isInteger(x) && x >= 0;
 
-const arrayLength = (arr: readonly unknown[]): Uint => arr.length as Uint;
+const arrayLength = (arr: readonly unknown[]): Uint =>
+  arr.length as Uint;
 
 const repeat = (str: string, count: Uint) => str.repeat(count);
 ```
 
----
+***
 
 ### PositiveInt
 
@@ -115,14 +113,15 @@ Represents integers strictly greater than zero.
 
 ```ts
 const isPositiveInt = (x: number): x is PositiveInt =>
-    Number.isInteger(x) && x > 0;
+  Number.isInteger(x) && x > 0;
 
-const take = <T>(arr: readonly T[], n: PositiveInt): T[] => arr.slice(0, n);
+const take = <T>(arr: readonly T[], n: PositiveInt): T[] =>
+  arr.slice(0, n);
 
 const id = (value: PositiveInt) => ({ id: value });
 ```
 
----
+***
 
 ### NegativeInt
 
@@ -137,13 +136,13 @@ Represents integers strictly less than zero.
 
 ```ts
 const isNegativeInt = (x: number): x is NegativeInt =>
-    Number.isInteger(x) && x < 0;
+  Number.isInteger(x) && x < 0;
 
 const offset = (value: NegativeInt) => ({ offset: value });
 const depth = (level: NegativeInt) => ({ belowGround: -level });
 ```
 
----
+***
 
 ### IntWithSmallInt
 
@@ -154,7 +153,7 @@ Defined in: [src/branded-types/int.d.mts:105](https://github.com/noshiro-pf/ts-t
 Integer type with small literal values included.
 Type: `-40 | -39 | ... | 39 | Int`
 
----
+***
 
 ### NonZeroIntWithSmallInt
 
@@ -165,7 +164,7 @@ Defined in: [src/branded-types/int.d.mts:111](https://github.com/noshiro-pf/ts-t
 Non-zero integer type with small literal values included.
 Type: `-40 | ... | -1 | 1 | ... | 39 | NonZeroInt`
 
----
+***
 
 ### NonNegativeIntWithSmallInt
 
@@ -176,7 +175,7 @@ Defined in: [src/branded-types/int.d.mts:117](https://github.com/noshiro-pf/ts-t
 Non-negative integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | NonNegativeInt`
 
----
+***
 
 ### UintWithSmallInt
 
@@ -188,7 +187,7 @@ Alias for `NonNegativeIntWithSmallInt`.
 Unsigned integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | Uint`
 
----
+***
 
 ### PositiveIntWithSmallInt
 
@@ -199,7 +198,7 @@ Defined in: [src/branded-types/int.d.mts:130](https://github.com/noshiro-pf/ts-t
 Positive integer type with small literal values included.
 Type: `1 | 2 | ... | 39 | PositiveInt`
 
----
+***
 
 ### NegativeIntWithSmallInt
 

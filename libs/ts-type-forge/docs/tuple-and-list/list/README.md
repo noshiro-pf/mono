@@ -1,6 +1,6 @@
 [**ts-type-forge**](../../README.md)
 
----
+***
 
 [ts-type-forge](../../README.md) / tuple-and-list/list
 

@@ -24,7 +24,7 @@ const build = async (): Promise<void> => {
   // Step 2: Validate file extensions
   {
     echo('2. Checking file extensions...');
-    await runCmdStep('npm run check:ext', 'Checking file extensions failed');
+    await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
     echo('✓ File extensions validated\n');
   }
 

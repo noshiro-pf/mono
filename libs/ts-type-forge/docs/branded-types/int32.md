@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/int32
 
@@ -21,17 +21,17 @@ Range: [-2^31, 2^31 - 1] or [-2,147,483,648, 2,147,483,647]
 
 ```ts
 const isInt32 = (x: number): x is Int32 =>
-    Number.isSafeInteger(x) && x >= -(2 ** 31) && x <= 2 ** 31 - 1;
+  Number.isSafeInteger(x) && x >= -(2**31) && x <= 2**31 - 1;
 
 const toInt32 = (x: number): Int32 => {
-    // Simulate 32-bit integer overflow
-    return (x | 0) as Int32;
+  // Simulate 32-bit integer overflow
+  return (x | 0) as Int32;
 };
 
 const bitwiseOr = (a: Int32, b: Int32): Int32 => (a | b) as Int32;
 ```
 
----
+***
 
 ### NonZeroInt32
 
@@ -46,12 +46,12 @@ Range: [-2^31, -1] ∪ [1, 2^31 - 1]
 
 ```ts
 const isNonZeroInt32 = (x: number): x is NonZeroInt32 =>
-    Number.isSafeInteger(x) && x !== 0 && x >= -(2 ** 31) && x <= 2 ** 31 - 1;
+  Number.isSafeInteger(x) && x !== 0 && x >= -(2**31) && x <= 2**31 - 1;
 
 const delta = (change: NonZeroInt32) => ({ delta: change });
 ```
 
----
+***
 
 ### NonNegativeInt32
 
@@ -66,12 +66,12 @@ Range: [0, 2^31 - 1] or [0, 2,147,483,647]
 
 ```ts
 const isNonNegativeInt32 = (x: number): x is NonNegativeInt32 =>
-    Number.isSafeInteger(x) && x >= 0 && x <= 2 ** 31 - 1;
+  Number.isSafeInteger(x) && x >= 0 && x <= 2**31 - 1;
 
 const score = (points: NonNegativeInt32) => ({ score: points });
 ```
 
----
+***
 
 ### PositiveInt32
 
@@ -86,12 +86,12 @@ Range: [1, 2^31 - 1] or [1, 2,147,483,647]
 
 ```ts
 const isPositiveInt32 = (x: number): x is PositiveInt32 =>
-    Number.isSafeInteger(x) && x > 0 && x <= 2 ** 31 - 1;
+  Number.isSafeInteger(x) && x > 0 && x <= 2**31 - 1;
 
 const userId = (id: PositiveInt32) => ({ userId: id });
 ```
 
----
+***
 
 ### NegativeInt32
 
@@ -106,12 +106,12 @@ Range: [-2^31, -1] or [-2,147,483,648, -1]
 
 ```ts
 const isNegativeInt32 = (x: number): x is NegativeInt32 =>
-    Number.isSafeInteger(x) && x < 0 && x >= -(2 ** 31);
+  Number.isSafeInteger(x) && x < 0 && x >= -(2**31);
 
 const offset = (value: NegativeInt32) => ({ offset: value });
 ```
 
----
+***
 
 ### Int32WithSmallInt
 
@@ -122,7 +122,7 @@ Defined in: [src/branded-types/int32.d.mts:83](https://github.com/noshiro-pf/ts-
 32-bit integer type with small literal values included.
 Type: `-40 | -39 | ... | 39 | Int32`
 
----
+***
 
 ### NonZeroInt32WithSmallInt
 
@@ -133,7 +133,7 @@ Defined in: [src/branded-types/int32.d.mts:89](https://github.com/noshiro-pf/ts-
 Non-zero 32-bit integer type with small literal values included.
 Type: `-40 | ... | -1 | 1 | ... | 39 | NonZeroInt32`
 
----
+***
 
 ### NonNegativeInt32WithSmallInt
 
@@ -144,7 +144,7 @@ Defined in: [src/branded-types/int32.d.mts:95](https://github.com/noshiro-pf/ts-
 Non-negative 32-bit integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | NonNegativeInt32`
 
----
+***
 
 ### PositiveInt32WithSmallInt
 
@@ -155,7 +155,7 @@ Defined in: [src/branded-types/int32.d.mts:101](https://github.com/noshiro-pf/ts
 Positive 32-bit integer type with small literal values included.
 Type: `1 | 2 | ... | 39 | PositiveInt32`
 
----
+***
 
 ### NegativeInt32WithSmallInt
 

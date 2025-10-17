@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / constants/web
 
@@ -19,7 +19,6 @@ This is a union of string literals corresponding to the nine standard HTTP verbs
 as defined in the HTTP specification.
 
 Each method has a specific semantic meaning:
-
 - `GET`: Retrieve data (safe, idempotent)
 - `POST`: Submit data (not idempotent)
 - `PUT`: Update/replace resource (idempotent)
@@ -32,21 +31,21 @@ Each method has a specific semantic meaning:
 
 #### See
 
-- [MDN HTTP Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
-- [RFC 7231 Section 4](https://tools.ietf.org/html/rfc7231#section-4)
+ - [MDN HTTP Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+ - [RFC 7231 Section 4](https://tools.ietf.org/html/rfc7231#section-4)
 
 #### Example
 
 ```ts
 // Type-safe HTTP client
 interface RequestConfig {
-    method: HTTPRequestMethod;
-    url: string;
-    data?: unknown;
+  method: HTTPRequestMethod;
+  url: string;
+  data?: unknown;
 }
 
 const makeRequest = (config: RequestConfig) => {
-    // Implementation here
+  // Implementation here
 };
 
 // Usage

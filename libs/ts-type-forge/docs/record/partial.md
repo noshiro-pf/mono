@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / record/partial
 
@@ -27,7 +27,7 @@ The original type.
 
 ##### K
 
-`K` _extends_ keyof `T`
+`K` *extends* keyof `T`
 
 The keys to make optional.
 
@@ -43,7 +43,7 @@ type PartiallyPartialData = PartiallyPartial<Data, 'a' | 'b'>;
 // Result: { a?: number; b?: string; c: boolean }
 ```
 
----
+***
 
 ### PartiallyOptional
 
@@ -63,7 +63,7 @@ The original type.
 
 ##### K
 
-`K` _extends_ keyof `T`
+`K` *extends* keyof `T`
 
 The keys to make optional.
 
@@ -79,7 +79,7 @@ type PartiallyOptionalData = PartiallyOptional<Data, 'a' | 'b'>;
 // Result: { a?: number; b?: string; c: boolean }
 ```
 
----
+***
 
 ### PartiallyNullable
 
@@ -100,7 +100,7 @@ The original type.
 
 ##### K
 
-`K` _extends_ keyof `T`
+`K` *extends* keyof `T`
 
 The keys to make nullable.
 
@@ -116,7 +116,7 @@ type PartiallyNullableData = PartiallyNullable<Data, 'a' | 'b'>;
 // Result: { a: number | undefined; b: string | undefined; c: boolean }
 ```
 
----
+***
 
 ### PartiallyRequired
 
@@ -137,7 +137,7 @@ The original type (can have optional properties).
 
 ##### K
 
-`K` _extends_ keyof `T`
+`K` *extends* keyof `T`
 
 The keys to make required.
 
@@ -153,7 +153,7 @@ type PartiallyRequiredData = PartiallyRequired<Data, 'a' | 'b'>;
 // Result: { a: number; b: string; c?: boolean }
 ```
 
----
+***
 
 ### OptionalKeys
 
@@ -169,7 +169,7 @@ to find keys where `undefined` is assignable (which is true only for optional pr
 
 ##### R
 
-`R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord)
+`R` *extends* [`UnknownRecord`](../constants/record.md#unknownrecord)
 
 The record type.
 
@@ -181,16 +181,16 @@ A union of keys that are optional in `R`.
 
 ```ts
 type K = OptionalKeys<{
-    a?: 0; // optional
-    b?: 0 | undefined; // optional
-    c?: undefined; // optional
-    d: 0; // required
-    e: undefined; // required, value is undefined
-    f: 0 | undefined; // required, value includes undefined
+  a?: 0; // optional
+  b?: 0 | undefined; // optional
+  c?: undefined; // optional
+  d: 0; // required
+  e: undefined; // required, value is undefined
+  f: 0 | undefined; // required, value includes undefined
 }>; // 'a' | 'b' | 'c'
 ```
 
----
+***
 
 ### RequiredKeys
 
@@ -198,14 +198,14 @@ type K = OptionalKeys<{
 
 Defined in: [src/record/partial.d.mts:116](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.d.mts#L116)
 
-Extracts keys from a record `R` that are _not_ explicitly marked as optional using the `?` modifier.
+Extracts keys from a record `R` that are *not* explicitly marked as optional using the `?` modifier.
 It calculates this by taking all keys of `R` and excluding the optional keys identified by `OptionalKeys<R>`.
 
 #### Type Parameters
 
 ##### R
 
-`R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord)
+`R` *extends* [`UnknownRecord`](../constants/record.md#unknownrecord)
 
 The record type.
 
@@ -217,11 +217,11 @@ A union of keys that are required (not optional) in `R`.
 
 ```ts
 type K = RequiredKeys<{
-    a?: 0; // optional
-    b?: 0 | undefined; // optional
-    c?: undefined; // optional
-    d: 0; // required
-    e: undefined; // required, value is undefined
-    f: 0 | undefined; // required, value includes undefined
+  a?: 0; // optional
+  b?: 0 | undefined; // optional
+  c?: undefined; // optional
+  d: 0; // required
+  e: undefined; // required, value is undefined
+  f: 0 | undefined; // required, value includes undefined
 }>; // 'd' | 'e' | 'f'
 ```

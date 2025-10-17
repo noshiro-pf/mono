@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / others/widen-literal
 
@@ -10,7 +10,7 @@
 
 ### WidenLiteral
 
-> **WidenLiteral**\<`T`\> = `T` _extends_ `string` ? `string` : `T` _extends_ `number` ? `number` : `T` _extends_ `boolean` ? `boolean` : `T` _extends_ `bigint` ? `bigint` : `T` _extends_ `symbol` ? `symbol` : `T`
+> **WidenLiteral**\<`T`\> = `T` *extends* `string` ? `string` : `T` *extends* `number` ? `number` : `T` *extends* `boolean` ? `boolean` : `T` *extends* `bigint` ? `bigint` : `T` *extends* `symbol` ? `symbol` : `T`
 
 Defined in: [src/others/widen-literal.d.mts:47](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/widen-literal.d.mts#L47)
 
@@ -40,31 +40,31 @@ The widened primitive type if `T` is a literal of a primitive, otherwise `T`.
 
 ```ts
 // Basic literal widening
-type Str = WidenLiteral<'hello'>; // string
-type Num = WidenLiteral<123>; // number
-type Bool = WidenLiteral<true>; // boolean
-type Big = WidenLiteral<100n>; // bigint
+type Str = WidenLiteral<"hello">;   // string
+type Num = WidenLiteral<123>;       // number
+type Bool = WidenLiteral<true>;     // boolean
+type Big = WidenLiteral<100n>;      // bigint
 type Sym = WidenLiteral<typeof Symbol.iterator>; // symbol
 
 // Non-primitives remain unchanged
 type Obj = WidenLiteral<{ a: number }>; // { a: number } (unchanged)
-type Arr = WidenLiteral<[1, 2, 3]>; // [1, 2, 3] (unchanged)
+type Arr = WidenLiteral<[1, 2, 3]>;     // [1, 2, 3] (unchanged)
 
 // Union types are widened distributively
-type Union = WidenLiteral<'a' | 1 | true>; // string | number | boolean
+type Union = WidenLiteral<"a" | 1 | true>; // string | number | boolean
 
 // Practical use case: API compatibility
 interface ApiConfig {
-    method: string; // API expects string, not literal
-    timeout: number; // API expects number, not literal
+  method: string;  // API expects string, not literal
+  timeout: number; // API expects number, not literal
 }
 
 type LiteralConfig = {
-    method: 'GET' | 'POST';
-    timeout: 5000;
+  method: "GET" | "POST";
+  timeout: 5000;
 };
 
 type CompatibleConfig = {
-    [K in keyof LiteralConfig]: WidenLiteral<LiteralConfig[K]>;
+  [K in keyof LiteralConfig]: WidenLiteral<LiteralConfig[K]>;
 }; // { method: string; timeout: number }
 ```

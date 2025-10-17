@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / type-level-integer/increment
 
@@ -27,7 +27,7 @@ Note: Due to TypeScript's recursion limits, this works reliably for small to med
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 A non-negative integer literal type to increment.
 
@@ -38,26 +38,26 @@ The number literal type representing `N + 1`.
 #### Example
 
 ```ts
-type Five = Increment<4>; // 5
-type One = Increment<0>; // 1
-type Ten = Increment<9>; // 10
+type Five = Increment<4>;  // 5
+type One = Increment<0>;   // 1
+type Ten = Increment<9>;   // 10
 
 // Useful in recursive type computations
-type CountToN<N extends number, Count extends number = 0> = Count extends N
-    ? Count
-    : CountToN<N, Increment<Count>>;
+type CountToN<N extends number, Count extends number = 0> =
+  Count extends N ? Count : CountToN<N, Increment<Count>>;
 
 type UpTo5 = CountToN<5>; // 5
 
 // Building sequences
-type Range<From extends number, To extends number> = From extends To
+type Range<From extends number, To extends number> =
+  From extends To
     ? From
     : From | Range<Increment<From>, To>;
 
 type OneToFive = Range<1, 5>; // 1 | 2 | 3 | 4 | 5
 ```
 
----
+***
 
 ### Decrement
 
@@ -78,7 +78,7 @@ result in compilation errors or unexpected behavior.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 A positive integer literal type (must be >= 1) to decrement.
 
@@ -90,22 +90,18 @@ The number literal type representing `N - 1`.
 
 ```ts
 type Three = Decrement<4>; // 3
-type Zero = Decrement<1>; // 0
-type Four = Decrement<5>; // 4
+type Zero = Decrement<1>;  // 0
+type Four = Decrement<5>;  // 4
 
 // type Error = Decrement<0>; // ⚠️ Error: will fail or return unexpected result
 
 // Useful in countdown scenarios
-type Countdown<N extends number> = N extends 0
-    ? 0
-    : N | Countdown<Decrement<N>>;
+type Countdown<N extends number> =
+  N extends 0 ? 0 : N | Countdown<Decrement<N>>;
 
 type CountdownFrom3 = Countdown<3>; // 3 | 2 | 1 | 0
 
 // Bounds checking
-type IsPositive<N extends number> = N extends 0
-    ? false
-    : N extends Decrement<Increment<N>>
-      ? true
-      : false;
+type IsPositive<N extends number> =
+  N extends 0 ? false : N extends Decrement<Increment<N>> ? true : false;
 ```

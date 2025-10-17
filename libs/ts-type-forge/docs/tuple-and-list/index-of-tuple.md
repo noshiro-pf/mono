@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / tuple-and-list/index-of-tuple
 
@@ -22,7 +22,7 @@ If `T` is a regular array (variable length), it returns `number`.
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -39,7 +39,7 @@ type EmptyTupleIndices = IndexOfTuple<[]>; // never
 type ReadonlyArrayIndices = IndexOfTuple<readonly number[]>; // number
 ```
 
----
+***
 
 ### NegativeIndexOfTuple
 
@@ -56,7 +56,7 @@ If `T` is a regular array (variable length), it returns `number`.
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 

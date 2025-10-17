@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / type-level-integer/index-type
 
@@ -22,7 +22,7 @@ Requires `N` to be a non-negative integer literal.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The upper bound (exclusive). Must be a non-negative integer literal.
 
@@ -38,7 +38,7 @@ type Idx0 = Index<0>; // never
 type Idx1 = Index<1>; // 0
 ```
 
----
+***
 
 ### IndexInclusive
 
@@ -54,7 +54,7 @@ Requires `N` to be a non-negative integer literal.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The upper bound (inclusive). Must be a non-negative integer literal.
 
@@ -69,7 +69,7 @@ type IdxInc3 = IndexInclusive<3>; // 0 | 1 | 2 | 3
 type IdxInc0 = IndexInclusive<0>; // 0
 ```
 
----
+***
 
 ### NegativeIndex
 
@@ -85,7 +85,7 @@ Requires `N` to be a non-negative integer literal.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The absolute value of the lower bound (inclusive). Must be a non-negative integer literal.
 

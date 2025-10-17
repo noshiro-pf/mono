@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/int16
 
@@ -21,13 +21,13 @@ Range: [-2^15, 2^15 - 1] or [-32,768, 32,767]
 
 ```ts
 const isInt16 = (x: number): x is Int16 =>
-    Number.isSafeInteger(x) && x >= -(2 ** 15) && x <= 2 ** 15 - 1;
+  Number.isSafeInteger(x) && x >= -(2**15) && x <= 2**15 - 1;
 
 const audioSample = (value: Int16) => ({ sample: value });
 const temperature = (celsius: Int16) => ({ celsius });
 ```
 
----
+***
 
 ### NonZeroInt16
 
@@ -42,12 +42,12 @@ Range: [-2^15, -1] ∪ [1, 2^15 - 1]
 
 ```ts
 const isNonZeroInt16 = (x: number): x is NonZeroInt16 =>
-    Number.isSafeInteger(x) && x !== 0 && x >= -(2 ** 15) && x <= 2 ** 15 - 1;
+  Number.isSafeInteger(x) && x !== 0 && x >= -(2**15) && x <= 2**15 - 1;
 
 const offset = (value: NonZeroInt16) => ({ offset: value });
 ```
 
----
+***
 
 ### NonNegativeInt16
 
@@ -62,12 +62,12 @@ Range: [0, 2^15 - 1] or [0, 32,767]
 
 ```ts
 const isNonNegativeInt16 = (x: number): x is NonNegativeInt16 =>
-    Number.isSafeInteger(x) && x >= 0 && x <= 2 ** 15 - 1;
+  Number.isSafeInteger(x) && x >= 0 && x <= 2**15 - 1;
 
 const altitude = (meters: NonNegativeInt16) => ({ altitude: meters });
 ```
 
----
+***
 
 ### PositiveInt16
 
@@ -82,12 +82,12 @@ Range: [1, 2^15 - 1] or [1, 32,767]
 
 ```ts
 const isPositiveInt16 = (x: number): x is PositiveInt16 =>
-    Number.isSafeInteger(x) && x > 0 && x <= 2 ** 15 - 1;
+  Number.isSafeInteger(x) && x > 0 && x <= 2**15 - 1;
 
 const year = (value: PositiveInt16) => ({ year: value });
 ```
 
----
+***
 
 ### NegativeInt16
 
@@ -102,12 +102,12 @@ Range: [-2^15, -1] or [-32,768, -1]
 
 ```ts
 const isNegativeInt16 = (x: number): x is NegativeInt16 =>
-    Number.isSafeInteger(x) && x < 0 && x >= -(2 ** 15);
+  Number.isSafeInteger(x) && x < 0 && x >= -(2**15);
 
 const relativePosition = (offset: NegativeInt16) => ({ x: offset });
 ```
 
----
+***
 
 ### Int16WithSmallInt
 
@@ -118,7 +118,7 @@ Defined in: [src/branded-types/int16.d.mts:79](https://github.com/noshiro-pf/ts-
 16-bit integer type with small literal values included.
 Type: `-40 | -39 | ... | 39 | Int16`
 
----
+***
 
 ### NonZeroInt16WithSmallInt
 
@@ -129,7 +129,7 @@ Defined in: [src/branded-types/int16.d.mts:85](https://github.com/noshiro-pf/ts-
 Non-zero 16-bit integer type with small literal values included.
 Type: `-40 | ... | -1 | 1 | ... | 39 | NonZeroInt16`
 
----
+***
 
 ### NonNegativeInt16WithSmallInt
 
@@ -140,7 +140,7 @@ Defined in: [src/branded-types/int16.d.mts:91](https://github.com/noshiro-pf/ts-
 Non-negative 16-bit integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | NonNegativeInt16`
 
----
+***
 
 ### PositiveInt16WithSmallInt
 
@@ -151,7 +151,7 @@ Defined in: [src/branded-types/int16.d.mts:97](https://github.com/noshiro-pf/ts-
 Positive 16-bit integer type with small literal values included.
 Type: `1 | 2 | ... | 39 | PositiveInt16`
 
----
+***
 
 ### NegativeInt16WithSmallInt
 

@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / others/boolean
 
@@ -10,7 +10,7 @@
 
 ### BoolNot
 
-> **BoolNot**\<`A`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> _extends_ `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> _extends_ `true` ? `true` : `never`
+> **BoolNot**\<`A`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> *extends* `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> *extends* `true` ? `true` : `never`
 
 Defined in: [src/others/boolean.d.mts:24](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/boolean.d.mts#L24)
 
@@ -21,7 +21,7 @@ This is the type-level equivalent of the JavaScript `!` operator.
 
 ##### A
 
-`A` _extends_ `boolean`
+`A` *extends* `boolean`
 
 A boolean literal type (`true` or `false`).
 
@@ -32,25 +32,25 @@ The logical negation of `A`: `false` if `A` is `true`, `true` if `A` is `false`.
 #### Example
 
 ```ts
-type Result1 = BoolNot<true>; // false
+type Result1 = BoolNot<true>;  // false
 type Result2 = BoolNot<false>; // true
 
 // Useful in conditional types
 type IsDisabled<T> = T extends { enabled: infer E }
-    ? E extends boolean
-        ? BoolNot<E>
-        : never
-    : true;
+  ? E extends boolean
+    ? BoolNot<E>
+    : never
+  : true;
 
-type Test1 = IsDisabled<{ enabled: true }>; // false
+type Test1 = IsDisabled<{ enabled: true }>;  // false
 type Test2 = IsDisabled<{ enabled: false }>; // true
 ```
 
----
+***
 
 ### BoolAnd
 
-> **BoolAnd**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `false` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `false` : `never` : `never`
+> **BoolAnd**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> *extends* `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> *extends* `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> *extends* `true` ? `false` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> *extends* `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> *extends* `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> *extends* `true` ? `false` : `never` : `never`
 
 Defined in: [src/others/boolean.d.mts:57](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/boolean.d.mts#L57)
 
@@ -62,13 +62,13 @@ Returns `true` only when both operands are `true`.
 
 ##### A
 
-`A` _extends_ `boolean`
+`A` *extends* `boolean`
 
 The first boolean literal type (`true` or `false`).
 
 ##### B
 
-`B` _extends_ `boolean`
+`B` *extends* `boolean`
 
 The second boolean literal type (`true` or `false`).
 
@@ -79,26 +79,26 @@ The second boolean literal type (`true` or `false`).
 #### Example
 
 ```ts
-type T_T = BoolAnd<true, true>; // true
-type T_F = BoolAnd<true, false>; // false
-type F_T = BoolAnd<false, true>; // false
+type T_T = BoolAnd<true, true>;   // true
+type T_F = BoolAnd<true, false>;  // false
+type F_T = BoolAnd<false, true>;  // false
 type F_F = BoolAnd<false, false>; // false
 
 // Useful for combining conditions
-type HasBothFlags<T> = T extends { flagA: infer A; flagB: infer B }
-    ? A extends boolean
-        ? B extends boolean
-            ? BoolAnd<A, B>
-            : false
-        : false
-    : false;
+type HasBothFlags<T> = T extends { flagA: infer A, flagB: infer B }
+  ? A extends boolean
+    ? B extends boolean
+      ? BoolAnd<A, B>
+      : false
+    : false
+  : false;
 ```
 
----
+***
 
 ### BoolOr
 
-> **BoolOr**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `true` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `false` : `never` : `never`
+> **BoolOr**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> *extends* `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> *extends* `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> *extends* `true` ? `true` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> *extends* `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> *extends* `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> *extends* `true` ? `false` : `never` : `never`
 
 Defined in: [src/others/boolean.d.mts:100](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/boolean.d.mts#L100)
 
@@ -110,13 +110,13 @@ Returns `true` when at least one operand is `true`.
 
 ##### A
 
-`A` _extends_ `boolean`
+`A` *extends* `boolean`
 
 The first boolean literal type (`true` or `false`).
 
 ##### B
 
-`B` _extends_ `boolean`
+`B` *extends* `boolean`
 
 The second boolean literal type (`true` or `false`).
 
@@ -127,28 +127,28 @@ The second boolean literal type (`true` or `false`).
 #### Example
 
 ```ts
-type T_T = BoolOr<true, true>; // true
-type T_F = BoolOr<true, false>; // true
-type F_T = BoolOr<false, true>; // true
+type T_T = BoolOr<true, true>;   // true
+type T_F = BoolOr<true, false>;  // true
+type F_T = BoolOr<false, true>;  // true
 type F_F = BoolOr<false, false>; // false
 
 // Useful for fallback conditions
-type HasAnyFlag<T> = T extends { flagA: infer A; flagB: infer B }
-    ? A extends boolean
-        ? B extends boolean
-            ? BoolOr<A, B>
-            : A
-        : B extends boolean
-          ? B
-          : false
-    : false;
+type HasAnyFlag<T> = T extends { flagA: infer A, flagB: infer B }
+  ? A extends boolean
+    ? B extends boolean
+      ? BoolOr<A, B>
+      : A
+    : B extends boolean
+      ? B
+      : false
+  : false;
 ```
 
----
+***
 
 ### BoolEq
 
-> **BoolEq**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `false` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> _extends_ `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> _extends_ `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> _extends_ `true` ? `true` : `never` : `never`
+> **BoolEq**\<`A`, `B`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `true`\> *extends* `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> *extends* `true` ? `true` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> *extends* `true` ? `false` : `never` : [`TypeEq`](../condition/eq.md#typeeq)\<`A`, `false`\> *extends* `true` ? [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `true`\> *extends* `true` ? `false` : [`TypeEq`](../condition/eq.md#typeeq)\<`B`, `false`\> *extends* `true` ? `true` : `never` : `never`
 
 Defined in: [src/others/boolean.d.mts:126](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/boolean.d.mts#L126)
 
@@ -159,26 +159,26 @@ Returns `true` if both `A` and `B` are the same, `false` otherwise.
 
 ##### A
 
-`A` _extends_ `boolean`
+`A` *extends* `boolean`
 
 The first boolean literal type (`true` or `false`).
 
 ##### B
 
-`B` _extends_ `boolean`
+`B` *extends* `boolean`
 
 The second boolean literal type (`true` or `false`).
 
 #### Example
 
 ```ts
-type T_T = BoolEq<true, true>; // true
-type T_F = BoolEq<true, false>; // false
-type F_T = BoolEq<false, true>; // false
+type T_T = BoolEq<true, true>;   // true
+type T_F = BoolEq<true, false>;  // false
+type F_T = BoolEq<false, true>;  // false
 type F_F = BoolEq<false, false>; // true
 ```
 
----
+***
 
 ### BoolNand
 
@@ -192,26 +192,26 @@ Performs a logical NAND (NOT AND) operation on two boolean literal types `A` and
 
 ##### A
 
-`A` _extends_ `boolean`
+`A` *extends* `boolean`
 
 The first boolean literal type (`true` or `false`).
 
 ##### B
 
-`B` _extends_ `boolean`
+`B` *extends* `boolean`
 
 The second boolean literal type (`true` or `false`).
 
 #### Example
 
 ```ts
-type T_T = BoolNand<true, true>; // false
-type T_F = BoolNand<true, false>; // true
-type F_T = BoolNand<false, true>; // true
+type T_T = BoolNand<true, true>;   // false
+type T_F = BoolNand<true, false>;  // true
+type F_T = BoolNand<false, true>;  // true
 type F_F = BoolNand<false, false>; // true
 ```
 
----
+***
 
 ### BoolNor
 
@@ -225,26 +225,26 @@ Performs a logical NOR (NOT OR) operation on two boolean literal types `A` and `
 
 ##### A
 
-`A` _extends_ `boolean`
+`A` *extends* `boolean`
 
 The first boolean literal type (`true` or `false`).
 
 ##### B
 
-`B` _extends_ `boolean`
+`B` *extends* `boolean`
 
 The second boolean literal type (`true` or `false`).
 
 #### Example
 
 ```ts
-type T_T = BoolNor<true, true>; // false
-type T_F = BoolNor<true, false>; // false
-type F_T = BoolNor<false, true>; // false
+type T_T = BoolNor<true, true>;   // false
+type T_F = BoolNor<true, false>;  // false
+type F_T = BoolNor<false, true>;  // false
 type F_F = BoolNor<false, false>; // true
 ```
 
----
+***
 
 ### BoolNeq
 
@@ -259,21 +259,21 @@ Returns `true` if `A` and `B` are different, `false` otherwise.
 
 ##### A
 
-`A` _extends_ `boolean`
+`A` *extends* `boolean`
 
 The first boolean literal type (`true` or `false`).
 
 ##### B
 
-`B` _extends_ `boolean`
+`B` *extends* `boolean`
 
 The second boolean literal type (`true` or `false`).
 
 #### Example
 
 ```ts
-type T_T = BoolNeq<true, true>; // false
-type T_F = BoolNeq<true, false>; // true
-type F_T = BoolNeq<false, true>; // true
+type T_T = BoolNeq<true, true>;   // false
+type T_F = BoolNeq<true, false>;  // true
+type F_T = BoolNeq<false, true>;  // true
 type F_F = BoolNeq<false, false>; // false
 ```

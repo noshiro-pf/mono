@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / condition/extends
 
@@ -10,7 +10,7 @@
 
 ### TypeExtends
 
-> **TypeExtends**\<`A`, `B`\> = \[`A`\] _extends_ \[`B`\] ? `true` : `false`
+> **TypeExtends**\<`A`, `B`\> = \[`A`\] *extends* \[`B`\] ? `true` : `false`
 
 Defined in: [src/condition/extends.d.mts:45](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/extends.d.mts#L45)
 

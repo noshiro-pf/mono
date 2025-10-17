@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/safe-int
 
@@ -23,14 +23,14 @@ Represents integers that can be exactly represented in JavaScript (±2^53 - 1).
 const isSafeInt = (x: number): x is SafeInt => Number.isSafeInteger(x);
 
 const safeMath = {
-    add: (a: SafeInt, b: SafeInt): SafeInt | undefined => {
-        const result = a + b;
-        return isSafeInt(result) ? result : undefined;
-    },
+  add: (a: SafeInt, b: SafeInt): SafeInt | undefined => {
+    const result = a + b;
+    return isSafeInt(result) ? result : undefined;
+  }
 };
 ```
 
----
+***
 
 ### NonZeroSafeInt
 
@@ -45,13 +45,13 @@ Represents safe integers that are not equal to zero.
 
 ```ts
 const isNonZeroSafeInt = (x: number): x is NonZeroSafeInt =>
-    Number.isSafeInteger(x) && x !== 0;
+  Number.isSafeInteger(x) && x !== 0;
 
 const step = (current: SafeInt, increment: NonZeroSafeInt): SafeInt =>
-    (current + increment) as SafeInt;
+  (current + increment) as SafeInt;
 ```
 
----
+***
 
 ### SafeUint
 
@@ -66,13 +66,13 @@ Represents non-negative integers within the safe integer range.
 
 ```ts
 const isSafeUint = (x: number): x is SafeUint =>
-    Number.isSafeInteger(x) && x >= 0;
+  Number.isSafeInteger(x) && x >= 0;
 
 const fileSize = (bytes: SafeUint) => ({ bytes });
 const timestamp = (): SafeUint => Date.now() as SafeUint;
 ```
 
----
+***
 
 ### PositiveSafeInt
 
@@ -87,13 +87,13 @@ Represents positive integers within the safe integer range.
 
 ```ts
 const isPositiveSafeInt = (x: number): x is PositiveSafeInt =>
-    Number.isSafeInteger(x) && x > 0;
+  Number.isSafeInteger(x) && x > 0;
 
 const userId = (id: PositiveSafeInt) => ({ userId: id });
 const port = (num: PositiveSafeInt & Uint16) => ({ port: num });
 ```
 
----
+***
 
 ### NegativeSafeInt
 
@@ -108,12 +108,12 @@ Represents negative integers within the safe integer range.
 
 ```ts
 const isNegativeSafeInt = (x: number): x is NegativeSafeInt =>
-    Number.isSafeInteger(x) && x < 0;
+  Number.isSafeInteger(x) && x < 0;
 
 const priority = (level: NegativeSafeInt) => ({ priority: -level });
 ```
 
----
+***
 
 ### NonNegativeSafeInt
 
@@ -125,7 +125,7 @@ Alias for `SafeUint`.
 Branded numeric type for non-negative safe integers.
 Represents non-negative integers within the safe integer range.
 
----
+***
 
 ### SafeIntWithSmallInt
 
@@ -136,7 +136,7 @@ Defined in: [src/branded-types/safe-int.d.mts:89](https://github.com/noshiro-pf/
 Safe integer type with small literal values included.
 Type: `-40 | -39 | ... | 39 | SafeInt`
 
----
+***
 
 ### NonZeroSafeIntWithSmallInt
 
@@ -147,7 +147,7 @@ Defined in: [src/branded-types/safe-int.d.mts:95](https://github.com/noshiro-pf/
 Non-zero safe integer type with small literal values included.
 Type: `-40 | ... | -1 | 1 | ... | 39 | NonZeroSafeInt`
 
----
+***
 
 ### NonNegativeSafeIntWithSmallInt
 
@@ -158,7 +158,7 @@ Defined in: [src/branded-types/safe-int.d.mts:101](https://github.com/noshiro-pf
 Non-negative safe integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | NonNegativeSafeInt`
 
----
+***
 
 ### SafeUintWithSmallInt
 
@@ -170,7 +170,7 @@ Alias for `NonNegativeSafeIntWithSmallInt`.
 Safe unsigned integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | SafeUint`
 
----
+***
 
 ### PositiveSafeIntWithSmallInt
 
@@ -181,7 +181,7 @@ Defined in: [src/branded-types/safe-int.d.mts:114](https://github.com/noshiro-pf
 Positive safe integer type with small literal values included.
 Type: `1 | 2 | ... | 39 | PositiveSafeInt`
 
----
+***
 
 ### NegativeSafeIntWithSmallInt
 

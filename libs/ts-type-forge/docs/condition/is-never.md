@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / condition/is-never
 
@@ -10,7 +10,7 @@
 
 ### IsNever
 
-> **IsNever**\<`T`\> = \[`T`\] _extends_ \[`never`\] ? `true` : `false`
+> **IsNever**\<`T`\> = \[`T`\] *extends* \[`never`\] ? `true` : `false`
 
 Defined in: [src/condition/is-never.d.mts:18](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/is-never.d.mts#L18)
 

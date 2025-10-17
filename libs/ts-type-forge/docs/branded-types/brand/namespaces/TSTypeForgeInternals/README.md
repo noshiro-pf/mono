@@ -1,6 +1,6 @@
 [**ts-type-forge**](../../../../README.md)
 
----
+***
 
 [ts-type-forge](../../../../README.md) / [branded-types/brand](../../README.md) / TSTypeForgeInternals
 
@@ -22,9 +22,9 @@ Defined in: [src/branded-types/brand.d.mts:27](https://github.com/noshiro-pf/ts-
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](../../README.md#unknownbrand)
+`B` *extends* [`UnknownBrand`](../../README.md#unknownbrand)
 
----
+***
 
 ### ExtractFalseKeys
 
@@ -36,9 +36,9 @@ Defined in: [src/branded-types/brand.d.mts:33](https://github.com/noshiro-pf/ts-
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](../../README.md#unknownbrand)
+`B` *extends* [`UnknownBrand`](../../README.md#unknownbrand)
 
----
+***
 
 ### ExtractBooleanKeys
 
@@ -50,13 +50,13 @@ Defined in: [src/branded-types/brand.d.mts:39](https://github.com/noshiro-pf/ts-
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](../../README.md#unknownbrand)
+`B` *extends* [`UnknownBrand`](../../README.md#unknownbrand)
 
----
+***
 
 ### ExtractBooleanKeysImpl
 
-> **ExtractBooleanKeysImpl**\<`B`, `K`, `Target`\> = `K` _extends_ `K` ? [`TypeEq`](../../../../condition/eq.md#typeeq)\<`B`\[`K`\], `Target`\> _extends_ `true` ? `K` : `never` : `never`
+> **ExtractBooleanKeysImpl**\<`B`, `K`, `Target`\> = `K` *extends* `K` ? [`TypeEq`](../../../../condition/eq.md#typeeq)\<`B`\[`K`\], `Target`\> *extends* `true` ? `K` : `never` : `never`
 
 Defined in: [src/branded-types/brand.d.mts:45](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L45)
 
@@ -64,17 +64,17 @@ Defined in: [src/branded-types/brand.d.mts:45](https://github.com/noshiro-pf/ts-
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](../../README.md#unknownbrand)
+`B` *extends* [`UnknownBrand`](../../README.md#unknownbrand)
 
 ##### K
 
-`K` _extends_ keyof `B`
+`K` *extends* keyof `B`
 
 ##### Target
 
-`Target` _extends_ `boolean`
+`Target` *extends* `boolean`
 
----
+***
 
 ### IntRangeKeys
 
@@ -82,7 +82,7 @@ Defined in: [src/branded-types/brand.d.mts:45](https://github.com/noshiro-pf/ts-
 
 Defined in: [src/branded-types/core.d.mts:27](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L27)
 
----
+***
 
 ### Keys\_
 
@@ -90,7 +90,7 @@ Defined in: [src/branded-types/core.d.mts:27](https://github.com/noshiro-pf/ts-t
 
 Defined in: [src/branded-types/core.d.mts:38](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L38)
 
----
+***
 
 ### BrandedNumberBaseType
 
@@ -98,7 +98,7 @@ Defined in: [src/branded-types/core.d.mts:38](https://github.com/noshiro-pf/ts-t
 
 Defined in: [src/branded-types/core.d.mts:48](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/core.d.mts#L48)
 
----
+***
 
 ### ExtendNumberBrand
 
@@ -110,17 +110,17 @@ Defined in: [src/branded-types/core.d.mts:50](https://github.com/noshiro-pf/ts-t
 
 ##### B
 
-`B` _extends_ [`BrandedNumberBaseType`](#brandednumberbasetype)
+`B` *extends* [`BrandedNumberBaseType`](#brandednumberbasetype)
 
 ##### T
 
-`T` _extends_ [`RelaxedExclude`](../../../../record/std.md#relaxedexclude)\<[`Keys_`](#keys_), [`UnwrapBrandTrueKeys`](../../README.md#unwrapbrandtruekeys)\<`B`\>\>
+`T` *extends* [`RelaxedExclude`](../../../../record/std.md#relaxedexclude)\<[`Keys_`](#keys_), [`UnwrapBrandTrueKeys`](../../README.md#unwrapbrandtruekeys)\<`B`\>\>
 
 ##### F
 
-`F` _extends_ [`RelaxedExclude`](../../../../record/std.md#relaxedexclude)\<[`Keys_`](#keys_), `T` \| [`UnwrapBrandFalseKeys`](../../README.md#unwrapbrandfalsekeys)\<`B`\>\> = `never`
+`F` *extends* [`RelaxedExclude`](../../../../record/std.md#relaxedexclude)\<[`Keys_`](#keys_), `T` \| [`UnwrapBrandFalseKeys`](../../README.md#unwrapbrandfalsekeys)\<`B`\>\> = `never`
 
----
+***
 
 ### SmallIntIndexMax
 
@@ -128,7 +128,7 @@ Defined in: [src/branded-types/core.d.mts:50](https://github.com/noshiro-pf/ts-t
 
 Defined in: [src/branded-types/small-int.d.mts:119](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L119)
 
----
+***
 
 ### SmallPositiveInt
 
@@ -142,9 +142,9 @@ Integers in `[1, MaxIndex - 1]`
 
 ##### MaxIndex
 
-`MaxIndex` _extends_ `number` = [`SmallIntIndexMax`](#smallintindexmax)
+`MaxIndex` *extends* `number` = [`SmallIntIndexMax`](#smallintindexmax)
 
----
+***
 
 ### SmallNegativeInt
 
@@ -158,13 +158,13 @@ Integers in `[-MaxIndex, -1]`
 
 ##### MaxIndex
 
-`MaxIndex` _extends_ `number` = [`SmallIntIndexMax`](#smallintindexmax)
+`MaxIndex` *extends* `number` = [`SmallIntIndexMax`](#smallintindexmax)
 
----
+***
 
 ### WithSmallIntImpl
 
-> **WithSmallIntImpl**\<`N`, `MaxIndex`\> = `Exclude`\<[`SmallInt`](../../../small-int.md#smallint)\<`""`, `MaxIndex`\>, `N` _extends_ [`NegativeNumber`](../../../core.md#negativenumber) ? [`SmallInt`](../../../small-int.md#smallint)\<`">=0"`, `MaxIndex`\> : `never` \| `N` _extends_ [`NonNegativeNumber`](../../../core.md#nonnegativenumber) ? [`SmallInt`](../../../small-int.md#smallint)\<`"<0"`, `MaxIndex`\> : `never` \| `N` _extends_ [`NonZeroNumber`](../../../core.md#nonzeronumber) ? `0` : `never`\> \| `N`
+> **WithSmallIntImpl**\<`N`, `MaxIndex`\> = `Exclude`\<[`SmallInt`](../../../small-int.md#smallint)\<`""`, `MaxIndex`\>, `N` *extends* [`NegativeNumber`](../../../core.md#negativenumber) ? [`SmallInt`](../../../small-int.md#smallint)\<`">=0"`, `MaxIndex`\> : `never` \| `N` *extends* [`NonNegativeNumber`](../../../core.md#nonnegativenumber) ? [`SmallInt`](../../../small-int.md#smallint)\<`"<0"`, `MaxIndex`\> : `never` \| `N` *extends* [`NonZeroNumber`](../../../core.md#nonzeronumber) ? `0` : `never`\> \| `N`
 
 Defined in: [src/branded-types/small-int.d.mts:129](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L129)
 
@@ -172,17 +172,17 @@ Defined in: [src/branded-types/small-int.d.mts:129](https://github.com/noshiro-p
 
 ##### N
 
-`N` _extends_ [`Int`](../../../int.md#int)
+`N` *extends* [`Int`](../../../int.md#int)
 
 ##### MaxIndex
 
-`MaxIndex` _extends_ `number`
+`MaxIndex` *extends* `number`
 
----
+***
 
 ### CastToInt
 
-> **CastToInt**\<`T`\> = `T` _extends_ [`Int`](../../../int.md#int) ? `T` : `never`
+> **CastToInt**\<`T`\> = `T` *extends* [`Int`](../../../int.md#int) ? `T` : `never`
 
 Defined in: [src/branded-types/small-int.d.mts:152](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L152)
 
@@ -209,11 +209,11 @@ type B = CastToInt<FiniteNumber>; // never
 type C = CastToInt<SafeInt>; // SafeInt (since SafeInt extends Int)
 ```
 
----
+***
 
 ### IntersectionImplSub
 
-> **IntersectionImplSub**\<`Types`\> = `Types` _extends_ readonly \[\] ? `unknown` : `Types` _extends_ readonly \[infer Head, `...(infer Tail)`\] ? `Head` & [`IntersectionImplSub`](#intersectionimplsub)\<`Tail`\> : `never`
+> **IntersectionImplSub**\<`Types`\> = `Types` *extends* readonly \[\] ? `unknown` : `Types` *extends* readonly \[infer Head, `...(infer Tail)`\] ? `Head` & [`IntersectionImplSub`](#intersectionimplsub)\<`Tail`\> : `never`
 
 Defined in: [src/others/utils.d.mts:122](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L122)
 
@@ -221,13 +221,13 @@ Defined in: [src/others/utils.d.mts:122](https://github.com/noshiro-pf/ts-type-f
 
 ##### Types
 
-`Types` _extends_ readonly `unknown`[]
+`Types` *extends* readonly `unknown`[]
 
----
+***
 
 ### MergeIfRecords
 
-> **MergeIfRecords**\<`R`\> = \[`R`\] _extends_ \[[`UnknownRecord`](../../../../constants/record.md#unknownrecord)\] ? [`MergeIntersection`](../../../../others/utils.md#mergeintersection)\<`R`\> : `R`
+> **MergeIfRecords**\<`R`\> = \[`R`\] *extends* \[[`UnknownRecord`](../../../../constants/record.md#unknownrecord)\] ? [`MergeIntersection`](../../../../others/utils.md#mergeintersection)\<`R`\> : `R`
 
 Defined in: [src/others/utils.d.mts:129](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L129)
 
@@ -237,11 +237,11 @@ Defined in: [src/others/utils.d.mts:129](https://github.com/noshiro-pf/ts-type-f
 
 `R`
 
----
+***
 
 ### RecordPathPrefixes
 
-> **RecordPathPrefixes**\<`L`\> = `L` _extends_ readonly \[infer Head, `...(infer Rest)`\] ? readonly \[\] \| readonly \[`Head`, `...RecordPathPrefixes<Rest>`\] : readonly \[\]
+> **RecordPathPrefixes**\<`L`\> = `L` *extends* readonly \[infer Head, `...(infer Rest)`\] ? readonly \[\] \| readonly \[`Head`, `...RecordPathPrefixes<Rest>`\] : readonly \[\]
 
 Defined in: [src/record/record-path.d.mts:38](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L38)
 
@@ -251,7 +251,7 @@ Generates a union of all prefixes of a given readonly tuple `L`, including the e
 
 ##### L
 
-`L` _extends_ readonly `unknown`[]
+`L` *extends* readonly `unknown`[]
 
 The readonly tuple type.
 

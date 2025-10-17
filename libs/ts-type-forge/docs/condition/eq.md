@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / condition/eq
 
@@ -10,7 +10,7 @@
 
 ### TypeEq
 
-> **TypeEq**\<`A`, `B`\> = \<`T`\>() => `T` _extends_ `A` ? `1` : `2` _extends_ \<`T`\>() => `T` _extends_ `B` ? `1` : `2` ? `true` : `false`
+> **TypeEq**\<`A`, `B`\> = \<`T`\>() => `T` *extends* `A` ? `1` : `2` *extends* \<`T`\>() => `T` *extends* `B` ? `1` : `2` ? `true` : `false`
 
 Defined in: [src/condition/eq.d.mts:23](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/condition/eq.d.mts#L23)
 

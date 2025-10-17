@@ -10,7 +10,6 @@ await assertExt({
     {
       path: path.resolve(projectRootPath, './test'),
       extension: '.mts',
-      ignorePatterns: [],
     },
     {
       path: path.resolve(projectRootPath, './scripts'),

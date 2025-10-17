@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / type-level-integer/seq
 
@@ -21,7 +21,7 @@ Requires `N` to be a non-negative integer literal for which `MakeTuple<unknown, 
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The upper bound (exclusive) of the sequence. Must be a non-negative integer literal.
 

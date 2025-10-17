@@ -1,6 +1,6 @@
 [**ts-type-forge**](../../../README.md)
 
----
+***
 
 [ts-type-forge](../../../README.md) / [tuple-and-list/list](../README.md) / List
 
@@ -22,7 +22,7 @@ Delegates to `Tuple.Head`.
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -45,7 +45,7 @@ type H3 = List.Head<[]>; // never
 type H4 = List.Head<[], 'default'>; // 'default'
 ```
 
----
+***
 
 ### Last
 
@@ -60,7 +60,7 @@ If the array is empty, it returns `never`.
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -77,7 +77,7 @@ type L3 = List.Last<[]>; // never
 type L4 = List.Last<[1]>; // 1
 ```
 
----
+***
 
 ### ButLast
 
@@ -92,7 +92,7 @@ Delegates to `Tuple.ButLast`.
 
 ##### A
 
-`A` _extends_ readonly `unknown`[]
+`A` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -109,7 +109,7 @@ type BL3 = List.ButLast<[1]>; // readonly []
 type BL4 = List.ButLast<[]>; // readonly []
 ```
 
----
+***
 
 ### Tail
 
@@ -124,7 +124,7 @@ Delegates to `Tuple.Tail`.
 
 ##### A
 
-`A` _extends_ readonly `unknown`[]
+`A` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -141,11 +141,11 @@ type T3 = List.Tail<[1]>; // readonly []
 type T4 = List.Tail<[]>; // readonly []
 ```
 
----
+***
 
 ### Reverse
 
-> **Reverse**\<`L`\> = `L` _extends_ readonly \[\] ? readonly \[\] : [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`L`\> _extends_ `true` ? `Tuple.Reverse`\<`L`\> : `L` _extends_ readonly \[`unknown`, `...readonly unknown[]`\] ? readonly \[`...Reverse<Tail<L>>`, [`Head`](#head)\<`L`\>\] : `Readonly`\<`L`\>
+> **Reverse**\<`L`\> = `L` *extends* readonly \[\] ? readonly \[\] : [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`L`\> *extends* `true` ? `Tuple.Reverse`\<`L`\> : `L` *extends* readonly \[`unknown`, `...readonly unknown[]`\] ? readonly \[`...Reverse<Tail<L>>`, [`Head`](#head)\<`L`\>\] : `Readonly`\<`L`\>
 
 Defined in: [src/tuple-and-list/list.d.mts:67](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L67)
 
@@ -157,7 +157,7 @@ For general arrays, it returns a readonly array of the same element type.
 
 ##### L
 
-`L` _extends_ readonly `unknown`[]
+`L` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -173,11 +173,11 @@ type R2 = List.Reverse<readonly string[]>; // readonly string[]
 type R3 = List.Reverse<[]>; // readonly []
 ```
 
----
+***
 
 ### Take
 
-> **Take**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.Take`\<`N`, `T`\> : `T`
+> **Take**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> *extends* `true` ? `Tuple.Take`\<`N`, `T`\> : `T`
 
 Defined in: [src/tuple-and-list/list.d.mts:87](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L87)
 
@@ -189,13 +189,13 @@ If `T` is a general array, it returns the original array type `T`.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The number of elements to take.
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -211,11 +211,11 @@ type TK2 = List.Take<5, [1, 2, 3]>; // readonly [1, 2, 3]
 type TK3 = List.Take<2, readonly string[]>; // readonly string[]
 ```
 
----
+***
 
 ### Skip
 
-> **Skip**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.Skip`\<`N`, `T`\> : `T`
+> **Skip**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> *extends* `true` ? `Tuple.Skip`\<`N`, `T`\> : `T`
 
 Defined in: [src/tuple-and-list/list.d.mts:102](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L102)
 
@@ -227,13 +227,13 @@ If `T` is a general array, it returns the original array type `T`.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The number of elements to skip.
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -249,11 +249,11 @@ type SK2 = List.Skip<3, [1, 2, 3]>; // readonly []
 type SK3 = List.Skip<1, readonly string[]>; // readonly string[]
 ```
 
----
+***
 
 ### TakeLast
 
-> **TakeLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.TakeLast`\<`N`, `T`\> : `T`
+> **TakeLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> *extends* `true` ? `Tuple.TakeLast`\<`N`, `T`\> : `T`
 
 Defined in: [src/tuple-and-list/list.d.mts:117](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L117)
 
@@ -265,13 +265,13 @@ If `T` is a general array, it returns the original array type `T`.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The number of elements to take.
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -287,11 +287,11 @@ type TL2 = List.TakeLast<5, [1, 2, 3]>; // readonly [1, 2, 3]
 type TL3 = List.TakeLast<2, readonly string[]>; // readonly string[]
 ```
 
----
+***
 
 ### SkipLast
 
-> **SkipLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.SkipLast`\<`N`, `T`\> : `T`
+> **SkipLast**\<`N`, `T`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> *extends* `true` ? `Tuple.SkipLast`\<`N`, `T`\> : `T`
 
 Defined in: [src/tuple-and-list/list.d.mts:132](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L132)
 
@@ -303,13 +303,13 @@ If `T` is a general array, it returns the original array type `T`.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The number of elements to skip.
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
@@ -325,11 +325,11 @@ type SL2 = List.SkipLast<3, [1, 2, 3]>; // readonly []
 type SL3 = List.SkipLast<1, readonly string[]>; // readonly string[]
 ```
 
----
+***
 
 ### SetAt
 
-> **SetAt**\<`T`, `I`, `V`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> _extends_ `true` ? `Tuple.SetAt`\<`T`, `I`, `V`\> : readonly (`T`\[`number`\] \| `V`)[]
+> **SetAt**\<`T`, `I`, `V`\> = [`IsFixedLengthList`](../../../condition/is-fixed-length-list.md#isfixedlengthlist)\<`T`\> *extends* `true` ? `Tuple.SetAt`\<`T`, `I`, `V`\> : readonly (`T`\[`number`\] \| `V`)[]
 
 Defined in: [src/tuple-and-list/list.d.mts:148](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L148)
 
@@ -341,13 +341,13 @@ If `T` is a general array, it returns a general array type `readonly (T[number] 
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type.
 
 ##### I
 
-`I` _extends_ `number`
+`I` *extends* `number`
 
 The index to update (must be a valid index for `T` if `T` is a tuple).
 
@@ -369,7 +369,7 @@ type SA2 = List.SetAt<readonly number[], 1, 'x'>; // readonly (string | number)[
 // type SA3 = List.SetAt<[1, 2], 2, 'x'>; // Error if I is out of bounds for tuple
 ```
 
----
+***
 
 ### Flatten
 
@@ -384,7 +384,7 @@ Delegates to `Tuple.Flatten`.
 
 ##### T
 
-`T` _extends_ readonly readonly `unknown`[][]
+`T` *extends* readonly readonly `unknown`[][]
 
 A readonly array/tuple where elements are themselves readonly arrays/tuples.
 
@@ -400,7 +400,7 @@ type F2 = List.Flatten<[readonly number[], readonly string[]]>; // readonly (str
 type F3 = List.Flatten<[[1], [2, [3]]]>; // readonly [1, 2, [3]] (only flattens one level)
 ```
 
----
+***
 
 ### Concat
 
@@ -415,13 +415,13 @@ Delegates to `Tuple.Concat`.
 
 ##### A
 
-`A` _extends_ readonly `unknown`[]
+`A` *extends* readonly `unknown`[]
 
 The first readonly array or tuple.
 
 ##### B
 
-`B` _extends_ readonly `unknown`[]
+`B` *extends* readonly `unknown`[]
 
 The second readonly array or tuple.
 
@@ -437,11 +437,11 @@ type C2 = List.Concat<readonly number[], readonly string[]>; // readonly (string
 type C3 = List.Concat<[1], readonly number[]>; // readonly [1, ...number[]]
 ```
 
----
+***
 
 ### Zip
 
-> **Zip**\<`A`, `B`\> = `A` _extends_ readonly \[\] ? readonly \[\] : `B` _extends_ readonly \[\] ? readonly \[\] : `A` _extends_ [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? `B` _extends_ [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? readonly \[readonly \[[`Head`](#head)\<`A`\>, [`Head`](#head)\<`B`\>\], `...Zip<Tail<A>, Tail<B>>`\] : readonly \[readonly \[[`Head`](#head)\<`A`\>, `B`\[`number`\]\], `...Zip<Tail<A>, Tail<B>>`\] : `B` _extends_ [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? readonly \[readonly \[`A`\[`number`\], [`Head`](#head)\<`B`\>\], `...Zip<Tail<A>, Tail<B>>`\] : readonly readonly \[`A`\[`number`\], `B`\[`number`\]\][]
+> **Zip**\<`A`, `B`\> = `A` *extends* readonly \[\] ? readonly \[\] : `B` *extends* readonly \[\] ? readonly \[\] : `A` *extends* [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? `B` *extends* [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? readonly \[readonly \[[`Head`](#head)\<`A`\>, [`Head`](#head)\<`B`\>\], `...Zip<Tail<A>, Tail<B>>`\] : readonly \[readonly \[[`Head`](#head)\<`A`\>, `B`\[`number`\]\], `...Zip<Tail<A>, Tail<B>>`\] : `B` *extends* [`NonEmptyArray`](../../array.md#nonemptyarray)\<`unknown`\> ? readonly \[readonly \[`A`\[`number`\], [`Head`](#head)\<`B`\>\], `...Zip<Tail<A>, Tail<B>>`\] : readonly readonly \[`A`\[`number`\], `B`\[`number`\]\][]
 
 Defined in: [src/tuple-and-list/list.d.mts:195](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/list.d.mts#L195)
 
@@ -453,13 +453,13 @@ potentially using the general element type for the longer array if one is a gene
 
 ##### A
 
-`A` _extends_ readonly `unknown`[]
+`A` *extends* readonly `unknown`[]
 
 The first readonly array or tuple.
 
 ##### B
 
-`B` _extends_ readonly `unknown`[]
+`B` *extends* readonly `unknown`[]
 
 The second readonly array or tuple.
 
@@ -477,7 +477,7 @@ type Z4 = List.Zip<[1, 2], readonly string[]>; // readonly [[1, string], [2, str
 type Z5 = List.Zip<readonly number[], ['a', 'b']>; // readonly [[number, 'a'], [number, 'b']]
 ```
 
----
+***
 
 ### Partition
 
@@ -492,13 +492,13 @@ Delegates to `Tuple.Partition`.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The desired size of each partition (must be a positive integer literal).
 
 ##### T
 
-`T` _extends_ readonly `unknown`[]
+`T` *extends* readonly `unknown`[]
 
 The readonly array or tuple type to partition.
 

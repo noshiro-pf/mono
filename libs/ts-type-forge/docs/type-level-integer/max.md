@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / type-level-integer/max
 
@@ -21,7 +21,7 @@ Effectively, this calculates `max(N)`.
 
 ##### N
 
-`N` _extends_ [`Uint10`](../constants/int-enum.md#uint10)
+`N` *extends* [`Uint10`](../constants/int-enum.md#uint10)
 
 A union of non-negative integer literals up to 1023 (`Uint10`).
 

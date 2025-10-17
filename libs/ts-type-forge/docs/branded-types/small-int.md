@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/small-int
 
@@ -10,7 +10,7 @@
 
 ### SmallInt
 
-> **SmallInt**\<`T`, `MaxIndex`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<=0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">=0"`\> _extends_ `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">0"`\> _extends_ `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"!=0"`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `""`\> _extends_ `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : `never`
+> **SmallInt**\<`T`, `MaxIndex`\> = [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<=0"`\> *extends* `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"<0"`\> *extends* `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">=0"`\> *extends* `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `">0"`\> *extends* `true` ? [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `"!=0"`\> *extends* `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> : [`TypeEq`](../condition/eq.md#typeeq)\<`T`, `""`\> *extends* `true` ? [`SmallNegativeInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallnegativeint)\<`MaxIndex`\> \| [`SmallPositiveInt`](brand/namespaces/TSTypeForgeInternals/README.md#smallpositiveint)\<`MaxIndex`\> \| `0` : `never`
 
 Defined in: [src/branded-types/small-int.d.mts:22](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/small-int.d.mts#L22)
 
@@ -21,20 +21,19 @@ Provides literal integer types within a small range for precise typing.
 
 ##### T
 
-`T` _extends_ `"!=0"` \| `""` \| `"<=0"` \| `"<0"` \| `">=0"` \| `">0"` = `""`
+`T` *extends* `"!=0"` \| `""` \| `"<=0"` \| `"<0"` \| `">=0"` \| `">0"` = `""`
 
 Constraint specifying which integers to include:
-
-- `''` : All integers in `[-MaxIndex, MaxIndex - 1]`
-- `'!=0'` : All integers except 0
-- `'<0'` : Negative integers only `[-MaxIndex, -1]`
-- `'<=0'` : Non-positive integers `[-MaxIndex, 0]`
-- `'>0'` : Positive integers only `[1, MaxIndex - 1]`
-- `'>=0'` : Non-negative integers `[0, MaxIndex - 1]`
+  - `''`    : All integers in `[-MaxIndex, MaxIndex - 1]`
+  - `'!=0'` : All integers except 0
+  - `'<0'`  : Negative integers only `[-MaxIndex, -1]`
+  - `'<=0'` : Non-positive integers `[-MaxIndex, 0]`
+  - `'>0'`  : Positive integers only `[1, MaxIndex - 1]`
+  - `'>=0'` : Non-negative integers `[0, MaxIndex - 1]`
 
 ##### MaxIndex
 
-`MaxIndex` _extends_ `number` = [`SmallIntIndexMax`](brand/namespaces/TSTypeForgeInternals/README.md#smallintindexmax)
+`MaxIndex` *extends* `number` = [`SmallIntIndexMax`](brand/namespaces/TSTypeForgeInternals/README.md#smallintindexmax)
 
 Maximum absolute value for the range (default: 40)
 
@@ -47,7 +46,7 @@ type Countdown = SmallInt<'>=0', 11>; // 0 | 1 | 2 | ... | 10
 type Offset = SmallInt<'!=0', 6>; // -5 | -4 | -3 | -2 | -1 | 1 | 2 | 3 | 4 | 5
 ```
 
----
+***
 
 ### SmallUint
 
@@ -65,7 +64,7 @@ type Index = SmallUint; // 0 | 1 | 2 | ... | 39
 const getItem = <T>(arr: readonly T[], i: Index) => arr[i];
 ```
 
----
+***
 
 ### WithSmallInt
 
@@ -81,13 +80,13 @@ the brand for larger values.
 
 ##### N
 
-`N` _extends_ [`Int`](int.md#int)
+`N` *extends* [`Int`](int.md#int)
 
 The integer brand type to enhance
 
 ##### MaxIndex
 
-`MaxIndex` _extends_ `number` = [`SmallIntIndexMax`](brand/namespaces/TSTypeForgeInternals/README.md#smallintindexmax)
+`MaxIndex` *extends* `number` = [`SmallIntIndexMax`](brand/namespaces/TSTypeForgeInternals/README.md#smallintindexmax)
 
 Maximum absolute value for literals (default: 40)
 
@@ -102,19 +101,19 @@ type Count = WithSmallInt<Uint>;
 // Count is 0 | 1 | 2 | ... | 39 | Uint
 
 const increment = (n: Count): Count => {
-    if (typeof n === 'number' && n < 39) {
-        return (n + 1) as Count; // Type narrowing works with literals
-    }
-    return ((n as number) + 1) as Count;
+  if (typeof n === 'number' && n < 39) {
+    return (n + 1) as Count; // Type narrowing works with literals
+  }
+  return (n as number + 1) as Count;
 };
 
 // Common patterns:
-type SmallInt = WithSmallInt<Int>; // -40 to 39 | Int
-type SmallUint = WithSmallInt<Uint>; // 0 to 39 | Uint
+type SmallInt = WithSmallInt<Int>;              // -40 to 39 | Int
+type SmallUint = WithSmallInt<Uint>;            // 0 to 39 | Uint
 type SmallPositiveInt = WithSmallInt<PositiveInt>; // 1 to 39 | PositiveInt
 ```
 
----
+***
 
 ### ExcludeSmallInt
 
@@ -129,13 +128,13 @@ Useful for converting back to pure branded types.
 
 ##### N
 
-`N` _extends_ [`IntWithSmallInt`](int.md#intwithsmallint)
+`N` *extends* [`IntWithSmallInt`](int.md#intwithsmallint)
 
 Integer type with small literals to remove from
 
 ##### MaxIndex
 
-`MaxIndex` _extends_ `number` = [`SmallIntIndexMax`](brand/namespaces/TSTypeForgeInternals/README.md#smallintindexmax)
+`MaxIndex` *extends* `number` = [`SmallIntIndexMax`](brand/namespaces/TSTypeForgeInternals/README.md#smallintindexmax)
 
 Maximum absolute value of literals to remove (default: 40)
 
@@ -150,10 +149,10 @@ type Count = WithSmallInt<Uint>; // 0 | 1 | ... | 39 | Uint
 type PureCount = RemoveSmallInt<Count>; // Uint
 
 const toLargeCount = (n: Count): RemoveSmallInt<Count> => {
-    if (typeof n === 'number') {
-        return (n + 1000) as Uint; // Convert small to large
-    }
-    return n;
+  if (typeof n === 'number') {
+    return (n + 1000) as Uint; // Convert small to large
+  }
+  return n;
 };
 ```
 

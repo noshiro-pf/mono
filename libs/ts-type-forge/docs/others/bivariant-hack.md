@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / others/bivariant-hack
 
@@ -30,7 +30,7 @@ Use with caution, as it intentionally weakens type safety for parameter types.
 
 ##### F
 
-`F` _extends_ (...`args`) => `unknown`
+`F` *extends* (...`args`) => `unknown`
 
 The function type whose parameters should be made bivariant.
 

@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/bigint
 
@@ -21,14 +21,14 @@ Represents values that can be stored in a BigInt64Array.
 
 ```ts
 const toBigInt64 = (x: bigint): BigInt64 => {
-    const min = -(2n ** 63n);
-    const max = 2n ** 63n - 1n;
-    if (x >= min && x <= max) return x as BigInt64;
-    throw new Error('Out of BigInt64 range');
+  const min = -(2n ** 63n);
+  const max = 2n ** 63n - 1n;
+  if (x >= min && x <= max) return x as BigInt64;
+  throw new Error('Out of BigInt64 range');
 };
 ```
 
----
+***
 
 ### BigUint64
 
@@ -43,8 +43,8 @@ Represents values that can be stored in a BigUint64Array.
 
 ```ts
 const toBigUint64 = (x: bigint): BigUint64 => {
-    const max = 2n ** 64n - 1n;
-    if (x >= 0n && x <= max) return x as BigUint64;
-    throw new Error('Out of BigUint64 range');
+  const max = 2n ** 64n - 1n;
+  if (x >= 0n && x <= max) return x as BigUint64;
+  throw new Error('Out of BigUint64 range');
 };
 ```

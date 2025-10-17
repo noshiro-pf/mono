@@ -73,5 +73,5 @@ for (const ruleset of rulesetsToCreate) {
     );
   }
 
-  await $('npm run fmt');
+  await $('pnpm run fmt');
 }

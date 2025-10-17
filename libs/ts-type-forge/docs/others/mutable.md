@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / others/mutable
 
@@ -36,27 +36,27 @@ An object type with all readonly modifiers removed.
 
 ```ts
 type ReadonlyUser = {
-    readonly id: number;
-    readonly name: string;
-    readonly email: string;
+  readonly id: number;
+  readonly name: string;
+  readonly email: string;
 };
 
 type MutableUser = Mutable<ReadonlyUser>;
 // Result: { id: number; name: string; email: string }
 
-const user: MutableUser = { id: 1, name: 'Alice', email: 'alice@example.com' };
-user.name = 'Alice Smith'; // ✓ allowed - property is mutable
+const user: MutableUser = { id: 1, name: "Alice", email: "alice@example.com" };
+user.name = "Alice Smith"; // ✓ allowed - property is mutable
 
 // Useful for creating editable versions of readonly data
 type Config = Readonly<{ host: string; port: number; ssl: boolean }>;
 type EditableConfig = Mutable<Config>; // { host: string; port: number; ssl: boolean }
 ```
 
----
+***
 
 ### ToMutableMap
 
-> **ToMutableMap**\<`T`\> = `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `Map`\<`K`, `V`\> : `never`
+> **ToMutableMap**\<`T`\> = `T` *extends* `ReadonlyMap`\<infer K, infer V\> ? `Map`\<`K`, `V`\> : `never`
 
 Defined in: [src/others/mutable.d.mts:51](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L51)
 
@@ -67,7 +67,7 @@ Extracts the key and value types from the readonly map and creates a standard mu
 
 ##### T
 
-`T` _extends_ `ReadonlyMap`\<`any`, `any`\>
+`T` *extends* `ReadonlyMap`\<`any`, `any`\>
 
 A type that extends `ReadonlyMap<any, any>`.
 
@@ -82,18 +82,16 @@ type ReadOnlyUserMap = ReadonlyMap<string, User>;
 type MutableUserMap = ToMutableMap<ReadOnlyUserMap>; // Map<string, User>
 
 // Useful when you need to convert readonly collections to mutable ones
-const convertToMutable = (
-    readonlyMap: ReadonlyMap<string, number>,
-): Map<string, number> => {
-    return new Map(readonlyMap);
+const convertToMutable = (readonlyMap: ReadonlyMap<string, number>): Map<string, number> => {
+  return new Map(readonlyMap);
 };
 ```
 
----
+***
 
 ### ToMutableSet
 
-> **ToMutableSet**\<`T`\> = `T` _extends_ `ReadonlySet`\<infer V\> ? `Set`\<`V`\> : `never`
+> **ToMutableSet**\<`T`\> = `T` *extends* `ReadonlySet`\<infer V\> ? `Set`\<`V`\> : `never`
 
 Defined in: [src/others/mutable.d.mts:73](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/mutable.d.mts#L73)
 
@@ -104,7 +102,7 @@ Extracts the value type from the readonly set and creates a standard mutable Set
 
 ##### T
 
-`T` _extends_ `ReadonlySet`\<`any`\>
+`T` *extends* `ReadonlySet`\<`any`\>
 
 A type that extends `ReadonlySet<any>`.
 
@@ -120,11 +118,11 @@ type MutableStringSet = ToMutableSet<ReadOnlyStringSet>; // Set<string>
 
 // Converting readonly collections to mutable ones
 const convertToMutable = (readonlySet: ReadonlySet<string>): Set<string> => {
-    return new Set(readonlySet);
+  return new Set(readonlySet);
 };
 ```
 
----
+***
 
 ### MutableSet
 
@@ -152,7 +150,7 @@ tags.add('vue'); // ✓ allowed - set is mutable
 tags.delete('react'); // ✓ allowed
 ```
 
----
+***
 
 ### MutableMap
 

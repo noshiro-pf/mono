@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/float
 
@@ -21,16 +21,16 @@ Represents values that can be stored in a Float32Array.
 
 ```ts
 const toFloat32 = (x: number): Float32 => {
-    const arr = new Float32Array([x]);
-    return arr[0] as Float32;
+  const arr = new Float32Array([x]);
+  return arr[0] as Float32;
 };
 
 const shader = (vertices: Float32[]) => {
-    // WebGL shader processing
+  // WebGL shader processing
 };
 ```
 
----
+***
 
 ### Float64
 
@@ -47,6 +47,6 @@ Represents values that can be stored in a Float64Array (standard JS number preci
 const toFloat64 = (x: number): Float64 => x as Float64;
 
 const scientificData = (measurements: Float64[]) => {
-    // High-precision calculations
+  // High-precision calculations
 };
 ```

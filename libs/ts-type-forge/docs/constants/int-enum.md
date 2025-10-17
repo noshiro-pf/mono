@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / constants/int-enum
 
@@ -23,15 +23,15 @@ or any data that fits within 8 bits of unsigned integer range.
 #### Example
 
 ```ts
-type RedChannel = Uint8; // 0-255 for RGB red component
-type ByteValue = Uint8; // Single byte representation
+type RedChannel = Uint8;   // 0-255 for RGB red component
+type ByteValue = Uint8;    // Single byte representation
 
 const isValidUint8 = (value: number): value is Uint8 => {
-    return Number.isInteger(value) && value >= 0 && value <= 255;
+  return Number.isInteger(value) && value >= 0 && value <= 255;
 };
 ```
 
----
+***
 
 ### Uint9
 
@@ -51,11 +51,11 @@ specific protocols or data formats that require 9-bit precision.
 type NineBitValue = Uint9;
 
 const validate9Bit = (value: number): value is Uint9 => {
-    return Number.isInteger(value) && value >= 0 && value <= 511;
+  return Number.isInteger(value) && value >= 0 && value <= 511;
 };
 ```
 
----
+***
 
 ### Uint10
 
@@ -72,15 +72,15 @@ where 10-bit depth provides better color accuracy than 8-bit.
 #### Example
 
 ```ts
-type TenBitColor = Uint10; // 10-bit color depth
-type PortNumber = Uint10; // Some port ranges
+type TenBitColor = Uint10;  // 10-bit color depth
+type PortNumber = Uint10;   // Some port ranges
 
 const isValid10Bit = (value: number): value is Uint10 => {
-    return Number.isInteger(value) && value >= 0 && value <= 1023;
+  return Number.isInteger(value) && value >= 0 && value <= 1023;
 };
 ```
 
----
+***
 
 ### Int8
 
@@ -91,7 +91,7 @@ Defined in: [src/constants/int-enum.d.mts:61](https://github.com/noshiro-pf/ts-t
 Represents a signed 8-bit integer.
 A union of integer literals from `-128` to `127`.
 
----
+***
 
 ### Int9
 
@@ -102,7 +102,7 @@ Defined in: [src/constants/int-enum.d.mts:67](https://github.com/noshiro-pf/ts-t
 Represents a signed 9-bit integer.
 A union of integer literals from `-256` to `255`.
 
----
+***
 
 ### Int10
 
@@ -113,7 +113,7 @@ Defined in: [src/constants/int-enum.d.mts:73](https://github.com/noshiro-pf/ts-t
 Represents a signed 10-bit integer.
 A union of integer literals from `-512` to `511`.
 
----
+***
 
 ### MonthEnum
 
@@ -141,7 +141,7 @@ type December = 12 satisfies MonthEnum;
 // type Invalid = 13; // Error: not assignable to MonthEnum
 ```
 
----
+***
 
 ### MonthIndexEnum
 
@@ -159,18 +159,17 @@ Useful for direct interaction with Date constructors and methods.
 
 ```ts
 const createDate = (year: number, month: MonthIndexEnum, day: number) => {
-    return new Date(year, month, day); // month is 0-based in Date constructor
+  return new Date(year, month, day); // month is 0-based in Date constructor
 };
 
-const januaryDate = createDate(2024, 0, 1); // January 1, 2024
+const januaryDate = createDate(2024, 0, 1);  // January 1, 2024
 const decemberDate = createDate(2024, 11, 31); // December 31, 2024
 
 // Convert from 1-based to 0-based
-const toMonthIndex = (month: MonthEnum): MonthIndexEnum =>
-    (month - 1) as MonthIndexEnum;
+const toMonthIndex = (month: MonthEnum): MonthIndexEnum => (month - 1) as MonthIndexEnum;
 ```
 
----
+***
 
 ### DateEnum
 
@@ -181,7 +180,7 @@ Defined in: [src/constants/int-enum.d.mts:123](https://github.com/noshiro-pf/ts-
 Represents the day of the month.
 A union of integer literals from `1` to `31`.
 
----
+***
 
 ### DayOfWeekIndex
 
@@ -192,7 +191,7 @@ Defined in: [src/constants/int-enum.d.mts:129](https://github.com/noshiro-pf/ts-
 Represents the zero-based index for the day of the week.
 A union of integer literals from `0` (typically Sunday) to `6` (typically Saturday).
 
----
+***
 
 ### DayOfWeekName
 
@@ -203,7 +202,7 @@ Defined in: [src/constants/int-enum.d.mts:135](https://github.com/noshiro-pf/ts-
 Represents the names of the days of the week.
 A union of string literals: `'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat'`.
 
----
+***
 
 ### HoursEnum
 
@@ -215,7 +214,6 @@ Represents the hours in a day using 24-hour format.
 A union of integer literals from `0` (midnight) to `23` (11 PM).
 
 Uses the international standard 24-hour time format where:
-
 - `0` represents midnight (00:00)
 - `12` represents noon (12:00)
 - `23` represents 11 PM (23:00)
@@ -239,7 +237,7 @@ type Noon = 12 satisfies HoursEnum;
 type ElevenPM = 23 satisfies HoursEnum;
 ```
 
----
+***
 
 ### MinutesEnum
 
@@ -250,7 +248,7 @@ Defined in: [src/constants/int-enum.d.mts:170](https://github.com/noshiro-pf/ts-
 Represents the minutes in an hour.
 A union of integer literals from `0` to `59`.
 
----
+***
 
 ### SecondsEnum
 
@@ -261,7 +259,7 @@ Defined in: [src/constants/int-enum.d.mts:176](https://github.com/noshiro-pf/ts-
 Represents the seconds in a minute.
 A union of integer literals from `0` to `59`.
 
----
+***
 
 ### MillisecondsEnum
 
@@ -272,7 +270,7 @@ Defined in: [src/constants/int-enum.d.mts:182](https://github.com/noshiro-pf/ts-
 Represents the milliseconds in a second.
 A union of integer literals from `0` to `999`.
 
----
+***
 
 ### Sexagesimal
 
@@ -283,7 +281,7 @@ Defined in: [src/constants/int-enum.d.mts:188](https://github.com/noshiro-pf/ts-
 Represents a value in the sexagesimal system (base 60), commonly used for minutes and seconds.
 A union of integer literals from `0` to `59`.
 
----
+***
 
 ### Percent
 

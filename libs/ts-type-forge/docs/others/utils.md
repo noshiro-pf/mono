@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / others/utils
 
@@ -10,7 +10,7 @@
 
 ### ToString
 
-> **ToString**\<`A`\> = `A` _extends_ `number` ? `` `${A}` `` : `A`
+> **ToString**\<`A`\> = `A` *extends* `number` ? `` `${A}` `` : `A`
 
 Defined in: [src/others/utils.d.mts:10](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L10)
 
@@ -31,11 +31,11 @@ type Str = ToString<123>; // "123"
 type Bool = ToString<boolean>; // boolean
 ```
 
----
+***
 
 ### ToNumber
 
-> **ToNumber**\<`S`\> = `S` _extends_ `` `${infer N extends number}` `` ? `N` : `never`
+> **ToNumber**\<`S`\> = `S` *extends* `` `${infer N extends number}` `` ? `N` : `never`
 
 Defined in: [src/others/utils.d.mts:21](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L21)
 
@@ -46,17 +46,17 @@ Requires TypeScript 4.8+.
 
 ##### S
 
-`S` _extends_ `` `${number}` ``
+`S` *extends* `` `${number}` ``
 
 A string literal type that extends `${number}`.
 
 #### Example
 
 ```ts
-type Num = ToNumber<'456'>; // 456
+type Num = ToNumber<"456">; // 456
 ```
 
----
+***
 
 ### ValueOf
 
@@ -80,7 +80,7 @@ The object type.
 type Values = ValueOf<{ a: string; b: number }>; // string | number
 ```
 
----
+***
 
 ### Length
 
@@ -95,7 +95,7 @@ Typically used for arrays and tuples.
 
 ##### T
 
-`T` _extends_ `Readonly`\<\{ `length`: `number`; \}\>
+`T` *extends* `Readonly`\<\{ `length`: `number`; \}\>
 
 A type with a `length: number` property (e.g., `readonly unknown[]`).
 
@@ -108,10 +108,10 @@ The type of the `length` property (e.g., `number` for arrays, a number literal f
 ```ts
 type TupleLen = Length<[1, 2, 3]>; // 3
 type ArrayLen = Length<string[]>; // number
-type StringLen = Length<'abc'>; // 3
+type StringLen = Length<"abc">; // 3
 ```
 
----
+***
 
 ### FunctionType()
 
@@ -146,7 +146,7 @@ The return type.
 
 `B`
 
----
+***
 
 ### Fn()
 
@@ -181,7 +181,7 @@ The return type.
 
 `B`
 
----
+***
 
 ### MonoTypeFunction
 
@@ -199,7 +199,7 @@ Represents a function type where the argument and return types are the same (`X`
 
 The argument and return type.
 
----
+***
 
 ### Reducer()
 
@@ -238,7 +238,7 @@ The action type.
 
 `S`
 
----
+***
 
 ### AnyFn()
 
@@ -256,11 +256,11 @@ Defined in: [src/others/utils.d.mts:76](https://github.com/noshiro-pf/ts-type-fo
 
 `any`
 
----
+***
 
 ### UnionToIntersection
 
-> **UnionToIntersection**\<`T`\> = `T` _extends_ `unknown` ? (`arg`) => `void` : `never` _extends_ (`arg`) => `void` ? `F` : `never`
+> **UnionToIntersection**\<`T`\> = `T` *extends* `unknown` ? (`arg`) => `void` : `never` *extends* (`arg`) => `void` ? `F` : `never`
 
 Defined in: [src/others/utils.d.mts:84](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/others/utils.d.mts#L84)
 
@@ -280,7 +280,7 @@ The union type.
 type Inter = UnionToIntersection<{ a: string } | { b: number }>; // { a: string } & { b: number }
 ```
 
----
+***
 
 ### MergeIntersection
 
@@ -295,7 +295,7 @@ Useful for making intersected types more readable in tooltips.
 
 ##### R
 
-`R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord)
+`R` *extends* [`UnknownRecord`](../constants/record.md#unknownrecord)
 
 An intersection of record types.
 
@@ -305,7 +305,7 @@ An intersection of record types.
 type Merged = MergeIntersection<{ a: string } & { b: number }>; // { a: string; b: number }
 ```
 
----
+***
 
 ### ExcludeFalsyValue
 
@@ -324,7 +324,7 @@ Note: Does not exclude `NaN` as it's not representable as a literal type.
 
 The type to filter.
 
----
+***
 
 ### Intersection
 
@@ -338,7 +338,7 @@ Creates an intersection type from a tuple of types `Types`.
 
 ##### Types
 
-`Types` _extends_ readonly `unknown`[]
+`Types` *extends* readonly `unknown`[]
 
 A readonly tuple of types.
 

@@ -1,6 +1,6 @@
 **ts-type-forge**
 
----
+***
 
 # ts-type-forge
 

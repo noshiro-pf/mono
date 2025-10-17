@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / record/deep
 
@@ -10,7 +10,7 @@
 
 ### DeepReadonly
 
-> **DeepReadonly**\<`T`\> = `T` _extends_ [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` _extends_ [`AnyFn`](../others/utils.md#anyfn) ? `T` : `T` _extends_ [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepReadonly`](#deepreadonly)\<`K`\>, [`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepReadonly`](#deepreadonly)\<`K`\>, [`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? `ReadonlySet`\<[`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ `ReadonlySet`\<infer V\> ? `ReadonlySet`\<[`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` _extends_ `Record`\<`string`, `any`\> \| readonly `unknown`[] ? `{ readonly [K in keyof T]: DeepReadonly<T[K]> }` : `T`
+> **DeepReadonly**\<`T`\> = `T` *extends* [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` *extends* [`AnyFn`](../others/utils.md#anyfn) ? `T` : `T` *extends* [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepReadonly`](#deepreadonly)\<`K`\>, [`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` *extends* `ReadonlyMap`\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepReadonly`](#deepreadonly)\<`K`\>, [`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` *extends* [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? `ReadonlySet`\<[`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` *extends* `ReadonlySet`\<infer V\> ? `ReadonlySet`\<[`DeepReadonly`](#deepreadonly)\<`V`\>\> : `T` *extends* `Record`\<`string`, `any`\> \| readonly `unknown`[] ? `{ readonly [K in keyof T]: DeepReadonly<T[K]> }` : `T`
 
 Defined in: [src/record/deep.d.mts:17](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/deep.d.mts#L17)
 
@@ -43,11 +43,11 @@ type ReadonlyData = DeepReadonly<Data>;
 // }
 ```
 
----
+***
 
 ### DeepMutable
 
-> **DeepMutable**\<`T`\> = `T` _extends_ [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` _extends_ [`AnyFn`](../others/utils.md#anyfn) ? `T` : `T` _extends_ [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepMutable`](#deepmutable)\<`K`\>, [`DeepMutable`](#deepmutable)\<`V`\>\> : `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepMutable`](#deepmutable)\<`K`\>, [`DeepMutable`](#deepmutable)\<`V`\>\> : `T` _extends_ [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepMutable`](#deepmutable)\<`V`\>\> : `T` _extends_ `ReadonlySet`\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepMutable`](#deepmutable)\<`V`\>\> : `T` _extends_ `Record`\<`string`, `any`\> \| readonly `unknown`[] ? `{ -readonly [K in keyof T]: DeepMutable<T[K]> }` : `T`
+> **DeepMutable**\<`T`\> = `T` *extends* [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` *extends* [`AnyFn`](../others/utils.md#anyfn) ? `T` : `T` *extends* [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepMutable`](#deepmutable)\<`K`\>, [`DeepMutable`](#deepmutable)\<`V`\>\> : `T` *extends* `ReadonlyMap`\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepMutable`](#deepmutable)\<`K`\>, [`DeepMutable`](#deepmutable)\<`V`\>\> : `T` *extends* [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepMutable`](#deepmutable)\<`V`\>\> : `T` *extends* `ReadonlySet`\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepMutable`](#deepmutable)\<`V`\>\> : `T` *extends* `Record`\<`string`, `any`\> \| readonly `unknown`[] ? `{ -readonly [K in keyof T]: DeepMutable<T[K]> }` : `T`
 
 Defined in: [src/record/deep.d.mts:46](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/deep.d.mts#L46)
 
@@ -69,19 +69,16 @@ A new type with all nested `readonly` modifiers removed.
 #### Example
 
 ```ts
-type ReadonlyData = {
-    readonly a: number;
-    readonly b: { readonly c: readonly string[] };
-};
+type ReadonlyData = { readonly a: number; readonly b: { readonly c: readonly string[] } };
 type MutableData = DeepMutable<ReadonlyData>;
 // Result: { a: number; b: { c: string[] } }
 ```
 
----
+***
 
 ### DeepPartial
 
-> **DeepPartial**\<`T`\> = `T` _extends_ [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` _extends_ [`AnyFn`](../others/utils.md#anyfn) ? `T` : `T` _extends_ [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepPartial`](#deeppartial)\<`K`\>, [`DeepPartial`](#deeppartial)\<`V`\>\> : `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepPartial`](#deeppartial)\<`K`\>, [`DeepPartial`](#deeppartial)\<`V`\>\> : `T` _extends_ [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepPartial`](#deeppartial)\<`V`\>\> : `T` _extends_ `ReadonlySet`\<infer V\> ? `ReadonlySet`\<[`DeepPartial`](#deeppartial)\<`V`\>\> : `T` _extends_ `Record`\<`string`, `any`\> \| readonly `unknown`[] ? `{ [K in keyof T]?: DeepPartial<T[K]> }` : `T`
+> **DeepPartial**\<`T`\> = `T` *extends* [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` *extends* [`AnyFn`](../others/utils.md#anyfn) ? `T` : `T` *extends* [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepPartial`](#deeppartial)\<`K`\>, [`DeepPartial`](#deeppartial)\<`V`\>\> : `T` *extends* `ReadonlyMap`\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepPartial`](#deeppartial)\<`K`\>, [`DeepPartial`](#deeppartial)\<`V`\>\> : `T` *extends* [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepPartial`](#deeppartial)\<`V`\>\> : `T` *extends* `ReadonlySet`\<infer V\> ? `ReadonlySet`\<[`DeepPartial`](#deeppartial)\<`V`\>\> : `T` *extends* `Record`\<`string`, `any`\> \| readonly `unknown`[] ? `{ [K in keyof T]?: DeepPartial<T[K]> }` : `T`
 
 Defined in: [src/record/deep.d.mts:82](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/deep.d.mts#L82)
 
@@ -115,11 +112,11 @@ type PartialData = DeepPartial<Data>;
 // }
 ```
 
----
+***
 
 ### DeepRequired
 
-> **DeepRequired**\<`T`\> = `T` _extends_ [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` _extends_ [`AnyFn`](../others/utils.md#anyfn) ? `T` : `T` _extends_ [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepRequired`](#deeprequired)\<`K`\>, [`DeepRequired`](#deeprequired)\<`V`\>\> : `T` _extends_ `ReadonlyMap`\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepRequired`](#deeprequired)\<`K`\>, [`DeepRequired`](#deeprequired)\<`V`\>\> : `T` _extends_ [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepRequired`](#deeprequired)\<`V`\>\> : `T` _extends_ `ReadonlySet`\<infer V\> ? `ReadonlySet`\<[`DeepRequired`](#deeprequired)\<`V`\>\> : `T` _extends_ `Record`\<`string`, `any`\> \| readonly `unknown`[] ? `{ [K in keyof T]-?: DeepRequired<T[K]> }` : `T`
+> **DeepRequired**\<`T`\> = `T` *extends* [`Primitive`](../constants/primitive.md#primitive) ? `T` : `T` *extends* [`AnyFn`](../others/utils.md#anyfn) ? `T` : `T` *extends* [`MutableMap`](../others/mutable.md#mutablemap)\<infer K, infer V\> ? [`MutableMap`](../others/mutable.md#mutablemap)\<[`DeepRequired`](#deeprequired)\<`K`\>, [`DeepRequired`](#deeprequired)\<`V`\>\> : `T` *extends* `ReadonlyMap`\<infer K, infer V\> ? `ReadonlyMap`\<[`DeepRequired`](#deeprequired)\<`K`\>, [`DeepRequired`](#deeprequired)\<`V`\>\> : `T` *extends* [`MutableSet`](../others/mutable.md#mutableset)\<infer V\> ? [`MutableSet`](../others/mutable.md#mutableset)\<[`DeepRequired`](#deeprequired)\<`V`\>\> : `T` *extends* `ReadonlySet`\<infer V\> ? `ReadonlySet`\<[`DeepRequired`](#deeprequired)\<`V`\>\> : `T` *extends* `Record`\<`string`, `any`\> \| readonly `unknown`[] ? `{ [K in keyof T]-?: DeepRequired<T[K]> }` : `T`
 
 Defined in: [src/record/deep.d.mts:112](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/deep.d.mts#L112)
 

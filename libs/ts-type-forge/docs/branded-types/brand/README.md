@@ -1,6 +1,6 @@
 [**ts-type-forge**](../../README.md)
 
----
+***
 
 [ts-type-forge](../../README.md) / branded-types/brand
 
@@ -26,7 +26,7 @@ Base type for all branded types. Represents a brand with unknown value type and 
 type MyBrand = Brand<string, 'validated', never>;
 ```
 
----
+***
 
 ### Brand
 
@@ -47,13 +47,13 @@ The underlying value type to be branded
 
 ##### TrueKeys
 
-`TrueKeys` _extends_ `string`
+`TrueKeys` *extends* `string`
 
 String literal keys that will be marked as `true` in the brand
 
 ##### FalseKeys
 
-`FalseKeys` _extends_ `string` = `never`
+`FalseKeys` *extends* `string` = `never`
 
 String literal keys that will be marked as `false` in the brand (defaults to `never`)
 
@@ -65,15 +65,15 @@ type UserId = Brand<string, 'UserId'>;
 type PostId = Brand<string, 'PostId'>;
 
 // These are incompatible even though both are strings
-const userId: UserId = 'user123' as UserId;
-const postId: PostId = 'post456' as PostId;
+const userId: UserId = "user123" as UserId;
+const postId: PostId = "post456" as PostId;
 // const wrongAssignment: UserId = postId; // Error!
 
 // Create validated types
 type NonZeroInt = Brand<number, 'integer', 'zero'>;
 ```
 
----
+***
 
 ### UnwrapBrandTrueKeys
 
@@ -87,7 +87,7 @@ Extracts all keys marked as `true` from a branded type.
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The branded type to extract keys from
 
@@ -102,7 +102,7 @@ type NonZeroInt = Brand<number, 'integer', 'zero'>;
 type TrueKeys = UnwrapBrandTrueKeys<NonZeroInt>; // 'integer'
 ```
 
----
+***
 
 ### UnwrapBrandFalseKeys
 
@@ -116,7 +116,7 @@ Extracts all keys marked as `false` from a branded type.
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The branded type to extract keys from
 
@@ -131,7 +131,7 @@ type NonZeroInt = Brand<number, 'integer', 'zero'>;
 type FalseKeys = UnwrapBrandFalseKeys<NonZeroInt>; // 'zero'
 ```
 
----
+***
 
 ### UnwrapBrandBooleanKeys
 
@@ -146,7 +146,7 @@ This occurs when a brand union normalizes and a key becomes `true | false`.
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The branded type to extract keys from
 
@@ -163,7 +163,7 @@ type UnionBrand = Brand1 | Brand2;
 type BooleanKeys = UnwrapBrandBooleanKeys<UnionBrand>; // 'key1' (since it's true | false)
 ```
 
----
+***
 
 ### UnwrapBrandKeys
 
@@ -177,7 +177,7 @@ Extracts all brand keys (true, false, and boolean) from a branded type.
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The branded type to extract keys from
 
@@ -192,7 +192,7 @@ type MyBrand = Brand<string, 'validated' | 'normalized', 'empty'>;
 type AllKeys = UnwrapBrandKeys<MyBrand>; // 'validated' | 'normalized' | 'empty'
 ```
 
----
+***
 
 ### GetBrandKeysPart
 
@@ -206,7 +206,7 @@ Extracts only the brand keys part of a branded type (without the underlying valu
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The branded type to extract from
 
@@ -221,11 +221,11 @@ type MyBrand = Brand<string, 'validated'>;
 type KeysPart = GetBrandKeysPart<MyBrand>; // { validated: true }
 ```
 
----
+***
 
 ### GetBrandValuePart
 
-> **GetBrandValuePart**\<`B`\> = `B` _extends_ [`Brand`](#brand)\<infer T, [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> ? `T` : `never`
+> **GetBrandValuePart**\<`B`\> = `B` *extends* [`Brand`](#brand)\<infer T, [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> ? `T` : `never`
 
 Defined in: [src/branded-types/brand.d.mts:174](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L174)
 
@@ -235,7 +235,7 @@ Extracts the underlying value type from a branded type.
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The branded type to extract from
 
@@ -253,11 +253,11 @@ type Age = Brand<number, 'Age' | 'positive'>;
 type AgeValue = GetBrandValuePart<Age>; // number
 ```
 
----
+***
 
 ### ExtendBrand
 
-> **ExtendBrand**\<`B`, `T`, `F`\> = [`IsNever`](../../condition/is-never.md#isnever)\<`F` & `T`\> _extends_ `true` ? [`Brand`](#brand)\<[`GetBrandValuePart`](#getbrandvaluepart)\<`B`\>, `T` \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, `F` \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> : `never`
+> **ExtendBrand**\<`B`, `T`, `F`\> = [`IsNever`](../../condition/is-never.md#isnever)\<`F` & `T`\> *extends* `true` ? [`Brand`](#brand)\<[`GetBrandValuePart`](#getbrandvaluepart)\<`B`\>, `T` \| [`UnwrapBrandTrueKeys`](#unwrapbrandtruekeys)\<`B`\> & `string`, `F` \| [`UnwrapBrandFalseKeys`](#unwrapbrandfalsekeys)\<`B`\> & `string`\> : `never`
 
 Defined in: [src/branded-types/brand.d.mts:205](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/branded-types/brand.d.mts#L205)
 
@@ -268,19 +268,19 @@ Fails if the same key would be marked as both true and false.
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The base brand to extend
 
 ##### T
 
-`T` _extends_ `string`
+`T` *extends* `string`
 
 Additional keys to mark as true
 
 ##### F
 
-`F` _extends_ `string` = `never`
+`F` *extends* `string` = `never`
 
 Additional keys to mark as false (defaults to never)
 
@@ -302,7 +302,7 @@ type OptionalEmail = ExtendBrand<Email, 'optional', 'required'>;
 // type Invalid = ExtendBrand<Email, 'verified', 'verified'>;
 ```
 
----
+***
 
 ### ChangeBaseBrand
 
@@ -316,7 +316,7 @@ Changes the underlying value type of a brand while preserving all brand keys.
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The brand whose keys to preserve
 
@@ -342,7 +342,7 @@ type SerializedData = Brand<string, 'json' | 'validated'>;
 type ParsedData = ChangeBaseBrand<SerializedData, object>;
 ```
 
----
+***
 
 ### IntersectBrand
 
@@ -357,13 +357,13 @@ The result has the intersection of value types and the union of all keys.
 
 ##### B1
 
-`B1` _extends_ [`UnknownBrand`](#unknownbrand)
+`B1` *extends* [`UnknownBrand`](#unknownbrand)
 
 First brand to intersect
 
 ##### B2
 
-`B2` _extends_ [`UnknownBrand`](#unknownbrand)
+`B2` *extends* [`UnknownBrand`](#unknownbrand)
 
 Second brand to intersect
 
@@ -385,7 +385,7 @@ type Person = IntersectBrand<Named, Aged>;
 // Brand<{ name: string } & { age: number }, 'named' | 'aged'>
 ```
 
----
+***
 
 ### NormalizeBrandUnion
 
@@ -400,7 +400,7 @@ This happens when different brands in a union have the same key with different b
 
 ##### B
 
-`B` _extends_ [`UnknownBrand`](#unknownbrand)
+`B` *extends* [`UnknownBrand`](#unknownbrand)
 
 The brand union to normalize
 

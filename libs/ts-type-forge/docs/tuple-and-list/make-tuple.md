@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / tuple-and-list/make-tuple
 
@@ -26,7 +26,7 @@ The type of elements in the tuple.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The desired length of the tuple (must be a non-negative integer literal).
 

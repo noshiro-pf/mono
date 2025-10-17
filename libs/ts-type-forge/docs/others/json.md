@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / others/json
 
@@ -21,14 +21,14 @@ Note that `undefined` is not a valid JSON primitive.
 #### Example
 
 ```ts
-const jsonString: JsonPrimitive = 'hello'; // ✓ valid
-const jsonNumber: JsonPrimitive = 42; // ✓ valid
-const jsonBoolean: JsonPrimitive = true; // ✓ valid
-const jsonNull: JsonPrimitive = null; // ✓ valid
+const jsonString: JsonPrimitive = "hello";     // ✓ valid
+const jsonNumber: JsonPrimitive = 42;          // ✓ valid
+const jsonBoolean: JsonPrimitive = true;       // ✓ valid
+const jsonNull: JsonPrimitive = null;          // ✓ valid
 // const invalid: JsonPrimitive = undefined;   // ✗ error
 ```
 
----
+***
 
 ### MutableJsonValue
 
@@ -47,27 +47,23 @@ programmatically, such as constructing API payloads or transforming data.
 
 ```ts
 const apiPayload: MutableJsonValue = {
-    user: {
-        name: 'John Doe',
-        age: 30,
-        preferences: ['dark-mode', 'notifications'],
-    },
+  user: {
+    name: "John Doe",
+    age: 30,
+    preferences: ["dark-mode", "notifications"]
+  }
 };
 
 // Can modify the structure
-if (
-    typeof apiPayload === 'object' &&
-    apiPayload !== null &&
-    'user' in apiPayload
-) {
-    const user = apiPayload.user as MutableJsonValue;
-    if (typeof user === 'object' && user !== null && 'age' in user) {
-        (user as any).age = 31; // Update age
-    }
+if (typeof apiPayload === 'object' && apiPayload !== null && 'user' in apiPayload) {
+  const user = apiPayload.user as MutableJsonValue;
+  if (typeof user === 'object' && user !== null && 'age' in user) {
+    (user as any).age = 31; // Update age
+  }
 }
 ```
 
----
+***
 
 ### JsonValue
 
@@ -88,24 +84,24 @@ or when enforcing immutability in your application.
 ```ts
 // API response that should remain immutable
 const apiResponse: JsonValue = {
-    data: {
-        users: [
-            { id: 1, name: 'Alice' },
-            { id: 2, name: 'Bob' },
-        ],
-    },
-    meta: { total: 2, page: 1 },
+  data: {
+    users: [
+      { id: 1, name: "Alice" },
+      { id: 2, name: "Bob" }
+    ]
+  },
+  meta: { total: 2, page: 1 }
 };
 
 // Type-safe JSON parsing
 const parseConfig = (jsonString: string): JsonValue => {
-    return JSON.parse(jsonString) as JsonValue;
+  return JSON.parse(jsonString) as JsonValue;
 };
 
 // apiResponse.data.users.push({...}); // ✗ Error: readonly array
 ```
 
----
+***
 
 ### JsonObject
 
@@ -121,18 +117,18 @@ throughout the entire object tree.
 
 ```ts
 const config: JsonObject = {
-    database: {
-        host: 'localhost',
-        port: 5432,
-        ssl: true,
-    },
-    features: ['auth', 'logging'],
+  database: {
+    host: "localhost",
+    port: 5432,
+    ssl: true
+  },
+  features: ["auth", "logging"]
 };
 
 // config.database.port = 3306; // ✗ Error: readonly property
 ```
 
----
+***
 
 ### MutableJsonObject
 
@@ -149,9 +145,9 @@ or transforming JSON structures.
 ```ts
 const builder: MutableJsonObject = {};
 builder.timestamp = Date.now();
-builder.data = { message: 'Hello' };
-builder.tags = ['info', 'user-action'];
+builder.data = { message: "Hello" };
+builder.tags = ["info", "user-action"];
 
 // All modifications are allowed
-builder.data = { message: 'Updated' }; // ✓ valid
+builder.data = { message: "Updated" }; // ✓ valid
 ```

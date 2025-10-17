@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / branded-types/uint32
 
@@ -21,16 +21,16 @@ Range: [0, 2^32 - 1] or [0, 4,294,967,295]
 
 ```ts
 const isUint32 = (x: number): x is Uint32 =>
-    Number.isSafeInteger(x) && x >= 0 && x <= 2 ** 32 - 1;
+  Number.isSafeInteger(x) && x >= 0 && x <= 2**32 - 1;
 
 const color = (rgba: Uint32) => ({ rgba });
 const ipAddress = (ip: Uint32) => {
-    // Convert to dotted decimal notation
-    return `${ip >>> 24}.${(ip >>> 16) & 0xff}.${(ip >>> 8) & 0xff}.${ip & 0xff}`;
+  // Convert to dotted decimal notation
+  return `${ip >>> 24}.${(ip >>> 16) & 0xff}.${(ip >>> 8) & 0xff}.${ip & 0xff}`;
 };
 ```
 
----
+***
 
 ### PositiveUint32
 
@@ -45,12 +45,12 @@ Range: [1, 2^32 - 1] or [1, 4,294,967,295]
 
 ```ts
 const isPositiveUint32 = (x: number): x is PositiveUint32 =>
-    Number.isSafeInteger(x) && x > 0 && x <= 2 ** 32 - 1;
+  Number.isSafeInteger(x) && x > 0 && x <= 2**32 - 1;
 
 const id = (value: PositiveUint32) => ({ id: value });
 ```
 
----
+***
 
 ### NonZeroUint32
 
@@ -66,12 +66,12 @@ Range: [1, 2^32 - 1] or [1, 4,294,967,295]
 
 ```ts
 const isNonZeroUint32 = (x: number): x is NonZeroUint32 =>
-    Number.isSafeInteger(x) && x > 0 && x <= 2 ** 32 - 1;
+  Number.isSafeInteger(x) && x > 0 && x <= 2**32 - 1;
 
 const divisor = (value: NonZeroUint32) => 1000000 / value;
 ```
 
----
+***
 
 ### Uint32WithSmallInt
 
@@ -82,7 +82,7 @@ Defined in: [src/branded-types/uint32.d.mts:52](https://github.com/noshiro-pf/ts
 32-bit unsigned integer type with small literal values included.
 Type: `0 | 1 | ... | 39 | Uint32`
 
----
+***
 
 ### PositiveUint32WithSmallInt
 
@@ -93,7 +93,7 @@ Defined in: [src/branded-types/uint32.d.mts:58](https://github.com/noshiro-pf/ts
 Positive 32-bit unsigned integer type with small literal values included.
 Type: `1 | 2 | ... | 39 | PositiveUint32`
 
----
+***
 
 ### NonZeroUint32WithSmallInt
 

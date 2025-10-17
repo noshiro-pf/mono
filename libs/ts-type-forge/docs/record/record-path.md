@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / record/record-path
 
@@ -37,7 +37,7 @@ type P = PathsWithIndex<Data>;
 // P = readonly [] | readonly ["a"] | readonly ["a", "b"] | readonly ["a", "b", number] | readonly ["a", "c"]
 ```
 
----
+***
 
 ### RecordPaths
 
@@ -68,7 +68,7 @@ type P = Paths<Data>;
 // P = readonly [] | readonly ["a"] | readonly ["a", "b"] | readonly ["a", "b", 0] | readonly ["a", "b", 1] | readonly ["a", "c"]
 ```
 
----
+***
 
 ### RecordPathAndValueTypeTuple
 
@@ -102,15 +102,15 @@ type KPV = KeyPathAndValueTypeAtPathTuple<Data>;
 //       | readonly [readonly ["b", 0], number]
 ```
 
----
+***
 
 ### RecordLeafPaths
 
-> **RecordLeafPaths**\<`R`\> = `R` _extends_ readonly `unknown`[] ? `TSTypeForgeInternals.LeafPathsImplListCase`\<`R`, keyof `R`\> : `R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.LeafPathsImplRecordCase`\<`R`, keyof `R`\> : readonly \[\]
+> **RecordLeafPaths**\<`R`\> = `R` *extends* readonly `unknown`[] ? `TSTypeForgeInternals.LeafPathsImplListCase`\<`R`, keyof `R`\> : `R` *extends* [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.LeafPathsImplRecordCase`\<`R`, keyof `R`\> : readonly \[\]
 
 Defined in: [src/record/record-path.d.mts:82](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L82)
 
-Calculates all possible paths from the root to the _leaf_ nodes within a nested record `R`,
+Calculates all possible paths from the root to the *leaf* nodes within a nested record `R`,
 using specific number literal indices for tuples. Leaf nodes are values that are not records or tuples.
 
 #### Type Parameters
@@ -133,15 +133,15 @@ type LP = LeafPaths<Data>;
 // LP = readonly ["a", "b", 0] | readonly ["a", "b", 1, "d"] | readonly ["a", "c"]
 ```
 
----
+***
 
 ### RecordLeafPathsWithIndex
 
-> **RecordLeafPathsWithIndex**\<`R`\> = `R` _extends_ readonly `unknown`[] ? `TSTypeForgeInternals.LeafPathsWithIndexImplListCase`\<`R`, keyof `R`\> : `R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.LeafPathsWithIndexImplRecordCase`\<`R`, keyof `R`\> : readonly \[\]
+> **RecordLeafPathsWithIndex**\<`R`\> = `R` *extends* readonly `unknown`[] ? `TSTypeForgeInternals.LeafPathsWithIndexImplListCase`\<`R`, keyof `R`\> : `R` *extends* [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.LeafPathsWithIndexImplRecordCase`\<`R`, keyof `R`\> : readonly \[\]
 
 Defined in: [src/record/record-path.d.mts:135](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L135)
 
-Calculates all possible paths from the root to the _leaf_ nodes within a nested record `R`,
+Calculates all possible paths from the root to the *leaf* nodes within a nested record `R`,
 allowing `number` as an index type for arrays. Leaf nodes are values that are not records or arrays.
 
 #### Type Parameters
@@ -164,11 +164,11 @@ type LP = LeafPathsWithIndex<Data>;
 // LP = readonly ["a", "b", number] | readonly ["a", "c"]
 ```
 
----
+***
 
 ### RecordUpdated
 
-> **RecordUpdated**\<`R`, `Path`, `ValueAfter`\> = `Path` _extends_ readonly \[\] ? `ValueAfter` : `R` _extends_ readonly `unknown`[] ? `TSTypeForgeInternals.RecordUpdatedImplTupleCase`\<`R`, `Path`, `ValueAfter`\> : `R` _extends_ [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.RecordUpdatedImplRecordCase`\<`R`, `Path`, `ValueAfter`\> : `R`
+> **RecordUpdated**\<`R`, `Path`, `ValueAfter`\> = `Path` *extends* readonly \[\] ? `ValueAfter` : `R` *extends* readonly `unknown`[] ? `TSTypeForgeInternals.RecordUpdatedImplTupleCase`\<`R`, `Path`, `ValueAfter`\> : `R` *extends* [`UnknownRecord`](../constants/record.md#unknownrecord) ? `TSTypeForgeInternals.RecordUpdatedImplRecordCase`\<`R`, `Path`, `ValueAfter`\> : `R`
 
 Defined in: [src/record/record-path.d.mts:192](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L192)
 
@@ -185,7 +185,7 @@ The original record or tuple type.
 
 ##### Path
 
-`Path` _extends_ [`RecordPaths`](#recordpaths)\<`R`\>
+`Path` *extends* [`RecordPaths`](#recordpaths)\<`R`\>
 
 The path to the value to update (from `Paths<R>`).
 
@@ -208,11 +208,11 @@ type Updated = RecordUpdated<Data, ['a', 'b', 1], number>;
 type UpdatedRoot = RecordUpdated<Data, [], null>; // null
 ```
 
----
+***
 
 ### RecordValueAtPath
 
-> **RecordValueAtPath**\<`R`, `Path`\> = `Path` _extends_ readonly \[infer Head, `...(infer Rest)`\] ? `Head` _extends_ keyof `R` ? `Rest` _extends_ [`RecordPaths`](#recordpaths)\<`R`\[`Head`\]\> ? [`RecordValueAtPath`](#recordvalueatpath)\<`R`\[`Head`\], `Rest`\> : `never` : `never` : `R`
+> **RecordValueAtPath**\<`R`, `Path`\> = `Path` *extends* readonly \[infer Head, `...(infer Rest)`\] ? `Head` *extends* keyof `R` ? `Rest` *extends* [`RecordPaths`](#recordpaths)\<`R`\[`Head`\]\> ? [`RecordValueAtPath`](#recordvalueatpath)\<`R`\[`Head`\], `Rest`\> : `never` : `never` : `R`
 
 Defined in: [src/record/record-path.d.mts:262](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/record-path.d.mts#L262)
 
@@ -229,7 +229,7 @@ The record or tuple type.
 
 ##### Path
 
-`Path` _extends_ [`RecordPaths`](#recordpaths)\<`R`\>
+`Path` *extends* [`RecordPaths`](#recordpaths)\<`R`\>
 
 The path to the value (from `Paths<R>`).
 
@@ -246,7 +246,7 @@ type V2 = RecordValueAtPath<Data, ['a']>; // { b: [string, boolean] }
 type V3 = RecordValueAtPath<Data, []>; // { a: { b: [string, boolean] } }
 ```
 
----
+***
 
 ### RecordValueAtPathWithIndex
 
@@ -268,7 +268,7 @@ The record or array type.
 
 ##### Path
 
-`Path` _extends_ [`RecordPathsWithIndex`](#recordpathswithindex)\<`R`\>
+`Path` *extends* [`RecordPathsWithIndex`](#recordpathswithindex)\<`R`\>
 
 The path to the value (from `PathsWithIndex<R>`).
 

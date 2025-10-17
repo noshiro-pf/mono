@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / type-level-integer/abs
 
@@ -10,7 +10,7 @@
 
 ### AbsoluteValue
 
-> **AbsoluteValue**\<`N`\> = `N` _extends_ `N` ? `` `${N}` `` _extends_ `` `-${infer P}` `` ? `P` _extends_ `` `${number}` `` ? [`ToNumber`](../others/utils.md#tonumber)\<`P`\> : `never` : `N` : `never`
+> **AbsoluteValue**\<`N`\> = `N` *extends* `N` ? `` `${N}` `` *extends* `` `-${infer P}` `` ? `P` *extends* `` `${number}` `` ? [`ToNumber`](../others/utils.md#tonumber)\<`P`\> : `never` : `N` : `never`
 
 Defined in: [src/type-level-integer/abs.d.mts:15](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/type-level-integer/abs.d.mts#L15)
 
@@ -23,7 +23,7 @@ Handles distribution over union types.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The number literal type.
 
@@ -34,13 +34,13 @@ The absolute value of `N` as a number literal type.
 #### Example
 
 ```ts
-type Pos = AbsoluteValue<10>; // 10
+type Pos = AbsoluteValue<10>;  // 10
 type Neg = AbsoluteValue<-5>; // 5
-type Zero = AbsoluteValue<0>; // 0
+type Zero = AbsoluteValue<0>;  // 0
 type Union = AbsoluteValue<-1 | 2>; // 1 | 2
 ```
 
----
+***
 
 ### Abs
 
@@ -55,7 +55,7 @@ Calculates the absolute value of a number literal type `N`.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The number literal type.
 
@@ -66,6 +66,6 @@ The absolute value of `N` as a number literal type.
 #### Example
 
 ```ts
-type Pos = Abs<10>; // 10
+type Pos = Abs<10>;  // 10
 type Neg = Abs<-5>; // 5
 ```

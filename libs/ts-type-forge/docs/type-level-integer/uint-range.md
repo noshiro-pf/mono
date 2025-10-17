@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / type-level-integer/uint-range
 
@@ -21,13 +21,13 @@ Requires `Start` and `End` to be non-negative integer literals where `Start <= E
 
 ##### Start
 
-`Start` _extends_ `number`
+`Start` *extends* `number`
 
 The starting integer literal (inclusive).
 
 ##### End
 
-`End` _extends_ `number`
+`End` *extends* `number`
 
 The ending integer literal (exclusive).
 
@@ -43,7 +43,7 @@ type R2 = UintRange<0, 4>; // 0 | 1 | 2 | 3
 type R3 = UintRange<5, 5>; // never
 ```
 
----
+***
 
 ### UintRangeInclusive
 
@@ -58,13 +58,13 @@ Requires `MinValue` and `MaxValue` to be non-negative integer literals where `Mi
 
 ##### MinValue
 
-`MinValue` _extends_ `number`
+`MinValue` *extends* `number`
 
 The starting integer literal (inclusive).
 
 ##### MaxValue
 
-`MaxValue` _extends_ `number`
+`MaxValue` *extends* `number`
 
 The ending integer literal (inclusive).
 

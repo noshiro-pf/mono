@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / constants/alphabet
 
@@ -30,11 +30,11 @@ type Test1 = IsVowel<'a'>; // true
 type Test2 = IsVowel<'b'>; // false
 
 const validateLowercase = (char: string): char is LowerAlphabet => {
-    return char.length === 1 && char >= 'a' && char <= 'z';
+  return char.length === 1 && char >= 'a' && char <= 'z';
 };
 ```
 
----
+***
 
 ### UpperAlphabet
 
@@ -50,20 +50,20 @@ Derived by applying the built-in `Uppercase` utility type to `LowerAlphabet`.
 
 ```ts
 type FirstLetter<S extends string> = S extends `${infer F}${string}`
-    ? F extends UpperAlphabet
-        ? F
-        : never
-    : never;
+  ? F extends UpperAlphabet
+    ? F
+    : never
+  : never;
 
 type T1 = FirstLetter<'Hello'>; // 'H'
 type T2 = FirstLetter<'world'>; // never
 
 const isUppercase = (char: string): char is UpperAlphabet => {
-    return char.length === 1 && char >= 'A' && char <= 'Z';
+  return char.length === 1 && char >= 'A' && char <= 'Z';
 };
 ```
 
----
+***
 
 ### Alphabet
 
@@ -83,17 +83,15 @@ and type-safe operations that work with any English letter.
 type AlphabetCount = 52; // LowerAlphabet (26) + UpperAlphabet (26)
 
 const isAlphabetic = (char: string): char is Alphabet => {
-    return (
-        char.length === 1 &&
-        ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'))
-    );
+  return char.length === 1 &&
+         ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'));
 };
 
 type ExtractAlpha<S extends string> = S extends `${infer F}${infer R}`
-    ? F extends Alphabet
-        ? `${F}${ExtractAlpha<R>}`
-        : ExtractAlpha<R>
-    : '';
+  ? F extends Alphabet
+    ? `${F}${ExtractAlpha<R>}`
+    : ExtractAlpha<R>
+  : '';
 
 type OnlyLetters = ExtractAlpha<'H3ll0 W0rld!'>; // 'HllWorld'
 ```

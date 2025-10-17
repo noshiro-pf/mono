@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / tuple-and-list/array
 
@@ -28,12 +28,12 @@ The type of elements in the array.
 
 ```ts
 type NA = MutableNonEmptyArray<string>; // [string, ...string[]]
-const valid: NA = ['hello'];
-const alsoValid: NA = ['hello', 'world'];
+const valid: NA = ["hello"];
+const alsoValid: NA = ["hello", "world"];
 // const invalid: NA = []; // Error
 ```
 
----
+***
 
 ### NonEmptyArray
 
@@ -61,11 +61,11 @@ const alsoValid: NA = [1, 2, 3];
 // valid.push(4); // Error: Property 'push' does not exist on type 'readonly [number, ...number[]]'.
 ```
 
----
+***
 
 ### ArrayElement
 
-> **ArrayElement**\<`S`\> = `S` _extends_ readonly infer T[] ? `T` : `never`
+> **ArrayElement**\<`S`\> = `S` *extends* readonly infer T[] ? `T` : `never`
 
 Defined in: [src/tuple-and-list/array.d.mts:37](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.d.mts#L37)
 
@@ -93,7 +93,7 @@ type TupleElm = ArrayElement<[string, boolean]>; // string | boolean
 type NotArray = ArrayElement<{ a: number }>; // never
 ```
 
----
+***
 
 ### ArrayOfLength
 
@@ -108,7 +108,7 @@ Alias for `MakeTuple<Elm, N>`.
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The desired length of the tuple (must be a non-negative integer literal).
 
@@ -129,7 +129,7 @@ type TupleOf3Strings = ArrayOfLength<3, string>; // readonly [string, string, st
 type TupleOf0Numbers = ArrayOfLength<0, number>; // readonly []
 ```
 
----
+***
 
 ### MutableArrayOfLength
 
@@ -143,7 +143,7 @@ Creates a mutable tuple type of a specific length `N` with elements of type `Elm
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The desired length of the tuple (must be a non-negative integer literal).
 
@@ -163,7 +163,7 @@ A mutable tuple type `[Elm, Elm, ..., Elm]` of length `N`.
 type MutableTupleOf2Booleans = MutableArrayOfLength<2, boolean>; // [boolean, boolean]
 ```
 
----
+***
 
 ### MutableArrayAtLeastLen
 
@@ -177,7 +177,7 @@ Creates a mutable array type that is guaranteed to have at least `N` elements of
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The minimum length of the array (must be a non-negative integer literal).
 
@@ -200,7 +200,7 @@ const alsoValid: AtLeast2Numbers = [1, 2, 3, 4];
 // const invalid: AtLeast2Numbers = [1]; // Error
 ```
 
----
+***
 
 ### ArrayAtLeastLen
 
@@ -214,7 +214,7 @@ Creates a readonly array type that is guaranteed to have at least `N` elements o
 
 ##### N
 
-`N` _extends_ `number`
+`N` *extends* `number`
 
 The minimum length of the array (must be a non-negative integer literal).
 
@@ -232,7 +232,7 @@ A readonly array type `readonly [Elm, ..., Elm, ...Elm[]]` with at least `N` ele
 
 ```ts
 type AtLeast3Strings = ArrayAtLeastLen<3, string>; // readonly [string, string, string, ...string[]]
-const valid: AtLeast3Strings = ['a', 'b', 'c'];
-const alsoValid: AtLeast3Strings = ['a', 'b', 'c', 'd'];
+const valid: AtLeast3Strings = ["a", "b", "c"];
+const alsoValid: AtLeast3Strings = ["a", "b", "c", "d"];
 // const invalid: AtLeast3Strings = ["a", "b"]; // Error
 ```

@@ -1,6 +1,6 @@
 [**ts-type-forge**](../README.md)
 
----
+***
 
 [ts-type-forge](../README.md) / record/std
 
@@ -10,7 +10,7 @@
 
 ### StrictExtract
 
-> **StrictExtract**\<`T`, `U`\> = `T` _extends_ `U` ? `T` : `never`
+> **StrictExtract**\<`T`, `U`\> = `T` *extends* `U` ? `T` : `never`
 
 Defined in: [src/record/std.d.mts:16](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/std.d.mts#L16)
 
@@ -27,7 +27,7 @@ The union type to extract from.
 
 ##### U
 
-`U` _extends_ `T`
+`U` *extends* `T`
 
 The type to extract, must extend `T`.
 
@@ -43,11 +43,11 @@ type Extracted = StrictExtract<Union, 'a' | 'b'>; // 'a' | 'b'
 // type Invalid = StrictExtract<Union, 'a' | 'd'>; // Error: 'd' is not assignable to Union
 ```
 
----
+***
 
 ### RelaxedExtract
 
-> **RelaxedExtract**\<`T`, `U`\> = `T` _extends_ `U` ? `T` : `never`
+> **RelaxedExtract**\<`T`, `U`\> = `T` *extends* `U` ? `T` : `never`
 
 Defined in: [src/record/std.d.mts:33](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/std.d.mts#L33)
 
@@ -80,7 +80,7 @@ type Extracted = RelaxedExtract<Union, 'a' | 'd'>; // 'a'
 type Numbers = RelaxedExtract<string | number | boolean, number>; // number
 ```
 
----
+***
 
 ### StrictPick
 
@@ -101,7 +101,7 @@ The object type to pick from.
 
 ##### K
 
-`K` _extends_ keyof `T`
+`K` *extends* keyof `T`
 
 The union of keys to pick, must extend `keyof T`.
 
@@ -117,7 +117,7 @@ type BasicInfo = StrictPick<Person, 'name' | 'age'>; // { name: string; age: num
 // type Invalid = StrictPick<Person, 'name' | 'invalid'>; // Error: 'invalid' is not a key of Person
 ```
 
----
+***
 
 ### RelaxedPick
 
@@ -154,11 +154,11 @@ type BasicInfo = RelaxedPick<Person, 'name' | 'age' | 'invalid'>; // { name: str
 type Empty = RelaxedPick<Person, 'nonexistent'>; // {}
 ```
 
----
+***
 
 ### StrictExclude
 
-> **StrictExclude**\<`T`, `U`\> = `T` _extends_ `U` ? `never` : `T`
+> **StrictExclude**\<`T`, `U`\> = `T` *extends* `U` ? `never` : `T`
 
 Defined in: [src/record/std.d.mts:86](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/std.d.mts#L86)
 
@@ -175,7 +175,7 @@ The union type to exclude from.
 
 ##### U
 
-`U` _extends_ `T`
+`U` *extends* `T`
 
 The type to exclude, must extend `T`.
 
@@ -191,11 +191,11 @@ type Remaining = StrictExclude<Union, 'a' | 'b'>; // 'c'
 // type Invalid = StrictExclude<Union, 'a' | 'd'>; // Error: 'd' is not assignable to Union
 ```
 
----
+***
 
 ### RelaxedExclude
 
-> **RelaxedExclude**\<`T`, `U`\> = `T` _extends_ `U` ? `never` : `T`
+> **RelaxedExclude**\<`T`, `U`\> = `T` *extends* `U` ? `never` : `T`
 
 Defined in: [src/record/std.d.mts:103](https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/std.d.mts#L103)
 
@@ -228,7 +228,7 @@ type Remaining = RelaxedExclude<Union, 'a' | 'd'>; // 'b' | 'c'
 type NonStrings = RelaxedExclude<string | number | boolean, string>; // number | boolean
 ```
 
----
+***
 
 ### StrictOmit
 
@@ -249,7 +249,7 @@ The object type to omit from.
 
 ##### K
 
-`K` _extends_ keyof `T`
+`K` *extends* keyof `T`
 
 The union of keys to omit, must extend `keyof T`.
 
@@ -265,7 +265,7 @@ type PublicInfo = StrictOmit<Person, 'email'>; // { name: string; age: number }
 // type Invalid = StrictOmit<Person, 'email' | 'invalid'>; // Error: 'invalid' is not a key of Person
 ```
 
----
+***
 
 ### RelaxedOmit
 
@@ -302,7 +302,7 @@ type PublicInfo = RelaxedOmit<Person, 'email' | 'invalid'>; // { name: string; a
 type Same = RelaxedOmit<Person, 'nonexistent'>; // { name: string; age: number; email: string }
 ```
 
----
+***
 
 ### ReadonlyRecord
 
@@ -317,7 +317,7 @@ All properties are readonly and cannot be modified after creation.
 
 ##### K
 
-`K` _extends_ `PropertyKey`
+`K` *extends* `PropertyKey`
 
 The type of keys, must extend `PropertyKey` (string | number | symbol).
 
@@ -339,7 +339,7 @@ const settings: Config = { host: 'localhost', port: 3000 };
 // settings.host = 'new-host'; // Error: Cannot assign to 'host' because it is a read-only property
 ```
 
----
+***
 
 ### MutableRecord
 
@@ -354,7 +354,7 @@ All properties are mutable and can be modified after creation.
 
 ##### K
 
-`K` _extends_ `PropertyKey`
+`K` *extends* `PropertyKey`
 
 The type of keys, must extend `PropertyKey` (string | number | symbol).
 

@@ -1,6 +1,9 @@
 {
   "version": "0.2",
   "language": "en",
+  "allowCompoundWords": true,
+  "caseSensitive": false,
+  "ignoreRandomStrings": true,
   "words": [
     "bivariant",
     "contravariance",
@@ -15,7 +18,10 @@
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",
-    "./package-lock.json",
-    "BREAKING_CHANGE_GUIDE.md"
+    "./pnpm-lock.yaml",
+    "./pnpm-workspace.yaml",
+    "docs/**",
+    "BREAKING_CHANGE_GUIDE.md",
+    "github/**"
   ]
 }
