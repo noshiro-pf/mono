@@ -389,6 +389,12 @@ expectType<
 // NOTE: This is not yet implemented in @octokit/openapi-types 26.0.0, but it exists in the actual API responses.
 const RepositoryRuleCopilotCodeReview = t.strictRecord({
   type: t.literal('copilot_code_review'),
+  parameters: t.optional(
+    t.strictRecord({
+      review_on_push: t.boolean(),
+      review_draft_pull_requests: t.boolean(),
+    }),
+  ),
 });
 
 export const RepositoryRule = t.union([
@@ -422,6 +428,10 @@ expectType<
     | components['schemas']['repository-rule']
     | Readonly<{
         type: 'copilot_code_review';
+        parameters?: {
+          review_on_push: boolean;
+          review_draft_pull_requests: boolean;
+        };
       }>
   >
 >('=');
