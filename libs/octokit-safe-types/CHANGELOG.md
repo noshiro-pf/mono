@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.1.0...v1.1.1) (2025-10-17)
+
+### Bug Fixes
+
+- fix RepositoryRule type ([#39](https://github.com/noshiro-pf/octokit-safe-types/issues/39)) ([c1e2760](https://github.com/noshiro-pf/octokit-safe-types/commit/c1e276006775b63efb937b97bfc8a0d6f68b2772))
+
 # [1.1.0](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.0.4...v1.1.0) (2025-10-16)
 
 ### Features
