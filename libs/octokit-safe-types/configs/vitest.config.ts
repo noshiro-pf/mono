@@ -24,7 +24,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['html', 'lcov', 'text'],
       include: ['src/**'],
-      exclude: ['**/index.mts'],
+      exclude: ['**/index.mts', 'src/entry-point.mts'],
     },
   },
 });

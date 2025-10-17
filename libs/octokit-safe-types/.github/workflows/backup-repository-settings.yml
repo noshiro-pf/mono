@@ -36,7 +36,8 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+
       - name: Back up
         run: |
           pnpm exec tsx scripts/github/repository/backup.mts

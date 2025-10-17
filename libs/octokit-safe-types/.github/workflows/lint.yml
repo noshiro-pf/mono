@@ -51,7 +51,8 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+
       # NOTE: To include this workflow in the branch protection rule status check,
       # skip each step instead of skipping the entire workflow with paths-ignore.
       - name: Check diff
