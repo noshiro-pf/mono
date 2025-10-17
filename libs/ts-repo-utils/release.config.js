@@ -45,7 +45,7 @@ export default {
     { path: '@semantic-release/npm', npmPublish: false },
 
     // 4-b. Sync CLI versions, format, build, and generate docs after version update.
-    ['@semantic-release/exec', { prepareCmd: 'npm run prepare-release' }],
+    ['@semantic-release/exec', { prepareCmd: 'pnpm run prepare-release' }],
 
     // 4-c. Publish the package to npmjs (after all files are updated).
     // 4-d. Run `npm dist-tag` command to add a tag to the package published on npmjs.
@@ -58,7 +58,7 @@ export default {
         assets: [
           'CHANGELOG.md',
           'package.json',
-          'package-lock.json',
+          'pnpm-lock.yaml',
           'src/cmd/*.mts', // CLI commands with updated versions
           'docs/**/*.md', // Generated documentation
         ],

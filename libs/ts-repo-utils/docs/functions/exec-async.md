@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
----
+***
 
 [ts-repo-utils](../README.md) / functions/exec-async
 
@@ -14,7 +14,7 @@
 
 Defined in: [src/functions/exec-async.mts:8](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L8)
 
----
+***
 
 ### ExecResult
 
@@ -26,7 +26,7 @@ Defined in: [src/functions/exec-async.mts:10](https://github.com/noshiro-pf/ts-r
 
 ##### T
 
-`T` _extends_ `string` \| `Buffer`
+`T` *extends* `string` \| `Buffer`
 
 ## Functions
 

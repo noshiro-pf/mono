@@ -1,11 +1,11 @@
 Verify these command and fix errors:
 
-- [ ] `npm i`
-- [ ] `npm run tsc` - Type checking
-- [ ] `npm run test` - Run all tests
-- [ ] `npm run lint` - ESLint validation
-- [ ] `npm run fmt` - Code formatting
-- [ ] `npm run build` - Full build pipeline
+- [ ] `pnpm i`
+- [ ] `pnpm run tsc` - Type checking
+- [ ] `pnpm run test` - Run all tests
+- [ ] `pnpm run lint` - ESLint validation
+- [ ] `pnpm run fmt` - Code formatting
+- [ ] `pnpm run build` - Full build pipeline
 
 ## Code Style Guidelines
 

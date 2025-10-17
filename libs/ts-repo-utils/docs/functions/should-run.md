@@ -59,7 +59,7 @@ GitHub Actions usage
   ```yaml
   - name: Check if type checks should run
   id: check_diff
-  run: npx check-should-run-type-checks
+  run: npm exec check-should-run-type-checks
 
   - name: Run type checks
   if: steps.check_diff.outputs.should_run == 'true'

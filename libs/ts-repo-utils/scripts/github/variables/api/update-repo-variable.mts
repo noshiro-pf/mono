@@ -1,4 +1,4 @@
-import { type EndpointKeys } from '@octokit/types';
+import { type EndpointKeys } from 'octokit-safe-types';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 

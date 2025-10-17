@@ -1,4 +1,4 @@
-#!/usr/bin/env -S npx tsx
+#!/usr/bin/env node
 
 import * as cmd from 'cmd-ts';
 import { checkShouldRunTypeChecks } from '../functions/index.mjs';

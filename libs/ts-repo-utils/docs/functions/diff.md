@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
----
+***
 
 [ts-repo-utils](../README.md) / functions/diff
 
@@ -31,7 +31,7 @@ diff --name-only <base> [--diff-filter=d]`
 
 `Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
----
+***
 
 ### getModifiedFiles()
 
@@ -52,7 +52,7 @@ not staged). Runs `git diff --name-only [--diff-filter=d]`
 
 `Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
----
+***
 
 ### getStagedFiles()
 
@@ -73,7 +73,7 @@ diff --staged --name-only [--diff-filter=d]`
 
 `Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
----
+***
 
 ### getUntrackedFiles()
 

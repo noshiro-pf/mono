@@ -8,3 +8,4 @@ tsconfig.json
 .cspell.json
 .prettierrc
 package-lock.json
+pnpm-lock.yaml

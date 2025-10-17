@@ -63,20 +63,18 @@ export const getWorkspacePackages = async (
       }),
     );
 
-    const packageInfos: readonly Package[] = await Promise.all(
-      packageJsonList
-        .filter(isNotUndefined)
-        .map(([packagePath, packageJson]) => ({
-          name: getStrFromJsonValue(packageJson, 'name'),
-          path: path.dirname(packagePath),
-          packageJson,
-          dependencies: {
-            ...getKeyValueRecordFromJsonValue(packageJson, 'dependencies'),
-            ...getKeyValueRecordFromJsonValue(packageJson, 'devDependencies'),
-            ...getKeyValueRecordFromJsonValue(packageJson, 'peerDependencies'),
-          },
-        })),
-    );
+    const packageInfos: readonly Package[] = packageJsonList
+      .filter(isNotUndefined)
+      .map(([packagePath, packageJson]) => ({
+        name: getStrFromJsonValue(packageJson, 'name'),
+        path: path.dirname(packagePath),
+        packageJson,
+        dependencies: {
+          ...getKeyValueRecordFromJsonValue(packageJson, 'dependencies'),
+          ...getKeyValueRecordFromJsonValue(packageJson, 'devDependencies'),
+          ...getKeyValueRecordFromJsonValue(packageJson, 'peerDependencies'),
+        },
+      }));
 
     return packageInfos;
   });

@@ -1,6 +1,6 @@
 [**ts-repo-utils**](../README.md)
 
----
+***
 
 [ts-repo-utils](../README.md) / functions/format
 
@@ -23,7 +23,7 @@ Format only files that differ from the specified base branch or commit
 `string`
 
 Base branch name or commit hash to compare against (defaults to
-'main')
+  'main')
 
 ##### options?
 
@@ -35,7 +35,7 @@ Options for formatting
 
 `Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
----
+***
 
 ### formatFiles()
 
@@ -61,7 +61,7 @@ Array of file paths to format
 
 `Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, readonly `unknown`[]\>\>
 
----
+***
 
 ### formatFilesGlob()
 
@@ -87,7 +87,7 @@ Glob pattern to match files
 
 `Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `unknown`\>\>
 
----
+***
 
 ### formatUncommittedFiles()
 
