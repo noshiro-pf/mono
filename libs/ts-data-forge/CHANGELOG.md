@@ -1,3 +1,9 @@
+## [3.3.1](https://github.com/noshiro-pf/ts-data-forge/compare/v3.3.0...v3.3.1) (2025-10-18)
+
+### Bug Fixes
+
+- add type checking and testing to JSDoc sample code ([#176](https://github.com/noshiro-pf/ts-data-forge/issues/176)) ([a41f6e0](https://github.com/noshiro-pf/ts-data-forge/commit/a41f6e0f344cae6c8ddefae3bab0683c6a2359ca))
+
 # [3.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.2.0...v3.3.0) (2025-09-16)
 
 ### Features
