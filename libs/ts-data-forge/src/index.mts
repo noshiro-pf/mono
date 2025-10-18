@@ -1,4 +1,3 @@
-export * from './array/index.mjs';
 export * from './collections/index.mjs';
 export * from './expect-type.mjs';
 export * from './functional/index.mjs';

@@ -5,17 +5,20 @@ import { Num } from './num.mjs';
 /** @internal */
 export namespace TsDataForgeInternals {
   /**
-   * Internal utilities for creating and managing refined (branded) number types.
+   * Internal utilities for creating and managing refined (branded) number
+   * types.
    *
    * This namespace provides factory functions and type utilities for building
    * type-safe numeric operations with compile-time constraints. It serves as
    * the foundation for all branded number types in the library, including:
+   *
    * - Integer types (Int, SafeInt, Int8, Int16, Int32)
    * - Unsigned types (UInt, UInt8, UInt16, UInt32)
    * - Constrained types (NonZero, NonNegative, Positive)
    * - Range-bounded types
    *
    * The utilities handle:
+   *
    * - Type validation and narrowing
    * - Arithmetic operations that preserve type constraints
    * - Automatic clamping for bounded types
@@ -40,6 +43,7 @@ export namespace TsDataForgeInternals {
 
     /**
      * Converts a branded number type to include the Int brand.
+     *
      * @template N - A branded number type
      * @internal
      */
@@ -60,6 +64,7 @@ export namespace TsDataForgeInternals {
 
     /**
      * Converts a branded number type to include the NonNegativeNumber brand.
+     *
      * @template N - A branded number type
      * @internal
      */
@@ -69,8 +74,9 @@ export namespace TsDataForgeInternals {
     >;
 
     /**
-     * Removes the non-zero brand constraint from a branded number type.
-     * Used when operations may produce zero values.
+     * Removes the non-zero brand constraint from a branded number type. Used
+     * when operations may produce zero values.
+     *
      * @template N - A branded number type
      * @internal
      */
@@ -83,16 +89,19 @@ export namespace TsDataForgeInternals {
     type CastToInt<N> = N extends Int ? N : never;
 
     /**
-     * Generates a type-safe API for a branded number type based on its characteristics.
+     * Generates a type-safe API for a branded number type based on its
+     * characteristics.
      *
-     * This type dynamically constructs an object type with appropriate methods based
-     * on the number class. For example:
+     * This type dynamically constructs an object type with appropriate methods
+     * based on the number class. For example:
+     *
      * - Integer types don't get floor/ceil/round methods
      * - Non-negative types don't get abs method
      * - Range-bounded types get MIN_VALUE/MAX_VALUE constants
      *
      * @template N - The branded number type
-     * @template classes - Union of characteristics: 'int' | 'non-negative' | 'positive' | 'range'
+     * @template classes - Union of characteristics: 'int' | 'non-negative' |
+     *   'positive' | 'range'
      * @internal
      */
     export type NumberClass<
@@ -271,28 +280,61 @@ export namespace TsDataForgeInternals {
     }>;
 
     /**
-     * Factory function that creates a complete set of type-safe operations for integer types.
+     * Factory function that creates a complete set of type-safe operations for
+     * integer types.
      *
      * This function generates:
+     *
      * - Type guards and validators
      * - Arithmetic operations that preserve type constraints
      * - Utility functions (min, max, abs, random)
      * - Automatic clamping for bounded types
      *
-     * All operations ensure results remain within the type's constraints,
-     * using clamping when bounds are specified.
+     * All operations ensure results remain within the type's constraints, using
+     * clamping when bounds are specified.
+     *
+     * @example
+     *
+     * ```ts
+     * const intOps = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
+     *   SafeInt,
+     *   number,
+     *   number
+     * >({
+     *   integerOrSafeInteger: 'SafeInteger',
+     *   MIN_VALUE: Number.MIN_SAFE_INTEGER,
+     *   MAX_VALUE: Number.MAX_SAFE_INTEGER,
+     *   typeNameInMessage: 'SafeInt',
+     * } as const);
+     *
+     * const six = intOps.castType(6);
+     * const four = intOps.castType(4);
+     * const sum = intOps.add(six, four);
+     * const difference = intOps.sub(six, four);
+     * const product = intOps.mul(six, four);
+     * const quotient = intOps.div(six, intOps.castType(2));
+     * const roundedClamp = intOps.clamp(1.5);
+     * const randomValue = intOps.random();
+     *
+     * assert(sum === 10);
+     * assert(difference === 2);
+     * assert(product === 24);
+     * assert(quotient === 3);
+     * assert(roundedClamp === 2);
+     * assert.ok(Number.isSafeInteger(randomValue));
+     * ```
      *
      * @template ElementType - The integer branded type
      * @template MIN_VALUE - Optional minimum value for bounded types
      * @template MAX_VALUE - Optional maximum value for bounded types
-     *
      * @param config - Configuration object
-     * @param config.integerOrSafeInteger - Whether to use Number.isInteger or Number.isSafeInteger
+     * @param config.integerOrSafeInteger - Whether to use Number.isInteger or
+     *   Number.isSafeInteger
      * @param config.nonZero - If true, excludes zero from valid values
      * @param config.MIN_VALUE - Minimum valid value (inclusive)
      * @param config.MAX_VALUE - Maximum valid value (inclusive)
-     * @param config.typeNameInMessage - Human-readable type name for error messages
-     *
+     * @param config.typeNameInMessage - Human-readable type name for error
+     *   messages
      * @returns Object containing all type-safe operations for the integer type
      * @internal
      */
@@ -452,28 +494,62 @@ export namespace TsDataForgeInternals {
     }>;
 
     /**
-     * Factory function that creates a complete set of type-safe operations for floating-point types.
+     * Factory function that creates a complete set of type-safe operations for
+     * floating-point types.
      *
      * This function generates:
+     *
      * - Type guards and validators (checking for finite values)
      * - Arithmetic operations that preserve type constraints
      * - Utility functions (min, max, abs, random)
      * - Automatic clamping for bounded types
      *
-     * All operations ensure results remain finite and within any specified bounds.
-     * Division by zero is prevented through type constraints.
+     * All operations ensure results remain finite and within any specified
+     * bounds. Division by zero is prevented through type constraints.
+     *
+     * @example
+     *
+     * ```ts
+     * const floatOps = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
+     *   PositiveFiniteNumber,
+     *   number,
+     *   number
+     * >({
+     *   nonZero: true,
+     *   MIN_VALUE: Number.MIN_VALUE,
+     *   MAX_VALUE: Number.MAX_VALUE,
+     *   typeNameInMessage: 'PositiveFiniteNumber',
+     * } as const);
+     *
+     * const fortyTwo = floatOps.castType(42.5);
+     * const seven = floatOps.castType(7.5);
+     * const sum = floatOps.add(fortyTwo, seven);
+     * const ratio = floatOps.div(sum, floatOps.castType(10));
+     * const clamped = floatOps.clamp(0);
+     * const boundedRandom = floatOps.random(
+     *   floatOps.castType(10),
+     *   floatOps.castType(20),
+     * );
+     * const nonZeroRandom = floatOps.randomNonZero();
+     *
+     * assert(sum === 50);
+     * assert(ratio === 5);
+     * assert.ok(clamped >= Number.MIN_VALUE);
+     * assert.ok(boundedRandom >= 10 && boundedRandom <= 20);
+     * assert.ok(nonZeroRandom > 0);
+     * ```
      *
      * @template ElementType - The floating-point branded type
      * @template MIN_VALUE - Optional minimum value for bounded types
      * @template MAX_VALUE - Optional maximum value for bounded types
-     *
      * @param config - Configuration object
      * @param config.nonZero - If true, excludes zero from valid values
      * @param config.MIN_VALUE - Minimum valid value (inclusive)
      * @param config.MAX_VALUE - Maximum valid value (inclusive)
-     * @param config.typeNameInMessage - Human-readable type name for error messages
-     *
-     * @returns Object containing all type-safe operations for the floating-point type
+     * @param config.typeNameInMessage - Human-readable type name for error
+     *   messages
+     * @returns Object containing all type-safe operations for the
+     *   floating-point type
      * @internal
      */
     export const operatorsForFloat = <

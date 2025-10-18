@@ -9,7 +9,7 @@ const config = {
   prettier: true,
   fix: true,
 
-  /** @type {import("markdownlint").Configuration} */
+  /** @type {import('markdownlint').Configuration} */
   config: {
     default: true,
     'line-length': false, // prefer Prettier's setting

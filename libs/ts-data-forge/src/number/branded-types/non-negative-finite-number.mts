@@ -52,6 +52,7 @@ expectType<TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>, Uint>(
 
 /**
  * Checks if a number is a NonNegativeFiniteNumber (a finite number >= 0).
+ *
  * @param value The value to check.
  * @returns `true` if the value is a NonNegativeFiniteNumber, `false` otherwise.
  */
@@ -59,64 +60,42 @@ export const isNonNegativeFiniteNumber = is;
 
 /**
  * Casts a number to a NonNegativeFiniteNumber type.
+ *
  * @param value The value to cast.
  * @returns The value as a NonNegativeFiniteNumber type.
  * @throws {TypeError} If the value is not a non-negative finite number.
- * @example
- * ```typescript
- * const x = asNonNegativeFiniteNumber(5.5); // NonNegativeFiniteNumber
- * const y = asNonNegativeFiniteNumber(0); // NonNegativeFiniteNumber
- * // asNonNegativeFiniteNumber(-1); // throws TypeError
- * // asNonNegativeFiniteNumber(Infinity); // throws TypeError
- * ```
  */
 export const asNonNegativeFiniteNumber = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for non-negative finite numbers.
+ * Namespace providing type-safe arithmetic operations for non-negative finite
+ * numbers.
  *
- * All operations maintain the non-negative constraint by clamping negative results to 0,
- * while ensuring results remain finite (excluding NaN and Infinity). This type is useful
- * for representing measurements, distances, weights, and other inherently non-negative values.
- *
- * @example
- * ```typescript
- * const distance = asNonNegativeFiniteNumber(5.5);
- * const speed = asNonNegativeFiniteNumber(2.2);
- *
- * // Arithmetic operations with non-negative clamping
- * const total = NonNegativeFiniteNumber.add(distance, speed);        // NonNegativeFiniteNumber (7.7)
- * const diff = NonNegativeFiniteNumber.sub(speed, distance);        // NonNegativeFiniteNumber (0 - clamped)
- * const area = NonNegativeFiniteNumber.mul(distance, speed);        // NonNegativeFiniteNumber (12.1)
- * const ratio = NonNegativeFiniteNumber.div(distance, speed);       // NonNegativeFiniteNumber (2.5)
- *
- * // Range operations
- * const clamped = NonNegativeFiniteNumber.clamp(-10.5);             // NonNegativeFiniteNumber (0)
- * const minimum = NonNegativeFiniteNumber.min(distance, speed);     // NonNegativeFiniteNumber (2.2)
- * const maximum = NonNegativeFiniteNumber.max(distance, speed);     // NonNegativeFiniteNumber (5.5)
- *
- * // Rounding operations (return Uint)
- * const pixels = NonNegativeFiniteNumber.round(distance);           // Uint (6)
- * const floorValue = NonNegativeFiniteNumber.floor(distance);       // Uint (5)
- * const ceilValue = NonNegativeFiniteNumber.ceil(distance);         // Uint (6)
- * ```
+ * All operations maintain the non-negative constraint by clamping negative
+ * results to 0, while ensuring results remain finite (excluding NaN and
+ * Infinity). This type is useful for representing measurements, distances,
+ * weights, and other inherently non-negative values.
  */
 export const NonNegativeFiniteNumber = {
   /**
    * Type guard to check if a value is a NonNegativeFiniteNumber.
+   *
    * @param value The value to check.
-   * @returns `true` if the value is a non-negative finite number, `false` otherwise.
+   * @returns `true` if the value is a non-negative finite number, `false`
+   *   otherwise.
    */
   is,
 
   /**
    * The minimum value for a non-negative finite number.
+   *
    * @readonly
    */
   MIN_VALUE,
 
   /**
    * Returns the smaller of two NonNegativeFiniteNumber values.
+   *
    * @param a The first NonNegativeFiniteNumber.
    * @param b The second NonNegativeFiniteNumber.
    * @returns The minimum value as a NonNegativeFiniteNumber.
@@ -125,6 +104,7 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Returns the larger of two NonNegativeFiniteNumber values.
+   *
    * @param a The first NonNegativeFiniteNumber.
    * @param b The second NonNegativeFiniteNumber.
    * @returns The maximum value as a NonNegativeFiniteNumber.
@@ -133,6 +113,7 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Clamps a number to the non-negative finite range.
+   *
    * @param value The number to clamp.
    * @returns The value clamped to [0, +∞) as a NonNegativeFiniteNumber.
    */
@@ -140,6 +121,7 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Rounds down a NonNegativeFiniteNumber to the nearest integer.
+   *
    * @param x The NonNegativeFiniteNumber to round down.
    * @returns The floor value as a Uint.
    */
@@ -147,6 +129,7 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Rounds up a NonNegativeFiniteNumber to the nearest integer.
+   *
    * @param x The NonNegativeFiniteNumber to round up.
    * @returns The ceiling value as a Uint.
    */
@@ -154,6 +137,7 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Rounds a NonNegativeFiniteNumber to the nearest integer.
+   *
    * @param x The NonNegativeFiniteNumber to round.
    * @returns The rounded value as a Uint.
    */
@@ -161,12 +145,15 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Generates a random NonNegativeFiniteNumber value.
+   *
    * @returns A random non-negative finite number.
    */
   random,
 
   /**
-   * Raises a NonNegativeFiniteNumber to the power of another NonNegativeFiniteNumber.
+   * Raises a NonNegativeFiniteNumber to the power of another
+   * NonNegativeFiniteNumber.
+   *
    * @param a The base NonNegativeFiniteNumber.
    * @param b The exponent NonNegativeFiniteNumber.
    * @returns `a ** b` clamped to [0, +∞) as a NonNegativeFiniteNumber.
@@ -175,6 +162,7 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Adds two NonNegativeFiniteNumber values.
+   *
    * @param a The first NonNegativeFiniteNumber.
    * @param b The second NonNegativeFiniteNumber.
    * @returns `a + b` clamped to [0, +∞) as a NonNegativeFiniteNumber.
@@ -183,14 +171,17 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Subtracts one NonNegativeFiniteNumber from another.
+   *
    * @param a The minuend NonNegativeFiniteNumber.
    * @param b The subtrahend NonNegativeFiniteNumber.
-   * @returns `a - b` clamped to [0, +∞) as a NonNegativeFiniteNumber (minimum 0).
+   * @returns `a - b` clamped to [0, +∞) as a NonNegativeFiniteNumber (minimum
+   *   0).
    */
   sub,
 
   /**
    * Multiplies two NonNegativeFiniteNumber values.
+   *
    * @param a The first NonNegativeFiniteNumber.
    * @param b The second NonNegativeFiniteNumber.
    * @returns `a * b` clamped to [0, +∞) as a NonNegativeFiniteNumber.
@@ -199,6 +190,7 @@ export const NonNegativeFiniteNumber = {
 
   /**
    * Divides one NonNegativeFiniteNumber by another.
+   *
    * @param a The dividend NonNegativeFiniteNumber.
    * @param b The divisor NonNegativeFiniteNumber.
    * @returns `a / b` clamped to [0, +∞) as a NonNegativeFiniteNumber.

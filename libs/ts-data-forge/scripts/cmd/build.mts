@@ -3,9 +3,7 @@ import { projectRootPath } from '../project-root-path.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');
 
-/**
- * Builds the entire project.
- */
+/** Builds the entire project. */
 const build = async (): Promise<void> => {
   echo('Starting build process...\n');
 

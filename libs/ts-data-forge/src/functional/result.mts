@@ -9,9 +9,9 @@ const OkTypeTagName = 'ts-data-forge::Result.ok';
 const ErrTypeTagName = 'ts-data-forge::Result.err';
 
 /**
+ * @template S The type of the success value.
  * @internal
  * Represents the 'Ok' variant of a Result, containing a success value.
- * @template S The type of the success value.
  */
 type Ok_<S> = Readonly<{
   /**
@@ -25,9 +25,9 @@ type Ok_<S> = Readonly<{
 }>;
 
 /**
+ * @template E The type of the error value.
  * @internal
  * Represents the 'Err' variant of a Result, containing an error value.
- * @template E The type of the error value.
  */
 type Err_<E> = Readonly<{
   /**
@@ -42,18 +42,32 @@ type Err_<E> = Readonly<{
 
 /**
  * Represents a value that can either be a success (`Ok`) or an error (`Err`).
+ *
  * @template S The type of the success value.
  * @template E The type of the error value.
  */
 export type Result<S, E> = Ok_<S> | Err_<E>;
 
 /**
- * Namespace for the `Result` type and related functions.
- * Provides utilities to handle operations that can succeed or fail.
+ * Namespace for the `Result` type and related functions. Provides utilities to
+ * handle operations that can succeed or fail.
  */
 export namespace Result {
   /**
    * Checks if the given value is a `Result`.
+   *
+   * @example
+   *
+   * ```ts
+   * const okValue = Result.ok('success');
+   * const errValue = Result.err(new Error('failure'));
+   * const notResult = { $$tag: 'ts-data-forge::Result.ok' };
+   *
+   * assert.ok(Result.isResult(okValue));
+   * assert.ok(Result.isResult(errValue));
+   * assert.notOk(Result.isResult(notResult));
+   * ```
+   *
    * @param maybeOptional The value to check.
    * @returns `true` if the value is a `Result`, otherwise `false`.
    */
@@ -68,46 +82,52 @@ export namespace Result {
 
   /**
    * Represents a `Result` that is a success, containing a value.
+   *
    * @template S The type of the success value.
    */
   export type Ok<S> = Ok_<S>;
 
   /**
    * Represents a `Result` that is an error, containing an error value.
+   *
    * @template E The type of the error value.
    */
   export type Err<E> = Err_<E>;
 
   /**
-   * Base type for any `Result`, used for generic constraints.
-   * Represents a `Result` with unknown success and error types.
+   * Base type for any `Result`, used for generic constraints. Represents a
+   * `Result` with unknown success and error types.
    */
   export type Base = Result<unknown, unknown>;
 
   /**
-   * Extracts the success value type `S` from a `Result.Ok<S>`.
-   * If the `Result` is `Result.Err<E>`, resolves to `never`.
+   * Extracts the success value type `S` from a `Result.Ok<S>`. If the `Result`
+   * is `Result.Err<E>`, resolves to `never`.
+   *
    * @template R The `Result.Base` type to unwrap.
    */
   export type UnwrapOk<R extends Base> = R extends Ok<infer S> ? S : never;
 
   /**
-   * Extracts the error value type `E` from a `Result.Err<E>`.
-   * If the `Result` is `Result.Ok<S>`, resolves to `never`.
+   * Extracts the error value type `E` from a `Result.Err<E>`. If the `Result`
+   * is `Result.Ok<S>`, resolves to `never`.
+   *
    * @template R The `Result.Base` type to unwrap.
    */
   export type UnwrapErr<R extends Base> = R extends Err<infer E> ? E : never;
 
   /**
-   * Narrows a `Result.Base` type to `Result.Ok<S>` if it is an `Ok`.
-   * If the `Result` is `Result.Err<E>`, resolves to `never`.
+   * Narrows a `Result.Base` type to `Result.Ok<S>` if it is an `Ok`. If the
+   * `Result` is `Result.Err<E>`, resolves to `never`.
+   *
    * @template R The `Result.Base` type to narrow.
    */
   export type NarrowToOk<R extends Base> = R extends Err<unknown> ? never : R;
 
   /**
-   * Narrows a `Result.Base` type to `Result.Err<E>` if it is an `Err`.
-   * If the `Result` is `Result.Ok<S>`, resolves to `never`.
+   * Narrows a `Result.Base` type to `Result.Err<E>` if it is an `Err`. If the
+   * `Result` is `Result.Ok<S>`, resolves to `never`.
+   *
    * @template R The `Result.Base` type to narrow.
    */
   export type NarrowToErr<R extends Base> = R extends Ok<unknown> ? never : R;
@@ -115,30 +135,25 @@ export namespace Result {
   /**
    * Creates a `Result.Ok` containing the given success value.
    *
-   * Use this constructor when an operation succeeds and you want to wrap
-   * the successful result in a Result type for consistent error handling.
+   * Use this constructor when an operation succeeds and you want to wrap the
+   * successful result in a Result type for consistent error handling.
+   *
+   * @example
+   *
+   * ```ts
+   * const success = Result.ok({ id: 1 });
+   * const failure = Result.err(new Error('missing data'));
+   *
+   * assert.deepStrictEqual(success, {
+   *   $$tag: 'ts-data-forge::Result.ok',
+   *   value: { id: 1 },
+   * });
+   * assert.ok(Result.isErr(failure));
+   * ```
    *
    * @template S The type of the success value.
    * @param value The success value.
    * @returns A `Result.Ok<S>` containing the value.
-   * @example
-   * ```typescript
-   * // Basic success case
-   * const success = Result.ok(42);
-   * console.log(Result.isOk(success)); // true
-   * console.log(Result.unwrapOk(success)); // 42
-   *
-   * // Function that returns a Result
-   * function divide(a: number, b: number): Result<number, string> {
-   *   if (b === 0) {
-   *     return Result.err("Division by zero");
-   *   }
-   *   return Result.ok(a / b);
-   * }
-   *
-   * const result = divide(10, 2);
-   * console.log(Result.unwrapOk(result)); // 5
-   * ```
    */
   export const ok = <S,>(value: S): Ok<S> => ({
     $$tag: OkTypeTagName,
@@ -148,42 +163,25 @@ export namespace Result {
   /**
    * Creates a `Result.Err` containing the given error value.
    *
-   * Use this constructor when an operation fails and you want to wrap
-   * the error information in a Result type for consistent error handling.
+   * Use this constructor when an operation fails and you want to wrap the error
+   * information in a Result type for consistent error handling.
+   *
+   * @example
+   *
+   * ```ts
+   * const success = Result.ok({ id: 1 });
+   * const failure = Result.err(new Error('missing data'));
+   *
+   * assert.deepStrictEqual(success, {
+   *   $$tag: 'ts-data-forge::Result.ok',
+   *   value: { id: 1 },
+   * });
+   * assert.ok(Result.isErr(failure));
+   * ```
    *
    * @template E The type of the error value.
    * @param value The error value.
    * @returns A `Result.Err<E>` containing the value.
-   * @example
-   * ```typescript
-   * // Basic error case
-   * const failure = Result.err("Something went wrong");
-   * console.log(Result.isErr(failure)); // true
-   * console.log(Result.unwrapErr(failure)); // "Something went wrong"
-   *
-   * // Function that can fail
-   * function parseInteger(input: string): Result<number, string> {
-   *   const num = parseInt(input, 10);
-   *   if (isNaN(num)) {
-   *     return Result.err(`Invalid number format: ${input}`);
-   *   }
-   *   return Result.ok(num);
-   * }
-   *
-   * const result = parseInteger("abc");
-   * console.log(Result.unwrapErr(result)); // "Invalid number format: abc"
-   *
-   * // Using custom error types
-   * interface ValidationError {
-   *   field: string;
-   *   message: string;
-   * }
-   *
-   * const validationError = Result.err<ValidationError>({
-   *   field: "email",
-   *   message: "Invalid email format"
-   * });
-   * ```
    */
   export const err = <E,>(value: E): Err<E> => ({
     $$tag: ErrTypeTagName,
@@ -197,119 +195,89 @@ export namespace Result {
   const toStr_ = String;
 
   /**
-   * Checks if a `Result` is `Result.Ok`.
-   * Acts as a type guard, narrowing the type to the success variant.
+   * Checks if a `Result` is `Result.Ok`. Acts as a type guard, narrowing the
+   * type to the success variant.
    *
    * This function is essential for type-safe Result handling, allowing
-   * TypeScript to understand that subsequent operations will work with
-   * the success value rather than the error value.
+   * TypeScript to understand that subsequent operations will work with the
+   * success value rather than the error value.
+   *
+   * @example
+   *
+   * ```ts
+   * const operation = Result.ok(3);
+   * const failure = Result.err('error');
+   *
+   * if (Result.isOk(operation)) {
+   *   const value: number = operation.value;
+   *   assert(value === 3);
+   * }
+   *
+   * assert.ok(Result.isErr(failure));
+   * ```
    *
    * @template R The `Result.Base` type to check.
    * @param result The `Result` to check.
    * @returns `true` if the `Result` is `Result.Ok`, otherwise `false`.
-   * @example
-   * ```typescript
-   * // Basic type guard usage
-   * const result: Result<number, string> = divide(10, 2);
-   *
-   * if (Result.isOk(result)) {
-   *   // TypeScript knows result is Result.Ok<number>
-   *   console.log(result.value); // Safe to access .value
-   *   console.log(Result.unwrapOk(result)); // 5
-   * } else {
-   *   // TypeScript knows result is Result.Err<string>
-   *   console.log(result.value); // Error message
-   * }
-   *
-   * // Using in conditional logic
-   * const processResult = (r: Result<string, Error>) => {
-   *   return Result.isOk(r)
-   *     ? r.value.toUpperCase() // Safe string operations
-   *     : "Error occurred";
-   * };
-   *
-   * // Filtering arrays of Results
-   * const results: Result<number, string>[] = [
-   *   Result.ok(1),
-   *   Result.err("error"),
-   *   Result.ok(2)
-   * ];
-   * const successes = results.filter(Result.isOk);
-   * // successes is Result.Ok<number>[]
-   * ```
    */
   export const isOk = <R extends Base>(result: R): result is NarrowToOk<R> =>
     result.$$tag === OkTypeTagName;
 
   /**
-   * Checks if a `Result` is `Result.Err`.
-   * Acts as a type guard, narrowing the type to the error variant.
+   * Checks if a `Result` is `Result.Err`. Acts as a type guard, narrowing the
+   * type to the error variant.
    *
    * This function is essential for type-safe Result handling, allowing
-   * TypeScript to understand that subsequent operations will work with
-   * the error value rather than the success value.
+   * TypeScript to understand that subsequent operations will work with the
+   * error value rather than the success value.
+   *
+   * @example
+   *
+   * ```ts
+   * const operation = Result.ok(3);
+   * const failure = Result.err('error');
+   *
+   * if (Result.isOk(operation)) {
+   *   const value: number = operation.value;
+   *   assert(value === 3);
+   * }
+   *
+   * assert.ok(Result.isErr(failure));
+   * ```
    *
    * @template R The `Result.Base` type to check.
    * @param result The `Result` to check.
    * @returns `true` if the `Result` is `Result.Err`, otherwise `false`.
-   * @example
-   * ```typescript
-   * // Basic type guard usage
-   * const result: Result<number, string> = divide(10, 0);
-   *
-   * if (Result.isErr(result)) {
-   *   // TypeScript knows result is Result.Err<string>
-   *   console.log(result.value); // Safe to access error .value
-   *   console.log(Result.unwrapErr(result)); // "Division by zero"
-   * } else {
-   *   // TypeScript knows result is Result.Ok<number>
-   *   console.log(result.value); // Success value
-   * }
-   *
-   * // Error handling patterns
-   * const handleResult = (r: Result<Data, ApiError>) => {
-   *   if (Result.isErr(r)) {
-   *     logError(r.value); // Safe error operations
-   *     return null;
-   *   }
-   *   return processData(r.value);
-   * };
-   *
-   * // Collecting errors from multiple Results
-   * const results: Result<string, ValidationError>[] = validateForm();
-   * const errors = results
-   *   .filter(Result.isErr)
-   *   .map(err => err.value); // ValidationError[]
-   * ```
    */
   export const isErr = <R extends Base>(result: R): result is NarrowToErr<R> =>
     result.$$tag === ErrTypeTagName;
 
   /**
-   * Unwraps a `Result`, returning the success value.
-   * Throws an error if the `Result` is `Result.Err`.
+   * Unwraps a `Result`, returning the success value. Throws an error if the
+   * `Result` is `Result.Err`.
    *
-   * This is useful when you're confident that a Result should contain a success value
-   * and want to treat errors as exceptional conditions. The error message will be
-   * constructed from the error value using the provided string conversion function.
+   * This is useful when you're confident that a Result should contain a success
+   * value and want to treat errors as exceptional conditions. The error message
+   * will be constructed from the error value using the provided string
+   * conversion function.
+   *
+   * @example
+   *
+   * ```ts
+   * const okResult = Result.ok('data');
+   * const errResult = Result.err(new Error('fail'));
+   *
+   * assert(Result.unwrapThrow(okResult) === 'data');
+   * assert.throws(() => Result.unwrapThrow(errResult), /fail/u);
+   * ```
    *
    * @template R The `Result.Base` type to unwrap.
    * @param result The `Result` to unwrap.
-   * @param toStr An optional function to convert the error value to a string for the error message. Defaults to `String`.
+   * @param toStr An optional function to convert the error value to a string
+   *   for the error message. Defaults to `String`.
    * @returns The success value if `Result.Ok`.
-   * @throws {Error} Error with the stringified error value if the `Result` is `Result.Err`.
-   * @example
-   * ```typescript
-   * const success = Result.ok(42);
-   * console.log(Result.unwrapThrow(success)); // 42
-   *
-   * const failure = Result.err("Network error");
-   * try {
-   *   Result.unwrapThrow(failure); // throws Error: "Network error"
-   * } catch (error) {
-   *   console.log(error.message); // "Network error"
-   * }
-   * ```
+   * @throws {Error} Error with the stringified error value if the `Result` is
+   *   `Result.Err`.
    */
   export const unwrapThrow = <R extends Base>(
     result: R,
@@ -325,39 +293,33 @@ export namespace Result {
   };
 
   /**
-   * Unwraps a `Result`, returning the success value or `undefined` if it's an error.
+   * Unwraps a `Result`, returning the success value or `undefined` if it's an
+   * error.
    *
-   * This function provides a safe way to extract success values from Results without
-   * throwing exceptions. It has overloaded behavior based on the type:
+   * This function provides a safe way to extract success values from Results
+   * without throwing exceptions. It has overloaded behavior based on the type:
+   *
    * - For `Result.Ok<T>`: Always returns `T` (guaranteed by type system)
    * - For general `Result<T, E>`: Returns `T | undefined`
+   *
+   * @example
+   *
+   * ```ts
+   * const okResult = Result.ok(42);
+   * const errResult = Result.err('oops');
+   *
+   * // Result.unwrapOk returns the value for Ok results
+   *
+   * assert(Result.unwrapOk(okResult) === 42);
+   *
+   * // Result.unwrapOk returns undefined for Err results
+   * // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+   * assert(Result.unwrapOk(errResult) === undefined);
+   * ```
    *
    * @template R The `Result.Base` type to unwrap.
    * @param result The `Result` to unwrap.
    * @returns The success value if `Result.Ok`, otherwise `undefined`.
-   * @example
-   * ```typescript
-   * // With guaranteed Ok - returns the value
-   * const success = Result.ok(42);
-   * const value = Result.unwrapOk(success); // Type: number, Value: 42
-   *
-   * // With general Result - may return undefined
-   * const maybeResult: Result<string, Error> = fetchData();
-   * const data = Result.unwrapOk(maybeResult); // Type: string | undefined
-   *
-   * // Safe pattern for handling both cases
-   * const result = Result.ok("hello");
-   * const unwrapped = Result.unwrapOk(result);
-   * if (unwrapped !== undefined) {
-   *   console.log(unwrapped.toUpperCase()); // "HELLO"
-   * }
-   *
-   * // Useful in conditional chains
-   * const processResult = (r: Result<number, string>) => {
-   *   const value = Result.unwrapOk(r);
-   *   return value !== undefined ? value * 2 : 0;
-   * };
-   * ```
    */
   export function unwrapOk<R extends Ok<unknown>>(result: R): UnwrapOk<R>;
 
@@ -371,18 +333,29 @@ export namespace Result {
   }
 
   /**
-   * Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
+   * Unwraps a `Result`, returning the success value or a default value if it is
+   * `Result.Err`.
+   *
+   * @example
+   *
+   * ```ts
+   * const okValue = Result.ok(10);
+   * const errValue = Result.err('fail');
+   *
+   * assert(Result.unwrapOkOr(okValue, 0) === 10);
+   * assert(Result.unwrapOkOr(errValue, 0) === 0);
+   *
+   * const unwrapWithDefault = Result.unwrapOkOr(5);
+   *
+   * assert(unwrapWithDefault(Result.ok(3)) === 3);
+   * assert(unwrapWithDefault(Result.err('no data')) === 5);
+   * ```
+   *
    * @template R The `Result.Base` type to unwrap.
    * @template D The type of the default value.
    * @param result The `Result` to unwrap.
    * @param defaultValue The value to return if `result` is `Result.Err`.
    * @returns The success value if `Result.Ok`, otherwise `defaultValue`.
-   * @example
-   * ```typescript
-   * const result = Result.ok(42);
-   * const value = Result.unwrapOkOr(result, 0);
-   * console.log(value); // 42
-   * ```
    */
   export function unwrapOkOr<R extends Base, D>(
     result: R,
@@ -418,30 +391,31 @@ export namespace Result {
   }
 
   /**
-   * Unwraps a `Result`, returning the error value.
-   * Throws an error if the `Result` is `Result.Ok`.
+   * Unwraps a `Result`, returning the error value. Throws an error if the
+   * `Result` is `Result.Ok`.
    *
    * This function is used when you expect a Result to be an error and want to
-   * extract the error value. If the Result is unexpectedly Ok, it will throw
-   * an error with information about the unexpected success value.
+   * extract the error value. If the Result is unexpectedly Ok, it will throw an
+   * error with information about the unexpected success value.
+   *
+   * @example
+   *
+   * ```ts
+   * const errResult = Result.err(new Error('broken'));
+   * const okResult = Result.ok('value');
+   *
+   * assert(Result.unwrapErrThrow(errResult).message === 'broken');
+   * assert.throws(() => Result.unwrapErrThrow(okResult), /Expected Err/u);
+   * ```
    *
    * @template R The `Result.Base` type to unwrap.
    * @param result The `Result` to unwrap.
-   * @param toStr An optional function to convert the success value to a string for the error message when the Result is unexpectedly Ok. Defaults to `String`.
+   * @param toStr An optional function to convert the success value to a string
+   *   for the error message when the Result is unexpectedly Ok. Defaults to
+   *   `String`.
    * @returns The error value if `Result.Err`.
-   * @throws {Error} Error with message "Expected Err but got Ok: {value}" if the `Result` is `Result.Ok`.
-   * @example
-   * ```typescript
-   * const failure = Result.err("Network timeout");
-   * console.log(Result.unwrapErrThrow(failure)); // "Network timeout"
-   *
-   * const success = Result.ok(42);
-   * try {
-   *   Result.unwrapErrThrow(success); // throws Error: "Expected Err but got Ok: 42"
-   * } catch (error) {
-   *   console.log(error.message); // "Expected Err but got Ok: 42"
-   * }
-   * ```
+   * @throws {Error} Error with message "Expected Err but got Ok: {value}" if
+   *   the `Result` is `Result.Ok`.
    */
   export const unwrapErrThrow = <R extends Base>(
     result: R,
@@ -459,23 +433,31 @@ export namespace Result {
   };
 
   /**
-   * Unwraps a `Result`, returning the error value or `undefined` if it is `Result.Ok`.
+   * Unwraps a `Result`, returning the error value or `undefined` if it is
+   * `Result.Ok`.
    *
-   * This provides a safe way to extract error values from Results without throwing
-   * exceptions. Useful for error handling patterns where you want to check for
-   * specific error conditions.
+   * This provides a safe way to extract error values from Results without
+   * throwing exceptions. Useful for error handling patterns where you want to
+   * check for specific error conditions.
+   *
+   * @example
+   *
+   * ```ts
+   * const okResult = Result.ok('data');
+   * const errResult = Result.err('problem');
+   *
+   * // Result.unwrapErr returns undefined for Ok results
+   * // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+   * assert(Result.unwrapErr(okResult) === undefined);
+   *
+   * // Result.unwrapErr returns the error value for Err results
+   *
+   * assert(Result.unwrapErr(errResult) === 'problem');
+   * ```
    *
    * @template R The `Result.Base` type to unwrap.
    * @param result The `Result` to unwrap.
    * @returns The error value if `Result.Err`, otherwise `undefined`.
-   * @example
-   * ```typescript
-   * const failure = Result.err("Connection failed");
-   * console.log(Result.unwrapErr(failure)); // "Connection failed"
-   *
-   * const success = Result.ok(42);
-   * console.log(Result.unwrapErr(success)); // undefined
-   * ```
    */
   export const unwrapErr = <R extends Base>(
     result: R,
@@ -484,18 +466,29 @@ export namespace Result {
     isErr(result) ? (result.value as UnwrapErr<R>) : undefined;
 
   /**
-   * Unwraps a `Result`, returning the error value or a default value if it is `Result.Ok`.
+   * Unwraps a `Result`, returning the error value or a default value if it is
+   * `Result.Ok`.
+   *
+   * @example
+   *
+   * ```ts
+   * const okResult = Result.ok('success');
+   * const errResult = Result.err('failure');
+   *
+   * assert(Result.unwrapErrOr(okResult, 'default') === 'default');
+   * assert(Result.unwrapErrOr(errResult, 'default') === 'failure');
+   *
+   * const unwrapError = Result.unwrapErrOr('fallback error');
+   *
+   * assert(unwrapError(Result.err('boom')) === 'boom');
+   * assert(unwrapError(Result.ok('no error')) === 'fallback error');
+   * ```
+   *
    * @template R The `Result.Base` type to unwrap.
    * @template D The type of the default value.
    * @param result The `Result` to unwrap.
    * @param defaultValue The value to return if `result` is `Result.Ok`.
    * @returns The error value if `Result.Err`, otherwise `defaultValue`.
-   * @example
-   * ```typescript
-   * const result = Result.err("failed");
-   * const error = Result.unwrapErrOr(result, "default");
-   * console.log(error); // "failed"
-   * ```
    */
   export function unwrapErrOr<R extends Base, D>(
     result: R,
@@ -531,25 +524,34 @@ export namespace Result {
   }
 
   /**
-   * Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
-   * If the `Result` is `Result.Err`, returns the original `Err`.
+   * Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the
+   * success value. If the `Result` is `Result.Err`, returns the original
+   * `Err`.
+   *
+   * @example
+   *
+   * ```ts
+   * const okNumber = Result.ok(5);
+   * const errMessage = Result.err('error');
+   *
+   * const doubled = Result.map(okNumber, (value) => value * 2);
+   * const untouchedError = Result.map(errMessage, (value: number) => value * 2);
+   *
+   * assert.deepStrictEqual(doubled, Result.ok(10));
+   * assert.deepStrictEqual(untouchedError, errMessage);
+   *
+   * const mapToLength = Result.map((text: string) => text.length);
+   *
+   * assert.deepStrictEqual(mapToLength(Result.ok('abc')), Result.ok(3));
+   * assert.deepStrictEqual(mapToLength(Result.err('bad')), Result.err('bad'));
+   * ```
+   *
    * @template R The input `Result.Base` type.
-   * @template S2 The type of the success value returned by the mapping function.
+   * @template S2 The type of the success value returned by the mapping
+   *   function.
    * @param result The `Result` to map.
    * @param mapFn The function to apply to the success value if present.
    * @returns A new `Result<S2, UnwrapErr<R>>`.
-   * @example
-   * ```typescript
-   * // Regular usage
-   * const result = Result.ok(5);
-   * const mapped = Result.map(result, x => x * 2);
-   * console.log(Result.unwrap(mapped)); // 10
-   *
-   * // Curried version for use with pipe
-   * const doubler = Result.map((x: number) => x * 2);
-   * const result2 = pipe(Result.ok(5)).map(doubler).value;
-   * console.log(Result.unwrap(result2)); // 10
-   * ```
    */
   export function map<R extends Base, S2>(
     result: R,
@@ -585,19 +587,33 @@ export namespace Result {
   }
 
   /**
-   * Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
-   * If the `Result` is `Result.Ok`, returns the original `Ok`.
+   * Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the
+   * error value. If the `Result` is `Result.Ok`, returns the original `Ok`.
+   *
+   * @example
+   *
+   * ```ts
+   * const okValue = Result.ok(3) as Result<number, string>;
+   * const errValue = Result.err('missing');
+   *
+   * const untouchedOk = Result.mapErr(okValue, (error) => error.toUpperCase());
+   * const uppercasedErr = Result.mapErr(errValue, (error) => error.toUpperCase());
+   *
+   * assert.deepStrictEqual(untouchedOk, Result.ok(3));
+   * assert.deepStrictEqual(uppercasedErr, Result.err('MISSING'));
+   *
+   * const mapError = Result.mapErr((error: Readonly<Error>) => error.message);
+   *
+   * const wrapped = mapError(Result.err(new Error('boom')));
+   *
+   * assert.deepStrictEqual(wrapped, Result.err('boom'));
+   * ```
+   *
    * @template R The input `Result.Base` type.
    * @template E2 The type of the error value returned by the mapping function.
    * @param result The `Result` to map.
    * @param mapFn The function to apply to the error value if present.
    * @returns A new `Result<UnwrapOk<R>, E2>`.
-   * @example
-   * ```typescript
-   * const result = Result.err("error");
-   * const mapped = Result.mapErr(result, e => e.toUpperCase());
-   * console.log(Result.unwrapErr(mapped)); // "ERROR"
-   * ```
    */
   export function mapErr<R extends Base, E2>(
     result: R,
@@ -633,7 +649,38 @@ export namespace Result {
   }
 
   /**
-   * Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
+   * Applies one of two functions depending on whether the `Result` is `Ok` or
+   * `Err`.
+   *
+   * @example
+   *
+   * ```ts
+   * const okValue = Result.ok(2);
+   * const errValue = Result.err('bad');
+   *
+   * const foldedOk = Result.fold(
+   *   okValue,
+   *   (value) => value * 2,
+   *   (error) => error,
+   * );
+   * const foldedErr = Result.fold(
+   *   errValue,
+   *   (value: number) => value * 2,
+   *   (error) => error.toUpperCase(),
+   * );
+   *
+   * assert.deepStrictEqual(foldedOk, Result.ok(4));
+   * assert.deepStrictEqual(foldedErr, Result.err('BAD'));
+   *
+   * const foldNumbers = Result.fold(
+   *   (value: number) => value * 3,
+   *   (error: string) => error.length,
+   * );
+   *
+   * assert.deepStrictEqual(foldNumbers(Result.ok(3)), Result.ok(9));
+   * assert.deepStrictEqual(foldNumbers(Result.err('oops')), Result.err(4));
+   * ```
+   *
    * @template R The input `Result.Base` type.
    * @template S2 The type of the success value returned by `mapFn`.
    * @template E2 The type of the error value returned by `mapErrFn`.
@@ -641,12 +688,6 @@ export namespace Result {
    * @param mapFn The function to apply if `result` is `Ok`.
    * @param mapErrFn The function to apply if `result` is `Err`.
    * @returns A new `Result<S2, E2>` based on the applied function.
-   * @example
-   * ```typescript
-   * const result = Result.ok(42);
-   * const folded = Result.fold(result, x => x * 2, () => 0);
-   * console.log(Result.unwrapOk(folded)); // 84
-   * ```
    */
   export function fold<R extends Base, S2, E2>(
     result: R,
@@ -693,23 +734,39 @@ export namespace Result {
   }
 
   /**
-   * Applies a function that returns a `Result` to the success value of a `Result`.
-   * If the input is `Err`, returns the original `Err`.
-   * This is the monadic bind operation for `Result`.
+   * Applies a function that returns a `Result` to the success value of a
+   * `Result`. If the input is `Err`, returns the original `Err`. This is the
+   * monadic bind operation for `Result`.
+   *
+   * @example
+   *
+   * ```ts
+   * const parseNumber = (input: string): Result<number, string> => {
+   *   const num = Number.parseInt(input, 10);
+   *   return Number.isNaN(num) ? Result.err('not a number') : Result.ok(num);
+   * };
+   *
+   * const parsed = Result.flatMap(Result.ok('42'), parseNumber);
+   * const failure = Result.flatMap(Result.ok('abc'), parseNumber);
+   * const passthrough = Result.flatMap(Result.err('fail'), parseNumber);
+   *
+   * assert.deepStrictEqual(parsed, Result.ok(42));
+   * assert.deepStrictEqual(failure, Result.err('not a number'));
+   * assert.deepStrictEqual(passthrough, Result.err('fail'));
+   *
+   * const parseThenDouble = Result.flatMap((input: string) =>
+   *   Result.map(parseNumber(input), (value) => value * 2),
+   * );
+   *
+   * assert.deepStrictEqual(parseThenDouble(Result.ok('10')), Result.ok(20));
+   * ```
+   *
    * @template R The input `Result.Base` type.
    * @template S2 The success type of the `Result` returned by the function.
    * @template E2 The error type of the `Result` returned by the function.
    * @param result The `Result` to flat map.
    * @param flatMapFn The function to apply that returns a `Result`.
    * @returns The result of applying the function, or the original `Err`.
-   * @example
-   * ```typescript
-   * const divide = (a: number, b: number): Result<number, string> =>
-   *   b === 0 ? Result.err("Division by zero") : Result.ok(a / b);
-   *
-   * const result = Result.flatMap(Result.ok(10), x => divide(x, 2));
-   * console.log(Result.unwrapOk(result)); // 5
-   * ```
    */
   export function flatMap<R extends Base, S2, E2>(
     result: R,
@@ -747,18 +804,27 @@ export namespace Result {
   }
 
   /**
-   * Unwraps a `Result`, returning the success value or throwing an error with the provided message.
+   * Unwraps a `Result`, returning the success value or throwing an error with
+   * the provided message.
+   *
+   * @example
+   *
+   * ```ts
+   * const okValue = Result.ok('data');
+   *
+   * assert(Result.expectToBe(okValue, 'should have value') === 'data');
+   *
+   * const expectResult = Result.expectToBe<string>('missing result');
+   *
+   * assert.throws(() => expectResult(Result.err('boom')), /missing result/u);
+   * assert(expectResult(Result.ok('value')) === 'value');
+   * ```
+   *
    * @template R The `Result.Base` type to unwrap.
    * @param result The `Result` to unwrap.
    * @param message The error message to throw if the `Result` is `Result.Err`.
    * @returns The success value if `Result.Ok`.
    * @throws Error with the provided message if the `Result` is `Result.Err`.
-   * @example
-   * ```typescript
-   * const result = Result.ok(42);
-   * const value = Result.expectToBe(result, "Operation must succeed");
-   * console.log(value); // 42
-   * ```
    */
   export function expectToBe<R extends Base>(
     result: R,
@@ -794,20 +860,32 @@ export namespace Result {
   }
 
   /**
+   * @template P The Promise type.
    * @internal
    * Utility type to extract the resolved value type from a Promise.
-   * @template P The Promise type.
-   * @example
-   * UnwrapPromise<Promise<string>> // string
-   * UnwrapPromise<Promise<number>> // number
    */
   type UnwrapPromise<P extends Promise<unknown>> =
     P extends Promise<infer V> ? V : never;
 
   /**
-   * Converts a Promise into a Promise that resolves to a `Result`.
-   * If the input Promise resolves, the `Result` will be `Ok` with the resolved value.
-   * If the input Promise rejects, the `Result` will be `Err` with the rejection reason.
+   * Converts a Promise into a Promise that resolves to a `Result`. If the input
+   * Promise resolves, the `Result` will be `Ok` with the resolved value. If the
+   * input Promise rejects, the `Result` will be `Err` with the rejection
+   * reason.
+   *
+   * @example
+   *
+   * ```ts
+   * const successPromise = Result.fromPromise(Promise.resolve('ok'));
+   * const failurePromise = Result.fromPromise(Promise.reject(new Error('fail')));
+   *
+   * const resolved = await successPromise;
+   * const rejected = await failurePromise;
+   *
+   * assert.deepStrictEqual(resolved, Result.ok('ok'));
+   * assert.ok(Result.isErr(rejected));
+   * ```
+   *
    * @template P The type of the input Promise.
    * @param promise The Promise to convert.
    * @returns A Promise that resolves to `Result<UnwrapPromise<P>, unknown>`.
@@ -821,28 +899,29 @@ export namespace Result {
   /**
    * Wraps a function that may throw an exception in a `Result`.
    *
-   * This is a fundamental utility for converting traditional exception-based error
-   * handling into Result-based error handling. Any thrown value is converted to an
-   * Error object for consistent error handling.
+   * This is a fundamental utility for converting traditional exception-based
+   * error handling into Result-based error handling. Any thrown value is
+   * converted to an Error object for consistent error handling.
    *
    * If the function executes successfully, returns `Result.Ok` with the result.
    * If the function throws, returns `Result.Err` with the caught error.
    *
+   * @example
+   *
+   * ```ts
+   * const success = Result.fromThrowable(() => 1 + 1);
+   * const failure = Result.fromThrowable(() => {
+   *   throw new Error('boom');
+   * });
+   *
+   * assert.deepStrictEqual(success, Result.ok(2));
+   * assert.ok(Result.isErr(failure));
+   * ```
+   *
    * @template T The return type of the function.
    * @param fn The function to execute that may throw.
-   * @returns A `Result<T, Error>` containing either the successful result or the caught error.
-   * @example
-   * ```typescript
-   * // Wrapping JSON.parse which can throw
-   * const parseJson = <T>(text: string): Result<T, Error> =>
-   *   Result.fromThrowable(() => JSON.parse(text) as T);
-   *
-   * const validJson = parseJson<{valid: boolean}>('{"valid": true}');
-   * if (Result.isOk(validJson)) {
-   *   console.log(validJson.value.valid); // true
-   * }
-   *
-   * ```
+   * @returns A `Result<T, Error>` containing either the successful result or
+   *   the caught error.
    */
   export const fromThrowable = <T,>(fn: () => T): Result<T, Error> => {
     try {
@@ -858,16 +937,20 @@ export namespace Result {
 
   /**
    * Swaps the success and error values of a `Result`.
+   *
+   * @example
+   *
+   * ```ts
+   * const okValue = Result.ok('value');
+   * const errValue = Result.err('error');
+   *
+   * assert.deepStrictEqual(Result.swap(okValue), Result.err('value'));
+   * assert.deepStrictEqual(Result.swap(errValue), Result.ok('error'));
+   * ```
+   *
    * @template R The input `Result.Base` type.
    * @param result The `Result` to swap.
    * @returns A new `Result` with success and error swapped.
-   * @example
-   * ```typescript
-   * const okResult = Result.ok(42);
-   * const swapped = Result.swap(okResult);
-   * console.log(Result.isErr(swapped)); // true
-   * console.log(Result.unwrapErr(swapped)); // 42
-   * ```
    */
   export const swap = <R extends Base>(
     result: R,
@@ -878,29 +961,27 @@ export namespace Result {
   /**
    * Converts a `Result` to an `Optional`.
    *
-   * This conversion is useful when you want to discard error information and only
-   * care about whether an operation succeeded. The error information is lost in
-   * this conversion, so use it when error details are not needed.
+   * This conversion is useful when you want to discard error information and
+   * only care about whether an operation succeeded. The error information is
+   * lost in this conversion, so use it when error details are not needed.
    *
-   * If the `Result` is `Ok`, returns `Some` with the value.
-   * If the `Result` is `Err`, returns `None`.
+   * If the `Result` is `Ok`, returns `Some` with the value. If the `Result` is
+   * `Err`, returns `None`.
+   *
+   * @example
+   *
+   * ```ts
+   * const okValue = Result.ok(7);
+   * const errValue = Result.err('fail');
+   *
+   * assert.deepStrictEqual(Result.toOptional(okValue), Optional.some(7));
+   * assert.deepStrictEqual(Result.toOptional(errValue), Optional.none);
+   * ```
    *
    * @template R The input `Result.Base` type.
    * @param result The `Result` to convert.
-   * @returns An `Optional<UnwrapOk<R>>` containing the success value or representing `None`.
-   * @example
-   * ```typescript
-   * // Basic conversion
-   * const okResult = Result.ok(42);
-   * const optional = Result.toOptional(okResult);
-   * console.log(Optional.isSome(optional)); // true
-   * console.log(Optional.unwrap(optional)); // 42
-   *
-   * const errResult = Result.err("Network error");
-   * const none = Result.toOptional(errResult);
-   * console.log(Optional.isNone(none)); // true
-   *
-   * ```
+   * @returns An `Optional<UnwrapOk<R>>` containing the success value or
+   *   representing `None`.
    */
   export const toOptional = <R extends Base>(
     result: R,
@@ -909,17 +990,31 @@ export namespace Result {
 
   /**
    * Returns the `Result` if it is `Ok`, otherwise returns the alternative.
+   *
+   * @example
+   *
+   * ```ts
+   * const primary = Result.ok('primary');
+   * const fallback = Result.ok('fallback');
+   * const failure = Result.err('failure');
+   *
+   * assert.deepStrictEqual(Result.orElse(primary, fallback), primary);
+   * assert.deepStrictEqual(Result.orElse(failure, fallback), fallback);
+   *
+   * const orElseFallback = Result.orElse(Result.ok('default'));
+   *
+   * assert.deepStrictEqual(
+   *   orElseFallback(Result.err('missing')),
+   *   Result.ok('default'),
+   * );
+   * assert.deepStrictEqual(orElseFallback(Result.ok('value')), Result.ok('value'));
+   * ```
+   *
    * @template R The input `Result.Base` type.
    * @param result The `Result` to check.
-   * @param alternative The alternative `Result` to return if the first is `Err`.
+   * @param alternative The alternative `Result` to return if the first is
+   *   `Err`.
    * @returns The first `Result` if `Ok`, otherwise the alternative.
-   * @example
-   * ```typescript
-   * const primary = Result.err("error");
-   * const fallback = Result.ok("default");
-   * const result = Result.orElse(primary, fallback);
-   * console.log(Result.unwrapOk(result)); // "default"
-   * ```
    */
   export function orElse<R extends Base, R2 extends Base>(
     result: R,
@@ -954,8 +1049,24 @@ export namespace Result {
   }
 
   /**
-   * Combines two `Result` values into a single `Result` containing a tuple.
-   * If either `Result` is `Err`, returns the first `Err` encountered.
+   * Combines two `Result` values into a single `Result` containing a tuple. If
+   * either `Result` is `Err`, returns the first `Err` encountered.
+   *
+   * @example
+   *
+   * ```ts
+   * const first = Result.ok('left');
+   * const second = Result.ok(1);
+   *
+   * const expected: readonly [string, number] = ['left', 1];
+   *
+   * assert.deepStrictEqual(Result.zip(first, second), Result.ok(expected));
+   * assert.deepStrictEqual(
+   *   Result.zip(first, Result.err('error')),
+   *   Result.err('error'),
+   * );
+   * ```
+   *
    * @template S1 The success type of the first `Result`.
    * @template E1 The error type of the first `Result`.
    * @template S2 The success type of the second `Result`.
@@ -963,16 +1074,6 @@ export namespace Result {
    * @param resultA The first `Result`.
    * @param resultB The second `Result`.
    * @returns A `Result` containing a tuple of both values, or the first `Err`.
-   * @example
-   * ```typescript
-   * const a = Result.ok(1);
-   * const b = Result.ok("hello");
-   * const zipped = Result.zip(a, b);
-   * console.log(Result.unwrapOk(zipped)); // [1, "hello"]
-   *
-   * const withErr = Result.zip(a, Result.err("error"));
-   * console.log(Result.unwrapErr(withErr)); // "error"
-   * ```
    */
   export const zip = <S1, E1, S2, E2>(
     resultA: Result<S1, E1>,

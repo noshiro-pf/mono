@@ -7,9 +7,9 @@ const SomeTypeTagName = 'ts-data-forge::Optional.some';
 const NoneTypeTagName = 'ts-data-forge::Optional.none';
 
 /**
+ * @template S The type of the contained value.
  * @internal
  * Represents the 'Some' variant of an Optional, containing a value.
- * @template S The type of the contained value.
  */
 type Some_<S> = Readonly<{
   /**
@@ -35,18 +35,32 @@ type None_ = Readonly<{
 }>;
 
 /**
- * Represents an optional value that can either be 'Some' (containing a value) or 'None' (empty).
+ * Represents an optional value that can either be 'Some' (containing a value)
+ * or 'None' (empty).
+ *
  * @template S The type of the value that might be present.
  */
 export type Optional<S> = None_ | Some_<S>;
 
 /**
- * Namespace for the {@link Optional} type and related functions.
- * Provides utilities to handle values that might be absent, similar to Option types in other languages.
+ * Namespace for the {@link Optional} type and related functions. Provides
+ * utilities to handle values that might be absent, similar to Option types in
+ * other languages.
  */
 export namespace Optional {
   /**
    * Checks if the given value is an {@link Optional}.
+   *
+   * @example
+   *
+   * ```ts
+   * const maybeOptional = Optional.some('value');
+   * const notOptional = { $$tag: 'ts-data-forge::Optional.some' };
+   *
+   * assert.ok(Optional.isOptional(maybeOptional));
+   * assert.notOk(Optional.isOptional(notOptional));
+   * ```
+   *
    * @param maybeOptional The value to check.
    * @returns `true` if the value is an {@link Optional}, otherwise `false`.
    */
@@ -61,53 +75,62 @@ export namespace Optional {
 
   /**
    * Represents an {@link Optional} that contains a value.
+   *
    * @template S The type of the contained value.
    */
   export type Some<S> = Some_<S>;
 
-  /**
-   * Represents an {@link Optional} that does not contain a value (is empty).
-   */
+  /** Represents an {@link Optional} that does not contain a value (is empty). */
   export type None = None_;
 
   /**
-   * Base type for any {@link Optional}, used for generic constraints.
-   * Represents an {@link Optional} with an unknown value type.
+   * Base type for any {@link Optional}, used for generic constraints. Represents
+   * an {@link Optional} with an unknown value type.
    */
   export type Base = Optional<unknown>;
 
   /**
-   * Extracts the value type `S` from an {@link Optional.Some}<S>.
-   * If the {@link Optional} is {@link Optional.None}, resolves to `never`.
+   * Extracts the value type `S` from an {@link Optional.Some}<S>. If the
+   * {@link Optional} is {@link Optional.None}, resolves to `never`.
+   *
    * @template O The {@link Optional.Base} type to unwrap.
    */
   export type Unwrap<O extends Base> = O extends Some<infer S> ? S : never;
 
   /**
-   * Narrows an {@link Optional.Base} type to {@link Optional.Some}<S> if it is a {@link Optional.Some}.
-   * If the {@link Optional} is {@link Optional.None}, resolves to `never`.
+   * Narrows an {@link Optional.Base} type to {@link Optional.Some}<S> if it is a
+   * {@link Optional.Some}. If the {@link Optional} is {@link Optional.None},
+   * resolves to `never`.
+   *
    * @template O The {@link Optional.Base} type to narrow.
    */
   export type NarrowToSome<O extends Base> = O extends None ? never : O;
 
   /**
-   * Narrows an {@link Optional.Base} type to {@link Optional.None} if it is a {@link Optional.None}.
-   * If the {@link Optional} is {@link Optional.Some}<S>, resolves to `never`.
+   * Narrows an {@link Optional.Base} type to {@link Optional.None} if it is a
+   * {@link Optional.None}. If the {@link Optional} is {@link Optional.Some}<S>,
+   * resolves to `never`.
+   *
    * @template O The {@link Optional.Base} type to narrow.
    */
   export type NarrowToNone<O extends Base> = O extends None ? O : never;
 
   /**
    * Creates an {@link Optional.Some} containing the given value.
+   *
+   * @example
+   *
+   * ```ts
+   * const someValue = Optional.some({ id: 1 });
+   * const noneValue = Optional.none;
+   *
+   * assert.ok(Optional.isSome(someValue));
+   * assert.ok(Optional.isNone(noneValue));
+   * ```
+   *
    * @template S The type of the value.
    * @param value The value to wrap in an {@link Optional.Some}.
    * @returns An {@link Optional.Some}<S> containing the value.
-   * @example
-   * ```typescript
-   * const someValue = Optional.some(42);
-   * console.log(Optional.isSome(someValue)); // true
-   * console.log(Optional.unwrap(someValue)); // 42
-   * ```
    */
   export const some = <S,>(value: S): Some<S> => ({
     $$tag: SomeTypeTagName,
@@ -115,62 +138,92 @@ export namespace Optional {
   });
 
   /**
-   * The singleton instance representing {@link Optional.None} (an empty Optional).
+   * The singleton instance representing {@link Optional.None} (an empty
+   * Optional).
+   *
    * @example
-   * ```typescript
-   * const emptyValue = Optional.none;
-   * console.log(Optional.isNone(emptyValue)); // true
-   * console.log(Optional.unwrapOr(emptyValue, "default")); // "default"
+   *
+   * ```ts
+   * const someValue = Optional.some({ id: 1 });
+   * const noneValue = Optional.none;
+   *
+   * assert.ok(Optional.isSome(someValue));
+   * assert.ok(Optional.isNone(noneValue));
    * ```
    */
   export const none: None = { $$tag: NoneTypeTagName } as const;
 
   /**
-   * Checks if an {@link Optional} is {@link Optional.Some}.
-   * Acts as a type guard.
+   * Checks if an {@link Optional} is {@link Optional.Some}. Acts as a type guard.
+   *
+   * @example
+   *
+   * ```ts
+   * const optionalNumber = Optional.some(42);
+   *
+   * if (Optional.isSome(optionalNumber)) {
+   *   const value: number = optionalNumber.value;
+   *   assert(value === 42);
+   * }
+   * ```
+   *
    * @template O The {@link Optional.Base} type to check.
    * @param optional The {@link Optional} to check.
-   * @returns `true` if the {@link Optional} is {@link Optional.Some}, `false` otherwise.
+   * @returns `true` if the {@link Optional} is {@link Optional.Some}, `false`
+   *   otherwise.
    */
   export const isSome = <O extends Base>(
     optional: O,
   ): optional is NarrowToSome<O> => optional.$$tag === SomeTypeTagName;
 
   /**
-   * Checks if an {@link Optional} is {@link Optional.None}.
-   * Acts as a type guard.
+   * Checks if an {@link Optional} is {@link Optional.None}. Acts as a type guard.
+   *
+   * @example
+   *
+   * ```ts
+   * const optionalValue = Optional.none as Optional<number>;
+   *
+   * if (Optional.isNone(optionalValue)) {
+   *   // Type narrowed to None
+   *   assert.ok(true); // optionalValue is None
+   * }
+   * ```
+   *
    * @template O The {@link Optional.Base} type to check.
    * @param optional The {@link Optional} to check.
-   * @returns `true` if the {@link Optional} is {@link Optional.None}, `false` otherwise.
+   * @returns `true` if the {@link Optional} is {@link Optional.None}, `false`
+   *   otherwise.
    */
   export const isNone = <O extends Base>(
     optional: O,
   ): optional is NarrowToNone<O> => optional.$$tag === NoneTypeTagName;
 
   /**
-   * Unwraps an `Optional`, returning the contained value.
-   * Throws an error if the `Optional` is `Optional.None`.
+   * Unwraps an `Optional`, returning the contained value. Throws an error if
+   * the `Optional` is `Optional.None`.
    *
-   * This is a safer alternative to direct value access when you know the Optional
-   * should contain a value. Use this method when an empty Optional represents
-   * a programming error or unexpected condition.
+   * This is a safer alternative to direct value access when you know the
+   * Optional should contain a value. Use this method when an empty Optional
+   * represents a programming error or unexpected condition.
+   *
+   * @example
+   *
+   * ```ts
+   * const present = Optional.some('available');
+   *
+   * assert(Optional.unwrapThrow(present) === 'available');
+   * assert.throws(
+   *   () => Optional.unwrapThrow(Optional.none),
+   *   /has failed because it is `None`/u,
+   * );
+   * ```
    *
    * @template O The `Optional.Base` type to unwrap.
    * @param optional The `Optional` to unwrap.
    * @returns The contained value if `Optional.Some`.
-   * @throws {Error} Error with message "`unwrapThrow()` has failed because it is `None`" if the `Optional` is `Optional.None`.
-   * @example
-   * ```typescript
-   * const userInput = Optional.some(42);
-   * console.log(Optional.unwrapThrow(userInput)); // 42
-   *
-   * const empty = Optional.none;
-   * try {
-   *   Optional.unwrapThrow(empty); // throws Error
-   * } catch (error) {
-   *   console.log(error.message); // "`unwrapThrow()` has failed because it is `None`"
-   * }
-   * ```
+   * @throws {Error} Error with message "`unwrapThrow()` has failed because it
+   *   is `None`" if the `Optional` is `Optional.None`.
    */
   export const unwrapThrow = <O extends Base>(optional: O): Unwrap<O> => {
     if (isSome(optional)) {
@@ -182,24 +235,28 @@ export namespace Optional {
   };
 
   /**
-   * Unwraps an `Optional`, returning the contained value or `undefined` if empty.
+   * Unwraps an `Optional`, returning the contained value or `undefined` if
+   * empty.
    *
    * This function provides a safe way to extract values from Optionals without
    * throwing exceptions. It has overloaded behavior based on the type:
+   *
    * - For `Optional.Some<T>`: Always returns `T` (guaranteed by type system)
    * - For general `Optional<T>`: Returns `T | undefined`
+   *
+   * @example
+   *
+   * ```ts
+   * const someString = Optional.some('text');
+   * const noneString = Optional.none as Optional<string>;
+   *
+   * assert(Optional.unwrap(someString) === 'text');
+   * assert(Optional.unwrap(noneString) === undefined);
+   * ```
    *
    * @template O The `Optional.Base` type to unwrap.
    * @param optional The `Optional` to unwrap.
    * @returns The contained value if `Optional.Some`, otherwise `undefined`.
-   * @example
-   * ```typescript
-   * const some = Optional.some(42);
-   * const value = Optional.unwrap(some); // 42
-   *
-   * const none = Optional.none;
-   * const result = Optional.unwrap(none); // undefined
-   * ```
    */
   export function unwrap<O extends Some<unknown>>(optional: O): Unwrap<O>;
 
@@ -213,32 +270,33 @@ export namespace Optional {
   }
 
   /**
-   * Unwraps an `Optional`, returning the contained value or a default value if it's `Optional.None`.
+   * Unwraps an `Optional`, returning the contained value or a default value if
+   * it's `Optional.None`.
    *
    * Supports both direct usage and curried form for functional composition.
-   * This is often preferred over `unwrap()` when you have a sensible fallback value.
+   * This is often preferred over `unwrap()` when you have a sensible fallback
+   * value.
+   *
+   * @example
+   *
+   * ```ts
+   * const withValue = Optional.some(5);
+   * const withoutValue = Optional.none as Optional<number>;
+   *
+   * assert(Optional.unwrapOr(withValue, 0) === 5);
+   * assert(Optional.unwrapOr(withoutValue, 0) === 0);
+   *
+   * const unwrapWithDefault = Optional.unwrapOr(10);
+   *
+   * assert(unwrapWithDefault(Optional.some(3)) === 3);
+   * assert(unwrapWithDefault(Optional.none) === 10);
+   * ```
    *
    * @template O The `Optional.Base` type to unwrap.
    * @template D The type of the default value.
    * @param optional The `Optional` to unwrap.
    * @param defaultValue The value to return if `optional` is `Optional.None`.
    * @returns The contained value if `Optional.Some`, otherwise `defaultValue`.
-   * @example
-   * ```typescript
-   * // Direct usage - most common pattern
-   * const some = Optional.some(42);
-   * const value1 = Optional.unwrapOr(some, 0);
-   * console.log(value1); // 42
-   *
-   * const none = Optional.none;
-   * const value2 = Optional.unwrapOr(none, 0);
-   * console.log(value2); // 0
-   *
-   * // Curried usage
-   * const unwrapWithDefault = Optional.unwrapOr("default");
-   * const result = unwrapWithDefault(Optional.some("hello"));
-   * console.log(result); // "hello"
-   * ```
    */
   export function unwrapOr<O extends Base, D>(
     optional: O,
@@ -280,17 +338,30 @@ export namespace Optional {
    * particularly useful for implementing default behavior or cascading lookups.
    * Supports both direct usage and curried form for functional composition.
    *
+   * @example
+   *
+   * ```ts
+   * const preferred = Optional.some('primary');
+   * const fallback = Optional.some('secondary');
+   * const noneValue = Optional.none as Optional<string>;
+   *
+   * assert.deepStrictEqual(Optional.orElse(preferred, fallback), preferred);
+   * assert.deepStrictEqual(Optional.orElse(noneValue, fallback), fallback);
+   *
+   * const orElseFallback = Optional.orElse(Optional.some('default'));
+   *
+   * assert.deepStrictEqual(orElseFallback(Optional.none), Optional.some('default'));
+   * assert.deepStrictEqual(
+   *   orElseFallback(Optional.some('value')),
+   *   Optional.some('value'),
+   * );
+   * ```
+   *
    * @template O The input `Optional.Base` type.
    * @param optional The `Optional` to check.
-   * @param alternative The alternative `Optional` to return if the first is `None`.
+   * @param alternative The alternative `Optional` to return if the first is
+   *   `None`.
    * @returns The first `Optional` if `Some`, otherwise the alternative.
-   * @example
-   * ```typescript
-   * const primary = Optional.none;
-   * const fallback = Optional.some("default");
-   * const result = Optional.orElse(primary, fallback);
-   * console.log(Optional.unwrap(result)); // "default"
-   * ```
    */
   export function orElse<O extends Base, const O2 extends Base>(
     optional: O,
@@ -321,24 +392,32 @@ export namespace Optional {
   }
 
   /**
-   * Maps an {@link Optional}<S> to {@link Optional}<S2> by applying a function to a contained value.
-   * If the {@link Optional} is {@link Optional.None}, it returns {@link Optional.none}.
-   * Otherwise, it applies the `mapFn` to the value in `Optional.Some` and returns a new `Optional.Some` with the result.
+   * Maps an {@link Optional}<S> to {@link Optional}<S2> by applying a function to
+   * a contained value. If the {@link Optional} is {@link Optional.None}, it
+   * returns {@link Optional.none}. Otherwise, it applies the `mapFn` to the
+   * value in `Optional.Some` and returns a new `Optional.Some` with the
+   * result.
+   *
+   * @example
+   *
+   * ```ts
+   * const numberOptional = Optional.some(21);
+   * const mapped = Optional.map(numberOptional, (value) => value * 2);
+   *
+   * assert.deepStrictEqual(mapped, Optional.some(42));
+   *
+   * const mapToLength = Optional.map((text: string) => text.length);
+   *
+   * assert.deepStrictEqual(mapToLength(Optional.some('abc')), Optional.some(3));
+   * assert.deepStrictEqual(mapToLength(Optional.none), Optional.none);
+   * ```
+   *
    * @template O The input `Optional.Base` type.
    * @template S2 The type of the value returned by the mapping function.
    * @param optional The `Optional` to map.
    * @param mapFn The function to apply to the value if it exists.
-   * @returns A new `Optional<S2>` resulting from the mapping, or `Optional.None` if the input was `Optional.None`.
-   * @example
-   * ```typescript
-   * const someNumber = Optional.some(5);
-   * const mapped = Optional.map(someNumber, x => x * 2);
-   * console.log(Optional.unwrap(mapped)); // 10
-   *
-   * const noneValue = Optional.none;
-   * const mappedNone = Optional.map(noneValue, x => x * 2);
-   * console.log(Optional.isNone(mappedNone)); // true
-   * ```
+   * @returns A new `Optional<S2>` resulting from the mapping, or
+   *   `Optional.None` if the input was `Optional.None`.
    */
   export function map<O extends Base, S2>(
     optional: O,
@@ -370,24 +449,33 @@ export namespace Optional {
   }
 
   /**
-   * Applies a function that returns an `Optional` to the value in an `Optional.Some`.
-   * If the input is `Optional.None`, returns `Optional.None`.
+   * Applies a function that returns an `Optional` to the value in an
+   * `Optional.Some`. If the input is `Optional.None`, returns `Optional.None`.
    * This is the monadic bind operation for `Optional`.
+   *
+   * @example
+   *
+   * ```ts
+   * const parseNumber = (input: string): Optional<number> => {
+   *   const num = Number.parseInt(input, 10);
+   *   return Number.isNaN(num) ? Optional.none : Optional.some(num);
+   * };
+   *
+   * const parsed = Optional.flatMap(Optional.some('10'), parseNumber);
+   *
+   * assert.deepStrictEqual(parsed, Optional.some(10));
+   *
+   * const flatMapParse = Optional.flatMap(parseNumber);
+   *
+   * assert.deepStrictEqual(flatMapParse(Optional.some('5')), Optional.some(5));
+   * assert.deepStrictEqual(flatMapParse(Optional.some('invalid')), Optional.none);
+   * ```
+   *
    * @template O The input `Optional.Base` type.
    * @template S2 The value type of the `Optional` returned by the function.
    * @param optional The `Optional` to flat map.
    * @param flatMapFn The function to apply that returns an `Optional`.
    * @returns The result of applying the function, or `Optional.None`.
-   * @example
-   * ```typescript
-   * const parseNumber = (s: string): Optional<number> => {
-   *   const n = Number(s);
-   *   return isNaN(n) ? Optional.none : Optional.some(n);
-   * };
-   *
-   * const result = Optional.flatMap(Optional.some("42"), parseNumber);
-   * console.log(Optional.unwrap(result)); // 42
-   * ```
    */
   export function flatMap<O extends Base, S2>(
     optional: O,
@@ -418,19 +506,29 @@ export namespace Optional {
   }
 
   /**
-   * Filters an `Optional` based on a predicate.
-   * If the `Optional` is `Some` and the predicate returns true, returns the original `Optional`.
-   * Otherwise returns `None`.
+   * Filters an `Optional` based on a predicate. If the `Optional` is `Some` and
+   * the predicate returns true, returns the original `Optional`. Otherwise
+   * returns `None`.
+   *
+   * @example
+   *
+   * ```ts
+   * const even = Optional.filter(Optional.some(4), (value) => value % 2 === 0);
+   * const odd = Optional.filter(Optional.some(3), (value) => value % 2 === 0);
+   *
+   * assert.deepStrictEqual(even, Optional.some(4));
+   * assert.deepStrictEqual(odd, Optional.none);
+   *
+   * const filterEven = Optional.filter((value: number) => value % 2 === 0);
+   *
+   * assert.deepStrictEqual(filterEven(Optional.some(6)), Optional.some(6));
+   * assert.deepStrictEqual(filterEven(Optional.some(5)), Optional.none);
+   * ```
+   *
    * @template O The input `Optional.Base` type.
    * @param optional The `Optional` to filter.
    * @param predicate The predicate function.
    * @returns The filtered `Optional`.
-   * @example
-   * ```typescript
-   * const someEven = Optional.some(4);
-   * const filtered = Optional.filter(someEven, x => x % 2 === 0);
-   * console.log(Optional.unwrap(filtered)); // 4
-   * ```
    */
   export function filter<O extends Base>(
     optional: O,
@@ -467,18 +565,29 @@ export namespace Optional {
   }
 
   /**
-   * Unwraps an `Optional`, returning the contained value or throwing an error with the provided message.
+   * Unwraps an `Optional`, returning the contained value or throwing an error
+   * with the provided message.
+   *
+   * @example
+   *
+   * ```ts
+   * const optionalValue = Optional.some('data');
+   *
+   * assert(Optional.expectToBe(optionalValue, 'value expected') === 'data');
+   *
+   * const expectValue = Optional.expectToBe<string>('missing optional');
+   *
+   * assert.throws(() => expectValue(Optional.none), /missing optional/u);
+   * assert(expectValue(Optional.some('present')) === 'present');
+   * ```
+   *
    * @template O The `Optional.Base` type to unwrap.
    * @param optional The `Optional` to unwrap.
-   * @param message The error message to throw if the `Optional` is `Optional.None`.
+   * @param message The error message to throw if the `Optional` is
+   *   `Optional.None`.
    * @returns The contained value if `Optional.Some`.
-   * @throws Error with the provided message if the `Optional` is `Optional.None`.
-   * @example
-   * ```typescript
-   * const some = Optional.some(42);
-   * const value = Optional.expectToBe(some, "Value must exist");
-   * console.log(value); // 42
-   * ```
+   * @throws Error with the provided message if the `Optional` is
+   *   `Optional.None`.
    */
   export function expectToBe<O extends Base>(
     optional: O,
@@ -514,21 +623,31 @@ export namespace Optional {
   /**
    * Combines two `Optional` values into a single `Optional` containing a tuple.
    * If either `Optional` is `None`, returns `None`.
+   *
+   * @example
+   *
+   * ```ts
+   * const zipped = Optional.zip(Optional.some('left'), Optional.some(1));
+   *
+   * assert.ok(Optional.isSome(zipped));
+   * if (Optional.isSome(zipped)) {
+   *   const expected: readonly [string, number] = ['left', 1];
+   *   assert.deepStrictEqual(zipped.value, expected);
+   * }
+   *
+   * const missing = Optional.zip(
+   *   Optional.some('value'),
+   *   Optional.none as Optional<number>,
+   * );
+   *
+   * assert.deepStrictEqual(missing, Optional.none);
+   * ```
+   *
    * @template A The value type of the first `Optional`.
    * @template B The value type of the second `Optional`.
    * @param optionalA The first `Optional`.
    * @param optionalB The second `Optional`.
    * @returns An `Optional` containing a tuple of both values, or `None`.
-   * @example
-   * ```typescript
-   * const a = Optional.some(1);
-   * const b = Optional.some("hello");
-   * const zipped = Optional.zip(a, b);
-   * console.log(Optional.unwrap(zipped)); // [1, "hello"]
-   *
-   * const withNone = Optional.zip(a, Optional.none);
-   * console.log(Optional.isNone(withNone)); // true
-   * ```
    */
   export const zip = <A, const B>(
     optionalA: Optional<A>,
@@ -545,19 +664,20 @@ export namespace Optional {
    * the Optional type system. The function treats both `null` and `undefined`
    * as empty values, converting them to `Optional.None`.
    *
+   * @example
+   *
+   * ```ts
+   * const present = Optional.fromNullable('hello');
+   * const absent = Optional.fromNullable<string | null>(null);
+   *
+   * assert.deepStrictEqual(present, Optional.some('hello'));
+   * assert.deepStrictEqual(absent, Optional.none);
+   * ```
+   *
    * @template T The type of the nullable value.
    * @param value The nullable value to convert.
-   * @returns `Optional.Some<NonNullable<T>>` if the value is not null or undefined, otherwise `Optional.None`.
-   * @example
-   * ```typescript
-   * const value: string | null = "hello";
-   * const optional = Optional.fromNullable(value);
-   * console.log(Optional.unwrap(optional)); // "hello"
-   *
-   * const nullValue: string | null = null;
-   * const noneOptional = Optional.fromNullable(nullValue);
-   * console.log(Optional.isNone(noneOptional)); // true
-   * ```
+   * @returns `Optional.Some<NonNullable<T>>` if the value is not null or
+   *   undefined, otherwise `Optional.None`.
    */
   export const fromNullable = <T,>(
     value: T | null | undefined,
@@ -570,20 +690,22 @@ export namespace Optional {
    * for empty Optionals. This is useful when interfacing with APIs or systems
    * that expect nullable values rather than Optional types.
    *
-   * Note: This returns `undefined` (not `null`) for consistency with JavaScript's
-   * undefined semantics and TypeScript's optional properties.
+   * Note: This returns `undefined` (not `null`) for consistency with
+   * JavaScript's undefined semantics and TypeScript's optional properties.
+   *
+   * @example
+   *
+   * ```ts
+   * const someNumber = Optional.some(42);
+   * const noneNumber = Optional.none as Optional<number>;
+   *
+   * assert(Optional.toNullable(someNumber) === 42);
+   * assert(Optional.toNullable(noneNumber) === undefined);
+   * ```
    *
    * @template O The `Optional.Base` type to convert.
    * @param optional The `Optional` to convert.
    * @returns The contained value if `Some`, otherwise `undefined`.
-   * @example
-   * ```typescript
-   * const some = Optional.some(42);
-   * console.log(Optional.toNullable(some)); // 42
-   *
-   * const none = Optional.none;
-   * console.log(Optional.toNullable(none)); // undefined
-   * ```
    */
   export const toNullable = <O extends Base>(
     optional: O,

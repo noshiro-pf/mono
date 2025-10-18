@@ -1,1 +1,1 @@
-export * from './array-utils.mjs';
+export * as Arr from './impl/index.mjs';

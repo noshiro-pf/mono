@@ -1,8 +1,6 @@
 import 'ts-repo-utils';
 
-/**
- * Runs all validation and build steps for the project.
- */
+/** Runs all validation and build steps for the project. */
 const checkAll = async (): Promise<void> => {
   echo('Starting full project validation and build...\n');
 

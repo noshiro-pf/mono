@@ -62,6 +62,7 @@ expectType<
 
 /**
  * Checks if a number is a NonZeroFiniteNumber (a finite number that is not 0).
+ *
  * @param value The value to check.
  * @returns `true` if the value is a NonZeroFiniteNumber, `false` otherwise.
  */
@@ -69,61 +70,34 @@ export const isNonZeroFiniteNumber = is;
 
 /**
  * Casts a number to a NonZeroFiniteNumber type.
+ *
  * @param value The value to cast.
  * @returns The value as a NonZeroFiniteNumber type.
  * @throws {TypeError} If the value is not a non-zero finite number.
- * @example
- * ```typescript
- * const x = asNonZeroFiniteNumber(5.5); // NonZeroFiniteNumber
- * const y = asNonZeroFiniteNumber(-3.2); // NonZeroFiniteNumber
- * // asNonZeroFiniteNumber(0); // throws TypeError
- * // asNonZeroFiniteNumber(Infinity); // throws TypeError
- * ```
  */
 export const asNonZeroFiniteNumber = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for non-zero finite numbers.
+ * Namespace providing type-safe arithmetic operations for non-zero finite
+ * numbers.
  *
- * All operations maintain the non-zero constraint while ensuring results remain finite
- * (excluding NaN and Infinity). This type is useful for values that must never be zero,
- * such as denominators, scaling factors, and ratios.
- *
- * @example
- * ```typescript
- * const factor = asNonZeroFiniteNumber(2.5);
- * const multiplier = asNonZeroFiniteNumber(-1.5);
- *
- * // Arithmetic operations that preserve non-zero constraint
- * const result = NonZeroFiniteNumber.add(factor, multiplier);        // NonZeroFiniteNumber (1.0)
- * const difference = NonZeroFiniteNumber.sub(factor, multiplier);    // NonZeroFiniteNumber (4.0)
- * const product = NonZeroFiniteNumber.mul(factor, multiplier);       // NonZeroFiniteNumber (-3.75)
- * const quotient = NonZeroFiniteNumber.div(factor, multiplier);      // NonZeroFiniteNumber (-1.666...)
- *
- * // Utility operations
- * const absolute = NonZeroFiniteNumber.abs(multiplier);              // NonZeroFiniteNumber (1.5)
- * const minimum = NonZeroFiniteNumber.min(factor, multiplier);       // NonZeroFiniteNumber (-1.5)
- * const maximum = NonZeroFiniteNumber.max(factor, multiplier);       // NonZeroFiniteNumber (2.5)
- *
- * // Rounding operations (return NonZeroInt)
- * const rounded = NonZeroFiniteNumber.round(factor);                 // NonZeroInt (3)
- * const floored = NonZeroFiniteNumber.floor(factor);                 // NonZeroInt (2)
- * const ceiled = NonZeroFiniteNumber.ceil(factor);                   // NonZeroInt (3)
- *
- * // Random generation
- * const randomValue = NonZeroFiniteNumber.random();                  // NonZeroFiniteNumber (random non-zero value)
- * ```
+ * All operations maintain the non-zero constraint while ensuring results remain
+ * finite (excluding NaN and Infinity). This type is useful for values that must
+ * never be zero, such as denominators, scaling factors, and ratios.
  */
 export const NonZeroFiniteNumber = {
   /**
    * Type guard to check if a value is a NonZeroFiniteNumber.
+   *
    * @param value The value to check.
-   * @returns `true` if the value is a non-zero finite number, `false` otherwise.
+   * @returns `true` if the value is a non-zero finite number, `false`
+   *   otherwise.
    */
   is,
 
   /**
    * Returns the absolute value of a non-zero finite number.
+   *
    * @param a The NonZeroFiniteNumber.
    * @returns The absolute value as a NonZeroFiniteNumber.
    */
@@ -131,6 +105,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Returns the smaller of two NonZeroFiniteNumber values.
+   *
    * @param a The first NonZeroFiniteNumber.
    * @param b The second NonZeroFiniteNumber.
    * @returns The minimum value as a NonZeroFiniteNumber.
@@ -139,6 +114,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Returns the larger of two NonZeroFiniteNumber values.
+   *
    * @param a The first NonZeroFiniteNumber.
    * @param b The second NonZeroFiniteNumber.
    * @returns The maximum value as a NonZeroFiniteNumber.
@@ -147,6 +123,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Rounds down a NonZeroFiniteNumber to the nearest integer.
+   *
    * @param x The NonZeroFiniteNumber to round down.
    * @returns The floor value as a NonZeroInt.
    */
@@ -154,6 +131,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Rounds up a NonZeroFiniteNumber to the nearest integer.
+   *
    * @param x The NonZeroFiniteNumber to round up.
    * @returns The ceiling value as a NonZeroInt.
    */
@@ -161,6 +139,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Rounds a NonZeroFiniteNumber to the nearest integer.
+   *
    * @param x The NonZeroFiniteNumber to round.
    * @returns The rounded value as a NonZeroInt.
    */
@@ -168,12 +147,14 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Generates a random NonZeroFiniteNumber value.
+   *
    * @returns A random non-zero finite number.
    */
   random,
 
   /**
    * Raises a NonZeroFiniteNumber to the power of another NonZeroFiniteNumber.
+   *
    * @param a The base NonZeroFiniteNumber.
    * @param b The exponent NonZeroFiniteNumber.
    * @returns `a ** b` as a NonZeroFiniteNumber.
@@ -182,6 +163,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Adds two NonZeroFiniteNumber values.
+   *
    * @param a The first NonZeroFiniteNumber.
    * @param b The second NonZeroFiniteNumber.
    * @returns `a + b` as a NonZeroFiniteNumber.
@@ -190,6 +172,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Subtracts one NonZeroFiniteNumber from another.
+   *
    * @param a The minuend NonZeroFiniteNumber.
    * @param b The subtrahend NonZeroFiniteNumber.
    * @returns `a - b` as a NonZeroFiniteNumber.
@@ -198,6 +181,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Multiplies two NonZeroFiniteNumber values.
+   *
    * @param a The first NonZeroFiniteNumber.
    * @param b The second NonZeroFiniteNumber.
    * @returns `a * b` as a NonZeroFiniteNumber.
@@ -206,6 +190,7 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Divides one NonZeroFiniteNumber by another.
+   *
    * @param a The dividend NonZeroFiniteNumber.
    * @param b The divisor NonZeroFiniteNumber.
    * @returns `a / b` as a NonZeroFiniteNumber.

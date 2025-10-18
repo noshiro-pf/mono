@@ -91,9 +91,7 @@ describe('IMap.create', () => {
 });
 
 describe('IMap.equal', () => {
-  test('should return false for different maps (implementation bug)', () => {
-    // Note: IMap.equal has a bug - it compares Optional<V> with V directly
-    // This is expected behavior given the current implementation
+  test('should return true for different maps', () => {
     const map1 = IMap.create([
       ['a', 1],
       ['b', 2],
@@ -102,11 +100,10 @@ describe('IMap.equal', () => {
       ['a', 1],
       ['b', 2],
     ]);
-    expect(IMap.equal(map1, map2)).toBe(false);
+    expect(IMap.equal(map1, map2)).toBe(true);
   });
 
-  test('should return false for different creation order (implementation bug)', () => {
-    // Note: IMap.equal has a bug - it compares Optional<V> with V directly
+  test('should return true for different creation order', () => {
     const map1 = IMap.create([
       ['a', 1],
       ['b', 2],
@@ -115,7 +112,7 @@ describe('IMap.equal', () => {
       ['b', 2],
       ['a', 1],
     ]);
-    expect(IMap.equal(map1, map2)).toBe(false);
+    expect(IMap.equal(map1, map2)).toBe(true);
   });
 
   test('should return false for maps with different sizes', () => {
@@ -354,24 +351,20 @@ describe('IMap.set', () => {
     expect(m0).toStrictEqual(IMap.create<number, number>([]));
   });
 
-  test('should create new instance when setting (implementation bug)', () => {
-    // Note: set method has bug - it compares value === this.get(key) but get returns Optional
-    // So it always creates new instance instead of returning same instance for same value
+  test('should not create new instance when setting the same value', () => {
     const map = IMap.create([['a', 1]]);
     const updated = map.set('a', 1);
-    expect(updated).not.toBe(map);
+    expect(updated).toBe(map);
     expect(Optional.unwrap(updated.get('a'))).toBe(1);
   });
 
-  test('should create new instance even with same value (implementation bug)', () => {
-    // Note: set method has bug - it compares value === this.get(key) but get returns Optional
+  test('should not create new instance even with same value', () => {
     const map = IMap.create([['a', 1]]);
-    const currentValue = map.get('a');
-    if (Optional.isSome(currentValue)) {
-      const updated = map.set('a', currentValue.value);
-      expect(updated).not.toBe(map);
-      expect(Optional.unwrap(updated.get('a'))).toBe(1);
-    }
+    const curr = map.get('a');
+    assert(Optional.isSome(curr));
+    const updated = map.set('a', curr.value);
+    expect(updated).toBe(map);
+    expect(Optional.unwrap(updated.get('a'))).toBe(1);
   });
 
   test('should not modify original map when setting', () => {

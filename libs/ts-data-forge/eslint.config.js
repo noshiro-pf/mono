@@ -49,6 +49,8 @@ const defineConfig = () => [
   {
     files: ['samples/**/*'],
     rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-unnecessary-condition': 'off',
       'import/no-extraneous-dependencies': 'off',
       'import/no-internal-modules': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
@@ -60,6 +62,12 @@ const defineConfig = () => [
     rules: {
       'import/no-default-export': 'off',
       'import/no-anonymous-default-export': 'off',
+    },
+  },
+  {
+    files: ['src/entry-point.mts'],
+    rules: {
+      'import/export': 'off',
     },
   },
 ];

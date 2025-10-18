@@ -10,6 +10,7 @@ await assertExt({
     {
       path: path.resolve(projectRootPath, './scripts'),
       extension: '.mts',
+      ignorePatterns: ['**/EMBED_JSDOC_EXAMPLES.md'],
     },
   ],
 });

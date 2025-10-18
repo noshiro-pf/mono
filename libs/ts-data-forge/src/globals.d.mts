@@ -2,10 +2,19 @@
 
 type SmallPositiveInt = WithSmallInt<PositiveInt>;
 
-/**
- * Represents the type of keys that can be used in a standard JavaScript Map.
- */
+/** Represents the type of keys that can be used in a standard JavaScript Map. */
 type MapSetKeyType = Primitive;
+
+type ArrayIndex<Ar extends readonly unknown[]> =
+  IsFixedLengthList<Ar> extends true ? IndexOfTuple<Ar> : SizeType.Arr;
+
+type ArgArrayIndex<Ar extends readonly unknown[]> =
+  IsFixedLengthList<Ar> extends true ? IndexOfTuple<Ar> : SizeType.ArgArr;
+
+type ArgArrayIndexWithNegative<Ar extends readonly unknown[]> =
+  IsFixedLengthList<Ar> extends true
+    ? IndexOfTuple<[...Ar, 0]> | NegativeIndexOfTuple<Ar>
+    : SizeType.ArgArrWithNegative;
 
 // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/length
 // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/length
