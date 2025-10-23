@@ -30,7 +30,7 @@ type Ret = Readonly<{
 }>;
 
 export const useElementSize = (
-  valuesToSubscribeChange: readonly unknown[] = []
+  valuesToSubscribeChange: readonly unknown[] = [],
 ): Ret => {
   const [elementSize, setElementSize] =
     React.useState<ElementSize>(initialValues);
@@ -58,7 +58,7 @@ export const useElementSize = (
 };
 
 const getElementPaddingsAndMargins = (
-  ref: React.RefObject<HTMLElement>
+  ref: React.RefObject<HTMLElement>,
 ): ElementSize => {
   if (ref.current === null) {
     return initialValues();
