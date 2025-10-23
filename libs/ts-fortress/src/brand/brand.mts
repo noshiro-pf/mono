@@ -12,11 +12,11 @@ export const brand = <
   const BrandFalseKeys extends readonly string[] = [],
 >({
   baseType,
-  is,
-  defaultValue,
-  typeName,
-  brandKeys,
   brandFalseKeys,
+  brandKeys,
+  defaultValue,
+  is,
+  typeName,
 }: Readonly<{
   baseType: Type<A>;
   is: (

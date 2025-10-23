@@ -21,9 +21,9 @@ export const arrayAtLeastLength = <A, N extends SmallUint>(
   type T = ArrayAtLeastLen<N, A>;
 
   const {
-    typeName = `ArrayAtLeastLen<${size}, ${elementType.typeName}>`,
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     defaultValue = Arr.create(size, elementType.defaultValue) as T,
+    typeName = `ArrayAtLeastLen<${size}, ${elementType.typeName}>`,
   } = options ?? {};
 
   const validate: Type<T>['validate'] = (a) => {

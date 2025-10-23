@@ -3,9 +3,9 @@ import { type Type } from '../type.mjs';
 import { brand } from './brand.mjs';
 
 export const brandedString = <K extends string>({
-  typeName,
   defaultValue,
   is = (_u): _u is Brand<string, K> => true,
+  typeName,
 }: Readonly<{
   typeName: K;
   defaultValue: string;

@@ -4,10 +4,10 @@ import { createCastFn } from './create-cast-fn.mjs';
 import { createIsFn } from './create-is-fn.mjs';
 
 export const createType = <A,>({
-  typeName,
   defaultValue,
-  validate,
   fill,
+  typeName,
+  validate,
 }: Readonly<{
   typeName: string;
   defaultValue: A;

@@ -18,7 +18,7 @@ export const array = <A,>(
 ): Type<readonly A[]> => {
   type T = readonly A[];
 
-  const { typeName = `${elementType.typeName}[]`, defaultValue = [] } =
+  const { defaultValue = [], typeName = `${elementType.typeName}[]` } =
     options ?? {};
 
   const validate: Type<T>['validate'] = (a) => {

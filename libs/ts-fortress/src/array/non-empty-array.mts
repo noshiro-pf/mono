@@ -20,8 +20,8 @@ export const nonEmptyArray = <A,>(
   type T = NonEmptyArray<A>;
 
   const {
-    typeName = `NonEmptyArray<${elementType.typeName}>`,
     defaultValue = Arr.newArray(1, elementType.defaultValue),
+    typeName = `NonEmptyArray<${elementType.typeName}>`,
   } = options ?? {};
 
   const validate: Type<T>['validate'] = (a) => {

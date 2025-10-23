@@ -11,8 +11,8 @@ export const uintRange = <
   Start extends Uint8,
   End extends Exclude<Uint8 | 256, Start>,
 >({
-  start,
   end,
+  start,
   ...options
 }: Readonly<{
   start: Start;

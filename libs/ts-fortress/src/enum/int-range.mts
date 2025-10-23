@@ -8,8 +8,8 @@ import {
 } from '../utils/index.mjs';
 
 export const intRange = <Start extends Int8 | -128, End extends Int8 | 128>({
-  start,
   end,
+  start,
   ...options
 }: Readonly<{
   start: Start;

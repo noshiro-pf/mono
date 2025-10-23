@@ -5,9 +5,9 @@ import { createCastFn } from './create-cast-fn.mjs';
 import { createPrimitiveValidationError } from './validation-error.mjs';
 
 export const createPrimitiveType = <A extends Primitive>({
-  typeName,
   defaultValue,
   is,
+  typeName,
 }: Readonly<{
   typeName: string;
   defaultValue: A;
