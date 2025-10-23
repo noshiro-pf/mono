@@ -1,3 +1,9 @@
+# [1.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.7.1...v1.8.0) (2025-10-23)
+
+### Features
+
+- add eslint-plugin-sort-destructure-keys ([#84](https://github.com/noshiro-pf/eslint-config-typed/issues/84)) ([05cc71d](https://github.com/noshiro-pf/eslint-config-typed/commit/05cc71d8c633b76871e097ffc08aee471a6305c0))
+
 ## [1.7.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.7.0...v1.7.1) (2025-10-16)
 
 ### Bug Fixes
