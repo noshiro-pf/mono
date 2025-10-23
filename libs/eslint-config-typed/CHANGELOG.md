@@ -1,3 +1,9 @@
+## [1.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.8.0...v1.8.1) (2025-10-23)
+
+### Bug Fixes
+
+- disable sort-destructure-keys rule ([#86](https://github.com/noshiro-pf/eslint-config-typed/issues/86)) ([ac64198](https://github.com/noshiro-pf/eslint-config-typed/commit/ac64198f33699ec47a7ae174c1f4ec97f8d21a22))
+
 # [1.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.7.1...v1.8.0) (2025-10-23)
 
 ### Features
