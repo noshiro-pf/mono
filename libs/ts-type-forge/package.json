@@ -66,11 +66,11 @@
     "@semantic-release/github": "^12.0.0",
     "@semantic-release/npm": "^13.1.1",
     "@semantic-release/release-notes-generator": "^14.1.0",
-    "@types/node": "^24.8.0",
+    "@types/node": "^24.9.1",
     "conventional-changelog-conventionalcommits": "^9.1.0",
-    "cspell": "^9.2.1",
+    "cspell": "^9.2.2",
     "eslint": "^9.38.0",
-    "eslint-config-typed": "^1.7.0",
+    "eslint-config-typed": "^1.8.0",
     "fast-glob": "^3.3.3",
     "markdownlint": "^0.39.0",
     "markdownlint-cli2": "^0.18.1",
@@ -88,5 +88,9 @@
     "typedoc": "^0.28.14",
     "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.9.3"
+  },
+  "volta": {
+    "node": "25.0.0",
+    "npm": "11.6.2"
   }
 }

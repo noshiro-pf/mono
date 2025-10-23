@@ -91,7 +91,7 @@ export const genTypeDefinitions = async (): Promise<void> => {
     .flatMap(({ relativePath, types }) => [
       `- ${relativePath}`,
       ...types.map(
-        ({ typeName, line }) => `  - [${typeName}](./${relativePath}#L${line})`,
+        ({ line, typeName }) => `  - [${typeName}](./${relativePath}#L${line})`,
       ),
     ])
     .join('\n');
