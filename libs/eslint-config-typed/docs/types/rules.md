@@ -98,6 +98,18 @@ Re-exports [EslintPluginRulesOption](rules/eslint-plugin-rules.md#eslintpluginru
 
 ---
 
+### EslintPluginSortDestructureKeysRules
+
+Re-exports [EslintPluginSortDestructureKeysRules](rules/eslint-plugin-sort-destructure-keys-rules.md#eslintpluginsortdestructurekeysrules)
+
+---
+
+### EslintPluginSortDestructureKeysRulesOption
+
+Re-exports [EslintPluginSortDestructureKeysRulesOption](rules/eslint-plugin-sort-destructure-keys-rules.md#eslintpluginsortdestructurekeysrulesoption)
+
+---
+
 ### EslintPreferArrowFunctionRules
 
 Re-exports [EslintPreferArrowFunctionRules](rules/eslint-prefer-arrow-functions-rules.md#eslintpreferarrowfunctionrules)

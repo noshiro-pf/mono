@@ -142,7 +142,7 @@ export const noHiddenTypeAssertions = createRule({
         // are they all set to `unknown` type arguments in this specific call?
         // If so, this is safe even if the function being called is a hidden type assertion.
         const allCorrespondingTypeArgumentsAreUnknownType =
-          typeParamsUsedInReturnType.every(({ typeParameter, index }) => {
+          typeParamsUsedInReturnType.every(({ index, typeParameter }) => {
             const typeArgument = (tsExpressionNode.typeArguments ?? [])[index];
             const typeArgumentType =
               typeArgument !== undefined

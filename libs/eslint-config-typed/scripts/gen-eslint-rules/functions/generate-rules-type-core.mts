@@ -172,7 +172,7 @@ const createResult = async (
     '',
   ];
 
-  for (const { ruleName, docs, deprecated, schema, rawSchema } of schemaList) {
+  for (const { deprecated, docs, rawSchema, ruleName, schema } of schemaList) {
     mut_resultToWrite.push(docs, `namespace ${toCapitalCase(ruleName)} {`);
 
     if (isDeprecated(deprecated)) {

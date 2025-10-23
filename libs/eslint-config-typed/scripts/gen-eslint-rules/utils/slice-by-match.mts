@@ -5,9 +5,9 @@
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const sliceByMatch = ({
-  target,
-  startRegexp,
   endRegexp,
+  startRegexp,
+  target,
 }: Readonly<{
   target: string;
   startRegexp: RegExp | string;

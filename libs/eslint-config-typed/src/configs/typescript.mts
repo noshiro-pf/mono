@@ -2,6 +2,7 @@ import {
   eslintArrayFuncRules,
   eslintFunctionalRules,
   eslintImportsRules,
+  eslintPluginSortDestructureKeysRules,
   eslintPromiseRules,
   eslintRules,
   eslintSecurityRules,
@@ -14,10 +15,10 @@ import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 import { eslintFlatConfigForTypeScriptWithoutRules } from './typescript-without-rules.mjs';
 
 export const eslintFlatConfigForTypeScript = ({
+  files,
+  packageDirs,
   tsconfigFileName,
   tsconfigRootDir,
-  packageDirs,
-  files,
 }: Readonly<{
   tsconfigFileName: string;
   tsconfigRootDir: string;
@@ -41,6 +42,7 @@ export const eslintFlatConfigForTypeScript = ({
       ...eslintUnicornRules,
       ...typescriptEslintRules,
       ...eslintTreeShakableRules,
+      ...eslintPluginSortDestructureKeysRules,
 
       'import/no-extraneous-dependencies': [
         'error',

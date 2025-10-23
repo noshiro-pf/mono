@@ -77,6 +77,12 @@ export const eslintPlugins = {
     rulePrefix: 'unicorn/',
     outputFileName: 'eslint-unicorn-rules.mts',
   },
+  EslintPluginSortDestructureKeys: {
+    typeName: 'EslintPluginSortDestructureKeysRules',
+    pluginName: 'eslint-plugin-sort-destructure-keys',
+    rulePrefix: 'sort-destructure-keys/',
+    outputFileName: 'eslint-plugin-sort-destructure-keys-rules.mts',
+  },
   EslintReactRules: {
     typeName: 'EslintReactRules',
     pluginName: 'eslint-plugin-react',

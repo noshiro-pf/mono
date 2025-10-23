@@ -33,4 +33,5 @@ export const eslintPluginRules: EslintPluginRules = {
   'eslint-plugin/no-meta-schema-default': 'error',
   'eslint-plugin/require-meta-default-options': 'error',
   'eslint-plugin/no-meta-replaced-by': 'error',
+  'eslint-plugin/require-test-case-name': withDefaultOption('error'),
 } as const;

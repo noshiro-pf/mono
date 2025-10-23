@@ -11,10 +11,10 @@ import { sliceByMatch } from './slice-by-match.mjs';
 export const replaceWithNoMatchCheckBetweenRegexp =
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   ({
-      startRegexp,
       endRegexp,
       mapFn,
       options,
+      startRegexp,
     }: Readonly<{
       startRegexp: RegExp | string;
       endRegexp: RegExp | string | undefined;

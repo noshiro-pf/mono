@@ -12,7 +12,7 @@
 
 > **eslintFlatConfigForTypeScript**(`__namedParameters`): readonly `object`[]
 
-Defined in: [src/configs/typescript.mts:16](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/typescript.mts#L16)
+Defined in: [src/configs/typescript.mts:17](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/typescript.mts#L17)
 
 #### Parameters
 

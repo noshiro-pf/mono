@@ -53,7 +53,7 @@ export const noUnsafeReadonlyMutableAssignment = createRule({
       // TODO support config
       const overrides = getDefaultOverrides();
 
-      const allSafe = typePairs.every(({ sourceType, destinationType }) => {
+      const allSafe = typePairs.every(({ destinationType, sourceType }) => {
         if (sourceType === destinationType) {
           // safe
           return true;

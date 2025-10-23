@@ -781,6 +781,53 @@ namespace RequireMetaType {
 }
 
 /**
+ * Require test cases to have a `name` property under certain conditions
+ *
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-test-case-name.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTestCaseName {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "require": {
+   *         "description": "When should the name property be required on a test case object.",
+   *         "enum": [
+   *           "always",
+   *           "objects",
+   *           "objects-with-config"
+   *         ]
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /** When should the name property be required on a test case object. */
+    readonly require?: 'always' | 'objects-with-config' | 'objects';
+  };
+
+  export type RuleEntry =
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
+}
+
+/**
  * Require the properties of a test case to be placed in a consistent order
  *
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/test-case-property-ordering.md
@@ -898,6 +945,7 @@ export type EslintPluginRules = {
   readonly 'eslint-plugin/require-meta-schema-description': RequireMetaSchemaDescription.RuleEntry;
   readonly 'eslint-plugin/require-meta-schema': RequireMetaSchema.RuleEntry;
   readonly 'eslint-plugin/require-meta-type': RequireMetaType.RuleEntry;
+  readonly 'eslint-plugin/require-test-case-name': RequireTestCaseName.RuleEntry;
   readonly 'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.RuleEntry;
   readonly 'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.RuleEntry;
 };
@@ -912,6 +960,7 @@ export type EslintPluginRulesOption = {
   readonly 'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.Options;
   readonly 'eslint-plugin/require-meta-fixable': RequireMetaFixable.Options;
   readonly 'eslint-plugin/require-meta-schema': RequireMetaSchema.Options;
+  readonly 'eslint-plugin/require-test-case-name': RequireTestCaseName.Options;
   readonly 'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.Options;
   readonly 'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.Options;
 };

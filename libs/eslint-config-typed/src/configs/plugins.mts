@@ -10,6 +10,9 @@ import eslintPluginSecurity from 'eslint-plugin-security';
 
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 
+// @ts-expect-error no type definition
+import eslintPluginSortDestructureKeys from 'eslint-plugin-sort-destructure-keys';
+
 import eslintPluginImport from 'eslint-plugin-import';
 
 // @ts-expect-error no type definition
@@ -76,6 +79,7 @@ export const plugins: Record<
   | 'testing-library'
   | 'total-functions'
   | 'unicorn'
+  | 'sort-destructure-keys'
   | 'tree-shakable'
   | 'eslint-plugin'
   | 'custom',
@@ -87,6 +91,8 @@ export const plugins: Record<
   cypress: eslintPluginCypress,
   playwright: eslintPluginPlaywright,
   functional: eslintPluginFunctional,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  'sort-destructure-keys': eslintPluginSortDestructureKeys,
   import: eslintPluginImport,
   jest: eslintPluginJest,
   vitest: eslintPluginVitest,
@@ -95,12 +101,10 @@ export const plugins: Record<
   'prefer-arrow-functions': eslintPluginPreferArrowFunctions,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   promise: eslintPluginPromise,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  react: eslintPluginReact as unknown as ESLintPlugin,
+  react: eslintPluginReact,
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   'react-hooks': eslintPluginReactHooks as unknown as ESLintPlugin,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  'react-refresh': eslintPluginReactRefresh as unknown as ESLintPlugin,
+  'react-refresh': eslintPluginReactRefresh,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'react-perf': eslintPluginReactPerf,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -111,7 +115,6 @@ export const plugins: Record<
   'total-functions': eslintPluginTotalFunctions,
   unicorn: eslintPluginUnicorn,
   'tree-shakable': eslintPluginTreeShakable,
-
   'eslint-plugin': eslintPluginEslintPlugin,
   custom: eslintPluginCustom,
 } as const satisfies FlatConfig['plugins'];

@@ -254,6 +254,24 @@ Re-exports [EslintPluginRulesOption](types/rules/eslint-plugin-rules.md#eslintpl
 
 ---
 
+### eslintPluginSortDestructureKeysRules
+
+Re-exports [eslintPluginSortDestructureKeysRules](rules/eslint-plugin-sort-destructure-keys-rules.md#eslintpluginsortdestructurekeysrules)
+
+---
+
+### EslintPluginSortDestructureKeysRules
+
+Re-exports [EslintPluginSortDestructureKeysRules](types/rules/eslint-plugin-sort-destructure-keys-rules.md#eslintpluginsortdestructurekeysrules)
+
+---
+
+### EslintPluginSortDestructureKeysRulesOption
+
+Re-exports [EslintPluginSortDestructureKeysRulesOption](types/rules/eslint-plugin-sort-destructure-keys-rules.md#eslintpluginsortdestructurekeysrulesoption)
+
+---
+
 ### eslintPluginTotalFunctions
 
 Re-exports [eslintPluginTotalFunctions](plugins/total-functions/plugin.md#eslintplugintotalfunctions)
