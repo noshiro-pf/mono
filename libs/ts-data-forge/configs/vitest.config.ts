@@ -27,7 +27,6 @@ export default defineConfig({
         '**/*.test.mts',
         '**/samples/**',
       ],
-      all: true,
     },
   },
 });

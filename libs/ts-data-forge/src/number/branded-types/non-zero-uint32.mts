@@ -6,19 +6,19 @@ type ElementType = NonZeroUint32;
 const typeNameInMessage = 'a non-zero integer in [1, 2^32)';
 
 const {
-  MIN_VALUE,
   MAX_VALUE,
-  min: min_,
-  max: max_,
-  pow,
+  MIN_VALUE,
   add,
-  sub,
-  mul,
-  div,
-  randomNonZero: random,
-  is,
   castType,
   clamp,
+  div,
+  is,
+  max: max_,
+  min: min_,
+  mul,
+  pow,
+  randomNonZero: random,
+  sub,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   1,

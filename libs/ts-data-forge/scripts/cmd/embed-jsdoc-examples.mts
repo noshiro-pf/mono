@@ -17,7 +17,7 @@ export const embedJsDocExamples = async (): Promise<
   try {
     const mut_modifiedFiles: string[] = [];
 
-    for (const { sourcePath, sampleFiles } of sourceFileMappings) {
+    for (const { sampleFiles, sourcePath } of sourceFileMappings) {
       const sourceFilePath = path.resolve(projectRootPath, sourcePath);
       const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
 

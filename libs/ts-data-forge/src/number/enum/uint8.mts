@@ -4,12 +4,12 @@ import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 const typeNameInMessage = 'an non-negative integer less than 256';
 
 const {
-  MIN_VALUE,
   MAX_VALUE,
-  random: randomImpl,
-  is: isImpl,
+  MIN_VALUE,
   castType: castTypeImpl,
   clamp: clampImpl,
+  is: isImpl,
+  random: randomImpl,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<Uint16, 0, 255>(
   {
     integerOrSafeInteger: 'SafeInteger',

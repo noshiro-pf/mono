@@ -6,19 +6,19 @@ type ElementType = Uint16;
 const typeNameInMessage = 'a non-negative integer less than 2^16';
 
 const {
-  MIN_VALUE,
   MAX_VALUE,
-  min: min_,
-  max: max_,
-  pow,
+  MIN_VALUE,
   add,
-  sub,
-  mul,
-  div,
-  random,
-  is,
   castType,
   clamp,
+  div,
+  is,
+  max: max_,
+  min: min_,
+  mul,
+  pow,
+  random,
+  sub,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   0,

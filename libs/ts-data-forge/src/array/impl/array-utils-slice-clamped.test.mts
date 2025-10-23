@@ -72,7 +72,7 @@ describe('Arr', () => {
           end: 3,
           expected: [],
         },
-      ] as const)('sliceClamped($start, $end)', ({ start, end, expected }) => {
+      ] as const)('sliceClamped($start, $end)', ({ end, expected, start }) => {
         expect(sliceClamped(list, start, end)).toStrictEqual(expected);
       });
     }

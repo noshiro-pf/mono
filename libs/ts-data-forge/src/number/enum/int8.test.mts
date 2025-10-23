@@ -13,7 +13,7 @@ describe('Int8', () => {
       { value: Number.NaN, expected: false },
       { value: Number.POSITIVE_INFINITY, expected: false },
       { value: Number.NEGATIVE_INFINITY, expected: false },
-    ])('isInt8($value) should return $expected', ({ value, expected }) => {
+    ])('isInt8($value) should return $expected', ({ expected, value }) => {
       expect(isInt8(value)).toBe(expected);
     });
   });
@@ -23,7 +23,7 @@ describe('Int8', () => {
       { value: -128, expected: -128 },
       { value: 0, expected: 0 },
       { value: 127, expected: 127 },
-    ])('asInt8($value) should return $expected', ({ value, expected }) => {
+    ])('asInt8($value) should return $expected', ({ expected, value }) => {
       expect(asInt8(value)).toBe(expected);
     });
 
@@ -67,7 +67,7 @@ describe('Int8', () => {
       { value: 127, expected: 127 },
       { value: 200, expected: 127 },
       { value: 1.5, expected: 2 },
-    ])('Int8.clamp($value) should return $expected', ({ value, expected }) => {
+    ])('Int8.clamp($value) should return $expected', ({ expected, value }) => {
       expect(Int8.clamp(value)).toBe(expected);
     });
   });
@@ -94,7 +94,7 @@ describe('Int8', () => {
       { value: -128, expected: 128 },
     ] as const)(
       'Int8.abs($value) should return $expected',
-      ({ value, expected }) => {
+      ({ expected, value }) => {
         const result = Int8.abs(value);
         expect(result).toBe(expected);
         expectType<typeof result, typeof expected>('=');
@@ -109,7 +109,7 @@ describe('Int8', () => {
       { x: -100, y: -50, expected: -128 }, // clamped to min
     ] as const)(
       'Int8.add($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Int8.add(x, y)).toBe(expected);
       },
     );
@@ -122,7 +122,7 @@ describe('Int8', () => {
       { x: 100, y: -50, expected: 127 }, // clamped to max
     ] as const)(
       'Int8.sub($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Int8.sub(x, y)).toBe(expected);
       },
     );
@@ -135,7 +135,7 @@ describe('Int8', () => {
       { x: -20, y: 10, expected: -128 }, // clamped to min
     ] as const)(
       'Int8.mul($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Int8.mul(x, y)).toBe(expected);
       },
     );
@@ -148,7 +148,7 @@ describe('Int8', () => {
       { x: -100, y: 3, expected: -34 },
     ] as const)(
       'Int8.div($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Int8.div(x, y)).toBe(expected);
       },
     );
@@ -161,7 +161,7 @@ describe('Int8', () => {
       { x: -10, y: 3, expected: -128 }, // clamped to min
     ] as const)(
       'Int8.pow($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Int8.pow(x, y)).toBe(expected);
       },
     );

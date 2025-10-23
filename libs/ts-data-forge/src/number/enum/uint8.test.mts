@@ -13,7 +13,7 @@ describe('Uint8', () => {
       { value: Number.NaN, expected: false },
       { value: Number.POSITIVE_INFINITY, expected: false },
       { value: Number.NEGATIVE_INFINITY, expected: false },
-    ])('isUint8($value) should return $expected', ({ value, expected }) => {
+    ])('isUint8($value) should return $expected', ({ expected, value }) => {
       expect(isUint8(value)).toBe(expected);
     });
   });
@@ -23,7 +23,7 @@ describe('Uint8', () => {
       { value: 0, expected: 0 },
       { value: 128, expected: 128 },
       { value: 255, expected: 255 },
-    ])('asUint8($value) should return $expected', ({ value, expected }) => {
+    ])('asUint8($value) should return $expected', ({ expected, value }) => {
       expect(asUint8(value)).toBe(expected);
     });
 
@@ -67,7 +67,7 @@ describe('Uint8', () => {
       { value: 255, expected: 255 },
       { value: 300, expected: 255 },
       { value: 1.5, expected: 2 },
-    ])('Uint8.clamp($value) should return $expected', ({ value, expected }) => {
+    ])('Uint8.clamp($value) should return $expected', ({ expected, value }) => {
       expect(Uint8.clamp(value)).toBe(expected);
     });
   });
@@ -93,7 +93,7 @@ describe('Uint8', () => {
       { x: 100, y: 50, expected: 150 },
     ] as const)(
       'Uint8.add($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Uint8.add(x, y)).toBe(expected);
       },
     );
@@ -106,7 +106,7 @@ describe('Uint8', () => {
       { x: 200, y: 50, expected: 150 },
     ] as const)(
       'Uint8.sub($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Uint8.sub(x, y)).toBe(expected);
       },
     );
@@ -119,7 +119,7 @@ describe('Uint8', () => {
       { x: 100, y: 2, expected: 200 },
     ] as const)(
       'Uint8.mul($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Uint8.mul(x, y)).toBe(expected);
       },
     );
@@ -132,7 +132,7 @@ describe('Uint8', () => {
       { x: 255, y: 5, expected: 51 },
     ] as const)(
       'Uint8.div($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Uint8.div(x, y)).toBe(expected);
       },
     );
@@ -145,7 +145,7 @@ describe('Uint8', () => {
       { x: 10, y: 2, expected: 100 },
     ] as const)(
       'Uint8.pow($x, $y) should return $expected',
-      ({ x, y, expected }) => {
+      ({ expected, x, y }) => {
         expect(Uint8.pow(x, y)).toBe(expected);
       },
     );
