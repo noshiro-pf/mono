@@ -1,11 +1,11 @@
 import { type FlatConfig } from '../types/index.mjs';
-import { eslintFlatConfigForReactBase } from './react-base.mjs';
+import { eslintConfigForReactBase } from './react-base.mjs';
 
-export const eslintFlatConfigForReact = (
+export const eslintConfigForReact = (
   files?: readonly string[],
 ): readonly FlatConfig[] =>
   [
-    eslintFlatConfigForReactBase(files),
+    ...eslintConfigForReactBase(files),
     {
       ...(files === undefined ? {} : { files }),
       settings: {

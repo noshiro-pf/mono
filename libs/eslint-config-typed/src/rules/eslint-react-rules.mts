@@ -1,6 +1,6 @@
 import { withDefaultOption, type EslintReactRules } from '../types/index.mjs';
 
-export const eslintReactRules: EslintReactRules = {
+export const eslintReactRules = {
   /**
    * Disable in favor of prettier
    *
@@ -162,4 +162,4 @@ export const eslintReactRules: EslintReactRules = {
   // deprecated
   'react/jsx-sort-default-props': 0,
   'react/jsx-space-before-closing': 0,
-} as const;
+} as const satisfies EslintReactRules;

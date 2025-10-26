@@ -10,6 +10,12 @@
 
 ### eslintPluginSortDestructureKeysRules
 
-> `const` **eslintPluginSortDestructureKeysRules**: [`EslintPluginSortDestructureKeysRules`](../types/rules/eslint-plugin-sort-destructure-keys-rules.md#eslintpluginsortdestructurekeysrules)
+> `const` **eslintPluginSortDestructureKeysRules**: `object`
 
 Defined in: [src/rules/eslint-plugin-sort-destructure-keys-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-plugin-sort-destructure-keys-rules.mts#L3)
+
+#### Type Declaration
+
+##### sort-destructure-keys/sort-destructure-keys
+
+> `readonly` **sort-destructure-keys/sort-destructure-keys**: `"off"` = `'off'`

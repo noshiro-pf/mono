@@ -8,9 +8,9 @@
 
 ## Functions
 
-### eslintFlatConfigForReact()
+### eslintConfigForReact()
 
-> **eslintFlatConfigForReact**(`files?`): readonly `object`[]
+> **eslintConfigForReact**(`files?`): readonly `object`[]
 
 Defined in: [src/configs/react.mts:4](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/react.mts#L4)
 

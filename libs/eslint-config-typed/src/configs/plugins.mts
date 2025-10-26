@@ -50,11 +50,10 @@ import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 // import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
 // import eslintPluginTreeShakable from 'eslint-plugin-tree-shakable';
 import {
+  eslintPluginCustom,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
 } from '../plugins/index.mjs';
-
-import { eslintPluginCustom } from '../custom-rules/index.mjs';
 
 import { type ESLintPlugin, type FlatConfig } from '../types/index.mjs';
 

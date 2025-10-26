@@ -8,63 +8,75 @@
 
 ## References
 
-### eslintFlatConfigForCypress
+### eslintConfigForBrowser
 
-Re-exports [eslintFlatConfigForCypress](configs/cypress.md#eslintflatconfigforcypress)
-
----
-
-### eslintFlatConfigForJest
-
-Re-exports [eslintFlatConfigForJest](configs/jest.md#eslintflatconfigforjest)
+Re-exports [eslintConfigForBrowser](configs/browser.md#eslintconfigforbrowser)
 
 ---
 
-### eslintFlatConfigForPlaywright
+### eslintConfigForCypress
 
-Re-exports [eslintFlatConfigForPlaywright](configs/playwright.md#eslintflatconfigforplaywright)
-
----
-
-### eslintFlatConfigForPreact
-
-Re-exports [eslintFlatConfigForPreact](configs/preact.md#eslintflatconfigforpreact)
+Re-exports [eslintConfigForCypress](configs/cypress.md#eslintconfigforcypress)
 
 ---
 
-### eslintFlatConfigForReact
+### eslintConfigForJest
 
-Re-exports [eslintFlatConfigForReact](configs/react.md#eslintflatconfigforreact)
-
----
-
-### eslintFlatConfigForReactBase
-
-Re-exports [eslintFlatConfigForReactBase](configs/react-base.md#eslintflatconfigforreactbase)
+Re-exports [eslintConfigForJest](configs/jest.md#eslintconfigforjest)
 
 ---
 
-### eslintFlatConfigForTestingLibrary
+### eslintConfigForNodeJs
 
-Re-exports [eslintFlatConfigForTestingLibrary](configs/testing-library.md#eslintflatconfigfortestinglibrary)
-
----
-
-### eslintFlatConfigForTypeScript
-
-Re-exports [eslintFlatConfigForTypeScript](configs/typescript.md#eslintflatconfigfortypescript)
+Re-exports [eslintConfigForNodeJs](configs/nodejs.md#eslintconfigfornodejs)
 
 ---
 
-### eslintFlatConfigForTypeScriptWithoutRules
+### eslintConfigForPlaywright
 
-Re-exports [eslintFlatConfigForTypeScriptWithoutRules](configs/typescript-without-rules.md#eslintflatconfigfortypescriptwithoutrules)
+Re-exports [eslintConfigForPlaywright](configs/playwright.md#eslintconfigforplaywright)
 
 ---
 
-### eslintFlatConfigForVitest
+### eslintConfigForPreact
 
-Re-exports [eslintFlatConfigForVitest](configs/vitest.md#eslintflatconfigforvitest)
+Re-exports [eslintConfigForPreact](configs/preact.md#eslintconfigforpreact)
+
+---
+
+### eslintConfigForReact
+
+Re-exports [eslintConfigForReact](configs/react.md#eslintconfigforreact)
+
+---
+
+### eslintConfigForReactBase
+
+Re-exports [eslintConfigForReactBase](configs/react-base.md#eslintconfigforreactbase)
+
+---
+
+### eslintConfigForTestingLibrary
+
+Re-exports [eslintConfigForTestingLibrary](configs/testing-library.md#eslintconfigfortestinglibrary)
+
+---
+
+### eslintConfigForTypeScript
+
+Re-exports [eslintConfigForTypeScript](configs/typescript.md#eslintconfigfortypescript)
+
+---
+
+### eslintConfigForTypeScriptWithoutRules
+
+Re-exports [eslintConfigForTypeScriptWithoutRules](configs/typescript-without-rules.md#eslintconfigfortypescriptwithoutrules)
+
+---
+
+### eslintConfigForVitest
+
+Re-exports [eslintConfigForVitest](configs/vitest.md#eslintconfigforvitest)
 
 ---
 

@@ -1,5 +1,6 @@
 import {
   type EslintArrayFuncRules,
+  type EslintCustomRules,
   type EslintCypressRules,
   type EslintFunctionalRules,
   type EslintImportsRules,
@@ -7,6 +8,7 @@ import {
   type EslintJsxA11yRules,
   type EslintPlaywrightRules,
   type EslintPluginRules,
+  type EslintPluginSortDestructureKeysRules,
   type EslintPreferArrowFunctionRules,
   type EslintPromiseRules,
   type EslintReactHooksRules,
@@ -26,6 +28,7 @@ import {
 
 type KnownRules = DeepReadonly<
   EslintArrayFuncRules &
+    EslintCustomRules &
     EslintCypressRules &
     EslintFunctionalRules &
     EslintImportsRules &
@@ -33,6 +36,7 @@ type KnownRules = DeepReadonly<
     EslintJsxA11yRules &
     EslintPlaywrightRules &
     EslintPluginRules &
+    EslintPluginSortDestructureKeysRules &
     EslintPreferArrowFunctionRules &
     EslintPromiseRules &
     EslintReactHooksRules &

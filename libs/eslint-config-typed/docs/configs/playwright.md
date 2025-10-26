@@ -8,9 +8,9 @@
 
 ## Functions
 
-### eslintFlatConfigForPlaywright()
+### eslintConfigForPlaywright()
 
-> **eslintFlatConfigForPlaywright**(`files?`): `object`
+> **eslintConfigForPlaywright**(`files?`): `object`
 
 Defined in: [src/configs/playwright.mts:5](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/playwright.mts#L5)
 

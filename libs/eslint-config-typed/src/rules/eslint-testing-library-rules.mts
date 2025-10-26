@@ -3,7 +3,7 @@ import {
   type EslintTestingLibraryRules,
 } from '../types/index.mjs';
 
-export const eslintTestingLibraryRules: EslintTestingLibraryRules = {
+export const eslintTestingLibraryRules = {
   'testing-library/await-async-events': ['error', { eventModule: 'userEvent' }],
   'testing-library/await-async-queries': 'error',
   'testing-library/await-async-utils': 'error',
@@ -36,4 +36,4 @@ export const eslintTestingLibraryRules: EslintTestingLibraryRules = {
   'testing-library/prefer-implicit-assert': 'off',
   'testing-library/prefer-query-matchers': 'off',
   'testing-library/prefer-user-event': 'off',
-} as const;
+} as const satisfies EslintTestingLibraryRules;

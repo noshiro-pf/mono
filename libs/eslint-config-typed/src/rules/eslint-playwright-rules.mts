@@ -3,7 +3,7 @@ import {
   type EslintPlaywrightRules,
 } from '../types/index.mjs';
 
-export const eslintPlaywrightRules: EslintPlaywrightRules = {
+export const eslintPlaywrightRules = {
   /* Rules common with vitest (keep settings aligned) */
   'playwright/expect-expect': withDefaultOption('error'),
   'playwright/max-expects': 'off',
@@ -65,4 +65,4 @@ export const eslintPlaywrightRules: EslintPlaywrightRules = {
   'playwright/valid-expect-in-promise': 'error',
   'playwright/no-wait-for-navigation': 'error',
   'playwright/valid-test-tags': withDefaultOption('error'),
-} as const;
+} as const satisfies EslintPlaywrightRules;

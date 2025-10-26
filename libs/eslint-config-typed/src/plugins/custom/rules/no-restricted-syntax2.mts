@@ -62,7 +62,7 @@ export const noRestrictedSyntax: Rule.RuleModule = {
         // eslint-disable-next-line functional/immutable-data
         return Object.assign(result, {
           // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-          [selector](node: ESTree.Node) {
+          [selector]: (node: ESTree.Node) => {
             context.report({
               node,
               messageId: 'restrictedSyntax',

@@ -8,12 +8,6 @@
 
 ## References
 
-### banTypes
-
-Re-exports [banTypes](rules/typescript-eslint-rules.md#bantypes)
-
----
-
 ### eslintArrayFuncRules
 
 Re-exports [eslintArrayFuncRules](rules/eslint-array-func-rules.md#eslintarrayfuncrules)
@@ -146,45 +140,15 @@ Re-exports [eslintVitestRules](rules/eslint-vitest-rules.md#eslintvitestrules)
 
 ---
 
-### ignoredMutablePattern
-
-Re-exports [ignoredMutablePattern](rules/eslint-functional-rules.md#ignoredmutablepattern)
-
----
-
-### immutableDataOptions
-
-Re-exports [immutableDataOptions](rules/eslint-functional-rules.md#immutabledataoptions)
-
----
-
-### noLetOptions
-
-Re-exports [noLetOptions](rules/eslint-functional-rules.md#noletoptions)
-
----
-
 ### restrictedGlobals
 
 Re-exports [restrictedGlobals](rules/eslint-rules.md#restrictedglobals)
 
 ---
 
-### restrictedGlobalsForFrontend
+### restrictedGlobalsForBrowser
 
-Re-exports [restrictedGlobalsForFrontend](rules/eslint-rules.md#restrictedglobalsforfrontend)
-
----
-
-### restrictedImportsOption
-
-Re-exports [restrictedImportsOption](rules/typescript-eslint-rules.md#restrictedimportsoption)
-
----
-
-### restrictedSyntax
-
-Re-exports [restrictedSyntax](rules/eslint-rules.md#restrictedsyntax)
+Re-exports [restrictedGlobalsForBrowser](rules/eslint-rules.md#restrictedglobalsforbrowser)
 
 ---
 

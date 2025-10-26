@@ -8,9 +8,9 @@
 
 ## Functions
 
-### eslintFlatConfigForPreact()
+### eslintConfigForPreact()
 
-> **eslintFlatConfigForPreact**(`files?`): readonly `object`[]
+> **eslintConfigForPreact**(`files?`): readonly `object`[]
 
 Defined in: [src/configs/preact.mts:4](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/preact.mts#L4)
 

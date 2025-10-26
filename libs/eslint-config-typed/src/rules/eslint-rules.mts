@@ -4,94 +4,88 @@ import {
   type EslintRulesOption,
 } from '../types/index.mjs';
 
-export const restrictedSyntax = [
-  {
-    // ban "in" operator
-    selector: "BinaryExpression[operator='in']",
-    message: 'use "Object.hasOwn" instead.',
-  },
-  {
-    // ban Object.prototype.hasOwnProperty.call
-    selector:
-      "MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']",
-    message: 'use "Object.hasOwn" instead.',
-  },
-  {
-    // ban "new Array" expression
-    selector: "NewExpression[callee.name='Array']",
-    message: 'use Array.from instead.',
-  },
-  {
-    // ban "React.useImperativeHandle"
-    selector:
-      "MemberExpression[object.name='React'][property.name='useImperativeHandle']",
-    message: 'pass Observable via props instead.',
-  },
-
-  // replaced by @typescript-eslint/consistent-type-assertions and total-functions/no-unsafe-type-assertion
-  // {
-  //   // ban "as"
-  //   selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
-  //   message: "Don't use `as`.",
-  // },
-  // {
-  //   selector:
-  //     "Identifier[name='draft'][parent.parent.callee.name!='produce'][parent.parent.parent.parent.parent.parent.callee.name!='produce']",
-  //   message:
-  //     "Don't use the identifier name `draft` except in immer produce function.",
-  // },
-];
-
 export const restrictedGlobals = [
-  'eval',
-  'Function',
+  {
+    name: 'eval',
+    message: 'Avoid using dangerous eval().',
+  },
   {
     name: 'Infinity',
-    message: "use 'Number.Infinity' instead.",
+    message: "Use 'Number.POSITIVE_INFINITY' instead.",
   },
   {
     name: 'isFinite',
-    message: "use 'Number.isFinite' instead.",
+    message: 'Use Number.isFinite instead to avoid type coercion.',
   },
   {
     name: 'isNaN',
-    message: "use 'Number.isNaN' instead.",
+    message: 'Use Number.isNaN instead to avoid type coercion.',
   },
   {
-    name: 'NaN',
-    message: "use 'Number.NaN'  instead.",
+    name: 'encodeURIComponent',
+    message:
+      "Use 'stringify' from https://www.npmjs.com/package/query-string instead. (link: https://zenn.dev/megeton/articles/5f1ba5c7e1bfd0)",
   },
   {
-    name: 'parseFloat',
-    message: "use 'Number.parseFloat' instead.",
-  },
-  {
-    name: 'parseInt',
-    message: "use 'Number.parseInt' instead.",
+    name: 'decodeURIComponent',
+    message:
+      "Use 'parse' from https://www.npmjs.com/package/query-string instead. (link: https://zenn.dev/megeton/articles/5f1ba5c7e1bfd0)",
   },
 ] as const satisfies EslintRulesOption['no-restricted-globals'];
 
-export const restrictedGlobalsForFrontend = [
+export const restrictedGlobalsForBrowser = [
   ...restrictedGlobals,
   {
     // Avoid ambiguity with react-router's location
     name: 'location',
-    message: "use 'window.location' instead.",
+    message: "Use 'window.location' instead.",
   },
   {
     // Avoid ambiguity with react-router's history
     name: 'history',
-    message: "use 'window.history' instead.",
+    message: "Use 'window.history' instead.",
   },
   {
     // Avoid ambiguity with react-router's navigator
     name: 'navigator',
-    message: "use 'window.navigator' instead.",
+    message: "Use 'window.navigator' instead.",
+  },
+  {
+    name: 'length',
+    message: "Don't use confusing globals declared in lib.dom",
+  },
+  {
+    name: 'event',
+    message: "Don't use confusing globals declared in lib.dom",
+  },
+  {
+    name: 'name',
+    message: "Don't use confusing globals declared in lib.dom",
+  },
+  {
+    name: 'parent',
+    message: "Don't use confusing globals declared in lib.dom",
+  },
+  {
+    name: 'status',
+    message: "Don't use confusing globals declared in lib.dom",
+  },
+  {
+    name: 'top',
+    message: "Don't use confusing globals declared in lib.dom",
+  },
+  {
+    name: 'close',
+    message: "Don't use confusing globals declared in lib.dom",
+  },
+  {
+    name: 'open',
+    message: "Don't use confusing globals declared in lib.dom",
   },
 ] as const satisfies EslintRulesOption['no-restricted-globals'];
 
 /** @link https://github.com/eslint/eslint/blob/main/conf/eslint-all.js */
-export const eslintRules: EslintRules = {
+export const eslintRules = {
   /**
    * Disable in favor of prettier
    *
@@ -160,7 +154,6 @@ export const eslintRules: EslintRules = {
   'prefer-promise-reject-errors': 'off',
   'consistent-return': 'off',
 
-  // customized
   'accessor-pairs': withDefaultOption('error'),
 
   // When there is no default case for a switch statement, there is a false positive that reports an error without considering type information.
@@ -174,7 +167,10 @@ export const eslintRules: EslintRules = {
   'consistent-this': withDefaultOption('error'),
   'default-case-last': 'error',
   'default-case': 'off', // disabled
+
   eqeqeq: ['error', 'always', { null: 'ignore' }],
+  'no-eq-null': 'off', // disabled to allow null in eqeqeq
+
   'for-direction': 'error',
   'func-name-matching': withDefaultOption('error'),
   'func-names': [
@@ -203,7 +199,6 @@ export const eslintRules: EslintRules = {
   'max-params': 'off', // disabled
   'max-statements': 'off', // disabled
   'new-cap': 'off', // disabled
-  'no-alert': 'error',
   'no-async-promise-executor': 'error',
   'no-await-in-loop': 'error',
   'no-bitwise': 'off', // disabled
@@ -228,7 +223,6 @@ export const eslintRules: EslintRules = {
   'no-empty-pattern': withDefaultOption('error'),
   'no-empty-static-block': 'error',
   'no-empty': withDefaultOption('error'),
-  'no-eq-null': 'off', // off since eqeqeq allows null
   'no-eval': withDefaultOption('error'),
   'no-ex-assign': 'error',
   'no-extend-native': withDefaultOption('error'),
@@ -236,7 +230,7 @@ export const eslintRules: EslintRules = {
   'no-extra-boolean-cast': [
     'error',
     {
-      enforceForLogicalOperands: true,
+      enforceForInnerExpressions: true,
     },
   ],
   'no-extra-label': 'error',
@@ -252,7 +246,6 @@ export const eslintRules: EslintRules = {
       string: true,
     },
   ],
-  'no-implicit-globals': withDefaultOption('error'),
   'no-inline-comments': 'off', // disabled
   'no-inner-declarations': withDefaultOption('error'),
   'no-invalid-regexp': withDefaultOption('error'),
@@ -265,11 +258,11 @@ export const eslintRules: EslintRules = {
   'no-misleading-character-class': withDefaultOption('error'),
   'no-multi-assign': withDefaultOption('error'),
   'no-multi-str': 'error',
-  'no-negated-condition': 'off', // disabled
-  'no-nested-ternary': 'off', // unicorn/no-nested-ternary
+  'no-negated-condition': 'off', // Covered by unicorn/no-negated-condition
+  'no-nested-ternary': 'off', // Covered by unicorn/no-nested-ternary
   'no-new-func': 'error',
   'no-new-native-nonconstructor': 'error',
-  'no-new-wrappers': 'error',
+  'no-new-wrappers': 'off', // Covered by unicorn/new-for-builtins
   'no-new': 'error',
   'no-nonoctal-decimal-escape': 'error',
   'no-object-constructor': 'error',
@@ -292,7 +285,7 @@ export const eslintRules: EslintRules = {
   'no-proto': 'error',
   'no-prototype-builtins': 'error',
   'no-regex-spaces': 'error',
-  'no-restricted-exports': withDefaultOption('error'),
+  'no-restricted-exports': ['error', { restrictedNamedExports: ['default'] }],
   'no-restricted-globals': ['error', ...restrictedGlobals],
   'no-restricted-properties': withDefaultOption('error'),
 
@@ -300,17 +293,52 @@ export const eslintRules: EslintRules = {
    * Write restricted syntax here that is difficult to achieve with other rules.
    * Use the following AST checker to determine how to write selectors:
    *
-   * AST checker:
-   * https://typescript-eslint.io/play/#ts=4.7.2&sourceType=module&showAST=es
+   * AST checker: https://typescript-eslint.io/play/#ts=5.9.3&showAST=es&fileType=.ts&code=LAKCA&eslintrc=N4KABGBEBOCuA2BTAzpAXGYBfEWg&tsconfig=N4KABGBEDGD2C2AHAlgGwKYCcDyiAuysAdgM6QBcYoEEkJemy0eAcgK6qoDCAFutAGsylBm3TgwAXxCSgA&tokens=false
    */
-  'no-restricted-syntax': ['error', ...restrictedSyntax],
+  'no-restricted-syntax': [
+    'error',
+
+    {
+      // ban "in" operator
+      selector: "BinaryExpression[operator='in']",
+      message: 'use "Object.hasOwn" instead.',
+    },
+    {
+      // ban Object.prototype.hasOwnProperty.call
+      selector:
+        "MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']",
+      message: 'use "Object.hasOwn" instead.',
+    },
+    {
+      // ban "new Array" expression
+      selector: "NewExpression[callee.name='Array']",
+      message: 'use Array.from instead.',
+    },
+    {
+      // ban "React.useImperativeHandle"
+      selector:
+        "MemberExpression[object.name='React'][property.name='useImperativeHandle']",
+      message: 'pass Observable via props instead.',
+    },
+    // replaced by @typescript-eslint/consistent-type-assertions and total-functions/no-unsafe-type-assertion
+    // {
+    //   // ban "as"
+    //   selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
+    //   message: "Don't use `as`.",
+    // },
+    // {
+    //   selector:
+    //     "Identifier[name='draft'][parent.parent.callee.name!='produce'][parent.parent.parent.parent.parent.parent.callee.name!='produce']",
+    //   message:
+    //     "Don't use the identifier name `draft` except in immer produce function.",
+    // },
+  ],
 
   'no-return-assign': withDefaultOption('error'),
-  'no-script-url': 'error',
   'no-self-assign': withDefaultOption('error'),
   'no-self-compare': 'error',
   'no-sequences': withDefaultOption('error'),
-  'no-shadow-restricted-names': withDefaultOption('error'),
+  'no-shadow-restricted-names': ['error', { reportGlobalThis: true }],
   'no-sparse-arrays': 'error',
   'no-template-curly-in-string': 'error',
   'no-ternary': 'off', // disabled
@@ -318,34 +346,40 @@ export const eslintRules: EslintRules = {
   'no-undefined': 'off', // disabled
   'no-underscore-dangle': 'off', // disabled
   'no-unmodified-loop-condition': 'error',
-  'no-unneeded-ternary': withDefaultOption('error'),
+  'no-unneeded-ternary': ['error', { defaultAssignment: false }],
   'no-unreachable-loop': withDefaultOption('error'),
   'no-unsafe-finally': 'error',
-  'no-unsafe-optional-chaining': withDefaultOption('error'),
+  'no-unsafe-optional-chaining': [
+    'error',
+    { disallowArithmeticOperators: true },
+  ],
   'no-unused-labels': 'error',
   'no-unused-private-class-members': 'error',
   'no-useless-backreference': 'error',
   'no-useless-call': 'error',
   'no-useless-catch': 'error',
-  'no-useless-computed-key': withDefaultOption('error'),
+  'no-useless-computed-key': ['error', { enforceForClassMembers: true }],
   'no-useless-concat': 'error',
   'no-useless-escape': withDefaultOption('error'),
   'no-useless-rename': withDefaultOption('error'),
   'no-useless-return': 'error',
-  'no-void': withDefaultOption('error'),
+  'no-void': ['error', { allowAsStatement: false }],
   'no-warning-comments': 'off', // disabled
   'no-with': 'error',
   'object-shorthand': withDefaultOption('error'),
   'one-var': 'off', // disabled
-  'operator-assignment': withDefaultOption('error'),
-  'prefer-arrow-callback': withDefaultOption('error'),
+  'operator-assignment': ['error', 'always'],
+  'prefer-arrow-callback': [
+    'error',
+    { allowNamedFunctions: false, allowUnboundThis: false },
+  ],
   'prefer-destructuring': 'off', // disabled
   'prefer-exponentiation-operator': 'error',
   'prefer-named-capture-group': 'off', // disabled
   'prefer-numeric-literals': 'error',
   'prefer-object-has-own': 'error',
   'prefer-object-spread': 'error',
-  'prefer-regex-literals': withDefaultOption('error'),
+  'prefer-regex-literals': ['error', { disallowRedundantWrapping: true }],
 
   /**
    * Used to avoid ambiguity with `+` operator. restrict-plus-operands limits
@@ -360,20 +394,33 @@ export const eslintRules: EslintRules = {
 
   radix: withDefaultOption('error'),
   'require-atomic-updates': withDefaultOption('error'),
+
+  /** https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_class */
   'require-unicode-regexp': withDefaultOption('error'),
+
   'require-yield': 'error',
-  'sort-imports': 'off', // disabled
+  'sort-imports': 'off', // Covered by prettier-plugin-organize-imports
   'sort-keys': 'off', // disabled
   'sort-vars': 'off', // disabled
   strict: withDefaultOption('error'),
   'symbol-description': 'off', // disabled
-  'use-isnan': withDefaultOption('error'),
+  'use-isnan': [
+    'error',
+    { enforceForIndexOf: true, enforceForSwitchCase: true },
+  ],
   'vars-on-top': 'error',
   yoda: 'off', // disabled
 
   'no-useless-assignment': 'error',
   'no-unassigned-vars': 'error',
   'preserve-caught-error': ['error', { requireCatchParameter: false }],
+
+  // For browser environment only
+  'no-alert': 'error',
+  'no-implicit-globals': withDefaultOption('error'),
+  'no-script-url': 'error',
+
+  // For Node.js environment only
 
   // deprecated
   'lines-around-comment': 0,
@@ -469,4 +516,4 @@ export const eslintRules: EslintRules = {
   'no-new-symbol': 0, // ts(2588)
   'line-comment-position': 0, // disabled
   'multiline-comment-style': 0, // disabled
-} as const;
+} as const satisfies EslintRules;

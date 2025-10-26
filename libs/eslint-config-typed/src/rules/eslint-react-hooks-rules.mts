@@ -3,7 +3,7 @@ import {
   type EslintReactHooksRules,
 } from '../types/index.mjs';
 
-export const eslintReactHooksRules: EslintReactHooksRules = {
+export const eslintReactHooksRules = {
   'react-hooks/rules-of-hooks': withDefaultOption('error'),
   'react-hooks/exhaustive-deps': withDefaultOption('error'),
   'react-hooks/hooks': withDefaultOption('error'),
@@ -33,4 +33,4 @@ export const eslintReactHooksRules: EslintReactHooksRules = {
   'react-hooks/automatic-effect-dependencies': withDefaultOption('error'),
   'react-hooks/fire': withDefaultOption('error'),
   'react-hooks/fbt': withDefaultOption('error'),
-} as const;
+} as const satisfies EslintReactHooksRules;

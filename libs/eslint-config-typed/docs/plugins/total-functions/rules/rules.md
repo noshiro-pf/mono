@@ -12,7 +12,7 @@
 
 > `const` **totalFunctionsRules**: `object`
 
-Defined in: [src/plugins/total-functions/rules/rules.mts:15](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/rules.mts#L15)
+Defined in: [src/plugins/total-functions/rules/rules.mts:17](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/plugins/total-functions/rules/rules.mts#L17)
 
 #### Type Declaration
 
@@ -48,9 +48,17 @@ Defined in: [src/plugins/total-functions/rules/rules.mts:15](https://github.com/
 
 > `readonly` **no-premature-fp-ts-effects**: `RuleModule`\<`string`, readonly `unknown`[], `unknown`, `RuleListener`\> = `noPrematureFpTsEffects`
 
+##### no-unsafe-enum-assignment
+
+> `readonly` **no-unsafe-enum-assignment**: `RuleModule`\<`never`, readonly \[\], `unknown`, `RuleListener`\> = `noUnsafeEnumAssignment`
+
 ##### no-unsafe-mutable-readonly-assignment
 
 > `readonly` **no-unsafe-mutable-readonly-assignment**: `RuleModule`\<`"errorStringGeneric"`, readonly `unknown`[], `unknown`, `RuleListener`\> = `noUnsafeMutableReadonlyAssignment`
+
+##### no-unsafe-optional-property-assignment
+
+> `readonly` **no-unsafe-optional-property-assignment**: `RuleModule`\<`never`, readonly \[\], `unknown`, `RuleListener`\> = `noUnsafeOptionalPropertyAssignment`
 
 ##### no-unsafe-readonly-mutable-assignment
 

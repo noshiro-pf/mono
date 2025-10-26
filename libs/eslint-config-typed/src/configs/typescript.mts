@@ -3,6 +3,7 @@ import {
   eslintFunctionalRules,
   eslintImportsRules,
   eslintPluginSortDestructureKeysRules,
+  eslintPreferArrowFunctionRules,
   eslintPromiseRules,
   eslintRules,
   eslintSecurityRules,
@@ -12,27 +13,30 @@ import {
   typescriptEslintRules,
 } from '../rules/index.mjs';
 import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
-import { eslintFlatConfigForTypeScriptWithoutRules } from './typescript-without-rules.mjs';
+import { eslintConfigForTypeScriptWithoutRules } from './typescript-without-rules.mjs';
 
-export const eslintFlatConfigForTypeScript = ({
+export const eslintConfigForTypeScript = ({
   files,
   packageDirs,
   tsconfigFileName,
   tsconfigRootDir,
+  usingStrictTsLib,
 }: Readonly<{
   tsconfigFileName: string;
   tsconfigRootDir: string;
   packageDirs: readonly string[];
   files?: readonly string[];
+  usingStrictTsLib?: boolean;
 }>): readonly FlatConfig[] => [
-  ...eslintFlatConfigForTypeScriptWithoutRules({
+  ...eslintConfigForTypeScriptWithoutRules({
     tsconfigFileName,
     tsconfigRootDir,
   }),
   {
-    files: files ?? ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+    files: files ?? ['**/*.{ts,tsx,mts,cts}'],
     rules: defineKnownRules({
       ...eslintArrayFuncRules,
+      ...eslintPreferArrowFunctionRules,
       ...eslintFunctionalRules,
       ...eslintTotalFunctionsRules,
       ...eslintImportsRules,
@@ -50,17 +54,23 @@ export const eslintFlatConfigForTypeScript = ({
           packageDir: packageDirs,
         },
       ],
+      ...(usingStrictTsLib === true
+        ? {
+            '@typescript-eslint/prefer-promise-reject-errors': 'off',
+            '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
+          }
+        : {}),
     }),
   } satisfies FlatConfig,
   {
-    files: ['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
+    files: ['**/*.{js,jsx,mjs,cjs}'],
     rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
       'import/no-internal-modules': 'off',
     }),
   } satisfies FlatConfig,
   {
-    files: ['**/*.d.ts', '**/*.d.mts', '**/*.d.cts'],
+    files: ['**/*.d.{ts,mts,cts}'],
     rules: defineKnownRules({
       '@typescript-eslint/triple-slash-reference': 'off',
       'import/unambiguous': 'off',
@@ -68,23 +78,25 @@ export const eslintFlatConfigForTypeScript = ({
   } satisfies FlatConfig,
   {
     files: [
-      '**/eslint.config.js',
-      '**/eslint.config.*.mjs',
-      '**/vite.config.ts',
-      '**/vite.config.mts',
-      '**/vitest.config.ts',
-      '**/vitest.config.mts',
-      '**/jest.config.js',
-      '**/jest.config.mjs',
-      '**/jest.config*.mjs',
-      '**/cypress.config.ts',
-      '**/cypress.config.mts',
-      '**/playwright.config.ts',
-      '**/playwright.config.mts',
+      // e.g.
+      // - eslint.config.ts
+      // - vitest.config.ts
+      // - jest.config.js
+      // - cypress.config.ts
+      // - playwright.config.ts
+      // - rollup.config.ts
+
+      '**/*.config.{js,mjs,cjs,ts,mts,cts}',
+
+      '**/*.config.*.{js,mjs,cjs,ts,mts,cts}',
+
+      '**/.markdownlint-cli2.{jsonc,yaml,cjs,mjs}',
+      '**/.markdownlint.{jsonc,json,yaml,yml,cjs,mjs}',
     ],
     rules: defineKnownRules({
       '@typescript-eslint/no-restricted-imports': 'off',
       'import/no-default-export': 'off',
+      'import/no-anonymous-default-export': 'off',
       'import/no-internal-modules': 'off',
       'import/no-named-as-default': 'off',
       'import/namespace': 'off',

@@ -3,6 +3,6 @@ import {
   type EslintReactRefreshRules,
 } from '../types/index.mjs';
 
-export const eslintReactRefreshRules: EslintReactRefreshRules = {
+export const eslintReactRefreshRules = {
   'react-refresh/only-export-components': withDefaultOption('error'),
-} as const;
+} as const satisfies EslintReactRefreshRules;

@@ -2,9 +2,7 @@ import globals from 'globals';
 import { eslintJestRules } from '../rules/index.mjs';
 import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForJest = (
-  files?: readonly string[],
-): FlatConfig =>
+export const eslintConfigForJest = (files?: readonly string[]): FlatConfig =>
   ({
     ...(files === undefined ? {} : { files }),
     languageOptions: {

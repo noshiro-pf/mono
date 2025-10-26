@@ -1,6 +1,6 @@
 import { withDefaultOption, type EslintCypressRules } from '../types/index.mjs';
 
-export const eslintCypressRules: EslintCypressRules = {
+export const eslintCypressRules = {
   'cypress/no-assigning-return-values': 'error',
   'cypress/no-unnecessary-waiting': 'error',
   'cypress/no-async-tests': 'error',
@@ -13,4 +13,4 @@ export const eslintCypressRules: EslintCypressRules = {
   'cypress/no-debug': 'error',
   'cypress/no-chained-get': 'error',
   'cypress/no-xpath': 'error',
-} as const;
+} as const satisfies EslintCypressRules;

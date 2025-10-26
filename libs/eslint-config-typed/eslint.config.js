@@ -1,6 +1,8 @@
 import {
-  eslintFlatConfigForTypeScript,
-  eslintFlatConfigForVitest,
+  defineKnownRules,
+  eslintConfigForNodeJs,
+  eslintConfigForTypeScript,
+  eslintConfigForVitest,
 } from 'eslint-config-typed';
 import 'ts-repo-utils';
 
@@ -11,16 +13,18 @@ const defineConfig = () => [
   {
     ignores: ['eslint.config.js', 'dist', 'coverage'],
   },
-  ...eslintFlatConfigForTypeScript({
+
+  ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
     packageDirs: [thisDir],
   }),
-  eslintFlatConfigForVitest(),
+
+  eslintConfigForVitest(),
 
   {
     files: ['test/**/*.mts', '**/*.test.mts'],
-    rules: {
+    rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-duplicate-type-constituents': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -28,49 +32,44 @@ const defineConfig = () => [
       '@typescript-eslint/no-restricted-types': 'off',
       '@typescript-eslint/no-redundant-type-constituents': 'off',
       'unicorn/consistent-function-scoping': 'off',
-    },
+    }),
   },
 
+  eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
     files: ['scripts/**', 'configs/**'],
-    rules: {
+    rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
       'no-await-in-loop': 'off',
       'import/no-unassigned-import': 'off',
       'import/no-internal-modules': 'off',
       'import/no-default-export': 'off',
       'import/no-extraneous-dependencies': 'off',
-      'unicorn/no-process-exit': 'off',
-    },
+    }),
   },
   {
     files: ['samples/**/*'],
-    rules: {
+    rules: defineKnownRules({
       'import/no-extraneous-dependencies': 'off',
       'import/no-internal-modules': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       'functional/immutable-data': 'off',
-    },
-  },
-  {
-    files: ['configs/**/*', '.markdownlint-cli2.mjs'],
-    rules: {
-      'import/no-default-export': 'off',
-      'import/no-anonymous-default-export': 'off',
-    },
+    }),
   },
   {
     files: ['src/types/rules/*.mts'],
-    rules: { 'functional/readonly-type': ['error', 'keyword'] },
+    rules: defineKnownRules({
+      'functional/readonly-type': ['error', 'keyword'],
+    }),
   },
   {
     files: [
       'src/plugins/total-functions/rules/**',
       'src/plugins/tree-shakable/rules/**',
     ],
-    rules: {
+    rules: defineKnownRules({
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
-    },
+    }),
   },
 ];
 

@@ -8,9 +8,9 @@
 
 ## Functions
 
-### eslintFlatConfigForVitest()
+### eslintConfigForVitest()
 
-> **eslintFlatConfigForVitest**(`files?`): `object`
+> **eslintConfigForVitest**(`files?`): `object`
 
 Defined in: [src/configs/vitest.mts:5](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/vitest.mts#L5)
 

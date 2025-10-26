@@ -1,5 +1,5 @@
 import { type EslintTreeShakableRules } from '../types/index.mjs';
 
-export const eslintTreeShakableRules: EslintTreeShakableRules = {
+export const eslintTreeShakableRules = {
   'tree-shakable/import-star': 'error',
-} as const;
+} as const satisfies EslintTreeShakableRules;

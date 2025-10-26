@@ -8,9 +8,9 @@
 
 ## Functions
 
-### eslintFlatConfigForCypress()
+### eslintConfigForCypress()
 
-> **eslintFlatConfigForCypress**(`files?`): `object`
+> **eslintConfigForCypress**(`files?`): `object`
 
 Defined in: [src/configs/cypress.mts:5](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/cypress.mts#L5)
 

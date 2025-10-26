@@ -12,7 +12,7 @@
 
 > **defineKnownRules**(`rules`): `Partial`\<`KnownRules`\>
 
-Defined in: [src/types/define-known-rules.mts:53](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/define-known-rules.mts#L53)
+Defined in: [src/types/define-known-rules.mts:57](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/define-known-rules.mts#L57)
 
 #### Parameters
 

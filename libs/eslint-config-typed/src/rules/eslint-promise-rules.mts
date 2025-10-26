@@ -1,6 +1,6 @@
 import { withDefaultOption, type EslintPromiseRules } from '../types/index.mjs';
 
-export const eslintPromiseRules: EslintPromiseRules = {
+export const eslintPromiseRules = {
   'promise/catch-or-return': ['error', { allowFinally: true }],
   'promise/no-return-wrap': withDefaultOption('error'),
   'promise/param-names': withDefaultOption('error'),
@@ -23,4 +23,4 @@ export const eslintPromiseRules: EslintPromiseRules = {
   'promise/no-multiple-resolved': 'error',
   'promise/spec-only': withDefaultOption('error'),
   'promise/prefer-catch': 'error',
-} as const;
+} as const satisfies EslintPromiseRules;

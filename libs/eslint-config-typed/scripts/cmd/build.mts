@@ -33,10 +33,7 @@ const build = async (): Promise<void> => {
 
   {
     echo('3.1 Generating rules types...');
-    await runCmdStep(
-      'pnpm run gen-rules-type',
-      'Generating rules types failed',
-    );
+    await runCmdStep('pnpm run gen-rule-type', 'Generating rules types failed');
     echo('✓ Generated rules types\n');
   }
 

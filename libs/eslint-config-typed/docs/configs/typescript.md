@@ -8,17 +8,17 @@
 
 ## Functions
 
-### eslintFlatConfigForTypeScript()
+### eslintConfigForTypeScript()
 
-> **eslintFlatConfigForTypeScript**(`__namedParameters`): readonly `object`[]
+> **eslintConfigForTypeScript**(`__namedParameters`): readonly `object`[]
 
-Defined in: [src/configs/typescript.mts:17](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/typescript.mts#L17)
+Defined in: [src/configs/typescript.mts:18](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/typescript.mts#L18)
 
 #### Parameters
 
 ##### \_\_namedParameters
 
-`Readonly`\<\{ `files?`: readonly `string`[]; `packageDirs`: readonly `string`[]; `tsconfigFileName`: `string`; `tsconfigRootDir`: `string`; \}\>
+`Readonly`\<\{ `files?`: readonly `string`[]; `packageDirs`: readonly `string`[]; `tsconfigFileName`: `string`; `tsconfigRootDir`: `string`; `usingStrictTsLib?`: `boolean`; \}\>
 
 #### Returns
 

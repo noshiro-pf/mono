@@ -3,7 +3,7 @@ import globals from 'globals';
 import { type FlatConfig } from '../types/index.mjs';
 import { plugins } from './plugins.mjs';
 
-export const eslintFlatConfigForTypeScriptWithoutRules = ({
+export const eslintConfigForTypeScriptWithoutRules = ({
   tsconfigFileName,
   tsconfigRootDir,
 }: Readonly<{

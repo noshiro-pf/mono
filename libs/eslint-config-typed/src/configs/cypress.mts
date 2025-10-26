@@ -2,9 +2,7 @@ import globals from 'globals';
 import { eslintCypressRules } from '../rules/index.mjs';
 import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForCypress = (
-  files?: readonly string[],
-): FlatConfig =>
+export const eslintConfigForCypress = (files?: readonly string[]): FlatConfig =>
   ({
     ...(files === undefined ? {} : { files }),
     languageOptions: {

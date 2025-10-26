@@ -1,6 +1,6 @@
 import { withDefaultOption, type EslintVitestRules } from '../types/index.mjs';
 
-export const eslintVitestRules: EslintVitestRules = {
+export const eslintVitestRules = {
   /* Rules common with jest and playwright (keep settings aligned) */
   'vitest/expect-expect': withDefaultOption('error'),
   'vitest/max-expects': 'off',
@@ -79,4 +79,4 @@ export const eslintVitestRules: EslintVitestRules = {
 
   // deprecated
   'vitest/no-done-callback': 0,
-} as const;
+} as const satisfies EslintVitestRules;

@@ -1,41 +1,9 @@
 import {
   withDefaultOption,
-  type RestrictedImportsOption,
   type TypeScriptEslintRules,
-  type TypeScriptEslintRulesOption,
 } from '../types/index.mjs';
 
-export const banTypes: TypeScriptEslintRulesOption['@typescript-eslint/no-restricted-types']['types'] =
-  {
-    object: {
-      message: 'Use `UnknownRecord` instead.',
-      fixWith: 'UnknownRecord',
-    },
-  } as const;
-
-// Note: If paths with the same name are defined multiple times, later definitions may overwrite earlier ones
-export const restrictedImportsOption: RestrictedImportsOption = {
-  paths: [
-    {
-      name: 'preact/compat',
-      importNames: [
-        'memo',
-        'useState',
-        'useReducer',
-        'useMemo',
-        'useCallback',
-        'useRef',
-        'useContext',
-        'useEffect',
-        'useLayoutEffect',
-        'useErrorBoundary',
-      ],
-      message: 'import hooks from preact/hooks instead.',
-    },
-  ],
-} as const;
-
-export const typescriptEslintRules: TypeScriptEslintRules = {
+export const typescriptEslintRules = {
   '@typescript-eslint/adjacent-overload-signatures': 'error',
   '@typescript-eslint/array-type': [
     'error',
@@ -44,7 +12,18 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/await-thenable': 'error',
   '@typescript-eslint/ban-ts-comment': withDefaultOption('error'),
   '@typescript-eslint/ban-tslint-comment': 'error',
-  '@typescript-eslint/no-restricted-types': ['error', { types: banTypes }],
+  '@typescript-eslint/no-restricted-types': [
+    'error',
+    {
+      types: {
+        object: {
+          message: 'Use `UnknownRecord` instead.',
+          fixWith: 'UnknownRecord',
+        },
+      },
+    },
+  ],
+
   '@typescript-eslint/class-literal-property-style': withDefaultOption('error'),
   '@typescript-eslint/consistent-indexed-object-style':
     withDefaultOption('error'),
@@ -74,6 +53,11 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     { allowIndexSignaturePropertyAccess: true },
   ],
 
+  '@typescript-eslint/explicit-member-accessibility': [
+    'error',
+    { accessibility: 'no-public' },
+  ],
+
   '@typescript-eslint/explicit-function-return-type': [
     'error',
     {
@@ -87,11 +71,8 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
       allowIIFEs: false,
     },
   ],
-  '@typescript-eslint/explicit-member-accessibility': [
-    'error',
-    { accessibility: 'no-public' },
-  ],
-  '@typescript-eslint/explicit-module-boundary-types': 'off', // preferred to use explicit-function-return-type
+  '@typescript-eslint/explicit-module-boundary-types': 'off', // Covered by explicit-function-return-type
+
   '@typescript-eslint/init-declarations': 'off', // let is disabled by functional/no-let
   '@typescript-eslint/member-ordering': 'off', // disabled
 
@@ -100,18 +81,28 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
    * safety
    * https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-function-parameters-bivariant
    */
-  '@typescript-eslint/method-signature-style': withDefaultOption('error'),
+  '@typescript-eslint/method-signature-style': ['error', 'property'],
   '@typescript-eslint/prefer-function-type': 'error',
 
   '@typescript-eslint/naming-convention': 'off', // disabled
   '@typescript-eslint/no-array-constructor': 'error',
   '@typescript-eslint/no-base-to-string': withDefaultOption('error'),
   '@typescript-eslint/no-confusing-non-null-assertion': 'error',
-  '@typescript-eslint/no-confusing-void-expression': withDefaultOption('error'),
+  '@typescript-eslint/no-confusing-void-expression': [
+    'error',
+    {
+      ignoreArrowShorthand: false,
+      ignoreVoidOperator: false,
+      ignoreVoidReturningFunctions: false,
+    },
+  ],
   '@typescript-eslint/no-dupe-class-members': 'error',
   '@typescript-eslint/no-dynamic-delete': 'error',
   '@typescript-eslint/no-empty-function': 'off', // disabled
-  '@typescript-eslint/no-explicit-any': withDefaultOption('error'),
+  '@typescript-eslint/no-explicit-any': [
+    'error',
+    { fixToUnknown: false, ignoreRestArgs: false },
+  ],
   '@typescript-eslint/no-extra-non-null-assertion': 'error',
   '@typescript-eslint/no-extraneous-class': withDefaultOption('error'),
   '@typescript-eslint/no-floating-promises': withDefaultOption('error'),
@@ -130,7 +121,9 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-misused-promises': [
     'error',
     {
-      checksConditionals: false, // strict-boolean-expression is sufficient
+      checksVoidReturn: true,
+      checksSpreads: true,
+      checksConditionals: false, // Covered by strict-boolean-expressions
     },
   ],
   '@typescript-eslint/no-namespace': 'off', // disabled
@@ -139,11 +132,9 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-non-null-assertion': 'error',
   '@typescript-eslint/no-redeclare': 'off', // disabled
   '@typescript-eslint/no-redundant-type-constituents': 'error',
-  '@typescript-eslint/no-require-imports': withDefaultOption('error'),
-  '@typescript-eslint/no-restricted-imports': [
-    'error',
-    restrictedImportsOption,
-  ],
+  // Note: If paths with the same name are defined multiple times, later definitions may overwrite earlier ones
+  '@typescript-eslint/no-restricted-imports': 'off',
+
   '@typescript-eslint/no-shadow': [
     'error',
     {
@@ -154,8 +145,13 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     },
   ],
   '@typescript-eslint/no-this-alias': withDefaultOption('error'),
-  '@typescript-eslint/no-unnecessary-boolean-literal-compare':
-    withDefaultOption('error'),
+  '@typescript-eslint/no-unnecessary-boolean-literal-compare': [
+    'error',
+    {
+      allowComparingNullableBooleansToTrue: true,
+      allowComparingNullableBooleansToFalse: true,
+    },
+  ],
   '@typescript-eslint/no-unnecessary-condition': [
     'error',
     { allowConstantLoopConditions: true },
@@ -176,7 +172,16 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     { allowOptionalChaining: false },
   ],
   '@typescript-eslint/no-unsafe-return': 'error',
-  '@typescript-eslint/no-unused-expressions': withDefaultOption('error'),
+  '@typescript-eslint/no-unused-expressions': [
+    'error',
+    {
+      allowShortCircuit: false,
+      allowTernary: false,
+      allowTaggedTemplates: false,
+      enforceForJSX: true,
+      ignoreDirectives: false,
+    },
+  ],
   '@typescript-eslint/no-unused-vars': [
     'error',
     {
@@ -220,8 +225,20 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
       },
     },
   ],
-  '@typescript-eslint/prefer-optional-chain': withDefaultOption('error'),
-  '@typescript-eslint/prefer-readonly': withDefaultOption('error'),
+  '@typescript-eslint/prefer-optional-chain': [
+    'error',
+    {
+      allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing: false,
+      checkAny: true,
+      checkBigInt: true,
+      checkBoolean: true,
+      checkNumber: true,
+      checkString: true,
+      checkUnknown: true,
+      requireNullish: false,
+    },
+  ],
+  '@typescript-eslint/prefer-readonly': ['error', { onlyInlineLambdas: false }],
   '@typescript-eslint/prefer-readonly-parameter-types': [
     'error',
     {
@@ -290,9 +307,13 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/prefer-reduce-type-parameter': 'error',
   '@typescript-eslint/prefer-regexp-exec': 'error',
   '@typescript-eslint/prefer-return-this-type': 'error',
-  '@typescript-eslint/prefer-string-starts-ends-with':
-    withDefaultOption('error'),
-  '@typescript-eslint/promise-function-async': 'off', // disabled
+  '@typescript-eslint/prefer-string-starts-ends-with': [
+    'error',
+    {
+      // Allows code like: `text[0] === text[0].toUpperCase();`
+      allowSingleElementEquality: 'always',
+    },
+  ],
 
   /**
    * Prevent forgetting compare function when sorting numbers, as `sort`
@@ -302,7 +323,9 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     'error',
     { ignoreStringArrays: true },
   ],
+
   '@typescript-eslint/require-await': 'error',
+  '@typescript-eslint/promise-function-async': 'off', // Conflicts with require-await rule
 
   /**
    * Used to avoid ambiguity with `+` operator. restrict-plus-operands limits
@@ -344,7 +367,17 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
    */
   '@typescript-eslint/strict-boolean-expressions': [
     'error',
-    { allowString: false, allowNumber: false, allowNullableObject: false },
+    {
+      allowAny: false,
+      allowNullableBoolean: false,
+      allowNullableEnum: false,
+      allowNullableNumber: false,
+      allowNullableObject: false, // default: true
+      allowNullableString: false,
+      allowNumber: false, // default: true
+      allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false,
+      allowString: false, // default: true
+    },
   ],
 
   /** Prevent missing switch cases (using type information) */
@@ -377,7 +410,15 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
     withDefaultOption('error'),
   '@typescript-eslint/no-unsafe-enum-comparison': 'error',
 
-  '@typescript-eslint/class-methods-use-this': withDefaultOption('error'),
+  '@typescript-eslint/class-methods-use-this': [
+    'error',
+    {
+      enforceForClassFields: true,
+      exceptMethods: [],
+      ignoreOverrideMethods: true, // default: false
+      ignoreClassesThatImplementAnInterface: false,
+    },
+  ],
   '@typescript-eslint/max-params': 'off',
   '@typescript-eslint/prefer-destructuring': 'off',
 
@@ -387,14 +428,23 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
   '@typescript-eslint/no-array-delete': 'error',
   '@typescript-eslint/prefer-find': 'error',
 
-  '@typescript-eslint/prefer-promise-reject-errors': 'off',
-  // It is not necessary now as we will change the type definition of strict-ts-lib if necessary.
-  // [ 'error', { allowEmptyReject: false }, ],
+  // This is not necessary if you change the type definition in strict-ts-lib.
+  '@typescript-eslint/prefer-promise-reject-errors': [
+    'error',
+    { allowEmptyReject: false },
+  ],
 
-  '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off', // unnecessary in TypeScript with strict-ts-lib
+  // This is not necessary if you change the type definition in strict-ts-lib.
+  '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
+
   '@typescript-eslint/only-throw-error': [
     'error',
-    { allowThrowingAny: false, allowThrowingUnknown: false },
+    {
+      allow: [],
+      allowRethrowing: true,
+      allowThrowingAny: false,
+      allowThrowingUnknown: false,
+    },
   ],
 
   '@typescript-eslint/no-empty-object-type': withDefaultOption('error'),
@@ -417,12 +467,17 @@ export const typescriptEslintRules: TypeScriptEslintRules = {
 
   '@typescript-eslint/no-unnecessary-type-conversion': 'error',
 
+  // For browser environment only
+
+  // For Node.js environment only
+  '@typescript-eslint/no-require-imports': withDefaultOption('error'),
+  '@typescript-eslint/no-var-requires': 0,
+
   // deprecated
   '@typescript-eslint/no-type-alias': 0,
   '@typescript-eslint/prefer-ts-expect-error': 0,
   '@typescript-eslint/sort-type-constituents': 0,
-  '@typescript-eslint/no-var-requires': 0,
   '@typescript-eslint/no-empty-interface': 0,
   '@typescript-eslint/no-loss-of-precision': 0,
   '@typescript-eslint/typedef': 0,
-} as const;
+} as const satisfies TypeScriptEslintRules;

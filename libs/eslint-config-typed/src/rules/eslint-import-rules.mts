@@ -1,6 +1,6 @@
 import { withDefaultOption, type EslintImportsRules } from '../types/index.mjs';
 
-export const eslintImportsRules: EslintImportsRules = {
+export const eslintImportsRules = {
   // Not needed when using TypeScript.
   'import/no-unresolved': 'off',
 
@@ -125,4 +125,4 @@ export const eslintImportsRules: EslintImportsRules = {
 
   // deprecated rules
   'import/imports-first': 0,
-} as const;
+} as const satisfies EslintImportsRules;

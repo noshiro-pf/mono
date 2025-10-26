@@ -8,6 +8,12 @@
 
 ## References
 
+### defineConfig
+
+Re-exports [defineConfig](types/define-config.md#defineconfig)
+
+---
+
 ### defineKnownRules
 
 Re-exports [defineKnownRules](types/define-known-rules.md#defineknownrules)
@@ -17,6 +23,18 @@ Re-exports [defineKnownRules](types/define-known-rules.md#defineknownrules)
 ### EslintArrayFuncRules
 
 Re-exports [EslintArrayFuncRules](types/rules/eslint-array-func-rules.md#eslintarrayfuncrules)
+
+---
+
+### EslintCustomRules
+
+Re-exports [EslintCustomRules](types/rules/eslint-custom-rules.md#eslintcustomrules)
+
+---
+
+### EslintCustomRulesOption
+
+Re-exports [EslintCustomRulesOption](types/rules/eslint-custom-rules.md#eslintcustomrulesoption)
 
 ---
 
@@ -275,12 +293,6 @@ Re-exports [EslintVitestRulesOption](types/rules/eslint-vitest-rules.md#eslintvi
 ### FlatConfig
 
 Re-exports [FlatConfig](types/flat-config.md#flatconfig)
-
----
-
-### RestrictedImportsOption
-
-Re-exports [RestrictedImportsOption](types/types.md#restrictedimportsoption)
 
 ---
 

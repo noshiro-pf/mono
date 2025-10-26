@@ -2,7 +2,7 @@ import globals from 'globals';
 import { eslintPlaywrightRules } from '../rules/index.mjs';
 import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
-export const eslintFlatConfigForPlaywright = (
+export const eslintConfigForPlaywright = (
   files?: readonly string[],
 ): FlatConfig =>
   ({

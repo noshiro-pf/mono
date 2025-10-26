@@ -17,6 +17,9 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+    - [defineConfig helper](#defineconfig-helper)
+    - [defineKnownRules utility](#defineknownrules-utility)
+    - [withDefaultOption utility](#withdefaultoption-utility)
 - [Configuration Examples](#configuration-examples)
     - [TypeScript + React Project](#typescript--react-project)
     - [Node.js TypeScript Project](#nodejs-typescript-project)
@@ -24,27 +27,36 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
 - [VS Code Integration](#vs-code-integration)
 - [API Reference](#api-reference)
     - [Configuration Functions](#configuration-functions)
+        - [Base Configurations](#base-configurations)
+        - [Framework Configurations](#framework-configurations)
+        - [Utility Configurations](#utility-configurations)
     - [Rule Collections](#rule-collections)
-    - [Utility Exports](#utility-exports)
+    - [Exported Pre-configured Rule Options](#exported-pre-configured-rule-options)
     - [Custom Plugins](#custom-plugins)
-    - [Custom Rules](#custom-rules)
     - [Type Definitions](#type-definitions)
+        - [Core Types](#core-types)
+        - [Rule Types](#rule-types)
 - [Customization](#customization)
     - [Override Specific Rules](#override-specific-rules)
     - [Use Type-Safe Rule Options](#use-type-safe-rule-options)
     - [Target Specific Files](#target-specific-files)
 - [Troubleshooting](#troubleshooting)
+    - [Common Issues](#common-issues)
+        - [1. ESLint can't find tsconfig.json](#1-eslint-cant-find-tsconfigjson)
+        - [2. Import resolution errors](#2-import-resolution-errors)
+        - [3. Performance issues](#3-performance-issues)
+    - [Known Limitations](#known-limitations)
 - [Contributing](#contributing)
 - [License](#license)
+- [Future Updates](#future-updates)
 
 ## Features
 
 - 🎯 **Type-Safe Configuration**: Fully typed ESLint rules and configurations for better IDE support
 - 📦 **Pre-configured Setups**: Ready-to-use configurations for TypeScript, React, Preact, and popular testing frameworks
-- 🔧 **Custom Rules**: Additional custom ESLint rules for enhanced code quality
-- 🚀 **Zero Configuration**: Works out of the box with sensible defaults
-- 🔄 **ESLint Flat Config Support**: Built for the modern ESLint flat configuration system
 - 📝 **Comprehensive Type Definitions**: Complete TypeScript types for all ESLint rules and options
+- 🔄 **ESLint Flat Config Support**: Built for the modern ESLint flat configuration system
+- 🔧 **Custom Rules**: Additional custom ESLint rules for enhanced code quality
 
 ## Requirements
 
@@ -55,7 +67,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
 ## Installation
 
 ```sh
-npm install --save-dev eslint-config-typed
+npm add -D eslint-config-typed
 # or
 yarn add -D eslint-config-typed
 # or
@@ -70,50 +82,53 @@ Create an `eslint.config.js` file in your project root:
 
 ```js
 import {
-    eslintFlatConfigForTypeScript,
-    eslintFlatConfigForVitest,
+    defineConfig,
+    eslintConfigForTypeScript,
+    eslintConfigForVitest,
+    defineKnownRules,
 } from 'eslint-config-typed';
-import * as path from 'node:path';
-import * as url from 'node:url';
+// import * as path from 'node:path';
+// import * as url from 'node:url';
 
 const thisDir = import.meta.dirname;
 // or path.dirname(url.fileURLToPath(import.meta.url));
 
-/** @returns {readonly import('eslint-config-typed').FlatConfig[]} */
-const defineConfig = () => [
+export default defineConfig([
     {
         // config with just ignores is the replacement for `.eslintignore`
         ignores: ['**/build/**', '**/dist/**', 'src/some/file/to/ignore.ts'],
     },
-    ...eslintFlatConfigForTypeScript({
+
+    // Base config for TypeScript & JavaScript code
+    ...eslintConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
         packageDirs: [thisDir],
 
-        // If you are using mono repo and the root package.json is in ../../../ :
+        // If you are using a monorepo and the root package.json is located at ../../../:
         // packageDirs: [path.resolve(thisDir, '../../..'), thisDir],
     }),
-    eslintFlatConfigForVitest(),
+    eslintConfigForVitest(),
 
     // You can override per-rule settings if necessary.
     {
-        rules: {
+        rules: defineKnownRules({
             '@typescript-eslint/no-explicit-any': 'warn',
             '@typescript-eslint/prefer-readonly-parameter-types': 'off',
             'react-hooks/exhaustive-deps': 'warn',
-            'functional/no-let': ['error', noLetOptions],
-        },
+            'functional/no-let': [
+                'error',
+                {
+                    allowInForLoopInit: true,
+                    allowInFunctions: false,
+                    ignoreIdentifierPattern: ignorePattern.filter(
+                        (p) => p !== '^draft',
+                    ),
+                },
+            ],
+        }),
     },
-];
-
-/** @type {import('eslint-config-typed').EslintFunctionalRulesOption['functional/no-let']} */
-const noLetOptions = {
-    allowInForLoopInit: false,
-    allowInFunctions: false,
-    ignoreIdentifierPattern: ignorePattern.filter((p) => p !== '^draft'),
-};
-
-export default defineConfig();
+]);
 ```
 
 Add a lint script to your `package.json`:
@@ -135,83 +150,156 @@ npm run lint
 npm run lint:fix
 ```
 
+### defineConfig helper
+
+`defineConfig` wraps your flat configuration array so JavaScript config files get full IntelliSense without relying on JSDoc casts. It keeps literal types intact while returning the config unchanged at runtime.
+
+```js
+import { defineConfig, eslintConfigForTypeScript } from 'eslint-config-typed';
+
+export default defineConfig([
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: import.meta.dirname,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [import.meta.dirname],
+    }),
+    {
+        rules: defineKnownRules({
+            // ...
+        }),
+    },
+]);
+```
+
+This is equivalent to:
+
+```js
+import { eslintConfigForTypeScript } from 'eslint-config-typed';
+
+/** @type {import('@typescript-eslint/utils/ts-eslint').FlatConfig[]} */
+export default [
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: import.meta.dirname,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [import.meta.dirname],
+    }),
+    {
+        rules: defineKnownRules({
+            // ...
+        }),
+    },
+];
+```
+
+### defineKnownRules utility
+
+`defineKnownRules` is a helper designed for the `rules` field in ESLint flat configs. It keeps the returned object untouched while giving you type-safe rule names and option inference in editors. When you wrap your overrides with this function you can rely on:
+
+- autocomplete and early feedback for rule identifiers, eliminating typo-prone string literals;
+- strongly typed options for every plugin rule that ships with `eslint-config-typed`, so you can discover valid properties without leaving your editor;
+- a zero-cost runtime helper—because the object is returned as-is, it blends seamlessly into any flat config block.
+
+### withDefaultOption utility
+
+`withDefaultOption` is a companion helper that highlights rules which ship with option objects. It maps the familiar severity strings to the numeric values ESLint expects: `withDefaultOption('error')` returns `2`, and `withDefaultOption('warn')` returns `1`. Within `defineKnownRules`, rules that provide options require one of these helpers when you want to keep the defaults and only adjust severity. This convention visually distinguishes rules that contain options, reminding users that a rule has configurable options.
+
+`defineKnownRules` also reserves `0` for deprecated rules. The resulting severity matrix looks like this:
+
+| Rule type            | Allowed severity values in `defineKnownRules`                  |
+| :------------------- | :------------------------------------------------------------- |
+| Deprecated rule      | `0`                                                            |
+| Rule without options | `"off"`, `"warn"`, `"error"`                                   |
+| Rule with options    | `"off"`, `1`, `2`, `["warn", <option>]`, `["error", <option>]` |
+
 ## Configuration Examples
 
 ### TypeScript + React Project
 
 ```js
 import {
-    eslintFlatConfigForTypeScript,
-    eslintFlatConfigForReact,
+    defineConfig,
+    eslintConfigForTypeScript,
+    eslintConfigForReact,
+    eslintConfigForNodeJs,
+    defineKnownRules,
 } from 'eslint-config-typed';
-import * as path from 'node:path';
-import * as url from 'node:url';
 
 const thisDir = import.meta.dirname;
 
-export default [
+export default defineConfig([
     { ignores: ['**/dist/**', '**/build/**', '**/.next/**'] },
-    ...eslintFlatConfigForTypeScript({
+    ...eslintConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
         packageDirs: [thisDir],
     }),
-    ...eslintFlatConfigForReact(),
-];
+    eslintConfigForReact(['src/**']),
+    eslintConfigForNodeJs(['scripts/**', 'configs/**']),
+    {
+        files: ['scripts/**', 'configs/**'],
+        rules: defineKnownRules({
+            '@typescript-eslint/explicit-function-return-type': 'off',
+            'no-await-in-loop': 'off',
+            'import/no-unassigned-import': 'off',
+            'import/no-internal-modules': 'off',
+            'import/no-default-export': 'off',
+            'import/no-extraneous-dependencies': 'off',
+        }),
+    },
+]);
 ```
 
 ### Node.js TypeScript Project
 
 ```js
-import { eslintFlatConfigForTypeScript } from 'eslint-config-typed';
-import * as path from 'node:path';
-import * as url from 'node:url';
+import {
+    defineConfig,
+    eslintConfigForTypeScript,
+    eslintConfigForNodeJs,
+    defineKnownRules,
+} from 'eslint-config-typed';
 
-const thisDir = import.meta.dirname;
-
-export default [
+export default defineConfig([
     { ignores: ['**/dist/**', '**/node_modules/**'] },
-    ...eslintFlatConfigForTypeScript({
-        tsconfigRootDir: thisDir,
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: import.meta.dirname,
         tsconfigFileName: './tsconfig.json',
-        packageDirs: [thisDir],
+        packageDirs: [import.meta.dirname],
     }),
+    eslintConfigForNodeJs(),
     {
-        rules: {
+        rules: defineKnownRules({
             // Allow console in Node.js
             'no-console': 'off',
             // Allow process.env access
             'no-process-env': 'off',
-        },
+        }),
     },
-];
+]);
 ```
 
 ### React + Testing Libraries
 
 ```js
 import {
-    eslintFlatConfigForTypeScript,
-    eslintFlatConfigForReact,
-    eslintFlatConfigForVitest,
-    eslintFlatConfigForTestingLibrary,
+    defineConfig,
+    eslintConfigForTypeScript,
+    eslintConfigForReact,
+    eslintConfigForVitest,
+    eslintConfigForTestingLibrary,
 } from 'eslint-config-typed';
-import * as path from 'node:path';
-import * as url from 'node:url';
 
-const thisDir = import.meta.dirname;
-
-export default [
+export default defineConfig([
     { ignores: ['**/dist/**', '**/coverage/**'] },
-    ...eslintFlatConfigForTypeScript({
-        tsconfigRootDir: thisDir,
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: import.meta.dirname,
         tsconfigFileName: './tsconfig.json',
-        packageDirs: [thisDir],
+        packageDirs: [import.meta.dirname],
     }),
-    ...eslintFlatConfigForReact(),
-    eslintFlatConfigForVitest(),
-    eslintFlatConfigForTestingLibrary(),
-];
+    ...eslintConfigForReact(),
+    eslintConfigForVitest(),
+    eslintConfigForTestingLibrary(),
+]);
 ```
 
 ## VS Code Integration
@@ -238,92 +326,112 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
 
 These functions return arrays of ESLint flat configurations:
 
-#### Framework Configurations
+#### Base Configurations
 
-- **`eslintFlatConfigForTypeScript(options)`** - TypeScript configuration with strict type checking rules
+- **`eslintConfigForTypeScript(options)`** - TypeScript configuration with strict type checking rules
     - `options.tsconfigRootDir`: Root directory containing tsconfig.json
     - `options.tsconfigFileName`: Path to tsconfig.json file
     - `options.packageDirs`: Array of package directories for import resolution
-- **`eslintFlatConfigForReact(options?)`** - React configuration with hooks and JSX rules
-- **`eslintFlatConfigForPreact(options?)`** - Preact configuration (lighter React alternative)
-- **`eslintFlatConfigForReactBase(options?)`** - Base React configuration without specific framework rules
+- **`eslintConfigForBrowser`** - Browser configuration (Turn off Node.js-specific rules)
+- **`eslintConfigForNodeJs`** - Node.js configuration (Turn off browser-specific rules)
 
-#### Testing Framework Configurations
+#### Framework Configurations
 
-- **`eslintFlatConfigForVitest(options?)`** - Vitest testing framework configuration
-- **`eslintFlatConfigForJest(options?)`** - Jest testing framework configuration
-- **`eslintFlatConfigForCypress(options?)`** - Cypress E2E testing configuration
-- **`eslintFlatConfigForPlaywright(options?)`** - Playwright E2E testing configuration
-- **`eslintFlatConfigForTestingLibrary(options?)`** - Testing Library configuration
+- **`eslintConfigForReact(options?)`** - React configuration with hooks and JSX rules
+    - `eslintConfigForBrowser` is included in this configuration
+- **`eslintConfigForPreact(options?)`** - Preact configuration (lighter React alternative)
+    - `eslintConfigForBrowser` is included in this configuration
+- **`eslintConfigForVitest(options?)`** - Vitest testing framework configuration
+- **`eslintConfigForJest(options?)`** - Jest testing framework configuration
+- **`eslintConfigForTestingLibrary(options?)`** - Testing Library configuration
+- **`eslintConfigForPlaywright(options?)`** - Playwright E2E testing configuration
+- **`eslintConfigForCypress(options?)`** - Cypress E2E testing configuration
 
 #### Utility Configurations
 
-- **`eslintFlatConfigForTypeScriptWithoutRules(options)`** - TypeScript parser setup without any rules
+- **`eslintConfigForTypeScriptWithoutRules(options)`** - TypeScript parser & plugins setup without any rules
 
 ### Rule Collections
 
 Pre-configured rule sets that can be imported and customized:
 
-- **`eslintRules`** - Core ESLint rules
-- **`typescriptEslintRules`** - TypeScript-specific ESLint rules
-- **`eslintReactRules`** - React-specific rules
-- **`eslintReactHooksRules`** - React Hooks rules
-- **`eslintReactPerfRules`** - React performance optimization rules
-- **`eslintReactRefreshRules`** - React Refresh (HMR) rules
-- **`eslintJsxA11yRules`** - Accessibility rules for JSX
-- **`eslintFunctionalRules`** - Functional programming style rules
-- **`eslintImportsRules`** - Import/export rules
-- **`eslintUnicornRules`** - Unicorn plugin rules for better code
-- **`eslintPromiseRules`** - Promise handling rules
-- **`eslintSecurityRules`** - Security best practices
-- **`eslintArrayFuncRules`** - Array function preference rules
-- **`eslintPreferArrowFunctionRules`** - Arrow function preference rules
-- **`eslintTotalFunctionsRules`** - Total functions (no partial functions) rules
-- **`eslintTreeShakableRules`** - Tree-shaking optimization rules
-- **`eslintVitestRules`** - Vitest-specific rules
-- **`eslintJestRules`** - Jest-specific rules
-- **`eslintCypressRules`** - Cypress-specific rules
-- **`eslintPlaywrightRules`** - Playwright-specific rules
-- **`eslintTestingLibraryRules`** - Testing Library rules
-- **`eslintStrictDependenciesRules`** - Strict dependency checking rules
-- **`eslintPluginRules`** - Additional plugin rules
+| Rule set                                   | Plugin name                            | Description                          |
+| :----------------------------------------- | :------------------------------------- | :----------------------------------- |
+| **`eslintRules`**                          | (eslint)                               | Core ESLint rules                    |
+| **`typescriptEslintRules`**                | `@typescript-eslint/eslint-plugin`     | TypeScript-specific ESLint rules     |
+| **`eslintFunctionalRules`**                | `eslint-plugin-functional`             | Functional programming style rules   |
+| **`eslintTotalFunctionsRules`**            | `eslint-plugin-total-functions`        | Functional programming style rules   |
+| **`eslintUnicornRules`**                   | `eslint-plugin-unicorn`                | Unicorn plugin rules for better code |
+| **`eslintArrayFuncRules`**                 | `eslint-plugin-array-func`             | Array function preference rules      |
+| **`eslintPreferArrowFunctionRules`**       | `eslint-plugin-prefer-arrow-functions` | Arrow function preference rules      |
+| **`eslintPluginSortDestructureKeysRules`** | `eslint-plugin-sort-destructure-keys`  | Object destructuring rules           |
+| **`eslintPromiseRules`**                   | `eslint-plugin-promise`                | Promise handling rules               |
+| **`eslintImportsRules`**                   | `eslint-plugin-import`                 | Import/export rules                  |
+| **`eslintSecurityRules`**                  | `eslint-plugin-security`               | Security best practices              |
+| **`eslintTreeShakableRules`**              | `eslint-plugin-tree-shakable`          | Tree-shaking optimization rules      |
+| **`eslintReactRules`**                     | `eslint-plugin-react`                  | React-specific rules                 |
+| **`eslintReactHooksRules`**                | `eslint-plugin-react-hooks`            | React Hooks rules                    |
+| **`eslintReactPerfRules`**                 | `eslint-plugin-react-perf`             | React performance optimization rules |
+| **`eslintReactRefreshRules`**              | `eslint-plugin-react-refresh`          | React Refresh (HMR) rules            |
+| **`eslintJsxA11yRules`**                   | `eslint-plugin-jsx-a11y`               | Accessibility rules for JSX          |
+| **`eslintVitestRules`**                    | `eslint-plugin-vitest`                 | Vitest-specific rules                |
+| **`eslintJestRules`**                      | `eslint-plugin-jest`                   | Jest-specific rules                  |
+| **`eslintTestingLibraryRules`**            | `eslint-plugin-testing-library`        | Testing Library rules                |
+| **`eslintPlaywrightRules`**                | `eslint-plugin-playwright`             | Playwright-specific rules            |
+| **`eslintCypressRules`**                   | `eslint-plugin-cypress`                | Cypress-specific rules               |
+| **`eslintPluginRules`**                    | `eslint-plugin-eslint-plugin`          | eslint-plugin development rules      |
 
-### Utility Exports
+### Exported Pre-configured Rule Options
 
-- **`restrictedSyntax`** - Array of restricted JavaScript syntax patterns
-- **`restrictedGlobals`** - Array of restricted global variables
-- **`restrictedGlobalsForFrontend`** - Frontend-specific restricted globals
-- **`restrictedImportsOption`** - Configuration for restricted imports
-- **`banTypes`** - TypeScript types that should be banned
-- **`ignoredMutablePattern`** - Patterns for allowed mutable variables
-- **`immutableDataOptions`** - Options for functional/immutable-data rule
-- **`noLetOptions`** - Options for functional/no-let rule
+| Pre-configured rule option        | Rule                    | Description                                     |
+| :-------------------------------- | :---------------------- | :---------------------------------------------- |
+| **`restrictedGlobals`**           | `no-restricted-globals` | Array of restricted global variables            |
+| **`restrictedGlobalsForBrowser`** | `no-restricted-globals` | Browser-environment-specific restricted globals |
+
+You can find other pre-configured rule options by traversing the pre-defined rules object like this:
+
+- `typescriptEslintRules['@typescript-eslint/no-restricted-types'][1].types`
+- `eslintRules['no-restricted-syntax'].slice(1)`
+
+The shape of the rule option varies depending on the rule, so please check the contents by tracing the predefined rules each time and extract it.
 
 ### Custom Plugins
 
+- **`eslintPluginTotalFunctions`**
+    - `eslint-plugin-total-functions` with support for Flat Config
+- **`eslintPluginTreeShakable`**
+    - `eslint-plugin-tree-shakable` with support for Flat Config
 - **`eslintPluginCustom`** - Custom ESLint plugin with additional rules
-- **`eslintPluginTotalFunctions`** - Plugin for enforcing total functions
-- **`eslintPluginTreeShakable`** - Plugin for tree-shaking optimizations
-- **`plugins`** - Collection of all available plugins
+    - Currently, this plugin only provides the `custom/no-restricted-syntax` rule (which duplicates ESLint's `no-restricted-syntax` rule).
+    - Can be used to set the error level to `error` or `warn` as needed.
 
-### Custom Rules
+Example:
 
-- **`noRestrictedSyntax`** - Enhanced restricted syntax rule
-- **`importStarRule`** - Rule for controlling import \* usage
-- **`noUnsafeOptionalPropertyAssignment`** - Prevent unsafe optional property assignments
-- **`noPrematureFpTsEffects`** - Prevent premature fp-ts effect usage
-- **`noPartialStringNormalize`** - Prevent partial string normalization
-- **`noUnsafeMutableReadonlyAssignment`** - Prevent unsafe mutable/readonly assignments
-- **`noPartialDivision`** - Prevent division by zero possibilities
-- **`requireStrictMode`** - Enforce strict mode
-- **`noEnums`** - Disallow TypeScript enums
-- **`noPartialUrlConstructor`** - Prevent partial URL constructor usage
-- **`noUnsafeTypeAssertion`** - Prevent unsafe type assertions
-- **`noUnsafeEnumAssignment`** - Prevent unsafe enum assignments
-- **`noUnsafeReadonlyMutableAssignment`** - Prevent readonly/mutable mismatches
-- **`noNestedFpTsEffects`** - Prevent nested fp-ts effects
-- **`noPartialArrayReduce`** - Prevent partial array reduce operations
-- **`noHiddenTypeAssertions`** - Prevent hidden type assertions
+```js
+import { eslintRules } from 'eslint-config-typed';
+
+export default defineConfig([
+    // ...
+    {
+        rules: defineKnownRules({
+            'no-restricted-syntax': [
+                'warn',
+                ...eslintRules['no-restricted-syntax'].slice(1),
+            ],
+            'custom/no-restricted-syntax': [
+                'error',
+                {
+                    // Restrict import style of React
+                    selector:
+                        "ImportDeclaration[source.value='react'][specifiers.0.type!='ImportNamespaceSpecifier']",
+                    message:
+                        "React should be imported as `import * as React from 'react'.",
+                },
+            ],
+        }),
+    },
+]);
+```
 
 ### Type Definitions
 
@@ -335,49 +443,56 @@ All rules and configurations come with complete TypeScript type definitions:
 - **`ESLintPlugin`** - ESLint plugin type
 - **`Rule`** - ESLint rule definition type
 - **`Rules`** - Collection of rules type
-- **`RestrictedImportsOption`** - Type for restricted imports configuration
 
 #### Rule Types
 
 Each plugin provides typed rule definitions:
 
-- **`EslintRules`** & **`EslintRulesOption`**
-- **`TypeScriptEslintRules`** & **`TypeScriptEslintRulesOption`**
-- **`EslintReactRules`** & **`EslintReactRulesOption`**
-- **`EslintReactHooksRules`** & **`EslintReactHooksRulesOption`**
-- **`EslintReactPerfRules`** & **`EslintReactPerfRulesOption`**
-- **`EslintReactRefreshRules`** & **`EslintReactRefreshRulesOption`**
-- **`EslintJsxA11yRules`** & **`EslintJsxA11yRulesOption`**
-- **`EslintFunctionalRules`** & **`EslintFunctionalRulesOption`**
-- **`EslintImportsRules`** & **`EslintImportsRulesOption`**
-- **`EslintUnicornRules`** & **`EslintUnicornRulesOption`**
-- **`EslintPromiseRules`** & **`EslintPromiseRulesOption`**
-- **`EslintSecurityRules`** (no options)
-- **`EslintArrayFuncRules`** (no options)
-- **`EslintPreferArrowFunctionRules`** & **`EslintPreferArrowFunctionRulesOption`**
-- **`EslintTotalFunctionsRules`** (no options)
-- **`EslintTreeShakableRules`** (no options)
-- **`EslintVitestRules`** & **`EslintVitestRulesOption`**
-- **`EslintJestRules`** & **`EslintJestRulesOption`**
-- **`EslintCypressRules`** & **`EslintCypressRulesOption`**
-- **`EslintPlaywrightRules`** & **`EslintPlaywrightRulesOption`**
-- **`EslintTestingLibraryRules`** & **`EslintTestingLibraryRulesOption`**
-- **`EslintStrictDependenciesRules`** & **`EslintStrictDependenciesRulesOption`**
-- **`EslintPluginRules`** & **`EslintPluginRulesOption`**
-- **`EslintDeprecationRules`** (no options)
+- General rules
+    - **`EslintRules`** & **`EslintRulesOption`**
+    - **`TypeScriptEslintRules`** & **`TypeScriptEslintRulesOption`**
+    - **`EslintFunctionalRules`** & **`EslintFunctionalRulesOption`**
+    - **`EslintTotalFunctionsRules`** (no options)
+    - **`EslintUnicornRules`** & **`EslintUnicornRulesOption`**
+    - **`EslintArrayFuncRules`** (no options)
+    - **`EslintPreferArrowFunctionRules`** & **`EslintPreferArrowFunctionRulesOption`**
+    - **`EslintPluginSortDestructureKeysRules`** & **`EslintPluginSortDestructureKeysRulesOption`**
+    - **`EslintPromiseRules`** & **`EslintPromiseRulesOption`**
+    - **`EslintImportsRules`** & **`EslintImportsRulesOption`**
+    - **`EslintStrictDependenciesRules`** & **`EslintStrictDependenciesRulesOption`**
+    - **`EslintSecurityRules`** (no options)
+    - **`EslintTreeShakableRules`** (no options)
+- React & JSX
+    - **`EslintReactRules`** & **`EslintReactRulesOption`**
+    - **`EslintReactHooksRules`** & **`EslintReactHooksRulesOption`**
+    - **`EslintReactPerfRules`** & **`EslintReactPerfRulesOption`**
+    - **`EslintReactRefreshRules`** & **`EslintReactRefreshRulesOption`**
+    - **`EslintJsxA11yRules`** & **`EslintJsxA11yRulesOption`**
+- Testing
+    - **`EslintVitestRules`** & **`EslintVitestRulesOption`**
+    - **`EslintJestRules`** & **`EslintJestRulesOption`**
+    - **`EslintPlaywrightRules`** & **`EslintPlaywrightRulesOption`**
+    - **`EslintCypressRules`** & **`EslintCypressRulesOption`**
+    - **`EslintTestingLibraryRules`** & **`EslintTestingLibraryRulesOption`**
+- Others
+    - **`EslintPluginRules`** & **`EslintPluginRulesOption`**
 
 ## Customization
+
+The pre-configured rules of `eslint-config-typed` are opinionated settings that prioritize strictness and enable as many non-conflicting rules as possible. Therefore, it is intended to be used by downgrading the severity of unnecessary rules in the config file from `"error"` to `"warn"` or `"off"`, or by overriding option settings.
 
 ### Override Specific Rules
 
 You can override any rule by adding a configuration object after the preset configurations:
 
 ```js
-export default [
-    ...eslintFlatConfigForTypeScript(options),
+import { typescriptEslintRules } from 'eslint-config-typed';
+
+export default defineConfig([
+    ...eslintConfigForTypeScript(options),
     {
-        rules: {
-            // Downgrade to warning
+        rules: defineKnownRules({
+            // Downgrade to warning (Option settings are inherited)
             '@typescript-eslint/no-explicit-any': 'warn',
             // Disable a rule
             '@typescript-eslint/prefer-readonly-parameter-types': 'off',
@@ -389,30 +504,59 @@ export default [
                     allowInFunctions: false,
                 },
             ],
-        },
+
+            // Update rule options
+            '@typescript-eslint/no-restricted-types': [
+                'error',
+                {
+                    types: {
+                        ...typescriptEslintRules[
+                            '@typescript-eslint/no-restricted-types'
+                        ][1].types,
+                        Function: "Don't use Function type",
+                    },
+                },
+            ],
+        }),
     },
-];
+]);
 ```
 
 ### Use Type-Safe Rule Options
 
 Leverage TypeScript for type-safe rule configuration:
 
-```js
-/** @type {import('eslint-config-typed').EslintFunctionalRulesOption['functional/no-let']} */
-const noLetOptions = {
-    allowInForLoopInit: false,
-    allowInFunctions: false,
-};
+```ts
+// configs/restricted-syntax-defs.mjs
 
-export default [
-    ...eslintFlatConfigForTypeScript(options),
+import { eslintRules } from 'eslint-config-typed';
+
+/** @type {import("eslint-config-typed").EslintRulesOption["no-restricted-syntax"]} */
+export const restrictedSyntax = [
+    ...eslintRules['no-restricted-syntax'].slice(1),
     {
-        rules: {
-            'functional/no-let': ['error', noLetOptions],
-        },
+        // Restrict type annotation style for React.useMemo
+        selector:
+            "TSTypeAnnotation[parent.parent.type='CallExpression'][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='useMemo']",
+        message:
+            'The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`.',
     },
 ];
+```
+
+```ts
+// eslint.config.js
+
+import { restrictedSyntax } from './configs/restricted-syntax-defs.mjs';
+
+export default defineConfig([
+    ...eslintConfigForTypeScript(options),
+    {
+        rules: defineKnownRules({
+            'no-restricted-syntax': ['error', restrictedSyntax],
+        }),
+    },
+]);
 ```
 
 ### Target Specific Files
@@ -420,26 +564,26 @@ export default [
 Apply different rules to different file patterns:
 
 ```js
-export default [
-    ...eslintFlatConfigForTypeScript(options),
+export default defineConfig([
+    ...eslintConfigForTypeScript(options),
     {
         files: ['**/*.test.ts', '**/*.spec.ts'],
-        rules: {
+        rules: defineKnownRules({
             // Allow any in tests
             '@typescript-eslint/no-explicit-any': 'off',
             // Allow console in tests
             'no-console': 'off',
-        },
+        }),
     },
     {
-        files: ['**/scripts/**/*.ts'],
-        rules: {
+        files: ['scripts/**/*.ts'],
+        rules: defineKnownRules({
             // Allow console in scripts
-            'no-console': 'off',
-            'no-process-exit': 'off',
-        },
+            'no-await-in-loop': 'off',
+            'import/no-unassigned-import': 'off',
+        }),
     },
-];
+]);
 ```
 
 ## Troubleshooting
@@ -453,11 +597,13 @@ Ensure the paths are correct:
 ```js
 const thisDir = import.meta.dirname;
 
-...eslintFlatConfigForTypeScript({
-    tsconfigRootDir: thisDir, // Must be absolute path
-    tsconfigFileName: './tsconfig.json', // Relative to tsconfigRootDir
-    packageDirs: [thisDir],
-})
+export default defineConfig([
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir, // Must be absolute path
+        tsconfigFileName: './tsconfig.json', // Relative to tsconfigRootDir
+        packageDirs: [thisDir],
+    }),
+]);
 ```
 
 #### 2. Import resolution errors
@@ -465,24 +611,25 @@ const thisDir = import.meta.dirname;
 The `packageDirs` option helps ESLint resolve imports correctly in monorepos:
 
 ```js
-...eslintFlatConfigForTypeScript({
-    tsconfigRootDir: thisDir,
-    tsconfigFileName: './tsconfig.json',
-    packageDirs: [
-        path.resolve(thisDir, '../../..'), // Monorepo root
-        thisDir, // Current package
-    ],
-})
+export default defineConfig([
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [
+            path.resolve(thisDir, '../../..'), // Monorepo root
+            thisDir, // Current package
+        ],
+    }),
+]);
 ```
 
-#### 3. Rule conflicts
-
-If you encounter rule conflicts, the last configuration wins. Place your overrides after the preset configurations.
-
-#### 4. Performance issues
+#### 3. Performance issues
 
 For large projects, consider:
 
+- Using `TIMING=1 eslint` to identify heavy rules
+- Using `NODE_OPTIONS='--max-old-space-size=<memory-size-MB>' eslint` to increase the maximum memory available
+- Separate heavy rules into a separate config and prepare a dedicated command
 - Using `.eslintignore` or `ignores` patterns to skip generated files
 - Running ESLint with `--cache` flag
 - Limiting the scope of type-aware rules
@@ -513,8 +660,10 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 ## Modules
 
 - [configs](configs.md)
+- [configs/browser](configs/browser.md)
 - [configs/cypress](configs/cypress.md)
 - [configs/jest](configs/jest.md)
+- [configs/nodejs](configs/nodejs.md)
 - [configs/playwright](configs/playwright.md)
 - [configs/plugins](configs/plugins.md)
 - [configs/preact](configs/preact.md)
@@ -524,12 +673,14 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 - [configs/typescript](configs/typescript.md)
 - [configs/typescript-without-rules](configs/typescript-without-rules.md)
 - [configs/vitest](configs/vitest.md)
-- [custom-rules](custom-rules.md)
-- [custom-rules/custom](custom-rules/custom.md)
-- [custom-rules/no-restricted-syntax2](custom-rules/no-restricted-syntax2.md)
 - [entry-point](entry-point.md)
 - [globals](globals.md)
 - [plugins](plugins.md)
+- [plugins/custom](plugins/custom.md)
+- [plugins/custom/custom](plugins/custom/custom.md)
+- [plugins/custom/rules](plugins/custom/rules.md)
+- [plugins/custom/rules/no-restricted-syntax2](plugins/custom/rules/no-restricted-syntax2.md)
+- [plugins/custom/rules/rules](plugins/custom/rules/rules.md)
 - [plugins/total-functions](plugins/total-functions.md)
 - [plugins/total-functions/plugin](plugins/total-functions/plugin.md)
 - [plugins/total-functions/rules](plugins/total-functions/rules.md)
@@ -581,11 +732,13 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 - [rules/eslint-vitest-rules](rules/eslint-vitest-rules.md)
 - [rules/typescript-eslint-rules](rules/typescript-eslint-rules.md)
 - [types](types.md)
+- [types/define-config](types/define-config.md)
 - [types/define-known-rules](types/define-known-rules.md)
 - [types/flat-config](types/flat-config.md)
 - [types/rule-severity-with-default-option](types/rule-severity-with-default-option.md)
 - [types/rules](types/rules.md)
 - [types/rules/eslint-array-func-rules](types/rules/eslint-array-func-rules.md)
+- [types/rules/eslint-custom-rules](types/rules/eslint-custom-rules.md)
 - [types/rules/eslint-cypress-rules](types/rules/eslint-cypress-rules.md)
 - [types/rules/eslint-functional-rules](types/rules/eslint-functional-rules.md)
 - [types/rules/eslint-import-rules](types/rules/eslint-import-rules.md)
@@ -609,4 +762,3 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 - [types/rules/eslint-unicorn-rules](types/rules/eslint-unicorn-rules.md)
 - [types/rules/eslint-vitest-rules](types/rules/eslint-vitest-rules.md)
 - [types/rules/typescript-eslint-rules](types/rules/typescript-eslint-rules.md)
-- [types/types](types/types.md)

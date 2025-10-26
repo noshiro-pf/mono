@@ -8,9 +8,9 @@
 
 ## Functions
 
-### eslintFlatConfigForTestingLibrary()
+### eslintConfigForTestingLibrary()
 
-> **eslintFlatConfigForTestingLibrary**(`files?`): `object`
+> **eslintConfigForTestingLibrary**(`files?`): `object`
 
 Defined in: [src/configs/testing-library.mts:5](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/testing-library.mts#L5)
 

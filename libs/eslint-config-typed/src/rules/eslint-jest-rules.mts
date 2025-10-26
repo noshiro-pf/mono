@@ -1,6 +1,6 @@
 import { withDefaultOption, type EslintJestRules } from '../types/index.mjs';
 
-export const eslintJestRules: EslintJestRules = {
+export const eslintJestRules = {
   /* Rules common with vitest and playwright (keep settings aligned) */
   'jest/expect-expect': withDefaultOption('error'),
   'jest/max-expects': 'off',
@@ -82,4 +82,4 @@ export const eslintJestRules: EslintJestRules = {
   'jest/unbound-method': withDefaultOption('error'),
   'jest/valid-expect-in-promise': 'error',
   'jest/prefer-ending-with-an-expect': withDefaultOption('error'),
-} as const;
+} as const satisfies EslintJestRules;

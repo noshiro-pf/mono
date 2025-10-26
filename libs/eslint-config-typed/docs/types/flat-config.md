@@ -12,7 +12,7 @@
 
 > **ESLintPlugin** = `DeepReadonly`\<`FlatConfig_.Plugin`\>
 
-Defined in: [src/types/flat-config.mts:9](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L9)
+Defined in: [src/types/flat-config.mts:8](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L8)
 
 ---
 
@@ -28,12 +28,12 @@ Defined in: [src/types/flat-config.mts:6](https://github.com/noshiro-pf/eslint-c
 
 > **Rule** = `DeepReadonly`\<`RuleDefinition`\>
 
-Defined in: [src/types/flat-config.mts:11](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L11)
+Defined in: [src/types/flat-config.mts:10](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L10)
 
 ---
 
 ### Rules
 
-> **Rules** = `Record`\<`string`, [`Rule`](#rule)\>
+> **Rules** = `ReadonlyRecord`\<`string`, [`Rule`](#rule)\>
 
-Defined in: [src/types/flat-config.mts:15](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L15)
+Defined in: [src/types/flat-config.mts:13](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L13)

@@ -10,6 +10,12 @@
 
 ### eslintPreferArrowFunctionRules
 
-> `const` **eslintPreferArrowFunctionRules**: [`EslintPreferArrowFunctionRules`](../types/rules/eslint-prefer-arrow-functions-rules.md#eslintpreferarrowfunctionrules)
+> `const` **eslintPreferArrowFunctionRules**: `object`
 
 Defined in: [src/rules/eslint-prefer-arrow-functions-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-prefer-arrow-functions-rules.mts#L3)
+
+#### Type Declaration
+
+##### prefer-arrow-functions/prefer-arrow-functions
+
+> `readonly` **prefer-arrow-functions/prefer-arrow-functions**: readonly \[`"error"`, \{ `allowedNames`: readonly \[\]; `allowNamedFunctions`: `false`; `allowObjectProperties`: `false`; `classPropertiesAllowed`: `false`; `disallowPrototype`: `true`; `returnStyle`: `"implicit"`; `singleReturnOnly`: `false`; \}\]

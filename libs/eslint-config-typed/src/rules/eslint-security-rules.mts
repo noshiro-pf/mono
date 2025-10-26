@@ -1,6 +1,6 @@
 import { type EslintSecurityRules } from '../types/index.mjs';
 
-export const eslintSecurityRules: EslintSecurityRules = {
+export const eslintSecurityRules = {
   'security/detect-unsafe-regex': 'error',
   'security/detect-non-literal-regexp': 'error',
   'security/detect-non-literal-require': 'error',
@@ -15,4 +15,4 @@ export const eslintSecurityRules: EslintSecurityRules = {
   'security/detect-object-injection': 'off', // too many false positives
   'security/detect-new-buffer': 'error',
   'security/detect-bidi-characters': 'error',
-} as const;
+} as const satisfies EslintSecurityRules;

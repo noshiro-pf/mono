@@ -3,7 +3,7 @@ import { createRule } from './common.mjs';
 /** An ESLint rule to ban unsafe assignment to optional properties. */
 
 export const noUnsafeOptionalPropertyAssignment = createRule({
-  name: 'no-unsafe-readonly-mutable-assignment',
+  name: 'no-unsafe-optional-property-assignment',
   meta: {
     type: 'problem',
     docs: {

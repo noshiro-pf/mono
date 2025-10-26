@@ -8,9 +8,9 @@
 
 ## Functions
 
-### eslintFlatConfigForJest()
+### eslintConfigForJest()
 
-> **eslintFlatConfigForJest**(`files?`): `object`
+> **eslintConfigForJest**(`files?`): `object`
 
 Defined in: [src/configs/jest.mts:5](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/jest.mts#L5)
 

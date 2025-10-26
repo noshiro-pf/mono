@@ -10,6 +10,12 @@
 
 ### eslintReactRefreshRules
 
-> `const` **eslintReactRefreshRules**: [`EslintReactRefreshRules`](../types/rules/eslint-react-refresh-rules.md#eslintreactrefreshrules)
+> `const` **eslintReactRefreshRules**: `object`
 
 Defined in: [src/rules/eslint-react-refresh-rules.mts:6](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-react-refresh-rules.mts#L6)
+
+#### Type Declaration
+
+##### react-refresh/only-export-components
+
+> `readonly` **react-refresh/only-export-components**: `1` \| `2`

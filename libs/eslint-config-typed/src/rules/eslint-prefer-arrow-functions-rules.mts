@@ -1,6 +1,6 @@
 import { type EslintPreferArrowFunctionRules } from '../types/index.mjs';
 
-export const eslintPreferArrowFunctionRules: EslintPreferArrowFunctionRules = {
+export const eslintPreferArrowFunctionRules = {
   'prefer-arrow-functions/prefer-arrow-functions': [
     'error',
     {
@@ -13,4 +13,4 @@ export const eslintPreferArrowFunctionRules: EslintPreferArrowFunctionRules = {
       singleReturnOnly: false,
     },
   ],
-} as const;
+} as const satisfies EslintPreferArrowFunctionRules;

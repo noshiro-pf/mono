@@ -1,7 +1,7 @@
 import { withDefaultOption, type EslintJsxA11yRules } from '../types/index.mjs';
 
 /** @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/src/index.js */
-export const eslintJsxA11yRules: EslintJsxA11yRules = {
+export const eslintJsxA11yRules = {
   'jsx-a11y/alt-text': withDefaultOption('error'),
   'jsx-a11y/anchor-ambiguous-text': withDefaultOption('error'),
   'jsx-a11y/anchor-has-content': withDefaultOption('error'),
@@ -177,4 +177,4 @@ export const eslintJsxA11yRules: EslintJsxA11yRules = {
   'jsx-a11y/accessible-emoji': 0,
   'jsx-a11y/label-has-for': 0,
   'jsx-a11y/no-onchange': 0,
-} as const;
+} as const satisfies EslintJsxA11yRules;

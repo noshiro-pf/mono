@@ -8,9 +8,9 @@
 
 ## Functions
 
-### eslintFlatConfigForTypeScriptWithoutRules()
+### eslintConfigForTypeScriptWithoutRules()
 
-> **eslintFlatConfigForTypeScriptWithoutRules**(`__namedParameters`): readonly `object`[]
+> **eslintConfigForTypeScriptWithoutRules**(`__namedParameters`): readonly `object`[]
 
 Defined in: [src/configs/typescript-without-rules.mts:6](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/configs/typescript-without-rules.mts#L6)
 

@@ -4,12 +4,10 @@ import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { type JSONSchema4 } from 'json-schema';
 import { compile, type Options } from 'json-schema-to-typescript';
 import { Arr, isBoolean, isString } from 'ts-data-forge';
-import {
-  totalFunctionsRules,
-  treeShakableRules,
-  type Rule,
-  type Rules,
-} from '../../../src/index.mjs';
+import { type Rule, type Rules } from '../../../src/index.mjs';
+import { customRules } from '../../../src/plugins/custom/rules/index.mjs';
+import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/index.mjs';
+import { treeShakableRules } from '../../../src/plugins/tree-shakable/rules/index.mjs';
 import { eslintPlugins } from '../constants/eslint-plugins.mjs';
 import {
   deepCopy,
@@ -202,7 +200,7 @@ const createResult = async (
             sc as JSONSchema4,
             'Options',
             compilerConfig,
-          ).catch((error) => {
+          ).catch((error: unknown) => {
             throw new Error(toStr(error));
           });
 
@@ -227,7 +225,7 @@ const createResult = async (
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               compile(s as JSONSchema4, `Options${index}`, compilerConfig),
             ),
-          ).catch((error) => {
+          ).catch((error: unknown) => {
             throw new Error(toStr(error));
           });
 
@@ -345,22 +343,27 @@ export const generateRulesTypeCore = async (
           (Object.entries(totalFunctionsRules) as unknown as DeepReadonly<
             [string, Rule][]
           >)
-        : pluginName === eslintPlugins.EslintTreeShakable.pluginName
+        : pluginName === eslintPlugins.EslintCustomRules.pluginName
           ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            (Object.entries(treeShakableRules) as unknown as DeepReadonly<
+            (Object.entries(customRules) as unknown as DeepReadonly<
               [string, Rule][]
             >)
-          : pluginName ===
-                eslintPlugins.EslintPreferArrowFunctionRules.pluginName ||
-              pluginName === eslintPlugins.EslintImportsRules.pluginName
-            ? (Object.entries(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
-                (await import(pluginName)).rules as Rules,
-              ) satisfies DeepReadonly<[string, Rule][]>)
-            : (Object.entries(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
-                (await import(pluginName)).default.rules as Rules,
-              ) satisfies DeepReadonly<[string, Rule][]>);
+          : pluginName === eslintPlugins.EslintTreeShakable.pluginName
+            ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+              (Object.entries(treeShakableRules) as unknown as DeepReadonly<
+                [string, Rule][]
+              >)
+            : pluginName ===
+                  eslintPlugins.EslintPreferArrowFunctionRules.pluginName ||
+                pluginName === eslintPlugins.EslintImportsRules.pluginName
+              ? (Object.entries(
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
+                  (await import(pluginName)).rules as Rules,
+                ) satisfies DeepReadonly<[string, Rule][]>)
+              : (Object.entries(
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
+                  (await import(pluginName)).default.rules as Rules,
+                ) satisfies DeepReadonly<[string, Rule][]>);
 
   const schemaList: DeepReadonly<
     {

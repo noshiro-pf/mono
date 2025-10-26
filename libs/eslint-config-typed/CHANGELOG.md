@@ -38,7 +38,7 @@
 
 ### Features
 
-- fix gen-rules-type scripts and fix rules ([#65](https://github.com/noshiro-pf/eslint-config-typed/issues/65)) ([5f20ce9](https://github.com/noshiro-pf/eslint-config-typed/commit/5f20ce9703e69e240bed9f03156aeac5b119f51c))
+- fix gen-rule-type scripts and fix rules ([#65](https://github.com/noshiro-pf/eslint-config-typed/issues/65)) ([5f20ce9](https://github.com/noshiro-pf/eslint-config-typed/commit/5f20ce9703e69e240bed9f03156aeac5b119f51c))
 
 # [1.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.12...v1.3.0) (2025-10-11)
 

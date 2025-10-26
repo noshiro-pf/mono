@@ -10,32 +10,90 @@
 
 ### eslintFunctionalRules
 
-> `const` **eslintFunctionalRules**: [`EslintFunctionalRules`](../types/rules/eslint-functional-rules.md#eslintfunctionalrules)
-
-Defined in: [src/rules/eslint-functional-rules.mts:53](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L53)
-
-#### Link
-
----
-
-### ignoredMutablePattern
-
-> `const` **ignoredMutablePattern**: `string`[]
-
-Defined in: [src/rules/eslint-functional-rules.mts:7](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L7)
-
----
-
-### immutableDataOptions
-
-> `const` **immutableDataOptions**: [`EslintFunctionalRulesOption`](../types/rules/eslint-functional-rules.md#eslintfunctionalrulesoption)\[`"functional/immutable-data"`\]
+> `const` **eslintFunctionalRules**: `object`
 
 Defined in: [src/rules/eslint-functional-rules.mts:14](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L14)
 
----
+#### Type Declaration
 
-### noLetOptions
+##### functional/functional-parameters
 
-> `const` **noLetOptions**: [`EslintFunctionalRulesOption`](../types/rules/eslint-functional-rules.md#eslintfunctionalrulesoption)\[`"functional/no-let"`\]
+> `readonly` **functional/functional-parameters**: `"off"` = `'off'`
 
-Defined in: [src/rules/eslint-functional-rules.mts:35](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-functional-rules.mts#L35)
+##### functional/immutable-data
+
+> `readonly` **functional/immutable-data**: readonly \[`"error"`, \{ `ignoreAccessorPattern`: readonly \[`"**.mut_**"`, `"this.**"`, `"super.**"`, `"**.current.**"`, `"**.displayName"`, `"**.scrollTop"`, `"**.debugLabel"`\]; `ignoreClasses`: `true`; `ignoreIdentifierPattern`: readonly \[`"^draft"`, `"^mut_"`, `"^_mut_"`, `"^#mut_"`, `"this"`, `"super"`, `"window.location.href"`\]; `ignoreImmediateMutation`: `true`; `ignoreNonConstDeclarations`: `false`; \}\]
+
+##### functional/no-class-inheritance
+
+> `readonly` **functional/no-class-inheritance**: `1` \| `2`
+
+##### functional/no-classes
+
+> `readonly` **functional/no-classes**: `"off"` = `'off'`
+
+##### functional/no-conditional-statements
+
+> `readonly` **functional/no-conditional-statements**: `"off"` = `'off'`
+
+##### functional/no-expression-statements
+
+> `readonly` **functional/no-expression-statements**: `"off"` = `'off'`
+
+##### functional/no-let
+
+> `readonly` **functional/no-let**: readonly \[`"error"`, \{ `allowInForLoopInit`: `false`; `allowInFunctions`: `false`; `ignoreIdentifierPattern`: (`"^mut_"` \| `"^_mut_"` \| `"^#mut_"`)[]; \}\]
+
+##### functional/no-loop-statements
+
+> `readonly` **functional/no-loop-statements**: `"off"` = `'off'`
+
+##### functional/no-mixed-types
+
+> `readonly` **functional/no-mixed-types**: `"off"` = `'off'`
+
+##### functional/no-promise-reject
+
+> `readonly` **functional/no-promise-reject**: `"off"` = `'off'`
+
+##### functional/no-return-void
+
+> `readonly` **functional/no-return-void**: `"off"` = `'off'`
+
+##### functional/no-this-expressions
+
+> `readonly` **functional/no-this-expressions**: `"off"` = `'off'`
+
+##### functional/no-throw-statements
+
+> `readonly` **functional/no-throw-statements**: `"off"` = `'off'`
+
+##### functional/no-try-statements
+
+> `readonly` **functional/no-try-statements**: `"off"` = `'off'`
+
+##### functional/prefer-immutable-types
+
+> `readonly` **functional/prefer-immutable-types**: `"off"` = `'off'`
+
+##### functional/prefer-property-signatures
+
+> `readonly` **functional/prefer-property-signatures**: `1` \| `2`
+
+##### functional/prefer-readonly-type
+
+> `readonly` **functional/prefer-readonly-type**: `0` = `0`
+
+##### functional/prefer-tacit
+
+> `readonly` **functional/prefer-tacit**: `"off"` = `'off'`
+
+##### functional/readonly-type
+
+> `readonly` **functional/readonly-type**: readonly \[`"error"`, `"generic"`\]
+
+##### functional/type-declaration-immutability
+
+> `readonly` **functional/type-declaration-immutability**: `"off"` = `'off'`
+
+#### Link

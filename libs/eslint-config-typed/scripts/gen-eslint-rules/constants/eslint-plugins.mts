@@ -143,6 +143,12 @@ export const eslintPlugins = {
     rulePrefix: 'eslint-plugin/',
     outputFileName: 'eslint-plugin-rules.mts',
   },
+  EslintCustomRules: {
+    typeName: 'EslintCustomRules',
+    pluginName: 'eslint-plugin-custom',
+    rulePrefix: 'custom/',
+    outputFileName: 'eslint-custom-rules.mts',
+  },
 } as const satisfies Record<
   string,
   {

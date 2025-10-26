@@ -10,6 +10,12 @@
 
 ### eslintTreeShakableRules
 
-> `const` **eslintTreeShakableRules**: [`EslintTreeShakableRules`](../types/rules/eslint-tree-shakable-rules.md#eslinttreeshakablerules)
+> `const` **eslintTreeShakableRules**: `object`
 
 Defined in: [src/rules/eslint-tree-shakable-rules.mts:3](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-tree-shakable-rules.mts#L3)
+
+#### Type Declaration
+
+##### tree-shakable/import-star
+
+> `readonly` **tree-shakable/import-star**: `"error"` = `'error'`

@@ -14,6 +14,18 @@ Re-exports [EslintArrayFuncRules](rules/eslint-array-func-rules.md#eslintarrayfu
 
 ---
 
+### EslintCustomRules
+
+Re-exports [EslintCustomRules](rules/eslint-custom-rules.md#eslintcustomrules)
+
+---
+
+### EslintCustomRulesOption
+
+Re-exports [EslintCustomRulesOption](rules/eslint-custom-rules.md#eslintcustomrulesoption)
+
+---
+
 ### EslintCypressRules
 
 Re-exports [EslintCypressRules](rules/eslint-cypress-rules.md#eslintcypressrules)

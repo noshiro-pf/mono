@@ -1,6 +1,6 @@
 import { withDefaultOption, type EslintPluginRules } from '../types/index.mjs';
 
-export const eslintPluginRules: EslintPluginRules = {
+export const eslintPluginRules = {
   'eslint-plugin/consistent-output': withDefaultOption('error'),
   'eslint-plugin/fixer-return': 'error',
   'eslint-plugin/meta-property-ordering': withDefaultOption('error'),
@@ -34,4 +34,4 @@ export const eslintPluginRules: EslintPluginRules = {
   'eslint-plugin/require-meta-default-options': 'error',
   'eslint-plugin/no-meta-replaced-by': 'error',
   'eslint-plugin/require-test-case-name': withDefaultOption('error'),
-} as const;
+} as const satisfies EslintPluginRules;

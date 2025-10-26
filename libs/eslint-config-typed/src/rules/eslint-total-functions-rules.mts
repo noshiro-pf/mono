@@ -1,6 +1,6 @@
 import { type EslintTotalFunctionsRules } from '../types/index.mjs';
 
-export const eslintTotalFunctionsRules: EslintTotalFunctionsRules = {
+export const eslintTotalFunctionsRules = {
   'total-functions/require-strict-mode': 'error',
 
   // Prioritize this as it can check more strictly than @typescript-eslint/no-unsafe-type-assertion
@@ -19,4 +19,7 @@ export const eslintTotalFunctionsRules: EslintTotalFunctionsRules = {
 
   'total-functions/no-nested-fp-ts-effects': 'off',
   'total-functions/no-hidden-type-assertions': 'off',
-} as const;
+
+  'total-functions/no-unsafe-enum-assignment': 0,
+  'total-functions/no-unsafe-optional-property-assignment': 0,
+} as const satisfies EslintTotalFunctionsRules;

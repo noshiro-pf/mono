@@ -39,7 +39,7 @@
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
     "fmt:full": "prettier --write .",
-    "gen-rules-type": "tsx ./scripts/gen-eslint-rules/main.mts",
+    "gen-rule-type": "tsx ./scripts/gen-eslint-rules/main.mts",
     "gh:apply-all": "run-s gh:apply-variables gh:apply-rulesets gh:apply-repository-settings",
     "gh:apply-repository-settings": "tsx --env-file=.env scripts/github/repository/apply.mts",
     "gh:apply-rulesets": "tsx --env-file=.env scripts/github/ruleset/apply.mts",
@@ -49,7 +49,7 @@
     "gh:backup-rulesets": "tsx --env-file=.env scripts/github/ruleset/backup.mts",
     "gi": "run-s gi:scripts gi:src fmt",
     "gi:scripts": "gen-index-ts ./scripts/github --index-ext .mts --export-ext .mjs --target-ext .mts --exclude cmd --exclude apply.mts --exclude octokit.mts",
-    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
+    "gi:src": "tsx scripts/cmd/gen-index.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
@@ -144,6 +144,13 @@
     "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.2"
+  },
+  "peerDependencies": {
+    "eslint": ">=9.0.0",
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "volta": {
     "node": "25.0.0",
