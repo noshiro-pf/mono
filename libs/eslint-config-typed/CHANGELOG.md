@@ -1,3 +1,20 @@
+# [2.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.8.1...v2.0.0) (2025-10-26)
+
+### Features
+
+- **breaking:** update rule settings and configs ([#87](https://github.com/noshiro-pf/eslint-config-typed/issues/87)) ([48ccb65](https://github.com/noshiro-pf/eslint-config-typed/commit/48ccb6503b4976d4f98d2e48960eda490a38b69c))
+
+### BREAKING CHANGES
+
+- **breaking:** - Renamed all `eslintFlatConfigFor<Something>` to `eslintConfigFor<Something>`
+
+* Added `eslintConfigForBrowser` and `eslintConfigForNodeJs`
+* Updated rule settings in various configs for stricter linting
+* Added `defineConfig` utility
+* Removed unintentionally exported `RestrictedImportsOption` type
+* Removed unintentionally exported internal implementations of `eslint-plugin-total-functions` and `eslint-plugin-tree-shakable` from exports
+* Updated README
+
 ## [1.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.8.0...v1.8.1) (2025-10-23)
 
 ### Bug Fixes
