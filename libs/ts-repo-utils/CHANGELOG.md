@@ -1,3 +1,9 @@
+## [7.7.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.7.2...v7.7.3) (2025-10-27)
+
+### Bug Fixes
+
+- bump @types/micromatch from 4.0.9 to 4.0.10 ([#185](https://github.com/noshiro-pf/ts-repo-utils/issues/185)) ([59ff4ff](https://github.com/noshiro-pf/ts-repo-utils/commit/59ff4ffcd34b97ef1d0bc605242fd6792154e83c))
+
 ## [7.7.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.7.1...v7.7.2) (2025-10-04)
 
 ### Bug Fixes
