@@ -135,7 +135,7 @@ export const eslintUnicornRules = {
   'unicorn/string-content': withDefaultOption('error'),
   'unicorn/switch-case-braces': 'off', // TODO: Enable this
   'unicorn/template-indent': withDefaultOption('error'),
-  'unicorn/text-encoding-identifier-case': 'error',
+  'unicorn/text-encoding-identifier-case': withDefaultOption('error'),
   'unicorn/throw-new-error': 'error',
   'unicorn/no-unreadable-iife': 'error',
   'unicorn/no-useless-switch-case': 'error',
@@ -204,6 +204,10 @@ export const eslintUnicornRules = {
   // Turned off because we can't distinguish `widow.postMessage` and `{Worker,MessagePort,Client,BroadcastChannel}#postMessage()`
   // See #1396
   'unicorn/require-post-message-target-origin': 'off',
+
+  'unicorn/no-immediate-mutation': 'error',
+  'unicorn/no-useless-collection-argument': 'error',
+  'unicorn/prefer-response-static-json': 'error',
 
   // For Node.js environment only
   'unicorn/no-new-buffer': 'error',

@@ -162,6 +162,10 @@ Enforce consistent file naming
 
 > `readonly` **unicorn/no-hex-escape**: `"error"` = `'error'`
 
+##### unicorn/no-immediate-mutation
+
+> `readonly` **unicorn/no-immediate-mutation**: `"error"` = `'error'`
+
 ##### unicorn/no-instanceof-array
 
 > `readonly` **unicorn/no-instanceof-array**: `0` = `0`
@@ -281,6 +285,10 @@ Enforce consistent file naming
 ##### unicorn/no-unused-properties
 
 > `readonly` **unicorn/no-unused-properties**: `"error"` = `'error'`
+
+##### unicorn/no-useless-collection-argument
+
+> `readonly` **unicorn/no-useless-collection-argument**: `"error"` = `'error'`
 
 ##### unicorn/no-useless-error-capture-stack-trace
 
@@ -491,6 +499,10 @@ See also `@typescript-eslint/strict-boolean-expressions`.
 
 > `readonly` **unicorn/prefer-regexp-test**: `"error"` = `'error'`
 
+##### unicorn/prefer-response-static-json
+
+> `readonly` **unicorn/prefer-response-static-json**: `"error"` = `'error'`
+
 ##### unicorn/prefer-set-has
 
 > `readonly` **unicorn/prefer-set-has**: `"error"` = `'error'`
@@ -589,7 +601,7 @@ See also `@typescript-eslint/strict-boolean-expressions`.
 
 ##### unicorn/text-encoding-identifier-case
 
-> `readonly` **unicorn/text-encoding-identifier-case**: `"error"` = `'error'`
+> `readonly` **unicorn/text-encoding-identifier-case**: `1` \| `2`
 
 ##### unicorn/throw-new-error
 

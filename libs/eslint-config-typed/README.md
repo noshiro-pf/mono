@@ -21,6 +21,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
     - [Node.js TypeScript Project](#nodejs-typescript-project)
     - [React + Testing Libraries](#react--testing-libraries)
 - [VS Code Integration](#vs-code-integration)
+- [Included plugins](#included-plugins)
 - [API Reference](#api-reference)
     - [Configuration Functions](#configuration-functions)
         - [Base Configurations](#base-configurations)
@@ -44,7 +45,6 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
     - [Known Limitations](#known-limitations)
 - [Contributing](#contributing)
 - [License](#license)
-- [Future Updates](#future-updates)
 
 ## Features
 
@@ -63,11 +63,11 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
 ## Installation
 
 ```sh
-npm add -D eslint-config-typed
+npm add -D eslint eslint-config-typed
 # or
-yarn add -D eslint-config-typed
+yarn add -D eslint eslint-config-typed
 # or
-pnpm add -D eslint-config-typed
+pnpm add -D eslint eslint-config-typed
 ```
 
 All required ESLint plugins and dependencies are automatically installed.
@@ -315,6 +315,32 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
     }
 }
 ```
+
+## Included plugins
+
+- "@typescript-eslint/eslint-plugin": "8.46.2"
+- "eslint-plugin-unicorn": "62.0.0"
+- "eslint-plugin-functional": "9.0.2"
+- "eslint-plugin-array-func": "5.1.0"
+- "eslint-plugin-prefer-arrow-functions": "3.9.1"
+- "eslint-plugin-sort-destructure-keys": "^2.0.0"
+- "eslint-plugin-security": "3.0.1"
+- "eslint-plugin-promise": "7.2.1"
+- "eslint-plugin-import": "2.32.0"
+- "eslint-plugin-strict-dependencies": "1.3.27"
+- "eslint-plugin-react": "7.37.5"
+- "eslint-plugin-react-hooks": "7.0.1"
+- "eslint-plugin-react-perf": "3.3.3"
+- "eslint-plugin-react-refresh": "0.4.24"
+- "eslint-plugin-jsx-a11y": "6.10.2"
+- "eslint-plugin-vitest": "0.5.4"
+- "eslint-plugin-jest": "29.0.1"
+- "eslint-plugin-playwright": "2.2.2"
+- "eslint-plugin-cypress": "5.2.0"
+- "eslint-plugin-testing-library": "7.13.3"
+- "eslint-plugin-eslint-plugin": "7.2.0"
+- "eslint-plugin-total-functions" (Reimplemented in this repository to support flat config)
+- "eslint-plugin-tree-shakable" (Reimplemented in this repository to support flat config)
 
 ## API Reference
 
@@ -647,8 +673,3 @@ Contributions are welcome! Please check our [GitHub repository](https://github.c
 ## License
 
 This project is licensed under the [Apache License 2.0](./LICENSE).
-
-## Future Updates
-
-- Enhanced support for `eslint-plugin-functional`
-    - Migration from `functional/prefer-readonly-type` to `functional/prefer-immutable-types` and `functional/type-declaration-immutability`

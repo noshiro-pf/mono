@@ -914,6 +914,23 @@ namespace TestCaseShorthandStrings {
     | 'off';
 }
 
+/**
+ * Enforce that all test cases with names have unique names
+ *
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/unique-test-case-names.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace UniqueTestCaseNames {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintPluginRules = {
   readonly 'eslint-plugin/consistent-output': ConsistentOutput.RuleEntry;
   readonly 'eslint-plugin/fixer-return': FixerReturn.RuleEntry;
@@ -948,6 +965,7 @@ export type EslintPluginRules = {
   readonly 'eslint-plugin/require-test-case-name': RequireTestCaseName.RuleEntry;
   readonly 'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.RuleEntry;
   readonly 'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.RuleEntry;
+  readonly 'eslint-plugin/unique-test-case-names': UniqueTestCaseNames.RuleEntry;
 };
 
 export type EslintPluginRulesOption = {

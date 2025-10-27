@@ -43,7 +43,7 @@ export const eslintReactRules = {
   'react/iframe-missing-sandbox': 'error',
   'react/jsx-boolean-value': ['error', 'never'],
 
-  // Enable to avoid rendering differences with characters like \n
+  // Even if props is a string, it is necessary because the display will change, such as whether "\n" will cause a line break.
   'react/jsx-curly-brace-presence': ['error', 'always'],
 
   /** Enforce consistent file naming */

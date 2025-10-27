@@ -12,7 +12,16 @@ export const eslintConfigForTypeScriptWithoutRules = ({
 }>): readonly FlatConfig[] =>
   [
     {
-      ignores: ['eslint.config.js', 'eslint.config.*.mjs'],
+      ignores: [
+        'eslint.config.js',
+        'eslint.config.*.mjs',
+        'eslint.*.config.mjs',
+        'node_modules',
+        '**/node_modules/**',
+        'dist',
+        'build',
+        'coverage',
+      ],
     },
     {
       languageOptions: {

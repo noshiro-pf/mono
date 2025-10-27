@@ -147,3 +147,7 @@ Defined in: [src/rules/eslint-plugin-rules.mts:3](https://github.com/noshiro-pf/
 ##### eslint-plugin/test-case-shorthand-strings
 
 > `readonly` **eslint-plugin/test-case-shorthand-strings**: `1` \| `2`
+
+##### eslint-plugin/unique-test-case-names
+
+> `readonly` **eslint-plugin/unique-test-case-names**: `"error"` = `'error'`
