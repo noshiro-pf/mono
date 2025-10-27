@@ -217,8 +217,8 @@ importers:
         specifier: ^5.2.0
         version: 5.2.0(typescript@5.9.3)
       ts-repo-utils:
-        specifier: ^7.7.2
-        version: 7.7.2(prettier@3.6.2)(typescript@5.9.3)
+        specifier: ^7.7.3
+        version: 7.7.3(prettier@3.6.2)(typescript@5.9.3)
       ts-type-forge:
         specifier: ^2.3.0
         version: 2.3.0
@@ -1167,8 +1167,8 @@ packages:
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
 
-  '@types/micromatch@4.0.9':
-    resolution: {integrity: sha512-7V+8ncr22h4UoYRLnLXSpTxjQrNUXtWHGeMPRJt1nULXI57G9bIcpyrHlmrQ7QK24EyyuXvYcSSWAM8GA9nqCg==}
+  '@types/micromatch@4.0.10':
+    resolution: {integrity: sha512-5jOhFDElqr4DKTrTEbnW8DZ4Hz5LRUEmyrGpCMrD/NphYv3nUnaF08xmSLx1rGGnyEs/kFnhiw6dCgcDqMr5PQ==}
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
@@ -3916,8 +3916,8 @@ packages:
   ts-fortress@5.2.0:
     resolution: {integrity: sha512-OXcfAigfWDayC6+zPh8xYy0sTaYCg9SmwnSNY1SV7l2ga2NrTHOBzNNtLPyDgZVARiu9MozQiRBhdJhp2ErkmA==}
 
-  ts-repo-utils@7.7.2:
-    resolution: {integrity: sha512-jq01uPd3GNPDozx28Uf6c4WIohCCYKIPi8B8MtzEptzHfLWWUHS+t9A/NOCH8EwiZ+j3rgbn2f+ApjcmKuW7aQ==}
+  ts-repo-utils@7.7.3:
+    resolution: {integrity: sha512-z59bso2RZBcr5YZYKblQh63RQVrrQLbqaNlHTD18eNv2FtuvXbCEkotB4zvP02X/WK6NeWWbH0iRyDOd45SJyA==}
     hasBin: true
     peerDependencies:
       prettier: ^3.6.2
@@ -5163,7 +5163,7 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
-  '@types/micromatch@4.0.9':
+  '@types/micromatch@4.0.10':
     dependencies:
       '@types/braces': 3.0.5
 
@@ -8310,9 +8310,9 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  ts-repo-utils@7.7.2(prettier@3.6.2)(typescript@5.9.3):
+  ts-repo-utils@7.7.3(prettier@3.6.2)(typescript@5.9.3):
     dependencies:
-      '@types/micromatch': 4.0.9
+      '@types/micromatch': 4.0.10
       cmd-ts: 0.14.3
       fast-glob: 3.3.3
       micromatch: 4.0.8
