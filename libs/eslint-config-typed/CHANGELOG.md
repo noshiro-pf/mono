@@ -1,3 +1,9 @@
+# [2.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.0.0...v2.1.0) (2025-10-27)
+
+### Features
+
+- update plugins and ignore list ([#97](https://github.com/noshiro-pf/eslint-config-typed/issues/97)) ([2ca61c8](https://github.com/noshiro-pf/eslint-config-typed/commit/2ca61c800379090a6cce21585e5b36d2cdcc9ea4))
+
 # [2.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.8.1...v2.0.0) (2025-10-26)
 
 ### Features
