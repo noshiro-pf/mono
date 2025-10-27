@@ -3,6 +3,5 @@
     {
       "mode": "auto"
     }
-  ],
-  "eslint.experimental.useFlatConfig": true
+  ]
 }
