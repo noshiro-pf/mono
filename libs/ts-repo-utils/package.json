@@ -79,7 +79,7 @@
     "z:vitest": "vitest --config ./configs/vitest.config.ts"
   },
   "dependencies": {
-    "@types/micromatch": "^4.0.9",
+    "@types/micromatch": "^4.0.10",
     "cmd-ts": "^0.14.3",
     "fast-glob": "^3.3.3",
     "micromatch": "^4.0.8",
