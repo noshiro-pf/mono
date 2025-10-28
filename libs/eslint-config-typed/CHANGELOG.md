@@ -1,3 +1,9 @@
+# [2.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.1.0...v2.2.0) (2025-10-28)
+
+### Features
+
+- export restrictedSyntax and restrictedSyntaxForReact; update ignore list ([#99](https://github.com/noshiro-pf/eslint-config-typed/issues/99)) ([1ec3225](https://github.com/noshiro-pf/eslint-config-typed/commit/1ec3225865ba4bd07d7d5eba9cc5e75063c7f7d0))
+
 # [2.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.0.0...v2.1.0) (2025-10-27)
 
 ### Features
