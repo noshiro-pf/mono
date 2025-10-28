@@ -12,7 +12,7 @@
 
 > `const` **eslintRules**: `object`
 
-Defined in: [src/rules/eslint-rules.mts:88](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L88)
+Defined in: [src/rules/eslint-rules.mts:303](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L303)
 
 #### Type Declaration
 
@@ -763,7 +763,7 @@ reduce readability
 
 ##### no-restricted-syntax
 
-> `readonly` **no-restricted-syntax**: readonly \[`"error"`, \{ `message`: "use \"Object.hasOwn\" instead."; `selector`: `"BinaryExpression[operator='in']"`; \}, \{ `message`: "use \"Object.hasOwn\" instead."; `selector`: `"MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']"`; \}, \{ `message`: `"use Array.from instead."`; `selector`: `"NewExpression[callee.name='Array']"`; \}, \{ `message`: `"pass Observable via props instead."`; `selector`: `"MemberExpression[object.name='React'][property.name='useImperativeHandle']"`; \}\]
+> `readonly` **no-restricted-syntax**: readonly \[`"error"`, \{ `message`: "use \"Object.hasOwn\" instead."; `selector`: `"BinaryExpression[operator='in']"`; \}, \{ `message`: "use \"Object.hasOwn\" instead."; `selector`: `"MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']"`; \}, \{ `message`: `"use Array.from instead."`; `selector`: `"NewExpression[callee.name='Array']"`; \}\]
 
 Write restricted syntax here that is difficult to achieve with other rules.
 Use the following AST checker to determine how to write selectors:
@@ -1239,3 +1239,77 @@ Defined in: [src/rules/eslint-rules.mts:7](https://github.com/noshiro-pf/eslint-
 > `const` **restrictedGlobalsForBrowser**: readonly \[\{ `message`: `"Avoid using dangerous eval()."`; `name`: `"eval"`; \}, \{ `message`: `"Use 'Number.POSITIVE_INFINITY' instead."`; `name`: `"Infinity"`; \}, \{ `message`: `"Use Number.isFinite instead to avoid type coercion."`; `name`: `"isFinite"`; \}, \{ `message`: `"Use Number.isNaN instead to avoid type coercion."`; `name`: `"isNaN"`; \}, \{ `message`: `"Use 'stringify' from https://www.npmjs.com/package/query-string instead. (link: https://zenn.dev/megeton/articles/5f1ba5c7e1bfd0)"`; `name`: `"encodeURIComponent"`; \}, \{ `message`: `"Use 'parse' from https://www.npmjs.com/package/query-string instead. (link: https://zenn.dev/megeton/articles/5f1ba5c7e1bfd0)"`; `name`: `"decodeURIComponent"`; \}, \{ `message`: `"Use 'window.location' instead."`; `name`: `"location"`; \}, \{ `message`: `"Use 'window.history' instead."`; `name`: `"history"`; \}, \{ `message`: `"Use 'window.navigator' instead."`; `name`: `"navigator"`; \}, \{ `message`: `"Don't use confusing globals declared in lib.dom"`; `name`: `"length"`; \}, \{ `message`: `"Don't use confusing globals declared in lib.dom"`; `name`: `"event"`; \}, \{ `message`: `"Don't use confusing globals declared in lib.dom"`; `name`: `"name"`; \}, \{ `message`: `"Don't use confusing globals declared in lib.dom"`; `name`: `"parent"`; \}, \{ `message`: `"Don't use confusing globals declared in lib.dom"`; `name`: `"status"`; \}, \{ `message`: `"Don't use confusing globals declared in lib.dom"`; `name`: `"top"`; \}, \{ `message`: `"Don't use confusing globals declared in lib.dom"`; `name`: `"close"`; \}, \{ `message`: `"Don't use confusing globals declared in lib.dom"`; `name`: `"open"`; \}\]
 
 Defined in: [src/rules/eslint-rules.mts:36](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L36)
+
+---
+
+### restrictedSyntax
+
+> `const` **restrictedSyntax**: readonly \[\{ `message`: "use \"Object.hasOwn\" instead."; `selector`: `"BinaryExpression[operator='in']"`; \}, \{ `message`: "use \"Object.hasOwn\" instead."; `selector`: `"MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']"`; \}, \{ `message`: `"use Array.from instead."`; `selector`: `"NewExpression[callee.name='Array']"`; \}\]
+
+Defined in: [src/rules/eslint-rules.mts:87](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L87)
+
+---
+
+### restrictedSyntaxForReact
+
+> `const` **restrictedSyntaxForReact**: `object`
+
+Defined in: [src/rules/eslint-rules.mts:121](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L121)
+
+#### Type Declaration
+
+##### componentName
+
+> `readonly` **componentName**: `object`
+
+###### componentName.maxLength()
+
+> `readonly` **maxLength**: (`maxLength`) => `object`[]
+
+###### Parameters
+
+###### maxLength
+
+`number` = `42`
+
+###### Returns
+
+`object`[]
+
+###### componentName.regexp()
+
+> `readonly` **regexp**: (`pattern`) => `object`[]
+
+###### Parameters
+
+###### pattern
+
+`string`
+
+###### Returns
+
+`object`[]
+
+##### componentVarTypeAnnotation
+
+> `readonly` **componentVarTypeAnnotation**: readonly \[\{ `message`: `"Use React.memo<Props>((props) => { ... }) instead."`; `selector`: `"TSQualifiedName[left.name='React'][right.name='FC']"`; \}, \{ `message`: `"Use React.memo<Props>((props) => { ... }) instead."`; `selector`: `"TSQualifiedName[left.name='React'][right.name='FunctionComponent']"`; \}\]
+
+##### importStyle
+
+> `readonly` **importStyle**: readonly \[\{ `message`: ``"React should be imported as `import * as React from 'react'`."``; `selector`: `"ImportDeclaration[source.value='react'][specifiers.0.type!='ImportNamespaceSpecifier']"`; \}, \{ `message`: `"The namespace name imported from 'react' must be 'React'."`; `selector`: `"Identifier[name!='React'][parent.type='ImportNamespaceSpecifier'][parent.parent.type='ImportDeclaration'][parent.parent.source.value='react']"`; \}\]
+
+##### propsTypeAnnotationStyle
+
+> `readonly` **propsTypeAnnotationStyle**: readonly \[\{ `message`: ``"Replace `React.memo((props: Props) => { ... })` with `React.memo<Props>((props) => { ... })`."``; `selector`: `"TSTypeAnnotation[parent.type='Identifier'][parent.parent.type='ArrowFunctionExpression'][parent.parent.parent.type='CallExpression'][parent.parent.parent.callee.object.name='React'][parent.parent.parent.callee.property.name='memo']"`; \}\]
+
+##### reactHooksDefinitionStyle
+
+> `readonly` **reactHooksDefinitionStyle**: readonly \[\{ `message`: `"Move logic to parent component instead of using React.useImperativeHandle."`; `selector`: `"MemberExpression[object.name='React'][property.name='useImperativeHandle']"`; \}, \{ `message`: ``"The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`."``; `selector`: `"TSTypeAnnotation[parent.parent.type='CallExpression'][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='useMemo']"`; \}\]
+
+##### reactMemoPropsArgumentName
+
+> `readonly` **reactMemoPropsArgumentName**: readonly \[\{ `message`: `"The argument name of arrow function passed to React.memo should be 'props'."`; `selector`: `"Identifier[name!='props'][parent.type='ArrowFunctionExpression'][parent.expression!=true][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='memo']"`; \}, \{ `message`: ``"The props of a component containing a return statement are limited to a variable named `'props'`."``; `selector`: `"ObjectPattern[parent.type='ArrowFunctionExpression'][parent.expression!=true][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='memo']"`; \}\]
+
+##### reactMemoTypeParam
+
+> `readonly` **reactMemoTypeParam**: readonly \[\{ `message`: ``"React.memo should have type parameter `'Props'`."``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments=undefined]"`; \}, \{ `message`: ``"React.memo should have type parameter `'Props'`."``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type!='TSTypeParameterInstantiation']"`; \}, \{ `message`: ``"React.memo should have type parameter `'Props'`."``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type='TSTypeParameterInstantiation'][parent.typeArguments.params.0.type!='TSTypeReference']"`; \}, \{ `message`: ``"React.memo should have type parameter `'Props'`."``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type='TSTypeParameterInstantiation'][parent.typeArguments.params.0.type='TSTypeReference'][parent.typeArguments.params.0.typeName.name!='Props']"`; \}\]

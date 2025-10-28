@@ -56,6 +56,8 @@ export const eslintImportsRules = {
 
   'import/no-extraneous-dependencies': 'off',
   'import/no-mutable-exports': 'error',
+
+  // TODO: https://github.com/noshiro-pf/eslint-config-typed/issues/98
   // 'import/no-unused-modules': ['error', { unusedExports: true }],
   'import/no-unused-modules': 'off',
 

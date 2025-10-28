@@ -21,6 +21,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
     - [Node.js TypeScript Project](#nodejs-typescript-project)
     - [React + Testing Libraries](#react--testing-libraries)
 - [VS Code Integration](#vs-code-integration)
+- [TypeScript Configuration Files](#typescript-configuration-files)
 - [Included plugins](#included-plugins)
 - [API Reference](#api-reference)
     - [Configuration Functions](#configuration-functions)
@@ -316,31 +317,54 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
 }
 ```
 
+## TypeScript Configuration Files
+
+You can also write your eslint config in `.ts` or `.mts` format, all you need to do is run `npm add -D jiti`.
+
+```ts
+import {
+    eslintConfigForTypeScript,
+    eslintConfigForVitest,
+    type FlatConfig,
+} from 'eslint-config-typed';
+
+export default [
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [thisDir],
+    }),
+    eslintConfigForVitest(),
+] satisfies FlatConfig[];
+```
+
+For details, see <https://eslint.org/docs/latest/use/configure/configuration-files#typescript-configuration-files>.
+
 ## Included plugins
 
-- "@typescript-eslint/eslint-plugin": "8.46.2"
-- "eslint-plugin-unicorn": "62.0.0"
-- "eslint-plugin-functional": "9.0.2"
-- "eslint-plugin-array-func": "5.1.0"
-- "eslint-plugin-prefer-arrow-functions": "3.9.1"
-- "eslint-plugin-sort-destructure-keys": "^2.0.0"
-- "eslint-plugin-security": "3.0.1"
-- "eslint-plugin-promise": "7.2.1"
-- "eslint-plugin-import": "2.32.0"
-- "eslint-plugin-strict-dependencies": "1.3.27"
-- "eslint-plugin-react": "7.37.5"
-- "eslint-plugin-react-hooks": "7.0.1"
-- "eslint-plugin-react-perf": "3.3.3"
-- "eslint-plugin-react-refresh": "0.4.24"
-- "eslint-plugin-jsx-a11y": "6.10.2"
-- "eslint-plugin-vitest": "0.5.4"
-- "eslint-plugin-jest": "29.0.1"
-- "eslint-plugin-playwright": "2.2.2"
-- "eslint-plugin-cypress": "5.2.0"
-- "eslint-plugin-testing-library": "7.13.3"
-- "eslint-plugin-eslint-plugin": "7.2.0"
-- "eslint-plugin-total-functions" (Reimplemented in this repository to support flat config)
-- "eslint-plugin-tree-shakable" (Reimplemented in this repository to support flat config)
+- @typescript-eslint/eslint-plugin
+- eslint-plugin-unicorn
+- eslint-plugin-functional
+- eslint-plugin-total-functions (Reimplemented in this repository to support flat config)
+- eslint-plugin-array-func
+- eslint-plugin-prefer-arrow-functions
+- eslint-plugin-sort-destructure-keys
+- eslint-plugin-security
+- eslint-plugin-promise
+- eslint-plugin-import
+- eslint-plugin-strict-dependencies
+- eslint-plugin-tree-shakable (Reimplemented in this repository to support flat config)
+- eslint-plugin-react
+- eslint-plugin-react-hooks
+- eslint-plugin-react-perf
+- eslint-plugin-react-refresh
+- eslint-plugin-jsx-a11y
+- eslint-plugin-vitest
+- eslint-plugin-jest
+- eslint-plugin-playwright
+- eslint-plugin-cypress
+- eslint-plugin-testing-library
+- eslint-plugin-eslint-plugin
 
 ## API Reference
 
@@ -405,15 +429,17 @@ Pre-configured rule sets that can be imported and customized:
 
 ### Exported Pre-configured Rule Options
 
-| Pre-configured rule option        | Rule                    | Description                                     |
-| :-------------------------------- | :---------------------- | :---------------------------------------------- |
-| **`restrictedGlobals`**           | `no-restricted-globals` | Array of restricted global variables            |
-| **`restrictedGlobalsForBrowser`** | `no-restricted-globals` | Browser-environment-specific restricted globals |
+| Pre-configured rule option        | Rule                    | Description                                                                                                                                                   |
+| :-------------------------------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`restrictedGlobals`**           | `no-restricted-globals` | Array of restricted global variables                                                                                                                          |
+| **`restrictedGlobalsForBrowser`** | `no-restricted-globals` | Browser-environment-specific restricted globals                                                                                                               |
+| **`restrictedSyntax`**            | `no-restricted-syntax`  | Disallows the `in` operator, `Object.prototype.hasOwnProperty.call` (suggests using `Object.hasOwn`), and `new Array(*)` syntax (suggests using `Array.from`) |
+| **`restrictedSyntaxForReact`**    | `no-restricted-syntax`  | Rule set to restrict React component styling                                                                                                                  |
 
 You can find other pre-configured rule options by traversing the pre-defined rules object like this:
 
-- `typescriptEslintRules['@typescript-eslint/no-restricted-types'][1].types`
-- `eslintRules['no-restricted-syntax'].slice(1)`
+- `typescriptEslintRules['@typescript-eslint/no-unused-vars'][1].varsIgnorePattern`
+- `eslintRules['logical-assignment-operators'].slice(1)`
 
 The shape of the rule option varies depending on the rule, so please check the contents by tracing the predefined rules each time and extract it.
 

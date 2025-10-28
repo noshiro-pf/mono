@@ -17,12 +17,13 @@
   ],
   "flagWords": [],
   "ignorePaths": [
-    "eslint.config.js",
+    "eslint.config.mts",
     "./package-lock.json",
     "./pnpm-lock.yaml",
     "./pnpm-workspace.yaml",
     "docs/**",
     "BREAKING_CHANGE_GUIDE.md",
-    "github/**"
+    "github/**",
+    "test/**"
   ]
 }

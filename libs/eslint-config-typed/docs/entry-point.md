@@ -518,6 +518,18 @@ Re-exports [restrictedGlobalsForBrowser](rules/eslint-rules.md#restrictedglobals
 
 ---
 
+### restrictedSyntax
+
+Re-exports [restrictedSyntax](rules/eslint-rules.md#restrictedsyntax)
+
+---
+
+### restrictedSyntaxForReact
+
+Re-exports [restrictedSyntaxForReact](rules/eslint-rules.md#restrictedsyntaxforreact)
+
+---
+
 ### Rule
 
 Re-exports [Rule](types/flat-config.md#rule)

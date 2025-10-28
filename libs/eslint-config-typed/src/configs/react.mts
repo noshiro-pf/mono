@@ -13,5 +13,5 @@ export const eslintConfigForReact = (
           version: 'detect',
         },
       },
-    } satisfies FlatConfig,
+    },
   ] as const;

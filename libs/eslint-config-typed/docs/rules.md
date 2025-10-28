@@ -152,6 +152,18 @@ Re-exports [restrictedGlobalsForBrowser](rules/eslint-rules.md#restrictedglobals
 
 ---
 
+### restrictedSyntax
+
+Re-exports [restrictedSyntax](rules/eslint-rules.md#restrictedsyntax)
+
+---
+
+### restrictedSyntaxForReact
+
+Re-exports [restrictedSyntaxForReact](rules/eslint-rules.md#restrictedsyntaxforreact)
+
+---
+
 ### typescriptEslintRules
 
 Re-exports [typescriptEslintRules](rules/typescript-eslint-rules.md#typescripteslintrules)

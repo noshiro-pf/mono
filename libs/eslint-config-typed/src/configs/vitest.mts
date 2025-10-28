@@ -14,4 +14,4 @@ export const eslintConfigForVitest = (files?: readonly string[]): FlatConfig =>
     rules: defineKnownRules({
       ...eslintVitestRules,
     }),
-  }) as const satisfies FlatConfig;
+  }) as const;

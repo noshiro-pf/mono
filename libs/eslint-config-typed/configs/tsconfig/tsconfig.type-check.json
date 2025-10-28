@@ -36,6 +36,9 @@
     "allowJs": true,
     "checkJs": true,
 
+    // JSX
+    "jsx": "react-jsx",
+
     // Interop Constraints
     "allowSyntheticDefaultImports": false,
     "esModuleInterop": true,

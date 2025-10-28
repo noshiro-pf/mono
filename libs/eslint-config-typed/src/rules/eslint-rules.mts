@@ -84,6 +84,221 @@ export const restrictedGlobalsForBrowser = [
   },
 ] as const satisfies EslintRulesOption['no-restricted-globals'];
 
+export const restrictedSyntax = [
+  {
+    // ban "in" operator
+    selector: "BinaryExpression[operator='in']",
+    message: 'use "Object.hasOwn" instead.',
+  },
+  {
+    // ban Object.prototype.hasOwnProperty.call
+    selector:
+      "MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']",
+    message: 'use "Object.hasOwn" instead.',
+  },
+  {
+    // ban "new Array" expression
+    selector: "NewExpression[callee.name='Array']",
+    message: 'use Array.from instead.',
+  },
+
+  // Covered by @typescript-eslint/consistent-type-assertions or total-functions/no-unsafe-type-assertion
+  // {
+  //   // ban "as"
+  //   selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
+  //   message: "Don't use `as`.",
+  // },
+
+  // TODO
+  // {
+  //   selector:
+  //     "Identifier[name='draft'][parent.parent.callee.name!='produce'][parent.parent.parent.parent.parent.parent.callee.name!='produce']",
+  //   message:
+  //     "Don't use the identifier name `draft` except in immer produce function.",
+  // },
+] as const satisfies EslintRulesOption['no-restricted-syntax'];
+
+export const restrictedSyntaxForReact = {
+  // [These rules recommends React component style like below]
+  //
+  // import * as React from "react";
+  //
+  // type Props = Readonly<{
+  //   numList: readonly number[];
+  // }>;
+  //
+  // OK
+  // export const Ok = React.memo<Props>((props) => {
+  //   const sum = React.useMemo(
+  //     () => props.numList.reduce((a, b) => a + b, 0),
+  //     [props.numList],
+  //   );
+  //
+  //   return <div>{sum}</div>;
+  // });
+  //
+  // export const NoReturnStatementWithSpread = React.memo<Props>(({ numList }) => <div>{numList.length}</div>); // OK
+  //
+  // export const NoReturnStatementWithoutSpread = React.memo<Props>((props) => <div>{props.numList.length}</div>); // OK
+
+  // https://typescript-eslint.io/play/#ts=5.9.3&showAST=es&fileType=.tsx&code=JYWwDg9gTgLgBAKjgQwM5wEoFNkGN4BmUEIcARFDvmQNwCwAUKJLIiugDYQAmaAFnCIlyXXqj61GjGAE8wWOAAViYdAF5MObhAB2HGQB4A3ozhwdAVxAAZYKhgAuOJWTa9M81YBGWKAG0AXXoGAF8APmDGAHoouAB5AGlGLAAPFnhcXXt4gGs4DWw8GAA6ECwQCANlCFUwgAo6sBVUAEp8sLgTBjNMnWzUK3zNIuKLVCwAWXKIOtMzODq2tQ6mmtRiyxs7EspuC1wsBuQAGjgvJY7kOABqM9OABhbjubM-VdUNq1t7AOfuuBakX%2BlBgFigOjgBm4wAAbmEjAMQCEDFFoXDgiFAVIGDF4kkGKl0nBetkAHIQbCg8EAZRgyBg5SwOhgAHVgDA%2BNSmlohoV8KVplVmvU6kZPFtspj2pC0fDNt8ShwmQBzDnI1GwsJYhjRWKJZJpaAZLLwcmUsE6Wn0xnMtkciAWGBclzcXlUEplCpCtYi96taVQzVGP2fCWKlVqlGy7W6uCkgDiBqJJPgAEEoMrUzodBA6QzXQV3QKvdVag0-U5S-7lp05im4Ii3SMxpNprN-mZFtKQ-LtsVdvtDnUTmcLigbnc4I8-vM4G9mqGFb85jHgVgqRDA3CEVZ1bKMavcQmk0biSa4OnM9nc9buKnUABJPTAHQKQsjT2VKu%2B5pOMW9%2BwnBdXR9HFHx-ACOApRrLoenPRt335FspgqdtZy7Gsey%2BPsBwOI5TnOaUrluLwHieF45ywsNl3%2BVczBBC0ZSDRE901A8gSPRMCUNVh60vLMczzLA70fZ9XztPgABU5CwbACF8JkDibflP29MtGl-YY3H0YxxQVICtBAjxNnAwIoK1aVYLPPp4AQ4YkPGFCZgojCVgXACdmEwd8NHIiJ1IqdyI7Sj3Own4ZwBIF6PXRit3hFiozYxhMQ42Jj245NzyciSHRgaT5EvKwmUceySicgBRFJc2AXAAGESEgV9mQMDS1krZoxz5EoAClqQADWKcqlTKZkOkQj021a1Qxys%2Bs7K60ZHLbFyxyohV%2By8vDhwIsdiMnacKPnNZF22GizDo5wYvBJjtwSjV0WSw80q4wlT3rJyBJvfN7yzDxxuLSpkB0GQfzWGa63gwZ-uQ5bgtcuA1pwzahxHQiaz2gKDuCo6Pg8s7IuxaKNxu%2BLd0Sh7QieuMXp440bLgD7ryEkSnw4F831KgHdI8gzXCMsDfDM8Jyw6yyIfp%2Baixh1CVu7UKww2vYttR3b-LIiLXkR8KVyiy7ibinckXJiJHtS6mT14rLpk%2B5n71Z9mJPy2SsHkygdCU-7VMKbTDH-MKSuA9wBYg8zQemsX-jmqHOel5y4dW%2BX1twlGdr8kj1cOrWYHxi6GOug27v3U3sU4i26eyS9nS0YTlImkthQaP2wyg8HI8h0hoaWmX4%2BlDzFe87bfPRtXAo1uc8Yi3Ors3WVDdYimUpL57GHrSSIHXjfN637eN%2BsXRlXq8BdGK0lkDKWuue-EWwYjuCJejhbY7Q%2BZ4az-vldT4f09HzPE9OyfdZ5xnsxMm90TaUyBEAA&eslintrc=N4KABGBEBOCuA2BTAzpAXGUEKQHYHsBaaFAF2gEsBjUxAE0OQE9dSBDAD3TAG1xsciaNHzRIAGn4CsA7JGSIkNUd0gBJALYAHUaQAiiKvDbQ2pCvlw9k%2BWNCqIAdADc28WIgC8AchJsa3gC61lqGFABmFELIjgAMjqRMoQCEPpo60KQAcmwaKFr%2BiADKoVQRUdBBElKykHnIyGwA5oiqAEqI-qRgyAAWtvB0YABGiGAU2rr0YGzIYAAGExndAFQzcx1dYOEiGmC%2BnQHzjpA1EAC%2BkrKYZ3IKSqQqGOp0iKzlQjy4uYip3psBYIFEisBJJLzedK6HL1AoOEphSJCII8YFvUiONGgxKhNKTTIGIwmMwWXAorEYimOGx2BwuNweHx%2BQHVa44eqNFqqAAqvTG31hhTAArGSymQx2%2BD2By63jAGlgyG6o32ANI3hOt0uIB11xk13kikMjzEz25RQAirA3B86DDEDwkOEMSKfGqUZQmr0XT8fAAxADCVSubLqKE5rWeAFUFGA1Y48hp8AAeAAKIi0yAAfAAKHNaDPIACUYE8WcwYEcVbA5xLFFwSs6dE1121etuOHuxqeUHNVptSLtP0diGdjld-0O6uCnu94993j9sFwNFJAalOlw6ODHagHOakagMbG8cTKfT%2BEzufzhZLZYrVccNbrDdobGbp1bkl1sn1tS7yimlAACyiAaKM0AAKIcAW4akjw%2BDDAAVsa855G6U7khmQiJGhEJnuSJjomCoQAILQE0sB5KwyCeMuryRFudCBKyob7lyzynmB%2BA9P0CBDL0bDOGMOJjMCPy0NACzeBembeMcn6yG2v67oaDw9pAoHgUI0GwQ08GIShNB4RhspAthmRMCZ3gEUCRHYuC5GUdRpDIKk9GjvW9B2SCGKiU5VHojEol-Oa3LgqmxJ5JJaivmw7wkpYO5snu4YHu0U4JtxvEDAJQkieCYDidFQjSbJyDyS2SkhtIqkASaqhaRBukkPplgIchqETu65mXjhVkTrZqL2X5jkUYFNHubgDFecxw2%2BSRiABS5wXgj4YURVFiAxXFCXmElPnEf540rZiUUxPEIXrUU4WhB04RCG8DjJWxaUcVAXFJjl-FgIJwlgKJRVbZJZWFpVikCMptUpWp3ZAZpYHNTBrXIAZnXGd1mG9aElnWUNVLHc5QVTTNTGHQ5ZEnUFi3XbdiCRaYJXQLFSrxeYiVkuTo2U0TNFnYzF0094G13aOj0roghELYTE2ufzuSC6J9p4X85UvQa7GHpAn08X0uW-flAOFcV22lfMMlgwpWrfrcf4CLDgE8jdjm4AQ7D7VYBNrZCrzvEilRc-zR3e%2BRIgAO5LiuHstXBB3zcRVJe7i3gBm48Ax21nPx6CicjY4VBp4gTiGV1C49dnlJ51SBfwEgTgFn1uODdx6u1JrGVaMYDgLDreYN5mGDlXe5bAJW1a1vMYBhxQpC9D3mVnmmhbXv3xaliPY9PhPVWQzb7Yw-VGlqL75j%2B18Px-KvUvB8nof4BHy6rpYGeo3HVKIMjse4Kk5AeIH1eF2LujH06FJxmQrkHUENc66YgsrhZuSZW723bmaPkMwqasGFD8MA%2BBwjoPDtsR%2BHsgYNGmI8OMC9sp6x%2BiqbwV8d7YChtgO2dwjSO2eAAeWAZFUgklPZ51Ej4O%2BD8o6khfqSa%2BoIP56Vft-Twv9ED-zztAoujgS4YzLljCBADa6qP7v1PGLcWI1Tbm9LWvIxKFhwXgtgYAqAbksOiOxlh2D1nrE0GYYASCkDsLgHo7swJOKImAeAEwZ5kJ4rY1wlA2DDCQFgvIQxzZXytl%2BHUts6psIas8Y%2B6IPjQHPuhAA9AAPUcMAAALAAJnEOcAAJEUwOgjvAADUTAUFiUgQkxhTAmkkRiNx3MISp1ruIt%2BedBn50AWo4B1ly5UkmSo%2BucCBoLlsqxDWZieRoPsZMLcmCRQhLeE0We31BgjDGEgBoANBJ%2BOqU%2BdcDYKCvCkiQMOlBaDrAWPY18YB1x7KcZ4ChXQspJiXpebMfdbzrwrLWAA3GAaRugKz-M3EEuYRQpSIFRY4zB5w4UQ0YXvFSB8skaSajpT%2BmcOpGRARCeZKzrKKkQOkIQJJhIAAl4p0CQEguQKCQL4H%2BvGZlRQAkAx4jPOY8UHBKlEM4gFmD6yNnfAwi4JiIAsM7GS%2BGIslqu3wO7eCudpbexGenKlsj%2BmQIxEsmZtK5laJNcRO1%2Bim4LmZVpfAfL2RbNQWMaJHS4kFVCGAbkZyhgqnim7Mw0xZjzxBZ67iyZuRZknvK%2BYPylRgGcBgcNQKRUKC9TmR8RZUlKRqIEfg5wQDnCAA&tsconfig=N4KABGBEDGD2C2AHAlgGwKYCcDyiAuysAdgM6QBcYoEEkJemy0eFYDArugDTg2RGwAqkWgALdNADW6ACYBJIjPQAPWQEFo0dCTKUO6XgF8QhoA&tokens=false
+
+  // TODO: Create a separate plugin for these rules
+
+  /* Restrict import style of React */
+  importStyle: [
+    {
+      selector:
+        "ImportDeclaration[source.value='react'][specifiers.0.type!='ImportNamespaceSpecifier']",
+      message: "React should be imported as `import * as React from 'react'`.",
+      // NOTE: React の import 方法を `import * as React from 'react'` と namespace import のみに限定するルール。
+      // import を1回で済ませられて便利なのと、 React.* に対する以降のルールを書きやすくするため。
+      // tree-shaking に悪影響は無い。
+    },
+    {
+      selector:
+        "Identifier[name!='React'][parent.type='ImportNamespaceSpecifier'][parent.parent.type='ImportDeclaration'][parent.parent.source.value='react']",
+      message: "The namespace name imported from 'react' must be 'React'.",
+    },
+  ],
+
+  /* Restrict React component definition style */
+
+  componentVarTypeAnnotation: [
+    {
+      // Ban "React.FC"
+      selector: "TSQualifiedName[left.name='React'][right.name='FC']",
+      message: 'Use React.memo<Props>((props) => { ... }) instead.',
+      // NOTE: React.FC による型注釈があれば React.memo を使うように促すルール。
+      // React.FC で型注釈されていない React.memo 化されていないコンポーネントは別途検出する必要がある。
+    },
+    {
+      // Ban "React.FunctionComponent"
+      selector:
+        "TSQualifiedName[left.name='React'][right.name='FunctionComponent']",
+      message: 'Use React.memo<Props>((props) => { ... }) instead.',
+    },
+  ],
+
+  reactMemoTypeParam: [
+    // NOTE: React.memo の型引数を `Props` に限定する。
+    // これは 1ファイル1コンポーネントの強制も意味する。
+    // 前提： component が React.memo でラップされていること。
+    {
+      selector:
+        // Detects `React.memo(...)`
+        "MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments=undefined]",
+      message: "React.memo should have type parameter `'Props'`.",
+    },
+    {
+      selector:
+        // Detects `React.memo<NotProps>(...)`
+        "MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type!='TSTypeParameterInstantiation']",
+      message: "React.memo should have type parameter `'Props'`.",
+    },
+    {
+      selector:
+        // Detects `React.memo<{ prop1: number }>(...)`
+        "MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type='TSTypeParameterInstantiation'][parent.typeArguments.params.0.type!='TSTypeReference']",
+      message: "React.memo should have type parameter `'Props'`.",
+    },
+    {
+      selector:
+        // Detects `React.memo<NotProps>(...)`, `React.memo<Readonly<{ prop1: number }>>(...)`
+        "MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type='TSTypeParameterInstantiation'][parent.typeArguments.params.0.type='TSTypeReference'][parent.typeArguments.params.0.typeName.name!='Props']",
+      message: "React.memo should have type parameter `'Props'`.",
+    },
+  ],
+
+  propsTypeAnnotationStyle: [
+    {
+      // Restrict Props type annotation style for React.memo
+      selector:
+        "TSTypeAnnotation[parent.type='Identifier'][parent.parent.type='ArrowFunctionExpression'][parent.parent.parent.type='CallExpression'][parent.parent.parent.callee.object.name='React'][parent.parent.parent.callee.property.name='memo']",
+      message:
+        'Replace `React.memo((props: Props) => { ... })` with `React.memo<Props>((props) => { ... })`.',
+      // 前提： Arrow function の使用が強制されていること。
+    },
+  ],
+
+  /* Restrict props argument name to be "props" */
+  reactMemoPropsArgumentName: [
+    {
+      // Restrict props argument name to be "props"
+      selector:
+        "Identifier[name!='props'][parent.type='ArrowFunctionExpression'][parent.expression!=true][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='memo']",
+      message:
+        "The argument name of arrow function passed to React.memo should be 'props'.",
+      // NOTE: component props を "props" という名前に限定する。
+      // 前提： component が React.memo でラップされていること。Arrow function の使用が強制されていること。
+    },
+    {
+      // Restrict props argument to be "props" variable (object destructuring is not allowed)
+      selector:
+        // Detect `React.memo<Props>(({ prop1, prop2 }) => { ... })`
+        "ObjectPattern[parent.type='ArrowFunctionExpression'][parent.expression!=true][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='memo']",
+      message:
+        "The props of a component containing a return statement are limited to a variable named `'props'`.",
+      // NOTE: return 文を含む component の props を "props" という名前の変数に限定する。
+      // 前提： component が React.memo でラップされていること。Arrow function の使用が強制されていること。
+    },
+  ],
+
+  componentName: {
+    maxLength: (maxLength: number = 42) => [
+      {
+        // Limit the length of component names ${maxLength} characters
+        selector: `Identifier[name=/^.{${maxLength},}$/][parent.type='VariableDeclarator'][parent.init.type='CallExpression'][parent.init.callee.object.name='React'][parent.init.callee.property.name='memo']`,
+        message: `The component name length should be less than ${maxLength}. Consider rewrite as \`const Component = React.memo<Props>((props) => { }); export { Component as SomeComponent };\`.`,
+        // NOTE:
+        // `const Name = React.memo<Props>((props) => {`
+        // が1行に収まるようにするためのルール。1行に収まらないとインデントが増えてコンポーネント実装の可読性が下がりやすくなるため。
+        // component props の型名や引数名の制約と併せて、 prettier のデフォルト print-width = 80 で export を省いた場合の最大長としてデフォルト値 42 を設定している。
+        // 抵触する場合、以下のように書き換える。
+        //
+        // const Component = React.memo<Props>((props) => {
+        //   ...
+        // });
+        //
+        // export { Component as SomeComponent };
+      },
+    ],
+
+    regexp: (pattern: string) => [
+      {
+        // Validate that component names match the provided pattern
+        selector: `Identifier[name=${pattern}][parent.type='VariableDeclarator'][parent.init.type='CallExpression'][parent.init.callee.object.name='React'][parent.init.callee.property.name='memo']`,
+        message: `The component name should match ${pattern}.`,
+      },
+    ],
+  },
+
+  /* Restrict React hooks definition style */
+  reactHooksDefinitionStyle: [
+    {
+      // Ban "React.useImperativeHandle"
+      selector:
+        "MemberExpression[object.name='React'][property.name='useImperativeHandle']",
+      message:
+        'Move logic to parent component instead of using React.useImperativeHandle.',
+    },
+    {
+      // Restrict type annotation style for React.useMemo
+      selector:
+        "TSTypeAnnotation[parent.parent.type='CallExpression'][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='useMemo']",
+      message:
+        'The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`.',
+    },
+  ],
+} as const satisfies Record<
+  string,
+  | EslintRulesOption['no-restricted-syntax']
+  | Record<
+      string,
+      (...args: readonly never[]) => EslintRulesOption['no-restricted-syntax']
+    >
+>;
+
 /** @link https://github.com/eslint/eslint/blob/main/conf/eslint-all.js */
 export const eslintRules = {
   /**
@@ -295,44 +510,7 @@ export const eslintRules = {
    *
    * AST checker: https://typescript-eslint.io/play/#ts=5.9.3&showAST=es&fileType=.ts&code=LAKCA&eslintrc=N4KABGBEBOCuA2BTAzpAXGYBfEWg&tsconfig=N4KABGBEDGD2C2AHAlgGwKYCcDyiAuysAdgM6QBcYoEEkJemy0eAcgK6qoDCAFutAGsylBm3TgwAXxCSgA&tokens=false
    */
-  'no-restricted-syntax': [
-    'error',
-
-    {
-      // ban "in" operator
-      selector: "BinaryExpression[operator='in']",
-      message: 'use "Object.hasOwn" instead.',
-    },
-    {
-      // ban Object.prototype.hasOwnProperty.call
-      selector:
-        "MemberExpression[object.object.object.name='Object'][object.object.property.name='prototype'][object.property.name='hasOwnProperty'][property.name='call']",
-      message: 'use "Object.hasOwn" instead.',
-    },
-    {
-      // ban "new Array" expression
-      selector: "NewExpression[callee.name='Array']",
-      message: 'use Array.from instead.',
-    },
-    {
-      // ban "React.useImperativeHandle"
-      selector:
-        "MemberExpression[object.name='React'][property.name='useImperativeHandle']",
-      message: 'pass Observable via props instead.',
-    },
-    // replaced by @typescript-eslint/consistent-type-assertions and total-functions/no-unsafe-type-assertion
-    // {
-    //   // ban "as"
-    //   selector: "TSAsExpression[typeAnnotation.typeName.name!='const']",
-    //   message: "Don't use `as`.",
-    // },
-    // {
-    //   selector:
-    //     "Identifier[name='draft'][parent.parent.callee.name!='produce'][parent.parent.parent.parent.parent.parent.callee.name!='produce']",
-    //   message:
-    //     "Don't use the identifier name `draft` except in immer produce function.",
-    // },
-  ],
+  'no-restricted-syntax': ['error', ...restrictedSyntax],
 
   'no-return-assign': withDefaultOption('error'),
   'no-self-assign': withDefaultOption('error'),

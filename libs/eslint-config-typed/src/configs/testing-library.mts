@@ -18,4 +18,4 @@ export const eslintConfigForTestingLibrary = (
     rules: defineKnownRules({
       ...eslintTestingLibraryRules,
     }),
-  }) as const satisfies FlatConfig;
+  }) as const;

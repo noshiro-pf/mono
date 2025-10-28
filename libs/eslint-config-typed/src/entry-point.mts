@@ -41,6 +41,8 @@ export {
   // Pre-configured rule options
   restrictedGlobals,
   restrictedGlobalsForBrowser,
+  restrictedSyntax,
+  restrictedSyntaxForReact,
 
   // Custom plugins
   eslintPluginCustom,

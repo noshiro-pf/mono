@@ -13,9 +13,9 @@ export const eslintConfigForTypeScriptWithoutRules = ({
   [
     {
       ignores: [
-        'eslint.config.js',
-        'eslint.config.*.mjs',
-        'eslint.*.config.mjs',
+        'eslint.config.{js,ts,mjs,mts,cjs,cts}',
+        'eslint.config.*.{js,ts,mjs,mts,cjs,cts}',
+        'eslint.*.config.{js,ts,mjs,mts,cjs,cts}',
         'node_modules',
         '**/node_modules/**',
         'dist',

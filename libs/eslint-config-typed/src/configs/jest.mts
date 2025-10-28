@@ -18,4 +18,4 @@ export const eslintConfigForJest = (files?: readonly string[]): FlatConfig =>
     rules: defineKnownRules({
       ...eslintJestRules,
     }),
-  }) as const satisfies FlatConfig;
+  }) as const;

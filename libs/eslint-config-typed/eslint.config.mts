@@ -1,19 +1,16 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
+  eslintConfigForReact,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  restrictedSyntaxForReact,
+  type FlatConfig,
 } from 'eslint-config-typed';
-import 'ts-repo-utils';
 
 const thisDir = import.meta.dirname;
 
-/** @returns {readonly import('eslint-config-typed').FlatConfig[]} */
-const defineConfig = () => [
-  {
-    ignores: ['eslint.config.js', 'dist', 'coverage'],
-  },
-
+export default [
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
@@ -21,19 +18,6 @@ const defineConfig = () => [
   }),
 
   eslintConfigForVitest(),
-
-  {
-    files: ['test/**/*.mts', '**/*.test.mts'],
-    rules: defineKnownRules({
-      '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/no-duplicate-type-constituents': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/consistent-indexed-object-style': 'off',
-      '@typescript-eslint/no-restricted-types': 'off',
-      '@typescript-eslint/no-redundant-type-constituents': 'off',
-      'unicorn/consistent-function-scoping': 'off',
-    }),
-  },
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
@@ -47,15 +31,24 @@ const defineConfig = () => [
       'import/no-extraneous-dependencies': 'off',
     }),
   },
+
+  ...eslintConfigForReact(['test/**/*.{mts,tsx}']),
   {
-    files: ['samples/**/*'],
+    files: ['test/**/*.{mts,tsx}'],
     rules: defineKnownRules({
-      'import/no-extraneous-dependencies': 'off',
-      'import/no-internal-modules': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      'functional/immutable-data': 'off',
+      'no-restricted-syntax': [
+        'error',
+        ...restrictedSyntaxForReact.componentName.maxLength(),
+        ...restrictedSyntaxForReact.componentVarTypeAnnotation,
+        ...restrictedSyntaxForReact.importStyle,
+        ...restrictedSyntaxForReact.propsTypeAnnotationStyle,
+        ...restrictedSyntaxForReact.reactHooksDefinitionStyle,
+        ...restrictedSyntaxForReact.reactMemoPropsArgumentName,
+        ...restrictedSyntaxForReact.reactMemoTypeParam,
+      ],
     }),
   },
+
   {
     files: ['src/types/rules/*.mts'],
     rules: defineKnownRules({
@@ -71,6 +64,4 @@ const defineConfig = () => [
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
     }),
   },
-];
-
-export default defineConfig();
+] satisfies FlatConfig[];
