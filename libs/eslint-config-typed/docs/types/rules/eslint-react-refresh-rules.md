@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-react-refresh-rules
 
@@ -22,7 +22,7 @@ Defined in: [src/types/rules/eslint-react-refresh-rules.mts:56](https://github.c
 
 Defined in: [src/types/rules/eslint-react-refresh-rules.mts:57](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-refresh-rules.mts#L57)
 
----
+***
 
 ### EslintReactRefreshRulesOption
 

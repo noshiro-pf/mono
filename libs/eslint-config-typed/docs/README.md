@@ -1,6 +1,6 @@
 **eslint-config-typed**
 
----
+***
 
 # eslint-config-typed
 
@@ -728,6 +728,12 @@ This project is licensed under the [Apache License 2.0](_media/LICENSE).
 - [plugins/custom/rules](plugins/custom/rules.md)
 - [plugins/custom/rules/no-restricted-syntax2](plugins/custom/rules/no-restricted-syntax2.md)
 - [plugins/custom/rules/rules](plugins/custom/rules/rules.md)
+- [plugins/strict-dependencies](plugins/strict-dependencies.md)
+- [plugins/strict-dependencies/plugin](plugins/strict-dependencies/plugin.md)
+- [plugins/strict-dependencies/rules](plugins/strict-dependencies/rules.md)
+- [plugins/strict-dependencies/rules/resolve-import-path](plugins/strict-dependencies/rules/resolve-import-path.md)
+- [plugins/strict-dependencies/rules/rules](plugins/strict-dependencies/rules/rules.md)
+- [plugins/strict-dependencies/rules/strict-dependencies](plugins/strict-dependencies/rules/strict-dependencies.md)
 - [plugins/total-functions](plugins/total-functions.md)
 - [plugins/total-functions/plugin](plugins/total-functions/plugin.md)
 - [plugins/total-functions/rules](plugins/total-functions/rules.md)

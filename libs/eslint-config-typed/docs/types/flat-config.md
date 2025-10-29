@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / types/flat-config
 
@@ -14,7 +14,7 @@
 
 Defined in: [src/types/flat-config.mts:8](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L8)
 
----
+***
 
 ### FlatConfig
 
@@ -22,7 +22,7 @@ Defined in: [src/types/flat-config.mts:8](https://github.com/noshiro-pf/eslint-c
 
 Defined in: [src/types/flat-config.mts:6](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L6)
 
----
+***
 
 ### Rule
 
@@ -30,7 +30,7 @@ Defined in: [src/types/flat-config.mts:6](https://github.com/noshiro-pf/eslint-c
 
 Defined in: [src/types/flat-config.mts:10](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/flat-config.mts#L10)
 
----
+***
 
 ### Rules
 

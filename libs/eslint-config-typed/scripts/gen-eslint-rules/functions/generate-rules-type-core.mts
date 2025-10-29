@@ -5,6 +5,7 @@ import { compile, type Options } from 'json-schema-to-typescript';
 import { Arr, isBoolean, isString } from 'ts-data-forge';
 import { type Rule, type Rules } from '../../../src/index.mjs';
 import { customRules } from '../../../src/plugins/custom/rules/index.mjs';
+import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
 import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/index.mjs';
 import { treeShakableRules } from '../../../src/plugins/tree-shakable/rules/index.mjs';
 import { eslintPlugins } from '../constants/eslint-plugins.mjs';
@@ -382,10 +383,12 @@ const getRules = async (
       return Object.entries(totalFunctionsRules as unknown as Rules);
 
     case eslintPlugins.EslintTreeShakable.pluginName:
-      return Object.entries(
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        treeShakableRules as unknown as Rules,
-      );
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Object.entries(treeShakableRules as unknown as Rules);
+
+    case eslintPlugins.EslintStrictDependencies.pluginName:
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Object.entries(strictDependenciesRules as unknown as Rules);
 
     case eslintPlugins.EslintPreferArrowFunctionRules.pluginName:
     case eslintPlugins.EslintImportsRules.pluginName:

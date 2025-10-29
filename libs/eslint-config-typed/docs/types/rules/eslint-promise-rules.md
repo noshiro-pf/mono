@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-promise-rules
 
@@ -118,7 +118,7 @@ Defined in: [src/types/rules/eslint-promise-rules.mts:546](https://github.com/no
 
 Defined in: [src/types/rules/eslint-promise-rules.mts:544](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-promise-rules.mts#L544)
 
----
+***
 
 ### EslintPromiseRulesOption
 

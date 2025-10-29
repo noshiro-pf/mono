@@ -83,9 +83,6 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^2.0.0
         version: 2.0.0(eslint@9.38.0(jiti@2.6.1))
-      eslint-plugin-strict-dependencies:
-        specifier: 1.3.27
-        version: 1.3.27
       eslint-plugin-testing-library:
         specifier: 7.13.3
         version: 7.13.3(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3)
@@ -98,9 +95,15 @@ importers:
       globals:
         specifier: 16.4.0
         version: 16.4.0
+      is-glob:
+        specifier: ^4.0.3
+        version: 4.0.3
       is-immutable-type:
         specifier: 5.0.1
         version: 5.0.1(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3)
+      micromatch:
+        specifier: ^4.0.8
+        version: 4.0.8
       tsutils:
         specifier: 3.21.0
         version: 3.21.0(typescript@5.9.3)
@@ -147,6 +150,9 @@ importers:
       '@types/estree':
         specifier: ^1.0.8
         version: 1.0.8
+      '@types/is-glob':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@types/json-schema':
         specifier: ^7.0.15
         version: 7.0.15
@@ -195,9 +201,6 @@ importers:
       markdownlint-cli2:
         specifier: ^0.18.1
         version: 0.18.1
-      micromatch:
-        specifier: ^4.0.8
-        version: 4.0.8
       npm-run-all2:
         specifier: ^8.0.4
         version: 8.0.4
@@ -1158,6 +1161,9 @@ packages:
 
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
+
+  '@types/is-glob@4.0.4':
+    resolution: {integrity: sha512-3mFBtIPQ0TQetKRDe94g8YrxJZxdMillMGegyv6zRBXvq4peRRhf2wLZ/Dl53emtTsC29dQQBwYvovS20yXpiQ==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -2162,9 +2168,6 @@ packages:
     peerDependencies:
       eslint: 5 - 9
 
-  eslint-plugin-strict-dependencies@1.3.27:
-    resolution: {integrity: sha512-HxYyrIzKlS2dcdmihf8zkOc4d5+jpOygfO33tZ1Xl9AIXSUlE3LG0isOSAduE3Ya+AKJAdBYAVYIKpX3OyA1Dw==}
-
   eslint-plugin-testing-library@7.13.3:
     resolution: {integrity: sha512-STwyXN7GnHulgsfdXVd5iC8fFCJVRQj2AcKtMmQOsA8G4oMnSCOX1p3MjbrDQ9fmwVf5wZy6vboTOTFobWuxOA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0, pnpm: ^9.14.0}
@@ -3160,10 +3163,6 @@ packages:
     resolution: {integrity: sha512-V6gygoYb/5EmNI+MEGrWkC+e6+Rr7mTmfHrxDbLzxQogBkgzo76rkok0Am6thgSF7Mv2nLOajAJj5vDJZEFn7g==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
-  normalize-path@3.0.0:
-    resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
-    engines: {node: '>=0.10.0'}
-
   normalize-url@8.1.0:
     resolution: {integrity: sha512-X06Mfd/5aKsRHc0O0J5CUedwnPmnDtLF2+nq+KN9KSDlJHkPuh0JUviWjEWMe0SW/9TDdSLVPuk7L5gGTIA1/w==}
     engines: {node: '>=14.16'}
@@ -3563,9 +3562,6 @@ packages:
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
-
-  require-strip-json-comments@2.0.0:
-    resolution: {integrity: sha512-Pta3KVBaVZ9DHMoOGRd+3PEc/EFZAQ1JVHQpKZfPo018fdT9iEsyPBzqNAgJAzKMF4kbr5G7GaqP0+UOwnGfPw==}
 
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
@@ -5158,6 +5154,8 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
+  '@types/is-glob@4.0.4': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
@@ -6366,13 +6364,6 @@ snapshots:
       eslint: 9.38.0(jiti@2.6.1)
       natural-compare-lite: 1.4.0
 
-  eslint-plugin-strict-dependencies@1.3.27:
-    dependencies:
-      is-glob: 4.0.3
-      micromatch: 4.0.8
-      normalize-path: 3.0.0
-      require-strip-json-comments: 2.0.0
-
   eslint-plugin-testing-library@7.13.3(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/scope-manager': 8.46.2
@@ -7538,8 +7529,6 @@ snapshots:
       semver: 7.7.3
       validate-npm-package-license: 3.0.4
 
-  normalize-path@3.0.0: {}
-
   normalize-url@8.1.0: {}
 
   npm-normalize-package-bin@4.0.0: {}
@@ -7880,10 +7869,6 @@ snapshots:
       jsesc: 3.1.0
 
   require-directory@2.1.1: {}
-
-  require-strip-json-comments@2.0.0:
-    dependencies:
-      strip-json-comments: 3.1.1
 
   resolve-from@4.0.0: {}
 

@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-prefer-arrow-functions-rules
 
@@ -22,7 +22,7 @@ Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:97](https:/
 
 Defined in: [src/types/rules/eslint-prefer-arrow-functions-rules.mts:98](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-prefer-arrow-functions-rules.mts#L98)
 
----
+***
 
 ### EslintPreferArrowFunctionRulesOption
 

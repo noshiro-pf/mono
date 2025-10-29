@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-unicorn-rules
 
@@ -880,7 +880,7 @@ Defined in: [src/types/rules/eslint-unicorn-rules.mts:4087](https://github.com/n
 
 Defined in: [src/types/rules/eslint-unicorn-rules.mts:4088](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-unicorn-rules.mts#L4088)
 
----
+***
 
 ### EslintUnicornRulesOption
 

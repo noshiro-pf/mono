@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-react-perf-rules
 
@@ -40,7 +40,7 @@ Defined in: [src/types/rules/eslint-react-perf-rules.mts:213](https://github.com
 
 Defined in: [src/types/rules/eslint-react-perf-rules.mts:211](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-perf-rules.mts#L211)
 
----
+***
 
 ### EslintReactPerfRulesOption
 

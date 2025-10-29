@@ -34,7 +34,7 @@ export const eslintConfigForTypeScript = ({
       tsconfigRootDir,
     }),
     {
-      files: files ?? ['**/*.{ts,tsx,mts,cts}'],
+      files: files ?? ['**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}'],
       rules: defineKnownRules({
         ...eslintArrayFuncRules,
         ...eslintPreferArrowFunctionRules,
@@ -48,6 +48,8 @@ export const eslintConfigForTypeScript = ({
         ...typescriptEslintRules,
         ...eslintTreeShakableRules,
         ...eslintPluginSortDestructureKeysRules,
+
+        'strict-dependencies/strict-dependencies': ['error', []],
 
         'import/no-extraneous-dependencies': [
           'error',

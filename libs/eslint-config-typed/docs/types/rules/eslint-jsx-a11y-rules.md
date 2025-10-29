@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-jsx-a11y-rules
 
@@ -250,7 +250,7 @@ Defined in: [src/types/rules/eslint-jsx-a11y-rules.mts:1859](https://github.com/
 
 Defined in: [src/types/rules/eslint-jsx-a11y-rules.mts:1860](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-jsx-a11y-rules.mts#L1860)
 
----
+***
 
 ### EslintJsxA11yRulesOption
 

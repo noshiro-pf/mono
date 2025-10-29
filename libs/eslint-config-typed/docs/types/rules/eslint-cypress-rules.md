@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-cypress-rules
 
@@ -88,7 +88,7 @@ Defined in: [src/types/rules/eslint-cypress-rules.mts:255](https://github.com/no
 
 Defined in: [src/types/rules/eslint-cypress-rules.mts:256](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-cypress-rules.mts#L256)
 
----
+***
 
 ### EslintCypressRulesOption
 

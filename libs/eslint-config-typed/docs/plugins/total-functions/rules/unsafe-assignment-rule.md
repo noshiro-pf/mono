@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../../README.md)
 
----
+***
 
 [eslint-config-typed](../../../README.md) / plugins/total-functions/rules/unsafe-assignment-rule
 
@@ -42,7 +42,7 @@ Defined in: [src/plugins/total-functions/rules/unsafe-assignment-rule.mts:40](ht
 
 `RuleListener`
 
----
+***
 
 ### getSafeTypeImmutability()
 

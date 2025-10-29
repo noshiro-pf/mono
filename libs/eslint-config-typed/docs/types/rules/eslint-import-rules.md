@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-import-rules
 
@@ -292,7 +292,7 @@ Defined in: [src/types/rules/eslint-import-rules.mts:2536](https://github.com/no
 
 Defined in: [src/types/rules/eslint-import-rules.mts:2540](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-import-rules.mts#L2540)
 
----
+***
 
 ### EslintImportsRulesOption
 

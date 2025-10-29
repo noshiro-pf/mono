@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / configs/nodejs
 
@@ -69,7 +69,7 @@ Set to `"latest"` for the most recent supported version.
 ###### Default
 
 ```ts
-'latest';
+"latest"
 ```
 
 ###### languageOptions.globals?
@@ -269,7 +269,7 @@ is equivalent to `"warn"` and `false` is equivalent to `"off"`.
 ###### Default
 
 ```ts
-'warn';
+"warn"
 ```
 
 ###### linterOptions.reportUnusedInlineConfigs?
@@ -284,7 +284,7 @@ since ESLint 9.19.0
 ###### Default
 
 ```ts
-'off';
+"off"
 ```
 
 ##### name?

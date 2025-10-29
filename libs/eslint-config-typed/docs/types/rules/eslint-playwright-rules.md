@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-playwright-rules
 
@@ -322,7 +322,7 @@ Defined in: [src/types/rules/eslint-playwright-rules.mts:1506](https://github.co
 
 Defined in: [src/types/rules/eslint-playwright-rules.mts:1507](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-playwright-rules.mts#L1507)
 
----
+***
 
 ### EslintPlaywrightRulesOption
 

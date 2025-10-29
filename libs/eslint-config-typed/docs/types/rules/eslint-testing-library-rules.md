@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-testing-library-rules
 
@@ -184,7 +184,7 @@ Defined in: [src/types/rules/eslint-testing-library-rules.mts:908](https://githu
 
 Defined in: [src/types/rules/eslint-testing-library-rules.mts:909](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-testing-library-rules.mts#L909)
 
----
+***
 
 ### EslintTestingLibraryRulesOption
 

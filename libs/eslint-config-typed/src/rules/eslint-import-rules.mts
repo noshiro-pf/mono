@@ -14,6 +14,9 @@ export const eslintImportsRules = {
     'error',
     {
       allow: [
+        '*/index.js',
+        '*/index.mjs',
+        '*/index.cjs',
         'rxjs/operators',
         'solid-js/web',
         '@testing-library/jest-dom/**',
@@ -28,8 +31,6 @@ export const eslintImportsRules = {
         '@fontsource/**',
         'resize-observer/lib/ResizeObserverEntry',
         'vitest/config',
-        '*/index.mjs',
-        '*/index.js',
         'zx/globals',
       ],
     },

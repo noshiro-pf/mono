@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/typescript-eslint-rules
 
@@ -802,7 +802,7 @@ Defined in: [src/types/rules/typescript-eslint-rules.mts:10074](https://github.c
 
 Defined in: [src/types/rules/typescript-eslint-rules.mts:10075](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/typescript-eslint-rules.mts#L10075)
 
----
+***
 
 ### TypeScriptEslintRulesOption
 

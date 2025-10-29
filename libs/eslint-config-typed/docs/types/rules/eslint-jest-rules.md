@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-jest-rules
 
@@ -394,7 +394,7 @@ Defined in: [src/types/rules/eslint-jest-rules.mts:1754](https://github.com/nosh
 
 Defined in: [src/types/rules/eslint-jest-rules.mts:1756](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-jest-rules.mts#L1756)
 
----
+***
 
 ### EslintJestRulesOption
 

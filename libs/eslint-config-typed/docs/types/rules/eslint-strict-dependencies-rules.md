@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-strict-dependencies-rules
 
@@ -12,7 +12,7 @@
 
 > **EslintStrictDependenciesRules** = `object`
 
-Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:76](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-strict-dependencies-rules.mts#L76)
+Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:82](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-strict-dependencies-rules.mts#L82)
 
 #### Properties
 
@@ -20,15 +20,15 @@ Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:76](https://gi
 
 > `readonly` **strict-dependencies/strict-dependencies**: `StrictDependencies.RuleEntry`
 
-Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:77](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-strict-dependencies-rules.mts#L77)
+Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:83](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-strict-dependencies-rules.mts#L83)
 
----
+***
 
 ### EslintStrictDependenciesRulesOption
 
 > **EslintStrictDependenciesRulesOption** = `object`
 
-Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:80](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-strict-dependencies-rules.mts#L80)
+Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:86](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-strict-dependencies-rules.mts#L86)
 
 #### Properties
 
@@ -36,4 +36,4 @@ Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:80](https://gi
 
 > `readonly` **strict-dependencies/strict-dependencies**: readonly \[`StrictDependencies.Options0`, `StrictDependencies.Options1`\]
 
-Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:81](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-strict-dependencies-rules.mts#L81)
+Defined in: [src/types/rules/eslint-strict-dependencies-rules.mts:87](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-strict-dependencies-rules.mts#L87)

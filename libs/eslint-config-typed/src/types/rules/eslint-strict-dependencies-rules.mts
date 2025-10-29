@@ -9,61 +9,67 @@ namespace StrictDependencies {
    * [
    *   {
    *     "type": "array",
-   *     "items": [
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "module": {
+   *     "items": {
+   *       "type": "object",
+   *       "additionalProperties": false,
+   *       "required": [
+   *         "module",
+   *         "allowReferenceFrom"
+   *       ],
+   *       "properties": {
+   *         "module": {
+   *           "type": "string"
+   *         },
+   *         "allowReferenceFrom": {
+   *           "type": "array",
+   *           "items": {
    *             "type": "string"
-   *           },
-   *           "allowReferenceFrom": {
-   *             "type": "array",
-   *             "items": [
-   *               {
-   *                 "type": "string"
-   *               }
-   *             ]
-   *           },
-   *           "allowSameModule": {
-   *             "type": "boolean"
-   *           },
-   *           "excludeTypeImportChecks": {
-   *             "type": "boolean"
    *           }
+   *         },
+   *         "allowSameModule": {
+   *           "type": "boolean"
+   *         },
+   *         "targetMembers": {
+   *           "type": "array",
+   *           "items": {
+   *             "type": "string"
+   *           }
+   *         },
+   *         "excludeTypeImportChecks": {
+   *           "type": "boolean"
    *         }
    *       }
-   *     ]
+   *     }
    *   },
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
    *     "properties": {
    *       "resolveRelativeImport": {
    *         "type": "boolean"
    *       },
    *       "pathIndexMap": {
-   *         "type": "object"
+   *         "type": "object",
+   *         "additionalProperties": {
+   *           "type": "number"
+   *         }
    *       }
    *     }
    *   }
    * ]
    * ```
    */
-  export type Options0 =
-    | readonly [
-        {
-          readonly module?: string;
-          readonly allowReferenceFrom?: readonly [] | readonly [string];
-          readonly allowSameModule?: boolean;
-          readonly excludeTypeImportChecks?: boolean;
-          readonly [k: string]: unknown;
-        },
-      ]
-    | readonly [];
+  export type Options0 = readonly {
+    readonly module: string;
+    readonly allowReferenceFrom: readonly string[];
+    readonly allowSameModule?: boolean;
+    readonly targetMembers?: readonly string[];
+    readonly excludeTypeImportChecks?: boolean;
+  }[];
 
   export type Options1 = {
     readonly resolveRelativeImport?: boolean;
-    readonly pathIndexMap?: UnknownRecord;
-    readonly [k: string]: unknown;
+    readonly pathIndexMap?: Record<string, number>;
   };
 
   export type RuleEntry =

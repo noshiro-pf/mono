@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / rules/typescript-eslint-rules
 
@@ -278,7 +278,7 @@ Off to allow explicit type annotations when desired
 
 ##### @typescript-eslint/no-restricted-types
 
-> `readonly` **@typescript-eslint/no-restricted-types**: readonly \[`"error"`, \{ `types`: \{ `object`: \{ `fixWith`: `"UnknownRecord"`; `message`: ``"Use `UnknownRecord` instead."``; \}; \}; \}\]
+> `readonly` **@typescript-eslint/no-restricted-types**: readonly \[`"error"`, \{ `types`: \{ `object`: \{ `fixWith`: `"UnknownRecord"`; `message`: `` "Use `UnknownRecord` instead." ``; \}; \}; \}\]
 
 ##### @typescript-eslint/no-shadow
 

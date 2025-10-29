@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-react-rules
 
@@ -634,7 +634,7 @@ Defined in: [src/types/rules/eslint-react-rules.mts:5060](https://github.com/nos
 
 Defined in: [src/types/rules/eslint-react-rules.mts:5061](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-react-rules.mts#L5061)
 
----
+***
 
 ### EslintReactRulesOption
 

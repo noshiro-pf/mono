@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-rules
 
@@ -1768,7 +1768,7 @@ Defined in: [src/types/rules/eslint-rules.mts:13771](https://github.com/noshiro-
 
 Defined in: [src/types/rules/eslint-rules.mts:13676](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-rules.mts#L13676)
 
----
+***
 
 ### EslintRulesOption
 

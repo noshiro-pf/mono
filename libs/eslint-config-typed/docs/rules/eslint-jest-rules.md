@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / rules/eslint-jest-rules
 
@@ -106,7 +106,7 @@ Defined in: [src/rules/eslint-jest-rules.mts:3](https://github.com/noshiro-pf/es
 
 ##### jest/no-restricted-matchers
 
-> `readonly` **jest/no-restricted-matchers**: readonly \[`"error"`, \{ `toBeFalsy`: ``"Use `.toBe(false)` instead."``; `toBeTruthy`: ``"Use `.toBe(true)` instead."``; \}\]
+> `readonly` **jest/no-restricted-matchers**: readonly \[`"error"`, \{ `toBeFalsy`: `` "Use `.toBe(false)` instead." ``; `toBeTruthy`: `` "Use `.toBe(true)` instead." ``; \}\]
 
 ##### jest/no-standalone-expect
 

@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / rules/eslint-vitest-rules
 
@@ -98,7 +98,7 @@ Defined in: [src/rules/eslint-vitest-rules.mts:3](https://github.com/noshiro-pf/
 
 ##### vitest/no-restricted-matchers
 
-> `readonly` **vitest/no-restricted-matchers**: readonly \[`"error"`, \{ `toBeFalsy`: ``"Use `.toBe(false)` instead."``; `toBeTruthy`: ``"Use `.toBe(true)` instead."``; \}\]
+> `readonly` **vitest/no-restricted-matchers**: readonly \[`"error"`, \{ `toBeFalsy`: `` "Use `.toBe(false)` instead." ``; `toBeTruthy`: `` "Use `.toBe(true)` instead." ``; \}\]
 
 ##### vitest/no-restricted-vi-methods
 

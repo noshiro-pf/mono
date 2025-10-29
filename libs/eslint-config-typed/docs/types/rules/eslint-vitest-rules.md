@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-vitest-rules
 
@@ -328,7 +328,7 @@ Defined in: [src/types/rules/eslint-vitest-rules.mts:1549](https://github.com/no
 
 Defined in: [src/types/rules/eslint-vitest-rules.mts:1548](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-vitest-rules.mts#L1548)
 
----
+***
 
 ### EslintVitestRulesOption
 

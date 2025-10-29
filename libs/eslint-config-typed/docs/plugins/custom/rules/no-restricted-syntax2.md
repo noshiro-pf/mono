@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../../README.md)
 
----
+***
 
 [eslint-config-typed](../../../README.md) / plugins/custom/rules/no-restricted-syntax2
 

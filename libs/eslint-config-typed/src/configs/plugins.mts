@@ -15,9 +15,6 @@ import eslintPluginSortDestructureKeys from 'eslint-plugin-sort-destructure-keys
 
 import eslintPluginImport from 'eslint-plugin-import';
 
-// @ts-expect-error no type definition
-import eslintPluginStrictDependencies from 'eslint-plugin-strict-dependencies';
-
 import eslintPluginJest from 'eslint-plugin-jest';
 
 import eslintPluginVitest from 'eslint-plugin-vitest';
@@ -51,6 +48,7 @@ import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 // import eslintPluginTreeShakable from 'eslint-plugin-tree-shakable';
 import {
   eslintPluginCustom,
+  eslintPluginStrictDependencies,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
 } from '../plugins/index.mjs';
@@ -108,7 +106,6 @@ export const plugins: Record<
   'react-perf': eslintPluginReactPerf,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   security: eslintPluginSecurity,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'strict-dependencies': eslintPluginStrictDependencies,
   'testing-library': eslintPluginTestingLibrary,
   'total-functions': eslintPluginTotalFunctions,

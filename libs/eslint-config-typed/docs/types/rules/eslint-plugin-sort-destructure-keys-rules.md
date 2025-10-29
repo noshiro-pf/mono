@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-plugin-sort-destructure-keys-rules
 
@@ -22,7 +22,7 @@ Defined in: [src/types/rules/eslint-plugin-sort-destructure-keys-rules.mts:49](h
 
 Defined in: [src/types/rules/eslint-plugin-sort-destructure-keys-rules.mts:50](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-plugin-sort-destructure-keys-rules.mts#L50)
 
----
+***
 
 ### EslintPluginSortDestructureKeysRulesOption
 

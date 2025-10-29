@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / rules/eslint-rules
 
@@ -1224,7 +1224,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expres
 
 https://github.com/eslint/eslint/blob/main/conf/eslint-all.js
 
----
+***
 
 ### restrictedGlobals
 
@@ -1232,7 +1232,7 @@ https://github.com/eslint/eslint/blob/main/conf/eslint-all.js
 
 Defined in: [src/rules/eslint-rules.mts:7](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L7)
 
----
+***
 
 ### restrictedGlobalsForBrowser
 
@@ -1240,7 +1240,7 @@ Defined in: [src/rules/eslint-rules.mts:7](https://github.com/noshiro-pf/eslint-
 
 Defined in: [src/rules/eslint-rules.mts:36](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L36)
 
----
+***
 
 ### restrictedSyntax
 
@@ -1248,7 +1248,7 @@ Defined in: [src/rules/eslint-rules.mts:36](https://github.com/noshiro-pf/eslint
 
 Defined in: [src/rules/eslint-rules.mts:87](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/rules/eslint-rules.mts#L87)
 
----
+***
 
 ### restrictedSyntaxForReact
 
@@ -1296,20 +1296,20 @@ Defined in: [src/rules/eslint-rules.mts:121](https://github.com/noshiro-pf/eslin
 
 ##### importStyle
 
-> `readonly` **importStyle**: readonly \[\{ `message`: ``"React should be imported as `import * as React from 'react'`."``; `selector`: `"ImportDeclaration[source.value='react'][specifiers.0.type!='ImportNamespaceSpecifier']"`; \}, \{ `message`: `"The namespace name imported from 'react' must be 'React'."`; `selector`: `"Identifier[name!='React'][parent.type='ImportNamespaceSpecifier'][parent.parent.type='ImportDeclaration'][parent.parent.source.value='react']"`; \}\]
+> `readonly` **importStyle**: readonly \[\{ `message`: `` "React should be imported as `import * as React from 'react'`." ``; `selector`: `"ImportDeclaration[source.value='react'][specifiers.0.type!='ImportNamespaceSpecifier']"`; \}, \{ `message`: `"The namespace name imported from 'react' must be 'React'."`; `selector`: `"Identifier[name!='React'][parent.type='ImportNamespaceSpecifier'][parent.parent.type='ImportDeclaration'][parent.parent.source.value='react']"`; \}\]
 
 ##### propsTypeAnnotationStyle
 
-> `readonly` **propsTypeAnnotationStyle**: readonly \[\{ `message`: ``"Replace `React.memo((props: Props) => { ... })` with `React.memo<Props>((props) => { ... })`."``; `selector`: `"TSTypeAnnotation[parent.type='Identifier'][parent.parent.type='ArrowFunctionExpression'][parent.parent.parent.type='CallExpression'][parent.parent.parent.callee.object.name='React'][parent.parent.parent.callee.property.name='memo']"`; \}\]
+> `readonly` **propsTypeAnnotationStyle**: readonly \[\{ `message`: `` "Replace `React.memo((props: Props) => { ... })` with `React.memo<Props>((props) => { ... })`." ``; `selector`: `"TSTypeAnnotation[parent.type='Identifier'][parent.parent.type='ArrowFunctionExpression'][parent.parent.parent.type='CallExpression'][parent.parent.parent.callee.object.name='React'][parent.parent.parent.callee.property.name='memo']"`; \}\]
 
 ##### reactHooksDefinitionStyle
 
-> `readonly` **reactHooksDefinitionStyle**: readonly \[\{ `message`: `"Move logic to parent component instead of using React.useImperativeHandle."`; `selector`: `"MemberExpression[object.name='React'][property.name='useImperativeHandle']"`; \}, \{ `message`: ``"The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`."``; `selector`: `"TSTypeAnnotation[parent.parent.type='CallExpression'][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='useMemo']"`; \}\]
+> `readonly` **reactHooksDefinitionStyle**: readonly \[\{ `message`: `"Move logic to parent component instead of using React.useImperativeHandle."`; `selector`: `"MemberExpression[object.name='React'][property.name='useImperativeHandle']"`; \}, \{ `message`: `` "The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`." ``; `selector`: `"TSTypeAnnotation[parent.parent.type='CallExpression'][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='useMemo']"`; \}\]
 
 ##### reactMemoPropsArgumentName
 
-> `readonly` **reactMemoPropsArgumentName**: readonly \[\{ `message`: `"The argument name of arrow function passed to React.memo should be 'props'."`; `selector`: `"Identifier[name!='props'][parent.type='ArrowFunctionExpression'][parent.expression!=true][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='memo']"`; \}, \{ `message`: ``"The props of a component containing a return statement are limited to a variable named `'props'`."``; `selector`: `"ObjectPattern[parent.type='ArrowFunctionExpression'][parent.expression!=true][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='memo']"`; \}\]
+> `readonly` **reactMemoPropsArgumentName**: readonly \[\{ `message`: `"The argument name of arrow function passed to React.memo should be 'props'."`; `selector`: `"Identifier[name!='props'][parent.type='ArrowFunctionExpression'][parent.expression!=true][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='memo']"`; \}, \{ `message`: `` "The props of a component containing a return statement are limited to a variable named `'props'`." ``; `selector`: `"ObjectPattern[parent.type='ArrowFunctionExpression'][parent.expression!=true][parent.parent.callee.object.name='React'][parent.parent.callee.property.name='memo']"`; \}\]
 
 ##### reactMemoTypeParam
 
-> `readonly` **reactMemoTypeParam**: readonly \[\{ `message`: ``"React.memo should have type parameter `'Props'`."``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments=undefined]"`; \}, \{ `message`: ``"React.memo should have type parameter `'Props'`."``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type!='TSTypeParameterInstantiation']"`; \}, \{ `message`: ``"React.memo should have type parameter `'Props'`."``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type='TSTypeParameterInstantiation'][parent.typeArguments.params.0.type!='TSTypeReference']"`; \}, \{ `message`: ``"React.memo should have type parameter `'Props'`."``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type='TSTypeParameterInstantiation'][parent.typeArguments.params.0.type='TSTypeReference'][parent.typeArguments.params.0.typeName.name!='Props']"`; \}\]
+> `readonly` **reactMemoTypeParam**: readonly \[\{ `message`: `` "React.memo should have type parameter `'Props'`." ``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments=undefined]"`; \}, \{ `message`: `` "React.memo should have type parameter `'Props'`." ``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type!='TSTypeParameterInstantiation']"`; \}, \{ `message`: `` "React.memo should have type parameter `'Props'`." ``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type='TSTypeParameterInstantiation'][parent.typeArguments.params.0.type!='TSTypeReference']"`; \}, \{ `message`: `` "React.memo should have type parameter `'Props'`." ``; `selector`: `"MemberExpression[object.name='React'][property.name='memo'][parent.typeArguments!=undefined][parent.typeArguments.type='TSTypeParameterInstantiation'][parent.typeArguments.params.0.type='TSTypeReference'][parent.typeArguments.params.0.typeName.name!='Props']"`; \}\]

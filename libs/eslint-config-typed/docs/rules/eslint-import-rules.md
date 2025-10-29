@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / rules/eslint-import-rules
 
@@ -125,7 +125,7 @@ reflected on the import side
 
 ##### import/no-internal-modules
 
-> `readonly` **import/no-internal-modules**: readonly \[`"error"`, \{ `allow`: readonly \[`"rxjs/operators"`, `"solid-js/web"`, `"@testing-library/jest-dom/**"`, `"react-dom/client"`, `"preact/**"`, `"immer/**"`, `"firebase/*"`, `"firebase-functions/**"`, `"@blueprintjs/*"`, `"@material-ui/**"`, `"@mui/material/**"`, `"@fontsource/**"`, `"resize-observer/lib/ResizeObserverEntry"`, `"vitest/config"`, `"*/index.mjs"`, `"*/index.js"`, `"zx/globals"`\]; \}\]
+> `readonly` **import/no-internal-modules**: readonly \[`"error"`, \{ `allow`: readonly \[`"*/index.js"`, `"*/index.mjs"`, `"*/index.cjs"`, `"rxjs/operators"`, `"solid-js/web"`, `"@testing-library/jest-dom/**"`, `"react-dom/client"`, `"preact/**"`, `"immer/**"`, `"firebase/*"`, `"firebase-functions/**"`, `"@blueprintjs/*"`, `"@material-ui/**"`, `"@mui/material/**"`, `"@fontsource/**"`, `"resize-observer/lib/ResizeObserverEntry"`, `"vitest/config"`, `"zx/globals"`\]; \}\]
 
 ##### import/no-mutable-exports
 

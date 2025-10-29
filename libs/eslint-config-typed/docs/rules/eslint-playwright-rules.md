@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / rules/eslint-playwright-rules
 
@@ -94,7 +94,7 @@ Defined in: [src/rules/eslint-playwright-rules.mts:6](https://github.com/noshiro
 
 ##### playwright/no-restricted-matchers
 
-> `readonly` **playwright/no-restricted-matchers**: readonly \[`"error"`, \{ `toBeFalsy`: ``"Use `.toBe(false)` instead."``; `toBeTruthy`: ``"Use `.toBe(true)` instead."``; \}\]
+> `readonly` **playwright/no-restricted-matchers**: readonly \[`"error"`, \{ `toBeFalsy`: `` "Use `.toBe(false)` instead." ``; `toBeTruthy`: `` "Use `.toBe(true)` instead." ``; \}\]
 
 ##### playwright/no-skipped-test
 

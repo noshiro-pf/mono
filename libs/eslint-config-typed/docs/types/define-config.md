@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../README.md)
 
----
+***
 
 [eslint-config-typed](../README.md) / types/define-config
 
@@ -18,7 +18,7 @@ Defined in: [src/types/define-config.mts:3](https://github.com/noshiro-pf/eslint
 
 ##### TConfig
 
-`TConfig` _extends_ readonly `object`[]
+`TConfig` *extends* readonly `object`[]
 
 #### Parameters
 

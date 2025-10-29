@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../README.md)
 
----
+***
 
 [eslint-config-typed](../../README.md) / types/rules/eslint-functional-rules
 
@@ -136,7 +136,7 @@ Defined in: [src/types/rules/eslint-functional-rules.mts:4084](https://github.co
 
 Defined in: [src/types/rules/eslint-functional-rules.mts:4085](https://github.com/noshiro-pf/eslint-config-typed/blob/main/src/types/rules/eslint-functional-rules.mts#L4085)
 
----
+***
 
 ### EslintFunctionalRulesOption
 

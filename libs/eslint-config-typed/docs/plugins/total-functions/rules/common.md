@@ -1,6 +1,6 @@
 [**eslint-config-typed**](../../../README.md)
 
----
+***
 
 [eslint-config-typed](../../../README.md) / plugins/total-functions/rules/common
 
@@ -26,11 +26,11 @@ Defined in: [src/plugins/total-functions/rules/common.mts:9](https://github.com/
 
 ##### Options
 
-`Options` _extends_ readonly `unknown`[]
+`Options` *extends* readonly `unknown`[]
 
 ##### MessageIds
 
-`MessageIds` _extends_ `string`
+`MessageIds` *extends* `string`
 
 #### Parameters
 
@@ -71,7 +71,7 @@ pairs of constituent types that are assignable.
 
 readonly `Readonly`\<\{ `destinationType`: `Type`; `sourceType`: `Type`; \}\>[]
 
----
+***
 
 ### isLiteral()
 
@@ -91,7 +91,7 @@ True if this expression is a literal, false otherwise.
 
 `boolean`
 
----
+***
 
 ### typeSymbolName()
 
