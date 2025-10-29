@@ -1,3 +1,9 @@
+## [2.2.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.2.0...v2.2.1) (2025-10-29)
+
+### Bug Fixes
+
+- treat RegExp as readonly in @typescript-eslint/prefer-readonly-parameter-types ([#101](https://github.com/noshiro-pf/eslint-config-typed/issues/101)) ([63b1ebf](https://github.com/noshiro-pf/eslint-config-typed/commit/63b1ebf03ef6964f2b820cc10de5f56d8d82d420))
+
 # [2.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.1.0...v2.2.0) (2025-10-28)
 
 ### Features
