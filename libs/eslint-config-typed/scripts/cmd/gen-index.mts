@@ -1,3 +1,4 @@
+import mm from 'micromatch';
 import { genIndex } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -12,11 +13,5 @@ await genIndex({
     fileName.endsWith('.test.mts') ||
     fileName === 'globals.d.mts' ||
     absolutePath === path.resolve(srcDir, './entry-point.mts') ||
-    absolutePath.startsWith(
-      path.resolve(srcDir, './plugins/total-functions/rules'),
-    ) ||
-    absolutePath.startsWith(
-      path.resolve(srcDir, './plugins/tree-shakable/rules'),
-    ) ||
-    absolutePath.startsWith(path.resolve(srcDir, './plugins/custom/rules')),
+    mm.isMatch(absolutePath, path.resolve(srcDir, './plugins/*/rules')),
 });

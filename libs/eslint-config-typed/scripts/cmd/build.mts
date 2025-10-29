@@ -6,7 +6,7 @@ const distDir = path.resolve(projectRootPath, './dist');
 /**
  * Builds the entire project.
  */
-const build = async (): Promise<void> => {
+export const build = async (full: boolean): Promise<void> => {
   echo('Starting build process...\n');
 
   // Step 1: Validate file extensions
@@ -31,24 +31,29 @@ const build = async (): Promise<void> => {
     echo('✓ Cleaned dist directory\n');
   }
 
-  {
-    echo('3.1 Generating rules types...');
-    await runCmdStep('pnpm run gen-rule-type', 'Generating rules types failed');
-    echo('✓ Generated rules types\n');
-  }
+  if (full) {
+    {
+      echo('3.1 Generating rules types...');
+      await runCmdStep(
+        'pnpm run gen-rule-type',
+        'Generating rules types failed',
+      );
+      echo('✓ Generated rules types\n');
+    }
 
-  // Step 3: Generate index files
-  {
-    echo('3-2. Generating index files...');
-    await runCmdStep('pnpm run gi', 'Generating index files failed');
-    echo('✓ Generating index files completed\n');
-  }
+    // Step 3: Generate index files
+    {
+      echo('3-2. Generating index files...');
+      await runCmdStep('pnpm run gi', 'Generating index files failed');
+      echo('✓ Generating index files completed\n');
+    }
 
-  // Step 4: Type checking
-  {
-    echo('4. Running type checking...');
-    await runCmdStep('tsc --noEmit', 'Type checking failed');
-    echo('✓ Type checking passed\n');
+    // Step 4: Type checking
+    {
+      echo('4. Running type checking...');
+      await runCmdStep('tsc --noEmit', 'Type checking failed');
+      echo('✓ Type checking passed\n');
+    }
   }
 
   // Step 5: Build with Rollup
@@ -138,4 +143,6 @@ const runStep = async (
   }
 };
 
-await build();
+if (isDirectlyExecuted(import.meta.url)) {
+  await build(false);
+}
