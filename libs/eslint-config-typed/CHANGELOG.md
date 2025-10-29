@@ -1,3 +1,9 @@
+# [2.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.2.1...v2.3.0) (2025-10-29)
+
+### Features
+
+- fork eslint-plugin-strict-dependencies as a local plugin ([#102](https://github.com/noshiro-pf/eslint-config-typed/issues/102)) ([f093067](https://github.com/noshiro-pf/eslint-config-typed/commit/f093067011bc9d34029b45dc4514e6cb8ccaf93b))
+
 ## [2.2.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.2.0...v2.2.1) (2025-10-29)
 
 ### Bug Fixes
