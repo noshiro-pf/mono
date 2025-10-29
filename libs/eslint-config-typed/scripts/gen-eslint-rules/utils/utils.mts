@@ -3,10 +3,6 @@ export const toCapitalCase = (str: string): string =>
     .replaceAll(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
     .replace(/^./u, (x) => x[0]?.toUpperCase() ?? str);
 
-export const deepCopy = <T,>(obj: T): T =>
-  // eslint-disable-next-line unicorn/prefer-structured-clone, total-functions/no-unsafe-type-assertion
-  JSON.parse(JSON.stringify(obj)) as unknown as T;
-
 export const deepReplace = <T,>(obj: T, from: string, to: string): T => {
   const s = JSON.stringify(obj);
   const r = s.replaceAll(from, to);

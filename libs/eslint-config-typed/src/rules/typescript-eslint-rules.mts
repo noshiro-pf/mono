@@ -249,6 +249,7 @@ export const typescriptEslintRules = {
         {
           from: 'lib',
           name: [
+            'RegExp',
             'AnimationEvent',
             'ClipboardEvent',
             'CompositionEvent',

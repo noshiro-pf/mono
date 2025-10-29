@@ -3,7 +3,6 @@
  * the regular expression.
  */
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const sliceByMatch = ({
   endRegexp,
   startRegexp,

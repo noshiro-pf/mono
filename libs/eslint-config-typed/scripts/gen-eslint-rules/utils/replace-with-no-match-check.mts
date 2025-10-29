@@ -11,7 +11,6 @@
  */
 export const replaceWithNoMatchCheck =
   (
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     searchValue: RegExp | string,
     replaceValue: string,
     options?: Readonly<
@@ -88,7 +87,6 @@ export const replaceWithNoMatchCheck =
 
 const sliceMaxLength = 100;
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const chopIfLong = (str: RegExp | string): string =>
   typeof str === 'string'
     ? str.length > sliceMaxLength

@@ -466,7 +466,7 @@ Off to allow explicit type annotations when desired
 
 ##### @typescript-eslint/prefer-readonly-parameter-types
 
-> `readonly` **@typescript-eslint/prefer-readonly-parameter-types**: readonly \[`"error"`, \{ `allow`: readonly \[\{ `from`: `"lib"`; `name`: readonly \[`"AnimationEvent"`, `"ClipboardEvent"`, `"CompositionEvent"`, `"DragEvent"`, `"Element"`, `"Event"`, `"FocusEvent"`, `"HTMLCanvasElement"`, `"HTMLDivElement"`, `"HTMLElement"`, `"HTMLImageElement"`, `"HTMLInputElement"`, `"HTMLSelectElement"`, `"HTMLTextAreaElement"`, `"KeyboardEvent"`, `"MouseEvent"`, `"PointerEvent"`, `"TouchEvent"`, `"TransitionEvent"`, `"UIEvent"`, `"WheelEvent"`\]; \}, \{ `from`: `"package"`; `name`: readonly \[`"FC"`, `"ReactNode"`\]; `package`: `"react"`; \}\]; `checkParameterProperties`: `true`; `ignoreInferredTypes`: `true`; `treatMethodsAsReadonly`: `true`; \}\]
+> `readonly` **@typescript-eslint/prefer-readonly-parameter-types**: readonly \[`"error"`, \{ `allow`: readonly \[\{ `from`: `"lib"`; `name`: readonly \[`"RegExp"`, `"AnimationEvent"`, `"ClipboardEvent"`, `"CompositionEvent"`, `"DragEvent"`, `"Element"`, `"Event"`, `"FocusEvent"`, `"HTMLCanvasElement"`, `"HTMLDivElement"`, `"HTMLElement"`, `"HTMLImageElement"`, `"HTMLInputElement"`, `"HTMLSelectElement"`, `"HTMLTextAreaElement"`, `"KeyboardEvent"`, `"MouseEvent"`, `"PointerEvent"`, `"TouchEvent"`, `"TransitionEvent"`, `"UIEvent"`, `"WheelEvent"`\]; \}, \{ `from`: `"package"`; `name`: readonly \[`"FC"`, `"ReactNode"`\]; `package`: `"react"`; \}\]; `checkParameterProperties`: `true`; `ignoreInferredTypes`: `true`; `treatMethodsAsReadonly`: `true`; \}\]
 
 ##### @typescript-eslint/prefer-reduce-type-parameter
 
