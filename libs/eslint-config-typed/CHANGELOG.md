@@ -1,3 +1,9 @@
+## [2.3.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.0...v2.3.1) (2025-10-30)
+
+### Bug Fixes
+
+- update config list and remove duplicate rules ([#103](https://github.com/noshiro-pf/eslint-config-typed/issues/103)) ([f9a440f](https://github.com/noshiro-pf/eslint-config-typed/commit/f9a440f0320ef45905f2cbaa8fd2af487d62a3ab))
+
 # [2.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.2.1...v2.3.0) (2025-10-29)
 
 ### Features
