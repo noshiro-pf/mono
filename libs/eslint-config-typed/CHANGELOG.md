@@ -1,3 +1,9 @@
+## [2.3.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.1...v2.3.2) (2025-10-30)
+
+### Bug Fixes
+
+- update ignore list ([#104](https://github.com/noshiro-pf/eslint-config-typed/issues/104)) ([df100dc](https://github.com/noshiro-pf/eslint-config-typed/commit/df100dc398daca9f7036cca2adeb2bb3c29d486e))
+
 ## [2.3.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.0...v2.3.1) (2025-10-30)
 
 ### Bug Fixes
