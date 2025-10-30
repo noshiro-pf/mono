@@ -336,7 +336,7 @@ Enforce consistent file naming
 
 ##### unicorn/prefer-array-find
 
-> `readonly` **unicorn/prefer-array-find**: `1` \| `2`
+> `readonly` **unicorn/prefer-array-find**: `"off"` = `'off'`
 
 ##### unicorn/prefer-array-flat
 

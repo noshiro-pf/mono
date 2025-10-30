@@ -278,7 +278,7 @@ Off to allow explicit type annotations when desired
 
 ##### @typescript-eslint/no-restricted-types
 
-> `readonly` **@typescript-eslint/no-restricted-types**: readonly \[`"error"`, \{ `types`: \{ `object`: \{ `fixWith`: `"UnknownRecord"`; `message`: `` "Use `UnknownRecord` instead." ``; \}; \}; \}\]
+> `readonly` **@typescript-eslint/no-restricted-types**: readonly \[`"error"`, \{ `types`: \{ `object`: \{ `fixWith`: `"UnknownRecord"`; `message`: `` "Use `UnknownRecord` from https://www.npmjs.com/package/ts-type-forge instead." ``; \}; \}; \}\]
 
 ##### @typescript-eslint/no-shadow
 

@@ -38,4 +38,4 @@ Defined in: [src/rules/eslint-array-func-rules.mts:3](https://github.com/noshiro
 
 ##### array-func/prefer-flat-map
 
-> `readonly` **array-func/prefer-flat-map**: `"error"` = `'error'`
+> `readonly` **array-func/prefer-flat-map**: `"off"` = `'off'`

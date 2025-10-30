@@ -17,7 +17,8 @@ export const typescriptEslintRules = {
     {
       types: {
         object: {
-          message: 'Use `UnknownRecord` instead.',
+          message:
+            'Use `UnknownRecord` from https://www.npmjs.com/package/ts-type-forge instead.',
           fixWith: 'UnknownRecord',
         },
       },

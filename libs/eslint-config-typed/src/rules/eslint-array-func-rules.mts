@@ -5,6 +5,8 @@ export const eslintArrayFuncRules = {
   'array-func/no-unnecessary-this-arg': 'error',
   'array-func/prefer-array-from': 'error',
   'array-func/avoid-reverse': 'error',
-  'array-func/prefer-flat-map': 'error',
+
+  // Covered by unicorn/prefer-array-flat-map
+  'array-func/prefer-flat-map': 'off',
   'array-func/prefer-flat': 'error',
 } as const satisfies EslintArrayFuncRules;

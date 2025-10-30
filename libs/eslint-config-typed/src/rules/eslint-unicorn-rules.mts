@@ -90,7 +90,7 @@ export const eslintUnicornRules = {
   'unicorn/no-zero-fractions': 'error',
   'unicorn/numeric-separators-style': 'off',
   'unicorn/prefer-add-event-listener': withDefaultOption('error'),
-  'unicorn/prefer-array-find': withDefaultOption('error'),
+  'unicorn/prefer-array-find': 'off', // Covered by @typescript-eslint/prefer-find
   'unicorn/prefer-array-flat': withDefaultOption('error'),
   'unicorn/prefer-array-flat-map': 'error',
   'unicorn/prefer-array-index-of': 'error',

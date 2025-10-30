@@ -96,6 +96,7 @@ export const eslintConfigForTypeScript = ({
 
         '**/.markdownlint-cli2.{jsonc,yaml,cjs,mjs}',
         '**/.markdownlint.{jsonc,json,yaml,yml,cjs,mjs}',
+        '.prettierrc.{js,cjs,ts,cts,mjs,mts}',
       ],
       rules: defineKnownRules({
         '@typescript-eslint/no-restricted-imports': 'off',
