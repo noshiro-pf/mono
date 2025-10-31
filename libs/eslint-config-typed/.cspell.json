@@ -21,7 +21,6 @@
     "./package-lock.json",
     "./pnpm-lock.yaml",
     "./pnpm-workspace.yaml",
-    "docs/**",
     "BREAKING_CHANGE_GUIDE.md",
     "github/**",
     "test/**"

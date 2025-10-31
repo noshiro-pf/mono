@@ -58,10 +58,6 @@
             "integration_id": 15368
           },
           {
-            "context": "style-check (doc)",
-            "integration_id": 15368
-          },
-          {
             "context": "style-check (fmt)",
             "integration_id": 15368
           },

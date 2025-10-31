@@ -39,10 +39,6 @@ const checkAll = async (): Promise<void> => {
   echo('7. Building project...');
   await runCmdStep('pnpm run build', 'Build failed');
 
-  // Step 8: Generate docs and check repo status
-  echo('8. Generating documentation...');
-  await runCmdStep('pnpm run doc', 'Documentation generation failed');
-
   // Step 8: Backup repository settings
   echo('8. Backing up repository settings...');
   await runCmdStep(

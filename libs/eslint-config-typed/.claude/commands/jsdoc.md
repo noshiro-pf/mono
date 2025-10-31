@@ -1,1 +1,0 @@
-For definitions in all files under src, add JSDoc in that file if it does not exist, and update the existing content if there is room for improvement. Please also provide examples where possible. Run `pnpm run doc` when you’re done making a series of code changes.

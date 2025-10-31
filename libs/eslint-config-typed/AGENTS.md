@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-The ESLint config source sits in `src/`, organized by responsibility: `configs/` for build and test presets, `plugins/` and `rules/` for exported rule collections, `types/` for shared TypeScript declarations, and `custom-rules/` for repository-only rules. Utility scripts live in `scripts/`, with CLI helpers under `scripts/cmd/`. Configuration inputs (Rollup, Vitest, Typedoc, tsconfig variants) are in `configs/`. Generated artifacts land in `dist/`—never edit that directory directly.
+The ESLint config source sits in `src/`, organized by responsibility: `configs/` for build and test presets, `plugins/` and `rules/` for exported rule collections, `types/` for shared TypeScript declarations, and `custom-rules/` for repository-only rules. Utility scripts live in `scripts/`, with CLI helpers under `scripts/cmd/`. Configuration inputs (Rollup, Vitest, tsconfig variants) are in `configs/`. Generated artifacts land in `dist/`—never edit that directory directly.
 
 ## Build, Test, and Development Commands
 

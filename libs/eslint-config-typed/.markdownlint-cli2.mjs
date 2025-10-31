@@ -2,7 +2,6 @@ const config = {
   globs: [
     '**/*.md',
     '!node_modules',
-    '!docs/**/*',
     '!CHANGELOG.md',
     '!./BREAKING_CHANGE_GUIDE.md',
   ],
