@@ -1,3 +1,13 @@
+# [3.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.2...v3.0.0) (2025-10-31)
+
+### Features
+
+- **breaking:** create react-coding-style-rules ([#107](https://github.com/noshiro-pf/eslint-config-typed/issues/107)) ([3c59507](https://github.com/noshiro-pf/eslint-config-typed/commit/3c595079306f02edca5e1c978271669bbdf0b1c9))
+
+### BREAKING CHANGES
+
+- **breaking:** - Removed `restrictedSyntaxForReact` (Replaced by `eslintPluginReactCodingStyle`)
+
 ## [2.3.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.1...v2.3.2) (2025-10-30)
 
 ### Bug Fixes
