@@ -401,31 +401,32 @@ These functions return arrays of ESLint flat configurations:
 
 Pre-configured rule sets that can be imported and customized:
 
-| Rule set                                   | Plugin name                            | Description                          |
-| :----------------------------------------- | :------------------------------------- | :----------------------------------- |
-| **`eslintRules`**                          | (eslint)                               | Core ESLint rules                    |
-| **`typescriptEslintRules`**                | `@typescript-eslint/eslint-plugin`     | TypeScript-specific ESLint rules     |
-| **`eslintFunctionalRules`**                | `eslint-plugin-functional`             | Functional programming style rules   |
-| **`eslintTotalFunctionsRules`**            | `eslint-plugin-total-functions`        | Functional programming style rules   |
-| **`eslintUnicornRules`**                   | `eslint-plugin-unicorn`                | Unicorn plugin rules for better code |
-| **`eslintArrayFuncRules`**                 | `eslint-plugin-array-func`             | Array function preference rules      |
-| **`eslintPreferArrowFunctionRules`**       | `eslint-plugin-prefer-arrow-functions` | Arrow function preference rules      |
-| **`eslintPluginSortDestructureKeysRules`** | `eslint-plugin-sort-destructure-keys`  | Object destructuring rules           |
-| **`eslintPromiseRules`**                   | `eslint-plugin-promise`                | Promise handling rules               |
-| **`eslintImportsRules`**                   | `eslint-plugin-import`                 | Import/export rules                  |
-| **`eslintSecurityRules`**                  | `eslint-plugin-security`               | Security best practices              |
-| **`eslintTreeShakableRules`**              | `eslint-plugin-tree-shakable`          | Tree-shaking optimization rules      |
-| **`eslintReactRules`**                     | `eslint-plugin-react`                  | React-specific rules                 |
-| **`eslintReactHooksRules`**                | `eslint-plugin-react-hooks`            | React Hooks rules                    |
-| **`eslintReactPerfRules`**                 | `eslint-plugin-react-perf`             | React performance optimization rules |
-| **`eslintReactRefreshRules`**              | `eslint-plugin-react-refresh`          | React Refresh (HMR) rules            |
-| **`eslintJsxA11yRules`**                   | `eslint-plugin-jsx-a11y`               | Accessibility rules for JSX          |
-| **`eslintVitestRules`**                    | `eslint-plugin-vitest`                 | Vitest-specific rules                |
-| **`eslintJestRules`**                      | `eslint-plugin-jest`                   | Jest-specific rules                  |
-| **`eslintTestingLibraryRules`**            | `eslint-plugin-testing-library`        | Testing Library rules                |
-| **`eslintPlaywrightRules`**                | `eslint-plugin-playwright`             | Playwright-specific rules            |
-| **`eslintCypressRules`**                   | `eslint-plugin-cypress`                | Cypress-specific rules               |
-| **`eslintPluginRules`**                    | `eslint-plugin-eslint-plugin`          | eslint-plugin development rules      |
+| Rule set                                   | Plugin name                            | Description                             |
+| :----------------------------------------- | :------------------------------------- | :-------------------------------------- |
+| **`eslintRules`**                          | (eslint)                               | Core ESLint rules                       |
+| **`typescriptEslintRules`**                | `@typescript-eslint/eslint-plugin`     | TypeScript-specific ESLint rules        |
+| **`eslintFunctionalRules`**                | `eslint-plugin-functional`             | Functional programming style rules      |
+| **`eslintTotalFunctionsRules`**            | `eslint-plugin-total-functions`        | Functional programming style rules      |
+| **`eslintUnicornRules`**                   | `eslint-plugin-unicorn`                | Unicorn plugin rules for better code    |
+| **`eslintArrayFuncRules`**                 | `eslint-plugin-array-func`             | Array function preference rules         |
+| **`eslintPreferArrowFunctionRules`**       | `eslint-plugin-prefer-arrow-functions` | Arrow function preference rules         |
+| **`eslintPluginSortDestructureKeysRules`** | `eslint-plugin-sort-destructure-keys`  | Object destructuring rules              |
+| **`eslintPromiseRules`**                   | `eslint-plugin-promise`                | Promise handling rules                  |
+| **`eslintImportsRules`**                   | `eslint-plugin-import`                 | Import/export rules                     |
+| **`eslintSecurityRules`**                  | `eslint-plugin-security`               | Security best practices                 |
+| **`eslintTreeShakableRules`**              | `eslint-plugin-tree-shakable`          | Tree-shaking optimization rules         |
+| **`eslintReactRules`**                     | `eslint-plugin-react`                  | React-specific rules                    |
+| **`eslintReactHooksRules`**                | `eslint-plugin-react-hooks`            | React Hooks rules                       |
+| **`eslintReactPerfRules`**                 | `eslint-plugin-react-perf`             | React performance optimization rules    |
+| **`eslintReactRefreshRules`**              | `eslint-plugin-react-refresh`          | React Refresh (HMR) rules               |
+| **`eslintReactCodingStyleRules`**          | `eslint-plugin-react-coding-style`     | Opinionated React component style rules |
+| **`eslintJsxA11yRules`**                   | `eslint-plugin-jsx-a11y`               | Accessibility rules for JSX             |
+| **`eslintVitestRules`**                    | `eslint-plugin-vitest`                 | Vitest-specific rules                   |
+| **`eslintJestRules`**                      | `eslint-plugin-jest`                   | Jest-specific rules                     |
+| **`eslintTestingLibraryRules`**            | `eslint-plugin-testing-library`        | Testing Library rules                   |
+| **`eslintPlaywrightRules`**                | `eslint-plugin-playwright`             | Playwright-specific rules               |
+| **`eslintCypressRules`**                   | `eslint-plugin-cypress`                | Cypress-specific rules                  |
+| **`eslintPluginRules`**                    | `eslint-plugin-eslint-plugin`          | eslint-plugin development rules         |
 
 ### Exported Pre-configured Rule Options
 
@@ -434,7 +435,6 @@ Pre-configured rule sets that can be imported and customized:
 | **`restrictedGlobals`**           | `no-restricted-globals` | Array of restricted global variables                                                                                                                          |
 | **`restrictedGlobalsForBrowser`** | `no-restricted-globals` | Browser-environment-specific restricted globals                                                                                                               |
 | **`restrictedSyntax`**            | `no-restricted-syntax`  | Disallows the `in` operator, `Object.prototype.hasOwnProperty.call` (suggests using `Object.hasOwn`), and `new Array(*)` syntax (suggests using `Array.from`) |
-| **`restrictedSyntaxForReact`**    | `no-restricted-syntax`  | Rule set to restrict React component styling                                                                                                                  |
 
 You can find other pre-configured rule options by traversing the pre-defined rules object like this:
 
@@ -449,6 +449,9 @@ The shape of the rule option varies depending on the rule, so please check the c
     - `eslint-plugin-total-functions` with support for Flat Config
 - **`eslintPluginTreeShakable`**
     - `eslint-plugin-tree-shakable` with support for Flat Config
+- **`eslintPluginReactCodingStyle`**
+    - Custom ESLint plugin that codifies this repository's React memo component conventions (namespace imports, `React.memo<Props>`, arrow props naming, etc.). See [`src/plugins/react-coding-style/README.md`](src/plugins/react-coding-style/README.md) for the rationale and examples.
+    - Provides rules such as `react-coding-style/import-style`, `react-coding-style/component-var-type-annotation`, `react-coding-style/react-memo-type-parameter`, `react-coding-style/react-memo-props-argument-name`, `react-coding-style/props-type-annotation-style`, and `react-coding-style/react-hooks-definition-style`.
 - **`eslintPluginCustom`** - Custom ESLint plugin with additional rules
     - Currently, this plugin only provides the `custom/no-restricted-syntax` rule (which duplicates ESLint's `no-restricted-syntax` rule).
     - Can be used to set the error level to `error` or `warn` as needed.

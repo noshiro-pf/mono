@@ -1,5 +1,6 @@
 import {
   eslintJsxA11yRules,
+  eslintReactCodingStyleRules,
   eslintReactHooksRules,
   eslintReactPerfRules,
   eslintReactRefreshRules,
@@ -28,6 +29,7 @@ export const eslintConfigForReactBase = (
         ...eslintReactRefreshRules,
         ...eslintJsxA11yRules,
         ...eslintReactPerfRules,
+        ...eslintReactCodingStyleRules,
       }),
     },
   ] as const;

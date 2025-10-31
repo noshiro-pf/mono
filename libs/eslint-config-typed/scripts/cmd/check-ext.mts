@@ -6,6 +6,7 @@ await assertExt({
     {
       path: path.resolve(projectRootPath, './src'),
       extension: '.mts',
+      ignorePatterns: ['**/README.md'],
     },
     {
       path: path.resolve(projectRootPath, './scripts'),

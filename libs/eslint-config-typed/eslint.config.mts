@@ -4,7 +4,6 @@ import {
   eslintConfigForReact,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
-  restrictedSyntaxForReact,
   type FlatConfig,
 } from 'eslint-config-typed';
 
@@ -26,16 +25,12 @@ export default [
         {
           zones: [
             {
-              /**
-               * make src independent of other modules
-               */
+              // make src independent of other modules
               from: './!(src)/**/*',
               target: './src/**/*',
             },
             {
-              /**
-               * make src/types independent of other modules
-               */
+              // make src/types independent of other modules
               from: './src/!(types)/**/*',
               target: './src/types/**/*',
             },
@@ -101,21 +96,6 @@ export default [
   },
 
   ...eslintConfigForReact(['test/**/*.{mts,tsx}']),
-  {
-    files: ['test/**/*.{mts,tsx}'],
-    rules: defineKnownRules({
-      'no-restricted-syntax': [
-        'error',
-        ...restrictedSyntaxForReact.componentName.maxLength(),
-        ...restrictedSyntaxForReact.componentVarTypeAnnotation,
-        ...restrictedSyntaxForReact.importStyle,
-        ...restrictedSyntaxForReact.propsTypeAnnotationStyle,
-        ...restrictedSyntaxForReact.reactHooksDefinitionStyle,
-        ...restrictedSyntaxForReact.reactMemoPropsArgumentName,
-        ...restrictedSyntaxForReact.reactMemoTypeParam,
-      ],
-    }),
-  },
 
   {
     files: ['src/types/rules/*.mts'],

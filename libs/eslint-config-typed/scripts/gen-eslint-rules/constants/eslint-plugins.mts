@@ -149,6 +149,12 @@ export const eslintPlugins = {
     rulePrefix: 'custom/',
     outputFileName: 'eslint-custom-rules.mts',
   },
+  EslintReactCodingStyleRules: {
+    typeName: 'EslintReactCodingStyleRules',
+    pluginName: 'eslint-plugin-react-coding-style',
+    rulePrefix: 'react-coding-style/',
+    outputFileName: 'eslint-react-coding-style-rules.mts',
+  },
 } as const satisfies Record<
   string,
   {

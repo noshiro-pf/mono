@@ -42,10 +42,10 @@ export {
   restrictedGlobals,
   restrictedGlobalsForBrowser,
   restrictedSyntax,
-  restrictedSyntaxForReact,
 
   // Custom plugins
   eslintPluginCustom,
+  eslintPluginReactCodingStyle,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
 
@@ -78,6 +78,7 @@ export {
   type EslintImportsRulesOption,
   type EslintStrictDependenciesRules,
   type EslintStrictDependenciesRulesOption,
+  type EslintReactCodingStyleRules,
   type EslintSecurityRules,
   type EslintTreeShakableRules,
   type EslintReactRules,

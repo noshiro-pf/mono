@@ -5,6 +5,7 @@ import { compile, type Options } from 'json-schema-to-typescript';
 import { Arr, isBoolean, isString } from 'ts-data-forge';
 import { type Rule, type Rules } from '../../../src/index.mjs';
 import { customRules } from '../../../src/plugins/custom/rules/index.mjs';
+import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/rules/rules.mjs';
 import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
 import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/index.mjs';
 import { treeShakableRules } from '../../../src/plugins/tree-shakable/rules/index.mjs';
@@ -377,6 +378,10 @@ const getRules = async (
     case eslintPlugins.EslintCustomRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Object.entries(customRules as unknown as Rules);
+
+    case eslintPlugins.EslintReactCodingStyleRules.pluginName:
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Object.entries(reactCodingStyleRules as unknown as Rules);
 
     case eslintPlugins.EslintTotalFunctions.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion

@@ -48,6 +48,7 @@ import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 // import eslintPluginTreeShakable from 'eslint-plugin-tree-shakable';
 import {
   eslintPluginCustom,
+  eslintPluginReactCodingStyle,
   eslintPluginStrictDependencies,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
@@ -71,6 +72,7 @@ export const plugins: Record<
   | 'react-hooks'
   | 'react-refresh'
   | 'react-perf'
+  | 'react-coding-style'
   | 'security'
   | 'strict-dependencies'
   | 'testing-library'
@@ -104,6 +106,7 @@ export const plugins: Record<
   'react-refresh': eslintPluginReactRefresh,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'react-perf': eslintPluginReactPerf,
+  'react-coding-style': eslintPluginReactCodingStyle,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   security: eslintPluginSecurity,
   'strict-dependencies': eslintPluginStrictDependencies,

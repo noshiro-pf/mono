@@ -11,6 +11,7 @@ import {
   type EslintPluginSortDestructureKeysRules,
   type EslintPreferArrowFunctionRules,
   type EslintPromiseRules,
+  type EslintReactCodingStyleRules,
   type EslintReactHooksRules,
   type EslintReactPerfRules,
   type EslintReactRefreshRules,
@@ -51,6 +52,7 @@ type KnownRules = DeepReadonly<
     EslintTreeShakableRules &
     EslintUnicornRules &
     EslintVitestRules &
+    EslintReactCodingStyleRules &
     TypeScriptEslintRules
 >;
 

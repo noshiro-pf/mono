@@ -20,21 +20,37 @@ export const Ok = React.memo<Props>((props) => {
 Ok.displayName = 'Ok';
 
 // OK
-export const NoReturnStatementWithSpread = React.memo<Props>(({ numList }) => (
-  <div>{numList.length}</div>
-));
+export const NoReturnStatementWithDestructedProps = React.memo<Props>(
+  ({ numList }) => <div>{numList.length}</div>,
+);
 
-NoReturnStatementWithSpread.displayName = 'NoReturnStatementWithSpread';
+NoReturnStatementWithDestructedProps.displayName =
+  'NoReturnStatementWithDestructedProps';
 
 // OK
-export const NoReturnStatementWithoutSpread = React.memo<Props>((props) => (
-  <div>{props.numList.length}</div>
-));
+export const NoReturnStatementWithoutDestructedProps = React.memo<Props>(
+  (props) => <div>{props.numList.length}</div>,
+);
 
-NoReturnStatementWithoutSpread.displayName = 'NoReturnStatementWithoutSpread';
+NoReturnStatementWithoutDestructedProps.displayName =
+  'NoReturnStatementWithoutDestructedProps';
+
+// OK
+export const MemoWithoutProps = React.memo(() => <div>{1}</div>);
+
+MemoWithoutProps.displayName = 'MemoWithoutProps';
 
 // NG
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line react-coding-style/react-memo-type-parameter
+export const MemoWithoutPropsWithUnnecessaryTypeArg = React.memo<never>(() => (
+  <div>{1}</div>
+));
+
+MemoWithoutPropsWithUnnecessaryTypeArg.displayName =
+  'MemoWithoutPropsWithUnnecessaryTypeArg';
+
+// NG
+// eslint-disable-next-line react-coding-style/props-type-annotation-style
 export const ArgAnnotated = React.memo<Props>((props: Props) => {
   const sum = React.useMemo(
     () => props.numList.reduce((a, b) => a + b, 0),
@@ -48,7 +64,7 @@ ArgAnnotated.displayName = 'ArgAnnotated';
 
 // NG
 export const ArgAnnotatedAsInline = React.memo<Props>(
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, react/prefer-read-only-props,no-restricted-syntax
+  // eslint-disable-next-line react-coding-style/props-type-annotation-style, @typescript-eslint/prefer-readonly-parameter-types, react/prefer-read-only-props
   (props: { numList: readonly number[] }) => {
     const sum = React.useMemo(
       () => props.numList.reduce((a, b) => a + b, 0),
@@ -63,7 +79,7 @@ ArgAnnotatedAsInline.displayName = 'ArgAnnotatedAsInline';
 
 // NG
 export const ArgAnnotatedAsInlineWithTypeReference = React.memo<Props>(
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line react-coding-style/props-type-annotation-style
   (props: Readonly<{ numList: readonly number[] }>) => {
     const sum = React.useMemo(
       () => props.numList.reduce((a, b) => a + b, 0),
@@ -81,7 +97,7 @@ ArgAnnotatedAsInlineWithTypeReference.displayName =
 export const MemoWithoutTypeArgument: React.MemoExoticComponent<
   (props: Props) => React.JSX.Element
 > =
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line react-coding-style/react-memo-type-parameter
   React.memo((props) => {
     const sum = React.useMemo(
       () => props.numList.reduce((a, b) => a + b, 0),
@@ -95,7 +111,7 @@ MemoWithoutTypeArgument.displayName = 'MemoWithoutTypeArgument';
 
 // NG
 // @ts-expect-error Parameter 'props' implicitly has an 'any' type.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any,no-restricted-syntax
+// eslint-disable-next-line react-coding-style/react-memo-type-parameter, @typescript-eslint/no-explicit-any
 export const MemoAnnotatedAsAny = React.memo<any>((props) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const sum = React.useMemo(
@@ -111,7 +127,7 @@ export const MemoAnnotatedAsAny = React.memo<any>((props) => {
 MemoAnnotatedAsAny.displayName = 'MemoAnnotatedAsAny';
 
 // NG
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line react-coding-style/react-memo-type-parameter
 export const MemoAnnotatedAsInline = React.memo<{ numList: readonly number[] }>(
   (props) => {
     const sum = React.useMemo(
@@ -126,8 +142,8 @@ export const MemoAnnotatedAsInline = React.memo<{ numList: readonly number[] }>(
 MemoAnnotatedAsInline.displayName = 'MemoAnnotatedAsInline';
 
 // NG
-// eslint-disable-next-line no-restricted-syntax
 export const MemoAnnotatedAsInlineWithTypeReference = React.memo<
+  // eslint-disable-next-line react-coding-style/react-memo-type-parameter
   Readonly<{ numList: readonly number[] }>
 >((props) => {
   const sum = React.useMemo(
@@ -142,7 +158,7 @@ MemoAnnotatedAsInlineWithTypeReference.displayName =
   'MemoAnnotatedAsInlineWithTypeReference';
 
 // NG
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line react-coding-style/react-memo-props-argument-name
 export const ArgSpread = React.memo<Props>(({ numList }) => {
   const sum = React.useMemo(
     () => numList.reduce((a, b) => a + b, 0),
@@ -155,7 +171,7 @@ export const ArgSpread = React.memo<Props>(({ numList }) => {
 ArgSpread.displayName = 'ArgSpread';
 
 // NG
-// eslint-disable-next-line no-restricted-syntax
+// eslint-disable-next-line react-coding-style/component-name
 const TooooooooooooooooooooooooLongComponentName = React.memo<Props>(
   (props) => {
     const sum = React.useMemo(

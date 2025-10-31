@@ -10,6 +10,7 @@ export * from './eslint-plugin-rules.mjs';
 export * from './eslint-plugin-sort-destructure-keys-rules.mjs';
 export * from './eslint-prefer-arrow-functions-rules.mjs';
 export * from './eslint-promise-rules.mjs';
+export * from './eslint-react-coding-style-rules.mjs';
 export * from './eslint-react-hooks-rules.mjs';
 export * from './eslint-react-perf-rules.mjs';
 export * from './eslint-react-refresh-rules.mjs';
