@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.1.1...v1.1.2) (2025-11-02)
+
+### Bug Fixes
+
+- update @octokit/openapi-types and fix type inconsistency issues ([#50](https://github.com/noshiro-pf/octokit-safe-types/issues/50)) ([2c91ba4](https://github.com/noshiro-pf/octokit-safe-types/commit/2c91ba4543792aafa47af10703a8074d9c829743))
+
 ## [1.1.1](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.1.0...v1.1.1) (2025-10-17)
 
 ### Bug Fixes
