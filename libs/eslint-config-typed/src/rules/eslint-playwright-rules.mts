@@ -65,4 +65,5 @@ export const eslintPlaywrightRules = {
   'playwright/valid-expect-in-promise': 'error',
   'playwright/no-wait-for-navigation': 'error',
   'playwright/valid-test-tags': withDefaultOption('error'),
+  'playwright/no-unused-locators': 'error',
 } as const satisfies EslintPlaywrightRules;

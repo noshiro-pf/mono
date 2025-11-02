@@ -18,7 +18,6 @@
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.mts",
-    "./package-lock.json",
     "./pnpm-lock.yaml",
     "./pnpm-workspace.yaml",
     "BREAKING_CHANGE_GUIDE.md",

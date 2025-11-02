@@ -660,6 +660,23 @@ namespace NoUnsafeReferences {
 }
 
 /**
+ * Disallow usage of page locators that are not used
+ *
+ * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-unused-locators.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoUnusedLocators {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Disallow unnecessary awaits for Playwright methods
  *
  * @link https://github.com/playwright-community/eslint-plugin-playwright/tree/main/docs/rules/no-useless-await.md
@@ -1253,7 +1270,7 @@ namespace ValidExpectInPromise {
 }
 
 /**
- * Enforce valid tag format in Playwright test blocks
+ * Enforce valid tag format in Playwright test blocks and titles
  *
  * ```md
  * | key         | value   |
@@ -1478,6 +1495,7 @@ export type EslintPlaywrightRules = {
   readonly 'playwright/no-slowed-test': NoSlowedTest.RuleEntry;
   readonly 'playwright/no-standalone-expect': NoStandaloneExpect.RuleEntry;
   readonly 'playwright/no-unsafe-references': NoUnsafeReferences.RuleEntry;
+  readonly 'playwright/no-unused-locators': NoUnusedLocators.RuleEntry;
   readonly 'playwright/no-useless-await': NoUselessAwait.RuleEntry;
   readonly 'playwright/no-useless-not': NoUselessNot.RuleEntry;
   readonly 'playwright/no-wait-for-navigation': NoWaitForNavigation.RuleEntry;

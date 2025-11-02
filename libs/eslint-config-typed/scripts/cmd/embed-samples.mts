@@ -1,4 +1,4 @@
-import { pipe } from 'ts-data-forge';
+import { pipe, unknownToString } from 'ts-data-forge';
 import { formatFiles } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -102,7 +102,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 
     return Result.ok(undefined);
   } catch (error) {
-    return Result.err(`❌ Failed to embed samples: ${String(error)}`);
+    return Result.err(`❌ Failed to embed samples: ${unknownToString(error)}`);
   }
 };
 

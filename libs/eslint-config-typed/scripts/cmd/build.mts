@@ -1,3 +1,4 @@
+import { unknownToString } from 'ts-data-forge';
 import { assertPathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -6,32 +7,32 @@ const distDir = path.resolve(projectRootPath, './dist');
 /**
  * Builds the entire project.
  */
-export const build = async (full: boolean): Promise<void> => {
+const build = async (skipCheck: boolean): Promise<void> => {
   echo('Starting build process...\n');
 
-  // Step 1: Validate file extensions
-  {
-    echo('1. Checking file extensions...');
-    await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
-    echo('✓ File extensions validated\n');
-  }
+  if (!skipCheck) {
+    // Step 1: Validate file extensions
+    {
+      echo('1. Checking file extensions...');
+      await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
+      echo('✓ File extensions validated\n');
+    }
 
-  // Step 2: Clean previous build
-  {
-    echo('2. Cleaning dist directory...');
-    await runStep(
-      Result.fromPromise(
-        fs.rm(distDir, {
-          recursive: true,
-          force: true,
-        }),
-      ),
-      'Failed to clean dist directory',
-    );
-    echo('✓ Cleaned dist directory\n');
-  }
+    // Step 2: Clean previous build
+    {
+      echo('2. Cleaning dist directory...');
+      await runStep(
+        Result.fromPromise(
+          fs.rm(distDir, {
+            recursive: true,
+            force: true,
+          }),
+        ),
+        'Failed to clean dist directory',
+      );
+      echo('✓ Cleaned dist directory\n');
+    }
 
-  if (full) {
     {
       echo('3.1 Generating rules types...');
       await runCmdStep(
@@ -137,12 +138,10 @@ const runStep = async (
 ): Promise<void> => {
   const result = await promise;
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${String(result.value)}`);
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
     console.error('❌ Build failed');
     process.exit(1);
   }
 };
 
-if (isDirectlyExecuted(import.meta.url)) {
-  await build(false);
-}
+await build(process.argv.includes('--skip-check'));
