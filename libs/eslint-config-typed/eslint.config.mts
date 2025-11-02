@@ -112,4 +112,10 @@ export default [
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
     }),
   },
+  {
+    files: ['samples/**'],
+    rules: defineKnownRules({
+      'import/no-default-export': 'off',
+    }),
+  },
 ] satisfies FlatConfig[];

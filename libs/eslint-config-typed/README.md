@@ -36,7 +36,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
         - [Rule Types](#rule-types)
 - [Customization](#customization)
     - [Override Specific Rules](#override-specific-rules)
-    - [Use Type-Safe Rule Options](#use-type-safe-rule-options)
+    - [Use RulesOptions Types](#use-rulesoptions-types)
     - [Target Specific Files](#target-specific-files)
 - [Troubleshooting](#troubleshooting)
     - [Common Issues](#common-issues)
@@ -49,7 +49,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
 
 ## Features
 
-- 🎯 **Type-Safe Configuration**: Fully typed ESLint rules and configurations for better IDE support
+- 🎯 **Type-Safe Configuration**: Fully typed ESLint rules **and options** and configurations for better IDE support
 - 📦 **Pre-configured Setups**: Ready-to-use configurations for TypeScript, React, Preact, and popular testing frameworks
 - 📝 **Comprehensive Type Definitions**: Complete TypeScript types for all ESLint rules and options
 - 🔄 **ESLint Flat Config Support**: Built for the modern ESLint flat configuration system
@@ -75,15 +75,17 @@ All required ESLint plugins and dependencies are automatically installed.
 
 ## Quick Start
 
-Create an `eslint.config.js` file in your project root:
+Create an `eslint.config.js` or `eslint.config.ts` file in your project root:
 
-```js
+```tsx
 import {
     defineConfig,
+    defineKnownRules,
     eslintConfigForTypeScript,
     eslintConfigForVitest,
-    defineKnownRules,
+    withDefaultOption,
 } from 'eslint-config-typed';
+
 // import * as path from 'node:path';
 // import * as url from 'node:url';
 
@@ -110,17 +112,15 @@ export default defineConfig([
     // You can override per-rule settings if necessary.
     {
         rules: defineKnownRules({
-            '@typescript-eslint/no-explicit-any': 'warn',
+            '@typescript-eslint/no-explicit-any': withDefaultOption('warn'),
             '@typescript-eslint/prefer-readonly-parameter-types': 'off',
-            'react-hooks/exhaustive-deps': 'warn',
+            'react-hooks/exhaustive-deps': withDefaultOption('warn'),
             'functional/no-let': [
                 'error',
                 {
                     allowInForLoopInit: true,
                     allowInFunctions: false,
-                    ignoreIdentifierPattern: ignorePattern.filter(
-                        (p) => p !== '^draft',
-                    ),
+                    ignoreIdentifierPattern: ['^mut_', '^_mut_', '^#mut_'],
                 },
             ],
         }),
@@ -151,14 +151,20 @@ npm run lint:fix
 
 `defineConfig` wraps your flat configuration array so JavaScript config files get full IntelliSense without relying on JSDoc casts. It keeps literal types intact while returning the config unchanged at runtime.
 
-```js
-import { defineConfig, eslintConfigForTypeScript } from 'eslint-config-typed';
+```tsx
+import {
+    defineConfig,
+    defineKnownRules,
+    eslintConfigForTypeScript,
+} from 'eslint-config-typed';
+
+const thisDir = import.meta.dirname;
 
 export default defineConfig([
     ...eslintConfigForTypeScript({
-        tsconfigRootDir: import.meta.dirname,
+        tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
-        packageDirs: [import.meta.dirname],
+        packageDirs: [thisDir],
     }),
     {
         rules: defineKnownRules({
@@ -170,31 +176,71 @@ export default defineConfig([
 
 This is equivalent to:
 
-```js
-import { eslintConfigForTypeScript } from 'eslint-config-typed';
+```tsx
+import {
+    defineKnownRules,
+    eslintConfigForTypeScript,
+    type FlatConfig,
+} from 'eslint-config-typed';
 
-/** @type {import('@typescript-eslint/utils/ts-eslint').FlatConfig[]} */
+const thisDir = import.meta.dirname;
+
 export default [
     ...eslintConfigForTypeScript({
-        tsconfigRootDir: import.meta.dirname,
+        tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
-        packageDirs: [import.meta.dirname],
+        packageDirs: [thisDir],
     }),
     {
         rules: defineKnownRules({
             // ...
         }),
     },
-];
+] satisfies readonly FlatConfig[];
 ```
 
 ### defineKnownRules utility
 
-`defineKnownRules` is a helper designed for the `rules` field in ESLint flat configs. It keeps the returned object untouched while giving you type-safe rule names and option inference in editors. When you wrap your overrides with this function you can rely on:
+`defineKnownRules` is a helper designed for the `rules` field in ESLint flat configs. It keeps the returned object untouched while giving you **type-safe rule names and option inference** in editors (like biome.json). When you wrap your overrides with this function you can rely on:
 
 - autocomplete and early feedback for rule identifiers, eliminating typo-prone string literals;
 - strongly typed options for every plugin rule that ships with `eslint-config-typed`, so you can discover valid properties without leaving your editor;
 - a zero-cost runtime helper—because the object is returned as-is, it blends seamlessly into any flat config block.
+
+```tsx
+import {
+    defineKnownRules,
+    eslintConfigForTypeScript,
+    type FlatConfig,
+} from 'eslint-config-typed';
+
+const thisDir = import.meta.dirname;
+
+export default [
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [thisDir],
+    }),
+    {
+        rules: defineKnownRules({
+            // @ts-expect-error typo of rule name
+            'no-restricted-globalsSSSS': 'error',
+            // ~~~~~~~~~~~~~~~~~~~~~~~
+        }),
+    },
+    {
+        rules: defineKnownRules({
+            'no-unsafe-optional-chaining': [
+                'error',
+                // @ts-expect-error typo of an option key
+                { disallowArithmeticOperatorsSSSSS: true },
+                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            ],
+        }),
+    },
+] satisfies FlatConfig[];
+```
 
 ### withDefaultOption utility
 
@@ -202,35 +248,97 @@ export default [
 
 `defineKnownRules` also reserves `0` for deprecated rules. The resulting severity matrix looks like this:
 
-| Rule type            | Allowed severity values in `defineKnownRules`                  |
-| :------------------- | :------------------------------------------------------------- |
-| Deprecated rule      | `0`                                                            |
-| Rule without options | `"off"`, `"warn"`, `"error"`                                   |
-| Rule with options    | `"off"`, `1`, `2`, `["warn", <option>]`, `["error", <option>]` |
+| Rule type            | Allowed severity values in `defineKnownRules` |
+| :------------------- | :-------------------------------------------- | ------ | -------- | ------- | ------------------- |
+| Deprecated rule      | `0`                                           |
+| Rule without options | `"off"                                        | "warn" | "error"` |
+| Rule with options    | `"off"                                        | 1      | 2        | ["warn" | "error", <option>]` |
 
-## Configuration Examples
-
-### TypeScript + React Project
-
-```js
+```tsx
 import {
-    defineConfig,
-    eslintConfigForTypeScript,
-    eslintConfigForReact,
-    eslintConfigForNodeJs,
     defineKnownRules,
+    eslintConfigForTypeScript,
+    withDefaultOption,
+    type FlatConfig,
 } from 'eslint-config-typed';
 
 const thisDir = import.meta.dirname;
 
-export default defineConfig([
-    { ignores: ['**/dist/**', '**/build/**', '**/.next/**'] },
+export default [
     ...eslintConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
         packageDirs: [thisDir],
     }),
-    eslintConfigForReact(['src/**']),
+    {
+        rules: defineKnownRules({
+            // @ts-expect-error Simply passing the string "error" to a rule with options is not allowed
+            'no-restricted-globals': 'error',
+            // ~~~~~~~~~~~~~~~~~~~~
+            // ^ Type Error! (Because "no-restricted-globals" has options)
+            // NOTE: In addition, some rules, such as "no-restricted-syntax" "and no-restricted-globals", have no effect unless you set the option.
+
+            // OK
+            'object-shorthand': withDefaultOption('error'),
+
+            // OK (options are set explicitly)
+            'no-unsafe-optional-chaining': [
+                'error',
+                { disallowArithmeticOperators: true },
+            ],
+        }),
+    },
+] satisfies FlatConfig[];
+```
+
+### TypeScript Configuration Files
+
+You can also write your eslint config in `.ts` or `.mts` format, all you need to do is run `npm add -D jiti`.
+
+```tsx
+import {
+    eslintConfigForTypeScript,
+    eslintConfigForVitest,
+    type FlatConfig,
+} from 'eslint-config-typed';
+
+const thisDir = import.meta.dirname;
+
+export default [
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [thisDir],
+    }),
+    eslintConfigForVitest(),
+] satisfies FlatConfig[];
+```
+
+For details, see <https://eslint.org/docs/latest/use/configure/configuration-files#typescript-configuration-files>.
+
+## Configuration Examples
+
+### TypeScript + React Project
+
+```tsx
+import {
+    defineKnownRules,
+    eslintConfigForNodeJs,
+    eslintConfigForReact,
+    eslintConfigForTypeScript,
+    type FlatConfig,
+} from 'eslint-config-typed';
+
+const thisDir = import.meta.dirname;
+
+export default [
+    { ignores: ['**/dist/**', '**/build/**', '**/.next/**', 'public/**'] },
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [thisDir],
+    }),
+    ...eslintConfigForReact(['src/**']),
     eslintConfigForNodeJs(['scripts/**', 'configs/**']),
     {
         files: ['scripts/**', 'configs/**'],
@@ -243,20 +351,20 @@ export default defineConfig([
             'import/no-extraneous-dependencies': 'off',
         }),
     },
-]);
+] satisfies FlatConfig[];
 ```
 
 ### Node.js TypeScript Project
 
-```js
+```tsx
 import {
-    defineConfig,
-    eslintConfigForTypeScript,
-    eslintConfigForNodeJs,
     defineKnownRules,
+    eslintConfigForNodeJs,
+    eslintConfigForTypeScript,
+    type FlatConfig,
 } from 'eslint-config-typed';
 
-export default defineConfig([
+export default [
     { ignores: ['**/dist/**', '**/node_modules/**'] },
     ...eslintConfigForTypeScript({
         tsconfigRootDir: import.meta.dirname,
@@ -268,25 +376,23 @@ export default defineConfig([
         rules: defineKnownRules({
             // Allow console in Node.js
             'no-console': 'off',
-            // Allow process.env access
-            'no-process-env': 'off',
         }),
     },
-]);
+] satisfies FlatConfig[];
 ```
 
 ### React + Testing Libraries
 
-```js
+```tsx
 import {
-    defineConfig,
-    eslintConfigForTypeScript,
     eslintConfigForReact,
-    eslintConfigForVitest,
     eslintConfigForTestingLibrary,
+    eslintConfigForTypeScript,
+    eslintConfigForVitest,
+    type FlatConfig,
 } from 'eslint-config-typed';
 
-export default defineConfig([
+export default [
     { ignores: ['**/dist/**', '**/coverage/**'] },
     ...eslintConfigForTypeScript({
         tsconfigRootDir: import.meta.dirname,
@@ -296,7 +402,7 @@ export default defineConfig([
     ...eslintConfigForReact(),
     eslintConfigForVitest(),
     eslintConfigForTestingLibrary(),
-]);
+] satisfies FlatConfig[];
 ```
 
 ## VS Code Integration
@@ -310,35 +416,12 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
             "mode": "auto"
         }
     ],
-    "eslint.experimental.useFlatConfig": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    }
+    "eslint.experimental.useFlatConfig": true
+    // "editor.codeActionsOnSave": {
+    //   "source.fixAll.eslint": "explicit"
+    // }
 }
 ```
-
-## TypeScript Configuration Files
-
-You can also write your eslint config in `.ts` or `.mts` format, all you need to do is run `npm add -D jiti`.
-
-```ts
-import {
-    eslintConfigForTypeScript,
-    eslintConfigForVitest,
-    type FlatConfig,
-} from 'eslint-config-typed';
-
-export default [
-    ...eslintConfigForTypeScript({
-        tsconfigRootDir: thisDir,
-        tsconfigFileName: './tsconfig.json',
-        packageDirs: [thisDir],
-    }),
-    eslintConfigForVitest(),
-] satisfies FlatConfig[];
-```
-
-For details, see <https://eslint.org/docs/latest/use/configure/configuration-files#typescript-configuration-files>.
 
 ## Included plugins
 
@@ -370,7 +453,7 @@ For details, see <https://eslint.org/docs/latest/use/configure/configuration-fil
 
 ### Configuration Functions
 
-These functions return arrays of ESLint flat configurations:
+These functions return (arrays of) ESLint flat configuration(s):
 
 #### Base Configurations
 
@@ -385,7 +468,7 @@ These functions return arrays of ESLint flat configurations:
 
 - **`eslintConfigForReact(options?)`** - React configuration with hooks and JSX rules
     - `eslintConfigForBrowser` is included in this configuration
-- **`eslintConfigForPreact(options?)`** - Preact configuration (lighter React alternative)
+- **`eslintConfigForPreact(options?)`** - Preact (lighter React alternative) configuration
     - `eslintConfigForBrowser` is included in this configuration
 - **`eslintConfigForVitest(options?)`** - Vitest testing framework configuration
 - **`eslintConfigForJest(options?)`** - Jest testing framework configuration
@@ -458,10 +541,14 @@ The shape of the rule option varies depending on the rule, so please check the c
 
 Example:
 
-```js
-import { eslintRules } from 'eslint-config-typed';
+```tsx
+import {
+    defineKnownRules,
+    eslintRules,
+    type FlatConfig,
+} from 'eslint-config-typed';
 
-export default defineConfig([
+export default [
     // ...
     {
         rules: defineKnownRules({
@@ -481,7 +568,7 @@ export default defineConfig([
             ],
         }),
     },
-]);
+] satisfies FlatConfig[];
 ```
 
 ### Type Definitions
@@ -491,9 +578,13 @@ All rules and configurations come with complete TypeScript type definitions:
 #### Core Types
 
 - **`FlatConfig`** - ESLint flat configuration type
+    - `= DeepReadonly<import('@typescript-eslint/utils/ts-eslint').FlatConfig>`
 - **`ESLintPlugin`** - ESLint plugin type
+    - `= DeepReadonly<import('@typescript-eslint/utils/ts-eslint').FlatConfig.Plugin>`
 - **`Rule`** - ESLint rule definition type
+    - `= DeepReadonly<import('@eslint/core').RuleDefinition>`
 - **`Rules`** - Collection of rules type
+    - `= Readonly<Record<string, Rule>>`
 
 #### Rule Types
 
@@ -536,15 +627,27 @@ The pre-configured rules of `eslint-config-typed` are opinionated settings that 
 
 You can override any rule by adding a configuration object after the preset configurations:
 
-```js
-import { typescriptEslintRules } from 'eslint-config-typed';
+```tsx
+import {
+    defineKnownRules,
+    eslintConfigForTypeScript,
+    type FlatConfig,
+    typescriptEslintRules,
+    withDefaultOption,
+} from 'eslint-config-typed';
 
-export default defineConfig([
-    ...eslintConfigForTypeScript(options),
+const thisDir = import.meta.dirname;
+
+export default [
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [thisDir],
+    }),
     {
         rules: defineKnownRules({
             // Downgrade to warning (Option settings are inherited)
-            '@typescript-eslint/no-explicit-any': 'warn',
+            '@typescript-eslint/no-explicit-any': withDefaultOption('warn'),
             // Disable a rule
             '@typescript-eslint/prefer-readonly-parameter-types': 'off',
             // Configure with options
@@ -570,19 +673,18 @@ export default defineConfig([
             ],
         }),
     },
-]);
+] satisfies FlatConfig[];
 ```
 
-### Use Type-Safe Rule Options
+### Use RulesOptions Types
 
 Leverage TypeScript for type-safe rule configuration:
 
-```ts
+```tsx
 // configs/restricted-syntax-defs.mjs
 
-import { eslintRules } from 'eslint-config-typed';
+import { eslintRules, type EslintRulesOption } from 'eslint-config-typed';
 
-/** @type {import("eslint-config-typed").EslintRulesOption["no-restricted-syntax"]} */
 export const restrictedSyntax = [
     ...eslintRules['no-restricted-syntax'].slice(1),
     {
@@ -592,31 +694,54 @@ export const restrictedSyntax = [
         message:
             'The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`.',
     },
-];
+] satisfies EslintRulesOption['no-restricted-syntax'];
 ```
 
-```ts
-// eslint.config.js
+```tsx
+// eslint.config.mts
 
-import { restrictedSyntax } from './configs/restricted-syntax-defs.mjs';
+import {
+    defineKnownRules,
+    eslintConfigForTypeScript,
+    type FlatConfig,
+} from 'eslint-config-typed';
+import { restrictedSyntax } from './restricted-syntax-defs.mjs';
 
-export default defineConfig([
-    ...eslintConfigForTypeScript(options),
+const thisDir = import.meta.dirname;
+
+export default [
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [thisDir],
+    }),
     {
         rules: defineKnownRules({
-            'no-restricted-syntax': ['error', restrictedSyntax],
+            'no-restricted-syntax': ['error', ...restrictedSyntax],
         }),
     },
-]);
+] satisfies readonly FlatConfig[];
 ```
 
 ### Target Specific Files
 
 Apply different rules to different file patterns:
 
-```js
-export default defineConfig([
-    ...eslintConfigForTypeScript(options),
+```tsx
+import {
+    defineKnownRules,
+    eslintConfigForTypeScript,
+    type FlatConfig,
+} from 'eslint-config-typed';
+
+const thisDir = import.meta.dirname;
+
+export default [
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [thisDir],
+    }),
     {
         files: ['**/*.test.ts', '**/*.spec.ts'],
         rules: defineKnownRules({
@@ -634,7 +759,7 @@ export default defineConfig([
             'import/no-unassigned-import': 'off',
         }),
     },
-]);
+] satisfies FlatConfig[];
 ```
 
 ## Troubleshooting
@@ -645,33 +770,41 @@ export default defineConfig([
 
 Ensure the paths are correct:
 
-```js
+```tsx
+import {
+    eslintConfigForTypeScript,
+    type FlatConfig,
+} from 'eslint-config-typed';
+
 const thisDir = import.meta.dirname;
 
-export default defineConfig([
-    ...eslintConfigForTypeScript({
-        tsconfigRootDir: thisDir, // Must be absolute path
-        tsconfigFileName: './tsconfig.json', // Relative to tsconfigRootDir
-        packageDirs: [thisDir],
-    }),
-]);
+export default eslintConfigForTypeScript({
+    tsconfigRootDir: thisDir, // Must be absolute path
+    tsconfigFileName: './tsconfig.json', // Relative to tsconfigRootDir
+    packageDirs: [thisDir],
+}) satisfies readonly FlatConfig[];
 ```
 
 #### 2. Import resolution errors
 
 The `packageDirs` option helps ESLint resolve imports correctly in monorepos:
 
-```js
-export default defineConfig([
-    ...eslintConfigForTypeScript({
-        tsconfigRootDir: thisDir,
-        tsconfigFileName: './tsconfig.json',
-        packageDirs: [
-            path.resolve(thisDir, '../../..'), // Monorepo root
-            thisDir, // Current package
-        ],
-    }),
-]);
+```tsx
+import {
+    eslintConfigForTypeScript,
+    type FlatConfig,
+} from 'eslint-config-typed';
+
+const thisDir = import.meta.dirname;
+
+export default eslintConfigForTypeScript({
+    tsconfigRootDir: thisDir,
+    tsconfigFileName: './tsconfig.json',
+    packageDirs: [
+        path.resolve(thisDir, '../../..'), // Monorepo root
+        thisDir, // Current package
+    ],
+}) satisfies readonly FlatConfig[];
 ```
 
 #### 3. Performance issues

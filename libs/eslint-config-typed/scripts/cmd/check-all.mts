@@ -26,21 +26,25 @@ const checkAll = async (): Promise<void> => {
   await runCmdStep('pnpm run test', 'Tests failed');
   echo('✓ Tests passed\n');
 
-  // Step 5: Build and check repo status
+  // Step 5: Build
   echo('5. Building project...');
   await runCmdStep('pnpm run build', 'Build failed');
 
-  // Step 6: Lint and check repo status
+  // Step 6: Lint
   echo('6. Running lint fixes...');
   await runCmdStep('pnpm run lint:fix', 'Linting failed');
   echo('✓ Lint fixes applied\n');
 
-  // Step 7: Build and check repo status
+  // Step 7: Build
   echo('7. Building project...');
   await runCmdStep('pnpm run build', 'Build failed');
 
-  // Step 8: Backup repository settings
-  echo('8. Backing up repository settings...');
+  // Step 8: Embed sample code to README.md
+  echo('8. Generating documentation...');
+  await runCmdStep('pnpm run doc:embed', 'Documentation embedding failed');
+
+  // Step 9: Backup repository settings
+  echo('9. Backing up repository settings...');
   await runCmdStep(
     'pnpm run gh:backup-all',
     'Backing up repository settings failed',
