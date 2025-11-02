@@ -26,7 +26,7 @@ export default [
     rules: defineKnownRules({
       // Allow console in scripts
       'no-await-in-loop': 'off',
-      'import/no-unassigned-import': 'off',
+      'import-x/no-unassigned-import': 'off',
     }),
   },
 ] satisfies FlatConfig[];

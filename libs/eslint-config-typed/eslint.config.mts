@@ -4,12 +4,16 @@ import {
   eslintConfigForReact,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  eslintImportsRules,
   type FlatConfig,
 } from 'eslint-config-typed';
 
 const thisDir = import.meta.dirname;
 
 export default [
+  {
+    ignores: ['.eslintrc.cjs'],
+  },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
     tsconfigFileName: './tsconfig.json',
@@ -20,7 +24,16 @@ export default [
 
   {
     rules: defineKnownRules({
-      'import/no-restricted-paths': [
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            '@typescript-eslint/utils/ts-eslint',
+          ],
+        },
+      ],
+      'import-x/no-restricted-paths': [
         'error',
         {
           zones: [
@@ -88,15 +101,24 @@ export default [
     rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
       'no-await-in-loop': 'off',
-      'import/no-unassigned-import': 'off',
-      'import/no-internal-modules': 'off',
-      'import/no-default-export': 'off',
-      'import/no-extraneous-dependencies': 'off',
+      'import-x/no-unassigned-import': 'off',
+      'import-x/no-internal-modules': 'off',
+      'import-x/no-default-export': 'off',
+      'import-x/no-extraneous-dependencies': 'off',
     }),
   },
 
   ...eslintConfigForReact(['test/**/*.{mts,tsx}']),
 
+  {
+    files: ['src/**'],
+    rules: defineKnownRules({
+      'import-x/no-unused-modules': [
+        'error',
+        { unusedExports: true, ignoreExports: ['src/entry-point.mts'] },
+      ],
+    }),
+  },
   {
     files: ['src/types/rules/*.mts'],
     rules: defineKnownRules({
@@ -115,7 +137,7 @@ export default [
   {
     files: ['samples/**'],
     rules: defineKnownRules({
-      'import/no-default-export': 'off',
+      'import-x/no-default-export': 'off',
     }),
   },
 ] satisfies FlatConfig[];

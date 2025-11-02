@@ -16,7 +16,7 @@ export const effects: readonly string[] = [
   'TaskThese',
 ] as const;
 
-export type FpTsEffectType = Readonly<{
+type FpTsEffectType = Readonly<{
   effectType: Type;
   effectName: string;
   effectTypeParameter: Type | undefined;

@@ -398,13 +398,13 @@ const getRules = async (
     case eslintPlugins.EslintPreferArrowFunctionRules.pluginName:
     case eslintPlugins.EslintImportsRules.pluginName:
       return Object.entries(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import-x/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
         (await import(pluginName)).rules as Rules,
       );
 
     default:
       return Object.entries(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, import-x/dynamic-import-chunkname, unicorn/no-await-expression-member, total-functions/no-unsafe-type-assertion
         (await import(pluginName)).default.rules as Rules,
       );
   }

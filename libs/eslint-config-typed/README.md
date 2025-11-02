@@ -345,10 +345,10 @@ export default [
         rules: defineKnownRules({
             '@typescript-eslint/explicit-function-return-type': 'off',
             'no-await-in-loop': 'off',
-            'import/no-unassigned-import': 'off',
-            'import/no-internal-modules': 'off',
-            'import/no-default-export': 'off',
-            'import/no-extraneous-dependencies': 'off',
+            'import-x/no-unassigned-import': 'off',
+            'import-x/no-internal-modules': 'off',
+            'import-x/no-default-export': 'off',
+            'import-x/no-extraneous-dependencies': 'off',
         }),
     },
 ] satisfies FlatConfig[];
@@ -434,7 +434,7 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
 - eslint-plugin-sort-destructure-keys
 - eslint-plugin-security
 - eslint-plugin-promise
-- eslint-plugin-import
+- eslint-plugin-import-x
 - eslint-plugin-strict-dependencies
 - eslint-plugin-tree-shakable (Reimplemented in this repository to support flat config)
 - eslint-plugin-react
@@ -495,7 +495,7 @@ Pre-configured rule sets that can be imported and customized:
 | **`eslintPreferArrowFunctionRules`**       | `eslint-plugin-prefer-arrow-functions` | Arrow function preference rules         |
 | **`eslintPluginSortDestructureKeysRules`** | `eslint-plugin-sort-destructure-keys`  | Object destructuring rules              |
 | **`eslintPromiseRules`**                   | `eslint-plugin-promise`                | Promise handling rules                  |
-| **`eslintImportsRules`**                   | `eslint-plugin-import`                 | Import/export rules                     |
+| **`eslintImportsRules`**                   | `eslint-plugin-import-x`               | Import/export rules                     |
 | **`eslintSecurityRules`**                  | `eslint-plugin-security`               | Security best practices                 |
 | **`eslintTreeShakableRules`**              | `eslint-plugin-tree-shakable`          | Tree-shaking optimization rules         |
 | **`eslintReactRules`**                     | `eslint-plugin-react`                  | React-specific rules                    |
@@ -756,7 +756,7 @@ export default [
         rules: defineKnownRules({
             // Allow console in scripts
             'no-await-in-loop': 'off',
-            'import/no-unassigned-import': 'off',
+            'import-x/no-unassigned-import': 'off',
         }),
     },
 ] satisfies FlatConfig[];
@@ -818,9 +818,36 @@ For large projects, consider:
 - Running ESLint with `--cache` flag
 - Limiting the scope of type-aware rules
 
+#### 4. How to Use import-x/no-unused-modules
+
+[`import-x/no-unused-modules`](https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-unused-modules.md) reports exported values that are never imported anywhere else. The rule still relies on ESLint’s classic configuration loader to discover ignore patterns, so a flat-config-only setup is not enough. For this to work, you need to place a `.eslintrc.cjs` file along with `eslint.config.mts`.
+
+```cjs
+// .eslintrc.cjs
+module.exports = {
+    ignorePatterns: ['**/node_modules/**', 'dist', '.eslintrc.cjs'],
+};
+```
+
+The flat config then enables the rule for our source tree and marks the public federation module as an allowed unused export:
+
+```ts
+// eslint.config.mts (excerpt)
+{
+  files: ['src/**'],
+  rules: defineKnownRules({
+    'import-x/no-unused-modules': [
+      'error',
+      { unusedExports: true, ignoreExports: ['src/entry-point.mts'] },
+    ],
+  }),
+},
+```
+
+With this configuration, you can run eslint and receive actionable diagnostic information when exports are no longer referenced. If you implement a library, add the file paths that define the variables, types, etc. that your library exports to the `ignoreExports` array so that the rule does not flag intentionally re-exported surfaces.
+
 ### Known Limitations
 
-- The `import/no-unused-modules` rule does not function properly with Native ESM
 - Some type-aware rules may have performance impacts on very large codebases
 - Flat config requires ESLint 9.0+ and may not be compatible with older tools
 

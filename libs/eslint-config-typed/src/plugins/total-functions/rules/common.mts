@@ -21,7 +21,7 @@ export const typeSymbolName = (type: Type): string | undefined => {
   }
 };
 
-export type TypePair = Readonly<{
+type TypePair = Readonly<{
   destinationType: Type;
   sourceType: Type;
 }>;

@@ -34,7 +34,7 @@ export const typescriptEslintRules = {
   ],
   '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
   '@typescript-eslint/consistent-type-imports': [
-    // relates to import/consistent-type-specifier-style rule
+    // relates to import-x/consistent-type-specifier-style rule
     'error',
     {
       prefer: 'type-imports',

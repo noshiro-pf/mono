@@ -2,21 +2,20 @@ import { withDefaultOption, type EslintImportsRules } from '../types/index.mjs';
 
 export const eslintImportsRules = {
   // Not needed when using TypeScript.
-  'import/no-unresolved': 'off',
+  'import-x/no-unresolved': 'off',
 
-  'import/named': 'off',
-  'import/default': 'error',
-  'import/namespace': withDefaultOption('error'),
-  'import/no-restricted-paths': 'off', // TODO
-  'import/no-absolute-path': withDefaultOption('error'),
-  'import/no-dynamic-require': withDefaultOption('error'),
-  'import/no-internal-modules': [
+  'import-x/named': 'off',
+  'import-x/default': 'error',
+  'import-x/namespace': withDefaultOption('error'),
+  'import-x/no-restricted-paths': 'off', // TODO
+  'import-x/no-absolute-path': withDefaultOption('error'),
+  'import-x/no-dynamic-require': withDefaultOption('error'),
+  'import-x/no-internal-modules': [
     'error',
     {
       allow: [
-        '*/index.js',
-        '*/index.mjs',
-        '*/index.cjs',
+        '*/index.{js,mjs,cjs,ts,mts,cts,d.ts,d.mts,d.cts}',
+        './index.{js,mjs,cjs,ts,mts,cts,d.ts,d.mts,d.cts}',
         'rxjs/operators',
         'solid-js/web',
         '@testing-library/jest-dom/**',
@@ -27,7 +26,7 @@ export const eslintImportsRules = {
         'firebase-functions/**',
         '@blueprintjs/*',
         '@material-ui/**',
-        '@mui/material/**',
+        '@mui/material',
         '@fontsource/**',
         'resize-observer/lib/ResizeObserverEntry',
         'vitest/config',
@@ -35,46 +34,45 @@ export const eslintImportsRules = {
       ],
     },
   ],
-  'import/no-webpack-loader-syntax': 'error',
-  'import/no-self-import': 'error',
-  'import/no-cycle': withDefaultOption('error'),
-  'import/no-useless-path-segments': withDefaultOption('error'),
-  'import/no-relative-parent-imports': 'off',
+  'import-x/no-webpack-loader-syntax': 'error',
+  'import-x/no-self-import': 'error',
+  'import-x/no-cycle': withDefaultOption('error'),
+  'import-x/no-useless-path-segments': withDefaultOption('error'),
+  'import-x/no-relative-parent-imports': 'off',
 
   // relates to @typescript-eslint/consistent-type-imports rule
-  'import/consistent-type-specifier-style': ['error', 'prefer-inline'],
+  'import-x/consistent-type-specifier-style': ['error', 'prefer-inline'],
 
-  'import/no-relative-packages': withDefaultOption('error'),
+  'import-x/no-relative-packages': withDefaultOption('error'),
 
   // helpfulWarnings
-  'import/export': 'error',
-  'import/no-named-as-default': 'error',
-  'import/no-named-as-default-member': 'error',
+  'import-x/export': 'error',
+  'import-x/no-named-as-default': 'error',
+  'import-x/no-named-as-default-member': 'error',
 
-  // prefer @typescript-eslint/no-deprecated
-  // https://github.com/import-js/eslint-plugin-import/issues/1532
-  'import/no-deprecated': 'off',
+  // prefer @typescript-eslint/no-deprecated (raised in import-js/eslint-plugin-import#1532)
+  'import-x/no-deprecated': 'off',
 
-  'import/no-extraneous-dependencies': 'off',
-  'import/no-mutable-exports': 'error',
+  'import-x/no-extraneous-dependencies': 'off',
+  'import-x/no-mutable-exports': 'error',
 
   // TODO: https://github.com/noshiro-pf/eslint-config-typed/issues/98
-  // 'import/no-unused-modules': ['error', { unusedExports: true }],
-  'import/no-unused-modules': 'off',
+  // 'import-x/no-unused-modules': ['error', { unusedExports: true }],
+  'import-x/no-unused-modules': 'off',
 
   // moduleSystems
-  'import/unambiguous': 'error',
-  'import/no-commonjs': 'off',
-  'import/no-amd': 'error',
-  'import/no-nodejs-modules': 'off',
-  'import/no-import-module-exports': 'off',
+  'import-x/unambiguous': 'error',
+  'import-x/no-commonjs': 'off',
+  'import-x/no-amd': 'error',
+  'import-x/no-nodejs-modules': 'off',
+  'import-x/no-import-module-exports': 'off',
 
   // styleGuide
-  'import/first': ['error', 'absolute-first'],
-  'import/exports-last': 'off',
-  'import/no-duplicates': withDefaultOption('error'),
-  'import/no-namespace': 'off',
-  'import/extensions': [
+  'import-x/first': ['error', 'absolute-first'],
+  'import-x/exports-last': 'off',
+  'import-x/no-duplicates': withDefaultOption('error'),
+  'import-x/no-namespace': 'off',
+  'import-x/extensions': [
     'error',
     'never',
     {
@@ -82,8 +80,8 @@ export const eslintImportsRules = {
     },
   ],
 
-  'import/order': 'off',
-  // 'import/order': [
+  'import-x/order': 'off',
+  // 'import-x/order': [
   //   'error',
   //   {
   //     groups: [], // using prettier-plugin-organize-imports
@@ -91,16 +89,16 @@ export const eslintImportsRules = {
   //   },
   // ],
 
-  'import/newline-after-import': [
+  'import-x/newline-after-import': [
     'error',
     {
       considerComments: true,
       count: 1,
     },
   ],
-  'import/prefer-default-export': 'off',
-  'import/max-dependencies': 'off',
-  'import/no-unassigned-import': [
+  'import-x/prefer-default-export': 'off',
+  'import-x/max-dependencies': 'off',
+  'import-x/no-unassigned-import': [
     'error',
     {
       allow: [
@@ -111,21 +109,26 @@ export const eslintImportsRules = {
       ],
     },
   ],
-  'import/no-named-default': 'off',
+  'import-x/no-named-default': 'off',
 
   /**
    * Prohibit default exports as renaming on the definition side is not
    * reflected on the import side
    */
-  'import/no-default-export': 'error',
+  'import-x/no-default-export': 'error',
 
-  'import/no-named-export': 'off',
-  'import/no-anonymous-default-export': withDefaultOption('error'),
-  'import/group-exports': 'off',
-  'import/dynamic-import-chunkname': withDefaultOption('error'),
-  'import/no-empty-named-blocks': 'error',
-  'import/enforce-node-protocol-usage': ['error', 'always'],
+  'import-x/no-named-export': 'off',
+  'import-x/no-anonymous-default-export': withDefaultOption('error'),
+  'import-x/group-exports': 'off',
+  'import-x/dynamic-import-chunkname': withDefaultOption('error'),
+  'import-x/no-empty-named-blocks': 'error',
+
+  // Covered by unicorn/prefer-node-protocol
+  // 'import-x/enforce-node-protocol-usage': ['error', 'always'],
+
+  'import-x/no-rename-default': withDefaultOption('error'),
+  'import-x/prefer-namespace-import': ['error', { patterns: ['react'] }],
 
   // deprecated rules
-  'import/imports-first': 0,
+  'import-x/imports-first': 0,
 } as const satisfies EslintImportsRules;

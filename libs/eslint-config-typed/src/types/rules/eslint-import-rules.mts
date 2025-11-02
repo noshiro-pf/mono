@@ -10,7 +10,7 @@ type SpreadOptionsIfIsArray<
 /**
  * Ensure imports point to a file/module that can be resolved.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-unresolved.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-unresolved.md
  *
  *  ```md
  *  | key        | value   |
@@ -50,8 +50,7 @@ namespace NoUnresolved {
    *         "default": true
    *       },
    *       "caseSensitiveStrict": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -78,7 +77,7 @@ namespace NoUnresolved {
 /**
  * Ensure named imports correspond to a named export in the remote file.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/named.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/named.md
  *
  *  ```md
  *  | key        | value   |
@@ -118,7 +117,7 @@ namespace Named {
 /**
  * Ensure a default export is present, given a default import.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/default.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/default.md
  *
  *  ```md
  *  | key        | value   |
@@ -135,7 +134,7 @@ namespace Default {
  * Ensure imported namespaces contain dereferenced properties as they are
  * dereferenced.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/namespace.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/namespace.md
  *
  *  ```md
  *  | key        | value   |
@@ -181,7 +180,7 @@ namespace Namespace {
 /**
  * Forbid namespace (a.k.a. "wildcard" `*`) imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-namespace.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-namespace.md
  *
  *  ```md
  *  | key        | value      |
@@ -226,7 +225,7 @@ namespace NoNamespace {
 /**
  * Forbid any invalid exports, i.e. re-export of the same name.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/export.md
  *
  *  ```md
  *  | key        | value   |
@@ -242,7 +241,7 @@ namespace Export {
 /**
  * Forbid the use of mutable exports with `var` or `let`.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-mutable-exports.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-mutable-exports.md
  *
  *  ```md
  *  | key        | value      |
@@ -258,13 +257,15 @@ namespace NoMutableExports {
 /**
  * Ensure consistent use of file extension within the import path.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/extensions.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/extensions.md
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace Extensions {
@@ -278,6 +279,7 @@ namespace Extensions {
    *       "type": "array",
    *       "items": [
    *         {
+   *           "type": "string",
    *           "enum": ["always", "ignorePackages", "never"]
    *         }
    *       ],
@@ -287,6 +289,7 @@ namespace Extensions {
    *       "type": "array",
    *       "items": [
    *         {
+   *           "type": "string",
    *           "enum": ["always", "ignorePackages", "never"]
    *         },
    *         {
@@ -296,14 +299,15 @@ namespace Extensions {
    *               "type": "object",
    *               "patternProperties": {
    *                 ".*": {
+   *                   "type": "string",
    *                   "enum": ["always", "ignorePackages", "never"]
    *                 }
    *               }
    *             },
-   *             "checkTypeImports": {
+   *             "ignorePackages": {
    *               "type": "boolean"
    *             },
-   *             "ignorePackages": {
+   *             "checkTypeImports": {
    *               "type": "boolean"
    *             },
    *             "pathGroupOverrides": {
@@ -325,6 +329,9 @@ namespace Extensions {
    *                 "additionalProperties": false,
    *                 "required": ["pattern", "action"]
    *               }
+   *             },
+   *             "fix": {
+   *               "type": "boolean"
    *             }
    *           }
    *         }
@@ -341,14 +348,15 @@ namespace Extensions {
    *               "type": "object",
    *               "patternProperties": {
    *                 ".*": {
+   *                   "type": "string",
    *                   "enum": ["always", "ignorePackages", "never"]
    *                 }
    *               }
    *             },
-   *             "checkTypeImports": {
+   *             "ignorePackages": {
    *               "type": "boolean"
    *             },
-   *             "ignorePackages": {
+   *             "checkTypeImports": {
    *               "type": "boolean"
    *             },
    *             "pathGroupOverrides": {
@@ -370,6 +378,9 @@ namespace Extensions {
    *                 "additionalProperties": false,
    *                 "required": ["pattern", "action"]
    *               }
+   *             },
+   *             "fix": {
+   *               "type": "boolean"
    *             }
    *           }
    *         }
@@ -380,9 +391,14 @@ namespace Extensions {
    *       "type": "array",
    *       "items": [
    *         {
+   *           "type": "string",
+   *           "enum": ["always", "ignorePackages", "never"]
+   *         },
+   *         {
    *           "type": "object",
    *           "patternProperties": {
    *             ".*": {
+   *               "type": "string",
    *               "enum": ["always", "ignorePackages", "never"]
    *             }
    *           }
@@ -394,12 +410,10 @@ namespace Extensions {
    *       "type": "array",
    *       "items": [
    *         {
-   *           "enum": ["always", "ignorePackages", "never"]
-   *         },
-   *         {
    *           "type": "object",
    *           "patternProperties": {
    *             ".*": {
+   *               "type": "string",
    *               "enum": ["always", "ignorePackages", "never"]
    *             }
    *           }
@@ -419,13 +433,14 @@ namespace Extensions {
             string,
             'always' | 'ignorePackages' | 'never'
           >;
-          readonly checkTypeImports?: boolean;
           readonly ignorePackages?: boolean;
+          readonly checkTypeImports?: boolean;
           readonly pathGroupOverrides?: readonly {
             readonly pattern: string;
             readonly patternOptions?: UnknownRecord;
             readonly action: 'enforce' | 'ignore';
           }[];
+          readonly fix?: boolean;
           readonly [k: string]: unknown;
         },
       ]
@@ -439,13 +454,14 @@ namespace Extensions {
             string,
             'always' | 'ignorePackages' | 'never'
           >;
-          readonly checkTypeImports?: boolean;
           readonly ignorePackages?: boolean;
+          readonly checkTypeImports?: boolean;
           readonly pathGroupOverrides?: readonly {
             readonly pattern: string;
             readonly patternOptions?: UnknownRecord;
             readonly action: 'enforce' | 'ignore';
           }[];
+          readonly fix?: boolean;
           readonly [k: string]: unknown;
         },
       ]
@@ -462,7 +478,7 @@ namespace Extensions {
 /**
  * Enforce which files can be imported in a given folder.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-restricted-paths.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-restricted-paths.md
  *
  *  ```md
  *  | key        | value   |
@@ -497,7 +513,7 @@ namespace NoRestrictedPaths {
    *                     "type": "string"
    *                   },
    *                   "uniqueItems": true,
-   *                   "minLength": 1
+   *                   "minItems": 1
    *                 }
    *               ]
    *             },
@@ -512,7 +528,7 @@ namespace NoRestrictedPaths {
    *                     "type": "string"
    *                   },
    *                   "uniqueItems": true,
-   *                   "minLength": 1
+   *                   "minItems": 1
    *                 }
    *               ]
    *             },
@@ -543,14 +559,14 @@ namespace NoRestrictedPaths {
     /** @minItems 1 */
     readonly zones?: readonly [
       {
-        readonly target?: string | readonly string[];
-        readonly from?: string | readonly string[];
+        readonly target?: string | readonly [string, ...(readonly string[])];
+        readonly from?: string | readonly [string, ...(readonly string[])];
         readonly except?: readonly string[];
         readonly message?: string;
       },
       ...(readonly {
-        readonly target?: string | readonly string[];
-        readonly from?: string | readonly string[];
+        readonly target?: string | readonly [string, ...(readonly string[])];
+        readonly from?: string | readonly [string, ...(readonly string[])];
         readonly except?: readonly string[];
         readonly message?: string;
       }[]),
@@ -567,7 +583,7 @@ namespace NoRestrictedPaths {
 /**
  * Forbid importing the submodules of other modules.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-internal-modules.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-internal-modules.md
  *
  *  ```md
  *  | key        | value      |
@@ -628,9 +644,9 @@ namespace NoInternalModules {
 }
 
 /**
- * Prefer named exports to be grouped together in a single export declaration
+ * Prefer named exports to be grouped together in a single export declaration.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/group-exports.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/group-exports.md
  *
  *  ```md
  *  | key        | value      |
@@ -646,7 +662,7 @@ namespace GroupExports {
 /**
  * Forbid importing packages through relative paths.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-relative-packages.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-relative-packages.md
  *
  *  ```md
  *  | key        | value      |
@@ -705,7 +721,7 @@ namespace NoRelativePackages {
 /**
  * Forbid importing modules from parent directories.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-relative-parent-imports.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-relative-parent-imports.md
  *
  *  ```md
  *  | key        | value      |
@@ -763,7 +779,7 @@ namespace NoRelativeParentImports {
 /**
  * Enforce or ban the use of inline type-only markers for named imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/consistent-type-specifier-style.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/consistent-type-specifier-style.md
  *
  *  ```md
  *  | key        | value      |
@@ -782,10 +798,10 @@ namespace ConsistentTypeSpecifierStyle {
    *   {
    *     "type": "string",
    *     "enum": [
-   *       "prefer-inline",
-   *       "prefer-top-level"
+   *       "prefer-top-level",
+   *       "prefer-inline"
    *     ],
-   *     "default": "prefer-inline"
+   *     "default": "prefer-top-level"
    *   }
    * ]
    * ```
@@ -801,7 +817,7 @@ namespace ConsistentTypeSpecifierStyle {
 /**
  * Forbid a module from importing itself.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-self-import.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-self-import.md
  *
  *  ```md
  *  | key         | value   |
@@ -819,7 +835,7 @@ namespace NoSelfImport {
  * Forbid a module from importing a module with a dependency path back to
  * itself.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-cycle.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-cycle.md
  *
  *  ```md
  *  | key        | value      |
@@ -878,11 +894,6 @@ namespace NoCycle {
    *         "description": "Allow cyclic dependency if there is at least one dynamic import in the chain",
    *         "type": "boolean",
    *         "default": false
-   *       },
-   *       "disableScc": {
-   *         "description": "When true, don't calculate a strongly-connected-components graph. SCC is used to reduce the time-complexity of cycle detection, but adds overhead.",
-   *         "type": "boolean",
-   *         "default": false
    *       }
    *     },
    *     "additionalProperties": false
@@ -904,12 +915,6 @@ namespace NoCycle {
      * chain
      */
     readonly allowUnsafeDynamicCyclicDependency?: boolean;
-    /**
-     * When true, don't calculate a strongly-connected-components graph. SCC is
-     * used to reduce the time-complexity of cycle detection, but adds
-     * overhead.
-     */
-    readonly disableScc?: boolean;
   };
 
   export type RuleEntry =
@@ -921,7 +926,7 @@ namespace NoCycle {
 /**
  * Forbid named default exports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-named-default.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-named-default.md
  *
  *  ```md
  *  | key        | value      |
@@ -937,7 +942,7 @@ namespace NoNamedDefault {
 /**
  * Forbid use of exported name as identifier of default export.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-named-as-default.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-named-as-default.md
  *
  *  ```md
  *  | key        | value   |
@@ -953,7 +958,7 @@ namespace NoNamedAsDefault {
 /**
  * Forbid use of exported name as property of default export.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-named-as-default-member.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-named-as-default-member.md
  *
  *  ```md
  *  | key        | value      |
@@ -969,7 +974,7 @@ namespace NoNamedAsDefaultMember {
 /**
  * Forbid anonymous values as default exports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-anonymous-default-export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-anonymous-default-export.md
  *
  *  ```md
  *  | key        | value      |
@@ -1051,10 +1056,56 @@ namespace NoAnonymousDefaultExport {
 }
 
 /**
+ * Forbid importing a default export by a different name.
+ *
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-rename-default.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace NoRenameDefault {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "commonjs": {
+   *         "default": false,
+   *         "type": "boolean"
+   *       },
+   *       "preventRenamingBindings": {
+   *         "default": true,
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly commonjs?: boolean;
+    readonly preventRenamingBindings?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
+}
+
+/**
  * Forbid modules without exports, or exports without matching import in another
  * module.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-unused-modules.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-unused-modules.md
  *
  *  ```md
  *  | key        | value      |
@@ -1070,6 +1121,7 @@ namespace NoUnusedModules {
    * ```json
    * [
    *   {
+   *     "type": "object",
    *     "properties": {
    *       "src": {
    *         "description": "files/paths to be analyzed (only for unused exports)",
@@ -1104,13 +1156,16 @@ namespace NoUnusedModules {
    *     },
    *     "anyOf": [
    *       {
+   *         "type": "object",
    *         "properties": {
    *           "unusedExports": {
+   *             "type": "boolean",
    *             "enum": [
    *               true
    *             ]
    *           },
    *           "src": {
+   *             "type": "array",
    *             "minItems": 1
    *           }
    *         },
@@ -1119,8 +1174,10 @@ namespace NoUnusedModules {
    *         ]
    *       },
    *       {
+   *         "type": "object",
    *         "properties": {
    *           "missingExports": {
+   *             "type": "boolean",
    *             "enum": [
    *               true
    *             ]
@@ -1157,7 +1214,8 @@ namespace NoUnusedModules {
       }
     | {
         readonly unusedExports: true;
-        readonly src?: UnknownRecord;
+        /** @minItems 1 */
+        readonly src?: readonly [unknown, ...(readonly unknown[])];
         readonly [k: string]: unknown;
       }
   );
@@ -1171,7 +1229,7 @@ namespace NoUnusedModules {
 /**
  * Forbid CommonJS `require` calls and `module.exports` or `exports.*`.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-commonjs.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-commonjs.md
  *
  *  ```md
  *  | key        | value      |
@@ -1191,6 +1249,7 @@ namespace NoCommonjs {
    *       "type": "array",
    *       "items": [
    *         {
+   *           "type": "string",
    *           "enum": ["allow-primitive-modules"]
    *         }
    *       ],
@@ -1241,7 +1300,7 @@ namespace NoCommonjs {
 /**
  * Forbid AMD `require` and `define` calls.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-amd.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-amd.md
  *
  *  ```md
  *  | key        | value      |
@@ -1257,7 +1316,7 @@ namespace NoAmd {
 /**
  * Forbid repeated import of the same module in multiple places.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-duplicates.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-duplicates.md
  *
  *  ```md
  *  | key        | value   |
@@ -1302,7 +1361,7 @@ namespace NoDuplicates {
 /**
  * Ensure all imports appear before other statements.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/first.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/first.md
  *
  *  ```md
  *  | key        | value      |
@@ -1339,7 +1398,7 @@ namespace First {
 /**
  * Enforce the maximum number of dependencies a module can have.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/max-dependencies.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/max-dependencies.md
  *
  *  ```md
  *  | key        | value      |
@@ -1383,7 +1442,7 @@ namespace MaxDependencies {
 /**
  * Forbid the use of extraneous packages.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-extraneous-dependencies.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-extraneous-dependencies.md
  *
  *  ```md
  *  | key        | value   |
@@ -1440,6 +1499,11 @@ namespace NoExtraneousDependencies {
    *         "type": [
    *           "boolean"
    *         ]
+   *       },
+   *       "whitelist": {
+   *         "type": [
+   *           "array"
+   *         ]
    *       }
    *     },
    *     "additionalProperties": false
@@ -1455,6 +1519,7 @@ namespace NoExtraneousDependencies {
     readonly packageDir?: string | readonly unknown[];
     readonly includeInternal?: boolean;
     readonly includeTypes?: boolean;
+    readonly whitelist?: readonly unknown[];
   };
 
   export type RuleEntry =
@@ -1466,7 +1531,7 @@ namespace NoExtraneousDependencies {
 /**
  * Forbid import of modules using absolute paths.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-absolute-path.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-absolute-path.md
  *
  *  ```md
  *  | key        | value      |
@@ -1525,7 +1590,7 @@ namespace NoAbsolutePath {
 /**
  * Forbid Node.js builtin modules.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-nodejs-modules.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-nodejs-modules.md
  *
  *  ```md
  *  | key        | value      |
@@ -1569,7 +1634,7 @@ namespace NoNodejsModules {
 /**
  * Forbid webpack loader syntax in imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-webpack-loader-syntax.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-webpack-loader-syntax.md
  *
  *  ```md
  *  | key        | value   |
@@ -1585,7 +1650,7 @@ namespace NoWebpackLoaderSyntax {
 /**
  * Enforce a convention in module import order.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/order.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/order.md
  *
  *  ```md
  *  | key        | value      |
@@ -1605,42 +1670,7 @@ namespace Order {
    *     "type": "object",
    *     "properties": {
    *       "groups": {
-   *         "type": "array",
-   *         "uniqueItems": true,
-   *         "items": {
-   *           "oneOf": [
-   *             {
-   *               "enum": [
-   *                 "builtin",
-   *                 "external",
-   *                 "internal",
-   *                 "unknown",
-   *                 "parent",
-   *                 "sibling",
-   *                 "index",
-   *                 "object",
-   *                 "type"
-   *               ]
-   *             },
-   *             {
-   *               "type": "array",
-   *               "uniqueItems": true,
-   *               "items": {
-   *                 "enum": [
-   *                   "builtin",
-   *                   "external",
-   *                   "internal",
-   *                   "unknown",
-   *                   "parent",
-   *                   "sibling",
-   *                   "index",
-   *                   "object",
-   *                   "type"
-   *                 ]
-   *               }
-   *             }
-   *           ]
-   *         }
+   *         "type": "array"
    *       },
    *       "pathGroupsExcludedImportTypes": {
    *         "type": "array"
@@ -1690,6 +1720,7 @@ namespace Order {
    *         }
    *       },
    *       "newlines-between": {
+   *         "type": "string",
    *         "enum": [
    *           "ignore",
    *           "always",
@@ -1698,6 +1729,7 @@ namespace Order {
    *         ]
    *       },
    *       "newlines-between-types": {
+   *         "type": "string",
    *         "enum": [
    *           "ignore",
    *           "always",
@@ -1706,6 +1738,7 @@ namespace Order {
    *         ]
    *       },
    *       "consolidateIslands": {
+   *         "type": "string",
    *         "enum": [
    *           "inside-groups",
    *           "never"
@@ -1760,6 +1793,7 @@ namespace Order {
    *             "default": false
    *           },
    *           "order": {
+   *             "type": "string",
    *             "enum": [
    *               "ignore",
    *               "asc",
@@ -1768,6 +1802,7 @@ namespace Order {
    *             "default": "ignore"
    *           },
    *           "orderImportKind": {
+   *             "type": "string",
    *             "enum": [
    *               "ignore",
    *               "asc",
@@ -1785,72 +1820,11 @@ namespace Order {
    *     },
    *     "additionalProperties": false,
    *     "dependencies": {
-   *       "sortTypesGroup": {
-   *         "oneOf": [
-   *           {
-   *             "properties": {
-   *               "sortTypesGroup": {
-   *                 "enum": [
-   *                   true
-   *                 ]
-   *               },
-   *               "groups": {
-   *                 "not": {
-   *                   "type": "array",
-   *                   "uniqueItems": true,
-   *                   "items": {
-   *                     "oneOf": [
-   *                       {
-   *                         "enum": [
-   *                           "builtin",
-   *                           "external",
-   *                           "internal",
-   *                           "unknown",
-   *                           "parent",
-   *                           "sibling",
-   *                           "index",
-   *                           "object"
-   *                         ]
-   *                       },
-   *                       {
-   *                         "type": "array",
-   *                         "uniqueItems": true,
-   *                         "items": {
-   *                           "enum": [
-   *                             "builtin",
-   *                             "external",
-   *                             "internal",
-   *                             "unknown",
-   *                             "parent",
-   *                             "sibling",
-   *                             "index",
-   *                             "object"
-   *                           ]
-   *                         }
-   *                       }
-   *                     ]
-   *                   }
-   *                 }
-   *               }
-   *             },
-   *             "required": [
-   *               "groups"
-   *             ]
-   *           },
-   *           {
-   *             "properties": {
-   *               "sortTypesGroup": {
-   *                 "enum": [
-   *                   false
-   *                 ]
-   *               }
-   *             }
-   *           }
-   *         ]
-   *       },
    *       "newlines-between-types": {
+   *         "type": "object",
    *         "properties": {
    *           "sortTypesGroup": {
+   *             "type": "boolean",
    *             "enum": [
    *               true
    *             ]
@@ -1861,50 +1835,34 @@ namespace Order {
    *         ]
    *       },
    *       "consolidateIslands": {
-   *         "oneOf": [
+   *         "anyOf": [
    *           {
+   *             "type": "object",
    *             "properties": {
-   *               "consolidateIslands": {
+   *               "newlines-between": {
+   *                 "type": "string",
    *                 "enum": [
-   *                   "inside-groups"
+   *                   "always-and-inside-groups"
    *                 ]
    *               }
    *             },
-   *             "anyOf": [
-   *               {
-   *                 "properties": {
-   *                   "newlines-between": {
-   *                     "enum": [
-   *                       "always-and-inside-groups"
-   *                     ]
-   *                   }
-   *                 },
-   *                 "required": [
-   *                   "newlines-between"
-   *                 ]
-   *               },
-   *               {
-   *                 "properties": {
-   *                   "newlines-between-types": {
-   *                     "enum": [
-   *                       "always-and-inside-groups"
-   *                     ]
-   *                   }
-   *                 },
-   *                 "required": [
-   *                   "newlines-between-types"
-   *                 ]
-   *               }
+   *             "required": [
+   *               "newlines-between"
    *             ]
    *           },
    *           {
+   *             "type": "object",
    *             "properties": {
-   *               "consolidateIslands": {
+   *               "newlines-between-types": {
+   *                 "type": "string",
    *                 "enum": [
-   *                   "never"
+   *                   "always-and-inside-groups"
    *                 ]
    *               }
-   *             }
+   *             },
+   *             "required": [
+   *               "newlines-between-types"
+   *             ]
    *           }
    *         ]
    *       }
@@ -1914,28 +1872,7 @@ namespace Order {
    * ```
    */
   export type Options = {
-    readonly groups?: readonly (
-      | readonly (
-          | 'builtin'
-          | 'external'
-          | 'index'
-          | 'internal'
-          | 'object'
-          | 'parent'
-          | 'sibling'
-          | 'type'
-          | 'unknown'
-        )[]
-      | 'builtin'
-      | 'external'
-      | 'index'
-      | 'internal'
-      | 'object'
-      | 'parent'
-      | 'sibling'
-      | 'type'
-      | 'unknown'
-    )[];
+    readonly groups?: readonly unknown[];
     readonly pathGroupsExcludedImportTypes?: readonly unknown[];
     readonly distinctGroup?: boolean;
     readonly pathGroups?: readonly {
@@ -1992,7 +1929,7 @@ namespace Order {
 /**
  * Enforce a newline after import statements.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/newline-after-import.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/newline-after-import.md
  *
  *  ```md
  *  | key        | value      |
@@ -2042,7 +1979,7 @@ namespace NewlineAfterImport {
 /**
  * Prefer a default export if module exports a single name or multiple names.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/prefer-default-export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/prefer-default-export.md
  *
  *  ```md
  *  | key        | value      |
@@ -2085,9 +2022,55 @@ namespace PreferDefaultExport {
 }
 
 /**
+ * Enforce using namespace imports for specific modules, like
+ * `react`/`react-dom`, etc.
+ *
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/prefer-namespace-import.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace PreferNamespaceImport {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "patterns": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "uniqueItems": true
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    readonly patterns?: readonly string[];
+  };
+
+  export type RuleEntry =
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
+}
+
+/**
  * Forbid default exports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-default-export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-default-export.md
  *
  *  ```md
  *  | key        | value      |
@@ -2103,7 +2086,7 @@ namespace NoDefaultExport {
 /**
  * Forbid named exports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-named-export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-named-export.md
  *
  *  ```md
  *  | key        | value      |
@@ -2119,7 +2102,7 @@ namespace NoNamedExport {
 /**
  * Forbid `require()` calls with expressions.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-dynamic-require.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-dynamic-require.md
  *
  *  ```md
  *  | key        | value      |
@@ -2159,7 +2142,7 @@ namespace NoDynamicRequire {
 /**
  * Forbid potentially ambiguous parse goal (`script` vs. `module`).
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/unambiguous.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/unambiguous.md
  *
  *  ```md
  *  | key        | value      |
@@ -2173,9 +2156,9 @@ namespace Unambiguous {
 }
 
 /**
- * Forbid unassigned imports
+ * Forbid unassigned imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-unassigned-import.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-unassigned-import.md
  *
  *  ```md
  *  | key        | value      |
@@ -2239,7 +2222,7 @@ namespace NoUnassignedImport {
 /**
  * Forbid unnecessary path segments in import and require statements.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-useless-path-segments.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-useless-path-segments.md
  *
  *  ```md
  *  | key        | value      |
@@ -2284,7 +2267,7 @@ namespace NoUselessPathSegments {
 /**
  * Enforce a leading comment with the webpackChunkName for dynamic imports.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/dynamic-import-chunkname.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/dynamic-import-chunkname.md
  *
  *  ```md
  *  | key            | value      |
@@ -2337,14 +2320,16 @@ namespace DynamicImportChunkname {
 /**
  * Forbid import statements with CommonJS module.exports.
  *
- * ```md
- * | key         | value   |
- * | :---------- | :------ |
- * | type        | problem |
- * | deprecated  | false   |
- * | fixable     | code    |
- * | recommended | true    |
- * ```
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-import-module-exports.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
+ *  ```
  */
 namespace NoImportModuleExports {
   /**
@@ -2377,7 +2362,7 @@ namespace NoImportModuleExports {
 /**
  * Forbid empty named import blocks.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-empty-named-blocks.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-empty-named-blocks.md
  *
  *  ```md
  *  | key            | value      |
@@ -2393,53 +2378,9 @@ namespace NoEmptyNamedBlocks {
 }
 
 /**
- * Enforce either using, or omitting, the `node:` protocol when importing
- * Node.js builtin modules.
- *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/enforce-node-protocol-usage.md
- *
- *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | false      |
- *  | fixable     | code       |
- *  | recommended | true       |
- *  ```
- */
-namespace EnforceNodeProtocolUsage {
-  /**
-   * ### schema
-   *
-   * ```json
-   * {
-   *   "type": "array",
-   *   "minItems": 1,
-   *   "maxItems": 1,
-   *   "items": [
-   *     {
-   *       "enum": ["always", "never"]
-   *     }
-   *   ]
-   * }
-   * ```
-   */
-  /**
-   * @minItems 1
-   * @maxItems 1
-   */
-  export type Options = readonly ['always' | 'never'];
-
-  export type RuleEntry =
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
-}
-
-/**
  * Ensure all exports appear after other statements.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/exports-last.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/exports-last.md
  *
  *  ```md
  *  | key        | value      |
@@ -2455,7 +2396,7 @@ namespace ExportsLast {
 /**
  * Forbid imported names marked with `@deprecated` documentation tag.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/v2.32.0/docs/rules/no-deprecated.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-deprecated.md
  *
  *  ```md
  *  | key        | value      |
@@ -2469,9 +2410,9 @@ namespace NoDeprecated {
 }
 
 /**
- * Replaced by `import/first`.
+ * Replaced by `import-x/first`.
  *
- * @link https://github.com/import-js/eslint-plugin-import/blob/7b25c1cb95ee18acc1531002fd343e1e6031f9ed/docs/rules/imports-first.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/imports-first.md
  *
  *  ```md
  *  | key        | value      |
@@ -2501,84 +2442,86 @@ namespace ImportsFirst {
 }
 
 export type EslintImportsRules = {
-  readonly 'import/no-unresolved': NoUnresolved.RuleEntry;
-  readonly 'import/named': Named.RuleEntry;
-  readonly 'import/default': Default.RuleEntry;
-  readonly 'import/namespace': Namespace.RuleEntry;
-  readonly 'import/no-namespace': NoNamespace.RuleEntry;
-  readonly 'import/export': Export.RuleEntry;
-  readonly 'import/no-mutable-exports': NoMutableExports.RuleEntry;
-  readonly 'import/extensions': Extensions.RuleEntry;
-  readonly 'import/no-restricted-paths': NoRestrictedPaths.RuleEntry;
-  readonly 'import/no-internal-modules': NoInternalModules.RuleEntry;
-  readonly 'import/group-exports': GroupExports.RuleEntry;
-  readonly 'import/no-relative-packages': NoRelativePackages.RuleEntry;
-  readonly 'import/no-relative-parent-imports': NoRelativeParentImports.RuleEntry;
-  readonly 'import/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.RuleEntry;
-  readonly 'import/no-self-import': NoSelfImport.RuleEntry;
-  readonly 'import/no-cycle': NoCycle.RuleEntry;
-  readonly 'import/no-named-default': NoNamedDefault.RuleEntry;
-  readonly 'import/no-named-as-default': NoNamedAsDefault.RuleEntry;
-  readonly 'import/no-named-as-default-member': NoNamedAsDefaultMember.RuleEntry;
-  readonly 'import/no-anonymous-default-export': NoAnonymousDefaultExport.RuleEntry;
-  readonly 'import/no-unused-modules': NoUnusedModules.RuleEntry;
-  readonly 'import/no-commonjs': NoCommonjs.RuleEntry;
-  readonly 'import/no-amd': NoAmd.RuleEntry;
-  readonly 'import/no-duplicates': NoDuplicates.RuleEntry;
-  readonly 'import/first': First.RuleEntry;
-  readonly 'import/max-dependencies': MaxDependencies.RuleEntry;
-  readonly 'import/no-extraneous-dependencies': NoExtraneousDependencies.RuleEntry;
-  readonly 'import/no-absolute-path': NoAbsolutePath.RuleEntry;
-  readonly 'import/no-nodejs-modules': NoNodejsModules.RuleEntry;
-  readonly 'import/no-webpack-loader-syntax': NoWebpackLoaderSyntax.RuleEntry;
-  readonly 'import/order': Order.RuleEntry;
-  readonly 'import/newline-after-import': NewlineAfterImport.RuleEntry;
-  readonly 'import/prefer-default-export': PreferDefaultExport.RuleEntry;
-  readonly 'import/no-default-export': NoDefaultExport.RuleEntry;
-  readonly 'import/no-named-export': NoNamedExport.RuleEntry;
-  readonly 'import/no-dynamic-require': NoDynamicRequire.RuleEntry;
-  readonly 'import/unambiguous': Unambiguous.RuleEntry;
-  readonly 'import/no-unassigned-import': NoUnassignedImport.RuleEntry;
-  readonly 'import/no-useless-path-segments': NoUselessPathSegments.RuleEntry;
-  readonly 'import/dynamic-import-chunkname': DynamicImportChunkname.RuleEntry;
-  readonly 'import/no-import-module-exports': NoImportModuleExports.RuleEntry;
-  readonly 'import/no-empty-named-blocks': NoEmptyNamedBlocks.RuleEntry;
-  readonly 'import/enforce-node-protocol-usage': EnforceNodeProtocolUsage.RuleEntry;
-  readonly 'import/exports-last': ExportsLast.RuleEntry;
-  readonly 'import/no-deprecated': NoDeprecated.RuleEntry;
+  readonly 'import-x/no-unresolved': NoUnresolved.RuleEntry;
+  readonly 'import-x/named': Named.RuleEntry;
+  readonly 'import-x/default': Default.RuleEntry;
+  readonly 'import-x/namespace': Namespace.RuleEntry;
+  readonly 'import-x/no-namespace': NoNamespace.RuleEntry;
+  readonly 'import-x/export': Export.RuleEntry;
+  readonly 'import-x/no-mutable-exports': NoMutableExports.RuleEntry;
+  readonly 'import-x/extensions': Extensions.RuleEntry;
+  readonly 'import-x/no-restricted-paths': NoRestrictedPaths.RuleEntry;
+  readonly 'import-x/no-internal-modules': NoInternalModules.RuleEntry;
+  readonly 'import-x/group-exports': GroupExports.RuleEntry;
+  readonly 'import-x/no-relative-packages': NoRelativePackages.RuleEntry;
+  readonly 'import-x/no-relative-parent-imports': NoRelativeParentImports.RuleEntry;
+  readonly 'import-x/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.RuleEntry;
+  readonly 'import-x/no-self-import': NoSelfImport.RuleEntry;
+  readonly 'import-x/no-cycle': NoCycle.RuleEntry;
+  readonly 'import-x/no-named-default': NoNamedDefault.RuleEntry;
+  readonly 'import-x/no-named-as-default': NoNamedAsDefault.RuleEntry;
+  readonly 'import-x/no-named-as-default-member': NoNamedAsDefaultMember.RuleEntry;
+  readonly 'import-x/no-anonymous-default-export': NoAnonymousDefaultExport.RuleEntry;
+  readonly 'import-x/no-rename-default': NoRenameDefault.RuleEntry;
+  readonly 'import-x/no-unused-modules': NoUnusedModules.RuleEntry;
+  readonly 'import-x/no-commonjs': NoCommonjs.RuleEntry;
+  readonly 'import-x/no-amd': NoAmd.RuleEntry;
+  readonly 'import-x/no-duplicates': NoDuplicates.RuleEntry;
+  readonly 'import-x/first': First.RuleEntry;
+  readonly 'import-x/max-dependencies': MaxDependencies.RuleEntry;
+  readonly 'import-x/no-extraneous-dependencies': NoExtraneousDependencies.RuleEntry;
+  readonly 'import-x/no-absolute-path': NoAbsolutePath.RuleEntry;
+  readonly 'import-x/no-nodejs-modules': NoNodejsModules.RuleEntry;
+  readonly 'import-x/no-webpack-loader-syntax': NoWebpackLoaderSyntax.RuleEntry;
+  readonly 'import-x/order': Order.RuleEntry;
+  readonly 'import-x/newline-after-import': NewlineAfterImport.RuleEntry;
+  readonly 'import-x/prefer-default-export': PreferDefaultExport.RuleEntry;
+  readonly 'import-x/prefer-namespace-import': PreferNamespaceImport.RuleEntry;
+  readonly 'import-x/no-default-export': NoDefaultExport.RuleEntry;
+  readonly 'import-x/no-named-export': NoNamedExport.RuleEntry;
+  readonly 'import-x/no-dynamic-require': NoDynamicRequire.RuleEntry;
+  readonly 'import-x/unambiguous': Unambiguous.RuleEntry;
+  readonly 'import-x/no-unassigned-import': NoUnassignedImport.RuleEntry;
+  readonly 'import-x/no-useless-path-segments': NoUselessPathSegments.RuleEntry;
+  readonly 'import-x/dynamic-import-chunkname': DynamicImportChunkname.RuleEntry;
+  readonly 'import-x/no-import-module-exports': NoImportModuleExports.RuleEntry;
+  readonly 'import-x/no-empty-named-blocks': NoEmptyNamedBlocks.RuleEntry;
+  readonly 'import-x/exports-last': ExportsLast.RuleEntry;
+  readonly 'import-x/no-deprecated': NoDeprecated.RuleEntry;
 
   // deprecated
-  readonly 'import/imports-first': ImportsFirst.RuleEntry;
+  readonly 'import-x/imports-first': ImportsFirst.RuleEntry;
 };
 
 export type EslintImportsRulesOption = {
-  readonly 'import/no-unresolved': NoUnresolved.Options;
-  readonly 'import/named': Named.Options;
-  readonly 'import/namespace': Namespace.Options;
-  readonly 'import/no-namespace': NoNamespace.Options;
-  readonly 'import/extensions': Extensions.Options;
-  readonly 'import/no-restricted-paths': NoRestrictedPaths.Options;
-  readonly 'import/no-internal-modules': NoInternalModules.Options;
-  readonly 'import/no-relative-packages': NoRelativePackages.Options;
-  readonly 'import/no-relative-parent-imports': NoRelativeParentImports.Options;
-  readonly 'import/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.Options;
-  readonly 'import/no-cycle': NoCycle.Options;
-  readonly 'import/no-anonymous-default-export': NoAnonymousDefaultExport.Options;
-  readonly 'import/no-unused-modules': NoUnusedModules.Options;
-  readonly 'import/no-commonjs': NoCommonjs.Options;
-  readonly 'import/no-duplicates': NoDuplicates.Options;
-  readonly 'import/first': First.Options;
-  readonly 'import/max-dependencies': MaxDependencies.Options;
-  readonly 'import/no-extraneous-dependencies': NoExtraneousDependencies.Options;
-  readonly 'import/no-absolute-path': NoAbsolutePath.Options;
-  readonly 'import/no-nodejs-modules': NoNodejsModules.Options;
-  readonly 'import/order': Order.Options;
-  readonly 'import/newline-after-import': NewlineAfterImport.Options;
-  readonly 'import/prefer-default-export': PreferDefaultExport.Options;
-  readonly 'import/no-dynamic-require': NoDynamicRequire.Options;
-  readonly 'import/no-unassigned-import': NoUnassignedImport.Options;
-  readonly 'import/no-useless-path-segments': NoUselessPathSegments.Options;
-  readonly 'import/dynamic-import-chunkname': DynamicImportChunkname.Options;
-  readonly 'import/no-import-module-exports': NoImportModuleExports.Options;
-  readonly 'import/enforce-node-protocol-usage': EnforceNodeProtocolUsage.Options;
+  readonly 'import-x/no-unresolved': NoUnresolved.Options;
+  readonly 'import-x/named': Named.Options;
+  readonly 'import-x/namespace': Namespace.Options;
+  readonly 'import-x/no-namespace': NoNamespace.Options;
+  readonly 'import-x/extensions': Extensions.Options;
+  readonly 'import-x/no-restricted-paths': NoRestrictedPaths.Options;
+  readonly 'import-x/no-internal-modules': NoInternalModules.Options;
+  readonly 'import-x/no-relative-packages': NoRelativePackages.Options;
+  readonly 'import-x/no-relative-parent-imports': NoRelativeParentImports.Options;
+  readonly 'import-x/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.Options;
+  readonly 'import-x/no-cycle': NoCycle.Options;
+  readonly 'import-x/no-anonymous-default-export': NoAnonymousDefaultExport.Options;
+  readonly 'import-x/no-rename-default': NoRenameDefault.Options;
+  readonly 'import-x/no-unused-modules': NoUnusedModules.Options;
+  readonly 'import-x/no-commonjs': NoCommonjs.Options;
+  readonly 'import-x/no-duplicates': NoDuplicates.Options;
+  readonly 'import-x/first': First.Options;
+  readonly 'import-x/max-dependencies': MaxDependencies.Options;
+  readonly 'import-x/no-extraneous-dependencies': NoExtraneousDependencies.Options;
+  readonly 'import-x/no-absolute-path': NoAbsolutePath.Options;
+  readonly 'import-x/no-nodejs-modules': NoNodejsModules.Options;
+  readonly 'import-x/order': Order.Options;
+  readonly 'import-x/newline-after-import': NewlineAfterImport.Options;
+  readonly 'import-x/prefer-default-export': PreferDefaultExport.Options;
+  readonly 'import-x/prefer-namespace-import': PreferNamespaceImport.Options;
+  readonly 'import-x/no-dynamic-require': NoDynamicRequire.Options;
+  readonly 'import-x/no-unassigned-import': NoUnassignedImport.Options;
+  readonly 'import-x/no-useless-path-segments': NoUselessPathSegments.Options;
+  readonly 'import-x/dynamic-import-chunkname': DynamicImportChunkname.Options;
+  readonly 'import-x/no-import-module-exports': NoImportModuleExports.Options;
 };

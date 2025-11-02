@@ -48,7 +48,7 @@ export const eslintConfigForTypeScriptWithoutRules = ({
       },
       plugins,
       settings: {
-        'import/parsers': {
+        'import-x/parsers': {
           '@typescript-eslint/parser': [
             '.test.ts',
             '.js',
@@ -61,7 +61,7 @@ export const eslintConfigForTypeScriptWithoutRules = ({
             '.tsx',
           ],
         },
-        'import/resolver': {
+        'import-x/resolver': {
           typescript: {
             alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
             // project: ['packages/**/tsconfig.json', 'config/tsconfig.json'],
@@ -83,7 +83,7 @@ export const eslintConfigForTypeScriptWithoutRules = ({
           },
         },
         // copied from default config
-        'import/extensions': [
+        'import-x/extensions': [
           '.js',
           '.ts',
           '.mjs',
@@ -93,7 +93,7 @@ export const eslintConfigForTypeScriptWithoutRules = ({
           '.jsx',
           '.tsx',
         ],
-        'import/external-module-folders': [
+        'import-x/external-module-folders': [
           'node_modules',
           'node_modules/@types',
         ],

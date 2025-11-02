@@ -51,7 +51,7 @@ export const eslintConfigForTypeScript = ({
 
         'strict-dependencies/strict-dependencies': ['error', []],
 
-        'import/no-extraneous-dependencies': [
+        'import-x/no-extraneous-dependencies': [
           'error',
           {
             packageDir: packageDirs,
@@ -70,14 +70,14 @@ export const eslintConfigForTypeScript = ({
       files: ['**/*.{js,jsx,mjs,cjs}'],
       rules: defineKnownRules({
         '@typescript-eslint/explicit-function-return-type': 'off',
-        'import/no-internal-modules': 'off',
+        'import-x/no-internal-modules': 'off',
       }),
     },
     {
       files: ['**/*.d.{ts,mts,cts}'],
       rules: defineKnownRules({
         '@typescript-eslint/triple-slash-reference': 'off',
-        'import/unambiguous': 'off',
+        'import-x/unambiguous': 'off',
       }),
     },
     {
@@ -100,11 +100,11 @@ export const eslintConfigForTypeScript = ({
       ],
       rules: defineKnownRules({
         '@typescript-eslint/no-restricted-imports': 'off',
-        'import/no-default-export': 'off',
-        'import/no-anonymous-default-export': 'off',
-        'import/no-internal-modules': 'off',
-        'import/no-named-as-default': 'off',
-        'import/namespace': 'off',
+        'import-x/no-default-export': 'off',
+        'import-x/no-anonymous-default-export': 'off',
+        'import-x/no-internal-modules': 'off',
+        'import-x/no-named-as-default': 'off',
+        'import-x/namespace': 'off',
       }),
     },
   ] as const;

@@ -1,3 +1,5 @@
+/* eslint-disable import-x/no-rename-default */
+
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 
 // @ts-expect-error no type definition
@@ -13,7 +15,7 @@ import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 // @ts-expect-error no type definition
 import eslintPluginSortDestructureKeys from 'eslint-plugin-sort-destructure-keys';
 
-import eslintPluginImport from 'eslint-plugin-import';
+import eslintPluginImport from 'eslint-plugin-import-x';
 
 import eslintPluginJest from 'eslint-plugin-jest';
 
@@ -62,7 +64,7 @@ export const plugins: Record<
   | 'cypress'
   | 'playwright'
   | 'functional'
-  | 'import'
+  | 'import-x'
   | 'jest'
   | 'vitest'
   | 'jsx-a11y'
@@ -92,7 +94,7 @@ export const plugins: Record<
   functional: eslintPluginFunctional,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'sort-destructure-keys': eslintPluginSortDestructureKeys,
-  import: eslintPluginImport,
+  'import-x': eslintPluginImport,
   jest: eslintPluginJest,
   vitest: eslintPluginVitest,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

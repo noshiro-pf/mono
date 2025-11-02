@@ -22,10 +22,10 @@ export default [
     rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
       'no-await-in-loop': 'off',
-      'import/no-unassigned-import': 'off',
-      'import/no-internal-modules': 'off',
-      'import/no-default-export': 'off',
-      'import/no-extraneous-dependencies': 'off',
+      'import-x/no-unassigned-import': 'off',
+      'import-x/no-internal-modules': 'off',
+      'import-x/no-default-export': 'off',
+      'import-x/no-extraneous-dependencies': 'off',
     }),
   },
 ] satisfies FlatConfig[];

@@ -12,7 +12,7 @@ import {
 } from 'is-immutable-type';
 import { type Program, type Type, type TypeChecker } from 'typescript';
 
-export type MessageId = 'errorStringGeneric';
+type MessageId = 'errorStringGeneric';
 
 export const getSafeTypeImmutability = (
   program: Program,
