@@ -1,3 +1,9 @@
+# [7.8.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.7.3...v7.8.0) (2025-11-02)
+
+### Features
+
+- add checkExt and createResultAssert ([#190](https://github.com/noshiro-pf/ts-repo-utils/issues/190)) ([2617f09](https://github.com/noshiro-pf/ts-repo-utils/commit/2617f09c280f3a6a8d5a4e8750500f7cb1cb97ab))
+
 ## [7.7.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.7.2...v7.7.3) (2025-10-27)
 
 ### Bug Fixes
