@@ -100,7 +100,7 @@ export const genTypeDefinitions = async (): Promise<void> => {
 
   const newContent = content.replaceAll(
     // eslint-disable-next-line security/detect-non-literal-regexp
-    new RegExp(`${markers.start}[.\\s\\S]*${markers.end}`, 'gu'),
+    new RegExp(String.raw`${markers.start}[.\s\S]*${markers.end}`, 'gu'),
     `${markers.start}\n${result}\n\n${markers.end}`,
   );
 

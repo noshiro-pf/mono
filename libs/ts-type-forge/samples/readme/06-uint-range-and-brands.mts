@@ -38,16 +38,16 @@ declare const userId: UserId;
 declare const productId: ProductId;
 
 // Type-safe functions that can't mix up IDs
-function getUserById(id: UserId): User | undefined {
+const getUserById = (id: UserId): User | undefined => {
   /* ... */
   IGNORE_EMBEDDING(id);
   return undefined;
-}
-function getProductById(id: ProductId): Product | undefined {
+};
+const getProductById = (id: ProductId): Product | undefined => {
   /* ... */
   IGNORE_EMBEDDING(id);
   return undefined;
-}
+};
 
 // @ts-expect-error Argument of type 'ProductId' is not assignable to parameter of type 'UserId'
 getUserById(productId);

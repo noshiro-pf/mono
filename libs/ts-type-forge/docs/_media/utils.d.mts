@@ -116,8 +116,9 @@ type Intersection<Types extends readonly unknown[]> =
 
 declare namespace TSTypeForgeInternals {
   /** @internal */
-  export type IntersectionImpl<Types extends readonly unknown[]> =
-    MergeIfRecords<IntersectionImplSub<Types>>;
+  type IntersectionImpl<Types extends readonly unknown[]> = MergeIfRecords<
+    IntersectionImplSub<Types>
+  >;
 
   type IntersectionImplSub<Types extends readonly unknown[]> =
     Types extends readonly []

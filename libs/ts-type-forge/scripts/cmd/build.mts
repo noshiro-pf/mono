@@ -1,3 +1,4 @@
+import { unknownToString } from 'ts-data-forge';
 import 'ts-repo-utils';
 import { genRootIndex } from '../functions/gen-root-index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
@@ -53,7 +54,7 @@ const runStep = async (
 ): Promise<void> => {
   const result = await promise;
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${String(result.value)}`);
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
     console.error('❌ Build failed');
     process.exit(1);
   }

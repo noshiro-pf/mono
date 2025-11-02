@@ -213,6 +213,7 @@ const config: ReadonlyConfig = {
 };
 
 // @ts-expect-error Cannot assign to 'port' because it is a read-only property
+// eslint-disable-next-line unicorn/no-immediate-mutation
 config.port = 8081;
 // @ts-expect-error Cannot assign to 'host' because it is a read-only property
 config.database.host = 'remote';
@@ -408,14 +409,14 @@ declare const userId: UserId;
 declare const productId: ProductId;
 
 // Type-safe functions that can't mix up IDs
-function getUserById(id: UserId): User | undefined {
+const getUserById = (id: UserId): User | undefined => {
     /* ... */
     return undefined;
-}
-function getProductById(id: ProductId): Product | undefined {
+};
+const getProductById = (id: ProductId): Product | undefined => {
     /* ... */
     return undefined;
-}
+};
 
 // @ts-expect-error Argument of type 'ProductId' is not assignable to parameter of type 'UserId'
 getUserById(productId);
