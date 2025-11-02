@@ -1,3 +1,9 @@
+# [3.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.0.0...v3.1.0) (2025-11-02)
+
+### Features
+
+- eslint-plugin-import-x ([#109](https://github.com/noshiro-pf/eslint-config-typed/issues/109)) ([336ec61](https://github.com/noshiro-pf/eslint-config-typed/commit/336ec616effb52e452598859263bb7a81b22383d))
+
 # [3.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.2...v3.0.0) (2025-10-31)
 
 ### Features
