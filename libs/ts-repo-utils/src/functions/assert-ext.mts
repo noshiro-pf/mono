@@ -1,6 +1,7 @@
-import { Arr, type IMap, isString } from 'ts-data-forge';
+import { Arr, type IMap, isString, Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
+import { createResultAssert } from './create-result-assert.mjs';
 
 /** Configuration for directory extension checking. */
 export type CheckExtConfig = DeepReadonly<{
@@ -23,13 +24,21 @@ export type CheckExtConfig = DeepReadonly<{
   }[];
 }>;
 
+export type CheckExtError = Readonly<{
+  message: string;
+  files: readonly string[];
+}>;
+
 /**
  * Validates that all files in specified directories have the correct
- * extensions. Exits with code 1 if any files have incorrect extensions.
+ * extensions.
  *
  * @param config - Configuration specifying directories and expected extensions.
+ * @returns Result.ok when all files pass, otherwise Result.err with details.
  */
-export const assertExt = async (config: CheckExtConfig): Promise<void> => {
+export const checkExt = async (
+  config: CheckExtConfig,
+): Promise<Result<undefined, CheckExtError>> => {
   // Check all directories in parallel
   const results = await Promise.all(
     config.directories.map(async ({ path: dir, extension, ignorePatterns }) => {
@@ -49,58 +58,42 @@ export const assertExt = async (config: CheckExtConfig): Promise<void> => {
   // Collect all incorrect files
   const allIncorrectFiles: readonly string[] = results.flat();
 
-  if (allIncorrectFiles.length > 0) {
-    const generateErrorMessage = (): string => {
-      // Group directories by extension for a cleaner message
-      const extensionGroups: IMap<
-        string,
-        readonly Readonly<{
-          relativePath: string;
-          extKey: string;
-        }>[]
-      > = Arr.groupBy(
-        config.directories.map(({ path: dirPath, extension }) => {
-          const relativePath = path.relative(process.cwd(), dirPath);
-          const extKey = isString(extension)
-            ? extension
-            : extension.join(' or ');
-
-          return {
-            relativePath,
-            extKey,
-          };
-        }),
-        ({ extKey }) => extKey,
-      );
-
-      // Generate message parts for each extension
-      const messageParts = Array.from(
-        extensionGroups.entries(),
-        ([ext, dirs]) => {
-          const dirList =
-            dirs.length === 1
-              ? dirs[0]?.relativePath
-              : dirs.map((d) => d.relativePath).join(', ');
-          return `${dirList} should have ${ext} extension`;
-        },
-      );
-
-      return `All files in ${messageParts.join(' and ')}.`;
-    };
-
-    const errorMessage = [
-      'Files with incorrect extensions found:',
-      ...allIncorrectFiles.map((file) => `  - ${file}`),
-      '',
-      generateErrorMessage(),
-    ].join('\n');
-
-    echo(errorMessage);
-    process.exit(1);
+  if (allIncorrectFiles.length === 0) {
+    return Result.ok(undefined);
   }
 
-  echo('✓ All files have correct extensions');
+  const message = [
+    'Files with incorrect extensions found:',
+    ...allIncorrectFiles.map((file) => `  - ${file}`),
+    '',
+    describeExpectedExtensions(config),
+  ].join('\n');
+
+  return Result.err({
+    message,
+    files: allIncorrectFiles,
+  });
 };
+
+/**
+ * Validates that all files in specified directories have the correct
+ * extensions. Exits with code 1 if any files have incorrect extensions.
+ *
+ * @param config - Configuration specifying directories and expected extensions.
+ */
+export const assertExt = createResultAssert<
+  CheckExtConfig,
+  undefined,
+  CheckExtError
+>({
+  run: checkExt,
+  onError: (error) => {
+    echo(error.message);
+  },
+  onSuccess: () => {
+    echo('✓ All files have correct extensions');
+  },
+});
 
 /**
  * Checks if all files in a directory have the expected extension.
@@ -133,4 +126,37 @@ const getFilesWithIncorrectExtension = async (
   return files.filter(
     (file) => !expectedExtensions.some((ext) => file.endsWith(ext)),
   );
+};
+
+const describeExpectedExtensions = (config: CheckExtConfig): string => {
+  // Group directories by extension for a cleaner message
+  const extensionGroups: IMap<
+    string,
+    readonly Readonly<{
+      relativePath: string;
+      extKey: string;
+    }>[]
+  > = Arr.groupBy(
+    config.directories.map(({ path: dirPath, extension }) => {
+      const relativePath = path.relative(process.cwd(), dirPath);
+      const extKey = isString(extension) ? extension : extension.join(' or ');
+
+      return {
+        relativePath,
+        extKey,
+      };
+    }),
+    ({ extKey }) => extKey,
+  );
+
+  // Generate message parts for each extension
+  const messageParts = Array.from(extensionGroups.entries(), ([ext, dirs]) => {
+    const dirList =
+      dirs.length === 1
+        ? dirs[0]?.relativePath
+        : dirs.map((d) => d.relativePath).join(', ');
+    return `${dirList} should have ${ext} extension`;
+  });
+
+  return `All files in ${messageParts.join(' and ')}.`;
 };

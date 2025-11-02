@@ -3,6 +3,7 @@ import glob_ from 'fast-glob';
 import * as fs_ from 'node:fs/promises';
 import * as os_ from 'node:os';
 import * as path_ from 'node:path';
+import { chdir as chdir_ } from 'node:process';
 import { Result as Result_ } from 'ts-data-forge';
 import { $ as $_ } from './functions/exec-async.mjs';
 import { isDirectlyExecuted as isDirectlyExecuted_ } from './functions/is-directly-executed.mjs';
@@ -19,6 +20,7 @@ const globalsDef = {
   $: $_,
   Result: Result_,
   echo: console.log,
+  cd: chdir_,
   isDirectlyExecuted: isDirectlyExecuted_,
 } as const;
 
@@ -35,5 +37,6 @@ declare global {
   const Result: typeof Result_;
   type Result<S, E> = Result_<S, E>;
   const echo: typeof console.log;
+  const cd: typeof chdir_;
   const isDirectlyExecuted: typeof isDirectlyExecuted_;
 }

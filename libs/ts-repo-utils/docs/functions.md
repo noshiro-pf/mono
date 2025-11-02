@@ -32,15 +32,39 @@ Re-exports [assertRepoIsClean](functions/assert-repo-is-clean.md#assertrepoiscle
 
 ***
 
+### checkExt
+
+Re-exports [checkExt](functions/assert-ext.md#checkext)
+
+***
+
 ### CheckExtConfig
 
 Re-exports [CheckExtConfig](functions/assert-ext.md#checkextconfig)
 
 ***
 
+### CheckExtError
+
+Re-exports [CheckExtError](functions/assert-ext.md#checkexterror)
+
+***
+
 ### checkShouldRunTypeChecks
 
 Re-exports [checkShouldRunTypeChecks](functions/should-run.md#checkshouldruntypechecks)
+
+***
+
+### createResultAssert
+
+Re-exports [createResultAssert](functions/create-result-assert.md#createresultassert)
+
+***
+
+### CreateResultAssertOptions
+
+Re-exports [CreateResultAssertOptions](functions/create-result-assert.md#createresultassertoptions)
 
 ***
 
