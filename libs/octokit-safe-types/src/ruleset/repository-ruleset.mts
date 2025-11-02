@@ -115,7 +115,7 @@ type PickKeys = Extract<
   | 'node_id'
   | '_links'
   | 'conditions'
-  // | 'rules'
+  | 'rules'
   | 'created_at'
   | 'updated_at'
 >;

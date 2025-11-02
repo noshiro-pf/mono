@@ -28,18 +28,14 @@ export const UpdateRulesetRequest = t.strictRecord({
 
 export type UpdateRulesetRequest = t.TypeOf<typeof UpdateRulesetRequest>;
 
-// TODO: Remove StrictOmit when `rules` type of @octokit/openapi-types is fixed.
 expectType<
-  StrictOmit<UpdateRulesetRequest, 'rules' | 'bypass_actors'>,
-  StrictOmit<
-    DeepReadonly<
-      Required<
-        paths['/repos/{owner}/{repo}/rulesets/{ruleset_id}']['put']
-      >['requestBody']['content']['application/json']
-    >,
-    'rules' | 'bypass_actors'
+  UpdateRulesetRequest,
+  DeepReadonly<
+    Required<
+      paths['/repos/{owner}/{repo}/rulesets/{ruleset_id}']['put']
+    >['requestBody']['content']['application/json']
   >
->('~=');
+>('=');
 
 expectType<
   paths['/repos/{owner}/{repo}/rulesets/{ruleset_id}']['put'],

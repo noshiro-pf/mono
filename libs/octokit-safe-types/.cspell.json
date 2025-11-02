@@ -8,7 +8,6 @@
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",
-    "./package-lock.json",
     "./pnpm-lock.yaml",
     "./pnpm-workspace.yaml",
     "docs/**",
