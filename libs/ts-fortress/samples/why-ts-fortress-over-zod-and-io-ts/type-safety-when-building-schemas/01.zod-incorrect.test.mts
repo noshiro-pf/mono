@@ -11,7 +11,7 @@ type SomeObjectIncorrect = z.infer<typeof SomeObjectIncorrect>; // inferred as {
 // embed-sample-code-ignore-below
 export { SomeObjectIncorrect };
 
-// eslint-disable-next-line import/first
+// eslint-disable-next-line import-x/first
 import { expectType } from 'ts-data-forge';
 
 expectType<

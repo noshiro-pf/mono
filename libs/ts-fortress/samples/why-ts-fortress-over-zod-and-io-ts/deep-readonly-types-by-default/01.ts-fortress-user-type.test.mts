@@ -1,4 +1,4 @@
-/* eslint-disable import/first */
+/* eslint-disable import-x/first */
 
 const someData = {
   name: 'name',

@@ -20,7 +20,7 @@ type T = t.TypeOf<typeof T>;
 // The runtime validator only accepts strings, but TypeScript thinks it accepts numbers!
 
 // embed-sample-code-ignore-below
-// eslint-disable-next-line import/first
+// eslint-disable-next-line import-x/first
 import { expectType } from 'ts-data-forge';
 
 expectType<T, 0 | 1 | 2 | 3 | 4>('=');

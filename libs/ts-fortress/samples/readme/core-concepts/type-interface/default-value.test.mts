@@ -1,4 +1,4 @@
-/* eslint-disable import/first */
+/* eslint-disable import-x/first */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 const useState = <T,>(_defaultValue: T): [T, (v: T) => void] => [
   _defaultValue,

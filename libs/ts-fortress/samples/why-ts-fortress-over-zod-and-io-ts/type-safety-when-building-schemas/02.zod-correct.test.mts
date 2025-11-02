@@ -11,7 +11,7 @@ const SomeObject = z.object({
 // embed-sample-code-ignore-below
 export { SomeObject };
 
-// eslint-disable-next-line import/first
+// eslint-disable-next-line import-x/first
 import { expectType } from 'ts-data-forge';
 
 type SomeObject = z.infer<typeof SomeObject>;

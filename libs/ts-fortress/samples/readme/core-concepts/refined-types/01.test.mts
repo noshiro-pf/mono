@@ -1,4 +1,4 @@
-/* eslint-disable import/first */
+/* eslint-disable import-x/first */
 const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};
 // embed-sample-code-ignore-above
 import * as t from 'ts-fortress';

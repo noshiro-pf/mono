@@ -29,7 +29,7 @@ assert(t.Result.isErr(U.validate('0'))); // ❌ Fails - string "0" is rejected
 assert(t.Result.isOk(U.validate(0))); // ✅ Success - number 0 is accepted
 
 // embed-sample-code-ignore-below
-// eslint-disable-next-line import/first
+// eslint-disable-next-line import-x/first
 import { expectType } from 'ts-data-forge';
 
 expectType<T, '0' | '1' | '2' | '3' | '4'>('=');

@@ -24,10 +24,10 @@ import * as ioTs from 'io-ts';
 import { expectType } from 'ts-data-forge';
 import * as z from 'zod';
 
-// eslint-disable-next-line import/no-internal-modules
+// eslint-disable-next-line import-x/no-internal-modules
 import { PathReporter } from 'io-ts/PathReporter';
 
-// eslint-disable-next-line import/no-internal-modules
+// eslint-disable-next-line import-x/no-internal-modules
 import * as tf from '../src/entry-point.mjs';
 
 describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {

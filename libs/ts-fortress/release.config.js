@@ -57,6 +57,7 @@ export default {
       {
         assets: ['CHANGELOG.md', 'package.json', 'pnpm-lock.yaml'],
         message:
+          // eslint-disable-next-line no-template-curly-in-string
           'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
       },
     ],

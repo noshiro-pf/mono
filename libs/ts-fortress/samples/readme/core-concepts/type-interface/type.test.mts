@@ -9,7 +9,7 @@ type Type<A> = Readonly<{
 }>;
 
 // embed-sample-code-ignore-below
-/* eslint-disable import/first */
+/* eslint-disable import-x/first */
 import { expectType } from 'ts-data-forge';
 import {
   type Type as Type_,

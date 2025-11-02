@@ -1,3 +1,4 @@
+import { unknownToString } from 'ts-data-forge';
 import { assertPathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -6,43 +7,45 @@ const distDir = path.resolve(projectRootPath, './dist');
 /**
  * Builds the entire project.
  */
-const build = async (): Promise<void> => {
+const build = async (skipCheck: boolean): Promise<void> => {
   echo('Starting build process...\n');
 
-  // Step 1: Validate file extensions
-  {
-    echo('1. Checking file extensions...');
-    await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
-    echo('✓ File extensions validated\n');
-  }
+  if (!skipCheck) {
+    // Step 1: Validate file extensions
+    {
+      echo('1. Checking file extensions...');
+      await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
+      echo('✓ File extensions validated\n');
+    }
 
-  // Step 2: Clean previous build
-  {
-    echo('2. Cleaning dist directory...');
-    await runStep(
-      Result.fromPromise(
-        fs.rm(distDir, {
-          recursive: true,
-          force: true,
-        }),
-      ),
-      'Failed to clean dist directory',
-    );
-    echo('✓ Cleaned dist directory\n');
-  }
+    // Step 2: Clean previous build
+    {
+      echo('2. Cleaning dist directory...');
+      await runStep(
+        Result.fromPromise(
+          fs.rm(distDir, {
+            recursive: true,
+            force: true,
+          }),
+        ),
+        'Failed to clean dist directory',
+      );
+      echo('✓ Cleaned dist directory\n');
+    }
 
-  // Step 3: Generate index files
-  {
-    echo('3. Generating index files...');
-    await runCmdStep('pnpm run gi', 'Generating index files failed');
-    echo('✓ Generating index files completed\n');
-  }
+    // Step 3: Generate index files
+    {
+      echo('3. Generating index files...');
+      await runCmdStep('pnpm run gi', 'Generating index files failed');
+      echo('✓ Generating index files completed\n');
+    }
 
-  // Step 4: Type checking
-  {
-    echo('4. Running type checking...');
-    await runCmdStep('tsc --noEmit', 'Type checking failed');
-    echo('✓ Type checking passed\n');
+    // Step 4: Type checking
+    {
+      echo('4. Running type checking...');
+      await runCmdStep('tsc --noEmit', 'Type checking failed');
+      echo('✓ Type checking passed\n');
+    }
   }
 
   // Step 5: Build with Rollup
@@ -126,10 +129,10 @@ const runStep = async (
 ): Promise<void> => {
   const result = await promise;
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${String(result.value)}`);
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
     console.error('❌ Build failed');
     process.exit(1);
   }
 };
 
-await build();
+await build(process.argv.includes('--skip-check'));
