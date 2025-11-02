@@ -1,6 +1,8 @@
 import 'ts-repo-utils';
 
-/** Runs all validation and build steps for the project. */
+/**
+ * Runs all validation and build steps for the project.
+ */
 const checkAll = async (): Promise<void> => {
   echo('Starting full project validation and build...\n');
 
@@ -24,16 +26,16 @@ const checkAll = async (): Promise<void> => {
   await runCmdStep('pnpm run test', 'Tests failed');
   echo('✓ Tests passed\n');
 
-  // Step 5: Lint and check repo status
+  // Step 5: Lint
   echo('5. Running lint fixes...');
   await runCmdStep('pnpm run lint:fix', 'Linting failed');
   echo('✓ Lint fixes applied\n');
 
-  // Step 6: Build and check repo status
+  // Step 6: Build
   echo('6. Building project...');
   await runCmdStep('pnpm run build', 'Build failed');
 
-  // Step 7: Generate docs and check repo status
+  // Step 7: Generate docs
   echo('7. Generating documentation...');
   await runCmdStep('pnpm run doc', 'Documentation generation failed');
 

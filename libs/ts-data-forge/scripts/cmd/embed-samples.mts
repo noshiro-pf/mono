@@ -1,4 +1,5 @@
 import { formatFiles } from 'ts-repo-utils';
+import { unknownToString } from '../../src/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { extractSampleCode } from './embed-samples-shared.mjs';
 
@@ -87,7 +88,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 
     return Result.ok(undefined);
   } catch (error) {
-    return Result.err(`❌ Failed to embed samples: ${String(error)}`);
+    return Result.err(`❌ Failed to embed samples: ${unknownToString(error)}`);
   }
 };
 

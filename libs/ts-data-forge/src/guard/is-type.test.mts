@@ -112,7 +112,7 @@ describe('isString', () => {
     expect(isString(true)).toBe(false);
     expect(isString(null)).toBe(false);
     expect(isString(undefined)).toBe(false);
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isString(new String('hello'))).toBe(false);
   });
 
@@ -140,7 +140,7 @@ describe('isNumber', () => {
     expect(isNumber(true)).toBe(false);
     expect(isNumber(null)).toBe(false);
     expect(isNumber(123n)).toBe(false);
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isNumber(new Number(42))).toBe(false);
   });
 
@@ -187,7 +187,7 @@ describe('isBoolean', () => {
     expect(isBoolean(0)).toBe(false);
     expect(isBoolean('true')).toBe(false);
     expect(isBoolean(null)).toBe(false);
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isBoolean(new Boolean(true))).toBe(false);
   });
 

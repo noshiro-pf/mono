@@ -66,11 +66,11 @@ describe('isPrimitive', () => {
   });
 
   test('should return false for boxed primitives', () => {
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isPrimitive(new String('hello'))).toBe(false);
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isPrimitive(new Number(42))).toBe(false);
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isPrimitive(new Boolean(true))).toBe(false);
   });
 

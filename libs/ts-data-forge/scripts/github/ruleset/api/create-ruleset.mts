@@ -8,7 +8,7 @@ import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 
 export const createRuleset = async ({
-  payload: { bypass_actors, conditions, enforcement, name, rules, target },
+  payload: { name, target, enforcement, bypass_actors, conditions, rules },
 }: Readonly<{
   payload: CreateRulesetRequest;
 }>): Promise<void> => {

@@ -3,14 +3,9 @@ import * as path from 'node:path';
 const srcDir = path.resolve(import.meta.dirname, '../src');
 const outDir = path.resolve(import.meta.dirname, '../docs');
 
-const readmePlugin = path.resolve(
-  import.meta.dirname,
-  './typedoc-readme-plugin.mjs',
-);
-
 /** @type {Partial<import('typedoc').TypeDocOptions>} */
 const config = {
-  plugin: ['typedoc-github-theme', readmePlugin],
+  plugin: ['typedoc-github-theme'],
   entryPoints: [`${srcDir}/**/*.mts`],
   exclude: [
     './**/index.mts',
@@ -20,6 +15,10 @@ const config = {
   ].map((p) => path.resolve(srcDir, p)),
   out: outDir,
   gitRevision: 'main',
+  headings: {
+    document: true,
+    readme: false,
+  },
   excludeInternal: true,
 };
 

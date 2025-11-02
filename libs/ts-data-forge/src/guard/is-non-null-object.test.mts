@@ -31,11 +31,11 @@ describe('isNonNullObject', () => {
   });
 
   test('should return true for boxed primitives', () => {
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isNonNullObject(new String('hello'))).toBe(true);
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isNonNullObject(new Number(42))).toBe(true);
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isNonNullObject(new Boolean(true))).toBe(true);
   });
 

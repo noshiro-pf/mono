@@ -85,7 +85,7 @@ describe('isNonEmptyString', () => {
 
   test('should not accept String objects', () => {
     // @ts-expect-error Testing non-string types
-    // eslint-disable-next-line no-new-wrappers, unicorn/new-for-builtins
+    // eslint-disable-next-line unicorn/new-for-builtins
     expect(isNonEmptyString(new String('hello') as unknown)).toBe(false);
   });
 });

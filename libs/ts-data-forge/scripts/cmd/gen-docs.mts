@@ -1,4 +1,5 @@
 import { assertPathExists } from 'ts-repo-utils';
+import { unknownToString } from '../../src/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { embedJsDocExamples } from './embed-jsdoc-examples.mjs';
 import { embedSamples } from './embed-samples.mjs';
@@ -56,7 +57,7 @@ const runStep = async (
 ): Promise<void> => {
   const result = await promise;
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${String(result.value)}`);
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
     console.error('❌ Documentation generation failed');
     process.exit(1);
   }
