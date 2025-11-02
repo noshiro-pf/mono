@@ -1,4 +1,4 @@
-/* eslint-disable import/no-internal-modules */
+/* eslint-disable import-x/no-internal-modules */
 import glob_ from 'fast-glob';
 import * as fs_ from 'node:fs/promises';
 import * as os_ from 'node:os';

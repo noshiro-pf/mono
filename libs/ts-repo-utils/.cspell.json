@@ -1,11 +1,13 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["multioption", "myorg", "noshiro", "testw", "tscw", "unstub"],
+  "allowCompoundWords": true,
+  "caseSensitive": false,
+  "ignoreRandomStrings": true,
+  "words": ["myorg", "noshiro", "testw", "tscw", "unstub"],
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",
-    "./package-lock.json",
     "./pnpm-lock.yaml",
     "./pnpm-workspace.yaml",
     "docs/**",

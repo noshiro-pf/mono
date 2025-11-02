@@ -5,6 +5,18 @@ type ExecOptionsCustom = Readonly<{
   silent?: boolean;
 }>;
 
+type ExecOptionsWithStringEncoding = Readonly<
+  childProcess.ExecOptionsWithStringEncoding & ExecOptionsCustom
+>;
+
+type ExecOptionsWithBufferEncoding = Readonly<
+  childProcess.ExecOptionsWithBufferEncoding & ExecOptionsCustom
+>;
+
+type NormalizedExecOptions = Readonly<
+  childProcess.ExecOptions & { encoding?: BufferEncoding | 'buffer' | null }
+>;
+
 export type ExecOptions = childProcess.ExecOptions & ExecOptionsCustom;
 
 export type ExecResult<T extends string | Buffer> = Result<
@@ -23,47 +35,92 @@ export type ExecResult<T extends string | Buffer> = Result<
 export function $(
   command: string,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  options?:
-    | ExecOptionsCustom
-    | Readonly<{ encoding: BufferEncoding } & ExecOptions>,
+  options?: ExecOptionsWithStringEncoding,
 ): Promise<ExecResult<string>>;
 
 export function $(
   command: string,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  options?: Readonly<{ encoding: 'buffer' | null } & ExecOptions>,
+  options: ExecOptionsWithBufferEncoding,
 ): Promise<ExecResult<Buffer>>;
+
+export function $<
+  TOptions extends
+    | ExecOptionsWithBufferEncoding
+    | ExecOptionsWithStringEncoding
+    | undefined = undefined,
+>(
+  command: string,
+  options?: TOptions,
+): Promise<
+  ExecResult<TOptions extends ExecOptionsWithBufferEncoding ? Buffer : string>
+>;
 
 export function $(
   command: string,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  options?: Readonly<
-    { encoding?: BufferEncoding | 'buffer' | null } & ExecOptions
-  >,
+  options?: ExecOptionsWithStringEncoding | ExecOptionsWithBufferEncoding,
 ): Promise<ExecResult<string | Buffer>> {
   const { silent = false, ...restOptions } = options ?? {};
+  const normalizedOptions: NormalizedExecOptions = restOptions;
 
   if (!silent) {
     echo(`$ ${command}`);
   }
 
   return new Promise((resolve) => {
-    // eslint-disable-next-line security/detect-child-process
-    childProcess.exec(command, restOptions, (error, stdout, stderr) => {
+    const handleResult = <T extends string | Buffer>(
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      error: childProcess.ExecException | null,
+      stdout: T,
+      stderr: T,
+    ): void => {
       if (!silent) {
-        if (stdout !== '') {
+        if (!isEmpty(stdout)) {
           echo(stdout);
         }
-        if (stderr !== '') {
+        if (!isEmpty(stderr)) {
           console.error(stderr);
         }
       }
 
       if (error !== null) {
         resolve(Result.err(error));
-      } else {
-        resolve(Result.ok({ stdout, stderr }));
+        return;
       }
-    });
+
+      resolve(
+        Result.ok<Readonly<{ stdout: T; stderr: T }>>({ stdout, stderr }),
+      );
+    };
+
+    const encoding = normalizedOptions.encoding;
+
+    if (encoding === 'buffer' || encoding === null) {
+      // eslint-disable-next-line security/detect-child-process
+      childProcess.exec(
+        command,
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        normalizedOptions as childProcess.ExecOptionsWithBufferEncoding,
+        (error, stdout, stderr) => {
+          handleResult(error, stdout, stderr);
+        },
+      );
+      return;
+    }
+
+    // eslint-disable-next-line security/detect-child-process
+    childProcess.exec(
+      command,
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      normalizedOptions as childProcess.ExecOptionsWithStringEncoding,
+      (error, stdout, stderr) => {
+        handleResult(error, stdout, stderr);
+      },
+    );
   });
 }
+
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const isEmpty = (value: string | Buffer): boolean =>
+  typeof value === 'string' ? value === '' : value.length === 0;

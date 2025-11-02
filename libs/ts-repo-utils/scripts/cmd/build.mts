@@ -1,3 +1,4 @@
+import { unknownToString } from 'ts-data-forge';
 import { assertPathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -138,10 +139,10 @@ const runStep = async (
 ): Promise<void> => {
   const result = await promise;
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${String(result.value)}`);
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
     console.error('❌ Build failed');
     process.exit(1);
   }
 };
 
-await (process.argv.includes('--skip-check') ? build(true) : build(false));
+await build(process.argv.includes('--skip-check'));

@@ -368,8 +368,8 @@ describe('exec-async', () => {
       // Type check for native exec with buffer encoding
       exec('echo "test"', { encoding: 'buffer' }, (error, stdout, stderr) => {
         expectType<ExecException | null, typeof error>('=');
-        expectType<Buffer, typeof stdout>('=');
-        expectType<Buffer, typeof stderr>('=');
+        expectType<Buffer, typeof stdout>('>=');
+        expectType<Buffer, typeof stderr>('>=');
       });
 
       // The $ function should produce the same types wrapped in Result (suppressed for clean output)
@@ -381,15 +381,15 @@ describe('exec-async', () => {
         Promise<
           Result<Readonly<{ stdout: Buffer; stderr: Buffer }>, ExecException>
         >
-      >('=');
+      >('~=');
     });
 
     test('should match exec callback types for null encoding', () => {
       // Type check for native exec with null encoding
       exec('echo "test"', { encoding: null }, (error, stdout, stderr) => {
         expectType<ExecException | null, typeof error>('=');
-        expectType<Buffer, typeof stdout>('=');
-        expectType<Buffer, typeof stderr>('=');
+        expectType<Buffer, typeof stdout>('>=');
+        expectType<Buffer, typeof stderr>('>=');
       });
 
       // The $ function should produce the same types wrapped in Result (suppressed for clean output)

@@ -26,20 +26,20 @@ const checkAll = async (): Promise<void> => {
   await runCmdStep('pnpm run test', 'Tests failed');
   echo('✓ Tests passed\n');
 
-  // Step 5: Build and check repo status
+  // Step 5: Build
   echo('5. Building project...');
   await runCmdStep('pnpm run build', 'Build failed');
 
-  // Step 6: Lint and check repo status
+  // Step 6: Lint
   echo('6. Running lint fixes...');
   await runCmdStep('pnpm run lint:fix', 'Linting failed');
   echo('✓ Lint fixes applied\n');
 
-  // Step 7: Build and check repo status
+  // Step 7: Build
   echo('7. Building project...');
   await runCmdStep('pnpm run build', 'Build failed');
 
-  // Step 8: Generate docs and check repo status
+  // Step 8: Generate docs
   echo('8. Generating documentation...');
   await runCmdStep('pnpm run doc', 'Documentation generation failed');
 

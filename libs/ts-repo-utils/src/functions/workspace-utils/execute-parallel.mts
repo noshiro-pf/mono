@@ -57,7 +57,7 @@ export const executeParallel = async (
 
     const wrappedPromise = promise
       // eslint-disable-next-line @typescript-eslint/no-loop-func
-      .catch((error) => {
+      .catch((error: unknown) => {
         mut_failed = true;
         throw error; // Re-throw to ensure fail-fast propagation
       })

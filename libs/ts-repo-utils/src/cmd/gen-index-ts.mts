@@ -2,7 +2,7 @@
 
 import * as cmd from 'cmd-ts';
 
-// eslint-disable-next-line import/no-internal-modules
+// eslint-disable-next-line import-x/no-internal-modules
 import { type InputOf, type OutputOf } from 'cmd-ts/dist/esm/from.js';
 import { expectType } from 'ts-data-forge';
 import { genIndex } from '../functions/index.mjs';
@@ -109,7 +109,7 @@ const cmdDef = cmd.command({
     expectType<typeof args.formatCommand, string | undefined>('=');
     expectType<typeof args.silent, boolean | undefined>('=');
 
-    main(args).catch((error) => {
+    main(args).catch((error: unknown) => {
       console.error('An error occurred:', error);
       process.exit(1);
     });

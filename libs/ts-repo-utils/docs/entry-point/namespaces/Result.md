@@ -6,8 +6,8 @@
 
 # Result
 
-Namespace for the `Result` type and related functions.
-Provides utilities to handle operations that can succeed or fail.
+Namespace for the `Result` type and related functions. Provides utilities to
+handle operations that can succeed or fail.
 
 ## Type Aliases
 
@@ -15,10 +15,10 @@ Provides utilities to handle operations that can succeed or fail.
 
 > **Base** = [`Result`](../README.md#result)\<`unknown`, `unknown`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:65
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:81
 
-Base type for any `Result`, used for generic constraints.
-Represents a `Result` with unknown success and error types.
+Base type for any `Result`, used for generic constraints. Represents a
+`Result` with unknown success and error types.
 
 ***
 
@@ -26,7 +26,7 @@ Represents a `Result` with unknown success and error types.
 
 > **Err**\<`E`\> = `Err_`\<`E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:60
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:76
 
 Represents a `Result` that is an error, containing an error value.
 
@@ -44,10 +44,10 @@ The type of the error value.
 
 > **NarrowToErr**\<`R`\> = `R` *extends* [`Ok`](#ok)\<`unknown`\> ? `never` : `R`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:89
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:109
 
-Narrows a `Result.Base` type to `Result.Err<E>` if it is an `Err`.
-If the `Result` is `Result.Ok<S>`, resolves to `never`.
+Narrows a `Result.Base` type to `Result.Err<E>` if it is an `Err`. If the
+`Result` is `Result.Ok<S>`, resolves to `never`.
 
 #### Type Parameters
 
@@ -63,10 +63,10 @@ The `Result.Base` type to narrow.
 
 > **NarrowToOk**\<`R`\> = `R` *extends* [`Err`](#err)\<`unknown`\> ? `never` : `R`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:83
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:102
 
-Narrows a `Result.Base` type to `Result.Ok<S>` if it is an `Ok`.
-If the `Result` is `Result.Err<E>`, resolves to `never`.
+Narrows a `Result.Base` type to `Result.Ok<S>` if it is an `Ok`. If the
+`Result` is `Result.Err<E>`, resolves to `never`.
 
 #### Type Parameters
 
@@ -82,7 +82,7 @@ The `Result.Base` type to narrow.
 
 > **Ok**\<`S`\> = `Ok_`\<`S`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:55
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:70
 
 Represents a `Result` that is a success, containing a value.
 
@@ -100,10 +100,10 @@ The type of the success value.
 
 > **UnwrapErr**\<`R`\> = `R` *extends* [`Err`](#err)\<infer E\> ? `E` : `never`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:77
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:95
 
-Extracts the error value type `E` from a `Result.Err<E>`.
-If the `Result` is `Result.Ok<S>`, resolves to `never`.
+Extracts the error value type `E` from a `Result.Err<E>`. If the `Result`
+is `Result.Ok<S>`, resolves to `never`.
 
 #### Type Parameters
 
@@ -119,10 +119,10 @@ The `Result.Base` type to unwrap.
 
 > **UnwrapOk**\<`R`\> = `R` *extends* [`Ok`](#ok)\<infer S\> ? `S` : `never`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:71
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:88
 
-Extracts the success value type `S` from a `Result.Ok<S>`.
-If the `Result` is `Result.Err<E>`, resolves to `never`.
+Extracts the success value type `S` from a `Result.Ok<S>`. If the `Result`
+is `Result.Err<E>`, resolves to `never`.
 
 #### Type Parameters
 
@@ -138,12 +138,12 @@ The `Result.Base` type to unwrap.
 
 > `const` **err**: \<`E`\>(`value`) => [`Err`](#err)\<`E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:159
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:157
 
 Creates a `Result.Err` containing the given error value.
 
-Use this constructor when an operation fails and you want to wrap
-the error information in a Result type for consistent error handling.
+Use this constructor when an operation fails and you want to wrap the error
+information in a Result type for consistent error handling.
 
 #### Type Parameters
 
@@ -169,34 +169,15 @@ A `Result.Err<E>` containing the value.
 
 #### Example
 
-```typescript
-// Basic error case
-const failure = Result.err("Something went wrong");
-console.log(Result.isErr(failure)); // true
-console.log(Result.unwrapErr(failure)); // "Something went wrong"
+```ts
+const success = Result.ok({ id: 1 });
+const failure = Result.err(new Error('missing data'));
 
-// Function that can fail
-function parseInteger(input: string): Result<number, string> {
-  const num = parseInt(input, 10);
-  if (isNaN(num)) {
-    return Result.err(`Invalid number format: ${input}`);
-  }
-  return Result.ok(num);
-}
-
-const result = parseInteger("abc");
-console.log(Result.unwrapErr(result)); // "Invalid number format: abc"
-
-// Using custom error types
-interface ValidationError {
-  field: string;
-  message: string;
-}
-
-const validationError = Result.err<ValidationError>({
-  field: "email",
-  message: "Invalid email format"
+assert.deepStrictEqual(success, {
+  $$tag: 'ts-data-forge::Result.ok',
+  value: { id: 1 },
 });
+assert.ok(Result.isErr(failure));
 ```
 
 ***
@@ -205,11 +186,12 @@ const validationError = Result.err<ValidationError>({
 
 > `const` **fromPromise**: \<`P`\>(`promise`) => `Promise`\<[`Result`](../README.md#result)\<`UnwrapPromise`\<`P`\>, `unknown`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:500
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:578
 
-Converts a Promise into a Promise that resolves to a `Result`.
-If the input Promise resolves, the `Result` will be `Ok` with the resolved value.
-If the input Promise rejects, the `Result` will be `Err` with the rejection reason.
+Converts a Promise into a Promise that resolves to a `Result`. If the input
+Promise resolves, the `Result` will be `Ok` with the resolved value. If the
+input Promise rejects, the `Result` will be `Err` with the rejection
+reason.
 
 #### Type Parameters
 
@@ -233,19 +215,32 @@ The Promise to convert.
 
 A Promise that resolves to `Result<UnwrapPromise<P>, unknown>`.
 
+#### Example
+
+```ts
+const successPromise = Result.fromPromise(Promise.resolve('ok'));
+const failurePromise = Result.fromPromise(Promise.reject(new Error('fail')));
+
+const resolved = await successPromise;
+const rejected = await failurePromise;
+
+assert.deepStrictEqual(resolved, Result.ok('ok'));
+assert.ok(Result.isErr(rejected));
+```
+
 ***
 
 ### fromThrowable()
 
 > `const` **fromThrowable**: \<`T`\>(`fn`) => [`Result`](../README.md#result)\<`T`, `Error`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:527
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:606
 
 Wraps a function that may throw an exception in a `Result`.
 
-This is a fundamental utility for converting traditional exception-based error
-handling into Result-based error handling. Any thrown value is converted to an
-Error object for consistent error handling.
+This is a fundamental utility for converting traditional exception-based
+error handling into Result-based error handling. Any thrown value is
+converted to an Error object for consistent error handling.
 
 If the function executes successfully, returns `Result.Ok` with the result.
 If the function throws, returns `Result.Err` with the caught error.
@@ -270,20 +265,19 @@ The function to execute that may throw.
 
 [`Result`](../README.md#result)\<`T`, `Error`\>
 
-A `Result<T, Error>` containing either the successful result or the caught error.
+A `Result<T, Error>` containing either the successful result or
+  the caught error.
 
 #### Example
 
-```typescript
-// Wrapping JSON.parse which can throw
-const parseJson = <T>(text: string): Result<T, Error> =>
-  Result.fromThrowable(() => JSON.parse(text) as T);
+```ts
+const success = Result.fromThrowable(() => 1 + 1);
+const failure = Result.fromThrowable(() => {
+  throw new Error('boom');
+});
 
-const validJson = parseJson<{valid: boolean}>('{"valid": true}');
-if (Result.isOk(validJson)) {
-  console.log(validJson.value.valid); // true
-}
-
+assert.deepStrictEqual(success, Result.ok(2));
+assert.ok(Result.isErr(failure));
 ```
 
 ***
@@ -292,14 +286,14 @@ if (Result.isOk(validJson)) {
 
 > `const` **isErr**: \<`R`\>(`result`) => `result is NarrowToErr<R>`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:244
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:211
 
-Checks if a `Result` is `Result.Err`.
-Acts as a type guard, narrowing the type to the error variant.
+Checks if a `Result` is `Result.Err`. Acts as a type guard, narrowing the
+type to the error variant.
 
 This function is essential for type-safe Result handling, allowing
-TypeScript to understand that subsequent operations will work with
-the error value rather than the success value.
+TypeScript to understand that subsequent operations will work with the
+error value rather than the success value.
 
 #### Type Parameters
 
@@ -325,33 +319,16 @@ The `Result` to check.
 
 #### Example
 
-```typescript
-// Basic type guard usage
-const result: Result<number, string> = divide(10, 0);
+```ts
+const operation = Result.ok(3);
+const failure = Result.err('error');
 
-if (Result.isErr(result)) {
-  // TypeScript knows result is Result.Err<string>
-  console.log(result.value); // Safe to access error .value
-  console.log(Result.unwrapErr(result)); // "Division by zero"
-} else {
-  // TypeScript knows result is Result.Ok<number>
-  console.log(result.value); // Success value
+if (Result.isOk(operation)) {
+  const value: number = operation.value;
+  assert(value === 3);
 }
 
-// Error handling patterns
-const handleResult = (r: Result<Data, ApiError>) => {
-  if (Result.isErr(r)) {
-    logError(r.value); // Safe error operations
-    return null;
-  }
-  return processData(r.value);
-};
-
-// Collecting errors from multiple Results
-const results: Result<string, ValidationError>[] = validateForm();
-const errors = results
-  .filter(Result.isErr)
-  .map(err => err.value); // ValidationError[]
+assert.ok(Result.isErr(failure));
 ```
 
 ***
@@ -360,14 +337,14 @@ const errors = results
 
 > `const` **isOk**: \<`R`\>(`result`) => `result is NarrowToOk<R>`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:202
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:184
 
-Checks if a `Result` is `Result.Ok`.
-Acts as a type guard, narrowing the type to the success variant.
+Checks if a `Result` is `Result.Ok`. Acts as a type guard, narrowing the
+type to the success variant.
 
 This function is essential for type-safe Result handling, allowing
-TypeScript to understand that subsequent operations will work with
-the success value rather than the error value.
+TypeScript to understand that subsequent operations will work with the
+success value rather than the error value.
 
 #### Type Parameters
 
@@ -393,34 +370,16 @@ The `Result` to check.
 
 #### Example
 
-```typescript
-// Basic type guard usage
-const result: Result<number, string> = divide(10, 2);
+```ts
+const operation = Result.ok(3);
+const failure = Result.err('error');
 
-if (Result.isOk(result)) {
-  // TypeScript knows result is Result.Ok<number>
-  console.log(result.value); // Safe to access .value
-  console.log(Result.unwrapOk(result)); // 5
-} else {
-  // TypeScript knows result is Result.Err<string>
-  console.log(result.value); // Error message
+if (Result.isOk(operation)) {
+  const value: number = operation.value;
+  assert(value === 3);
 }
 
-// Using in conditional logic
-const processResult = (r: Result<string, Error>) => {
-  return Result.isOk(r)
-    ? r.value.toUpperCase() // Safe string operations
-    : "Error occurred";
-};
-
-// Filtering arrays of Results
-const results: Result<number, string>[] = [
-  Result.ok(1),
-  Result.err("error"),
-  Result.ok(2)
-];
-const successes = results.filter(Result.isOk);
-// successes is Result.Ok<number>[]
+assert.ok(Result.isErr(failure));
 ```
 
 ***
@@ -429,7 +388,7 @@ const successes = results.filter(Result.isOk);
 
 > `const` **isResult**: (`maybeOptional`) => `maybeOptional is Result<unknown, unknown>`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:50
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:64
 
 Checks if the given value is a `Result`.
 
@@ -447,18 +406,30 @@ The value to check.
 
 `true` if the value is a `Result`, otherwise `false`.
 
+#### Example
+
+```ts
+const okValue = Result.ok('success');
+const errValue = Result.err(new Error('failure'));
+const notResult = { $$tag: 'ts-data-forge::Result.ok' };
+
+assert.ok(Result.isResult(okValue));
+assert.ok(Result.isResult(errValue));
+assert.notOk(Result.isResult(notResult));
+```
+
 ***
 
 ### ok()
 
 > `const` **ok**: \<`S`\>(`value`) => [`Ok`](#ok)\<`S`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:118
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:133
 
 Creates a `Result.Ok` containing the given success value.
 
-Use this constructor when an operation succeeds and you want to wrap
-the successful result in a Result type for consistent error handling.
+Use this constructor when an operation succeeds and you want to wrap the
+successful result in a Result type for consistent error handling.
 
 #### Type Parameters
 
@@ -484,22 +455,15 @@ A `Result.Ok<S>` containing the value.
 
 #### Example
 
-```typescript
-// Basic success case
-const success = Result.ok(42);
-console.log(Result.isOk(success)); // true
-console.log(Result.unwrapOk(success)); // 42
+```ts
+const success = Result.ok({ id: 1 });
+const failure = Result.err(new Error('missing data'));
 
-// Function that returns a Result
-function divide(a: number, b: number): Result<number, string> {
-  if (b === 0) {
-    return Result.err("Division by zero");
-  }
-  return Result.ok(a / b);
-}
-
-const result = divide(10, 2);
-console.log(Result.unwrapOk(result)); // 5
+assert.deepStrictEqual(success, {
+  $$tag: 'ts-data-forge::Result.ok',
+  value: { id: 1 },
+});
+assert.ok(Result.isErr(failure));
 ```
 
 ***
@@ -508,7 +472,7 @@ console.log(Result.unwrapOk(result)); // 5
 
 > `const` **swap**: \<`R`\>(`result`) => [`Result`](../README.md#result)\<[`UnwrapErr`](#unwraperr)\<`R`\>, [`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:541
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:624
 
 Swaps the success and error values of a `Result`.
 
@@ -536,11 +500,12 @@ A new `Result` with success and error swapped.
 
 #### Example
 
-```typescript
-const okResult = Result.ok(42);
-const swapped = Result.swap(okResult);
-console.log(Result.isErr(swapped)); // true
-console.log(Result.unwrapErr(swapped)); // 42
+```ts
+const okValue = Result.ok('value');
+const errValue = Result.err('error');
+
+assert.deepStrictEqual(Result.swap(okValue), Result.err('value'));
+assert.deepStrictEqual(Result.swap(errValue), Result.ok('error'));
 ```
 
 ***
@@ -549,16 +514,16 @@ console.log(Result.unwrapErr(swapped)); // 42
 
 > `const` **toOptional**: \<`R`\>(`result`) => `Optional`\<[`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:569
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:650
 
 Converts a `Result` to an `Optional`.
 
-This conversion is useful when you want to discard error information and only
-care about whether an operation succeeded. The error information is lost in
-this conversion, so use it when error details are not needed.
+This conversion is useful when you want to discard error information and
+only care about whether an operation succeeded. The error information is
+lost in this conversion, so use it when error details are not needed.
 
-If the `Result` is `Ok`, returns `Some` with the value.
-If the `Result` is `Err`, returns `None`.
+If the `Result` is `Ok`, returns `Some` with the value. If the `Result` is
+`Err`, returns `None`.
 
 #### Type Parameters
 
@@ -580,21 +545,17 @@ The `Result` to convert.
 
 `Optional`\<[`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-An `Optional<UnwrapOk<R>>` containing the success value or representing `None`.
+An `Optional<UnwrapOk<R>>` containing the success value or
+  representing `None`.
 
 #### Example
 
-```typescript
-// Basic conversion
-const okResult = Result.ok(42);
-const optional = Result.toOptional(okResult);
-console.log(Optional.isSome(optional)); // true
-console.log(Optional.unwrap(optional)); // 42
+```ts
+const okValue = Result.ok(7);
+const errValue = Result.err('fail');
 
-const errResult = Result.err("Network error");
-const none = Result.toOptional(errResult);
-console.log(Optional.isNone(none)); // true
-
+assert.deepStrictEqual(Result.toOptional(okValue), Optional.some(7));
+assert.deepStrictEqual(Result.toOptional(errValue), Optional.none);
 ```
 
 ***
@@ -603,13 +564,14 @@ console.log(Optional.isNone(none)); // true
 
 > `const` **unwrapErr**: \<`R`\>(`result`) => [`UnwrapErr`](#unwraperr)\<`R`\> \| `undefined`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:371
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:353
 
-Unwraps a `Result`, returning the error value or `undefined` if it is `Result.Ok`.
+Unwraps a `Result`, returning the error value or `undefined` if it is
+`Result.Ok`.
 
-This provides a safe way to extract error values from Results without throwing
-exceptions. Useful for error handling patterns where you want to check for
-specific error conditions.
+This provides a safe way to extract error values from Results without
+throwing exceptions. Useful for error handling patterns where you want to
+check for specific error conditions.
 
 #### Type Parameters
 
@@ -635,12 +597,17 @@ The error value if `Result.Err`, otherwise `undefined`.
 
 #### Example
 
-```typescript
-const failure = Result.err("Connection failed");
-console.log(Result.unwrapErr(failure)); // "Connection failed"
+```ts
+const okResult = Result.ok('data');
+const errResult = Result.err('problem');
 
-const success = Result.ok(42);
-console.log(Result.unwrapErr(success)); // undefined
+// Result.unwrapErr returns undefined for Ok results
+// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+assert(Result.unwrapErr(okResult) === undefined);
+
+// Result.unwrapErr returns the error value for Err results
+
+assert(Result.unwrapErr(errResult) === 'problem');
 ```
 
 ***
@@ -649,14 +616,14 @@ console.log(Result.unwrapErr(success)); // undefined
 
 > `const` **unwrapErrThrow**: \<`R`\>(`result`, `toStr?`) => [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:351
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:325
 
-Unwraps a `Result`, returning the error value.
-Throws an error if the `Result` is `Result.Ok`.
+Unwraps a `Result`, returning the error value. Throws an error if the
+`Result` is `Result.Ok`.
 
 This function is used when you expect a Result to be an error and want to
-extract the error value. If the Result is unexpectedly Ok, it will throw
-an error with information about the unexpected success value.
+extract the error value. If the Result is unexpectedly Ok, it will throw an
+error with information about the unexpected success value.
 
 #### Type Parameters
 
@@ -678,7 +645,9 @@ The `Result` to unwrap.
 
 (`v`) => `string`
 
-An optional function to convert the success value to a string for the error message when the Result is unexpectedly Ok. Defaults to `String`.
+An optional function to convert the success value to a string
+  for the error message when the Result is unexpectedly Ok. Defaults to
+  `String`.
 
 #### Returns
 
@@ -686,23 +655,20 @@ An optional function to convert the success value to a string for the error mess
 
 The error value if `Result.Err`.
 
-#### Throws
-
-Error with message "Expected Err but got Ok: {value}" if the `Result` is `Result.Ok`.
-
 #### Example
 
-```typescript
-const failure = Result.err("Network timeout");
-console.log(Result.unwrapErrThrow(failure)); // "Network timeout"
+```ts
+const errResult = Result.err(new Error('broken'));
+const okResult = Result.ok('value');
 
-const success = Result.ok(42);
-try {
-  Result.unwrapErrThrow(success); // throws Error: "Expected Err but got Ok: 42"
-} catch (error) {
-  console.log(error.message); // "Expected Err but got Ok: 42"
-}
+assert(Result.unwrapErrThrow(errResult).message === 'broken');
+assert.throws(() => Result.unwrapErrThrow(okResult), /Expected Err/u);
 ```
+
+#### Throws
+
+Error with message "Expected Err but got Ok: {value}" if
+  the `Result` is `Result.Ok`.
 
 ***
 
@@ -710,14 +676,15 @@ try {
 
 > `const` **unwrapThrow**: \<`R`\>(`result`, `toStr?`) => [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:271
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:239
 
-Unwraps a `Result`, returning the success value.
-Throws an error if the `Result` is `Result.Err`.
+Unwraps a `Result`, returning the success value. Throws an error if the
+`Result` is `Result.Err`.
 
-This is useful when you're confident that a Result should contain a success value
-and want to treat errors as exceptional conditions. The error message will be
-constructed from the error value using the provided string conversion function.
+This is useful when you're confident that a Result should contain a success
+value and want to treat errors as exceptional conditions. The error message
+will be constructed from the error value using the provided string
+conversion function.
 
 #### Type Parameters
 
@@ -739,7 +706,8 @@ The `Result` to unwrap.
 
 (`e`) => `string`
 
-An optional function to convert the error value to a string for the error message. Defaults to `String`.
+An optional function to convert the error value to a string
+  for the error message. Defaults to `String`.
 
 #### Returns
 
@@ -747,23 +715,20 @@ An optional function to convert the error value to a string for the error messag
 
 The success value if `Result.Ok`.
 
-#### Throws
-
-Error with the stringified error value if the `Result` is `Result.Err`.
-
 #### Example
 
-```typescript
-const success = Result.ok(42);
-console.log(Result.unwrapThrow(success)); // 42
+```ts
+const okResult = Result.ok('data');
+const errResult = Result.err(new Error('fail'));
 
-const failure = Result.err("Network error");
-try {
-  Result.unwrapThrow(failure); // throws Error: "Network error"
-} catch (error) {
-  console.log(error.message); // "Network error"
-}
+assert(Result.unwrapThrow(okResult) === 'data');
+assert.throws(() => Result.unwrapThrow(errResult), /fail/u);
 ```
+
+#### Throws
+
+Error with the stringified error value if the `Result` is
+  `Result.Err`.
 
 ***
 
@@ -771,10 +736,10 @@ try {
 
 > `const` **zip**: \<`S1`, `E1`, `S2`, `E2`\>(`resultA`, `resultB`) => [`Result`](../README.md#result)\<readonly \[`S1`, `S2`\], `E1` \| `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:607
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:708
 
-Combines two `Result` values into a single `Result` containing a tuple.
-If either `Result` is `Err`, returns the first `Err` encountered.
+Combines two `Result` values into a single `Result` containing a tuple. If
+either `Result` is `Err`, returns the first `Err` encountered.
 
 #### Type Parameters
 
@@ -824,14 +789,17 @@ A `Result` containing a tuple of both values, or the first `Err`.
 
 #### Example
 
-```typescript
-const a = Result.ok(1);
-const b = Result.ok("hello");
-const zipped = Result.zip(a, b);
-console.log(Result.unwrapOk(zipped)); // [1, "hello"]
+```ts
+const first = Result.ok('left');
+const second = Result.ok(1);
 
-const withErr = Result.zip(a, Result.err("error"));
-console.log(Result.unwrapErr(withErr)); // "error"
+const expected: readonly [string, number] = ['left', 1];
+
+assert.deepStrictEqual(Result.zip(first, second), Result.ok(expected));
+assert.deepStrictEqual(
+  Result.zip(first, Result.err('error')),
+  Result.err('error'),
+);
 ```
 
 ## Functions
@@ -842,9 +810,10 @@ console.log(Result.unwrapErr(withErr)); // "error"
 
 > **expectToBe**\<`R`\>(`result`, `message`): [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:481
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:547
 
-Unwraps a `Result`, returning the success value or throwing an error with the provided message.
+Unwraps a `Result`, returning the success value or throwing an error with
+the provided message.
 
 ##### Type Parameters
 
@@ -874,25 +843,31 @@ The error message to throw if the `Result` is `Result.Err`.
 
 The success value if `Result.Ok`.
 
+##### Example
+
+```ts
+const okValue = Result.ok('data');
+
+assert(Result.expectToBe(okValue, 'should have value') === 'data');
+
+const expectResult = Result.expectToBe<string>('missing result');
+
+assert.throws(() => expectResult(Result.err('boom')), /missing result/u);
+assert(expectResult(Result.ok('value')) === 'value');
+```
+
 ##### Throws
 
 Error with the provided message if the `Result` is `Result.Err`.
-
-##### Example
-
-```typescript
-const result = Result.ok(42);
-const value = Result.expectToBe(result, "Operation must succeed");
-console.log(value); // 42
-```
 
 #### Call Signature
 
 > **expectToBe**\<`S`\>(`message`): \<`E`\>(`result`) => `S`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:482
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:548
 
-Unwraps a `Result`, returning the success value or throwing an error with the provided message.
+Unwraps a `Result`, returning the success value or throwing an error with
+the provided message.
 
 ##### Type Parameters
 
@@ -930,17 +905,22 @@ The success value if `Result.Ok`.
 
 `S`
 
+##### Example
+
+```ts
+const okValue = Result.ok('data');
+
+assert(Result.expectToBe(okValue, 'should have value') === 'data');
+
+const expectResult = Result.expectToBe<string>('missing result');
+
+assert.throws(() => expectResult(Result.err('boom')), /missing result/u);
+assert(expectResult(Result.ok('value')) === 'value');
+```
+
 ##### Throws
 
 Error with the provided message if the `Result` is `Result.Err`.
-
-##### Example
-
-```typescript
-const result = Result.ok(42);
-const value = Result.expectToBe(result, "Operation must succeed");
-console.log(value); // 42
-```
 
 ***
 
@@ -950,11 +930,11 @@ console.log(value); // 42
 
 > **flatMap**\<`R`, `S2`, `E2`\>(`result`, `flatMapFn`): [`Result`](../README.md#result)\<`S2`, `E2` \| [`UnwrapErr`](#unwraperr)\<`R`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:465
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:522
 
-Applies a function that returns a `Result` to the success value of a `Result`.
-If the input is `Err`, returns the original `Err`.
-This is the monadic bind operation for `Result`.
+Applies a function that returns a `Result` to the success value of a
+`Result`. If the input is `Err`, returns the original `Err`. This is the
+monadic bind operation for `Result`.
 
 ##### Type Parameters
 
@@ -998,23 +978,36 @@ The result of applying the function, or the original `Err`.
 
 ##### Example
 
-```typescript
-const divide = (a: number, b: number): Result<number, string> =>
-  b === 0 ? Result.err("Division by zero") : Result.ok(a / b);
+```ts
+const parseNumber = (input: string): Result<number, string> => {
+  const num = Number.parseInt(input, 10);
+  return Number.isNaN(num) ? Result.err('not a number') : Result.ok(num);
+};
 
-const result = Result.flatMap(Result.ok(10), x => divide(x, 2));
-console.log(Result.unwrapOk(result)); // 5
+const parsed = Result.flatMap(Result.ok('42'), parseNumber);
+const failure = Result.flatMap(Result.ok('abc'), parseNumber);
+const passthrough = Result.flatMap(Result.err('fail'), parseNumber);
+
+assert.deepStrictEqual(parsed, Result.ok(42));
+assert.deepStrictEqual(failure, Result.err('not a number'));
+assert.deepStrictEqual(passthrough, Result.err('fail'));
+
+const parseThenDouble = Result.flatMap((input: string) =>
+  Result.map(parseNumber(input), (value) => value * 2),
+);
+
+assert.deepStrictEqual(parseThenDouble(Result.ok('10')), Result.ok(20));
 ```
 
 #### Call Signature
 
 > **flatMap**\<`S`, `S2`, `E2`\>(`flatMapFn`): \<`E`\>(`result`) => [`Result`](../README.md#result)\<`S2`, `E2` \| `E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:466
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:523
 
-Applies a function that returns a `Result` to the success value of a `Result`.
-If the input is `Err`, returns the original `Err`.
-This is the monadic bind operation for `Result`.
+Applies a function that returns a `Result` to the success value of a
+`Result`. If the input is `Err`, returns the original `Err`. This is the
+monadic bind operation for `Result`.
 
 ##### Type Parameters
 
@@ -1066,12 +1059,25 @@ The result of applying the function, or the original `Err`.
 
 ##### Example
 
-```typescript
-const divide = (a: number, b: number): Result<number, string> =>
-  b === 0 ? Result.err("Division by zero") : Result.ok(a / b);
+```ts
+const parseNumber = (input: string): Result<number, string> => {
+  const num = Number.parseInt(input, 10);
+  return Number.isNaN(num) ? Result.err('not a number') : Result.ok(num);
+};
 
-const result = Result.flatMap(Result.ok(10), x => divide(x, 2));
-console.log(Result.unwrapOk(result)); // 5
+const parsed = Result.flatMap(Result.ok('42'), parseNumber);
+const failure = Result.flatMap(Result.ok('abc'), parseNumber);
+const passthrough = Result.flatMap(Result.err('fail'), parseNumber);
+
+assert.deepStrictEqual(parsed, Result.ok(42));
+assert.deepStrictEqual(failure, Result.err('not a number'));
+assert.deepStrictEqual(passthrough, Result.err('fail'));
+
+const parseThenDouble = Result.flatMap((input: string) =>
+  Result.map(parseNumber(input), (value) => value * 2),
+);
+
+assert.deepStrictEqual(parseThenDouble(Result.ok('10')), Result.ok(20));
 ```
 
 ***
@@ -1082,9 +1088,10 @@ console.log(Result.unwrapOk(result)); // 5
 
 > **fold**\<`R`, `S2`, `E2`\>(`result`, `mapFn`, `mapErrFn`): [`Result`](../README.md#result)\<`S2`, `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:444
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:485
 
-Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
+Applies one of two functions depending on whether the `Result` is `Ok` or
+`Err`.
 
 ##### Type Parameters
 
@@ -1134,19 +1141,41 @@ A new `Result<S2, E2>` based on the applied function.
 
 ##### Example
 
-```typescript
-const result = Result.ok(42);
-const folded = Result.fold(result, x => x * 2, () => 0);
-console.log(Result.unwrapOk(folded)); // 84
+```ts
+const okValue = Result.ok(2);
+const errValue = Result.err('bad');
+
+const foldedOk = Result.fold(
+  okValue,
+  (value) => value * 2,
+  (error) => error,
+);
+const foldedErr = Result.fold(
+  errValue,
+  (value: number) => value * 2,
+  (error) => error.toUpperCase(),
+);
+
+assert.deepStrictEqual(foldedOk, Result.ok(4));
+assert.deepStrictEqual(foldedErr, Result.err('BAD'));
+
+const foldNumbers = Result.fold(
+  (value: number) => value * 3,
+  (error: string) => error.length,
+);
+
+assert.deepStrictEqual(foldNumbers(Result.ok(3)), Result.ok(9));
+assert.deepStrictEqual(foldNumbers(Result.err('oops')), Result.err(4));
 ```
 
 #### Call Signature
 
 > **fold**\<`S`, `E`, `S2`, `E2`\>(`mapFn`, `mapErrFn`): (`result`) => [`Result`](../README.md#result)\<`S2`, `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:445
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:486
 
-Applies one of two functions depending on whether the `Result` is `Ok` or `Err`.
+Applies one of two functions depending on whether the `Result` is `Ok` or
+`Err`.
 
 ##### Type Parameters
 
@@ -1202,10 +1231,31 @@ A new `Result<S2, E2>` based on the applied function.
 
 ##### Example
 
-```typescript
-const result = Result.ok(42);
-const folded = Result.fold(result, x => x * 2, () => 0);
-console.log(Result.unwrapOk(folded)); // 84
+```ts
+const okValue = Result.ok(2);
+const errValue = Result.err('bad');
+
+const foldedOk = Result.fold(
+  okValue,
+  (value) => value * 2,
+  (error) => error,
+);
+const foldedErr = Result.fold(
+  errValue,
+  (value: number) => value * 2,
+  (error) => error.toUpperCase(),
+);
+
+assert.deepStrictEqual(foldedOk, Result.ok(4));
+assert.deepStrictEqual(foldedErr, Result.err('BAD'));
+
+const foldNumbers = Result.fold(
+  (value: number) => value * 3,
+  (error: string) => error.length,
+);
+
+assert.deepStrictEqual(foldNumbers(Result.ok(3)), Result.ok(9));
+assert.deepStrictEqual(foldNumbers(Result.err('oops')), Result.err(4));
 ```
 
 ***
@@ -1216,10 +1266,11 @@ console.log(Result.unwrapOk(folded)); // 84
 
 > **map**\<`R`, `S2`\>(`result`, `mapFn`): [`Result`](../README.md#result)\<`S2`, [`UnwrapErr`](#unwraperr)\<`R`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:409
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:411
 
-Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
-If the `Result` is `Result.Err`, returns the original `Err`.
+Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the
+success value. If the `Result` is `Result.Err`, returns the original
+`Err`.
 
 ##### Type Parameters
 
@@ -1233,7 +1284,8 @@ The input `Result.Base` type.
 
 `S2`
 
-The type of the success value returned by the mapping function.
+The type of the success value returned by the mapping
+  function.
 
 ##### Parameters
 
@@ -1257,26 +1309,31 @@ A new `Result<S2, UnwrapErr<R>>`.
 
 ##### Example
 
-```typescript
-// Regular usage
-const result = Result.ok(5);
-const mapped = Result.map(result, x => x * 2);
-console.log(Result.unwrap(mapped)); // 10
+```ts
+const okNumber = Result.ok(5);
+const errMessage = Result.err('error');
 
-// Curried version for use with pipe
-const doubler = Result.map((x: number) => x * 2);
-const result2 = pipe(Result.ok(5)).map(doubler).value;
-console.log(Result.unwrap(result2)); // 10
+const doubled = Result.map(okNumber, (value) => value * 2);
+const untouchedError = Result.map(errMessage, (value: number) => value * 2);
+
+assert.deepStrictEqual(doubled, Result.ok(10));
+assert.deepStrictEqual(untouchedError, errMessage);
+
+const mapToLength = Result.map((text: string) => text.length);
+
+assert.deepStrictEqual(mapToLength(Result.ok('abc')), Result.ok(3));
+assert.deepStrictEqual(mapToLength(Result.err('bad')), Result.err('bad'));
 ```
 
 #### Call Signature
 
 > **map**\<`S`, `S2`\>(`mapFn`): \<`E`\>(`result`) => [`Result`](../README.md#result)\<`S2`, `E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:410
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:412
 
-Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the success value.
-If the `Result` is `Result.Err`, returns the original `Err`.
+Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the
+success value. If the `Result` is `Result.Err`, returns the original
+`Err`.
 
 ##### Type Parameters
 
@@ -1288,7 +1345,8 @@ If the `Result` is `Result.Err`, returns the original `Err`.
 
 `S2`
 
-The type of the success value returned by the mapping function.
+The type of the success value returned by the mapping
+  function.
 
 ##### Parameters
 
@@ -1322,16 +1380,20 @@ A new `Result<S2, UnwrapErr<R>>`.
 
 ##### Example
 
-```typescript
-// Regular usage
-const result = Result.ok(5);
-const mapped = Result.map(result, x => x * 2);
-console.log(Result.unwrap(mapped)); // 10
+```ts
+const okNumber = Result.ok(5);
+const errMessage = Result.err('error');
 
-// Curried version for use with pipe
-const doubler = Result.map((x: number) => x * 2);
-const result2 = pipe(Result.ok(5)).map(doubler).value;
-console.log(Result.unwrap(result2)); // 10
+const doubled = Result.map(okNumber, (value) => value * 2);
+const untouchedError = Result.map(errMessage, (value: number) => value * 2);
+
+assert.deepStrictEqual(doubled, Result.ok(10));
+assert.deepStrictEqual(untouchedError, errMessage);
+
+const mapToLength = Result.map((text: string) => text.length);
+
+assert.deepStrictEqual(mapToLength(Result.ok('abc')), Result.ok(3));
+assert.deepStrictEqual(mapToLength(Result.err('bad')), Result.err('bad'));
 ```
 
 ***
@@ -1342,10 +1404,10 @@ console.log(Result.unwrap(result2)); // 10
 
 > **mapErr**\<`R`, `E2`\>(`result`, `mapFn`): [`Result`](../README.md#result)\<[`UnwrapOk`](#unwrapok)\<`R`\>, `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:426
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:442
 
-Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
-If the `Result` is `Result.Ok`, returns the original `Ok`.
+Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the
+error value. If the `Result` is `Result.Ok`, returns the original `Ok`.
 
 ##### Type Parameters
 
@@ -1383,20 +1445,31 @@ A new `Result<UnwrapOk<R>, E2>`.
 
 ##### Example
 
-```typescript
-const result = Result.err("error");
-const mapped = Result.mapErr(result, e => e.toUpperCase());
-console.log(Result.unwrapErr(mapped)); // "ERROR"
+```ts
+const okValue = Result.ok(3) as Result<number, string>;
+const errValue = Result.err('missing');
+
+const untouchedOk = Result.mapErr(okValue, (error) => error.toUpperCase());
+const uppercasedErr = Result.mapErr(errValue, (error) => error.toUpperCase());
+
+assert.deepStrictEqual(untouchedOk, Result.ok(3));
+assert.deepStrictEqual(uppercasedErr, Result.err('MISSING'));
+
+const mapError = Result.mapErr((error: Readonly<Error>) => error.message);
+
+const wrapped = mapError(Result.err(new Error('boom')));
+
+assert.deepStrictEqual(wrapped, Result.err('boom'));
 ```
 
 #### Call Signature
 
 > **mapErr**\<`E`, `E2`\>(`mapFn`): \<`S`\>(`result`) => [`Result`](../README.md#result)\<`S`, `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:427
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:443
 
-Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the error value.
-If the `Result` is `Result.Ok`, returns the original `Ok`.
+Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the
+error value. If the `Result` is `Result.Ok`, returns the original `Ok`.
 
 ##### Type Parameters
 
@@ -1442,10 +1515,21 @@ A new `Result<UnwrapOk<R>, E2>`.
 
 ##### Example
 
-```typescript
-const result = Result.err("error");
-const mapped = Result.mapErr(result, e => e.toUpperCase());
-console.log(Result.unwrapErr(mapped)); // "ERROR"
+```ts
+const okValue = Result.ok(3) as Result<number, string>;
+const errValue = Result.err('missing');
+
+const untouchedOk = Result.mapErr(okValue, (error) => error.toUpperCase());
+const uppercasedErr = Result.mapErr(errValue, (error) => error.toUpperCase());
+
+assert.deepStrictEqual(untouchedOk, Result.ok(3));
+assert.deepStrictEqual(uppercasedErr, Result.err('MISSING'));
+
+const mapError = Result.mapErr((error: Readonly<Error>) => error.message);
+
+const wrapped = mapError(Result.err(new Error('boom')));
+
+assert.deepStrictEqual(wrapped, Result.err('boom'));
 ```
 
 ***
@@ -1456,7 +1540,7 @@ console.log(Result.unwrapErr(mapped)); // "ERROR"
 
 > **orElse**\<`R`, `R2`\>(`result`, `alternative`): `R2` \| [`NarrowToOk`](#narrowtook)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:584
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:679
 
 Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
@@ -1484,7 +1568,8 @@ The `Result` to check.
 
 `R2`
 
-The alternative `Result` to return if the first is `Err`.
+The alternative `Result` to return if the first is
+  `Err`.
 
 ##### Returns
 
@@ -1494,18 +1579,28 @@ The first `Result` if `Ok`, otherwise the alternative.
 
 ##### Example
 
-```typescript
-const primary = Result.err("error");
-const fallback = Result.ok("default");
-const result = Result.orElse(primary, fallback);
-console.log(Result.unwrapOk(result)); // "default"
+```ts
+const primary = Result.ok('primary');
+const fallback = Result.ok('fallback');
+const failure = Result.err('failure');
+
+assert.deepStrictEqual(Result.orElse(primary, fallback), primary);
+assert.deepStrictEqual(Result.orElse(failure, fallback), fallback);
+
+const orElseFallback = Result.orElse(Result.ok('default'));
+
+assert.deepStrictEqual(
+  orElseFallback(Result.err('missing')),
+  Result.ok('default'),
+);
+assert.deepStrictEqual(orElseFallback(Result.ok('value')), Result.ok('value'));
 ```
 
 #### Call Signature
 
 > **orElse**\<`S`, `E`, `S2`, `E2`\>(`alternative`): (`result`) => [`Result`](../README.md#result)\<`S2`, `E2`\> \| [`Result`](../README.md#result)\<`S`, `E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:585
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:680
 
 Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
@@ -1533,7 +1628,8 @@ Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
 [`Result`](../README.md#result)\<`S2`, `E2`\>
 
-The alternative `Result` to return if the first is `Err`.
+The alternative `Result` to return if the first is
+  `Err`.
 
 ##### Returns
 
@@ -1553,11 +1649,21 @@ The first `Result` if `Ok`, otherwise the alternative.
 
 ##### Example
 
-```typescript
-const primary = Result.err("error");
-const fallback = Result.ok("default");
-const result = Result.orElse(primary, fallback);
-console.log(Result.unwrapOk(result)); // "default"
+```ts
+const primary = Result.ok('primary');
+const fallback = Result.ok('fallback');
+const failure = Result.err('failure');
+
+assert.deepStrictEqual(Result.orElse(primary, fallback), primary);
+assert.deepStrictEqual(Result.orElse(failure, fallback), fallback);
+
+const orElseFallback = Result.orElse(Result.ok('default'));
+
+assert.deepStrictEqual(
+  orElseFallback(Result.err('missing')),
+  Result.ok('default'),
+);
+assert.deepStrictEqual(orElseFallback(Result.ok('value')), Result.ok('value'));
 ```
 
 ***
@@ -1568,9 +1674,10 @@ console.log(Result.unwrapOk(result)); // "default"
 
 > **unwrapErrOr**\<`R`, `D`\>(`result`, `defaultValue`): `D` \| [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:386
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:379
 
-Unwraps a `Result`, returning the error value or a default value if it is `Result.Ok`.
+Unwraps a `Result`, returning the error value or a default value if it is
+`Result.Ok`.
 
 ##### Type Parameters
 
@@ -1608,19 +1715,27 @@ The error value if `Result.Err`, otherwise `defaultValue`.
 
 ##### Example
 
-```typescript
-const result = Result.err("failed");
-const error = Result.unwrapErrOr(result, "default");
-console.log(error); // "failed"
+```ts
+const okResult = Result.ok('success');
+const errResult = Result.err('failure');
+
+assert(Result.unwrapErrOr(okResult, 'default') === 'default');
+assert(Result.unwrapErrOr(errResult, 'default') === 'failure');
+
+const unwrapError = Result.unwrapErrOr('fallback error');
+
+assert(unwrapError(Result.err('boom')) === 'boom');
+assert(unwrapError(Result.ok('no error')) === 'fallback error');
 ```
 
 #### Call Signature
 
 > **unwrapErrOr**\<`E`, `D`\>(`defaultValue`): \<`S`\>(`result`) => `E` \| `D`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:387
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:380
 
-Unwraps a `Result`, returning the error value or a default value if it is `Result.Ok`.
+Unwraps a `Result`, returning the error value or a default value if it is
+`Result.Ok`.
 
 ##### Type Parameters
 
@@ -1666,10 +1781,17 @@ The error value if `Result.Err`, otherwise `defaultValue`.
 
 ##### Example
 
-```typescript
-const result = Result.err("failed");
-const error = Result.unwrapErrOr(result, "default");
-console.log(error); // "failed"
+```ts
+const okResult = Result.ok('success');
+const errResult = Result.err('failure');
+
+assert(Result.unwrapErrOr(okResult, 'default') === 'default');
+assert(Result.unwrapErrOr(errResult, 'default') === 'failure');
+
+const unwrapError = Result.unwrapErrOr('fallback error');
+
+assert(unwrapError(Result.err('boom')) === 'boom');
+assert(unwrapError(Result.ok('no error')) === 'fallback error');
 ```
 
 ***
@@ -1680,12 +1802,14 @@ console.log(error); // "failed"
 
 > **unwrapOk**\<`R`\>(`result`): [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:307
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:269
 
-Unwraps a `Result`, returning the success value or `undefined` if it's an error.
+Unwraps a `Result`, returning the success value or `undefined` if it's an
+error.
 
-This function provides a safe way to extract success values from Results without
-throwing exceptions. It has overloaded behavior based on the type:
+This function provides a safe way to extract success values from Results
+without throwing exceptions. It has overloaded behavior based on the type:
+
 - For `Result.Ok<T>`: Always returns `T` (guaranteed by type system)
 - For general `Result<T, E>`: Returns `T | undefined`
 
@@ -1713,39 +1837,31 @@ The success value if `Result.Ok`, otherwise `undefined`.
 
 ##### Example
 
-```typescript
-// With guaranteed Ok - returns the value
-const success = Result.ok(42);
-const value = Result.unwrapOk(success); // Type: number, Value: 42
+```ts
+const okResult = Result.ok(42);
+const errResult = Result.err('oops');
 
-// With general Result - may return undefined
-const maybeResult: Result<string, Error> = fetchData();
-const data = Result.unwrapOk(maybeResult); // Type: string | undefined
+// Result.unwrapOk returns the value for Ok results
 
-// Safe pattern for handling both cases
-const result = Result.ok("hello");
-const unwrapped = Result.unwrapOk(result);
-if (unwrapped !== undefined) {
-  console.log(unwrapped.toUpperCase()); // "HELLO"
-}
+assert(Result.unwrapOk(okResult) === 42);
 
-// Useful in conditional chains
-const processResult = (r: Result<number, string>) => {
-  const value = Result.unwrapOk(r);
-  return value !== undefined ? value * 2 : 0;
-};
+// Result.unwrapOk returns undefined for Err results
+// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+assert(Result.unwrapOk(errResult) === undefined);
 ```
 
 #### Call Signature
 
 > **unwrapOk**\<`R`\>(`result`): [`UnwrapOk`](#unwrapok)\<`R`\> \| `undefined`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:308
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:270
 
-Unwraps a `Result`, returning the success value or `undefined` if it's an error.
+Unwraps a `Result`, returning the success value or `undefined` if it's an
+error.
 
-This function provides a safe way to extract success values from Results without
-throwing exceptions. It has overloaded behavior based on the type:
+This function provides a safe way to extract success values from Results
+without throwing exceptions. It has overloaded behavior based on the type:
+
 - For `Result.Ok<T>`: Always returns `T` (guaranteed by type system)
 - For general `Result<T, E>`: Returns `T | undefined`
 
@@ -1773,27 +1889,17 @@ The success value if `Result.Ok`, otherwise `undefined`.
 
 ##### Example
 
-```typescript
-// With guaranteed Ok - returns the value
-const success = Result.ok(42);
-const value = Result.unwrapOk(success); // Type: number, Value: 42
+```ts
+const okResult = Result.ok(42);
+const errResult = Result.err('oops');
 
-// With general Result - may return undefined
-const maybeResult: Result<string, Error> = fetchData();
-const data = Result.unwrapOk(maybeResult); // Type: string | undefined
+// Result.unwrapOk returns the value for Ok results
 
-// Safe pattern for handling both cases
-const result = Result.ok("hello");
-const unwrapped = Result.unwrapOk(result);
-if (unwrapped !== undefined) {
-  console.log(unwrapped.toUpperCase()); // "HELLO"
-}
+assert(Result.unwrapOk(okResult) === 42);
 
-// Useful in conditional chains
-const processResult = (r: Result<number, string>) => {
-  const value = Result.unwrapOk(r);
-  return value !== undefined ? value * 2 : 0;
-};
+// Result.unwrapOk returns undefined for Err results
+// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+assert(Result.unwrapOk(errResult) === undefined);
 ```
 
 ***
@@ -1804,9 +1910,10 @@ const processResult = (r: Result<number, string>) => {
 
 > **unwrapOkOr**\<`R`, `D`\>(`result`, `defaultValue`): `D` \| [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:323
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:296
 
-Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
+Unwraps a `Result`, returning the success value or a default value if it is
+`Result.Err`.
 
 ##### Type Parameters
 
@@ -1844,19 +1951,27 @@ The success value if `Result.Ok`, otherwise `defaultValue`.
 
 ##### Example
 
-```typescript
-const result = Result.ok(42);
-const value = Result.unwrapOkOr(result, 0);
-console.log(value); // 42
+```ts
+const okValue = Result.ok(10);
+const errValue = Result.err('fail');
+
+assert(Result.unwrapOkOr(okValue, 0) === 10);
+assert(Result.unwrapOkOr(errValue, 0) === 0);
+
+const unwrapWithDefault = Result.unwrapOkOr(5);
+
+assert(unwrapWithDefault(Result.ok(3)) === 3);
+assert(unwrapWithDefault(Result.err('no data')) === 5);
 ```
 
 #### Call Signature
 
 > **unwrapOkOr**\<`S`, `D`\>(`defaultValue`): \<`E`\>(`result`) => `S` \| `D`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:324
+Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:297
 
-Unwraps a `Result`, returning the success value or a default value if it is `Result.Err`.
+Unwraps a `Result`, returning the success value or a default value if it is
+`Result.Err`.
 
 ##### Type Parameters
 
@@ -1902,8 +2017,15 @@ The success value if `Result.Ok`, otherwise `defaultValue`.
 
 ##### Example
 
-```typescript
-const result = Result.ok(42);
-const value = Result.unwrapOkOr(result, 0);
-console.log(value); // 42
+```ts
+const okValue = Result.ok(10);
+const errValue = Result.err('fail');
+
+assert(Result.unwrapOkOr(okValue, 0) === 10);
+assert(Result.unwrapOkOr(errValue, 0) === 0);
+
+const unwrapWithDefault = Result.unwrapOkOr(5);
+
+assert(unwrapWithDefault(Result.ok(3)) === 3);
+assert(unwrapWithDefault(Result.err('no data')) === 5);
 ```

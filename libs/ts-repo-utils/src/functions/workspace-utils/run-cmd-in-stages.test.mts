@@ -1,4 +1,5 @@
 /* eslint-disable vitest/no-restricted-vi-methods */
+import { type MockInstance } from 'vitest';
 import '../../node-global.mjs';
 import { executeStages } from './execute-parallel.mjs';
 import { getWorkspacePackages } from './get-workspace-packages.mjs';
@@ -16,9 +17,9 @@ vi.mock('./get-workspace-packages.mjs', () => ({
 
 describe('runCmdInStagesAcrossWorkspaces', () => {
   type MockedSpies = Readonly<{
-    consoleLogSpy: ReturnType<typeof vi.spyOn>;
-    consoleErrorSpy: ReturnType<typeof vi.spyOn>;
-    processExitSpy: ReturnType<typeof vi.spyOn>;
+    consoleLogSpy: MockInstance<typeof console.log>;
+    consoleErrorSpy: MockInstance<typeof console.error>;
+    processExitSpy: MockInstance<typeof process.exit>;
   }>;
 
   const setupSpies = (): MockedSpies => {
@@ -30,14 +31,10 @@ describe('runCmdInStagesAcrossWorkspaces', () => {
       .spyOn(console, 'error')
       .mockImplementation((): void => {});
 
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     const processExitSpy = vi
       .spyOn(process, 'exit')
-
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      .mockImplementation((): never => undefined as never) as ReturnType<
-      typeof vi.spyOn
-    >;
+      .mockImplementation((): never => undefined as never);
 
     return { consoleLogSpy, consoleErrorSpy, processExitSpy };
   };

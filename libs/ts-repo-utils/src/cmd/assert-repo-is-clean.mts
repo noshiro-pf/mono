@@ -14,7 +14,7 @@ const cmdDef = cmd.command({
     }),
   },
   handler: (args) => {
-    main(args).catch((error) => {
+    main(args).catch((error: unknown) => {
       console.error('An error occurred:', error);
       process.exit(1);
     });

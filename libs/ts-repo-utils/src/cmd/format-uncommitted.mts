@@ -44,7 +44,7 @@ const cmdDef = cmd.command({
       excludeStaged: args.excludeStaged ?? false,
       ignoreUnknown: args.ignoreUnknown ?? true,
       silent: args.silent ?? false,
-    }).catch((error) => {
+    }).catch((error: unknown) => {
       console.error('An error occurred:', error);
       process.exit(1);
     });
