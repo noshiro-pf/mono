@@ -121,8 +121,8 @@ importers:
         specifier: ^5.2.0
         version: 5.2.0(typescript@5.9.3)
       ts-repo-utils:
-        specifier: ^7.7.3
-        version: 7.7.3(prettier@3.6.2)(typescript@5.9.3)
+        specifier: ^7.8.0
+        version: 7.8.0(prettier@3.6.2)(typescript@5.9.3)
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -4023,8 +4023,8 @@ packages:
   ts-fortress@5.2.0:
     resolution: {integrity: sha512-OXcfAigfWDayC6+zPh8xYy0sTaYCg9SmwnSNY1SV7l2ga2NrTHOBzNNtLPyDgZVARiu9MozQiRBhdJhp2ErkmA==}
 
-  ts-repo-utils@7.7.3:
-    resolution: {integrity: sha512-z59bso2RZBcr5YZYKblQh63RQVrrQLbqaNlHTD18eNv2FtuvXbCEkotB4zvP02X/WK6NeWWbH0iRyDOd45SJyA==}
+  ts-repo-utils@7.8.0:
+    resolution: {integrity: sha512-hPXLo97p9xvOh34838nt2QRV9v3nKOzn8GTDNHqWcNf+U4ngPsBOkGqfiuAMOdf5DDloFW8HzeF1lE69UCGW6w==}
     hasBin: true
     peerDependencies:
       prettier: ^3.6.2
@@ -8656,7 +8656,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  ts-repo-utils@7.7.3(prettier@3.6.2)(typescript@5.9.3):
+  ts-repo-utils@7.8.0(prettier@3.6.2)(typescript@5.9.3):
     dependencies:
       '@types/micromatch': 4.0.10
       cmd-ts: 0.14.3
