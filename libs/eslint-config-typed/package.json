@@ -97,6 +97,7 @@
     "is-glob": "^4.0.3",
     "is-immutable-type": "5.0.1",
     "micromatch": "^4.0.8",
+    "ts-data-forge": "^3.3.1",
     "tsutils": "3.21.0",
     "typescript-eslint": "8.46.2"
   },
@@ -140,7 +141,6 @@
     "react": "^19.2.0",
     "rollup": "^4.52.5",
     "semantic-release": "^25.0.1",
-    "ts-data-forge": "^3.3.1",
     "ts-fortress": "^5.2.0",
     "ts-repo-utils": "^7.8.0",
     "ts-type-forge": "^2.3.0",

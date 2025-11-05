@@ -104,6 +104,9 @@ importers:
       micromatch:
         specifier: ^4.0.8
         version: 4.0.8
+      ts-data-forge:
+        specifier: ^3.3.1
+        version: 3.3.1(typescript@5.9.3)
       tsutils:
         specifier: 3.21.0
         version: 3.21.0(typescript@5.9.3)
@@ -228,9 +231,6 @@ importers:
       semantic-release:
         specifier: ^25.0.1
         version: 25.0.1(typescript@5.9.3)
-      ts-data-forge:
-        specifier: ^3.3.1
-        version: 3.3.1(typescript@5.9.3)
       ts-fortress:
         specifier: ^5.2.0
         version: 5.2.0(typescript@5.9.3)
