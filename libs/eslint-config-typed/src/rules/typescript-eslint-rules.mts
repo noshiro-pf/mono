@@ -2,6 +2,7 @@ import {
   withDefaultOption,
   type TypeScriptEslintRules,
 } from '../types/index.mjs';
+import { allExtensionsRegexUnionStr } from './all-extensions.mjs';
 
 export const typescriptEslintRules = {
   '@typescript-eslint/adjacent-overload-signatures': 'error',
@@ -133,8 +134,20 @@ export const typescriptEslintRules = {
   '@typescript-eslint/no-non-null-assertion': 'error',
   '@typescript-eslint/no-redeclare': 'off', // disabled
   '@typescript-eslint/no-redundant-type-constituents': 'error',
+
   // Note: If paths with the same name are defined multiple times, later definitions may overwrite earlier ones
-  '@typescript-eslint/no-restricted-imports': 'off',
+  '@typescript-eslint/no-restricted-imports': [
+    'error',
+    {
+      patterns: [
+        {
+          regex: String.raw`^(\.\/|\.\.\/)+index\.(${allExtensionsRegexUnionStr})$`,
+          message:
+            'Do not specify index.mjs directly by relative path, but import it by module name (e.g. ./X/index.mjs).',
+        },
+      ],
+    },
+  ],
 
   '@typescript-eslint/no-shadow': [
     'error',

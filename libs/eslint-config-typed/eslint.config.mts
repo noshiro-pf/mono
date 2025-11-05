@@ -120,6 +120,12 @@ export default [
     }),
   },
   {
+    files: ['src/entry-point.mts'],
+    rules: defineKnownRules({
+      '@typescript-eslint/no-restricted-imports': 'off',
+    }),
+  },
+  {
     files: ['src/types/rules/*.mts'],
     rules: defineKnownRules({
       'functional/readonly-type': ['error', 'keyword'],

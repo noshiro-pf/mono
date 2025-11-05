@@ -1,4 +1,5 @@
 import { withDefaultOption, type EslintImportsRules } from '../types/index.mjs';
+import { allExtensionsStr } from './all-extensions.mjs';
 
 export const eslintImportsRules = {
   // Not needed when using TypeScript.
@@ -16,8 +17,8 @@ export const eslintImportsRules = {
     'error',
     {
       allow: [
-        '*/index.{js,mjs,cjs,ts,mts,cts,d.ts,d.mts,d.cts}',
-        './index.{js,mjs,cjs,ts,mts,cts,d.ts,d.mts,d.cts}',
+        `*/index.{${allExtensionsStr}}`,
+        `./index.{${allExtensionsStr}}`,
         'rxjs/operators',
         'solid-js/web',
         '@testing-library/jest-dom/**',
@@ -82,11 +83,11 @@ export const eslintImportsRules = {
     },
   ],
 
-  'import-x/order': 'off',
+  'import-x/order': 'off', // using prettier-plugin-organize-imports
   // 'import-x/order': [
   //   'error',
   //   {
-  //     groups: [], // using prettier-plugin-organize-imports
+  //     groups: [],
   //     'newlines-between': 'never',
   //   },
   // ],
@@ -126,7 +127,7 @@ export const eslintImportsRules = {
   'import-x/no-empty-named-blocks': 'error',
 
   // Covered by unicorn/prefer-node-protocol
-  // 'import-x/enforce-node-protocol-usage': ['error', 'always'],
+  // 'import/enforce-node-protocol-usage': ['error', 'always'],
 
   'import-x/no-rename-default': withDefaultOption('error'),
   'import-x/prefer-namespace-import': ['error', { patterns: ['react'] }],
