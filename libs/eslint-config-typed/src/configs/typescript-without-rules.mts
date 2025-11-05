@@ -48,55 +48,56 @@ export const eslintConfigForTypeScriptWithoutRules = ({
       },
       plugins,
       settings: {
-        'import-x/parsers': {
-          '@typescript-eslint/parser': [
-            '.test.ts',
-            '.js',
-            '.ts',
-            '.mjs',
-            '.mts',
-            '.cjs',
-            '.cts',
-            '.jsx',
-            '.tsx',
-          ],
-        },
-        'import-x/resolver': {
-          typescript: {
-            alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
-            // project: ['packages/**/tsconfig.json', 'config/tsconfig.json'],
-            project: ['packages/**/tsconfig.json'],
-          },
-          // copied from default config
-          node: {
-            extensions: [
-              '.test.ts',
-              '.js',
-              '.ts',
-              '.mjs',
-              '.mts',
-              '.cjs',
-              '.cts',
-              '.jsx',
-              '.tsx',
-            ],
-          },
-        },
-        // copied from default config
-        'import-x/extensions': [
-          '.js',
-          '.ts',
-          '.mjs',
-          '.mts',
-          '.cjs',
-          '.cts',
-          '.jsx',
-          '.tsx',
-        ],
-        'import-x/external-module-folders': [
-          'node_modules',
-          'node_modules/@types',
-        ],
+        ...eslintPluginImportXSettings,
       },
     },
   ] as const;
+
+// Omit `.d.ts` because 1) TypeScript compilation already confirms that
+// types are resolved, and 2) it would mask an unresolved
+// `.ts`/`.tsx`/`.js`/`.jsx` implementation.
+const typeScriptExtensions = ['.ts', '.tsx', '.cts', '.mts'] as const;
+
+const allExtensions = [
+  ...typeScriptExtensions,
+  '.js',
+  '.jsx',
+  '.cjs',
+  '.mjs',
+] as const;
+
+/**
+ * This config:
+ *
+ * 1. Adds `.jsx`, `.ts`, `.cts`, `.mts`, and `.tsx` as an extension
+ * 2. Enables JSX/TSX parsing
+ */
+const eslintPluginImportXSettings = {
+  'import-x/extensions': allExtensions,
+  'import-x/external-module-folders': ['node_modules', 'node_modules/@types'],
+  'import-x/parsers': {
+    '@typescript-eslint/parser': typeScriptExtensions,
+  },
+  'import-x/resolver': {
+    typescript: true,
+    // typescript: {
+    //   alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+    //   project: ['packages/**/tsconfig.json', 'config/tsconfig.json'],
+    //   project: ['packages/**/tsconfig.json'],
+    // },
+
+    // node: {
+    //   extensions: [
+    //     '.test.ts',
+    //     '.js',
+    //     '.ts',
+    //     '.mjs',
+    //     '.mts',
+    //     '.cjs',
+    //     '.cts',
+    //     '.jsx',
+    //     '.tsx',
+    //   ],
+    // },
+  },
+} as const;

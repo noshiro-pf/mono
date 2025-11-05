@@ -4,7 +4,9 @@ export const eslintImportsRules = {
   // Not needed when using TypeScript.
   'import-x/no-unresolved': 'off',
 
+  // TypeScript compilation already ensures that named imports exist in the referenced module
   'import-x/named': 'off',
+
   'import-x/default': 'error',
   'import-x/namespace': withDefaultOption('error'),
   'import-x/no-restricted-paths': 'off', // TODO
