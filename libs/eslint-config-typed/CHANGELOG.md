@@ -1,3 +1,9 @@
+## [3.1.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.1.2...v3.1.3) (2025-11-05)
+
+### Bug Fixes
+
+- fix import-x settings ([#117](https://github.com/noshiro-pf/eslint-config-typed/issues/117)) ([342ab1c](https://github.com/noshiro-pf/eslint-config-typed/commit/342ab1c4fa4cb5f4ec0351ab2dd72cfd8e2bbf27))
+
 ## [3.1.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.1.1...v3.1.2) (2025-11-03)
 
 ### Bug Fixes
