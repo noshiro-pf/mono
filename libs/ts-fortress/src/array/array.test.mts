@@ -10,16 +10,17 @@ import { array } from './array.mjs';
 describe(array, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
-      expect(array(number()).defaultValue).toStrictEqual([]);
+      assert.deepStrictEqual(array(number()).defaultValue, []);
     });
 
     test('with explicit default value', () => {
-      expect(
+      assert.deepStrictEqual(
         array(number(), {
           typeName: 'xs',
           defaultValue: [],
         }).defaultValue,
-      ).toStrictEqual([]);
+        [],
+      );
     });
   });
 
@@ -65,13 +66,14 @@ describe(array, () => {
       const ys: unknown = [1, 2, 3];
 
       const result = xs.validate(ys);
+
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
 
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toStrictEqual([1, 2, 3]);
+      assert.deepStrictEqual(resultValue, [1, 2, 3]);
     });
 
     test('falsy case', () => {
@@ -86,7 +88,7 @@ describe(array, () => {
       const resultError = Result.unwrapErrThrow(result);
 
       // Test that we have structured ValidationError objects
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: ['0'],
           actualValue: '1',
@@ -104,7 +106,7 @@ describe(array, () => {
       ]);
 
       // Test that we can convert to legacy string format for backward compatibility
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <number> at 0, got <string> type value "1".',
         'Expected <number> at 1, got <string> type value "".',
       ]);
@@ -126,13 +128,13 @@ describe(array, () => {
     test('noop', () => {
       const ys: unknown = [1, 2, 3];
 
-      expect(xs.fill(ys)).toStrictEqual([1, 2, 3]);
+      assert.deepStrictEqual(xs.fill(ys), [1, 2, 3]);
     });
 
     test('fill with the default value', () => {
       const ys: unknown = ['1', '', 3];
 
-      expect(xs.fill(ys)).toStrictEqual([0, 0, 3]);
+      assert.deepStrictEqual(xs.fill(ys), [0, 0, 3]);
     });
   });
 });

@@ -94,6 +94,7 @@ describe(iso8601, () => {
   type Iso8601Type = TypeOf<typeof baseType>;
 
   expectType<Iso8601Type, string>('<=');
+
   expectType<typeof baseType.defaultValue, Iso8601Type>('=');
 
   test.each(validSamples)('should accept $0', (e) => {
@@ -142,7 +143,7 @@ describe(iso8601, () => {
       throw new Error('Expected validation failure');
     }
 
-    expect(result.value).toStrictEqual([
+    assert.deepStrictEqual(result.value, [
       {
         path: [],
         actualValue: 'not-an-iso-date',
@@ -152,7 +153,7 @@ describe(iso8601, () => {
       },
     ]);
 
-    expect(validationErrorsToMessages(result.value)).toStrictEqual([
+    assert.deepStrictEqual(validationErrorsToMessages(result.value), [
       'Expected <Iso8601>, got <string> type value "not-an-iso-date".',
     ]);
   });

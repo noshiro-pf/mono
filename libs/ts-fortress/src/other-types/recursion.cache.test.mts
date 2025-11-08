@@ -11,14 +11,17 @@ describe('recursion - caching and defaultValue', () => {
     });
 
     // First access computes and caches
-    expect(T.defaultValue).toStrictEqual({ x: 1 });
+    assert.deepStrictEqual(T.defaultValue, { x: 1 });
     // Second access uses cache without recomputing
-    expect(T.defaultValue).toStrictEqual({ x: 1 });
+    assert.deepStrictEqual(T.defaultValue, { x: 1 });
+
     expect(mut_calls).toBe(1);
 
     // Using is()/fill()/validate() does not trigger additional definition calls
     expect(T.is({ x: 2 })).toBe(true);
-    expect(T.fill({})).toStrictEqual({ x: 1 });
+
+    assert.deepStrictEqual(T.fill({}), { x: 1 });
+
     expect(mut_calls).toBe(1);
   });
 
@@ -34,7 +37,8 @@ describe('recursion - caching and defaultValue', () => {
     );
 
     // defaultValue prefers options.defaultValue
-    expect(T.defaultValue).toStrictEqual({ x: 0 });
+    assert.deepStrictEqual(T.defaultValue, { x: 0 });
+
     // validate triggers definition exactly once
     expect(T.is({ x: 7 })).toBe(true);
     expect(mut_calls).toBe(1);

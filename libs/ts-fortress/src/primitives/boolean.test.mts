@@ -56,7 +56,7 @@ describe(boolean, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 'not a boolean',
@@ -66,7 +66,7 @@ describe(boolean, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <boolean>, got <string> type value "not a boolean".',
       ]);
     });

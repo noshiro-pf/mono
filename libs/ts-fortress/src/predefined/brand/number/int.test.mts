@@ -68,7 +68,7 @@ describe(int, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 42.5,
@@ -78,7 +78,7 @@ describe(int, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <Int>, got <number> type value `42.5`.',
       ]);
     });
@@ -90,7 +90,7 @@ describe(int, () => {
 
       const resultError1 = Result.unwrapErrThrow(result);
 
-      expect(resultError1).toStrictEqual([
+      assert.deepStrictEqual(resultError1, [
         {
           path: [],
           actualValue: 'not a number',
@@ -100,7 +100,7 @@ describe(int, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
         'Expected <number>, got <string> type value "not a number".',
       ]);
     });

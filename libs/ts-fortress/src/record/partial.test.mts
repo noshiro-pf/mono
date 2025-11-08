@@ -102,13 +102,14 @@ describe(partial, () => {
         };
 
         const result = ymd.validate(x);
+
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue = Result.unwrapThrow(result);
 
-        expect(resultValue).toStrictEqual({
+        assert.deepStrictEqual(resultValue, {
           year: 2000,
           month: 12,
           date: 25,
@@ -134,13 +135,14 @@ describe(partial, () => {
         const x: UnknownRecord = {};
 
         const result = ymd.validate(x);
+
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue2 = Result.unwrapThrow(result);
 
-        expect(resultValue2).toStrictEqual({});
+        assert.deepStrictEqual(resultValue2, {});
       });
 
       test('validate returns input as-is for empty object', () => {
@@ -163,18 +165,22 @@ describe(partial, () => {
         };
 
         const result = ymd.validate(x);
+
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue4 = Result.unwrapThrow(result);
 
-        expect(resultValue4).toStrictEqual({
-          year: 2000,
-          month: 12,
-          date: 25,
-          aaa: 999,
-        });
+        assert.deepStrictEqual(
+          resultValue4,
+          ymd.cast({
+            year: 2000,
+            month: 12,
+            date: 25,
+            aaa: 999,
+          }),
+        );
       });
 
       test('validate returns input as-is for OK cases with additional keys', () => {
@@ -206,7 +212,7 @@ describe(partial, () => {
 
         const resultError = Result.unwrapErrThrow(result);
 
-        expect(resultError).toStrictEqual([
+        assert.deepStrictEqual(resultError, [
           {
             path: ['month'],
             actualValue: 'ab',
@@ -222,7 +228,7 @@ describe(partial, () => {
             message: undefined,
           },
         ]);
-        expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError), [
           'Expected <number> at month, got <string> type value "ab".',
           'Expected <number> at date, got <string> type value "cd".',
         ]);
@@ -240,7 +246,7 @@ describe(partial, () => {
 
         const resultError1 = Result.unwrapErrThrow(result);
 
-        expect(resultError1).toStrictEqual([
+        assert.deepStrictEqual(resultError1, [
           {
             path: ['month'],
             actualValue: 'ab',
@@ -249,7 +255,7 @@ describe(partial, () => {
             message: undefined,
           },
         ]);
-        expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
           'Expected <number> at month, got <string> type value "ab".',
         ]);
       });
@@ -259,7 +265,7 @@ describe(partial, () => {
       test('from an empty record', () => {
         const x: UnknownRecord = {};
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 1900,
           month: 1,
           date: 1,
@@ -273,7 +279,7 @@ describe(partial, () => {
           date: 999,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 999,
           date: 999,
@@ -285,7 +291,7 @@ describe(partial, () => {
           year: 2000,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 1,
           date: 1,
@@ -298,7 +304,7 @@ describe(partial, () => {
           aaaaa: 9999,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 1,
           date: 1,
@@ -379,13 +385,14 @@ describe(partial, () => {
         };
 
         const result = ymd.validate(x);
+
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue6 = Result.unwrapThrow(result);
 
-        expect(resultValue6).toStrictEqual({
+        assert.deepStrictEqual(resultValue6, {
           year: 2000,
           month: 12,
         });
@@ -418,7 +425,7 @@ describe(partial, () => {
 
         const resultError2 = Result.unwrapErrThrow(result);
 
-        expect(resultError2).toStrictEqual([
+        assert.deepStrictEqual(resultError2, [
           {
             path: ['month'],
             actualValue: 'ab',
@@ -434,7 +441,7 @@ describe(partial, () => {
             message: undefined,
           },
         ]);
-        expect(validationErrorsToMessages(resultError2)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
           'Expected <number> at month, got <string> type value "ab".',
           'Expected <number> at date, got <string> type value "cd".',
         ]);
@@ -445,7 +452,7 @@ describe(partial, () => {
       test('from an empty record', () => {
         const x: UnknownRecord = {};
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 1900,
           month: 1,
           date: 1,
@@ -459,7 +466,7 @@ describe(partial, () => {
           date: 999,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 999,
           date: 999,
@@ -471,7 +478,7 @@ describe(partial, () => {
           year: 2000,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 1,
           date: 1,
@@ -484,7 +491,7 @@ describe(partial, () => {
           aaaaa: 9999,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 1,
           date: 1,

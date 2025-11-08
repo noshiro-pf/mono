@@ -33,6 +33,7 @@ type KeyofType<R extends ReadonlyRecord<string, Type<unknown>>> =
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 expectType<keyof {}, never>('=');
+
 expectType<ToString<keyof { 1: 1; 2: 2; 3: 3 }>, '1' | '2' | '3'>('=');
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

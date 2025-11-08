@@ -9,6 +9,7 @@ describe(literal, () => {
     type Hello = TypeOf<typeof hello>;
 
     expectType<Hello, 'hello'>('=');
+
     expectType<typeof hello.defaultValue, Hello>('=');
 
     describe('default value', () => {
@@ -53,6 +54,7 @@ describe(literal, () => {
       test('empty string literal', () => {
         const empty = literal('');
         type Empty = TypeOf<typeof empty>;
+
         expectType<Empty, ''>('=');
 
         expect(empty.is('')).toBe(true);
@@ -62,6 +64,7 @@ describe(literal, () => {
       test('whitespace literal', () => {
         const whitespace = literal('   ');
         type Whitespace = TypeOf<typeof whitespace>;
+
         expectType<Whitespace, '   '>('=');
 
         expect(whitespace.is('   ')).toBe(true);
@@ -72,6 +75,7 @@ describe(literal, () => {
       test('emoji literal', () => {
         const emoji = literal('🎉');
         type Emoji = TypeOf<typeof emoji>;
+
         expectType<Emoji, '🎉'>('=');
 
         expect(emoji.is('🎉')).toBe(true);
@@ -81,6 +85,7 @@ describe(literal, () => {
       test('multiline literal', () => {
         const multiline = literal('line1\nline2');
         type Multiline = TypeOf<typeof multiline>;
+
         expectType<Multiline, 'line1\nline2'>('=');
 
         expect(multiline.is('line1\nline2')).toBe(true);
@@ -108,7 +113,7 @@ describe(literal, () => {
 
         const resultError = Result.unwrapErrThrow(result);
 
-        expect(resultError).toStrictEqual([
+        assert.deepStrictEqual(resultError, [
           {
             path: [],
             actualValue: 'world',
@@ -177,6 +182,7 @@ describe(literal, () => {
     type Literal42 = TypeOf<typeof literal42>;
 
     expectType<Literal42, 42>('=');
+
     expectType<typeof literal42.defaultValue, Literal42>('=');
 
     describe('default value', () => {
@@ -221,6 +227,7 @@ describe(literal, () => {
       test('zero literal', () => {
         const zero = literal(0);
         type Zero = TypeOf<typeof zero>;
+
         expectType<Zero, 0>('=');
 
         expect(zero.is(0)).toBe(true);
@@ -231,6 +238,7 @@ describe(literal, () => {
       test('negative literal', () => {
         const negative = literal(-100);
         type Negative = TypeOf<typeof negative>;
+
         expectType<Negative, -100>('=');
 
         expect(negative.is(-100)).toBe(true);
@@ -240,6 +248,7 @@ describe(literal, () => {
       test('decimal literal', () => {
         const pi = literal(3.14);
         type Pi = TypeOf<typeof pi>;
+
         expectType<Pi, 3.14>('=');
 
         expect(pi.is(3.14)).toBe(true);
@@ -267,7 +276,7 @@ describe(literal, () => {
 
         const resultError1 = Result.unwrapErrThrow(result);
 
-        expect(resultError1).toStrictEqual([
+        assert.deepStrictEqual(resultError1, [
           {
             path: [],
             actualValue: 43,
@@ -354,7 +363,7 @@ describe(literal, () => {
 
         const resultError2 = Result.unwrapErrThrow(result);
 
-        expect(resultError2).toStrictEqual([
+        assert.deepStrictEqual(resultError2, [
           {
             path: [],
             actualValue: 99n,
@@ -364,7 +373,7 @@ describe(literal, () => {
           },
         ]);
 
-        expect(validationErrorsToMessages(resultError2)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
           'Expected <literal(42n)>, got <bigint> type value `99n`.',
         ]);
       });
@@ -376,7 +385,7 @@ describe(literal, () => {
 
         const resultError3 = Result.unwrapErrThrow(result);
 
-        expect(resultError3).toStrictEqual([
+        assert.deepStrictEqual(resultError3, [
           {
             path: [],
             actualValue: 'not a bigint',
@@ -386,7 +395,7 @@ describe(literal, () => {
           },
         ]);
 
-        expect(validationErrorsToMessages(resultError3)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError3), [
           'Expected <literal(42n)>, got <string> type value "not a bigint".',
         ]);
       });
@@ -496,7 +505,7 @@ describe(literal, () => {
 
           const resultError4 = Result.unwrapErrThrow(result);
 
-          expect(resultError4).toStrictEqual([
+          assert.deepStrictEqual(resultError4, [
             {
               path: [],
               actualValue: false,
@@ -506,7 +515,7 @@ describe(literal, () => {
             },
           ]);
 
-          expect(validationErrorsToMessages(resultError4)).toStrictEqual([
+          assert.deepStrictEqual(validationErrorsToMessages(resultError4), [
             'Expected <literal(true)>, got <boolean> type value `false`.',
           ]);
         });
@@ -518,7 +527,7 @@ describe(literal, () => {
 
           const resultError5 = Result.unwrapErrThrow(result);
 
-          expect(resultError5).toStrictEqual([
+          assert.deepStrictEqual(resultError5, [
             {
               path: [],
               actualValue: 'not a boolean',
@@ -528,7 +537,7 @@ describe(literal, () => {
             },
           ]);
 
-          expect(validationErrorsToMessages(resultError5)).toStrictEqual([
+          assert.deepStrictEqual(validationErrorsToMessages(resultError5), [
             'Expected <literal(true)>, got <string> type value "not a boolean".',
           ]);
         });
@@ -617,7 +626,7 @@ describe(literal, () => {
 
           const resultError6 = Result.unwrapErrThrow(result);
 
-          expect(resultError6).toStrictEqual([
+          assert.deepStrictEqual(resultError6, [
             {
               path: [],
               actualValue: true,
@@ -627,7 +636,7 @@ describe(literal, () => {
             },
           ]);
 
-          expect(validationErrorsToMessages(resultError6)).toStrictEqual([
+          assert.deepStrictEqual(validationErrorsToMessages(resultError6), [
             'Expected <literal(false)>, got <boolean> type value `true`.',
           ]);
         });

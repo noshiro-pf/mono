@@ -5,6 +5,7 @@ import { int8 } from './int8.mjs';
 describe(int8, () => {
   const t0 = int8();
   type T0 = TypeOf<typeof t0>;
+
   expectType<T0, Int8>('=');
 
   test('defaultValue', () => {

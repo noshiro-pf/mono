@@ -21,6 +21,7 @@ describe(number, () => {
   type Num = TypeOf<typeof num>;
 
   expectType<Num, number>('=');
+
   expectType<typeof num.defaultValue, Num>('=');
 
   describe('is', () => {
@@ -168,7 +169,7 @@ describe(number, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 'not a number',

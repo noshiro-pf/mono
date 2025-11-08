@@ -91,7 +91,7 @@ describe(positiveSafeInt, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 0,
@@ -100,7 +100,7 @@ describe(positiveSafeInt, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <PositiveSafeInt>, got <number> type value `0`.',
       ]);
     });

@@ -58,7 +58,7 @@ describe(symbol, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 'not a symbol',
@@ -68,7 +68,7 @@ describe(symbol, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <symbol>, got <string> type value "not a symbol".',
       ]);
     });

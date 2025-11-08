@@ -13,7 +13,9 @@ describe(uuid, () => {
   const baseType = uuid();
 
   type UuidType = TypeOf<typeof baseType>;
+
   expectType<UuidType, string>('<=');
+
   expectType<typeof baseType.defaultValue, UuidType>('=');
 
   test('provides nil UUID as default', () => {
@@ -47,7 +49,7 @@ describe(uuid, () => {
       throw new Error('Expected validation failure');
     }
 
-    expect(result.value).toStrictEqual([
+    assert.deepStrictEqual(result.value, [
       {
         path: [],
         actualValue: 'not-a-uuid',
@@ -57,7 +59,7 @@ describe(uuid, () => {
       },
     ]);
 
-    expect(validationErrorsToMessages(result.value)).toStrictEqual([
+    assert.deepStrictEqual(validationErrorsToMessages(result.value), [
       'Expected <Uuid>, got <string> type value "not-a-uuid".',
     ]);
   });
@@ -67,7 +69,9 @@ describe(uuidV4, () => {
   const v4Type = uuidV4();
 
   type UuidV4Type = TypeOf<typeof v4Type>;
+
   expectType<UuidV4Type, string>('<=');
+
   expectType<typeof v4Type.defaultValue, UuidV4Type>('=');
 
   test('recognizes version 4 UUIDs only', () => {
@@ -84,7 +88,7 @@ describe(uuidV4, () => {
       throw new Error('Expected validation failure');
     }
 
-    expect(result.value).toStrictEqual([
+    assert.deepStrictEqual(result.value, [
       {
         path: [],
         actualValue: uuidV6Example,

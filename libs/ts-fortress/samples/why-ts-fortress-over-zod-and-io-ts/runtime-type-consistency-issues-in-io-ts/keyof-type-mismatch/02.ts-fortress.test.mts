@@ -33,4 +33,5 @@ assert(t.Result.isOk(U.validate(0))); // ✅ Success - number 0 is accepted
 import { expectType } from 'ts-data-forge';
 
 expectType<T, '0' | '1' | '2' | '3' | '4'>('=');
+
 expectType<U, 0 | 1 | 2 | 3 | 4>('=');

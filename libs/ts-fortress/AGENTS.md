@@ -22,7 +22,7 @@
 
 ## Testing Guidelines
 
-- Standardize on Vitest with `test()` blocks and `.toStrictEqual()` assertions to lock behavior.
+- Standardize on Vitest with `test()` blocks and `assert.deepStrictEqual(A, B)` assertions to lock behavior.
 - Maintain test names that describe intent, cover both success paths and guard rails, and mirror source layout.
 - For coverage reviews, run `npm run test:cov` followed by `npm run test:cov:ui`.
 

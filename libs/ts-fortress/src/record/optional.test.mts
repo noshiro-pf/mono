@@ -16,7 +16,7 @@ describe(optional, () => {
 
   describe('optional function', () => {
     test('creates optional property type', () => {
-      expect(optionalNumber).toStrictEqual({
+      assert.deepStrictEqual(optionalNumber, {
         ...numberType,
         optional: true,
       });

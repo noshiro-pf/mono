@@ -10,7 +10,7 @@ describe('mergeRecords - fill and defaultType', () => {
     const T = mergeRecords([A, B]);
 
     // Non-record input: should merge defaults from A and B
-    expect(T.fill(null)).toStrictEqual({ a: '', b: 1, s: 'B' });
+    assert.deepStrictEqual(T.fill(null), { a: '', b: 1, s: 'B' });
   });
 
   test('fill with record merges filled values and input own props', () => {
@@ -18,12 +18,15 @@ describe('mergeRecords - fill and defaultType', () => {
     const input = { a: 'x', extra: 'keep' } as const;
 
     // Should keep input.extra and fill missing from A/B
-    expect(T.fill(input)).toStrictEqual({
-      a: 'x',
-      b: 1,
-      s: 'B',
-      extra: 'keep',
-    });
+    assert.deepStrictEqual(
+      T.fill(input),
+      T.cast({
+        a: 'x',
+        b: 1,
+        s: 'B',
+        extra: 'keep',
+      }),
+    );
   });
 
   test('custom defaultType overrides fallback fill/default', () => {
@@ -31,9 +34,9 @@ describe('mergeRecords - fill and defaultType', () => {
     const T = mergeRecords([A, B], { defaultType: Default });
 
     // defaultValue comes from defaultType
-    expect(T.defaultValue).toStrictEqual({ a: 'dA', b: 9, s: 'dS' });
+    assert.deepStrictEqual(T.defaultValue, { a: 'dA', b: 9, s: 'dS' });
 
     // fill uses defaultType.fill when invalid
-    expect(T.fill(undefined)).toStrictEqual({ a: 'dA', b: 9, s: 'dS' });
+    assert.deepStrictEqual(T.fill(undefined), { a: 'dA', b: 9, s: 'dS' });
   });
 });

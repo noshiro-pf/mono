@@ -68,7 +68,7 @@ describe('simpleBrandedString', () => {
 
         const resultError = Result.unwrapErrThrow(result);
 
-        expect(resultError).toStrictEqual([
+        assert.deepStrictEqual(resultError, [
           {
             path: [],
             actualValue: 42,
@@ -77,7 +77,7 @@ describe('simpleBrandedString', () => {
             message: undefined,
           },
         ]);
-        expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError), [
           'Expected <string>, got <number> type value `42`.',
         ]);
       });
@@ -148,7 +148,7 @@ describe('simpleBrandedString', () => {
 
         const resultError1 = Result.unwrapErrThrow(result);
 
-        expect(resultError1).toStrictEqual([
+        assert.deepStrictEqual(resultError1, [
           {
             path: [],
             actualValue: null,
@@ -157,7 +157,7 @@ describe('simpleBrandedString', () => {
             message: undefined,
           },
         ]);
-        expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
           'Expected <string>, got <object> type value `null`.',
         ]);
       });
@@ -211,7 +211,9 @@ describe('simpleBrandedString', () => {
       type LastName = TypeOf<typeof lastNameType>;
 
       // These should be different types even though they're both branded strings
+
       expectType<FirstName, Brand<string, 'FirstName'>>('=');
+
       expectType<LastName, Brand<string, 'LastName'>>('=');
 
       expect(firstNameType.typeName).toBe('"FirstName"');

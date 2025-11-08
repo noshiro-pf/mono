@@ -81,7 +81,7 @@ describe(int32, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 3_000_000_000,
@@ -90,7 +90,7 @@ describe(int32, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <Int32>, got <number> type value `3000000000`.',
       ]);
     });

@@ -79,7 +79,7 @@ describe(safeInt, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: Number.MAX_SAFE_INTEGER + 1,
@@ -89,7 +89,7 @@ describe(safeInt, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <SafeInt>, got <number> type value `9007199254740992`.',
       ]);
     });

@@ -93,7 +93,7 @@ describe(safeUint, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: -5,
@@ -102,7 +102,7 @@ describe(safeUint, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <SafeUint>, got <number> type value `-5`.',
       ]);
     });

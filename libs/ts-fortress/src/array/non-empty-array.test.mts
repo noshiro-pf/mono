@@ -10,20 +10,21 @@ import { nonEmptyArray } from './non-empty-array.mjs';
 describe(nonEmptyArray, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
-      expect(nonEmptyArray(number()).defaultValue).toStrictEqual([0]);
+      assert.deepStrictEqual(nonEmptyArray(number()).defaultValue, [0]);
     });
 
     test('with explicit default value, case 1', () => {
-      expect(nonEmptyArray(number(1)).defaultValue).toStrictEqual([1]);
+      assert.deepStrictEqual(nonEmptyArray(number(1)).defaultValue, [1]);
     });
 
     test('with explicit default value, case 2', () => {
-      expect(
+      assert.deepStrictEqual(
         nonEmptyArray(number(), {
           typeName: 'xs',
           defaultValue: [2],
         }).defaultValue,
-      ).toStrictEqual([2]);
+        [2],
+      );
     });
   });
 
@@ -81,13 +82,14 @@ describe(nonEmptyArray, () => {
       const ys: unknown = [1, 2, 3];
 
       const result = xs.validate(ys);
+
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
 
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toStrictEqual([1, 2, 3]);
+      assert.deepStrictEqual(resultValue, [1, 2, 3]);
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -110,7 +112,7 @@ describe(nonEmptyArray, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: ys,
@@ -120,7 +122,7 @@ describe(nonEmptyArray, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected non-empty array, got empty array',
       ]);
     });
@@ -134,7 +136,7 @@ describe(nonEmptyArray, () => {
 
       const resultError1 = Result.unwrapErrThrow(result);
 
-      expect(resultError1).toStrictEqual([
+      assert.deepStrictEqual(resultError1, [
         {
           path: ['0'],
           actualValue: '1',
@@ -151,7 +153,7 @@ describe(nonEmptyArray, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
         'Expected <number> at 0, got <string> type value "1".',
         'Expected <number> at 1, got <string> type value "".',
       ]);
@@ -162,19 +164,19 @@ describe(nonEmptyArray, () => {
     test('noop', () => {
       const ys: unknown = [1, 2, 3];
 
-      expect(xs.fill(ys)).toStrictEqual([1, 2, 3]);
+      assert.deepStrictEqual(xs.fill(ys), [1, 2, 3]);
     });
 
     test('fill with the default value', () => {
       const ys: unknown = ['1', '', 3];
 
-      expect(xs.fill(ys)).toStrictEqual([0, 0, 3]);
+      assert.deepStrictEqual(xs.fill(ys), [0, 0, 3]);
     });
 
     test('fill empty array', () => {
       const ys: unknown = [];
 
-      expect(xs.fill(ys)).toStrictEqual([1]);
+      assert.deepStrictEqual(xs.fill(ys), [1]);
     });
   });
 });

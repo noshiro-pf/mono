@@ -73,9 +73,10 @@ describe(pick, () => {
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expectType<typeof resultValue, Ym>('=');
 
-      expect(resultValue).toStrictEqual({
+      assert.deepStrictEqual(resultValue, {
         year: 2000,
         month: 12,
       });
@@ -107,13 +108,17 @@ describe(pick, () => {
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue2 = Result.unwrapThrow(result);
+
       expectType<typeof resultValue2, Ym>('=');
 
-      expect(resultValue2).toStrictEqual({
-        year: 2000,
-        month: 12,
-        aaa: 999,
-      });
+      assert.deepStrictEqual(
+        resultValue2,
+        ym.cast({
+          year: 2000,
+          month: 12,
+          aaa: 999,
+        }),
+      );
     });
 
     test('validate returns input as-is for OK cases with additional keys', () => {
@@ -143,7 +148,7 @@ describe(pick, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: ['month'],
           actualValue: 'ab',
@@ -152,7 +157,7 @@ describe(pick, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <number> at month, got <string> type value "ab".',
       ]);
     });
@@ -162,7 +167,7 @@ describe(pick, () => {
     test('from an empty record', () => {
       const x: UnknownRecord = {};
 
-      expect(ym.fill(x)).toStrictEqual({
+      assert.deepStrictEqual(ym.fill(x), {
         year: 1900,
         month: 1,
       });
@@ -174,7 +179,7 @@ describe(pick, () => {
         month: 999,
       };
 
-      expect(ym.fill(x)).toStrictEqual({
+      assert.deepStrictEqual(ym.fill(x), {
         year: 2000,
         month: 999,
       });
@@ -185,7 +190,7 @@ describe(pick, () => {
         year: 2000,
       };
 
-      expect(ym.fill(x)).toStrictEqual({
+      assert.deepStrictEqual(ym.fill(x), {
         year: 2000,
         month: 1,
       });
@@ -197,7 +202,7 @@ describe(pick, () => {
         aaaaa: 9999,
       };
 
-      expect(ym.fill(x)).toStrictEqual({
+      assert.deepStrictEqual(ym.fill(x), {
         year: 2000,
         month: 1,
       });

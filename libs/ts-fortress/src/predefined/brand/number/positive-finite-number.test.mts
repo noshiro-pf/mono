@@ -99,7 +99,7 @@ describe(positiveFiniteNumber, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 0,
@@ -108,7 +108,7 @@ describe(positiveFiniteNumber, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <PositiveFiniteNumber>, got <number> type value `0`.',
       ]);
     });

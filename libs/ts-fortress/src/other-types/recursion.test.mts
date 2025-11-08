@@ -152,13 +152,13 @@ describe('recursive', () => {
   test('JsonValue - cast function', () => {
     const result = JsonValue.cast({ a: 1, b: [2, 3], c: { d: 'hello' } });
 
-    expect(result).toStrictEqual({ a: 1, b: [2, 3], c: { d: 'hello' } });
+    assert.deepStrictEqual(result, { a: 1, b: [2, 3], c: { d: 'hello' } });
   });
 
   test('JsonValue - fill function', () => {
     const result = JsonValue.fill({ a: 1, b: [2, 3] });
 
-    expect(result).toStrictEqual({ a: 1, b: [2, 3] });
+    assert.deepStrictEqual(result, { a: 1, b: [2, 3] });
 
     // Fill with default value for invalid input
     const defaultResult = JsonValue.fill(undefined);

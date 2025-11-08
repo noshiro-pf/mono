@@ -10,24 +10,27 @@ import { arrayAtLeastLength } from './array-at-least-length.mjs';
 describe(arrayAtLeastLength, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
-      expect(arrayAtLeastLength(3, number()).defaultValue).toStrictEqual([
-        0, 0, 0,
-      ]);
+      assert.deepStrictEqual(
+        arrayAtLeastLength(3, number()).defaultValue,
+        [0, 0, 0],
+      );
     });
 
     test('with explicit element default value', () => {
-      expect(arrayAtLeastLength(2, number(5)).defaultValue).toStrictEqual([
-        5, 5,
-      ]);
+      assert.deepStrictEqual(
+        arrayAtLeastLength(2, number(5)).defaultValue,
+        [5, 5],
+      );
     });
 
     test('with explicit default value override', () => {
-      expect(
+      assert.deepStrictEqual(
         arrayAtLeastLength(3, number(), {
           typeName: 'ys',
           defaultValue: [1, 2, 3, 4],
         }).defaultValue,
-      ).toStrictEqual([1, 2, 3, 4]);
+        [1, 2, 3, 4],
+      );
     });
   });
 
@@ -97,13 +100,14 @@ describe(arrayAtLeastLength, () => {
       const ys: unknown = [4, 5, 6, 7];
 
       const result = xs.validate(ys);
+
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
 
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toStrictEqual([4, 5, 6, 7]);
+      assert.deepStrictEqual(resultValue, [4, 5, 6, 7]);
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -126,7 +130,7 @@ describe(arrayAtLeastLength, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: ys,
@@ -136,7 +140,7 @@ describe(arrayAtLeastLength, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <array>, got <string> type value "foo".',
       ]);
     });
@@ -150,7 +154,7 @@ describe(arrayAtLeastLength, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: ys,
@@ -160,7 +164,7 @@ describe(arrayAtLeastLength, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected array of length 3 or more, got length 2',
       ]);
     });
@@ -174,7 +178,7 @@ describe(arrayAtLeastLength, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: ['1'],
           actualValue: '2',
@@ -184,7 +188,7 @@ describe(arrayAtLeastLength, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <number> at 1, got <string> type value "2".',
       ]);
     });
@@ -194,19 +198,19 @@ describe(arrayAtLeastLength, () => {
     test('keeps numeric entries and trims extras', () => {
       const ys: unknown = [4, 5, 6, 7];
 
-      expect(xs.fill(ys)).toStrictEqual([4, 5, 6]);
+      assert.deepStrictEqual(xs.fill(ys), [4, 5, 6]);
     });
 
     test('fills missing or invalid entries', () => {
       const ys: unknown = [4, '5'];
 
-      expect(xs.fill(ys)).toStrictEqual([4, 0, 0]);
+      assert.deepStrictEqual(xs.fill(ys), [4, 0, 0]);
     });
 
     test('fill with the default value for non-array input', () => {
       const ys: unknown = null;
 
-      expect(xs.fill(ys)).toStrictEqual([1, 2, 3]);
+      assert.deepStrictEqual(xs.fill(ys), [1, 2, 3]);
     });
   });
 });

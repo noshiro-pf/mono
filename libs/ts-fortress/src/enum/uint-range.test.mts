@@ -49,6 +49,7 @@ describe(uintRange, () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = month.validate(5);
+
       expectType<typeof result, Result<Month, readonly ValidationError[]>>('=');
 
       expect(Result.isOk(result)).toBe(true);
@@ -76,14 +77,14 @@ describe(uintRange, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError[0]).toStrictEqual({
+      assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: 13,
         expectedType: 'month',
         typeName: 'month',
         message: 'The value is expected to be an integer between 1 and 12',
       });
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value is expected to be an integer between 1 and 12',
       ]);
     });

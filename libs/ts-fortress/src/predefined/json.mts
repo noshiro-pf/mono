@@ -11,6 +11,7 @@ export const JsonPrimitive = union([nullType, number(), string(), boolean()]);
 if (import.meta.vitest !== undefined) {
   test('JsonPrimitive', () => {
     expectType<TypeOf<typeof JsonPrimitive>, JsonPrimitive>('=');
+
     expectType<JsonPrimitive, null | boolean | number | string>('=');
 
     expect(JsonPrimitive.defaultValue).toBeNull();

@@ -46,6 +46,7 @@ describe(enumType, () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(3);
+
       expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
         '=',
       );
@@ -64,7 +65,7 @@ describe(enumType, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError[0]).toStrictEqual({
+      assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: 5,
         expectedType: 'enum',
@@ -72,7 +73,7 @@ describe(enumType, () => {
         message:
           'The value is expected to be one of the elements contained in { 3, 2, a }',
       });
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value is expected to be one of the elements contained in { 3, 2, a }',
       ]);
     });

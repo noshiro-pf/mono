@@ -15,7 +15,9 @@ describe(intRange, () => {
   });
 
   type Rng = TypeOf<typeof rng>;
+
   expectType<Rng, -2 | -1 | 0 | 1 | 2>('=');
+
   expectType<typeof rng.defaultValue, Rng>('=');
 
   describe('is', () => {
@@ -50,14 +52,14 @@ describe(intRange, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError[0]).toStrictEqual<ValidationError>({
+      assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: 3,
         expectedType: 'rng',
         message: 'The value is expected to be an integer between -2 and 2',
         typeName: 'rng',
-      });
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      } satisfies ValidationError);
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value is expected to be an integer between -2 and 2',
       ]);
     });

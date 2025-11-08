@@ -118,13 +118,14 @@ describe(required, () => {
         };
 
         const result = ymd.validate(x);
+
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue = Result.unwrapThrow(result);
 
-        expect(resultValue).toStrictEqual({
+        assert.deepStrictEqual(resultValue, {
           year: 2000,
           month: 12,
           date: 25,
@@ -159,7 +160,7 @@ describe(required, () => {
 
         const resultError = Result.unwrapErrThrow(result);
 
-        expect(resultError).toStrictEqual([
+        assert.deepStrictEqual(resultError, [
           {
             path: ['date'],
             actualValue: { year: 2000, month: 12 },
@@ -169,7 +170,7 @@ describe(required, () => {
             message: 'Missing required key "date"',
           },
         ]);
-        expect(validationErrorsToMessages(resultError)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError), [
           'Missing required key "date" at date',
         ]);
       });
@@ -183,18 +184,22 @@ describe(required, () => {
         };
 
         const result = ymd.validate(x);
+
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue2 = Result.unwrapThrow(result);
 
-        expect(resultValue2).toStrictEqual({
-          year: 2000,
-          month: 12,
-          date: 25,
-          aaa: 999,
-        });
+        assert.deepStrictEqual(
+          resultValue2,
+          ymd.cast({
+            year: 2000,
+            month: 12,
+            date: 25,
+            aaa: 999,
+          }),
+        );
       });
 
       test('validate returns input as-is for OK cases with additional keys', () => {
@@ -226,7 +231,7 @@ describe(required, () => {
 
         const resultError1 = Result.unwrapErrThrow(result);
 
-        expect(resultError1).toStrictEqual([
+        assert.deepStrictEqual(resultError1, [
           {
             path: ['month'],
             actualValue: 'ab',
@@ -242,7 +247,7 @@ describe(required, () => {
             message: undefined,
           },
         ]);
-        expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
           'Expected <number> at month, got <string> type value "ab".',
           'Expected <number> at date, got <string> type value "cd".',
         ]);
@@ -261,7 +266,7 @@ describe(required, () => {
 
         const resultError2 = Result.unwrapErrThrow(result);
 
-        expect(resultError2).toStrictEqual([
+        assert.deepStrictEqual(resultError2, [
           {
             path: ['month'],
             actualValue: 'ab',
@@ -270,7 +275,7 @@ describe(required, () => {
             message: undefined,
           },
         ]);
-        expect(validationErrorsToMessages(resultError2)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
           'Expected <number> at month, got <string> type value "ab".',
         ]);
       });
@@ -280,7 +285,7 @@ describe(required, () => {
       test('from an empty record', () => {
         const x: UnknownRecord = {};
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 1900,
           month: 1,
           date: 1,
@@ -294,7 +299,7 @@ describe(required, () => {
           date: 999,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 999,
           date: 999,
@@ -306,7 +311,7 @@ describe(required, () => {
           year: 2000,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 1,
           date: 1,
@@ -319,7 +324,7 @@ describe(required, () => {
           aaaaa: 9999,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 1,
           date: 1,
@@ -434,13 +439,14 @@ describe(required, () => {
         };
 
         const result = ymd.validate(x);
+
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue4 = Result.unwrapThrow(result);
 
-        expect(resultValue4).toStrictEqual({
+        assert.deepStrictEqual(resultValue4, {
           year: 2000,
           month: 12,
         });
@@ -473,7 +479,7 @@ describe(required, () => {
 
         const resultValue6 = Result.unwrapThrow(result);
 
-        expect(resultValue6).toStrictEqual({
+        assert.deepStrictEqual(resultValue6, {
           year: 2000,
           month: 12,
           date: 15,
@@ -493,7 +499,7 @@ describe(required, () => {
 
         const resultError3 = Result.unwrapErrThrow(result);
 
-        expect(resultError3).toStrictEqual([
+        assert.deepStrictEqual(resultError3, [
           {
             path: ['month'],
             actualValue: { year: 2000, date: 15 },
@@ -504,7 +510,7 @@ describe(required, () => {
             message: 'Missing required key "month"',
           },
         ]);
-        expect(validationErrorsToMessages(resultError3)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError3), [
           'Missing required key "month" at month',
         ]);
       });
@@ -522,7 +528,7 @@ describe(required, () => {
 
         const resultError4 = Result.unwrapErrThrow(result);
 
-        expect(resultError4).toStrictEqual([
+        assert.deepStrictEqual(resultError4, [
           {
             path: ['month'],
             actualValue: 'ab',
@@ -538,7 +544,7 @@ describe(required, () => {
             message: undefined,
           },
         ]);
-        expect(validationErrorsToMessages(resultError4)).toStrictEqual([
+        assert.deepStrictEqual(validationErrorsToMessages(resultError4), [
           'Expected <number> at month, got <string> type value "ab".',
           'Expected <number> at date, got <string> type value "cd".',
         ]);
@@ -549,7 +555,7 @@ describe(required, () => {
       test('from an empty record', () => {
         const x: UnknownRecord = {};
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 1900,
           month: 1,
           date: 1,
@@ -563,7 +569,7 @@ describe(required, () => {
           date: 999,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 999,
           date: 999,
@@ -576,7 +582,7 @@ describe(required, () => {
           month: 12,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 12,
           date: 1,
@@ -589,7 +595,7 @@ describe(required, () => {
           // missing month - fill should provide default
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 1,
           date: 1,
@@ -603,7 +609,7 @@ describe(required, () => {
           aaaaa: 9999,
         };
 
-        expect(ymd.fill(x)).toStrictEqual({
+        assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
           month: 12,
           date: 1,

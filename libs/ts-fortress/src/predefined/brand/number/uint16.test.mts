@@ -99,7 +99,7 @@ describe(uint16, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: -5,
@@ -108,7 +108,7 @@ describe(uint16, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <Uint16>, got <number> type value `-5`.',
       ]);
     });

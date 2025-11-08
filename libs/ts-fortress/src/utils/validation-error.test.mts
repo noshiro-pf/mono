@@ -18,7 +18,7 @@ describe('validation-error', () => {
 
       expectType<typeof error, ValidationError>('=');
 
-      expect(error).toStrictEqual({
+      assert.deepStrictEqual(error, {
         path: [],
         actualValue: 123,
         expectedType: 'string',
@@ -49,7 +49,7 @@ describe('validation-error', () => {
 
       const result = prependPathToValidationErrors(errors, 'parent');
 
-      expect(result).toStrictEqual([
+      assert.deepStrictEqual(result, [
         {
           path: ['parent', 'field'],
           actualValue: 123,
@@ -70,7 +70,7 @@ describe('validation-error', () => {
     test('handles empty errors array', () => {
       const result = prependPathToValidationErrors([], 'key');
 
-      expect(result).toStrictEqual([]);
+      assert.deepStrictEqual(result, []);
     });
   });
 
@@ -95,7 +95,7 @@ describe('validation-error', () => {
 
       const result = prependIndexToValidationErrors(errors, 5);
 
-      expect(result).toStrictEqual([
+      assert.deepStrictEqual(result, [
         {
           path: ['5', 'field'],
           actualValue: 123,
@@ -116,7 +116,7 @@ describe('validation-error', () => {
     test('handles empty errors array', () => {
       const result = prependIndexToValidationErrors([], 0);
 
-      expect(result).toStrictEqual([]);
+      assert.deepStrictEqual(result, []);
     });
   });
 
@@ -146,7 +146,7 @@ describe('validation-error', () => {
         },
       ];
 
-      expect(validationErrorsToMessages(errors)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(errors), [
         'Expected <string> at user.name, got <number> type value `123`.',
         'Expected <number> at items.0, got <string> type value "invalid".',
         'Expected <boolean>, got <object> type value `null`.',
@@ -164,13 +164,13 @@ describe('validation-error', () => {
         },
       ];
 
-      expect(validationErrorsToMessages(errors)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(errors), [
         'Custom validation message at field',
       ]);
     });
 
     test('handles empty errors array', () => {
-      expect(validationErrorsToMessages([])).toStrictEqual([]);
+      assert.deepStrictEqual(validationErrorsToMessages([]), []);
     });
   });
 });

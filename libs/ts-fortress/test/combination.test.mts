@@ -1,4 +1,4 @@
-import { expectType, Result } from 'ts-data-forge';
+import { asInt, expectType, Result } from 'ts-data-forge';
 import {
   array,
   arrayOfLength,
@@ -128,7 +128,7 @@ describe('nested record', () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: ['xs', '1'],
           actualValue: 2.2,
@@ -158,7 +158,7 @@ describe('nested record', () => {
           message: 'The value is expected to be an integer between 0 and 10',
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <Int> at xs.1, got <number> type value `2.2`.',
         'Expected <Int> at xs.2, got <number> type value `3.3`.',
         'The value is expected to be an integer between 0 and 10 at rec.a',
@@ -171,7 +171,7 @@ describe('nested record', () => {
     test('from an empty record', () => {
       const x: UnknownRecord = {};
 
-      expect(nestedRecord.fill(x)).toStrictEqual({
+      assert.deepStrictEqual(nestedRecord.fill(x), {
         xs: [],
         rec: {
           a: 0,
@@ -195,8 +195,8 @@ describe('nested record', () => {
         u: undefined,
       };
 
-      expect(nestedRecord.fill(x)).toStrictEqual({
-        xs: [-1, 2, 2],
+      assert.deepStrictEqual(nestedRecord.fill(x), {
+        xs: [asInt(-1), asInt(2), asInt(2)],
         rec: {
           a: 0,
           b: 0,
@@ -215,8 +215,8 @@ describe('nested record', () => {
         },
       };
 
-      expect(nestedRecord.fill(x)).toStrictEqual({
-        xs: [11, 22],
+      assert.deepStrictEqual(nestedRecord.fill(x), {
+        xs: [asInt(11), asInt(22)],
         rec: {
           a: 3,
           b: 0,
@@ -238,8 +238,8 @@ describe('nested record', () => {
         aaaaa: [9999],
       };
 
-      expect(nestedRecord.fill(x)).toStrictEqual({
-        xs: [11, 22],
+      assert.deepStrictEqual(nestedRecord.fill(x), {
+        xs: [asInt(11), asInt(22)],
         rec: {
           a: 3,
           b: 0,
@@ -283,6 +283,7 @@ describe('advanced type', () => {
   });
   const MetricKeys = keyof(MetricShape);
   type MetricKey = TypeOf<typeof MetricKeys>;
+
   expectType<MetricKey, 'alpha' | 'beta' | 'gamma'>('=');
 
   const Metrics = keyValueRecord(MetricKeys, EvenRange);
@@ -396,7 +397,7 @@ describe('advanced type', () => {
 
     const messages = validationErrorsToMessages(result.value);
 
-    expect(messages).toStrictEqual([
+    assert.deepStrictEqual(messages, [
       'The type of value is expected to match all types of { { id: "Identifier", status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<"Tag"> | undefined) }, Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }> }',
       'The type of value is expected to be one of the elements contained in { enum, null, undefined } at status',
       'The value is expected to be an integer between -128 and 127 at coordinates.1',
@@ -420,13 +421,13 @@ describe('advanced type', () => {
       status: undefined,
     };
 
-    expect(AdvancedNodeType.fill(partialNode)).toStrictEqual({
-      id: 'id:partial',
+    assert.deepStrictEqual(AdvancedNodeType.fill(partialNode), {
+      id: Identifier.cast('id:partial'),
       status: undefined,
       coordinates: [0, 0],
       palette: [0, 0],
-      metrics: {},
-      tags: ['tag:0'],
+      metrics: Metrics.cast({}),
+      tags: [Tag.cast('tag:0')],
       extras: {},
       children: [],
     });

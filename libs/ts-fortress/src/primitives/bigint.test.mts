@@ -56,7 +56,7 @@ describe(bigint, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 123,
@@ -66,7 +66,7 @@ describe(bigint, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <bigint>, got <number> type value `123`.',
       ]);
     });

@@ -72,6 +72,7 @@ describe(mergeRecords, () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate({ x: 0, y: 1, z: 2, w: 3 });
+
       expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
         '=',
       );
@@ -80,7 +81,7 @@ describe(mergeRecords, () => {
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toStrictEqual({ x: 0, y: 1, z: 2, w: 3 });
+      assert.deepStrictEqual(resultValue, { x: 0, y: 1, z: 2, w: 3 });
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -101,7 +102,7 @@ describe(mergeRecords, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: { x: 0, y: 1 },
@@ -125,7 +126,7 @@ describe(mergeRecords, () => {
           message: 'Missing required key "w"',
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
         'Missing required key "z" at z',
         'Missing required key "w" at w',
@@ -137,13 +138,13 @@ describe(mergeRecords, () => {
     test('noop', () => {
       const x: unknown = { x: 0, y: 1, z: 2, w: 3 };
 
-      expect(targetType.fill(x)).toStrictEqual({ x: 0, y: 1, z: 2, w: 3 });
+      assert.deepStrictEqual(targetType.fill(x), { x: 0, y: 1, z: 2, w: 3 });
     });
 
     test('fill with the default value', () => {
       const x = { x: 0, y: 1, z: 2 };
 
-      expect(targetType.fill(x)).toStrictEqual({ x: 0, y: 1, z: 2, w: 0 });
+      assert.deepStrictEqual(targetType.fill(x), { x: 0, y: 1, z: 2, w: 0 });
     });
   });
 });

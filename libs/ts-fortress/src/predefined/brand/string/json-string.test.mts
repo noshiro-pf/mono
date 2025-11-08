@@ -8,7 +8,9 @@ describe(jsonString, () => {
   const customDefault = jsonString({ defaultValue: '{"ok":true}' });
 
   type JsonStringType = TypeOf<typeof baseType>;
+
   expectType<JsonStringType, string>('<=');
+
   expectType<typeof baseType.defaultValue, JsonStringType>('=');
 
   test('provides an object literal as default', () => {
@@ -39,7 +41,7 @@ describe(jsonString, () => {
       throw new Error('Expected validation failure');
     }
 
-    expect(result.value).toStrictEqual([
+    assert.deepStrictEqual(result.value, [
       {
         path: [],
         actualValue: 'not-json',
@@ -49,7 +51,7 @@ describe(jsonString, () => {
       },
     ]);
 
-    expect(validationErrorsToMessages(result.value)).toStrictEqual([
+    assert.deepStrictEqual(validationErrorsToMessages(result.value), [
       'Expected <JsonString>, got <string> type value "not-json".',
     ]);
   });

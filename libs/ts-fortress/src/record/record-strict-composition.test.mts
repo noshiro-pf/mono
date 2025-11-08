@@ -34,7 +34,7 @@ describe('record strict composition tests', () => {
 
       // pick validates by calling the original record's validate with filled data
       // so it includes all original fields with defaults
-      expect(resultValue).toStrictEqual({
+      assert.deepStrictEqual(resultValue, {
         id: '123',
         name: 'John',
       });
@@ -63,7 +63,8 @@ describe('record strict composition tests', () => {
       const resultError = Result.unwrapErrThrow(result);
 
       expect(resultError).toHaveLength(1);
-      expect(resultError[0]).toStrictEqual({
+
+      assert.deepStrictEqual(resultError[0], {
         path: ['extra'],
         actualValue: 'not allowed',
         typeName:
@@ -104,7 +105,7 @@ describe('record strict composition tests', () => {
 
       // omit validates by calling the original record's validate with filled data
       // so it includes all original fields with defaults
-      expect(resultValue2).toStrictEqual({
+      assert.deepStrictEqual(resultValue2, {
         id: '123',
         name: 'John',
       });
@@ -133,7 +134,8 @@ describe('record strict composition tests', () => {
       const resultError2 = Result.unwrapErrThrow(result);
 
       expect(resultError2).toHaveLength(1);
-      expect(resultError2[0]).toStrictEqual({
+
+      assert.deepStrictEqual(resultError2[0], {
         path: ['extra'],
         actualValue: 'not allowed',
         typeName:
@@ -175,7 +177,7 @@ describe('record strict composition tests', () => {
       const resultValue4 = Result.unwrapThrow(result);
 
       // partial now only returns the provided fields
-      expect(resultValue4).toStrictEqual({
+      assert.deepStrictEqual(resultValue4, {
         id: '123',
         name: 'John',
       });
@@ -204,7 +206,7 @@ describe('record strict composition tests', () => {
       const resultValue6 = Result.unwrapThrow(result);
 
       // partial with empty object returns empty object
-      expect(resultValue6).toStrictEqual({});
+      assert.deepStrictEqual(resultValue6, {});
     });
 
     test('partialType validate returns input as-is for empty object', () => {
@@ -230,7 +232,8 @@ describe('record strict composition tests', () => {
       const resultError4 = Result.unwrapErrThrow(result);
 
       expect(resultError4).toHaveLength(1);
-      expect(resultError4[0]).toStrictEqual({
+
+      assert.deepStrictEqual(resultError4[0], {
         path: ['extra'],
         actualValue: 'not allowed',
         typeName:
@@ -257,7 +260,7 @@ describe('record strict composition tests', () => {
       const resultValue8 = Result.unwrapThrow(result);
 
       // partially partial now only returns the provided fields
-      expect(resultValue8).toStrictEqual({
+      assert.deepStrictEqual(resultValue8, {
         id: '123',
         name: 'John',
       });
@@ -431,7 +434,7 @@ describe('record strict composition tests', () => {
 
       const resultValue10 = Result.unwrapThrow(result);
 
-      expect(resultValue10).toStrictEqual({
+      assert.deepStrictEqual(resultValue10, {
         id: '123',
         name: 'John',
       });
@@ -464,7 +467,7 @@ describe('record strict composition tests', () => {
 
       const resultValue12 = Result.unwrapThrow(result);
 
-      expect(resultValue12).toStrictEqual({
+      assert.deepStrictEqual(resultValue12, {
         id: '123',
       });
     });

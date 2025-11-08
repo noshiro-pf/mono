@@ -8,6 +8,7 @@ describe(valueof, () => {
   test('empty record -> undefinedType', () => {
     const R = record({});
     const V = valueof(R);
+
     expectType<typeof V, Type<undefined>>('=');
 
     expect(V.defaultValue).toBe(undefinedType.defaultValue);
@@ -20,6 +21,7 @@ describe(valueof, () => {
     const R = record({ a: string() });
     const V = valueof(R);
     type T = TypeOf<typeof V>;
+
     expectType<T, string>('=');
 
     expect(Result.isOk(V.validate('x'))).toBe(true);
@@ -30,6 +32,7 @@ describe(valueof, () => {
     const R = record({ a: number(), b: string() });
     const V = valueof(R);
     type T = TypeOf<typeof V>;
+
     expectType<T, number | string>('=');
 
     expect(V.is(1)).toBe(true);

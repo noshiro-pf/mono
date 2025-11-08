@@ -43,7 +43,7 @@ import { expectType } from 'ts-data-forge';
 // Type-level assertion
 expectType<typeof result, readonly [0, 0, 0]>('=');
 // Runtime assertion
-expect(result).toStrictEqual([0, 0, 0]);
+assert.deepStrictEqual(result, [0, 0, 0]);
 ```
 
 **Testing Structure**: Tests are co-located with source files using `.test.mts` suffix and follow the pattern of testing both the TypeScript type inference and runtime behavior of validators.
@@ -89,7 +89,7 @@ ts-fortress is a **TypeScript-first schema validation library** with static type
 ## Code Style Guidelines
 
 - **NEVER**: Use `as any`, `as never`, or `@ts-ignore` (use `@ts-expect-error` when absolutely necessary)
-- **YOU MUST**: Use `.toStrictEqual()` instead of `.toEqual()` in Vitest tests
+- **YOU MUST**: Use `assert.deepStrictEqual(A, B)` instead of `assert.deepEqual(A, B)`, `expect(A).toEqual(B)`, `expect(A).toStrictEqual(B)` in Vitest tests
 - **YOU MUST**: Use `test()` instead of `it()` in Vitest tests
 - **YOU MUST**: Use named exports unless restricted by libraries or frameworks
 - **YOU MUST**: Avoid using file scope `/* eslint-disable */`.

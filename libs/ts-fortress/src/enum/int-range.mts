@@ -93,6 +93,9 @@ type NegativeToPositive<N extends number> =
 expectType<NegativeToPositive<-3>, 3>('=');
 
 expectType<IntRange<1, 5>, 1 | 2 | 3 | 4>('=');
+
 expectType<IntRange<-3, 3>, -3 | -2 | -1 | 0 | 1 | 2>('=');
+
 expectType<IntRange<3, -3>, never>('=');
+
 expectType<IntRange<-5, -1>, -5 | -4 | -3 | -2>('=');

@@ -98,7 +98,7 @@ describe(nonNegativeFiniteNumber, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: -5.5,
@@ -107,7 +107,7 @@ describe(nonNegativeFiniteNumber, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <NonNegativeFiniteNumber>, got <number> type value `-5.5`.',
       ]);
     });

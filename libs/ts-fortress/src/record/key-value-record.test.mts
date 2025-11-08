@@ -59,6 +59,7 @@ describe(keyValueRecord, () => {
       };
 
       const result = strNumRecord.validate(x);
+
       expectType<
         typeof result,
         Result<StrNumRecord, readonly ValidationError[]>
@@ -68,7 +69,7 @@ describe(keyValueRecord, () => {
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toStrictEqual({
+      assert.deepStrictEqual(resultValue, {
         year: 2000,
         month: 12,
         date: 25,
@@ -103,7 +104,7 @@ describe(keyValueRecord, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 'ab',
@@ -133,7 +134,7 @@ describe(keyValueRecord, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value of the record is expected to be <number>',
         'Expected <number> at month, got <string> type value "ab".',
         'The value of the record is expected to be <number>',
@@ -146,7 +147,7 @@ describe(keyValueRecord, () => {
     test('from an empty record', () => {
       const x: UnknownRecord = {};
 
-      expect(strNumRecord.fill(x)).toStrictEqual({});
+      assert.deepStrictEqual(strNumRecord.fill(x), {});
     });
 
     test('from a filled record', () => {
@@ -156,7 +157,7 @@ describe(keyValueRecord, () => {
         date: 999,
       };
 
-      expect(strNumRecord.fill(x)).toStrictEqual({
+      assert.deepStrictEqual(strNumRecord.fill(x), {
         year: 2000,
         month: 999,
         date: 999,
@@ -169,7 +170,7 @@ describe(keyValueRecord, () => {
         month: '12',
       };
 
-      expect(strNumRecord.fill(x)).toStrictEqual({
+      assert.deepStrictEqual(strNumRecord.fill(x), {
         year: 2000,
       });
     });

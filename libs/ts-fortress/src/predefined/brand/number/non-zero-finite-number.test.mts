@@ -99,7 +99,7 @@ describe(nonZeroFiniteNumber, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 0,
@@ -108,7 +108,7 @@ describe(nonZeroFiniteNumber, () => {
           message: undefined,
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <NonZeroFiniteNumber>, got <number> type value `0`.',
       ]);
     });

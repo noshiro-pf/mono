@@ -57,6 +57,7 @@ describe(keyof, () => {
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expectType<typeof resultValue, Ymd>('=');
 
       expect(resultValue).toBe('year');
@@ -82,7 +83,7 @@ describe(keyof, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 'minutes',
@@ -92,7 +93,7 @@ describe(keyof, () => {
             'The value is expected to be one of the elements contained in { year, month, date }',
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value is expected to be one of the elements contained in { year, month, date }',
       ]);
     });

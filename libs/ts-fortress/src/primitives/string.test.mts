@@ -23,6 +23,7 @@ describe(string, () => {
   type Str = TypeOf<typeof str>;
 
   expectType<Str, string>('=');
+
   expectType<typeof str.defaultValue, Str>('=');
 
   describe('is', () => {
@@ -184,7 +185,7 @@ describe(string, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 42,

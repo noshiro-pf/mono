@@ -1,5 +1,4 @@
 import { expectType, Result } from 'ts-data-forge';
-
 import { number, string } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
@@ -10,6 +9,7 @@ test('SetType with string elements', () => {
   type StringSet = TypeOf<typeof StringSet>;
 
   // Type test
+
   expectType<StringSet, ReadonlySet<string>>('=');
 
   // Valid set
@@ -38,6 +38,7 @@ test('SetType with number elements', () => {
   type NumberSet = TypeOf<typeof NumberSet>;
 
   // Type test
+
   expectType<NumberSet, ReadonlySet<number>>('=');
 
   const validSet = new Set([1, 2, 3, 4, 5]);
@@ -99,7 +100,8 @@ test('SetType fill() method', () => {
   const filled3 = NumberSet.fill({});
 
   expect(filled3.size).toBe(0);
-  expect(filled3).toStrictEqual(new Set());
+
+  assert.deepStrictEqual(filled3, new Set());
 });
 
 test('SetType cast() method', () => {
@@ -169,6 +171,7 @@ test('SetType with complex element types', () => {
   type UserSet = TypeOf<typeof UserSet>;
 
   // Type test
+
   expectType<UserSet, ReadonlySet<Readonly<{ id: number; name: string }>>>('=');
 
   const user1 = { id: 1, name: 'Alice' };
@@ -195,7 +198,8 @@ test('SetType with complex element types', () => {
 test('SetType defaultValue', () => {
   const StringSet = SetType(string());
 
-  expect(StringSet.defaultValue).toStrictEqual(new Set());
+  assert.deepStrictEqual(StringSet.defaultValue, new Set());
+
   expect(StringSet.defaultValue.size).toBe(0);
 });
 

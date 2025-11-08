@@ -10,7 +10,7 @@ Verify these command and fix errors:
 ## Code Style Guidelines
 
 - **NEVER**: Use `as any`, `as never`, or `@ts-ignore` (use `@ts-expect-error` when absolutely necessary)
-- **YOU MUST**: Use `.toStrictEqual()` instead of `.toEqual()` in Vitest tests
+- **YOU MUST**: Use `assert.deepStrictEqual(A, B)` instead of `assert.deepEqual(A, B)`, `expect(A).toEqual(B)`, `expect(A).toStrictEqual(B)` in Vitest tests
 - **YOU MUST**: Use `test()` instead of `it()` in Vitest tests
 - **YOU MUST**: Use named exports unless restricted by libraries or frameworks
 - **IMPORTANT**: Use arrow functions in all cases

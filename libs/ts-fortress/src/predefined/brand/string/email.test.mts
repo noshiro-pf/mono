@@ -76,6 +76,7 @@ describe(email, () => {
   type EmailType = TypeOf<typeof baseType>;
 
   expectType<EmailType, string>('<=');
+
   expectType<typeof baseType.defaultValue, EmailType>('=');
 
   test.each(validSamples)('should accept $0', (e) => {

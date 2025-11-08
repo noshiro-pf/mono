@@ -47,7 +47,7 @@ describe('record strict composition - simple tests', () => {
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toStrictEqual({ id: '123', name: 'John' });
+      assert.deepStrictEqual(resultValue, { id: '123', name: 'John' });
     });
 
     test('pickedType validate returns input as-is for OK cases', () => {

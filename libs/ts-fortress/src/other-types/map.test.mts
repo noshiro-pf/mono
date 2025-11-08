@@ -8,6 +8,7 @@ test('MapType with string keys and number values', () => {
   type StringNumberMap = TypeOf<typeof StringNumberMap>;
 
   // Type test
+
   expectType<StringNumberMap, ReadonlyMap<string, number>>('=');
 
   // Valid map
@@ -112,7 +113,8 @@ test('MapType fill() method', () => {
   const filled3 = StringNumberMap.fill({});
 
   expect(filled3.size).toBe(0);
-  expect(filled3).toStrictEqual(new Map());
+
+  assert.deepStrictEqual(filled3, new Map());
 });
 
 test('MapType cast() method', () => {
@@ -172,6 +174,7 @@ test('MapType with number keys and string values', () => {
   type NumberStringMap = TypeOf<typeof NumberStringMap>;
 
   // Type test
+
   expectType<NumberStringMap, ReadonlyMap<number, string>>('=');
 
   const validMap = new Map([
@@ -190,6 +193,7 @@ test('MapType with number keys and string values', () => {
 test('MapType defaultValue', () => {
   const StringNumberMap = MapType(string(), number());
 
-  expect(StringNumberMap.defaultValue).toStrictEqual(new Map());
+  assert.deepStrictEqual(StringNumberMap.defaultValue, new Map());
+
   expect(StringNumberMap.defaultValue.size).toBe(0);
 });

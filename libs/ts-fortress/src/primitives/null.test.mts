@@ -6,6 +6,7 @@ describe('null type', () => {
   type Null = TypeOf<typeof nullType>;
 
   expectType<Null, null>('=');
+
   expectType<typeof nullType.defaultValue, Null>('=');
 
   describe('default value', () => {
@@ -142,7 +143,7 @@ describe('null type', () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: undefined,
@@ -161,7 +162,7 @@ describe('null type', () => {
 
       const resultError1 = Result.unwrapErrThrow(result);
 
-      expect(resultError1).toStrictEqual([
+      assert.deepStrictEqual(resultError1, [
         {
           path: [],
           actualValue: 0,

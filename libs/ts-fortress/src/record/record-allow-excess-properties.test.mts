@@ -40,7 +40,7 @@ describe('record allowExcessProperties option', () => {
 
     const resultError = Result.unwrapErrThrow(result);
 
-    expect(resultError).toStrictEqual([
+    assert.deepStrictEqual(resultError, [
       {
         path: ['extra'],
         actualValue: 'not allowed',
@@ -50,7 +50,7 @@ describe('record allowExcessProperties option', () => {
       },
     ]);
 
-    expect(validationErrorsToMessages(resultError)).toStrictEqual([
+    assert.deepStrictEqual(validationErrorsToMessages(resultError), [
       'Excess property "extra" is not allowed at extra',
     ]);
   });
@@ -69,7 +69,7 @@ describe('record allowExcessProperties option', () => {
 
     const resultValue = Result.unwrapThrow(result);
 
-    expect(resultValue).toStrictEqual({
+    assert.deepStrictEqual(resultValue, {
       name: 42,
       age: 25,
     });
@@ -100,12 +100,14 @@ describe('record allowExcessProperties option', () => {
     expect(Result.isOk(result)).toBe(true);
 
     const resultValue2 = Result.unwrapThrow(result);
-
-    expect(resultValue2).toStrictEqual({
-      name: 42,
-      age: 25,
-      extra: 'allowed',
-    });
+    assert.deepStrictEqual(
+      resultValue2,
+      defaultRecord.cast({
+        name: 42,
+        age: 25,
+        extra: 'allowed',
+      }),
+    );
   });
 
   test('permissiveRecord validate returns input as-is for OK cases', () => {
@@ -134,11 +136,14 @@ describe('record allowExcessProperties option', () => {
 
     const resultValue4 = Result.unwrapThrow(result);
 
-    expect(resultValue4).toStrictEqual({
-      name: 42,
-      age: 25,
-      extra: 'allowed by default',
-    });
+    assert.deepStrictEqual(
+      resultValue4,
+      defaultRecord.cast({
+        name: 42,
+        age: 25,
+        extra: 'allowed by default',
+      }),
+    );
   });
 
   test('defaultRecord validate returns input as-is for OK cases', () => {
@@ -167,7 +172,8 @@ describe('record allowExcessProperties option', () => {
     const resultError1 = Result.unwrapErrThrow(result);
 
     expect(resultError1).toHaveLength(2);
-    expect(resultError1).toStrictEqual([
+
+    assert.deepStrictEqual(resultError1, [
       {
         path: ['extra1'],
         actualValue: 'not allowed 1',
@@ -199,8 +205,9 @@ describe('record allowExcessProperties option', () => {
     const resultError2 = Result.unwrapErrThrow(result);
 
     expect(resultError2).toHaveLength(2);
+
     // First error: invalid type for 'name'
-    expect(resultError2[0]).toStrictEqual({
+    assert.deepStrictEqual(resultError2[0], {
       path: ['name'],
       actualValue: 'invalid',
       expectedType: 'number',
@@ -208,7 +215,7 @@ describe('record allowExcessProperties option', () => {
       message: undefined,
     });
     // Second error: excess property
-    expect(resultError2[1]).toStrictEqual({
+    assert.deepStrictEqual(resultError2[1], {
       path: ['extra'],
       actualValue: 'not allowed',
       typeName: '{ name: number, age: number }',

@@ -72,6 +72,7 @@ describe(union, () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(3);
+
       expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
         '=',
       );
@@ -90,7 +91,7 @@ describe(union, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError[0]).toStrictEqual({
+      assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: 5,
         expectedType: '({ x: number, y: number } | literal(3) | literal("2"))',
@@ -98,7 +99,7 @@ describe(union, () => {
         message:
           'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
       });
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
       ]);
     });
@@ -119,7 +120,7 @@ describe(union, () => {
     test('noop', () => {
       const x: unknown = { x: 3, y: 4 };
 
-      expect(targetType.fill(x)).toStrictEqual({ x: 3, y: 4 });
+      assert.deepStrictEqual(targetType.fill(x), { x: 3, y: 4 });
     });
 
     test('fill with the default value', () => {

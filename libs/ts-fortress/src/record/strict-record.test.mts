@@ -11,6 +11,7 @@ describe(strictRecord, () => {
   });
 
   type User = TypeOf<typeof userType>;
+
   expectType<User, Readonly<{ name: string; age: number }>>('=');
 
   describe('is', () => {
@@ -42,9 +43,10 @@ describe(strictRecord, () => {
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expectType<typeof resultValue, User>('=');
 
-      expect(resultValue).toStrictEqual({
+      assert.deepStrictEqual(resultValue, {
         name: 'John',
         age: 30,
       });
@@ -70,7 +72,7 @@ describe(strictRecord, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: ['extra'],
           actualValue: 'not allowed',
@@ -79,7 +81,7 @@ describe(strictRecord, () => {
           message: 'Excess property "extra" is not allowed',
         },
       ]);
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Excess property "extra" is not allowed at extra',
       ]);
     });
@@ -93,7 +95,7 @@ describe(strictRecord, () => {
 
       const resultError1 = Result.unwrapErrThrow(result);
 
-      expect(resultError1).toStrictEqual([
+      assert.deepStrictEqual(resultError1, [
         {
           path: ['age'],
           actualValue: 'thirty',
@@ -113,7 +115,7 @@ describe(strictRecord, () => {
 
       const resultError2 = Result.unwrapErrThrow(result);
 
-      expect(resultError2).toStrictEqual([
+      assert.deepStrictEqual(resultError2, [
         {
           path: ['age'],
           actualValue: incompleteUser,
@@ -177,7 +179,7 @@ describe(strictRecord, () => {
 
   describe('default values', () => {
     test('has correct default value', () => {
-      expect(userType.defaultValue).toStrictEqual({
+      assert.deepStrictEqual(userType.defaultValue, {
         name: '',
         age: 0,
       });
@@ -190,7 +192,7 @@ describe(strictRecord, () => {
 
       const result = userType.fill(partialData);
 
-      expect(result).toStrictEqual({
+      assert.deepStrictEqual(result, {
         name: 'John',
         age: 0,
       });
@@ -201,7 +203,7 @@ describe(strictRecord, () => {
 
       const result = userType.fill(validData);
 
-      expect(result).toStrictEqual({
+      assert.deepStrictEqual(result, {
         name: 'John',
         age: 30,
       });

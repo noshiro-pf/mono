@@ -4,6 +4,7 @@ import { undefinedType } from './undefined.mjs';
 
 describe('undefined type', () => {
   expectType<undefined, undefined>('=');
+
   expectType<typeof undefinedType.defaultValue, undefined>('=');
 
   describe('default value', () => {
@@ -140,7 +141,7 @@ describe('undefined type', () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: null,
@@ -159,7 +160,7 @@ describe('undefined type', () => {
 
       const resultError1 = Result.unwrapErrThrow(result);
 
-      expect(resultError1).toStrictEqual([
+      assert.deepStrictEqual(resultError1, [
         {
           path: [],
           actualValue: 0,

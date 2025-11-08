@@ -10,20 +10,27 @@ import { arrayOfLength } from './array-of-length.mjs';
 describe(arrayOfLength, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
-      expect(arrayOfLength(3, number()).defaultValue).toStrictEqual([0, 0, 0]);
+      assert.deepStrictEqual(
+        arrayOfLength(3, number()).defaultValue,
+        [0, 0, 0],
+      );
     });
 
     test('with explicit default value, case 1', () => {
-      expect(arrayOfLength(3, number(2)).defaultValue).toStrictEqual([2, 2, 2]);
+      assert.deepStrictEqual(
+        arrayOfLength(3, number(2)).defaultValue,
+        [2, 2, 2],
+      );
     });
 
     test('with explicit default value, case 2', () => {
-      expect(
+      assert.deepStrictEqual(
         arrayOfLength(4, number(), {
           typeName: 'xs',
           defaultValue: [1, 2, 3, 4],
         }).defaultValue,
-      ).toStrictEqual([1, 2, 3, 4]);
+        [1, 2, 3, 4],
+      );
     });
   });
 
@@ -81,13 +88,14 @@ describe(arrayOfLength, () => {
       const ys: unknown = [5, 6, 7, 8];
 
       const result = xs.validate(ys);
+
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
 
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toStrictEqual([5, 6, 7, 8]);
+      assert.deepStrictEqual(resultValue, [5, 6, 7, 8]);
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -110,7 +118,7 @@ describe(arrayOfLength, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: ys,
@@ -120,7 +128,7 @@ describe(arrayOfLength, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected array of length 4, got length 0',
       ]);
     });
@@ -134,7 +142,7 @@ describe(arrayOfLength, () => {
 
       const resultError1 = Result.unwrapErrThrow(result);
 
-      expect(resultError1).toStrictEqual([
+      assert.deepStrictEqual(resultError1, [
         {
           path: ['1'],
           actualValue: '1',
@@ -151,7 +159,7 @@ describe(arrayOfLength, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError1)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
         'Expected <number> at 1, got <string> type value "1".',
         'Expected <number> at 2, got <string> type value "".',
       ]);
@@ -162,19 +170,19 @@ describe(arrayOfLength, () => {
     test('noop', () => {
       const ys: unknown = [1, 2, 3];
 
-      expect(xs.fill(ys)).toStrictEqual([1, 2, 3, 0]);
+      assert.deepStrictEqual(xs.fill(ys), [1, 2, 3, 0]);
     });
 
     test('fill with the default value', () => {
       const ys: unknown = ['1', '', 3];
 
-      expect(xs.fill(ys)).toStrictEqual([0, 0, 3, 0]);
+      assert.deepStrictEqual(xs.fill(ys), [0, 0, 3, 0]);
     });
 
     test('fill empty array', () => {
       const ys: unknown = [];
 
-      expect(xs.fill(ys)).toStrictEqual([0, 0, 0, 0]);
+      assert.deepStrictEqual(xs.fill(ys), [0, 0, 0, 0]);
     });
   });
 });

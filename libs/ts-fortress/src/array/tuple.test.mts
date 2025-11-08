@@ -12,9 +12,10 @@ import { tuple } from './tuple.mjs';
 describe(tuple, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
-      expect(
+      assert.deepStrictEqual(
         tuple([literal(1), literal(2), literal(3)]).defaultValue,
-      ).toStrictEqual([1, 2, 3]);
+        [1, 2, 3],
+      );
     });
 
     test('with explicit default value', () => {
@@ -79,6 +80,7 @@ describe(tuple, () => {
       const x: unknown = [{ x: 1, y: 2 }, 3, '2'];
 
       const result = targetType.validate(x);
+
       expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
         '=',
       );
@@ -87,7 +89,7 @@ describe(tuple, () => {
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toStrictEqual([{ x: 1, y: 2 }, 3, '2']);
+      assert.deepStrictEqual(resultValue, [{ x: 1, y: 2 }, 3, '2']);
     });
 
     test('falsy case - not array', () => {
@@ -99,7 +101,7 @@ describe(tuple, () => {
 
       const resultError = Result.unwrapErrThrow(result);
 
-      expect(resultError).toStrictEqual([
+      assert.deepStrictEqual(resultError, [
         {
           path: [],
           actualValue: 'not an array',
@@ -119,7 +121,7 @@ describe(tuple, () => {
 
       const resultError1 = Result.unwrapErrThrow(result);
 
-      expect(resultError1).toStrictEqual([
+      assert.deepStrictEqual(resultError1, [
         {
           path: [],
           actualValue: x,
@@ -140,7 +142,7 @@ describe(tuple, () => {
 
       const resultError2 = Result.unwrapErrThrow(result);
 
-      expect(resultError2).toStrictEqual([
+      assert.deepStrictEqual(resultError2, [
         {
           path: ['0', 'x'],
           actualValue: 'str',
@@ -157,7 +159,7 @@ describe(tuple, () => {
         },
       ]);
 
-      expect(validationErrorsToMessages(resultError2)).toStrictEqual([
+      assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
         'Expected <number> at 0.x, got <string> type value "str".',
         'Expected <number> at 0.y, got <string> type value "str".',
       ]);
@@ -173,7 +175,8 @@ describe(tuple, () => {
 
       // Note: tuple validation may create new arrays for type safety
       // so we check for structural equality rather than reference equality
-      expect(resultValue1).toStrictEqual(input);
+      assert.deepStrictEqual(resultValue1, targetType.cast(input));
+
       // For tuples, the inner objects should maintain reference equality
       expect(resultValue1[0]).toBe(input[0]); // ✅ same reference for nested objects
     });
@@ -183,37 +186,37 @@ describe(tuple, () => {
     test('noop', () => {
       const x: unknown = [{ x: 1, y: 2 }, 3, '2'];
 
-      expect(targetType.fill(x)).toStrictEqual([{ x: 1, y: 2 }, 3, '2']);
+      assert.deepStrictEqual(targetType.fill(x), [{ x: 1, y: 2 }, 3, '2']);
     });
 
     test('fill with the default value', () => {
       const x: unknown = 5;
 
-      expect(targetType.fill(x)).toStrictEqual([{ x: 0, y: 0 }, 3, '2']);
+      assert.deepStrictEqual(targetType.fill(x), [{ x: 0, y: 0 }, 3, '2']);
     });
 
     test('fill only the first element with the default value, case 1', () => {
       const x: unknown = [123, 3, '2'];
 
-      expect(targetType.fill(x)).toStrictEqual([{ x: 0, y: 0 }, 3, '2']);
+      assert.deepStrictEqual(targetType.fill(x), [{ x: 0, y: 0 }, 3, '2']);
     });
 
     test('fill only the first element with the default value, case 2', () => {
       const x: unknown = [{ z: 5 }, 3, '2'];
 
-      expect(targetType.fill(x)).toStrictEqual([{ x: 0, y: 0 }, 3, '2']);
+      assert.deepStrictEqual(targetType.fill(x), [{ x: 0, y: 0 }, 3, '2']);
     });
 
     test('fill only the second element with the default value', () => {
       const x: unknown = [{ x: 1, y: 2 }, 0, '2'];
 
-      expect(targetType.fill(x)).toStrictEqual([{ x: 1, y: 2 }, 3, '2']);
+      assert.deepStrictEqual(targetType.fill(x), [{ x: 1, y: 2 }, 3, '2']);
     });
 
     test('fill only the third element with the default value', () => {
       const x: unknown = [{ x: 1, y: 2 }, 3, 999];
 
-      expect(targetType.fill(x)).toStrictEqual([{ x: 1, y: 2 }, 3, '2']);
+      assert.deepStrictEqual(targetType.fill(x), [{ x: 1, y: 2 }, 3, '2']);
     });
   });
 });
