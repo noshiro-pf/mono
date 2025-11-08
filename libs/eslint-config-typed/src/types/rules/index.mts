@@ -18,6 +18,7 @@ export * from './eslint-react-rules.mjs';
 export * from './eslint-rules.mjs';
 export * from './eslint-security-rules.mjs';
 export * from './eslint-strict-dependencies-rules.mjs';
+export * from './eslint-stylistic-rules.mjs';
 export * from './eslint-testing-library-rules.mjs';
 export * from './eslint-total-functions-rules.mjs';
 export * from './eslint-tree-shakable-rules.mjs';

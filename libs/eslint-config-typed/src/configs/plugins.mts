@@ -1,5 +1,6 @@
 /* eslint-disable import-x/no-rename-default */
 
+import stylistic from '@stylistic/eslint-plugin';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 
 // @ts-expect-error no type definition
@@ -60,6 +61,7 @@ import { type ESLintPlugin, type FlatConfig } from '../types/index.mjs';
 
 export const plugins: Record<
   | '@typescript-eslint'
+  | '@stylistic'
   | 'array-func'
   | 'cypress'
   | 'playwright'
@@ -87,6 +89,7 @@ export const plugins: Record<
   Omit<ESLintPlugin, 'configs'>
 > = {
   '@typescript-eslint': typescriptEslint,
+  '@stylistic': stylistic,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'array-func': eslintPluginArrayFunc,
   cypress: eslintPluginCypress,

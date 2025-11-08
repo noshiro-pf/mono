@@ -345,7 +345,8 @@ export const generateRulesTypeCore = async (
     ruleName,
     schema: normalizeToSchemaArray(
       falseToUndefined(
-        pluginName === '@typescript-eslint/eslint-plugin'
+        pluginName === '@typescript-eslint/eslint-plugin' ||
+          pluginName === '@stylistic/eslint-plugin'
           ? // Temporary workaround because schema changes made the compilation fail
             deepReplace(meta?.schema, '#/items/0/', '#/')
           : meta?.schema,

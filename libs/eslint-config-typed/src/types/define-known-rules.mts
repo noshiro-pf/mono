@@ -19,6 +19,7 @@ import {
   type EslintRules,
   type EslintSecurityRules,
   type EslintStrictDependenciesRules,
+  type EslintStylisticRules,
   type EslintTestingLibraryRules,
   type EslintTotalFunctionsRules,
   type EslintTreeShakableRules,
@@ -45,6 +46,7 @@ type KnownRules = DeepReadonly<
     EslintReactRefreshRules &
     EslintReactRules &
     EslintRules &
+    EslintStylisticRules &
     EslintSecurityRules &
     EslintStrictDependenciesRules &
     EslintTestingLibraryRules &

@@ -5,6 +5,12 @@ export const eslintPlugins = {
     rulePrefix: 'xxx/',
     outputFileName: 'eslint-rules.mts',
   },
+  EslintStylisticRules: {
+    typeName: 'EslintStylisticRules',
+    pluginName: '@stylistic/eslint-plugin',
+    rulePrefix: '@stylistic/',
+    outputFileName: 'eslint-stylistic-rules.mts',
+  },
   EslintArrayFuncRules: {
     typeName: 'EslintArrayFuncRules',
     pluginName: 'eslint-plugin-array-func',
@@ -162,6 +168,7 @@ export const eslintPlugins = {
     pluginName:
       | '@typescript-eslint/eslint-plugin'
       | '@vitest/eslint-plugin'
+      | '@stylistic/eslint-plugin'
       | 'eslint'
       | `eslint-plugin-${string}`;
     rulePrefix: `${string}/`;
