@@ -1,3 +1,9 @@
+# [5.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v5.2.0...v5.3.0) (2025-11-08)
+
+### Features
+
+- remove custom message property from ValidationError object and add optional fields instead ([#135](https://github.com/noshiro-pf/ts-fortress/issues/135)) ([f1a75c6](https://github.com/noshiro-pf/ts-fortress/commit/f1a75c69a1e3185dc4a8f2c83a62d4f6ac92e631))
+
 # [5.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v5.1.0...v5.2.0) (2025-09-26)
 
 ### Features
