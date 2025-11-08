@@ -8,7 +8,10 @@ describe('validation-error formatting details', () => {
         actualValue: 123,
         expectedType: 'number',
         typeName: 'number',
-        message: 'Oops',
+        details: {
+          kind: 'custom',
+          message: 'Oops',
+        },
       },
       20,
     );
@@ -24,7 +27,7 @@ describe('validation-error formatting details', () => {
         actualValue: long,
         expectedType: 'string',
         typeName: 'string',
-        message: undefined,
+        details: undefined,
       },
       10,
     );
@@ -40,7 +43,7 @@ describe('validation-error formatting details', () => {
         actualValue: bigNumber,
         expectedType: 'number',
         typeName: 'number',
-        message: undefined,
+        details: undefined,
       },
       5,
     );

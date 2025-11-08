@@ -105,9 +105,10 @@ describe(positiveFiniteNumber, () => {
           actualValue: 0,
           expectedType: 'PositiveFiniteNumber',
           typeName: 'PositiveFiniteNumber',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <PositiveFiniteNumber>, got <number> type value `0`.',
       ]);

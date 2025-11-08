@@ -12,7 +12,7 @@
 
 > **arrayAtLeastLength**\<`A`, `N`\>(`size`, `elementType`, `options?`): [`Type`](../type/README.md#type)\<`ArrayAtLeastLen`\<`N`, `A`\>\>
 
-Defined in: [src/array/array-at-least-length.mts:13](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/array-at-least-length.mts#L13)
+Defined in: [src/array/array-at-least-length.mts:12](https://github.com/noshiro-pf/ts-fortress/blob/main/src/array/array-at-least-length.mts#L12)
 
 #### Type Parameters
 

@@ -74,7 +74,7 @@ describe(int, () => {
           actualValue: 42.5,
           expectedType: 'Int',
           typeName: 'Int',
-          message: undefined,
+          details: undefined,
         },
       ]);
 
@@ -96,7 +96,7 @@ describe(int, () => {
           actualValue: 'not a number',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
 

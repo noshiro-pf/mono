@@ -64,7 +64,7 @@ describe(symbol, () => {
           actualValue: 'not a symbol',
           expectedType: 'symbol',
           typeName: 'symbol',
-          message: undefined,
+          details: undefined,
         },
       ]);
 

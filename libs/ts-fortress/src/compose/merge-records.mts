@@ -6,7 +6,6 @@ import {
   createIsFn,
   toIntersectionString,
   type ValidationError,
-  type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 export const mergeRecords = <
@@ -33,11 +32,12 @@ export const mergeRecords = <
             path: [],
             actualValue: a,
             expectedType: typeNameFilled,
-            message: `The type of value is expected to match all types of { ${types
-              .map((t) => t.typeName)
-              .join(', ')} }`,
             typeName: typeNameFilled,
-          } satisfies ValidationErrorWithMessage;
+            details: {
+              kind: 'intersection',
+              typeNames: types.map((t) => t.typeName),
+            },
+          } satisfies ValidationError;
 
           yield* res.value;
         }

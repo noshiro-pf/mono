@@ -42,26 +42,39 @@ describe('recursive', () => {
 
   test('JsonValue - primitive values', () => {
     expect(JsonValue.is(true)).toBe(true);
+
     expect(JsonValue.is(false)).toBe(true);
+
     expect(JsonValue.is(42)).toBe(true);
+
     expect(JsonValue.is(3.14)).toBe(true);
+
     expect(JsonValue.is('hello')).toBe(true);
+
     expect(JsonValue.is(null)).toBe(true);
+
     expect(JsonValue.is(undefined)).toBe(false);
   });
 
   test('JsonValue - arrays', () => {
     expect(JsonValue.is([])).toBe(true);
+
     expect(JsonValue.is([1, 2, 3])).toBe(true);
+
     expect(JsonValue.is(['a', 'b', 'c'])).toBe(true);
+
     expect(JsonValue.is([true, false, null])).toBe(true);
+
     expect(JsonValue.is([1, 'a', true, null])).toBe(true);
   });
 
   test('JsonValue - objects', () => {
     expect(JsonValue.is({})).toBe(true);
+
     expect(JsonValue.is({ a: 1 })).toBe(true);
+
     expect(JsonValue.is({ a: 1, b: 'hello' })).toBe(true);
+
     expect(JsonValue.is({ a: 1, b: [1, 2, 3] })).toBe(true);
   });
 
@@ -141,7 +154,9 @@ describe('recursive', () => {
 
   test('JsonValue - invalid values', () => {
     expect(JsonValue.is(undefined)).toBe(false);
+
     expect(JsonValue.is(Symbol('test'))).toBe(false);
+
     expect(JsonValue.is(() => 'function')).toBe(false);
 
     // Note: keyValueRecord accepts any object with string keys, including Date/Set/Map
@@ -192,7 +207,9 @@ describe('recursive', () => {
     };
 
     expect(LinkedListNumber.is(list)).toBe(true);
+
     expect(LinkedListNumber.is({ value: 1, next: null })).toBe(true);
+
     expect(LinkedListNumber.is({ value: 'not a number', next: null })).toBe(
       false,
     );
@@ -231,7 +248,9 @@ describe('recursive', () => {
     };
 
     expect(TreeNodeString.is(tree)).toBe(true);
+
     expect(TreeNodeString.is({ value: 'node', children: [] })).toBe(true);
+
     expect(TreeNodeString.is({ value: 123, children: [] })).toBe(false);
   });
 });

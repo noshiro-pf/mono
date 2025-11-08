@@ -1,4 +1,4 @@
-import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -6,7 +6,6 @@ import {
   createIsFn,
   createPrimitiveValidationError,
   type ValidationError,
-  type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 const isSet = (value: unknown): value is ReadonlySet<unknown> =>
@@ -33,6 +32,7 @@ export const SetType = <T extends Type<unknown>>(
           actualValue: a,
           expectedType: 'Set',
           typeName,
+          details: undefined,
         }),
       ]);
     }
@@ -46,9 +46,12 @@ export const SetType = <T extends Type<unknown>>(
             path: [],
             actualValue: element,
             expectedType: typeName,
-            message: `The element of the Set is expected to be <${elementType.typeName}>, but got <${typeof element}> type value \`${unknownToString(element)}\``,
             typeName,
-          } satisfies ValidationErrorWithMessage;
+            details: {
+              kind: 'set-element',
+              expectedType: elementType.typeName,
+            },
+          } satisfies ValidationError;
 
           yield* res.value;
         }

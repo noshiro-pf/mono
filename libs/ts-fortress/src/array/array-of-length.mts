@@ -7,7 +7,6 @@ import {
   createPrimitiveValidationError,
   prependIndexToValidationErrors,
   type ValidationError,
-  type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 export const arrayOfLength = <A, N extends SmallUint>(
@@ -33,6 +32,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
           actualValue: a,
           expectedType: 'array',
           typeName,
+          details: undefined,
         }),
       ]);
     }
@@ -43,9 +43,13 @@ export const arrayOfLength = <A, N extends SmallUint>(
           path: [],
           actualValue: a,
           expectedType: typeName,
-          message: `Expected array of length ${size}, got length ${a.length}`,
           typeName,
-        } satisfies ValidationErrorWithMessage,
+          details: {
+            kind: 'array-length',
+            expectedLength: size,
+            actualLength: a.length,
+          },
+        } satisfies ValidationError,
       ]);
     }
 

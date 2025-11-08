@@ -175,7 +175,7 @@ describe(number, () => {
           actualValue: 'not a number',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -201,7 +201,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(6)).toBe(true);
+
       expect(type.is(5)).toBe(false);
+
       expect(type.is(42)).toBe(true);
     });
 
@@ -217,7 +219,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(5)).toBe(true);
+
       expect(type.is(4)).toBe(false);
+
       expect(type.is(10)).toBe(true);
     });
 
@@ -233,6 +237,7 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(7)).toBe(true);
+
       expect(type.is(4)).toBe(false);
     });
 
@@ -248,7 +253,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(3)).toBe(true);
+
       expect(type.is(5)).toBe(false);
+
       expect(type.is(10)).toBe(false);
     });
 
@@ -264,7 +271,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(4)).toBe(true);
+
       expect(type.is(5)).toBe(true);
+
       expect(type.is(6)).toBe(false);
     });
 
@@ -280,7 +289,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(5)).toBe(true);
+
       expect(type.is(6)).toBe(false);
+
       expect(type.is(3)).toBe(true);
     });
 
@@ -296,7 +307,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(10)).toBe(true);
+
       expect(type.is(0)).toBe(false);
+
       expect(type.is(-1)).toBe(false);
     });
 
@@ -315,7 +328,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(5)).toBe(true);
+
       expect(type.is(0)).toBe(true);
+
       expect(type.is(-1)).toBe(false);
     });
 
@@ -334,7 +349,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(-5)).toBe(true);
+
       expect(type.is(0)).toBe(false);
+
       expect(type.is(1)).toBe(false);
     });
 
@@ -353,7 +370,9 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(-5)).toBe(true);
+
       expect(type.is(0)).toBe(true);
+
       expect(type.is(1)).toBe(false);
     });
 
@@ -372,6 +391,7 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(9)).toBe(true);
+
       expect(type.is(10)).toBe(false);
     });
 
@@ -387,6 +407,7 @@ describe('number with constraints', () => {
       expectType<typeof type, Type<number>>('=');
 
       expect(type.is(10)).toBe(true);
+
       expect(type.is(11)).toBe(false);
     });
 
@@ -403,7 +424,9 @@ describe('number with constraints', () => {
         expectType<typeof type, Type<number>>('=');
 
         expect(type.is(6)).toBe(true);
+
         expect(type.is(1)).toBe(false);
+
         expect(type.is(10)).toBe(false);
       });
 
@@ -419,8 +442,11 @@ describe('number with constraints', () => {
         expectType<typeof type, Type<number>>('=');
 
         expect(type.is(5)).toBe(true);
+
         expect(type.is(10)).toBe(true);
+
         expect(type.is(4)).toBe(false);
+
         expect(type.is(11)).toBe(false);
       });
 
@@ -436,8 +462,11 @@ describe('number with constraints', () => {
         expectType<typeof type, Type<number>>('=');
 
         expect(type.is(9)).toBe(true);
+
         expect(type.is(3)).toBe(true);
+
         expect(type.is(-3)).toBe(false);
+
         expect(type.is(10)).toBe(false);
       });
 
@@ -459,9 +488,13 @@ describe('number with constraints', () => {
         expectType<typeof type, Type<number>>('=');
 
         expect(type.is(10)).toBe(true);
+
         expect(type.is(0)).toBe(true);
+
         expect(type.is(11)).toBe(false);
+
         expect(type.is(-2)).toBe(false);
+
         expect(type.is(9)).toBe(false);
       });
 

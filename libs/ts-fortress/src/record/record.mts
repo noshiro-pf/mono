@@ -11,7 +11,6 @@ import {
   createPrimitiveValidationError,
   prependPathToValidationErrors,
   type ValidationError,
-  type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
@@ -48,6 +47,7 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
           actualValue: a,
           expectedType: 'record',
           typeName: typeNameFilled,
+          details: undefined,
         }),
       ]);
     }
@@ -62,8 +62,11 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
                 actualValue: a,
                 typeName: typeNameFilled,
                 expectedType: typeNameFilled,
-                message: `Missing required key "${k}"`,
-              } satisfies ValidationErrorWithMessage;
+                details: {
+                  kind: 'missing-key',
+                  key: k,
+                },
+              } satisfies ValidationError;
             }
           } else {
             // The case where the key exists in the object
@@ -90,8 +93,11 @@ export const record = <const R extends ReadonlyRecord<string, Type<unknown>>>(
               actualValue: a[key],
               typeName: typeNameFilled,
               expectedType: typeNameFilled,
-              message: `Excess property "${key}" is not allowed`,
-            }) satisfies ValidationErrorWithMessage,
+              details: {
+                kind: 'excess-key',
+                key,
+              },
+            }) satisfies ValidationError,
         );
 
         return Result.err([...defaultErrors, ...excessErrors]);

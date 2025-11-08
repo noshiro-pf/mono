@@ -117,24 +117,36 @@ describe(intersection, () => {
             expectedType:
               '({ x: number, y: number } & { z: number, w: number })',
             typeName: '({ x: number, y: number } & { z: number, w: number })',
-            message:
-              'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
+            details: {
+              kind: 'intersection',
+              typeNames: [
+                '{ x: number, y: number }',
+                '{ z: number, w: number }',
+              ],
+            },
           },
           {
             path: ['z'],
             actualValue: { x: 0, y: 1 },
             expectedType: '{ z: number, w: number }',
             typeName: '{ z: number, w: number }',
-            message: 'Missing required key "z"',
+            details: {
+              kind: 'missing-key',
+              key: 'z',
+            },
           },
           {
             path: ['w'],
             actualValue: { x: 0, y: 1 },
             expectedType: '{ z: number, w: number }',
             typeName: '{ z: number, w: number }',
-            message: 'Missing required key "w"',
+            details: {
+              kind: 'missing-key',
+              key: 'w',
+            },
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
           'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
           'Missing required key "z" at z',
@@ -232,33 +244,38 @@ describe(intersection, () => {
             path: [],
             actualValue: 'aaa',
             expectedType: '(number & number)',
-            message:
-              'The type of value is expected to match all types of { number, number }',
             typeName: '(number & number)',
+            details: {
+              kind: 'intersection',
+              typeNames: ['number', 'number'],
+            },
           },
           {
             path: [],
             actualValue: 'aaa',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
           {
             path: [],
             actualValue: 'aaa',
             expectedType: '(number & number)',
-            message:
-              'The type of value is expected to match all types of { number, number }',
             typeName: '(number & number)',
+            details: {
+              kind: 'intersection',
+              typeNames: ['number', 'number'],
+            },
           },
           {
             path: [],
             actualValue: 'aaa',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
           'The type of value is expected to match all types of { number, number }',
           'Expected <number>, got <string> type value "aaa".',
@@ -372,31 +389,43 @@ describe(intersection, () => {
             path: [],
             actualValue: 7,
             expectedType: '(uintRange(0, 5) & uintRange(1, 7))',
-            message:
-              'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
             typeName: '(uintRange(0, 5) & uintRange(1, 7))',
+            details: {
+              kind: 'intersection',
+              typeNames: ['uintRange(0, 5)', 'uintRange(1, 7)'],
+            },
           },
           {
             path: [],
             actualValue: 7,
             expectedType: 'uintRange(0, 5)',
-            message: 'The value is expected to be an integer between 0 and 4',
             typeName: 'uintRange(0, 5)',
+            details: {
+              kind: 'integer-range',
+              start: 0,
+              endExclusive: 5,
+            },
           },
           {
             path: [],
             actualValue: 7,
             expectedType: '(uintRange(0, 5) & uintRange(1, 7))',
-            message:
-              'The type of value is expected to match all types of { uintRange(0, 5), uintRange(1, 7) }',
             typeName: '(uintRange(0, 5) & uintRange(1, 7))',
+            details: {
+              kind: 'intersection',
+              typeNames: ['uintRange(0, 5)', 'uintRange(1, 7)'],
+            },
           },
           {
             path: [],
             actualValue: 7,
             expectedType: 'uintRange(1, 7)',
-            message: 'The value is expected to be an integer between 1 and 6',
             typeName: 'uintRange(1, 7)',
+            details: {
+              kind: 'integer-range',
+              start: 1,
+              endExclusive: 7,
+            },
           },
         ]);
 

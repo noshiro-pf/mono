@@ -14,6 +14,7 @@ describe('omit - allowExcessProperties propagation', () => {
     const t = omit(base, ['c']);
 
     // Should reject excess properties
+
     expect(t.is({ a: '', b: 1, extra: 'x' })).toBe(false);
   });
 
@@ -21,6 +22,7 @@ describe('omit - allowExcessProperties propagation', () => {
     const t = omit(base, ['c'], { allowExcessProperties: true });
 
     // Should allow excess properties now
+
     expect(t.is({ a: '', b: 1, extra: 'x' })).toBe(true);
   });
 });

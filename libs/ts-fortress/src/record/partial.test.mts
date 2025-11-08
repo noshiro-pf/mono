@@ -218,16 +218,17 @@ describe(partial, () => {
             actualValue: 'ab',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
           {
             path: ['date'],
             actualValue: 'cd',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
           'Expected <number> at month, got <string> type value "ab".',
           'Expected <number> at date, got <string> type value "cd".',
@@ -252,9 +253,10 @@ describe(partial, () => {
             actualValue: 'ab',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
           'Expected <number> at month, got <string> type value "ab".',
         ]);
@@ -431,16 +433,17 @@ describe(partial, () => {
             actualValue: 'ab',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
           {
             path: ['date'],
             actualValue: 'cd',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
           'Expected <number> at month, got <string> type value "ab".',
           'Expected <number> at date, got <string> type value "cd".',

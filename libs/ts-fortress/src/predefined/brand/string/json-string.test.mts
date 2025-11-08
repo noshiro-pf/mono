@@ -15,6 +15,7 @@ describe(jsonString, () => {
 
   test('provides an object literal as default', () => {
     expect(baseType.defaultValue).toBe('{}');
+
     expect(customDefault.defaultValue).toBe('{"ok":true}');
   });
 
@@ -47,7 +48,7 @@ describe(jsonString, () => {
         actualValue: 'not-json',
         expectedType: 'JsonString',
         typeName: 'JsonString',
-        message: undefined,
+        details: undefined,
       },
     ]);
 
@@ -62,6 +63,7 @@ describe(jsonString, () => {
 
   test('cast returns parsed string when valid, throws otherwise', () => {
     expect(baseType.cast('{"foo":1}')).toBe('{"foo":1}');
+
     expect(() => baseType.cast('invalid')).toThrow('Expected');
   });
 });

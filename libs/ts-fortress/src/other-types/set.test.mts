@@ -2,6 +2,7 @@ import { expectType, Result } from 'ts-data-forge';
 import { number, string } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { SetType } from './set.mjs';
 
 test('SetType with string elements', () => {
@@ -16,11 +17,17 @@ test('SetType with string elements', () => {
   const validSet = new Set(['a', 'b', 'c']);
 
   // is() test
+
   expect(StringSet.is(validSet)).toBe(true);
+
   expect(StringSet.is(new Set())).toBe(true);
+
   expect(StringSet.is({})).toBe(false);
+
   expect(StringSet.is([])).toBe(false);
+
   expect(StringSet.is(null)).toBe(false);
+
   expect(StringSet.is(undefined)).toBe(false);
 
   // validate() test
@@ -44,6 +51,7 @@ test('SetType with number elements', () => {
   const validSet = new Set([1, 2, 3, 4, 5]);
 
   // is() test
+
   expect(NumberSet.is(validSet)).toBe(true);
 
   // validate() test
@@ -62,6 +70,7 @@ test('SetType with invalid element types', () => {
   const invalidSet = new Set<unknown>(['valid', 123, 'another', true]);
 
   // is() test
+
   expect(StringSet.is(invalidSet)).toBe(false);
 
   // validate() test
@@ -72,7 +81,13 @@ test('SetType with invalid element types', () => {
   const resultError = Result.unwrapErrThrow(result);
 
   expect(resultError.length).toBeGreaterThan(0);
-  expect(resultError[0]?.message).toContain('element of the Set');
+
+  assert.deepStrictEqual(validationErrorsToMessages(resultError), [
+    'The element of the Set is expected to be <string>, but got <number> type value `123`',
+    'Expected <string>, got <number> type value `123`.',
+    'The element of the Set is expected to be <string>, but got <boolean> type value `true`',
+    'Expected <string>, got <boolean> type value `true`.',
+  ]);
 });
 
 test('SetType fill() method', () => {
@@ -83,8 +98,11 @@ test('SetType fill() method', () => {
   const filled1 = NumberSet.fill(validSet);
 
   expect(filled1.size).toBe(3);
+
   expect(filled1.has(1)).toBe(true);
+
   expect(filled1.has(2)).toBe(true);
+
   expect(filled1.has(3)).toBe(true);
 
   // Mixed valid/invalid elements - should filter out invalid ones
@@ -92,8 +110,11 @@ test('SetType fill() method', () => {
   const filled2 = NumberSet.fill(mixedSet);
 
   expect(filled2.size).toBe(3);
+
   expect(filled2.has(1)).toBe(true);
+
   expect(filled2.has(2)).toBe(true);
+
   expect(filled2.has(3)).toBe(true);
 
   // Non-set input - should return default (empty set)
@@ -114,9 +135,11 @@ test('SetType cast() method', () => {
   expect(casted).toBe(validSet);
 
   // Invalid input - should throw
+
   expect(() => StringSet.cast('not a set')).toThrow(
     'Expected <Set>, got <string> type value',
   );
+
   expect(() => StringSet.cast([])).toThrow(
     'Expected <Set>, got <object> type value',
   );
@@ -136,9 +159,11 @@ test('SetType assertIs() method', () => {
   }).not.toThrow();
 
   // Invalid input - should throw
+
   expect(() => {
     assertIsNumberSet('not a set');
   }).toThrow('Expected <Set>, got <string> type value');
+
   expect(() => {
     assertIsNumberSet([1, 2, 3]);
   }).toThrow('Expected <Set>, got <object> type value');
@@ -179,6 +204,7 @@ test('SetType with complex element types', () => {
   const validSet = new Set([user1, user2]);
 
   // is() test
+
   expect(UserSet.is(validSet)).toBe(true);
 
   // validate() test
@@ -210,6 +236,7 @@ test('SetType ensures uniqueness', () => {
   const setWithDuplicates = new Set([1, 2, 2, 3, 3, 3]);
 
   expect(setWithDuplicates.size).toBe(3); // Only unique values
+
   expect(NumberSet.is(setWithDuplicates)).toBe(true);
 
   const result = NumberSet.validate(setWithDuplicates);

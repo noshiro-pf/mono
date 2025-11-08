@@ -55,7 +55,7 @@ describe(uuid, () => {
         actualValue: 'not-a-uuid',
         expectedType: 'Uuid',
         typeName: 'Uuid',
-        message: undefined,
+        details: undefined,
       },
     ]);
 
@@ -76,6 +76,7 @@ describe(uuidV4, () => {
 
   test('recognizes version 4 UUIDs only', () => {
     expect(v4Type.is(uuidV4Example)).toBe(true);
+
     expect(v4Type.is(uuidV6Example)).toBe(false);
   });
 
@@ -94,7 +95,7 @@ describe(uuidV4, () => {
         actualValue: uuidV6Example,
         expectedType: 'UuidV4',
         typeName: 'UuidV4',
-        message: undefined,
+        details: undefined,
       },
     ]);
   });
@@ -109,7 +110,9 @@ describe(uuidV6, () => {
 
   test('recognizes only version 6 UUIDs', () => {
     expect(v6Type.is(uuidV6Example)).toBe(true);
+
     expect(v6Type.is(uuidV4Example)).toBe(false);
+
     expect(v6Type.is(uuidV7Example)).toBe(false);
   });
 });
@@ -119,7 +122,9 @@ describe(uuidV7, () => {
 
   test('recognizes only version 7 UUIDs', () => {
     expect(v7Type.is(uuidV7Example)).toBe(true);
+
     expect(v7Type.is(uuidV4Example)).toBe(false);
+
     expect(v7Type.is(uuidV6Example)).toBe(false);
   });
 });

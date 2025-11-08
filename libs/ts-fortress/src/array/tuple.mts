@@ -7,7 +7,6 @@ import {
   createPrimitiveValidationError,
   prependIndexToValidationErrors,
   type ValidationError,
-  type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 type MapTuple<T extends readonly Type<unknown>[]> = {
@@ -36,6 +35,7 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
           actualValue: a,
           expectedType: 'array',
           typeName,
+          details: undefined,
         }),
       ]);
     }
@@ -47,8 +47,12 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
           actualValue: a,
           expectedType: typeName,
           typeName,
-          message: `The length of tuple is expected to be ${types.length}, but it is actually ${a.length}`,
-        } satisfies ValidationErrorWithMessage,
+          details: {
+            kind: 'tuple-length',
+            expectedLength: types.length,
+            actualLength: a.length,
+          },
+        } satisfies ValidationError,
       ]);
     }
 

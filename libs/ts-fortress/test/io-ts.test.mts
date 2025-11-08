@@ -40,7 +40,9 @@ describe('inconsistent keyof type', () => {
     });
 
     // ❌ Runtime behavior is inconsistent with TypeScript types!
+
     expect(T.is(0)).toBe(false); // false (fails) - number 0 is rejected
+
     expect(T.is('0')).toBe(true); // true (succeeds) - string "0" is accepted
 
     type T = t.TypeOf<typeof T>;
@@ -62,7 +64,9 @@ describe('inconsistent keyof type', () => {
     );
 
     // ✅ ts-fortress correctly handles numeric keys as strings
+
     expect(T.is(0)).toBe(false); // false - number 0 is rejected
+
     expect(T.is('0')).toBe(true); // true - string "0" is accepted
 
     type T = (typeof T)['defaultValue'];
@@ -105,9 +109,11 @@ describe('union + undefined decode issues', () => {
         throw new Error('Expected Right result');
       }
       const right = res.right;
+
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct
 
       expect(A.is(right)).toBe(true); // ✅ correct
+
       expect(B.is(right)).toBe(false); // ✅ correct
     });
 
@@ -120,9 +126,11 @@ describe('union + undefined decode issues', () => {
         throw new Error('Expected Right result');
       }
       const right = res.right;
+
       assert.deepStrictEqual(right, { A: 1, B: undefined }); // ❌ incorrect (expected to be { A: 1 })
 
       expect(A.is(right)).toBe(true); // ✅ correct
+
       expect(B.is(right)).toBe(true); // ❌ incorrect (expected to be false)
     });
 
@@ -135,9 +143,11 @@ describe('union + undefined decode issues', () => {
         throw new Error('Expected Right result');
       }
       const right = res.right;
+
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct
 
       expect(A.is(right)).toBe(true); // ✅ correct
+
       expect(C.is(right)).toBe(true); // ✅ correct (partial type accepts it)
     });
 
@@ -150,9 +160,11 @@ describe('union + undefined decode issues', () => {
         throw new Error('Expected Right result');
       }
       const right = res.right;
+
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct (not {})
 
       expect(A.is(right)).toBe(true); // ✅ correct
+
       expect(C.is(right)).toBe(true); // ✅ correct
     });
   });
@@ -185,9 +197,11 @@ describe('union + undefined decode issues', () => {
       expect(Result.isOk(res)).toBe(true); // should succeed
 
       const resValue = Result.unwrapThrow(res);
+
       assert.deepStrictEqual(resValue, { A: 1 }); // ✅ correct
 
       expect(A.is(resValue)).toBe(true); // ✅ correct
+
       expect(B.is(resValue)).toBe(false); // ✅ correct
     });
 
@@ -197,9 +211,11 @@ describe('union + undefined decode issues', () => {
       expect(Result.isOk(res)).toBe(true); // should succeed
 
       const resValue1 = Result.unwrapThrow(res);
+
       assert.deepStrictEqual(resValue1, { A: 1 }); // ✅ correct (not { A: 1, B: undefined })
 
       expect(A.is(resValue1)).toBe(true); // ✅ correct
+
       expect(B.is(resValue1)).toBe(false); // ✅ correct (not true)
     });
 
@@ -209,9 +225,11 @@ describe('union + undefined decode issues', () => {
       expect(Result.isOk(res)).toBe(true); // should succeed
 
       const resValue2 = Result.unwrapThrow(res);
+
       assert.deepStrictEqual(resValue2, { A: 1 }); // ✅ correct
 
       expect(A.is(resValue2)).toBe(true); // ✅ correct
+
       expect(C.is(resValue2)).toBe(true); // ✅ correct (partial type accepts it)
     });
 
@@ -221,9 +239,11 @@ describe('union + undefined decode issues', () => {
       expect(Result.isOk(res)).toBe(true); // should succeed
 
       const resValue3 = Result.unwrapThrow(res);
+
       assert.deepStrictEqual(resValue3, { A: 1 }); // ✅ correct (not {})
 
       expect(A.is(resValue3)).toBe(true); // ✅ correct
+
       expect(C.is(resValue3)).toBe(true); // ✅ correct
     });
   });

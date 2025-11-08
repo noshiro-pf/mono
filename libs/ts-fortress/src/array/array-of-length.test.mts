@@ -124,7 +124,11 @@ describe(arrayOfLength, () => {
           actualValue: ys,
           expectedType: 'xs',
           typeName: 'xs',
-          message: 'Expected array of length 4, got length 0',
+          details: {
+            kind: 'array-length',
+            expectedLength: 4,
+            actualLength: 0,
+          },
         },
       ]);
 
@@ -148,14 +152,14 @@ describe(arrayOfLength, () => {
           actualValue: '1',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['2'],
           actualValue: '',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
 

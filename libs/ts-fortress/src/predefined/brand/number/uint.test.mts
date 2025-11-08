@@ -109,9 +109,10 @@ describe(uint, () => {
           actualValue: -5,
           expectedType: 'Uint',
           typeName: 'Uint',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <Uint>, got <number> type value `-5`.',
       ]);
@@ -130,9 +131,10 @@ describe(uint, () => {
           actualValue: 'not a number',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
         'Expected <number>, got <string> type value "not a number".',
       ]);

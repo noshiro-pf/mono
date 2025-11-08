@@ -78,9 +78,13 @@ describe(strictRecord, () => {
           actualValue: 'not allowed',
           expectedType: '{ name: string, age: number }',
           typeName: '{ name: string, age: number }',
-          message: 'Excess property "extra" is not allowed',
+          details: {
+            kind: 'excess-key',
+            key: 'extra',
+          },
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Excess property "extra" is not allowed at extra',
       ]);
@@ -101,7 +105,7 @@ describe(strictRecord, () => {
           actualValue: 'thirty',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -121,7 +125,10 @@ describe(strictRecord, () => {
           actualValue: incompleteUser,
           expectedType: '{ name: string, age: number }',
           typeName: '{ name: string, age: number }',
-          message: 'Missing required key "age"',
+          details: {
+            kind: 'missing-key',
+            key: 'age',
+          },
         },
       ]);
     });
@@ -137,6 +144,7 @@ describe(strictRecord, () => {
       const dataWithExtra = { name: 'John', age: 30, extra: 'allowed' };
 
       expect(regularRecord.is(dataWithExtra)).toBe(true);
+
       expect(
         strictRecord({ name: string(), age: number() }).is(dataWithExtra),
       ).toBe(false);
@@ -146,6 +154,7 @@ describe(strictRecord, () => {
       const invalidData = { name: 'John', age: 'thirty' };
 
       expect(regularRecord.is(invalidData)).toBe(false);
+
       expect(
         strictRecord({ name: string(), age: number() }).is(invalidData),
       ).toBe(false);
@@ -173,6 +182,7 @@ describe(strictRecord, () => {
       const resultError3 = Result.unwrapErrThrow(result);
 
       expect(resultError3[0]?.expectedType).toBe('User');
+
       expect(resultError3[0]?.typeName).toBe('User');
     });
   });

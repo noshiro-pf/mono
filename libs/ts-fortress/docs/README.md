@@ -420,7 +420,7 @@ assert.deepStrictEqual(errorResult.value, [
         actualValue: 'thirty',
         expectedType: 'number',
         typeName: 'number',
-        message: undefined,
+        details: undefined,
     },
 ]);
 
@@ -527,6 +527,7 @@ const newUser: User = { ...User.defaultValue, id: 'user-123' };
 const newUser2: User = User.fill({ id: 'user-456' });
 
 assert.deepStrictEqual(newUser, { id: 'user-123', name: 'Guest', score: 0 });
+
 assert.deepStrictEqual(newUser2, { id: 'user-456', name: 'Guest', score: 0 });
 
 // Useful for React state initialization
@@ -894,20 +895,21 @@ const result = User.validate(invalidData);
 assert(t.Result.isErr(result));
 
 // result.value is an array of ValidationError objects
+
 assert.deepStrictEqual(result.value, [
     {
         actualValue: 123,
         expectedType: 'string',
-        message: undefined,
         path: ['name'],
         typeName: 'string',
+        details: undefined,
     },
     {
         actualValue: 'not a number',
         expectedType: 'number',
-        message: undefined,
         path: ['age'],
         typeName: 'number',
+        details: undefined,
     },
 ] satisfies t.ValidationError[]);
 
@@ -954,8 +956,11 @@ assert.deepStrictEqual(strictResult.value, [
         path: ['extra'],
         actualValue: 'not allowed',
         expectedType: '{ name: string, age: number }',
-        message: 'Excess property "extra" is not allowed',
         typeName: '{ name: string, age: number }',
+        details: {
+            kind: 'excess-key',
+            key: 'extra',
+        },
     },
 ]);
 ```

@@ -99,9 +99,10 @@ describe(safeUint, () => {
           actualValue: -5,
           expectedType: 'SafeUint',
           typeName: 'SafeUint',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <SafeUint>, got <number> type value `-5`.',
       ]);

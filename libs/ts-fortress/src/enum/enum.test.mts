@@ -70,9 +70,12 @@ describe(enumType, () => {
         actualValue: 5,
         expectedType: 'enum',
         typeName: 'enum',
-        message:
-          'The value is expected to be one of the elements contained in { 3, 2, a }',
+        details: {
+          kind: 'enum',
+          values: [3, '2', 'a'] as const,
+        },
       });
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value is expected to be one of the elements contained in { 3, 2, a }',
       ]);

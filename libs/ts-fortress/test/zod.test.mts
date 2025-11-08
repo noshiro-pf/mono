@@ -48,7 +48,9 @@ describe('api check', () => {
     const s = z.string().check(z.maxLength(5));
 
     expect(s.safeParse('12').success).toBe(true);
+
     expect(s.safeParse('1234').success).toBe(true);
+
     expect(s.safeParse('123456').success).toBe(false);
   });
 
@@ -56,7 +58,9 @@ describe('api check', () => {
     const s = z.string().max(5);
 
     expect(s.safeParse('12').success).toBe(true);
+
     expect(s.safeParse('1234').success).toBe(true);
+
     expect(s.safeParse('123456').success).toBe(false);
   });
 
@@ -64,7 +68,9 @@ describe('api check', () => {
     const s = z.string().min(3).max(5);
 
     expect(s.safeParse('12').success).toBe(false);
+
     expect(s.safeParse('1234').success).toBe(true);
+
     expect(s.safeParse('123456').success).toBe(false);
   });
 });

@@ -4,7 +4,7 @@ import {
   createAssertFn,
   createCastFn,
   createIsFn,
-  type ValidationErrorWithMessage,
+  type ValidationError,
 } from '../utils/index.mjs';
 
 export const enumType = <const Values extends NonEmptyArray<Primitive>>(
@@ -35,11 +35,12 @@ export const enumType = <const Values extends NonEmptyArray<Primitive>>(
             path: [],
             actualValue: a,
             expectedType: typeName,
-            message: `The value is expected to be one of the elements contained in { ${values.join(
-              ', ',
-            )} }`,
             typeName,
-          } satisfies ValidationErrorWithMessage,
+            details: {
+              kind: 'enum',
+              values,
+            },
+          } satisfies ValidationError,
         ]);
 
   const is = createIsFn<T>(validate);

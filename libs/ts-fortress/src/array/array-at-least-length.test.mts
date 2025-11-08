@@ -136,7 +136,7 @@ describe(arrayAtLeastLength, () => {
           actualValue: ys,
           expectedType: 'array',
           typeName: 'xs',
-          message: undefined,
+          details: undefined,
         },
       ]);
 
@@ -160,7 +160,11 @@ describe(arrayAtLeastLength, () => {
           actualValue: ys,
           expectedType: 'xs',
           typeName: 'xs',
-          message: 'Expected array of length 3 or more, got length 2',
+          details: {
+            kind: 'array-min-length',
+            minLength: 3,
+            actualLength: 2,
+          },
         },
       ]);
 
@@ -184,7 +188,7 @@ describe(arrayAtLeastLength, () => {
           actualValue: '2',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
 

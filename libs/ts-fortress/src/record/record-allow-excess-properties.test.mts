@@ -46,7 +46,10 @@ describe('record allowExcessProperties option', () => {
         actualValue: 'not allowed',
         typeName: '{ name: number, age: number }',
         expectedType: '{ name: number, age: number }',
-        message: 'Excess property "extra" is not allowed',
+        details: {
+          kind: 'excess-key',
+          key: 'extra',
+        },
       },
     ]);
 
@@ -100,6 +103,7 @@ describe('record allowExcessProperties option', () => {
     expect(Result.isOk(result)).toBe(true);
 
     const resultValue2 = Result.unwrapThrow(result);
+
     assert.deepStrictEqual(
       resultValue2,
       defaultRecord.cast({
@@ -179,14 +183,20 @@ describe('record allowExcessProperties option', () => {
         actualValue: 'not allowed 1',
         typeName: '{ name: number, age: number }',
         expectedType: '{ name: number, age: number }',
-        message: 'Excess property "extra1" is not allowed',
+        details: {
+          kind: 'excess-key',
+          key: 'extra1',
+        },
       },
       {
         path: ['extra2'],
         actualValue: 'not allowed 2',
         typeName: '{ name: number, age: number }',
         expectedType: '{ name: number, age: number }',
-        message: 'Excess property "extra2" is not allowed',
+        details: {
+          kind: 'excess-key',
+          key: 'extra2',
+        },
       },
     ]);
   });
@@ -207,20 +217,25 @@ describe('record allowExcessProperties option', () => {
     expect(resultError2).toHaveLength(2);
 
     // First error: invalid type for 'name'
+
     assert.deepStrictEqual(resultError2[0], {
       path: ['name'],
       actualValue: 'invalid',
       expectedType: 'number',
       typeName: 'number',
-      message: undefined,
+      details: undefined,
     });
     // Second error: excess property
+
     assert.deepStrictEqual(resultError2[1], {
       path: ['extra'],
       actualValue: 'not allowed',
       typeName: '{ name: number, age: number }',
       expectedType: '{ name: number, age: number }',
-      message: 'Excess property "extra" is not allowed',
+      details: {
+        kind: 'excess-key',
+        key: 'extra',
+      },
     });
   });
 });

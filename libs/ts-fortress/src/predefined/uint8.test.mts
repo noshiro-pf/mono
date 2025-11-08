@@ -14,6 +14,7 @@ describe(uint8, () => {
 
   test('valid boundaries', () => {
     expect(Result.isOk(t0.validate(0))).toBe(true);
+
     expect(Result.isOk(t0.validate(255))).toBe(true);
   });
 
@@ -21,7 +22,9 @@ describe(uint8, () => {
     const t = uint8(7);
 
     expect(Result.isErr(t.validate(256))).toBe(true);
+
     expect(t.fill(999)).toBe(7);
+
     expect(t.fill(42)).toBe(42);
   });
 });

@@ -104,9 +104,10 @@ describe(nonNegativeFiniteNumber, () => {
           actualValue: -5.5,
           expectedType: 'NonNegativeFiniteNumber',
           typeName: 'NonNegativeFiniteNumber',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <NonNegativeFiniteNumber>, got <number> type value `-5.5`.',
       ]);

@@ -18,22 +18,30 @@ describe('simpleBrandedNumber', () => {
 
     test('creates branded number type with default value 0', () => {
       expect(userIdType.defaultValue).toBe(0);
+
       expect(userIdType.typeName).toBe('"UserId"');
     });
 
     describe('is', () => {
       test('returns true for any number', () => {
         expect(userIdType.is(123)).toBe(true);
+
         expect(userIdType.is(-456)).toBe(true);
+
         expect(userIdType.is(0)).toBe(true);
+
         expect(userIdType.is(3.14)).toBe(true);
       });
 
       test('returns false for non-numbers', () => {
         expect(userIdType.is('123')).toBe(false);
+
         expect(userIdType.is(null)).toBe(false);
+
         expect(userIdType.is(undefined)).toBe(false);
+
         expect(userIdType.is({})).toBe(false);
+
         expect(userIdType.is([])).toBe(false);
       });
     });
@@ -73,9 +81,10 @@ describe('simpleBrandedNumber', () => {
             actualValue: 'not a number',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
           'Expected <number>, got <string> type value "not a number".',
         ]);
@@ -115,6 +124,7 @@ describe('simpleBrandedNumber', () => {
 
     test('creates branded number type with custom default value', () => {
       expect(scoreType.defaultValue).toBe(100);
+
       expect(scoreType.typeName).toBe('"Score"');
     });
 
@@ -153,9 +163,10 @@ describe('simpleBrandedNumber', () => {
             actualValue: 'invalid',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
           'Expected <number>, got <string> type value "invalid".',
         ]);
@@ -191,6 +202,7 @@ describe('simpleBrandedNumber', () => {
       }
 
       expect(isPrice).toBe(true);
+
       expect(x).toBe(29.99);
     });
   });

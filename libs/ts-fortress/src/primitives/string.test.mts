@@ -191,7 +191,7 @@ describe(string, () => {
           actualValue: 42,
           expectedType: 'string',
           typeName: 'string',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -225,7 +225,9 @@ describe('string with constraints', () => {
       expectType<typeof type, Type<`ab${string}`>>('=');
 
       expect(type.is('ab')).toBe(true);
+
       expect(type.is('abcde__')).toBe(true);
+
       expect(type.is('cab')).toBe(false);
     });
 
@@ -248,7 +250,9 @@ describe('string with constraints', () => {
       expectType<TypeOf<typeof type>, `${string}ghi`>('=');
 
       expect(type.is('ghi')).toBe(true);
+
       expect(type.is('xyz_ghi')).toBe(true);
+
       expect(type.is('xyz')).toBe(false);
     });
 
@@ -271,7 +275,9 @@ describe('string with constraints', () => {
       expectType<TypeOf<typeof type>, `${string}def${string}`>('=');
 
       expect(type.is('def')).toBe(true);
+
       expect(type.is('xyz_def_uvw')).toBe(true);
+
       expect(type.is('xyz_uvw')).toBe(false);
     });
 
@@ -294,6 +300,7 @@ describe('string with constraints', () => {
       expectType<typeof type, Type<string>>('=');
 
       expect(type.is('abcde__')).toBe(true);
+
       expect(type.is('ABC')).toBe(false);
     });
 
@@ -312,6 +319,7 @@ describe('string with constraints', () => {
       expectType<typeof type, Type<string>>('=');
 
       expect(type.is('ABC')).toBe(true);
+
       expect(type.is('abc')).toBe(false);
     });
 
@@ -330,6 +338,7 @@ describe('string with constraints', () => {
       expectType<typeof type, Type<string>>('=');
 
       expect(type.is('value')).toBe(true);
+
       expect(type.is('')).toBe(false);
     });
 
@@ -348,6 +357,7 @@ describe('string with constraints', () => {
       expectType<typeof type, Type<string>>('=');
 
       expect(type.is('hello')).toBe(true);
+
       expect(type.is('hi')).toBe(false);
     });
 
@@ -364,6 +374,7 @@ describe('string with constraints', () => {
       expectType<typeof type, Type<string>>('=');
 
       expect(type.is('hello')).toBe(true);
+
       expect(type.is('hi')).toBe(true);
     });
   });
@@ -375,6 +386,7 @@ describe('string with constraints', () => {
       expectType<typeof type, Type<string>>('=');
 
       expect(type.is('tiny')).toBe(true);
+
       expect(type.is('excessive')).toBe(false);
     });
 
@@ -394,6 +406,7 @@ describe('string with constraints', () => {
       expectType<typeof type, Type<string>>('=');
 
       expect(type.is('67890')).toBe(true);
+
       expect(type.is('abc123')).toBe(false);
     });
 
@@ -414,8 +427,11 @@ describe('string with constraints', () => {
         expectType<TypeOf<typeof type>, `ab${string}` & `${string}ba`>('=');
 
         expect(type.is('aba')).toBe(true);
+
         expect(type.is('abba')).toBe(true);
+
         expect(type.is('abca')).toBe(false);
+
         expect(type.is('caba')).toBe(false);
       });
 
@@ -441,9 +457,13 @@ describe('string with constraints', () => {
         >('=');
 
         expect(type.is('abcdef')).toBe(true);
+
         expect(type.is('abXXcdef')).toBe(true);
+
         expect(type.is('ab__ef')).toBe(false);
+
         expect(type.is('zzcdef')).toBe(false);
+
         expect(type.is('abcdefx')).toBe(false);
       });
 
@@ -475,7 +495,9 @@ describe('string with constraints', () => {
         expectType<typeof type, Type<string>>('=');
 
         expect(type.is('1234')).toBe(true);
+
         expect(type.is('ABCD')).toBe(false);
+
         expect(type.is('abcd')).toBe(false);
       });
 
@@ -498,8 +520,11 @@ describe('string with constraints', () => {
         expectType<typeof type, Type<string>>('=');
 
         expect(type.is('value')).toBe(true);
+
         expect(type.is('')).toBe(false);
+
         expect(type.is('hi')).toBe(false);
+
         expect(type.is('extra-long-token')).toBe(false);
       });
 
@@ -541,8 +566,11 @@ describe('string with constraints', () => {
         expectType<typeof type, Type<`${string}feature${string}`>>('=');
 
         expect(type.is('feature-toggle')).toBe(true);
+
         expect(type.is('featureflag')).toBe(true);
+
         expect(type.is('feature_flag')).toBe(false);
+
         expect(type.is('flag')).toBe(false);
       });
 
@@ -567,8 +595,11 @@ describe('string with constraints', () => {
         expectType<typeof type, Type<string>>('=');
 
         expect(type.is('6789')).toBe(true);
+
         expect(type.is('6789012')).toBe(false);
+
         expect(type.is('678')).toBe(false);
+
         expect(type.is('67a9')).toBe(false);
       });
 

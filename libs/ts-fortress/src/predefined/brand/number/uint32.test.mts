@@ -105,9 +105,10 @@ describe(uint32, () => {
           actualValue: -5,
           expectedType: 'Uint32',
           typeName: 'Uint32',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <Uint32>, got <number> type value `-5`.',
       ]);

@@ -12,13 +12,13 @@
 
 > **record**\<`R`\>(`shape`, `options?`): [`RecordType`](../type/README.md#recordtype)\<`R`\>
 
-Defined in: [src/record/record.mts:17](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L17)
+Defined in: [src/record/record.mts:16](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L16)
 
 #### Type Parameters
 
 ##### R
 
-`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](../utils/validation-error.md#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: [src/record/record.mts:17](https://github.com/noshiro-pf/ts-fortress
 
 > **strictRecord**\<`R`\>(`source`, `options?`): [`RecordType`](../type/README.md#recordtype)\<`R`\>
 
-Defined in: [src/record/record.mts:153](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L153)
+Defined in: [src/record/record.mts:159](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L159)
 
 Creates a strict record type that does not allow excess properties.
 This is an alias for `record(source, { allowExcessProperties: false })`.
@@ -49,7 +49,7 @@ This is an alias for `record(source, { allowExcessProperties: false })`.
 
 ##### R
 
-`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](../utils/validation-error.md#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 #### Parameters
 

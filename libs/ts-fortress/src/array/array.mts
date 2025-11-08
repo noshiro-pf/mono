@@ -28,6 +28,7 @@ export const array = <A,>(
           actualValue: a,
           expectedType: 'array',
           typeName,
+          details: undefined,
         }),
       ]);
     }

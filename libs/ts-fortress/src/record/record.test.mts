@@ -107,16 +107,17 @@ describe(record, () => {
           actualValue: 'ab',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['date'],
           actualValue: 'cd',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <number> at month, got <string> type value "ab".',
         'Expected <number> at date, got <string> type value "cd".',
@@ -140,16 +141,23 @@ describe(record, () => {
           actualValue: { year: 2000 },
           typeName: '{ year: number, month: number, date: number }',
           expectedType: '{ year: number, month: number, date: number }',
-          message: 'Missing required key "month"',
+          details: {
+            kind: 'missing-key',
+            key: 'month',
+          },
         },
         {
           path: ['date'],
           actualValue: { year: 2000 },
           typeName: '{ year: number, month: number, date: number }',
           expectedType: '{ year: number, month: number, date: number }',
-          message: 'Missing required key "date"',
+          details: {
+            kind: 'missing-key',
+            key: 'date',
+          },
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
         'Missing required key "month" at month',
         'Missing required key "date" at date',
@@ -326,16 +334,17 @@ describe('partial record', () => {
           actualValue: 'ab',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['date'],
           actualValue: 'cd',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
         'Expected <number> at month, got <string> type value "ab".',
         'Expected <number> at date, got <string> type value "cd".',

@@ -86,16 +86,19 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
       : [];
 
     // io-ts adds unnecessary "Readonly<...>" wrapper
+
     assert.deepStrictEqual(ioTsErrorMessages, [
       'Invalid value "twenty-five" supplied to : Readonly<{ name: string, age: number }>/age: number',
     ]);
 
     // zod produces clear path-based error message with visual formatting
+
     expect(zodErrorMessages).toBe(
       '✖ Invalid input: expected number, received string\n  → at age',
     );
 
     // ts-fortress produces clean, focused error message
+
     assert.deepStrictEqual(tsFortressErrorMessages, [
       'Expected <number> at age, got <string> type value "twenty-five".',
     ]);
@@ -176,16 +179,19 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
       : [];
 
     // io-ts produces extremely verbose error with triple nested Readonly wrappers
+
     assert.deepStrictEqual(ioTsErrorMessages, [
       'Invalid value "not-a-number" supplied to : Readonly<{ user: Readonly<{ profile: Readonly<{ age: number }> }> }>/user: Readonly<{ profile: Readonly<{ age: number }> }>/profile: Readonly<{ age: number }>/age: number',
     ]);
 
     // zod produces clear nested path error message with visual formatting
+
     expect(zodErrorMessages).toBe(
       '✖ Invalid input: expected number, received string\n  → at user.profile.age',
     );
 
     // ts-fortress produces clean, actionable error message
+
     assert.deepStrictEqual(tsFortressErrorMessages, [
       'Expected <number> at user.profile.age, got <string> type value "not-a-number".',
     ]);
@@ -274,6 +280,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
       : [];
 
     // io-ts produces multiple extremely verbose error messages
+
     assert.deepStrictEqual(ioTsErrorMessages, [
       'Invalid value "invalid" supplied to : Readonly<{ user: Readonly<{ id: number, profile: Readonly<{ age: number, score: number }> }> }>/user: Readonly<{ id: number, profile: Readonly<{ age: number, score: number }> }>/id: number',
       'Invalid value "not-a-number" supplied to : Readonly<{ user: Readonly<{ id: number, profile: Readonly<{ age: number, score: number }> }> }>/user: Readonly<{ id: number, profile: Readonly<{ age: number, score: number }> }>/profile: Readonly<{ age: number, score: number }>/age: number',
@@ -281,11 +288,13 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
     ]);
 
     // zod produces organized path-based error messages with visual formatting
+
     expect(zodErrorMessages).toBe(
       '✖ Invalid input: expected number, received string\n  → at user.id\n✖ Invalid input: expected number, received string\n  → at user.profile.age\n✖ Invalid input: expected number, received boolean\n  → at user.profile.score',
     );
 
     // ts-fortress produces clean, specific error messages for each issue
+
     assert.deepStrictEqual(tsFortressErrorMessages, [
       'Expected <number> at user.id, got <string> type value "invalid".',
       'Expected <number> at user.profile.age, got <string> type value "not-a-number".',

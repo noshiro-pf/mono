@@ -88,24 +88,26 @@ describe(array, () => {
       const resultError = Result.unwrapErrThrow(result);
 
       // Test that we have structured ValidationError objects
+
       assert.deepStrictEqual(resultError, [
         {
           path: ['0'],
           actualValue: '1',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['1'],
           actualValue: '',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
 
       // Test that we can convert to legacy string format for backward compatibility
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <number> at 0, got <string> type value "1".',
         'Expected <number> at 1, got <string> type value "".',

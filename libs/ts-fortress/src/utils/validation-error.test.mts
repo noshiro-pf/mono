@@ -14,6 +14,7 @@ describe('validation-error', () => {
         actualValue: 123,
         expectedType: 'string',
         typeName: 'string',
+        details: undefined,
       });
 
       expectType<typeof error, ValidationError>('=');
@@ -23,7 +24,7 @@ describe('validation-error', () => {
         actualValue: 123,
         expectedType: 'string',
         typeName: 'string',
-        message: undefined,
+        details: undefined,
       });
     });
   });
@@ -36,14 +37,14 @@ describe('validation-error', () => {
           actualValue: 123,
           expectedType: 'string',
           typeName: 'string',
-          message: undefined,
+          details: undefined,
         },
         {
           path: [],
           actualValue: null,
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ];
 
@@ -55,14 +56,14 @@ describe('validation-error', () => {
           actualValue: 123,
           expectedType: 'string',
           typeName: 'string',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['parent'],
           actualValue: null,
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -82,14 +83,14 @@ describe('validation-error', () => {
           actualValue: 123,
           expectedType: 'string',
           typeName: 'string',
-          message: undefined,
+          details: undefined,
         },
         {
           path: [],
           actualValue: null,
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ];
 
@@ -101,14 +102,14 @@ describe('validation-error', () => {
           actualValue: 123,
           expectedType: 'string',
           typeName: 'string',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['5'],
           actualValue: null,
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -128,21 +129,21 @@ describe('validation-error', () => {
           actualValue: 123,
           expectedType: 'string',
           typeName: 'string',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['items', '0'],
           actualValue: 'invalid',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
         {
           path: [],
           actualValue: null,
           expectedType: 'boolean',
           typeName: 'boolean',
-          message: undefined,
+          details: undefined,
         },
       ];
 
@@ -160,7 +161,10 @@ describe('validation-error', () => {
           actualValue: 'invalid',
           expectedType: 'number',
           typeName: 'number',
-          message: 'Custom validation message',
+          details: {
+            kind: 'custom',
+            message: 'Custom validation message',
+          },
         },
       ];
 

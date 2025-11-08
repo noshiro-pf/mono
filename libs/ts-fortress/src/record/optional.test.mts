@@ -24,6 +24,7 @@ describe(optional, () => {
 
     test('preserves original type properties', () => {
       expect(optionalNumber.defaultValue).toBe(42);
+
       expect(optionalNumber.typeName).toBe('number');
     });
   });

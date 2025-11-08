@@ -82,8 +82,13 @@ describe(uintRange, () => {
         actualValue: 13,
         expectedType: 'month',
         typeName: 'month',
-        message: 'The value is expected to be an integer between 1 and 12',
+        details: {
+          kind: 'integer-range',
+          start: 1,
+          endExclusive: 13,
+        },
       });
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value is expected to be an integer between 1 and 12',
       ]);

@@ -147,7 +147,7 @@ describe('undefined type', () => {
           actualValue: null,
           expectedType: 'undefined',
           typeName: 'undefined',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -166,7 +166,7 @@ describe('undefined type', () => {
           actualValue: 0,
           expectedType: 'undefined',
           typeName: 'undefined',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });

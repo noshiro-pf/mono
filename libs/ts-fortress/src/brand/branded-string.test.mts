@@ -18,23 +18,32 @@ describe('simpleBrandedString', () => {
 
     test('creates branded string type with default value empty string', () => {
       expect(userNameType.defaultValue).toBe('');
+
       expect(userNameType.typeName).toBe('"UserName"');
     });
 
     describe('is', () => {
       test('returns true for any string', () => {
         expect(userNameType.is('alice')).toBe(true);
+
         expect(userNameType.is('bob123')).toBe(true);
+
         expect(userNameType.is('')).toBe(true);
+
         expect(userNameType.is('special@chars!')).toBe(true);
       });
 
       test('returns false for non-strings', () => {
         expect(userNameType.is(123)).toBe(false);
+
         expect(userNameType.is(null)).toBe(false);
+
         expect(userNameType.is(undefined)).toBe(false);
+
         expect(userNameType.is({})).toBe(false);
+
         expect(userNameType.is([])).toBe(false);
+
         expect(userNameType.is(true)).toBe(false);
       });
     });
@@ -74,9 +83,10 @@ describe('simpleBrandedString', () => {
             actualValue: 42,
             expectedType: 'string',
             typeName: 'string',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
           'Expected <string>, got <number> type value `42`.',
         ]);
@@ -116,6 +126,7 @@ describe('simpleBrandedString', () => {
 
     test('creates branded string type with custom default value', () => {
       expect(categoryType.defaultValue).toBe('general');
+
       expect(categoryType.typeName).toBe('"Category"');
     });
 
@@ -154,9 +165,10 @@ describe('simpleBrandedString', () => {
             actualValue: null,
             expectedType: 'string',
             typeName: 'string',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
           'Expected <string>, got <object> type value `null`.',
         ]);
@@ -192,6 +204,7 @@ describe('simpleBrandedString', () => {
       }
 
       expect(isEmail).toBe(true);
+
       expect(x).toBe('user@example.com');
     });
   });
@@ -217,6 +230,7 @@ describe('simpleBrandedString', () => {
       expectType<LastName, Brand<string, 'LastName'>>('=');
 
       expect(firstNameType.typeName).toBe('"FirstName"');
+
       expect(lastNameType.typeName).toBe('"LastName"');
     });
   });

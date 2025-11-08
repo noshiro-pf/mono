@@ -134,30 +134,39 @@ describe('nested record', () => {
           actualValue: 2.2,
           expectedType: 'Int',
           typeName: 'Int',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['xs', '2'],
           actualValue: 3.3,
           expectedType: 'Int',
           typeName: 'Int',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['rec', 'a'],
           actualValue: 123,
           expectedType: 'uintRange(0, 11)',
           typeName: 'uintRange(0, 11)',
-          message: 'The value is expected to be an integer between 0 and 10',
+          details: {
+            kind: 'integer-range',
+            start: 0,
+            endExclusive: 11,
+          },
         },
         {
           path: ['rec', 'b'],
           actualValue: 234,
           expectedType: 'uintRange(0, 11)',
           typeName: 'uintRange(0, 11)',
-          message: 'The value is expected to be an integer between 0 and 10',
+          details: {
+            kind: 'integer-range',
+            start: 0,
+            endExclusive: 11,
+          },
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <Int> at xs.1, got <number> type value `2.2`.',
         'Expected <Int> at xs.2, got <number> type value `3.3`.',

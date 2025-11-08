@@ -34,6 +34,7 @@ export const refine = <
                     actualValue: a,
                     expectedType: typeName,
                     typeName,
+                    details: undefined,
                   }),
                 ]),
       ).value;

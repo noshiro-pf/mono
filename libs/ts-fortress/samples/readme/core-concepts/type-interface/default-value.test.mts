@@ -22,6 +22,7 @@ const newUser: User = { ...User.defaultValue, id: 'user-123' };
 const newUser2: User = User.fill({ id: 'user-456' });
 
 assert.deepStrictEqual(newUser, { id: 'user-123', name: 'Guest', score: 0 });
+
 assert.deepStrictEqual(newUser2, { id: 'user-456', name: 'Guest', score: 0 });
 
 // Useful for React state initialization

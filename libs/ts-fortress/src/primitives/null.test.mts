@@ -149,7 +149,7 @@ describe('null type', () => {
           actualValue: undefined,
           expectedType: 'null',
           typeName: 'null',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -168,7 +168,7 @@ describe('null type', () => {
           actualValue: 0,
           expectedType: 'null',
           typeName: 'null',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });

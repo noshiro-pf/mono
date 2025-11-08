@@ -59,9 +59,13 @@ export const brand = <
                     actualValue: res.value,
                     expectedType: typeNameFilled,
                     typeName: typeNameFilled,
-                    message:
+                    details:
+                      // If typeName is specified, it will be used in the error message, so no further information is required.
                       typeName === undefined
-                        ? `The value must satisfy the constraint corresponding to the brand keys: <${brandKeysStr}>`
+                        ? {
+                            kind: 'brand' as const,
+                            description: brandKeysStr,
+                          }
                         : undefined,
                   } satisfies ValidationError,
                 ]),

@@ -118,7 +118,9 @@ describe(nonEmptyArray, () => {
           actualValue: ys,
           expectedType: 'xs',
           typeName: 'xs',
-          message: 'Expected non-empty array, got empty array',
+          details: {
+            kind: 'non-empty-array',
+          },
         },
       ]);
 
@@ -142,14 +144,14 @@ describe(nonEmptyArray, () => {
           actualValue: '1',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['1'],
           actualValue: '',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
 

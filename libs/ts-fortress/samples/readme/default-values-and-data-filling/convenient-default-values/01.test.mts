@@ -12,6 +12,7 @@ const Schema = t.record({
 });
 
 // embed-sample-code-ignore-below
+
 assert.deepStrictEqual(Schema.defaultValue, {
   name: '',
   age: 0,

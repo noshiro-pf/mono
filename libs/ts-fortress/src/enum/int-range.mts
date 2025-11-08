@@ -4,7 +4,7 @@ import {
   createAssertFn,
   createCastFn,
   createIsFn,
-  type ValidationErrorWithMessage,
+  type ValidationError,
 } from '../utils/index.mjs';
 
 export const intRange = <Start extends Int8 | -128, End extends Int8 | 128>({
@@ -33,9 +33,13 @@ export const intRange = <Start extends Int8 | -128, End extends Int8 | 128>({
           path: [],
           actualValue: a,
           expectedType: typeNameFilled,
-          message: `The value is expected to be an integer between ${start} and ${end - 1}`,
           typeName: typeNameFilled,
-        } satisfies ValidationErrorWithMessage,
+          details: {
+            kind: 'integer-range',
+            start,
+            endExclusive: end,
+          },
+        } satisfies ValidationError,
       ]);
     }
 

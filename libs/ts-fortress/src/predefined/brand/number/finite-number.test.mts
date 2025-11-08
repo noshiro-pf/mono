@@ -97,7 +97,7 @@ describe(finiteNumber, () => {
           actualValue: Number.POSITIVE_INFINITY,
           expectedType: 'FiniteNumber',
           typeName: 'FiniteNumber',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -115,7 +115,7 @@ describe(finiteNumber, () => {
           actualValue: 'not a number',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
 

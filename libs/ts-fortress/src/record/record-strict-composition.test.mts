@@ -1,6 +1,7 @@
 import { Result } from 'ts-data-forge';
 import { mergeRecords } from '../compose/index.mjs';
 import { number, string } from '../primitives/index.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { omit } from './omit.mjs';
 import { partial } from './partial.mjs';
 import { pick } from './pick.mjs';
@@ -34,6 +35,7 @@ describe('record strict composition tests', () => {
 
       // pick validates by calling the original record's validate with filled data
       // so it includes all original fields with defaults
+
       assert.deepStrictEqual(resultValue, {
         id: '123',
         name: 'John',
@@ -71,7 +73,10 @@ describe('record strict composition tests', () => {
           'Pick<{ id: string, name: string, age: number, email: string }, "id" | "name">',
         expectedType:
           'Pick<{ id: string, name: string, age: number, email: string }, "id" | "name">',
-        message: 'Excess property "extra" is not allowed',
+        details: {
+          kind: 'excess-key',
+          key: 'extra',
+        },
       });
     });
 
@@ -85,7 +90,10 @@ describe('record strict composition tests', () => {
       const resultError1 = Result.unwrapErrThrow(result);
 
       expect(resultError1).toHaveLength(1);
-      expect(resultError1[0]?.message).toBe('Missing required key "name"');
+
+      assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
+        'Missing required key "name" at name',
+      ]);
     });
   });
 
@@ -105,6 +113,7 @@ describe('record strict composition tests', () => {
 
       // omit validates by calling the original record's validate with filled data
       // so it includes all original fields with defaults
+
       assert.deepStrictEqual(resultValue2, {
         id: '123',
         name: 'John',
@@ -142,7 +151,10 @@ describe('record strict composition tests', () => {
           'Omit<{ id: string, name: string, age: number, email: string }, "age" | "email">',
         expectedType:
           'Omit<{ id: string, name: string, age: number, email: string }, "age" | "email">',
-        message: 'Excess property "extra" is not allowed',
+        details: {
+          kind: 'excess-key',
+          key: 'extra',
+        },
       });
     });
 
@@ -156,9 +168,10 @@ describe('record strict composition tests', () => {
       const resultError3 = Result.unwrapErrThrow(result);
 
       expect(resultError3).toHaveLength(1);
-      expect(resultError3[0]?.message).toBe(
-        'Excess property "age" is not allowed',
-      );
+
+      assert.deepStrictEqual(validationErrorsToMessages(resultError3), [
+        'Excess property "age" is not allowed at age',
+      ]);
     });
   });
 
@@ -177,6 +190,7 @@ describe('record strict composition tests', () => {
       const resultValue4 = Result.unwrapThrow(result);
 
       // partial now only returns the provided fields
+
       assert.deepStrictEqual(resultValue4, {
         id: '123',
         name: 'John',
@@ -206,6 +220,7 @@ describe('record strict composition tests', () => {
       const resultValue6 = Result.unwrapThrow(result);
 
       // partial with empty object returns empty object
+
       assert.deepStrictEqual(resultValue6, {});
     });
 
@@ -240,7 +255,10 @@ describe('record strict composition tests', () => {
           'Partial<{ id: string, name: string, age: number, email: string }>',
         expectedType:
           'Partial<{ id: string, name: string, age: number, email: string }>',
-        message: 'Excess property "extra" is not allowed',
+        details: {
+          kind: 'excess-key',
+          key: 'extra',
+        },
       });
     });
 
@@ -260,6 +278,7 @@ describe('record strict composition tests', () => {
       const resultValue8 = Result.unwrapThrow(result);
 
       // partially partial now only returns the provided fields
+
       assert.deepStrictEqual(resultValue8, {
         id: '123',
         name: 'John',
@@ -294,7 +313,10 @@ describe('record strict composition tests', () => {
       const resultError5 = Result.unwrapErrThrow(result);
 
       expect(resultError5).toHaveLength(1);
-      expect(resultError5[0]?.message).toBe('Missing required key "name"');
+
+      assert.deepStrictEqual(validationErrorsToMessages(resultError5), [
+        'Missing required key "name" at name',
+      ]);
     });
   });
 
@@ -328,6 +350,7 @@ describe('record strict composition tests', () => {
       // mergeRecords validates against each record separately
       // strictRecord1 will reject because it doesn't know about age/email
       // strictRecord2 will reject because it doesn't know about id/name
+
       expect(mergedType.is(validData)).toBe(false);
 
       const result = mergedType.validate(validData);
@@ -337,6 +360,7 @@ describe('record strict composition tests', () => {
       const resultError6 = Result.unwrapErrThrow(result);
 
       // Both records should produce errors for unknown fields
+
       expect(resultError6.length).toBeGreaterThan(0);
     });
 
@@ -358,12 +382,12 @@ describe('record strict composition tests', () => {
       const resultError7 = Result.unwrapErrThrow(result);
 
       // Both records should reject the excess property
+
       expect(resultError7.length).toBeGreaterThanOrEqual(1);
 
-      const excessErrors = resultError7.filter(
-        (error) =>
-          error.message?.includes('Excess property "extra" is not allowed') ===
-          true,
+      const resultError7Messages = validationErrorsToMessages(resultError7);
+      const excessErrors = resultError7Messages.filter((message) =>
+        message.includes('Excess property "extra" is not allowed'),
       );
 
       expect(excessErrors.length).toBeGreaterThanOrEqual(1);
@@ -377,12 +401,13 @@ describe('record strict composition tests', () => {
       expect(Result.isErr(result)).toBe(true);
 
       const resultError8 = Result.unwrapErrThrow(result);
-      const missingEmailError = resultError8.find(
-        (error) =>
-          error.message?.includes('Missing required key "email"') === true,
-      );
+      const resultError8Messages = validationErrorsToMessages(resultError8);
 
-      expect(missingEmailError).toBeDefined();
+      expect(
+        resultError8Messages.some((message) =>
+          message.includes('Missing required key "email"'),
+        ),
+      ).toBe(true);
     });
 
     test('mixed strict and permissive records', () => {
@@ -406,13 +431,13 @@ describe('record strict composition tests', () => {
       // Since one record is permissive, the merged type should accept excess properties
       // But this depends on implementation - in ts-fortress, each record validates independently
       // The strict record will reject, the permissive record will accept
+
       expect(Result.isErr(result)).toBe(true); // Strict record rejects excess property
 
       const resultError9 = Result.unwrapErrThrow(result);
-      const excessErrors = resultError9.filter(
-        (error) =>
-          error.message?.includes('Excess property "extra" is not allowed') ===
-          true,
+      const resultError9Messages = validationErrorsToMessages(resultError9);
+      const excessErrors = resultError9Messages.filter((message) =>
+        message.includes('Excess property "extra" is not allowed'),
       );
 
       expect(excessErrors.length).toBeGreaterThanOrEqual(1);
@@ -500,9 +525,10 @@ describe('record strict composition tests', () => {
       const resultError10 = Result.unwrapErrThrow(result);
 
       expect(resultError10).toHaveLength(1);
-      expect(resultError10[0]?.message).toBe(
-        'Excess property "extra" is not allowed',
-      );
+
+      assert.deepStrictEqual(validationErrorsToMessages(resultError10), [
+        'Excess property "extra" is not allowed at extra',
+      ]);
     });
   });
 });

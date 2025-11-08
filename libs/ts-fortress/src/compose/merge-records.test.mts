@@ -108,24 +108,33 @@ describe(mergeRecords, () => {
           actualValue: { x: 0, y: 1 },
           expectedType: '({ x: number, y: number } & { z: number, w: number })',
           typeName: '({ x: number, y: number } & { z: number, w: number })',
-          message:
-            'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
+          details: {
+            kind: 'intersection',
+            typeNames: ['{ x: number, y: number }', '{ z: number, w: number }'],
+          },
         },
         {
           path: ['z'],
           actualValue: { x: 0, y: 1 },
           expectedType: '{ z: number, w: number }',
           typeName: '{ z: number, w: number }',
-          message: 'Missing required key "z"',
+          details: {
+            kind: 'missing-key',
+            key: 'z',
+          },
         },
         {
           path: ['w'],
           actualValue: { x: 0, y: 1 },
           expectedType: '{ z: number, w: number }',
           typeName: '{ z: number, w: number }',
-          message: 'Missing required key "w"',
+          details: {
+            kind: 'missing-key',
+            key: 'w',
+          },
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
         'Missing required key "z" at z',

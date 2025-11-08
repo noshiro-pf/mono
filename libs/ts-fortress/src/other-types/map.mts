@@ -7,7 +7,6 @@ import {
   createPrimitiveValidationError,
   prependPathToValidationErrors,
   type ValidationError,
-  type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 const isMap = (value: unknown): value is ReadonlyMap<unknown, unknown> =>
@@ -38,6 +37,7 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
           actualValue: a,
           expectedType: 'Map',
           typeName,
+          details: undefined,
         }),
       ]);
     }
@@ -52,9 +52,13 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
               path: [],
               actualValue: k,
               expectedType: typeName,
-              message: `The key of the Map is expected to be <${keyType.typeName}>, but got <${typeof k}> type value \`${unknownToString(k)}\``,
               typeName,
-            } satisfies ValidationErrorWithMessage;
+              details: {
+                kind: 'map-entry',
+                entry: 'key',
+                expectedType: keyType.typeName,
+              },
+            } satisfies ValidationError;
 
             yield* res.value;
           }
@@ -66,9 +70,13 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
               path: [],
               actualValue: v,
               expectedType: typeName,
-              message: `The value of the Map is expected to be <${valueType.typeName}>, but got <${typeof v}> type value \`${unknownToString(v)}\``,
               typeName,
-            } satisfies ValidationErrorWithMessage;
+              details: {
+                kind: 'map-entry',
+                entry: 'value',
+                expectedType: valueType.typeName,
+              },
+            } satisfies ValidationError;
 
             yield* prependPathToValidationErrors(res.value, unknownToString(k));
           }

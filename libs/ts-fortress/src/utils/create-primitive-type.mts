@@ -21,6 +21,7 @@ export const createPrimitiveType = <A extends Primitive>({
             actualValue: a,
             expectedType: typeName,
             typeName,
+            details: undefined,
           }),
         ]);
 

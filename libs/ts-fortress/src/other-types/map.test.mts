@@ -1,6 +1,7 @@
 import { expectType, Result } from 'ts-data-forge';
 import { number, string } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { MapType } from './map.mjs';
 
 test('MapType with string keys and number values', () => {
@@ -19,11 +20,17 @@ test('MapType with string keys and number values', () => {
   ]);
 
   // is() test
+
   expect(StringNumberMap.is(validMap)).toBe(true);
+
   expect(StringNumberMap.is(new Map())).toBe(true);
+
   expect(StringNumberMap.is({})).toBe(false);
+
   expect(StringNumberMap.is([])).toBe(false);
+
   expect(StringNumberMap.is(null)).toBe(false);
+
   expect(StringNumberMap.is(undefined)).toBe(false);
 
   // validate() test
@@ -46,6 +53,7 @@ test('MapType with invalid key types', () => {
   ]);
 
   // is() test
+
   expect(StringNumberMap.is(invalidMap)).toBe(false);
 
   // validate() test
@@ -56,7 +64,11 @@ test('MapType with invalid key types', () => {
   const resultError = Result.unwrapErrThrow(result);
 
   expect(resultError.length).toBeGreaterThan(0);
-  expect(resultError[0]?.message).toContain('key of the Map');
+
+  assert.deepStrictEqual(validationErrorsToMessages(resultError), [
+    'The key of the Map is expected to be <string>, but got <number> type value `123`',
+    'Expected <string>, got <number> type value `123`.',
+  ]);
 });
 
 test('MapType with invalid value types', () => {
@@ -69,6 +81,7 @@ test('MapType with invalid value types', () => {
   ]);
 
   // is() test
+
   expect(StringNumberMap.is(invalidMap)).toBe(false);
 
   // validate() test
@@ -79,7 +92,11 @@ test('MapType with invalid value types', () => {
   const resultError1 = Result.unwrapErrThrow(result);
 
   expect(resultError1.length).toBeGreaterThan(0);
-  expect(resultError1[0]?.message).toContain('value of the Map');
+
+  assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
+    'The value of the Map is expected to be <number>, but got <string> type value `not a number`',
+    'Expected <number> at b, got <string> type value "not a number".',
+  ]);
 });
 
 test('MapType fill() method', () => {
@@ -93,7 +110,9 @@ test('MapType fill() method', () => {
   const filled1 = StringNumberMap.fill(validMap);
 
   expect(filled1.size).toBe(2);
+
   expect(filled1.get('a')).toBe(1);
+
   expect(filled1.get('b')).toBe(2);
 
   // Mixed valid/invalid entries - should filter out invalid ones
@@ -106,7 +125,9 @@ test('MapType fill() method', () => {
   const filled2 = StringNumberMap.fill(mixedMap);
 
   expect(filled2.size).toBe(2);
+
   expect(filled2.get('valid')).toBe(1);
+
   expect(filled2.get('good')).toBe(3);
 
   // Non-map input - should return default (empty map)
@@ -127,6 +148,7 @@ test('MapType cast() method', () => {
   expect(casted).toBe(validMap);
 
   // Invalid input - should throw
+
   expect(() => StringNumberMap.cast('not a map')).toThrow(
     'Expected <Map>, got <string> type value',
   );
@@ -147,6 +169,7 @@ test('MapType assertIs() method', () => {
   }).not.toThrow();
 
   // Invalid input - should throw
+
   expect(() => {
     assertIsStringNumberMap('not a map');
   }).toThrow('Expected <Map>, got <string> type value');

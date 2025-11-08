@@ -10,6 +10,7 @@ describe('mergeRecords - fill and defaultType', () => {
     const T = mergeRecords([A, B]);
 
     // Non-record input: should merge defaults from A and B
+
     assert.deepStrictEqual(T.fill(null), { a: '', b: 1, s: 'B' });
   });
 
@@ -18,6 +19,7 @@ describe('mergeRecords - fill and defaultType', () => {
     const input = { a: 'x', extra: 'keep' } as const;
 
     // Should keep input.extra and fill missing from A/B
+
     assert.deepStrictEqual(
       T.fill(input),
       T.cast({
@@ -34,9 +36,11 @@ describe('mergeRecords - fill and defaultType', () => {
     const T = mergeRecords([A, B], { defaultType: Default });
 
     // defaultValue comes from defaultType
+
     assert.deepStrictEqual(T.defaultValue, { a: 'dA', b: 9, s: 'dS' });
 
     // fill uses defaultType.fill when invalid
+
     assert.deepStrictEqual(T.fill(undefined), { a: 'dA', b: 9, s: 'dS' });
   });
 });

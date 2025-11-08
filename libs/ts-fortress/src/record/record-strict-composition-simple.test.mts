@@ -24,17 +24,22 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
 
       const result = pickedType.validate(dataWithExcess);
+      assert(Result.isErr(result));
 
-      expect(Result.isErr(result)).toBe(true);
-
-      const resultError = Result.unwrapErrThrow(result);
-      const excessError = resultError.find(
-        (error) =>
-          error.message?.includes('Excess property "extra" is not allowed') ===
-          true,
-      );
-
-      expect(excessError).toBeDefined();
+      assert.deepStrictEqual(result.value, [
+        {
+          path: ['extra'],
+          actualValue: 'not allowed',
+          expectedType:
+            'Pick<{ id: string, name: string, age: number }, "id" | "name">',
+          typeName:
+            'Pick<{ id: string, name: string, age: number }, "id" | "name">',
+          details: {
+            kind: 'excess-key',
+            key: 'extra',
+          },
+        },
+      ]);
     });
 
     test('pick accepts valid data and fills missing fields', () => {
@@ -71,17 +76,21 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
 
       const result = omittedType.validate(dataWithExcess);
+      assert(Result.isErr(result));
 
-      expect(Result.isErr(result)).toBe(true);
-
-      const resultError1 = Result.unwrapErrThrow(result);
-      const excessError = resultError1.find(
-        (error) =>
-          error.message?.includes('Excess property "extra" is not allowed') ===
-          true,
-      );
-
-      expect(excessError).toBeDefined();
+      assert.deepStrictEqual(result.value, [
+        {
+          path: ['extra'],
+          actualValue: 'not allowed',
+          expectedType:
+            'Omit<{ id: string, name: string, age: number }, "age">',
+          typeName: 'Omit<{ id: string, name: string, age: number }, "age">',
+          details: {
+            kind: 'excess-key',
+            key: 'extra',
+          },
+        },
+      ]);
     });
   });
 
@@ -93,17 +102,20 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', extra: 'not allowed' };
 
       const result = partialType.validate(dataWithExcess);
+      assert(Result.isErr(result));
 
-      expect(Result.isErr(result)).toBe(true);
-
-      const resultError2 = Result.unwrapErrThrow(result);
-      const excessError = resultError2.find(
-        (error) =>
-          error.message?.includes('Excess property "extra" is not allowed') ===
-          true,
-      );
-
-      expect(excessError).toBeDefined();
+      assert.deepStrictEqual(result.value, [
+        {
+          path: ['extra'],
+          actualValue: 'not allowed',
+          expectedType: 'Partial<{ id: string, name: string, age: number }>',
+          typeName: 'Partial<{ id: string, name: string, age: number }>',
+          details: {
+            kind: 'excess-key',
+            key: 'extra',
+          },
+        },
+      ]);
     });
   });
 

@@ -167,9 +167,13 @@ describe(required, () => {
             expectedType:
               'Required<{ year: number, month: number, date: number }>',
             typeName: 'Required<{ year: number, month: number, date: number }>',
-            message: 'Missing required key "date"',
+            details: {
+              kind: 'missing-key',
+              key: 'date',
+            },
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
           'Missing required key "date" at date',
         ]);
@@ -237,16 +241,17 @@ describe(required, () => {
             actualValue: 'ab',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
           {
             path: ['date'],
             actualValue: 'cd',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
           'Expected <number> at month, got <string> type value "ab".',
           'Expected <number> at date, got <string> type value "cd".',
@@ -272,9 +277,10 @@ describe(required, () => {
             actualValue: 'ab',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
           'Expected <number> at month, got <string> type value "ab".',
         ]);
@@ -507,9 +513,13 @@ describe(required, () => {
               'PartiallyRequired<{ year: number, month: number, date: number }, "year" | "month">',
             typeName:
               'PartiallyRequired<{ year: number, month: number, date: number }, "year" | "month">',
-            message: 'Missing required key "month"',
+            details: {
+              kind: 'missing-key',
+              key: 'month',
+            },
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError3), [
           'Missing required key "month" at month',
         ]);
@@ -534,16 +544,17 @@ describe(required, () => {
             actualValue: 'ab',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
           {
             path: ['date'],
             actualValue: 'cd',
             expectedType: 'number',
             typeName: 'number',
-            message: undefined,
+            details: undefined,
           },
         ]);
+
         assert.deepStrictEqual(validationErrorsToMessages(resultError4), [
           'Expected <number> at month, got <string> type value "ab".',
           'Expected <number> at date, got <string> type value "cd".',

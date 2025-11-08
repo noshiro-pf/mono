@@ -80,6 +80,12 @@ Re-exports [ValidationError](utils/validation-error.md#validationerror)
 
 ***
 
+### ValidationErrorDetails
+
+Re-exports [ValidationErrorDetails](utils/validation-error.md#validationerrordetails)
+
+***
+
 ### validationErrorsToMessages
 
 Re-exports [validationErrorsToMessages](utils/validation-error.md#validationerrorstomessages)
@@ -89,9 +95,3 @@ Re-exports [validationErrorsToMessages](utils/validation-error.md#validationerro
 ### validationErrorToMessage
 
 Re-exports [validationErrorToMessage](utils/validation-error.md#validationerrortomessage)
-
-***
-
-### ValidationErrorWithMessage
-
-Re-exports [ValidationErrorWithMessage](utils/validation-error.md#validationerrorwithmessage)

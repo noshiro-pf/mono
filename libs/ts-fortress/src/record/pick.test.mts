@@ -154,9 +154,10 @@ describe(pick, () => {
           actualValue: 'ab',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <number> at month, got <string> type value "ab".',
       ]);

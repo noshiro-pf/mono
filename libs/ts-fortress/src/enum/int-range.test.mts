@@ -1,9 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
-import {
-  type ValidationError,
-  validationErrorsToMessages,
-} from '../utils/index.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { intRange } from './int-range.mjs';
 
 describe(intRange, () => {
@@ -23,13 +20,17 @@ describe(intRange, () => {
   describe('is', () => {
     test('valid cases', () => {
       expect(rng.is(-2)).toBe(true);
+
       expect(rng.is(0)).toBe(true);
+
       expect(rng.is(2)).toBe(true);
     });
 
     test('invalid cases', () => {
       expect(rng.is(-3)).toBe(false);
+
       expect(rng.is(3)).toBe(false); // end is exclusive
+
       expect(rng.is(1.5)).toBe(false); // not integer
     });
   });
@@ -56,9 +57,14 @@ describe(intRange, () => {
         path: [],
         actualValue: 3,
         expectedType: 'rng',
-        message: 'The value is expected to be an integer between -2 and 2',
         typeName: 'rng',
-      } satisfies ValidationError);
+        details: {
+          kind: 'integer-range',
+          start: -2,
+          endExclusive: 3,
+        },
+      });
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value is expected to be an integer between -2 and 2',
       ]);

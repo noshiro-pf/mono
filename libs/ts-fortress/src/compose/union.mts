@@ -5,7 +5,7 @@ import {
   createCastFn,
   createIsFn,
   toUnionString,
-  type ValidationErrorWithMessage,
+  type ValidationError,
 } from '../utils/index.mjs';
 
 export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
@@ -32,11 +32,12 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
             path: [],
             actualValue: a,
             expectedType: typeNameFilled,
-            message: `The type of value is expected to be one of the elements contained in { ${types
-              .map((t) => t.typeName)
-              .join(', ')} }`,
             typeName: typeNameFilled,
-          } satisfies ValidationErrorWithMessage,
+            details: {
+              kind: 'union',
+              typeNames: types.map((t) => t.typeName),
+            },
+          } satisfies ValidationError,
         ]);
 
   const is = createIsFn<T>(validate);

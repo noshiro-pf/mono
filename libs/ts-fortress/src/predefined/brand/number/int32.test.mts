@@ -87,9 +87,10 @@ describe(int32, () => {
           actualValue: 3_000_000_000,
           expectedType: 'Int32',
           typeName: 'Int32',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <Int32>, got <number> type value `3000000000`.',
       ]);

@@ -96,9 +96,12 @@ describe(union, () => {
         actualValue: 5,
         expectedType: '({ x: number, y: number } | literal(3) | literal("2"))',
         typeName: '({ x: number, y: number } | literal(3) | literal("2"))',
-        message:
-          'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
+        details: {
+          kind: 'union',
+          typeNames: ['{ x: number, y: number }', 'literal(3)', 'literal("2")'],
+        },
       });
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
       ]);

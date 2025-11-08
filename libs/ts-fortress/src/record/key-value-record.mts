@@ -7,7 +7,6 @@ import {
   createPrimitiveValidationError,
   prependPathToValidationErrors,
   type ValidationError,
-  type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 type RecordResultType<
@@ -36,6 +35,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
           actualValue: a,
           expectedType: 'record',
           typeName,
+          details: undefined,
         }),
       ]);
     }
@@ -50,9 +50,13 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
               path: [],
               actualValue: k,
               expectedType: typeName,
-              message: `The key of the record is expected to be <${keyType.typeName}>`,
               typeName,
-            } satisfies ValidationErrorWithMessage;
+              details: {
+                kind: 'record-entry',
+                entry: 'key',
+                expectedType: keyType.typeName,
+              },
+            } satisfies ValidationError;
 
             yield* res.value;
           }
@@ -64,9 +68,13 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
               path: [],
               actualValue: v,
               expectedType: typeName,
-              message: `The value of the record is expected to be <${valueType.typeName}>`,
               typeName,
-            } satisfies ValidationErrorWithMessage;
+              details: {
+                kind: 'record-entry',
+                entry: 'value',
+                expectedType: valueType.typeName,
+              },
+            } satisfies ValidationError;
 
             yield* prependPathToValidationErrors(res.value, k);
           }

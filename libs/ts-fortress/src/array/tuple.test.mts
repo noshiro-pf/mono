@@ -107,7 +107,7 @@ describe(tuple, () => {
           actualValue: 'not an array',
           expectedType: 'array',
           typeName: 'tuple',
-          message: undefined,
+          details: undefined,
         },
       ]);
     });
@@ -127,8 +127,11 @@ describe(tuple, () => {
           actualValue: x,
           expectedType: 'tuple',
           typeName: 'tuple',
-          message:
-            'The length of tuple is expected to be 3, but it is actually 1',
+          details: {
+            kind: 'tuple-length',
+            expectedLength: 3,
+            actualLength: 1,
+          },
         },
       ]);
     });
@@ -148,14 +151,14 @@ describe(tuple, () => {
           actualValue: 'str',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
         {
           path: ['0', 'y'],
           actualValue: 'str',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
 
@@ -166,7 +169,7 @@ describe(tuple, () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = [{ x: 5, y: 10 }, 3, '2'];
+      const input = [{ x: 5, y: 10 }, 3, '2'] as const;
       const result = targetType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -175,7 +178,8 @@ describe(tuple, () => {
 
       // Note: tuple validation may create new arrays for type safety
       // so we check for structural equality rather than reference equality
-      assert.deepStrictEqual(resultValue1, targetType.cast(input));
+
+      assert.deepStrictEqual(resultValue1, input);
 
       // For tuples, the inner objects should maintain reference equality
       expect(resultValue1[0]).toBe(input[0]); // ✅ same reference for nested objects

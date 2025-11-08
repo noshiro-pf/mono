@@ -62,7 +62,7 @@ describe(bigint, () => {
           actualValue: 123,
           expectedType: 'bigint',
           typeName: 'bigint',
-          message: undefined,
+          details: undefined,
         },
       ]);
 
@@ -142,7 +142,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(6n)).toBe(true);
+
       expect(type.is(5n)).toBe(false);
+
       expect(type.is(20n)).toBe(true);
     });
 
@@ -158,7 +160,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(5n)).toBe(true);
+
       expect(type.is(4n)).toBe(false);
+
       expect(type.is(10n)).toBe(true);
     });
 
@@ -174,6 +178,7 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(6n)).toBe(true);
+
       expect(type.is(4n)).toBe(false);
     });
 
@@ -189,7 +194,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(3n)).toBe(true);
+
       expect(type.is(5n)).toBe(false);
+
       expect(type.is(10n)).toBe(false);
     });
 
@@ -205,7 +212,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(4n)).toBe(true);
+
       expect(type.is(5n)).toBe(true);
+
       expect(type.is(6n)).toBe(false);
     });
 
@@ -221,7 +230,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(5n)).toBe(true);
+
       expect(type.is(6n)).toBe(false);
+
       expect(type.is(3n)).toBe(true);
     });
 
@@ -237,7 +248,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(10n)).toBe(true);
+
       expect(type.is(0n)).toBe(false);
+
       expect(type.is(-1n)).toBe(false);
     });
 
@@ -256,7 +269,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(5n)).toBe(true);
+
       expect(type.is(0n)).toBe(true);
+
       expect(type.is(-1n)).toBe(false);
     });
 
@@ -275,7 +290,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(-5n)).toBe(true);
+
       expect(type.is(0n)).toBe(false);
+
       expect(type.is(1n)).toBe(false);
     });
 
@@ -294,7 +311,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(-5n)).toBe(true);
+
       expect(type.is(0n)).toBe(true);
+
       expect(type.is(1n)).toBe(false);
     });
 
@@ -313,7 +332,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(9n)).toBe(true);
+
       expect(type.is(10n)).toBe(false);
+
       expect(type.is(-6n)).toBe(true);
     });
 
@@ -329,7 +350,9 @@ describe('bigint with constraints', () => {
       expectType<typeof type, Type<bigint>>('=');
 
       expect(type.is(10n)).toBe(true);
+
       expect(type.is(11n)).toBe(false);
+
       expect(type.is(-2n)).toBe(true);
     });
 
@@ -346,7 +369,9 @@ describe('bigint with constraints', () => {
         expectType<typeof type, Type<bigint>>('=');
 
         expect(type.is(6n)).toBe(true);
+
         expect(type.is(1n)).toBe(false);
+
         expect(type.is(10n)).toBe(false);
       });
 
@@ -362,8 +387,11 @@ describe('bigint with constraints', () => {
         expectType<typeof type, Type<bigint>>('=');
 
         expect(type.is(5n)).toBe(true);
+
         expect(type.is(10n)).toBe(true);
+
         expect(type.is(4n)).toBe(false);
+
         expect(type.is(11n)).toBe(false);
       });
 
@@ -379,8 +407,11 @@ describe('bigint with constraints', () => {
         expectType<typeof type, Type<bigint>>('=');
 
         expect(type.is(9n)).toBe(true);
+
         expect(type.is(3n)).toBe(true);
+
         expect(type.is(-3n)).toBe(false);
+
         expect(type.is(10n)).toBe(false);
       });
 
@@ -402,9 +433,13 @@ describe('bigint with constraints', () => {
         expectType<typeof type, Type<bigint>>('=');
 
         expect(type.is(10n)).toBe(true);
+
         expect(type.is(0n)).toBe(true);
+
         expect(type.is(11n)).toBe(false);
+
         expect(type.is(-2n)).toBe(false);
+
         expect(type.is(9n)).toBe(false);
       });
 

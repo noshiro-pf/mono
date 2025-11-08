@@ -109,9 +109,10 @@ describe(positiveInt, () => {
           actualValue: -5,
           expectedType: 'PositiveInt',
           typeName: 'PositiveInt',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <PositiveInt>, got <number> type value `-5`.',
       ]);
@@ -130,9 +131,10 @@ describe(positiveInt, () => {
           actualValue: 'not a number',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
         'Expected <number>, got <string> type value "not a number".',
       ]);

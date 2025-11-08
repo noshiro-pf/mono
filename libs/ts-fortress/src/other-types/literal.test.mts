@@ -58,6 +58,7 @@ describe(literal, () => {
         expectType<Empty, ''>('=');
 
         expect(empty.is('')).toBe(true);
+
         expect(empty.is(' ')).toBe(false);
       });
 
@@ -68,7 +69,9 @@ describe(literal, () => {
         expectType<Whitespace, '   '>('=');
 
         expect(whitespace.is('   ')).toBe(true);
+
         expect(whitespace.is('  ')).toBe(false);
+
         expect(whitespace.is('    ')).toBe(false);
       });
 
@@ -79,6 +82,7 @@ describe(literal, () => {
         expectType<Emoji, '🎉'>('=');
 
         expect(emoji.is('🎉')).toBe(true);
+
         expect(emoji.is('🎊')).toBe(false);
       });
 
@@ -89,6 +93,7 @@ describe(literal, () => {
         expectType<Multiline, 'line1\nline2'>('=');
 
         expect(multiline.is('line1\nline2')).toBe(true);
+
         expect(multiline.is(String.raw`line1\nline2`)).toBe(false);
       });
     });
@@ -119,7 +124,7 @@ describe(literal, () => {
             actualValue: 'world',
             expectedType: 'literal("hello")',
             typeName: 'literal("hello")',
-            message: undefined,
+            details: undefined,
           },
         ]);
       });
@@ -231,7 +236,9 @@ describe(literal, () => {
         expectType<Zero, 0>('=');
 
         expect(zero.is(0)).toBe(true);
+
         expect(zero.is(-0)).toBe(true); // JavaScript treats 0 and -0 as equal
+
         expect(zero.is(1)).toBe(false);
       });
 
@@ -242,6 +249,7 @@ describe(literal, () => {
         expectType<Negative, -100>('=');
 
         expect(negative.is(-100)).toBe(true);
+
         expect(negative.is(100)).toBe(false);
       });
 
@@ -252,6 +260,7 @@ describe(literal, () => {
         expectType<Pi, 3.14>('=');
 
         expect(pi.is(3.14)).toBe(true);
+
         expect(pi.is(3.141)).toBe(false);
       });
     });
@@ -282,7 +291,7 @@ describe(literal, () => {
             actualValue: 43,
             expectedType: 'literal(42)',
             typeName: 'literal(42)',
-            message: undefined,
+            details: undefined,
           },
         ]);
       });
@@ -369,7 +378,7 @@ describe(literal, () => {
             actualValue: 99n,
             expectedType: 'literal(42n)',
             typeName: 'literal(42n)',
-            message: undefined,
+            details: undefined,
           },
         ]);
 
@@ -391,7 +400,7 @@ describe(literal, () => {
             actualValue: 'not a bigint',
             expectedType: 'literal(42n)',
             typeName: 'literal(42n)',
-            message: undefined,
+            details: undefined,
           },
         ]);
 
@@ -511,7 +520,7 @@ describe(literal, () => {
               actualValue: false,
               expectedType: 'literal(true)',
               typeName: 'literal(true)',
-              message: undefined,
+              details: undefined,
             },
           ]);
 
@@ -533,7 +542,7 @@ describe(literal, () => {
               actualValue: 'not a boolean',
               expectedType: 'literal(true)',
               typeName: 'literal(true)',
-              message: undefined,
+              details: undefined,
             },
           ]);
 
@@ -632,7 +641,7 @@ describe(literal, () => {
               actualValue: true,
               expectedType: 'literal(false)',
               typeName: 'literal(false)',
-              message: undefined,
+              details: undefined,
             },
           ]);
 

@@ -97,9 +97,10 @@ describe(positiveSafeInt, () => {
           actualValue: 0,
           expectedType: 'PositiveSafeInt',
           typeName: 'PositiveSafeInt',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <PositiveSafeInt>, got <number> type value `0`.',
       ]);

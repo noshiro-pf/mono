@@ -120,6 +120,7 @@ describe(iso8601, () => {
     });
 
     expect(strictType.is('2008-02-29')).toBe(true);
+
     expect(strictType.is('2009-02-29')).toBe(false);
   });
 
@@ -131,6 +132,7 @@ describe(iso8601, () => {
     });
 
     expect(type.is('2009-05-19T14:39:22')).toBe(true);
+
     expect(type.is('2009-05-19 14:39:22')).toBe(false);
   });
 
@@ -149,7 +151,7 @@ describe(iso8601, () => {
         actualValue: 'not-an-iso-date',
         expectedType: 'Iso8601',
         typeName: 'Iso8601',
-        message: undefined,
+        details: undefined,
       },
     ]);
 
@@ -162,6 +164,7 @@ describe(iso8601, () => {
     const value = '2021-01-22T13:13:57.494677Z';
 
     expect(baseType.fill(value)).toBe(value);
+
     expect(() => baseType.cast(value)).not.toThrow();
   });
 

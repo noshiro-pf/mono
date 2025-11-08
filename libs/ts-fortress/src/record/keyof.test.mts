@@ -89,10 +89,13 @@ describe(keyof, () => {
           actualValue: 'minutes',
           expectedType: 'keyof { year: number, month: number, date: number }',
           typeName: 'keyof { year: number, month: number, date: number }',
-          message:
-            'The value is expected to be one of the elements contained in { year, month, date }',
+          details: {
+            kind: 'enum',
+            values: ['year', 'month', 'date'],
+          },
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value is expected to be one of the elements contained in { year, month, date }',
       ]);

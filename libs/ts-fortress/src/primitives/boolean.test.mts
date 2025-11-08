@@ -62,7 +62,7 @@ describe(boolean, () => {
           actualValue: 'not a boolean',
           expectedType: 'boolean',
           typeName: 'boolean',
-          message: undefined,
+          details: undefined,
         },
       ]);
 

@@ -341,6 +341,7 @@ const C = t.partial({
         assert.notDeepEqual(res.right, expected); // NG
 
         const actual = { A: 1, B: undefined };
+
         assert.deepStrictEqual(res.right, actual);
 
         assert.ok(A.is(res.right)); // ok
@@ -358,6 +359,7 @@ const C = t.partial({
         assert.notDeepEqual(res.right, expected); // NG
 
         const actual = { A: 1 };
+
         assert.deepStrictEqual(res.right, actual);
 
         assert(A.is(res.right)); // ok

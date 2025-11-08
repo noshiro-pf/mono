@@ -85,7 +85,7 @@ describe(safeInt, () => {
           actualValue: Number.MAX_SAFE_INTEGER + 1,
           expectedType: 'SafeInt',
           typeName: 'SafeInt',
-          message: undefined,
+          details: undefined,
         },
       ]);
 

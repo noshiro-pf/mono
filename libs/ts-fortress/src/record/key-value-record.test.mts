@@ -110,30 +110,39 @@ describe(keyValueRecord, () => {
           actualValue: 'ab',
           expectedType: 'key-value-record',
           typeName: 'key-value-record',
-          message: 'The value of the record is expected to be <number>',
+          details: {
+            kind: 'record-entry',
+            entry: 'value',
+            expectedType: 'number',
+          },
         },
         {
           path: ['month'],
           actualValue: 'ab',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
         {
           path: [],
           actualValue: 'cd',
           expectedType: 'key-value-record',
           typeName: 'key-value-record',
-          message: 'The value of the record is expected to be <number>',
+          details: {
+            kind: 'record-entry',
+            entry: 'value',
+            expectedType: 'number',
+          },
         },
         {
           path: ['date'],
           actualValue: 'cd',
           expectedType: 'number',
           typeName: 'number',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'The value of the record is expected to be <number>',
         'Expected <number> at month, got <string> type value "ab".',

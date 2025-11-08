@@ -26,7 +26,7 @@ assert.deepStrictEqual(errorResult.value, [
     actualValue: 'thirty',
     expectedType: 'number',
     typeName: 'number',
-    message: undefined,
+    details: undefined,
   },
 ]);
 

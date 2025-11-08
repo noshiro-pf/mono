@@ -7,7 +7,6 @@ import {
   createPrimitiveValidationError,
   prependIndexToValidationErrors,
   type ValidationError,
-  type ValidationErrorWithMessage,
 } from '../utils/index.mjs';
 
 export const nonEmptyArray = <A,>(
@@ -31,6 +30,7 @@ export const nonEmptyArray = <A,>(
           actualValue: a,
           expectedType: 'array',
           typeName,
+          details: undefined,
         }),
       ]);
     }
@@ -42,8 +42,10 @@ export const nonEmptyArray = <A,>(
           actualValue: a,
           expectedType: typeName,
           typeName,
-          message: 'Expected non-empty array, got empty array',
-        } satisfies ValidationErrorWithMessage,
+          details: {
+            kind: 'non-empty-array',
+          },
+        } satisfies ValidationError,
       ]);
     }
 

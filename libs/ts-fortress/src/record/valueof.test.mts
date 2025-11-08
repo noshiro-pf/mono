@@ -12,6 +12,7 @@ describe(valueof, () => {
     expectType<typeof V, Type<undefined>>('=');
 
     expect(V.defaultValue).toBe(undefinedType.defaultValue);
+
     expect(Result.isOk(V.validate(undefined))).toBe(true);
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(V.fill('anything')).toBeUndefined();
@@ -25,6 +26,7 @@ describe(valueof, () => {
     expectType<T, string>('=');
 
     expect(Result.isOk(V.validate('x'))).toBe(true);
+
     expect(Result.isErr(V.validate(1))).toBe(true);
   });
 
@@ -36,7 +38,9 @@ describe(valueof, () => {
     expectType<T, number | string>('=');
 
     expect(V.is(1)).toBe(true);
+
     expect(V.is('s')).toBe(true);
+
     expect(V.is(false)).toBe(false);
   });
 });

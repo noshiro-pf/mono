@@ -93,9 +93,10 @@ describe(nonZeroInt, () => {
           actualValue: 0,
           expectedType: 'NonZeroInt',
           typeName: 'NonZeroInt',
-          message: undefined,
+          details: undefined,
         },
       ]);
+
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Expected <NonZeroInt>, got <number> type value `0`.',
       ]);
