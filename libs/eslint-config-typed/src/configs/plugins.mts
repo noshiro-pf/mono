@@ -19,7 +19,7 @@ import eslintPluginImport from 'eslint-plugin-import-x';
 
 import eslintPluginJest from 'eslint-plugin-jest';
 
-import eslintPluginVitest from 'eslint-plugin-vitest';
+import eslintPluginVitest from '@vitest/eslint-plugin';
 
 import eslintPluginTestingLibrary from 'eslint-plugin-testing-library';
 

@@ -123,7 +123,9 @@ export const eslintImportsRules = {
   'import-x/no-named-export': 'off',
   'import-x/no-anonymous-default-export': withDefaultOption('error'),
   'import-x/group-exports': 'off',
-  'import-x/dynamic-import-chunkname': withDefaultOption('error'),
+
+  'import-x/dynamic-import-chunkname': 'off',
+
   'import-x/no-empty-named-blocks': 'error',
 
   // Covered by unicorn/prefer-node-protocol

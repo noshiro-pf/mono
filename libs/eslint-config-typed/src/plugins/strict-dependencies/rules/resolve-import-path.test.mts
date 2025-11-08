@@ -15,7 +15,7 @@ const actualFunctions = vi.hoisted<{
   getParsedCommandLineOfConfigFile: undefined,
 }));
 
-vi.mock('typescript', async () => {
+vi.mock(import('typescript'), async () => {
   const actual = await vi.importActual<TypeScriptModule>('typescript');
   // eslint-disable-next-line functional/immutable-data
   actualFunctions.findConfigFile = actual.findConfigFile;
@@ -174,7 +174,7 @@ const baseUrlCases = [
   expected: string;
 }>[];
 
-describe('resolveImportPath', () => {
+describe(resolveImportPath, () => {
   test('should resolve relative path', () => {
     expect(
       resolveImportPath('../../components/ui/Text', 'src/pages/aaa/bbb.ts', {}),
@@ -189,6 +189,7 @@ describe('resolveImportPath', () => {
 
   test('should do nothing if tsconfig.json does not exist', () => {
     useFixture(undefined);
+
     expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
       'components/aaa/bbb',
     );
@@ -196,9 +197,11 @@ describe('resolveImportPath', () => {
 
   test('should do nothing if no paths setting', () => {
     useFixture('no-paths');
+
     expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
       'components/aaa/bbb',
     );
+
     useFixture(undefined);
   });
 
@@ -206,10 +209,12 @@ describe('resolveImportPath', () => {
     'alias $label',
     ({ importPath, expected }: Readonly<(typeof aliasCases)[number]>) => {
       useFixture('paths-basic');
+
       expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
         'components/aaa/bbb',
       );
       expect(resolveImportPath(importPath, undefined, {})).toBe(expected);
+
       useFixture(undefined);
     },
   );
@@ -218,41 +223,49 @@ describe('resolveImportPath', () => {
     'baseUrl $fixtureName',
     ({ fixtureName, expected }: Readonly<(typeof baseUrlCases)[number]>) => {
       useFixture(fixtureName);
+
       expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
         'components/aaa/bbb',
       );
       expect(resolveImportPath('@/components/aaa/bbb', undefined, {})).toBe(
         expected,
       );
+
       useFixture(undefined);
     },
   );
 
   test('should resolve path alias with specified index in pathIndexMap', () => {
     useFixture('paths-multiple');
+
     expect(
       resolveImportPath('@/components/aaa/bbb', undefined, {
         '@/components/*': 1,
       }),
     ).toBe('src/alternativeComponents/aaa/bbb');
+
     useFixture(undefined);
   });
 
   test('should resolve path alias with default index when specified index does not exist', () => {
     useFixture('paths-multiple');
+
     expect(
       resolveImportPath('@/components/aaa/bbb', undefined, {
         '@/components/*': 5,
       }),
     ).toBe('src/components/aaa/bbb');
+
     useFixture(undefined);
   });
 
   test('should resolve path alias with default index when pathIndexMap is empty', () => {
     useFixture('paths-multiple');
+
     expect(resolveImportPath('@/components/aaa/bbb', undefined, {})).toBe(
       'src/components/aaa/bbb',
     );
+
     useFixture(undefined);
   });
 });

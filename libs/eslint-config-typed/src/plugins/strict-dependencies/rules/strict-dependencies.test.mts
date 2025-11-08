@@ -1,7 +1,6 @@
 import parserModule from '@typescript-eslint/parser';
 import { TSESLint } from '@typescript-eslint/utils';
 import * as path from 'node:path';
-import { describe, expect, test } from 'vitest';
 import { strictDependenciesRule } from './strict-dependencies.mjs';
 
 // FIXME: https://github.com/knowledge-work/eslint-plugin-strict-dependencies/tree/v1.3.27 のテストをコピーしてきて
@@ -72,7 +71,7 @@ const runRule = (
   return linter.verify(code, config, filename);
 };
 
-describe('strictDependenciesRule', () => {
+describe('strictDependencies Rule', () => {
   test('allows import from permitted module', () => {
     const messages = runRule(
       "import { Text } from 'src/components/ui/Text';",

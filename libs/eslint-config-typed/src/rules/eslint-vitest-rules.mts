@@ -77,6 +77,35 @@ export const eslintVitestRules = {
   'vitest/prefer-to-be-object': 'error',
   'vitest/require-local-test-context-for-concurrent-snapshots': 'error',
 
+  'vitest/no-importing-vitest-globals': 'error',
+  'vitest/prefer-importing-vitest-globals': 'off',
+
+  'vitest/consistent-vitest-vi': withDefaultOption('error'),
+  'vitest/hoisted-apis-on-top': 'error',
+  'vitest/padding-around-after-all-blocks': 'error',
+  'vitest/padding-around-after-each-blocks': 'error',
+  'vitest/padding-around-all': 'error',
+  'vitest/padding-around-before-all-blocks': 'error',
+  'vitest/padding-around-before-each-blocks': 'error',
+  'vitest/padding-around-describe-blocks': 'error',
+  'vitest/padding-around-expect-groups': 'error',
+  'vitest/padding-around-test-blocks': 'error',
+  'vitest/prefer-called-exactly-once-with': 'error',
+  'vitest/prefer-called-once': 'error',
+  'vitest/prefer-called-times': 'error',
+  'vitest/prefer-describe-function-title': 'error',
+  'vitest/prefer-expect-type-of': 'error',
+  'vitest/prefer-import-in-mock': 'error',
+  'vitest/prefer-strict-boolean-matchers': 'error',
+  'vitest/prefer-vi-mocked': 'error',
+  'vitest/require-mock-type-parameters': 'off',
+  // 'vitest/require-mock-type-parameters': [
+  //   'error',
+  //   { checkImportFunctions: true },
+  // ],
+  'vitest/valid-expect-in-promise': 'error',
+  'vitest/warn-todo': 'error',
+
   // deprecated
   'vitest/no-done-callback': 0,
 } as const satisfies EslintVitestRules;

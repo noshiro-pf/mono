@@ -121,7 +121,7 @@ export const eslintPlugins = {
   },
   EslintVitestRules: {
     typeName: 'EslintVitestRules',
-    pluginName: 'eslint-plugin-vitest',
+    pluginName: '@vitest/eslint-plugin',
     rulePrefix: 'vitest/',
     outputFileName: 'eslint-vitest-rules.mts',
   },
@@ -161,6 +161,7 @@ export const eslintPlugins = {
     typeName: `${string}Rules`;
     pluginName:
       | '@typescript-eslint/eslint-plugin'
+      | '@vitest/eslint-plugin'
       | 'eslint'
       | `eslint-plugin-${string}`;
     rulePrefix: `${string}/`;
