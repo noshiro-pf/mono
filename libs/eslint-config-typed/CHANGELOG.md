@@ -1,3 +1,9 @@
+# [3.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.2.1...v3.3.0) (2025-11-08)
+
+### Features
+
+- replace eslint-plugin-vitest with @vitest/eslint-plugin ([#120](https://github.com/noshiro-pf/eslint-config-typed/issues/120)) ([be92479](https://github.com/noshiro-pf/eslint-config-typed/commit/be924797e19e94e0ae3c45b286cdb00e183b4745))
+
 ## [3.2.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.2.0...v3.2.1) (2025-11-05)
 
 ### Bug Fixes
