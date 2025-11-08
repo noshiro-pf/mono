@@ -1,3 +1,9 @@
+# [3.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.3.0...v3.4.0) (2025-11-08)
+
+### Features
+
+- add @stylistic/eslint-plugin ([#121](https://github.com/noshiro-pf/eslint-config-typed/issues/121)) ([b28952a](https://github.com/noshiro-pf/eslint-config-typed/commit/b28952a6dd0ad7448f9106897ff16e29aac8e959))
+
 # [3.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.2.1...v3.3.0) (2025-11-08)
 
 ### Features
