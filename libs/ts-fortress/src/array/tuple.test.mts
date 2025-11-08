@@ -9,7 +9,7 @@ import {
 } from '../utils/index.mjs';
 import { tuple } from './tuple.mjs';
 
-describe('tuple', () => {
+describe(tuple, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
       expect(
@@ -82,9 +82,11 @@ describe('tuple', () => {
       expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
         '=',
       );
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toStrictEqual([{ x: 1, y: 2 }, 3, '2']);
     });
 
@@ -92,9 +94,11 @@ describe('tuple', () => {
       const x: unknown = 'not an array';
 
       const result = targetType.validate(x);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -110,9 +114,11 @@ describe('tuple', () => {
       const x: unknown = [{ x: 1, y: 2 }];
 
       const result = targetType.validate(x);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError1 = Result.unwrapErrThrow(result);
+
       expect(resultError1).toStrictEqual([
         {
           path: [],
@@ -129,9 +135,11 @@ describe('tuple', () => {
       const x: unknown = [{ x: 'str', y: 'str' }, 3, '2'];
 
       const result = targetType.validate(x);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError2 = Result.unwrapErrThrow(result);
+
       expect(resultError2).toStrictEqual([
         {
           path: ['0', 'x'],
@@ -158,8 +166,11 @@ describe('tuple', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = [{ x: 5, y: 10 }, 3, '2'];
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       // Note: tuple validation may create new arrays for type safety
       // so we check for structural equality rather than reference equality
       expect(resultValue1).toStrictEqual(input);

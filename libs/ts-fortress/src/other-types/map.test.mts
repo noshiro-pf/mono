@@ -27,8 +27,11 @@ test('MapType with string keys and number values', () => {
 
   // validate() test
   const result = StringNumberMap.validate(validMap);
+
   expect(Result.isOk(result)).toBe(true);
+
   const resultValue = Result.unwrapThrow(result);
+
   expect(resultValue).toBe(validMap); // Same reference
 });
 
@@ -46,8 +49,11 @@ test('MapType with invalid key types', () => {
 
   // validate() test
   const result = StringNumberMap.validate(invalidMap);
+
   expect(Result.isErr(result)).toBe(true);
+
   const resultError = Result.unwrapErrThrow(result);
+
   expect(resultError.length).toBeGreaterThan(0);
   expect(resultError[0]?.message).toContain('key of the Map');
 });
@@ -66,8 +72,11 @@ test('MapType with invalid value types', () => {
 
   // validate() test
   const result = StringNumberMap.validate(invalidMap);
+
   expect(Result.isErr(result)).toBe(true);
+
   const resultError1 = Result.unwrapErrThrow(result);
+
   expect(resultError1.length).toBeGreaterThan(0);
   expect(resultError1[0]?.message).toContain('value of the Map');
 });
@@ -81,6 +90,7 @@ test('MapType fill() method', () => {
     ['b', 2],
   ]);
   const filled1 = StringNumberMap.fill(validMap);
+
   expect(filled1.size).toBe(2);
   expect(filled1.get('a')).toBe(1);
   expect(filled1.get('b')).toBe(2);
@@ -93,12 +103,14 @@ test('MapType fill() method', () => {
     ['good', 3],
   ]);
   const filled2 = StringNumberMap.fill(mixedMap);
+
   expect(filled2.size).toBe(2);
   expect(filled2.get('valid')).toBe(1);
   expect(filled2.get('good')).toBe(3);
 
   // Non-map input - should return default (empty map)
   const filled3 = StringNumberMap.fill({});
+
   expect(filled3.size).toBe(0);
   expect(filled3).toStrictEqual(new Map());
 });
@@ -109,6 +121,7 @@ test('MapType cast() method', () => {
   // Valid map
   const validMap = new Map([['key', 42]]);
   const casted = StringNumberMap.cast(validMap);
+
   expect(casted).toBe(validMap);
 
   // Invalid input - should throw
@@ -126,6 +139,7 @@ test('MapType assertIs() method', () => {
 
   // Valid map - should not throw
   const validMap = new Map([['key', 42]]);
+
   expect(() => {
     assertIsStringNumberMap(validMap);
   }).not.toThrow();
@@ -145,8 +159,11 @@ test('MapType with custom typeName', () => {
 
   // Error message should include custom type name
   const result = CustomMap.validate('not a map');
+
   expect(Result.isErr(result)).toBe(true);
+
   const resultError2 = Result.unwrapErrThrow(result);
+
   expect(resultError2[0]?.typeName).toBe('CustomStringNumberMap');
 });
 
@@ -166,6 +183,7 @@ test('MapType with number keys and string values', () => {
   expect(NumberStringMap.is(validMap)).toBe(true);
 
   const result = NumberStringMap.validate(validMap);
+
   expect(Result.isOk(result)).toBe(true);
 });
 

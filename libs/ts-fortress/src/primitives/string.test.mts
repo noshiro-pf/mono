@@ -4,15 +4,17 @@ import { expectType, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import { string } from './string.mjs';
 
-describe('string', () => {
+describe(string, () => {
   describe('default value', () => {
     test('without explicit default value', () => {
       const strDefault = string();
+
       expect(strDefault.defaultValue).toBe('');
     });
 
     test('with explicit default value', () => {
       const strCustom = string('hello');
+
       expect(strCustom.defaultValue).toBe('hello');
     });
   });
@@ -72,6 +74,7 @@ describe('string', () => {
 
     test('valid string', () => {
       const value: unknown = 'hello';
+
       expect(() => {
         assertIs(value);
       }).not.toThrow();
@@ -79,6 +82,7 @@ describe('string', () => {
 
     test('invalid value throws', () => {
       const value: unknown = 42;
+
       expect(() => {
         assertIs(value);
       }).toThrow(/Expected <string>/u);
@@ -89,11 +93,13 @@ describe('string', () => {
     test('valid string returns as is', () => {
       const value: unknown = 'hello';
       const result = str.cast(value);
+
       expect(result).toBe('hello');
     });
 
     test('invalid value throws error', () => {
       const value: unknown = 42;
+
       expect(() => str.cast(value)).toThrow(
         'Expected <string>, got <number> type value `42`.',
       );
@@ -102,6 +108,7 @@ describe('string', () => {
     test('throws error with type mismatch', () => {
       const strWithDefault = string('default');
       const value: unknown = 42;
+
       expect(() => strWithDefault.cast(value)).toThrow(
         'Expected <string>, got <number> type value `42`.',
       );
@@ -112,24 +119,28 @@ describe('string', () => {
     test('valid string returns as is', () => {
       const value: unknown = 'hello';
       const result = str.fill(value);
+
       expect(result).toBe('hello');
     });
 
     test('undefined returns default', () => {
       const value: unknown = undefined;
       const result = str.fill(value);
+
       expect(result).toBe('');
     });
 
     test('null returns default', () => {
       const value: unknown = null;
       const result = str.fill(value);
+
       expect(result).toBe('');
     });
 
     test('invalid value returns default', () => {
       const value: unknown = 42;
       const result = str.fill(value);
+
       expect(result).toBe('');
     });
 
@@ -137,6 +148,7 @@ describe('string', () => {
       const strWithDefault = string('default');
       const value: unknown = 42;
       const result = strWithDefault.fill(value);
+
       expect(result).toBe('default');
     });
   });
@@ -147,7 +159,9 @@ describe('string', () => {
       const result = str.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe('hello');
     });
 
@@ -156,7 +170,9 @@ describe('string', () => {
       const result = str.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe('');
     });
 
@@ -165,7 +181,9 @@ describe('string', () => {
       const result = str.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
+
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -180,8 +198,11 @@ describe('string', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = 'hello world';
       const result = str.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue2 = Result.unwrapThrow(result);
+
       expect(resultValue2).toBe(input); // ✅ same reference
     });
   });
@@ -377,6 +398,7 @@ describe('string with constraints', () => {
 
     test('rejects invalid default value', () => {
       const numeric = /^\d+$/u;
+
       expect(() => string('abc', { regex: numeric })).toThrow(
         String.raw`regex = ^\d+$`,
       );
@@ -525,6 +547,7 @@ describe('string with constraints', () => {
 
       test('rejects invalid default value', () => {
         const slug = /^[a-z-]+$/u;
+
         expect(() =>
           string('featureFLAG', { includes: 'feature', regex: slug }),
         ).toThrow('regex = ^[a-z-]+$');
@@ -550,6 +573,7 @@ describe('string with constraints', () => {
 
       test('rejects invalid default value', () => {
         const digits = /^[0-9]+$/u;
+
         expect(() =>
           // @ts-expect-error "1234567" violates maxLength = 6
           string('1234567', {

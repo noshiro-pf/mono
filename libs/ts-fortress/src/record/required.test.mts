@@ -9,7 +9,7 @@ import { optional, type OptionalPropertyType } from './optional.mjs';
 import { record } from './record.mjs';
 import { required, type RequiredType } from './required.mjs';
 
-describe('required', () => {
+describe(required, () => {
   describe('fully required', () => {
     const ymdBase = record({
       year: optional(number(1900)),
@@ -119,9 +119,11 @@ describe('required', () => {
 
         const result = ymd.validate(x);
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue = Result.unwrapThrow(result);
+
         expect(resultValue).toStrictEqual({
           year: 2000,
           month: 12,
@@ -136,8 +138,11 @@ describe('required', () => {
           date: 25,
         };
         const result = ymd.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue1 = Result.unwrapThrow(result);
+
         expect(resultValue1).toBe(input); // ✅ same reference
       });
 
@@ -149,9 +154,11 @@ describe('required', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError = Result.unwrapErrThrow(result);
+
         expect(resultError).toStrictEqual([
           {
             path: ['date'],
@@ -177,9 +184,11 @@ describe('required', () => {
 
         const result = ymd.validate(x);
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue2 = Result.unwrapThrow(result);
+
         expect(resultValue2).toStrictEqual({
           year: 2000,
           month: 12,
@@ -196,8 +205,11 @@ describe('required', () => {
           aaa: 999,
         };
         const result = ymd.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue3 = Result.unwrapThrow(result);
+
         expect(resultValue3).toBe(input); // ✅ same reference
       });
 
@@ -209,9 +221,11 @@ describe('required', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError1 = Result.unwrapErrThrow(result);
+
         expect(resultError1).toStrictEqual([
           {
             path: ['month'],
@@ -242,9 +256,11 @@ describe('required', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError2 = Result.unwrapErrThrow(result);
+
         expect(resultError2).toStrictEqual([
           {
             path: ['month'],
@@ -419,9 +435,11 @@ describe('required', () => {
 
         const result = ymd.validate(x);
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue4 = Result.unwrapThrow(result);
+
         expect(resultValue4).toStrictEqual({
           year: 2000,
           month: 12,
@@ -434,8 +452,11 @@ describe('required', () => {
           month: 12,
         };
         const result = ymd.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue5 = Result.unwrapThrow(result);
+
         expect(resultValue5).toBe(input); // ✅ same reference
       });
 
@@ -447,9 +468,11 @@ describe('required', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue6 = Result.unwrapThrow(result);
+
         expect(resultValue6).toStrictEqual({
           year: 2000,
           month: 12,
@@ -465,9 +488,11 @@ describe('required', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError3 = Result.unwrapErrThrow(result);
+
         expect(resultError3).toStrictEqual([
           {
             path: ['month'],
@@ -492,9 +517,11 @@ describe('required', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError4 = Result.unwrapErrThrow(result);
+
         expect(resultError4).toStrictEqual([
           {
             path: ['month'],

@@ -3,7 +3,7 @@ import { type Type, type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { bigint } from './bigint.mjs';
 
-describe('bigint', () => {
+describe(bigint, () => {
   const targetType = bigint(0n);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -41,17 +41,21 @@ describe('bigint', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(456n);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(456n);
     });
 
     test('falsy case', () => {
       const result = targetType.validate(123);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -70,8 +74,11 @@ describe('bigint', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = 999n;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
@@ -81,6 +88,7 @@ describe('bigint', () => {
       const x: unknown = 789n;
 
       const assertIs: (a: unknown) => asserts a is bigint = targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).not.toThrow();
@@ -90,6 +98,7 @@ describe('bigint', () => {
       const x: unknown = 'not a bigint';
 
       const assertIs: (a: unknown) => asserts a is bigint = targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).toThrow('Expected');

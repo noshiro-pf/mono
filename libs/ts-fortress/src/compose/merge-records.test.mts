@@ -8,7 +8,7 @@ import {
 } from '../utils/index.mjs';
 import { mergeRecords } from './merge-records.mjs';
 
-describe('mergeRecords', () => {
+describe(mergeRecords, () => {
   // @ts-expect-error should pass record type
   mergeRecords([record({ x: number(), y: number() }), number()]);
 
@@ -75,25 +75,32 @@ describe('mergeRecords', () => {
       expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
         '=',
       );
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toStrictEqual({ x: 0, y: 1, z: 2, w: 3 });
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = { x: 0, y: 1, z: 2, w: 3 };
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case', () => {
       const result = targetType.validate({ x: 0, y: 1 });
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],

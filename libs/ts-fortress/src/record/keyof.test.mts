@@ -5,7 +5,7 @@ import { validationErrorsToMessages } from '../utils/index.mjs';
 import { keyof } from './keyof.mjs';
 import { record } from './record.mjs';
 
-describe('keyof', () => {
+describe(keyof, () => {
   const ymdKey = keyof(
     record({
       year: number(1900),
@@ -53,18 +53,23 @@ describe('keyof', () => {
       const x: unknown = 'year';
 
       const result = ymdKey.validate(x);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
       expectType<typeof resultValue, Ymd>('=');
+
       expect(resultValue).toBe('year');
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 'year';
       const result = ymdKey.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
@@ -72,9 +77,11 @@ describe('keyof', () => {
       const x: unknown = 'minutes';
 
       const result = ymdKey.validate(x);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],

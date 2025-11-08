@@ -3,7 +3,7 @@ import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { int32 } from './int32.mjs';
 
-describe('int32', () => {
+describe(int32, () => {
   const targetType = int32(asInt32(0));
 
   type TargetType = TypeOf<typeof targetType>;
@@ -25,7 +25,9 @@ describe('int32', () => {
       }
 
       expect(isTarget).toBe(true);
+
       assert(isNumber(x));
+
       expect(isInt32(x)).toBe(true);
     });
 
@@ -53,25 +55,32 @@ describe('int32', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(-1_000_000);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(-1_000_000);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 1_000_000;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - out of range', () => {
       const result = targetType.validate(3_000_000_000);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],

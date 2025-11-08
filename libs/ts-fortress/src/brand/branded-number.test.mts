@@ -42,24 +42,31 @@ describe('simpleBrandedNumber', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 42;
         const result = userIdType.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue = Result.unwrapThrow(result);
+
         expect(resultValue).toBe(input); // ✅ same reference
       });
 
       test('succeeds for valid numbers', () => {
         const result = userIdType.validate(42);
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue1 = Result.unwrapThrow(result);
+
         expect(resultValue1).toBe(42);
       });
 
       test('fails for non-numbers', () => {
         const result = userIdType.validate('not a number');
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError = Result.unwrapErrThrow(result);
+
         expect(resultError).toStrictEqual([
           {
             path: [],
@@ -115,24 +122,31 @@ describe('simpleBrandedNumber', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 85;
         const result = scoreType.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue2 = Result.unwrapThrow(result);
+
         expect(resultValue2).toBe(input); // ✅ same reference
       });
 
       test('succeeds for valid numbers', () => {
         const result = scoreType.validate(85);
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue3 = Result.unwrapThrow(result);
+
         expect(resultValue3).toBe(85);
       });
 
       test('fails for non-numbers', () => {
         const result = scoreType.validate('invalid');
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError1 = Result.unwrapErrThrow(result);
+
         expect(resultError1).toStrictEqual([
           {
             path: [],

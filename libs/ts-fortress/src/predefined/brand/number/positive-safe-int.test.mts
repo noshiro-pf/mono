@@ -3,7 +3,7 @@ import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { positiveSafeInt } from './positive-safe-int.mjs';
 
-describe('positiveSafeInt', () => {
+describe(positiveSafeInt, () => {
   const targetType = positiveSafeInt(1);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -25,7 +25,9 @@ describe('positiveSafeInt', () => {
       }
 
       expect(isTarget).toBe(true);
+
       assert(isNumber(x));
+
       expect(isPositiveSafeInt(x)).toBe(true);
     });
 
@@ -63,25 +65,32 @@ describe('positiveSafeInt', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(789_012);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(789_012);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123_456;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - zero', () => {
       const result = targetType.validate(0);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],

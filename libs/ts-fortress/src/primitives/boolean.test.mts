@@ -3,7 +3,7 @@ import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { boolean } from './boolean.mjs';
 
-describe('boolean', () => {
+describe(boolean, () => {
   const targetType = boolean(false);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -41,17 +41,21 @@ describe('boolean', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(true);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(true);
     });
 
     test('falsy case', () => {
       const result = targetType.validate('not a boolean');
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -70,8 +74,11 @@ describe('boolean', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = false;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
@@ -82,6 +89,7 @@ describe('boolean', () => {
 
       const assertIs: (a: unknown) => asserts a is boolean =
         targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).not.toThrow();
@@ -92,6 +100,7 @@ describe('boolean', () => {
 
       const assertIs: (a: unknown) => asserts a is boolean =
         targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).toThrow('Expected');

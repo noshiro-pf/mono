@@ -7,7 +7,7 @@ import {
 } from '../utils/index.mjs';
 import { array } from './array.mjs';
 
-describe('array', () => {
+describe(array, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
       expect(array(number()).defaultValue).toStrictEqual([]);
@@ -66,9 +66,11 @@ describe('array', () => {
 
       const result = xs.validate(ys);
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toStrictEqual([1, 2, 3]);
     });
 
@@ -76,10 +78,13 @@ describe('array', () => {
       const ys: unknown = ['1', '', 3];
 
       expect(xs.is(ys)).toBe(false);
+
       const result = xs.validate(ys);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       // Test that we have structured ValidationError objects
       expect(resultError).toStrictEqual([
         {
@@ -108,8 +113,11 @@ describe('array', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = [10, 20, 30];
       const result = xs.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });

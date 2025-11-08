@@ -4,7 +4,7 @@ import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { record, strictRecord } from './record.mjs';
 
-describe('strictRecord', () => {
+describe(strictRecord, () => {
   const userType = strictRecord({
     name: string(),
     age: number(),
@@ -38,10 +38,12 @@ describe('strictRecord', () => {
       const validUser = { name: 'John', age: 30 };
 
       const result = userType.validate(validUser);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
       expectType<typeof resultValue, User>('=');
+
       expect(resultValue).toStrictEqual({
         name: 'John',
         age: 30,
@@ -51,8 +53,11 @@ describe('strictRecord', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = { name: 'John', age: 30 };
       const result = userType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
@@ -60,9 +65,11 @@ describe('strictRecord', () => {
       const userWithExtra = { name: 'John', age: 30, extra: 'not allowed' };
 
       const result = userType.validate(userWithExtra);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: ['extra'],
@@ -81,9 +88,11 @@ describe('strictRecord', () => {
       const invalidUser = { name: 'John', age: 'thirty' };
 
       const result = userType.validate(invalidUser);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError1 = Result.unwrapErrThrow(result);
+
       expect(resultError1).toStrictEqual([
         {
           path: ['age'],
@@ -99,9 +108,11 @@ describe('strictRecord', () => {
       const incompleteUser = { name: 'John' };
 
       const result = userType.validate(incompleteUser);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError2 = Result.unwrapErrThrow(result);
+
       expect(resultError2).toStrictEqual([
         {
           path: ['age'],
@@ -154,9 +165,11 @@ describe('strictRecord', () => {
         age: 30,
         extra: 'not allowed',
       });
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError3 = Result.unwrapErrThrow(result);
+
       expect(resultError3[0]?.expectedType).toBe('User');
       expect(resultError3[0]?.typeName).toBe('User');
     });
@@ -176,6 +189,7 @@ describe('strictRecord', () => {
       const partialData = { name: 'John' };
 
       const result = userType.fill(partialData);
+
       expect(result).toStrictEqual({
         name: 'John',
         age: 0,
@@ -186,6 +200,7 @@ describe('strictRecord', () => {
       const validData = { name: 'John', age: 30 };
 
       const result = userType.fill(validData);
+
       expect(result).toStrictEqual({
         name: 'John',
         age: 30,

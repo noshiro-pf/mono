@@ -3,7 +3,7 @@ import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { literal } from './literal.mjs';
 
-describe('literal', () => {
+describe(literal, () => {
   describe('string', () => {
     const hello = literal('hello');
     type Hello = TypeOf<typeof hello>;
@@ -94,7 +94,9 @@ describe('literal', () => {
         const result = hello.validate(value);
 
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue = Result.unwrapThrow(result);
+
         expect(resultValue).toBe('hello');
       });
 
@@ -103,7 +105,9 @@ describe('literal', () => {
         const result = hello.validate(value);
 
         expect(Result.isErr(result)).toBe(true);
+
         const resultError = Result.unwrapErrThrow(result);
+
         expect(resultError).toStrictEqual([
           {
             path: [],
@@ -118,8 +122,11 @@ describe('literal', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 'hello';
         const result = hello.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue1 = Result.unwrapThrow(result);
+
         expect(resultValue1).toBe(input); // ✅ same reference
       });
     });
@@ -128,11 +135,13 @@ describe('literal', () => {
       test('valid literal returns as is', () => {
         const value: unknown = 'hello';
         const result = hello.cast(value);
+
         expect(result).toBe('hello');
       });
 
       test('invalid value throws error', () => {
         const value: unknown = 'world';
+
         expect(() => hello.cast(value)).toThrow(
           'Expected <literal("hello")>, got <string> type value "world".',
         );
@@ -143,18 +152,21 @@ describe('literal', () => {
       test('valid literal returns as is', () => {
         const value: unknown = 'hello';
         const result = hello.fill(value);
+
         expect(result).toBe('hello');
       });
 
       test('undefined returns default (the literal itself)', () => {
         const value: unknown = undefined;
         const result = hello.fill(value);
+
         expect(result).toBe('hello');
       });
 
       test('different value returns default', () => {
         const value: unknown = 'world';
         const result = hello.fill(value);
+
         expect(result).toBe('hello');
       });
     });
@@ -241,7 +253,9 @@ describe('literal', () => {
         const result = literal42.validate(value);
 
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue2 = Result.unwrapThrow(result);
+
         expect(resultValue2).toBe(42);
       });
 
@@ -250,7 +264,9 @@ describe('literal', () => {
         const result = literal42.validate(value);
 
         expect(Result.isErr(result)).toBe(true);
+
         const resultError1 = Result.unwrapErrThrow(result);
+
         expect(resultError1).toStrictEqual([
           {
             path: [],
@@ -265,8 +281,11 @@ describe('literal', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 42;
         const result = literal42.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue3 = Result.unwrapThrow(result);
+
         expect(resultValue3).toBe(input); // ✅ same reference
       });
     });
@@ -320,17 +339,21 @@ describe('literal', () => {
     describe('validate', () => {
       test('truthy case', () => {
         const result = targetType.validate(42n);
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue4 = Result.unwrapThrow(result);
+
         expect(resultValue4).toBe(42n);
       });
 
       test('falsy case - different bigint', () => {
         const result = targetType.validate(99n);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError2 = Result.unwrapErrThrow(result);
+
         expect(resultError2).toStrictEqual([
           {
             path: [],
@@ -348,9 +371,11 @@ describe('literal', () => {
 
       test('falsy case - non-bigint', () => {
         const result = targetType.validate('not a bigint');
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError3 = Result.unwrapErrThrow(result);
+
         expect(resultError3).toStrictEqual([
           {
             path: [],
@@ -369,8 +394,11 @@ describe('literal', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 42n;
         const result = targetType.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue5 = Result.unwrapThrow(result);
+
         expect(resultValue5).toBe(input); // ✅ same reference
       });
     });
@@ -453,17 +481,21 @@ describe('literal', () => {
       describe('validate', () => {
         test('truthy case', () => {
           const result = targetType.validate(true);
+
           expect(Result.isOk(result)).toBe(true);
 
           const resultValue6 = Result.unwrapThrow(result);
+
           expect(resultValue6).toBe(true);
         });
 
         test('falsy case - different boolean', () => {
           const result = targetType.validate(false);
+
           expect(Result.isErr(result)).toBe(true);
 
           const resultError4 = Result.unwrapErrThrow(result);
+
           expect(resultError4).toStrictEqual([
             {
               path: [],
@@ -481,9 +513,11 @@ describe('literal', () => {
 
         test('falsy case - non-boolean', () => {
           const result = targetType.validate('not a boolean');
+
           expect(Result.isErr(result)).toBe(true);
 
           const resultError5 = Result.unwrapErrThrow(result);
+
           expect(resultError5).toStrictEqual([
             {
               path: [],
@@ -502,8 +536,11 @@ describe('literal', () => {
         test('validate returns input as-is for OK cases', () => {
           const input = true;
           const result = targetType.validate(input);
+
           expect(Result.isOk(result)).toBe(true);
+
           const resultValue7 = Result.unwrapThrow(result);
+
           expect(resultValue7).toBe(input); // ✅ same reference
         });
       });
@@ -565,17 +602,21 @@ describe('literal', () => {
       describe('validate', () => {
         test('truthy case', () => {
           const result = targetType.validate(false);
+
           expect(Result.isOk(result)).toBe(true);
 
           const resultValue8 = Result.unwrapThrow(result);
+
           expect(resultValue8).toBe(false);
         });
 
         test('falsy case - different boolean', () => {
           const result = targetType.validate(true);
+
           expect(Result.isErr(result)).toBe(true);
 
           const resultError6 = Result.unwrapErrThrow(result);
+
           expect(resultError6).toStrictEqual([
             {
               path: [],
@@ -594,8 +635,11 @@ describe('literal', () => {
         test('validate returns input as-is for OK cases', () => {
           const input = false;
           const result = targetType.validate(input);
+
           expect(Result.isOk(result)).toBe(true);
+
           const resultValue9 = Result.unwrapThrow(result);
+
           expect(resultValue9).toBe(input); // ✅ same reference
         });
       });

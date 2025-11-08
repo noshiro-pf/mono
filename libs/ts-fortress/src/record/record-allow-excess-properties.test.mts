@@ -35,9 +35,11 @@ describe('record allowExcessProperties option', () => {
     expect(strictRecord.is(dataWithExcess)).toBe(false);
 
     const result = strictRecord.validate(dataWithExcess);
+
     expect(Result.isErr(result)).toBe(true);
 
     const resultError = Result.unwrapErrThrow(result);
+
     expect(resultError).toStrictEqual([
       {
         path: ['extra'],
@@ -62,9 +64,11 @@ describe('record allowExcessProperties option', () => {
     expect(strictRecord.is(validData)).toBe(true);
 
     const result = strictRecord.validate(validData);
+
     expect(Result.isOk(result)).toBe(true);
 
     const resultValue = Result.unwrapThrow(result);
+
     expect(resultValue).toStrictEqual({
       name: 42,
       age: 25,
@@ -74,8 +78,11 @@ describe('record allowExcessProperties option', () => {
   test('strictRecord validate returns input as-is for OK cases', () => {
     const input = { name: 42, age: 25 };
     const result = strictRecord.validate(input);
+
     expect(Result.isOk(result)).toBe(true);
+
     const resultValue1 = Result.unwrapThrow(result);
+
     expect(resultValue1).toBe(input); // ✅ same reference
   });
 
@@ -89,9 +96,11 @@ describe('record allowExcessProperties option', () => {
     expect(permissiveRecord.is(dataWithExcess)).toBe(true);
 
     const result = permissiveRecord.validate(dataWithExcess);
+
     expect(Result.isOk(result)).toBe(true);
 
     const resultValue2 = Result.unwrapThrow(result);
+
     expect(resultValue2).toStrictEqual({
       name: 42,
       age: 25,
@@ -102,8 +111,11 @@ describe('record allowExcessProperties option', () => {
   test('permissiveRecord validate returns input as-is for OK cases', () => {
     const input = { name: 42, age: 25, extra: 'allowed' };
     const result = permissiveRecord.validate(input);
+
     expect(Result.isOk(result)).toBe(true);
+
     const resultValue3 = Result.unwrapThrow(result);
+
     expect(resultValue3).toBe(input); // ✅ same reference
   });
 
@@ -117,9 +129,11 @@ describe('record allowExcessProperties option', () => {
     expect(defaultRecord.is(dataWithExcess)).toBe(true);
 
     const result = defaultRecord.validate(dataWithExcess);
+
     expect(Result.isOk(result)).toBe(true);
 
     const resultValue4 = Result.unwrapThrow(result);
+
     expect(resultValue4).toStrictEqual({
       name: 42,
       age: 25,
@@ -130,8 +144,11 @@ describe('record allowExcessProperties option', () => {
   test('defaultRecord validate returns input as-is for OK cases', () => {
     const input = { name: 42, age: 25, extra: 'allowed by default' };
     const result = defaultRecord.validate(input);
+
     expect(Result.isOk(result)).toBe(true);
+
     const resultValue5 = Result.unwrapThrow(result);
+
     expect(resultValue5).toBe(input); // ✅ same reference
   });
 
@@ -144,9 +161,11 @@ describe('record allowExcessProperties option', () => {
     };
 
     const result = strictRecord.validate(dataWithMultipleExcess);
+
     expect(Result.isErr(result)).toBe(true);
 
     const resultError1 = Result.unwrapErrThrow(result);
+
     expect(resultError1).toHaveLength(2);
     expect(resultError1).toStrictEqual([
       {
@@ -174,9 +193,11 @@ describe('record allowExcessProperties option', () => {
     };
 
     const result = strictRecord.validate(invalidData);
+
     expect(Result.isErr(result)).toBe(true);
 
     const resultError2 = Result.unwrapErrThrow(result);
+
     expect(resultError2).toHaveLength(2);
     // First error: invalid type for 'name'
     expect(resultError2[0]).toStrictEqual({

@@ -3,7 +3,7 @@ import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { int } from './int.mjs';
 
-describe('int', () => {
+describe(int, () => {
   const targetType = int(0);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -53,17 +53,21 @@ describe('int', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(42);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(42);
     });
 
     test('falsy case - float', () => {
       const result = targetType.validate(42.5);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -81,9 +85,11 @@ describe('int', () => {
 
     test('falsy case - string', () => {
       const result = targetType.validate('not a number');
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError1 = Result.unwrapErrThrow(result);
+
       expect(resultError1).toStrictEqual([
         {
           path: [],
@@ -102,8 +108,11 @@ describe('int', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = 123;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
@@ -114,6 +123,7 @@ describe('int', () => {
 
       const assertIs: (a: unknown) => asserts a is TargetType =
         targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).not.toThrow();
@@ -124,6 +134,7 @@ describe('int', () => {
 
       const assertIs: (a: unknown) => asserts a is TargetType =
         targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).toThrow('Expected <Int>');

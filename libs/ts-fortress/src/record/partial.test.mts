@@ -9,7 +9,7 @@ import { optional, type OptionalPropertyType } from './optional.mjs';
 import { partial, type PartialType } from './partial.mjs';
 import { record } from './record.mjs';
 
-describe('partial', () => {
+describe(partial, () => {
   describe('fully partial', () => {
     const ymdBase = record({
       year: number(1900),
@@ -103,9 +103,11 @@ describe('partial', () => {
 
         const result = ymd.validate(x);
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue = Result.unwrapThrow(result);
+
         expect(resultValue).toStrictEqual({
           year: 2000,
           month: 12,
@@ -120,8 +122,11 @@ describe('partial', () => {
           date: 25,
         };
         const result = ymd.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue1 = Result.unwrapThrow(result);
+
         expect(resultValue1).toBe(input); // ✅ same reference
       });
 
@@ -130,17 +135,22 @@ describe('partial', () => {
 
         const result = ymd.validate(x);
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue2 = Result.unwrapThrow(result);
+
         expect(resultValue2).toStrictEqual({});
       });
 
       test('validate returns input as-is for empty object', () => {
         const input: UnknownRecord = {};
         const result = ymd.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue3 = Result.unwrapThrow(result);
+
         expect(resultValue3).toBe(input); // ✅ same reference
       });
 
@@ -154,9 +164,11 @@ describe('partial', () => {
 
         const result = ymd.validate(x);
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue4 = Result.unwrapThrow(result);
+
         expect(resultValue4).toStrictEqual({
           year: 2000,
           month: 12,
@@ -173,8 +185,11 @@ describe('partial', () => {
           aaa: 999,
         };
         const result = ymd.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue5 = Result.unwrapThrow(result);
+
         expect(resultValue5).toBe(input); // ✅ same reference
       });
 
@@ -186,9 +201,11 @@ describe('partial', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError = Result.unwrapErrThrow(result);
+
         expect(resultError).toStrictEqual([
           {
             path: ['month'],
@@ -218,9 +235,11 @@ describe('partial', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError1 = Result.unwrapErrThrow(result);
+
         expect(resultError1).toStrictEqual([
           {
             path: ['month'],
@@ -361,9 +380,11 @@ describe('partial', () => {
 
         const result = ymd.validate(x);
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue6 = Result.unwrapThrow(result);
+
         expect(resultValue6).toStrictEqual({
           year: 2000,
           month: 12,
@@ -376,8 +397,11 @@ describe('partial', () => {
           month: 12,
         };
         const result = ymd.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue7 = Result.unwrapThrow(result);
+
         expect(resultValue7).toBe(input); // ✅ same reference
       });
 
@@ -389,9 +413,11 @@ describe('partial', () => {
         };
 
         const result = ymd.validate(x);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError2 = Result.unwrapErrThrow(result);
+
         expect(resultError2).toStrictEqual([
           {
             path: ['month'],

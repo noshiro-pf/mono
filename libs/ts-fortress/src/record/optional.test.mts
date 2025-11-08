@@ -6,7 +6,7 @@ import {
   type OptionalPropertyType,
 } from './optional.mjs';
 
-describe('optional', () => {
+describe(optional, () => {
   const numberType = number(42);
   const optionalNumber = optional(numberType);
 
@@ -28,7 +28,7 @@ describe('optional', () => {
     });
   });
 
-  describe('isOptionalProperty', () => {
+  describe(isOptionalProperty, () => {
     test('returns true for optional property', () => {
       expect(isOptionalProperty(optionalNumber)).toBe(true);
     });

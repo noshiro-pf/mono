@@ -9,7 +9,7 @@ import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { uint16 } from './uint16.mjs';
 
-describe('uint16', () => {
+describe(uint16, () => {
   const targetType = uint16(asUint16(0));
 
   type TargetType = TypeOf<typeof targetType>;
@@ -31,7 +31,9 @@ describe('uint16', () => {
       }
 
       expect(isTarget).toBe(true);
+
       assert(isNumber(x));
+
       expect(isUint16(x)).toBe(true);
     });
 
@@ -71,25 +73,32 @@ describe('uint16', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(50_000);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(50_000);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 30_000;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - negative', () => {
       const result = targetType.validate(-5);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],

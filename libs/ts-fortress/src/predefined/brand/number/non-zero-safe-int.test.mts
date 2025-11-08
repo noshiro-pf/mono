@@ -3,7 +3,7 @@ import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { nonZeroSafeInt } from './non-zero-safe-int.mjs';
 
-describe('nonZeroSafeInt', () => {
+describe(nonZeroSafeInt, () => {
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const targetType = nonZeroSafeInt(1 as NonZeroSafeInt);
 
@@ -26,7 +26,9 @@ describe('nonZeroSafeInt', () => {
       }
 
       expect(isTarget).toBe(true);
+
       assert(isNumber(x));
+
       expect(isNonZeroSafeInt(x)).toBe(true);
     });
 
@@ -66,25 +68,32 @@ describe('nonZeroSafeInt', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(-789_012);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(-789_012);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - zero', () => {
       const result = targetType.validate(0);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],

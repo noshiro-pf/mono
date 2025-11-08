@@ -123,9 +123,11 @@ describe('nested record', () => {
       };
 
       const result = nestedRecord.validate(x);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: ['xs', '1'],
@@ -385,6 +387,7 @@ describe('advanced type', () => {
     };
 
     const result = AdvancedNodeType.validate(invalid);
+
     expect(Result.isErr(result)).toBe(true);
 
     if (!Result.isErr(result)) {

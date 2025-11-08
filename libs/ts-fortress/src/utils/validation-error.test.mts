@@ -8,7 +8,7 @@ import {
 } from './validation-error.mjs';
 
 describe('validation-error', () => {
-  describe('createPrimitiveValidationError', () => {
+  describe(createPrimitiveValidationError, () => {
     test('creates primitive validation error', () => {
       const error = createPrimitiveValidationError({
         actualValue: 123,
@@ -17,6 +17,7 @@ describe('validation-error', () => {
       });
 
       expectType<typeof error, ValidationError>('=');
+
       expect(error).toStrictEqual({
         path: [],
         actualValue: 123,
@@ -27,7 +28,7 @@ describe('validation-error', () => {
     });
   });
 
-  describe('prependPathToValidationErrors', () => {
+  describe(prependPathToValidationErrors, () => {
     test('prepends key to validation errors', () => {
       const errors: readonly ValidationError[] = [
         {
@@ -68,11 +69,12 @@ describe('validation-error', () => {
 
     test('handles empty errors array', () => {
       const result = prependPathToValidationErrors([], 'key');
+
       expect(result).toStrictEqual([]);
     });
   });
 
-  describe('prependIndexToValidationErrors', () => {
+  describe(prependIndexToValidationErrors, () => {
     test('prepends index to validation errors', () => {
       const errors: readonly ValidationError[] = [
         {
@@ -113,11 +115,12 @@ describe('validation-error', () => {
 
     test('handles empty errors array', () => {
       const result = prependIndexToValidationErrors([], 0);
+
       expect(result).toStrictEqual([]);
     });
   });
 
-  describe('validationErrorsToMessages', () => {
+  describe(validationErrorsToMessages, () => {
     test('converts validation errors to messages', () => {
       const errors: readonly ValidationError[] = [
         {

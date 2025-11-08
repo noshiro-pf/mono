@@ -7,7 +7,7 @@ import {
 } from '../utils/index.mjs';
 import { arrayOfLength } from './array-of-length.mjs';
 
-describe('arrayOfLength', () => {
+describe(arrayOfLength, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
       expect(arrayOfLength(3, number()).defaultValue).toStrictEqual([0, 0, 0]);
@@ -82,17 +82,22 @@ describe('arrayOfLength', () => {
 
       const result = xs.validate(ys);
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toStrictEqual([5, 6, 7, 8]);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = [5, 6, 7, 8];
       const result = xs.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
@@ -100,9 +105,11 @@ describe('arrayOfLength', () => {
       const ys: unknown = [];
 
       const result = xs.validate(ys);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -122,9 +129,11 @@ describe('arrayOfLength', () => {
       const ys: unknown = [0, '1', '', 3];
 
       const result = xs.validate(ys);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError1 = Result.unwrapErrThrow(result);
+
       expect(resultError1).toStrictEqual([
         {
           path: ['1'],

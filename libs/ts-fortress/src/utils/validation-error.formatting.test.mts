@@ -12,6 +12,7 @@ describe('validation-error formatting details', () => {
       },
       20,
     );
+
     expect(msg).toBe('Oops at a.b');
   });
 
@@ -27,6 +28,7 @@ describe('validation-error formatting details', () => {
       },
       10,
     );
+
     expect(msg).toBe('Expected <string>, got <string> type value.');
   });
 
@@ -42,6 +44,7 @@ describe('validation-error formatting details', () => {
       },
       5,
     );
+
     expect(msg).toBe('Expected <number> at p, got <number> type value.');
   });
 });

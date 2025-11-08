@@ -6,7 +6,7 @@ import {
 } from '../utils/index.mjs';
 import { uintRange } from './uint-range.mjs';
 
-describe('uintRange', () => {
+describe(uintRange, () => {
   const month = uintRange({
     start: 1,
     end: 13,
@@ -50,25 +50,32 @@ describe('uintRange', () => {
     test('truthy case', () => {
       const result = month.validate(5);
       expectType<typeof result, Result<Month, readonly ValidationError[]>>('=');
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(5);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 5;
       const result = month.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case', () => {
       const result = month.validate(13);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError[0]).toStrictEqual({
         path: [],
         actualValue: 13,

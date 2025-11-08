@@ -43,24 +43,31 @@ describe('simpleBrandedString', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 'john_doe';
         const result = userNameType.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue = Result.unwrapThrow(result);
+
         expect(resultValue).toBe(input); // ✅ same reference
       });
 
       test('succeeds for valid strings', () => {
         const result = userNameType.validate('john_doe');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue1 = Result.unwrapThrow(result);
+
         expect(resultValue1).toBe('john_doe');
       });
 
       test('fails for non-strings', () => {
         const result = userNameType.validate(42);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError = Result.unwrapErrThrow(result);
+
         expect(resultError).toStrictEqual([
           {
             path: [],
@@ -116,24 +123,31 @@ describe('simpleBrandedString', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 'technology';
         const result = categoryType.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue2 = Result.unwrapThrow(result);
+
         expect(resultValue2).toBe(input); // ✅ same reference
       });
 
       test('succeeds for valid strings', () => {
         const result = categoryType.validate('technology');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue3 = Result.unwrapThrow(result);
+
         expect(resultValue3).toBe('technology');
       });
 
       test('fails for non-strings', () => {
         const result = categoryType.validate(null);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError1 = Result.unwrapErrThrow(result);
+
         expect(resultError1).toStrictEqual([
           {
             path: [],

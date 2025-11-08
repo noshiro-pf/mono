@@ -70,7 +70,7 @@ const invalidSamples = [
   'foo"bar"@gmail.com',
 ] as const satisfies readonly string[];
 
-describe('email', () => {
+describe(email, () => {
   const baseType = email();
 
   type EmailType = TypeOf<typeof baseType>;

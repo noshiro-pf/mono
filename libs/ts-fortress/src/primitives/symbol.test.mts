@@ -3,7 +3,7 @@ import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { symbol } from './symbol.mjs';
 
-describe('symbol', () => {
+describe(symbol, () => {
   const defaultSym = Symbol('default');
   const targetType = symbol(defaultSym);
 
@@ -43,17 +43,21 @@ describe('symbol', () => {
     test('truthy case', () => {
       const testSym = Symbol('test');
       const result = targetType.validate(testSym);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(testSym);
     });
 
     test('falsy case', () => {
       const result = targetType.validate('not a symbol');
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -72,8 +76,11 @@ describe('symbol', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = Symbol('my-symbol');
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
@@ -83,6 +90,7 @@ describe('symbol', () => {
       const x: unknown = Symbol('test');
 
       const assertIs: (a: unknown) => asserts a is symbol = targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).not.toThrow();
@@ -92,6 +100,7 @@ describe('symbol', () => {
       const x: unknown = 'not a symbol';
 
       const assertIs: (a: unknown) => asserts a is symbol = targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).toThrow('Expected');

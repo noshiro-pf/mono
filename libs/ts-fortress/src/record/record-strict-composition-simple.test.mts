@@ -24,6 +24,7 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
 
       const result = pickedType.validate(dataWithExcess);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
@@ -32,6 +33,7 @@ describe('record strict composition - simple tests', () => {
           error.message?.includes('Excess property "extra" is not allowed') ===
           true,
       );
+
       expect(excessError).toBeDefined();
     });
 
@@ -40,9 +42,11 @@ describe('record strict composition - simple tests', () => {
       const validData = { id: '123', name: 'John' };
 
       const result = pickedType.validate(validData);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toStrictEqual({ id: '123', name: 'John' });
     });
 
@@ -50,8 +54,11 @@ describe('record strict composition - simple tests', () => {
       const pickedType = pick(strictRecord, ['id', 'name']);
       const input = { id: '123', name: 'John' };
       const result = pickedType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
@@ -64,6 +71,7 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
 
       const result = omittedType.validate(dataWithExcess);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError1 = Result.unwrapErrThrow(result);
@@ -72,6 +80,7 @@ describe('record strict composition - simple tests', () => {
           error.message?.includes('Excess property "extra" is not allowed') ===
           true,
       );
+
       expect(excessError).toBeDefined();
     });
   });
@@ -84,6 +93,7 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', extra: 'not allowed' };
 
       const result = partialType.validate(dataWithExcess);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError2 = Result.unwrapErrThrow(result);
@@ -92,6 +102,7 @@ describe('record strict composition - simple tests', () => {
           error.message?.includes('Excess property "extra" is not allowed') ===
           true,
       );
+
       expect(excessError).toBeDefined();
     });
   });
@@ -107,14 +118,18 @@ describe('record strict composition - simple tests', () => {
       const data = { id: '123', name: 'John', age: 25, extra: 'not allowed' };
 
       const result = strictRecord.validate(data);
+
       expect(Result.isErr(result)).toBe(true);
     });
 
     test('strictRecord validate returns input as-is for OK cases', () => {
       const input = { id: '123', name: 'John', age: 25 };
       const result = strictRecord.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue2 = Result.unwrapThrow(result);
+
       expect(resultValue2).toBe(input); // ✅ same reference
     });
 
@@ -122,14 +137,18 @@ describe('record strict composition - simple tests', () => {
       const data = { id: '123', name: 'John', age: 25, extra: 'allowed' };
 
       const result = permissiveRecord.validate(data);
+
       expect(Result.isOk(result)).toBe(true);
     });
 
     test('permissiveRecord validate returns input as-is for OK cases', () => {
       const input = { id: '123', name: 'John', age: 25, extra: 'allowed' };
       const result = permissiveRecord.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue3 = Result.unwrapThrow(result);
+
       expect(resultValue3).toBe(input); // ✅ same reference
     });
 
@@ -138,6 +157,7 @@ describe('record strict composition - simple tests', () => {
       const data = { id: '123', name: 'John', extra: 'not allowed' };
 
       const result = strictPicked.validate(data);
+
       expect(Result.isErr(result)).toBe(true);
     });
 
@@ -146,6 +166,7 @@ describe('record strict composition - simple tests', () => {
       const data = { id: '123', name: 'John', extra: 'allowed' };
 
       const result = permissivePicked.validate(data);
+
       expect(Result.isOk(result)).toBe(true);
     });
 
@@ -153,8 +174,11 @@ describe('record strict composition - simple tests', () => {
       const permissivePicked = pick(permissiveRecord, ['id', 'name']);
       const input = { id: '123', name: 'John', extra: 'allowed' };
       const result = permissivePicked.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue4 = Result.unwrapThrow(result);
+
       expect(resultValue4).toBe(input); // ✅ same reference
     });
   });

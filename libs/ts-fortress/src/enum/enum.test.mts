@@ -6,7 +6,7 @@ import {
 } from '../utils/index.mjs';
 import { enumType } from './enum.mjs';
 
-describe('enumType', () => {
+describe(enumType, () => {
   const targetType = enumType([3, '2', 'a'], {
     defaultValue: 3,
   });
@@ -49,17 +49,21 @@ describe('enumType', () => {
       expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
         '=',
       );
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(3);
     });
 
     test('falsy case', () => {
       const result = targetType.validate(5);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError[0]).toStrictEqual({
         path: [],
         actualValue: 5,
@@ -76,8 +80,11 @@ describe('enumType', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = 'a';
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });

@@ -2,7 +2,7 @@ import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
 import { nullType } from './null.mjs';
 
-describe('nullType', () => {
+describe('null type', () => {
   type Null = TypeOf<typeof nullType>;
 
   expectType<Null, null>('=');
@@ -56,6 +56,7 @@ describe('nullType', () => {
   describe('assertIs', () => {
     test('null does not throw', () => {
       const value: unknown = null;
+
       expect(() => {
         nullType.assertIs(value);
       }).not.toThrow();
@@ -63,6 +64,7 @@ describe('nullType', () => {
 
     test('non-null throws', () => {
       const value: unknown = undefined;
+
       expect(() => {
         nullType.assertIs(value);
       }).toThrow('Expected <null>, got <undefined> type value `undefined`.');
@@ -73,11 +75,13 @@ describe('nullType', () => {
     test('null returns null', () => {
       const value: unknown = null;
       const result = nullType.cast(value);
+
       expect(result).toBeNull();
     });
 
     test('non-null throws error', () => {
       const value: unknown = undefined;
+
       expect(() => nullType.cast(value)).toThrow(
         'Expected <null>, got <undefined> type value `undefined`.',
       );
@@ -97,12 +101,14 @@ describe('nullType', () => {
     test('null returns null', () => {
       const value: unknown = null;
       const result = nullType.fill(value);
+
       expect(result).toBeNull();
     });
 
     test('undefined returns default (null)', () => {
       const value: unknown = undefined;
       const result = nullType.fill(value);
+
       expect(result).toBeNull();
     });
 
@@ -110,6 +116,7 @@ describe('nullType', () => {
       'nullType.fill($0) should be default (null)',
       (value) => {
         const result = nullType.fill(value);
+
         expect(result).toBeNull();
       },
     );
@@ -121,7 +128,9 @@ describe('nullType', () => {
       const result = nullType.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBeNull();
     });
 
@@ -130,7 +139,9 @@ describe('nullType', () => {
       const result = nullType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
+
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -147,7 +158,9 @@ describe('nullType', () => {
       const result = nullType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
+
       const resultError1 = Result.unwrapErrThrow(result);
+
       expect(resultError1).toStrictEqual([
         {
           path: [],
@@ -162,8 +175,11 @@ describe('nullType', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = null;
       const result = nullType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });

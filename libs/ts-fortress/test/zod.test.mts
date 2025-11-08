@@ -1,5 +1,4 @@
 import { expectType } from 'ts-data-forge';
-import { test } from 'vitest';
 import * as z from 'zod';
 
 test('JsonValueZod', () => {

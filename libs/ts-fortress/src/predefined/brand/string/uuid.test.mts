@@ -9,7 +9,7 @@ const uuidV4Example = '550e8400-e29b-41d4-a716-446655440000';
 const uuidV6Example = '550e8400-e29b-61d4-a716-446655440000';
 const uuidV7Example = '550e8400-e29b-71d4-a716-446655440000';
 
-describe('uuid', () => {
+describe(uuid, () => {
   const baseType = uuid();
 
   type UuidType = TypeOf<typeof baseType>;
@@ -40,7 +40,9 @@ describe('uuid', () => {
 
   test('validate surfaces details for invalid strings', () => {
     const result = baseType.validate('not-a-uuid');
+
     expect(Result.isErr(result)).toBe(true);
+
     if (!Result.isErr(result)) {
       throw new Error('Expected validation failure');
     }
@@ -61,7 +63,7 @@ describe('uuid', () => {
   });
 });
 
-describe('uuidV4', () => {
+describe(uuidV4, () => {
   const v4Type = uuidV4();
 
   type UuidV4Type = TypeOf<typeof v4Type>;
@@ -75,7 +77,9 @@ describe('uuidV4', () => {
 
   test('validate reports version mismatch', () => {
     const result = v4Type.validate(uuidV6Example);
+
     expect(Result.isErr(result)).toBe(true);
+
     if (!Result.isErr(result)) {
       throw new Error('Expected validation failure');
     }
@@ -96,7 +100,7 @@ describe('uuidV4', () => {
   });
 });
 
-describe('uuidV6', () => {
+describe(uuidV6, () => {
   const v6Type = uuidV6();
 
   test('recognizes only version 6 UUIDs', () => {
@@ -106,7 +110,7 @@ describe('uuidV6', () => {
   });
 });
 
-describe('uuidV7', () => {
+describe(uuidV7, () => {
   const v7Type = uuidV7();
 
   test('recognizes only version 7 UUIDs', () => {

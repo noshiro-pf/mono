@@ -2,15 +2,17 @@ import { expectType, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import { number } from './number.mjs';
 
-describe('number', () => {
+describe(number, () => {
   describe('default value', () => {
     test('without explicit default value', () => {
       const numDefault = number();
+
       expect(numDefault.defaultValue).toBe(0);
     });
 
     test('with explicit default value', () => {
       const numCustom = number(42);
+
       expect(numCustom.defaultValue).toBe(42);
     });
   });
@@ -67,6 +69,7 @@ describe('number', () => {
 
     test('valid number', () => {
       const value: unknown = 42;
+
       expect(() => {
         assertIs(value);
       }).not.toThrow();
@@ -74,6 +77,7 @@ describe('number', () => {
 
     test('invalid value throws', () => {
       const value: unknown = '42';
+
       expect(() => {
         assertIs(value);
       }).toThrow(/Expected <number>/u);
@@ -84,11 +88,13 @@ describe('number', () => {
     test('valid number returns as is', () => {
       const value: unknown = 42;
       const result = num.cast(value);
+
       expect(result).toBe(42);
     });
 
     test('invalid value throws error', () => {
       const value: unknown = 'not a number';
+
       expect(() => num.cast(value)).toThrow(
         'Expected <number>, got <string> type value "not a number".',
       );
@@ -97,6 +103,7 @@ describe('number', () => {
     test('throws error with type mismatch', () => {
       const numWithDefault = number(100);
       const value: unknown = 'not a number';
+
       expect(() => numWithDefault.cast(value)).toThrow(
         'Expected <number>, got <string> type value "not a number".',
       );
@@ -107,24 +114,28 @@ describe('number', () => {
     test('valid number returns as is', () => {
       const value: unknown = 42;
       const result = num.fill(value);
+
       expect(result).toBe(42);
     });
 
     test('undefined returns default', () => {
       const value: unknown = undefined;
       const result = num.fill(value);
+
       expect(result).toBe(0);
     });
 
     test('null returns default', () => {
       const value: unknown = null;
       const result = num.fill(value);
+
       expect(result).toBe(0);
     });
 
     test('invalid value returns default', () => {
       const value: unknown = 'not a number';
       const result = num.fill(value);
+
       expect(result).toBe(0);
     });
 
@@ -132,6 +143,7 @@ describe('number', () => {
       const numWithDefault = number(100);
       const value: unknown = 'not a number';
       const result = numWithDefault.fill(value);
+
       expect(result).toBe(100);
     });
   });
@@ -142,7 +154,9 @@ describe('number', () => {
       const result = num.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(42);
     });
 
@@ -151,7 +165,9 @@ describe('number', () => {
       const result = num.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
+
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -166,8 +182,11 @@ describe('number', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = 123.456;
       const result = num.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });

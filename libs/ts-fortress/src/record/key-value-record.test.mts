@@ -7,7 +7,7 @@ import {
 } from '../utils/index.mjs';
 import { keyValueRecord } from './key-value-record.mjs';
 
-describe('keyValueRecord', () => {
+describe(keyValueRecord, () => {
   const strNumRecord = keyValueRecord(string(), number());
 
   type StrNumRecord = TypeOf<typeof strNumRecord>;
@@ -63,9 +63,11 @@ describe('keyValueRecord', () => {
         typeof result,
         Result<StrNumRecord, readonly ValidationError[]>
       >('=');
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toStrictEqual({
         year: 2000,
         month: 12,
@@ -80,8 +82,11 @@ describe('keyValueRecord', () => {
         date: 25,
       };
       const result = strNumRecord.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
@@ -93,9 +98,11 @@ describe('keyValueRecord', () => {
       };
 
       const result = strNumRecord.validate(x);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],

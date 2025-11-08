@@ -9,7 +9,7 @@ import {
 } from '../utils/index.mjs';
 import { intersection } from './intersection.mjs';
 
-describe('intersection', () => {
+describe(intersection, () => {
   describe('merge records', () => {
     const targetType = intersection(
       [
@@ -83,25 +83,32 @@ describe('intersection', () => {
           typeof result,
           Result<TargetType, readonly ValidationError[]>
         >('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue = Result.unwrapThrow(result);
+
         expect(resultValue).toStrictEqual({ x: 0, y: 1, z: 2, w: 3 });
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = { x: 0, y: 1, z: 2, w: 3 };
         const result = targetType.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue1 = Result.unwrapThrow(result);
+
         expect(resultValue1).toBe(input); // ✅ same reference
       });
 
       test('falsy case', () => {
         const result = targetType.validate({ x: 0, y: 1 });
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError = Result.unwrapErrThrow(result);
+
         expect(resultError).toStrictEqual([
           {
             path: [],
@@ -192,25 +199,32 @@ describe('intersection', () => {
           typeof result,
           Result<TargetType, readonly ValidationError[]>
         >('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue2 = Result.unwrapThrow(result);
+
         expect(resultValue2).toBe(0);
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = 0;
         const result = targetType.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue3 = Result.unwrapThrow(result);
+
         expect(resultValue3).toBe(input); // ✅ same reference
       });
 
       test('falsy case', () => {
         const result = targetType.validate('aaa');
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError1 = Result.unwrapErrThrow(result);
+
         expect(resultError1).toStrictEqual([
           {
             path: [],
@@ -324,25 +338,32 @@ describe('intersection', () => {
           typeof result,
           Result<TargetType, readonly ValidationError[]>
         >('=');
+
         expect(Result.isOk(result)).toBe(true);
 
         const resultValue4 = Result.unwrapThrow(result);
+
         expect(resultValue4).toBe(3);
       });
 
       test('validate returns input as-is for OK cases', () => {
         const input = 3;
         const result = targetType.validate(input);
+
         expect(Result.isOk(result)).toBe(true);
+
         const resultValue5 = Result.unwrapThrow(result);
+
         expect(resultValue5).toBe(input); // ✅ same reference
       });
 
       test('falsy case', () => {
         const result = targetType.validate(7);
+
         expect(Result.isErr(result)).toBe(true);
 
         const resultError2 = Result.unwrapErrThrow(result);
+
         expect(resultError2).toStrictEqual([
           {
             path: [],

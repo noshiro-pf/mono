@@ -87,7 +87,7 @@ const expandedYearFormats = [
   '+275760-09-13T00:00:00Z', // 275760 A.D.
 ] as const satisfies readonly string[];
 
-describe('iso8601', () => {
+describe(iso8601, () => {
   const baseType = iso8601();
   const baseDefault = baseType.defaultValue;
 
@@ -135,7 +135,9 @@ describe('iso8601', () => {
 
   test('validate yields detailed errors for invalid strings', () => {
     const result = baseType.validate('not-an-iso-date');
+
     expect(Result.isErr(result)).toBe(true);
+
     if (!Result.isErr(result)) {
       throw new Error('Expected validation failure');
     }

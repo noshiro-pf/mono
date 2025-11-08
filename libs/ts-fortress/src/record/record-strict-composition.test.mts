@@ -27,9 +27,11 @@ describe('record strict composition tests', () => {
       expect(pickedType.is(validData)).toBe(true);
 
       const result = pickedType.validate(validData);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       // pick validates by calling the original record's validate with filled data
       // so it includes all original fields with defaults
       expect(resultValue).toStrictEqual({
@@ -41,8 +43,11 @@ describe('record strict composition tests', () => {
     test('pickedType validate returns input as-is for OK cases', () => {
       const input = { id: '123', name: 'John' };
       const result = pickedType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
@@ -52,9 +57,11 @@ describe('record strict composition tests', () => {
       expect(pickedType.is(dataWithExcess)).toBe(false);
 
       const result = pickedType.validate(dataWithExcess);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toHaveLength(1);
       expect(resultError[0]).toStrictEqual({
         path: ['extra'],
@@ -71,9 +78,11 @@ describe('record strict composition tests', () => {
       const incompleteData = { id: '123' }; // missing 'name'
 
       const result = pickedType.validate(incompleteData);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError1 = Result.unwrapErrThrow(result);
+
       expect(resultError1).toHaveLength(1);
       expect(resultError1[0]?.message).toBe('Missing required key "name"');
     });
@@ -88,9 +97,11 @@ describe('record strict composition tests', () => {
       expect(omittedType.is(validData)).toBe(true);
 
       const result = omittedType.validate(validData);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue2 = Result.unwrapThrow(result);
+
       // omit validates by calling the original record's validate with filled data
       // so it includes all original fields with defaults
       expect(resultValue2).toStrictEqual({
@@ -102,8 +113,11 @@ describe('record strict composition tests', () => {
     test('omittedType validate returns input as-is for OK cases', () => {
       const input = { id: '123', name: 'John' };
       const result = omittedType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue3 = Result.unwrapThrow(result);
+
       expect(resultValue3).toBe(input); // ✅ same reference
     });
 
@@ -113,9 +127,11 @@ describe('record strict composition tests', () => {
       expect(omittedType.is(dataWithExcess)).toBe(false);
 
       const result = omittedType.validate(dataWithExcess);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError2 = Result.unwrapErrThrow(result);
+
       expect(resultError2).toHaveLength(1);
       expect(resultError2[0]).toStrictEqual({
         path: ['extra'],
@@ -132,9 +148,11 @@ describe('record strict composition tests', () => {
       const dataWithOmittedProperty = { id: '123', name: 'John', age: 25 }; // 'age' was omitted but provided
 
       const result = omittedType.validate(dataWithOmittedProperty);
+
       expect(Result.isErr(result)).toBe(true); // omit rejects excess properties
 
       const resultError3 = Result.unwrapErrThrow(result);
+
       expect(resultError3).toHaveLength(1);
       expect(resultError3[0]?.message).toBe(
         'Excess property "age" is not allowed',
@@ -151,9 +169,11 @@ describe('record strict composition tests', () => {
       expect(partialType.is(validData)).toBe(true);
 
       const result = partialType.validate(validData);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue4 = Result.unwrapThrow(result);
+
       // partial now only returns the provided fields
       expect(resultValue4).toStrictEqual({
         id: '123',
@@ -164,8 +184,11 @@ describe('record strict composition tests', () => {
     test('partialType validate returns input as-is for OK cases', () => {
       const input = { id: '123', name: 'John' };
       const result = partialType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue5 = Result.unwrapThrow(result);
+
       expect(resultValue5).toBe(input); // ✅ same reference
     });
 
@@ -175,9 +198,11 @@ describe('record strict composition tests', () => {
       expect(partialType.is(emptyData)).toBe(true);
 
       const result = partialType.validate(emptyData);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue6 = Result.unwrapThrow(result);
+
       // partial with empty object returns empty object
       expect(resultValue6).toStrictEqual({});
     });
@@ -185,8 +210,11 @@ describe('record strict composition tests', () => {
     test('partialType validate returns input as-is for empty object', () => {
       const input = {};
       const result = partialType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue7 = Result.unwrapThrow(result);
+
       expect(resultValue7).toBe(input); // ✅ same reference
     });
 
@@ -196,9 +224,11 @@ describe('record strict composition tests', () => {
       expect(partialType.is(dataWithExcess)).toBe(false);
 
       const result = partialType.validate(dataWithExcess);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError4 = Result.unwrapErrThrow(result);
+
       expect(resultError4).toHaveLength(1);
       expect(resultError4[0]).toStrictEqual({
         path: ['extra'],
@@ -221,9 +251,11 @@ describe('record strict composition tests', () => {
       expect(partiallyPartialType.is(validData)).toBe(true);
 
       const result = partiallyPartialType.validate(validData);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue8 = Result.unwrapThrow(result);
+
       // partially partial now only returns the provided fields
       expect(resultValue8).toStrictEqual({
         id: '123',
@@ -237,8 +269,11 @@ describe('record strict composition tests', () => {
       });
       const input = { id: '123', name: 'John' };
       const result = partiallyPartialType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue9 = Result.unwrapThrow(result);
+
       expect(resultValue9).toBe(input); // ✅ same reference
     });
 
@@ -250,9 +285,11 @@ describe('record strict composition tests', () => {
       const incompleteData = { id: '123' }; // missing required 'name'
 
       const result = partiallyPartialType.validate(incompleteData);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError5 = Result.unwrapErrThrow(result);
+
       expect(resultError5).toHaveLength(1);
       expect(resultError5[0]?.message).toBe('Missing required key "name"');
     });
@@ -291,9 +328,11 @@ describe('record strict composition tests', () => {
       expect(mergedType.is(validData)).toBe(false);
 
       const result = mergedType.validate(validData);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError6 = Result.unwrapErrThrow(result);
+
       // Both records should produce errors for unknown fields
       expect(resultError6.length).toBeGreaterThan(0);
     });
@@ -310,16 +349,20 @@ describe('record strict composition tests', () => {
       expect(mergedType.is(dataWithExcess)).toBe(false);
 
       const result = mergedType.validate(dataWithExcess);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError7 = Result.unwrapErrThrow(result);
+
       // Both records should reject the excess property
       expect(resultError7.length).toBeGreaterThanOrEqual(1);
+
       const excessErrors = resultError7.filter(
         (error) =>
           error.message?.includes('Excess property "extra" is not allowed') ===
           true,
       );
+
       expect(excessErrors.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -327,6 +370,7 @@ describe('record strict composition tests', () => {
       const incompleteData = { id: '123', name: 'John', age: 25 }; // missing 'email'
 
       const result = mergedType.validate(incompleteData);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError8 = Result.unwrapErrThrow(result);
@@ -334,6 +378,7 @@ describe('record strict composition tests', () => {
         (error) =>
           error.message?.includes('Missing required key "email"') === true,
       );
+
       expect(missingEmailError).toBeDefined();
     });
 
@@ -366,6 +411,7 @@ describe('record strict composition tests', () => {
           error.message?.includes('Excess property "extra" is not allowed') ===
           true,
       );
+
       expect(excessErrors.length).toBeGreaterThanOrEqual(1);
     });
   });
@@ -380,9 +426,11 @@ describe('record strict composition tests', () => {
       expect(pickedPartialType.is(validData)).toBe(true);
 
       const result = pickedPartialType.validate(validData);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue10 = Result.unwrapThrow(result);
+
       expect(resultValue10).toStrictEqual({
         id: '123',
         name: 'John',
@@ -394,8 +442,11 @@ describe('record strict composition tests', () => {
       const pickedPartialType = pick(partialType, ['id', 'name']);
       const input = { id: '123', name: 'John' };
       const result = pickedPartialType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue11 = Result.unwrapThrow(result);
+
       expect(resultValue11).toBe(input); // ✅ same reference
     });
 
@@ -408,9 +459,11 @@ describe('record strict composition tests', () => {
       expect(partialPickedType.is(validData)).toBe(true);
 
       const result = partialPickedType.validate(validData);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue12 = Result.unwrapThrow(result);
+
       expect(resultValue12).toStrictEqual({
         id: '123',
       });
@@ -421,8 +474,11 @@ describe('record strict composition tests', () => {
       const partialPickedType = partial(pickedType);
       const input = { id: '123' };
       const result = partialPickedType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue13 = Result.unwrapThrow(result);
+
       expect(resultValue13).toBe(input); // ✅ same reference
     });
 
@@ -435,9 +491,11 @@ describe('record strict composition tests', () => {
       expect(pickedPartialType.is(dataWithExcess)).toBe(false);
 
       const result = pickedPartialType.validate(dataWithExcess);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError10 = Result.unwrapErrThrow(result);
+
       expect(resultError10).toHaveLength(1);
       expect(resultError10[0]?.message).toBe(
         'Excess property "extra" is not allowed',

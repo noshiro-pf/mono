@@ -3,7 +3,7 @@ import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { uint } from './uint.mjs';
 
-describe('uint', () => {
+describe(uint, () => {
   const targetType = uint(0);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -25,7 +25,9 @@ describe('uint', () => {
       }
 
       expect(isTarget).toBe(true);
+
       assert(isNumber(x));
+
       expect(isUint(x)).toBe(true);
     });
 
@@ -75,25 +77,32 @@ describe('uint', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(42);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(42);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - negative', () => {
       const result = targetType.validate(-5);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -110,9 +119,11 @@ describe('uint', () => {
 
     test('falsy case - string', () => {
       const result = targetType.validate('not a number');
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError1 = Result.unwrapErrThrow(result);
+
       expect(resultError1).toStrictEqual([
         {
           path: [],
@@ -134,6 +145,7 @@ describe('uint', () => {
 
       const assertIs: (a: unknown) => asserts a is TargetType =
         targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).not.toThrow();
@@ -144,6 +156,7 @@ describe('uint', () => {
 
       const assertIs: (a: unknown) => asserts a is TargetType =
         targetType.assertIs;
+
       expect(() => {
         assertIs(x);
       }).toThrow('Expected <Uint>');

@@ -8,6 +8,7 @@ describe('mergeRecords - fill and defaultType', () => {
 
   test('fill with non-record uses merged defaults', () => {
     const T = mergeRecords([A, B]);
+
     // Non-record input: should merge defaults from A and B
     expect(T.fill(null)).toStrictEqual({ a: '', b: 1, s: 'B' });
   });
@@ -15,6 +16,7 @@ describe('mergeRecords - fill and defaultType', () => {
   test('fill with record merges filled values and input own props', () => {
     const T = mergeRecords([A, B]);
     const input = { a: 'x', extra: 'keep' } as const;
+
     // Should keep input.extra and fill missing from A/B
     expect(T.fill(input)).toStrictEqual({
       a: 'x',

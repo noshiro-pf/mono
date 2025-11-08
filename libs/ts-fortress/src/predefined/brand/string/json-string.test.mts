@@ -3,7 +3,7 @@ import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { jsonString } from './json-string.mjs';
 
-describe('jsonString', () => {
+describe(jsonString, () => {
   const baseType = jsonString();
   const customDefault = jsonString({ defaultValue: '{"ok":true}' });
 
@@ -32,7 +32,9 @@ describe('jsonString', () => {
 
   test('validate yields detailed errors for invalid strings', () => {
     const result = baseType.validate('not-json');
+
     expect(Result.isErr(result)).toBe(true);
+
     if (!Result.isErr(result)) {
       throw new Error('Expected validation failure');
     }

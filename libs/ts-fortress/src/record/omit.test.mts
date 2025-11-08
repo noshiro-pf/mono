@@ -5,7 +5,7 @@ import { validationErrorsToMessages } from '../utils/index.mjs';
 import { omit } from './omit.mjs';
 import { record } from './record.mjs';
 
-describe('omit', () => {
+describe(omit, () => {
   const ymd = record({
     year: number(1900),
     month: number(1),
@@ -69,10 +69,12 @@ describe('omit', () => {
       };
 
       const result = ym.validate(x);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
       expectType<typeof resultValue, Ym>('=');
+
       expect(resultValue).toStrictEqual({
         year: 2000,
         month: 12,
@@ -85,8 +87,11 @@ describe('omit', () => {
         month: 12,
       };
       const result = ym.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
@@ -98,10 +103,12 @@ describe('omit', () => {
       };
 
       const result = ym.validate(x);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue2 = Result.unwrapThrow(result);
       expectType<typeof resultValue2, Ym>('=');
+
       expect(resultValue2).toStrictEqual({
         year: 2000,
         month: 12,
@@ -116,8 +123,11 @@ describe('omit', () => {
         aaa: 999,
       };
       const result = ym.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue3 = Result.unwrapThrow(result);
+
       expect(resultValue3).toBe(input); // ✅ same reference
     });
 
@@ -128,9 +138,11 @@ describe('omit', () => {
       };
 
       const result = ym.validate(x);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: ['month'],

@@ -2,7 +2,7 @@
 import { expectType, Result } from 'ts-data-forge';
 import { undefinedType } from './undefined.mjs';
 
-describe('undefinedType', () => {
+describe('undefined type', () => {
   expectType<undefined, undefined>('=');
   expectType<typeof undefinedType.defaultValue, undefined>('=');
 
@@ -54,6 +54,7 @@ describe('undefinedType', () => {
   describe('assertIs', () => {
     test('undefined does not throw', () => {
       const value: unknown = undefined;
+
       expect(() => {
         undefinedType.assertIs(value);
       }).not.toThrow();
@@ -61,6 +62,7 @@ describe('undefinedType', () => {
 
     test('non-undefined throws', () => {
       const value: unknown = null;
+
       expect(() => {
         undefinedType.assertIs(value);
       }).toThrow('Expected <undefined>, got <object> type value `null`.');
@@ -71,11 +73,13 @@ describe('undefinedType', () => {
     test('undefined returns undefined', () => {
       const value: unknown = undefined;
       const result = undefinedType.cast(value);
+
       expect(result).toBeUndefined();
     });
 
     test('non-undefined throws error', () => {
       const value: unknown = null;
+
       expect(() => {
         undefinedType.cast(value);
       }).toThrow('Expected <undefined>, got <object> type value `null`.');
@@ -95,12 +99,14 @@ describe('undefinedType', () => {
     test('undefined returns undefined', () => {
       const value: unknown = undefined;
       const result = undefinedType.fill(value);
+
       expect(result).toBeUndefined();
     });
 
     test('null returns default (undefined)', () => {
       const value: unknown = null;
       const result = undefinedType.fill(value);
+
       expect(result).toBeUndefined();
     });
 
@@ -108,6 +114,7 @@ describe('undefinedType', () => {
       'undefinedType.fill($0) return default (undefined)',
       (v) => {
         const result = undefinedType.fill(v);
+
         expect(result).toBeUndefined();
       },
     );
@@ -119,7 +126,9 @@ describe('undefinedType', () => {
       const result = undefinedType.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBeUndefined();
     });
 
@@ -128,7 +137,9 @@ describe('undefinedType', () => {
       const result = undefinedType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
+
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],
@@ -145,7 +156,9 @@ describe('undefinedType', () => {
       const result = undefinedType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
+
       const resultError1 = Result.unwrapErrThrow(result);
+
       expect(resultError1).toStrictEqual([
         {
           path: [],
@@ -160,8 +173,11 @@ describe('undefinedType', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = undefined;
       const result = undefinedType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });

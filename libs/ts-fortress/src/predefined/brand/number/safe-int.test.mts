@@ -3,7 +3,7 @@ import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { safeInt } from './safe-int.mjs';
 
-describe('safeInt', () => {
+describe(safeInt, () => {
   const targetType = safeInt(0);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -53,25 +53,32 @@ describe('safeInt', () => {
   describe('validate', () => {
     test('truthy case', () => {
       const result = targetType.validate(-42);
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(-42);
     });
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123;
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
     test('falsy case - unsafe integer', () => {
       const result = targetType.validate(Number.MAX_SAFE_INTEGER + 1);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError).toStrictEqual([
         {
           path: [],

@@ -9,7 +9,7 @@ import {
 } from '../utils/index.mjs';
 import { union } from './union.mjs';
 
-describe('union', () => {
+describe(union, () => {
   const targetType = union(
     [record({ x: number(), y: number() }), literal(3), literal('2')],
     {
@@ -75,17 +75,21 @@ describe('union', () => {
       expectType<typeof result, Result<TargetType, readonly ValidationError[]>>(
         '=',
       );
+
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue = Result.unwrapThrow(result);
+
       expect(resultValue).toBe(3);
     });
 
     test('falsy case', () => {
       const result = targetType.validate(5);
+
       expect(Result.isErr(result)).toBe(true);
 
       const resultError = Result.unwrapErrThrow(result);
+
       expect(resultError[0]).toStrictEqual({
         path: [],
         actualValue: 5,
@@ -102,8 +106,11 @@ describe('union', () => {
     test('validate returns input as-is for OK cases', () => {
       const input = { x: 10, y: 20 };
       const result = targetType.validate(input);
+
       expect(Result.isOk(result)).toBe(true);
+
       const resultValue1 = Result.unwrapThrow(result);
+
       expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
