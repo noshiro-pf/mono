@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.type-check.json",
+  "compilerOptions": {
+    // Emit
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "importsNotUsedAsValues": "remove",
+    "newLine": "lf",
+    "noEmit": false,
+    "noEmitOnError": true,
+
+    // Projects
+    "incremental": false
+  }
+}
