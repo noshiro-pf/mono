@@ -1,6 +1,6 @@
 import { expectType } from '../expect-type.mjs';
 import { pipe } from '../functional/index.mjs';
-import { asNonZeroFiniteNumber } from './index.mjs';
+import { asNonZeroFiniteNumber } from './branded-types/index.mjs';
 import { Num } from './num.mjs';
 
 const testClamp = (
@@ -13,7 +13,7 @@ const testClamp = (
   });
 };
 
-describe('Num', () => {
+describe('Num test', () => {
   describe('clamp', () => {
     testClamp([0, 2], 2.3, 2);
     testClamp([0, 2], -0.5, 0);
@@ -22,6 +22,7 @@ describe('Num', () => {
 
     test('should support regular usage with three parameters', () => {
       expectTypeOf(Num.clamp(15, 0, 10)).toEqualTypeOf<number>();
+
       expect(Num.clamp(15, 0, 10)).toBe(10);
       expect(Num.clamp(-5, 0, 10)).toBe(0);
       expect(Num.clamp(5, 0, 10)).toBe(5);
@@ -32,12 +33,15 @@ describe('Num', () => {
       const clampTo0_10 = Num.clamp(0, 10);
 
       const result1 = pipe(15).map(clampTo0_10).value;
+
       expect(result1).toBe(10);
 
       const result2 = pipe(-5).map(clampTo0_10).value;
+
       expect(result2).toBe(0);
 
       const result3 = pipe(7.5).map(clampTo0_10).value;
+
       expect(result3).toBe(7.5);
     });
 
@@ -58,6 +62,7 @@ describe('Num', () => {
       expect(Num.clamp(0, -10, -5)).toBe(-5);
 
       const clampNegative = Num.clamp(-10, -5);
+
       expect(clampNegative(-15)).toBe(-10);
       expect(clampNegative(-7)).toBe(-7);
       expect(clampNegative(0)).toBe(-5);
@@ -73,6 +78,7 @@ describe('Num', () => {
       } else {
         expectType<typeof x, number>('=');
       }
+
       expect(f(x)).toBe(true);
     });
 
@@ -84,6 +90,7 @@ describe('Num', () => {
       } else {
         expectType<typeof x, number>('=');
       }
+
       expect(f(x)).toBe(false);
     });
   });
@@ -106,6 +113,7 @@ describe('Num', () => {
   describe('isInRange', () => {
     test('checks range (lower inclusive, upper exclusive)', () => {
       const inRange = Num.isInRange(0, 10);
+
       expect(inRange(5)).toBe(true);
       expect(inRange(0)).toBe(true); // inclusive lower bound
       expect(inRange(10)).toBe(false); // exclusive upper bound
@@ -117,6 +125,7 @@ describe('Num', () => {
   describe('isInRangeInclusive', () => {
     test('checks range (inclusive)', () => {
       const inRange = Num.isInRangeInclusive(0, 10);
+
       expect(inRange(5)).toBe(true);
       expect(inRange(0)).toBe(true); // inclusive
       expect(inRange(10)).toBe(true); // inclusive
@@ -128,6 +137,7 @@ describe('Num', () => {
   describe('isUintInRange', () => {
     test('checks uint range (lower inclusive, upper exclusive)', () => {
       const inRange = Num.isUintInRange(0, 5);
+
       expect(inRange(2)).toBe(true);
       expect(inRange(0)).toBe(true); // inclusive lower bound
       expect(inRange(5)).toBe(false); // exclusive upper bound
@@ -141,6 +151,7 @@ describe('Num', () => {
       if (Num.isNonZero(x)) {
         expectType<typeof x, NonZeroNumber>('=');
       }
+
       expect(Num.isNonZero(5)).toBe(true);
       expect(Num.isNonZero(-3)).toBe(true);
       expect(Num.isNonZero(0)).toBe(false);
@@ -203,14 +214,17 @@ describe('Num', () => {
   describe('round', () => {
     test('creates rounding function with specified precision', () => {
       const round2 = Num.round(2);
+
       expect(round2(3.141_59)).toBe(3.14);
       expect(round2(2.556)).toBe(2.56);
 
       const round1 = Num.round(1);
+
       expect(round1(3.141_59)).toBe(3.1);
       expect(round1(2.56)).toBe(2.6);
 
       const round3 = Num.round(3);
+
       expect(round3(3.1416)).toBe(3.142);
       expect(round3(2.7182)).toBe(2.718);
     });

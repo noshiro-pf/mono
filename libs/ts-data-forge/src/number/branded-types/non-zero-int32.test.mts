@@ -6,8 +6,8 @@ import {
   NonZeroInt32,
 } from './non-zero-int32.mjs';
 
-describe('NonZeroInt32', () => {
-  describe('asNonZeroInt32', () => {
+describe('NonZeroInt32 test', () => {
+  describe(asNonZeroInt32, () => {
     test('accepts valid non-zero int32 values', () => {
       expect(() => asNonZeroInt32(1)).not.toThrow();
       expect(() => asNonZeroInt32(-1)).not.toThrow();
@@ -62,7 +62,7 @@ describe('NonZeroInt32', () => {
     );
   });
 
-  describe('isNonZeroInt32', () => {
+  describe(isNonZeroInt32, () => {
     test('correctly identifies non-zero int32 values', () => {
       expect(isNonZeroInt32(1)).toBe(true);
       expect(isNonZeroInt32(-1)).toBe(true);
@@ -127,6 +127,7 @@ describe('NonZeroInt32', () => {
         asNonZeroInt32(2_147_483_000),
         asNonZeroInt32(1000),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(NonZeroInt32.add(a, b)).toBe(1_500_000);
     });
@@ -136,6 +137,7 @@ describe('NonZeroInt32', () => {
         asNonZeroInt32(-2_147_483_000),
         asNonZeroInt32(1000),
       );
+
       expect(result).toBe(-2_147_483_648); // clamped to min
       expect(NonZeroInt32.sub(a, b)).toBe(500_000);
     });
@@ -145,6 +147,7 @@ describe('NonZeroInt32', () => {
         asNonZeroInt32(100_000),
         asNonZeroInt32(100_000),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(NonZeroInt32.mul(asNonZeroInt32(1000), asNonZeroInt32(5))).toBe(
         5000,
@@ -162,6 +165,7 @@ describe('NonZeroInt32', () => {
         asNonZeroInt32(10_000),
         asNonZeroInt32(3),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(NonZeroInt32.pow(asNonZeroInt32(2), asNonZeroInt32(3))).toBe(8);
     });
@@ -174,6 +178,7 @@ describe('NonZeroInt32', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroInt32.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroInt32.is(result)).toBe(true);
@@ -185,6 +190,7 @@ describe('NonZeroInt32', () => {
     test('generates values within NonZeroInt32 range', () => {
       for (const _ of range(10)) {
         const result = NonZeroInt32.random(-20, 20);
+
         expect(result).toBeGreaterThanOrEqual(-2_147_483_648);
         expect(result).toBeLessThanOrEqual(2_147_483_647);
       }

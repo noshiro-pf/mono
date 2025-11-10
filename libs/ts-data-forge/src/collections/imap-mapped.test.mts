@@ -28,7 +28,8 @@ describe('IMapMapped[Symbol.iterator]', () => {
       fromKey,
     );
 
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -49,6 +50,7 @@ describe('IMapMapped.create', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(map.size).toBe(0);
   });
 
@@ -61,6 +63,7 @@ describe('IMapMapped.create', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(map.size).toBe(2);
     expect(Optional.unwrap(map.get({ id: 1, type: 'user' }))).toBe('Alice');
     expect(Optional.unwrap(map.get({ id: 2, type: 'admin' }))).toBe('Bob');
@@ -76,6 +79,7 @@ describe('IMapMapped.create', () => {
       stringToTestKey,
     );
     const copy = IMapMapped.create(original, testKeyToString, stringToTestKey);
+
     expect(copy.size).toBe(2);
     expect(Optional.unwrap(copy.get({ id: 1, type: 'user' }))).toBe('Alice');
     expect(Optional.unwrap(copy.get({ id: 2, type: 'admin' }))).toBe('Bob');
@@ -102,6 +106,7 @@ describe('IMapMapped.create', () => {
       complexKeyToString,
       stringToComplexKey,
     );
+
     expect(map.size).toBe(1);
     expect(
       Optional.unwrap(map.get({ nested: { id: 1 }, arr: [1, 2, 3] })),
@@ -127,6 +132,7 @@ describe('IMapMapped.equal', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     // Test structural equality, not reference equality
     expect(map1.size).toBe(map2.size);
     expect(map1.has({ id: 1, type: 'user' })).toBe(true);
@@ -153,6 +159,7 @@ describe('IMapMapped.equal', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(IMapMapped.equal(map1, map2)).toBe(false);
   });
 
@@ -173,6 +180,7 @@ describe('IMapMapped.equal', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(IMapMapped.equal(map1, map2)).toBe(false);
   });
 
@@ -187,6 +195,7 @@ describe('IMapMapped.equal', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(IMapMapped.equal(map1, map2)).toBe(true);
   });
 });
@@ -221,6 +230,7 @@ describe('IMapMapped.has', () => {
 
     expect(s0.has({ v: 3 })).toBe(true);
   });
+
   test('case 2', () => {
     const s0 = IMapMapped.create(
       [
@@ -234,6 +244,7 @@ describe('IMapMapped.has', () => {
 
     expect(s0.has({ v: 4 })).toBe(false);
   });
+
   test('case 3', () => {
     const s0 = IMapMapped.create<Readonly<{ v: number }>, string, number>(
       [],
@@ -257,8 +268,9 @@ describe('IMapMapped.get', () => {
       fromKey,
     );
 
-    expect(s0.get({ v: 3 })).toStrictEqual(Optional.some('3'));
+    assert.deepStrictEqual(s0.get({ v: 3 }), Optional.some('3'));
   });
+
   test('case 2', () => {
     const s0 = IMapMapped.create(
       [
@@ -270,8 +282,9 @@ describe('IMapMapped.get', () => {
       fromKey,
     );
 
-    expect(s0.get({ v: 4 })).toStrictEqual(Optional.none);
+    assert.deepStrictEqual(s0.get({ v: 4 }), Optional.none);
   });
+
   test('case 3', () => {
     const s0 = IMapMapped.create<Readonly<{ v: number }>, string, number>(
       [],
@@ -279,7 +292,7 @@ describe('IMapMapped.get', () => {
       fromKey,
     );
 
-    expect(s0.get({ v: 3 })).toStrictEqual(Optional.none);
+    assert.deepStrictEqual(s0.get({ v: 3 }), Optional.none);
   });
 });
 
@@ -295,7 +308,8 @@ describe('IMapMapped.set', () => {
       fromKey,
     );
 
-    expect(s0.set({ v: 5 }, '5')).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.set({ v: 5 }, '5'),
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -307,7 +321,8 @@ describe('IMapMapped.set', () => {
         fromKey,
       ),
     );
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -319,6 +334,7 @@ describe('IMapMapped.set', () => {
       ),
     );
   });
+
   test('case 2', () => {
     const s0 = IMapMapped.create(
       [
@@ -330,7 +346,8 @@ describe('IMapMapped.set', () => {
       fromKey,
     );
 
-    expect(s0.set({ v: 3 }, '3')).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.set({ v: 3 }, '3'),
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -341,7 +358,8 @@ describe('IMapMapped.set', () => {
         fromKey,
       ),
     );
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -353,13 +371,19 @@ describe('IMapMapped.set', () => {
       ),
     );
   });
-  test('case 3', () => {
-    const s0 = IMapMapped.create([], toKey, fromKey);
 
-    expect(s0.set({ v: 1 }, '1')).toStrictEqual(
+  test('case 3', () => {
+    const s0 = IMapMapped.create<Readonly<{ v: number }>, string, number>(
+      [],
+      toKey,
+      fromKey,
+    );
+
+    assert.deepStrictEqual(
+      s0.set({ v: 1 }, '1'),
       IMapMapped.create([[{ v: 1 }, '1']], toKey, fromKey),
     );
-    expect(s0).toStrictEqual(IMapMapped.create([], toKey, fromKey));
+    assert.deepStrictEqual(s0, IMapMapped.create([], toKey, fromKey));
   });
 });
 
@@ -373,6 +397,7 @@ describe('IMapMapped.update', () => {
     const updated = map.update({ id: 1, type: 'user' }, (name) =>
       name.toUpperCase(),
     );
+
     expect(Optional.unwrap(updated.get({ id: 1, type: 'user' }))).toBe('ALICE');
   });
 
@@ -385,6 +410,7 @@ describe('IMapMapped.update', () => {
     const updated = map.update({ id: 2, type: 'user' }, (name) =>
       name.toUpperCase(),
     );
+
     expect(updated).toBe(map);
     expect(Optional.isNone(updated.get({ id: 2, type: 'user' }))).toBe(true);
   });
@@ -402,7 +428,8 @@ describe('IMapMapped.delete', () => {
       fromKey,
     );
 
-    expect(s0.delete({ v: 10 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.delete({ v: 10 }),
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -413,7 +440,8 @@ describe('IMapMapped.delete', () => {
         fromKey,
       ),
     );
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -425,6 +453,7 @@ describe('IMapMapped.delete', () => {
       ),
     );
   });
+
   test('case 2', () => {
     const s0 = IMapMapped.create(
       [
@@ -436,7 +465,8 @@ describe('IMapMapped.delete', () => {
       fromKey,
     );
 
-    expect(s0.delete({ v: 3 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.delete({ v: 3 }),
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -446,7 +476,8 @@ describe('IMapMapped.delete', () => {
         fromKey,
       ),
     );
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       IMapMapped.create(
         [
           [{ v: 1 }, '1'],
@@ -458,13 +489,15 @@ describe('IMapMapped.delete', () => {
       ),
     );
   });
+
   test('case 3', () => {
     const s0 = IMapMapped.create([], toKey, fromKey);
 
-    expect(s0.delete({ v: 1 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.delete({ v: 1 }),
       IMapMapped.create([], toKey, fromKey),
     );
-    expect(s0).toStrictEqual(IMapMapped.create([], toKey, fromKey));
+    assert.deepStrictEqual(s0, IMapMapped.create([], toKey, fromKey));
   });
 
   test('should delete entry if it exists', () => {
@@ -494,6 +527,7 @@ describe('IMapMapped.every', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(map.every((value) => typeof value === 'string')).toBe(true);
   });
 
@@ -506,6 +540,7 @@ describe('IMapMapped.every', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(map.every((value) => value.length > 5)).toBe(false);
   });
 
@@ -515,6 +550,7 @@ describe('IMapMapped.every', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(map.every((value) => value.length > 0)).toBe(true);
   });
 });
@@ -529,6 +565,7 @@ describe('IMapMapped.some', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     // eslint-disable-next-line unicorn/prefer-includes
     expect(map.some((value) => value === 'Alice')).toBe(true);
   });
@@ -542,6 +579,7 @@ describe('IMapMapped.some', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     // eslint-disable-next-line unicorn/prefer-includes
     expect(map.some((value) => value === 'Charlie')).toBe(false);
   });
@@ -552,6 +590,7 @@ describe('IMapMapped.some', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     expect(map.some((value) => value.length > 0)).toBe(false);
   });
 });
@@ -586,6 +625,7 @@ describe('IMapMapped.withMutations', () => {
       stringToTestKey,
     );
     const updated = map.withMutations([]);
+
     expect(updated.size).toBe(1);
     expect(Optional.unwrap(updated.get({ id: 1, type: 'user' }))).toBe('Alice');
   });
@@ -790,6 +830,7 @@ describe('IMapMapped.toKeysArray', () => {
       stringToTestKey,
     );
     const keys = map.toKeysArray();
+
     expect(keys).toHaveLength(2);
     expect(keys).toContainEqual({ id: 1, type: 'user' });
     expect(keys).toContainEqual({ id: 2, type: 'admin' });
@@ -807,6 +848,7 @@ describe('IMapMapped.toValuesArray', () => {
       stringToTestKey,
     );
     const values = map.toValuesArray();
+
     expect(values).toHaveLength(2);
     expect(values).toContain('Alice');
     expect(values).toContain('Bob');
@@ -824,6 +866,7 @@ describe('IMapMapped.toEntriesArray', () => {
       stringToTestKey,
     );
     const entries = map.toEntriesArray();
+
     expect(entries).toHaveLength(2);
     expect(entries).toContainEqual([{ id: 1, type: 'user' }, 'Alice']);
     expect(entries).toContainEqual([{ id: 2, type: 'admin' }, 'Bob']);
@@ -842,7 +885,8 @@ describe('IMapMapped.toArray', () => {
     );
     const entries = map.toArray();
     const entriesArray = map.toEntriesArray();
-    expect(entries).toStrictEqual(entriesArray);
+
+    assert.deepStrictEqual(entries, entriesArray);
   });
 });
 
@@ -857,6 +901,7 @@ describe('IMapMapped.toRawMap', () => {
       stringToTestKey,
     );
     const rawMap = map.toRawMap();
+
     expect(rawMap.size).toBe(2);
     expect(rawMap.get('user_1')).toBe('Alice');
     expect(rawMap.get('admin_2')).toBe('Bob');

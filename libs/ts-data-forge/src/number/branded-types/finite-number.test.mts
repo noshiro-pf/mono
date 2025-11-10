@@ -3,8 +3,8 @@ import { range } from '../../iterator/index.mjs';
 import { asFiniteNumber, FiniteNumber } from './finite-number.mjs';
 import { asNonZeroFiniteNumber } from './non-zero-finite-number.mjs';
 
-describe('FiniteNumber', () => {
-  describe('asFiniteNumber', () => {
+describe('FiniteNumber test', () => {
+  describe(asFiniteNumber, () => {
     test('accepts valid finite numbers', () => {
       expect(() => asFiniteNumber(0)).not.toThrow();
       expect(() => asFiniteNumber(1)).not.toThrow();
@@ -119,6 +119,7 @@ describe('FiniteNumber', () => {
 
       for (const _ of range(10)) {
         const result = FiniteNumber.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(FiniteNumber.is(result)).toBe(true);

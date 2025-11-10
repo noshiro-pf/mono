@@ -6,8 +6,8 @@ import {
   PositiveInt16,
 } from './positive-int16.mjs';
 
-describe('PositiveInt16', () => {
-  describe('asPositiveInt16', () => {
+describe('PositiveInt16 test', () => {
+  describe(asPositiveInt16, () => {
     test('accepts valid positive int16 values', () => {
       expect(() => asPositiveInt16(1)).not.toThrow();
       expect(() => asPositiveInt16(1000)).not.toThrow();
@@ -67,7 +67,7 @@ describe('PositiveInt16', () => {
     );
   });
 
-  describe('isPositiveInt16', () => {
+  describe(isPositiveInt16, () => {
     test('correctly identifies positive int16 values', () => {
       expect(isPositiveInt16(1)).toBe(true);
       expect(isPositiveInt16(1000)).toBe(true);
@@ -126,6 +126,7 @@ describe('PositiveInt16', () => {
         asPositiveInt16(32_000),
         asPositiveInt16(1000),
       );
+
       expect(result).toBe(32_767); // clamped to max
       expect(PositiveInt16.add(a, b)).toBe(150);
     });
@@ -140,6 +141,7 @@ describe('PositiveInt16', () => {
         asPositiveInt16(1000),
         asPositiveInt16(100),
       );
+
       expect(result).toBe(32_767); // clamped to max
       expect(PositiveInt16.mul(asPositiveInt16(10), asPositiveInt16(5))).toBe(
         50,
@@ -159,6 +161,7 @@ describe('PositiveInt16', () => {
         asPositiveInt16(200),
         asPositiveInt16(3),
       );
+
       expect(result).toBe(32_767); // clamped to max
       expect(PositiveInt16.pow(asPositiveInt16(2), asPositiveInt16(3))).toBe(8);
     });
@@ -171,6 +174,7 @@ describe('PositiveInt16', () => {
 
       for (const _ of range(10)) {
         const result = PositiveInt16.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(PositiveInt16.is(result)).toBe(true);
@@ -182,6 +186,7 @@ describe('PositiveInt16', () => {
     test('generates values within PositiveInt16 range', () => {
       for (const _ of range(10)) {
         const result = PositiveInt16.random(1, 30);
+
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(32_767);
       }

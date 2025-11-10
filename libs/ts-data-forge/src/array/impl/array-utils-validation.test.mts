@@ -11,7 +11,7 @@ import {
 } from './array-utils-validation.mjs';
 
 describe('Arr validations', () => {
-  describe('isArray', () => {
+  describe(isArray, () => {
     test('should return true for arrays', () => {
       expect(isArray([1, 2, 3])).toBe(true);
       expect(isArray([])).toBe(true);
@@ -48,6 +48,7 @@ describe('Arr validations', () => {
       const readonlyArray: readonly number[] = [1, 2, 3];
       if (isArray(readonlyArray)) {
         expectType<typeof readonlyArray, readonly number[]>('=');
+
         expect(readonlyArray).toHaveLength(3);
       }
     });
@@ -56,6 +57,7 @@ describe('Arr validations', () => {
       const mutableArray: number[] = [1, 2, 3];
       if (isArray(mutableArray)) {
         expectType<typeof mutableArray, number[]>('=');
+
         expect(mutableArray).toHaveLength(3);
       }
     });
@@ -129,12 +131,14 @@ describe('Arr validations', () => {
       const value: unknown = [1, 2, 3];
       if (isArray(value)) {
         expectType<typeof value, readonly unknown[]>('=');
+
         expect(value).toHaveLength(3);
       }
     });
 
     test('should handle array-like objects', () => {
       const arrayLike = { 0: 'a', 1: 'b', length: 2 };
+
       expect(isArray(arrayLike)).toBe(false);
     });
 
@@ -195,6 +199,7 @@ describe('Arr validations', () => {
           }
           return 0;
         };
+
         expect(processGeneric([1, 2, 3])).toBe(3);
         expect(processGeneric('hello')).toBe(0);
       });
@@ -217,8 +222,9 @@ describe('Arr validations', () => {
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           return [value] as ArrayOrValue<T>;
         };
-        expect(makeArray([1, 2, 3])).toStrictEqual([1, 2, 3]);
-        expect(makeArray(5)).toStrictEqual([5]);
+
+        assert.deepStrictEqual(makeArray([1, 2, 3]), [1, 2, 3]);
+        assert.deepStrictEqual(makeArray(5), [5]);
       });
 
       test('should handle intersection types', () => {
@@ -226,6 +232,7 @@ describe('Arr validations', () => {
         const tagged = Object.assign([1, 2, 3], { tag: 'test' }) as TaggedArray;
         if (isArray(tagged)) {
           expectType<typeof tagged, TaggedArray>('=');
+
           expect(tagged.tag).toBe('test');
         }
       });
@@ -299,7 +306,7 @@ describe('Arr validations', () => {
     });
   });
 
-  describe('isEmpty', () => {
+  describe(isEmpty, () => {
     const xs = [1, 2, 3] as const;
     const result = isEmpty(xs);
 
@@ -314,7 +321,7 @@ describe('Arr validations', () => {
     });
   });
 
-  describe('isNonEmpty', () => {
+  describe(isNonEmpty, () => {
     const xs = [1, 2, 3] as const;
     const result = isNonEmpty(xs);
 
@@ -329,10 +336,12 @@ describe('Arr validations', () => {
     });
   });
 
-  describe('isArrayOfLength', () => {
+  describe(isArrayOfLength, () => {
     test('should return true if array has specified length', () => {
       const arr = [1, 2, 3] as const;
+
       expect(isArrayOfLength(arr, 3)).toBe(true);
+
       if (isArrayOfLength(arr, 3)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
@@ -340,12 +349,15 @@ describe('Arr validations', () => {
 
     test('should return false if array does not have specified length', () => {
       const arr = [1, 2, 3] as const;
+
       expect(isArrayOfLength(arr, 2)).toBe(false);
     });
 
     test('should return true for empty array and length 0', () => {
       const arr = [] as const;
+
       expect(isArrayOfLength(arr, 0)).toBe(true);
+
       if (isArrayOfLength(arr, 0)) {
         expectType<typeof arr, readonly []>('=');
       }
@@ -353,24 +365,31 @@ describe('Arr validations', () => {
 
     test('should return false for non-empty array and length 0', () => {
       const arr = [1] as const;
+
       expect(isArrayOfLength(arr, 0)).toBe(false);
     });
 
     test('should work with unknown array type', () => {
       const arr: number[] = [1, 2];
+
       expect(isArrayOfLength(arr, 2)).toBe(true);
+
       if (isArrayOfLength(arr, 2)) {
         expectType<typeof arr, number[] & ArrayOfLength<2, number>>('=');
       }
+
       expect(isArrayOfLength(arr, 3)).toBe(false);
     });
 
     test('should work with unknown readonly array type', () => {
       const arr: readonly number[] = [1, 2];
+
       expect(isArrayOfLength(arr, 2)).toBe(true);
+
       if (isArrayOfLength(arr, 2)) {
         expectType<typeof arr, ArrayOfLength<2, number>>('=');
       }
+
       expect(isArrayOfLength(arr, 3)).toBe(false);
     });
 
@@ -390,19 +409,24 @@ describe('Arr validations', () => {
       const array: readonly number[] = [1, 2, 3];
       if (isArrayOfLength(array, 3)) {
         expectType<typeof array, ArrayOfLength<3, number>>('=');
+
         expect(array).toHaveLength(3);
       }
     });
   });
 
-  describe('isArrayAtLeastLength', () => {
+  describe(isArrayAtLeastLength, () => {
     test('should return true if array length is greater than or equal to specified length', () => {
       const arr = [1, 2, 3] as const;
+
       expect(isArrayAtLeastLength(arr, 3)).toBe(true);
+
       if (isArrayAtLeastLength(arr, 3)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
+
       expect(isArrayAtLeastLength(arr, 2)).toBe(true);
+
       if (isArrayAtLeastLength(arr, 2)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
@@ -410,12 +434,15 @@ describe('Arr validations', () => {
 
     test('should return false if array length is less than specified length', () => {
       const arr = [1, 2, 3] as const;
+
       expect(isArrayAtLeastLength(arr, 4)).toBe(false);
     });
 
     test('should return true for empty array and length 0', () => {
       const arr = [] as const;
+
       expect(isArrayAtLeastLength(arr, 0)).toBe(true);
+
       if (isArrayAtLeastLength(arr, 0)) {
         expectType<typeof arr, readonly []>('=');
       }
@@ -423,19 +450,25 @@ describe('Arr validations', () => {
 
     test('should return false for empty array and positive length', () => {
       const arr = [] as const;
+
       expect(isArrayAtLeastLength(arr, 1)).toBe(false);
     });
 
     test('should work with unknown array type', () => {
       const arr: number[] = [1, 2];
+
       expect(isArrayAtLeastLength(arr, 2)).toBe(true);
+
       if (isArrayAtLeastLength(arr, 2)) {
         expectType<typeof arr, number[] & ArrayAtLeastLen<2, number>>('=');
       }
+
       expect(isArrayAtLeastLength(arr, 1)).toBe(true);
+
       if (isArrayAtLeastLength(arr, 1)) {
         expectType<typeof arr, number[] & ArrayAtLeastLen<1, number>>('=');
       }
+
       expect(isArrayAtLeastLength(arr, 3)).toBe(false);
     });
 
@@ -455,21 +488,24 @@ describe('Arr validations', () => {
       const array: readonly number[] = [1, 2, 3];
       if (isArrayAtLeastLength(array, 2)) {
         expectType<typeof array, ArrayAtLeastLen<2, number>>('=');
+
         expect(array.length).toBeGreaterThanOrEqual(2);
       }
     });
   });
 
-  describe('every', () => {
+  describe(every, () => {
     test('should return true when all elements satisfy predicate', () => {
       const evens = [2, 4, 6, 8];
       const allEven = every(evens, (n) => n % 2 === 0);
+
       expect(allEven).toBe(true);
     });
 
     test('should return false when not all elements satisfy predicate', () => {
       const mixed = [2, 3, 4, 6];
       const allEven = every(mixed, (n) => n % 2 === 0);
+
       expect(allEven).toBe(false);
     });
 
@@ -484,6 +520,7 @@ describe('Arr validations', () => {
     test('should work with curried version', () => {
       const isPositive = (n: number): boolean => n > 0;
       const allPositive = every(isPositive);
+
       expect(allPositive([1, 2, 3])).toBe(true);
       expect(allPositive([1, -2, 3])).toBe(false);
     });
@@ -501,32 +538,37 @@ describe('Arr validations', () => {
     test('should return true for empty array', () => {
       const empty: number[] = [];
       const result = every(empty, (n) => n > 0);
+
       expect(result).toBe(true);
     });
 
     test('should pass index to predicate', () => {
       const numbers = [0, 1, 2, 3];
       const indexMatchesValue = every(numbers, (val, idx) => val === idx);
+
       expect(indexMatchesValue).toBe(true);
     });
   });
 
-  describe('some', () => {
+  describe(some, () => {
     test('should return true when at least one element satisfies predicate', () => {
       const numbers = [1, 3, 5, 8];
       const hasEven = some(numbers, (n) => n % 2 === 0);
+
       expect(hasEven).toBe(true);
     });
 
     test('should return false when no elements satisfy predicate', () => {
       const odds = [1, 3, 5, 7];
       const hasEven = some(odds, (n) => n % 2 === 0);
+
       expect(hasEven).toBe(false);
     });
 
     test('should work with curried version', () => {
       const isNegative = (n: number): boolean => n < 0;
       const hasNegative = some(isNegative);
+
       expect(hasNegative([1, 2, -3])).toBe(true);
       expect(hasNegative([1, 2, 3])).toBe(false);
     });
@@ -534,6 +576,7 @@ describe('Arr validations', () => {
     test('should return false for empty array', () => {
       const empty: number[] = [];
       const result = some(empty, (n) => n > 0);
+
       expect(result).toBe(false);
     });
 
@@ -543,13 +586,15 @@ describe('Arr validations', () => {
         numbers,
         (val, idx) => val === idx * 10,
       );
+
       expect(hasValueMatchingIndex).toBe(true);
     });
   });
 
-  describe('indexIsInRange', () => {
+  describe(indexIsInRange, () => {
     test('should return true for valid indices', () => {
       const array = ['a', 'b', 'c'];
+
       expect(indexIsInRange(array, 0)).toBe(true);
       expect(indexIsInRange(array, 1)).toBe(true);
       expect(indexIsInRange(array, 2)).toBe(true);
@@ -557,12 +602,14 @@ describe('Arr validations', () => {
 
     test('should return false for invalid indices', () => {
       const array = ['a', 'b', 'c'];
+
       expect(indexIsInRange(array, 3)).toBe(false);
       expect(indexIsInRange(array, 10)).toBe(false);
     });
 
     test('should work with empty array', () => {
       const empty: readonly string[] = [];
+
       expect(indexIsInRange(empty, 0)).toBe(false);
       // @ts-expect-error negative indices should not be allowed
       expect(indexIsInRange(empty, -1)).toBe(false);
@@ -570,6 +617,7 @@ describe('Arr validations', () => {
 
     test('should be type error with floating point indices', () => {
       const array = [1, 2, 3];
+
       // @ts-expect-error floating point indices should not be allowed
       expect(indexIsInRange(array, 1.5)).toBe(true); // JavaScript arrays accept floating point indices
       // @ts-expect-error floating point indices should not be allowed

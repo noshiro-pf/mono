@@ -5,7 +5,7 @@ const f = <Key extends string, V, KeySub extends Key>(
   obj: ReadonlyRecord<KeySub, V>,
 ): V | undefined => (keyIsIn(key, obj) ? obj[key] : undefined);
 
-describe('keyIsIn', () => {
+describe(keyIsIn, () => {
   f('a' as 'a' | 'b' | 'c', { a: 0, b: 1 });
 
   test('', () => {

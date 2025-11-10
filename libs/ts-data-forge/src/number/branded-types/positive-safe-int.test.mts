@@ -6,8 +6,8 @@ import {
   PositiveSafeInt,
 } from './positive-safe-int.mjs';
 
-describe('PositiveSafeInt', () => {
-  describe('asPositiveSafeInt', () => {
+describe('PositiveSafeInt test', () => {
+  describe(asPositiveSafeInt, () => {
     test('accepts valid positive safe integers', () => {
       expect(() => asPositiveSafeInt(1)).not.toThrow();
       expect(() => asPositiveSafeInt(2)).not.toThrow();
@@ -72,7 +72,7 @@ describe('PositiveSafeInt', () => {
     );
   });
 
-  describe('isPositiveSafeInt', () => {
+  describe(isPositiveSafeInt, () => {
     test('correctly identifies positive safe integers', () => {
       expect(isPositiveSafeInt(1)).toBe(true);
       expect(isPositiveSafeInt(2)).toBe(true);
@@ -136,6 +136,7 @@ describe('PositiveSafeInt', () => {
     test('add (clamped to positive safe int range)', () => {
       const largeValue = asPositiveSafeInt(Number.MAX_SAFE_INTEGER - 1);
       const result = PositiveSafeInt.add(largeValue, asPositiveSafeInt(10));
+
       expect(result).toBe(Number.MAX_SAFE_INTEGER); // clamped to max
       expect(PositiveSafeInt.add(a, b)).toBe(7);
     });
@@ -151,6 +152,7 @@ describe('PositiveSafeInt', () => {
         Math.floor(Math.sqrt(Number.MAX_SAFE_INTEGER)),
       );
       const result = PositiveSafeInt.mul(largeValue, largeValue);
+
       expect(result).toBeLessThanOrEqual(Number.MAX_SAFE_INTEGER);
       expect(
         PositiveSafeInt.mul(asPositiveSafeInt(10), asPositiveSafeInt(5)),
@@ -170,6 +172,7 @@ describe('PositiveSafeInt', () => {
         asPositiveSafeInt(1000),
         asPositiveSafeInt(10),
       );
+
       expect(result).toBe(Number.MAX_SAFE_INTEGER); // clamped to max
       expect(
         PositiveSafeInt.pow(asPositiveSafeInt(2), asPositiveSafeInt(3)),
@@ -184,6 +187,7 @@ describe('PositiveSafeInt', () => {
 
       for (const _ of range(10)) {
         const result = PositiveSafeInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(PositiveSafeInt.is(result)).toBe(true);
@@ -195,6 +199,7 @@ describe('PositiveSafeInt', () => {
     test('generates values within positive safe int range', () => {
       for (const _ of range(10)) {
         const result = PositiveSafeInt.random(1, 30);
+
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(Number.MAX_SAFE_INTEGER);
       }

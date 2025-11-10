@@ -1,5 +1,5 @@
 // Example: src/json/json.mts (stringify)
-import { Json, Result } from 'ts-data-forge';
+import { isString, Json, Result } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 const data = { name: 'Bob', age: 25, active: true };
@@ -23,5 +23,7 @@ const filtered = Json.stringify(data, (key, value) => {
 
 assert.ok(Result.isOk(filtered));
 if (Result.isOk(filtered)) {
+  assert(isString(filtered.value));
+
   assert.ok(!filtered.value.includes('age'));
 }

@@ -2,7 +2,7 @@ import { expectType } from '../expect-type.mjs';
 import { Result } from '../functional/index.mjs';
 import { createPromise } from './promise.mjs';
 
-describe('createPromise', () => {
+describe(createPromise, () => {
   test('resolves to Result.ok when executor resolves', async () => {
     const resultPromise = createPromise<number, Error>((resolve) => {
       resolve(42);
@@ -11,7 +11,9 @@ describe('createPromise', () => {
     expectType<typeof resultPromise, Promise<Result<number, Error>>>('=');
 
     const result = await resultPromise;
+
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toBe(42);
     }
@@ -24,6 +26,7 @@ describe('createPromise', () => {
     });
 
     expect(Result.isErr(result)).toBe(true);
+
     if (Result.isErr(result)) {
       expect(result.value).toBe(rejection);
     }
@@ -35,8 +38,10 @@ describe('createPromise', () => {
     });
 
     expect(Result.isErr(result)).toBe(true);
+
     if (Result.isErr(result)) {
       expectType<typeof result.value, string>('=');
+
       expect(result.value).toBe('failure');
     }
   });

@@ -1,8 +1,8 @@
 import { expectType } from '../../expect-type.mjs';
 import { Int8, asInt8, isInt8 } from './int8.mjs';
 
-describe('Int8', () => {
-  describe('isInt8', () => {
+describe('Int8 test', () => {
+  describe(isInt8, () => {
     test.each([
       { value: -128, expected: true },
       { value: 0, expected: true },
@@ -18,7 +18,7 @@ describe('Int8', () => {
     });
   });
 
-  describe('asInt8', () => {
+  describe(asInt8, () => {
     test.each([
       { value: -128, expected: -128 },
       { value: 0, expected: 0 },
@@ -48,6 +48,7 @@ describe('Int8', () => {
   describe('Int8.MIN_VALUE', () => {
     test('should be -128', () => {
       expect(Int8.MIN_VALUE).toBe(-128);
+
       expectType<typeof Int8.MIN_VALUE, -128>('=');
     });
   });
@@ -55,6 +56,7 @@ describe('Int8', () => {
   describe('Int8.MAX_VALUE', () => {
     test('should be 127', () => {
       expect(Int8.MAX_VALUE).toBe(127);
+
       expectType<typeof Int8.MAX_VALUE, 127>('=');
     });
   });
@@ -96,7 +98,9 @@ describe('Int8', () => {
       'Int8.abs($value) should return $expected',
       ({ expected, value }) => {
         const result = Int8.abs(value);
+
         expect(result).toBe(expected);
+
         expectType<typeof result, typeof expected>('=');
       },
     );
@@ -172,6 +176,7 @@ describe('Int8', () => {
       const min = -10;
       const max = 10;
       const result = Int8.random(min, max);
+
       expect(result).toBeGreaterThanOrEqual(min);
       expect(result).toBeLessThanOrEqual(max);
       expect(Number.isInteger(result)).toBe(true);

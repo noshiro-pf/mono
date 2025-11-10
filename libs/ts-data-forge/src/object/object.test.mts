@@ -30,7 +30,7 @@ describe('shallowEq', () => {
 
 describe('pick', () => {
   test('should pick specified keys', () => {
-    expect(Obj.pick({ a: 1, b: 2, c: 3 }, ['a', 'b'])).toStrictEqual({
+    assert.deepStrictEqual(Obj.pick({ a: 1, b: 2, c: 3 }, ['a', 'b']), {
       a: 1,
       b: 2,
     });
@@ -39,7 +39,8 @@ describe('pick', () => {
   test('pick should support curried form', () => {
     const pickAB = Obj.pick(['a', 'b']);
     const result = pickAB({ a: 1, b: 2, c: 3, d: 4 });
-    expect(result).toStrictEqual({ a: 1, b: 2 });
+
+    assert.deepStrictEqual(result, { a: 1, b: 2 });
   });
 
   test('pick should work with pipe when curried', () => {
@@ -47,13 +48,15 @@ describe('pick', () => {
     const user = { id: 1, name: 'Alice', email: 'alice@example.com', age: 30 };
 
     const result = pipe(user).map(pickIdAndName).value;
-    expect(result).toStrictEqual({ id: 1, name: 'Alice' });
+
+    assert.deepStrictEqual(result, { id: 1, name: 'Alice' });
   });
 
   test('pick should handle empty keys in curried form', () => {
     const pickNone = Obj.pick([]);
     const result = pickNone({ a: 1, b: 2 });
-    expect(result).toStrictEqual({});
+
+    assert.deepStrictEqual(result, {});
   });
 
   test('pick should work for records that only partially contain the key in curried form', () => {
@@ -67,19 +70,24 @@ describe('pick', () => {
     const result = pipe(user).map(pickVisible).value satisfies {
       name: string;
     };
-    expect(result).toStrictEqual({ name: 'Alice' });
+
+    assert.deepStrictEqual(result, { name: 'Alice' });
   });
 });
 
 describe('omit', () => {
   test('should omit specified keys', () => {
-    expect(Obj.omit({ a: 1, b: 2, c: 3 }, ['c'])).toStrictEqual({ a: 1, b: 2 });
+    assert.deepStrictEqual(Obj.omit({ a: 1, b: 2, c: 3 }, ['c']), {
+      a: 1,
+      b: 2,
+    });
   });
 
   test('omit should support curried form', () => {
     const omitC = Obj.omit(['c']);
     const result = omitC({ a: 1, b: 2, c: 3, d: 4 });
-    expect(result).toStrictEqual({ a: 1, b: 2, d: 4 });
+
+    assert.deepStrictEqual(result, { a: 1, b: 2, d: 4 });
   });
 
   test('omit should work with pipe when curried', () => {
@@ -92,20 +100,23 @@ describe('omit', () => {
     };
 
     const result = pipe(user).map(omitSensitive).value;
-    expect(result).toStrictEqual({ id: 1, name: 'Alice' });
+
+    assert.deepStrictEqual(result, { id: 1, name: 'Alice' });
   });
 
   test('omit should handle empty keys in curried form', () => {
     const omitNone = Obj.omit([]);
     const original = { a: 1, b: 2, c: 3 };
     const result = omitNone(original);
-    expect(result).toStrictEqual(original);
+
+    assert.deepStrictEqual(result, original);
   });
 
   test('should omit multiple keys in curried form', () => {
     const omitBAndD = Obj.omit(['b', 'd']);
     const result = omitBAndD({ a: 1, b: 2, c: 3, d: 4, e: 5 });
-    expect(result).toStrictEqual({ a: 1, c: 3, e: 5 });
+
+    assert.deepStrictEqual(result, { a: 1, c: 3, e: 5 });
   });
 
   test('omit should work for records that only partially contain the key in curried form', () => {
@@ -120,7 +131,8 @@ describe('omit', () => {
       id: number;
       name: string;
     };
-    expect(result).toStrictEqual({ id: 1, name: 'Alice' });
+
+    assert.deepStrictEqual(result, { id: 1, name: 'Alice' });
   });
 });
 
@@ -138,7 +150,8 @@ describe('fromEntries', () => {
       typeof result,
       Readonly<{ name: 'Alice'; age: 30; active: true }>
     >('=');
-    expect(result).toStrictEqual({ name: 'Alice', age: 30, active: true });
+
+    assert.deepStrictEqual(result, { name: 'Alice', age: 30, active: true });
   });
 
   test('should produce partial record when keys are unions', () => {
@@ -148,6 +161,6 @@ describe('fromEntries', () => {
       Readonly<Record<'name' | 'email', string>>
     >;
 
-    expect(result).toStrictEqual({ name: 'Alice' });
+    assert.deepStrictEqual(result, { name: 'Alice' });
   });
 });

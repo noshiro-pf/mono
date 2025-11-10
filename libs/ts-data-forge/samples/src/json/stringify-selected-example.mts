@@ -1,5 +1,5 @@
 // Example: src/json/json.mts (stringifySelected)
-import { Json, Result } from 'ts-data-forge';
+import { isString, Json, Result } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 const user = {
@@ -15,6 +15,8 @@ const safeJson = Json.stringifySelected(user, ['id', 'name', 'role']);
 
 assert.ok(Result.isOk(safeJson));
 if (Result.isOk(safeJson)) {
+  assert(isString(safeJson.value));
+
   const parsed: unknown = JSON.parse(safeJson.value);
   assert.deepStrictEqual(parsed, {
     id: 1,

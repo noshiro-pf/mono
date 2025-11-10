@@ -6,8 +6,8 @@ import {
   NonNegativeFiniteNumber,
 } from './non-negative-finite-number.mjs';
 
-describe('NonNegativeFiniteNumber', () => {
-  describe('asNonNegativeFiniteNumber', () => {
+describe('NonNegativeFiniteNumber test', () => {
+  describe(asNonNegativeFiniteNumber, () => {
     test('accepts valid non-negative finite numbers', () => {
       expect(() => asNonNegativeFiniteNumber(0)).not.toThrow();
       expect(() => asNonNegativeFiniteNumber(1)).not.toThrow();
@@ -55,7 +55,7 @@ describe('NonNegativeFiniteNumber', () => {
     );
   });
 
-  describe('isNonNegativeFiniteNumber', () => {
+  describe(isNonNegativeFiniteNumber, () => {
     test('correctly identifies non-negative finite numbers', () => {
       expect(isNonNegativeFiniteNumber(0)).toBe(true);
       expect(isNonNegativeFiniteNumber(1)).toBe(true);
@@ -131,7 +131,7 @@ describe('NonNegativeFiniteNumber', () => {
 
     test('div method exists', () => {
       // Test that the div function exists and is of the right type
-      expect(typeof NonNegativeFiniteNumber.div).toBe('function');
+      expectTypeOf(NonNegativeFiniteNumber.div).toBeFunction();
       // Note: Cannot test division without type assertions due to strict type requirements
     });
 
@@ -158,6 +158,7 @@ describe('NonNegativeFiniteNumber', () => {
 
       for (const _ of range(10)) {
         const result = NonNegativeFiniteNumber.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonNegativeFiniteNumber.is(result)).toBe(true);
@@ -171,6 +172,7 @@ describe('NonNegativeFiniteNumber', () => {
 
       for (const _ of range(10)) {
         const result = NonNegativeFiniteNumber.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(5);
       }

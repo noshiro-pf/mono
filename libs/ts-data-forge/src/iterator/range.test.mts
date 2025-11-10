@@ -1,46 +1,52 @@
 import { range } from './range.mjs';
 
-describe('range', () => {
+describe(range, () => {
   test('range(0, 10)', () => {
-    expect(Array.from(range(0, 10))).toStrictEqual([
-      0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-    ]);
+    assert.deepStrictEqual(
+      Array.from(range(0, 10)),
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    );
   });
 
   test('range(10)', () => {
-    expect(Array.from(range(10))).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    assert.deepStrictEqual(
+      Array.from(range(10)),
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    );
   });
 
   test('range(0)', () => {
-    expect(Array.from(range(0))).toStrictEqual([]);
+    assert.deepStrictEqual(Array.from(range(0)), []);
   });
 
   test('range(-1)', () => {
     // @ts-expect-error negative end is not allowed
-    expect(Array.from(range(-1))).toStrictEqual([]);
+    assert.deepStrictEqual(Array.from(range(-1)), []);
   });
 
   test('range(10, 0, -1)', () => {
-    expect(Array.from(range(10, 0, -1))).toStrictEqual([
-      10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
-    ]);
+    assert.deepStrictEqual(
+      Array.from(range(10, 0, -1)),
+      [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+    );
   });
 
   test('range(0, -10, -1)', () => {
-    expect(Array.from(range(0, -10, -1))).toStrictEqual([
-      0, -1, -2, -3, -4, -5, -6, -7, -8, -9,
-    ]);
+    assert.deepStrictEqual(
+      Array.from(range(0, -10, -1)),
+      [0, -1, -2, -3, -4, -5, -6, -7, -8, -9],
+    );
   });
 
   test('range(0, 0)', () => {
-    expect(Array.from(range(0, 0))).toStrictEqual([]);
+    assert.deepStrictEqual(Array.from(range(0, 0)), []);
   });
 
   test('range(0, 11, 2)', () => {
-    expect(Array.from(range(0, 11, 2))).toStrictEqual([0, 2, 4, 6, 8, 10]);
+    assert.deepStrictEqual(Array.from(range(0, 11, 2)), [0, 2, 4, 6, 8, 10]);
   });
 
   test('range(1, 12, 2)', () => {
-    expect(Array.from(range(1, 12, 2))).toStrictEqual([1, 3, 5, 7, 9, 11]);
+    assert.deepStrictEqual(Array.from(range(1, 12, 2)), [1, 3, 5, 7, 9, 11]);
   });
 });

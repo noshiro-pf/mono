@@ -1,4 +1,5 @@
 import { expectType } from '../expect-type.mjs';
+import { isString } from '../guard/index.mjs';
 import { ISet } from './iset.mjs';
 
 describe('ISet.create', () => {
@@ -6,17 +7,20 @@ describe('ISet.create', () => {
     const s0 = ISet.create(ISet.create(ISet.create([1, 2, 3] as const)));
 
     expectType<typeof s0, ISet<1 | 2 | 3>>('<=');
-    expect(s0).toStrictEqual(ISet.create([1, 2, 3] as const));
+
+    assert.deepStrictEqual(s0, ISet.create([1, 2, 3] as const));
   });
 
   test('should create empty set', () => {
     const set = ISet.create<string>([]);
+
     expect(set.size).toBe(0);
     expect(set.isEmpty).toBe(true);
   });
 
   test('should create set from array', () => {
     const set = ISet.create([1, 2, 3, 2, 1]);
+
     expect(set.size).toBe(3);
     expect(set.has(1)).toBe(true);
     expect(set.has(2)).toBe(true);
@@ -26,6 +30,7 @@ describe('ISet.create', () => {
   test('should create set from JavaScript Set', () => {
     const jsSet = new Set(['a', 'b', 'c']);
     const set = ISet.create(jsSet);
+
     expect(set.size).toBe(3);
     expect(set.has('a')).toBe(true);
     expect(set.has('b')).toBe(true);
@@ -35,6 +40,7 @@ describe('ISet.create', () => {
   test('should create set from another ISet', () => {
     const original = ISet.create([1, 2, 3]);
     const copy = ISet.create(original);
+
     expect(copy.size).toBe(3);
     expect(copy.has(1)).toBe(true);
     expect(copy.has(2)).toBe(true);
@@ -47,6 +53,7 @@ describe('ISet.size', () => {
     const s0 = ISet.create([1, 2, 3] as const);
 
     expectType<typeof s0.size, number>('<=');
+
     expect(s0.size).toBe(3);
   });
 
@@ -60,11 +67,13 @@ describe('ISet.size', () => {
 describe('isEmpty property', () => {
   test('should return true for empty set', () => {
     const set = ISet.create<string>([]);
+
     expect(set.isEmpty).toBe(true);
   });
 
   test('should return false for non-empty set', () => {
     const set = ISet.create([1, 2, 3]);
+
     expect(set.isEmpty).toBe(false);
   });
 });
@@ -74,6 +83,7 @@ describe('ISet.has', () => {
     const s0 = ISet.create([1, 2, 3] as const);
 
     expectType<typeof s0.has, (value: 1 | 2 | 3) => boolean>('<=');
+
     expect(s0.has(2)).toBe(true);
   });
 
@@ -97,12 +107,14 @@ describe('ISet.has', () => {
 
   test('should handle boolean values', () => {
     const set = ISet.create([true, false]);
+
     expect(set.has(true)).toBe(true);
     expect(set.has(false)).toBe(true);
   });
 
   test('should handle null and undefined', () => {
     const set = ISet.create([null, undefined]);
+
     expect(set.has(null)).toBe(true);
     expect(set.has(undefined)).toBe(true);
   });
@@ -116,6 +128,7 @@ describe('ISet.every', () => {
       typeof s0.every,
       (predicate: (value: 2 | 4 | 6) => boolean) => boolean
     >('<=');
+
     expect(s0.every((x) => x % 2 === 0)).toBe(true);
   });
 
@@ -133,16 +146,19 @@ describe('ISet.every', () => {
 
   test('should return true when all elements satisfy predicate', () => {
     const set = ISet.create([2, 4, 6, 8]);
+
     expect(set.every((x) => x % 2 === 0)).toBe(true);
   });
 
   test('should return false when some elements do not satisfy predicate', () => {
     const set = ISet.create([1, 2, 3, 4]);
+
     expect(set.every((x) => x % 2 === 0)).toBe(false);
   });
 
   test('should return true for empty set', () => {
     const set = ISet.create<number>([]);
+
     expect(set.every((x) => x > 0)).toBe(true);
   });
 });
@@ -154,13 +170,14 @@ describe('every method as type guard', () => {
       // Type should be narrowed to ISet<string>
       const values = set.toArray();
       for (const value of values) {
-        expect(typeof value).toBe('string');
+        expect(isString(value)).toBe(true);
       }
     }
   });
 
   test('should work with mixed types that fail guard', () => {
     const set = ISet.create<string | number>(['hello', 42, 'world']);
+
     expect(
       set.every((value): value is string => typeof value === 'string'),
     ).toBe(false);
@@ -175,6 +192,7 @@ describe('ISet.some', () => {
       typeof s0.some,
       (predicate: (value: 1 | 3 | 5) => boolean) => boolean
     >('<=');
+
     expect(s0.some((x) => x % 2 === 0)).toBe(false);
   });
 
@@ -192,21 +210,25 @@ describe('ISet.some', () => {
 
   test('should return true when at least one element satisfies predicate', () => {
     const set = ISet.create([1, 3, 5, 6]);
+
     expect(set.some((x) => x % 2 === 0)).toBe(true);
   });
 
   test('should return false when no elements satisfy predicate', () => {
     const set = ISet.create([1, 3, 5, 7]);
+
     expect(set.some((x) => x % 2 === 0)).toBe(false);
   });
 
   test('should return false for empty set', () => {
     const set = ISet.create<number>([]);
+
     expect(set.some((x) => x > 0)).toBe(false);
   });
 
   test('should work with complex predicates', () => {
     const set = ISet.create(['hello', 'world', 'test']);
+
     expect(set.some((str) => str.includes('o'))).toBe(true);
     expect(set.some((str) => str.includes('z'))).toBe(false);
   });
@@ -218,22 +240,23 @@ describe('ISet.add', () => {
 
     expectType<typeof s0.add, (value: number) => ISet<number>>('<=');
     const s1 = ISet.create<number>([1, 2, 3, 4]);
-    expect(s0.add(4)).toStrictEqual(s1);
-    expect(s0).toStrictEqual(ISet.create<number>([1, 2, 3]));
+
+    assert.deepStrictEqual(s0.add(4), s1);
+    assert.deepStrictEqual(s0, ISet.create<number>([1, 2, 3]));
   });
 
   test('case 2', () => {
-    const s0 = ISet.create([1, 2, 3]);
+    const s0 = ISet.create<number>([1, 2, 3]);
 
-    expect(s0.add(2)).toStrictEqual(ISet.create([1, 2, 3]));
-    expect(s0).toStrictEqual(ISet.create([1, 2, 3]));
+    assert.deepStrictEqual(s0.add(2), ISet.create([1, 2, 3]));
+    assert.deepStrictEqual(s0, ISet.create([1, 2, 3]));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
 
-    expect(s0.add(1)).toStrictEqual(ISet.create([1]));
-    expect(s0).toStrictEqual(ISet.create([]));
+    assert.deepStrictEqual(s0.add(1), ISet.create([1]));
+    assert.deepStrictEqual(s0, ISet.create<number>([]));
   });
 
   test('should add new elements and maintain immutability', () => {
@@ -249,6 +272,7 @@ describe('ISet.add', () => {
   test('should return same instance when adding existing element', () => {
     const set = ISet.create([1, 2, 3]);
     const result = set.add(2);
+
     expect(result).toBe(set);
   });
 
@@ -269,22 +293,23 @@ describe('ISet.delete', () => {
     const s0 = ISet.create<number>([1, 2, 3]);
 
     expectType<typeof s0.delete, (value: number) => ISet<number>>('<=');
-    expect(s0.delete(4)).toStrictEqual(ISet.create<number>([1, 2, 3]));
-    expect(s0).toStrictEqual(ISet.create<number>([1, 2, 3]));
+
+    assert.deepStrictEqual(s0.delete(4), ISet.create<number>([1, 2, 3]));
+    assert.deepStrictEqual(s0, ISet.create<number>([1, 2, 3]));
   });
 
   test('case 2', () => {
     const s0 = ISet.create([1, 2, 3]);
 
-    expect(s0.delete(2)).toStrictEqual(ISet.create([1, 3]));
-    expect(s0).toStrictEqual(ISet.create([1, 2, 3]));
+    assert.deepStrictEqual(s0.delete(2), ISet.create<1 | 2 | 3>([1, 3]));
+    assert.deepStrictEqual(s0, ISet.create([1, 2, 3]));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
 
-    expect(s0.delete(1)).toStrictEqual(ISet.create([]));
-    expect(s0).toStrictEqual(ISet.create([]));
+    assert.deepStrictEqual(s0.delete(1), ISet.create<number>([]));
+    assert.deepStrictEqual(s0, ISet.create<number>([]));
   });
 
   test('should delete existing elements and maintain immutability', () => {
@@ -300,6 +325,7 @@ describe('ISet.delete', () => {
   test('should return same instance when deleting non-existent element', () => {
     const set = ISet.create<number>([1, 2, 3]);
     const result = set.delete(4);
+
     expect(result).toBe(set);
   });
 });
@@ -312,22 +338,30 @@ describe('ISet.map', () => {
       typeof s0.map,
       <U extends MapSetKeyType>(mapper: (value: 1 | 2 | 3) => U) => ISet<U>
     >('<=');
-    expect(s0.map((x) => x * 2)).toStrictEqual(ISet.create([2, 4, 6]));
+
+    assert.deepStrictEqual(
+      s0.map((x) => x * 2),
+      ISet.create<number>([2, 4, 6]),
+    );
   });
 
   test('case 2', () => {
     const s0 = ISet.create<number>([]);
 
-    expect(s0.map((x) => x * 2)).toStrictEqual(ISet.create([]));
+    assert.deepStrictEqual(
+      s0.map((x) => x * 2),
+      ISet.create<number>([]),
+    );
   });
 
   test('should transform all elements', () => {
     const set = ISet.create([1, 2, 3]);
     const doubled = set.map((x) => x * 2);
 
-    expect(doubled.toArray().toSorted((a, b) => a - b)).toStrictEqual([
-      2, 4, 6,
-    ]);
+    assert.deepStrictEqual(
+      doubled.toArray().toSorted((a, b) => a - b),
+      [2, 4, 6],
+    );
   });
 
   test('should handle type transformations', () => {
@@ -350,13 +384,20 @@ describe('ISet.filter', () => {
         predicate: (value: 1 | 2 | 3 | 4 | 5) => boolean,
       ) => ISet<1 | 2 | 3 | 4 | 5>
     >('<=');
-    expect(s0.filter((x) => x % 2 === 0)).toStrictEqual(ISet.create([2, 4]));
+
+    assert.deepStrictEqual(
+      s0.filter((x) => x % 2 === 0),
+      ISet.create<1 | 2 | 3 | 4 | 5>([2, 4]),
+    );
   });
 
   test('case 2', () => {
     const s0 = ISet.create<number>([]);
 
-    expect(s0.filter((x) => x % 2 === 0)).toStrictEqual(ISet.create([]));
+    assert.deepStrictEqual(
+      s0.filter((x) => x % 2 === 0),
+      ISet.create<number>([]),
+    );
   });
 
   test('should filter elements based on predicate', () => {
@@ -403,6 +444,7 @@ describe('ISet.filterNot', () => {
   test('should return same set when no elements satisfy predicate', () => {
     const set = ISet.create([1, 3, 5]);
     const nonEvens = set.filterNot((x) => x % 2 === 0);
+
     expect(nonEvens.size).toBe(3);
     expect(ISet.equal(set, nonEvens)).toBe(true);
   });
@@ -410,6 +452,7 @@ describe('ISet.filterNot', () => {
   test('should return empty set when all elements satisfy predicate', () => {
     const set = ISet.create([2, 4, 6]);
     const nonEvens = set.filterNot((x) => x % 2 === 0);
+
     expect(nonEvens.isEmpty).toBe(true);
   });
 });
@@ -420,6 +463,7 @@ describe('ISet.isSubsetOf', () => {
     const s1 = ISet.create<number>([1, 2, 3]);
 
     expectType<typeof s0.isSubsetOf, (other: ISet<number>) => boolean>('<=');
+
     expect(s0.isSubsetOf(s1)).toBe(true);
   });
 
@@ -440,18 +484,21 @@ describe('ISet.isSubsetOf', () => {
   test('should return true for subset relationship', () => {
     const subset = ISet.create<number>([1, 2]);
     const superset = ISet.create<number>([1, 2, 3, 4]);
+
     expect(subset.isSubsetOf(superset)).toBe(true);
   });
 
   test('should return true for equal sets', () => {
     const set1 = ISet.create<number>([1, 2, 3]);
     const set2 = ISet.create<number>([1, 2, 3]);
+
     expect(set1.isSubsetOf(set2)).toBe(true);
   });
 
   test('should return false for non-subset', () => {
     const set1 = ISet.create<number>([1, 2, 5]);
     const set2 = ISet.create<number>([1, 2, 3, 4]);
+
     expect(set1.isSubsetOf(set2)).toBe(false);
   });
 });
@@ -462,6 +509,7 @@ describe('ISet.isSupersetOf', () => {
     const s1 = ISet.create<number>([1, 2]);
 
     expectType<typeof s0.isSupersetOf, (other: ISet<number>) => boolean>('<=');
+
     expect(s0.isSupersetOf(s1)).toBe(true);
   });
 
@@ -482,18 +530,21 @@ describe('ISet.isSupersetOf', () => {
   test('should return true for superset relationship', () => {
     const superset = ISet.create<number>([1, 2, 3, 4]);
     const subset = ISet.create<number>([1, 2]);
+
     expect(superset.isSupersetOf(subset)).toBe(true);
   });
 
   test('should return true for equal sets', () => {
     const set1 = ISet.create<number>([1, 2, 3]);
     const set2 = ISet.create<number>([1, 2, 3]);
+
     expect(set1.isSupersetOf(set2)).toBe(true);
   });
 
   test('should return false for non-superset', () => {
     const set1 = ISet.create<number>([1, 2, 3]);
     const set2 = ISet.create<number>([1, 2, 3, 4]);
+
     expect(set1.isSupersetOf(set2)).toBe(false);
   });
 });
@@ -504,21 +555,22 @@ describe('ISet.subtract', () => {
     const s1 = ISet.create<number>([2, 4]);
 
     expectType<typeof s0.subtract, (other: ISet<number>) => ISet<number>>('<=');
-    expect(s0.subtract(s1)).toStrictEqual(ISet.create<number>([1, 3]));
+
+    assert.deepStrictEqual(s0.subtract(s1), ISet.create<number>([1, 3]));
   });
 
   test('case 2', () => {
     const s0 = ISet.create<number>([1, 2, 3]);
     const s1 = ISet.create<number>([]);
 
-    expect(s0.subtract(s1)).toStrictEqual(ISet.create<number>([1, 2, 3]));
+    assert.deepStrictEqual(s0.subtract(s1), ISet.create<number>([1, 2, 3]));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
     const s1 = ISet.create<number>([1, 2, 3]);
 
-    expect(s0.subtract(s1)).toStrictEqual(ISet.create<number>([]));
+    assert.deepStrictEqual(s0.subtract(s1), ISet.create<number>([]));
   });
 
   test('should return elements in first set but not in second', () => {
@@ -549,7 +601,9 @@ describe('ISet.intersection', () => {
       typeof ISet.intersection,
       <T extends Primitive>(a: ISet<T>, b: ISet<T>) => ISet<T>
     >('<=');
-    expect(ISet.intersection(s0, s1)).toStrictEqual(
+
+    assert.deepStrictEqual(
+      ISet.intersection(s0, s1),
       ISet.create<number>([2, 3]),
     );
   });
@@ -558,14 +612,14 @@ describe('ISet.intersection', () => {
     const s0 = ISet.create<number>([1, 2, 3]);
     const s1 = ISet.create<number>([]);
 
-    expect(ISet.intersection(s0, s1)).toStrictEqual(ISet.create<number>([]));
+    assert.deepStrictEqual(ISet.intersection(s0, s1), ISet.create<number>([]));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
     const s1 = ISet.create<number>([1, 2, 3]);
 
-    expect(ISet.intersection(s0, s1)).toStrictEqual(ISet.create<number>([]));
+    assert.deepStrictEqual(ISet.intersection(s0, s1), ISet.create<number>([]));
   });
 
   test('should return common elements', () => {
@@ -595,21 +649,22 @@ describe('ISet.intersect', () => {
     expectType<typeof s0.intersect, (other: ISet<number>) => ISet<number>>(
       '<=',
     );
-    expect(s0.intersect(s1)).toStrictEqual(ISet.create<number>([2, 3]));
+
+    assert.deepStrictEqual(s0.intersect(s1), ISet.create<number>([2, 3]));
   });
 
   test('case 2', () => {
     const s0 = ISet.create<number>([1, 2, 3]);
     const s1 = ISet.create<number>([]);
 
-    expect(s0.intersect(s1)).toStrictEqual(ISet.create<number>([]));
+    assert.deepStrictEqual(s0.intersect(s1), ISet.create<number>([]));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
     const s1 = ISet.create<number>([1, 2, 3]);
 
-    expect(s0.intersect(s1)).toStrictEqual(ISet.create<number>([]));
+    assert.deepStrictEqual(s0.intersect(s1), ISet.create<number>([]));
   });
 
   test('should return common elements using instance method', () => {
@@ -632,7 +687,9 @@ describe('ISet.union', () => {
       typeof ISet.union,
       <T extends Primitive>(a: ISet<T>, b: ISet<T>) => ISet<T>
     >('!=');
-    expect(ISet.union(s0, s1)).toStrictEqual(
+
+    assert.deepStrictEqual(
+      ISet.union(s0, s1),
       ISet.create<number>([1, 2, 3, 4, 5]),
     );
   });
@@ -641,19 +698,19 @@ describe('ISet.union', () => {
     const s0 = ISet.create([1, 2, 3]);
     const s1 = ISet.create<number>([]);
 
-    expect(ISet.union(s0, s1)).toStrictEqual(ISet.create([1, 2, 3]));
+    assert.deepStrictEqual(ISet.union(s0, s1), ISet.create<number>([1, 2, 3]));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
-    const s1 = ISet.create([1, 2, 3]);
+    const s1 = ISet.create<number>([1, 2, 3]);
 
-    expect(ISet.union(s0, s1)).toStrictEqual(ISet.create([1, 2, 3]));
+    assert.deepStrictEqual(ISet.union(s0, s1), ISet.create<number>([1, 2, 3]));
   });
 
   test('should return combined elements using static method', () => {
-    const set1 = ISet.create([1, 2, 3]);
-    const set2 = ISet.create([3, 4, 5]);
+    const set1 = ISet.create<number>([1, 2, 3]);
+    const set2 = ISet.create<number>([3, 4, 5]);
     const result = ISet.union(set1, set2);
 
     expect(result.size).toBe(5);
@@ -670,26 +727,30 @@ describe('ISet.union', () => {
       const s1 = ISet.create([3, 4, 5] as const);
 
       expectType<typeof s0.union, (other: ISet<number>) => ISet<number>>('<=');
-      expect(s0.union(s1)).toStrictEqual(ISet.create([1, 2, 3, 4, 5]));
+
+      assert.deepStrictEqual(
+        s0.union(s1),
+        ISet.create<1 | 2 | 3 | 4 | 5>([1, 2, 3, 4, 5]),
+      );
     });
 
     test('case 2', () => {
-      const s0 = ISet.create([1, 2, 3]);
+      const s0 = ISet.create<number>([1, 2, 3]);
       const s1 = ISet.create<number>([]);
 
-      expect(s0.union(s1)).toStrictEqual(ISet.create([1, 2, 3]));
+      assert.deepStrictEqual(s0.union(s1), ISet.create<number>([1, 2, 3]));
     });
 
     test('case 3', () => {
       const s0 = ISet.create<number>([]);
-      const s1 = ISet.create([1, 2, 3]);
+      const s1 = ISet.create<number>([1, 2, 3]);
 
-      expect(s0.union(s1)).toStrictEqual(ISet.create([1, 2, 3]));
+      assert.deepStrictEqual(s0.union(s1), ISet.create<number>([1, 2, 3]));
     });
 
     test('should return combined elements using instance method', () => {
-      const set1 = ISet.create([1, 2, 3]);
-      const set2 = ISet.create([3, 4, 5]);
+      const set1 = ISet.create<number>([1, 2, 3]);
+      const set2 = ISet.create<number>([3, 4, 5]);
       const result = set1.union(set2);
 
       expect(result.size).toBe(5);
@@ -716,7 +777,10 @@ describe('ISet.forEach', () => {
       mut_result.push(x);
     }
 
-    expect(mut_result.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    assert.deepStrictEqual(
+      mut_result.toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 
   test('should execute callback for each element', () => {
@@ -727,7 +791,10 @@ describe('ISet.forEach', () => {
       mut_collected.push(value);
     }
 
-    expect(mut_collected.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    assert.deepStrictEqual(
+      mut_collected.toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 
   test('should not call callback for empty set', () => {
@@ -754,7 +821,10 @@ describe('ISet.keys', () => {
       mut_result.push(x);
     }
 
-    expect(mut_result.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    assert.deepStrictEqual(
+      mut_result.toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 });
 
@@ -769,7 +839,10 @@ describe('ISet.values', () => {
       mut_result.push(x);
     }
 
-    expect(mut_result.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    assert.deepStrictEqual(
+      mut_result.toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 });
 
@@ -787,11 +860,14 @@ describe('ISet.entries', () => {
       mut_result.push([x[0], x[1]]);
     }
 
-    expect(mut_result.toSorted((a, b) => a[0] - b[0])).toStrictEqual([
-      [1, 1],
-      [2, 2],
-      [3, 3],
-    ]);
+    assert.deepStrictEqual(
+      mut_result.toSorted((a, b) => a[0] - b[0]),
+      [
+        [1, 1],
+        [2, 2],
+        [3, 3],
+      ],
+    );
   });
 });
 
@@ -800,15 +876,17 @@ describe('ISet.toArray', () => {
     const s0 = ISet.create([1, 2, 3] as const);
 
     expectType<typeof s0.toArray, () => readonly (1 | 2 | 3)[]>('<=');
-    expect(Array.from(s0.toArray()).toSorted((a, b) => a - b)).toStrictEqual([
-      1, 2, 3,
-    ]);
+
+    assert.deepStrictEqual(
+      Array.from(s0.toArray()).toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 
   test('case 2', () => {
     const s0 = ISet.create<number>([]);
 
-    expect(s0.toArray()).toStrictEqual([]);
+    assert.deepStrictEqual(s0.toArray(), []);
   });
 
   test('should convert set to array', () => {
@@ -816,9 +894,11 @@ describe('ISet.toArray', () => {
     const array = set.toArray();
 
     expect(array).toHaveLength(3);
-    expect(Array.from(array).toSorted((a, b) => a - b)).toStrictEqual([
-      1, 2, 3,
-    ]);
+
+    assert.deepStrictEqual(
+      Array.from(array).toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 });
 
@@ -845,30 +925,35 @@ describe('ISet.equal', () => {
   test('should return true for equal sets', () => {
     const set1 = ISet.create([1, 2, 3]);
     const set2 = ISet.create([3, 2, 1]); // Different order
+
     expect(ISet.equal(set1, set2)).toBe(true);
   });
 
   test('should return false for sets with different sizes', () => {
     const set1 = ISet.create<'a' | 'b' | 'c' | 'd'>(['a', 'b']);
     const set2 = ISet.create<'a' | 'b' | 'c' | 'd'>(['a', 'b', 'c']);
+
     expect(ISet.equal(set1, set2)).toBe(false);
   });
 
   test('should return false for sets with different elements', () => {
     const set1 = ISet.create<'a' | 'b' | 'c' | 'd'>(['a', 'b', 'c']);
     const set2 = ISet.create<'a' | 'b' | 'c' | 'd'>(['a', 'b', 'd']);
+
     expect(ISet.equal(set1, set2)).toBe(false);
   });
 
   test('should return true for empty sets', () => {
     const set1 = ISet.create<string>([]);
     const set2 = ISet.create<string>([]);
+
     expect(ISet.equal(set1, set2)).toBe(true);
   });
 
   test('should handle sets with special values', () => {
     const set1 = ISet.create([Number.NaN, null, undefined]);
     const set2 = ISet.create([undefined, Number.NaN, null]);
+
     expect(ISet.equal(set1, set2)).toBe(true);
   });
 });
@@ -917,10 +1002,12 @@ describe('ISet.diff', () => {
     const nonEmptySet = ISet.create<string>(['a', 'b']);
 
     const diff1 = ISet.diff(emptySet, nonEmptySet);
+
     expect(diff1.deleted.isEmpty).toBe(true);
     expect(diff1.added.size).toBe(2);
 
     const diff2 = ISet.diff(nonEmptySet, emptySet);
+
     expect(diff2.deleted.size).toBe(2);
     expect(diff2.added.isEmpty).toBe(true);
   });
@@ -946,6 +1033,7 @@ describe('ISet.withMutations', () => {
   test('should handle empty mutations array', () => {
     const set = ISet.create(['a', 'b', 'c']);
     const updated = set.withMutations([]);
+
     expect(updated.size).toBe(set.size);
     expect(ISet.equal(set, updated)).toBe(true);
   });
@@ -957,6 +1045,7 @@ describe('ISet.withMutations', () => {
       { type: 'delete', key: 'b' }, // Doesn't exist
       { type: 'add', key: 'b' },
     ]);
+
     expect(updated.size).toBe(2);
     expect(updated.has('a')).toBe(true);
     expect(updated.has('b')).toBe(true);
@@ -972,44 +1061,54 @@ describe('iterable functionality', () => {
       mut_collected.push(value);
     }
 
-    expect(mut_collected.toSorted((a, b) => a - b)).toStrictEqual([1, 2, 3]);
+    assert.deepStrictEqual(
+      mut_collected.toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 
   test('should work with spread operator', () => {
     const set = ISet.create([1, 2, 3]);
     const array = Array.from(set);
 
-    expect(Array.from(array).toSorted((a, b) => a - b)).toStrictEqual([
-      1, 2, 3,
-    ]);
+    assert.deepStrictEqual(
+      Array.from(array).toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 
   test('should work with Array.from', () => {
     const set = ISet.create([1, 2, 3]);
     const array = Array.from(set);
 
-    expect(Array.from(array).toSorted((a, b) => a - b)).toStrictEqual([
-      1, 2, 3,
-    ]);
+    assert.deepStrictEqual(
+      Array.from(array).toSorted((a, b) => a - b),
+      [1, 2, 3],
+    );
   });
 
   test('should work with destructuring', () => {
     const set = ISet.create([1, 2]);
     const values = Array.from(set);
 
-    expect(values.toSorted((a, b) => a - b)).toStrictEqual([1, 2]);
+    assert.deepStrictEqual(
+      values.toSorted((a, b) => a - b),
+      [1, 2],
+    );
   });
 });
 
 describe('edge cases', () => {
   test('should handle NaN correctly', () => {
     const set = ISet.create([Number.NaN, 1, 2]);
+
     expect(set.has(Number.NaN)).toBe(true);
     expect(set.size).toBe(3);
   });
 
   test('should handle boolean values', () => {
     const set = ISet.create([true, false, true]);
+
     expect(set.size).toBe(2);
     expect(set.has(true)).toBe(true);
     expect(set.has(false)).toBe(true);
@@ -1017,6 +1116,7 @@ describe('edge cases', () => {
 
   test('should handle null and undefined', () => {
     const set = ISet.create([null, undefined, null]);
+
     expect(set.size).toBe(2);
     expect(set.has(null)).toBe(true);
     expect(set.has(undefined)).toBe(true);

@@ -6,8 +6,8 @@ import {
   NonZeroInt16,
 } from './non-zero-int16.mjs';
 
-describe('NonZeroInt16', () => {
-  describe('asNonZeroInt16', () => {
+describe('NonZeroInt16 test', () => {
+  describe(asNonZeroInt16, () => {
     test('accepts valid non-zero int16 values', () => {
       expect(() => asNonZeroInt16(1)).not.toThrow();
       expect(() => asNonZeroInt16(-1)).not.toThrow();
@@ -62,7 +62,7 @@ describe('NonZeroInt16', () => {
     );
   });
 
-  describe('isNonZeroInt16', () => {
+  describe(isNonZeroInt16, () => {
     test('correctly identifies non-zero int16 values', () => {
       expect(isNonZeroInt16(1)).toBe(true);
       expect(isNonZeroInt16(-1)).toBe(true);
@@ -127,6 +127,7 @@ describe('NonZeroInt16', () => {
         asNonZeroInt16(32_000),
         asNonZeroInt16(1000),
       );
+
       expect(result).toBe(32_767); // clamped to max
       expect(NonZeroInt16.add(a, b)).toBe(150);
     });
@@ -136,6 +137,7 @@ describe('NonZeroInt16', () => {
         asNonZeroInt16(-32_000),
         asNonZeroInt16(1000),
       );
+
       expect(result).toBe(-32_768); // clamped to min
       expect(NonZeroInt16.sub(a, b)).toBe(50);
     });
@@ -145,6 +147,7 @@ describe('NonZeroInt16', () => {
         asNonZeroInt16(1000),
         asNonZeroInt16(100),
       );
+
       expect(result).toBe(32_767); // clamped to max
       expect(NonZeroInt16.mul(asNonZeroInt16(10), asNonZeroInt16(5))).toBe(50);
     });
@@ -157,6 +160,7 @@ describe('NonZeroInt16', () => {
 
     test('pow (with clamping)', () => {
       const result = NonZeroInt16.pow(asNonZeroInt16(200), asNonZeroInt16(3));
+
       expect(result).toBe(32_767); // clamped to max
       expect(NonZeroInt16.pow(asNonZeroInt16(2), asNonZeroInt16(3))).toBe(8);
     });
@@ -169,6 +173,7 @@ describe('NonZeroInt16', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroInt16.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroInt16.is(result)).toBe(true);
@@ -180,6 +185,7 @@ describe('NonZeroInt16', () => {
     test('generates values within NonZeroInt16 range', () => {
       for (const _ of range(10)) {
         const result = NonZeroInt16.random(-20, 20);
+
         expect(result).toBeGreaterThanOrEqual(-32_768);
         expect(result).toBeLessThanOrEqual(32_767);
       }

@@ -1,6 +1,6 @@
 import { ifThen } from './if-then.mjs';
 
-describe('ifThen', () => {
+describe(ifThen, () => {
   test('should implement logical implication truth table', () => {
     // True antecedent, true consequent -> true
     expect(ifThen(true, true)).toBe(true);
@@ -34,6 +34,7 @@ describe('ifThen', () => {
     ): boolean =>
       // If admin, then must have permission
       ifThen(isAdmin, hasPermission);
+
     expect(checkPermission(true, true)).toBe(true); // admin with permission
     expect(checkPermission(true, false)).toBe(false); // admin without permission
     expect(checkPermission(false, true)).toBe(true); // non-admin with permission
@@ -47,6 +48,7 @@ describe('ifThen', () => {
     ): boolean =>
       // If premium, then all premium features must be enabled
       ifThen(isPremium, hasAllFeatures);
+
     expect(validateSubscription(true, true)).toBe(true); // premium with all features
     expect(validateSubscription(true, false)).toBe(false); // premium without all features
     expect(validateSubscription(false, true)).toBe(true); // non-premium with features
@@ -67,6 +69,7 @@ describe('ifThen', () => {
     const checkExpiredLogic = (isExpired: boolean, isValid: boolean): boolean =>
       // "If not expired then valid" is equivalent to "expired OR valid"
       ifThen(!isExpired, isValid);
+
     expect(checkExpiredLogic(false, true)).toBe(true); // not expired and valid
     expect(checkExpiredLogic(false, false)).toBe(false); // not expired but invalid
     expect(checkExpiredLogic(true, true)).toBe(true); // expired but valid (vacuous)

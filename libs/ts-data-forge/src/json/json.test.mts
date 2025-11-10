@@ -1,32 +1,36 @@
 import { Arr } from '../array/index.mjs';
 import { Result } from '../functional/index.mjs';
-import { hasKey, isRecord } from '../guard/index.mjs';
+import { hasKey, isRecord, isString } from '../guard/index.mjs';
 import { Json } from './json.mjs';
 
 describe('parse', () => {
   test('should parse primitive values', () => {
-    expect(Json.parse('"hello"')).toStrictEqual(Result.ok('hello'));
-    expect(Json.parse('42')).toStrictEqual(Result.ok(42));
-    expect(Json.parse('true')).toStrictEqual(Result.ok(true));
-    expect(Json.parse('false')).toStrictEqual(Result.ok(false));
-    expect(Json.parse('null')).toStrictEqual(Result.ok(null));
+    assert.deepStrictEqual(Json.parse('"hello"'), Result.ok('hello'));
+    assert.deepStrictEqual(Json.parse('42'), Result.ok(42));
+    assert.deepStrictEqual(Json.parse('true'), Result.ok(true));
+    assert.deepStrictEqual(Json.parse('false'), Result.ok(false));
+    assert.deepStrictEqual(Json.parse('null'), Result.ok(null));
   });
 
   test('should parse arrays', () => {
-    expect(Json.parse('[1,2,3]')).toStrictEqual(Result.ok([1, 2, 3]));
-    expect(Json.parse('["a","b","c"]')).toStrictEqual(
+    assert.deepStrictEqual(Json.parse('[1,2,3]'), Result.ok([1, 2, 3]));
+    assert.deepStrictEqual(
+      Json.parse('["a","b","c"]'),
       Result.ok(['a', 'b', 'c']),
     );
-    expect(Json.parse('[1,"two",true,null]')).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.parse('[1,"two",true,null]'),
       Result.ok([1, 'two', true, null]),
     );
   });
 
   test('should parse objects', () => {
-    expect(Json.parse('{"a":1,"b":2}')).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.parse('{"a":1,"b":2}'),
       Result.ok({ a: 1, b: 2 }),
     );
-    expect(Json.parse('{"name":"test","value":42}')).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.parse('{"name":"test","value":42}'),
       Result.ok({
         name: 'test',
         value: 42,
@@ -43,14 +47,17 @@ describe('parse', () => {
         },
       },
     };
-    expect(Json.parse(json)).toStrictEqual(Result.ok(expected));
+
+    assert.deepStrictEqual(Json.parse(json), Result.ok(expected));
   });
 
   test('should handle whitespace', () => {
-    expect(Json.parse('  {  "a" : 1 ,  "b" : 2  }  ')).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.parse('  {  "a" : 1 ,  "b" : 2  }  '),
       Result.ok({ a: 1, b: 2 }),
     );
-    expect(Json.parse('\n[\n  1,\n  2,\n  3\n]\n')).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.parse('\n[\n  1,\n  2,\n  3\n]\n'),
       Result.ok([1, 2, 3]),
     );
   });
@@ -63,12 +70,12 @@ describe('parse', () => {
   });
 
   test('should return parsed value for valid JSON', () => {
-    expect(Json.parse('{"a":1}')).toStrictEqual(Result.ok({ a: 1 }));
-    expect(Json.parse('[1,2,3]')).toStrictEqual(Result.ok([1, 2, 3]));
-    expect(Json.parse('"string"')).toStrictEqual(Result.ok('string'));
-    expect(Json.parse('42')).toStrictEqual(Result.ok(42));
-    expect(Json.parse('true')).toStrictEqual(Result.ok(true));
-    expect(Json.parse('null')).toStrictEqual(Result.ok(null));
+    assert.deepStrictEqual(Json.parse('{"a":1}'), Result.ok({ a: 1 }));
+    assert.deepStrictEqual(Json.parse('[1,2,3]'), Result.ok([1, 2, 3]));
+    assert.deepStrictEqual(Json.parse('"string"'), Result.ok('string'));
+    assert.deepStrictEqual(Json.parse('42'), Result.ok(42));
+    assert.deepStrictEqual(Json.parse('true'), Result.ok(true));
+    assert.deepStrictEqual(Json.parse('null'), Result.ok(null));
   });
 
   test('should return error for invalid JSON cases', () => {
@@ -80,10 +87,10 @@ describe('parse', () => {
   });
 
   test('should handle edge cases', () => {
-    expect(Json.parse('0')).toStrictEqual(Result.ok(0));
-    expect(Json.parse('""')).toStrictEqual(Result.ok(''));
-    expect(Json.parse('[]')).toStrictEqual(Result.ok([]));
-    expect(Json.parse('{}')).toStrictEqual(Result.ok({}));
+    assert.deepStrictEqual(Json.parse('0'), Result.ok(0));
+    assert.deepStrictEqual(Json.parse('""'), Result.ok(''));
+    assert.deepStrictEqual(Json.parse('[]'), Result.ok([]));
+    assert.deepStrictEqual(Json.parse('{}'), Result.ok({}));
   });
 
   test('should not throw errors', () => {
@@ -105,6 +112,7 @@ describe('parse', () => {
     const result = Json.parse(jsonString, dateReviver);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (
       Result.isOk(result) &&
       isRecord(result.value) &&
@@ -130,9 +138,11 @@ describe('parse', () => {
     );
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toHaveProperty('number');
       expect(result.value).toHaveProperty('text');
+
       if (
         isRecord(result.value) &&
         hasKey(result.value, 'number') &&
@@ -147,27 +157,31 @@ describe('parse', () => {
 
 describe('stringify', () => {
   test('should stringify primitive values', () => {
-    expect(Json.stringify('hello')).toStrictEqual(Result.ok('"hello"'));
-    expect(Json.stringify(42)).toStrictEqual(Result.ok('42'));
-    expect(Json.stringify(true)).toStrictEqual(Result.ok('true'));
-    expect(Json.stringify(null)).toStrictEqual(Result.ok('null'));
+    assert.deepStrictEqual(Json.stringify('hello'), Result.ok('"hello"'));
+    assert.deepStrictEqual(Json.stringify(42), Result.ok('42'));
+    assert.deepStrictEqual(Json.stringify(true), Result.ok('true'));
+    assert.deepStrictEqual(Json.stringify(null), Result.ok('null'));
   });
 
   test('should stringify arrays', () => {
-    expect(Json.stringify([1, 2, 3])).toStrictEqual(Result.ok('[1,2,3]'));
-    expect(Json.stringify(['a', 'b', 'c'])).toStrictEqual(
+    assert.deepStrictEqual(Json.stringify([1, 2, 3]), Result.ok('[1,2,3]'));
+    assert.deepStrictEqual(
+      Json.stringify(['a', 'b', 'c']),
       Result.ok('["a","b","c"]'),
     );
-    expect(Json.stringify([1, 'two', true, null])).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.stringify([1, 'two', true, null]),
       Result.ok('[1,"two",true,null]'),
     );
   });
 
   test('should stringify objects', () => {
-    expect(Json.stringify({ a: 1, b: 2 })).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.stringify({ a: 1, b: 2 }),
       Result.ok('{"a":1,"b":2}'),
     );
-    expect(Json.stringify({ name: 'test', value: 42 })).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.stringify({ name: 'test', value: 42 }),
       Result.ok('{"name":"test","value":42}'),
     );
   });
@@ -180,41 +194,53 @@ describe('stringify', () => {
         },
       },
     };
-    expect(Json.stringify(nested)).toStrictEqual(
+
+    assert.deepStrictEqual(
+      Json.stringify(nested),
       Result.ok('{"level1":{"level2":{"array":[1,2,{"level3":"deep"}]}}}'),
     );
   });
 
   test('should handle empty structures', () => {
-    expect(Json.stringify({})).toStrictEqual(Result.ok('{}'));
-    expect(Json.stringify([])).toStrictEqual(Result.ok('[]'));
+    assert.deepStrictEqual(Json.stringify({}), Result.ok('{}'));
+    assert.deepStrictEqual(Json.stringify([]), Result.ok('[]'));
   });
 
   test('should handle special string values', () => {
-    expect(Json.stringify('with "quotes"')).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.stringify('with "quotes"'),
       Result.ok(String.raw`"with \"quotes\""`),
     );
-    expect(Json.stringify('with\nnewline')).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.stringify('with\nnewline'),
       Result.ok(String.raw`"with\nnewline"`),
     );
-    expect(Json.stringify('with\ttab')).toStrictEqual(
+    assert.deepStrictEqual(
+      Json.stringify('with\ttab'),
       Result.ok(String.raw`"with\ttab"`),
     );
   });
 
   test('should return stringified value for valid JSON values', () => {
-    expect(Json.stringify({ a: 1 })).toStrictEqual(Result.ok('{"a":1}'));
-    expect(Json.stringify([1, 2, 3])).toStrictEqual(Result.ok('[1,2,3]'));
-    expect(Json.stringify('string')).toStrictEqual(Result.ok('"string"'));
-    expect(Json.stringify(42)).toStrictEqual(Result.ok('42'));
-    expect(Json.stringify(true)).toStrictEqual(Result.ok('true'));
-    expect(Json.stringify(null)).toStrictEqual(Result.ok('null'));
+    assert.deepStrictEqual(Json.stringify({ a: 1 }), Result.ok('{"a":1}'));
+    assert.deepStrictEqual(Json.stringify([1, 2, 3]), Result.ok('[1,2,3]'));
+    assert.deepStrictEqual(Json.stringify('string'), Result.ok('"string"'));
+    assert.deepStrictEqual(Json.stringify(42), Result.ok('42'));
+    assert.deepStrictEqual(Json.stringify(true), Result.ok('true'));
+    assert.deepStrictEqual(Json.stringify(null), Result.ok('null'));
   });
 
   test('should handle non-serializable values', () => {
-    expect(Json.stringify(undefined)).toStrictEqual(Result.ok(undefined));
-    expect(Json.stringify(Symbol('test'))).toStrictEqual(Result.ok(undefined));
-    expect(Json.stringify(() => {})).toStrictEqual(Result.ok(undefined));
+    assert.deepStrictEqual(Json.stringify(undefined), Result.ok(undefined));
+    assert.deepStrictEqual(
+      Json.stringify(Symbol('test')),
+      Result.ok(undefined),
+    );
+    assert.deepStrictEqual(
+      Json.stringify(() => {}),
+      Result.ok(undefined),
+    );
+
     // BigInt should cause an error
     expect(Result.isErr(Json.stringify(123n))).toBe(true);
   });
@@ -223,6 +249,7 @@ describe('stringify', () => {
     const mut_obj: any = { a: 1 };
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     mut_obj.circular = mut_obj;
+
     expect(Result.isErr(Json.stringify(mut_obj))).toBe(true);
   });
 
@@ -230,12 +257,18 @@ describe('stringify', () => {
     const obj = {
       toJSON: () => ({ custom: 'value' }),
     };
-    expect(Json.stringify(obj)).toStrictEqual(Result.ok('{"custom":"value"}'));
+
+    assert.deepStrictEqual(
+      Json.stringify(obj),
+      Result.ok('{"custom":"value"}'),
+    );
   });
 
   test('should handle Date objects', () => {
     const date = new Date('2023-01-01T00:00:00.000Z');
-    expect(Json.stringify(date)).toStrictEqual(
+
+    assert.deepStrictEqual(
+      Json.stringify(date),
       Result.ok('"2023-01-01T00:00:00.000Z"'),
     );
   });
@@ -263,6 +296,7 @@ describe('stringify', () => {
     const result = Json.stringify(data, secureReplacer);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toContain('[REDACTED]');
       expect(result.value).not.toContain('secret123');
@@ -274,6 +308,7 @@ describe('stringify', () => {
     const result = Json.stringify(data, undefined, 2);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toContain('\n');
       expect(result.value).toContain('  '); // 2 spaces indentation
@@ -285,6 +320,7 @@ describe('stringify', () => {
     const result = Json.stringify(data, undefined, '\t');
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toContain('\n');
       expect(result.value).toContain('\t'); // tab indentation
@@ -305,13 +341,18 @@ describe('stringifySelected', () => {
     const result = Json.stringifySelected(user, ['id', 'name', 'email']);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
+      assert(isString(result.value));
+
       const parsed: unknown = JSON.parse(result.value);
-      expect(parsed).toStrictEqual({
+
+      assert.deepStrictEqual(parsed, {
         id: 1,
         name: 'Alice',
         email: 'alice@example.com',
       });
+
       expect(parsed).not.toHaveProperty('password');
       expect(parsed).not.toHaveProperty('lastLogin');
     }
@@ -335,17 +376,22 @@ describe('stringifySelected', () => {
     ]);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
+      assert(isString(result.value));
       const parsed: unknown = JSON.parse(result.value);
       if (isRecord(parsed) && hasKey(parsed, 'users')) {
         expect(isRecord(parsed.users)).toBe(false);
         expect(parsed.users).toHaveLength(2);
+
         if (Arr.isArray(parsed.users)) {
-          expect(parsed.users[0]).toStrictEqual({ id: 1, name: 'Alice' });
+          assert.deepStrictEqual(parsed.users[0], { id: 1, name: 'Alice' });
+
           expect(parsed.users[0]).not.toHaveProperty('secret');
         }
         if (isRecord(parsed) && hasKey(parsed, 'metadata')) {
-          expect(parsed.metadata).toStrictEqual({ total: 2 });
+          assert.deepStrictEqual(parsed.metadata, { total: 2 });
+
           expect(parsed.metadata).not.toHaveProperty('page');
           expect(parsed.metadata).not.toHaveProperty('internal');
         }
@@ -363,8 +409,11 @@ describe('stringifySelected', () => {
     const result = Json.stringifySelected(matrix, [0, 1]);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
+      assert(isString(result.value));
       const parsed: unknown = JSON.parse(result.value);
+
       // Note: stringifySelected works with JSON.stringify's replacer parameter
       // which may not work as expected with arrays
       expect(Array.isArray(parsed)).toBe(true);
@@ -377,6 +426,7 @@ describe('stringifySelected', () => {
     const result = Json.stringifySelected(data, ['a', 'b', 'c'], 2);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toContain('\n');
       expect(result.value).toContain('  ');
@@ -388,6 +438,7 @@ describe('stringifySelected', () => {
     const result = Json.stringifySelected(data, []);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toBe('{}');
     }
@@ -398,9 +449,12 @@ describe('stringifySelected', () => {
     const result = Json.stringifySelected(data, undefined);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
+      assert(isString(result.value));
       const parsed: unknown = JSON.parse(result.value);
-      expect(parsed).toStrictEqual({ a: 1, b: 2 });
+
+      assert.deepStrictEqual(parsed, { a: 1, b: 2 });
     }
   });
 
@@ -413,8 +467,9 @@ describe('stringifySelected', () => {
 
     // Note: JSON.stringify may handle circular references differently depending on the replacer
     expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
+
     if (Result.isErr(result)) {
-      expect(typeof result.value).toBe('string');
+      expectTypeOf(result.value).toBeString();
     }
   });
 });
@@ -431,6 +486,7 @@ describe('stringifySortedKey', () => {
     const result = Json.stringifySortedKey(unsortedObj);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toBe(
         '{"aardvark":"animal","apple":"fruit","banana":"fruit","zebra":"animal"}',
@@ -458,19 +514,24 @@ describe('stringifySortedKey', () => {
     const result = Json.stringifySortedKey(nestedObj);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
+      assert(isString(result.value));
       const parsed: unknown = JSON.parse(result.value);
       if (isRecord(parsed)) {
         const keys = Object.keys(parsed);
-        expect(keys).toStrictEqual(['settings', 'user']); // sorted top-level keys
+
+        assert.deepStrictEqual(keys, ['settings', 'user']); // sorted top-level keys
 
         if (hasKey(parsed, 'user') && isRecord(parsed.user)) {
           const userKeys = Object.keys(parsed.user);
-          expect(userKeys).toStrictEqual(['address', 'age', 'name']); // sorted nested keys
+
+          assert.deepStrictEqual(userKeys, ['address', 'age', 'name']); // sorted nested keys
 
           if (hasKey(parsed.user, 'address') && isRecord(parsed.user.address)) {
             const addressKeys = Object.keys(parsed.user.address);
-            expect(addressKeys).toStrictEqual(['city', 'country', 'zip']); // sorted deeper nested keys
+
+            assert.deepStrictEqual(addressKeys, ['city', 'country', 'zip']); // sorted deeper nested keys
           }
         }
       }
@@ -493,18 +554,26 @@ describe('stringifySortedKey', () => {
     const result = Json.stringifySortedKey(dataWithArrays);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
+      assert(isString(result.value));
       const parsed: unknown = JSON.parse(result.value);
 
       if (isRecord(parsed)) {
         // Check top-level keys are sorted
         const topKeys = Object.keys(parsed);
-        expect(topKeys).toStrictEqual(['metadata', 'users']);
+
+        assert.deepStrictEqual(topKeys, ['metadata', 'users']);
 
         // Check metadata keys are sorted
         if (hasKey(parsed, 'metadata') && isRecord(parsed.metadata)) {
           const metadataKeys = Object.keys(parsed.metadata);
-          expect(metadataKeys).toStrictEqual(['author', 'created', 'version']);
+
+          assert.deepStrictEqual(metadataKeys, [
+            'author',
+            'created',
+            'version',
+          ]);
         }
 
         // Check user object keys are sorted
@@ -516,7 +585,8 @@ describe('stringifySortedKey', () => {
           const firstUser = parsed.users[0];
           if (isRecord(firstUser)) {
             const userKeys = Object.keys(firstUser);
-            expect(userKeys).toStrictEqual(['active', 'id', 'name']);
+
+            assert.deepStrictEqual(userKeys, ['active', 'id', 'name']);
           }
         }
       }
@@ -528,6 +598,7 @@ describe('stringifySortedKey', () => {
     const result = Json.stringifySortedKey(obj, 2);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toContain('\n');
       expect(result.value).toContain('  ');
@@ -566,8 +637,9 @@ describe('stringifySortedKey', () => {
 
       // This may throw due to circular reference during key extraction
       expect(Result.isErr(result)).toBe(true);
+
       if (Result.isErr(result)) {
-        expect(typeof result.value).toBe('string');
+        expectTypeOf(result.value).toBeString();
       }
     } catch (error) {
       // Expected if circular reference causes stack overflow
@@ -579,6 +651,7 @@ describe('stringifySortedKey', () => {
     const result = Json.stringifySortedKey({});
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
       expect(result.value).toBe('{}');
     }
@@ -600,12 +673,15 @@ describe('stringifySortedKey', () => {
     const result = Json.stringifySortedKey(deep);
 
     expect(Result.isOk(result)).toBe(true);
+
     if (Result.isOk(result)) {
+      assert(isString(result.value));
       const parsed: unknown = JSON.parse(result.value);
       if (isRecord(parsed) && hasKey(parsed, 'level1')) {
         const level1 = parsed.level1;
         if (isRecord(level1)) {
-          expect(Object.keys(level1)).toStrictEqual(['a', 'z']);
+          assert.deepStrictEqual(Object.keys(level1), ['a', 'z']);
+
           if (
             hasKey(level1, 'a') &&
             isRecord(level1.a) &&
@@ -613,7 +689,7 @@ describe('stringifySortedKey', () => {
           ) {
             const nested = level1.a.nested;
             if (isRecord(nested)) {
-              expect(Object.keys(nested)).toStrictEqual(['x', 'y']);
+              assert.deepStrictEqual(Object.keys(nested), ['x', 'y']);
             }
           }
         }

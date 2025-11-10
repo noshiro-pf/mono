@@ -1,8 +1,8 @@
 import { expectType } from '../../expect-type.mjs';
 import { Uint8, asUint8, isUint8 } from './uint8.mjs';
 
-describe('Uint8', () => {
-  describe('isUint8', () => {
+describe('Uint8 test', () => {
+  describe(isUint8, () => {
     test.each([
       { value: 0, expected: true },
       { value: 128, expected: true },
@@ -18,7 +18,7 @@ describe('Uint8', () => {
     });
   });
 
-  describe('asUint8', () => {
+  describe(asUint8, () => {
     test.each([
       { value: 0, expected: 0 },
       { value: 128, expected: 128 },
@@ -48,6 +48,7 @@ describe('Uint8', () => {
   describe('Uint8.MIN_VALUE', () => {
     test('should be 0', () => {
       expect(Uint8.MIN_VALUE).toBe(0);
+
       expectType<typeof Uint8.MIN_VALUE, 0>('=');
     });
   });
@@ -55,6 +56,7 @@ describe('Uint8', () => {
   describe('Uint8.MAX_VALUE', () => {
     test('should be 255', () => {
       expect(Uint8.MAX_VALUE).toBe(255);
+
       expectType<typeof Uint8.MAX_VALUE, 255>('=');
     });
   });
@@ -156,6 +158,7 @@ describe('Uint8', () => {
       const min = 10;
       const max = 50;
       const result = Uint8.random(min, max);
+
       expect(result).toBeGreaterThanOrEqual(min);
       expect(result).toBeLessThanOrEqual(max);
       expect(Number.isInteger(result)).toBe(true);

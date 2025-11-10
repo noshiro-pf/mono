@@ -1,7 +1,7 @@
 import { expectType } from '../expect-type.mjs';
 import { isNonEmptyString } from './is-non-empty-string.mjs';
 
-describe('isNonEmptyString', () => {
+describe(isNonEmptyString, () => {
   test('should return true for non-empty strings', () => {
     expect(isNonEmptyString('hello')).toBe(true);
     expect(isNonEmptyString('a')).toBe(true);
@@ -42,6 +42,7 @@ describe('isNonEmptyString', () => {
     // @ts-expect-error Testing non-string types
     if (isNonEmptyString(value)) {
       expectType<typeof value, string>('=');
+
       // TypeScript knows it's a string
       expect(value.length).toBeGreaterThan(0);
       expect(value.charAt(0)).toBe('t');
@@ -53,6 +54,7 @@ describe('isNonEmptyString', () => {
 
     if (isNonEmptyString(maybeString)) {
       expectType<typeof maybeString, string>('=');
+
       expect(maybeString.toUpperCase()).toBe('HELLO');
     }
   });
@@ -71,7 +73,8 @@ describe('isNonEmptyString', () => {
 
     // @ts-expect-error Testing non-string types
     const nonEmptyStrings = mixed.filter(isNonEmptyString);
-    expect(nonEmptyStrings).toStrictEqual(['valid', 'another', 'third']);
+
+    assert.deepStrictEqual(nonEmptyStrings, ['valid', 'another', 'third']);
   });
 
   test('should handle string edge cases', () => {

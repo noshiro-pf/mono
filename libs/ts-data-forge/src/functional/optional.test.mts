@@ -2,7 +2,7 @@ import { expectType } from '../expect-type.mjs';
 import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
 
-describe('Optional', () => {
+describe('Optional test', () => {
   describe('isOptional', () => {
     test('should return true for Some values', () => {
       expect(Optional.isOptional(Optional.some(42))).toBe(true);
@@ -28,16 +28,20 @@ describe('Optional', () => {
   describe('some', () => {
     test('should create a Some variant with the provided value', () => {
       const someNumber = Optional.some(42);
+
       expect(Optional.isSome(someNumber)).toBe(true);
       expect(Optional.unwrap(someNumber)).toBe(42);
 
       const someString = Optional.some('hello');
+
       expect(Optional.isSome(someString)).toBe(true);
       expect(Optional.unwrap(someString)).toBe('hello');
 
       const someObject = Optional.some({ name: 'Alice', age: 30 });
+
       expect(Optional.isSome(someObject)).toBe(true);
-      expect(Optional.unwrap(someObject)).toStrictEqual({
+
+      assert.deepStrictEqual(Optional.unwrap(someObject), {
         name: 'Alice',
         age: 30,
       });
@@ -66,12 +70,14 @@ describe('Optional', () => {
   describe('isSome and isNone', () => {
     test('should correctly identify Some values', () => {
       const some = Optional.some(42);
+
       expect(Optional.isSome(some)).toBe(true);
       expect(Optional.isNone(some)).toBe(false);
     });
 
     test('should correctly identify None values', () => {
       const none = Optional.none;
+
       expect(Optional.isSome(none)).toBe(false);
       expect(Optional.isNone(none)).toBe(true);
     });
@@ -95,6 +101,7 @@ describe('Optional', () => {
       const mapped = Optional.map(some, (x) => x * 2);
 
       expect(Optional.isSome(mapped)).toBe(true);
+
       if (Optional.isSome(mapped)) {
         expect(Optional.unwrap(mapped)).toBe(10);
       }
@@ -120,6 +127,7 @@ describe('Optional', () => {
 
     test('should preserve types correctly', () => {
       const some = Optional.some(42);
+
       expectTypeOf(Optional.map(some, (x) => x.toString())).toEqualTypeOf<
         Optional<string>
       >();
@@ -132,12 +140,14 @@ describe('Optional', () => {
       const mapped = doubler(some);
 
       expect(Optional.isSome(mapped)).toBe(true);
+
       if (Optional.isSome(mapped)) {
         expect(Optional.unwrap(mapped)).toBe(10);
       }
 
       const none = Optional.none;
       const mappedNone = doubler(none);
+
       expect(Optional.isNone(mappedNone)).toBe(true);
     });
 
@@ -148,6 +158,7 @@ describe('Optional', () => {
       const result = pipe(Optional.some(5)).map(doubler).map(toStringFn).value;
 
       expect(Optional.isSome(result)).toBe(true);
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe('10');
       }
@@ -168,9 +179,11 @@ describe('Optional', () => {
 
     test('should have correct return types', () => {
       const someNumber = Optional.some(42);
+
       expectTypeOf(Optional.unwrap(someNumber)).toExtend<number | undefined>();
 
       const none = Optional.none;
+
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expectTypeOf(Optional.unwrapOr(none, undefined)).toExtend<undefined>();
     });
@@ -190,6 +203,7 @@ describe('Optional', () => {
 
     test('should have correct return types', () => {
       const someNumber = Optional.some(42);
+
       expectTypeOf(Optional.unwrapThrow(someNumber)).toExtend<number>();
     });
   });
@@ -209,6 +223,7 @@ describe('Optional', () => {
 
     test('should have correct return types', () => {
       const someNumber = Optional.some(42);
+
       expectTypeOf(Optional.unwrapOr(someNumber, 0)).toExtend<number>();
 
       expectTypeOf(Optional.unwrapOr(someNumber, 'default')).toExtend<
@@ -216,6 +231,7 @@ describe('Optional', () => {
       >();
 
       const none = Optional.none;
+
       expectTypeOf(Optional.unwrapOr(none, 'default')).toExtend<string>();
     });
 
@@ -224,10 +240,12 @@ describe('Optional', () => {
 
       const someValue = Optional.some(100);
       const result = unwrapWithDefault(someValue);
+
       expect(result).toBe(100);
 
       const noneValue = Optional.none;
       const defaultResult = unwrapWithDefault(noneValue);
+
       expect(defaultResult).toBe(42);
     });
 
@@ -237,9 +255,11 @@ describe('Optional', () => {
       const someResult = pipe(Optional.some('hello')).map(
         unwrapWithDefault,
       ).value;
+
       expect(someResult).toBe('hello');
 
       const noneResult = pipe(Optional.none).map(unwrapWithDefault).value;
+
       expect(noneResult).toBe('default');
     });
   });
@@ -247,11 +267,13 @@ describe('Optional', () => {
   describe('expectToBe', () => {
     test('should return the value for Some', () => {
       const expectNumber = Optional.expectToBe<number>('Expected a number');
+
       expect(expectNumber(Optional.some(42))).toBe(42);
     });
 
     test('should throw with custom message for None', () => {
       const expectNumber = Optional.expectToBe<number>('Expected a number');
+
       expect(() => expectNumber(Optional.none)).toThrow('Expected a number');
     });
 
@@ -270,9 +292,11 @@ describe('Optional', () => {
 
       const someValue = Optional.some('important data');
       const result = getValue(someValue);
+
       expect(result).toBe('important data');
 
       const noneValue = Optional.none;
+
       expect(() => getValue(noneValue)).toThrow('Value must exist');
     });
 
@@ -282,7 +306,8 @@ describe('Optional', () => {
       const someResult = pipe(Optional.some({ name: 'Alice', age: 30 })).map(
         expectUser,
       ).value;
-      expect(someResult).toStrictEqual({ name: 'Alice', age: 30 });
+
+      assert.deepStrictEqual(someResult, { name: 'Alice', age: 30 });
 
       expect(() => pipe(Optional.none).map(expectUser).value).toThrow(
         'User not found',
@@ -324,6 +349,7 @@ describe('Optional', () => {
       }
 
       const invalid = Optional.flatMap(Optional.some('abc'), parseNumber);
+
       expect(Optional.isNone(invalid)).toBe(true);
     });
 
@@ -331,6 +357,7 @@ describe('Optional', () => {
       const result = Optional.flatMap(Optional.none, (_: never) =>
         Optional.some(42),
       );
+
       expect(Optional.isNone(result)).toBe(true);
     });
 
@@ -364,15 +391,19 @@ describe('Optional', () => {
       const parser = Optional.flatMap(parseNumber);
 
       const result = parser(Optional.some('42'));
+
       expect(Optional.isSome(result)).toBe(true);
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe(42);
       }
 
       const invalid = parser(Optional.some('abc'));
+
       expect(Optional.isNone(invalid)).toBe(true);
 
       const noneResult = parser(Optional.none);
+
       expect(Optional.isNone(noneResult)).toBe(true);
     });
 
@@ -391,6 +422,7 @@ describe('Optional', () => {
       const result = pipe(Optional.some('42')).map(parser).map(doubler).value;
 
       expect(Optional.isSome(result)).toBe(true);
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe(84);
       }
@@ -409,11 +441,13 @@ describe('Optional', () => {
     test('should return None for Some values that do not match predicate', () => {
       const someOdd = Optional.some(5);
       const filtered = Optional.filter(someOdd, (x) => x % 2 === 0);
+
       expect(Optional.isNone(filtered)).toBe(true);
     });
 
     test('should return None if input is None', () => {
       const filtered = Optional.filter(Optional.none, (_: never) => true);
+
       expect(Optional.isNone(filtered)).toBe(true);
     });
 
@@ -422,16 +456,20 @@ describe('Optional', () => {
 
       const someEven = Optional.some(4);
       const filtered = evenFilter(someEven);
+
       expect(Optional.isSome(filtered)).toBe(true);
+
       if (Optional.isSome(filtered)) {
         expect(Optional.unwrap(filtered)).toBe(4);
       }
 
       const someOdd = Optional.some(5);
       const filteredOdd = evenFilter(someOdd);
+
       expect(Optional.isNone(filteredOdd)).toBe(true);
 
       const noneResult = evenFilter(Optional.none);
+
       expect(Optional.isNone(noneResult)).toBe(true);
     });
 
@@ -444,6 +482,7 @@ describe('Optional', () => {
         .map(positiveFilter).value;
 
       expect(Optional.isSome(result)).toBe(true);
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe(4);
       }
@@ -475,6 +514,7 @@ describe('Optional', () => {
 
     test('should return None if both are None', () => {
       const result = Optional.orElse(Optional.none, Optional.none);
+
       expect(Optional.isNone(result)).toBe(true);
     });
 
@@ -483,14 +523,18 @@ describe('Optional', () => {
 
       const someValue = Optional.some('primary');
       const result = fallbackTo(someValue);
+
       expect(Optional.isSome(result)).toBe(true);
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe('primary');
       }
 
       const noneValue = Optional.none;
       const fallbackResult = fallbackTo(noneValue);
+
       expect(Optional.isSome(fallbackResult)).toBe(true);
+
       if (Optional.isSome(fallbackResult)) {
         expect(Optional.unwrap(fallbackResult)).toBe('fallback');
       }
@@ -500,13 +544,17 @@ describe('Optional', () => {
       const fallbackTo = Optional.orElse(Optional.some('backup'));
 
       const someResult = pipe(Optional.some('original')).map(fallbackTo).value;
+
       expect(Optional.isSome(someResult)).toBe(true);
+
       if (Optional.isSome(someResult)) {
         expect(Optional.unwrap(someResult)).toBe('original');
       }
 
       const noneResult = pipe(Optional.none).map(fallbackTo).value;
+
       expect(Optional.isSome(noneResult)).toBe(true);
+
       if (Optional.isSome(noneResult)) {
         expect(Optional.unwrap(noneResult)).toBe('backup');
       }
@@ -519,7 +567,7 @@ describe('Optional', () => {
       const b = Optional.some('hello');
       const zipped = Optional.zip(a, b);
       if (Optional.isSome(zipped)) {
-        expect(Optional.unwrap(zipped)).toStrictEqual([1, 'hello']);
+        assert.deepStrictEqual(Optional.unwrap(zipped), [1, 'hello']);
       }
     });
 
@@ -527,6 +575,7 @@ describe('Optional', () => {
       const a = Optional.none;
       const b = Optional.some('hello');
       const zipped = Optional.zip(a, b);
+
       expect(Optional.isNone(zipped)).toBe(true);
     });
 
@@ -534,11 +583,13 @@ describe('Optional', () => {
       const a = Optional.some(1);
       const b = Optional.none;
       const zipped = Optional.zip(a, b);
+
       expect(Optional.isNone(zipped)).toBe(true);
     });
 
     test('should return None if both are None', () => {
       const zipped = Optional.zip(Optional.none, Optional.none);
+
       expect(Optional.isNone(zipped)).toBe(true);
     });
   });
@@ -573,6 +624,7 @@ describe('Optional', () => {
 
     test('should work with union types', () => {
       const value: string | null = 'test';
+
       expectTypeOf(Optional.fromNullable(value)).toExtend<Optional<string>>();
     });
   });
@@ -591,6 +643,7 @@ describe('Optional', () => {
 
     test('should have correct return type', () => {
       const some = Optional.some(42);
+
       expectTypeOf(Optional.toNullable(some)).toExtend<number | undefined>();
     });
   });
@@ -598,6 +651,7 @@ describe('Optional', () => {
   describe('edge cases', () => {
     test('should handle undefined as a Some value', () => {
       const someUndefined = Optional.some(undefined);
+
       expect(Optional.isSome(someUndefined)).toBe(true);
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expect(Optional.unwrap(someUndefined)).toBeUndefined();
@@ -608,15 +662,18 @@ describe('Optional', () => {
 
     test('should handle null as a Some value', () => {
       const someNull = Optional.some(null);
+
       expect(Optional.isSome(someNull)).toBe(true);
       expect(Optional.unwrap(someNull)).toBeNull();
     });
 
     test('should handle nested Optionals', () => {
       const nested = Optional.some(Optional.some(42));
+
       expect(Optional.isSome(nested)).toBe(true);
 
       const inner = Optional.unwrap(nested);
+
       expect(Optional.isOptional(inner)).toBe(true);
       expect(Optional.unwrap(inner)).toBe(42);
     });

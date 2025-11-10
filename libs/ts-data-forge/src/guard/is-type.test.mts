@@ -18,7 +18,7 @@ import {
   isUndefined,
 } from './is-type.mjs';
 
-describe('isUndefined', () => {
+describe(isUndefined, () => {
   test('should return true for undefined', () => {
     expect(isUndefined(undefined)).toBe(true);
   });
@@ -39,7 +39,7 @@ describe('isUndefined', () => {
   });
 });
 
-describe('isNotUndefined', () => {
+describe(isNotUndefined, () => {
   test('should return false for undefined', () => {
     expect(isNotUndefined(undefined)).toBe(false);
   });
@@ -59,7 +59,7 @@ describe('isNotUndefined', () => {
   });
 });
 
-describe('isNull', () => {
+describe(isNull, () => {
   test('should return true for null', () => {
     expect(isNull(null)).toBe(true);
   });
@@ -80,7 +80,7 @@ describe('isNull', () => {
   });
 });
 
-describe('isNotNull', () => {
+describe(isNotNull, () => {
   test('should return false for null', () => {
     expect(isNotNull(null)).toBe(false);
   });
@@ -99,7 +99,7 @@ describe('isNotNull', () => {
   });
 });
 
-describe('isString', () => {
+describe(isString, () => {
   test('should return true for strings', () => {
     expect(isString('')).toBe(true);
     expect(isString('hello')).toBe(true);
@@ -120,12 +120,13 @@ describe('isString', () => {
     const value: unknown = 'test';
     if (isString(value)) {
       expectType<typeof value, string>('=');
+
       expect(value).toHaveLength(4);
     }
   });
 });
 
-describe('isNumber', () => {
+describe(isNumber, () => {
   test('should return true for numbers', () => {
     expect(isNumber(0)).toBe(true);
     expect(isNumber(42)).toBe(true);
@@ -148,12 +149,13 @@ describe('isNumber', () => {
     const value: unknown = 42;
     if (isNumber(value)) {
       expectType<typeof value, number>('=');
+
       expect(value + 1).toBe(43);
     }
   });
 });
 
-describe('isBigint', () => {
+describe(isBigint, () => {
   test('should return true for bigints', () => {
     expect(isBigint(0n)).toBe(true);
     expect(isBigint(123n)).toBe(true);
@@ -171,12 +173,13 @@ describe('isBigint', () => {
     const value: unknown = 123n;
     if (isBigint(value)) {
       expectType<typeof value, bigint>('=');
+
       expect(value + 1n).toBe(124n);
     }
   });
 });
 
-describe('isBoolean', () => {
+describe(isBoolean, () => {
   test('should return true for booleans', () => {
     expect(isBoolean(true)).toBe(true);
     expect(isBoolean(false)).toBe(true);
@@ -195,12 +198,13 @@ describe('isBoolean', () => {
     const value: unknown = true;
     if (isBoolean(value)) {
       expectType<typeof value, boolean>('=');
+
       expect(!value).toBe(false);
     }
   });
 });
 
-describe('isSymbol', () => {
+describe(isSymbol, () => {
   test('should return true for symbols', () => {
     expect(isSymbol(Symbol())).toBe(true);
     expect(isSymbol(Symbol('test'))).toBe(true);
@@ -217,12 +221,13 @@ describe('isSymbol', () => {
     const value: unknown = Symbol('test');
     if (isSymbol(value)) {
       expectType<typeof value, symbol>('=');
+
       expect(value.toString()).toContain('Symbol');
     }
   });
 });
 
-describe('isNotBoolean', () => {
+describe(isNotBoolean, () => {
   test('should return false for boolean values', () => {
     expect(isNotBoolean(true)).toBe(false);
     expect(isNotBoolean(false)).toBe(false);
@@ -243,13 +248,14 @@ describe('isNotBoolean', () => {
     const value: string | number | boolean = 'test';
     if (isNotBoolean(value)) {
       expectType<typeof value, string | number>('<=');
+
       // Should not have boolean methods
       expect(typeof value === 'string' || typeof value === 'number').toBe(true);
     }
   });
 });
 
-describe('isNotNumber', () => {
+describe(isNotNumber, () => {
   test('should return false for number values', () => {
     expect(isNotNumber(0)).toBe(false);
     expect(isNotNumber(42)).toBe(false);
@@ -275,6 +281,7 @@ describe('isNotNumber', () => {
     const value: string | number | boolean = 'test';
     if (isNotNumber(value)) {
       expectType<typeof value, string | boolean>('<=');
+
       expect(typeof value === 'string' || typeof value === 'boolean').toBe(
         true,
       );
@@ -282,7 +289,7 @@ describe('isNotNumber', () => {
   });
 });
 
-describe('isNotBigint', () => {
+describe(isNotBigint, () => {
   test('should return false for bigint values', () => {
     expect(isNotBigint(0n)).toBe(false);
     expect(isNotBigint(123n)).toBe(false);
@@ -304,12 +311,13 @@ describe('isNotBigint', () => {
     const value: number | bigint = 123;
     if (isNotBigint(value)) {
       expectType<typeof value, number>('<=');
-      expect(typeof value).toBe('number');
+
+      expectTypeOf(value).toBeNumber();
     }
   });
 });
 
-describe('isNotString', () => {
+describe(isNotString, () => {
   test('should return false for string values', () => {
     expect(isNotString('')).toBe(false);
     expect(isNotString('hello')).toBe(false);
@@ -333,6 +341,7 @@ describe('isNotString', () => {
     const value: string | number | boolean = 42;
     if (isNotString(value)) {
       expectType<typeof value, number | boolean>('<=');
+
       expect(typeof value === 'number' || typeof value === 'boolean').toBe(
         true,
       );
@@ -340,7 +349,7 @@ describe('isNotString', () => {
   });
 });
 
-describe('isNotSymbol', () => {
+describe(isNotSymbol, () => {
   test('should return false for symbol values', () => {
     expect(isNotSymbol(Symbol())).toBe(false);
     expect(isNotSymbol(Symbol('test'))).toBe(false);
@@ -363,12 +372,13 @@ describe('isNotSymbol', () => {
     const value: string | number | symbol = 'test';
     if (isNotSymbol(value)) {
       expectType<typeof value, string | number>('<=');
+
       expect(typeof value === 'string' || typeof value === 'number').toBe(true);
     }
   });
 });
 
-describe('isNullish', () => {
+describe(isNullish, () => {
   test('should return true for null and undefined', () => {
     expect(isNullish(null)).toBe(true);
     expect(isNullish(undefined)).toBe(true);
@@ -389,6 +399,7 @@ describe('isNullish', () => {
     const value: string | null | undefined = null;
     if (isNullish(value)) {
       expectType<typeof value, null | undefined>('<=');
+
       // Value is guaranteed to be null or undefined in this branch
       expect(true).toBe(true);
     }
@@ -401,7 +412,7 @@ describe('isNullish', () => {
   });
 });
 
-describe('isNonNullish', () => {
+describe(isNonNullish, () => {
   test('should return false for null and undefined', () => {
     expect(isNonNullish(null)).toBe(false);
     expect(isNonNullish(undefined)).toBe(false);
@@ -424,6 +435,7 @@ describe('isNonNullish', () => {
     const value: string | null | undefined = 'test';
     if (isNonNullish(value)) {
       expectType<typeof value, string>('<=');
+
       expect(value).toHaveLength(4);
     }
   });
@@ -441,7 +453,8 @@ describe('isNonNullish', () => {
     expectType<typeof definedItems, string[]>('<=');
 
     expect(definedItems).toHaveLength(3);
-    expect(definedItems).toStrictEqual(['hello', 'world', 'test']);
+
+    assert.deepStrictEqual(definedItems, ['hello', 'world', 'test']);
   });
 
   test('should handle complex union types', () => {
@@ -450,6 +463,7 @@ describe('isNonNullish', () => {
 
     if (isNonNullish(value)) {
       expectType<typeof value, string | number | boolean>('<=');
+
       // Value is guaranteed to be non-nullish in this branch
       expect(true).toBe(true);
     }
@@ -462,7 +476,8 @@ describe('type guard behavior in complex scenarios', () => {
 
     if (isNonNullish(value) && isNotBoolean(value) && isNotNumber(value)) {
       expectType<typeof value, string>('<=');
-      expect(typeof value).toBe('string');
+
+      expectTypeOf(value).toBeString();
     }
   });
 
@@ -487,6 +502,6 @@ describe('type guard behavior in complex scenarios', () => {
     const strings = nonBooleans.filter(isNotNumber);
     expectType<typeof strings, string[]>('<=');
 
-    expect(strings).toStrictEqual(['hello', 'world']);
+    assert.deepStrictEqual(strings, ['hello', 'world']);
   });
 });

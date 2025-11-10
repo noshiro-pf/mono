@@ -6,8 +6,8 @@ import {
   PositiveUint32,
 } from './positive-uint32.mjs';
 
-describe('PositiveUint32', () => {
-  describe('asPositiveUint32', () => {
+describe('PositiveUint32 test', () => {
+  describe(asPositiveUint32, () => {
     test('accepts valid positive uint32 values', () => {
       expect(() => asPositiveUint32(1)).not.toThrow();
       expect(() => asPositiveUint32(1000)).not.toThrow();
@@ -68,7 +68,7 @@ describe('PositiveUint32', () => {
     );
   });
 
-  describe('isPositiveUint32', () => {
+  describe(isPositiveUint32, () => {
     test('correctly identifies positive uint32 values', () => {
       expect(isPositiveUint32(1)).toBe(true);
       expect(isPositiveUint32(1000)).toBe(true);
@@ -128,6 +128,7 @@ describe('PositiveUint32', () => {
         asPositiveUint32(4_294_967_000),
         asPositiveUint32(1000),
       );
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(PositiveUint32.add(a, b)).toBe(1_500_000);
     });
@@ -142,6 +143,7 @@ describe('PositiveUint32', () => {
         asPositiveUint32(100_000),
         asPositiveUint32(100_000),
       );
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(
         PositiveUint32.mul(asPositiveUint32(1000), asPositiveUint32(5)),
@@ -166,6 +168,7 @@ describe('PositiveUint32', () => {
         asPositiveUint32(10_000),
         asPositiveUint32(3),
       );
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(PositiveUint32.pow(asPositiveUint32(2), asPositiveUint32(3))).toBe(
         8,
@@ -180,6 +183,7 @@ describe('PositiveUint32', () => {
 
       for (const _ of range(10)) {
         const result = PositiveUint32.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(PositiveUint32.is(result)).toBe(true);
@@ -191,6 +195,7 @@ describe('PositiveUint32', () => {
     test('generates values within PositiveUint32 range', () => {
       for (const _ of range(10)) {
         const result = PositiveUint32.random(1, 30);
+
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(4_294_967_295);
       }

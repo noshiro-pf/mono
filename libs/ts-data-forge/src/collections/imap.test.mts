@@ -1,4 +1,5 @@
 import { Optional } from '../functional/index.mjs';
+import { isString } from '../guard/index.mjs';
 import { IMap } from './imap.mjs';
 
 describe('IMap[Symbol.iterator]', () => {
@@ -11,7 +12,8 @@ describe('IMap[Symbol.iterator]', () => {
       ] as const),
     );
 
-    expect(m0).toStrictEqual(
+    assert.deepStrictEqual(
+      m0,
       IMap.create([
         [1, 10],
         [2, 20],
@@ -64,6 +66,7 @@ describe('IMap[Symbol.iterator]', () => {
 describe('IMap.create', () => {
   test('should create empty map', () => {
     const map = IMap.create<string, number>([]);
+
     expect(map.size).toBe(0);
   });
 
@@ -73,6 +76,7 @@ describe('IMap.create', () => {
       ['b', 2],
     ]);
     const map = IMap.create(jsMap);
+
     expect(map.size).toBe(2);
     expect(Optional.unwrap(map.get('a'))).toBe(1);
     expect(Optional.unwrap(map.get('b'))).toBe(2);
@@ -84,6 +88,7 @@ describe('IMap.create', () => {
       ['b', 2],
     ]);
     const copy = IMap.create(original);
+
     expect(copy.size).toBe(2);
     expect(Optional.unwrap(copy.get('a'))).toBe(1);
     expect(Optional.unwrap(copy.get('b'))).toBe(2);
@@ -100,6 +105,7 @@ describe('IMap.equal', () => {
       ['a', 1],
       ['b', 2],
     ]);
+
     expect(IMap.equal(map1, map2)).toBe(true);
   });
 
@@ -112,6 +118,7 @@ describe('IMap.equal', () => {
       ['b', 2],
       ['a', 1],
     ]);
+
     expect(IMap.equal(map1, map2)).toBe(true);
   });
 
@@ -121,6 +128,7 @@ describe('IMap.equal', () => {
       ['a', 1],
       ['b', 2],
     ]);
+
     expect(IMap.equal(map1, map2)).toBe(false);
   });
 
@@ -133,6 +141,7 @@ describe('IMap.equal', () => {
       ['a', 1],
       ['b', 3],
     ]);
+
     expect(IMap.equal(map1, map2)).toBe(false);
   });
 
@@ -145,12 +154,14 @@ describe('IMap.equal', () => {
       ['a', 1],
       ['c', 2],
     ]);
+
     expect(IMap.equal(map1, map2)).toBe(false);
   });
 
   test('should return true for empty maps', () => {
     const map1 = IMap.create<string, number>([]);
     const map2 = IMap.create<string, number>([]);
+
     expect(IMap.equal(map1, map2)).toBe(true);
   });
 });
@@ -216,6 +227,7 @@ describe('IMap.has', () => {
       [true, 'yes'],
       [false, 'no'],
     ]);
+
     expect(map.has(true)).toBe(true);
     expect(map.has(false)).toBe(true);
   });
@@ -225,6 +237,7 @@ describe('IMap.has', () => {
       ['1', 'one'],
       ['2', 'two'],
     ]);
+
     expect(map.has('1')).toBe(true);
     expect(map.has(String(1))).toBe(true);
   });
@@ -240,7 +253,7 @@ describe('IMap.get', () => {
       [7, 70],
     ] as const);
 
-    expect(m0.get(6)).toStrictEqual(Optional.some(60));
+    assert.deepStrictEqual(m0.get(6), Optional.some(60));
   });
 
   test('case 2', () => {
@@ -252,13 +265,13 @@ describe('IMap.get', () => {
       [7, 70],
     ]);
 
-    expect(m0.get(8)).toStrictEqual(Optional.none);
+    assert.deepStrictEqual(m0.get(8), Optional.none);
   });
 
   test('case 3', () => {
     const m0 = IMap.create<number, number>([]);
 
-    expect(m0.get(0)).toStrictEqual(Optional.none);
+    assert.deepStrictEqual(m0.get(0), Optional.none);
   });
 
   test('case 4', () => {
@@ -271,7 +284,7 @@ describe('IMap.get', () => {
       [Number.NaN, 100],
     ] as const);
 
-    expect(m0.get(Number.NaN)).toStrictEqual(Optional.some(100));
+    assert.deepStrictEqual(m0.get(Number.NaN), Optional.some(100));
   });
 
   test('should handle undefined and null values', () => {
@@ -279,6 +292,7 @@ describe('IMap.get', () => {
       ['undef', undefined],
       ['null', null],
     ]);
+
     expect(Optional.unwrap(map.get('undef'))).toBeUndefined();
     expect(Optional.unwrap(map.get('null'))).toBeNull();
   });
@@ -294,7 +308,8 @@ describe('IMap.set', () => {
       [7, 70],
     ]);
 
-    expect(m0.set(9, 90)).toStrictEqual(
+    assert.deepStrictEqual(
+      m0.set(9, 90),
       IMap.create([
         [1, 10],
         [3, 30],
@@ -304,7 +319,8 @@ describe('IMap.set', () => {
         [9, 90],
       ]),
     );
-    expect(m0).toStrictEqual(
+    assert.deepStrictEqual(
+      m0,
       IMap.create([
         [1, 10],
         [3, 30],
@@ -324,7 +340,8 @@ describe('IMap.set', () => {
       [7, 70],
     ]);
 
-    expect(m0.set(3, 40)).toStrictEqual(
+    assert.deepStrictEqual(
+      m0.set(3, 40),
       IMap.create([
         [1, 10],
         [3, 40],
@@ -333,7 +350,8 @@ describe('IMap.set', () => {
         [7, 70],
       ]),
     );
-    expect(m0).toStrictEqual(
+    assert.deepStrictEqual(
+      m0,
       IMap.create([
         [1, 10],
         [3, 30],
@@ -347,13 +365,14 @@ describe('IMap.set', () => {
   test('case 3', () => {
     const m0 = IMap.create<number, number>([]);
 
-    expect(m0.set(1, 10)).toStrictEqual(IMap.create([[1, 10]]));
-    expect(m0).toStrictEqual(IMap.create<number, number>([]));
+    assert.deepStrictEqual(m0.set(1, 10), IMap.create([[1, 10]]));
+    assert.deepStrictEqual(m0, IMap.create<number, number>([]));
   });
 
   test('should not create new instance when setting the same value', () => {
     const map = IMap.create([['a', 1]]);
     const updated = map.set('a', 1);
+
     expect(updated).toBe(map);
     expect(Optional.unwrap(updated.get('a'))).toBe(1);
   });
@@ -363,6 +382,7 @@ describe('IMap.set', () => {
     const curr = map.get('a');
     assert(Optional.isSome(curr));
     const updated = map.set('a', curr.value);
+
     expect(updated).toBe(map);
     expect(Optional.unwrap(updated.get('a'))).toBe(1);
   });
@@ -388,7 +408,8 @@ describe('IMap.update', () => {
       [7, 70],
     ]);
 
-    expect(m0.update(9, (x) => 2 * x)).toStrictEqual(
+    assert.deepStrictEqual(
+      m0.update(9, (x) => 2 * x),
       IMap.create([
         [1, 10],
         [3, 30],
@@ -397,7 +418,8 @@ describe('IMap.update', () => {
         [7, 70],
       ]),
     );
-    expect(m0).toStrictEqual(
+    assert.deepStrictEqual(
+      m0,
       IMap.create([
         [1, 10],
         [3, 30],
@@ -417,7 +439,8 @@ describe('IMap.update', () => {
       [7, 70],
     ]);
 
-    expect(m0.update(3, (x) => 2 * x)).toStrictEqual(
+    assert.deepStrictEqual(
+      m0.update(3, (x) => 2 * x),
       IMap.create([
         [1, 10],
         [3, 60],
@@ -426,7 +449,8 @@ describe('IMap.update', () => {
         [7, 70],
       ]),
     );
-    expect(m0).toStrictEqual(
+    assert.deepStrictEqual(
+      m0,
       IMap.create([
         [1, 10],
         [3, 30],
@@ -440,8 +464,11 @@ describe('IMap.update', () => {
   test('case 3', () => {
     const m0 = IMap.create<number, number>([]);
 
-    expect(m0.update(1, (x) => 2 * x)).toStrictEqual(IMap.create([]));
-    expect(m0).toStrictEqual(IMap.create<number, number>([]));
+    assert.deepStrictEqual(
+      m0.update(1, (x) => 2 * x),
+      IMap.create([]),
+    );
+    assert.deepStrictEqual(m0, IMap.create<number, number>([]));
   });
 
   test('should not modify original map when updating', () => {
@@ -463,7 +490,8 @@ describe('IMap.delete', () => {
       [7, 70],
     ]);
 
-    expect(m0.delete(10)).toStrictEqual(
+    assert.deepStrictEqual(
+      m0.delete(10),
       IMap.create([
         [1, 10],
         [3, 30],
@@ -472,7 +500,8 @@ describe('IMap.delete', () => {
         [7, 70],
       ]),
     );
-    expect(m0).toStrictEqual(
+    assert.deepStrictEqual(
+      m0,
       IMap.create([
         [1, 10],
         [3, 30],
@@ -492,15 +521,17 @@ describe('IMap.delete', () => {
       [7, 70],
     ]);
 
-    expect(m0.delete(3)).toStrictEqual(
-      IMap.create([
+    assert.deepStrictEqual(
+      m0.delete(3),
+      IMap.create<1 | 3 | 5 | 6 | 7, number>([
         [1, 10],
         [5, 50],
         [6, 60],
         [7, 70],
       ]),
     );
-    expect(m0).toStrictEqual(
+    assert.deepStrictEqual(
+      m0,
       IMap.create([
         [1, 10],
         [3, 30],
@@ -514,8 +545,8 @@ describe('IMap.delete', () => {
   test('case 3', () => {
     const m0 = IMap.create<number, number>([]);
 
-    expect(m0.delete(1)).toStrictEqual(IMap.create([]));
-    expect(m0).toStrictEqual(IMap.create<number, number>([]));
+    assert.deepStrictEqual(m0.delete(1), IMap.create([]));
+    assert.deepStrictEqual(m0, IMap.create<number, number>([]));
   });
 
   test('should not modify original map when deleting', () => {
@@ -539,6 +570,7 @@ describe('IMap.every', () => {
       ['b', 4],
       ['c', 6],
     ]);
+
     expect(map.every((value) => value % 2 === 0)).toBe(true);
   });
 
@@ -548,11 +580,13 @@ describe('IMap.every', () => {
       ['b', 3],
       ['c', 4],
     ]);
+
     expect(map.every((value) => value % 2 === 0)).toBe(false);
   });
 
   test('should return true for empty map', () => {
     const map = IMap.create<string, number>([]);
+
     expect(map.every((value) => value > 0)).toBe(true);
   });
 
@@ -562,6 +596,7 @@ describe('IMap.every', () => {
       ['bb', 2],
       ['cc', 3],
     ]);
+
     expect(map.every((_value, key) => key.length === 2)).toBe(true);
   });
 
@@ -573,7 +608,8 @@ describe('IMap.every', () => {
     if (map.every((value): value is string => typeof value === 'string')) {
       // Type should be narrowed to IMap<string, string>
       const firstValue = Optional.unwrap(map.get('a'));
-      expect(typeof firstValue).toBe('string');
+
+      expect(isString(firstValue)).toBe(true);
     }
   });
 });
@@ -585,6 +621,7 @@ describe('IMap.some', () => {
       ['b', 2],
       ['c', 3],
     ]);
+
     expect(map.some((value) => value % 2 === 0)).toBe(true);
   });
 
@@ -594,11 +631,13 @@ describe('IMap.some', () => {
       ['b', 3],
       ['c', 5],
     ]);
+
     expect(map.some((value) => value % 2 === 0)).toBe(false);
   });
 
   test('should return false for empty map', () => {
     const map = IMap.create<string, number>([]);
+
     expect(map.some((value) => value > 0)).toBe(false);
   });
 
@@ -608,6 +647,7 @@ describe('IMap.some', () => {
       ['bb', 2],
       ['c', 3],
     ]);
+
     expect(map.some((_value, key) => key.length > 1)).toBe(true);
   });
 });
@@ -637,6 +677,7 @@ describe('IMap.withMutations', () => {
       ['b', 2],
     ]);
     const updated = map.withMutations([]);
+
     expect(updated.size).toBe(map.size);
     expect(Optional.unwrap(updated.get('a'))).toBe(1);
     expect(Optional.unwrap(updated.get('b'))).toBe(2);
@@ -647,6 +688,7 @@ describe('IMap.withMutations', () => {
     const updated = map.withMutations([
       { type: 'update', key: 'nonexistent', updater: (x: number) => x * 2 },
     ]);
+
     expect(updated.size).toBe(map.size);
     expect(Optional.isNone(updated.get('nonexistent'))).toBe(true);
   });
@@ -657,6 +699,7 @@ describe('IMap.withMutations', () => {
       { type: 'set', key: 'a', value: 10 },
       { type: 'update', key: 'a', updater: (x: number) => x + 5 },
     ]);
+
     expect(Optional.unwrap(updated.get('a'))).toBe(15);
   });
 });
@@ -860,6 +903,7 @@ describe('IMap.toKeysArray', () => {
       ['c', 3],
     ]);
     const keys = map.toKeysArray();
+
     expect(keys).toHaveLength(3);
     expect(keys).toContain('a');
     expect(keys).toContain('b');
@@ -875,6 +919,7 @@ describe('IMap.toValuesArray', () => {
       ['c', 3],
     ]);
     const values = map.toValuesArray();
+
     expect(values).toHaveLength(3);
     expect(values).toContain(1);
     expect(values).toContain(2);
@@ -890,6 +935,7 @@ describe('IMap.toEntriesArray', () => {
       ['c', 3],
     ]);
     const entries = map.toEntriesArray();
+
     expect(entries).toHaveLength(3);
     expect(entries).toContainEqual(['a', 1]);
     expect(entries).toContainEqual(['b', 2]);
@@ -906,7 +952,8 @@ describe('IMap.toArray', () => {
     ]);
     const entries = map.toArray();
     const entriesArray = map.toEntriesArray();
-    expect(entries).toStrictEqual(entriesArray);
+
+    assert.deepStrictEqual(entries, entriesArray);
   });
 });
 
@@ -918,6 +965,7 @@ describe('IMap.toRawMap', () => {
       ['c', 3],
     ]);
     const rawMap = map.toRawMap();
+
     expect(rawMap.size).toBe(3);
     expect(rawMap.get('a')).toBe(1);
     expect(rawMap.get('b')).toBe(2);

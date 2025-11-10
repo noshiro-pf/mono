@@ -6,8 +6,8 @@ import {
   NonZeroUint32,
 } from './non-zero-uint32.mjs';
 
-describe('NonZeroUint32', () => {
-  describe('asNonZeroUint32', () => {
+describe('NonZeroUint32 test', () => {
+  describe(asNonZeroUint32, () => {
     test('accepts valid non-zero uint32 values', () => {
       expect(() => asNonZeroUint32(1)).not.toThrow();
       expect(() => asNonZeroUint32(1000)).not.toThrow();
@@ -68,7 +68,7 @@ describe('NonZeroUint32', () => {
     );
   });
 
-  describe('isNonZeroUint32', () => {
+  describe(isNonZeroUint32, () => {
     test('correctly identifies non-zero uint32 values', () => {
       expect(isNonZeroUint32(1)).toBe(true);
       expect(isNonZeroUint32(1000)).toBe(true);
@@ -128,6 +128,7 @@ describe('NonZeroUint32', () => {
         asNonZeroUint32(4_294_967_000),
         asNonZeroUint32(1000),
       );
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(NonZeroUint32.add(a, b)).toBe(1_500_000);
     });
@@ -142,6 +143,7 @@ describe('NonZeroUint32', () => {
         asNonZeroUint32(100_000),
         asNonZeroUint32(100_000),
       );
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(NonZeroUint32.mul(asNonZeroUint32(1000), asNonZeroUint32(5))).toBe(
         5000,
@@ -161,6 +163,7 @@ describe('NonZeroUint32', () => {
         asNonZeroUint32(10_000),
         asNonZeroUint32(3),
       );
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(NonZeroUint32.pow(asNonZeroUint32(2), asNonZeroUint32(3))).toBe(8);
     });
@@ -173,6 +176,7 @@ describe('NonZeroUint32', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroUint32.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroUint32.is(result)).toBe(true);
@@ -184,6 +188,7 @@ describe('NonZeroUint32', () => {
     test('generates values within NonZeroUint32 range', () => {
       for (const _ of range(10)) {
         const result = NonZeroUint32.random(1, 30);
+
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(4_294_967_295);
       }

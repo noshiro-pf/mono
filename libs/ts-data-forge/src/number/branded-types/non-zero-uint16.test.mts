@@ -6,8 +6,8 @@ import {
   NonZeroUint16,
 } from './non-zero-uint16.mjs';
 
-describe('NonZeroUint16', () => {
-  describe('asNonZeroUint16', () => {
+describe('NonZeroUint16 test', () => {
+  describe(asNonZeroUint16, () => {
     test('accepts valid non-zero uint16 values', () => {
       expect(() => asNonZeroUint16(1)).not.toThrow();
       expect(() => asNonZeroUint16(1000)).not.toThrow();
@@ -68,7 +68,7 @@ describe('NonZeroUint16', () => {
     );
   });
 
-  describe('isNonZeroUint16', () => {
+  describe(isNonZeroUint16, () => {
     test('correctly identifies non-zero uint16 values', () => {
       expect(isNonZeroUint16(1)).toBe(true);
       expect(isNonZeroUint16(1000)).toBe(true);
@@ -128,6 +128,7 @@ describe('NonZeroUint16', () => {
         asNonZeroUint16(65_000),
         asNonZeroUint16(1000),
       );
+
       expect(result).toBe(65_535); // clamped to max
       expect(NonZeroUint16.add(a, b)).toBe(150);
     });
@@ -142,6 +143,7 @@ describe('NonZeroUint16', () => {
         asNonZeroUint16(1000),
         asNonZeroUint16(100),
       );
+
       expect(result).toBe(65_535); // clamped to max
       expect(NonZeroUint16.mul(asNonZeroUint16(10), asNonZeroUint16(5))).toBe(
         50,
@@ -161,6 +163,7 @@ describe('NonZeroUint16', () => {
         asNonZeroUint16(256),
         asNonZeroUint16(3),
       );
+
       expect(result).toBe(65_535); // clamped to max
       expect(NonZeroUint16.pow(asNonZeroUint16(2), asNonZeroUint16(3))).toBe(8);
     });
@@ -173,6 +176,7 @@ describe('NonZeroUint16', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroUint16.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroUint16.is(result)).toBe(true);
@@ -184,6 +188,7 @@ describe('NonZeroUint16', () => {
     test('generates values within NonZeroUint16 range', () => {
       for (const _ of range(10)) {
         const result = NonZeroUint16.random(1, 30);
+
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(65_535);
       }

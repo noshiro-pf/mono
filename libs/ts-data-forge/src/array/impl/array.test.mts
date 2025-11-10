@@ -40,7 +40,7 @@ describe('Array.flat', () => {
   >('=');
 
   test('case 1', () => {
-    expect(result).toStrictEqual([1, 2, 3, 4, [5, 6, [7, 8]]]);
+    assert.deepStrictEqual(result, [1, 2, 3, 4, [5, 6, [7, 8]]]);
   });
 });
 
@@ -75,7 +75,7 @@ describe('Array.find', () => {
     expectType<typeof result, Readonly<{ v: 1 }> | undefined>('=');
 
     test('case 1', () => {
-      expect(result).toStrictEqual({ v: 1 });
+      assert.deepStrictEqual(result, { v: 1 });
     });
   }
   {
@@ -89,7 +89,7 @@ describe('Array.find', () => {
     expectType<typeof result, Readonly<{ v: 1 | 2 | 3 }> | undefined>('=');
 
     test('case 2', () => {
-      expect(result).toStrictEqual({ v: 1 });
+      assert.deepStrictEqual(result, { v: 1 });
     });
   }
 });
@@ -129,7 +129,7 @@ describe('Array.filter', () => {
     expectType<typeof filtered, (1 | 3)[]>('=');
 
     test('case 1', () => {
-      expect(filtered).toStrictEqual([1, 3]);
+      assert.deepStrictEqual(filtered, [1, 3]);
     });
   }
 
@@ -140,7 +140,7 @@ describe('Array.filter', () => {
     expectType<typeof filtered, (1 | 2 | 3)[]>('=');
 
     test('case 2', () => {
-      expect(filtered).toStrictEqual([1, 3]);
+      assert.deepStrictEqual(filtered, [1, 3]);
     });
   }
 });

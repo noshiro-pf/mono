@@ -6,8 +6,8 @@ import {
   PositiveUint16,
 } from './positive-uint16.mjs';
 
-describe('PositiveUint16', () => {
-  describe('asPositiveUint16', () => {
+describe('PositiveUint16 test', () => {
+  describe(asPositiveUint16, () => {
     test('accepts valid positive uint16 values', () => {
       expect(() => asPositiveUint16(1)).not.toThrow();
       expect(() => asPositiveUint16(1000)).not.toThrow();
@@ -68,7 +68,7 @@ describe('PositiveUint16', () => {
     );
   });
 
-  describe('isPositiveUint16', () => {
+  describe(isPositiveUint16, () => {
     test('correctly identifies positive uint16 values', () => {
       expect(isPositiveUint16(1)).toBe(true);
       expect(isPositiveUint16(1000)).toBe(true);
@@ -128,6 +128,7 @@ describe('PositiveUint16', () => {
         asPositiveUint16(65_000),
         asPositiveUint16(1000),
       );
+
       expect(result).toBe(65_535); // clamped to max
       expect(PositiveUint16.add(a, b)).toBe(150);
     });
@@ -142,6 +143,7 @@ describe('PositiveUint16', () => {
         asPositiveUint16(1000),
         asPositiveUint16(100),
       );
+
       expect(result).toBe(65_535); // clamped to max
       expect(
         PositiveUint16.mul(asPositiveUint16(10), asPositiveUint16(5)),
@@ -163,6 +165,7 @@ describe('PositiveUint16', () => {
         asPositiveUint16(256),
         asPositiveUint16(3),
       );
+
       expect(result).toBe(65_535); // clamped to max
       expect(PositiveUint16.pow(asPositiveUint16(2), asPositiveUint16(3))).toBe(
         8,
@@ -177,6 +180,7 @@ describe('PositiveUint16', () => {
 
       for (const _ of range(10)) {
         const result = PositiveUint16.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(PositiveUint16.is(result)).toBe(true);
@@ -188,6 +192,7 @@ describe('PositiveUint16', () => {
     test('generates values within PositiveUint16 range', () => {
       for (const _ of range(10)) {
         const result = PositiveUint16.random(1, 30);
+
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(65_535);
       }

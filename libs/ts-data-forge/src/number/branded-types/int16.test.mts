@@ -3,8 +3,8 @@ import { range } from '../../iterator/index.mjs';
 import { asInt16, Int16, isInt16 } from './int16.mjs';
 import { asNonZeroInt16 } from './non-zero-int16.mjs';
 
-describe('Int16', () => {
-  describe('asInt16', () => {
+describe('Int16 test', () => {
+  describe(asInt16, () => {
     test('accepts valid int16 values', () => {
       expect(() => asInt16(0)).not.toThrow();
       expect(() => asInt16(1)).not.toThrow();
@@ -49,7 +49,7 @@ describe('Int16', () => {
     });
   });
 
-  describe('isInt16', () => {
+  describe(isInt16, () => {
     test('correctly identifies int16 values', () => {
       expect(isInt16(0)).toBe(true);
       expect(isInt16(1)).toBe(true);
@@ -109,18 +109,21 @@ describe('Int16', () => {
 
     test('add (with clamping)', () => {
       const result = Int16.add(asInt16(32_000), asInt16(1000));
+
       expect(result).toBe(32_767); // clamped to max
       expect(Int16.add(a, b)).toBe(150);
     });
 
     test('sub (with clamping)', () => {
       const result = Int16.sub(asInt16(-32_000), asInt16(1000));
+
       expect(result).toBe(-32_768); // clamped to min
       expect(Int16.sub(a, b)).toBe(50);
     });
 
     test('mul (with clamping)', () => {
       const result = Int16.mul(asInt16(1000), asInt16(100));
+
       expect(result).toBe(32_767); // clamped to max
       expect(Int16.mul(asInt16(10), asInt16(5))).toBe(50);
     });
@@ -133,6 +136,7 @@ describe('Int16', () => {
 
     test('pow (with clamping)', () => {
       const result = Int16.pow(asInt16(200), asInt16(3));
+
       expect(result).toBe(32_767); // clamped to max
       expect(Int16.pow(asInt16(2), asInt16(3))).toBe(8);
     });
@@ -145,6 +149,7 @@ describe('Int16', () => {
 
       for (const _ of range(10)) {
         const result = Int16.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(Int16.is(result)).toBe(true);
@@ -155,6 +160,7 @@ describe('Int16', () => {
     test('generates values within Int16 range', () => {
       for (const _ of range(10)) {
         const result = Int16.random(-20, 20);
+
         expect(result).toBeGreaterThanOrEqual(Int16.MIN_VALUE);
         expect(result).toBeLessThanOrEqual(Int16.MAX_VALUE);
       }

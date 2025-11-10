@@ -2,8 +2,8 @@ import { expectType } from '../../expect-type.mjs';
 import { range } from '../../iterator/index.mjs';
 import { asUint, isUint, Uint } from './uint.mjs';
 
-describe('Uint', () => {
-  describe('asUint', () => {
+describe('Uint test', () => {
+  describe(asUint, () => {
     test('accepts valid unsigned integers', () => {
       expect(() => asUint(0)).not.toThrow();
       expect(() => asUint(1)).not.toThrow();
@@ -46,7 +46,7 @@ describe('Uint', () => {
     });
   });
 
-  describe('isUint', () => {
+  describe(isUint, () => {
     test('correctly identifies unsigned integers', () => {
       expect(isUint(0)).toBe(true);
       expect(isUint(1)).toBe(true);
@@ -132,6 +132,7 @@ describe('Uint', () => {
 
       for (const _ of range(10)) {
         const result = Uint.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(Uint.is(result)).toBe(true);
@@ -143,6 +144,7 @@ describe('Uint', () => {
     test('generates values starting from 0', () => {
       for (const _ of range(10)) {
         const result = Uint.random(0, 30);
+
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(30);
       }

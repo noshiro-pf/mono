@@ -2,13 +2,14 @@ import { expectType } from '../expect-type.mjs';
 import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
 
-describe('pipe', () => {
+describe(pipe, () => {
   test('basic pipe operations', () => {
     const result = pipe(5)
       .map((x) => x * 2)
       .map((x) => x + 1).value;
 
     expect(result).toBe(11);
+
     expectType<typeof result, number>('=');
   });
 
@@ -18,6 +19,7 @@ describe('pipe', () => {
       .map((s) => `${s}!`).value;
 
     expect(result).toBe('HELLO!');
+
     expectType<typeof result, string>('=');
   });
 
@@ -27,6 +29,7 @@ describe('pipe', () => {
       .map((arr) => arr.length).value;
 
     expect(result).toBe(3);
+
     expectType<typeof result, number>('=');
   });
 
@@ -34,6 +37,7 @@ describe('pipe', () => {
     const result = pipe(5 as number | null).mapNullable((x) => x * 2).value;
 
     expect(result).toBe(10);
+
     expectType<typeof result, number | undefined>('=');
   });
 
@@ -41,6 +45,7 @@ describe('pipe', () => {
     const result = pipe(null as number | null).mapNullable((x) => x * 2).value;
 
     expect(result).toBeUndefined();
+
     expectType<typeof result, number | undefined>('=');
   });
 
@@ -50,6 +55,7 @@ describe('pipe', () => {
     ).value;
 
     expect(result).toBeUndefined();
+
     expectType<typeof result, number | undefined>('=');
   });
 
@@ -58,6 +64,7 @@ describe('pipe', () => {
     const result = pipe(optional).mapOptional((x) => x * 2).value;
 
     expect(Optional.isSome(result)).toBe(true);
+
     if (Optional.isSome(result)) {
       expect(result.value).toBe(84);
     }
@@ -69,6 +76,7 @@ describe('pipe', () => {
     const result = pipe(optional).mapOptional((x) => x * 2).value;
 
     expect(Optional.isNone(result)).toBe(true);
+
     expectType<typeof result, Optional<number>>('=');
   });
 
@@ -80,6 +88,7 @@ describe('pipe', () => {
       .map((s) => `${s} items`).value;
 
     expect(result).toBe('15 items');
+
     expectType<typeof result, string>('=');
   });
 });

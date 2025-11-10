@@ -2,8 +2,8 @@ import { expectType } from '../../expect-type.mjs';
 import { range } from '../../iterator/index.mjs';
 import { asSafeUint, isSafeUint, SafeUint } from './safe-uint.mjs';
 
-describe('SafeUint', () => {
-  describe('asSafeUint', () => {
+describe('SafeUint test', () => {
+  describe(asSafeUint, () => {
     test('accepts valid safe unsigned integers', () => {
       expect(() => asSafeUint(0)).not.toThrow();
       expect(() => asSafeUint(1)).not.toThrow();
@@ -52,7 +52,7 @@ describe('SafeUint', () => {
     });
   });
 
-  describe('isSafeUint', () => {
+  describe(isSafeUint, () => {
     test('correctly identifies safe unsigned integers', () => {
       expect(isSafeUint(0)).toBe(true);
       expect(isSafeUint(1)).toBe(true);
@@ -111,6 +111,7 @@ describe('SafeUint', () => {
     test('add (clamped to safe uint range)', () => {
       const largeValue = asSafeUint(Number.MAX_SAFE_INTEGER - 1);
       const result = SafeUint.add(largeValue, asSafeUint(10));
+
       expect(result).toBe(Number.MAX_SAFE_INTEGER); // clamped to max
       expect(SafeUint.add(a, b)).toBe(7);
     });
@@ -126,6 +127,7 @@ describe('SafeUint', () => {
         Math.floor(Math.sqrt(Number.MAX_SAFE_INTEGER)),
       );
       const result = SafeUint.mul(largeValue, largeValue);
+
       expect(result).toBeLessThanOrEqual(Number.MAX_SAFE_INTEGER);
       expect(SafeUint.mul(asSafeUint(10), asSafeUint(5))).toBe(50);
     });
@@ -138,6 +140,7 @@ describe('SafeUint', () => {
 
     test('pow (clamped to safe uint range)', () => {
       const result = SafeUint.pow(asSafeUint(1000), asSafeUint(10));
+
       expect(result).toBe(Number.MAX_SAFE_INTEGER); // clamped to max
       expect(SafeUint.pow(asSafeUint(2), asSafeUint(3))).toBe(8);
     });
@@ -150,6 +153,7 @@ describe('SafeUint', () => {
 
       for (const _ of range(10)) {
         const result = SafeUint.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(SafeUint.is(result)).toBe(true);
@@ -161,6 +165,7 @@ describe('SafeUint', () => {
     test('generates values within safe uint range', () => {
       for (const _ of range(10)) {
         const result = SafeUint.random(0, 30);
+
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(Number.MAX_SAFE_INTEGER);
       }

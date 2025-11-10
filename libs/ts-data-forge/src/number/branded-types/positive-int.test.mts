@@ -2,8 +2,8 @@ import { expectType } from '../../expect-type.mjs';
 import { range } from '../../iterator/index.mjs';
 import { asPositiveInt, isPositiveInt, PositiveInt } from './positive-int.mjs';
 
-describe('PositiveInt', () => {
-  describe('asPositiveInt', () => {
+describe('PositiveInt test', () => {
+  describe(asPositiveInt, () => {
     test('accepts valid positive integers', () => {
       expect(() => asPositiveInt(1)).not.toThrow();
       expect(() => asPositiveInt(2)).not.toThrow();
@@ -55,7 +55,7 @@ describe('PositiveInt', () => {
     );
   });
 
-  describe('isPositiveInt', () => {
+  describe(isPositiveInt, () => {
     test('correctly identifies positive integers', () => {
       expect(isPositiveInt(1)).toBe(true);
       expect(isPositiveInt(2)).toBe(true);
@@ -146,6 +146,7 @@ describe('PositiveInt', () => {
 
       for (const _ of range(10)) {
         const result = PositiveInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(PositiveInt.is(result)).toBe(true);
@@ -160,6 +161,7 @@ describe('PositiveInt', () => {
 
       for (const _ of range(10)) {
         const result = PositiveInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(5);
         expect(result).toBeGreaterThan(0);

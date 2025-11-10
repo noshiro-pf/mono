@@ -6,8 +6,8 @@ import {
   NonZeroFiniteNumber,
 } from './non-zero-finite-number.mjs';
 
-describe('NonZeroFiniteNumber', () => {
-  describe('asNonZeroFiniteNumber', () => {
+describe('NonZeroFiniteNumber test', () => {
+  describe(asNonZeroFiniteNumber, () => {
     test('accepts valid non-zero finite numbers', () => {
       expect(() => asNonZeroFiniteNumber(1)).not.toThrow();
       expect(() => asNonZeroFiniteNumber(-1)).not.toThrow();
@@ -55,7 +55,7 @@ describe('NonZeroFiniteNumber', () => {
     );
   });
 
-  describe('isNonZeroFiniteNumber', () => {
+  describe(isNonZeroFiniteNumber, () => {
     test('correctly identifies non-zero finite numbers', () => {
       expect(isNonZeroFiniteNumber(1)).toBe(true);
       expect(isNonZeroFiniteNumber(-1)).toBe(true);
@@ -155,6 +155,7 @@ describe('NonZeroFiniteNumber', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroFiniteNumber.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroFiniteNumber.is(result)).toBe(true);
@@ -168,6 +169,7 @@ describe('NonZeroFiniteNumber', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroFiniteNumber.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroFiniteNumber.is(result)).toBe(true);
@@ -181,6 +183,7 @@ describe('NonZeroFiniteNumber', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroFiniteNumber.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroFiniteNumber.is(result)).toBe(true);

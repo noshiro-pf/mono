@@ -4,16 +4,18 @@ import { range } from '../iterator/index.mjs';
 import { asUint32 } from '../number/index.mjs';
 import { createQueue, type Queue } from './queue.mjs';
 
-describe('Queue', () => {
+describe('Queue test', () => {
   describe('initialization', () => {
     test('should be empty if initialized without values', () => {
       const q = createQueue();
+
       expect(q.isEmpty).toBe(true);
       expect(q.size).toBe(0);
     });
 
     test('should not be empty if initialized with values', () => {
       const q = createQueue([1, 2, 3]);
+
       expect(q.isEmpty).toBe(false);
       expect(q.size).toBe(3);
     });
@@ -29,6 +31,7 @@ describe('Queue', () => {
 
     test('should increase size and not be empty after enqueueing to an empty queue', () => {
       mut_q.enqueue(1);
+
       expect(mut_q.isEmpty).toBe(false);
       expect(mut_q.size).toBe(1);
     });
@@ -36,6 +39,7 @@ describe('Queue', () => {
     test('should increase size when enqueueing to a non-empty queue', () => {
       mut_q.enqueue(1);
       mut_q.enqueue(2);
+
       expect(mut_q.size).toBe(2);
     });
   });
@@ -44,6 +48,7 @@ describe('Queue', () => {
     test('should return Optional.none and size should be 0 when dequeuing from an empty queue', () => {
       const q = createQueue<number>();
       const result = q.dequeue();
+
       expect(Optional.isNone(result)).toBe(true);
       expect(q.isEmpty).toBe(true);
       expect(q.size).toBe(0);
@@ -54,17 +59,23 @@ describe('Queue', () => {
       const initialSize = q.size;
 
       const result1 = q.dequeue(); // Dequeues 1 (first element)
+
       expect(Optional.isSome(result1)).toBe(true);
+
       if (Optional.isSome(result1)) {
         expect(result1.value).toBe(1);
       }
+
       expect(q.size).toBe(initialSize - 1);
 
       const result2 = q.dequeue(); // Dequeues 2
+
       expect(Optional.isSome(result2)).toBe(true);
+
       if (Optional.isSome(result2)) {
         expect(result2.value).toBe(2);
       }
+
       expect(q.size).toBe(initialSize - 2);
     });
 
@@ -72,9 +83,12 @@ describe('Queue', () => {
       const q = createQueue([1, 2]); // Internal: [1, 2]
       q.dequeue(); // Dequeues 1
       q.dequeue(); // Dequeues 2
+
       expect(q.isEmpty).toBe(true);
       expect(q.size).toBe(0);
+
       const result = q.dequeue(); // Dequeue from empty
+
       expect(Optional.isNone(result)).toBe(true);
     });
   });
@@ -89,33 +103,41 @@ describe('Queue', () => {
       expect(q.size).toBe(3);
 
       let mut_result = q.dequeue(); // Dequeues 1 (first in)
+
       expect(Optional.isSome(mut_result) && mut_result.value === 1).toBe(true);
       expect(q.size).toBe(2);
 
       mut_result = q.dequeue(); // Dequeues 2
+
       expect(Optional.isSome(mut_result) && mut_result.value === 2).toBe(true);
       expect(q.size).toBe(1);
 
       mut_result = q.dequeue(); // Dequeues 3
+
       expect(Optional.isSome(mut_result) && mut_result.value === 3).toBe(true);
       expect(q.size).toBe(0);
       expect(q.isEmpty).toBe(true);
 
       mut_result = q.dequeue();
+
       expect(Optional.isNone(mut_result)).toBe(true);
     });
 
     test('initial values are dequeued in the same order (FIFO)', () => {
       const q = createQueue([1, 2, 3]); // Internal: [1, 2, 3]
+
       expect(q.size).toBe(3);
 
       const result1 = q.dequeue(); // Dequeues 1 (first element)
+
       expect(Optional.isSome(result1) && result1.value === 1).toBe(true);
 
       const result2 = q.dequeue(); // Dequeues 2
+
       expect(Optional.isSome(result2) && result2.value === 2).toBe(true);
 
       const result3 = q.dequeue(); // Dequeues 3
+
       expect(Optional.isSome(result3) && result3.value === 3).toBe(true);
 
       expect(q.isEmpty).toBe(true);
@@ -128,18 +150,22 @@ describe('Queue', () => {
       q.enqueue('B');
 
       const result1 = q.dequeue();
+
       expect(Optional.isSome(result1) && result1.value === 'A').toBe(true);
 
       q.enqueue('C');
       q.enqueue('D');
 
       const result2 = q.dequeue();
+
       expect(Optional.isSome(result2) && result2.value === 'B').toBe(true);
 
       const result3 = q.dequeue();
+
       expect(Optional.isSome(result3) && result3.value === 'C').toBe(true);
 
       const result4 = q.dequeue();
+
       expect(Optional.isSome(result4) && result4.value === 'D').toBe(true);
 
       expect(q.isEmpty).toBe(true);
@@ -188,6 +214,7 @@ describe('Queue', () => {
       // Verify all elements can be dequeued in correct order
       for (const i of range(1, 21)) {
         const result = q.dequeue();
+
         expect(Optional.isSome(result) && result.value === i).toBe(true);
       }
 
@@ -233,9 +260,11 @@ describe('Queue', () => {
       // Test single element enqueue/dequeue cycles
       for (const i of range(10)) {
         q.enqueue(`item-${i}`);
+
         expect(q.size).toBe(1);
 
         const result = q.dequeue();
+
         expect(Optional.isSome(result) && result.value === `item-${i}`).toBe(
           true,
         );
@@ -269,12 +298,14 @@ describe('Queue', () => {
       // Remove first 5 objects
       for (const i of range(0, 5)) {
         const result = q.dequeue();
+
         expect(Optional.isSome(result) && result.value.id === i).toBe(true);
       }
 
       // Remaining objects should still be accessible
       for (const i of range(5, 10)) {
         const result = q.dequeue();
+
         expect(Optional.isSome(result) && result.value.id === i).toBe(true);
       }
 

@@ -2,8 +2,8 @@ import { expectType } from '../../expect-type.mjs';
 import { range } from '../../iterator/index.mjs';
 import { asNonZeroInt, isNonZeroInt, NonZeroInt } from './non-zero-int.mjs';
 
-describe('NonZeroInt', () => {
-  describe('asNonZeroInt', () => {
+describe('NonZeroInt test', () => {
+  describe(asNonZeroInt, () => {
     test('accepts valid non-zero integers', () => {
       expect(() => asNonZeroInt(1)).not.toThrow();
       expect(() => asNonZeroInt(-1)).not.toThrow();
@@ -46,7 +46,7 @@ describe('NonZeroInt', () => {
     });
   });
 
-  describe('isNonZeroInt', () => {
+  describe(isNonZeroInt, () => {
     test('correctly identifies non-zero integers', () => {
       expect(isNonZeroInt(1)).toBe(true);
       expect(isNonZeroInt(-1)).toBe(true);
@@ -131,6 +131,7 @@ describe('NonZeroInt', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroInt.is(result)).toBe(true);
@@ -145,6 +146,7 @@ describe('NonZeroInt', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroInt.is(result)).toBe(true);
@@ -159,6 +161,7 @@ describe('NonZeroInt', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroInt.is(result)).toBe(true);

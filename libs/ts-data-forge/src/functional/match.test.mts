@@ -1,7 +1,7 @@
 import { expectType } from '../expect-type.mjs';
 import { match } from './match.mjs';
 
-describe('match', () => {
+describe(match, () => {
   type Direction = 'E' | 'N' | 'S' | 'W';
   const direction: Direction = 'N' as Direction;
 

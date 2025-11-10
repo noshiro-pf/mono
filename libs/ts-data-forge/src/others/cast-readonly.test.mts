@@ -1,12 +1,13 @@
 import { castDeepReadonly, castReadonly } from './cast-readonly.mjs';
 
-describe('castReadonly', () => {
+describe(castReadonly, () => {
   test('should cast mutable array to readonly', () => {
     const mutableArr = [1, 2, 3];
     const readonlyArr = castReadonly(mutableArr);
 
     expect(readonlyArr).toBe(mutableArr); // Same reference
-    expect(readonlyArr).toStrictEqual([1, 2, 3]);
+
+    assert.deepStrictEqual(readonlyArr, [1, 2, 3]);
   });
 
   test('should cast mutable object to readonly', () => {
@@ -14,7 +15,8 @@ describe('castReadonly', () => {
     const readonlyObj = castReadonly(mutableObj);
 
     expect(readonlyObj).toBe(mutableObj); // Same reference
-    expect(readonlyObj).toStrictEqual({ x: 1, y: 2 });
+
+    assert.deepStrictEqual(readonlyObj, { x: 1, y: 2 });
   });
 
   test('should preserve the runtime value', () => {
@@ -38,7 +40,7 @@ describe('castReadonly', () => {
   });
 });
 
-describe('castDeepReadonly', () => {
+describe(castDeepReadonly, () => {
   test('should cast deeply nested structure to readonly', () => {
     const mutableNested = {
       a: { b: [1, 2, 3] },
@@ -47,7 +49,9 @@ describe('castDeepReadonly', () => {
     const readonlyNested = castDeepReadonly(mutableNested);
 
     expect(readonlyNested).toBe(mutableNested); // Same reference
-    expect(readonlyNested.a.b).toStrictEqual([1, 2, 3]);
+
+    assert.deepStrictEqual(readonlyNested.a.b, [1, 2, 3]);
+
     expect(readonlyNested.c.d.e).toBe('value');
   });
 

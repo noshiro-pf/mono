@@ -20,7 +20,8 @@ describe('ISetMapped[Symbol.iterator]', () => {
       fromKey,
     );
 
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
@@ -48,6 +49,7 @@ describe('ISetMapped.has', () => {
 
     expect(s0.has({ v: 3 })).toBe(true);
   });
+
   test('case 2', () => {
     const s0 = ISetMapped.create(
       [{ v: 1 }, { v: 2 }, { v: 3 }],
@@ -57,6 +59,7 @@ describe('ISetMapped.has', () => {
 
     expect(s0.has({ v: 4 })).toBe(false);
   });
+
   test('case 3', () => {
     const s0 = ISetMapped.create<Readonly<{ v: number }>, number>(
       [],
@@ -76,17 +79,20 @@ describe('ISetMapped.add', () => {
       fromKey,
     );
 
-    expect(s0.add({ v: 5 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.add({ v: 5 }),
       ISetMapped.create(
         [{ v: 1 }, { v: 2 }, { v: 3 }, { v: 5 }],
         toKey,
         fromKey,
       ),
     );
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
+
   test('case 2', () => {
     const s0 = ISetMapped.create(
       [{ v: 1 }, { v: 2 }, { v: 3 }],
@@ -94,20 +100,24 @@ describe('ISetMapped.add', () => {
       fromKey,
     );
 
-    expect(s0.add({ v: 3 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.add({ v: 3 }),
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
+
   test('case 3', () => {
     const s0 = ISetMapped.create([], toKey, fromKey);
 
-    expect(s0.add({ v: 1 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.add({ v: 1 }),
       ISetMapped.create([{ v: 1 }], toKey, fromKey),
     );
-    expect(s0).toStrictEqual(ISetMapped.create([], toKey, fromKey));
+    assert.deepStrictEqual(s0, ISetMapped.create([], toKey, fromKey));
   });
 });
 
@@ -119,13 +129,16 @@ describe('ISetMapped.delete', () => {
       fromKey,
     );
 
-    expect(s0.delete({ v: 10 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.delete({ v: 10 }),
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
+
   test('case 2', () => {
     const s0 = ISetMapped.create(
       [{ v: 1 }, { v: 2 }, { v: 3 }],
@@ -133,20 +146,24 @@ describe('ISetMapped.delete', () => {
       fromKey,
     );
 
-    expect(s0.delete({ v: 3 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.delete({ v: 3 }),
       ISetMapped.create([{ v: 1 }, { v: 2 }], toKey, fromKey),
     );
-    expect(s0).toStrictEqual(
+    assert.deepStrictEqual(
+      s0,
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
+
   test('case 3', () => {
     const s0 = ISetMapped.create([], toKey, fromKey);
 
-    expect(s0.delete({ v: 1 })).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.delete({ v: 1 }),
       ISetMapped.create([], toKey, fromKey),
     );
-    expect(s0).toStrictEqual(ISetMapped.create([], toKey, fromKey));
+    assert.deepStrictEqual(s0, ISetMapped.create([], toKey, fromKey));
   });
 });
 
@@ -207,7 +224,8 @@ describe('ISetMapped.entries', () => {
     for (const [k, v] of s0.entries()) {
       expect(elements).toContainEqual(k);
       expect(elements).toContainEqual(v);
-      expect(k).toStrictEqual(v);
+
+      assert.deepStrictEqual(k, v);
     }
   });
 });
@@ -221,10 +239,12 @@ describe('ISetMapped.subtract', () => {
     );
     const s1 = ISetMapped.create([{ v: 2 }, { v: 4 }], toKey, fromKey);
 
-    expect(s0.subtract(s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.subtract(s1),
       ISetMapped.create([{ v: 1 }, { v: 3 }], toKey, fromKey),
     );
   });
+
   test('case 2', () => {
     const s0 = ISetMapped.create(
       [{ v: 1 }, { v: 2 }, { v: 3 }],
@@ -233,10 +253,12 @@ describe('ISetMapped.subtract', () => {
     );
     const s1 = ISetMapped.create([], toKey, fromKey);
 
-    expect(s0.subtract(s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.subtract(s1),
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
+
   test('case 3', () => {
     const s0 = ISetMapped.create([], toKey, fromKey);
     const s1 = ISetMapped.create(
@@ -245,7 +267,8 @@ describe('ISetMapped.subtract', () => {
       fromKey,
     );
 
-    expect(s0.subtract(s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      s0.subtract(s1),
       ISetMapped.create([], toKey, fromKey),
     );
   });
@@ -266,13 +289,16 @@ describe('ISetMapped.diff', () => {
 
     const diff = ISetMapped.diff(s0, s1);
 
-    expect(diff.deleted).toStrictEqual(
+    assert.deepStrictEqual(
+      diff.deleted,
       ISetMapped.create([{ v: 1 }], toKey, fromKey),
     );
-    expect(diff.added).toStrictEqual(
+    assert.deepStrictEqual(
+      diff.added,
       ISetMapped.create([{ v: 4 }], toKey, fromKey),
     );
   });
+
   test('case 2', () => {
     const s0 = ISetMapped.create(
       [{ v: 1 }, { v: 2 }, { v: 3 }],
@@ -283,11 +309,13 @@ describe('ISetMapped.diff', () => {
 
     const diff = ISetMapped.diff(s0, s1);
 
-    expect(diff.deleted).toStrictEqual(
+    assert.deepStrictEqual(
+      diff.deleted,
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
-    expect(diff.added).toStrictEqual(ISetMapped.create([], toKey, fromKey));
+    assert.deepStrictEqual(diff.added, ISetMapped.create([], toKey, fromKey));
   });
+
   test('case 3', () => {
     const s0 = ISetMapped.create([], toKey, fromKey);
     const s1 = ISetMapped.create(
@@ -298,8 +326,9 @@ describe('ISetMapped.diff', () => {
 
     const diff = ISetMapped.diff(s0, s1);
 
-    expect(diff.deleted).toStrictEqual(ISetMapped.create([], toKey, fromKey));
-    expect(diff.added).toStrictEqual(
+    assert.deepStrictEqual(diff.deleted, ISetMapped.create([], toKey, fromKey));
+    assert.deepStrictEqual(
+      diff.added,
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
@@ -318,7 +347,8 @@ describe('ISetMapped.union', () => {
       fromKey,
     );
 
-    expect(ISetMapped.union(s0, s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      ISetMapped.union(s0, s1),
       ISetMapped.create(
         [{ v: 1 }, { v: 2 }, { v: 3 }, { v: 4 }, { v: 5 }],
         toKey,
@@ -326,6 +356,7 @@ describe('ISetMapped.union', () => {
       ),
     );
   });
+
   test('case 2', () => {
     const s0 = ISetMapped.create(
       [{ v: 1 }, { v: 2 }, { v: 3 }],
@@ -334,10 +365,12 @@ describe('ISetMapped.union', () => {
     );
     const s1 = ISetMapped.create([], toKey, fromKey);
 
-    expect(ISetMapped.union(s0, s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      ISetMapped.union(s0, s1),
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
+
   test('case 3', () => {
     const s0 = ISetMapped.create([], toKey, fromKey);
     const s1 = ISetMapped.create(
@@ -346,7 +379,8 @@ describe('ISetMapped.union', () => {
       fromKey,
     );
 
-    expect(ISetMapped.union(s0, s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      ISetMapped.union(s0, s1),
       ISetMapped.create([{ v: 1 }, { v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
@@ -365,10 +399,12 @@ describe('ISetMapped.intersection', () => {
       fromKey,
     );
 
-    expect(ISetMapped.intersection(s0, s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      ISetMapped.intersection(s0, s1),
       ISetMapped.create([{ v: 2 }, { v: 3 }], toKey, fromKey),
     );
   });
+
   test('case 2', () => {
     const s0 = ISetMapped.create(
       [{ v: 1 }, { v: 2 }, { v: 3 }],
@@ -377,10 +413,12 @@ describe('ISetMapped.intersection', () => {
     );
     const s1 = ISetMapped.create([], toKey, fromKey);
 
-    expect(ISetMapped.intersection(s0, s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      ISetMapped.intersection(s0, s1),
       ISetMapped.create([], toKey, fromKey),
     );
   });
+
   test('case 3', () => {
     const s0 = ISetMapped.create([], toKey, fromKey);
     const s1 = ISetMapped.create(
@@ -389,7 +427,8 @@ describe('ISetMapped.intersection', () => {
       fromKey,
     );
 
-    expect(ISetMapped.intersection(s0, s1)).toStrictEqual(
+    assert.deepStrictEqual(
+      ISetMapped.intersection(s0, s1),
       ISetMapped.create([], toKey, fromKey),
     );
   });
@@ -403,6 +442,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(set.size).toBe(0);
     });
 
@@ -415,6 +455,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(set.size).toBe(2);
       expect(set.has({ id: 1, type: 'user' })).toBe(true);
       expect(set.has({ id: 2, type: 'admin' })).toBe(true);
@@ -430,6 +471,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(set.size).toBe(2);
     });
   });
@@ -452,6 +494,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(ISetMapped.equal(set1, set2)).toBe(true);
     });
 
@@ -472,6 +515,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(ISetMapped.equal(set1, set2)).toBe(false);
     });
 
@@ -486,6 +530,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(ISetMapped.equal(set1, set2)).toBe(true);
     });
   });
@@ -611,6 +656,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(set.every((el) => el.type === 'user')).toBe(true);
     });
 
@@ -623,6 +669,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(set.every((el) => el.type === 'user')).toBe(false);
     });
   });
@@ -637,6 +684,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(set.some((el) => el.type === 'admin')).toBe(true);
     });
 
@@ -649,6 +697,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         testElementToString,
         stringToTestElement,
       );
+
       expect(set.some((el) => el.type === 'admin')).toBe(false);
     });
   });
@@ -735,6 +784,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
       const updated = set.withMutations([]);
+
       expect(updated.size).toBe(1);
       expect(ISetMapped.equal(set, updated)).toBe(true);
     });
@@ -1035,8 +1085,9 @@ describe('ISetMapped additional functionality with complex types', () => {
       const entries = Array.from(set.entries());
 
       expect(entries).toHaveLength(2);
+
       for (const [key, value] of entries) {
-        expect(key).toStrictEqual(value);
+        assert.deepStrictEqual(key, value);
       }
     });
 

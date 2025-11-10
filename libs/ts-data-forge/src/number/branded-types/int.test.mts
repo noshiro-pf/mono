@@ -3,8 +3,8 @@ import { range } from '../../iterator/index.mjs';
 import { asInt, Int, isInt } from './int.mjs';
 import { asNonZeroInt } from './non-zero-int.mjs';
 
-describe('Int', () => {
-  describe('asInt', () => {
+describe('Int test', () => {
+  describe(asInt, () => {
     test('accepts valid integers', () => {
       expect(() => asInt(0)).not.toThrow();
       expect(() => asInt(1)).not.toThrow();
@@ -42,7 +42,7 @@ describe('Int', () => {
     });
   });
 
-  describe('isInt', () => {
+  describe(isInt, () => {
     test('correctly identifies integers', () => {
       expect(isInt(0)).toBe(true);
       expect(isInt(1)).toBe(true);
@@ -123,6 +123,7 @@ describe('Int', () => {
 
       for (const _ of range(10)) {
         const result = Int.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(Int.is(result)).toBe(true);

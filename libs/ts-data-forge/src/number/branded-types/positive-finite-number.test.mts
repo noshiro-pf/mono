@@ -6,8 +6,8 @@ import {
   PositiveFiniteNumber,
 } from './positive-finite-number.mjs';
 
-describe('PositiveFiniteNumber', () => {
-  describe('asPositiveFiniteNumber', () => {
+describe('PositiveFiniteNumber test', () => {
+  describe(asPositiveFiniteNumber, () => {
     test('accepts valid positive finite numbers', () => {
       expect(() => asPositiveFiniteNumber(1)).not.toThrow();
       expect(() => asPositiveFiniteNumber(3.14)).not.toThrow();
@@ -60,7 +60,7 @@ describe('PositiveFiniteNumber', () => {
     );
   });
 
-  describe('isPositiveFiniteNumber', () => {
+  describe(isPositiveFiniteNumber, () => {
     test('correctly identifies positive finite numbers', () => {
       expect(isPositiveFiniteNumber(1)).toBe(true);
       expect(isPositiveFiniteNumber(3.14)).toBe(true);
@@ -134,9 +134,11 @@ describe('PositiveFiniteNumber', () => {
 
     test('sub (never goes below Number.MIN_VALUE)', () => {
       const result1 = PositiveFiniteNumber.sub(a, b);
+
       expect(result1).toBe(3);
 
       const result2 = PositiveFiniteNumber.sub(b, a);
+
       expect(result2).toBe(Number.MIN_VALUE); // clamped to MIN_VALUE
     });
 
@@ -173,6 +175,7 @@ describe('PositiveFiniteNumber', () => {
 
       for (const _ of range(10)) {
         const result = PositiveFiniteNumber.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(PositiveFiniteNumber.is(result)).toBe(true);
@@ -186,6 +189,7 @@ describe('PositiveFiniteNumber', () => {
 
       for (const _ of range(10)) {
         const result = PositiveFiniteNumber.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(Number.MIN_VALUE);
         expect(result).toBeLessThanOrEqual(1);
         expect(result).toBeGreaterThan(0);

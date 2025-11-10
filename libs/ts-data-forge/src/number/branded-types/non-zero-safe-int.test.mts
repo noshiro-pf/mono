@@ -6,8 +6,8 @@ import {
   NonZeroSafeInt,
 } from './non-zero-safe-int.mjs';
 
-describe('NonZeroSafeInt', () => {
-  describe('asNonZeroSafeInt', () => {
+describe('NonZeroSafeInt test', () => {
+  describe(asNonZeroSafeInt, () => {
     test('accepts valid non-zero safe integers', () => {
       expect(() => asNonZeroSafeInt(1)).not.toThrow();
       expect(() => asNonZeroSafeInt(-1)).not.toThrow();
@@ -68,7 +68,7 @@ describe('NonZeroSafeInt', () => {
     );
   });
 
-  describe('isNonZeroSafeInt', () => {
+  describe(isNonZeroSafeInt, () => {
     test('correctly identifies non-zero safe integers', () => {
       expect(isNonZeroSafeInt(1)).toBe(true);
       expect(isNonZeroSafeInt(-1)).toBe(true);
@@ -135,6 +135,7 @@ describe('NonZeroSafeInt', () => {
     test('add (with clamping to safe integer range)', () => {
       const largeValue = asNonZeroSafeInt(Number.MAX_SAFE_INTEGER - 1);
       const result = NonZeroSafeInt.add(largeValue, asNonZeroSafeInt(10));
+
       expect(result).toBe(Number.MAX_SAFE_INTEGER); // clamped to max
       expect(NonZeroSafeInt.add(a, b)).toBe(7);
     });
@@ -142,6 +143,7 @@ describe('NonZeroSafeInt', () => {
     test('sub (with clamping to safe integer range)', () => {
       const smallValue = asNonZeroSafeInt(Number.MIN_SAFE_INTEGER + 1);
       const result = NonZeroSafeInt.sub(smallValue, asNonZeroSafeInt(10));
+
       expect(result).toBe(Number.MIN_SAFE_INTEGER); // clamped to min
       expect(NonZeroSafeInt.sub(a, b)).toBe(3);
     });
@@ -151,6 +153,7 @@ describe('NonZeroSafeInt', () => {
         Math.floor(Math.sqrt(Number.MAX_SAFE_INTEGER)),
       );
       const result = NonZeroSafeInt.mul(largeValue, largeValue);
+
       expect(result).toBeLessThanOrEqual(Number.MAX_SAFE_INTEGER);
       expect(
         NonZeroSafeInt.mul(asNonZeroSafeInt(10), asNonZeroSafeInt(5)),
@@ -172,6 +175,7 @@ describe('NonZeroSafeInt', () => {
         asNonZeroSafeInt(1000),
         asNonZeroSafeInt(10),
       );
+
       expect(result).toBe(Number.MAX_SAFE_INTEGER); // clamped to max
       expect(NonZeroSafeInt.pow(asNonZeroSafeInt(2), asNonZeroSafeInt(3))).toBe(
         8,
@@ -186,6 +190,7 @@ describe('NonZeroSafeInt', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroSafeInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroSafeInt.is(result)).toBe(true);
@@ -200,6 +205,7 @@ describe('NonZeroSafeInt', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroSafeInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroSafeInt.is(result)).toBe(true);
@@ -214,6 +220,7 @@ describe('NonZeroSafeInt', () => {
 
       for (const _ of range(10)) {
         const result = NonZeroSafeInt.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonZeroSafeInt.is(result)).toBe(true);

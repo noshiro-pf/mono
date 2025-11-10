@@ -1,7 +1,7 @@
 import { expectType } from '../expect-type.mjs';
 import { isRecord } from './is-record.mjs';
 
-describe('isRecord', () => {
+describe(isRecord, () => {
   test('{ x: 1 } is a record', () => {
     const obj = { x: 1 } as const;
     const unk: unknown = obj;

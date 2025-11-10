@@ -1,5 +1,5 @@
 // Example: src/json/json.mts (stringifySortedKey)
-import { Json, Result } from 'ts-data-forge';
+import { isString, Json, Result } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 const unorderedData = {
@@ -28,6 +28,8 @@ if (Result.isOk(sorted)) {
 const formatted = Json.stringifySortedKey(unorderedData, 2);
 assert.ok(Result.isOk(formatted));
 if (Result.isOk(formatted)) {
+  assert(isString(formatted.value));
+
   // Check that keys are in order (first key should be "apple")
   assert.ok(
     formatted.value.indexOf('"apple"') < formatted.value.indexOf('"mango"'),

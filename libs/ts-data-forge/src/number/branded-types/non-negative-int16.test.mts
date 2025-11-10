@@ -7,8 +7,8 @@ import {
 } from './non-negative-int16.mjs';
 import { asPositiveInt16 } from './positive-int16.mjs';
 
-describe('NonNegativeInt16', () => {
-  describe('asNonNegativeInt16', () => {
+describe('NonNegativeInt16 test', () => {
+  describe(asNonNegativeInt16, () => {
     test('accepts valid non-negative int16 values', () => {
       expect(() => asNonNegativeInt16(0)).not.toThrow();
       expect(() => asNonNegativeInt16(1)).not.toThrow();
@@ -65,7 +65,7 @@ describe('NonNegativeInt16', () => {
     );
   });
 
-  describe('isNonNegativeInt16', () => {
+  describe(isNonNegativeInt16, () => {
     test('correctly identifies non-negative int16 values', () => {
       expect(isNonNegativeInt16(0)).toBe(true);
       expect(isNonNegativeInt16(1)).toBe(true);
@@ -125,6 +125,7 @@ describe('NonNegativeInt16', () => {
         asNonNegativeInt16(32_000),
         asNonNegativeInt16(1000),
       );
+
       expect(result).toBe(32_767); // clamped to max
       expect(NonNegativeInt16.add(a, b)).toBe(150);
     });
@@ -140,6 +141,7 @@ describe('NonNegativeInt16', () => {
         asNonNegativeInt16(1000),
         asNonNegativeInt16(100),
       );
+
       expect(result).toBe(32_767); // clamped to max
       expect(
         NonNegativeInt16.mul(asNonNegativeInt16(10), asNonNegativeInt16(5)),
@@ -161,6 +163,7 @@ describe('NonNegativeInt16', () => {
         asNonNegativeInt16(200),
         asNonNegativeInt16(3),
       );
+
       expect(result).toBe(32_767); // clamped to max
       expect(
         NonNegativeInt16.pow(asNonNegativeInt16(2), asNonNegativeInt16(3)),
@@ -175,6 +178,7 @@ describe('NonNegativeInt16', () => {
 
       for (const _ of range(10)) {
         const result = NonNegativeInt16.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonNegativeInt16.is(result)).toBe(true);
@@ -186,6 +190,7 @@ describe('NonNegativeInt16', () => {
     test('generates values within NonNegativeInt16 range', () => {
       for (const _ of range(10)) {
         const result = NonNegativeInt16.random(0, 30);
+
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(32_767);
       }

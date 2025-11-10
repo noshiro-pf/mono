@@ -3,8 +3,8 @@ import { range } from '../../iterator/index.mjs';
 import { asInt32, Int32, isInt32 } from './int32.mjs';
 import { asNonZeroInt32 } from './non-zero-int32.mjs';
 
-describe('Int32', () => {
-  describe('asInt32', () => {
+describe('Int32 test', () => {
+  describe(asInt32, () => {
     test('accepts valid int32 values', () => {
       expect(() => asInt32(0)).not.toThrow();
       expect(() => asInt32(1)).not.toThrow();
@@ -49,7 +49,7 @@ describe('Int32', () => {
     });
   });
 
-  describe('isInt32', () => {
+  describe(isInt32, () => {
     test('correctly identifies int32 values', () => {
       expect(isInt32(0)).toBe(true);
       expect(isInt32(1)).toBe(true);
@@ -109,18 +109,21 @@ describe('Int32', () => {
 
     test('add (with clamping)', () => {
       const result = Int32.add(asInt32(2_147_483_000), asInt32(1000));
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(Int32.add(a, b)).toBe(1_500_000);
     });
 
     test('sub (with clamping)', () => {
       const result = Int32.sub(asInt32(-2_147_483_000), asInt32(1000));
+
       expect(result).toBe(-2_147_483_648); // clamped to min
       expect(Int32.sub(a, b)).toBe(500_000);
     });
 
     test('mul (with clamping)', () => {
       const result = Int32.mul(asInt32(100_000), asInt32(100_000));
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(Int32.mul(asInt32(1000), asInt32(5))).toBe(5000);
     });
@@ -133,6 +136,7 @@ describe('Int32', () => {
 
     test('pow (with clamping)', () => {
       const result = Int32.pow(asInt32(10_000), asInt32(3));
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(Int32.pow(asInt32(2), asInt32(3))).toBe(8);
     });
@@ -145,6 +149,7 @@ describe('Int32', () => {
 
       for (const _ of range(10)) {
         const result = Int32.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(Int32.is(result)).toBe(true);
@@ -155,6 +160,7 @@ describe('Int32', () => {
     test('generates values within Int32 range', () => {
       for (const _ of range(10)) {
         const result = Int32.random(-20, 20);
+
         expect(result).toBeGreaterThanOrEqual(Int32.MIN_VALUE);
         expect(result).toBeLessThanOrEqual(Int32.MAX_VALUE);
       }

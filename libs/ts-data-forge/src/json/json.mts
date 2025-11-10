@@ -108,6 +108,8 @@ export namespace Json {
    *
    * assert.ok(Result.isOk(filtered));
    * if (Result.isOk(filtered)) {
+   *   assert(isString(filtered.value));
+   *
    *   assert.ok(!filtered.value.includes('age'));
    * }
    * ```
@@ -136,7 +138,7 @@ export namespace Json {
     value: unknown,
     replacer?: (this: unknown, key: string, val: unknown) => unknown,
     space?: UintRangeInclusive<1, 10> | string,
-  ): Result<string, string> => {
+  ): Result<string | undefined, string> => {
     try {
       return Result.ok(JSON.stringify(value, replacer, space));
     } catch (error) {
@@ -170,6 +172,8 @@ export namespace Json {
    *
    * assert.ok(Result.isOk(safeJson));
    * if (Result.isOk(safeJson)) {
+   *   assert(isString(safeJson.value));
+   *
    *   const parsed: unknown = JSON.parse(safeJson.value);
    *   assert.deepStrictEqual(parsed, {
    *     id: 1,
@@ -207,7 +211,7 @@ export namespace Json {
     value: unknown,
     propertiesToBeSelected?: readonly (number | string)[],
     space?: UintRangeInclusive<1, 10> | string,
-  ): Result<string, string> => {
+  ): Result<string | undefined, string> => {
     try {
       return Result.ok(
         JSON.stringify(value, castMutable(propertiesToBeSelected), space),
@@ -257,6 +261,8 @@ export namespace Json {
    * const formatted = Json.stringifySortedKey(unorderedData, 2);
    * assert.ok(Result.isOk(formatted));
    * if (Result.isOk(formatted)) {
+   *   assert(isString(formatted.value));
+   *
    *   // Check that keys are in order (first key should be "apple")
    *   assert.ok(
    *     formatted.value.indexOf('"apple"') < formatted.value.indexOf('"mango"'),
@@ -288,7 +294,7 @@ export namespace Json {
   export const stringifySortedKey = (
     value: UnknownRecord,
     space?: UintRangeInclusive<1, 10> | string,
-  ): Result<string, string> => {
+  ): Result<string | undefined, string> => {
     const allKeys = pipe(keysDeep(value))
       .map((keys) => Arr.uniq(keys))
       .map((ks) => ks.toSorted()).value;

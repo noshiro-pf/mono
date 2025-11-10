@@ -3,8 +3,8 @@ import { range } from '../../iterator/index.mjs';
 import { asNonZeroUint16 } from './non-zero-uint16.mjs';
 import { asUint16, isUint16, Uint16 } from './uint16.mjs';
 
-describe('Uint16', () => {
-  describe('asUint16', () => {
+describe('Uint16 test', () => {
+  describe(asUint16, () => {
     test('accepts valid uint16 values', () => {
       expect(() => asUint16(0)).not.toThrow();
       expect(() => asUint16(1)).not.toThrow();
@@ -52,7 +52,7 @@ describe('Uint16', () => {
     });
   });
 
-  describe('isUint16', () => {
+  describe(isUint16, () => {
     test('correctly identifies uint16 values', () => {
       expect(isUint16(0)).toBe(true);
       expect(isUint16(1)).toBe(true);
@@ -108,6 +108,7 @@ describe('Uint16', () => {
 
     test('add (with clamping to uint16 range)', () => {
       const result = Uint16.add(asUint16(65_000), asUint16(1000));
+
       expect(result).toBe(65_535); // clamped to max
       expect(Uint16.add(a, b)).toBe(150);
     });
@@ -120,6 +121,7 @@ describe('Uint16', () => {
 
     test('mul (with clamping to uint16 range)', () => {
       const result = Uint16.mul(asUint16(1000), asUint16(100));
+
       expect(result).toBe(65_535); // clamped to max
       expect(Uint16.mul(asUint16(10), asUint16(5))).toBe(50);
     });
@@ -132,6 +134,7 @@ describe('Uint16', () => {
 
     test('pow (with clamping to uint16 range)', () => {
       const result = Uint16.pow(asUint16(256), asUint16(3));
+
       expect(result).toBe(65_535); // clamped to max
       expect(Uint16.pow(asUint16(2), asUint16(3))).toBe(8);
     });
@@ -144,6 +147,7 @@ describe('Uint16', () => {
 
       for (const _ of range(10)) {
         const result = Uint16.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(Uint16.is(result)).toBe(true);
@@ -155,6 +159,7 @@ describe('Uint16', () => {
     test('generates values within Uint16 range', () => {
       for (const _ of range(10)) {
         const result = Uint16.random(0, 30);
+
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(65_535);
       }

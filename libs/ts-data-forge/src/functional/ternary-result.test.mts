@@ -2,7 +2,7 @@ import { expectType } from '../expect-type.mjs';
 import { Optional } from './optional/index.mjs';
 import { TernaryResult } from './ternary-result/index.mjs';
 
-describe('TernaryResult', () => {
+describe('TernaryResult test', () => {
   test('constructors and guards', () => {
     const ok = TernaryResult.ok(1);
     const warn = TernaryResult.warn(1, 'caution');
@@ -64,10 +64,12 @@ describe('TernaryResult', () => {
 
     expect(TernaryResult.unwrapOk(okResult)).toBe(3);
     expect(TernaryResult.isWarn(warnResult)).toBe(true);
+
     if (TernaryResult.isWarn(warnResult)) {
       expect(warnResult.value).toBe(3);
       expect(warnResult.warning).toBe('slow');
     }
+
     expect(TernaryResult.unwrapErr(errResult)).toBe('bad');
   });
 
@@ -93,24 +95,28 @@ describe('TernaryResult', () => {
 
     expect(TernaryResult.unwrapOk(value)).toBe(2);
     expect(TernaryResult.unwrapOk(warn)).toBe(4);
-    expect(TernaryResult.unwrapWarn(warn)).toStrictEqual({
+
+    assert.deepStrictEqual(TernaryResult.unwrapWarn(warn), {
       warning: 'heads up',
     });
-    expect(TernaryResult.unwrapErr(err)).toStrictEqual({ message: 'boom' });
+    assert.deepStrictEqual(TernaryResult.unwrapErr(err), { message: 'boom' });
   });
 
   test('orElse keeps Ok and Warn variants', () => {
     const fallback = TernaryResult.ok('fallback');
 
-    expect(
+    assert.deepStrictEqual(
       TernaryResult.orElse(TernaryResult.ok('value'), fallback),
-    ).toStrictEqual(TernaryResult.ok('value'));
-    expect(
+      TernaryResult.ok('value'),
+    );
+    assert.deepStrictEqual(
       TernaryResult.orElse(TernaryResult.warn('value', 'warn'), fallback),
-    ).toStrictEqual(TernaryResult.warn('value', 'warn'));
-    expect(
+      TernaryResult.warn('value', 'warn'),
+    );
+    assert.deepStrictEqual(
       TernaryResult.orElse(TernaryResult.err('err'), fallback),
-    ).toStrictEqual(fallback);
+      fallback,
+    );
   });
 
   test('unwrap helpers', () => {
@@ -150,26 +156,32 @@ describe('TernaryResult', () => {
     const warn = TernaryResult.warn('warn', 'warned');
     const err = TernaryResult.err('err');
 
-    expect(TernaryResult.zip(ok, TernaryResult.ok(1))).toStrictEqual(
+    assert.deepStrictEqual(
+      TernaryResult.zip(ok, TernaryResult.ok(1)),
       TernaryResult.ok(['x', 1] as const),
     );
-    expect(TernaryResult.zip(ok, warn)).toStrictEqual(
+    assert.deepStrictEqual(
+      TernaryResult.zip(ok, warn),
       TernaryResult.warn(['x', 'warn'] as const, 'warned'),
     );
-    expect(TernaryResult.zip(warn, ok)).toStrictEqual(
+    assert.deepStrictEqual(
+      TernaryResult.zip(warn, ok),
       TernaryResult.warn(['warn', 'x'] as const, 'warned'),
     );
-    expect(TernaryResult.zip(ok, err)).toStrictEqual(err);
-    expect(TernaryResult.zip(err, warn)).toStrictEqual(err);
+    assert.deepStrictEqual(TernaryResult.zip(ok, err), err);
+    assert.deepStrictEqual(TernaryResult.zip(err, warn), err);
   });
 
   test('toOptional keeps only Ok values', () => {
-    expect(TernaryResult.toOptional(TernaryResult.ok(1))).toStrictEqual(
+    assert.deepStrictEqual(
+      TernaryResult.toOptional(TernaryResult.ok(1)),
       Optional.some(1),
     );
-    expect(
+    assert.deepStrictEqual(
       TernaryResult.toOptional(TernaryResult.warn(1, 'warn')),
-    ).toStrictEqual(Optional.some(1));
+      Optional.some(1),
+    );
+
     expect(TernaryResult.toOptional(TernaryResult.err('err'))).toBe(
       Optional.none,
     );
@@ -183,16 +195,20 @@ describe('TernaryResult', () => {
     const rejected = await TernaryResult.fromPromise(
       Promise.reject(new Error('bad')),
     );
+
     expect(TernaryResult.isErr(rejected)).toBe(true);
   });
 
   test('fromThrowable converts thrown values', () => {
-    expect(TernaryResult.fromThrowable(() => 5)).toStrictEqual(
+    assert.deepStrictEqual(
+      TernaryResult.fromThrowable(() => 5),
       TernaryResult.ok(5),
     );
+
     const errorResult = TernaryResult.fromThrowable(() => {
       throw new Error('boom');
     });
+
     expect(TernaryResult.isErr(errorResult)).toBe(true);
   });
 });

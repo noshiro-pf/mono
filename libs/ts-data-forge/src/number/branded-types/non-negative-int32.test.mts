@@ -7,8 +7,8 @@ import {
 } from './non-negative-int32.mjs';
 import { asPositiveInt32 } from './positive-int32.mjs';
 
-describe('NonNegativeInt32', () => {
-  describe('asNonNegativeInt32', () => {
+describe('NonNegativeInt32 test', () => {
+  describe(asNonNegativeInt32, () => {
     test('accepts valid non-negative int32 values', () => {
       expect(() => asNonNegativeInt32(0)).not.toThrow();
       expect(() => asNonNegativeInt32(1)).not.toThrow();
@@ -65,7 +65,7 @@ describe('NonNegativeInt32', () => {
     );
   });
 
-  describe('isNonNegativeInt32', () => {
+  describe(isNonNegativeInt32, () => {
     test('correctly identifies non-negative int32 values', () => {
       expect(isNonNegativeInt32(0)).toBe(true);
       expect(isNonNegativeInt32(1)).toBe(true);
@@ -125,6 +125,7 @@ describe('NonNegativeInt32', () => {
         asNonNegativeInt32(2_147_483_000),
         asNonNegativeInt32(1000),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(NonNegativeInt32.add(a, b)).toBe(1_500_000);
     });
@@ -140,6 +141,7 @@ describe('NonNegativeInt32', () => {
         asNonNegativeInt32(100_000),
         asNonNegativeInt32(100_000),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(
         NonNegativeInt32.mul(asNonNegativeInt32(1000), asNonNegativeInt32(5)),
@@ -164,6 +166,7 @@ describe('NonNegativeInt32', () => {
         asNonNegativeInt32(10_000),
         asNonNegativeInt32(3),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(
         NonNegativeInt32.pow(asNonNegativeInt32(2), asNonNegativeInt32(3)),
@@ -178,6 +181,7 @@ describe('NonNegativeInt32', () => {
 
       for (const _ of range(10)) {
         const result = NonNegativeInt32.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(NonNegativeInt32.is(result)).toBe(true);
@@ -189,6 +193,7 @@ describe('NonNegativeInt32', () => {
     test('generates values within NonNegativeInt32 range', () => {
       for (const _ of range(10)) {
         const result = NonNegativeInt32.random(0, 30);
+
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(2_147_483_647);
       }

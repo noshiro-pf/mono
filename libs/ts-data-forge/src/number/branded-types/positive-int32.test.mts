@@ -6,8 +6,8 @@ import {
   PositiveInt32,
 } from './positive-int32.mjs';
 
-describe('PositiveInt32', () => {
-  describe('asPositiveInt32', () => {
+describe('PositiveInt32 test', () => {
+  describe(asPositiveInt32, () => {
     test('accepts valid positive int32 values', () => {
       expect(() => asPositiveInt32(1)).not.toThrow();
       expect(() => asPositiveInt32(1000)).not.toThrow();
@@ -67,7 +67,7 @@ describe('PositiveInt32', () => {
     );
   });
 
-  describe('isPositiveInt32', () => {
+  describe(isPositiveInt32, () => {
     test('correctly identifies positive int32 values', () => {
       expect(isPositiveInt32(1)).toBe(true);
       expect(isPositiveInt32(1000)).toBe(true);
@@ -126,6 +126,7 @@ describe('PositiveInt32', () => {
         asPositiveInt32(2_147_483_000),
         asPositiveInt32(1000),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(PositiveInt32.add(a, b)).toBe(1_500_000);
     });
@@ -140,6 +141,7 @@ describe('PositiveInt32', () => {
         asPositiveInt32(100_000),
         asPositiveInt32(100_000),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(PositiveInt32.mul(asPositiveInt32(1000), asPositiveInt32(5))).toBe(
         5000,
@@ -159,6 +161,7 @@ describe('PositiveInt32', () => {
         asPositiveInt32(10_000),
         asPositiveInt32(3),
       );
+
       expect(result).toBe(2_147_483_647); // clamped to max
       expect(PositiveInt32.pow(asPositiveInt32(2), asPositiveInt32(3))).toBe(8);
     });
@@ -171,6 +174,7 @@ describe('PositiveInt32', () => {
 
       for (const _ of range(10)) {
         const result = PositiveInt32.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(PositiveInt32.is(result)).toBe(true);
@@ -182,6 +186,7 @@ describe('PositiveInt32', () => {
     test('generates values within PositiveInt32 range', () => {
       for (const _ of range(10)) {
         const result = PositiveInt32.random(1, 30);
+
         expect(result).toBeGreaterThanOrEqual(1);
         expect(result).toBeLessThanOrEqual(2_147_483_647);
       }

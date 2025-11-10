@@ -3,8 +3,8 @@ import { range } from '../../iterator/index.mjs';
 import { asNonZeroUint32 } from './non-zero-uint32.mjs';
 import { asUint32, isUint32, Uint32 } from './uint32.mjs';
 
-describe('Uint32', () => {
-  describe('asUint32', () => {
+describe('Uint32 test', () => {
+  describe(asUint32, () => {
     test('accepts valid uint32 values', () => {
       expect(() => asUint32(0)).not.toThrow();
       expect(() => asUint32(1)).not.toThrow();
@@ -52,7 +52,7 @@ describe('Uint32', () => {
     });
   });
 
-  describe('isUint32', () => {
+  describe(isUint32, () => {
     test('correctly identifies uint32 values', () => {
       expect(isUint32(0)).toBe(true);
       expect(isUint32(1)).toBe(true);
@@ -108,6 +108,7 @@ describe('Uint32', () => {
 
     test('add (with clamping to uint32 range)', () => {
       const result = Uint32.add(asUint32(4_294_967_000), asUint32(1000));
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(Uint32.add(a, b)).toBe(1_500_000);
     });
@@ -120,6 +121,7 @@ describe('Uint32', () => {
 
     test('mul (with clamping to uint32 range)', () => {
       const result = Uint32.mul(asUint32(100_000), asUint32(100_000));
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(Uint32.mul(asUint32(1000), asUint32(5))).toBe(5000);
     });
@@ -132,6 +134,7 @@ describe('Uint32', () => {
 
     test('pow (with clamping to uint32 range)', () => {
       const result = Uint32.pow(asUint32(10_000), asUint32(3));
+
       expect(result).toBe(4_294_967_295); // clamped to max
       expect(Uint32.pow(asUint32(2), asUint32(3))).toBe(8);
     });
@@ -144,6 +147,7 @@ describe('Uint32', () => {
 
       for (const _ of range(10)) {
         const result = Uint32.random(min, max);
+
         expect(result).toBeGreaterThanOrEqual(min);
         expect(result).toBeLessThanOrEqual(max);
         expect(Uint32.is(result)).toBe(true);
@@ -155,6 +159,7 @@ describe('Uint32', () => {
     test('generates values within Uint32 range', () => {
       for (const _ of range(10)) {
         const result = Uint32.random(0, 30);
+
         expect(result).toBeGreaterThanOrEqual(0);
         expect(result).toBeLessThanOrEqual(4_294_967_295);
       }

@@ -1,7 +1,8 @@
 import { expectType } from '../expect-type.mjs';
 import { isPrimitive } from './is-primitive.mjs';
+import { isSymbol } from './is-type.mjs';
 
-describe('isPrimitive', () => {
+describe(isPrimitive, () => {
   test('should return true for string primitives', () => {
     expect(isPrimitive('hello')).toBe(true);
     expect(isPrimitive('')).toBe(true);
@@ -95,8 +96,9 @@ describe('isPrimitive', () => {
     expect(primitives[2]).toBe(true);
     expect(primitives[3]).toBeNull();
     expect(primitives[4]).toBeUndefined();
-    expect(typeof primitives[5]).toBe('symbol');
 
-    expect(nonPrimitives).toStrictEqual([{}, []]);
+    expect(isSymbol(primitives[5])).toBe(true);
+
+    assert.deepStrictEqual(nonPrimitives, [{}, []]);
   });
 });

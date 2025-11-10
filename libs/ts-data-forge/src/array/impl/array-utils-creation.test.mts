@@ -1,6 +1,11 @@
 import { expectType } from '../../expect-type.mjs';
 import { range as rangeIterator } from '../../iterator/index.mjs';
-import { asNonZeroSafeInt, asUint32 } from '../../number/index.mjs';
+import {
+  asNonZeroSafeInt,
+  asSafeInt,
+  asSafeUint,
+  asUint32,
+} from '../../number/index.mjs';
 import {
   copy,
   create,
@@ -13,34 +18,40 @@ import {
 } from './array-utils-creation.mjs';
 
 describe('Arr creations', () => {
-  describe('zeros', () => {
+  describe(zeros, () => {
     test('fixed length', () => {
       const result = zeros(3);
       expectType<typeof result, readonly [0, 0, 0]>('=');
-      expect(result).toStrictEqual([0, 0, 0]);
+
+      assert.deepStrictEqual(result, [0, 0, 0]);
     });
 
     test('fixed length (empty)', () => {
       const result = zeros(0);
       expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('unknown length', () => {
       const n: number = 3;
       const result = zeros(asUint32(n));
       expectType<typeof result, readonly 0[]>('=');
-      expect(result).toStrictEqual([0, 0, 0]);
+
+      assert.deepStrictEqual(result, [0, 0, 0]);
     });
 
     test('should create array with zero length', () => {
       const result = zeros(0);
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
+
       expect(result).toHaveLength(0);
     });
 
     test('should create large arrays', () => {
       const result = zeros(asUint32(1000));
+
       expect(result).toHaveLength(1000);
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       expect(result.every((x) => x === 0)).toBe(true);
@@ -48,37 +59,43 @@ describe('Arr creations', () => {
 
     test('should work with curried version', () => {
       const createTenZeros = zeros(10);
-      expect(createTenZeros).toStrictEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
+      assert.deepStrictEqual(createTenZeros, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     });
   });
 
-  describe('seq', () => {
+  describe(seq, () => {
     test('fixed length', () => {
       const result = seq(5);
       expectType<typeof result, readonly [0, 1, 2, 3, 4]>('=');
-      expect(result).toStrictEqual([0, 1, 2, 3, 4]);
+
+      assert.deepStrictEqual(result, [0, 1, 2, 3, 4]);
     });
 
     test('fixed length (empty)', () => {
       const result = seq(0);
       expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('unknown length', () => {
       const n: number = 3;
       const result = seq(asUint32(n));
       expectType<typeof result, readonly SizeType.Arr[]>('=');
-      expect(result).toStrictEqual([0, 1, 2]);
+
+      assert.deepStrictEqual(result, [asUint32(0), asUint32(1), asUint32(2)]);
     });
 
     test('should create sequence with zero length', () => {
       const result = seq(0);
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('should create sequence with large length', () => {
       const result = seq(asUint32(100));
+
       expect(result).toHaveLength(100);
       expect(result[0]).toBe(0);
       expect(result[99]).toBe(99);
@@ -86,21 +103,24 @@ describe('Arr creations', () => {
 
     test('should work with curried version', () => {
       const createFiveSeq = seq(5);
-      expect(createFiveSeq).toStrictEqual([0, 1, 2, 3, 4]);
+
+      assert.deepStrictEqual(createFiveSeq, [0, 1, 2, 3, 4]);
     });
   });
 
-  describe('create', () => {
+  describe(create, () => {
     test('fixed length with primitive value', () => {
       const result = create(3, 'a');
       expectType<typeof result, readonly ['a', 'a', 'a']>('=');
-      expect(result).toStrictEqual(['a', 'a', 'a']);
+
+      assert.deepStrictEqual(result, ['a', 'a', 'a']);
     });
 
     test('fixed length with null', () => {
       const result = create(2, null);
       expectType<typeof result, readonly [null, null]>('=');
-      expect(result).toStrictEqual([null, null]);
+
+      assert.deepStrictEqual(result, [null, null]);
     });
 
     test('fixed length with object (shallow copy)', () => {
@@ -109,7 +129,9 @@ describe('Arr creations', () => {
       expectType<typeof result, readonly [{ id: number }, { id: number }]>(
         '~=',
       );
-      expect(result).toStrictEqual([obj, obj]);
+
+      assert.deepStrictEqual(result, [obj, obj]);
+
       expect(result[0]).toBe(obj);
       expect(result[1]).toBe(obj);
     });
@@ -117,49 +139,59 @@ describe('Arr creations', () => {
     test('fixed length (empty)', () => {
       const result = create(0, 123);
       expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('unknown length', () => {
       const n: number = 2;
       const result = create(asUint32(n), true);
       expectType<typeof result, readonly true[]>('=');
-      expect(result).toStrictEqual([true, true]);
+
+      assert.deepStrictEqual(result, [true, true]);
     });
 
     test('should create array with function values', () => {
       const fn = (): string => 'test';
       const result = create(3, fn);
-      expect(result).toStrictEqual([fn, fn, fn]);
+
+      assert.deepStrictEqual(result, [fn, fn, fn]);
+
       expect(result[0]).toBe(fn);
     });
 
     test('should create array with object values', () => {
       const obj = { a: 1 };
       const result = create(2, obj);
-      expect(result).toStrictEqual([obj, obj]);
+
+      assert.deepStrictEqual(result, [obj, obj]);
+
       expect(result[0]).toBe(obj); // Same reference
     });
 
     test('should create empty array when length is 0', () => {
       const result = create(0, 'value');
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('newArray is alias for create', () => {
       const created1 = create(3, 'test');
       const created2 = newArray(3, 'test');
-      expect(created1).toStrictEqual(created2);
-      expect(created1).toStrictEqual(['test', 'test', 'test']);
+
+      assert.deepStrictEqual(created1, created2);
+      assert.deepStrictEqual(created1, ['test', 'test', 'test']);
     });
   });
 
-  describe('copy', () => {
+  describe(copy, () => {
     test('should create a shallow copy of an array of primitives', () => {
       const original = [1, 2, 3] as const;
       const copied = copy(original);
       expectType<typeof copied, readonly [1, 2, 3]>('=');
-      expect(copied).toStrictEqual(original);
+
+      assert.deepStrictEqual(copied, original);
+
       expect(copied).not.toBe(original);
     });
 
@@ -170,7 +202,9 @@ describe('Arr creations', () => {
       const copied = copy(original);
 
       expectType<typeof copied, readonly [{ id: number }, { id: number }]>('=');
-      expect(copied).toStrictEqual(original);
+
+      assert.deepStrictEqual(copied, original);
+
       expect(copied).not.toBe(original);
       expect(copied[0]).toBe(original[0]); // Object references are the same
       expect(copied[1]).toBe(original[1]);
@@ -180,7 +214,9 @@ describe('Arr creations', () => {
       const original = [] as const;
       const copied = copy(original);
       expectType<typeof copied, readonly []>('=');
-      expect(copied).toStrictEqual(original);
+
+      assert.deepStrictEqual(copied, original);
+
       expect(copied).not.toBe(original);
     });
 
@@ -190,7 +226,9 @@ describe('Arr creations', () => {
       expectType<typeof copied, readonly [1, 'hello', true, null, undefined]>(
         '=',
       );
-      expect(copied).toStrictEqual(original);
+
+      assert.deepStrictEqual(copied, original);
+
       expect(copied).not.toBe(original);
     });
 
@@ -198,26 +236,34 @@ describe('Arr creations', () => {
       const mut_original: number[] = [1, 2, 3];
       const copied = copy(mut_original);
       expectType<typeof copied, number[]>('=');
-      expect(copied).toStrictEqual(mut_original);
+
+      assert.deepStrictEqual(copied, mut_original);
+
       expect(copied).not.toBe(mut_original);
+
       // Modify original to ensure copy is shallow
       mut_original.push(4);
-      expect(mut_original).toStrictEqual([1, 2, 3, 4]);
-      expect(copied).toStrictEqual([1, 2, 3]);
+
+      assert.deepStrictEqual(mut_original, [1, 2, 3, 4]);
+      assert.deepStrictEqual(copied, [1, 2, 3]);
     });
 
     test('should create shallow copy of array', () => {
       const original = [1, 2, 3] as const;
       const copied = copy(original);
       expectType<typeof copied, readonly [1, 2, 3]>('=');
-      expect(copied).toStrictEqual(original);
+
+      assert.deepStrictEqual(copied, original);
+
       expect(copied).not.toBe(original);
     });
 
     test('should work with empty array', () => {
       const empty = [] as const;
       const copied = copy(empty);
-      expect(copied).toStrictEqual([]);
+
+      assert.deepStrictEqual(copied, []);
+
       expect(copied).not.toBe(empty);
     });
 
@@ -225,58 +271,82 @@ describe('Arr creations', () => {
       const mixed = [1, 'hello', true] as const;
       const copied = copy(mixed);
       expectType<typeof copied, readonly [1, 'hello', true]>('=');
-      expect(copied).toStrictEqual([1, 'hello', true]);
+
+      assert.deepStrictEqual(copied, [1, 'hello', true]);
     });
   });
 
-  describe('range', () => {
+  describe(range, () => {
     test('start < end, step = 1 (default)', () => {
       const result = range(1, 5);
       expectType<typeof result, readonly [1, 2, 3, 4]>('=');
-      expect(result).toStrictEqual([1, 2, 3, 4]);
+
+      assert.deepStrictEqual(result, [1, 2, 3, 4]);
     });
 
     test('start === end, step = 1 (default)', () => {
       const result = range(3, 3);
       expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('start > end, step = 1 (default)', () => {
       const result = range(5, 1);
       expectType<typeof result, readonly []>('=');
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('start < end, step > 1', () => {
       const result = range(0, 6, 2);
       expectType<typeof result, readonly SafeUint[]>('='); // Type is less specific with explicit step
-      expect(result).toStrictEqual([0, 2, 4]);
+
+      assert.deepStrictEqual(result, [
+        asSafeUint(0),
+        asSafeUint(2),
+        asSafeUint(4),
+      ]);
     });
 
     test('start < end, step > 1, not reaching end', () => {
       const result = range(0, 5, 2);
-      expect(result).toStrictEqual([0, 2, 4]);
+
+      assert.deepStrictEqual(result, [
+        asSafeUint(0),
+        asSafeUint(2),
+        asSafeUint(4),
+      ]);
     });
 
     test('start > end, step < 0', () => {
       const result = range(5, 0, -1);
-      expect(result).toStrictEqual([5, 4, 3, 2, 1]);
+
+      assert.deepStrictEqual(result, [
+        asSafeInt(5),
+        asSafeInt(4),
+        asSafeInt(3),
+        asSafeInt(2),
+        asSafeInt(1),
+      ]);
     });
 
     test('start > end, step < 0, not reaching end', () => {
       const result = range(5, 1, -2);
-      expect(result).toStrictEqual([5, 3]);
+
+      assert.deepStrictEqual(result, [asSafeInt(5), asSafeInt(3)]);
     });
 
     test('start < end, step < 0 (empty result)', () => {
       const result = range(1, 5, -1);
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('start > end, step > 0 (empty result)', () => {
       const result = range(5, 1, 1);
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('unknown start/end/step', () => {
@@ -289,7 +359,12 @@ describe('Arr creations', () => {
         asNonZeroSafeInt(step),
       );
       expectType<typeof result, readonly SafeInt[]>('=');
-      expect(result).toStrictEqual([1, 2, 3]);
+
+      assert.deepStrictEqual(result, [
+        asSafeInt(1),
+        asSafeInt(2),
+        asSafeInt(3),
+      ]);
     });
 
     test('range(1, 3)', () => {
@@ -297,7 +372,7 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly [1, 2]>('=');
 
-      expect(result).toStrictEqual([1, 2]);
+      assert.deepStrictEqual(result, [1, 2]);
     });
 
     test('range(1, 3, 1)', () => {
@@ -305,7 +380,7 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly [1, 2]>('=');
 
-      expect(result).toStrictEqual([1, 2]);
+      assert.deepStrictEqual(result, [1, 2]);
     });
 
     test('range(0, 0)', () => {
@@ -313,7 +388,7 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly []>('=');
 
-      expect(result).toStrictEqual([]);
+      assert.deepStrictEqual(result, []);
     });
 
     test('range(0, 1)', () => {
@@ -321,7 +396,7 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly [0]>('=');
 
-      expect(result).toStrictEqual([0]);
+      assert.deepStrictEqual(result, [asSafeUint(0)]);
     });
 
     test('range(0, -1)', () => {
@@ -329,7 +404,7 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly SafeInt[]>('=');
 
-      expect(result).toStrictEqual([]);
+      assert.deepStrictEqual(result, []);
     });
 
     test('range(SmallUint, SmallUint)', () => {
@@ -380,7 +455,7 @@ describe('Arr creations', () => {
         )[]
       >('=');
 
-      expect(result).toStrictEqual([0]);
+      assert.deepStrictEqual(result, [asSafeUint(0)]);
     });
 
     test('range(0 | 1 | 2, 1 | 2 | 3)', () => {
@@ -388,7 +463,7 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly (0 | 1 | 2)[]>('=');
 
-      expect(result).toStrictEqual([0]);
+      assert.deepStrictEqual(result, [0]);
     });
 
     test('range(2|3, 5|6|7)', () => {
@@ -396,7 +471,7 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly (2 | 3 | 4 | 5 | 6)[]>('=');
 
-      expect(result).toStrictEqual([2, 3, 4]);
+      assert.deepStrictEqual(result, [2, 3, 4]);
     });
 
     test('range(0, 10, 2)', () => {
@@ -404,7 +479,13 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly SafeUint[]>('=');
 
-      expect(result).toStrictEqual([0, 2, 4, 6, 8]);
+      assert.deepStrictEqual(result, [
+        asSafeUint(0),
+        asSafeUint(2),
+        asSafeUint(4),
+        asSafeUint(6),
+        asSafeUint(8),
+      ]);
     });
 
     test('range(0, 11, 2)', () => {
@@ -412,7 +493,14 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly SafeUint[]>('=');
 
-      expect(result).toStrictEqual([0, 2, 4, 6, 8, 10]);
+      assert.deepStrictEqual(result, [
+        asSafeUint(0),
+        asSafeUint(2),
+        asSafeUint(4),
+        asSafeUint(6),
+        asSafeUint(8),
+        asSafeUint(10),
+      ]);
     });
 
     test('range(1, 12, 2)', () => {
@@ -420,7 +508,14 @@ describe('Arr creations', () => {
 
       expectType<typeof result, readonly SafeUint[]>('=');
 
-      expect(result).toStrictEqual([1, 3, 5, 7, 9, 11]);
+      assert.deepStrictEqual(result, [
+        asSafeUint(1),
+        asSafeUint(3),
+        asSafeUint(5),
+        asSafeUint(7),
+        asSafeUint(9),
+        asSafeUint(11),
+      ]);
     });
 
     // Note: These tests were removed as the range function doesn't return Result type
@@ -428,22 +523,31 @@ describe('Arr creations', () => {
 
     test('should handle range with step larger than difference', () => {
       const result = range(0, 5, 10);
-      expect(result).toStrictEqual([0]);
+
+      assert.deepStrictEqual(result, [asSafeUint(0)]);
     });
 
     test('should handle negative step with increasing range', () => {
       const result = range(0, 5, -1);
-      expect(result).toStrictEqual([]); // Should be empty when step direction conflicts
+
+      assert.deepStrictEqual(result, []); // Should be empty when step direction conflicts
     });
 
     test('should work with basic range functionality', () => {
       // Test basic range functionality without currying assumptions
       const result = range(0, 5, 1);
-      expect(result).toStrictEqual([0, 1, 2, 3, 4]);
+
+      assert.deepStrictEqual(result, [
+        asSafeUint(0),
+        asSafeUint(1),
+        asSafeUint(2),
+        asSafeUint(3),
+        asSafeUint(4),
+      ]);
     });
   });
 
-  describe('generate', () => {
+  describe(generate, () => {
     test('basic generator usage', () => {
       const result = generate<number>(function* () {
         yield 1;
@@ -452,7 +556,8 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly number[]>('=');
-      expect(result).toStrictEqual([1, 2, 3]);
+
+      assert.deepStrictEqual(result, [1, 2, 3]);
     });
 
     test('generator with yield*', () => {
@@ -463,7 +568,8 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly number[]>('=');
-      expect(result).toStrictEqual([1, 2, 3, 4]);
+
+      assert.deepStrictEqual(result, [1, 2, 3, 4]);
     });
 
     test('empty generator', () => {
@@ -472,7 +578,8 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly string[]>('=');
-      expect(result).toStrictEqual([]);
+
+      assert.deepStrictEqual(result, []);
     });
 
     test('generator with conditional logic', () => {
@@ -486,7 +593,8 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly number[]>('=');
-      expect(result).toStrictEqual([1, 2, 3]);
+
+      assert.deepStrictEqual(result, [1, 2, 3]);
     });
 
     test('generator with early return', () => {
@@ -500,7 +608,8 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly number[]>('=');
-      expect(result).toStrictEqual([1]);
+
+      assert.deepStrictEqual(result, [1]);
     });
 
     test('generator with complex data types', () => {
@@ -510,7 +619,8 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly { id: number; name: string }[]>('=');
-      expect(result).toStrictEqual([
+
+      assert.deepStrictEqual(result, [
         { id: 1, name: 'Alice' },
         { id: 2, name: 'Bob' },
       ]);
@@ -524,7 +634,8 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly (string | number)[]>('=');
-      expect(result).toStrictEqual(['hello', 42, 'world']);
+
+      assert.deepStrictEqual(result, ['hello', 42, 'world']);
     });
 
     test('generator with loops', () => {
@@ -535,11 +646,12 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly number[]>('=');
-      expect(result).toStrictEqual([0, 1, 2]);
+
+      assert.deepStrictEqual(result, [0, 1, 2]);
     });
   });
 
-  describe('generateAsync', () => {
+  describe(generateAsync, () => {
     test('should generate array from async generator', async () => {
       // eslint-disable-next-line @typescript-eslint/require-await
       const result = await generateAsync<number>(async function* () {
@@ -549,7 +661,8 @@ describe('Arr creations', () => {
       });
 
       expectType<typeof result, readonly number[]>('=');
-      expect(result).toStrictEqual([1, 2, 3]);
+
+      assert.deepStrictEqual(result, [1, 2, 3]);
     });
 
     test('should handle async operations in generator', async () => {
@@ -562,7 +675,7 @@ describe('Arr creations', () => {
         yield 'c';
       });
 
-      expect(result).toStrictEqual(['a', 'b', 'c']);
+      assert.deepStrictEqual(result, ['a', 'b', 'c']);
     });
 
     test('should generate empty array from empty async generator', async () => {
@@ -570,7 +683,7 @@ describe('Arr creations', () => {
         // Empty generator
       });
 
-      expect(result).toStrictEqual([]);
+      assert.deepStrictEqual(result, []);
     });
 
     test('should handle async generator with delays', async () => {
@@ -583,7 +696,7 @@ describe('Arr creations', () => {
         }
       });
 
-      expect(result).toStrictEqual([0, 1, 2]);
+      assert.deepStrictEqual(result, [0, 1, 2]);
     });
   });
 });

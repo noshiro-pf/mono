@@ -1,7 +1,7 @@
 import { expectType } from '../expect-type.mjs';
 import { isNonNullObject } from './is-non-null-object.mjs';
 
-describe('isNonNullObject', () => {
+describe(isNonNullObject, () => {
   test('should return true for plain objects', () => {
     expect(isNonNullObject({})).toBe(true);
     expect(isNonNullObject({ a: 1, b: 'test' })).toBe(true);
@@ -57,9 +57,7 @@ describe('isNonNullObject', () => {
     const value: unknown = { test: true };
 
     if (isNonNullObject(value)) {
-      expectType<typeof value, NonNullable<UnknownRecord>>('>=');
-      // Can access object methods
-      expect(typeof value.toString).toBe('function');
+      expectType<typeof value, object>('=');
     }
   });
 
@@ -85,6 +83,6 @@ describe('isNonNullObject', () => {
 
     const objects = mixed.filter(isNonNullObject);
 
-    expect(objects).toStrictEqual([{ a: 1 }, []]);
+    assert.deepStrictEqual(objects, [{ a: 1 }, []]);
   });
 });

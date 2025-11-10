@@ -2,29 +2,37 @@ import { expectType } from '../expect-type.mjs';
 import { pipe } from '../functional/index.mjs';
 import { mapNullable } from './map-nullable.mjs';
 
-describe('mapNullable', () => {
+describe(mapNullable, () => {
   describe('regular usage', () => {
     test('should apply function to non-null value', () => {
       const result = mapNullable('hello', (s) => s.toUpperCase());
+
       expect(result).toBe('HELLO');
+
       expectType<typeof result, string | undefined>('=');
     });
 
     test('should apply function to non-undefined value', () => {
       const result = mapNullable(42, (n) => n * 2);
+
       expect(result).toBe(84);
+
       expectType<typeof result, number | undefined>('=');
     });
 
     test('should return undefined for null input', () => {
       const result = mapNullable(null, (s: string) => s.toUpperCase());
+
       expect(result).toBeUndefined();
+
       expectType<typeof result, string | undefined>('=');
     });
 
     test('should return undefined for undefined input', () => {
       const result = mapNullable(undefined, (s: string) => s.toUpperCase());
+
       expect(result).toBeUndefined();
+
       expectType<typeof result, string | undefined>('=');
     });
 
@@ -34,18 +42,21 @@ describe('mapNullable', () => {
         user,
         (u) => `${u.name} is ${u.age} years old`,
       );
+
       expect(result).toBe('Alice is 30 years old');
     });
 
     test('should work with nullable object properties', () => {
       const user: { name?: string } = { name: 'Bob' };
       const result = mapNullable(user.name, (name) => name.toUpperCase());
+
       expect(result).toBe('BOB');
 
       const userWithoutName: { name?: string } = {};
       const resultEmpty = mapNullable(userWithoutName.name, (name) =>
         name.toUpperCase(),
       );
+
       expect(resultEmpty).toBeUndefined();
     });
   });
@@ -55,12 +66,15 @@ describe('mapNullable', () => {
       const toUpperCase = mapNullable((s: string) => s.toUpperCase());
 
       const result1 = toUpperCase('hello');
+
       expect(result1).toBe('HELLO');
 
       const result2 = toUpperCase(null);
+
       expect(result2).toBeUndefined();
 
       const result3 = toUpperCase(undefined);
+
       expect(result3).toBeUndefined();
     });
 
@@ -68,12 +82,15 @@ describe('mapNullable', () => {
       const double = mapNullable((n: number) => n * 2);
 
       const result1 = double(21);
+
       expect(result1).toBe(42);
 
       const result2 = double(null);
+
       expect(result2).toBeUndefined();
 
       const result3 = double(undefined);
+
       expect(result3).toBeUndefined();
     });
 
@@ -84,9 +101,11 @@ describe('mapNullable', () => {
 
       const user = { name: 'Charlie', age: 25 };
       const result1 = getName(user);
+
       expect(result1).toBe('Charlie');
 
       const result2 = getName(null);
+
       expect(result2).toBeUndefined();
     });
 
@@ -141,27 +160,32 @@ describe('mapNullable', () => {
 
     test('should work with zero values', () => {
       const result = mapNullable(0, (n) => n + 1);
+
       expect(result).toBe(1);
     });
 
     test('should work with empty string', () => {
       const result = mapNullable('', (s) => s.length);
+
       expect(result).toBe(0);
     });
 
     test('should work with false boolean', () => {
       const result = mapNullable(false, (b) => !b);
+
       expect(result).toBe(true);
     });
 
     test('should work with arrays', () => {
       const result = mapNullable([1, 2, 3], (arr) => arr.length);
+
       expect(result).toBe(3);
 
       const nullResult = mapNullable(
         null as number[] | null,
         (arr) => arr.length,
       );
+
       expect(nullResult).toBeUndefined();
     });
 
@@ -172,6 +196,7 @@ describe('mapNullable', () => {
       };
 
       const result = mapNullable(data, (d) => d.user.profile.name);
+
       expect(result).toBe('Alice');
     });
   });
@@ -206,10 +231,12 @@ describe('mapNullable', () => {
 
       const input1 = 'hello';
       const result1 = double(getLength(toUpperCase(input1)));
+
       expect(result1).toBe(10);
 
       const input2: string | null = null;
       const result2 = double(getLength(toUpperCase(input2)));
+
       expect(result2).toBeUndefined();
     });
   });
