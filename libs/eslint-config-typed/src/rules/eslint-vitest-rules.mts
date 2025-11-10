@@ -92,7 +92,7 @@ export const eslintVitestRules = {
   'vitest/padding-around-test-blocks': 'error',
   'vitest/prefer-called-exactly-once-with': 'error',
   'vitest/prefer-called-once': 'error',
-  'vitest/prefer-called-times': 'error',
+  'vitest/prefer-called-times': 'off',
   'vitest/prefer-describe-function-title': 'error',
   'vitest/prefer-expect-type-of': 'error',
   'vitest/prefer-import-in-mock': 'error',
