@@ -55,6 +55,7 @@ import {
   eslintPluginStrictDependencies,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
+  eslintPluginVitestCodingStyle,
 } from '../plugins/index.mjs';
 
 import { type ESLintPlugin, type FlatConfig } from '../types/index.mjs';
@@ -76,16 +77,17 @@ export const plugins: Record<
   | 'react-hooks'
   | 'react-refresh'
   | 'react-perf'
-  | 'react-coding-style'
   | 'security'
-  | 'strict-dependencies'
   | 'testing-library'
-  | 'total-functions'
   | 'unicorn'
   | 'sort-destructure-keys'
-  | 'tree-shakable'
   | 'eslint-plugin'
-  | 'custom',
+  | 'tree-shakable'
+  | 'total-functions'
+  | 'strict-dependencies'
+  | 'custom'
+  | 'react-coding-style'
+  | 'vitest-coding-style',
   Omit<ESLintPlugin, 'configs'>
 > = {
   '@typescript-eslint': typescriptEslint,
@@ -111,14 +113,15 @@ export const plugins: Record<
   'react-refresh': eslintPluginReactRefresh,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'react-perf': eslintPluginReactPerf,
-  'react-coding-style': eslintPluginReactCodingStyle,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   security: eslintPluginSecurity,
-  'strict-dependencies': eslintPluginStrictDependencies,
   'testing-library': eslintPluginTestingLibrary,
-  'total-functions': eslintPluginTotalFunctions,
   unicorn: eslintPluginUnicorn,
-  'tree-shakable': eslintPluginTreeShakable,
   'eslint-plugin': eslintPluginEslintPlugin,
+  'tree-shakable': eslintPluginTreeShakable,
+  'total-functions': eslintPluginTotalFunctions,
+  'strict-dependencies': eslintPluginStrictDependencies,
   custom: eslintPluginCustom,
+  'react-coding-style': eslintPluginReactCodingStyle,
+  'vitest-coding-style': eslintPluginVitestCodingStyle,
 } as const satisfies FlatConfig['plugins'];

@@ -161,6 +161,12 @@ export const eslintPlugins = {
     rulePrefix: 'react-coding-style/',
     outputFileName: 'eslint-react-coding-style-rules.mts',
   },
+  EslintVitestCodingStyleRules: {
+    typeName: 'EslintVitestCodingStyleRules',
+    pluginName: 'eslint-plugin-vitest-coding-style',
+    rulePrefix: 'vitest-coding-style/',
+    outputFileName: 'eslint-vitest-coding-style-rules.mts',
+  },
 } as const satisfies Record<
   string,
   {

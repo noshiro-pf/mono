@@ -22,5 +22,6 @@ export * from './eslint-testing-library-rules.mjs';
 export * from './eslint-total-functions-rules.mjs';
 export * from './eslint-tree-shakable-rules.mjs';
 export * from './eslint-unicorn-rules.mjs';
+export * from './eslint-vitest-coding-style-rules.mjs';
 export * from './eslint-vitest-rules.mjs';
 export * from './typescript-eslint-rules.mjs';

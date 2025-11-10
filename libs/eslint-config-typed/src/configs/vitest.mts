@@ -1,5 +1,7 @@
-// import vitest from 'eslint-plugin-vitest';
-import { eslintVitestRules } from '../rules/index.mjs';
+import {
+  eslintVitestCodingStyleRules,
+  eslintVitestRules,
+} from '../rules/index.mjs';
 import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
 export const eslintConfigForVitest = (files?: readonly string[]): FlatConfig =>
@@ -13,5 +15,6 @@ export const eslintConfigForVitest = (files?: readonly string[]): FlatConfig =>
     },
     rules: defineKnownRules({
       ...eslintVitestRules,
+      ...eslintVitestCodingStyleRules,
     }),
   }) as const;

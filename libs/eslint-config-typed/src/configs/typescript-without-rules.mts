@@ -66,6 +66,8 @@ const allExtensions = [
   '.mjs',
 ] as const;
 
+// https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/src/config/typescript.ts
+
 /**
  * This config:
  *
