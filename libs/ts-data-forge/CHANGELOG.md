@@ -1,3 +1,9 @@
+# [4.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.3.1...v4.0.0) (2025-11-10)
+
+### Features
+
+- **breaking:** Defined `Optional` and `Result` types globally and re… ([#194](https://github.com/noshiro-pf/ts-data-forge/issues/194)) ([54e0ddb](https://github.com/noshiro-pf/ts-data-forge/commit/54e0ddba8ab5bb3e79f2b5c574029c1e2711a644))
+
 ## [3.3.1](https://github.com/noshiro-pf/ts-data-forge/compare/v3.3.0...v3.3.1) (2025-10-18)
 
 ### Bug Fixes
