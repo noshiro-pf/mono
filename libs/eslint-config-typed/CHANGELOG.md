@@ -1,3 +1,9 @@
+# [3.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.4.0...v3.5.0) (2025-11-10)
+
+### Features
+
+- add custom lint rule vitest-coding-style/no-expect-to-strict-equal ([#126](https://github.com/noshiro-pf/eslint-config-typed/issues/126)) ([12bb6e5](https://github.com/noshiro-pf/eslint-config-typed/commit/12bb6e5bcfdfee5ef03093506138facd0d810fea))
+
 # [3.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.3.0...v3.4.0) (2025-11-08)
 
 ### Features
