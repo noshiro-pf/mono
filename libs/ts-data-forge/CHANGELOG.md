@@ -1,3 +1,9 @@
+# [5.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v4.1.0...v5.0.0) (2025-11-10)
+
+### Features
+
+- **breaking:** fix return type of Json.stringify ([#201](https://github.com/noshiro-pf/ts-data-forge/issues/201)) ([4a92303](https://github.com/noshiro-pf/ts-data-forge/commit/4a92303ac697c9d7cf2005e80b2a57c6161f0480))
+
 # [4.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v4.0.0...v4.1.0) (2025-11-10)
 
 ### Features
