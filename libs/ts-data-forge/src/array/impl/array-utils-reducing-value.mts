@@ -27,16 +27,12 @@ export function min<const Ar extends readonly number[]>(
   array: Ar,
   // If the array elements are numbers, comparator is optional.
   comparator?: (x: Ar[number], y: Ar[number]) => number,
-): Ar extends NonEmptyArray<unknown>
-  ? Optional.Some<Ar[number]>
-  : Optional<Ar[number]>;
+): Ar extends NonEmptyArray<unknown> ? Some<Ar[number]> : Optional<Ar[number]>;
 
 export function min<const Ar extends readonly unknown[]>(
   array: Ar,
   comparator: (x: Ar[number], y: Ar[number]) => number,
-): Ar extends NonEmptyArray<unknown>
-  ? Optional.Some<Ar[number]>
-  : Optional<Ar[number]>;
+): Ar extends NonEmptyArray<unknown> ? Some<Ar[number]> : Optional<Ar[number]>;
 
 export function min<E extends number>(
   array: readonly E[],
@@ -75,16 +71,12 @@ export function max<const Ar extends readonly number[]>(
   array: Ar,
   // If the array elements are numbers, comparator is optional.
   comparator?: (x: Ar[number], y: Ar[number]) => number,
-): Ar extends NonEmptyArray<unknown>
-  ? Optional.Some<Ar[number]>
-  : Optional<Ar[number]>;
+): Ar extends NonEmptyArray<unknown> ? Some<Ar[number]> : Optional<Ar[number]>;
 
 export function max<const Ar extends readonly unknown[]>(
   array: Ar,
   comparator: (x: Ar[number], y: Ar[number]) => number,
-): Ar extends NonEmptyArray<unknown>
-  ? Optional.Some<Ar[number]>
-  : Optional<Ar[number]>;
+): Ar extends NonEmptyArray<unknown> ? Some<Ar[number]> : Optional<Ar[number]>;
 
 export function max<E extends number>(
   array: readonly E[],
@@ -122,17 +114,13 @@ export function minBy<const Ar extends readonly unknown[]>(
   array: Ar,
   // If the array elements are mapped to numbers, comparator is optional.
   comparatorValueMapper: (value: Ar[number]) => number,
-): Ar extends NonEmptyArray<unknown>
-  ? Optional.Some<Ar[number]>
-  : Optional<Ar[number]>;
+): Ar extends NonEmptyArray<unknown> ? Some<Ar[number]> : Optional<Ar[number]>;
 
 export function minBy<const Ar extends readonly unknown[], V>(
   array: Ar,
   comparatorValueMapper: (value: Ar[number]) => V,
   comparator: (x: V, y: V) => number,
-): Ar extends NonEmptyArray<unknown>
-  ? Optional.Some<Ar[number]>
-  : Optional<Ar[number]>;
+): Ar extends NonEmptyArray<unknown> ? Some<Ar[number]> : Optional<Ar[number]>;
 
 export function minBy<E, V>(
   array: readonly E[],
@@ -173,17 +161,13 @@ export function maxBy<const Ar extends readonly unknown[]>(
   array: Ar,
   // If the array elements are mapped to numbers, comparator is optional.
   comparatorValueMapper: (value: Ar[number]) => number,
-): Ar extends NonEmptyArray<unknown>
-  ? Optional.Some<Ar[number]>
-  : Optional<Ar[number]>;
+): Ar extends NonEmptyArray<unknown> ? Some<Ar[number]> : Optional<Ar[number]>;
 
 export function maxBy<const Ar extends readonly unknown[], V>(
   array: Ar,
   comparatorValueMapper: (value: Ar[number]) => V,
   comparator: (x: V, y: V) => number,
-): Ar extends NonEmptyArray<unknown>
-  ? Optional.Some<Ar[number]>
-  : Optional<Ar[number]>;
+): Ar extends NonEmptyArray<unknown> ? Some<Ar[number]> : Optional<Ar[number]>;
 
 export function maxBy<E, V>(
   array: readonly E[],

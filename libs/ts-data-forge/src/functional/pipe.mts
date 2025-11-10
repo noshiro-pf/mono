@@ -1,4 +1,4 @@
-import { Optional } from './optional.mjs';
+import { Optional } from './optional/index.mjs';
 
 /**
  * Creates a new pipe object that allows for chaining operations on a value.
@@ -18,7 +18,7 @@ import { Optional } from './optional.mjs';
  * @param a The initial value to wrap in a pipe.
  * @returns A pipe object with chaining methods appropriate for the value type.
  */
-export function pipe<const A extends Optional.Base>(
+export function pipe<const A extends UnknownOptional>(
   a: A,
 ): PipeWithMapOptional<A>;
 
@@ -40,7 +40,7 @@ export function pipe<const A>(a: A): PipeImpl<A> {
   }
 }
 
-type Pipe<A> = A extends Optional.Base ? PipeWithMapOptional<A> : PipeBase<A>;
+type Pipe<A> = A extends UnknownOptional ? PipeWithMapOptional<A> : PipeBase<A>;
 
 /**
  * @template A The type of the current value in the pipe.
@@ -105,7 +105,7 @@ type PipeBase<A> = Readonly<{
  * Pipe interface for Optional values, providing Optional-aware mapping.
  * Extends PipeBase with mapOptional functionality for monadic operations.
  */
-type PipeWithMapOptional<A extends Optional.Base> = MergeIntersection<
+type PipeWithMapOptional<A extends UnknownOptional> = MergeIntersection<
   PipeBase<A> &
     Readonly<{
       /**
@@ -148,7 +148,7 @@ type PipeImpl<A> = Partial<
     map: <B>(fn: (a: A) => B) => PipeBase<B>;
     mapNullable: <B>(fn: (a: NonNullable<A>) => B) => PipeBase<B | undefined>;
     mapOptional: <B>(
-      fn: (a: Optional.Unwrap<Cast<A, Optional.Base>>) => B,
+      fn: (a: Optional.Unwrap<Cast<A, UnknownOptional>>) => B,
     ) => PipeBase<Optional<B>>;
   }>
 >;

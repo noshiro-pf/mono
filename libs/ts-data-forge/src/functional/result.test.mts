@@ -1,7 +1,7 @@
 import { expectType } from '../expect-type.mjs';
-import { Optional } from './optional.mjs';
+import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
-import { Result } from './result.mjs';
+import { Result } from './result/index.mjs';
 
 describe('Result', () => {
   describe('ok', () => {
@@ -42,7 +42,7 @@ describe('Result', () => {
     test('type guard for Ok results', () => {
       const result: Result<number, string> = Result.ok(42);
       if (Result.isOk(result)) {
-        expectType<typeof result, Result.Ok<number>>('<=');
+        expectType<typeof result, Ok<number>>('<=');
         expect(result.value).toBe(42);
       }
     });
@@ -57,7 +57,7 @@ describe('Result', () => {
     test('type guard for Err results', () => {
       const result: Result<number, string> = Result.err('error');
       if (Result.isErr(result)) {
-        expectType<typeof result, Result.Err<string>>('<=');
+        expectType<typeof result, Err<string>>('<=');
         expect(result.value).toBe('error');
       }
     });
@@ -260,6 +260,7 @@ describe('Result', () => {
 
     test('returns undefined for Ok result', () => {
       const result: Result<number, string> = Result.ok(42);
+
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       const value = Result.unwrapErr(result);
       expect(value).toBeUndefined();

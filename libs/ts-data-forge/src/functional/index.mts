@@ -1,4 +1,4 @@
 export * from './match.mjs';
-export * from './optional.mjs';
+export * from './optional/index.mjs';
 export * from './pipe.mjs';
-export * from './result.mjs';
+export * from './result/index.mjs';

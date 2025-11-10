@@ -275,25 +275,68 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/functional/match/match-exhaustive-example.mts'],
   },
   {
-    sourcePath: 'src/functional/optional.mts',
-    sampleFiles: [
-      'samples/src/functional/optional/is-optional-example.mts',
-      'samples/src/functional/optional/some-example.mts',
-      'samples/src/functional/optional/some-example.mts',
-      'samples/src/functional/optional/is-some-example.mts',
-      'samples/src/functional/optional/is-none-example.mts',
-      'samples/src/functional/optional/unwrap-throw-example.mts',
-      'samples/src/functional/optional/unwrap-example.mts',
-      'samples/src/functional/optional/unwrap-or-example.mts',
-      'samples/src/functional/optional/or-else-example.mts',
-      'samples/src/functional/optional/map-example.mts',
-      'samples/src/functional/optional/flat-map-example.mts',
-      'samples/src/functional/optional/filter-example.mts',
-      'samples/src/functional/optional/expect-to-be-example.mts',
-      'samples/src/functional/optional/zip-example.mts',
-      'samples/src/functional/optional/from-nullable-example.mts',
-      'samples/src/functional/optional/to-nullable-example.mts',
-    ],
+    sourcePath: 'src/functional/optional/impl/optional-expect-to-be.mts',
+    sampleFiles: ['samples/src/functional/optional/expect-to-be-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-filter.mts',
+    sampleFiles: ['samples/src/functional/optional/filter-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-flat-map.mts',
+    sampleFiles: ['samples/src/functional/optional/flat-map-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-from-nullable.mts',
+    sampleFiles: ['samples/src/functional/optional/from-nullable-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-is-none.mts',
+    sampleFiles: ['samples/src/functional/optional/is-none-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-is-optional.mts',
+    sampleFiles: ['samples/src/functional/optional/is-optional-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-is-some.mts',
+    sampleFiles: ['samples/src/functional/optional/is-some-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-map.mts',
+    sampleFiles: ['samples/src/functional/optional/map-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-none.mts',
+    sampleFiles: ['samples/src/functional/optional/some-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-or-else.mts',
+    sampleFiles: ['samples/src/functional/optional/or-else-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-some.mts',
+    sampleFiles: ['samples/src/functional/optional/some-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-to-nullable.mts',
+    sampleFiles: ['samples/src/functional/optional/to-nullable-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-unwrap-or.mts',
+    sampleFiles: ['samples/src/functional/optional/unwrap-or-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-unwrap-throw.mts',
+    sampleFiles: ['samples/src/functional/optional/unwrap-throw-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-unwrap.mts',
+    sampleFiles: ['samples/src/functional/optional/unwrap-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/optional/impl/optional-zip.mts',
+    sampleFiles: ['samples/src/functional/optional/zip-example.mts'],
   },
   {
     sourcePath: 'src/functional/pipe.mts',
@@ -304,31 +347,92 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
-    sourcePath: 'src/functional/result.mts',
-    sampleFiles: [
-      'samples/src/functional/result/is-result-example.mts',
-      'samples/src/functional/result/ok-err-example.mts',
-      'samples/src/functional/result/ok-err-example.mts',
-      'samples/src/functional/result/is-ok-example.mts',
-      'samples/src/functional/result/is-ok-example.mts',
-      'samples/src/functional/result/unwrap-throw-example.mts',
-      'samples/src/functional/result/unwrap-ok-example.mts',
-      'samples/src/functional/result/unwrap-ok-or-example.mts',
-      'samples/src/functional/result/unwrap-err-throw-example.mts',
-      'samples/src/functional/result/unwrap-err-example.mts',
-      'samples/src/functional/result/unwrap-err-or-example.mts',
-      'samples/src/functional/result/map-example.mts',
-      'samples/src/functional/result/map-err-example.mts',
-      'samples/src/functional/result/fold-example.mts',
-      'samples/src/functional/result/flat-map-example.mts',
-      'samples/src/functional/result/expect-to-be-example.mts',
-      'samples/src/functional/result/from-promise-example.mts',
-      'samples/src/functional/result/from-throwable-example.mts',
-      'samples/src/functional/result/swap-example.mts',
-      'samples/src/functional/result/to-optional-example.mts',
-      'samples/src/functional/result/or-else-example.mts',
-      'samples/src/functional/result/zip-example.mts',
-    ],
+    sourcePath: 'src/functional/result/impl/result-is-result.mts',
+    sampleFiles: ['samples/src/functional/result/is-result-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-ok.mts',
+    sampleFiles: ['samples/src/functional/result/ok-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-err.mts',
+    sampleFiles: ['samples/src/functional/result/ok-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-is-ok.mts',
+    sampleFiles: ['samples/src/functional/result/is-ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-is-err.mts',
+    sampleFiles: ['samples/src/functional/result/is-ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-unwrap-throw.mts',
+    sampleFiles: ['samples/src/functional/result/unwrap-throw-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-unwrap-ok.mts',
+    sampleFiles: ['samples/src/functional/result/unwrap-ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-unwrap-ok-or.mts',
+    sampleFiles: ['samples/src/functional/result/unwrap-ok-or-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-unwrap-err-throw.mts',
+    sampleFiles: ['samples/src/functional/result/unwrap-err-throw-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-unwrap-err.mts',
+    sampleFiles: ['samples/src/functional/result/unwrap-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-unwrap-err-or.mts',
+    sampleFiles: ['samples/src/functional/result/unwrap-err-or-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-map.mts',
+    sampleFiles: ['samples/src/functional/result/map-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-map-err.mts',
+    sampleFiles: ['samples/src/functional/result/map-err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-fold.mts',
+    sampleFiles: ['samples/src/functional/result/fold-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-flat-map.mts',
+    sampleFiles: ['samples/src/functional/result/flat-map-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-expect-to-be.mts',
+    sampleFiles: ['samples/src/functional/result/expect-to-be-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-from-promise.mts',
+    sampleFiles: ['samples/src/functional/result/from-promise-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-from-throwable.mts',
+    sampleFiles: ['samples/src/functional/result/from-throwable-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-swap.mts',
+    sampleFiles: ['samples/src/functional/result/swap-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-to-optional.mts',
+    sampleFiles: ['samples/src/functional/result/to-optional-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-or-else.mts',
+    sampleFiles: ['samples/src/functional/result/or-else-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/result/impl/result-zip.mts',
+    sampleFiles: ['samples/src/functional/result/zip-example.mts'],
   },
   {
     sourcePath: 'src/guard/has-key.mts',

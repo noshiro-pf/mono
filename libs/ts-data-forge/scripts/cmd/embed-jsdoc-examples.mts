@@ -1,3 +1,4 @@
+import { Result } from 'ts-data-forge';
 import { formatFiles } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { sourceFileMappings } from './embed-jsdoc-examples-map.mjs';

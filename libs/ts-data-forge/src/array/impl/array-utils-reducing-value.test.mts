@@ -20,7 +20,7 @@ describe('Arr reducing value', () => {
       const xs = [3, 5, 4] as const;
       const result = min(xs);
 
-      expectType<typeof result, Optional.Some<3 | 4 | 5>>('=');
+      expectType<typeof result, Some<3 | 4 | 5>>('=');
 
       test('case 1', () => {
         expect(Optional.isSome(result)).toBe(true);
@@ -33,7 +33,7 @@ describe('Arr reducing value', () => {
       const xs = [3, 5, 4] as const;
       const result = min(xs, (a, b) => a - b);
 
-      expectType<typeof result, Optional.Some<3 | 4 | 5>>('=');
+      expectType<typeof result, Some<3 | 4 | 5>>('=');
 
       test('case 2', () => {
         expect(Optional.isSome(result)).toBe(true);
@@ -61,7 +61,7 @@ describe('Arr reducing value', () => {
     const xs = [3, 5, 4] as const;
     const result = max(xs, (a, b) => a - b);
 
-    expectType<typeof result, Optional.Some<3 | 4 | 5>>('=');
+    expectType<typeof result, Some<3 | 4 | 5>>('=');
 
     test('case 1', () => {
       expect(Optional.isSome(result)).toBe(true);
@@ -72,7 +72,7 @@ describe('Arr reducing value', () => {
 
     test('case 2: no comparator', () => {
       const res = max(xs);
-      expectType<typeof res, Optional.Some<3 | 4 | 5>>('=');
+      expectType<typeof res, Some<3 | 4 | 5>>('=');
       expect(Optional.isSome(res)).toBe(true);
       if (Optional.isSome(res)) {
         expect(res.value).toBe(5);
@@ -111,7 +111,7 @@ describe('Arr reducing value', () => {
 
     expectType<
       typeof result,
-      Optional.Some<
+      Some<
         Readonly<
           | { x: 1; y: 2 }
           | { x: 2; y: 3 }
@@ -152,7 +152,7 @@ describe('Arr reducing value', () => {
 
       expectType<
         typeof res,
-        Optional.Some<
+        Some<
           Readonly<
             | { name: 'apple'; score: 10 }
             | { name: 'banana'; score: 5 }
@@ -182,7 +182,7 @@ describe('Arr reducing value', () => {
 
     expectType<
       typeof result,
-      Optional.Some<
+      Some<
         Readonly<
           | { x: 1; y: 2 }
           | { x: 2; y: 3 }
@@ -223,7 +223,7 @@ describe('Arr reducing value', () => {
 
       expectType<
         typeof res,
-        Optional.Some<
+        Some<
           Readonly<
             | { name: 'apple'; score: 10 }
             | { name: 'banana'; score: 5 }

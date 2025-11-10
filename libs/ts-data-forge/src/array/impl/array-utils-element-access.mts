@@ -70,11 +70,11 @@ export function at<E>(
 export const head = <const Ar extends readonly unknown[]>(
   array: Ar,
 ): Ar extends readonly []
-  ? Optional.None
+  ? None
   : Ar extends readonly [infer E, ...unknown[]]
-    ? Optional.Some<E>
+    ? Some<E>
     : Ar extends NonEmptyArray<infer E>
-      ? Optional.Some<E>
+      ? Some<E>
       : Optional<Ar[number]> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   (array.length === 0 ? Optional.none : Optional.some(array.at(0))) as never;
@@ -98,11 +98,11 @@ export const head = <const Ar extends readonly unknown[]>(
 export const last = <const Ar extends readonly unknown[]>(
   array: Ar,
 ): Ar extends readonly []
-  ? Optional.None
+  ? None
   : Ar extends readonly [...unknown[], infer E]
-    ? Optional.Some<E>
+    ? Some<E>
     : Ar extends NonEmptyArray<infer E>
-      ? Optional.Some<E>
+      ? Some<E>
       : Optional<Ar[number]> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   (array.length === 0 ? Optional.none : Optional.some(array.at(-1))) as never;

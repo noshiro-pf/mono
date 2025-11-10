@@ -1,5 +1,5 @@
 import { expectType } from '../expect-type.mjs';
-import { Optional } from './optional.mjs';
+import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
 
 describe('Optional', () => {
@@ -45,7 +45,7 @@ describe('Optional', () => {
 
     test('should preserve const types', () => {
       expectTypeOf(Optional.some('test' as const)).toEqualTypeOf<
-        Optional.Some<'test'>
+        Some<'test'>
       >();
     });
   });
@@ -80,11 +80,11 @@ describe('Optional', () => {
       const optional = Optional.some(42) as Optional<number>;
 
       if (Optional.isSome(optional)) {
-        expectType<typeof optional, Optional.Some<number>>('=');
+        expectType<typeof optional, Some<number>>('=');
       }
 
       if (Optional.isNone(optional)) {
-        expectType<typeof optional, Optional.None>('<=');
+        expectType<typeof optional, None>('<=');
       }
     });
   });
@@ -292,11 +292,10 @@ describe('Optional', () => {
 
   describe('type utilities', () => {
     test('should correctly unwrap types', () => {
-      type SomeNumber = Optional.Some<number>;
+      type SomeNumber = Some<number>;
       type UnwrappedNumber = Optional.Unwrap<SomeNumber>;
       expectType<UnwrappedNumber, number>('=');
 
-      type None = Optional.None;
       type UnwrappedNone = Optional.Unwrap<None>;
       expectType<UnwrappedNone, never>('=');
     });
@@ -305,10 +304,10 @@ describe('Optional', () => {
       type MaybeNumber = Optional<number>;
 
       type OnlySome = Optional.NarrowToSome<MaybeNumber>;
-      expectType<OnlySome, Optional.Some<number>>('=');
+      expectType<OnlySome, Some<number>>('=');
 
       type OnlyNone = Optional.NarrowToNone<MaybeNumber>;
-      expectType<OnlyNone, Optional.None>('=');
+      expectType<OnlyNone, None>('=');
     });
   });
 

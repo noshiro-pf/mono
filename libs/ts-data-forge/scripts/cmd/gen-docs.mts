@@ -1,5 +1,5 @@
+import { Result, unknownToString } from 'ts-data-forge';
 import { assertPathExists } from 'ts-repo-utils';
-import { unknownToString } from '../../src/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { embedJsDocExamples } from './embed-jsdoc-examples.mjs';
 import { embedSamples } from './embed-samples.mjs';

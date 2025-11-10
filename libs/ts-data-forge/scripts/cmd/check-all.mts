@@ -1,3 +1,4 @@
+import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 
 /**

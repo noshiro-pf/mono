@@ -1,6 +1,5 @@
 export * from './collections/index.mjs';
 export * from './expect-type.mjs';
-export * from './functional/index.mjs';
 export * from './guard/index.mjs';
 export * from './iterator/index.mjs';
 export * from './json/index.mjs';

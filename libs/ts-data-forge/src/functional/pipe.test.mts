@@ -1,5 +1,5 @@
 import { expectType } from '../expect-type.mjs';
-import { Optional } from './optional.mjs';
+import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
 
 describe('pipe', () => {

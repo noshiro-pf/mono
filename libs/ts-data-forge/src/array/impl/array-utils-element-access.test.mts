@@ -32,7 +32,7 @@ describe('Arr element access', () => {
       const xs = [1, 2, 3] as const;
       const h = head(xs);
 
-      expectType<typeof h, Optional.Some<1>>('=');
+      expectType<typeof h, Some<1>>('=');
 
       expect(Optional.isSome(h)).toBe(true);
       if (Optional.isSome(h)) {
@@ -44,7 +44,7 @@ describe('Arr element access', () => {
       const xs: MutableNonEmptyArray<number> = [1, 2, 3];
       const h = head(xs);
 
-      expectType<typeof h, Optional.Some<number>>('=');
+      expectType<typeof h, Some<number>>('=');
 
       expect(Optional.isSome(h)).toBe(true);
       if (Optional.isSome(h)) {
@@ -69,7 +69,7 @@ describe('Arr element access', () => {
 
       const h = head(xs);
 
-      expectType<typeof h, Optional.None>('=');
+      expectType<typeof h, None>('=');
 
       expect(Optional.isNone(h)).toBe(true);
     });
@@ -93,7 +93,7 @@ describe('Arr element access', () => {
       const xs = [1, 2, 3] as const;
       const l = last(xs);
 
-      expectType<typeof l, Optional.Some<3>>('=');
+      expectType<typeof l, Some<3>>('=');
 
       expect(Optional.isSome(l)).toBe(true);
       if (Optional.isSome(l)) {
@@ -105,7 +105,7 @@ describe('Arr element access', () => {
       const xs: MutableNonEmptyArray<number> = [1, 2, 3];
       const l = last(xs);
 
-      expectType<typeof l, Optional.Some<number>>('=');
+      expectType<typeof l, Some<number>>('=');
 
       expect(Optional.isSome(l)).toBe(true);
       if (Optional.isSome(l)) {
@@ -130,7 +130,7 @@ describe('Arr element access', () => {
 
       const l = last(xs);
 
-      expectType<typeof l, Optional.None>('=');
+      expectType<typeof l, None>('=');
 
       expect(Optional.isNone(l)).toBe(true);
     });
