@@ -1,3 +1,9 @@
+# [4.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v4.0.0...v4.1.0) (2025-11-10)
+
+### Features
+
+- add TernaryResult ([#200](https://github.com/noshiro-pf/ts-data-forge/issues/200)) ([eeac8fd](https://github.com/noshiro-pf/ts-data-forge/commit/eeac8fdf84082b299d29ae20e052229f6be2e36e))
+
 # [4.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.3.1...v4.0.0) (2025-11-10)
 
 ### Features
