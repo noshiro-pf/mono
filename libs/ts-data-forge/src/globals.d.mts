@@ -84,7 +84,7 @@ type Optional<S> = None | Some<S>;
  */
 type UnknownOptional = Optional<unknown>;
 
-// #endregion
+// #endregion Optional
 
 // #region Result
 
@@ -128,4 +128,57 @@ type Result<S, E> = Ok<S> | Err<E>;
  */
 type UnknownResult = Result<unknown, unknown>;
 
-// #endregion
+// #endregion Result
+
+// #region TernaryResult
+/**
+ * Represents a `TernaryResult` that is a success, containing a value.
+ */
+type TernaryOk<S> = Readonly<{
+  /** @internal Discriminant property for the 'Ok' type. */
+  $$tag: 'ts-data-forge::Result.ok';
+
+  /** The success value. */
+  value: S;
+}>;
+
+/**
+ * Represents a `TernaryResult` that contains a success value and an attached
+ * warning.
+ */
+type TernaryWarn<S, W> = Readonly<{
+  /** @internal Discriminant property for the 'Warn' type. */
+  $$tag: 'ts-data-forge::Result.warn';
+
+  /** The success value. */
+  value: S;
+
+  /** The warning value. */
+  warning: W;
+}>;
+
+/**
+ * Represents a `TernaryResult` that is an error, containing an error value.
+ */
+type TernaryErr<E> = Readonly<{
+  /** @internal Discriminant property for the 'Err' type. */
+  $$tag: 'ts-data-forge::Result.err';
+
+  /** The error value. */
+  value: E;
+}>;
+
+/**
+ * Represents a value that can be `Ok`, `Warn`, or `Err`.
+ */
+type TernaryResult<S, E, W = E> =
+  | TernaryOk<S>
+  | TernaryWarn<S, W>
+  | TernaryErr<E>;
+
+/**
+ * Base type for any `TernaryResult`, used for generic constraints.
+ */
+type UnknownTernaryResult = TernaryResult<unknown, unknown, unknown>;
+
+// #endregion TernaryResult

@@ -1,0 +1,198 @@
+import { expectType } from '../expect-type.mjs';
+import { Optional } from './optional/index.mjs';
+import { TernaryResult } from './ternary-result/index.mjs';
+
+describe('TernaryResult', () => {
+  test('constructors and guards', () => {
+    const ok = TernaryResult.ok(1);
+    const warn = TernaryResult.warn(1, 'caution');
+    const err = TernaryResult.err(new Error('boom'));
+
+    expect(TernaryResult.isOk(ok)).toBe(true);
+    expect(TernaryResult.isWarn(warn)).toBe(true);
+    expect(TernaryResult.isErr(err)).toBe(true);
+    expect(TernaryResult.isTernaryResult(ok)).toBe(true);
+    expect(TernaryResult.isTernaryResult({})).toBe(false);
+
+    expectType<typeof ok, TernaryResult<number, never, never>>('<=');
+    expectType<typeof warn, TernaryResult<number, never, string>>('<=');
+    expectType<typeof err, TernaryResult<never, Error, never>>('<=');
+  });
+
+  test('map transforms Ok and Warn success values', () => {
+    const ok = TernaryResult.ok(2);
+    const warn = TernaryResult.warn(2, 'check');
+    const err = TernaryResult.err('fail');
+
+    const double = TernaryResult.map((value: number) => value * 2);
+
+    expect(TernaryResult.unwrapOk(double(ok))).toBe(4);
+    expect(TernaryResult.unwrapOk(double(warn))).toBe(4);
+    expect(TernaryResult.unwrapWarn(double(warn))).toBe('check');
+    expect(TernaryResult.unwrapErr(double(err))).toBe('fail');
+  });
+
+  test('mapWarn and mapErr leave other variants untouched', () => {
+    const warn = TernaryResult.warn(2, 'slow');
+    const err = TernaryResult.err('err');
+
+    const warnMessage = TernaryResult.mapWarn(
+      (warning: string) => `${warning}!`,
+    );
+    const errUpper = TernaryResult.mapErr((value: string) =>
+      value.toUpperCase(),
+    );
+
+    expect(TernaryResult.unwrapWarn(warnMessage(warn))).toBe('slow!');
+    expect(TernaryResult.unwrapOk(warnMessage(warn))).toBe(2);
+    expect(TernaryResult.unwrapWarn(errUpper(warn))).toBe('slow');
+    expect(TernaryResult.unwrapErr(errUpper(err))).toBe('ERR');
+  });
+
+  test('flatMap propagates Warn and Err while keeping warnings', () => {
+    const parse = (value: string): TernaryResult<number, string, never> =>
+      Number.isNaN(Number(value))
+        ? TernaryResult.err('NaN')
+        : TernaryResult.ok(Number(value));
+
+    const warn = TernaryResult.warn('3', 'slow');
+    const err = TernaryResult.err('bad');
+
+    const okResult = TernaryResult.flatMap(TernaryResult.ok('3'), parse);
+    const warnResult = TernaryResult.flatMap(warn, parse);
+    const errResult = TernaryResult.flatMap(err, parse);
+
+    expect(TernaryResult.unwrapOk(okResult)).toBe(3);
+    expect(TernaryResult.isWarn(warnResult)).toBe(true);
+    if (TernaryResult.isWarn(warnResult)) {
+      expect(warnResult.value).toBe(3);
+      expect(warnResult.warning).toBe('slow');
+    }
+    expect(TernaryResult.unwrapErr(errResult)).toBe('bad');
+  });
+
+  test('fold maps each variant independently', () => {
+    const value = TernaryResult.fold(
+      TernaryResult.ok(1),
+      (o: number) => o + 1,
+      (w: string) => ({ warning: w }),
+      (e: string) => ({ message: e }),
+    );
+    const warn = TernaryResult.fold(
+      TernaryResult.warn(2, 'heads up'),
+      (x) => x * 2,
+      (w: string) => ({ warning: w }),
+      (e: string) => ({ message: e }),
+    );
+    const err = TernaryResult.fold(
+      TernaryResult.err('boom'),
+      (x) => x,
+      (w: string) => ({ warning: w }),
+      (e: string) => ({ message: e }),
+    );
+
+    expect(TernaryResult.unwrapOk(value)).toBe(2);
+    expect(TernaryResult.unwrapOk(warn)).toBe(4);
+    expect(TernaryResult.unwrapWarn(warn)).toStrictEqual({
+      warning: 'heads up',
+    });
+    expect(TernaryResult.unwrapErr(err)).toStrictEqual({ message: 'boom' });
+  });
+
+  test('orElse keeps Ok and Warn variants', () => {
+    const fallback = TernaryResult.ok('fallback');
+
+    expect(
+      TernaryResult.orElse(TernaryResult.ok('value'), fallback),
+    ).toStrictEqual(TernaryResult.ok('value'));
+    expect(
+      TernaryResult.orElse(TernaryResult.warn('value', 'warn'), fallback),
+    ).toStrictEqual(TernaryResult.warn('value', 'warn'));
+    expect(
+      TernaryResult.orElse(TernaryResult.err('err'), fallback),
+    ).toStrictEqual(fallback);
+  });
+
+  test('unwrap helpers', () => {
+    const warn = TernaryResult.warn('value', 'careful');
+    const err = TernaryResult.err('broken');
+
+    expect(TernaryResult.unwrapOk(TernaryResult.ok(3))).toBe(3);
+    expect(TernaryResult.unwrapOk(warn)).toBe('value');
+    expect(TernaryResult.unwrapWarn(warn)).toBe('careful');
+    expect(TernaryResult.unwrapErr(err)).toBe('broken');
+    expect(TernaryResult.unwrapOkOr(err, 0)).toBe(0);
+    expect(TernaryResult.unwrapWarnOr(err, 'default')).toBe('default');
+    expect(TernaryResult.unwrapErrOr(warn, 'default')).toBe('default');
+  });
+
+  test('throwing unwrap variants provide descriptive errors', () => {
+    expect(() =>
+      TernaryResult.unwrapThrow(TernaryResult.warn('notice', 'warned')),
+    ).toThrow(/Warn/u);
+    expect(() =>
+      TernaryResult.unwrapWarnThrow(TernaryResult.err('no warn')),
+    ).toThrow(/Err/u);
+    expect(() =>
+      TernaryResult.unwrapErrThrow(TernaryResult.ok('no err')),
+    ).toThrow(/Ok/u);
+  });
+
+  test('expectToBe unwraps Ok values', () => {
+    expect(TernaryResult.expectToBe(TernaryResult.ok('v'), 'msg')).toBe('v');
+    expect(() =>
+      TernaryResult.expectToBe(TernaryResult.err('x'), 'missing'),
+    ).toThrow(/missing/u);
+  });
+
+  test('zip prefers Err over Warn or Ok.', () => {
+    const ok = TernaryResult.ok('x');
+    const warn = TernaryResult.warn('warn', 'warned');
+    const err = TernaryResult.err('err');
+
+    expect(TernaryResult.zip(ok, TernaryResult.ok(1))).toStrictEqual(
+      TernaryResult.ok(['x', 1] as const),
+    );
+    expect(TernaryResult.zip(ok, warn)).toStrictEqual(
+      TernaryResult.warn(['x', 'warn'] as const, 'warned'),
+    );
+    expect(TernaryResult.zip(warn, ok)).toStrictEqual(
+      TernaryResult.warn(['warn', 'x'] as const, 'warned'),
+    );
+    expect(TernaryResult.zip(ok, err)).toStrictEqual(err);
+    expect(TernaryResult.zip(err, warn)).toStrictEqual(err);
+  });
+
+  test('toOptional keeps only Ok values', () => {
+    expect(TernaryResult.toOptional(TernaryResult.ok(1))).toStrictEqual(
+      Optional.some(1),
+    );
+    expect(
+      TernaryResult.toOptional(TernaryResult.warn(1, 'warn')),
+    ).toStrictEqual(Optional.some(1));
+    expect(TernaryResult.toOptional(TernaryResult.err('err'))).toBe(
+      Optional.none,
+    );
+  });
+
+  test('fromPromise resolves into TernaryResult', async () => {
+    await expect(
+      TernaryResult.fromPromise(Promise.resolve('ok')),
+    ).resolves.toStrictEqual(TernaryResult.ok('ok'));
+
+    const rejected = await TernaryResult.fromPromise(
+      Promise.reject(new Error('bad')),
+    );
+    expect(TernaryResult.isErr(rejected)).toBe(true);
+  });
+
+  test('fromThrowable converts thrown values', () => {
+    expect(TernaryResult.fromThrowable(() => 5)).toStrictEqual(
+      TernaryResult.ok(5),
+    );
+    const errorResult = TernaryResult.fromThrowable(() => {
+      throw new Error('boom');
+    });
+    expect(TernaryResult.isErr(errorResult)).toBe(true);
+  });
+});

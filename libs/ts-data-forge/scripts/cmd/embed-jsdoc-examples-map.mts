@@ -218,6 +218,158 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-ok.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-warn.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/warn-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-err.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/err-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-is-ok.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/is-ok-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-is-warn.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/is-warn-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-is-err.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/is-err-example.mts'],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-is-ternary-result.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/is-ternary-result-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-map.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/map-example.mts'],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-map-warn.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/map-warn-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-map-err.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/map-err-example.mts'],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-flat-map.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/flat-map-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-fold.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/fold-example.mts'],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-or-else.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/or-else-example.mts'],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-to-optional.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/to-optional-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-expect-to-be.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/expect-to-be-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-ok.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-ok-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-ok-or.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-ok-or-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-warn.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-warn-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-warn-or.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-warn-or-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-warn-throw.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-warn-throw-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-err.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-err-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-err-or.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-err-or-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-err-throw.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-err-throw-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-unwrap-throw.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/unwrap-throw-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-from-promise.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/from-promise-example.mts',
+    ],
+  },
+  {
+    sourcePath:
+      'src/functional/ternary-result/impl/ternary-result-from-throwable.mts',
+    sampleFiles: [
+      'samples/src/functional/ternary-result/from-throwable-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/functional/ternary-result/impl/ternary-result-zip.mts',
+    sampleFiles: ['samples/src/functional/ternary-result/zip-example.mts'],
+  },
+  {
     sourcePath: 'src/collections/iset.mts',
     sampleFiles: [
       'samples/src/collections/iset/size-example.mts',
