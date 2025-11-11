@@ -1,4 +1,4 @@
-import { assertPathExists } from 'ts-repo-utils';
+import { assertPathExists, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');

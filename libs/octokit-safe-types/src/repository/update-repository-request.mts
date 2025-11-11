@@ -3,30 +3,24 @@ import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
 const SecurityAndAnalysisForRequest = t.union([
-  t.strictRecord({
-    advanced_security: t.optional(
-      t.strictRecord({ status: t.optional(t.string()) }),
-    ),
-    code_security: t.optional(
-      t.strictRecord({ status: t.optional(t.string()) }),
-    ),
-    secret_scanning: t.optional(
-      t.strictRecord({ status: t.optional(t.string()) }),
-    ),
+  t.record({
+    advanced_security: t.optional(t.record({ status: t.optional(t.string()) })),
+    code_security: t.optional(t.record({ status: t.optional(t.string()) })),
+    secret_scanning: t.optional(t.record({ status: t.optional(t.string()) })),
     secret_scanning_push_protection: t.optional(
-      t.strictRecord({ status: t.optional(t.string()) }),
+      t.record({ status: t.optional(t.string()) }),
     ),
     secret_scanning_ai_detection: t.optional(
-      t.strictRecord({ status: t.optional(t.string()) }),
+      t.record({ status: t.optional(t.string()) }),
     ),
     secret_scanning_non_provider_patterns: t.optional(
-      t.strictRecord({ status: t.optional(t.string()) }),
+      t.record({ status: t.optional(t.string()) }),
     ),
   }),
   t.nullType,
 ]);
 
-export const UpdateRepositoryRequest = t.strictRecord({
+export const UpdateRepositoryRequest = t.record({
   name: t.optional(t.string()),
   description: t.optional(t.string()),
   homepage: t.optional(t.string()),

@@ -14,28 +14,28 @@ expectType<
 
 // Organization ruleset conditions pieces
 
-const OrgRulesetConditionsRepositoryNameTarget = t.strictRecord({
-  repository_name: t.strictRecord({
+const OrgRulesetConditionsRepositoryNameTarget = t.record({
+  repository_name: t.record({
     include: t.optional(t.array(t.string())),
     exclude: t.optional(t.array(t.string())),
     protected: t.optional(t.boolean()),
   }),
 });
 
-const OrgRulesetConditionsRepositoryIdTarget = t.strictRecord({
-  repository_id: t.strictRecord({
+const OrgRulesetConditionsRepositoryIdTarget = t.record({
+  repository_id: t.record({
     repository_ids: t.optional(t.array(t.number())),
   }),
 });
 
-const OrgRulesetConditionsRepositoryPropertySpec = t.strictRecord({
+const OrgRulesetConditionsRepositoryPropertySpec = t.record({
   name: t.string(),
   property_values: t.array(t.string()),
   source: t.optional(t.enumType(['custom', 'system'])),
 });
 
-const OrgRulesetConditionsRepositoryPropertyTarget = t.strictRecord({
-  repository_property: t.strictRecord({
+const OrgRulesetConditionsRepositoryPropertyTarget = t.record({
+  repository_property: t.record({
     include: t.optional(t.array(OrgRulesetConditionsRepositoryPropertySpec)),
     exclude: t.optional(t.array(OrgRulesetConditionsRepositoryPropertySpec)),
   }),
@@ -44,15 +44,15 @@ const OrgRulesetConditionsRepositoryPropertyTarget = t.strictRecord({
 const OrgRulesetConditions = t.union([
   t.intersection(
     [RepositoryRulesetConditions, OrgRulesetConditionsRepositoryNameTarget],
-    t.strictRecord({ repository_name: t.strictRecord({}) }),
+    t.record({ repository_name: t.record({}) }),
   ),
   t.intersection(
     [RepositoryRulesetConditions, OrgRulesetConditionsRepositoryIdTarget],
-    t.strictRecord({ repository_id: t.strictRecord({}) }),
+    t.record({ repository_id: t.record({}) }),
   ),
   t.intersection(
     [RepositoryRulesetConditions, OrgRulesetConditionsRepositoryPropertyTarget],
-    t.strictRecord({ repository_property: t.strictRecord({}) }),
+    t.record({ repository_property: t.record({}) }),
   ),
 ]);
 
@@ -61,7 +61,7 @@ expectType<
   DeepReadonly<components['schemas']['org-ruleset-conditions']>
 >('=');
 
-export const RepositoryRuleset = t.strictRecord({
+export const RepositoryRuleset = t.record({
   id: t.number(),
   name: t.string(),
   target: t.optional(t.enumType(['branch', 'tag', 'push', 'repository'])),
@@ -76,15 +76,15 @@ export const RepositoryRuleset = t.strictRecord({
   ),
   node_id: t.optional(t.string()),
   _links: t.optional(
-    t.strictRecord({
+    t.record({
       self: t.optional(
-        t.strictRecord({
+        t.record({
           href: t.optional(t.string()),
         }),
       ),
       html: t.optional(
         t.union([
-          t.strictRecord({
+          t.record({
             href: t.optional(t.string()),
           }),
           t.nullType,

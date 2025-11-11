@@ -5,7 +5,7 @@ import { RepositoryRulesetBypassActor } from './bypass-actor.mjs';
 import { RepositoryRulesetConditions } from './conditions.mjs';
 import { RepositoryRule } from './repository-rule.mjs';
 
-export const CreateRulesetRequest = t.strictRecord({
+export const CreateRulesetRequest = t.record({
   /** @description The name of the ruleset. */
   name: t.string(),
 

@@ -2,7 +2,7 @@ import { type components } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
-const RepositoryRuleCreation = t.strictRecord({
+const RepositoryRuleCreation = t.record({
   type: t.literal('creation'),
 });
 
@@ -11,10 +11,10 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-creation']>
 >('=');
 
-const RepositoryRuleUpdate = t.strictRecord({
+const RepositoryRuleUpdate = t.record({
   type: t.literal('update'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description Branch can pull changes from its upstream repository */
       update_allows_fetch_and_merge: t.boolean(),
     }),
@@ -26,7 +26,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-update']>
 >('=');
 
-const RepositoryRuleDeletion = t.strictRecord({
+const RepositoryRuleDeletion = t.record({
   type: t.literal('deletion'),
 });
 
@@ -35,7 +35,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-deletion']>
 >('=');
 
-const RepositoryRuleRequiredLinearHistory = t.strictRecord({
+const RepositoryRuleRequiredLinearHistory = t.record({
   type: t.literal('required_linear_history'),
 });
 
@@ -44,10 +44,10 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-required-linear-history']>
 >('=');
 
-const RepositoryRuleMergeQueue = t.strictRecord({
+const RepositoryRuleMergeQueue = t.record({
   type: t.literal('merge_queue'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description Maximum time for a required status check to report a conclusion. After this much time has elapsed, checks that have not reported a conclusion will be assumed to have failed */
       check_response_timeout_minutes: t.number(),
 
@@ -83,10 +83,10 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-merge-queue']>
 >('=');
 
-const RepositoryRuleRequiredDeployments = t.strictRecord({
+const RepositoryRuleRequiredDeployments = t.record({
   type: t.literal('required_deployments'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description The environments that must be successfully deployed to before branches can be merged. */
       required_deployment_environments: t.array(t.string()),
     }),
@@ -98,7 +98,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-required-deployments']>
 >('=');
 
-const RepositoryRuleRequiredSignatures = t.strictRecord({
+const RepositoryRuleRequiredSignatures = t.record({
   type: t.literal('required_signatures'),
 });
 
@@ -107,10 +107,10 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-required-signatures']>
 >('=');
 
-const RepositoryRulePullRequest = t.strictRecord({
+const RepositoryRulePullRequest = t.record({
   type: t.literal('pull_request'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description Array of allowed merge methods. Allowed values include `merge`, `squash`, and `rebase`. At least one option must be enabled. */
       allowed_merge_methods: t.optional(
         t.array(t.enumType(['merge', 'squash', 'rebase'])),
@@ -142,16 +142,16 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-pull-request']>
 >('=');
 
-const RepositoryRuleRequiredStatusChecks = t.strictRecord({
+const RepositoryRuleRequiredStatusChecks = t.record({
   type: t.literal('required_status_checks'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description Allow repositories and branches to be created if a check would otherwise prohibit it. */
       do_not_enforce_on_create: t.optional(t.boolean()),
 
       /** @description Status checks that are required. */
       required_status_checks: t.array(
-        t.strictRecord({
+        t.record({
           /** @description The status check context name that must be present on the commit. */
           context: t.string(),
 
@@ -171,7 +171,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-required-status-checks']>
 >('=');
 
-const RepositoryRuleNonFastForward = t.strictRecord({
+const RepositoryRuleNonFastForward = t.record({
   type: t.literal('non_fast_forward'),
 });
 
@@ -180,7 +180,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-non-fast-forward']>
 >('=');
 
-const CommonPatternParameters = t.strictRecord({
+const CommonPatternParameters = t.record({
   /** @description How this rule will appear to users. */
   name: t.optional(t.string()),
 
@@ -197,7 +197,7 @@ const CommonPatternParameters = t.strictRecord({
   pattern: t.string(),
 });
 
-const RepositoryRuleCommitMessagePattern = t.strictRecord({
+const RepositoryRuleCommitMessagePattern = t.record({
   type: t.literal('commit_message_pattern'),
   parameters: t.optional(CommonPatternParameters),
 });
@@ -207,7 +207,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-commit-message-pattern']>
 >('=');
 
-const RepositoryRuleCommitAuthorEmailPattern = t.strictRecord({
+const RepositoryRuleCommitAuthorEmailPattern = t.record({
   type: t.literal('commit_author_email_pattern'),
   parameters: t.optional(CommonPatternParameters),
 });
@@ -219,7 +219,7 @@ expectType<
   >
 >('=');
 
-const RepositoryRuleCommitterEmailPattern = t.strictRecord({
+const RepositoryRuleCommitterEmailPattern = t.record({
   type: t.literal('committer_email_pattern'),
   parameters: t.optional(CommonPatternParameters),
 });
@@ -229,7 +229,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-committer-email-pattern']>
 >('=');
 
-const RepositoryRuleBranchNamePattern = t.strictRecord({
+const RepositoryRuleBranchNamePattern = t.record({
   type: t.literal('branch_name_pattern'),
   parameters: t.optional(CommonPatternParameters),
 });
@@ -239,7 +239,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-branch-name-pattern']>
 >('=');
 
-const RepositoryRuleTagNamePattern = t.strictRecord({
+const RepositoryRuleTagNamePattern = t.record({
   type: t.literal('tag_name_pattern'),
   parameters: t.optional(CommonPatternParameters),
 });
@@ -249,10 +249,10 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-tag-name-pattern']>
 >('=');
 
-const RepositoryRuleFilePathRestriction = t.strictRecord({
+const RepositoryRuleFilePathRestriction = t.record({
   type: t.literal('file_path_restriction'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description The file paths that are restricted from being pushed to the commit graph. */
       restricted_file_paths: t.array(t.string()),
     }),
@@ -264,10 +264,10 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-file-path-restriction']>
 >('=');
 
-const RepositoryRuleMaxFilePathLength = t.strictRecord({
+const RepositoryRuleMaxFilePathLength = t.record({
   type: t.literal('max_file_path_length'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description The maximum amount of characters allowed in file paths. */
       max_file_path_length: t.number(),
     }),
@@ -279,10 +279,10 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-max-file-path-length']>
 >('=');
 
-const RepositoryRuleFileExtensionRestriction = t.strictRecord({
+const RepositoryRuleFileExtensionRestriction = t.record({
   type: t.literal('file_extension_restriction'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description The file extensions that are restricted from being pushed to the commit graph. */
       restricted_file_extensions: t.array(t.string()),
     }),
@@ -296,10 +296,10 @@ expectType<
   >
 >('=');
 
-const RepositoryRuleMaxFileSize = t.strictRecord({
+const RepositoryRuleMaxFileSize = t.record({
   type: t.literal('max_file_size'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description The maximum file size allowed in megabytes. This limit does not apply to Git Large File Storage (Git LFS). */
       max_file_size: t.number(),
     }),
@@ -311,7 +311,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-max-file-size']>
 >('=');
 
-const WorkflowFileReference = t.strictRecord({
+const WorkflowFileReference = t.record({
   /** @description The path to the workflow file */
   path: t.string(),
 
@@ -325,10 +325,10 @@ const WorkflowFileReference = t.strictRecord({
   sha: t.optional(t.string()),
 });
 
-const RepositoryRuleWorkflows = t.strictRecord({
+const RepositoryRuleWorkflows = t.record({
   type: t.literal('workflows'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description Allow repositories and branches to be created if a check would otherwise prohibit it. */
       do_not_enforce_on_create: t.optional(t.boolean()),
 
@@ -343,7 +343,7 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-workflows']>
 >('=');
 
-const CodeScanningTool = t.strictRecord({
+const CodeScanningTool = t.record({
   /**
    * @description The severity level at which code scanning results that raise alerts block a reference update.
    * @enum {string}
@@ -371,10 +371,10 @@ const CodeScanningTool = t.strictRecord({
   tool: t.string(),
 });
 
-const RepositoryRuleCodeScanning = t.strictRecord({
+const RepositoryRuleCodeScanning = t.record({
   type: t.literal('code_scanning'),
   parameters: t.optional(
-    t.strictRecord({
+    t.record({
       /** @description Tools that must provide code scanning results for this rule to pass. */
       code_scanning_tools: t.array(CodeScanningTool),
     }),
@@ -386,11 +386,11 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-code-scanning']>
 >('=');
 
-const RepositoryRuleCopilotCodeReview = t.strictRecord({
+const RepositoryRuleCopilotCodeReview = t.record({
   type: t.literal('copilot_code_review'),
   parameters: t.optional(
     t.partial(
-      t.strictRecord({
+      t.record({
         review_on_push: t.boolean(),
         review_draft_pull_requests: t.boolean(),
       }),

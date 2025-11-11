@@ -2,7 +2,7 @@ import { type components } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
-const SimpleUser = t.strictRecord({
+const SimpleUser = t.record({
   name: t.optional(t.union([t.string(), t.nullType])),
   email: t.optional(t.union([t.string(), t.nullType])),
   login: t.string(),
@@ -30,7 +30,7 @@ const SimpleUser = t.strictRecord({
 const NullableSimpleUser = t.union([SimpleUser, t.nullType]);
 
 const NullableLicenseSimple = t.union([
-  t.strictRecord({
+  t.record({
     key: t.string(),
     name: t.string(),
     url: t.union([t.string(), t.nullType]),
@@ -41,7 +41,7 @@ const NullableLicenseSimple = t.union([
   t.nullType,
 ]);
 
-const CodeOfConductSimple = t.strictRecord({
+const CodeOfConductSimple = t.record({
   url: t.string(),
   key: t.string(),
   name: t.string(),
@@ -49,53 +49,47 @@ const CodeOfConductSimple = t.strictRecord({
 });
 
 const SecurityAndAnalysis = t.union([
-  t.record(
-    {
-      advanced_security: t.optional(
-        t.strictRecord({
-          status: t.optional(t.enumType(['enabled', 'disabled'])),
-        }),
-      ),
-      code_security: t.optional(
-        t.strictRecord({
-          status: t.optional(t.enumType(['enabled', 'disabled'])),
-        }),
-      ),
-      dependabot_security_updates: t.optional(
-        t.strictRecord({
-          status: t.optional(t.enumType(['enabled', 'disabled'])),
-        }),
-      ),
-      secret_scanning: t.optional(
-        t.strictRecord({
-          status: t.optional(t.enumType(['enabled', 'disabled'])),
-        }),
-      ),
-      secret_scanning_push_protection: t.optional(
-        t.strictRecord({
-          status: t.optional(t.enumType(['enabled', 'disabled'])),
-        }),
-      ),
-      secret_scanning_non_provider_patterns: t.optional(
-        t.strictRecord({
-          status: t.optional(t.enumType(['enabled', 'disabled'])),
-        }),
-      ),
-      secret_scanning_ai_detection: t.optional(
-        t.strictRecord({
-          status: t.optional(t.enumType(['enabled', 'disabled'])),
-        }),
-      ),
-    },
-    {
-      // NOTE: It may contain a key called "secret_scanning_validity_checks"
-      allowExcessProperties: true,
-    },
-  ),
+  t.record({
+    advanced_security: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+    code_security: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+    dependabot_security_updates: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+    secret_scanning: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+    secret_scanning_push_protection: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+    secret_scanning_non_provider_patterns: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+    secret_scanning_ai_detection: t.optional(
+      t.record({
+        status: t.optional(t.enumType(['enabled', 'disabled'])),
+      }),
+    ),
+  }),
   t.nullType,
 ]);
 
-const Repository = t.strictRecord({
+const Repository = t.record({
   id: t.number(),
   node_id: t.string(),
   name: t.string(),
@@ -103,7 +97,7 @@ const Repository = t.strictRecord({
   license: NullableLicenseSimple,
   forks: t.number(),
   permissions: t.optional(
-    t.strictRecord({
+    t.record({
       admin: t.boolean(),
       pull: t.boolean(),
       triage: t.optional(t.boolean()),
@@ -206,7 +200,7 @@ const Repository = t.strictRecord({
   starred_at: t.optional(t.string()),
   anonymous_access_enabled: t.optional(t.boolean()),
   code_search_index_status: t.optional(
-    t.strictRecord({
+    t.record({
       lexical_search_ok: t.optional(t.boolean()),
       lexical_commit_sha: t.optional(t.string()),
     }),
@@ -215,7 +209,7 @@ const Repository = t.strictRecord({
 
 const NullableRepository = t.union([Repository, t.nullType]);
 
-export const FullRepository = t.strictRecord({
+export const FullRepository = t.record({
   id: t.number(),
   node_id: t.string(),
   name: t.string(),
@@ -290,7 +284,7 @@ export const FullRepository = t.strictRecord({
   created_at: t.string(),
   updated_at: t.string(),
   permissions: t.optional(
-    t.strictRecord({
+    t.record({
       admin: t.boolean(),
       maintain: t.optional(t.boolean()),
       push: t.boolean(),

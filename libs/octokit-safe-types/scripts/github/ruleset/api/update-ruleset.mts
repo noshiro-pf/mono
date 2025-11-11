@@ -28,6 +28,7 @@ export const updateRuleset = async ({
       enforcement,
       bypass_actors: castDeepMutable(bypass_actors),
       conditions: castDeepMutable(conditions),
+
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       rules: castDeepMutable(
         rules,
