@@ -40,8 +40,8 @@ jobs:
 
       - name: Back up
         run: |
-          pnpm exec tsx scripts/github/repository/backup.mts
-          pnpm exec tsx scripts/github/ruleset/backup.mts
+          pnpm exec tsx src/github/repository/backup.mts
+          pnpm exec tsx src/github/ruleset/backup.mts
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 

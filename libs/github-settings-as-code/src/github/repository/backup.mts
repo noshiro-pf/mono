@@ -1,6 +1,5 @@
 import { Obj } from 'ts-data-forge';
-import 'ts-repo-utils';
-import { mkdirClean } from '../../utils.mjs';
+import { makeEmptyDir } from 'ts-repo-utils';
 import {
   repositorySettingsDir,
   repositorySettingsJsonName,
@@ -10,8 +9,10 @@ import { repositoryKeysToPick } from './constants.mjs';
 
 const backupDir = path.resolve(repositorySettingsDir, './bk');
 
-export const backupRepositorySettings = async (fmt: boolean = true) => {
-  await mkdirClean(backupDir);
+export const backupRepositorySettings = async (
+  fmt: boolean = true,
+): Promise<void> => {
+  await makeEmptyDir(backupDir);
 
   const repositorySettings = await getRepositorySettings();
 

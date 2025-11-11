@@ -1,14 +1,13 @@
 import { Obj } from 'ts-data-forge';
-import 'ts-repo-utils';
-import { mkdirClean } from '../../utils.mjs';
+import { makeEmptyDir } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
 import { getAllRulesets, getRuleset } from './api/index.mjs';
 import { rulesetKeysToPick } from './constants.mjs';
 
 const backupDir = path.resolve(rulesetsDir, './bk');
 
-export const backupRulesets = async (fmt: boolean = true) => {
-  await mkdirClean(backupDir);
+export const backupRulesets = async (fmt: boolean = true): Promise<void> => {
+  await makeEmptyDir(backupDir);
 
   const rulesetsResult = await getAllRulesets();
 

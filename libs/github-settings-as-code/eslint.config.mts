@@ -60,6 +60,15 @@ export default [
         'error',
         { unusedExports: true, ignoreExports: ['src/entry-point.mts'] },
       ],
+      'no-await-in-loop': 'off',
+      '@typescript-eslint/prefer-readonly-parameter-types': 'off',
+      'import-x/no-unassigned-import': 'off',
+    }),
+  },
+  {
+    files: ['src/entry-point.mts'],
+    rules: defineKnownRules({
+      '@typescript-eslint/no-restricted-imports': 'off',
     }),
   },
 

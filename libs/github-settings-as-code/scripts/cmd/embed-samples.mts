@@ -1,5 +1,5 @@
 import { pipe, unknownToString } from 'ts-data-forge';
-import { formatFiles } from 'ts-repo-utils';
+import { formatFiles, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const codeBlockStart = '```tsx';

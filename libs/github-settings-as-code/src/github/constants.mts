@@ -1,10 +1,9 @@
 import packageJson from '../../package.json' with { type: 'json' };
-import { projectRootPath } from '../project-root-path.mjs';
 
 export const OWNER = 'noshiro-pf';
 export const REPO = packageJson.name;
 
-const githubDir = path.resolve(projectRootPath, './github');
+const githubDir = path.resolve(process.cwd(), './github');
 
 export const repositorySettingsDir = path.resolve(
   githubDir,

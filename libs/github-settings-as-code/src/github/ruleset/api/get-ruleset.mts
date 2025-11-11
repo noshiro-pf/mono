@@ -1,5 +1,6 @@
 import { GetRulesetResponse, type EndpointKeys } from 'octokit-safe-types';
 import { validationErrorsToMessages } from 'ts-fortress';
+import { Result } from 'ts-repo-utils';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 

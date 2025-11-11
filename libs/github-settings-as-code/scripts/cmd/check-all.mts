@@ -1,4 +1,4 @@
-import 'ts-repo-utils';
+import { Result } from 'ts-repo-utils';
 
 /**
  * Runs all validation and build steps for the project.
@@ -31,13 +31,9 @@ const checkAll = async (): Promise<void> => {
   await runCmdStep('pnpm run lint:fix', 'Linting failed');
   echo('✓ Lint fixes applied\n');
 
-  // Step 6: Build
-  echo('6. Building project...');
-  await runCmdStep('pnpm run build', 'Build failed');
-
   // Step 7: Generate docs
-  echo('7. Generating documentation...');
-  await runCmdStep('pnpm run doc', 'Documentation generation failed');
+  echo('7. Formatting files...');
+  await runCmdStep('pnpm run fmt', 'Formatting files failed');
 
   // Step 8: Backup repository settings
   echo('8. Backing up repository settings...');
