@@ -1,6 +1,6 @@
 import { type ExecException } from 'node:child_process';
 import * as prettier from 'prettier';
-import { Arr, isNotUndefined, Result } from 'ts-data-forge';
+import { Arr, isNotUndefined, pipe, Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import {
   getDiffFrom,
@@ -127,21 +127,28 @@ const defaultIgnoreFn = (filePath: string): boolean => {
     ignoreFiles.has(filename) ||
     filename.startsWith('.env') ||
     ignoreExtensions.some((ext) => filePath.endsWith(ext)) ||
-    ignoreDirs.some((dir) => filename.startsWith(dir))
+    pipe(filePath.split(path.sep)).map((pathSegments) =>
+      pathSegments.some((segment) => ignoreDirs.includes(segment)),
+    ).value
   );
 };
 
 const ignoreFiles: ReadonlySet<string> = new Set([
   '.DS_Store',
   'package-lock.json',
+  'yarn.lock',
+  'pnpm-lock.yaml',
   'LICENSE',
   '.prettierignore',
   '.editorconfig',
   '.gitignore',
   '.npmignore',
+  '.envrc',
+  '.nvmrc',
+  '.npmrc',
 ]);
 
-const ignoreExtensions: readonly string[] = [
+const ignoreExtensions: readonly `.${string}`[] = [
   '.svg',
   '.png',
   '.jpg',
@@ -171,6 +178,7 @@ const ignoreDirs: readonly string[] = [
   '.cache',
   '.vscode',
   '.yarn',
+  '.wireit',
 ] as const;
 
 /**
