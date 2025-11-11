@@ -1,3 +1,9 @@
+# [6.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v5.3.0...v6.0.0) (2025-11-11)
+
+### Features
+
+- **breaking:** add excessPropertyValidation, excessPropertyFill options to record type to replace allowExcessProperties ([#138](https://github.com/noshiro-pf/ts-fortress/issues/138)) ([8028b07](https://github.com/noshiro-pf/ts-fortress/commit/8028b0705d0e53450b6bd24964b508d565aa01d9))
+
 # [5.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v5.2.0...v5.3.0) (2025-11-08)
 
 ### Features
