@@ -1,5 +1,9 @@
 import { expectType, Obj } from 'ts-data-forge';
-import { type RecordType, type Type } from '../type.mjs';
+import {
+  type ExcessPropertyBehavior,
+  type RecordType,
+  type Type,
+} from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import {
   isOptionalProperty,
@@ -15,16 +19,16 @@ import { record } from './record.mjs';
 export const required = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
   const KeysToBeRequired extends NonEmptyArray<keyof R & string>,
+  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
-  recordType: RecordType<R>,
+  recordType: RecordType<R, ExcessValidation>,
   options?: PartialReadonly<{
     keysToBeRequired: KeysToBeRequired;
     typeName: string;
-
-    /** @default true */
-    allowExcessProperties: boolean;
+    excessPropertyValidation: ExcessValidation;
+    excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
   }>,
-): RequiredType<R, KeysToBeRequired> => {
+): RequiredType<R, KeysToBeRequired, ExcessValidation> => {
   const typeNameFilled: string =
     options?.typeName ??
     (options?.keysToBeRequired === undefined
@@ -48,8 +52,10 @@ export const required = <
 
   return record(requiredShape, {
     typeName: typeNameFilled,
-    allowExcessProperties:
-      options?.allowExcessProperties ?? recordType.allowExcessProperties,
+    excessPropertyValidation:
+      options?.excessPropertyValidation ?? recordType.excessPropertyValidation,
+    excessPropertyFill:
+      options?.excessPropertyFill ?? recordType.excessPropertyFill,
   });
 };
 
@@ -86,7 +92,8 @@ type PartiallyRequiredType<
 export type RequiredType<
   R extends ReadonlyRecord<string, Type<unknown>>,
   KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
-> = RecordType<RequiredTypeShape<R, KeysToBeRequired>>;
+  ExcessValidation extends ExcessPropertyBehavior = 'strip',
+> = RecordType<RequiredTypeShape<R, KeysToBeRequired>, ExcessValidation>;
 
 expectType<
   RequiredTypeShape<
@@ -125,7 +132,8 @@ expectType<
         b: Type<1>;
         c: Type<2>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -150,7 +158,8 @@ expectType<
         b: Type<1>;
         c: OptionalPropertyType<Type<2>>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -176,7 +185,8 @@ expectType<
         b: Type<1>;
         c: OptionalPropertyType<Type<2>>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -202,7 +212,8 @@ expectType<
         b: Type<1>;
         c: Type<2>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -228,7 +239,8 @@ expectType<
         b: Type<1>;
         c: Type<2>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 

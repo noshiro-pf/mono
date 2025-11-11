@@ -399,14 +399,14 @@ const User = t.record({
     age: t.number(),
 });
 
-// Success case - returns the same object reference
+// Success case - validates correctly
 const validData = { name: 'Alice', age: 30 } as const;
 const result = User.validate(validData);
 
 assert(t.Result.isOk(result));
-assert(result.value === validData); // true - same reference!
-
+// In strip mode (default), a new object is created even without excess properties
 assert.deepStrictEqual(result.value, { name: 'Alice', age: 30 });
+assert.notEqual(result.value, validData);
 
 // Error case - provides detailed error information
 const invalidData = { name: 'Bob', age: 'thirty' } as const;
@@ -600,7 +600,8 @@ const StrictUserType = t.record(
         name: t.string(),
     },
     {
-        allowExcessProperties: false, // Reject any properties not defined in schema
+        excessPropertyValidation: 'error', // Reject any properties not defined in schema
+        excessPropertyFill: 'strip',
     },
 );
 
@@ -617,7 +618,8 @@ const PermissiveUserType = t.record(
         name: t.string(),
     },
     {
-        allowExcessProperties: true, // Allow additional properties (default behavior)
+        excessPropertyValidation: 'allow', // Allow additional properties (default behavior)
+        excessPropertyFill: 'allow',
     },
 );
 
@@ -942,7 +944,8 @@ const StrictType = t.record(
         age: t.number(),
     },
     {
-        allowExcessProperties: false,
+        excessPropertyValidation: 'error',
+        excessPropertyFill: 'strip',
     },
 );
 

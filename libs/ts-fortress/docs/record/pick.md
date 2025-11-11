@@ -10,9 +10,9 @@
 
 ### PickedType
 
-> **PickedType**\<`R`, `KeysToPick`\> = [`RecordType`](../type/README.md#recordtype)\<`Pick`\<`R`, `ArrayElement`\<`KeysToPick`\>\>\>
+> **PickedType**\<`R`, `KeysToPick`, `ExcessValidation`\> = [`RecordType`](../type/README.md#recordtype)\<`Pick`\<`R`, `ArrayElement`\<`KeysToPick`\>\>, `ExcessValidation`\>
 
-Defined in: [src/record/pick.mts:28](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L28)
+Defined in: [src/record/pick.mts:34](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L34)
 
 #### Type Parameters
 
@@ -24,13 +24,17 @@ Defined in: [src/record/pick.mts:28](https://github.com/noshiro-pf/ts-fortress/b
 
 `KeysToPick` *extends* readonly keyof `R`[]
 
+##### ExcessValidation
+
+`ExcessValidation` *extends* [`ExcessPropertyBehavior`](../type/README.md#excesspropertybehavior) = `"strip"`
+
 ## Functions
 
 ### pick()
 
-> **pick**\<`R`, `KeysToPick`\>(`recordType`, `keysToPick`, `options?`): [`PickedType`](#pickedtype)\<`R`, `KeysToPick`\>
+> **pick**\<`R`, `KeysToPick`, `ExcessValidation`\>(`recordType`, `keysToPick`, `options?`): [`PickedType`](#pickedtype)\<`R`, `KeysToPick`, `ExcessValidation`\>
 
-Defined in: [src/record/pick.mts:7](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L7)
+Defined in: [src/record/pick.mts:11](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/pick.mts#L11)
 
 Creates a record type with keys picked.
 
@@ -38,17 +42,21 @@ Creates a record type with keys picked.
 
 ##### R
 
-`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => [`Result`](../entry-point/README.md#result)\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](../utils/validation-error.md#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
+`R` *extends* `ReadonlyRecord`\<`string`, `Readonly`\<\{ `assertIs`: (`a`) => `asserts a is unknown`; `cast`: (`a`) => `unknown`; `defaultValue`: `unknown`; `fill`: (`a`) => `unknown`; `is`: (`a`) => `a is unknown`; `typeName`: `string`; `validate`: (`a`) => `Result`\<`unknown`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](../utils/validation-error.md#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>; \}\>\>
 
 ##### KeysToPick
 
 `KeysToPick` *extends* readonly keyof `R` & `string`[]
 
+##### ExcessValidation
+
+`ExcessValidation` *extends* [`ExcessPropertyBehavior`](../type/README.md#excesspropertybehavior) = `"strip"`
+
 #### Parameters
 
 ##### recordType
 
-[`RecordType`](../type/README.md#recordtype)\<`R`\>
+[`RecordType`](../type/README.md#recordtype)\<`R`, `ExcessValidation`\>
 
 ##### keysToPick
 
@@ -56,8 +64,8 @@ Creates a record type with keys picked.
 
 ##### options?
 
-`Partial`\<`Readonly`\<\{ `allowExcessProperties`: `boolean`; `typeName`: `string`; \}\>\>
+`Partial`\<`Readonly`\<\{ `excessPropertyFill`: `"allow"` \| `"strip"`; `excessPropertyValidation`: `ExcessValidation`; `typeName`: `string`; \}\>\>
 
 #### Returns
 
-[`PickedType`](#pickedtype)\<`R`, `KeysToPick`\>
+[`PickedType`](#pickedtype)\<`R`, `KeysToPick`, `ExcessValidation`\>

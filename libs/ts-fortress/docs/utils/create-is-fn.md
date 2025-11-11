@@ -24,7 +24,7 @@ Defined in: [src/utils/create-is-fn.mts:5](https://github.com/noshiro-pf/ts-fort
 
 ##### validate
 
-(`a`) => [`Result`](../entry-point/README.md#result)\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](validation-error.md#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
+(`a`) => `Result`\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](validation-error.md#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
 
 #### Returns
 

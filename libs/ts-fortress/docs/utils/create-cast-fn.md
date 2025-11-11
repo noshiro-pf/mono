@@ -24,7 +24,7 @@ Defined in: [src/utils/create-cast-fn.mts:6](https://github.com/noshiro-pf/ts-fo
 
 ##### validate
 
-(`a`) => [`Result`](../entry-point/README.md#result)\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](validation-error.md#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
+(`a`) => `Result`\<`T`, readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](validation-error.md#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]\>
 
 #### Returns
 

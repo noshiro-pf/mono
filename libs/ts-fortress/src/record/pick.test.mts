@@ -6,20 +6,35 @@ import { pick } from './pick.mjs';
 import { record } from './record.mjs';
 
 describe(pick, () => {
-  const ymd = record({
-    year: number(1900),
-    month: number(1),
-    date: number(1),
-  });
+  const ymd = record(
+    {
+      year: number(1900),
+      month: number(1),
+      date: number(1),
+    },
+    { excessPropertyValidation: 'strip' },
+  );
+
+  const ymdEased = record(
+    {
+      year: number(1900),
+      month: number(1),
+      date: number(1),
+    },
+    { excessPropertyValidation: 'allow' },
+  );
 
   const ym = pick(ymd, ['year', 'month']);
+
+  const ymEased = pick(ymdEased, ['year', 'month']);
 
   expectType<
     typeof ym,
     Type<Readonly<{ year: number; month: number }>> &
       Readonly<{
         shape: Readonly<{ year: Type<number>; month: Type<number> }>;
-        allowExcessProperties: boolean;
+        excessPropertyValidation: 'strip';
+        excessPropertyFill: 'allow' | 'strip';
       }>
   >('=');
 
@@ -82,12 +97,32 @@ describe(pick, () => {
       });
     });
 
-    test('validate returns input as-is for OK cases', () => {
+    test('validate returns the stripped content of input with additional keys for OK cases if excessPropertyValidation is "strip"', () => {
+      const input: UnknownRecord = {
+        year: 2000,
+        month: 12,
+        aaa: 999,
+      };
+      const result = ym.validate(input);
+
+      expect(Result.isOk(result)).toBe(true);
+
+      const resultValue1 = Result.unwrapThrow(result);
+
+      assert.deepStrictEqual(resultValue1, {
+        year: 2000,
+        month: 12,
+      });
+
+      expect(resultValue1).not.toBe(input); // ✅ different reference
+    });
+
+    test('validate returns input with additional keys as-is for OK cases', () => {
       const input: UnknownRecord = {
         year: 2000,
         month: 12,
       };
-      const result = ym.validate(input);
+      const result = ymEased.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
 
@@ -121,13 +156,33 @@ describe(pick, () => {
       );
     });
 
-    test('validate returns input as-is for OK cases with additional keys', () => {
-      const input: UnknownRecord = {
+    test('validate returns the stripped content of input for OK cases if excessPropertyValidation is "strip"', () => {
+      const input = {
         year: 2000,
         month: 12,
         aaa: 999,
       };
       const result = ym.validate(input);
+
+      expect(Result.isOk(result)).toBe(true);
+
+      const resultValue3 = Result.unwrapThrow(result);
+
+      assert.deepStrictEqual(resultValue3, {
+        year: 2000,
+        month: 12,
+      });
+
+      expect(resultValue3).not.toBe(input); // ✅ different reference
+    });
+
+    test('validate returns input as-is for OK cases if excessPropertyValidation is "allow"', () => {
+      const input: UnknownRecord = {
+        year: 2000,
+        month: 12,
+        aaa: 999,
+      };
+      const result = ymEased.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
 

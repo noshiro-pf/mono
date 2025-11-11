@@ -9,7 +9,10 @@ describe('record allowExcessProperties option', () => {
       name: number(),
       age: number(),
     },
-    { allowExcessProperties: false },
+    {
+      excessPropertyValidation: 'error',
+      excessPropertyFill: 'strip',
+    },
   );
 
   const permissiveRecord = record(
@@ -17,7 +20,10 @@ describe('record allowExcessProperties option', () => {
       name: number(),
       age: number(),
     },
-    { allowExcessProperties: true },
+    {
+      excessPropertyValidation: 'allow',
+      excessPropertyFill: 'allow',
+    },
   );
 
   const defaultRecord = record({
@@ -25,7 +31,18 @@ describe('record allowExcessProperties option', () => {
     age: number(),
   });
 
-  test('allowExcessProperties: false - rejects excess properties', () => {
+  const stripRecord = record(
+    {
+      name: number(),
+      age: number(),
+    },
+    {
+      excessPropertyValidation: 'strip',
+      excessPropertyFill: 'strip',
+    },
+  );
+
+  test("excessPropertyValidation: 'error' - rejects excess properties", () => {
     const dataWithExcess = {
       name: 42,
       age: 25,
@@ -58,7 +75,7 @@ describe('record allowExcessProperties option', () => {
     ]);
   });
 
-  test('allowExcessProperties: false - accepts valid data without excess properties', () => {
+  test("excessPropertyValidation: 'error' - accepts valid data without excess properties", () => {
     const validData = {
       name: 42,
       age: 25,
@@ -89,7 +106,7 @@ describe('record allowExcessProperties option', () => {
     expect(resultValue1).toBe(input); // ✅ same reference
   });
 
-  test('allowExcessProperties: true - accepts excess properties', () => {
+  test("excessPropertyValidation: 'allow' - accepts excess properties", () => {
     const dataWithExcess = {
       name: 42,
       age: 25,
@@ -104,14 +121,12 @@ describe('record allowExcessProperties option', () => {
 
     const resultValue2 = Result.unwrapThrow(result);
 
-    assert.deepStrictEqual(
-      resultValue2,
-      defaultRecord.cast({
-        name: 42,
-        age: 25,
-        extra: 'allowed',
-      }),
-    );
+    // In allow mode, excess properties are kept
+    assert.deepStrictEqual(resultValue2, {
+      name: 42,
+      age: 25,
+      extra: 'allowed',
+    });
   });
 
   test('permissiveRecord validate returns input as-is for OK cases', () => {
@@ -125,11 +140,11 @@ describe('record allowExcessProperties option', () => {
     expect(resultValue3).toBe(input); // ✅ same reference
   });
 
-  test('default behavior - allows excess properties (allowExcessProperties defaults to true)', () => {
+  test('default behavior - strips excess properties (excessPropertyValidation defaults to strip)', () => {
     const dataWithExcess = {
       name: 42,
       age: 25,
-      extra: 'allowed by default',
+      extra: 'stripped by default',
     };
 
     expect(defaultRecord.is(dataWithExcess)).toBe(true);
@@ -140,28 +155,50 @@ describe('record allowExcessProperties option', () => {
 
     const resultValue4 = Result.unwrapThrow(result);
 
-    assert.deepStrictEqual(
-      resultValue4,
-      defaultRecord.cast({
-        name: 42,
-        age: 25,
-        extra: 'allowed by default',
-      }),
-    );
+    // Default mode is strip, so excess properties are removed
+    assert.deepStrictEqual(resultValue4, {
+      name: 42,
+      age: 25,
+    });
   });
 
-  test('defaultRecord validate returns input as-is for OK cases', () => {
-    const input = { name: 42, age: 25, extra: 'allowed by default' };
+  test('defaultRecord validate returns stripped content for OK cases', () => {
+    const input = { name: 42, age: 25, extra: 'stripped by default' };
     const result = defaultRecord.validate(input);
 
     expect(Result.isOk(result)).toBe(true);
 
     const resultValue5 = Result.unwrapThrow(result);
 
-    expect(resultValue5).toBe(input); // ✅ same reference
+    // Default mode is strip, so excess property is removed
+    assert.deepStrictEqual(resultValue5, {
+      name: 42,
+      age: 25,
+    });
+
+    expect(resultValue5).not.toBe(input); // Different reference
   });
 
-  test('allowExcessProperties: false - multiple excess properties', () => {
+  test("excessPropertyValidation: 'strip' - strips excess properties", () => {
+    const dataWithExcess = {
+      name: 42,
+      age: 25,
+      extra: 'stripped',
+    };
+
+    const result = stripRecord.validate(dataWithExcess);
+
+    expect(Result.isOk(result)).toBe(true);
+
+    const resultValue = Result.unwrapThrow(result);
+
+    assert.deepStrictEqual(resultValue, {
+      name: 42,
+      age: 25,
+    });
+  });
+
+  test("excessPropertyValidation: 'error' - multiple excess properties", () => {
     const dataWithMultipleExcess = {
       name: 42,
       age: 25,
@@ -201,7 +238,7 @@ describe('record allowExcessProperties option', () => {
     ]);
   });
 
-  test('allowExcessProperties: false - combines with other validation errors', () => {
+  test("excessPropertyValidation: 'error' - combines with other validation errors", () => {
     const invalidData = {
       name: 'invalid', // should be number
       age: 25,

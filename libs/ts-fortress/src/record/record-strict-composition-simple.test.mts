@@ -13,7 +13,10 @@ describe('record strict composition - simple tests', () => {
       name: string(),
       age: number(),
     },
-    { allowExcessProperties: false },
+    {
+      excessPropertyValidation: 'error',
+      excessPropertyFill: 'strip',
+    },
   );
 
   describe('pick behavior with strict record', () => {
@@ -124,7 +127,7 @@ describe('record strict composition - simple tests', () => {
       id: string(),
       name: string(),
       age: number(),
-    }); // allowExcessProperties defaults to true
+    }); // default excessPropertyValidation is 'strip'
 
     test('strict record rejects excess properties', () => {
       const data = { id: '123', name: 'John', age: 25, extra: 'not allowed' };
@@ -145,23 +148,39 @@ describe('record strict composition - simple tests', () => {
       expect(resultValue2).toBe(input); // ✅ same reference
     });
 
-    test('permissive record accepts excess properties', () => {
-      const data = { id: '123', name: 'John', age: 25, extra: 'allowed' };
+    test('default record strips excess properties', () => {
+      const data = { id: '123', name: 'John', age: 25, extra: 'stripped' };
 
       const result = permissiveRecord.validate(data);
 
       expect(Result.isOk(result)).toBe(true);
+
+      const resultValue = Result.unwrapThrow(result);
+
+      // In strip mode (default), excess properties are removed
+      assert.deepStrictEqual(resultValue, {
+        id: '123',
+        name: 'John',
+        age: 25,
+      });
     });
 
-    test('permissiveRecord validate returns input as-is for OK cases', () => {
-      const input = { id: '123', name: 'John', age: 25, extra: 'allowed' };
+    test('permissiveRecord validate strips excess properties', () => {
+      const input = { id: '123', name: 'John', age: 25, extra: 'stripped' };
       const result = permissiveRecord.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue3 = Result.unwrapThrow(result);
 
-      expect(resultValue3).toBe(input); // ✅ same reference
+      // In strip mode, excess properties are removed
+      assert.deepStrictEqual(resultValue3, {
+        id: '123',
+        name: 'John',
+        age: 25,
+      });
+
+      expect(resultValue3).not.toBe(input); // Different reference
     });
 
     test('pick from strict record rejects excess properties', () => {
@@ -173,25 +192,39 @@ describe('record strict composition - simple tests', () => {
       expect(Result.isErr(result)).toBe(true);
     });
 
-    test('pick from permissive record accepts excess properties', () => {
+    test('pick from default record strips excess properties', () => {
       const permissivePicked = pick(permissiveRecord, ['id', 'name']);
-      const data = { id: '123', name: 'John', extra: 'allowed' };
+      const data = { id: '123', name: 'John', extra: 'stripped' };
 
       const result = permissivePicked.validate(data);
 
       expect(Result.isOk(result)).toBe(true);
+
+      const resultValue = Result.unwrapThrow(result);
+
+      // In strip mode (inherited from parent), excess properties are removed
+      assert.deepStrictEqual(resultValue, {
+        id: '123',
+        name: 'John',
+      });
     });
 
-    test('permissivePicked validate returns input as-is for OK cases', () => {
+    test('permissivePicked validate strips excess properties', () => {
       const permissivePicked = pick(permissiveRecord, ['id', 'name']);
-      const input = { id: '123', name: 'John', extra: 'allowed' };
+      const input = { id: '123', name: 'John', extra: 'stripped' };
       const result = permissivePicked.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
 
       const resultValue4 = Result.unwrapThrow(result);
 
-      expect(resultValue4).toBe(input); // ✅ same reference
+      // In strip mode, excess properties are removed
+      assert.deepStrictEqual(resultValue4, {
+        id: '123',
+        name: 'John',
+      });
+
+      expect(resultValue4).not.toBe(input); // Different reference
     });
   });
 });

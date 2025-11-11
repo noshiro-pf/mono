@@ -6,11 +6,23 @@ import { optional } from './optional.mjs';
 import { record } from './record.mjs';
 
 describe(record, () => {
-  const ymd = record({
-    year: number(1900),
-    month: number(1),
-    date: number(1),
-  });
+  const ymd = record(
+    {
+      year: number(1900),
+      month: number(1),
+      date: number(1),
+    },
+    { excessPropertyValidation: 'strip' },
+  );
+
+  const ymdEased = record(
+    {
+      year: number(1900),
+      month: optional(number(1)),
+      date: optional(number(1)),
+    },
+    { excessPropertyValidation: 'allow' },
+  );
 
   expectType<
     typeof ymd,
@@ -21,7 +33,8 @@ describe(record, () => {
           month: Type<number>;
           date: Type<number>;
         }>;
-        allowExcessProperties: boolean;
+        excessPropertyValidation: 'strip';
+        excessPropertyFill: 'allow' | 'strip';
       }>
   >('=');
 
@@ -164,13 +177,36 @@ describe(record, () => {
       ]);
     });
 
-    test('validate returns input as-is for OK cases', () => {
+    test('validate returns the stripped content of input for OK cases if excessPropertyValidation is "strip"', () => {
+      const input = {
+        year: 2023,
+        month: 6,
+        date: 15,
+        extra: 'should be stripped',
+      };
+
+      const result = ymd.validate(input);
+
+      expect(Result.isOk(result)).toBe(true);
+
+      const resultValue1 = Result.unwrapThrow(result);
+
+      assert.deepStrictEqual(resultValue1, {
+        year: 2023,
+        month: 6,
+        date: 15,
+      });
+
+      expect(resultValue1).not.toBe(input); // ✅ different reference
+    });
+
+    test('validate returns input as-is for OK cases if excessPropertyValidation is "allow"', () => {
       const input = {
         year: 2023,
         month: 6,
         date: 15,
       };
-      const result = ymd.validate(input);
+      const result = ymdEased.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
 
@@ -233,11 +269,23 @@ describe(record, () => {
 });
 
 describe('partial record', () => {
-  const ymd = record({
-    year: number(1900),
-    month: optional(number(1)),
-    date: optional(number(1)),
-  });
+  const ymd = record(
+    {
+      year: number(1900),
+      month: optional(number(1)),
+      date: optional(number(1)),
+    },
+    { excessPropertyValidation: 'strip' },
+  );
+
+  const ymdEased = record(
+    {
+      year: number(1900),
+      month: optional(number(1)),
+      date: optional(number(1)),
+    },
+    { excessPropertyValidation: 'allow' },
+  );
 
   type Ymd = TypeOf<typeof ymd>;
 
@@ -351,12 +399,32 @@ describe('partial record', () => {
       ]);
     });
 
-    test('validate returns input as-is for OK cases', () => {
+    test('validate returns the stripped content of input for OK cases if excessPropertyValidation is "strip"', () => {
+      const input = {
+        year: 2024,
+        month: 8,
+        extra: 'should be stripped',
+      };
+      const result = ymd.validate(input);
+
+      expect(Result.isOk(result)).toBe(true);
+
+      const resultValue3 = Result.unwrapThrow(result);
+
+      assert.deepStrictEqual(resultValue3, {
+        year: 2024,
+        month: 8,
+      });
+
+      expect(resultValue3).not.toBe(input); // ✅ different reference
+    });
+
+    test('validate returns input as-is for OK cases if excessPropertyValidation is "allow"', () => {
       const input = {
         year: 2024,
         month: 8,
       };
-      const result = ymd.validate(input);
+      const result = ymdEased.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
 

@@ -1,5 +1,5 @@
 import { unknownToString } from 'ts-data-forge';
-import { assertPathExists } from 'ts-repo-utils';
+import { assertPathExists, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { embedSamples } from './embed-samples.mjs';
 
@@ -41,7 +41,12 @@ export const genDocs = async (): Promise<void> => {
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${result.value.message}`);
+    const error = result.value;
+
+    const message = Error.isError(error)
+      ? error.message
+      : unknownToString(error);
+    console.error(`${errorMsg}: ${message}`);
     console.error('❌ Documentation generation failed');
     process.exit(1);
   }

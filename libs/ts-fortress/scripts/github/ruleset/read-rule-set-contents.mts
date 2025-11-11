@@ -1,6 +1,6 @@
 import { type Dirent } from 'node:fs';
 import * as t from 'ts-fortress';
-import 'ts-repo-utils';
+import { Result } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
 import { RulesetPicked } from './constants.mjs';
 

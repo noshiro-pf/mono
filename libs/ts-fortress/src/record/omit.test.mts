@@ -19,7 +19,8 @@ describe(omit, () => {
     Type<Readonly<{ year: number; month: number }>> &
       Readonly<{
         shape: Readonly<{ year: Type<number>; month: Type<number> }>;
-        allowExcessProperties: boolean;
+        excessPropertyValidation: 'strip';
+        excessPropertyFill: 'allow' | 'strip';
       }>
   >('=');
 
@@ -93,7 +94,39 @@ describe(omit, () => {
 
       const resultValue1 = Result.unwrapThrow(result);
 
-      expect(resultValue1).toBe(input); // ✅ same reference
+      assert.deepStrictEqual(resultValue1, input); // Deep equality
+
+      // In strip mode (default), a new object is created even without excess properties
+      expect(resultValue1).not.toBe(input); // Different reference
+    });
+
+    test('validate returns input as-is for OK cases (allow mode)', () => {
+      const ymAllow = omit(
+        record(
+          {
+            year: number(1900),
+            month: number(1),
+            date: number(1),
+          },
+          { excessPropertyValidation: 'allow' },
+        ),
+        ['date'],
+      );
+
+      const input: UnknownRecord = {
+        year: 2000,
+        month: 12,
+      };
+      const result = ymAllow.validate(input);
+
+      expect(Result.isOk(result)).toBe(true);
+
+      const resultValue1 = Result.unwrapThrow(result);
+
+      assert.deepStrictEqual(resultValue1, input); // Deep equality
+
+      // In allow mode, the same reference is returned
+      expect(resultValue1).toBe(input); // Same reference
     });
 
     test('truthy case with additional keys', () => {
@@ -133,7 +166,13 @@ describe(omit, () => {
 
       const resultValue3 = Result.unwrapThrow(result);
 
-      expect(resultValue3).toBe(input); // ✅ same reference
+      // In strip mode, excess properties are removed, so we get a new object
+      assert.deepStrictEqual(resultValue3, {
+        year: 2000,
+        month: 12,
+      });
+
+      expect(resultValue3).not.toBe(input); // Different reference
     });
 
     test('falsy case', () => {

@@ -46,7 +46,8 @@ describe(required, () => {
             month: Type<number>;
             date: Type<number>;
           }>;
-          allowExcessProperties: boolean;
+          excessPropertyValidation: 'strip';
+          excessPropertyFill: 'allow' | 'strip';
         }>
     >('=');
 
@@ -144,7 +145,39 @@ describe(required, () => {
 
         const resultValue1 = Result.unwrapThrow(result);
 
-        expect(resultValue1).toBe(input); // ✅ same reference
+        assert.deepStrictEqual(resultValue1, input); // Deep equality
+
+        // In strip mode (default), a new object is created even without excess properties
+        expect(resultValue1).not.toBe(input); // Different reference
+      });
+
+      test('validate returns input as-is for OK cases (allow mode)', () => {
+        const ymdBaseAllow = record(
+          {
+            year: optional(number(1900)),
+            month: optional(number(1)),
+            date: optional(number(1)),
+          },
+          { excessPropertyValidation: 'allow' },
+        );
+
+        const ymdAllow = required(ymdBaseAllow);
+
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          date: 25,
+        };
+        const result = ymdAllow.validate(input);
+
+        expect(Result.isOk(result)).toBe(true);
+
+        const resultValue1 = Result.unwrapThrow(result);
+
+        assert.deepStrictEqual(resultValue1, input); // Deep equality
+
+        // In allow mode, the same reference is returned
+        expect(resultValue1).toBe(input); // Same reference
       });
 
       test('falsy case - missing required property', () => {
@@ -219,7 +252,13 @@ describe(required, () => {
 
         const resultValue3 = Result.unwrapThrow(result);
 
-        expect(resultValue3).toBe(input); // ✅ same reference
+        assert.deepStrictEqual(resultValue3, {
+          year: 2000,
+          month: 12,
+          date: 25,
+        });
+
+        expect(resultValue3).not.toBe(input); // Different reference
       });
 
       test('falsy case - wrong type', () => {
@@ -469,7 +508,40 @@ describe(required, () => {
 
         const resultValue5 = Result.unwrapThrow(result);
 
-        expect(resultValue5).toBe(input); // ✅ same reference
+        assert.deepStrictEqual(resultValue5, input); // Deep equality
+
+        // In strip mode (default), a new object is created even without excess properties
+        expect(resultValue5).not.toBe(input); // Different reference
+      });
+
+      test('partiallyRequiredType validate returns input as-is for OK cases (allow mode)', () => {
+        const ymdBaseAllow = record(
+          {
+            year: optional(number(1900)),
+            month: optional(number(1)),
+            date: optional(number(1)),
+          },
+          { excessPropertyValidation: 'allow' },
+        );
+
+        const ymdAllow = required(ymdBaseAllow, {
+          keysToBeRequired: ['year', 'month'],
+        });
+
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+        };
+        const result = ymdAllow.validate(input);
+
+        expect(Result.isOk(result)).toBe(true);
+
+        const resultValue5 = Result.unwrapThrow(result);
+
+        assert.deepStrictEqual(resultValue5, input); // Deep equality
+
+        // In allow mode, the same reference is returned
+        expect(resultValue5).toBe(input); // Same reference
       });
 
       test('truthy case - with optional field', () => {

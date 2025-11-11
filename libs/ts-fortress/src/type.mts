@@ -1,4 +1,4 @@
-import { expectType, type Result } from 'ts-data-forge';
+import { expectType } from 'ts-data-forge';
 import { type ValidationError } from './utils/index.mjs';
 
 /**
@@ -28,20 +28,40 @@ export type TypeOf<A extends Type<unknown>> = A['defaultValue'];
 
 /** @deprecated */
 export type OptionalType<A> = MergeIntersection<
-  Type<A> & Readonly<{ optional: true }>
+  Type<A> &
+    Readonly<{
+      optional: true;
+    }>
 >;
 
-export type RecordType<R extends ReadonlyRecord<string, Type<unknown>>> = Type<
-  TsFortressInternal.RecordTypeValue<R>
+export type ExcessPropertyBehavior = 'allow' | 'strip' | 'error';
+
+export type ExcessPropertyFillBehavior = Extract<
+  ExcessPropertyBehavior,
+  'allow' | 'strip'
+>;
+
+export type RecordType<
+  R extends ReadonlyRecord<string, Type<unknown>>,
+  ExcessPropertyValidation extends ExcessPropertyBehavior = 'strip',
+> = Type<
+  ExcessPropertyValidation extends 'allow'
+    ? TsFortressInternal.RecordTypeValue<R> | UnknownRecord
+    : TsFortressInternal.RecordTypeValue<R>
 > &
-  Readonly<{ shape: R; allowExcessProperties: boolean }>;
+  Readonly<{
+    shape: R;
+    excessPropertyValidation: ExcessPropertyValidation;
+    excessPropertyFill: ExcessPropertyFillBehavior;
+  }>;
 
 expectType<
   RecordType<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
   Type<Readonly<{ a: 0; b: 1; c: 2 }>> &
     Readonly<{
       shape: { a: Type<0>; b: Type<1>; c: Type<2> };
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: ExcessPropertyFillBehavior;
     }>
 >('=');
 

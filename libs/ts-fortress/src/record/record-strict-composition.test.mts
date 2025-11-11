@@ -16,7 +16,10 @@ describe('record strict composition tests', () => {
       age: number(),
       email: string(),
     },
-    { allowExcessProperties: false },
+    {
+      excessPropertyValidation: 'error',
+      excessPropertyFill: 'strip',
+    },
   );
 
   describe('pick with strict record', () => {
@@ -326,7 +329,10 @@ describe('record strict composition tests', () => {
         id: string(),
         name: string(),
       },
-      { allowExcessProperties: false },
+      {
+        excessPropertyValidation: 'error',
+        excessPropertyFill: 'strip',
+      },
     );
 
     const strictRecord2 = record(
@@ -334,7 +340,10 @@ describe('record strict composition tests', () => {
         age: number(),
         email: string(),
       },
-      { allowExcessProperties: false },
+      {
+        excessPropertyValidation: 'error',
+        excessPropertyFill: 'strip',
+      },
     );
 
     const mergedType = mergeRecords([strictRecord1, strictRecord2]);

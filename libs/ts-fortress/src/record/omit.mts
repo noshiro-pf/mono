@@ -1,5 +1,9 @@
 import { expectType, Obj } from 'ts-data-forge';
-import { type RecordType, type Type } from '../type.mjs';
+import {
+  type ExcessPropertyBehavior,
+  type RecordType,
+  type Type,
+} from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
@@ -7,28 +11,31 @@ import { record } from './record.mjs';
 export const omit = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
   const KeysToOmit extends readonly (keyof R & string)[],
+  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
-  recordType: RecordType<R>,
+  recordType: RecordType<R, ExcessValidation>,
   keysToOmit: KeysToOmit,
   options?: PartialReadonly<{
     typeName: string;
-
-    /** @default true */
-    allowExcessProperties: boolean;
+    excessPropertyValidation: ExcessValidation;
+    excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
   }>,
-): OmittedType<R, KeysToOmit> =>
+): OmittedType<R, KeysToOmit, ExcessValidation> =>
   record(Obj.omit(recordType.shape, keysToOmit), {
     typeName:
       options?.typeName ??
       `Omit<${recordType.typeName}, ${toUnionKeyString(keysToOmit)}>`,
-    allowExcessProperties:
-      options?.allowExcessProperties ?? recordType.allowExcessProperties,
+    excessPropertyValidation:
+      options?.excessPropertyValidation ?? recordType.excessPropertyValidation,
+    excessPropertyFill:
+      options?.excessPropertyFill ?? recordType.excessPropertyFill,
   });
 
 export type OmittedType<
   R extends ReadonlyRecord<string, Type<unknown>>,
   KeysToOmit extends readonly (keyof R)[],
-> = RecordType<Omit<R, ArrayElement<KeysToOmit>>>;
+  ExcessValidation extends ExcessPropertyBehavior = 'strip',
+> = RecordType<Omit<R, ArrayElement<KeysToOmit>>, ExcessValidation>;
 
 expectType<
   Omit<{ a: Type<0>; b: Type<1>; c: Type<2> }, 'a' | 'b'>,
@@ -42,7 +49,8 @@ expectType<
   Type<Readonly<{ c: 2 }>> &
     Readonly<{
       shape: { c: Type<2> };
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -51,7 +59,8 @@ expectType<
   Type<Readonly<{ c: 2 }>> &
     Readonly<{
       shape: { c: Type<2> };
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 

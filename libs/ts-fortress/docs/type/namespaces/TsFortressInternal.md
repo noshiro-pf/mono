@@ -12,7 +12,7 @@
 
 > **RecordTypeValue**\<`R`\> = [`RecordTypeValueImpl`](#recordtypevalueimpl)\<`R`\>
 
-Defined in: [src/type.mts:49](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L49)
+Defined in: [src/type.mts:69](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L69)
 
 #### Type Parameters
 
@@ -26,7 +26,7 @@ Defined in: [src/type.mts:49](https://github.com/noshiro-pf/ts-fortress/blob/mai
 
 > **RecordTypeValueImpl**\<`R`\> = `RecordTypeValueImplSub`\<`R`, `OptionalTypeKeys`\<`R`\>\>
 
-Defined in: [src/type.mts:52](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L52)
+Defined in: [src/type.mts:72](https://github.com/noshiro-pf/ts-fortress/blob/main/src/type.mts#L72)
 
 #### Type Parameters
 

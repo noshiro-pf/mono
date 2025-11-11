@@ -1,5 +1,9 @@
 import { expectType } from 'ts-data-forge';
-import { type RecordType, type Type } from '../type.mjs';
+import {
+  type ExcessPropertyBehavior,
+  type RecordType,
+  type Type,
+} from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { optional, type OptionalPropertyType } from './optional.mjs';
 import { record } from './record.mjs';
@@ -11,16 +15,16 @@ import { record } from './record.mjs';
 export const partial = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
   const KeysToBeOptional extends NonEmptyArray<keyof R & string>,
+  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
-  recordType: RecordType<R>,
+  recordType: RecordType<R, ExcessValidation>,
   options?: PartialReadonly<{
     keysToBeOptional: KeysToBeOptional;
     typeName: string;
-
-    /** @default true */
-    allowExcessProperties: boolean;
+    excessPropertyValidation: ExcessValidation;
+    excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
   }>,
-): PartialType<R, KeysToBeOptional> => {
+): PartialType<R, KeysToBeOptional, ExcessValidation> => {
   const typeNameFilled: string =
     options?.typeName ??
     (options?.keysToBeOptional === undefined
@@ -44,8 +48,10 @@ export const partial = <
 
   return record(partialShape, {
     typeName: typeNameFilled,
-    allowExcessProperties:
-      options?.allowExcessProperties ?? recordType.allowExcessProperties,
+    excessPropertyValidation:
+      options?.excessPropertyValidation ?? recordType.excessPropertyValidation,
+    excessPropertyFill:
+      options?.excessPropertyFill ?? recordType.excessPropertyFill,
   });
 };
 
@@ -71,7 +77,8 @@ type PartiallyOptionalType<
 export type PartialType<
   R extends ReadonlyRecord<string, Type<unknown>>,
   KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined,
-> = RecordType<PartialTypeShape<R, KeysToBeOptional>>;
+  ExcessValidation extends ExcessPropertyBehavior = 'strip',
+> = RecordType<PartialTypeShape<R, KeysToBeOptional>, ExcessValidation>;
 
 expectType<
   PartialTypeShape<{ a: Type<0>; b: Type<1>; c: Type<2> }, ['a']>,
@@ -103,7 +110,8 @@ expectType<
         b: Type<1>;
         c: Type<2>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -128,7 +136,8 @@ expectType<
         b: Type<1>;
         c: Type<2>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -147,7 +156,8 @@ expectType<
         b: Type<1>;
         c: Type<2>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -166,7 +176,8 @@ expectType<
         b: OptionalPropertyType<Type<1>>;
         c: Type<2>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 
@@ -185,7 +196,8 @@ expectType<
         b: OptionalPropertyType<Type<1>>;
         c: OptionalPropertyType<Type<2>>;
       }>;
-      allowExcessProperties: boolean;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
     }>
 >('=');
 

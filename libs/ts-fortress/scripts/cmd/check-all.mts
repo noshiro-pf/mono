@@ -1,4 +1,5 @@
-import 'ts-repo-utils';
+import { unknownToString } from 'ts-data-forge';
+import { Result } from 'ts-repo-utils';
 
 /**
  * Runs all validation and build steps for the project.
@@ -52,7 +53,12 @@ const checkAll = async (): Promise<void> => {
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${result.value.message}`);
+    const error = result.value;
+
+    const message = Error.isError(error)
+      ? error.message
+      : unknownToString(error);
+    console.error(`${errorMsg}: ${message}`);
     console.error('❌ Check failed');
     process.exit(1);
   }

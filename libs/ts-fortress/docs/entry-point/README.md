@@ -10,37 +10,13 @@
 
 - [Result](namespaces/Result.md)
 
-## Type Aliases
-
-### Result
-
-> **Result**\<`S`, `E`\> = `Ok_`\<`S`\> \| `Err_`\<`E`\>
-
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:40
-
-Represents a value that can either be a success (`Ok`) or an error (`Err`).
-
-#### Type Parameters
-
-##### S
-
-`S`
-
-The type of the success value.
-
-##### E
-
-`E`
-
-The type of the error value.
-
 ## Variables
 
 ### asFiniteNumber()
 
 > `const` **asFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:25
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:25
 
 Casts a number to a FiniteNumber branded type.
 
@@ -76,7 +52,7 @@ If the value is NaN, Infinity, or -Infinity
 
 > `const` **asInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:41
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:41
 
 Casts a number to an Int branded type.
 
@@ -121,7 +97,7 @@ If the value is not an integer
 
 > `const` **asInt16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:17
 
 Casts a number to an Int16 type.
 
@@ -153,7 +129,7 @@ If the value is not an integer in [-2^15, 2^15).
 
 > `const` **asInt32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:17
 
 Casts a number to an Int32 type.
 
@@ -185,7 +161,7 @@ If the value is not an integer in [-2^31, 2^31).
 
 > `const` **asInt8**: (`x`) => `Int8`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:21
 
 Casts a number to an Int8 branded type.
 
@@ -214,7 +190,7 @@ If the value is not a valid 8-bit signed integer
 
 > `const` **asNonNegativeFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:17
 
 Casts a number to a NonNegativeFiniteNumber type.
 
@@ -246,7 +222,7 @@ If the value is not a non-negative finite number.
 
 > `const` **asNonNegativeInt16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:16
 
 Casts a number to a NonNegativeInt16 type.
 
@@ -278,7 +254,7 @@ If the value is not a non-negative integer in [0, 2^15).
 
 > `const` **asNonNegativeInt32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:16
 
 Casts a number to a NonNegativeInt32 type.
 
@@ -310,7 +286,7 @@ If the value is not a non-negative integer in [0, 2^31).
 
 > `const` **asNonZeroFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:17
 
 Casts a number to a NonZeroFiniteNumber type.
 
@@ -342,7 +318,7 @@ If the value is not a non-zero finite number.
 
 > `const` **asNonZeroInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:16
 
 Casts a number to a NonZeroInt type.
 
@@ -374,7 +350,7 @@ If the value is not a non-zero integer.
 
 > `const` **asNonZeroInt16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:17
 
 Casts a number to a NonZeroInt16 type.
 
@@ -406,7 +382,7 @@ If the value is not a non-zero integer in [-2^15, 2^15).
 
 > `const` **asNonZeroInt32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:17
 
 Casts a number to a NonZeroInt32 type.
 
@@ -438,7 +414,7 @@ If the value is not a non-zero integer in [-2^31, 2^31).
 
 > `const` **asNonZeroSafeInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:17
 
 Casts a number to a NonZeroSafeInt type.
 
@@ -470,7 +446,7 @@ If the value is not a non-zero safe integer.
 
 > `const` **asNonZeroUint16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:16
 
 Casts a number to a NonZeroUint16 type.
 
@@ -502,7 +478,7 @@ If the value is not a non-zero integer in [1, 2^16).
 
 > `const` **asNonZeroUint32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:16
 
 Casts a number to a NonZeroUint32 type.
 
@@ -534,7 +510,7 @@ If the value is not a non-zero integer in [1, 2^32).
 
 > `const` **asPositiveFiniteNumber**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:17
 
 Casts a number to a PositiveFiniteNumber type.
 
@@ -566,7 +542,7 @@ If the value is not a positive finite number.
 
 > `const` **asPositiveInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:39
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:39
 
 Casts a number to a PositiveInt branded type.
 
@@ -611,7 +587,7 @@ If the value is not a positive integer
 
 > `const` **asPositiveInt16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:16
 
 Casts a number to a PositiveInt16 type.
 
@@ -643,7 +619,7 @@ If the value is not a positive integer in [1, 2^15).
 
 > `const` **asPositiveInt32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:16
 
 Casts a number to a PositiveInt32 type.
 
@@ -675,7 +651,7 @@ If the value is not a positive integer in [1, 2^31).
 
 > `const` **asPositiveSafeInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:34
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:34
 
 Casts a number to a PositiveSafeInt type.
 
@@ -716,7 +692,7 @@ If the value is not a positive safe integer.
 
 > `const` **asPositiveUint16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:16
 
 Casts a number to a PositiveUint16 type.
 
@@ -748,7 +724,7 @@ If the value is not a positive integer in [1, 2^16).
 
 > `const` **asPositiveUint32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:16
 
 Casts a number to a PositiveUint32 type.
 
@@ -780,7 +756,7 @@ If the value is not a positive integer in [1, 2^32).
 
 > `const` **asSafeInt**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:40
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:40
 
 Casts a number to a SafeInt branded type.
 
@@ -825,7 +801,7 @@ If the value is not a safe integer
 
 > `const` **asSafeUint**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:15
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:15
 
 Casts a number to a SafeUint type.
 
@@ -857,7 +833,7 @@ If the value is not a non-negative safe integer.
 
 > `const` **asUint**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:32
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:32
 
 Casts a number to a Uint type.
 
@@ -898,7 +874,7 @@ If the value is not a non-negative integer.
 
 > `const` **asUint16**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:17
 
 Casts a number to a Uint16 type.
 
@@ -931,7 +907,7 @@ If the value is not a non-negative integer less than
 
 > `const` **asUint32**: \<`N`\>(`x`) => `number` & `object` & `Readonly`\<\{ `TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3`: `unknown`; \}\> & `N`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:17
 
 Casts a number to a Uint32 type.
 
@@ -964,7 +940,7 @@ If the value is not a non-negative integer less than
 
 > `const` **asUint8**: (`x`) => `Uint8`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:17
 
 Casts a number to a Uint8 type. This function validates that the input is
 within the Uint8 range [0, 255] and is an integer, then returns it with the
@@ -992,7 +968,7 @@ If the value is not a valid 8-bit unsigned integer.
 
 > `const` **FiniteNumber**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:44
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:44
 
 Namespace providing type-safe operations for FiniteNumber branded types.
 
@@ -1300,7 +1276,7 @@ Subtracts two finite numbers.
 
 > `const` **Int**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:59
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:59
 
 Namespace providing type-safe operations for Int branded types.
 
@@ -1635,7 +1611,7 @@ assert(difference === 4);
 
 > `const` **Int16**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:41
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:41
 
 Namespace providing type-safe arithmetic operations for 16-bit signed
 integers.
@@ -1886,7 +1862,7 @@ Subtracts one Int16 from another.
 
 > `const` **Int32**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:37
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:37
 
 Namespace providing type-safe arithmetic operations for 32-bit signed
 integers.
@@ -2137,7 +2113,7 @@ Subtracts one Int32 from another.
 
 > `const` **Int8**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:38
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:38
 
 Namespace providing type-safe operations for Int8 (8-bit signed integer)
 branded types.
@@ -2436,7 +2412,7 @@ Second operand
 
 > `const` **isBigint**: (`u`) => `u is bigint`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/guard/is-type.d.mts:166
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/guard/is-type.d.mts:166
 
 Type guard that checks if a value is a bigint.
 
@@ -2476,7 +2452,7 @@ assert.deepStrictEqual(bigints, [1n, 3n]);
 
 > `const` **isFiniteNumber**: (`a`) => `a is FiniteNumber`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:13
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/finite-number.d.mts:13
 
 Type guard that checks if a value is a finite number.
 
@@ -2502,7 +2478,7 @@ these special values.
 
 > `const` **isInt**: (`a`) => `a is Int`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:20
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int.d.mts:20
 
 Type guard that checks if a value is an integer.
 
@@ -2536,7 +2512,7 @@ assert.ok(Int.is(-10));
 
 > `const` **isInt16**: (`a`) => `a is Int16`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:9
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int16.d.mts:9
 
 Checks if a number is an Int16 (16-bit signed integer in the range [-2^15,
 2^15)).
@@ -2559,7 +2535,7 @@ Checks if a number is an Int16 (16-bit signed integer in the range [-2^15,
 
 > `const` **isInt32**: (`a`) => `a is Int32`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:9
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/int32.d.mts:9
 
 Checks if a number is an Int32 (32-bit signed integer in the range [-2^31,
 2^31)).
@@ -2582,7 +2558,7 @@ Checks if a number is an Int32 (32-bit signed integer in the range [-2^31,
 
 > `const` **isInt8**: (`x`) => `x is Int8`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:10
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/int8.d.mts:10
 
 Type guard that checks if a value is an 8-bit signed integer.
 
@@ -2607,7 +2583,7 @@ that fit in exactly 8 bits of memory.
 
 > `const` **isNonNegativeFiniteNumber**: (`a`) => `a is NonNegativeFiniteNumber`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:9
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:9
 
 Checks if a number is a NonNegativeFiniteNumber (a finite number >= 0).
 
@@ -2629,7 +2605,7 @@ Checks if a number is a NonNegativeFiniteNumber (a finite number >= 0).
 
 > `const` **isNonNegativeInt16**: (`a`) => `a is NonNegativeInt16`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:8
 
 Checks if a number is a NonNegativeInt16 (16-bit non-negative signed integer
 in the range [0, 2^15)).
@@ -2652,7 +2628,7 @@ in the range [0, 2^15)).
 
 > `const` **isNonNegativeInt32**: (`a`) => `a is NonNegativeInt32`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:8
 
 Checks if a number is a NonNegativeInt32 (32-bit non-negative signed integer
 in the range [0, 2^31)).
@@ -2675,7 +2651,7 @@ in the range [0, 2^31)).
 
 > `const` **isNonZeroFiniteNumber**: (`a`) => `a is NonZeroFiniteNumber`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:9
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:9
 
 Checks if a number is a NonZeroFiniteNumber (a finite number that is not 0).
 
@@ -2697,7 +2673,7 @@ Checks if a number is a NonZeroFiniteNumber (a finite number that is not 0).
 
 > `const` **isNonZeroInt**: (`a`) => `a is NonZeroInt`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:8
 
 Checks if a number is a NonZeroInt.
 
@@ -2719,7 +2695,7 @@ Checks if a number is a NonZeroInt.
 
 > `const` **isNonZeroInt16**: (`a`) => `a is NonZeroInt16`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:9
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:9
 
 Checks if a number is a NonZeroInt16 (16-bit non-zero signed integer in the
 range [-2^15, 2^15) excluding 0).
@@ -2742,7 +2718,7 @@ range [-2^15, 2^15) excluding 0).
 
 > `const` **isNonZeroInt32**: (`a`) => `a is NonZeroInt32`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:9
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:9
 
 Checks if a number is a NonZeroInt32 (32-bit non-zero signed integer in the
 range [-2^31, 2^31) excluding 0).
@@ -2765,7 +2741,7 @@ range [-2^31, 2^31) excluding 0).
 
 > `const` **isNonZeroSafeInt**: (`a`) => `a is NonZeroSafeInt`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:9
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:9
 
 Checks if a number is a NonZeroSafeInt (a non-zero safe integer in the range
 [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] excluding 0).
@@ -2788,7 +2764,7 @@ Checks if a number is a NonZeroSafeInt (a non-zero safe integer in the range
 
 > `const` **isNonZeroUint16**: (`a`) => `a is PositiveUint16`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:8
 
 Checks if a number is a NonZeroUint16 (16-bit non-zero unsigned integer in
 the range [1, 2^16)).
@@ -2811,7 +2787,7 @@ the range [1, 2^16)).
 
 > `const` **isNonZeroUint32**: (`a`) => `a is PositiveUint32`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:8
 
 Checks if a number is a NonZeroUint32 (32-bit non-zero unsigned integer in
 the range [1, 2^32)).
@@ -2834,7 +2810,7 @@ the range [1, 2^32)).
 
 > `const` **isPositiveFiniteNumber**: (`a`) => `a is PositiveFiniteNumber`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:9
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:9
 
 Checks if a number is a PositiveFiniteNumber (a finite number > 0).
 
@@ -2856,7 +2832,7 @@ Checks if a number is a PositiveFiniteNumber (a finite number > 0).
 
 > `const` **isPositiveInt**: (`a`) => `a is PositiveInt`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:18
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:18
 
 Type guard that checks if a value is a positive integer.
 
@@ -2889,7 +2865,7 @@ assert.ok(PositiveInt.is(10));
 
 > `const` **isPositiveInt16**: (`a`) => `a is PositiveInt16`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:8
 
 Checks if a number is a PositiveInt16 (16-bit positive signed integer in the
 range [1, 2^15)).
@@ -2912,7 +2888,7 @@ range [1, 2^15)).
 
 > `const` **isPositiveInt32**: (`a`) => `a is PositiveInt32`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:8
 
 Checks if a number is a PositiveInt32 (32-bit positive signed integer in the
 range [1, 2^31)).
@@ -2935,7 +2911,7 @@ range [1, 2^31)).
 
 > `const` **isPositiveSafeInt**: (`a`) => `a is PositiveSafeInt`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:17
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:17
 
 Checks if a number is a PositiveSafeInt (a positive safe integer in the range
 [1, MAX_SAFE_INTEGER]).
@@ -2967,7 +2943,7 @@ assert.ok(PositiveSafeInt.is(42));
 
 > `const` **isPositiveUint16**: (`a`) => `a is PositiveUint16`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:8
 
 Checks if a number is a PositiveUint16 (16-bit positive unsigned integer in
 the range [1, 2^16)).
@@ -2990,7 +2966,7 @@ the range [1, 2^16)).
 
 > `const` **isPositiveUint32**: (`a`) => `a is PositiveUint32`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:8
 
 Checks if a number is a PositiveUint32 (32-bit positive unsigned integer in
 the range [1, 2^32)).
@@ -3013,7 +2989,7 @@ the range [1, 2^32)).
 
 > `const` **isSafeInt**: (`a`) => `a is SafeInt`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:19
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:19
 
 Type guard that checks if a value is a safe integer.
 
@@ -3046,7 +3022,7 @@ assert.ok(SafeInt.is(Number.MIN_SAFE_INTEGER));
 
 > `const` **isSafeUint**: (`a`) => `a is SafeUint`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:7
 
 Checks if a number is a SafeUint.
 
@@ -3068,7 +3044,7 @@ Checks if a number is a SafeUint.
 
 > `const` **isUint**: (`a`) => `a is NonNegativeInt`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:15
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:15
 
 Checks if a number is a Uint.
 
@@ -3098,7 +3074,7 @@ assert.ok(Uint.is(0));
 
 > `const` **isUint16**: (`a`) => `a is Uint16`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:8
 
 Checks if a number is a Uint16 (16-bit unsigned integer in the range [0,
 2^16)).
@@ -3121,7 +3097,7 @@ Checks if a number is a Uint16 (16-bit unsigned integer in the range [0,
 
 > `const` **isUint32**: (`a`) => `a is Uint32`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:8
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:8
 
 Checks if a number is a Uint32 (32-bit unsigned integer in the range [0,
 2^32)).
@@ -3144,7 +3120,7 @@ Checks if a number is a Uint32 (32-bit unsigned integer in the range [0,
 
 > `const` **isUint8**: (`x`) => `x is Uint8`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:7
 
 Checks if a number is a Uint8 (8-bit unsigned integer in the range [0, 255]).
 
@@ -3166,7 +3142,7 @@ Checks if a number is a Uint8 (8-bit unsigned integer in the range [0, 255]).
 
 > `const` **NonNegativeFiniteNumber**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:37
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-finite-number.d.mts:37
 
 Namespace providing type-safe arithmetic operations for non-negative finite
 numbers.
@@ -3457,7 +3433,7 @@ Subtracts one NonNegativeFiniteNumber from another.
 
 > `const` **NonNegativeInt16**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:42
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int16.d.mts:42
 
 Namespace providing type-safe arithmetic operations for 16-bit non-negative
 integers.
@@ -3692,7 +3668,7 @@ Subtracts one NonNegativeInt16 from another.
 
 > `const` **NonNegativeInt32**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:40
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-negative-int32.d.mts:40
 
 Namespace providing type-safe arithmetic operations for 32-bit non-negative
 integers.
@@ -3928,7 +3904,7 @@ Subtracts one NonNegativeInt32 from another.
 
 > `const` **NonZeroFiniteNumber**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:32
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-finite-number.d.mts:32
 
 Namespace providing type-safe arithmetic operations for non-zero finite
 numbers.
@@ -4210,7 +4186,7 @@ Subtracts one NonZeroFiniteNumber from another.
 
 > `const` **NonZeroInt**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:31
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int.d.mts:31
 
 Namespace providing type-safe arithmetic operations for non-zero integers.
 
@@ -4430,7 +4406,7 @@ Subtracts one non-zero integer from another.
 
 > `const` **NonZeroInt16**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:43
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int16.d.mts:43
 
 Namespace providing type-safe arithmetic operations for 16-bit non-zero
 signed integers.
@@ -4684,7 +4660,7 @@ Subtracts one NonZeroInt16 from another.
 
 > `const` **NonZeroInt32**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:39
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-int32.d.mts:39
 
 Namespace providing type-safe arithmetic operations for 32-bit non-zero
 signed integers.
@@ -4939,7 +4915,7 @@ Subtracts one NonZeroInt32 from another.
 
 > `const` **NonZeroSafeInt**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:35
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-safe-int.d.mts:35
 
 Namespace providing type-safe arithmetic operations for non-zero safe
 integers.
@@ -5198,7 +5174,7 @@ Subtracts one NonZeroSafeInt from another.
 
 > `const` **NonZeroUint16**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:42
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint16.d.mts:42
 
 Namespace providing type-safe arithmetic operations for 16-bit non-zero
 unsigned integers.
@@ -5433,7 +5409,7 @@ Subtracts one NonZeroUint16 from another.
 
 > `const` **NonZeroUint32**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:40
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/non-zero-uint32.d.mts:40
 
 Namespace providing type-safe arithmetic operations for 32-bit non-zero
 unsigned integers.
@@ -5668,7 +5644,7 @@ Subtracts one NonZeroUint32 from another.
 
 > `const` **PositiveFiniteNumber**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:38
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-finite-number.d.mts:38
 
 Namespace providing type-safe arithmetic operations for positive finite
 numbers.
@@ -5958,7 +5934,7 @@ Subtracts one PositiveFiniteNumber from another.
 
 > `const` **PositiveInt**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:68
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int.d.mts:68
 
 Namespace providing type-safe operations for PositiveInt branded types.
 
@@ -6320,7 +6296,7 @@ assert(difference === 1);
 
 > `const` **PositiveInt16**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:43
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int16.d.mts:43
 
 Namespace providing type-safe arithmetic operations for 16-bit positive
 integers.
@@ -6555,7 +6531,7 @@ Subtracts one PositiveInt16 from another.
 
 > `const` **PositiveInt32**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:41
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-int32.d.mts:41
 
 Namespace providing type-safe arithmetic operations for 32-bit positive
 integers.
@@ -6790,7 +6766,7 @@ Subtracts one PositiveInt32 from another.
 
 > `const` **PositiveSafeInt**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:57
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-safe-int.d.mts:57
 
 Namespace providing type-safe arithmetic operations for positive safe
 integers.
@@ -7145,7 +7121,7 @@ assert.ok(PositiveSafeInt.is(difference));
 
 > `const` **PositiveUint16**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:42
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint16.d.mts:42
 
 Namespace providing type-safe arithmetic operations for 16-bit positive
 unsigned integers.
@@ -7380,7 +7356,7 @@ Subtracts one PositiveUint16 from another.
 
 > `const` **PositiveUint32**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:40
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/positive-uint32.d.mts:40
 
 Namespace providing type-safe arithmetic operations for 32-bit positive
 unsigned integers.
@@ -7616,7 +7592,7 @@ Subtracts one PositiveUint32 from another.
 
 > `const` **SafeInt**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:64
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-int.d.mts:64
 
 Namespace providing type-safe operations for SafeInt branded types.
 
@@ -8001,7 +7977,7 @@ assert.ok(SafeInt.is(difference));
 
 > `const` **SafeUint**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:37
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/safe-uint.d.mts:37
 
 Namespace providing type-safe arithmetic operations for safe unsigned
 integers.
@@ -8237,7 +8213,7 @@ Subtracts one SafeUint from another.
 
 > `const` **Uint**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:51
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint.d.mts:51
 
 Namespace providing type-safe arithmetic operations for unsigned integers.
 
@@ -8554,7 +8530,7 @@ assert(difference === 0);
 
 > `const` **Uint16**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:42
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint16.d.mts:42
 
 Namespace providing type-safe arithmetic operations for 16-bit unsigned
 integers.
@@ -8789,7 +8765,7 @@ Subtracts one Uint16 from another.
 
 > `const` **Uint32**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:37
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/branded-types/uint32.d.mts:37
 
 Utility functions for working with Uint32 (32-bit unsigned integer) branded
 types. Provides type-safe operations that ensure results remain within the
@@ -9026,7 +9002,7 @@ Subtracts two Uint32 values, with result clamped to [0, 2^32).
 
 > `const` **Uint8**: `object`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:27
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/number/enum/uint8.d.mts:27
 
 Namespace providing type-safe arithmetic operations for 8-bit unsigned
 integers.
@@ -9378,6 +9354,18 @@ Re-exports [email](../predefined/brand/string/email.md#email)
 ### enumType
 
 Re-exports [enumType](../enum/enum.md#enumtype)
+
+***
+
+### ExcessPropertyBehavior
+
+Re-exports [ExcessPropertyBehavior](../type/README.md#excesspropertybehavior)
+
+***
+
+### ExcessPropertyFillBehavior
+
+Re-exports [ExcessPropertyFillBehavior](../type/README.md#excesspropertyfillbehavior)
 
 ***
 

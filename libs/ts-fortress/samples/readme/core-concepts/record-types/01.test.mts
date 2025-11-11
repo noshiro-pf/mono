@@ -34,7 +34,8 @@ const StrictUserType = t.record(
     name: t.string(),
   },
   {
-    allowExcessProperties: false, // Reject any properties not defined in schema
+    excessPropertyValidation: 'error', // Reject any properties not defined in schema
+    excessPropertyFill: 'strip',
   },
 );
 
@@ -51,7 +52,8 @@ const PermissiveUserType = t.record(
     name: t.string(),
   },
   {
-    allowExcessProperties: true, // Allow additional properties (default behavior)
+    excessPropertyValidation: 'allow', // Allow additional properties (default behavior)
+    excessPropertyFill: 'allow',
   },
 );
 

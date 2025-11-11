@@ -46,7 +46,8 @@ describe(partial, () => {
             month: OptionalPropertyType<Type<number>>;
             date: OptionalPropertyType<Type<number>>;
           }>;
-          allowExcessProperties: boolean;
+          excessPropertyValidation: 'strip';
+          excessPropertyFill: 'allow' | 'strip';
         }>
     >('=');
 
@@ -128,7 +129,39 @@ describe(partial, () => {
 
         const resultValue1 = Result.unwrapThrow(result);
 
-        expect(resultValue1).toBe(input); // ✅ same reference
+        assert.deepStrictEqual(resultValue1, input); // Deep equality
+
+        // In strip mode (default), a new object is created even without excess properties
+        expect(resultValue1).not.toBe(input); // Different reference
+      });
+
+      test('validate returns input as-is for OK cases (allow mode)', () => {
+        const ymdBaseAllow = record(
+          {
+            year: number(1900),
+            month: optional(number(1)),
+            date: optional(number(1)),
+          },
+          { excessPropertyValidation: 'allow' },
+        );
+
+        const ymdAllow = partial(ymdBaseAllow);
+
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          date: 25,
+        };
+        const result = ymdAllow.validate(input);
+
+        expect(Result.isOk(result)).toBe(true);
+
+        const resultValue1 = Result.unwrapThrow(result);
+
+        assert.deepStrictEqual(resultValue1, input); // Deep equality
+
+        // In allow mode, the same reference is returned
+        expect(resultValue1).toBe(input); // Same reference
       });
 
       test('truthy case optional keys', () => {
@@ -153,7 +186,35 @@ describe(partial, () => {
 
         const resultValue3 = Result.unwrapThrow(result);
 
-        expect(resultValue3).toBe(input); // ✅ same reference
+        assert.deepStrictEqual(resultValue3, input); // Deep equality
+
+        // In strip mode (default), a new object is created even without excess properties
+        expect(resultValue3).not.toBe(input); // Different reference
+      });
+
+      test('validate returns input as-is for empty object (allow mode)', () => {
+        const ymdBaseAllow = record(
+          {
+            year: number(1900),
+            month: optional(number(1)),
+            date: optional(number(1)),
+          },
+          { excessPropertyValidation: 'allow' },
+        );
+
+        const ymdAllow = partial(ymdBaseAllow);
+
+        const input: UnknownRecord = {};
+        const result = ymdAllow.validate(input);
+
+        expect(Result.isOk(result)).toBe(true);
+
+        const resultValue3 = Result.unwrapThrow(result);
+
+        assert.deepStrictEqual(resultValue3, input); // Deep equality
+
+        // In allow mode, the same reference is returned
+        expect(resultValue3).toBe(input); // Same reference
       });
 
       test('truthy case with additional keys', () => {
@@ -196,7 +257,13 @@ describe(partial, () => {
 
         const resultValue5 = Result.unwrapThrow(result);
 
-        expect(resultValue5).toBe(input); // ✅ same reference
+        assert.deepStrictEqual(resultValue5, {
+          year: 2000,
+          month: 12,
+          date: 25,
+        });
+
+        expect(resultValue5).not.toBe(input); // Different reference
       });
 
       test('falsy case 1', () => {
@@ -411,7 +478,40 @@ describe(partial, () => {
 
         const resultValue7 = Result.unwrapThrow(result);
 
-        expect(resultValue7).toBe(input); // ✅ same reference
+        assert.deepStrictEqual(resultValue7, input); // Deep equality
+
+        // In strip mode (default), a new object is created even without excess properties
+        expect(resultValue7).not.toBe(input); // Different reference
+      });
+
+      test('partiallyPartialType validate returns input as-is for OK cases (allow mode)', () => {
+        const ymdBaseAllow = record(
+          {
+            year: number(1900),
+            month: number(1),
+            date: number(1),
+          },
+          { excessPropertyValidation: 'allow' },
+        );
+
+        const ymdAllow = partial(ymdBaseAllow, {
+          keysToBeOptional: ['month', 'date'],
+        });
+
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+        };
+        const result = ymdAllow.validate(input);
+
+        expect(Result.isOk(result)).toBe(true);
+
+        const resultValue7 = Result.unwrapThrow(result);
+
+        assert.deepStrictEqual(resultValue7, input); // Deep equality
+
+        // In allow mode, the same reference is returned
+        expect(resultValue7).toBe(input); // Same reference
       });
 
       test('falsy case', () => {
