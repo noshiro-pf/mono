@@ -14,17 +14,11 @@ export default defineConfig({
     passWithNoTests: true,
     restoreMocks: true,
     hideSkippedTests: true,
-    alias: {
-      'typescript-template': path.resolve(
-        projectRootPath,
-        './src/entry-point.mts',
-      ),
-    },
     coverage: {
       provider: 'v8',
       reporter: ['html', 'lcov', 'text'],
       include: ['src/**'],
-      exclude: ['**/index.mts', 'src/entry-point.mts'],
+      exclude: ['**/index.mts'],
     },
   },
 });

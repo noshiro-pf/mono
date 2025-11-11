@@ -41,10 +41,7 @@ export default {
     '@semantic-release/changelog',
 
     // 4. Run prettier and build before committing.
-    [
-      '@semantic-release/exec',
-      { prepareCmd: 'pnpm run fmt && pnpm run build' },
-    ],
+    ['@semantic-release/exec', { prepareCmd: 'pnpm run fmt' }],
 
     // 4-a. Update the version field in package.json with the next version number.
     // 4-b. Publish the package to npmjs.
@@ -55,7 +52,12 @@ export default {
     [
       '@semantic-release/git',
       {
-        assets: ['CHANGELOG.md', 'package.json', 'pnpm-lock.yaml'],
+        assets: [
+          'CHANGELOG.md',
+          'package.json',
+          'pnpm-lock.yaml',
+          'src/**/*.mts',
+        ],
         message:
           // eslint-disable-next-line no-template-curly-in-string
           'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',

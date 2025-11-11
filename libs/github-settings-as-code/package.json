@@ -44,7 +44,7 @@
     "gh:backup-rulesets": "tsx --env-file=.env src/github/ruleset/backup.mts",
     "gi": "run-s gi:scripts gi:src fmt",
     "gi:scripts": "gen-index-ts ./src/github --index-ext .mts --export-ext .mjs --target-ext .mts --exclude cmd --exclude apply.mts --exclude octokit.mts",
-    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude apply.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",

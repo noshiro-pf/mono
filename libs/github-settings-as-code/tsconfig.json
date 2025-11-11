@@ -3,11 +3,6 @@
     "./configs/tsconfig/tsconfig.type-check.json",
     "./configs/tsconfig/tsconfig.vite.json"
   ],
-  "compilerOptions": {
-    "paths": {
-      "typescript-template": ["./src/entry-point.mts"]
-    }
-  },
   "include": [
     "./src",
     "./test",

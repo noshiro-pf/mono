@@ -31,6 +31,11 @@ const checkAll = async (): Promise<void> => {
   await runCmdStep('pnpm run lint:fix', 'Linting failed');
   echo('✓ Lint fixes applied\n');
 
+  // Step 6: Generate index
+  echo('6. Running genIndex...');
+  await runCmdStep('pnpm run gi', 'genIndex failed');
+  echo('✓ genIndex completed\n');
+
   // Step 7: Generate docs
   echo('7. Formatting files...');
   await runCmdStep('pnpm run fmt', 'Formatting files failed');
