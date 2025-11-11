@@ -1,3 +1,9 @@
+## [7.8.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.8.0...v7.8.1) (2025-11-11)
+
+### Bug Fixes
+
+- fix defaultIgnoreFn of formatters ([#198](https://github.com/noshiro-pf/ts-repo-utils/issues/198)) ([abf797b](https://github.com/noshiro-pf/ts-repo-utils/commit/abf797b0d646156b23227c1dfe82e5cd7a5a7927))
+
 # [7.8.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.7.3...v7.8.0) (2025-11-02)
 
 ### Features
