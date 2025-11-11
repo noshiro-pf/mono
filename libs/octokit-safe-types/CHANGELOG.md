@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.1.2...v1.2.0) (2025-11-11)
+
+### Features
+
+- use record instead of strictRecord ([#55](https://github.com/noshiro-pf/octokit-safe-types/issues/55)) ([a45a001](https://github.com/noshiro-pf/octokit-safe-types/commit/a45a0010532e1bf5cb2449ed2a8c7ac3398f320d))
+
 ## [1.1.2](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.1.1...v1.1.2) (2025-11-02)
 
 ### Bug Fixes
