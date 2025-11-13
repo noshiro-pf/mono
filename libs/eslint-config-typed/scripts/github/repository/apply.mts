@@ -1,5 +1,5 @@
 import { type UpdateRepositoryRequest } from 'octokit-safe-types';
-import { Obj } from 'ts-data-forge';
+import { Obj, Result } from 'ts-data-forge';
 import { validationErrorsToMessages } from 'ts-fortress';
 import 'ts-repo-utils';
 import {

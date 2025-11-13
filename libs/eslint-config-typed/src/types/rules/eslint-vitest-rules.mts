@@ -519,12 +519,18 @@ namespace NoHooks {
    *     "properties": {
    *       "allow": {
    *         "type": "array",
-   *         "contains": [
-   *           "beforeAll",
-   *           "beforeEach",
-   *           "afterAll",
-   *           "afterEach"
-   *         ]
+   *         "items": {
+   *           "type": "string",
+   *           "enum": [
+   *             "beforeAll",
+   *             "beforeEach",
+   *             "afterAll",
+   *             "afterEach"
+   *           ]
+   *         },
+   *         "additionalItems": false,
+   *         "uniqueItems": true,
+   *         "description": "This array option controls which Vitest hooks are checked by this rule."
    *       }
    *     },
    *     "additionalProperties": false
@@ -533,7 +539,13 @@ namespace NoHooks {
    * ```
    */
   export type Options = {
-    readonly allow?: readonly unknown[];
+    /** This array option controls which Vitest hooks are checked by this rule. */
+    readonly allow?: readonly (
+      | 'afterAll'
+      | 'afterEach'
+      | 'beforeAll'
+      | 'beforeEach'
+    )[];
   };
 
   export type RuleEntry =
@@ -1598,6 +1610,24 @@ namespace PreferViMocked {
 }
 
 /**
+ * Ensure that every `expect.poll` call is awaited
+ *
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-awaited-expect-poll.md
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | false   |
+ *  | requiresTypeChecking | false   |
+ *  ```
+ */
+namespace RequireAwaitedExpectPoll {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Require setup and teardown to be within a hook
  *
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-hook.md
@@ -2042,6 +2072,7 @@ export type EslintVitestRules = {
   readonly 'vitest/prefer-to-have-length': PreferToHaveLength.RuleEntry;
   readonly 'vitest/prefer-todo': PreferTodo.RuleEntry;
   readonly 'vitest/prefer-vi-mocked': PreferViMocked.RuleEntry;
+  readonly 'vitest/require-awaited-expect-poll': RequireAwaitedExpectPoll.RuleEntry;
   readonly 'vitest/require-hook': RequireHook.RuleEntry;
   readonly 'vitest/require-local-test-context-for-concurrent-snapshots': RequireLocalTestContextForConcurrentSnapshots.RuleEntry;
   readonly 'vitest/require-mock-type-parameters': RequireMockTypeParameters.RuleEntry;

@@ -105,6 +105,7 @@ export const eslintVitestRules = {
   // ],
   'vitest/valid-expect-in-promise': 'error',
   'vitest/warn-todo': 'error',
+  'vitest/require-awaited-expect-poll': 'error',
 
   // deprecated
   'vitest/no-done-callback': 0,
