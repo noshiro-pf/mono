@@ -12,7 +12,7 @@
 
 > **NarrowToErr**\<`R`\> = `R` *extends* `Err`\<`unknown`\> ? `R` : `never`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/types.d.mts:28
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/types.d.mts:28
 
 Narrows a `UnknownResult` type to `Result.Err<E>` if it is an `Err`. If the
 `Result` is `Result.Ok<S>`, resolves to `never`.
@@ -31,7 +31,7 @@ The `UnknownResult` type to narrow.
 
 > **NarrowToOk**\<`R`\> = `R` *extends* `Ok`\<`unknown`\> ? `R` : `never`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/types.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/types.d.mts:21
 
 Narrows a `UnknownResult` type to `Result.Ok<S>` if it is an `Ok`. If the
 `Result` is `Result.Err<E>`, resolves to `never`.
@@ -50,7 +50,7 @@ The `UnknownResult` type to narrow.
 
 > **UnwrapErr**\<`R`\> = `R` *extends* `Err`\<infer E\> ? `E` : `never`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/types.d.mts:14
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/types.d.mts:14
 
 Extracts the error value type `E` from a `Result.Err<E>`. If the `Result`
 is `Result.Ok<S>`, resolves to `never`.
@@ -69,7 +69,7 @@ The `UnknownResult` type to unwrap.
 
 > **UnwrapOk**\<`R`\> = `R` *extends* `Ok`\<infer S\> ? `S` : `never`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/types.d.mts:7
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/types.d.mts:7
 
 Extracts the success value type `S` from a `Result.Ok<S>`. If the `Result`
 is `Result.Err<E>`, resolves to `never`.
@@ -88,7 +88,7 @@ The `UnknownResult` type to unwrap.
 
 > `const` **err**: \<`E`\>(`value`) => `Err`\<`E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-err.d.mts:24
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-err.d.mts:24
 
 Creates a `Result.Err` containing the given error value.
 
@@ -136,7 +136,7 @@ assert.ok(Result.isErr(failure));
 
 > `const` **fromPromise**: \<`P`\>(`promise`) => `Promise`\<`Result`\<`UnwrapPromise`\<`P`\>, `unknown`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-from-promise.d.mts:30
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-from-promise.d.mts:30
 
 Converts a Promise into a Promise that resolves to a `Result`. If the input
 Promise resolves, the `Result` will be `Ok` with the resolved value. If the
@@ -184,7 +184,7 @@ assert.ok(Result.isErr(rejected));
 
 > `const` **fromThrowable**: \<`T`\>(`fn`) => `Result`\<`T`, `Error`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-from-throwable.d.mts:28
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-from-throwable.d.mts:28
 
 Wraps a function that may throw an exception in a `Result`.
 
@@ -236,7 +236,7 @@ assert.ok(Result.isErr(failure));
 
 > `const` **isErr**: \<`R`\>(`result`) => `result is NarrowToErr<R>`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-is-err.d.mts:19
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-is-err.d.mts:19
 
 Type guard for the error variant.
 
@@ -276,7 +276,7 @@ assert.ok(Result.isErr(failure));
 
 > `const` **isOk**: \<`R`\>(`result`) => `result is NarrowToOk<R>`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-is-ok.d.mts:19
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-is-ok.d.mts:19
 
 Type guard for the ok variant.
 
@@ -316,7 +316,7 @@ assert.ok(Result.isErr(failure));
 
 > `const` **isResult**: (`maybeResult`) => `maybeResult is UnknownResult`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-is-result.d.mts:16
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-is-result.d.mts:16
 
 Checks whether the provided value is a Result\<S, E\>.
 
@@ -348,7 +348,7 @@ assert.notOk(Result.isResult(notResult));
 
 > `const` **ok**: \<`S`\>(`value`) => `Ok`\<`S`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-ok.d.mts:24
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-ok.d.mts:24
 
 Creates a `Result.Ok` containing the given success value.
 
@@ -396,7 +396,7 @@ assert.ok(Result.isErr(failure));
 
 > `const` **swap**: \<`R`\>(`result`) => `Result`\<[`UnwrapErr`](#unwraperr)\<`R`\>, [`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-swap.d.mts:19
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-swap.d.mts:19
 
 Swaps the success and error values of a `Result`.
 
@@ -438,7 +438,7 @@ assert.deepStrictEqual(Result.swap(errValue), Result.ok('error'));
 
 > `const` **toOptional**: \<`R`\>(`result`) => `Optional`\<[`UnwrapOk`](#unwrapok)\<`R`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-to-optional.d.mts:27
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-to-optional.d.mts:27
 
 Converts a `Result` to an `Optional`.
 
@@ -488,7 +488,7 @@ assert.deepStrictEqual(Result.toOptional(errValue), Optional.none);
 
 > `const` **unwrapErr**: \<`R`\>(`result`) => [`UnwrapErr`](#unwraperr)\<`R`\> \| `undefined`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-err.d.mts:30
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-err.d.mts:30
 
 Unwraps a `Result`, returning the error value or `undefined` if it is
 `Result.Ok`.
@@ -541,7 +541,7 @@ assert(Result.unwrapErr(errResult) === 'problem');
 
 > `const` **unwrapErrThrow**: \<`R`\>(`result`, `toStr?`) => [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-err-throw.d.mts:29
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-err-throw.d.mts:29
 
 Unwraps a `Result`, returning the error value. Throws an error if the
 `Result` is `Result.Ok`.
@@ -601,7 +601,7 @@ Error with message "Expected Err but got Ok: {value}" if
 
 > `const` **unwrapThrow**: \<`R`\>(`result`, `toStr?`) => [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-throw.d.mts:29
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-throw.d.mts:29
 
 Unwraps a `Result`, returning the success value. Throws an error if the
 `Result` is `Result.Err`.
@@ -661,7 +661,7 @@ Error with the stringified error value if the `Result` is
 
 > `const` **zip**: \<`S1`, `E1`, `S2`, `E2`\>(`resultA`, `resultB`) => `Result`\<readonly \[`S1`, `S2`\], `E1` \| `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-zip.d.mts:28
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-zip.d.mts:28
 
 Combines two `Result` values into a single `Result` containing a tuple. If
 either `Result` is `Err`, returns the first `Err` encountered.
@@ -735,7 +735,7 @@ assert.deepStrictEqual(
 
 > **expectToBe**\<`R`\>(`result`, `message`): [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-expect-to-be.d.mts:25
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-expect-to-be.d.mts:25
 
 Unwraps a `Result`, returning the success value or throwing an error with
 the provided message.
@@ -789,7 +789,7 @@ Error with the provided message if the `Result` is `Result.Err`.
 
 > **expectToBe**\<`S`\>(`message`): \<`E`\>(`result`) => `S`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-expect-to-be.d.mts:26
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-expect-to-be.d.mts:26
 
 Unwraps a `Result`, returning the success value or throwing an error with
 the provided message.
@@ -855,7 +855,7 @@ Error with the provided message if the `Result` is `Result.Err`.
 
 > **flatMap**\<`R`, `S2`, `E2`\>(`result`, `flatMapFn`): `Result`\<`S2`, `E2` \| [`UnwrapErr`](#unwraperr)\<`R`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-flat-map.d.mts:37
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-flat-map.d.mts:37
 
 Applies a function that returns a `Result` to the success value of a
 `Result`. If the input is `Err`, returns the original `Err`. This is the
@@ -928,7 +928,7 @@ assert.deepStrictEqual(parseThenDouble(Result.ok('10')), Result.ok(20));
 
 > **flatMap**\<`S`, `S2`, `E2`\>(`flatMapFn`): \<`E`\>(`result`) => `Result`\<`S2`, `E2` \| `E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-flat-map.d.mts:38
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-flat-map.d.mts:38
 
 Applies a function that returns a `Result` to the success value of a
 `Result`. If the input is `Err`, returns the original `Err`. This is the
@@ -1013,7 +1013,7 @@ assert.deepStrictEqual(parseThenDouble(Result.ok('10')), Result.ok(20));
 
 > **fold**\<`R`, `S2`, `E2`\>(`result`, `mapFn`, `mapErrFn`): `Result`\<`S2`, `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-fold.d.mts:43
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-fold.d.mts:43
 
 Applies one of two functions depending on whether the `Result` is `Ok` or
 `Err`.
@@ -1097,7 +1097,7 @@ assert.deepStrictEqual(foldNumbers(Result.err('oops')), Result.err(4));
 
 > **fold**\<`S`, `E`, `S2`, `E2`\>(`mapFn`, `mapErrFn`): (`result`) => `Result`\<`S2`, `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-fold.d.mts:44
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-fold.d.mts:44
 
 Applies one of two functions depending on whether the `Result` is `Ok` or
 `Err`.
@@ -1191,7 +1191,7 @@ assert.deepStrictEqual(foldNumbers(Result.err('oops')), Result.err(4));
 
 > **map**\<`R`, `S2`\>(`result`, `mapFn`): `Result`\<`S2`, [`UnwrapErr`](#unwraperr)\<`R`\>\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-map.d.mts:32
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-map.d.mts:32
 
 Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the
 success value. If the `Result` is `Result.Err`, returns the original
@@ -1254,7 +1254,7 @@ assert.deepStrictEqual(mapToLength(Result.err('bad')), Result.err('bad'));
 
 > **map**\<`S`, `S2`\>(`mapFn`): \<`E`\>(`result`) => `Result`\<`S2`, `E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-map.d.mts:33
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-map.d.mts:33
 
 Maps a `Result<S, E>` to `Result<S2, E>` by applying a function to the
 success value. If the `Result` is `Result.Err`, returns the original
@@ -1329,7 +1329,7 @@ assert.deepStrictEqual(mapToLength(Result.err('bad')), Result.err('bad'));
 
 > **mapErr**\<`R`, `E2`\>(`result`, `mapFn`): `Result`\<[`UnwrapOk`](#unwrapok)\<`R`\>, `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-map-err.d.mts:31
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-map-err.d.mts:31
 
 Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the
 error value. If the `Result` is `Result.Ok`, returns the original `Ok`.
@@ -1391,7 +1391,7 @@ assert.deepStrictEqual(wrapped, Result.err('boom'));
 
 > **mapErr**\<`E`, `E2`\>(`mapFn`): \<`S`\>(`result`) => `Result`\<`S`, `E2`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-map-err.d.mts:32
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-map-err.d.mts:32
 
 Maps a `Result<S, E>` to `Result<S, E2>` by applying a function to the
 error value. If the `Result` is `Result.Ok`, returns the original `Ok`.
@@ -1465,7 +1465,7 @@ assert.deepStrictEqual(wrapped, Result.err('boom'));
 
 > **orElse**\<`R`, `R2`\>(`result`, `alternative`): `R2` \| [`NarrowToOk`](#narrowtook)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-or-else.d.mts:30
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-or-else.d.mts:30
 
 Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
@@ -1525,7 +1525,7 @@ assert.deepStrictEqual(orElseFallback(Result.ok('value')), Result.ok('value'));
 
 > **orElse**\<`S`, `E`, `S2`, `E2`\>(`alternative`): (`result`) => `Result`\<`S2`, `E2`\> \| `Result`\<`S`, `E`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-or-else.d.mts:31
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-or-else.d.mts:31
 
 Returns the `Result` if it is `Ok`, otherwise returns the alternative.
 
@@ -1599,7 +1599,7 @@ assert.deepStrictEqual(orElseFallback(Result.ok('value')), Result.ok('value'));
 
 > **unwrapErrOr**\<`R`, `D`\>(`result`, `defaultValue`): `D` \| [`UnwrapErr`](#unwraperr)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-err-or.d.mts:27
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-err-or.d.mts:27
 
 Unwraps a `Result`, returning the error value or a default value if it is
 `Result.Ok`.
@@ -1657,7 +1657,7 @@ assert(unwrapError(Result.ok('no error')) === 'fallback error');
 
 > **unwrapErrOr**\<`D`\>(`defaultValue`): \<`S`, `E`\>(`result`) => `D` \| `E`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-err-or.d.mts:28
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-err-or.d.mts:28
 
 Unwraps a `Result`, returning the error value or a default value if it is
 `Result.Ok`.
@@ -1727,7 +1727,7 @@ assert(unwrapError(Result.ok('no error')) === 'fallback error');
 
 > **unwrapOk**\<`R`\>(`result`): [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-ok.d.mts:21
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-ok.d.mts:21
 
 Safely unwraps the success value, returning `undefined` for failures.
 
@@ -1767,7 +1767,7 @@ assert(Result.unwrapOk(errResult) === undefined);
 
 > **unwrapOk**\<`R`\>(`result`): [`UnwrapOk`](#unwrapok)\<`R`\> \| `undefined`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-ok.d.mts:22
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-ok.d.mts:22
 
 Safely unwraps the success value, returning `undefined` for failures.
 
@@ -1811,7 +1811,7 @@ assert(Result.unwrapOk(errResult) === undefined);
 
 > **unwrapOkOr**\<`R`, `D`\>(`result`, `defaultValue`): `D` \| [`UnwrapOk`](#unwrapok)\<`R`\>
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-ok-or.d.mts:27
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-ok-or.d.mts:27
 
 Unwraps a `Result`, returning the success value or a default value if it is
 `Result.Err`.
@@ -1869,7 +1869,7 @@ assert(unwrapWithDefault(Result.err('no data')) === 5);
 
 > **unwrapOkOr**\<`S`, `D`\>(`defaultValue`): \<`E`\>(`result`) => `S` \| `D`
 
-Defined in: node\_modules/.pnpm/ts-data-forge@5.0.0\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-ok-or.d.mts:28
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result/impl/result-unwrap-ok-or.d.mts:28
 
 Unwraps a `Result`, returning the success value or a default value if it is
 `Result.Err`.

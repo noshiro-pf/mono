@@ -1,3 +1,4 @@
+import { isError } from '@sindresorhus/is';
 import { unknownToString } from 'ts-data-forge';
 import { assertPathExists, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
@@ -43,9 +44,7 @@ const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   if (Result.isErr(result)) {
     const error = result.value;
 
-    const message = Error.isError(error)
-      ? error.message
-      : unknownToString(error);
+    const message = isError(error) ? error.message : unknownToString(error);
     console.error(`${errorMsg}: ${message}`);
     console.error('❌ Documentation generation failed');
     process.exit(1);

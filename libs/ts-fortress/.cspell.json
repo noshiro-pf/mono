@@ -4,7 +4,7 @@
   "allowCompoundWords": true,
   "caseSensitive": false,
   "ignoreRandomStrings": true,
-  "words": ["brandable", "noshiro", "testw", "tscw", "valueof"],
+  "words": ["brandable", "noshiro", "sindresorhus", "testw", "tscw", "valueof"],
   "flagWords": [],
   "ignorePaths": [
     "eslint.config.js",
