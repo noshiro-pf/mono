@@ -1,3 +1,9 @@
+## [7.8.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.8.1...v7.8.2) (2025-11-14)
+
+### Bug Fixes
+
+- avoid using Error.isError ([#199](https://github.com/noshiro-pf/ts-repo-utils/issues/199)) ([509552f](https://github.com/noshiro-pf/ts-repo-utils/commit/509552fa0a37cca2f94aceff2b6b3fb8e3a6a78a))
+
 ## [7.8.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.8.0...v7.8.1) (2025-11-11)
 
 ### Bug Fixes
