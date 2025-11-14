@@ -1,3 +1,9 @@
+## [6.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v6.0.0...v6.0.1) (2025-11-14)
+
+### Bug Fixes
+
+- avoid using Error.isError ([#139](https://github.com/noshiro-pf/ts-fortress/issues/139)) ([54ba522](https://github.com/noshiro-pf/ts-fortress/commit/54ba5228f73f0b33c78a2a09adcf7a3e0fe12695))
+
 # [6.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v5.3.0...v6.0.0) (2025-11-11)
 
 ### Features
