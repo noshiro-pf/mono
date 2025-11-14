@@ -1,6 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import dedent from 'dedent';
 import { noPartialArrayReduce } from './no-partial-array-reduce.mjs';
 
 const ruleTester = new RuleTester({
@@ -18,28 +19,28 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // non-empty array literal, reduce
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         ["a"].reduce(() => "a");
       `,
     },
     // non-empty array literal, reduceRight
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         ["a"].reduceRight(() => "a");
       `,
     },
     // empty array literal, initial value provided
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         [].reduce(() => "b", "a");
       `,
     },
     // non-empty tuple
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr = ["a"] as const;
         arr.reduce(() => "b");
       `,
@@ -47,7 +48,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // non-empty tuple with rest
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: [string, ...string[]] = ["a"];
         arr.reduce(() => "b");
       `,
@@ -55,7 +56,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // initial value provided
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr = ["string"];
         arr.reduce(() => "b", "a");
       `,
@@ -63,7 +64,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // initial value provided, readonly array
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: readonly string[] = ["string"];
         arr.reduce(() => "b", "a");
       `,
@@ -71,7 +72,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // non-array type
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         type Foo = {
           reduce: (func: () => void) => void;
         };
@@ -82,14 +83,14 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // method other than reduce
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         [].filter(() => true);
       `,
     },
     // union of array types, initial value provided
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: readonly string[] | readonly number[] = ["string"];
         arr.reduce(() => "b", "a");
       `,
@@ -97,21 +98,21 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // literal with first element undefined (doesn't throw)
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         [undefined].reduce(() => "a");
       `,
     },
     // computed form, literal
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         ["a"]["reduce"](() => "a");
       `,
     },
     // computed form, value
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const n = "reduce";
         ["a"][n](() => "a");
       `,
@@ -119,7 +120,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // computed form, union
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         let n: "reduce" | "reduceRight" = "reduce";
         if (Date.now > 0) {
           n = "reduceRight";
@@ -130,7 +131,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // other function named reduce
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const reduce = () => "a";
         reduce();
       `,
@@ -140,7 +141,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // array of unknown length, reduce
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: readonly string[] = ["string"];
         arr.reduce(() => "b");
       `,
@@ -154,7 +155,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // array of unknown length, reduceRight
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: readonly string[] = ["string"];
         arr.reduceRight(() => "b");
       `,
@@ -168,7 +169,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // empty literal
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         [].reduce(() => "b");
       `,
       errors: [
@@ -181,7 +182,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // empty tuple
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr = [] as const;
         arr.reduce(() => "b");
       `,
@@ -195,7 +196,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // union of array types, initial value not provided
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: readonly string[] | readonly number[] = ["string"];
         arr.reduce(() => "b");
       `,
@@ -209,7 +210,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // literal with spread
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         [...[]].reduce(() => "a");
       `,
       errors: [
@@ -222,7 +223,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // computed form, literal
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: string[] = [];
         arr["reduce"](() => "a");
       `,
@@ -236,7 +237,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // computed form, value
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: string[] = [];
         const n = "reduce";
         arr[n](() => "a");
@@ -251,7 +252,7 @@ ruleTester.run('no-partial-array-reduce', noPartialArrayReduce, {
     // computed form, union
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const arr: string[] = [];
         let n: "reduce" | "reduceRight" = "reduce";
         if (Date.now > 0) {

@@ -1,6 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import dedent from 'dedent';
 import { noUnsafeTypeAssertion } from './no-unsafe-type-assertion.mjs';
 
 const ruleTester = new RuleTester({
@@ -83,7 +84,7 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
     // widening object to object | undefined
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         type Foo = object;
         const foo: Foo = {};
         const bar = foo as Foo | undefined;
@@ -92,7 +93,7 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
     // recursive type (linting must terminate)
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         type Foo = { readonly a: Foo } | undefined;
         type Bar = { readonly a: Bar } | undefined;
         const foo: Foo = { a: undefined };
@@ -109,7 +110,7 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
     // asserting unknown to anything
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo: unknown = "";
         const bar = foo as string;
       `,
@@ -123,7 +124,7 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
     // asserting any to anything
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo: any = "";
         const bar = foo as string;
       `,
@@ -203,7 +204,7 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
     // as incompatible type (union)
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         type Foo = { readonly foo: string };
         type Bar = { readonly foo: string | undefined };
         const bar: Bar = { foo: undefined };
@@ -219,7 +220,7 @@ ruleTester.run('no-unsafe-type-assertion', noUnsafeTypeAssertion, {
     // as incompatible type (nested)
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         type Foo = { readonly foo: { readonly a: string } };
         type Bar = { readonly foo: { readonly a: string | undefined } };
         const bar: Bar = { foo: { a: undefined } };

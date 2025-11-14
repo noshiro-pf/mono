@@ -1,4 +1,5 @@
 export * from './all-extensions.mjs';
+export * from './custom-rules.mjs';
 export * from './eslint-array-func-rules.mjs';
 export * from './eslint-cypress-rules.mjs';
 export * from './eslint-functional-rules.mjs';

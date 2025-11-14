@@ -1,6 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import dedent from 'dedent';
 import { noPartialDivision } from './no-partial-division.mjs';
 
 const ruleTester = new RuleTester({
@@ -17,25 +18,25 @@ ruleTester.run('no-partial-division', noPartialDivision, {
   valid: [
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         1 / 1;
       `,
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         1n / 1n;
       `,
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         1 + 1;
       `,
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo = 1;
         const bar = 1 as const;
         const result = foo / bar;
@@ -43,7 +44,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo = 1;
         const bar = 1;
         const result = foo / bar;
@@ -51,7 +52,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo: bigint = 1n;
         const bar = 1n as const;
         const result = foo / bar;
@@ -59,7 +60,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo = 1n;
         const bar = 1n;
         const result = foo / bar;
@@ -67,21 +68,21 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         declare const foo: 42 | 43;
         const bar = 1 / foo;
       `,
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         declare const foo: 43 & { __tag: string };
         const bar = 1 / foo;
       `,
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         declare const foo: 43n & { __tag: string };
         const bar = 1n / foo;
       `,
@@ -90,7 +91,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
   invalid: [
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const result = 1 / 0;
       `,
       errors: [
@@ -102,7 +103,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const result = 1 / 0.0;
       `,
       errors: [
@@ -114,7 +115,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const result = 1 / -0;
       `,
       errors: [
@@ -126,7 +127,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const result = 1n / 0n;
       `,
       errors: [
@@ -138,7 +139,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const result = 1n / -0n;
       `,
       errors: [
@@ -150,7 +151,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo: bigint = 1n;
         const bar: bigint = 0n;
         const result = foo / bar;
@@ -164,7 +165,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo: bigint = 1n;
         const bar: bigint = 1n;
         const result = foo / bar;
@@ -178,7 +179,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const foo = 1n;
         const bar = 0n;
         const result = foo / bar;
@@ -192,7 +193,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         declare const foo: 42 | 0;
         const bar = 1 / foo;
       `,
@@ -205,7 +206,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         declare const foo: 42 | number;
         const bar = 1 / foo;
       `,
@@ -218,7 +219,7 @@ ruleTester.run('no-partial-division', noPartialDivision, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         declare const foo: number & { __tag: string };
         const bar = 1 / foo;
       `,

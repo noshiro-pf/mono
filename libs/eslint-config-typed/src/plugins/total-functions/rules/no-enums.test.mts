@@ -1,6 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import dedent from 'dedent';
 import { noEnums } from './no-enums.mjs';
 
 const ruleTester = new RuleTester({
@@ -18,7 +19,7 @@ ruleTester.run<'errorStringGeneric', readonly []>('no-enums', noEnums, {
   invalid: [
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         enum ZeroOrOne {
           Zero = 0,
           One = 1,
@@ -33,7 +34,7 @@ ruleTester.run<'errorStringGeneric', readonly []>('no-enums', noEnums, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         enum ZeroOrOne {
           Zero,
           One,
@@ -48,7 +49,7 @@ ruleTester.run<'errorStringGeneric', readonly []>('no-enums', noEnums, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         enum AOrB {
           A = "A",
           B = "B",

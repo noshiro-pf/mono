@@ -1,6 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { AST_NODE_TYPES } from '@typescript-eslint/utils';
+import dedent from 'dedent';
 import { noPartialUrlConstructor } from './no-partial-url-constructor.mjs';
 
 const ruleTester = new RuleTester({
@@ -17,20 +18,20 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
   valid: [
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         // tsc will catch this so this rule doesn't need to
         new URL()
       `,
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         new URL("http://example.com");
       `,
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         new URL("/hello", "http://example.com");
       `,
     },
@@ -43,7 +44,7 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     // },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         new Set()
       `,
     },
@@ -51,7 +52,7 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
   invalid: [
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const str: string = "foo";
         new URL(str);
       `,
@@ -64,7 +65,7 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         new URL("foo")
       `,
       errors: [
@@ -76,7 +77,7 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         new URL("foo", "bar")
       `,
       errors: [
@@ -88,7 +89,7 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         new URL("http://example.com", "bar")
       `,
       errors: [
@@ -137,7 +138,7 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     // },
     {
       filename: 'file.ts',
-      code: `
+      code: dedent`
         const ATurdByAnyOtherName = URL;
         const foo = new ATurdByAnyOtherName("");
       `,

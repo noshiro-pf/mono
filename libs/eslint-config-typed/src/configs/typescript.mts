@@ -1,5 +1,6 @@
 import {
   eslintArrayFuncRules,
+  eslintCustomRules,
   eslintFunctionalRules,
   eslintImportsRules,
   eslintPluginSortDestructureKeysRules,
@@ -50,6 +51,7 @@ export const eslintConfigForTypeScript = ({
         ...typescriptEslintRules,
         ...eslintTreeShakableRules,
         ...eslintPluginSortDestructureKeysRules,
+        ...eslintCustomRules,
 
         'strict-dependencies/strict-dependencies': ['error', []],
 
