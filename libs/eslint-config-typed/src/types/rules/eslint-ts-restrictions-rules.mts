@@ -8,6 +8,59 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
+ * Ensure all properties are destructured from an object when explicitly
+ * requested
+ *
+ * ```md
+ * | key        | value      |
+ * | :--------- | :--------- |
+ * | type       | suggestion |
+ * | deprecated | false      |
+ * ```
+ */
+namespace CheckDestructuringCompleteness {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "alwaysCheckReactComponentProps": {
+   *         "type": "boolean",
+   *         "description": "Always check React component props destructuring without directive keyword"
+   *       },
+   *       "directiveKeyword": {
+   *         "type": "string",
+   *         "description": "Custom directive keyword to enable checking (default: \"@check-destructuring-completeness\")"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /**
+     * Always check React component props destructuring without directive
+     * keyword
+     */
+    readonly alwaysCheckReactComponentProps?: boolean;
+    /**
+     * Custom directive keyword to enable checking (default:
+     * "@check-destructuring-completeness")
+     */
+    readonly directiveKeyword?: string;
+  };
+
+  export type RuleEntry =
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
+}
+
+/**
  * Disallow type assertions with specified type names
  *
  * ```md
@@ -164,11 +217,13 @@ namespace NoRestrictedSyntax {
 }
 
 export type EslintTsRestrictionsRules = {
+  readonly 'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   readonly 'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
   readonly 'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
 };
 
 export type EslintTsRestrictionsRulesOption = {
+  readonly 'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.Options;
   readonly 'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
   readonly 'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.Options;
 };
