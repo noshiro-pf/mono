@@ -1,3 +1,9 @@
+# [3.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.6.0...v3.7.0) (2025-11-14)
+
+### Features
+
+- create eslint-plugin-ts-restrictions ([#132](https://github.com/noshiro-pf/eslint-config-typed/issues/132)) ([62715c8](https://github.com/noshiro-pf/eslint-config-typed/commit/62715c8fc27c58e1a66997c45982c3630f947361))
+
 # [3.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.5.2...v3.6.0) (2025-11-14)
 
 ### Features
