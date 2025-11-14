@@ -1,3 +1,9 @@
+## [5.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v5.0.0...v5.0.1) (2025-11-14)
+
+### Bug Fixes
+
+- avoid using Error.isError ([#202](https://github.com/noshiro-pf/ts-data-forge/issues/202)) ([023e222](https://github.com/noshiro-pf/ts-data-forge/commit/023e2222f42fda7d2e3f398e24ef172bd07bc8ef))
+
 # [5.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v4.1.0...v5.0.0) (2025-11-10)
 
 ### Features
