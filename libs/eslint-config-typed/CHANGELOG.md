@@ -1,3 +1,9 @@
+# [3.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.5.2...v3.6.0) (2025-11-14)
+
+### Features
+
+- enable @stylistic/padding-line-between-statements rule ([#130](https://github.com/noshiro-pf/eslint-config-typed/issues/130)) ([0ca76ed](https://github.com/noshiro-pf/eslint-config-typed/commit/0ca76eda8c2e166a1aa88612554d9769638f725d))
+
 ## [3.5.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.5.1...v3.5.2) (2025-11-13)
 
 ### Bug Fixes
