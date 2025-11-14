@@ -1,4 +1,5 @@
 /* eslint-disable require-atomic-updates */
+import { isError } from '@sindresorhus/is';
 import { spawn } from 'node:child_process';
 import {
   createPromise,
@@ -160,9 +161,7 @@ export const executeStages = async (
         );
       } catch (error) {
         // executeParallel will throw immediately on any failure (fail-fast)
-        const errorMessage = Error.isError(error)
-          ? error.message
-          : String(error);
+        const errorMessage = isError(error) ? error.message : String(error);
         console.error(`\n❌ Stage ${i + 1} failed (fail-fast):`);
         console.error(errorMessage);
         throw new Error(`Stage ${i + 1} failed: ${errorMessage}`, {
@@ -240,14 +239,14 @@ const executeScript = (
   ).map((result) =>
     result.then(
       Result.mapErr((err) => {
-        const errorMessage: string = Error.isError(err)
+        const errorMessage: string = isError(err)
           ? err.message
           : isRecord(err) && hasKey(err, 'message')
             ? (err.message?.toString() ?? 'Unknown error message')
             : 'Unknown error';
 
         console.error(`\nError in ${pkg.name}:`, errorMessage);
-        return Error.isError(err) ? err : new Error(errorMessage);
+        return isError(err) ? err : new Error(errorMessage);
       }),
     ),
   ).value;

@@ -82,7 +82,7 @@ describe('diff', () => {
     };
   };
 
-  describe('getUntrackedFiles', () => {
+  describe(getUntrackedFiles, () => {
     test('should return empty array when no files are changed', async () => {
       const { repoPath, cleanup } = await createTempRepo();
       const repoFunctions = createRepoFunctions(repoPath);
@@ -91,6 +91,7 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           expect(Array.isArray(result.value)).toBe(true);
         }
@@ -113,8 +114,10 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
+
           expect(files).toContain(testFileName);
         }
       } finally {
@@ -142,8 +145,10 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
+
           expect(files).not.toContain(testFileName);
         }
       } finally {
@@ -176,8 +181,10 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
+
           expect(files).toContain(newFile);
           expect(files).not.toContain(modifyFile);
         }
@@ -194,11 +201,13 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
           // Verify no deleted files are included (status 'D')
           for (const file of files) {
-            expect(typeof file).toBe('string');
+            expectTypeOf(file).toBeString();
+
             expect(file.length).toBeGreaterThan(0);
           }
         }
@@ -229,12 +238,14 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
 
           // Each file should be a non-empty string
           for (const file of files) {
-            expect(typeof file).toBe('string');
+            expectTypeOf(file).toBeString();
+
             expect(file.trim()).toBe(file); // No leading/trailing whitespace
             expect(file.length).toBeGreaterThan(0);
           }
@@ -252,6 +263,7 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           expect(Array.isArray(result.value)).toBe(true);
         }
@@ -261,14 +273,16 @@ describe('diff', () => {
     });
   });
 
-  describe('getStagedFiles', () => {
+  describe(getStagedFiles, () => {
     test('should return empty array when no files are staged', async () => {
       const { repoPath, cleanup } = await createTempRepo();
       const repoFunctions = createRepoFunctions(repoPath);
 
       try {
         const result = await repoFunctions.getStagedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           expect(Array.isArray(result.value)).toBe(true);
         }
@@ -290,9 +304,12 @@ describe('diff', () => {
         await execInRepo(`git add ${testFileName}`, { silent: true });
 
         const result = await repoFunctions.getStagedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
+
           expect(files).toContain(testFileName);
         }
       } finally {
@@ -318,9 +335,12 @@ describe('diff', () => {
         await execInRepo(`git add ${file1} ${file2}`, { silent: true });
 
         const result = await repoFunctions.getStagedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
+
           expect(files).toContain(file1);
           expect(files).toContain(file2);
         }
@@ -355,9 +375,12 @@ describe('diff', () => {
         const resultExclude = await repoFunctions.getStagedFiles({
           silent: true,
         });
+
         expect(Result.isOk(resultExclude)).toBe(true);
+
         if (Result.isOk(resultExclude)) {
           const files = resultExclude.value;
+
           expect(files).not.toContain(testFileName);
         }
 
@@ -375,9 +398,12 @@ describe('diff', () => {
             excludeDeleted: false,
             silent: true,
           });
+
           expect(Result.isOk(resultInclude)).toBe(true);
+
           if (Result.isOk(resultInclude)) {
             const files = resultInclude.value;
+
             expect(files).toContain(testFileName);
           }
         } else {
@@ -397,12 +423,15 @@ describe('diff', () => {
 
       try {
         const result = await repoFunctions.getStagedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
           // Each file should be a non-empty string
           for (const file of files) {
-            expect(typeof file).toBe('string');
+            expectTypeOf(file).toBeString();
+
             expect(file.trim()).toBe(file); // No leading/trailing whitespace
           }
         }
@@ -417,7 +446,9 @@ describe('diff', () => {
 
       try {
         const result = await repoFunctions.getStagedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           expect(Array.isArray(result.value)).toBe(true);
         }
@@ -432,6 +463,7 @@ describe('diff', () => {
 
       try {
         const result = await repoFunctions.getStagedFiles({ silent: true });
+
         // Should always return a Result, either Ok or Err
         expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
       } finally {
@@ -440,14 +472,16 @@ describe('diff', () => {
     });
   });
 
-  describe('getModifiedFiles', () => {
+  describe(getModifiedFiles, () => {
     test('should return empty array when no files are modified', async () => {
       const { repoPath, cleanup } = await createTempRepo();
       const repoFunctions = createRepoFunctions(repoPath);
 
       try {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           expect(Array.isArray(result.value)).toBe(true);
         }
@@ -476,9 +510,12 @@ describe('diff', () => {
         await fs.writeFile(testFilePath, 'modified content');
 
         const result = await repoFunctions.getModifiedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
+
           expect(files).toContain(testFileName);
         }
       } finally {
@@ -511,9 +548,12 @@ describe('diff', () => {
         await fs.writeFile(filePath2, 'modified content 2');
 
         const result = await repoFunctions.getModifiedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
+
           expect(files).toContain(file1);
           expect(files).toContain(file2);
         }
@@ -545,9 +585,12 @@ describe('diff', () => {
         const resultExclude = await repoFunctions.getModifiedFiles({
           silent: true,
         });
+
         expect(Result.isOk(resultExclude)).toBe(true);
+
         if (Result.isOk(resultExclude)) {
           const files = resultExclude.value;
+
           expect(files).not.toContain(testFileName);
         }
 
@@ -556,9 +599,12 @@ describe('diff', () => {
           excludeDeleted: false,
           silent: true,
         });
+
         expect(Result.isOk(resultInclude)).toBe(true);
+
         if (Result.isOk(resultInclude)) {
           const files = resultInclude.value;
+
           expect(files).toContain(testFileName);
         }
       } finally {
@@ -572,12 +618,15 @@ describe('diff', () => {
 
       try {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           const files = result.value;
           // Each file should be a non-empty string
           for (const file of files) {
-            expect(typeof file).toBe('string');
+            expectTypeOf(file).toBeString();
+
             expect(file.trim()).toBe(file); // No leading/trailing whitespace
           }
         }
@@ -592,7 +641,9 @@ describe('diff', () => {
 
       try {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
+
         expect(Result.isOk(result)).toBe(true);
+
         if (Result.isOk(result)) {
           expect(Array.isArray(result.value)).toBe(true);
         }
@@ -607,6 +658,7 @@ describe('diff', () => {
 
       try {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
+
         // Should always return a Result, either Ok or Err
         expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
       } finally {
@@ -615,7 +667,7 @@ describe('diff', () => {
     });
   });
 
-  describe('getDiffFrom', () => {
+  describe(getDiffFrom, () => {
     test('should work with silent option', async () => {
       const { repoPath, cleanup, execInRepo } = await createTempRepo();
       const repoFunctions = createRepoFunctions(repoPath);

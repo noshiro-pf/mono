@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 
+import { isError } from '@sindresorhus/is';
 import { executeParallel } from './execute-parallel.mjs';
 import { getWorkspacePackages } from './get-workspace-packages.mjs';
 
@@ -43,7 +44,7 @@ export const runCmdInParallelAcrossWorkspaces = async ({
     await executeParallel(filteredPackages, cmd, concurrency);
     console.log(`\n✅ ${cmd} completed successfully (all packages)`);
   } catch (error) {
-    const errorMessage = Error.isError(error)
+    const errorMessage = isError(error)
       ? error.message
       : (error?.toString() ?? '');
     console.error(`\n❌ ${cmd} failed (fail-fast mode stopped execution):`);

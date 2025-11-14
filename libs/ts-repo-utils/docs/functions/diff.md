@@ -10,7 +10,7 @@
 
 ### getDiffFrom()
 
-> **getDiffFrom**(`base`, `options?`): `Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **getDiffFrom**(`base`, `options?`): `Promise`\<[`Result`](../node-global.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 Defined in: [src/functions/diff.mts:72](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L72)
 
@@ -29,13 +29,13 @@ diff --name-only <base> [--diff-filter=d]`
 
 #### Returns
 
-`Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+`Promise`\<[`Result`](../node-global.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 ***
 
 ### getModifiedFiles()
 
-> **getModifiedFiles**(`options?`): `Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **getModifiedFiles**(`options?`): `Promise`\<[`Result`](../node-global.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 Defined in: [src/functions/diff.mts:30](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L30)
 
@@ -50,13 +50,13 @@ not staged). Runs `git diff --name-only [--diff-filter=d]`
 
 #### Returns
 
-`Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+`Promise`\<[`Result`](../node-global.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 ***
 
 ### getStagedFiles()
 
-> **getStagedFiles**(`options?`): `Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **getStagedFiles**(`options?`): `Promise`\<[`Result`](../node-global.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 Defined in: [src/functions/diff.mts:51](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L51)
 
@@ -71,13 +71,13 @@ diff --staged --name-only [--diff-filter=d]`
 
 #### Returns
 
-`Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+`Promise`\<[`Result`](../node-global.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 ***
 
 ### getUntrackedFiles()
 
-> **getUntrackedFiles**(`options?`): `Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+> **getUntrackedFiles**(`options?`): `Promise`\<[`Result`](../node-global.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
 Defined in: [src/functions/diff.mts:9](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/diff.mts#L9)
 
@@ -92,4 +92,4 @@ ls-files --others --exclude-standard [--deleted]`
 
 #### Returns
 
-`Promise`\<[`Result`](../entry-point/README.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
+`Promise`\<[`Result`](../node-global.md#result)\<readonly `string`[], `ExecException` \| `Readonly`\<\{ `message`: `string`; \}\>\>\>

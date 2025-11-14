@@ -12,7 +12,7 @@
 
 > **executeParallel**(`packages`, `scriptName`, `concurrency`): `Promise`\<readonly `Readonly`\<\{ `code?`: `number`; `skipped?`: `boolean`; \}\>[]\>
 
-Defined in: [src/functions/workspace-utils/execute-parallel.mts:28](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L28)
+Defined in: [src/functions/workspace-utils/execute-parallel.mts:29](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L29)
 
 Executes a npm script across multiple packages in parallel with a concurrency
 limit. Uses fail-fast behavior - stops execution immediately when any package
@@ -52,7 +52,7 @@ A promise that resolves to an array of execution results, or rejects
 
 > **executeStages**(`packages`, `scriptName`, `concurrency`): `Promise`\<`void`\>
 
-Defined in: [src/functions/workspace-utils/execute-parallel.mts:109](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L109)
+Defined in: [src/functions/workspace-utils/execute-parallel.mts:110](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L110)
 
 Executes a npm script across packages in dependency order stages. Packages
 are grouped into stages where each stage contains packages whose dependencies

@@ -18,7 +18,7 @@ Defined in: [src/functions/exec-async.mts:20](https://github.com/noshiro-pf/ts-r
 
 ### ExecResult
 
-> **ExecResult**\<`T`\> = [`Result`](../entry-point/README.md#result)\<`Readonly`\<\{ `stderr`: `T`; `stdout`: `T`; \}\>, `childProcess.ExecException`\>
+> **ExecResult**\<`T`\> = [`Result`](../node-global.md#result)\<`Readonly`\<\{ `stderr`: `T`; `stdout`: `T`; \}\>, `childProcess.ExecException`\>
 
 Defined in: [src/functions/exec-async.mts:22](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/exec-async.mts#L22)
 

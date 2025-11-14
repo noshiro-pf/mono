@@ -10,9 +10,11 @@
 
 ### Result
 
-> **Result**\<`S`, `E`\> = [`Result`](entry-point/README.md#result)\<`S`, `E`\>
+> **Result**\<`S`, `E`\> = `Ok`\<`S`\> \| `Err`\<`E`\>
 
-Defined in: [src/node-global.mts:37](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L37)
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/globals.d.mts:123
+
+Represents a value that can either be a success (`Ok`) or an error (`Err`).
 
 #### Type Parameters
 
@@ -20,9 +22,13 @@ Defined in: [src/node-global.mts:37](https://github.com/noshiro-pf/ts-repo-utils
 
 `S`
 
+The type of the success value.
+
 ##### E
 
 `E`
+
+The type of the error value.
 
 ## Variables
 
@@ -38,7 +44,7 @@ Defined in: [src/node-global.mts:36](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **cd**: *typeof* `chdir_`
 
-Defined in: [src/node-global.mts:40](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L40)
+Defined in: [src/node-global.mts:39](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L39)
 
 ***
 
@@ -46,7 +52,7 @@ Defined in: [src/node-global.mts:40](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **echo**: *typeof* `console.log`
 
-Defined in: [src/node-global.mts:39](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L39)
+Defined in: [src/node-global.mts:38](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L38)
 
 ***
 
@@ -70,7 +76,7 @@ Defined in: [src/node-global.mts:34](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **isDirectlyExecuted**: *typeof* [`isDirectlyExecuted`](functions/is-directly-executed.md#isdirectlyexecuted)
 
-Defined in: [src/node-global.mts:41](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L41)
+Defined in: [src/node-global.mts:40](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L40)
 
 ***
 
@@ -92,6 +98,6 @@ Defined in: [src/node-global.mts:31](https://github.com/noshiro-pf/ts-repo-utils
 
 ### Result
 
-> `const` **Result**: *typeof* [`Result`](entry-point/namespaces/Result.md)
+> **Result**: [`Result`](entry-point/namespaces/Result.md)
 
-Defined in: [src/node-global.mts:37](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L37)
+Defined in: node\_modules/.pnpm/ts-data-forge@5.0.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/globals.d.mts:123

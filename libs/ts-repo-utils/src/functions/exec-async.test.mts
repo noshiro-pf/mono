@@ -21,11 +21,13 @@ describe('exec-async', () => {
       (globalThis as any).echo = originalEcho;
     }
   };
+
   describe('basic command execution', () => {
     test('should execute simple command successfully', async () => {
       const result = await $('echo "hello world"', { silent: true });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('hello world');
         expect(result.value.stderr).toBe('');
@@ -36,6 +38,7 @@ describe('exec-async', () => {
       const result = await $('echo "line1\nline2\nline3"', { silent: true });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('line1\nline2\nline3');
         expect(result.value.stderr).toBe('');
@@ -46,6 +49,7 @@ describe('exec-async', () => {
       const result = await $('true', { silent: true });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
         expect(result.value.stdout).toBe('');
         expect(result.value.stderr).toBe('');
@@ -58,6 +62,7 @@ describe('exec-async', () => {
       const result = await $('nonexistent_command_xyz', { silent: true });
 
       expect(Result.isErr(result)).toBe(true);
+
       if (Result.isErr(result)) {
         expect(result.value).toBeDefined();
         expect(result.value.code).toBeDefined();
@@ -68,6 +73,7 @@ describe('exec-async', () => {
       const result = await $('exit 1', { silent: true });
 
       expect(Result.isErr(result)).toBe(true);
+
       if (Result.isErr(result)) {
         expect(result.value).toBeDefined();
         expect(result.value.code).toBe(1);
@@ -80,6 +86,7 @@ describe('exec-async', () => {
       });
 
       expect(Result.isErr(result)).toBe(true);
+
       if (Result.isErr(result)) {
         expect(result.value).toBeDefined();
       }
@@ -115,8 +122,9 @@ describe('exec-async', () => {
       const result = await $('echo "test"', { silent: true });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
-        expect(typeof result.value.stdout).toBe('string');
+        expectTypeOf(result.value.stdout).toBeString();
       }
     });
 
@@ -127,6 +135,7 @@ describe('exec-async', () => {
       });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
         expect(Buffer.isBuffer(result.value.stdout)).toBe(true);
         expect(Buffer.isBuffer(result.value.stderr)).toBe(true);
@@ -137,6 +146,7 @@ describe('exec-async', () => {
       const result = await $('echo "test"', { silent: true, encoding: null });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
         expect(Buffer.isBuffer(result.value.stdout)).toBe(true);
         expect(Buffer.isBuffer(result.value.stderr)).toBe(true);
@@ -150,8 +160,10 @@ describe('exec-async', () => {
       });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
-        expect(typeof result.value.stdout).toBe('string');
+        expectTypeOf(result.value.stdout).toBeString();
+
         expect(result.value.stdout.trim()).toBe('test 日本語');
       }
     });
@@ -164,6 +176,7 @@ describe('exec-async', () => {
       });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('hello world');
       }
@@ -173,6 +186,7 @@ describe('exec-async', () => {
       const result = await $('echo "first" && echo "second"', { silent: true });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('first\nsecond');
       }
@@ -182,6 +196,7 @@ describe('exec-async', () => {
       const result = await $('echo "first"; echo "second"', { silent: true });
 
       expect(Result.isOk(result)).toBe(true);
+
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('first\nsecond');
       }

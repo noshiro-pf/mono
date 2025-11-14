@@ -35,7 +35,6 @@ declare global {
 
   const $: typeof $_;
   const Result: typeof Result_;
-  type Result<S, E> = Result_<S, E>;
   const echo: typeof console.log;
   const cd: typeof chdir_;
   const isDirectlyExecuted: typeof isDirectlyExecuted_;

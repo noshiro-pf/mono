@@ -55,7 +55,7 @@ Array of directory paths and their expected extensions
 
 ### checkExt()
 
-> **checkExt**(`config`): `Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `Readonly`\<\{ `files`: readonly `string`[]; `message`: `string`; \}\>\>\>
+> **checkExt**(`config`): `Promise`\<[`Result`](../node-global.md#result)\<`undefined`, `Readonly`\<\{ `files`: readonly `string`[]; `message`: `string`; \}\>\>\>
 
 Defined in: [src/functions/assert-ext.mts:39](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-ext.mts#L39)
 
@@ -76,6 +76,6 @@ Array of directory paths and their expected extensions
 
 #### Returns
 
-`Promise`\<[`Result`](../entry-point/README.md#result)\<`undefined`, `Readonly`\<\{ `files`: readonly `string`[]; `message`: `string`; \}\>\>\>
+`Promise`\<[`Result`](../node-global.md#result)\<`undefined`, `Readonly`\<\{ `files`: readonly `string`[]; `message`: `string`; \}\>\>\>
 
 Result.ok when all files pass, otherwise Result.err with details.

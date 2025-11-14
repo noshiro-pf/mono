@@ -10,30 +10,6 @@
 
 - [Result](namespaces/Result.md)
 
-## Type Aliases
-
-### Result
-
-> **Result**\<`S`, `E`\> = `Ok_`\<`S`\> \| `Err_`\<`E`\>
-
-Defined in: node\_modules/.pnpm/ts-data-forge@3.3.1\_typescript@5.9.3/node\_modules/ts-data-forge/dist/functional/result.d.mts:40
-
-Represents a value that can either be a success (`Ok`) or an error (`Err`).
-
-#### Type Parameters
-
-##### S
-
-`S`
-
-The type of the success value.
-
-##### E
-
-`E`
-
-The type of the error value.
-
 ## References
 
 ### $

@@ -1,4 +1,3 @@
-/* eslint-disable vitest/no-conditional-expect */
 import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
@@ -15,14 +14,14 @@ import {
   formatUncommittedFiles,
 } from './format.mjs';
 
-vi.mock('./diff.mjs', () => ({
+vi.mock(import('./diff.mjs'), () => ({
   getDiffFrom: vi.fn(),
   getModifiedFiles: vi.fn(),
   getStagedFiles: vi.fn(),
   getUntrackedFiles: vi.fn(),
 }));
 
-describe('formatFilesGlob', () => {
+describe(formatFilesGlob, () => {
   const testDir = path.join(
     process.cwd(),
     `test-format-files-${crypto.randomUUID()}`,
@@ -71,10 +70,12 @@ describe('formatFilesGlob', () => {
 
       // Format TypeScript files
       const result = await formatFilesGlob(`${testDir}/*.ts`, { silent: true });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Check that files were formatted
       const content1 = await readTestFile(file1);
+
       expect(content1).toBe(
         `${dedent`
           const foo = 'bar';
@@ -83,6 +84,7 @@ describe('formatFilesGlob', () => {
       );
 
       const content2 = await readTestFile(file2);
+
       expect(content2).toBe(
         `${dedent`
           function test(x: number, y: string) {
@@ -93,6 +95,7 @@ describe('formatFilesGlob', () => {
 
       // Check that non-matching file was not touched
       const mdContent = await readTestFile(path.join(testDir, 'test.md'));
+
       expect(mdContent).toBe('# Test\n\nSome    spaces');
     } finally {
       // Cleanup
@@ -105,6 +108,7 @@ describe('formatFilesGlob', () => {
     const result = await formatFilesGlob('/non-existent-path/*.ts', {
       silent: true,
     });
+
     expect(Result.isOk(result)).toBe(true);
   });
 
@@ -126,10 +130,12 @@ describe('formatFilesGlob', () => {
       const result = await formatFilesGlob(`${testDir}/**/*.ts`, {
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Check that nested file was formatted
       const content = await readTestFile(nestedFile);
+
       expect(content).toBe(
         `${dedent`
           export const helper = (x: number) => {
@@ -144,7 +150,7 @@ describe('formatFilesGlob', () => {
   });
 });
 
-describe('formatFiles', () => {
+describe(formatFiles, () => {
   const testDir = path.join(
     process.cwd(),
     `test-format-files-list-${crypto.randomUUID()}`,
@@ -188,10 +194,12 @@ describe('formatFiles', () => {
       const result = await formatFiles([file1, file2], {
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Check formatted content
       const content1 = await readTestFile(file1);
+
       expect(content1).toBe(
         `${dedent`
           const x = { a: 1, b: 2 };
@@ -199,6 +207,7 @@ describe('formatFiles', () => {
       );
 
       const content2 = await readTestFile(file2);
+
       expect(content2).toBe(
         `${dedent`
           function test() {
@@ -216,11 +225,12 @@ describe('formatFiles', () => {
     const result = await formatFiles([], {
       silent: true,
     });
+
     expect(Result.isOk(result)).toBe(true);
   });
 });
 
-describe('formatUncommittedFiles', () => {
+describe(formatUncommittedFiles, () => {
   const testDir = path.join(
     process.cwd(),
     `test-format-uncommitted-${crypto.randomUUID()}`,
@@ -272,6 +282,7 @@ describe('formatUncommittedFiles', () => {
       );
 
       const result = await formatUncommittedFiles({ silent: true });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Verify all git functions were called
@@ -282,6 +293,7 @@ describe('formatUncommittedFiles', () => {
       // Verify files were formatted
       const verifyPromises = allFiles.map(async (file) => {
         const content = await fs.readFile(path.join(testDir, file), 'utf8');
+
         expect(content).toBe('const x = 1;\n');
       });
       await Promise.all(verifyPromises);
@@ -306,6 +318,7 @@ describe('formatUncommittedFiles', () => {
         staged: false,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
@@ -332,6 +345,7 @@ describe('formatUncommittedFiles', () => {
         staged: false,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       expect(getUntrackedFiles).not.toHaveBeenCalled();
@@ -358,6 +372,7 @@ describe('formatUncommittedFiles', () => {
         staged: true,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       expect(getUntrackedFiles).not.toHaveBeenCalled();
@@ -393,6 +408,7 @@ describe('formatUncommittedFiles', () => {
         staged: true,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
@@ -417,10 +433,12 @@ describe('formatUncommittedFiles', () => {
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([duplicateFile]));
 
       const result = await formatUncommittedFiles({ silent: true });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Verify file was formatted (only once despite appearing in all categories)
       const content = await fs.readFile(duplicateFile, 'utf8');
+
       expect(content).toBe('const x = 1;\n');
     } finally {
       await cleanupTest();
@@ -435,6 +453,7 @@ describe('formatUncommittedFiles', () => {
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatUncommittedFiles({ silent: true });
+
       expect(Result.isOk(result)).toBe(true);
     } finally {
       await cleanupTest();
@@ -453,9 +472,11 @@ describe('formatUncommittedFiles', () => {
         staged: false,
         silent: true,
       });
+
       expect(Result.isErr(result)).toBe(true);
+
       if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual(error);
+        assert.deepStrictEqual(result.value, error);
       }
     } finally {
       await cleanupTest();
@@ -474,9 +495,11 @@ describe('formatUncommittedFiles', () => {
         staged: false,
         silent: true,
       });
+
       expect(Result.isErr(result)).toBe(true);
+
       if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual(error);
+        assert.deepStrictEqual(result.value, error);
       }
     } finally {
       await cleanupTest();
@@ -495,9 +518,11 @@ describe('formatUncommittedFiles', () => {
         staged: true,
         silent: true,
       });
+
       expect(Result.isErr(result)).toBe(true);
+
       if (Result.isErr(result)) {
-        expect(result.value).toStrictEqual(error);
+        assert.deepStrictEqual(result.value, error);
       }
     } finally {
       await cleanupTest();
@@ -519,10 +544,12 @@ describe('formatUncommittedFiles', () => {
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result1 = await formatUncommittedFiles({ silent: false });
+
       expect(Result.isOk(result1)).toBe(true);
       // With silent: false, console output may occur
 
       const result2 = await formatUncommittedFiles({ silent: true });
+
       expect(Result.isOk(result2)).toBe(true);
       // With silent: true, console output should be suppressed
 
@@ -551,9 +578,11 @@ describe('formatUncommittedFiles', () => {
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatUncommittedFiles({ silent: true });
+
       expect(Result.isOk(result)).toBe(true);
 
       const content = await fs.readFile(path.join(testDir, testFile), 'utf8');
+
       expect(content).toBe(
         `${dedent`
           function test() {
@@ -582,6 +611,7 @@ describe('formatUncommittedFiles', () => {
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatUncommittedFiles({ silent: true });
+
       // Should handle error gracefully
       expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
     } finally {
@@ -590,7 +620,7 @@ describe('formatUncommittedFiles', () => {
   });
 });
 
-describe('formatDiffFrom', () => {
+describe(formatDiffFrom, () => {
   const testDir = path.join(
     process.cwd(),
     `test-format-diff-${crypto.randomUUID()}`,
@@ -628,10 +658,12 @@ describe('formatDiffFrom', () => {
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatDiffFrom('main', { silent: true });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Check file was formatted
       const content = await readTestFile(file1);
+
       expect(content).toBe(
         `${dedent`
           const a = 1;
@@ -676,10 +708,12 @@ describe('formatDiffFrom', () => {
         includeUntracked: true,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Check both files were formatted
       const diffContent = await readTestFile(diffFile);
+
       expect(diffContent).toBe(
         `${dedent`
           const diff = true;
@@ -687,6 +721,7 @@ describe('formatDiffFrom', () => {
       );
 
       const untrackedContent = await readTestFile(untrackedFile);
+
       expect(untrackedContent).toBe(
         `${dedent`
           const untracked = true;
@@ -722,6 +757,7 @@ describe('formatDiffFrom', () => {
         includeUntracked: true,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Verify both functions were called
@@ -730,6 +766,7 @@ describe('formatDiffFrom', () => {
 
       // Check that the file was formatted (content should change)
       const finalContent = await readTestFile(sharedFile);
+
       expect(finalContent).toBe(
         `${dedent`
           const shared = { value: 1 };
@@ -776,10 +813,12 @@ describe('formatDiffFrom', () => {
 
       // Test default behavior (no options provided)
       const result = await formatDiffFrom('main', { silent: true });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Check all files were formatted
       const diffContent = await readTestFile(diffFile);
+
       expect(diffContent).toBe(
         `${dedent`
           const diff = true;
@@ -787,6 +826,7 @@ describe('formatDiffFrom', () => {
       );
 
       const stagedContent = await readTestFile(stagedFile);
+
       expect(stagedContent).toBe(
         `${dedent`
           const staged = true;
@@ -794,6 +834,7 @@ describe('formatDiffFrom', () => {
       );
 
       const untrackedContent = await readTestFile(untrackedFile);
+
       expect(untrackedContent).toBe(
         `${dedent`
           const untracked = true;
@@ -840,10 +881,12 @@ describe('formatDiffFrom', () => {
         includeModified: false,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Check both files were formatted
       const diffContent = await readTestFile(diffFile);
+
       expect(diffContent).toBe(
         `${dedent`
           const diff = true;
@@ -851,6 +894,7 @@ describe('formatDiffFrom', () => {
       );
 
       const stagedContent = await readTestFile(stagedFile);
+
       expect(stagedContent).toBe(
         `${dedent`
           const staged = true;
@@ -888,6 +932,7 @@ describe('formatDiffFrom', () => {
         includeStaged: true,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Verify all functions were called
@@ -897,6 +942,7 @@ describe('formatDiffFrom', () => {
 
       // Check that the file was formatted (content should change)
       const finalContent = await readTestFile(sharedFile);
+
       expect(finalContent).toBe(
         `${dedent`
           const shared = { value: 1 };
@@ -931,10 +977,12 @@ describe('formatDiffFrom', () => {
         includeModified: false,
         silent: true,
       });
+
       expect(Result.isOk(result)).toBe(true);
 
       // Check only diff file was formatted
       const diffContent = await readTestFile(diffFile);
+
       expect(diffContent).toBe(
         `${dedent`
           const diff = true;

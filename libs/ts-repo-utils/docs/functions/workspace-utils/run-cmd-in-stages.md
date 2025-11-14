@@ -12,7 +12,7 @@
 
 > **runCmdInStagesAcrossWorkspaces**(`options`): `Promise`\<`void`\>
 
-Defined in: [src/functions/workspace-utils/run-cmd-in-stages.mts:23](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/run-cmd-in-stages.mts#L23)
+Defined in: [src/functions/workspace-utils/run-cmd-in-stages.mts:24](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/run-cmd-in-stages.mts#L24)
 
 Executes a npm script command across all workspace packages in dependency
 order stages. Packages are grouped into stages where each stage contains

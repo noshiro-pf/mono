@@ -7,15 +7,15 @@ import { runCmdInStagesAcrossWorkspaces } from './run-cmd-in-stages.mjs';
 import { type Package } from './types.mjs';
 
 // Mock the dependencies
-vi.mock('./execute-parallel.mjs', () => ({
+vi.mock(import('./execute-parallel.mjs'), () => ({
   executeStages: vi.fn(),
 }));
 
-vi.mock('./get-workspace-packages.mjs', () => ({
+vi.mock(import('./get-workspace-packages.mjs'), () => ({
   getWorkspacePackages: vi.fn(),
 }));
 
-describe('runCmdInStagesAcrossWorkspaces', () => {
+describe(runCmdInStagesAcrossWorkspaces, () => {
   type MockedSpies = Readonly<{
     consoleLogSpy: MockInstance<typeof console.log>;
     consoleErrorSpy: MockInstance<typeof console.error>;
@@ -217,6 +217,7 @@ describe('runCmdInStagesAcrossWorkspaces', () => {
       const expectedFilteredPackages = mockPackages.filter((pkg) =>
         pkg.name.startsWith('package-'),
       );
+
       expect(executeStages).toHaveBeenCalledWith(
         expectedFilteredPackages,
         'test',
