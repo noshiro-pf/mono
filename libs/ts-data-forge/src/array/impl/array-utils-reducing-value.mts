@@ -1,3 +1,4 @@
+import { isError } from '@sindresorhus/is';
 import { IMap } from '../../collections/index.mjs';
 import { Optional, Result } from '../../functional/index.mjs';
 import { isString, isUndefined } from '../../guard/index.mjs';
@@ -515,7 +516,7 @@ const joinImpl = <E,>(
     return Result.ok(result);
   } catch (error) {
     return Result.err(
-      Error.isError(error) ? error : new Error(unknownToString(error)),
+      isError(error) ? error : new Error(unknownToString(error)),
     );
   }
 };

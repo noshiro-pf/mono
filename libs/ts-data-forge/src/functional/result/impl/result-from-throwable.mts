@@ -1,3 +1,4 @@
+import { isError } from '@sindresorhus/is';
 import { unknownToString } from '../../../others/index.mjs';
 import { err } from './result-err.mjs';
 import { ok } from './result-ok.mjs';
@@ -33,7 +34,7 @@ export const fromThrowable = <T,>(fn: () => T): Result<T, Error> => {
   try {
     return ok(fn());
   } catch (error) {
-    if (Error.isError(error)) {
+    if (isError(error)) {
       return err(error);
     }
     const msg = unknownToString(error);

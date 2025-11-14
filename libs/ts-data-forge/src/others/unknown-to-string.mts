@@ -1,3 +1,4 @@
+import { isError } from '@sindresorhus/is';
 import { isNonNullish } from '../guard/index.mjs';
 
 /**
@@ -57,7 +58,7 @@ export const unknownToString = (
             : JSON.stringify(value);
         return stringified;
       } catch (error) {
-        return Error.isError(error)
+        return isError(error)
           ? error.message
           : '[Circular or Non-serializable]';
       }
