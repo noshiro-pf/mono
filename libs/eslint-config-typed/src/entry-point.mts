@@ -37,6 +37,10 @@ export {
   eslintCypressRules,
   eslintPlaywrightRules,
   eslintPluginRules,
+  eslintTsRestrictionsRules,
+  eslintReactCodingStyleRules,
+  eslintStylisticRules,
+  eslintVitestCodingStyleRules,
 
   // Pre-configured rule options
   restrictedGlobals,
@@ -44,10 +48,12 @@ export {
   restrictedSyntax,
 
   // Custom plugins
-  eslintPluginTsRestrictions,
-  eslintPluginReactCodingStyle,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
+  eslintPluginStrictDependencies,
+  eslintPluginTsRestrictions,
+  eslintPluginVitestCodingStyle,
+  eslintPluginReactCodingStyle,
 
   // Utilities
   defineConfig,
@@ -79,6 +85,7 @@ export {
   type EslintStrictDependenciesRules,
   type EslintStrictDependenciesRulesOption,
   type EslintReactCodingStyleRules,
+  type EslintReactCodingStyleRulesOption,
   type EslintSecurityRules,
   type EslintTreeShakableRules,
   type EslintReactRules,
@@ -103,6 +110,11 @@ export {
   type EslintTestingLibraryRulesOption,
   type EslintPluginRules,
   type EslintPluginRulesOption,
+  type EslintStylisticRules,
+  type EslintStylisticRulesOption,
+  type EslintTsRestrictionsRules,
+  type EslintTsRestrictionsRulesOption,
+  type EslintVitestCodingStyleRules,
 
   // Utility types
   type FlatConfig,

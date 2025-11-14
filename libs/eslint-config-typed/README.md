@@ -499,18 +499,20 @@ Pre-configured rule sets that can be imported and customized:
 | **`eslintImportsRules`**                   | `eslint-plugin-import-x`               | Import/export rules                                    |
 | **`eslintSecurityRules`**                  | `eslint-plugin-security`               | Security best practices                                |
 | **`eslintTreeShakableRules`**              | `eslint-plugin-tree-shakable`          | Tree-shaking optimization rules                        |
+| **`eslintStylisticRules`**                 | `@stylistic/eslint-plugin`             | Stylistic formatting rules disabled to mirror Prettier |
+| **`eslintTsRestrictionsRules`**            | `eslint-plugin-ts-restrictions`        | Restrict some syntax in TypeScript                     |
 | **`eslintReactRules`**                     | `eslint-plugin-react`                  | React-specific rules                                   |
 | **`eslintReactHooksRules`**                | `eslint-plugin-react-hooks`            | React Hooks rules                                      |
 | **`eslintReactPerfRules`**                 | `eslint-plugin-react-perf`             | React performance optimization rules                   |
 | **`eslintReactRefreshRules`**              | `eslint-plugin-react-refresh`          | React Refresh (HMR) rules                              |
 | **`eslintReactCodingStyleRules`**          | `eslint-plugin-react-coding-style`     | Opinionated React component style rules                |
-| **`eslintStylisticRules`**                 | `@stylistic/eslint-plugin`             | Stylistic formatting rules disabled to mirror Prettier |
 | **`eslintJsxA11yRules`**                   | `eslint-plugin-jsx-a11y`               | Accessibility rules for JSX                            |
 | **`eslintVitestRules`**                    | `eslint-plugin-vitest`                 | Vitest-specific rules                                  |
 | **`eslintJestRules`**                      | `eslint-plugin-jest`                   | Jest-specific rules                                    |
 | **`eslintTestingLibraryRules`**            | `eslint-plugin-testing-library`        | Testing Library rules                                  |
 | **`eslintPlaywrightRules`**                | `eslint-plugin-playwright`             | Playwright-specific rules                              |
 | **`eslintCypressRules`**                   | `eslint-plugin-cypress`                | Cypress-specific rules                                 |
+| **`eslintVitestCodingStyleRules`**         | `eslint-plugin-vitest-coding-style`    | Vitest best practices                                  |
 | **`eslintPluginRules`**                    | `eslint-plugin-eslint-plugin`          | eslint-plugin development rules                        |
 
 ### Exported Pre-configured Rule Options
@@ -607,18 +609,22 @@ Each plugin provides typed rule definitions:
     - **`EslintStrictDependenciesRules`** & **`EslintStrictDependenciesRulesOption`**
     - **`EslintSecurityRules`** (no options)
     - **`EslintTreeShakableRules`** (no options)
+    - **`EslintStylisticRules`** & **`EslintStylisticRulesOption`**
+    - **`EslintTsRestrictionsRules`** & **`EslintTsRestrictionsRulesOption`**
 - React & JSX
     - **`EslintReactRules`** & **`EslintReactRulesOption`**
     - **`EslintReactHooksRules`** & **`EslintReactHooksRulesOption`**
     - **`EslintReactPerfRules`** & **`EslintReactPerfRulesOption`**
     - **`EslintReactRefreshRules`** & **`EslintReactRefreshRulesOption`**
     - **`EslintJsxA11yRules`** & **`EslintJsxA11yRulesOption`**
+    - **`EslintReactCodingStyleRules`** & **`EslintReactCodingStyleRulesOption`**
 - Testing
     - **`EslintVitestRules`** & **`EslintVitestRulesOption`**
     - **`EslintJestRules`** & **`EslintJestRulesOption`**
     - **`EslintPlaywrightRules`** & **`EslintPlaywrightRulesOption`**
     - **`EslintCypressRules`** & **`EslintCypressRulesOption`**
     - **`EslintTestingLibraryRules`** & **`EslintTestingLibraryRulesOption`**
+    - **`EslintVitestCodingStyleRules`** (no options)
 - Others
     - **`EslintPluginRules`** & **`EslintPluginRulesOption`**
 
