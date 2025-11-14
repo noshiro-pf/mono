@@ -1,4 +1,8 @@
-import { type EslintStylisticRules } from '../types/index.mjs';
+import { pipe } from 'ts-data-forge';
+import {
+  type EslintStylisticRules,
+  type EslintStylisticRulesOption,
+} from '../types/index.mjs';
 
 export const eslintStylisticRules = {
   // Rules explicitly disabled by eslint-config-prettier (special handling)
@@ -92,6 +96,7 @@ export const eslintStylisticRules = {
   // Additional stylistic rules defaulted to off
   '@stylistic/curly-newline': 'off',
   '@stylistic/exp-list-style': 'off',
+
   // Covered by react/jsx-curly-brace-presence
   '@stylistic/jsx-curly-brace-presence': 'off',
   '@stylistic/jsx-function-call-newline': 'off',
@@ -101,6 +106,35 @@ export const eslintStylisticRules = {
   '@stylistic/line-comment-position': 'off',
   '@stylistic/lines-between-class-members': 'off',
   '@stylistic/multiline-comment-style': 'off',
-  '@stylistic/padding-line-between-statements': 'off',
   '@stylistic/spaced-comment': 'off',
+
+  '@stylistic/padding-line-between-statements': [
+    'error',
+    { blankLine: 'never', prev: 'import', next: 'import' },
+    { blankLine: 'always', prev: '*', next: 'return' },
+
+    ...pipe([
+      'for',
+      'if',
+      'switch',
+      // 'case', // This conflicts with no-fallthrough
+      'default',
+      'class',
+      'while',
+      'multiline-block-like',
+      'multiline-expression',
+      'multiline-const',
+      'multiline-let',
+      // 'multiline-var', // `var` is disallowed by "no-var" rule
+      'multiline-return',
+      'multiline-type',
+      'multiline-using',
+    ] as const satisfies EslintStylisticRulesOption['@stylistic/padding-line-between-statements'][0]['next']).map(
+      (keys) =>
+        [
+          { blankLine: 'always', prev: keys, next: '*' },
+          { blankLine: 'always', prev: '*', next: keys },
+        ] as const,
+    ).value,
+  ],
 } as const satisfies EslintStylisticRules;

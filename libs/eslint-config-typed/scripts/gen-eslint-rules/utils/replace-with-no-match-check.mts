@@ -48,6 +48,7 @@ export const replaceWithNoMatchCheck =
 
         case 'warn':
           console.warn(msg);
+
           return target;
 
         case 'off':
@@ -74,6 +75,7 @@ export const replaceWithNoMatchCheck =
 
         case 'warn':
           console.warn(msg);
+
           return target;
 
         case undefined:

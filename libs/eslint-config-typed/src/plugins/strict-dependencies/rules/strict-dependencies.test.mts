@@ -91,6 +91,7 @@ describe('strictDependencies Rule', () => {
 
     expect(messages).toHaveLength(1);
     expect(messages[0]?.messageId).toBe('forbidden-import');
+
     expect(messages[0]?.message).toBe(
       `import '${normalize('src/components/ui/Text')}' is not allowed from ${normalize('src/components/test/aaa.ts')}.`,
     );
@@ -105,6 +106,7 @@ describe('strictDependencies Rule', () => {
 
     expect(messages).toHaveLength(1);
     expect(messages[0]?.messageId).toBe('forbidden-import-specifier');
+
     expect(messages[0]?.message).toBe(
       `import specifier 'Text' is not allowed from ${normalize('src/components/button.tsx')}.`,
     );

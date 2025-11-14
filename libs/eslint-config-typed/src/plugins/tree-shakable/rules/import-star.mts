@@ -44,11 +44,14 @@ const checkModuleNamespaceUsage = (
   const scope = context.sourceCode.getScope(node);
 
   const variable = scope.set.get(identifier.name);
+
   if (variable === undefined) {
     return;
   }
+
   for (const ref of variable.references) {
     const referencedIdentifier = ref.identifier;
+
     if (!isTreeShakingSafeReference(referencedIdentifier)) {
       context.report({
         node: referencedIdentifier,
@@ -76,11 +79,14 @@ const isTreeShakingSafeReference = (
         // id.foo
         return true;
       }
+
       const memberName = parent.property;
+
       if (memberName.type === TSESTree.AST_NODE_TYPES.Literal) {
         // id["foo"]
         return true;
       }
+
       return false;
     }
 
@@ -93,10 +99,12 @@ const isTreeShakingSafeReference = (
       // TypeScript's type
       return true;
     }
+
     case TSESTree.AST_NODE_TYPES.TSTypeQuery: {
       // 'typeof t' in TypeScript's type context
       return true;
     }
+
     case TSESTree.AST_NODE_TYPES.AccessorProperty:
     case TSESTree.AST_NODE_TYPES.ArrayExpression:
     case TSESTree.AST_NODE_TYPES.ArrayPattern:

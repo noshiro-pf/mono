@@ -19,9 +19,11 @@ vi.mock(import('typescript'), async () => {
   const actual = await vi.importActual<TypeScriptModule>('typescript');
   // eslint-disable-next-line functional/immutable-data
   actualFunctions.findConfigFile = actual.findConfigFile;
+
   // eslint-disable-next-line functional/immutable-data
   actualFunctions.getParsedCommandLineOfConfigFile =
     actual.getParsedCommandLineOfConfigFile;
+
   return {
     ...actual,
     findConfigFile: vi.fn(actual.findConfigFile),
@@ -100,6 +102,7 @@ const restoreActual = (): void => {
     actualFunctions.getParsedCommandLineOfConfigFile !== undefined
   ) {
     mockFindConfigFile.mockImplementation(actualFunctions.findConfigFile);
+
     mockGetParsedCommandLine.mockImplementation(
       actualFunctions.getParsedCommandLineOfConfigFile,
     );
@@ -115,6 +118,7 @@ const useFixture = (fixtureName: FixtureName | undefined): void => {
 
   const compilerOptions = compilerOptionsByFixture[fixtureName];
   mockFindConfigFile.mockImplementation(() => 'tsconfig.json');
+
   mockGetParsedCommandLine.mockImplementation(() => ({
     options: { ...compilerOptions },
     fileNames: [],
@@ -213,6 +217,7 @@ describe(resolveImportPath, () => {
       expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
         'components/aaa/bbb',
       );
+
       expect(resolveImportPath(importPath, undefined, {})).toBe(expected);
 
       useFixture(undefined);
@@ -227,6 +232,7 @@ describe(resolveImportPath, () => {
       expect(resolveImportPath('components/aaa/bbb', undefined, {})).toBe(
         'components/aaa/bbb',
       );
+
       expect(resolveImportPath('@/components/aaa/bbb', undefined, {})).toBe(
         expected,
       );

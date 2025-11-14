@@ -128,6 +128,7 @@ export const createNoUnsafeAssignmentRule =
           const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(
             declaration.id,
           );
+
           const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(
             declaration.init,
           );
@@ -177,6 +178,7 @@ export const createNoUnsafeAssignmentRule =
 
       AssignmentExpression: (node): void => {
         const leftTsNode = parserServices.esTreeNodeToTSNodeMap.get(node.left);
+
         const rightTsNode = parserServices.esTreeNodeToTSNodeMap.get(
           node.right,
         );
@@ -348,6 +350,7 @@ export const createNoUnsafeAssignmentRule =
         const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(
           node.returnType.typeAnnotation,
         );
+
         const destinationType = checker.getTypeAtLocation(destinationNode);
         const sourceNode = parserServices.esTreeNodeToTSNodeMap.get(node.body);
         const sourceType = checker.getTypeAtLocation(sourceNode);
@@ -410,6 +413,7 @@ export const createNoUnsafeAssignmentRule =
 
           // TODO handle spread elements
           const rawArgument = node.arguments[i];
+
           const argument =
             rawArgument?.type === AST_NODE_TYPES.SpreadElement
               ? undefined

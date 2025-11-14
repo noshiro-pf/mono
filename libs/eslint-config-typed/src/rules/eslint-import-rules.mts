@@ -83,7 +83,7 @@ export const eslintImportsRules = {
     },
   ],
 
-  'import-x/order': 'off', // using prettier-plugin-organize-imports
+  'import-x/order': 'off', // Covered by prettier-plugin-organize-imports
   // 'import-x/order': [
   //   'error',
   //   {
@@ -91,7 +91,6 @@ export const eslintImportsRules = {
   //     'newlines-between': 'never',
   //   },
   // ],
-
   'import-x/newline-after-import': [
     'error',
     {
@@ -99,6 +98,7 @@ export const eslintImportsRules = {
       count: 1,
     },
   ],
+
   'import-x/prefer-default-export': 'off',
   'import-x/max-dependencies': 'off',
   'import-x/no-unassigned-import': [

@@ -27,6 +27,7 @@ export const resolveImportPath = (
         const matchedKey: string | undefined = Object.keys(pathIndexMap).find(
           (k) => k === key,
         );
+
         // MEMO: pathIndexMapの指定がない場合 or 指定されているindexにアクセスしても値が得られない場合は[0]固定
         const pathIndex =
           matchedKey !== undefined ? pathIndexMap[matchedKey] : 0;
@@ -71,6 +72,7 @@ const readTsConfig = (tsconfigPath: string): ts.CompilerOptions | undefined => {
   const basePath = ts.sys.directoryExists(tsconfigPath)
     ? tsconfigPath
     : path.dirname(tsconfigPath);
+
   const found = ts.findConfigFile(
     basePath,
     (filePath) => ts.sys.fileExists(filePath),

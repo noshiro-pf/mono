@@ -32,6 +32,7 @@ export const noPartialUrlConstructor = createRule({
         const objectNode = parserServices.esTreeNodeToTSNodeMap.get(
           node.callee,
         );
+
         const objectType = checker.getTypeAtLocation(objectNode);
 
         const prototype = checker.getPropertyOfType(objectType, 'prototype');
@@ -57,6 +58,7 @@ export const noPartialUrlConstructor = createRule({
                 messageId: 'errorStringWillDefinitelyThrow',
               } as const);
             }
+
             return;
           }
 
@@ -75,6 +77,7 @@ export const noPartialUrlConstructor = createRule({
                 messageId: 'errorStringWillDefinitelyThrow',
               } as const);
             }
+
             return;
           }
 
@@ -93,6 +96,7 @@ const isValidUrl = (s: string, base?: string): boolean => {
   try {
     // eslint-disable-next-line no-new
     new URL(s, base);
+
     return true;
   } catch {
     return false;

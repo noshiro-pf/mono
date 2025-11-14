@@ -105,9 +105,11 @@ export const strictDependenciesRule: TSESLint.RuleModule<
     return {
       ImportDeclaration: (node: DeepReadonly<TSESTree.ImportDeclaration>) => {
         const fileFullPath = context.filename;
+
         const relativeFilePath = path.normalize(
           path.relative(process.cwd(), fileFullPath),
         );
+
         const importPath = resolveImportPath(
           node.source.value,
           resolveRelativeImport === true ? relativeFilePath : undefined,
@@ -157,6 +159,7 @@ export const strictDependenciesRule: TSESLint.RuleModule<
               dependency.targetMembers,
               importedModules,
             );
+
             if (commonImportedList.length > 0) {
               context.report({
                 node: castDeepMutable(node),
@@ -167,6 +170,7 @@ export const strictDependenciesRule: TSESLint.RuleModule<
                 },
               });
             }
+
             continue;
           }
 

@@ -46,6 +46,7 @@ const checkAll = async (): Promise<void> => {
 
   // Step 9: Backup repository settings
   echo('9. Backing up repository settings...');
+
   await runCmdStep(
     'pnpm run gh:backup-all',
     'Backing up repository settings failed',
@@ -56,6 +57,7 @@ const checkAll = async (): Promise<void> => {
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
+
   if (Result.isErr(result)) {
     console.error(`${errorMsg}: ${result.value.message}`);
     console.error('❌ Check failed');

@@ -57,6 +57,7 @@ export const reactMemoPropsArgumentNameRule: TSESLint.RuleModule<MessageIds> = {
             messageId: 'propsParamMustBeNamedProps',
           });
         }
+
         return;
       }
 

@@ -30,6 +30,7 @@ export const noPrematureFpTsEffects = createRule({
         const calleeNode = parserServices.esTreeNodeToTSNodeMap.get(
           node.callee,
         );
+
         const calleeType = checker.getTypeAtLocation(calleeNode);
 
         const effectType = fpTsEffectType(calleeType);

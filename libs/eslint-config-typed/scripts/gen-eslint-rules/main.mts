@@ -20,6 +20,7 @@ export const generateRulesType = async (): Promise<void> => {
 
     if (result.type === 'error') {
       console.error(result.error);
+
       return;
     }
   }
@@ -30,6 +31,7 @@ export const generateRulesType = async (): Promise<void> => {
 
     if (result.type === 'error') {
       console.error(result.error);
+
       return;
     }
   }
@@ -40,6 +42,7 @@ export const generateRulesType = async (): Promise<void> => {
 
     if (Result.isErr(result)) {
       console.error(result.value);
+
       return;
     }
   }
@@ -50,6 +53,7 @@ export const generateRulesType = async (): Promise<void> => {
 
     if (result.type === 'error') {
       console.error(result.error);
+
       return;
     }
   }
@@ -60,6 +64,7 @@ export const generateRulesType = async (): Promise<void> => {
 
     if (Result.isErr(result)) {
       console.error(result.value);
+
       return;
     }
   }
@@ -69,6 +74,7 @@ export const generateRulesType = async (): Promise<void> => {
 
     if (result.type === 'error') {
       console.error(result.error);
+
       return;
     }
   }

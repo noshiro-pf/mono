@@ -21,6 +21,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     // Step 2: Clean previous build
     {
       echo('2. Cleaning dist directory...');
+
       await runStep(
         Result.fromPromise(
           fs.rm(distDir, {
@@ -30,15 +31,18 @@ const build = async (skipCheck: boolean): Promise<void> => {
         ),
         'Failed to clean dist directory',
       );
+
       echo('✓ Cleaned dist directory\n');
     }
 
     {
       echo('3.1 Generating rules types...');
+
       await runCmdStep(
         'pnpm run gen-rule-type',
         'Generating rules types failed',
       );
+
       echo('✓ Generated rules types\n');
     }
 
@@ -66,6 +70,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
 
     echo('5. Building with Rollup...');
     await assertPathExists(rollupConfig, 'Rollup config');
+
     await runCmdStep(
       [
         'rollup',
@@ -75,6 +80,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
       ].join(' '),
       'Rollup build failed',
     );
+
     echo('✓ Rollup build completed\n');
   }
 
@@ -85,26 +91,31 @@ const build = async (skipCheck: boolean): Promise<void> => {
     await assertPathExists(srcGlobalsFile, 'Global types file');
 
     const destFile = path.resolve(distDir, 'globals.d.mts');
+
     await runCmdStep(
       `cp "${srcGlobalsFile}" "${destFile}"`,
       'Failed to copy globals',
     );
+
     echo('✓ Copied globals.d.mts to dist\n');
   }
 
   // Step 7: Generate dist/types.d.mts
   {
     echo('7. Generating dist/types.d.mts...');
+
     const content = [
       "import './globals.d.mts';",
       "export * from './entry-point.mjs';",
     ].join('\n');
 
     const typesFile = path.resolve(distDir, 'types.d.mts');
+
     await runStep(
       Result.fromPromise(fs.writeFile(typesFile, content)),
       'Failed to generate dist/types.d.mts',
     );
+
     echo('✓ Generated dist/types.d.mts\n');
   }
 
@@ -113,10 +124,12 @@ const build = async (skipCheck: boolean): Promise<void> => {
     echo('8. Generating dist TypeScript config...');
     const configContent = JSON.stringify({ include: ['.'] });
     const configFile = path.resolve(distDir, 'tsconfig.json');
+
     await runStep(
       Result.fromPromise(fs.writeFile(configFile, configContent)),
       'Failed to generate tsconfig',
     );
+
     echo('✓ Generated dist/tsconfig.json\n');
   }
 
@@ -125,6 +138,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
+
   if (Result.isErr(result)) {
     console.error(`${errorMsg}: ${result.value.message}`);
     console.error('❌ Build failed');
@@ -137,6 +151,7 @@ const runStep = async (
   errorMsg: string,
 ): Promise<void> => {
   const result = await promise;
+
   if (Result.isErr(result)) {
     console.error(`${errorMsg}: ${unknownToString(result.value)}`);
     console.error('❌ Build failed');

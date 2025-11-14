@@ -31,6 +31,7 @@ export const noPartialDivision = createRule({
         const numberLiteralParts = intersectionTypeParts(type).filter(
           (t) => isBigIntLiteral(t) || t.isNumberLiteral(),
         );
+
         return (
           numberLiteralParts.length > 0 &&
           numberLiteralParts.every((t) => isSafeDenominator(t))
@@ -67,6 +68,7 @@ export const noPartialDivision = createRule({
           const denominatorNode = parserServices.esTreeNodeToTSNodeMap.get(
             node.right,
           );
+
           const denominatorNodeType =
             checker.getTypeAtLocation(denominatorNode);
 
@@ -95,6 +97,7 @@ const isPseudoBigInt = (val: unknown): val is PseudoBigInt => {
     typeof val === 'object' && val !== null
       ? (val as Partial<PseudoBigInt>)
       : undefined;
+
   return (
     valAsPseudoBigInt !== undefined &&
     typeof valAsPseudoBigInt.base10Value === 'string' &&

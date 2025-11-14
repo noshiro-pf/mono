@@ -74,6 +74,7 @@ export const componentNameRule: TSESLint.RuleModule<MessageIds, Options> = {
               maxLength: maxLength.toString(),
             },
           });
+
           return;
         }
 

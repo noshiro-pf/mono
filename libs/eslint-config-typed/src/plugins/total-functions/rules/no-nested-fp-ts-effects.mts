@@ -45,6 +45,7 @@ export const noNestedFpTsEffects = createRule({
           if (effectTypeParameterName === undefined) {
             return;
           }
+
           const isNestedEffect = effects.includes(effectTypeParameterName);
 
           const isNestedPromise = isThenableType(

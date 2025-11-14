@@ -17,6 +17,7 @@ const variables = [
 ] as const;
 
 const variableListSaved = await listRepoVariables();
+
 const variablesSaved: ReadonlySet<string> = new Set(
   variableListSaved.map((v) => v.name),
 );

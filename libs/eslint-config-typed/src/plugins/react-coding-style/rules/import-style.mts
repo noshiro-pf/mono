@@ -38,6 +38,7 @@ export const importStyleRule: TSESLint.RuleModule<MessageIds> = {
           node,
           messageId: 'namespaceImportRequired',
         });
+
         return;
       }
 

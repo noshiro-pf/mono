@@ -83,6 +83,7 @@ export const noUnsafeMutableReadonlyAssignment = createRule({
           destinationType,
           overrides,
         );
+
         const sourceImmutability = getSafeTypeImmutability(
           program,
           checker,

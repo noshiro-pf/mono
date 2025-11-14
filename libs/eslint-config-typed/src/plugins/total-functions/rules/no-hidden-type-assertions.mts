@@ -107,6 +107,7 @@ export const noHiddenTypeAssertions = createRule({
         }
 
         const typeParameters = callSignature.declaration.typeParameters;
+
         const parameters = parametersToTypeNodes(
           callSignature.declaration.parameters,
           0,
@@ -144,6 +145,7 @@ export const noHiddenTypeAssertions = createRule({
         const allCorrespondingTypeArgumentsAreUnknownType =
           typeParamsUsedInReturnType.every(({ index, typeParameter }) => {
             const typeArgument = (tsExpressionNode.typeArguments ?? [])[index];
+
             const typeArgumentType =
               typeArgument !== undefined
                 ? checker.getTypeAtLocation(typeArgument)
@@ -200,6 +202,7 @@ const hasTypeNode = (
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     const typeAttr = (typeElement as Partial<Readonly<{ type: TypeNode }>>)
       .type;
+
     return typeAttr !== undefined && isTypeNode(typeAttr);
   } catch {
     return false;

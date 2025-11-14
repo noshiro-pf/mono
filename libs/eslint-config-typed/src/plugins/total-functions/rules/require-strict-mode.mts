@@ -33,6 +33,7 @@ export const requireStrictMode = createRule({
     return {
       Program: (node) => {
         const mustBeEnabled = ['strict', 'noUncheckedIndexedAccess'] as const;
+
         const mustNotBeDisabled = [
           'strictFunctionTypes',
           'strictBindCallApply',

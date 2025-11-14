@@ -21,5 +21,6 @@ export const listRepoVariables = async (): Promise<
       headers: octokitHeaders,
     },
   );
+
   return result.data.variables;
 };

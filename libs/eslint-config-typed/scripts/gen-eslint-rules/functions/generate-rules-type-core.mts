@@ -87,6 +87,7 @@ const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
     ]);
 
   const tableHeader = ['key', 'value'] as const;
+
   const [longestKeyLength, longestValueLength] = keyValuesStr.reduce<
     readonly [number, number]
   >(
@@ -123,6 +124,7 @@ const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
     ' *  ```',
     ' */',
   ];
+
   return result.filter((line) => line !== undefined).join('\n');
 };
 
@@ -178,6 +180,7 @@ const createResult = async (
       if (schema.length > 0) {
         mut_resultToWrite.push(...rawSchemaToString(rawSchema));
       }
+
       mut_resultToWrite.push('  export type RuleEntry = 0;');
     } else {
       switch (schema.length) {
@@ -185,12 +188,14 @@ const createResult = async (
           mut_resultToWrite.push(
             `  export type RuleEntry = ${RuleSeverityForNoOption};`,
           );
+
           break;
 
         case 1: {
           mut_resultToWrite.push(...rawSchemaToString(rawSchema));
 
           const sc = schema[0];
+
           if (sc === undefined) {
             throw new Error("schema can't be undefined here");
           }
@@ -214,6 +219,7 @@ const createResult = async (
               : 'Linter.StringSeverity',
             `   | SpreadOptionsIfIsArray<readonly [${RuleSeverityForNoOption}, Options]>;`,
           );
+
           break;
         }
 
@@ -248,10 +254,12 @@ const createResult = async (
                 }, ${OptionsStrs.slice(0, i + 1).join(', ')}]`,
             ),
           );
+
           break;
         }
       }
     }
+
     mut_resultToWrite.push('}', '\n');
   }
 

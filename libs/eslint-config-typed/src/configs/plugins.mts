@@ -1,3 +1,4 @@
+/* eslint-disable @stylistic/padding-line-between-statements */
 /* eslint-disable import-x/no-rename-default */
 
 import stylistic from '@stylistic/eslint-plugin';

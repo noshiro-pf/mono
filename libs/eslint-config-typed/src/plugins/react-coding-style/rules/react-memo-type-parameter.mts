@@ -48,6 +48,7 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
           node: castDeepMutable(node.callee),
           messageId: 'requirePropsTypeParameter',
         });
+
         return;
       }
 
@@ -56,6 +57,7 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
           node: castDeepMutable(typeArguments),
           messageId: 'omitTypeParameterWhenPropsEmpty',
         });
+
         return;
       }
 
@@ -64,6 +66,7 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
           node: castDeepMutable(typeArguments),
           messageId: 'requirePropsTypeParameter',
         });
+
         return;
       }
 
@@ -71,6 +74,7 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
 
       if (!isPropsTypeReference(firstParameter)) {
         const reportTarget = firstParameter ?? node.callee;
+
         context.report({
           node: castDeepMutable(reportTarget),
           messageId: 'requirePropsTypeParameter',

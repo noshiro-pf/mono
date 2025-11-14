@@ -21,6 +21,7 @@ export const getReactMemoArrowFunction = (
   node: DeepReadonly<TSESTree.CallExpression>,
 ): DeepReadonly<TSESTree.ArrowFunctionExpression> | undefined => {
   const [firstArgument] = node.arguments;
+
   if (firstArgument === undefined) {
     return undefined;
   }
