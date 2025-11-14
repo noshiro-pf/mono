@@ -149,12 +149,6 @@ export const eslintPlugins = {
     rulePrefix: 'eslint-plugin/',
     outputFileName: 'eslint-plugin-rules.mts',
   },
-  EslintCustomRules: {
-    typeName: 'EslintCustomRules',
-    pluginName: 'eslint-plugin-custom',
-    rulePrefix: 'custom/',
-    outputFileName: 'eslint-custom-rules.mts',
-  },
   EslintReactCodingStyleRules: {
     typeName: 'EslintReactCodingStyleRules',
     pluginName: 'eslint-plugin-react-coding-style',
@@ -166,6 +160,12 @@ export const eslintPlugins = {
     pluginName: 'eslint-plugin-vitest-coding-style',
     rulePrefix: 'vitest-coding-style/',
     outputFileName: 'eslint-vitest-coding-style-rules.mts',
+  },
+  EslintTsRestrictionsRules: {
+    typeName: 'EslintTsRestrictionsRules',
+    pluginName: 'eslint-plugin-ts-restrictions',
+    rulePrefix: 'ts-restrictions/',
+    outputFileName: 'eslint-ts-restrictions-rules.mts',
   },
 } as const satisfies Record<
   string,

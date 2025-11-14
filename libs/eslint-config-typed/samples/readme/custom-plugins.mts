@@ -12,7 +12,7 @@ export default [
         'warn',
         ...eslintRules['no-restricted-syntax'].slice(1),
       ],
-      'custom/no-restricted-syntax': [
+      'ts-restrictions/no-restricted-syntax': [
         'error',
         {
           // Restrict import style of React

@@ -44,7 +44,7 @@ export {
   restrictedSyntax,
 
   // Custom plugins
-  eslintPluginCustom,
+  eslintPluginTsRestrictions,
   eslintPluginReactCodingStyle,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,

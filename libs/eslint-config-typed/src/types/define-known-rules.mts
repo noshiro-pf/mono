@@ -1,6 +1,5 @@
 import {
   type EslintArrayFuncRules,
-  type EslintCustomRules,
   type EslintCypressRules,
   type EslintFunctionalRules,
   type EslintImportsRules,
@@ -23,14 +22,15 @@ import {
   type EslintTestingLibraryRules,
   type EslintTotalFunctionsRules,
   type EslintTreeShakableRules,
+  type EslintTsRestrictionsRules,
   type EslintUnicornRules,
   type EslintVitestRules,
   type TypeScriptEslintRules,
 } from './rules/index.mjs';
 
 type KnownRules = DeepReadonly<
-  EslintArrayFuncRules &
-    EslintCustomRules &
+  EslintTsRestrictionsRules &
+    EslintArrayFuncRules &
     EslintCypressRules &
     EslintFunctionalRules &
     EslintImportsRules &

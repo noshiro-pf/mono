@@ -146,4 +146,19 @@ export default [
       'import-x/no-default-export': 'off',
     }),
   },
+  {
+    files: ['test/**'],
+    rules: defineKnownRules({
+      'ts-restrictions/no-restricted-cast-name': [
+        'error',
+        {
+          name: 'Int',
+          fixWith: {
+            kind: 'function',
+            name: 'asInt',
+          },
+        },
+      ],
+    }),
+  },
 ] satisfies FlatConfig[];

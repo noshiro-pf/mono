@@ -51,11 +51,11 @@ import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 // import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
 // import eslintPluginTreeShakable from 'eslint-plugin-tree-shakable';
 import {
-  eslintPluginCustom,
   eslintPluginReactCodingStyle,
   eslintPluginStrictDependencies,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
+  eslintPluginTsRestrictions,
   eslintPluginVitestCodingStyle,
 } from '../plugins/index.mjs';
 
@@ -86,7 +86,7 @@ export const plugins: Record<
   | 'tree-shakable'
   | 'total-functions'
   | 'strict-dependencies'
-  | 'custom'
+  | 'ts-restrictions'
   | 'react-coding-style'
   | 'vitest-coding-style',
   Omit<ESLintPlugin, 'configs'>
@@ -122,7 +122,7 @@ export const plugins: Record<
   'tree-shakable': eslintPluginTreeShakable,
   'total-functions': eslintPluginTotalFunctions,
   'strict-dependencies': eslintPluginStrictDependencies,
-  custom: eslintPluginCustom,
+  'ts-restrictions': eslintPluginTsRestrictions,
   'react-coding-style': eslintPluginReactCodingStyle,
   'vitest-coding-style': eslintPluginVitestCodingStyle,
 } as const satisfies FlatConfig['plugins'];

@@ -4,11 +4,11 @@ import { type JSONSchema4 } from 'json-schema';
 import { compile, type Options } from 'json-schema-to-typescript';
 import { Arr, isBoolean, isString } from 'ts-data-forge';
 import { type Rule, type Rules } from '../../../src/index.mjs';
-import { customRules } from '../../../src/plugins/custom/rules/index.mjs';
 import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/rules/rules.mjs';
 import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
 import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/index.mjs';
 import { treeShakableRules } from '../../../src/plugins/tree-shakable/rules/index.mjs';
+import { tsRestrictionsRules } from '../../../src/plugins/ts-restrictions/rules/rules.mjs';
 import { vitestCodingStyleRules } from '../../../src/plugins/vitest-coding-style/rules/rules.mjs';
 import { eslintPlugins } from '../constants/eslint-plugins.mjs';
 import {
@@ -385,9 +385,9 @@ const getRules = async (
         >
       );
 
-    case eslintPlugins.EslintCustomRules.pluginName:
+    case eslintPlugins.EslintTsRestrictionsRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      return Object.entries(customRules as unknown as Rules);
+      return Object.entries(tsRestrictionsRules as unknown as Rules);
 
     case eslintPlugins.EslintReactCodingStyleRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion

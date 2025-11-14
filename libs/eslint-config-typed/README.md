@@ -537,8 +537,8 @@ The shape of the rule option varies depending on the rule, so please check the c
 - **`eslintPluginReactCodingStyle`**
     - Custom ESLint plugin that codifies this repository's React memo component conventions (namespace imports, `React.memo<Props>`, arrow props naming, etc.). See [`src/plugins/react-coding-style/README.md`](src/plugins/react-coding-style/README.md) for the rationale and examples.
     - Provides rules such as `react-coding-style/import-style`, `react-coding-style/component-var-type-annotation`, `react-coding-style/react-memo-type-parameter`, `react-coding-style/react-memo-props-argument-name`, `react-coding-style/props-type-annotation-style`, and `react-coding-style/react-hooks-definition-style`.
-- **`eslintPluginCustom`** - Custom ESLint plugin with additional rules
-    - Currently, this plugin only provides the `custom/no-restricted-syntax` rule (which duplicates ESLint's `no-restricted-syntax` rule).
+- **`eslintPluginTsRestrictions`** - Custom ESLint plugin with additional rules for TypeScript
+    - Currently, this plugin only provides the `ts-restrictions/no-restricted-syntax` rule (which duplicates ESLint's `no-restricted-syntax` rule).
     - Can be used to set the error level to `error` or `warn` as needed.
 
 Example:
