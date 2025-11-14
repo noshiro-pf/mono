@@ -1,3 +1,9 @@
+# [3.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.7.1...v3.8.0) (2025-11-14)
+
+### Features
+
+- add ts-restrictions/check-destructuring-completeness rule ([#134](https://github.com/noshiro-pf/eslint-config-typed/issues/134)) ([3ca2e7a](https://github.com/noshiro-pf/eslint-config-typed/commit/3ca2e7a0fddc47bed3e94e78d2eb16305739634b))
+
 ## [3.7.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.7.0...v3.7.1) (2025-11-14)
 
 ### Bug Fixes
