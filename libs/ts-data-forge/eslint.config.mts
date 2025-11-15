@@ -70,6 +70,7 @@ export default [
     rules: defineKnownRules({
       '@typescript-eslint/no-restricted-imports': 'off',
       'import-x/export': 'off',
+      '@stylistic/padding-line-between-statements': 'off',
     }),
   },
 

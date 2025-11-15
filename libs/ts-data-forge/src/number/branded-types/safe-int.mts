@@ -53,6 +53,7 @@ const {
  * @returns `true` if the value is a safe integer, `false` otherwise
  */
 export const isSafeInt = is;
+
 /**
  * Casts a number to a SafeInt branded type.
  *

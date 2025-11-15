@@ -293,6 +293,7 @@ export function skipLast<E>(
  * @see {@link tail}
  */
 export const rest = tail;
+
 /**
  * Alias for `skip`.
  *

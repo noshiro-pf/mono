@@ -330,6 +330,7 @@ export const isNotSymbol = <T,>(u: T): u is RelaxedExclude<T, symbol> =>
  *   narrows the type to `null`.
  */
 export const isNull = (u: unknown): u is null => u === null;
+
 /**
  * Type guard that checks if a value is not `null`.
  *
@@ -355,6 +356,7 @@ export const isNull = (u: unknown): u is null => u === null;
  *   TypeScript excludes `null` from the type.
  */
 export const isNotNull = <T,>(u: T | null): u is T => u !== null;
+
 /**
  * Type guard that checks if a value is `null` or `undefined` (nullish).
  *
@@ -382,6 +384,7 @@ export const isNotNull = <T,>(u: T | null): u is T => u !== null;
  *   `true`, TypeScript narrows the type to `null | undefined`.
  */
 export const isNullish = (u: unknown): u is null | undefined => u == null;
+
 /**
  * Type guard that checks if a value is not `null` or `undefined` (non-nullish).
  *

@@ -57,6 +57,7 @@ expectType<TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>, Uint>(
  * @returns `true` if the value is a NonNegativeFiniteNumber, `false` otherwise.
  */
 export const isNonNegativeFiniteNumber = is;
+
 /**
  * Casts a number to a NonNegativeFiniteNumber type.
  *

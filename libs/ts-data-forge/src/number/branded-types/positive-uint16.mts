@@ -38,6 +38,7 @@ const {
  * @returns `true` if the value is a PositiveUint16, `false` otherwise.
  */
 export const isPositiveUint16 = is;
+
 /**
  * Casts a number to a PositiveUint16 type.
  *

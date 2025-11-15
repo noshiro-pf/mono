@@ -49,6 +49,7 @@ const {
  * @returns `true` if the value is an integer, `false` otherwise
  */
 export const isInt = is;
+
 /**
  * Casts a number to an Int branded type.
  *

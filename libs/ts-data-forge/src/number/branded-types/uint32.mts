@@ -38,6 +38,7 @@ const {
  * @returns `true` if the value is a Uint32, `false` otherwise.
  */
 export const isUint32 = is;
+
 /**
  * Casts a number to a Uint32 type.
  *

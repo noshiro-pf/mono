@@ -79,8 +79,8 @@ importers:
         specifier: 9.39.1
         version: 9.39.1(jiti@2.6.1)
       eslint-config-typed:
-        specifier: ^3.13.1
-        version: 3.13.1(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.9)
+        specifier: ^3.13.2
+        version: 3.13.2(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.9)
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -2043,8 +2043,8 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  eslint-config-typed@3.13.1:
-    resolution: {integrity: sha512-IV8UEkkZM+YtN9U45XIm7FCA+I7zkhKBGuxnAav6/1+0bq6iGHbv8Jpi4zc0o5RCHIFEjr7HMP8Qxea2kqzE5Q==}
+  eslint-config-typed@3.13.2:
+    resolution: {integrity: sha512-CoTyxBVvQJD3BzHXj+hocvn4vD6YIXTyHHDwPxDchvyqXD8op1jWZh48HpR/QFGCYmtLCIGkFg8MOA/KvnlL/A==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       eslint: '>=9.0.0'
@@ -6431,7 +6431,7 @@ snapshots:
       eslint: 9.39.1(jiti@2.6.1)
       semver: 7.7.3
 
-  eslint-config-typed@3.13.1(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.9):
+  eslint-config-typed@3.13.2(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.9):
     dependencies:
       '@eslint/js': 9.39.1
       '@sindresorhus/is': 7.1.1

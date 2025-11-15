@@ -42,6 +42,7 @@ const {
  * @returns `true` if the value is a NonZeroSafeInt, `false` otherwise.
  */
 export const isNonZeroSafeInt = is;
+
 /**
  * Casts a number to a NonZeroSafeInt type.
  *

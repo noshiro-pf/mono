@@ -49,6 +49,7 @@ const {
  * @returns `true` if the value is a positive integer, `false` otherwise
  */
 export const isPositiveInt = is;
+
 /**
  * Casts a number to a PositiveInt branded type.
  *

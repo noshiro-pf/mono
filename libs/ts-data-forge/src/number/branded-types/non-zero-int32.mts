@@ -40,6 +40,7 @@ const {
  * @returns `true` if the value is a NonZeroInt32, `false` otherwise.
  */
 export const isNonZeroInt32 = is;
+
 /**
  * Casts a number to a NonZeroInt32 type.
  *

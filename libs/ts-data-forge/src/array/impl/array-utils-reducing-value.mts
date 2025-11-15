@@ -483,9 +483,13 @@ export function foldr<E, P>(
  * ```
  */
 export function sum(array: readonly []): 0;
+
 export function sum<N extends number>(array: readonly [N]): N;
+
 export function sum(array: readonly Uint[]): Uint;
+
 export function sum(array: readonly Int[]): Int;
+
 export function sum(array: readonly number[]): number;
 
 export function sum(array: readonly number[]): number {
@@ -566,6 +570,7 @@ const joinImpl = <E,>(
  * @see {@link foldl}
  */
 export const reduce = foldl;
+
 /**
  * Alias for `foldr`.
  *

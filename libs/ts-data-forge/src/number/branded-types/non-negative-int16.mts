@@ -38,6 +38,7 @@ const {
  * @returns `true` if the value is a NonNegativeInt16, `false` otherwise.
  */
 export const isNonNegativeInt16 = is;
+
 /**
  * Casts a number to a NonNegativeInt16 type.
  *

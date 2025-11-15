@@ -39,6 +39,7 @@ const {
  * @returns `true` if the value is a NonZeroUint16, `false` otherwise.
  */
 export const isNonZeroUint16 = is;
+
 /**
  * Casts a number to a NonZeroUint16 type.
  *

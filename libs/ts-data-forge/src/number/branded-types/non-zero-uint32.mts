@@ -39,6 +39,7 @@ const {
  * @returns `true` if the value is a NonZeroUint32, `false` otherwise.
  */
 export const isNonZeroUint32 = is;
+
 /**
  * Casts a number to a NonZeroUint32 type.
  *

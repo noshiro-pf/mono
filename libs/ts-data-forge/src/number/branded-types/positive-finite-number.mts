@@ -77,6 +77,7 @@ expectType<
  * @returns `true` if the value is a PositiveFiniteNumber, `false` otherwise.
  */
 export const isPositiveFiniteNumber = is;
+
 /**
  * Casts a number to a PositiveFiniteNumber type.
  *

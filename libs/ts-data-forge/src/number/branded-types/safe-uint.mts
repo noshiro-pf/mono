@@ -38,6 +38,7 @@ const {
  * @returns `true` if the value is a SafeUint, `false` otherwise.
  */
 export const isSafeUint = is;
+
 /**
  * Casts a number to a SafeUint type.
  *

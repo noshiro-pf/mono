@@ -51,6 +51,7 @@ const {
  * @returns `true` if the value is a PositiveSafeInt, `false` otherwise.
  */
 export const isPositiveSafeInt = is;
+
 /**
  * Casts a number to a PositiveSafeInt type.
  *

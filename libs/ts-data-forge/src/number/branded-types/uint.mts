@@ -46,6 +46,7 @@ const {
  * @returns `true` if the value is a Uint, `false` otherwise.
  */
 export const isUint = is;
+
 /**
  * Casts a number to a Uint type.
  *
