@@ -1,3 +1,9 @@
+# [3.9.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.8.1...v3.9.0) (2025-11-15)
+
+### Features
+
+- support named imports from react in react-coding-style plugin rules ([#136](https://github.com/noshiro-pf/eslint-config-typed/issues/136)) ([eaed96d](https://github.com/noshiro-pf/eslint-config-typed/commit/eaed96de15f7de18233f0d800dfbc9e8b3ebbd19))
+
 ## [3.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.8.0...v3.8.1) (2025-11-15)
 
 ### Bug Fixes
