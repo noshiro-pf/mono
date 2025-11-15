@@ -1,8 +1,4 @@
-import { pipe } from 'ts-data-forge';
-import {
-  type EslintStylisticRules,
-  type EslintStylisticRulesOption,
-} from '../types/index.mjs';
+import { type EslintStylisticRules } from '../types/index.mjs';
 
 export const eslintStylisticRules = {
   // Rules explicitly disabled by eslint-config-prettier (special handling)
@@ -110,31 +106,25 @@ export const eslintStylisticRules = {
 
   '@stylistic/padding-line-between-statements': [
     'error',
-    { blankLine: 'never', prev: 'import', next: 'import' },
-    { blankLine: 'always', prev: '*', next: 'return' },
-
-    ...pipe([
-      'for',
-      'if',
-      'switch',
-      // 'case', // This conflicts with no-fallthrough
-      'default',
-      'class',
-      'while',
-      'multiline-block-like',
-      'multiline-expression',
-      'multiline-const',
-      'multiline-let',
-      // 'multiline-var', // `var` is disallowed by "no-var" rule
-      'multiline-return',
-      'multiline-type',
-      'multiline-using',
-    ] as const satisfies EslintStylisticRulesOption['@stylistic/padding-line-between-statements'][0]['next']).map(
-      (keys) =>
-        [
-          { blankLine: 'always', prev: keys, next: '*' },
-          { blankLine: 'always', prev: '*', next: keys },
-        ] as const,
-    ).value,
+    {
+      blankLine: 'always',
+      prev: '*',
+      next: '*',
+    },
+    {
+      blankLine: 'never',
+      prev: 'import',
+      next: 'import',
+    },
+    {
+      blankLine: 'never',
+      prev: 'singleline-export',
+      next: 'singleline-export',
+    },
+    {
+      blankLine: 'any',
+      prev: 'case',
+      next: 'case',
+    },
   ],
 } as const satisfies EslintStylisticRules;

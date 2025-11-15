@@ -95,6 +95,7 @@ const readTsConfig = (tsconfigPath: string): ts.CompilerOptions | undefined => {
       onUnRecoverableConfigFileDiagnostic: (d) => {
         // 解析不能な診断を投げる
         const msg = ts.flattenDiagnosticMessageText(d.messageText, '\n');
+
         throw new Error(`Invalid tsconfig: ${msg}`);
       },
       getCurrentDirectory: () => ts.sys.getCurrentDirectory(),

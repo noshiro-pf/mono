@@ -17,6 +17,7 @@ const actualFunctions = vi.hoisted<{
 
 vi.mock(import('typescript'), async () => {
   const actual = await vi.importActual<TypeScriptModule>('typescript');
+
   // eslint-disable-next-line functional/immutable-data
   actualFunctions.findConfigFile = actual.findConfigFile;
 
@@ -34,6 +35,7 @@ vi.mock(import('typescript'), async () => {
 });
 
 const mockFindConfigFile = vi.mocked(ts.findConfigFile);
+
 const mockGetParsedCommandLine = vi.mocked(ts.getParsedCommandLineOfConfigFile);
 
 const compilerOptionsByFixture = {
@@ -117,6 +119,7 @@ const useFixture = (fixtureName: FixtureName | undefined): void => {
   }
 
   const compilerOptions = compilerOptionsByFixture[fixtureName];
+
   mockFindConfigFile.mockImplementation(() => 'tsconfig.json');
 
   mockGetParsedCommandLine.mockImplementation(() => ({

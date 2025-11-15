@@ -611,9 +611,10 @@ namespace ImportStyle {
         },
       ]
     | readonly [];
-  export type Styles = BooleanObject | false;
 
+  export type Styles = BooleanObject | false;
   export type ModuleStyles = Readonly<Record<string, Styles>>;
+
   export type BooleanObject = Readonly<
     Partial<Record<'default' | 'named' | 'namespace' | 'unassigned', boolean>>
   >;
@@ -3502,8 +3503,8 @@ namespace PreventAbbreviations {
         },
       ]
     | readonly [];
-  export type Replacements = BooleanObject | false;
 
+  export type Replacements = BooleanObject | false;
   export type Abbreviations = Readonly<Record<string, Replacements>>;
   export type BooleanObject = Readonly<Record<string, boolean>>;
 

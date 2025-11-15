@@ -1322,6 +1322,7 @@ namespace JsxCurlySpacing {
         | ('always' | 'never'),
       ]
     | readonly [];
+
   export type BasicConfigOrBoolean = BasicConfig | boolean;
 
   export type BasicConfig = {

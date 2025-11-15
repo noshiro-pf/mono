@@ -9,39 +9,52 @@ const checkAll = async (): Promise<void> => {
 
   // Step 1: Install dependencies
   echo('1. Installing dependencies...');
+
   await runCmdStep('pnpm i', 'Failed to install dependencies');
+
   echo('✓ Dependencies installed\n');
 
   // Step 2: Spell check
   echo('2. Running spell check...');
+
   await runCmdStep('pnpm run cspell --fail-fast', 'Spell check failed');
+
   echo('✓ Spell check passed\n');
 
   // Step 3: Check file extensions
   echo('3. Checking file extensions...');
+
   await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
+
   echo('✓ File extensions validated\n');
 
   // Step 4: Run tests
   echo('4. Running tests...');
+
   await runCmdStep('pnpm run test', 'Tests failed');
+
   echo('✓ Tests passed\n');
 
   // Step 5: Build
   echo('5. Building project...');
+
   await runCmdStep('pnpm run build', 'Build failed');
 
   // Step 6: Lint
   echo('6. Running lint fixes...');
+
   await runCmdStep('pnpm run lint:fix', 'Linting failed');
+
   echo('✓ Lint fixes applied\n');
 
   // Step 7: Build
   echo('7. Building project...');
+
   await runCmdStep('pnpm run build', 'Build failed');
 
   // Step 8: Embed sample code to README.md
   echo('8. Generating documentation...');
+
   await runCmdStep('pnpm run doc:embed', 'Documentation embedding failed');
 
   // Step 9: Backup repository settings
@@ -60,7 +73,9 @@ const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
 
   if (Result.isErr(result)) {
     console.error(`${errorMsg}: ${result.value.message}`);
+
     console.error('❌ Check failed');
+
     process.exit(1);
   }
 };

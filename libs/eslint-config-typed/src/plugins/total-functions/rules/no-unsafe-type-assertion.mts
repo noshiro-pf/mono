@@ -20,6 +20,7 @@ export const noUnsafeTypeAssertion = createRule({
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+
     const checker = parserServices.program.getTypeChecker();
 
     const isUnsafe = (
@@ -42,10 +43,12 @@ export const noUnsafeTypeAssertion = createRule({
     ): void => {
       // The right hand side of the "as".
       const destinationNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+
       const rawDestinationType = checker.getTypeAtLocation(destinationNode);
 
       // The left hand side of the "as".
       const sourceNode = destinationNode.expression;
+
       const rawSourceType = checker.getTypeAtLocation(sourceNode);
 
       if (isUnsafe(rawDestinationType, rawSourceType)) {

@@ -1680,6 +1680,7 @@ namespace FuncNames {
       ]
     | readonly []
     | readonly [Value];
+
   export type Value = 'always' | 'as-needed' | 'never';
 
   export type RuleEntry =

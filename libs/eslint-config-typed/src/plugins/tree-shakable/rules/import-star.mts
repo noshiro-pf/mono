@@ -19,7 +19,9 @@ export const importStarRule: TSESLint.RuleModule<MessageIds> = {
     ImportNamespaceSpecifier: (node) => {
       // import * as mod from 'specifier'
       const identifier = node.local;
+
       const moduleName = getModuleSpecifier(node);
+
       checkModuleNamespaceUsage(node, context, moduleName, identifier);
     },
   }),

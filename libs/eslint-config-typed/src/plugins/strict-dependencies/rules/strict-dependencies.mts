@@ -100,6 +100,7 @@ export const strictDependenciesRule: TSESLint.RuleModule<
       : {};
 
     const resolveRelativeImport = options.resolveRelativeImport;
+
     const pathIndexMap = options.pathIndexMap ?? {};
 
     return {

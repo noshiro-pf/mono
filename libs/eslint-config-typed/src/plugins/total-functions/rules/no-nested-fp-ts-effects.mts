@@ -19,11 +19,13 @@ export const noNestedFpTsEffects = createRule({
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+
     const checker = parserServices.program.getTypeChecker();
 
     return {
       CallExpression: (node) => {
         const tsNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+
         const expressionType = checker.getTypeAtLocation(tsNode);
 
         const effectType = fpTsEffectType(expressionType);

@@ -50,7 +50,9 @@ export const createNoUnsafeAssignmentRule =
     context: Readonly<TSESLint.RuleContext<MessageId, readonly unknown[]>>,
   ): TSESLint.RuleListener => {
     const parserServices = ESLintUtils.getParserServices(context);
+
     const program = parserServices.program;
+
     const checker = program.getTypeChecker();
 
     // Special handling for array methods that return mutable arrays but that
@@ -72,6 +74,7 @@ export const createNoUnsafeAssignmentRule =
 
       // Arrays have number index types. This gives us access to the type within the array.
       const destinationIndexType = destinationType.getNumberIndexType();
+
       const sourceIndexType = sourceType.getNumberIndexType();
 
       return checker.isArrayType(destinationType) &&
@@ -134,6 +137,7 @@ export const createNoUnsafeAssignmentRule =
           );
 
           const destinationType = checker.getTypeAtLocation(leftTsNode);
+
           const sourceType = checker.getTypeAtLocation(rightTsNode);
 
           const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
@@ -184,6 +188,7 @@ export const createNoUnsafeAssignmentRule =
         );
 
         const destinationType = checker.getTypeAtLocation(leftTsNode);
+
         const sourceType = checker.getTypeAtLocation(rightTsNode);
 
         const arrayMethodCallSafety = isSafeAssignmentFromArrayMethod(
@@ -352,7 +357,9 @@ export const createNoUnsafeAssignmentRule =
         );
 
         const destinationType = checker.getTypeAtLocation(destinationNode);
+
         const sourceNode = parserServices.esTreeNodeToTSNodeMap.get(node.body);
+
         const sourceType = checker.getTypeAtLocation(sourceNode);
 
         // the BlockStatement case should be handled by the ReturnStatement branch.
@@ -405,6 +412,7 @@ export const createNoUnsafeAssignmentRule =
 
         for (const [i, tsArgument] of tsNode.arguments.entries()) {
           const sourceType = checker.getTypeAtLocation(tsArgument);
+
           const destinationType = checker.getContextualType(tsArgument);
 
           if (destinationType === undefined) {

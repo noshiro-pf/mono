@@ -41,6 +41,7 @@ export const noHiddenTypeAssertions = createRule({
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+
     const checker = parserServices.program.getTypeChecker();
 
     const explodeTypeNode = (
@@ -95,6 +96,7 @@ export const noHiddenTypeAssertions = createRule({
     return {
       CallExpression: (node) => {
         const tsExpressionNode = parserServices.esTreeNodeToTSNodeMap.get(node);
+
         const callSignature = checker.getResolvedSignature(tsExpressionNode);
 
         if (callSignature?.declaration === undefined) {

@@ -27,6 +27,7 @@ export const generateRulesType = async (): Promise<void> => {
 
   {
     console.log('running `lint --fix` ... (adding "readonly")');
+
     const result = await lintFix();
 
     if (result.type === 'error') {
@@ -38,6 +39,7 @@ export const generateRulesType = async (): Promise<void> => {
 
   {
     console.log('formatting code ...');
+
     const result = await $(formatCommand);
 
     if (Result.isErr(result)) {
@@ -49,6 +51,7 @@ export const generateRulesType = async (): Promise<void> => {
 
   {
     console.log('running `lint --fix` ... (sorting unions)');
+
     const result = await lintFix();
 
     if (result.type === 'error') {
@@ -60,6 +63,7 @@ export const generateRulesType = async (): Promise<void> => {
 
   {
     console.log('formatting code ...');
+
     const result = await $(formatCommand);
 
     if (Result.isErr(result)) {
@@ -81,6 +85,7 @@ export const generateRulesType = async (): Promise<void> => {
 
   {
     console.log('formatting code ...');
+
     const result = await $(formatCommand);
 
     if (Result.isErr(result)) {

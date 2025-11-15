@@ -36,6 +36,7 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
       }
 
       const arrowFunction = getReactMemoArrowFunction(node);
+
       const typeArguments = node.typeArguments;
 
       // Detects `React.memo(...)`

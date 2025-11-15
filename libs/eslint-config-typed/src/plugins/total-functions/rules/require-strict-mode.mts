@@ -28,6 +28,7 @@ export const requireStrictMode = createRule({
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+
     const options = parserServices.program.getCompilerOptions();
 
     return {

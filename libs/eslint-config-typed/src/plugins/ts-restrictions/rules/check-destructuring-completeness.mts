@@ -70,7 +70,9 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
       options.directiveKeyword ?? DEFAULT_DIRECTIVE_KEYWORD;
 
     const typeChecker = parserServices.program.getTypeChecker();
+
     const esTreeNodeToTSNodeMap = parserServices.esTreeNodeToTSNodeMap;
+
     const sourceCode = context.sourceCode;
 
     const hasDirectiveComment = (
@@ -168,6 +170,7 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
       const type = typeChecker.getTypeAtLocation(tsNode);
 
       const objectProps = getObjectTypeProperties(type);
+
       const destructuredProps = new Set<string>();
 
       for (const prop of node.id.properties) {
@@ -214,6 +217,7 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
             const type = typeChecker.getTypeAtLocation(tsNode);
 
             const objectProps = getObjectTypeProperties(type);
+
             const destructuredProps = new Set<string>();
 
             for (const prop of param.properties) {

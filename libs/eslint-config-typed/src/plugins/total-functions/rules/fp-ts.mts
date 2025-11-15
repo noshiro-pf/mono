@@ -29,6 +29,7 @@ const fpTsEffectTypeParameter = (
 ): Type | undefined => {
   if (effectName === 'IO') {
     const signatures = effectType.getCallSignatures();
+
     const signature = signatures[0];
 
     if (signatures.length !== 1 || signature === undefined) {

@@ -51,6 +51,7 @@ export const importStyleRule: TSESLint.RuleModule<MessageIds, Options> = {
   },
   create: (context) => {
     const options = context.options[0] ?? {};
+
     const importStyle = options.importStyle ?? 'namespace';
 
     return {

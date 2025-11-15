@@ -45,6 +45,7 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
   },
   create: (context) => {
     const options = context.options[0] ?? {};
+
     const ignoreTranspilerName = options.ignoreTranspilerName ?? false;
 
     const checkComponent = (
@@ -79,6 +80,7 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
       }
 
       const program = grandParent;
+
       const componentIndex = program.body.indexOf(parent);
 
       if (componentIndex === -1) {

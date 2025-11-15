@@ -12,7 +12,6 @@ export const repositorySettingsDir = path.resolve(
 );
 
 export const repositorySettingsJsonName = 'settings.json';
-
 export const rulesetsDir = path.resolve(githubDir, './rulesets');
 
 export const octokitHeaders = {

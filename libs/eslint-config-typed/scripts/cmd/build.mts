@@ -14,7 +14,9 @@ const build = async (skipCheck: boolean): Promise<void> => {
     // Step 1: Validate file extensions
     {
       echo('1. Checking file extensions...');
+
       await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
+
       echo('✓ File extensions validated\n');
     }
 
@@ -49,14 +51,18 @@ const build = async (skipCheck: boolean): Promise<void> => {
     // Step 3: Generate index files
     {
       echo('3-2. Generating index files...');
+
       await runCmdStep('pnpm run gi', 'Generating index files failed');
+
       echo('✓ Generating index files completed\n');
     }
 
     // Step 4: Type checking
     {
       echo('4. Running type checking...');
+
       await runCmdStep('tsc --noEmit', 'Type checking failed');
+
       echo('✓ Type checking passed\n');
     }
   }
@@ -69,6 +75,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     );
 
     echo('5. Building with Rollup...');
+
     await assertPathExists(rollupConfig, 'Rollup config');
 
     await runCmdStep(
@@ -87,7 +94,9 @@ const build = async (skipCheck: boolean): Promise<void> => {
   // Step 6: Copy globals
   {
     const srcGlobalsFile = path.resolve(projectRootPath, './src/globals.d.mts');
+
     echo('6. Copying global type definitions...');
+
     await assertPathExists(srcGlobalsFile, 'Global types file');
 
     const destFile = path.resolve(distDir, 'globals.d.mts');
@@ -122,7 +131,9 @@ const build = async (skipCheck: boolean): Promise<void> => {
   // Step 8: Generate dist tsconfig
   {
     echo('8. Generating dist TypeScript config...');
+
     const configContent = JSON.stringify({ include: ['.'] });
+
     const configFile = path.resolve(distDir, 'tsconfig.json');
 
     await runStep(
@@ -141,7 +152,9 @@ const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
 
   if (Result.isErr(result)) {
     console.error(`${errorMsg}: ${result.value.message}`);
+
     console.error('❌ Build failed');
+
     process.exit(1);
   }
 };
@@ -154,7 +167,9 @@ const runStep = async (
 
   if (Result.isErr(result)) {
     console.error(`${errorMsg}: ${unknownToString(result.value)}`);
+
     console.error('❌ Build failed');
+
     process.exit(1);
   }
 };

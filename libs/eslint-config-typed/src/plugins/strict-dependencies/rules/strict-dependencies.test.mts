@@ -11,6 +11,7 @@ type RuleOptions = Parameters<
 >[0]['options'];
 
 const pluginName = 'test-strict-dependencies';
+
 const ruleId = 'strict-dependencies';
 
 const fromRoot = (relativePath: string): string =>
@@ -90,6 +91,7 @@ describe('strictDependencies Rule', () => {
     );
 
     expect(messages).toHaveLength(1);
+
     expect(messages[0]?.messageId).toBe('forbidden-import');
 
     expect(messages[0]?.message).toBe(
@@ -105,6 +107,7 @@ describe('strictDependencies Rule', () => {
     );
 
     expect(messages).toHaveLength(1);
+
     expect(messages[0]?.messageId).toBe('forbidden-import-specifier');
 
     expect(messages[0]?.message).toBe(

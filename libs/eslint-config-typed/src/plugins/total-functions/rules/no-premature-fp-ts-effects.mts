@@ -19,6 +19,7 @@ export const noPrematureFpTsEffects = createRule({
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+
     const checker = parserServices.program.getTypeChecker();
 
     return {

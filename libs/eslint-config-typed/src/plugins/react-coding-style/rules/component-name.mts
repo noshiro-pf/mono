@@ -53,7 +53,9 @@ export const componentNameRule: TSESLint.RuleModule<MessageIds, Options> = {
   },
   create: (context) => {
     const option = context.options[0];
+
     const maxLength = option?.maxLength ?? 42;
+
     const pattern = option?.pattern;
 
     return {

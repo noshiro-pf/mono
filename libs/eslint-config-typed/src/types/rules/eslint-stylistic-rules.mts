@@ -211,6 +211,7 @@ namespace ArrayElementNewline {
           },
       ]
     | readonly [];
+
   export type BasicConfig =
     | 'always'
     | 'consistent'
@@ -519,11 +520,13 @@ namespace CommaDangle {
           },
       ]
     | readonly [];
+
   export type Value =
     | 'always-multiline'
     | 'always'
     | 'never'
     | 'only-multiline';
+
   export type ValueWithIgnore =
     | 'always-multiline'
     | 'always'
@@ -6059,13 +6062,16 @@ namespace ExpListStyle {
       readonly JSONObjectExpression?: BaseConfig;
     };
   };
+
   export type SingleLineConfig = {
     readonly spacing?: 'always' | 'never';
     readonly maxItems?: number;
   };
+
   export type MultiLineConfig = {
     readonly minItems?: number;
   };
+
   export type BaseConfig = {
     readonly singleLine?: SingleLineConfig;
     readonly multiline?: MultiLineConfig;
@@ -6516,6 +6522,7 @@ namespace MemberDelimiterStyle {
     };
     readonly multilineDetection?: 'brackets' | 'last-member';
   };
+
   export type DelimiterConfig = {
     readonly multiline?: {
       readonly delimiter?: MultiLineOption;
@@ -8351,9 +8358,11 @@ namespace PaddingLineBetweenStatements {
    * ```
    */
   export type PaddingType = 'always' | 'any' | 'never';
+
   export type StatementOption =
     | StatementType
     | readonly [StatementType, ...(readonly StatementType[])];
+
   export type StatementType =
     | '*'
     | 'block-like'
@@ -8411,6 +8420,7 @@ namespace PaddingLineBetweenStatements {
     | 'var'
     | 'while'
     | 'with';
+
   export type Options = readonly {
     readonly blankLine: PaddingType;
     readonly prev: StatementOption;
@@ -9466,6 +9476,7 @@ namespace TypeAnnotationSpacing {
       readonly returnType?: SpacingConfig;
     };
   };
+
   export type SpacingConfig = {
     readonly before?: boolean;
     readonly after?: boolean;

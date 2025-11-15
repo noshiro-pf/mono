@@ -1811,13 +1811,16 @@ namespace MemberOrdering {
     | 'static-readonly-field'
     | 'static-set'
     | 'static-static-initialization';
+
   export type OptionalityOrderOptions = 'optional-first' | 'required-first';
+
   export type OrderOptions =
     | 'alphabetically-case-insensitive'
     | 'alphabetically'
     | 'as-written'
     | 'natural-case-insensitive'
     | 'natural';
+
   export type TypeItems =
     | 'constructor'
     | 'field'
@@ -3652,6 +3655,7 @@ namespace NamingConvention {
    * ```
    */
   export type FormatOptionsConfig = readonly PredefinedFormats[] | null;
+
   export type PredefinedFormats =
     | 'camelCase'
     | 'PascalCase'
@@ -3659,6 +3663,7 @@ namespace NamingConvention {
     | 'strictCamelCase'
     | 'StrictPascalCase'
     | 'UPPER_CASE';
+
   export type UnderscoreOptions =
     | 'allow'
     | 'allowDouble'
@@ -3666,13 +3671,16 @@ namespace NamingConvention {
     | 'forbid'
     | 'require'
     | 'requireDouble';
+
   export type PrefixSuffixConfig = readonly string[];
+
   export type TypeModifiers =
     | 'array'
     | 'boolean'
     | 'function'
     | 'number'
     | 'string';
+
   export type Options = readonly (
     | {
         readonly custom?: MatchRegexConfig;

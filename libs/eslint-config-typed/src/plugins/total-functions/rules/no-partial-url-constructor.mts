@@ -20,6 +20,7 @@ export const noPartialUrlConstructor = createRule({
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+
     const checker = parserServices.program.getTypeChecker();
 
     return {

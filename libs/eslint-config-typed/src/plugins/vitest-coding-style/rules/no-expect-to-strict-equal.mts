@@ -52,6 +52,7 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
         }
 
         const actualArgument = expectCall.arguments[0];
+
         const expectedArgument = node.arguments[0];
 
         if (actualArgument === undefined || expectedArgument === undefined) {
@@ -59,7 +60,9 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
         }
 
         const actualText = sourceCode.getText(actualArgument);
+
         const expectedText = sourceCode.getText(expectedArgument);
+
         const typeArgumentText = getTypeArgumentText(node, sourceCode);
 
         const expectedWithCast =

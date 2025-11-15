@@ -24,6 +24,7 @@ export const noPartialStringNormalize = createRule({
   },
   create: (context) => {
     const parserServices = ESLintUtils.getParserServices(context);
+
     const checker = parserServices.program.getTypeChecker();
 
     return {
