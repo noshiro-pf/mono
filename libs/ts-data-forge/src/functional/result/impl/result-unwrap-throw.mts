@@ -15,9 +15,11 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *
  * ```ts
  * const okResult = Result.ok('data');
+ *
  * const errResult = Result.err(new Error('fail'));
  *
  * assert(Result.unwrapThrow(okResult) === 'data');
+ *
  * assert.throws(() => Result.unwrapThrow(errResult), /fail/u);
  * ```
  *

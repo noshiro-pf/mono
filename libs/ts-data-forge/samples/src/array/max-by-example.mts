@@ -9,6 +9,7 @@ const projects = [
 ];
 
 const mostStars = Arr.maxBy(projects, (project) => project.stars);
+
 const smallestStars = Arr.maxBy(
   projects,
   (project) => project.stars,
@@ -16,4 +17,5 @@ const smallestStars = Arr.maxBy(
 );
 
 assert.deepStrictEqual(mostStars, Optional.some({ id: 'b', stars: 30 }));
+
 assert.deepStrictEqual(smallestStars, Optional.some({ id: 'a', stars: 10 }));

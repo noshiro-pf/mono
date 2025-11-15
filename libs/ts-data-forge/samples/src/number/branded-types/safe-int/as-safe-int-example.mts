@@ -5,4 +5,5 @@ import { SafeInt, asSafeInt } from 'ts-data-forge';
 const branded = asSafeInt(123);
 
 assert(branded === 123);
+
 assert.ok(SafeInt.is(branded));

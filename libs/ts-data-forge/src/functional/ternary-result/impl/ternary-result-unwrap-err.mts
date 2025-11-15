@@ -8,9 +8,11 @@ import { type UnwrapErr } from './types.mjs';
  *
  * ```ts
  * const errValue = TernaryResult.err('fail');
+ *
  * const okValue = TernaryResult.ok('value');
  *
  * assert.strictEqual(TernaryResult.unwrapErr(errValue), 'fail');
+ *
  * // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
  * assert.strictEqual(TernaryResult.unwrapErr(okValue), undefined);
  * ```

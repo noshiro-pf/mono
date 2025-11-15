@@ -62,7 +62,6 @@ const random = (min: Int8, max: Int8): Int8 =>
  * @returns `true` if the value is an Int8, `false` otherwise
  */
 export const isInt8 = is;
-
 /**
  * Casts a number to an Int8 branded type.
  *

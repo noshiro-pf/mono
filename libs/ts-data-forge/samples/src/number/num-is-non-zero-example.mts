@@ -8,6 +8,7 @@ if (Num.isNonZero(value)) {
   // Safe to divide now that we know value is non-zero
   // eslint-disable-next-line total-functions/no-partial-division
   const inverted = 1 / value;
+
   assert(inverted === 0.2);
 }
 

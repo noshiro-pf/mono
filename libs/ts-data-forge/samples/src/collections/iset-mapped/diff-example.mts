@@ -17,6 +17,7 @@ const previous = ISetMapped.create<Point, string>(
   toKey,
   fromKey,
 );
+
 const current = ISetMapped.create<Point, string>(
   [
     { x: 2, tag: 'b' },
@@ -29,4 +30,5 @@ const current = ISetMapped.create<Point, string>(
 const { added, deleted } = ISetMapped.diff(previous, current);
 
 assert.deepStrictEqual(Array.from(added), [{ x: 3, tag: 'c' }]);
+
 assert.deepStrictEqual(Array.from(deleted), [{ x: 1, tag: 'a' }]);

@@ -10,20 +10,24 @@ import { warn } from './ternary-result-warn.mjs';
  *
  * ```ts
  * const okPair = TernaryResult.zip(TernaryResult.ok('left'), TernaryResult.ok(1));
+ *
  * const warnPair = TernaryResult.zip(
  *   TernaryResult.warn('left', 'warn'),
  *   TernaryResult.ok(1),
  * );
+ *
  * const errPair = TernaryResult.zip(
  *   TernaryResult.ok('left'),
  *   TernaryResult.err('err'),
  * );
  *
  * assert.deepStrictEqual(okPair, TernaryResult.ok(['left', 1] as const));
+ *
  * assert.deepStrictEqual(
  *   warnPair,
  *   TernaryResult.warn(['left', 1] as const, 'warn'),
  * );
+ *
  * assert.deepStrictEqual(errPair, TernaryResult.err('err'));
  * ```
  */

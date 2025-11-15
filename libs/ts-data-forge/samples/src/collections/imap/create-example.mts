@@ -8,4 +8,5 @@ const map = IMap.create<string, number | string>([
 ]);
 
 assert(map.size === 2);
+
 assert.deepStrictEqual(map.get('status'), Optional.some('active'));

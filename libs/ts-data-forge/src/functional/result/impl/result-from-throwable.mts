@@ -17,11 +17,13 @@ import { ok } from './result-ok.mjs';
  *
  * ```ts
  * const success = Result.fromThrowable(() => 1 + 1);
+ *
  * const failure = Result.fromThrowable(() => {
  *   throw new Error('boom');
  * });
  *
  * assert.deepStrictEqual(success, Result.ok(2));
+ *
  * assert.ok(Result.isErr(failure));
  * ```
  *
@@ -37,7 +39,9 @@ export const fromThrowable = <T,>(fn: () => T): Result<T, Error> => {
     if (isError(error)) {
       return err(error);
     }
+
     const msg = unknownToString(error);
+
     return err(new Error(msg));
   }
 };

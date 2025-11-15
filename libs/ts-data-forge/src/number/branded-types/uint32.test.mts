@@ -7,32 +7,43 @@ describe('Uint32 test', () => {
   describe(asUint32, () => {
     test('accepts valid uint32 values', () => {
       expect(() => asUint32(0)).not.toThrow();
+
       expect(() => asUint32(1)).not.toThrow();
+
       expect(() => asUint32(4_294_967_295)).not.toThrow(); // 2^32 - 1
+
       expect(() => asUint32(2_147_483_648)).not.toThrow(); // 2^31
     });
 
     test('rejects values outside uint32 range', () => {
       expect(() => asUint32(4_294_967_296)).toThrow(TypeError); // 2^32
+
       expect(() => asUint32(10_000_000_000)).toThrow(TypeError);
     });
 
     test('rejects negative integers', () => {
       expect(() => asUint32(-1)).toThrow(TypeError);
+
       expect(() => asUint32(-42)).toThrow(TypeError);
     });
 
     test('rejects non-integers', () => {
       expect(() => asUint32(Number.NaN)).toThrow(TypeError);
+
       expect(() => asUint32(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+
       expect(() => asUint32(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+
       expect(() => asUint32(1.2)).toThrow(TypeError);
+
       expect(() => asUint32(-3.4)).toThrow(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
       expect(asUint32(5)).toBe(5);
+
       expect(asUint32(0)).toBe(0);
+
       expect(asUint32(4_294_967_295)).toBe(4_294_967_295);
     });
 
@@ -55,26 +66,35 @@ describe('Uint32 test', () => {
   describe(isUint32, () => {
     test('correctly identifies uint32 values', () => {
       expect(isUint32(0)).toBe(true);
+
       expect(isUint32(1)).toBe(true);
+
       expect(isUint32(4_294_967_295)).toBe(true);
+
       expect(isUint32(2_147_483_648)).toBe(true);
     });
 
     test('correctly identifies values outside uint32 range', () => {
       expect(isUint32(4_294_967_296)).toBe(false);
+
       expect(isUint32(10_000_000_000)).toBe(false);
     });
 
     test('correctly identifies negative integers', () => {
       expect(isUint32(-1)).toBe(false);
+
       expect(isUint32(-42)).toBe(false);
     });
 
     test('correctly identifies non-integers', () => {
       expect(isUint32(Number.NaN)).toBe(false);
+
       expect(isUint32(Number.POSITIVE_INFINITY)).toBe(false);
+
       expect(isUint32(Number.NEGATIVE_INFINITY)).toBe(false);
+
       expect(isUint32(1.2)).toBe(false);
+
       expect(isUint32(-3.4)).toBe(false);
     });
   });
@@ -82,7 +102,9 @@ describe('Uint32 test', () => {
   describe('Uint32.is', () => {
     test('same as isUint32 function', () => {
       expect(Uint32.is(5)).toBe(isUint32(5));
+
       expect(Uint32.is(4_294_967_296)).toBe(isUint32(4_294_967_296));
+
       expect(Uint32.is(-1)).toBe(isUint32(-1));
     });
   });
@@ -90,19 +112,25 @@ describe('Uint32 test', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(Uint32.MIN_VALUE).toBe(0);
+
       expect(Uint32.MAX_VALUE).toBe(4_294_967_295);
     });
   });
 
   describe('mathematical operations', () => {
     const a = asUint32(1_000_000);
+
     const b = asUint32(500_000);
+
     const c = asUint32(0);
 
     test('min and max', () => {
       expect(Uint32.min(a, b)).toBe(500_000);
+
       expect(Uint32.max(a, b)).toBe(1_000_000);
+
       expect(Uint32.min(a, c)).toBe(0);
+
       expect(Uint32.max(a, c)).toBe(1_000_000);
     });
 
@@ -110,12 +138,15 @@ describe('Uint32 test', () => {
       const result = Uint32.add(asUint32(4_294_967_000), asUint32(1000));
 
       expect(result).toBe(4_294_967_295); // clamped to max
+
       expect(Uint32.add(a, b)).toBe(1_500_000);
     });
 
     test('sub (never goes below 0)', () => {
       expect(Uint32.sub(a, b)).toBe(500_000);
+
       expect(Uint32.sub(b, a)).toBe(0); // clamped to 0
+
       expect(Uint32.sub(c, a)).toBe(0); // clamped to 0
     });
 
@@ -123,12 +154,15 @@ describe('Uint32 test', () => {
       const result = Uint32.mul(asUint32(100_000), asUint32(100_000));
 
       expect(result).toBe(4_294_967_295); // clamped to max
+
       expect(Uint32.mul(asUint32(1000), asUint32(5))).toBe(5000);
     });
 
     test('div (floor division, never goes below 0)', () => {
       expect(Uint32.div(a, asNonZeroUint32(500_000))).toBe(2);
+
       expect(Uint32.div(asUint32(7), asNonZeroUint32(3))).toBe(2);
+
       expect(Uint32.div(asUint32(500_000), asNonZeroUint32(1_000_000))).toBe(0); // floor(500000/1000000) = 0
     });
 
@@ -136,6 +170,7 @@ describe('Uint32 test', () => {
       const result = Uint32.pow(asUint32(10_000), asUint32(3));
 
       expect(result).toBe(4_294_967_295); // clamped to max
+
       expect(Uint32.pow(asUint32(2), asUint32(3))).toBe(8);
     });
   });
@@ -143,15 +178,20 @@ describe('Uint32 test', () => {
   describe('random', () => {
     test('generates uint32 values within specified range', () => {
       const min = 0;
+
       const max = 20;
 
       for (const _ of range(10)) {
         const result = Uint32.random(min, max);
 
         expect(result).toBeGreaterThanOrEqual(min);
+
         expect(result).toBeLessThanOrEqual(max);
+
         expect(Uint32.is(result)).toBe(true);
+
         expect(Number.isInteger(result)).toBe(true);
+
         expect(result).toBeGreaterThanOrEqual(0);
       }
     });
@@ -161,6 +201,7 @@ describe('Uint32 test', () => {
         const result = Uint32.random(0, 30);
 
         expect(result).toBeGreaterThanOrEqual(0);
+
         expect(result).toBeLessThanOrEqual(4_294_967_295);
       }
     });

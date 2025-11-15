@@ -39,7 +39,9 @@ const {
  *
  * ```ts
  * assert.ok(isPositiveInt(5));
+ *
  * assert.notOk(isPositiveInt(0));
+ *
  * assert.ok(PositiveInt.is(10));
  * ```
  *
@@ -47,7 +49,6 @@ const {
  * @returns `true` if the value is a positive integer, `false` otherwise
  */
 export const isPositiveInt = is;
-
 /**
  * Casts a number to a PositiveInt branded type.
  *
@@ -61,6 +62,7 @@ export const isPositiveInt = is;
  * const branded = asPositiveInt(7);
  *
  * assert(branded === 7);
+ *
  * assert.ok(PositiveInt.is(branded));
  * ```
  *
@@ -94,7 +96,9 @@ export const PositiveInt = {
    *
    * ```ts
    * assert.ok(isPositiveInt(5));
+   *
    * assert.notOk(isPositiveInt(0));
+   *
    * assert.ok(PositiveInt.is(10));
    * ```
    *
@@ -164,9 +168,11 @@ export const PositiveInt = {
    *
    * ```ts
    * const belowRange = PositiveInt.clamp(0);
+   *
    * const withinRange = PositiveInt.clamp(10);
    *
    * assert(belowRange === 1);
+   *
    * assert(withinRange === 10);
    * ```
    *
@@ -185,10 +191,13 @@ export const PositiveInt = {
    *
    * ```ts
    * const min = asPositiveInt(3);
+   *
    * const max = asPositiveInt(6);
+   *
    * const randomValue = PositiveInt.random(min, max);
    *
    * assert.ok(PositiveInt.is(randomValue));
+   *
    * assert.ok(randomValue >= 3 && randomValue <= 6);
    * ```
    *
@@ -206,7 +215,9 @@ export const PositiveInt = {
    *
    * ```ts
    * const base = asPositiveInt(2);
+   *
    * const exponent = asPositiveInt(4);
+   *
    * const power = PositiveInt.pow(base, exponent);
    *
    * assert(power === 16);
@@ -284,9 +295,11 @@ export const PositiveInt = {
    *
    * ```ts
    * const quotient = PositiveInt.div(asPositiveInt(9), asPositiveInt(2));
+   *
    * const clamped = PositiveInt.div(asPositiveInt(3), asPositiveInt(10));
    *
    * assert(quotient === 4);
+   *
    * assert(clamped === 1);
    * ```
    *

@@ -13,14 +13,19 @@ import { isNonEmpty } from './array-utils-validation.mjs';
  *
  * ```ts
  * const values = [5, 3, 9] as const;
+ *
  * const empty: readonly number[] = [];
  *
  * const smallest = Arr.min(values);
+ *
  * const none = Arr.min(empty);
+ *
  * const custom = Arr.min(values, (a, b) => b - a);
  *
  * assert.deepStrictEqual(smallest, Optional.some(3));
+ *
  * assert.deepStrictEqual(none, Optional.none);
+ *
  * assert.deepStrictEqual(custom, Optional.some(9));
  * ```
  */
@@ -62,9 +67,11 @@ export function min<E extends number>(
  * const values = [5, 3, 9];
  *
  * const largest = Arr.max(values);
+ *
  * const reversed = Arr.max(values, (a, b) => b - a);
  *
  * assert.deepStrictEqual(largest, Optional.some(9));
+ *
  * assert.deepStrictEqual(reversed, Optional.some(3));
  * ```
  */
@@ -84,6 +91,7 @@ export function max<E extends number>(
   comparator?: (x: E, y: E) => number,
 ): Optional<E> {
   const cmp = comparator ?? ((x, y) => Num.from(x) - Num.from(y));
+
   // Find max by finding min with an inverted comparator
   return min(array, (x, y) => -cmp(x, y));
 }
@@ -101,6 +109,7 @@ export function max<E extends number>(
  * ] as const;
  *
  * const leastVisits = Arr.minBy(users, (user) => user.visits);
+ *
  * const custom = Arr.minBy(
  *   users,
  *   (user) => user.visits,
@@ -108,6 +117,7 @@ export function max<E extends number>(
  * );
  *
  * assert.deepStrictEqual(leastVisits, Optional.some({ id: 2, visits: 3 }));
+ *
  * assert.deepStrictEqual(custom, Optional.some({ id: 1, visits: 10 }));
  * ```
  */
@@ -148,6 +158,7 @@ export function minBy<E, V>(
  * ];
  *
  * const mostStars = Arr.maxBy(projects, (project) => project.stars);
+ *
  * const smallestStars = Arr.maxBy(
  *   projects,
  *   (project) => project.stars,
@@ -155,6 +166,7 @@ export function minBy<E, V>(
  * );
  *
  * assert.deepStrictEqual(mostStars, Optional.some({ id: 'b', stars: 30 }));
+ *
  * assert.deepStrictEqual(smallestStars, Optional.some({ id: 'a', stars: 10 }));
  * ```
  */
@@ -191,9 +203,11 @@ export function maxBy<E, V>(
  * const words = ['Ada', 'Grace', 'Linus'] as const;
  *
  * const longWords = Arr.count(words, (word) => word.length > 4);
+ *
  * const withCurried = Arr.count<string>((word) => word.includes('a'))(words);
  *
  * assert(longWords === 2);
+ *
  * assert(withCurried === 2);
  * ```
  */
@@ -217,14 +231,17 @@ export function count<E>(
   switch (args.length) {
     case 2: {
       const [array, predicate] = args;
+
       return array.reduce<Uint32>(
         (acc, curr, index) =>
           predicate(curr, asUint32(index)) ? Uint32.add(acc, 1) : acc,
         asUint32(0),
       );
     }
+
     case 1: {
       const [predicate] = args;
+
       return (array) => count(array, predicate);
     }
   }
@@ -241,7 +258,9 @@ export function count<E>(
  * const counts = Arr.countBy(words, (word) => word[0]);
  *
  * assert.deepStrictEqual(counts.get('A'), Optional.some(2));
+ *
  * assert.deepStrictEqual(counts.get('G'), Optional.some(1));
+ *
  * assert.deepStrictEqual(counts.get('B'), Optional.some(1));
  * ```
  */
@@ -268,10 +287,12 @@ export function countBy<E, G extends MapSetKeyType>(
   switch (args.length) {
     case 2: {
       const [array, grouper] = args;
+
       const mut_groups = new Map<G, SizeType.Arr>();
 
       for (const [index, e] of array.entries()) {
         const key = grouper(e, asUint32(index));
+
         const curr = mut_groups.get(key) ?? 0;
 
         mut_groups.set(key, asUint32(curr + 1));
@@ -279,8 +300,10 @@ export function countBy<E, G extends MapSetKeyType>(
 
       return IMap.create(mut_groups);
     }
+
     case 1: {
       const [grouper] = args;
+
       return (array) => countBy(array, grouper);
     }
   }
@@ -295,12 +318,14 @@ export function countBy<E, G extends MapSetKeyType>(
  * const words = ['Ada', 'Lovelace'];
  *
  * const totalLength = Arr.foldl(words, (acc, word) => acc + word.length, 0);
+ *
  * const concat = Arr.foldl<string | number, string>(
  *   (acc, value) => `${acc}-${value}`,
  *   'items',
  * )(words);
  *
  * assert(totalLength === 11);
+ *
  * assert(concat === 'items-Ada-Lovelace');
  * ```
  */
@@ -346,13 +371,16 @@ export function foldl<E, P>(
   switch (args.length) {
     case 3: {
       const [array, callbackfn, initialValue] = args;
+
       return array.reduce(
         (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
         initialValue,
       );
     }
+
     case 2: {
       const [callbackfn, initialValue] = args;
+
       return (array) => foldl(array, callbackfn, initialValue);
     }
   }
@@ -367,12 +395,14 @@ export function foldl<E, P>(
  * const numbers = [1, 2, 3];
  *
  * const subtractRight = Arr.foldr(numbers, (acc, value) => acc - value, 0);
+ *
  * const joinFromRight = Arr.foldr<number, string>(
  *   (acc, value) => `${acc}${value}`,
  *   '',
  * )(numbers);
  *
  * assert(subtractRight === -6);
+ *
  * assert(joinFromRight === '321');
  * ```
  */
@@ -418,13 +448,16 @@ export function foldr<E, P>(
   switch (args.length) {
     case 3: {
       const [array, callbackfn, initialValue] = args;
+
       return array.reduceRight(
         (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
         initialValue,
       );
     }
+
     case 2: {
       const [callbackfn, initialValue] = args;
+
       return (array) => foldr(array, callbackfn, initialValue);
     }
   }
@@ -437,23 +470,22 @@ export function foldr<E, P>(
  *
  * ```ts
  * const numbers = [1, 2, 3, 4] as const;
+ *
  * const negatives = [3, -2, 5] as const;
  *
  * const total = Arr.sum(numbers);
+ *
  * const totalNegatives = Arr.sum(negatives);
  *
  * assert(total === 10);
+ *
  * assert(totalNegatives === 6);
  * ```
  */
 export function sum(array: readonly []): 0;
-
 export function sum<N extends number>(array: readonly [N]): N;
-
 export function sum(array: readonly Uint[]): Uint;
-
 export function sum(array: readonly Int[]): Int;
-
 export function sum(array: readonly number[]): number;
 
 export function sum(array: readonly number[]): number {
@@ -469,9 +501,11 @@ export function sum(array: readonly number[]): number {
  * const numbers = [1, 2, 3] as const;
  *
  * const defaultSeparator = Arr.join(numbers);
+ *
  * const hyphenSeparated = Arr.join(numbers, '-');
  *
  * assert.deepStrictEqual(defaultSeparator, Result.ok('1,2,3'));
+ *
  * assert.deepStrictEqual(hyphenSeparated, Result.ok('1-2-3'));
  * ```
  */
@@ -495,13 +529,17 @@ export function join<E>(
 
     case 1: {
       const [arg] = args;
+
       if (isString(arg) || isUndefined(arg)) {
         return (array) => joinImpl(array, arg);
       }
+
       return joinImpl(arg, undefined);
     }
+
     case 2: {
       const [array, separator] = args;
+
       return joinImpl(array, separator);
     }
   }
@@ -513,6 +551,7 @@ const joinImpl = <E,>(
 ): Result<string, Error> => {
   try {
     const result = array.join(separator);
+
     return Result.ok(result);
   } catch (error) {
     return Result.err(
@@ -527,7 +566,6 @@ const joinImpl = <E,>(
  * @see {@link foldl}
  */
 export const reduce = foldl;
-
 /**
  * Alias for `foldr`.
  *

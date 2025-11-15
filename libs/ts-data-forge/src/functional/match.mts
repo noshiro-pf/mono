@@ -70,10 +70,13 @@ export function match<
   switch (args.length) {
     case 2: {
       const [target, cases] = args;
+
       return cases[target];
     }
+
     case 3: {
       const [target, cases, defaultValue] = args;
+
       return keyIsIn(target, cases) ? cases[target] : defaultValue;
     }
   }
@@ -102,8 +105,11 @@ type AllCasesCovered<Case extends PropertyKey, R> =
   TypeEq<Case, keyof R> extends true ? true : false;
 
 expectType<AllCasesCovered<'a' | 'b', { a: 1; b: 2 }>, true>('=');
+
 expectType<AllCasesCovered<'a' | 'b' | 'c', { a: 1; b: 2 }>, false>('=');
+
 expectType<AllCasesCovered<'a' | 'b', { a: 1; b: 2; c: 3 }>, false>('=');
+
 expectType<AllCasesCovered<string, Record<string, string>>, true>('=');
 
 /**
@@ -121,15 +127,19 @@ type IsLiteralUnionFullyCovered<
     : false;
 
 expectType<IsLiteralUnionFullyCovered<'a' | 'b', { a: 1; b: 2 }>, true>('=');
+
 expectType<IsLiteralUnionFullyCovered<'a' | 'b' | 'c', { a: 1; b: 2 }>, false>(
   '=',
 );
+
 expectType<IsLiteralUnionFullyCovered<'a' | 'b', { a: 1; b: 2; c: 3 }>, false>(
   '=',
 );
+
 expectType<IsLiteralUnionFullyCovered<string, Record<string, string>>, false>(
   '=',
 );
+
 expectType<
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   IsLiteralUnionFullyCovered<'a' | 'b' | string, { a: 1; b: 2 }>,
@@ -152,9 +162,15 @@ type IsLiteralType<T extends PropertyKey> = string extends T
       : true;
 
 expectType<IsLiteralType<'a' | 'b'>, true>('=');
+
 expectType<IsLiteralType<'a'>, true>('=');
+
 expectType<IsLiteralType<string>, false>('=');
+
 expectType<IsLiteralType<number>, false>('=');
+
 expectType<IsLiteralType<1>, true>('=');
+
 expectType<IsLiteralType<number | 'aa'>, false>('=');
+
 expectType<IsLiteralType<'aa' | 32>, true>('=');

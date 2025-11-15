@@ -21,6 +21,7 @@ describe(createPromise, () => {
 
   test('resolves to Result.err when executor rejects', async () => {
     const rejection = new Error('boom');
+
     const result = await createPromise<number, Error>((_resolve, reject) => {
       reject(rejection);
     });

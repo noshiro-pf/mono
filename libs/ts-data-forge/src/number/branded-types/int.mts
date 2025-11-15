@@ -39,7 +39,9 @@ const {
  *
  * ```ts
  * assert.ok(isInt(5));
+ *
  * assert.notOk(isInt(5.25));
+ *
  * assert.ok(Int.is(-10));
  * ```
  *
@@ -47,7 +49,6 @@ const {
  * @returns `true` if the value is an integer, `false` otherwise
  */
 export const isInt = is;
-
 /**
  * Casts a number to an Int branded type.
  *
@@ -61,6 +62,7 @@ export const isInt = is;
  * const branded = asInt(42);
  *
  * assert(branded === 42);
+ *
  * assert.ok(Int.is(branded));
  * ```
  *
@@ -89,7 +91,9 @@ export const Int = {
    *
    * ```ts
    * assert.ok(isInt(5));
+   *
    * assert.notOk(isInt(5.25));
+   *
    * assert.ok(Int.is(-10));
    * ```
    *
@@ -110,9 +114,11 @@ export const Int = {
    *
    * ```ts
    * const negative = asInt(-12);
+   *
    * const absolute = Int.abs(negative);
    *
    * assert(absolute === 12);
+   *
    * assert.ok(Int.is(absolute));
    * ```
    *
@@ -163,10 +169,13 @@ export const Int = {
    *
    * ```ts
    * const min = asInt(1);
+   *
    * const max = asInt(6);
+   *
    * const randomValue = Int.random(min, max);
    *
    * assert.ok(Int.is(randomValue));
+   *
    * assert.ok(randomValue >= 1 && randomValue <= 6);
    * ```
    *
@@ -183,7 +192,9 @@ export const Int = {
    *
    * ```ts
    * const base = asInt(2);
+   *
    * const exponent = asInt(5);
+   *
    * const power = Int.pow(base, exponent);
    *
    * assert(power === 32);
@@ -256,7 +267,9 @@ export const Int = {
    *
    * ```ts
    * const dividend = asInt(17);
+   *
    * const divisor = asInt(5);
+   *
    * const quotient = Int.div(dividend, divisor);
    *
    * assert(quotient === 3);

@@ -10,6 +10,7 @@ describe('Queue test', () => {
       const q = createQueue();
 
       expect(q.isEmpty).toBe(true);
+
       expect(q.size).toBe(0);
     });
 
@@ -17,6 +18,7 @@ describe('Queue test', () => {
       const q = createQueue([1, 2, 3]);
 
       expect(q.isEmpty).toBe(false);
+
       expect(q.size).toBe(3);
     });
   });
@@ -33,11 +35,13 @@ describe('Queue test', () => {
       mut_q.enqueue(1);
 
       expect(mut_q.isEmpty).toBe(false);
+
       expect(mut_q.size).toBe(1);
     });
 
     test('should increase size when enqueueing to a non-empty queue', () => {
       mut_q.enqueue(1);
+
       mut_q.enqueue(2);
 
       expect(mut_q.size).toBe(2);
@@ -47,15 +51,19 @@ describe('Queue test', () => {
   describe('dequeue', () => {
     test('should return Optional.none and size should be 0 when dequeuing from an empty queue', () => {
       const q = createQueue<number>();
+
       const result = q.dequeue();
 
       expect(Optional.isNone(result)).toBe(true);
+
       expect(q.isEmpty).toBe(true);
+
       expect(q.size).toBe(0);
     });
 
     test('should decrease size and return the dequeued element for a non-empty queue', () => {
       const q = createQueue([1, 2, 3]); // FIFO: elements are in order [1, 2, 3]
+
       const initialSize = q.size;
 
       const result1 = q.dequeue(); // Dequeues 1 (first element)
@@ -81,10 +89,13 @@ describe('Queue test', () => {
 
     test('should become empty after dequeuing all elements', () => {
       const q = createQueue([1, 2]); // Internal: [1, 2]
+
       q.dequeue(); // Dequeues 1
+
       q.dequeue(); // Dequeues 2
 
       expect(q.isEmpty).toBe(true);
+
       expect(q.size).toBe(0);
 
       const result = q.dequeue(); // Dequeue from empty
@@ -96,8 +107,11 @@ describe('Queue test', () => {
   describe('FIFO behavior', () => {
     test('elements should be dequeued in first-in, first-out order', () => {
       const q = createQueue<number>();
+
       q.enqueue(1); // internal: [1]
+
       q.enqueue(2); // internal: [1, 2]
+
       q.enqueue(3); // internal: [1, 2, 3]
 
       expect(q.size).toBe(3);
@@ -105,17 +119,21 @@ describe('Queue test', () => {
       let mut_result = q.dequeue(); // Dequeues 1 (first in)
 
       expect(Optional.isSome(mut_result) && mut_result.value === 1).toBe(true);
+
       expect(q.size).toBe(2);
 
       mut_result = q.dequeue(); // Dequeues 2
 
       expect(Optional.isSome(mut_result) && mut_result.value === 2).toBe(true);
+
       expect(q.size).toBe(1);
 
       mut_result = q.dequeue(); // Dequeues 3
 
       expect(Optional.isSome(mut_result) && mut_result.value === 3).toBe(true);
+
       expect(q.size).toBe(0);
+
       expect(q.isEmpty).toBe(true);
 
       mut_result = q.dequeue();
@@ -147,6 +165,7 @@ describe('Queue test', () => {
       const q = createQueue<string>();
 
       q.enqueue('A');
+
       q.enqueue('B');
 
       const result1 = q.dequeue();
@@ -154,6 +173,7 @@ describe('Queue test', () => {
       expect(Optional.isSome(result1) && result1.value === 'A').toBe(true);
 
       q.enqueue('C');
+
       q.enqueue('D');
 
       const result2 = q.dequeue();
@@ -183,19 +203,27 @@ describe('Queue test', () => {
 
       // Remove first 3 elements
       expect(Optional.unwrap(q.dequeue())).toBe(1);
+
       expect(Optional.unwrap(q.dequeue())).toBe(2);
+
       expect(Optional.unwrap(q.dequeue())).toBe(3);
 
       // Add more elements (this should wrap around in the buffer)
       q.enqueue(6);
+
       q.enqueue(7);
+
       q.enqueue(8);
 
       // Verify FIFO order is maintained
       expect(Optional.unwrap(q.dequeue())).toBe(4);
+
       expect(Optional.unwrap(q.dequeue())).toBe(5);
+
       expect(Optional.unwrap(q.dequeue())).toBe(6);
+
       expect(Optional.unwrap(q.dequeue())).toBe(7);
+
       expect(Optional.unwrap(q.dequeue())).toBe(8);
 
       expect(q.isEmpty).toBe(true);
@@ -247,6 +275,7 @@ describe('Queue test', () => {
       for (const i of range(51, 101)) {
         expect(Optional.unwrap(q.dequeue())).toBe(i);
       }
+
       for (const i of range(101, 151)) {
         expect(Optional.unwrap(q.dequeue())).toBe(i);
       }
@@ -268,12 +297,14 @@ describe('Queue test', () => {
         expect(Optional.isSome(result) && result.value === `item-${i}`).toBe(
           true,
         );
+
         expect(q.isEmpty).toBe(true);
       }
     });
 
     test('should handle large initial values array', () => {
       const largeArray = Arr.range(1, asUint32(51));
+
       const q = createQueue(largeArray);
 
       expect(q.size).toBe(50);
@@ -288,6 +319,7 @@ describe('Queue test', () => {
 
     test('should properly clean up references for garbage collection', () => {
       const q = createQueue<{ id: number }>();
+
       const objects = Arr.seq(10).map((i) => ({ id: i }));
 
       // Add all objects

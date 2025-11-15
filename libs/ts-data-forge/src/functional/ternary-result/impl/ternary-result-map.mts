@@ -11,21 +11,27 @@ import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
  *
  * ```ts
  * const okNumber = TernaryResult.ok(5);
+ *
  * const warnValue = TernaryResult.warn(5, 'slow');
+ *
  * const errValue = TernaryResult.err('bad');
  *
  * const doubled = TernaryResult.map(okNumber, (value) => value * 2);
+ *
  * const warnPassthrough = TernaryResult.map(
  *   warnValue,
  *   (value: number) => value * 2,
  * );
+ *
  * const errPassthrough = TernaryResult.map(
  *   errValue,
  *   (value: number) => value * 2,
  * );
  *
  * assert.deepStrictEqual(doubled, TernaryResult.ok(10));
+ *
  * assert.deepStrictEqual(warnPassthrough, TernaryResult.warn(10, 'slow'));
+ *
  * assert.deepStrictEqual(errPassthrough, errValue);
  * ```
  */
@@ -49,10 +55,13 @@ export function map<R extends UnknownTernaryResult, S2>(
   switch (args.length) {
     case 2: {
       const [result, mapFn] = args;
+
       return mapImpl(result, mapFn);
     }
+
     case 1: {
       const [mapFn] = args;
+
       return (result: R) => mapImpl(result, mapFn);
     }
   }

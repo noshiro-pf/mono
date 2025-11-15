@@ -80,27 +80,34 @@ describe('Arr', () => {
     test('should be type error for index overflow for fixed length array', () => {
       {
         const array = [1, 2, 3, 4, 5] as const;
+
         // @ts-expect-error end index is out of bounds
         const result = sliceClamped(array, 0, 6);
 
         assert.deepStrictEqual(result, array);
       }
+
       {
         const array = [1, 2, 3, 4, 5] as const;
+
         // @ts-expect-error end index is out of bounds
         const result = sliceClamped(array, 0, -6);
 
         assert.deepStrictEqual(result, []);
       }
+
       {
         const array = [1, 2, 3, 4, 5] as const;
+
         // @ts-expect-error start index is out of bounds
         const result = sliceClamped(array, -6, 5);
 
         assert.deepStrictEqual(result, array);
       }
+
       {
         const array = [1, 2, 3, 4, 5] as const;
+
         // @ts-expect-error start index is out of bounds
         const result = sliceClamped(array, 6, 5);
 
@@ -110,6 +117,7 @@ describe('Arr', () => {
 
     test('should slice with clamped indices', () => {
       const array = [1, 2, 3, 4, 5];
+
       const result = sliceClamped(array, 1, 3);
 
       assert.deepStrictEqual(result, [2, 3]);
@@ -117,6 +125,7 @@ describe('Arr', () => {
 
     test('should clamp start index below 0', () => {
       const array = [1, 2, 3, 4, 5];
+
       const result = sliceClamped(array, -10, 3);
 
       assert.deepStrictEqual(result, [1, 2, 3]);
@@ -124,6 +133,7 @@ describe('Arr', () => {
 
     test('should clamp end index above length', () => {
       const array = [1, 2, 3, 4, 5];
+
       const result = sliceClamped(array, asUint32(2), asUint32(100));
 
       assert.deepStrictEqual(result, [3, 4, 5]);
@@ -131,6 +141,7 @@ describe('Arr', () => {
 
     test('should work with both indices out of range', () => {
       const array = [1, 2, 3];
+
       const result = sliceClamped(array, asInt32(-10), asUint32(100));
 
       assert.deepStrictEqual(result, [1, 2, 3]);
@@ -138,6 +149,7 @@ describe('Arr', () => {
 
     test('should work with empty array', () => {
       const array: readonly number[] = [];
+
       const result = sliceClamped(array, 0, 5);
 
       assert.deepStrictEqual(result, []);

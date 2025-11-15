@@ -9,6 +9,7 @@ const processData = (data: unknown): string | undefined => {
   ) {
     return `Hello, ${data.name}!`;
   }
+
   return undefined;
 };
 
@@ -22,5 +23,7 @@ if (isNonNullObject(value)) {
 
 // Example usage
 assert(processData({ name: 'Alice' }) === 'Hello, Alice!');
+
 assert(processData({ age: 30 }) === undefined);
+
 assert(processData('not an object') === undefined);

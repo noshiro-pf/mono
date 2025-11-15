@@ -2,13 +2,17 @@ import { Optional } from '../functional/index.mjs';
 import { IMapMapped } from './imap-mapped.mjs';
 
 const toKey = (a: Readonly<{ v: number }>): number => a.v;
+
 const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k });
 
 type TestKey = { id: number; type: string };
+
 const testKeyToString = (key: Readonly<TestKey>): string =>
   `${key.type}_${key.id}`;
+
 const stringToTestKey = (str: string): TestKey => {
   const [type, idStr] = str.split('_');
+
   return { type: type ?? '', id: Number(idStr ?? '0') };
 };
 
@@ -65,7 +69,9 @@ describe('IMapMapped.create', () => {
     );
 
     expect(map.size).toBe(2);
+
     expect(Optional.unwrap(map.get({ id: 1, type: 'user' }))).toBe('Alice');
+
     expect(Optional.unwrap(map.get({ id: 2, type: 'admin' }))).toBe('Bob');
   });
 
@@ -78,23 +84,29 @@ describe('IMapMapped.create', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const copy = IMapMapped.create(original, testKeyToString, stringToTestKey);
 
     expect(copy.size).toBe(2);
+
     expect(Optional.unwrap(copy.get({ id: 1, type: 'user' }))).toBe('Alice');
+
     expect(Optional.unwrap(copy.get({ id: 2, type: 'admin' }))).toBe('Bob');
   });
 
   test('should handle complex key transformations', () => {
     type ComplexKey = { nested: { id: number }; arr: number[] };
+
     const complexKeyToString = (
       key: DeepReadonly<{
         nested: { id: number };
         arr: number[];
       }>,
     ): string => `${key.nested.id}_${key.arr.join(',')}`;
+
     const stringToComplexKey = (str: string): ComplexKey => {
       const [idStr, arrStr] = str.split('_');
+
       return {
         nested: { id: Number(idStr ?? '0') },
         arr: (arrStr ?? '').split(',').map(Number),
@@ -108,6 +120,7 @@ describe('IMapMapped.create', () => {
     );
 
     expect(map.size).toBe(1);
+
     expect(
       Optional.unwrap(map.get({ nested: { id: 1 }, arr: [1, 2, 3] })),
     ).toBe('test');
@@ -124,6 +137,7 @@ describe('IMapMapped.equal', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const map2 = IMapMapped.create(
       [
         [{ id: 1, type: 'user' }, 'Alice'],
@@ -135,8 +149,11 @@ describe('IMapMapped.equal', () => {
 
     // Test structural equality, not reference equality
     expect(map1.size).toBe(map2.size);
+
     expect(map1.has({ id: 1, type: 'user' })).toBe(true);
+
     expect(map2.has({ id: 1, type: 'user' })).toBe(true);
+
     expect(Optional.unwrap(map1.get({ id: 1, type: 'user' }))).toBe(
       Optional.unwrap(map2.get({ id: 1, type: 'user' })),
     );
@@ -151,6 +168,7 @@ describe('IMapMapped.equal', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const map2 = IMapMapped.create(
       [
         [{ id: 1, type: 'user' }, 'Alice'],
@@ -172,6 +190,7 @@ describe('IMapMapped.equal', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const map2 = IMapMapped.create(
       [
         [{ id: 1, type: 'user' }, 'Alice'],
@@ -190,6 +209,7 @@ describe('IMapMapped.equal', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const map2 = IMapMapped.create<TestKey, string, string>(
       [],
       testKeyToString,
@@ -321,6 +341,7 @@ describe('IMapMapped.set', () => {
         fromKey,
       ),
     );
+
     assert.deepStrictEqual(
       s0,
       IMapMapped.create(
@@ -358,6 +379,7 @@ describe('IMapMapped.set', () => {
         fromKey,
       ),
     );
+
     assert.deepStrictEqual(
       s0,
       IMapMapped.create(
@@ -383,6 +405,7 @@ describe('IMapMapped.set', () => {
       s0.set({ v: 1 }, '1'),
       IMapMapped.create([[{ v: 1 }, '1']], toKey, fromKey),
     );
+
     assert.deepStrictEqual(s0, IMapMapped.create([], toKey, fromKey));
   });
 });
@@ -394,6 +417,7 @@ describe('IMapMapped.update', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const updated = map.update({ id: 1, type: 'user' }, (name) =>
       name.toUpperCase(),
     );
@@ -407,11 +431,13 @@ describe('IMapMapped.update', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const updated = map.update({ id: 2, type: 'user' }, (name) =>
       name.toUpperCase(),
     );
 
     expect(updated).toBe(map);
+
     expect(Optional.isNone(updated.get({ id: 2, type: 'user' }))).toBe(true);
   });
 });
@@ -440,6 +466,7 @@ describe('IMapMapped.delete', () => {
         fromKey,
       ),
     );
+
     assert.deepStrictEqual(
       s0,
       IMapMapped.create(
@@ -476,6 +503,7 @@ describe('IMapMapped.delete', () => {
         fromKey,
       ),
     );
+
     assert.deepStrictEqual(
       s0,
       IMapMapped.create(
@@ -497,6 +525,7 @@ describe('IMapMapped.delete', () => {
       s0.delete({ v: 1 }),
       IMapMapped.create([], toKey, fromKey),
     );
+
     assert.deepStrictEqual(s0, IMapMapped.create([], toKey, fromKey));
   });
 
@@ -509,10 +538,13 @@ describe('IMapMapped.delete', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const updated = map.delete({ id: 2, type: 'admin' });
 
     expect(updated).not.toBe(map); // Should return new instance
+
     expect(updated.size).toBe(1);
+
     expect(map.size).toBe(2); // Original unchanged
   });
 });
@@ -614,7 +646,9 @@ describe('IMapMapped.withMutations', () => {
     ]);
 
     expect(updated.size).toBe(2);
+
     expect(Optional.unwrap(updated.get({ id: 1, type: 'user' }))).toBe('ALICE');
+
     expect(Optional.unwrap(updated.get({ id: 2, type: 'admin' }))).toBe('Bob');
   });
 
@@ -624,9 +658,11 @@ describe('IMapMapped.withMutations', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const updated = map.withMutations([]);
 
     expect(updated.size).toBe(1);
+
     expect(Optional.unwrap(updated.get({ id: 1, type: 'user' }))).toBe('Alice');
   });
 });
@@ -641,11 +677,13 @@ describe('IMapMapped.map', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const transformed = map.map((value) => value.toUpperCase());
 
     expect(Optional.unwrap(transformed.get({ id: 1, type: 'user' }))).toBe(
       'ALICE',
     );
+
     expect(Optional.unwrap(transformed.get({ id: 2, type: 'admin' }))).toBe(
       'BOB',
     );
@@ -660,11 +698,13 @@ describe('IMapMapped.map', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const transformed = map.map((value, key) => `${key.type}:${value}`);
 
     expect(Optional.unwrap(transformed.get({ id: 1, type: 'user' }))).toBe(
       'user:Alice',
     );
+
     expect(Optional.unwrap(transformed.get({ id: 2, type: 'admin' }))).toBe(
       'admin:Bob',
     );
@@ -681,14 +721,17 @@ describe('IMapMapped.mapKeys', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const transformed = map.mapKeys((key) => ({ ...key, id: key.id * 10 }));
 
     expect(Optional.isNone(transformed.get({ id: 1, type: 'user' }))).toBe(
       true,
     );
+
     expect(Optional.unwrap(transformed.get({ id: 10, type: 'user' }))).toBe(
       'Alice',
     );
+
     expect(Optional.unwrap(transformed.get({ id: 20, type: 'admin' }))).toBe(
       'Bob',
     );
@@ -705,6 +748,7 @@ describe('IMapMapped.mapEntries', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const transformed = map.mapEntries(([key, value]) => [
       { ...key, id: key.id * 10 },
       value.toUpperCase(),
@@ -713,6 +757,7 @@ describe('IMapMapped.mapEntries', () => {
     expect(Optional.unwrap(transformed.get({ id: 10, type: 'user' }))).toBe(
       'ALICE',
     );
+
     expect(Optional.unwrap(transformed.get({ id: 20, type: 'admin' }))).toBe(
       'BOB',
     );
@@ -730,11 +775,14 @@ describe('IMapMapped.forEach', () => {
       toKey,
       fromKey,
     );
+
     const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
+
     const values = ['1', '2', '3'];
 
     for (const [key, value] of s0.entries()) {
       expect(keys).toContainEqual(key);
+
       expect(values).toContainEqual(value);
     }
   });
@@ -748,6 +796,7 @@ describe('IMapMapped.forEach', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const mut_collected: [TestKey, string][] = [];
 
     for (const [key, value] of map.entries()) {
@@ -755,7 +804,9 @@ describe('IMapMapped.forEach', () => {
     }
 
     expect(mut_collected).toHaveLength(2);
+
     expect(mut_collected).toContainEqual([{ id: 1, type: 'user' }, 'Alice']);
+
     expect(mut_collected).toContainEqual([{ id: 2, type: 'admin' }, 'Bob']);
   });
 });
@@ -771,6 +822,7 @@ describe('IMapMapped.keys', () => {
       toKey,
       fromKey,
     );
+
     const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
 
     for (const k of s0.keys()) {
@@ -790,6 +842,7 @@ describe('IMapMapped.values', () => {
       toKey,
       fromKey,
     );
+
     const values = ['1', '2', '3'];
 
     for (const v of s0.values()) {
@@ -809,11 +862,14 @@ describe('IMapMapped.entries', () => {
       toKey,
       fromKey,
     );
+
     const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
+
     const values = ['1', '2', '3'];
 
     for (const [k, v] of s0.entries()) {
       expect(keys).toContainEqual(k);
+
       expect(values).toContainEqual(v);
     }
   });
@@ -829,10 +885,13 @@ describe('IMapMapped.toKeysArray', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const keys = map.toKeysArray();
 
     expect(keys).toHaveLength(2);
+
     expect(keys).toContainEqual({ id: 1, type: 'user' });
+
     expect(keys).toContainEqual({ id: 2, type: 'admin' });
   });
 });
@@ -847,10 +906,13 @@ describe('IMapMapped.toValuesArray', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const values = map.toValuesArray();
 
     expect(values).toHaveLength(2);
+
     expect(values).toContain('Alice');
+
     expect(values).toContain('Bob');
   });
 });
@@ -865,10 +927,13 @@ describe('IMapMapped.toEntriesArray', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const entries = map.toEntriesArray();
 
     expect(entries).toHaveLength(2);
+
     expect(entries).toContainEqual([{ id: 1, type: 'user' }, 'Alice']);
+
     expect(entries).toContainEqual([{ id: 2, type: 'admin' }, 'Bob']);
   });
 });
@@ -883,7 +948,9 @@ describe('IMapMapped.toArray', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const entries = map.toArray();
+
     const entriesArray = map.toEntriesArray();
 
     assert.deepStrictEqual(entries, entriesArray);
@@ -900,10 +967,13 @@ describe('IMapMapped.toRawMap', () => {
       testKeyToString,
       stringToTestKey,
     );
+
     const rawMap = map.toRawMap();
 
     expect(rawMap.size).toBe(2);
+
     expect(rawMap.get('user_1')).toBe('Alice');
+
     expect(rawMap.get('admin_2')).toBe('Bob');
   });
 });

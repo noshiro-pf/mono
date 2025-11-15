@@ -19,7 +19,9 @@ const base = ISetMapped.create<Point, string>(
 );
 
 const withoutSecond = base.delete({ x: 2, tag: 'b' });
+
 const unchanged = base.delete({ x: 3, tag: 'c' });
 
 assert.deepStrictEqual(Array.from(withoutSecond), [{ x: 1, tag: 'a' }]);
+
 assert(unchanged === base);

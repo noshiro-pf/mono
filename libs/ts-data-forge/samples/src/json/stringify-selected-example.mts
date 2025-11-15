@@ -14,19 +14,24 @@ const user = {
 const safeJson = Json.stringifySelected(user, ['id', 'name', 'role']);
 
 assert.ok(Result.isOk(safeJson));
+
 if (Result.isOk(safeJson)) {
   assert(isString(safeJson.value));
 
   const parsed: unknown = JSON.parse(safeJson.value);
+
   assert.deepStrictEqual(parsed, {
     id: 1,
     name: 'Charlie',
     role: 'admin',
   });
+
   assert.ok(!safeJson.value.includes('password'));
+
   assert.ok(!safeJson.value.includes('email'));
 }
 
 // With formatting
 const formatted = Json.stringifySelected(user, ['id', 'name'], 2);
+
 assert.ok(Result.isOk(formatted));

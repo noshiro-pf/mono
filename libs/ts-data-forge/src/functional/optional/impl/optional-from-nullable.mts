@@ -12,9 +12,11 @@ import { some } from './optional-some.mjs';
  *
  * ```ts
  * const present = Optional.fromNullable('hello');
+ *
  * const absent = Optional.fromNullable<string | null>(null);
  *
  * assert.deepStrictEqual(present, Optional.some('hello'));
+ *
  * assert.deepStrictEqual(absent, Optional.none);
  * ```
  *

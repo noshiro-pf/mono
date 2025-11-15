@@ -14,6 +14,7 @@ import {
 describe('Arr modifications', () => {
   describe(toUpdated, () => {
     const xs = [1, 2, 3] as const;
+
     const result = toUpdated(xs, 1, (x) => x + 2);
 
     expectType<typeof result, ArrayOfLength<3, number>>('=');
@@ -58,6 +59,7 @@ describe('Arr modifications', () => {
   describe(toRemoved, () => {
     test('case 1', () => {
       const xs = [1, 2, 3] as const;
+
       const result = toRemoved(xs, 1);
 
       expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
@@ -67,6 +69,7 @@ describe('Arr modifications', () => {
 
     test('case 2 (remove head)', () => {
       const xs = [1, 2, 3] as const;
+
       const result = toRemoved(xs, 0);
 
       expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
@@ -76,6 +79,7 @@ describe('Arr modifications', () => {
 
     test('case 3 (remove tail)', () => {
       const xs = [1, 2, 3] as const;
+
       const result = toRemoved(xs, 2);
 
       expectType<typeof result, readonly (1 | 2 | 3)[]>('=');
@@ -85,6 +89,7 @@ describe('Arr modifications', () => {
 
     test('case 4 (number[])', () => {
       const xs: number[] = [1, 2, 3];
+
       const result = toRemoved(xs, 5);
 
       expectType<typeof result, readonly number[]>('=');
@@ -96,6 +101,7 @@ describe('Arr modifications', () => {
   describe(toPushed, () => {
     test('case 1', () => {
       const xs = [1, 2, 3] as const;
+
       const result = toPushed(xs, 4 as const);
 
       expectType<typeof result, readonly [1, 2, 3, 4]>('=');
@@ -105,6 +111,7 @@ describe('Arr modifications', () => {
 
     test('case 2', () => {
       const xs: number[] = [1, 2, 3];
+
       const result = toPushed(xs, 4 as const);
 
       expectType<typeof result, readonly [...number[], 4]>('=');
@@ -138,6 +145,7 @@ describe('Arr modifications', () => {
   describe(toFilled, () => {
     test('should fill entire array with value', () => {
       const arr = [1, 2, 3, 4, 5];
+
       const result = toFilled(arr, 0);
 
       assert.deepStrictEqual(result, [0, 0, 0, 0, 0]);
@@ -145,7 +153,9 @@ describe('Arr modifications', () => {
 
     test('should work with curried version', () => {
       const fillWithZero = toFilled(0);
+
       const arr = [1, 2, 3];
+
       const result = fillWithZero(arr);
 
       assert.deepStrictEqual(result, [0, 0, 0]);
@@ -155,6 +165,7 @@ describe('Arr modifications', () => {
   describe(toRangeFilled, () => {
     test('should fill array with range', () => {
       const arr = [1, 2, 3, 4, 5];
+
       const result = toRangeFilled(arr, 0, [1, 4]);
 
       assert.deepStrictEqual(result, [1, 0, 0, 0, 5]);
@@ -162,6 +173,7 @@ describe('Arr modifications', () => {
 
     test('should fill with range starting from 0', () => {
       const arr = [1, 2, 3, 4, 5];
+
       const result = toRangeFilled(arr, 9, [0, 3]);
 
       assert.deepStrictEqual(result, [9, 9, 9, 4, 5]);
@@ -169,6 +181,7 @@ describe('Arr modifications', () => {
 
     test('should handle empty range', () => {
       const arr = [1, 2, 3];
+
       const result = toRangeFilled(arr, 0, [2, 2]);
 
       assert.deepStrictEqual(result, [1, 2, 3]);
@@ -176,6 +189,7 @@ describe('Arr modifications', () => {
 
     test('should clamp range to array bounds', () => {
       const arr = [1, 2, 3];
+
       const result = toRangeFilled(arr, 0, [1, 10]);
 
       assert.deepStrictEqual(result, [1, 0, 0]);
@@ -183,6 +197,7 @@ describe('Arr modifications', () => {
 
     test('should handle negative start (clamped to 0)', () => {
       const arr = [1, 2, 3];
+
       const result = toRangeFilled(arr, 9, [-5, 2]);
 
       assert.deepStrictEqual(result, [9, 9, 3]);
@@ -214,7 +229,9 @@ describe('Arr modifications', () => {
 
     test('should work with different value types', () => {
       const nums = [1, 2, 3] as const;
+
       const withString = set(nums, 1, 'two');
+
       expectType<typeof withString, readonly [1 | 'two', 2 | 'two', 3 | 'two']>(
         '=',
       );
@@ -224,6 +241,7 @@ describe('Arr modifications', () => {
 
     test('should work at index 0', () => {
       const tuple = ['a', 'b', 'c'] as const;
+
       const updated = set(tuple, 0, 'A');
 
       assert.deepStrictEqual(updated, ['A', 'b', 'c']);
@@ -231,6 +249,7 @@ describe('Arr modifications', () => {
 
     test('should work at last index', () => {
       const tuple = ['a', 'b', 'c'] as const;
+
       const updated = set(tuple, 2, 'C');
 
       assert.deepStrictEqual(updated, ['a', 'b', 'C']);

@@ -13,14 +13,17 @@ import { type Unwrap } from './types.mjs';
  *
  * ```ts
  * const withValue = Optional.some(5);
+ *
  * const withoutValue = Optional.none as Optional<number>;
  *
  * assert(Optional.unwrapOr(withValue, 0) === 5);
+ *
  * assert(Optional.unwrapOr(withoutValue, 0) === 0);
  *
  * const unwrapWithDefault = Optional.unwrapOr(10);
  *
  * assert(unwrapWithDefault(Optional.some(3)) === 3);
+ *
  * assert(unwrapWithDefault(Optional.none) === 10);
  * ```
  *
@@ -46,12 +49,14 @@ export function unwrapOr<O extends UnknownOptional, D>(
   switch (args.length) {
     case 2: {
       const [optional, defaultValue] = args;
+
       return unwrapOrImpl(optional, defaultValue);
     }
 
     case 1: {
       // Curried version: first argument is default value
       const [defaultValue] = args;
+
       return (optional: Optional<Unwrap<O>>) =>
         unwrapOrImpl(optional, defaultValue);
     }

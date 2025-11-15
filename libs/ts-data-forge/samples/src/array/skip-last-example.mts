@@ -5,7 +5,9 @@ import { Arr } from 'ts-data-forge';
 const values = ['a', 'b', 'c', 'd'];
 
 const withoutLastTwo = Arr.skipLast(values, 2);
+
 const withoutLastThree = Arr.skipLast(3)(values);
 
 assert.deepStrictEqual(withoutLastTwo, ['a', 'b']);
+
 assert.deepStrictEqual(withoutLastThree, ['a']);

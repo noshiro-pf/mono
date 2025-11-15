@@ -5,6 +5,7 @@ import { TernaryResult } from 'ts-data-forge';
 const errValue = TernaryResult.err('boom');
 
 assert.strictEqual(TernaryResult.unwrapErrThrow(errValue), 'boom');
+
 assert.throws(
   () => TernaryResult.unwrapErrThrow(TernaryResult.ok('value')),
   /Expected Err/u,

@@ -13,6 +13,7 @@ import { type UnwrapErr } from './types.mjs';
  *
  * ```ts
  * const okResult = Result.ok('data');
+ *
  * const errResult = Result.err('problem');
  *
  * // Result.unwrapErr returns undefined for Ok results

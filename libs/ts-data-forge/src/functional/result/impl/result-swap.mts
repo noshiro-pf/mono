@@ -11,9 +11,11 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *
  * ```ts
  * const okValue = Result.ok('value');
+ *
  * const errValue = Result.err('error');
  *
  * assert.deepStrictEqual(Result.swap(okValue), Result.err('value'));
+ *
  * assert.deepStrictEqual(Result.swap(errValue), Result.ok('error'));
  * ```
  *

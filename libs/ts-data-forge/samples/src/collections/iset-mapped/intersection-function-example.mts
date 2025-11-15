@@ -17,6 +17,7 @@ const left = ISetMapped.create<Point, string>(
   toKey,
   fromKey,
 );
+
 const right = ISetMapped.create<Point, string>(
   [{ x: 2, tag: 'b' }],
   toKey,

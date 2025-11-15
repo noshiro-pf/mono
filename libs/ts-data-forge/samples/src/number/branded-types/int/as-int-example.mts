@@ -5,4 +5,5 @@ import { Int, asInt } from 'ts-data-forge';
 const branded = asInt(42);
 
 assert(branded === 42);
+
 assert.ok(Int.is(branded));

@@ -8,9 +8,11 @@ import { NoneTypeTagName, SomeTypeTagName } from './tag.mjs';
  *
  * ```ts
  * const maybeOptional = Optional.some('value');
+ *
  * const notOptional = { $$tag: 'ts-data-forge::Optional.some' };
  *
  * assert.ok(Optional.isOptional(maybeOptional));
+ *
  * assert.notOk(Optional.isOptional(notOptional));
  * ```
  *

@@ -16,10 +16,12 @@ const base = ISetMapped.create<Point, string>(
 );
 
 const withNew = base.add({ x: 2, tag: 'b' });
+
 const unchanged = base.add({ x: 1, tag: 'a' });
 
 assert.deepStrictEqual(Array.from(withNew), [
   { x: 1, tag: 'a' },
   { x: 2, tag: 'b' },
 ]);
+
 assert(unchanged === base);

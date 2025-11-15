@@ -14,11 +14,13 @@ import { size } from './array-utils-size.mjs';
  * const numbers = [1, 2, 3] as const;
  *
  * const doubled = Arr.map(numbers, (value) => value * 2);
+ *
  * const indexed = Arr.map<number, string>((value, index) => `${index}:${value}`)(
  *   numbers,
  * );
  *
  * assert.deepStrictEqual(doubled, [2, 4, 6]);
+ *
  * assert.deepStrictEqual(indexed, ['0:1', '1:2', '2:3']);
  * ```
  */
@@ -42,11 +44,14 @@ export function map<A, B>(
   switch (args.length) {
     case 2: {
       const [array, mapFn] = args;
+
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return array.map(mapFn as never);
     }
+
     case 1: {
       const [mapFn] = args;
+
       return (array: readonly A[]) => map(array, mapFn);
     }
   }
@@ -61,15 +66,18 @@ export function map<A, B>(
  * const changes = [5, -2, 3] as const;
  *
  * const runningTotals = Arr.scan(changes, (total, change) => total + change, 0);
+ *
  * const runningTotalsFromCurried = Arr.scan(
  *   (total: number, change: number) => total + change,
  *   10,
  * )([-5, 15]);
  *
  * const expectedTotals = [0, 5, 3, 6] as const;
+ *
  * const expectedCurriedTotals = [10, 5, 20] as const;
  *
  * assert.deepStrictEqual(runningTotals, expectedTotals);
+ *
  * assert.deepStrictEqual(runningTotalsFromCurried, expectedCurriedTotals);
  * ```
  */
@@ -111,6 +119,7 @@ export function scan<E, S>(
   switch (args.length) {
     case 3: {
       const [array, reducer, init] = args;
+
       const mut_result: MutableNonEmptyArray<S> = castMutable(
         newArray<S, PositiveUint32>(asPositiveUint32(array.length + 1), init),
       );
@@ -119,13 +128,16 @@ export function scan<E, S>(
 
       for (const [index, value] of array.entries()) {
         mut_acc = reducer(mut_acc, value, asUint32(index));
+
         mut_result[index + 1] = mut_acc;
       }
 
       return mut_result;
     }
+
     case 2: {
       const [reducer, init] = args;
+
       return (array) => scan(array, reducer, init);
     }
   }
@@ -159,17 +171,21 @@ export const toReversed = <const Ar extends readonly unknown[]>(
  *
  * ```ts
  * const numbers = [3, 1, 2] as const;
+ *
  * const words = ['banana', 'apple', 'cherry'] as const;
  *
  * const ascendingNumbers = Arr.toSorted(numbers);
+ *
  * const alphabetical = Arr.toSorted(words, (left, right) =>
  *   left.localeCompare(right),
  * );
  *
  * const expectedNumbers = [1, 2, 3] as const;
+ *
  * const expectedWords = ['apple', 'banana', 'cherry'] as const;
  *
  * assert.deepStrictEqual(ascendingNumbers, expectedNumbers);
+ *
  * assert.deepStrictEqual(alphabetical, expectedWords);
  * ```
  */
@@ -207,6 +223,7 @@ export const toSorted = <const Ar extends readonly unknown[]>(
  * ] as const;
  *
  * const byIssueCount = Arr.toSortedBy(projects, (project) => project.issues);
+ *
  * const byIssueCountDescending = Arr.toSortedBy(
  *   projects,
  *   (project) => project.issues,
@@ -226,6 +243,7 @@ export const toSorted = <const Ar extends readonly unknown[]>(
  * ] as const;
  *
  * assert.deepStrictEqual(byIssueCount, expectedByIssues);
+ *
  * assert.deepStrictEqual(byIssueCountDescending, expectedByIssueCountDescending);
  * ```
  */
@@ -276,9 +294,11 @@ export function toSortedBy<E, const V>(
  * const numbers = [1, 2, 3, 4] as const;
  *
  * const evens = Arr.filter(numbers, (value) => value % 2 === 0);
+ *
  * const greaterThanTwo = Arr.filter<number>((value) => value > 2)(numbers);
  *
  * assert.deepStrictEqual(evens, [2, 4]);
+ *
  * assert.deepStrictEqual(greaterThanTwo, [3, 4]);
  * ```
  */
@@ -316,10 +336,13 @@ export function filter<E>(
   switch (args.length) {
     case 2: {
       const [array, predicate] = args;
+
       return array.filter((a, i) => predicate(a, asUint32(i)));
     }
+
     case 1: {
       const [predicate] = args;
+
       return (array) => filter(array, predicate);
     }
   }
@@ -334,9 +357,11 @@ export function filter<E>(
  * const names = ['Ada', 'Grace', 'Linus'] as const;
  *
  * const notAda = Arr.filterNot(names, (name) => name === 'Ada');
+ *
  * const notShort = Arr.filterNot<string>((name) => name.length <= 4)(names);
  *
  * assert.deepStrictEqual(notAda, ['Grace', 'Linus']);
+ *
  * assert.deepStrictEqual(notShort, ['Grace', 'Linus']);
  * ```
  */
@@ -360,10 +385,13 @@ export function filterNot<E>(
   switch (args.length) {
     case 2: {
       const [array, predicate] = args;
+
       return array.filter((a, i) => !predicate(a, asUint32(i)));
     }
+
     case 1: {
       const [predicate] = args;
+
       return (array) => filterNot(array, predicate);
     }
   }
@@ -432,6 +460,7 @@ export const uniqBy = <
     const mappedValue = mapFn(val);
 
     if (mut_mappedValues.has(mappedValue)) return false;
+
     mut_mappedValues.add(mappedValue);
 
     return true;
@@ -450,9 +479,11 @@ export const uniqBy = <
  * ] as const;
  *
  * const flatOnce = Arr.flat(nested, 1);
+ *
  * const flatCurried = Arr.flat()(nested);
  *
  * assert.deepStrictEqual(flatOnce, [1, 2, 3, 4]);
+ *
  * assert.deepStrictEqual(flatCurried, [1, 2, 3, 4]);
  * ```
  */
@@ -473,17 +504,22 @@ export function flat<E, D extends SafeUintWithSmallInt = 1>(
   switch (args.length) {
     case 2: {
       const [array, depth] = args;
+
       return array.flat(depth);
     }
+
     case 1: {
       const [arrayOrDepth] = args;
+
       if (typeof arrayOrDepth === 'number') {
         const depth = arrayOrDepth as SafeUintWithSmallInt | undefined;
+
         return (array) => flat(array, depth);
       } else if (arrayOrDepth === undefined) {
         return (array) => flat(array, 1);
       } else {
         expectType<typeof arrayOrDepth, readonly E[]>('=');
+
         return arrayOrDepth.flat();
       }
     }
@@ -502,11 +538,13 @@ export function flat<E, D extends SafeUintWithSmallInt = 1>(
  * const words = ['Ada', 'AI'] as const;
  *
  * const characters = Arr.flatMap(words, (word) => word.split(''));
+ *
  * const labeled = Arr.flatMap<string, string>((word, index) =>
  *   word.split('').map((char) => `${index}-${char}`),
  * )(words);
  *
  * assert.deepStrictEqual(characters, ['A', 'd', 'a', 'A', 'I']);
+ *
  * assert.deepStrictEqual(labeled, ['0-A', '0-d', '0-a', '1-A', '1-I']);
  * ```
  */
@@ -530,10 +568,13 @@ export function flatMap<A, B>(
   switch (args.length) {
     case 2: {
       const [array, mapFn] = args;
+
       return array.flatMap((a, i) => mapFn(a, asUint32(i)));
     }
+
     case 1: {
       const [mapFn] = args;
+
       return (array: readonly A[]) => flatMap(array, mapFn);
     }
   }
@@ -548,11 +589,13 @@ export function flatMap<A, B>(
  * const values = [1, 2, 3, 4, 5] as const;
  *
  * const pairs = Arr.partition(values, 2);
+ *
  * const triples = Arr.partition(3)(values);
  *
  * const expectedPairs = [[1, 2], [3, 4], [5]] as const;
  *
  * assert.deepStrictEqual(pairs, expectedPairs);
+ *
  * assert.deepStrictEqual(triples, [
  *   [1, 2, 3],
  *   [4, 5],
@@ -589,6 +632,7 @@ export function partition<
   switch (args.length) {
     case 2: {
       const [array, chunkSize] = args;
+
       return chunkSize < 2
         ? []
         : // eslint-disable-next-line total-functions/no-partial-division
@@ -596,8 +640,10 @@ export function partition<
             array.slice(chunkSize * i, chunkSize * (i + 1)),
           );
     }
+
     case 1: {
       const [chunkSize] = args;
+
       return (array) => partition(array, chunkSize);
     }
   }
@@ -610,6 +656,7 @@ export function partition<
  *
  * ```ts
  * const numbers = [1, 2] as const;
+ *
  * const words = ['three', 'four'] as const;
  *
  * const combined = Arr.concat(numbers, words);
@@ -636,6 +683,7 @@ export const concat = <
  * const animals = ['ant', 'bat', 'cat', 'dove'] as const;
  *
  * const groupedByLength = Arr.groupBy(animals, (animal) => animal.length);
+ *
  * const groupedByFirstLetter = Arr.groupBy((animal: string) => animal[0])(
  *   animals,
  * );
@@ -644,16 +692,19 @@ export const concat = <
  *   groupedByLength.get(3),
  *   Optional.some(['ant', 'bat', 'cat'] as const),
  * );
+ *
  * assert.deepStrictEqual(
  *   groupedByLength.get(4),
  *   Optional.some(['dove'] as const),
  * );
+ *
  * assert.deepStrictEqual(groupedByLength.get(5), Optional.none);
  *
  * assert.deepStrictEqual(
  *   groupedByFirstLetter.get('a'),
  *   Optional.some(['ant'] as const),
  * );
+ *
  * assert.deepStrictEqual(
  *   groupedByFirstLetter.get('d'),
  *   Optional.some(['dove'] as const),
@@ -683,22 +734,28 @@ export function groupBy<E, G extends MapSetKeyType>(
   switch (args.length) {
     case 2: {
       const [array, grouper] = args;
+
       const mut_groups = new Map<G, E[]>(); // Store mutable arrays internally
 
       for (const [index, e] of array.entries()) {
         const key = grouper(e, asUint32(index)); // Ensure index is treated as SizeType.Arr
+
         const mut_group = mut_groups.get(key);
+
         if (mut_group !== undefined) {
           mut_group.push(e);
         } else {
           mut_groups.set(key, [e]);
         }
       }
+
       // Cast to IMap<G, readonly A[]> for the public interface
       return IMap.create<G, readonly E[]>(mut_groups);
     }
+
     case 1: {
       const [grouper] = args;
+
       return (array: readonly E[]) => groupBy(array, grouper);
     }
   }
@@ -711,6 +768,7 @@ export function groupBy<E, G extends MapSetKeyType>(
  *
  * ```ts
  * const letters = ['a', 'b', 'c'] as const;
+ *
  * const numbers = [1, 2, 3] as const;
  *
  * const pairs = Arr.zip(letters, numbers);

@@ -8,9 +8,11 @@ import { NoneTypeTagName } from './tag.mjs';
  *
  * ```ts
  * const someValue = Optional.some({ id: 1 });
+ *
  * const noneValue = Optional.none;
  *
  * assert.ok(Optional.isSome(someValue));
+ *
  * assert.ok(Optional.isNone(noneValue));
  * ```
  */

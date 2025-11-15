@@ -5,6 +5,7 @@ import { TernaryResult } from 'ts-data-forge';
 const okValue = TernaryResult.ok('ready');
 
 assert.strictEqual(TernaryResult.unwrapThrow(okValue), 'ready');
+
 assert.throws(
   () => TernaryResult.unwrapThrow(TernaryResult.warn('warn', 'warned')),
   /Expected Ok/u,

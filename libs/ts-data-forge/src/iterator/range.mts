@@ -40,11 +40,15 @@ import { SafeInt, asSafeInt } from '../number/index.mjs';
  *
  * ```ts
  * const zeroToThree = Array.from(range(0, 3));
+ *
  * const threeToZero = Array.from(range(3, 0, -1));
+ *
  * const defaultEnd = Array.from(range(4));
  *
  * assert.deepStrictEqual(zeroToThree, [0, 1, 2]);
+ *
  * assert.deepStrictEqual(threeToZero, [3, 2, 1]);
+ *
  * assert.deepStrictEqual(defaultEnd, [0, 1, 2, 3]);
  * ```
  *
@@ -86,15 +90,20 @@ export function* range(
   switch (args.length) {
     case 1: {
       const [end] = args;
+
       for (const i of range(0, end, 1)) {
         yield i;
       }
+
       break;
     }
 
     case 2:
+
+    // falls through
     case 3: {
       const [start, end, step = 1] = args;
+
       for (
         let mut_i: SafeInt = asSafeInt(start);
         step > 0 ? mut_i < end : mut_i > end;

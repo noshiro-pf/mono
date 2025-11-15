@@ -27,9 +27,9 @@ const {
 >({
   integerOrSafeInteger: 'SafeInteger',
   nonZero: true,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-min-safe-integer
   MIN_VALUE: Number.MIN_SAFE_INTEGER as SafeInt,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
   MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
   typeNameInMessage,
 } as const);
@@ -42,7 +42,6 @@ const {
  * @returns `true` if the value is a NonZeroSafeInt, `false` otherwise.
  */
 export const isNonZeroSafeInt = is;
-
 /**
  * Casts a number to a NonZeroSafeInt type.
  *

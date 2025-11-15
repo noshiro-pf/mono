@@ -9,14 +9,17 @@ import { type UnwrapOk } from './types.mjs';
  *
  * ```ts
  * const okValue = Result.ok(10);
+ *
  * const errValue = Result.err('fail');
  *
  * assert(Result.unwrapOkOr(okValue, 0) === 10);
+ *
  * assert(Result.unwrapOkOr(errValue, 0) === 0);
  *
  * const unwrapWithDefault = Result.unwrapOkOr(5);
  *
  * assert(unwrapWithDefault(Result.ok(3)) === 3);
+ *
  * assert(unwrapWithDefault(Result.err('no data')) === 5);
  * ```
  *
@@ -43,12 +46,14 @@ export function unwrapOkOr<R extends UnknownResult, D>(
     case 2: {
       // Direct version: first argument is result
       const [result, defaultValue] = args;
+
       return unwrapOkOrImpl(result, defaultValue);
     }
 
     case 1: {
       // Curried version
       const [defaultValue] = args;
+
       return (result: R) => unwrapOkOrImpl(result, defaultValue);
     }
   }

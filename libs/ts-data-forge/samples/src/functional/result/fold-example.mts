@@ -3,6 +3,7 @@ import { Result } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 const okValue = Result.ok(2);
+
 const errValue = Result.err('bad');
 
 const foldedOk = Result.fold(
@@ -10,6 +11,7 @@ const foldedOk = Result.fold(
   (value) => value * 2,
   (error) => error,
 );
+
 const foldedErr = Result.fold(
   errValue,
   (value: number) => value * 2,
@@ -17,6 +19,7 @@ const foldedErr = Result.fold(
 );
 
 assert.deepStrictEqual(foldedOk, Result.ok(4));
+
 assert.deepStrictEqual(foldedErr, Result.err('BAD'));
 
 const foldNumbers = Result.fold(
@@ -25,4 +28,5 @@ const foldNumbers = Result.fold(
 );
 
 assert.deepStrictEqual(foldNumbers(Result.ok(3)), Result.ok(9));
+
 assert.deepStrictEqual(foldNumbers(Result.err('oops')), Result.err(4));

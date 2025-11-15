@@ -10,11 +10,13 @@ import { ok } from './ternary-result-ok.mjs';
  *
  * ```ts
  * const success = TernaryResult.fromThrowable(() => 1 + 1);
+ *
  * const failure = TernaryResult.fromThrowable(() => {
  *   throw new Error('boom');
  * });
  *
  * assert.deepStrictEqual(success, TernaryResult.ok(2));
+ *
  * assert.ok(TernaryResult.isErr(failure));
  * ```
  */
@@ -27,6 +29,7 @@ export const fromThrowable = <T,>(
     if (isError(error)) {
       return err(error);
     }
+
     return err(new Error(unknownToString(error)));
   }
 };

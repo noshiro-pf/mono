@@ -8,6 +8,7 @@ const okFold = TernaryResult.fold(
   (warn: string) => warn.length,
   (error: string) => error.toUpperCase(),
 );
+
 const warnFold = TernaryResult.fold(
   TernaryResult.warn(2, 'spike'),
   (value: number) => value,
@@ -16,4 +17,5 @@ const warnFold = TernaryResult.fold(
 );
 
 assert.deepStrictEqual(okFold, TernaryResult.ok(4));
+
 assert.deepStrictEqual(warnFold, TernaryResult.warn(2, 'SPIKE'));

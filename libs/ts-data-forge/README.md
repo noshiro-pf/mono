@@ -140,6 +140,7 @@ The `expectType` utility allows you to make assertions about types at compile ti
 import { expectType } from 'ts-data-forge';
 
 type User = { id: number; name: string };
+
 type Admin = { id: number; name: string; role: 'admin' };
 
 // Assert that Admin extends User
@@ -201,7 +202,9 @@ const handleStatus = (status: Status, data?: string): string =>
     });
 
 assert(handleStatus('loading') === 'Please wait...');
+
 assert(handleStatus('success', 'Hello') === 'Data: Hello');
+
 assert(handleStatus('error') === 'An error occurred');
 
 // Pattern matching with Result
@@ -209,6 +212,7 @@ const processResult = (result: Result<number, string>): string =>
     Result.isOk(result) ? `Success: ${result.value}` : `Error: ${result.value}`;
 
 assert(processResult(Result.ok(42)) === 'Success: 42');
+
 assert(processResult(Result.err('Failed')) === 'Error: Failed');
 ```
 
@@ -221,33 +225,41 @@ import { Num } from 'ts-data-forge';
 
 // Basic conversions
 assert(Num.from('123') === 123);
+
 assert(Number.isNaN(Num.from('abc')));
 
 // Range checking
 const inRange = Num.isInRange(0, 10);
 
 assert(inRange(5));
+
 assert(inRange(0)); // (inclusive lower bound)
+
 assert(!inRange(10)); // (exclusive upper bound)
 
 // Clamping values
 const clamp = Num.clamp(0, 100);
 
 assert(clamp(150) === 100);
+
 assert(clamp(-10) === 0);
 
 // Rounding utilities
 const round2 = Num.round(2);
 
 assert(round2(3.141_59) === 3.14);
+
 assert(Num.roundAt(3.141_59, 3) === 3.142);
+
 assert(Num.roundToInt(3.7) === 4);
 
 // Type guards
 const value = 5; // example value
+
 if (Num.isNonZero(value)) {
     // value is guaranteed to be non-zero
     const result = Num.div(10, value); // Safe division
+
     assert(result === 2);
 }
 ```
@@ -272,13 +284,19 @@ import {
 
 // Basic branded types
 const integer = asInt(42); // Int - any integer
+
 const unsigned = asUint(42); // Uint - non-negative integer
+
 const finite = asFiniteNumber(3.14); // FiniteNumber - finite floating-point
+
 const safeInt = asSafeInt(42); // SafeInt - integer in safe range
 
 assert(integer === 42);
+
 assert(unsigned === 42);
+
 assert(finite === 3.14);
+
 assert(safeInt === 42);
 
 // This line would cause a runtime error:
@@ -288,29 +306,41 @@ assert.throw(() => {
 
 // Range-constrained types (16-bit, 32-bit)
 const int16 = asInt16(1000); // Int16: [-32768, 32767]
+
 const uint32 = asUint32(3_000_000_000); // Uint32: [0, 4294967295]
+
 assert(int16 === 1000);
+
 assert(uint32 === 3_000_000_000);
 
 // Non-zero and positive variants
 const nonZeroInt = asNonZeroInt(5); // NonZeroInt - excludes zero
+
 const positiveInt = asPositiveInt(10); // PositiveInt - excludes zero and negatives
+
 assert(nonZeroInt === 5);
+
 assert(positiveInt === 10);
 
 // Type-safe arithmetic with automatic clamping
 const sum = Int16.add(int16, asInt16(2000)); // Int16 (3000)
+
 const clamped = Int16.clamp(100_000); // Int16 (32767 - clamped to MAX_VALUE)
+
 assert(sum === 3000);
+
 assert(clamped === 32_767);
 
 // Safe division with non-zero types
 const ratio = NonZeroInt.div(asNonZeroInt(10), nonZeroInt); // No division by zero risk
+
 assert(ratio === 2);
 
 // Random generation within type constraints
 const randomInt16 = Int16.random(); // Int16 (random value in valid range)
+
 assert(-32_768 <= randomInt16);
+
 assert(randomInt16 <= 32_767);
 ```
 
@@ -332,6 +362,7 @@ assert(sum === 20);
 if (Arr.isArrayAtLeastLength(numbers, 2)) {
     // numbers is now guaranteed to have at least 2 elements
     expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
+
     assert(numbers[1] === 2); // Safe access to index 1
 }
 
@@ -347,9 +378,11 @@ assert.deepStrictEqual(unique, [1, 2, 3, 4, 5]);
 
 // Array creation
 const zeros: readonly [0, 0, 0, 0, 0] = Arr.zeros(5);
+
 assert.deepStrictEqual(zeros, [0, 0, 0, 0, 0]);
 
 const range: readonly [1, 2, 3] = Arr.range(1, 4);
+
 assert.deepStrictEqual(range, [1, 2, 3]);
 
 const people = [
@@ -360,10 +393,12 @@ const people = [
 
 // Find maximum by property
 const oldestPerson = Arr.maxBy(people, (person) => person.age);
+
 assert.deepStrictEqual(
     oldestPerson,
     Optional.some({ name: 'Charlie', age: 35 } as const),
 );
+
 if (Optional.isSome(oldestPerson)) {
     assert(oldestPerson.value.name === 'Charlie');
 }
@@ -378,21 +413,27 @@ import { Arr, IMap, ISet, Optional } from 'ts-data-forge';
 
 // IMap usage - immutable operations
 const originalMap = IMap.create<string, number>([]);
+
 const mapWithOne = originalMap.set('one', 1);
+
 const mapWithTwo = mapWithOne.set('two', 2);
 
 // Original map is unchanged
 assert(originalMap.size === 0);
+
 assert.deepStrictEqual(mapWithTwo.get('one'), Optional.some(1));
 
 assert(!mapWithTwo.has('three'));
 
 // Using pipe for fluent updates
 const sequence = Arr.seq(10); // [0, 1, 2, ..., 9]
+
 const pairs = sequence.map(
     (i) => [i, i.toString()] as readonly [number, string],
 );
+
 const skipped = Arr.skip(pairs, 1); // [[1, "1"], ..., [9, "9"]]
+
 const idMap = IMap.create<number, string>(skipped);
 
 assert(idMap.size === 9);
@@ -408,10 +449,13 @@ assert(idMapUpdated.size === 9);
 
 // ISet usage
 const originalSet = ISet.create<number>([]);
+
 const setWithItems = originalSet.add(1).add(2).add(1); // Duplicate ignored
 
 assert(originalSet.size === 0); // (unchanged)
+
 assert(setWithItems.has(1));
+
 assert(setWithItems.size === 2);
 ```
 
@@ -431,6 +475,7 @@ const processData = (data: unknown): string | undefined => {
     ) {
         return `Hello, ${data.name}!`;
     }
+
     return undefined;
 };
 
@@ -444,7 +489,9 @@ if (isNonNullObject(value)) {
 
 // Example usage
 assert(processData({ name: 'Alice' }) === 'Hello, Alice!');
+
 assert(processData({ age: 30 }) === undefined);
+
 assert(processData('not an object') === undefined);
 ```
 
@@ -457,6 +504,7 @@ import { range } from 'ts-data-forge';
 
 // Traditional for loop using range
 const mut_values: number[] = [];
+
 for (const i of range(0, 5)) {
     mut_values.push(i);
 }
@@ -465,13 +513,16 @@ assert.deepStrictEqual(mut_values, [0, 1, 2, 3, 4]);
 
 // Create arrays from ranges
 const numbers = Array.from(range(1, 4));
-const squares = Array.from(range(1, 6), (x) => x * x);
+
+const squares = Array.from(range(1, 6), (x) => x ** 2);
 
 assert.deepStrictEqual(numbers, [1, 2, 3]);
+
 assert.deepStrictEqual(squares, [1, 4, 9, 16, 25]);
 
 // Step ranges
 const mut_stepValues: number[] = [];
+
 for (const i of range(0, 10, 2)) {
     mut_stepValues.push(i);
 }
@@ -484,15 +535,12 @@ assert.deepStrictEqual(mut_stepValues, [0, 2, 4, 6, 8]);
 Safely work with readonly types when interfacing with mutable APIs.
 
 ```tsx
+import { Autocomplete, TextField } from '@mui/material';
+import { produce } from 'immer';
 import type * as React from 'react';
 import { castMutable } from 'ts-data-forge';
 
 // Example: Material-UI Autocomplete
-import { Autocomplete, TextField } from '@mui/material';
-
-// Immer.js example
-import { produce } from 'immer';
-
 export const SomeComponent: React.FC = () => (
     <Autocomplete
         options={castMutable(readonlyOptions)}
@@ -539,6 +587,7 @@ const updatedState = produce(initialState, (draft) => {
 });
 
 assert.deepStrictEqual(initialState.items, ['item1', 'item2']);
+
 assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);
 ```
 

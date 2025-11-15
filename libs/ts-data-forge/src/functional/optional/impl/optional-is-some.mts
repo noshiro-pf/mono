@@ -11,6 +11,7 @@ import { type NarrowToSome } from './types.mjs';
  *
  * if (Optional.isSome(optionalNumber)) {
  *   const value: number = optionalNumber.value;
+ *
  *   assert(value === 42);
  * }
  * ```

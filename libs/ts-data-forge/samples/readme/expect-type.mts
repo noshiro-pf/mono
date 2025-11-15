@@ -1,6 +1,7 @@
 import { expectType } from 'ts-data-forge';
 
 type User = { id: number; name: string };
+
 type Admin = { id: number; name: string; role: 'admin' };
 
 // Assert that Admin extends User

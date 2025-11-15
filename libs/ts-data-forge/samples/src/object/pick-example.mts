@@ -12,6 +12,7 @@ const user = {
 
 // Direct usage
 const publicInfo = Obj.pick(user, ['id', 'name', 'role']);
+
 assert.deepStrictEqual(publicInfo, {
   id: 1,
   name: 'Bob',

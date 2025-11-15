@@ -12,8 +12,10 @@ import { some } from './optional-some.mjs';
  * const zipped = Optional.zip(Optional.some('left'), Optional.some(1));
  *
  * assert.ok(Optional.isSome(zipped));
+ *
  * if (Optional.isSome(zipped)) {
  *   const expected: readonly [string, number] = ['left', 1];
+ *
  *   assert.deepStrictEqual(zipped.value, expected);
  * }
  *

@@ -66,6 +66,7 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 
   if (hasKey(obj, 'a')) {
     expectType<typeof obj.a, 0>('=');
+
     expectType<typeof obj, Readonly<{ a: 0 }>>('=');
   }
 
@@ -86,7 +87,9 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 
   if (hasKey(obj, 'a') && hasKey(obj, 'b')) {
     expectType<typeof obj.a, 1>('=');
+
     expectType<typeof obj.b, 1>('=');
+
     expectType<typeof obj, Readonly<{ a: 1; b: 1 }>>('=');
   }
 }
@@ -122,7 +125,9 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 
   if (hasKey(obj, 'a') && hasKey(obj, 'b')) {
     expectType<typeof obj.a, number>('=');
+
     expectType<typeof obj.b, number>('=');
+
     expectType<
       typeof obj,
       | Readonly<{ a: 1; b: 1 }>
@@ -138,6 +143,7 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 
   if (hasKey(o, 'a')) {
     expectType<typeof o.a, unknown>('=');
+
     expectType<
       typeof o,
       ReadonlyRecord<'a', unknown> & ReadonlyRecord<string, unknown>
@@ -146,6 +152,7 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 
   if (hasKey(o, 'c')) {
     expectType<typeof o.c, unknown>('=');
+
     expectType<
       typeof o,
       ReadonlyRecord<'c', unknown> & ReadonlyRecord<string, unknown>
@@ -154,7 +161,9 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 
   if (hasKey(o, 'a') && hasKey(o, 'b')) {
     expectType<typeof o.a, unknown>('=');
+
     expectType<typeof o.b, unknown>('=');
+
     expectType<
       typeof o,
       ReadonlyRecord<'a', unknown> &

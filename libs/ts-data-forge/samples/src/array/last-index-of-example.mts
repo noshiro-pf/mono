@@ -5,14 +5,20 @@ import { Arr } from 'ts-data-forge';
 const fruits = ['apple', 'banana', 'orange', 'banana'];
 
 const lastBanana = Arr.lastIndexOf(fruits, 'banana');
+
 const lastApple = Arr.lastIndexOf(fruits, 'apple');
+
 const notFound = Arr.lastIndexOf(fruits, 'grape');
 
 // Curried version
 const findLastBanana = Arr.lastIndexOf('banana');
+
 const index = findLastBanana(fruits);
 
 console.log(lastBanana); // => 3
+
 console.log(lastApple); // => 0
+
 console.log(notFound); // => -1
+
 console.log(index); // => 3

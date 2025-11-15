@@ -10,12 +10,16 @@ const parse = (value: string): TernaryResult<number, string, string> =>
 const doubled = TernaryResult.flatMap(TernaryResult.ok('3'), (text) =>
   TernaryResult.map(parse(text), (num) => num * 2),
 );
+
 const warnPassthrough = TernaryResult.flatMap(
   TernaryResult.warn('3', 'retry'),
   parse,
 );
+
 const errPassthrough = TernaryResult.flatMap(TernaryResult.err('oops'), parse);
 
 assert.deepStrictEqual(doubled, TernaryResult.ok(6));
+
 assert.deepStrictEqual(warnPassthrough, TernaryResult.warn(3, 'retry'));
+
 assert.deepStrictEqual(errPassthrough, TernaryResult.err('oops'));

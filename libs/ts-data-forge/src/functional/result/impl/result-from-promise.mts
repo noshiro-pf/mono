@@ -19,12 +19,15 @@ type UnwrapPromise<P extends Promise<unknown>> =
  *
  * ```ts
  * const successPromise = Result.fromPromise(Promise.resolve('ok'));
+ *
  * const failurePromise = Result.fromPromise(Promise.reject(new Error('fail')));
  *
  * const resolved = await successPromise;
+ *
  * const rejected = await failurePromise;
  *
  * assert.deepStrictEqual(resolved, Result.ok('ok'));
+ *
  * assert.ok(Result.isErr(rejected));
  * ```
  *

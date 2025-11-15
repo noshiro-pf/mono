@@ -51,9 +51,11 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * ```ts
    * const emptySet = ISet.create<number>([]);
+   *
    * const filledSet = ISet.create([1, 2]);
    *
    * assert.ok(emptySet.isEmpty);
+   *
    * assert.notOk(filledSet.isEmpty);
    * ```
    */
@@ -69,6 +71,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * const set = ISet.create(['apple', 'banana']);
    *
    * assert.ok(set.has('apple'));
+   *
    * assert.notOk(set.has('cherry'));
    * ```
    *
@@ -88,9 +91,11 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * const numbers = ISet.create([2, 4, 6]);
    *
    * const allEven = numbers.every((value) => value % 2 === 0);
+   *
    * const narrowed = numbers.every((value): value is 2 | 4 | 6 => value % 2 === 0);
    *
    * assert.ok(allEven);
+   *
    * assert.ok(narrowed);
    * ```
    *
@@ -118,6 +123,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * const numbers = ISet.create([1, 3, 5]);
    *
    * assert.ok(numbers.some((value) => value > 4));
+   *
    * assert.notOk(numbers.some((value) => value > 10));
    * ```
    *
@@ -138,9 +144,11 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * const base = ISet.create<number>([1, 2]);
    *
    * const withThree = base.add(3);
+   *
    * const unchanged = base.add(2);
    *
    * assert.deepStrictEqual(Array.from(withThree), [1, 2, 3]);
+   *
    * assert(unchanged === base);
    * ```
    *
@@ -158,9 +166,11 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * const base = ISet.create<number>([1, 2, 3]);
    *
    * const withoutTwo = base.delete(2);
+   *
    * const unchanged = base.delete(4);
    *
    * assert.deepStrictEqual(Array.from(withoutTwo), [1, 3]);
+   *
    * assert(unchanged === base);
    * ```
    *
@@ -187,6 +197,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * const mutated = base.withMutations(actions);
    *
    * assert.deepStrictEqual(Array.from(mutated), ['b', 'c']);
+   *
    * assert.deepStrictEqual(Array.from(base), ['a', 'b']);
    * ```
    *
@@ -230,11 +241,13 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * const letters = ISet.create(['apple', 'bee', 'cat']);
    *
    * const shortWords = letters.filter((value) => value.length <= 3);
+   *
    * const narrowed = letters.filter(
    *   (value): value is 'bee' | 'cat' => value.length === 3,
    * );
    *
    * assert.deepStrictEqual(Array.from(shortWords), ['bee', 'cat']);
+   *
    * assert.deepStrictEqual(Array.from(narrowed), ['bee', 'cat']);
    * ```
    *
@@ -280,9 +293,11 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * ```ts
    * const subset = ISet.create<number>([1, 2]);
+   *
    * const superset = ISet.create<number>([1, 2, 3]);
    *
    * assert.ok(subset.isSubsetOf(superset));
+   *
    * assert.notOk(superset.isSubsetOf(subset));
    * ```
    *
@@ -299,9 +314,11 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * ```ts
    * const superset = ISet.create<string>(['a', 'b', 'c']);
+   *
    * const subset = ISet.create<string>(['a', 'c']);
    *
    * assert.ok(superset.isSupersetOf(subset));
+   *
    * assert.notOk(subset.isSupersetOf(superset));
    * ```
    *
@@ -319,6 +336,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * ```ts
    * const all = ISet.create<number>([1, 2, 3, 4]);
+   *
    * const toRemove = ISet.create<number>([2, 4]);
    *
    * const difference = all.subtract(toRemove);
@@ -339,6 +357,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * ```ts
    * const left = ISet.create<string>(['x', 'y']);
+   *
    * const right = ISet.create<string>(['y', 'z']);
    *
    * const shared = left.intersect(right);
@@ -358,6 +377,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * ```ts
    * const numbers = ISet.create([1, 2]);
+   *
    * const letters = ISet.create(['a', 'b']);
    *
    * const combined = numbers.union(letters);
@@ -380,6 +400,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * ```ts
    * const set = ISet.create(['alpha', 'beta']);
+   *
    * const collected: string[] = [];
    *
    * for (const value of set) {
@@ -477,6 +498,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * const raw = set.toRawSet();
    *
    * assert.ok(is.set(raw));
+   *
    * assert.ok(raw.has('alpha'));
    * ```
    *
@@ -557,10 +579,13 @@ export namespace ISet {
    *
    * ```ts
    * const first = ISet.create<number>([1, 2]);
+   *
    * const second = ISet.create<number>([2, 1]);
+   *
    * const third = ISet.create<number>([1, 3]);
    *
    * assert.ok(ISet.equal(first, second));
+   *
    * assert.notOk(ISet.equal(first, third));
    * ```
    *
@@ -591,11 +616,13 @@ export namespace ISet {
    *
    * ```ts
    * const previous = ISet.create<string>(['draft', 'review']);
+   *
    * const current = ISet.create<string>(['review', 'published']);
    *
    * const { added, deleted } = ISet.diff(previous, current);
    *
    * assert.deepStrictEqual(Array.from(added), ['published']);
+   *
    * assert.deepStrictEqual(Array.from(deleted), ['draft']);
    * ```
    *
@@ -627,6 +654,7 @@ export namespace ISet {
    *
    * ```ts
    * const left = ISet.create<number>([1, 2, 3]);
+   *
    * const right = ISet.create<number>([2, 4]);
    *
    * const overlap = ISet.intersection(left, right);
@@ -658,6 +686,7 @@ export namespace ISet {
    *
    * ```ts
    * const numbers = ISet.create([1, 2]);
+   *
    * const words = ISet.create(['one', 'two']);
    *
    * const union = ISet.union(numbers, words);
@@ -711,6 +740,7 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
    */
   constructor(iterable: Iterable<K>, showNotFoundMessage: boolean = false) {
     this.#set = new Set(iterable);
+
     this.#showNotFoundMessage = showNotFoundMessage;
   }
 
@@ -766,8 +796,10 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
     if (!this.has(key)) {
       if (this.#showNotFoundMessage) {
         const keyStr = unknownToString(key);
+
         console.warn(`ISet.delete: key not found: ${keyStr}`);
       }
+
       return this;
     }
 
@@ -786,10 +818,12 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
       switch (action.type) {
         case 'delete':
           mut_result.delete(action.key);
+
           break;
 
         case 'add':
           mut_result.add(action.key);
+
           break;
       }
     }

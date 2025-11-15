@@ -11,37 +11,49 @@ describe('NonNegativeInt32 test', () => {
   describe(asNonNegativeInt32, () => {
     test('accepts valid non-negative int32 values', () => {
       expect(() => asNonNegativeInt32(0)).not.toThrow();
+
       expect(() => asNonNegativeInt32(1)).not.toThrow();
+
       expect(() => asNonNegativeInt32(1000)).not.toThrow();
+
       expect(() => asNonNegativeInt32(2_147_483_647)).not.toThrow(); // 2^31 - 1
     });
 
     test('rejects negative integers', () => {
       expect(() => asNonNegativeInt32(-1)).toThrow(TypeError);
+
       expect(() => asNonNegativeInt32(-42)).toThrow(TypeError);
+
       expect(() => asNonNegativeInt32(-2_147_483_648)).toThrow(TypeError);
     });
 
     test('rejects values outside int32 range', () => {
       expect(() => asNonNegativeInt32(2_147_483_648)).toThrow(TypeError); // 2^31
+
       expect(() => asNonNegativeInt32(4_294_967_296)).toThrow(TypeError);
     });
 
     test('rejects non-integers', () => {
       expect(() => asNonNegativeInt32(Number.NaN)).toThrow(TypeError);
+
       expect(() => asNonNegativeInt32(Number.POSITIVE_INFINITY)).toThrow(
         TypeError,
       );
+
       expect(() => asNonNegativeInt32(Number.NEGATIVE_INFINITY)).toThrow(
         TypeError,
       );
+
       expect(() => asNonNegativeInt32(1.2)).toThrow(TypeError);
+
       expect(() => asNonNegativeInt32(-3.4)).toThrow(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
       expect(asNonNegativeInt32(0)).toBe(0);
+
       expect(asNonNegativeInt32(5)).toBe(5);
+
       expect(asNonNegativeInt32(2_147_483_647)).toBe(2_147_483_647);
     });
 
@@ -68,27 +80,37 @@ describe('NonNegativeInt32 test', () => {
   describe(isNonNegativeInt32, () => {
     test('correctly identifies non-negative int32 values', () => {
       expect(isNonNegativeInt32(0)).toBe(true);
+
       expect(isNonNegativeInt32(1)).toBe(true);
+
       expect(isNonNegativeInt32(1000)).toBe(true);
+
       expect(isNonNegativeInt32(2_147_483_647)).toBe(true);
     });
 
     test('correctly identifies negative integers', () => {
       expect(isNonNegativeInt32(-1)).toBe(false);
+
       expect(isNonNegativeInt32(-42)).toBe(false);
+
       expect(isNonNegativeInt32(-2_147_483_648)).toBe(false);
     });
 
     test('correctly identifies values outside int32 range', () => {
       expect(isNonNegativeInt32(2_147_483_648)).toBe(false);
+
       expect(isNonNegativeInt32(4_294_967_296)).toBe(false);
     });
 
     test('correctly identifies non-integers', () => {
       expect(isNonNegativeInt32(Number.NaN)).toBe(false);
+
       expect(isNonNegativeInt32(Number.POSITIVE_INFINITY)).toBe(false);
+
       expect(isNonNegativeInt32(Number.NEGATIVE_INFINITY)).toBe(false);
+
       expect(isNonNegativeInt32(1.2)).toBe(false);
+
       expect(isNonNegativeInt32(-3.4)).toBe(false);
     });
   });
@@ -96,7 +118,9 @@ describe('NonNegativeInt32 test', () => {
   describe('NonNegativeInt32.is', () => {
     test('same as isNonNegativeInt32 function', () => {
       expect(NonNegativeInt32.is(5)).toBe(isNonNegativeInt32(5));
+
       expect(NonNegativeInt32.is(0)).toBe(isNonNegativeInt32(0));
+
       expect(NonNegativeInt32.is(-1)).toBe(isNonNegativeInt32(-1));
     });
   });
@@ -104,19 +128,25 @@ describe('NonNegativeInt32 test', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(NonNegativeInt32.MIN_VALUE).toBe(0);
+
       expect(NonNegativeInt32.MAX_VALUE).toBe(2_147_483_647);
     });
   });
 
   describe('mathematical operations', () => {
     const a = asNonNegativeInt32(1_000_000);
+
     const b = asNonNegativeInt32(500_000);
+
     const c = asNonNegativeInt32(0);
 
     test('min and max', () => {
       expect(NonNegativeInt32.min(a, b)).toBe(500_000);
+
       expect(NonNegativeInt32.max(a, b)).toBe(1_000_000);
+
       expect(NonNegativeInt32.min(a, c)).toBe(0);
+
       expect(NonNegativeInt32.max(a, c)).toBe(1_000_000);
     });
 
@@ -127,12 +157,15 @@ describe('NonNegativeInt32 test', () => {
       );
 
       expect(result).toBe(2_147_483_647); // clamped to max
+
       expect(NonNegativeInt32.add(a, b)).toBe(1_500_000);
     });
 
     test('sub (never goes below 0)', () => {
       expect(NonNegativeInt32.sub(a, b)).toBe(500_000);
+
       expect(NonNegativeInt32.sub(b, a)).toBe(0); // clamped to 0
+
       expect(NonNegativeInt32.sub(c, a)).toBe(0); // clamped to 0
     });
 
@@ -143,6 +176,7 @@ describe('NonNegativeInt32 test', () => {
       );
 
       expect(result).toBe(2_147_483_647); // clamped to max
+
       expect(
         NonNegativeInt32.mul(asNonNegativeInt32(1000), asNonNegativeInt32(5)),
       ).toBe(5000);
@@ -150,9 +184,11 @@ describe('NonNegativeInt32 test', () => {
 
     test('div (floor division, never goes below 0)', () => {
       expect(NonNegativeInt32.div(a, asPositiveInt32(500_000))).toBe(2);
+
       expect(
         NonNegativeInt32.div(asNonNegativeInt32(7), asPositiveInt32(3)),
       ).toBe(2);
+
       expect(
         NonNegativeInt32.div(
           asNonNegativeInt32(500_000),
@@ -168,6 +204,7 @@ describe('NonNegativeInt32 test', () => {
       );
 
       expect(result).toBe(2_147_483_647); // clamped to max
+
       expect(
         NonNegativeInt32.pow(asNonNegativeInt32(2), asNonNegativeInt32(3)),
       ).toBe(8);
@@ -177,15 +214,20 @@ describe('NonNegativeInt32 test', () => {
   describe('random', () => {
     test('generates non-negative int32 values within specified range', () => {
       const min = 0;
+
       const max = 20;
 
       for (const _ of range(10)) {
         const result = NonNegativeInt32.random(min, max);
 
         expect(result).toBeGreaterThanOrEqual(min);
+
         expect(result).toBeLessThanOrEqual(max);
+
         expect(NonNegativeInt32.is(result)).toBe(true);
+
         expect(Number.isInteger(result)).toBe(true);
+
         expect(result).toBeGreaterThanOrEqual(0);
       }
     });
@@ -195,6 +237,7 @@ describe('NonNegativeInt32 test', () => {
         const result = NonNegativeInt32.random(0, 30);
 
         expect(result).toBeGreaterThanOrEqual(0);
+
         expect(result).toBeLessThanOrEqual(2_147_483_647);
       }
     });

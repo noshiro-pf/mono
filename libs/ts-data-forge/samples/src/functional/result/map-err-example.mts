@@ -3,12 +3,15 @@ import { Result } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 const okValue = Result.ok(3) as Result<number, string>;
+
 const errValue = Result.err('missing');
 
 const untouchedOk = Result.mapErr(okValue, (error) => error.toUpperCase());
+
 const uppercasedErr = Result.mapErr(errValue, (error) => error.toUpperCase());
 
 assert.deepStrictEqual(untouchedOk, Result.ok(3));
+
 assert.deepStrictEqual(uppercasedErr, Result.err('MISSING'));
 
 const mapError = Result.mapErr((error: Readonly<Error>) => error.message);

@@ -77,6 +77,7 @@ describe('Uint8 test', () => {
   describe('Uint8.min', () => {
     test('should return minimum value', () => {
       expect(Uint8.min(100, 50, 10)).toBe(10);
+
       expect(Uint8.min(1, 2, 3)).toBe(1);
     });
   });
@@ -84,6 +85,7 @@ describe('Uint8 test', () => {
   describe('Uint8.max', () => {
     test('should return maximum value', () => {
       expect(Uint8.max(100, 50, 10)).toBe(100);
+
       expect(Uint8.max(1, 2, 3)).toBe(3);
     });
   });
@@ -156,11 +158,15 @@ describe('Uint8 test', () => {
   describe('Uint8.random', () => {
     test('should generate value within range', () => {
       const min = 10;
+
       const max = 50;
+
       const result = Uint8.random(min, max);
 
       expect(result).toBeGreaterThanOrEqual(min);
+
       expect(result).toBeLessThanOrEqual(max);
+
       expect(Number.isInteger(result)).toBe(true);
     });
   });

@@ -15,6 +15,7 @@ import { type NarrowToOk } from './types.mjs';
  *
  * if (TernaryResult.isOk(maybeNumber)) {
  *   const value: number = maybeNumber.value;
+ *
  *   assert.strictEqual(value, 42);
  * }
  * ```

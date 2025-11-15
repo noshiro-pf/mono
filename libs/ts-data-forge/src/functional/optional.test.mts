@@ -6,8 +6,11 @@ describe('Optional test', () => {
   describe('isOptional', () => {
     test('should return true for Some values', () => {
       expect(Optional.isOptional(Optional.some(42))).toBe(true);
+
       expect(Optional.isOptional(Optional.some('hello'))).toBe(true);
+
       expect(Optional.isOptional(Optional.some(null))).toBe(true);
+
       expect(Optional.isOptional(Optional.some(undefined))).toBe(true);
     });
 
@@ -17,10 +20,15 @@ describe('Optional test', () => {
 
     test('should return false for non-Optional values', () => {
       expect(Optional.isOptional(42)).toBe(false);
+
       expect(Optional.isOptional('hello')).toBe(false);
+
       expect(Optional.isOptional(null)).toBe(false);
+
       expect(Optional.isOptional(undefined)).toBe(false);
+
       expect(Optional.isOptional({})).toBe(false);
+
       expect(Optional.isOptional({ type: 'fake', value: 42 })).toBe(false);
     });
   });
@@ -30,11 +38,13 @@ describe('Optional test', () => {
       const someNumber = Optional.some(42);
 
       expect(Optional.isSome(someNumber)).toBe(true);
+
       expect(Optional.unwrap(someNumber)).toBe(42);
 
       const someString = Optional.some('hello');
 
       expect(Optional.isSome(someString)).toBe(true);
+
       expect(Optional.unwrap(someString)).toBe('hello');
 
       const someObject = Optional.some({ name: 'Alice', age: 30 });
@@ -57,7 +67,9 @@ describe('Optional test', () => {
   describe('none', () => {
     test('should be a singleton None value', () => {
       expect(Optional.isNone(Optional.none)).toBe(true);
+
       expect(Optional.isSome(Optional.none)).toBe(false);
+
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expect(Optional.unwrapOr(Optional.none, undefined)).toBeUndefined();
     });
@@ -72,6 +84,7 @@ describe('Optional test', () => {
       const some = Optional.some(42);
 
       expect(Optional.isSome(some)).toBe(true);
+
       expect(Optional.isNone(some)).toBe(false);
     });
 
@@ -79,6 +92,7 @@ describe('Optional test', () => {
       const none = Optional.none;
 
       expect(Optional.isSome(none)).toBe(false);
+
       expect(Optional.isNone(none)).toBe(true);
     });
 
@@ -98,6 +112,7 @@ describe('Optional test', () => {
   describe('map', () => {
     test('should map over Some values', () => {
       const some = Optional.some(5);
+
       const mapped = Optional.map(some, (x) => x * 2);
 
       expect(Optional.isSome(mapped)).toBe(true);
@@ -109,6 +124,7 @@ describe('Optional test', () => {
 
     test('should return None for None values', () => {
       const none = Optional.none;
+
       const mapped = Optional.map(none, (x: never) => x * 2);
 
       expect(Optional.isNone(mapped)).toBe(true);
@@ -137,6 +153,7 @@ describe('Optional test', () => {
       const doubler = Optional.map((x: number) => x * 2);
 
       const some = Optional.some(5);
+
       const mapped = doubler(some);
 
       expect(Optional.isSome(mapped)).toBe(true);
@@ -146,6 +163,7 @@ describe('Optional test', () => {
       }
 
       const none = Optional.none;
+
       const mappedNone = doubler(none);
 
       expect(Optional.isNone(mappedNone)).toBe(true);
@@ -153,6 +171,7 @@ describe('Optional test', () => {
 
     test('should work with pipe when curried', () => {
       const doubler = Optional.map((x: number) => x * 2);
+
       const toStringFn = Optional.map((x: number) => x.toString());
 
       const result = pipe(Optional.some(5)).map(doubler).map(toStringFn).value;
@@ -168,7 +187,9 @@ describe('Optional test', () => {
   describe('unwrap', () => {
     test('should return the value for Some', () => {
       expect(Optional.unwrap(Optional.some(42))).toBe(42);
+
       expect(Optional.unwrap(Optional.some('hello'))).toBe('hello');
+
       expect(Optional.unwrap(Optional.some(null))).toBeNull();
     });
 
@@ -192,6 +213,7 @@ describe('Optional test', () => {
   describe('unwrapThrow', () => {
     test('should return the value for Some', () => {
       expect(Optional.unwrapThrow(Optional.some(42))).toBe(42);
+
       expect(Optional.unwrapThrow(Optional.some('hello'))).toBe('hello');
     });
 
@@ -211,6 +233,7 @@ describe('Optional test', () => {
   describe('unwrapOr', () => {
     test('should return the value for Some', () => {
       expect(Optional.unwrapOr(Optional.some(42), 0)).toBe(42);
+
       expect(Optional.unwrapOr(Optional.some('hello'), 'default')).toBe(
         'hello',
       );
@@ -218,6 +241,7 @@ describe('Optional test', () => {
 
     test('should return the default value for None', () => {
       expect(Optional.unwrapOr(Optional.none, 0)).toBe(0);
+
       expect(Optional.unwrapOr(Optional.none, 'default')).toBe('default');
     });
 
@@ -239,11 +263,13 @@ describe('Optional test', () => {
       const unwrapWithDefault = Optional.unwrapOr(42);
 
       const someValue = Optional.some(100);
+
       const result = unwrapWithDefault(someValue);
 
       expect(result).toBe(100);
 
       const noneValue = Optional.none;
+
       const defaultResult = unwrapWithDefault(noneValue);
 
       expect(defaultResult).toBe(42);
@@ -281,9 +307,11 @@ describe('Optional test', () => {
       const expectValidId = Optional.expectToBe<string>('ID is required');
 
       const id1 = Optional.some('user-123');
+
       const id2 = Optional.none;
 
       expect(expectValidId(id1)).toBe('user-123');
+
       expect(() => expectValidId(id2)).toThrow('ID is required');
     });
 
@@ -291,6 +319,7 @@ describe('Optional test', () => {
       const getValue = Optional.expectToBe('Value must exist');
 
       const someValue = Optional.some('important data');
+
       const result = getValue(someValue);
 
       expect(result).toBe('important data');
@@ -318,10 +347,13 @@ describe('Optional test', () => {
   describe('type utilities', () => {
     test('should correctly unwrap types', () => {
       type SomeNumber = Some<number>;
+
       type UnwrappedNumber = Optional.Unwrap<SomeNumber>;
+
       expectType<UnwrappedNumber, number>('=');
 
       type UnwrappedNone = Optional.Unwrap<None>;
+
       expectType<UnwrappedNone, never>('=');
     });
 
@@ -329,9 +361,11 @@ describe('Optional test', () => {
       type MaybeNumber = Optional<number>;
 
       type OnlySome = Optional.NarrowToSome<MaybeNumber>;
+
       expectType<OnlySome, Some<number>>('=');
 
       type OnlyNone = Optional.NarrowToNone<MaybeNumber>;
+
       expectType<OnlyNone, None>('=');
     });
   });
@@ -340,10 +374,12 @@ describe('Optional test', () => {
     test('should chain operations that return Optional', () => {
       const parseNumber = (s: string): Optional<number> => {
         const n = Number(s);
+
         return Number.isNaN(n) ? Optional.none : Optional.some(n);
       };
 
       const result = Optional.flatMap(Optional.some('42'), parseNumber);
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe(42);
       }
@@ -364,6 +400,7 @@ describe('Optional test', () => {
     test('should support chaining multiple flatMaps', () => {
       const parseNumber = (s: string): Optional<number> => {
         const n = Number(s);
+
         return Number.isNaN(n) ? Optional.none : Optional.some(n);
       };
 
@@ -376,7 +413,9 @@ describe('Optional test', () => {
               Optional.some(n / divisor);
 
       const intermediate = Optional.flatMap(Optional.some('100'), parseNumber);
+
       const result = Optional.flatMap(intermediate, divideBy(2));
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe(50);
       }
@@ -385,6 +424,7 @@ describe('Optional test', () => {
     test('should support curried form', () => {
       const parseNumber = (s: string): Optional<number> => {
         const n = Number(s);
+
         return Number.isNaN(n) ? Optional.none : Optional.some(n);
       };
 
@@ -410,6 +450,7 @@ describe('Optional test', () => {
     test('should work with pipe when curried', () => {
       const parseNumber = (s: string): Optional<number> => {
         const n = Number(s);
+
         return Number.isNaN(n) ? Optional.none : Optional.some(n);
       };
 
@@ -417,6 +458,7 @@ describe('Optional test', () => {
         n > 0 ? Optional.some(n * 2) : Optional.none;
 
       const parser = Optional.flatMap(parseNumber);
+
       const doubler = Optional.flatMap(doubleIfPositive);
 
       const result = pipe(Optional.some('42')).map(parser).map(doubler).value;
@@ -432,7 +474,9 @@ describe('Optional test', () => {
   describe('filter', () => {
     test('should keep Some values that match predicate', () => {
       const someEven = Optional.some(4);
+
       const filtered = Optional.filter(someEven, (x) => x % 2 === 0);
+
       if (Optional.isSome(filtered)) {
         expect(Optional.unwrap(filtered)).toBe(4);
       }
@@ -440,6 +484,7 @@ describe('Optional test', () => {
 
     test('should return None for Some values that do not match predicate', () => {
       const someOdd = Optional.some(5);
+
       const filtered = Optional.filter(someOdd, (x) => x % 2 === 0);
 
       expect(Optional.isNone(filtered)).toBe(true);
@@ -455,6 +500,7 @@ describe('Optional test', () => {
       const evenFilter = Optional.filter((x: number) => x % 2 === 0);
 
       const someEven = Optional.some(4);
+
       const filtered = evenFilter(someEven);
 
       expect(Optional.isSome(filtered)).toBe(true);
@@ -464,6 +510,7 @@ describe('Optional test', () => {
       }
 
       const someOdd = Optional.some(5);
+
       const filteredOdd = evenFilter(someOdd);
 
       expect(Optional.isNone(filteredOdd)).toBe(true);
@@ -475,6 +522,7 @@ describe('Optional test', () => {
 
     test('should work with pipe when curried', () => {
       const evenFilter = Optional.filter((x: number) => x % 2 === 0);
+
       const positiveFilter = Optional.filter((x: number) => x > 0);
 
       const result = pipe(Optional.some(4))
@@ -496,8 +544,11 @@ describe('Optional test', () => {
   describe('orElse', () => {
     test('should return the first Optional if it is Some', () => {
       const primary = Optional.some(42);
+
       const fallback = Optional.some(100);
+
       const result = Optional.orElse(primary, fallback);
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe(42);
       }
@@ -505,8 +556,11 @@ describe('Optional test', () => {
 
     test('should return the alternative if the first is None', () => {
       const primary = Optional.none;
+
       const fallback = Optional.some('default');
+
       const result = Optional.orElse(primary, fallback);
+
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe('default');
       }
@@ -522,6 +576,7 @@ describe('Optional test', () => {
       const fallbackTo = Optional.orElse(Optional.some('fallback'));
 
       const someValue = Optional.some('primary');
+
       const result = fallbackTo(someValue);
 
       expect(Optional.isSome(result)).toBe(true);
@@ -531,6 +586,7 @@ describe('Optional test', () => {
       }
 
       const noneValue = Optional.none;
+
       const fallbackResult = fallbackTo(noneValue);
 
       expect(Optional.isSome(fallbackResult)).toBe(true);
@@ -564,8 +620,11 @@ describe('Optional test', () => {
   describe('zip', () => {
     test('should combine two Some values into a tuple', () => {
       const a = Optional.some(1);
+
       const b = Optional.some('hello');
+
       const zipped = Optional.zip(a, b);
+
       if (Optional.isSome(zipped)) {
         assert.deepStrictEqual(Optional.unwrap(zipped), [1, 'hello']);
       }
@@ -573,7 +632,9 @@ describe('Optional test', () => {
 
     test('should return None if first is None', () => {
       const a = Optional.none;
+
       const b = Optional.some('hello');
+
       const zipped = Optional.zip(a, b);
 
       expect(Optional.isNone(zipped)).toBe(true);
@@ -581,7 +642,9 @@ describe('Optional test', () => {
 
     test('should return None if second is None', () => {
       const a = Optional.some(1);
+
       const b = Optional.none;
+
       const zipped = Optional.zip(a, b);
 
       expect(Optional.isNone(zipped)).toBe(true);
@@ -597,19 +660,24 @@ describe('Optional test', () => {
   describe('fromNullable', () => {
     test('should convert non-null values to Some', () => {
       const helloOpt = Optional.fromNullable('hello');
+
       if (Optional.isSome(helloOpt))
         expect(Optional.unwrap(helloOpt)).toBe('hello');
 
       const numOpt = Optional.fromNullable(42);
+
       if (Optional.isSome(numOpt)) expect(Optional.unwrap(numOpt)).toBe(42);
 
       const zeroOpt = Optional.fromNullable(0);
+
       if (Optional.isSome(zeroOpt)) expect(Optional.unwrap(zeroOpt)).toBe(0);
 
       const emptyOpt = Optional.fromNullable('');
+
       if (Optional.isSome(emptyOpt)) expect(Optional.unwrap(emptyOpt)).toBe('');
 
       const falseOpt = Optional.fromNullable(false);
+
       if (Optional.isSome(falseOpt))
         expect(Optional.unwrap(falseOpt)).toBe(false);
     });
@@ -632,7 +700,9 @@ describe('Optional test', () => {
   describe('toNullable', () => {
     test('should convert Some to its value', () => {
       expect(Optional.toNullable(Optional.some(42))).toBe(42);
+
       expect(Optional.toNullable(Optional.some('hello'))).toBe('hello');
+
       expect(Optional.toNullable(Optional.some(null))).toBeNull();
     });
 
@@ -653,6 +723,7 @@ describe('Optional test', () => {
       const someUndefined = Optional.some(undefined);
 
       expect(Optional.isSome(someUndefined)).toBe(true);
+
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expect(Optional.unwrap(someUndefined)).toBeUndefined();
 
@@ -664,6 +735,7 @@ describe('Optional test', () => {
       const someNull = Optional.some(null);
 
       expect(Optional.isSome(someNull)).toBe(true);
+
       expect(Optional.unwrap(someNull)).toBeNull();
     });
 
@@ -675,6 +747,7 @@ describe('Optional test', () => {
       const inner = Optional.unwrap(nested);
 
       expect(Optional.isOptional(inner)).toBe(true);
+
       expect(Optional.unwrap(inner)).toBe(42);
     });
   });

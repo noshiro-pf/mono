@@ -9,6 +9,7 @@ const users = [
 ] as const;
 
 const leastVisits = Arr.minBy(users, (user) => user.visits);
+
 const custom = Arr.minBy(
   users,
   (user) => user.visits,
@@ -16,4 +17,5 @@ const custom = Arr.minBy(
 );
 
 assert.deepStrictEqual(leastVisits, Optional.some({ id: 2, visits: 3 }));
+
 assert.deepStrictEqual(custom, Optional.some({ id: 1, visits: 10 }));

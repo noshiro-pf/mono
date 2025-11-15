@@ -4,10 +4,13 @@ import { isRecord } from './is-record.mjs';
 describe(isRecord, () => {
   test('{ x: 1 } is a record', () => {
     const obj = { x: 1 } as const;
+
     const unk: unknown = obj;
+
     const res = isRecord(unk);
 
     expectType<typeof obj, UnknownRecord>('<=');
+
     expectType<typeof res, boolean>('=');
 
     if (res) {
@@ -19,10 +22,13 @@ describe(isRecord, () => {
 
   test('{} is a record', () => {
     const obj = {} as const;
+
     const unk: unknown = obj;
+
     const res = isRecord(unk);
 
     expectType<typeof obj, {}>('=');
+
     expectType<typeof res, boolean>('=');
 
     if (res) {
@@ -34,10 +40,13 @@ describe(isRecord, () => {
 
   test('[] is not a record', () => {
     const obj: DeepReadonly<never[]> = [] as const;
+
     const unk: unknown = obj;
+
     const res = isRecord(unk);
 
     expectType<typeof obj, readonly never[]>('=');
+
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -45,10 +54,13 @@ describe(isRecord, () => {
 
   test('null is not a record', () => {
     const obj = null;
+
     const unk: unknown = obj;
+
     const res = isRecord(unk);
 
     expectType<typeof obj, null>('=');
+
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -56,10 +68,13 @@ describe(isRecord, () => {
 
   test('undefined is not a record', () => {
     const obj = undefined;
+
     const unk: unknown = obj;
+
     const res = isRecord(unk);
 
     expectType<typeof obj, undefined>('=');
+
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -67,10 +82,13 @@ describe(isRecord, () => {
 
   test('3 is not a record', () => {
     const obj = 3;
+
     const unk: unknown = obj;
+
     const res = isRecord(unk);
 
     expectType<typeof obj, 3>('=');
+
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);
@@ -78,10 +96,13 @@ describe(isRecord, () => {
 
   test('"str" is not a record', () => {
     const obj = 'str';
+
     const unk: unknown = obj;
+
     const res = isRecord(unk);
 
     expectType<typeof obj, 'str'>('=');
+
     expectType<typeof res, boolean>('=');
 
     expect(res).toBe(false);

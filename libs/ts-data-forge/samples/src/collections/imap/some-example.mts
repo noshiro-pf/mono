@@ -10,4 +10,5 @@ const entries = [
 const map = IMap.create(entries);
 
 assert.ok(map.some((value) => value > 4));
+
 assert.notOk(map.some((value) => value > 10));

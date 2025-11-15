@@ -13,14 +13,17 @@ import { type Unwrap } from './types.mjs';
  *
  * ```ts
  * const even = Optional.filter(Optional.some(4), (value) => value % 2 === 0);
+ *
  * const odd = Optional.filter(Optional.some(3), (value) => value % 2 === 0);
  *
  * assert.deepStrictEqual(even, Optional.some(4));
+ *
  * assert.deepStrictEqual(odd, Optional.none);
  *
  * const filterEven = Optional.filter((value: number) => value % 2 === 0);
  *
  * assert.deepStrictEqual(filterEven(Optional.some(6)), Optional.some(6));
+ *
  * assert.deepStrictEqual(filterEven(Optional.some(5)), Optional.none);
  * ```
  *
@@ -47,12 +50,14 @@ export function filter<O extends UnknownOptional>(
   switch (args.length) {
     case 2: {
       const [optional, predicate] = args;
+
       return filterImpl(optional, predicate);
     }
 
     case 1: {
       // Curried version: first argument is predicate function
       const [predicate] = args;
+
       return (optional: O) => filterImpl(optional, predicate);
     }
   }
@@ -64,6 +69,7 @@ const filterImpl = <O extends UnknownOptional>(
 ): Optional<Unwrap<O>> => {
   if (isSome(optional)) {
     const value = unwrap(optional);
+
     return predicate(value) ? some(value) : none;
   }
 

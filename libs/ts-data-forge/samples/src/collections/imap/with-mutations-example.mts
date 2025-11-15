@@ -22,6 +22,9 @@ const actions: readonly Readonly<
 const mutated = base.withMutations(actions);
 
 assert.deepStrictEqual(mutated.get('c'), Optional.some(3));
+
 assert.deepStrictEqual(mutated.get('b'), Optional.some(20));
+
 assert.deepStrictEqual(mutated.get('a'), Optional.none);
+
 assert.deepStrictEqual(base.get('b'), Optional.some(2));

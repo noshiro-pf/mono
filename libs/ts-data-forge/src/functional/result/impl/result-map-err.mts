@@ -10,12 +10,15 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *
  * ```ts
  * const okValue = Result.ok(3) as Result<number, string>;
+ *
  * const errValue = Result.err('missing');
  *
  * const untouchedOk = Result.mapErr(okValue, (error) => error.toUpperCase());
+ *
  * const uppercasedErr = Result.mapErr(errValue, (error) => error.toUpperCase());
  *
  * assert.deepStrictEqual(untouchedOk, Result.ok(3));
+ *
  * assert.deepStrictEqual(uppercasedErr, Result.err('MISSING'));
  *
  * const mapError = Result.mapErr((error: Readonly<Error>) => error.message);
@@ -50,12 +53,14 @@ export function mapErr<R extends UnknownResult, E2>(
     case 2: {
       // Direct version: first argument is result
       const [result, mapFn] = args;
+
       return mapErrImpl(result, mapFn);
     }
 
     case 1: {
       // Curried version: first argument is mapping function
       const [mapFn] = args;
+
       return (result: R) => mapErrImpl(result, mapFn);
     }
   }

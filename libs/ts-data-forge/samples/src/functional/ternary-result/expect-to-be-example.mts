@@ -5,6 +5,7 @@ import { TernaryResult } from 'ts-data-forge';
 const okValue = TernaryResult.ok('ready');
 
 assert.strictEqual(TernaryResult.expectToBe(okValue, 'missing'), 'ready');
+
 const expectResult = TernaryResult.expectToBe<string>('needs value');
 
 assert.throws(() => expectResult(TernaryResult.err('oops')), /needs value/u);

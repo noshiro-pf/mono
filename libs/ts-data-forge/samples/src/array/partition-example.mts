@@ -5,11 +5,13 @@ import { Arr } from 'ts-data-forge';
 const values = [1, 2, 3, 4, 5] as const;
 
 const pairs = Arr.partition(values, 2);
+
 const triples = Arr.partition(3)(values);
 
 const expectedPairs = [[1, 2], [3, 4], [5]] as const;
 
 assert.deepStrictEqual(pairs, expectedPairs);
+
 assert.deepStrictEqual(triples, [
   [1, 2, 3],
   [4, 5],

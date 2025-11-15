@@ -5,9 +5,11 @@ import { TernaryResult } from 'ts-data-forge';
 const okValue = TernaryResult.ok('value');
 
 assert.strictEqual(TernaryResult.unwrapErrOr(okValue, 'default'), 'default');
+
 const unwrapErr = TernaryResult.unwrapErrOr('fallback error');
 
 assert.strictEqual(unwrapErr(TernaryResult.err('boom')), 'boom');
+
 assert.strictEqual(
   unwrapErr(TernaryResult.warn('value', 'warn')),
   'fallback error',

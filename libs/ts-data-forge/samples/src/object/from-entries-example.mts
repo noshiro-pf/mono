@@ -10,6 +10,7 @@ const entries1 = [
 ] as const;
 
 const obj1 = Obj.fromEntries(entries1);
+
 assert.deepStrictEqual(obj1, {
   name: 'David',
   age: 25,
@@ -23,4 +24,5 @@ const dynamicEntries: (readonly ['x' | 'y', number])[] = [
 ];
 
 const obj2 = Obj.fromEntries(dynamicEntries);
+
 assert.deepStrictEqual(obj2, { x: 10, y: 20 });

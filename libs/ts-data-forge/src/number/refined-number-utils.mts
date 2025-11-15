@@ -36,6 +36,7 @@ export namespace TsDataForgeInternals {
         if (!is(a)) {
           throw new TypeError(`Expected ${typeNameInErrorMessage}, got: ${a}`);
         }
+
         return a;
       };
 
@@ -308,19 +309,31 @@ export namespace TsDataForgeInternals {
      * } as const);
      *
      * const six = intOps.castType(6);
+     *
      * const four = intOps.castType(4);
+     *
      * const sum = intOps.add(six, four);
+     *
      * const difference = intOps.sub(six, four);
+     *
      * const product = intOps.mul(six, four);
+     *
      * const quotient = intOps.div(six, intOps.castType(2));
+     *
      * const roundedClamp = intOps.clamp(1.5);
+     *
      * const randomValue = intOps.random();
      *
      * assert(sum === 10);
+     *
      * assert(difference === 2);
+     *
      * assert(product === 24);
+     *
      * assert(quotient === 3);
+     *
      * assert(roundedClamp === 2);
+     *
      * assert.ok(Number.isSafeInteger(randomValue));
      * ```
      *
@@ -437,6 +450,7 @@ export namespace TsDataForgeInternals {
       ): ElementType => {
         while (true) {
           const r = randomImpl(min, max);
+
           if (Num.isNonZero(r)) return clampOrCastFn(r);
         }
       };
@@ -522,20 +536,30 @@ export namespace TsDataForgeInternals {
      * } as const);
      *
      * const fortyTwo = floatOps.castType(42.5);
+     *
      * const seven = floatOps.castType(7.5);
+     *
      * const sum = floatOps.add(fortyTwo, seven);
+     *
      * const ratio = floatOps.div(sum, floatOps.castType(10));
+     *
      * const clamped = floatOps.clamp(0);
+     *
      * const boundedRandom = floatOps.random(
      *   floatOps.castType(10),
      *   floatOps.castType(20),
      * );
+     *
      * const nonZeroRandom = floatOps.randomNonZero();
      *
      * assert(sum === 50);
+     *
      * assert(ratio === 5);
+     *
      * assert.ok(clamped >= Number.MIN_VALUE);
+     *
      * assert.ok(boundedRandom >= 10 && boundedRandom <= 20);
+     *
      * assert.ok(nonZeroRandom > 0);
      * ```
      *
@@ -624,6 +648,7 @@ export namespace TsDataForgeInternals {
       ): ElementType => {
         while (true) {
           const r = random(min, max);
+
           if (isNonZero(r)) return r;
         }
       };

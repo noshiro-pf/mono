@@ -8,10 +8,12 @@ import { type NarrowToOk } from './types.mjs';
  *
  * ```ts
  * const operation = Result.ok(3);
+ *
  * const failure = Result.err('error');
  *
  * if (Result.isOk(operation)) {
  *   const value: number = operation.value;
+ *
  *   assert(value === 3);
  * }
  *

@@ -16,6 +16,7 @@ import { type Unwrap } from './types.mjs';
  * const expectValue = Optional.expectToBe<string>('missing optional');
  *
  * assert.throws(() => expectValue(Optional.none), /missing optional/u);
+ *
  * assert(expectValue(Optional.some('present')) === 'present');
  * ```
  *
@@ -41,12 +42,14 @@ export function expectToBe<O extends UnknownOptional>(
   switch (args.length) {
     case 2: {
       const [optional, message] = args;
+
       return expectToBeImpl(optional, message);
     }
 
     case 1: {
       // Curried version: first argument is message
       const [message] = args;
+
       return (optional: Optional<Unwrap<O>>): Unwrap<O> =>
         expectToBeImpl(optional, message);
     }

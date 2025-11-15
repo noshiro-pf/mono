@@ -8,4 +8,5 @@ const product = PositiveSafeInt.mul(
 );
 
 assert(product === 1000);
+
 assert.ok(PositiveSafeInt.is(product));

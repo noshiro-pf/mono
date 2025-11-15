@@ -5,4 +5,5 @@ import { ISet } from 'ts-data-forge';
 const set = ISet.create(['apple', 'banana']);
 
 assert.ok(set.has('apple'));
+
 assert.notOk(set.has('cherry'));

@@ -10,7 +10,9 @@ const successPromise = createPromise<number, string>((resolve) => {
 });
 
 const successResult = await successPromise;
+
 assert.ok(Result.isOk(successResult));
+
 if (Result.isOk(successResult)) {
   assert(successResult.value === 42);
 }
@@ -23,7 +25,9 @@ const errorPromise = createPromise<number, string>((_, reject) => {
 });
 
 const errorResult = await errorPromise;
+
 assert.ok(Result.isErr(errorResult));
+
 if (Result.isErr(errorResult)) {
   assert(errorResult.value === 'Something went wrong');
 }

@@ -9,6 +9,7 @@ const projects = [
 ] as const;
 
 const byIssueCount = Arr.toSortedBy(projects, (project) => project.issues);
+
 const byIssueCountDescending = Arr.toSortedBy(
   projects,
   (project) => project.issues,
@@ -28,4 +29,5 @@ const expectedByIssueCountDescending = [
 ] as const;
 
 assert.deepStrictEqual(byIssueCount, expectedByIssues);
+
 assert.deepStrictEqual(byIssueCountDescending, expectedByIssueCountDescending);

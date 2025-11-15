@@ -14,16 +14,23 @@ describe('Arr validations', () => {
   describe(isArray, () => {
     test('should return true for arrays', () => {
       expect(isArray([1, 2, 3])).toBe(true);
+
       expect(isArray([])).toBe(true);
+
       expect(isArray(['a', 'b'])).toBe(true);
     });
 
     test('should return false for non-arrays', () => {
       expect(isArray('hello')).toBe(false);
+
       expect(isArray(123)).toBe(false);
+
       expect(isArray(null)).toBe(false);
+
       expect(isArray(undefined)).toBe(false);
+
       expect(isArray({})).toBe(false);
+
       expect(isArray(new Set())).toBe(false);
     });
 
@@ -34,18 +41,23 @@ describe('Arr validations', () => {
         if (isArray(value)) {
           // value should be typed as number[]
           expectType<typeof value, readonly number[]>('=');
+
           return value.length;
         }
+
         return 0;
       };
 
       expect(processValue([1, 2, 3])).toBe(3);
+
       expect(processValue('hello')).toBe(0);
+
       expect(processValue(null)).toBe(0);
     });
 
     test('should work with readonly arrays', () => {
       const readonlyArray: readonly number[] = [1, 2, 3];
+
       if (isArray(readonlyArray)) {
         expectType<typeof readonlyArray, readonly number[]>('=');
 
@@ -55,6 +67,7 @@ describe('Arr validations', () => {
 
     test('should work with mutable arrays', () => {
       const mutableArray: number[] = [1, 2, 3];
+
       if (isArray(mutableArray)) {
         expectType<typeof mutableArray, number[]>('=');
 
@@ -69,18 +82,24 @@ describe('Arr validations', () => {
         if (isArray(value)) {
           // Only number[] should remain
           expectType<typeof value, readonly number[]>('=');
+
           return value.length;
         }
+
         // Non-array types
         expectType<typeof value, string | boolean | Readonly<{ a: number }>>(
           '=',
         );
+
         return -1;
       };
 
       expect(checkUnion([1, 2])).toBe(2);
+
       expect(checkUnion('test')).toBe(-1);
+
       expect(checkUnion(true)).toBe(-1);
+
       expect(checkUnion({ a: 1 })).toBe(-1);
     });
 
@@ -97,38 +116,51 @@ describe('Arr validations', () => {
         if (isArray(value)) {
           // Only number[] should remain
           expectType<typeof value, readonly unknown[]>('=');
+
           return value.length;
         }
+
         // Non-array types
         expectType<
           typeof value,
           string | boolean | Readonly<{ a: number }> | unknown | object
         >('=');
+
         return -1;
       };
 
       expect(checkUnion([1, 2])).toBe(2);
+
       expect(checkUnion('test')).toBe(-1);
+
       expect(checkUnion(true)).toBe(-1);
+
       expect(checkUnion({ a: 1 })).toBe(-1);
     });
 
     test('should return true for arrays (additional)', () => {
       expect(isArray([])).toBe(true);
+
       expect(isArray([1, 2, 3])).toBe(true);
+
       expect(isArray(['a', 'b'])).toBe(true);
     });
 
     test('should return false for non-arrays (additional)', () => {
       expect(isArray('string')).toBe(false);
+
       expect(isArray(123)).toBe(false);
+
       expect(isArray({})).toBe(false);
+
       expect(isArray(null)).toBe(false);
+
       expect(isArray(undefined)).toBe(false);
     });
 
     test('should work as type guard (additional)', () => {
       const value: unknown = [1, 2, 3];
+
       if (isArray(value)) {
         expectType<typeof value, readonly unknown[]>('=');
 
@@ -145,6 +177,7 @@ describe('Arr validations', () => {
     describe('comprehensive type guard tests', () => {
       test('should narrow unknown type to array', () => {
         const value: unknown = [1, 2, 3];
+
         if (isArray(value)) {
           expectType<typeof value, readonly unknown[]>('=');
         } else {
@@ -154,6 +187,7 @@ describe('Arr validations', () => {
 
       test('should handle any type', () => {
         const value: any = [1, 2, 3];
+
         if (isArray(value)) {
           expectType<typeof value, readonly unknown[]>('=');
         }
@@ -161,6 +195,7 @@ describe('Arr validations', () => {
 
       test('should work with nested arrays', () => {
         const nested: readonly (readonly number[])[] = [[1], [2], [3]];
+
         if (isArray(nested)) {
           expectType<typeof nested, readonly (readonly number[])[]>('=');
         }
@@ -168,6 +203,7 @@ describe('Arr validations', () => {
 
       test('should distinguish between array and tuple types', () => {
         const tuple: readonly [1, 2, 3] = [1, 2, 3];
+
         if (isArray(tuple)) {
           expectType<typeof tuple, readonly [1, 2, 3]>('=');
         }
@@ -175,6 +211,7 @@ describe('Arr validations', () => {
 
       test('should work with empty tuple type', () => {
         const emptyTuple: readonly [] = [];
+
         if (isArray(emptyTuple)) {
           expectType<typeof emptyTuple, readonly []>('=');
         }
@@ -185,7 +222,9 @@ describe('Arr validations', () => {
           | readonly string[]
           | readonly number[]
           | readonly boolean[];
+
         const mixedArray: MixedArrayUnion = [1, 2, 3];
+
         if (isArray(mixedArray)) {
           expectType<typeof mixedArray, MixedArrayUnion>('<=');
         }
@@ -197,16 +236,19 @@ describe('Arr validations', () => {
             // Type is narrowed to array type within this block
             return value.length;
           }
+
           return 0;
         };
 
         expect(processGeneric([1, 2, 3])).toBe(3);
+
         expect(processGeneric('hello')).toBe(0);
       });
 
       test('should handle never type correctly', () => {
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         const neverValue = undefined as never;
+
         if (isArray(neverValue)) {
           expectType<typeof neverValue, never>('=');
         }
@@ -214,22 +256,27 @@ describe('Arr validations', () => {
 
       test('should work with conditional types', () => {
         type ArrayOrValue<T> = T extends readonly unknown[] ? T : readonly T[];
+
         const makeArray = <T,>(value: T): ArrayOrValue<T> => {
           if (isArray(value)) {
             // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             return value as ArrayOrValue<T>;
           }
+
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           return [value] as ArrayOrValue<T>;
         };
 
         assert.deepStrictEqual(makeArray([1, 2, 3]), [1, 2, 3]);
+
         assert.deepStrictEqual(makeArray(5), [5]);
       });
 
       test('should handle intersection types', () => {
         type TaggedArray = readonly number[] & { tag: string };
+
         const tagged = Object.assign([1, 2, 3], { tag: 'test' }) as TaggedArray;
+
         if (isArray(tagged)) {
           expectType<typeof tagged, TaggedArray>('=');
 
@@ -239,8 +286,10 @@ describe('Arr validations', () => {
 
       test('should work with branded types', () => {
         type BrandedArray = readonly number[] & Readonly<{ __brand: unknown }>;
+
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         const branded = [1, 2, 3] as unknown as BrandedArray;
+
         if (isArray(branded)) {
           expectType<typeof branded, BrandedArray>('=');
         }
@@ -258,32 +307,43 @@ describe('Arr validations', () => {
         const processComplex = (value: ComplexUnion): number => {
           if (isArray(value)) {
             expectType<typeof value, readonly number[]>('=');
+
             return value.length;
           }
+
           if (typeof value === 'string') {
             expectType<typeof value, string>('=');
+
             return value.length;
           }
+
           if (value === null) {
             expectType<typeof value, null>('=');
+
             return 0;
           }
+
           expectType<
             typeof value,
             | { type: 'array'; data: readonly string[] }
             | { type: 'object'; data: Record<string, unknown> }
           >('=');
+
           return -1;
         };
 
         expect(processComplex([1, 2, 3])).toBe(3);
+
         expect(processComplex('test')).toBe(4);
+
         expect(processComplex(null)).toBe(0);
+
         expect(processComplex({ type: 'array', data: ['a', 'b'] })).toBe(-1);
       });
 
       test('should preserve literal types in arrays', () => {
         const literalArray = [1, 2, 3] as const;
+
         if (isArray(literalArray)) {
           expectType<typeof literalArray, readonly [1, 2, 3]>('=');
         }
@@ -291,6 +351,7 @@ describe('Arr validations', () => {
 
       test('should handle arrays with mixed element types', () => {
         const mixed: readonly (string | number | boolean)[] = [1, 'two', true];
+
         if (isArray(mixed)) {
           expectType<typeof mixed, readonly (string | number | boolean)[]>('=');
         }
@@ -298,7 +359,9 @@ describe('Arr validations', () => {
 
       test('should work with symbol-keyed arrays', () => {
         const sym = Symbol('test');
+
         const arrWithSymbol = Object.assign([1, 2, 3], { [sym]: 'value' });
+
         if (isArray(arrWithSymbol)) {
           expect(arrWithSymbol).toHaveLength(3);
         }
@@ -308,6 +371,7 @@ describe('Arr validations', () => {
 
   describe(isEmpty, () => {
     const xs = [1, 2, 3] as const;
+
     const result = isEmpty(xs);
 
     expectType<typeof result, boolean>('=');
@@ -323,6 +387,7 @@ describe('Arr validations', () => {
 
   describe(isNonEmpty, () => {
     const xs = [1, 2, 3] as const;
+
     const result = isNonEmpty(xs);
 
     expectType<typeof result, boolean>('=');
@@ -395,18 +460,23 @@ describe('Arr validations', () => {
 
     test('should return true for arrays of exact length (additional)', () => {
       expect(isArrayOfLength([1, 2, 3], 3)).toBe(true);
+
       expect(isArrayOfLength([], 0)).toBe(true);
+
       expect(isArrayOfLength(['a'], 1)).toBe(true);
     });
 
     test('should return false for arrays of different length (additional)', () => {
       expect(isArrayOfLength([1, 2, 3], 2)).toBe(false);
+
       expect(isArrayOfLength([1, 2, 3], 4)).toBe(false);
+
       expect(isArrayOfLength([], 1)).toBe(false);
     });
 
     test('should work as type guard with exact length (additional)', () => {
       const array: readonly number[] = [1, 2, 3];
+
       if (isArrayOfLength(array, 3)) {
         expectType<typeof array, ArrayOfLength<3, number>>('=');
 
@@ -474,18 +544,23 @@ describe('Arr validations', () => {
 
     test('should return true for arrays of at least specified length (additional)', () => {
       expect(isArrayAtLeastLength([1, 2, 3], 3)).toBe(true);
+
       expect(isArrayAtLeastLength([1, 2, 3], 2)).toBe(true);
+
       expect(isArrayAtLeastLength([1, 2, 3], 1)).toBe(true);
+
       expect(isArrayAtLeastLength([1, 2, 3], 0)).toBe(true);
     });
 
     test('should return false for arrays shorter than specified length (additional)', () => {
       expect(isArrayAtLeastLength([1, 2, 3], 4)).toBe(false);
+
       expect(isArrayAtLeastLength([], 1)).toBe(false);
     });
 
     test('should work as type guard for at least length (additional)', () => {
       const array: readonly number[] = [1, 2, 3];
+
       if (isArrayAtLeastLength(array, 2)) {
         expectType<typeof array, ArrayAtLeastLen<2, number>>('=');
 
@@ -497,6 +572,7 @@ describe('Arr validations', () => {
   describe(every, () => {
     test('should return true when all elements satisfy predicate', () => {
       const evens = [2, 4, 6, 8];
+
       const allEven = every(evens, (n) => n % 2 === 0);
 
       expect(allEven).toBe(true);
@@ -504,6 +580,7 @@ describe('Arr validations', () => {
 
     test('should return false when not all elements satisfy predicate', () => {
       const mixed = [2, 3, 4, 6];
+
       const allEven = every(mixed, (n) => n % 2 === 0);
 
       expect(allEven).toBe(false);
@@ -511,6 +588,7 @@ describe('Arr validations', () => {
 
     test('should work as type guard', () => {
       const mixed: (string | number)[] = ['hello', 'world'];
+
       if (every(mixed, (x): x is string => typeof x === 'string')) {
         // TypeScript narrows mixed to readonly string[] here
         expect(mixed.every((s) => typeof s === 'string')).toBe(true);
@@ -519,16 +597,21 @@ describe('Arr validations', () => {
 
     test('should work with curried version', () => {
       const isPositive = (n: number): boolean => n > 0;
+
       const allPositive = every(isPositive);
 
       expect(allPositive([1, 2, 3])).toBe(true);
+
       expect(allPositive([1, -2, 3])).toBe(false);
     });
 
     test('should work with curried type guards', () => {
       const isString = (x: unknown): x is string => typeof x === 'string';
+
       const allStrings = every(isString);
+
       const data: unknown[] = ['a', 'b', 'c'];
+
       if (allStrings(data)) {
         // TypeScript narrows data to readonly string[] here
         expect(data.join('')).toBe('abc');
@@ -537,6 +620,7 @@ describe('Arr validations', () => {
 
     test('should return true for empty array', () => {
       const empty: number[] = [];
+
       const result = every(empty, (n) => n > 0);
 
       expect(result).toBe(true);
@@ -544,6 +628,7 @@ describe('Arr validations', () => {
 
     test('should pass index to predicate', () => {
       const numbers = [0, 1, 2, 3];
+
       const indexMatchesValue = every(numbers, (val, idx) => val === idx);
 
       expect(indexMatchesValue).toBe(true);
@@ -553,6 +638,7 @@ describe('Arr validations', () => {
   describe(some, () => {
     test('should return true when at least one element satisfies predicate', () => {
       const numbers = [1, 3, 5, 8];
+
       const hasEven = some(numbers, (n) => n % 2 === 0);
 
       expect(hasEven).toBe(true);
@@ -560,6 +646,7 @@ describe('Arr validations', () => {
 
     test('should return false when no elements satisfy predicate', () => {
       const odds = [1, 3, 5, 7];
+
       const hasEven = some(odds, (n) => n % 2 === 0);
 
       expect(hasEven).toBe(false);
@@ -567,14 +654,17 @@ describe('Arr validations', () => {
 
     test('should work with curried version', () => {
       const isNegative = (n: number): boolean => n < 0;
+
       const hasNegative = some(isNegative);
 
       expect(hasNegative([1, 2, -3])).toBe(true);
+
       expect(hasNegative([1, 2, 3])).toBe(false);
     });
 
     test('should return false for empty array', () => {
       const empty: number[] = [];
+
       const result = some(empty, (n) => n > 0);
 
       expect(result).toBe(false);
@@ -582,6 +672,7 @@ describe('Arr validations', () => {
 
     test('should pass index to predicate', () => {
       const numbers = [10, 10, 10, 30];
+
       const hasValueMatchingIndex = some(
         numbers,
         (val, idx) => val === idx * 10,
@@ -596,7 +687,9 @@ describe('Arr validations', () => {
       const array = ['a', 'b', 'c'];
 
       expect(indexIsInRange(array, 0)).toBe(true);
+
       expect(indexIsInRange(array, 1)).toBe(true);
+
       expect(indexIsInRange(array, 2)).toBe(true);
     });
 
@@ -604,6 +697,7 @@ describe('Arr validations', () => {
       const array = ['a', 'b', 'c'];
 
       expect(indexIsInRange(array, 3)).toBe(false);
+
       expect(indexIsInRange(array, 10)).toBe(false);
     });
 
@@ -611,6 +705,7 @@ describe('Arr validations', () => {
       const empty: readonly string[] = [];
 
       expect(indexIsInRange(empty, 0)).toBe(false);
+
       // @ts-expect-error negative indices should not be allowed
       expect(indexIsInRange(empty, -1)).toBe(false);
     });
@@ -620,6 +715,7 @@ describe('Arr validations', () => {
 
       // @ts-expect-error floating point indices should not be allowed
       expect(indexIsInRange(array, 1.5)).toBe(true); // JavaScript arrays accept floating point indices
+
       // @ts-expect-error floating point indices should not be allowed
       expect(indexIsInRange(array, 3.1)).toBe(false);
     });

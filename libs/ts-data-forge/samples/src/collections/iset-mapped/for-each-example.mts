@@ -19,6 +19,7 @@ const set = ISetMapped.create<Point, string>(
 );
 
 const collected: Point[] = [];
+
 for (const point of set) {
   collected.push(point);
 }

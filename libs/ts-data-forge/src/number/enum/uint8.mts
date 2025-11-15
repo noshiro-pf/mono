@@ -53,7 +53,6 @@ const random = (min: Uint8, max: Uint8): Uint8 =>
  * @returns `true` if the value is a Uint8, `false` otherwise.
  */
 export const isUint8 = is;
-
 /**
  * Casts a number to a Uint8 type. This function validates that the input is
  * within the Uint8 range [0, 255] and is an integer, then returns it with the

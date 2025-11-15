@@ -16,4 +16,5 @@ const set = ISetMapped.create<Point, string>(
 );
 
 assert.ok(set.has({ x: 1, tag: 'a' }));
+
 assert.notOk(set.has({ x: 2, tag: 'b' }));

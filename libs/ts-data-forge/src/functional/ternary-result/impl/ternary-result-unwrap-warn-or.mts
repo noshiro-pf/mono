@@ -10,9 +10,11 @@ import { type UnwrapWarn } from './types.mjs';
  * const okValue = TernaryResult.ok('value');
  *
  * assert.strictEqual(TernaryResult.unwrapWarnOr(okValue, 'warn'), 'warn');
+ *
  * const unwrapWarn = TernaryResult.unwrapWarnOr('fallback warn');
  *
  * assert.strictEqual(unwrapWarn(TernaryResult.warn('value', 'slow')), 'slow');
+ *
  * assert.strictEqual(unwrapWarn(TernaryResult.err('err')), 'fallback warn');
  * ```
  */
@@ -32,10 +34,13 @@ export function unwrapWarnOr<R extends UnknownTernaryResult, D>(
   switch (args.length) {
     case 2: {
       const [result, defaultValue] = args;
+
       return unwrapWarn(result) ?? defaultValue;
     }
+
     case 1: {
       const [defaultValue] = args;
+
       return (result: R) => unwrapWarn(result) ?? defaultValue;
     }
   }

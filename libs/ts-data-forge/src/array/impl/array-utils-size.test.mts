@@ -5,6 +5,7 @@ describe('size/length', () => {
     const array = [1, 2, 3];
 
     expect(size(array)).toBe(array.length);
+
     expect(length(array)).toBe(3);
   });
 });

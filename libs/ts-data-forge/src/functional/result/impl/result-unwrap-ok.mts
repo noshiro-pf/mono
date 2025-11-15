@@ -8,6 +8,7 @@ import { type UnwrapOk } from './types.mjs';
  *
  * ```ts
  * const okResult = Result.ok(42);
+ *
  * const errResult = Result.err('oops');
  *
  * // Result.unwrapOk returns the value for Ok results
@@ -21,6 +22,7 @@ import { type UnwrapOk } from './types.mjs';
  * ```
  */
 export function unwrapOk<R extends Ok<unknown>>(result: R): UnwrapOk<R>;
+
 export function unwrapOk<R extends UnknownResult>(
   result: R,
 ): UnwrapOk<R> | undefined;

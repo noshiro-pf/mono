@@ -6,6 +6,7 @@ const candidate = 10;
 
 if (Num.isNonNegative(candidate)) {
   const index: number = candidate;
+
   assert(index === 10);
 }
 

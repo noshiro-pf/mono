@@ -8,7 +8,9 @@ const nested = [
 ] as const;
 
 const flatOnce = Arr.flat(nested, 1);
+
 const flatCurried = Arr.flat()(nested);
 
 assert.deepStrictEqual(flatOnce, [1, 2, 3, 4]);
+
 assert.deepStrictEqual(flatCurried, [1, 2, 3, 4]);

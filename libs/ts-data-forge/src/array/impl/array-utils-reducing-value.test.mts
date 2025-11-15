@@ -18,6 +18,7 @@ describe('Arr reducing value', () => {
   describe(min, () => {
     {
       const xs = [3, 5, 4] as const;
+
       const result = min(xs);
 
       expectType<typeof result, Some<3 | 4 | 5>>('=');
@@ -30,8 +31,10 @@ describe('Arr reducing value', () => {
         }
       });
     }
+
     {
       const xs = [3, 5, 4] as const;
+
       const result = min(xs, (a, b) => a - b);
 
       expectType<typeof result, Some<3 | 4 | 5>>('=');
@@ -44,8 +47,10 @@ describe('Arr reducing value', () => {
         }
       });
     }
+
     {
       const xs: readonly (3 | 4 | 5)[] = [3, 5, 4] as const;
+
       const result = min(xs, (a, b) => a - b);
 
       expectType<typeof result, Optional<3 | 4 | 5>>('=');
@@ -62,6 +67,7 @@ describe('Arr reducing value', () => {
 
   describe(max, () => {
     const xs = [3, 5, 4] as const;
+
     const result = max(xs, (a, b) => a - b);
 
     expectType<typeof result, Some<3 | 4 | 5>>('=');
@@ -76,6 +82,7 @@ describe('Arr reducing value', () => {
 
     test('case 2: no comparator', () => {
       const res = max(xs);
+
       expectType<typeof res, Some<3 | 4 | 5>>('=');
 
       expect(Optional.isSome(res)).toBe(true);
@@ -87,7 +94,9 @@ describe('Arr reducing value', () => {
 
     test('case 3: readonly array', () => {
       const arr: readonly number[] = [1, 5, 2];
+
       const res = max(arr);
+
       expectType<typeof res, Optional<number>>('=');
 
       expect(Optional.isSome(res)).toBe(true);
@@ -99,7 +108,9 @@ describe('Arr reducing value', () => {
 
     test('case 4: empty array', () => {
       const arr: readonly number[] = [];
+
       const res = max(arr);
+
       expectType<typeof res, Optional<number>>('=');
 
       expect(Optional.isNone(res)).toBe(true);
@@ -142,7 +153,9 @@ describe('Arr reducing value', () => {
 
     test('case 2: empty array', () => {
       const arr: readonly { x: number }[] = [];
+
       const res = minBy(arr, (a) => a.x);
+
       expectType<typeof res, Optional<{ x: number }>>('=');
 
       expect(Optional.isNone(res)).toBe(true);
@@ -216,7 +229,9 @@ describe('Arr reducing value', () => {
 
     test('case 2: empty array', () => {
       const arr: readonly { x: number }[] = [];
+
       const res = maxBy(arr, (a) => a.x);
+
       expectType<typeof res, Optional<{ x: number }>>('=');
 
       expect(Optional.isNone(res)).toBe(true);
@@ -274,7 +289,9 @@ describe('Arr reducing value', () => {
 
     test('case 2: empty array', () => {
       const arr: readonly number[] = [];
+
       const res = count(arr, (x) => x > 0);
+
       expectType<typeof res, Uint32>('=');
 
       expect(res).toBe(0);
@@ -308,7 +325,9 @@ describe('Arr reducing value', () => {
 
     test('case 2: empty array', () => {
       const arr: readonly { x: number }[] = [];
+
       const res = countBy(arr, (a) => a.x);
+
       expectType<typeof res, IMap<number, Uint32>>('=');
 
       expect(res.size).toBe(0);
@@ -318,6 +337,7 @@ describe('Arr reducing value', () => {
   describe(foldl, () => {
     test('empty array', () => {
       const result = foldl([], (acc, curr: number) => acc + curr, 0);
+
       expectType<typeof result, number>('=');
 
       expect(result).toBe(0);
@@ -325,6 +345,7 @@ describe('Arr reducing value', () => {
 
     test('sum numbers', () => {
       const result = foldl([1, 2, 3] as const, (acc, curr) => acc + curr, 0);
+
       expectType<typeof result, number>('=');
 
       expect(result).toBe(6);
@@ -336,6 +357,7 @@ describe('Arr reducing value', () => {
         (acc, curr) => acc + curr,
         '',
       );
+
       expectType<typeof result, string>('=');
 
       expect(result).toBe('abc');
@@ -345,6 +367,7 @@ describe('Arr reducing value', () => {
   describe(foldr, () => {
     test('empty array', () => {
       const result = foldr([], (acc, curr: number) => acc + curr, 0);
+
       expectType<typeof result, number>('=');
 
       expect(result).toBe(0);
@@ -353,6 +376,7 @@ describe('Arr reducing value', () => {
     test('subtract numbers from right', () => {
       // (1 - (2 - (3 - 0))) = 1 - (2 - 3) = 1 - (-1) = 2
       const result = foldr([1, 2, 3] as const, (acc, curr) => curr - acc, 0);
+
       expectType<typeof result, number>('=');
 
       expect(result).toBe(2); // 3 - (2 - (1 - 0)) = 3 - (2 - 1) = 3 - 1 = 2.  No, this is (acc, curr) => acc - curr.
@@ -369,6 +393,7 @@ describe('Arr reducing value', () => {
         (acc, curr) => curr + acc,
         '',
       );
+
       expectType<typeof result, string>('=');
 
       expect(result).toBe('abc'); // c + (b + (a + "")) = cba. No, it's curr + acc.
@@ -381,6 +406,7 @@ describe('Arr reducing value', () => {
   describe(sum, () => {
     test('empty array', () => {
       const result = sum([]);
+
       expectType<typeof result, 0>('=');
 
       expect(result).toBe(0);
@@ -388,6 +414,7 @@ describe('Arr reducing value', () => {
 
     test('one element array', () => {
       const result = sum([23]);
+
       expectType<typeof result, 23>('=');
 
       expect(result).toBe(23);
@@ -395,6 +422,7 @@ describe('Arr reducing value', () => {
 
     test('positive numbers', () => {
       const result = sum([1, 2, 3, 4, 5] as const);
+
       expectType<typeof result, number>('=');
 
       expect(result).toBe(15);
@@ -402,6 +430,7 @@ describe('Arr reducing value', () => {
 
     test('mixed numbers', () => {
       const result = sum([1, -2, 3, 0, -5] as const);
+
       expectType<typeof result, number>('=');
 
       expect(result).toBe(-3);
@@ -411,6 +440,7 @@ describe('Arr reducing value', () => {
   describe(join, () => {
     test('should join array elements', () => {
       const arr = ['Hello', 'World'];
+
       const result = join(arr, ' ');
 
       expect(Result.isOk(result)).toBe(true);
@@ -422,6 +452,7 @@ describe('Arr reducing value', () => {
 
     test('should handle empty separator', () => {
       const arr = ['a', 'b', 'c'];
+
       const result = join(arr, '');
 
       expect(Result.isOk(result)).toBe(true);
@@ -433,6 +464,7 @@ describe('Arr reducing value', () => {
 
     test('should handle undefined separator', () => {
       const arr = ['a', 'b', 'c'];
+
       const result = join(arr);
 
       expect(Result.isOk(result)).toBe(true);

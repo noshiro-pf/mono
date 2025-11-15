@@ -9,14 +9,17 @@ import { type UnwrapErr } from './types.mjs';
  *
  * ```ts
  * const okResult = Result.ok('success');
+ *
  * const errResult = Result.err('failure');
  *
  * assert(Result.unwrapErrOr(okResult, 'default') === 'default');
+ *
  * assert(Result.unwrapErrOr(errResult, 'default') === 'failure');
  *
  * const unwrapError = Result.unwrapErrOr('fallback error');
  *
  * assert(unwrapError(Result.err('boom')) === 'boom');
+ *
  * assert(unwrapError(Result.ok('no error')) === 'fallback error');
  * ```
  *
@@ -43,12 +46,14 @@ export function unwrapErrOr<R extends UnknownResult, D>(
     case 2: {
       // Direct version: first argument is result
       const [result, defaultValue] = args;
+
       return unwrapErrOrImpl(result, defaultValue);
     }
 
     case 1: {
       // Curried version
       const [defaultValue] = args;
+
       return (result: R) => unwrapErrOrImpl(result, defaultValue);
     }
   }

@@ -3,6 +3,7 @@ import { match } from './match.mjs';
 
 describe(match, () => {
   type Direction = 'E' | 'N' | 'S' | 'W';
+
   const direction: Direction = 'N' as Direction;
 
   test('literal union', () => {
@@ -159,6 +160,7 @@ describe(match, () => {
 
   test('with default case - string key missing', () => {
     const unknownDirection = 'X' as string;
+
     const res = match(
       unknownDirection,
       {

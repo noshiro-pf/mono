@@ -5,4 +5,5 @@ import { SafeInt, asSafeInt } from 'ts-data-forge';
 const difference = SafeInt.sub(asSafeInt(9), asSafeInt(14));
 
 assert(difference === -5);
+
 assert.ok(SafeInt.is(difference));

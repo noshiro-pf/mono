@@ -8,10 +8,12 @@ assert.deepStrictEqual(
   TernaryResult.orElse(TernaryResult.ok('value'), fallback),
   TernaryResult.ok('value'),
 );
+
 assert.deepStrictEqual(
   TernaryResult.orElse(TernaryResult.warn('value', 'warn'), fallback),
   TernaryResult.warn('value', 'warn'),
 );
+
 assert.deepStrictEqual(
   TernaryResult.orElse(TernaryResult.err('err'), fallback),
   fallback,

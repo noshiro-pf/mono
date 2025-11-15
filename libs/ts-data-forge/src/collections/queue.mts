@@ -45,21 +45,29 @@ export type Queue<T> = Readonly<{
    * const queue = createQueue<number>();
    *
    * assert.ok(queue.isEmpty);
+   *
    * assert(queue.size === 0);
    *
    * queue.enqueue(1);
+   *
    * queue.enqueue(2);
    *
    * assert.notOk(queue.isEmpty);
+   *
    * assert(queue.size === 2);
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(2));
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.none);
    *
    * const seededQueue = createQueue(['first', 'second']);
    *
    * assert(seededQueue.size === 2);
+   *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
+   *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('second'));
    * ```
    */
@@ -74,21 +82,29 @@ export type Queue<T> = Readonly<{
    * const queue = createQueue<number>();
    *
    * assert.ok(queue.isEmpty);
+   *
    * assert(queue.size === 0);
    *
    * queue.enqueue(1);
+   *
    * queue.enqueue(2);
    *
    * assert.notOk(queue.isEmpty);
+   *
    * assert(queue.size === 2);
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(2));
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.none);
    *
    * const seededQueue = createQueue(['first', 'second']);
    *
    * assert(seededQueue.size === 2);
+   *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
+   *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('second'));
    * ```
    */
@@ -103,21 +119,29 @@ export type Queue<T> = Readonly<{
    * const queue = createQueue<number>();
    *
    * assert.ok(queue.isEmpty);
+   *
    * assert(queue.size === 0);
    *
    * queue.enqueue(1);
+   *
    * queue.enqueue(2);
    *
    * assert.notOk(queue.isEmpty);
+   *
    * assert(queue.size === 2);
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(2));
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.none);
    *
    * const seededQueue = createQueue(['first', 'second']);
    *
    * assert(seededQueue.size === 2);
+   *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
+   *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('second'));
    * ```
    *
@@ -135,21 +159,29 @@ export type Queue<T> = Readonly<{
    * const queue = createQueue<number>();
    *
    * assert.ok(queue.isEmpty);
+   *
    * assert(queue.size === 0);
    *
    * queue.enqueue(1);
+   *
    * queue.enqueue(2);
    *
    * assert.notOk(queue.isEmpty);
+   *
    * assert(queue.size === 2);
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(2));
+   *
    * assert.deepStrictEqual(queue.dequeue(), Optional.none);
    *
    * const seededQueue = createQueue(['first', 'second']);
    *
    * assert(seededQueue.size === 2);
+   *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
+   *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('second'));
    * ```
    *
@@ -206,8 +238,11 @@ class QueueClass<T> implements Queue<T> {
     );
 
     this.#head = 0;
+
     this.#tail = 0;
+
     this.#mut_size = 0;
+
     this.#capacity = initialCapacity;
 
     // Add initial values
@@ -247,8 +282,11 @@ class QueueClass<T> implements Queue<T> {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const element = this.#buffer[this.#head]!;
+
     this.#buffer[this.#head] = undefined; // Clear reference for garbage collection
+
     this.#head = (this.#head + 1) % this.#capacity;
+
     this.#mut_size -= 1;
 
     return Optional.some(element);
@@ -278,7 +316,9 @@ class QueueClass<T> implements Queue<T> {
     }
 
     this.#buffer[this.#tail] = value;
+
     this.#tail = (this.#tail + 1) % this.#capacity;
+
     this.#mut_size += 1;
   }
 
@@ -289,6 +329,7 @@ class QueueClass<T> implements Queue<T> {
    */
   #resize(): void {
     const newCapacity = asUint32(this.#capacity * 2);
+
     const newBuffer = Array.from<unknown, T | undefined>(
       { length: newCapacity },
       () => undefined,
@@ -297,12 +338,16 @@ class QueueClass<T> implements Queue<T> {
     // Copy elements in order from head to tail
     for (const i of range(asSafeUint(this.#mut_size))) {
       const sourceIndex = (this.#head + i) % this.#capacity;
+
       newBuffer[i] = this.#buffer[sourceIndex];
     }
 
     this.#buffer = newBuffer;
+
     this.#head = 0;
+
     this.#tail = this.#mut_size;
+
     this.#capacity = newCapacity;
   }
 }
@@ -337,21 +382,29 @@ class QueueClass<T> implements Queue<T> {
  * const queue = createQueue<number>();
  *
  * assert.ok(queue.isEmpty);
+ *
  * assert(queue.size === 0);
  *
  * queue.enqueue(1);
+ *
  * queue.enqueue(2);
  *
  * assert.notOk(queue.isEmpty);
+ *
  * assert(queue.size === 2);
+ *
  * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
+ *
  * assert.deepStrictEqual(queue.dequeue(), Optional.some(2));
+ *
  * assert.deepStrictEqual(queue.dequeue(), Optional.none);
  *
  * const seededQueue = createQueue(['first', 'second']);
  *
  * assert(seededQueue.size === 2);
+ *
  * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
+ *
  * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('second'));
  * ```
  *

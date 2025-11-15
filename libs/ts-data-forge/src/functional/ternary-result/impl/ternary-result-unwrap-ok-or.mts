@@ -10,9 +10,11 @@ import { type UnwrapOk } from './types.mjs';
  * const errValue = TernaryResult.err('err');
  *
  * assert.strictEqual(TernaryResult.unwrapOkOr(errValue, 0), 0);
+ *
  * const unwrapWithDefault = TernaryResult.unwrapOkOr('fallback');
  *
  * assert.strictEqual(unwrapWithDefault(TernaryResult.ok(5)), 5);
+ *
  * assert.strictEqual(
  *   unwrapWithDefault(TernaryResult.warn('warn-value', 'warn')),
  *   'warn-value',
@@ -35,10 +37,13 @@ export function unwrapOkOr<R extends UnknownTernaryResult, D>(
   switch (args.length) {
     case 2: {
       const [result, defaultValue] = args;
+
       return unwrapOk(result) ?? defaultValue;
     }
+
     case 1: {
       const [defaultValue] = args;
+
       return (result: R) => unwrapOk(result) ?? defaultValue;
     }
   }

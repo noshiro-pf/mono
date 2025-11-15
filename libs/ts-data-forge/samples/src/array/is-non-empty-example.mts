@@ -3,9 +3,11 @@ import { Arr } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 const users: readonly { id: number }[] = [{ id: 1 }];
+
 const emptyUsers: readonly { id: number }[] = [];
 
 assert.ok(Arr.isNonEmpty(users));
+
 assert.notOk(Arr.isNonEmpty(emptyUsers));
 
 if (Arr.isNonEmpty(users)) {

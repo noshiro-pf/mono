@@ -38,6 +38,7 @@ describe(mapNullable, () => {
 
     test('should work with complex transformations', () => {
       const user = { name: 'Alice', age: 30 };
+
       const result = mapNullable(
         user,
         (u) => `${u.name} is ${u.age} years old`,
@@ -48,11 +49,13 @@ describe(mapNullable, () => {
 
     test('should work with nullable object properties', () => {
       const user: { name?: string } = { name: 'Bob' };
+
       const result = mapNullable(user.name, (name) => name.toUpperCase());
 
       expect(result).toBe('BOB');
 
       const userWithoutName: { name?: string } = {};
+
       const resultEmpty = mapNullable(userWithoutName.name, (name) =>
         name.toUpperCase(),
       );
@@ -100,6 +103,7 @@ describe(mapNullable, () => {
       );
 
       const user = { name: 'Charlie', age: 25 };
+
       const result1 = getName(user);
 
       expect(result1).toBe('Charlie');
@@ -111,6 +115,7 @@ describe(mapNullable, () => {
 
     test('should work with pipe composition', () => {
       const toUpperCase = mapNullable((s: string) => s.toUpperCase());
+
       const addGreeting = mapNullable((s: string) => `Hello, ${s}!`);
 
       const result = pipe('world').map(toUpperCase).map(addGreeting).value;
@@ -120,6 +125,7 @@ describe(mapNullable, () => {
 
     test('should handle null values in pipe composition', () => {
       const toUpperCase = mapNullable((s: string) => s.toUpperCase());
+
       const addGreeting = mapNullable((s: string) => `Hello, ${s}!`);
 
       const result = pipe(null as string | null)
@@ -131,7 +137,9 @@ describe(mapNullable, () => {
 
     test('should work with multiple transformations in pipe', () => {
       const toStr = mapNullable((n: number) => n.toString());
+
       const addPrefix = mapNullable((s: string) => `Number: ${s}`);
+
       const toUpperCase = mapNullable((s: string) => s.toUpperCase());
 
       const result = pipe(42 as number | null)
@@ -206,7 +214,9 @@ describe(mapNullable, () => {
       const getValue = (): string | null => 'hello';
 
       const step1 = mapNullable(getValue(), (s) => s.toUpperCase());
+
       const step2 = mapNullable(step1, (s) => s.length);
+
       const step3 = mapNullable(step2, (n) => n * 2);
 
       expect(step3).toBe(10); // 'HELLO'.length * 2 = 5 * 2 = 10
@@ -216,25 +226,33 @@ describe(mapNullable, () => {
       const getValue = (): string | null => null;
 
       const step1 = mapNullable(getValue(), (s) => s.toUpperCase());
+
       const step2 = mapNullable(step1, (s) => s.length);
+
       const step3 = mapNullable(step2, (n) => n * 2);
 
       expect(step1).toBeUndefined();
+
       expect(step2).toBeUndefined();
+
       expect(step3).toBeUndefined();
     });
 
     test('should work with curried functions in chain', () => {
       const toUpperCase = mapNullable((s: string) => s.toUpperCase());
+
       const getLength = mapNullable((s: string) => s.length);
+
       const double = mapNullable((n: number) => n * 2);
 
       const input1 = 'hello';
+
       const result1 = double(getLength(toUpperCase(input1)));
 
       expect(result1).toBe(10);
 
       const input2: string | null = null;
+
       const result2 = double(getLength(toUpperCase(input2)));
 
       expect(result2).toBeUndefined();
@@ -264,9 +282,11 @@ describe(mapNullable, () => {
       const extractUserName = mapNullable(
         (r: ApiResponse) => r.data?.user?.name,
       );
+
       const formatName = mapNullable((name: string) => `Mr. ${name}`);
 
       const userName = extractUserName(response);
+
       const formattedName = formatName(userName);
 
       expect(formattedName).toBe('Mr. John Doe');
@@ -284,15 +304,19 @@ describe(mapNullable, () => {
       };
 
       const extractAge = mapNullable((data: FormDataType) => data.age);
+
       const parseAge = mapNullable((ageStr: string) =>
         Number.parseInt(ageStr, 10),
       );
+
       const validateAge = mapNullable((age: number) =>
         age >= 18 ? age : null,
       );
 
       const extractedAge = extractAge(formData);
+
       const parsedAge = parseAge(extractedAge);
+
       const validAge = validateAge(parsedAge);
 
       expect(validAge).toBe(25);
@@ -310,14 +334,17 @@ describe(mapNullable, () => {
       };
 
       const extractAge = mapNullable((data: FormDataType) => data.age);
+
       const parseAge = mapNullable((ageStr: string) =>
         Number.parseInt(ageStr, 10),
       );
 
       const extractedAge = extractAge(incompleteFormData);
+
       const parsedAge = parseAge(extractedAge);
 
       expect(extractedAge).toBeUndefined();
+
       expect(parsedAge).toBeUndefined();
     });
   });

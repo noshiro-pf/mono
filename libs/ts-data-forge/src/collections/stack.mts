@@ -45,21 +45,28 @@ export type Stack<T> = Readonly<{
    * const stack = createStack<string>();
    *
    * assert.ok(stack.isEmpty);
+   *
    * assert(stack.size === 0);
    *
    * stack.push('first');
+   *
    * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
    * assert.notOk(stack.isEmpty);
+   *
    * assert(stack.size === 2);
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.some('first'));
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.none);
    *
    * const seededStack = createStack([10, 20, 30]);
    *
    * assert(seededStack.size === 3);
+   *
    * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
    * ```
    */
@@ -74,21 +81,28 @@ export type Stack<T> = Readonly<{
    * const stack = createStack<string>();
    *
    * assert.ok(stack.isEmpty);
+   *
    * assert(stack.size === 0);
    *
    * stack.push('first');
+   *
    * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
    * assert.notOk(stack.isEmpty);
+   *
    * assert(stack.size === 2);
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.some('first'));
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.none);
    *
    * const seededStack = createStack([10, 20, 30]);
    *
    * assert(seededStack.size === 3);
+   *
    * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
    * ```
    */
@@ -103,21 +117,28 @@ export type Stack<T> = Readonly<{
    * const stack = createStack<string>();
    *
    * assert.ok(stack.isEmpty);
+   *
    * assert(stack.size === 0);
    *
    * stack.push('first');
+   *
    * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
    * assert.notOk(stack.isEmpty);
+   *
    * assert(stack.size === 2);
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.some('first'));
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.none);
    *
    * const seededStack = createStack([10, 20, 30]);
    *
    * assert(seededStack.size === 3);
+   *
    * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
    * ```
    *
@@ -135,21 +156,28 @@ export type Stack<T> = Readonly<{
    * const stack = createStack<string>();
    *
    * assert.ok(stack.isEmpty);
+   *
    * assert(stack.size === 0);
    *
    * stack.push('first');
+   *
    * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
    * assert.notOk(stack.isEmpty);
+   *
    * assert(stack.size === 2);
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.some('first'));
+   *
    * assert.deepStrictEqual(stack.pop(), Optional.none);
    *
    * const seededStack = createStack([10, 20, 30]);
    *
    * assert(seededStack.size === 3);
+   *
    * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
    * ```
    *
@@ -197,7 +225,9 @@ class StackClass<T> implements Stack<T> {
       { length: initialCapacity },
       () => undefined,
     );
+
     this.#mut_size = asUint32(0);
+
     this.#capacity = initialCapacity;
 
     // Add initial values
@@ -236,8 +266,10 @@ class StackClass<T> implements Stack<T> {
     }
 
     this.#mut_size = Uint32.sub(this.#mut_size, 1);
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const element = this.#buffer[this.#mut_size]!;
+
     this.#buffer[this.#mut_size] = undefined; // Clear reference for garbage collection
 
     return Optional.some(element);
@@ -267,6 +299,7 @@ class StackClass<T> implements Stack<T> {
     }
 
     this.#buffer[this.#mut_size] = value;
+
     this.#mut_size = Uint32.add(this.#mut_size, 1);
   }
 
@@ -277,6 +310,7 @@ class StackClass<T> implements Stack<T> {
    */
   #resize(): void {
     const newCapacity = asUint32(this.#capacity * 2);
+
     const newBuffer = Array.from<unknown, T | undefined>(
       { length: newCapacity },
       () => undefined,
@@ -288,6 +322,7 @@ class StackClass<T> implements Stack<T> {
     }
 
     this.#buffer = newBuffer;
+
     this.#capacity = newCapacity;
   }
 }
@@ -322,21 +357,28 @@ class StackClass<T> implements Stack<T> {
  * const stack = createStack<string>();
  *
  * assert.ok(stack.isEmpty);
+ *
  * assert(stack.size === 0);
  *
  * stack.push('first');
+ *
  * // eslint-disable-next-line unicorn/prefer-single-call
  * stack.push('second');
  *
  * assert.notOk(stack.isEmpty);
+ *
  * assert(stack.size === 2);
+ *
  * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
+ *
  * assert.deepStrictEqual(stack.pop(), Optional.some('first'));
+ *
  * assert.deepStrictEqual(stack.pop(), Optional.none);
  *
  * const seededStack = createStack([10, 20, 30]);
  *
  * assert(seededStack.size === 3);
+ *
  * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
  * ```
  *

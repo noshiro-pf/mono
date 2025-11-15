@@ -14,4 +14,5 @@ const actions: readonly Readonly<
 const mutated = base.withMutations(actions);
 
 assert.deepStrictEqual(Array.from(mutated), ['b', 'c']);
+
 assert.deepStrictEqual(Array.from(base), ['a', 'b']);

@@ -36,7 +36,9 @@ const {
  *
  * ```ts
  * assert.ok(isUint(4));
+ *
  * assert.notOk(isUint(-1));
+ *
  * assert.ok(Uint.is(0));
  * ```
  *
@@ -44,7 +46,6 @@ const {
  * @returns `true` if the value is a Uint, `false` otherwise.
  */
 export const isUint = is;
-
 /**
  * Casts a number to a Uint type.
  *
@@ -54,6 +55,7 @@ export const isUint = is;
  * const branded = asUint(12);
  *
  * assert(branded === 12);
+ *
  * assert.ok(Uint.is(branded));
  * ```
  *
@@ -78,7 +80,9 @@ export const Uint = {
    *
    * ```ts
    * assert.ok(isUint(4));
+   *
    * assert.notOk(isUint(-1));
+   *
    * assert.ok(Uint.is(0));
    * ```
    *
@@ -136,9 +140,11 @@ export const Uint = {
    *
    * ```ts
    * const clampedNegative = Uint.clamp(-5);
+   *
    * const clampedPositive = Uint.clamp(42);
    *
    * assert(clampedNegative === 0);
+   *
    * assert(clampedPositive === 42);
    * ```
    *
@@ -154,10 +160,13 @@ export const Uint = {
    *
    * ```ts
    * const min = asUint(0);
+   *
    * const max = asUint(3);
+   *
    * const randomValue = Uint.random(min, max);
    *
    * assert.ok(Uint.is(randomValue));
+   *
    * assert.ok(randomValue >= 0 && randomValue <= 3);
    * ```
    *
@@ -172,7 +181,9 @@ export const Uint = {
    *
    * ```ts
    * const base = asUint(2);
+   *
    * const exponent = asUint(5);
+   *
    * const power = Uint.pow(base, exponent);
    *
    * assert(power === 32);

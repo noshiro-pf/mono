@@ -14,17 +14,29 @@ const intOps = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
 } as const);
 
 const six = intOps.castType(6);
+
 const four = intOps.castType(4);
+
 const sum = intOps.add(six, four);
+
 const difference = intOps.sub(six, four);
+
 const product = intOps.mul(six, four);
+
 const quotient = intOps.div(six, intOps.castType(2));
+
 const roundedClamp = intOps.clamp(1.5);
+
 const randomValue = intOps.random();
 
 assert(sum === 10);
+
 assert(difference === 2);
+
 assert(product === 24);
+
 assert(quotient === 3);
+
 assert(roundedClamp === 2);
+
 assert.ok(Number.isSafeInteger(randomValue));

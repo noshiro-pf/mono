@@ -19,4 +19,5 @@ const set = ISetMapped.create<Point, string>(
 );
 
 assert.ok(set.some((point) => point.x > 4));
+
 assert.notOk(set.some((point) => point.x > 10));

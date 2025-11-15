@@ -8,4 +8,5 @@ const set = ISet.create(['alpha']);
 const raw = set.toRawSet();
 
 assert.ok(is.set(raw));
+
 assert.ok(raw.has('alpha'));

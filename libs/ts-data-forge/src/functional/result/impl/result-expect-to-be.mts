@@ -16,6 +16,7 @@ import { type UnwrapOk } from './types.mjs';
  * const expectResult = Result.expectToBe<string>('missing result');
  *
  * assert.throws(() => expectResult(Result.err('boom')), /missing result/u);
+ *
  * assert(expectResult(Result.ok('value')) === 'value');
  * ```
  *
@@ -40,12 +41,14 @@ export function expectToBe<R extends UnknownResult>(
     case 2: {
       // Direct version: first argument is result
       const [result, message] = args;
+
       return expectToBeImpl(result, message);
     }
 
     case 1: {
       // Curried version: first argument is message
       const [message] = args;
+
       return (result: R): UnwrapOk<R> => expectToBeImpl(result, message);
     }
   }

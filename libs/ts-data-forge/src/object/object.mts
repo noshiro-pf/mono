@@ -17,20 +17,25 @@ export namespace Obj {
    *
    * ```ts
    * const obj1 = { name: 'Alice', age: 30 };
+   *
    * const obj2 = { name: 'Alice', age: 30 };
+   *
    * const obj3 = { name: 'Alice', age: 31 };
    *
    * assert.ok(Obj.shallowEq(obj1, obj2));
+   *
    * assert.notOk(Obj.shallowEq(obj1, obj3));
    *
    * // Custom equality function
    * const obj4 = { value: 1 };
+   *
    * const obj5 = { value: 1.00001 };
    *
    * const closeEnough = (a: unknown, b: unknown): boolean => {
    *   if (typeof a === 'number' && typeof b === 'number') {
    *     return Math.abs(a - b) < 0.001;
    *   }
+   *
    *   return Object.is(a, b);
    * };
    *
@@ -50,6 +55,7 @@ export namespace Obj {
     eq: (x: unknown, y: unknown) => boolean = Object.is,
   ): boolean => {
     const aEntries = Object.entries(a);
+
     const bEntries = Object.entries(b);
 
     if (aEntries.length !== bEntries.length) return false;
@@ -78,6 +84,7 @@ export namespace Obj {
    *
    * // Direct usage
    * const publicInfo = Obj.pick(user, ['id', 'name', 'role']);
+   *
    * assert.deepStrictEqual(publicInfo, {
    *   id: 1,
    *   name: 'Bob',
@@ -122,6 +129,7 @@ export namespace Obj {
     switch (args.length) {
       case 2: {
         const [record, keys] = args;
+
         const keysSet = new Set<keyof R>(keys);
 
         return (
@@ -134,6 +142,7 @@ export namespace Obj {
 
       case 1: {
         const [keys] = args;
+
         return (record: R) => pick(record, keys);
       }
     }
@@ -161,6 +170,7 @@ export namespace Obj {
    *
    * // Direct usage - remove sensitive fields
    * const safeUser = Obj.omit(user, ['password', 'internalNote']);
+   *
    * assert.deepStrictEqual(safeUser, {
    *   id: 1,
    *   name: 'Charlie',
@@ -206,6 +216,7 @@ export namespace Obj {
     switch (args.length) {
       case 2: {
         const [record, keys] = args;
+
         const keysSet = new Set<keyof R>(keys);
 
         return (
@@ -218,12 +229,14 @@ export namespace Obj {
 
       case 1: {
         const [keys] = args;
+
         return <R2 extends UnknownRecord>(record: R2) => {
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           const result = omit(record, keys as readonly (keyof R2)[]) as Omit<
             R2,
             ArrayElement<Keys>
           >;
+
           return result;
         };
       }
@@ -253,6 +266,7 @@ export namespace Obj {
    * ] as const;
    *
    * const obj1 = Obj.fromEntries(entries1);
+   *
    * assert.deepStrictEqual(obj1, {
    *   name: 'David',
    *   age: 25,
@@ -266,6 +280,7 @@ export namespace Obj {
    * ];
    *
    * const obj2 = Obj.fromEntries(dynamicEntries);
+   *
    * assert.deepStrictEqual(obj2, { x: 10, y: 20 });
    * ```
    *

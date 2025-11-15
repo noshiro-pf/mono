@@ -77,6 +77,7 @@ describe('Int8 test', () => {
   describe('Int8.min', () => {
     test('should return minimum value', () => {
       expect(Int8.min(-100, -50, 10)).toBe(-100);
+
       expect(Int8.min(1, 2, 3)).toBe(1);
     });
   });
@@ -84,6 +85,7 @@ describe('Int8 test', () => {
   describe('Int8.max', () => {
     test('should return maximum value', () => {
       expect(Int8.max(-100, -50, 10)).toBe(10);
+
       expect(Int8.max(1, 2, 3)).toBe(3);
     });
   });
@@ -174,11 +176,15 @@ describe('Int8 test', () => {
   describe('Int8.random', () => {
     test('should generate value within range', () => {
       const min = -10;
+
       const max = 10;
+
       const result = Int8.random(min, max);
 
       expect(result).toBeGreaterThanOrEqual(min);
+
       expect(result).toBeLessThanOrEqual(max);
+
       expect(Number.isInteger(result)).toBe(true);
     });
   });

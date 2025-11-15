@@ -5,6 +5,7 @@ describe(unknownToString, () => {
     const result = unknownToString('aaaaa');
 
     expect(result).toBe('aaaaa');
+
     expect(JSON.stringify('aaaaa')).toBe('"aaaaa"');
   });
 
@@ -12,6 +13,7 @@ describe(unknownToString, () => {
     const result = unknownToString(1);
 
     expect(result).toBe('1');
+
     expect(JSON.stringify(1)).toBe('1');
   });
 
@@ -19,6 +21,7 @@ describe(unknownToString, () => {
     const result = unknownToString(true);
 
     expect(result).toBe('true');
+
     expect(JSON.stringify(true)).toBe('true');
   });
 
@@ -26,6 +29,7 @@ describe(unknownToString, () => {
     const result = unknownToString(Symbol('sym'));
 
     expect(result).toBe('Symbol(sym)');
+
     expect(JSON.stringify(Symbol('sym'))).toBeUndefined();
   });
 
@@ -33,6 +37,7 @@ describe(unknownToString, () => {
     const result = unknownToString(() => 0);
 
     expect(result).toBe('() => 0');
+
     expect(JSON.stringify(() => 0)).toBeUndefined();
   });
 
@@ -40,6 +45,7 @@ describe(unknownToString, () => {
     const result = unknownToString(undefined);
 
     expect(result).toBe('undefined');
+
     expect(JSON.stringify(undefined)).toBeUndefined();
   });
 
@@ -47,6 +53,7 @@ describe(unknownToString, () => {
     const result = unknownToString(null);
 
     expect(result).toBe('null');
+
     expect(JSON.stringify(null)).toBe('null');
   });
 
@@ -54,6 +61,7 @@ describe(unknownToString, () => {
     const result = unknownToString({ a: { b: 1 } });
 
     expect(result).toBe('{"a":{"b":1}}');
+
     expect(JSON.stringify({ a: { b: 1 } })).toBe('{"a":{"b":1}}');
   });
 
@@ -77,7 +85,9 @@ describe(unknownToString, () => {
 
   test('circular reference returns error message', () => {
     const mut_circular: { a: number; self?: unknown } = { a: 1 };
+
     mut_circular.self = mut_circular;
+
     const result = unknownToString(mut_circular);
 
     // Should return an error message string instead of throwing

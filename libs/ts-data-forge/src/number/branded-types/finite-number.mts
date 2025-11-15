@@ -60,7 +60,6 @@ expectType<TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>, Int>(
  * @returns `true` if the value is finite, `false` otherwise
  */
 export const isFiniteNumber = is;
-
 /**
  * Casts a number to a FiniteNumber branded type.
  *

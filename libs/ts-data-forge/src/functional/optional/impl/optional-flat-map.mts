@@ -13,6 +13,7 @@ import { type Unwrap } from './types.mjs';
  * ```ts
  * const parseNumber = (input: string): Optional<number> => {
  *   const num = Number.parseInt(input, 10);
+ *
  *   return Number.isNaN(num) ? Optional.none : Optional.some(num);
  * };
  *
@@ -23,6 +24,7 @@ import { type Unwrap } from './types.mjs';
  * const flatMapParse = Optional.flatMap(parseNumber);
  *
  * assert.deepStrictEqual(flatMapParse(Optional.some('5')), Optional.some(5));
+ *
  * assert.deepStrictEqual(flatMapParse(Optional.some('invalid')), Optional.none);
  * ```
  *
@@ -50,12 +52,14 @@ export function flatMap<O extends UnknownOptional, S2>(
   switch (args.length) {
     case 2: {
       const [optional, flatMapFn] = args;
+
       return flatMapImpl(optional, flatMapFn);
     }
 
     case 1: {
       // Curried version
       const [flatMapFn] = args;
+
       return (optional: O) => flatMapImpl(optional, flatMapFn);
     }
   }

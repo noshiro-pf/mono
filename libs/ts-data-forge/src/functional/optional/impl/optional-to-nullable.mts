@@ -16,9 +16,11 @@ import { type Unwrap } from './types.mjs';
  *
  * ```ts
  * const someNumber = Optional.some(42);
+ *
  * const noneNumber = Optional.none as Optional<number>;
  *
  * assert(Optional.toNullable(someNumber) === 42);
+ *
  * assert(Optional.toNullable(noneNumber) === undefined);
  * ```
  *

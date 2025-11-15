@@ -5,6 +5,7 @@ import { sourceFileMappings } from './embed-jsdoc-examples-map.mjs';
 import { extractSampleCode } from './embed-samples-shared.mjs';
 
 const codeBlockStart = '```ts';
+
 const codeBlockEnd = '```';
 
 /**
@@ -20,9 +21,11 @@ export const embedJsDocExamples = async (): Promise<
 
     for (const { sampleFiles, sourcePath } of sourceFileMappings) {
       const sourceFilePath = path.resolve(projectRootPath, sourcePath);
+
       const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
 
       const mut_results: string[] = [];
+
       let mut_rest: string = sourceContent;
 
       for (const sampleFile of sampleFiles) {
@@ -30,6 +33,7 @@ export const embedJsDocExamples = async (): Promise<
 
         // Read sample content
         const sampleContent = await fs.readFile(samplePath, 'utf8');
+
         const sampleContentSliced = extractSampleCode(sampleContent);
 
         // Find next code block
@@ -57,6 +61,7 @@ export const embedJsDocExamples = async (): Promise<
           0,
           Math.max(0, codeBlockStartIndex + codeBlockStart.length),
         );
+
         const afterBlock = mut_rest.slice(Math.max(0, codeBlockEndIndex));
 
         // Indent the sample code to match JSDoc style (3 spaces + ' * ')
@@ -78,13 +83,17 @@ export const embedJsDocExamples = async (): Promise<
 
       // Write updated source file
       const updatedContent = mut_results.join('');
+
       await fs.writeFile(sourceFilePath, updatedContent, 'utf8');
+
       mut_modifiedFiles.push(sourceFilePath);
     }
 
     if (mut_modifiedFiles.length > 0) {
       console.log(`\nFormatting ${mut_modifiedFiles.length} modified files...`);
+
       await formatFiles(mut_modifiedFiles);
+
       console.log('✓ Formatting completed');
     }
 
@@ -96,8 +105,10 @@ export const embedJsDocExamples = async (): Promise<
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await embedJsDocExamples();
+
   if (Result.isErr(result)) {
     console.error(result.value);
+
     process.exit(1);
   }
 }

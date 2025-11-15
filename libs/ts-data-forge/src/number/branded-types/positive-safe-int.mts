@@ -26,7 +26,7 @@ const {
 >({
   integerOrSafeInteger: 'SafeInteger',
   MIN_VALUE: 1,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
   MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
   typeNameInMessage,
 } as const);
@@ -39,8 +39,11 @@ const {
  *
  * ```ts
  * assert.ok(isPositiveSafeInt(1));
+ *
  * assert.ok(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
+ *
  * assert.notOk(isPositiveSafeInt(0));
+ *
  * assert.ok(PositiveSafeInt.is(42));
  * ```
  *
@@ -48,7 +51,6 @@ const {
  * @returns `true` if the value is a PositiveSafeInt, `false` otherwise.
  */
 export const isPositiveSafeInt = is;
-
 /**
  * Casts a number to a PositiveSafeInt type.
  *
@@ -58,6 +60,7 @@ export const isPositiveSafeInt = is;
  * const branded = asPositiveSafeInt(128);
  *
  * assert(branded === 128);
+ *
  * assert.ok(PositiveSafeInt.is(branded));
  * ```
  *
@@ -84,8 +87,11 @@ export const PositiveSafeInt = {
    *
    * ```ts
    * assert.ok(isPositiveSafeInt(1));
+   *
    * assert.ok(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
+   *
    * assert.notOk(isPositiveSafeInt(0));
+   *
    * assert.ok(PositiveSafeInt.is(42));
    * ```
    *
@@ -156,11 +162,15 @@ export const PositiveSafeInt = {
    *
    * ```ts
    * const belowRange = PositiveSafeInt.clamp(0);
+   *
    * const withinRange = PositiveSafeInt.clamp(123);
+   *
    * const aboveRange = PositiveSafeInt.clamp(Number.MAX_SAFE_INTEGER + 10);
    *
    * assert(belowRange === 1);
+   *
    * assert(withinRange === 123);
+   *
    * assert(aboveRange === Number.MAX_SAFE_INTEGER);
    * ```
    *
@@ -176,10 +186,13 @@ export const PositiveSafeInt = {
    *
    * ```ts
    * const min = asPositiveSafeInt(1);
+   *
    * const max = asPositiveSafeInt(6);
+   *
    * const randomValue = PositiveSafeInt.random(min, max);
    *
    * assert.ok(PositiveSafeInt.is(randomValue));
+   *
    * assert.ok(randomValue >= 1 && randomValue <= 6);
    * ```
    *
@@ -194,7 +207,9 @@ export const PositiveSafeInt = {
    *
    * ```ts
    * const base = asPositiveSafeInt(3);
+   *
    * const exponent = asPositiveSafeInt(3);
+   *
    * const power = PositiveSafeInt.pow(base, exponent);
    *
    * assert(power === 27);
@@ -218,6 +233,7 @@ export const PositiveSafeInt = {
    * );
    *
    * assert(sum === 3048);
+   *
    * assert.ok(PositiveSafeInt.is(sum));
    * ```
    *
@@ -239,6 +255,7 @@ export const PositiveSafeInt = {
    * );
    *
    * assert(difference === 1);
+   *
    * assert.ok(PositiveSafeInt.is(difference));
    * ```
    *
@@ -261,6 +278,7 @@ export const PositiveSafeInt = {
    * );
    *
    * assert(product === 1000);
+   *
    * assert.ok(PositiveSafeInt.is(product));
    * ```
    *
@@ -280,12 +298,14 @@ export const PositiveSafeInt = {
    *   asPositiveSafeInt(25),
    *   asPositiveSafeInt(4),
    * );
+   *
    * const clamped = PositiveSafeInt.div(
    *   asPositiveSafeInt(5),
    *   asPositiveSafeInt(50),
    * );
    *
    * assert(quotient === 6);
+   *
    * assert(clamped === 1);
    * ```
    *

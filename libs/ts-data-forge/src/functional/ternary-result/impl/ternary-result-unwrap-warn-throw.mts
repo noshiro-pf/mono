@@ -12,6 +12,7 @@ import { variantName } from './variant-name.mjs';
  * const warnValue = TernaryResult.warn('pending', 'check logs');
  *
  * assert.strictEqual(TernaryResult.unwrapWarnThrow(warnValue), 'check logs');
+ *
  * assert.throws(
  *   () => TernaryResult.unwrapWarnThrow(TernaryResult.err('err')),
  *   /Expected Warn/u,

@@ -8,4 +8,5 @@ const map = IMap.create<'id' | 'enabled', number | boolean>([
 ]);
 
 assert.ok(map.has('id'));
+
 assert.notOk(map.has('missing'));

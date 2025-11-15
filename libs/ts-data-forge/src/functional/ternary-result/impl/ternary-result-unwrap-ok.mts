@@ -9,13 +9,16 @@ import { type UnwrapOk } from './types.mjs';
  *
  * ```ts
  * const okValue = TernaryResult.ok(3);
+ *
  * const warnValue = TernaryResult.warn(4, 'warn');
  *
  * assert.strictEqual(TernaryResult.unwrapOk(okValue), 3);
+ *
  * assert.strictEqual(TernaryResult.unwrapOk(warnValue), 4);
  * ```
  */
 export function unwrapOk<R extends TernaryOk<unknown>>(result: R): UnwrapOk<R>;
+
 export function unwrapOk<R extends UnknownTernaryResult>(
   result: R,
 ): UnwrapOk<R> | undefined;

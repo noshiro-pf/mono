@@ -8,20 +8,25 @@ import { filterNot, partition } from './array-utils-transformation.mjs';
 
 describe('Array overloaded functions - type error validation', () => {
   const testArray = [1, 2, 3, 4, 5] as const;
+
   const predicate = (x: number): boolean => x > 3;
 
   describe('findIndex type safety', () => {
     test('findIndex with correct arguments should work', () => {
       // These should work fine
       const _result1 = findIndex(testArray, predicate);
+
       const _result2 = findIndex(predicate);
+
       const _result3 = findIndex(predicate)(testArray);
 
       expectType<typeof _result1, 0 | 1 | 2 | 3 | 4 | -1>('=');
+
       expectType<
         typeof _result2,
         (array: readonly number[]) => SizeType.Arr | -1
       >('=');
+
       expectType<typeof _result3, SizeType.Arr | -1>('=');
     });
 
@@ -41,14 +46,18 @@ describe('Array overloaded functions - type error validation', () => {
     test('filterNot with correct arguments should work', () => {
       // These should work fine
       const _result1 = filterNot(testArray, predicate);
+
       const _result2 = filterNot(predicate);
+
       const _result3 = filterNot(predicate)(testArray);
 
       expectType<typeof _result1, readonly number[]>('<=');
+
       expectType<
         typeof _result2,
         (array: readonly number[]) => readonly number[]
       >('<=');
+
       expectType<typeof _result3, readonly number[]>('<=');
     });
 
@@ -67,14 +76,18 @@ describe('Array overloaded functions - type error validation', () => {
     test('partition with correct arguments should work', () => {
       // These should work fine
       const _result1 = partition(testArray, 2);
+
       const _result2 = partition(2);
+
       const _result3 = partition(2)(testArray);
 
       expectType<typeof _result1, readonly (readonly number[])[]>('<=');
+
       expectType<
         typeof _result2,
         <A>(array: readonly A[]) => readonly (readonly A[])[]
       >('<=');
+
       expectType<typeof _result3, readonly (readonly number[])[]>('<=');
     });
 
@@ -93,9 +106,11 @@ describe('Array overloaded functions - type error validation', () => {
     test('range with correct arguments should work', () => {
       // These should work fine
       const _result1 = range(1, 5);
+
       const _result2 = range(1, 5, 1);
 
       expectType<typeof _result1, readonly [1, 2, 3, 4]>('=');
+
       expectType<typeof _result2, readonly [1, 2, 3, 4]>('=');
     });
 
@@ -112,12 +127,15 @@ describe('Array overloaded functions - type error validation', () => {
     test('spread with correct tuple types should work', () => {
       // Correct usage with spread
       const correctArgs1 = [testArray, predicate] as const;
+
       const correctArgs2 = [predicate] as const;
 
       const _result1 = findIndex(...correctArgs1);
+
       const _result2 = findIndex(...correctArgs2);
 
       expectType<typeof _result1, 0 | 1 | 2 | 3 | 4 | -1>('<=');
+
       expectType<
         typeof _result2,
         (array: readonly number[]) => SizeType.Arr | -1
@@ -141,6 +159,7 @@ describe('Array overloaded functions - type error validation', () => {
     test('composition should preserve type safety', () => {
       // This should work
       const findPositive = findIndex((x: number) => x > 0);
+
       const filterNegative = filterNot((x: number) => x < 0);
 
       const _composedResult = pipe(testArray)

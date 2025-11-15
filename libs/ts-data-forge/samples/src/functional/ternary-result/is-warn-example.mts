@@ -10,5 +10,6 @@ const maybeWarn = TernaryResult.warn('value', 'check logs') as TernaryResult<
 
 if (TernaryResult.isWarn(maybeWarn)) {
   assert.strictEqual(maybeWarn.value, 'value');
+
   assert.strictEqual(maybeWarn.warning, 'check logs');
 }

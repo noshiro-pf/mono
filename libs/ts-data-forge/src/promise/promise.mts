@@ -17,7 +17,9 @@ import { Result } from '../functional/index.mjs';
  * });
  *
  * const successResult = await successPromise;
+ *
  * assert.ok(Result.isOk(successResult));
+ *
  * if (Result.isOk(successResult)) {
  *   assert(successResult.value === 42);
  * }
@@ -30,7 +32,9 @@ import { Result } from '../functional/index.mjs';
  * });
  *
  * const errorResult = await errorPromise;
+ *
  * assert.ok(Result.isErr(errorResult));
+ *
  * if (Result.isErr(errorResult)) {
  *   assert(errorResult.value === 'Something went wrong');
  * }

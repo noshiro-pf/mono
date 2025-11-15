@@ -83,6 +83,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * const fromKey = (key: string) => JSON.parse(key) as Point;
    *
    * const empty = ISetMapped.create<Point, string>([], toKey, fromKey);
+   *
    * const points = ISetMapped.create<Point, string>(
    *   [{ x: 1, tag: 'a' }],
    *   toKey,
@@ -90,6 +91,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * assert.ok(empty.isEmpty);
+   *
    * assert.notOk(points.isEmpty);
    * ```
    */
@@ -115,6 +117,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * assert.ok(set.has({ x: 1, tag: 'a' }));
+   *
    * assert.notOk(set.has({ x: 2, tag: 'b' }));
    * ```
    *
@@ -148,11 +151,13 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * const allEven = set.every((point) => point.x % 2 === 0);
+   *
    * const narrowed = set.every(
    *   (point): point is Readonly<{ x: 2 | 4; tag: 'even' }> => point.x % 2 === 0,
    * );
    *
    * assert.ok(allEven);
+   *
    * assert.ok(narrowed);
    * ```
    *
@@ -196,6 +201,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * assert.ok(set.some((point) => point.x > 4));
+   *
    * assert.notOk(set.some((point) => point.x > 10));
    * ```
    *
@@ -227,12 +233,14 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * const withNew = base.add({ x: 2, tag: 'b' });
+   *
    * const unchanged = base.add({ x: 1, tag: 'a' });
    *
    * assert.deepStrictEqual(Array.from(withNew), [
    *   { x: 1, tag: 'a' },
    *   { x: 2, tag: 'b' },
    * ]);
+   *
    * assert(unchanged === base);
    * ```
    *
@@ -264,9 +272,11 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * const withoutSecond = base.delete({ x: 2, tag: 'b' });
+   *
    * const unchanged = base.delete({ x: 3, tag: 'c' });
    *
    * assert.deepStrictEqual(Array.from(withoutSecond), [{ x: 1, tag: 'a' }]);
+   *
    * assert(unchanged === base);
    * ```
    *
@@ -310,6 +320,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   { x: 2, tag: 'b' },
    *   { x: 3, tag: 'c' },
    * ]);
+   *
    * assert.deepStrictEqual(Array.from(base), [
    *   { x: 1, tag: 'a' },
    *   { x: 2, tag: 'b' },
@@ -461,6 +472,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * const collected: Point[] = [];
+   *
    * for (const point of set) {
    *   collected.push(point);
    * }
@@ -495,6 +507,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   toKey,
    *   fromKey,
    * );
+   *
    * const superset = ISetMapped.create<Point, string>(
    *   [
    *     { x: 1, tag: 'a' },
@@ -505,6 +518,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * assert.ok(subset.isSubsetOf(superset));
+   *
    * assert.notOk(superset.isSubsetOf(subset));
    * ```
    *
@@ -535,6 +549,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   toKey,
    *   fromKey,
    * );
+   *
    * const subset = ISetMapped.create<Point, string>(
    *   [{ x: 2, tag: 'b' }],
    *   toKey,
@@ -542,6 +557,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * );
    *
    * assert.ok(superset.isSupersetOf(subset));
+   *
    * assert.notOk(subset.isSupersetOf(superset));
    * ```
    *
@@ -574,6 +590,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   toKey,
    *   fromKey,
    * );
+   *
    * const right = ISetMapped.create<Point, string>(
    *   [{ x: 2, tag: 'b' }],
    *   toKey,
@@ -615,6 +632,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   toKey,
    *   fromKey,
    * );
+   *
    * const right = ISetMapped.create<Point, string>(
    *   [{ x: 2, tag: 'b' }],
    *   toKey,
@@ -649,6 +667,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   toKey,
    *   fromKey,
    * );
+   *
    * const right = ISetMapped.create<Point, string>(
    *   [{ x: 2, tag: 'b' }],
    *   toKey,
@@ -828,6 +847,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * const raw = set.toRawSet();
    *
    * assert.ok(is.set(raw));
+   *
    * assert.ok(raw.has(toKey({ x: 1, tag: 'a' })));
    * ```
    *
@@ -955,6 +975,7 @@ export namespace ISetMapped {
    *   toKey,
    *   fromKey,
    * );
+   *
    * const second = ISetMapped.create<Point, string>(
    *   [
    *     { x: 2, tag: 'b' },
@@ -963,6 +984,7 @@ export namespace ISetMapped {
    *   toKey,
    *   fromKey,
    * );
+   *
    * const third = ISetMapped.create<Point, string>(
    *   [{ x: 3, tag: 'c' }],
    *   toKey,
@@ -970,6 +992,7 @@ export namespace ISetMapped {
    * );
    *
    * assert.ok(ISetMapped.equal(first, second));
+   *
    * assert.notOk(ISetMapped.equal(first, third));
    * ```
    *
@@ -1006,6 +1029,7 @@ export namespace ISetMapped {
    *   toKey,
    *   fromKey,
    * );
+   *
    * const current = ISetMapped.create<Point, string>(
    *   [
    *     { x: 2, tag: 'b' },
@@ -1018,6 +1042,7 @@ export namespace ISetMapped {
    * const { added, deleted } = ISetMapped.diff(previous, current);
    *
    * assert.deepStrictEqual(Array.from(added), [{ x: 3, tag: 'c' }]);
+   *
    * assert.deepStrictEqual(Array.from(deleted), [{ x: 1, tag: 'a' }]);
    * ```
    *
@@ -1056,6 +1081,7 @@ export namespace ISetMapped {
    *   toKey,
    *   fromKey,
    * );
+   *
    * const right = ISetMapped.create<Point, string>(
    *   [{ x: 2, tag: 'b' }],
    *   toKey,
@@ -1096,6 +1122,7 @@ export namespace ISetMapped {
    *   toKey,
    *   fromKey,
    * );
+   *
    * const right = ISetMapped.create<Point, string>(
    *   [{ x: 2, tag: 'b' }],
    *   toKey,
@@ -1173,8 +1200,11 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
     showNotFoundMessage: boolean = false,
   ) {
     this.#set = new Set(Array.from(iterable, toKey));
+
     this.#toKey = toKey;
+
     this.#fromKey = fromKey;
+
     this.#showNotFoundMessage = showNotFoundMessage;
   }
 
@@ -1238,8 +1268,10 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
           `ISetMapped.delete: key not found: ${String(this.#toKey(key))}`,
         );
       }
+
       return this;
     }
+
     const keyMapped = this.#toKey(key);
 
     return ISetMapped.create(
@@ -1265,10 +1297,12 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
       switch (action.type) {
         case 'delete':
           mut_result.delete(key);
+
           break;
 
         case 'add':
           mut_result.add(key);
+
           break;
       }
     }
@@ -1407,6 +1441,7 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
     for (const km of this.#set.keys()) {
       // JavaScript Set's entries() yields [value, value]
       const a = this.#fromKey(km);
+
       yield [a, a];
     }
   }

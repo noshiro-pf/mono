@@ -4,6 +4,7 @@ import { projectRootPath } from '../project-root-path.mjs';
 import { extractSampleCode } from './embed-samples-shared.mjs';
 
 const codeBlockStart = '```tsx';
+
 const codeBlockEnd = '```';
 
 const documents: DeepReadonly<
@@ -37,6 +38,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
       const mut_results: string[] = [];
+
       let mut_rest: string = markdownContent;
 
       for (const sampleCodeFile of sampleCodeFiles) {
@@ -44,6 +46,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 
         // Read sample content
         const sampleContent = await fs.readFile(samplePath, 'utf8');
+
         const sampleContentSliced = extractSampleCode(sampleContent);
 
         // Find next code block
@@ -69,6 +72,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
           0,
           Math.max(0, codeBlockStartIndex + codeBlockStart.length),
         );
+
         const afterBlock = mut_rest.slice(Math.max(0, codeBlockEndIndex));
 
         mut_results.push(beforeBlock, sampleContentSliced);
@@ -94,8 +98,10 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await embedSamples();
+
   if (Result.isErr(result)) {
     console.error(result.value);
+
     process.exit(1);
   }
 }

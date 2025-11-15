@@ -8,11 +8,15 @@ import { ErrTypeTagName, OkTypeTagName, WarnTypeTagName } from './tag.mjs';
  *
  * ```ts
  * const okValue = TernaryResult.ok('done');
+ *
  * const warnValue = TernaryResult.warn('done', 'retry later');
+ *
  * const notResult = { $$tag: 'ts-data-forge::Result.ok' };
  *
  * assert.ok(TernaryResult.isTernaryResult(okValue));
+ *
  * assert.ok(TernaryResult.isTernaryResult(warnValue));
+ *
  * assert.ok(!TernaryResult.isTernaryResult(notResult));
  * ```
  */

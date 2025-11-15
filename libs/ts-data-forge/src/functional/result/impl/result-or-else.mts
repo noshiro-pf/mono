@@ -8,10 +8,13 @@ import { type NarrowToOk } from './types.mjs';
  *
  * ```ts
  * const primary = Result.ok('primary');
+ *
  * const fallback = Result.ok('fallback');
+ *
  * const failure = Result.err('failure');
  *
  * assert.deepStrictEqual(Result.orElse(primary, fallback), primary);
+ *
  * assert.deepStrictEqual(Result.orElse(failure, fallback), fallback);
  *
  * const orElseFallback = Result.orElse(Result.ok('default'));
@@ -20,6 +23,7 @@ import { type NarrowToOk } from './types.mjs';
  *   orElseFallback(Result.err('missing')),
  *   Result.ok('default'),
  * );
+ *
  * assert.deepStrictEqual(orElseFallback(Result.ok('value')), Result.ok('value'));
  * ```
  *
@@ -46,12 +50,14 @@ export function orElse<R extends UnknownResult, R2 extends UnknownResult>(
     case 2: {
       // Direct version: first argument is result
       const [result, alternative] = args;
+
       return orElseImpl(result, alternative);
     }
 
     case 1: {
       // Curried version
       const [alternative] = args;
+
       return (result: R) => orElseImpl(result, alternative);
     }
   }

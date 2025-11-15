@@ -32,6 +32,7 @@ describe('Array.some', () => {
 
 describe('Array.flat', () => {
   const xs = [1, 2, [3, 4, [5, 6, [7, 8]]]] as const;
+
   const result = xs.flat();
 
   expectType<
@@ -47,6 +48,7 @@ describe('Array.flat', () => {
 describe('Array.includes', () => {
   {
     const xs = [2, 1, 3] as const;
+
     const result = xs.includes(2);
 
     expectType<typeof result, boolean>('=');
@@ -55,8 +57,10 @@ describe('Array.includes', () => {
       expect(result).toBe(true);
     });
   }
+
   {
     const xs: readonly number[] = [2, 1, 3];
+
     const result = xs.includes(4);
 
     expectType<typeof result, boolean>('=');
@@ -70,6 +74,7 @@ describe('Array.includes', () => {
 describe('Array.find', () => {
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
+
     const result = xs.find((x) => x.v === 1);
 
     expectType<typeof result, Readonly<{ v: 1 }> | undefined>('=');
@@ -78,12 +83,14 @@ describe('Array.find', () => {
       assert.deepStrictEqual(result, { v: 1 });
     });
   }
+
   {
     const xs: readonly Readonly<{ v: 1 | 2 | 3 }>[] = [
       { v: 2 },
       { v: 1 },
       { v: 3 },
     ] as const;
+
     const result = xs.find((x) => x.v === 1);
 
     expectType<typeof result, Readonly<{ v: 1 | 2 | 3 }> | undefined>('=');
@@ -97,6 +104,7 @@ describe('Array.find', () => {
 describe('Array.findIndex', () => {
   {
     const xs = [{ v: 2 }, { v: 1 }, { v: 3 }] as const;
+
     const result = xs.findIndex((x) => x.v === 1);
 
     expectType<typeof result, number>('=');
@@ -105,12 +113,14 @@ describe('Array.findIndex', () => {
       expect(result).toBe(1);
     });
   }
+
   {
     const xs: readonly Readonly<{ v: 1 | 2 | 3 }>[] = [
       { v: 2 },
       { v: 1 },
       { v: 3 },
     ] as const;
+
     const result = xs.findIndex((x) => x.v === 1);
 
     expectType<typeof result, number>('=');
@@ -124,6 +134,7 @@ describe('Array.findIndex', () => {
 describe('Array.filter', () => {
   {
     const xs = [1, 2, 3] as const;
+
     const filtered = xs.filter((x): x is 1 | 3 => x % 2 === 1);
 
     expectType<typeof filtered, (1 | 3)[]>('=');
@@ -135,6 +146,7 @@ describe('Array.filter', () => {
 
   {
     const xs = [1, 2, 3] as const;
+
     const filtered = xs.filter((x) => x % 2 === 1);
 
     expectType<typeof filtered, (1 | 2 | 3)[]>('=');

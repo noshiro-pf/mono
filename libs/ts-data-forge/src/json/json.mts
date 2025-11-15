@@ -21,12 +21,15 @@ export namespace Json {
    *
    * ```ts
    * const validJson = '{"name": "Alice", "age": 30}';
+   *
    * const invalidJson = '{invalid json}';
    *
    * const parsed = Json.parse(validJson);
+   *
    * const failed = Json.parse(invalidJson);
    *
    * assert.ok(Result.isOk(parsed));
+   *
    * if (Result.isOk(parsed)) {
    *   assert.deepStrictEqual(parsed.value, { name: 'Alice', age: 30 });
    * }
@@ -35,10 +38,12 @@ export namespace Json {
    *
    * // With reviver
    * const jsonWithDate = '{"created": "2024-01-01T00:00:00.000Z"}';
+   *
    * const withReviver = Json.parse(jsonWithDate, (key, value) => {
    *   if (key === 'created' && typeof value === 'string') {
    *     return new Date(value);
    *   }
+   *
    *   return value;
    * });
    *
@@ -71,6 +76,7 @@ export namespace Json {
       );
     } catch (error: unknown) {
       const errStr = unknownToString(error);
+
       return Result.err(errStr);
     }
   };
@@ -91,22 +97,27 @@ export namespace Json {
    *
    * // Basic stringify
    * const basic = Json.stringify(data);
+   *
    * assert.ok(Result.isOk(basic));
+   *
    * if (Result.isOk(basic)) {
    *   assert(basic.value === '{"name":"Bob","age":25,"active":true}');
    * }
    *
    * // With formatting
    * const formatted = Json.stringify(data, undefined, 2);
+   *
    * assert.ok(Result.isOk(formatted));
    *
    * // With replacer
    * const filtered = Json.stringify(data, (key, value) => {
    *   if (key === 'age') return undefined; // omit age field
+   *
    *   return value;
    * });
    *
    * assert.ok(Result.isOk(filtered));
+   *
    * if (Result.isOk(filtered)) {
    *   assert(isString(filtered.value));
    *
@@ -143,6 +154,7 @@ export namespace Json {
       return Result.ok(JSON.stringify(value, replacer, space));
     } catch (error) {
       const errStr = unknownToString(error);
+
       return Result.err(errStr);
     }
   };
@@ -171,21 +183,26 @@ export namespace Json {
    * const safeJson = Json.stringifySelected(user, ['id', 'name', 'role']);
    *
    * assert.ok(Result.isOk(safeJson));
+   *
    * if (Result.isOk(safeJson)) {
    *   assert(isString(safeJson.value));
    *
    *   const parsed: unknown = JSON.parse(safeJson.value);
+   *
    *   assert.deepStrictEqual(parsed, {
    *     id: 1,
    *     name: 'Charlie',
    *     role: 'admin',
    *   });
+   *
    *   assert.ok(!safeJson.value.includes('password'));
+   *
    *   assert.ok(!safeJson.value.includes('email'));
    * }
    *
    * // With formatting
    * const formatted = Json.stringifySelected(user, ['id', 'name'], 2);
+   *
    * assert.ok(Result.isOk(formatted));
    * ```
    *
@@ -218,6 +235,7 @@ export namespace Json {
       );
     } catch (error) {
       const errStr = unknownToString(error);
+
       return Result.err(errStr);
     }
   };
@@ -250,16 +268,20 @@ export namespace Json {
    * const sorted = Json.stringifySortedKey(unorderedData);
    *
    * assert.ok(Result.isOk(sorted));
+   *
    * if (Result.isOk(sorted)) {
    *   // Keys should appear in alphabetical order
    *   const expected =
    *     '{"apple":2,"mango":3,"nested":{"alpha":"a","beta":"b","zulu":"z"},"zebra":1}';
+   *
    *   assert(sorted.value === expected);
    * }
    *
    * // With formatting
    * const formatted = Json.stringifySortedKey(unorderedData, 2);
+   *
    * assert.ok(Result.isOk(formatted));
+   *
    * if (Result.isOk(formatted)) {
    *   assert(isString(formatted.value));
    *
@@ -267,9 +289,11 @@ export namespace Json {
    *   assert.ok(
    *     formatted.value.indexOf('"apple"') < formatted.value.indexOf('"mango"'),
    *   );
+   *
    *   assert.ok(
    *     formatted.value.indexOf('"mango"') < formatted.value.indexOf('"nested"'),
    *   );
+   *
    *   assert.ok(
    *     formatted.value.indexOf('"nested"') < formatted.value.indexOf('"zebra"'),
    *   );
@@ -321,10 +345,13 @@ const keysDeepImpl = (
 ): void => {
   for (const k of Object.keys(obj)) {
     mut_keys.push(k);
+
     const o = obj[k];
+
     if (isRecord(o)) {
       keysDeepImpl(o, mut_keys);
     }
+
     if (Array.isArray(o)) {
       for (const li of o) {
         if (isRecord(li)) {
@@ -349,6 +376,8 @@ const keysDeepImpl = (
  */
 const keysDeep = (obj: UnknownRecord): readonly string[] => {
   const mut_keys: string[] = [];
+
   keysDeepImpl(obj, mut_keys);
+
   return mut_keys;
 };

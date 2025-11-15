@@ -373,8 +373,11 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
     showNotFoundMessage: boolean = false,
   ) {
     this.#map = new Map(Array.from(iterable, ([k, v]) => [toKey(k), v]));
+
     this.#toKey = toKey;
+
     this.#fromKey = fromKey;
+
     this.#showNotFoundMessage = showNotFoundMessage;
   }
 
@@ -391,6 +394,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
   /** @inheritdoc */
   get(key: K): Optional<V> {
     if (!this.has(key)) return Optional.none;
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Optional.some(this.#map.get(this.#toKey(key))!);
   }
@@ -429,8 +433,10 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
           `IMapMapped.delete: key not found: ${String(this.#toKey(key))}`,
         );
       }
+
       return this;
     }
+
     const keyMapped = this.#toKey(key);
 
     return IMapMapped.create(
@@ -445,6 +451,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
   /** @inheritdoc */
   set(key: K, value: V): IMapMapped<K, V, KM> {
     if (value === this.get(key)) return this; // has no changes
+
     const keyMapped = this.#toKey(key);
 
     if (!this.has(key)) {
@@ -476,6 +483,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
           `IMapMapped.update: key not found: ${String(this.#toKey(key))}`,
         );
       }
+
       return this;
     }
 
@@ -512,10 +520,12 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
       switch (action.type) {
         case 'delete':
           mut_result.delete(key);
+
           break;
 
         case 'set':
           mut_result.set(key, action.value);
+
           break;
 
         case 'update': {
@@ -527,6 +537,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
                 `IMapMapped.withMutations::update: key not found: ${String(key)}`,
               );
             }
+
             break;
           }
 

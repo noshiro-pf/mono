@@ -5,7 +5,9 @@ import { Arr } from 'ts-data-forge';
 const base = [2, 3] as const;
 
 const prefixed = Arr.toUnshifted(base, 1);
+
 const prefixedCurried = Arr.toUnshifted(0)(base);
 
 assert.deepStrictEqual(prefixed, [1, 2, 3]);
+
 assert.deepStrictEqual(prefixedCurried, [0, 2, 3]);

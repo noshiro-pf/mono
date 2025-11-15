@@ -5,4 +5,5 @@ import { SafeInt, asSafeInt } from 'ts-data-forge';
 const sum = SafeInt.add(asSafeInt(9), asSafeInt(4));
 
 assert(sum === 13);
+
 assert.ok(SafeInt.is(sum));

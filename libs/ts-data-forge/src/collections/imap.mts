@@ -62,6 +62,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * ]);
    *
    * assert.ok(map.has('id'));
+   *
    * assert.notOk(map.has('missing'));
    * ```
    *
@@ -79,6 +80,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const map = IMap.create([['user', { id: 1 }]]);
    *
    * assert.deepStrictEqual(map.get('user'), Optional.some({ id: 1 }));
+   *
    * assert.deepStrictEqual(map.get('missing'), Optional.none);
    * ```
    *
@@ -102,9 +104,11 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * ]);
    *
    * const allEven = map.every((value) => value % 2 === 0);
+   *
    * const isNarrowed = map.every((value): value is 2 | 4 => value % 2 === 0);
    *
    * assert.ok(allEven);
+   *
    * assert.ok(isNarrowed);
    * ```
    *
@@ -139,6 +143,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const map = IMap.create(entries);
    *
    * assert.ok(map.some((value) => value > 4));
+   *
    * assert.notOk(map.some((value) => value > 10));
    * ```
    *
@@ -164,8 +169,11 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const withoutB = original.delete('b');
    *
    * assert.deepStrictEqual(original.get('b'), Optional.some(2));
+   *
    * assert.deepStrictEqual(withoutB.get('b'), Optional.none);
+   *
    * assert(original.size === 2);
+   *
    * assert(withoutB.size === 1);
    * ```
    *
@@ -188,10 +196,13 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const base = IMap.create<'count' | 'status', number | string>(entries);
    *
    * const updated = base.set('count', 2);
+   *
    * const extended = base.set('status', 'ok');
    *
    * assert.deepStrictEqual(base.get('count'), Optional.some(1));
+   *
    * assert.deepStrictEqual(updated.get('count'), Optional.some(2));
+   *
    * assert.deepStrictEqual(extended.get('status'), Optional.some('ok'));
    * ```
    *
@@ -215,10 +226,13 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const scores = IMap.create<'alice' | 'bob' | 'charlie', number>(entries);
    *
    * const boosted = scores.update('alice', (value) => value + 5);
+   *
    * const unchanged = scores.update('charlie', (value) => value + 1);
    *
    * assert.deepStrictEqual(boosted.get('alice'), Optional.some(15));
+   *
    * assert.deepStrictEqual(scores.get('alice'), Optional.some(10));
+   *
    * assert(unchanged === scores);
    * ```
    *
@@ -255,8 +269,11 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const mutated = base.withMutations(actions);
    *
    * assert.deepStrictEqual(mutated.get('c'), Optional.some(3));
+   *
    * assert.deepStrictEqual(mutated.get('b'), Optional.some(20));
+   *
    * assert.deepStrictEqual(mutated.get('a'), Optional.none);
+   *
    * assert.deepStrictEqual(base.get('b'), Optional.some(2));
    * ```
    *
@@ -559,6 +576,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const raw = map.toRawMap();
    *
    * assert.ok(is.map(raw));
+   *
    * assert(raw.get('key') === 1);
    * ```
    *
@@ -616,6 +634,7 @@ export namespace IMap {
    * ]);
    *
    * assert(map.size === 2);
+   *
    * assert.deepStrictEqual(map.get('status'), Optional.some('active'));
    * ```
    *
@@ -658,6 +677,7 @@ export namespace IMap {
    * ]);
    *
    * assert.ok(IMap.equal(first, second));
+   *
    * assert.notOk(IMap.equal(first, third));
    * ```
    *
@@ -719,6 +739,7 @@ class IMapClass<K extends MapSetKeyType, V>
     showNotFoundMessage: boolean = false,
   ) {
     this.#map = new Map(iterable);
+
     this.#showNotFoundMessage = showNotFoundMessage;
   }
 
@@ -736,6 +757,7 @@ class IMapClass<K extends MapSetKeyType, V>
   /** @inheritdoc */
   get(key: K | (WidenLiteral<K> & {})): Optional<V> {
     if (!this.has(key)) return Optional.none;
+
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-non-null-assertion
     return Optional.some(this.#map.get(key as K)!);
   }
@@ -771,8 +793,10 @@ class IMapClass<K extends MapSetKeyType, V>
     if (!this.has(key)) {
       if (this.#showNotFoundMessage) {
         const keyStr = unknownToString(key);
+
         console.warn(`IMap.delete: key not found: ${keyStr}`);
       }
+
       return this;
     }
 
@@ -784,7 +808,9 @@ class IMapClass<K extends MapSetKeyType, V>
   /** @inheritdoc */
   set(key: K, value: V): IMap<K, V> {
     const curr = this.get(key);
+
     if (Optional.isSome(curr) && value === curr.value) return this; // has no changes
+
     if (!this.has(key)) {
       return IMap.create([...this.#map, tp(key, value)]);
     } else {
@@ -801,8 +827,10 @@ class IMapClass<K extends MapSetKeyType, V>
     if (Optional.isNone(curr)) {
       if (this.#showNotFoundMessage) {
         const keyStr = unknownToString(key);
+
         console.warn(`IMap.update: key not found: ${keyStr}`);
       }
+
       return this;
     }
 
@@ -827,10 +855,12 @@ class IMapClass<K extends MapSetKeyType, V>
       switch (action.type) {
         case 'delete':
           mut_result.delete(action.key);
+
           break;
 
         case 'set':
           mut_result.set(action.key, action.value);
+
           break;
 
         case 'update': {
@@ -841,8 +871,10 @@ class IMapClass<K extends MapSetKeyType, V>
           if (!mut_result.has(key) || curr === undefined) {
             if (this.#showNotFoundMessage) {
               const keyStr = unknownToString(key);
+
               console.warn(`IMap.withMutations: key not found: ${keyStr}`);
             }
+
             break;
           }
 

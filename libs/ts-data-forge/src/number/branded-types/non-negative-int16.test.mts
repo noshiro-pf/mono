@@ -11,37 +11,49 @@ describe('NonNegativeInt16 test', () => {
   describe(asNonNegativeInt16, () => {
     test('accepts valid non-negative int16 values', () => {
       expect(() => asNonNegativeInt16(0)).not.toThrow();
+
       expect(() => asNonNegativeInt16(1)).not.toThrow();
+
       expect(() => asNonNegativeInt16(1000)).not.toThrow();
+
       expect(() => asNonNegativeInt16(32_767)).not.toThrow(); // 2^15 - 1
     });
 
     test('rejects negative integers', () => {
       expect(() => asNonNegativeInt16(-1)).toThrow(TypeError);
+
       expect(() => asNonNegativeInt16(-42)).toThrow(TypeError);
+
       expect(() => asNonNegativeInt16(-32_768)).toThrow(TypeError);
     });
 
     test('rejects values outside int16 range', () => {
       expect(() => asNonNegativeInt16(32_768)).toThrow(TypeError); // 2^15
+
       expect(() => asNonNegativeInt16(65_536)).toThrow(TypeError);
     });
 
     test('rejects non-integers', () => {
       expect(() => asNonNegativeInt16(Number.NaN)).toThrow(TypeError);
+
       expect(() => asNonNegativeInt16(Number.POSITIVE_INFINITY)).toThrow(
         TypeError,
       );
+
       expect(() => asNonNegativeInt16(Number.NEGATIVE_INFINITY)).toThrow(
         TypeError,
       );
+
       expect(() => asNonNegativeInt16(1.2)).toThrow(TypeError);
+
       expect(() => asNonNegativeInt16(-3.4)).toThrow(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
       expect(asNonNegativeInt16(0)).toBe(0);
+
       expect(asNonNegativeInt16(5)).toBe(5);
+
       expect(asNonNegativeInt16(32_767)).toBe(32_767);
     });
 
@@ -68,27 +80,37 @@ describe('NonNegativeInt16 test', () => {
   describe(isNonNegativeInt16, () => {
     test('correctly identifies non-negative int16 values', () => {
       expect(isNonNegativeInt16(0)).toBe(true);
+
       expect(isNonNegativeInt16(1)).toBe(true);
+
       expect(isNonNegativeInt16(1000)).toBe(true);
+
       expect(isNonNegativeInt16(32_767)).toBe(true);
     });
 
     test('correctly identifies negative integers', () => {
       expect(isNonNegativeInt16(-1)).toBe(false);
+
       expect(isNonNegativeInt16(-42)).toBe(false);
+
       expect(isNonNegativeInt16(-32_768)).toBe(false);
     });
 
     test('correctly identifies values outside int16 range', () => {
       expect(isNonNegativeInt16(32_768)).toBe(false);
+
       expect(isNonNegativeInt16(65_536)).toBe(false);
     });
 
     test('correctly identifies non-integers', () => {
       expect(isNonNegativeInt16(Number.NaN)).toBe(false);
+
       expect(isNonNegativeInt16(Number.POSITIVE_INFINITY)).toBe(false);
+
       expect(isNonNegativeInt16(Number.NEGATIVE_INFINITY)).toBe(false);
+
       expect(isNonNegativeInt16(1.2)).toBe(false);
+
       expect(isNonNegativeInt16(-3.4)).toBe(false);
     });
   });
@@ -96,7 +118,9 @@ describe('NonNegativeInt16 test', () => {
   describe('NonNegativeInt16.is', () => {
     test('same as isNonNegativeInt16 function', () => {
       expect(NonNegativeInt16.is(5)).toBe(isNonNegativeInt16(5));
+
       expect(NonNegativeInt16.is(0)).toBe(isNonNegativeInt16(0));
+
       expect(NonNegativeInt16.is(-1)).toBe(isNonNegativeInt16(-1));
     });
   });
@@ -104,19 +128,25 @@ describe('NonNegativeInt16 test', () => {
   describe('constants', () => {
     test('MIN_VALUE and MAX_VALUE', () => {
       expect(NonNegativeInt16.MIN_VALUE).toBe(0);
+
       expect(NonNegativeInt16.MAX_VALUE).toBe(32_767);
     });
   });
 
   describe('mathematical operations', () => {
     const a = asNonNegativeInt16(100);
+
     const b = asNonNegativeInt16(50);
+
     const c = asNonNegativeInt16(0);
 
     test('min and max', () => {
       expect(NonNegativeInt16.min(a, b)).toBe(50);
+
       expect(NonNegativeInt16.max(a, b)).toBe(100);
+
       expect(NonNegativeInt16.min(a, c)).toBe(0);
+
       expect(NonNegativeInt16.max(a, c)).toBe(100);
     });
 
@@ -127,12 +157,15 @@ describe('NonNegativeInt16 test', () => {
       );
 
       expect(result).toBe(32_767); // clamped to max
+
       expect(NonNegativeInt16.add(a, b)).toBe(150);
     });
 
     test('sub (never goes below 0)', () => {
       expect(NonNegativeInt16.sub(a, b)).toBe(50);
+
       expect(NonNegativeInt16.sub(b, a)).toBe(0); // clamped to 0
+
       expect(NonNegativeInt16.sub(c, a)).toBe(0); // clamped to 0
     });
 
@@ -143,6 +176,7 @@ describe('NonNegativeInt16 test', () => {
       );
 
       expect(result).toBe(32_767); // clamped to max
+
       expect(
         NonNegativeInt16.mul(asNonNegativeInt16(10), asNonNegativeInt16(5)),
       ).toBe(50);
@@ -150,9 +184,11 @@ describe('NonNegativeInt16 test', () => {
 
     test('div (floor division, never goes below 0)', () => {
       expect(NonNegativeInt16.div(a, asPositiveInt16(50))).toBe(2);
+
       expect(
         NonNegativeInt16.div(asNonNegativeInt16(7), asPositiveInt16(3)),
       ).toBe(2);
+
       expect(
         NonNegativeInt16.div(asNonNegativeInt16(50), asPositiveInt16(100)),
       ).toBe(0); // floor(50/100) = 0
@@ -165,6 +201,7 @@ describe('NonNegativeInt16 test', () => {
       );
 
       expect(result).toBe(32_767); // clamped to max
+
       expect(
         NonNegativeInt16.pow(asNonNegativeInt16(2), asNonNegativeInt16(3)),
       ).toBe(8);
@@ -174,15 +211,20 @@ describe('NonNegativeInt16 test', () => {
   describe('random', () => {
     test('generates non-negative int16 values within specified range', () => {
       const min = 0;
+
       const max = 20;
 
       for (const _ of range(10)) {
         const result = NonNegativeInt16.random(min, max);
 
         expect(result).toBeGreaterThanOrEqual(min);
+
         expect(result).toBeLessThanOrEqual(max);
+
         expect(NonNegativeInt16.is(result)).toBe(true);
+
         expect(Number.isInteger(result)).toBe(true);
+
         expect(result).toBeGreaterThanOrEqual(0);
       }
     });
@@ -192,6 +234,7 @@ describe('NonNegativeInt16 test', () => {
         const result = NonNegativeInt16.random(0, 30);
 
         expect(result).toBeGreaterThanOrEqual(0);
+
         expect(result).toBeLessThanOrEqual(32_767);
       }
     });

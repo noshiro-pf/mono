@@ -7,9 +7,11 @@ import { asUint32, Num } from '../../number/index.mjs';
  *
  * ```ts
  * const maybeArray: unknown = [1, 2, 3];
+ *
  * const maybeValue: unknown = 'Ada';
  *
  * assert.ok(Arr.isArray(maybeArray));
+ *
  * assert.notOk(Arr.isArray(maybeValue));
  *
  * if (Arr.isArray(maybeArray)) {
@@ -40,9 +42,11 @@ type Cast<A, B> = A extends B ? A : never;
  *
  * ```ts
  * const emptyNumbers: readonly number[] = [] as const;
+ *
  * const words = ['Ada', 'Lovelace'] as const;
  *
  * assert.ok(Arr.isEmpty(emptyNumbers));
+ *
  * assert.notOk(Arr.isEmpty(words));
  *
  * if (Arr.isEmpty(emptyNumbers)) {
@@ -60,9 +64,11 @@ export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
  *
  * ```ts
  * const users: readonly { id: number }[] = [{ id: 1 }];
+ *
  * const emptyUsers: readonly { id: number }[] = [];
  *
  * assert.ok(Arr.isNonEmpty(users));
+ *
  * assert.notOk(Arr.isNonEmpty(emptyUsers));
  *
  * if (Arr.isNonEmpty(users)) {
@@ -81,9 +87,11 @@ export const isNonEmpty = <E,>(
  *
  * ```ts
  * const pair: readonly number[] = [1, 2];
+ *
  * const triple: readonly number[] = [1, 2, 3];
  *
  * assert.ok(Arr.isArrayOfLength(pair, 2));
+ *
  * assert.notOk(Arr.isArrayOfLength(triple, 2));
  *
  * if (Arr.isArrayOfLength(pair, 2)) {
@@ -103,9 +111,11 @@ export const isArrayOfLength = <E, N extends SizeType.ArgArr>(
  *
  * ```ts
  * const queue: readonly string[] = ['task-1', 'task-2'];
+ *
  * const emptyQueue: readonly string[] = [];
  *
  * assert.ok(Arr.isArrayAtLeastLength(queue, 1));
+ *
  * assert.notOk(Arr.isArrayAtLeastLength(emptyQueue, 1));
  *
  * if (Arr.isArrayAtLeastLength(queue, 1)) {
@@ -125,12 +135,15 @@ export const isArrayAtLeastLength = <E, N extends SizeType.ArgArr>(
  *
  * ```ts
  * const numbers = [2, 4, 6] as const;
+ *
  * const words = ['Ada', 'Grace'] as const;
  *
  * const allEven = Arr.every(numbers, (value) => value % 2 === 0);
+ *
  * const allStartWithA = Arr.every(words, (value) => value.startsWith('A'));
  *
  * assert.ok(allEven);
+ *
  * assert.notOk(allStartWithA);
  * ```
  */
@@ -165,10 +178,13 @@ export function every<E>(
   switch (args.length) {
     case 2: {
       const [array, predicate] = args;
+
       return array.every((a, i) => predicate(a, asUint32(i)));
     }
+
     case 1: {
       const [predicate] = args;
+
       return (array) => every(array, predicate);
     }
   }
@@ -181,12 +197,15 @@ export function every<E>(
  *
  * ```ts
  * const numbers = [1, 3, 5] as const;
+ *
  * const words = ['Ada', 'Grace'] as const;
  *
  * const hasEven = Arr.some(numbers, (value) => value % 2 === 0);
+ *
  * const hasShortName = Arr.some(words, (value) => value.length <= 3);
  *
  * assert.notOk(hasEven);
+ *
  * assert.ok(hasShortName);
  * ```
  */
@@ -210,10 +229,13 @@ export function some<E>(
   switch (args.length) {
     case 2: {
       const [array, predicate] = args;
+
       return array.some((a, i) => predicate(a, asUint32(i)));
     }
+
     case 1: {
       const [predicate] = args;
+
       return (array) => some(array, predicate);
     }
   }
@@ -228,6 +250,7 @@ export function some<E>(
  * const items = ['Ada', 'Grace', 'Katherine'] as const;
  *
  * assert.ok(Arr.indexIsInRange(items, 1));
+ *
  * assert.notOk(Arr.indexIsInRange(items, 3));
  *
  * if (Arr.indexIsInRange(items, 2)) {

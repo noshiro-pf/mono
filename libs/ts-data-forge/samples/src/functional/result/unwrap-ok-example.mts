@@ -3,6 +3,7 @@ import { Result } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 const okResult = Result.ok(42);
+
 const errResult = Result.err('oops');
 
 // Result.unwrapOk returns the value for Ok results

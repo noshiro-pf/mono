@@ -23,6 +23,7 @@ const backupIds: ReadonlySet<number> = await readRulesetBackupFiles().then(
 );
 
 const rulesetsToUpdate = rulesets.filter((r) => backupIds.has(r.id));
+
 const rulesetsToCreate = rulesets.filter((r) => !backupIds.has(r.id));
 
 for (const ruleset of rulesetsToUpdate) {

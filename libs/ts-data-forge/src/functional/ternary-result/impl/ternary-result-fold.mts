@@ -17,6 +17,7 @@ import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
  *   (warn: string) => warn.length,
  *   (error: string) => error.toUpperCase(),
  * );
+ *
  * const warnFold = TernaryResult.fold(
  *   TernaryResult.warn(2, 'spike'),
  *   (value: number) => value,
@@ -25,6 +26,7 @@ import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
  * );
  *
  * assert.deepStrictEqual(okFold, TernaryResult.ok(4));
+ *
  * assert.deepStrictEqual(warnFold, TernaryResult.warn(2, 'SPIKE'));
  * ```
  */
@@ -59,10 +61,13 @@ export function fold<R extends UnknownTernaryResult, S2, W2, E2>(
   switch (args.length) {
     case 4: {
       const [result, mapOk, mapWarn, mapErr] = args;
+
       return foldImpl(result, mapOk, mapWarn, mapErr);
     }
+
     case 3: {
       const [mapOk, mapWarn, mapErr] = args;
+
       return (result: R) => foldImpl(result, mapOk, mapWarn, mapErr);
     }
   }

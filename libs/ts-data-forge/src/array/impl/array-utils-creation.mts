@@ -8,9 +8,11 @@ import { range as rangeIterator } from '../../iterator/index.mjs';
  *
  * ```ts
  * const emptyZeros = Arr.zeros(0);
+ *
  * const threeZeros = Arr.zeros(3);
  *
  * assert.deepStrictEqual(emptyZeros, []);
+ *
  * assert.deepStrictEqual(threeZeros, [0, 0, 0]);
  * ```
  */
@@ -31,9 +33,11 @@ export const zeros = <N extends SizeType.ArgArr>(
  *
  * ```ts
  * const emptySeq = Arr.seq(0);
+ *
  * const firstFive = Arr.seq(5);
  *
  * assert.deepStrictEqual(emptySeq, []);
+ *
  * assert.deepStrictEqual(firstFive, [0, 1, 2, 3, 4]);
  * ```
  */
@@ -54,9 +58,11 @@ export const seq = <N extends SizeType.ArgArr>(
  *
  * ```ts
  * const threeOnes = Arr.create(3, 1);
+ *
  * const emptyStrings = Arr.create(0, 'Ada');
  *
  * assert.deepStrictEqual(threeOnes, [1, 1, 1]);
+ *
  * assert.deepStrictEqual(emptyStrings, []);
  * ```
  */
@@ -86,7 +92,9 @@ export const newArray = create;
  * ```ts
  * const numbers = Arr.generate(function* () {
  *   yield 1;
+ *
  *   yield 2;
+ *
  *   yield 3;
  * });
  *
@@ -105,7 +113,9 @@ export const generate = <T,>(
  * ```ts
  * const values = await Arr.generateAsync(async function* () {
  *   yield 'Ada';
+ *
  *   await Promise.resolve();
+ *
  *   yield 'Lovelace';
  * });
  *
@@ -123,9 +133,11 @@ export const generateAsync = <T,>(
  *
  * ```ts
  * const original = [{ id: 1 }, { id: 2 }] as const;
+ *
  * const cloned = Arr.copy(original);
  *
  * assert.deepStrictEqual(cloned, original);
+ *
  * assert.notStrictEqual(cloned, original);
  * ```
  */
@@ -143,13 +155,19 @@ type RangeList<S extends SmallUint, E extends SmallUint> =
     : List.Skip<S, Seq<E>>;
 
 expectType<RangeList<1, 5>, readonly [1, 2, 3, 4]>('=');
+
 expectType<RangeList<1, 2>, readonly [1]>('=');
+
 expectType<RangeList<1, 1>, readonly []>('=');
+
 expectType<RangeList<1, 1 | 3>, readonly (1 | 2)[]>('=');
+
 expectType<RangeList<1 | 3, 3 | 5>, readonly (1 | 2 | 3 | 4)[]>('=');
+
 expectType<RangeList<1 | 2 | 3, 5 | 6 | 7>, readonly (1 | 2 | 3 | 4 | 5 | 6)[]>(
   '=',
 );
+
 expectType<RangeList<5, 1>, readonly []>('=');
 
 /**
@@ -159,9 +177,11 @@ expectType<RangeList<5, 1>, readonly []>('=');
  *
  * ```ts
  * const ascending = Arr.range(asUint32(1), asUint32(5));
+ *
  * const empty = Arr.range(asUint32(2), asUint32(2));
  *
  * assert.deepStrictEqual(ascending, [1, 2, 3, 4]);
+ *
  * assert.deepStrictEqual(empty, []);
  * ```
  */

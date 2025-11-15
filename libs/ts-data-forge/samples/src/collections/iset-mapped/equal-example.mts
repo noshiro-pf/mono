@@ -17,6 +17,7 @@ const first = ISetMapped.create<Point, string>(
   toKey,
   fromKey,
 );
+
 const second = ISetMapped.create<Point, string>(
   [
     { x: 2, tag: 'b' },
@@ -25,6 +26,7 @@ const second = ISetMapped.create<Point, string>(
   toKey,
   fromKey,
 );
+
 const third = ISetMapped.create<Point, string>(
   [{ x: 3, tag: 'c' }],
   toKey,
@@ -32,4 +34,5 @@ const third = ISetMapped.create<Point, string>(
 );
 
 assert.ok(ISetMapped.equal(first, second));
+
 assert.notOk(ISetMapped.equal(first, third));

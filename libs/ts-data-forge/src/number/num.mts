@@ -50,6 +50,7 @@ export namespace Num {
    *   // Safe to divide now that we know value is non-zero
    *   // eslint-disable-next-line total-functions/no-partial-division
    *   const inverted = 1 / value;
+   *
    *   assert(inverted === 0.2);
    * }
    *
@@ -81,6 +82,7 @@ export namespace Num {
    *
    * if (Num.isNonNegative(candidate)) {
    *   const index: number = candidate;
+   *
    *   assert(index === 10);
    * }
    *
@@ -134,6 +136,7 @@ export namespace Num {
    * const isGrade = Num.isInRange(0, 100);
    *
    * assert.ok(isGrade(50));
+   *
    * assert.notOk(isGrade(100));
    * ```
    *
@@ -157,6 +160,7 @@ export namespace Num {
    * const isPercentage = Num.isInRangeInclusive(0, 100);
    *
    * assert.ok(isPercentage(100));
+   *
    * assert.notOk(isPercentage(-1));
    * ```
    *
@@ -216,7 +220,9 @@ export namespace Num {
    * const indexGuard = Num.isUintInRange(0, 5);
    *
    * assert.ok(indexGuard(3));
+   *
    * assert.notOk(indexGuard(5));
+   *
    * assert.notOk(indexGuard(-1));
    * ```
    *
@@ -250,6 +256,7 @@ export namespace Num {
    * const inclusiveGuard = Num.isUintInRangeInclusive(0, 5);
    *
    * assert.ok(inclusiveGuard(5));
+   *
    * assert.notOk(inclusiveGuard(6));
    * ```
    *
@@ -278,11 +285,13 @@ export namespace Num {
    *
    * ```ts
    * assert(Num.clamp(150, 0, 100) === 100);
+   *
    * assert(Num.clamp(-50, 0, 100) === 0);
    *
    * const clampToPercentage = Num.clamp(0, 100);
    *
    * assert(clampToPercentage(75) === 75);
+   *
    * assert(clampToPercentage(150) === 100);
    * ```
    */
@@ -306,6 +315,7 @@ export namespace Num {
     switch (args.length) {
       case 3: {
         const [target, lowerBound, upperBound] = args;
+
         return !Number.isFinite(target)
           ? lowerBound
           : Math.max(lowerBound, Math.min(upperBound, target));
@@ -313,6 +323,7 @@ export namespace Num {
 
       case 2: {
         const [lowerBound, upperBound] = args;
+
         return (target: number): number =>
           clamp(target, lowerBound, upperBound);
       }
@@ -385,7 +396,7 @@ export namespace Num {
    * @returns The rounded integer as an Int branded type
    */
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  export const roundToInt = (num: number): Int => (0 | (num + 0.5)) as Int;
+  export const roundToInt = (num: number): Int => Math.trunc(num + 0.5) as Int;
 
   /**
    * Creates a reusable rounding function with a fixed precision.

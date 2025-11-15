@@ -7,6 +7,7 @@ describe('Arr element access', () => {
   describe(at, () => {
     test('should handle very large positive indices', () => {
       const array = [1, 2, 3];
+
       const result = at(array, asUint32(1000));
 
       expect(Optional.isNone(result)).toBe(true);
@@ -14,6 +15,7 @@ describe('Arr element access', () => {
 
     test('should handle very large negative indices', () => {
       const array = [1, 2, 3];
+
       const result = at(array, asInt32(-1000));
 
       expect(Optional.isNone(result)).toBe(true);
@@ -21,6 +23,7 @@ describe('Arr element access', () => {
 
     test('should work with valid indices', () => {
       const array = [10, 20, 30];
+
       const result = at(array, 1);
 
       expect(Optional.isSome(result)).toBe(true);
@@ -34,6 +37,7 @@ describe('Arr element access', () => {
   describe(head, () => {
     test('case 1', () => {
       const xs = [1, 2, 3] as const;
+
       const h = head(xs);
 
       expectType<typeof h, Some<1>>('=');
@@ -47,6 +51,7 @@ describe('Arr element access', () => {
 
     test('case 2', () => {
       const xs: MutableNonEmptyArray<number> = [1, 2, 3];
+
       const h = head(xs);
 
       expectType<typeof h, Some<number>>('=');
@@ -60,6 +65,7 @@ describe('Arr element access', () => {
 
     test('case 3', () => {
       const mut_xs: number[] = [1, 2, 3];
+
       const h = head(mut_xs);
 
       expectType<typeof h, Optional<number>>('=');
@@ -101,6 +107,7 @@ describe('Arr element access', () => {
   describe(last, () => {
     test('case 1', () => {
       const xs = [1, 2, 3] as const;
+
       const l = last(xs);
 
       expectType<typeof l, Some<3>>('=');
@@ -114,6 +121,7 @@ describe('Arr element access', () => {
 
     test('case 2', () => {
       const xs: MutableNonEmptyArray<number> = [1, 2, 3];
+
       const l = last(xs);
 
       expectType<typeof l, Some<number>>('=');
@@ -127,6 +135,7 @@ describe('Arr element access', () => {
 
     test('case 3', () => {
       const mut_xs: number[] = [1, 2, 3];
+
       const l = last(mut_xs);
 
       expectType<typeof l, Optional<number>>('=');

@@ -45,11 +45,14 @@ export function set<E, const V = E>(
   switch (args.length) {
     case 3: {
       const [array, index, newValue] = args;
+
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return (array as (E | V)[]).with(index, newValue);
     }
+
     case 2: {
       const [index, newValue] = args;
+
       return (array) => set(array, index, newValue);
     }
   }
@@ -64,12 +67,14 @@ export function set<E, const V = E>(
  * const temperatures: number[] = [20, 21, 22];
  *
  * const increased = Arr.toUpdated(temperatures, 1, (value) => value + 5);
+ *
  * const incrementLast = Arr.toUpdated<number>(
  *   2,
  *   (value) => value + 1,
  * )(temperatures);
  *
  * assert.deepStrictEqual(increased, [20, 26, 22]);
+ *
  * assert.deepStrictEqual(incrementLast, [20, 21, 23]);
  * ```
  */
@@ -110,11 +115,14 @@ export function toUpdated<E, V = E>(
   switch (args.length) {
     case 3: {
       const [array, index, updater] = args;
+
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, total-functions/no-unsafe-type-assertion
       return (array as (E | V)[]).with(index, updater(array[index]!));
     }
+
     case 2: {
       const [index, updater] = args;
+
       return (array) => toUpdated(array, index, updater);
     }
   }
@@ -129,9 +137,11 @@ export function toUpdated<E, V = E>(
  * const numbers = [1, 2, 4] as const;
  *
  * const withThree = Arr.toInserted(numbers, 2, 3);
+ *
  * const appendFive = Arr.toInserted(3, 5)(numbers);
  *
  * assert.deepStrictEqual(withThree, [1, 2, 3, 4]);
+ *
  * assert.deepStrictEqual(appendFive, [1, 2, 4, 5]);
  * ```
  */
@@ -168,6 +178,7 @@ export function toInserted<E, const V = E>(
   switch (args.length) {
     case 3: {
       const [array, index, newValue] = args;
+
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return (array as readonly (E | V)[]).toSpliced(
         index,
@@ -175,8 +186,10 @@ export function toInserted<E, const V = E>(
         newValue,
       ) as unknown as NonEmptyArray<E | V>;
     }
+
     case 2: {
       const [index, newValue] = args;
+
       return (array) => toInserted(array, index, newValue);
     }
   }
@@ -193,9 +206,11 @@ type CastToNumber<T> = T extends number ? T : never;
  * const letters = ['a', 'b', 'c', 'd'] as const;
  *
  * const withoutSecond = Arr.toRemoved(letters, 1);
+ *
  * const withoutFirstCurried = Arr.toRemoved(0)(letters);
  *
  * assert.deepStrictEqual(withoutSecond, ['a', 'c', 'd']);
+ *
  * assert.deepStrictEqual(withoutFirstCurried, ['b', 'c', 'd']);
  * ```
  */
@@ -216,10 +231,13 @@ export function toRemoved<E>(
   switch (args.length) {
     case 2: {
       const [array, index] = args;
+
       return array.toSpliced(index, 1);
     }
+
     case 1: {
       const [index] = args;
+
       return (array) => toRemoved(array, index);
     }
   }
@@ -234,9 +252,11 @@ export function toRemoved<E>(
  * const base = [1, 2] as const;
  *
  * const appended = Arr.toPushed(base, 3);
+ *
  * const appendedCurried = Arr.toPushed(4)(base);
  *
  * assert.deepStrictEqual(appended, [1, 2, 3]);
+ *
  * assert.deepStrictEqual(appendedCurried, [1, 2, 4]);
  * ```
  */
@@ -255,14 +275,17 @@ export function toPushed<const Ar extends readonly unknown[], const V>(
   switch (args.length) {
     case 2: {
       const [array, newValue] = args;
+
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return array.toSpliced(array.length, 0, newValue) as unknown as readonly [
         ...Ar,
         V,
       ];
     }
+
     case 1: {
       const [newValue] = args;
+
       return (array) => toPushed(array, newValue);
     }
   }
@@ -277,9 +300,11 @@ export function toPushed<const Ar extends readonly unknown[], const V>(
  * const base = [2, 3] as const;
  *
  * const prefixed = Arr.toUnshifted(base, 1);
+ *
  * const prefixedCurried = Arr.toUnshifted(0)(base);
  *
  * assert.deepStrictEqual(prefixed, [1, 2, 3]);
+ *
  * assert.deepStrictEqual(prefixedCurried, [0, 2, 3]);
  * ```
  */
@@ -298,11 +323,14 @@ export function toUnshifted<Ar extends readonly unknown[], const V>(
   switch (args.length) {
     case 2: {
       const [array, newValue] = args;
+
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return array.toSpliced(0, 0, newValue) as unknown as readonly [V, ...Ar];
     }
+
     case 1: {
       const [newValue] = args;
+
       return (array) => toUnshifted(array, newValue);
     }
   }
@@ -317,9 +345,11 @@ export function toUnshifted<Ar extends readonly unknown[], const V>(
  * const base = [1, 2, 3];
  *
  * const filled = Arr.toFilled(base, 0);
+ *
  * const filledCurried = Arr.toFilled('x')(base);
  *
  * assert.deepStrictEqual(filled, [0, 0, 0]);
+ *
  * assert.deepStrictEqual(filledCurried, ['x', 'x', 'x']);
  * ```
  */
@@ -349,10 +379,13 @@ export function toFilled<E>(
   switch (args.length) {
     case 2: {
       const [array, value] = args;
+
       return create(asPositiveUint32(array.length), value);
     }
+
     case 1: {
       const [value] = args;
+
       return (array) => toFilled(array, value);
     }
   }
@@ -367,9 +400,11 @@ export function toFilled<E>(
  * const base = [0, 1, 2, 3, 4];
  *
  * const filledMiddle = Arr.toRangeFilled(base, 9, [1, 4]);
+ *
  * const filledPrefix = Arr.toRangeFilled(8, [0, 2])(base);
  *
  * assert.deepStrictEqual(filledMiddle, [0, 9, 9, 9, 4]);
+ *
  * assert.deepStrictEqual(filledPrefix, [8, 8, 2, 3, 4]);
  * ```
  */
@@ -422,12 +457,17 @@ export function toRangeFilled<E, const V>(
   switch (args.length) {
     case 3: {
       const [array, value, [start, end]] = args;
+
       const mut_cp: (E | V)[] = castMutable(copy(array));
+
       mut_cp.fill(value, start, end);
+
       return mut_cp;
     }
+
     case 2: {
       const [value, fillRange] = args;
+
       return (array) => toRangeFilled(array, value, fillRange);
     }
   }

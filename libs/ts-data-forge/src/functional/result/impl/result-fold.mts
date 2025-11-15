@@ -11,6 +11,7 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *
  * ```ts
  * const okValue = Result.ok(2);
+ *
  * const errValue = Result.err('bad');
  *
  * const foldedOk = Result.fold(
@@ -18,6 +19,7 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *   (value) => value * 2,
  *   (error) => error,
  * );
+ *
  * const foldedErr = Result.fold(
  *   errValue,
  *   (value: number) => value * 2,
@@ -25,6 +27,7 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  * );
  *
  * assert.deepStrictEqual(foldedOk, Result.ok(4));
+ *
  * assert.deepStrictEqual(foldedErr, Result.err('BAD'));
  *
  * const foldNumbers = Result.fold(
@@ -33,6 +36,7 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  * );
  *
  * assert.deepStrictEqual(foldNumbers(Result.ok(3)), Result.ok(9));
+ *
  * assert.deepStrictEqual(foldNumbers(Result.err('oops')), Result.err(4));
  * ```
  *
@@ -72,12 +76,14 @@ export function fold<R extends UnknownResult, S2, E2>(
     case 3: {
       // Direct version: first argument is result
       const [result, mapFn, mapErrFn] = args;
+
       return foldImpl(result, mapFn, mapErrFn);
     }
 
     case 2: {
       // Curried version
       const [mapFn, mapErrFn] = args;
+
       return (result: R) => foldImpl(result, mapFn, mapErrFn);
     }
   }

@@ -17,6 +17,7 @@ const superset = ISetMapped.create<Point, string>(
   toKey,
   fromKey,
 );
+
 const subset = ISetMapped.create<Point, string>(
   [{ x: 2, tag: 'b' }],
   toKey,
@@ -24,4 +25,5 @@ const subset = ISetMapped.create<Point, string>(
 );
 
 assert.ok(superset.isSupersetOf(subset));
+
 assert.notOk(subset.isSupersetOf(superset));

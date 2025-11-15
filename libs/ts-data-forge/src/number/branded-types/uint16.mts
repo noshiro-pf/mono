@@ -38,7 +38,6 @@ const {
  * @returns `true` if the value is a Uint16, `false` otherwise.
  */
 export const isUint16 = is;
-
 /**
  * Casts a number to a Uint16 type.
  *

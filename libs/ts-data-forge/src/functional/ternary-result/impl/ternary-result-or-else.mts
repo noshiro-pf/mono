@@ -14,10 +14,12 @@ import { type NarrowToOk, type NarrowToWarn } from './types.mjs';
  *   TernaryResult.orElse(TernaryResult.ok('value'), fallback),
  *   TernaryResult.ok('value'),
  * );
+ *
  * assert.deepStrictEqual(
  *   TernaryResult.orElse(TernaryResult.warn('value', 'warn'), fallback),
  *   TernaryResult.warn('value', 'warn'),
  * );
+ *
  * assert.deepStrictEqual(
  *   TernaryResult.orElse(TernaryResult.err('err'), fallback),
  *   fallback,
@@ -47,10 +49,13 @@ export function orElse<
   switch (args.length) {
     case 2: {
       const [result, alternative] = args;
+
       return orElseImpl(result, alternative);
     }
+
     case 1: {
       const [alternative] = args;
+
       return (result: R) => orElseImpl(result, alternative);
     }
   }

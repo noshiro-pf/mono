@@ -38,7 +38,6 @@ const {
  * @returns `true` if the value is a NonNegativeInt32, `false` otherwise.
  */
 export const isNonNegativeInt32 = is;
-
 /**
  * Casts a number to a NonNegativeInt32 type.
  *

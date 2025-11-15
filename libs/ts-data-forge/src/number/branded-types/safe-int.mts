@@ -26,9 +26,9 @@ const {
   SafeUint
 >({
   integerOrSafeInteger: 'SafeInteger',
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-min-safe-integer
   MIN_VALUE: Number.MIN_SAFE_INTEGER as SafeInt,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
   MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
   typeNameInMessage,
 } as const);
@@ -43,7 +43,9 @@ const {
  *
  * ```ts
  * assert.ok(isSafeInt(Number.MAX_SAFE_INTEGER));
+ *
  * assert.notOk(isSafeInt(Number.MAX_SAFE_INTEGER + 0.5));
+ *
  * assert.ok(SafeInt.is(Number.MIN_SAFE_INTEGER));
  * ```
  *
@@ -51,7 +53,6 @@ const {
  * @returns `true` if the value is a safe integer, `false` otherwise
  */
 export const isSafeInt = is;
-
 /**
  * Casts a number to a SafeInt branded type.
  *
@@ -65,6 +66,7 @@ export const isSafeInt = is;
  * const branded = asSafeInt(123);
  *
  * assert(branded === 123);
+ *
  * assert.ok(SafeInt.is(branded));
  * ```
  *
@@ -98,7 +100,9 @@ export const SafeInt = {
    *
    * ```ts
    * assert.ok(isSafeInt(Number.MAX_SAFE_INTEGER));
+   *
    * assert.notOk(isSafeInt(Number.MAX_SAFE_INTEGER + 0.5));
+   *
    * assert.ok(SafeInt.is(Number.MIN_SAFE_INTEGER));
    * ```
    *
@@ -132,9 +136,11 @@ export const SafeInt = {
    *
    * ```ts
    * const negative = asSafeInt(-900);
+   *
    * const absolute = SafeInt.abs(negative);
    *
    * assert(absolute === 900);
+   *
    * assert.ok(SafeInt.is(absolute));
    * ```
    *
@@ -182,11 +188,15 @@ export const SafeInt = {
    *
    * ```ts
    * const aboveRange = SafeInt.clamp(1e20);
+   *
    * const withinRange = SafeInt.clamp(123);
+   *
    * const belowRange = SafeInt.clamp(-1e20);
    *
    * assert(aboveRange === Number.MAX_SAFE_INTEGER);
+   *
    * assert(withinRange === 123);
+   *
    * assert(belowRange === Number.MIN_SAFE_INTEGER);
    * ```
    *
@@ -206,10 +216,13 @@ export const SafeInt = {
    *
    * ```ts
    * const min = asSafeInt(-10);
+   *
    * const max = asSafeInt(10);
+   *
    * const randomValue = SafeInt.random(min, max);
    *
    * assert.ok(SafeInt.is(randomValue));
+   *
    * assert.ok(randomValue >= -10 && randomValue <= 10);
    * ```
    *
@@ -226,10 +239,13 @@ export const SafeInt = {
    *
    * ```ts
    * const base = asSafeInt(3);
+   *
    * const exponent = asSafeInt(5);
+   *
    * const power = SafeInt.pow(base, exponent);
    *
    * assert(power === 243);
+   *
    * assert.ok(SafeInt.is(power));
    * ```
    *
@@ -248,6 +264,7 @@ export const SafeInt = {
    * const sum = SafeInt.add(asSafeInt(9), asSafeInt(4));
    *
    * assert(sum === 13);
+   *
    * assert.ok(SafeInt.is(sum));
    * ```
    *
@@ -266,6 +283,7 @@ export const SafeInt = {
    * const difference = SafeInt.sub(asSafeInt(9), asSafeInt(14));
    *
    * assert(difference === -5);
+   *
    * assert.ok(SafeInt.is(difference));
    * ```
    *
@@ -284,6 +302,7 @@ export const SafeInt = {
    * const product = SafeInt.mul(asSafeInt(-8), asSafeInt(7));
    *
    * assert(product === -56);
+   *
    * assert.ok(SafeInt.is(product));
    * ```
    *
@@ -305,6 +324,7 @@ export const SafeInt = {
    * const quotient = SafeInt.div(asSafeInt(-17), asSafeInt(5));
    *
    * assert(quotient === -4);
+   *
    * assert.ok(SafeInt.is(quotient));
    * ```
    *

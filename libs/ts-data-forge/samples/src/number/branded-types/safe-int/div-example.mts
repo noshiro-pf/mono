@@ -5,4 +5,5 @@ import { SafeInt, asSafeInt } from 'ts-data-forge';
 const quotient = SafeInt.div(asSafeInt(-17), asSafeInt(5));
 
 assert(quotient === -4);
+
 assert.ok(SafeInt.is(quotient));

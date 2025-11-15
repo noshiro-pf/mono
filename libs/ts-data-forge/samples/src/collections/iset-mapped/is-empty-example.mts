@@ -10,6 +10,7 @@ const toKey = (point: Point) => JSON.stringify(point);
 const fromKey = (key: string) => JSON.parse(key) as Point;
 
 const empty = ISetMapped.create<Point, string>([], toKey, fromKey);
+
 const points = ISetMapped.create<Point, string>(
   [{ x: 1, tag: 'a' }],
   toKey,
@@ -17,4 +18,5 @@ const points = ISetMapped.create<Point, string>(
 );
 
 assert.ok(empty.isEmpty);
+
 assert.notOk(points.isEmpty);

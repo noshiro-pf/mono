@@ -19,9 +19,11 @@ const set = ISetMapped.create<Point, string>(
 );
 
 const allEven = set.every((point) => point.x % 2 === 0);
+
 const narrowed = set.every(
   (point): point is Readonly<{ x: 2 | 4; tag: 'even' }> => point.x % 2 === 0,
 );
 
 assert.ok(allEven);
+
 assert.ok(narrowed);

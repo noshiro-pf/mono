@@ -36,7 +36,6 @@ const {
  * @returns `true` if the value is a NonZeroInt, `false` otherwise.
  */
 export const isNonZeroInt = is;
-
 /**
  * Casts a number to a NonZeroInt type.
  *

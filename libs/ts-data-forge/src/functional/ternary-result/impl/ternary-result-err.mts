@@ -9,6 +9,7 @@ import { ErrTypeTagName } from './tag.mjs';
  * const failure = TernaryResult.err(new Error('missing data'));
  *
  * assert.strictEqual(failure.$$tag, 'ts-data-forge::Result.err');
+ *
  * assert.ok(TernaryResult.isErr(failure));
  * ```
  */

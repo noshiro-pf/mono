@@ -12,6 +12,7 @@ const user = {
 
 // Direct usage - remove sensitive fields
 const safeUser = Obj.omit(user, ['password', 'internalNote']);
+
 assert.deepStrictEqual(safeUser, {
   id: 1,
   name: 'Charlie',

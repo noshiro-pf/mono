@@ -9,4 +9,5 @@ assert(Result.expectToBe(okValue, 'should have value') === 'data');
 const expectResult = Result.expectToBe<string>('missing result');
 
 assert.throws(() => expectResult(Result.err('boom')), /missing result/u);
+
 assert(expectResult(Result.ok('value')) === 'value');

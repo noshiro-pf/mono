@@ -14,6 +14,7 @@ import { type Unwrap } from './types.mjs';
  *
  * ```ts
  * const numberOptional = Optional.some(21);
+ *
  * const mapped = Optional.map(numberOptional, (value) => value * 2);
  *
  * assert.deepStrictEqual(mapped, Optional.some(42));
@@ -21,6 +22,7 @@ import { type Unwrap } from './types.mjs';
  * const mapToLength = Optional.map((text: string) => text.length);
  *
  * assert.deepStrictEqual(mapToLength(Optional.some('abc')), Optional.some(3));
+ *
  * assert.deepStrictEqual(mapToLength(Optional.none), Optional.none);
  * ```
  *
@@ -49,11 +51,14 @@ export function map<O extends UnknownOptional, S2>(
   switch (args.length) {
     case 2: {
       const [optional, mapFn] = args;
+
       return mapImpl(optional, mapFn);
     }
+
     case 1: {
       // Curried version: first argument is mapping function
       const [mapFn] = args;
+
       return (optional: O) => mapImpl(optional, mapFn);
     }
   }

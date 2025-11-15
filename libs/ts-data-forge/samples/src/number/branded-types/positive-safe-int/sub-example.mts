@@ -8,4 +8,5 @@ const difference = PositiveSafeInt.sub(
 );
 
 assert(difference === 1);
+
 assert.ok(PositiveSafeInt.is(difference));

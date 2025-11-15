@@ -36,7 +36,9 @@ const handleStatus = (status: Status, data?: string): string =>
   });
 
 assert(handleStatus('loading') === 'Please wait...');
+
 assert(handleStatus('success', 'Hello') === 'Data: Hello');
+
 assert(handleStatus('error') === 'An error occurred');
 
 // Pattern matching with Result
@@ -44,4 +46,5 @@ const processResult = (result: Result<number, string>): string =>
   Result.isOk(result) ? `Success: ${result.value}` : `Error: ${result.value}`;
 
 assert(processResult(Result.ok(42)) === 'Success: 42');
+
 assert(processResult(Result.err('Failed')) === 'Error: Failed');

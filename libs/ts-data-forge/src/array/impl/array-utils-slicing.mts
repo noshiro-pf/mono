@@ -11,18 +11,23 @@ import { isEmpty } from './array-utils-validation.mjs';
  * ```ts
  * {
  *   const scientists = ['Ada', 'Grace', 'Katherine'] as const;
+ *
  *   const remainder = Arr.tail(scientists);
  *
  *   assert.deepStrictEqual(remainder, ['Grace', 'Katherine']);
+ *
  *   assert(remainder.length === 2);
  * }
+ *
  * {
  *   const values = [1, 2, 3] as const;
  *
  *   const remainder = Arr.rest(values);
+ *
  *   const emptyRemainder = Arr.rest([1] as const);
  *
  *   assert.deepStrictEqual(remainder, [2, 3] as const);
+ *
  *   assert.deepStrictEqual(emptyRemainder, [] as const);
  * }
  * ```
@@ -40,9 +45,11 @@ export const tail = <const Ar extends readonly unknown[]>(
  *
  * ```ts
  * const queue = ['task-1', 'task-2', 'task-3'] as const;
+ *
  * const withoutLast = Arr.butLast(queue);
  *
  * assert.deepStrictEqual(withoutLast, ['task-1', 'task-2']);
+ *
  * assert(withoutLast.length === 2);
  * ```
  */
@@ -61,9 +68,11 @@ export const butLast = <const Ar extends readonly unknown[]>(
  * const values = [1, 2, 3, 4];
  *
  * const firstTwo = Arr.take(values, 2);
+ *
  * const firstThree = Arr.take(3)(values);
  *
  * assert.deepStrictEqual(firstTwo, [1, 2]);
+ *
  * assert.deepStrictEqual(firstThree, [1, 2, 3]);
  * ```
  */
@@ -101,10 +110,13 @@ export function take<E>(
   switch (args.length) {
     case 2: {
       const [array, num] = args;
+
       return sliceClamped(array, 0, num);
     }
+
     case 1: {
       const [num] = args;
+
       return (array) => take(array, num);
     }
   }
@@ -119,9 +131,11 @@ export function take<E>(
  * const values = [1, 2, 3, 4];
  *
  * const lastTwo = Arr.takeLast(values, 2);
+ *
  * const lastThree = Arr.takeLast(3)(values);
  *
  * assert.deepStrictEqual(lastTwo, [3, 4]);
+ *
  * assert.deepStrictEqual(lastThree, [2, 3, 4]);
  * ```
  */
@@ -159,10 +173,13 @@ export function takeLast<E>(
   switch (args.length) {
     case 2: {
       const [array, num] = args;
+
       return sliceClamped(array, Uint32.sub(size(array), num), size(array));
     }
+
     case 1: {
       const [num] = args;
+
       return (array) => takeLast(array, num);
     }
   }
@@ -177,9 +194,11 @@ export function takeLast<E>(
  * const values = ['a', 'b', 'c', 'd'] as const;
  *
  * const withoutFirstTwo = Arr.skip(values, 2);
+ *
  * const withoutFirstThree = Arr.skip(3)(values);
  *
  * assert.deepStrictEqual(withoutFirstTwo, ['c', 'd']);
+ *
  * assert.deepStrictEqual(withoutFirstThree, ['d']);
  * ```
  */
@@ -204,10 +223,13 @@ export function skip<E>(
   switch (args.length) {
     case 2: {
       const [array, num] = args;
+
       return sliceClamped(array, num, size(array));
     }
+
     case 1: {
       const [num] = args;
+
       return (array) => skip(array, num);
     }
   }
@@ -222,9 +244,11 @@ export function skip<E>(
  * const values = ['a', 'b', 'c', 'd'];
  *
  * const withoutLastTwo = Arr.skipLast(values, 2);
+ *
  * const withoutLastThree = Arr.skipLast(3)(values);
  *
  * assert.deepStrictEqual(withoutLastTwo, ['a', 'b']);
+ *
  * assert.deepStrictEqual(withoutLastThree, ['a']);
  * ```
  */
@@ -251,10 +275,13 @@ export function skipLast<E>(
   switch (args.length) {
     case 2: {
       const [array, num] = args;
+
       return sliceClamped(array, 0, Uint32.sub(size(array), num));
     }
+
     case 1: {
       const [num] = args;
+
       return (array) => skipLast(array, num);
     }
   }
@@ -266,7 +293,6 @@ export function skipLast<E>(
  * @see {@link tail}
  */
 export const rest = tail;
-
 /**
  * Alias for `skip`.
  *

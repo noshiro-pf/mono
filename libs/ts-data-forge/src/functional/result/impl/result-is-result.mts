@@ -8,11 +8,15 @@ import { ErrTypeTagName, OkTypeTagName } from './tag.mjs';
  *
  * ```ts
  * const okValue = Result.ok('success');
+ *
  * const errValue = Result.err(new Error('failure'));
+ *
  * const notResult = { $$tag: 'ts-data-forge::Result.ok' };
  *
  * assert.ok(Result.isResult(okValue));
+ *
  * assert.ok(Result.isResult(errValue));
+ *
  * assert.notOk(Result.isResult(notResult));
  * ```
  */

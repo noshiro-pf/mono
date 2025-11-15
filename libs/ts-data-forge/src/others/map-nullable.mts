@@ -36,10 +36,13 @@ export function mapNullable<const A, const B>(
   switch (args.length) {
     case 2: {
       const [value, mapFn] = args;
+
       return value == null ? undefined : mapFn(value);
     }
+
     case 1: {
       const [mapFn] = args;
+
       return (value: A | null | undefined) => mapNullable(value, mapFn);
     }
   }

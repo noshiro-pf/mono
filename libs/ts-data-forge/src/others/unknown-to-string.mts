@@ -51,11 +51,13 @@ export const unknownToString = (
       if (!isNonNullish(value)) {
         return 'null';
       }
+
       try {
         const stringified =
           options?.prettyPrintObject === true
             ? JSON.stringify(value, undefined, 2)
             : JSON.stringify(value);
+
         return stringified;
       } catch (error) {
         return isError(error)

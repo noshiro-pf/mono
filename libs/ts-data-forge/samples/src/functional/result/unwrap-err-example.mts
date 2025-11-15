@@ -3,6 +3,7 @@ import { Result } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 const okResult = Result.ok('data');
+
 const errResult = Result.err('problem');
 
 // Result.unwrapErr returns undefined for Ok results

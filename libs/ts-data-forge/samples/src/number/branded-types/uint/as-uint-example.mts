@@ -5,4 +5,5 @@ import { Uint, asUint } from 'ts-data-forge';
 const branded = asUint(12);
 
 assert(branded === 12);
+
 assert.ok(Uint.is(branded));

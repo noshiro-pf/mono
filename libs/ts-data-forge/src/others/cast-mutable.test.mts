@@ -4,6 +4,7 @@ import { castDeepMutable, castMutable } from './cast-mutable.mjs';
 describe(castMutable, () => {
   test('should allow mutating arrays that were readonly', () => {
     const readonlyArray: readonly number[] = [1, 2, 3];
+
     const mut_array = castMutable(readonlyArray);
 
     expectType<typeof mut_array, number[]>('=');
@@ -11,6 +12,7 @@ describe(castMutable, () => {
     mut_array.push(4);
 
     assert.deepStrictEqual(mut_array, [1, 2, 3, 4]);
+
     assert.deepStrictEqual(readonlyArray, [1, 2, 3, 4]);
   });
 
@@ -21,12 +23,15 @@ describe(castMutable, () => {
     };
 
     const mut_user = castMutable(readonlyUser);
+
     expectType<typeof mut_user, { name: string; age: number }>('=');
 
     mut_user.age = 31;
+
     mut_user.name = 'Bob';
 
     assert.deepStrictEqual(mut_user, { name: 'Bob', age: 31 });
+
     assert.deepStrictEqual(readonlyUser, { name: 'Bob', age: 31 });
   });
 });
@@ -65,12 +70,14 @@ describe(castDeepMutable, () => {
     expectType<typeof mut_state, MutableState>('~=');
 
     mut_state.user.profile.tags.push('editor');
+
     mut_state.user.profile.name = 'Bob';
 
     assert.deepStrictEqual(mut_state.user.profile, {
       name: 'Bob',
       tags: ['admin', 'owner', 'editor'],
     });
+
     assert.deepStrictEqual(readonlyState.user.profile.tags, [
       'admin',
       'owner',

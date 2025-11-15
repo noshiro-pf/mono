@@ -12,7 +12,9 @@ describe('Arr slicing', () => {
   describe(tail, () => {
     test('should return all elements except the first', () => {
       const array = [1, 2, 3, 4] as const;
+
       const result = tail(array);
+
       expectType<typeof result, readonly [2, 3, 4]>('=');
 
       assert.deepStrictEqual(result, [2, 3, 4]);
@@ -20,7 +22,9 @@ describe('Arr slicing', () => {
 
     test('should work with single element array', () => {
       const array = [1] as const;
+
       const result = tail(array);
+
       expectType<typeof result, readonly []>('=');
 
       assert.deepStrictEqual(result, []);
@@ -28,7 +32,9 @@ describe('Arr slicing', () => {
 
     test('should work with empty array', () => {
       const array = [] as const;
+
       const result = tail(array);
+
       expectType<typeof result, readonly []>('=');
 
       assert.deepStrictEqual(result, []);
@@ -38,6 +44,7 @@ describe('Arr slicing', () => {
   describe(butLast, () => {
     test('readonly number[] type', () => {
       const xs: readonly number[] = [1, 2, 3];
+
       const bl = butLast(xs);
 
       expectType<typeof bl, readonly number[]>('=');
@@ -47,7 +54,9 @@ describe('Arr slicing', () => {
 
     test('should return all elements except the last', () => {
       const array = [1, 2, 3, 4] as const;
+
       const result = butLast(array);
+
       expectType<typeof result, readonly [1, 2, 3]>('=');
 
       assert.deepStrictEqual(result, [1, 2, 3]);
@@ -55,7 +64,9 @@ describe('Arr slicing', () => {
 
     test('should work with single element array', () => {
       const array = [1] as const;
+
       const result = butLast(array);
+
       expectType<typeof result, readonly []>('=');
 
       assert.deepStrictEqual(result, []);
@@ -63,7 +74,9 @@ describe('Arr slicing', () => {
 
     test('should work with empty array', () => {
       const array = [] as const;
+
       const result = butLast(array);
+
       expectType<typeof result, readonly []>('=');
 
       assert.deepStrictEqual(result, []);
@@ -73,6 +86,7 @@ describe('Arr slicing', () => {
   describe(take, () => {
     {
       const xs = [1, 2, 3] as const;
+
       const t = take(xs, 2);
 
       expectType<typeof t, readonly [1, 2]>('=');
@@ -81,8 +95,10 @@ describe('Arr slicing', () => {
         assert.deepStrictEqual(t, [1, 2]);
       });
     }
+
     {
       const xs: readonly number[] = [1, 2, 3];
+
       const t = take(xs, 2);
 
       expectType<typeof t, readonly number[]>('=');
@@ -96,6 +112,7 @@ describe('Arr slicing', () => {
   describe(takeLast, () => {
     {
       const xs = [1, 2, 3] as const;
+
       const t = takeLast(xs, 2);
 
       expectType<typeof t, readonly [2, 3]>('=');
@@ -104,8 +121,10 @@ describe('Arr slicing', () => {
         assert.deepStrictEqual(t, [2, 3]);
       });
     }
+
     {
       const xs: readonly number[] = [1, 2, 3];
+
       const t = takeLast(xs, 2);
 
       expectType<typeof t, readonly number[]>('=');
@@ -119,6 +138,7 @@ describe('Arr slicing', () => {
   describe(skip, () => {
     {
       const xs = [1, 2, 3] as const;
+
       const t = skip(xs, 2);
 
       expectType<typeof t, readonly [3]>('=');
@@ -127,8 +147,10 @@ describe('Arr slicing', () => {
         assert.deepStrictEqual(t, [3]);
       });
     }
+
     {
       const xs: readonly number[] = [1, 2, 3];
+
       const t = skip(xs, 2);
 
       expectType<typeof t, readonly number[]>('=');
@@ -142,6 +164,7 @@ describe('Arr slicing', () => {
   describe(skipLast, () => {
     {
       const xs = [1, 2, 3] as const;
+
       const t = skipLast(xs, 2);
 
       expectType<typeof t, readonly [1]>('=');
@@ -150,8 +173,10 @@ describe('Arr slicing', () => {
         assert.deepStrictEqual(t, [1]);
       });
     }
+
     {
       const xs: readonly number[] = [1, 2, 3];
+
       const t = skipLast(xs, 2);
 
       expectType<typeof t, readonly number[]>('=');

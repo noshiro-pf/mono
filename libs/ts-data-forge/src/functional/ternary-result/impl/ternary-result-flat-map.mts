@@ -17,14 +17,18 @@ import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
  * const doubled = TernaryResult.flatMap(TernaryResult.ok('3'), (text) =>
  *   TernaryResult.map(parse(text), (num) => num * 2),
  * );
+ *
  * const warnPassthrough = TernaryResult.flatMap(
  *   TernaryResult.warn('3', 'retry'),
  *   parse,
  * );
+ *
  * const errPassthrough = TernaryResult.flatMap(TernaryResult.err('oops'), parse);
  *
  * assert.deepStrictEqual(doubled, TernaryResult.ok(6));
+ *
  * assert.deepStrictEqual(warnPassthrough, TernaryResult.warn(3, 'retry'));
+ *
  * assert.deepStrictEqual(errPassthrough, TernaryResult.err('oops'));
  * ```
  */
@@ -51,10 +55,13 @@ export function flatMap<R extends UnknownTernaryResult, S2, W2, E2>(
   switch (args.length) {
     case 2: {
       const [result, flatMapFn] = args;
+
       return flatMapImpl(result, flatMapFn);
     }
+
     case 1: {
       const [flatMapFn] = args;
+
       return (result: R) => flatMapImpl(result, flatMapFn);
     }
   }

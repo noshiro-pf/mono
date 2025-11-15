@@ -9,15 +9,22 @@ describe('Stack test', () => {
     const stack = createStack<number>();
 
     expectType<typeof stack, Stack<number>>('=');
+
     expectType<typeof stack.isEmpty, boolean>('=');
+
     expectType<typeof stack.size, SizeType.Arr>('=');
+
     expectType<typeof stack.pop, () => Optional<number>>('=');
+
     expectType<typeof stack.push, (value: number) => void>('=');
 
     // Verify the type checking works at runtime too
     expectTypeOf(stack.isEmpty).toBeBoolean();
+
     expectTypeOf(stack.size).toBeNumber();
+
     expectTypeOf(stack.pop).toBeFunction();
+
     expectTypeOf(stack.push).toBeFunction();
   });
 
@@ -25,6 +32,7 @@ describe('Stack test', () => {
     const stack = createStack<string>();
 
     expect(stack.isEmpty).toBe(true);
+
     expect(stack.size).toBe(0);
   });
 
@@ -32,12 +40,16 @@ describe('Stack test', () => {
     const stack = createStack<number>([1, 2, 3]);
 
     expect(stack.isEmpty).toBe(false);
+
     expect(stack.size).toBe(3);
 
     // Last element should be on top (LIFO)
     expect(Optional.unwrap(stack.pop())).toBe(3);
+
     expect(Optional.unwrap(stack.pop())).toBe(2);
+
     expect(Optional.unwrap(stack.pop())).toBe(1);
+
     expect(stack.isEmpty).toBe(true);
   });
 
@@ -45,20 +57,26 @@ describe('Stack test', () => {
     const stack = createStack<string>();
 
     stack.push('first');
+
     // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('second');
+
     // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('third');
 
     expect(stack.size).toBe(3);
+
     expect(stack.isEmpty).toBe(false);
 
     // LIFO: Last In, First Out
     expect(Optional.unwrap(stack.pop())).toBe('third');
+
     expect(Optional.unwrap(stack.pop())).toBe('second');
+
     expect(Optional.unwrap(stack.pop())).toBe('first');
 
     expect(stack.isEmpty).toBe(true);
+
     expect(stack.size).toBe(0);
   });
 
@@ -68,7 +86,9 @@ describe('Stack test', () => {
     const result = stack.pop();
 
     expect(Optional.isNone(result)).toBe(true);
+
     expect(stack.isEmpty).toBe(true);
+
     expect(stack.size).toBe(0);
   });
 
@@ -100,6 +120,7 @@ describe('Stack test', () => {
     Optional.unwrap(stack.pop());
 
     expect(stack.size).toBe(0);
+
     expect(stack.isEmpty).toBe(true);
   });
 
@@ -107,17 +128,21 @@ describe('Stack test', () => {
     const stack = createStack<string>();
 
     stack.push('a');
+
     // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('b');
 
     expect(Optional.unwrap(stack.pop())).toBe('b');
 
     stack.push('c');
+
     // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('d');
 
     expect(Optional.unwrap(stack.pop())).toBe('d');
+
     expect(Optional.unwrap(stack.pop())).toBe('c');
+
     expect(Optional.unwrap(stack.pop())).toBe('a');
 
     expect(stack.isEmpty).toBe(true);
@@ -125,16 +150,20 @@ describe('Stack test', () => {
 
   test('should work with object types', () => {
     type Item = Readonly<{ id: number; name: string }>;
+
     const stack = createStack<Item>();
 
     const item1: Item = { id: 1, name: 'first' };
+
     const item2: Item = { id: 2, name: 'second' };
 
     stack.push(item1);
+
     // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(item2);
 
     assert.deepStrictEqual(Optional.unwrap(stack.pop()), item2);
+
     assert.deepStrictEqual(Optional.unwrap(stack.pop()), item1);
 
     expect(stack.isEmpty).toBe(true);
@@ -142,6 +171,7 @@ describe('Stack test', () => {
 
   test('should handle large number of operations efficiently', () => {
     const stack = createStack<number>();
+
     const n = asPositiveSafeInt(10_000);
 
     // Push many elements
@@ -150,6 +180,7 @@ describe('Stack test', () => {
     }
 
     expect(stack.size).toBe(n);
+
     expect(stack.isEmpty).toBe(false);
 
     // Pop all elements and verify LIFO order
@@ -157,21 +188,25 @@ describe('Stack test', () => {
       const result = stack.pop();
 
       expect(Optional.isSome(result)).toBe(true);
+
       expect(Optional.unwrap(result)).toBe(i);
     }
 
     expect(stack.isEmpty).toBe(true);
+
     expect(stack.size).toBe(0);
   });
 
   test('should not mutate initial values array', () => {
     const initialValues = [1, 2, 3];
+
     const originalLength = initialValues.length;
 
     const stack = createStack(initialValues);
 
     // Modify stack
     stack.push(4);
+
     Optional.unwrap(stack.pop());
 
     // Original array should be unchanged
@@ -184,17 +219,24 @@ describe('Stack test', () => {
     const stack = createStack<string | null | undefined>();
 
     stack.push('value');
+
     // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(null);
+
     // eslint-disable-next-line unicorn/prefer-single-call
     stack.push(undefined);
+
     // eslint-disable-next-line unicorn/prefer-single-call
     stack.push('another');
 
     expect(Optional.unwrap(stack.pop())).toBe('another');
+
     expect(Optional.unwrap(stack.pop())).toBeUndefined();
+
     expect(Optional.unwrap(stack.pop())).toBeNull();
+
     expect(Optional.unwrap(stack.pop())).toBe('value');
+
     expect(stack.isEmpty).toBe(true);
   });
 
@@ -215,6 +257,7 @@ describe('Stack test', () => {
     }
 
     const endTime = performance.now();
+
     const duration = endTime - startTime;
 
     // Should complete in reasonable time (much less than 100ms for 512 operations)
@@ -226,6 +269,7 @@ describe('Stack test', () => {
 
     for (const i of range(100)) {
       stack.push(i);
+
       if (i % 2 === 1) {
         // Pop every other time
         const result = stack.pop();

@@ -67,7 +67,6 @@ expectType<
  * @returns `true` if the value is a NonZeroFiniteNumber, `false` otherwise.
  */
 export const isNonZeroFiniteNumber = is;
-
 /**
  * Casts a number to a NonZeroFiniteNumber type.
  *

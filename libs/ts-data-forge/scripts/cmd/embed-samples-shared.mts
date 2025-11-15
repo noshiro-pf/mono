@@ -1,4 +1,5 @@
 const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
+
 const ignoreBelowKeyword = '// embed-sample-code-ignore-below';
 
 /** Extracts the relevant sample code, removing ignore markers */

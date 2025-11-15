@@ -9,11 +9,15 @@ import { Optional, pipe } from '../../functional/index.mjs';
  * const letters: readonly string[] = ['a', 'b', 'c'];
  *
  * const two = Arr.at(letters, 1);
+ *
  * const last = Arr.at(-1)(letters);
+ *
  * const missing = Arr.at(letters, 5);
  *
  * assert.deepStrictEqual(two, Optional.some('b'));
+ *
  * assert.deepStrictEqual(last, Optional.some('c'));
+ *
  * assert.deepStrictEqual(missing, Optional.none);
  * ```
  */
@@ -36,6 +40,7 @@ export function at<E>(
   switch (args.length) {
     case 2: {
       const [array, index] = args;
+
       return pipe(index < 0 ? array.length + index : index).map(
         (normalizedIndex) =>
           normalizedIndex < 0 || normalizedIndex >= array.length
@@ -44,8 +49,10 @@ export function at<E>(
               Optional.some(array[normalizedIndex]!),
       ).value;
     }
+
     case 1: {
       const [index] = args;
+
       return (array) => at(array, index);
     }
   }
@@ -58,12 +65,15 @@ export function at<E>(
  *
  * ```ts
  * const users = [{ id: 1 }, { id: 2 }];
+ *
  * const empty: { id: number }[] = [];
  *
  * const first = Arr.head(users);
+ *
  * const none = Arr.head(empty);
  *
  * assert.deepStrictEqual(first, Optional.some({ id: 1 }));
+ *
  * assert.deepStrictEqual(none, Optional.none);
  * ```
  */
@@ -86,12 +96,15 @@ export const head = <const Ar extends readonly unknown[]>(
  *
  * ```ts
  * const queue = ['first', 'second'];
+ *
  * const emptyQueue: string[] = [];
  *
  * const lastValue = Arr.last(queue);
+ *
  * const none = Arr.last(emptyQueue);
  *
  * assert.deepStrictEqual(lastValue, Optional.some('second'));
+ *
  * assert.deepStrictEqual(none, Optional.none);
  * ```
  */

@@ -1,12 +1,9 @@
+import { Autocomplete, TextField } from '@mui/material';
+import { produce } from 'immer';
 import type * as React from 'react';
 import { castMutable } from 'ts-data-forge';
 
 // Example: Material-UI Autocomplete
-import { Autocomplete, TextField } from '@mui/material';
-
-// Immer.js example
-import { produce } from 'immer';
-
 export const SomeComponent: React.FC = () => (
   <Autocomplete
     options={castMutable(readonlyOptions)}
@@ -53,4 +50,5 @@ const updatedState = produce(initialState, (draft) => {
 });
 
 assert.deepStrictEqual(initialState.items, ['item1', 'item2']);
+
 assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);

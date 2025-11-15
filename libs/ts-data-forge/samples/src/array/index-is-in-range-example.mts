@@ -5,6 +5,7 @@ import { Arr } from 'ts-data-forge';
 const items = ['Ada', 'Grace', 'Katherine'] as const;
 
 assert.ok(Arr.indexIsInRange(items, 1));
+
 assert.notOk(Arr.indexIsInRange(items, 3));
 
 if (Arr.indexIsInRange(items, 2)) {

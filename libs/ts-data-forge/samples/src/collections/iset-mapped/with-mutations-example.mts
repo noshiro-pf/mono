@@ -31,6 +31,7 @@ assert.deepStrictEqual(Array.from(mutated), [
   { x: 2, tag: 'b' },
   { x: 3, tag: 'c' },
 ]);
+
 assert.deepStrictEqual(Array.from(base), [
   { x: 1, tag: 'a' },
   { x: 2, tag: 'b' },

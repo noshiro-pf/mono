@@ -5,10 +5,13 @@
  *
  * ```ts
  * const numbers = [1, 2, 3] as const;
+ *
  * const sameNumbers = [1, 2, 3] as const;
+ *
  * const differentNumbers = [1, 2, 4] as const;
  *
  * assert.ok(Arr.eq(numbers, sameNumbers));
+ *
  * assert.notOk(Arr.eq(numbers, differentNumbers));
  * ```
  */
@@ -35,10 +38,13 @@ export const equal = eq;
  *
  * ```ts
  * const subset = [1, 2] as const;
+ *
  * const superset = [1, 2, 3] as const;
+ *
  * const notSubset = [2, 4] as const;
  *
  * assert.ok(Arr.isSubset(subset, superset));
+ *
  * assert.notOk(Arr.isSubset(notSubset, superset));
  * ```
  */
@@ -58,11 +64,15 @@ export const isSubset = <E1 extends Primitive, E2 extends Primitive = E1>(
  *
  * ```ts
  * const potentialSuperset = ['a', 'b', 'c'] as const;
+ *
  * const subset = ['a', 'c'] as const;
+ *
  * const notSuperset = ['a', 'd'] as const;
  *
  * assert.ok(Arr.isSuperset(potentialSuperset, subset));
+ *
  * assert.notOk(Arr.isSuperset(subset, potentialSuperset));
+ *
  * assert.notOk(Arr.isSuperset(potentialSuperset, notSuperset));
  * ```
  */
@@ -78,6 +88,7 @@ export const isSuperset = <E1 extends Primitive, E2 extends Primitive = E1>(
  *
  * ```ts
  * const refs = ['Ada', 'Alan', 'Grace'] as const;
+ *
  * const attendees = ['Grace', 'Alan', 'Barbara'] as const;
  *
  * const both = Arr.setIntersection(refs, attendees);
@@ -102,6 +113,7 @@ export const setIntersection = <
  *
  * ```ts
  * const baseline = [1, 2, 3, 4] as const;
+ *
  * const removed = [2, 4] as const;
  *
  * const remaining = Arr.setDifference(baseline, removed);
@@ -121,6 +133,7 @@ export const setDifference = <E extends Primitive>(
  *
  * ```ts
  * const upcoming = [1, 3, 5, 7, 9] as const;
+ *
  * const completed = [3, 4, 7] as const;
  *
  * const remaining = Arr.sortedNumSetDifference(upcoming, completed);
@@ -135,27 +148,33 @@ export const sortedNumSetDifference = <E extends number>(
   sortedList2: readonly E[],
 ): readonly E[] => {
   const mut_result: E[] = [];
+
   let mut_it1 = 0; // iterator for sortedList1
+
   let mut_it2 = 0; // iterator for sortedList2
 
   while (mut_it1 < sortedList1.length && mut_it2 < sortedList2.length) {
     // Non-null assertions are safe due to loop condition
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const val1 = sortedList1[mut_it1]!;
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const val2 = sortedList2[mut_it2]!;
 
     if (val1 === val2) {
       mut_it1 += 1;
+
       mut_it2 += 1;
     } else if (val1 < val2) {
       mut_result.push(val1);
+
       mut_it1 += 1;
     } else {
       // val1 > val2
       mut_it2 += 1;
     }
   }
+
   // Add remaining elements from sortedList1
   for (; mut_it1 < sortedList1.length; mut_it1 += 1) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

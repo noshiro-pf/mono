@@ -8,4 +8,5 @@ const sum = PositiveSafeInt.add(
 );
 
 assert(sum === 3048);
+
 assert.ok(PositiveSafeInt.is(sum));

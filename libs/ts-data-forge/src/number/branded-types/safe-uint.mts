@@ -26,7 +26,7 @@ const {
 >({
   integerOrSafeInteger: 'SafeInteger',
   MIN_VALUE: 0,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
   MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
   typeNameInMessage,
 } as const);
@@ -38,7 +38,6 @@ const {
  * @returns `true` if the value is a SafeUint, `false` otherwise.
  */
 export const isSafeUint = is;
-
 /**
  * Casts a number to a SafeUint type.
  *

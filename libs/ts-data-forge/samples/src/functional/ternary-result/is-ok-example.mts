@@ -10,5 +10,6 @@ const maybeNumber = TernaryResult.ok(42) as TernaryResult<
 
 if (TernaryResult.isOk(maybeNumber)) {
   const value: number = maybeNumber.value;
+
   assert.strictEqual(value, 42);
 }

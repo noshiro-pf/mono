@@ -39,7 +39,6 @@ const {
  * @returns `true` if the value is an Int32, `false` otherwise.
  */
 export const isInt32 = is;
-
 /**
  * Casts a number to an Int32 type.
  *

@@ -9,4 +9,5 @@ assert(Optional.expectToBe(optionalValue, 'value expected') === 'data');
 const expectValue = Optional.expectToBe<string>('missing optional');
 
 assert.throws(() => expectValue(Optional.none), /missing optional/u);
+
 assert(expectValue(Optional.some('present')) === 'present');

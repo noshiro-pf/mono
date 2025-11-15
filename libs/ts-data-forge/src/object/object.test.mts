@@ -38,6 +38,7 @@ describe('pick', () => {
 
   test('pick should support curried form', () => {
     const pickAB = Obj.pick(['a', 'b']);
+
     const result = pickAB({ a: 1, b: 2, c: 3, d: 4 });
 
     assert.deepStrictEqual(result, { a: 1, b: 2 });
@@ -45,6 +46,7 @@ describe('pick', () => {
 
   test('pick should work with pipe when curried', () => {
     const pickIdAndName = Obj.pick(['id', 'name']);
+
     const user = { id: 1, name: 'Alice', email: 'alice@example.com', age: 30 };
 
     const result = pipe(user).map(pickIdAndName).value;
@@ -54,6 +56,7 @@ describe('pick', () => {
 
   test('pick should handle empty keys in curried form', () => {
     const pickNone = Obj.pick([]);
+
     const result = pickNone({ a: 1, b: 2 });
 
     assert.deepStrictEqual(result, {});
@@ -61,6 +64,7 @@ describe('pick', () => {
 
   test('pick should work for records that only partially contain the key in curried form', () => {
     const pickVisible = Obj.pick(['name', 'age']);
+
     const user = {
       id: 1,
       name: 'Alice',
@@ -85,6 +89,7 @@ describe('omit', () => {
 
   test('omit should support curried form', () => {
     const omitC = Obj.omit(['c']);
+
     const result = omitC({ a: 1, b: 2, c: 3, d: 4 });
 
     assert.deepStrictEqual(result, { a: 1, b: 2, d: 4 });
@@ -92,6 +97,7 @@ describe('omit', () => {
 
   test('omit should work with pipe when curried', () => {
     const omitSensitive = Obj.omit(['password', 'email']);
+
     const user = {
       id: 1,
       name: 'Alice',
@@ -106,7 +112,9 @@ describe('omit', () => {
 
   test('omit should handle empty keys in curried form', () => {
     const omitNone = Obj.omit([]);
+
     const original = { a: 1, b: 2, c: 3 };
+
     const result = omitNone(original);
 
     assert.deepStrictEqual(result, original);
@@ -114,6 +122,7 @@ describe('omit', () => {
 
   test('should omit multiple keys in curried form', () => {
     const omitBAndD = Obj.omit(['b', 'd']);
+
     const result = omitBAndD({ a: 1, b: 2, c: 3, d: 4, e: 5 });
 
     assert.deepStrictEqual(result, { a: 1, c: 3, e: 5 });
@@ -121,6 +130,7 @@ describe('omit', () => {
 
   test('omit should work for records that only partially contain the key in curried form', () => {
     const omitSensitive = Obj.omit(['password', 'email']);
+
     const user = {
       id: 1,
       name: 'Alice',
