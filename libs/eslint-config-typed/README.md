@@ -438,6 +438,7 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
 - eslint-plugin-import-x
 - eslint-plugin-strict-dependencies
 - eslint-plugin-tree-shakable (Reimplemented in this repository to support flat config)
+- eslint-plugin-n
 - eslint-plugin-react
 - eslint-plugin-react-hooks
 - eslint-plugin-react-perf
@@ -501,6 +502,7 @@ Pre-configured rule sets that can be imported and customized:
 | **`eslintTreeShakableRules`**              | `eslint-plugin-tree-shakable`          | Tree-shaking optimization rules                        |
 | **`eslintStylisticRules`**                 | `@stylistic/eslint-plugin`             | Stylistic formatting rules disabled to mirror Prettier |
 | **`eslintTsRestrictionsRules`**            | `eslint-plugin-ts-restrictions`        | Restrict some syntax in TypeScript                     |
+| **`eslintNRules`**                         | `eslint-plugin-n`                      | Node.js-specific rules                                 |
 | **`eslintReactRules`**                     | `eslint-plugin-react`                  | React-specific rules                                   |
 | **`eslintReactHooksRules`**                | `eslint-plugin-react-hooks`            | React Hooks rules                                      |
 | **`eslintReactPerfRules`**                 | `eslint-plugin-react-perf`             | React performance optimization rules                   |
@@ -611,6 +613,7 @@ Each plugin provides typed rule definitions:
     - **`EslintTreeShakableRules`** (no options)
     - **`EslintStylisticRules`** & **`EslintStylisticRulesOption`**
     - **`EslintTsRestrictionsRules`** & **`EslintTsRestrictionsRulesOption`**
+    - **`EslintNRules`** (no options)
 - React & JSX
     - **`EslintReactRules`** & **`EslintReactRulesOption`**
     - **`EslintReactHooksRules`** & **`EslintReactHooksRulesOption`**
