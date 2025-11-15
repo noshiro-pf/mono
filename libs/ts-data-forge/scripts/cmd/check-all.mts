@@ -1,4 +1,3 @@
-import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 
 /**
@@ -7,60 +6,81 @@ import 'ts-repo-utils';
 const checkAll = async (): Promise<void> => {
   echo('Starting full project validation and build...\n');
 
-  // Step 1: Install dependencies
-  echo('1. Installing dependencies...');
+  await logStep({
+    startMessage: 'Installing dependencies',
+    action: () => runCmdStep('pnpm i', 'Failed to install dependencies'),
+    successMessage: 'Dependencies installed',
+  });
 
-  await runCmdStep('pnpm i', 'Failed to install dependencies');
+  await logStep({
+    startMessage: 'Running spell check',
+    action: () =>
+      runCmdStep('pnpm run cspell --fail-fast', 'Spell check failed'),
+    successMessage: 'Spell check passed',
+  });
 
-  echo('✓ Dependencies installed\n');
+  await logStep({
+    startMessage: 'Checking file extensions',
+    action: () =>
+      runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+    successMessage: 'File extensions validated',
+  });
 
-  // Step 2: Spell check
-  echo('2. Running spell check...');
+  await logStep({
+    startMessage: 'Running tests',
+    action: () => runCmdStep('pnpm run test', 'Tests failed'),
+    successMessage: 'Tests passed',
+  });
 
-  await runCmdStep('pnpm run cspell --fail-fast', 'Spell check failed');
+  await logStep({
+    startMessage: 'Running lint fixes',
+    action: () => runCmdStep('pnpm run lint:fix', 'Linting failed'),
+    successMessage: 'Lint fixes applied',
+  });
 
-  echo('✓ Spell check passed\n');
+  await logStep({
+    startMessage: 'Building project',
+    action: () => runCmdStep('pnpm run build', 'Build failed'),
+    successMessage: 'Build succeeded',
+  });
 
-  // Step 3: Check file extensions
-  echo('3. Checking file extensions...');
+  await logStep({
+    startMessage: 'Generating documentation',
+    action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
+    successMessage: 'Documentation generated',
+  });
 
-  await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
-
-  echo('✓ File extensions validated\n');
-
-  // Step 4: Run tests
-  echo('4. Running tests...');
-
-  await runCmdStep('pnpm run test', 'Tests failed');
-
-  echo('✓ Tests passed\n');
-
-  // Step 5: Lint
-  echo('5. Running lint fixes...');
-
-  await runCmdStep('pnpm run lint:fix', 'Linting failed');
-
-  echo('✓ Lint fixes applied\n');
-
-  // Step 6: Build
-  echo('6. Building project...');
-
-  await runCmdStep('pnpm run build', 'Build failed');
-
-  // Step 7: Generate docs
-  echo('7. Generating documentation...');
-
-  await runCmdStep('pnpm run doc', 'Documentation generation failed');
-
-  // Step 8: Backup repository settings
-  echo('8. Backing up repository settings...');
-
-  await runCmdStep(
-    'pnpm run gh:backup-all',
-    'Backing up repository settings failed',
-  );
+  await logStep({
+    startMessage: 'Backing up repository settings',
+    action: () =>
+      runCmdStep(
+        'pnpm run gh:backup-all',
+        'Backing up repository settings failed',
+      ),
+    successMessage: 'Repository settings backed up',
+  });
 
   echo('✅ All checks completed successfully!\n');
+};
+
+const step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  echo(`${step.current}. ${startMessage}...`);
+
+  await action();
+
+  echo(`✓ ${successMessage}.\n`);
+
+  step.current += 1;
 };
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
