@@ -15,26 +15,58 @@ const tester = new RuleTester({
   },
 });
 
-tester.run(ruleName, banUseImperativeHandleHook, {
-  valid: [],
-  invalid: [
-    {
-      name: 'Disallow React.useImperativeHandle',
-      code: dedent`
-        type Props = Readonly<{
-          readonly ref: unknown;
-        }>;
-
-        const Component = React.memo<Props>((props) => {
-          React.useImperativeHandle(props.ref, () => ({}));
-          return null;
-        });
-      `,
-      errors: [
+describe('ban-use-imperative-handle-hook', () => {
+  describe('namespace import (React.useImperativeHandle)', () => {
+    tester.run(ruleName, banUseImperativeHandleHook, {
+      valid: [],
+      invalid: [
         {
-          messageId: 'disallowUseImperativeHandle',
+          name: 'Disallow React.useImperativeHandle',
+          code: dedent`
+            type Props = Readonly<{
+              readonly ref: unknown;
+            }>;
+
+            const Component = React.memo<Props>((props) => {
+              React.useImperativeHandle(props.ref, () => ({}));
+              return null;
+            });
+          `,
+          errors: [
+            {
+              messageId: 'disallowUseImperativeHandle',
+            },
+          ],
         },
       ],
-    },
-  ],
+    });
+  });
+
+  describe('named import (useImperativeHandle)', () => {
+    tester.run(ruleName, banUseImperativeHandleHook, {
+      valid: [],
+      invalid: [
+        {
+          name: 'Disallow useImperativeHandle',
+          code: dedent`
+            import { memo, useImperativeHandle } from 'react';
+
+            type Props = Readonly<{
+              readonly ref: unknown;
+            }>;
+
+            const Component = memo<Props>((props) => {
+              useImperativeHandle(props.ref, () => ({}));
+              return null;
+            });
+          `,
+          errors: [
+            {
+              messageId: 'disallowUseImperativeHandle',
+            },
+          ],
+        },
+      ],
+    });
+  });
 });

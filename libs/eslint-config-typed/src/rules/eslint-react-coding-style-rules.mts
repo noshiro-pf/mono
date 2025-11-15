@@ -1,8 +1,8 @@
 import { type EslintReactCodingStyleRules } from '../types/index.mjs';
 
 export const eslintReactCodingStyleRules = {
-  // Covered by import-x/prefer-namespace-import
-  'react-coding-style/import-style': 'off',
+  // import-x/prefer-namespace-import checks similar things, but this rule enforces more strict style.
+  'react-coding-style/import-style': ['error', { importStyle: 'namespace' }],
 
   'react-coding-style/component-name': ['error', { maxLength: 42 }],
   'react-coding-style/component-var-type-annotation': 'error',

@@ -1,6 +1,6 @@
 import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import { castDeepMutable } from 'ts-data-forge';
-import { isReactMemberExpression } from './shared.mjs';
+import { isReactApiCall } from './shared.mjs';
 
 type MessageIds = 'disallowUseImperativeHandle';
 
@@ -18,10 +18,10 @@ export const banUseImperativeHandleHook: TSESLint.RuleModule<MessageIds> = {
     },
   },
   create: (context) => ({
-    MemberExpression: (node: DeepReadonly<TSESTree.MemberExpression>) => {
-      if (isReactMemberExpression(node, 'useImperativeHandle')) {
+    CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
+      if (isReactApiCall(context, node, 'useImperativeHandle')) {
         context.report({
-          node: castDeepMutable(node),
+          node: castDeepMutable(node.callee),
           messageId: 'disallowUseImperativeHandle',
         });
       }

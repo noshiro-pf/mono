@@ -161,4 +161,16 @@ export default [
       ],
     }),
   },
+
+  {
+    files: ['test/react-named-imports/**'],
+    rules: defineKnownRules({
+      'react-coding-style/import-style': [
+        'error',
+        {
+          importStyle: 'named',
+        },
+      ],
+    }),
+  },
 ] satisfies FlatConfig[];

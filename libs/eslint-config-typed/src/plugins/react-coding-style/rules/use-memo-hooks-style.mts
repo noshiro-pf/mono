@@ -3,8 +3,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { castDeepMutable } from 'ts-data-forge';
-import { isReactCallExpression } from './shared.mjs';
+import { castDeepMutable, hasKey } from 'ts-data-forge';
+import { isReactApiCall } from './shared.mjs';
 
 type MessageIds = 'disallowUseMemoTypeAnnotation';
 
@@ -23,7 +23,7 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
   },
   create: (context) => ({
     CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
-      if (!isReactCallExpression(node, 'useMemo')) {
+      if (!isReactApiCall(context, node, 'useMemo')) {
         return;
       }
 
@@ -46,7 +46,72 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
           messageId: 'disallowUseMemoTypeAnnotation',
         });
       }
+
+      const [firstArg] = node.arguments;
+
+      if (firstArg?.type === AST_NODE_TYPES.ArrowFunctionExpression) {
+        const { returnType, body } = firstArg;
+
+        if (returnType !== undefined) {
+          context.report({
+            node: castDeepMutable(returnType),
+            messageId: 'disallowUseMemoTypeAnnotation',
+          });
+        }
+
+        checkNodeForTypeAnnotations(context, body);
+      }
     },
   }),
   defaultOptions: [],
+};
+
+const checkNodeForTypeAnnotations = (
+  context: DeepReadonly<TSESLint.RuleContext<MessageIds, readonly []>>,
+  node: DeepReadonly<TSESTree.Node>,
+): void => {
+  if (
+    node.type === AST_NODE_TYPES.TSAsExpression ||
+    node.type === AST_NODE_TYPES.TSTypeAssertion ||
+    node.type === AST_NODE_TYPES.TSSatisfiesExpression
+  ) {
+    context.report({
+      node: castDeepMutable(node),
+      messageId: 'disallowUseMemoTypeAnnotation',
+    });
+
+    return;
+  }
+
+  if (hasKey(node, 'body')) {
+    const nodeWithBody = node;
+
+    if (nodeWithBody.body !== undefined && nodeWithBody.body !== null) {
+      checkNodeForTypeAnnotations(
+        context,
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        nodeWithBody.body as DeepReadonly<TSESTree.Node>,
+      );
+    }
+  }
+
+  if (hasKey(node, 'expression')) {
+    const nodeWithExpression = node;
+
+    checkNodeForTypeAnnotations(
+      context,
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      nodeWithExpression.expression as DeepReadonly<TSESTree.Node>,
+    );
+  }
+
+  if (hasKey(node, 'argument')) {
+    const nodeWithArgument = node;
+
+    checkNodeForTypeAnnotations(
+      context,
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      nodeWithArgument.argument as DeepReadonly<TSESTree.Node>,
+    );
+  }
 };

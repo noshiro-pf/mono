@@ -132,7 +132,10 @@ export const eslintImportsRules = {
   // 'import/enforce-node-protocol-usage': ['error', 'always'],
 
   'import-x/no-rename-default': withDefaultOption('error'),
-  'import-x/prefer-namespace-import': ['error', { patterns: ['react'] }],
+
+  // Covered by react-coding-style/import-style
+  'import-x/prefer-namespace-import': 'off',
+  // 'import-x/prefer-namespace-import': ['error', { patterns: ['react'] }],
 
   // deprecated rules
   'import-x/imports-first': 0,

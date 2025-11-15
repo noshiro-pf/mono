@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
-import { isReactCallExpression } from './shared.mjs';
+import { isReactApiCall } from './shared.mjs';
 
 type ComponentNameOption = Readonly<{
   maxLength?: number;
@@ -60,9 +60,12 @@ export const componentNameRule: TSESLint.RuleModule<MessageIds, Options> = {
       VariableDeclarator: (node) => {
         if (
           node.id.type !== AST_NODE_TYPES.Identifier ||
-          node.init?.type !== AST_NODE_TYPES.CallExpression ||
-          !isReactCallExpression(node.init, 'memo')
+          node.init?.type !== AST_NODE_TYPES.CallExpression
         ) {
+          return;
+        }
+
+        if (!isReactApiCall(context, node.init, 'memo')) {
           return;
         }
 

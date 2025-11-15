@@ -66,7 +66,7 @@ namespace ComponentVarTypeAnnotation {
 }
 
 /**
- * Enforces importing React with a single namespace import named 'React'.
+ * Enforces importing React with a specific style (namespace or named imports).
  *
  * ```md
  * | key        | value      |
@@ -76,7 +76,40 @@ namespace ComponentVarTypeAnnotation {
  * ```
  */
 namespace ImportStyle {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "importStyle": {
+   *         "type": "string",
+   *         "enum": [
+   *           "namespace",
+   *           "named"
+   *         ],
+   *         "description": "Import style to enforce: \"namespace\" for `import * as React` or \"named\" for `import { ... }`"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /**
+     * Import style to enforce: "namespace" for `import * as React` or "named"
+     * for `import { ... }`
+     */
+    readonly importStyle?: 'named' | 'namespace';
+  };
+
+  export type RuleEntry =
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
 }
 
 /**
@@ -163,4 +196,5 @@ export type EslintReactCodingStyleRules = {
 
 export type EslintReactCodingStyleRulesOption = {
   readonly 'react-coding-style/component-name': ComponentName.Options;
+  readonly 'react-coding-style/import-style': ImportStyle.Options;
 };

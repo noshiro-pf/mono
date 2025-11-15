@@ -4,7 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { castDeepMutable } from 'ts-data-forge';
-import { getReactMemoArrowFunction, isReactCallExpression } from './shared.mjs';
+import { getReactMemoArrowFunction, isReactApiCall } from './shared.mjs';
 
 type MessageIds = 'propsParamMustBeNamedProps' | 'propsParamMustBeIdentifier';
 
@@ -29,7 +29,7 @@ export const reactMemoPropsArgumentNameRule: TSESLint.RuleModule<MessageIds> = {
   },
   create: (context) => ({
     CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
-      if (!isReactCallExpression(node, 'memo')) {
+      if (!isReactApiCall(context, node, 'memo')) {
         return;
       }
 
