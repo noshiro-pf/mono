@@ -1,3 +1,9 @@
+## [3.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.8.0...v3.8.1) (2025-11-15)
+
+### Bug Fixes
+
+- fix ts-restrictions/no-restricted-cast-name rule ([#135](https://github.com/noshiro-pf/eslint-config-typed/issues/135)) ([a7d2cf0](https://github.com/noshiro-pf/eslint-config-typed/commit/a7d2cf059bc2c12de7d96c5ab9dfc6d7081f284f))
+
 # [3.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.7.1...v3.8.0) (2025-11-14)
 
 ### Features
