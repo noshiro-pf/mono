@@ -46,18 +46,6 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
-    startMessage: 'Building project',
-    action: () => runCmdStep('pnpm run build', 'Build failed'),
-    successMessage: 'Build succeeded',
-  });
-
-  await logStep({
-    startMessage: 'Running lint fixes',
-    action: () => runCmdStep('pnpm run lint:fix', 'Linting failed'),
-    successMessage: 'Lint fixes applied',
-  });
-
-  await logStep({
     startMessage: 'Generating documentation',
     action: () =>
       runCmdStep('pnpm run doc:embed', 'Documentation embedding failed'),
