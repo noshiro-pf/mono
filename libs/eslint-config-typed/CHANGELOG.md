@@ -1,3 +1,9 @@
+## [3.13.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.2...v3.13.3) (2025-11-15)
+
+### Bug Fixes
+
+- fix import-x/newline-after-import rule setting ([#145](https://github.com/noshiro-pf/eslint-config-typed/issues/145)) ([2482012](https://github.com/noshiro-pf/eslint-config-typed/commit/2482012812dfa6f38762ff474a2115fec36118b1))
+
 ## [3.13.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.1...v3.13.2) (2025-11-15)
 
 ### Bug Fixes
