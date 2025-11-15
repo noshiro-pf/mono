@@ -183,6 +183,46 @@ namespace BanUseImperativeHandleHook {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * Require displayName property for React components created with React.memo
+ *
+ * ```md
+ * | key        | value      |
+ * | :--------- | :--------- |
+ * | type       | suggestion |
+ * | deprecated | false      |
+ * ```
+ */
+namespace DisplayName {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignoreTranspilerName": {
+   *         "type": "boolean",
+   *         "description": "When true, ignores components that get displayName from variable name"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = {
+    /** When true, ignores components that get displayName from variable name */
+    readonly ignoreTranspilerName?: boolean;
+  };
+
+  export type RuleEntry =
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
+    | 'off';
+}
+
 export type EslintReactCodingStyleRules = {
   readonly 'react-coding-style/component-name': ComponentName.RuleEntry;
   readonly 'react-coding-style/component-var-type-annotation': ComponentVarTypeAnnotation.RuleEntry;
@@ -192,9 +232,11 @@ export type EslintReactCodingStyleRules = {
   readonly 'react-coding-style/react-memo-type-parameter': ReactMemoTypeParameter.RuleEntry;
   readonly 'react-coding-style/use-memo-hook-style': UseMemoHookStyle.RuleEntry;
   readonly 'react-coding-style/ban-use-imperative-handle-hook': BanUseImperativeHandleHook.RuleEntry;
+  readonly 'react-coding-style/display-name': DisplayName.RuleEntry;
 };
 
 export type EslintReactCodingStyleRulesOption = {
   readonly 'react-coding-style/component-name': ComponentName.Options;
   readonly 'react-coding-style/import-style': ImportStyle.Options;
+  readonly 'react-coding-style/display-name': DisplayName.Options;
 };

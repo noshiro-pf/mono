@@ -11,4 +11,5 @@ export const eslintReactCodingStyleRules = {
   'react-coding-style/react-memo-type-parameter': 'error',
   'react-coding-style/ban-use-imperative-handle-hook': 'error',
   'react-coding-style/use-memo-hook-style': 'error',
+  'react-coding-style/display-name': ['error', { ignoreTranspilerName: false }],
 } as const satisfies EslintReactCodingStyleRules;

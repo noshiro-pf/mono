@@ -2,6 +2,7 @@ import { type ESLintPlugin } from '../../../types/index.mjs';
 import { banUseImperativeHandleHook } from './ban-use-imperative-handle-hook.mjs';
 import { componentNameRule } from './component-name.mjs';
 import { componentVarTypeAnnotationRule } from './component-var-type-annotation.mjs';
+import { displayNameRule } from './display-name.mjs';
 import { importStyleRule } from './import-style.mjs';
 import { propsTypeAnnotationStyleRule } from './props-type-annotation-style.mjs';
 import { reactMemoPropsArgumentNameRule } from './react-memo-props-argument-name.mjs';
@@ -17,4 +18,5 @@ export const reactCodingStyleRules = {
   'react-memo-type-parameter': reactMemoTypeParameterRule,
   'use-memo-hook-style': useMemoHooksStyleRule,
   'ban-use-imperative-handle-hook': banUseImperativeHandleHook,
+  'display-name': displayNameRule,
 } as const satisfies ESLintPlugin['rules'];

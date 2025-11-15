@@ -16,64 +16,6 @@ type MessageIds = 'incompleteDestructuring';
 
 const DEFAULT_DIRECTIVE_KEYWORD = '@check-destructuring-completeness';
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const getObjectTypeProperties = (type: ts.Type): readonly string[] => {
-  try {
-    const properties = type.getProperties();
-
-    // Limit to reasonable number of properties to avoid hangs
-    if (properties.length > 1000) {
-      return [];
-    }
-
-    return properties
-      .map((prop) => prop.name)
-      .filter(
-        (name) =>
-          // Filter out symbol properties and internal properties
-          !name.startsWith('__') &&
-          // Only include string property names
-          typeof name === 'string' &&
-          name.length > 0,
-      );
-  } catch {
-    // If there's any error getting properties, return empty array
-    return [];
-  }
-};
-
-const isReactComponentFunction = (
-  node: DeepReadonly<TSESTree.Node> | undefined | null,
-): boolean => {
-  if (node === undefined || node === null) return false;
-
-  // Arrow function component
-  if (node.type === AST_NODE_TYPES.ArrowFunctionExpression) {
-    const { body } = node;
-
-    if (body.type === AST_NODE_TYPES.BlockStatement) {
-      return body.body.some((statement) => {
-        if (statement.type !== AST_NODE_TYPES.ReturnStatement) return false;
-
-        const { argument } = statement;
-
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (argument === null || argument === undefined) return false;
-
-        const argType = (argument as { type?: string }).type;
-
-        return argType === 'JSXElement' || argType === 'JSXFragment';
-      });
-    }
-
-    const bodyType = (body as { type?: string }).type;
-
-    return bodyType === 'JSXElement' || bodyType === 'JSXFragment';
-  }
-
-  return false;
-};
-
 export const checkDestructuringCompleteness: TSESLint.RuleModule<
   MessageIds,
   Options
@@ -302,5 +244,63 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
       },
     };
   },
-  defaultOptions: [],
+  defaultOptions: [{ alwaysCheckReactComponentProps: true }],
+};
+
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const getObjectTypeProperties = (type: ts.Type): readonly string[] => {
+  try {
+    const properties = type.getProperties();
+
+    // Limit to reasonable number of properties to avoid hangs
+    if (properties.length > 1000) {
+      return [];
+    }
+
+    return properties
+      .map((prop) => prop.name)
+      .filter(
+        (name) =>
+          // Filter out symbol properties and internal properties
+          !name.startsWith('__') &&
+          // Only include string property names
+          typeof name === 'string' &&
+          name.length > 0,
+      );
+  } catch {
+    // If there's any error getting properties, return empty array
+    return [];
+  }
+};
+
+const isReactComponentFunction = (
+  node: DeepReadonly<TSESTree.Node> | undefined | null,
+): boolean => {
+  if (node === undefined || node === null) return false;
+
+  // Arrow function component
+  if (node.type === AST_NODE_TYPES.ArrowFunctionExpression) {
+    const { body } = node;
+
+    if (body.type === AST_NODE_TYPES.BlockStatement) {
+      return body.body.some((statement) => {
+        if (statement.type !== AST_NODE_TYPES.ReturnStatement) return false;
+
+        const { argument } = statement;
+
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (argument === null || argument === undefined) return false;
+
+        const argType = (argument as { type?: string }).type;
+
+        return argType === 'JSXElement' || argType === 'JSXFragment';
+      });
+    }
+
+    const bodyType = (body as { type?: string }).type;
+
+    return bodyType === 'JSXElement' || bodyType === 'JSXFragment';
+  }
+
+  return false;
 };
