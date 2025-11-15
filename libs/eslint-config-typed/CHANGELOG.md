@@ -1,3 +1,9 @@
+## [3.13.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.0...v3.13.1) (2025-11-15)
+
+### Bug Fixes
+
+- fix dependencies ([#142](https://github.com/noshiro-pf/eslint-config-typed/issues/142)) ([145e2cf](https://github.com/noshiro-pf/eslint-config-typed/commit/145e2cf041e7288f87032552311d1839f26d3ef1))
+
 # [3.13.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.12.0...v3.13.0) (2025-11-15)
 
 ### Features
