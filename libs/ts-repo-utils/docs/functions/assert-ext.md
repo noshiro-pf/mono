@@ -30,7 +30,7 @@ Defined in: [src/functions/assert-ext.mts:27](https://github.com/noshiro-pf/ts-r
 
 > `const` **assertExt**: (`config`) => `Promise`\<`undefined`\>
 
-Defined in: [src/functions/assert-ext.mts:84](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-ext.mts#L84)
+Defined in: [src/functions/assert-ext.mts:85](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-ext.mts#L85)
 
 Validates that all files in specified directories have the correct
 extensions. Exits with code 1 if any files have incorrect extensions.

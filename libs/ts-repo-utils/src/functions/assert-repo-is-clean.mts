@@ -11,9 +11,11 @@ export const repoIsDirty = async (
   options?: Readonly<{ silent?: boolean }>,
 ): Promise<boolean> => {
   const status = await getGitStatus({ silent: options?.silent ?? false });
+
   if (Result.isErr(status)) {
     throw new Error(`Failed to get git status: ${status.value}`);
   }
+
   return status.value.isDirty;
 };
 
@@ -25,12 +27,14 @@ export const assertRepoIsClean = async (
   options?: Readonly<{ silent?: boolean }>,
 ): Promise<void> => {
   const silent = options?.silent ?? false;
+
   const conditionalEcho = silent ? () => {} : echo;
 
   const gitStatusResult = await getGitStatus({ silent });
 
   if (Result.isErr(gitStatusResult)) {
     conditionalEcho(gitStatusResult.value);
+
     return;
   }
 
@@ -38,20 +42,25 @@ export const assertRepoIsClean = async (
 
   if (!gitStatus.isDirty) {
     conditionalEcho('Repo is clean\n');
+
     return;
   }
 
   conditionalEcho('Repo is dirty\n');
+
   conditionalEcho('Changed files:\n');
+
   conditionalEcho(gitStatus.stdout);
 
   // Show files not tracked by git and unstaged changes
   const addResult = await $('git add -N .', { silent });
+
   if (Result.isErr(addResult)) {
     conditionalEcho('Warning: Failed to add untracked files for diff\n');
   }
 
   const diffResult = await $('git diff', { silent });
+
   if (Result.isErr(diffResult)) {
     conditionalEcho('Warning: Failed to show diff\n');
   }

@@ -36,6 +36,7 @@ export const executeParallel = async (
   >[] = [];
 
   const mut_executing = new Set<Promise<unknown>>();
+
   let mut_failed = false as boolean;
 
   for (const pkg of packages) {
@@ -49,8 +50,10 @@ export const executeParallel = async (
       // Check for failure immediately
       if (Result.isErr(result)) {
         mut_failed = true;
+
         throw result.value; // Throw the error to trigger fail-fast
       }
+
       return result.value; // Return the unwrapped value for success
     });
 
@@ -60,10 +63,12 @@ export const executeParallel = async (
       // eslint-disable-next-line @typescript-eslint/no-loop-func
       .catch((error: unknown) => {
         mut_failed = true;
+
         throw error; // Re-throw to ensure fail-fast propagation
       })
       .finally(() => {
         mut_executing.delete(wrappedPromise);
+
         if (DEBUG) {
           console.debug('executing size', mut_executing.size);
         }
@@ -84,6 +89,7 @@ export const executeParallel = async (
         // If any process fails, cancel remaining processes and throw immediately
         // eslint-disable-next-line no-useless-assignment
         mut_failed = true;
+
         throw error;
       }
     }
@@ -117,6 +123,7 @@ export const executeStages = async (
   const sorted = topologicalSortPackages(packages, dependencyGraph);
 
   const mut_stages: (readonly Package[])[] = [];
+
   const mut_completed = new Set<string>();
 
   while (mut_completed.size < sorted.length) {
@@ -126,6 +133,7 @@ export const executeStages = async (
       if (mut_completed.has(pkg.name)) continue;
 
       const deps = dependencyGraph.get(pkg.name) ?? [];
+
       const depsCompleted = deps.every((dep) => mut_completed.has(dep));
 
       if (depsCompleted) {
@@ -138,6 +146,7 @@ export const executeStages = async (
     }
 
     mut_stages.push(mut_stage);
+
     for (const pkg of mut_stage) {
       mut_completed.add(pkg.name);
     }
@@ -150,6 +159,7 @@ export const executeStages = async (
   for (const [i, stage] of mut_stages.entries()) {
     if (stage.length > 0) {
       console.log(`Stage ${i + 1}: ${stage.map((p) => p.name).join(', ')}`);
+
       try {
         // eslint-disable-next-line no-await-in-loop
         const results = await executeParallel(stage, scriptName, concurrency);
@@ -162,8 +172,11 @@ export const executeStages = async (
       } catch (error) {
         // executeParallel will throw immediately on any failure (fail-fast)
         const errorMessage = isError(error) ? error.message : String(error);
+
         console.error(`\n❌ Stage ${i + 1} failed (fail-fast):`);
+
         console.error(errorMessage);
+
         throw new Error(`Stage ${i + 1} failed: ${errorMessage}`, {
           cause: error,
         });
@@ -202,12 +215,15 @@ const executeScript = (
             : {};
 
         const hasScript = hasKey(packageJsonScripts, scriptName);
+
         if (!hasScript) {
           resolve({ skipped: true });
+
           return;
         }
 
         const prefixStr = prefix ? `[${pkg.name}] ` : '';
+
         const proc = spawn('npm', ['run', scriptName], {
           cwd: pkg.path,
           shell: true,
@@ -226,6 +242,7 @@ const executeScript = (
           if (DEBUG) {
             console.debug(`${pkg.name} process closed with code: ${code}`);
           }
+
           if (code === 0 || code === null) {
             resolve({ code: code ?? 0 });
           } else {
@@ -246,6 +263,7 @@ const executeScript = (
             : 'Unknown error';
 
         console.error(`\nError in ${pkg.name}:`, errorMessage);
+
         return isError(err) ? err : new Error(errorMessage);
       }),
     ),
@@ -263,15 +281,18 @@ const topologicalSortPackages = (
   dependencyGraph: ReadonlyMap<string, readonly string[]>,
 ): readonly Package[] => {
   const mut_visited = new Set<string>();
+
   const mut_result: string[] = [];
 
   const packageMap = new Map(packages.map((p) => [p.name, p]));
 
   const visit = (pkgName: string): void => {
     if (mut_visited.has(pkgName)) return;
+
     mut_visited.add(pkgName);
 
     const deps = dependencyGraph.get(pkgName) ?? [];
+
     for (const dep of deps) {
       visit(dep);
     }
@@ -300,12 +321,14 @@ const buildDependencyGraph = (
   packages: readonly Package[],
 ): ReadonlyMap<string, readonly string[]> => {
   const packageMap = new Map(packages.map((p) => [p.name, p]));
+
   const mut_graph = new Map<string, readonly string[]>();
 
   for (const pkg of packages) {
     const deps = Object.keys(pkg.dependencies).filter((depName) =>
       packageMap.has(depName),
     );
+
     mut_graph.set(pkg.name, deps);
   }
 

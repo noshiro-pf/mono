@@ -36,7 +36,7 @@ The type of the error value.
 
 > `const` **$**: *typeof* [`$`](functions/exec-async.md#)
 
-Defined in: [src/node-global.mts:36](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L36)
+Defined in: [src/node-global.mts:39](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L39)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [src/node-global.mts:36](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **cd**: *typeof* `chdir_`
 
-Defined in: [src/node-global.mts:39](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L39)
+Defined in: [src/node-global.mts:45](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L45)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [src/node-global.mts:39](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **echo**: *typeof* `console.log`
 
-Defined in: [src/node-global.mts:38](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L38)
+Defined in: [src/node-global.mts:43](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L43)
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: [src/node-global.mts:38](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **fs**: *typeof* `fs_`
 
-Defined in: [src/node-global.mts:32](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L32)
+Defined in: [src/node-global.mts:33](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L33)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [src/node-global.mts:32](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **glob**: *typeof* `glob_`
 
-Defined in: [src/node-global.mts:34](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L34)
+Defined in: [src/node-global.mts:37](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L37)
 
 ***
 
@@ -76,7 +76,7 @@ Defined in: [src/node-global.mts:34](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **isDirectlyExecuted**: *typeof* [`isDirectlyExecuted`](functions/is-directly-executed.md#isdirectlyexecuted)
 
-Defined in: [src/node-global.mts:40](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L40)
+Defined in: [src/node-global.mts:47](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L47)
 
 ***
 
@@ -84,7 +84,7 @@ Defined in: [src/node-global.mts:40](https://github.com/noshiro-pf/ts-repo-utils
 
 > `const` **os**: *typeof* `os_`
 
-Defined in: [src/node-global.mts:33](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L33)
+Defined in: [src/node-global.mts:35](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/node-global.mts#L35)
 
 ***
 

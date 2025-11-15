@@ -62,6 +62,7 @@ export function $(
   options?: ExecOptionsWithStringEncoding | ExecOptionsWithBufferEncoding,
 ): Promise<ExecResult<string | Buffer>> {
   const { silent = false, ...restOptions } = options ?? {};
+
   const normalizedOptions: NormalizedExecOptions = restOptions;
 
   if (!silent) {
@@ -79,6 +80,7 @@ export function $(
         if (!isEmpty(stdout)) {
           echo(stdout);
         }
+
         if (!isEmpty(stderr)) {
           console.error(stderr);
         }
@@ -86,6 +88,7 @@ export function $(
 
       if (error !== null) {
         resolve(Result.err(error));
+
         return;
       }
 
@@ -106,6 +109,7 @@ export function $(
           handleResult(error, stdout, stderr);
         },
       );
+
       return;
     }
 

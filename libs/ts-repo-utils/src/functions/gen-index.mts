@@ -91,28 +91,35 @@ export const genIndex = async (
     // Step 1: Verify target directories exist
     for (const dir of targetDirs) {
       const resolvedDir = path.resolve(dir);
+
       // eslint-disable-next-line no-await-in-loop
       await assertPathExists(resolvedDir, `Target directory: ${dir}`);
     }
 
     // Step 2: Generate index files
     conditionalEcho('Generating index files...');
+
     for (const dir of targetDirs) {
       const resolvedDir = path.resolve(dir);
+
       // eslint-disable-next-line no-await-in-loop
       await generateIndexFileForDir(resolvedDir, filledConfig);
     }
+
     conditionalEcho('✓ Index files generated\n');
 
     // Step 3: Format generated files
     if (filledConfig.formatCommand !== undefined) {
       conditionalEcho('Formatting generated files...');
+
       const fmtResult = await $(filledConfig.formatCommand, {
         silent: filledConfig.silent,
       });
+
       if (Result.isErr(fmtResult)) {
         throw new Error(`Formatting failed: ${fmtResult.value.message}`);
       }
+
       conditionalEcho('✓ Formatting completed\n');
     }
 
@@ -121,6 +128,7 @@ export const genIndex = async (
     return Result.ok(undefined);
   } catch (error) {
     conditionalEcho(`❌ Index generation failed: ${String(error)}\n`);
+
     return Result.err(error);
   }
 };
@@ -148,6 +156,7 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
                 if (exclude !== undefined && Array.isArray(exclude)) {
                   yield* exclude;
                 }
+
                 yield* defaultConfig.exclude;
               }),
             ),
@@ -169,6 +178,7 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
                     return true;
                   }
                 }
+
                 return false;
               },
           ).value,
@@ -198,14 +208,18 @@ const generateIndexFileForDir = async (
 ): Promise<void> => {
   try {
     const actualBaseDir = baseDir ?? dirPath;
+
     const entries = await fs.readdir(dirPath, { withFileTypes: true });
 
     const mut_subDirectories: string[] = [];
+
     const mut_filesToExport: string[] = [];
 
     for (const entry of entries) {
       const entryName = entry.name;
+
       const entryPath = path.join(dirPath, entryName);
+
       const relativePath = path.relative(actualBaseDir, entryPath);
 
       if (
@@ -220,6 +234,7 @@ const generateIndexFileForDir = async (
 
       if (entry.isDirectory()) {
         mut_subDirectories.push(entryName);
+
         // Recursively call for subdirectories first
         // eslint-disable-next-line no-await-in-loop
         await generateIndexFileForDir(entryPath, config, actualBaseDir);
@@ -244,6 +259,7 @@ const generateIndexFileForDir = async (
     const indexPath = path.join(dirPath, `index${config.indexFileExtension}`);
 
     await fs.writeFile(indexPath, indexContent);
+
     echo(`Generated: ${path.relative(process.cwd(), indexPath)}`);
   } catch (error) {
     throw new Error(

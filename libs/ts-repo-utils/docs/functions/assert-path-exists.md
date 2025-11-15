@@ -12,7 +12,7 @@
 
 > **assertPathExists**(`filePath`, `description`): `Promise`\<`void`\>
 
-Defined in: [src/functions/assert-path-exists.mts:24](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-path-exists.mts#L24)
+Defined in: [src/functions/assert-path-exists.mts:25](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-path-exists.mts#L25)
 
 Validates that a path exists and exits with code 1 if it doesn't.
 

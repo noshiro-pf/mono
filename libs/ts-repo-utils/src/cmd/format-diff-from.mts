@@ -52,6 +52,7 @@ const cmdDef = cmd.command({
       silent: args.silent ?? false,
     }).catch((error: unknown) => {
       console.error('An error occurred:', error);
+
       process.exit(1);
     });
   },

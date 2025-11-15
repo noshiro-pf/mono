@@ -47,6 +47,7 @@ export const createResultAssert = <Config, Ok, Err>({
       } else {
         defaultOnError(result.value);
       }
+
       process.exit(exitCode);
     }
 

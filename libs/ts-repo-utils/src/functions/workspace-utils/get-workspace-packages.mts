@@ -80,6 +80,7 @@ export const getWorkspacePackages = async (
   });
 
   const allPackageArrays = await Promise.all(packagePromises);
+
   const finalPackages = allPackageArrays.flat();
 
   return finalPackages;
@@ -108,12 +109,16 @@ const getKeyValueRecordFromJsonValue = (
   if (!isRecord(value) || !hasKey(value, key)) {
     return {};
   }
+
   const obj = value[key];
+
   if (!isRecord(obj)) {
     return {};
   }
+
   const entries = Object.entries(obj).filter(
     (entry): entry is [string, string] => isString(entry[1]),
   );
+
   return Object.fromEntries(entries);
 };

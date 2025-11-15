@@ -84,6 +84,7 @@ export const checkShouldRunTypeChecks = async (
 
   if (Result.isErr(files)) {
     console.error('Error getting diff:', files.value);
+
     process.exit(1);
   }
 
@@ -102,6 +103,7 @@ export const checkShouldRunTypeChecks = async (
       // File extension pattern match (pattern starts with '**.')
       if (pattern.startsWith('**.')) {
         const extension = pattern.slice(2); // Remove '**'
+
         return path.basename(file).endsWith(extension);
       }
 

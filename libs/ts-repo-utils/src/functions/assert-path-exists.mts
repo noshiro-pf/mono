@@ -9,6 +9,7 @@ import '../node-global.mjs';
 export const pathExists = async (filePath: string): Promise<boolean> => {
   try {
     await fs.access(filePath);
+
     return true;
   } catch {
     return false;
@@ -27,6 +28,7 @@ export const assertPathExists = async (
 ): Promise<void> => {
   if (!(await pathExists(filePath))) {
     echo(`${description} does not exist: ${filePath}`);
+
     process.exit(1);
   }
 };

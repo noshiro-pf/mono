@@ -29,13 +29,20 @@ Object.assign(globalThis, globalsDef);
 
 declare global {
   const path: typeof path_;
+
   const fs: typeof fs_;
+
   const os: typeof os_;
+
   const glob: typeof glob_;
 
   const $: typeof $_;
+
   const Result: typeof Result_;
+
   const echo: typeof console.log;
+
   const cd: typeof chdir_;
+
   const isDirectlyExecuted: typeof isDirectlyExecuted_;
 }

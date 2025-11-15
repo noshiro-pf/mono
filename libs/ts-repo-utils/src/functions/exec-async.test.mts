@@ -10,10 +10,12 @@ describe('exec-async', () => {
   const withSilentEcho = async <T,>(fn: () => Promise<T>): Promise<T> => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const originalEcho = (globalThis as any).echo;
+
     // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-unsafe-member-access
     (globalThis as any).echo = () => {
       // Silent implementation - no output
     };
+
     try {
       return await fn();
     } finally {
@@ -30,6 +32,7 @@ describe('exec-async', () => {
 
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('hello world');
+
         expect(result.value.stderr).toBe('');
       }
     });
@@ -41,6 +44,7 @@ describe('exec-async', () => {
 
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('line1\nline2\nline3');
+
         expect(result.value.stderr).toBe('');
       }
     });
@@ -52,6 +56,7 @@ describe('exec-async', () => {
 
       if (Result.isOk(result)) {
         expect(result.value.stdout).toBe('');
+
         expect(result.value.stderr).toBe('');
       }
     });
@@ -65,6 +70,7 @@ describe('exec-async', () => {
 
       if (Result.isErr(result)) {
         expect(result.value).toBeDefined();
+
         expect(result.value.code).toBeDefined();
       }
     });
@@ -76,6 +82,7 @@ describe('exec-async', () => {
 
       if (Result.isErr(result)) {
         expect(result.value).toBeDefined();
+
         expect(result.value.code).toBe(1);
       }
     });
@@ -138,6 +145,7 @@ describe('exec-async', () => {
 
       if (Result.isOk(result)) {
         expect(Buffer.isBuffer(result.value.stdout)).toBe(true);
+
         expect(Buffer.isBuffer(result.value.stderr)).toBe(true);
       }
     });
@@ -149,6 +157,7 @@ describe('exec-async', () => {
 
       if (Result.isOk(result)) {
         expect(Buffer.isBuffer(result.value.stdout)).toBe(true);
+
         expect(Buffer.isBuffer(result.value.stderr)).toBe(true);
       }
     });
@@ -223,6 +232,7 @@ describe('exec-async', () => {
       if (Result.isOk(result)) {
         // These assignments will fail at compile time if types don't match
         assertType<string>(result.value.stdout);
+
         assertType<string>(result.value.stderr);
       }
     });
@@ -249,6 +259,7 @@ describe('exec-async', () => {
 
       if (Result.isOk(result)) {
         assertType<Buffer>(result.value.stdout);
+
         assertType<Buffer>(result.value.stderr);
       }
     });
@@ -263,6 +274,7 @@ describe('exec-async', () => {
 
       if (Result.isOk(result)) {
         assertType<Buffer>(result.value.stdout);
+
         assertType<Buffer>(result.value.stderr);
       }
     });
@@ -272,10 +284,12 @@ describe('exec-async', () => {
         encoding: 'utf8',
         silent: true,
       });
+
       const _resultAscii = await $('echo "test"', {
         encoding: 'ascii',
         silent: true,
       });
+
       const _resultBase64 = await $('echo "test"', {
         encoding: 'base64',
         silent: true,
@@ -299,17 +313,21 @@ describe('exec-async', () => {
 
     test('should maintain type safety with const encoding values', async () => {
       const bufferEncoding = 'buffer';
+
       const nullEncoding = null;
+
       const utf8Encoding = 'utf8';
 
       const _resultBuffer = await $('echo "test"', {
         encoding: bufferEncoding,
         silent: true,
       });
+
       const _resultNull = await $('echo "test"', {
         encoding: nullEncoding,
         silent: true,
       });
+
       const _resultUtf8 = await $('echo "test"', {
         encoding: utf8Encoding,
         silent: true,
@@ -365,12 +383,15 @@ describe('exec-async', () => {
       // Type check for native exec with default options
       exec('echo "test"', (error, stdout, stderr) => {
         expectType<ExecException | null, typeof error>('=');
+
         expectType<string, typeof stdout>('=');
+
         expectType<string, typeof stderr>('=');
       });
 
       // The $ function should produce the same types wrapped in Result (suppressed for clean output)
       const _resultPromise = withSilentEcho(async () => $('echo "test"'));
+
       expectType<
         typeof _resultPromise,
         Promise<
@@ -383,7 +404,9 @@ describe('exec-async', () => {
       // Type check for native exec with buffer encoding
       exec('echo "test"', { encoding: 'buffer' }, (error, stdout, stderr) => {
         expectType<ExecException | null, typeof error>('=');
+
         expectType<Buffer, typeof stdout>('>=');
+
         expectType<Buffer, typeof stderr>('>=');
       });
 
@@ -391,6 +414,7 @@ describe('exec-async', () => {
       const _resultPromise = withSilentEcho(async () =>
         $('echo "test"', { encoding: 'buffer' }),
       );
+
       expectType<
         typeof _resultPromise,
         Promise<
@@ -403,7 +427,9 @@ describe('exec-async', () => {
       // Type check for native exec with null encoding
       exec('echo "test"', { encoding: null }, (error, stdout, stderr) => {
         expectType<ExecException | null, typeof error>('=');
+
         expectType<Buffer, typeof stdout>('>=');
+
         expectType<Buffer, typeof stderr>('>=');
       });
 
@@ -411,6 +437,7 @@ describe('exec-async', () => {
       const _resultPromise = withSilentEcho(async () =>
         $('echo "test"', { encoding: null }),
       );
+
       expectType<
         typeof _resultPromise,
         Promise<
@@ -423,7 +450,9 @@ describe('exec-async', () => {
       // Type check for native exec with utf8 encoding
       exec('echo "test"', { encoding: 'utf8' }, (error, stdout, stderr) => {
         expectType<ExecException | null, typeof error>('=');
+
         expectType<string, typeof stdout>('=');
+
         expectType<string, typeof stderr>('=');
       });
 
@@ -431,6 +460,7 @@ describe('exec-async', () => {
       const _resultPromise = withSilentEcho(async () =>
         $('echo "test"', { encoding: 'utf8' }),
       );
+
       expectType<
         typeof _resultPromise,
         Promise<
@@ -446,7 +476,9 @@ describe('exec-async', () => {
         { encoding: 'utf8', timeout: 5000 },
         (error, stdout, stderr) => {
           expectType<ExecException | null, typeof error>('=');
+
           expectType<string, typeof stdout>('=');
+
           expectType<string, typeof stderr>('=');
         },
       );
@@ -456,6 +488,7 @@ describe('exec-async', () => {
         encoding: 'utf8',
         silent: true,
       });
+
       expectType<
         typeof _resultPromise,
         Promise<
@@ -503,17 +536,21 @@ describe('exec-async', () => {
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               stderr: undefined as unknown as T,
             };
+
             return emptyParams;
           };
 
           // Default encoding comparison
           const _execDefault = captureExecTypes<string>();
+
           const $Default = await $('echo "test"', { silent: true });
+
           if (Result.isOk($Default)) {
             expectType<
               typeof _execDefault.stdout,
               typeof $Default.value.stdout
             >('=');
+
             expectType<
               typeof _execDefault.stderr,
               typeof $Default.value.stderr
@@ -522,14 +559,17 @@ describe('exec-async', () => {
 
           // Buffer encoding comparison
           const _execBuffer = captureExecTypes<Buffer>('buffer');
+
           const $Buffer = await $('echo "test"', {
             encoding: 'buffer',
             silent: true,
           });
+
           if (Result.isOk($Buffer)) {
             expectType<typeof _execBuffer.stdout, typeof $Buffer.value.stdout>(
               '=',
             );
+
             expectType<typeof _execBuffer.stderr, typeof $Buffer.value.stderr>(
               '=',
             );
@@ -542,7 +582,9 @@ describe('exec-async', () => {
         });
       } finally {
         consoleLogSpy.mockRestore();
+
         consoleErrorSpy.mockRestore();
+
         stderrWriteSpy.mockRestore();
       }
     });

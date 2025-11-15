@@ -46,6 +46,7 @@ const cmdDef = cmd.command({
       silent: args.silent ?? false,
     }).catch((error: unknown) => {
       console.error('An error occurred:', error);
+
       process.exit(1);
     });
   },
@@ -67,6 +68,7 @@ const main = async (
     ignoreUnknown: args.ignoreUnknown,
     silent: args.silent,
   });
+
   if (Result.isErr(result)) {
     process.exit(1);
   }

@@ -3,6 +3,7 @@ import 'ts-repo-utils';
 // Now these functions are globally available
 
 const result = await $('npm test');
+
 if (Result.isErr(result)) {
   console.error(result.value);
 }

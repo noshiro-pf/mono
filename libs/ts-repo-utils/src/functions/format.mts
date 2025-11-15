@@ -28,6 +28,7 @@ export const formatFiles = async (
 
   if (files.length === 0) {
     conditionalEcho('No files to format');
+
     return Result.ok(undefined);
   }
 
@@ -45,6 +46,7 @@ export const formatFiles = async (
           } catch {
             // File doesn't exist, skip it
             conditionalEcho(`Skipping non-existent file: ${filePath}`);
+
             return Result.ok(undefined);
           }
 
@@ -64,6 +66,7 @@ export const formatFiles = async (
             (options?.ignore ?? defaultIgnoreFn)(filePath)
           ) {
             conditionalEcho(`Skipping ignored file: ${filePath}`);
+
             return Result.ok(undefined);
           }
 
@@ -73,6 +76,7 @@ export const formatFiles = async (
           ) {
             // Silently skip files with no parser
             conditionalEcho(`Skipping file (no parser): ${filePath}`);
+
             return Result.ok(undefined);
           }
 
@@ -87,6 +91,7 @@ export const formatFiles = async (
             conditionalEcho(`Unchanged: ${filePath}`);
           } else {
             await fs.writeFile(filePath, formatted, 'utf8');
+
             conditionalEcho(`Formatted: ${filePath}`);
           }
 
@@ -95,6 +100,7 @@ export const formatFiles = async (
           if (!silent) {
             console.error(`Error formatting ${filePath}:`, error);
           }
+
           return Result.err(error);
         }
       }),
@@ -102,6 +108,7 @@ export const formatFiles = async (
 
   if (results.every((r) => r.status === 'fulfilled')) {
     const fulfilled = results.map((r) => r.value);
+
     if (fulfilled.every(Result.isOk)) {
       return Result.ok(undefined);
     } else {
@@ -195,8 +202,11 @@ export const formatFilesGlob = async (
   }>,
 ): Promise<Result<undefined, unknown>> => {
   const silent = options?.silent ?? false;
+
   const ignoreUnknown = options?.ignoreUnknown ?? true;
+
   const ignore = options?.ignore;
+
   const conditionalEcho = silent ? () => {} : echo;
 
   try {
@@ -209,6 +219,7 @@ export const formatFilesGlob = async (
 
     if (files.length === 0) {
       conditionalEcho('No files found matching pattern:', pathGlob);
+
       return Result.ok(undefined);
     }
 
@@ -217,6 +228,7 @@ export const formatFilesGlob = async (
     if (!silent) {
       console.error('Error in formatFiles:', error);
     }
+
     return Result.err(error);
   }
 };
@@ -262,6 +274,7 @@ export const formatUncommittedFiles = async (
           untrackedFilesResult.value,
         );
       }
+
       return untrackedFilesResult;
     }
 
@@ -275,6 +288,7 @@ export const formatUncommittedFiles = async (
       if (!silent) {
         console.error('Error getting changed files:', diffFilesResult.value);
       }
+
       return diffFilesResult;
     }
 
@@ -288,6 +302,7 @@ export const formatUncommittedFiles = async (
       if (!silent) {
         console.error('Error getting changed files:', stagedFilesResult.value);
       }
+
       return stagedFilesResult;
     }
 
@@ -355,10 +370,12 @@ export const formatDiffFrom = async (
     if (!silent) {
       console.error('Error getting changed files:', diffFromBaseResult.value);
     }
+
     return diffFromBaseResult;
   }
 
   const diffFiles = diffFromBaseResult.value;
+
   const mut_allFiles: string[] = diffFiles.slice();
 
   // If includeUntracked is true, also get untracked files
@@ -375,6 +392,7 @@ export const formatDiffFrom = async (
         if (!silent) {
           console.error(`Error getting ${type} files:`, filesResult.value);
         }
+
         return filesResult;
       }
 
@@ -408,6 +426,7 @@ export const formatDiffFrom = async (
 
   if (allFiles.length === 0) {
     conditionalEcho('No files to format');
+
     return Result.ok(undefined);
   }
 

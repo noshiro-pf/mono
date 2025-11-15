@@ -12,18 +12,22 @@ const syncCliVersions = async (): Promise<void> => {
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const packageJson = JSON.parse(packageJsonContent) as { version: string };
+
   const targetVersion = packageJson.version;
 
   echo(`Target version: ${targetVersion}`);
 
   // Step 2: Find all CLI command files
   const cmdDir = path.resolve(projectRootPath, './src/cmd');
+
   const cliFiles = await glob('*.mts', { cwd: cmdDir, absolute: true });
 
   echo(`Found ${cliFiles.length} CLI files to update:`);
+
   for (const file of cliFiles) {
     echo(`  - ${path.relative(projectRootPath, file)}`);
   }
+
   echo('');
 
   // Step 3: Update version in each CLI file
@@ -39,31 +43,38 @@ const syncCliVersions = async (): Promise<void> => {
       const versionRegex = /(\s+version:\s+["'`])([^"'`]+)(["'`],?)/gu;
 
       let mut_hasUpdates = false as boolean;
+
       const updatedContent = content.replaceAll(
         versionRegex,
         (match, prefix: string, currentVersion: string, suffix: string) => {
           if (currentVersion !== targetVersion) {
             mut_hasUpdates = true;
+
             echo(`  ${relativePath}: ${currentVersion} → ${targetVersion}`);
+
             return `${prefix}${targetVersion}${suffix}`;
           }
+
           return match;
         },
       );
 
       if (mut_hasUpdates) {
         await fs.writeFile(filePath, updatedContent, 'utf8');
+
         mut_updatedCount += 1;
       } else {
         echo(`  ${relativePath}: already up to date (${targetVersion})`);
       }
     } catch (error) {
       echo(`  ❌ Failed to update ${relativePath}: ${String(error)}`);
+
       process.exit(1);
     }
   }
 
   echo('');
+
   if (mut_updatedCount > 0) {
     echo(
       `✅ Updated ${mut_updatedCount} CLI command${mut_updatedCount === 1 ? '' : 's'}\n`,

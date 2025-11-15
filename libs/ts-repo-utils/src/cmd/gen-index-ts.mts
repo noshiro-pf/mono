@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import * as cmd from 'cmd-ts';
-
 // eslint-disable-next-line import-x/no-internal-modules
 import { type InputOf, type OutputOf } from 'cmd-ts/dist/esm/from.js';
 import { expectType } from 'ts-data-forge';
@@ -71,6 +70,7 @@ const cmdDef = cmd.command({
                 `export-ext should be 'none' or a valid extension`,
               );
             }
+
             return Promise.resolve('none' as const);
           },
         }),
@@ -101,16 +101,22 @@ const cmdDef = cmd.command({
     console.log(args);
 
     expectType<typeof args.targetDirectory, string>('=');
+
     expectType<typeof args.targetExtensions, NonEmptyArray<Ext>>('=');
+
     expectType<typeof args.exportStatementExtension, Ext | 'none'>('=');
+
     expectType<typeof args.indexFileExtension, Ext>('=');
 
     expectType<typeof args.exclude, string[] | undefined>('=');
+
     expectType<typeof args.formatCommand, string | undefined>('=');
+
     expectType<typeof args.silent, boolean | undefined>('=');
 
     main(args).catch((error: unknown) => {
       console.error('An error occurred:', error);
+
       process.exit(1);
     });
   },

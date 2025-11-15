@@ -52,7 +52,7 @@ A promise that resolves to an array of execution results, or rejects
 
 > **executeStages**(`packages`, `scriptName`, `concurrency`): `Promise`\<`void`\>
 
-Defined in: [src/functions/workspace-utils/execute-parallel.mts:110](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L110)
+Defined in: [src/functions/workspace-utils/execute-parallel.mts:116](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/workspace-utils/execute-parallel.mts#L116)
 
 Executes a npm script across packages in dependency order stages. Packages
 are grouped into stages where each stage contains packages whose dependencies

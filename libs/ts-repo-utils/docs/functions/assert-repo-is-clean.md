@@ -12,7 +12,7 @@
 
 > **assertRepoIsClean**(`options?`): `Promise`\<`void`\>
 
-Defined in: [src/functions/assert-repo-is-clean.mts:24](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-clean.mts#L24)
+Defined in: [src/functions/assert-repo-is-clean.mts:26](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/assert-repo-is-clean.mts#L26)
 
 Checks if the repository is clean and exits with code 1 if it is dirty. Shows
 git status and diff output before exiting.

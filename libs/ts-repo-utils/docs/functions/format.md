@@ -12,7 +12,7 @@
 
 > **formatDiffFrom**(`base`, `options?`): `Promise`\<[`Result`](../node-global.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:317](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L317)
+Defined in: [src/functions/format.mts:332](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L332)
 
 Format only files that differ from the specified base branch or commit
 
@@ -67,7 +67,7 @@ Array of file paths to format
 
 > **formatFilesGlob**(`pathGlob`, `options?`): `Promise`\<[`Result`](../node-global.md#result)\<`undefined`, `unknown`\>\>
 
-Defined in: [src/functions/format.mts:189](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L189)
+Defined in: [src/functions/format.mts:196](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L196)
 
 Format files matching the given glob pattern using Prettier
 
@@ -93,7 +93,7 @@ Glob pattern to match files
 
 > **formatUncommittedFiles**(`options?`): `Promise`\<[`Result`](../node-global.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:229](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L229)
+Defined in: [src/functions/format.mts:241](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L241)
 
 Format only files that have been changed (git status)
 

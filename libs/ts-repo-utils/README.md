@@ -250,13 +250,16 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 
 // calculator.mjs
 export const add = (a: number, b: number): number => a + b;
+
 export const multiply = (a: number, b: number): number => a * b;
 
 // Only run main logic when executed directly: node calculator.mjs (or tsx calculator.mts)
 // When imported elsewhere, only the functions are available
 if (isDirectlyExecuted(import.meta.url)) {
     console.log('Calculator CLI');
+
     console.log('2 + 3 =', add(2, 3));
+
     console.log('4 × 5 =', multiply(4, 5));
 }
 ```
@@ -281,6 +284,7 @@ Checks if a file or directory exists at the specified path.
 import { pathExists } from 'ts-repo-utils';
 
 const exists = await pathExists('./src/index.ts');
+
 console.log(exists satisfies boolean); // true or false
 ```
 
@@ -350,6 +354,7 @@ Creates an assert-style wrapper around a function that returns a `Result`, exiti
 import { repoIsDirty } from 'ts-repo-utils';
 
 const isDirty = await repoIsDirty();
+
 if (isDirty) {
     console.log('Repository has uncommitted changes');
 }
@@ -678,6 +683,7 @@ Executes an npm script command across all workspace packages in dependency order
 import { getWorkspacePackages } from 'ts-repo-utils';
 
 const packages = await getWorkspacePackages('.');
+
 console.log(packages.map((pkg) => pkg.name));
 // ['@myorg/package-a', '@myorg/package-b', ...]
 ```
@@ -717,6 +723,7 @@ Retrieves all workspace packages from a monorepo based on the workspace patterns
 import { executeParallel, getWorkspacePackages } from 'ts-repo-utils';
 
 const packages = await getWorkspacePackages('.');
+
 await executeParallel(packages, 'lint', 4);
 ```
 
@@ -726,6 +733,7 @@ await executeParallel(packages, 'lint', 4);
 import { executeStages, getWorkspacePackages } from 'ts-repo-utils';
 
 const packages = await getWorkspacePackages('.');
+
 await executeStages(packages, 'build', 3);
 ```
 
@@ -739,6 +747,7 @@ import 'ts-repo-utils';
 // Now these functions are globally available
 
 const result = await $('npm test');
+
 if (Result.isErr(result)) {
     console.error(result.value);
 }
@@ -830,6 +839,7 @@ import { assertExt, assertPathExists, assertRepoIsClean } from 'ts-repo-utils';
 
 // Check required files exist (exits with code 1 if files don't exist)
 await assertPathExists('./package.json', 'Package manifest');
+
 await assertPathExists('./tsconfig.json', 'TypeScript config');
 
 // Validate extensions

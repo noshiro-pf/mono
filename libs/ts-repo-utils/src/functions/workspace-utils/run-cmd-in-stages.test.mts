@@ -24,9 +24,11 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
 
   const setupSpies = (): MockedSpies => {
     vi.clearAllMocks();
+
     const consoleLogSpy = vi
       .spyOn(console, 'log')
       .mockImplementation((): void => {});
+
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation((): void => {});
@@ -42,7 +44,9 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   const cleanupSpies = (spies: MockedSpies): void => {
     spies.consoleLogSpy.mockRestore();
+
     spies.consoleErrorSpy.mockRestore();
+
     spies.processExitSpy.mockRestore();
   };
 
@@ -76,6 +80,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
 
       // Mock executeStages to throw an error (simulating a failed command)
       const mockError = new Error('package-a exited with code 1');
+
       vi.mocked(executeStages).mockRejectedValue(mockError);
 
       // Record start time
@@ -90,6 +95,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
 
       // Record end time
       const endTime = Date.now();
+
       const executionTime = endTime - startTime;
 
       // Verify that execution was fast (fail-fast behavior)
@@ -103,6 +109,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       expect(spies.consoleErrorSpy).toHaveBeenCalledWith(
         '\n❌ test failed (fail-fast mode stopped execution):',
       );
+
       expect(spies.consoleErrorSpy).toHaveBeenCalledWith(
         'package-a exited with code 1',
       );
@@ -140,6 +147,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       ];
 
       vi.mocked(getWorkspacePackages).mockResolvedValue(mockPackages);
+
       vi.mocked(executeStages).mockResolvedValue(undefined);
 
       // Execute the function
@@ -156,6 +164,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       expect(spies.consoleLogSpy).toHaveBeenCalledWith(
         '\nStarting test across 2 packages (fail-fast mode)...',
       );
+
       expect(spies.consoleLogSpy).toHaveBeenCalledWith(
         '\n✅ test completed successfully (all stages)',
       );
@@ -200,6 +209,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       ];
 
       vi.mocked(getWorkspacePackages).mockResolvedValue(mockPackages);
+
       vi.mocked(executeStages).mockResolvedValue(undefined);
 
       // Filter to only packages starting with 'package-'
@@ -239,6 +249,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
     try {
       // Mock getWorkspacePackages to throw an error
       const mockError = new Error('Failed to load workspace packages');
+
       vi.mocked(getWorkspacePackages).mockRejectedValue(mockError);
 
       // Execute the function
@@ -255,9 +266,11 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       expect(spies.consoleErrorSpy).toHaveBeenCalledWith(
         '\n❌ test failed (fail-fast mode stopped execution):',
       );
+
       expect(spies.consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to load workspace packages',
       );
+
       expect(spies.processExitSpy).toHaveBeenCalledWith(1);
     } finally {
       cleanupSpies(spies);

@@ -33,7 +33,9 @@ describe(formatFilesGlob, () => {
     content: string,
   ): Promise<string> => {
     const filePath = path.join(testDir, filename);
+
     await fs.writeFile(filePath, content, 'utf8');
+
     return filePath;
   };
 
@@ -43,6 +45,7 @@ describe(formatFilesGlob, () => {
 
   test('should format files matching glob pattern', async () => {
     vi.clearAllMocks();
+
     // Setup test directory
     await fs.mkdir(testDir, { recursive: true });
 
@@ -105,6 +108,7 @@ describe(formatFilesGlob, () => {
 
   test('should return ok when no files match pattern', async () => {
     vi.clearAllMocks();
+
     const result = await formatFilesGlob('/non-existent-path/*.ts', {
       silent: true,
     });
@@ -114,6 +118,7 @@ describe(formatFilesGlob, () => {
 
   test('should handle nested directories with glob pattern', async () => {
     vi.clearAllMocks();
+
     // Setup test directory with nested structure
     await fs.mkdir(path.join(testDir, 'src', 'utils'), { recursive: true });
 
@@ -162,7 +167,9 @@ describe(formatFiles, () => {
     content: string,
   ): Promise<string> => {
     const filePath = path.join(testDir, filename);
+
     await fs.writeFile(filePath, content, 'utf8');
+
     return filePath;
   };
 
@@ -172,6 +179,7 @@ describe(formatFiles, () => {
 
   test('should format a list of files', async () => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -222,6 +230,7 @@ describe(formatFiles, () => {
 
   test('should return ok for empty file list', async () => {
     vi.clearAllMocks();
+
     const result = await formatFiles([], {
       silent: true,
     });
@@ -241,14 +250,19 @@ describe(formatUncommittedFiles, () => {
     content: string,
   ): Promise<string> => {
     const filePath = path.join(testDir, filename);
+
     const dir = path.dirname(filePath);
+
     await fs.mkdir(dir, { recursive: true });
+
     await fs.writeFile(filePath, content, 'utf8');
+
     return filePath;
   };
 
   const setupTest = async (): Promise<void> => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
   };
 
@@ -258,25 +272,32 @@ describe(formatUncommittedFiles, () => {
 
   test('should format all uncommitted files by default', async () => {
     await setupTest();
+
     try {
       const untrackedFiles = ['untracked1.ts', 'untracked2.ts'];
+
       const modifiedFiles = ['modified1.ts', 'modified2.ts'];
+
       const stagedFiles = ['staged1.ts', 'staged2.ts'];
 
       // Create test files
       const allFiles = [...untrackedFiles, ...modifiedFiles, ...stagedFiles];
+
       const filePromises = allFiles.map((file) =>
         createTestFile(file, 'const x=1'),
       );
+
       await Promise.all(filePromises);
 
       // Mock git functions
       vi.mocked(getUntrackedFiles).mockResolvedValue(
         Result.ok(untrackedFiles.map((f) => path.join(testDir, f))),
       );
+
       vi.mocked(getModifiedFiles).mockResolvedValue(
         Result.ok(modifiedFiles.map((f) => path.join(testDir, f))),
       );
+
       vi.mocked(getStagedFiles).mockResolvedValue(
         Result.ok(stagedFiles.map((f) => path.join(testDir, f))),
       );
@@ -287,7 +308,9 @@ describe(formatUncommittedFiles, () => {
 
       // Verify all git functions were called
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
+
       expect(getModifiedFiles).toHaveBeenCalledWith({ silent: true });
+
       expect(getStagedFiles).toHaveBeenCalledWith({ silent: true });
 
       // Verify files were formatted
@@ -296,6 +319,7 @@ describe(formatUncommittedFiles, () => {
 
         expect(content).toBe('const x = 1;\n');
       });
+
       await Promise.all(verifyPromises);
     } finally {
       await cleanupTest();
@@ -304,8 +328,10 @@ describe(formatUncommittedFiles, () => {
 
   test('should format only untracked files when specified', async () => {
     await setupTest();
+
     try {
       const untrackedFiles = ['untracked.ts'] as const;
+
       await createTestFile(untrackedFiles[0], 'const x=1');
 
       vi.mocked(getUntrackedFiles).mockResolvedValue(
@@ -322,7 +348,9 @@ describe(formatUncommittedFiles, () => {
       expect(Result.isOk(result)).toBe(true);
 
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
+
       expect(getModifiedFiles).not.toHaveBeenCalled();
+
       expect(getStagedFiles).not.toHaveBeenCalled();
     } finally {
       await cleanupTest();
@@ -331,8 +359,10 @@ describe(formatUncommittedFiles, () => {
 
   test('should format only modified files when specified', async () => {
     await setupTest();
+
     try {
       const modifiedFiles = ['modified.ts'] as const;
+
       await createTestFile(modifiedFiles[0], 'const x=1');
 
       vi.mocked(getModifiedFiles).mockResolvedValue(
@@ -349,7 +379,9 @@ describe(formatUncommittedFiles, () => {
       expect(Result.isOk(result)).toBe(true);
 
       expect(getUntrackedFiles).not.toHaveBeenCalled();
+
       expect(getModifiedFiles).toHaveBeenCalledWith({ silent: true });
+
       expect(getStagedFiles).not.toHaveBeenCalled();
     } finally {
       await cleanupTest();
@@ -358,8 +390,10 @@ describe(formatUncommittedFiles, () => {
 
   test('should format only staged files when specified', async () => {
     await setupTest();
+
     try {
       const stagedFiles = ['staged.ts'] as const;
+
       await createTestFile(stagedFiles[0], 'const x=1');
 
       vi.mocked(getStagedFiles).mockResolvedValue(
@@ -376,7 +410,9 @@ describe(formatUncommittedFiles, () => {
       expect(Result.isOk(result)).toBe(true);
 
       expect(getUntrackedFiles).not.toHaveBeenCalled();
+
       expect(getModifiedFiles).not.toHaveBeenCalled();
+
       expect(getStagedFiles).toHaveBeenCalledWith({ silent: true });
     } finally {
       await cleanupTest();
@@ -385,19 +421,24 @@ describe(formatUncommittedFiles, () => {
 
   test('should handle combinations of file types', async () => {
     await setupTest();
+
     try {
       const untrackedFiles = ['untracked.ts'];
+
       const stagedFiles = ['staged.ts'];
 
       const allFiles = [...untrackedFiles, ...stagedFiles];
+
       const filePromises = allFiles.map((file) =>
         createTestFile(file, 'const x=1'),
       );
+
       await Promise.all(filePromises);
 
       vi.mocked(getUntrackedFiles).mockResolvedValue(
         Result.ok(untrackedFiles.map((f) => path.join(testDir, f))),
       );
+
       vi.mocked(getStagedFiles).mockResolvedValue(
         Result.ok(stagedFiles.map((f) => path.join(testDir, f))),
       );
@@ -412,7 +453,9 @@ describe(formatUncommittedFiles, () => {
       expect(Result.isOk(result)).toBe(true);
 
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
+
       expect(getModifiedFiles).not.toHaveBeenCalled();
+
       expect(getStagedFiles).toHaveBeenCalledWith({ silent: true });
     } finally {
       await cleanupTest();
@@ -421,15 +464,19 @@ describe(formatUncommittedFiles, () => {
 
   test('should deduplicate files that appear in multiple categories', async () => {
     await setupTest();
+
     try {
       const duplicateFile = path.join(testDir, 'duplicate.ts');
+
       await createTestFile('duplicate.ts', 'const x=1');
 
       // Mock the same file appearing in multiple categories
       vi.mocked(getUntrackedFiles).mockResolvedValue(
         Result.ok([duplicateFile]),
       );
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([duplicateFile]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([duplicateFile]));
 
       const result = await formatUncommittedFiles({ silent: true });
@@ -447,9 +494,12 @@ describe(formatUncommittedFiles, () => {
 
   test('should handle empty file lists', async () => {
     await setupTest();
+
     try {
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatUncommittedFiles({ silent: true });
@@ -462,8 +512,10 @@ describe(formatUncommittedFiles, () => {
 
   test('should return error when getUntrackedFiles fails', async () => {
     await setupTest();
+
     try {
       const error = { message: 'Git error' };
+
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.err(error));
 
       const result = await formatUncommittedFiles({
@@ -485,8 +537,10 @@ describe(formatUncommittedFiles, () => {
 
   test('should return error when getModifiedFiles fails', async () => {
     await setupTest();
+
     try {
       const error = { message: 'Git error' };
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.err(error));
 
       const result = await formatUncommittedFiles({
@@ -508,8 +562,10 @@ describe(formatUncommittedFiles, () => {
 
   test('should return error when getStagedFiles fails', async () => {
     await setupTest();
+
     try {
       const error = { message: 'Git error' };
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.err(error));
 
       const result = await formatUncommittedFiles({
@@ -531,16 +587,20 @@ describe(formatUncommittedFiles, () => {
 
   test('should respect silent option', async () => {
     await setupTest();
+
     try {
       // Using vi.stubGlobal to avoid direct assignment
       const consoleErrorStub = vi.fn();
+
       vi.stubGlobal('console', {
         ...console,
         error: consoleErrorStub,
       });
 
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result1 = await formatUncommittedFiles({ silent: false });
@@ -561,8 +621,10 @@ describe(formatUncommittedFiles, () => {
 
   test('should format TypeScript files correctly', async () => {
     await setupTest();
+
     try {
       const testFile = 'test.ts';
+
       await createTestFile(
         testFile,
         dedent`
@@ -574,7 +636,9 @@ describe(formatUncommittedFiles, () => {
       vi.mocked(getUntrackedFiles).mockResolvedValue(
         Result.ok([path.join(testDir, testFile)]),
       );
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatUncommittedFiles({ silent: true });
@@ -598,16 +662,21 @@ describe(formatUncommittedFiles, () => {
 
   test('should handle non-formattable files gracefully', async () => {
     await setupTest();
+
     try {
       const binaryFile = 'test.bin';
+
       const binaryPath = path.join(testDir, binaryFile);
+
       await createTestFile(
         binaryFile,
         Buffer.from([0x00, 0x01, 0x02]).toString(),
       );
 
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([binaryPath]));
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatUncommittedFiles({ silent: true });
@@ -631,7 +700,9 @@ describe(formatDiffFrom, () => {
     content: string,
   ): Promise<string> => {
     const filePath = path.join(testDir, filename);
+
     await fs.writeFile(filePath, content, 'utf8');
+
     return filePath;
   };
 
@@ -640,6 +711,7 @@ describe(formatDiffFrom, () => {
 
   test('should format files from diff', async () => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -654,7 +726,9 @@ describe(formatDiffFrom, () => {
       vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([file1]));
 
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatDiffFrom('main', { silent: true });
@@ -679,6 +753,7 @@ describe(formatDiffFrom, () => {
 
   test('should include untracked files when option is set', async () => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -698,10 +773,13 @@ describe(formatDiffFrom, () => {
 
       // Mock both functions
       vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([diffFile]));
+
       vi.mocked(getUntrackedFiles).mockResolvedValue(
         Result.ok([untrackedFile]),
       );
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatDiffFrom('main', {
@@ -729,6 +807,7 @@ describe(formatDiffFrom, () => {
       );
 
       expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
+
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
     } finally {
       await fs.rm(testDir, { recursive: true, force: true });
@@ -737,6 +816,7 @@ describe(formatDiffFrom, () => {
 
   test('should deduplicate files when including untracked', async () => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -749,8 +829,11 @@ describe(formatDiffFrom, () => {
 
       // Mock both functions to return the same file
       vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([sharedFile]));
+
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([sharedFile]));
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatDiffFrom('main', {
@@ -762,6 +845,7 @@ describe(formatDiffFrom, () => {
 
       // Verify both functions were called
       expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
+
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
 
       // Check that the file was formatted (content should change)
@@ -779,6 +863,7 @@ describe(formatDiffFrom, () => {
 
   test('should include both staged and untracked files by default', async () => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -805,10 +890,13 @@ describe(formatDiffFrom, () => {
 
       // Mock all functions
       vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([diffFile]));
+
       vi.mocked(getUntrackedFiles).mockResolvedValue(
         Result.ok([untrackedFile]),
       );
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([stagedFile]));
 
       // Test default behavior (no options provided)
@@ -843,7 +931,9 @@ describe(formatDiffFrom, () => {
 
       // Verify all functions were called by default
       expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
+
       expect(getStagedFiles).toHaveBeenCalledWith({ silent: true });
+
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
     } finally {
       await fs.rm(testDir, { recursive: true, force: true });
@@ -852,6 +942,7 @@ describe(formatDiffFrom, () => {
 
   test('should include staged files when option is set', async () => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -871,8 +962,11 @@ describe(formatDiffFrom, () => {
 
       // Mock all functions
       vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([diffFile]));
+
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([stagedFile]));
 
       const result = await formatDiffFrom('main', {
@@ -902,7 +996,9 @@ describe(formatDiffFrom, () => {
       );
 
       expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
+
       expect(getStagedFiles).toHaveBeenCalledWith({ silent: true });
+
       expect(getUntrackedFiles).not.toHaveBeenCalled();
     } finally {
       await fs.rm(testDir, { recursive: true, force: true });
@@ -911,6 +1007,7 @@ describe(formatDiffFrom, () => {
 
   test('should deduplicate files when including both staged and untracked', async () => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -923,8 +1020,11 @@ describe(formatDiffFrom, () => {
 
       // Mock all functions to return the same file
       vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([sharedFile]));
+
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([sharedFile]));
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([sharedFile]));
 
       const result = await formatDiffFrom('main', {
@@ -937,7 +1037,9 @@ describe(formatDiffFrom, () => {
 
       // Verify all functions were called
       expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
+
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
+
       expect(getStagedFiles).toHaveBeenCalledWith({ silent: true });
 
       // Check that the file was formatted (content should change)
@@ -955,6 +1057,7 @@ describe(formatDiffFrom, () => {
 
   test('should exclude staged files when option is set to false', async () => {
     vi.clearAllMocks();
+
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -967,8 +1070,11 @@ describe(formatDiffFrom, () => {
 
       // Mock functions - staged should not be called
       vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([diffFile]));
+
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
       vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
 
       const result = await formatDiffFrom('main', {
@@ -990,8 +1096,11 @@ describe(formatDiffFrom, () => {
       );
 
       expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
+
       expect(getStagedFiles).not.toHaveBeenCalled();
+
       expect(getUntrackedFiles).not.toHaveBeenCalled();
+
       expect(getModifiedFiles).not.toHaveBeenCalled();
     } finally {
       await fs.rm(testDir, { recursive: true, force: true });

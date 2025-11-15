@@ -50,6 +50,7 @@ export const checkExt = async (
         );
       } catch (error) {
         console.error(`Failed to check directory ${dir}: ${String(error)}`);
+
         return [];
       }
     }),
@@ -111,6 +112,7 @@ const getFilesWithIncorrectExtension = async (
   await assertPathExists(dir, 'Directory');
 
   const defaultIgnorePatterns = ['tsconfig.json', 'globals.d.*'];
+
   const finalIgnorePatterns = ignorePatterns ?? defaultIgnorePatterns;
 
   // Convert relative patterns to absolute paths for the glob ignore option
@@ -139,6 +141,7 @@ const describeExpectedExtensions = (config: CheckExtConfig): string => {
   > = Arr.groupBy(
     config.directories.map(({ path: dirPath, extension }) => {
       const relativePath = path.relative(process.cwd(), dirPath);
+
       const extKey = isString(extension) ? extension : extension.join(' or ');
 
       return {
@@ -155,6 +158,7 @@ const describeExpectedExtensions = (config: CheckExtConfig): string => {
       dirs.length === 1
         ? dirs[0]?.relativePath
         : dirs.map((d) => d.relativePath).join(', ');
+
     return `${dirList} should have ${ext} extension`;
   });
 

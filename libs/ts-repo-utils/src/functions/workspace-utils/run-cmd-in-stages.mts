@@ -43,14 +43,19 @@ export const runCmdInStagesAcrossWorkspaces = async ({
     console.log(
       `\nStarting ${cmd} across ${filteredPackages.length} packages (fail-fast mode)...`,
     );
+
     await executeStages(filteredPackages, cmd, concurrency);
+
     console.log(`\n✅ ${cmd} completed successfully (all stages)`);
   } catch (error) {
     const errorMessage = isError(error)
       ? error.message
       : (error?.toString() ?? '');
+
     console.error(`\n❌ ${cmd} failed (fail-fast mode stopped execution):`);
+
     console.error(errorMessage);
+
     process.exit(1);
   }
 };
