@@ -19,6 +19,7 @@ type R0 = DeepReadonly<{
 }>;
 
 type K0 = RecordLeafPaths<R0>;
+
 expectType<
   K0,
   | readonly ['x', 'a']
@@ -36,6 +37,7 @@ expectType<
 >('=');
 
 type K1 = RecordLeafPathsWithIndex<R0>;
+
 expectType<
   K1,
   | readonly ['x', 'a']
@@ -54,10 +56,13 @@ expectType<
 >('=');
 
 type K2 = RecordLeafPathsWithIndex<[]>;
+
 expectType<K2, readonly []>('=');
+
 expectType<RecordLeafPathsWithIndex<Record<1, unknown>>, readonly [1]>('=');
 
 type K3 = RecordPathsWithIndex<R0>;
+
 expectType<
   K3,
   | readonly ['x', 'a']
@@ -91,6 +96,7 @@ expectType<
 >('=');
 
 type K4 = RecordPaths<R0>;
+
 expectType<
   K4,
   | readonly ['x', 'a']

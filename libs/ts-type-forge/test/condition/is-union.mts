@@ -1,12 +1,19 @@
 import { expectType } from '../expect-type.mjs';
 
 expectType<IsUnion<never>, false>('=');
+
 expectType<IsUnion<unknown>, false>('=');
+
 expectType<IsUnion<any>, false>('=');
+
 expectType<IsUnion<string>, false>('=');
+
 expectType<IsUnion<true | false>, true>('=');
+
 expectType<IsUnion<boolean>, true>('=');
+
 expectType<IsUnion<number | string>, true>('=');
+
 expectType<IsUnion<[number | string]>, false>('=');
 
 expectType<

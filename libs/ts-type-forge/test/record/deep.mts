@@ -68,11 +68,17 @@ type RequiredBase = {
 {
   // Primitives
   expectType<DeepReadonly<string>, string>('=');
+
   expectType<DeepReadonly<number>, number>('=');
+
   expectType<DeepReadonly<boolean>, boolean>('=');
+
   expectType<DeepReadonly<null>, null>('=');
+
   expectType<DeepReadonly<undefined>, undefined>('=');
+
   expectType<DeepReadonly<symbol>, symbol>('=');
+
   expectType<DeepReadonly<bigint>, bigint>('=');
 
   // Function
@@ -141,11 +147,17 @@ type RequiredBase = {
 {
   // Primitives
   expectType<DeepMutable<string>, string>('=');
+
   expectType<DeepMutable<number>, number>('=');
+
   expectType<DeepMutable<boolean>, boolean>('=');
+
   expectType<DeepMutable<null>, null>('=');
+
   expectType<DeepMutable<undefined>, undefined>('=');
+
   expectType<DeepMutable<symbol>, symbol>('=');
+
   expectType<DeepMutable<bigint>, bigint>('=');
 
   // Function
@@ -179,11 +191,17 @@ type RequiredBase = {
 {
   // Primitives
   expectType<DeepPartial<string>, string>('=');
+
   expectType<DeepPartial<number>, number>('=');
+
   expectType<DeepPartial<boolean>, boolean>('=');
+
   expectType<DeepPartial<null>, null>('=');
+
   expectType<DeepPartial<undefined>, undefined>('=');
+
   expectType<DeepPartial<symbol>, symbol>('=');
+
   expectType<DeepPartial<bigint>, bigint>('=');
 
   // Function
@@ -216,7 +234,9 @@ type RequiredBase = {
   // Complex Type
 
   expectType<DeepPartial<Base>, PartialBase>('=');
+
   expectType<DeepPartial<PartialBase>, PartialBase>('=');
+
   expectType<DeepPartial<RequiredBase>, PartialBase>('=');
 }
 
@@ -224,11 +244,17 @@ type RequiredBase = {
 {
   // Primitives
   expectType<DeepRequired<string>, string>('=');
+
   expectType<DeepRequired<number>, number>('=');
+
   expectType<DeepRequired<boolean>, boolean>('=');
+
   expectType<DeepRequired<null>, null>('=');
+
   expectType<DeepRequired<undefined>, undefined>('='); // Note: undefined remains undefined
+
   expectType<DeepRequired<symbol>, symbol>('=');
+
   expectType<DeepRequired<bigint>, bigint>('=');
 
   // Function
@@ -236,7 +262,9 @@ type RequiredBase = {
 
   // Simple Object with optional
   expectType<DeepRequired<{ a?: number }>, { a: number }>('=');
+
   expectType<DeepRequired<{ a?: number }>, { a: number }>('=');
+
   expectType<
     DeepRequired<{ a: number | undefined }>,
     { a: number | undefined }

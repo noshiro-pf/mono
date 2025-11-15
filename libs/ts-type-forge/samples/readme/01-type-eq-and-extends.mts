@@ -2,14 +2,17 @@
 // import type { TypeEq, TypeExtends } from 'ts-type-forge'; // if importing explicitly
 
 type User = { id: number; name: string };
+
 type Admin = { id: number; name: string; role: 'admin' };
 
 // Check exact type equality
 type IsExactMatch = TypeEq<User, Admin>; // false
+
 type IsSameType = TypeEq<User, User>; // true
 
 // Check type extension relationships
 type AdminExtendsUser = TypeExtends<Admin, User>; // true
+
 type UserExtendsAdmin = TypeExtends<User, Admin>; // false
 
 // Use in conditional types
@@ -21,6 +24,7 @@ type GetUserType<T> =
       : 'unknown';
 
 type AdminType = GetUserType<Admin>; // 'admin'
+
 type UserType = GetUserType<User>; // 'user'
 
 // embed-sample-code-ignore-below

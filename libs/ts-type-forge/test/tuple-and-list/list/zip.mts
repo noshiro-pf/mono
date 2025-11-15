@@ -1,7 +1,9 @@
 import { expectType } from '../../expect-type.mjs';
 
 expectType<List.Zip<readonly [], readonly []>, readonly []>('=');
+
 expectType<List.Zip<readonly [1], readonly []>, readonly []>('=');
+
 expectType<List.Zip<readonly [], readonly [1]>, readonly []>('=');
 
 // <= かつ >= だが "=" だとエラーになってしまう
@@ -9,6 +11,7 @@ expectType<
   List.Zip<ArrayOfLength<32, 1>, ArrayOfLength<32, 2>>,
   ArrayOfLength<32, readonly [1, 2]>
 >('<=');
+
 expectType<
   ArrayOfLength<32, readonly [1, 2]>,
   List.Zip<ArrayOfLength<32, 1>, ArrayOfLength<32, 2>>

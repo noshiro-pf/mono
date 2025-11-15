@@ -5,6 +5,7 @@ const srcDir = path.resolve(projectRootPath, './src');
 const readmePath = path.resolve(projectRootPath, './README.md');
 
 const typeRegex = /^type ([^< =]*)/u;
+
 const namespaceRegex = /^declare namespace ([^ {]*)/u;
 
 const markers = {
@@ -34,11 +35,13 @@ const processFile = async (
 
   try {
     const content = await fs.readFile(filePath, 'utf8');
+
     const lines = content.split('\n');
 
     for (const [index, line] of lines.entries()) {
       {
         const match = typeRegex.exec(line);
+
         if (match?.[1] !== undefined) {
           // Exclude internal namespace helper types if needed (adjust regex if necessary)
           // For now, just matching the pattern
@@ -48,14 +51,17 @@ const processFile = async (
           });
         }
       }
+
       {
         const namespaceMatch = namespaceRegex.exec(line);
+
         if (
           namespaceMatch?.[1] !== undefined &&
           namespaceMatch[1] !== TSTypeForgeInternals // Exclude TSTypeForgeInternals namespace
         ) {
           for (const [idx, l] of lines.entries()) {
             const typeMatch = typeRegex.exec(l.trimStart());
+
             if (typeMatch?.[1] !== undefined) {
               // Exclude internal namespace helper types if needed (adjust regex if necessary)
               // For now, just matching the pattern
@@ -71,6 +77,7 @@ const processFile = async (
   } catch (error) {
     console.error(`Error processing file ${filePath}:`, error);
   }
+
   return {
     relativePath,
     types: mut_results,

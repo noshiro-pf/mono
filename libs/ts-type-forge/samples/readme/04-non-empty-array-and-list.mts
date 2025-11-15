@@ -32,9 +32,13 @@ const getFirstPostTitle = (posts: NonEmptyArray<Post>): string =>
 type NumberList = readonly [1, 2, 3, 4, 5];
 
 type FirstElement = List.Head<NumberList>; // 1
+
 type LastElement = List.Last<NumberList>; // 5
+
 type WithoutFirst = List.Tail<NumberList>; // readonly [2, 3, 4, 5]
+
 type FirstThree = List.Take<3, NumberList>; // readonly [1, 2, 3]
+
 type Reversed = List.Reverse<NumberList>; // readonly [5, 4, 3, 2, 1]
 
 // Combine operations

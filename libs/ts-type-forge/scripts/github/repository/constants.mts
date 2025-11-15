@@ -62,8 +62,5 @@ export type RepositoryKeysToPick = StrictExclude<
 
 expectType<keyof UpdateRepositoryRequest, RepositoryKeysToPick>('>=');
 
-export const RepositoryPicked = t.pick(FullRepository, repositoryKeysToPick, {
-  allowExcessProperties: true,
-});
-
+export const RepositoryPicked = t.pick(FullRepository, repositoryKeysToPick);
 export type RepositoryPicked = t.TypeOf<typeof RepositoryPicked>;

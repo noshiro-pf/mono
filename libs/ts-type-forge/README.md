@@ -152,14 +152,17 @@ The type utilities allow you to perform complex type checking and assertions at 
 // import type { TypeEq, TypeExtends } from 'ts-type-forge'; // if importing explicitly
 
 type User = { id: number; name: string };
+
 type Admin = { id: number; name: string; role: 'admin' };
 
 // Check exact type equality
 type IsExactMatch = TypeEq<User, Admin>; // false
+
 type IsSameType = TypeEq<User, User>; // true
 
 // Check type extension relationships
 type AdminExtendsUser = TypeExtends<Admin, User>; // true
+
 type UserExtendsAdmin = TypeExtends<User, Admin>; // false
 
 // Use in conditional types
@@ -171,6 +174,7 @@ type GetUserType<T> =
           : 'unknown';
 
 type AdminType = GetUserType<Admin>; // 'admin'
+
 type UserType = GetUserType<User>; // 'user'
 ```
 
@@ -211,8 +215,10 @@ const config: ReadonlyConfig = {
 // @ts-expect-error Cannot assign to 'port' because it is a read-only property
 // eslint-disable-next-line unicorn/no-immediate-mutation
 config.port = 8081;
+
 // @ts-expect-error Cannot assign to 'host' because it is a read-only property
 config.database.host = 'remote';
+
 // @ts-expect-error Property 'push' does not exist on type 'readonly string[]'
 config.features.push('featureC');
 
@@ -303,9 +309,13 @@ const getFirstPostTitle = (posts: NonEmptyArray<Post>): string =>
 type NumberList = readonly [1, 2, 3, 4, 5];
 
 type FirstElement = List.Head<NumberList>; // 1
+
 type LastElement = List.Last<NumberList>; // 5
+
 type WithoutFirst = List.Tail<NumberList>; // readonly [2, 3, 4, 5]
+
 type FirstThree = List.Take<3, NumberList>; // readonly [1, 2, 3]
+
 type Reversed = List.Reverse<NumberList>; // readonly [5, 4, 3, 2, 1]
 
 // Combine operations
@@ -386,31 +396,40 @@ export const parseIntegerInclusive = (
 
 // Valid usages:
 parseInteger('10'); // radix defaults to 10
+
 parseInteger('10', 2); // Binary
+
 parseInteger('255', 16); // Hexadecimal
+
 parseInteger('123', 36); // Maximum base
 
 // Invalid usages (TypeScript will error):
 // @ts-expect-error Argument of type '1' is not assignable to parameter of type 'UintRange<2, 37> | undefined'
 parseInteger('10', 1);
+
 // @ts-expect-error Argument of type '37' is not assignable to parameter of type 'UintRange<2, 37> | undefined'
 parseInteger('10', 37);
 
 // Branded types for additional safety
 type UserId = Brand<number, 'UserId'>;
+
 type ProductId = Brand<number, 'ProductId'>;
 
 // Create branded values (you would typically have constructor functions)
 declare const userId: UserId;
+
 declare const productId: ProductId;
 
 // Type-safe functions that can't mix up IDs
 const getUserById = (id: UserId): User | undefined => {
     /* ... */
+
     return undefined;
 };
+
 const getProductById = (id: ProductId): Product | undefined => {
     /* ... */
+
     return undefined;
 };
 

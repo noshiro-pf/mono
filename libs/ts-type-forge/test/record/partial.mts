@@ -240,6 +240,7 @@ type Base = {
 // --- MapToNever ---
 {
   expectType<MapToNever<{ a: 1; b: 'x' }>, { a: never; b: never }>('=');
+
   expectType<MapToNever<{}>, {}>('=');
 }
 

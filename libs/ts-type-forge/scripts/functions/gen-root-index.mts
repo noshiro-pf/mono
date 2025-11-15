@@ -8,6 +8,7 @@ export const genRootIndex = async (
 
   if (dtsFiles.length === 0) {
     console.log('No .d.mts files found (excluding index.d.mts).');
+
     // Optionally clear the index file or leave it as is
     // await fs.writeFile(indexFilePath, '', 'utf-8');
     return;
@@ -19,6 +20,7 @@ export const genRootIndex = async (
       const relativePath = path
         .relative(srcDir, filePath)
         .replaceAll('\\', '/');
+
       return `/// <reference path="./${relativePath}" />`;
     })
     .toSorted(); // Sort alphabetically for consistent order
@@ -27,6 +29,7 @@ export const genRootIndex = async (
 
   try {
     await fs.writeFile(indexFilePath, fileContent, 'utf8');
+
     console.log(
       `Successfully generated ${indexFilePath} with ${referenceLines.length} references.`,
     );
@@ -40,5 +43,6 @@ const getDtsFiles = async (
   indexFilePath: string,
 ): Promise<readonly string[]> => {
   const dtsFiles = await glob(`${srcDir}/**/*.d.mts`);
+
   return dtsFiles.filter((filePath) => filePath !== indexFilePath);
 };

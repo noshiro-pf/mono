@@ -15,10 +15,12 @@ expectType<MutableUser, { id: number; name: string; email: string }>('=');
 
 // Test that Mutable removes readonly modifiers
 expectType<Mutable<Readonly<{ a: string }>>, { a: string }>('=');
+
 expectType<
   Mutable<{ readonly a: string; b: number }>,
   { a: string; b: number }
 >('=');
+
 expectType<
   Mutable<Readonly<{ x: boolean; y: string }>>,
   { x: boolean; y: string }
@@ -48,25 +50,33 @@ expectType<
 // Test ToMutableMap utility type
 
 expectType<ToMutableMap<ReadonlyMap<string, number>>, Map<string, number>>('=');
+
 expectType<ToMutableMap<ReadonlyMap<number, string>>, Map<number, string>>('=');
+
 expectType<ToMutableMap<ReadonlyMap<any, any>>, Map<any, any>>('=');
 
 // Test ToMutableSet utility type
 
 expectType<ToMutableSet<ReadonlySet<string>>, Set<string>>('=');
+
 expectType<ToMutableSet<ReadonlySet<number>>, Set<number>>('=');
+
 expectType<ToMutableSet<ReadonlySet<any>>, Set<any>>('=');
 
 // Test MutableSet alias
 
 expectType<MutableSet<string>, Set<string>>('=');
+
 expectType<MutableSet<number>, Set<number>>('=');
+
 expectType<MutableSet<any>, Set<any>>('=');
 
 // Test MutableMap alias
 
 expectType<MutableMap<string, number>, Map<string, number>>('=');
+
 expectType<MutableMap<number, string>, Map<number, string>>('=');
+
 expectType<MutableMap<any, any>, Map<any, any>>('=');
 
 // Test edge cases
@@ -85,10 +95,12 @@ expectType<
 
 // Test interaction with built-in Readonly
 type TestReadonlyInteraction = Mutable<Readonly<{ a: string; b: number }>>;
+
 expectType<TestReadonlyInteraction, { a: string; b: number }>('=');
 
 // Test that Mutable is idempotent for already mutable objects
 type AlreadyMutable = { a: string; b: number };
+
 expectType<Mutable<AlreadyMutable>, AlreadyMutable>('=');
 
 // Test with union types

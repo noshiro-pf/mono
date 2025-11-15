@@ -33,6 +33,7 @@ type R0 = DeepReadonly<{
 }>;
 
 expectType<RecordUpdated<R0, readonly [], 'changed'>, 'changed'>('=');
+
 expectType<RecordUpdated<R0, readonly [], never>, never>('=');
 
 expectType<
