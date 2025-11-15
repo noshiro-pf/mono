@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.1...v1.0.2) (2025-11-15)
+
+### Bug Fixes
+
+- fix commands ([59d9ec2](https://github.com/noshiro-pf/github-settings-as-code/commit/59d9ec2df1609035fc015fc001c0ee6a2bba158d))
+
 ## [1.0.1](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.0...v1.0.1) (2025-11-15)
 
 ### Bug Fixes
