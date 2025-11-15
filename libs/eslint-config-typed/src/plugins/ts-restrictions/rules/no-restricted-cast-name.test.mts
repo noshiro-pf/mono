@@ -2,8 +2,6 @@ import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { noRestrictedCastName } from './no-restricted-cast-name.mjs';
 
-/* eslint-disable vitest/expect-expect */
-
 const tester = new RuleTester({
   languageOptions: {
     parser,
@@ -15,7 +13,7 @@ const tester = new RuleTester({
 });
 
 describe('no-restricted-cast-name', () => {
-  test('validates with string options', () => {
+  describe('with string options', () => {
     tester.run(
       'no-restricted-cast-name with string options',
       noRestrictedCastName,
@@ -79,7 +77,7 @@ describe('no-restricted-cast-name', () => {
     );
   });
 
-  test('validates with fixWith type option', () => {
+  describe('with fixWith type option', () => {
     tester.run(
       'no-restricted-cast-name with fixWith type option',
       noRestrictedCastName,
@@ -140,7 +138,7 @@ describe('no-restricted-cast-name', () => {
     );
   });
 
-  test('validates with fixWith function option', () => {
+  describe('with fixWith function option', () => {
     tester.run(
       'no-restricted-cast-name with fixWith function option',
       noRestrictedCastName,
@@ -210,7 +208,7 @@ describe('no-restricted-cast-name', () => {
     );
   });
 
-  test('validates with multiple options', () => {
+  describe('with multiple options', () => {
     tester.run(
       'no-restricted-cast-name with multiple options',
       noRestrictedCastName,
@@ -263,7 +261,7 @@ describe('no-restricted-cast-name', () => {
     );
   });
 
-  test('validates qualified type names', () => {
+  describe('with qualified type names', () => {
     tester.run(
       'no-restricted-cast-name with qualified type names',
       noRestrictedCastName,

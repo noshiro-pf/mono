@@ -30,6 +30,30 @@ const getTypeName = (
 ): string | undefined => {
   if (typeAnnotation === undefined) return undefined;
 
+  if (typeAnnotation.type === AST_NODE_TYPES.TSAnyKeyword) {
+    return 'any';
+  }
+
+  if (typeAnnotation.type === AST_NODE_TYPES.TSUnknownKeyword) {
+    return 'unknown';
+  }
+
+  if (typeAnnotation.type === AST_NODE_TYPES.TSNeverKeyword) {
+    return 'never';
+  }
+
+  if (typeAnnotation.type === AST_NODE_TYPES.TSStringKeyword) {
+    return 'string';
+  }
+
+  if (typeAnnotation.type === AST_NODE_TYPES.TSNumberKeyword) {
+    return 'number';
+  }
+
+  if (typeAnnotation.type === AST_NODE_TYPES.TSBooleanKeyword) {
+    return 'boolean';
+  }
+
   if (typeAnnotation.type === AST_NODE_TYPES.TSTypeReference) {
     const { typeName } = typeAnnotation;
 
