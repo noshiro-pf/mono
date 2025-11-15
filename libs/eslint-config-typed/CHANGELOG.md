@@ -1,3 +1,9 @@
+# [3.12.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.11.0...v3.12.0) (2025-11-15)
+
+### Features
+
+- add eslint-plugin-math ([#140](https://github.com/noshiro-pf/eslint-config-typed/issues/140)) ([a3a70de](https://github.com/noshiro-pf/eslint-config-typed/commit/a3a70de8b5fa7a5fa9462ba1988e19e0ffec3eba))
+
 # [3.11.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.10.0...v3.11.0) (2025-11-15)
 
 ### Features
