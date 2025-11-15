@@ -1,6 +1,6 @@
 import { unknownToString } from 'ts-data-forge';
 import 'ts-repo-utils';
-import { genRootIndex } from '../functions/gen-root-index.mjs';
+import { genRootIndex } from '../functions/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const srcDir = path.resolve(projectRootPath, 'src');
@@ -13,37 +13,50 @@ const indexFilePath = path.resolve(srcDir, 'index.d.mts');
 const build = async (): Promise<void> => {
   echo('Starting build process...\n');
 
-  // Step 1: Generate dist tsconfig
-  {
-    echo('1. Generating root index.d.mts...');
+  await logStep({
+    startMessage: 'Generating root index.d.mts',
+    action: () =>
+      runStep(
+        Result.fromPromise(genRootIndex(srcDir, indexFilePath)),
+        'Failed to generate tsconfig',
+      ),
+    successMessage: 'Generated src/index.d.mts',
+  });
 
-    await runStep(
-      Result.fromPromise(genRootIndex(srcDir, indexFilePath)),
-      'Failed to generate tsconfig',
-    );
+  await logStep({
+    startMessage: 'Checking file extensions',
+    action: () =>
+      runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+    successMessage: 'File extensions validated',
+  });
 
-    echo('✓ Generated src/index.d.mts\n');
-  }
-
-  // Step 2: Validate file extensions
-  {
-    echo('2. Checking file extensions...');
-
-    await runCmdStep('pnpm run check:ext', 'Checking file extensions failed');
-
-    echo('✓ File extensions validated\n');
-  }
-
-  // Step 3: Type checking
-  {
-    echo('3. Running type checking...');
-
-    await runCmdStep('tsc --noEmit', 'Type checking failed');
-
-    echo('✓ Type checking passed\n');
-  }
+  await logStep({
+    startMessage: 'Running type checking',
+    action: () => runCmdStep('tsc --noEmit', 'Type checking failed'),
+    successMessage: 'Type checking passed',
+  });
 
   echo('✅ Build completed successfully!\n');
+};
+
+const step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  echo(`${step.current}. ${startMessage}...`);
+
+  await action();
+
+  echo(`✓ ${successMessage}.\n`);
+
+  step.current += 1;
 };
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {

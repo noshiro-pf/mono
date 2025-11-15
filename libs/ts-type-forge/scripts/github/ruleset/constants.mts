@@ -23,4 +23,5 @@ expectType<keyof UpdateRulesetRequest | 'id', KeysToPick>('=');
 expectType<keyof CreateRulesetRequest, keyof UpdateRulesetRequest>('=');
 
 export const RulesetPicked = t.pick(RepositoryRuleset, rulesetKeysToPick);
+
 export type RulesetPicked = t.TypeOf<typeof RulesetPicked>;
