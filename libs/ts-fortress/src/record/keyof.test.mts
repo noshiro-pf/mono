@@ -97,7 +97,7 @@ describe(keyof, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'The value is expected to be one of the elements contained in { year, month, date }',
+        'Error: expected one of { year, month, date } but "minutes" was passed.',
       ]);
     });
   });

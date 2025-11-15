@@ -148,9 +148,9 @@ describe('validation-error', () => {
       ];
 
       assert.deepStrictEqual(validationErrorsToMessages(errors), [
-        'Expected <string> at user.name, got <number> type value `123`.',
-        'Expected <number> at items.0, got <string> type value "invalid".',
-        'Expected <boolean>, got <object> type value `null`.',
+        'Error at user.name: expected <string> value but <number> type value `123` was passed.',
+        'Error at items.0: expected <number> value but <string> type value "invalid" was passed.',
+        'Error: expected <boolean> value but <object> type value `null` was passed.',
       ]);
     });
 
@@ -169,7 +169,7 @@ describe('validation-error', () => {
       ];
 
       assert.deepStrictEqual(validationErrorsToMessages(errors), [
-        'Custom validation message at field',
+        'Error at field: Custom validation message',
       ]);
     });
 

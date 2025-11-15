@@ -53,7 +53,7 @@ describe(jsonString, () => {
     ]);
 
     assert.deepStrictEqual(validationErrorsToMessages(result.value), [
-      'Expected <JsonString>, got <string> type value "not-json".',
+      'Error: expected <JsonString> value but <string> type value "not-json" was passed.',
     ]);
   });
 
@@ -64,6 +64,6 @@ describe(jsonString, () => {
   test('cast returns parsed string when valid, throws otherwise', () => {
     expect(baseType.cast('{"foo":1}')).toBe('{"foo":1}');
 
-    expect(() => baseType.cast('invalid')).toThrow('Expected');
+    expect(() => baseType.cast('invalid')).toThrow('Error');
   });
 });

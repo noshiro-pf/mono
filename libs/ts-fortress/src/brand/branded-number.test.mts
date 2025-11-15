@@ -86,7 +86,7 @@ describe('simpleBrandedNumber', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-          'Expected <number>, got <string> type value "not a number".',
+          'Error: expected <number> value but <string> type value "not a number" was passed.',
         ]);
       });
     });
@@ -97,7 +97,7 @@ describe('simpleBrandedNumber', () => {
       });
 
       test('throws for invalid values', () => {
-        expect(() => userIdType.cast('invalid')).toThrow('Expected');
+        expect(() => userIdType.cast('invalid')).toThrow('Error');
       });
     });
 
@@ -168,7 +168,7 @@ describe('simpleBrandedNumber', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-          'Expected <number>, got <string> type value "invalid".',
+          'Error: expected <number> value but <string> type value "invalid" was passed.',
         ]);
       });
     });

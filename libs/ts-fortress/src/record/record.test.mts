@@ -132,8 +132,8 @@ describe(record, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <number> at month, got <string> type value "ab".',
-        'Expected <number> at date, got <string> type value "cd".',
+        'Error at month: expected <number> value but <string> type value "ab" was passed.',
+        'Error at date: expected <number> value but <string> type value "cd" was passed.',
       ]);
     });
 
@@ -172,8 +172,8 @@ describe(record, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-        'Missing required key "month" at month',
-        'Missing required key "date" at date',
+        'Error at month: missing required key "month".',
+        'Error at date: missing required key "date".',
       ]);
     });
 
@@ -394,8 +394,8 @@ describe('partial record', () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
-        'Expected <number> at month, got <string> type value "ab".',
-        'Expected <number> at date, got <string> type value "cd".',
+        'Error at month: expected <number> value but <string> type value "ab" was passed.',
+        'Error at date: expected <number> value but <string> type value "cd" was passed.',
       ]);
     });
 

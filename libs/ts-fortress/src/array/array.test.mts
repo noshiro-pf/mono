@@ -109,8 +109,8 @@ describe(array, () => {
       // Test that we can convert to legacy string format for backward compatibility
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <number> at 0, got <string> type value "1".',
-        'Expected <number> at 1, got <string> type value "".',
+        'Error at 0: expected <number> value but <string> type value "1" was passed.',
+        'Error at 1: expected <number> value but <string> type value "" was passed.',
       ]);
     });
 

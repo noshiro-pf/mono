@@ -208,7 +208,7 @@ describe(required, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-          'Missing required key "date" at date',
+          'Error at date: missing required key "date".',
         ]);
       });
 
@@ -292,8 +292,8 @@ describe(required, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-          'Expected <number> at month, got <string> type value "ab".',
-          'Expected <number> at date, got <string> type value "cd".',
+          'Error at month: expected <number> value but <string> type value "ab" was passed.',
+          'Error at date: expected <number> value but <string> type value "cd" was passed.',
         ]);
       });
 
@@ -321,7 +321,7 @@ describe(required, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
-          'Expected <number> at month, got <string> type value "ab".',
+          'Error at month: expected <number> value but <string> type value "ab" was passed.',
         ]);
       });
     });
@@ -593,7 +593,7 @@ describe(required, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError3), [
-          'Missing required key "month" at month',
+          'Error at month: missing required key "month".',
         ]);
       });
 
@@ -628,8 +628,8 @@ describe(required, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError4), [
-          'Expected <number> at month, got <string> type value "ab".',
-          'Expected <number> at date, got <string> type value "cd".',
+          'Error at month: expected <number> value but <string> type value "ab" was passed.',
+          'Error at date: expected <number> value but <string> type value "cd" was passed.',
         ]);
       });
     });

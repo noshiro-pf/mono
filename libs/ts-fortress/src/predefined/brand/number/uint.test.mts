@@ -114,7 +114,7 @@ describe(uint, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <Uint>, got <number> type value `-5`.',
+        'Error: expected <Uint> value but <number> type value `-5` was passed.',
       ]);
     });
 
@@ -136,7 +136,7 @@ describe(uint, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-        'Expected <number>, got <string> type value "not a number".',
+        'Error: expected <number> value but <string> type value "not a number" was passed.',
       ]);
     });
   });
@@ -161,7 +161,7 @@ describe(uint, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrow('Expected <Uint>');
+      }).toThrow('Error: expected <Uint> value');
     });
   });
 
@@ -175,7 +175,7 @@ describe(uint, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Expected');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

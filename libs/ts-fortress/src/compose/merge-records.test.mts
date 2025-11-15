@@ -136,9 +136,9 @@ describe(mergeRecords, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'The type of value is expected to match all types of { { x: number, y: number }, { z: number, w: number } }',
-        'Missing required key "z" at z',
-        'Missing required key "w" at w',
+        'Error: expected value to match all types of { { x: number, y: number }, { z: number, w: number } } but <object> type value `{"x":0,"y":1}` was passed.',
+        'Error at z: missing required key "z".',
+        'Error at w: missing required key "w".',
       ]);
     });
   });

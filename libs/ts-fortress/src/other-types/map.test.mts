@@ -66,8 +66,8 @@ test('MapType with invalid key types', () => {
   expect(resultError.length).toBeGreaterThan(0);
 
   assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-    'The key of the Map is expected to be <string>, but got <number> type value `123`',
-    'Expected <string>, got <number> type value `123`.',
+    'Error: expected Map key to be <string> but <number> type value `123` was passed.',
+    'Error: expected <string> value but <number> type value `123` was passed.',
   ]);
 });
 
@@ -94,8 +94,8 @@ test('MapType with invalid value types', () => {
   expect(resultError1.length).toBeGreaterThan(0);
 
   assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-    'The value of the Map is expected to be <number>, but got <string> type value `not a number`',
-    'Expected <number> at b, got <string> type value "not a number".',
+    'Error: expected Map value to be <number> but <string> type value "not a number" was passed.',
+    'Error at b: expected <number> value but <string> type value "not a number" was passed.',
   ]);
 });
 
@@ -150,7 +150,7 @@ test('MapType cast() method', () => {
   // Invalid input - should throw
 
   expect(() => StringNumberMap.cast('not a map')).toThrow(
-    'Expected <Map>, got <string> type value',
+    'Error: expected <Map> value but <string> type value',
   );
 });
 
@@ -172,7 +172,7 @@ test('MapType assertIs() method', () => {
 
   expect(() => {
     assertIsStringNumberMap('not a map');
-  }).toThrow('Expected <Map>, got <string> type value');
+  }).toThrow('Error: expected <Map> value but <string> type value');
 });
 
 test('MapType with custom typeName', () => {

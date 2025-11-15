@@ -90,7 +90,7 @@ describe(uintRange, () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'The value is expected to be an integer between 1 and 12',
+        'Error: expected an integer between 1 and 12 but `13` was passed.',
       ]);
     });
   });

@@ -67,7 +67,7 @@ describe(boolean, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <boolean>, got <string> type value "not a boolean".',
+        'Error: expected <boolean> value but <string> type value "not a boolean" was passed.',
       ]);
     });
 
@@ -103,7 +103,7 @@ describe(boolean, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrow('Expected');
+      }).toThrow('Error');
     });
   });
 
@@ -117,7 +117,7 @@ describe(boolean, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Expected');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

@@ -77,7 +77,7 @@ describe(enumType, () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'The value is expected to be one of the elements contained in { 3, 2, a }',
+        'Error: expected one of { 3, 2, a } but `5` was passed.',
       ]);
     });
 

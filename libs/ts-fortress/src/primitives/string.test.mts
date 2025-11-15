@@ -86,7 +86,7 @@ describe(string, () => {
 
       expect(() => {
         assertIs(value);
-      }).toThrow(/Expected <string>/u);
+      }).toThrow(/Error: expected <string> value/u);
     });
   });
 
@@ -102,7 +102,7 @@ describe(string, () => {
       const value: unknown = 42;
 
       expect(() => str.cast(value)).toThrow(
-        'Expected <string>, got <number> type value `42`.',
+        'Error: expected <string> value but <number> type value `42` was passed.',
       );
     });
 
@@ -111,7 +111,7 @@ describe(string, () => {
       const value: unknown = 42;
 
       expect(() => strWithDefault.cast(value)).toThrow(
-        'Expected <string>, got <number> type value `42`.',
+        'Error: expected <string> value but <number> type value `42` was passed.',
       );
     });
   });

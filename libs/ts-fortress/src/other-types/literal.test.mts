@@ -153,7 +153,7 @@ describe(literal, () => {
         const value: unknown = 'world';
 
         expect(() => hello.cast(value)).toThrow(
-          'Expected <literal("hello")>, got <string> type value "world".',
+          'Error: expected <literal("hello")> value but <string> type value "world" was passed.',
         );
       });
     });
@@ -383,7 +383,7 @@ describe(literal, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
-          'Expected <literal(42n)>, got <bigint> type value `99n`.',
+          'Error: expected <literal(42n)> value but <bigint> type value `99n` was passed.',
         ]);
       });
 
@@ -405,7 +405,7 @@ describe(literal, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError3), [
-          'Expected <literal(42n)>, got <string> type value "not a bigint".',
+          'Error: expected <literal(42n)> value but <string> type value "not a bigint" was passed.',
         ]);
       });
 
@@ -431,7 +431,7 @@ describe(literal, () => {
       test('falsy case', () => {
         const x: unknown = 123n;
 
-        expect(() => targetType.cast(x)).toThrow('Expected');
+        expect(() => targetType.cast(x)).toThrow('Error');
       });
     });
 
@@ -525,7 +525,7 @@ describe(literal, () => {
           ]);
 
           assert.deepStrictEqual(validationErrorsToMessages(resultError4), [
-            'Expected <literal(true)>, got <boolean> type value `false`.',
+            'Error: expected <literal(true)> value but <boolean> type value `false` was passed.',
           ]);
         });
 
@@ -547,7 +547,7 @@ describe(literal, () => {
           ]);
 
           assert.deepStrictEqual(validationErrorsToMessages(resultError5), [
-            'Expected <literal(true)>, got <string> type value "not a boolean".',
+            'Error: expected <literal(true)> value but <string> type value "not a boolean" was passed.',
           ]);
         });
 
@@ -573,7 +573,7 @@ describe(literal, () => {
         test('falsy case', () => {
           const x: unknown = false;
 
-          expect(() => targetType.cast(x)).toThrow('Expected');
+          expect(() => targetType.cast(x)).toThrow('Error');
         });
       });
 
@@ -646,7 +646,7 @@ describe(literal, () => {
           ]);
 
           assert.deepStrictEqual(validationErrorsToMessages(resultError6), [
-            'Expected <literal(false)>, got <boolean> type value `true`.',
+            'Error: expected <literal(false)> value but <boolean> type value `true` was passed.',
           ]);
         });
 

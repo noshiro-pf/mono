@@ -69,7 +69,7 @@ describe(symbol, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <symbol>, got <string> type value "not a symbol".',
+        'Error: expected <symbol> value but <string> type value "not a symbol" was passed.',
       ]);
     });
 
@@ -103,7 +103,7 @@ describe(symbol, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrow('Expected');
+      }).toThrow('Error');
     });
   });
 
@@ -118,7 +118,7 @@ describe(symbol, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Expected');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

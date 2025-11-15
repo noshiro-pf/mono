@@ -71,7 +71,7 @@ describe('record allowExcessProperties option', () => {
     ]);
 
     assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-      'Excess property "extra" is not allowed at extra',
+      'Error at extra: excess property "extra" is not allowed.',
     ]);
   });
 

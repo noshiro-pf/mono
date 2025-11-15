@@ -168,10 +168,10 @@ describe('nested record', () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <Int> at xs.1, got <number> type value `2.2`.',
-        'Expected <Int> at xs.2, got <number> type value `3.3`.',
-        'The value is expected to be an integer between 0 and 10 at rec.a',
-        'The value is expected to be an integer between 0 and 10 at rec.b',
+        'Error at xs.1: expected <Int> value but <number> type value `2.2` was passed.',
+        'Error at xs.2: expected <Int> value but <number> type value `3.3` was passed.',
+        'Error at rec.a: expected an integer between 0 and 10 but `123` was passed.',
+        'Error at rec.b: expected an integer between 0 and 10 but `234` was passed.',
       ]);
     });
   });
@@ -407,20 +407,20 @@ describe('advanced type', () => {
     const messages = validationErrorsToMessages(result.value);
 
     assert.deepStrictEqual(messages, [
-      'The type of value is expected to match all types of { { id: "Identifier", status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<"Tag"> | undefined) }, Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }> }',
-      'The type of value is expected to be one of the elements contained in { enum, null, undefined } at status',
-      'The value is expected to be an integer between -128 and 127 at coordinates.1',
-      'The type of value is expected to match all types of { NonEmptyArray<EvenRange>, ArrayOfLength<2, EvenRange> } at palette',
-      'Expected <EvenRange> at palette.0, got <number> type value `1`.',
-      'Expected <EvenRange> at palette.1, got <number> type value `3`.',
-      'Expected <EvenRange> at palette.2, got <number> type value `5`.',
-      'The type of value is expected to match all types of { NonEmptyArray<EvenRange>, ArrayOfLength<2, EvenRange> } at palette',
-      'Expected array of length 2, got length 3 at palette',
-      'The type of value is expected to be one of the elements contained in { key-value-record, undefined } at metrics',
-      'The type of value is expected to be one of the elements contained in { NonEmptyArray<"Tag">, undefined } at tags',
-      'The type of value is expected to match all types of { { id: "Identifier", status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<"Tag"> | undefined) }, Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }> }',
-      'The type of value is expected to be one of the elements contained in { key-value-record, undefined } at extras',
-      'The type of value is expected to be one of the elements contained in { AdvancedNode[], undefined } at children',
+      'Error: expected value to match all types of { { id: "Identifier", status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<"Tag"> | undefined) }, Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }> } but <object> type value was passed.',
+      'Error at status: expected one of { enum, null, undefined } but <string> type value "unknown" was passed.',
+      'Error at coordinates.1: expected an integer between -128 and 127 but `190` was passed.',
+      'Error at palette: expected value to match all types of { NonEmptyArray<EvenRange>, ArrayOfLength<2, EvenRange> } but <object> type value `[1,3,5]` was passed.',
+      'Error at palette.0: expected <EvenRange> value but <number> type value `1` was passed.',
+      'Error at palette.1: expected <EvenRange> value but <number> type value `3` was passed.',
+      'Error at palette.2: expected <EvenRange> value but <number> type value `5` was passed.',
+      'Error at palette: expected value to match all types of { NonEmptyArray<EvenRange>, ArrayOfLength<2, EvenRange> } but <object> type value `[1,3,5]` was passed.',
+      'Error at palette: expected array of length 2 but length 3 was passed.',
+      'Error at metrics: expected one of { key-value-record, undefined } but <object> type value `{"alpha":1}` was passed.',
+      'Error at tags: expected one of { NonEmptyArray<"Tag">, undefined } but <object> type value `[]` was passed.',
+      'Error: expected value to match all types of { { id: "Identifier", status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<"Tag"> | undefined) }, Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }> } but <object> type value was passed.',
+      'Error at extras: expected one of { key-value-record, undefined } but <object> type value was passed.',
+      'Error at children: expected one of { AdvancedNode[], undefined } but <object> type value `[{}]` was passed.',
     ]);
   });
 

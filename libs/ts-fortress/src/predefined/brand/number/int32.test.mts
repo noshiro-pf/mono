@@ -92,7 +92,7 @@ describe(int32, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <Int32>, got <number> type value `3000000000`.',
+        'Error: expected <Int32> value but <number> type value `3000000000` was passed.',
       ]);
     });
   });
@@ -107,7 +107,7 @@ describe(int32, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Expected');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

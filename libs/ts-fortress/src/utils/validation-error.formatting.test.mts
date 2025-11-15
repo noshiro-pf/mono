@@ -16,7 +16,7 @@ describe('validation-error formatting details', () => {
       20,
     );
 
-    expect(msg).toBe('Oops at a.b');
+    expect(msg).toBe('Error at a.b: Oops');
   });
 
   test('omits long string actual value beyond max length', () => {
@@ -32,7 +32,9 @@ describe('validation-error formatting details', () => {
       10,
     );
 
-    expect(msg).toBe('Expected <string>, got <string> type value.');
+    expect(msg).toBe(
+      'Error: expected <string> value but <string> type value was passed.',
+    );
   });
 
   test('non-string actual value omitted when too long for unknownToString', () => {
@@ -48,6 +50,8 @@ describe('validation-error formatting details', () => {
       5,
     );
 
-    expect(msg).toBe('Expected <number> at p, got <number> type value.');
+    expect(msg).toBe(
+      'Error at p: expected <number> value but <number> type value was passed.',
+    );
   });
 });

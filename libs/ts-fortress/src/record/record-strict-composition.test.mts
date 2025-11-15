@@ -95,7 +95,7 @@ describe('record strict composition tests', () => {
       expect(resultError1).toHaveLength(1);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-        'Missing required key "name" at name',
+        'Error at name: missing required key "name".',
       ]);
     });
   });
@@ -173,7 +173,7 @@ describe('record strict composition tests', () => {
       expect(resultError3).toHaveLength(1);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError3), [
-        'Excess property "age" is not allowed at age',
+        'Error at age: excess property "age" is not allowed.',
       ]);
     });
   });
@@ -318,7 +318,7 @@ describe('record strict composition tests', () => {
       expect(resultError5).toHaveLength(1);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError5), [
-        'Missing required key "name" at name',
+        'Error at name: missing required key "name".',
       ]);
     });
   });
@@ -396,7 +396,7 @@ describe('record strict composition tests', () => {
 
       const resultError7Messages = validationErrorsToMessages(resultError7);
       const excessErrors = resultError7Messages.filter((message) =>
-        message.includes('Excess property "extra" is not allowed'),
+        message.includes('excess property "extra" is not allowed.'),
       );
 
       expect(excessErrors.length).toBeGreaterThanOrEqual(1);
@@ -414,7 +414,7 @@ describe('record strict composition tests', () => {
 
       expect(
         resultError8Messages.some((message) =>
-          message.includes('Missing required key "email"'),
+          message.includes('missing required key "email".'),
         ),
       ).toBe(true);
     });
@@ -446,7 +446,7 @@ describe('record strict composition tests', () => {
       const resultError9 = Result.unwrapErrThrow(result);
       const resultError9Messages = validationErrorsToMessages(resultError9);
       const excessErrors = resultError9Messages.filter((message) =>
-        message.includes('Excess property "extra" is not allowed'),
+        message.includes('excess property "extra" is not allowed.'),
       );
 
       expect(excessErrors.length).toBeGreaterThanOrEqual(1);
@@ -536,7 +536,7 @@ describe('record strict composition tests', () => {
       expect(resultError10).toHaveLength(1);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError10), [
-        'Excess property "extra" is not allowed at extra',
+        'Error at extra: excess property "extra" is not allowed.',
       ]);
     });
   });

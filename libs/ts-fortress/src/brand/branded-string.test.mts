@@ -88,7 +88,7 @@ describe('simpleBrandedString', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-          'Expected <string>, got <number> type value `42`.',
+          'Error: expected <string> value but <number> type value `42` was passed.',
         ]);
       });
     });
@@ -99,7 +99,7 @@ describe('simpleBrandedString', () => {
       });
 
       test('throws for invalid values', () => {
-        expect(() => userNameType.cast(123)).toThrow('Expected');
+        expect(() => userNameType.cast(123)).toThrow('Error');
       });
     });
 
@@ -170,7 +170,7 @@ describe('simpleBrandedString', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-          'Expected <string>, got <object> type value `null`.',
+          'Error: expected <string> value but <object> type value `null` was passed.',
         ]);
       });
     });

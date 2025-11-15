@@ -100,7 +100,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
     // ts-fortress produces clean, focused error message
 
     assert.deepStrictEqual(tsFortressErrorMessages, [
-      'Expected <number> at age, got <string> type value "twenty-five".',
+      'Error at age: expected <number> value but <string> type value "twenty-five" was passed.',
     ]);
   });
 
@@ -193,7 +193,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
     // ts-fortress produces clean, actionable error message
 
     assert.deepStrictEqual(tsFortressErrorMessages, [
-      'Expected <number> at user.profile.age, got <string> type value "not-a-number".',
+      'Error at user.profile.age: expected <number> value but <string> type value "not-a-number" was passed.',
     ]);
   });
 
@@ -296,9 +296,9 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
     // ts-fortress produces clean, specific error messages for each issue
 
     assert.deepStrictEqual(tsFortressErrorMessages, [
-      'Expected <number> at user.id, got <string> type value "invalid".',
-      'Expected <number> at user.profile.age, got <string> type value "not-a-number".',
-      'Expected <number> at user.profile.score, got <boolean> type value `false`.',
+      'Error at user.id: expected <number> value but <string> type value "invalid" was passed.',
+      'Error at user.profile.age: expected <number> value but <string> type value "not-a-number" was passed.',
+      'Error at user.profile.score: expected <number> value but <boolean> type value `false` was passed.',
     ]);
   });
 });

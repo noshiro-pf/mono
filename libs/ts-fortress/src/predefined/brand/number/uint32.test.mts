@@ -110,7 +110,7 @@ describe(uint32, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <Uint32>, got <number> type value `-5`.',
+        'Error: expected <Uint32> value but <number> type value `-5` was passed.',
       ]);
     });
   });
@@ -125,7 +125,7 @@ describe(uint32, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Expected');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

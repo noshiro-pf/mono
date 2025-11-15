@@ -125,7 +125,7 @@ describe(nonEmptyArray, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected non-empty array, got empty array',
+        'Error: expected non-empty array but empty array was passed.',
       ]);
     });
 
@@ -156,8 +156,8 @@ describe(nonEmptyArray, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-        'Expected <number> at 0, got <string> type value "1".',
-        'Expected <number> at 1, got <string> type value "".',
+        'Error at 0: expected <number> value but <string> type value "1" was passed.',
+        'Error at 1: expected <number> value but <string> type value "" was passed.',
       ]);
     });
   });

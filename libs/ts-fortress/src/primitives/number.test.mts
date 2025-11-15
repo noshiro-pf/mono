@@ -81,7 +81,7 @@ describe(number, () => {
 
       expect(() => {
         assertIs(value);
-      }).toThrow(/Expected <number>/u);
+      }).toThrow(/Error: expected <number> value/u);
     });
   });
 
@@ -97,7 +97,7 @@ describe(number, () => {
       const value: unknown = 'not a number';
 
       expect(() => num.cast(value)).toThrow(
-        'Expected <number>, got <string> type value "not a number".',
+        'Error: expected <number> value but <string> type value "not a number" was passed.',
       );
     });
 
@@ -106,7 +106,7 @@ describe(number, () => {
       const value: unknown = 'not a number';
 
       expect(() => numWithDefault.cast(value)).toThrow(
-        'Expected <number>, got <string> type value "not a number".',
+        'Error: expected <number> value but <string> type value "not a number" was passed.',
       );
     });
   });

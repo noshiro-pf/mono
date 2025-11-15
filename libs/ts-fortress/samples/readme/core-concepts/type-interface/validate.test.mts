@@ -31,5 +31,5 @@ assert.deepStrictEqual(errorResult.value, [
 ]);
 
 assert.deepStrictEqual(t.validationErrorsToMessages(errorResult.value), [
-  'Expected <number> at age, got <string> type value "thirty".',
+  'Error at age: expected <number> value but <string> type value "thirty" was passed.',
 ]);

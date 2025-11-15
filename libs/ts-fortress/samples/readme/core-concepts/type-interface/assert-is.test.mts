@@ -18,7 +18,9 @@ try {
 } catch (error) {
   assert.deepStrictEqual(
     error,
-    new Error(`\nExpected <number>, got <string> type value "not a number".`),
+    new Error(
+      `\nError: expected <number> value but <string> type value "not a number" was passed.`,
+    ),
   );
 }
 
@@ -47,6 +49,8 @@ try {
 } catch (error) {
   assert.deepStrictEqual(
     error,
-    new Error(`\nExpected <string> at id, got <number> type value \`123\`.`),
+    new Error(
+      `\nError at id: expected <string> value but <number> type value \`123\` was passed.`,
+    ),
   );
 }

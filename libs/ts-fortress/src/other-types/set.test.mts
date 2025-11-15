@@ -83,10 +83,10 @@ test('SetType with invalid element types', () => {
   expect(resultError.length).toBeGreaterThan(0);
 
   assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-    'The element of the Set is expected to be <string>, but got <number> type value `123`',
-    'Expected <string>, got <number> type value `123`.',
-    'The element of the Set is expected to be <string>, but got <boolean> type value `true`',
-    'Expected <string>, got <boolean> type value `true`.',
+    'Error: expected Set element to be <string> but <number> type value `123` was passed.',
+    'Error: expected <string> value but <number> type value `123` was passed.',
+    'Error: expected Set element to be <string> but <boolean> type value `true` was passed.',
+    'Error: expected <string> value but <boolean> type value `true` was passed.',
   ]);
 });
 
@@ -137,11 +137,11 @@ test('SetType cast() method', () => {
   // Invalid input - should throw
 
   expect(() => StringSet.cast('not a set')).toThrow(
-    'Expected <Set>, got <string> type value',
+    'Error: expected <Set> value but <string> type value',
   );
 
   expect(() => StringSet.cast([])).toThrow(
-    'Expected <Set>, got <object> type value',
+    'Error: expected <Set> value but <object> type value',
   );
 });
 
@@ -162,11 +162,11 @@ test('SetType assertIs() method', () => {
 
   expect(() => {
     assertIsNumberSet('not a set');
-  }).toThrow('Expected <Set>, got <string> type value');
+  }).toThrow('Error: expected <Set> value but <string> type value');
 
   expect(() => {
     assertIsNumberSet([1, 2, 3]);
-  }).toThrow('Expected <Set>, got <object> type value');
+  }).toThrow('Error: expected <Set> value but <object> type value');
 });
 
 test('SetType with custom typeName', () => {

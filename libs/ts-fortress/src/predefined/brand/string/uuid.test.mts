@@ -60,7 +60,7 @@ describe(uuid, () => {
     ]);
 
     assert.deepStrictEqual(validationErrorsToMessages(result.value), [
-      'Expected <Uuid>, got <string> type value "not-a-uuid".',
+      'Error: expected <Uuid> value but <string> type value "not-a-uuid" was passed.',
     ]);
   });
 });

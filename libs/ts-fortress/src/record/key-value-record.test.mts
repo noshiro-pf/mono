@@ -144,10 +144,10 @@ describe(keyValueRecord, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'The value of the record is expected to be <number>',
-        'Expected <number> at month, got <string> type value "ab".',
-        'The value of the record is expected to be <number>',
-        'Expected <number> at date, got <string> type value "cd".',
+        'Error: expected record value to be <number> but <string> type value "ab" was passed.',
+        'Error at month: expected <number> value but <string> type value "ab" was passed.',
+        'Error: expected record value to be <number> but <string> type value "cd" was passed.',
+        'Error at date: expected <number> value but <string> type value "cd" was passed.',
       ]);
     });
   });

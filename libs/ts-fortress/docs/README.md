@@ -157,9 +157,9 @@ assert.deepStrictEqual(
         result.value satisfies readonly t.ValidationError[],
     ),
     [
-        `Missing required key "age" at age`,
-        `Missing required key "notifications" at preferences.notifications`,
-        `Missing required key "tags" at tags`,
+        `Error at age: missing required key "age".`,
+        `Error at preferences.notifications: missing required key "notifications".`,
+        `Error at tags: missing required key "tags".`,
     ],
 );
 ```
@@ -425,7 +425,7 @@ assert.deepStrictEqual(errorResult.value, [
 ]);
 
 assert.deepStrictEqual(t.validationErrorsToMessages(errorResult.value), [
-    'Expected <number> at age, got <string> type value "thirty".',
+    'Error at age: expected <number> value but <string> type value "thirty" was passed.',
 ]);
 ```
 
@@ -455,7 +455,7 @@ try {
     assert.deepStrictEqual(
         error,
         new Error(
-            `\nExpected <number>, got <string> type value "not a number".`,
+            `\nError: expected <number> value but <string> type value "not a number" was passed.`,
         ),
     );
 }
@@ -495,7 +495,9 @@ try {
 } catch (error) {
     assert.deepStrictEqual(
         error,
-        new Error('Expected <number>, got <string> type value "invalid".'),
+        new Error(
+            'Error: expected <number> value but <string> type value "invalid" was passed.',
+        ),
     );
 }
 ```
@@ -740,9 +742,9 @@ assert.deepStrictEqual(
         result.value satisfies readonly t.ValidationError[],
     ),
     [
-        'Expected <Uuid> at id, got <string> type value "user123".',
-        'Expected <PositiveNumber> at score, got <number> type value `-10`.',
-        'Expected <EvenNumber> at level, got <number> type value `3`.',
+        'Error at id: expected <Uuid> value but <string> type value "user123" was passed.',
+        'Error at score: expected <PositiveNumber> value but <number> type value `-10` was passed.',
+        'Error at level: expected <EvenNumber> value but <number> type value `3` was passed.',
     ],
 );
 ```
@@ -919,8 +921,8 @@ assert.deepStrictEqual(result.value, [
 const messages = t.validationErrorsToMessages(result.value);
 
 assert.deepStrictEqual(messages, [
-    'Expected <string> at name, got <number> type value `123`.',
-    'Expected <number> at age, got <string> type value "not a number".',
+    'Error at name: expected <string> value but <number> type value `123` was passed.',
+    'Error at age: expected <number> value but <string> type value "not a number" was passed.',
 ]);
 
 const assertIsUser: (a: unknown) => asserts a is User = User.assertIs;
@@ -932,7 +934,7 @@ try {
     assert.deepStrictEqual(
         error,
         new Error(
-            '\nExpected <string> at name, got <number> type value `123`.,\nExpected <number> at age, got <string> type value "not a number".',
+            '\nError at name: expected <string> value but <number> type value `123` was passed.,\nError at age: expected <number> value but <string> type value "not a number" was passed.',
         ),
     );
 }

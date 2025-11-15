@@ -103,7 +103,7 @@ describe(union, () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'The type of value is expected to be one of the elements contained in { { x: number, y: number }, literal(3), literal("2") }',
+        'Error: expected one of { { x: number, y: number }, literal(3), literal("2") } but <number> type value `5` was passed.',
       ]);
     });
 

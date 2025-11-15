@@ -90,7 +90,7 @@ describe(safeInt, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <SafeInt>, got <number> type value `9007199254740992`.',
+        'Error: expected <SafeInt> value but <number> type value `9007199254740992` was passed.',
       ]);
     });
   });
@@ -105,7 +105,7 @@ describe(safeInt, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Expected');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

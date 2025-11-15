@@ -198,7 +198,7 @@ describe(omit, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <number> at month, got <string> type value "ab".',
+        'Error at month: expected <number> value but <string> type value "ab" was passed.',
       ]);
     });
   });

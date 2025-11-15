@@ -66,7 +66,7 @@ describe(intRange, () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'The value is expected to be an integer between -2 and 2',
+        'Error: expected an integer between -2 and 2 but `3` was passed.',
       ]);
     });
   });

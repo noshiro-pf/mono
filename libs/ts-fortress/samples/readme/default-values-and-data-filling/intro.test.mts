@@ -51,8 +51,8 @@ assert.deepStrictEqual(
     result.value satisfies readonly t.ValidationError[],
   ),
   [
-    `Missing required key "age" at age`,
-    `Missing required key "notifications" at preferences.notifications`,
-    `Missing required key "tags" at tags`,
+    `Error at age: missing required key "age".`,
+    `Error at preferences.notifications: missing required key "notifications".`,
+    `Error at tags: missing required key "tags".`,
   ],
 );

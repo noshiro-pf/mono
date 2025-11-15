@@ -9,6 +9,8 @@ try {
 } catch (error) {
   assert.deepStrictEqual(
     error,
-    new Error('Expected <number>, got <string> type value "invalid".'),
+    new Error(
+      'Error: expected <number> value but <string> type value "invalid" was passed.',
+    ),
   );
 }

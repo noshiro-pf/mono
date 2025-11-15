@@ -98,7 +98,7 @@ describe(int16, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <Int16>, got <number> type value `50000`.',
+        'Error: expected <Int16> value but <number> type value `50000` was passed.',
       ]);
     });
   });
@@ -113,7 +113,7 @@ describe(int16, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Expected');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

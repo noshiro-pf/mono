@@ -90,8 +90,8 @@ assert.deepStrictEqual(
     result.value satisfies readonly t.ValidationError[],
   ),
   [
-    'Expected <Uuid> at id, got <string> type value "user123".',
-    'Expected <PositiveNumber> at score, got <number> type value `-10`.',
-    'Expected <EvenNumber> at level, got <number> type value `3`.',
+    'Error at id: expected <Uuid> value but <string> type value "user123" was passed.',
+    'Error at score: expected <PositiveNumber> value but <number> type value `-10` was passed.',
+    'Error at level: expected <EvenNumber> value but <number> type value `3` was passed.',
   ],
 );

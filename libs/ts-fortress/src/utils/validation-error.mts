@@ -91,12 +91,16 @@ export const validationErrorToMessage = (
   error: ValidationError,
   maxLengthToPrintActualValue: number = 20,
 ): string => {
-  const pathStr = error.path.length > 0 ? ` at ${error.path.join('.')}` : '';
+  const pathPrefix =
+    error.path.length > 0 ? `Error at ${error.path.join('.')}: ` : 'Error: ';
 
-  const detailsMessage = createDetailsMessage(error);
+  const detailsMessage = createDetailsMessage(
+    error,
+    maxLengthToPrintActualValue,
+  );
 
   if (detailsMessage !== undefined) {
-    return `${detailsMessage}${pathStr}`;
+    return `${pathPrefix}${detailsMessage}`;
   }
 
   const actualTypeStr = typeof error.actualValue;
@@ -109,52 +113,61 @@ export const validationErrorToMessage = (
         s.length <= maxLengthToPrintActualValue ? ` \`${s}\`` : '',
       ).value;
 
-  return `Expected <${error.expectedType}>${pathStr}, got <${actualTypeStr}> type value${actualValueStr}.`;
+  return `${pathPrefix}expected <${error.expectedType}> value but <${actualTypeStr}> type value${actualValueStr} was passed.`;
 };
 
-const createDetailsMessage = (error: ValidationError): string | undefined => {
+const createDetailsMessage = (
+  error: ValidationError,
+  maxLengthToPrintActualValue: number,
+): string | undefined => {
+  const actualTypeStr = typeof error.actualValue;
+  const actualValueStr: string = isString(error.actualValue)
+    ? error.actualValue.length <= maxLengthToPrintActualValue
+      ? ` "${error.actualValue}"`
+      : ''
+    : pipe(unknownToString(error.actualValue)).map((s) =>
+        s.length <= maxLengthToPrintActualValue ? ` \`${s}\`` : '',
+      ).value;
+
   switch (error.details?.kind) {
     case undefined:
       return undefined;
     case 'custom':
       return error.details.message;
     case 'enum':
-      return `The value is expected to be one of the elements contained in { ${error.details.values
+      return `expected one of { ${error.details.values
         .map((value) => String(value))
-        .join(', ')} }`;
+        .join(', ')} } but${actualValueStr} was passed.`;
     case 'integer-range':
-      return `The value is expected to be an integer between ${error.details.start} and ${error.details.endExclusive - 1}`;
+      return `expected an integer between ${error.details.start} and ${error.details.endExclusive - 1} but${actualValueStr} was passed.`;
     case 'tuple-length':
-      return `The length of tuple is expected to be ${error.details.expectedLength}, but it is actually ${error.details.actualLength}`;
+      return `expected tuple of length ${error.details.expectedLength} but length ${error.details.actualLength} was passed.`;
     case 'array-length':
-      return `Expected array of length ${error.details.expectedLength}, got length ${error.details.actualLength}`;
+      return `expected array of length ${error.details.expectedLength} but length ${error.details.actualLength} was passed.`;
     case 'array-min-length':
-      return `Expected array of length ${error.details.minLength} or more, got length ${error.details.actualLength}`;
+      return `expected array of length ${error.details.minLength} or more but length ${error.details.actualLength} was passed.`;
     case 'non-empty-array':
-      return 'Expected non-empty array, got empty array';
+      return 'expected non-empty array but empty array was passed.';
     case 'missing-key':
-      return `Missing required key "${error.details.key}"`;
+      return `missing required key "${error.details.key}".`;
     case 'excess-key':
-      return `Excess property "${error.details.key}" is not allowed`;
+      return `excess property "${error.details.key}" is not allowed.`;
     case 'intersection':
-      return `The type of value is expected to match all types of { ${error.details.typeNames.join(', ')} }`;
+      return `expected value to match all types of { ${error.details.typeNames.join(', ')} } but <${actualTypeStr}> type value${actualValueStr} was passed.`;
     case 'union':
-      return `The type of value is expected to be one of the elements contained in { ${error.details.typeNames.join(', ')} }`;
+      return `expected one of { ${error.details.typeNames.join(', ')} } but <${actualTypeStr}> type value${actualValueStr} was passed.`;
     case 'record-entry':
       return error.details.entry === 'key'
-        ? `The key of the record is expected to be <${error.details.expectedType}>`
-        : `The value of the record is expected to be <${error.details.expectedType}>`;
-    case 'map-entry': {
-      const base =
-        error.details.entry === 'key'
-          ? `The key of the Map is expected to be <${error.details.expectedType}>`
-          : `The value of the Map is expected to be <${error.details.expectedType}>`;
-      return `${base}, but got <${typeof error.actualValue}> type value \`${unknownToString(error.actualValue)}\``;
-    }
+        ? `expected record key to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`
+        : `expected record value to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+    case 'map-entry':
+      return error.details.entry === 'key'
+        ? `expected Map key to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`
+        : `expected Map value to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
     case 'set-element':
-      return `The element of the Set is expected to be <${error.details.expectedType}>, but got <${typeof error.actualValue}> type value \`${unknownToString(error.actualValue)}\``;
+      return `expected Set element to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
     case 'brand':
-      return `The value must satisfy the constraint corresponding to the brand keys: <${error.details.description}>`;
+      return `expected value to satisfy constraint: <${error.details.description}>.`;
   }
 };
 

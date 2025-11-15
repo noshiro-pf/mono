@@ -110,7 +110,7 @@ describe(nonZeroFiniteNumber, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Expected <NonZeroFiniteNumber>, got <number> type value `0`.',
+        'Error: expected <NonZeroFiniteNumber> value but <number> type value `0` was passed.',
       ]);
     });
   });
@@ -125,7 +125,7 @@ describe(nonZeroFiniteNumber, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Expected');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 
