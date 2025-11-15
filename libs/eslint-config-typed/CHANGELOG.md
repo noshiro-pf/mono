@@ -1,3 +1,9 @@
+# [3.13.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.12.0...v3.13.0) (2025-11-15)
+
+### Features
+
+- update padding-line-between-statements config ([#141](https://github.com/noshiro-pf/eslint-config-typed/issues/141)) ([217dd57](https://github.com/noshiro-pf/eslint-config-typed/commit/217dd57feb02d556e8b645582d4171d4f0585d9e))
+
 # [3.12.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.11.0...v3.12.0) (2025-11-15)
 
 ### Features
