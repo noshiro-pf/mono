@@ -1,3 +1,9 @@
+# [6.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.0.1...v6.1.0) (2025-11-15)
+
+### Features
+
+- make validationErrorToMessage output to print error path first ([#140](https://github.com/noshiro-pf/ts-fortress/issues/140)) ([d2279c9](https://github.com/noshiro-pf/ts-fortress/commit/d2279c93d4923f7b555e81bc5f545c658899fd44))
+
 ## [6.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v6.0.0...v6.0.1) (2025-11-14)
 
 ### Bug Fixes
