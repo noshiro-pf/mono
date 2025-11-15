@@ -3,6 +3,7 @@ import {
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  eslintImportsRules,
   type FlatConfig,
 } from 'eslint-config-typed';
 
@@ -59,6 +60,22 @@ export default [
       'no-await-in-loop': 'off',
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
       'import-x/no-unassigned-import': 'off',
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            'dotenv/config',
+          ],
+        },
+      ],
+    }),
+  },
+
+  {
+    files: ['src/cmd/**'],
+    rules: defineKnownRules({
+      'import-x/no-internal-modules': 'off',
     }),
   },
 

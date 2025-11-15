@@ -1,3 +1,4 @@
+import 'ts-repo-utils';
 import packageJson from '../../package.json' with { type: 'json' };
 
 export const OWNER = 'noshiro-pf';
@@ -11,7 +12,6 @@ export const repositorySettingsDir = path.resolve(
 );
 
 export const repositorySettingsJsonName = 'settings.json';
-
 export const rulesetsDir = path.resolve(githubDir, './rulesets');
 
 export const octokitHeaders = {

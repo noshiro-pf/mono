@@ -1,5 +1,7 @@
+#!/usr/bin/env node
+import 'dotenv/config';
 import { Obj } from 'ts-data-forge';
-import { makeEmptyDir } from 'ts-repo-utils';
+import { formatUncommittedFiles, makeEmptyDir } from 'ts-repo-utils';
 import {
   repositorySettingsDir,
   repositorySettingsJsonName,
@@ -26,7 +28,7 @@ export const backupRepositorySettings = async (
   );
 
   if (fmt) {
-    await $('pnpm run fmt');
+    await formatUncommittedFiles();
   }
 };
 

@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.type-check.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "importsNotUsedAsValues": "remove",
+    "newLine": "lf",
+    "noEmit": false,
+    "noEmitOnError": true,
+    "incremental": false
+  }
+}

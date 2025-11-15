@@ -1,5 +1,7 @@
+#!/usr/bin/env node
+import 'dotenv/config';
 import { Obj } from 'ts-data-forge';
-import { makeEmptyDir } from 'ts-repo-utils';
+import { formatUncommittedFiles, makeEmptyDir } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
 import { getAllRulesets, getRuleset } from './api/index.mjs';
 import { rulesetKeysToPick } from './constants.mjs';
@@ -21,7 +23,7 @@ export const backupRulesets = async (fmt: boolean = true): Promise<void> => {
   }
 
   if (fmt) {
-    await $('pnpm run fmt');
+    await formatUncommittedFiles();
   }
 };
 

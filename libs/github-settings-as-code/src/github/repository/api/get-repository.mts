@@ -1,6 +1,6 @@
 import { GetRepositoryResponse, type EndpointKeys } from 'octokit-safe-types';
 import { validationErrorsToMessages } from 'ts-fortress';
-import { Result } from 'ts-repo-utils';
+import 'ts-repo-utils';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 
@@ -18,6 +18,7 @@ export const getRepositorySettings =
 
     {
       const res = GetRepositoryResponse.validate(getRepositoryResult.data);
+
       if (Result.isErr(res)) {
         console.warn(validationErrorsToMessages(res.value));
       }

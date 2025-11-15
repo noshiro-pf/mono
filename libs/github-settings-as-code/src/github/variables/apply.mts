@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+import 'dotenv/config';
 import 'ts-repo-utils';
 import {
   createRepoVariable,
@@ -5,24 +7,31 @@ import {
   updateRepoVariable,
 } from './api/index.mjs';
 
-const variables = [
-  {
-    name: 'DEPENDABOT_AUTO_MERGE_BOT_APP_ID',
-    value: '1442916',
-  },
-  {
-    name: 'SEMANTIC_RELEASE_GIT_PERMISSION_BOT_APP_ID',
-    value: '1442563',
-  },
-] as const;
+export const applyVariables = async (): Promise<void> => {
+  const variables = [
+    {
+      name: 'DEPENDABOT_AUTO_MERGE_BOT_APP_ID',
+      value: '1442916',
+    },
+    {
+      name: 'SEMANTIC_RELEASE_GIT_PERMISSION_BOT_APP_ID',
+      value: '1442563',
+    },
+  ] as const;
 
-const variableListSaved = await listRepoVariables();
-const variablesSaved: ReadonlySet<string> = new Set(
-  variableListSaved.map((v) => v.name),
-);
+  const variableListSaved = await listRepoVariables();
 
-for (const variable of variables) {
-  const found = variablesSaved.has(variable.name);
+  const variablesSaved: ReadonlySet<string> = new Set(
+    variableListSaved.map((v) => v.name),
+  );
 
-  await (found ? updateRepoVariable(variable) : createRepoVariable(variable));
+  for (const variable of variables) {
+    const found = variablesSaved.has(variable.name);
+
+    await (found ? updateRepoVariable(variable) : createRepoVariable(variable));
+  }
+};
+
+if (isDirectlyExecuted(import.meta.url)) {
+  await applyVariables();
 }

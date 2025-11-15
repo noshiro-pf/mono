@@ -1,5 +1,7 @@
+#!/usr/bin/env node
+import 'dotenv/config';
 import { Obj } from 'ts-data-forge';
-import 'ts-repo-utils';
+import { formatUncommittedFiles } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
 import {
   createRuleset,
@@ -14,64 +16,71 @@ import {
   readRulesetFiles,
 } from './read-rule-set-contents.mjs';
 
-await backupRulesets(false);
+export const applyRulesets = async (): Promise<void> => {
+  await backupRulesets(false);
 
-const rulesets = await readRulesetFiles();
+  const rulesets = await readRulesetFiles();
 
-const backupIds: ReadonlySet<number> = await readRulesetBackupFiles().then(
-  (rs) => new Set(rs.map((r) => r.id)),
-);
+  const backupIds: ReadonlySet<number> = await readRulesetBackupFiles().then(
+    (rs) => new Set(rs.map((r) => r.id)),
+  );
 
-const rulesetsToUpdate = rulesets.filter((r) => backupIds.has(r.id));
-const rulesetsToCreate = rulesets.filter((r) => !backupIds.has(r.id));
+  const rulesetsToUpdate = rulesets.filter((r) => backupIds.has(r.id));
 
-for (const ruleset of rulesetsToUpdate) {
-  await updateRuleset({
-    rulesetId: ruleset.id,
-    payload: {
-      bypass_actors: ruleset.bypass_actors,
-      conditions: ruleset.conditions ?? undefined,
-      enforcement: ruleset.enforcement,
-      name: ruleset.name,
-      rules: ruleset.rules,
-      target: ruleset.target === 'repository' ? undefined : ruleset.target,
-    },
-  });
-}
+  const rulesetsToCreate = rulesets.filter((r) => !backupIds.has(r.id));
 
-for (const ruleset of rulesetsToCreate) {
-  await createRuleset({
-    payload: {
-      bypass_actors: ruleset.bypass_actors,
-      conditions: ruleset.conditions ?? undefined,
-      enforcement: ruleset.enforcement,
-      name: ruleset.name,
-      rules: ruleset.rules,
-      target: ruleset.target === 'repository' ? undefined : ruleset.target,
-    },
-  });
-}
-
-// update local ruleset files
-{
-  const rulesetsResult = await getAllRulesets();
-
-  for (const rule of rulesetsResult) {
-    const content = await getRuleset(rule.id);
-
-    const str = JSON.stringify(
-      Obj.pick(content, rulesetKeysToPick),
-      undefined,
-      2,
-    );
-
-    await fs.writeFile(path.resolve(rulesetsDir, `${rule.name}.json`), str);
-
-    await fs.writeFile(
-      path.resolve(rulesetsDir, `./bk/${rule.name}.json`),
-      str,
-    );
+  for (const ruleset of rulesetsToUpdate) {
+    await updateRuleset({
+      rulesetId: ruleset.id,
+      payload: {
+        bypass_actors: ruleset.bypass_actors,
+        conditions: ruleset.conditions ?? undefined,
+        enforcement: ruleset.enforcement,
+        name: ruleset.name,
+        rules: ruleset.rules,
+        target: ruleset.target === 'repository' ? undefined : ruleset.target,
+      },
+    });
   }
 
-  await $('pnpm run fmt');
+  for (const ruleset of rulesetsToCreate) {
+    await createRuleset({
+      payload: {
+        bypass_actors: ruleset.bypass_actors,
+        conditions: ruleset.conditions ?? undefined,
+        enforcement: ruleset.enforcement,
+        name: ruleset.name,
+        rules: ruleset.rules,
+        target: ruleset.target === 'repository' ? undefined : ruleset.target,
+      },
+    });
+  }
+
+  // update local ruleset files
+  {
+    const rulesetsResult = await getAllRulesets();
+
+    for (const rule of rulesetsResult) {
+      const content = await getRuleset(rule.id);
+
+      const str = JSON.stringify(
+        Obj.pick(content, rulesetKeysToPick),
+        undefined,
+        2,
+      );
+
+      await fs.writeFile(path.resolve(rulesetsDir, `${rule.name}.json`), str);
+
+      await fs.writeFile(
+        path.resolve(rulesetsDir, `./bk/${rule.name}.json`),
+        str,
+      );
+    }
+
+    await formatUncommittedFiles();
+  }
+};
+
+if (isDirectlyExecuted(import.meta.url)) {
+  await applyRulesets();
 }
