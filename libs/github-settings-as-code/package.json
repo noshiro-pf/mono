@@ -15,13 +15,13 @@
   "sideEffects": false,
   "type": "module",
   "bin": {
-    "gh:apply-all": "./dist/cmd/gh-apply-all.mjs",
-    "gh:apply-repository-settings": "./dist/github/repository/apply.mjs",
-    "gh:apply-rulesets": "./dist/github/ruleset/apply.mjs",
-    "gh:apply-variables": "./dist/github/variables/apply.mjs",
-    "gh:backup-all": "./dist/cmd/gh-backup-all.mjs",
-    "gh:backup-repository-settings": "./dist/github/repository/backup.mjs",
-    "gh:backup-rulesets": "./dist/github/ruleset/backup.mjs"
+    "gh-apply-all": "./dist/cmd/gh-apply-all.mjs",
+    "gh-apply-repository-settings": "./dist/github/repository/apply.mjs",
+    "gh-apply-rulesets": "./dist/github/ruleset/apply.mjs",
+    "gh-apply-variables": "./dist/github/variables/apply.mjs",
+    "gh-backup-all": "./dist/cmd/gh-backup-all.mjs",
+    "gh-backup-repository-settings": "./dist/github/repository/backup.mjs",
+    "gh-backup-rulesets": "./dist/github/ruleset/backup.mjs"
   },
   "files": [
     "dist",
