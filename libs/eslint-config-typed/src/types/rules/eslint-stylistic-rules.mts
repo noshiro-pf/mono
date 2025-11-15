@@ -6505,6 +6505,7 @@ namespace MemberDelimiterStyle {
    * ```
    */
   export type MultiLineOption = 'comma' | 'none' | 'semi';
+
   export type SingleLineOption = 'comma' | 'semi';
 
   export type Options = {

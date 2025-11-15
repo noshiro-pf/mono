@@ -1,7 +1,7 @@
-import { type EslintMathRules } from '../types/index.mjs';
+import { withDefaultOption, type EslintMathRules } from '../types/index.mjs';
 
 export const eslintMathRules = {
-  'math/abs': 'error',
+  'math/abs': ['error', { prefer: 'Math.abs', aggressive: true }],
   'math/no-static-infinity-calculations': 'error',
   'math/no-static-nan-calculations': 'error',
   'math/prefer-exponentiation-operator': 'error',
@@ -23,7 +23,7 @@ export const eslintMathRules = {
   // https://github.com/tc39/proposal-math-sum
   'math/prefer-math-sum-precise': 'off',
 
-  'math/prefer-math-trunc': 'error',
+  'math/prefer-math-trunc': withDefaultOption('error'),
   'math/prefer-number-epsilon': 'error',
 
   // Covered by unicorn/prefer-number-properties (checks more patterns including global isFinite())

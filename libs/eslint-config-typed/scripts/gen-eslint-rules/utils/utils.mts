@@ -1,7 +1,15 @@
 export const toCapitalCase = (str: string): string =>
   str
-    .replaceAll(/-./gu, (x) => x[1]?.toUpperCase() ?? str)
+    .replaceAll(/[-/]./gu, (x) => x[1]?.toUpperCase() ?? str) // "aaa-bbb" ->
     .replace(/^./u, (x) => x[0]?.toUpperCase() ?? str);
+
+if (import.meta.vitest !== undefined) {
+  test(toCapitalCase, () => {
+    expect(toCapitalCase('aaa-bbb')).toBe('AaaBbb');
+
+    expect(toCapitalCase('aaa/bbb')).toBe('AaaBbb');
+  });
+}
 
 export const deepReplace = <T,>(obj: T, from: string, to: string): T => {
   const s = JSON.stringify(obj);
@@ -21,4 +29,5 @@ export const falseToUndefined = <T,>(
   (a === false ? undefined : a) as RelaxedExclude<T, false>;
 
 export const toStr: (v: unknown) => string = String;
+
 export const closeBraceRegexp = /\n\}\n/gu;

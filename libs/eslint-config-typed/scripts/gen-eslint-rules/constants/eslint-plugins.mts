@@ -143,6 +143,18 @@ export const eslintPlugins = {
     rulePrefix: '@typescript-eslint/',
     outputFileName: 'typescript-eslint-rules.mts',
   },
+  EslintPluginN: {
+    typeName: 'EslintNRules',
+    pluginName: 'eslint-plugin-n',
+    rulePrefix: 'n/',
+    outputFileName: 'eslint-n-rules.mts',
+  },
+  EslintPluginMath: {
+    typeName: 'EslintMathRules',
+    pluginName: 'eslint-plugin-math',
+    rulePrefix: 'math/',
+    outputFileName: 'eslint-math-rules.mts',
+  },
   EslintPluginRules: {
     typeName: 'EslintPluginRules',
     pluginName: 'eslint-plugin-eslint-plugin',

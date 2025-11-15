@@ -6,6 +6,7 @@ import {
   type EslintJestRules,
   type EslintJsxA11yRules,
   type EslintMathRules,
+  type EslintNRules,
   type EslintPlaywrightRules,
   type EslintPluginRules,
   type EslintPluginSortDestructureKeysRules,
@@ -25,6 +26,7 @@ import {
   type EslintTreeShakableRules,
   type EslintTsRestrictionsRules,
   type EslintUnicornRules,
+  type EslintVitestCodingStyleRules,
   type EslintVitestRules,
   type TypeScriptEslintRules,
 } from './rules/index.mjs';
@@ -43,6 +45,7 @@ type KnownRules = DeepReadonly<
     EslintPluginSortDestructureKeysRules &
     EslintPreferArrowFunctionRules &
     EslintPromiseRules &
+    EslintNRules &
     EslintReactHooksRules &
     EslintReactPerfRules &
     EslintReactRefreshRules &
@@ -56,6 +59,7 @@ type KnownRules = DeepReadonly<
     EslintTreeShakableRules &
     EslintUnicornRules &
     EslintVitestRules &
+    EslintVitestCodingStyleRules &
     EslintReactCodingStyleRules &
     TypeScriptEslintRules
 >;

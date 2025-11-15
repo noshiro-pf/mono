@@ -5,7 +5,6 @@ export * from './nodejs.mjs';
 export * from './playwright.mjs';
 export * from './plugins.mjs';
 export * from './preact.mjs';
-export * from './react-base.mjs';
 export * from './react.mjs';
 export * from './testing-library.mjs';
 export * from './typescript-without-rules.mjs';

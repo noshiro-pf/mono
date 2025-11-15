@@ -10,7 +10,7 @@ const thisDir = import.meta.dirname;
 
 const outDir = path.resolve(thisDir, '../../src/types/rules');
 
-const eslintConfigPath = path.resolve(thisDir, './eslint.config.gen.mjs');
+const eslintConfigPath = path.resolve(thisDir, './eslint.config.gen.mts');
 
 const formatCommand = 'pnpm exec prettier --write src/types/rules/*.mts';
 

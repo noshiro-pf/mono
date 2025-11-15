@@ -1,3 +1,4 @@
+import { allExtensionsStr } from '../constants/index.mjs';
 import {
   eslintArrayFuncRules,
   eslintFunctionalRules,
@@ -84,6 +85,12 @@ export const eslintConfigForTypeScript = ({
       rules: defineKnownRules({
         '@typescript-eslint/triple-slash-reference': 'off',
         'import-x/unambiguous': 'off',
+      }),
+    },
+    {
+      files: [`**/index.{${allExtensionsStr}}`],
+      rules: defineKnownRules({
+        '@stylistic/padding-line-between-statements': 'off',
       }),
     },
     {

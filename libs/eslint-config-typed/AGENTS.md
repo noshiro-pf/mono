@@ -72,3 +72,12 @@ All sources are TypeScript ESM using the `.mts` extension; compiled output is `.
 - セキュリティと品質
     - `eval`，`Function`，動的 `require`，危険な正規表現は使用禁止。
     - `unicorn/*` でファイル命名、配列操作、最新 DOM/Node API の採用を強制し、`import-x/no-useless-path-segments` や `no-restricted-globals` で可読性とバグ低減を図る。
+
+## Plugin の追加の仕方
+
+1. `pnpm add eslint-plugin-X`
+2. scripts/gen-eslint-rules/constants/eslint-plugins.mts に定義を追加
+3. `pnpm run gen-rule-type`
+4. src/configs/plugins.mts を更新
+5. src/rules に rule ファイル追加
+6. src/configs のどれかに rules を追加

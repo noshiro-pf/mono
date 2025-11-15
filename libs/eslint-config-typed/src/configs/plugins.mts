@@ -36,6 +36,8 @@ import eslintPluginPromise from 'eslint-plugin-promise';
 
 import eslintPluginReact from 'eslint-plugin-react';
 
+import eslintPluginN from 'eslint-plugin-n';
+
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
 
 import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
@@ -77,6 +79,7 @@ export const plugins: Record<
   | 'math'
   | 'prefer-arrow-functions'
   | 'promise'
+  | 'n'
   | 'react'
   | 'react-hooks'
   | 'react-refresh'
@@ -112,6 +115,7 @@ export const plugins: Record<
   'prefer-arrow-functions': eslintPluginPreferArrowFunctions,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   promise: eslintPluginPromise,
+  n: eslintPluginN,
   react: eslintPluginReact,
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   'react-hooks': eslintPluginReactHooks as unknown as ESLintPlugin,

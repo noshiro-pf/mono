@@ -117,11 +117,6 @@ export const eslintStylisticRules = {
       next: 'import',
     },
     {
-      blankLine: 'never',
-      prev: 'singleline-export',
-      next: 'singleline-export',
-    },
-    {
       blankLine: 'any',
       prev: 'case',
       next: 'case',

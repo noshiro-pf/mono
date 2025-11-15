@@ -605,7 +605,7 @@ Each plugin provides typed rule definitions:
     - **`EslintTotalFunctionsRules`** (no options)
     - **`EslintUnicornRules`** & **`EslintUnicornRulesOption`**
     - **`EslintArrayFuncRules`** (no options)
-    - **`EslintMathRules`** (no options)
+    - **`EslintMathRules`** & **`EslintMathRulesOption`**
     - **`EslintPreferArrowFunctionRules`** & **`EslintPreferArrowFunctionRulesOption`**
     - **`EslintStylisticRules`** & **`EslintStylisticRulesOption`**
     - **`EslintPluginSortDestructureKeysRules`** & **`EslintPluginSortDestructureKeysRulesOption`**
@@ -616,7 +616,7 @@ Each plugin provides typed rule definitions:
     - **`EslintTreeShakableRules`** (no options)
     - **`EslintStylisticRules`** & **`EslintStylisticRulesOption`**
     - **`EslintTsRestrictionsRules`** & **`EslintTsRestrictionsRulesOption`**
-    - **`EslintNRules`** (no options)
+    - **`EslintNRules`** & **`EslintNRulesOption`**
 - React & JSX
     - **`EslintReactRules`** & **`EslintReactRulesOption`**
     - **`EslintReactHooksRules`** & **`EslintReactHooksRulesOption`**

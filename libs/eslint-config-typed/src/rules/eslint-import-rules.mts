@@ -1,5 +1,5 @@
+import { allExtensionsStr } from '../constants/index.mjs';
 import { withDefaultOption, type EslintImportsRules } from '../types/index.mjs';
-import { allExtensionsStr } from './all-extensions.mjs';
 
 export const eslintImportsRules = {
   // Not needed when using TypeScript.

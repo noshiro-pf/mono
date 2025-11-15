@@ -13,4 +13,5 @@ const allExtensions = [
 ] as const;
 
 export const allExtensionsStr = allExtensions.join(',');
+
 export const allExtensionsRegexUnionStr = allExtensions.join('|');

@@ -1,8 +1,8 @@
+import { allExtensionsRegexUnionStr } from '../constants/index.mjs';
 import {
   withDefaultOption,
   type TypeScriptEslintRules,
 } from '../types/index.mjs';
-import { allExtensionsRegexUnionStr } from './all-extensions.mjs';
 
 export const typescriptEslintRules = {
   '@typescript-eslint/adjacent-overload-signatures': 'error',

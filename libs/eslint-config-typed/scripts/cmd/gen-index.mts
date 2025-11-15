@@ -11,7 +11,9 @@ await genIndex({
   targetExtensions: ['.mts', '.tsx'],
   exclude: ({ absolutePath, fileName }) =>
     fileName.endsWith('.test.mts') ||
+    fileName === 'react-base.mts' ||
     fileName === 'globals.d.mts' ||
     absolutePath === path.resolve(srcDir, './entry-point.mts') ||
+    mm.isMatch(absolutePath, path.resolve(srcDir, './constants/**')) ||
     mm.isMatch(absolutePath, path.resolve(srcDir, './plugins/*/rules')),
 });

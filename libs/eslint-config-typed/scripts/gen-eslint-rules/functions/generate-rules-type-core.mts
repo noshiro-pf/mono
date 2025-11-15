@@ -186,6 +186,7 @@ const createResult = async (
       switch (schema.length) {
         case 0:
           mut_resultToWrite.push(
+            '',
             `  export type RuleEntry = ${RuleSeverityForNoOption};`,
           );
 
@@ -268,6 +269,7 @@ const createResult = async (
   );
 
   mut_resultToWrite.push(
+    '',
     `export type ${typeName} = Readonly<{`,
 
     ...schemaList
@@ -291,9 +293,7 @@ const createResult = async (
               )}.RuleEntry;`,
           ),
         ]),
-
     '}>',
-
     '',
   );
 
@@ -301,6 +301,7 @@ const createResult = async (
     schemaList.some((s) => !isDeprecated(s.deprecated) && s.schema.length > 0)
   ) {
     mut_resultToWrite.push(
+      '',
       `export type ${typeName}Option = Readonly<{`,
 
       ...schemaList
@@ -319,6 +320,7 @@ const createResult = async (
         ),
 
       '}>',
+      '',
     );
   }
 

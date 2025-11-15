@@ -1,4 +1,4 @@
-import { type EslintNRules } from '../types/index.mjs';
+import { withDefaultOption, type EslintNRules } from '../types/index.mjs';
 
 export const eslintNRules = {
   'n/callback-return': 'off',
@@ -8,7 +8,7 @@ export const eslintNRules = {
   'n/handle-callback-err': 'off',
   'n/hashbang': 'off',
   'n/no-callback-literal': 'off',
-  'n/no-deprecated-api': 'error',
+  'n/no-deprecated-api': withDefaultOption('error'),
   'n/no-exports-assign': 'error',
   'n/no-extraneous-import': 'off',
   'n/no-extraneous-require': 'off',
@@ -18,12 +18,12 @@ export const eslintNRules = {
   'n/no-new-require': 'error',
   'n/no-path-concat': 'error',
   'n/no-process-env': 'off',
-  'n/no-process-exit': 'off',
+  'n/no-process-exit': 'error',
   'n/no-restricted-import': 'off',
   'n/no-restricted-require': 'off',
   'n/no-sync': 'off',
   'n/no-top-level-await': 'off',
-  'n/no-unpublished-bin': 'error',
+  'n/no-unpublished-bin': withDefaultOption('error'),
   'n/no-unpublished-import': 'off',
   'n/no-unpublished-require': 'off',
   'n/no-unsupported-features/es-builtins': 'off',
@@ -36,8 +36,12 @@ export const eslintNRules = {
   'n/prefer-global/text-encoder': 'off',
   'n/prefer-global/url-search-params': 'off',
   'n/prefer-global/url': 'off',
-  'n/prefer-node-protocol': 'error',
+  'n/prefer-node-protocol': withDefaultOption('error'),
   'n/prefer-promises/dns': 'off',
   'n/prefer-promises/fs': 'off',
   'n/process-exit-as-throw': 'off',
+
+  // deprecated
+  'n/no-hide-core-modules': 0,
+  'n/shebang': 0,
 } as const satisfies EslintNRules;
