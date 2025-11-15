@@ -1,3 +1,9 @@
+# [3.11.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.10.0...v3.11.0) (2025-11-15)
+
+### Features
+
+- add eslint-plugin-n ([#138](https://github.com/noshiro-pf/eslint-config-typed/issues/138)) ([bcc05b4](https://github.com/noshiro-pf/eslint-config-typed/commit/bcc05b414204d802b7fdb752a1ecf5a44d37b94d))
+
 # [3.10.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.9.0...v3.10.0) (2025-11-15)
 
 ### Features
