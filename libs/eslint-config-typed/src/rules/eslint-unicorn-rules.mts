@@ -107,7 +107,10 @@ export const eslintUnicornRules = {
   'unicorn/prefer-default-parameters': 'error',
   'unicorn/prefer-export-from': withDefaultOption('error'),
   'unicorn/prefer-includes': 'error',
-  'unicorn/prefer-math-trunc': 'error',
+
+  // Covered by math/prefer-math-trunc (more specific for mathematical truncation)
+  'unicorn/prefer-math-trunc': 'off',
+
   'unicorn/prefer-negative-index': 'error',
   'unicorn/prefer-number-properties': withDefaultOption('error'),
   'unicorn/prefer-object-from-entries': withDefaultOption('error'),

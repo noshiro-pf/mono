@@ -370,8 +370,12 @@ export const eslintRules = {
     'error',
     { allowNamedFunctions: false, allowUnboundThis: false },
   ],
+
   'prefer-destructuring': 'off', // disabled
-  'prefer-exponentiation-operator': 'error',
+
+  // Covered by math/prefer-exponentiation-operator (more specific to mathematical operations)
+  'prefer-exponentiation-operator': 'off',
+
   'prefer-named-capture-group': 'off', // disabled
   'prefer-numeric-literals': 'error',
   'prefer-object-has-own': 'error',

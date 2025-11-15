@@ -5,6 +5,7 @@ import {
   type EslintImportsRules,
   type EslintJestRules,
   type EslintJsxA11yRules,
+  type EslintMathRules,
   type EslintPlaywrightRules,
   type EslintPluginRules,
   type EslintPluginSortDestructureKeysRules,
@@ -36,6 +37,7 @@ type KnownRules = DeepReadonly<
     EslintImportsRules &
     EslintJestRules &
     EslintJsxA11yRules &
+    EslintMathRules &
     EslintPlaywrightRules &
     EslintPluginRules &
     EslintPluginSortDestructureKeysRules &

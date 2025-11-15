@@ -436,6 +436,7 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
 - eslint-plugin-security
 - eslint-plugin-promise
 - eslint-plugin-import-x
+- eslint-plugin-math
 - eslint-plugin-strict-dependencies
 - eslint-plugin-tree-shakable (Reimplemented in this repository to support flat config)
 - eslint-plugin-n
@@ -494,6 +495,7 @@ Pre-configured rule sets that can be imported and customized:
 | **`eslintTotalFunctionsRules`**            | `eslint-plugin-total-functions`        | Functional programming style rules                     |
 | **`eslintUnicornRules`**                   | `eslint-plugin-unicorn`                | Unicorn plugin rules for better code                   |
 | **`eslintArrayFuncRules`**                 | `eslint-plugin-array-func`             | Array function preference rules                        |
+| **`eslintMathRules`**                      | `eslint-plugin-math`                   | Math object and Number rules                           |
 | **`eslintPreferArrowFunctionRules`**       | `eslint-plugin-prefer-arrow-functions` | Arrow function preference rules                        |
 | **`eslintPluginSortDestructureKeysRules`** | `eslint-plugin-sort-destructure-keys`  | Object destructuring rules                             |
 | **`eslintPromiseRules`**                   | `eslint-plugin-promise`                | Promise handling rules                                 |
@@ -603,6 +605,7 @@ Each plugin provides typed rule definitions:
     - **`EslintTotalFunctionsRules`** (no options)
     - **`EslintUnicornRules`** & **`EslintUnicornRulesOption`**
     - **`EslintArrayFuncRules`** (no options)
+    - **`EslintMathRules`** (no options)
     - **`EslintPreferArrowFunctionRules`** & **`EslintPreferArrowFunctionRulesOption`**
     - **`EslintStylisticRules`** & **`EslintStylisticRulesOption`**
     - **`EslintPluginSortDestructureKeysRules`** & **`EslintPluginSortDestructureKeysRulesOption`**

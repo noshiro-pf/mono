@@ -46,6 +46,8 @@ import eslintPluginReactPerf from 'eslint-plugin-react-perf';
 // @ts-expect-error no type definition
 import eslintPluginJsxA11y from 'eslint-plugin-jsx-a11y';
 
+import eslintPluginMath from 'eslint-plugin-math';
+
 import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 
 // import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
@@ -72,6 +74,7 @@ export const plugins: Record<
   | 'jest'
   | 'vitest'
   | 'jsx-a11y'
+  | 'math'
   | 'prefer-arrow-functions'
   | 'promise'
   | 'react'
@@ -105,6 +108,7 @@ export const plugins: Record<
   vitest: eslintPluginVitest,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'jsx-a11y': eslintPluginJsxA11y,
+  math: eslintPluginMath,
   'prefer-arrow-functions': eslintPluginPreferArrowFunctions,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   promise: eslintPluginPromise,
