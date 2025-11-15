@@ -94,7 +94,7 @@ export const eslintImportsRules = {
   'import-x/newline-after-import': [
     'error',
     {
-      considerComments: true,
+      considerComments: false, // Must be false for consistency with the @stylistic/padding-line-between-statements rule
       count: 1,
     },
   ],
