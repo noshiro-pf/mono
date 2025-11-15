@@ -1,3 +1,9 @@
+# [3.10.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.9.0...v3.10.0) (2025-11-15)
+
+### Features
+
+- add react-coding-style/display-name rule ([#137](https://github.com/noshiro-pf/eslint-config-typed/issues/137)) ([754cee8](https://github.com/noshiro-pf/eslint-config-typed/commit/754cee8f32a9a242c099b982dac469a402d3f1ad))
+
 # [3.9.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.8.1...v3.9.0) (2025-11-15)
 
 ### Features
