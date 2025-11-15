@@ -61,7 +61,10 @@ jobs:
 
       - name: Run lint
         if: steps.check_diff_type.outputs.should_run == 'true'
-        run: pnpm run lint
+        run: pnpm run lint:fix
+
+      - name: Run format
+        run: pnpm run fmt
 
       - name: Check if there is no file diff
         run: pnpm run z:assert-repo-is-clean
