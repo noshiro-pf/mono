@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@octokit/core':
-        specifier: ^7.0.6
-        version: 7.0.6
       '@octokit/openapi-types':
         specifier: ^27.0.0
         version: 27.0.0
@@ -78,6 +75,9 @@ importers:
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
+      github-settings-as-code:
+        specifier: ^1.0.5
+        version: 1.0.5(prettier@3.6.2)(typescript@5.9.3)
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
@@ -1711,6 +1711,10 @@ packages:
     resolution: {integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==}
     engines: {node: '>=8'}
 
+  dotenv@17.2.3:
+    resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
+    engines: {node: '>=12'}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -2260,6 +2264,10 @@ packages:
 
   git-log-parser@1.2.1:
     resolution: {integrity: sha512-PI+sPDvHXNPl5WNOErAK05s3j0lgwUzMN6o8cyQrDaKfT3qd7TmNJKeXX+SknI5I0QhG5fVPAEwSY4tRGDtYoQ==}
+
+  github-settings-as-code@1.0.5:
+    resolution: {integrity: sha512-iRQ3V8j7p8yChoLihmVJ8He4Wdgw5y7kd3s1KJ4QBE57vkVhTnUFyqcVMsw1BgN2FQLjz2+B3I3QZfoA9/qt1Q==}
+    hasBin: true
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -3115,6 +3123,9 @@ packages:
   object.values@1.2.1:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
+
+  octokit-safe-types@1.2.0:
+    resolution: {integrity: sha512-G0k/M9/RD1a7d3hqoAcYXq3vHoN+DEzHwVgZnQ4QVo4BkT61kps7soXOgWTwqENFTzCGQLVNKyw/FallzvOL0Q==}
 
   onetime@5.1.2:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
@@ -5726,6 +5737,8 @@ snapshots:
     dependencies:
       is-obj: 2.0.0
 
+  dotenv@17.2.3: {}
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -6519,6 +6532,19 @@ snapshots:
       stream-combiner2: 1.1.1
       through2: 2.0.5
       traverse: 0.6.8
+
+  github-settings-as-code@1.0.5(prettier@3.6.2)(typescript@5.9.3):
+    dependencies:
+      '@octokit/core': 7.0.6
+      dotenv: 17.2.3
+      octokit-safe-types: 1.2.0(typescript@5.9.3)
+      ts-data-forge: 5.0.1(typescript@5.9.3)
+      ts-fortress: 6.1.0(typescript@5.9.3)
+      ts-repo-utils: 7.8.2(prettier@3.6.2)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - prettier
+      - supports-color
+      - typescript
 
   glob-parent@5.1.2:
     dependencies:
@@ -7389,6 +7415,16 @@ snapshots:
       call-bound: 1.0.4
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
+
+  octokit-safe-types@1.2.0(typescript@5.9.3):
+    dependencies:
+      '@octokit/core': 7.0.6
+      '@octokit/openapi-types': 27.0.0
+      '@octokit/types': 16.0.0
+      ts-data-forge: 5.0.1(typescript@5.9.3)
+      ts-fortress: 6.1.0(typescript@5.9.3)
+    transitivePeerDependencies:
+      - typescript
 
   onetime@5.1.2:
     dependencies:
