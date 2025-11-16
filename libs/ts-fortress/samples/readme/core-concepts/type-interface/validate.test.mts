@@ -7,15 +7,19 @@ const User = t.record({
 
 // Success case - validates correctly
 const validData = { name: 'Alice', age: 30 } as const;
+
 const result = User.validate(validData);
 
 assert(t.Result.isOk(result));
+
 // In strip mode (default), a new object is created even without excess properties
 assert.deepStrictEqual(result.value, { name: 'Alice', age: 30 });
+
 assert.notEqual(result.value, validData);
 
 // Error case - provides detailed error information
 const invalidData = { name: 'Bob', age: 'thirty' } as const;
+
 const errorResult = User.validate(invalidData);
 
 assert(t.Result.isErr(errorResult));

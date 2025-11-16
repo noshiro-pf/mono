@@ -54,6 +54,7 @@ describe(strictRecord, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = { name: 'John', age: 30 };
+
       const result = userType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

@@ -88,6 +88,7 @@ describe(omit, () => {
         year: 2000,
         month: 12,
       };
+
       const result = ym.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -117,6 +118,7 @@ describe(omit, () => {
         year: 2000,
         month: 12,
       };
+
       const result = ymAllow.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -160,6 +162,7 @@ describe(omit, () => {
         month: 12,
         aaa: 999,
       };
+
       const result = ym.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

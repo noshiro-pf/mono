@@ -23,10 +23,8 @@
 import * as ioTs from 'io-ts';
 import { expectType } from 'ts-data-forge';
 import * as z from 'zod';
-
 // eslint-disable-next-line import-x/no-internal-modules
 import { PathReporter } from 'io-ts/PathReporter';
-
 // eslint-disable-next-line import-x/no-internal-modules
 import * as tf from '../src/entry-point.mjs';
 
@@ -71,16 +69,19 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
 
     // Get io-ts error messages
     const ioTsResult = IoTsSimpleReadonly.decode(invalidData);
+
     const ioTsErrorMessages = PathReporter.report(ioTsResult);
 
     // Get zod error messages using prettifyError
     const zodResult = ZodSimpleType.safeParse(invalidData);
+
     const zodErrorMessages = zodResult.success
       ? ''
       : z.prettifyError(zodResult.error);
 
     // Get ts-fortress error messages
     const tsFortressResult = TsFortressSimpleType.validate(invalidData);
+
     const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
       ? tf.validationErrorsToMessages(tsFortressResult.value)
       : [];
@@ -164,16 +165,19 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
 
     // Get io-ts error messages
     const ioTsResult = IoTsNestedReadonly.decode(invalidData);
+
     const ioTsErrorMessages = PathReporter.report(ioTsResult);
 
     // Get zod error messages using prettifyError
     const zodResult = ZodNestedType.safeParse(invalidData);
+
     const zodErrorMessages = zodResult.success
       ? ''
       : z.prettifyError(zodResult.error);
 
     // Get ts-fortress error messages
     const tsFortressResult = TsFortressNestedType.validate(invalidData);
+
     const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
       ? tf.validationErrorsToMessages(tsFortressResult.value)
       : [];
@@ -265,16 +269,19 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
 
     // Get io-ts error messages
     const ioTsResult = IoTsComplexReadonly.decode(invalidData);
+
     const ioTsErrorMessages = PathReporter.report(ioTsResult);
 
     // Get zod error messages using prettifyError
     const zodResult = ZodComplexType.safeParse(invalidData);
+
     const zodErrorMessages = zodResult.success
       ? ''
       : z.prettifyError(zodResult.error);
 
     // Get ts-fortress error messages
     const tsFortressResult = TsFortressComplexType.validate(invalidData);
+
     const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
       ? tf.validationErrorsToMessages(tsFortressResult.value)
       : [];

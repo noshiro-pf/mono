@@ -49,6 +49,7 @@ describe('simpleBrandedNumber', () => {
     describe('validate', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 42;
+
         const result = userIdType.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -131,6 +132,7 @@ describe('simpleBrandedNumber', () => {
     describe('validate', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 85;
+
         const result = scoreType.validate(input);
 
         expect(Result.isOk(result)).toBe(true);

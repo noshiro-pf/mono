@@ -65,6 +65,7 @@ describe(keyof, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = 'year';
+
       const result = ymdKey.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

@@ -19,6 +19,7 @@ export const recursion = <A,>(
   const getInnerType = (): Type<A> => {
     // eslint-disable-next-line functional/immutable-data
     cache.innerType ??= definition();
+
     return cache.innerType;
   };
 
@@ -34,8 +35,10 @@ export const recursion = <A,>(
       if (options?.defaultValue !== undefined) {
         return options.defaultValue;
       }
+
       // eslint-disable-next-line functional/immutable-data
       cache.computedDefaultValue ??= getInnerType().defaultValue;
+
       return cache.computedDefaultValue;
     },
     fill,

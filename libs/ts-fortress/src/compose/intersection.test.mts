@@ -94,6 +94,7 @@ describe(intersection, () => {
 
       test('validate returns input as-is for OK cases', () => {
         const input = { x: 0, y: 1, z: 2, w: 3 };
+
         const result = targetType.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -223,6 +224,7 @@ describe(intersection, () => {
 
       test('validate returns input as-is for OK cases', () => {
         const input = 0;
+
         const result = targetType.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -368,6 +370,7 @@ describe(intersection, () => {
 
       test('validate returns input as-is for OK cases', () => {
         const input = 3;
+
         const result = targetType.validate(input);
 
         expect(Result.isOk(result)).toBe(true);

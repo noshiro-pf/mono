@@ -54,6 +54,7 @@ export const record = <
       .join(', ')} }`;
 
   const excessPropertyValidation = options?.excessPropertyValidation ?? 'strip';
+
   const excessPropertyFill = options?.excessPropertyFill ?? 'strip';
 
   const defaultValue: Type<T>['defaultValue'] =
@@ -99,6 +100,7 @@ export const record = <
           } else {
             // The case where the key exists in the object
             const v = a[k];
+
             const res = valueType.validate(v);
 
             if (Result.isErr(res)) {
@@ -160,6 +162,7 @@ export const record = <
         const excessEntries = Object.entries(a).filter(
           ([key]) => !sourceKeys.has(key),
         );
+
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return Object.fromEntries([
           ...Object.entries(shape).map(([k, v]) =>

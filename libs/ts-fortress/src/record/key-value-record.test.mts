@@ -82,6 +82,7 @@ describe(keyValueRecord, () => {
         month: 12,
         date: 25,
       };
+
       const result = strNumRecord.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

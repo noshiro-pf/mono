@@ -139,6 +139,7 @@ describe(required, () => {
           month: 12,
           date: 25,
         };
+
         const result = ymd.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -168,6 +169,7 @@ describe(required, () => {
           month: 12,
           date: 25,
         };
+
         const result = ymdAllow.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -246,6 +248,7 @@ describe(required, () => {
           date: 25,
           aaa: 999,
         };
+
         const result = ymd.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -502,6 +505,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
         };
+
         const result = ymd.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -532,6 +536,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
         };
+
         const result = ymdAllow.validate(input);
 
         expect(Result.isOk(result)).toBe(true);

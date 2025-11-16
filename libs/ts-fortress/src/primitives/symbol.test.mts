@@ -5,6 +5,7 @@ import { symbol } from './symbol.mjs';
 
 describe(symbol, () => {
   const defaultSym = Symbol('default');
+
   const targetType = symbol(defaultSym);
 
   type TargetType = TypeOf<typeof targetType>;
@@ -42,6 +43,7 @@ describe(symbol, () => {
   describe('validate', () => {
     test('truthy case', () => {
       const testSym = Symbol('test');
+
       const result = targetType.validate(testSym);
 
       expect(Result.isOk(result)).toBe(true);
@@ -75,6 +77,7 @@ describe(symbol, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = Symbol('my-symbol');
+
       const result = targetType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -110,6 +113,7 @@ describe(symbol, () => {
   describe('cast', () => {
     test('truthy case', () => {
       const testSym = Symbol('test');
+
       const x: unknown = testSym;
 
       expect(targetType.cast(x)).toBe(testSym);
@@ -125,6 +129,7 @@ describe(symbol, () => {
   describe('fill', () => {
     test('noop', () => {
       const testSym = Symbol('test');
+
       const x: unknown = testSym;
 
       expect(targetType.fill(x)).toBe(testSym);

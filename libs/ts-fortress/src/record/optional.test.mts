@@ -8,6 +8,7 @@ import {
 
 describe(optional, () => {
   const numberType = number(42);
+
   const optionalNumber = optional(numberType);
 
   type OptionalNumber = OptionalPropertyType<typeof numberType>;

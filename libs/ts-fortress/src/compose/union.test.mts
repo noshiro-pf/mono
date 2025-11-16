@@ -109,6 +109,7 @@ describe(union, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = { x: 10, y: 20 };
+
       const result = targetType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

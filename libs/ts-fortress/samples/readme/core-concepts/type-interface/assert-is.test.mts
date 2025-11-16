@@ -14,6 +14,7 @@ const processValue = (value: unknown): void => {
 
 try {
   processValue(42); // Works
+
   processValue('not a number'); // Throws error
 } catch (error) {
   assert.deepStrictEqual(
@@ -45,6 +46,7 @@ const processUser = (data: unknown): void => {
 // embed-sample-code-ignore-below
 try {
   processUser({ id: 'id', name: 'name' }); // Works
+
   processUser({ id: 123, name: 'name' }); // Throws error
 } catch (error) {
   assert.deepStrictEqual(

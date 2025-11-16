@@ -86,10 +86,13 @@ const user: User = UserType.cast(someData);
 // ❌ All of these produce TypeScript errors:
 // @ts-expect-error Cannot assign to 'name' because it is read-only
 user.name = 'new name';
+
 // @ts-expect-error Cannot assign to 'street' because it is read-only
 user.address.street = 'new street';
+
 // @ts-expect-error Property 'push' does not exist on readonly array
 user.tags.push('new tag');
+
 // @ts-expect-error Index signature in type 'readonly string[]' only permits reading
 user.tags[0] = 'modified';
 ```
@@ -122,8 +125,11 @@ const user: User = UserSchema.parse(someData);
 
 // None of these will result in a TypeScript compilation error:
 user.name = 'new name';
+
 user.address.street = 'new street';
+
 user.tags.push('new tag');
+
 user.tags[0] = 'modified';
 ```
 
@@ -158,6 +164,7 @@ const invalidData = {
 
 // Get io-ts error messages
 const ioTsResult = IoTsNestedReadonly.decode(invalidData);
+
 const ioTsErrorMessages = PathReporter.report(ioTsResult);
 
 assert.equal(
@@ -191,6 +198,7 @@ const TsFortressNestedType = tf.record({
 
 // Get ts-fortress error messages
 const tsFortressResult = TsFortressNestedType.validate(invalidData);
+
 const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
     ? tf.validationErrorsToMessages(tsFortressResult.value)
     : [];
@@ -223,6 +231,7 @@ const ZodNestedType = z
 
 // Get Zod error messages using prettifyError
 const zodResult = ZodNestedType.safeParse(invalidData);
+
 const zodErrorMessages = zodResult.success
     ? ''
     : z.prettifyError(zodResult.error);
@@ -268,6 +277,7 @@ const T = t.keyof({
 
 // ❌ Runtime behavior is inconsistent with TypeScript types!
 assert(!isRight(T.decode(0))); // number 0 is rejected
+
 assert(isRight(T.decode('0'))); // string "0" is accepted
 
 type T = t.TypeOf<typeof T>;
@@ -300,6 +310,7 @@ type T = t.TypeOf<typeof T>;
 
 // ✅ Runtime behavior matches TypeScript types exactly
 assert(t.Result.isErr(T.validate(0))); // ❌ Fails correctly - number 0 is rejected
+
 assert(t.Result.isOk(T.validate('0'))); // ✅ Success - string "0" is accepted
 
 // For this use case, if you want to define a union type of numeric literals, you can use `uintRange` from ts-fortress:
@@ -310,6 +321,7 @@ type U = t.TypeOf<typeof U>;
 // ↑ TypeScript correctly infers: 0 | 1 | 2 | 3 | 4 (number literals)
 
 assert(t.Result.isErr(U.validate('0'))); // ❌ Fails - string "0" is rejected
+
 assert(t.Result.isOk(U.validate(0))); // ✅ Success - number 0 is accepted
 ```
 
@@ -334,10 +346,12 @@ const C = t.partial({
 // ❌ Case 1: Union decode adds unexpected fields
 {
     const UnionBA = t.union([B, A]);
+
     const res = UnionBA.decode({ A: 1 });
 
     if (isRight(res)) {
         const expected = { A: 1 };
+
         assert.notDeepEqual(res.right, expected); // NG
 
         const actual = { A: 1, B: undefined };
@@ -345,6 +359,7 @@ const C = t.partial({
         assert.deepStrictEqual(res.right, actual);
 
         assert.ok(A.is(res.right)); // ok
+
         assert.notOk(!B.is(res.right)); // NG (expected: false)
     }
 }
@@ -352,10 +367,12 @@ const C = t.partial({
 // ❌ Case 2: Union decode produces inconsistent results
 {
     const UnionCA = t.union([C, A]);
+
     const res = UnionCA.decode({ A: 1 });
 
     if (isRight(res)) {
         const expected = {};
+
         assert.notDeepEqual(res.right, expected); // NG
 
         const actual = { A: 1 };
@@ -363,6 +380,7 @@ const C = t.partial({
         assert.deepStrictEqual(res.right, actual);
 
         assert(A.is(res.right)); // ok
+
         assert(C.is(res.right)); // ok
     }
 }
@@ -391,12 +409,14 @@ const C = t.partial(
 // ✅ Case 1: Union validation is predictable and correct
 {
     const UnionBA = t.union([B, A]);
+
     const result = UnionBA.validate({ A: 1 });
 
     if (t.Result.isOk(result)) {
         assert.deepStrictEqual(result.value, { A: 1 }); // Correct! No unexpected fields
 
         assert(A.is(result.value)); // Correct
+
         assert(!B.is(result.value)); // Correct! B requires field B
     }
 }
@@ -404,12 +424,14 @@ const C = t.partial(
 // ✅ Case 2: Consistent validation behavior
 {
     const UnionCA = t.union([C, A]);
+
     const result = UnionCA.validate({ A: 1 });
 
     if (t.Result.isOk(result)) {
         assert.deepStrictEqual(result.value, { A: 1 }); // Correct and consistent
 
         assert(A.is(result.value)); // Correct
+
         assert(C.is(result.value)); // Consistent! ts-fortress partial types allow extra fields
     }
 }

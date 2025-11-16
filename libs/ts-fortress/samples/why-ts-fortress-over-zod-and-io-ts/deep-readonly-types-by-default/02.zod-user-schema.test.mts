@@ -36,6 +36,9 @@ const user: User = UserSchema.parse(someData);
 
 // None of these will result in a TypeScript compilation error:
 user.name = 'new name';
+
 user.address.street = 'new street';
+
 user.tags.push('new tag');
+
 user.tags[0] = 'modified';

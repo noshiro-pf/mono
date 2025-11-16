@@ -29,6 +29,7 @@ const ZodNestedType = z
 
 // Get Zod error messages using prettifyError
 const zodResult = ZodNestedType.safeParse(invalidData);
+
 const zodErrorMessages = zodResult.success
   ? ''
   : z.prettifyError(zodResult.error);

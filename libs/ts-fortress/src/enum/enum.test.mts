@@ -83,6 +83,7 @@ describe(enumType, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = 'a';
+
       const result = targetType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

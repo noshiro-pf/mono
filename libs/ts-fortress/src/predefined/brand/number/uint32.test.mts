@@ -83,6 +83,7 @@ describe(uint32, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = 2_000_000_000;
+
       const result = targetType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

@@ -100,6 +100,7 @@ describe(arrayOfLength, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = [5, 6, 7, 8];
+
       const result = xs.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

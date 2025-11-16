@@ -61,6 +61,7 @@ describe(uintRange, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = 5;
+
       const result = month.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

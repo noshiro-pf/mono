@@ -75,6 +75,7 @@ describe('undefined type', () => {
   describe('cast', () => {
     test('undefined returns undefined', () => {
       const value: unknown = undefined;
+
       const result = undefinedType.cast(value);
 
       expect(result).toBeUndefined();
@@ -105,6 +106,7 @@ describe('undefined type', () => {
   describe('fill', () => {
     test('undefined returns undefined', () => {
       const value: unknown = undefined;
+
       const result = undefinedType.fill(value);
 
       expect(result).toBeUndefined();
@@ -112,6 +114,7 @@ describe('undefined type', () => {
 
     test('null returns default (undefined)', () => {
       const value: unknown = null;
+
       const result = undefinedType.fill(value);
 
       expect(result).toBeUndefined();
@@ -130,6 +133,7 @@ describe('undefined type', () => {
   describe('validate', () => {
     test('undefined is valid', () => {
       const value: unknown = undefined;
+
       const result = undefinedType.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
@@ -141,6 +145,7 @@ describe('undefined type', () => {
 
     test('null is invalid', () => {
       const value: unknown = null;
+
       const result = undefinedType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
@@ -160,6 +165,7 @@ describe('undefined type', () => {
 
     test('other values are invalid', () => {
       const value: unknown = 0;
+
       const result = undefinedType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
@@ -179,6 +185,7 @@ describe('undefined type', () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = undefined;
+
       const result = undefinedType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

@@ -51,6 +51,7 @@ describe('simpleBrandedString', () => {
     describe('validate', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 'john_doe';
+
         const result = userNameType.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -133,6 +134,7 @@ describe('simpleBrandedString', () => {
     describe('validate', () => {
       test('validate returns input as-is for OK cases', () => {
         const input = 'technology';
+
         const result = categoryType.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -214,6 +216,7 @@ describe('simpleBrandedString', () => {
       typeName: 'FirstName',
       defaultValue: '',
     });
+
     const lastNameType = brandedString({
       typeName: 'LastName',
       defaultValue: '',
@@ -221,6 +224,7 @@ describe('simpleBrandedString', () => {
 
     test('creates distinct branded types', () => {
       type FirstName = TypeOf<typeof firstNameType>;
+
       type LastName = TypeOf<typeof lastNameType>;
 
       // These should be different types even though they're both branded strings

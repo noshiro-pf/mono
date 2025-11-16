@@ -11,6 +11,7 @@ export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
   type T = Brand<UuidBaseString, 'Uuid'>;
 
   const defaultValue = options?.defaultValue ?? nilUuid;
+
   const version = options?.version ?? 'all';
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -74,6 +75,7 @@ type UuidValidatorOption<V extends UuidVersion | UuidVersionAdditionalOption> =
   }>;
 
 const nilUuid = '00000000-0000-0000-0000-000000000000' satisfies UuidBaseString;
+
 const maxUuid = 'ffffffff-ffff-ffff-ffff-ffffffffffff' satisfies UuidBaseString;
 
 const regexDef = {

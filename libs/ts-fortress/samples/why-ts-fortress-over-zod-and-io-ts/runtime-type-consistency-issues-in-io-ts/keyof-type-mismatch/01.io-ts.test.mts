@@ -11,6 +11,7 @@ const T = t.keyof({
 
 // ❌ Runtime behavior is inconsistent with TypeScript types!
 assert(!isRight(T.decode(0))); // number 0 is rejected
+
 assert(isRight(T.decode('0'))); // string "0" is accepted
 
 type T = t.TypeOf<typeof T>;

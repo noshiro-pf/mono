@@ -89,6 +89,7 @@ const expandedYearFormats = [
 
 describe(iso8601, () => {
   const baseType = iso8601();
+
   const baseDefault = baseType.defaultValue;
 
   type Iso8601Type = TypeOf<typeof baseType>;

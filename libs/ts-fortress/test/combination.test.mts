@@ -280,6 +280,7 @@ describe('advanced type', () => {
   ]);
 
   const paletteBase = arrayOfLength(2, EvenRange);
+
   const Palette = intersection(
     [nonEmptyArray(EvenRange), paletteBase],
     paletteBase,
@@ -290,12 +291,15 @@ describe('advanced type', () => {
     beta: literal('beta'),
     gamma: literal('gamma'),
   });
+
   const MetricKeys = keyof(MetricShape);
+
   type MetricKey = TypeOf<typeof MetricKeys>;
 
   expectType<MetricKey, 'alpha' | 'beta' | 'gamma'>('=');
 
   const Metrics = keyValueRecord(MetricKeys, EvenRange);
+
   const NullableMetrics = nullable(Metrics);
 
   const Tag = brandedString({
@@ -322,6 +326,7 @@ describe('advanced type', () => {
   ]);
 
   const NullableTags = nullable(nonEmptyArray(Tag));
+
   const NullableExtras = nullable(keyValueRecord(SettingKey, SettingValue));
 
   type AdvancedNode = Readonly<{

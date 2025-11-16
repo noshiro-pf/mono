@@ -97,6 +97,7 @@ describe('record allowExcessProperties option', () => {
 
   test('strictRecord validate returns input as-is for OK cases', () => {
     const input = { name: 42, age: 25 };
+
     const result = strictRecord.validate(input);
 
     expect(Result.isOk(result)).toBe(true);
@@ -131,6 +132,7 @@ describe('record allowExcessProperties option', () => {
 
   test('permissiveRecord validate returns input as-is for OK cases', () => {
     const input = { name: 42, age: 25, extra: 'allowed' };
+
     const result = permissiveRecord.validate(input);
 
     expect(Result.isOk(result)).toBe(true);
@@ -164,6 +166,7 @@ describe('record allowExcessProperties option', () => {
 
   test('defaultRecord validate returns stripped content for OK cases', () => {
     const input = { name: 42, age: 25, extra: 'stripped by default' };
+
     const result = defaultRecord.validate(input);
 
     expect(Result.isOk(result)).toBe(true);

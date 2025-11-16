@@ -20,6 +20,7 @@ describe(string, () => {
   });
 
   const str = string();
+
   type Str = TypeOf<typeof str>;
 
   expectType<Str, string>('=');
@@ -93,6 +94,7 @@ describe(string, () => {
   describe('cast', () => {
     test('valid string returns as is', () => {
       const value: unknown = 'hello';
+
       const result = str.cast(value);
 
       expect(result).toBe('hello');
@@ -108,6 +110,7 @@ describe(string, () => {
 
     test('throws error with type mismatch', () => {
       const strWithDefault = string('default');
+
       const value: unknown = 42;
 
       expect(() => strWithDefault.cast(value)).toThrow(
@@ -119,6 +122,7 @@ describe(string, () => {
   describe('fill', () => {
     test('valid string returns as is', () => {
       const value: unknown = 'hello';
+
       const result = str.fill(value);
 
       expect(result).toBe('hello');
@@ -126,6 +130,7 @@ describe(string, () => {
 
     test('undefined returns default', () => {
       const value: unknown = undefined;
+
       const result = str.fill(value);
 
       expect(result).toBe('');
@@ -133,6 +138,7 @@ describe(string, () => {
 
     test('null returns default', () => {
       const value: unknown = null;
+
       const result = str.fill(value);
 
       expect(result).toBe('');
@@ -140,6 +146,7 @@ describe(string, () => {
 
     test('invalid value returns default', () => {
       const value: unknown = 42;
+
       const result = str.fill(value);
 
       expect(result).toBe('');
@@ -147,7 +154,9 @@ describe(string, () => {
 
     test('uses custom default value for invalid', () => {
       const strWithDefault = string('default');
+
       const value: unknown = 42;
+
       const result = strWithDefault.fill(value);
 
       expect(result).toBe('default');
@@ -157,6 +166,7 @@ describe(string, () => {
   describe('validate', () => {
     test('valid string', () => {
       const value: unknown = 'hello';
+
       const result = str.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
@@ -168,6 +178,7 @@ describe(string, () => {
 
     test('empty string is valid', () => {
       const value: unknown = '';
+
       const result = str.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
@@ -179,6 +190,7 @@ describe(string, () => {
 
     test('invalid value', () => {
       const value: unknown = 42;
+
       const result = str.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
@@ -198,6 +210,7 @@ describe(string, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = 'hello world';
+
       const result = str.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -401,6 +414,7 @@ describe('string with constraints', () => {
   describe('string constrained by regex', () => {
     test('accepts valid default value', () => {
       const numeric = /^\d+$/u;
+
       const type = string('12345', { regex: numeric });
 
       expectType<typeof type, Type<string>>('=');
@@ -558,6 +572,7 @@ describe('string with constraints', () => {
     describe('string constrained by regex and includes', () => {
       test('accepts valid default value', () => {
         const slug = /^[a-z-]+$/u;
+
         const type = string('feature-flag', {
           includes: 'feature',
           regex: slug,
@@ -586,6 +601,7 @@ describe('string with constraints', () => {
     describe('string constrained by minLength, maxLength, and regex', () => {
       test('accepts valid default value', () => {
         const digits = /^[0-9]+$/u;
+
         const type = string('12345', {
           minLength: 4,
           maxLength: 6,

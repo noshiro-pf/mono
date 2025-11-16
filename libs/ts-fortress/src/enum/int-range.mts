@@ -63,6 +63,7 @@ export const intRange = <Start extends Int8 | -128, End extends Int8 | 128>({
 };
 
 type NegativeRange = NegativeIndex<128>;
+
 type PositiveRange = IndexInclusive<128>;
 
 type IntRange<Start extends Int8 | -128, End extends Int8 | 128> =

@@ -116,6 +116,7 @@ describe(array, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = [10, 20, 30];
+
       const result = xs.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

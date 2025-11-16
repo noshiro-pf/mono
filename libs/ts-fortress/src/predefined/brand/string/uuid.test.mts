@@ -4,9 +4,13 @@ import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { uuid, uuidV4, uuidV6, uuidV7 } from './uuid.mjs';
 
 const nilUuid = '00000000-0000-0000-0000-000000000000';
+
 const maxUuid = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+
 const uuidV4Example = '550e8400-e29b-41d4-a716-446655440000';
+
 const uuidV6Example = '550e8400-e29b-61d4-a716-446655440000';
+
 const uuidV7Example = '550e8400-e29b-71d4-a716-446655440000';
 
 describe(uuid, () => {

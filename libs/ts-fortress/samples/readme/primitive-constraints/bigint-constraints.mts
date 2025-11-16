@@ -7,4 +7,5 @@ const PermissionsMask = t.bigint(0b11_1111n, {
 });
 
 PermissionsMask.is(0b10_1100n); // true
+
 PermissionsMask.is(0b10_1111n); // false (not divisible by 4)

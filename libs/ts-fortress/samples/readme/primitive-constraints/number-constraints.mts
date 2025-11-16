@@ -8,5 +8,7 @@ const Percentage = t.number(100, {
 });
 
 Percentage.is(75); // true
+
 Percentage.is(72); // false (fails `step`)
+
 Percentage.is(-5); // false (fails `min`/`nonNegative`)

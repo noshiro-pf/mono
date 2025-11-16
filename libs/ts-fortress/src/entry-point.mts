@@ -86,4 +86,5 @@ export {
   isUint32,
   isUint8,
 } from 'ts-data-forge';
+
 export * from './index.mjs';

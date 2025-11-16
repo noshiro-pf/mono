@@ -206,6 +206,7 @@ describe(record, () => {
         month: 6,
         date: 15,
       };
+
       const result = ymdEased.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -405,6 +406,7 @@ describe('partial record', () => {
         month: 8,
         extra: 'should be stripped',
       };
+
       const result = ymd.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -424,6 +426,7 @@ describe('partial record', () => {
         year: 2024,
         month: 8,
       };
+
       const result = ymdEased.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

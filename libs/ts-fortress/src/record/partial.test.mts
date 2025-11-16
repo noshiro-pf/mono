@@ -123,6 +123,7 @@ describe(partial, () => {
           month: 12,
           date: 25,
         };
+
         const result = ymd.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -152,6 +153,7 @@ describe(partial, () => {
           month: 12,
           date: 25,
         };
+
         const result = ymdAllow.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -180,6 +182,7 @@ describe(partial, () => {
 
       test('validate returns input as-is for empty object', () => {
         const input: UnknownRecord = {};
+
         const result = ymd.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -205,6 +208,7 @@ describe(partial, () => {
         const ymdAllow = partial(ymdBaseAllow);
 
         const input: UnknownRecord = {};
+
         const result = ymdAllow.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -251,6 +255,7 @@ describe(partial, () => {
           date: 25,
           aaa: 999,
         };
+
         const result = ymd.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -472,6 +477,7 @@ describe(partial, () => {
           year: 2000,
           month: 12,
         };
+
         const result = ymd.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -502,6 +508,7 @@ describe(partial, () => {
           year: 2000,
           month: 12,
         };
+
         const result = ymdAllow.validate(input);
 
         expect(Result.isOk(result)).toBe(true);

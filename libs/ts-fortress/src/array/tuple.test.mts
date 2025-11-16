@@ -170,6 +170,7 @@ describe(tuple, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = [{ x: 5, y: 10 }, 3, '2'] as const;
+
       const result = targetType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

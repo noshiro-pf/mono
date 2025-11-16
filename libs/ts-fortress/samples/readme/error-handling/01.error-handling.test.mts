@@ -69,6 +69,7 @@ const StrictType = t.record(
 );
 
 const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
+
 const strictResult = StrictType.validate(dataWithExcess);
 
 assert(t.Result.isErr(strictResult));

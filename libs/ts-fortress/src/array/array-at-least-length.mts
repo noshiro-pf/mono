@@ -56,6 +56,7 @@ export const arrayAtLeastLength = <A, N extends SmallUint>(
     const errors: readonly ValidationError[] = Arr.generate(function* () {
       for (const [index, el] of a.entries()) {
         const res = elementType.validate(el);
+
         if (Result.isErr(res)) {
           yield* prependIndexToValidationErrors(res.value, index);
         }

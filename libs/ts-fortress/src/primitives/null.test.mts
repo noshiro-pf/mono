@@ -77,6 +77,7 @@ describe('null type', () => {
   describe('cast', () => {
     test('null returns null', () => {
       const value: unknown = null;
+
       const result = nullType.cast(value);
 
       expect(result).toBeNull();
@@ -103,6 +104,7 @@ describe('null type', () => {
   describe('fill', () => {
     test('null returns null', () => {
       const value: unknown = null;
+
       const result = nullType.fill(value);
 
       expect(result).toBeNull();
@@ -110,6 +112,7 @@ describe('null type', () => {
 
     test('undefined returns default (null)', () => {
       const value: unknown = undefined;
+
       const result = nullType.fill(value);
 
       expect(result).toBeNull();
@@ -128,6 +131,7 @@ describe('null type', () => {
   describe('validate', () => {
     test('null is valid', () => {
       const value: unknown = null;
+
       const result = nullType.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
@@ -139,6 +143,7 @@ describe('null type', () => {
 
     test('undefined is invalid', () => {
       const value: unknown = undefined;
+
       const result = nullType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
@@ -158,6 +163,7 @@ describe('null type', () => {
 
     test('other values are invalid', () => {
       const value: unknown = 0;
+
       const result = nullType.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
@@ -177,6 +183,7 @@ describe('null type', () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = null;
+
       const result = nullType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

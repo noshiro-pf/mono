@@ -18,6 +18,7 @@ describe(number, () => {
   });
 
   const num = number();
+
   type Num = TypeOf<typeof num>;
 
   expectType<Num, number>('=');
@@ -88,6 +89,7 @@ describe(number, () => {
   describe('cast', () => {
     test('valid number returns as is', () => {
       const value: unknown = 42;
+
       const result = num.cast(value);
 
       expect(result).toBe(42);
@@ -103,6 +105,7 @@ describe(number, () => {
 
     test('throws error with type mismatch', () => {
       const numWithDefault = number(100);
+
       const value: unknown = 'not a number';
 
       expect(() => numWithDefault.cast(value)).toThrow(
@@ -114,6 +117,7 @@ describe(number, () => {
   describe('fill', () => {
     test('valid number returns as is', () => {
       const value: unknown = 42;
+
       const result = num.fill(value);
 
       expect(result).toBe(42);
@@ -121,6 +125,7 @@ describe(number, () => {
 
     test('undefined returns default', () => {
       const value: unknown = undefined;
+
       const result = num.fill(value);
 
       expect(result).toBe(0);
@@ -128,6 +133,7 @@ describe(number, () => {
 
     test('null returns default', () => {
       const value: unknown = null;
+
       const result = num.fill(value);
 
       expect(result).toBe(0);
@@ -135,6 +141,7 @@ describe(number, () => {
 
     test('invalid value returns default', () => {
       const value: unknown = 'not a number';
+
       const result = num.fill(value);
 
       expect(result).toBe(0);
@@ -142,7 +149,9 @@ describe(number, () => {
 
     test('uses custom default value for invalid', () => {
       const numWithDefault = number(100);
+
       const value: unknown = 'not a number';
+
       const result = numWithDefault.fill(value);
 
       expect(result).toBe(100);
@@ -152,6 +161,7 @@ describe(number, () => {
   describe('validate', () => {
     test('valid number', () => {
       const value: unknown = 42;
+
       const result = num.validate(value);
 
       expect(Result.isOk(result)).toBe(true);
@@ -163,6 +173,7 @@ describe(number, () => {
 
     test('invalid value', () => {
       const value: unknown = 'not a number';
+
       const result = num.validate(value);
 
       expect(Result.isErr(result)).toBe(true);
@@ -182,6 +193,7 @@ describe(number, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123.456;
+
       const result = num.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

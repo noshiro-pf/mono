@@ -16,10 +16,12 @@ const C = t.partial({
 // ❌ Case 1: Union decode adds unexpected fields
 {
   const UnionBA = t.union([B, A]);
+
   const res = UnionBA.decode({ A: 1 });
 
   if (isRight(res)) {
     const expected = { A: 1 };
+
     assert.notDeepEqual(res.right, expected); // NG
 
     const actual = { A: 1, B: undefined };
@@ -27,6 +29,7 @@ const C = t.partial({
     assert.deepStrictEqual(res.right, actual);
 
     assert.ok(A.is(res.right)); // ok
+
     assert.notOk(!B.is(res.right)); // NG (expected: false)
   }
 }
@@ -34,10 +37,12 @@ const C = t.partial({
 // ❌ Case 2: Union decode produces inconsistent results
 {
   const UnionCA = t.union([C, A]);
+
   const res = UnionCA.decode({ A: 1 });
 
   if (isRight(res)) {
     const expected = {};
+
     assert.notDeepEqual(res.right, expected); // NG
 
     const actual = { A: 1 };
@@ -45,6 +50,7 @@ const C = t.partial({
     assert.deepStrictEqual(res.right, actual);
 
     assert(A.is(res.right)); // ok
+
     assert(C.is(res.right)); // ok
   }
 }

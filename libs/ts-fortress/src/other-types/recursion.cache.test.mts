@@ -5,8 +5,10 @@ import { recursion } from './recursion.mjs';
 describe('recursion - caching and defaultValue', () => {
   test('computes inner type only once and caches defaultValue', () => {
     let mut_calls = 0;
+
     const T = recursion('T', () => {
       mut_calls += 1;
+
       return record({ x: number(1) });
     });
 
@@ -30,10 +32,12 @@ describe('recursion - caching and defaultValue', () => {
 
   test('uses provided options.defaultValue without computing inner default', () => {
     let mut_calls = 0;
+
     const T = recursion(
       'T2',
       () => {
         mut_calls += 1;
+
         return record({ x: number(7) });
       },
       { defaultValue: { x: 0 } },

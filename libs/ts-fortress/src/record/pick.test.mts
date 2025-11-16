@@ -103,6 +103,7 @@ describe(pick, () => {
         month: 12,
         aaa: 999,
       };
+
       const result = ym.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -122,6 +123,7 @@ describe(pick, () => {
         year: 2000,
         month: 12,
       };
+
       const result = ymEased.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -162,6 +164,7 @@ describe(pick, () => {
         month: 12,
         aaa: 999,
       };
+
       const result = ym.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -182,6 +185,7 @@ describe(pick, () => {
         month: 12,
         aaa: 999,
       };
+
       const result = ymEased.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

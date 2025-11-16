@@ -4,6 +4,7 @@ import { mergeRecords } from './merge-records.mjs';
 
 describe('mergeRecords - fill and defaultType', () => {
   const A = record({ a: string(), s: string('S') });
+
   const B = record({ b: number(1), s: string('B') });
 
   test('fill with non-record uses merged defaults', () => {
@@ -16,6 +17,7 @@ describe('mergeRecords - fill and defaultType', () => {
 
   test('fill with record merges filled values and input own props', () => {
     const T = mergeRecords([A, B]);
+
     const input = { a: 'x', extra: 'keep' } as const;
 
     // Should keep input.extra and fill missing from A/B
@@ -33,6 +35,7 @@ describe('mergeRecords - fill and defaultType', () => {
 
   test('custom defaultType overrides fallback fill/default', () => {
     const Default = record({ a: string('dA'), b: number(9), s: string('dS') });
+
     const T = mergeRecords([A, B], { defaultType: Default });
 
     // defaultValue comes from defaultType

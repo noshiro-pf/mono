@@ -27,6 +27,7 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
 
       const result = pickedType.validate(dataWithExcess);
+
       assert(Result.isErr(result));
 
       assert.deepStrictEqual(result.value, [
@@ -47,6 +48,7 @@ describe('record strict composition - simple tests', () => {
 
     test('pick accepts valid data and fills missing fields', () => {
       const pickedType = pick(strictRecord, ['id', 'name']);
+
       const validData = { id: '123', name: 'John' };
 
       const result = pickedType.validate(validData);
@@ -60,7 +62,9 @@ describe('record strict composition - simple tests', () => {
 
     test('pickedType validate returns input as-is for OK cases', () => {
       const pickedType = pick(strictRecord, ['id', 'name']);
+
       const input = { id: '123', name: 'John' };
+
       const result = pickedType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -79,6 +83,7 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
 
       const result = omittedType.validate(dataWithExcess);
+
       assert(Result.isErr(result));
 
       assert.deepStrictEqual(result.value, [
@@ -105,6 +110,7 @@ describe('record strict composition - simple tests', () => {
       const dataWithExcess = { id: '123', extra: 'not allowed' };
 
       const result = partialType.validate(dataWithExcess);
+
       assert(Result.isErr(result));
 
       assert.deepStrictEqual(result.value, [
@@ -139,6 +145,7 @@ describe('record strict composition - simple tests', () => {
 
     test('strictRecord validate returns input as-is for OK cases', () => {
       const input = { id: '123', name: 'John', age: 25 };
+
       const result = strictRecord.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -167,6 +174,7 @@ describe('record strict composition - simple tests', () => {
 
     test('permissiveRecord validate strips excess properties', () => {
       const input = { id: '123', name: 'John', age: 25, extra: 'stripped' };
+
       const result = permissiveRecord.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
@@ -185,6 +193,7 @@ describe('record strict composition - simple tests', () => {
 
     test('pick from strict record rejects excess properties', () => {
       const strictPicked = pick(strictRecord, ['id', 'name']);
+
       const data = { id: '123', name: 'John', extra: 'not allowed' };
 
       const result = strictPicked.validate(data);
@@ -194,6 +203,7 @@ describe('record strict composition - simple tests', () => {
 
     test('pick from default record strips excess properties', () => {
       const permissivePicked = pick(permissiveRecord, ['id', 'name']);
+
       const data = { id: '123', name: 'John', extra: 'stripped' };
 
       const result = permissivePicked.validate(data);
@@ -211,7 +221,9 @@ describe('record strict composition - simple tests', () => {
 
     test('permissivePicked validate strips excess properties', () => {
       const permissivePicked = pick(permissiveRecord, ['id', 'name']);
+
       const input = { id: '123', name: 'John', extra: 'stripped' };
+
       const result = permissivePicked.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

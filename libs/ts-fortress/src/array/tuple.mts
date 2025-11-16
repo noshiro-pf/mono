@@ -59,6 +59,7 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
     const errors: readonly ValidationError[] = Arr.generate(function* () {
       for (const [index, [typeDef, el]] of Arr.zip(types, a).entries()) {
         const res = typeDef.validate(el);
+
         if (Result.isErr(res)) {
           yield* prependIndexToValidationErrors(res.value, index);
         }

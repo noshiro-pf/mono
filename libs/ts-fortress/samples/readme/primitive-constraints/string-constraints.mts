@@ -11,6 +11,7 @@ const Slug = t.string('feature-flag', {
 });
 
 Slug.is('feature-beta'); // true
+
 Slug.is('Feature-Flag'); // false (fails regex)
 
 type SlugType = t.TypeOf<typeof Slug>; // inferred as `feature${string}`

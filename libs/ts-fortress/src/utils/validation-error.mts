@@ -121,6 +121,7 @@ const createDetailsMessage = (
   maxLengthToPrintActualValue: number,
 ): string | undefined => {
   const actualTypeStr = typeof error.actualValue;
+
   const actualValueStr: string = isString(error.actualValue)
     ? error.actualValue.length <= maxLengthToPrintActualValue
       ? ` "${error.actualValue}"`

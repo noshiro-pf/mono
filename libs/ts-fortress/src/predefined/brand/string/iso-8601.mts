@@ -10,6 +10,7 @@ import { type Type, type TypeOf } from '../../../type.mjs';
  */
 export const iso8601 = (options?: ISO8601ValidatorOption): Type<Iso8601> => {
   const filledOptions = ISO8601ValidatorOption.fill(options);
+
   const is = isISO8601(filledOptions);
 
   return brandedString({
@@ -48,6 +49,7 @@ const isISO8601 =
       : regexpIso8601.test(str);
 
     if (check && filledOptions.strict) return isValidDate(str);
+
     return check;
   };
 
@@ -67,17 +69,25 @@ const isValidDate = (str: string): boolean => {
   // like 2009-02-31
   // first check for ordinal dates
   const ordinalMatch = /^(\d{4})-?(\d{3})([ T]\.*|$)/u.exec(str);
+
   if (ordinalMatch !== null) {
     const oYear = Number(ordinalMatch[1]);
+
     const oDay = Number(ordinalMatch[2]);
+
     // if is leap year
     if ((oYear % 4 === 0 && oYear % 100 !== 0) || oYear % 400 === 0)
       return oDay <= 366;
+
     return oDay <= 365;
   }
+
   const match = /(\d{4})-?(\d{0,2})-?(\d*)/u.exec(str)?.map(Number);
+
   const year = match?.[1];
+
   const month: number | undefined = match?.[2];
+
   const date: number | undefined = match?.[3];
 
   // create a date object and compare
@@ -92,5 +102,6 @@ const isValidDate = (str: string): boolean => {
       d.getUTCDate() === date
     );
   }
+
   return true;
 };

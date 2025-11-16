@@ -6,6 +6,7 @@ import { MapType } from './map.mjs';
 
 test('MapType with string keys and number values', () => {
   const StringNumberMap = MapType(string(), number());
+
   type StringNumberMap = TypeOf<typeof StringNumberMap>;
 
   // Type test
@@ -107,6 +108,7 @@ test('MapType fill() method', () => {
     ['a', 1],
     ['b', 2],
   ]);
+
   const filled1 = StringNumberMap.fill(validMap);
 
   expect(filled1.size).toBe(2);
@@ -122,6 +124,7 @@ test('MapType fill() method', () => {
     ['another', 'not a number'], // Invalid value
     ['good', 3],
   ]);
+
   const filled2 = StringNumberMap.fill(mixedMap);
 
   expect(filled2.size).toBe(2);
@@ -143,6 +146,7 @@ test('MapType cast() method', () => {
 
   // Valid map
   const validMap = new Map([['key', 42]]);
+
   const casted = StringNumberMap.cast(validMap);
 
   expect(casted).toBe(validMap);
@@ -194,6 +198,7 @@ test('MapType with custom typeName', () => {
 
 test('MapType with number keys and string values', () => {
   const NumberStringMap = MapType(number(), string());
+
   type NumberStringMap = TypeOf<typeof NumberStringMap>;
 
   // Type test

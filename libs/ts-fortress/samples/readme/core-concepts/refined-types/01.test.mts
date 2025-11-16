@@ -1,5 +1,6 @@
 /* eslint-disable import-x/first */
 const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};
+
 // embed-sample-code-ignore-above
 import * as t from 'ts-fortress';
 
@@ -40,6 +41,7 @@ assert(t.Result.isOk(uuidResult));
 
 if (t.Result.isOk(uuidResult)) {
   const validUuid = uuidResult.value; // string, guaranteed to be valid Uuid format
+
   IGNORE_EMBEDDING(validUuid);
 }
 
@@ -49,12 +51,15 @@ assert(t.Result.isOk(positiveResult));
 
 if (t.Result.isOk(positiveResult)) {
   const positiveNum = positiveResult.value; // number, guaranteed to be > 0
+
   IGNORE_EMBEDDING(positiveNum);
 }
 
 // Invalid cases
 assert(!Uuid.is('invalid-uuid'));
+
 assert(!PositiveNumber.is(-5));
+
 assert(!EvenNumber.is(7));
 
 // Use in record schemas

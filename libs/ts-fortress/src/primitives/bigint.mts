@@ -86,6 +86,7 @@ export function bigint<C extends Constraints>(
 
   if (constraints.multipleOf !== undefined) {
     const divisor = constraints.multipleOf;
+
     if (divisor === 0n) {
       if (defaultValue !== 0n) {
         throw new Error(
@@ -101,6 +102,7 @@ export function bigint<C extends Constraints>(
 
   if (constraints.step !== undefined) {
     const stepValue = constraints.step;
+
     if (stepValue === 0n) {
       if (defaultValue !== 0n) {
         throw new Error(
@@ -212,35 +214,46 @@ const createConstraintsPredicate =
     if (constraints.gt !== undefined && !(value > constraints.gt)) {
       return false;
     }
+
     if (constraints.gte !== undefined && !(value >= constraints.gte)) {
       return false;
     }
+
     if (constraints.min !== undefined && !(value >= constraints.min)) {
       return false;
     }
+
     if (constraints.lt !== undefined && !(value < constraints.lt)) {
       return false;
     }
+
     if (constraints.lte !== undefined && !(value <= constraints.lte)) {
       return false;
     }
+
     if (constraints.max !== undefined && !(value <= constraints.max)) {
       return false;
     }
+
     if (constraints.positive === true && !(value > 0n)) {
       return false;
     }
+
     if (constraints.nonNegative === true && !(value >= 0n)) {
       return false;
     }
+
     if (constraints.negative === true && !(value < 0n)) {
       return false;
     }
+
     if (constraints.nonPositive === true && !(value <= 0n)) {
       return false;
     }
+
     if (constraints.multipleOf !== undefined) {
       const divisor = constraints.multipleOf;
+
       if (divisor === 0n) {
         if (value !== 0n) {
           return false;
@@ -249,8 +262,10 @@ const createConstraintsPredicate =
         return false;
       }
     }
+
     if (constraints.step !== undefined) {
       const stepValue = constraints.step;
+
       if (stepValue === 0n) {
         if (value !== 0n) {
           return false;

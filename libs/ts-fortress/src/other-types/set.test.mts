@@ -7,6 +7,7 @@ import { SetType } from './set.mjs';
 
 test('SetType with string elements', () => {
   const StringSet = SetType(string());
+
   type StringSet = TypeOf<typeof StringSet>;
 
   // Type test
@@ -42,6 +43,7 @@ test('SetType with string elements', () => {
 
 test('SetType with number elements', () => {
   const NumberSet = SetType(number());
+
   type NumberSet = TypeOf<typeof NumberSet>;
 
   // Type test
@@ -95,6 +97,7 @@ test('SetType fill() method', () => {
 
   // Valid set - should preserve all elements
   const validSet = new Set([1, 2, 3]);
+
   const filled1 = NumberSet.fill(validSet);
 
   expect(filled1.size).toBe(3);
@@ -107,6 +110,7 @@ test('SetType fill() method', () => {
 
   // Mixed valid/invalid elements - should filter out invalid ones
   const mixedSet = new Set<unknown>([1, 'not a number', 2, true, 3]);
+
   const filled2 = NumberSet.fill(mixedSet);
 
   expect(filled2.size).toBe(3);
@@ -130,6 +134,7 @@ test('SetType cast() method', () => {
 
   // Valid set
   const validSet = new Set(['hello', 'world']);
+
   const casted = StringSet.cast(validSet);
 
   expect(casted).toBe(validSet);
@@ -193,6 +198,7 @@ test('SetType with complex element types', () => {
   });
 
   const UserSet = SetType(UserType);
+
   type UserSet = TypeOf<typeof UserSet>;
 
   // Type test
@@ -200,7 +206,9 @@ test('SetType with complex element types', () => {
   expectType<UserSet, ReadonlySet<Readonly<{ id: number; name: string }>>>('=');
 
   const user1 = { id: 1, name: 'Alice' };
+
   const user2 = { id: 2, name: 'Bob' };
+
   const validSet = new Set([user1, user2]);
 
   // is() test

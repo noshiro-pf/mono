@@ -86,6 +86,7 @@ describe(mergeRecords, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = { x: 0, y: 1, z: 2, w: 3 };
+
       const result = targetType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);

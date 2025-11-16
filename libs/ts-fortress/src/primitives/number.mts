@@ -192,39 +192,50 @@ const createConstraintsPredicate =
     if (constraints.gt !== undefined && !(value > constraints.gt)) {
       return false;
     }
+
     if (constraints.gte !== undefined && !(value >= constraints.gte)) {
       return false;
     }
+
     if (constraints.min !== undefined && !(value >= constraints.min)) {
       return false;
     }
+
     if (constraints.lt !== undefined && !(value < constraints.lt)) {
       return false;
     }
+
     if (constraints.lte !== undefined && !(value <= constraints.lte)) {
       return false;
     }
+
     if (constraints.max !== undefined && !(value <= constraints.max)) {
       return false;
     }
+
     if (constraints.positive === true && !(value > 0)) {
       return false;
     }
+
     if (constraints.nonNegative === true && !(value >= 0)) {
       return false;
     }
+
     if (constraints.negative === true && !(value < 0)) {
       return false;
     }
+
     if (constraints.nonPositive === true && !(value <= 0)) {
       return false;
     }
+
     if (
       constraints.multipleOf !== undefined &&
       value % constraints.multipleOf !== 0
     ) {
       return false;
     }
+
     if (constraints.step !== undefined && value % constraints.step !== 0) {
       return false;
     }

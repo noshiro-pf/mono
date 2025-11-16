@@ -1,5 +1,6 @@
 /* eslint-disable import-x/first */
 const PersonType = t.record({});
+
 // embed-sample-code-ignore-above
 import * as t from 'ts-fortress';
 

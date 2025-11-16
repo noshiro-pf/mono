@@ -30,7 +30,7 @@ Defined in: [src/utils/validation-error.mts:3](https://github.com/noshiro-pf/ts-
 
 > **createPrimitiveValidationError**(`__namedParameters`): [`ValidationError`](#validationerror)
 
-Defined in: [src/utils/validation-error.mts:208](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/validation-error.mts#L208)
+Defined in: [src/utils/validation-error.mts:209](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/validation-error.mts#L209)
 
 Creates a basic validation error for primitive type validation
 
@@ -50,7 +50,7 @@ Creates a basic validation error for primitive type validation
 
 > **prependIndexToValidationErrors**(`errors`, `index`): readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]
 
-Defined in: [src/utils/validation-error.mts:199](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/validation-error.mts#L199)
+Defined in: [src/utils/validation-error.mts:200](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/validation-error.mts#L200)
 
 Prepends an array index to all validation errors
 
@@ -74,7 +74,7 @@ readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorD
 
 > **prependPathToValidationErrors**(`errors`, `pathSegment`): readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorDetails`](#validationerrordetails); `expectedType`: `string`; `path`: readonly `string`[]; `typeName`: `string`; \}\>[]
 
-Defined in: [src/utils/validation-error.mts:187](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/validation-error.mts#L187)
+Defined in: [src/utils/validation-error.mts:188](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/validation-error.mts#L188)
 
 Prepends a path segment to all validation errors
 
@@ -98,7 +98,7 @@ readonly `Readonly`\<\{ `actualValue`: `unknown`; `details?`: [`ValidationErrorD
 
 > **validationErrorsToMessages**(`errors`, `maxLengthToPrintActualValue`): readonly `string`[]
 
-Defined in: [src/utils/validation-error.mts:178](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/validation-error.mts#L178)
+Defined in: [src/utils/validation-error.mts:179](https://github.com/noshiro-pf/ts-fortress/blob/main/src/utils/validation-error.mts#L179)
 
 Converts an array of validation errors to an array of string messages
 (for backward compatibility)

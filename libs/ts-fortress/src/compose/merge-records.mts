@@ -27,6 +27,7 @@ export const mergeRecords = <
     const errors: readonly ValidationError[] = Arr.generate(function* () {
       for (const type of types) {
         const res = type.validate(a);
+
         if (Result.isErr(res)) {
           yield {
             path: [],

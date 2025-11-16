@@ -7,6 +7,7 @@ import { valueof } from './valueof.mjs';
 describe(valueof, () => {
   test('empty record -> undefinedType', () => {
     const R = record({});
+
     const V = valueof(R);
 
     expectType<typeof V, Type<undefined>>('=');
@@ -14,13 +15,16 @@ describe(valueof, () => {
     expect(V.defaultValue).toBe(undefinedType.defaultValue);
 
     expect(Result.isOk(V.validate(undefined))).toBe(true);
+
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(V.fill('anything')).toBeUndefined();
   });
 
   test('single field returns that type', () => {
     const R = record({ a: string() });
+
     const V = valueof(R);
+
     type T = TypeOf<typeof V>;
 
     expectType<T, string>('=');
@@ -32,7 +36,9 @@ describe(valueof, () => {
 
   test('multiple fields returns union type', () => {
     const R = record({ a: number(), b: string() });
+
     const V = valueof(R);
+
     type T = TypeOf<typeof V>;
 
     expectType<T, number | string>('=');

@@ -26,6 +26,7 @@ const invalidData = {
 
 // Get io-ts error messages
 const ioTsResult = IoTsNestedReadonly.decode(invalidData);
+
 const ioTsErrorMessages = PathReporter.report(ioTsResult);
 
 assert.equal(

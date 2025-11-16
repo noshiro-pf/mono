@@ -23,6 +23,7 @@ const TsFortressNestedType = tf.record({
 
 // Get ts-fortress error messages
 const tsFortressResult = TsFortressNestedType.validate(invalidData);
+
 const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
   ? tf.validationErrorsToMessages(tsFortressResult.value)
   : [];

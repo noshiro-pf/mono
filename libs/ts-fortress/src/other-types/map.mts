@@ -63,8 +63,10 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
             yield* res.value;
           }
         }
+
         {
           const res = valueType.validate(v);
+
           if (Result.isErr(res)) {
             yield {
               path: [],

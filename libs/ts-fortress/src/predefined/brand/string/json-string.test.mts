@@ -5,6 +5,7 @@ import { jsonString } from './json-string.mjs';
 
 describe(jsonString, () => {
   const baseType = jsonString();
+
   const customDefault = jsonString({ defaultValue: '{"ok":true}' });
 
   type JsonStringType = TypeOf<typeof baseType>;

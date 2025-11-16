@@ -44,7 +44,7 @@ Defined in: [src/record/record.mts:18](https://github.com/noshiro-pf/ts-fortress
 
 > **strictRecord**\<`R`\>(`source`, `options?`): [`RecordType`](../type/README.md#recordtype)\<`R`, `"error"`\>
 
-Defined in: [src/record/record.mts:220](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L220)
+Defined in: [src/record/record.mts:223](https://github.com/noshiro-pf/ts-fortress/blob/main/src/record/record.mts#L223)
 
 Creates a strict record type that does not allow excess properties.
 This is an alias for `record(source, { excessPropertyValidation: 'error' })`.

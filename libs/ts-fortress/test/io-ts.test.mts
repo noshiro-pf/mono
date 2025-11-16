@@ -94,8 +94,11 @@ describe('union + undefined decode issues', () => {
     });
 
     const UnionAB = t.union([A, B]);
+
     const UnionBA = t.union([B, A]);
+
     const UnionAC = t.union([A, C]);
+
     const UnionCA = t.union([C, A]);
 
     const target = { A: 1 };
@@ -108,6 +111,7 @@ describe('union + undefined decode issues', () => {
       if (res._tag !== 'Right') {
         throw new Error('Expected Right result');
       }
+
       const right = res.right;
 
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct
@@ -125,6 +129,7 @@ describe('union + undefined decode issues', () => {
       if (res._tag !== 'Right') {
         throw new Error('Expected Right result');
       }
+
       const right = res.right;
 
       assert.deepStrictEqual(right, { A: 1, B: undefined }); // ❌ incorrect (expected to be { A: 1 })
@@ -142,6 +147,7 @@ describe('union + undefined decode issues', () => {
       if (res._tag !== 'Right') {
         throw new Error('Expected Right result');
       }
+
       const right = res.right;
 
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct
@@ -159,6 +165,7 @@ describe('union + undefined decode issues', () => {
       if (res._tag !== 'Right') {
         throw new Error('Expected Right result');
       }
+
       const right = res.right;
 
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct (not {})
@@ -185,8 +192,11 @@ describe('union + undefined decode issues', () => {
     );
 
     const UnionAB = f.union([A, B]);
+
     const UnionBA = f.union([B, A]);
+
     const UnionAC = f.union([A, C]);
+
     const UnionCA = f.union([C, A]);
 
     const target = { A: 1 };

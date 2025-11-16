@@ -20,20 +20,26 @@ export const genDocs = async (): Promise<void> => {
 
   // Step 0: Embed sample code into README
   echo('0. Embedding sample code into README...');
+
   await runStep(embedSamples(), 'Sample embedding failed');
+
   echo('✓ Sample code embedded into README\n');
 
   // Step 1: Generate docs with TypeDoc
   echo('1. Generating documentation with TypeDoc...');
+
   await runCmdStep(
     `typedoc --options "${TYPEDOC_CONFIG}"`,
     'TypeDoc generation failed',
   );
+
   echo('✓ TypeDoc generation completed\n');
 
   // Step 2: Lint markdown files
   echo('2. Linting markdown files...');
+
   await runCmdStep('pnpm run md', 'Markdown linting failed');
+
   echo('✓ Markdown linting completed\n');
 
   echo('✅ Documentation generation completed successfully!\n');
@@ -41,12 +47,16 @@ export const genDocs = async (): Promise<void> => {
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
+
   if (Result.isErr(result)) {
     const error = result.value;
 
     const message = isError(error) ? error.message : unknownToString(error);
+
     console.error(`${errorMsg}: ${message}`);
+
     console.error('❌ Documentation generation failed');
+
     process.exit(1);
   }
 };
@@ -56,9 +66,12 @@ const runStep = async (
   errorMsg: string,
 ): Promise<void> => {
   const result = await promise;
+
   if (Result.isErr(result)) {
     console.error(`${errorMsg}: ${unknownToString(result.value)}`);
+
     console.error('❌ Documentation generation failed');
+
     process.exit(1);
   }
 };

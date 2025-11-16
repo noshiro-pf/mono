@@ -85,6 +85,7 @@ if (User.is(userData)) {
 
 // Get validation result with error details
 const result = User.validate(userData);
+
 if (t.Result.isOk(result)) {
     result.value satisfies User; // typed as User
 } else {
@@ -265,6 +266,7 @@ const Slug = t.string('feature-flag', {
 });
 
 Slug.is('feature-beta'); // true
+
 Slug.is('Feature-Flag'); // false (fails regex)
 
 type SlugType = t.TypeOf<typeof Slug>; // inferred as `feature${string}`
@@ -292,7 +294,9 @@ const Percentage = t.number(100, {
 });
 
 Percentage.is(75); // true
+
 Percentage.is(72); // false (fails `step`)
+
 Percentage.is(-5); // false (fails `min`/`nonNegative`)
 ```
 
@@ -314,6 +318,7 @@ const PermissionsMask = t.bigint(0b11_1111n, {
 });
 
 PermissionsMask.is(0b10_1100n); // true
+
 PermissionsMask.is(0b10_1111n); // false (not divisible by 4)
 ```
 
@@ -397,15 +402,19 @@ const User = t.record({
 
 // Success case - validates correctly
 const validData = { name: 'Alice', age: 30 } as const;
+
 const result = User.validate(validData);
 
 assert(t.Result.isOk(result));
+
 // In strip mode (default), a new object is created even without excess properties
 assert.deepStrictEqual(result.value, { name: 'Alice', age: 30 });
+
 assert.notEqual(result.value, validData);
 
 // Error case - provides detailed error information
 const invalidData = { name: 'Bob', age: 'thirty' } as const;
+
 const errorResult = User.validate(invalidData);
 
 assert(t.Result.isErr(errorResult));
@@ -446,6 +455,7 @@ const processValue = (value: unknown): void => {
 
 try {
     processValue(42); // Works
+
     processValue('not a number'); // Throws error
 } catch (error) {
     assert.deepStrictEqual(
@@ -521,6 +531,7 @@ type User = t.TypeOf<typeof User>;
 
 // Use defaultValue for initialization
 const newUser: User = { ...User.defaultValue, id: 'user-123' };
+
 // This default value filling process can also be written as follows:
 const newUser2: User = User.fill({ id: 'user-456' });
 
@@ -531,6 +542,7 @@ assert.deepStrictEqual(newUser2, { id: 'user-456', name: 'Guest', score: 0 });
 // Useful for React state initialization
 const UserForm = () => {
     const [formData, setFormData] = useState<User>(User.defaultValue);
+
     // ...
 };
 ```
@@ -542,17 +554,23 @@ import * as t from 'ts-fortress';
 
 // Basic primitives
 const stringType = t.string('default');
+
 const numberType = t.number();
+
 const booleanType = t.boolean(false);
+
 const nullType = t.nullType;
+
 const undefinedType = t.undefinedType;
 
 // Literal types
 const statusType = t.literal('active');
+
 const versionType = t.literal(1);
 
 // Arrays
 const stringArrayType = t.array(t.string());
+
 const nonEmptyArrayType = t.nonEmptyArray(t.number());
 
 // Tuples
@@ -623,10 +641,13 @@ const PermissiveUserType = t.record(
 
 // Example usage - both StrictUserType and StrictUserTypeAlias behave identically
 const strictData = { id: '123', name: 'John', extra: 'not allowed' };
+
 assert(!StrictUserType.is(strictData)); // 'extra' property causes rejection
+
 assert(!StrictUserTypeAlias.is(strictData)); // same as above
 
 const permissiveData = { id: '123', name: 'John', extra: 'allowed' };
+
 assert(PermissiveUserType.is(permissiveData)); // 'extra' property is allowed
 
 // strictRecord provides cleaner syntax for strict validation
@@ -638,6 +659,7 @@ const UserSchema = t.strictRecord({
 
 // Validation examples
 UserSchema.is({ name: 'John', email: 'john@example.com', age: 30 }); // ✅ true
+
 UserSchema.is({
     name: 'John',
     email: 'john@example.com',
@@ -702,7 +724,9 @@ if (t.Result.isOk(positiveResult)) {
 
 // Invalid cases
 assert(!Uuid.is('invalid-uuid'));
+
 assert(!PositiveNumber.is(-5));
+
 assert(!EvenNumber.is(7));
 
 // Use in record schemas
@@ -798,14 +822,18 @@ import * as t from 'ts-fortress';
 
 // Simple branded types
 const UserId = t.brandedString({ typeName: 'UserId', defaultValue: '' });
+
 const Weight = t.brandedNumber({ typeName: 'Weight', defaultValue: 0 });
 
 type UserId = t.TypeOf<typeof UserId>; // Brand<string, 'UserId'>
+
 type Weight = t.TypeOf<typeof Weight>; // Brand<number, 'Weight'>
 
 // Rich number validation types
 const PositiveInt = t.positiveInt(1);
+
 const SafeInt = t.safeInt(0);
+
 const UInt16 = t.uint16(0);
 
 // Usage
@@ -948,6 +976,7 @@ const StrictType = t.record(
 );
 
 const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
+
 const strictResult = StrictType.validate(dataWithExcess);
 
 assert(t.Result.isErr(strictResult));

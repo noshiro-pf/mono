@@ -9,6 +9,7 @@ describe('keyof (empty record)', () => {
     expect(T.is(undefined)).toBe(true);
 
     expect(Result.isOk(T.validate(undefined))).toBe(true);
+
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(T.fill('anything')).toBeUndefined();
   });

@@ -6,6 +6,7 @@ import { literal } from './literal.mjs';
 describe(literal, () => {
   describe('string', () => {
     const hello = literal('hello');
+
     type Hello = TypeOf<typeof hello>;
 
     expectType<Hello, 'hello'>('=');
@@ -53,6 +54,7 @@ describe(literal, () => {
     describe('special string literals', () => {
       test('empty string literal', () => {
         const empty = literal('');
+
         type Empty = TypeOf<typeof empty>;
 
         expectType<Empty, ''>('=');
@@ -64,6 +66,7 @@ describe(literal, () => {
 
       test('whitespace literal', () => {
         const whitespace = literal('   ');
+
         type Whitespace = TypeOf<typeof whitespace>;
 
         expectType<Whitespace, '   '>('=');
@@ -77,6 +80,7 @@ describe(literal, () => {
 
       test('emoji literal', () => {
         const emoji = literal('🎉');
+
         type Emoji = TypeOf<typeof emoji>;
 
         expectType<Emoji, '🎉'>('=');
@@ -88,6 +92,7 @@ describe(literal, () => {
 
       test('multiline literal', () => {
         const multiline = literal('line1\nline2');
+
         type Multiline = TypeOf<typeof multiline>;
 
         expectType<Multiline, 'line1\nline2'>('=');
@@ -101,6 +106,7 @@ describe(literal, () => {
     describe('validate', () => {
       test('exact match', () => {
         const value: unknown = 'hello';
+
         const result = hello.validate(value);
 
         expect(Result.isOk(result)).toBe(true);
@@ -112,6 +118,7 @@ describe(literal, () => {
 
       test('different value', () => {
         const value: unknown = 'world';
+
         const result = hello.validate(value);
 
         expect(Result.isErr(result)).toBe(true);
@@ -131,6 +138,7 @@ describe(literal, () => {
 
       test('validate returns input as-is for OK cases', () => {
         const input = 'hello';
+
         const result = hello.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -144,6 +152,7 @@ describe(literal, () => {
     describe('cast', () => {
       test('valid literal returns as is', () => {
         const value: unknown = 'hello';
+
         const result = hello.cast(value);
 
         expect(result).toBe('hello');
@@ -161,6 +170,7 @@ describe(literal, () => {
     describe('fill', () => {
       test('valid literal returns as is', () => {
         const value: unknown = 'hello';
+
         const result = hello.fill(value);
 
         expect(result).toBe('hello');
@@ -168,6 +178,7 @@ describe(literal, () => {
 
       test('undefined returns default (the literal itself)', () => {
         const value: unknown = undefined;
+
         const result = hello.fill(value);
 
         expect(result).toBe('hello');
@@ -175,6 +186,7 @@ describe(literal, () => {
 
       test('different value returns default', () => {
         const value: unknown = 'world';
+
         const result = hello.fill(value);
 
         expect(result).toBe('hello');
@@ -184,6 +196,7 @@ describe(literal, () => {
 
   describe('number', () => {
     const literal42 = literal(42);
+
     type Literal42 = TypeOf<typeof literal42>;
 
     expectType<Literal42, 42>('=');
@@ -231,6 +244,7 @@ describe(literal, () => {
     describe('special number literals', () => {
       test('zero literal', () => {
         const zero = literal(0);
+
         type Zero = TypeOf<typeof zero>;
 
         expectType<Zero, 0>('=');
@@ -244,6 +258,7 @@ describe(literal, () => {
 
       test('negative literal', () => {
         const negative = literal(-100);
+
         type Negative = TypeOf<typeof negative>;
 
         expectType<Negative, -100>('=');
@@ -255,6 +270,7 @@ describe(literal, () => {
 
       test('decimal literal', () => {
         const pi = literal(3.14);
+
         type Pi = TypeOf<typeof pi>;
 
         expectType<Pi, 3.14>('=');
@@ -268,6 +284,7 @@ describe(literal, () => {
     describe('validate', () => {
       test('exact match', () => {
         const value: unknown = 42;
+
         const result = literal42.validate(value);
 
         expect(Result.isOk(result)).toBe(true);
@@ -279,6 +296,7 @@ describe(literal, () => {
 
       test('different value', () => {
         const value: unknown = 43;
+
         const result = literal42.validate(value);
 
         expect(Result.isErr(result)).toBe(true);
@@ -298,6 +316,7 @@ describe(literal, () => {
 
       test('validate returns input as-is for OK cases', () => {
         const input = 42;
+
         const result = literal42.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -411,6 +430,7 @@ describe(literal, () => {
 
       test('validate returns input as-is for OK cases', () => {
         const input = 42n;
+
         const result = targetType.validate(input);
 
         expect(Result.isOk(result)).toBe(true);
@@ -553,6 +573,7 @@ describe(literal, () => {
 
         test('validate returns input as-is for OK cases', () => {
           const input = true;
+
           const result = targetType.validate(input);
 
           expect(Result.isOk(result)).toBe(true);
@@ -652,6 +673,7 @@ describe(literal, () => {
 
         test('validate returns input as-is for OK cases', () => {
           const input = false;
+
           const result = targetType.validate(input);
 
           expect(Result.isOk(result)).toBe(true);

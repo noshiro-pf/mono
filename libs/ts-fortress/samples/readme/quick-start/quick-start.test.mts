@@ -47,6 +47,7 @@ if (User.is(userData)) {
 
 // Get validation result with error details
 const result = User.validate(userData);
+
 if (t.Result.isOk(result)) {
   result.value satisfies User; // typed as User
 } else {

@@ -82,6 +82,7 @@ describe(nonNegativeFiniteNumber, () => {
 
     test('validate returns input as-is for OK cases', () => {
       const input = 123.456;
+
       const result = targetType.validate(input);
 
       expect(Result.isOk(result)).toBe(true);
