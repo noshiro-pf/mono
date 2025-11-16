@@ -1,4 +1,5 @@
 import { unknownToString } from 'ts-data-forge';
+import 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');
