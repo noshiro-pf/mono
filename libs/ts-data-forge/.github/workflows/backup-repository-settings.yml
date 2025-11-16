@@ -39,9 +39,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Back up
-        run: |
-          pnpm exec tsx scripts/github/repository/backup.mts
-          pnpm exec tsx scripts/github/ruleset/backup.mts
+        run: pnpm exec gh-backup-all
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
