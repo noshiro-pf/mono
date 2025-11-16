@@ -1,7 +1,13 @@
 import { hasKey, isRecord, isString, Json, Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 
-export const OWNER = process.env['OWNER'];
+const ownerNullable = process.env['OWNER'];
+
+if (ownerNullable === undefined) {
+  throw new Error('OWNER env var is not set');
+}
+
+export const OWNER = ownerNullable;
 
 const packageJsonPath = path.resolve(process.cwd(), './package.json');
 
