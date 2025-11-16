@@ -1,3 +1,9 @@
+## [1.0.5](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.4...v1.0.5) (2025-11-16)
+
+### Bug Fixes
+
+- fix scripts ([86bab71](https://github.com/noshiro-pf/github-settings-as-code/commit/86bab7141f1c0180f6831bcc7dc3b7880af256bc))
+
 ## [1.0.4](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.3...v1.0.4) (2025-11-16)
 
 ### Bug Fixes
