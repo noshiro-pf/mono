@@ -97,7 +97,7 @@
     "cspell": "^9.3.2",
     "eslint": "9.39.1",
     "eslint-config-typed": "^3.13.3",
-    "github-settings-as-code": "^1.0.5",
+    "github-settings-as-code": "^1.0.6",
     "immer": "^10.2.0",
     "jiti": "^2.6.1",
     "markdownlint": "^0.39.0",

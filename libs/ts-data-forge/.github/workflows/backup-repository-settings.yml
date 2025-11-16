@@ -42,6 +42,7 @@ jobs:
         run: pnpm exec gh-backup-all
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          OWNER: noshiro-pf
 
       - name: Check if there is no file diff
         run: pnpm exec assert-repo-is-clean
