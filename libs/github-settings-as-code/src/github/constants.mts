@@ -1,8 +1,27 @@
+import { hasKey, isRecord, isString, Json, Result } from 'ts-data-forge';
 import 'ts-repo-utils';
-import packageJson from '../../package.json' with { type: 'json' };
 
 export const OWNER = 'noshiro-pf';
-export const REPO = packageJson.name;
+
+const packageJsonPath = path.resolve(process.cwd(), './package.json');
+
+const packageJsonStr = await fs.readFile(packageJsonPath, { encoding: 'utf8' });
+
+const packageJson = Json.parse(packageJsonStr);
+
+if (Result.isErr(packageJson)) {
+  throw new Error(packageJson.value);
+}
+
+if (
+  !isRecord(packageJson.value) ||
+  !hasKey(packageJson.value, 'name') ||
+  !isString(packageJson.value.name)
+) {
+  throw new Error('package.json not parsed correctly');
+}
+
+export const REPO: string = packageJson.value.name;
 
 const githubDir = path.resolve(process.cwd(), './github');
 
@@ -12,6 +31,7 @@ export const repositorySettingsDir = path.resolve(
 );
 
 export const repositorySettingsJsonName = 'settings.json';
+
 export const rulesetsDir = path.resolve(githubDir, './rulesets');
 
 export const octokitHeaders = {
