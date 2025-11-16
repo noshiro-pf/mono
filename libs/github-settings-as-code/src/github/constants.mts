@@ -1,7 +1,7 @@
 import { hasKey, isRecord, isString, Json, Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 
-export const OWNER = 'noshiro-pf';
+export const OWNER = process.env['OWNER'];
 
 const packageJsonPath = path.resolve(process.cwd(), './package.json');
 
