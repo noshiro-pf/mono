@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.5...v1.0.6) (2025-11-16)
+
+### Bug Fixes
+
+- use env value for OWNER ([654325e](https://github.com/noshiro-pf/github-settings-as-code/commit/654325e14d8bd4cb7592af1d04e14d43e18836ad))
+- use env value for OWNER ([1d684e4](https://github.com/noshiro-pf/github-settings-as-code/commit/1d684e433a90d4d31e4f0a570e14ddef36649dff))
+
 ## [1.0.5](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.4...v1.0.5) (2025-11-16)
 
 ### Bug Fixes
