@@ -24,6 +24,8 @@ export const formatFiles = async (
 ): Promise<Result<undefined, readonly unknown[]>> => {
   const silent = options?.silent ?? false;
 
+  const noIgnore = options?.ignore === false;
+
   const conditionalEcho = silent ? () => {} : echo;
 
   if (files.length === 0) {
@@ -62,7 +64,7 @@ export const formatFiles = async (
           });
 
           if (
-            options?.ignore !== false &&
+            !noIgnore &&
             (fileInfo.ignored || (options?.ignore ?? defaultIgnoreFn)(filePath))
           ) {
             conditionalEcho(`Skipping ignored file: ${filePath}`);
@@ -71,6 +73,7 @@ export const formatFiles = async (
           }
 
           if (
+            !noIgnore &&
             (options?.ignoreUnknown ?? true) &&
             fileInfo.inferredParser === null
           ) {
