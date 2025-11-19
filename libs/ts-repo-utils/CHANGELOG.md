@@ -1,3 +1,9 @@
+# [7.9.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.8.2...v7.9.0) (2025-11-19)
+
+### Features
+
+- add no ignore option to format APIs ([#205](https://github.com/noshiro-pf/ts-repo-utils/issues/205)) ([0f46bb1](https://github.com/noshiro-pf/ts-repo-utils/commit/0f46bb1790a603eca68f026d65c80814066d8e03))
+
 ## [7.8.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.8.1...v7.8.2) (2025-11-14)
 
 ### Bug Fixes
