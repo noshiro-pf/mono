@@ -18,7 +18,7 @@ export const formatFiles = async (
   files: readonly string[],
   options?: Readonly<{
     silent?: boolean;
-    ignore?: (filePath: string) => boolean;
+    ignore?: false | ((filePath: string) => boolean);
     ignoreUnknown?: boolean;
   }>,
 ): Promise<Result<undefined, readonly unknown[]>> => {
@@ -62,8 +62,8 @@ export const formatFiles = async (
           });
 
           if (
-            fileInfo.ignored ||
-            (options?.ignore ?? defaultIgnoreFn)(filePath)
+            options?.ignore !== false &&
+            (fileInfo.ignored || (options?.ignore ?? defaultIgnoreFn)(filePath))
           ) {
             conditionalEcho(`Skipping ignored file: ${filePath}`);
 
@@ -198,7 +198,7 @@ export const formatFilesGlob = async (
   options?: Readonly<{
     silent?: boolean;
     ignoreUnknown?: boolean;
-    ignore?: (filePath: string) => boolean;
+    ignore?: false | ((filePath: string) => boolean);
   }>,
 ): Promise<Result<undefined, unknown>> => {
   const silent = options?.silent ?? false;
@@ -213,7 +213,7 @@ export const formatFilesGlob = async (
     // Find all files matching the glob
     const files = await glob(pathGlob, {
       absolute: true,
-      ignore: ['**/node_modules/**', '**/.git/**'],
+      ignore: ignore === false ? [] : ['**/node_modules/**', '**/.git/**'],
       dot: true,
     });
 
@@ -245,7 +245,7 @@ export const formatUncommittedFiles = async (
     staged?: boolean;
     silent?: boolean;
     ignoreUnknown?: boolean;
-    ignore?: (filePath: string) => boolean;
+    ignore?: false | ((filePath: string) => boolean);
   }>,
 ): Promise<
   Result<
@@ -337,7 +337,7 @@ export const formatDiffFrom = async (
     includeStaged?: boolean;
     silent?: boolean;
     ignoreUnknown?: boolean;
-    ignore?: (filePath: string) => boolean;
+    ignore?: false | ((filePath: string) => boolean);
   }>,
 ): Promise<
   Result<

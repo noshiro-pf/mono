@@ -27,7 +27,7 @@ Base branch name or commit hash to compare against (defaults to
 
 ##### options?
 
-`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `includeModified?`: `boolean`; `includeStaged?`: `boolean`; `includeUntracked?`: `boolean`; `silent?`: `boolean`; \}\>
+`Readonly`\<\{ `ignore?`: `false` \| (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `includeModified?`: `boolean`; `includeStaged?`: `boolean`; `includeUntracked?`: `boolean`; `silent?`: `boolean`; \}\>
 
 Options for formatting
 
@@ -55,7 +55,7 @@ Array of file paths to format
 
 ##### options?
 
-`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `silent?`: `boolean`; \}\>
+`Readonly`\<\{ `ignore?`: `false` \| (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `silent?`: `boolean`; \}\>
 
 #### Returns
 
@@ -81,7 +81,7 @@ Glob pattern to match files
 
 ##### options?
 
-`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `silent?`: `boolean`; \}\>
+`Readonly`\<\{ `ignore?`: `false` \| (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `silent?`: `boolean`; \}\>
 
 #### Returns
 
@@ -101,7 +101,7 @@ Format only files that have been changed (git status)
 
 ##### options?
 
-`Readonly`\<\{ `ignore?`: (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `modified?`: `boolean`; `silent?`: `boolean`; `staged?`: `boolean`; `untracked?`: `boolean`; \}\>
+`Readonly`\<\{ `ignore?`: `false` \| (`filePath`) => `boolean`; `ignoreUnknown?`: `boolean`; `modified?`: `boolean`; `silent?`: `boolean`; `staged?`: `boolean`; `untracked?`: `boolean`; \}\>
 
 Options for formatting
 
