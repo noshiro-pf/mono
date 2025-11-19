@@ -43,14 +43,14 @@ namespace ExpectExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly assertFunctionNames?: readonly [] | readonly [string];
-  };
+  export type Options = Readonly<{
+    assertFunctionNames?: readonly [] | readonly [string];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -85,14 +85,14 @@ namespace MaxExpects {
    * ]
    * ```
    */
-  export type Options = {
-    readonly max?: number;
-  };
+  export type Options = Readonly<{
+    max?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -127,14 +127,14 @@ namespace MaxNestedDescribe {
    * ]
    * ```
    */
-  export type Options = {
-    readonly max?: number;
-  };
+  export type Options = Readonly<{
+    max?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -172,14 +172,14 @@ namespace MissingPlaywrightAwait {
    * ]
    * ```
    */
-  export type Options = {
-    readonly customMatchers?: readonly string[];
-  };
+  export type Options = Readonly<{
+    customMatchers?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -375,14 +375,14 @@ namespace NoHooks {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allow?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    allow?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -487,14 +487,14 @@ namespace NoRawLocators {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowed?: readonly string[];
-  };
+  export type Options = Readonly<{
+    allowed?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -531,9 +531,9 @@ namespace NoRestrictedMatchers {
   export type Options = Readonly<Record<string, string | null>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -569,14 +569,15 @@ namespace NoSkippedTest {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowConditional?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    allowConditional?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -612,14 +613,15 @@ namespace NoSlowedTest {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowConditional?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    allowConditional?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -903,16 +905,17 @@ namespace PreferLowercaseTitle {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedPrefixes?: readonly string[];
-    readonly ignore?: readonly ('test.describe' | 'test')[];
-    readonly ignoreTopLevelDescribe?: boolean;
-  };
+  export type Options = Readonly<{
+    allowedPrefixes?: readonly string[];
+    ignore?: readonly ('test.describe' | 'test')[];
+    /** @default false */
+    ignoreTopLevelDescribe?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -948,14 +951,15 @@ namespace PreferNativeLocators {
    * ]
    * ```
    */
-  export type Options = {
-    readonly testIdAttribute?: string;
-  };
+  export type Options = Readonly<{
+    /** @default 'data-testid' */
+    testIdAttribute?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1101,14 +1105,14 @@ namespace RequireHook {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedFunctionCalls?: readonly string[];
-  };
+  export type Options = Readonly<{
+    allowedFunctionCalls?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1178,14 +1182,14 @@ namespace RequireTopLevelDescribe {
    * ]
    * ```
    */
-  export type Options = {
-    readonly maxTopLevelDescribes?: number;
-  };
+  export type Options = Readonly<{
+    maxTopLevelDescribes?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1241,15 +1245,15 @@ namespace ValidExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly maxArgs?: number;
-    readonly minArgs?: number;
-  };
+  export type Options = Readonly<{
+    maxArgs?: number;
+    minArgs?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1333,25 +1337,25 @@ namespace ValidTestTags {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedTags?: readonly (
+  export type Options = Readonly<{
+    allowedTags?: readonly (
       | string
-      | {
-          readonly source?: string;
-        }
+      | Readonly<{
+          source?: string;
+        }>
     )[];
-    readonly disallowedTags?: readonly (
+    disallowedTags?: readonly (
       | string
-      | {
-          readonly source?: string;
-        }
+      | Readonly<{
+          source?: string;
+        }>
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1449,97 +1453,109 @@ namespace ValidTitle {
    * ]
    * ```
    */
-  /* modified */
-  export type Options = {
-    readonly disallowedWords?: readonly string[];
-    readonly ignoreSpaces?: boolean;
-    readonly ignoreTypeOfDescribeName?: boolean;
-    readonly ignoreTypeOfStepName?: boolean;
-    readonly ignoreTypeOfTestName?: boolean;
-    readonly mustNotMatch?: MustMatchType | string;
-    readonly mustMatch?: MustMatchType | string;
-  };
+  export type MustMatchType =
+    | PatternOrPatternArray
+    | Readonly<{
+        describe?: PatternOrPatternArray;
+        test?: PatternOrPatternArray;
+        step?: PatternOrPatternArray;
+      }>;
 
-  type MustMatchType = Readonly<
-    Partial<Record<'describe' | 'it' | 'test', string>>
-  >;
+  export type PatternOrPatternArray =
+    | string
+    | readonly [string]
+    | readonly [string, string];
+
+  export type Options = Readonly<{
+    disallowedWords?: readonly string[];
+    /** @default false */
+    ignoreSpaces?: boolean;
+    /** @default false */
+    ignoreTypeOfDescribeName?: boolean;
+    /** @default true */
+    ignoreTypeOfStepName?: boolean;
+    /** @default false */
+    ignoreTypeOfTestName?: boolean;
+    mustMatch?: MustMatchType;
+    mustNotMatch?: MustMatchType;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintPlaywrightRules = {
-  readonly 'playwright/expect-expect': ExpectExpect.RuleEntry;
-  readonly 'playwright/max-expects': MaxExpects.RuleEntry;
-  readonly 'playwright/max-nested-describe': MaxNestedDescribe.RuleEntry;
-  readonly 'playwright/missing-playwright-await': MissingPlaywrightAwait.RuleEntry;
-  readonly 'playwright/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
-  readonly 'playwright/no-conditional-expect': NoConditionalExpect.RuleEntry;
-  readonly 'playwright/no-conditional-in-test': NoConditionalInTest.RuleEntry;
-  readonly 'playwright/no-duplicate-hooks': NoDuplicateHooks.RuleEntry;
-  readonly 'playwright/no-element-handle': NoElementHandle.RuleEntry;
-  readonly 'playwright/no-eval': NoEval.RuleEntry;
-  readonly 'playwright/no-focused-test': NoFocusedTest.RuleEntry;
-  readonly 'playwright/no-force-option': NoForceOption.RuleEntry;
-  readonly 'playwright/no-get-by-title': NoGetByTitle.RuleEntry;
-  readonly 'playwright/no-hooks': NoHooks.RuleEntry;
-  readonly 'playwright/no-nested-step': NoNestedStep.RuleEntry;
-  readonly 'playwright/no-networkidle': NoNetworkidle.RuleEntry;
-  readonly 'playwright/no-nth-methods': NoNthMethods.RuleEntry;
-  readonly 'playwright/no-page-pause': NoPagePause.RuleEntry;
-  readonly 'playwright/no-raw-locators': NoRawLocators.RuleEntry;
-  readonly 'playwright/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
-  readonly 'playwright/no-skipped-test': NoSkippedTest.RuleEntry;
-  readonly 'playwright/no-slowed-test': NoSlowedTest.RuleEntry;
-  readonly 'playwright/no-standalone-expect': NoStandaloneExpect.RuleEntry;
-  readonly 'playwright/no-unsafe-references': NoUnsafeReferences.RuleEntry;
-  readonly 'playwright/no-unused-locators': NoUnusedLocators.RuleEntry;
-  readonly 'playwright/no-useless-await': NoUselessAwait.RuleEntry;
-  readonly 'playwright/no-useless-not': NoUselessNot.RuleEntry;
-  readonly 'playwright/no-wait-for-navigation': NoWaitForNavigation.RuleEntry;
-  readonly 'playwright/no-wait-for-selector': NoWaitForSelector.RuleEntry;
-  readonly 'playwright/no-wait-for-timeout': NoWaitForTimeout.RuleEntry;
-  readonly 'playwright/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
-  readonly 'playwright/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
-  readonly 'playwright/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
-  readonly 'playwright/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
-  readonly 'playwright/prefer-locator': PreferLocator.RuleEntry;
-  readonly 'playwright/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
-  readonly 'playwright/prefer-native-locators': PreferNativeLocators.RuleEntry;
-  readonly 'playwright/prefer-strict-equal': PreferStrictEqual.RuleEntry;
-  readonly 'playwright/prefer-to-be': PreferToBe.RuleEntry;
-  readonly 'playwright/prefer-to-contain': PreferToContain.RuleEntry;
-  readonly 'playwright/prefer-to-have-count': PreferToHaveCount.RuleEntry;
-  readonly 'playwright/prefer-to-have-length': PreferToHaveLength.RuleEntry;
-  readonly 'playwright/prefer-web-first-assertions': PreferWebFirstAssertions.RuleEntry;
-  readonly 'playwright/require-hook': RequireHook.RuleEntry;
-  readonly 'playwright/require-soft-assertions': RequireSoftAssertions.RuleEntry;
-  readonly 'playwright/require-to-throw-message': RequireToThrowMessage.RuleEntry;
-  readonly 'playwright/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
-  readonly 'playwright/valid-describe-callback': ValidDescribeCallback.RuleEntry;
-  readonly 'playwright/valid-expect': ValidExpect.RuleEntry;
-  readonly 'playwright/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
-  readonly 'playwright/valid-test-tags': ValidTestTags.RuleEntry;
-  readonly 'playwright/valid-title': ValidTitle.RuleEntry;
-};
+export type EslintPlaywrightRules = Readonly<{
+  'playwright/expect-expect': ExpectExpect.RuleEntry;
+  'playwright/max-expects': MaxExpects.RuleEntry;
+  'playwright/max-nested-describe': MaxNestedDescribe.RuleEntry;
+  'playwright/missing-playwright-await': MissingPlaywrightAwait.RuleEntry;
+  'playwright/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
+  'playwright/no-conditional-expect': NoConditionalExpect.RuleEntry;
+  'playwright/no-conditional-in-test': NoConditionalInTest.RuleEntry;
+  'playwright/no-duplicate-hooks': NoDuplicateHooks.RuleEntry;
+  'playwright/no-element-handle': NoElementHandle.RuleEntry;
+  'playwright/no-eval': NoEval.RuleEntry;
+  'playwright/no-focused-test': NoFocusedTest.RuleEntry;
+  'playwright/no-force-option': NoForceOption.RuleEntry;
+  'playwright/no-get-by-title': NoGetByTitle.RuleEntry;
+  'playwright/no-hooks': NoHooks.RuleEntry;
+  'playwright/no-nested-step': NoNestedStep.RuleEntry;
+  'playwright/no-networkidle': NoNetworkidle.RuleEntry;
+  'playwright/no-nth-methods': NoNthMethods.RuleEntry;
+  'playwright/no-page-pause': NoPagePause.RuleEntry;
+  'playwright/no-raw-locators': NoRawLocators.RuleEntry;
+  'playwright/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
+  'playwright/no-skipped-test': NoSkippedTest.RuleEntry;
+  'playwright/no-slowed-test': NoSlowedTest.RuleEntry;
+  'playwright/no-standalone-expect': NoStandaloneExpect.RuleEntry;
+  'playwright/no-unsafe-references': NoUnsafeReferences.RuleEntry;
+  'playwright/no-unused-locators': NoUnusedLocators.RuleEntry;
+  'playwright/no-useless-await': NoUselessAwait.RuleEntry;
+  'playwright/no-useless-not': NoUselessNot.RuleEntry;
+  'playwright/no-wait-for-navigation': NoWaitForNavigation.RuleEntry;
+  'playwright/no-wait-for-selector': NoWaitForSelector.RuleEntry;
+  'playwright/no-wait-for-timeout': NoWaitForTimeout.RuleEntry;
+  'playwright/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
+  'playwright/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
+  'playwright/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
+  'playwright/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
+  'playwright/prefer-locator': PreferLocator.RuleEntry;
+  'playwright/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
+  'playwright/prefer-native-locators': PreferNativeLocators.RuleEntry;
+  'playwright/prefer-strict-equal': PreferStrictEqual.RuleEntry;
+  'playwright/prefer-to-be': PreferToBe.RuleEntry;
+  'playwright/prefer-to-contain': PreferToContain.RuleEntry;
+  'playwright/prefer-to-have-count': PreferToHaveCount.RuleEntry;
+  'playwright/prefer-to-have-length': PreferToHaveLength.RuleEntry;
+  'playwright/prefer-web-first-assertions': PreferWebFirstAssertions.RuleEntry;
+  'playwright/require-hook': RequireHook.RuleEntry;
+  'playwright/require-soft-assertions': RequireSoftAssertions.RuleEntry;
+  'playwright/require-to-throw-message': RequireToThrowMessage.RuleEntry;
+  'playwright/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
+  'playwright/valid-describe-callback': ValidDescribeCallback.RuleEntry;
+  'playwright/valid-expect': ValidExpect.RuleEntry;
+  'playwright/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
+  'playwright/valid-test-tags': ValidTestTags.RuleEntry;
+  'playwright/valid-title': ValidTitle.RuleEntry;
+}>;
 
-export type EslintPlaywrightRulesOption = {
-  readonly 'playwright/expect-expect': ExpectExpect.Options;
-  readonly 'playwright/max-expects': MaxExpects.Options;
-  readonly 'playwright/max-nested-describe': MaxNestedDescribe.Options;
-  readonly 'playwright/missing-playwright-await': MissingPlaywrightAwait.Options;
-  readonly 'playwright/no-hooks': NoHooks.Options;
-  readonly 'playwright/no-raw-locators': NoRawLocators.Options;
-  readonly 'playwright/no-restricted-matchers': NoRestrictedMatchers.Options;
-  readonly 'playwright/no-skipped-test': NoSkippedTest.Options;
-  readonly 'playwright/no-slowed-test': NoSlowedTest.Options;
-  readonly 'playwright/prefer-lowercase-title': PreferLowercaseTitle.Options;
-  readonly 'playwright/prefer-native-locators': PreferNativeLocators.Options;
-  readonly 'playwright/require-hook': RequireHook.Options;
-  readonly 'playwright/require-top-level-describe': RequireTopLevelDescribe.Options;
-  readonly 'playwright/valid-expect': ValidExpect.Options;
-  readonly 'playwright/valid-test-tags': ValidTestTags.Options;
-  readonly 'playwright/valid-title': ValidTitle.Options;
-};
+export type EslintPlaywrightRulesOption = Readonly<{
+  'playwright/expect-expect': ExpectExpect.Options;
+  'playwright/max-expects': MaxExpects.Options;
+  'playwright/max-nested-describe': MaxNestedDescribe.Options;
+  'playwright/missing-playwright-await': MissingPlaywrightAwait.Options;
+  'playwright/no-hooks': NoHooks.Options;
+  'playwright/no-raw-locators': NoRawLocators.Options;
+  'playwright/no-restricted-matchers': NoRestrictedMatchers.Options;
+  'playwright/no-skipped-test': NoSkippedTest.Options;
+  'playwright/no-slowed-test': NoSlowedTest.Options;
+  'playwright/prefer-lowercase-title': PreferLowercaseTitle.Options;
+  'playwright/prefer-native-locators': PreferNativeLocators.Options;
+  'playwright/require-hook': RequireHook.Options;
+  'playwright/require-top-level-describe': RequireTopLevelDescribe.Options;
+  'playwright/valid-expect': ValidExpect.Options;
+  'playwright/valid-test-tags': ValidTestTags.Options;
+  'playwright/valid-title': ValidTitle.Options;
+}>;

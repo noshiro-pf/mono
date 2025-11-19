@@ -45,9 +45,9 @@ namespace ConsistentOutput {
   export type Options = 'always' | 'consistent';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -101,9 +101,9 @@ namespace MetaPropertyOrdering {
   export type Options = readonly unknown[];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -282,18 +282,18 @@ namespace NoPropertyInNode {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Any additional regular expressions to consider source files defining AST
      * Node types.
      */
-    readonly additionalNodeTypeFiles?: readonly unknown[];
-  };
+    additionalNodeTypeFiles?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -467,9 +467,9 @@ namespace ReportMessageFormat {
   export type Options = string;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -524,18 +524,20 @@ namespace RequireMetaDocsDescription {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * A regular expression that the description must match. Use `'.+'` to allow
      * anything.
+     *
+     * @default '^(enforce|require|disallow)'
      */
-    readonly pattern?: string;
-  };
+    pattern?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -572,15 +574,19 @@ namespace RequireMetaDocsRecommended {
    * ]
    * ```
    */
-  export type Options = {
-    /** Whether to allow values of types other than boolean. */
-    readonly allowNonBoolean?: boolean;
-  };
+  export type Options = Readonly<{
+    /**
+     * Whether to allow values of types other than boolean.
+     *
+     * @default false
+     */
+    allowNonBoolean?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -616,19 +622,19 @@ namespace RequireMetaDocsUrl {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * A pattern to enforce rule's document URL. It replaces `{{name}}`
      * placeholder by each rule name. The rule name is the basename of each rule
      * file. Omitting this allows any URL.
      */
-    readonly pattern?: string;
-  };
+    pattern?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -664,20 +670,22 @@ namespace RequireMetaFixable {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether the rule should attempt to detect rules that do not have a fixer
      * but enable the `meta.fixable` property. This option is off by default
      * because it increases the chance of false positives since fixers can't
      * always be detected when helper functions are used.
+     *
+     * @default false
      */
-    readonly catchNoFixerButFixableProperty?: boolean;
-  };
+    catchNoFixerButFixableProperty?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -749,18 +757,20 @@ namespace RequireMetaSchema {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether the rule should require the `meta.schema` property to be
      * specified (with `schema: []`) for rules that have no options.
+     *
+     * @default true
      */
-    readonly requireSchemaPropertyWhenOptionless?: boolean;
-  };
+    requireSchemaPropertyWhenOptionless?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -816,15 +826,15 @@ namespace RequireTestCaseName {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** When should the name property be required on a test case object. */
-    readonly require?: 'always' | 'objects-with-config' | 'objects';
-  };
+    require?: 'always' | 'objects' | 'objects-with-config';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -861,9 +871,9 @@ namespace TestCasePropertyOrdering {
   export type Options = readonly unknown[];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -904,14 +914,14 @@ namespace TestCaseShorthandStrings {
    */
   export type Options =
     | 'as-needed'
-    | 'consistent-as-needed'
+    | 'never'
     | 'consistent'
-    | 'never';
+    | 'consistent-as-needed';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -931,54 +941,54 @@ namespace UniqueTestCaseNames {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintPluginRules = {
-  readonly 'eslint-plugin/consistent-output': ConsistentOutput.RuleEntry;
-  readonly 'eslint-plugin/fixer-return': FixerReturn.RuleEntry;
-  readonly 'eslint-plugin/meta-property-ordering': MetaPropertyOrdering.RuleEntry;
-  readonly 'eslint-plugin/no-deprecated-context-methods': NoDeprecatedContextMethods.RuleEntry;
-  readonly 'eslint-plugin/no-deprecated-report-api': NoDeprecatedReportApi.RuleEntry;
-  readonly 'eslint-plugin/no-identical-tests': NoIdenticalTests.RuleEntry;
-  readonly 'eslint-plugin/no-meta-replaced-by': NoMetaReplacedBy.RuleEntry;
-  readonly 'eslint-plugin/no-meta-schema-default': NoMetaSchemaDefault.RuleEntry;
-  readonly 'eslint-plugin/no-missing-message-ids': NoMissingMessageIds.RuleEntry;
-  readonly 'eslint-plugin/no-missing-placeholders': NoMissingPlaceholders.RuleEntry;
-  readonly 'eslint-plugin/no-only-tests': NoOnlyTests.RuleEntry;
-  readonly 'eslint-plugin/no-property-in-node': NoPropertyInNode.RuleEntry;
-  readonly 'eslint-plugin/no-unused-message-ids': NoUnusedMessageIds.RuleEntry;
-  readonly 'eslint-plugin/no-unused-placeholders': NoUnusedPlaceholders.RuleEntry;
-  readonly 'eslint-plugin/no-useless-token-range': NoUselessTokenRange.RuleEntry;
-  readonly 'eslint-plugin/prefer-message-ids': PreferMessageIds.RuleEntry;
-  readonly 'eslint-plugin/prefer-object-rule': PreferObjectRule.RuleEntry;
-  readonly 'eslint-plugin/prefer-output-null': PreferOutputNull.RuleEntry;
-  readonly 'eslint-plugin/prefer-placeholders': PreferPlaceholders.RuleEntry;
-  readonly 'eslint-plugin/prefer-replace-text': PreferReplaceText.RuleEntry;
-  readonly 'eslint-plugin/report-message-format': ReportMessageFormat.RuleEntry;
-  readonly 'eslint-plugin/require-meta-default-options': RequireMetaDefaultOptions.RuleEntry;
-  readonly 'eslint-plugin/require-meta-docs-description': RequireMetaDocsDescription.RuleEntry;
-  readonly 'eslint-plugin/require-meta-docs-recommended': RequireMetaDocsRecommended.RuleEntry;
-  readonly 'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.RuleEntry;
-  readonly 'eslint-plugin/require-meta-fixable': RequireMetaFixable.RuleEntry;
-  readonly 'eslint-plugin/require-meta-has-suggestions': RequireMetaHasSuggestions.RuleEntry;
-  readonly 'eslint-plugin/require-meta-schema-description': RequireMetaSchemaDescription.RuleEntry;
-  readonly 'eslint-plugin/require-meta-schema': RequireMetaSchema.RuleEntry;
-  readonly 'eslint-plugin/require-meta-type': RequireMetaType.RuleEntry;
-  readonly 'eslint-plugin/require-test-case-name': RequireTestCaseName.RuleEntry;
-  readonly 'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.RuleEntry;
-  readonly 'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.RuleEntry;
-  readonly 'eslint-plugin/unique-test-case-names': UniqueTestCaseNames.RuleEntry;
-};
+export type EslintPluginRules = Readonly<{
+  'eslint-plugin/consistent-output': ConsistentOutput.RuleEntry;
+  'eslint-plugin/fixer-return': FixerReturn.RuleEntry;
+  'eslint-plugin/meta-property-ordering': MetaPropertyOrdering.RuleEntry;
+  'eslint-plugin/no-deprecated-context-methods': NoDeprecatedContextMethods.RuleEntry;
+  'eslint-plugin/no-deprecated-report-api': NoDeprecatedReportApi.RuleEntry;
+  'eslint-plugin/no-identical-tests': NoIdenticalTests.RuleEntry;
+  'eslint-plugin/no-meta-replaced-by': NoMetaReplacedBy.RuleEntry;
+  'eslint-plugin/no-meta-schema-default': NoMetaSchemaDefault.RuleEntry;
+  'eslint-plugin/no-missing-message-ids': NoMissingMessageIds.RuleEntry;
+  'eslint-plugin/no-missing-placeholders': NoMissingPlaceholders.RuleEntry;
+  'eslint-plugin/no-only-tests': NoOnlyTests.RuleEntry;
+  'eslint-plugin/no-property-in-node': NoPropertyInNode.RuleEntry;
+  'eslint-plugin/no-unused-message-ids': NoUnusedMessageIds.RuleEntry;
+  'eslint-plugin/no-unused-placeholders': NoUnusedPlaceholders.RuleEntry;
+  'eslint-plugin/no-useless-token-range': NoUselessTokenRange.RuleEntry;
+  'eslint-plugin/prefer-message-ids': PreferMessageIds.RuleEntry;
+  'eslint-plugin/prefer-object-rule': PreferObjectRule.RuleEntry;
+  'eslint-plugin/prefer-output-null': PreferOutputNull.RuleEntry;
+  'eslint-plugin/prefer-placeholders': PreferPlaceholders.RuleEntry;
+  'eslint-plugin/prefer-replace-text': PreferReplaceText.RuleEntry;
+  'eslint-plugin/report-message-format': ReportMessageFormat.RuleEntry;
+  'eslint-plugin/require-meta-default-options': RequireMetaDefaultOptions.RuleEntry;
+  'eslint-plugin/require-meta-docs-description': RequireMetaDocsDescription.RuleEntry;
+  'eslint-plugin/require-meta-docs-recommended': RequireMetaDocsRecommended.RuleEntry;
+  'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.RuleEntry;
+  'eslint-plugin/require-meta-fixable': RequireMetaFixable.RuleEntry;
+  'eslint-plugin/require-meta-has-suggestions': RequireMetaHasSuggestions.RuleEntry;
+  'eslint-plugin/require-meta-schema-description': RequireMetaSchemaDescription.RuleEntry;
+  'eslint-plugin/require-meta-schema': RequireMetaSchema.RuleEntry;
+  'eslint-plugin/require-meta-type': RequireMetaType.RuleEntry;
+  'eslint-plugin/require-test-case-name': RequireTestCaseName.RuleEntry;
+  'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.RuleEntry;
+  'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.RuleEntry;
+  'eslint-plugin/unique-test-case-names': UniqueTestCaseNames.RuleEntry;
+}>;
 
-export type EslintPluginRulesOption = {
-  readonly 'eslint-plugin/consistent-output': ConsistentOutput.Options;
-  readonly 'eslint-plugin/meta-property-ordering': MetaPropertyOrdering.Options;
-  readonly 'eslint-plugin/no-property-in-node': NoPropertyInNode.Options;
-  readonly 'eslint-plugin/report-message-format': ReportMessageFormat.Options;
-  readonly 'eslint-plugin/require-meta-docs-description': RequireMetaDocsDescription.Options;
-  readonly 'eslint-plugin/require-meta-docs-recommended': RequireMetaDocsRecommended.Options;
-  readonly 'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.Options;
-  readonly 'eslint-plugin/require-meta-fixable': RequireMetaFixable.Options;
-  readonly 'eslint-plugin/require-meta-schema': RequireMetaSchema.Options;
-  readonly 'eslint-plugin/require-test-case-name': RequireTestCaseName.Options;
-  readonly 'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.Options;
-  readonly 'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.Options;
-};
+export type EslintPluginRulesOption = Readonly<{
+  'eslint-plugin/consistent-output': ConsistentOutput.Options;
+  'eslint-plugin/meta-property-ordering': MetaPropertyOrdering.Options;
+  'eslint-plugin/no-property-in-node': NoPropertyInNode.Options;
+  'eslint-plugin/report-message-format': ReportMessageFormat.Options;
+  'eslint-plugin/require-meta-docs-description': RequireMetaDocsDescription.Options;
+  'eslint-plugin/require-meta-docs-recommended': RequireMetaDocsRecommended.Options;
+  'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.Options;
+  'eslint-plugin/require-meta-fixable': RequireMetaFixable.Options;
+  'eslint-plugin/require-meta-schema': RequireMetaSchema.Options;
+  'eslint-plugin/require-test-case-name': RequireTestCaseName.Options;
+  'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.Options;
+  'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.Options;
+}>;

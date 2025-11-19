@@ -38,9 +38,9 @@ namespace CallbackReturn {
   export type Options = readonly string[];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -81,17 +81,17 @@ namespace ExportsStyle {
    * ]
    * ```
    */
-  export type Options0 = 'exports' | 'module.exports';
+  export type Options0 = 'module.exports' | 'exports';
 
-  export type Options1 = {
-    readonly allowBatchAssign?: boolean;
-  };
+  export type Options1 = Readonly<{
+    allowBatchAssign?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | readonly [Linter.StringSeverity, Options0, Options1]
     | readonly [Linter.StringSeverity, Options0]
-    | 'off';
+    | readonly [Linter.StringSeverity, Options0, Options1];
 }
 
 /**
@@ -138,10 +138,10 @@ namespace FileExtensionInImport {
   export type Options1 = Readonly<Record<string, 'always' | 'never'>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | readonly [Linter.StringSeverity, Options0, Options1]
     | readonly [Linter.StringSeverity, Options0]
-    | 'off';
+    | readonly [Linter.StringSeverity, Options0, Options1];
 }
 
 /**
@@ -189,9 +189,9 @@ namespace HandleCallbackErr {
   export type Options = string;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -378,22 +378,23 @@ namespace NoDeprecatedApi {
    * ]
    * ```
    */
-  export type Options = {
-    readonly version?: string;
-    readonly ignoreModuleItems?: readonly (
+  export type Options = Readonly<{
+    version?: string;
+    ignoreModuleItems?: readonly (
       | '_linklist'
       | '_stream_wrap'
       | 'async_hooks.currentId'
       | 'async_hooks.triggerId'
       | 'buffer.Buffer()'
+      | 'new buffer.Buffer()'
       | 'buffer.SlowBuffer'
       | 'constants'
       | 'crypto._toBuf'
+      | 'crypto.Credentials'
+      | 'crypto.DEFAULT_ENCODING'
       | 'crypto.createCipher'
       | 'crypto.createCredentials'
       | 'crypto.createDecipher'
-      | 'crypto.Credentials'
-      | 'crypto.DEFAULT_ENCODING'
       | 'crypto.fips'
       | 'crypto.prng'
       | 'crypto.pseudoRandomBytes'
@@ -402,52 +403,50 @@ namespace NoDeprecatedApi {
       | 'events.EventEmitter.listenerCount'
       | 'events.listenerCount'
       | 'freelist'
+      | 'fs.SyncWriteStream'
       | 'fs.exists'
       | 'fs.lchmod'
       | 'fs.lchmodSync'
-      | 'fs.SyncWriteStream'
       | 'http.createClient'
-      | 'module._debug'
-      | 'module.createRequireFromPath'
-      | 'module.Module._debug'
       | 'module.Module.createRequireFromPath'
       | 'module.Module.requireRepl'
+      | 'module.Module._debug'
+      | 'module.createRequireFromPath'
       | 'module.requireRepl'
+      | 'module._debug'
       | 'net._setSimultaneousAccepts'
-      | 'new buffer.Buffer()'
-      | 'new safe-buffer.Buffer()'
       | 'os.getNetworkInterfaces'
       | 'os.tmpDir'
       | 'path._makeLong'
+      | 'process.EventEmitter'
       | 'process.assert'
       | 'process.binding'
       | 'process.env.NODE_REPL_HISTORY_FILE'
-      | 'process.EventEmitter'
       | 'process.report.triggerReport'
       | 'punycode'
       | 'readline.codePointAt'
       | 'readline.getStringWidth'
       | 'readline.isFullWidthCodePoint'
       | 'readline.stripVTControlCharacters'
-      | 'repl.builtinModules'
+      | 'repl.REPLServer'
       | 'repl.Recoverable'
       | 'repl.REPL_MODE_MAGIC'
-      | 'repl.REPLServer'
+      | 'repl.builtinModules'
       | 'safe-buffer.Buffer()'
+      | 'new safe-buffer.Buffer()'
       | 'safe-buffer.SlowBuffer'
       | 'sys'
       | 'timers.enroll'
       | 'timers.unenroll'
       | 'tls.CleartextStream'
+      | 'tls.CryptoStream'
+      | 'tls.SecurePair'
       | 'tls.convertNPNProtocols'
       | 'tls.createSecurePair'
-      | 'tls.CryptoStream'
       | 'tls.parseCertString'
-      | 'tls.SecurePair'
       | 'tty.setRawMode'
       | 'url.parse'
       | 'url.resolve'
-      | 'util._extend'
       | 'util.debug'
       | 'util.error'
       | 'util.isArray'
@@ -469,6 +468,7 @@ namespace NoDeprecatedApi {
       | 'util.print'
       | 'util.pump'
       | 'util.puts'
+      | 'util._extend'
       | 'vm.runInDebugContext'
       | 'zlib.BrotliCompress()'
       | 'zlib.BrotliDecompress()'
@@ -480,32 +480,32 @@ namespace NoDeprecatedApi {
       | 'zlib.InflateRaw()'
       | 'zlib.Unzip()'
     )[];
-    readonly ignoreGlobalItems?: readonly (
+    ignoreGlobalItems?: readonly (
       | 'Buffer()'
-      | 'COUNTER_HTTP_CLIENT_REQUEST'
-      | 'COUNTER_HTTP_CLIENT_RESPONSE'
+      | 'new Buffer()'
+      | 'COUNTER_NET_SERVER_CONNECTION'
+      | 'COUNTER_NET_SERVER_CONNECTION_CLOSE'
       | 'COUNTER_HTTP_SERVER_REQUEST'
       | 'COUNTER_HTTP_SERVER_RESPONSE'
-      | 'COUNTER_NET_SERVER_CONNECTION_CLOSE'
-      | 'COUNTER_NET_SERVER_CONNECTION'
+      | 'COUNTER_HTTP_CLIENT_REQUEST'
+      | 'COUNTER_HTTP_CLIENT_RESPONSE'
       | 'GLOBAL'
       | 'Intl.v8BreakIterator'
-      | 'new Buffer()'
+      | 'require.extensions'
+      | 'root'
+      | 'process.EventEmitter'
       | 'process.assert'
       | 'process.binding'
       | 'process.env.NODE_REPL_HISTORY_FILE'
-      | 'process.EventEmitter'
       | 'process.report.triggerReport'
-      | 'require.extensions'
-      | 'root'
     )[];
-    readonly ignoreIndirectDependencies?: boolean;
-  };
+    ignoreIndirectDependencies?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -629,40 +629,40 @@ namespace NoExtraneousImport {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowModules?: readonly string[];
-    readonly convertPath?:
-      | Record<string, readonly [string, string]>
+  export type Options = Readonly<{
+    allowModules?: readonly string[];
+    convertPath?:
+      | Readonly<Record<string, readonly [string, string]>>
       | readonly [
-          {
+          Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          },
-          ...(readonly {
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          }[]),
+            replace: readonly [string, string];
+          }>[],
         ];
-    readonly resolvePaths?: readonly string[];
-    readonly resolverConfig?: UnknownRecord;
-  };
+    resolvePaths?: readonly string[];
+    resolverConfig?: UnknownRecord;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -777,41 +777,41 @@ namespace NoExtraneousRequire {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowModules?: readonly string[];
-    readonly convertPath?:
-      | Record<string, readonly [string, string]>
+  export type Options = Readonly<{
+    allowModules?: readonly string[];
+    convertPath?:
+      | Readonly<Record<string, readonly [string, string]>>
       | readonly [
-          {
+          Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          },
-          ...(readonly {
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          }[]),
+            replace: readonly [string, string];
+          }>[],
         ];
-    readonly resolvePaths?: readonly string[];
-    readonly resolverConfig?: UnknownRecord;
-    readonly tryExtensions?: readonly string[];
-  };
+    resolvePaths?: readonly string[];
+    resolverConfig?: UnknownRecord;
+    tryExtensions?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -909,22 +909,23 @@ namespace NoMissingImport {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowModules?: readonly string[];
-    readonly resolvePaths?: readonly string[];
-    readonly resolverConfig?: UnknownRecord;
-    readonly tryExtensions?: readonly string[];
-    readonly ignoreTypeImport?: boolean;
-    readonly tsconfigPath?: string;
-    readonly typescriptExtensionMap?:
+  export type Options = Readonly<{
+    allowModules?: readonly string[];
+    resolvePaths?: readonly string[];
+    resolverConfig?: UnknownRecord;
+    tryExtensions?: readonly string[];
+    /** @default false */
+    ignoreTypeImport?: boolean;
+    tsconfigPath?: string;
+    typescriptExtensionMap?:
       | readonly (readonly unknown[])[]
-      | ('preserve' | 'react-jsx' | 'react-jsxdev' | 'react-native' | 'react');
-  };
+      | ('react' | 'react-jsx' | 'react-jsxdev' | 'react-native' | 'preserve');
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1018,21 +1019,21 @@ namespace NoMissingRequire {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowModules?: readonly string[];
-    readonly tryExtensions?: readonly string[];
-    readonly resolvePaths?: readonly string[];
-    readonly resolverConfig?: UnknownRecord;
-    readonly typescriptExtensionMap?:
+  export type Options = Readonly<{
+    allowModules?: readonly string[];
+    tryExtensions?: readonly string[];
+    resolvePaths?: readonly string[];
+    resolverConfig?: UnknownRecord;
+    typescriptExtensionMap?:
       | readonly (readonly unknown[])[]
-      | ('preserve' | 'react-jsx' | 'react-jsxdev' | 'react-native' | 'react');
-    readonly tsconfigPath?: string;
-  };
+      | ('react' | 'react-jsx' | 'react-jsxdev' | 'react-native' | 'preserve');
+    tsconfigPath?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1078,15 +1079,15 @@ namespace NoMixedRequires {
    */
   export type Options =
     | boolean
-    | {
-        readonly grouping?: boolean;
-        readonly allowCall?: boolean;
-      };
+    | Readonly<{
+        grouping?: boolean;
+        allowCall?: boolean;
+      }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1157,14 +1158,14 @@ namespace NoProcessEnv {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedVariables?: readonly string[];
-  };
+  export type Options = Readonly<{
+    allowedVariables?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1245,16 +1246,16 @@ namespace NoRestrictedImport {
    */
   export type Options = readonly (
     | string
-    | {
-        readonly name: string | readonly string[];
-        readonly message?: string;
-      }
+    | Readonly<{
+        name: string | readonly string[];
+        message?: string;
+      }>
   )[];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1318,16 +1319,16 @@ namespace NoRestrictedRequire {
    */
   export type Options = readonly (
     | string
-    | {
-        readonly name: string | readonly string[];
-        readonly message?: string;
-      }
+    | Readonly<{
+        name: string | readonly string[];
+        message?: string;
+      }>
   )[];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1424,31 +1425,35 @@ namespace NoSync {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowAtRootLevel?: boolean;
-    readonly ignores?: readonly (
+  export type Options = Readonly<{
+    /** @default false */
+    allowAtRootLevel?: boolean;
+    /** @default [ ] */
+    ignores?: readonly (
       | string
-      | {
-          readonly from?: 'file';
-          readonly path?: string;
-          readonly name?: readonly string[];
-        }
-      | {
-          readonly from?: 'lib';
-          readonly name?: readonly string[];
-        }
-      | {
-          readonly from?: 'package';
-          readonly package?: string;
-          readonly name?: readonly string[];
-        }
+      | Readonly<
+          | {
+              from?: 'file';
+              path?: string;
+              name?: readonly string[];
+            }
+          | {
+              from?: 'lib';
+              name?: readonly string[];
+            }
+          | {
+              from?: 'package';
+              package?: string;
+              name?: readonly string[];
+            }
+        >
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1538,38 +1543,38 @@ namespace NoTopLevelAwait {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreBin?: boolean;
-    readonly convertPath?:
-      | Record<string, readonly [string, string]>
+  export type Options = Readonly<{
+    ignoreBin?: boolean;
+    convertPath?:
+      | Readonly<Record<string, readonly [string, string]>>
       | readonly [
-          {
+          Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          },
-          ...(readonly {
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          }[]),
+            replace: readonly [string, string];
+          }>[],
         ];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1655,38 +1660,38 @@ namespace NoUnpublishedBin {
    * ]
    * ```
    */
-  export type Options = {
-    readonly convertPath?:
-      | Record<string, readonly [string, string]>
+  export type Options = Readonly<{
+    convertPath?:
+      | Readonly<Record<string, readonly [string, string]>>
       | readonly [
-          {
+          Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          },
-          ...(readonly {
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          }[]),
+            replace: readonly [string, string];
+          }>[],
         ];
-    readonly [k: string]: unknown;
-  };
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1809,43 +1814,45 @@ namespace NoUnpublishedImport {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowModules?: readonly string[];
-    readonly convertPath?:
-      | Record<string, readonly [string, string]>
+  export type Options = Readonly<{
+    allowModules?: readonly string[];
+    convertPath?:
+      | Readonly<Record<string, readonly [string, string]>>
       | readonly [
-          {
+          Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          },
-          ...(readonly {
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          }[]),
+            replace: readonly [string, string];
+          }>[],
         ];
-    readonly resolvePaths?: readonly string[];
-    readonly resolverConfig?: UnknownRecord;
-    readonly tryExtensions?: readonly string[];
-    readonly ignoreTypeImport?: boolean;
-    readonly ignorePrivate?: boolean;
-  };
+    resolvePaths?: readonly string[];
+    resolverConfig?: UnknownRecord;
+    tryExtensions?: readonly string[];
+    /** @default false */
+    ignoreTypeImport?: boolean;
+    /** @default true */
+    ignorePrivate?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1964,42 +1971,43 @@ namespace NoUnpublishedRequire {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowModules?: readonly string[];
-    readonly convertPath?:
-      | Record<string, readonly [string, string]>
+  export type Options = Readonly<{
+    allowModules?: readonly string[];
+    convertPath?:
+      | Readonly<Record<string, readonly [string, string]>>
       | readonly [
-          {
+          Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          },
-          ...(readonly {
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          }[]),
+            replace: readonly [string, string];
+          }>[],
         ];
-    readonly resolvePaths?: readonly string[];
-    readonly resolverConfig?: UnknownRecord;
-    readonly tryExtensions?: readonly string[];
-    readonly ignorePrivate?: boolean;
-  };
+    resolvePaths?: readonly string[];
+    resolverConfig?: UnknownRecord;
+    tryExtensions?: readonly string[];
+    /** @default true */
+    ignorePrivate?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2324,18 +2332,19 @@ namespace NoUnsupportedFeaturesEsBuiltins {
    * ]
    * ```
    */
-  export type Options = {
-    readonly version?: string;
-    readonly ignores?: readonly (
+  export type Options = Readonly<{
+    version?: string;
+    ignores?: readonly (
       | 'AggregateError'
+      | 'Array'
       | 'Array.from'
       | 'Array.isArray'
       | 'Array.length'
       | 'Array.of'
       | 'Array.toLocaleString'
-      | 'Array'
-      | 'ArrayBuffer.isView'
       | 'ArrayBuffer'
+      | 'ArrayBuffer.isView'
+      | 'Atomics'
       | 'Atomics.add'
       | 'Atomics.and'
       | 'Atomics.compareExchange'
@@ -2349,73 +2358,65 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'Atomics.wait'
       | 'Atomics.waitAsync'
       | 'Atomics.xor'
-      | 'Atomics'
+      | 'BigInt'
       | 'BigInt.asIntN'
       | 'BigInt.asUintN'
-      | 'BigInt'
+      | 'BigInt64Array'
       | 'BigInt64Array.BYTES_PER_ELEMENT'
       | 'BigInt64Array.from'
       | 'BigInt64Array.name'
       | 'BigInt64Array.of'
-      | 'BigInt64Array'
+      | 'BigUint64Array'
       | 'BigUint64Array.BYTES_PER_ELEMENT'
       | 'BigUint64Array.from'
       | 'BigUint64Array.name'
       | 'BigUint64Array.of'
-      | 'BigUint64Array'
       | 'Boolean'
       | 'DataView'
+      | 'Date'
+      | 'Date.UTC'
       | 'Date.now'
       | 'Date.parse'
       | 'Date.toLocaleDateString'
       | 'Date.toLocaleString'
       | 'Date.toLocaleTimeString'
-      | 'Date.UTC'
-      | 'Date'
-      | 'decodeURI'
-      | 'decodeURIComponent'
-      | 'encodeURI'
-      | 'encodeURIComponent'
-      | 'Error.cause'
       | 'Error'
-      | 'escape'
-      | 'eval'
+      | 'Error.cause'
       | 'EvalError'
       | 'FinalizationRegistry'
+      | 'Float32Array'
       | 'Float32Array.BYTES_PER_ELEMENT'
       | 'Float32Array.from'
       | 'Float32Array.name'
       | 'Float32Array.of'
-      | 'Float32Array'
+      | 'Float64Array'
       | 'Float64Array.BYTES_PER_ELEMENT'
       | 'Float64Array.from'
       | 'Float64Array.name'
       | 'Float64Array.of'
-      | 'Float64Array'
+      | 'Function'
       | 'Function.length'
       | 'Function.name'
-      | 'Function'
-      | 'globalThis'
       | 'Infinity'
-      | 'Int8Array.BYTES_PER_ELEMENT'
-      | 'Int8Array.from'
-      | 'Int8Array.name'
-      | 'Int8Array.of'
-      | 'Int8Array'
+      | 'Int16Array'
       | 'Int16Array.BYTES_PER_ELEMENT'
       | 'Int16Array.from'
       | 'Int16Array.name'
       | 'Int16Array.of'
-      | 'Int16Array'
+      | 'Int32Array'
       | 'Int32Array.BYTES_PER_ELEMENT'
       | 'Int32Array.from'
       | 'Int32Array.name'
       | 'Int32Array.of'
-      | 'Int32Array'
+      | 'Int8Array'
+      | 'Int8Array.BYTES_PER_ELEMENT'
+      | 'Int8Array.from'
+      | 'Int8Array.name'
+      | 'Int8Array.of'
+      | 'Intl'
       | 'Intl.Collator'
       | 'Intl.DateTimeFormat'
       | 'Intl.DisplayNames'
-      | 'Intl.getCanonicalLocales'
       | 'Intl.ListFormat'
       | 'Intl.Locale'
       | 'Intl.NumberFormat'
@@ -2423,15 +2424,22 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'Intl.RelativeTimeFormat'
       | 'Intl.Segmenter'
       | 'Intl.Segments'
+      | 'Intl.getCanonicalLocales'
       | 'Intl.supportedValuesOf'
-      | 'Intl'
-      | 'isFinite'
-      | 'isNaN'
+      | 'JSON'
       | 'JSON.parse'
       | 'JSON.stringify'
-      | 'JSON'
-      | 'Map.groupBy'
       | 'Map'
+      | 'Map.groupBy'
+      | 'Math'
+      | 'Math.E'
+      | 'Math.LN10'
+      | 'Math.LN2'
+      | 'Math.LOG10E'
+      | 'Math.LOG2E'
+      | 'Math.PI'
+      | 'Math.SQRT1_2'
+      | 'Math.SQRT2'
       | 'Math.abs'
       | 'Math.acos'
       | 'Math.acosh'
@@ -2445,24 +2453,18 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'Math.clz32'
       | 'Math.cos'
       | 'Math.cosh'
-      | 'Math.E'
       | 'Math.exp'
       | 'Math.expm1'
       | 'Math.floor'
       | 'Math.fround'
       | 'Math.hypot'
       | 'Math.imul'
-      | 'Math.LN2'
-      | 'Math.LN10'
       | 'Math.log'
+      | 'Math.log10'
       | 'Math.log1p'
       | 'Math.log2'
-      | 'Math.LOG2E'
-      | 'Math.log10'
-      | 'Math.LOG10E'
       | 'Math.max'
       | 'Math.min'
-      | 'Math.PI'
       | 'Math.pow'
       | 'Math.random'
       | 'Math.round'
@@ -2470,27 +2472,24 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'Math.sin'
       | 'Math.sinh'
       | 'Math.sqrt'
-      | 'Math.SQRT1_2'
-      | 'Math.SQRT2'
       | 'Math.tan'
       | 'Math.tanh'
       | 'Math.trunc'
-      | 'Math'
       | 'NaN'
       | 'Number.EPSILON'
-      | 'Number.isFinite'
-      | 'Number.isInteger'
-      | 'Number.isNaN'
-      | 'Number.isSafeInteger'
       | 'Number.MAX_SAFE_INTEGER'
       | 'Number.MAX_VALUE'
       | 'Number.MIN_SAFE_INTEGER'
       | 'Number.MIN_VALUE'
-      | 'Number.NaN'
       | 'Number.NEGATIVE_INFINITY'
+      | 'Number.NaN'
+      | 'Number.POSITIVE_INFINITY'
+      | 'Number.isFinite'
+      | 'Number.isInteger'
+      | 'Number.isNaN'
+      | 'Number.isSafeInteger'
       | 'Number.parseFloat'
       | 'Number.parseInt'
-      | 'Number.POSITIVE_INFINITY'
       | 'Number.toLocaleString'
       | 'Object.assign'
       | 'Object.create'
@@ -2520,19 +2519,18 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'Object.seal'
       | 'Object.setPrototypeOf'
       | 'Object.values'
-      | 'parseFloat'
-      | 'parseInt'
+      | 'Promise'
       | 'Promise.all'
       | 'Promise.allSettled'
       | 'Promise.any'
       | 'Promise.race'
       | 'Promise.reject'
       | 'Promise.resolve'
-      | 'Promise'
-      | 'Proxy.revocable'
       | 'Proxy'
+      | 'Proxy.revocable'
       | 'RangeError'
       | 'ReferenceError'
+      | 'Reflect'
       | 'Reflect.apply'
       | 'Reflect.construct'
       | 'Reflect.defineProperty'
@@ -2546,7 +2544,7 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'Reflect.preventExtensions'
       | 'Reflect.set'
       | 'Reflect.setPrototypeOf'
-      | 'Reflect'
+      | 'RegExp'
       | 'RegExp.dotAll'
       | 'RegExp.hasIndices'
       | 'RegExp.input'
@@ -2556,9 +2554,9 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'RegExp.leftContext'
       | 'RegExp.n'
       | 'RegExp.rightContext'
-      | 'RegExp'
       | 'Set'
       | 'SharedArrayBuffer'
+      | 'String'
       | 'String.fromCharCode'
       | 'String.fromCodePoint'
       | 'String.length'
@@ -2566,7 +2564,7 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'String.raw'
       | 'String.toLocaleLowerCase'
       | 'String.toLocaleUpperCase'
-      | 'String'
+      | 'Symbol'
       | 'Symbol.asyncIterator'
       | 'Symbol.for'
       | 'Symbol.hasInstance'
@@ -2582,41 +2580,51 @@ namespace NoUnsupportedFeaturesEsBuiltins {
       | 'Symbol.toPrimitive'
       | 'Symbol.toStringTag'
       | 'Symbol.unscopables'
-      | 'Symbol'
       | 'SyntaxError'
       | 'TypeError'
-      | 'Uint8Array.BYTES_PER_ELEMENT'
-      | 'Uint8Array.from'
-      | 'Uint8Array.name'
-      | 'Uint8Array.of'
-      | 'Uint8Array'
-      | 'Uint8ClampedArray.BYTES_PER_ELEMENT'
-      | 'Uint8ClampedArray.from'
-      | 'Uint8ClampedArray.name'
-      | 'Uint8ClampedArray.of'
-      | 'Uint8ClampedArray'
+      | 'URIError'
+      | 'Uint16Array'
       | 'Uint16Array.BYTES_PER_ELEMENT'
       | 'Uint16Array.from'
       | 'Uint16Array.name'
       | 'Uint16Array.of'
-      | 'Uint16Array'
+      | 'Uint32Array'
       | 'Uint32Array.BYTES_PER_ELEMENT'
       | 'Uint32Array.from'
       | 'Uint32Array.name'
       | 'Uint32Array.of'
-      | 'Uint32Array'
-      | 'unescape'
-      | 'URIError'
+      | 'Uint8Array'
+      | 'Uint8Array.BYTES_PER_ELEMENT'
+      | 'Uint8Array.from'
+      | 'Uint8Array.name'
+      | 'Uint8Array.of'
+      | 'Uint8ClampedArray'
+      | 'Uint8ClampedArray.BYTES_PER_ELEMENT'
+      | 'Uint8ClampedArray.from'
+      | 'Uint8ClampedArray.name'
+      | 'Uint8ClampedArray.of'
       | 'WeakMap'
       | 'WeakRef'
       | 'WeakSet'
+      | 'decodeURI'
+      | 'decodeURIComponent'
+      | 'encodeURI'
+      | 'encodeURIComponent'
+      | 'escape'
+      | 'eval'
+      | 'globalThis'
+      | 'isFinite'
+      | 'isNaN'
+      | 'parseFloat'
+      | 'parseInt'
+      | 'unescape'
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3248,606 +3256,606 @@ namespace NoUnsupportedFeaturesEsSyntax {
    * ]
    * ```
    */
-  export type Options = {
-    readonly version?: string;
-    readonly ignores?: readonly (
+  export type Options = Readonly<{
+    version?: string;
+    ignores?: readonly (
+      | 'no-accessor-properties'
       | 'accessor-properties'
       | 'accessorProperties'
+      | 'no-arbitrary-module-namespace-names'
       | 'arbitrary-module-namespace-names'
       | 'arbitraryModuleNamespaceNames'
+      | 'no-array-from'
       | 'array-from'
-      | 'array-isarray'
-      | 'array-of'
-      | 'array-prototype-copywithin'
-      | 'array-prototype-entries'
-      | 'array-prototype-every'
-      | 'array-prototype-fill'
-      | 'array-prototype-filter'
-      | 'array-prototype-find'
-      | 'array-prototype-findindex'
-      | 'array-prototype-findlast-findlastindex'
-      | 'array-prototype-flat'
-      | 'array-prototype-foreach'
-      | 'array-prototype-includes'
-      | 'array-prototype-indexof'
-      | 'array-prototype-keys'
-      | 'array-prototype-lastindexof'
-      | 'array-prototype-map'
-      | 'array-prototype-reduce'
-      | 'array-prototype-reduceright'
-      | 'array-prototype-some'
-      | 'array-prototype-toreversed'
-      | 'array-prototype-tosorted'
-      | 'array-prototype-tospliced'
-      | 'array-prototype-values'
-      | 'array-prototype-with'
-      | 'array-string-prototype-at'
       | 'arrayFrom'
+      | 'no-array-isarray'
+      | 'array-isarray'
       | 'arrayIsarray'
+      | 'no-array-of'
+      | 'array-of'
       | 'arrayOf'
+      | 'no-array-prototype-copywithin'
+      | 'array-prototype-copywithin'
       | 'arrayPrototypeCopywithin'
+      | 'no-array-prototype-entries'
+      | 'array-prototype-entries'
       | 'arrayPrototypeEntries'
+      | 'no-array-prototype-every'
+      | 'array-prototype-every'
       | 'arrayPrototypeEvery'
+      | 'no-array-prototype-fill'
+      | 'array-prototype-fill'
       | 'arrayPrototypeFill'
+      | 'no-array-prototype-filter'
+      | 'array-prototype-filter'
       | 'arrayPrototypeFilter'
+      | 'no-array-prototype-find'
+      | 'array-prototype-find'
       | 'arrayPrototypeFind'
+      | 'no-array-prototype-findindex'
+      | 'array-prototype-findindex'
       | 'arrayPrototypeFindindex'
+      | 'no-array-prototype-findlast-findlastindex'
+      | 'array-prototype-findlast-findlastindex'
       | 'arrayPrototypeFindlastFindlastindex'
+      | 'no-array-prototype-flat'
+      | 'array-prototype-flat'
       | 'arrayPrototypeFlat'
+      | 'no-array-prototype-foreach'
+      | 'array-prototype-foreach'
       | 'arrayPrototypeForeach'
+      | 'no-array-prototype-includes'
+      | 'array-prototype-includes'
       | 'arrayPrototypeIncludes'
+      | 'no-array-prototype-indexof'
+      | 'array-prototype-indexof'
       | 'arrayPrototypeIndexof'
+      | 'no-array-prototype-keys'
+      | 'array-prototype-keys'
       | 'arrayPrototypeKeys'
+      | 'no-array-prototype-lastindexof'
+      | 'array-prototype-lastindexof'
       | 'arrayPrototypeLastindexof'
+      | 'no-array-prototype-map'
+      | 'array-prototype-map'
       | 'arrayPrototypeMap'
+      | 'no-array-prototype-reduce'
+      | 'array-prototype-reduce'
       | 'arrayPrototypeReduce'
+      | 'no-array-prototype-reduceright'
+      | 'array-prototype-reduceright'
       | 'arrayPrototypeReduceright'
+      | 'no-array-prototype-some'
+      | 'array-prototype-some'
       | 'arrayPrototypeSome'
+      | 'no-array-prototype-toreversed'
+      | 'array-prototype-toreversed'
       | 'arrayPrototypeToreversed'
+      | 'no-array-prototype-tosorted'
+      | 'array-prototype-tosorted'
       | 'arrayPrototypeTosorted'
+      | 'no-array-prototype-tospliced'
+      | 'array-prototype-tospliced'
       | 'arrayPrototypeTospliced'
+      | 'no-array-prototype-values'
+      | 'array-prototype-values'
       | 'arrayPrototypeValues'
+      | 'no-array-prototype-with'
+      | 'array-prototype-with'
       | 'arrayPrototypeWith'
+      | 'no-array-string-prototype-at'
+      | 'array-string-prototype-at'
       | 'arrayStringPrototypeAt'
+      | 'no-arrow-functions'
       | 'arrow-functions'
       | 'arrowFunctions'
+      | 'no-async-functions'
       | 'async-functions'
-      | 'async-iteration'
       | 'asyncFunctions'
+      | 'no-async-iteration'
+      | 'async-iteration'
       | 'asyncIteration'
+      | 'no-atomics-waitasync'
       | 'atomics-waitasync'
-      | 'atomics'
       | 'atomicsWaitasync'
+      | 'no-atomics'
+      | 'atomics'
+      | 'no-bigint'
       | 'bigint'
+      | 'no-binary-numeric-literals'
       | 'binary-numeric-literals'
       | 'binaryNumericLiterals'
+      | 'no-block-scoped-functions'
       | 'block-scoped-functions'
-      | 'block-scoped-variables'
       | 'blockScopedFunctions'
+      | 'no-block-scoped-variables'
+      | 'block-scoped-variables'
       | 'blockScopedVariables'
+      | 'no-class-fields'
       | 'class-fields'
-      | 'class-static-block'
-      | 'classes'
       | 'classFields'
+      | 'no-class-static-block'
+      | 'class-static-block'
       | 'classStaticBlock'
+      | 'no-classes'
+      | 'classes'
+      | 'no-computed-properties'
       | 'computed-properties'
       | 'computedProperties'
+      | 'no-date-now'
       | 'date-now'
-      | 'date-prototype-getyear-setyear'
-      | 'date-prototype-togmtstring'
       | 'dateNow'
+      | 'no-date-prototype-getyear-setyear'
+      | 'date-prototype-getyear-setyear'
       | 'datePrototypeGetyearSetyear'
+      | 'no-date-prototype-togmtstring'
+      | 'date-prototype-togmtstring'
       | 'datePrototypeTogmtstring'
+      | 'no-default-parameters'
       | 'default-parameters'
       | 'defaultParameters'
+      | 'no-destructuring'
       | 'destructuring'
+      | 'no-dynamic-import'
       | 'dynamic-import'
       | 'dynamicImport'
+      | 'no-error-cause'
       | 'error-cause'
       | 'errorCause'
+      | 'no-escape-unescape'
       | 'escape-unescape'
       | 'escapeUnescape'
+      | 'no-exponential-operators'
       | 'exponential-operators'
       | 'exponentialOperators'
+      | 'no-export-ns-from'
       | 'export-ns-from'
       | 'exportNsFrom'
+      | 'no-for-of-loops'
       | 'for-of-loops'
       | 'forOfLoops'
+      | 'no-function-declarations-in-if-statement-clauses-without-block'
       | 'function-declarations-in-if-statement-clauses-without-block'
-      | 'function-prototype-bind'
       | 'functionDeclarationsInIfStatementClausesWithoutBlock'
+      | 'no-function-prototype-bind'
+      | 'function-prototype-bind'
       | 'functionPrototypeBind'
+      | 'no-generators'
       | 'generators'
+      | 'no-global-this'
       | 'global-this'
       | 'globalThis'
+      | 'no-hashbang'
       | 'hashbang'
+      | 'no-import-meta'
       | 'import-meta'
       | 'importMeta'
+      | 'no-initializers-in-for-in'
       | 'initializers-in-for-in'
       | 'initializersInForIn'
+      | 'no-intl-datetimeformat-prototype-formatrange'
       | 'intl-datetimeformat-prototype-formatrange'
-      | 'intl-datetimeformat-prototype-formattoparts'
-      | 'intl-displaynames'
-      | 'intl-getcanonicallocales'
-      | 'intl-listformat'
-      | 'intl-locale'
-      | 'intl-numberformat-prototype-formatrange'
-      | 'intl-numberformat-prototype-formatrangetoparts'
-      | 'intl-numberformat-prototype-formattoparts'
-      | 'intl-pluralrules-prototype-selectrange'
-      | 'intl-pluralrules'
-      | 'intl-relativetimeformat'
-      | 'intl-segmenter'
-      | 'intl-supportedvaluesof'
       | 'intlDatetimeformatPrototypeFormatrange'
+      | 'no-intl-datetimeformat-prototype-formattoparts'
+      | 'intl-datetimeformat-prototype-formattoparts'
       | 'intlDatetimeformatPrototypeFormattoparts'
+      | 'no-intl-displaynames'
+      | 'intl-displaynames'
       | 'intlDisplaynames'
+      | 'no-intl-getcanonicallocales'
+      | 'intl-getcanonicallocales'
       | 'intlGetcanonicallocales'
+      | 'no-intl-listformat'
+      | 'intl-listformat'
       | 'intlListformat'
+      | 'no-intl-locale'
+      | 'intl-locale'
       | 'intlLocale'
+      | 'no-intl-numberformat-prototype-formatrange'
+      | 'intl-numberformat-prototype-formatrange'
       | 'intlNumberformatPrototypeFormatrange'
+      | 'no-intl-numberformat-prototype-formatrangetoparts'
+      | 'intl-numberformat-prototype-formatrangetoparts'
       | 'intlNumberformatPrototypeFormatrangetoparts'
+      | 'no-intl-numberformat-prototype-formattoparts'
+      | 'intl-numberformat-prototype-formattoparts'
       | 'intlNumberformatPrototypeFormattoparts'
-      | 'intlPluralrules'
+      | 'no-intl-pluralrules-prototype-selectrange'
+      | 'intl-pluralrules-prototype-selectrange'
       | 'intlPluralrulesPrototypeSelectrange'
+      | 'no-intl-pluralrules'
+      | 'intl-pluralrules'
+      | 'intlPluralrules'
+      | 'no-intl-relativetimeformat'
+      | 'intl-relativetimeformat'
       | 'intlRelativetimeformat'
+      | 'no-intl-segmenter'
+      | 'intl-segmenter'
       | 'intlSegmenter'
+      | 'no-intl-supportedvaluesof'
+      | 'intl-supportedvaluesof'
       | 'intlSupportedvaluesof'
+      | 'no-json-superset'
       | 'json-superset'
-      | 'json'
       | 'jsonSuperset'
+      | 'no-json'
+      | 'json'
+      | 'no-keyword-properties'
       | 'keyword-properties'
       | 'keywordProperties'
+      | 'no-labelled-function-declarations'
       | 'labelled-function-declarations'
       | 'labelledFunctionDeclarations'
+      | 'no-legacy-object-prototype-accessor-methods'
       | 'legacy-object-prototype-accessor-methods'
       | 'legacyObjectPrototypeAccessorMethods'
+      | 'no-logical-assignment-operators'
       | 'logical-assignment-operators'
       | 'logicalAssignmentOperators'
+      | 'no-malformed-template-literals'
       | 'malformed-template-literals'
       | 'malformedTemplateLiterals'
-      | 'map'
-      | 'math-acosh'
-      | 'math-asinh'
-      | 'math-atanh'
-      | 'math-cbrt'
-      | 'math-clz32'
-      | 'math-cosh'
-      | 'math-expm1'
-      | 'math-fround'
-      | 'math-hypot'
-      | 'math-imul'
-      | 'math-log1p'
-      | 'math-log2'
-      | 'math-log10'
-      | 'math-sign'
-      | 'math-sinh'
-      | 'math-tanh'
-      | 'math-trunc'
-      | 'mathAcosh'
-      | 'mathAsinh'
-      | 'mathAtanh'
-      | 'mathCbrt'
-      | 'mathClz32'
-      | 'mathCosh'
-      | 'mathExpm1'
-      | 'mathFround'
-      | 'mathHypot'
-      | 'mathImul'
-      | 'mathLog1p'
-      | 'mathLog2'
-      | 'mathLog10'
-      | 'mathSign'
-      | 'mathSinh'
-      | 'mathTanh'
-      | 'mathTrunc'
-      | 'modules'
-      | 'new-target'
-      | 'new.target'
-      | 'newTarget'
-      | 'no-accessor-properties'
-      | 'no-arbitrary-module-namespace-names'
-      | 'no-array-from'
-      | 'no-array-isarray'
-      | 'no-array-of'
-      | 'no-array-prototype-copywithin'
-      | 'no-array-prototype-entries'
-      | 'no-array-prototype-every'
-      | 'no-array-prototype-fill'
-      | 'no-array-prototype-filter'
-      | 'no-array-prototype-find'
-      | 'no-array-prototype-findindex'
-      | 'no-array-prototype-findlast-findlastindex'
-      | 'no-array-prototype-flat'
-      | 'no-array-prototype-foreach'
-      | 'no-array-prototype-includes'
-      | 'no-array-prototype-indexof'
-      | 'no-array-prototype-keys'
-      | 'no-array-prototype-lastindexof'
-      | 'no-array-prototype-map'
-      | 'no-array-prototype-reduce'
-      | 'no-array-prototype-reduceright'
-      | 'no-array-prototype-some'
-      | 'no-array-prototype-toreversed'
-      | 'no-array-prototype-tosorted'
-      | 'no-array-prototype-tospliced'
-      | 'no-array-prototype-values'
-      | 'no-array-prototype-with'
-      | 'no-array-string-prototype-at'
-      | 'no-arrow-functions'
-      | 'no-async-functions'
-      | 'no-async-iteration'
-      | 'no-atomics-waitasync'
-      | 'no-atomics'
-      | 'no-bigint'
-      | 'no-binary-numeric-literals'
-      | 'no-block-scoped-functions'
-      | 'no-block-scoped-variables'
-      | 'no-class-fields'
-      | 'no-class-static-block'
-      | 'no-classes'
-      | 'no-computed-properties'
-      | 'no-date-now'
-      | 'no-date-prototype-getyear-setyear'
-      | 'no-date-prototype-togmtstring'
-      | 'no-default-parameters'
-      | 'no-destructuring'
-      | 'no-dynamic-import'
-      | 'no-error-cause'
-      | 'no-escape-unescape'
-      | 'no-exponential-operators'
-      | 'no-export-ns-from'
-      | 'no-for-of-loops'
-      | 'no-function-declarations-in-if-statement-clauses-without-block'
-      | 'no-function-prototype-bind'
-      | 'no-generators'
-      | 'no-global-this'
-      | 'no-hashbang'
-      | 'no-import-meta'
-      | 'no-initializers-in-for-in'
-      | 'no-intl-datetimeformat-prototype-formatrange'
-      | 'no-intl-datetimeformat-prototype-formattoparts'
-      | 'no-intl-displaynames'
-      | 'no-intl-getcanonicallocales'
-      | 'no-intl-listformat'
-      | 'no-intl-locale'
-      | 'no-intl-numberformat-prototype-formatrange'
-      | 'no-intl-numberformat-prototype-formatrangetoparts'
-      | 'no-intl-numberformat-prototype-formattoparts'
-      | 'no-intl-pluralrules-prototype-selectrange'
-      | 'no-intl-pluralrules'
-      | 'no-intl-relativetimeformat'
-      | 'no-intl-segmenter'
-      | 'no-intl-supportedvaluesof'
-      | 'no-json-superset'
-      | 'no-json'
-      | 'no-keyword-properties'
-      | 'no-labelled-function-declarations'
-      | 'no-legacy-object-prototype-accessor-methods'
-      | 'no-logical-assignment-operators'
-      | 'no-malformed-template-literals'
       | 'no-map'
+      | 'map'
       | 'no-math-acosh'
+      | 'math-acosh'
+      | 'mathAcosh'
       | 'no-math-asinh'
+      | 'math-asinh'
+      | 'mathAsinh'
       | 'no-math-atanh'
+      | 'math-atanh'
+      | 'mathAtanh'
       | 'no-math-cbrt'
+      | 'math-cbrt'
+      | 'mathCbrt'
       | 'no-math-clz32'
+      | 'math-clz32'
+      | 'mathClz32'
       | 'no-math-cosh'
+      | 'math-cosh'
+      | 'mathCosh'
       | 'no-math-expm1'
+      | 'math-expm1'
+      | 'mathExpm1'
       | 'no-math-fround'
+      | 'math-fround'
+      | 'mathFround'
       | 'no-math-hypot'
+      | 'math-hypot'
+      | 'mathHypot'
       | 'no-math-imul'
-      | 'no-math-log1p'
-      | 'no-math-log2'
+      | 'math-imul'
+      | 'mathImul'
       | 'no-math-log10'
+      | 'math-log10'
+      | 'mathLog10'
+      | 'no-math-log1p'
+      | 'math-log1p'
+      | 'mathLog1p'
+      | 'no-math-log2'
+      | 'math-log2'
+      | 'mathLog2'
       | 'no-math-sign'
+      | 'math-sign'
+      | 'mathSign'
       | 'no-math-sinh'
+      | 'math-sinh'
+      | 'mathSinh'
       | 'no-math-tanh'
+      | 'math-tanh'
+      | 'mathTanh'
       | 'no-math-trunc'
+      | 'math-trunc'
+      | 'mathTrunc'
       | 'no-modules'
+      | 'modules'
       | 'no-new-target'
+      | 'new-target'
+      | 'newTarget'
+      | 'new.target'
       | 'no-nullish-coalescing-operators'
-      | 'no-number-epsilon'
-      | 'no-number-isfinite'
-      | 'no-number-isinteger'
-      | 'no-number-isnan'
-      | 'no-number-issafeinteger'
-      | 'no-number-maxsafeinteger'
-      | 'no-number-minsafeinteger'
-      | 'no-number-parsefloat'
-      | 'no-number-parseint'
-      | 'no-numeric-separators'
-      | 'no-object-assign'
-      | 'no-object-create'
-      | 'no-object-defineproperties'
-      | 'no-object-defineproperty'
-      | 'no-object-entries'
-      | 'no-object-freeze'
-      | 'no-object-fromentries'
-      | 'no-object-getownpropertydescriptor'
-      | 'no-object-getownpropertydescriptors'
-      | 'no-object-getownpropertynames'
-      | 'no-object-getownpropertysymbols'
-      | 'no-object-getprototypeof'
-      | 'no-object-hasown'
-      | 'no-object-is'
-      | 'no-object-isextensible'
-      | 'no-object-isfrozen'
-      | 'no-object-issealed'
-      | 'no-object-keys'
-      | 'no-object-map-groupby'
-      | 'no-object-preventextensions'
-      | 'no-object-seal'
-      | 'no-object-setprototypeof'
-      | 'no-object-super-properties'
-      | 'no-object-values'
-      | 'no-octal-numeric-literals'
-      | 'no-optional-catch-binding'
-      | 'no-optional-chaining'
-      | 'no-private-in'
-      | 'no-promise-all-settled'
-      | 'no-promise-any'
-      | 'no-promise-prototype-finally'
-      | 'no-promise-withresolvers'
-      | 'no-promise'
-      | 'no-property-shorthands'
-      | 'no-proxy'
-      | 'no-reflect'
-      | 'no-regexp-d-flag'
-      | 'no-regexp-lookbehind-assertions'
-      | 'no-regexp-named-capture-groups'
-      | 'no-regexp-prototype-compile'
-      | 'no-regexp-prototype-flags'
-      | 'no-regexp-s-flag'
-      | 'no-regexp-u-flag'
-      | 'no-regexp-unicode-property-escapes-2019'
-      | 'no-regexp-unicode-property-escapes-2020'
-      | 'no-regexp-unicode-property-escapes-2021'
-      | 'no-regexp-unicode-property-escapes-2022'
-      | 'no-regexp-unicode-property-escapes-2023'
-      | 'no-regexp-unicode-property-escapes'
-      | 'no-regexp-v-flag'
-      | 'no-regexp-y-flag'
-      | 'no-resizable-and-growable-arraybuffers'
-      | 'no-rest-parameters'
-      | 'no-rest-spread-properties'
-      | 'no-set'
-      | 'no-shadow-catch-param'
-      | 'no-shared-array-buffer'
-      | 'no-spread-elements'
-      | 'no-string-create-html-methods'
-      | 'no-string-fromcodepoint'
-      | 'no-string-prototype-codepointat'
-      | 'no-string-prototype-endswith'
-      | 'no-string-prototype-includes'
-      | 'no-string-prototype-iswellformed-towellformed'
-      | 'no-string-prototype-matchall'
-      | 'no-string-prototype-normalize'
-      | 'no-string-prototype-padstart-padend'
-      | 'no-string-prototype-repeat'
-      | 'no-string-prototype-replaceall'
-      | 'no-string-prototype-startswith'
-      | 'no-string-prototype-substr'
-      | 'no-string-prototype-trim'
-      | 'no-string-prototype-trimleft-trimright'
-      | 'no-string-prototype-trimstart-trimend'
-      | 'no-string-raw'
-      | 'no-subclassing-builtins'
-      | 'no-symbol-prototype-description'
-      | 'no-symbol'
-      | 'no-template-literals'
-      | 'no-top-level-await'
-      | 'no-trailing-commas'
-      | 'no-trailing-function-commas'
-      | 'no-typed-arrays'
-      | 'no-unicode-codepoint-escapes'
-      | 'no-weak-map'
-      | 'no-weak-set'
-      | 'no-weakrefs'
       | 'nullish-coalescing-operators'
       | 'nullishCoalescingOperators'
+      | 'no-number-epsilon'
       | 'number-epsilon'
-      | 'number-isfinite'
-      | 'number-isinteger'
-      | 'number-isnan'
-      | 'number-issafeinteger'
-      | 'number-maxsafeinteger'
-      | 'number-minsafeinteger'
-      | 'number-parsefloat'
-      | 'number-parseint'
       | 'numberEpsilon'
+      | 'no-number-isfinite'
+      | 'number-isfinite'
       | 'numberIsfinite'
+      | 'no-number-isinteger'
+      | 'number-isinteger'
       | 'numberIsinteger'
+      | 'no-number-isnan'
+      | 'number-isnan'
       | 'numberIsnan'
+      | 'no-number-issafeinteger'
+      | 'number-issafeinteger'
       | 'numberIssafeinteger'
+      | 'no-number-maxsafeinteger'
+      | 'number-maxsafeinteger'
       | 'numberMaxsafeinteger'
+      | 'no-number-minsafeinteger'
+      | 'number-minsafeinteger'
       | 'numberMinsafeinteger'
+      | 'no-number-parsefloat'
+      | 'number-parsefloat'
       | 'numberParsefloat'
+      | 'no-number-parseint'
+      | 'number-parseint'
       | 'numberParseint'
+      | 'no-numeric-separators'
       | 'numeric-separators'
       | 'numericSeparators'
+      | 'no-object-assign'
       | 'object-assign'
-      | 'object-create'
-      | 'object-defineproperties'
-      | 'object-defineproperty'
-      | 'object-entries'
-      | 'object-freeze'
-      | 'object-fromentries'
-      | 'object-getownpropertydescriptor'
-      | 'object-getownpropertydescriptors'
-      | 'object-getownpropertynames'
-      | 'object-getownpropertysymbols'
-      | 'object-getprototypeof'
-      | 'object-hasown'
-      | 'object-is'
-      | 'object-isextensible'
-      | 'object-isfrozen'
-      | 'object-issealed'
-      | 'object-keys'
-      | 'object-map-groupby'
-      | 'object-preventextensions'
-      | 'object-seal'
-      | 'object-setprototypeof'
-      | 'object-super-properties'
-      | 'object-values'
       | 'objectAssign'
+      | 'no-object-create'
+      | 'object-create'
       | 'objectCreate'
+      | 'no-object-defineproperties'
+      | 'object-defineproperties'
       | 'objectDefineproperties'
+      | 'no-object-defineproperty'
+      | 'object-defineproperty'
       | 'objectDefineproperty'
+      | 'no-object-entries'
+      | 'object-entries'
       | 'objectEntries'
+      | 'no-object-freeze'
+      | 'object-freeze'
       | 'objectFreeze'
+      | 'no-object-fromentries'
+      | 'object-fromentries'
       | 'objectFromentries'
+      | 'no-object-getownpropertydescriptor'
+      | 'object-getownpropertydescriptor'
       | 'objectGetownpropertydescriptor'
+      | 'no-object-getownpropertydescriptors'
+      | 'object-getownpropertydescriptors'
       | 'objectGetownpropertydescriptors'
+      | 'no-object-getownpropertynames'
+      | 'object-getownpropertynames'
       | 'objectGetownpropertynames'
+      | 'no-object-getownpropertysymbols'
+      | 'object-getownpropertysymbols'
       | 'objectGetownpropertysymbols'
+      | 'no-object-getprototypeof'
+      | 'object-getprototypeof'
       | 'objectGetprototypeof'
+      | 'no-object-hasown'
+      | 'object-hasown'
       | 'objectHasown'
+      | 'no-object-is'
+      | 'object-is'
       | 'objectIs'
+      | 'no-object-isextensible'
+      | 'object-isextensible'
       | 'objectIsextensible'
+      | 'no-object-isfrozen'
+      | 'object-isfrozen'
       | 'objectIsfrozen'
+      | 'no-object-issealed'
+      | 'object-issealed'
       | 'objectIssealed'
+      | 'no-object-keys'
+      | 'object-keys'
       | 'objectKeys'
+      | 'no-object-map-groupby'
+      | 'object-map-groupby'
       | 'objectMapGroupby'
+      | 'no-object-preventextensions'
+      | 'object-preventextensions'
       | 'objectPreventextensions'
+      | 'no-object-seal'
+      | 'object-seal'
       | 'objectSeal'
+      | 'no-object-setprototypeof'
+      | 'object-setprototypeof'
       | 'objectSetprototypeof'
+      | 'no-object-super-properties'
+      | 'object-super-properties'
       | 'objectSuperProperties'
+      | 'no-object-values'
+      | 'object-values'
       | 'objectValues'
+      | 'no-octal-numeric-literals'
       | 'octal-numeric-literals'
       | 'octalNumericLiterals'
+      | 'no-optional-catch-binding'
       | 'optional-catch-binding'
-      | 'optional-chaining'
       | 'optionalCatchBinding'
+      | 'no-optional-chaining'
+      | 'optional-chaining'
       | 'optionalChaining'
+      | 'no-private-in'
       | 'private-in'
       | 'privateIn'
+      | 'no-promise-all-settled'
       | 'promise-all-settled'
-      | 'promise-any'
-      | 'promise-prototype-finally'
-      | 'promise-withresolvers'
-      | 'promise'
       | 'promiseAllSettled'
+      | 'no-promise-any'
+      | 'promise-any'
       | 'promiseAny'
+      | 'no-promise-prototype-finally'
+      | 'promise-prototype-finally'
       | 'promisePrototypeFinally'
+      | 'no-promise-withresolvers'
+      | 'promise-withresolvers'
       | 'promiseWithresolvers'
+      | 'no-promise'
+      | 'promise'
+      | 'no-property-shorthands'
       | 'property-shorthands'
       | 'propertyShorthands'
+      | 'no-proxy'
       | 'proxy'
+      | 'no-reflect'
       | 'reflect'
+      | 'no-regexp-d-flag'
       | 'regexp-d-flag'
-      | 'regexp-lookbehind-assertions'
-      | 'regexp-named-capture-groups'
-      | 'regexp-prototype-compile'
-      | 'regexp-prototype-flags'
-      | 'regexp-s-flag'
-      | 'regexp-u-flag'
-      | 'regexp-unicode-property-escapes-2019'
-      | 'regexp-unicode-property-escapes-2020'
-      | 'regexp-unicode-property-escapes-2021'
-      | 'regexp-unicode-property-escapes-2022'
-      | 'regexp-unicode-property-escapes-2023'
-      | 'regexp-unicode-property-escapes'
-      | 'regexp-v-flag'
-      | 'regexp-y-flag'
       | 'regexpDFlag'
-      | 'regexpLookbehind'
+      | 'no-regexp-lookbehind-assertions'
+      | 'regexp-lookbehind-assertions'
       | 'regexpLookbehindAssertions'
+      | 'regexpLookbehind'
+      | 'no-regexp-named-capture-groups'
+      | 'regexp-named-capture-groups'
       | 'regexpNamedCaptureGroups'
+      | 'no-regexp-prototype-compile'
+      | 'regexp-prototype-compile'
       | 'regexpPrototypeCompile'
+      | 'no-regexp-prototype-flags'
+      | 'regexp-prototype-flags'
       | 'regexpPrototypeFlags'
-      | 'regexpS'
+      | 'no-regexp-s-flag'
+      | 'regexp-s-flag'
       | 'regexpSFlag'
-      | 'regexpU'
+      | 'regexpS'
+      | 'no-regexp-u-flag'
+      | 'regexp-u-flag'
       | 'regexpUFlag'
-      | 'regexpUnicodeProperties'
-      | 'regexpUnicodePropertyEscapes'
+      | 'regexpU'
+      | 'no-regexp-unicode-property-escapes-2019'
+      | 'regexp-unicode-property-escapes-2019'
       | 'regexpUnicodePropertyEscapes2019'
+      | 'no-regexp-unicode-property-escapes-2020'
+      | 'regexp-unicode-property-escapes-2020'
       | 'regexpUnicodePropertyEscapes2020'
+      | 'no-regexp-unicode-property-escapes-2021'
+      | 'regexp-unicode-property-escapes-2021'
       | 'regexpUnicodePropertyEscapes2021'
+      | 'no-regexp-unicode-property-escapes-2022'
+      | 'regexp-unicode-property-escapes-2022'
       | 'regexpUnicodePropertyEscapes2022'
+      | 'no-regexp-unicode-property-escapes-2023'
+      | 'regexp-unicode-property-escapes-2023'
       | 'regexpUnicodePropertyEscapes2023'
+      | 'no-regexp-unicode-property-escapes'
+      | 'regexp-unicode-property-escapes'
+      | 'regexpUnicodePropertyEscapes'
+      | 'regexpUnicodeProperties'
+      | 'no-regexp-v-flag'
+      | 'regexp-v-flag'
       | 'regexpVFlag'
-      | 'regexpY'
+      | 'no-regexp-y-flag'
+      | 'regexp-y-flag'
       | 'regexpYFlag'
+      | 'regexpY'
+      | 'no-resizable-and-growable-arraybuffers'
       | 'resizable-and-growable-arraybuffers'
       | 'resizableAndGrowableArraybuffers'
+      | 'no-rest-parameters'
       | 'rest-parameters'
-      | 'rest-spread-properties'
       | 'restParameters'
+      | 'no-rest-spread-properties'
+      | 'rest-spread-properties'
       | 'restSpreadProperties'
+      | 'no-set'
       | 'set'
+      | 'no-shadow-catch-param'
       | 'shadow-catch-param'
       | 'shadowCatchParam'
+      | 'no-shared-array-buffer'
       | 'shared-array-buffer'
       | 'sharedArrayBuffer'
+      | 'no-spread-elements'
       | 'spread-elements'
       | 'spreadElements'
+      | 'no-string-create-html-methods'
       | 'string-create-html-methods'
-      | 'string-fromcodepoint'
-      | 'string-prototype-codepointat'
-      | 'string-prototype-endswith'
-      | 'string-prototype-includes'
-      | 'string-prototype-iswellformed-towellformed'
-      | 'string-prototype-matchall'
-      | 'string-prototype-normalize'
-      | 'string-prototype-padstart-padend'
-      | 'string-prototype-repeat'
-      | 'string-prototype-replaceall'
-      | 'string-prototype-startswith'
-      | 'string-prototype-substr'
-      | 'string-prototype-trim'
-      | 'string-prototype-trimleft-trimright'
-      | 'string-prototype-trimstart-trimend'
-      | 'string-raw'
       | 'stringCreateHtmlMethods'
+      | 'no-string-fromcodepoint'
+      | 'string-fromcodepoint'
       | 'stringFromcodepoint'
+      | 'no-string-prototype-codepointat'
+      | 'string-prototype-codepointat'
       | 'stringPrototypeCodepointat'
+      | 'no-string-prototype-endswith'
+      | 'string-prototype-endswith'
       | 'stringPrototypeEndswith'
+      | 'no-string-prototype-includes'
+      | 'string-prototype-includes'
       | 'stringPrototypeIncludes'
+      | 'no-string-prototype-iswellformed-towellformed'
+      | 'string-prototype-iswellformed-towellformed'
       | 'stringPrototypeIswellformedTowellformed'
+      | 'no-string-prototype-matchall'
+      | 'string-prototype-matchall'
       | 'stringPrototypeMatchall'
+      | 'no-string-prototype-normalize'
+      | 'string-prototype-normalize'
       | 'stringPrototypeNormalize'
+      | 'no-string-prototype-padstart-padend'
+      | 'string-prototype-padstart-padend'
       | 'stringPrototypePadstartPadend'
+      | 'no-string-prototype-repeat'
+      | 'string-prototype-repeat'
       | 'stringPrototypeRepeat'
+      | 'no-string-prototype-replaceall'
+      | 'string-prototype-replaceall'
       | 'stringPrototypeReplaceall'
+      | 'no-string-prototype-startswith'
+      | 'string-prototype-startswith'
       | 'stringPrototypeStartswith'
+      | 'no-string-prototype-substr'
+      | 'string-prototype-substr'
       | 'stringPrototypeSubstr'
+      | 'no-string-prototype-trim'
+      | 'string-prototype-trim'
       | 'stringPrototypeTrim'
+      | 'no-string-prototype-trimleft-trimright'
+      | 'string-prototype-trimleft-trimright'
       | 'stringPrototypeTrimleftTrimright'
+      | 'no-string-prototype-trimstart-trimend'
+      | 'string-prototype-trimstart-trimend'
       | 'stringPrototypeTrimstartTrimend'
+      | 'no-string-raw'
+      | 'string-raw'
       | 'stringRaw'
+      | 'no-subclassing-builtins'
       | 'subclassing-builtins'
       | 'subclassingBuiltins'
+      | 'no-symbol-prototype-description'
       | 'symbol-prototype-description'
-      | 'symbol'
       | 'symbolPrototypeDescription'
+      | 'no-symbol'
+      | 'symbol'
+      | 'no-template-literals'
       | 'template-literals'
       | 'templateLiterals'
+      | 'no-top-level-await'
       | 'top-level-await'
       | 'topLevelAwait'
+      | 'no-trailing-commas'
       | 'trailing-commas'
-      | 'trailing-function-commas'
       | 'trailingCommas'
-      | 'trailingCommasInFunctions'
+      | 'no-trailing-function-commas'
+      | 'trailing-function-commas'
       | 'trailingFunctionCommas'
+      | 'trailingCommasInFunctions'
+      | 'no-typed-arrays'
       | 'typed-arrays'
       | 'typedArrays'
+      | 'no-unicode-codepoint-escapes'
       | 'unicode-codepoint-escapes'
-      | 'unicodeCodePointEscapes'
       | 'unicodeCodepointEscapes'
+      | 'unicodeCodePointEscapes'
+      | 'no-weak-map'
       | 'weak-map'
-      | 'weak-set'
       | 'weakMap'
-      | 'weakrefs'
+      | 'no-weak-set'
+      | 'weak-set'
       | 'weakSet'
+      | 'no-weakrefs'
+      | 'weakrefs'
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5508,26 +5516,299 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    * ]
    * ```
    */
-  export type Options = {
-    readonly version?: string;
-    readonly allowExperimental?: boolean;
-    readonly ignores?: readonly (
-      | '__dirname'
+  export type Options = Readonly<{
+    version?: string;
+    allowExperimental?: boolean;
+    ignores?: readonly (
       | '__filename'
-      | '_http_agent'
-      | '_http_client'
-      | '_http_common'
-      | '_http_incoming'
-      | '_http_outgoing'
-      | '_http_server'
+      | '__dirname'
+      | 'require'
+      | 'require.cache'
+      | 'require.extensions'
+      | 'require.main'
+      | 'require.resolve'
+      | 'require.resolve.paths'
+      | 'module'
+      | 'module.children'
+      | 'module.exports'
+      | 'module.filename'
+      | 'module.id'
+      | 'module.isPreloading'
+      | 'module.loaded'
+      | 'module.parent'
+      | 'module.path'
+      | 'module.paths'
+      | 'module.require'
+      | 'exports'
       | 'AbortController'
-      | 'AbortSignal.abort'
-      | 'AbortSignal.any'
-      | 'AbortSignal.timeout'
       | 'AbortSignal'
+      | 'AbortSignal.abort'
+      | 'AbortSignal.timeout'
+      | 'AbortSignal.any'
+      | 'DOMException'
+      | 'FormData'
+      | 'Headers'
+      | 'MessageEvent'
+      | 'Navigator'
+      | 'Request'
+      | 'Response'
+      | 'WebAssembly'
+      | 'WebSocket'
+      | 'fetch'
+      | 'global'
+      | 'queueMicrotask'
+      | 'navigator'
+      | 'navigator.hardwareConcurrency'
+      | 'navigator.language'
+      | 'navigator.languages'
+      | 'navigator.platform'
+      | 'navigator.userAgent'
+      | 'structuredClone'
+      | 'localStorage'
+      | 'sessionStorage'
+      | 'Storage'
+      | 'Blob'
+      | 'new Buffer()'
+      | 'Buffer'
+      | 'Buffer.alloc'
+      | 'Buffer.allocUnsafe'
+      | 'Buffer.allocUnsafeSlow'
+      | 'Buffer.byteLength'
+      | 'Buffer.compare'
+      | 'Buffer.concat'
+      | 'Buffer.copyBytesFrom'
+      | 'Buffer.from'
+      | 'Buffer.isBuffer'
+      | 'Buffer.isEncoding'
+      | 'File'
+      | 'atob'
+      | 'btoa'
+      | 'console'
+      | 'console.profile'
+      | 'console.profileEnd'
+      | 'console.timeStamp'
+      | 'console.Console'
+      | 'console.assert'
+      | 'console.clear'
+      | 'console.count'
+      | 'console.countReset'
+      | 'console.debug'
+      | 'console.dir'
+      | 'console.dirxml'
+      | 'console.error'
+      | 'console.group'
+      | 'console.groupCollapsed'
+      | 'console.groupEnd'
+      | 'console.info'
+      | 'console.log'
+      | 'console.table'
+      | 'console.time'
+      | 'console.timeEnd'
+      | 'console.timeLog'
+      | 'console.trace'
+      | 'console.warn'
+      | 'crypto'
+      | 'crypto.subtle'
+      | 'crypto.subtle.decrypt'
+      | 'crypto.subtle.deriveBits'
+      | 'crypto.subtle.deriveKey'
+      | 'crypto.subtle.digest'
+      | 'crypto.subtle.encrypt'
+      | 'crypto.subtle.exportKey'
+      | 'crypto.subtle.generateKey'
+      | 'crypto.subtle.importKey'
+      | 'crypto.subtle.sign'
+      | 'crypto.subtle.unwrapKey'
+      | 'crypto.subtle.verify'
+      | 'crypto.subtle.wrapKey'
+      | 'crypto.getRandomValues'
+      | 'crypto.randomUUID'
+      | 'Crypto'
+      | 'CryptoKey'
+      | 'SubtleCrypto'
+      | 'CloseEvent'
+      | 'CustomEvent'
+      | 'Event'
+      | 'EventSource'
+      | 'EventTarget'
+      | 'PerformanceEntry'
+      | 'PerformanceMark'
+      | 'PerformanceMeasure'
+      | 'PerformanceObserver'
+      | 'PerformanceObserverEntryList'
+      | 'PerformanceResourceTiming'
+      | 'performance'
+      | 'performance.clearMarks'
+      | 'performance.clearMeasures'
+      | 'performance.clearResourceTimings'
+      | 'performance.eventLoopUtilization'
+      | 'performance.getEntries'
+      | 'performance.getEntriesByName'
+      | 'performance.getEntriesByType'
+      | 'performance.mark'
+      | 'performance.markResourceTiming'
+      | 'performance.measure'
+      | 'performance.nodeTiming'
+      | 'performance.nodeTiming.bootstrapComplete'
+      | 'performance.nodeTiming.environment'
+      | 'performance.nodeTiming.idleTime'
+      | 'performance.nodeTiming.loopExit'
+      | 'performance.nodeTiming.loopStart'
+      | 'performance.nodeTiming.nodeStart'
+      | 'performance.nodeTiming.uvMetricsInfo'
+      | 'performance.nodeTiming.v8Start'
+      | 'performance.now'
+      | 'performance.onresourcetimingbufferfull'
+      | 'performance.setResourceTimingBufferSize'
+      | 'performance.timeOrigin'
+      | 'performance.timerify'
+      | 'performance.toJSON'
+      | 'process'
+      | 'process.allowedNodeEnvironmentFlags'
+      | 'process.availableMemory'
+      | 'process.arch'
+      | 'process.argv'
+      | 'process.argv0'
+      | 'process.channel'
+      | 'process.config'
+      | 'process.connected'
+      | 'process.debugPort'
+      | 'process.env'
+      | 'process.execArgv'
+      | 'process.execPath'
+      | 'process.execve'
+      | 'process.exitCode'
+      | 'process.features.cached_builtins'
+      | 'process.features.debug'
+      | 'process.features.inspector'
+      | 'process.features.ipv6'
+      | 'process.features.require_module'
+      | 'process.features.tls'
+      | 'process.features.tls_alpn'
+      | 'process.features.tls_ocsp'
+      | 'process.features.tls_sni'
+      | 'process.features.typescript'
+      | 'process.features.uv'
+      | 'process.finalization.register'
+      | 'process.finalization.registerBeforeExit'
+      | 'process.finalization.unregister'
+      | 'process.getBuiltinModule'
+      | 'process.mainModule'
+      | 'process.noDeprecation'
+      | 'process.permission'
+      | 'process.pid'
+      | 'process.platform'
+      | 'process.ppid'
+      | 'process.ref'
+      | 'process.release'
+      | 'process.report'
+      | 'process.report.excludeEnv'
+      | 'process.sourceMapsEnabled'
+      | 'process.stdin'
+      | 'process.stdin.isRaw'
+      | 'process.stdin.isTTY'
+      | 'process.stdin.setRawMode'
+      | 'process.stdout'
+      | 'process.stdout.clearLine'
+      | 'process.stdout.clearScreenDown'
+      | 'process.stdout.columns'
+      | 'process.stdout.cursorTo'
+      | 'process.stdout.getColorDepth'
+      | 'process.stdout.getWindowSize'
+      | 'process.stdout.hasColors'
+      | 'process.stdout.isTTY'
+      | 'process.stdout.moveCursor'
+      | 'process.stdout.rows'
+      | 'process.stderr'
+      | 'process.stderr.clearLine'
+      | 'process.stderr.clearScreenDown'
+      | 'process.stderr.columns'
+      | 'process.stderr.cursorTo'
+      | 'process.stderr.getColorDepth'
+      | 'process.stderr.getWindowSize'
+      | 'process.stderr.hasColors'
+      | 'process.stderr.isTTY'
+      | 'process.stderr.moveCursor'
+      | 'process.stderr.rows'
+      | 'process.threadCpuUsage'
+      | 'process.throwDeprecation'
+      | 'process.title'
+      | 'process.traceDeprecation'
+      | 'process.version'
+      | 'process.versions'
+      | 'process.abort'
+      | 'process.chdir'
+      | 'process.constrainedMemory'
+      | 'process.cpuUsage'
+      | 'process.cwd'
+      | 'process.disconnect'
+      | 'process.dlopen'
+      | 'process.emitWarning'
+      | 'process.exit'
+      | 'process.getActiveResourcesInfo'
+      | 'process.getegid'
+      | 'process.geteuid'
+      | 'process.getgid'
+      | 'process.getgroups'
+      | 'process.getuid'
+      | 'process.hasUncaughtExceptionCaptureCallback'
+      | 'process.hrtime'
+      | 'process.hrtime.bigint'
+      | 'process.initgroups'
+      | 'process.kill'
+      | 'process.loadEnvFile'
+      | 'process.memoryUsage'
+      | 'process.rss'
+      | 'process.nextTick'
+      | 'process.resourceUsage'
+      | 'process.send'
+      | 'process.setegid'
+      | 'process.seteuid'
+      | 'process.setgid'
+      | 'process.setgroups'
+      | 'process.setuid'
+      | 'process.setSourceMapsEnabled'
+      | 'process.setUncaughtExceptionCaptureCallback'
+      | 'process.umask'
+      | 'process.unref'
+      | 'process.uptime'
+      | 'ReadableStream'
+      | 'ReadableStream.from'
+      | 'ReadableStreamDefaultReader'
+      | 'ReadableStreamBYOBReader'
+      | 'ReadableStreamDefaultController'
+      | 'ReadableByteStreamController'
+      | 'ReadableStreamBYOBRequest'
+      | 'WritableStream'
+      | 'WritableStreamDefaultWriter'
+      | 'WritableStreamDefaultController'
+      | 'TransformStream'
+      | 'TransformStreamDefaultController'
+      | 'ByteLengthQueuingStrategy'
+      | 'CountQueuingStrategy'
+      | 'TextEncoderStream'
+      | 'TextDecoderStream'
+      | 'CompressionStream'
+      | 'DecompressionStream'
+      | 'setInterval'
+      | 'clearInterval'
+      | 'setTimeout'
+      | 'clearTimeout'
+      | 'setImmediate'
+      | 'clearImmediate'
+      | 'URL'
+      | 'URL.canParse'
+      | 'URL.createObjectURL'
+      | 'URL.revokeObjectURL'
+      | 'URLSearchParams'
+      | 'TextDecoder'
+      | 'TextEncoder'
+      | 'BroadcastChannel'
+      | 'MessageChannel'
+      | 'MessagePort'
+      | 'assert'
       | 'assert.Assert'
       | 'assert.assert'
-      | 'assert.CallTracker'
       | 'assert.deepEqual'
       | 'assert.deepStrictEqual'
       | 'assert.doesNotMatch'
@@ -5544,9 +5825,12 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'assert.ok'
       | 'assert.partialDeepStrictEqual'
       | 'assert.rejects'
+      | 'assert.strictEqual'
+      | 'assert.throws'
+      | 'assert.CallTracker'
+      | 'assert.strict'
       | 'assert.strict.Assert'
       | 'assert.strict.assert'
-      | 'assert.strict.CallTracker'
       | 'assert.strict.deepEqual'
       | 'assert.strict.deepStrictEqual'
       | 'assert.strict.doesNotMatch'
@@ -5565,13 +5849,10 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'assert.strict.rejects'
       | 'assert.strict.strictEqual'
       | 'assert.strict.throws'
-      | 'assert.strict'
-      | 'assert.strictEqual'
-      | 'assert.throws'
-      | 'assert'
+      | 'assert.strict.CallTracker'
+      | 'assert/strict'
       | 'assert/strict.Assert'
       | 'assert/strict.assert'
-      | 'assert/strict.CallTracker'
       | 'assert/strict.deepEqual'
       | 'assert/strict.deepStrictEqual'
       | 'assert/strict.doesNotMatch'
@@ -5590,27 +5871,32 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'assert/strict.rejects'
       | 'assert/strict.strictEqual'
       | 'assert/strict.throws'
-      | 'assert/strict'
+      | 'assert/strict.CallTracker'
+      | 'async_hooks'
+      | 'async_hooks.createHook'
+      | 'async_hooks.executionAsyncResource'
+      | 'async_hooks.executionAsyncId'
+      | 'async_hooks.triggerAsyncId'
+      | 'async_hooks.AsyncLocalStorage'
       | 'async_hooks.AsyncLocalStorage.bind'
       | 'async_hooks.AsyncLocalStorage.snapshot'
-      | 'async_hooks.AsyncLocalStorage'
-      | 'async_hooks.AsyncResource.bind'
       | 'async_hooks.AsyncResource'
-      | 'async_hooks.createHook'
-      | 'async_hooks.executionAsyncId'
-      | 'async_hooks.executionAsyncResource'
-      | 'async_hooks.triggerAsyncId'
-      | 'async_hooks'
-      | 'atob'
-      | 'Blob'
-      | 'BroadcastChannel'
-      | 'btoa'
-      | 'Buffer.alloc'
-      | 'Buffer.allocUnsafe'
-      | 'Buffer.allocUnsafeSlow'
+      | 'async_hooks.AsyncResource.bind'
+      | 'buffer'
+      | 'buffer.constants'
+      | 'buffer.INSPECT_MAX_BYTES'
+      | 'buffer.kMaxLength'
+      | 'buffer.kStringMaxLength'
       | 'buffer.atob'
-      | 'buffer.Blob'
       | 'buffer.btoa'
+      | 'buffer.isAscii'
+      | 'buffer.isUtf8'
+      | 'buffer.resolveObjectURL'
+      | 'buffer.transcode'
+      | 'buffer.SlowBuffer'
+      | 'buffer.Blob'
+      | 'new buffer.Buffer()'
+      | 'buffer.Buffer'
       | 'buffer.Buffer.alloc'
       | 'buffer.Buffer.allocUnsafe'
       | 'buffer.Buffer.allocUnsafeSlow'
@@ -5621,87 +5907,49 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'buffer.Buffer.from'
       | 'buffer.Buffer.isBuffer'
       | 'buffer.Buffer.isEncoding'
-      | 'buffer.Buffer'
-      | 'Buffer.byteLength'
-      | 'Buffer.compare'
-      | 'Buffer.concat'
-      | 'buffer.constants'
-      | 'Buffer.copyBytesFrom'
       | 'buffer.File'
-      | 'Buffer.from'
-      | 'buffer.INSPECT_MAX_BYTES'
-      | 'buffer.isAscii'
-      | 'Buffer.isBuffer'
-      | 'Buffer.isEncoding'
-      | 'buffer.isUtf8'
-      | 'buffer.kMaxLength'
-      | 'buffer.kStringMaxLength'
-      | 'buffer.resolveObjectURL'
-      | 'buffer.SlowBuffer'
-      | 'buffer.transcode'
-      | 'Buffer'
-      | 'buffer'
-      | 'ByteLengthQueuingStrategy'
-      | 'child_process.ChildProcess'
+      | 'child_process'
       | 'child_process.exec'
       | 'child_process.execFile'
-      | 'child_process.execFileSync'
-      | 'child_process.execSync'
       | 'child_process.fork'
       | 'child_process.spawn'
+      | 'child_process.execFileSync'
+      | 'child_process.execSync'
       | 'child_process.spawnSync'
-      | 'child_process'
-      | 'clearImmediate'
-      | 'clearInterval'
-      | 'clearTimeout'
-      | 'CloseEvent'
-      | 'cluster.disconnect'
-      | 'cluster.fork'
+      | 'child_process.ChildProcess'
+      | 'cluster'
       | 'cluster.isMaster'
       | 'cluster.isPrimary'
       | 'cluster.isWorker'
       | 'cluster.schedulingPolicy'
       | 'cluster.settings'
+      | 'cluster.worker'
+      | 'cluster.workers'
+      | 'cluster.disconnect'
+      | 'cluster.fork'
       | 'cluster.setupMaster'
       | 'cluster.setupPrimary'
       | 'cluster.Worker'
-      | 'cluster.worker'
-      | 'cluster.workers'
-      | 'cluster'
-      | 'CompressionStream'
-      | 'console.assert'
-      | 'console.clear'
-      | 'console.Console'
-      | 'console.count'
-      | 'console.countReset'
-      | 'console.debug'
-      | 'console.dir'
-      | 'console.dirxml'
-      | 'console.error'
-      | 'console.group'
-      | 'console.groupCollapsed'
-      | 'console.groupEnd'
-      | 'console.info'
-      | 'console.log'
-      | 'console.profile'
-      | 'console.profileEnd'
-      | 'console.table'
-      | 'console.time'
-      | 'console.timeEnd'
-      | 'console.timeLog'
-      | 'console.timeStamp'
-      | 'console.trace'
-      | 'console.warn'
-      | 'console'
-      | 'CountQueuingStrategy'
-      | 'crypto.Certificate.exportChallenge'
-      | 'crypto.Certificate.exportPublicKey'
-      | 'crypto.Certificate.verifySpkac'
-      | 'crypto.Certificate'
+      | 'crypto.constants'
+      | 'crypto.fips'
+      | 'crypto.webcrypto'
+      | 'crypto.webcrypto.subtle'
+      | 'crypto.webcrypto.subtle.decrypt'
+      | 'crypto.webcrypto.subtle.deriveBits'
+      | 'crypto.webcrypto.subtle.deriveKey'
+      | 'crypto.webcrypto.subtle.digest'
+      | 'crypto.webcrypto.subtle.encrypt'
+      | 'crypto.webcrypto.subtle.exportKey'
+      | 'crypto.webcrypto.subtle.generateKey'
+      | 'crypto.webcrypto.subtle.importKey'
+      | 'crypto.webcrypto.subtle.sign'
+      | 'crypto.webcrypto.subtle.unwrapKey'
+      | 'crypto.webcrypto.subtle.verify'
+      | 'crypto.webcrypto.subtle.wrapKey'
+      | 'crypto.webcrypto.getRandomValues'
+      | 'crypto.webcrypto.randomUUID'
       | 'crypto.checkPrime'
       | 'crypto.checkPrimeSync'
-      | 'crypto.Cipher'
-      | 'crypto.constants'
       | 'crypto.createCipher'
       | 'crypto.createCipheriv'
       | 'crypto.createDecipher'
@@ -5716,13 +5964,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.createSecretKey'
       | 'crypto.createSign'
       | 'crypto.createVerify'
-      | 'crypto.Decipher'
-      | 'crypto.DiffieHellman'
       | 'crypto.diffieHellman'
-      | 'crypto.DiffieHellmanGroup'
-      | 'crypto.ECDH.convertKey'
-      | 'crypto.ECDH'
-      | 'crypto.fips'
       | 'crypto.generateKey'
       | 'crypto.generateKeyPair'
       | 'crypto.generateKeyPairSync'
@@ -5735,16 +5977,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.getDiffieHellman'
       | 'crypto.getFips'
       | 'crypto.getHashes'
-      | 'crypto.getRandomValues'
-      | 'crypto.Hash'
       | 'crypto.hash'
-      | 'crypto.Hash()'
       | 'crypto.hkdf'
       | 'crypto.hkdfSync'
-      | 'crypto.Hmac'
-      | 'crypto.Hmac()'
-      | 'crypto.KeyObject.from'
-      | 'crypto.KeyObject'
       | 'crypto.pbkdf2'
       | 'crypto.pbkdf2Sync'
       | 'crypto.privateDecrypt'
@@ -5752,72 +5987,75 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.publicDecrypt'
       | 'crypto.publicEncrypt'
       | 'crypto.randomBytes'
-      | 'crypto.randomFill'
       | 'crypto.randomFillSync'
+      | 'crypto.randomFill'
       | 'crypto.randomInt'
-      | 'crypto.randomUUID'
       | 'crypto.scrypt'
       | 'crypto.scryptSync'
       | 'crypto.secureHeapUsed'
       | 'crypto.setEngine'
       | 'crypto.setFips'
-      | 'crypto.Sign'
       | 'crypto.sign'
-      | 'crypto.subtle.decrypt'
-      | 'crypto.subtle.deriveBits'
-      | 'crypto.subtle.deriveKey'
-      | 'crypto.subtle.digest'
-      | 'crypto.subtle.encrypt'
-      | 'crypto.subtle.exportKey'
-      | 'crypto.subtle.generateKey'
-      | 'crypto.subtle.importKey'
-      | 'crypto.subtle.sign'
-      | 'crypto.subtle.unwrapKey'
-      | 'crypto.subtle.verify'
-      | 'crypto.subtle.wrapKey'
-      | 'crypto.subtle'
       | 'crypto.timingSafeEqual'
-      | 'crypto.Verify'
       | 'crypto.verify'
-      | 'crypto.webcrypto.getRandomValues'
-      | 'crypto.webcrypto.randomUUID'
-      | 'crypto.webcrypto.subtle.decrypt'
-      | 'crypto.webcrypto.subtle.deriveBits'
-      | 'crypto.webcrypto.subtle.deriveKey'
-      | 'crypto.webcrypto.subtle.digest'
-      | 'crypto.webcrypto.subtle.encrypt'
-      | 'crypto.webcrypto.subtle.exportKey'
-      | 'crypto.webcrypto.subtle.generateKey'
-      | 'crypto.webcrypto.subtle.importKey'
-      | 'crypto.webcrypto.subtle.sign'
-      | 'crypto.webcrypto.subtle.unwrapKey'
-      | 'crypto.webcrypto.subtle.verify'
-      | 'crypto.webcrypto.subtle.wrapKey'
-      | 'crypto.webcrypto.subtle'
-      | 'crypto.webcrypto'
+      | 'crypto.Certificate'
+      | 'crypto.Certificate.exportChallenge'
+      | 'crypto.Certificate.exportPublicKey'
+      | 'crypto.Certificate.verifySpkac'
+      | 'crypto.Cipher'
+      | 'crypto.Decipher'
+      | 'crypto.DiffieHellman'
+      | 'crypto.DiffieHellmanGroup'
+      | 'crypto.ECDH'
+      | 'crypto.ECDH.convertKey'
+      | 'crypto.Hash()'
+      | 'new crypto.Hash()'
+      | 'crypto.Hash'
+      | 'crypto.Hmac()'
+      | 'new crypto.Hmac()'
+      | 'crypto.Hmac'
+      | 'crypto.KeyObject'
+      | 'crypto.KeyObject.from'
+      | 'crypto.Sign'
+      | 'crypto.Verify'
       | 'crypto.X509Certificate'
-      | 'Crypto'
-      | 'crypto'
-      | 'CryptoKey'
-      | 'CustomEvent'
-      | 'DecompressionStream'
+      | 'dgram'
       | 'dgram.createSocket'
       | 'dgram.Socket'
-      | 'dgram'
-      | 'diagnostics_channel.Channel'
-      | 'diagnostics_channel.channel'
-      | 'diagnostics_channel.hasSubscribers'
-      | 'diagnostics_channel.subscribe'
-      | 'diagnostics_channel.TracingChannel'
-      | 'diagnostics_channel.tracingChannel'
-      | 'diagnostics_channel.unsubscribe'
       | 'diagnostics_channel'
-      | 'dns.getDefaultResultOrder'
+      | 'diagnostics_channel.hasSubscribers'
+      | 'diagnostics_channel.channel'
+      | 'diagnostics_channel.subscribe'
+      | 'diagnostics_channel.unsubscribe'
+      | 'diagnostics_channel.tracingChannel'
+      | 'diagnostics_channel.Channel'
+      | 'diagnostics_channel.TracingChannel'
+      | 'dns'
+      | 'dns.Resolver'
       | 'dns.getServers'
       | 'dns.lookup'
       | 'dns.lookupService'
+      | 'dns.resolve'
+      | 'dns.resolve4'
+      | 'dns.resolve6'
+      | 'dns.resolveAny'
+      | 'dns.resolveCname'
+      | 'dns.resolveCaa'
+      | 'dns.resolveMx'
+      | 'dns.resolveNaptr'
+      | 'dns.resolveNs'
+      | 'dns.resolvePtr'
+      | 'dns.resolveSoa'
+      | 'dns.resolveSrv'
+      | 'dns.resolveTlsa'
+      | 'dns.resolveTxt'
+      | 'dns.reverse'
+      | 'dns.setDefaultResultOrder'
+      | 'dns.getDefaultResultOrder'
+      | 'dns.setServers'
+      | 'dns.promises'
+      | 'dns.promises.Resolver'
       | 'dns.promises.cancel'
-      | 'dns.promises.getDefaultResultOrder'
       | 'dns.promises.getServers'
       | 'dns.promises.lookup'
       | 'dns.promises.lookupService'
@@ -5831,36 +6069,17 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'dns.promises.resolveNaptr'
       | 'dns.promises.resolveNs'
       | 'dns.promises.resolvePtr'
-      | 'dns.promises.Resolver'
       | 'dns.promises.resolveSoa'
       | 'dns.promises.resolveSrv'
       | 'dns.promises.resolveTlsa'
       | 'dns.promises.resolveTxt'
       | 'dns.promises.reverse'
       | 'dns.promises.setDefaultResultOrder'
+      | 'dns.promises.getDefaultResultOrder'
       | 'dns.promises.setServers'
-      | 'dns.promises'
-      | 'dns.resolve'
-      | 'dns.resolve4'
-      | 'dns.resolve6'
-      | 'dns.resolveAny'
-      | 'dns.resolveCaa'
-      | 'dns.resolveCname'
-      | 'dns.resolveMx'
-      | 'dns.resolveNaptr'
-      | 'dns.resolveNs'
-      | 'dns.resolvePtr'
-      | 'dns.Resolver'
-      | 'dns.resolveSoa'
-      | 'dns.resolveSrv'
-      | 'dns.resolveTlsa'
-      | 'dns.resolveTxt'
-      | 'dns.reverse'
-      | 'dns.setDefaultResultOrder'
-      | 'dns.setServers'
-      | 'dns'
+      | 'dns/promises'
+      | 'dns/promises.Resolver'
       | 'dns/promises.cancel'
-      | 'dns/promises.getDefaultResultOrder'
       | 'dns/promises.getServers'
       | 'dns/promises.lookup'
       | 'dns/promises.lookupService'
@@ -5874,125 +6093,60 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'dns/promises.resolveNaptr'
       | 'dns/promises.resolveNs'
       | 'dns/promises.resolvePtr'
-      | 'dns/promises.Resolver'
       | 'dns/promises.resolveSoa'
       | 'dns/promises.resolveSrv'
       | 'dns/promises.resolveTlsa'
       | 'dns/promises.resolveTxt'
       | 'dns/promises.reverse'
       | 'dns/promises.setDefaultResultOrder'
+      | 'dns/promises.getDefaultResultOrder'
       | 'dns/promises.setServers'
-      | 'dns/promises'
+      | 'domain'
       | 'domain.create'
       | 'domain.Domain'
-      | 'domain'
-      | 'DOMException'
-      | 'Event'
-      | 'events.addAbortListener'
-      | 'events.captureRejections'
-      | 'events.captureRejectionSymbol'
-      | 'events.CustomEvent'
-      | 'events.defaultMaxListeners'
-      | 'events.errorMonitor'
+      | 'events'
       | 'events.Event'
-      | 'events.EventEmitter.addAbortListener'
-      | 'events.EventEmitter.captureRejections'
-      | 'events.EventEmitter.captureRejectionSymbol'
+      | 'events.EventTarget'
+      | 'events.CustomEvent'
+      | 'events.NodeEventTarget'
+      | 'events.EventEmitter'
       | 'events.EventEmitter.defaultMaxListeners'
       | 'events.EventEmitter.errorMonitor'
+      | 'events.EventEmitter.captureRejections'
+      | 'events.EventEmitter.captureRejectionSymbol'
       | 'events.EventEmitter.getEventListeners'
       | 'events.EventEmitter.getMaxListeners'
+      | 'events.EventEmitter.once'
       | 'events.EventEmitter.listenerCount'
       | 'events.EventEmitter.on'
-      | 'events.EventEmitter.once'
       | 'events.EventEmitter.setMaxListeners'
-      | 'events.EventEmitter'
-      | 'events.EventEmitterAsyncResource.addAbortListener'
-      | 'events.EventEmitterAsyncResource.captureRejections'
-      | 'events.EventEmitterAsyncResource.captureRejectionSymbol'
+      | 'events.EventEmitter.addAbortListener'
+      | 'events.EventEmitterAsyncResource'
       | 'events.EventEmitterAsyncResource.defaultMaxListeners'
       | 'events.EventEmitterAsyncResource.errorMonitor'
+      | 'events.EventEmitterAsyncResource.captureRejections'
+      | 'events.EventEmitterAsyncResource.captureRejectionSymbol'
       | 'events.EventEmitterAsyncResource.getEventListeners'
       | 'events.EventEmitterAsyncResource.getMaxListeners'
+      | 'events.EventEmitterAsyncResource.once'
       | 'events.EventEmitterAsyncResource.listenerCount'
       | 'events.EventEmitterAsyncResource.on'
-      | 'events.EventEmitterAsyncResource.once'
       | 'events.EventEmitterAsyncResource.setMaxListeners'
-      | 'events.EventEmitterAsyncResource'
-      | 'events.EventTarget'
+      | 'events.EventEmitterAsyncResource.addAbortListener'
+      | 'events.defaultMaxListeners'
+      | 'events.errorMonitor'
+      | 'events.captureRejections'
+      | 'events.captureRejectionSymbol'
       | 'events.getEventListeners'
       | 'events.getMaxListeners'
-      | 'events.listenerCount'
-      | 'events.NodeEventTarget'
-      | 'events.on'
       | 'events.once'
+      | 'events.listenerCount'
+      | 'events.on'
       | 'events.setMaxListeners'
-      | 'events'
-      | 'EventSource'
-      | 'EventTarget'
-      | 'exports'
-      | 'fetch'
-      | 'File'
-      | 'FormData'
-      | 'fs.access'
-      | 'fs.accessSync'
-      | 'fs.appendFile'
-      | 'fs.appendFileSync'
-      | 'fs.chmod'
-      | 'fs.chmodSync'
-      | 'fs.chown'
-      | 'fs.chownSync'
-      | 'fs.close'
-      | 'fs.closeSync'
-      | 'fs.common_objects'
-      | 'fs.constants'
-      | 'fs.copyFile'
-      | 'fs.copyFileSync'
-      | 'fs.cp'
-      | 'fs.cpSync'
-      | 'fs.createReadStream'
-      | 'fs.createWriteStream'
-      | 'fs.Dir'
-      | 'fs.Dirent'
-      | 'fs.exists'
-      | 'fs.existsSync'
-      | 'fs.fchmod'
-      | 'fs.fchmodSync'
-      | 'fs.fchown'
-      | 'fs.fchownSync'
-      | 'fs.fdatasync'
-      | 'fs.fdatasyncSync'
-      | 'fs.fstat'
-      | 'fs.fstatSync'
-      | 'fs.FSWatcher'
-      | 'fs.fsync'
-      | 'fs.fsyncSync'
-      | 'fs.ftruncate'
-      | 'fs.ftruncateSync'
-      | 'fs.futimes'
-      | 'fs.futimesSync'
-      | 'fs.glob'
-      | 'fs.globSync'
-      | 'fs.lchmod'
-      | 'fs.lchmodSync'
-      | 'fs.lchown'
-      | 'fs.lchownSync'
-      | 'fs.link'
-      | 'fs.linkSync'
-      | 'fs.lstat'
-      | 'fs.lstatSync'
-      | 'fs.lutimes'
-      | 'fs.lutimesSync'
-      | 'fs.mkdir'
-      | 'fs.mkdirSync'
-      | 'fs.mkdtemp'
-      | 'fs.mkdtempSync'
-      | 'fs.native'
-      | 'fs.open'
-      | 'fs.openAsBlob'
-      | 'fs.opendir'
-      | 'fs.opendirSync'
-      | 'fs.openSync'
+      | 'events.addAbortListener'
+      | 'fs'
+      | 'fs.promises'
+      | 'fs.promises.FileHandle'
       | 'fs.promises.access'
       | 'fs.promises.appendFile'
       | 'fs.promises.chmod'
@@ -6000,7 +6154,6 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs.promises.constants'
       | 'fs.promises.copyFile'
       | 'fs.promises.cp'
-      | 'fs.promises.FileHandle'
       | 'fs.promises.glob'
       | 'fs.promises.lchmod'
       | 'fs.promises.lchown'
@@ -6011,8 +6164,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs.promises.mkdtemp'
       | 'fs.promises.open'
       | 'fs.promises.opendir'
-      | 'fs.promises.readdir'
       | 'fs.promises.readFile'
+      | 'fs.promises.readdir'
       | 'fs.promises.readlink'
       | 'fs.promises.realpath'
       | 'fs.promises.rename'
@@ -6026,55 +6179,115 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs.promises.utimes'
       | 'fs.promises.watch'
       | 'fs.promises.writeFile'
-      | 'fs.promises'
+      | 'fs.access'
+      | 'fs.appendFile'
+      | 'fs.chmod'
+      | 'fs.chown'
+      | 'fs.close'
+      | 'fs.copyFile'
+      | 'fs.cp'
+      | 'fs.createReadStream'
+      | 'fs.createWriteStream'
+      | 'fs.exists'
+      | 'fs.fchmod'
+      | 'fs.fchown'
+      | 'fs.fdatasync'
+      | 'fs.fstat'
+      | 'fs.fsync'
+      | 'fs.ftruncate'
+      | 'fs.futimes'
+      | 'fs.glob'
+      | 'fs.lchmod'
+      | 'fs.lchown'
+      | 'fs.link'
+      | 'fs.lstat'
+      | 'fs.lutimes'
+      | 'fs.mkdir'
+      | 'fs.mkdtemp'
+      | 'fs.native'
+      | 'fs.open'
+      | 'fs.openAsBlob'
+      | 'fs.opendir'
       | 'fs.read'
       | 'fs.readdir'
-      | 'fs.readdirSync'
       | 'fs.readFile'
-      | 'fs.readFileSync'
       | 'fs.readlink'
-      | 'fs.readlinkSync'
-      | 'fs.ReadStream'
-      | 'fs.readSync'
       | 'fs.readv'
-      | 'fs.readvSync'
-      | 'fs.realpath.native'
       | 'fs.realpath'
-      | 'fs.realpathSync.native'
-      | 'fs.realpathSync'
+      | 'fs.realpath.native'
       | 'fs.rename'
-      | 'fs.renameSync'
       | 'fs.rm'
       | 'fs.rmdir'
-      | 'fs.rmdirSync'
-      | 'fs.rmSync'
       | 'fs.stat'
-      | 'fs.StatFs'
       | 'fs.statfs'
-      | 'fs.statfsSync'
-      | 'fs.Stats'
-      | 'fs.Stats()'
-      | 'fs.statSync'
-      | 'fs.StatWatcher'
       | 'fs.symlink'
-      | 'fs.symlinkSync'
       | 'fs.truncate'
-      | 'fs.truncateSync'
       | 'fs.unlink'
-      | 'fs.unlinkSync'
       | 'fs.unwatchFile'
       | 'fs.utimes'
-      | 'fs.utimesSync'
       | 'fs.watch'
       | 'fs.watchFile'
       | 'fs.write'
       | 'fs.writeFile'
-      | 'fs.writeFileSync'
-      | 'fs.WriteStream'
-      | 'fs.writeSync'
       | 'fs.writev'
+      | 'fs.accessSync'
+      | 'fs.appendFileSync'
+      | 'fs.chmodSync'
+      | 'fs.chownSync'
+      | 'fs.closeSync'
+      | 'fs.copyFileSync'
+      | 'fs.cpSync'
+      | 'fs.existsSync'
+      | 'fs.fchmodSync'
+      | 'fs.fchownSync'
+      | 'fs.fdatasyncSync'
+      | 'fs.fstatSync'
+      | 'fs.fsyncSync'
+      | 'fs.ftruncateSync'
+      | 'fs.futimesSync'
+      | 'fs.globSync'
+      | 'fs.lchmodSync'
+      | 'fs.lchownSync'
+      | 'fs.linkSync'
+      | 'fs.lstatSync'
+      | 'fs.lutimesSync'
+      | 'fs.mkdirSync'
+      | 'fs.mkdtempSync'
+      | 'fs.opendirSync'
+      | 'fs.openSync'
+      | 'fs.readdirSync'
+      | 'fs.readFileSync'
+      | 'fs.readlinkSync'
+      | 'fs.readSync'
+      | 'fs.readvSync'
+      | 'fs.realpathSync'
+      | 'fs.realpathSync.native'
+      | 'fs.renameSync'
+      | 'fs.rmdirSync'
+      | 'fs.rmSync'
+      | 'fs.statfsSync'
+      | 'fs.statSync'
+      | 'fs.symlinkSync'
+      | 'fs.truncateSync'
+      | 'fs.unlinkSync'
+      | 'fs.utimesSync'
+      | 'fs.writeFileSync'
+      | 'fs.writeSync'
       | 'fs.writevSync'
-      | 'fs'
+      | 'fs.constants'
+      | 'fs.Dir'
+      | 'fs.Dirent'
+      | 'fs.FSWatcher'
+      | 'fs.StatWatcher'
+      | 'fs.ReadStream'
+      | 'fs.Stats()'
+      | 'new fs.Stats()'
+      | 'fs.Stats'
+      | 'fs.StatFs'
+      | 'fs.WriteStream'
+      | 'fs.common_objects'
+      | 'fs/promises'
+      | 'fs/promises.FileHandle'
       | 'fs/promises.access'
       | 'fs/promises.appendFile'
       | 'fs/promises.chmod'
@@ -6082,7 +6295,6 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs/promises.constants'
       | 'fs/promises.copyFile'
       | 'fs/promises.cp'
-      | 'fs/promises.FileHandle'
       | 'fs/promises.glob'
       | 'fs/promises.lchmod'
       | 'fs/promises.lchown'
@@ -6093,8 +6305,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs/promises.mkdtemp'
       | 'fs/promises.open'
       | 'fs/promises.opendir'
-      | 'fs/promises.readdir'
       | 'fs/promises.readFile'
+      | 'fs/promises.readdir'
       | 'fs/promises.readlink'
       | 'fs/promises.realpath'
       | 'fs/promises.rename'
@@ -6108,60 +6320,59 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs/promises.utimes'
       | 'fs/promises.watch'
       | 'fs/promises.writeFile'
-      | 'fs/promises'
-      | 'global'
-      | 'Headers'
-      | 'http.Agent'
-      | 'http.ClientRequest'
-      | 'http.createServer'
-      | 'http.get'
-      | 'http.globalAgent'
-      | 'http.IncomingMessage'
-      | 'http.maxHeaderSize'
-      | 'http.METHODS'
-      | 'http.OutgoingMessage'
-      | 'http.request'
-      | 'http.Server'
-      | 'http.ServerResponse'
-      | 'http.setMaxIdleHTTPParsers'
-      | 'http.STATUS_CODES'
-      | 'http.validateHeaderName'
-      | 'http.validateHeaderValue'
-      | 'http.WebSocket'
-      | 'http'
-      | 'http2.ClientHttp2Session'
-      | 'http2.ClientHttp2Stream'
-      | 'http2.connect'
+      | 'http2'
       | 'http2.constants'
-      | 'http2.createSecureServer'
+      | 'http2.sensitiveHeaders'
       | 'http2.createServer'
+      | 'http2.createSecureServer'
+      | 'http2.connect'
       | 'http2.getDefaultSettings'
       | 'http2.getPackedSettings'
       | 'http2.getUnpackedSettings'
-      | 'http2.Http2SecureServer'
+      | 'http2.performServerHandshake'
+      | 'http2.Http2Session'
+      | 'http2.ServerHttp2Session'
+      | 'http2.ClientHttp2Session'
+      | 'http2.Http2Stream'
+      | 'http2.ClientHttp2Stream'
+      | 'http2.ServerHttp2Stream'
       | 'http2.Http2Server'
+      | 'http2.Http2SecureServer'
       | 'http2.Http2ServerRequest'
       | 'http2.Http2ServerResponse'
-      | 'http2.Http2Session'
-      | 'http2.Http2Stream'
-      | 'http2.performServerHandshake'
-      | 'http2.sensitiveHeaders'
-      | 'http2.ServerHttp2Session'
-      | 'http2.ServerHttp2Stream'
-      | 'http2'
-      | 'https.Agent'
+      | 'http'
+      | 'http.METHODS'
+      | 'http.STATUS_CODES'
+      | 'http.globalAgent'
+      | 'http.maxHeaderSize'
+      | 'http.createServer'
+      | 'http.get'
+      | 'http.request'
+      | 'http.validateHeaderName'
+      | 'http.validateHeaderValue'
+      | 'http.setMaxIdleHTTPParsers'
+      | 'http.Agent'
+      | 'http.ClientRequest'
+      | 'http.Server'
+      | 'http.ServerResponse'
+      | 'http.IncomingMessage'
+      | 'http.OutgoingMessage'
+      | 'http.WebSocket'
+      | '_http_agent'
+      | '_http_client'
+      | '_http_common'
+      | '_http_incoming'
+      | '_http_outgoing'
+      | '_http_server'
+      | 'https'
+      | 'https.globalAgent'
       | 'https.createServer'
       | 'https.get'
-      | 'https.globalAgent'
       | 'https.request'
+      | 'https.Agent'
       | 'https.Server'
-      | 'https'
-      | 'import.meta.dirname'
-      | 'import.meta.filename'
-      | 'import.meta.main'
-      | 'import.meta.resolve'
-      | 'inspector.close'
-      | 'inspector.console'
+      | 'inspector'
+      | 'inspector.Session'
       | 'inspector.Network.dataReceived'
       | 'inspector.Network.dataSent'
       | 'inspector.Network.loadingFailed'
@@ -6169,13 +6380,13 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'inspector.Network.requestWillBeSent'
       | 'inspector.Network.responseReceived'
       | 'inspector.NetworkResources.put'
+      | 'inspector.console'
+      | 'inspector.close'
       | 'inspector.open'
-      | 'inspector.Session'
       | 'inspector.url'
       | 'inspector.waitForDebugger'
-      | 'inspector'
-      | 'inspector/promises.close'
-      | 'inspector/promises.console'
+      | 'inspector/promises'
+      | 'inspector/promises.Session'
       | 'inspector/promises.Network.dataReceived'
       | 'inspector/promises.Network.dataSent'
       | 'inspector/promises.Network.loadingFailed'
@@ -6183,96 +6394,70 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'inspector/promises.Network.requestWillBeSent'
       | 'inspector/promises.Network.responseReceived'
       | 'inspector/promises.NetworkResources.put'
+      | 'inspector/promises.console'
+      | 'inspector/promises.close'
       | 'inspector/promises.open'
-      | 'inspector/promises.Session'
       | 'inspector/promises.url'
       | 'inspector/promises.waitForDebugger'
-      | 'inspector/promises'
-      | 'localStorage'
-      | 'MessageChannel'
-      | 'MessageEvent'
-      | 'MessagePort'
       | 'module.builtinModules'
-      | 'module.children'
       | 'module.constants.compileCacheStatus'
       | 'module.createRequire'
       | 'module.createRequireFromPath'
       | 'module.enableCompileCache'
-      | 'module.exports'
-      | 'module.filename'
       | 'module.findPackageJSON'
-      | 'module.findSourceMap'
       | 'module.flushCompileCache'
       | 'module.getCompileCacheDir'
       | 'module.getSourceMapsSupport'
-      | 'module.id'
       | 'module.isBuiltin'
-      | 'module.isPreloading'
-      | 'module.loaded'
+      | 'module.registerHooks'
+      | 'module.register'
+      | 'module.setSourceMapsSupport'
+      | 'module.stripTypeScriptTypes'
+      | 'module.syncBuiltinESMExports'
+      | 'module.findSourceMap'
+      | 'module.SourceMap'
       | 'module.Module.builtinModules'
       | 'module.Module.createRequire'
       | 'module.Module.createRequireFromPath'
       | 'module.Module.enableCompileCache'
       | 'module.Module.findPackageJSON'
-      | 'module.Module.findSourceMap'
       | 'module.Module.flushCompileCache'
       | 'module.Module.getCompileCacheDir'
       | 'module.Module.getSourceMapsSupport'
       | 'module.Module.isBuiltin'
-      | 'module.Module.register'
       | 'module.Module.registerHooks'
+      | 'module.Module.register'
       | 'module.Module.setSourceMapsSupport'
-      | 'module.Module.SourceMap'
       | 'module.Module.stripTypeScriptTypes'
       | 'module.Module.syncBuiltinESMExports'
-      | 'module.parent'
-      | 'module.path'
-      | 'module.paths'
-      | 'module.register'
-      | 'module.registerHooks'
-      | 'module.require'
-      | 'module.setSourceMapsSupport'
-      | 'module.SourceMap'
-      | 'module.stripTypeScriptTypes'
-      | 'module.syncBuiltinESMExports'
-      | 'module'
-      | 'navigator.hardwareConcurrency'
-      | 'navigator.language'
-      | 'navigator.languages'
-      | 'navigator.platform'
-      | 'navigator.userAgent'
-      | 'Navigator'
-      | 'navigator'
-      | 'net.BlockList.isBlockList'
-      | 'net.BlockList'
+      | 'module.Module.findSourceMap'
+      | 'module.Module.SourceMap'
+      | 'net'
       | 'net.connect'
       | 'net.createConnection'
       | 'net.createServer'
       | 'net.getDefaultAutoSelectFamily'
+      | 'net.setDefaultAutoSelectFamily'
       | 'net.getDefaultAutoSelectFamilyAttemptTimeout'
+      | 'net.setDefaultAutoSelectFamilyAttemptTimeout'
       | 'net.isIP'
       | 'net.isIPv4'
       | 'net.isIPv6'
-      | 'net.Server'
-      | 'net.setDefaultAutoSelectFamily'
-      | 'net.setDefaultAutoSelectFamilyAttemptTimeout'
-      | 'net.Socket'
-      | 'net.SocketAddress.parse'
+      | 'net.BlockList'
+      | 'net.BlockList.isBlockList'
       | 'net.SocketAddress'
-      | 'net'
-      | 'new buffer.Buffer()'
-      | 'new Buffer()'
-      | 'new crypto.Hash()'
-      | 'new crypto.Hmac()'
-      | 'new fs.Stats()'
-      | 'os.arch'
-      | 'os.availableParallelism'
-      | 'os.constants.priority'
-      | 'os.constants'
-      | 'os.cpus'
-      | 'os.devNull'
-      | 'os.endianness'
+      | 'net.SocketAddress.parse'
+      | 'net.Server'
+      | 'net.Socket'
+      | 'os'
       | 'os.EOL'
+      | 'os.constants'
+      | 'os.constants.priority'
+      | 'os.devNull'
+      | 'os.availableParallelism'
+      | 'os.arch'
+      | 'os.cpus'
+      | 'os.endianness'
       | 'os.freemem'
       | 'os.getPriority'
       | 'os.homedir'
@@ -6289,86 +6474,83 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'os.uptime'
       | 'os.userInfo'
       | 'os.version'
-      | 'os'
-      | 'path.basename'
-      | 'path.delimiter'
-      | 'path.dirname'
-      | 'path.extname'
-      | 'path.format'
-      | 'path.isAbsolute'
-      | 'path.join'
-      | 'path.matchesGlob'
-      | 'path.normalize'
-      | 'path.parse'
-      | 'path.posix.basename'
+      | 'path'
+      | 'path.posix'
       | 'path.posix.delimiter'
+      | 'path.posix.sep'
+      | 'path.posix.basename'
       | 'path.posix.dirname'
       | 'path.posix.extname'
       | 'path.posix.format'
+      | 'path.posix.matchesGlob'
       | 'path.posix.isAbsolute'
       | 'path.posix.join'
-      | 'path.posix.matchesGlob'
       | 'path.posix.normalize'
       | 'path.posix.parse'
       | 'path.posix.relative'
       | 'path.posix.resolve'
-      | 'path.posix.sep'
       | 'path.posix.toNamespacedPath'
-      | 'path.posix'
-      | 'path.relative'
-      | 'path.resolve'
-      | 'path.sep'
-      | 'path.toNamespacedPath'
-      | 'path.win32.basename'
+      | 'path.win32'
       | 'path.win32.delimiter'
+      | 'path.win32.sep'
+      | 'path.win32.basename'
       | 'path.win32.dirname'
       | 'path.win32.extname'
       | 'path.win32.format'
+      | 'path.win32.matchesGlob'
       | 'path.win32.isAbsolute'
       | 'path.win32.join'
-      | 'path.win32.matchesGlob'
       | 'path.win32.normalize'
       | 'path.win32.parse'
       | 'path.win32.relative'
       | 'path.win32.resolve'
-      | 'path.win32.sep'
       | 'path.win32.toNamespacedPath'
-      | 'path.win32'
-      | 'path'
-      | 'path/posix.basename'
+      | 'path.delimiter'
+      | 'path.sep'
+      | 'path.basename'
+      | 'path.dirname'
+      | 'path.extname'
+      | 'path.format'
+      | 'path.matchesGlob'
+      | 'path.isAbsolute'
+      | 'path.join'
+      | 'path.normalize'
+      | 'path.parse'
+      | 'path.relative'
+      | 'path.resolve'
+      | 'path.toNamespacedPath'
+      | 'path/posix'
       | 'path/posix.delimiter'
+      | 'path/posix.sep'
+      | 'path/posix.basename'
       | 'path/posix.dirname'
       | 'path/posix.extname'
       | 'path/posix.format'
+      | 'path/posix.matchesGlob'
       | 'path/posix.isAbsolute'
       | 'path/posix.join'
-      | 'path/posix.matchesGlob'
       | 'path/posix.normalize'
       | 'path/posix.parse'
       | 'path/posix.relative'
       | 'path/posix.resolve'
-      | 'path/posix.sep'
       | 'path/posix.toNamespacedPath'
-      | 'path/posix'
-      | 'path/win32.basename'
+      | 'path/win32'
       | 'path/win32.delimiter'
+      | 'path/win32.sep'
+      | 'path/win32.basename'
       | 'path/win32.dirname'
       | 'path/win32.extname'
       | 'path/win32.format'
+      | 'path/win32.matchesGlob'
       | 'path/win32.isAbsolute'
       | 'path/win32.join'
-      | 'path/win32.matchesGlob'
       | 'path/win32.normalize'
       | 'path/win32.parse'
       | 'path/win32.relative'
       | 'path/win32.resolve'
-      | 'path/win32.sep'
       | 'path/win32.toNamespacedPath'
-      | 'path/win32'
-      | 'perf_hooks.createHistogram'
-      | 'perf_hooks.Histogram'
-      | 'perf_hooks.IntervalHistogram'
-      | 'perf_hooks.monitorEventLoopDelay'
+      | 'perf_hooks'
+      | 'perf_hooks.performance'
       | 'perf_hooks.performance.clearMarks'
       | 'perf_hooks.performance.clearMeasures'
       | 'perf_hooks.performance.clearResourceTimings'
@@ -6379,6 +6561,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'perf_hooks.performance.mark'
       | 'perf_hooks.performance.markResourceTiming'
       | 'perf_hooks.performance.measure'
+      | 'perf_hooks.performance.nodeTiming'
       | 'perf_hooks.performance.nodeTiming.bootstrapComplete'
       | 'perf_hooks.performance.nodeTiming.environment'
       | 'perf_hooks.performance.nodeTiming.idleTime'
@@ -6387,319 +6570,158 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'perf_hooks.performance.nodeTiming.nodeStart'
       | 'perf_hooks.performance.nodeTiming.uvMetricsInfo'
       | 'perf_hooks.performance.nodeTiming.v8Start'
-      | 'perf_hooks.performance.nodeTiming'
       | 'perf_hooks.performance.now'
       | 'perf_hooks.performance.onresourcetimingbufferfull'
       | 'perf_hooks.performance.setResourceTimingBufferSize'
       | 'perf_hooks.performance.timeOrigin'
       | 'perf_hooks.performance.timerify'
       | 'perf_hooks.performance.toJSON'
-      | 'perf_hooks.performance'
+      | 'perf_hooks.createHistogram'
+      | 'perf_hooks.monitorEventLoopDelay'
       | 'perf_hooks.PerformanceEntry'
       | 'perf_hooks.PerformanceMark'
       | 'perf_hooks.PerformanceMeasure'
       | 'perf_hooks.PerformanceNodeEntry'
       | 'perf_hooks.PerformanceNodeTiming'
+      | 'perf_hooks.PerformanceResourceTiming'
       | 'perf_hooks.PerformanceObserver'
       | 'perf_hooks.PerformanceObserverEntryList'
-      | 'perf_hooks.PerformanceResourceTiming'
+      | 'perf_hooks.Histogram'
+      | 'perf_hooks.IntervalHistogram'
       | 'perf_hooks.RecordableHistogram'
-      | 'perf_hooks'
-      | 'performance.clearMarks'
-      | 'performance.clearMeasures'
-      | 'performance.clearResourceTimings'
-      | 'performance.eventLoopUtilization'
-      | 'performance.getEntries'
-      | 'performance.getEntriesByName'
-      | 'performance.getEntriesByType'
-      | 'performance.mark'
-      | 'performance.markResourceTiming'
-      | 'performance.measure'
-      | 'performance.nodeTiming.bootstrapComplete'
-      | 'performance.nodeTiming.environment'
-      | 'performance.nodeTiming.idleTime'
-      | 'performance.nodeTiming.loopExit'
-      | 'performance.nodeTiming.loopStart'
-      | 'performance.nodeTiming.nodeStart'
-      | 'performance.nodeTiming.uvMetricsInfo'
-      | 'performance.nodeTiming.v8Start'
-      | 'performance.nodeTiming'
-      | 'performance.now'
-      | 'performance.onresourcetimingbufferfull'
-      | 'performance.setResourceTimingBufferSize'
-      | 'performance.timeOrigin'
-      | 'performance.timerify'
-      | 'performance.toJSON'
-      | 'performance'
-      | 'PerformanceEntry'
-      | 'PerformanceMark'
-      | 'PerformanceMeasure'
-      | 'PerformanceObserver'
-      | 'PerformanceObserverEntryList'
-      | 'PerformanceResourceTiming'
-      | 'process.abort'
-      | 'process.allowedNodeEnvironmentFlags'
-      | 'process.arch'
-      | 'process.argv'
-      | 'process.argv0'
-      | 'process.availableMemory'
-      | 'process.channel'
-      | 'process.chdir'
-      | 'process.config'
-      | 'process.connected'
-      | 'process.constrainedMemory'
-      | 'process.cpuUsage'
-      | 'process.cwd'
-      | 'process.debugPort'
-      | 'process.disconnect'
-      | 'process.dlopen'
-      | 'process.emitWarning'
-      | 'process.env'
-      | 'process.execArgv'
-      | 'process.execPath'
-      | 'process.execve'
-      | 'process.exit'
-      | 'process.exitCode'
-      | 'process.features.cached_builtins'
-      | 'process.features.debug'
-      | 'process.features.inspector'
-      | 'process.features.ipv6'
-      | 'process.features.require_module'
-      | 'process.features.tls_alpn'
-      | 'process.features.tls_ocsp'
-      | 'process.features.tls_sni'
-      | 'process.features.tls'
-      | 'process.features.typescript'
-      | 'process.features.uv'
-      | 'process.finalization.register'
-      | 'process.finalization.registerBeforeExit'
-      | 'process.finalization.unregister'
-      | 'process.getActiveResourcesInfo'
-      | 'process.getBuiltinModule'
-      | 'process.getegid'
-      | 'process.geteuid'
-      | 'process.getgid'
-      | 'process.getgroups'
-      | 'process.getuid'
-      | 'process.hasUncaughtExceptionCaptureCallback'
-      | 'process.hrtime.bigint'
-      | 'process.hrtime'
-      | 'process.initgroups'
-      | 'process.kill'
-      | 'process.loadEnvFile'
-      | 'process.mainModule'
-      | 'process.memoryUsage'
-      | 'process.nextTick'
-      | 'process.noDeprecation'
-      | 'process.permission'
-      | 'process.pid'
-      | 'process.platform'
-      | 'process.ppid'
-      | 'process.ref'
-      | 'process.release'
-      | 'process.report.excludeEnv'
-      | 'process.report'
-      | 'process.resourceUsage'
-      | 'process.rss'
-      | 'process.send'
-      | 'process.setegid'
-      | 'process.seteuid'
-      | 'process.setgid'
-      | 'process.setgroups'
-      | 'process.setSourceMapsEnabled'
-      | 'process.setuid'
-      | 'process.setUncaughtExceptionCaptureCallback'
-      | 'process.sourceMapsEnabled'
-      | 'process.stderr.clearLine'
-      | 'process.stderr.clearScreenDown'
-      | 'process.stderr.columns'
-      | 'process.stderr.cursorTo'
-      | 'process.stderr.getColorDepth'
-      | 'process.stderr.getWindowSize'
-      | 'process.stderr.hasColors'
-      | 'process.stderr.isTTY'
-      | 'process.stderr.moveCursor'
-      | 'process.stderr.rows'
-      | 'process.stderr'
-      | 'process.stdin.isRaw'
-      | 'process.stdin.isTTY'
-      | 'process.stdin.setRawMode'
-      | 'process.stdin'
-      | 'process.stdout.clearLine'
-      | 'process.stdout.clearScreenDown'
-      | 'process.stdout.columns'
-      | 'process.stdout.cursorTo'
-      | 'process.stdout.getColorDepth'
-      | 'process.stdout.getWindowSize'
-      | 'process.stdout.hasColors'
-      | 'process.stdout.isTTY'
-      | 'process.stdout.moveCursor'
-      | 'process.stdout.rows'
-      | 'process.stdout'
-      | 'process.threadCpuUsage'
-      | 'process.throwDeprecation'
-      | 'process.title'
-      | 'process.traceDeprecation'
-      | 'process.umask'
-      | 'process.unref'
-      | 'process.uptime'
-      | 'process.version'
-      | 'process.versions'
-      | 'process'
+      | 'punycode'
+      | 'punycode.ucs2'
+      | 'punycode.version'
       | 'punycode.decode'
       | 'punycode.encode'
       | 'punycode.toASCII'
       | 'punycode.toUnicode'
-      | 'punycode.ucs2'
-      | 'punycode.version'
-      | 'punycode'
+      | 'querystring'
       | 'querystring.decode'
       | 'querystring.encode'
       | 'querystring.escape'
       | 'querystring.parse'
       | 'querystring.stringify'
       | 'querystring.unescape'
-      | 'querystring'
-      | 'queueMicrotask'
-      | 'ReadableByteStreamController'
-      | 'ReadableStream.from'
-      | 'ReadableStream'
-      | 'ReadableStreamBYOBReader'
-      | 'ReadableStreamBYOBRequest'
-      | 'ReadableStreamDefaultController'
-      | 'ReadableStreamDefaultReader'
+      | 'readline'
+      | 'readline.promises'
+      | 'readline.promises.createInterface'
+      | 'readline.promises.Interface'
+      | 'readline.promises.Readline'
       | 'readline.clearLine'
       | 'readline.clearScreenDown'
       | 'readline.createInterface'
       | 'readline.cursorTo'
-      | 'readline.emitKeypressEvents'
-      | 'readline.Interface'
-      | 'readline.InterfaceConstructor'
       | 'readline.moveCursor'
-      | 'readline.promises.createInterface'
-      | 'readline.promises.Interface'
-      | 'readline.promises.Readline'
-      | 'readline.promises'
-      | 'readline'
+      | 'readline.Interface'
+      | 'readline.emitKeypressEvents'
+      | 'readline.InterfaceConstructor'
+      | 'readline/promises'
       | 'readline/promises.createInterface'
       | 'readline/promises.Interface'
       | 'readline/promises.Readline'
-      | 'readline/promises'
-      | 'repl.builtinModules'
-      | 'repl.Recoverable'
-      | 'repl.Recoverable()'
+      | 'repl'
+      | 'repl.start'
+      | 'repl.writer'
+      | 'repl.REPLServer()'
+      | 'repl.REPLServer'
       | 'repl.REPL_MODE_MAGIC'
       | 'repl.REPL_MODE_SLOPPY'
       | 'repl.REPL_MODE_STRICT'
-      | 'repl.REPLServer'
-      | 'repl.REPLServer()'
-      | 'repl.start'
-      | 'repl.writer'
-      | 'repl'
-      | 'Request'
-      | 'require.cache'
-      | 'require.extensions'
-      | 'require.main'
-      | 'require.resolve.paths'
-      | 'require.resolve'
-      | 'require'
-      | 'Response'
+      | 'repl.Recoverable()'
+      | 'repl.Recoverable'
+      | 'repl.builtinModules'
+      | 'sea'
+      | 'sea.isSea'
       | 'sea.getAsset'
       | 'sea.getAssetAsBlob'
       | 'sea.getRawAsset'
-      | 'sea.isSea'
+      | 'sea.sea.isSea'
       | 'sea.sea.getAsset'
       | 'sea.sea.getAssetAsBlob'
       | 'sea.sea.getRawAsset'
-      | 'sea.sea.isSea'
-      | 'sea'
-      | 'sessionStorage'
-      | 'setImmediate'
-      | 'setInterval'
-      | 'setTimeout'
-      | 'sqlite.backup'
-      | 'sqlite.constants.SQLITE_CHANGESET_ABORT'
-      | 'sqlite.constants.SQLITE_CHANGESET_OMIT'
-      | 'sqlite.constants.SQLITE_CHANGESET_REPLACE'
-      | 'sqlite.constants'
-      | 'sqlite.DatabaseSync'
-      | 'sqlite.SQLITE_CHANGESET_ABORT'
-      | 'sqlite.SQLITE_CHANGESET_OMIT'
-      | 'sqlite.SQLITE_CHANGESET_REPLACE'
-      | 'sqlite.StatementSync'
-      | 'sqlite'
-      | 'Storage'
-      | 'stream.addAbortSignal'
+      | 'stream'
+      | 'stream.promises'
+      | 'stream.promises.pipeline'
+      | 'stream.promises.finished'
+      | 'stream.finished'
+      | 'stream.pipeline'
       | 'stream.compose'
+      | 'stream.duplexPair'
+      | 'stream.Readable'
+      | 'stream.Readable.from'
+      | 'stream.Readable.isDisturbed'
+      | 'stream.Readable.fromWeb'
+      | 'stream.Readable.toWeb'
+      | 'stream.Writable'
+      | 'stream.Writable.fromWeb'
+      | 'stream.Writable.toWeb'
+      | 'stream.Duplex'
       | 'stream.Duplex.from'
       | 'stream.Duplex.fromWeb'
       | 'stream.Duplex.toWeb'
-      | 'stream.Duplex'
-      | 'stream.duplexPair'
-      | 'stream.finished'
-      | 'stream.getDefaultHighWaterMark'
+      | 'stream.Transform'
       | 'stream.isErrored'
       | 'stream.isReadable'
-      | 'stream.pipeline'
-      | 'stream.promises.finished'
-      | 'stream.promises.pipeline'
-      | 'stream.promises'
-      | 'stream.Readable.from'
-      | 'stream.Readable.fromWeb'
-      | 'stream.Readable.isDisturbed'
-      | 'stream.Readable.toWeb'
-      | 'stream.Readable'
+      | 'stream.addAbortSignal'
+      | 'stream.getDefaultHighWaterMark'
       | 'stream.setDefaultHighWaterMark'
-      | 'stream.Transform'
-      | 'stream.Writable.fromWeb'
-      | 'stream.Writable.toWeb'
-      | 'stream.Writable'
-      | 'stream'
+      | 'stream/promises.pipeline'
+      | 'stream/promises.finished'
+      | 'stream/web'
+      | 'stream/web.ReadableStream'
+      | 'stream/web.ReadableStream.from'
+      | 'stream/web.ReadableStreamDefaultReader'
+      | 'stream/web.ReadableStreamBYOBReader'
+      | 'stream/web.ReadableStreamDefaultController'
+      | 'stream/web.ReadableByteStreamController'
+      | 'stream/web.ReadableStreamBYOBRequest'
+      | 'stream/web.WritableStream'
+      | 'stream/web.WritableStreamDefaultWriter'
+      | 'stream/web.WritableStreamDefaultController'
+      | 'stream/web.TransformStream'
+      | 'stream/web.TransformStreamDefaultController'
+      | 'stream/web.ByteLengthQueuingStrategy'
+      | 'stream/web.CountQueuingStrategy'
+      | 'stream/web.TextEncoderStream'
+      | 'stream/web.TextDecoderStream'
+      | 'stream/web.CompressionStream'
+      | 'stream/web.DecompressionStream'
+      | 'stream/consumers'
       | 'stream/consumers.arrayBuffer'
       | 'stream/consumers.blob'
       | 'stream/consumers.buffer'
       | 'stream/consumers.json'
       | 'stream/consumers.text'
-      | 'stream/consumers'
-      | 'stream/promises.finished'
-      | 'stream/promises.pipeline'
-      | 'stream/web.ByteLengthQueuingStrategy'
-      | 'stream/web.CompressionStream'
-      | 'stream/web.CountQueuingStrategy'
-      | 'stream/web.DecompressionStream'
-      | 'stream/web.ReadableByteStreamController'
-      | 'stream/web.ReadableStream.from'
-      | 'stream/web.ReadableStream'
-      | 'stream/web.ReadableStreamBYOBReader'
-      | 'stream/web.ReadableStreamBYOBRequest'
-      | 'stream/web.ReadableStreamDefaultController'
-      | 'stream/web.ReadableStreamDefaultReader'
-      | 'stream/web.TextDecoderStream'
-      | 'stream/web.TextEncoderStream'
-      | 'stream/web.TransformStream'
-      | 'stream/web.TransformStreamDefaultController'
-      | 'stream/web.WritableStream'
-      | 'stream/web.WritableStreamDefaultController'
-      | 'stream/web.WritableStreamDefaultWriter'
-      | 'stream/web'
-      | 'string_decoder.StringDecoder'
       | 'string_decoder'
-      | 'structuredClone'
-      | 'SubtleCrypto'
+      | 'string_decoder.StringDecoder'
+      | 'sqlite'
+      | 'sqlite.constants'
+      | 'sqlite.constants.SQLITE_CHANGESET_OMIT'
+      | 'sqlite.constants.SQLITE_CHANGESET_REPLACE'
+      | 'sqlite.constants.SQLITE_CHANGESET_ABORT'
+      | 'sqlite.backup'
+      | 'sqlite.DatabaseSync'
+      | 'sqlite.StatementSync'
+      | 'sqlite.SQLITE_CHANGESET_OMIT'
+      | 'sqlite.SQLITE_CHANGESET_REPLACE'
+      | 'sqlite.SQLITE_CHANGESET_ABORT'
+      | 'test'
       | 'test.after'
       | 'test.afterEach'
-      | 'test.assert.register'
       | 'test.assert'
+      | 'test.assert.register'
       | 'test.before'
       | 'test.beforeEach'
+      | 'test.describe'
       | 'test.describe.only'
       | 'test.describe.skip'
       | 'test.describe.todo'
-      | 'test.describe'
+      | 'test.it'
       | 'test.it.only'
       | 'test.it.skip'
       | 'test.it.todo'
-      | 'test.it'
+      | 'test.mock'
       | 'test.mock.fn'
       | 'test.mock.getter'
       | 'test.mock.method'
@@ -6707,49 +6729,44 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'test.mock.reset'
       | 'test.mock.restoreAll'
       | 'test.mock.setter'
+      | 'test.mock.timers'
       | 'test.mock.timers.enable'
       | 'test.mock.timers.reset'
       | 'test.mock.timers.tick'
-      | 'test.mock.timers'
-      | 'test.mock'
       | 'test.only'
       | 'test.run'
-      | 'test.skip'
+      | 'test.snapshot'
       | 'test.snapshot.setDefaultSnapshotSerializers'
       | 'test.snapshot.setResolveSnapshotPath'
-      | 'test.snapshot'
+      | 'test.skip'
       | 'test.suite'
+      | 'test.test'
       | 'test.test.only'
       | 'test.test.skip'
       | 'test.test.todo'
-      | 'test.test'
       | 'test.todo'
-      | 'test'
-      | 'TextDecoder'
-      | 'TextDecoderStream'
-      | 'TextEncoder'
-      | 'TextEncoderStream'
-      | 'timers.clearImmediate'
-      | 'timers.clearInterval'
-      | 'timers.clearTimeout'
+      | 'timers'
       | 'timers.Immediate'
-      | 'timers.promises.scheduler.wait'
-      | 'timers.promises.scheduler.yield'
+      | 'timers.Timeout'
+      | 'timers.setImmediate'
+      | 'timers.clearImmediate'
+      | 'timers.setInterval'
+      | 'timers.clearInterval'
+      | 'timers.setTimeout'
+      | 'timers.clearTimeout'
+      | 'timers.promises'
+      | 'timers.promises.setTimeout'
       | 'timers.promises.setImmediate'
       | 'timers.promises.setInterval'
-      | 'timers.promises.setTimeout'
-      | 'timers.promises'
-      | 'timers.setImmediate'
-      | 'timers.setInterval'
-      | 'timers.setTimeout'
-      | 'timers.Timeout'
-      | 'timers'
-      | 'timers/promises.scheduler.wait'
-      | 'timers/promises.scheduler.yield'
+      | 'timers.promises.scheduler.wait'
+      | 'timers.promises.scheduler.yield'
+      | 'timers/promises'
+      | 'timers/promises.setTimeout'
       | 'timers/promises.setImmediate'
       | 'timers/promises.setInterval'
-      | 'timers/promises.setTimeout'
-      | 'timers/promises'
+      | 'timers/promises.scheduler.wait'
+      | 'timers/promises.scheduler.yield'
+      | 'tls'
       | 'tls.checkServerIdentity'
       | 'tls.connect'
       | 'tls.createSecureContext'
@@ -6768,59 +6785,110 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'tls.Server'
       | 'tls.setDefaultCACertificates'
       | 'tls.TLSSocket'
-      | 'tls'
+      | 'trace_events'
       | 'trace_events.createTracing'
       | 'trace_events.getEnabledCategories'
-      | 'trace_events'
-      | 'TransformStream'
-      | 'TransformStreamDefaultController'
+      | 'tty'
       | 'tty.isatty'
       | 'tty.ReadStream'
       | 'tty.WriteStream'
-      | 'tty'
-      | 'URL.canParse'
-      | 'URL.createObjectURL'
+      | 'url'
       | 'url.domainToASCII'
       | 'url.domainToUnicode'
       | 'url.fileURLToPath'
       | 'url.format'
       | 'url.pathToFileURL'
-      | 'URL.revokeObjectURL'
+      | 'url.urlToHttpOptions'
+      | 'url.URL'
       | 'url.URL.canParse'
       | 'url.URL.createObjectURL'
       | 'url.URL.revokeObjectURL'
-      | 'url.URL'
-      | 'url.Url'
       | 'url.URLPattern'
       | 'url.URLSearchParams'
-      | 'url.urlToHttpOptions'
-      | 'URL'
-      | 'url'
-      | 'URLSearchParams'
-      | 'util._extend'
-      | 'util.aborted'
+      | 'url.Url'
+      | 'util.promisify'
+      | 'util.promisify.custom'
       | 'util.callbackify'
-      | 'util.debug'
       | 'util.debuglog'
+      | 'util.debug'
       | 'util.deprecate'
       | 'util.diff'
       | 'util.format'
       | 'util.formatWithOptions'
       | 'util.getCallSite'
       | 'util.getCallSites'
+      | 'util.getSystemErrorName'
       | 'util.getSystemErrorMap'
       | 'util.getSystemErrorMessage'
-      | 'util.getSystemErrorName'
       | 'util.inherits'
+      | 'util.inspect'
       | 'util.inspect.custom'
       | 'util.inspect.defaultOptions'
       | 'util.inspect.replDefaults'
-      | 'util.inspect'
+      | 'util.isDeepStrictEqual'
+      | 'util.parseArgs'
+      | 'util.parseEnv'
+      | 'util.setTraceSigInt'
+      | 'util.stripVTControlCharacters'
+      | 'util.styleText'
+      | 'util.toUSVString'
+      | 'util.transferableAbortController'
+      | 'util.transferableAbortSignal'
+      | 'util.aborted'
+      | 'util.MIMEType'
+      | 'util.MIMEParams'
+      | 'util.TextDecoder'
+      | 'util.TextEncoder'
+      | 'util.types'
+      | 'util.types.isExternal'
+      | 'util.types.isDate'
+      | 'util.types.isArgumentsObject'
+      | 'util.types.isBigIntObject'
+      | 'util.types.isBooleanObject'
+      | 'util.types.isNumberObject'
+      | 'util.types.isStringObject'
+      | 'util.types.isSymbolObject'
+      | 'util.types.isNativeError'
+      | 'util.types.isRegExp'
+      | 'util.types.isAsyncFunction'
+      | 'util.types.isGeneratorFunction'
+      | 'util.types.isGeneratorObject'
+      | 'util.types.isPromise'
+      | 'util.types.isMap'
+      | 'util.types.isSet'
+      | 'util.types.isMapIterator'
+      | 'util.types.isSetIterator'
+      | 'util.types.isWeakMap'
+      | 'util.types.isWeakSet'
+      | 'util.types.isArrayBuffer'
+      | 'util.types.isDataView'
+      | 'util.types.isSharedArrayBuffer'
+      | 'util.types.isProxy'
+      | 'util.types.isModuleNamespaceObject'
+      | 'util.types.isAnyArrayBuffer'
+      | 'util.types.isBoxedPrimitive'
+      | 'util.types.isArrayBufferView'
+      | 'util.types.isTypedArray'
+      | 'util.types.isUint8Array'
+      | 'util.types.isUint8ClampedArray'
+      | 'util.types.isUint16Array'
+      | 'util.types.isUint32Array'
+      | 'util.types.isInt8Array'
+      | 'util.types.isInt16Array'
+      | 'util.types.isInt32Array'
+      | 'util.types.isFloat16Array'
+      | 'util.types.isFloat32Array'
+      | 'util.types.isFloat64Array'
+      | 'util.types.isBigInt64Array'
+      | 'util.types.isBigUint64Array'
+      | 'util.types.isKeyObject'
+      | 'util.types.isCryptoKey'
+      | 'util.types.isWebAssemblyCompiledModule'
+      | 'util._extend'
       | 'util.isArray'
       | 'util.isBoolean'
       | 'util.isBuffer'
       | 'util.isDate'
-      | 'util.isDeepStrictEqual'
       | 'util.isError'
       | 'util.isFunction'
       | 'util.isNull'
@@ -6833,253 +6901,185 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'util.isSymbol'
       | 'util.isUndefined'
       | 'util.log'
-      | 'util.MIMEParams'
-      | 'util.MIMEType'
-      | 'util.parseArgs'
-      | 'util.parseEnv'
-      | 'util.promisify.custom'
-      | 'util.promisify'
-      | 'util.setTraceSigInt'
-      | 'util.stripVTControlCharacters'
-      | 'util.styleText'
-      | 'util.TextDecoder'
-      | 'util.TextEncoder'
-      | 'util.toUSVString'
-      | 'util.transferableAbortController'
-      | 'util.transferableAbortSignal'
-      | 'util.types.isAnyArrayBuffer'
-      | 'util.types.isArgumentsObject'
-      | 'util.types.isArrayBuffer'
-      | 'util.types.isArrayBufferView'
-      | 'util.types.isAsyncFunction'
-      | 'util.types.isBigInt64Array'
-      | 'util.types.isBigIntObject'
-      | 'util.types.isBigUint64Array'
-      | 'util.types.isBooleanObject'
-      | 'util.types.isBoxedPrimitive'
-      | 'util.types.isCryptoKey'
-      | 'util.types.isDataView'
-      | 'util.types.isDate'
-      | 'util.types.isExternal'
-      | 'util.types.isFloat16Array'
-      | 'util.types.isFloat32Array'
-      | 'util.types.isFloat64Array'
-      | 'util.types.isGeneratorFunction'
-      | 'util.types.isGeneratorObject'
-      | 'util.types.isInt8Array'
-      | 'util.types.isInt16Array'
-      | 'util.types.isInt32Array'
-      | 'util.types.isKeyObject'
-      | 'util.types.isMap'
-      | 'util.types.isMapIterator'
-      | 'util.types.isModuleNamespaceObject'
-      | 'util.types.isNativeError'
-      | 'util.types.isNumberObject'
-      | 'util.types.isPromise'
-      | 'util.types.isProxy'
-      | 'util.types.isRegExp'
-      | 'util.types.isSet'
-      | 'util.types.isSetIterator'
-      | 'util.types.isSharedArrayBuffer'
-      | 'util.types.isStringObject'
-      | 'util.types.isSymbolObject'
-      | 'util.types.isTypedArray'
-      | 'util.types.isUint8Array'
-      | 'util.types.isUint8ClampedArray'
-      | 'util.types.isUint16Array'
-      | 'util.types.isUint32Array'
-      | 'util.types.isWeakMap'
-      | 'util.types.isWeakSet'
-      | 'util.types.isWebAssemblyCompiledModule'
-      | 'util.types'
       | 'util'
-      | 'util/types.isAnyArrayBuffer'
-      | 'util/types.isArgumentsObject'
-      | 'util/types.isArrayBuffer'
-      | 'util/types.isArrayBufferView'
-      | 'util/types.isAsyncFunction'
-      | 'util/types.isBigInt64Array'
-      | 'util/types.isBigIntObject'
-      | 'util/types.isBigUint64Array'
-      | 'util/types.isBooleanObject'
-      | 'util/types.isBoxedPrimitive'
-      | 'util/types.isCryptoKey'
-      | 'util/types.isDataView'
-      | 'util/types.isDate'
+      | 'util/types'
       | 'util/types.isExternal'
-      | 'util/types.isFloat16Array'
-      | 'util/types.isFloat32Array'
-      | 'util/types.isFloat64Array'
-      | 'util/types.isGeneratorFunction'
-      | 'util/types.isGeneratorObject'
-      | 'util/types.isInt8Array'
-      | 'util/types.isInt16Array'
-      | 'util/types.isInt32Array'
-      | 'util/types.isKeyObject'
-      | 'util/types.isMap'
-      | 'util/types.isMapIterator'
-      | 'util/types.isModuleNamespaceObject'
-      | 'util/types.isNativeError'
+      | 'util/types.isDate'
+      | 'util/types.isArgumentsObject'
+      | 'util/types.isBigIntObject'
+      | 'util/types.isBooleanObject'
       | 'util/types.isNumberObject'
-      | 'util/types.isPromise'
-      | 'util/types.isProxy'
-      | 'util/types.isRegExp'
-      | 'util/types.isSet'
-      | 'util/types.isSetIterator'
-      | 'util/types.isSharedArrayBuffer'
       | 'util/types.isStringObject'
       | 'util/types.isSymbolObject'
+      | 'util/types.isNativeError'
+      | 'util/types.isRegExp'
+      | 'util/types.isAsyncFunction'
+      | 'util/types.isGeneratorFunction'
+      | 'util/types.isGeneratorObject'
+      | 'util/types.isPromise'
+      | 'util/types.isMap'
+      | 'util/types.isSet'
+      | 'util/types.isMapIterator'
+      | 'util/types.isSetIterator'
+      | 'util/types.isWeakMap'
+      | 'util/types.isWeakSet'
+      | 'util/types.isArrayBuffer'
+      | 'util/types.isDataView'
+      | 'util/types.isSharedArrayBuffer'
+      | 'util/types.isProxy'
+      | 'util/types.isModuleNamespaceObject'
+      | 'util/types.isAnyArrayBuffer'
+      | 'util/types.isBoxedPrimitive'
+      | 'util/types.isArrayBufferView'
       | 'util/types.isTypedArray'
       | 'util/types.isUint8Array'
       | 'util/types.isUint8ClampedArray'
       | 'util/types.isUint16Array'
       | 'util/types.isUint32Array'
-      | 'util/types.isWeakMap'
-      | 'util/types.isWeakSet'
+      | 'util/types.isInt8Array'
+      | 'util/types.isInt16Array'
+      | 'util/types.isInt32Array'
+      | 'util/types.isFloat16Array'
+      | 'util/types.isFloat32Array'
+      | 'util/types.isFloat64Array'
+      | 'util/types.isBigInt64Array'
+      | 'util/types.isBigUint64Array'
+      | 'util/types.isKeyObject'
+      | 'util/types.isCryptoKey'
       | 'util/types.isWebAssemblyCompiledModule'
-      | 'util/types'
-      | 'v8.cachedDataVersionTag'
-      | 'v8.DefaultDeserializer'
-      | 'v8.DefaultSerializer'
+      | 'v8'
+      | 'v8.serialize'
       | 'v8.deserialize'
+      | 'v8.Serializer'
       | 'v8.Deserializer'
-      | 'v8.GCProfiler'
+      | 'v8.DefaultSerializer'
+      | 'v8.DefaultDeserializer'
+      | 'v8.promiseHooks'
+      | 'v8.promiseHooks.onInit'
+      | 'v8.promiseHooks.onSettled'
+      | 'v8.promiseHooks.onBefore'
+      | 'v8.promiseHooks.onAfter'
+      | 'v8.promiseHooks.createHook'
+      | 'v8.startupSnapshot'
+      | 'v8.startupSnapshot.addSerializeCallback'
+      | 'v8.startupSnapshot.addDeserializeCallback'
+      | 'v8.startupSnapshot.setDeserializeMainFunction'
+      | 'v8.startupSnapshot.isBuildingSnapshot'
+      | 'v8.cachedDataVersionTag'
       | 'v8.getHeapCodeStatistics'
       | 'v8.getHeapSnapshot'
       | 'v8.getHeapSpaceStatistics'
       | 'v8.getHeapStatistics'
       | 'v8.isStringOneByteRepresentation'
-      | 'v8.promiseHooks.createHook'
-      | 'v8.promiseHooks.onAfter'
-      | 'v8.promiseHooks.onBefore'
-      | 'v8.promiseHooks.onInit'
-      | 'v8.promiseHooks.onSettled'
-      | 'v8.promiseHooks'
       | 'v8.queryObjects'
-      | 'v8.serialize'
-      | 'v8.Serializer'
       | 'v8.setFlagsFromString'
-      | 'v8.setHeapSnapshotNearHeapLimit'
-      | 'v8.startupSnapshot.addDeserializeCallback'
-      | 'v8.startupSnapshot.addSerializeCallback'
-      | 'v8.startupSnapshot.isBuildingSnapshot'
-      | 'v8.startupSnapshot.setDeserializeMainFunction'
-      | 'v8.startupSnapshot'
       | 'v8.stopCoverage'
       | 'v8.takeCoverage'
       | 'v8.writeHeapSnapshot'
-      | 'v8'
-      | 'vm.compileFunction'
+      | 'v8.setHeapSnapshotNearHeapLimit'
+      | 'v8.GCProfiler'
       | 'vm.constants'
+      | 'vm.compileFunction'
       | 'vm.createContext'
       | 'vm.isContext'
       | 'vm.measureMemory'
-      | 'vm.Module'
       | 'vm.runInContext'
       | 'vm.runInNewContext'
       | 'vm.runInThisContext'
       | 'vm.Script'
+      | 'vm.Module'
       | 'vm.SourceTextModule'
       | 'vm.SyntheticModule'
       | 'vm'
       | 'wasi.WASI'
       | 'wasi'
-      | 'WebAssembly'
-      | 'WebSocket'
-      | 'worker_threads.BroadcastChannel'
+      | 'worker_threads'
+      | 'worker_threads.parentPort'
+      | 'worker_threads.resourceLimits'
+      | 'worker_threads.SHARE_ENV'
+      | 'worker_threads.threadId'
+      | 'worker_threads.workerData'
       | 'worker_threads.getEnvironmentData'
       | 'worker_threads.getHeapStatistics'
+      | 'worker_threads.markAsUncloneable'
+      | 'worker_threads.markAsUntransferable'
       | 'worker_threads.isInternalThread'
       | 'worker_threads.isMainThread'
       | 'worker_threads.isMarkedAsUntransferable'
-      | 'worker_threads.markAsUncloneable'
-      | 'worker_threads.markAsUntransferable'
-      | 'worker_threads.MessageChannel'
-      | 'worker_threads.MessagePort'
       | 'worker_threads.moveMessagePortToContext'
-      | 'worker_threads.parentPort'
       | 'worker_threads.postMessageToThread'
       | 'worker_threads.receiveMessageOnPort'
-      | 'worker_threads.resourceLimits'
       | 'worker_threads.setEnvironmentData'
-      | 'worker_threads.SHARE_ENV'
-      | 'worker_threads.threadId'
+      | 'worker_threads.BroadcastChannel'
+      | 'worker_threads.MessageChannel'
+      | 'worker_threads.MessagePort'
       | 'worker_threads.Worker'
-      | 'worker_threads.workerData'
-      | 'worker_threads'
-      | 'WritableStream'
-      | 'WritableStreamDefaultController'
-      | 'WritableStreamDefaultWriter'
-      | 'zlib.BrotliCompress'
       | 'zlib.brotliCompress'
-      | 'zlib.BrotliCompress()'
       | 'zlib.brotliCompressSync'
-      | 'zlib.BrotliDecompress'
       | 'zlib.brotliDecompress'
-      | 'zlib.BrotliDecompress()'
       | 'zlib.brotliDecompressSync'
+      | 'zlib.constants'
+      | 'zlib.constants.ZSTD_e_continue'
+      | 'zlib.constants.ZSTD_e_flush'
+      | 'zlib.constants.ZSTD_e_end'
+      | 'zlib.constants.ZSTD_fast'
+      | 'zlib.constants.ZSTD_dfast'
+      | 'zlib.constants.ZSTD_greedy'
+      | 'zlib.constants.ZSTD_lazy'
+      | 'zlib.constants.ZSTD_lazy2'
       | 'zlib.constants.ZSTD_btlazy2'
       | 'zlib.constants.ZSTD_btopt'
       | 'zlib.constants.ZSTD_btultra'
       | 'zlib.constants.ZSTD_btultra2'
-      | 'zlib.constants.ZSTD_c_chainLog'
-      | 'zlib.constants.ZSTD_c_checksumFlag'
       | 'zlib.constants.ZSTD_c_compressionLevel'
-      | 'zlib.constants.ZSTD_c_contentSizeFlag'
-      | 'zlib.constants.ZSTD_c_dictIDFlag'
-      | 'zlib.constants.ZSTD_c_enableLongDistanceMatching'
-      | 'zlib.constants.ZSTD_c_hashLog'
-      | 'zlib.constants.ZSTD_c_jobSize'
-      | 'zlib.constants.ZSTD_c_ldmBucketSizeLog'
-      | 'zlib.constants.ZSTD_c_ldmHashLog'
-      | 'zlib.constants.ZSTD_c_ldmHashRateLog'
-      | 'zlib.constants.ZSTD_c_ldmMinMatch'
-      | 'zlib.constants.ZSTD_c_minMatch'
-      | 'zlib.constants.ZSTD_c_nbWorkers'
-      | 'zlib.constants.ZSTD_c_overlapLog'
-      | 'zlib.constants.ZSTD_c_searchLog'
-      | 'zlib.constants.ZSTD_c_strategy'
-      | 'zlib.constants.ZSTD_c_targetLength'
       | 'zlib.constants.ZSTD_c_windowLog'
-      | 'zlib.constants.ZSTD_CLEVEL_DEFAULT'
+      | 'zlib.constants.ZSTD_c_hashLog'
+      | 'zlib.constants.ZSTD_c_chainLog'
+      | 'zlib.constants.ZSTD_c_searchLog'
+      | 'zlib.constants.ZSTD_c_minMatch'
+      | 'zlib.constants.ZSTD_c_targetLength'
+      | 'zlib.constants.ZSTD_c_strategy'
+      | 'zlib.constants.ZSTD_c_enableLongDistanceMatching'
+      | 'zlib.constants.ZSTD_c_ldmHashLog'
+      | 'zlib.constants.ZSTD_c_ldmMinMatch'
+      | 'zlib.constants.ZSTD_c_ldmBucketSizeLog'
+      | 'zlib.constants.ZSTD_c_ldmHashRateLog'
+      | 'zlib.constants.ZSTD_c_contentSizeFlag'
+      | 'zlib.constants.ZSTD_c_checksumFlag'
+      | 'zlib.constants.ZSTD_c_dictIDFlag'
+      | 'zlib.constants.ZSTD_c_nbWorkers'
+      | 'zlib.constants.ZSTD_c_jobSize'
+      | 'zlib.constants.ZSTD_c_overlapLog'
       | 'zlib.constants.ZSTD_d_windowLogMax'
-      | 'zlib.constants.ZSTD_dfast'
-      | 'zlib.constants.ZSTD_e_continue'
-      | 'zlib.constants.ZSTD_e_end'
-      | 'zlib.constants.ZSTD_e_flush'
-      | 'zlib.constants.ZSTD_error_checksum_wrong'
+      | 'zlib.constants.ZSTD_CLEVEL_DEFAULT'
+      | 'zlib.constants.ZSTD_error_no_error'
+      | 'zlib.constants.ZSTD_error_GENERIC'
+      | 'zlib.constants.ZSTD_error_prefix_unknown'
+      | 'zlib.constants.ZSTD_error_version_unsupported'
+      | 'zlib.constants.ZSTD_error_frameParameter_unsupported'
+      | 'zlib.constants.ZSTD_error_frameParameter_windowTooLarge'
       | 'zlib.constants.ZSTD_error_corruption_detected'
+      | 'zlib.constants.ZSTD_error_checksum_wrong'
+      | 'zlib.constants.ZSTD_error_literals_headerWrong'
       | 'zlib.constants.ZSTD_error_dictionary_corrupted'
       | 'zlib.constants.ZSTD_error_dictionary_wrong'
       | 'zlib.constants.ZSTD_error_dictionaryCreation_failed'
-      | 'zlib.constants.ZSTD_error_dstBuffer_null'
-      | 'zlib.constants.ZSTD_error_dstSize_tooSmall'
-      | 'zlib.constants.ZSTD_error_frameParameter_unsupported'
-      | 'zlib.constants.ZSTD_error_frameParameter_windowTooLarge'
-      | 'zlib.constants.ZSTD_error_GENERIC'
-      | 'zlib.constants.ZSTD_error_init_missing'
-      | 'zlib.constants.ZSTD_error_literals_headerWrong'
-      | 'zlib.constants.ZSTD_error_maxSymbolValue_tooLarge'
-      | 'zlib.constants.ZSTD_error_maxSymbolValue_tooSmall'
-      | 'zlib.constants.ZSTD_error_memory_allocation'
-      | 'zlib.constants.ZSTD_error_no_error'
-      | 'zlib.constants.ZSTD_error_noForwardProgress_destFull'
-      | 'zlib.constants.ZSTD_error_noForwardProgress_inputEmpty'
+      | 'zlib.constants.ZSTD_error_parameter_unsupported'
       | 'zlib.constants.ZSTD_error_parameter_combination_unsupported'
       | 'zlib.constants.ZSTD_error_parameter_outOfBound'
-      | 'zlib.constants.ZSTD_error_parameter_unsupported'
-      | 'zlib.constants.ZSTD_error_prefix_unknown'
-      | 'zlib.constants.ZSTD_error_srcSize_wrong'
+      | 'zlib.constants.ZSTD_error_tableLog_tooLarge'
+      | 'zlib.constants.ZSTD_error_maxSymbolValue_tooLarge'
+      | 'zlib.constants.ZSTD_error_maxSymbolValue_tooSmall'
       | 'zlib.constants.ZSTD_error_stabilityCondition_notRespected'
       | 'zlib.constants.ZSTD_error_stage_wrong'
-      | 'zlib.constants.ZSTD_error_tableLog_tooLarge'
-      | 'zlib.constants.ZSTD_error_version_unsupported'
+      | 'zlib.constants.ZSTD_error_init_missing'
+      | 'zlib.constants.ZSTD_error_memory_allocation'
       | 'zlib.constants.ZSTD_error_workSpace_tooSmall'
-      | 'zlib.constants.ZSTD_fast'
-      | 'zlib.constants.ZSTD_greedy'
-      | 'zlib.constants.ZSTD_lazy'
-      | 'zlib.constants.ZSTD_lazy2'
-      | 'zlib.constants'
+      | 'zlib.constants.ZSTD_error_dstSize_tooSmall'
+      | 'zlib.constants.ZSTD_error_srcSize_wrong'
+      | 'zlib.constants.ZSTD_error_dstBuffer_null'
+      | 'zlib.constants.ZSTD_error_noForwardProgress_destFull'
+      | 'zlib.constants.ZSTD_error_noForwardProgress_inputEmpty'
       | 'zlib.crc32'
       | 'zlib.createBrotliCompress'
       | 'zlib.createBrotliDecompress'
@@ -7092,49 +7092,57 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'zlib.createUnzip'
       | 'zlib.createZstdCompress'
       | 'zlib.createZstdDecompress'
-      | 'zlib.Deflate'
       | 'zlib.deflate'
-      | 'zlib.Deflate()'
-      | 'zlib.DeflateRaw'
       | 'zlib.deflateRaw'
-      | 'zlib.DeflateRaw()'
       | 'zlib.deflateRawSync'
       | 'zlib.deflateSync'
-      | 'zlib.Gunzip'
       | 'zlib.gunzip'
-      | 'zlib.Gunzip()'
       | 'zlib.gunzipSync'
-      | 'zlib.Gzip'
       | 'zlib.gzip'
-      | 'zlib.Gzip()'
       | 'zlib.gzipSync'
-      | 'zlib.Inflate'
       | 'zlib.inflate'
-      | 'zlib.Inflate()'
-      | 'zlib.InflateRaw'
       | 'zlib.inflateRaw'
-      | 'zlib.InflateRaw()'
       | 'zlib.inflateRawSync'
       | 'zlib.inflateSync'
-      | 'zlib.Unzip'
       | 'zlib.unzip'
-      | 'zlib.Unzip()'
       | 'zlib.unzipSync'
-      | 'zlib.ZstdCompress'
       | 'zlib.zstdCompress'
       | 'zlib.zstdCompressSync'
-      | 'zlib.ZstdDecompress'
       | 'zlib.zstdDecompress'
       | 'zlib.zstdDecompressSync'
+      | 'zlib.BrotliCompress()'
+      | 'zlib.BrotliCompress'
+      | 'zlib.BrotliDecompress()'
+      | 'zlib.BrotliDecompress'
+      | 'zlib.Deflate()'
+      | 'zlib.Deflate'
+      | 'zlib.DeflateRaw()'
+      | 'zlib.DeflateRaw'
+      | 'zlib.Gunzip()'
+      | 'zlib.Gunzip'
+      | 'zlib.Gzip()'
+      | 'zlib.Gzip'
+      | 'zlib.Inflate()'
+      | 'zlib.Inflate'
+      | 'zlib.InflateRaw()'
+      | 'zlib.InflateRaw'
+      | 'zlib.Unzip()'
+      | 'zlib.Unzip'
+      | 'zlib.ZstdCompress'
+      | 'zlib.ZstdDecompress'
       | 'zlib.ZstdOptions'
       | 'zlib'
+      | 'import.meta.resolve'
+      | 'import.meta.dirname'
+      | 'import.meta.filename'
+      | 'import.meta.main'
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7168,9 +7176,9 @@ namespace PreferGlobalBuffer {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7204,9 +7212,9 @@ namespace PreferGlobalConsole {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7240,9 +7248,9 @@ namespace PreferGlobalProcess {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7276,9 +7284,9 @@ namespace PreferGlobalTextDecoder {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7312,9 +7320,9 @@ namespace PreferGlobalTextEncoder {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7348,9 +7356,9 @@ namespace PreferGlobalUrlSearchParams {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7384,9 +7392,9 @@ namespace PreferGlobalUrl {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7421,14 +7429,14 @@ namespace PreferNodeProtocol {
    * ]
    * ```
    */
-  export type Options = {
-    readonly version?: string;
-  };
+  export type Options = Readonly<{
+    version?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7586,40 +7594,40 @@ namespace Hashbang {
    * ]
    * ```
    */
-  export type Options = {
-    readonly convertPath?:
-      | Record<string, readonly [string, string]>
+  export type Options = Readonly<{
+    convertPath?:
+      | Readonly<Record<string, readonly [string, string]>>
       | readonly [
-          {
+          Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          },
-          ...(readonly {
+            replace: readonly [string, string];
+          }>,
+          ...Readonly<{
             /** @minItems 1 */
-            readonly include: readonly [string, ...(readonly string[])];
-            readonly exclude?: readonly string[];
+            include: readonly [string, ...string[]];
+            exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            readonly replace: readonly [string, string];
-          }[]),
+            replace: readonly [string, string];
+          }>[],
         ];
-    readonly ignoreUnpublished?: boolean;
-    readonly additionalExecutables?: readonly string[];
-    readonly executableMap?: Record<string, string>;
-  };
+    ignoreUnpublished?: boolean;
+    additionalExecutables?: readonly string[];
+    executableMap?: Readonly<Record<string, string>>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7804,87 +7812,84 @@ namespace Shebang {
   export type RuleEntry = 0;
 }
 
-export type EslintNRules = {
-  readonly 'n/callback-return': CallbackReturn.RuleEntry;
-  readonly 'n/exports-style': ExportsStyle.RuleEntry;
-  readonly 'n/file-extension-in-import': FileExtensionInImport.RuleEntry;
-  readonly 'n/global-require': GlobalRequire.RuleEntry;
-  readonly 'n/handle-callback-err': HandleCallbackErr.RuleEntry;
-  readonly 'n/no-callback-literal': NoCallbackLiteral.RuleEntry;
-  readonly 'n/no-deprecated-api': NoDeprecatedApi.RuleEntry;
-  readonly 'n/no-exports-assign': NoExportsAssign.RuleEntry;
-  readonly 'n/no-extraneous-import': NoExtraneousImport.RuleEntry;
-  readonly 'n/no-extraneous-require': NoExtraneousRequire.RuleEntry;
-  readonly 'n/no-missing-import': NoMissingImport.RuleEntry;
-  readonly 'n/no-missing-require': NoMissingRequire.RuleEntry;
-  readonly 'n/no-mixed-requires': NoMixedRequires.RuleEntry;
-  readonly 'n/no-new-require': NoNewRequire.RuleEntry;
-  readonly 'n/no-path-concat': NoPathConcat.RuleEntry;
-  readonly 'n/no-process-env': NoProcessEnv.RuleEntry;
-  readonly 'n/no-process-exit': NoProcessExit.RuleEntry;
-  readonly 'n/no-restricted-import': NoRestrictedImport.RuleEntry;
-  readonly 'n/no-restricted-require': NoRestrictedRequire.RuleEntry;
-  readonly 'n/no-sync': NoSync.RuleEntry;
-  readonly 'n/no-top-level-await': NoTopLevelAwait.RuleEntry;
-  readonly 'n/no-unpublished-bin': NoUnpublishedBin.RuleEntry;
-  readonly 'n/no-unpublished-import': NoUnpublishedImport.RuleEntry;
-  readonly 'n/no-unpublished-require': NoUnpublishedRequire.RuleEntry;
-  readonly 'n/no-unsupported-features/es-builtins': NoUnsupportedFeaturesEsBuiltins.RuleEntry;
-  readonly 'n/no-unsupported-features/es-syntax': NoUnsupportedFeaturesEsSyntax.RuleEntry;
-  readonly 'n/no-unsupported-features/node-builtins': NoUnsupportedFeaturesNodeBuiltins.RuleEntry;
-  readonly 'n/prefer-global/buffer': PreferGlobalBuffer.RuleEntry;
-  readonly 'n/prefer-global/console': PreferGlobalConsole.RuleEntry;
-  readonly 'n/prefer-global/process': PreferGlobalProcess.RuleEntry;
-  readonly 'n/prefer-global/text-decoder': PreferGlobalTextDecoder.RuleEntry;
-  readonly 'n/prefer-global/text-encoder': PreferGlobalTextEncoder.RuleEntry;
-  readonly 'n/prefer-global/url-search-params': PreferGlobalUrlSearchParams.RuleEntry;
-  readonly 'n/prefer-global/url': PreferGlobalUrl.RuleEntry;
-  readonly 'n/prefer-node-protocol': PreferNodeProtocol.RuleEntry;
-  readonly 'n/prefer-promises/dns': PreferPromisesDns.RuleEntry;
-  readonly 'n/prefer-promises/fs': PreferPromisesFs.RuleEntry;
-  readonly 'n/process-exit-as-throw': ProcessExitAsThrow.RuleEntry;
-  readonly 'n/hashbang': Hashbang.RuleEntry;
+export type EslintNRules = Readonly<{
+  'n/callback-return': CallbackReturn.RuleEntry;
+  'n/exports-style': ExportsStyle.RuleEntry;
+  'n/file-extension-in-import': FileExtensionInImport.RuleEntry;
+  'n/global-require': GlobalRequire.RuleEntry;
+  'n/handle-callback-err': HandleCallbackErr.RuleEntry;
+  'n/no-callback-literal': NoCallbackLiteral.RuleEntry;
+  'n/no-deprecated-api': NoDeprecatedApi.RuleEntry;
+  'n/no-exports-assign': NoExportsAssign.RuleEntry;
+  'n/no-extraneous-import': NoExtraneousImport.RuleEntry;
+  'n/no-extraneous-require': NoExtraneousRequire.RuleEntry;
+  'n/no-missing-import': NoMissingImport.RuleEntry;
+  'n/no-missing-require': NoMissingRequire.RuleEntry;
+  'n/no-mixed-requires': NoMixedRequires.RuleEntry;
+  'n/no-new-require': NoNewRequire.RuleEntry;
+  'n/no-path-concat': NoPathConcat.RuleEntry;
+  'n/no-process-env': NoProcessEnv.RuleEntry;
+  'n/no-process-exit': NoProcessExit.RuleEntry;
+  'n/no-restricted-import': NoRestrictedImport.RuleEntry;
+  'n/no-restricted-require': NoRestrictedRequire.RuleEntry;
+  'n/no-sync': NoSync.RuleEntry;
+  'n/no-top-level-await': NoTopLevelAwait.RuleEntry;
+  'n/no-unpublished-bin': NoUnpublishedBin.RuleEntry;
+  'n/no-unpublished-import': NoUnpublishedImport.RuleEntry;
+  'n/no-unpublished-require': NoUnpublishedRequire.RuleEntry;
+  'n/no-unsupported-features/es-builtins': NoUnsupportedFeaturesEsBuiltins.RuleEntry;
+  'n/no-unsupported-features/es-syntax': NoUnsupportedFeaturesEsSyntax.RuleEntry;
+  'n/no-unsupported-features/node-builtins': NoUnsupportedFeaturesNodeBuiltins.RuleEntry;
+  'n/prefer-global/buffer': PreferGlobalBuffer.RuleEntry;
+  'n/prefer-global/console': PreferGlobalConsole.RuleEntry;
+  'n/prefer-global/process': PreferGlobalProcess.RuleEntry;
+  'n/prefer-global/text-decoder': PreferGlobalTextDecoder.RuleEntry;
+  'n/prefer-global/text-encoder': PreferGlobalTextEncoder.RuleEntry;
+  'n/prefer-global/url-search-params': PreferGlobalUrlSearchParams.RuleEntry;
+  'n/prefer-global/url': PreferGlobalUrl.RuleEntry;
+  'n/prefer-node-protocol': PreferNodeProtocol.RuleEntry;
+  'n/prefer-promises/dns': PreferPromisesDns.RuleEntry;
+  'n/prefer-promises/fs': PreferPromisesFs.RuleEntry;
+  'n/process-exit-as-throw': ProcessExitAsThrow.RuleEntry;
+  'n/hashbang': Hashbang.RuleEntry;
 
   // deprecated
-  readonly 'n/no-hide-core-modules': NoHideCoreModules.RuleEntry;
-  readonly 'n/shebang': Shebang.RuleEntry;
-};
+  'n/no-hide-core-modules': NoHideCoreModules.RuleEntry;
+  'n/shebang': Shebang.RuleEntry;
+}>;
 
-export type EslintNRulesOption = {
-  readonly 'n/callback-return': CallbackReturn.Options;
-  readonly 'n/exports-style': readonly [
-    ExportsStyle.Options0,
-    ExportsStyle.Options1,
-  ];
-  readonly 'n/file-extension-in-import': readonly [
+export type EslintNRulesOption = Readonly<{
+  'n/callback-return': CallbackReturn.Options;
+  'n/exports-style': readonly [ExportsStyle.Options0, ExportsStyle.Options1];
+  'n/file-extension-in-import': readonly [
     FileExtensionInImport.Options0,
     FileExtensionInImport.Options1,
   ];
-  readonly 'n/handle-callback-err': HandleCallbackErr.Options;
-  readonly 'n/no-deprecated-api': NoDeprecatedApi.Options;
-  readonly 'n/no-extraneous-import': NoExtraneousImport.Options;
-  readonly 'n/no-extraneous-require': NoExtraneousRequire.Options;
-  readonly 'n/no-missing-import': NoMissingImport.Options;
-  readonly 'n/no-missing-require': NoMissingRequire.Options;
-  readonly 'n/no-mixed-requires': NoMixedRequires.Options;
-  readonly 'n/no-process-env': NoProcessEnv.Options;
-  readonly 'n/no-restricted-import': NoRestrictedImport.Options;
-  readonly 'n/no-restricted-require': NoRestrictedRequire.Options;
-  readonly 'n/no-sync': NoSync.Options;
-  readonly 'n/no-top-level-await': NoTopLevelAwait.Options;
-  readonly 'n/no-unpublished-bin': NoUnpublishedBin.Options;
-  readonly 'n/no-unpublished-import': NoUnpublishedImport.Options;
-  readonly 'n/no-unpublished-require': NoUnpublishedRequire.Options;
-  readonly 'n/no-unsupported-features/es-builtins': NoUnsupportedFeaturesEsBuiltins.Options;
-  readonly 'n/no-unsupported-features/es-syntax': NoUnsupportedFeaturesEsSyntax.Options;
-  readonly 'n/no-unsupported-features/node-builtins': NoUnsupportedFeaturesNodeBuiltins.Options;
-  readonly 'n/prefer-global/buffer': PreferGlobalBuffer.Options;
-  readonly 'n/prefer-global/console': PreferGlobalConsole.Options;
-  readonly 'n/prefer-global/process': PreferGlobalProcess.Options;
-  readonly 'n/prefer-global/text-decoder': PreferGlobalTextDecoder.Options;
-  readonly 'n/prefer-global/text-encoder': PreferGlobalTextEncoder.Options;
-  readonly 'n/prefer-global/url-search-params': PreferGlobalUrlSearchParams.Options;
-  readonly 'n/prefer-global/url': PreferGlobalUrl.Options;
-  readonly 'n/prefer-node-protocol': PreferNodeProtocol.Options;
-  readonly 'n/hashbang': Hashbang.Options;
-};
+  'n/handle-callback-err': HandleCallbackErr.Options;
+  'n/no-deprecated-api': NoDeprecatedApi.Options;
+  'n/no-extraneous-import': NoExtraneousImport.Options;
+  'n/no-extraneous-require': NoExtraneousRequire.Options;
+  'n/no-missing-import': NoMissingImport.Options;
+  'n/no-missing-require': NoMissingRequire.Options;
+  'n/no-mixed-requires': NoMixedRequires.Options;
+  'n/no-process-env': NoProcessEnv.Options;
+  'n/no-restricted-import': NoRestrictedImport.Options;
+  'n/no-restricted-require': NoRestrictedRequire.Options;
+  'n/no-sync': NoSync.Options;
+  'n/no-top-level-await': NoTopLevelAwait.Options;
+  'n/no-unpublished-bin': NoUnpublishedBin.Options;
+  'n/no-unpublished-import': NoUnpublishedImport.Options;
+  'n/no-unpublished-require': NoUnpublishedRequire.Options;
+  'n/no-unsupported-features/es-builtins': NoUnsupportedFeaturesEsBuiltins.Options;
+  'n/no-unsupported-features/es-syntax': NoUnsupportedFeaturesEsSyntax.Options;
+  'n/no-unsupported-features/node-builtins': NoUnsupportedFeaturesNodeBuiltins.Options;
+  'n/prefer-global/buffer': PreferGlobalBuffer.Options;
+  'n/prefer-global/console': PreferGlobalConsole.Options;
+  'n/prefer-global/process': PreferGlobalProcess.Options;
+  'n/prefer-global/text-decoder': PreferGlobalTextDecoder.Options;
+  'n/prefer-global/text-encoder': PreferGlobalTextEncoder.Options;
+  'n/prefer-global/url-search-params': PreferGlobalUrlSearchParams.Options;
+  'n/prefer-global/url': PreferGlobalUrl.Options;
+  'n/prefer-node-protocol': PreferNodeProtocol.Options;
+  'n/hashbang': Hashbang.Options;
+}>;

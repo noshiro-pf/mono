@@ -46,15 +46,15 @@ namespace Abs {
    * ]
    * ```
    */
-  export type Options = {
-    readonly prefer?: 'expression' | 'Math.abs';
-    readonly aggressive?: boolean;
-  };
+  export type Options = Readonly<{
+    prefer?: 'Math.abs' | 'expression';
+    aggressive?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -376,14 +376,14 @@ namespace PreferMathSumPrecise {
    * ]
    * ```
    */
-  export type Options = {
-    readonly aggressive?: boolean;
-  };
+  export type Options = Readonly<{
+    aggressive?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -419,14 +419,15 @@ namespace PreferMathTrunc {
    * ]
    * ```
    */
-  export type Options = {
-    readonly reportBitwise?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default true */
+    reportBitwise?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -591,39 +592,39 @@ namespace PreferNumberMinValue {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintMathRules = {
-  readonly 'math/abs': Abs.RuleEntry;
-  readonly 'math/no-static-infinity-calculations': NoStaticInfinityCalculations.RuleEntry;
-  readonly 'math/no-static-nan-calculations': NoStaticNanCalculations.RuleEntry;
-  readonly 'math/prefer-exponentiation-operator': PreferExponentiationOperator.RuleEntry;
-  readonly 'math/prefer-math-cbrt': PreferMathCbrt.RuleEntry;
-  readonly 'math/prefer-math-e': PreferMathE.RuleEntry;
-  readonly 'math/prefer-math-hypot': PreferMathHypot.RuleEntry;
-  readonly 'math/prefer-math-ln10': PreferMathLn10.RuleEntry;
-  readonly 'math/prefer-math-ln2': PreferMathLn2.RuleEntry;
-  readonly 'math/prefer-math-log10': PreferMathLog10.RuleEntry;
-  readonly 'math/prefer-math-log10e': PreferMathLog10e.RuleEntry;
-  readonly 'math/prefer-math-log2': PreferMathLog2.RuleEntry;
-  readonly 'math/prefer-math-log2e': PreferMathLog2e.RuleEntry;
-  readonly 'math/prefer-math-pi': PreferMathPi.RuleEntry;
-  readonly 'math/prefer-math-sqrt': PreferMathSqrt.RuleEntry;
-  readonly 'math/prefer-math-sqrt1-2': PreferMathSqrt12.RuleEntry;
-  readonly 'math/prefer-math-sqrt2': PreferMathSqrt2.RuleEntry;
-  readonly 'math/prefer-math-sum-precise': PreferMathSumPrecise.RuleEntry;
-  readonly 'math/prefer-math-trunc': PreferMathTrunc.RuleEntry;
-  readonly 'math/prefer-number-epsilon': PreferNumberEpsilon.RuleEntry;
-  readonly 'math/prefer-number-is-finite': PreferNumberIsFinite.RuleEntry;
-  readonly 'math/prefer-number-is-integer': PreferNumberIsInteger.RuleEntry;
-  readonly 'math/prefer-number-is-nan': PreferNumberIsNan.RuleEntry;
-  readonly 'math/prefer-number-is-safe-integer': PreferNumberIsSafeInteger.RuleEntry;
-  readonly 'math/prefer-number-max-safe-integer': PreferNumberMaxSafeInteger.RuleEntry;
-  readonly 'math/prefer-number-max-value': PreferNumberMaxValue.RuleEntry;
-  readonly 'math/prefer-number-min-safe-integer': PreferNumberMinSafeInteger.RuleEntry;
-  readonly 'math/prefer-number-min-value': PreferNumberMinValue.RuleEntry;
-};
+export type EslintMathRules = Readonly<{
+  'math/abs': Abs.RuleEntry;
+  'math/no-static-infinity-calculations': NoStaticInfinityCalculations.RuleEntry;
+  'math/no-static-nan-calculations': NoStaticNanCalculations.RuleEntry;
+  'math/prefer-exponentiation-operator': PreferExponentiationOperator.RuleEntry;
+  'math/prefer-math-cbrt': PreferMathCbrt.RuleEntry;
+  'math/prefer-math-e': PreferMathE.RuleEntry;
+  'math/prefer-math-hypot': PreferMathHypot.RuleEntry;
+  'math/prefer-math-ln10': PreferMathLn10.RuleEntry;
+  'math/prefer-math-ln2': PreferMathLn2.RuleEntry;
+  'math/prefer-math-log10': PreferMathLog10.RuleEntry;
+  'math/prefer-math-log10e': PreferMathLog10e.RuleEntry;
+  'math/prefer-math-log2': PreferMathLog2.RuleEntry;
+  'math/prefer-math-log2e': PreferMathLog2e.RuleEntry;
+  'math/prefer-math-pi': PreferMathPi.RuleEntry;
+  'math/prefer-math-sqrt': PreferMathSqrt.RuleEntry;
+  'math/prefer-math-sqrt1-2': PreferMathSqrt12.RuleEntry;
+  'math/prefer-math-sqrt2': PreferMathSqrt2.RuleEntry;
+  'math/prefer-math-sum-precise': PreferMathSumPrecise.RuleEntry;
+  'math/prefer-math-trunc': PreferMathTrunc.RuleEntry;
+  'math/prefer-number-epsilon': PreferNumberEpsilon.RuleEntry;
+  'math/prefer-number-is-finite': PreferNumberIsFinite.RuleEntry;
+  'math/prefer-number-is-integer': PreferNumberIsInteger.RuleEntry;
+  'math/prefer-number-is-nan': PreferNumberIsNan.RuleEntry;
+  'math/prefer-number-is-safe-integer': PreferNumberIsSafeInteger.RuleEntry;
+  'math/prefer-number-max-safe-integer': PreferNumberMaxSafeInteger.RuleEntry;
+  'math/prefer-number-max-value': PreferNumberMaxValue.RuleEntry;
+  'math/prefer-number-min-safe-integer': PreferNumberMinSafeInteger.RuleEntry;
+  'math/prefer-number-min-value': PreferNumberMinValue.RuleEntry;
+}>;
 
-export type EslintMathRulesOption = {
-  readonly 'math/abs': Abs.Options;
-  readonly 'math/prefer-math-sum-precise': PreferMathSumPrecise.Options;
-  readonly 'math/prefer-math-trunc': PreferMathTrunc.Options;
-};
+export type EslintMathRulesOption = Readonly<{
+  'math/abs': Abs.Options;
+  'math/prefer-math-sum-precise': PreferMathSumPrecise.Options;
+  'math/prefer-math-trunc': PreferMathTrunc.Options;
+}>;

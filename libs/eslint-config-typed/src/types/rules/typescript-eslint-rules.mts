@@ -71,20 +71,20 @@ namespace ArrayType {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** The array type expected for mutable cases. */
-    readonly default?: 'array-simple' | 'array' | 'generic';
+    default?: 'array' | 'generic' | 'array-simple';
     /**
      * The array type expected for readonly cases. If omitted, the value for
      * `default` will be used.
      */
-    readonly readonly?: 'array-simple' | 'array' | 'generic';
-  };
+    readonly?: 'array' | 'generic' | 'array-simple';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -179,46 +179,46 @@ namespace BanTsComment {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * A minimum character length for descriptions when `allow-with-description`
      * is enabled.
      */
-    readonly minimumDescriptionLength?: number;
+    minimumDescriptionLength?: number;
     /** Whether allow ts-check directives, and with which restrictions. */
-    readonly 'ts-check'?:
+    'ts-check'?:
       | boolean
       | 'allow-with-description'
-      | {
-          readonly descriptionFormat?: string;
-        };
+      | Readonly<{
+          descriptionFormat?: string;
+        }>;
     /** Whether and when expect-error directives, and with which restrictions. */
-    readonly 'ts-expect-error'?:
+    'ts-expect-error'?:
       | boolean
       | 'allow-with-description'
-      | {
-          readonly descriptionFormat?: string;
-        };
+      | Readonly<{
+          descriptionFormat?: string;
+        }>;
     /** Whether allow ts-ignore directives, and with which restrictions. */
-    readonly 'ts-ignore'?:
+    'ts-ignore'?:
       | boolean
       | 'allow-with-description'
-      | {
-          readonly descriptionFormat?: string;
-        };
+      | Readonly<{
+          descriptionFormat?: string;
+        }>;
     /** Whether allow ts-nocheck directives, and with which restrictions. */
-    readonly 'ts-nocheck'?:
+    'ts-nocheck'?:
       | boolean
       | 'allow-with-description'
-      | {
-          readonly descriptionFormat?: string;
-        };
-  };
+      | Readonly<{
+          descriptionFormat?: string;
+        }>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -274,9 +274,9 @@ namespace ClassLiteralPropertyStyle {
   export type Options = 'fields' | 'getters';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -338,27 +338,27 @@ namespace ClassMethodsUseThis {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Enforces that functions used as instance field initializers utilize
      * `this`.
      */
-    readonly enforceForClassFields?: boolean;
+    enforceForClassFields?: boolean;
     /** Allows specified method names to be ignored with this rule. */
-    readonly exceptMethods?: readonly string[];
+    exceptMethods?: readonly string[];
     /**
      * Whether to ignore class members that are defined within a class that
      * `implements` a type.
      */
-    readonly ignoreClassesThatImplementAnInterface?: boolean | 'public-fields';
+    ignoreClassesThatImplementAnInterface?: boolean | 'public-fields';
     /** Whether to ignore members marked with the `override` modifier. */
-    readonly ignoreOverrideMethods?: boolean;
-  };
+    ignoreOverrideMethods?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -394,12 +394,12 @@ namespace ConsistentGenericConstructors {
    * ```
    */
   /** Which constructor call syntax to prefer. */
-  export type Options = 'constructor' | 'type-annotation';
+  export type Options = 'type-annotation' | 'constructor';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -435,12 +435,12 @@ namespace ConsistentIndexedObjectStyle {
    * ```
    */
   /** Which indexed object syntax to prefer. */
-  export type Options = 'index-signature' | 'record';
+  export type Options = 'record' | 'index-signature';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -474,14 +474,14 @@ namespace ConsistentReturn {
    * ]
    * ```
    */
-  export type Options = {
-    readonly treatUndefinedAsUnspecified?: boolean;
-  };
+  export type Options = Readonly<{
+    treatUndefinedAsUnspecified?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -560,36 +560,31 @@ namespace ConsistentTypeAssertions {
    * ]
    * ```
    */
-  export type Options =
+  export type Options = Readonly<
+    | {
+        /** The expected assertion style to enforce. */
+        assertionStyle: 'never';
+      }
     | {
         /**
          * Whether to always prefer type declarations for array literals used as
          * variable initializers, rather than type assertions.
          */
-        readonly arrayLiteralTypeAssertions?:
-          | 'allow-as-parameter'
-          | 'allow'
-          | 'never';
+        arrayLiteralTypeAssertions?: 'allow' | 'allow-as-parameter' | 'never';
         /** The expected assertion style to enforce. */
-        readonly assertionStyle?: 'angle-bracket' | 'as';
+        assertionStyle?: 'as' | 'angle-bracket';
         /**
          * Whether to always prefer type declarations for object literals used
          * as variable initializers, rather than type assertions.
          */
-        readonly objectLiteralTypeAssertions?:
-          | 'allow-as-parameter'
-          | 'allow'
-          | 'never';
+        objectLiteralTypeAssertions?: 'allow' | 'allow-as-parameter' | 'never';
       }
-    | {
-        /** The expected assertion style to enforce. */
-        readonly assertionStyle: 'never';
-      };
+  >;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -627,9 +622,9 @@ namespace ConsistentTypeDefinitions {
   export type Options = 'interface' | 'type';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -665,18 +660,18 @@ namespace ConsistentTypeExports {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether the rule will autofix "mixed" export cases using TS inline type
      * specifiers.
      */
-    readonly fixMixedExportsWithInlineTypeSpecifier?: boolean;
-  };
+    fixMixedExportsWithInlineTypeSpecifier?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -727,22 +722,22 @@ namespace ConsistentTypeImports {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to disallow type imports in type annotations (`import()`). */
-    readonly disallowTypeAnnotations?: boolean;
+    disallowTypeAnnotations?: boolean;
     /**
      * The expected type modifier to be added when an import is detected as used
      * only in the type position.
      */
-    readonly fixStyle?: 'inline-type-imports' | 'separate-type-imports';
+    fixStyle?: 'separate-type-imports' | 'inline-type-imports';
     /** The expected import kind for type-only imports. */
-    readonly prefer?: 'no-type-imports' | 'type-imports';
-  };
+    prefer?: 'type-imports' | 'no-type-imports';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -811,32 +806,32 @@ namespace DotNotation {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether to allow accessing properties matching an index signature with
      * array notation.
      */
-    readonly allowIndexSignaturePropertyAccess?: boolean;
+    allowIndexSignaturePropertyAccess?: boolean;
     /** Whether to allow keywords such as ["class"]`. */
-    readonly allowKeywords?: boolean;
+    allowKeywords?: boolean;
     /** Regular expression of names to allow. */
-    readonly allowPattern?: string;
+    allowPattern?: string;
     /**
      * Whether to allow accessing class members marked as `private` with array
      * notation.
      */
-    readonly allowPrivateClassPropertyAccess?: boolean;
+    allowPrivateClassPropertyAccess?: boolean;
     /**
      * Whether to allow accessing class members marked as `protected` with array
      * notation.
      */
-    readonly allowProtectedClassPropertyAccess?: boolean;
-  };
+    allowProtectedClassPropertyAccess?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -901,44 +896,44 @@ namespace ExplicitFunctionReturnType {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow arrow functions that start with the `void` keyword. */
-    readonly allowConciseArrowFunctionExpressionsStartingWithVoid?: boolean;
+    allowConciseArrowFunctionExpressionsStartingWithVoid?: boolean;
     /**
      * Whether to ignore arrow functions immediately returning a `as const`
      * value.
      */
-    readonly allowDirectConstAssertionInArrowFunctions?: boolean;
+    allowDirectConstAssertionInArrowFunctions?: boolean;
     /**
      * An array of function/method names that will not have their arguments or
      * return values checked.
      */
-    readonly allowedNames?: readonly string[];
+    allowedNames?: readonly string[];
     /**
      * Whether to ignore function expressions (functions which are not part of a
      * declaration).
      */
-    readonly allowExpressions?: boolean;
+    allowExpressions?: boolean;
     /** Whether to ignore functions that don't have generic type parameters. */
-    readonly allowFunctionsWithoutTypeParameters?: boolean;
+    allowFunctionsWithoutTypeParameters?: boolean;
     /**
      * Whether to ignore functions immediately returning another function
      * expression.
      */
-    readonly allowHigherOrderFunctions?: boolean;
+    allowHigherOrderFunctions?: boolean;
     /** Whether to ignore immediately invoked function expressions (IIFEs). */
-    readonly allowIIFEs?: boolean;
+    allowIIFEs?: boolean;
     /**
      * Whether to ignore type annotations on the variable of function
      * expressions.
      */
-    readonly allowTypedFunctionExpressions?: boolean;
-  };
+    allowTypedFunctionExpressions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1035,45 +1030,45 @@ namespace ExplicitMemberAccessibility {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Which accessibility modifier is required to exist or not exist. */
-    readonly accessibility?: 'explicit' | 'no-public' | 'off';
+    accessibility?: 'explicit' | 'no-public' | 'off';
     /** Specific method names that may be ignored. */
-    readonly ignoredMethodNames?: readonly string[];
+    ignoredMethodNames?: readonly string[];
     /**
      * Changes to required accessibility modifiers for specific kinds of class
      * members.
      */
-    readonly overrides?: {
+    overrides?: Readonly<{
       /**
        * Which member accessibility modifier requirements to apply for
        * accessors.
        */
-      readonly accessors?: 'explicit' | 'no-public' | 'off';
+      accessors?: 'explicit' | 'no-public' | 'off';
       /**
        * Which member accessibility modifier requirements to apply for
        * constructors.
        */
-      readonly constructors?: 'explicit' | 'no-public' | 'off';
+      constructors?: 'explicit' | 'no-public' | 'off';
       /** Which member accessibility modifier requirements to apply for methods. */
-      readonly methods?: 'explicit' | 'no-public' | 'off';
+      methods?: 'explicit' | 'no-public' | 'off';
       /**
        * Which member accessibility modifier requirements to apply for
        * parameterProperties.
        */
-      readonly parameterProperties?: 'explicit' | 'no-public' | 'off';
+      parameterProperties?: 'explicit' | 'no-public' | 'off';
       /**
        * Which member accessibility modifier requirements to apply for
        * properties.
        */
-      readonly properties?: 'explicit' | 'no-public' | 'off';
-    };
-  };
+      properties?: 'explicit' | 'no-public' | 'off';
+    }>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1131,42 +1126,42 @@ namespace ExplicitModuleBoundaryTypes {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to ignore arguments that are explicitly typed as `any`. */
-    readonly allowArgumentsExplicitlyTypedAsAny?: boolean;
+    allowArgumentsExplicitlyTypedAsAny?: boolean;
     /**
      * Whether to ignore return type annotations on body-less arrow functions
      * that return an `as const` type assertion. You must still type the
      * parameters of the function.
      */
-    readonly allowDirectConstAssertionInArrowFunctions?: boolean;
+    allowDirectConstAssertionInArrowFunctions?: boolean;
     /**
      * An array of function/method names that will not have their arguments or
      * return values checked.
      */
-    readonly allowedNames?: readonly string[];
+    allowedNames?: readonly string[];
     /**
      * Whether to ignore return type annotations on functions immediately
      * returning another function expression. You must still type the parameters
      * of the function.
      */
-    readonly allowHigherOrderFunctions?: boolean;
+    allowHigherOrderFunctions?: boolean;
     /**
      * Whether to ignore return type annotations on functions with overload
      * signatures.
      */
-    readonly allowOverloadFunctions?: boolean;
+    allowOverloadFunctions?: boolean;
     /**
      * Whether to ignore type annotations on the variable of a function
      * expression.
      */
-    readonly allowTypedFunctionExpressions?: boolean;
-  };
+    allowTypedFunctionExpressions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1222,20 +1217,20 @@ namespace InitDeclarations {
    * ```
    */
   export type Options =
-    | readonly [
-        'never',
-        {
-          readonly ignoreForLoopInit?: boolean;
-        },
-      ]
+    | readonly []
     | readonly ['always']
     | readonly ['never']
-    | readonly [];
+    | readonly [
+        'never',
+        Readonly<{
+          ignoreForLoopInit?: boolean;
+        }>,
+      ];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1279,19 +1274,19 @@ namespace MaxParams {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to count a `this` declaration when the type is `void`. */
-    readonly countVoidThis?: boolean;
+    countVoidThis?: boolean;
     /** A maximum number of parameters in function definitions. */
-    readonly max?: number;
+    max?: number;
     /** (deprecated) A maximum number of parameters in function definitions. */
-    readonly maximum?: number;
-  };
+    maximum?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1658,239 +1653,229 @@ namespace MemberOrdering {
    * ```
    */
   export type AllItems =
-    | '#private-accessor'
-    | '#private-field'
-    | '#private-get'
-    | '#private-instance-accessor'
-    | '#private-instance-field'
-    | '#private-instance-get'
-    | '#private-instance-method'
-    | '#private-instance-readonly-field'
-    | '#private-instance-set'
-    | '#private-instance-static-initialization'
-    | '#private-method'
-    | '#private-readonly-field'
-    | '#private-set'
-    | '#private-static-accessor'
-    | '#private-static-field'
-    | '#private-static-get'
-    | '#private-static-method'
-    | '#private-static-readonly-field'
-    | '#private-static-set'
-    | '#private-static-static-initialization'
-    | 'abstract-accessor'
-    | 'abstract-field'
-    | 'abstract-get'
-    | 'abstract-method'
+    | 'readonly-signature'
+    | 'signature'
+    | 'readonly-field'
+    | 'public-readonly-field'
+    | 'public-decorated-readonly-field'
+    | 'decorated-readonly-field'
+    | 'static-readonly-field'
+    | 'public-static-readonly-field'
+    | 'instance-readonly-field'
+    | 'public-instance-readonly-field'
     | 'abstract-readonly-field'
-    | 'abstract-set'
-    | 'abstract-static-initialization'
-    | 'accessor'
+    | 'public-abstract-readonly-field'
+    | 'protected-readonly-field'
+    | 'protected-decorated-readonly-field'
+    | 'protected-static-readonly-field'
+    | 'protected-instance-readonly-field'
+    | 'protected-abstract-readonly-field'
+    | 'private-readonly-field'
+    | 'private-decorated-readonly-field'
+    | 'private-static-readonly-field'
+    | 'private-instance-readonly-field'
+    | '#private-readonly-field'
+    | '#private-static-readonly-field'
+    | '#private-instance-readonly-field'
+    | 'field'
+    | 'public-field'
+    | 'public-decorated-field'
+    | 'decorated-field'
+    | 'static-field'
+    | 'public-static-field'
+    | 'instance-field'
+    | 'public-instance-field'
+    | 'abstract-field'
+    | 'public-abstract-field'
+    | 'protected-field'
+    | 'protected-decorated-field'
+    | 'protected-static-field'
+    | 'protected-instance-field'
+    | 'protected-abstract-field'
+    | 'private-field'
+    | 'private-decorated-field'
+    | 'private-static-field'
+    | 'private-instance-field'
+    | '#private-field'
+    | '#private-static-field'
+    | '#private-instance-field'
+    | 'method'
+    | 'public-method'
+    | 'public-decorated-method'
+    | 'decorated-method'
+    | 'static-method'
+    | 'public-static-method'
+    | 'instance-method'
+    | 'public-instance-method'
+    | 'abstract-method'
+    | 'public-abstract-method'
+    | 'protected-method'
+    | 'protected-decorated-method'
+    | 'protected-static-method'
+    | 'protected-instance-method'
+    | 'protected-abstract-method'
+    | 'private-method'
+    | 'private-decorated-method'
+    | 'private-static-method'
+    | 'private-instance-method'
+    | '#private-method'
+    | '#private-static-method'
+    | '#private-instance-method'
     | 'call-signature'
     | 'constructor'
-    | 'decorated-accessor'
-    | 'decorated-field'
-    | 'decorated-get'
-    | 'decorated-method'
-    | 'decorated-readonly-field'
-    | 'decorated-set'
-    | 'field'
-    | 'get'
-    | 'instance-accessor'
-    | 'instance-field'
-    | 'instance-get'
-    | 'instance-method'
-    | 'instance-readonly-field'
-    | 'instance-set'
-    | 'instance-static-initialization'
-    | 'method'
-    | 'private-accessor'
-    | 'private-constructor'
-    | 'private-decorated-accessor'
-    | 'private-decorated-field'
-    | 'private-decorated-get'
-    | 'private-decorated-method'
-    | 'private-decorated-readonly-field'
-    | 'private-decorated-set'
-    | 'private-field'
-    | 'private-get'
-    | 'private-instance-accessor'
-    | 'private-instance-field'
-    | 'private-instance-get'
-    | 'private-instance-method'
-    | 'private-instance-readonly-field'
-    | 'private-instance-set'
-    | 'private-instance-static-initialization'
-    | 'private-method'
-    | 'private-readonly-field'
-    | 'private-set'
-    | 'private-static-accessor'
-    | 'private-static-field'
-    | 'private-static-get'
-    | 'private-static-method'
-    | 'private-static-readonly-field'
-    | 'private-static-set'
-    | 'private-static-static-initialization'
-    | 'protected-abstract-accessor'
-    | 'protected-abstract-field'
-    | 'protected-abstract-get'
-    | 'protected-abstract-method'
-    | 'protected-abstract-readonly-field'
-    | 'protected-abstract-set'
-    | 'protected-abstract-static-initialization'
-    | 'protected-accessor'
-    | 'protected-constructor'
-    | 'protected-decorated-accessor'
-    | 'protected-decorated-field'
-    | 'protected-decorated-get'
-    | 'protected-decorated-method'
-    | 'protected-decorated-readonly-field'
-    | 'protected-decorated-set'
-    | 'protected-field'
-    | 'protected-get'
-    | 'protected-instance-accessor'
-    | 'protected-instance-field'
-    | 'protected-instance-get'
-    | 'protected-instance-method'
-    | 'protected-instance-readonly-field'
-    | 'protected-instance-set'
-    | 'protected-instance-static-initialization'
-    | 'protected-method'
-    | 'protected-readonly-field'
-    | 'protected-set'
-    | 'protected-static-accessor'
-    | 'protected-static-field'
-    | 'protected-static-get'
-    | 'protected-static-method'
-    | 'protected-static-readonly-field'
-    | 'protected-static-set'
-    | 'protected-static-static-initialization'
-    | 'public-abstract-accessor'
-    | 'public-abstract-field'
-    | 'public-abstract-get'
-    | 'public-abstract-method'
-    | 'public-abstract-readonly-field'
-    | 'public-abstract-set'
-    | 'public-abstract-static-initialization'
-    | 'public-accessor'
     | 'public-constructor'
+    | 'protected-constructor'
+    | 'private-constructor'
+    | 'accessor'
+    | 'public-accessor'
     | 'public-decorated-accessor'
-    | 'public-decorated-field'
-    | 'public-decorated-get'
-    | 'public-decorated-method'
-    | 'public-decorated-readonly-field'
-    | 'public-decorated-set'
-    | 'public-field'
-    | 'public-get'
-    | 'public-instance-accessor'
-    | 'public-instance-field'
-    | 'public-instance-get'
-    | 'public-instance-method'
-    | 'public-instance-readonly-field'
-    | 'public-instance-set'
-    | 'public-instance-static-initialization'
-    | 'public-method'
-    | 'public-readonly-field'
-    | 'public-set'
-    | 'public-static-accessor'
-    | 'public-static-field'
-    | 'public-static-get'
-    | 'public-static-method'
-    | 'public-static-readonly-field'
-    | 'public-static-set'
-    | 'public-static-static-initialization'
-    | 'readonly-field'
-    | 'readonly-signature'
-    | 'set'
-    | 'signature'
+    | 'decorated-accessor'
     | 'static-accessor'
-    | 'static-field'
+    | 'public-static-accessor'
+    | 'instance-accessor'
+    | 'public-instance-accessor'
+    | 'abstract-accessor'
+    | 'public-abstract-accessor'
+    | 'protected-accessor'
+    | 'protected-decorated-accessor'
+    | 'protected-static-accessor'
+    | 'protected-instance-accessor'
+    | 'protected-abstract-accessor'
+    | 'private-accessor'
+    | 'private-decorated-accessor'
+    | 'private-static-accessor'
+    | 'private-instance-accessor'
+    | '#private-accessor'
+    | '#private-static-accessor'
+    | '#private-instance-accessor'
+    | 'get'
+    | 'public-get'
+    | 'public-decorated-get'
+    | 'decorated-get'
     | 'static-get'
-    | 'static-initialization'
-    | 'static-method'
-    | 'static-readonly-field'
+    | 'public-static-get'
+    | 'instance-get'
+    | 'public-instance-get'
+    | 'abstract-get'
+    | 'public-abstract-get'
+    | 'protected-get'
+    | 'protected-decorated-get'
+    | 'protected-static-get'
+    | 'protected-instance-get'
+    | 'protected-abstract-get'
+    | 'private-get'
+    | 'private-decorated-get'
+    | 'private-static-get'
+    | 'private-instance-get'
+    | '#private-get'
+    | '#private-static-get'
+    | '#private-instance-get'
+    | 'set'
+    | 'public-set'
+    | 'public-decorated-set'
+    | 'decorated-set'
     | 'static-set'
-    | 'static-static-initialization';
+    | 'public-static-set'
+    | 'instance-set'
+    | 'public-instance-set'
+    | 'abstract-set'
+    | 'public-abstract-set'
+    | 'protected-set'
+    | 'protected-decorated-set'
+    | 'protected-static-set'
+    | 'protected-instance-set'
+    | 'protected-abstract-set'
+    | 'private-set'
+    | 'private-decorated-set'
+    | 'private-static-set'
+    | 'private-instance-set'
+    | '#private-set'
+    | '#private-static-set'
+    | '#private-instance-set'
+    | 'static-initialization'
+    | 'static-static-initialization'
+    | 'public-static-static-initialization'
+    | 'instance-static-initialization'
+    | 'public-instance-static-initialization'
+    | 'abstract-static-initialization'
+    | 'public-abstract-static-initialization'
+    | 'protected-static-static-initialization'
+    | 'protected-instance-static-initialization'
+    | 'protected-abstract-static-initialization'
+    | 'private-static-static-initialization'
+    | 'private-instance-static-initialization'
+    | '#private-static-static-initialization'
+    | '#private-instance-static-initialization';
 
   export type OptionalityOrderOptions = 'optional-first' | 'required-first';
 
   export type OrderOptions =
-    | 'alphabetically-case-insensitive'
     | 'alphabetically'
+    | 'alphabetically-case-insensitive'
     | 'as-written'
-    | 'natural-case-insensitive'
-    | 'natural';
+    | 'natural'
+    | 'natural-case-insensitive';
 
   export type TypeItems =
-    | 'constructor'
+    | 'readonly-signature'
+    | 'signature'
+    | 'readonly-field'
     | 'field'
     | 'method'
-    | 'readonly-field'
-    | 'readonly-signature'
-    | 'signature';
+    | 'constructor';
 
-  export type Options = {
+  export type Options = Readonly<{
     /** Which ordering to enforce for classes. */
-    readonly classes?:
-      | readonly (AllItems | readonly AllItems[])[]
+    classes?:
       | 'never'
-      | {
-          readonly memberTypes?:
-            | readonly (AllItems | readonly AllItems[])[]
-            | 'never';
-          readonly optionalityOrder?: OptionalityOrderOptions;
-          readonly order?: OrderOptions;
-        };
+      | readonly (AllItems | readonly AllItems[])[]
+      | Readonly<{
+          memberTypes?: readonly (AllItems | readonly AllItems[])[] | 'never';
+          optionalityOrder?: OptionalityOrderOptions;
+          order?: OrderOptions;
+        }>;
     /** Which ordering to enforce for classExpressions. */
-    readonly classExpressions?:
-      | readonly (AllItems | readonly AllItems[])[]
+    classExpressions?:
       | 'never'
-      | {
-          readonly memberTypes?:
-            | readonly (AllItems | readonly AllItems[])[]
-            | 'never';
-          readonly optionalityOrder?: OptionalityOrderOptions;
-          readonly order?: OrderOptions;
-        };
+      | readonly (AllItems | readonly AllItems[])[]
+      | Readonly<{
+          memberTypes?: readonly (AllItems | readonly AllItems[])[] | 'never';
+          optionalityOrder?: OptionalityOrderOptions;
+          order?: OrderOptions;
+        }>;
     /** Which ordering to enforce for default. */
-    readonly default?:
+    default?:
+      | 'never'
       | readonly (AllItems | readonly AllItems[])[]
-      | 'never'
-      | {
-          readonly memberTypes?:
-            | readonly (AllItems | readonly AllItems[])[]
-            | 'never';
-          readonly optionalityOrder?: OptionalityOrderOptions;
-          readonly order?: OrderOptions;
-        };
+      | Readonly<{
+          memberTypes?: readonly (AllItems | readonly AllItems[])[] | 'never';
+          optionalityOrder?: OptionalityOrderOptions;
+          order?: OrderOptions;
+        }>;
     /** Which ordering to enforce for interfaces. */
-    readonly interfaces?:
-      | readonly (TypeItems | readonly TypeItems[])[]
+    interfaces?:
       | 'never'
-      | {
-          readonly memberTypes?:
-            | readonly (TypeItems | readonly TypeItems[])[]
-            | 'never';
-          readonly optionalityOrder?: OptionalityOrderOptions;
-          readonly order?: OrderOptions;
-        };
+      | readonly (TypeItems | readonly TypeItems[])[]
+      | Readonly<{
+          memberTypes?: readonly (TypeItems | readonly TypeItems[])[] | 'never';
+          optionalityOrder?: OptionalityOrderOptions;
+          order?: OrderOptions;
+        }>;
     /** Which ordering to enforce for typeLiterals. */
-    readonly typeLiterals?:
-      | readonly (TypeItems | readonly TypeItems[])[]
+    typeLiterals?:
       | 'never'
-      | {
-          readonly memberTypes?:
-            | readonly (TypeItems | readonly TypeItems[])[]
-            | 'never';
-          readonly optionalityOrder?: OptionalityOrderOptions;
-          readonly order?: OrderOptions;
-        };
-  };
+      | readonly (TypeItems | readonly TypeItems[])[]
+      | Readonly<{
+          memberTypes?: readonly (TypeItems | readonly TypeItems[])[] | 'never';
+          optionalityOrder?: OptionalityOrderOptions;
+          order?: OrderOptions;
+        }>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1924,12 +1909,12 @@ namespace MethodSignatureStyle {
    * ```
    */
   /** The method signature style to enforce using. */
-  export type Options = 'method' | 'property';
+  export type Options = 'property' | 'method';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3658,536 +3643,527 @@ namespace NamingConvention {
 
   export type PredefinedFormats =
     | 'camelCase'
-    | 'PascalCase'
-    | 'snake_case'
     | 'strictCamelCase'
+    | 'PascalCase'
     | 'StrictPascalCase'
+    | 'snake_case'
     | 'UPPER_CASE';
 
   export type UnderscoreOptions =
-    | 'allow'
-    | 'allowDouble'
-    | 'allowSingleOrDouble'
     | 'forbid'
+    | 'allow'
     | 'require'
-    | 'requireDouble';
+    | 'requireDouble'
+    | 'allowDouble'
+    | 'allowSingleOrDouble';
 
   export type PrefixSuffixConfig = readonly string[];
 
   export type TypeModifiers =
-    | 'array'
     | 'boolean'
-    | 'function'
+    | 'string'
     | 'number'
-    | 'string';
+    | 'function'
+    | 'array';
 
-  export type Options = readonly (
+  export type Options = readonly Readonly<
     | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly modifiers?: readonly (
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        modifiers?: readonly (
+          | 'const'
+          | 'readonly'
+          | 'static'
+          | 'public'
+          | 'protected'
+          | 'private'
           | '#private'
           | 'abstract'
-          | 'async'
-          | 'const'
-          | 'default'
           | 'destructured'
-          | 'exported'
           | 'global'
-          | 'namespace'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-          | 'static'
+          | 'exported'
           | 'unused'
-        )[];
-        readonly selector: readonly (
-          | 'accessor'
-          | 'autoAccessor'
-          | 'class'
-          | 'classicAccessor'
-          | 'classMethod'
-          | 'classProperty'
+          | 'requiresQuotes'
+          | 'override'
+          | 'async'
           | 'default'
-          | 'enum'
-          | 'enumMember'
-          | 'function'
-          | 'import'
-          | 'interface'
+          | 'namespace'
+        )[];
+        selector: readonly (
+          | 'default'
+          | 'variableLike'
           | 'memberLike'
+          | 'typeLike'
           | 'method'
-          | 'objectLiteralMethod'
-          | 'objectLiteralProperty'
+          | 'property'
+          | 'accessor'
+          | 'variable'
+          | 'function'
           | 'parameter'
           | 'parameterProperty'
-          | 'property'
-          | 'typeAlias'
-          | 'typeLike'
+          | 'classicAccessor'
+          | 'enumMember'
+          | 'classMethod'
+          | 'objectLiteralMethod'
           | 'typeMethod'
-          | 'typeParameter'
+          | 'classProperty'
+          | 'objectLiteralProperty'
           | 'typeProperty'
-          | 'variable'
-          | 'variableLike'
+          | 'autoAccessor'
+          | 'class'
+          | 'interface'
+          | 'typeAlias'
+          | 'enum'
+          | 'typeParameter'
+          | 'import'
         )[];
-        readonly types?: readonly TypeModifiers[];
+        types?: readonly TypeModifiers[];
       }
     | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'accessor';
-        readonly modifiers?: readonly (
-          | 'abstract'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'autoAccessor';
-        readonly modifiers?: readonly (
-          | 'abstract'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'class';
-        readonly modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'classicAccessor';
-        readonly modifiers?: readonly (
-          | 'abstract'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'classMethod';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'classProperty';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'default';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'default';
+        modifiers?: readonly (
           | 'const'
+          | 'readonly'
+          | 'static'
+          | 'public'
+          | 'protected'
+          | 'private'
+          | '#private'
+          | 'abstract'
+          | 'destructured'
+          | 'global'
+          | 'exported'
+          | 'unused'
+          | 'requiresQuotes'
+          | 'override'
+          | 'async'
           | 'default'
-          | 'destructured'
-          | 'exported'
-          | 'global'
           | 'namespace'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-          | 'static'
-          | 'unused'
         )[];
       }
     | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'enum';
-        readonly modifiers?: readonly ('exported' | 'unused')[];
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'variableLike';
+        modifiers?: readonly ('unused' | 'async')[];
       }
     | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'enumMember';
-        readonly modifiers?: readonly 'requiresQuotes'[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'function';
-        readonly modifiers?: readonly (
-          | 'async'
-          | 'exported'
-          | 'global'
-          | 'unused'
-        )[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'import';
-        readonly modifiers?: readonly ('default' | 'namespace')[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'interface';
-        readonly modifiers?: readonly ('exported' | 'unused')[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'memberLike';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'method';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'objectLiteralMethod';
-        readonly modifiers?: readonly ('async' | 'public' | 'requiresQuotes')[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'objectLiteralProperty';
-        readonly modifiers?: readonly ('public' | 'requiresQuotes')[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'parameter';
-        readonly modifiers?: readonly ('destructured' | 'unused')[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'parameterProperty';
-        readonly modifiers?: readonly (
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'property';
-        readonly modifiers?: readonly (
-          | '#private'
-          | 'abstract'
-          | 'async'
-          | 'override'
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-          | 'static'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeAlias';
-        readonly modifiers?: readonly ('exported' | 'unused')[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeLike';
-        readonly modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeMethod';
-        readonly modifiers?: readonly ('public' | 'requiresQuotes')[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeParameter';
-        readonly modifiers?: readonly 'unused'[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'typeProperty';
-        readonly modifiers?: readonly (
-          | 'public'
-          | 'readonly'
-          | 'requiresQuotes'
-        )[];
-        readonly types?: readonly TypeModifiers[];
-      }
-    | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'variable';
-        readonly modifiers?: readonly (
-          | 'async'
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'variable';
+        modifiers?: readonly (
           | 'const'
           | 'destructured'
           | 'exported'
           | 'global'
           | 'unused'
+          | 'async'
         )[];
-        readonly types?: readonly TypeModifiers[];
+        types?: readonly TypeModifiers[];
       }
     | {
-        readonly custom?: MatchRegexConfig;
-        readonly failureMessage?: string;
-        readonly format: FormatOptionsConfig;
-        readonly leadingUnderscore?: UnderscoreOptions;
-        readonly prefix?: PrefixSuffixConfig;
-        readonly suffix?: PrefixSuffixConfig;
-        readonly trailingUnderscore?: UnderscoreOptions;
-        readonly filter?: MatchRegexConfig | string;
-        readonly selector: 'variableLike';
-        readonly modifiers?: readonly ('async' | 'unused')[];
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'function';
+        modifiers?: readonly ('exported' | 'global' | 'unused' | 'async')[];
       }
-  )[];
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'parameter';
+        modifiers?: readonly ('destructured' | 'unused')[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'memberLike';
+        modifiers?: readonly (
+          | 'abstract'
+          | 'private'
+          | '#private'
+          | 'protected'
+          | 'public'
+          | 'readonly'
+          | 'requiresQuotes'
+          | 'static'
+          | 'override'
+          | 'async'
+        )[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'classProperty';
+        modifiers?: readonly (
+          | 'abstract'
+          | 'private'
+          | '#private'
+          | 'protected'
+          | 'public'
+          | 'readonly'
+          | 'requiresQuotes'
+          | 'static'
+          | 'override'
+        )[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'objectLiteralProperty';
+        modifiers?: readonly ('public' | 'requiresQuotes')[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'typeProperty';
+        modifiers?: readonly ('public' | 'readonly' | 'requiresQuotes')[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'parameterProperty';
+        modifiers?: readonly (
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'readonly'
+        )[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'property';
+        modifiers?: readonly (
+          | 'abstract'
+          | 'private'
+          | '#private'
+          | 'protected'
+          | 'public'
+          | 'readonly'
+          | 'requiresQuotes'
+          | 'static'
+          | 'override'
+          | 'async'
+        )[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'classMethod';
+        modifiers?: readonly (
+          | 'abstract'
+          | 'private'
+          | '#private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+          | 'override'
+          | 'async'
+        )[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'objectLiteralMethod';
+        modifiers?: readonly ('public' | 'requiresQuotes' | 'async')[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'typeMethod';
+        modifiers?: readonly ('public' | 'requiresQuotes')[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'method';
+        modifiers?: readonly (
+          | 'abstract'
+          | 'private'
+          | '#private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+          | 'override'
+          | 'async'
+        )[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'classicAccessor';
+        modifiers?: readonly (
+          | 'abstract'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+          | 'override'
+        )[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'autoAccessor';
+        modifiers?: readonly (
+          | 'abstract'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+          | 'override'
+        )[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'accessor';
+        modifiers?: readonly (
+          | 'abstract'
+          | 'private'
+          | 'protected'
+          | 'public'
+          | 'requiresQuotes'
+          | 'static'
+          | 'override'
+        )[];
+        types?: readonly TypeModifiers[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'enumMember';
+        modifiers?: readonly 'requiresQuotes'[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'typeLike';
+        modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'class';
+        modifiers?: readonly ('abstract' | 'exported' | 'unused')[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'interface';
+        modifiers?: readonly ('exported' | 'unused')[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'typeAlias';
+        modifiers?: readonly ('exported' | 'unused')[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'enum';
+        modifiers?: readonly ('exported' | 'unused')[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'typeParameter';
+        modifiers?: readonly 'unused'[];
+      }
+    | {
+        custom?: MatchRegexConfig;
+        failureMessage?: string;
+        format: FormatOptionsConfig;
+        leadingUnderscore?: UnderscoreOptions;
+        prefix?: PrefixSuffixConfig;
+        suffix?: PrefixSuffixConfig;
+        trailingUnderscore?: UnderscoreOptions;
+        filter?: string | MatchRegexConfig;
+        selector: 'import';
+        modifiers?: readonly ('default' | 'namespace')[];
+      }
+  >[];
 
-  export type MatchRegexConfig = {
-    readonly match: boolean;
-    readonly regex: string;
-  };
+  export type MatchRegexConfig = Readonly<{
+    match: boolean;
+    regex: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4268,17 +4244,17 @@ namespace NoBaseToString {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to also check values of type `unknown` */
-    readonly checkUnknown?: boolean;
+    checkUnknown?: boolean;
     /** Stringified type names to ignore. */
-    readonly ignoredTypeNames?: readonly string[];
-  };
+    ignoredTypeNames?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4342,25 +4318,25 @@ namespace NoConfusingVoidExpression {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether to ignore "shorthand" `() =>` arrow functions: those without `{
      * ... }` braces.
      */
-    readonly ignoreArrowShorthand?: boolean;
+    ignoreArrowShorthand?: boolean;
     /** Whether to ignore returns that start with the `void` operator. */
-    readonly ignoreVoidOperator?: boolean;
+    ignoreVoidOperator?: boolean;
     /**
      * Whether to ignore returns from functions with explicit `void` return
      * types and functions with contextual `void` return types.
      */
-    readonly ignoreVoidReturningFunctions?: boolean;
-  };
+    ignoreVoidReturningFunctions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4503,31 +4479,33 @@ namespace NoDeprecated {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Type specifiers that can be allowed. */
-    readonly allow?: readonly (
+    allow?: readonly (
       | string
-      | {
-          readonly from: 'file';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly path?: string;
-        }
-      | {
-          readonly from: 'lib';
-          readonly name: string | readonly [string, ...(readonly string[])];
-        }
-      | {
-          readonly from: 'package';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly package: string;
-        }
+      | Readonly<
+          | {
+              from: 'file';
+              name: string | readonly [string, ...string[]];
+              path?: string;
+            }
+          | {
+              from: 'lib';
+              name: string | readonly [string, ...string[]];
+            }
+          | {
+              from: 'package';
+              name: string | readonly [string, ...string[]];
+              package: string;
+            }
+        >
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4602,17 +4580,17 @@ namespace NoDuplicateTypeConstituents {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to ignore `&` intersections. */
-    readonly ignoreIntersections?: boolean;
+    ignoreIntersections?: boolean;
     /** Whether to ignore `|` unions. */
-    readonly ignoreUnions?: boolean;
-  };
+    ignoreUnions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4686,30 +4664,30 @@ namespace NoEmptyFunction {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Locations and kinds of functions that are allowed to be empty. */
-    readonly allow?: readonly (
-      | 'arrowFunctions'
-      | 'asyncFunctions'
-      | 'asyncMethods'
-      | 'constructors'
-      | 'decoratedFunctions'
+    allow?: readonly (
       | 'functions'
+      | 'arrowFunctions'
       | 'generatorFunctions'
+      | 'methods'
       | 'generatorMethods'
       | 'getters'
-      | 'methods'
-      | 'overrideMethods'
+      | 'setters'
+      | 'constructors'
       | 'private-constructors'
       | 'protected-constructors'
-      | 'setters'
+      | 'asyncFunctions'
+      | 'asyncMethods'
+      | 'decoratedFunctions'
+      | 'overrideMethods'
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4798,22 +4776,22 @@ namespace NoEmptyObjectType {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow empty interfaces. */
-    readonly allowInterfaces?: 'always' | 'never' | 'with-single-extends';
+    allowInterfaces?: 'always' | 'never' | 'with-single-extends';
     /** Whether to allow empty object type literals. */
-    readonly allowObjectTypes?: 'always' | 'never';
+    allowObjectTypes?: 'always' | 'never';
     /**
      * A stringified regular expression to allow interfaces and object type
      * aliases with the configured name.
      */
-    readonly allowWithName?: string;
-  };
+    allowWithName?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4854,20 +4832,20 @@ namespace NoExplicitAny {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether to enable auto-fixing in which the `any` type is converted to the
      * `unknown` type.
      */
-    readonly fixToUnknown?: boolean;
+    fixToUnknown?: boolean;
     /** Whether to ignore rest parameter arrays. */
-    readonly ignoreRestArgs?: boolean;
-  };
+    ignoreRestArgs?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4932,21 +4910,21 @@ namespace NoExtraneousClass {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow extraneous classes that contain only a constructor. */
-    readonly allowConstructorOnly?: boolean;
+    allowConstructorOnly?: boolean;
     /** Whether to allow extraneous classes that have no body (i.e. are empty). */
-    readonly allowEmpty?: boolean;
+    allowEmpty?: boolean;
     /** Whether to allow extraneous classes that only contain static members. */
-    readonly allowStaticOnly?: boolean;
+    allowStaticOnly?: boolean;
     /** Whether to allow extraneous classes that include a decorator. */
-    readonly allowWithDecorator?: boolean;
-  };
+    allowWithDecorator?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5213,55 +5191,59 @@ namespace NoFloatingPromises {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Type specifiers of functions whose calls are safe to float. */
-    readonly allowForKnownSafeCalls?: readonly (
+    allowForKnownSafeCalls?: readonly (
       | string
-      | {
-          readonly from: 'file';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly path?: string;
-        }
-      | {
-          readonly from: 'lib';
-          readonly name: string | readonly [string, ...(readonly string[])];
-        }
-      | {
-          readonly from: 'package';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly package: string;
-        }
+      | Readonly<
+          | {
+              from: 'file';
+              name: string | readonly [string, ...string[]];
+              path?: string;
+            }
+          | {
+              from: 'lib';
+              name: string | readonly [string, ...string[]];
+            }
+          | {
+              from: 'package';
+              name: string | readonly [string, ...string[]];
+              package: string;
+            }
+        >
     )[];
     /** Type specifiers that are known to be safe to float. */
-    readonly allowForKnownSafePromises?: readonly (
+    allowForKnownSafePromises?: readonly (
       | string
-      | {
-          readonly from: 'file';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly path?: string;
-        }
-      | {
-          readonly from: 'lib';
-          readonly name: string | readonly [string, ...(readonly string[])];
-        }
-      | {
-          readonly from: 'package';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly package: string;
-        }
+      | Readonly<
+          | {
+              from: 'file';
+              name: string | readonly [string, ...string[]];
+              path?: string;
+            }
+          | {
+              from: 'lib';
+              name: string | readonly [string, ...string[]];
+            }
+          | {
+              from: 'package';
+              name: string | readonly [string, ...string[]];
+              package: string;
+            }
+        >
     )[];
     /** Whether to check all "Thenable"s, not just the built-in Promise type. */
-    readonly checkThenables?: boolean;
+    checkThenables?: boolean;
     /** Whether to ignore async IIFEs (Immediately Invoked Function Expressions). */
-    readonly ignoreIIFE?: boolean;
+    ignoreIIFE?: boolean;
     /** Whether to ignore `void` expressions. */
-    readonly ignoreVoid?: boolean;
-  };
+    ignoreVoid?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5356,17 +5338,17 @@ namespace NoInferrableTypes {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to ignore function parameters. */
-    readonly ignoreParameters?: boolean;
+    ignoreParameters?: boolean;
     /** Whether to ignore class properties. */
-    readonly ignoreProperties?: boolean;
-  };
+    ignoreProperties?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5399,14 +5381,14 @@ namespace NoInvalidThis {
    * ]
    * ```
    */
-  export type Options = {
-    readonly capIsConstructor?: boolean;
-  };
+  export type Options = Readonly<{
+    capIsConstructor?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5458,19 +5440,17 @@ namespace NoInvalidVoidType {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether a `this` parameter of a function may be `void`. */
-    readonly allowAsThisParameter?: boolean;
+    allowAsThisParameter?: boolean;
     /** Whether `void` can be used as a valid value for generic type parameters. */
-    readonly allowInGenericTypeArguments?:
-      | boolean
-      | readonly [string, ...(readonly string[])];
-  };
+    allowInGenericTypeArguments?: boolean | readonly [string, ...string[]];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5588,30 +5568,49 @@ namespace NoMagicNumbers {
    * ]
    * ```
    */
-  export type Options = {
-    readonly detectObjects?: boolean;
-    readonly enforceConst?: boolean;
-    readonly ignore?: readonly (number | string)[];
-    readonly ignoreArrayIndexes?: boolean;
-    readonly ignoreDefaultValues?: boolean;
-    readonly ignoreClassFieldInitialValues?: boolean;
-    /** Whether enums used in TypeScript are considered okay. */
-    readonly ignoreEnums?: boolean;
+  export type Options = Readonly<{
+    /** @default false */
+    detectObjects?: boolean;
+    /** @default false */
+    enforceConst?: boolean;
+    ignore?: readonly (number | string)[];
+    /** @default false */
+    ignoreArrayIndexes?: boolean;
+    /** @default false */
+    ignoreDefaultValues?: boolean;
+    /** @default false */
+    ignoreClassFieldInitialValues?: boolean;
+    /**
+     * Whether enums used in TypeScript are considered okay.
+     *
+     * @default false
+     */
+    ignoreEnums?: boolean;
     /**
      * Whether numbers used in TypeScript numeric literal types are considered
      * okay.
+     *
+     * @default false
      */
-    readonly ignoreNumericLiteralTypes?: boolean;
-    /** Whether `readonly` class properties are considered okay. */
-    readonly ignoreReadonlyClassProperties?: boolean;
-    /** Whether numbers used to index types are okay. */
-    readonly ignoreTypeIndexes?: boolean;
-  };
+    ignoreNumericLiteralTypes?: boolean;
+    /**
+     * Whether `readonly` class properties are considered okay.
+     *
+     * @default false
+     */
+    ignoreReadonlyClassProperties?: boolean;
+    /**
+     * Whether numbers used to index types are okay.
+     *
+     * @default false
+     */
+    ignoreTypeIndexes?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5649,15 +5648,15 @@ namespace NoMeaninglessVoidOperator {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to suggest removing `void` when the argument has type `never`. */
-    readonly checkNever?: boolean;
-  };
+    checkNever?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5754,55 +5753,55 @@ namespace NoMisusedPromises {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to warn when a Promise is provided to conditional statements. */
-    readonly checksConditionals?: boolean;
+    checksConditionals?: boolean;
     /** Whether to warn when `...` spreading a `Promise`. */
-    readonly checksSpreads?: boolean;
+    checksSpreads?: boolean;
     /**
      * Whether to warn when a Promise is returned from a function typed as
      * returning `void`.
      */
-    readonly checksVoidReturn?:
+    checksVoidReturn?:
       | boolean
-      | {
+      | Readonly<{
           /**
            * Disables checking an asynchronous function passed as argument where
            * the parameter type expects a function that returns `void`.
            */
-          readonly arguments?: boolean;
+          arguments?: boolean;
           /**
            * Disables checking an asynchronous function passed as a JSX
            * attribute expected to be a function that returns `void`.
            */
-          readonly attributes?: boolean;
+          attributes?: boolean;
           /**
            * Disables checking an asynchronous method in a type that extends or
            * implements another type expecting that method to return `void`.
            */
-          readonly inheritedMethods?: boolean;
+          inheritedMethods?: boolean;
           /**
            * Disables checking an asynchronous function passed as an object
            * property expected to be a function that returns `void`.
            */
-          readonly properties?: boolean;
+          properties?: boolean;
           /**
            * Disables checking an asynchronous function returned in a function
            * whose return type is a function that returns `void`.
            */
-          readonly returns?: boolean;
+          returns?: boolean;
           /**
            * Disables checking an asynchronous function used as a variable whose
            * return type is a function that returns `void`.
            */
-          readonly variables?: boolean;
-        };
-  };
+          variables?: boolean;
+        }>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -5946,31 +5945,33 @@ namespace NoMisusedSpread {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** An array of type specifiers that are known to be safe to spread. */
-    readonly allow?: readonly (
+    allow?: readonly (
       | string
-      | {
-          readonly from: 'file';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly path?: string;
-        }
-      | {
-          readonly from: 'lib';
-          readonly name: string | readonly [string, ...(readonly string[])];
-        }
-      | {
-          readonly from: 'package';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly package: string;
-        }
+      | Readonly<
+          | {
+              from: 'file';
+              name: string | readonly [string, ...string[]];
+              path?: string;
+            }
+          | {
+              from: 'lib';
+              name: string | readonly [string, ...string[]];
+            }
+          | {
+              from: 'package';
+              name: string | readonly [string, ...string[]];
+              package: string;
+            }
+        >
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6027,20 +6028,20 @@ namespace NoNamespace {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow `declare` with custom TypeScript namespaces. */
-    readonly allowDeclarations?: boolean;
+    allowDeclarations?: boolean;
     /**
      * Whether to allow `declare` with custom TypeScript namespaces inside
      * definition files.
      */
-    readonly allowDefinitionFiles?: boolean;
-  };
+    allowDefinitionFiles?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6133,20 +6134,20 @@ namespace NoRedeclare {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to report shadowing of built-in global variables. */
-    readonly builtinGlobals?: boolean;
+    builtinGlobals?: boolean;
     /**
      * Whether to ignore declaration merges between certain TypeScript
      * declaration types.
      */
-    readonly ignoreDeclarationMerge?: boolean;
-  };
+    ignoreDeclarationMerge?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6207,17 +6208,17 @@ namespace NoRequireImports {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Patterns of import paths to allow requiring from. */
-    readonly allow?: readonly string[];
+    allow?: readonly string[];
     /** Allows `require` statements in import declarations. */
-    readonly allowAsImport?: boolean;
-  };
+    allowAsImport?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6405,59 +6406,53 @@ namespace NoRestrictedImports {
   export type Options =
     | readonly (
         | string
-        | {
-            readonly name: string;
-            readonly message?: string;
-            readonly importNames?: readonly string[];
-            readonly allowImportNames?: readonly string[];
+        | Readonly<{
+            name: string;
+            message?: string;
+            importNames?: readonly string[];
+            allowImportNames?: readonly string[];
             /** Whether to allow type-only imports for a path. */
-            readonly allowTypeImports?: boolean;
-          }
+            allowTypeImports?: boolean;
+          }>
       )[]
+    | readonly []
     | readonly [
-        {
-          readonly paths?: readonly (
+        Readonly<{
+          paths?: readonly (
             | string
-            | {
-                readonly name: string;
-                readonly message?: string;
-                readonly importNames?: readonly string[];
-                readonly allowImportNames?: readonly string[];
+            | Readonly<{
+                name: string;
+                message?: string;
+                importNames?: readonly string[];
+                allowImportNames?: readonly string[];
                 /** Whether to allow type-only imports for a path. */
-                readonly allowTypeImports?: boolean;
-              }
+                allowTypeImports?: boolean;
+              }>
           )[];
-          readonly patterns?:
-            | readonly {
+          patterns?:
+            | readonly string[]
+            | readonly Readonly<{
                 /** @minItems 1 */
-                readonly importNames?: readonly [
-                  string,
-                  ...(readonly string[]),
-                ];
+                importNames?: readonly [string, ...string[]];
                 /** @minItems 1 */
-                readonly allowImportNames?: readonly [
-                  string,
-                  ...(readonly string[]),
-                ];
+                allowImportNames?: readonly [string, ...string[]];
                 /** @minItems 1 */
-                readonly group?: readonly [string, ...(readonly string[])];
-                readonly regex?: string;
-                readonly importNamePattern?: string;
-                readonly allowImportNamePattern?: string;
-                readonly message?: string;
-                readonly caseSensitive?: boolean;
+                group?: readonly [string, ...string[]];
+                regex?: string;
+                importNamePattern?: string;
+                allowImportNamePattern?: string;
+                message?: string;
+                caseSensitive?: boolean;
                 /** Whether to allow type-only imports for a path. */
-                readonly allowTypeImports?: boolean;
-              }[]
-            | readonly string[];
-        },
-      ]
-    | readonly [];
+                allowTypeImports?: boolean;
+              }>[];
+        }>,
+      ];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6536,32 +6531,32 @@ namespace NoRestrictedTypes {
    * ```
    */
   export type BanConfig =
-    | string
     | true
-    | {
+    | string
+    | Readonly<{
         /**
          * Type to autofix replace with. Note that autofixers can be applied
          * automatically - so you need to be careful with this option.
          */
-        readonly fixWith?: string;
+        fixWith?: string;
         /** Custom error message. */
-        readonly message?: string;
+        message?: string;
         /** Types to suggest replacing with. */
-        readonly suggest?: readonly string[];
-      };
+        suggest?: readonly string[];
+      }>;
 
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * An object whose keys are the types you want to ban, and the values are
      * error messages.
      */
-    readonly types?: Record<string, BanConfig>;
-  };
+    types?: Readonly<Record<string, BanConfig>>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6626,36 +6621,31 @@ namespace NoShadow {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Identifier names for which shadowing is allowed. */
-    readonly allow?: readonly string[];
+    allow?: readonly string[];
     /** Whether to report shadowing of built-in global variables. */
-    readonly builtinGlobals?: boolean;
+    builtinGlobals?: boolean;
     /**
      * Whether to report shadowing before outer functions or variables are
      * defined.
      */
-    readonly hoist?:
-      | 'all'
-      | 'functions-and-types'
-      | 'functions'
-      | 'never'
-      | 'types';
+    hoist?: 'all' | 'functions' | 'functions-and-types' | 'never' | 'types';
     /** Whether to ignore function parameters named the same as a variable. */
-    readonly ignoreFunctionTypeParameterNameValueShadow?: boolean;
+    ignoreFunctionTypeParameterNameValueShadow?: boolean;
     /**
      * Whether to ignore the variable initializers when the shadowed variable is
      * presumably still unitialized.
      */
-    readonly ignoreOnInitialization?: boolean;
+    ignoreOnInitialization?: boolean;
     /** Whether to ignore types named the same as a variable. */
-    readonly ignoreTypeValueShadow?: boolean;
-  };
+    ignoreTypeValueShadow?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6697,20 +6687,20 @@ namespace NoThisAlias {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether to ignore destructurings, such as `const { props, state } =
      * this`.
      */
-    readonly allowDestructuring?: boolean;
+    allowDestructuring?: boolean;
     /** Names to ignore, such as ["self"] for `const self = this;`. */
-    readonly allowedNames?: readonly string[];
-  };
+    allowedNames?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6836,29 +6826,29 @@ namespace NoUnnecessaryBooleanLiteralCompare {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether to allow comparisons between nullable boolean variables and
      * `false`.
      */
-    readonly allowComparingNullableBooleansToFalse?: boolean;
+    allowComparingNullableBooleansToFalse?: boolean;
     /**
      * Whether to allow comparisons between nullable boolean variables and
      * `true`.
      */
-    readonly allowComparingNullableBooleansToTrue?: boolean;
+    allowComparingNullableBooleansToTrue?: boolean;
     /**
      * Unless this is set to `true`, the rule will error on every file whose
      * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
      * (or `strict`) set to `true`.
      */
-    readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
-  };
+    allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6917,27 +6907,27 @@ namespace NoUnnecessaryCondition {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to ignore constant loop conditions, such as `while (true)`. */
-    readonly allowConstantLoopConditions?:
+    allowConstantLoopConditions?:
       | boolean
       | ('always' | 'never' | 'only-allowed-literals');
     /**
      * Whether to not error when running with a tsconfig that has
      * strictNullChecks turned.
      */
-    readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+    allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
     /**
      * Whether to check the asserted argument of a type predicate function for
      * unnecessary conditions
      */
-    readonly checkTypePredicates?: boolean;
-  };
+    checkTypePredicates?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7053,17 +7043,17 @@ namespace NoUnnecessaryTypeAssertion {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to check literal const assertions. */
-    readonly checkLiteralConstAssertions?: boolean;
+    checkLiteralConstAssertions?: boolean;
     /** A list of type names to ignore. */
-    readonly typesToIgnore?: readonly string[];
-  };
+    typesToIgnore?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7264,15 +7254,15 @@ namespace NoUnsafeMemberAccess {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow `?.` optional chains on `any` values. */
-    readonly allowOptionalChaining?: boolean;
-  };
+    allowOptionalChaining?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7371,18 +7361,35 @@ namespace NoUnusedExpressions {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowShortCircuit?: boolean;
-    readonly allowTernary?: boolean;
-    readonly allowTaggedTemplates?: boolean;
-    readonly enforceForJSX?: boolean;
-    readonly ignoreDirectives?: boolean;
-  };
+  export type Options = Readonly<{
+    allowShortCircuit?: boolean;
+    allowTernary?: boolean;
+    allowTaggedTemplates?: boolean;
+    enforceForJSX?: boolean;
+    ignoreDirectives?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * Disallow unused private class members
+ *
+ * @link https://typescript-eslint.io/rules/no-unused-private-class-members
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | requiresTypeChecking | false   |
+ *  ```
+ */
+namespace NoUnusedPrivateClassMembers {
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -7483,49 +7490,48 @@ namespace NoUnusedVars {
    * ```
    */
   export type Options =
-    | 'all'
-    | 'local'
-    | {
+    | ('all' | 'local')
+    | Readonly<{
         /** Whether to check all, some, or no arguments. */
-        readonly args?: 'after-used' | 'all' | 'none';
+        args?: 'all' | 'after-used' | 'none';
         /** Regular expressions of argument names to not check for usage. */
-        readonly argsIgnorePattern?: string;
+        argsIgnorePattern?: string;
         /** Whether to check catch block arguments. */
-        readonly caughtErrors?: 'all' | 'none';
+        caughtErrors?: 'all' | 'none';
         /**
          * Regular expressions of catch block argument names to not check for
          * usage.
          */
-        readonly caughtErrorsIgnorePattern?: string;
+        caughtErrorsIgnorePattern?: string;
         /**
          * Regular expressions of destructured array variable names to not check
          * for usage.
          */
-        readonly destructuredArrayIgnorePattern?: string;
+        destructuredArrayIgnorePattern?: string;
         /**
          * Whether to ignore classes with at least one static initialization
          * block.
          */
-        readonly ignoreClassWithStaticInitBlock?: boolean;
+        ignoreClassWithStaticInitBlock?: boolean;
         /** Whether to ignore sibling properties in `...` destructurings. */
-        readonly ignoreRestSiblings?: boolean;
+        ignoreRestSiblings?: boolean;
         /** Whether to ignore using or await using declarations. */
-        readonly ignoreUsingDeclarations?: boolean;
+        ignoreUsingDeclarations?: boolean;
         /**
          * Whether to report variables that match any of the valid ignore
          * pattern options if they have been used.
          */
-        readonly reportUsedIgnorePattern?: boolean;
+        reportUsedIgnorePattern?: boolean;
         /** Whether to check all variables or only locally-declared variables. */
-        readonly vars?: 'all' | 'local';
+        vars?: 'all' | 'local';
         /** Regular expressions of variable names to not check for usage. */
-        readonly varsIgnorePattern?: string;
-      };
+        varsIgnorePattern?: string;
+      }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7596,30 +7602,30 @@ namespace NoUseBeforeDefine {
    */
   export type Options =
     | 'nofunc'
-    | {
+    | Readonly<{
         /** Whether to ignore named exports. */
-        readonly allowNamedExports?: boolean;
+        allowNamedExports?: boolean;
         /** Whether to ignore references to class declarations. */
-        readonly classes?: boolean;
+        classes?: boolean;
         /** Whether to check references to enums. */
-        readonly enums?: boolean;
+        enums?: boolean;
         /** Whether to ignore references to function declarations. */
-        readonly functions?: boolean;
+        functions?: boolean;
         /**
          * Whether to ignore type references, such as in type annotations and
          * assertions.
          */
-        readonly ignoreTypeReferences?: boolean;
+        ignoreTypeReferences?: boolean;
         /** Whether to check references to types. */
-        readonly typedefs?: boolean;
+        typedefs?: boolean;
         /** Whether to ignore references to variables. */
-        readonly variables?: boolean;
-      };
+        variables?: boolean;
+      }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7884,37 +7890,39 @@ namespace OnlyThrowError {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Type specifiers that can be thrown. */
-    readonly allow?: readonly (
+    allow?: readonly (
       | string
-      | {
-          readonly from: 'file';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly path?: string;
-        }
-      | {
-          readonly from: 'lib';
-          readonly name: string | readonly [string, ...(readonly string[])];
-        }
-      | {
-          readonly from: 'package';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly package: string;
-        }
+      | Readonly<
+          | {
+              from: 'file';
+              name: string | readonly [string, ...string[]];
+              path?: string;
+            }
+          | {
+              from: 'lib';
+              name: string | readonly [string, ...string[]];
+            }
+          | {
+              from: 'package';
+              name: string | readonly [string, ...string[]];
+              package: string;
+            }
+        >
     )[];
     /** Whether to allow rethrowing caught values that are not `Error` objects. */
-    readonly allowRethrowing?: boolean;
+    allowRethrowing?: boolean;
     /** Whether to always allow throwing values typed as `any`. */
-    readonly allowThrowingAny?: boolean;
+    allowThrowingAny?: boolean;
     /** Whether to always allow throwing values typed as `unknown`. */
-    readonly allowThrowingUnknown?: boolean;
-  };
+    allowThrowingUnknown?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -7974,25 +7982,25 @@ namespace ParameterProperties {
    * ```
    */
   export type Modifier =
-    | 'private readonly'
+    | 'readonly'
     | 'private'
-    | 'protected readonly'
     | 'protected'
-    | 'public readonly'
     | 'public'
-    | 'readonly';
+    | 'private readonly'
+    | 'protected readonly'
+    | 'public readonly';
 
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow certain kinds of properties to be ignored. */
-    readonly allow?: readonly Modifier[];
+    allow?: readonly Modifier[];
     /** Whether to prefer class properties or parameter properties. */
-    readonly prefer?: 'class-property' | 'parameter-property';
-  };
+    prefer?: 'class-property' | 'parameter-property';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -8097,40 +8105,41 @@ namespace PreferDestructuring {
    * ]
    * ```
    */
-  export type Options0 =
+  export type Options0 = Readonly<
     | {
-        readonly array?: boolean;
-        readonly object?: boolean;
+        AssignmentExpression?: Readonly<{
+          array?: boolean;
+          object?: boolean;
+        }>;
+        VariableDeclarator?: Readonly<{
+          array?: boolean;
+          object?: boolean;
+        }>;
       }
     | {
-        readonly AssignmentExpression?: {
-          readonly array?: boolean;
-          readonly object?: boolean;
-        };
-        readonly VariableDeclarator?: {
-          readonly array?: boolean;
-          readonly object?: boolean;
-        };
-      };
+        array?: boolean;
+        object?: boolean;
+      }
+  >;
 
-  export type Options1 = {
+  export type Options1 = Readonly<{
     /**
      * Whether to enforce destructuring on variable declarations with type
      * annotations.
      */
-    readonly enforceForDeclarationWithTypeAnnotation?: boolean;
+    enforceForDeclarationWithTypeAnnotation?: boolean;
     /**
      * Whether to enforce destructuring that use a different variable name than
      * the property name.
      */
-    readonly enforceForRenamedProperties?: boolean;
-  };
+    enforceForRenamedProperties?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | readonly [Linter.StringSeverity, Options0, Options1]
     | readonly [Linter.StringSeverity, Options0]
-    | 'off';
+    | readonly [Linter.StringSeverity, Options0, Options1];
 }
 
 /**
@@ -8257,15 +8266,15 @@ namespace PreferLiteralEnumMember {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow using bitwise expressions in enum initializers. */
-    readonly allowBitwiseExpressions?: boolean;
-  };
+    allowBitwiseExpressions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -8377,54 +8386,54 @@ namespace PreferNullishCoalescing {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Unless this is set to `true`, the rule will error on every file whose
      * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
      * (or `strict`) set to `true`.
      */
-    readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+    allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
     /** Whether to ignore arguments to the `Boolean` constructor */
-    readonly ignoreBooleanCoercion?: boolean;
+    ignoreBooleanCoercion?: boolean;
     /** Whether to ignore cases that are located within a conditional test. */
-    readonly ignoreConditionalTests?: boolean;
+    ignoreConditionalTests?: boolean;
     /**
      * Whether to ignore any if statements that could be simplified by using the
      * nullish coalescing operator.
      */
-    readonly ignoreIfStatements?: boolean;
+    ignoreIfStatements?: boolean;
     /**
      * Whether to ignore any logical or expressions that are part of a mixed
      * logical expression (with `&&`).
      */
-    readonly ignoreMixedLogicalExpressions?: boolean;
+    ignoreMixedLogicalExpressions?: boolean;
     /**
      * Whether to ignore all (`true`) or some (an object with properties)
      * primitive types.
      */
-    readonly ignorePrimitives?:
-      | true
-      | {
+    ignorePrimitives?:
+      | Readonly<{
           /** Ignore bigint primitive types. */
-          readonly bigint?: boolean;
+          bigint?: boolean;
           /** Ignore boolean primitive types. */
-          readonly boolean?: boolean;
+          boolean?: boolean;
           /** Ignore number primitive types. */
-          readonly number?: boolean;
+          number?: boolean;
           /** Ignore string primitive types. */
-          readonly string?: boolean;
-        };
+          string?: boolean;
+        }>
+      | true;
     /**
      * Whether to ignore any ternary expressions that could be simplified by
      * using the nullish coalescing operator.
      */
-    readonly ignoreTernaryTests?: boolean;
-  };
+    ignoreTernaryTests?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -8491,53 +8500,53 @@ namespace PreferOptionalChain {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Allow autofixers that will change the return type of the expression. This
      * option is considered unsafe as it may break the build.
      */
-    readonly allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing?: boolean;
+    allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing?: boolean;
     /**
      * Check operands that are typed as `any` when inspecting "loose boolean"
      * operands.
      */
-    readonly checkAny?: boolean;
+    checkAny?: boolean;
     /**
      * Check operands that are typed as `bigint` when inspecting "loose boolean"
      * operands.
      */
-    readonly checkBigInt?: boolean;
+    checkBigInt?: boolean;
     /**
      * Check operands that are typed as `boolean` when inspecting "loose
      * boolean" operands.
      */
-    readonly checkBoolean?: boolean;
+    checkBoolean?: boolean;
     /**
      * Check operands that are typed as `number` when inspecting "loose boolean"
      * operands.
      */
-    readonly checkNumber?: boolean;
+    checkNumber?: boolean;
     /**
      * Check operands that are typed as `string` when inspecting "loose boolean"
      * operands.
      */
-    readonly checkString?: boolean;
+    checkString?: boolean;
     /**
      * Check operands that are typed as `unknown` when inspecting "loose
      * boolean" operands.
      */
-    readonly checkUnknown?: boolean;
+    checkUnknown?: boolean;
     /**
      * Skip operands that are not typed with `null` and/or `undefined` when
      * inspecting "loose boolean" operands.
      */
-    readonly requireNullish?: boolean;
-  };
+    requireNullish?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -8581,19 +8590,19 @@ namespace PreferPromiseRejectErrors {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow calls to `Promise.reject()` with no arguments. */
-    readonly allowEmptyReject?: boolean;
+    allowEmptyReject?: boolean;
     /** Whether to always allow throwing values typed as `any`. */
-    readonly allowThrowingAny?: boolean;
+    allowThrowingAny?: boolean;
     /** Whether to always allow throwing values typed as `unknown`. */
-    readonly allowThrowingUnknown?: boolean;
-  };
+    allowThrowingUnknown?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -8630,18 +8639,18 @@ namespace PreferReadonly {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether to restrict checking only to members immediately assigned a
      * lambda value.
      */
-    readonly onlyInlineLambdas?: boolean;
-  };
+    onlyInlineLambdas?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -8796,37 +8805,39 @@ namespace PreferReadonlyParameterTypes {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** An array of type specifiers to ignore. */
-    readonly allow?: readonly (
+    allow?: readonly (
       | string
-      | {
-          readonly from: 'file';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly path?: string;
-        }
-      | {
-          readonly from: 'lib';
-          readonly name: string | readonly [string, ...(readonly string[])];
-        }
-      | {
-          readonly from: 'package';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly package: string;
-        }
+      | Readonly<
+          | {
+              from: 'file';
+              name: string | readonly [string, ...string[]];
+              path?: string;
+            }
+          | {
+              from: 'lib';
+              name: string | readonly [string, ...string[]];
+            }
+          | {
+              from: 'package';
+              name: string | readonly [string, ...string[]];
+              package: string;
+            }
+        >
     )[];
     /** Whether to check class parameter properties. */
-    readonly checkParameterProperties?: boolean;
+    checkParameterProperties?: boolean;
     /** Whether to ignore parameters which don't explicitly specify a type. */
-    readonly ignoreInferredTypes?: boolean;
+    ignoreInferredTypes?: boolean;
     /** Whether to treat all mutable methods as though they are readonly. */
-    readonly treatMethodsAsReadonly?: boolean;
-  };
+    treatMethodsAsReadonly?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -8926,18 +8937,18 @@ namespace PreferStringStartsEndsWith {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether to allow equality checks against the first or last element of a
      * string.
      */
-    readonly allowSingleElementEquality?: 'always' | 'never';
-  };
+    allowSingleElementEquality?: 'always' | 'never';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9013,25 +9024,25 @@ namespace PromiseFunctionAsync {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to consider `any` and `unknown` to be Promises. */
-    readonly allowAny?: boolean;
+    allowAny?: boolean;
     /** Any extra names of classes or interfaces to be considered Promises. */
-    readonly allowedPromiseNames?: readonly string[];
+    allowedPromiseNames?: readonly string[];
     /** Whether to check arrow functions. */
-    readonly checkArrowFunctions?: boolean;
+    checkArrowFunctions?: boolean;
     /** Whether to check standalone function declarations. */
-    readonly checkFunctionDeclarations?: boolean;
+    checkFunctionDeclarations?: boolean;
     /** Whether to check inline function expressions */
-    readonly checkFunctionExpressions?: boolean;
+    checkFunctionExpressions?: boolean;
     /** Whether to check methods on classes and object literals. */
-    readonly checkMethodDeclarations?: boolean;
-  };
+    checkMethodDeclarations?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9086,15 +9097,15 @@ namespace RequireArraySortCompare {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to ignore arrays in which all elements are strings. */
-    readonly ignoreStringArrays?: boolean;
-  };
+    ignoreStringArrays?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9170,28 +9181,28 @@ namespace RestrictPlusOperands {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow `any` typed values. */
-    readonly allowAny?: boolean;
+    allowAny?: boolean;
     /** Whether to allow `boolean` typed values. */
-    readonly allowBoolean?: boolean;
+    allowBoolean?: boolean;
     /** Whether to allow potentially `null` or `undefined` typed values. */
-    readonly allowNullish?: boolean;
+    allowNullish?: boolean;
     /**
      * Whether to allow `bigint`/`number` typed values and `string` typed values
      * to be added together.
      */
-    readonly allowNumberAndString?: boolean;
+    allowNumberAndString?: boolean;
     /** Whether to allow `regexp` typed values. */
-    readonly allowRegExp?: boolean;
+    allowRegExp?: boolean;
     /** Whether to skip compound assignments such as `+=`. */
-    readonly skipCompoundAssignments?: boolean;
-  };
+    skipCompoundAssignments?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9361,45 +9372,47 @@ namespace RestrictTemplateExpressions {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow `any` typed values in template expressions. */
-    readonly allowAny?: boolean;
+    allowAny?: boolean;
     /** Whether to allow `array` typed values in template expressions. */
-    readonly allowArray?: boolean;
+    allowArray?: boolean;
     /** Whether to allow `boolean` typed values in template expressions. */
-    readonly allowBoolean?: boolean;
+    allowBoolean?: boolean;
     /** Whether to allow `nullish` typed values in template expressions. */
-    readonly allowNullish?: boolean;
+    allowNullish?: boolean;
     /** Whether to allow `number` typed values in template expressions. */
-    readonly allowNumber?: boolean;
+    allowNumber?: boolean;
     /** Whether to allow `regexp` typed values in template expressions. */
-    readonly allowRegExp?: boolean;
+    allowRegExp?: boolean;
     /** Whether to allow `never` typed values in template expressions. */
-    readonly allowNever?: boolean;
+    allowNever?: boolean;
     /** Types to allow in template expressions. */
-    readonly allow?: readonly (
+    allow?: readonly (
       | string
-      | {
-          readonly from: 'file';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly path?: string;
-        }
-      | {
-          readonly from: 'lib';
-          readonly name: string | readonly [string, ...(readonly string[])];
-        }
-      | {
-          readonly from: 'package';
-          readonly name: string | readonly [string, ...(readonly string[])];
-          readonly package: string;
-        }
+      | Readonly<
+          | {
+              from: 'file';
+              name: string | readonly [string, ...string[]];
+              path?: string;
+            }
+          | {
+              from: 'lib';
+              name: string | readonly [string, ...string[]];
+            }
+          | {
+              from: 'package';
+              name: string | readonly [string, ...string[]];
+              package: string;
+            }
+        >
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9466,9 +9479,9 @@ namespace ReturnAwait {
     | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9601,38 +9614,38 @@ namespace StrictBooleanExpressions {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to allow `any`s in a boolean context. */
-    readonly allowAny?: boolean;
+    allowAny?: boolean;
     /** Whether to allow nullable `boolean`s in a boolean context. */
-    readonly allowNullableBoolean?: boolean;
+    allowNullableBoolean?: boolean;
     /** Whether to allow nullable `enum`s in a boolean context. */
-    readonly allowNullableEnum?: boolean;
+    allowNullableEnum?: boolean;
     /** Whether to allow nullable `number`s in a boolean context. */
-    readonly allowNullableNumber?: boolean;
+    allowNullableNumber?: boolean;
     /**
      * Whether to allow nullable `object`s, `symbol`s, and functions in a
      * boolean context.
      */
-    readonly allowNullableObject?: boolean;
+    allowNullableObject?: boolean;
     /** Whether to allow nullable `string`s in a boolean context. */
-    readonly allowNullableString?: boolean;
+    allowNullableString?: boolean;
     /** Whether to allow `number`s in a boolean context. */
-    readonly allowNumber?: boolean;
+    allowNumber?: boolean;
     /**
      * Unless this is set to `true`, the rule will error on every file whose
      * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
      * (or `strict`) set to `true`.
      */
-    readonly allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+    allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
     /** Whether to allow `string`s in a boolean context. */
-    readonly allowString?: boolean;
-  };
+    allowString?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9680,30 +9693,30 @@ namespace SwitchExhaustivenessCheck {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * If 'true', allow 'default' cases on switch statements with exhaustive
      * cases.
      */
-    readonly allowDefaultCaseForExhaustiveSwitch?: boolean;
+    allowDefaultCaseForExhaustiveSwitch?: boolean;
     /**
      * If 'true', the 'default' clause is used to determine whether the switch
      * statement is exhaustive for union type
      */
-    readonly considerDefaultExhaustiveForUnions?: boolean;
+    considerDefaultExhaustiveForUnions?: boolean;
     /**
      * Regular expression for a comment that can indicate an intentionally
      * omitted default case.
      */
-    readonly defaultCaseCommentPattern?: string;
+    defaultCaseCommentPattern?: string;
     /** If 'true', require a 'default' clause for switches on non-union types. */
-    readonly requireDefaultForNonUnion?: boolean;
-  };
+    requireDefaultForNonUnion?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9760,19 +9773,19 @@ namespace TripleSlashReference {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** What to enforce for `/// <reference lib="..." />` references. */
-    readonly lib?: 'always' | 'never';
+    lib?: 'always' | 'never';
     /** What to enforce for `/// <reference path="..." />` references. */
-    readonly path?: 'always' | 'never';
+    path?: 'always' | 'never';
     /** What to enforce for `/// <reference types="..." />` references. */
-    readonly types?: 'always' | 'never' | 'prefer-import';
-  };
+    types?: 'always' | 'never' | 'prefer-import';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9870,15 +9883,15 @@ namespace UnboundMethod {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to skip checking whether `static` methods are correctly bound. */
-    readonly ignoreStatic?: boolean;
-  };
+    ignoreStatic?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9918,23 +9931,23 @@ namespace UnifiedSignatures {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Whether two parameters with different names at the same index should be
      * considered different even if their types are the same.
      */
-    readonly ignoreDifferentlyNamedParameters?: boolean;
+    ignoreDifferentlyNamedParameters?: boolean;
     /**
      * Whether two overloads with different JSDoc comments should be considered
      * different even if their parameter and return types are the same.
      */
-    readonly ignoreOverloadsWithDifferentJSDoc?: boolean;
-  };
+    ignoreOverloadsWithDifferentJSDoc?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -9956,214 +9969,215 @@ namespace UseUnknownInCatchCallbackVariable {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type TypeScriptEslintRules = {
-  readonly '@typescript-eslint/adjacent-overload-signatures': AdjacentOverloadSignatures.RuleEntry;
-  readonly '@typescript-eslint/array-type': ArrayType.RuleEntry;
-  readonly '@typescript-eslint/await-thenable': AwaitThenable.RuleEntry;
-  readonly '@typescript-eslint/ban-ts-comment': BanTsComment.RuleEntry;
-  readonly '@typescript-eslint/ban-tslint-comment': BanTslintComment.RuleEntry;
-  readonly '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.RuleEntry;
-  readonly '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.RuleEntry;
-  readonly '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.RuleEntry;
-  readonly '@typescript-eslint/consistent-indexed-object-style': ConsistentIndexedObjectStyle.RuleEntry;
-  readonly '@typescript-eslint/consistent-return': ConsistentReturn.RuleEntry;
-  readonly '@typescript-eslint/consistent-type-assertions': ConsistentTypeAssertions.RuleEntry;
-  readonly '@typescript-eslint/consistent-type-definitions': ConsistentTypeDefinitions.RuleEntry;
-  readonly '@typescript-eslint/consistent-type-exports': ConsistentTypeExports.RuleEntry;
-  readonly '@typescript-eslint/consistent-type-imports': ConsistentTypeImports.RuleEntry;
-  readonly '@typescript-eslint/default-param-last': DefaultParamLast.RuleEntry;
-  readonly '@typescript-eslint/dot-notation': DotNotation.RuleEntry;
-  readonly '@typescript-eslint/explicit-function-return-type': ExplicitFunctionReturnType.RuleEntry;
-  readonly '@typescript-eslint/explicit-member-accessibility': ExplicitMemberAccessibility.RuleEntry;
-  readonly '@typescript-eslint/explicit-module-boundary-types': ExplicitModuleBoundaryTypes.RuleEntry;
-  readonly '@typescript-eslint/init-declarations': InitDeclarations.RuleEntry;
-  readonly '@typescript-eslint/max-params': MaxParams.RuleEntry;
-  readonly '@typescript-eslint/member-ordering': MemberOrdering.RuleEntry;
-  readonly '@typescript-eslint/method-signature-style': MethodSignatureStyle.RuleEntry;
-  readonly '@typescript-eslint/naming-convention': NamingConvention.RuleEntry;
-  readonly '@typescript-eslint/no-array-constructor': NoArrayConstructor.RuleEntry;
-  readonly '@typescript-eslint/no-array-delete': NoArrayDelete.RuleEntry;
-  readonly '@typescript-eslint/no-base-to-string': NoBaseToString.RuleEntry;
-  readonly '@typescript-eslint/no-confusing-non-null-assertion': NoConfusingNonNullAssertion.RuleEntry;
-  readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.RuleEntry;
-  readonly '@typescript-eslint/no-deprecated': NoDeprecated.RuleEntry;
-  readonly '@typescript-eslint/no-dupe-class-members': NoDupeClassMembers.RuleEntry;
-  readonly '@typescript-eslint/no-duplicate-enum-values': NoDuplicateEnumValues.RuleEntry;
-  readonly '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.RuleEntry;
-  readonly '@typescript-eslint/no-dynamic-delete': NoDynamicDelete.RuleEntry;
-  readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.RuleEntry;
-  readonly '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.RuleEntry;
-  readonly '@typescript-eslint/no-explicit-any': NoExplicitAny.RuleEntry;
-  readonly '@typescript-eslint/no-extra-non-null-assertion': NoExtraNonNullAssertion.RuleEntry;
-  readonly '@typescript-eslint/no-extraneous-class': NoExtraneousClass.RuleEntry;
-  readonly '@typescript-eslint/no-floating-promises': NoFloatingPromises.RuleEntry;
-  readonly '@typescript-eslint/no-for-in-array': NoForInArray.RuleEntry;
-  readonly '@typescript-eslint/no-implied-eval': NoImpliedEval.RuleEntry;
-  readonly '@typescript-eslint/no-import-type-side-effects': NoImportTypeSideEffects.RuleEntry;
-  readonly '@typescript-eslint/no-inferrable-types': NoInferrableTypes.RuleEntry;
-  readonly '@typescript-eslint/no-invalid-this': NoInvalidThis.RuleEntry;
-  readonly '@typescript-eslint/no-invalid-void-type': NoInvalidVoidType.RuleEntry;
-  readonly '@typescript-eslint/no-loop-func': NoLoopFunc.RuleEntry;
-  readonly '@typescript-eslint/no-magic-numbers': NoMagicNumbers.RuleEntry;
-  readonly '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.RuleEntry;
-  readonly '@typescript-eslint/no-misused-new': NoMisusedNew.RuleEntry;
-  readonly '@typescript-eslint/no-misused-promises': NoMisusedPromises.RuleEntry;
-  readonly '@typescript-eslint/no-misused-spread': NoMisusedSpread.RuleEntry;
-  readonly '@typescript-eslint/no-mixed-enums': NoMixedEnums.RuleEntry;
-  readonly '@typescript-eslint/no-namespace': NoNamespace.RuleEntry;
-  readonly '@typescript-eslint/no-non-null-asserted-nullish-coalescing': NoNonNullAssertedNullishCoalescing.RuleEntry;
-  readonly '@typescript-eslint/no-non-null-asserted-optional-chain': NoNonNullAssertedOptionalChain.RuleEntry;
-  readonly '@typescript-eslint/no-non-null-assertion': NoNonNullAssertion.RuleEntry;
-  readonly '@typescript-eslint/no-redeclare': NoRedeclare.RuleEntry;
-  readonly '@typescript-eslint/no-redundant-type-constituents': NoRedundantTypeConstituents.RuleEntry;
-  readonly '@typescript-eslint/no-require-imports': NoRequireImports.RuleEntry;
-  readonly '@typescript-eslint/no-restricted-imports': NoRestrictedImports.RuleEntry;
-  readonly '@typescript-eslint/no-restricted-types': NoRestrictedTypes.RuleEntry;
-  readonly '@typescript-eslint/no-shadow': NoShadow.RuleEntry;
-  readonly '@typescript-eslint/no-this-alias': NoThisAlias.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-condition': NoUnnecessaryCondition.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-parameter-property-assignment': NoUnnecessaryParameterPropertyAssignment.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-qualifier': NoUnnecessaryQualifier.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-template-expression': NoUnnecessaryTemplateExpression.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-type-arguments': NoUnnecessaryTypeArguments.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-type-assertion': NoUnnecessaryTypeAssertion.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-type-constraint': NoUnnecessaryTypeConstraint.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-type-conversion': NoUnnecessaryTypeConversion.RuleEntry;
-  readonly '@typescript-eslint/no-unnecessary-type-parameters': NoUnnecessaryTypeParameters.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-argument': NoUnsafeArgument.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-assignment': NoUnsafeAssignment.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-call': NoUnsafeCall.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-declaration-merging': NoUnsafeDeclarationMerging.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-enum-comparison': NoUnsafeEnumComparison.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-function-type': NoUnsafeFunctionType.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-return': NoUnsafeReturn.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-type-assertion': NoUnsafeTypeAssertion.RuleEntry;
-  readonly '@typescript-eslint/no-unsafe-unary-minus': NoUnsafeUnaryMinus.RuleEntry;
-  readonly '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.RuleEntry;
-  readonly '@typescript-eslint/no-unused-vars': NoUnusedVars.RuleEntry;
-  readonly '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.RuleEntry;
-  readonly '@typescript-eslint/no-useless-constructor': NoUselessConstructor.RuleEntry;
-  readonly '@typescript-eslint/no-useless-empty-export': NoUselessEmptyExport.RuleEntry;
-  readonly '@typescript-eslint/no-wrapper-object-types': NoWrapperObjectTypes.RuleEntry;
-  readonly '@typescript-eslint/non-nullable-type-assertion-style': NonNullableTypeAssertionStyle.RuleEntry;
-  readonly '@typescript-eslint/only-throw-error': OnlyThrowError.RuleEntry;
-  readonly '@typescript-eslint/parameter-properties': ParameterProperties.RuleEntry;
-  readonly '@typescript-eslint/prefer-as-const': PreferAsConst.RuleEntry;
-  readonly '@typescript-eslint/prefer-destructuring': PreferDestructuring.RuleEntry;
-  readonly '@typescript-eslint/prefer-enum-initializers': PreferEnumInitializers.RuleEntry;
-  readonly '@typescript-eslint/prefer-find': PreferFind.RuleEntry;
-  readonly '@typescript-eslint/prefer-for-of': PreferForOf.RuleEntry;
-  readonly '@typescript-eslint/prefer-function-type': PreferFunctionType.RuleEntry;
-  readonly '@typescript-eslint/prefer-includes': PreferIncludes.RuleEntry;
-  readonly '@typescript-eslint/prefer-literal-enum-member': PreferLiteralEnumMember.RuleEntry;
-  readonly '@typescript-eslint/prefer-namespace-keyword': PreferNamespaceKeyword.RuleEntry;
-  readonly '@typescript-eslint/prefer-nullish-coalescing': PreferNullishCoalescing.RuleEntry;
-  readonly '@typescript-eslint/prefer-optional-chain': PreferOptionalChain.RuleEntry;
-  readonly '@typescript-eslint/prefer-promise-reject-errors': PreferPromiseRejectErrors.RuleEntry;
-  readonly '@typescript-eslint/prefer-readonly': PreferReadonly.RuleEntry;
-  readonly '@typescript-eslint/prefer-readonly-parameter-types': PreferReadonlyParameterTypes.RuleEntry;
-  readonly '@typescript-eslint/prefer-reduce-type-parameter': PreferReduceTypeParameter.RuleEntry;
-  readonly '@typescript-eslint/prefer-regexp-exec': PreferRegexpExec.RuleEntry;
-  readonly '@typescript-eslint/prefer-return-this-type': PreferReturnThisType.RuleEntry;
-  readonly '@typescript-eslint/prefer-string-starts-ends-with': PreferStringStartsEndsWith.RuleEntry;
-  readonly '@typescript-eslint/promise-function-async': PromiseFunctionAsync.RuleEntry;
-  readonly '@typescript-eslint/related-getter-setter-pairs': RelatedGetterSetterPairs.RuleEntry;
-  readonly '@typescript-eslint/require-array-sort-compare': RequireArraySortCompare.RuleEntry;
-  readonly '@typescript-eslint/require-await': RequireAwait.RuleEntry;
-  readonly '@typescript-eslint/restrict-plus-operands': RestrictPlusOperands.RuleEntry;
-  readonly '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.RuleEntry;
-  readonly '@typescript-eslint/return-await': ReturnAwait.RuleEntry;
-  readonly '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.RuleEntry;
-  readonly '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.RuleEntry;
-  readonly '@typescript-eslint/triple-slash-reference': TripleSlashReference.RuleEntry;
-  readonly '@typescript-eslint/unbound-method': UnboundMethod.RuleEntry;
-  readonly '@typescript-eslint/unified-signatures': UnifiedSignatures.RuleEntry;
-  readonly '@typescript-eslint/use-unknown-in-catch-callback-variable': UseUnknownInCatchCallbackVariable.RuleEntry;
+export type TypeScriptEslintRules = Readonly<{
+  '@typescript-eslint/adjacent-overload-signatures': AdjacentOverloadSignatures.RuleEntry;
+  '@typescript-eslint/array-type': ArrayType.RuleEntry;
+  '@typescript-eslint/await-thenable': AwaitThenable.RuleEntry;
+  '@typescript-eslint/ban-ts-comment': BanTsComment.RuleEntry;
+  '@typescript-eslint/ban-tslint-comment': BanTslintComment.RuleEntry;
+  '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.RuleEntry;
+  '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.RuleEntry;
+  '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.RuleEntry;
+  '@typescript-eslint/consistent-indexed-object-style': ConsistentIndexedObjectStyle.RuleEntry;
+  '@typescript-eslint/consistent-return': ConsistentReturn.RuleEntry;
+  '@typescript-eslint/consistent-type-assertions': ConsistentTypeAssertions.RuleEntry;
+  '@typescript-eslint/consistent-type-definitions': ConsistentTypeDefinitions.RuleEntry;
+  '@typescript-eslint/consistent-type-exports': ConsistentTypeExports.RuleEntry;
+  '@typescript-eslint/consistent-type-imports': ConsistentTypeImports.RuleEntry;
+  '@typescript-eslint/default-param-last': DefaultParamLast.RuleEntry;
+  '@typescript-eslint/dot-notation': DotNotation.RuleEntry;
+  '@typescript-eslint/explicit-function-return-type': ExplicitFunctionReturnType.RuleEntry;
+  '@typescript-eslint/explicit-member-accessibility': ExplicitMemberAccessibility.RuleEntry;
+  '@typescript-eslint/explicit-module-boundary-types': ExplicitModuleBoundaryTypes.RuleEntry;
+  '@typescript-eslint/init-declarations': InitDeclarations.RuleEntry;
+  '@typescript-eslint/max-params': MaxParams.RuleEntry;
+  '@typescript-eslint/member-ordering': MemberOrdering.RuleEntry;
+  '@typescript-eslint/method-signature-style': MethodSignatureStyle.RuleEntry;
+  '@typescript-eslint/naming-convention': NamingConvention.RuleEntry;
+  '@typescript-eslint/no-array-constructor': NoArrayConstructor.RuleEntry;
+  '@typescript-eslint/no-array-delete': NoArrayDelete.RuleEntry;
+  '@typescript-eslint/no-base-to-string': NoBaseToString.RuleEntry;
+  '@typescript-eslint/no-confusing-non-null-assertion': NoConfusingNonNullAssertion.RuleEntry;
+  '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.RuleEntry;
+  '@typescript-eslint/no-deprecated': NoDeprecated.RuleEntry;
+  '@typescript-eslint/no-dupe-class-members': NoDupeClassMembers.RuleEntry;
+  '@typescript-eslint/no-duplicate-enum-values': NoDuplicateEnumValues.RuleEntry;
+  '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.RuleEntry;
+  '@typescript-eslint/no-dynamic-delete': NoDynamicDelete.RuleEntry;
+  '@typescript-eslint/no-empty-function': NoEmptyFunction.RuleEntry;
+  '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.RuleEntry;
+  '@typescript-eslint/no-explicit-any': NoExplicitAny.RuleEntry;
+  '@typescript-eslint/no-extra-non-null-assertion': NoExtraNonNullAssertion.RuleEntry;
+  '@typescript-eslint/no-extraneous-class': NoExtraneousClass.RuleEntry;
+  '@typescript-eslint/no-floating-promises': NoFloatingPromises.RuleEntry;
+  '@typescript-eslint/no-for-in-array': NoForInArray.RuleEntry;
+  '@typescript-eslint/no-implied-eval': NoImpliedEval.RuleEntry;
+  '@typescript-eslint/no-import-type-side-effects': NoImportTypeSideEffects.RuleEntry;
+  '@typescript-eslint/no-inferrable-types': NoInferrableTypes.RuleEntry;
+  '@typescript-eslint/no-invalid-this': NoInvalidThis.RuleEntry;
+  '@typescript-eslint/no-invalid-void-type': NoInvalidVoidType.RuleEntry;
+  '@typescript-eslint/no-loop-func': NoLoopFunc.RuleEntry;
+  '@typescript-eslint/no-magic-numbers': NoMagicNumbers.RuleEntry;
+  '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.RuleEntry;
+  '@typescript-eslint/no-misused-new': NoMisusedNew.RuleEntry;
+  '@typescript-eslint/no-misused-promises': NoMisusedPromises.RuleEntry;
+  '@typescript-eslint/no-misused-spread': NoMisusedSpread.RuleEntry;
+  '@typescript-eslint/no-mixed-enums': NoMixedEnums.RuleEntry;
+  '@typescript-eslint/no-namespace': NoNamespace.RuleEntry;
+  '@typescript-eslint/no-non-null-asserted-nullish-coalescing': NoNonNullAssertedNullishCoalescing.RuleEntry;
+  '@typescript-eslint/no-non-null-asserted-optional-chain': NoNonNullAssertedOptionalChain.RuleEntry;
+  '@typescript-eslint/no-non-null-assertion': NoNonNullAssertion.RuleEntry;
+  '@typescript-eslint/no-redeclare': NoRedeclare.RuleEntry;
+  '@typescript-eslint/no-redundant-type-constituents': NoRedundantTypeConstituents.RuleEntry;
+  '@typescript-eslint/no-require-imports': NoRequireImports.RuleEntry;
+  '@typescript-eslint/no-restricted-imports': NoRestrictedImports.RuleEntry;
+  '@typescript-eslint/no-restricted-types': NoRestrictedTypes.RuleEntry;
+  '@typescript-eslint/no-shadow': NoShadow.RuleEntry;
+  '@typescript-eslint/no-this-alias': NoThisAlias.RuleEntry;
+  '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.RuleEntry;
+  '@typescript-eslint/no-unnecessary-condition': NoUnnecessaryCondition.RuleEntry;
+  '@typescript-eslint/no-unnecessary-parameter-property-assignment': NoUnnecessaryParameterPropertyAssignment.RuleEntry;
+  '@typescript-eslint/no-unnecessary-qualifier': NoUnnecessaryQualifier.RuleEntry;
+  '@typescript-eslint/no-unnecessary-template-expression': NoUnnecessaryTemplateExpression.RuleEntry;
+  '@typescript-eslint/no-unnecessary-type-arguments': NoUnnecessaryTypeArguments.RuleEntry;
+  '@typescript-eslint/no-unnecessary-type-assertion': NoUnnecessaryTypeAssertion.RuleEntry;
+  '@typescript-eslint/no-unnecessary-type-constraint': NoUnnecessaryTypeConstraint.RuleEntry;
+  '@typescript-eslint/no-unnecessary-type-conversion': NoUnnecessaryTypeConversion.RuleEntry;
+  '@typescript-eslint/no-unnecessary-type-parameters': NoUnnecessaryTypeParameters.RuleEntry;
+  '@typescript-eslint/no-unsafe-argument': NoUnsafeArgument.RuleEntry;
+  '@typescript-eslint/no-unsafe-assignment': NoUnsafeAssignment.RuleEntry;
+  '@typescript-eslint/no-unsafe-call': NoUnsafeCall.RuleEntry;
+  '@typescript-eslint/no-unsafe-declaration-merging': NoUnsafeDeclarationMerging.RuleEntry;
+  '@typescript-eslint/no-unsafe-enum-comparison': NoUnsafeEnumComparison.RuleEntry;
+  '@typescript-eslint/no-unsafe-function-type': NoUnsafeFunctionType.RuleEntry;
+  '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.RuleEntry;
+  '@typescript-eslint/no-unsafe-return': NoUnsafeReturn.RuleEntry;
+  '@typescript-eslint/no-unsafe-type-assertion': NoUnsafeTypeAssertion.RuleEntry;
+  '@typescript-eslint/no-unsafe-unary-minus': NoUnsafeUnaryMinus.RuleEntry;
+  '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.RuleEntry;
+  '@typescript-eslint/no-unused-private-class-members': NoUnusedPrivateClassMembers.RuleEntry;
+  '@typescript-eslint/no-unused-vars': NoUnusedVars.RuleEntry;
+  '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.RuleEntry;
+  '@typescript-eslint/no-useless-constructor': NoUselessConstructor.RuleEntry;
+  '@typescript-eslint/no-useless-empty-export': NoUselessEmptyExport.RuleEntry;
+  '@typescript-eslint/no-wrapper-object-types': NoWrapperObjectTypes.RuleEntry;
+  '@typescript-eslint/non-nullable-type-assertion-style': NonNullableTypeAssertionStyle.RuleEntry;
+  '@typescript-eslint/only-throw-error': OnlyThrowError.RuleEntry;
+  '@typescript-eslint/parameter-properties': ParameterProperties.RuleEntry;
+  '@typescript-eslint/prefer-as-const': PreferAsConst.RuleEntry;
+  '@typescript-eslint/prefer-destructuring': PreferDestructuring.RuleEntry;
+  '@typescript-eslint/prefer-enum-initializers': PreferEnumInitializers.RuleEntry;
+  '@typescript-eslint/prefer-find': PreferFind.RuleEntry;
+  '@typescript-eslint/prefer-for-of': PreferForOf.RuleEntry;
+  '@typescript-eslint/prefer-function-type': PreferFunctionType.RuleEntry;
+  '@typescript-eslint/prefer-includes': PreferIncludes.RuleEntry;
+  '@typescript-eslint/prefer-literal-enum-member': PreferLiteralEnumMember.RuleEntry;
+  '@typescript-eslint/prefer-namespace-keyword': PreferNamespaceKeyword.RuleEntry;
+  '@typescript-eslint/prefer-nullish-coalescing': PreferNullishCoalescing.RuleEntry;
+  '@typescript-eslint/prefer-optional-chain': PreferOptionalChain.RuleEntry;
+  '@typescript-eslint/prefer-promise-reject-errors': PreferPromiseRejectErrors.RuleEntry;
+  '@typescript-eslint/prefer-readonly': PreferReadonly.RuleEntry;
+  '@typescript-eslint/prefer-readonly-parameter-types': PreferReadonlyParameterTypes.RuleEntry;
+  '@typescript-eslint/prefer-reduce-type-parameter': PreferReduceTypeParameter.RuleEntry;
+  '@typescript-eslint/prefer-regexp-exec': PreferRegexpExec.RuleEntry;
+  '@typescript-eslint/prefer-return-this-type': PreferReturnThisType.RuleEntry;
+  '@typescript-eslint/prefer-string-starts-ends-with': PreferStringStartsEndsWith.RuleEntry;
+  '@typescript-eslint/promise-function-async': PromiseFunctionAsync.RuleEntry;
+  '@typescript-eslint/related-getter-setter-pairs': RelatedGetterSetterPairs.RuleEntry;
+  '@typescript-eslint/require-array-sort-compare': RequireArraySortCompare.RuleEntry;
+  '@typescript-eslint/require-await': RequireAwait.RuleEntry;
+  '@typescript-eslint/restrict-plus-operands': RestrictPlusOperands.RuleEntry;
+  '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.RuleEntry;
+  '@typescript-eslint/return-await': ReturnAwait.RuleEntry;
+  '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.RuleEntry;
+  '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.RuleEntry;
+  '@typescript-eslint/triple-slash-reference': TripleSlashReference.RuleEntry;
+  '@typescript-eslint/unbound-method': UnboundMethod.RuleEntry;
+  '@typescript-eslint/unified-signatures': UnifiedSignatures.RuleEntry;
+  '@typescript-eslint/use-unknown-in-catch-callback-variable': UseUnknownInCatchCallbackVariable.RuleEntry;
 
   // deprecated
-  readonly '@typescript-eslint/no-empty-interface': NoEmptyInterface.RuleEntry;
-  readonly '@typescript-eslint/no-loss-of-precision': NoLossOfPrecision.RuleEntry;
-  readonly '@typescript-eslint/no-type-alias': NoTypeAlias.RuleEntry;
-  readonly '@typescript-eslint/no-var-requires': NoVarRequires.RuleEntry;
-  readonly '@typescript-eslint/prefer-ts-expect-error': PreferTsExpectError.RuleEntry;
-  readonly '@typescript-eslint/sort-type-constituents': SortTypeConstituents.RuleEntry;
-  readonly '@typescript-eslint/typedef': Typedef.RuleEntry;
-};
+  '@typescript-eslint/no-empty-interface': NoEmptyInterface.RuleEntry;
+  '@typescript-eslint/no-loss-of-precision': NoLossOfPrecision.RuleEntry;
+  '@typescript-eslint/no-type-alias': NoTypeAlias.RuleEntry;
+  '@typescript-eslint/no-var-requires': NoVarRequires.RuleEntry;
+  '@typescript-eslint/prefer-ts-expect-error': PreferTsExpectError.RuleEntry;
+  '@typescript-eslint/sort-type-constituents': SortTypeConstituents.RuleEntry;
+  '@typescript-eslint/typedef': Typedef.RuleEntry;
+}>;
 
-export type TypeScriptEslintRulesOption = {
-  readonly '@typescript-eslint/array-type': ArrayType.Options;
-  readonly '@typescript-eslint/ban-ts-comment': BanTsComment.Options;
-  readonly '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.Options;
-  readonly '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.Options;
-  readonly '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.Options;
-  readonly '@typescript-eslint/consistent-indexed-object-style': ConsistentIndexedObjectStyle.Options;
-  readonly '@typescript-eslint/consistent-return': ConsistentReturn.Options;
-  readonly '@typescript-eslint/consistent-type-assertions': ConsistentTypeAssertions.Options;
-  readonly '@typescript-eslint/consistent-type-definitions': ConsistentTypeDefinitions.Options;
-  readonly '@typescript-eslint/consistent-type-exports': ConsistentTypeExports.Options;
-  readonly '@typescript-eslint/consistent-type-imports': ConsistentTypeImports.Options;
-  readonly '@typescript-eslint/dot-notation': DotNotation.Options;
-  readonly '@typescript-eslint/explicit-function-return-type': ExplicitFunctionReturnType.Options;
-  readonly '@typescript-eslint/explicit-member-accessibility': ExplicitMemberAccessibility.Options;
-  readonly '@typescript-eslint/explicit-module-boundary-types': ExplicitModuleBoundaryTypes.Options;
-  readonly '@typescript-eslint/init-declarations': InitDeclarations.Options;
-  readonly '@typescript-eslint/max-params': MaxParams.Options;
-  readonly '@typescript-eslint/member-ordering': MemberOrdering.Options;
-  readonly '@typescript-eslint/method-signature-style': MethodSignatureStyle.Options;
-  readonly '@typescript-eslint/naming-convention': NamingConvention.Options;
-  readonly '@typescript-eslint/no-base-to-string': NoBaseToString.Options;
-  readonly '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.Options;
-  readonly '@typescript-eslint/no-deprecated': NoDeprecated.Options;
-  readonly '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.Options;
-  readonly '@typescript-eslint/no-empty-function': NoEmptyFunction.Options;
-  readonly '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.Options;
-  readonly '@typescript-eslint/no-explicit-any': NoExplicitAny.Options;
-  readonly '@typescript-eslint/no-extraneous-class': NoExtraneousClass.Options;
-  readonly '@typescript-eslint/no-floating-promises': NoFloatingPromises.Options;
-  readonly '@typescript-eslint/no-inferrable-types': NoInferrableTypes.Options;
-  readonly '@typescript-eslint/no-invalid-this': NoInvalidThis.Options;
-  readonly '@typescript-eslint/no-invalid-void-type': NoInvalidVoidType.Options;
-  readonly '@typescript-eslint/no-magic-numbers': NoMagicNumbers.Options;
-  readonly '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.Options;
-  readonly '@typescript-eslint/no-misused-promises': NoMisusedPromises.Options;
-  readonly '@typescript-eslint/no-misused-spread': NoMisusedSpread.Options;
-  readonly '@typescript-eslint/no-namespace': NoNamespace.Options;
-  readonly '@typescript-eslint/no-redeclare': NoRedeclare.Options;
-  readonly '@typescript-eslint/no-require-imports': NoRequireImports.Options;
-  readonly '@typescript-eslint/no-restricted-imports': NoRestrictedImports.Options;
-  readonly '@typescript-eslint/no-restricted-types': NoRestrictedTypes.Options;
-  readonly '@typescript-eslint/no-shadow': NoShadow.Options;
-  readonly '@typescript-eslint/no-this-alias': NoThisAlias.Options;
-  readonly '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.Options;
-  readonly '@typescript-eslint/no-unnecessary-condition': NoUnnecessaryCondition.Options;
-  readonly '@typescript-eslint/no-unnecessary-type-assertion': NoUnnecessaryTypeAssertion.Options;
-  readonly '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.Options;
-  readonly '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.Options;
-  readonly '@typescript-eslint/no-unused-vars': NoUnusedVars.Options;
-  readonly '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.Options;
-  readonly '@typescript-eslint/only-throw-error': OnlyThrowError.Options;
-  readonly '@typescript-eslint/parameter-properties': ParameterProperties.Options;
-  readonly '@typescript-eslint/prefer-destructuring': readonly [
+export type TypeScriptEslintRulesOption = Readonly<{
+  '@typescript-eslint/array-type': ArrayType.Options;
+  '@typescript-eslint/ban-ts-comment': BanTsComment.Options;
+  '@typescript-eslint/class-literal-property-style': ClassLiteralPropertyStyle.Options;
+  '@typescript-eslint/class-methods-use-this': ClassMethodsUseThis.Options;
+  '@typescript-eslint/consistent-generic-constructors': ConsistentGenericConstructors.Options;
+  '@typescript-eslint/consistent-indexed-object-style': ConsistentIndexedObjectStyle.Options;
+  '@typescript-eslint/consistent-return': ConsistentReturn.Options;
+  '@typescript-eslint/consistent-type-assertions': ConsistentTypeAssertions.Options;
+  '@typescript-eslint/consistent-type-definitions': ConsistentTypeDefinitions.Options;
+  '@typescript-eslint/consistent-type-exports': ConsistentTypeExports.Options;
+  '@typescript-eslint/consistent-type-imports': ConsistentTypeImports.Options;
+  '@typescript-eslint/dot-notation': DotNotation.Options;
+  '@typescript-eslint/explicit-function-return-type': ExplicitFunctionReturnType.Options;
+  '@typescript-eslint/explicit-member-accessibility': ExplicitMemberAccessibility.Options;
+  '@typescript-eslint/explicit-module-boundary-types': ExplicitModuleBoundaryTypes.Options;
+  '@typescript-eslint/init-declarations': InitDeclarations.Options;
+  '@typescript-eslint/max-params': MaxParams.Options;
+  '@typescript-eslint/member-ordering': MemberOrdering.Options;
+  '@typescript-eslint/method-signature-style': MethodSignatureStyle.Options;
+  '@typescript-eslint/naming-convention': NamingConvention.Options;
+  '@typescript-eslint/no-base-to-string': NoBaseToString.Options;
+  '@typescript-eslint/no-confusing-void-expression': NoConfusingVoidExpression.Options;
+  '@typescript-eslint/no-deprecated': NoDeprecated.Options;
+  '@typescript-eslint/no-duplicate-type-constituents': NoDuplicateTypeConstituents.Options;
+  '@typescript-eslint/no-empty-function': NoEmptyFunction.Options;
+  '@typescript-eslint/no-empty-object-type': NoEmptyObjectType.Options;
+  '@typescript-eslint/no-explicit-any': NoExplicitAny.Options;
+  '@typescript-eslint/no-extraneous-class': NoExtraneousClass.Options;
+  '@typescript-eslint/no-floating-promises': NoFloatingPromises.Options;
+  '@typescript-eslint/no-inferrable-types': NoInferrableTypes.Options;
+  '@typescript-eslint/no-invalid-this': NoInvalidThis.Options;
+  '@typescript-eslint/no-invalid-void-type': NoInvalidVoidType.Options;
+  '@typescript-eslint/no-magic-numbers': NoMagicNumbers.Options;
+  '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.Options;
+  '@typescript-eslint/no-misused-promises': NoMisusedPromises.Options;
+  '@typescript-eslint/no-misused-spread': NoMisusedSpread.Options;
+  '@typescript-eslint/no-namespace': NoNamespace.Options;
+  '@typescript-eslint/no-redeclare': NoRedeclare.Options;
+  '@typescript-eslint/no-require-imports': NoRequireImports.Options;
+  '@typescript-eslint/no-restricted-imports': NoRestrictedImports.Options;
+  '@typescript-eslint/no-restricted-types': NoRestrictedTypes.Options;
+  '@typescript-eslint/no-shadow': NoShadow.Options;
+  '@typescript-eslint/no-this-alias': NoThisAlias.Options;
+  '@typescript-eslint/no-unnecessary-boolean-literal-compare': NoUnnecessaryBooleanLiteralCompare.Options;
+  '@typescript-eslint/no-unnecessary-condition': NoUnnecessaryCondition.Options;
+  '@typescript-eslint/no-unnecessary-type-assertion': NoUnnecessaryTypeAssertion.Options;
+  '@typescript-eslint/no-unsafe-member-access': NoUnsafeMemberAccess.Options;
+  '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.Options;
+  '@typescript-eslint/no-unused-vars': NoUnusedVars.Options;
+  '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.Options;
+  '@typescript-eslint/only-throw-error': OnlyThrowError.Options;
+  '@typescript-eslint/parameter-properties': ParameterProperties.Options;
+  '@typescript-eslint/prefer-destructuring': readonly [
     PreferDestructuring.Options0,
     PreferDestructuring.Options1,
   ];
-  readonly '@typescript-eslint/prefer-literal-enum-member': PreferLiteralEnumMember.Options;
-  readonly '@typescript-eslint/prefer-nullish-coalescing': PreferNullishCoalescing.Options;
-  readonly '@typescript-eslint/prefer-optional-chain': PreferOptionalChain.Options;
-  readonly '@typescript-eslint/prefer-promise-reject-errors': PreferPromiseRejectErrors.Options;
-  readonly '@typescript-eslint/prefer-readonly': PreferReadonly.Options;
-  readonly '@typescript-eslint/prefer-readonly-parameter-types': PreferReadonlyParameterTypes.Options;
-  readonly '@typescript-eslint/prefer-string-starts-ends-with': PreferStringStartsEndsWith.Options;
-  readonly '@typescript-eslint/promise-function-async': PromiseFunctionAsync.Options;
-  readonly '@typescript-eslint/require-array-sort-compare': RequireArraySortCompare.Options;
-  readonly '@typescript-eslint/restrict-plus-operands': RestrictPlusOperands.Options;
-  readonly '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.Options;
-  readonly '@typescript-eslint/return-await': ReturnAwait.Options;
-  readonly '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.Options;
-  readonly '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.Options;
-  readonly '@typescript-eslint/triple-slash-reference': TripleSlashReference.Options;
-  readonly '@typescript-eslint/unbound-method': UnboundMethod.Options;
-  readonly '@typescript-eslint/unified-signatures': UnifiedSignatures.Options;
-};
+  '@typescript-eslint/prefer-literal-enum-member': PreferLiteralEnumMember.Options;
+  '@typescript-eslint/prefer-nullish-coalescing': PreferNullishCoalescing.Options;
+  '@typescript-eslint/prefer-optional-chain': PreferOptionalChain.Options;
+  '@typescript-eslint/prefer-promise-reject-errors': PreferPromiseRejectErrors.Options;
+  '@typescript-eslint/prefer-readonly': PreferReadonly.Options;
+  '@typescript-eslint/prefer-readonly-parameter-types': PreferReadonlyParameterTypes.Options;
+  '@typescript-eslint/prefer-string-starts-ends-with': PreferStringStartsEndsWith.Options;
+  '@typescript-eslint/promise-function-async': PromiseFunctionAsync.Options;
+  '@typescript-eslint/require-array-sort-compare': RequireArraySortCompare.Options;
+  '@typescript-eslint/restrict-plus-operands': RestrictPlusOperands.Options;
+  '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.Options;
+  '@typescript-eslint/return-await': ReturnAwait.Options;
+  '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.Options;
+  '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.Options;
+  '@typescript-eslint/triple-slash-reference': TripleSlashReference.Options;
+  '@typescript-eslint/unbound-method': UnboundMethod.Options;
+  '@typescript-eslint/unified-signatures': UnifiedSignatures.Options;
+}>;

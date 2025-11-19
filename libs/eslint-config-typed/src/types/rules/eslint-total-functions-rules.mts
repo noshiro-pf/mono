@@ -225,21 +225,21 @@ namespace RequireStrictMode {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintTotalFunctionsRules = {
-  readonly 'total-functions/no-enums': NoEnums.RuleEntry;
-  readonly 'total-functions/no-hidden-type-assertions': NoHiddenTypeAssertions.RuleEntry;
-  readonly 'total-functions/no-nested-fp-ts-effects': NoNestedFpTsEffects.RuleEntry;
-  readonly 'total-functions/no-partial-array-reduce': NoPartialArrayReduce.RuleEntry;
-  readonly 'total-functions/no-partial-division': NoPartialDivision.RuleEntry;
-  readonly 'total-functions/no-partial-string-normalize': NoPartialStringNormalize.RuleEntry;
-  readonly 'total-functions/no-partial-url-constructor': NoPartialUrlConstructor.RuleEntry;
-  readonly 'total-functions/no-premature-fp-ts-effects': NoPrematureFpTsEffects.RuleEntry;
-  readonly 'total-functions/no-unsafe-mutable-readonly-assignment': NoUnsafeMutableReadonlyAssignment.RuleEntry;
-  readonly 'total-functions/no-unsafe-readonly-mutable-assignment': NoUnsafeReadonlyMutableAssignment.RuleEntry;
-  readonly 'total-functions/no-unsafe-type-assertion': NoUnsafeTypeAssertion.RuleEntry;
-  readonly 'total-functions/require-strict-mode': RequireStrictMode.RuleEntry;
+export type EslintTotalFunctionsRules = Readonly<{
+  'total-functions/no-enums': NoEnums.RuleEntry;
+  'total-functions/no-hidden-type-assertions': NoHiddenTypeAssertions.RuleEntry;
+  'total-functions/no-nested-fp-ts-effects': NoNestedFpTsEffects.RuleEntry;
+  'total-functions/no-partial-array-reduce': NoPartialArrayReduce.RuleEntry;
+  'total-functions/no-partial-division': NoPartialDivision.RuleEntry;
+  'total-functions/no-partial-string-normalize': NoPartialStringNormalize.RuleEntry;
+  'total-functions/no-partial-url-constructor': NoPartialUrlConstructor.RuleEntry;
+  'total-functions/no-premature-fp-ts-effects': NoPrematureFpTsEffects.RuleEntry;
+  'total-functions/no-unsafe-mutable-readonly-assignment': NoUnsafeMutableReadonlyAssignment.RuleEntry;
+  'total-functions/no-unsafe-readonly-mutable-assignment': NoUnsafeReadonlyMutableAssignment.RuleEntry;
+  'total-functions/no-unsafe-type-assertion': NoUnsafeTypeAssertion.RuleEntry;
+  'total-functions/require-strict-mode': RequireStrictMode.RuleEntry;
 
   // deprecated
-  readonly 'total-functions/no-unsafe-enum-assignment': NoUnsafeEnumAssignment.RuleEntry;
-  readonly 'total-functions/no-unsafe-optional-property-assignment': NoUnsafeOptionalPropertyAssignment.RuleEntry;
-};
+  'total-functions/no-unsafe-enum-assignment': NoUnsafeEnumAssignment.RuleEntry;
+  'total-functions/no-unsafe-optional-property-assignment': NoUnsafeOptionalPropertyAssignment.RuleEntry;
+}>;

@@ -16,6 +16,6 @@ namespace NoExpectToStrictEqual {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintVitestCodingStyleRules = {
-  readonly 'vitest-coding-style/no-expect-to-strict-equal': NoExpectToStrictEqual.RuleEntry;
-};
+export type EslintVitestCodingStyleRules = Readonly<{
+  'vitest-coding-style/no-expect-to-strict-equal': NoExpectToStrictEqual.RuleEntry;
+}>;

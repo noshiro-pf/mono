@@ -49,15 +49,15 @@ namespace ConsistentTestIt {
    * ]
    * ```
    */
-  export type Options = {
-    readonly fn?: 'it' | 'test';
-    readonly withinDescribe?: 'it' | 'test';
-  };
+  export type Options = Readonly<{
+    fn?: 'it' | 'test';
+    withinDescribe?: 'it' | 'test';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -99,15 +99,15 @@ namespace ExpectExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly assertFunctionNames?: readonly string[];
-    readonly additionalTestBlockFunctions?: readonly string[];
-  };
+  export type Options = Readonly<{
+    assertFunctionNames?: readonly string[];
+    additionalTestBlockFunctions?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -141,14 +141,14 @@ namespace MaxExpects {
    * ]
    * ```
    */
-  export type Options = {
-    readonly max?: number;
-  };
+  export type Options = Readonly<{
+    max?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -182,14 +182,14 @@ namespace MaxNestedDescribe {
    * ]
    * ```
    */
-  export type Options = {
-    readonly max?: number;
-  };
+  export type Options = Readonly<{
+    max?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -408,14 +408,14 @@ namespace NoHooks {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allow?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    allow?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -506,16 +506,16 @@ namespace NoLargeSnapshots {
    * ]
    * ```
    */
-  export type Options = {
-    readonly maxSize?: number;
-    readonly inlineMaxSize?: number;
-    readonly allowedSnapshots?: Record<string, readonly unknown[]>;
-  };
+  export type Options = Readonly<{
+    maxSize?: number;
+    inlineMaxSize?: number;
+    allowedSnapshots?: Readonly<Record<string, readonly unknown[]>>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -567,9 +567,9 @@ namespace NoRestrictedJestMethods {
   export type Options = Readonly<Record<string, string | null>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -605,9 +605,9 @@ namespace NoRestrictedMatchers {
   export type Options = Readonly<Record<string, string | null>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -643,14 +643,14 @@ namespace NoStandaloneExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly additionalTestBlockFunctions?: readonly string[];
-  };
+  export type Options = Readonly<{
+    additionalTestBlockFunctions?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -927,15 +927,15 @@ namespace PreferEndingWithAnExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly assertFunctionNames?: readonly string[];
-    readonly additionalTestBlockFunctions?: readonly string[];
-  };
+  export type Options = Readonly<{
+    assertFunctionNames?: readonly string[];
+    additionalTestBlockFunctions?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -992,16 +992,16 @@ namespace PreferExpectAssertions {
    * ]
    * ```
    */
-  export type Options = {
-    readonly onlyFunctionsWithAsyncKeyword?: boolean;
-    readonly onlyFunctionsWithExpectInLoop?: boolean;
-    readonly onlyFunctionsWithExpectInCallback?: boolean;
-  };
+  export type Options = Readonly<{
+    onlyFunctionsWithAsyncKeyword?: boolean;
+    onlyFunctionsWithExpectInLoop?: boolean;
+    onlyFunctionsWithExpectInCallback?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1095,21 +1095,21 @@ namespace PreferImportingJestGlobals {
    * ]
    * ```
    */
-  export type Options = {
-    readonly types?: readonly (
-      | 'describe'
-      | 'expect'
+  export type Options = Readonly<{
+    types?: readonly (
       | 'hook'
-      | 'jest'
+      | 'describe'
       | 'test'
+      | 'expect'
+      | 'jest'
       | 'unknown'
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1184,17 +1184,19 @@ namespace PreferLowercaseTitle {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignore?: readonly ('describe' | 'it' | 'test')[];
-    readonly allowedPrefixes?: readonly string[];
-    readonly ignoreTopLevelDescribe?: boolean;
-    readonly ignoreTodos?: boolean;
-  };
+  export type Options = Readonly<{
+    ignore?: readonly ('describe' | 'test' | 'it')[];
+    allowedPrefixes?: readonly string[];
+    /** @default false */
+    ignoreTopLevelDescribe?: boolean;
+    /** @default false */
+    ignoreTodos?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1245,9 +1247,9 @@ namespace PreferSnapshotHint {
   export type Options = 'always' | 'multi';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1385,14 +1387,14 @@ namespace RequireHook {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedFunctionCalls?: readonly string[];
-  };
+  export type Options = Readonly<{
+    allowedFunctionCalls?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1442,14 +1444,14 @@ namespace RequireTopLevelDescribe {
    * ]
    * ```
    */
-  export type Options = {
-    readonly maxNumberOfTopLevelDescribes?: number;
-  };
+  export type Options = Readonly<{
+    maxNumberOfTopLevelDescribes?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1485,15 +1487,15 @@ namespace UnboundMethod {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** Whether to skip checking whether `static` methods are correctly bound. */
-    readonly ignoreStatic?: boolean;
-  };
+    ignoreStatic?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1574,17 +1576,18 @@ namespace ValidExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly alwaysAwait?: boolean;
-    readonly asyncMatchers?: readonly string[];
-    readonly minArgs?: number;
-    readonly maxArgs?: number;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    alwaysAwait?: boolean;
+    asyncMatchers?: readonly string[];
+    minArgs?: number;
+    maxArgs?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1677,108 +1680,121 @@ namespace ValidTitle {
    * ]
    * ```
    */
-  /* modified */
-  export type Options = {
-    readonly ignoreTypeOfDescribeName?: boolean;
-    readonly disallowedWords?: readonly string[];
-    readonly mustNotMatch?: MustMatchType | string;
-    readonly mustMatch?: MustMatchType | string;
-  };
+  export type MustMatchType =
+    | PatternOrPatternArray
+    | Readonly<{
+        describe?: PatternOrPatternArray;
+        test?: PatternOrPatternArray;
+        it?: PatternOrPatternArray;
+      }>;
 
-  type MustMatchType = Readonly<
-    Partial<Record<'describe' | 'it' | 'test', string>>
-  >;
+  export type PatternOrPatternArray =
+    | string
+    | readonly [string]
+    | readonly [string, string];
+
+  export type Options = Readonly<{
+    /** @default false */
+    ignoreSpaces?: boolean;
+    /** @default false */
+    ignoreTypeOfDescribeName?: boolean;
+    /** @default false */
+    ignoreTypeOfTestName?: boolean;
+    disallowedWords?: readonly string[];
+    mustMatch?: MustMatchType;
+    mustNotMatch?: MustMatchType;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintJestRules = {
-  readonly 'jest/consistent-test-it': ConsistentTestIt.RuleEntry;
-  readonly 'jest/expect-expect': ExpectExpect.RuleEntry;
-  readonly 'jest/max-expects': MaxExpects.RuleEntry;
-  readonly 'jest/max-nested-describe': MaxNestedDescribe.RuleEntry;
-  readonly 'jest/no-alias-methods': NoAliasMethods.RuleEntry;
-  readonly 'jest/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
-  readonly 'jest/no-conditional-expect': NoConditionalExpect.RuleEntry;
-  readonly 'jest/no-conditional-in-test': NoConditionalInTest.RuleEntry;
-  readonly 'jest/no-confusing-set-timeout': NoConfusingSetTimeout.RuleEntry;
-  readonly 'jest/no-deprecated-functions': NoDeprecatedFunctions.RuleEntry;
-  readonly 'jest/no-disabled-tests': NoDisabledTests.RuleEntry;
-  readonly 'jest/no-done-callback': NoDoneCallback.RuleEntry;
-  readonly 'jest/no-duplicate-hooks': NoDuplicateHooks.RuleEntry;
-  readonly 'jest/no-export': NoExport.RuleEntry;
-  readonly 'jest/no-focused-tests': NoFocusedTests.RuleEntry;
-  readonly 'jest/no-hooks': NoHooks.RuleEntry;
-  readonly 'jest/no-identical-title': NoIdenticalTitle.RuleEntry;
-  readonly 'jest/no-interpolation-in-snapshots': NoInterpolationInSnapshots.RuleEntry;
-  readonly 'jest/no-jasmine-globals': NoJasmineGlobals.RuleEntry;
-  readonly 'jest/no-large-snapshots': NoLargeSnapshots.RuleEntry;
-  readonly 'jest/no-mocks-import': NoMocksImport.RuleEntry;
-  readonly 'jest/no-restricted-jest-methods': NoRestrictedJestMethods.RuleEntry;
-  readonly 'jest/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
-  readonly 'jest/no-standalone-expect': NoStandaloneExpect.RuleEntry;
-  readonly 'jest/no-test-prefixes': NoTestPrefixes.RuleEntry;
-  readonly 'jest/no-test-return-statement': NoTestReturnStatement.RuleEntry;
-  readonly 'jest/no-untyped-mock-factory': NoUntypedMockFactory.RuleEntry;
-  readonly 'jest/padding-around-after-all-blocks': PaddingAroundAfterAllBlocks.RuleEntry;
-  readonly 'jest/padding-around-after-each-blocks': PaddingAroundAfterEachBlocks.RuleEntry;
-  readonly 'jest/padding-around-all': PaddingAroundAll.RuleEntry;
-  readonly 'jest/padding-around-before-all-blocks': PaddingAroundBeforeAllBlocks.RuleEntry;
-  readonly 'jest/padding-around-before-each-blocks': PaddingAroundBeforeEachBlocks.RuleEntry;
-  readonly 'jest/padding-around-describe-blocks': PaddingAroundDescribeBlocks.RuleEntry;
-  readonly 'jest/padding-around-expect-groups': PaddingAroundExpectGroups.RuleEntry;
-  readonly 'jest/padding-around-test-blocks': PaddingAroundTestBlocks.RuleEntry;
-  readonly 'jest/prefer-called-with': PreferCalledWith.RuleEntry;
-  readonly 'jest/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
-  readonly 'jest/prefer-each': PreferEach.RuleEntry;
-  readonly 'jest/prefer-ending-with-an-expect': PreferEndingWithAnExpect.RuleEntry;
-  readonly 'jest/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
-  readonly 'jest/prefer-expect-assertions': PreferExpectAssertions.RuleEntry;
-  readonly 'jest/prefer-expect-resolves': PreferExpectResolves.RuleEntry;
-  readonly 'jest/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
-  readonly 'jest/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
-  readonly 'jest/prefer-importing-jest-globals': PreferImportingJestGlobals.RuleEntry;
-  readonly 'jest/prefer-jest-mocked': PreferJestMocked.RuleEntry;
-  readonly 'jest/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
-  readonly 'jest/prefer-mock-promise-shorthand': PreferMockPromiseShorthand.RuleEntry;
-  readonly 'jest/prefer-snapshot-hint': PreferSnapshotHint.RuleEntry;
-  readonly 'jest/prefer-spy-on': PreferSpyOn.RuleEntry;
-  readonly 'jest/prefer-strict-equal': PreferStrictEqual.RuleEntry;
-  readonly 'jest/prefer-to-be': PreferToBe.RuleEntry;
-  readonly 'jest/prefer-to-contain': PreferToContain.RuleEntry;
-  readonly 'jest/prefer-to-have-length': PreferToHaveLength.RuleEntry;
-  readonly 'jest/prefer-todo': PreferTodo.RuleEntry;
-  readonly 'jest/require-hook': RequireHook.RuleEntry;
-  readonly 'jest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
-  readonly 'jest/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
-  readonly 'jest/unbound-method': UnboundMethod.RuleEntry;
-  readonly 'jest/valid-describe-callback': ValidDescribeCallback.RuleEntry;
-  readonly 'jest/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
-  readonly 'jest/valid-expect': ValidExpect.RuleEntry;
-  readonly 'jest/valid-title': ValidTitle.RuleEntry;
-};
+export type EslintJestRules = Readonly<{
+  'jest/consistent-test-it': ConsistentTestIt.RuleEntry;
+  'jest/expect-expect': ExpectExpect.RuleEntry;
+  'jest/max-expects': MaxExpects.RuleEntry;
+  'jest/max-nested-describe': MaxNestedDescribe.RuleEntry;
+  'jest/no-alias-methods': NoAliasMethods.RuleEntry;
+  'jest/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
+  'jest/no-conditional-expect': NoConditionalExpect.RuleEntry;
+  'jest/no-conditional-in-test': NoConditionalInTest.RuleEntry;
+  'jest/no-confusing-set-timeout': NoConfusingSetTimeout.RuleEntry;
+  'jest/no-deprecated-functions': NoDeprecatedFunctions.RuleEntry;
+  'jest/no-disabled-tests': NoDisabledTests.RuleEntry;
+  'jest/no-done-callback': NoDoneCallback.RuleEntry;
+  'jest/no-duplicate-hooks': NoDuplicateHooks.RuleEntry;
+  'jest/no-export': NoExport.RuleEntry;
+  'jest/no-focused-tests': NoFocusedTests.RuleEntry;
+  'jest/no-hooks': NoHooks.RuleEntry;
+  'jest/no-identical-title': NoIdenticalTitle.RuleEntry;
+  'jest/no-interpolation-in-snapshots': NoInterpolationInSnapshots.RuleEntry;
+  'jest/no-jasmine-globals': NoJasmineGlobals.RuleEntry;
+  'jest/no-large-snapshots': NoLargeSnapshots.RuleEntry;
+  'jest/no-mocks-import': NoMocksImport.RuleEntry;
+  'jest/no-restricted-jest-methods': NoRestrictedJestMethods.RuleEntry;
+  'jest/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
+  'jest/no-standalone-expect': NoStandaloneExpect.RuleEntry;
+  'jest/no-test-prefixes': NoTestPrefixes.RuleEntry;
+  'jest/no-test-return-statement': NoTestReturnStatement.RuleEntry;
+  'jest/no-untyped-mock-factory': NoUntypedMockFactory.RuleEntry;
+  'jest/padding-around-after-all-blocks': PaddingAroundAfterAllBlocks.RuleEntry;
+  'jest/padding-around-after-each-blocks': PaddingAroundAfterEachBlocks.RuleEntry;
+  'jest/padding-around-all': PaddingAroundAll.RuleEntry;
+  'jest/padding-around-before-all-blocks': PaddingAroundBeforeAllBlocks.RuleEntry;
+  'jest/padding-around-before-each-blocks': PaddingAroundBeforeEachBlocks.RuleEntry;
+  'jest/padding-around-describe-blocks': PaddingAroundDescribeBlocks.RuleEntry;
+  'jest/padding-around-expect-groups': PaddingAroundExpectGroups.RuleEntry;
+  'jest/padding-around-test-blocks': PaddingAroundTestBlocks.RuleEntry;
+  'jest/prefer-called-with': PreferCalledWith.RuleEntry;
+  'jest/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
+  'jest/prefer-each': PreferEach.RuleEntry;
+  'jest/prefer-ending-with-an-expect': PreferEndingWithAnExpect.RuleEntry;
+  'jest/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
+  'jest/prefer-expect-assertions': PreferExpectAssertions.RuleEntry;
+  'jest/prefer-expect-resolves': PreferExpectResolves.RuleEntry;
+  'jest/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
+  'jest/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
+  'jest/prefer-importing-jest-globals': PreferImportingJestGlobals.RuleEntry;
+  'jest/prefer-jest-mocked': PreferJestMocked.RuleEntry;
+  'jest/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
+  'jest/prefer-mock-promise-shorthand': PreferMockPromiseShorthand.RuleEntry;
+  'jest/prefer-snapshot-hint': PreferSnapshotHint.RuleEntry;
+  'jest/prefer-spy-on': PreferSpyOn.RuleEntry;
+  'jest/prefer-strict-equal': PreferStrictEqual.RuleEntry;
+  'jest/prefer-to-be': PreferToBe.RuleEntry;
+  'jest/prefer-to-contain': PreferToContain.RuleEntry;
+  'jest/prefer-to-have-length': PreferToHaveLength.RuleEntry;
+  'jest/prefer-todo': PreferTodo.RuleEntry;
+  'jest/require-hook': RequireHook.RuleEntry;
+  'jest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
+  'jest/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
+  'jest/unbound-method': UnboundMethod.RuleEntry;
+  'jest/valid-describe-callback': ValidDescribeCallback.RuleEntry;
+  'jest/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
+  'jest/valid-expect': ValidExpect.RuleEntry;
+  'jest/valid-title': ValidTitle.RuleEntry;
+}>;
 
-export type EslintJestRulesOption = {
-  readonly 'jest/consistent-test-it': ConsistentTestIt.Options;
-  readonly 'jest/expect-expect': ExpectExpect.Options;
-  readonly 'jest/max-expects': MaxExpects.Options;
-  readonly 'jest/max-nested-describe': MaxNestedDescribe.Options;
-  readonly 'jest/no-hooks': NoHooks.Options;
-  readonly 'jest/no-large-snapshots': NoLargeSnapshots.Options;
-  readonly 'jest/no-restricted-jest-methods': NoRestrictedJestMethods.Options;
-  readonly 'jest/no-restricted-matchers': NoRestrictedMatchers.Options;
-  readonly 'jest/no-standalone-expect': NoStandaloneExpect.Options;
-  readonly 'jest/prefer-ending-with-an-expect': PreferEndingWithAnExpect.Options;
-  readonly 'jest/prefer-expect-assertions': PreferExpectAssertions.Options;
-  readonly 'jest/prefer-importing-jest-globals': PreferImportingJestGlobals.Options;
-  readonly 'jest/prefer-lowercase-title': PreferLowercaseTitle.Options;
-  readonly 'jest/prefer-snapshot-hint': PreferSnapshotHint.Options;
-  readonly 'jest/require-hook': RequireHook.Options;
-  readonly 'jest/require-top-level-describe': RequireTopLevelDescribe.Options;
-  readonly 'jest/unbound-method': UnboundMethod.Options;
-  readonly 'jest/valid-expect': ValidExpect.Options;
-  readonly 'jest/valid-title': ValidTitle.Options;
-};
+export type EslintJestRulesOption = Readonly<{
+  'jest/consistent-test-it': ConsistentTestIt.Options;
+  'jest/expect-expect': ExpectExpect.Options;
+  'jest/max-expects': MaxExpects.Options;
+  'jest/max-nested-describe': MaxNestedDescribe.Options;
+  'jest/no-hooks': NoHooks.Options;
+  'jest/no-large-snapshots': NoLargeSnapshots.Options;
+  'jest/no-restricted-jest-methods': NoRestrictedJestMethods.Options;
+  'jest/no-restricted-matchers': NoRestrictedMatchers.Options;
+  'jest/no-standalone-expect': NoStandaloneExpect.Options;
+  'jest/prefer-ending-with-an-expect': PreferEndingWithAnExpect.Options;
+  'jest/prefer-expect-assertions': PreferExpectAssertions.Options;
+  'jest/prefer-importing-jest-globals': PreferImportingJestGlobals.Options;
+  'jest/prefer-lowercase-title': PreferLowercaseTitle.Options;
+  'jest/prefer-snapshot-hint': PreferSnapshotHint.Options;
+  'jest/require-hook': RequireHook.Options;
+  'jest/require-top-level-describe': RequireTopLevelDescribe.Options;
+  'jest/unbound-method': UnboundMethod.Options;
+  'jest/valid-expect': ValidExpect.Options;
+  'jest/valid-title': ValidTitle.Options;
+}>;

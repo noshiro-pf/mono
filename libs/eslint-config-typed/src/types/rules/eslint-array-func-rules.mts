@@ -99,11 +99,11 @@ namespace PreferFlat {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintArrayFuncRules = {
-  readonly 'array-func/from-map': FromMap.RuleEntry;
-  readonly 'array-func/no-unnecessary-this-arg': NoUnnecessaryThisArg.RuleEntry;
-  readonly 'array-func/prefer-array-from': PreferArrayFrom.RuleEntry;
-  readonly 'array-func/avoid-reverse': AvoidReverse.RuleEntry;
-  readonly 'array-func/prefer-flat-map': PreferFlatMap.RuleEntry;
-  readonly 'array-func/prefer-flat': PreferFlat.RuleEntry;
-};
+export type EslintArrayFuncRules = Readonly<{
+  'array-func/from-map': FromMap.RuleEntry;
+  'array-func/no-unnecessary-this-arg': NoUnnecessaryThisArg.RuleEntry;
+  'array-func/prefer-array-from': PreferArrayFrom.RuleEntry;
+  'array-func/avoid-reverse': AvoidReverse.RuleEntry;
+  'array-func/prefer-flat-map': PreferFlatMap.RuleEntry;
+  'array-func/prefer-flat': PreferFlat.RuleEntry;
+}>;

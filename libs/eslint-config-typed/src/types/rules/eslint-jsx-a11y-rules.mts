@@ -100,19 +100,19 @@ namespace AltText {
    * ]
    * ```
    */
-  export type Options = {
-    readonly elements?: readonly string[];
-    readonly img?: readonly string[];
-    readonly object?: readonly string[];
-    readonly area?: readonly string[];
-    readonly 'input[type="image"]'?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    elements?: readonly string[];
+    img?: readonly string[];
+    object?: readonly string[];
+    area?: readonly string[];
+    'input[type="image"]'?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -149,15 +149,15 @@ namespace AnchorAmbiguousText {
    * ]
    * ```
    */
-  export type Options = {
-    readonly words?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    words?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -193,15 +193,15 @@ namespace AnchorHasContent {
    * ]
    * ```
    */
-  export type Options = {
-    readonly components?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    components?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -259,21 +259,21 @@ namespace AnchorIsValid {
    * ]
    * ```
    */
-  export type Options = {
-    readonly components?: readonly string[];
-    readonly specialLink?: readonly string[];
+  export type Options = Readonly<{
+    components?: readonly string[];
+    specialLink?: readonly string[];
     /** @minItems 1 */
-    readonly aspects?: readonly [
-      'invalidHref' | 'noHref' | 'preferButton',
-      ...(readonly ('invalidHref' | 'noHref' | 'preferButton')[]),
+    aspects?: readonly [
+      'noHref' | 'invalidHref' | 'preferButton',
+      ...('noHref' | 'invalidHref' | 'preferButton')[],
     ];
-    readonly [k: string]: unknown;
-  };
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -303,9 +303,9 @@ namespace AriaActivedescendantHasTabindex {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -335,9 +335,9 @@ namespace AriaProps {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -367,9 +367,9 @@ namespace AriaProptypes {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -409,16 +409,17 @@ namespace AriaRole {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedInvalidRoles?: readonly string[];
-    readonly ignoreNonDOM?: boolean;
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    allowedInvalidRoles?: readonly string[];
+    /** @default false */
+    ignoreNonDOM?: boolean;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -449,9 +450,9 @@ namespace AriaUnsupportedElements {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -487,15 +488,15 @@ namespace AutocompleteValid {
    * ]
    * ```
    */
-  export type Options = {
-    readonly inputComponents?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    inputComponents?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -526,9 +527,9 @@ namespace ClickEventsHaveKeyEvents {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -593,20 +594,20 @@ namespace ControlHasAssociatedLabel {
    * ]
    * ```
    */
-  export type Options = {
-    readonly labelAttributes?: readonly string[];
-    readonly controlComponents?: readonly string[];
-    readonly ignoreElements?: readonly string[];
-    readonly ignoreRoles?: readonly string[];
+  export type Options = Readonly<{
+    labelAttributes?: readonly string[];
+    controlComponents?: readonly string[];
+    ignoreElements?: readonly string[];
+    ignoreRoles?: readonly string[];
     /** JSX tree depth limit to check for accessible label */
-    readonly depth?: number;
-    readonly [k: string]: unknown;
-  };
+    depth?: number;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -642,15 +643,15 @@ namespace HeadingHasContent {
    * ]
    * ```
    */
-  export type Options = {
-    readonly components?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    components?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -680,9 +681,9 @@ namespace HtmlHasLang {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -712,9 +713,9 @@ namespace IframeHasTitle {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -759,16 +760,16 @@ namespace ImgRedundantAlt {
    * ]
    * ```
    */
-  export type Options = {
-    readonly components?: readonly string[];
-    readonly words?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    components?: readonly string[];
+    words?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -842,17 +843,13 @@ namespace InteractiveSupportsFocus {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** @minItems 0 */
-    readonly tabbable?: readonly (
+    tabbable?: readonly (
       | 'button'
       | 'checkbox'
       | 'columnheader'
       | 'combobox'
-      | 'doc-backlink'
-      | 'doc-biblioref'
-      | 'doc-glossref'
-      | 'doc-noteref'
       | 'grid'
       | 'gridcell'
       | 'link'
@@ -879,14 +876,18 @@ namespace InteractiveSupportsFocus {
       | 'tree'
       | 'treegrid'
       | 'treeitem'
+      | 'doc-backlink'
+      | 'doc-biblioref'
+      | 'doc-glossref'
+      | 'doc-noteref'
     )[];
-    readonly [k: string]: unknown;
-  };
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -953,21 +954,21 @@ namespace LabelHasAssociatedControl {
    * ]
    * ```
    */
-  export type Options = {
-    readonly labelComponents?: readonly string[];
-    readonly labelAttributes?: readonly string[];
-    readonly controlComponents?: readonly string[];
+  export type Options = Readonly<{
+    labelComponents?: readonly string[];
+    labelAttributes?: readonly string[];
+    controlComponents?: readonly string[];
     /** Assert that the label has htmlFor, a nested label, both or either */
-    readonly assert?: 'both' | 'either' | 'htmlFor' | 'nesting';
+    assert?: 'htmlFor' | 'nesting' | 'both' | 'either';
     /** JSX tree depth limit to check for accessible label */
-    readonly depth?: number;
-    readonly [k: string]: unknown;
-  };
+    depth?: number;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1089,9 +1090,9 @@ namespace Lang {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1144,17 +1145,17 @@ namespace MediaHasCaption {
    * ]
    * ```
    */
-  export type Options = {
-    readonly audio?: readonly string[];
-    readonly video?: readonly string[];
-    readonly track?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    audio?: readonly string[];
+    video?: readonly string[];
+    track?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1201,18 +1202,18 @@ namespace MouseEventsHaveKeyEvents {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** An array of events that need to be accompanied by `onFocus` */
-    readonly hoverInHandlers?: readonly string[];
+    hoverInHandlers?: readonly string[];
     /** An array of events that need to be accompanied by `onBlur` */
-    readonly hoverOutHandlers?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+    hoverOutHandlers?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1243,9 +1244,9 @@ namespace NoAccessKey {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1275,9 +1276,9 @@ namespace NoAriaHiddenOnFocusable {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1309,15 +1310,16 @@ namespace NoAutofocus {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreNonDOM?: boolean;
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    ignoreNonDOM?: boolean;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1358,16 +1360,16 @@ namespace NoDistractingElements {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** @minItems 0 */
-    readonly elements?: readonly ('blink' | 'marquee')[];
-    readonly [k: string]: unknown;
-  };
+    elements?: readonly ('marquee' | 'blink')[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1403,9 +1405,9 @@ namespace NoInteractiveElementToNoninteractiveRole {
   export type Options = Readonly<Record<string, readonly string[]>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1442,15 +1444,15 @@ namespace NoNoninteractiveElementInteractions {
    * ]
    * ```
    */
-  export type Options = {
-    readonly handlers?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    handlers?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1486,9 +1488,9 @@ namespace NoNoninteractiveElementToInteractiveRole {
   export type Options = Readonly<Record<string, readonly string[]>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1534,18 +1536,18 @@ namespace NoNoninteractiveTabindex {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** An array of ARIA roles */
-    readonly roles?: readonly string[];
+    roles?: readonly string[];
     /** An array of HTML tag names */
-    readonly tags?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+    tags?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1609,9 +1611,9 @@ namespace NoRedundantRoles {
   export type Options = Readonly<Record<string, readonly string[]>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1648,15 +1650,15 @@ namespace NoStaticElementInteractions {
    * ]
    * ```
    */
-  export type Options = {
-    readonly handlers?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    handlers?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1686,9 +1688,9 @@ namespace PreferTagOverRole {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1719,9 +1721,9 @@ namespace RoleHasRequiredAriaProps {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1752,9 +1754,9 @@ namespace RoleSupportsAriaProps {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1784,9 +1786,9 @@ namespace Scope {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1816,90 +1818,90 @@ namespace TabindexNoPositive {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintJsxA11yRules = {
-  readonly 'jsx-a11y/alt-text': AltText.RuleEntry;
-  readonly 'jsx-a11y/anchor-ambiguous-text': AnchorAmbiguousText.RuleEntry;
-  readonly 'jsx-a11y/anchor-has-content': AnchorHasContent.RuleEntry;
-  readonly 'jsx-a11y/anchor-is-valid': AnchorIsValid.RuleEntry;
-  readonly 'jsx-a11y/aria-activedescendant-has-tabindex': AriaActivedescendantHasTabindex.RuleEntry;
-  readonly 'jsx-a11y/aria-props': AriaProps.RuleEntry;
-  readonly 'jsx-a11y/aria-proptypes': AriaProptypes.RuleEntry;
-  readonly 'jsx-a11y/aria-role': AriaRole.RuleEntry;
-  readonly 'jsx-a11y/aria-unsupported-elements': AriaUnsupportedElements.RuleEntry;
-  readonly 'jsx-a11y/autocomplete-valid': AutocompleteValid.RuleEntry;
-  readonly 'jsx-a11y/click-events-have-key-events': ClickEventsHaveKeyEvents.RuleEntry;
-  readonly 'jsx-a11y/control-has-associated-label': ControlHasAssociatedLabel.RuleEntry;
-  readonly 'jsx-a11y/heading-has-content': HeadingHasContent.RuleEntry;
-  readonly 'jsx-a11y/html-has-lang': HtmlHasLang.RuleEntry;
-  readonly 'jsx-a11y/iframe-has-title': IframeHasTitle.RuleEntry;
-  readonly 'jsx-a11y/img-redundant-alt': ImgRedundantAlt.RuleEntry;
-  readonly 'jsx-a11y/interactive-supports-focus': InteractiveSupportsFocus.RuleEntry;
-  readonly 'jsx-a11y/label-has-associated-control': LabelHasAssociatedControl.RuleEntry;
-  readonly 'jsx-a11y/lang': Lang.RuleEntry;
-  readonly 'jsx-a11y/media-has-caption': MediaHasCaption.RuleEntry;
-  readonly 'jsx-a11y/mouse-events-have-key-events': MouseEventsHaveKeyEvents.RuleEntry;
-  readonly 'jsx-a11y/no-access-key': NoAccessKey.RuleEntry;
-  readonly 'jsx-a11y/no-aria-hidden-on-focusable': NoAriaHiddenOnFocusable.RuleEntry;
-  readonly 'jsx-a11y/no-autofocus': NoAutofocus.RuleEntry;
-  readonly 'jsx-a11y/no-distracting-elements': NoDistractingElements.RuleEntry;
-  readonly 'jsx-a11y/no-interactive-element-to-noninteractive-role': NoInteractiveElementToNoninteractiveRole.RuleEntry;
-  readonly 'jsx-a11y/no-noninteractive-element-interactions': NoNoninteractiveElementInteractions.RuleEntry;
-  readonly 'jsx-a11y/no-noninteractive-element-to-interactive-role': NoNoninteractiveElementToInteractiveRole.RuleEntry;
-  readonly 'jsx-a11y/no-noninteractive-tabindex': NoNoninteractiveTabindex.RuleEntry;
-  readonly 'jsx-a11y/no-redundant-roles': NoRedundantRoles.RuleEntry;
-  readonly 'jsx-a11y/no-static-element-interactions': NoStaticElementInteractions.RuleEntry;
-  readonly 'jsx-a11y/prefer-tag-over-role': PreferTagOverRole.RuleEntry;
-  readonly 'jsx-a11y/role-has-required-aria-props': RoleHasRequiredAriaProps.RuleEntry;
-  readonly 'jsx-a11y/role-supports-aria-props': RoleSupportsAriaProps.RuleEntry;
-  readonly 'jsx-a11y/scope': Scope.RuleEntry;
-  readonly 'jsx-a11y/tabindex-no-positive': TabindexNoPositive.RuleEntry;
+export type EslintJsxA11yRules = Readonly<{
+  'jsx-a11y/alt-text': AltText.RuleEntry;
+  'jsx-a11y/anchor-ambiguous-text': AnchorAmbiguousText.RuleEntry;
+  'jsx-a11y/anchor-has-content': AnchorHasContent.RuleEntry;
+  'jsx-a11y/anchor-is-valid': AnchorIsValid.RuleEntry;
+  'jsx-a11y/aria-activedescendant-has-tabindex': AriaActivedescendantHasTabindex.RuleEntry;
+  'jsx-a11y/aria-props': AriaProps.RuleEntry;
+  'jsx-a11y/aria-proptypes': AriaProptypes.RuleEntry;
+  'jsx-a11y/aria-role': AriaRole.RuleEntry;
+  'jsx-a11y/aria-unsupported-elements': AriaUnsupportedElements.RuleEntry;
+  'jsx-a11y/autocomplete-valid': AutocompleteValid.RuleEntry;
+  'jsx-a11y/click-events-have-key-events': ClickEventsHaveKeyEvents.RuleEntry;
+  'jsx-a11y/control-has-associated-label': ControlHasAssociatedLabel.RuleEntry;
+  'jsx-a11y/heading-has-content': HeadingHasContent.RuleEntry;
+  'jsx-a11y/html-has-lang': HtmlHasLang.RuleEntry;
+  'jsx-a11y/iframe-has-title': IframeHasTitle.RuleEntry;
+  'jsx-a11y/img-redundant-alt': ImgRedundantAlt.RuleEntry;
+  'jsx-a11y/interactive-supports-focus': InteractiveSupportsFocus.RuleEntry;
+  'jsx-a11y/label-has-associated-control': LabelHasAssociatedControl.RuleEntry;
+  'jsx-a11y/lang': Lang.RuleEntry;
+  'jsx-a11y/media-has-caption': MediaHasCaption.RuleEntry;
+  'jsx-a11y/mouse-events-have-key-events': MouseEventsHaveKeyEvents.RuleEntry;
+  'jsx-a11y/no-access-key': NoAccessKey.RuleEntry;
+  'jsx-a11y/no-aria-hidden-on-focusable': NoAriaHiddenOnFocusable.RuleEntry;
+  'jsx-a11y/no-autofocus': NoAutofocus.RuleEntry;
+  'jsx-a11y/no-distracting-elements': NoDistractingElements.RuleEntry;
+  'jsx-a11y/no-interactive-element-to-noninteractive-role': NoInteractiveElementToNoninteractiveRole.RuleEntry;
+  'jsx-a11y/no-noninteractive-element-interactions': NoNoninteractiveElementInteractions.RuleEntry;
+  'jsx-a11y/no-noninteractive-element-to-interactive-role': NoNoninteractiveElementToInteractiveRole.RuleEntry;
+  'jsx-a11y/no-noninteractive-tabindex': NoNoninteractiveTabindex.RuleEntry;
+  'jsx-a11y/no-redundant-roles': NoRedundantRoles.RuleEntry;
+  'jsx-a11y/no-static-element-interactions': NoStaticElementInteractions.RuleEntry;
+  'jsx-a11y/prefer-tag-over-role': PreferTagOverRole.RuleEntry;
+  'jsx-a11y/role-has-required-aria-props': RoleHasRequiredAriaProps.RuleEntry;
+  'jsx-a11y/role-supports-aria-props': RoleSupportsAriaProps.RuleEntry;
+  'jsx-a11y/scope': Scope.RuleEntry;
+  'jsx-a11y/tabindex-no-positive': TabindexNoPositive.RuleEntry;
 
   // deprecated
-  readonly 'jsx-a11y/accessible-emoji': AccessibleEmoji.RuleEntry;
-  readonly 'jsx-a11y/label-has-for': LabelHasFor.RuleEntry;
-  readonly 'jsx-a11y/no-onchange': NoOnchange.RuleEntry;
-};
+  'jsx-a11y/accessible-emoji': AccessibleEmoji.RuleEntry;
+  'jsx-a11y/label-has-for': LabelHasFor.RuleEntry;
+  'jsx-a11y/no-onchange': NoOnchange.RuleEntry;
+}>;
 
-export type EslintJsxA11yRulesOption = {
-  readonly 'jsx-a11y/alt-text': AltText.Options;
-  readonly 'jsx-a11y/anchor-ambiguous-text': AnchorAmbiguousText.Options;
-  readonly 'jsx-a11y/anchor-has-content': AnchorHasContent.Options;
-  readonly 'jsx-a11y/anchor-is-valid': AnchorIsValid.Options;
-  readonly 'jsx-a11y/aria-activedescendant-has-tabindex': AriaActivedescendantHasTabindex.Options;
-  readonly 'jsx-a11y/aria-props': AriaProps.Options;
-  readonly 'jsx-a11y/aria-proptypes': AriaProptypes.Options;
-  readonly 'jsx-a11y/aria-role': AriaRole.Options;
-  readonly 'jsx-a11y/aria-unsupported-elements': AriaUnsupportedElements.Options;
-  readonly 'jsx-a11y/autocomplete-valid': AutocompleteValid.Options;
-  readonly 'jsx-a11y/click-events-have-key-events': ClickEventsHaveKeyEvents.Options;
-  readonly 'jsx-a11y/control-has-associated-label': ControlHasAssociatedLabel.Options;
-  readonly 'jsx-a11y/heading-has-content': HeadingHasContent.Options;
-  readonly 'jsx-a11y/html-has-lang': HtmlHasLang.Options;
-  readonly 'jsx-a11y/iframe-has-title': IframeHasTitle.Options;
-  readonly 'jsx-a11y/img-redundant-alt': ImgRedundantAlt.Options;
-  readonly 'jsx-a11y/interactive-supports-focus': InteractiveSupportsFocus.Options;
-  readonly 'jsx-a11y/label-has-associated-control': LabelHasAssociatedControl.Options;
-  readonly 'jsx-a11y/lang': Lang.Options;
-  readonly 'jsx-a11y/media-has-caption': MediaHasCaption.Options;
-  readonly 'jsx-a11y/mouse-events-have-key-events': MouseEventsHaveKeyEvents.Options;
-  readonly 'jsx-a11y/no-access-key': NoAccessKey.Options;
-  readonly 'jsx-a11y/no-aria-hidden-on-focusable': NoAriaHiddenOnFocusable.Options;
-  readonly 'jsx-a11y/no-autofocus': NoAutofocus.Options;
-  readonly 'jsx-a11y/no-distracting-elements': NoDistractingElements.Options;
-  readonly 'jsx-a11y/no-interactive-element-to-noninteractive-role': NoInteractiveElementToNoninteractiveRole.Options;
-  readonly 'jsx-a11y/no-noninteractive-element-interactions': NoNoninteractiveElementInteractions.Options;
-  readonly 'jsx-a11y/no-noninteractive-element-to-interactive-role': NoNoninteractiveElementToInteractiveRole.Options;
-  readonly 'jsx-a11y/no-noninteractive-tabindex': NoNoninteractiveTabindex.Options;
-  readonly 'jsx-a11y/no-redundant-roles': NoRedundantRoles.Options;
-  readonly 'jsx-a11y/no-static-element-interactions': NoStaticElementInteractions.Options;
-  readonly 'jsx-a11y/prefer-tag-over-role': PreferTagOverRole.Options;
-  readonly 'jsx-a11y/role-has-required-aria-props': RoleHasRequiredAriaProps.Options;
-  readonly 'jsx-a11y/role-supports-aria-props': RoleSupportsAriaProps.Options;
-  readonly 'jsx-a11y/scope': Scope.Options;
-  readonly 'jsx-a11y/tabindex-no-positive': TabindexNoPositive.Options;
-};
+export type EslintJsxA11yRulesOption = Readonly<{
+  'jsx-a11y/alt-text': AltText.Options;
+  'jsx-a11y/anchor-ambiguous-text': AnchorAmbiguousText.Options;
+  'jsx-a11y/anchor-has-content': AnchorHasContent.Options;
+  'jsx-a11y/anchor-is-valid': AnchorIsValid.Options;
+  'jsx-a11y/aria-activedescendant-has-tabindex': AriaActivedescendantHasTabindex.Options;
+  'jsx-a11y/aria-props': AriaProps.Options;
+  'jsx-a11y/aria-proptypes': AriaProptypes.Options;
+  'jsx-a11y/aria-role': AriaRole.Options;
+  'jsx-a11y/aria-unsupported-elements': AriaUnsupportedElements.Options;
+  'jsx-a11y/autocomplete-valid': AutocompleteValid.Options;
+  'jsx-a11y/click-events-have-key-events': ClickEventsHaveKeyEvents.Options;
+  'jsx-a11y/control-has-associated-label': ControlHasAssociatedLabel.Options;
+  'jsx-a11y/heading-has-content': HeadingHasContent.Options;
+  'jsx-a11y/html-has-lang': HtmlHasLang.Options;
+  'jsx-a11y/iframe-has-title': IframeHasTitle.Options;
+  'jsx-a11y/img-redundant-alt': ImgRedundantAlt.Options;
+  'jsx-a11y/interactive-supports-focus': InteractiveSupportsFocus.Options;
+  'jsx-a11y/label-has-associated-control': LabelHasAssociatedControl.Options;
+  'jsx-a11y/lang': Lang.Options;
+  'jsx-a11y/media-has-caption': MediaHasCaption.Options;
+  'jsx-a11y/mouse-events-have-key-events': MouseEventsHaveKeyEvents.Options;
+  'jsx-a11y/no-access-key': NoAccessKey.Options;
+  'jsx-a11y/no-aria-hidden-on-focusable': NoAriaHiddenOnFocusable.Options;
+  'jsx-a11y/no-autofocus': NoAutofocus.Options;
+  'jsx-a11y/no-distracting-elements': NoDistractingElements.Options;
+  'jsx-a11y/no-interactive-element-to-noninteractive-role': NoInteractiveElementToNoninteractiveRole.Options;
+  'jsx-a11y/no-noninteractive-element-interactions': NoNoninteractiveElementInteractions.Options;
+  'jsx-a11y/no-noninteractive-element-to-interactive-role': NoNoninteractiveElementToInteractiveRole.Options;
+  'jsx-a11y/no-noninteractive-tabindex': NoNoninteractiveTabindex.Options;
+  'jsx-a11y/no-redundant-roles': NoRedundantRoles.Options;
+  'jsx-a11y/no-static-element-interactions': NoStaticElementInteractions.Options;
+  'jsx-a11y/prefer-tag-over-role': PreferTagOverRole.Options;
+  'jsx-a11y/role-has-required-aria-props': RoleHasRequiredAriaProps.Options;
+  'jsx-a11y/role-supports-aria-props': RoleSupportsAriaProps.Options;
+  'jsx-a11y/scope': Scope.Options;
+  'jsx-a11y/tabindex-no-positive': TabindexNoPositive.Options;
+}>;

@@ -15,6 +15,6 @@ namespace ImportStar {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintTreeShakableRules = {
-  readonly 'tree-shakable/import-star': ImportStar.RuleEntry;
-};
+export type EslintTreeShakableRules = Readonly<{
+  'tree-shakable/import-star': ImportStar.RuleEntry;
+}>;

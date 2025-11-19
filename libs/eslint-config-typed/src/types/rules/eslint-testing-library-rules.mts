@@ -58,17 +58,17 @@ namespace AwaitAsyncEvents {
    * ]
    * ```
    */
-  export type Options = {
-    readonly eventModule?:
-      | readonly ('fireEvent' | 'userEvent')[]
-      | 'fireEvent'
-      | 'userEvent';
-  };
+  export type Options = Readonly<{
+    /** @default 'userEvent' */
+    eventModule?:
+      | ('fireEvent' | 'userEvent')
+      | readonly ('fireEvent' | 'userEvent')[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -156,16 +156,17 @@ namespace ConsistentDataTestid {
    * ]
    * ```
    */
-  export type Options = {
-    readonly testIdPattern: string;
-    readonly testIdAttribute?: string | readonly string[];
-    readonly customMessage?: string;
-  };
+  export type Options = Readonly<{
+    testIdPattern: string;
+    /** @default 'data-testid' */
+    testIdAttribute?: string | readonly string[];
+    customMessage?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -209,18 +210,21 @@ namespace NoAwaitSyncEvents {
    * ]
    * ```
    */
-  export type Options = {
-    /** @minItems 1 */
-    readonly eventModules?: readonly [
+  export type Options = Readonly<{
+    /**
+     * @default ['fire-event']
+     * @minItems 1
+     */
+    eventModules?: readonly [
       'fire-event' | 'user-event',
-      ...(readonly ('fire-event' | 'user-event')[]),
+      ...('fire-event' | 'user-event')[],
     ];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -307,21 +311,21 @@ namespace NoDebuggingUtils {
    * ]
    * ```
    */
-  export type Options = {
-    readonly utilsToCheckFor?: {
-      readonly prettyFormat?: boolean;
-      readonly logDOM?: boolean;
-      readonly logRoles?: boolean;
-      readonly prettyDOM?: boolean;
-      readonly logTestingPlaygroundURL?: boolean;
-      readonly debug?: boolean;
-    };
-  };
+  export type Options = Readonly<{
+    utilsToCheckFor?: Readonly<{
+      prettyFormat?: boolean;
+      logDOM?: boolean;
+      logRoles?: boolean;
+      prettyDOM?: boolean;
+      logTestingPlaygroundURL?: boolean;
+      debug?: boolean;
+    }>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -352,9 +356,9 @@ namespace NoDomImport {
   export type Options = string;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -420,14 +424,14 @@ namespace NoNodeAccess {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowContainerFirstChild?: boolean;
-  };
+  export type Options = Readonly<{
+    allowContainerFirstChild?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -480,14 +484,14 @@ namespace NoRenderInLifecycle {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowTestingFrameworkSetupHook?: 'beforeAll' | 'beforeEach';
-  };
+  export type Options = Readonly<{
+    allowTestingFrameworkSetupHook?: 'beforeEach' | 'beforeAll';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -536,14 +540,14 @@ namespace NoUnnecessaryAct {
    * ]
    * ```
    */
-  export type Options = {
-    readonly isStrict?: boolean;
-  };
+  export type Options = Readonly<{
+    isStrict?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -635,19 +639,19 @@ namespace PreferExplicitAssert {
    * ]
    * ```
    */
-  export type Options = {
-    readonly assertion?:
-      | 'toBeDefined'
-      | 'toBeInTheDocument'
+  export type Options = Readonly<{
+    assertion?:
       | 'toBeOnTheScreen'
-      | 'toBeTruthy';
-    readonly includeFindQueries?: boolean;
-  };
+      | 'toBeInTheDocument'
+      | 'toBeTruthy'
+      | 'toBeDefined';
+    includeFindQueries?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -719,15 +723,15 @@ namespace PreferPresenceQueries {
    * ]
    * ```
    */
-  export type Options = {
-    readonly presence?: boolean;
-    readonly absence?: boolean;
-  };
+  export type Options = Readonly<{
+    presence?: boolean;
+    absence?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -793,17 +797,17 @@ namespace PreferQueryMatchers {
    * ]
    * ```
    */
-  export type Options = {
-    readonly validEntries?: readonly {
-      readonly query?: 'get' | 'query';
-      readonly matcher?: string;
-    }[];
-  };
+  export type Options = Readonly<{
+    validEntries?: readonly Readonly<{
+      query?: 'get' | 'query';
+      matcher?: string;
+    }>[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -852,14 +856,14 @@ namespace PreferUserEvent {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedMethods?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    allowedMethods?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -878,48 +882,48 @@ namespace RenderResultNamingConvention {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintTestingLibraryRules = {
-  readonly 'testing-library/await-async-events': AwaitAsyncEvents.RuleEntry;
-  readonly 'testing-library/await-async-queries': AwaitAsyncQueries.RuleEntry;
-  readonly 'testing-library/await-async-utils': AwaitAsyncUtils.RuleEntry;
-  readonly 'testing-library/consistent-data-testid': ConsistentDataTestid.RuleEntry;
-  readonly 'testing-library/no-await-sync-events': NoAwaitSyncEvents.RuleEntry;
-  readonly 'testing-library/no-await-sync-queries': NoAwaitSyncQueries.RuleEntry;
-  readonly 'testing-library/no-container': NoContainer.RuleEntry;
-  readonly 'testing-library/no-debugging-utils': NoDebuggingUtils.RuleEntry;
-  readonly 'testing-library/no-dom-import': NoDomImport.RuleEntry;
-  readonly 'testing-library/no-global-regexp-flag-in-query': NoGlobalRegexpFlagInQuery.RuleEntry;
-  readonly 'testing-library/no-manual-cleanup': NoManualCleanup.RuleEntry;
-  readonly 'testing-library/no-node-access': NoNodeAccess.RuleEntry;
-  readonly 'testing-library/no-promise-in-fire-event': NoPromiseInFireEvent.RuleEntry;
-  readonly 'testing-library/no-render-in-lifecycle': NoRenderInLifecycle.RuleEntry;
-  readonly 'testing-library/no-test-id-queries': NoTestIdQueries.RuleEntry;
-  readonly 'testing-library/no-unnecessary-act': NoUnnecessaryAct.RuleEntry;
-  readonly 'testing-library/no-wait-for-multiple-assertions': NoWaitForMultipleAssertions.RuleEntry;
-  readonly 'testing-library/no-wait-for-side-effects': NoWaitForSideEffects.RuleEntry;
-  readonly 'testing-library/no-wait-for-snapshot': NoWaitForSnapshot.RuleEntry;
-  readonly 'testing-library/prefer-explicit-assert': PreferExplicitAssert.RuleEntry;
-  readonly 'testing-library/prefer-find-by': PreferFindBy.RuleEntry;
-  readonly 'testing-library/prefer-implicit-assert': PreferImplicitAssert.RuleEntry;
-  readonly 'testing-library/prefer-presence-queries': PreferPresenceQueries.RuleEntry;
-  readonly 'testing-library/prefer-query-by-disappearance': PreferQueryByDisappearance.RuleEntry;
-  readonly 'testing-library/prefer-query-matchers': PreferQueryMatchers.RuleEntry;
-  readonly 'testing-library/prefer-screen-queries': PreferScreenQueries.RuleEntry;
-  readonly 'testing-library/prefer-user-event': PreferUserEvent.RuleEntry;
-  readonly 'testing-library/render-result-naming-convention': RenderResultNamingConvention.RuleEntry;
-};
+export type EslintTestingLibraryRules = Readonly<{
+  'testing-library/await-async-events': AwaitAsyncEvents.RuleEntry;
+  'testing-library/await-async-queries': AwaitAsyncQueries.RuleEntry;
+  'testing-library/await-async-utils': AwaitAsyncUtils.RuleEntry;
+  'testing-library/consistent-data-testid': ConsistentDataTestid.RuleEntry;
+  'testing-library/no-await-sync-events': NoAwaitSyncEvents.RuleEntry;
+  'testing-library/no-await-sync-queries': NoAwaitSyncQueries.RuleEntry;
+  'testing-library/no-container': NoContainer.RuleEntry;
+  'testing-library/no-debugging-utils': NoDebuggingUtils.RuleEntry;
+  'testing-library/no-dom-import': NoDomImport.RuleEntry;
+  'testing-library/no-global-regexp-flag-in-query': NoGlobalRegexpFlagInQuery.RuleEntry;
+  'testing-library/no-manual-cleanup': NoManualCleanup.RuleEntry;
+  'testing-library/no-node-access': NoNodeAccess.RuleEntry;
+  'testing-library/no-promise-in-fire-event': NoPromiseInFireEvent.RuleEntry;
+  'testing-library/no-render-in-lifecycle': NoRenderInLifecycle.RuleEntry;
+  'testing-library/no-test-id-queries': NoTestIdQueries.RuleEntry;
+  'testing-library/no-unnecessary-act': NoUnnecessaryAct.RuleEntry;
+  'testing-library/no-wait-for-multiple-assertions': NoWaitForMultipleAssertions.RuleEntry;
+  'testing-library/no-wait-for-side-effects': NoWaitForSideEffects.RuleEntry;
+  'testing-library/no-wait-for-snapshot': NoWaitForSnapshot.RuleEntry;
+  'testing-library/prefer-explicit-assert': PreferExplicitAssert.RuleEntry;
+  'testing-library/prefer-find-by': PreferFindBy.RuleEntry;
+  'testing-library/prefer-implicit-assert': PreferImplicitAssert.RuleEntry;
+  'testing-library/prefer-presence-queries': PreferPresenceQueries.RuleEntry;
+  'testing-library/prefer-query-by-disappearance': PreferQueryByDisappearance.RuleEntry;
+  'testing-library/prefer-query-matchers': PreferQueryMatchers.RuleEntry;
+  'testing-library/prefer-screen-queries': PreferScreenQueries.RuleEntry;
+  'testing-library/prefer-user-event': PreferUserEvent.RuleEntry;
+  'testing-library/render-result-naming-convention': RenderResultNamingConvention.RuleEntry;
+}>;
 
-export type EslintTestingLibraryRulesOption = {
-  readonly 'testing-library/await-async-events': AwaitAsyncEvents.Options;
-  readonly 'testing-library/consistent-data-testid': ConsistentDataTestid.Options;
-  readonly 'testing-library/no-await-sync-events': NoAwaitSyncEvents.Options;
-  readonly 'testing-library/no-debugging-utils': NoDebuggingUtils.Options;
-  readonly 'testing-library/no-dom-import': NoDomImport.Options;
-  readonly 'testing-library/no-node-access': NoNodeAccess.Options;
-  readonly 'testing-library/no-render-in-lifecycle': NoRenderInLifecycle.Options;
-  readonly 'testing-library/no-unnecessary-act': NoUnnecessaryAct.Options;
-  readonly 'testing-library/prefer-explicit-assert': PreferExplicitAssert.Options;
-  readonly 'testing-library/prefer-presence-queries': PreferPresenceQueries.Options;
-  readonly 'testing-library/prefer-query-matchers': PreferQueryMatchers.Options;
-  readonly 'testing-library/prefer-user-event': PreferUserEvent.Options;
-};
+export type EslintTestingLibraryRulesOption = Readonly<{
+  'testing-library/await-async-events': AwaitAsyncEvents.Options;
+  'testing-library/consistent-data-testid': ConsistentDataTestid.Options;
+  'testing-library/no-await-sync-events': NoAwaitSyncEvents.Options;
+  'testing-library/no-debugging-utils': NoDebuggingUtils.Options;
+  'testing-library/no-dom-import': NoDomImport.Options;
+  'testing-library/no-node-access': NoNodeAccess.Options;
+  'testing-library/no-render-in-lifecycle': NoRenderInLifecycle.Options;
+  'testing-library/no-unnecessary-act': NoUnnecessaryAct.Options;
+  'testing-library/prefer-explicit-assert': PreferExplicitAssert.Options;
+  'testing-library/prefer-presence-queries': PreferPresenceQueries.Options;
+  'testing-library/prefer-query-matchers': PreferQueryMatchers.Options;
+  'testing-library/prefer-user-event': PreferUserEvent.Options;
+}>;

@@ -39,14 +39,14 @@ namespace BetterRegex {
    * ]
    * ```
    */
-  export type Options = {
-    readonly sortCharacterClasses?: boolean;
-  };
+  export type Options = Readonly<{
+    sortCharacterClasses?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -85,15 +85,15 @@ namespace CatchErrorName {
    * ]
    * ```
    */
-  export type Options = {
-    readonly name?: string;
-    readonly ignore?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    name?: string;
+    ignore?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -218,14 +218,14 @@ namespace ConsistentFunctionScoping {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkArrowFunctions?: boolean;
-  };
+  export type Options = Readonly<{
+    checkArrowFunctions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -310,12 +310,12 @@ namespace EscapeCase {
    * ]
    * ```
    */
-  export type Options = 'lowercase' | 'uppercase';
+  export type Options = 'uppercase' | 'lowercase';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -366,18 +366,18 @@ namespace ExpiringTodoComments {
    * ]
    * ```
    */
-  export type Options = {
-    readonly terms?: readonly string[];
-    readonly ignore?: readonly unknown[];
-    readonly ignoreDatesOnPullRequests?: boolean;
-    readonly allowWarningComments?: boolean;
-    readonly date?: string;
-  };
+  export type Options = Readonly<{
+    terms?: readonly string[];
+    ignore?: readonly unknown[];
+    ignoreDatesOnPullRequests?: boolean;
+    allowWarningComments?: boolean;
+    date?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -417,14 +417,15 @@ namespace ExplicitLengthCheck {
    * ]
    * ```
    */
-  export type Options = {
-    readonly 'non-zero'?: 'greater-than' | 'not-equal';
-  };
+  export type Options = Readonly<{
+    /** @default 'greater-than' */
+    'non-zero'?: 'greater-than' | 'not-equal';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -502,27 +503,28 @@ namespace FilenameCase {
    * ]
    * ```
    */
-  export type Options =
+  export type Options = Readonly<
     | {
-        readonly case?: 'camelCase' | 'kebabCase' | 'pascalCase' | 'snakeCase';
-        readonly ignore?: readonly unknown[];
-        readonly multipleFileExtensions?: boolean;
+        case?: 'camelCase' | 'snakeCase' | 'kebabCase' | 'pascalCase';
+        ignore?: readonly unknown[];
+        multipleFileExtensions?: boolean;
       }
     | {
-        readonly cases?: {
-          readonly camelCase?: boolean;
-          readonly snakeCase?: boolean;
-          readonly kebabCase?: boolean;
-          readonly pascalCase?: boolean;
-        };
-        readonly ignore?: readonly unknown[];
-        readonly multipleFileExtensions?: boolean;
-      };
+        cases?: Readonly<{
+          camelCase?: boolean;
+          snakeCase?: boolean;
+          kebabCase?: boolean;
+          pascalCase?: boolean;
+        }>;
+        ignore?: readonly unknown[];
+        multipleFileExtensions?: boolean;
+      }
+  >;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -600,30 +602,33 @@ namespace ImportStyle {
    * ```
    */
   export type Options =
+    | readonly []
     | readonly [
-        {
-          readonly checkImport?: boolean;
-          readonly checkDynamicImport?: boolean;
-          readonly checkExportFrom?: boolean;
-          readonly checkRequire?: boolean;
-          readonly extendDefaultStyles?: boolean;
-          readonly styles?: ModuleStyles;
-        },
-      ]
-    | readonly [];
+        Readonly<{
+          checkImport?: boolean;
+          checkDynamicImport?: boolean;
+          checkExportFrom?: boolean;
+          checkRequire?: boolean;
+          extendDefaultStyles?: boolean;
+          styles?: ModuleStyles;
+        }>,
+      ];
 
-  export type Styles = BooleanObject | false;
+  export type Styles = false | BooleanObject;
 
   export type ModuleStyles = Readonly<Record<string, Styles>>;
 
-  export type BooleanObject = Readonly<
-    Partial<Record<'default' | 'named' | 'namespace' | 'unassigned', boolean>>
-  >;
+  export type BooleanObject = Readonly<{
+    default?: boolean;
+    named?: boolean;
+    namespace?: boolean;
+    unassigned?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -785,14 +790,14 @@ namespace NoArrayReduce {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowSimpleOperations?: boolean;
-  };
+  export type Options = Readonly<{
+    allowSimpleOperations?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -827,14 +832,14 @@ namespace NoArrayReverse {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowExpressionStatement?: boolean;
-  };
+  export type Options = Readonly<{
+    allowExpressionStatement?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -869,14 +874,14 @@ namespace NoArraySort {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowExpressionStatement?: boolean;
-  };
+  export type Options = Readonly<{
+    allowExpressionStatement?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1074,17 +1079,17 @@ namespace NoInstanceofBuiltins {
    * ]
    * ```
    */
-  export type Options = {
-    readonly useErrorIsError?: boolean;
-    readonly strategy?: 'loose' | 'strict';
-    readonly include?: readonly string[];
-    readonly exclude?: readonly string[];
-  };
+  export type Options = Readonly<{
+    useErrorIsError?: boolean;
+    strategy?: 'loose' | 'strict';
+    include?: readonly string[];
+    exclude?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1166,17 +1171,17 @@ namespace NoKeywordPrefix {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** @minItems 0 */
-    readonly disallowedPrefixes?: readonly [] | readonly [string];
-    readonly checkProperties?: boolean;
-    readonly onlyCamelCase?: boolean;
-  };
+    disallowedPrefixes?: readonly [] | readonly [string];
+    checkProperties?: boolean;
+    onlyCamelCase?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1358,14 +1363,14 @@ namespace NoNull {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkStrictEquality?: boolean;
-  };
+  export type Options = Readonly<{
+    checkStrictEquality?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1506,14 +1511,14 @@ namespace NoTypeofUndefined {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkGlobalVariables?: boolean;
-  };
+  export type Options = Readonly<{
+    checkGlobalVariables?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1615,14 +1620,14 @@ namespace NoUnnecessaryPolyfills {
    * ]
    * ```
    */
-  export type Options = {
-    readonly targets: UnknownRecord | string | readonly unknown[];
-  };
+  export type Options = Readonly<{
+    targets: string | readonly unknown[] | Readonly<Record<string, unknown>>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1860,15 +1865,15 @@ namespace NoUselessUndefined {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkArguments?: boolean;
-    readonly checkArrowFunctionBody?: boolean;
-  };
+  export type Options = Readonly<{
+    checkArguments?: boolean;
+    checkArrowFunctionBody?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1924,14 +1929,14 @@ namespace NumberLiteralCase {
    * ]
    * ```
    */
-  export type Options = {
-    readonly hexadecimalValue?: 'lowercase' | 'uppercase';
-  };
+  export type Options = Readonly<{
+    hexadecimalValue?: 'uppercase' | 'lowercase';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2034,34 +2039,34 @@ namespace NumericSeparatorsStyle {
    * ]
    * ```
    */
-  export type Options = {
-    readonly binary?: {
-      readonly onlyIfContainsSeparator?: boolean;
-      readonly minimumDigits?: number;
-      readonly groupLength?: number;
-    };
-    readonly octal?: {
-      readonly onlyIfContainsSeparator?: boolean;
-      readonly minimumDigits?: number;
-      readonly groupLength?: number;
-    };
-    readonly hexadecimal?: {
-      readonly onlyIfContainsSeparator?: boolean;
-      readonly minimumDigits?: number;
-      readonly groupLength?: number;
-    };
-    readonly number?: {
-      readonly onlyIfContainsSeparator?: boolean;
-      readonly minimumDigits?: number;
-      readonly groupLength?: number;
-    };
-    readonly onlyIfContainsSeparator?: boolean;
-  };
+  export type Options = Readonly<{
+    binary?: Readonly<{
+      onlyIfContainsSeparator?: boolean;
+      minimumDigits?: number;
+      groupLength?: number;
+    }>;
+    octal?: Readonly<{
+      onlyIfContainsSeparator?: boolean;
+      minimumDigits?: number;
+      groupLength?: number;
+    }>;
+    hexadecimal?: Readonly<{
+      onlyIfContainsSeparator?: boolean;
+      minimumDigits?: number;
+      groupLength?: number;
+    }>;
+    number?: Readonly<{
+      onlyIfContainsSeparator?: boolean;
+      minimumDigits?: number;
+      groupLength?: number;
+    }>;
+    onlyIfContainsSeparator?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2101,14 +2106,14 @@ namespace PreferAddEventListener {
    * ]
    * ```
    */
-  export type Options = {
-    readonly excludedPackages?: readonly string[];
-  };
+  export type Options = Readonly<{
+    excludedPackages?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2145,14 +2150,14 @@ namespace PreferArrayFind {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkFromLast?: boolean;
-  };
+  export type Options = Readonly<{
+    checkFromLast?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2188,14 +2193,14 @@ namespace PreferArrayFlat {
    * ]
    * ```
    */
-  export type Options = {
-    readonly functions?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    functions?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2293,15 +2298,15 @@ namespace PreferAt {
    * ]
    * ```
    */
-  export type Options = {
-    readonly getLastElementFunctions?: readonly unknown[];
-    readonly checkAllIndexAccess?: boolean;
-  };
+  export type Options = Readonly<{
+    getLastElementFunctions?: readonly unknown[];
+    checkAllIndexAccess?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2557,14 +2562,14 @@ namespace PreferExportFrom {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreUsedVariables?: boolean;
-  };
+  export type Options = Readonly<{
+    ignoreUsedVariables?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2863,15 +2868,15 @@ namespace PreferNumberProperties {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkInfinity?: boolean;
-    readonly checkNaN?: boolean;
-  };
+  export type Options = Readonly<{
+    checkInfinity?: boolean;
+    checkNaN?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2908,14 +2913,14 @@ namespace PreferObjectFromEntries {
    * ]
    * ```
    */
-  export type Options = {
-    readonly functions?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    functions?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3102,14 +3107,14 @@ namespace PreferSingleCall {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignore?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    ignore?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3257,14 +3262,14 @@ namespace PreferStructuredClone {
    * ]
    * ```
    */
-  export type Options = {
-    readonly functions?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    functions?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3307,18 +3312,18 @@ namespace PreferSwitch {
    * ]
    * ```
    */
-  export type Options = {
-    readonly minimumCases?: number;
-    readonly emptyDefaultCase?:
+  export type Options = Readonly<{
+    minimumCases?: number;
+    emptyDefaultCase?:
+      | 'no-default-comment'
       | 'do-nothing-comment'
-      | 'no-default-case'
-      | 'no-default-comment';
-  };
+      | 'no-default-case';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3353,9 +3358,9 @@ namespace PreferTernary {
   export type Options = 'always' | 'only-single-line';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3488,33 +3493,33 @@ namespace PreventAbbreviations {
    * ```
    */
   export type Options =
+    | readonly []
     | readonly [
-        {
-          readonly checkProperties?: boolean;
-          readonly checkVariables?: boolean;
-          readonly checkDefaultAndNamespaceImports?: boolean | string;
-          readonly checkShorthandImports?: boolean | string;
-          readonly checkShorthandProperties?: boolean;
-          readonly checkFilenames?: boolean;
-          readonly extendDefaultReplacements?: boolean;
-          readonly replacements?: Abbreviations;
-          readonly extendDefaultAllowList?: boolean;
-          readonly allowList?: BooleanObject;
-          readonly ignore?: readonly unknown[];
-        },
-      ]
-    | readonly [];
+        Readonly<{
+          checkProperties?: boolean;
+          checkVariables?: boolean;
+          checkDefaultAndNamespaceImports?: boolean | string;
+          checkShorthandImports?: boolean | string;
+          checkShorthandProperties?: boolean;
+          checkFilenames?: boolean;
+          extendDefaultReplacements?: boolean;
+          replacements?: Abbreviations;
+          extendDefaultAllowList?: boolean;
+          allowList?: BooleanObject;
+          ignore?: readonly unknown[];
+        }>,
+      ];
 
-  export type Replacements = BooleanObject | false;
+  export type Replacements = false | BooleanObject;
 
   export type Abbreviations = Readonly<Record<string, Replacements>>;
 
   export type BooleanObject = Readonly<Record<string, boolean>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3547,12 +3552,12 @@ namespace RelativeUrlStyle {
    * ]
    * ```
    */
-  export type Options = 'always' | 'never';
+  export type Options = 'never' | 'always';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3704,22 +3709,24 @@ namespace StringContent {
    * ]
    * ```
    */
-  export type Options = {
-    readonly patterns?: Record<
-      string,
-      | string
-      | {
-          readonly suggest: string;
-          readonly fix?: boolean;
-          readonly message?: string;
-        }
+  export type Options = Readonly<{
+    patterns?: Readonly<
+      Record<
+        string,
+        | string
+        | Readonly<{
+            suggest: string;
+            fix?: boolean;
+            message?: string;
+          }>
+      >
     >;
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3754,9 +3761,9 @@ namespace SwitchCaseBraces {
   export type Options = 'always' | 'avoid';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3828,18 +3835,18 @@ namespace TemplateIndent {
    * ]
    * ```
    */
-  export type Options = {
-    readonly indent?: number | string;
-    readonly tags?: readonly string[];
-    readonly functions?: readonly string[];
-    readonly selectors?: readonly string[];
-    readonly comments?: readonly string[];
-  };
+  export type Options = Readonly<{
+    indent?: string | number;
+    tags?: readonly string[];
+    functions?: readonly string[];
+    selectors?: readonly string[];
+    comments?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3875,14 +3882,14 @@ namespace TextEncodingIdentifierCase {
    * ]
    * ```
    */
-  export type Options = {
-    readonly withDash?: boolean;
-  };
+  export type Options = Readonly<{
+    withDash?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3948,190 +3955,190 @@ namespace NoArrayPushPush {
   export type RuleEntry = 0;
 }
 
-export type EslintUnicornRules = {
-  readonly 'unicorn/better-regex': BetterRegex.RuleEntry;
-  readonly 'unicorn/catch-error-name': CatchErrorName.RuleEntry;
-  readonly 'unicorn/consistent-assert': ConsistentAssert.RuleEntry;
-  readonly 'unicorn/consistent-date-clone': ConsistentDateClone.RuleEntry;
-  readonly 'unicorn/consistent-destructuring': ConsistentDestructuring.RuleEntry;
-  readonly 'unicorn/consistent-empty-array-spread': ConsistentEmptyArraySpread.RuleEntry;
-  readonly 'unicorn/consistent-existence-index-check': ConsistentExistenceIndexCheck.RuleEntry;
-  readonly 'unicorn/consistent-function-scoping': ConsistentFunctionScoping.RuleEntry;
-  readonly 'unicorn/custom-error-definition': CustomErrorDefinition.RuleEntry;
-  readonly 'unicorn/empty-brace-spaces': EmptyBraceSpaces.RuleEntry;
-  readonly 'unicorn/error-message': ErrorMessage.RuleEntry;
-  readonly 'unicorn/escape-case': EscapeCase.RuleEntry;
-  readonly 'unicorn/expiring-todo-comments': ExpiringTodoComments.RuleEntry;
-  readonly 'unicorn/explicit-length-check': ExplicitLengthCheck.RuleEntry;
-  readonly 'unicorn/filename-case': FilenameCase.RuleEntry;
-  readonly 'unicorn/import-style': ImportStyle.RuleEntry;
-  readonly 'unicorn/new-for-builtins': NewForBuiltins.RuleEntry;
-  readonly 'unicorn/no-abusive-eslint-disable': NoAbusiveEslintDisable.RuleEntry;
-  readonly 'unicorn/no-accessor-recursion': NoAccessorRecursion.RuleEntry;
-  readonly 'unicorn/no-anonymous-default-export': NoAnonymousDefaultExport.RuleEntry;
-  readonly 'unicorn/no-array-callback-reference': NoArrayCallbackReference.RuleEntry;
-  readonly 'unicorn/no-array-for-each': NoArrayForEach.RuleEntry;
-  readonly 'unicorn/no-array-method-this-argument': NoArrayMethodThisArgument.RuleEntry;
-  readonly 'unicorn/no-array-reduce': NoArrayReduce.RuleEntry;
-  readonly 'unicorn/no-array-reverse': NoArrayReverse.RuleEntry;
-  readonly 'unicorn/no-array-sort': NoArraySort.RuleEntry;
-  readonly 'unicorn/no-await-expression-member': NoAwaitExpressionMember.RuleEntry;
-  readonly 'unicorn/no-await-in-promise-methods': NoAwaitInPromiseMethods.RuleEntry;
-  readonly 'unicorn/no-console-spaces': NoConsoleSpaces.RuleEntry;
-  readonly 'unicorn/no-document-cookie': NoDocumentCookie.RuleEntry;
-  readonly 'unicorn/no-empty-file': NoEmptyFile.RuleEntry;
-  readonly 'unicorn/no-for-loop': NoForLoop.RuleEntry;
-  readonly 'unicorn/no-hex-escape': NoHexEscape.RuleEntry;
-  readonly 'unicorn/no-immediate-mutation': NoImmediateMutation.RuleEntry;
-  readonly 'unicorn/no-instanceof-builtins': NoInstanceofBuiltins.RuleEntry;
-  readonly 'unicorn/no-invalid-fetch-options': NoInvalidFetchOptions.RuleEntry;
-  readonly 'unicorn/no-invalid-remove-event-listener': NoInvalidRemoveEventListener.RuleEntry;
-  readonly 'unicorn/no-keyword-prefix': NoKeywordPrefix.RuleEntry;
-  readonly 'unicorn/no-lonely-if': NoLonelyIf.RuleEntry;
-  readonly 'unicorn/no-magic-array-flat-depth': NoMagicArrayFlatDepth.RuleEntry;
-  readonly 'unicorn/no-named-default': NoNamedDefault.RuleEntry;
-  readonly 'unicorn/no-negated-condition': NoNegatedCondition.RuleEntry;
-  readonly 'unicorn/no-negation-in-equality-check': NoNegationInEqualityCheck.RuleEntry;
-  readonly 'unicorn/no-nested-ternary': NoNestedTernary.RuleEntry;
-  readonly 'unicorn/no-new-array': NoNewArray.RuleEntry;
-  readonly 'unicorn/no-new-buffer': NoNewBuffer.RuleEntry;
-  readonly 'unicorn/no-null': NoNull.RuleEntry;
-  readonly 'unicorn/no-object-as-default-parameter': NoObjectAsDefaultParameter.RuleEntry;
-  readonly 'unicorn/no-process-exit': NoProcessExit.RuleEntry;
-  readonly 'unicorn/no-single-promise-in-promise-methods': NoSinglePromiseInPromiseMethods.RuleEntry;
-  readonly 'unicorn/no-static-only-class': NoStaticOnlyClass.RuleEntry;
-  readonly 'unicorn/no-thenable': NoThenable.RuleEntry;
-  readonly 'unicorn/no-this-assignment': NoThisAssignment.RuleEntry;
-  readonly 'unicorn/no-typeof-undefined': NoTypeofUndefined.RuleEntry;
-  readonly 'unicorn/no-unnecessary-array-flat-depth': NoUnnecessaryArrayFlatDepth.RuleEntry;
-  readonly 'unicorn/no-unnecessary-array-splice-count': NoUnnecessaryArraySpliceCount.RuleEntry;
-  readonly 'unicorn/no-unnecessary-await': NoUnnecessaryAwait.RuleEntry;
-  readonly 'unicorn/no-unnecessary-polyfills': NoUnnecessaryPolyfills.RuleEntry;
-  readonly 'unicorn/no-unnecessary-slice-end': NoUnnecessarySliceEnd.RuleEntry;
-  readonly 'unicorn/no-unreadable-array-destructuring': NoUnreadableArrayDestructuring.RuleEntry;
-  readonly 'unicorn/no-unreadable-iife': NoUnreadableIife.RuleEntry;
-  readonly 'unicorn/no-unused-properties': NoUnusedProperties.RuleEntry;
-  readonly 'unicorn/no-useless-collection-argument': NoUselessCollectionArgument.RuleEntry;
-  readonly 'unicorn/no-useless-error-capture-stack-trace': NoUselessErrorCaptureStackTrace.RuleEntry;
-  readonly 'unicorn/no-useless-fallback-in-spread': NoUselessFallbackInSpread.RuleEntry;
-  readonly 'unicorn/no-useless-length-check': NoUselessLengthCheck.RuleEntry;
-  readonly 'unicorn/no-useless-promise-resolve-reject': NoUselessPromiseResolveReject.RuleEntry;
-  readonly 'unicorn/no-useless-spread': NoUselessSpread.RuleEntry;
-  readonly 'unicorn/no-useless-switch-case': NoUselessSwitchCase.RuleEntry;
-  readonly 'unicorn/no-useless-undefined': NoUselessUndefined.RuleEntry;
-  readonly 'unicorn/no-zero-fractions': NoZeroFractions.RuleEntry;
-  readonly 'unicorn/number-literal-case': NumberLiteralCase.RuleEntry;
-  readonly 'unicorn/numeric-separators-style': NumericSeparatorsStyle.RuleEntry;
-  readonly 'unicorn/prefer-add-event-listener': PreferAddEventListener.RuleEntry;
-  readonly 'unicorn/prefer-array-find': PreferArrayFind.RuleEntry;
-  readonly 'unicorn/prefer-array-flat': PreferArrayFlat.RuleEntry;
-  readonly 'unicorn/prefer-array-flat-map': PreferArrayFlatMap.RuleEntry;
-  readonly 'unicorn/prefer-array-index-of': PreferArrayIndexOf.RuleEntry;
-  readonly 'unicorn/prefer-array-some': PreferArraySome.RuleEntry;
-  readonly 'unicorn/prefer-at': PreferAt.RuleEntry;
-  readonly 'unicorn/prefer-bigint-literals': PreferBigintLiterals.RuleEntry;
-  readonly 'unicorn/prefer-blob-reading-methods': PreferBlobReadingMethods.RuleEntry;
-  readonly 'unicorn/prefer-class-fields': PreferClassFields.RuleEntry;
-  readonly 'unicorn/prefer-classlist-toggle': PreferClasslistToggle.RuleEntry;
-  readonly 'unicorn/prefer-code-point': PreferCodePoint.RuleEntry;
-  readonly 'unicorn/prefer-date-now': PreferDateNow.RuleEntry;
-  readonly 'unicorn/prefer-default-parameters': PreferDefaultParameters.RuleEntry;
-  readonly 'unicorn/prefer-dom-node-append': PreferDomNodeAppend.RuleEntry;
-  readonly 'unicorn/prefer-dom-node-dataset': PreferDomNodeDataset.RuleEntry;
-  readonly 'unicorn/prefer-dom-node-remove': PreferDomNodeRemove.RuleEntry;
-  readonly 'unicorn/prefer-dom-node-text-content': PreferDomNodeTextContent.RuleEntry;
-  readonly 'unicorn/prefer-event-target': PreferEventTarget.RuleEntry;
-  readonly 'unicorn/prefer-export-from': PreferExportFrom.RuleEntry;
-  readonly 'unicorn/prefer-global-this': PreferGlobalThis.RuleEntry;
-  readonly 'unicorn/prefer-import-meta-properties': PreferImportMetaProperties.RuleEntry;
-  readonly 'unicorn/prefer-includes': PreferIncludes.RuleEntry;
-  readonly 'unicorn/prefer-json-parse-buffer': PreferJsonParseBuffer.RuleEntry;
-  readonly 'unicorn/prefer-keyboard-event-key': PreferKeyboardEventKey.RuleEntry;
-  readonly 'unicorn/prefer-logical-operator-over-ternary': PreferLogicalOperatorOverTernary.RuleEntry;
-  readonly 'unicorn/prefer-math-min-max': PreferMathMinMax.RuleEntry;
-  readonly 'unicorn/prefer-math-trunc': PreferMathTrunc.RuleEntry;
-  readonly 'unicorn/prefer-modern-dom-apis': PreferModernDomApis.RuleEntry;
-  readonly 'unicorn/prefer-modern-math-apis': PreferModernMathApis.RuleEntry;
-  readonly 'unicorn/prefer-module': PreferModule.RuleEntry;
-  readonly 'unicorn/prefer-native-coercion-functions': PreferNativeCoercionFunctions.RuleEntry;
-  readonly 'unicorn/prefer-negative-index': PreferNegativeIndex.RuleEntry;
-  readonly 'unicorn/prefer-node-protocol': PreferNodeProtocol.RuleEntry;
-  readonly 'unicorn/prefer-number-properties': PreferNumberProperties.RuleEntry;
-  readonly 'unicorn/prefer-object-from-entries': PreferObjectFromEntries.RuleEntry;
-  readonly 'unicorn/prefer-optional-catch-binding': PreferOptionalCatchBinding.RuleEntry;
-  readonly 'unicorn/prefer-prototype-methods': PreferPrototypeMethods.RuleEntry;
-  readonly 'unicorn/prefer-query-selector': PreferQuerySelector.RuleEntry;
-  readonly 'unicorn/prefer-reflect-apply': PreferReflectApply.RuleEntry;
-  readonly 'unicorn/prefer-regexp-test': PreferRegexpTest.RuleEntry;
-  readonly 'unicorn/prefer-response-static-json': PreferResponseStaticJson.RuleEntry;
-  readonly 'unicorn/prefer-set-has': PreferSetHas.RuleEntry;
-  readonly 'unicorn/prefer-set-size': PreferSetSize.RuleEntry;
-  readonly 'unicorn/prefer-single-call': PreferSingleCall.RuleEntry;
-  readonly 'unicorn/prefer-spread': PreferSpread.RuleEntry;
-  readonly 'unicorn/prefer-string-raw': PreferStringRaw.RuleEntry;
-  readonly 'unicorn/prefer-string-replace-all': PreferStringReplaceAll.RuleEntry;
-  readonly 'unicorn/prefer-string-slice': PreferStringSlice.RuleEntry;
-  readonly 'unicorn/prefer-string-starts-ends-with': PreferStringStartsEndsWith.RuleEntry;
-  readonly 'unicorn/prefer-string-trim-start-end': PreferStringTrimStartEnd.RuleEntry;
-  readonly 'unicorn/prefer-structured-clone': PreferStructuredClone.RuleEntry;
-  readonly 'unicorn/prefer-switch': PreferSwitch.RuleEntry;
-  readonly 'unicorn/prefer-ternary': PreferTernary.RuleEntry;
-  readonly 'unicorn/prefer-top-level-await': PreferTopLevelAwait.RuleEntry;
-  readonly 'unicorn/prefer-type-error': PreferTypeError.RuleEntry;
-  readonly 'unicorn/prevent-abbreviations': PreventAbbreviations.RuleEntry;
-  readonly 'unicorn/relative-url-style': RelativeUrlStyle.RuleEntry;
-  readonly 'unicorn/require-array-join-separator': RequireArrayJoinSeparator.RuleEntry;
-  readonly 'unicorn/require-module-attributes': RequireModuleAttributes.RuleEntry;
-  readonly 'unicorn/require-module-specifiers': RequireModuleSpecifiers.RuleEntry;
-  readonly 'unicorn/require-number-to-fixed-digits-argument': RequireNumberToFixedDigitsArgument.RuleEntry;
-  readonly 'unicorn/require-post-message-target-origin': RequirePostMessageTargetOrigin.RuleEntry;
-  readonly 'unicorn/string-content': StringContent.RuleEntry;
-  readonly 'unicorn/switch-case-braces': SwitchCaseBraces.RuleEntry;
-  readonly 'unicorn/template-indent': TemplateIndent.RuleEntry;
-  readonly 'unicorn/text-encoding-identifier-case': TextEncodingIdentifierCase.RuleEntry;
-  readonly 'unicorn/throw-new-error': ThrowNewError.RuleEntry;
+export type EslintUnicornRules = Readonly<{
+  'unicorn/better-regex': BetterRegex.RuleEntry;
+  'unicorn/catch-error-name': CatchErrorName.RuleEntry;
+  'unicorn/consistent-assert': ConsistentAssert.RuleEntry;
+  'unicorn/consistent-date-clone': ConsistentDateClone.RuleEntry;
+  'unicorn/consistent-destructuring': ConsistentDestructuring.RuleEntry;
+  'unicorn/consistent-empty-array-spread': ConsistentEmptyArraySpread.RuleEntry;
+  'unicorn/consistent-existence-index-check': ConsistentExistenceIndexCheck.RuleEntry;
+  'unicorn/consistent-function-scoping': ConsistentFunctionScoping.RuleEntry;
+  'unicorn/custom-error-definition': CustomErrorDefinition.RuleEntry;
+  'unicorn/empty-brace-spaces': EmptyBraceSpaces.RuleEntry;
+  'unicorn/error-message': ErrorMessage.RuleEntry;
+  'unicorn/escape-case': EscapeCase.RuleEntry;
+  'unicorn/expiring-todo-comments': ExpiringTodoComments.RuleEntry;
+  'unicorn/explicit-length-check': ExplicitLengthCheck.RuleEntry;
+  'unicorn/filename-case': FilenameCase.RuleEntry;
+  'unicorn/import-style': ImportStyle.RuleEntry;
+  'unicorn/new-for-builtins': NewForBuiltins.RuleEntry;
+  'unicorn/no-abusive-eslint-disable': NoAbusiveEslintDisable.RuleEntry;
+  'unicorn/no-accessor-recursion': NoAccessorRecursion.RuleEntry;
+  'unicorn/no-anonymous-default-export': NoAnonymousDefaultExport.RuleEntry;
+  'unicorn/no-array-callback-reference': NoArrayCallbackReference.RuleEntry;
+  'unicorn/no-array-for-each': NoArrayForEach.RuleEntry;
+  'unicorn/no-array-method-this-argument': NoArrayMethodThisArgument.RuleEntry;
+  'unicorn/no-array-reduce': NoArrayReduce.RuleEntry;
+  'unicorn/no-array-reverse': NoArrayReverse.RuleEntry;
+  'unicorn/no-array-sort': NoArraySort.RuleEntry;
+  'unicorn/no-await-expression-member': NoAwaitExpressionMember.RuleEntry;
+  'unicorn/no-await-in-promise-methods': NoAwaitInPromiseMethods.RuleEntry;
+  'unicorn/no-console-spaces': NoConsoleSpaces.RuleEntry;
+  'unicorn/no-document-cookie': NoDocumentCookie.RuleEntry;
+  'unicorn/no-empty-file': NoEmptyFile.RuleEntry;
+  'unicorn/no-for-loop': NoForLoop.RuleEntry;
+  'unicorn/no-hex-escape': NoHexEscape.RuleEntry;
+  'unicorn/no-immediate-mutation': NoImmediateMutation.RuleEntry;
+  'unicorn/no-instanceof-builtins': NoInstanceofBuiltins.RuleEntry;
+  'unicorn/no-invalid-fetch-options': NoInvalidFetchOptions.RuleEntry;
+  'unicorn/no-invalid-remove-event-listener': NoInvalidRemoveEventListener.RuleEntry;
+  'unicorn/no-keyword-prefix': NoKeywordPrefix.RuleEntry;
+  'unicorn/no-lonely-if': NoLonelyIf.RuleEntry;
+  'unicorn/no-magic-array-flat-depth': NoMagicArrayFlatDepth.RuleEntry;
+  'unicorn/no-named-default': NoNamedDefault.RuleEntry;
+  'unicorn/no-negated-condition': NoNegatedCondition.RuleEntry;
+  'unicorn/no-negation-in-equality-check': NoNegationInEqualityCheck.RuleEntry;
+  'unicorn/no-nested-ternary': NoNestedTernary.RuleEntry;
+  'unicorn/no-new-array': NoNewArray.RuleEntry;
+  'unicorn/no-new-buffer': NoNewBuffer.RuleEntry;
+  'unicorn/no-null': NoNull.RuleEntry;
+  'unicorn/no-object-as-default-parameter': NoObjectAsDefaultParameter.RuleEntry;
+  'unicorn/no-process-exit': NoProcessExit.RuleEntry;
+  'unicorn/no-single-promise-in-promise-methods': NoSinglePromiseInPromiseMethods.RuleEntry;
+  'unicorn/no-static-only-class': NoStaticOnlyClass.RuleEntry;
+  'unicorn/no-thenable': NoThenable.RuleEntry;
+  'unicorn/no-this-assignment': NoThisAssignment.RuleEntry;
+  'unicorn/no-typeof-undefined': NoTypeofUndefined.RuleEntry;
+  'unicorn/no-unnecessary-array-flat-depth': NoUnnecessaryArrayFlatDepth.RuleEntry;
+  'unicorn/no-unnecessary-array-splice-count': NoUnnecessaryArraySpliceCount.RuleEntry;
+  'unicorn/no-unnecessary-await': NoUnnecessaryAwait.RuleEntry;
+  'unicorn/no-unnecessary-polyfills': NoUnnecessaryPolyfills.RuleEntry;
+  'unicorn/no-unnecessary-slice-end': NoUnnecessarySliceEnd.RuleEntry;
+  'unicorn/no-unreadable-array-destructuring': NoUnreadableArrayDestructuring.RuleEntry;
+  'unicorn/no-unreadable-iife': NoUnreadableIife.RuleEntry;
+  'unicorn/no-unused-properties': NoUnusedProperties.RuleEntry;
+  'unicorn/no-useless-collection-argument': NoUselessCollectionArgument.RuleEntry;
+  'unicorn/no-useless-error-capture-stack-trace': NoUselessErrorCaptureStackTrace.RuleEntry;
+  'unicorn/no-useless-fallback-in-spread': NoUselessFallbackInSpread.RuleEntry;
+  'unicorn/no-useless-length-check': NoUselessLengthCheck.RuleEntry;
+  'unicorn/no-useless-promise-resolve-reject': NoUselessPromiseResolveReject.RuleEntry;
+  'unicorn/no-useless-spread': NoUselessSpread.RuleEntry;
+  'unicorn/no-useless-switch-case': NoUselessSwitchCase.RuleEntry;
+  'unicorn/no-useless-undefined': NoUselessUndefined.RuleEntry;
+  'unicorn/no-zero-fractions': NoZeroFractions.RuleEntry;
+  'unicorn/number-literal-case': NumberLiteralCase.RuleEntry;
+  'unicorn/numeric-separators-style': NumericSeparatorsStyle.RuleEntry;
+  'unicorn/prefer-add-event-listener': PreferAddEventListener.RuleEntry;
+  'unicorn/prefer-array-find': PreferArrayFind.RuleEntry;
+  'unicorn/prefer-array-flat': PreferArrayFlat.RuleEntry;
+  'unicorn/prefer-array-flat-map': PreferArrayFlatMap.RuleEntry;
+  'unicorn/prefer-array-index-of': PreferArrayIndexOf.RuleEntry;
+  'unicorn/prefer-array-some': PreferArraySome.RuleEntry;
+  'unicorn/prefer-at': PreferAt.RuleEntry;
+  'unicorn/prefer-bigint-literals': PreferBigintLiterals.RuleEntry;
+  'unicorn/prefer-blob-reading-methods': PreferBlobReadingMethods.RuleEntry;
+  'unicorn/prefer-class-fields': PreferClassFields.RuleEntry;
+  'unicorn/prefer-classlist-toggle': PreferClasslistToggle.RuleEntry;
+  'unicorn/prefer-code-point': PreferCodePoint.RuleEntry;
+  'unicorn/prefer-date-now': PreferDateNow.RuleEntry;
+  'unicorn/prefer-default-parameters': PreferDefaultParameters.RuleEntry;
+  'unicorn/prefer-dom-node-append': PreferDomNodeAppend.RuleEntry;
+  'unicorn/prefer-dom-node-dataset': PreferDomNodeDataset.RuleEntry;
+  'unicorn/prefer-dom-node-remove': PreferDomNodeRemove.RuleEntry;
+  'unicorn/prefer-dom-node-text-content': PreferDomNodeTextContent.RuleEntry;
+  'unicorn/prefer-event-target': PreferEventTarget.RuleEntry;
+  'unicorn/prefer-export-from': PreferExportFrom.RuleEntry;
+  'unicorn/prefer-global-this': PreferGlobalThis.RuleEntry;
+  'unicorn/prefer-import-meta-properties': PreferImportMetaProperties.RuleEntry;
+  'unicorn/prefer-includes': PreferIncludes.RuleEntry;
+  'unicorn/prefer-json-parse-buffer': PreferJsonParseBuffer.RuleEntry;
+  'unicorn/prefer-keyboard-event-key': PreferKeyboardEventKey.RuleEntry;
+  'unicorn/prefer-logical-operator-over-ternary': PreferLogicalOperatorOverTernary.RuleEntry;
+  'unicorn/prefer-math-min-max': PreferMathMinMax.RuleEntry;
+  'unicorn/prefer-math-trunc': PreferMathTrunc.RuleEntry;
+  'unicorn/prefer-modern-dom-apis': PreferModernDomApis.RuleEntry;
+  'unicorn/prefer-modern-math-apis': PreferModernMathApis.RuleEntry;
+  'unicorn/prefer-module': PreferModule.RuleEntry;
+  'unicorn/prefer-native-coercion-functions': PreferNativeCoercionFunctions.RuleEntry;
+  'unicorn/prefer-negative-index': PreferNegativeIndex.RuleEntry;
+  'unicorn/prefer-node-protocol': PreferNodeProtocol.RuleEntry;
+  'unicorn/prefer-number-properties': PreferNumberProperties.RuleEntry;
+  'unicorn/prefer-object-from-entries': PreferObjectFromEntries.RuleEntry;
+  'unicorn/prefer-optional-catch-binding': PreferOptionalCatchBinding.RuleEntry;
+  'unicorn/prefer-prototype-methods': PreferPrototypeMethods.RuleEntry;
+  'unicorn/prefer-query-selector': PreferQuerySelector.RuleEntry;
+  'unicorn/prefer-reflect-apply': PreferReflectApply.RuleEntry;
+  'unicorn/prefer-regexp-test': PreferRegexpTest.RuleEntry;
+  'unicorn/prefer-response-static-json': PreferResponseStaticJson.RuleEntry;
+  'unicorn/prefer-set-has': PreferSetHas.RuleEntry;
+  'unicorn/prefer-set-size': PreferSetSize.RuleEntry;
+  'unicorn/prefer-single-call': PreferSingleCall.RuleEntry;
+  'unicorn/prefer-spread': PreferSpread.RuleEntry;
+  'unicorn/prefer-string-raw': PreferStringRaw.RuleEntry;
+  'unicorn/prefer-string-replace-all': PreferStringReplaceAll.RuleEntry;
+  'unicorn/prefer-string-slice': PreferStringSlice.RuleEntry;
+  'unicorn/prefer-string-starts-ends-with': PreferStringStartsEndsWith.RuleEntry;
+  'unicorn/prefer-string-trim-start-end': PreferStringTrimStartEnd.RuleEntry;
+  'unicorn/prefer-structured-clone': PreferStructuredClone.RuleEntry;
+  'unicorn/prefer-switch': PreferSwitch.RuleEntry;
+  'unicorn/prefer-ternary': PreferTernary.RuleEntry;
+  'unicorn/prefer-top-level-await': PreferTopLevelAwait.RuleEntry;
+  'unicorn/prefer-type-error': PreferTypeError.RuleEntry;
+  'unicorn/prevent-abbreviations': PreventAbbreviations.RuleEntry;
+  'unicorn/relative-url-style': RelativeUrlStyle.RuleEntry;
+  'unicorn/require-array-join-separator': RequireArrayJoinSeparator.RuleEntry;
+  'unicorn/require-module-attributes': RequireModuleAttributes.RuleEntry;
+  'unicorn/require-module-specifiers': RequireModuleSpecifiers.RuleEntry;
+  'unicorn/require-number-to-fixed-digits-argument': RequireNumberToFixedDigitsArgument.RuleEntry;
+  'unicorn/require-post-message-target-origin': RequirePostMessageTargetOrigin.RuleEntry;
+  'unicorn/string-content': StringContent.RuleEntry;
+  'unicorn/switch-case-braces': SwitchCaseBraces.RuleEntry;
+  'unicorn/template-indent': TemplateIndent.RuleEntry;
+  'unicorn/text-encoding-identifier-case': TextEncodingIdentifierCase.RuleEntry;
+  'unicorn/throw-new-error': ThrowNewError.RuleEntry;
 
   // deprecated
-  readonly 'unicorn/no-instanceof-array': NoInstanceofArray.RuleEntry;
-  readonly 'unicorn/no-length-as-slice-end': NoLengthAsSliceEnd.RuleEntry;
-  readonly 'unicorn/no-array-push-push': NoArrayPushPush.RuleEntry;
-};
+  'unicorn/no-instanceof-array': NoInstanceofArray.RuleEntry;
+  'unicorn/no-length-as-slice-end': NoLengthAsSliceEnd.RuleEntry;
+  'unicorn/no-array-push-push': NoArrayPushPush.RuleEntry;
+}>;
 
-export type EslintUnicornRulesOption = {
-  readonly 'unicorn/better-regex': BetterRegex.Options;
-  readonly 'unicorn/catch-error-name': CatchErrorName.Options;
-  readonly 'unicorn/consistent-function-scoping': ConsistentFunctionScoping.Options;
-  readonly 'unicorn/escape-case': EscapeCase.Options;
-  readonly 'unicorn/expiring-todo-comments': ExpiringTodoComments.Options;
-  readonly 'unicorn/explicit-length-check': ExplicitLengthCheck.Options;
-  readonly 'unicorn/filename-case': FilenameCase.Options;
-  readonly 'unicorn/import-style': ImportStyle.Options;
-  readonly 'unicorn/no-array-reduce': NoArrayReduce.Options;
-  readonly 'unicorn/no-array-reverse': NoArrayReverse.Options;
-  readonly 'unicorn/no-array-sort': NoArraySort.Options;
-  readonly 'unicorn/no-instanceof-builtins': NoInstanceofBuiltins.Options;
-  readonly 'unicorn/no-keyword-prefix': NoKeywordPrefix.Options;
-  readonly 'unicorn/no-null': NoNull.Options;
-  readonly 'unicorn/no-typeof-undefined': NoTypeofUndefined.Options;
-  readonly 'unicorn/no-unnecessary-polyfills': NoUnnecessaryPolyfills.Options;
-  readonly 'unicorn/no-useless-undefined': NoUselessUndefined.Options;
-  readonly 'unicorn/number-literal-case': NumberLiteralCase.Options;
-  readonly 'unicorn/numeric-separators-style': NumericSeparatorsStyle.Options;
-  readonly 'unicorn/prefer-add-event-listener': PreferAddEventListener.Options;
-  readonly 'unicorn/prefer-array-find': PreferArrayFind.Options;
-  readonly 'unicorn/prefer-array-flat': PreferArrayFlat.Options;
-  readonly 'unicorn/prefer-at': PreferAt.Options;
-  readonly 'unicorn/prefer-export-from': PreferExportFrom.Options;
-  readonly 'unicorn/prefer-number-properties': PreferNumberProperties.Options;
-  readonly 'unicorn/prefer-object-from-entries': PreferObjectFromEntries.Options;
-  readonly 'unicorn/prefer-single-call': PreferSingleCall.Options;
-  readonly 'unicorn/prefer-structured-clone': PreferStructuredClone.Options;
-  readonly 'unicorn/prefer-switch': PreferSwitch.Options;
-  readonly 'unicorn/prefer-ternary': PreferTernary.Options;
-  readonly 'unicorn/prevent-abbreviations': PreventAbbreviations.Options;
-  readonly 'unicorn/relative-url-style': RelativeUrlStyle.Options;
-  readonly 'unicorn/string-content': StringContent.Options;
-  readonly 'unicorn/switch-case-braces': SwitchCaseBraces.Options;
-  readonly 'unicorn/template-indent': TemplateIndent.Options;
-  readonly 'unicorn/text-encoding-identifier-case': TextEncodingIdentifierCase.Options;
-};
+export type EslintUnicornRulesOption = Readonly<{
+  'unicorn/better-regex': BetterRegex.Options;
+  'unicorn/catch-error-name': CatchErrorName.Options;
+  'unicorn/consistent-function-scoping': ConsistentFunctionScoping.Options;
+  'unicorn/escape-case': EscapeCase.Options;
+  'unicorn/expiring-todo-comments': ExpiringTodoComments.Options;
+  'unicorn/explicit-length-check': ExplicitLengthCheck.Options;
+  'unicorn/filename-case': FilenameCase.Options;
+  'unicorn/import-style': ImportStyle.Options;
+  'unicorn/no-array-reduce': NoArrayReduce.Options;
+  'unicorn/no-array-reverse': NoArrayReverse.Options;
+  'unicorn/no-array-sort': NoArraySort.Options;
+  'unicorn/no-instanceof-builtins': NoInstanceofBuiltins.Options;
+  'unicorn/no-keyword-prefix': NoKeywordPrefix.Options;
+  'unicorn/no-null': NoNull.Options;
+  'unicorn/no-typeof-undefined': NoTypeofUndefined.Options;
+  'unicorn/no-unnecessary-polyfills': NoUnnecessaryPolyfills.Options;
+  'unicorn/no-useless-undefined': NoUselessUndefined.Options;
+  'unicorn/number-literal-case': NumberLiteralCase.Options;
+  'unicorn/numeric-separators-style': NumericSeparatorsStyle.Options;
+  'unicorn/prefer-add-event-listener': PreferAddEventListener.Options;
+  'unicorn/prefer-array-find': PreferArrayFind.Options;
+  'unicorn/prefer-array-flat': PreferArrayFlat.Options;
+  'unicorn/prefer-at': PreferAt.Options;
+  'unicorn/prefer-export-from': PreferExportFrom.Options;
+  'unicorn/prefer-number-properties': PreferNumberProperties.Options;
+  'unicorn/prefer-object-from-entries': PreferObjectFromEntries.Options;
+  'unicorn/prefer-single-call': PreferSingleCall.Options;
+  'unicorn/prefer-structured-clone': PreferStructuredClone.Options;
+  'unicorn/prefer-switch': PreferSwitch.Options;
+  'unicorn/prefer-ternary': PreferTernary.Options;
+  'unicorn/prevent-abbreviations': PreventAbbreviations.Options;
+  'unicorn/relative-url-style': RelativeUrlStyle.Options;
+  'unicorn/string-content': StringContent.Options;
+  'unicorn/switch-case-braces': SwitchCaseBraces.Options;
+  'unicorn/template-indent': TemplateIndent.Options;
+  'unicorn/text-encoding-identifier-case': TextEncodingIdentifierCase.Options;
+}>;

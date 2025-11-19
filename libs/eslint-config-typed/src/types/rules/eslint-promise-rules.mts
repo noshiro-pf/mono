@@ -40,15 +40,15 @@ namespace ParamNames {
    * ]
    * ```
    */
-  export type Options = {
-    readonly resolvePattern?: string;
-    readonly rejectPattern?: string;
-  };
+  export type Options = Readonly<{
+    resolvePattern?: string;
+    rejectPattern?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -82,14 +82,14 @@ namespace NoReturnWrap {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowReject?: boolean;
-  };
+  export type Options = Readonly<{
+    allowReject?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -131,15 +131,15 @@ namespace AlwaysReturn {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreLastCallback?: boolean;
-    readonly ignoreAssignmentVariable?: readonly string[];
-  };
+  export type Options = Readonly<{
+    ignoreLastCallback?: boolean;
+    ignoreAssignmentVariable?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -191,17 +191,17 @@ namespace CatchOrReturn {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowFinally?: boolean;
-    readonly allowThen?: boolean;
-    readonly allowThenStrict?: boolean;
-    readonly terminationMethod?: string | readonly string[];
-  };
+  export type Options = Readonly<{
+    allowFinally?: boolean;
+    allowThen?: boolean;
+    allowThenStrict?: boolean;
+    terminationMethod?: string | readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -249,15 +249,15 @@ namespace PreferAwaitToThen {
    * ]
    * ```
    */
-  export type Options = {
-    readonly strict?: boolean;
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    strict?: boolean;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -331,15 +331,15 @@ namespace NoCallbackInPromise {
    * ]
    * ```
    */
-  export type Options = {
-    readonly exceptions?: readonly string[];
-    readonly timeoutsErr?: boolean;
-  };
+  export type Options = Readonly<{
+    exceptions?: readonly string[];
+    timeoutsErr?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -457,14 +457,14 @@ namespace ValidParams {
    * ]
    * ```
    */
-  export type Options = {
-    readonly exclude?: readonly string[];
-  };
+  export type Options = Readonly<{
+    exclude?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -516,43 +516,43 @@ namespace SpecOnly {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedMethods?: readonly string[];
-  };
+  export type Options = Readonly<{
+    allowedMethods?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintPromiseRules = {
-  readonly 'promise/param-names': ParamNames.RuleEntry;
-  readonly 'promise/no-return-wrap': NoReturnWrap.RuleEntry;
-  readonly 'promise/always-return': AlwaysReturn.RuleEntry;
-  readonly 'promise/catch-or-return': CatchOrReturn.RuleEntry;
-  readonly 'promise/prefer-await-to-callbacks': PreferAwaitToCallbacks.RuleEntry;
-  readonly 'promise/prefer-await-to-then': PreferAwaitToThen.RuleEntry;
-  readonly 'promise/prefer-catch': PreferCatch.RuleEntry;
-  readonly 'promise/no-native': NoNative.RuleEntry;
-  readonly 'promise/no-callback-in-promise': NoCallbackInPromise.RuleEntry;
-  readonly 'promise/no-promise-in-callback': NoPromiseInCallback.RuleEntry;
-  readonly 'promise/no-nesting': NoNesting.RuleEntry;
-  readonly 'promise/avoid-new': AvoidNew.RuleEntry;
-  readonly 'promise/no-new-statics': NoNewStatics.RuleEntry;
-  readonly 'promise/no-return-in-finally': NoReturnInFinally.RuleEntry;
-  readonly 'promise/valid-params': ValidParams.RuleEntry;
-  readonly 'promise/no-multiple-resolved': NoMultipleResolved.RuleEntry;
-  readonly 'promise/spec-only': SpecOnly.RuleEntry;
-};
+export type EslintPromiseRules = Readonly<{
+  'promise/param-names': ParamNames.RuleEntry;
+  'promise/no-return-wrap': NoReturnWrap.RuleEntry;
+  'promise/always-return': AlwaysReturn.RuleEntry;
+  'promise/catch-or-return': CatchOrReturn.RuleEntry;
+  'promise/prefer-await-to-callbacks': PreferAwaitToCallbacks.RuleEntry;
+  'promise/prefer-await-to-then': PreferAwaitToThen.RuleEntry;
+  'promise/prefer-catch': PreferCatch.RuleEntry;
+  'promise/no-native': NoNative.RuleEntry;
+  'promise/no-callback-in-promise': NoCallbackInPromise.RuleEntry;
+  'promise/no-promise-in-callback': NoPromiseInCallback.RuleEntry;
+  'promise/no-nesting': NoNesting.RuleEntry;
+  'promise/avoid-new': AvoidNew.RuleEntry;
+  'promise/no-new-statics': NoNewStatics.RuleEntry;
+  'promise/no-return-in-finally': NoReturnInFinally.RuleEntry;
+  'promise/valid-params': ValidParams.RuleEntry;
+  'promise/no-multiple-resolved': NoMultipleResolved.RuleEntry;
+  'promise/spec-only': SpecOnly.RuleEntry;
+}>;
 
-export type EslintPromiseRulesOption = {
-  readonly 'promise/param-names': ParamNames.Options;
-  readonly 'promise/no-return-wrap': NoReturnWrap.Options;
-  readonly 'promise/always-return': AlwaysReturn.Options;
-  readonly 'promise/catch-or-return': CatchOrReturn.Options;
-  readonly 'promise/prefer-await-to-then': PreferAwaitToThen.Options;
-  readonly 'promise/no-callback-in-promise': NoCallbackInPromise.Options;
-  readonly 'promise/valid-params': ValidParams.Options;
-  readonly 'promise/spec-only': SpecOnly.Options;
-};
+export type EslintPromiseRulesOption = Readonly<{
+  'promise/param-names': ParamNames.Options;
+  'promise/no-return-wrap': NoReturnWrap.Options;
+  'promise/always-return': AlwaysReturn.Options;
+  'promise/catch-or-return': CatchOrReturn.Options;
+  'promise/prefer-await-to-then': PreferAwaitToThen.Options;
+  'promise/no-callback-in-promise': NoCallbackInPromise.Options;
+  'promise/valid-params': ValidParams.Options;
+  'promise/spec-only': SpecOnly.Options;
+}>;

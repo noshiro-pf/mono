@@ -55,18 +55,20 @@ namespace BooleanPropNaming {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** @minItems 1 */
-    readonly propTypeNames?: readonly [string, ...(readonly string[])];
-    readonly rule?: string;
-    readonly message?: string;
-    readonly validateNested?: boolean;
-  };
+    propTypeNames?: readonly [string, ...string[]];
+    /** @default '^(is|has)[A-Z]([A-Za-z0-9]?)+' */
+    rule?: string;
+    message?: string;
+    /** @default false */
+    validateNested?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -108,16 +110,19 @@ namespace ButtonHasType {
    * ]
    * ```
    */
-  export type Options = {
-    readonly button?: boolean;
-    readonly submit?: boolean;
-    readonly reset?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default true */
+    button?: boolean;
+    /** @default true */
+    submit?: boolean;
+    /** @default true */
+    reset?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -152,15 +157,15 @@ namespace CheckedRequiresOnchangeOrReadonly {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreMissingProperties?: boolean;
-    readonly ignoreExclusiveCheckedAttribute?: boolean;
-  };
+  export type Options = Readonly<{
+    ignoreMissingProperties?: boolean;
+    ignoreExclusiveCheckedAttribute?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -193,14 +198,15 @@ namespace DefaultPropsMatchPropTypes {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowRequiredDefaults?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    allowRequiredDefaults?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -251,16 +257,16 @@ namespace DestructuringAssignment {
    */
   export type Options0 = 'always' | 'never';
 
-  export type Options1 = {
-    readonly ignoreClassFields?: boolean;
-    readonly destructureInSignature?: 'always' | 'ignore';
-  };
+  export type Options1 = Readonly<{
+    ignoreClassFields?: boolean;
+    destructureInSignature?: 'always' | 'ignore';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | readonly [Linter.StringSeverity, Options0, Options1]
     | readonly [Linter.StringSeverity, Options0]
-    | 'off';
+    | readonly [Linter.StringSeverity, Options0, Options1];
 }
 
 /**
@@ -296,15 +302,15 @@ namespace DisplayName {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreTranspilerName?: boolean;
-    readonly checkContextObjects?: boolean;
-  };
+  export type Options = Readonly<{
+    ignoreTranspilerName?: boolean;
+    checkContextObjects?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -475,30 +481,32 @@ namespace ForbidComponentProps {
    * ]
    * ```
    */
-  export type Options = {
-    readonly forbid?: readonly (
-      | UnknownRecord
+  export type Options = Readonly<{
+    forbid?: readonly (
       | string
-      | {
-          readonly propName?: string;
-          readonly allowedFor?: readonly string[];
-          readonly allowedForPatterns?: readonly string[];
-          readonly message?: string;
-        }
-      | {
-          readonly propNamePattern?: string;
-          readonly allowedFor?: readonly string[];
-          readonly allowedForPatterns?: readonly string[];
-          readonly message?: string;
-        }
+      | Readonly<
+          | {
+              propName?: string;
+              allowedFor?: readonly string[];
+              allowedForPatterns?: readonly string[];
+              message?: string;
+            }
+          | Record<string, unknown>
+          | {
+              propNamePattern?: string;
+              allowedFor?: readonly string[];
+              allowedForPatterns?: readonly string[];
+              message?: string;
+            }
+        >
     )[];
-    readonly [k: string]: unknown;
-  };
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -558,22 +566,22 @@ namespace ForbidDomProps {
    * ]
    * ```
    */
-  export type Options = {
-    readonly forbid?: readonly (
+  export type Options = Readonly<{
+    forbid?: readonly (
       | string
-      | {
-          readonly propName?: string;
-          readonly disallowedFor?: readonly string[];
-          readonly message?: string;
-          readonly [k: string]: unknown;
-        }
+      | Readonly<{
+          propName?: string;
+          disallowedFor?: readonly string[];
+          message?: string;
+          [k: string]: unknown;
+        }>
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -628,20 +636,20 @@ namespace ForbidElements {
    * ]
    * ```
    */
-  export type Options = {
-    readonly forbid?: readonly (
+  export type Options = Readonly<{
+    forbid?: readonly (
       | string
-      | {
-          readonly element: string;
-          readonly message?: string;
-        }
+      | Readonly<{
+          element: string;
+          message?: string;
+        }>
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -674,14 +682,14 @@ namespace ForbidForeignPropTypes {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowInPropTypes?: boolean;
-  };
+  export type Options = Readonly<{
+    allowInPropTypes?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -723,17 +731,17 @@ namespace ForbidPropTypes {
    * ]
    * ```
    */
-  export type Options = {
-    readonly forbid?: readonly string[];
-    readonly checkContextTypes?: boolean;
-    readonly checkChildContextTypes?: boolean;
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    forbid?: readonly string[];
+    checkContextTypes?: boolean;
+    checkChildContextTypes?: boolean;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -823,27 +831,24 @@ namespace FunctionComponentDefinition {
    * ]
    * ```
    */
-  export type Options = {
-    readonly namedComponents?:
+  export type Options = Readonly<{
+    namedComponents?:
+      | ('function-declaration' | 'arrow-function' | 'function-expression')
       | readonly (
-          | 'arrow-function'
           | 'function-declaration'
+          | 'arrow-function'
           | 'function-expression'
-        )[]
-      | 'arrow-function'
-      | 'function-declaration'
-      | 'function-expression';
-    readonly unnamedComponents?:
-      | readonly ('arrow-function' | 'function-expression')[]
-      | 'arrow-function'
-      | 'function-expression';
-    readonly [k: string]: unknown;
-  };
+        )[];
+    unnamedComponents?:
+      | ('arrow-function' | 'function-expression')
+      | readonly ('arrow-function' | 'function-expression')[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -880,14 +885,15 @@ namespace HookUseState {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowDestructuredState?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    allowDestructuredState?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -992,29 +998,29 @@ namespace JsxBooleanValue {
    * ```
    */
   export type Options =
-    | readonly [
-        'always',
-        {
-          readonly never?: readonly string[];
-          readonly assumeUndefinedIsFalse?: boolean;
-        },
-      ]
-    | readonly [
-        'never',
-        {
-          readonly always?: readonly string[];
-          readonly assumeUndefinedIsFalse?: boolean;
-        },
-      ]
+    | readonly []
     | readonly ['always' | 'never']
     | readonly ['always']
+    | readonly [
+        'always',
+        Readonly<{
+          never?: readonly string[];
+          assumeUndefinedIsFalse?: boolean;
+        }>,
+      ]
     | readonly ['never']
-    | readonly [];
+    | readonly [
+        'never',
+        Readonly<{
+          always?: readonly string[];
+          assumeUndefinedIsFalse?: boolean;
+        }>,
+      ];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1107,36 +1113,35 @@ namespace JsxClosingBracketLocation {
    * ```
    */
   export type Options =
-    | 'after-props'
-    | 'line-aligned'
-    | 'props-aligned'
-    | 'tag-aligned'
-    | {
-        readonly location?:
-          | 'after-props'
-          | 'line-aligned'
-          | 'props-aligned'
-          | 'tag-aligned';
-      }
-    | {
-        readonly nonEmpty?:
-          | 'after-props'
-          | 'line-aligned'
-          | 'props-aligned'
-          | 'tag-aligned'
-          | false;
-        readonly selfClosing?:
-          | 'after-props'
-          | 'line-aligned'
-          | 'props-aligned'
-          | 'tag-aligned'
-          | false;
-      };
+    | ('after-props' | 'props-aligned' | 'tag-aligned' | 'line-aligned')
+    | Readonly<
+        | {
+            location?:
+              | 'after-props'
+              | 'props-aligned'
+              | 'tag-aligned'
+              | 'line-aligned';
+          }
+        | {
+            nonEmpty?:
+              | 'after-props'
+              | 'props-aligned'
+              | 'tag-aligned'
+              | 'line-aligned'
+              | false;
+            selfClosing?:
+              | 'after-props'
+              | 'props-aligned'
+              | 'tag-aligned'
+              | 'line-aligned'
+              | false;
+          }
+      >;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1184,16 +1189,15 @@ namespace JsxClosingTagLocation {
    * ```
    */
   export type Options =
-    | 'line-aligned'
-    | 'tag-aligned'
-    | {
-        readonly location?: 'line-aligned' | 'tag-aligned';
-      };
+    | ('tag-aligned' | 'line-aligned')
+    | Readonly<{
+        location?: 'tag-aligned' | 'line-aligned';
+      }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1296,49 +1300,51 @@ namespace JsxCurlySpacing {
    * ```
    */
   export type Options =
+    | readonly []
     | readonly [
-        (
-          | (BasicConfig & {
-              readonly attributes?: BasicConfigOrBoolean;
-              readonly children?: BasicConfigOrBoolean;
-              readonly [k: string]: unknown;
-            })
-          | ('always' | 'never')
-        ),
-        {
-          readonly allowMultiline?: boolean;
-          readonly spacing?: {
-            readonly objectLiterals?: 'always' | 'never';
-            readonly [k: string]: unknown;
-          };
-        },
-      ]
-    | readonly [
-        | (BasicConfig & {
-            readonly attributes?: BasicConfigOrBoolean;
-            readonly children?: BasicConfigOrBoolean;
-            readonly [k: string]: unknown;
-          })
+        | (BasicConfig &
+            Readonly<{
+              attributes?: BasicConfigOrBoolean;
+              children?: BasicConfigOrBoolean;
+              [k: string]: unknown;
+            }>)
         | ('always' | 'never'),
       ]
-    | readonly [];
+    | readonly [
+        (
+          | (BasicConfig &
+              Readonly<{
+                attributes?: BasicConfigOrBoolean;
+                children?: BasicConfigOrBoolean;
+                [k: string]: unknown;
+              }>)
+          | ('always' | 'never')
+        ),
+        Readonly<{
+          allowMultiline?: boolean;
+          spacing?: Readonly<{
+            objectLiterals?: 'always' | 'never';
+            [k: string]: unknown;
+          }>;
+        }>,
+      ];
 
   export type BasicConfigOrBoolean = BasicConfig | boolean;
 
-  export type BasicConfig = {
-    readonly when?: 'always' | 'never';
-    readonly allowMultiline?: boolean;
-    readonly spacing?: {
-      readonly objectLiterals?: 'always' | 'never';
-      readonly [k: string]: unknown;
-    };
-    readonly [k: string]: unknown;
-  };
+  export type BasicConfig = Readonly<{
+    when?: 'always' | 'never';
+    allowMultiline?: boolean;
+    spacing?: Readonly<{
+      objectLiterals?: 'always' | 'never';
+      [k: string]: unknown;
+    }>;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1396,17 +1402,16 @@ namespace JsxCurlyNewline {
    * ```
    */
   export type Options =
-    | 'consistent'
-    | 'never'
-    | {
-        readonly singleline?: 'consistent' | 'forbid' | 'require';
-        readonly multiline?: 'consistent' | 'forbid' | 'require';
-      };
+    | ('consistent' | 'never')
+    | Readonly<{
+        singleline?: 'consistent' | 'require' | 'forbid';
+        multiline?: 'consistent' | 'require' | 'forbid';
+      }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1440,9 +1445,9 @@ namespace JsxEqualsSpacing {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1487,16 +1492,16 @@ namespace JsxFilenameExtension {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allow?: 'always' | 'as-needed';
-    readonly extensions?: readonly string[];
-    readonly ignoreFilesWithoutCode?: boolean;
-  };
+  export type Options = Readonly<{
+    allow?: 'always' | 'as-needed';
+    extensions?: readonly string[];
+    ignoreFilesWithoutCode?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1532,15 +1537,15 @@ namespace JsxFirstPropNewLine {
    */
   export type Options =
     | 'always'
-    | 'multiline-multiprop'
+    | 'never'
     | 'multiline'
-    | 'multiprop'
-    | 'never';
+    | 'multiline-multiprop'
+    | 'multiprop';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1679,43 +1684,44 @@ namespace JsxHandlerNames {
    * ]
    * ```
    */
-  export type Options =
+  export type Options = Readonly<
     | {
-        readonly checkInlineFunction?: boolean;
+        eventHandlerPrefix?: string;
+        eventHandlerPropPrefix?: string;
+        checkLocalVariables?: boolean;
+        checkInlineFunction?: boolean;
+        ignoreComponentNames?: readonly string[];
       }
     | {
-        readonly checkLocalVariables?: boolean;
+        eventHandlerPrefix?: string;
+        eventHandlerPropPrefix?: false;
+        checkLocalVariables?: boolean;
+        checkInlineFunction?: boolean;
+        ignoreComponentNames?: readonly string[];
       }
     | {
-        readonly eventHandlerPrefix?: false;
-        readonly eventHandlerPropPrefix?: string;
-        readonly checkLocalVariables?: boolean;
-        readonly checkInlineFunction?: boolean;
-        readonly ignoreComponentNames?: readonly string[];
+        eventHandlerPrefix?: false;
+        eventHandlerPropPrefix?: string;
+        checkLocalVariables?: boolean;
+        checkInlineFunction?: boolean;
+        ignoreComponentNames?: readonly string[];
       }
     | {
-        readonly eventHandlerPrefix?: string;
-        readonly eventHandlerPropPrefix?: false;
-        readonly checkLocalVariables?: boolean;
-        readonly checkInlineFunction?: boolean;
-        readonly ignoreComponentNames?: readonly string[];
+        checkLocalVariables?: boolean;
       }
     | {
-        readonly eventHandlerPrefix?: string;
-        readonly eventHandlerPropPrefix?: string;
-        readonly checkLocalVariables?: boolean;
-        readonly checkInlineFunction?: boolean;
-        readonly ignoreComponentNames?: readonly string[];
+        checkInlineFunction?: boolean;
       }
     | {
-        readonly ignoreComponentNames?: readonly string[];
-        readonly [k: string]: unknown;
-      };
+        ignoreComponentNames?: readonly string[];
+        [k: string]: unknown;
+      }
+  >;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1764,18 +1770,18 @@ namespace JsxIndent {
    * ]
    * ```
    */
-  export type Options0 = number | 'tab';
+  export type Options0 = 'tab' | number;
 
-  export type Options1 = {
-    readonly checkAttributes?: boolean;
-    readonly indentLogicalExpressions?: boolean;
-  };
+  export type Options1 = Readonly<{
+    checkAttributes?: boolean;
+    indentLogicalExpressions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | readonly [Linter.StringSeverity, Options0, Options1]
     | readonly [Linter.StringSeverity, Options0]
-    | 'off';
+    | readonly [Linter.StringSeverity, Options0, Options1];
 }
 
 /**
@@ -1835,19 +1841,18 @@ namespace JsxIndentProps {
    * ```
    */
   export type Options =
+    | ('tab' | 'first')
     | number
-    | 'first'
-    | 'tab'
-    | {
-        readonly indentMode?: number | 'first' | 'tab';
-        readonly ignoreTernaryOperator?: boolean;
-        readonly [k: string]: unknown;
-      };
+    | Readonly<{
+        indentMode?: ('tab' | 'first') | number;
+        ignoreTernaryOperator?: boolean;
+        [k: string]: unknown;
+      }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1889,16 +1894,19 @@ namespace JsxKey {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkFragmentShorthand?: boolean;
-    readonly checkKeyMustBeforeSpread?: boolean;
-    readonly warnOnDuplicates?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    checkFragmentShorthand?: boolean;
+    /** @default false */
+    checkKeyMustBeforeSpread?: boolean;
+    /** @default false */
+    warnOnDuplicates?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1932,14 +1940,14 @@ namespace JsxMaxDepth {
    * ]
    * ```
    */
-  export type Options = {
-    readonly max?: number;
-  };
+  export type Options = Readonly<{
+    max?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2004,23 +2012,24 @@ namespace JsxMaxPropsPerLine {
    * ]
    * ```
    */
-  export type Options =
+  export type Options = Readonly<
     | {
-        readonly maximum?: {
-          readonly single?: number;
-          readonly multi?: number;
-          readonly [k: string]: unknown;
-        };
+        maximum?: Readonly<{
+          single?: number;
+          multi?: number;
+          [k: string]: unknown;
+        }>;
       }
     | {
-        readonly maximum?: number;
-        readonly when?: 'always' | 'multiline';
-      };
+        maximum?: number;
+        when?: 'always' | 'multiline';
+      }
+  >;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2076,15 +2085,17 @@ namespace JsxNewline {
    * ]
    * ```
    */
-  export type Options = {
-    readonly prevent?: boolean;
-    readonly allowMultilines?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    prevent?: boolean;
+    /** @default false */
+    allowMultilines?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2134,18 +2145,23 @@ namespace JsxNoBind {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowArrowFunctions?: boolean;
-    readonly allowBind?: boolean;
-    readonly allowFunctions?: boolean;
-    readonly ignoreRefs?: boolean;
-    readonly ignoreDOMComponents?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    allowArrowFunctions?: boolean;
+    /** @default false */
+    allowBind?: boolean;
+    /** @default false */
+    allowFunctions?: boolean;
+    /** @default false */
+    ignoreRefs?: boolean;
+    /** @default false */
+    ignoreDOMComponents?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2211,14 +2227,14 @@ namespace JsxNoDuplicateProps {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreCase?: boolean;
-  };
+  export type Options = Readonly<{
+    ignoreCase?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2263,14 +2279,15 @@ namespace JsxNoLeakedRender {
    * ]
    * ```
    */
-  export type Options = {
-    readonly validStrategies?: readonly ('coerce' | 'ternary')[];
-  };
+  export type Options = Readonly<{
+    /** @default ['ternary', 'coerce'] */
+    validStrategies?: readonly ('ternary' | 'coerce')[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2345,28 +2362,30 @@ namespace JsxNoLiterals {
    * ]
    * ```
    */
-  export type Options = {
-    readonly elementOverrides?: Record<
-      string,
-      {
-        readonly applyToNestedElements?: boolean;
-        readonly noStrings?: boolean;
-        readonly allowedStrings?: readonly string[];
-        readonly ignoreProps?: boolean;
-        readonly noAttributeStrings?: boolean;
-        readonly [k: string]: unknown;
-      }
+  export type Options = Readonly<{
+    elementOverrides?: Readonly<
+      Record<
+        string,
+        Readonly<{
+          applyToNestedElements?: boolean;
+          noStrings?: boolean;
+          allowedStrings?: readonly string[];
+          ignoreProps?: boolean;
+          noAttributeStrings?: boolean;
+          [k: string]: unknown;
+        }>
+      >
     >;
-    readonly noStrings?: boolean;
-    readonly allowedStrings?: readonly string[];
-    readonly ignoreProps?: boolean;
-    readonly noAttributeStrings?: boolean;
-  };
+    noStrings?: boolean;
+    allowedStrings?: readonly string[];
+    ignoreProps?: boolean;
+    noAttributeStrings?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2444,34 +2463,34 @@ namespace JsxNoScriptUrl {
    * ```
    */
   export type Options =
+    | readonly []
     | readonly [
-        {
-          readonly includeFromSettings?: boolean;
-          readonly [k: string]: unknown;
-        },
+        readonly Readonly<{
+          name: string;
+          props: readonly string[];
+        }>[],
       ]
     | readonly [
-        readonly {
-          readonly name: string;
-          readonly props: readonly string[];
-        }[],
-        {
-          readonly includeFromSettings?: boolean;
-          readonly [k: string]: unknown;
-        },
+        readonly Readonly<{
+          name: string;
+          props: readonly string[];
+        }>[],
+        Readonly<{
+          includeFromSettings?: boolean;
+          [k: string]: unknown;
+        }>,
       ]
     | readonly [
-        readonly {
-          readonly name: string;
-          readonly props: readonly string[];
-        }[],
-      ]
-    | readonly [];
+        Readonly<{
+          includeFromSettings?: boolean;
+          [k: string]: unknown;
+        }>,
+      ];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2522,18 +2541,20 @@ namespace JsxNoTargetBlank {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowReferrer?: boolean;
-    readonly enforceDynamicLinks?: 'always' | 'never';
-    readonly warnOnSpreadAttributes?: boolean;
-    readonly links?: boolean;
-    readonly forms?: boolean;
-  };
+  export type Options = Readonly<{
+    allowReferrer?: boolean;
+    enforceDynamicLinks?: 'always' | 'never';
+    warnOnSpreadAttributes?: boolean;
+    /** @default true */
+    links?: boolean;
+    /** @default false */
+    forms?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2567,15 +2588,15 @@ namespace JsxNoUselessFragment {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowExpressions?: boolean;
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    allowExpressions?: boolean;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2617,14 +2638,14 @@ namespace JsxOneExpressionPerLine {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allow?: 'literal' | 'non-jsx' | 'none' | 'single-child';
-  };
+  export type Options = Readonly<{
+    allow?: 'none' | 'literal' | 'single-child' | 'non-jsx';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2657,14 +2678,14 @@ namespace JsxNoUndef {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowGlobals?: boolean;
-  };
+  export type Options = Readonly<{
+    allowGlobals?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2729,17 +2750,17 @@ namespace JsxCurlyBracePresence {
    * ```
    */
   export type Options =
-    | {
-        readonly props?: 'always' | 'ignore' | 'never';
-        readonly children?: 'always' | 'ignore' | 'never';
-        readonly propElementValues?: 'always' | 'ignore' | 'never';
-      }
-    | ('always' | 'ignore' | 'never');
+    | Readonly<{
+        props?: 'always' | 'never' | 'ignore';
+        children?: 'always' | 'never' | 'ignore';
+        propElementValues?: 'always' | 'never' | 'ignore';
+      }>
+    | ('always' | 'never' | 'ignore');
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2788,18 +2809,18 @@ namespace JsxPascalCase {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowAllCaps?: boolean;
-    readonly allowLeadingUnderscore?: boolean;
-    readonly allowNamespace?: boolean;
+  export type Options = Readonly<{
+    allowAllCaps?: boolean;
+    allowLeadingUnderscore?: boolean;
+    allowNamespace?: boolean;
     /** @minItems 0 */
-    readonly ignore?: readonly [] | readonly [string];
-  };
+    ignore?: readonly [] | readonly [string];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2830,12 +2851,12 @@ namespace JsxFragments {
    * ]
    * ```
    */
-  export type Options = 'element' | 'syntax';
+  export type Options = 'syntax' | 'element';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2936,18 +2957,20 @@ namespace JsxPropsNoSpreading {
    * ]
    * ```
    */
-  export type Options = UnknownRecord & {
-    readonly html?: 'enforce' | 'ignore';
-    readonly custom?: 'enforce' | 'ignore';
-    readonly explicitSpread?: 'enforce' | 'ignore';
-    readonly exceptions?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<
+    {
+      html?: 'enforce' | 'ignore';
+      custom?: 'enforce' | 'ignore';
+      explicitSpread?: 'enforce' | 'ignore';
+      exceptions?: readonly string[];
+      [k: string]: unknown;
+    } & Record<string, unknown>
+  >;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3060,21 +3083,23 @@ namespace JsxSortProps {
    * ]
    * ```
    */
-  export type Options = {
-    readonly callbacksLast?: boolean;
-    readonly shorthandFirst?: boolean;
-    readonly shorthandLast?: boolean;
-    readonly multiline?: 'first' | 'ignore' | 'last';
-    readonly ignoreCase?: boolean;
-    readonly noSortAlphabetically?: boolean;
-    readonly reservedFirst?: boolean | readonly unknown[];
-    readonly locale?: string;
-  };
+  export type Options = Readonly<{
+    callbacksLast?: boolean;
+    shorthandFirst?: boolean;
+    shorthandLast?: boolean;
+    /** @default 'ignore' */
+    multiline?: 'ignore' | 'first' | 'last';
+    ignoreCase?: boolean;
+    noSortAlphabetically?: boolean;
+    reservedFirst?: readonly unknown[] | boolean;
+    /** @default 'auto' */
+    locale?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3173,25 +3198,17 @@ namespace JsxTagSpacing {
    * ]
    * ```
    */
-  export type Options = {
-    readonly closingSlash?: 'allow' | 'always' | 'never';
-    readonly beforeSelfClosing?:
-      | 'allow'
-      | 'always'
-      | 'never'
-      | 'proportional-always';
-    readonly afterOpening?: 'allow-multiline' | 'allow' | 'always' | 'never';
-    readonly beforeClosing?:
-      | 'allow'
-      | 'always'
-      | 'never'
-      | 'proportional-always';
-  };
+  export type Options = Readonly<{
+    closingSlash?: 'always' | 'never' | 'allow';
+    beforeSelfClosing?: 'always' | 'proportional-always' | 'never' | 'allow';
+    afterOpening?: 'always' | 'allow-multiline' | 'never' | 'allow';
+    beforeClosing?: 'always' | 'proportional-always' | 'never' | 'allow';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3324,62 +3341,38 @@ namespace JsxWrapMultilines {
    * ]
    * ```
    */
-  export type Options = {
-    readonly declaration?:
-      | 'ignore'
-      | 'never'
-      | 'parens-new-line'
-      | 'parens'
+  export type Options = Readonly<{
+    declaration?:
+      | true
       | false
-      | true;
-    readonly assignment?:
       | 'ignore'
-      | 'never'
-      | 'parens-new-line'
       | 'parens'
+      | 'parens-new-line'
+      | 'never';
+    assignment?:
+      | true
       | false
-      | true;
-    readonly return?:
       | 'ignore'
-      | 'never'
-      | 'parens-new-line'
       | 'parens'
+      | 'parens-new-line'
+      | 'never';
+    return?: true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
+    arrow?: true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
+    condition?:
+      | true
       | false
-      | true;
-    readonly arrow?:
       | 'ignore'
-      | 'never'
-      | 'parens-new-line'
       | 'parens'
-      | false
-      | true;
-    readonly condition?:
-      | 'ignore'
-      | 'never'
       | 'parens-new-line'
-      | 'parens'
-      | false
-      | true;
-    readonly logical?:
-      | 'ignore'
-      | 'never'
-      | 'parens-new-line'
-      | 'parens'
-      | false
-      | true;
-    readonly prop?:
-      | 'ignore'
-      | 'never'
-      | 'parens-new-line'
-      | 'parens'
-      | false
-      | true;
-  };
+      | 'never';
+    logical?: true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
+    prop?: true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3416,9 +3409,9 @@ namespace NoInvalidHtmlAttribute {
   export type Options = readonly 'rel'[];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3517,14 +3510,15 @@ namespace NoChildrenProp {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowFunctions?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    allowFunctions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3561,16 +3555,16 @@ namespace NoDanger {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** @minItems 0 */
-    readonly customComponentNames?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+    customComponentNames?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3635,9 +3629,9 @@ namespace NoDidMountSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3669,9 +3663,9 @@ namespace NoDidUpdateSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3753,14 +3747,15 @@ namespace NoMultiComp {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreStateless?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    ignoreStateless?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3825,14 +3820,14 @@ namespace NoStringRefs {
    * ]
    * ```
    */
-  export type Options = {
-    readonly noTemplateLiterals?: boolean;
-  };
+  export type Options = Readonly<{
+    noTemplateLiterals?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3952,21 +3947,21 @@ namespace NoUnescapedEntities {
    * ]
    * ```
    */
-  export type Options = {
-    readonly forbid?: readonly (
+  export type Options = Readonly<{
+    forbid?: readonly (
       | string
-      | {
-          readonly char?: string;
-          readonly alternatives?: readonly string[];
-          readonly [k: string]: unknown;
-        }
+      | Readonly<{
+          char?: string;
+          alternatives?: readonly string[];
+          [k: string]: unknown;
+        }>
     )[];
-  };
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4007,15 +4002,16 @@ namespace NoUnknownProperty {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignore?: readonly string[];
-    readonly requireDataLowercase?: boolean;
-  };
+  export type Options = Readonly<{
+    ignore?: readonly string[];
+    /** @default false */
+    requireDataLowercase?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4049,14 +4045,15 @@ namespace NoUnsafe {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkAliases?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    checkAliases?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4098,16 +4095,16 @@ namespace NoUnstableNestedComponents {
    * ]
    * ```
    */
-  export type Options = {
-    readonly customValidators?: readonly string[];
-    readonly allowAsProps?: boolean;
-    readonly propNamePattern?: string;
-  };
+  export type Options = Readonly<{
+    customValidators?: readonly string[];
+    allowAsProps?: boolean;
+    propNamePattern?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4169,16 +4166,16 @@ namespace NoUnusedPropTypes {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignore?: readonly string[];
-    readonly customValidators?: readonly string[];
-    readonly skipShapeProps?: boolean;
-  };
+  export type Options = Readonly<{
+    ignore?: readonly string[];
+    customValidators?: readonly string[];
+    skipShapeProps?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4243,9 +4240,9 @@ namespace NoWillUpdateSetState {
   export type Options = 'disallow-in-func';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4278,9 +4275,9 @@ namespace PreferEs6Class {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4347,14 +4344,15 @@ namespace PreferStatelessFunction {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignorePureComponents?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    ignorePureComponents?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4399,16 +4397,16 @@ namespace PropTypes {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignore?: readonly string[];
-    readonly customValidators?: readonly string[];
-    readonly skipUndeclared?: boolean;
-  };
+  export type Options = Readonly<{
+    ignore?: readonly string[];
+    customValidators?: readonly string[];
+    skipUndeclared?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4472,17 +4470,17 @@ namespace RequireDefaultProps {
    * ]
    * ```
    */
-  export type Options = {
-    readonly forbidDefaultForRequired?: boolean;
-    readonly classes?: 'defaultProps' | 'ignore';
-    readonly functions?: 'defaultArguments' | 'defaultProps' | 'ignore';
-    readonly ignoreFunctionalComponents?: boolean;
-  };
+  export type Options = Readonly<{
+    forbidDefaultForRequired?: boolean;
+    classes?: 'defaultProps' | 'ignore';
+    functions?: 'defaultArguments' | 'defaultProps' | 'ignore';
+    ignoreFunctionalComponents?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4518,14 +4516,14 @@ namespace RequireOptimization {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowDecorators?: readonly string[];
-  };
+  export type Options = Readonly<{
+    allowDecorators?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4580,15 +4578,17 @@ namespace SelfClosingComp {
    * ]
    * ```
    */
-  export type Options = {
-    readonly component?: boolean;
-    readonly html?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default true */
+    component?: boolean;
+    /** @default true */
+    html?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4635,15 +4635,15 @@ namespace SortComp {
    * ]
    * ```
    */
-  export type Options = {
-    readonly order?: readonly string[];
-    readonly groups?: Record<string, readonly string[]>;
-  };
+  export type Options = Readonly<{
+    order?: readonly string[];
+    groups?: Readonly<Record<string, readonly string[]>>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4676,14 +4676,14 @@ namespace SortDefaultProps {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreCase?: boolean;
-  };
+  export type Options = Readonly<{
+    ignoreCase?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4732,19 +4732,19 @@ namespace SortPropTypes {
    * ]
    * ```
    */
-  export type Options = {
-    readonly requiredFirst?: boolean;
-    readonly callbacksLast?: boolean;
-    readonly ignoreCase?: boolean;
-    readonly noSortAlphabetically?: boolean;
-    readonly sortShapeProp?: boolean;
-    readonly checkTypes?: boolean;
-  };
+  export type Options = Readonly<{
+    requiredFirst?: boolean;
+    callbacksLast?: boolean;
+    ignoreCase?: boolean;
+    noSortAlphabetically?: boolean;
+    sortShapeProp?: boolean;
+    checkTypes?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4777,9 +4777,9 @@ namespace StateInConstructor {
   export type Options = 'always' | 'never';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4859,42 +4859,39 @@ namespace StaticPropertyPlacement {
    * ```
    */
   export type Options0 =
-    | 'property assignment'
+    | 'static public field'
     | 'static getter'
-    | 'static public field';
+    | 'property assignment';
 
-  export type Options1 = {
-    readonly propTypes?:
-      | 'property assignment'
+  export type Options1 = Readonly<{
+    propTypes?: 'static public field' | 'static getter' | 'property assignment';
+    defaultProps?:
+      | 'static public field'
       | 'static getter'
-      | 'static public field';
-    readonly defaultProps?:
-      | 'property assignment'
+      | 'property assignment';
+    childContextTypes?:
+      | 'static public field'
       | 'static getter'
-      | 'static public field';
-    readonly childContextTypes?:
-      | 'property assignment'
+      | 'property assignment';
+    contextTypes?:
+      | 'static public field'
       | 'static getter'
-      | 'static public field';
-    readonly contextTypes?:
-      | 'property assignment'
+      | 'property assignment';
+    contextType?:
+      | 'static public field'
       | 'static getter'
-      | 'static public field';
-    readonly contextType?:
-      | 'property assignment'
+      | 'property assignment';
+    displayName?:
+      | 'static public field'
       | 'static getter'
-      | 'static public field';
-    readonly displayName?:
-      | 'property assignment'
-      | 'static getter'
-      | 'static public field';
-  };
+      | 'property assignment';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | readonly [Linter.StringSeverity, Options0, Options1]
     | readonly [Linter.StringSeverity, Options0]
-    | 'off';
+    | readonly [Linter.StringSeverity, Options0, Options1];
 }
 
 /**
@@ -4931,15 +4928,15 @@ namespace StylePropObject {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allow?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    allow?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4958,191 +4955,188 @@ namespace VoidDomElementsNoChildren {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintReactRules = {
-  readonly 'react/boolean-prop-naming': BooleanPropNaming.RuleEntry;
-  readonly 'react/button-has-type': ButtonHasType.RuleEntry;
-  readonly 'react/checked-requires-onchange-or-readonly': CheckedRequiresOnchangeOrReadonly.RuleEntry;
-  readonly 'react/default-props-match-prop-types': DefaultPropsMatchPropTypes.RuleEntry;
-  readonly 'react/destructuring-assignment': DestructuringAssignment.RuleEntry;
-  readonly 'react/display-name': DisplayName.RuleEntry;
-  readonly 'react/forbid-component-props': ForbidComponentProps.RuleEntry;
-  readonly 'react/forbid-dom-props': ForbidDomProps.RuleEntry;
-  readonly 'react/forbid-elements': ForbidElements.RuleEntry;
-  readonly 'react/forbid-foreign-prop-types': ForbidForeignPropTypes.RuleEntry;
-  readonly 'react/forbid-prop-types': ForbidPropTypes.RuleEntry;
-  readonly 'react/forward-ref-uses-ref': ForwardRefUsesRef.RuleEntry;
-  readonly 'react/function-component-definition': FunctionComponentDefinition.RuleEntry;
-  readonly 'react/hook-use-state': HookUseState.RuleEntry;
-  readonly 'react/iframe-missing-sandbox': IframeMissingSandbox.RuleEntry;
-  readonly 'react/jsx-boolean-value': JsxBooleanValue.RuleEntry;
-  readonly 'react/jsx-child-element-spacing': JsxChildElementSpacing.RuleEntry;
-  readonly 'react/jsx-closing-bracket-location': JsxClosingBracketLocation.RuleEntry;
-  readonly 'react/jsx-closing-tag-location': JsxClosingTagLocation.RuleEntry;
-  readonly 'react/jsx-curly-spacing': JsxCurlySpacing.RuleEntry;
-  readonly 'react/jsx-curly-newline': JsxCurlyNewline.RuleEntry;
-  readonly 'react/jsx-equals-spacing': JsxEqualsSpacing.RuleEntry;
-  readonly 'react/jsx-filename-extension': JsxFilenameExtension.RuleEntry;
-  readonly 'react/jsx-first-prop-new-line': JsxFirstPropNewLine.RuleEntry;
-  readonly 'react/jsx-handler-names': JsxHandlerNames.RuleEntry;
-  readonly 'react/jsx-indent': JsxIndent.RuleEntry;
-  readonly 'react/jsx-indent-props': JsxIndentProps.RuleEntry;
-  readonly 'react/jsx-key': JsxKey.RuleEntry;
-  readonly 'react/jsx-max-depth': JsxMaxDepth.RuleEntry;
-  readonly 'react/jsx-max-props-per-line': JsxMaxPropsPerLine.RuleEntry;
-  readonly 'react/jsx-newline': JsxNewline.RuleEntry;
-  readonly 'react/jsx-no-bind': JsxNoBind.RuleEntry;
-  readonly 'react/jsx-no-comment-textnodes': JsxNoCommentTextnodes.RuleEntry;
-  readonly 'react/jsx-no-constructed-context-values': JsxNoConstructedContextValues.RuleEntry;
-  readonly 'react/jsx-no-duplicate-props': JsxNoDuplicateProps.RuleEntry;
-  readonly 'react/jsx-no-leaked-render': JsxNoLeakedRender.RuleEntry;
-  readonly 'react/jsx-no-literals': JsxNoLiterals.RuleEntry;
-  readonly 'react/jsx-no-script-url': JsxNoScriptUrl.RuleEntry;
-  readonly 'react/jsx-no-target-blank': JsxNoTargetBlank.RuleEntry;
-  readonly 'react/jsx-no-useless-fragment': JsxNoUselessFragment.RuleEntry;
-  readonly 'react/jsx-one-expression-per-line': JsxOneExpressionPerLine.RuleEntry;
-  readonly 'react/jsx-no-undef': JsxNoUndef.RuleEntry;
-  readonly 'react/jsx-curly-brace-presence': JsxCurlyBracePresence.RuleEntry;
-  readonly 'react/jsx-pascal-case': JsxPascalCase.RuleEntry;
-  readonly 'react/jsx-fragments': JsxFragments.RuleEntry;
-  readonly 'react/jsx-props-no-multi-spaces': JsxPropsNoMultiSpaces.RuleEntry;
-  readonly 'react/jsx-props-no-spreading': JsxPropsNoSpreading.RuleEntry;
-  readonly 'react/jsx-props-no-spread-multi': JsxPropsNoSpreadMulti.RuleEntry;
-  readonly 'react/jsx-sort-props': JsxSortProps.RuleEntry;
-  readonly 'react/jsx-tag-spacing': JsxTagSpacing.RuleEntry;
-  readonly 'react/jsx-uses-react': JsxUsesReact.RuleEntry;
-  readonly 'react/jsx-uses-vars': JsxUsesVars.RuleEntry;
-  readonly 'react/jsx-wrap-multilines': JsxWrapMultilines.RuleEntry;
-  readonly 'react/no-invalid-html-attribute': NoInvalidHtmlAttribute.RuleEntry;
-  readonly 'react/no-access-state-in-setstate': NoAccessStateInSetstate.RuleEntry;
-  readonly 'react/no-adjacent-inline-elements': NoAdjacentInlineElements.RuleEntry;
-  readonly 'react/no-array-index-key': NoArrayIndexKey.RuleEntry;
-  readonly 'react/no-arrow-function-lifecycle': NoArrowFunctionLifecycle.RuleEntry;
-  readonly 'react/no-children-prop': NoChildrenProp.RuleEntry;
-  readonly 'react/no-danger': NoDanger.RuleEntry;
-  readonly 'react/no-danger-with-children': NoDangerWithChildren.RuleEntry;
-  readonly 'react/no-deprecated': NoDeprecated.RuleEntry;
-  readonly 'react/no-did-mount-set-state': NoDidMountSetState.RuleEntry;
-  readonly 'react/no-did-update-set-state': NoDidUpdateSetState.RuleEntry;
-  readonly 'react/no-direct-mutation-state': NoDirectMutationState.RuleEntry;
-  readonly 'react/no-find-dom-node': NoFindDomNode.RuleEntry;
-  readonly 'react/no-is-mounted': NoIsMounted.RuleEntry;
-  readonly 'react/no-multi-comp': NoMultiComp.RuleEntry;
-  readonly 'react/no-namespace': NoNamespace.RuleEntry;
-  readonly 'react/no-set-state': NoSetState.RuleEntry;
-  readonly 'react/no-string-refs': NoStringRefs.RuleEntry;
-  readonly 'react/no-redundant-should-component-update': NoRedundantShouldComponentUpdate.RuleEntry;
-  readonly 'react/no-render-return-value': NoRenderReturnValue.RuleEntry;
-  readonly 'react/no-this-in-sfc': NoThisInSfc.RuleEntry;
-  readonly 'react/no-typos': NoTypos.RuleEntry;
-  readonly 'react/no-unescaped-entities': NoUnescapedEntities.RuleEntry;
-  readonly 'react/no-unknown-property': NoUnknownProperty.RuleEntry;
-  readonly 'react/no-unsafe': NoUnsafe.RuleEntry;
-  readonly 'react/no-unstable-nested-components': NoUnstableNestedComponents.RuleEntry;
-  readonly 'react/no-unused-class-component-methods': NoUnusedClassComponentMethods.RuleEntry;
-  readonly 'react/no-unused-prop-types': NoUnusedPropTypes.RuleEntry;
-  readonly 'react/no-unused-state': NoUnusedState.RuleEntry;
-  readonly 'react/no-object-type-as-default-prop': NoObjectTypeAsDefaultProp.RuleEntry;
-  readonly 'react/no-will-update-set-state': NoWillUpdateSetState.RuleEntry;
-  readonly 'react/prefer-es6-class': PreferEs6Class.RuleEntry;
-  readonly 'react/prefer-exact-props': PreferExactProps.RuleEntry;
-  readonly 'react/prefer-read-only-props': PreferReadOnlyProps.RuleEntry;
-  readonly 'react/prefer-stateless-function': PreferStatelessFunction.RuleEntry;
-  readonly 'react/prop-types': PropTypes.RuleEntry;
-  readonly 'react/react-in-jsx-scope': ReactInJsxScope.RuleEntry;
-  readonly 'react/require-default-props': RequireDefaultProps.RuleEntry;
-  readonly 'react/require-optimization': RequireOptimization.RuleEntry;
-  readonly 'react/require-render-return': RequireRenderReturn.RuleEntry;
-  readonly 'react/self-closing-comp': SelfClosingComp.RuleEntry;
-  readonly 'react/sort-comp': SortComp.RuleEntry;
-  readonly 'react/sort-default-props': SortDefaultProps.RuleEntry;
-  readonly 'react/sort-prop-types': SortPropTypes.RuleEntry;
-  readonly 'react/state-in-constructor': StateInConstructor.RuleEntry;
-  readonly 'react/static-property-placement': StaticPropertyPlacement.RuleEntry;
-  readonly 'react/style-prop-object': StylePropObject.RuleEntry;
-  readonly 'react/void-dom-elements-no-children': VoidDomElementsNoChildren.RuleEntry;
+export type EslintReactRules = Readonly<{
+  'react/boolean-prop-naming': BooleanPropNaming.RuleEntry;
+  'react/button-has-type': ButtonHasType.RuleEntry;
+  'react/checked-requires-onchange-or-readonly': CheckedRequiresOnchangeOrReadonly.RuleEntry;
+  'react/default-props-match-prop-types': DefaultPropsMatchPropTypes.RuleEntry;
+  'react/destructuring-assignment': DestructuringAssignment.RuleEntry;
+  'react/display-name': DisplayName.RuleEntry;
+  'react/forbid-component-props': ForbidComponentProps.RuleEntry;
+  'react/forbid-dom-props': ForbidDomProps.RuleEntry;
+  'react/forbid-elements': ForbidElements.RuleEntry;
+  'react/forbid-foreign-prop-types': ForbidForeignPropTypes.RuleEntry;
+  'react/forbid-prop-types': ForbidPropTypes.RuleEntry;
+  'react/forward-ref-uses-ref': ForwardRefUsesRef.RuleEntry;
+  'react/function-component-definition': FunctionComponentDefinition.RuleEntry;
+  'react/hook-use-state': HookUseState.RuleEntry;
+  'react/iframe-missing-sandbox': IframeMissingSandbox.RuleEntry;
+  'react/jsx-boolean-value': JsxBooleanValue.RuleEntry;
+  'react/jsx-child-element-spacing': JsxChildElementSpacing.RuleEntry;
+  'react/jsx-closing-bracket-location': JsxClosingBracketLocation.RuleEntry;
+  'react/jsx-closing-tag-location': JsxClosingTagLocation.RuleEntry;
+  'react/jsx-curly-spacing': JsxCurlySpacing.RuleEntry;
+  'react/jsx-curly-newline': JsxCurlyNewline.RuleEntry;
+  'react/jsx-equals-spacing': JsxEqualsSpacing.RuleEntry;
+  'react/jsx-filename-extension': JsxFilenameExtension.RuleEntry;
+  'react/jsx-first-prop-new-line': JsxFirstPropNewLine.RuleEntry;
+  'react/jsx-handler-names': JsxHandlerNames.RuleEntry;
+  'react/jsx-indent': JsxIndent.RuleEntry;
+  'react/jsx-indent-props': JsxIndentProps.RuleEntry;
+  'react/jsx-key': JsxKey.RuleEntry;
+  'react/jsx-max-depth': JsxMaxDepth.RuleEntry;
+  'react/jsx-max-props-per-line': JsxMaxPropsPerLine.RuleEntry;
+  'react/jsx-newline': JsxNewline.RuleEntry;
+  'react/jsx-no-bind': JsxNoBind.RuleEntry;
+  'react/jsx-no-comment-textnodes': JsxNoCommentTextnodes.RuleEntry;
+  'react/jsx-no-constructed-context-values': JsxNoConstructedContextValues.RuleEntry;
+  'react/jsx-no-duplicate-props': JsxNoDuplicateProps.RuleEntry;
+  'react/jsx-no-leaked-render': JsxNoLeakedRender.RuleEntry;
+  'react/jsx-no-literals': JsxNoLiterals.RuleEntry;
+  'react/jsx-no-script-url': JsxNoScriptUrl.RuleEntry;
+  'react/jsx-no-target-blank': JsxNoTargetBlank.RuleEntry;
+  'react/jsx-no-useless-fragment': JsxNoUselessFragment.RuleEntry;
+  'react/jsx-one-expression-per-line': JsxOneExpressionPerLine.RuleEntry;
+  'react/jsx-no-undef': JsxNoUndef.RuleEntry;
+  'react/jsx-curly-brace-presence': JsxCurlyBracePresence.RuleEntry;
+  'react/jsx-pascal-case': JsxPascalCase.RuleEntry;
+  'react/jsx-fragments': JsxFragments.RuleEntry;
+  'react/jsx-props-no-multi-spaces': JsxPropsNoMultiSpaces.RuleEntry;
+  'react/jsx-props-no-spreading': JsxPropsNoSpreading.RuleEntry;
+  'react/jsx-props-no-spread-multi': JsxPropsNoSpreadMulti.RuleEntry;
+  'react/jsx-sort-props': JsxSortProps.RuleEntry;
+  'react/jsx-tag-spacing': JsxTagSpacing.RuleEntry;
+  'react/jsx-uses-react': JsxUsesReact.RuleEntry;
+  'react/jsx-uses-vars': JsxUsesVars.RuleEntry;
+  'react/jsx-wrap-multilines': JsxWrapMultilines.RuleEntry;
+  'react/no-invalid-html-attribute': NoInvalidHtmlAttribute.RuleEntry;
+  'react/no-access-state-in-setstate': NoAccessStateInSetstate.RuleEntry;
+  'react/no-adjacent-inline-elements': NoAdjacentInlineElements.RuleEntry;
+  'react/no-array-index-key': NoArrayIndexKey.RuleEntry;
+  'react/no-arrow-function-lifecycle': NoArrowFunctionLifecycle.RuleEntry;
+  'react/no-children-prop': NoChildrenProp.RuleEntry;
+  'react/no-danger': NoDanger.RuleEntry;
+  'react/no-danger-with-children': NoDangerWithChildren.RuleEntry;
+  'react/no-deprecated': NoDeprecated.RuleEntry;
+  'react/no-did-mount-set-state': NoDidMountSetState.RuleEntry;
+  'react/no-did-update-set-state': NoDidUpdateSetState.RuleEntry;
+  'react/no-direct-mutation-state': NoDirectMutationState.RuleEntry;
+  'react/no-find-dom-node': NoFindDomNode.RuleEntry;
+  'react/no-is-mounted': NoIsMounted.RuleEntry;
+  'react/no-multi-comp': NoMultiComp.RuleEntry;
+  'react/no-namespace': NoNamespace.RuleEntry;
+  'react/no-set-state': NoSetState.RuleEntry;
+  'react/no-string-refs': NoStringRefs.RuleEntry;
+  'react/no-redundant-should-component-update': NoRedundantShouldComponentUpdate.RuleEntry;
+  'react/no-render-return-value': NoRenderReturnValue.RuleEntry;
+  'react/no-this-in-sfc': NoThisInSfc.RuleEntry;
+  'react/no-typos': NoTypos.RuleEntry;
+  'react/no-unescaped-entities': NoUnescapedEntities.RuleEntry;
+  'react/no-unknown-property': NoUnknownProperty.RuleEntry;
+  'react/no-unsafe': NoUnsafe.RuleEntry;
+  'react/no-unstable-nested-components': NoUnstableNestedComponents.RuleEntry;
+  'react/no-unused-class-component-methods': NoUnusedClassComponentMethods.RuleEntry;
+  'react/no-unused-prop-types': NoUnusedPropTypes.RuleEntry;
+  'react/no-unused-state': NoUnusedState.RuleEntry;
+  'react/no-object-type-as-default-prop': NoObjectTypeAsDefaultProp.RuleEntry;
+  'react/no-will-update-set-state': NoWillUpdateSetState.RuleEntry;
+  'react/prefer-es6-class': PreferEs6Class.RuleEntry;
+  'react/prefer-exact-props': PreferExactProps.RuleEntry;
+  'react/prefer-read-only-props': PreferReadOnlyProps.RuleEntry;
+  'react/prefer-stateless-function': PreferStatelessFunction.RuleEntry;
+  'react/prop-types': PropTypes.RuleEntry;
+  'react/react-in-jsx-scope': ReactInJsxScope.RuleEntry;
+  'react/require-default-props': RequireDefaultProps.RuleEntry;
+  'react/require-optimization': RequireOptimization.RuleEntry;
+  'react/require-render-return': RequireRenderReturn.RuleEntry;
+  'react/self-closing-comp': SelfClosingComp.RuleEntry;
+  'react/sort-comp': SortComp.RuleEntry;
+  'react/sort-default-props': SortDefaultProps.RuleEntry;
+  'react/sort-prop-types': SortPropTypes.RuleEntry;
+  'react/state-in-constructor': StateInConstructor.RuleEntry;
+  'react/static-property-placement': StaticPropertyPlacement.RuleEntry;
+  'react/style-prop-object': StylePropObject.RuleEntry;
+  'react/void-dom-elements-no-children': VoidDomElementsNoChildren.RuleEntry;
 
   // deprecated
-  readonly 'react/jsx-sort-default-props': JsxSortDefaultProps.RuleEntry;
-  readonly 'react/jsx-space-before-closing': JsxSpaceBeforeClosing.RuleEntry;
-};
+  'react/jsx-sort-default-props': JsxSortDefaultProps.RuleEntry;
+  'react/jsx-space-before-closing': JsxSpaceBeforeClosing.RuleEntry;
+}>;
 
-export type EslintReactRulesOption = {
-  readonly 'react/boolean-prop-naming': BooleanPropNaming.Options;
-  readonly 'react/button-has-type': ButtonHasType.Options;
-  readonly 'react/checked-requires-onchange-or-readonly': CheckedRequiresOnchangeOrReadonly.Options;
-  readonly 'react/default-props-match-prop-types': DefaultPropsMatchPropTypes.Options;
-  readonly 'react/destructuring-assignment': readonly [
+export type EslintReactRulesOption = Readonly<{
+  'react/boolean-prop-naming': BooleanPropNaming.Options;
+  'react/button-has-type': ButtonHasType.Options;
+  'react/checked-requires-onchange-or-readonly': CheckedRequiresOnchangeOrReadonly.Options;
+  'react/default-props-match-prop-types': DefaultPropsMatchPropTypes.Options;
+  'react/destructuring-assignment': readonly [
     DestructuringAssignment.Options0,
     DestructuringAssignment.Options1,
   ];
-  readonly 'react/display-name': DisplayName.Options;
-  readonly 'react/forbid-component-props': ForbidComponentProps.Options;
-  readonly 'react/forbid-dom-props': ForbidDomProps.Options;
-  readonly 'react/forbid-elements': ForbidElements.Options;
-  readonly 'react/forbid-foreign-prop-types': ForbidForeignPropTypes.Options;
-  readonly 'react/forbid-prop-types': ForbidPropTypes.Options;
-  readonly 'react/function-component-definition': FunctionComponentDefinition.Options;
-  readonly 'react/hook-use-state': HookUseState.Options;
-  readonly 'react/jsx-boolean-value': JsxBooleanValue.Options;
-  readonly 'react/jsx-closing-bracket-location': JsxClosingBracketLocation.Options;
-  readonly 'react/jsx-closing-tag-location': JsxClosingTagLocation.Options;
-  readonly 'react/jsx-curly-spacing': JsxCurlySpacing.Options;
-  readonly 'react/jsx-curly-newline': JsxCurlyNewline.Options;
-  readonly 'react/jsx-equals-spacing': JsxEqualsSpacing.Options;
-  readonly 'react/jsx-filename-extension': JsxFilenameExtension.Options;
-  readonly 'react/jsx-first-prop-new-line': JsxFirstPropNewLine.Options;
-  readonly 'react/jsx-handler-names': JsxHandlerNames.Options;
-  readonly 'react/jsx-indent': readonly [
-    JsxIndent.Options0,
-    JsxIndent.Options1,
-  ];
-  readonly 'react/jsx-indent-props': JsxIndentProps.Options;
-  readonly 'react/jsx-key': JsxKey.Options;
-  readonly 'react/jsx-max-depth': JsxMaxDepth.Options;
-  readonly 'react/jsx-max-props-per-line': JsxMaxPropsPerLine.Options;
-  readonly 'react/jsx-newline': JsxNewline.Options;
-  readonly 'react/jsx-no-bind': JsxNoBind.Options;
-  readonly 'react/jsx-no-duplicate-props': JsxNoDuplicateProps.Options;
-  readonly 'react/jsx-no-leaked-render': JsxNoLeakedRender.Options;
-  readonly 'react/jsx-no-literals': JsxNoLiterals.Options;
-  readonly 'react/jsx-no-script-url': JsxNoScriptUrl.Options;
-  readonly 'react/jsx-no-target-blank': JsxNoTargetBlank.Options;
-  readonly 'react/jsx-no-useless-fragment': JsxNoUselessFragment.Options;
-  readonly 'react/jsx-one-expression-per-line': JsxOneExpressionPerLine.Options;
-  readonly 'react/jsx-no-undef': JsxNoUndef.Options;
-  readonly 'react/jsx-curly-brace-presence': JsxCurlyBracePresence.Options;
-  readonly 'react/jsx-pascal-case': JsxPascalCase.Options;
-  readonly 'react/jsx-fragments': JsxFragments.Options;
-  readonly 'react/jsx-props-no-spreading': JsxPropsNoSpreading.Options;
-  readonly 'react/jsx-sort-props': JsxSortProps.Options;
-  readonly 'react/jsx-tag-spacing': JsxTagSpacing.Options;
-  readonly 'react/jsx-wrap-multilines': JsxWrapMultilines.Options;
-  readonly 'react/no-invalid-html-attribute': NoInvalidHtmlAttribute.Options;
-  readonly 'react/no-children-prop': NoChildrenProp.Options;
-  readonly 'react/no-danger': NoDanger.Options;
-  readonly 'react/no-did-mount-set-state': NoDidMountSetState.Options;
-  readonly 'react/no-did-update-set-state': NoDidUpdateSetState.Options;
-  readonly 'react/no-multi-comp': NoMultiComp.Options;
-  readonly 'react/no-string-refs': NoStringRefs.Options;
-  readonly 'react/no-unescaped-entities': NoUnescapedEntities.Options;
-  readonly 'react/no-unknown-property': NoUnknownProperty.Options;
-  readonly 'react/no-unsafe': NoUnsafe.Options;
-  readonly 'react/no-unstable-nested-components': NoUnstableNestedComponents.Options;
-  readonly 'react/no-unused-prop-types': NoUnusedPropTypes.Options;
-  readonly 'react/no-will-update-set-state': NoWillUpdateSetState.Options;
-  readonly 'react/prefer-es6-class': PreferEs6Class.Options;
-  readonly 'react/prefer-stateless-function': PreferStatelessFunction.Options;
-  readonly 'react/prop-types': PropTypes.Options;
-  readonly 'react/require-default-props': RequireDefaultProps.Options;
-  readonly 'react/require-optimization': RequireOptimization.Options;
-  readonly 'react/self-closing-comp': SelfClosingComp.Options;
-  readonly 'react/sort-comp': SortComp.Options;
-  readonly 'react/sort-default-props': SortDefaultProps.Options;
-  readonly 'react/sort-prop-types': SortPropTypes.Options;
-  readonly 'react/state-in-constructor': StateInConstructor.Options;
-  readonly 'react/static-property-placement': readonly [
+  'react/display-name': DisplayName.Options;
+  'react/forbid-component-props': ForbidComponentProps.Options;
+  'react/forbid-dom-props': ForbidDomProps.Options;
+  'react/forbid-elements': ForbidElements.Options;
+  'react/forbid-foreign-prop-types': ForbidForeignPropTypes.Options;
+  'react/forbid-prop-types': ForbidPropTypes.Options;
+  'react/function-component-definition': FunctionComponentDefinition.Options;
+  'react/hook-use-state': HookUseState.Options;
+  'react/jsx-boolean-value': JsxBooleanValue.Options;
+  'react/jsx-closing-bracket-location': JsxClosingBracketLocation.Options;
+  'react/jsx-closing-tag-location': JsxClosingTagLocation.Options;
+  'react/jsx-curly-spacing': JsxCurlySpacing.Options;
+  'react/jsx-curly-newline': JsxCurlyNewline.Options;
+  'react/jsx-equals-spacing': JsxEqualsSpacing.Options;
+  'react/jsx-filename-extension': JsxFilenameExtension.Options;
+  'react/jsx-first-prop-new-line': JsxFirstPropNewLine.Options;
+  'react/jsx-handler-names': JsxHandlerNames.Options;
+  'react/jsx-indent': readonly [JsxIndent.Options0, JsxIndent.Options1];
+  'react/jsx-indent-props': JsxIndentProps.Options;
+  'react/jsx-key': JsxKey.Options;
+  'react/jsx-max-depth': JsxMaxDepth.Options;
+  'react/jsx-max-props-per-line': JsxMaxPropsPerLine.Options;
+  'react/jsx-newline': JsxNewline.Options;
+  'react/jsx-no-bind': JsxNoBind.Options;
+  'react/jsx-no-duplicate-props': JsxNoDuplicateProps.Options;
+  'react/jsx-no-leaked-render': JsxNoLeakedRender.Options;
+  'react/jsx-no-literals': JsxNoLiterals.Options;
+  'react/jsx-no-script-url': JsxNoScriptUrl.Options;
+  'react/jsx-no-target-blank': JsxNoTargetBlank.Options;
+  'react/jsx-no-useless-fragment': JsxNoUselessFragment.Options;
+  'react/jsx-one-expression-per-line': JsxOneExpressionPerLine.Options;
+  'react/jsx-no-undef': JsxNoUndef.Options;
+  'react/jsx-curly-brace-presence': JsxCurlyBracePresence.Options;
+  'react/jsx-pascal-case': JsxPascalCase.Options;
+  'react/jsx-fragments': JsxFragments.Options;
+  'react/jsx-props-no-spreading': JsxPropsNoSpreading.Options;
+  'react/jsx-sort-props': JsxSortProps.Options;
+  'react/jsx-tag-spacing': JsxTagSpacing.Options;
+  'react/jsx-wrap-multilines': JsxWrapMultilines.Options;
+  'react/no-invalid-html-attribute': NoInvalidHtmlAttribute.Options;
+  'react/no-children-prop': NoChildrenProp.Options;
+  'react/no-danger': NoDanger.Options;
+  'react/no-did-mount-set-state': NoDidMountSetState.Options;
+  'react/no-did-update-set-state': NoDidUpdateSetState.Options;
+  'react/no-multi-comp': NoMultiComp.Options;
+  'react/no-string-refs': NoStringRefs.Options;
+  'react/no-unescaped-entities': NoUnescapedEntities.Options;
+  'react/no-unknown-property': NoUnknownProperty.Options;
+  'react/no-unsafe': NoUnsafe.Options;
+  'react/no-unstable-nested-components': NoUnstableNestedComponents.Options;
+  'react/no-unused-prop-types': NoUnusedPropTypes.Options;
+  'react/no-will-update-set-state': NoWillUpdateSetState.Options;
+  'react/prefer-es6-class': PreferEs6Class.Options;
+  'react/prefer-stateless-function': PreferStatelessFunction.Options;
+  'react/prop-types': PropTypes.Options;
+  'react/require-default-props': RequireDefaultProps.Options;
+  'react/require-optimization': RequireOptimization.Options;
+  'react/self-closing-comp': SelfClosingComp.Options;
+  'react/sort-comp': SortComp.Options;
+  'react/sort-default-props': SortDefaultProps.Options;
+  'react/sort-prop-types': SortPropTypes.Options;
+  'react/state-in-constructor': StateInConstructor.Options;
+  'react/static-property-placement': readonly [
     StaticPropertyPlacement.Options0,
     StaticPropertyPlacement.Options1,
   ];
-  readonly 'react/style-prop-object': StylePropObject.Options;
-};
+  'react/style-prop-object': StylePropObject.Options;
+}>;

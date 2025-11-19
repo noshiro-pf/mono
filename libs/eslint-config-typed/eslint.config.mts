@@ -127,12 +127,6 @@ export default [
     }),
   },
   {
-    files: ['src/types/rules/*.mts'],
-    rules: defineKnownRules({
-      'functional/readonly-type': ['error', 'keyword'],
-    }),
-  },
-  {
     files: [
       'src/plugins/total-functions/rules/**',
       'src/plugins/tree-shakable/rules/**',

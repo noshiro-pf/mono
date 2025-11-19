@@ -229,33 +229,37 @@ namespace UnsafeToChainCommand {
    * ```
    */
   /** Disallow actions within chains */
-  export type Options = {
-    /** An additional list of methods to check for unsafe chaining. */
-    readonly methods?: readonly unknown[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    /**
+     * An additional list of methods to check for unsafe chaining.
+     *
+     * @default [ ]
+     */
+    methods?: readonly unknown[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintCypressRules = {
-  readonly 'cypress/assertion-before-screenshot': AssertionBeforeScreenshot.RuleEntry;
-  readonly 'cypress/no-assigning-return-values': NoAssigningReturnValues.RuleEntry;
-  readonly 'cypress/no-async-before': NoAsyncBefore.RuleEntry;
-  readonly 'cypress/no-async-tests': NoAsyncTests.RuleEntry;
-  readonly 'cypress/no-chained-get': NoChainedGet.RuleEntry;
-  readonly 'cypress/no-debug': NoDebug.RuleEntry;
-  readonly 'cypress/no-force': NoForce.RuleEntry;
-  readonly 'cypress/no-pause': NoPause.RuleEntry;
-  readonly 'cypress/no-unnecessary-waiting': NoUnnecessaryWaiting.RuleEntry;
-  readonly 'cypress/no-xpath': NoXpath.RuleEntry;
-  readonly 'cypress/require-data-selectors': RequireDataSelectors.RuleEntry;
-  readonly 'cypress/unsafe-to-chain-command': UnsafeToChainCommand.RuleEntry;
-};
+export type EslintCypressRules = Readonly<{
+  'cypress/assertion-before-screenshot': AssertionBeforeScreenshot.RuleEntry;
+  'cypress/no-assigning-return-values': NoAssigningReturnValues.RuleEntry;
+  'cypress/no-async-before': NoAsyncBefore.RuleEntry;
+  'cypress/no-async-tests': NoAsyncTests.RuleEntry;
+  'cypress/no-chained-get': NoChainedGet.RuleEntry;
+  'cypress/no-debug': NoDebug.RuleEntry;
+  'cypress/no-force': NoForce.RuleEntry;
+  'cypress/no-pause': NoPause.RuleEntry;
+  'cypress/no-unnecessary-waiting': NoUnnecessaryWaiting.RuleEntry;
+  'cypress/no-xpath': NoXpath.RuleEntry;
+  'cypress/require-data-selectors': RequireDataSelectors.RuleEntry;
+  'cypress/unsafe-to-chain-command': UnsafeToChainCommand.RuleEntry;
+}>;
 
-export type EslintCypressRulesOption = {
-  readonly 'cypress/unsafe-to-chain-command': UnsafeToChainCommand.Options;
-};
+export type EslintCypressRulesOption = Readonly<{
+  'cypress/unsafe-to-chain-command': UnsafeToChainCommand.Options;
+}>;

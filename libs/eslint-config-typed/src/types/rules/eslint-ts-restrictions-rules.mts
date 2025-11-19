@@ -41,23 +41,23 @@ namespace CheckDestructuringCompleteness {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Always check React component props destructuring without directive
      * keyword
      */
-    readonly alwaysCheckReactComponentProps?: boolean;
+    alwaysCheckReactComponentProps?: boolean;
     /**
      * Custom directive keyword to enable checking (default:
      * "@check-destructuring-completeness")
      */
-    readonly directiveKeyword?: string;
-  };
+    directiveKeyword?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -136,24 +136,25 @@ namespace NoRestrictedCastName {
   /** @minItems 0 */
   export type Options = readonly (
     | string
-    | {
-        readonly name: string;
-        readonly fixWith?:
+    | Readonly<{
+        name: string;
+        fixWith?: Readonly<
           | {
-              readonly kind: 'function';
-              readonly name: string;
+              kind: 'type';
+              name: string;
             }
           | {
-              readonly kind: 'type';
-              readonly name: string;
-            };
-      }
+              kind: 'function';
+              name: string;
+            }
+        >;
+      }>
   )[];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -204,26 +205,26 @@ namespace NoRestrictedSyntax {
   /** @minItems 0 */
   export type Options = readonly (
     | string
-    | {
-        readonly selector: string;
-        readonly message?: string;
-      }
+    | Readonly<{
+        selector: string;
+        message?: string;
+      }>
   )[];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintTsRestrictionsRules = {
-  readonly 'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
-  readonly 'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
-  readonly 'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
-};
+export type EslintTsRestrictionsRules = Readonly<{
+  'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
+  'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
+  'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
+}>;
 
-export type EslintTsRestrictionsRulesOption = {
-  readonly 'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.Options;
-  readonly 'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
-  readonly 'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.Options;
-};
+export type EslintTsRestrictionsRulesOption = Readonly<{
+  'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.Options;
+  'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
+  'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.Options;
+}>;

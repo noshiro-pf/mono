@@ -59,33 +59,33 @@ namespace StrictDependencies {
    * ]
    * ```
    */
-  export type Options0 = readonly {
-    readonly module: string;
-    readonly allowReferenceFrom: readonly string[];
-    readonly allowSameModule?: boolean;
-    readonly targetMembers?: readonly string[];
-    readonly excludeTypeImportChecks?: boolean;
-  }[];
+  export type Options0 = readonly Readonly<{
+    module: string;
+    allowReferenceFrom: readonly string[];
+    allowSameModule?: boolean;
+    targetMembers?: readonly string[];
+    excludeTypeImportChecks?: boolean;
+  }>[];
 
-  export type Options1 = {
-    readonly resolveRelativeImport?: boolean;
-    readonly pathIndexMap?: Record<string, number>;
-  };
+  export type Options1 = Readonly<{
+    resolveRelativeImport?: boolean;
+    pathIndexMap?: Readonly<Record<string, number>>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | readonly [Linter.StringSeverity, Options0, Options1]
     | readonly [Linter.StringSeverity, Options0]
-    | 'off';
+    | readonly [Linter.StringSeverity, Options0, Options1];
 }
 
-export type EslintStrictDependenciesRules = {
-  readonly 'strict-dependencies/strict-dependencies': StrictDependencies.RuleEntry;
-};
+export type EslintStrictDependenciesRules = Readonly<{
+  'strict-dependencies/strict-dependencies': StrictDependencies.RuleEntry;
+}>;
 
-export type EslintStrictDependenciesRulesOption = {
-  readonly 'strict-dependencies/strict-dependencies': readonly [
+export type EslintStrictDependenciesRulesOption = Readonly<{
+  'strict-dependencies/strict-dependencies': readonly [
     StrictDependencies.Options0,
     StrictDependencies.Options1,
   ];
-};
+}>;

@@ -40,15 +40,15 @@ namespace ComponentName {
    * ]
    * ```
    */
-  export type Options = {
-    readonly maxLength?: number;
-    readonly pattern?: UnknownRecord;
-  };
+  export type Options = Readonly<{
+    maxLength?: number;
+    pattern?: UnknownRecord;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -98,18 +98,18 @@ namespace ImportStyle {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * Import style to enforce: "namespace" for `import * as React` or "named"
      * for `import { ... }`
      */
-    readonly importStyle?: 'named' | 'namespace';
-  };
+    importStyle?: 'namespace' | 'named';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -212,31 +212,31 @@ namespace DisplayName {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** When true, ignores components that get displayName from variable name */
-    readonly ignoreTranspilerName?: boolean;
-  };
+    ignoreTranspilerName?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintReactCodingStyleRules = {
-  readonly 'react-coding-style/component-name': ComponentName.RuleEntry;
-  readonly 'react-coding-style/component-var-type-annotation': ComponentVarTypeAnnotation.RuleEntry;
-  readonly 'react-coding-style/import-style': ImportStyle.RuleEntry;
-  readonly 'react-coding-style/props-type-annotation-style': PropsTypeAnnotationStyle.RuleEntry;
-  readonly 'react-coding-style/react-memo-props-argument-name': ReactMemoPropsArgumentName.RuleEntry;
-  readonly 'react-coding-style/react-memo-type-parameter': ReactMemoTypeParameter.RuleEntry;
-  readonly 'react-coding-style/use-memo-hook-style': UseMemoHookStyle.RuleEntry;
-  readonly 'react-coding-style/ban-use-imperative-handle-hook': BanUseImperativeHandleHook.RuleEntry;
-  readonly 'react-coding-style/display-name': DisplayName.RuleEntry;
-};
+export type EslintReactCodingStyleRules = Readonly<{
+  'react-coding-style/component-name': ComponentName.RuleEntry;
+  'react-coding-style/component-var-type-annotation': ComponentVarTypeAnnotation.RuleEntry;
+  'react-coding-style/import-style': ImportStyle.RuleEntry;
+  'react-coding-style/props-type-annotation-style': PropsTypeAnnotationStyle.RuleEntry;
+  'react-coding-style/react-memo-props-argument-name': ReactMemoPropsArgumentName.RuleEntry;
+  'react-coding-style/react-memo-type-parameter': ReactMemoTypeParameter.RuleEntry;
+  'react-coding-style/use-memo-hook-style': UseMemoHookStyle.RuleEntry;
+  'react-coding-style/ban-use-imperative-handle-hook': BanUseImperativeHandleHook.RuleEntry;
+  'react-coding-style/display-name': DisplayName.RuleEntry;
+}>;
 
-export type EslintReactCodingStyleRulesOption = {
-  readonly 'react-coding-style/component-name': ComponentName.Options;
-  readonly 'react-coding-style/import-style': ImportStyle.Options;
-  readonly 'react-coding-style/display-name': DisplayName.Options;
-};
+export type EslintReactCodingStyleRulesOption = Readonly<{
+  'react-coding-style/component-name': ComponentName.Options;
+  'react-coding-style/import-style': ImportStyle.Options;
+  'react-coding-style/display-name': DisplayName.Options;
+}>;

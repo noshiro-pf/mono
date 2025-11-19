@@ -36,20 +36,20 @@ namespace SortDestructureKeys {
    * ]
    * ```
    */
-  export type Options = {
-    readonly caseSensitive?: boolean;
-  };
+  export type Options = Readonly<{
+    caseSensitive?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintPluginSortDestructureKeysRules = {
-  readonly 'sort-destructure-keys/sort-destructure-keys': SortDestructureKeys.RuleEntry;
-};
+export type EslintPluginSortDestructureKeysRules = Readonly<{
+  'sort-destructure-keys/sort-destructure-keys': SortDestructureKeys.RuleEntry;
+}>;
 
-export type EslintPluginSortDestructureKeysRulesOption = {
-  readonly 'sort-destructure-keys/sort-destructure-keys': SortDestructureKeys.Options;
-};
+export type EslintPluginSortDestructureKeysRulesOption = Readonly<{
+  'sort-destructure-keys/sort-destructure-keys': SortDestructureKeys.Options;
+}>;

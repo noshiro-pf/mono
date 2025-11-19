@@ -58,20 +58,21 @@ namespace NoUnresolved {
    * ]
    * ```
    */
-  export type Options = {
-    readonly commonjs?: boolean;
-    readonly amd?: boolean;
-    readonly esmodule?: boolean;
+  export type Options = Readonly<{
+    commonjs?: boolean;
+    amd?: boolean;
+    esmodule?: boolean;
     /** @minItems 1 */
-    readonly ignore?: readonly [string, ...(readonly string[])];
-    readonly caseSensitive?: boolean;
-    readonly caseSensitiveStrict?: boolean;
-  };
+    ignore?: readonly [string, ...string[]];
+    /** @default true */
+    caseSensitive?: boolean;
+    caseSensitiveStrict?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -104,14 +105,14 @@ namespace Named {
    * ]
    * ```
    */
-  export type Options = {
-    readonly commonjs?: boolean;
-  };
+  export type Options = Readonly<{
+    commonjs?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -163,18 +164,20 @@ namespace Namespace {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /**
      * If `false`, will report computed (and thus, un-lintable) references to
      * namespace members.
+     *
+     * @default false
      */
-    readonly allowComputed?: boolean;
-  };
+    allowComputed?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -211,15 +214,15 @@ namespace NoNamespace {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignore?: readonly string[];
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    ignore?: readonly string[];
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -426,53 +429,53 @@ namespace Extensions {
    * ```
    */
   export type Options =
-    | readonly [
-        'always' | 'ignorePackages' | 'never',
-        {
-          readonly pattern?: Record<
-            string,
-            'always' | 'ignorePackages' | 'never'
-          >;
-          readonly ignorePackages?: boolean;
-          readonly checkTypeImports?: boolean;
-          readonly pathGroupOverrides?: readonly {
-            readonly pattern: string;
-            readonly patternOptions?: UnknownRecord;
-            readonly action: 'enforce' | 'ignore';
-          }[];
-          readonly fix?: boolean;
-          readonly [k: string]: unknown;
-        },
-      ]
-    | readonly [
-        'always' | 'ignorePackages' | 'never',
-        Record<string, 'always' | 'ignorePackages' | 'never'>,
-      ]
-    | readonly [
-        {
-          readonly pattern?: Record<
-            string,
-            'always' | 'ignorePackages' | 'never'
-          >;
-          readonly ignorePackages?: boolean;
-          readonly checkTypeImports?: boolean;
-          readonly pathGroupOverrides?: readonly {
-            readonly pattern: string;
-            readonly patternOptions?: UnknownRecord;
-            readonly action: 'enforce' | 'ignore';
-          }[];
-          readonly fix?: boolean;
-          readonly [k: string]: unknown;
-        },
-      ]
-    | readonly ['always' | 'ignorePackages' | 'never']
     | readonly []
-    | readonly [Record<string, 'always' | 'ignorePackages' | 'never'>];
+    | readonly ['always' | 'ignorePackages' | 'never']
+    | readonly [
+        'always' | 'ignorePackages' | 'never',
+        Readonly<{
+          pattern?: Readonly<
+            Record<string, 'always' | 'ignorePackages' | 'never'>
+          >;
+          ignorePackages?: boolean;
+          checkTypeImports?: boolean;
+          pathGroupOverrides?: readonly Readonly<{
+            pattern: string;
+            patternOptions?: Readonly<Record<string, unknown>>;
+            action: 'enforce' | 'ignore';
+          }>[];
+          fix?: boolean;
+          [k: string]: unknown;
+        }>,
+      ]
+    | readonly [
+        Readonly<{
+          pattern?: Readonly<
+            Record<string, 'always' | 'ignorePackages' | 'never'>
+          >;
+          ignorePackages?: boolean;
+          checkTypeImports?: boolean;
+          pathGroupOverrides?: readonly Readonly<{
+            pattern: string;
+            patternOptions?: Readonly<Record<string, unknown>>;
+            action: 'enforce' | 'ignore';
+          }>[];
+          fix?: boolean;
+          [k: string]: unknown;
+        }>,
+      ]
+    | readonly [
+        'always' | 'ignorePackages' | 'never',
+        Readonly<Record<string, 'always' | 'ignorePackages' | 'never'>>,
+      ]
+    | readonly [
+        Readonly<Record<string, 'always' | 'ignorePackages' | 'never'>>,
+      ];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -555,29 +558,29 @@ namespace NoRestrictedPaths {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** @minItems 1 */
-    readonly zones?: readonly [
-      {
-        readonly target?: string | readonly [string, ...(readonly string[])];
-        readonly from?: string | readonly [string, ...(readonly string[])];
-        readonly except?: readonly string[];
-        readonly message?: string;
-      },
-      ...(readonly {
-        readonly target?: string | readonly [string, ...(readonly string[])];
-        readonly from?: string | readonly [string, ...(readonly string[])];
-        readonly except?: readonly string[];
-        readonly message?: string;
-      }[]),
+    zones?: readonly [
+      Readonly<{
+        target?: string | readonly [string, ...string[]];
+        from?: string | readonly [string, ...string[]];
+        except?: readonly string[];
+        message?: string;
+      }>,
+      ...Readonly<{
+        target?: string | readonly [string, ...string[]];
+        from?: string | readonly [string, ...string[]];
+        except?: readonly string[];
+        message?: string;
+      }>[],
     ];
-    readonly basePath?: string;
-  };
+    basePath?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -629,18 +632,19 @@ namespace NoInternalModules {
    * ]
    * ```
    */
-  export type Options =
+  export type Options = Readonly<
     | {
-        readonly allow?: readonly string[];
+        allow?: readonly string[];
       }
     | {
-        readonly forbid?: readonly string[];
-      };
+        forbid?: readonly string[];
+      }
+  >;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -704,18 +708,18 @@ namespace NoRelativePackages {
    * ]
    * ```
    */
-  export type Options = {
-    readonly commonjs?: boolean;
-    readonly amd?: boolean;
-    readonly esmodule?: boolean;
+  export type Options = Readonly<{
+    commonjs?: boolean;
+    amd?: boolean;
+    esmodule?: boolean;
     /** @minItems 1 */
-    readonly ignore?: readonly [string, ...(readonly string[])];
-  };
+    ignore?: readonly [string, ...string[]];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -762,18 +766,18 @@ namespace NoRelativeParentImports {
    * ]
    * ```
    */
-  export type Options = {
-    readonly commonjs?: boolean;
-    readonly amd?: boolean;
-    readonly esmodule?: boolean;
+  export type Options = Readonly<{
+    commonjs?: boolean;
+    amd?: boolean;
+    esmodule?: boolean;
     /** @minItems 1 */
-    readonly ignore?: readonly [string, ...(readonly string[])];
-  };
+    ignore?: readonly [string, ...string[]];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -806,12 +810,12 @@ namespace ConsistentTypeSpecifierStyle {
    * ]
    * ```
    */
-  export type Options = 'prefer-inline' | 'prefer-top-level';
+  export type Options = 'prefer-top-level' | 'prefer-inline';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -901,26 +905,32 @@ namespace NoCycle {
    * ]
    * ```
    */
-  export type Options = {
-    readonly commonjs?: boolean;
-    readonly amd?: boolean;
-    readonly esmodule?: boolean;
+  export type Options = Readonly<{
+    commonjs?: boolean;
+    amd?: boolean;
+    esmodule?: boolean;
     /** @minItems 1 */
-    readonly ignore?: readonly [string, ...(readonly string[])];
-    readonly maxDepth?: number | '∞';
-    /** Ignore external modules */
-    readonly ignoreExternal?: boolean;
+    ignore?: readonly [string, ...string[]];
+    maxDepth?: number | '∞';
+    /**
+     * Ignore external modules
+     *
+     * @default false
+     */
+    ignoreExternal?: boolean;
     /**
      * Allow cyclic dependency if there is at least one dynamic import in the
      * chain
+     *
+     * @default false
      */
-    readonly allowUnsafeDynamicCyclicDependency?: boolean;
-  };
+    allowUnsafeDynamicCyclicDependency?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1030,29 +1040,29 @@ namespace NoAnonymousDefaultExport {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** If `false`, will report default export of an array */
-    readonly allowArray?: boolean;
+    allowArray?: boolean;
     /** If `false`, will report default export of an arrow function */
-    readonly allowArrowFunction?: boolean;
+    allowArrowFunction?: boolean;
     /** If `false`, will report default export of a function call */
-    readonly allowCallExpression?: boolean;
+    allowCallExpression?: boolean;
     /** If `false`, will report default export of an anonymous class */
-    readonly allowAnonymousClass?: boolean;
+    allowAnonymousClass?: boolean;
     /** If `false`, will report default export of an anonymous function */
-    readonly allowAnonymousFunction?: boolean;
+    allowAnonymousFunction?: boolean;
     /** If `false`, will report default export of a literal */
-    readonly allowLiteral?: boolean;
+    allowLiteral?: boolean;
     /** If `false`, will report default export of an object expression */
-    readonly allowObject?: boolean;
+    allowObject?: boolean;
     /** If `false`, will report default export of a class instantiation */
-    readonly allowNew?: boolean;
-  };
+    allowNew?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1090,15 +1100,17 @@ namespace NoRenameDefault {
    * ]
    * ```
    */
-  export type Options = {
-    readonly commonjs?: boolean;
-    readonly preventRenamingBindings?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    commonjs?: boolean;
+    /** @default true */
+    preventRenamingBindings?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1192,38 +1204,40 @@ namespace NoUnusedModules {
    * ]
    * ```
    */
-  export type Options = {
-    /** Files/paths to be analyzed (only for unused exports) */
-    readonly src?: readonly string[];
-    /**
-     * Files/paths for which unused exports will not be reported (e.g module
-     * entry points)
-     */
-    readonly ignoreExports?: readonly string[];
-    /** Report modules without any exports */
-    readonly missingExports?: boolean;
-    /** Report exports without any usage */
-    readonly unusedExports?: boolean;
-    /** Ignore type exports without any usage */
-    readonly ignoreUnusedTypeExports?: boolean;
-    readonly [k: string]: unknown;
-  } & (
-    | {
-        readonly missingExports: true;
-        readonly [k: string]: unknown;
-      }
-    | {
-        readonly unusedExports: true;
-        /** @minItems 1 */
-        readonly src?: readonly [unknown, ...(readonly unknown[])];
-        readonly [k: string]: unknown;
-      }
-  );
+  export type Options = Readonly<
+    (
+      | {
+          unusedExports: true;
+          /** @minItems 1 */
+          src?: readonly [unknown, ...unknown[]];
+          [k: string]: unknown;
+        }
+      | {
+          missingExports: true;
+          [k: string]: unknown;
+        }
+    ) & {
+      /** Files/paths to be analyzed (only for unused exports) */
+      src?: readonly string[];
+      /**
+       * Files/paths for which unused exports will not be reported (e.g module
+       * entry points)
+       */
+      ignoreExports?: readonly string[];
+      /** Report modules without any exports */
+      missingExports?: boolean;
+      /** Report exports without any usage */
+      unusedExports?: boolean;
+      /** Ignore type exports without any usage */
+      ignoreUnusedTypeExports?: boolean;
+      [k: string]: unknown;
+    }
+  >;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1281,20 +1295,20 @@ namespace NoCommonjs {
    * ```
    */
   export type Options =
-    | readonly [
-        {
-          readonly allowPrimitiveModules?: boolean;
-          readonly allowRequire?: boolean;
-          readonly allowConditionalRequire?: boolean;
-        },
-      ]
+    | readonly []
     | readonly ['allow-primitive-modules']
-    | readonly [];
+    | readonly [
+        Readonly<{
+          allowPrimitiveModules?: boolean;
+          allowRequire?: boolean;
+          allowConditionalRequire?: boolean;
+        }>,
+      ];
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1347,15 +1361,15 @@ namespace NoDuplicates {
    * ]
    * ```
    */
-  export type Options = {
-    readonly considerQueryString?: boolean;
-    readonly 'prefer-inline'?: boolean;
-  };
+  export type Options = Readonly<{
+    considerQueryString?: boolean;
+    'prefer-inline'?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1390,9 +1404,9 @@ namespace First {
   export type Options = 'absolute-first' | 'disable-absolute-first';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1428,15 +1442,15 @@ namespace MaxDependencies {
    * ]
    * ```
    */
-  export type Options = {
-    readonly max?: number;
-    readonly ignoreTypeImports?: boolean;
-  };
+  export type Options = Readonly<{
+    max?: number;
+    ignoreTypeImports?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1511,21 +1525,21 @@ namespace NoExtraneousDependencies {
    * ]
    * ```
    */
-  export type Options = {
-    readonly devDependencies?: boolean | readonly unknown[];
-    readonly optionalDependencies?: boolean | readonly unknown[];
-    readonly peerDependencies?: boolean | readonly unknown[];
-    readonly bundledDependencies?: boolean | readonly unknown[];
-    readonly packageDir?: string | readonly unknown[];
-    readonly includeInternal?: boolean;
-    readonly includeTypes?: boolean;
-    readonly whitelist?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    devDependencies?: boolean | readonly unknown[];
+    optionalDependencies?: boolean | readonly unknown[];
+    peerDependencies?: boolean | readonly unknown[];
+    bundledDependencies?: boolean | readonly unknown[];
+    packageDir?: string | readonly unknown[];
+    includeInternal?: boolean;
+    includeTypes?: boolean;
+    whitelist?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1573,18 +1587,18 @@ namespace NoAbsolutePath {
    * ]
    * ```
    */
-  export type Options = {
-    readonly commonjs?: boolean;
-    readonly amd?: boolean;
-    readonly esmodule?: boolean;
+  export type Options = Readonly<{
+    commonjs?: boolean;
+    amd?: boolean;
+    esmodule?: boolean;
     /** @minItems 1 */
-    readonly ignore?: readonly [string, ...(readonly string[])];
-  };
+    ignore?: readonly [string, ...string[]];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1621,14 +1635,14 @@ namespace NoNodejsModules {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allow?: readonly string[];
-  };
+  export type Options = Readonly<{
+    allow?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1871,59 +1885,63 @@ namespace Order {
    * ]
    * ```
    */
-  export type Options = {
-    readonly groups?: readonly unknown[];
-    readonly pathGroupsExcludedImportTypes?: readonly unknown[];
-    readonly distinctGroup?: boolean;
-    readonly pathGroups?: readonly {
-      readonly pattern: string;
-      readonly patternOptions?: UnknownRecord;
-      readonly group:
+  export type Options = Readonly<{
+    groups?: readonly unknown[];
+    pathGroupsExcludedImportTypes?: readonly unknown[];
+    /** @default true */
+    distinctGroup?: boolean;
+    pathGroups?: readonly Readonly<{
+      pattern: string;
+      patternOptions?: Readonly<Record<string, unknown>>;
+      group:
         | 'builtin'
         | 'external'
-        | 'index'
         | 'internal'
-        | 'object'
+        | 'unknown'
         | 'parent'
         | 'sibling'
-        | 'type'
-        | 'unknown';
-      readonly position?: 'after' | 'before';
-    }[];
-    readonly 'newlines-between'?:
-      | 'always-and-inside-groups'
-      | 'always'
+        | 'index'
+        | 'object'
+        | 'type';
+      position?: 'after' | 'before';
+    }>[];
+    'newlines-between'?:
       | 'ignore'
-      | 'never';
-    readonly 'newlines-between-types'?:
-      | 'always-and-inside-groups'
       | 'always'
-      | 'ignore'
+      | 'always-and-inside-groups'
       | 'never';
-    readonly consolidateIslands?: 'inside-groups' | 'never';
-    readonly sortTypesGroup?: boolean;
-    readonly named?:
+    'newlines-between-types'?:
+      | 'ignore'
+      | 'always'
+      | 'always-and-inside-groups'
+      | 'never';
+    consolidateIslands?: 'inside-groups' | 'never';
+    /** @default false */
+    sortTypesGroup?: boolean;
+    /** @default false */
+    named?:
       | boolean
-      | {
-          readonly enabled?: boolean;
-          readonly import?: boolean;
-          readonly export?: boolean;
-          readonly require?: boolean;
-          readonly cjsExports?: boolean;
-          readonly types?: 'mixed' | 'types-first' | 'types-last';
-        };
-    readonly alphabetize?: {
-      readonly caseInsensitive?: boolean;
-      readonly order?: 'asc' | 'desc' | 'ignore';
-      readonly orderImportKind?: 'asc' | 'desc' | 'ignore';
-    };
-    readonly warnOnUnassignedImports?: boolean;
-  };
+      | Readonly<{
+          enabled?: boolean;
+          import?: boolean;
+          export?: boolean;
+          require?: boolean;
+          cjsExports?: boolean;
+          types?: 'mixed' | 'types-first' | 'types-last';
+        }>;
+    alphabetize?: Readonly<{
+      caseInsensitive?: boolean;
+      order?: 'ignore' | 'asc' | 'desc';
+      orderImportKind?: 'ignore' | 'asc' | 'desc';
+    }>;
+    /** @default false */
+    warnOnUnassignedImports?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1964,16 +1982,16 @@ namespace NewlineAfterImport {
    * ]
    * ```
    */
-  export type Options = {
-    readonly count?: number;
-    readonly exactCount?: boolean;
-    readonly considerComments?: boolean;
-  };
+  export type Options = Readonly<{
+    count?: number;
+    exactCount?: boolean;
+    considerComments?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2011,14 +2029,15 @@ namespace PreferDefaultExport {
    * ]
    * ```
    */
-  export type Options = {
-    readonly target?: 'any' | 'single';
-  };
+  export type Options = Readonly<{
+    /** @default 'single' */
+    target?: 'single' | 'any';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2057,14 +2076,14 @@ namespace PreferNamespaceImport {
    * ]
    * ```
    */
-  export type Options = {
-    readonly patterns?: readonly string[];
-  };
+  export type Options = Readonly<{
+    patterns?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2129,14 +2148,14 @@ namespace NoDynamicRequire {
    * ]
    * ```
    */
-  export type Options = {
-    readonly esmodule?: boolean;
-  };
+  export type Options = Readonly<{
+    esmodule?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2206,17 +2225,17 @@ namespace NoUnassignedImport {
    * ]
    * ```
    */
-  export type Options = {
-    readonly devDependencies?: boolean | readonly unknown[];
-    readonly optionalDependencies?: boolean | readonly unknown[];
-    readonly peerDependencies?: boolean | readonly unknown[];
-    readonly allow?: readonly string[];
-  };
+  export type Options = Readonly<{
+    devDependencies?: boolean | readonly unknown[];
+    optionalDependencies?: boolean | readonly unknown[];
+    peerDependencies?: boolean | readonly unknown[];
+    allow?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2253,15 +2272,15 @@ namespace NoUselessPathSegments {
    * ]
    * ```
    */
-  export type Options = {
-    readonly commonjs?: boolean;
-    readonly noUselessIndex?: boolean;
-  };
+  export type Options = Readonly<{
+    commonjs?: boolean;
+    noUselessIndex?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2304,17 +2323,17 @@ namespace DynamicImportChunkname {
    * ]
    * ```
    */
-  export type Options = {
-    readonly importFunctions?: readonly string[];
-    readonly allowEmpty?: boolean;
-    readonly webpackChunknameFormat?: string;
-    readonly [k: string]: unknown;
-  };
+  export type Options = Readonly<{
+    importFunctions?: readonly string[];
+    allowEmpty?: boolean;
+    webpackChunknameFormat?: string;
+    [k: string]: unknown;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2349,14 +2368,14 @@ namespace NoImportModuleExports {
    * ]
    * ```
    */
-  export type Options = {
-    readonly exceptions?: readonly unknown[];
-  };
+  export type Options = Readonly<{
+    exceptions?: readonly unknown[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2441,87 +2460,87 @@ namespace ImportsFirst {
   export type RuleEntry = 0;
 }
 
-export type EslintImportsRules = {
-  readonly 'import-x/no-unresolved': NoUnresolved.RuleEntry;
-  readonly 'import-x/named': Named.RuleEntry;
-  readonly 'import-x/default': Default.RuleEntry;
-  readonly 'import-x/namespace': Namespace.RuleEntry;
-  readonly 'import-x/no-namespace': NoNamespace.RuleEntry;
-  readonly 'import-x/export': Export.RuleEntry;
-  readonly 'import-x/no-mutable-exports': NoMutableExports.RuleEntry;
-  readonly 'import-x/extensions': Extensions.RuleEntry;
-  readonly 'import-x/no-restricted-paths': NoRestrictedPaths.RuleEntry;
-  readonly 'import-x/no-internal-modules': NoInternalModules.RuleEntry;
-  readonly 'import-x/group-exports': GroupExports.RuleEntry;
-  readonly 'import-x/no-relative-packages': NoRelativePackages.RuleEntry;
-  readonly 'import-x/no-relative-parent-imports': NoRelativeParentImports.RuleEntry;
-  readonly 'import-x/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.RuleEntry;
-  readonly 'import-x/no-self-import': NoSelfImport.RuleEntry;
-  readonly 'import-x/no-cycle': NoCycle.RuleEntry;
-  readonly 'import-x/no-named-default': NoNamedDefault.RuleEntry;
-  readonly 'import-x/no-named-as-default': NoNamedAsDefault.RuleEntry;
-  readonly 'import-x/no-named-as-default-member': NoNamedAsDefaultMember.RuleEntry;
-  readonly 'import-x/no-anonymous-default-export': NoAnonymousDefaultExport.RuleEntry;
-  readonly 'import-x/no-rename-default': NoRenameDefault.RuleEntry;
-  readonly 'import-x/no-unused-modules': NoUnusedModules.RuleEntry;
-  readonly 'import-x/no-commonjs': NoCommonjs.RuleEntry;
-  readonly 'import-x/no-amd': NoAmd.RuleEntry;
-  readonly 'import-x/no-duplicates': NoDuplicates.RuleEntry;
-  readonly 'import-x/first': First.RuleEntry;
-  readonly 'import-x/max-dependencies': MaxDependencies.RuleEntry;
-  readonly 'import-x/no-extraneous-dependencies': NoExtraneousDependencies.RuleEntry;
-  readonly 'import-x/no-absolute-path': NoAbsolutePath.RuleEntry;
-  readonly 'import-x/no-nodejs-modules': NoNodejsModules.RuleEntry;
-  readonly 'import-x/no-webpack-loader-syntax': NoWebpackLoaderSyntax.RuleEntry;
-  readonly 'import-x/order': Order.RuleEntry;
-  readonly 'import-x/newline-after-import': NewlineAfterImport.RuleEntry;
-  readonly 'import-x/prefer-default-export': PreferDefaultExport.RuleEntry;
-  readonly 'import-x/prefer-namespace-import': PreferNamespaceImport.RuleEntry;
-  readonly 'import-x/no-default-export': NoDefaultExport.RuleEntry;
-  readonly 'import-x/no-named-export': NoNamedExport.RuleEntry;
-  readonly 'import-x/no-dynamic-require': NoDynamicRequire.RuleEntry;
-  readonly 'import-x/unambiguous': Unambiguous.RuleEntry;
-  readonly 'import-x/no-unassigned-import': NoUnassignedImport.RuleEntry;
-  readonly 'import-x/no-useless-path-segments': NoUselessPathSegments.RuleEntry;
-  readonly 'import-x/dynamic-import-chunkname': DynamicImportChunkname.RuleEntry;
-  readonly 'import-x/no-import-module-exports': NoImportModuleExports.RuleEntry;
-  readonly 'import-x/no-empty-named-blocks': NoEmptyNamedBlocks.RuleEntry;
-  readonly 'import-x/exports-last': ExportsLast.RuleEntry;
-  readonly 'import-x/no-deprecated': NoDeprecated.RuleEntry;
+export type EslintImportsRules = Readonly<{
+  'import-x/no-unresolved': NoUnresolved.RuleEntry;
+  'import-x/named': Named.RuleEntry;
+  'import-x/default': Default.RuleEntry;
+  'import-x/namespace': Namespace.RuleEntry;
+  'import-x/no-namespace': NoNamespace.RuleEntry;
+  'import-x/export': Export.RuleEntry;
+  'import-x/no-mutable-exports': NoMutableExports.RuleEntry;
+  'import-x/extensions': Extensions.RuleEntry;
+  'import-x/no-restricted-paths': NoRestrictedPaths.RuleEntry;
+  'import-x/no-internal-modules': NoInternalModules.RuleEntry;
+  'import-x/group-exports': GroupExports.RuleEntry;
+  'import-x/no-relative-packages': NoRelativePackages.RuleEntry;
+  'import-x/no-relative-parent-imports': NoRelativeParentImports.RuleEntry;
+  'import-x/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.RuleEntry;
+  'import-x/no-self-import': NoSelfImport.RuleEntry;
+  'import-x/no-cycle': NoCycle.RuleEntry;
+  'import-x/no-named-default': NoNamedDefault.RuleEntry;
+  'import-x/no-named-as-default': NoNamedAsDefault.RuleEntry;
+  'import-x/no-named-as-default-member': NoNamedAsDefaultMember.RuleEntry;
+  'import-x/no-anonymous-default-export': NoAnonymousDefaultExport.RuleEntry;
+  'import-x/no-rename-default': NoRenameDefault.RuleEntry;
+  'import-x/no-unused-modules': NoUnusedModules.RuleEntry;
+  'import-x/no-commonjs': NoCommonjs.RuleEntry;
+  'import-x/no-amd': NoAmd.RuleEntry;
+  'import-x/no-duplicates': NoDuplicates.RuleEntry;
+  'import-x/first': First.RuleEntry;
+  'import-x/max-dependencies': MaxDependencies.RuleEntry;
+  'import-x/no-extraneous-dependencies': NoExtraneousDependencies.RuleEntry;
+  'import-x/no-absolute-path': NoAbsolutePath.RuleEntry;
+  'import-x/no-nodejs-modules': NoNodejsModules.RuleEntry;
+  'import-x/no-webpack-loader-syntax': NoWebpackLoaderSyntax.RuleEntry;
+  'import-x/order': Order.RuleEntry;
+  'import-x/newline-after-import': NewlineAfterImport.RuleEntry;
+  'import-x/prefer-default-export': PreferDefaultExport.RuleEntry;
+  'import-x/prefer-namespace-import': PreferNamespaceImport.RuleEntry;
+  'import-x/no-default-export': NoDefaultExport.RuleEntry;
+  'import-x/no-named-export': NoNamedExport.RuleEntry;
+  'import-x/no-dynamic-require': NoDynamicRequire.RuleEntry;
+  'import-x/unambiguous': Unambiguous.RuleEntry;
+  'import-x/no-unassigned-import': NoUnassignedImport.RuleEntry;
+  'import-x/no-useless-path-segments': NoUselessPathSegments.RuleEntry;
+  'import-x/dynamic-import-chunkname': DynamicImportChunkname.RuleEntry;
+  'import-x/no-import-module-exports': NoImportModuleExports.RuleEntry;
+  'import-x/no-empty-named-blocks': NoEmptyNamedBlocks.RuleEntry;
+  'import-x/exports-last': ExportsLast.RuleEntry;
+  'import-x/no-deprecated': NoDeprecated.RuleEntry;
 
   // deprecated
-  readonly 'import-x/imports-first': ImportsFirst.RuleEntry;
-};
+  'import-x/imports-first': ImportsFirst.RuleEntry;
+}>;
 
-export type EslintImportsRulesOption = {
-  readonly 'import-x/no-unresolved': NoUnresolved.Options;
-  readonly 'import-x/named': Named.Options;
-  readonly 'import-x/namespace': Namespace.Options;
-  readonly 'import-x/no-namespace': NoNamespace.Options;
-  readonly 'import-x/extensions': Extensions.Options;
-  readonly 'import-x/no-restricted-paths': NoRestrictedPaths.Options;
-  readonly 'import-x/no-internal-modules': NoInternalModules.Options;
-  readonly 'import-x/no-relative-packages': NoRelativePackages.Options;
-  readonly 'import-x/no-relative-parent-imports': NoRelativeParentImports.Options;
-  readonly 'import-x/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.Options;
-  readonly 'import-x/no-cycle': NoCycle.Options;
-  readonly 'import-x/no-anonymous-default-export': NoAnonymousDefaultExport.Options;
-  readonly 'import-x/no-rename-default': NoRenameDefault.Options;
-  readonly 'import-x/no-unused-modules': NoUnusedModules.Options;
-  readonly 'import-x/no-commonjs': NoCommonjs.Options;
-  readonly 'import-x/no-duplicates': NoDuplicates.Options;
-  readonly 'import-x/first': First.Options;
-  readonly 'import-x/max-dependencies': MaxDependencies.Options;
-  readonly 'import-x/no-extraneous-dependencies': NoExtraneousDependencies.Options;
-  readonly 'import-x/no-absolute-path': NoAbsolutePath.Options;
-  readonly 'import-x/no-nodejs-modules': NoNodejsModules.Options;
-  readonly 'import-x/order': Order.Options;
-  readonly 'import-x/newline-after-import': NewlineAfterImport.Options;
-  readonly 'import-x/prefer-default-export': PreferDefaultExport.Options;
-  readonly 'import-x/prefer-namespace-import': PreferNamespaceImport.Options;
-  readonly 'import-x/no-dynamic-require': NoDynamicRequire.Options;
-  readonly 'import-x/no-unassigned-import': NoUnassignedImport.Options;
-  readonly 'import-x/no-useless-path-segments': NoUselessPathSegments.Options;
-  readonly 'import-x/dynamic-import-chunkname': DynamicImportChunkname.Options;
-  readonly 'import-x/no-import-module-exports': NoImportModuleExports.Options;
-};
+export type EslintImportsRulesOption = Readonly<{
+  'import-x/no-unresolved': NoUnresolved.Options;
+  'import-x/named': Named.Options;
+  'import-x/namespace': Namespace.Options;
+  'import-x/no-namespace': NoNamespace.Options;
+  'import-x/extensions': Extensions.Options;
+  'import-x/no-restricted-paths': NoRestrictedPaths.Options;
+  'import-x/no-internal-modules': NoInternalModules.Options;
+  'import-x/no-relative-packages': NoRelativePackages.Options;
+  'import-x/no-relative-parent-imports': NoRelativeParentImports.Options;
+  'import-x/consistent-type-specifier-style': ConsistentTypeSpecifierStyle.Options;
+  'import-x/no-cycle': NoCycle.Options;
+  'import-x/no-anonymous-default-export': NoAnonymousDefaultExport.Options;
+  'import-x/no-rename-default': NoRenameDefault.Options;
+  'import-x/no-unused-modules': NoUnusedModules.Options;
+  'import-x/no-commonjs': NoCommonjs.Options;
+  'import-x/no-duplicates': NoDuplicates.Options;
+  'import-x/first': First.Options;
+  'import-x/max-dependencies': MaxDependencies.Options;
+  'import-x/no-extraneous-dependencies': NoExtraneousDependencies.Options;
+  'import-x/no-absolute-path': NoAbsolutePath.Options;
+  'import-x/no-nodejs-modules': NoNodejsModules.Options;
+  'import-x/order': Order.Options;
+  'import-x/newline-after-import': NewlineAfterImport.Options;
+  'import-x/prefer-default-export': PreferDefaultExport.Options;
+  'import-x/prefer-namespace-import': PreferNamespaceImport.Options;
+  'import-x/no-dynamic-require': NoDynamicRequire.Options;
+  'import-x/no-unassigned-import': NoUnassignedImport.Options;
+  'import-x/no-useless-path-segments': NoUselessPathSegments.Options;
+  'import-x/dynamic-import-chunkname': DynamicImportChunkname.Options;
+  'import-x/no-import-module-exports': NoImportModuleExports.Options;
+}>;

@@ -47,14 +47,14 @@ namespace JsxNoNewObjectAsProp {
    * ]
    * ```
    */
-  export type Options = {
-    readonly nativeAllowList?: readonly string[] | 'all';
-  };
+  export type Options = Readonly<{
+    nativeAllowList?: 'all' | readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -97,14 +97,14 @@ namespace JsxNoNewArrayAsProp {
    * ]
    * ```
    */
-  export type Options = {
-    readonly nativeAllowList?: readonly string[] | 'all';
-  };
+  export type Options = Readonly<{
+    nativeAllowList?: 'all' | readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -147,14 +147,14 @@ namespace JsxNoNewFunctionAsProp {
    * ]
    * ```
    */
-  export type Options = {
-    readonly nativeAllowList?: readonly string[] | 'all';
-  };
+  export type Options = Readonly<{
+    nativeAllowList?: 'all' | readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -197,26 +197,26 @@ namespace JsxNoJsxAsProp {
    * ]
    * ```
    */
-  export type Options = {
-    readonly nativeAllowList?: readonly string[] | 'all';
-  };
+  export type Options = Readonly<{
+    nativeAllowList?: 'all' | readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintReactPerfRules = {
-  readonly 'react-perf/jsx-no-new-object-as-prop': JsxNoNewObjectAsProp.RuleEntry;
-  readonly 'react-perf/jsx-no-new-array-as-prop': JsxNoNewArrayAsProp.RuleEntry;
-  readonly 'react-perf/jsx-no-new-function-as-prop': JsxNoNewFunctionAsProp.RuleEntry;
-  readonly 'react-perf/jsx-no-jsx-as-prop': JsxNoJsxAsProp.RuleEntry;
-};
+export type EslintReactPerfRules = Readonly<{
+  'react-perf/jsx-no-new-object-as-prop': JsxNoNewObjectAsProp.RuleEntry;
+  'react-perf/jsx-no-new-array-as-prop': JsxNoNewArrayAsProp.RuleEntry;
+  'react-perf/jsx-no-new-function-as-prop': JsxNoNewFunctionAsProp.RuleEntry;
+  'react-perf/jsx-no-jsx-as-prop': JsxNoJsxAsProp.RuleEntry;
+}>;
 
-export type EslintReactPerfRulesOption = {
-  readonly 'react-perf/jsx-no-new-object-as-prop': JsxNoNewObjectAsProp.Options;
-  readonly 'react-perf/jsx-no-new-array-as-prop': JsxNoNewArrayAsProp.Options;
-  readonly 'react-perf/jsx-no-new-function-as-prop': JsxNoNewFunctionAsProp.Options;
-  readonly 'react-perf/jsx-no-jsx-as-prop': JsxNoJsxAsProp.Options;
-};
+export type EslintReactPerfRulesOption = Readonly<{
+  'react-perf/jsx-no-new-object-as-prop': JsxNoNewObjectAsProp.Options;
+  'react-perf/jsx-no-new-array-as-prop': JsxNoNewArrayAsProp.Options;
+  'react-perf/jsx-no-new-function-as-prop': JsxNoNewFunctionAsProp.Options;
+  'react-perf/jsx-no-jsx-as-prop': JsxNoJsxAsProp.Options;
+}>;

@@ -53,17 +53,17 @@ namespace ExhaustiveDeps {
    * ]
    * ```
    */
-  export type Options = {
-    readonly additionalHooks?: string;
-    readonly enableDangerousAutofixThisMayCauseInfiniteLoops?: boolean;
-    readonly experimental_autoDependenciesHooks?: readonly string[];
-    readonly requireExplicitEffectDeps?: boolean;
-  };
+  export type Options = Readonly<{
+    additionalHooks?: string;
+    enableDangerousAutofixThisMayCauseInfiniteLoops?: boolean;
+    experimental_autoDependenciesHooks?: readonly string[];
+    requireExplicitEffectDeps?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -97,14 +97,14 @@ namespace RulesOfHooks {
    * ]
    * ```
    */
-  export type Options = {
-    readonly additionalHooks?: string;
-  };
+  export type Options = Readonly<{
+    additionalHooks?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -136,9 +136,9 @@ namespace Hooks {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -170,9 +170,9 @@ namespace CapitalizedCalls {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -206,9 +206,9 @@ namespace StaticComponents {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -242,9 +242,9 @@ namespace UseMemo {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -278,9 +278,9 @@ namespace VoidUseMemo {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -313,9 +313,9 @@ namespace ComponentHookFactories {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -350,9 +350,9 @@ namespace PreserveManualMemoization {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -385,9 +385,9 @@ namespace IncompatibleLibrary {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -420,9 +420,9 @@ namespace Immutability {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -456,9 +456,9 @@ namespace Globals {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -492,9 +492,9 @@ namespace Refs {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -526,9 +526,9 @@ namespace MemoizedEffectDependencies {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -561,9 +561,9 @@ namespace SetStateInEffect {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -595,9 +595,9 @@ namespace NoDerivingStateInEffects {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -630,9 +630,9 @@ namespace ErrorBoundaries {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -666,9 +666,9 @@ namespace Purity {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -701,9 +701,9 @@ namespace SetStateInRender {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -735,9 +735,9 @@ namespace Invariant {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -769,9 +769,9 @@ namespace Todo {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -803,9 +803,9 @@ namespace Syntax {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -837,9 +837,9 @@ namespace UnsupportedSyntax {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -871,9 +871,9 @@ namespace Config {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -906,9 +906,9 @@ namespace Gating {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -940,9 +940,9 @@ namespace RuleSuppression {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -974,9 +974,9 @@ namespace AutomaticEffectDependencies {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1008,9 +1008,9 @@ namespace Fire {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1042,71 +1042,71 @@ namespace Fbt {
   export type Options = UnknownRecord;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintReactHooksRules = {
-  readonly 'react-hooks/exhaustive-deps': ExhaustiveDeps.RuleEntry;
-  readonly 'react-hooks/rules-of-hooks': RulesOfHooks.RuleEntry;
-  readonly 'react-hooks/hooks': Hooks.RuleEntry;
-  readonly 'react-hooks/capitalized-calls': CapitalizedCalls.RuleEntry;
-  readonly 'react-hooks/static-components': StaticComponents.RuleEntry;
-  readonly 'react-hooks/use-memo': UseMemo.RuleEntry;
-  readonly 'react-hooks/void-use-memo': VoidUseMemo.RuleEntry;
-  readonly 'react-hooks/component-hook-factories': ComponentHookFactories.RuleEntry;
-  readonly 'react-hooks/preserve-manual-memoization': PreserveManualMemoization.RuleEntry;
-  readonly 'react-hooks/incompatible-library': IncompatibleLibrary.RuleEntry;
-  readonly 'react-hooks/immutability': Immutability.RuleEntry;
-  readonly 'react-hooks/globals': Globals.RuleEntry;
-  readonly 'react-hooks/refs': Refs.RuleEntry;
-  readonly 'react-hooks/memoized-effect-dependencies': MemoizedEffectDependencies.RuleEntry;
-  readonly 'react-hooks/set-state-in-effect': SetStateInEffect.RuleEntry;
-  readonly 'react-hooks/no-deriving-state-in-effects': NoDerivingStateInEffects.RuleEntry;
-  readonly 'react-hooks/error-boundaries': ErrorBoundaries.RuleEntry;
-  readonly 'react-hooks/purity': Purity.RuleEntry;
-  readonly 'react-hooks/set-state-in-render': SetStateInRender.RuleEntry;
-  readonly 'react-hooks/invariant': Invariant.RuleEntry;
-  readonly 'react-hooks/todo': Todo.RuleEntry;
-  readonly 'react-hooks/syntax': Syntax.RuleEntry;
-  readonly 'react-hooks/unsupported-syntax': UnsupportedSyntax.RuleEntry;
-  readonly 'react-hooks/config': Config.RuleEntry;
-  readonly 'react-hooks/gating': Gating.RuleEntry;
-  readonly 'react-hooks/rule-suppression': RuleSuppression.RuleEntry;
-  readonly 'react-hooks/automatic-effect-dependencies': AutomaticEffectDependencies.RuleEntry;
-  readonly 'react-hooks/fire': Fire.RuleEntry;
-  readonly 'react-hooks/fbt': Fbt.RuleEntry;
-};
+export type EslintReactHooksRules = Readonly<{
+  'react-hooks/exhaustive-deps': ExhaustiveDeps.RuleEntry;
+  'react-hooks/rules-of-hooks': RulesOfHooks.RuleEntry;
+  'react-hooks/hooks': Hooks.RuleEntry;
+  'react-hooks/capitalized-calls': CapitalizedCalls.RuleEntry;
+  'react-hooks/static-components': StaticComponents.RuleEntry;
+  'react-hooks/use-memo': UseMemo.RuleEntry;
+  'react-hooks/void-use-memo': VoidUseMemo.RuleEntry;
+  'react-hooks/component-hook-factories': ComponentHookFactories.RuleEntry;
+  'react-hooks/preserve-manual-memoization': PreserveManualMemoization.RuleEntry;
+  'react-hooks/incompatible-library': IncompatibleLibrary.RuleEntry;
+  'react-hooks/immutability': Immutability.RuleEntry;
+  'react-hooks/globals': Globals.RuleEntry;
+  'react-hooks/refs': Refs.RuleEntry;
+  'react-hooks/memoized-effect-dependencies': MemoizedEffectDependencies.RuleEntry;
+  'react-hooks/set-state-in-effect': SetStateInEffect.RuleEntry;
+  'react-hooks/no-deriving-state-in-effects': NoDerivingStateInEffects.RuleEntry;
+  'react-hooks/error-boundaries': ErrorBoundaries.RuleEntry;
+  'react-hooks/purity': Purity.RuleEntry;
+  'react-hooks/set-state-in-render': SetStateInRender.RuleEntry;
+  'react-hooks/invariant': Invariant.RuleEntry;
+  'react-hooks/todo': Todo.RuleEntry;
+  'react-hooks/syntax': Syntax.RuleEntry;
+  'react-hooks/unsupported-syntax': UnsupportedSyntax.RuleEntry;
+  'react-hooks/config': Config.RuleEntry;
+  'react-hooks/gating': Gating.RuleEntry;
+  'react-hooks/rule-suppression': RuleSuppression.RuleEntry;
+  'react-hooks/automatic-effect-dependencies': AutomaticEffectDependencies.RuleEntry;
+  'react-hooks/fire': Fire.RuleEntry;
+  'react-hooks/fbt': Fbt.RuleEntry;
+}>;
 
-export type EslintReactHooksRulesOption = {
-  readonly 'react-hooks/exhaustive-deps': ExhaustiveDeps.Options;
-  readonly 'react-hooks/rules-of-hooks': RulesOfHooks.Options;
-  readonly 'react-hooks/hooks': Hooks.Options;
-  readonly 'react-hooks/capitalized-calls': CapitalizedCalls.Options;
-  readonly 'react-hooks/static-components': StaticComponents.Options;
-  readonly 'react-hooks/use-memo': UseMemo.Options;
-  readonly 'react-hooks/void-use-memo': VoidUseMemo.Options;
-  readonly 'react-hooks/component-hook-factories': ComponentHookFactories.Options;
-  readonly 'react-hooks/preserve-manual-memoization': PreserveManualMemoization.Options;
-  readonly 'react-hooks/incompatible-library': IncompatibleLibrary.Options;
-  readonly 'react-hooks/immutability': Immutability.Options;
-  readonly 'react-hooks/globals': Globals.Options;
-  readonly 'react-hooks/refs': Refs.Options;
-  readonly 'react-hooks/memoized-effect-dependencies': MemoizedEffectDependencies.Options;
-  readonly 'react-hooks/set-state-in-effect': SetStateInEffect.Options;
-  readonly 'react-hooks/no-deriving-state-in-effects': NoDerivingStateInEffects.Options;
-  readonly 'react-hooks/error-boundaries': ErrorBoundaries.Options;
-  readonly 'react-hooks/purity': Purity.Options;
-  readonly 'react-hooks/set-state-in-render': SetStateInRender.Options;
-  readonly 'react-hooks/invariant': Invariant.Options;
-  readonly 'react-hooks/todo': Todo.Options;
-  readonly 'react-hooks/syntax': Syntax.Options;
-  readonly 'react-hooks/unsupported-syntax': UnsupportedSyntax.Options;
-  readonly 'react-hooks/config': Config.Options;
-  readonly 'react-hooks/gating': Gating.Options;
-  readonly 'react-hooks/rule-suppression': RuleSuppression.Options;
-  readonly 'react-hooks/automatic-effect-dependencies': AutomaticEffectDependencies.Options;
-  readonly 'react-hooks/fire': Fire.Options;
-  readonly 'react-hooks/fbt': Fbt.Options;
-};
+export type EslintReactHooksRulesOption = Readonly<{
+  'react-hooks/exhaustive-deps': ExhaustiveDeps.Options;
+  'react-hooks/rules-of-hooks': RulesOfHooks.Options;
+  'react-hooks/hooks': Hooks.Options;
+  'react-hooks/capitalized-calls': CapitalizedCalls.Options;
+  'react-hooks/static-components': StaticComponents.Options;
+  'react-hooks/use-memo': UseMemo.Options;
+  'react-hooks/void-use-memo': VoidUseMemo.Options;
+  'react-hooks/component-hook-factories': ComponentHookFactories.Options;
+  'react-hooks/preserve-manual-memoization': PreserveManualMemoization.Options;
+  'react-hooks/incompatible-library': IncompatibleLibrary.Options;
+  'react-hooks/immutability': Immutability.Options;
+  'react-hooks/globals': Globals.Options;
+  'react-hooks/refs': Refs.Options;
+  'react-hooks/memoized-effect-dependencies': MemoizedEffectDependencies.Options;
+  'react-hooks/set-state-in-effect': SetStateInEffect.Options;
+  'react-hooks/no-deriving-state-in-effects': NoDerivingStateInEffects.Options;
+  'react-hooks/error-boundaries': ErrorBoundaries.Options;
+  'react-hooks/purity': Purity.Options;
+  'react-hooks/set-state-in-render': SetStateInRender.Options;
+  'react-hooks/invariant': Invariant.Options;
+  'react-hooks/todo': Todo.Options;
+  'react-hooks/syntax': Syntax.Options;
+  'react-hooks/unsupported-syntax': UnsupportedSyntax.Options;
+  'react-hooks/config': Config.Options;
+  'react-hooks/gating': Gating.Options;
+  'react-hooks/rule-suppression': RuleSuppression.Options;
+  'react-hooks/automatic-effect-dependencies': AutomaticEffectDependencies.Options;
+  'react-hooks/fire': Fire.Options;
+  'react-hooks/fbt': Fbt.Options;
+}>;

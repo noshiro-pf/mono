@@ -482,6 +482,8 @@ export const typescriptEslintRules = {
 
   '@typescript-eslint/no-unnecessary-type-conversion': 'error',
 
+  '@typescript-eslint/no-unused-private-class-members': 'error',
+
   // For browser environment only
 
   // For Node.js environment only

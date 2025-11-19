@@ -249,19 +249,19 @@ namespace DetectBidiCharacters {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintSecurityRules = {
-  readonly 'security/detect-unsafe-regex': DetectUnsafeRegex.RuleEntry;
-  readonly 'security/detect-non-literal-regexp': DetectNonLiteralRegexp.RuleEntry;
-  readonly 'security/detect-non-literal-require': DetectNonLiteralRequire.RuleEntry;
-  readonly 'security/detect-non-literal-fs-filename': DetectNonLiteralFsFilename.RuleEntry;
-  readonly 'security/detect-eval-with-expression': DetectEvalWithExpression.RuleEntry;
-  readonly 'security/detect-pseudoRandomBytes': DetectPseudoRandomBytes.RuleEntry;
-  readonly 'security/detect-possible-timing-attacks': DetectPossibleTimingAttacks.RuleEntry;
-  readonly 'security/detect-no-csrf-before-method-override': DetectNoCsrfBeforeMethodOverride.RuleEntry;
-  readonly 'security/detect-buffer-noassert': DetectBufferNoassert.RuleEntry;
-  readonly 'security/detect-child-process': DetectChildProcess.RuleEntry;
-  readonly 'security/detect-disable-mustache-escape': DetectDisableMustacheEscape.RuleEntry;
-  readonly 'security/detect-object-injection': DetectObjectInjection.RuleEntry;
-  readonly 'security/detect-new-buffer': DetectNewBuffer.RuleEntry;
-  readonly 'security/detect-bidi-characters': DetectBidiCharacters.RuleEntry;
-};
+export type EslintSecurityRules = Readonly<{
+  'security/detect-unsafe-regex': DetectUnsafeRegex.RuleEntry;
+  'security/detect-non-literal-regexp': DetectNonLiteralRegexp.RuleEntry;
+  'security/detect-non-literal-require': DetectNonLiteralRequire.RuleEntry;
+  'security/detect-non-literal-fs-filename': DetectNonLiteralFsFilename.RuleEntry;
+  'security/detect-eval-with-expression': DetectEvalWithExpression.RuleEntry;
+  'security/detect-pseudoRandomBytes': DetectPseudoRandomBytes.RuleEntry;
+  'security/detect-possible-timing-attacks': DetectPossibleTimingAttacks.RuleEntry;
+  'security/detect-no-csrf-before-method-override': DetectNoCsrfBeforeMethodOverride.RuleEntry;
+  'security/detect-buffer-noassert': DetectBufferNoassert.RuleEntry;
+  'security/detect-child-process': DetectChildProcess.RuleEntry;
+  'security/detect-disable-mustache-escape': DetectDisableMustacheEscape.RuleEntry;
+  'security/detect-object-injection': DetectObjectInjection.RuleEntry;
+  'security/detect-new-buffer': DetectNewBuffer.RuleEntry;
+  'security/detect-bidi-characters': DetectBidiCharacters.RuleEntry;
+}>;

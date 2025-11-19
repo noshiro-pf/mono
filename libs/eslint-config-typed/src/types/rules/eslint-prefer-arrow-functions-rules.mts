@@ -78,26 +78,33 @@ namespace PreferArrowFunctions {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedNames?: readonly string[];
-    readonly allowNamedFunctions?: boolean | 'only-expressions';
-    readonly allowObjectProperties?: boolean;
-    readonly classPropertiesAllowed?: boolean;
-    readonly disallowPrototype?: boolean;
-    readonly returnStyle?: 'explicit' | 'implicit' | 'unchanged'; // modified
-    readonly singleReturnOnly?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default [ ] */
+    allowedNames?: readonly string[];
+    /** @default false */
+    allowNamedFunctions?: boolean | 'only-expressions';
+    /** @default false */
+    allowObjectProperties?: boolean;
+    /** @default false */
+    classPropertiesAllowed?: boolean;
+    /** @default false */
+    disallowPrototype?: boolean;
+    /** @default 'unchanged' */
+    returnStyle?: 'explicit' | 'implicit' | 'unchanged';
+    /** @default false */
+    singleReturnOnly?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintPreferArrowFunctionRules = {
-  readonly 'prefer-arrow-functions/prefer-arrow-functions': PreferArrowFunctions.RuleEntry;
-};
+export type EslintPreferArrowFunctionRules = Readonly<{
+  'prefer-arrow-functions/prefer-arrow-functions': PreferArrowFunctions.RuleEntry;
+}>;
 
-export type EslintPreferArrowFunctionRulesOption = {
-  readonly 'prefer-arrow-functions/prefer-arrow-functions': PreferArrowFunctions.Options;
-};
+export type EslintPreferArrowFunctionRulesOption = Readonly<{
+  'prefer-arrow-functions/prefer-arrow-functions': PreferArrowFunctions.Options;
+}>;

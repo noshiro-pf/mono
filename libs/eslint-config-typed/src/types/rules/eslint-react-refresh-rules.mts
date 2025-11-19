@@ -40,23 +40,23 @@ namespace OnlyExportComponents {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowExportNames?: readonly string[];
-    readonly allowConstantExport?: boolean;
-    readonly customHOCs?: readonly string[];
-    readonly checkJS?: boolean;
-  };
+  export type Options = Readonly<{
+    allowExportNames?: readonly string[];
+    allowConstantExport?: boolean;
+    customHOCs?: readonly string[];
+    checkJS?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintReactRefreshRules = {
-  readonly 'react-refresh/only-export-components': OnlyExportComponents.RuleEntry;
-};
+export type EslintReactRefreshRules = Readonly<{
+  'react-refresh/only-export-components': OnlyExportComponents.RuleEntry;
+}>;
 
-export type EslintReactRefreshRulesOption = {
-  readonly 'react-refresh/only-export-components': OnlyExportComponents.Options;
-};
+export type EslintReactRefreshRulesOption = Readonly<{
+  'react-refresh/only-export-components': OnlyExportComponents.Options;
+}>;

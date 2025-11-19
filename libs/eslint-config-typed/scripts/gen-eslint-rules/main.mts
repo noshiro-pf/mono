@@ -1,103 +1,86 @@
 #!/usr/bin/env tsx
 
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import 'ts-repo-utils';
+import {
+  applyTransformationsToFile,
+  applyTypeTransformations,
+} from './codemod/apply-type-transformations.mjs';
 import { eslintPlugins } from './constants/eslint-plugins.mjs';
 import { generateRulesTypeCore } from './functions/generate-rules-type-core.mjs';
-import { replaceRulesType } from './functions/replace-rules-type.mjs';
 
 const thisDir = import.meta.dirname;
 
-const outDir = path.resolve(thisDir, '../../src/types/rules');
+export const outDir = path.resolve(thisDir, '../../src/types/rules');
 
 const eslintConfigPath = path.resolve(thisDir, './eslint.config.gen.mts');
 
-const formatCommand = 'pnpm exec prettier --write src/types/rules/*.mts';
-
-export const generateRulesType = async (): Promise<void> => {
+export const generateRulesType = async (
+  targetFileNames?: NonEmptyArray<string>,
+): Promise<void> => {
   {
-    const result = await generate();
+    const result = await generate(targetFileNames);
 
     if (result.type === 'error') {
       console.error(result.error);
 
       return;
     }
+
+    await fmt(targetFileNames);
   }
 
   {
-    console.log('running `lint --fix` ... (adding "readonly")');
+    console.log('running codemod...');
 
-    const result = await lintFix();
+    await applyTypeTransformationsForTargets(targetFileNames);
+
+    await fmt(targetFileNames);
+  }
+
+  {
+    console.log('running `lint --fix` ...');
+
+    const result = await lintFix(targetFileNames);
 
     if (result.type === 'error') {
       console.error(result.error);
 
       return;
     }
-  }
 
-  {
-    console.log('formatting code ...');
-
-    const result = await $(formatCommand);
-
-    if (Result.isErr(result)) {
-      console.error(result.value);
-
-      return;
-    }
-  }
-
-  {
-    console.log('running `lint --fix` ... (sorting unions)');
-
-    const result = await lintFix();
-
-    if (result.type === 'error') {
-      console.error(result.error);
-
-      return;
-    }
-  }
-
-  {
-    console.log('formatting code ...');
-
-    const result = await $(formatCommand);
-
-    if (Result.isErr(result)) {
-      console.error(result.value);
-
-      return;
-    }
-  }
-
-  {
-    const result = await runReplace();
-
-    if (result.type === 'error') {
-      console.error(result.error);
-
-      return;
-    }
-  }
-
-  {
-    console.log('formatting code ...');
-
-    const result = await $(formatCommand);
-
-    if (Result.isErr(result)) {
-      console.error(result.value);
-    }
+    await fmt(targetFileNames);
   }
 };
 
-const generate = async (): Promise<
-  Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>
-> => {
-  for (const plugin of Object.values(eslintPlugins)) {
+const fmt = async (targetFileNames?: NonEmptyArray<string>): Promise<void> => {
+  console.log('formatting code ...');
+
+  const targetPattern =
+    targetFileNames === undefined
+      ? 'src/types/rules/*.mts'
+      : targetFileNames.map((name) => `src/types/rules/${name}`).join(' ');
+
+  const result = await $(`pnpm exec prettier --write ${targetPattern}`);
+
+  if (Result.isErr(result)) {
+    console.error(result.value);
+  }
+};
+
+const generate = async (
+  targetFileNames?: NonEmptyArray<string>,
+): Promise<Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>> => {
+  const plugins = Object.values(eslintPlugins);
+
+  const targetPlugins =
+    targetFileNames === undefined
+      ? plugins
+      : plugins.filter((plugin) =>
+          targetFileNames.includes(plugin.outputFileName),
+        );
+
+  for (const plugin of targetPlugins) {
     console.log(`generating ${plugin.outputFileName} ...`);
 
     try {
@@ -118,10 +101,23 @@ const generate = async (): Promise<
   return { type: 'ok' };
 };
 
-const lintFix = async (): Promise<
-  Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>
-> => {
-  const targetFiles: readonly string[] = await glob(`${outDir}/*.mts`);
+const lintFix = async (
+  targetFileNames?: NonEmptyArray<string>,
+): Promise<Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>> => {
+  const allFiles: readonly string[] = await glob(`${outDir}/*.mts`);
+
+  const targetFiles =
+    targetFileNames === undefined
+      ? allFiles
+      : allFiles.filter((filePath) =>
+          targetFileNames.some((name) => filePath.endsWith(name)),
+        );
+
+  if (targetFiles.length === 0) {
+    console.warn('No files to lint');
+
+    return { type: 'ok' };
+  }
 
   const result = await $(
     `TIMING=1 eslint ${[
@@ -139,28 +135,30 @@ const lintFix = async (): Promise<
   return { type: 'ok' };
 };
 
-const runReplace = async (): Promise<
-  Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>
-> => {
-  for (const plugin of Object.values(eslintPlugins)) {
-    try {
-      console.log(`modifying ${plugin.outputFileName} ...`);
+const applyTypeTransformationsForTargets = async (
+  targetFileNames?: readonly string[],
+): Promise<void> => {
+  if (targetFileNames === undefined || targetFileNames.length === 0) {
+    await applyTypeTransformations();
+  } else {
+    for (const fileName of targetFileNames) {
+      const filePath = path.resolve(outDir, fileName);
 
-      const targetFilePath = `${outDir}/${plugin.outputFileName}`;
-
-      const content = await fs.readFile(targetFilePath, { encoding: 'utf8' });
-
-      const result = replaceRulesType(content, plugin.typeName);
-
-      await fs.writeFile(targetFilePath, result);
-    } catch (error) {
-      return { type: 'error', error };
+      await applyTransformationsToFile(filePath);
     }
   }
-
-  return { type: 'ok' };
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  await generateRulesType();
+  const targetFiles = process.argv.slice(2);
+
+  if (Arr.isNonEmpty(targetFiles)) {
+    console.log(`Generating specific files: ${targetFiles.join(', ')}`);
+
+    await generateRulesType(targetFiles);
+  } else {
+    console.log('Generating all files...');
+
+    await generateRulesType();
+  }
 }

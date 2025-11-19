@@ -46,15 +46,17 @@ namespace ConsistentTestFilename {
    * ]
    * ```
    */
-  export type Options = {
-    readonly pattern?: string;
-    readonly allTestPattern?: string;
-  };
+  export type Options = Readonly<{
+    /** @default '.*\.test\.[tj]sx?$' */
+    pattern?: string;
+    /** @default '.*\.(test|spec)\.[tj]sx?$' */
+    allTestPattern?: string;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -100,15 +102,15 @@ namespace ConsistentTestIt {
    * ]
    * ```
    */
-  export type Options = {
-    readonly fn?: 'it' | 'test';
-    readonly withinDescribe?: 'it' | 'test';
-  };
+  export type Options = Readonly<{
+    fn?: 'test' | 'it';
+    withinDescribe?: 'test' | 'it';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -148,14 +150,15 @@ namespace ConsistentVitestVi {
    * ]
    * ```
    */
-  export type Options = {
-    readonly fn?: 'vi' | 'vitest';
-  };
+  export type Options = Readonly<{
+    /** @default 'vi' */
+    fn?: 'vi' | 'vitest';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -198,15 +201,15 @@ namespace ExpectExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly assertFunctionNames?: readonly string[];
-    readonly additionalTestBlockFunctions?: readonly string[];
-  };
+  export type Options = Readonly<{
+    assertFunctionNames?: readonly string[];
+    additionalTestBlockFunctions?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -258,14 +261,14 @@ namespace MaxExpects {
    * ]
    * ```
    */
-  export type Options = {
-    readonly max?: number;
-  };
+  export type Options = Readonly<{
+    max?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -299,14 +302,14 @@ namespace MaxNestedDescribe {
    * ]
    * ```
    */
-  export type Options = {
-    readonly max?: number;
-  };
+  export type Options = Readonly<{
+    max?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -485,14 +488,15 @@ namespace NoFocusedTests {
    * ]
    * ```
    */
-  export type Options = {
-    readonly fixable?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default true */
+    fixable?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -538,20 +542,15 @@ namespace NoHooks {
    * ]
    * ```
    */
-  export type Options = {
+  export type Options = Readonly<{
     /** This array option controls which Vitest hooks are checked by this rule. */
-    readonly allow?: readonly (
-      | 'afterAll'
-      | 'afterEach'
-      | 'beforeAll'
-      | 'beforeEach'
-    )[];
-  };
+    allow?: readonly ('beforeAll' | 'beforeEach' | 'afterAll' | 'afterEach')[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -666,16 +665,16 @@ namespace NoLargeSnapshots {
    * ]
    * ```
    */
-  export type Options = {
-    readonly maxSize?: number;
-    readonly inlineMaxSize?: number;
-    readonly allowedSnapshots?: Record<string, readonly unknown[]>;
-  };
+  export type Options = Readonly<{
+    maxSize?: number;
+    inlineMaxSize?: number;
+    allowedSnapshots?: Readonly<Record<string, readonly unknown[]>>;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -729,9 +728,9 @@ namespace NoRestrictedMatchers {
   export type Options = Readonly<Record<string, string | null>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -768,9 +767,9 @@ namespace NoRestrictedViMethods {
   export type Options = Readonly<Record<string, string | null>>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -807,14 +806,14 @@ namespace NoStandaloneExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly additionalTestBlockFunctions?: readonly string[];
-  };
+  export type Options = Readonly<{
+    additionalTestBlockFunctions?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1169,16 +1168,16 @@ namespace PreferExpectAssertions {
    * ]
    * ```
    */
-  export type Options = {
-    readonly onlyFunctionsWithAsyncKeyword?: boolean;
-    readonly onlyFunctionsWithExpectInLoop?: boolean;
-    readonly onlyFunctionsWithExpectInCallback?: boolean;
-  };
+  export type Options = Readonly<{
+    onlyFunctionsWithAsyncKeyword?: boolean;
+    onlyFunctionsWithExpectInLoop?: boolean;
+    onlyFunctionsWithExpectInCallback?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1341,17 +1340,19 @@ namespace PreferLowercaseTitle {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignore?: readonly ('describe' | 'it' | 'test')[];
-    readonly allowedPrefixes?: readonly string[];
-    readonly ignoreTopLevelDescribe?: boolean;
-    readonly lowercaseFirstCharacterOnly?: boolean;
-  };
+  export type Options = Readonly<{
+    ignore?: readonly ('describe' | 'test' | 'it')[];
+    allowedPrefixes?: readonly string[];
+    /** @default false */
+    ignoreTopLevelDescribe?: boolean;
+    /** @default true */
+    lowercaseFirstCharacterOnly?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1404,9 +1405,9 @@ namespace PreferSnapshotHint {
   export type Options = 'always' | 'multi';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1661,14 +1662,14 @@ namespace RequireHook {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowedFunctionCalls?: readonly string[];
-  };
+  export type Options = Readonly<{
+    allowedFunctionCalls?: readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1720,14 +1721,14 @@ namespace RequireMockTypeParameters {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkImportFunctions?: boolean;
-  };
+  export type Options = Readonly<{
+    checkImportFunctions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1780,14 +1781,15 @@ namespace RequireTopLevelDescribe {
    * ]
    * ```
    */
-  export type Options = {
-    readonly maxNumberOfTopLevelDescribes?: number;
-  };
+  export type Options = Readonly<{
+    /** @default null */
+    maxNumberOfTopLevelDescribes?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1870,17 +1872,18 @@ namespace ValidExpect {
    * ]
    * ```
    */
-  export type Options = {
-    readonly alwaysAwait?: boolean;
-    readonly asyncMatchers?: readonly string[];
-    readonly minArgs?: number;
-    readonly maxArgs?: number;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    alwaysAwait?: boolean;
+    asyncMatchers?: readonly string[];
+    minArgs?: number;
+    maxArgs?: number;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1971,23 +1974,33 @@ namespace ValidTitle {
    * ]
    * ```
    */
-  /* modified */
-  export type Options = {
-    readonly ignoreTypeOfDescribeName?: boolean;
-    readonly allowArguments?: boolean;
-    readonly disallowedWords?: readonly string[];
-    readonly mustNotMatch?: MustMatchType | string;
-    readonly mustMatch?: MustMatchType | string;
-  };
+  export type MustMatchType =
+    | PatternOrPatternArray
+    | Readonly<{
+        describe?: PatternOrPatternArray;
+        test?: PatternOrPatternArray;
+        it?: PatternOrPatternArray;
+      }>;
 
-  type MustMatchType = Readonly<
-    Partial<Record<'describe' | 'it' | 'test', string>>
-  >;
+  export type PatternOrPatternArray =
+    | string
+    | readonly [string]
+    | readonly [string, string];
+
+  export type Options = Readonly<{
+    /** @default false */
+    ignoreTypeOfDescribeName?: boolean;
+    /** @default false */
+    allowArguments?: boolean;
+    disallowedWords?: readonly string[];
+    mustMatch?: MustMatchType;
+    mustNotMatch?: MustMatchType;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -2007,106 +2020,106 @@ namespace WarnTodo {
   export type RuleEntry = Linter.StringSeverity;
 }
 
-export type EslintVitestRules = {
-  readonly 'vitest/consistent-test-filename': ConsistentTestFilename.RuleEntry;
-  readonly 'vitest/consistent-test-it': ConsistentTestIt.RuleEntry;
-  readonly 'vitest/consistent-vitest-vi': ConsistentVitestVi.RuleEntry;
-  readonly 'vitest/expect-expect': ExpectExpect.RuleEntry;
-  readonly 'vitest/hoisted-apis-on-top': HoistedApisOnTop.RuleEntry;
-  readonly 'vitest/max-expects': MaxExpects.RuleEntry;
-  readonly 'vitest/max-nested-describe': MaxNestedDescribe.RuleEntry;
-  readonly 'vitest/no-alias-methods': NoAliasMethods.RuleEntry;
-  readonly 'vitest/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
-  readonly 'vitest/no-conditional-expect': NoConditionalExpect.RuleEntry;
-  readonly 'vitest/no-conditional-in-test': NoConditionalInTest.RuleEntry;
-  readonly 'vitest/no-conditional-tests': NoConditionalTests.RuleEntry;
-  readonly 'vitest/no-disabled-tests': NoDisabledTests.RuleEntry;
-  readonly 'vitest/no-duplicate-hooks': NoDuplicateHooks.RuleEntry;
-  readonly 'vitest/no-focused-tests': NoFocusedTests.RuleEntry;
-  readonly 'vitest/no-hooks': NoHooks.RuleEntry;
-  readonly 'vitest/no-identical-title': NoIdenticalTitle.RuleEntry;
-  readonly 'vitest/no-import-node-test': NoImportNodeTest.RuleEntry;
-  readonly 'vitest/no-importing-vitest-globals': NoImportingVitestGlobals.RuleEntry;
-  readonly 'vitest/no-interpolation-in-snapshots': NoInterpolationInSnapshots.RuleEntry;
-  readonly 'vitest/no-large-snapshots': NoLargeSnapshots.RuleEntry;
-  readonly 'vitest/no-mocks-import': NoMocksImport.RuleEntry;
-  readonly 'vitest/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
-  readonly 'vitest/no-restricted-vi-methods': NoRestrictedViMethods.RuleEntry;
-  readonly 'vitest/no-standalone-expect': NoStandaloneExpect.RuleEntry;
-  readonly 'vitest/no-test-prefixes': NoTestPrefixes.RuleEntry;
-  readonly 'vitest/no-test-return-statement': NoTestReturnStatement.RuleEntry;
-  readonly 'vitest/padding-around-after-all-blocks': PaddingAroundAfterAllBlocks.RuleEntry;
-  readonly 'vitest/padding-around-after-each-blocks': PaddingAroundAfterEachBlocks.RuleEntry;
-  readonly 'vitest/padding-around-all': PaddingAroundAll.RuleEntry;
-  readonly 'vitest/padding-around-before-all-blocks': PaddingAroundBeforeAllBlocks.RuleEntry;
-  readonly 'vitest/padding-around-before-each-blocks': PaddingAroundBeforeEachBlocks.RuleEntry;
-  readonly 'vitest/padding-around-describe-blocks': PaddingAroundDescribeBlocks.RuleEntry;
-  readonly 'vitest/padding-around-expect-groups': PaddingAroundExpectGroups.RuleEntry;
-  readonly 'vitest/padding-around-test-blocks': PaddingAroundTestBlocks.RuleEntry;
-  readonly 'vitest/prefer-called-exactly-once-with': PreferCalledExactlyOnceWith.RuleEntry;
-  readonly 'vitest/prefer-called-once': PreferCalledOnce.RuleEntry;
-  readonly 'vitest/prefer-called-times': PreferCalledTimes.RuleEntry;
-  readonly 'vitest/prefer-called-with': PreferCalledWith.RuleEntry;
-  readonly 'vitest/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
-  readonly 'vitest/prefer-describe-function-title': PreferDescribeFunctionTitle.RuleEntry;
-  readonly 'vitest/prefer-each': PreferEach.RuleEntry;
-  readonly 'vitest/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
-  readonly 'vitest/prefer-expect-assertions': PreferExpectAssertions.RuleEntry;
-  readonly 'vitest/prefer-expect-resolves': PreferExpectResolves.RuleEntry;
-  readonly 'vitest/prefer-expect-type-of': PreferExpectTypeOf.RuleEntry;
-  readonly 'vitest/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
-  readonly 'vitest/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
-  readonly 'vitest/prefer-import-in-mock': PreferImportInMock.RuleEntry;
-  readonly 'vitest/prefer-importing-vitest-globals': PreferImportingVitestGlobals.RuleEntry;
-  readonly 'vitest/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
-  readonly 'vitest/prefer-mock-promise-shorthand': PreferMockPromiseShorthand.RuleEntry;
-  readonly 'vitest/prefer-snapshot-hint': PreferSnapshotHint.RuleEntry;
-  readonly 'vitest/prefer-spy-on': PreferSpyOn.RuleEntry;
-  readonly 'vitest/prefer-strict-boolean-matchers': PreferStrictBooleanMatchers.RuleEntry;
-  readonly 'vitest/prefer-strict-equal': PreferStrictEqual.RuleEntry;
-  readonly 'vitest/prefer-to-be-falsy': PreferToBeFalsy.RuleEntry;
-  readonly 'vitest/prefer-to-be-object': PreferToBeObject.RuleEntry;
-  readonly 'vitest/prefer-to-be-truthy': PreferToBeTruthy.RuleEntry;
-  readonly 'vitest/prefer-to-be': PreferToBe.RuleEntry;
-  readonly 'vitest/prefer-to-contain': PreferToContain.RuleEntry;
-  readonly 'vitest/prefer-to-have-length': PreferToHaveLength.RuleEntry;
-  readonly 'vitest/prefer-todo': PreferTodo.RuleEntry;
-  readonly 'vitest/prefer-vi-mocked': PreferViMocked.RuleEntry;
-  readonly 'vitest/require-awaited-expect-poll': RequireAwaitedExpectPoll.RuleEntry;
-  readonly 'vitest/require-hook': RequireHook.RuleEntry;
-  readonly 'vitest/require-local-test-context-for-concurrent-snapshots': RequireLocalTestContextForConcurrentSnapshots.RuleEntry;
-  readonly 'vitest/require-mock-type-parameters': RequireMockTypeParameters.RuleEntry;
-  readonly 'vitest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
-  readonly 'vitest/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
-  readonly 'vitest/valid-describe-callback': ValidDescribeCallback.RuleEntry;
-  readonly 'vitest/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
-  readonly 'vitest/valid-expect': ValidExpect.RuleEntry;
-  readonly 'vitest/valid-title': ValidTitle.RuleEntry;
-  readonly 'vitest/warn-todo': WarnTodo.RuleEntry;
+export type EslintVitestRules = Readonly<{
+  'vitest/consistent-test-filename': ConsistentTestFilename.RuleEntry;
+  'vitest/consistent-test-it': ConsistentTestIt.RuleEntry;
+  'vitest/consistent-vitest-vi': ConsistentVitestVi.RuleEntry;
+  'vitest/expect-expect': ExpectExpect.RuleEntry;
+  'vitest/hoisted-apis-on-top': HoistedApisOnTop.RuleEntry;
+  'vitest/max-expects': MaxExpects.RuleEntry;
+  'vitest/max-nested-describe': MaxNestedDescribe.RuleEntry;
+  'vitest/no-alias-methods': NoAliasMethods.RuleEntry;
+  'vitest/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
+  'vitest/no-conditional-expect': NoConditionalExpect.RuleEntry;
+  'vitest/no-conditional-in-test': NoConditionalInTest.RuleEntry;
+  'vitest/no-conditional-tests': NoConditionalTests.RuleEntry;
+  'vitest/no-disabled-tests': NoDisabledTests.RuleEntry;
+  'vitest/no-duplicate-hooks': NoDuplicateHooks.RuleEntry;
+  'vitest/no-focused-tests': NoFocusedTests.RuleEntry;
+  'vitest/no-hooks': NoHooks.RuleEntry;
+  'vitest/no-identical-title': NoIdenticalTitle.RuleEntry;
+  'vitest/no-import-node-test': NoImportNodeTest.RuleEntry;
+  'vitest/no-importing-vitest-globals': NoImportingVitestGlobals.RuleEntry;
+  'vitest/no-interpolation-in-snapshots': NoInterpolationInSnapshots.RuleEntry;
+  'vitest/no-large-snapshots': NoLargeSnapshots.RuleEntry;
+  'vitest/no-mocks-import': NoMocksImport.RuleEntry;
+  'vitest/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
+  'vitest/no-restricted-vi-methods': NoRestrictedViMethods.RuleEntry;
+  'vitest/no-standalone-expect': NoStandaloneExpect.RuleEntry;
+  'vitest/no-test-prefixes': NoTestPrefixes.RuleEntry;
+  'vitest/no-test-return-statement': NoTestReturnStatement.RuleEntry;
+  'vitest/padding-around-after-all-blocks': PaddingAroundAfterAllBlocks.RuleEntry;
+  'vitest/padding-around-after-each-blocks': PaddingAroundAfterEachBlocks.RuleEntry;
+  'vitest/padding-around-all': PaddingAroundAll.RuleEntry;
+  'vitest/padding-around-before-all-blocks': PaddingAroundBeforeAllBlocks.RuleEntry;
+  'vitest/padding-around-before-each-blocks': PaddingAroundBeforeEachBlocks.RuleEntry;
+  'vitest/padding-around-describe-blocks': PaddingAroundDescribeBlocks.RuleEntry;
+  'vitest/padding-around-expect-groups': PaddingAroundExpectGroups.RuleEntry;
+  'vitest/padding-around-test-blocks': PaddingAroundTestBlocks.RuleEntry;
+  'vitest/prefer-called-exactly-once-with': PreferCalledExactlyOnceWith.RuleEntry;
+  'vitest/prefer-called-once': PreferCalledOnce.RuleEntry;
+  'vitest/prefer-called-times': PreferCalledTimes.RuleEntry;
+  'vitest/prefer-called-with': PreferCalledWith.RuleEntry;
+  'vitest/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
+  'vitest/prefer-describe-function-title': PreferDescribeFunctionTitle.RuleEntry;
+  'vitest/prefer-each': PreferEach.RuleEntry;
+  'vitest/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
+  'vitest/prefer-expect-assertions': PreferExpectAssertions.RuleEntry;
+  'vitest/prefer-expect-resolves': PreferExpectResolves.RuleEntry;
+  'vitest/prefer-expect-type-of': PreferExpectTypeOf.RuleEntry;
+  'vitest/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
+  'vitest/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
+  'vitest/prefer-import-in-mock': PreferImportInMock.RuleEntry;
+  'vitest/prefer-importing-vitest-globals': PreferImportingVitestGlobals.RuleEntry;
+  'vitest/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
+  'vitest/prefer-mock-promise-shorthand': PreferMockPromiseShorthand.RuleEntry;
+  'vitest/prefer-snapshot-hint': PreferSnapshotHint.RuleEntry;
+  'vitest/prefer-spy-on': PreferSpyOn.RuleEntry;
+  'vitest/prefer-strict-boolean-matchers': PreferStrictBooleanMatchers.RuleEntry;
+  'vitest/prefer-strict-equal': PreferStrictEqual.RuleEntry;
+  'vitest/prefer-to-be-falsy': PreferToBeFalsy.RuleEntry;
+  'vitest/prefer-to-be-object': PreferToBeObject.RuleEntry;
+  'vitest/prefer-to-be-truthy': PreferToBeTruthy.RuleEntry;
+  'vitest/prefer-to-be': PreferToBe.RuleEntry;
+  'vitest/prefer-to-contain': PreferToContain.RuleEntry;
+  'vitest/prefer-to-have-length': PreferToHaveLength.RuleEntry;
+  'vitest/prefer-todo': PreferTodo.RuleEntry;
+  'vitest/prefer-vi-mocked': PreferViMocked.RuleEntry;
+  'vitest/require-awaited-expect-poll': RequireAwaitedExpectPoll.RuleEntry;
+  'vitest/require-hook': RequireHook.RuleEntry;
+  'vitest/require-local-test-context-for-concurrent-snapshots': RequireLocalTestContextForConcurrentSnapshots.RuleEntry;
+  'vitest/require-mock-type-parameters': RequireMockTypeParameters.RuleEntry;
+  'vitest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
+  'vitest/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
+  'vitest/valid-describe-callback': ValidDescribeCallback.RuleEntry;
+  'vitest/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
+  'vitest/valid-expect': ValidExpect.RuleEntry;
+  'vitest/valid-title': ValidTitle.RuleEntry;
+  'vitest/warn-todo': WarnTodo.RuleEntry;
 
   // deprecated
-  readonly 'vitest/no-done-callback': NoDoneCallback.RuleEntry;
-};
+  'vitest/no-done-callback': NoDoneCallback.RuleEntry;
+}>;
 
-export type EslintVitestRulesOption = {
-  readonly 'vitest/consistent-test-filename': ConsistentTestFilename.Options;
-  readonly 'vitest/consistent-test-it': ConsistentTestIt.Options;
-  readonly 'vitest/consistent-vitest-vi': ConsistentVitestVi.Options;
-  readonly 'vitest/expect-expect': ExpectExpect.Options;
-  readonly 'vitest/max-expects': MaxExpects.Options;
-  readonly 'vitest/max-nested-describe': MaxNestedDescribe.Options;
-  readonly 'vitest/no-focused-tests': NoFocusedTests.Options;
-  readonly 'vitest/no-hooks': NoHooks.Options;
-  readonly 'vitest/no-large-snapshots': NoLargeSnapshots.Options;
-  readonly 'vitest/no-restricted-matchers': NoRestrictedMatchers.Options;
-  readonly 'vitest/no-restricted-vi-methods': NoRestrictedViMethods.Options;
-  readonly 'vitest/no-standalone-expect': NoStandaloneExpect.Options;
-  readonly 'vitest/prefer-expect-assertions': PreferExpectAssertions.Options;
-  readonly 'vitest/prefer-lowercase-title': PreferLowercaseTitle.Options;
-  readonly 'vitest/prefer-snapshot-hint': PreferSnapshotHint.Options;
-  readonly 'vitest/require-hook': RequireHook.Options;
-  readonly 'vitest/require-mock-type-parameters': RequireMockTypeParameters.Options;
-  readonly 'vitest/require-top-level-describe': RequireTopLevelDescribe.Options;
-  readonly 'vitest/valid-expect': ValidExpect.Options;
-  readonly 'vitest/valid-title': ValidTitle.Options;
-};
+export type EslintVitestRulesOption = Readonly<{
+  'vitest/consistent-test-filename': ConsistentTestFilename.Options;
+  'vitest/consistent-test-it': ConsistentTestIt.Options;
+  'vitest/consistent-vitest-vi': ConsistentVitestVi.Options;
+  'vitest/expect-expect': ExpectExpect.Options;
+  'vitest/max-expects': MaxExpects.Options;
+  'vitest/max-nested-describe': MaxNestedDescribe.Options;
+  'vitest/no-focused-tests': NoFocusedTests.Options;
+  'vitest/no-hooks': NoHooks.Options;
+  'vitest/no-large-snapshots': NoLargeSnapshots.Options;
+  'vitest/no-restricted-matchers': NoRestrictedMatchers.Options;
+  'vitest/no-restricted-vi-methods': NoRestrictedViMethods.Options;
+  'vitest/no-standalone-expect': NoStandaloneExpect.Options;
+  'vitest/prefer-expect-assertions': PreferExpectAssertions.Options;
+  'vitest/prefer-lowercase-title': PreferLowercaseTitle.Options;
+  'vitest/prefer-snapshot-hint': PreferSnapshotHint.Options;
+  'vitest/require-hook': RequireHook.Options;
+  'vitest/require-mock-type-parameters': RequireMockTypeParameters.Options;
+  'vitest/require-top-level-describe': RequireTopLevelDescribe.Options;
+  'vitest/valid-expect': ValidExpect.Options;
+  'vitest/valid-title': ValidTitle.Options;
+}>;

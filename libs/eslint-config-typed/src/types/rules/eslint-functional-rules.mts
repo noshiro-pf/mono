@@ -594,96 +594,96 @@ namespace FunctionalParameters {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreIdentifierPattern?: string | readonly string[];
-    readonly ignorePrefixSelector?: string | readonly string[];
-    readonly allowRestParameter?: boolean;
-    readonly allowArgumentsKeyword?: boolean;
-    readonly enforceParameterCount?:
-      | 'atLeastOne'
-      | 'exactlyOne'
+  export type Options = Readonly<{
+    ignoreIdentifierPattern?: string | readonly string[];
+    ignorePrefixSelector?: string | readonly string[];
+    allowRestParameter?: boolean;
+    allowArgumentsKeyword?: boolean;
+    enforceParameterCount?:
       | false
-      | {
-          readonly count?: 'atLeastOne' | 'exactlyOne';
-          readonly ignoreGettersAndSetters?: boolean;
-          readonly ignoreLambdaExpression?: boolean;
-          readonly ignoreIIFE?: boolean;
-        };
-    readonly overrides?: readonly {
-      readonly specifiers?:
-        | readonly (
+      | ('atLeastOne' | 'exactlyOne')
+      | Readonly<{
+          count?: 'atLeastOne' | 'exactlyOne';
+          ignoreGettersAndSetters?: boolean;
+          ignoreLambdaExpression?: boolean;
+          ignoreIIFE?: boolean;
+        }>;
+    overrides?: readonly Readonly<{
+      specifiers?:
+        | Readonly<
             | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'file';
-                readonly path?: string;
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'file';
+                path?: string;
               }
             | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'lib';
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'lib';
               }
             | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'package';
-                readonly package?: string;
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'package';
+                package?: string;
               }
-          )[]
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'file';
-            readonly path?: string;
-          }
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'lib';
-          }
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'package';
-            readonly package?: string;
-          };
-      readonly options?: {
-        readonly ignoreIdentifierPattern?: string | readonly string[];
-        readonly ignorePrefixSelector?: string | readonly string[];
-        readonly allowRestParameter?: boolean;
-        readonly allowArgumentsKeyword?: boolean;
-        readonly enforceParameterCount?:
-          | 'atLeastOne'
-          | 'exactlyOne'
+          >
+        | readonly Readonly<
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'file';
+                path?: string;
+              }
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'lib';
+              }
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'package';
+                package?: string;
+              }
+          >[];
+      options?: Readonly<{
+        ignoreIdentifierPattern?: string | readonly string[];
+        ignorePrefixSelector?: string | readonly string[];
+        allowRestParameter?: boolean;
+        allowArgumentsKeyword?: boolean;
+        enforceParameterCount?:
           | false
-          | {
-              readonly count?: 'atLeastOne' | 'exactlyOne';
-              readonly ignoreGettersAndSetters?: boolean;
-              readonly ignoreLambdaExpression?: boolean;
-              readonly ignoreIIFE?: boolean;
-            };
-      };
-      readonly inherit?: boolean;
-      readonly disable?: boolean;
-    }[];
-  };
+          | ('atLeastOne' | 'exactlyOne')
+          | Readonly<{
+              count?: 'atLeastOne' | 'exactlyOne';
+              ignoreGettersAndSetters?: boolean;
+              ignoreLambdaExpression?: boolean;
+              ignoreIIFE?: boolean;
+            }>;
+      }>;
+      inherit?: boolean;
+      disable?: boolean;
+    }>[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1253,88 +1253,90 @@ namespace ImmutableData {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreIdentifierPattern?: string | readonly string[];
-    readonly ignoreAccessorPattern?: string | readonly string[];
-    readonly ignoreClasses?: boolean | 'fieldsOnly';
-    readonly ignoreMapsAndSets?: boolean;
-    readonly ignoreImmediateMutation?: boolean;
-    readonly ignoreNonConstDeclarations?:
+  export type Options = Readonly<{
+    ignoreIdentifierPattern?: string | readonly string[];
+    ignoreAccessorPattern?: string | readonly string[];
+    ignoreClasses?: boolean | 'fieldsOnly';
+    ignoreMapsAndSets?: boolean;
+    ignoreImmediateMutation?: boolean;
+    ignoreNonConstDeclarations?:
       | boolean
-      | {
-          readonly treatParametersAsConst?: boolean;
-        };
-    readonly overrides?: readonly {
-      readonly specifiers?:
-        | readonly (
+      | Readonly<{
+          treatParametersAsConst?: boolean;
+        }>;
+    overrides?: readonly Readonly<{
+      specifiers?:
+        | Readonly<
             | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'file';
-                readonly path?: string;
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'file';
+                path?: string;
               }
             | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'lib';
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'lib';
               }
             | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'package';
-                readonly package?: string;
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'package';
+                package?: string;
               }
-          )[]
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'file';
-            readonly path?: string;
-          }
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'lib';
-          }
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'package';
-            readonly package?: string;
-          };
-      readonly options?: {
-        readonly ignoreIdentifierPattern?: string | readonly string[];
-        readonly ignoreAccessorPattern?: string | readonly string[];
-        readonly ignoreClasses?: boolean | 'fieldsOnly';
-        readonly ignoreMapsAndSets?: boolean;
-        readonly ignoreImmediateMutation?: boolean;
-        readonly ignoreNonConstDeclarations?:
+          >
+        | readonly Readonly<
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'file';
+                path?: string;
+              }
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'lib';
+              }
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'package';
+                package?: string;
+              }
+          >[];
+      options?: Readonly<{
+        ignoreIdentifierPattern?: string | readonly string[];
+        ignoreAccessorPattern?: string | readonly string[];
+        ignoreClasses?: boolean | 'fieldsOnly';
+        ignoreMapsAndSets?: boolean;
+        ignoreImmediateMutation?: boolean;
+        ignoreNonConstDeclarations?:
           | boolean
-          | {
-              readonly treatParametersAsConst?: boolean;
-            };
-      };
-      readonly inherit?: boolean;
-      readonly disable?: boolean;
-    }[];
-  };
+          | Readonly<{
+              treatParametersAsConst?: boolean;
+            }>;
+      }>;
+      inherit?: boolean;
+      disable?: boolean;
+    }>[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1384,15 +1386,15 @@ namespace NoClasses {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreIdentifierPattern?: string | readonly string[];
-    readonly ignoreCodePattern?: string | readonly string[];
-  };
+  export type Options = Readonly<{
+    ignoreIdentifierPattern?: string | readonly string[];
+    ignoreCodePattern?: string | readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1442,15 +1444,15 @@ namespace NoClassInheritance {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreIdentifierPattern?: string | readonly string[];
-    readonly ignoreCodePattern?: string | readonly string[];
-  };
+  export type Options = Readonly<{
+    ignoreIdentifierPattern?: string | readonly string[];
+    ignoreCodePattern?: string | readonly string[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1504,15 +1506,15 @@ namespace NoConditionalStatements {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreCodePattern?: string | readonly string[];
-    readonly allowReturningBranches?: boolean | 'ifExhaustive';
-  };
+  export type Options = Readonly<{
+    ignoreCodePattern?: string | readonly string[];
+    allowReturningBranches?: boolean | 'ifExhaustive';
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1559,16 +1561,16 @@ namespace NoExpressionStatements {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreCodePattern?: string | readonly string[];
-    readonly ignoreVoid?: boolean;
-    readonly ignoreSelfReturning?: boolean;
-  };
+  export type Options = Readonly<{
+    ignoreCodePattern?: string | readonly string[];
+    ignoreVoid?: boolean;
+    ignoreSelfReturning?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1615,16 +1617,16 @@ namespace NoLet {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreIdentifierPattern?: string | readonly string[];
-    readonly allowInForLoopInit?: boolean;
-    readonly allowInFunctions?: boolean;
-  };
+  export type Options = Readonly<{
+    ignoreIdentifierPattern?: string | readonly string[];
+    allowInForLoopInit?: boolean;
+    allowInFunctions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1680,15 +1682,15 @@ namespace NoMixedTypes {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkInterfaces?: boolean;
-    readonly checkTypeLiterals?: boolean;
-  };
+  export type Options = Readonly<{
+    checkInterfaces?: boolean;
+    checkTypeLiterals?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1747,16 +1749,16 @@ namespace NoReturnVoid {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowNull?: boolean;
-    readonly allowUndefined?: boolean;
-    readonly ignoreInferredTypes?: boolean;
-  };
+  export type Options = Readonly<{
+    allowNull?: boolean;
+    allowUndefined?: boolean;
+    ignoreInferredTypes?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1809,14 +1811,14 @@ namespace NoThrowStatements {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowToRejectPromises?: boolean;
-  };
+  export type Options = Readonly<{
+    allowToRejectPromises?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1854,15 +1856,15 @@ namespace NoTryStatements {
    * ]
    * ```
    */
-  export type Options = {
-    readonly allowCatch?: boolean;
-    readonly allowFinally?: boolean;
-  };
+  export type Options = Readonly<{
+    allowCatch?: boolean;
+    allowFinally?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3282,372 +3284,374 @@ namespace PreferImmutableTypes {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreClasses?: boolean | 'fieldsOnly';
-    readonly enforcement?:
-      | 'Calculating'
-      | 'Immutable'
-      | 'None'
-      | 'ReadonlyDeep'
+  export type Options = Readonly<{
+    ignoreClasses?: boolean | 'fieldsOnly';
+    enforcement?:
       | 'ReadonlyShallow'
+      | 'ReadonlyDeep'
+      | 'Immutable'
+      | null
       | 3
       | 4
       | 5
-      | false
-      | null;
-    readonly ignoreInferredTypes?: boolean;
-    readonly ignoreNamePattern?: string | readonly string[];
-    readonly ignoreTypePattern?: string | readonly string[];
-    readonly parameters?:
-      | {
-          readonly ignoreClasses?: boolean | 'fieldsOnly';
-          readonly enforcement?:
-            | 'Calculating'
-            | 'Immutable'
-            | 'None'
-            | 'ReadonlyDeep'
+      | 'Calculating'
+      | 'None'
+      | false;
+    ignoreInferredTypes?: boolean;
+    ignoreNamePattern?: string | readonly string[];
+    ignoreTypePattern?: string | readonly string[];
+    parameters?:
+      | Readonly<{
+          ignoreClasses?: boolean | 'fieldsOnly';
+          enforcement?:
             | 'ReadonlyShallow'
+            | 'ReadonlyDeep'
+            | 'Immutable'
+            | null
             | 3
             | 4
             | 5
-            | false
-            | null;
-          readonly ignoreInferredTypes?: boolean;
-          readonly ignoreNamePattern?: string | readonly string[];
-          readonly ignoreTypePattern?: string | readonly string[];
-        }
+            | 'Calculating'
+            | 'None'
+            | false;
+          ignoreInferredTypes?: boolean;
+          ignoreNamePattern?: string | readonly string[];
+          ignoreTypePattern?: string | readonly string[];
+        }>
       | (
-          | 'Calculating'
-          | 'Immutable'
-          | 'None'
-          | 'ReadonlyDeep'
           | 'ReadonlyShallow'
+          | 'ReadonlyDeep'
+          | 'Immutable'
+          | null
           | 3
           | 4
           | 5
+          | 'Calculating'
+          | 'None'
           | false
-          | null
         );
-    readonly returnTypes?:
-      | {
-          readonly ignoreClasses?: boolean | 'fieldsOnly';
-          readonly enforcement?:
-            | 'Calculating'
-            | 'Immutable'
-            | 'None'
-            | 'ReadonlyDeep'
+    returnTypes?:
+      | Readonly<{
+          ignoreClasses?: boolean | 'fieldsOnly';
+          enforcement?:
             | 'ReadonlyShallow'
+            | 'ReadonlyDeep'
+            | 'Immutable'
+            | null
             | 3
             | 4
             | 5
-            | false
-            | null;
-          readonly ignoreInferredTypes?: boolean;
-          readonly ignoreNamePattern?: string | readonly string[];
-          readonly ignoreTypePattern?: string | readonly string[];
-        }
+            | 'Calculating'
+            | 'None'
+            | false;
+          ignoreInferredTypes?: boolean;
+          ignoreNamePattern?: string | readonly string[];
+          ignoreTypePattern?: string | readonly string[];
+        }>
       | (
-          | 'Calculating'
-          | 'Immutable'
-          | 'None'
-          | 'ReadonlyDeep'
           | 'ReadonlyShallow'
+          | 'ReadonlyDeep'
+          | 'Immutable'
+          | null
           | 3
           | 4
           | 5
+          | 'Calculating'
+          | 'None'
           | false
-          | null
         );
-    readonly variables?:
-      | {
-          readonly ignoreClasses?: boolean | 'fieldsOnly';
-          readonly enforcement?:
-            | 'Calculating'
-            | 'Immutable'
-            | 'None'
-            | 'ReadonlyDeep'
+    variables?:
+      | Readonly<{
+          ignoreClasses?: boolean | 'fieldsOnly';
+          enforcement?:
             | 'ReadonlyShallow'
+            | 'ReadonlyDeep'
+            | 'Immutable'
+            | null
             | 3
             | 4
             | 5
-            | false
-            | null;
-          readonly ignoreInferredTypes?: boolean;
-          readonly ignoreNamePattern?: string | readonly string[];
-          readonly ignoreTypePattern?: string | readonly string[];
-          readonly ignoreInFunctions?: boolean;
-        }
+            | 'Calculating'
+            | 'None'
+            | false;
+          ignoreInferredTypes?: boolean;
+          ignoreNamePattern?: string | readonly string[];
+          ignoreTypePattern?: string | readonly string[];
+          ignoreInFunctions?: boolean;
+        }>
       | (
-          | 'Calculating'
-          | 'Immutable'
-          | 'None'
-          | 'ReadonlyDeep'
           | 'ReadonlyShallow'
-          | 3
-          | 4
-          | 5
-          | false
+          | 'ReadonlyDeep'
+          | 'Immutable'
           | null
-        );
-    readonly fixer?: {
-      readonly ReadonlyShallow?:
-        | readonly {
-            readonly pattern?: string;
-            readonly replace?: string;
-          }[]
-        | {
-            readonly pattern?: string;
-            readonly replace?: string;
-          };
-      readonly ReadonlyDeep?:
-        | readonly {
-            readonly pattern?: string;
-            readonly replace?: string;
-          }[]
-        | {
-            readonly pattern?: string;
-            readonly replace?: string;
-          };
-      readonly Immutable?:
-        | readonly {
-            readonly pattern?: string;
-            readonly replace?: string;
-          }[]
-        | {
-            readonly pattern?: string;
-            readonly replace?: string;
-          };
-    };
-    readonly suggestions?: {
-      readonly ReadonlyShallow?: readonly (readonly {
-        readonly pattern?: string;
-        readonly replace?: string;
-        readonly message?: string;
-      }[])[];
-      readonly ReadonlyDeep?: readonly (readonly {
-        readonly pattern?: string;
-        readonly replace?: string;
-        readonly message?: string;
-      }[])[];
-      readonly Immutable?: readonly (readonly {
-        readonly pattern?: string;
-        readonly replace?: string;
-        readonly message?: string;
-      }[])[];
-    };
-    readonly overrides?: readonly {
-      readonly specifiers?:
-        | readonly (
-            | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'file';
-                readonly path?: string;
-              }
-            | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'lib';
-              }
-            | {
-                readonly name?: string | readonly string[];
-                readonly pattern?: string | readonly string[];
-                readonly ignoreName?: string | readonly string[];
-                readonly ignorePattern?: string | readonly string[];
-                readonly from?: 'package';
-                readonly package?: string;
-              }
-          )[]
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'file';
-            readonly path?: string;
-          }
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'lib';
-          }
-        | {
-            readonly name?: string | readonly string[];
-            readonly pattern?: string | readonly string[];
-            readonly ignoreName?: string | readonly string[];
-            readonly ignorePattern?: string | readonly string[];
-            readonly from?: 'package';
-            readonly package?: string;
-          };
-      readonly options?: {
-        readonly ignoreClasses?: boolean | 'fieldsOnly';
-        readonly enforcement?:
-          | 'Calculating'
-          | 'Immutable'
-          | 'None'
-          | 'ReadonlyDeep'
-          | 'ReadonlyShallow'
           | 3
           | 4
           | 5
+          | 'Calculating'
+          | 'None'
           | false
-          | null;
-        readonly ignoreInferredTypes?: boolean;
-        readonly ignoreNamePattern?: string | readonly string[];
-        readonly ignoreTypePattern?: string | readonly string[];
-        readonly parameters?:
-          | {
-              readonly ignoreClasses?: boolean | 'fieldsOnly';
-              readonly enforcement?:
-                | 'Calculating'
-                | 'Immutable'
-                | 'None'
-                | 'ReadonlyDeep'
+        );
+    fixer?: Readonly<{
+      ReadonlyShallow?:
+        | Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>
+        | readonly Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>[];
+      ReadonlyDeep?:
+        | Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>
+        | readonly Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>[];
+      Immutable?:
+        | Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>
+        | readonly Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>[];
+    }>;
+    suggestions?: Readonly<{
+      ReadonlyShallow?: readonly (readonly Readonly<{
+        pattern?: string;
+        replace?: string;
+        message?: string;
+      }>[])[];
+      ReadonlyDeep?: readonly (readonly Readonly<{
+        pattern?: string;
+        replace?: string;
+        message?: string;
+      }>[])[];
+      Immutable?: readonly (readonly Readonly<{
+        pattern?: string;
+        replace?: string;
+        message?: string;
+      }>[])[];
+    }>;
+    overrides?: readonly Readonly<{
+      specifiers?:
+        | Readonly<
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'file';
+                path?: string;
+              }
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'lib';
+              }
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'package';
+                package?: string;
+              }
+          >
+        | readonly Readonly<
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'file';
+                path?: string;
+              }
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'lib';
+              }
+            | {
+                name?: string | readonly string[];
+                pattern?: string | readonly string[];
+                ignoreName?: string | readonly string[];
+                ignorePattern?: string | readonly string[];
+                from?: 'package';
+                package?: string;
+              }
+          >[];
+      options?: Readonly<{
+        ignoreClasses?: boolean | 'fieldsOnly';
+        enforcement?:
+          | 'ReadonlyShallow'
+          | 'ReadonlyDeep'
+          | 'Immutable'
+          | null
+          | 3
+          | 4
+          | 5
+          | 'Calculating'
+          | 'None'
+          | false;
+        ignoreInferredTypes?: boolean;
+        ignoreNamePattern?: string | readonly string[];
+        ignoreTypePattern?: string | readonly string[];
+        parameters?:
+          | Readonly<{
+              ignoreClasses?: boolean | 'fieldsOnly';
+              enforcement?:
                 | 'ReadonlyShallow'
+                | 'ReadonlyDeep'
+                | 'Immutable'
+                | null
                 | 3
                 | 4
                 | 5
-                | false
-                | null;
-              readonly ignoreInferredTypes?: boolean;
-              readonly ignoreNamePattern?: string | readonly string[];
-              readonly ignoreTypePattern?: string | readonly string[];
-            }
+                | 'Calculating'
+                | 'None'
+                | false;
+              ignoreInferredTypes?: boolean;
+              ignoreNamePattern?: string | readonly string[];
+              ignoreTypePattern?: string | readonly string[];
+            }>
           | (
-              | 'Calculating'
-              | 'Immutable'
-              | 'None'
-              | 'ReadonlyDeep'
               | 'ReadonlyShallow'
+              | 'ReadonlyDeep'
+              | 'Immutable'
+              | null
               | 3
               | 4
               | 5
+              | 'Calculating'
+              | 'None'
               | false
-              | null
             );
-        readonly returnTypes?:
-          | {
-              readonly ignoreClasses?: boolean | 'fieldsOnly';
-              readonly enforcement?:
-                | 'Calculating'
-                | 'Immutable'
-                | 'None'
-                | 'ReadonlyDeep'
+        returnTypes?:
+          | Readonly<{
+              ignoreClasses?: boolean | 'fieldsOnly';
+              enforcement?:
                 | 'ReadonlyShallow'
+                | 'ReadonlyDeep'
+                | 'Immutable'
+                | null
                 | 3
                 | 4
                 | 5
-                | false
-                | null;
-              readonly ignoreInferredTypes?: boolean;
-              readonly ignoreNamePattern?: string | readonly string[];
-              readonly ignoreTypePattern?: string | readonly string[];
-            }
+                | 'Calculating'
+                | 'None'
+                | false;
+              ignoreInferredTypes?: boolean;
+              ignoreNamePattern?: string | readonly string[];
+              ignoreTypePattern?: string | readonly string[];
+            }>
           | (
-              | 'Calculating'
-              | 'Immutable'
-              | 'None'
-              | 'ReadonlyDeep'
               | 'ReadonlyShallow'
+              | 'ReadonlyDeep'
+              | 'Immutable'
+              | null
               | 3
               | 4
               | 5
+              | 'Calculating'
+              | 'None'
               | false
-              | null
             );
-        readonly variables?:
-          | {
-              readonly ignoreClasses?: boolean | 'fieldsOnly';
-              readonly enforcement?:
-                | 'Calculating'
-                | 'Immutable'
-                | 'None'
-                | 'ReadonlyDeep'
+        variables?:
+          | Readonly<{
+              ignoreClasses?: boolean | 'fieldsOnly';
+              enforcement?:
                 | 'ReadonlyShallow'
+                | 'ReadonlyDeep'
+                | 'Immutable'
+                | null
                 | 3
                 | 4
                 | 5
-                | false
-                | null;
-              readonly ignoreInferredTypes?: boolean;
-              readonly ignoreNamePattern?: string | readonly string[];
-              readonly ignoreTypePattern?: string | readonly string[];
-              readonly ignoreInFunctions?: boolean;
-            }
+                | 'Calculating'
+                | 'None'
+                | false;
+              ignoreInferredTypes?: boolean;
+              ignoreNamePattern?: string | readonly string[];
+              ignoreTypePattern?: string | readonly string[];
+              ignoreInFunctions?: boolean;
+            }>
           | (
-              | 'Calculating'
-              | 'Immutable'
-              | 'None'
-              | 'ReadonlyDeep'
               | 'ReadonlyShallow'
+              | 'ReadonlyDeep'
+              | 'Immutable'
+              | null
               | 3
               | 4
               | 5
+              | 'Calculating'
+              | 'None'
               | false
-              | null
             );
-        readonly fixer?: {
-          readonly ReadonlyShallow?:
-            | readonly {
-                readonly pattern?: string;
-                readonly replace?: string;
-              }[]
-            | {
-                readonly pattern?: string;
-                readonly replace?: string;
-              };
-          readonly ReadonlyDeep?:
-            | readonly {
-                readonly pattern?: string;
-                readonly replace?: string;
-              }[]
-            | {
-                readonly pattern?: string;
-                readonly replace?: string;
-              };
-          readonly Immutable?:
-            | readonly {
-                readonly pattern?: string;
-                readonly replace?: string;
-              }[]
-            | {
-                readonly pattern?: string;
-                readonly replace?: string;
-              };
-        };
-        readonly suggestions?: {
-          readonly ReadonlyShallow?: readonly (readonly {
-            readonly pattern?: string;
-            readonly replace?: string;
-            readonly message?: string;
-          }[])[];
-          readonly ReadonlyDeep?: readonly (readonly {
-            readonly pattern?: string;
-            readonly replace?: string;
-            readonly message?: string;
-          }[])[];
-          readonly Immutable?: readonly (readonly {
-            readonly pattern?: string;
-            readonly replace?: string;
-            readonly message?: string;
-          }[])[];
-        };
-      };
-      readonly inherit?: boolean;
-      readonly disable?: boolean;
-    }[];
-  };
+        fixer?: Readonly<{
+          ReadonlyShallow?:
+            | Readonly<{
+                pattern?: string;
+                replace?: string;
+              }>
+            | readonly Readonly<{
+                pattern?: string;
+                replace?: string;
+              }>[];
+          ReadonlyDeep?:
+            | Readonly<{
+                pattern?: string;
+                replace?: string;
+              }>
+            | readonly Readonly<{
+                pattern?: string;
+                replace?: string;
+              }>[];
+          Immutable?:
+            | Readonly<{
+                pattern?: string;
+                replace?: string;
+              }>
+            | readonly Readonly<{
+                pattern?: string;
+                replace?: string;
+              }>[];
+        }>;
+        suggestions?: Readonly<{
+          ReadonlyShallow?: readonly (readonly Readonly<{
+            pattern?: string;
+            replace?: string;
+            message?: string;
+          }>[])[];
+          ReadonlyDeep?: readonly (readonly Readonly<{
+            pattern?: string;
+            replace?: string;
+            message?: string;
+          }>[])[];
+          Immutable?: readonly (readonly Readonly<{
+            pattern?: string;
+            replace?: string;
+            message?: string;
+          }>[])[];
+        }>;
+      }>;
+      inherit?: boolean;
+      disable?: boolean;
+    }>[];
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3683,14 +3687,15 @@ namespace PreferPropertySignatures {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreIfReadonlyWrapped?: boolean;
-  };
+  export type Options = Readonly<{
+    /** @default false */
+    ignoreIfReadonlyWrapped?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3796,14 +3801,14 @@ namespace PreferTacit {
    * ]
    * ```
    */
-  export type Options = {
-    readonly checkMemberExpressions?: boolean;
-  };
+  export type Options = Readonly<{
+    checkMemberExpressions?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -3840,9 +3845,9 @@ namespace ReadonlyType {
   export type Options = 'generic' | 'keyword';
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -4011,98 +4016,98 @@ namespace TypeDeclarationImmutability {
    * ]
    * ```
    */
-  export type Options = {
-    readonly ignoreIdentifierPattern?: string | readonly string[];
-    readonly rules?: readonly {
-      readonly identifiers: string | readonly string[];
-      readonly immutability:
-        | 'Calculating'
-        | 'Immutable'
+  export type Options = Readonly<{
+    ignoreIdentifierPattern?: string | readonly string[];
+    rules?: readonly Readonly<{
+      identifiers: string | readonly string[];
+      immutability:
         | 'Mutable'
-        | 'ReadonlyDeep'
         | 'ReadonlyShallow'
+        | 'ReadonlyDeep'
+        | 'Immutable'
+        | null
         | 2
         | 3
         | 4
         | 5
-        | null;
-      readonly comparator?:
-        | -1
-        | -2
-        | 'AtLeast'
-        | 'AtMost'
+        | 'Calculating';
+      comparator?:
         | 'Exactly'
-        | 'Less'
+        | 'AtLeast'
         | 'More'
+        | -2
+        | 'Less'
+        | -1
+        | 'AtMost'
         | 0
         | 1
         | 2;
-      readonly fixer?:
-        | readonly {
-            readonly pattern?: string;
-            readonly replace?: string;
-          }[]
+      fixer?:
         | false
-        | {
-            readonly pattern?: string;
-            readonly replace?: string;
-          };
-      readonly suggestions?:
-        | readonly {
-            readonly pattern?: string;
-            readonly replace?: string;
-          }[]
-        | false;
-    }[];
-    readonly ignoreInterfaces?: boolean;
-  };
+        | Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>
+        | readonly Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>[];
+      suggestions?:
+        | false
+        | readonly Readonly<{
+            pattern?: string;
+            replace?: string;
+          }>[];
+    }>[];
+    ignoreInterfaces?: boolean;
+  }>;
 
   export type RuleEntry =
+    | 'off'
     | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>
-    | 'off';
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
-export type EslintFunctionalRules = {
-  readonly 'functional/functional-parameters': FunctionalParameters.RuleEntry;
-  readonly 'functional/immutable-data': ImmutableData.RuleEntry;
-  readonly 'functional/no-classes': NoClasses.RuleEntry;
-  readonly 'functional/no-class-inheritance': NoClassInheritance.RuleEntry;
-  readonly 'functional/no-conditional-statements': NoConditionalStatements.RuleEntry;
-  readonly 'functional/no-expression-statements': NoExpressionStatements.RuleEntry;
-  readonly 'functional/no-let': NoLet.RuleEntry;
-  readonly 'functional/no-loop-statements': NoLoopStatements.RuleEntry;
-  readonly 'functional/no-mixed-types': NoMixedTypes.RuleEntry;
-  readonly 'functional/no-promise-reject': NoPromiseReject.RuleEntry;
-  readonly 'functional/no-return-void': NoReturnVoid.RuleEntry;
-  readonly 'functional/no-this-expressions': NoThisExpressions.RuleEntry;
-  readonly 'functional/no-throw-statements': NoThrowStatements.RuleEntry;
-  readonly 'functional/no-try-statements': NoTryStatements.RuleEntry;
-  readonly 'functional/prefer-immutable-types': PreferImmutableTypes.RuleEntry;
-  readonly 'functional/prefer-property-signatures': PreferPropertySignatures.RuleEntry;
-  readonly 'functional/prefer-tacit': PreferTacit.RuleEntry;
-  readonly 'functional/readonly-type': ReadonlyType.RuleEntry;
-  readonly 'functional/type-declaration-immutability': TypeDeclarationImmutability.RuleEntry;
+export type EslintFunctionalRules = Readonly<{
+  'functional/functional-parameters': FunctionalParameters.RuleEntry;
+  'functional/immutable-data': ImmutableData.RuleEntry;
+  'functional/no-classes': NoClasses.RuleEntry;
+  'functional/no-class-inheritance': NoClassInheritance.RuleEntry;
+  'functional/no-conditional-statements': NoConditionalStatements.RuleEntry;
+  'functional/no-expression-statements': NoExpressionStatements.RuleEntry;
+  'functional/no-let': NoLet.RuleEntry;
+  'functional/no-loop-statements': NoLoopStatements.RuleEntry;
+  'functional/no-mixed-types': NoMixedTypes.RuleEntry;
+  'functional/no-promise-reject': NoPromiseReject.RuleEntry;
+  'functional/no-return-void': NoReturnVoid.RuleEntry;
+  'functional/no-this-expressions': NoThisExpressions.RuleEntry;
+  'functional/no-throw-statements': NoThrowStatements.RuleEntry;
+  'functional/no-try-statements': NoTryStatements.RuleEntry;
+  'functional/prefer-immutable-types': PreferImmutableTypes.RuleEntry;
+  'functional/prefer-property-signatures': PreferPropertySignatures.RuleEntry;
+  'functional/prefer-tacit': PreferTacit.RuleEntry;
+  'functional/readonly-type': ReadonlyType.RuleEntry;
+  'functional/type-declaration-immutability': TypeDeclarationImmutability.RuleEntry;
 
   // deprecated
-  readonly 'functional/prefer-readonly-type': PreferReadonlyType.RuleEntry;
-};
+  'functional/prefer-readonly-type': PreferReadonlyType.RuleEntry;
+}>;
 
-export type EslintFunctionalRulesOption = {
-  readonly 'functional/functional-parameters': FunctionalParameters.Options;
-  readonly 'functional/immutable-data': ImmutableData.Options;
-  readonly 'functional/no-classes': NoClasses.Options;
-  readonly 'functional/no-class-inheritance': NoClassInheritance.Options;
-  readonly 'functional/no-conditional-statements': NoConditionalStatements.Options;
-  readonly 'functional/no-expression-statements': NoExpressionStatements.Options;
-  readonly 'functional/no-let': NoLet.Options;
-  readonly 'functional/no-mixed-types': NoMixedTypes.Options;
-  readonly 'functional/no-return-void': NoReturnVoid.Options;
-  readonly 'functional/no-throw-statements': NoThrowStatements.Options;
-  readonly 'functional/no-try-statements': NoTryStatements.Options;
-  readonly 'functional/prefer-immutable-types': PreferImmutableTypes.Options;
-  readonly 'functional/prefer-property-signatures': PreferPropertySignatures.Options;
-  readonly 'functional/prefer-tacit': PreferTacit.Options;
-  readonly 'functional/readonly-type': ReadonlyType.Options;
-  readonly 'functional/type-declaration-immutability': TypeDeclarationImmutability.Options;
-};
+export type EslintFunctionalRulesOption = Readonly<{
+  'functional/functional-parameters': FunctionalParameters.Options;
+  'functional/immutable-data': ImmutableData.Options;
+  'functional/no-classes': NoClasses.Options;
+  'functional/no-class-inheritance': NoClassInheritance.Options;
+  'functional/no-conditional-statements': NoConditionalStatements.Options;
+  'functional/no-expression-statements': NoExpressionStatements.Options;
+  'functional/no-let': NoLet.Options;
+  'functional/no-mixed-types': NoMixedTypes.Options;
+  'functional/no-return-void': NoReturnVoid.Options;
+  'functional/no-throw-statements': NoThrowStatements.Options;
+  'functional/no-try-statements': NoTryStatements.Options;
+  'functional/prefer-immutable-types': PreferImmutableTypes.Options;
+  'functional/prefer-property-signatures': PreferPropertySignatures.Options;
+  'functional/prefer-tacit': PreferTacit.Options;
+  'functional/readonly-type': ReadonlyType.Options;
+  'functional/type-declaration-immutability': TypeDeclarationImmutability.Options;
+}>;
