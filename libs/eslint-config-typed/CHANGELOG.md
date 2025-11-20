@@ -1,3 +1,9 @@
+## [3.13.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.4...v3.13.5) (2025-11-20)
+
+### Bug Fixes
+
+- update rule options of @typescript-eslint/consistent-type-assertions ([#148](https://github.com/noshiro-pf/eslint-config-typed/issues/148)) ([2dbd3f0](https://github.com/noshiro-pf/eslint-config-typed/commit/2dbd3f05e6994d0b8e50ec8ece8246b039e024d2))
+
 ## [3.13.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.3...v3.13.4) (2025-11-19)
 
 ### Bug Fixes
