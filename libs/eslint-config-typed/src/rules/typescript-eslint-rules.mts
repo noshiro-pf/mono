@@ -31,7 +31,13 @@ export const typescriptEslintRules = {
     withDefaultOption('error'),
   '@typescript-eslint/consistent-type-assertions': [
     'error',
-    { assertionStyle: 'as', objectLiteralTypeAssertions: 'never' },
+    {
+      // Only the style of casting with <T> is prohibited here.
+      // Type assertions themselves are prohibited by total-functions/no-unsafe-type-assertion.
+      assertionStyle: 'as',
+      arrayLiteralTypeAssertions: 'allow',
+      objectLiteralTypeAssertions: 'allow',
+    },
   ],
   '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
   '@typescript-eslint/consistent-type-imports': [

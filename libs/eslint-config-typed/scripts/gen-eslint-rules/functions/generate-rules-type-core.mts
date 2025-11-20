@@ -122,7 +122,6 @@ const addDefaultValuesToDescription = (
       const existingDescription =
         prop.description !== undefined ? `${prop.description}\n\n` : '';
 
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       mut_newProperties[key] = {
         ...prop,
         description: `${existingDescription}@default ${defaultValue}`,
@@ -132,7 +131,6 @@ const addDefaultValuesToDescription = (
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return {
     ...schema,
     properties: mut_newProperties,
@@ -144,7 +142,7 @@ const addDefaultValuesToDescription = (
  * これにより index signature ではなく、具体的なプロパティ名を持つ型が生成される。
  * また、共通の型を definitions に抽出して $ref で参照するようにする
  */
-/* eslint-disable functional/no-let, @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/consistent-type-assertions, total-functions/no-unsafe-type-assertion */
+/* eslint-disable functional/no-let, @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-member-access, total-functions/no-unsafe-type-assertion */
 
 const expandMustMatchPatternProperties = (schema: JSONSchema4): JSONSchema4 => {
   if (
