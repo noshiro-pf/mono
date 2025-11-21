@@ -126,7 +126,7 @@ console.log(getAllDatesOfMonth(2024, 2));
 type RangeList<S extends Uint8, E extends Uint8> =
   // S, E のいずれかが 2 要素以上の union の場合
   BoolOr<IsUnion<S>, IsUnion<E>> extends true
-    ? Exclude<LEQ[E], LEQ[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくならないので、その回避のため
+    ? Exclude<LT[E], LT[Min<S>]>[] // union に対して Seq で型計算すると、結果が正しくならないので、その回避のため
     : ListSkip<S, Seq<E>>;
 ```
 
@@ -153,8 +153,8 @@ expectType<RangeList<5, 1>, readonly []>('=');
 これらを組み合わせると `ListSkip<S, Seq<E>>` とすることで `S` 以上 `E` 未満の整数の連番配列を作ることができます（例： `RangeList<1, 5> = [1, 2, 3, 4]`）。よって、 `ListSkip` と `Seq` を作ることができればここは解決します。
 
 次に `S` または `E` が union 型の場合の判定ですが、これは `BoolOr` と `IsUnion` という型ユーティリティを実装することで実現できます。実装は [TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)を参照してください。
-そしてそのときの型は、 union 型 `S` の中の最小値 `L` から union 型 `E` の中の最大値 - 1 = `U` までの union 型を要素とする配列 `(L | (L + 1) | ... | (U - 1) | U)[]` とします。これは `LEQ` という配列を作ることで `Exclude<LEQ[E], LEQ[Min<S>]>[]` として実装することができます。
-`LEQ[U]` は `U` の最大値未満のすべての非負整数を含む union 型を返すようにします（例： `LEQ[4 | 5 | 6] = 0 | 1 | 2 | 3 | 4 | 5`）。 `Min` は非負整数の union 型 `U` を受け取り、最小値を返す型です（例： `Min<3 | 4 | 5> = 3`）。`Min` の実装については[TypeScript の型ユーティリティ Min, Max の実装](https://zenn.dev/noshiro_piko/articles/typescript-type-level-min)という記事で解説しているのでそちらを参照してください。あとは `LEQ` を実装できれば OK です。
+そしてそのときの型は、 union 型 `S` の中の最小値 `L` から union 型 `E` の中の最大値 - 1 = `U` までの union 型を要素とする配列 `(L | (L + 1) | ... | (U - 1) | U)[]` とします。これは後述の `LT` という配列を作ることで `Exclude<LT[E], LT[Min<S>]>[]` として実装することができます。
+`LT[U]` は `U` の最大値未満のすべての非負整数を含む union 型を返すようにします（例： `LT[4 | 5 | 6] = 0 | 1 | 2 | 3 | 4 | 5`）。 `Min` は非負整数の union 型 `U` を受け取り、最小値を返す型です（例： `Min<3 | 4 | 5> = 3`）。`Min` の実装については[TypeScript の型ユーティリティ Min, Max の実装](https://zenn.dev/noshiro_piko/articles/typescript-type-level-min)という記事で解説しているのでそちらを参照してください。あとは `LT` を実装できれば OK です。
 
 ---
 
@@ -226,10 +226,10 @@ type ToNumber<S extends `${number}`> = S extends `${infer N extends number}`
 `MakeTuple<E, N>` は`N` 要素の `E` からなるタプルを返す型で、[TypeScript 型ユーティリティ集](https://zenn.dev/noshiro_piko/articles/typescript-type-utilities)で実装方法を解説しています。
 `Seq` は、長さ `N` の適当な配列を作り、 `keyof` でその key を取り出すことで連番配列を作っています。このとき `keyof` の結果は文字列リテラル型になってしまうのでこれを数値型にするために `ToNumber` を使っています。
 
-#### `LEQ` の実装
+#### `LT` の実装
 
 ```ts
-type LEQ = {
+type LT = {
   [N in Uint8]: Index<N>;
 };
 // {
