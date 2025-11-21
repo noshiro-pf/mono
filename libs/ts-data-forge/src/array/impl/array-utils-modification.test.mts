@@ -22,6 +22,14 @@ describe('Arr modifications', () => {
     test('case 1', () => {
       assert.deepStrictEqual(result, [1, 4, 3]);
     });
+
+    test('should work with curried version', () => {
+      const updater = toUpdated(1, (x: number) => x * 2);
+
+      const r = updater([10, 20, 30]);
+
+      assert.deepStrictEqual(r, [10, 40, 30]);
+    });
   });
 
   describe(toInserted, () => {
@@ -53,6 +61,14 @@ describe('Arr modifications', () => {
       expectType<typeof result, NonEmptyArray<string | 5>>('=');
 
       assert.deepStrictEqual(result, ['a', 'b', 'c', 5]);
+    });
+
+    test('should work with curried version', () => {
+      const inserter = toInserted(2, 99);
+
+      const result = inserter([1, 2, 3]);
+
+      assert.deepStrictEqual(result, [1, 2, 99, 3]);
     });
   });
 
@@ -96,6 +112,14 @@ describe('Arr modifications', () => {
 
       assert.deepStrictEqual(result, [1, 2, 3]);
     });
+
+    test('should work with curried version', () => {
+      const removeFirst = toRemoved(0);
+
+      const result = removeFirst([10, 20, 30]);
+
+      assert.deepStrictEqual(result, [20, 30]);
+    });
   });
 
   describe(toPushed, () => {
@@ -118,6 +142,14 @@ describe('Arr modifications', () => {
 
       assert.deepStrictEqual(result, [1, 2, 3, 4]);
     });
+
+    test('should work with curried version', () => {
+      const pushFive = toPushed(5);
+
+      const result = pushFive([1, 2, 3]);
+
+      assert.deepStrictEqual(result, [1, 2, 3, 5]);
+    });
   });
 
   describe(toUnshifted, () => {
@@ -139,6 +171,14 @@ describe('Arr modifications', () => {
       expectType<typeof result, readonly [4, ...number[]]>('=');
 
       assert.deepStrictEqual(result, [4, 1, 2, 3]);
+    });
+
+    test('should work with curried version', () => {
+      const unshiftZero = toUnshifted(0);
+
+      const result = unshiftZero([1, 2, 3]);
+
+      assert.deepStrictEqual(result, [0, 1, 2, 3]);
     });
   });
 
@@ -203,6 +243,14 @@ describe('Arr modifications', () => {
       assert.deepStrictEqual(result, [9, 9, 3]);
     });
 
+    test('should work with curried version', () => {
+      const fillMiddle = toRangeFilled(7, [1, 3]);
+
+      const result = fillMiddle([1, 2, 3, 4]);
+
+      assert.deepStrictEqual(result, [1, 7, 7, 4]);
+    });
+
     test('A non-integer starting value should result in a type error', () => {
       const arr = [1, 2, 3];
 
@@ -253,6 +301,14 @@ describe('Arr modifications', () => {
       const updated = set(tuple, 2, 'C');
 
       assert.deepStrictEqual(updated, ['a', 'b', 'C']);
+    });
+
+    test('should work with curried version', () => {
+      const setIndex1To99 = set(1, 99);
+
+      const r = setIndex1To99([10, 20, 30]);
+
+      assert.deepStrictEqual(r, [10, 99, 30]);
     });
   });
 });

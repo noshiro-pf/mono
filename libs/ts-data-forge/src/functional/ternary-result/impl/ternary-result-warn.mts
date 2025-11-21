@@ -16,7 +16,10 @@ import { WarnTypeTagName } from './tag.mjs';
  * });
  * ```
  */
-export const warn = <S, W>(value: S, warning: W): TernaryWarn<S, W> => ({
+export const warn = <const S, const W>(
+  value: S,
+  warning: W,
+): TernaryWarn<S, W> => ({
   $$tag: WarnTypeTagName,
   value,
   warning,

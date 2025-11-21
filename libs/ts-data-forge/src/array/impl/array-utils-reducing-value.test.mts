@@ -296,6 +296,14 @@ describe('Arr reducing value', () => {
 
       expect(res).toBe(0);
     });
+
+    test('should work with curried version', () => {
+      const countEven = count((x: number) => x % 2 === 0);
+
+      const res = countEven([1, 2, 3, 4, 5, 6]);
+
+      expect(res).toBe(3);
+    });
   });
 
   describe(countBy, () => {
@@ -332,6 +340,28 @@ describe('Arr reducing value', () => {
 
       expect(res.size).toBe(0);
     });
+
+    test('should work with curried version', () => {
+      const groupByParity = countBy((x: number) => x % 2);
+
+      const res = groupByParity([1, 2, 3, 4, 5, 6]);
+
+      const even = res.get(0);
+
+      expect(Optional.isSome(even)).toBe(true);
+
+      if (Optional.isSome(even)) {
+        expect(even.value).toBe(3);
+      }
+
+      const odd = res.get(1);
+
+      expect(Optional.isSome(odd)).toBe(true);
+
+      if (Optional.isSome(odd)) {
+        expect(odd.value).toBe(3);
+      }
+    });
   });
 
   describe(foldl, () => {
@@ -361,6 +391,14 @@ describe('Arr reducing value', () => {
       expectType<typeof result, string>('=');
 
       expect(result).toBe('abc');
+    });
+
+    test('should work with curried version', () => {
+      const sumReduce = foldl((acc: number, curr: number) => acc + curr, 0);
+
+      const result = sumReduce([1, 2, 3, 4]);
+
+      expect(result).toBe(10);
     });
   });
 
@@ -400,6 +438,14 @@ describe('Arr reducing value', () => {
       // Iteration 1: prev = "", curr = "c". Result = "c" + "" = "c".
       // Iteration 2: prev = "c", curr = "b". Result = "b" + "c" = "bc".
       // Iteration 3: prev = "bc", curr = "a". Result = "a" + "bc" = "abc".
+    });
+
+    test('should work with curried version', () => {
+      const productReduce = foldr((acc: number, curr: number) => acc * curr, 1);
+
+      const result = productReduce([2, 3, 4]);
+
+      expect(result).toBe(24); // 1 * 4 * 3 * 2 = 24
     });
   });
 
@@ -471,6 +517,18 @@ describe('Arr reducing value', () => {
 
       if (Result.isOk(result)) {
         expect(result.value).toBe('a,b,c');
+      }
+    });
+
+    test('should work with curried version', () => {
+      const joinWithDash = join('-');
+
+      const result = joinWithDash(['x', 'y', 'z']);
+
+      expect(Result.isOk(result)).toBe(true);
+
+      if (Result.isOk(result)) {
+        expect(result.value).toBe('x-y-z');
       }
     });
   });

@@ -608,7 +608,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   },
   {
     sourcePath: 'src/guard/is-record.mts',
-    sampleFiles: ['samples/src/guard/is-record/is-record-example.mts'],
+    sampleFiles: [
+      'samples/src/guard/is-record/is-record-example.mts',
+      'samples/src/guard/is-record/is-mutable-record-example.mts',
+    ],
   },
   {
     sourcePath: 'src/guard/is-type.mts',

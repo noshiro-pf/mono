@@ -257,4 +257,49 @@ describe('TernaryResult test', () => {
 
     expect(TernaryResult.isErr(errorResult)).toBe(true);
   });
+
+  test('unwrapOkOr curried version', () => {
+    const unwrap = TernaryResult.unwrapOkOr(999);
+
+    expect(unwrap(TernaryResult.ok(42))).toBe(42);
+
+    expect(unwrap(TernaryResult.warn(10, 'notice'))).toBe(10);
+
+    expect(unwrap(TernaryResult.err('error'))).toBe(999);
+  });
+
+  test('unwrapWarnOr curried version', () => {
+    const unwrap = TernaryResult.unwrapWarnOr('default');
+
+    expect(unwrap(TernaryResult.warn(1, 'alert'))).toBe('alert');
+
+    expect(unwrap(TernaryResult.ok(5))).toBe('default');
+
+    expect(unwrap(TernaryResult.err('fail'))).toBe('default');
+  });
+
+  test('unwrapErrOr curried version', () => {
+    const unwrap = TernaryResult.unwrapErrOr('fallback');
+
+    expect(unwrap(TernaryResult.err('bad'))).toBe('bad');
+
+    expect(unwrap(TernaryResult.ok(3))).toBe('fallback');
+
+    expect(unwrap(TernaryResult.warn(1, 'note'))).toBe('fallback');
+  });
+
+  test('orElse curried version', () => {
+    const fallback = TernaryResult.ok('backup');
+
+    const useBackup = TernaryResult.orElse(fallback);
+
+    assert.deepStrictEqual(useBackup(TernaryResult.ok(1)), TernaryResult.ok(1));
+
+    assert.deepStrictEqual(
+      useBackup(TernaryResult.warn(2, 'w')),
+      TernaryResult.warn(2, 'w'),
+    );
+
+    assert.deepStrictEqual(useBackup(TernaryResult.err('e')), fallback);
+  });
 });

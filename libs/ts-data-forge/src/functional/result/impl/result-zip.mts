@@ -12,7 +12,7 @@ import { ok } from './result-ok.mjs';
  *
  * const second = Result.ok(1);
  *
- * const expected: readonly [string, number] = ['left', 1];
+ * const expected = ['left', 1] as const;
  *
  * assert.deepStrictEqual(Result.zip(first, second), Result.ok(expected));
  *

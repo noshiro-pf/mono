@@ -32,6 +32,18 @@ describe('Arr element access', () => {
         expect(result.value).toBe(20);
       }
     });
+
+    test('should work with curried version', () => {
+      const atIndex2 = at(2);
+
+      const result = atIndex2([10, 20, 30, 40]);
+
+      expect(Optional.isSome(result)).toBe(true);
+
+      if (Optional.isSome(result)) {
+        expect(result.value).toBe(30);
+      }
+    });
   });
 
   describe(head, () => {

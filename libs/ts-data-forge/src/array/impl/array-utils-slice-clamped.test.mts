@@ -154,5 +154,13 @@ describe('Arr', () => {
 
       assert.deepStrictEqual(result, []);
     });
+
+    test('should work with curried version', () => {
+      const slice1to3 = sliceClamped(1, 3);
+
+      const result = slice1to3([10, 20, 30, 40, 50]);
+
+      assert.deepStrictEqual(result, [20, 30]);
+    });
   });
 });

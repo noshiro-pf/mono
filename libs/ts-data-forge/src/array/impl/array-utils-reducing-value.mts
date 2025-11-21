@@ -513,20 +513,22 @@ export function sum(array: readonly number[]): number {
  * assert.deepStrictEqual(hyphenSeparated, Result.ok('1-2-3'));
  * ```
  */
-export function join<E>(
-  array: readonly E[],
+export function join(
+  array: readonly unknown[],
   separator?: string,
 ): Result<string, Error>;
 
 export function join(
   separator?: string,
-): <E>(array: readonly E[]) => Result<string, Error>;
+): (array: readonly unknown[]) => Result<string, Error>;
 
-export function join<E>(
+export function join(
   ...args:
-    | readonly [array: readonly E[], separator?: string]
+    | readonly [array: readonly unknown[], separator?: string]
     | readonly [separator?: string]
-): Result<string, Error> | ((array: readonly E[]) => Result<string, Error>) {
+):
+  | Result<string, Error>
+  | ((array: readonly unknown[]) => Result<string, Error>) {
   switch (args.length) {
     case 0:
       return (array) => joinImpl(array, undefined);
@@ -549,8 +551,8 @@ export function join<E>(
   }
 }
 
-const joinImpl = <E,>(
-  array: readonly E[],
+const joinImpl = (
+  array: readonly unknown[],
   separator: string | undefined,
 ): Result<string, Error> => {
   try {

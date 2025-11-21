@@ -107,6 +107,14 @@ describe('Arr slicing', () => {
         assert.deepStrictEqual(t, [1, 2]);
       });
     }
+
+    test('should work with curried version', () => {
+      const takeTwo = take(2);
+
+      const result = takeTwo([1, 2, 3, 4, 5]);
+
+      assert.deepStrictEqual(result, [1, 2]);
+    });
   });
 
   describe(takeLast, () => {
@@ -133,6 +141,14 @@ describe('Arr slicing', () => {
         assert.deepStrictEqual(t, [2, 3]);
       });
     }
+
+    test('should work with curried version', () => {
+      const takeLastThree = takeLast(3);
+
+      const result = takeLastThree([1, 2, 3, 4, 5]);
+
+      assert.deepStrictEqual(result, [3, 4, 5]);
+    });
   });
 
   describe(skip, () => {
@@ -159,6 +175,14 @@ describe('Arr slicing', () => {
         assert.deepStrictEqual(t, [3]);
       });
     }
+
+    test('should work with curried version', () => {
+      const skipTwo = skip(2);
+
+      const result = skipTwo([1, 2, 3, 4, 5]);
+
+      assert.deepStrictEqual(result, [3, 4, 5]);
+    });
   });
 
   describe(skipLast, () => {
@@ -185,5 +209,13 @@ describe('Arr slicing', () => {
         assert.deepStrictEqual(t, [1]);
       });
     }
+
+    test('should work with curried version', () => {
+      const skipLastTwo = skipLast(2);
+
+      const result = skipLastTwo([1, 2, 3, 4, 5]);
+
+      assert.deepStrictEqual(result, [1, 2, 3]);
+    });
   });
 });
