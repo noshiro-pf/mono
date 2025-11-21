@@ -1,3 +1,9 @@
+## [7.9.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.1...v7.9.2) (2025-11-21)
+
+### Bug Fixes
+
+- debug console.log ([#207](https://github.com/noshiro-pf/ts-repo-utils/issues/207)) ([5c2c662](https://github.com/noshiro-pf/ts-repo-utils/commit/5c2c66267c6e0ec7bab6a07b46b0d571ad64856e))
+
 ## [7.9.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.0...v7.9.1) (2025-11-19)
 
 ### Bug Fixes
