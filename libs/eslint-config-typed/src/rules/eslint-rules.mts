@@ -52,35 +52,43 @@ export const restrictedGlobalsForBrowser = [
   },
   {
     name: 'length',
-    message: "Don't use confusing globals declared in lib.dom",
+    message:
+      'Do not use variables with the same name as global variables declared in lib.dom as they are confusing.',
   },
   {
     name: 'event',
-    message: "Don't use confusing globals declared in lib.dom",
+    message:
+      'Do not use variables with the same name as global variables declared in lib.dom as they are confusing.',
   },
   {
     name: 'name',
-    message: "Don't use confusing globals declared in lib.dom",
+    message:
+      'Do not use variables with the same name as global variables declared in lib.dom as they are confusing.',
   },
   {
     name: 'parent',
-    message: "Don't use confusing globals declared in lib.dom",
+    message:
+      'Do not use variables with the same name as global variables declared in lib.dom as they are confusing.',
   },
   {
     name: 'status',
-    message: "Don't use confusing globals declared in lib.dom",
+    message:
+      'Do not use variables with the same name as global variables declared in lib.dom as they are confusing.',
   },
   {
     name: 'top',
-    message: "Don't use confusing globals declared in lib.dom",
+    message:
+      'Do not use variables with the same name as global variables declared in lib.dom as they are confusing.',
   },
   {
     name: 'close',
-    message: "Don't use confusing globals declared in lib.dom",
+    message:
+      'Do not use variables with the same name as global variables declared in lib.dom as they are confusing.',
   },
   {
     name: 'open',
-    message: "Don't use confusing globals declared in lib.dom",
+    message:
+      'Do not use variables with the same name as global variables declared in lib.dom as they are confusing.',
   },
 ] as const satisfies EslintRulesOption['no-restricted-globals'];
 
