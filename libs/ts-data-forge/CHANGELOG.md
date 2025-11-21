@@ -1,3 +1,9 @@
+# [5.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v5.0.1...v5.1.0) (2025-11-21)
+
+### Features
+
+- improve type implementation of Result utilities and add isMutableRecord ([#208](https://github.com/noshiro-pf/ts-data-forge/issues/208)) ([14f25ed](https://github.com/noshiro-pf/ts-data-forge/commit/14f25edb633810a9ffcffb638a05516455da13be))
+
 ## [5.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v5.0.0...v5.0.1) (2025-11-14)
 
 ### Bug Fixes
