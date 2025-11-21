@@ -98,8 +98,6 @@ const cmdDef = cmd.command({
     }),
   },
   handler: (args) => {
-    console.log(args);
-
     expectType<typeof args.targetDirectory, string>('=');
 
     expectType<typeof args.targetExtensions, NonEmptyArray<Ext>>('=');
