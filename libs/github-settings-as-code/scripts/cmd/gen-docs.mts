@@ -17,31 +17,49 @@ export const genDocs = async (): Promise<void> => {
   // Verify TypeDoc config exists
   await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
 
-  // Step 0: Embed sample code into README
-  echo('0. Embedding sample code into README...');
+  await logStep({
+    startMessage: 'Embedding sample code into README',
+    action: () => runStep(embedSamples(), 'Sample embedding failed'),
+    successMessage: 'Sample code embedded into README',
+  });
 
-  await runStep(embedSamples(), 'Sample embedding failed');
+  await logStep({
+    startMessage: 'Generating documentation with TypeDoc',
+    action: () =>
+      runCmdStep(
+        `typedoc --options "${TYPEDOC_CONFIG}"`,
+        'TypeDoc generation failed',
+      ),
+    successMessage: 'TypeDoc generation completed',
+  });
 
-  echo('✓ Sample code embedded into README\n');
-
-  // Step 1: Generate docs with TypeDoc
-  echo('1. Generating documentation with TypeDoc...');
-
-  await runCmdStep(
-    `typedoc --options "${TYPEDOC_CONFIG}"`,
-    'TypeDoc generation failed',
-  );
-
-  echo('✓ TypeDoc generation completed\n');
-
-  // Step 2: Lint markdown files
-  echo('2. Linting markdown files...');
-
-  await runCmdStep('pnpm run md', 'Markdown linting failed');
-
-  echo('✓ Markdown linting completed\n');
+  await logStep({
+    startMessage: 'Linting markdown files',
+    action: () => runCmdStep('pnpm run md', 'Markdown linting failed'),
+    successMessage: 'Markdown linting completed',
+  });
 
   echo('✅ Documentation generation completed successfully!\n');
+};
+
+const step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  echo(`${step.current}. ${startMessage}...`);
+
+  await action();
+
+  echo(`✓ ${successMessage}.\n`);
+
+  step.current += 1;
 };
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
