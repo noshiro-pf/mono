@@ -16,38 +16,56 @@ export const genDocs = async (): Promise<void> => {
   // Verify TypeDoc config exists
   await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
 
-  // Step 1: Embed sample code into README
-  echo('1. Embedding sample code into README...');
+  await logStep({
+    startMessage: 'Embedding sample code into README',
+    action: () => runStep(embedSamples(), 'Sample embedding failed'),
+    successMessage: 'Sample code embedded into README',
+  });
 
-  await runStep(embedSamples(), 'Sample embedding failed');
+  await logStep({
+    startMessage: 'Embedding sample code into JSDoc',
+    action: () =>
+      runStep(embedJsDocExamples(), 'Sample embedding into JSDoc failed'),
+    successMessage: 'Sample code embedded into JSDoc',
+  });
 
-  echo('✓ Sample code embedded into README\n');
+  await logStep({
+    startMessage: 'Generating documentation with TypeDoc',
+    action: () =>
+      runCmdStep(
+        `typedoc --options "${TYPEDOC_CONFIG}"`,
+        'TypeDoc generation failed',
+      ),
+    successMessage: 'TypeDoc generation completed',
+  });
 
-  // Step 2: Embed sample code into JSDoc
-  echo('2. Embedding sample code into JSDoc...');
-
-  await runStep(embedJsDocExamples(), 'Sample embedding into JSDoc failed');
-
-  echo('✓ Sample code embedded into JSDoc\n');
-
-  // Step 3: Generate docs with TypeDoc
-  echo('3. Generating documentation with TypeDoc...');
-
-  await runCmdStep(
-    `typedoc --options "${TYPEDOC_CONFIG}"`,
-    'TypeDoc generation failed',
-  );
-
-  echo('✓ TypeDoc generation completed\n');
-
-  // Step 4: Lint markdown files
-  echo('4. Linting markdown files...');
-
-  await runCmdStep('pnpm run md', 'Markdown linting failed');
-
-  echo('✓ Markdown linting completed\n');
+  await logStep({
+    startMessage: 'Linting markdown files',
+    action: () => runCmdStep('pnpm run md', 'Markdown linting failed'),
+    successMessage: 'Markdown linting completed',
+  });
 
   echo('✅ Documentation generation completed successfully!\n');
+};
+
+const step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  echo(`${step.current}. ${startMessage}...`);
+
+  await action();
+
+  echo(`✓ ${successMessage}.\n`);
+
+  step.current += 1;
 };
 
 const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
