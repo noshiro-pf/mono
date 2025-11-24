@@ -141,7 +141,7 @@
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-packagejson": "^2.5.19",
     "react": "^19.2.0",
-    "rollup": "^4.53.2",
+    "rollup": "^4.53.3",
     "semantic-release": "^25.0.2",
     "ts-fortress": "^6.1.0",
     "ts-morph": "^27.0.2",
