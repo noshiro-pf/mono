@@ -105,7 +105,7 @@
     "cspell": "^9.3.2",
     "dedent": "^1.7.0",
     "eslint": "9.39.1",
-    "eslint-config-typed": "^3.13.3",
+    "eslint-config-typed": "^3.13.6",
     "fast-glob": "^3.3.3",
     "github-settings-as-code": "^1.0.6",
     "jiti": "^2.6.1",
