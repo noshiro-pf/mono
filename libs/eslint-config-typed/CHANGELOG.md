@@ -1,3 +1,9 @@
+## [3.13.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.6...v3.13.7) (2025-11-24)
+
+### Bug Fixes
+
+- bump eslint-plugin-math from 0.13.0 to 0.13.1 ([#151](https://github.com/noshiro-pf/eslint-config-typed/issues/151)) ([d0e8e52](https://github.com/noshiro-pf/eslint-config-typed/commit/d0e8e52ebd77655aaa94be76ab8a7299e991065e))
+
 ## [3.13.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.5...v3.13.6) (2025-11-21)
 
 ### Bug Fixes
