@@ -1,3 +1,9 @@
+## [7.9.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.2...v7.9.3) (2025-11-25)
+
+### Bug Fixes
+
+- fix format logic ([#215](https://github.com/noshiro-pf/ts-repo-utils/issues/215)) ([6d79841](https://github.com/noshiro-pf/ts-repo-utils/commit/6d79841f6ccf330dfec3f5fb670fd2c87133cfab))
+
 ## [7.9.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.1...v7.9.2) (2025-11-21)
 
 ### Bug Fixes
