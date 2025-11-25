@@ -2,6 +2,7 @@ import { type ExecException } from 'node:child_process';
 import * as prettier from 'prettier';
 import { Arr, isNotUndefined, pipe, Result } from 'ts-data-forge';
 import '../node-global.mjs';
+import { pathExists } from './assert-path-exists.mjs';
 import {
   getDiffFrom,
   getModifiedFiles,
@@ -43,30 +44,24 @@ export const formatFiles = async (
       files.map(async (filePath) => {
         try {
           // Check if file exists first
-          try {
-            await fs.access(filePath);
-          } catch {
-            // File doesn't exist, skip it
+          if (!(await pathExists(filePath))) {
             conditionalEcho(`Skipping non-existent file: ${filePath}`);
 
             return Result.ok(undefined);
           }
 
-          // Read file content
-          const content = await fs.readFile(filePath, 'utf8');
+          if (!noIgnore && (options?.ignore ?? defaultIgnoreFn)(filePath)) {
+            conditionalEcho(`Skipping ignored file: ${filePath}`);
 
-          // Resolve prettier config for this file
-          const prettierOptions = await prettier.resolveConfig(filePath);
+            return Result.ok(undefined);
+          }
 
           // Check if file is ignored by prettier
           const fileInfo = await prettier.getFileInfo(filePath, {
             ignorePath: '.prettierignore',
           });
 
-          if (
-            !noIgnore &&
-            (fileInfo.ignored || (options?.ignore ?? defaultIgnoreFn)(filePath))
-          ) {
+          if (!noIgnore && fileInfo.ignored) {
             conditionalEcho(`Skipping ignored file: ${filePath}`);
 
             return Result.ok(undefined);
@@ -82,6 +77,12 @@ export const formatFiles = async (
 
             return Result.ok(undefined);
           }
+
+          // Read file content
+          const content = await fs.readFile(filePath, 'utf8');
+
+          // Resolve prettier config for this file
+          const prettierOptions = await prettier.resolveConfig(filePath);
 
           // Format the content
           const formatted = await prettier.format(content, {

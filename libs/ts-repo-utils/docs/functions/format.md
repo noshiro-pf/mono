@@ -12,7 +12,7 @@
 
 > **formatDiffFrom**(`base`, `options?`): `Promise`\<[`Result`](../node-global.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:335](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L335)
+Defined in: [src/functions/format.mts:336](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L336)
 
 Format only files that differ from the specified base branch or commit
 
@@ -41,7 +41,7 @@ Options for formatting
 
 > **formatFiles**(`files`, `options?`): `Promise`\<[`Result`](../node-global.md#result)\<`undefined`, readonly `unknown`[]\>\>
 
-Defined in: [src/functions/format.mts:17](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L17)
+Defined in: [src/functions/format.mts:18](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L18)
 
 Format a list of files using Prettier
 
@@ -67,7 +67,7 @@ Array of file paths to format
 
 > **formatFilesGlob**(`pathGlob`, `options?`): `Promise`\<[`Result`](../node-global.md#result)\<`undefined`, `unknown`\>\>
 
-Defined in: [src/functions/format.mts:199](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L199)
+Defined in: [src/functions/format.mts:200](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L200)
 
 Format files matching the given glob pattern using Prettier
 
@@ -93,7 +93,7 @@ Glob pattern to match files
 
 > **formatUncommittedFiles**(`options?`): `Promise`\<[`Result`](../node-global.md#result)\<`undefined`, `ExecException` \| readonly `unknown`[] \| `Readonly`\<\{ `message`: `string`; \}\>\>\>
 
-Defined in: [src/functions/format.mts:244](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L244)
+Defined in: [src/functions/format.mts:245](https://github.com/noshiro-pf/ts-repo-utils/blob/main/src/functions/format.mts#L245)
 
 Format only files that have been changed (git status)
 
