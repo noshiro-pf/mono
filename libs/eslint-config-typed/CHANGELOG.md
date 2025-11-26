@@ -1,3 +1,9 @@
+# [3.14.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.7...v3.14.0) (2025-11-26)
+
+### Features
+
+- add vitest-coding-style rules ([#158](https://github.com/noshiro-pf/eslint-config-typed/issues/158)) ([864bae3](https://github.com/noshiro-pf/eslint-config-typed/commit/864bae3ecea9a022956315367e997374197954ce))
+
 ## [3.13.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.6...v3.13.7) (2025-11-24)
 
 ### Bug Fixes
