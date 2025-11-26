@@ -3,5 +3,8 @@
     "./tsconfig/tsconfig.type-check.json",
     "./tsconfig/tsconfig.vite.json"
   ],
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"]
+  },
   "include": ["../src", "../test", "../samples"]
 }

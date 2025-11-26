@@ -17,13 +17,13 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
     type: 'suggestion',
     docs: {
       description:
-        'Disallow `expect().toStrictEqual()` in favor of `assert.deepStrictEqual()`.',
+        'Disallow `expect(X).toStrictEqual(Y)` in favor of `assert.deepStrictEqual(X, Y)`, as the former also checks type equality between X and Y.',
     },
     fixable: 'code',
     schema: [],
     messages: {
       useAssert:
-        'Use `assert.deepStrictEqual()` instead of `expect().toStrictEqual()`.',
+        'Use `assert.deepStrictEqual(X, Y)` instead of `expect(X).toStrictEqual(Y)`.',
     },
   },
   defaultOptions: [],

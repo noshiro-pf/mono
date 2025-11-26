@@ -20,10 +20,11 @@ export default defineConfig({
         './src/entry-point.mts',
       ),
     },
+    testTimeout: 30000,
     coverage: {
       provider: 'v8',
       reporter: ['html', 'lcov', 'text'],
-      include: ['src/**'],
+      include: ['src/**/*.{mts,tsx}'],
       exclude: ['**/index.mts', 'src/entry-point.mts'],
     },
   },
