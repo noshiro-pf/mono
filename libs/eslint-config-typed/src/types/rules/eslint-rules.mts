@@ -8439,7 +8439,6 @@ namespace NoRestrictedGlobals {
             message?: string;
           }>
       )[]
-    | readonly []
     | readonly [
         Readonly<{
           /** @minItems 0 */
@@ -8704,7 +8703,6 @@ namespace NoRestrictedImports {
             allowTypeImports?: boolean;
           }>
       )[]
-    | readonly []
     | readonly [
         Readonly<{
           paths?: readonly (
@@ -11019,14 +11017,12 @@ namespace ObjectShorthand {
         | 'consistent'
         | 'consistent-as-needed',
       ]
-    | readonly ['always' | 'methods' | 'properties']
     | readonly [
         'always' | 'methods' | 'properties',
         Readonly<{
           avoidQuotes?: boolean;
         }>,
       ]
-    | readonly ['always' | 'methods']
     | readonly [
         'always' | 'methods',
         Readonly<{

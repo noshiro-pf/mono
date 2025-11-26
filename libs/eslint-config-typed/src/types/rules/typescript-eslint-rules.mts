@@ -6415,7 +6415,6 @@ namespace NoRestrictedImports {
             allowTypeImports?: boolean;
           }>
       )[]
-    | readonly []
     | readonly [
         Readonly<{
           paths?: readonly (

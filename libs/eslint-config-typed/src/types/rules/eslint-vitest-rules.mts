@@ -8,6 +8,75 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
+ * Enforce using `.each` or `.for` consistently
+ *
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-each-for.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ConsistentEachFor {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "test": {
+   *         "type": "string",
+   *         "enum": [
+   *           "each",
+   *           "for"
+   *         ]
+   *       },
+   *       "it": {
+   *         "type": "string",
+   *         "enum": [
+   *           "each",
+   *           "for"
+   *         ]
+   *       },
+   *       "describe": {
+   *         "type": "string",
+   *         "enum": [
+   *           "each",
+   *           "for"
+   *         ]
+   *       },
+   *       "suite": {
+   *         "type": "string",
+   *         "enum": [
+   *           "each",
+   *           "for"
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    test?: 'each' | 'for';
+    it?: 'each' | 'for';
+    describe?: 'each' | 'for';
+    suite?: 'each' | 'for';
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * Require test file pattern
  *
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-test-filename.md
@@ -1113,7 +1182,7 @@ namespace PreferEach {
 }
 
 /**
- * Enforce using the built-in quality matchers
+ * Enforce using the built-in equality matchers
  *
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-equality-matcher.md
  *
@@ -1673,6 +1742,25 @@ namespace RequireHook {
 }
 
 /**
+ * Require usage of import in vi.mock()
+ *
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-import-vi-mock.md
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | fixable              | code       |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | false      |
+ *  ```
+ */
+namespace RequireImportViMock {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Require local Test Context for concurrent snapshot tests
  *
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-local-test-context-for-concurrent-snapshots.md
@@ -2021,6 +2109,7 @@ namespace WarnTodo {
 }
 
 export type EslintVitestRules = Readonly<{
+  'vitest/consistent-each-for': ConsistentEachFor.RuleEntry;
   'vitest/consistent-test-filename': ConsistentTestFilename.RuleEntry;
   'vitest/consistent-test-it': ConsistentTestIt.RuleEntry;
   'vitest/consistent-vitest-vi': ConsistentVitestVi.RuleEntry;
@@ -2087,6 +2176,7 @@ export type EslintVitestRules = Readonly<{
   'vitest/prefer-vi-mocked': PreferViMocked.RuleEntry;
   'vitest/require-awaited-expect-poll': RequireAwaitedExpectPoll.RuleEntry;
   'vitest/require-hook': RequireHook.RuleEntry;
+  'vitest/require-import-vi-mock': RequireImportViMock.RuleEntry;
   'vitest/require-local-test-context-for-concurrent-snapshots': RequireLocalTestContextForConcurrentSnapshots.RuleEntry;
   'vitest/require-mock-type-parameters': RequireMockTypeParameters.RuleEntry;
   'vitest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
@@ -2102,6 +2192,7 @@ export type EslintVitestRules = Readonly<{
 }>;
 
 export type EslintVitestRulesOption = Readonly<{
+  'vitest/consistent-each-for': ConsistentEachFor.Options;
   'vitest/consistent-test-filename': ConsistentTestFilename.Options;
   'vitest/consistent-test-it': ConsistentTestIt.Options;
   'vitest/consistent-vitest-vi': ConsistentVitestVi.Options;

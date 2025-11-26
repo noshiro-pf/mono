@@ -110,7 +110,8 @@ const checkNodeForTypeAnnotations = (
 
     checkNodeForTypeAnnotations(
       context,
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      // FIXME: Enable @typescript-eslint/no-deprecated
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-deprecated
       nodeWithArgument.argument as DeepReadonly<TSESTree.Node>,
     );
   }

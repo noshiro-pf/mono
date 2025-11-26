@@ -107,6 +107,17 @@ export const eslintVitestRules = {
   'vitest/warn-todo': 'error',
   'vitest/require-awaited-expect-poll': 'error',
 
+  'vitest/consistent-each-for': [
+    'error',
+    {
+      test: 'each',
+      it: 'each',
+      describe: 'each',
+      suite: 'each',
+    },
+  ],
+  'vitest/require-import-vi-mock': 'error',
+
   // deprecated
   'vitest/no-done-callback': 0,
 } as const satisfies EslintVitestRules;

@@ -999,7 +999,6 @@ namespace JsxBooleanValue {
    */
   export type Options =
     | readonly []
-    | readonly ['always' | 'never']
     | readonly ['always']
     | readonly [
         'always',
