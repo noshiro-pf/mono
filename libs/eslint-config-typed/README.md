@@ -16,12 +16,12 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
     - [defineConfig helper](#defineconfig-helper)
     - [defineKnownRules utility](#defineknownrules-utility)
     - [withDefaultOption utility](#withdefaultoption-utility)
+- [TypeScript Configuration Files](#typescript-configuration-files)
 - [Configuration Examples](#configuration-examples)
     - [TypeScript + React Project](#typescript--react-project)
     - [Node.js TypeScript Project](#nodejs-typescript-project)
     - [React + Testing Libraries](#react--testing-libraries)
 - [VS Code Integration](#vs-code-integration)
-- [TypeScript Configuration Files](#typescript-configuration-files)
 - [Included plugins](#included-plugins)
 - [API Reference](#api-reference)
     - [Configuration Functions](#configuration-functions)
@@ -31,6 +31,10 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
     - [Rule Collections](#rule-collections)
     - [Exported Pre-configured Rule Options](#exported-pre-configured-rule-options)
     - [Custom Plugins](#custom-plugins)
+        - [Forked plugins](#forked-plugins)
+        - [ts-restrictions](#ts-restrictions)
+        - [vitest-coding-style](#vitest-coding-style)
+        - [react-coding-style](#react-coding-style)
     - [Type Definitions](#type-definitions)
         - [Core Types](#core-types)
         - [Rule Types](#rule-types)
@@ -43,6 +47,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
         - [1. ESLint can't find tsconfig.json](#1-eslint-cant-find-tsconfigjson)
         - [2. Import resolution errors](#2-import-resolution-errors)
         - [3. Performance issues](#3-performance-issues)
+        - [4. How to Use import-x/no-unused-modules](#4-how-to-use-import-xno-unused-modules)
     - [Known Limitations](#known-limitations)
 - [Contributing](#contributing)
 - [License](#license)
@@ -536,16 +541,21 @@ The shape of the rule option varies depending on the rule, so please check the c
 
 ### Custom Plugins
 
+#### Forked plugins
+
 - **`eslintPluginTotalFunctions`**
-    - `eslint-plugin-total-functions` with support for Flat Config
+    - Flat Config version of `eslint-plugin-total-functions`
 - **`eslintPluginTreeShakable`**
-    - `eslint-plugin-tree-shakable` with support for Flat Config
-- **`eslintPluginReactCodingStyle`**
-    - Custom ESLint plugin that codifies this repository's React memo component conventions (namespace imports, `React.memo<Props>`, arrow props naming, etc.). See [`src/plugins/react-coding-style/README.md`](src/plugins/react-coding-style/README.md) for the rationale and examples.
-    - Provides rules such as `react-coding-style/import-style`, `react-coding-style/component-var-type-annotation`, `react-coding-style/react-memo-type-parameter`, `react-coding-style/react-memo-props-argument-name`, `react-coding-style/props-type-annotation-style`, and `react-coding-style/react-hooks-definition-style`.
-- **`eslintPluginTsRestrictions`** - Custom ESLint plugin with additional rules for TypeScript
-    - Currently, this plugin only provides the `ts-restrictions/no-restricted-syntax` rule (which duplicates ESLint's `no-restricted-syntax` rule).
-    - Can be used to set the error level to `error` or `warn` as needed.
+    - Flat Config version of `eslint-plugin-tree-shakable`
+- **`eslintPluginStrictDependencies`**
+    - Flat Config version of `eslint-plugin-strict-dependencies`
+
+#### ts-restrictions
+
+**`eslintPluginTsRestrictions`** - Custom ESLint plugin with additional rules for TypeScript
+
+- Currently, this plugin only provides the `ts-restrictions/no-restricted-syntax` rule (which duplicates ESLint's `no-restricted-syntax` rule).
+- Can be used to set the error level to `error` or `warn` as needed.
 
 Example:
 
@@ -578,6 +588,77 @@ export default [
     },
 ] satisfies FlatConfig[];
 ```
+
+#### vitest-coding-style
+
+**`eslintPluginVitestCodingStyle`** - Opinionated rules that constrain how Vitest `assert`/`expect` APIs are used. Rules that rely on type information (for example `prefer-assert-is-true-over-expect-true` / `prefer-assert-is-false-over-expect-false`) assume the plugin types are loaded via tsconfig; add this plugin type definition to `compilerOptions.types` as shown below.
+
+```jsonc
+{
+    "compilerOptions": {
+        "types": [
+            "vitest/globals",
+            "vitest/importMeta",
+            "eslint-config-typed/vitest-coding-style", // add this line
+        ],
+    },
+}
+```
+
+This type definition provides overridden `Chai.Assert` type:
+
+- Change the type definition of `isTrue`/`isFalse`
+    - Change the arg type from `unknown` to `boolean`
+    - Change the return type of `isTrue` from `asserts value is true` to `asserts value` so that it can be used as an assertion function like `assert.ok`.
+    - Removed optional `message` arg
+    - Before
+        - `isTrue: (value: unknown, message?: string) => asserts value is true`
+        - `isFalse: (value: unknown, message?: string) => asserts value is false`
+    - After
+        - `isTrue: (value: boolean) => asserts value;`
+        - `isFalse: (value: boolean) => asserts value is false`
+- Removed the call signature (`assert(x)`)
+- Removed `deepEqual`, `equal`, `notEqual`, `ok`, `notOk`, `isOk`, `isNotOk`,
+    - `deepEqual` : Removed in favor of `assert.deepStrictEqual`
+    - `equal` : Removed in favor of `assert.strictEqual`
+    - `notEqual` : Removed in favor of `assert.notStrictEqual`
+    - `ok` : Removed in favor of `assert.isTrue`
+    - `notOk` : Removed in favor of `assert.isFalse`
+    - `isOk` : Removed in favor of `assert.isTrue`
+    - `isNotOk` : Removed in favor of `assert.isFalse`
+- Removed optional `message` arg from all `assert.*` methods
+- Convert arg types to be readonly
+- Replace `Object` with `object`
+
+| Included rules                                       | Description                                                                                   |
+| :--------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| `no-expect-to-strict-equal`                          | Forbid `expect(x).toStrictEqual(y)`; prefer `assert.deepStrictEqual(x, y)`                    |
+| `prefer-assert-deep-strict-equal-over-deep-equal`    | Replace `assert.deepEqual(x)` with `assert.deepStrictEqual(x)`                                |
+| `prefer-assert-is-true-over-assert`                  | Canonicalize `assert(x)` / `assert.isOk(x)` / `assert.ok(x)` to `assert.isTrue(x)`            |
+| `prefer-assert-is-false-over-assert-not-ok`          | Canonicalize `assert.isNotOk(x)` / `assert.notOk(x)` to `assert.isFalse(x)`                   |
+| `prefer-assert-is-false-over-negated-assert-is-true` | Rewrite `assert.isTrue(!x)` to `assert.isFalse(x)`                                            |
+| `prefer-assert-is-true-over-negated-assert-is-false` | Rewrite `assert.isFalse(!x)` to `assert.isTrue(x)`                                            |
+| `prefer-assert-is-true-over-expect-true`             | Rewrite `expect(x).toBe(true)` to `assert.isTrue(x)` (only when `x` is boolean; type-aware)   |
+| `prefer-assert-is-false-over-expect-false`           | Rewrite `expect(x).toBe(false)` to `assert.isFalse(x)` (only when `x` is boolean; type-aware) |
+
+#### react-coding-style
+
+**`eslintPluginReactCodingStyle`** - Custom ESLint plugin that codifies this repository's React memo component conventions (namespace imports, `React.memo<Props>`, arrow props naming, etc.).
+
+- See [`src/plugins/react-coding-style/README.md`](src/plugins/react-coding-style/README.md) for the rationale and examples.
+- Provides rules such as `react-coding-style/import-style`, `react-coding-style/component-var-type-annotation`, `react-coding-style/react-memo-type-parameter`, `react-coding-style/react-memo-props-argument-name`, `react-coding-style/props-type-annotation-style`, and `react-coding-style/react-hooks-definition-style`.
+
+| Included rules                   | Description                                                                                                           |
+| :------------------------------- | :-------------------------------------------------------------------------------------------------------------------- |
+| `component-name`                 | Enforce concise React.memo component variable names (default max length 42; optional pattern)                         |
+| `component-var-type-annotation`  | Forbid React.FC / React.FunctionComponent type annotations; prefer `React.memo<Props>((props) => ...)`                |
+| `import-style`                   | Enforce React import style (`import * as React` by default; configurable to named imports)                            |
+| `props-type-annotation-style`    | Forbid annotating props in the React.memo arrow function; use `React.memo<Props>((props) => ...)`                     |
+| `react-memo-props-argument-name` | Require the React.memo arrow function to take a single identifier named `props`                                       |
+| `react-memo-type-parameter`      | Require `React.memo<Props>` when props exist; forbid type parameter when there are no props                           |
+| `use-memo-hook-style`            | Forbid type assertions/annotations inside and around `React.useMemo`; annotate via type parameter or variable instead |
+| `ban-use-imperative-handle-hook` | Forbid `React.useImperativeHandle`; move logic to the parent component                                                |
+| `display-name`                   | Require explicit `displayName` on React.memo components                                                               |
 
 ### Type Definitions
 

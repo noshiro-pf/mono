@@ -19,6 +19,11 @@
         "types": "./dist/types.d.mts",
         "default": "./dist/entry-point.mjs"
       }
+    },
+    "./vitest-coding-style": {
+      "import": {
+        "types": "./src/plugins/vitest-coding-style/rules/vitest-coding-style.d.mts"
+      }
     }
   },
   "module": "./dist/entry-point.mjs",

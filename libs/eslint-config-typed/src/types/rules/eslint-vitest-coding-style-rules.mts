@@ -18,7 +18,7 @@ namespace NoExpectToStrictEqual {
 }
 
 /**
- * Prefer assert(X) over assert.ok(X), assert.isOk(X).
+ * Prefer assert.deepStrictEqual(X) over assert.deepEqual(X).
  *
  * ```md
  * | key        | value      |
@@ -28,12 +28,12 @@ namespace NoExpectToStrictEqual {
  * | fixable    | code       |
  * ```
  */
-namespace PreferAssertOverAssertOk {
+namespace PreferAssertDeepStrictEqualOverDeepEqual {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.notOk(X) over assert.isNotOk(X).
+ * Prefer assert.isTrue(X) over assert(X), assert.isOk(X), assert.ok(X).
  *
  * ```md
  * | key        | value      |
@@ -43,12 +43,12 @@ namespace PreferAssertOverAssertOk {
  * | fixable    | code       |
  * ```
  */
-namespace PreferAssertNotOkOverAssertIsNotOk {
+namespace PreferAssertIsTrueOverAssert {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert(X) over expect(X).toBe(true) (only if X is boolean)
+ * Prefer assert.isFalse(X) over assert.isNotOk(X), assert.notOk(X).
  *
  * ```md
  * | key        | value      |
@@ -58,12 +58,12 @@ namespace PreferAssertNotOkOverAssertIsNotOk {
  * | fixable    | code       |
  * ```
  */
-namespace PreferAssertOverExpectTrue {
+namespace PreferAssertIsFalseOverAssertNotOk {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.notOk(X) over expect(X).toBe(false) (only if X is boolean)
+ * Prefer assert.isTrue(X) over expect(X).toBe(true) (only if X is boolean)
  *
  * ```md
  * | key        | value      |
@@ -73,14 +73,62 @@ namespace PreferAssertOverExpectTrue {
  * | fixable    | code       |
  * ```
  */
-namespace PreferAssertNotOkOverExpectFalse {
+namespace PreferAssertIsTrueOverExpectTrue {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * Prefer assert.isFalse(X) over expect(X).toBe(false) (only if X is boolean)
+ *
+ * ```md
+ * | key        | value      |
+ * | :--------- | :--------- |
+ * | type       | suggestion |
+ * | deprecated | false      |
+ * | fixable    | code       |
+ * ```
+ */
+namespace PreferAssertIsFalseOverExpectFalse {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * Prefer assert.isFalse(X) over assert.isTrue(!X).
+ *
+ * ```md
+ * | key        | value      |
+ * | :--------- | :--------- |
+ * | type       | suggestion |
+ * | deprecated | false      |
+ * | fixable    | code       |
+ * ```
+ */
+namespace PreferAssertIsFalseOverNegatedAssertIsTrue {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * Prefer assert.isTrue(X) over assert.isFalse(!X).
+ *
+ * ```md
+ * | key        | value      |
+ * | :--------- | :--------- |
+ * | type       | suggestion |
+ * | deprecated | false      |
+ * | fixable    | code       |
+ * ```
+ */
+namespace PreferAssertIsTrueOverNegatedAssertIsFalse {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintVitestCodingStyleRules = Readonly<{
   'vitest-coding-style/no-expect-to-strict-equal': NoExpectToStrictEqual.RuleEntry;
-  'vitest-coding-style/prefer-assert-over-assert-ok': PreferAssertOverAssertOk.RuleEntry;
-  'vitest-coding-style/prefer-assert-not-ok-over-assert-is-not-ok': PreferAssertNotOkOverAssertIsNotOk.RuleEntry;
-  'vitest-coding-style/prefer-assert-over-expect-true': PreferAssertOverExpectTrue.RuleEntry;
-  'vitest-coding-style/prefer-assert-not-ok-over-expect-false': PreferAssertNotOkOverExpectFalse.RuleEntry;
+  'vitest-coding-style/prefer-assert-deep-strict-equal-over-deep-equal': PreferAssertDeepStrictEqualOverDeepEqual.RuleEntry;
+  'vitest-coding-style/prefer-assert-is-true-over-assert': PreferAssertIsTrueOverAssert.RuleEntry;
+  'vitest-coding-style/prefer-assert-is-false-over-assert-not-ok': PreferAssertIsFalseOverAssertNotOk.RuleEntry;
+  'vitest-coding-style/prefer-assert-is-true-over-expect-true': PreferAssertIsTrueOverExpectTrue.RuleEntry;
+  'vitest-coding-style/prefer-assert-is-false-over-expect-false': PreferAssertIsFalseOverExpectFalse.RuleEntry;
+  'vitest-coding-style/prefer-assert-is-false-over-negated-assert-is-true': PreferAssertIsFalseOverNegatedAssertIsTrue.RuleEntry;
+  'vitest-coding-style/prefer-assert-is-true-over-negated-assert-is-false': PreferAssertIsTrueOverNegatedAssertIsFalse.RuleEntry;
 }>;

@@ -21,8 +21,8 @@
     "eslint.config.mts",
     "./pnpm-lock.yaml",
     "./pnpm-workspace.yaml",
-    "BREAKING_CHANGE_GUIDE.md",
     "github/**",
-    "test/**"
+    "test/**",
+    "agents/common/**"
   ]
 }

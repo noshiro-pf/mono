@@ -195,7 +195,7 @@ if (import.meta.vitest !== undefined) {
 
         expect(node.getKind()).toBe(kind);
 
-        assert(isPrimitiveTypeNode(node));
+        assert.isTrue(isPrimitiveTypeNode(node));
       });
     });
 
@@ -266,7 +266,7 @@ if (import.meta.vitest !== undefined) {
 
         expect(node.getKind()).toBe(kind); // Verify node type
 
-        assert.notOk(isPrimitiveTypeNode(node));
+        assert.isFalse(isPrimitiveTypeNode(node));
       });
 
       test.each([
@@ -294,7 +294,7 @@ if (import.meta.vitest !== undefined) {
           throw new Error('Node should be defined');
         }
 
-        assert.notOk(isPrimitiveTypeNode(node));
+        assert.isFalse(isPrimitiveTypeNode(node));
       });
     });
   });

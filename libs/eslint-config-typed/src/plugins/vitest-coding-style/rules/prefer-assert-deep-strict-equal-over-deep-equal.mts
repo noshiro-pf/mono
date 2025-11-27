@@ -1,23 +1,23 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
 
-type MessageIds = 'preferAssertOverAssertOk';
+type MessageIds = 'preferAssertDeepStrictEqual';
 
 type Options = readonly [];
 
-export const preferAssertOverAssertOkRule: TSESLint.RuleModule<
+export const preferAssertDeepStrictEqualOverDeepEqualRule: TSESLint.RuleModule<
   MessageIds,
   Options
 > = {
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Prefer assert(X) over assert.ok(X), assert.isOk(X).',
+      description: 'Prefer assert.deepStrictEqual(X) over assert.deepEqual(X).',
     },
     fixable: 'code',
     schema: [],
     messages: {
-      preferAssertOverAssertOk:
-        'Use assert(X) instead of assert.ok(X), assert.isOk(X).',
+      preferAssertDeepStrictEqual:
+        'Use assert.deepStrictEqual(X) instead of assert.deepEqual(X).',
     },
   },
   defaultOptions: [],
@@ -27,14 +27,14 @@ export const preferAssertOverAssertOkRule: TSESLint.RuleModule<
         node.object.type === AST_NODE_TYPES.Identifier &&
         node.object.name === 'assert' &&
         node.property.type === AST_NODE_TYPES.Identifier &&
-        (node.property.name === 'ok' || node.property.name === 'isOk') &&
+        node.property.name === 'deepEqual' &&
         node.parent.type === AST_NODE_TYPES.CallExpression &&
         node.parent.callee === node
       ) {
         context.report({
           node,
-          messageId: 'preferAssertOverAssertOk',
-          fix: (fixer) => fixer.replaceText(node, 'assert'),
+          messageId: 'preferAssertDeepStrictEqual',
+          fix: (fixer) => fixer.replaceText(node, 'assert.deepStrictEqual'),
         });
       }
     },

@@ -12,7 +12,7 @@ const thisDir = import.meta.dirname;
 
 export default [
   {
-    ignores: ['.eslintrc.cjs'],
+    ignores: ['.eslintrc.cjs', 'docs/**', 'agents/**'],
   },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
@@ -108,8 +108,6 @@ export default [
     }),
   },
 
-  ...eslintConfigForReact(['test/**/*.{mts,tsx}']),
-
   {
     files: ['src/**'],
     rules: defineKnownRules({
@@ -141,6 +139,9 @@ export default [
       'import-x/no-default-export': 'off',
     }),
   },
+
+  ...eslintConfigForReact(['test/**/*.{mts,tsx}']),
+
   {
     files: ['test/**'],
     rules: defineKnownRules({
@@ -156,7 +157,6 @@ export default [
       ],
     }),
   },
-
   {
     files: ['test/react-named-imports/**'],
     rules: defineKnownRules({

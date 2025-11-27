@@ -61,7 +61,7 @@ if (import.meta.vitest !== undefined) {
         expectType<typeof _typeNode, tsm.ArrayTypeNode>('=');
       }
 
-      assert(node.isKind(tsm.SyntaxKind.TypeOperator));
+      assert.isTrue(node.isKind(tsm.SyntaxKind.TypeOperator));
 
       if (!isReadonlyArrayTypeNode(node)) {
         throw new Error('node should be ReadonlyArrayTypeNode');
@@ -69,13 +69,13 @@ if (import.meta.vitest !== undefined) {
 
       expect(node.getOperator()).toBe(tsm.SyntaxKind.ReadonlyKeyword);
 
-      assert(node.getTypeNode().isKind(tsm.SyntaxKind.ArrayType));
+      assert.isTrue(node.getTypeNode().isKind(tsm.SyntaxKind.ArrayType));
     });
 
     test('should return false for non-readonly array', () => {
       const node = getTypeNodeFromSource('type Test = string[];', 'Test');
 
-      assert.notOk(isReadonlyArrayTypeNode(node));
+      assert.isFalse(isReadonlyArrayTypeNode(node));
     });
 
     test('should return false for readonly tuple', () => {
@@ -84,7 +84,7 @@ if (import.meta.vitest !== undefined) {
         'Test',
       );
 
-      assert.notOk(isReadonlyArrayTypeNode(node));
+      assert.isFalse(isReadonlyArrayTypeNode(node));
     });
   });
 }
@@ -111,7 +111,7 @@ if (import.meta.vitest !== undefined) {
         'Test',
       );
 
-      assert(isReadonlyTupleTypeNode(node));
+      assert.isTrue(isReadonlyTupleTypeNode(node));
 
       if (isReadonlyTupleTypeNode(node)) {
         const _operator = node.getOperator();
@@ -123,7 +123,7 @@ if (import.meta.vitest !== undefined) {
         expectType<typeof _typeNode, tsm.TupleTypeNode>('=');
       }
 
-      assert(node.isKind(tsm.SyntaxKind.TypeOperator));
+      assert.isTrue(node.isKind(tsm.SyntaxKind.TypeOperator));
 
       if (!isReadonlyTupleTypeNode(node)) {
         throw new Error('node should be ReadonlyTupleTypeNode');
@@ -131,13 +131,13 @@ if (import.meta.vitest !== undefined) {
 
       expect(node.getOperator()).toBe(tsm.SyntaxKind.ReadonlyKeyword);
 
-      assert(node.getTypeNode().isKind(tsm.SyntaxKind.TupleType));
+      assert.isTrue(node.getTypeNode().isKind(tsm.SyntaxKind.TupleType));
     });
 
     test('should return false for non-readonly tuple', () => {
       const node = getTypeNodeFromSource('type Test = [boolean];', 'Test');
 
-      assert.notOk(isReadonlyTupleTypeNode(node));
+      assert.isFalse(isReadonlyTupleTypeNode(node));
     });
 
     test('should return false for readonly array', () => {
@@ -146,7 +146,7 @@ if (import.meta.vitest !== undefined) {
         'Test',
       );
 
-      assert.notOk(isReadonlyTupleTypeNode(node));
+      assert.isFalse(isReadonlyTupleTypeNode(node));
     });
   });
 }
@@ -187,7 +187,7 @@ if (import.meta.vitest !== undefined) {
         'Test',
       );
 
-      assert(isReadonlyTypeReferenceNode(node));
+      assert.isTrue(isReadonlyTypeReferenceNode(node));
 
       if (isReadonlyTypeReferenceNode(node)) {
         const _typeNameText = node.getTypeName().getText();
@@ -202,7 +202,7 @@ if (import.meta.vitest !== undefined) {
         >('=');
       }
 
-      assert(node.isKind(tsm.SyntaxKind.TypeReference));
+      assert.isTrue(node.isKind(tsm.SyntaxKind.TypeReference));
 
       if (!isReadonlyTypeReferenceNode(node)) {
         throw new Error('node should be ReadonlyNode');
@@ -219,14 +219,14 @@ if (import.meta.vitest !== undefined) {
         'Test',
       );
 
-      assert.notOk(isReadonlyTypeReferenceNode(node));
+      assert.isFalse(isReadonlyTypeReferenceNode(node));
     });
 
     test('should return false for Readonly without type arguments', () => {
       // Note: This is syntactically incorrect TS, but testing the guard
       const node = getTypeNodeFromSource('type Test = Readonly;', 'Test');
 
-      assert.notOk(isReadonlyTypeReferenceNode(node));
+      assert.isFalse(isReadonlyTypeReferenceNode(node));
     });
 
     test('should return false for Readonly with multiple type arguments', () => {
@@ -241,7 +241,7 @@ if (import.meta.vitest !== undefined) {
 
       const node = sourceFile.getTypeAliasOrThrow('Test').getTypeNodeOrThrow();
 
-      assert.notOk(isReadonlyTypeReferenceNode(node));
+      assert.isFalse(isReadonlyTypeReferenceNode(node));
     });
   });
 }

@@ -6,11 +6,11 @@ import {
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
 
-type MessageIds = 'preferAssertNotOkOverExpectFalse';
+type MessageIds = 'preferAssertIsFalseOverExpectFalse';
 
 type Options = readonly [];
 
-export const preferAssertNotOkOverExpectFalseRule: TSESLint.RuleModule<
+export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
   MessageIds,
   Options
 > = {
@@ -18,13 +18,13 @@ export const preferAssertNotOkOverExpectFalseRule: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Prefer assert.notOk(X) over expect(X).toBe(false) (only if X is boolean)',
+        'Prefer assert.isFalse(X) over expect(X).toBe(false) (only if X is boolean)',
     },
     fixable: 'code',
     schema: [],
     messages: {
-      preferAssertNotOkOverExpectFalse:
-        'Use assert.notOk(X) instead of expect(X).toBe(false)',
+      preferAssertIsFalseOverExpectFalse:
+        'Use assert.isFalse(X) instead of expect(X).toBe(false)',
     },
   },
   defaultOptions: [],
@@ -64,8 +64,9 @@ export const preferAssertNotOkOverExpectFalseRule: TSESLint.RuleModule<
 
           context.report({
             node,
-            messageId: 'preferAssertNotOkOverExpectFalse',
-            fix: (fixer) => fixer.replaceText(node, `assert.notOk(${argText})`),
+            messageId: 'preferAssertIsFalseOverExpectFalse',
+            fix: (fixer) =>
+              fixer.replaceText(node, `assert.isFalse(${argText})`),
           });
         }
       },

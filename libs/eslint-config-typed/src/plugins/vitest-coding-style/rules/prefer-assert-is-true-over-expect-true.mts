@@ -6,11 +6,11 @@ import {
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
 
-type MessageIds = 'preferAssertOverExpectTrue';
+type MessageIds = 'preferAssertIsTrueOverExpectTrue';
 
 type Options = readonly [];
 
-export const preferAssertOverExpectTrueRule: TSESLint.RuleModule<
+export const preferAssertIsTrueOverExpectTrueRule: TSESLint.RuleModule<
   MessageIds,
   Options
 > = {
@@ -18,13 +18,13 @@ export const preferAssertOverExpectTrueRule: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Prefer assert(X) over expect(X).toBe(true) (only if X is boolean)',
+        'Prefer assert.isTrue(X) over expect(X).toBe(true) (only if X is boolean)',
     },
     fixable: 'code',
     schema: [],
     messages: {
-      preferAssertOverExpectTrue:
-        'Use assert(X) instead of expect(X).toBe(true)',
+      preferAssertIsTrueOverExpectTrue:
+        'Use assert.isTrue(X) instead of expect(X).toBe(true)',
     },
   },
   defaultOptions: [],
@@ -64,8 +64,9 @@ export const preferAssertOverExpectTrueRule: TSESLint.RuleModule<
 
           context.report({
             node,
-            messageId: 'preferAssertOverExpectTrue',
-            fix: (fixer) => fixer.replaceText(node, `assert(${argText})`),
+            messageId: 'preferAssertIsTrueOverExpectTrue',
+            fix: (fixer) =>
+              fixer.replaceText(node, `assert.isTrue(${argText})`),
           });
         }
       },
