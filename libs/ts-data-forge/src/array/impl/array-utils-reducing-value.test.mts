@@ -491,9 +491,7 @@ describe('Arr reducing value', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe('Hello World');
-      }
+      expect(result.value).toBe('Hello World');
     });
 
     test('should handle empty separator', () => {
@@ -503,9 +501,7 @@ describe('Arr reducing value', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe('abc');
-      }
+      expect(result.value).toBe('abc');
     });
 
     test('should handle undefined separator', () => {
@@ -515,9 +511,7 @@ describe('Arr reducing value', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe('a,b,c');
-      }
+      expect(result.value).toBe('a,b,c');
     });
 
     test('should work with curried version', () => {
@@ -527,9 +521,7 @@ describe('Arr reducing value', () => {
 
       assert.isTrue(Result.isOk(result));
 
-      if (Result.isOk(result)) {
-        expect(result.value).toBe('x-y-z');
-      }
+      expect(result.value).toBe('x-y-z');
     });
   });
 });

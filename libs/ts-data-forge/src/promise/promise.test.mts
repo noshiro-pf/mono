@@ -14,9 +14,7 @@ describe(createPromise, () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toBe(42);
-    }
+    expect(result.value).toBe(42);
   });
 
   test('resolves to Result.err when executor rejects', async () => {
@@ -28,9 +26,7 @@ describe(createPromise, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      expect(result.value).toBe(rejection);
-    }
+    expect(result.value).toBe(rejection);
   });
 
   test('supports non-Error rejection reasons', async () => {
@@ -40,10 +36,8 @@ describe(createPromise, () => {
 
     assert.isTrue(Result.isErr(result));
 
-    if (Result.isErr(result)) {
-      expectType<typeof result.value, string>('=');
+    expectType<typeof result.value, string>('=');
 
-      expect(result.value).toBe('failure');
-    }
+    expect(result.value).toBe('failure');
   });
 });

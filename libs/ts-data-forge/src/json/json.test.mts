@@ -141,7 +141,6 @@ describe('parse', () => {
     assert.isTrue(Result.isOk(result));
 
     if (
-      Result.isOk(result) &&
       isRecord(result.value) &&
       hasKey(result.value, 'name') &&
       hasKey(result.value, 'created')
@@ -168,20 +167,18 @@ describe('parse', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toHaveProperty('number');
+    expect(result.value).toHaveProperty('number');
 
-      expect(result.value).toHaveProperty('text');
+    expect(result.value).toHaveProperty('text');
 
-      if (
-        isRecord(result.value) &&
-        hasKey(result.value, 'number') &&
-        hasKey(result.value, 'text')
-      ) {
-        expect(result.value.number).toBe(42);
+    if (
+      isRecord(result.value) &&
+      hasKey(result.value, 'number') &&
+      hasKey(result.value, 'text')
+    ) {
+      expect(result.value.number).toBe(42);
 
-        expect(result.value.text).toBe('hello');
-      }
+      expect(result.value.text).toBe('hello');
     }
   });
 });
@@ -348,11 +345,9 @@ describe('stringify', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toContain('[REDACTED]');
+    expect(result.value).toContain('[REDACTED]');
 
-      expect(result.value).not.toContain('secret123');
-    }
+    expect(result.value).not.toContain('secret123');
   });
 
   test('should format output with space parameter (number)', () => {
@@ -362,11 +357,9 @@ describe('stringify', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toContain('\n');
+    expect(result.value).toContain('\n');
 
-      expect(result.value).toContain('  '); // 2 spaces indentation
-    }
+    expect(result.value).toContain('  '); // 2 spaces indentation
   });
 
   test('should format output with space parameter (string)', () => {
@@ -376,11 +369,9 @@ describe('stringify', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toContain('\n');
+    expect(result.value).toContain('\n');
 
-      expect(result.value).toContain('\t'); // tab indentation
-    }
+    expect(result.value).toContain('\t'); // tab indentation
   });
 });
 
@@ -398,21 +389,19 @@ describe('stringifySelected', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      assert.isTrue(isString(result.value));
+    assert.isTrue(isString(result.value));
 
-      const parsed: unknown = JSON.parse(result.value);
+    const parsed: unknown = JSON.parse(result.value);
 
-      assert.deepStrictEqual(parsed, {
-        id: 1,
-        name: 'Alice',
-        email: 'alice@example.com',
-      });
+    assert.deepStrictEqual(parsed, {
+      id: 1,
+      name: 'Alice',
+      email: 'alice@example.com',
+    });
 
-      expect(parsed).not.toHaveProperty('password');
+    expect(parsed).not.toHaveProperty('password');
 
-      expect(parsed).not.toHaveProperty('lastLogin');
-    }
+    expect(parsed).not.toHaveProperty('lastLogin');
   });
 
   test('should work with nested objects', () => {
@@ -434,29 +423,27 @@ describe('stringifySelected', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      assert.isTrue(isString(result.value));
+    assert.isTrue(isString(result.value));
 
-      const parsed: unknown = JSON.parse(result.value);
+    const parsed: unknown = JSON.parse(result.value);
 
-      if (isRecord(parsed) && hasKey(parsed, 'users')) {
-        assert.isFalse(isRecord(parsed.users));
+    if (isRecord(parsed) && hasKey(parsed, 'users')) {
+      assert.isTrue(Arr.isArray(parsed.users));
 
-        expect(parsed.users).toHaveLength(2);
+      expect(parsed.users).toHaveLength(2);
 
-        if (Arr.isArray(parsed.users)) {
-          assert.deepStrictEqual(parsed.users[0], { id: 1, name: 'Alice' });
+      if (Arr.isArray(parsed.users)) {
+        assert.deepStrictEqual(parsed.users[0], { id: 1, name: 'Alice' });
 
-          expect(parsed.users[0]).not.toHaveProperty('secret');
-        }
+        expect(parsed.users[0]).not.toHaveProperty('secret');
+      }
 
-        if (isRecord(parsed) && hasKey(parsed, 'metadata')) {
-          assert.deepStrictEqual(parsed.metadata, { total: 2 });
+      if (isRecord(parsed) && hasKey(parsed, 'metadata')) {
+        assert.deepStrictEqual(parsed.metadata, { total: 2 });
 
-          expect(parsed.metadata).not.toHaveProperty('page');
+        expect(parsed.metadata).not.toHaveProperty('page');
 
-          expect(parsed.metadata).not.toHaveProperty('internal');
-        }
+        expect(parsed.metadata).not.toHaveProperty('internal');
       }
     }
   });
@@ -472,17 +459,15 @@ describe('stringifySelected', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      assert.isTrue(isString(result.value));
+    assert.isTrue(isString(result.value));
 
-      const parsed: unknown = JSON.parse(result.value);
+    const parsed: unknown = JSON.parse(result.value);
 
-      // Note: stringifySelected works with JSON.stringify's replacer parameter
-      // which may not work as expected with arrays
-      assert.isTrue(Array.isArray(parsed));
+    // Note: stringifySelected works with JSON.stringify's replacer parameter
+    // which may not work as expected with arrays
+    assert.isTrue(Array.isArray(parsed));
 
-      expect(parsed).toHaveLength(3);
-    }
+    expect(parsed).toHaveLength(3);
   });
 
   test('should handle formatting with space parameter', () => {
@@ -492,11 +477,9 @@ describe('stringifySelected', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toContain('\n');
+    expect(result.value).toContain('\n');
 
-      expect(result.value).toContain('  ');
-    }
+    expect(result.value).toContain('  ');
   });
 
   test('should handle empty selection array', () => {
@@ -506,9 +489,7 @@ describe('stringifySelected', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toBe('{}');
-    }
+    expect(result.value).toBe('{}');
   });
 
   test('should handle undefined properties parameter', () => {
@@ -518,13 +499,11 @@ describe('stringifySelected', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      assert.isTrue(isString(result.value));
+    assert.isTrue(isString(result.value));
 
-      const parsed: unknown = JSON.parse(result.value);
+    const parsed: unknown = JSON.parse(result.value);
 
-      assert.deepStrictEqual(parsed, { a: 1, b: 2 });
-    }
+    assert.deepStrictEqual(parsed, { a: 1, b: 2 });
   });
 
   test('should handle circular references with error', () => {
@@ -558,11 +537,9 @@ describe('stringifySortedKey', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toBe(
-        '{"aardvark":"animal","apple":"fruit","banana":"fruit","zebra":"animal"}',
-      );
-    }
+    expect(result.value).toBe(
+      '{"aardvark":"animal","apple":"fruit","banana":"fruit","zebra":"animal"}',
+    );
   });
 
   test('should sort nested object keys', () => {
@@ -586,26 +563,24 @@ describe('stringifySortedKey', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      assert.isTrue(isString(result.value));
+    assert.isTrue(isString(result.value));
 
-      const parsed: unknown = JSON.parse(result.value);
+    const parsed: unknown = JSON.parse(result.value);
 
-      if (isRecord(parsed)) {
-        const keys = Object.keys(parsed);
+    if (isRecord(parsed)) {
+      const keys = Object.keys(parsed);
 
-        assert.deepStrictEqual(keys, ['settings', 'user']); // sorted top-level keys
+      assert.deepStrictEqual(keys, ['settings', 'user']); // sorted top-level keys
 
-        if (hasKey(parsed, 'user') && isRecord(parsed.user)) {
-          const userKeys = Object.keys(parsed.user);
+      if (hasKey(parsed, 'user') && isRecord(parsed.user)) {
+        const userKeys = Object.keys(parsed.user);
 
-          assert.deepStrictEqual(userKeys, ['address', 'age', 'name']); // sorted nested keys
+        assert.deepStrictEqual(userKeys, ['address', 'age', 'name']); // sorted nested keys
 
-          if (hasKey(parsed.user, 'address') && isRecord(parsed.user.address)) {
-            const addressKeys = Object.keys(parsed.user.address);
+        if (hasKey(parsed.user, 'address') && isRecord(parsed.user.address)) {
+          const addressKeys = Object.keys(parsed.user.address);
 
-            assert.deepStrictEqual(addressKeys, ['city', 'country', 'zip']); // sorted deeper nested keys
-          }
+          assert.deepStrictEqual(addressKeys, ['city', 'country', 'zip']); // sorted deeper nested keys
         }
       }
     }
@@ -628,41 +603,35 @@ describe('stringifySortedKey', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      assert.isTrue(isString(result.value));
+    assert.isTrue(isString(result.value));
 
-      const parsed: unknown = JSON.parse(result.value);
+    const parsed: unknown = JSON.parse(result.value);
 
-      if (isRecord(parsed)) {
-        // Check top-level keys are sorted
-        const topKeys = Object.keys(parsed);
+    if (isRecord(parsed)) {
+      // Check top-level keys are sorted
+      const topKeys = Object.keys(parsed);
 
-        assert.deepStrictEqual(topKeys, ['metadata', 'users']);
+      assert.deepStrictEqual(topKeys, ['metadata', 'users']);
 
-        // Check metadata keys are sorted
-        if (hasKey(parsed, 'metadata') && isRecord(parsed.metadata)) {
-          const metadataKeys = Object.keys(parsed.metadata);
+      // Check metadata keys are sorted
+      if (hasKey(parsed, 'metadata') && isRecord(parsed.metadata)) {
+        const metadataKeys = Object.keys(parsed.metadata);
 
-          assert.deepStrictEqual(metadataKeys, [
-            'author',
-            'created',
-            'version',
-          ]);
-        }
+        assert.deepStrictEqual(metadataKeys, ['author', 'created', 'version']);
+      }
 
-        // Check user object keys are sorted
-        if (
-          hasKey(parsed, 'users') &&
-          Arr.isArray(parsed.users) &&
-          Arr.isNonEmpty(parsed.users)
-        ) {
-          const firstUser = parsed.users[0];
+      // Check user object keys are sorted
+      if (
+        hasKey(parsed, 'users') &&
+        Arr.isArray(parsed.users) &&
+        Arr.isNonEmpty(parsed.users)
+      ) {
+        const firstUser = parsed.users[0];
 
-          if (isRecord(firstUser)) {
-            const userKeys = Object.keys(firstUser);
+        if (isRecord(firstUser)) {
+          const userKeys = Object.keys(firstUser);
 
-            assert.deepStrictEqual(userKeys, ['active', 'id', 'name']);
-          }
+          assert.deepStrictEqual(userKeys, ['active', 'id', 'name']);
         }
       }
     }
@@ -675,13 +644,11 @@ describe('stringifySortedKey', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toContain('\n');
+    expect(result.value).toContain('\n');
 
-      expect(result.value).toContain('  ');
+    expect(result.value).toContain('  ');
 
-      expect(result.value).toMatch(/\{\s+"a": 1,\s+"b": 2\s+\}/u);
-    }
+    expect(result.value).toMatch(/\{\s+"a": 1,\s+"b": 2\s+\}/u);
   });
 
   test('should produce deterministic output', () => {
@@ -697,9 +664,7 @@ describe('stringifySortedKey', () => {
 
     assert.isTrue(Result.isOk(result2));
 
-    if (Result.isOk(result1) && Result.isOk(result2)) {
-      expect(result1.value).toBe(result2.value);
-    }
+    expect(result1.value).toBe(result2.value);
   });
 
   test('should handle problematic objects', () => {
@@ -735,9 +700,7 @@ describe('stringifySortedKey', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      expect(result.value).toBe('{}');
-    }
+    expect(result.value).toBe('{}');
   });
 
   test('should handle deeply nested structures', () => {
@@ -757,27 +720,25 @@ describe('stringifySortedKey', () => {
 
     assert.isTrue(Result.isOk(result));
 
-    if (Result.isOk(result)) {
-      assert.isTrue(isString(result.value));
+    assert.isTrue(isString(result.value));
 
-      const parsed: unknown = JSON.parse(result.value);
+    const parsed: unknown = JSON.parse(result.value);
 
-      if (isRecord(parsed) && hasKey(parsed, 'level1')) {
-        const level1 = parsed.level1;
+    if (isRecord(parsed) && hasKey(parsed, 'level1')) {
+      const level1 = parsed.level1;
 
-        if (isRecord(level1)) {
-          assert.deepStrictEqual(Object.keys(level1), ['a', 'z']);
+      if (isRecord(level1)) {
+        assert.deepStrictEqual(Object.keys(level1), ['a', 'z']);
 
-          if (
-            hasKey(level1, 'a') &&
-            isRecord(level1.a) &&
-            hasKey(level1.a, 'nested')
-          ) {
-            const nested = level1.a.nested;
+        if (
+          hasKey(level1, 'a') &&
+          isRecord(level1.a) &&
+          hasKey(level1.a, 'nested')
+        ) {
+          const nested = level1.a.nested;
 
-            if (isRecord(nested)) {
-              assert.deepStrictEqual(Object.keys(nested), ['x', 'y']);
-            }
+          if (isRecord(nested)) {
+            assert.deepStrictEqual(Object.keys(nested), ['x', 'y']);
           }
         }
       }
