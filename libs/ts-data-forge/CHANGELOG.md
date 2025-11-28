@@ -1,3 +1,9 @@
+## [5.1.1](https://github.com/noshiro-pf/ts-data-forge/compare/v5.1.0...v5.1.1) (2025-11-28)
+
+### Bug Fixes
+
+- fix runtime dependency ([#221](https://github.com/noshiro-pf/ts-data-forge/issues/221)) ([12eda3b](https://github.com/noshiro-pf/ts-data-forge/commit/12eda3bdcba2d3605b98ab0d89b2db4713c23ffa))
+
 # [5.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v5.0.1...v5.1.0) (2025-11-21)
 
 ### Features
