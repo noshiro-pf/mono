@@ -1,3 +1,14 @@
+# [6.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v5.1.1...v6.0.0) (2025-11-28)
+
+### Features
+
+- **breaking:** fix isRecord implementation ([#222](https://github.com/noshiro-pf/ts-data-forge/issues/222)) ([cb146db](https://github.com/noshiro-pf/ts-data-forge/commit/cb146db2db5daf2952c34fdda5dd6b9a8cc903bd))
+
+### BREAKING CHANGES
+
+- **breaking:** Changed the implementation of `isRecord` function.
+  The `isRecord` function previously returned `false` for arrays, but now it returns `true` because `string[]` etc. can be assigned to `Record<string, unknown>`.
+
 ## [5.1.1](https://github.com/noshiro-pf/ts-data-forge/compare/v5.1.0...v5.1.1) (2025-11-28)
 
 ### Bug Fixes
