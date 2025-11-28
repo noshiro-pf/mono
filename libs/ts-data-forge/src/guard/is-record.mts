@@ -38,8 +38,7 @@ import { isNonNullObject } from './is-non-null-object.mjs';
  * @see {@link isNonNullObject} - For checking any object type (includes arrays)
  * @see {@link hasKey} - For checking if a record has specific keys
  */
-export const isRecord = (u: unknown): u is UnknownRecord =>
-  isNonNullObject(u) && !Array.isArray(u);
+export const isRecord = (u: unknown): u is UnknownRecord => isNonNullObject(u);
 
 /**
  * Type guard that checks if a value is a mutable record (an object with mutable string keys).

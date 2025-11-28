@@ -2,110 +2,100 @@ import { expectType } from '../expect-type.mjs';
 import { isRecord } from './is-record.mjs';
 
 describe(isRecord, () => {
-  test('{ x: 1 } is a record', () => {
-    const obj = { x: 1 } as const;
+  describe('arrays are Records', () => {
+    test('number[] is assignable to Record<number, unknown>', () => {
+      const arr: Record<number, unknown> = [1, 2, 3];
 
-    const unk: unknown = obj;
+      const unk: unknown = arr;
 
-    const res = isRecord(unk);
+      assert.isTrue(isRecord(unk));
 
-    expectType<typeof obj, UnknownRecord>('<=');
+      expectType<typeof unk, UnknownRecord>('<=');
+    });
 
-    expectType<typeof res, boolean>('=');
+    test('string[] is assignable to Record<number, unknown>', () => {
+      const arr: Record<number, unknown> = ['1', '2', '3'];
 
-    if (res) {
-      expectType<typeof unk, UnknownRecord>('=');
-    }
+      const unk: unknown = arr;
 
-    assert.isTrue(res);
+      assert.isTrue(isRecord(unk));
+
+      expectType<typeof unk, UnknownRecord>('<=');
+    });
+
+    test('[] is a record', () => {
+      const arr: unknown = [] as const;
+
+      const unk: unknown = arr;
+
+      assert.isTrue(isRecord(unk));
+
+      expectType<typeof unk, UnknownRecord>('<=');
+    });
   });
 
-  test('{} is a record', () => {
-    const obj = {} as const;
+  describe('non-null objects are Records', () => {
+    test('{ x: 1 } is a record', () => {
+      const obj = { x: 1 } as const;
 
-    const unk: unknown = obj;
+      const unk: unknown = obj;
 
-    const res = isRecord(unk);
+      assert.isTrue(isRecord(unk));
 
-    expectType<typeof obj, {}>('=');
+      expectType<typeof unk, UnknownRecord>('<=');
+    });
 
-    expectType<typeof res, boolean>('=');
+    test('{} is a record', () => {
+      const obj = {} as const;
 
-    if (res) {
-      expectType<typeof unk, UnknownRecord>('=');
-    }
+      const unk: unknown = obj;
 
-    assert.isTrue(res);
+      assert.isTrue(isRecord(unk));
+
+      expectType<typeof unk, UnknownRecord>('<=');
+    });
   });
 
-  test('[] is not a record', () => {
-    const obj: DeepReadonly<never[]> = [] as const;
+  describe('primitives are not Records', () => {
+    test('null is not a record', () => {
+      const obj = null;
 
-    const unk: unknown = obj;
+      const unk: unknown = obj;
 
-    const res = isRecord(unk);
+      assert.isFalse(isRecord(unk));
 
-    expectType<typeof obj, readonly never[]>('=');
+      expectType<typeof unk, UnknownRecord>('!<=');
+    });
 
-    expectType<typeof res, boolean>('=');
+    test('undefined is not a record', () => {
+      const prm = undefined;
 
-    assert.isFalse(res);
-  });
+      const unk: unknown = prm;
 
-  test('null is not a record', () => {
-    const obj = null;
+      assert.isFalse(isRecord(unk));
 
-    const unk: unknown = obj;
+      expectType<typeof unk, UnknownRecord>('!<=');
+    });
 
-    const res = isRecord(unk);
+    test('3 is not a record', () => {
+      const prm = 3;
 
-    expectType<typeof obj, null>('=');
+      const unk: unknown = prm;
 
-    expectType<typeof res, boolean>('=');
+      assert.isFalse(isRecord(unk));
 
-    assert.isFalse(res);
-  });
+      expectType<typeof unk, UnknownRecord>('!<=');
+    });
 
-  test('undefined is not a record', () => {
-    const obj = undefined;
+    test('"str" is not a record', () => {
+      const prm = 'str';
 
-    const unk: unknown = obj;
+      const unk: unknown = prm;
 
-    const res = isRecord(unk);
+      assert.isFalse(isRecord(unk));
 
-    expectType<typeof obj, undefined>('=');
-
-    expectType<typeof res, boolean>('=');
-
-    assert.isFalse(res);
-  });
-
-  test('3 is not a record', () => {
-    const obj = 3;
-
-    const unk: unknown = obj;
-
-    const res = isRecord(unk);
-
-    expectType<typeof obj, 3>('=');
-
-    expectType<typeof res, boolean>('=');
-
-    assert.isFalse(res);
-  });
-
-  test('"str" is not a record', () => {
-    const obj = 'str';
-
-    const unk: unknown = obj;
-
-    const res = isRecord(unk);
-
-    expectType<typeof obj, 'str'>('=');
-
-    expectType<typeof res, boolean>('=');
-
-    assert.isFalse(res);
+      expectType<typeof unk, UnknownRecord>('!<=');
+    });
   });
 
   // test('Map is not a record', () => {
