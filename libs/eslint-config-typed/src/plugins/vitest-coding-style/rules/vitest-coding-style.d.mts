@@ -1,11 +1,51 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 /* eslint-disable @typescript-eslint/no-restricted-types */
-// eslint-disable-next-line vitest/no-importing-vitest-globals
-import { type assert as originalAssert } from 'vitest';
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 
 declare global {
-  const assert: Pick<originalAssert, never> & OverriddenAssert;
+  const assert: OverriddenAssert;
+
+  const suite: (typeof import('vitest'))['suite'];
+
+  const test: (typeof import('vitest'))['test'];
+
+  const chai: (typeof import('vitest'))['chai'];
+
+  const describe: (typeof import('vitest'))['describe'];
+
+  const it: (typeof import('vitest'))['it'];
+
+  const expectTypeOf: (typeof import('vitest'))['expectTypeOf'];
+
+  const assertType: (typeof import('vitest'))['assertType'];
+
+  const expect: (typeof import('vitest'))['expect'];
+
+  const vitest: (typeof import('vitest'))['vitest'];
+
+  const vi: (typeof import('vitest'))['vitest'];
+
+  const beforeAll: (typeof import('vitest'))['beforeAll'];
+
+  const afterAll: (typeof import('vitest'))['afterAll'];
+
+  const beforeEach: (typeof import('vitest'))['beforeEach'];
+
+  const afterEach: (typeof import('vitest'))['afterEach'];
+
+  const onTestFailed: (typeof import('vitest'))['onTestFailed'];
+
+  const onTestFinished: (typeof import('vitest'))['onTestFinished'];
 }
+
+// eslint-disable-next-line unicorn/require-module-specifiers
+export {};
+
+type Constructor<T> = Chai.Constructor<T>;
+
+type Operator = Chai.Operator;
+
+type OperatorComparable = Chai.OperatorComparable;
 
 type OverriddenAssert = Readonly<{
   /**
