@@ -1,3 +1,9 @@
+## [4.0.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.0...v4.0.1) (2025-11-28)
+
+### Bug Fixes
+
+- fix vitest global type export ([#161](https://github.com/noshiro-pf/eslint-config-typed/issues/161)) ([0a3819a](https://github.com/noshiro-pf/eslint-config-typed/commit/0a3819a2da4d5a2d8379462a2b821cc5522595ae))
+
 # [4.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.14.1...v4.0.0) (2025-11-27)
 
 ### Features
