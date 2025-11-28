@@ -611,7 +611,7 @@ assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);
 - **Type Safety**: All utilities are designed with TypeScript's type system in mind, providing compile-time guarantees.
 - **Immutability**: Data structures and operations promote immutable patterns for safer, more predictable code.
 - **Functional Programming**: Support for functional programming paradigms with utilities like `Optional`, `Result`, and `pipe`.
-- **Zero Runtime Dependencies**: The library has no external runtime dependencies, keeping your bundle size minimal.
+- **Zero Runtime Dependencies**: The library has no external runtime dependencies except for [@sindresorhus/is](https://github.com/sindresorhus/is), keeping your bundle size minimal.
 - **Comprehensive Testing**: All utilities are thoroughly tested with both runtime and compile-time tests.
 
 **Important Notes:**
