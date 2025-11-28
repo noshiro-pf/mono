@@ -1,3 +1,9 @@
+## [4.0.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.1...v4.0.2) (2025-11-28)
+
+### Bug Fixes
+
+- fix vitest globals path ([#162](https://github.com/noshiro-pf/eslint-config-typed/issues/162)) ([49baadb](https://github.com/noshiro-pf/eslint-config-typed/commit/49baadb5c460fc53c3c18cb64ee468e314a0645e))
+
 ## [4.0.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.0...v4.0.1) (2025-11-28)
 
 ### Bug Fixes
