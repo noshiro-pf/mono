@@ -598,7 +598,7 @@ export default [
     "compilerOptions": {
         "types": [
             // "vitest/globals", // Remove this line
-            "eslint-config-typed/vitest", // Add this line
+            "eslint-config-typed/vitest-globals", // Add this line
             "vitest/importMeta",
         ],
     },

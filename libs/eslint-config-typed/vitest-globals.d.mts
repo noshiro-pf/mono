@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-restricted-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
+// Copied from https://github.com/vitest-dev/vitest/blob/v4.0.14/packages/vitest/globals.d.ts and replaced `assert`
+
 declare global {
   const assert: OverriddenAssert;
 

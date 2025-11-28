@@ -20,8 +20,8 @@
         "default": "./dist/entry-point.mjs"
       }
     },
-    "./vitest": {
-      "types": "./src/plugins/vitest-coding-style/rules/vitest-coding-style.d.mts"
+    "./vitest-globals": {
+      "types": "./vitest-globals.d.mts"
     }
   },
   "module": "./dist/entry-point.mjs",
@@ -103,7 +103,7 @@
     "is-glob": "^4.0.3",
     "is-immutable-type": "5.0.1",
     "micromatch": "^4.0.8",
-    "ts-data-forge": "^5.1.0",
+    "ts-data-forge": "^6.0.0",
     "tsutils": "3.21.0",
     "typescript-eslint": "8.48.0"
   },
@@ -139,10 +139,10 @@
     "markdownlint": "^0.39.0",
     "markdownlint-cli2": "^0.19.1",
     "npm-run-all2": "^8.0.4",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.1",
     "prettier-plugin-jsdoc": "^1.5.0",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-packagejson": "^2.5.19",
+    "prettier-plugin-packagejson": "^2.5.20",
     "react": "^19.2.0",
     "rollup": "^4.53.3",
     "semantic-release": "^25.0.2",

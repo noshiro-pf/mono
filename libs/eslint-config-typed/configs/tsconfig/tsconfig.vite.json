@@ -7,7 +7,5 @@
       "vitest/importMeta"
     ]
   },
-  "include": [
-    "../../src/plugins/vitest-coding-style/rules/vitest-coding-style.d.mts"
-  ]
+  "include": ["../../vitest-globals.d.mts"]
 }
