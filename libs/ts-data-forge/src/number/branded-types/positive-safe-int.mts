@@ -38,13 +38,13 @@ const {
  * @example
  *
  * ```ts
- * assert.ok(isPositiveSafeInt(1));
+ * assert.isTrue(isPositiveSafeInt(1));
  *
- * assert.ok(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
+ * assert.isTrue(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
  *
- * assert.notOk(isPositiveSafeInt(0));
+ * assert.isFalse(isPositiveSafeInt(0));
  *
- * assert.ok(PositiveSafeInt.is(42));
+ * assert.isTrue(PositiveSafeInt.is(42));
  * ```
  *
  * @param value The value to check.
@@ -60,9 +60,9 @@ export const isPositiveSafeInt = is;
  * ```ts
  * const branded = asPositiveSafeInt(128);
  *
- * assert(branded === 128);
+ * assert.isTrue(branded === 128);
  *
- * assert.ok(PositiveSafeInt.is(branded));
+ * assert.isTrue(PositiveSafeInt.is(branded));
  * ```
  *
  * @param value The value to cast.
@@ -87,13 +87,13 @@ export const PositiveSafeInt = {
    * @example
    *
    * ```ts
-   * assert.ok(isPositiveSafeInt(1));
+   * assert.isTrue(isPositiveSafeInt(1));
    *
-   * assert.ok(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
+   * assert.isTrue(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
    *
-   * assert.notOk(isPositiveSafeInt(0));
+   * assert.isFalse(isPositiveSafeInt(0));
    *
-   * assert.ok(PositiveSafeInt.is(42));
+   * assert.isTrue(PositiveSafeInt.is(42));
    * ```
    *
    * @param value The value to check.
@@ -127,7 +127,7 @@ export const PositiveSafeInt = {
    *   asPositiveSafeInt(5),
    * );
    *
-   * assert(smallest === 5);
+   * assert.isTrue(smallest === 5);
    * ```
    *
    * @param a The first PositiveSafeInt.
@@ -147,7 +147,7 @@ export const PositiveSafeInt = {
    *   asPositiveSafeInt(5),
    * );
    *
-   * assert(largest === 10);
+   * assert.isTrue(largest === 10);
    * ```
    *
    * @param a The first PositiveSafeInt.
@@ -168,11 +168,11 @@ export const PositiveSafeInt = {
    *
    * const aboveRange = PositiveSafeInt.clamp(Number.MAX_SAFE_INTEGER + 10);
    *
-   * assert(belowRange === 1);
+   * assert.isTrue(belowRange === 1);
    *
-   * assert(withinRange === 123);
+   * assert.isTrue(withinRange === 123);
    *
-   * assert(aboveRange === Number.MAX_SAFE_INTEGER);
+   * assert.isTrue(aboveRange === Number.MAX_SAFE_INTEGER);
    * ```
    *
    * @param value The number to clamp.
@@ -192,9 +192,9 @@ export const PositiveSafeInt = {
    *
    * const randomValue = PositiveSafeInt.random(min, max);
    *
-   * assert.ok(PositiveSafeInt.is(randomValue));
+   * assert.isTrue(PositiveSafeInt.is(randomValue));
    *
-   * assert.ok(randomValue >= 1 && randomValue <= 6);
+   * assert.isTrue(randomValue >= 1 && randomValue <= 6);
    * ```
    *
    * @returns A random PositiveSafeInt between 1 and MAX_SAFE_INTEGER.
@@ -213,7 +213,7 @@ export const PositiveSafeInt = {
    *
    * const power = PositiveSafeInt.pow(base, exponent);
    *
-   * assert(power === 27);
+   * assert.isTrue(power === 27);
    * ```
    *
    * @param a The base PositiveSafeInt.
@@ -233,9 +233,9 @@ export const PositiveSafeInt = {
    *   asPositiveSafeInt(2048),
    * );
    *
-   * assert(sum === 3048);
+   * assert.isTrue(sum === 3048);
    *
-   * assert.ok(PositiveSafeInt.is(sum));
+   * assert.isTrue(PositiveSafeInt.is(sum));
    * ```
    *
    * @param a The first PositiveSafeInt.
@@ -255,9 +255,9 @@ export const PositiveSafeInt = {
    *   asPositiveSafeInt(20),
    * );
    *
-   * assert(difference === 1);
+   * assert.isTrue(difference === 1);
    *
-   * assert.ok(PositiveSafeInt.is(difference));
+   * assert.isTrue(PositiveSafeInt.is(difference));
    * ```
    *
    * @param a The minuend PositiveSafeInt.
@@ -278,9 +278,9 @@ export const PositiveSafeInt = {
    *   asPositiveSafeInt(20),
    * );
    *
-   * assert(product === 1000);
+   * assert.isTrue(product === 1000);
    *
-   * assert.ok(PositiveSafeInt.is(product));
+   * assert.isTrue(PositiveSafeInt.is(product));
    * ```
    *
    * @param a The first PositiveSafeInt.
@@ -305,9 +305,9 @@ export const PositiveSafeInt = {
    *   asPositiveSafeInt(50),
    * );
    *
-   * assert(quotient === 6);
+   * assert.isTrue(quotient === 6);
    *
-   * assert(clamped === 1);
+   * assert.isTrue(clamped === 1);
    * ```
    *
    * @param a The dividend PositiveSafeInt.

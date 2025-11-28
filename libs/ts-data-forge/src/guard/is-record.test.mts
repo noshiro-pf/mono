@@ -17,7 +17,7 @@ describe(isRecord, () => {
       expectType<typeof unk, UnknownRecord>('=');
     }
 
-    expect(res).toBe(true);
+    assert.isTrue(res);
   });
 
   test('{} is a record', () => {
@@ -35,7 +35,7 @@ describe(isRecord, () => {
       expectType<typeof unk, UnknownRecord>('=');
     }
 
-    expect(res).toBe(true);
+    assert.isTrue(res);
   });
 
   test('[] is not a record', () => {
@@ -49,7 +49,7 @@ describe(isRecord, () => {
 
     expectType<typeof res, boolean>('=');
 
-    expect(res).toBe(false);
+    assert.isFalse(res);
   });
 
   test('null is not a record', () => {
@@ -63,7 +63,7 @@ describe(isRecord, () => {
 
     expectType<typeof res, boolean>('=');
 
-    expect(res).toBe(false);
+    assert.isFalse(res);
   });
 
   test('undefined is not a record', () => {
@@ -77,7 +77,7 @@ describe(isRecord, () => {
 
     expectType<typeof res, boolean>('=');
 
-    expect(res).toBe(false);
+    assert.isFalse(res);
   });
 
   test('3 is not a record', () => {
@@ -91,7 +91,7 @@ describe(isRecord, () => {
 
     expectType<typeof res, boolean>('=');
 
-    expect(res).toBe(false);
+    assert.isFalse(res);
   });
 
   test('"str" is not a record', () => {
@@ -105,7 +105,7 @@ describe(isRecord, () => {
 
     expectType<typeof res, boolean>('=');
 
-    expect(res).toBe(false);
+    assert.isFalse(res);
   });
 
   // test('Map is not a record', () => {

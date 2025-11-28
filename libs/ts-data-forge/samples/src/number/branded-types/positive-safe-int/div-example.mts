@@ -12,6 +12,6 @@ const clamped = PositiveSafeInt.div(
   asPositiveSafeInt(50),
 );
 
-assert(quotient === 6);
+assert.isTrue(quotient === 6);
 
-assert(clamped === 1);
+assert.isTrue(clamped === 1);

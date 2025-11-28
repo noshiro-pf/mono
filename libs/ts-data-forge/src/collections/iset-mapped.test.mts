@@ -51,7 +51,7 @@ describe('ISetMapped.has', () => {
       fromKey,
     );
 
-    expect(s0.has({ v: 3 })).toBe(true);
+    assert.isTrue(s0.has({ v: 3 }));
   });
 
   test('case 2', () => {
@@ -61,7 +61,7 @@ describe('ISetMapped.has', () => {
       fromKey,
     );
 
-    expect(s0.has({ v: 4 })).toBe(false);
+    assert.isFalse(s0.has({ v: 4 }));
   });
 
   test('case 3', () => {
@@ -71,7 +71,7 @@ describe('ISetMapped.has', () => {
       fromKey,
     );
 
-    expect(s0.has({ v: 3 })).toBe(false);
+    assert.isFalse(s0.has({ v: 3 }));
   });
 });
 
@@ -488,9 +488,9 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(set.size).toBe(2);
 
-      expect(set.has({ id: 1, type: 'user' })).toBe(true);
+      assert.isTrue(set.has({ id: 1, type: 'user' }));
 
-      expect(set.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(set.has({ id: 2, type: 'admin' }));
     });
 
     test('should handle duplicate elements based on mapping', () => {
@@ -528,7 +528,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(ISetMapped.equal(set1, set2)).toBe(true);
+      assert.isTrue(ISetMapped.equal(set1, set2));
     });
 
     test('should return false for sets with different elements', () => {
@@ -550,7 +550,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(ISetMapped.equal(set1, set2)).toBe(false);
+      assert.isFalse(ISetMapped.equal(set1, set2));
     });
 
     test('should return true for empty sets', () => {
@@ -566,7 +566,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(ISetMapped.equal(set1, set2)).toBe(true);
+      assert.isTrue(ISetMapped.equal(set1, set2));
     });
   });
 
@@ -596,11 +596,11 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(diff.deleted.size).toBe(1);
 
-      expect(diff.deleted.has({ id: 1, type: 'user' })).toBe(true);
+      assert.isTrue(diff.deleted.has({ id: 1, type: 'user' }));
 
       expect(diff.added.size).toBe(1);
 
-      expect(diff.added.has({ id: 4, type: 'user' })).toBe(true);
+      assert.isTrue(diff.added.has({ id: 4, type: 'user' }));
     });
 
     test('should handle no changes', () => {
@@ -656,9 +656,9 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(intersection.size).toBe(2);
 
-      expect(intersection.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(intersection.has({ id: 2, type: 'admin' }));
 
-      expect(intersection.has({ id: 3, type: 'guest' })).toBe(true);
+      assert.isTrue(intersection.has({ id: 3, type: 'guest' }));
     });
 
     test('should compute union correctly', () => {
@@ -684,13 +684,13 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(union.size).toBe(4);
 
-      expect(union.has({ id: 1, type: 'user' })).toBe(true);
+      assert.isTrue(union.has({ id: 1, type: 'user' }));
 
-      expect(union.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(union.has({ id: 2, type: 'admin' }));
 
-      expect(union.has({ id: 3, type: 'guest' })).toBe(true);
+      assert.isTrue(union.has({ id: 3, type: 'guest' }));
 
-      expect(union.has({ id: 4, type: 'user' })).toBe(true);
+      assert.isTrue(union.has({ id: 4, type: 'user' }));
     });
   });
 
@@ -705,7 +705,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(set.every((el) => el.type === 'user')).toBe(true);
+      assert.isTrue(set.every((el) => el.type === 'user'));
     });
 
     test('should return false when some elements do not satisfy predicate', () => {
@@ -718,7 +718,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(set.every((el) => el.type === 'user')).toBe(false);
+      assert.isFalse(set.every((el) => el.type === 'user'));
     });
   });
 
@@ -733,7 +733,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(set.some((el) => el.type === 'admin')).toBe(true);
+      assert.isTrue(set.some((el) => el.type === 'admin'));
     });
 
     test('should return false when no elements satisfy predicate', () => {
@@ -746,7 +746,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(set.some((el) => el.type === 'admin')).toBe(false);
+      assert.isFalse(set.some((el) => el.type === 'admin'));
     });
   });
 
@@ -762,9 +762,9 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(updated.size).toBe(2);
 
-      expect(updated.has({ id: 1, type: 'user' })).toBe(true);
+      assert.isTrue(updated.has({ id: 1, type: 'user' }));
 
-      expect(updated.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(updated.has({ id: 2, type: 'admin' }));
     });
 
     test('should return same instance when adding existing element', () => {
@@ -795,9 +795,9 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(updated.size).toBe(1);
 
-      expect(updated.has({ id: 1, type: 'user' })).toBe(false);
+      assert.isFalse(updated.has({ id: 1, type: 'user' }));
 
-      expect(updated.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(updated.has({ id: 2, type: 'admin' }));
     });
 
     test('should return same instance when deleting non-existent element', () => {
@@ -829,11 +829,11 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(updated.size).toBe(2);
 
-      expect(updated.has({ id: 1, type: 'user' })).toBe(false);
+      assert.isFalse(updated.has({ id: 1, type: 'user' }));
 
-      expect(updated.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(updated.has({ id: 2, type: 'admin' }));
 
-      expect(updated.has({ id: 3, type: 'guest' })).toBe(true);
+      assert.isTrue(updated.has({ id: 3, type: 'guest' }));
     });
 
     test('should handle empty mutations array', () => {
@@ -847,7 +847,7 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(updated.size).toBe(1);
 
-      expect(ISetMapped.equal(set, updated)).toBe(true);
+      assert.isTrue(ISetMapped.equal(set, updated));
     });
   });
 
@@ -869,9 +869,9 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(transformed.size).toBe(2);
 
-      expect(transformed.has({ id: 1, type: 'USER' })).toBe(true);
+      assert.isTrue(transformed.has({ id: 1, type: 'USER' }));
 
-      expect(transformed.has({ id: 2, type: 'ADMIN' })).toBe(true);
+      assert.isTrue(transformed.has({ id: 2, type: 'ADMIN' }));
     });
   });
 
@@ -891,11 +891,11 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(filtered.size).toBe(2);
 
-      expect(filtered.has({ id: 1, type: 'user' })).toBe(true);
+      assert.isTrue(filtered.has({ id: 1, type: 'user' }));
 
-      expect(filtered.has({ id: 3, type: 'user' })).toBe(true);
+      assert.isTrue(filtered.has({ id: 3, type: 'user' }));
 
-      expect(filtered.has({ id: 2, type: 'admin' })).toBe(false);
+      assert.isFalse(filtered.has({ id: 2, type: 'admin' }));
     });
   });
 
@@ -915,11 +915,11 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(filtered.size).toBe(1);
 
-      expect(filtered.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(filtered.has({ id: 2, type: 'admin' }));
 
-      expect(filtered.has({ id: 1, type: 'user' })).toBe(false);
+      assert.isFalse(filtered.has({ id: 1, type: 'user' }));
 
-      expect(filtered.has({ id: 3, type: 'user' })).toBe(false);
+      assert.isFalse(filtered.has({ id: 3, type: 'user' }));
     });
   });
 
@@ -965,7 +965,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(subset.isSubsetOf(superset)).toBe(true);
+      assert.isTrue(subset.isSubsetOf(superset));
     });
 
     test('should return false for non-subset', () => {
@@ -987,7 +987,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(set1.isSubsetOf(set2)).toBe(false);
+      assert.isFalse(set1.isSubsetOf(set2));
     });
   });
 
@@ -1008,7 +1008,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(superset.isSupersetOf(subset)).toBe(true);
+      assert.isTrue(superset.isSupersetOf(subset));
     });
 
     test('should return false for non-superset', () => {
@@ -1030,7 +1030,7 @@ describe('ISetMapped additional functionality with complex types', () => {
         stringToTestElement,
       );
 
-      expect(set1.isSupersetOf(set2)).toBe(false);
+      assert.isFalse(set1.isSupersetOf(set2));
     });
   });
 
@@ -1059,11 +1059,11 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(result.size).toBe(2);
 
-      expect(result.has({ id: 1, type: 'user' })).toBe(true);
+      assert.isTrue(result.has({ id: 1, type: 'user' }));
 
-      expect(result.has({ id: 3, type: 'guest' })).toBe(true);
+      assert.isTrue(result.has({ id: 3, type: 'guest' }));
 
-      expect(result.has({ id: 2, type: 'admin' })).toBe(false);
+      assert.isFalse(result.has({ id: 2, type: 'admin' }));
     });
   });
 
@@ -1093,11 +1093,11 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(result.size).toBe(2);
 
-      expect(result.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(result.has({ id: 2, type: 'admin' }));
 
-      expect(result.has({ id: 3, type: 'guest' })).toBe(true);
+      assert.isTrue(result.has({ id: 3, type: 'guest' }));
 
-      expect(result.has({ id: 1, type: 'user' })).toBe(false);
+      assert.isFalse(result.has({ id: 1, type: 'user' }));
     });
   });
 
@@ -1125,13 +1125,13 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(result.size).toBe(4);
 
-      expect(result.has({ id: 1, type: 'user' })).toBe(true);
+      assert.isTrue(result.has({ id: 1, type: 'user' }));
 
-      expect(result.has({ id: 2, type: 'admin' })).toBe(true);
+      assert.isTrue(result.has({ id: 2, type: 'admin' }));
 
-      expect(result.has({ id: 3, type: 'guest' })).toBe(true);
+      assert.isTrue(result.has({ id: 3, type: 'guest' }));
 
-      expect(result.has({ id: 4, type: 'user' })).toBe(true);
+      assert.isTrue(result.has({ id: 4, type: 'user' }));
     });
   });
 
@@ -1251,9 +1251,9 @@ describe('ISetMapped additional functionality with complex types', () => {
 
       expect(rawSet.size).toBe(2);
 
-      expect(rawSet.has('user_1')).toBe(true);
+      assert.isTrue(rawSet.has('user_1'));
 
-      expect(rawSet.has('admin_2')).toBe(true);
+      assert.isTrue(rawSet.has('admin_2'));
     });
   });
 });

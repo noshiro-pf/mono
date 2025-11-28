@@ -65,37 +65,37 @@ describe('Uint16 test', () => {
 
   describe(isUint16, () => {
     test('correctly identifies uint16 values', () => {
-      expect(isUint16(0)).toBe(true);
+      assert.isTrue(isUint16(0));
 
-      expect(isUint16(1)).toBe(true);
+      assert.isTrue(isUint16(1));
 
-      expect(isUint16(65_535)).toBe(true);
+      assert.isTrue(isUint16(65_535));
 
-      expect(isUint16(32_768)).toBe(true);
+      assert.isTrue(isUint16(32_768));
     });
 
     test('correctly identifies values outside uint16 range', () => {
-      expect(isUint16(65_536)).toBe(false);
+      assert.isFalse(isUint16(65_536));
 
-      expect(isUint16(100_000)).toBe(false);
+      assert.isFalse(isUint16(100_000));
     });
 
     test('correctly identifies negative integers', () => {
-      expect(isUint16(-1)).toBe(false);
+      assert.isFalse(isUint16(-1));
 
-      expect(isUint16(-42)).toBe(false);
+      assert.isFalse(isUint16(-42));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isUint16(Number.NaN)).toBe(false);
+      assert.isFalse(isUint16(Number.NaN));
 
-      expect(isUint16(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isUint16(Number.POSITIVE_INFINITY));
 
-      expect(isUint16(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isUint16(Number.NEGATIVE_INFINITY));
 
-      expect(isUint16(1.2)).toBe(false);
+      assert.isFalse(isUint16(1.2));
 
-      expect(isUint16(-3.4)).toBe(false);
+      assert.isFalse(isUint16(-3.4));
     });
   });
 
@@ -188,9 +188,9 @@ describe('Uint16 test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(Uint16.is(result)).toBe(true);
+        assert.isTrue(Uint16.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).toBeGreaterThanOrEqual(0);
       }

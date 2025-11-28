@@ -16,4 +16,4 @@ const points: readonly Point[] = [
 
 const set = ISetMapped.create<Point, string>(points, toKey, fromKey);
 
-assert(set.size === 2);
+assert.isTrue(set.size === 2);

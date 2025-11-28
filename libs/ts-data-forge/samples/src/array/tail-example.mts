@@ -9,7 +9,7 @@ import { Arr } from 'ts-data-forge';
 
   assert.deepStrictEqual(remainder, ['Grace', 'Katherine']);
 
-  assert(remainder.length === 2);
+  assert.isTrue(remainder.length === 2);
 }
 
 {

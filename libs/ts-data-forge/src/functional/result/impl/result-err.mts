@@ -18,7 +18,7 @@ import { ErrTypeTagName } from './tag.mjs';
  *   value: { id: 1 },
  * });
  *
- * assert.ok(Result.isErr(failure));
+ * assert.isTrue(Result.isErr(failure));
  * ```
  *
  * @template E The type of the error value.

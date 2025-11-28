@@ -9,6 +9,6 @@ const map = IMap.create(entries);
 
 const raw = map.toRawMap();
 
-assert.ok(is.map(raw));
+assert.isTrue(is.map(raw));
 
-assert(raw.get('key') === 1);
+assert.isTrue(raw.get('key') === 1);

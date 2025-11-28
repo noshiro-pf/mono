@@ -68,41 +68,41 @@ describe('SafeUint test', () => {
 
   describe(isSafeUint, () => {
     test('correctly identifies safe unsigned integers', () => {
-      expect(isSafeUint(0)).toBe(true);
+      assert.isTrue(isSafeUint(0));
 
-      expect(isSafeUint(1)).toBe(true);
+      assert.isTrue(isSafeUint(1));
 
-      expect(isSafeUint(42)).toBe(true);
+      assert.isTrue(isSafeUint(42));
 
-      expect(isSafeUint(100)).toBe(true);
+      assert.isTrue(isSafeUint(100));
 
-      expect(isSafeUint(Number.MAX_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isSafeUint(Number.MAX_SAFE_INTEGER));
     });
 
     test('correctly identifies negative numbers', () => {
-      expect(isSafeUint(-1)).toBe(false);
+      assert.isFalse(isSafeUint(-1));
 
-      expect(isSafeUint(-42)).toBe(false);
+      assert.isFalse(isSafeUint(-42));
 
-      expect(isSafeUint(Number.MIN_SAFE_INTEGER)).toBe(false);
+      assert.isFalse(isSafeUint(Number.MIN_SAFE_INTEGER));
     });
 
     test('correctly identifies values outside safe integer range', () => {
-      expect(isSafeUint(Number.MAX_SAFE_INTEGER + 1)).toBe(false);
+      assert.isFalse(isSafeUint(Number.MAX_SAFE_INTEGER + 1));
 
-      expect(isSafeUint(Number.MAX_VALUE)).toBe(false);
+      assert.isFalse(isSafeUint(Number.MAX_VALUE));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isSafeUint(Number.NaN)).toBe(false);
+      assert.isFalse(isSafeUint(Number.NaN));
 
-      expect(isSafeUint(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isSafeUint(Number.POSITIVE_INFINITY));
 
-      expect(isSafeUint(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isSafeUint(Number.NEGATIVE_INFINITY));
 
-      expect(isSafeUint(1.2)).toBe(false);
+      assert.isFalse(isSafeUint(1.2));
 
-      expect(isSafeUint(-3.4)).toBe(false);
+      assert.isFalse(isSafeUint(-3.4));
     });
   });
 
@@ -201,9 +201,9 @@ describe('SafeUint test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(SafeUint.is(result)).toBe(true);
+        assert.isTrue(SafeUint.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).toBeGreaterThanOrEqual(0);
       }

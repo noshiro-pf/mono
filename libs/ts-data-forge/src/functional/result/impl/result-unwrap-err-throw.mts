@@ -18,7 +18,7 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *
  * const okResult = Result.ok('value');
  *
- * assert(Result.unwrapErrThrow(errResult).message === 'broken');
+ * assert.isTrue(Result.unwrapErrThrow(errResult).message === 'broken');
  *
  * assert.throws(() => Result.unwrapErrThrow(okResult), /Expected Err/u);
  * ```

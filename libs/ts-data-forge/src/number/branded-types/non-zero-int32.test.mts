@@ -77,39 +77,39 @@ describe('NonZeroInt32 test', () => {
 
   describe(isNonZeroInt32, () => {
     test('correctly identifies non-zero int32 values', () => {
-      expect(isNonZeroInt32(1)).toBe(true);
+      assert.isTrue(isNonZeroInt32(1));
 
-      expect(isNonZeroInt32(-1)).toBe(true);
+      assert.isTrue(isNonZeroInt32(-1));
 
-      expect(isNonZeroInt32(2_147_483_647)).toBe(true);
+      assert.isTrue(isNonZeroInt32(2_147_483_647));
 
-      expect(isNonZeroInt32(-2_147_483_648)).toBe(true);
+      assert.isTrue(isNonZeroInt32(-2_147_483_648));
     });
 
     test('correctly identifies zero', () => {
-      expect(isNonZeroInt32(0)).toBe(false);
+      assert.isFalse(isNonZeroInt32(0));
     });
 
     test('correctly identifies values outside int32 range', () => {
-      expect(isNonZeroInt32(2_147_483_648)).toBe(false);
+      assert.isFalse(isNonZeroInt32(2_147_483_648));
 
-      expect(isNonZeroInt32(-2_147_483_649)).toBe(false);
+      assert.isFalse(isNonZeroInt32(-2_147_483_649));
 
-      expect(isNonZeroInt32(4_294_967_296)).toBe(false);
+      assert.isFalse(isNonZeroInt32(4_294_967_296));
 
-      expect(isNonZeroInt32(-4_294_967_296)).toBe(false);
+      assert.isFalse(isNonZeroInt32(-4_294_967_296));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isNonZeroInt32(Number.NaN)).toBe(false);
+      assert.isFalse(isNonZeroInt32(Number.NaN));
 
-      expect(isNonZeroInt32(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroInt32(Number.POSITIVE_INFINITY));
 
-      expect(isNonZeroInt32(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroInt32(Number.NEGATIVE_INFINITY));
 
-      expect(isNonZeroInt32(1.2)).toBe(false);
+      assert.isFalse(isNonZeroInt32(1.2));
 
-      expect(isNonZeroInt32(-3.4)).toBe(false);
+      assert.isFalse(isNonZeroInt32(-3.4));
     });
   });
 
@@ -222,9 +222,9 @@ describe('NonZeroInt32 test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroInt32.is(result)).toBe(true);
+        assert.isTrue(NonZeroInt32.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).not.toBe(0);
       }

@@ -31,7 +31,7 @@ describe('Stack test', () => {
   test('should be empty when created without initial values', () => {
     const stack = createStack<string>();
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
 
     expect(stack.size).toBe(0);
   });
@@ -39,7 +39,7 @@ describe('Stack test', () => {
   test('should create with initial values', () => {
     const stack = createStack<number>([1, 2, 3]);
 
-    expect(stack.isEmpty).toBe(false);
+    assert.isFalse(stack.isEmpty);
 
     expect(stack.size).toBe(3);
 
@@ -50,7 +50,7 @@ describe('Stack test', () => {
 
     expect(Optional.unwrap(stack.pop())).toBe(1);
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
   });
 
   test('should implement LIFO behavior correctly', () => {
@@ -66,7 +66,7 @@ describe('Stack test', () => {
 
     expect(stack.size).toBe(3);
 
-    expect(stack.isEmpty).toBe(false);
+    assert.isFalse(stack.isEmpty);
 
     // LIFO: Last In, First Out
     expect(Optional.unwrap(stack.pop())).toBe('third');
@@ -75,7 +75,7 @@ describe('Stack test', () => {
 
     expect(Optional.unwrap(stack.pop())).toBe('first');
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
 
     expect(stack.size).toBe(0);
   });
@@ -85,9 +85,9 @@ describe('Stack test', () => {
 
     const result = stack.pop();
 
-    expect(Optional.isNone(result)).toBe(true);
+    assert.isTrue(Optional.isNone(result));
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
 
     expect(stack.size).toBe(0);
   });
@@ -121,7 +121,7 @@ describe('Stack test', () => {
 
     expect(stack.size).toBe(0);
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
   });
 
   test('should handle mixed push and pop operations', () => {
@@ -145,7 +145,7 @@ describe('Stack test', () => {
 
     expect(Optional.unwrap(stack.pop())).toBe('a');
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
   });
 
   test('should work with object types', () => {
@@ -166,7 +166,7 @@ describe('Stack test', () => {
 
     assert.deepStrictEqual(Optional.unwrap(stack.pop()), item1);
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
   });
 
   test('should handle large number of operations efficiently', () => {
@@ -181,18 +181,18 @@ describe('Stack test', () => {
 
     expect(stack.size).toBe(n);
 
-    expect(stack.isEmpty).toBe(false);
+    assert.isFalse(stack.isEmpty);
 
     // Pop all elements and verify LIFO order
     for (const i of range(asSafeInt(n - 1), -1, -1)) {
       const result = stack.pop();
 
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       expect(Optional.unwrap(result)).toBe(i);
     }
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
 
     expect(stack.size).toBe(0);
   });
@@ -237,7 +237,7 @@ describe('Stack test', () => {
 
     expect(Optional.unwrap(stack.pop())).toBe('value');
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
   });
 
   test('should maintain performance characteristics', () => {
@@ -288,6 +288,6 @@ describe('Stack test', () => {
       expect(Optional.unwrap(result)).toBe(i);
     }
 
-    expect(stack.isEmpty).toBe(true);
+    assert.isTrue(stack.isEmpty);
   });
 });

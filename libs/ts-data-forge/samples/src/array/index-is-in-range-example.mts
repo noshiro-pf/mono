@@ -4,10 +4,10 @@ import { Arr } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const items = ['Ada', 'Grace', 'Katherine'] as const;
 
-assert.ok(Arr.indexIsInRange(items, 1));
+assert.isTrue(Arr.indexIsInRange(items, 1));
 
-assert.notOk(Arr.indexIsInRange(items, 3));
+assert.isFalse(Arr.indexIsInRange(items, 3));
 
 if (Arr.indexIsInRange(items, 2)) {
-  assert(items[2] === 'Katherine');
+  assert.isTrue(items[2] === 'Katherine');
 }

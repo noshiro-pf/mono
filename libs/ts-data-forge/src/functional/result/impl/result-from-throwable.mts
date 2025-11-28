@@ -24,7 +24,7 @@ import { ok } from './result-ok.mjs';
  *
  * assert.deepStrictEqual(success, Result.ok(2));
  *
- * assert.ok(Result.isErr(failure));
+ * assert.isTrue(Result.isErr(failure));
  * ```
  *
  * @template T The return type of the function.

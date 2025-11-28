@@ -8,4 +8,4 @@ const smallest = PositiveInt.min(
   asPositiveInt(12),
 );
 
-assert(smallest === 3);
+assert.isTrue(smallest === 3);

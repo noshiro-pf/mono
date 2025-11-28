@@ -8,8 +8,8 @@ const withinRange = PositiveSafeInt.clamp(123);
 
 const aboveRange = PositiveSafeInt.clamp(Number.MAX_SAFE_INTEGER + 10);
 
-assert(belowRange === 1);
+assert.isTrue(belowRange === 1);
 
-assert(withinRange === 123);
+assert.isTrue(withinRange === 123);
 
-assert(aboveRange === Number.MAX_SAFE_INTEGER);
+assert.isTrue(aboveRange === Number.MAX_SAFE_INTEGER);

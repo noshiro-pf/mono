@@ -2,8 +2,8 @@
 import { Int, isInt } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
-assert.ok(isInt(5));
+assert.isTrue(isInt(5));
 
-assert.notOk(isInt(5.25));
+assert.isFalse(isInt(5.25));
 
-assert.ok(Int.is(-10));
+assert.isTrue(Int.is(-10));

@@ -3,73 +3,73 @@ import { isNonNullObject } from './is-non-null-object.mjs';
 
 describe(isNonNullObject, () => {
   test('should return true for plain objects', () => {
-    expect(isNonNullObject({})).toBe(true);
+    assert.isTrue(isNonNullObject({}));
 
-    expect(isNonNullObject({ a: 1, b: 'test' })).toBe(true);
+    assert.isTrue(isNonNullObject({ a: 1, b: 'test' }));
 
-    expect(isNonNullObject({ nested: { value: true } })).toBe(true);
+    assert.isTrue(isNonNullObject({ nested: { value: true } }));
   });
 
   test('should return true for arrays', () => {
-    expect(isNonNullObject([])).toBe(true);
+    assert.isTrue(isNonNullObject([]));
 
-    expect(isNonNullObject([1, 2, 3])).toBe(true);
+    assert.isTrue(isNonNullObject([1, 2, 3]));
 
-    expect(isNonNullObject(['a', 'b', 'c'])).toBe(true);
+    assert.isTrue(isNonNullObject(['a', 'b', 'c']));
   });
 
   test('should return true for functions', () => {
-    expect(isNonNullObject(() => {})).toBe(false);
+    assert.isFalse(isNonNullObject(() => {}));
 
-    expect(isNonNullObject(async () => {})).toBe(false);
+    assert.isFalse(isNonNullObject(async () => {}));
 
     // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-    expect(isNonNullObject(class MyClass {})).toBe(false);
+    assert.isFalse(isNonNullObject(class MyClass {}));
   });
 
   test('should return true for built-in objects', () => {
-    expect(isNonNullObject(new Date())).toBe(true);
+    assert.isTrue(isNonNullObject(new Date()));
 
-    expect(isNonNullObject(/test/u)).toBe(true);
+    assert.isTrue(isNonNullObject(/test/u));
 
-    expect(isNonNullObject(/regex/u)).toBe(true);
+    assert.isTrue(isNonNullObject(/regex/u));
 
-    expect(isNonNullObject(new Map())).toBe(true);
+    assert.isTrue(isNonNullObject(new Map()));
 
-    expect(isNonNullObject(new Set())).toBe(true);
+    assert.isTrue(isNonNullObject(new Set()));
 
-    expect(isNonNullObject(new Error('test'))).toBe(true);
+    assert.isTrue(isNonNullObject(new Error('test')));
   });
 
   test('should return true for boxed primitives', () => {
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isNonNullObject(new String('hello'))).toBe(true);
+    assert.isTrue(isNonNullObject(new String('hello')));
 
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isNonNullObject(new Number(42))).toBe(true);
+    assert.isTrue(isNonNullObject(new Number(42)));
 
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isNonNullObject(new Boolean(true))).toBe(true);
+    assert.isTrue(isNonNullObject(new Boolean(true)));
   });
 
   test('should return false for null', () => {
-    expect(isNonNullObject(null)).toBe(false);
+    assert.isFalse(isNonNullObject(null));
   });
 
   test('should return false for primitive values', () => {
-    expect(isNonNullObject(undefined)).toBe(false);
+    assert.isFalse(isNonNullObject(undefined));
 
-    expect(isNonNullObject('string')).toBe(false);
+    assert.isFalse(isNonNullObject('string'));
 
-    expect(isNonNullObject(42)).toBe(false);
+    assert.isFalse(isNonNullObject(42));
 
-    expect(isNonNullObject(true)).toBe(false);
+    assert.isFalse(isNonNullObject(true));
 
-    expect(isNonNullObject(false)).toBe(false);
+    assert.isFalse(isNonNullObject(false));
 
-    expect(isNonNullObject(Symbol('test'))).toBe(false);
+    assert.isFalse(isNonNullObject(Symbol('test')));
 
-    expect(isNonNullObject(123n)).toBe(false);
+    assert.isFalse(isNonNullObject(123n));
   });
 
   test('should act as a type guard', () => {

@@ -224,8 +224,8 @@ export namespace TsDataForgeInternals {
       ElementType extends Int,
       MIN_VALUE extends number,
       MAX_VALUE extends number,
-      ElementTypeWithSmallInt extends
-        WithSmallInt<ElementType> = WithSmallInt<ElementType>,
+      ElementTypeWithSmallInt extends WithSmallInt<ElementType> =
+        WithSmallInt<ElementType>,
     > = Readonly<{
       MIN_VALUE: MIN_VALUE;
       MAX_VALUE: MAX_VALUE;
@@ -324,17 +324,17 @@ export namespace TsDataForgeInternals {
      *
      * const randomValue = intOps.random();
      *
-     * assert(sum === 10);
+     * assert.isTrue(sum === 10);
      *
-     * assert(difference === 2);
+     * assert.isTrue(difference === 2);
      *
-     * assert(product === 24);
+     * assert.isTrue(product === 24);
      *
-     * assert(quotient === 3);
+     * assert.isTrue(quotient === 3);
      *
-     * assert(roundedClamp === 2);
+     * assert.isTrue(roundedClamp === 2);
      *
-     * assert.ok(Number.isSafeInteger(randomValue));
+     * assert.isTrue(Number.isSafeInteger(randomValue));
      * ```
      *
      * @template ElementType - The integer branded type
@@ -552,15 +552,15 @@ export namespace TsDataForgeInternals {
      *
      * const nonZeroRandom = floatOps.randomNonZero();
      *
-     * assert(sum === 50);
+     * assert.isTrue(sum === 50);
      *
-     * assert(ratio === 5);
+     * assert.isTrue(ratio === 5);
      *
-     * assert.ok(clamped >= Number.MIN_VALUE);
+     * assert.isTrue(clamped >= Number.MIN_VALUE);
      *
-     * assert.ok(boundedRandom >= 10 && boundedRandom <= 20);
+     * assert.isTrue(boundedRandom >= 10 && boundedRandom <= 20);
      *
-     * assert.ok(nonZeroRandom > 0);
+     * assert.isTrue(nonZeroRandom > 0);
      * ```
      *
      * @template ElementType - The floating-point branded type

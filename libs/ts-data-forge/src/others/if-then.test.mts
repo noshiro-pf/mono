@@ -3,16 +3,16 @@ import { ifThen } from './if-then.mjs';
 describe(ifThen, () => {
   test('should implement logical implication truth table', () => {
     // True antecedent, true consequent -> true
-    expect(ifThen(true, true)).toBe(true);
+    assert.isTrue(ifThen(true, true));
 
     // True antecedent, false consequent -> false
-    expect(ifThen(true, false)).toBe(false);
+    assert.isFalse(ifThen(true, false));
 
     // False antecedent, true consequent -> true (vacuously true)
-    expect(ifThen(false, true)).toBe(true);
+    assert.isTrue(ifThen(false, true));
 
     // False antecedent, false consequent -> true (vacuously true)
-    expect(ifThen(false, false)).toBe(true);
+    assert.isTrue(ifThen(false, false));
   });
 
   test('should work for validation logic', () => {
@@ -22,13 +22,13 @@ describe(ifThen, () => {
       return ifThen(isRequired, hasValue);
     };
 
-    expect(validateField('hello', true)).toBe(true); // required and has value
+    assert.isTrue(validateField('hello', true)); // required and has value
 
-    expect(validateField('', true)).toBe(false); // required but no value
+    assert.isFalse(validateField('', true)); // required but no value
 
-    expect(validateField('', false)).toBe(true); // not required, so valid
+    assert.isTrue(validateField('', false)); // not required, so valid
 
-    expect(validateField('hello', false)).toBe(true); // not required, has value
+    assert.isTrue(validateField('hello', false)); // not required, has value
   });
 
   test('should work for access control logic', () => {
@@ -39,13 +39,13 @@ describe(ifThen, () => {
       // If admin, then must have permission
       ifThen(isAdmin, hasPermission);
 
-    expect(checkPermission(true, true)).toBe(true); // admin with permission
+    assert.isTrue(checkPermission(true, true)); // admin with permission
 
-    expect(checkPermission(true, false)).toBe(false); // admin without permission
+    assert.isFalse(checkPermission(true, false)); // admin without permission
 
-    expect(checkPermission(false, true)).toBe(true); // non-admin with permission
+    assert.isTrue(checkPermission(false, true)); // non-admin with permission
 
-    expect(checkPermission(false, false)).toBe(true); // non-admin without permission
+    assert.isTrue(checkPermission(false, false)); // non-admin without permission
   });
 
   test('should work for contract validation', () => {
@@ -56,26 +56,26 @@ describe(ifThen, () => {
       // If premium, then all premium features must be enabled
       ifThen(isPremium, hasAllFeatures);
 
-    expect(validateSubscription(true, true)).toBe(true); // premium with all features
+    assert.isTrue(validateSubscription(true, true)); // premium with all features
 
-    expect(validateSubscription(true, false)).toBe(false); // premium without all features
+    assert.isFalse(validateSubscription(true, false)); // premium without all features
 
-    expect(validateSubscription(false, true)).toBe(true); // non-premium with features
+    assert.isTrue(validateSubscription(false, true)); // non-premium with features
 
-    expect(validateSubscription(false, false)).toBe(true); // non-premium without features
+    assert.isTrue(validateSubscription(false, false)); // non-premium without features
   });
 
   test('should work in chaining scenarios', () => {
     const validateChain = (a: boolean, b: boolean, c: boolean): boolean =>
       ifThen(a, b) && ifThen(b, c);
 
-    expect(validateChain(true, true, true)).toBe(true); // valid chain
+    assert.isTrue(validateChain(true, true, true)); // valid chain
 
-    expect(validateChain(true, false, true)).toBe(false); // breaks at first implication
+    assert.isFalse(validateChain(true, false, true)); // breaks at first implication
 
-    expect(validateChain(false, false, false)).toBe(true); // vacuously true chain
+    assert.isTrue(validateChain(false, false, false)); // vacuously true chain
 
-    expect(validateChain(true, true, false)).toBe(false); // breaks at second implication
+    assert.isFalse(validateChain(true, true, false)); // breaks at second implication
   });
 
   test('should work with negation patterns', () => {
@@ -83,12 +83,12 @@ describe(ifThen, () => {
       // "If not expired then valid" is equivalent to "expired OR valid"
       ifThen(!isExpired, isValid);
 
-    expect(checkExpiredLogic(false, true)).toBe(true); // not expired and valid
+    assert.isTrue(checkExpiredLogic(false, true)); // not expired and valid
 
-    expect(checkExpiredLogic(false, false)).toBe(false); // not expired but invalid
+    assert.isFalse(checkExpiredLogic(false, false)); // not expired but invalid
 
-    expect(checkExpiredLogic(true, true)).toBe(true); // expired but valid (vacuous)
+    assert.isTrue(checkExpiredLogic(true, true)); // expired but valid (vacuous)
 
-    expect(checkExpiredLogic(true, false)).toBe(true); // expired and invalid (vacuous)
+    assert.isTrue(checkExpiredLogic(true, false)); // expired and invalid (vacuous)
   });
 });

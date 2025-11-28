@@ -79,39 +79,39 @@ describe('PositiveInt32 test', () => {
 
   describe(isPositiveInt32, () => {
     test('correctly identifies positive int32 values', () => {
-      expect(isPositiveInt32(1)).toBe(true);
+      assert.isTrue(isPositiveInt32(1));
 
-      expect(isPositiveInt32(1000)).toBe(true);
+      assert.isTrue(isPositiveInt32(1000));
 
-      expect(isPositiveInt32(2_147_483_647)).toBe(true);
+      assert.isTrue(isPositiveInt32(2_147_483_647));
     });
 
     test('correctly identifies zero', () => {
-      expect(isPositiveInt32(0)).toBe(false);
+      assert.isFalse(isPositiveInt32(0));
     });
 
     test('correctly identifies values outside int32 range', () => {
-      expect(isPositiveInt32(2_147_483_648)).toBe(false);
+      assert.isFalse(isPositiveInt32(2_147_483_648));
 
-      expect(isPositiveInt32(4_294_967_296)).toBe(false);
+      assert.isFalse(isPositiveInt32(4_294_967_296));
     });
 
     test('correctly identifies negative integers', () => {
-      expect(isPositiveInt32(-1)).toBe(false);
+      assert.isFalse(isPositiveInt32(-1));
 
-      expect(isPositiveInt32(-42)).toBe(false);
+      assert.isFalse(isPositiveInt32(-42));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isPositiveInt32(Number.NaN)).toBe(false);
+      assert.isFalse(isPositiveInt32(Number.NaN));
 
-      expect(isPositiveInt32(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isPositiveInt32(Number.POSITIVE_INFINITY));
 
-      expect(isPositiveInt32(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isPositiveInt32(Number.NEGATIVE_INFINITY));
 
-      expect(isPositiveInt32(1.2)).toBe(false);
+      assert.isFalse(isPositiveInt32(1.2));
 
-      expect(isPositiveInt32(-3.4)).toBe(false);
+      assert.isFalse(isPositiveInt32(-3.4));
     });
   });
 
@@ -209,9 +209,9 @@ describe('PositiveInt32 test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(PositiveInt32.is(result)).toBe(true);
+        assert.isTrue(PositiveInt32.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).toBeGreaterThan(0);
       }

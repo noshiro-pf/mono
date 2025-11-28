@@ -66,37 +66,37 @@ describe('Int32 test', () => {
 
   describe(isInt32, () => {
     test('correctly identifies int32 values', () => {
-      expect(isInt32(0)).toBe(true);
+      assert.isTrue(isInt32(0));
 
-      expect(isInt32(1)).toBe(true);
+      assert.isTrue(isInt32(1));
 
-      expect(isInt32(-1)).toBe(true);
+      assert.isTrue(isInt32(-1));
 
-      expect(isInt32(2_147_483_647)).toBe(true);
+      assert.isTrue(isInt32(2_147_483_647));
 
-      expect(isInt32(-2_147_483_648)).toBe(true);
+      assert.isTrue(isInt32(-2_147_483_648));
     });
 
     test('correctly identifies values outside int32 range', () => {
-      expect(isInt32(2_147_483_648)).toBe(false);
+      assert.isFalse(isInt32(2_147_483_648));
 
-      expect(isInt32(-2_147_483_649)).toBe(false);
+      assert.isFalse(isInt32(-2_147_483_649));
 
-      expect(isInt32(4_294_967_296)).toBe(false);
+      assert.isFalse(isInt32(4_294_967_296));
 
-      expect(isInt32(-4_294_967_296)).toBe(false);
+      assert.isFalse(isInt32(-4_294_967_296));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isInt32(Number.NaN)).toBe(false);
+      assert.isFalse(isInt32(Number.NaN));
 
-      expect(isInt32(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isInt32(Number.POSITIVE_INFINITY));
 
-      expect(isInt32(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isInt32(Number.NEGATIVE_INFINITY));
 
-      expect(isInt32(1.2)).toBe(false);
+      assert.isFalse(isInt32(1.2));
 
-      expect(isInt32(-3.4)).toBe(false);
+      assert.isFalse(isInt32(-3.4));
     });
   });
 
@@ -197,9 +197,9 @@ describe('Int32 test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(Int32.is(result)).toBe(true);
+        assert.isTrue(Int32.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
       }
     });
 

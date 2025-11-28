@@ -10,13 +10,13 @@ const parsed = Json.parse(validJson);
 
 const failed = Json.parse(invalidJson);
 
-assert.ok(Result.isOk(parsed));
+assert.isTrue(Result.isOk(parsed));
 
 if (Result.isOk(parsed)) {
   assert.deepStrictEqual(parsed.value, { name: 'Alice', age: 30 });
 }
 
-assert.ok(Result.isErr(failed));
+assert.isTrue(Result.isErr(failed));
 
 // With reviver
 const jsonWithDate = '{"created": "2024-01-01T00:00:00.000Z"}';
@@ -29,4 +29,4 @@ const withReviver = Json.parse(jsonWithDate, (key, value) => {
   return value;
 });
 
-assert.ok(Result.isOk(withReviver));
+assert.isTrue(Result.isOk(withReviver));

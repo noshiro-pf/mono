@@ -6,6 +6,6 @@ const superset = ISet.create<string>(['a', 'b', 'c']);
 
 const subset = ISet.create<string>(['a', 'c']);
 
-assert.ok(superset.isSupersetOf(subset));
+assert.isTrue(superset.isSupersetOf(subset));
 
-assert.notOk(subset.isSupersetOf(superset));
+assert.isFalse(subset.isSupersetOf(superset));

@@ -11,4 +11,4 @@ assert.deepStrictEqual(success, {
   value: { id: 1 },
 });
 
-assert.ok(Result.isErr(failure));
+assert.isTrue(Result.isErr(failure));

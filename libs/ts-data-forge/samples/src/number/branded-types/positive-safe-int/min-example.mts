@@ -7,4 +7,4 @@ const smallest = PositiveSafeInt.min(
   asPositiveSafeInt(5),
 );
 
-assert(smallest === 5);
+assert.isTrue(smallest === 5);

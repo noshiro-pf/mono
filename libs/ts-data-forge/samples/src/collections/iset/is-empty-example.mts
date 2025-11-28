@@ -6,6 +6,6 @@ const emptySet = ISet.create<number>([]);
 
 const filledSet = ISet.create([1, 2]);
 
-assert.ok(emptySet.isEmpty);
+assert.isTrue(emptySet.isEmpty);
 
-assert.notOk(filledSet.isEmpty);
+assert.isFalse(filledSet.isEmpty);

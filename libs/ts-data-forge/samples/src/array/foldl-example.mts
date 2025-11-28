@@ -11,6 +11,6 @@ const concat = Arr.foldl<string | number, string>(
   'items',
 )(words);
 
-assert(totalLength === 11);
+assert.isTrue(totalLength === 11);
 
-assert(concat === 'items-Ada-Lovelace');
+assert.isTrue(concat === 'items-Ada-Lovelace');

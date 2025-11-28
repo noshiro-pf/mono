@@ -10,9 +10,9 @@ import { asUint32, Num } from '../../number/index.mjs';
  *
  * const maybeValue: unknown = 'Ada';
  *
- * assert.ok(Arr.isArray(maybeArray));
+ * assert.isTrue(Arr.isArray(maybeArray));
  *
- * assert.notOk(Arr.isArray(maybeValue));
+ * assert.isFalse(Arr.isArray(maybeValue));
  *
  * if (Arr.isArray(maybeArray)) {
  *   assert.deepStrictEqual(maybeArray, [1, 2, 3]);
@@ -45,9 +45,9 @@ type Cast<A, B> = A extends B ? A : never;
  *
  * const words = ['Ada', 'Lovelace'] as const;
  *
- * assert.ok(Arr.isEmpty(emptyNumbers));
+ * assert.isTrue(Arr.isEmpty(emptyNumbers));
  *
- * assert.notOk(Arr.isEmpty(words));
+ * assert.isFalse(Arr.isEmpty(words));
  *
  * if (Arr.isEmpty(emptyNumbers)) {
  *   assert.deepStrictEqual(emptyNumbers, []);
@@ -67,9 +67,9 @@ export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
  *
  * const emptyUsers: readonly { id: number }[] = [];
  *
- * assert.ok(Arr.isNonEmpty(users));
+ * assert.isTrue(Arr.isNonEmpty(users));
  *
- * assert.notOk(Arr.isNonEmpty(emptyUsers));
+ * assert.isFalse(Arr.isNonEmpty(emptyUsers));
  *
  * if (Arr.isNonEmpty(users)) {
  *   assert.deepStrictEqual(users[0], { id: 1 });
@@ -90,9 +90,9 @@ export const isNonEmpty = <E,>(
  *
  * const triple: readonly number[] = [1, 2, 3];
  *
- * assert.ok(Arr.isArrayOfLength(pair, 2));
+ * assert.isTrue(Arr.isArrayOfLength(pair, 2));
  *
- * assert.notOk(Arr.isArrayOfLength(triple, 2));
+ * assert.isFalse(Arr.isArrayOfLength(triple, 2));
  *
  * if (Arr.isArrayOfLength(pair, 2)) {
  *   assert.deepStrictEqual(pair, [1, 2]);
@@ -114,12 +114,12 @@ export const isArrayOfLength = <E, N extends SizeType.ArgArr>(
  *
  * const emptyQueue: readonly string[] = [];
  *
- * assert.ok(Arr.isArrayAtLeastLength(queue, 1));
+ * assert.isTrue(Arr.isArrayAtLeastLength(queue, 1));
  *
- * assert.notOk(Arr.isArrayAtLeastLength(emptyQueue, 1));
+ * assert.isFalse(Arr.isArrayAtLeastLength(emptyQueue, 1));
  *
  * if (Arr.isArrayAtLeastLength(queue, 1)) {
- *   assert(queue[0] === 'task-1');
+ *   assert.isTrue(queue[0] === 'task-1');
  * }
  * ```
  */
@@ -142,9 +142,9 @@ export const isArrayAtLeastLength = <E, N extends SizeType.ArgArr>(
  *
  * const allStartWithA = Arr.every(words, (value) => value.startsWith('A'));
  *
- * assert.ok(allEven);
+ * assert.isTrue(allEven);
  *
- * assert.notOk(allStartWithA);
+ * assert.isFalse(allStartWithA);
  * ```
  */
 // Type guard overloads - narrow the entire array type
@@ -204,9 +204,9 @@ export function every<E>(
  *
  * const hasShortName = Arr.some(words, (value) => value.length <= 3);
  *
- * assert.notOk(hasEven);
+ * assert.isFalse(hasEven);
  *
- * assert.ok(hasShortName);
+ * assert.isTrue(hasShortName);
  * ```
  */
 export function some<const Ar extends readonly unknown[]>(
@@ -249,12 +249,12 @@ export function some<E>(
  * ```ts
  * const items = ['Ada', 'Grace', 'Katherine'] as const;
  *
- * assert.ok(Arr.indexIsInRange(items, 1));
+ * assert.isTrue(Arr.indexIsInRange(items, 1));
  *
- * assert.notOk(Arr.indexIsInRange(items, 3));
+ * assert.isFalse(Arr.indexIsInRange(items, 3));
  *
  * if (Arr.indexIsInRange(items, 2)) {
- *   assert(items[2] === 'Katherine');
+ *   assert.isTrue(items[2] === 'Katherine');
  * }
  * ```
  */

@@ -8,6 +8,6 @@ const second = ISet.create<number>([2, 1]);
 
 const third = ISet.create<number>([1, 3]);
 
-assert.ok(ISet.equal(first, second));
+assert.isTrue(ISet.equal(first, second));
 
-assert.notOk(ISet.equal(first, third));
+assert.isFalse(ISet.equal(first, third));

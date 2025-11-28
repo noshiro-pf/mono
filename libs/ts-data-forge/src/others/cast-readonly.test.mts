@@ -28,7 +28,7 @@ describe(castReadonly, () => {
 
     expect(readonly.value).toBe(42);
 
-    expect(Object.is(readonly, original)).toBe(true);
+    assert.isTrue(Object.is(readonly, original));
   });
 
   test('castReadonly should work with primitives', () => {
@@ -36,7 +36,7 @@ describe(castReadonly, () => {
 
     expect(castReadonly('hello')).toBe('hello');
 
-    expect(castReadonly(true)).toBe(true);
+    assert.isTrue(castReadonly(true));
   });
 
   test('castReadonly should work with null and undefined', () => {
@@ -75,7 +75,7 @@ describe(castDeepReadonly, () => {
 
     expect(readonly.users[0]?.profile.name).toBe('Alice');
 
-    expect(readonly.settings.options.debug).toBe(true);
+    assert.isTrue(readonly.settings.options.debug);
   });
 
   test('should work with arrays of objects', () => {
@@ -98,7 +98,7 @@ describe(castDeepReadonly, () => {
 
     expect(castDeepReadonly('hello')).toBe('hello');
 
-    expect(castDeepReadonly(true)).toBe(true);
+    assert.isTrue(castDeepReadonly(true));
   });
 
   test('castDeepReadonly should work with null and undefined', () => {

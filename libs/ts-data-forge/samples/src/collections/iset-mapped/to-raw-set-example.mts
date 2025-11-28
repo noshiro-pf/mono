@@ -18,6 +18,6 @@ const set = ISetMapped.create<Point, string>(
 
 const raw = set.toRawSet();
 
-assert.ok(is.set(raw));
+assert.isTrue(is.set(raw));
 
-assert.ok(raw.has(toKey({ x: 1, tag: 'a' })));
+assert.isTrue(raw.has(toKey({ x: 1, tag: 'a' })));

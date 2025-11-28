@@ -79,39 +79,39 @@ describe('NonNegativeInt32 test', () => {
 
   describe(isNonNegativeInt32, () => {
     test('correctly identifies non-negative int32 values', () => {
-      expect(isNonNegativeInt32(0)).toBe(true);
+      assert.isTrue(isNonNegativeInt32(0));
 
-      expect(isNonNegativeInt32(1)).toBe(true);
+      assert.isTrue(isNonNegativeInt32(1));
 
-      expect(isNonNegativeInt32(1000)).toBe(true);
+      assert.isTrue(isNonNegativeInt32(1000));
 
-      expect(isNonNegativeInt32(2_147_483_647)).toBe(true);
+      assert.isTrue(isNonNegativeInt32(2_147_483_647));
     });
 
     test('correctly identifies negative integers', () => {
-      expect(isNonNegativeInt32(-1)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(-1));
 
-      expect(isNonNegativeInt32(-42)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(-42));
 
-      expect(isNonNegativeInt32(-2_147_483_648)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(-2_147_483_648));
     });
 
     test('correctly identifies values outside int32 range', () => {
-      expect(isNonNegativeInt32(2_147_483_648)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(2_147_483_648));
 
-      expect(isNonNegativeInt32(4_294_967_296)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(4_294_967_296));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isNonNegativeInt32(Number.NaN)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(Number.NaN));
 
-      expect(isNonNegativeInt32(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(Number.POSITIVE_INFINITY));
 
-      expect(isNonNegativeInt32(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(Number.NEGATIVE_INFINITY));
 
-      expect(isNonNegativeInt32(1.2)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(1.2));
 
-      expect(isNonNegativeInt32(-3.4)).toBe(false);
+      assert.isFalse(isNonNegativeInt32(-3.4));
     });
   });
 
@@ -224,9 +224,9 @@ describe('NonNegativeInt32 test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonNegativeInt32.is(result)).toBe(true);
+        assert.isTrue(NonNegativeInt32.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).toBeGreaterThanOrEqual(0);
       }

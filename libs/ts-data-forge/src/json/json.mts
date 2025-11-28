@@ -28,13 +28,13 @@ export namespace Json {
    *
    * const failed = Json.parse(invalidJson);
    *
-   * assert.ok(Result.isOk(parsed));
+   * assert.isTrue(Result.isOk(parsed));
    *
    * if (Result.isOk(parsed)) {
    *   assert.deepStrictEqual(parsed.value, { name: 'Alice', age: 30 });
    * }
    *
-   * assert.ok(Result.isErr(failed));
+   * assert.isTrue(Result.isErr(failed));
    *
    * // With reviver
    * const jsonWithDate = '{"created": "2024-01-01T00:00:00.000Z"}';
@@ -47,7 +47,7 @@ export namespace Json {
    *   return value;
    * });
    *
-   * assert.ok(Result.isOk(withReviver));
+   * assert.isTrue(Result.isOk(withReviver));
    * ```
    *
    * @param text - A valid JSON string to parse. Can contain any valid JSON data
@@ -98,16 +98,16 @@ export namespace Json {
    * // Basic stringify
    * const basic = Json.stringify(data);
    *
-   * assert.ok(Result.isOk(basic));
+   * assert.isTrue(Result.isOk(basic));
    *
    * if (Result.isOk(basic)) {
-   *   assert(basic.value === '{"name":"Bob","age":25,"active":true}');
+   *   assert.isTrue(basic.value === '{"name":"Bob","age":25,"active":true}');
    * }
    *
    * // With formatting
    * const formatted = Json.stringify(data, undefined, 2);
    *
-   * assert.ok(Result.isOk(formatted));
+   * assert.isTrue(Result.isOk(formatted));
    *
    * // With replacer
    * const filtered = Json.stringify(data, (key, value) => {
@@ -116,12 +116,12 @@ export namespace Json {
    *   return value;
    * });
    *
-   * assert.ok(Result.isOk(filtered));
+   * assert.isTrue(Result.isOk(filtered));
    *
    * if (Result.isOk(filtered)) {
-   *   assert(isString(filtered.value));
+   *   assert.isTrue(isString(filtered.value));
    *
-   *   assert.ok(!filtered.value.includes('age'));
+   *   assert.isFalse(filtered.value.includes('age'));
    * }
    * ```
    *
@@ -182,10 +182,10 @@ export namespace Json {
    * // Select only safe properties to serialize
    * const safeJson = Json.stringifySelected(user, ['id', 'name', 'role']);
    *
-   * assert.ok(Result.isOk(safeJson));
+   * assert.isTrue(Result.isOk(safeJson));
    *
    * if (Result.isOk(safeJson)) {
-   *   assert(isString(safeJson.value));
+   *   assert.isTrue(isString(safeJson.value));
    *
    *   const parsed: unknown = JSON.parse(safeJson.value);
    *
@@ -195,15 +195,15 @@ export namespace Json {
    *     role: 'admin',
    *   });
    *
-   *   assert.ok(!safeJson.value.includes('password'));
+   *   assert.isFalse(safeJson.value.includes('password'));
    *
-   *   assert.ok(!safeJson.value.includes('email'));
+   *   assert.isFalse(safeJson.value.includes('email'));
    * }
    *
    * // With formatting
    * const formatted = Json.stringifySelected(user, ['id', 'name'], 2);
    *
-   * assert.ok(Result.isOk(formatted));
+   * assert.isTrue(Result.isOk(formatted));
    * ```
    *
    * @param value - The JavaScript value to serialize. While any value is
@@ -267,34 +267,34 @@ export namespace Json {
    * // Keys will be sorted alphabetically at all levels
    * const sorted = Json.stringifySortedKey(unorderedData);
    *
-   * assert.ok(Result.isOk(sorted));
+   * assert.isTrue(Result.isOk(sorted));
    *
    * if (Result.isOk(sorted)) {
    *   // Keys should appear in alphabetical order
    *   const expected =
    *     '{"apple":2,"mango":3,"nested":{"alpha":"a","beta":"b","zulu":"z"},"zebra":1}';
    *
-   *   assert(sorted.value === expected);
+   *   assert.isTrue(sorted.value === expected);
    * }
    *
    * // With formatting
    * const formatted = Json.stringifySortedKey(unorderedData, 2);
    *
-   * assert.ok(Result.isOk(formatted));
+   * assert.isTrue(Result.isOk(formatted));
    *
    * if (Result.isOk(formatted)) {
-   *   assert(isString(formatted.value));
+   *   assert.isTrue(isString(formatted.value));
    *
    *   // Check that keys are in order (first key should be "apple")
-   *   assert.ok(
+   *   assert.isTrue(
    *     formatted.value.indexOf('"apple"') < formatted.value.indexOf('"mango"'),
    *   );
    *
-   *   assert.ok(
+   *   assert.isTrue(
    *     formatted.value.indexOf('"mango"') < formatted.value.indexOf('"nested"'),
    *   );
    *
-   *   assert.ok(
+   *   assert.isTrue(
    *     formatted.value.indexOf('"nested"') < formatted.value.indexOf('"zebra"'),
    *   );
    * }

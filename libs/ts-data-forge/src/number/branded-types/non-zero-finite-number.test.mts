@@ -69,31 +69,31 @@ describe('NonZeroFiniteNumber test', () => {
 
   describe(isNonZeroFiniteNumber, () => {
     test('correctly identifies non-zero finite numbers', () => {
-      expect(isNonZeroFiniteNumber(1)).toBe(true);
+      assert.isTrue(isNonZeroFiniteNumber(1));
 
-      expect(isNonZeroFiniteNumber(-1)).toBe(true);
+      assert.isTrue(isNonZeroFiniteNumber(-1));
 
-      expect(isNonZeroFiniteNumber(3.14)).toBe(true);
+      assert.isTrue(isNonZeroFiniteNumber(3.14));
 
-      expect(isNonZeroFiniteNumber(-2.5)).toBe(true);
+      assert.isTrue(isNonZeroFiniteNumber(-2.5));
 
-      expect(isNonZeroFiniteNumber(0.001)).toBe(true);
+      assert.isTrue(isNonZeroFiniteNumber(0.001));
 
-      expect(isNonZeroFiniteNumber(-0.001)).toBe(true);
+      assert.isTrue(isNonZeroFiniteNumber(-0.001));
     });
 
     test('correctly identifies zero', () => {
-      expect(isNonZeroFiniteNumber(0)).toBe(false);
+      assert.isFalse(isNonZeroFiniteNumber(0));
 
-      expect(isNonZeroFiniteNumber(-0)).toBe(false);
+      assert.isFalse(isNonZeroFiniteNumber(-0));
     });
 
     test('correctly identifies non-finite numbers', () => {
-      expect(isNonZeroFiniteNumber(Number.NaN)).toBe(false);
+      assert.isFalse(isNonZeroFiniteNumber(Number.NaN));
 
-      expect(isNonZeroFiniteNumber(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroFiniteNumber(Number.POSITIVE_INFINITY));
 
-      expect(isNonZeroFiniteNumber(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroFiniteNumber(Number.NEGATIVE_INFINITY));
     });
   });
 
@@ -200,7 +200,7 @@ describe('NonZeroFiniteNumber test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroFiniteNumber.is(result)).toBe(true);
+        assert.isTrue(NonZeroFiniteNumber.is(result));
 
         expect(result).not.toBe(0);
       }
@@ -218,7 +218,7 @@ describe('NonZeroFiniteNumber test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroFiniteNumber.is(result)).toBe(true);
+        assert.isTrue(NonZeroFiniteNumber.is(result));
 
         expect(result).not.toBe(0);
       }
@@ -236,7 +236,7 @@ describe('NonZeroFiniteNumber test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroFiniteNumber.is(result)).toBe(true);
+        assert.isTrue(NonZeroFiniteNumber.is(result));
 
         expect(result).not.toBe(0);
       }

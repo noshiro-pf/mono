@@ -8,9 +8,9 @@ const errResult = Result.err('oops');
 
 // Result.unwrapOk returns the value for Ok results
 
-assert(Result.unwrapOk(okResult) === 42);
+assert.isTrue(Result.unwrapOk(okResult) === 42);
 
 // Result.unwrapOk returns undefined for Err results
 
 // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-assert(Result.unwrapOk(errResult) === undefined);
+assert.isTrue(Result.unwrapOk(errResult) === undefined);

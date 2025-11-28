@@ -8,4 +8,4 @@ const largest = PositiveInt.max(
   asPositiveInt(12),
 );
 
-assert(largest === 12);
+assert.isTrue(largest === 12);

@@ -35,11 +35,11 @@ const {
  * @example
  *
  * ```ts
- * assert.ok(isUint(4));
+ * assert.isTrue(isUint(4));
  *
- * assert.notOk(isUint(-1));
+ * assert.isFalse(isUint(-1));
  *
- * assert.ok(Uint.is(0));
+ * assert.isTrue(Uint.is(0));
  * ```
  *
  * @param value The value to check.
@@ -55,9 +55,9 @@ export const isUint = is;
  * ```ts
  * const branded = asUint(12);
  *
- * assert(branded === 12);
+ * assert.isTrue(branded === 12);
  *
- * assert.ok(Uint.is(branded));
+ * assert.isTrue(Uint.is(branded));
  * ```
  *
  * @param value The value to cast.
@@ -80,11 +80,11 @@ export const Uint = {
    * @example
    *
    * ```ts
-   * assert.ok(isUint(4));
+   * assert.isTrue(isUint(4));
    *
-   * assert.notOk(isUint(-1));
+   * assert.isFalse(isUint(-1));
    *
-   * assert.ok(Uint.is(0));
+   * assert.isTrue(Uint.is(0));
    * ```
    *
    * @param value The value to check.
@@ -108,7 +108,7 @@ export const Uint = {
    * ```ts
    * const smallest = Uint.min(asUint(7), asUint(3));
    *
-   * assert(smallest === 3);
+   * assert.isTrue(smallest === 3);
    * ```
    *
    * @param a The first Uint.
@@ -125,7 +125,7 @@ export const Uint = {
    * ```ts
    * const largest = Uint.max(asUint(7), asUint(3));
    *
-   * assert(largest === 7);
+   * assert.isTrue(largest === 7);
    * ```
    *
    * @param a The first Uint.
@@ -144,9 +144,9 @@ export const Uint = {
    *
    * const clampedPositive = Uint.clamp(42);
    *
-   * assert(clampedNegative === 0);
+   * assert.isTrue(clampedNegative === 0);
    *
-   * assert(clampedPositive === 42);
+   * assert.isTrue(clampedPositive === 42);
    * ```
    *
    * @param value The number to clamp.
@@ -166,9 +166,9 @@ export const Uint = {
    *
    * const randomValue = Uint.random(min, max);
    *
-   * assert.ok(Uint.is(randomValue));
+   * assert.isTrue(Uint.is(randomValue));
    *
-   * assert.ok(randomValue >= 0 && randomValue <= 3);
+   * assert.isTrue(randomValue >= 0 && randomValue <= 3);
    * ```
    *
    * @returns A random non-negative integer as a Uint.
@@ -187,7 +187,7 @@ export const Uint = {
    *
    * const power = Uint.pow(base, exponent);
    *
-   * assert(power === 32);
+   * assert.isTrue(power === 32);
    * ```
    *
    * @param a The base Uint.
@@ -204,7 +204,7 @@ export const Uint = {
    * ```ts
    * const sum = Uint.add(asUint(5), asUint(8));
    *
-   * assert(sum === 13);
+   * assert.isTrue(sum === 13);
    * ```
    *
    * @param a The first Uint.
@@ -221,7 +221,7 @@ export const Uint = {
    * ```ts
    * const difference = Uint.sub(asUint(5), asUint(8));
    *
-   * assert(difference === 0);
+   * assert.isTrue(difference === 0);
    * ```
    *
    * @param a The minuend Uint.
@@ -238,7 +238,7 @@ export const Uint = {
    * ```ts
    * const product = Uint.mul(asUint(7), asUint(6));
    *
-   * assert(product === 42);
+   * assert.isTrue(product === 42);
    * ```
    *
    * @param a The first Uint.
@@ -255,7 +255,7 @@ export const Uint = {
    * ```ts
    * const quotient = Uint.div(asUint(10), asUint(4));
    *
-   * assert(quotient === 2);
+   * assert.isTrue(quotient === 2);
    * ```
    *
    * @param a The dividend Uint.

@@ -7,6 +7,6 @@ const sum = PositiveSafeInt.add(
   asPositiveSafeInt(2048),
 );
 
-assert(sum === 3048);
+assert.isTrue(sum === 3048);
 
-assert.ok(PositiveSafeInt.is(sum));
+assert.isTrue(PositiveSafeInt.is(sum));

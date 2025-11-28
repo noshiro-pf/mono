@@ -60,35 +60,35 @@ describe('NonZeroInt test', () => {
 
   describe(isNonZeroInt, () => {
     test('correctly identifies non-zero integers', () => {
-      expect(isNonZeroInt(1)).toBe(true);
+      assert.isTrue(isNonZeroInt(1));
 
-      expect(isNonZeroInt(-1)).toBe(true);
+      assert.isTrue(isNonZeroInt(-1));
 
-      expect(isNonZeroInt(42)).toBe(true);
+      assert.isTrue(isNonZeroInt(42));
 
-      expect(isNonZeroInt(-42)).toBe(true);
+      assert.isTrue(isNonZeroInt(-42));
 
-      expect(isNonZeroInt(Number.MAX_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isNonZeroInt(Number.MAX_SAFE_INTEGER));
 
-      expect(isNonZeroInt(Number.MIN_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isNonZeroInt(Number.MIN_SAFE_INTEGER));
     });
 
     test('correctly identifies zero', () => {
-      expect(isNonZeroInt(0)).toBe(false);
+      assert.isFalse(isNonZeroInt(0));
 
-      expect(isNonZeroInt(-0)).toBe(false);
+      assert.isFalse(isNonZeroInt(-0));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isNonZeroInt(Number.NaN)).toBe(false);
+      assert.isFalse(isNonZeroInt(Number.NaN));
 
-      expect(isNonZeroInt(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroInt(Number.POSITIVE_INFINITY));
 
-      expect(isNonZeroInt(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroInt(Number.NEGATIVE_INFINITY));
 
-      expect(isNonZeroInt(1.2)).toBe(false);
+      assert.isFalse(isNonZeroInt(1.2));
 
-      expect(isNonZeroInt(-3.4)).toBe(false);
+      assert.isFalse(isNonZeroInt(-3.4));
     });
   });
 
@@ -175,9 +175,9 @@ describe('NonZeroInt test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroInt.is(result)).toBe(true);
+        assert.isTrue(NonZeroInt.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).not.toBe(0);
       }
@@ -195,9 +195,9 @@ describe('NonZeroInt test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroInt.is(result)).toBe(true);
+        assert.isTrue(NonZeroInt.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).not.toBe(0);
       }
@@ -215,9 +215,9 @@ describe('NonZeroInt test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroInt.is(result)).toBe(true);
+        assert.isTrue(NonZeroInt.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).not.toBe(0);
       }

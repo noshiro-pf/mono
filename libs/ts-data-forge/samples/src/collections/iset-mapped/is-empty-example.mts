@@ -17,6 +17,6 @@ const points = ISetMapped.create<Point, string>(
   fromKey,
 );
 
-assert.ok(empty.isEmpty);
+assert.isTrue(empty.isEmpty);
 
-assert.notOk(points.isEmpty);
+assert.isFalse(points.isEmpty);

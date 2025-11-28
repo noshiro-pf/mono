@@ -6,6 +6,6 @@ const negative = asSafeInt(-900);
 
 const absolute = SafeInt.abs(negative);
 
-assert(absolute === 900);
+assert.isTrue(absolute === 900);
 
-assert.ok(SafeInt.is(absolute));
+assert.isTrue(SafeInt.is(absolute));

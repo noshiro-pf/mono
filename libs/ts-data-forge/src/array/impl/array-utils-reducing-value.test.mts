@@ -24,7 +24,7 @@ describe('Arr reducing value', () => {
       expectType<typeof result, Some<3 | 4 | 5>>('=');
 
       test('case 1', () => {
-        expect(Optional.isSome(result)).toBe(true);
+        assert.isTrue(Optional.isSome(result));
 
         if (Optional.isSome(result)) {
           expect(result.value).toBe(3);
@@ -40,7 +40,7 @@ describe('Arr reducing value', () => {
       expectType<typeof result, Some<3 | 4 | 5>>('=');
 
       test('case 2', () => {
-        expect(Optional.isSome(result)).toBe(true);
+        assert.isTrue(Optional.isSome(result));
 
         if (Optional.isSome(result)) {
           expect(result.value).toBe(3);
@@ -56,7 +56,7 @@ describe('Arr reducing value', () => {
       expectType<typeof result, Optional<3 | 4 | 5>>('=');
 
       test('case 3', () => {
-        expect(Optional.isSome(result)).toBe(true);
+        assert.isTrue(Optional.isSome(result));
 
         if (Optional.isSome(result)) {
           expect(result.value).toBe(3);
@@ -73,7 +73,7 @@ describe('Arr reducing value', () => {
     expectType<typeof result, Some<3 | 4 | 5>>('=');
 
     test('case 1', () => {
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
         expect(result.value).toBe(5);
@@ -85,7 +85,7 @@ describe('Arr reducing value', () => {
 
       expectType<typeof res, Some<3 | 4 | 5>>('=');
 
-      expect(Optional.isSome(res)).toBe(true);
+      assert.isTrue(Optional.isSome(res));
 
       if (Optional.isSome(res)) {
         expect(res.value).toBe(5);
@@ -99,7 +99,7 @@ describe('Arr reducing value', () => {
 
       expectType<typeof res, Optional<number>>('=');
 
-      expect(Optional.isSome(res)).toBe(true);
+      assert.isTrue(Optional.isSome(res));
 
       if (Optional.isSome(res)) {
         expect(res.value).toBe(5);
@@ -113,7 +113,7 @@ describe('Arr reducing value', () => {
 
       expectType<typeof res, Optional<number>>('=');
 
-      expect(Optional.isNone(res)).toBe(true);
+      assert.isTrue(Optional.isNone(res));
     });
   });
 
@@ -144,7 +144,7 @@ describe('Arr reducing value', () => {
     >('=');
 
     test('case 1', () => {
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
         assert.deepStrictEqual(result.value, { x: 1, y: 2 });
@@ -158,7 +158,7 @@ describe('Arr reducing value', () => {
 
       expectType<typeof res, Optional<{ x: number }>>('=');
 
-      expect(Optional.isNone(res)).toBe(true);
+      assert.isTrue(Optional.isNone(res));
     });
 
     test('case 3: custom comparator', () => {
@@ -185,7 +185,7 @@ describe('Arr reducing value', () => {
         >
       >('=');
 
-      expect(Optional.isSome(res)).toBe(true);
+      assert.isTrue(Optional.isSome(res));
 
       if (Optional.isSome(res)) {
         assert.deepStrictEqual(res.value, { name: 'apple', score: 10 });
@@ -220,7 +220,7 @@ describe('Arr reducing value', () => {
     >('=');
 
     test('case 1', () => {
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
         assert.deepStrictEqual(result.value, { x: 6, y: 1 });
@@ -234,7 +234,7 @@ describe('Arr reducing value', () => {
 
       expectType<typeof res, Optional<{ x: number }>>('=');
 
-      expect(Optional.isNone(res)).toBe(true);
+      assert.isTrue(Optional.isNone(res));
     });
 
     test('case 3: custom comparator', () => {
@@ -261,7 +261,7 @@ describe('Arr reducing value', () => {
         >
       >('=');
 
-      expect(Optional.isSome(res)).toBe(true);
+      assert.isTrue(Optional.isSome(res));
 
       if (Optional.isSome(res)) {
         assert.deepStrictEqual(res.value, { name: 'cherry', score: 12 });
@@ -348,7 +348,7 @@ describe('Arr reducing value', () => {
 
       const even = res.get(0);
 
-      expect(Optional.isSome(even)).toBe(true);
+      assert.isTrue(Optional.isSome(even));
 
       if (Optional.isSome(even)) {
         expect(even.value).toBe(3);
@@ -356,7 +356,7 @@ describe('Arr reducing value', () => {
 
       const odd = res.get(1);
 
-      expect(Optional.isSome(odd)).toBe(true);
+      assert.isTrue(Optional.isSome(odd));
 
       if (Optional.isSome(odd)) {
         expect(odd.value).toBe(3);
@@ -489,7 +489,7 @@ describe('Arr reducing value', () => {
 
       const result = join(arr, ' ');
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value).toBe('Hello World');
@@ -501,7 +501,7 @@ describe('Arr reducing value', () => {
 
       const result = join(arr, '');
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value).toBe('abc');
@@ -513,7 +513,7 @@ describe('Arr reducing value', () => {
 
       const result = join(arr);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value).toBe('a,b,c');
@@ -525,7 +525,7 @@ describe('Arr reducing value', () => {
 
       const result = joinWithDash(['x', 'y', 'z']);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value).toBe('x-y-z');

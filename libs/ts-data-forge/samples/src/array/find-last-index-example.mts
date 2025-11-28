@@ -9,6 +9,6 @@ const lastIndexOfB = Arr.findLastIndex(letters, (letter) => letter === 'b');
 // eslint-disable-next-line unicorn/prefer-array-index-of
 const notFound = Arr.findLastIndex<string>((letter) => letter === 'z')(letters);
 
-assert(lastIndexOfB === 3);
+assert.isTrue(lastIndexOfB === 3);
 
-assert(notFound === -1);
+assert.isTrue(notFound === -1);

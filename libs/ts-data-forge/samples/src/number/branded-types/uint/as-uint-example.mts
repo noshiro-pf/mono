@@ -4,6 +4,6 @@ import { Uint, asUint } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const branded = asUint(12);
 
-assert(branded === 12);
+assert.isTrue(branded === 12);
 
-assert.ok(Uint.is(branded));
+assert.isTrue(Uint.is(branded));

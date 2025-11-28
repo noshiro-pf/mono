@@ -10,4 +10,4 @@ const unchanged = base.delete(4);
 
 assert.deepStrictEqual(Array.from(withoutTwo), [1, 3]);
 
-assert(unchanged === base);
+assert.isTrue(unchanged === base);

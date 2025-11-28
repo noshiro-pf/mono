@@ -9,7 +9,7 @@ const failure = Result.err('error');
 if (Result.isOk(operation)) {
   const value: number = operation.value;
 
-  assert(value === 3);
+  assert.isTrue(value === 3);
 }
 
-assert.ok(Result.isErr(failure));
+assert.isTrue(Result.isErr(failure));

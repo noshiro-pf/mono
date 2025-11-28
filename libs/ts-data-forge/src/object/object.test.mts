@@ -4,27 +4,27 @@ import { Obj } from './object.mjs';
 
 describe('shallowEq', () => {
   test('truthy case 1', () => {
-    expect(Obj.shallowEq({ x: 0 }, { x: 0 })).toBe(true);
+    assert.isTrue(Obj.shallowEq({ x: 0 }, { x: 0 }));
   });
 
   test('truthy case 2', () => {
-    expect(Obj.shallowEq({}, {})).toBe(true);
+    assert.isTrue(Obj.shallowEq({}, {}));
   });
 
   test('falsy case 1', () => {
-    expect(Obj.shallowEq({ x: 0 }, { x: 0, y: 0 })).toBe(false);
+    assert.isFalse(Obj.shallowEq({ x: 0 }, { x: 0, y: 0 }));
   });
 
   test('falsy case 2', () => {
-    expect(Obj.shallowEq({ x: 0, y: 0 }, { x: 0 })).toBe(false);
+    assert.isFalse(Obj.shallowEq({ x: 0, y: 0 }, { x: 0 }));
   });
 
   test('falsy case 3', () => {
-    expect(Obj.shallowEq({ x: 0 }, { y: 0 })).toBe(false);
+    assert.isFalse(Obj.shallowEq({ x: 0 }, { y: 0 }));
   });
 
   test('falsy case 4', () => {
-    expect(Obj.shallowEq({ x: [] }, { y: 0 })).toBe(false);
+    assert.isFalse(Obj.shallowEq({ x: [] }, { y: 0 }));
   });
 });
 

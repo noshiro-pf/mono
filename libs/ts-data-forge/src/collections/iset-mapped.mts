@@ -64,7 +64,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *
    * const set = ISetMapped.create<Point, string>(points, toKey, fromKey);
    *
-   * assert(set.size === 2);
+   * assert.isTrue(set.size === 2);
    * ```
    */
   size: SizeType.Arr;
@@ -90,9 +90,9 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   fromKey,
    * );
    *
-   * assert.ok(empty.isEmpty);
+   * assert.isTrue(empty.isEmpty);
    *
-   * assert.notOk(points.isEmpty);
+   * assert.isFalse(points.isEmpty);
    * ```
    */
   isEmpty: boolean;
@@ -116,9 +116,9 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   fromKey,
    * );
    *
-   * assert.ok(set.has({ x: 1, tag: 'a' }));
+   * assert.isTrue(set.has({ x: 1, tag: 'a' }));
    *
-   * assert.notOk(set.has({ x: 2, tag: 'b' }));
+   * assert.isFalse(set.has({ x: 2, tag: 'b' }));
    * ```
    *
    * @param key The element to check.
@@ -156,9 +156,9 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   (point): point is Readonly<{ x: 2 | 4; tag: 'even' }> => point.x % 2 === 0,
    * );
    *
-   * assert.ok(allEven);
+   * assert.isTrue(allEven);
    *
-   * assert.ok(narrowed);
+   * assert.isTrue(narrowed);
    * ```
    *
    * @param predicate A function to test each element.
@@ -200,9 +200,9 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   fromKey,
    * );
    *
-   * assert.ok(set.some((point) => point.x > 4));
+   * assert.isTrue(set.some((point) => point.x > 4));
    *
-   * assert.notOk(set.some((point) => point.x > 10));
+   * assert.isFalse(set.some((point) => point.x > 10));
    * ```
    *
    * @param predicate A function to test each element.
@@ -241,7 +241,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   { x: 2, tag: 'b' },
    * ]);
    *
-   * assert(unchanged === base);
+   * assert.isTrue(unchanged === base);
    * ```
    *
    * @param key The element to add.
@@ -277,7 +277,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *
    * assert.deepStrictEqual(Array.from(withoutSecond), [{ x: 1, tag: 'a' }]);
    *
-   * assert(unchanged === base);
+   * assert.isTrue(unchanged === base);
    * ```
    *
    * @param key The element to delete.
@@ -517,9 +517,9 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   fromKey,
    * );
    *
-   * assert.ok(subset.isSubsetOf(superset));
+   * assert.isTrue(subset.isSubsetOf(superset));
    *
-   * assert.notOk(superset.isSubsetOf(subset));
+   * assert.isFalse(superset.isSubsetOf(subset));
    * ```
    *
    * @param set The other set.
@@ -556,9 +556,9 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *   fromKey,
    * );
    *
-   * assert.ok(superset.isSupersetOf(subset));
+   * assert.isTrue(superset.isSupersetOf(subset));
    *
-   * assert.notOk(subset.isSupersetOf(superset));
+   * assert.isFalse(subset.isSupersetOf(superset));
    * ```
    *
    * @param set The other set.
@@ -846,9 +846,9 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *
    * const raw = set.toRawSet();
    *
-   * assert.ok(is.set(raw));
+   * assert.isTrue(is.set(raw));
    *
-   * assert.ok(raw.has(toKey({ x: 1, tag: 'a' })));
+   * assert.isTrue(raw.has(toKey({ x: 1, tag: 'a' })));
    * ```
    *
    * @returns The raw ReadonlySet instance.
@@ -991,9 +991,9 @@ export namespace ISetMapped {
    *   fromKey,
    * );
    *
-   * assert.ok(ISetMapped.equal(first, second));
+   * assert.isTrue(ISetMapped.equal(first, second));
    *
-   * assert.notOk(ISetMapped.equal(first, third));
+   * assert.isFalse(ISetMapped.equal(first, third));
    * ```
    *
    * @template K The type of the custom elements.

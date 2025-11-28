@@ -6,9 +6,9 @@ const maybeArray: unknown = [1, 2, 3];
 
 const maybeValue: unknown = 'Ada';
 
-assert.ok(Arr.isArray(maybeArray));
+assert.isTrue(Arr.isArray(maybeArray));
 
-assert.notOk(Arr.isArray(maybeValue));
+assert.isFalse(Arr.isArray(maybeValue));
 
 if (Arr.isArray(maybeArray)) {
   assert.deepStrictEqual(maybeArray, [1, 2, 3]);

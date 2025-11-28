@@ -11,6 +11,6 @@ const indexOfMissing = Arr.findIndex<string>((letter) => letter === 'z')(
   letters,
 );
 
-assert(indexOfB === 1);
+assert.isTrue(indexOfB === 1);
 
-assert(indexOfMissing === -1);
+assert.isTrue(indexOfMissing === -1);

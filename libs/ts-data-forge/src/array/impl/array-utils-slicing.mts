@@ -16,7 +16,7 @@ import { isEmpty } from './array-utils-validation.mjs';
  *
  *   assert.deepStrictEqual(remainder, ['Grace', 'Katherine']);
  *
- *   assert(remainder.length === 2);
+ *   assert.isTrue(remainder.length === 2);
  * }
  *
  * {
@@ -50,7 +50,7 @@ export const tail = <const Ar extends readonly unknown[]>(
  *
  * assert.deepStrictEqual(withoutLast, ['task-1', 'task-2']);
  *
- * assert(withoutLast.length === 2);
+ * assert.isTrue(withoutLast.length === 2);
  * ```
  */
 export const butLast = <const Ar extends readonly unknown[]>(

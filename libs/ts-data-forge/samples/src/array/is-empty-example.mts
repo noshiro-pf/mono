@@ -6,9 +6,9 @@ const emptyNumbers: readonly number[] = [] as const;
 
 const words = ['Ada', 'Lovelace'] as const;
 
-assert.ok(Arr.isEmpty(emptyNumbers));
+assert.isTrue(Arr.isEmpty(emptyNumbers));
 
-assert.notOk(Arr.isEmpty(words));
+assert.isFalse(Arr.isEmpty(words));
 
 if (Arr.isEmpty(emptyNumbers)) {
   assert.deepStrictEqual(emptyNumbers, []);

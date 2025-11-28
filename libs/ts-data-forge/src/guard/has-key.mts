@@ -21,9 +21,9 @@
  *
  * if (hasKey(maybeUser, 'id')) {
  *   // `maybeUser` is now known to have an `id` property.
- *   assert(maybeUser.id === 42);
+ *   assert.isTrue(maybeUser.id === 42);
  * } else {
- *   assert.fail('Expected the object to contain the id key.');
+ *   assert.fail();
  * }
  * ```
  *
@@ -58,11 +58,14 @@ export type HasKeyReturnType<
 > = R extends R // union distribution
   ? K extends keyof R
     ? string extends keyof R
-      ? ReadonlyRecord<K, R[keyof R]> & R
+      ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+        ReadonlyRecord<K, R[keyof R]> & R
       : number extends keyof R
-        ? ReadonlyRecord<K, R[keyof R]> & R
+        ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+          ReadonlyRecord<K, R[keyof R]> & R
         : symbol extends keyof R
-          ? ReadonlyRecord<K, R[keyof R]> & R
+          ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+            ReadonlyRecord<K, R[keyof R]> & R
           : R
     : never // omit union member that does not have key K
   : never; // dummy case for union distribution

@@ -13,10 +13,10 @@ const user = {
 // Select only safe properties to serialize
 const safeJson = Json.stringifySelected(user, ['id', 'name', 'role']);
 
-assert.ok(Result.isOk(safeJson));
+assert.isTrue(Result.isOk(safeJson));
 
 if (Result.isOk(safeJson)) {
-  assert(isString(safeJson.value));
+  assert.isTrue(isString(safeJson.value));
 
   const parsed: unknown = JSON.parse(safeJson.value);
 
@@ -26,12 +26,12 @@ if (Result.isOk(safeJson)) {
     role: 'admin',
   });
 
-  assert.ok(!safeJson.value.includes('password'));
+  assert.isFalse(safeJson.value.includes('password'));
 
-  assert.ok(!safeJson.value.includes('email'));
+  assert.isFalse(safeJson.value.includes('email'));
 }
 
 // With formatting
 const formatted = Json.stringifySelected(user, ['id', 'name'], 2);
 
-assert.ok(Result.isOk(formatted));
+assert.isTrue(Result.isOk(formatted));

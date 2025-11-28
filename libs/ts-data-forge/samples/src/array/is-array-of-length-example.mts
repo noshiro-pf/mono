@@ -6,9 +6,9 @@ const pair: readonly number[] = [1, 2];
 
 const triple: readonly number[] = [1, 2, 3];
 
-assert.ok(Arr.isArrayOfLength(pair, 2));
+assert.isTrue(Arr.isArrayOfLength(pair, 2));
 
-assert.notOk(Arr.isArrayOfLength(triple, 2));
+assert.isFalse(Arr.isArrayOfLength(triple, 2));
 
 if (Arr.isArrayOfLength(pair, 2)) {
   assert.deepStrictEqual(pair, [1, 2]);

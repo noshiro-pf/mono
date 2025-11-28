@@ -6,6 +6,6 @@ const clampedNegative = Uint.clamp(-5);
 
 const clampedPositive = Uint.clamp(42);
 
-assert(clampedNegative === 0);
+assert.isTrue(clampedNegative === 0);
 
-assert(clampedPositive === 42);
+assert.isTrue(clampedPositive === 42);

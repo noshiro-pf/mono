@@ -89,7 +89,7 @@ type PipeBase<A> = Readonly<{
    *   value.toUpperCase(),
    * );
    *
-   * assert(empty.value === undefined);
+   * assert.isTrue(empty.value === undefined);
    * ```
    *
    * @template B The type of the transformed value.
@@ -127,7 +127,7 @@ type PipeWithMapOptional<A extends UnknownOptional> = MergeIntersection<
        *   (value) => value * 2,
        * );
        *
-       * assert.ok(Optional.isNone(empty.value));
+       * assert.isTrue(Optional.isNone(empty.value));
        * ```
        *
        * @template B The type of the transformed inner value.

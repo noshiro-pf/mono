@@ -9,11 +9,11 @@ describe(keyIsIn, () => {
   f('a' as 'a' | 'b' | 'c', { a: 0, b: 1 });
 
   test('', () => {
-    expect(
+    assert.isTrue(
       keyIsIn('a', {
         a: 0,
         b: 1,
       }),
-    ).toBe(true);
+    );
   });
 });

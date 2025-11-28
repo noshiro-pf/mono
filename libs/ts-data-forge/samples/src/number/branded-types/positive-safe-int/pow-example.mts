@@ -8,4 +8,4 @@ const exponent = asPositiveSafeInt(3);
 
 const power = PositiveSafeInt.pow(base, exponent);
 
-assert(power === 27);
+assert.isTrue(power === 27);

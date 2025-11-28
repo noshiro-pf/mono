@@ -893,9 +893,9 @@ describe('Arr transformations', () => {
 
       const vegetables = grouped.get('vegetable');
 
-      expect(Optional.isSome(fruits)).toBe(true);
+      assert.isTrue(Optional.isSome(fruits));
 
-      expect(Optional.isSome(vegetables)).toBe(true);
+      assert.isTrue(Optional.isSome(vegetables));
 
       if (Optional.isSome(fruits)) {
         expect(fruits.value).toHaveLength(2);

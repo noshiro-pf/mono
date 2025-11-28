@@ -6,6 +6,6 @@ const someString = Optional.some('text');
 
 const noneString = Optional.none as Optional<string>;
 
-assert(Optional.unwrap(someString) === 'text');
+assert.isTrue(Optional.unwrap(someString) === 'text');
 
-assert(Optional.unwrap(noneString) === undefined);
+assert.isTrue(Optional.unwrap(noneString) === undefined);

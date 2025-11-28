@@ -93,7 +93,7 @@ describe('Num test', () => {
         expectType<typeof x, number>('=');
       }
 
-      expect(f(x)).toBe(true);
+      assert.isTrue(f(x));
     });
 
     test('falsy case', () => {
@@ -107,7 +107,7 @@ describe('Num test', () => {
         expectType<typeof x, number>('=');
       }
 
-      expect(f(x)).toBe(false);
+      assert.isFalse(f(x));
     });
   });
 
@@ -135,15 +135,15 @@ describe('Num test', () => {
     test('checks range (lower inclusive, upper exclusive)', () => {
       const inRange = Num.isInRange(0, 10);
 
-      expect(inRange(5)).toBe(true);
+      assert.isTrue(inRange(5));
 
-      expect(inRange(0)).toBe(true); // inclusive lower bound
+      assert.isTrue(inRange(0)); // inclusive lower bound
 
-      expect(inRange(10)).toBe(false); // exclusive upper bound
+      assert.isFalse(inRange(10)); // exclusive upper bound
 
-      expect(inRange(-1)).toBe(false);
+      assert.isFalse(inRange(-1));
 
-      expect(inRange(15)).toBe(false);
+      assert.isFalse(inRange(15));
     });
   });
 
@@ -151,15 +151,15 @@ describe('Num test', () => {
     test('checks range (inclusive)', () => {
       const inRange = Num.isInRangeInclusive(0, 10);
 
-      expect(inRange(5)).toBe(true);
+      assert.isTrue(inRange(5));
 
-      expect(inRange(0)).toBe(true); // inclusive
+      assert.isTrue(inRange(0)); // inclusive
 
-      expect(inRange(10)).toBe(true); // inclusive
+      assert.isTrue(inRange(10)); // inclusive
 
-      expect(inRange(-1)).toBe(false);
+      assert.isFalse(inRange(-1));
 
-      expect(inRange(15)).toBe(false);
+      assert.isFalse(inRange(15));
     });
   });
 
@@ -167,13 +167,13 @@ describe('Num test', () => {
     test('checks uint range (lower inclusive, upper exclusive)', () => {
       const inRange = Num.isUintInRange(0, 5);
 
-      expect(inRange(2)).toBe(true);
+      assert.isTrue(inRange(2));
 
-      expect(inRange(0)).toBe(true); // inclusive lower bound
+      assert.isTrue(inRange(0)); // inclusive lower bound
 
-      expect(inRange(5)).toBe(false); // exclusive upper bound
+      assert.isFalse(inRange(5)); // exclusive upper bound
 
-      expect(inRange(-1)).toBe(false);
+      assert.isFalse(inRange(-1));
     });
   });
 
@@ -185,33 +185,33 @@ describe('Num test', () => {
         expectType<typeof x, NonZeroNumber>('=');
       }
 
-      expect(Num.isNonZero(5)).toBe(true);
+      assert.isTrue(Num.isNonZero(5));
 
-      expect(Num.isNonZero(-3)).toBe(true);
+      assert.isTrue(Num.isNonZero(-3));
 
-      expect(Num.isNonZero(0)).toBe(false);
+      assert.isFalse(Num.isNonZero(0));
     });
   });
 
   describe('isNonNegative', () => {
     test('type guard for non-negative numbers', () => {
-      expect(Num.isNonNegative(5)).toBe(true);
+      assert.isTrue(Num.isNonNegative(5));
 
-      expect(Num.isNonNegative(0)).toBe(true);
+      assert.isTrue(Num.isNonNegative(0));
 
-      expect(Num.isNonNegative(-1)).toBe(false);
+      assert.isFalse(Num.isNonNegative(-1));
     });
   });
 
   describe('isPositive', () => {
     test('type guard for positive numbers', () => {
-      expect(Num.isPositive(5)).toBe(true);
+      assert.isTrue(Num.isPositive(5));
 
-      expect(Num.isPositive(0.1)).toBe(true);
+      assert.isTrue(Num.isPositive(0.1));
 
-      expect(Num.isPositive(0)).toBe(false);
+      assert.isFalse(Num.isPositive(0));
 
-      expect(Num.isPositive(-1)).toBe(false);
+      assert.isFalse(Num.isPositive(-1));
     });
   });
 

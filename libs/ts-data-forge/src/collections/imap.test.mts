@@ -122,7 +122,7 @@ describe('IMap.equal', () => {
       ['b', 2],
     ]);
 
-    expect(IMap.equal(map1, map2)).toBe(true);
+    assert.isTrue(IMap.equal(map1, map2));
   });
 
   test('should return true for different creation order', () => {
@@ -136,7 +136,7 @@ describe('IMap.equal', () => {
       ['a', 1],
     ]);
 
-    expect(IMap.equal(map1, map2)).toBe(true);
+    assert.isTrue(IMap.equal(map1, map2));
   });
 
   test('should return false for maps with different sizes', () => {
@@ -147,7 +147,7 @@ describe('IMap.equal', () => {
       ['b', 2],
     ]);
 
-    expect(IMap.equal(map1, map2)).toBe(false);
+    assert.isFalse(IMap.equal(map1, map2));
   });
 
   test('should return false for maps with different values', () => {
@@ -161,7 +161,7 @@ describe('IMap.equal', () => {
       ['b', 3],
     ]);
 
-    expect(IMap.equal(map1, map2)).toBe(false);
+    assert.isFalse(IMap.equal(map1, map2));
   });
 
   test('should return false for maps with different keys', () => {
@@ -175,7 +175,7 @@ describe('IMap.equal', () => {
       ['c', 2],
     ]);
 
-    expect(IMap.equal(map1, map2)).toBe(false);
+    assert.isFalse(IMap.equal(map1, map2));
   });
 
   test('should return true for empty maps', () => {
@@ -183,7 +183,7 @@ describe('IMap.equal', () => {
 
     const map2 = IMap.create<string, number>([]);
 
-    expect(IMap.equal(map1, map2)).toBe(true);
+    assert.isTrue(IMap.equal(map1, map2));
   });
 });
 
@@ -209,7 +209,7 @@ describe('IMap.has', () => {
       [7, 70],
     ] as const);
 
-    expect(m0.has(6)).toBe(true);
+    assert.isTrue(m0.has(6));
   });
 
   test('case 2', () => {
@@ -221,13 +221,13 @@ describe('IMap.has', () => {
       [7, 70],
     ]);
 
-    expect(m0.has(8)).toBe(false);
+    assert.isFalse(m0.has(8));
   });
 
   test('case 3', () => {
     const m0 = IMap.create<number, number>([]);
 
-    expect(m0.has(0)).toBe(false);
+    assert.isFalse(m0.has(0));
   });
 
   test('case 4', () => {
@@ -240,7 +240,7 @@ describe('IMap.has', () => {
       [Number.NaN, 0],
     ] as const);
 
-    expect(m0.has(Number.NaN)).toBe(true);
+    assert.isTrue(m0.has(Number.NaN));
   });
 
   test('should handle boolean keys', () => {
@@ -249,9 +249,9 @@ describe('IMap.has', () => {
       [false, 'no'],
     ]);
 
-    expect(map.has(true)).toBe(true);
+    assert.isTrue(map.has(true));
 
-    expect(map.has(false)).toBe(true);
+    assert.isTrue(map.has(false));
   });
 
   test('should handle string number keys', () => {
@@ -260,9 +260,9 @@ describe('IMap.has', () => {
       ['2', 'two'],
     ]);
 
-    expect(map.has('1')).toBe(true);
+    assert.isTrue(map.has('1'));
 
-    expect(map.has(String(1))).toBe(true);
+    assert.isTrue(map.has(String(1)));
   });
 });
 
@@ -411,7 +411,7 @@ describe('IMap.set', () => {
 
     const curr = map.get('a');
 
-    assert(Optional.isSome(curr));
+    assert.isTrue(Optional.isSome(curr));
 
     const updated = map.set('a', curr.value);
 
@@ -429,9 +429,9 @@ describe('IMap.set', () => {
 
     expect(modified.size).toBe(2);
 
-    expect(original.has('b')).toBe(false);
+    assert.isFalse(original.has('b'));
 
-    expect(modified.has('b')).toBe(true);
+    assert.isTrue(modified.has('b'));
   });
 });
 
@@ -606,9 +606,9 @@ describe('IMap.delete', () => {
 
     expect(modified.size).toBe(1);
 
-    expect(original.has('a')).toBe(true);
+    assert.isTrue(original.has('a'));
 
-    expect(modified.has('a')).toBe(false);
+    assert.isFalse(modified.has('a'));
   });
 });
 
@@ -620,7 +620,7 @@ describe('IMap.every', () => {
       ['c', 6],
     ]);
 
-    expect(map.every((value) => value % 2 === 0)).toBe(true);
+    assert.isTrue(map.every((value) => value % 2 === 0));
   });
 
   test('should return false when some elements do not satisfy predicate', () => {
@@ -630,13 +630,13 @@ describe('IMap.every', () => {
       ['c', 4],
     ]);
 
-    expect(map.every((value) => value % 2 === 0)).toBe(false);
+    assert.isFalse(map.every((value) => value % 2 === 0));
   });
 
   test('should return true for empty map', () => {
     const map = IMap.create<string, number>([]);
 
-    expect(map.every((value) => value > 0)).toBe(true);
+    assert.isTrue(map.every((value) => value > 0));
   });
 
   test('should work with key parameter', () => {
@@ -646,7 +646,7 @@ describe('IMap.every', () => {
       ['cc', 3],
     ]);
 
-    expect(map.every((_value, key) => key.length === 2)).toBe(true);
+    assert.isTrue(map.every((_value, key) => key.length === 2));
   });
 
   test('should work as type guard', () => {
@@ -659,7 +659,7 @@ describe('IMap.every', () => {
       // Type should be narrowed to IMap<string, string>
       const firstValue = Optional.unwrap(map.get('a'));
 
-      expect(isString(firstValue)).toBe(true);
+      assert.isTrue(isString(firstValue));
     }
   });
 });
@@ -672,7 +672,7 @@ describe('IMap.some', () => {
       ['c', 3],
     ]);
 
-    expect(map.some((value) => value % 2 === 0)).toBe(true);
+    assert.isTrue(map.some((value) => value % 2 === 0));
   });
 
   test('should return false when no elements satisfy predicate', () => {
@@ -682,13 +682,13 @@ describe('IMap.some', () => {
       ['c', 5],
     ]);
 
-    expect(map.some((value) => value % 2 === 0)).toBe(false);
+    assert.isFalse(map.some((value) => value % 2 === 0));
   });
 
   test('should return false for empty map', () => {
     const map = IMap.create<string, number>([]);
 
-    expect(map.some((value) => value > 0)).toBe(false);
+    assert.isFalse(map.some((value) => value > 0));
   });
 
   test('should work with key parameter', () => {
@@ -698,7 +698,7 @@ describe('IMap.some', () => {
       ['c', 3],
     ]);
 
-    expect(map.some((_value, key) => key.length > 1)).toBe(true);
+    assert.isTrue(map.some((_value, key) => key.length > 1));
   });
 });
 
@@ -721,7 +721,7 @@ describe('IMap.withMutations', () => {
 
     expect(Optional.unwrap(updated.get('c'))).toBe(3);
 
-    expect(Optional.isNone(updated.get('b'))).toBe(true);
+    assert.isTrue(Optional.isNone(updated.get('b')));
   });
 
   test('should handle empty mutations array', () => {
@@ -748,7 +748,7 @@ describe('IMap.withMutations', () => {
 
     expect(updated.size).toBe(map.size);
 
-    expect(Optional.isNone(updated.get('nonexistent'))).toBe(true);
+    assert.isTrue(Optional.isNone(updated.get('nonexistent')));
   });
 
   test('should handle mixed operations', () => {
@@ -816,7 +816,7 @@ describe('IMap.mapKeys', () => {
 
     const mapped = map.mapKeys((key) => key.toUpperCase());
 
-    expect(Optional.isNone(mapped.get('a'))).toBe(true);
+    assert.isTrue(Optional.isNone(mapped.get('a')));
 
     expect(Optional.unwrap(mapped.get('A'))).toBe(1);
 

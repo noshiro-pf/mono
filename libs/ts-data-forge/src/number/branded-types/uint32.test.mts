@@ -65,37 +65,37 @@ describe('Uint32 test', () => {
 
   describe(isUint32, () => {
     test('correctly identifies uint32 values', () => {
-      expect(isUint32(0)).toBe(true);
+      assert.isTrue(isUint32(0));
 
-      expect(isUint32(1)).toBe(true);
+      assert.isTrue(isUint32(1));
 
-      expect(isUint32(4_294_967_295)).toBe(true);
+      assert.isTrue(isUint32(4_294_967_295));
 
-      expect(isUint32(2_147_483_648)).toBe(true);
+      assert.isTrue(isUint32(2_147_483_648));
     });
 
     test('correctly identifies values outside uint32 range', () => {
-      expect(isUint32(4_294_967_296)).toBe(false);
+      assert.isFalse(isUint32(4_294_967_296));
 
-      expect(isUint32(10_000_000_000)).toBe(false);
+      assert.isFalse(isUint32(10_000_000_000));
     });
 
     test('correctly identifies negative integers', () => {
-      expect(isUint32(-1)).toBe(false);
+      assert.isFalse(isUint32(-1));
 
-      expect(isUint32(-42)).toBe(false);
+      assert.isFalse(isUint32(-42));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isUint32(Number.NaN)).toBe(false);
+      assert.isFalse(isUint32(Number.NaN));
 
-      expect(isUint32(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isUint32(Number.POSITIVE_INFINITY));
 
-      expect(isUint32(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isUint32(Number.NEGATIVE_INFINITY));
 
-      expect(isUint32(1.2)).toBe(false);
+      assert.isFalse(isUint32(1.2));
 
-      expect(isUint32(-3.4)).toBe(false);
+      assert.isFalse(isUint32(-3.4));
     });
   });
 
@@ -188,9 +188,9 @@ describe('Uint32 test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(Uint32.is(result)).toBe(true);
+        assert.isTrue(Uint32.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).toBeGreaterThanOrEqual(0);
       }

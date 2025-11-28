@@ -167,7 +167,7 @@ describe('Uint8 test', () => {
 
       expect(result).toBeLessThanOrEqual(max);
 
-      expect(Number.isInteger(result)).toBe(true);
+      assert.isTrue(Number.isInteger(result));
     });
   });
 });

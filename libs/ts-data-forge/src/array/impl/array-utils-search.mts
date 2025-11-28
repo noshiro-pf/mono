@@ -194,9 +194,9 @@ export function findLast<E>(
  *   letters,
  * );
  *
- * assert(indexOfB === 1);
+ * assert.isTrue(indexOfB === 1);
  *
- * assert(indexOfMissing === -1);
+ * assert.isTrue(indexOfMissing === -1);
  * ```
  */
 export function findIndex<const Ar extends readonly unknown[]>(
@@ -259,9 +259,9 @@ export function findIndex<E>(
  * // eslint-disable-next-line unicorn/prefer-array-index-of
  * const notFound = Arr.findLastIndex<string>((letter) => letter === 'z')(letters);
  *
- * assert(lastIndexOfB === 3);
+ * assert.isTrue(lastIndexOfB === 3);
  *
- * assert(notFound === -1);
+ * assert.isTrue(notFound === -1);
  * ```
  */
 export function findLastIndex<const Ar extends readonly unknown[]>(

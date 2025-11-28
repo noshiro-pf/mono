@@ -8,6 +8,6 @@ const exponent = asSafeInt(5);
 
 const power = SafeInt.pow(base, exponent);
 
-assert(power === 243);
+assert.isTrue(power === 243);
 
-assert.ok(SafeInt.is(power));
+assert.isTrue(SafeInt.is(power));

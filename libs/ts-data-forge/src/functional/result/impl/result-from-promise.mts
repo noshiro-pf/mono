@@ -28,7 +28,7 @@ type UnwrapPromise<P extends Promise<unknown>> =
  *
  * assert.deepStrictEqual(resolved, Result.ok('ok'));
  *
- * assert.ok(Result.isErr(rejected));
+ * assert.isTrue(Result.isErr(rejected));
  * ```
  *
  * @template P The type of the input Promise.

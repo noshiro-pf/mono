@@ -2,12 +2,12 @@
 import { Num } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
-assert(Num.clamp(150, 0, 100) === 100);
+assert.isTrue(Num.clamp(150, 0, 100) === 100);
 
-assert(Num.clamp(-50, 0, 100) === 0);
+assert.isTrue(Num.clamp(-50, 0, 100) === 0);
 
 const clampToPercentage = Num.clamp(0, 100);
 
-assert(clampToPercentage(75) === 75);
+assert.isTrue(clampToPercentage(75) === 75);
 
-assert(clampToPercentage(150) === 100);
+assert.isTrue(clampToPercentage(150) === 100);

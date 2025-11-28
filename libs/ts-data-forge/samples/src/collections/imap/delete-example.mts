@@ -13,6 +13,6 @@ assert.deepStrictEqual(original.get('b'), Optional.some(2));
 
 assert.deepStrictEqual(withoutB.get('b'), Optional.none);
 
-assert(original.size === 2);
+assert.isTrue(original.size === 2);
 
-assert(withoutB.size === 1);
+assert.isTrue(withoutB.size === 1);

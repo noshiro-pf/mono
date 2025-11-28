@@ -8,6 +8,6 @@ const longWords = Arr.count(words, (word) => word.length > 4);
 
 const withCurried = Arr.count<string>((word) => word.includes('a'))(words);
 
-assert(longWords === 2);
+assert.isTrue(longWords === 2);
 
-assert(withCurried === 2);
+assert.isTrue(withCurried === 2);

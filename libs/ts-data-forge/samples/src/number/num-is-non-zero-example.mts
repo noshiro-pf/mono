@@ -9,7 +9,7 @@ if (Num.isNonZero(value)) {
   // eslint-disable-next-line total-functions/no-partial-division
   const inverted = 1 / value;
 
-  assert(inverted === 0.2);
+  assert.isTrue(inverted === 0.2);
 }
 
-assert.notOk(Num.isNonZero(0));
+assert.isFalse(Num.isNonZero(0));

@@ -17,4 +17,4 @@ assert.deepStrictEqual(boosted.get('alice'), Optional.some(15));
 
 assert.deepStrictEqual(scores.get('alice'), Optional.some(10));
 
-assert(unchanged === scores);
+assert.isTrue(unchanged === scores);

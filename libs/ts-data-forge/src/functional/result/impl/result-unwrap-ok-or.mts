@@ -12,15 +12,15 @@ import { type UnwrapOk } from './types.mjs';
  *
  * const errValue = Result.err('fail');
  *
- * assert(Result.unwrapOkOr(okValue, 0) === 10);
+ * assert.isTrue(Result.unwrapOkOr(okValue, 0) === 10);
  *
- * assert(Result.unwrapOkOr(errValue, 0) === 0);
+ * assert.isTrue(Result.unwrapOkOr(errValue, 0) === 0);
  *
  * const unwrapWithDefault = Result.unwrapOkOr(5);
  *
- * assert(unwrapWithDefault(Result.ok(3)) === 3);
+ * assert.isTrue(unwrapWithDefault(Result.ok(3)) === 3);
  *
- * assert(unwrapWithDefault(Result.err('no data')) === 5);
+ * assert.isTrue(unwrapWithDefault(Result.err('no data')) === 5);
  * ```
  *
  * @template R The `UnknownResult` type to unwrap.

@@ -4,6 +4,6 @@ import { Num } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const inclusiveGuard = Num.isUintInRangeInclusive(0, 5);
 
-assert.ok(inclusiveGuard(5));
+assert.isTrue(inclusiveGuard(5));
 
-assert.notOk(inclusiveGuard(6));
+assert.isFalse(inclusiveGuard(6));

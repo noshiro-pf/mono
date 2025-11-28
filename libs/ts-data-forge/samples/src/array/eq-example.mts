@@ -8,6 +8,6 @@ const sameNumbers = [1, 2, 3] as const;
 
 const differentNumbers = [1, 2, 4] as const;
 
-assert.ok(Arr.eq(numbers, sameNumbers));
+assert.isTrue(Arr.eq(numbers, sameNumbers));
 
-assert.notOk(Arr.eq(numbers, differentNumbers));
+assert.isFalse(Arr.eq(numbers, differentNumbers));

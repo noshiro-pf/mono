@@ -10,4 +10,4 @@ const rejected = await TernaryResult.fromPromise(
 
 assert.deepStrictEqual(resolved, TernaryResult.ok('ok'));
 
-assert.ok(TernaryResult.isErr(rejected));
+assert.isTrue(TernaryResult.isErr(rejected));

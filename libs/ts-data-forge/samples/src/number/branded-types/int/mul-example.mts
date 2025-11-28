@@ -4,4 +4,4 @@ import { Int, asInt } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const product = Int.mul(asInt(-4), asInt(6));
 
-assert(product === -24);
+assert.isTrue(product === -24);

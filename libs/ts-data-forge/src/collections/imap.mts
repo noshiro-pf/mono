@@ -44,7 +44,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *
    * const map = IMap.create(entries);
    *
-   * assert(map.size === 2);
+   * assert.isTrue(map.size === 2);
    * ```
    */
   size: SizeType.Arr;
@@ -61,9 +61,9 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *   ['enabled', true],
    * ]);
    *
-   * assert.ok(map.has('id'));
+   * assert.isTrue(map.has('id'));
    *
-   * assert.notOk(map.has('missing'));
+   * assert.isFalse(map.has('missing'));
    * ```
    *
    * @param key The key to check.
@@ -107,9 +107,9 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *
    * const isNarrowed = map.every((value): value is 2 | 4 => value % 2 === 0);
    *
-   * assert.ok(allEven);
+   * assert.isTrue(allEven);
    *
-   * assert.ok(isNarrowed);
+   * assert.isTrue(isNarrowed);
    * ```
    *
    * @param predicate A function to test each key-value pair.
@@ -142,9 +142,9 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *
    * const map = IMap.create(entries);
    *
-   * assert.ok(map.some((value) => value > 4));
+   * assert.isTrue(map.some((value) => value > 4));
    *
-   * assert.notOk(map.some((value) => value > 10));
+   * assert.isFalse(map.some((value) => value > 10));
    * ```
    *
    * @param predicate A function to test each key-value pair.
@@ -172,9 +172,9 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *
    * assert.deepStrictEqual(withoutB.get('b'), Optional.none);
    *
-   * assert(original.size === 2);
+   * assert.isTrue(original.size === 2);
    *
-   * assert(withoutB.size === 1);
+   * assert.isTrue(withoutB.size === 1);
    * ```
    *
    * @param key The key to delete.
@@ -233,7 +233,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *
    * assert.deepStrictEqual(scores.get('alice'), Optional.some(10));
    *
-   * assert(unchanged === scores);
+   * assert.isTrue(unchanged === scores);
    * ```
    *
    * @param key The key whose value to update.
@@ -575,9 +575,9 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *
    * const raw = map.toRawMap();
    *
-   * assert.ok(is.map(raw));
+   * assert.isTrue(is.map(raw));
    *
-   * assert(raw.get('key') === 1);
+   * assert.isTrue(raw.get('key') === 1);
    * ```
    *
    * @returns The raw ReadonlyMap instance.
@@ -633,7 +633,7 @@ export namespace IMap {
    *   ['status', 'active'],
    * ]);
    *
-   * assert(map.size === 2);
+   * assert.isTrue(map.size === 2);
    *
    * assert.deepStrictEqual(map.get('status'), Optional.some('active'));
    * ```
@@ -676,9 +676,9 @@ export namespace IMap {
    *   ['b', 3],
    * ]);
    *
-   * assert.ok(IMap.equal(first, second));
+   * assert.isTrue(IMap.equal(first, second));
    *
-   * assert.notOk(IMap.equal(first, third));
+   * assert.isFalse(IMap.equal(first, third));
    * ```
    *
    * @template K The type of the keys.

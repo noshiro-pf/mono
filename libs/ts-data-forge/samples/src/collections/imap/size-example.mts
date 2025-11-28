@@ -9,4 +9,4 @@ const entries = [
 
 const map = IMap.create(entries);
 
-assert(map.size === 2);
+assert.isTrue(map.size === 2);

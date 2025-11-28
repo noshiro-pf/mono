@@ -4,6 +4,6 @@ import { Num } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const isPercentage = Num.isInRangeInclusive(0, 100);
 
-assert.ok(isPercentage(100));
+assert.isTrue(isPercentage(100));
 
-assert.notOk(isPercentage(-1));
+assert.isFalse(isPercentage(-1));

@@ -15,4 +15,4 @@ const message = match<
   published: 'Complete',
 });
 
-assert(message === 'Work in progress');
+assert.isTrue(message === 'Work in progress');

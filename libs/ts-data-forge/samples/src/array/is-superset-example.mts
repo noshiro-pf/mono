@@ -8,8 +8,8 @@ const subset = ['a', 'c'] as const;
 
 const notSuperset = ['a', 'd'] as const;
 
-assert.ok(Arr.isSuperset(potentialSuperset, subset));
+assert.isTrue(Arr.isSuperset(potentialSuperset, subset));
 
-assert.notOk(Arr.isSuperset(subset, potentialSuperset));
+assert.isFalse(Arr.isSuperset(subset, potentialSuperset));
 
-assert.notOk(Arr.isSuperset(potentialSuperset, notSuperset));
+assert.isFalse(Arr.isSuperset(potentialSuperset, notSuperset));

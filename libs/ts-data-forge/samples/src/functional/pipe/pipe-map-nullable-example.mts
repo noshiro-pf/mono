@@ -12,4 +12,4 @@ const empty = pipe<string | undefined>(undefined).mapNullable((value) =>
   value.toUpperCase(),
 );
 
-assert(empty.value === undefined);
+assert.isTrue(empty.value === undefined);

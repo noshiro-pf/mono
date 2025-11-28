@@ -64,13 +64,13 @@ describe(pipe, () => {
 
     const result = pipe(optional).mapOptional((x) => x * 2).value;
 
-    expect(Optional.isSome(result)).toBe(true);
+    assert.isTrue(Optional.isSome(result));
 
     if (Optional.isSome(result)) {
       expect(result.value).toBe(84);
     }
 
-    expectType<typeof result, Optional<number>>('=');
+    expectType<typeof result, Some<number>>('=');
   });
 
   test('mapOptional with None value', () => {
@@ -78,9 +78,9 @@ describe(pipe, () => {
 
     const result = pipe(optional).mapOptional((x) => x * 2).value;
 
-    expect(Optional.isNone(result)).toBe(true);
+    assert.isTrue(Optional.isNone(result));
 
-    expectType<typeof result, Optional<number>>('=');
+    expectType<typeof result, None>('=');
   });
 
   test('chaining multiple operations', () => {

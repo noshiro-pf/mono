@@ -7,7 +7,7 @@ const user = { id: 1, name: 'Ada' } as const;
 const maybeKey: string = 'name';
 
 if (keyIsIn(maybeKey, user)) {
-  assert(user[maybeKey] === 'Ada');
+  assert.isTrue(user[maybeKey] === 'Ada');
 } else {
-  assert.fail('Expected a known key.');
+  assert.fail();
 }

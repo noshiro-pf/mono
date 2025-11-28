@@ -22,9 +22,9 @@ export namespace Obj {
    *
    * const obj3 = { name: 'Alice', age: 31 };
    *
-   * assert.ok(Obj.shallowEq(obj1, obj2));
+   * assert.isTrue(Obj.shallowEq(obj1, obj2));
    *
-   * assert.notOk(Obj.shallowEq(obj1, obj3));
+   * assert.isFalse(Obj.shallowEq(obj1, obj3));
    *
    * // Custom equality function
    * const obj4 = { value: 1 };
@@ -39,7 +39,7 @@ export namespace Obj {
    *   return Object.is(a, b);
    * };
    *
-   * assert.ok(Obj.shallowEq(obj4, obj5, closeEnough));
+   * assert.isTrue(Obj.shallowEq(obj4, obj5, closeEnough));
    * ```
    *
    * @param a - The first record to compare
@@ -370,6 +370,7 @@ export namespace Obj {
         : TypeEq<Entries['length'], 0> extends true
           ? K
           : ValuesOfEntriesImpl<
+              // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
               K | Entries[0][1],
               List.Tail<Entries>,
               Decrement<RemainingNumRecursions>

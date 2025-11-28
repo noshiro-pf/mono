@@ -44,17 +44,17 @@ export type Queue<T> = Readonly<{
    * ```ts
    * const queue = createQueue<number>();
    *
-   * assert.ok(queue.isEmpty);
+   * assert.isTrue(queue.isEmpty);
    *
-   * assert(queue.size === 0);
+   * assert.isTrue(queue.size === 0);
    *
    * queue.enqueue(1);
    *
    * queue.enqueue(2);
    *
-   * assert.notOk(queue.isEmpty);
+   * assert.isFalse(queue.isEmpty);
    *
-   * assert(queue.size === 2);
+   * assert.isTrue(queue.size === 2);
    *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
    *
@@ -64,7 +64,7 @@ export type Queue<T> = Readonly<{
    *
    * const seededQueue = createQueue(['first', 'second']);
    *
-   * assert(seededQueue.size === 2);
+   * assert.isTrue(seededQueue.size === 2);
    *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
    *
@@ -81,17 +81,17 @@ export type Queue<T> = Readonly<{
    * ```ts
    * const queue = createQueue<number>();
    *
-   * assert.ok(queue.isEmpty);
+   * assert.isTrue(queue.isEmpty);
    *
-   * assert(queue.size === 0);
+   * assert.isTrue(queue.size === 0);
    *
    * queue.enqueue(1);
    *
    * queue.enqueue(2);
    *
-   * assert.notOk(queue.isEmpty);
+   * assert.isFalse(queue.isEmpty);
    *
-   * assert(queue.size === 2);
+   * assert.isTrue(queue.size === 2);
    *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
    *
@@ -101,7 +101,7 @@ export type Queue<T> = Readonly<{
    *
    * const seededQueue = createQueue(['first', 'second']);
    *
-   * assert(seededQueue.size === 2);
+   * assert.isTrue(seededQueue.size === 2);
    *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
    *
@@ -118,17 +118,17 @@ export type Queue<T> = Readonly<{
    * ```ts
    * const queue = createQueue<number>();
    *
-   * assert.ok(queue.isEmpty);
+   * assert.isTrue(queue.isEmpty);
    *
-   * assert(queue.size === 0);
+   * assert.isTrue(queue.size === 0);
    *
    * queue.enqueue(1);
    *
    * queue.enqueue(2);
    *
-   * assert.notOk(queue.isEmpty);
+   * assert.isFalse(queue.isEmpty);
    *
-   * assert(queue.size === 2);
+   * assert.isTrue(queue.size === 2);
    *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
    *
@@ -138,7 +138,7 @@ export type Queue<T> = Readonly<{
    *
    * const seededQueue = createQueue(['first', 'second']);
    *
-   * assert(seededQueue.size === 2);
+   * assert.isTrue(seededQueue.size === 2);
    *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
    *
@@ -158,17 +158,17 @@ export type Queue<T> = Readonly<{
    * ```ts
    * const queue = createQueue<number>();
    *
-   * assert.ok(queue.isEmpty);
+   * assert.isTrue(queue.isEmpty);
    *
-   * assert(queue.size === 0);
+   * assert.isTrue(queue.size === 0);
    *
    * queue.enqueue(1);
    *
    * queue.enqueue(2);
    *
-   * assert.notOk(queue.isEmpty);
+   * assert.isFalse(queue.isEmpty);
    *
-   * assert(queue.size === 2);
+   * assert.isTrue(queue.size === 2);
    *
    * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
    *
@@ -178,7 +178,7 @@ export type Queue<T> = Readonly<{
    *
    * const seededQueue = createQueue(['first', 'second']);
    *
-   * assert(seededQueue.size === 2);
+   * assert.isTrue(seededQueue.size === 2);
    *
    * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
    *
@@ -381,17 +381,17 @@ class QueueClass<T> implements Queue<T> {
  * ```ts
  * const queue = createQueue<number>();
  *
- * assert.ok(queue.isEmpty);
+ * assert.isTrue(queue.isEmpty);
  *
- * assert(queue.size === 0);
+ * assert.isTrue(queue.size === 0);
  *
  * queue.enqueue(1);
  *
  * queue.enqueue(2);
  *
- * assert.notOk(queue.isEmpty);
+ * assert.isFalse(queue.isEmpty);
  *
- * assert(queue.size === 2);
+ * assert.isTrue(queue.size === 2);
  *
  * assert.deepStrictEqual(queue.dequeue(), Optional.some(1));
  *
@@ -401,7 +401,7 @@ class QueueClass<T> implements Queue<T> {
  *
  * const seededQueue = createQueue(['first', 'second']);
  *
- * assert(seededQueue.size === 2);
+ * assert.isTrue(seededQueue.size === 2);
  *
  * assert.deepStrictEqual(seededQueue.dequeue(), Optional.some('first'));
  *

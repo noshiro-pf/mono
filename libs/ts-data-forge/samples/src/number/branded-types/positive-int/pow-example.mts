@@ -8,4 +8,4 @@ const exponent = asPositiveInt(4);
 
 const power = PositiveInt.pow(base, exponent);
 
-assert(power === 16);
+assert.isTrue(power === 16);

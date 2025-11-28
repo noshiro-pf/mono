@@ -7,4 +7,4 @@ const largest = PositiveSafeInt.max(
   asPositiveSafeInt(5),
 );
 
-assert(largest === 10);
+assert.isTrue(largest === 10);

@@ -16,7 +16,7 @@ describe('ISet.create', () => {
 
     expect(set.size).toBe(0);
 
-    expect(set.isEmpty).toBe(true);
+    assert.isTrue(set.isEmpty);
   });
 
   test('should create set from array', () => {
@@ -24,11 +24,11 @@ describe('ISet.create', () => {
 
     expect(set.size).toBe(3);
 
-    expect(set.has(1)).toBe(true);
+    assert.isTrue(set.has(1));
 
-    expect(set.has(2)).toBe(true);
+    assert.isTrue(set.has(2));
 
-    expect(set.has(3)).toBe(true);
+    assert.isTrue(set.has(3));
   });
 
   test('should create set from JavaScript Set', () => {
@@ -38,11 +38,11 @@ describe('ISet.create', () => {
 
     expect(set.size).toBe(3);
 
-    expect(set.has('a')).toBe(true);
+    assert.isTrue(set.has('a'));
 
-    expect(set.has('b')).toBe(true);
+    assert.isTrue(set.has('b'));
 
-    expect(set.has('c')).toBe(true);
+    assert.isTrue(set.has('c'));
   });
 
   test('should create set from another ISet', () => {
@@ -52,11 +52,11 @@ describe('ISet.create', () => {
 
     expect(copy.size).toBe(3);
 
-    expect(copy.has(1)).toBe(true);
+    assert.isTrue(copy.has(1));
 
-    expect(copy.has(2)).toBe(true);
+    assert.isTrue(copy.has(2));
 
-    expect(copy.has(3)).toBe(true);
+    assert.isTrue(copy.has(3));
   });
 });
 
@@ -80,13 +80,13 @@ describe('isEmpty property', () => {
   test('should return true for empty set', () => {
     const set = ISet.create<string>([]);
 
-    expect(set.isEmpty).toBe(true);
+    assert.isTrue(set.isEmpty);
   });
 
   test('should return false for non-empty set', () => {
     const set = ISet.create([1, 2, 3]);
 
-    expect(set.isEmpty).toBe(false);
+    assert.isFalse(set.isEmpty);
   });
 });
 
@@ -96,41 +96,41 @@ describe('ISet.has', () => {
 
     expectType<typeof s0.has, (value: 1 | 2 | 3) => boolean>('<=');
 
-    expect(s0.has(2)).toBe(true);
+    assert.isTrue(s0.has(2));
   });
 
   test('case 2', () => {
     const s0 = ISet.create<number>([1, 2, 3]);
 
-    expect(s0.has(4)).toBe(false);
+    assert.isFalse(s0.has(4));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
 
-    expect(s0.has(1)).toBe(false);
+    assert.isFalse(s0.has(1));
   });
 
   test('case 4', () => {
     const s0 = ISet.create([1, 2, 3, Number.NaN] as const);
 
-    expect(s0.has(Number.NaN)).toBe(true);
+    assert.isTrue(s0.has(Number.NaN));
   });
 
   test('should handle boolean values', () => {
     const set = ISet.create([true, false]);
 
-    expect(set.has(true)).toBe(true);
+    assert.isTrue(set.has(true));
 
-    expect(set.has(false)).toBe(true);
+    assert.isTrue(set.has(false));
   });
 
   test('should handle null and undefined', () => {
     const set = ISet.create([null, undefined]);
 
-    expect(set.has(null)).toBe(true);
+    assert.isTrue(set.has(null));
 
-    expect(set.has(undefined)).toBe(true);
+    assert.isTrue(set.has(undefined));
   });
 });
 
@@ -143,37 +143,37 @@ describe('ISet.every', () => {
       (predicate: (value: 2 | 4 | 6) => boolean) => boolean
     >('<=');
 
-    expect(s0.every((x) => x % 2 === 0)).toBe(true);
+    assert.isTrue(s0.every((x) => x % 2 === 0));
   });
 
   test('case 2', () => {
     const s0 = ISet.create([1, 2, 3] as const);
 
-    expect(s0.every((x) => x % 2 === 0)).toBe(false);
+    assert.isFalse(s0.every((x) => x % 2 === 0));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
 
-    expect(s0.every((x) => x % 2 === 0)).toBe(true);
+    assert.isTrue(s0.every((x) => x % 2 === 0));
   });
 
   test('should return true when all elements satisfy predicate', () => {
     const set = ISet.create([2, 4, 6, 8]);
 
-    expect(set.every((x) => x % 2 === 0)).toBe(true);
+    assert.isTrue(set.every((x) => x % 2 === 0));
   });
 
   test('should return false when some elements do not satisfy predicate', () => {
     const set = ISet.create([1, 2, 3, 4]);
 
-    expect(set.every((x) => x % 2 === 0)).toBe(false);
+    assert.isFalse(set.every((x) => x % 2 === 0));
   });
 
   test('should return true for empty set', () => {
     const set = ISet.create<number>([]);
 
-    expect(set.every((x) => x > 0)).toBe(true);
+    assert.isTrue(set.every((x) => x > 0));
   });
 });
 
@@ -186,7 +186,7 @@ describe('every method as type guard', () => {
       const values = set.toArray();
 
       for (const value of values) {
-        expect(isString(value)).toBe(true);
+        assert.isTrue(isString(value));
       }
     }
   });
@@ -194,9 +194,9 @@ describe('every method as type guard', () => {
   test('should work with mixed types that fail guard', () => {
     const set = ISet.create<string | number>(['hello', 42, 'world']);
 
-    expect(
+    assert.isFalse(
       set.every((value): value is string => typeof value === 'string'),
-    ).toBe(false);
+    );
   });
 });
 
@@ -209,45 +209,45 @@ describe('ISet.some', () => {
       (predicate: (value: 1 | 3 | 5) => boolean) => boolean
     >('<=');
 
-    expect(s0.some((x) => x % 2 === 0)).toBe(false);
+    assert.isFalse(s0.some((x) => x % 2 === 0));
   });
 
   test('case 2', () => {
     const s0 = ISet.create([1, 2, 3] as const);
 
-    expect(s0.some((x) => x % 2 === 0)).toBe(true);
+    assert.isTrue(s0.some((x) => x % 2 === 0));
   });
 
   test('case 3', () => {
     const s0 = ISet.create<number>([]);
 
-    expect(s0.some((x) => x % 2 === 0)).toBe(false);
+    assert.isFalse(s0.some((x) => x % 2 === 0));
   });
 
   test('should return true when at least one element satisfies predicate', () => {
     const set = ISet.create([1, 3, 5, 6]);
 
-    expect(set.some((x) => x % 2 === 0)).toBe(true);
+    assert.isTrue(set.some((x) => x % 2 === 0));
   });
 
   test('should return false when no elements satisfy predicate', () => {
     const set = ISet.create([1, 3, 5, 7]);
 
-    expect(set.some((x) => x % 2 === 0)).toBe(false);
+    assert.isFalse(set.some((x) => x % 2 === 0));
   });
 
   test('should return false for empty set', () => {
     const set = ISet.create<number>([]);
 
-    expect(set.some((x) => x > 0)).toBe(false);
+    assert.isFalse(set.some((x) => x > 0));
   });
 
   test('should work with complex predicates', () => {
     const set = ISet.create(['hello', 'world', 'test']);
 
-    expect(set.some((str) => str.includes('o'))).toBe(true);
+    assert.isTrue(set.some((str) => str.includes('o')));
 
-    expect(set.some((str) => str.includes('z'))).toBe(false);
+    assert.isFalse(set.some((str) => str.includes('z')));
   });
 });
 
@@ -289,9 +289,9 @@ describe('ISet.add', () => {
 
     expect(modified.size).toBe(4);
 
-    expect(original.has(4)).toBe(false);
+    assert.isFalse(original.has(4));
 
-    expect(modified.has(4)).toBe(true);
+    assert.isTrue(modified.has(4));
   });
 
   test('should return same instance when adding existing element', () => {
@@ -311,11 +311,11 @@ describe('ISet.add', () => {
 
     const withNaN = withUndefined.add(Number.NaN);
 
-    expect(withNaN.has(null)).toBe(true);
+    assert.isTrue(withNaN.has(null));
 
-    expect(withNaN.has(undefined)).toBe(true);
+    assert.isTrue(withNaN.has(undefined));
 
-    expect(withNaN.has(Number.NaN)).toBe(true);
+    assert.isTrue(withNaN.has(Number.NaN));
   });
 });
 
@@ -355,9 +355,9 @@ describe('ISet.delete', () => {
 
     expect(modified.size).toBe(3);
 
-    expect(original.has(2)).toBe(true);
+    assert.isTrue(original.has(2));
 
-    expect(modified.has(2)).toBe(false);
+    assert.isFalse(modified.has(2));
   });
 
   test('should return same instance when deleting non-existent element', () => {
@@ -409,11 +409,11 @@ describe('ISet.map', () => {
 
     const strings = set.map((x) => x.toString());
 
-    expect(strings.has('1')).toBe(true);
+    assert.isTrue(strings.has('1'));
 
-    expect(strings.has('2')).toBe(true);
+    assert.isTrue(strings.has('2'));
 
-    expect(strings.has('3')).toBe(true);
+    assert.isTrue(strings.has('3'));
   });
 });
 
@@ -450,11 +450,11 @@ describe('ISet.filter', () => {
 
     expect(evens.size).toBe(3);
 
-    expect(evens.has(2)).toBe(true);
+    assert.isTrue(evens.has(2));
 
-    expect(evens.has(4)).toBe(true);
+    assert.isTrue(evens.has(4));
 
-    expect(evens.has(6)).toBe(true);
+    assert.isTrue(evens.has(6));
   });
 
   test('should work as type guard', () => {
@@ -466,9 +466,9 @@ describe('ISet.filter', () => {
 
     expect(strings.size).toBe(2);
 
-    expect(strings.has('hello')).toBe(true);
+    assert.isTrue(strings.has('hello'));
 
-    expect(strings.has('world')).toBe(true);
+    assert.isTrue(strings.has('world'));
   });
 
   test('should return empty set when no elements match', () => {
@@ -478,7 +478,7 @@ describe('ISet.filter', () => {
 
     expect(evens.size).toBe(0);
 
-    expect(evens.isEmpty).toBe(true);
+    assert.isTrue(evens.isEmpty);
   });
 });
 
@@ -490,11 +490,11 @@ describe('ISet.filterNot', () => {
 
     expect(odds.size).toBe(3);
 
-    expect(odds.has(1)).toBe(true);
+    assert.isTrue(odds.has(1));
 
-    expect(odds.has(3)).toBe(true);
+    assert.isTrue(odds.has(3));
 
-    expect(odds.has(5)).toBe(true);
+    assert.isTrue(odds.has(5));
   });
 
   test('should return same set when no elements satisfy predicate', () => {
@@ -504,7 +504,7 @@ describe('ISet.filterNot', () => {
 
     expect(nonEvens.size).toBe(3);
 
-    expect(ISet.equal(set, nonEvens)).toBe(true);
+    assert.isTrue(ISet.equal(set, nonEvens));
   });
 
   test('should return empty set when all elements satisfy predicate', () => {
@@ -512,7 +512,7 @@ describe('ISet.filterNot', () => {
 
     const nonEvens = set.filterNot((x) => x % 2 === 0);
 
-    expect(nonEvens.isEmpty).toBe(true);
+    assert.isTrue(nonEvens.isEmpty);
   });
 });
 
@@ -524,7 +524,7 @@ describe('ISet.isSubsetOf', () => {
 
     expectType<typeof s0.isSubsetOf, (other: ISet<number>) => boolean>('<=');
 
-    expect(s0.isSubsetOf(s1)).toBe(true);
+    assert.isTrue(s0.isSubsetOf(s1));
   });
 
   test('case 2', () => {
@@ -532,7 +532,7 @@ describe('ISet.isSubsetOf', () => {
 
     const s1 = ISet.create<number>([1, 2]);
 
-    expect(s0.isSubsetOf(s1)).toBe(false);
+    assert.isFalse(s0.isSubsetOf(s1));
   });
 
   test('case 3', () => {
@@ -540,7 +540,7 @@ describe('ISet.isSubsetOf', () => {
 
     const s1 = ISet.create<number>([1, 2, 3]);
 
-    expect(s0.isSubsetOf(s1)).toBe(true);
+    assert.isTrue(s0.isSubsetOf(s1));
   });
 
   test('should return true for subset relationship', () => {
@@ -548,7 +548,7 @@ describe('ISet.isSubsetOf', () => {
 
     const superset = ISet.create<number>([1, 2, 3, 4]);
 
-    expect(subset.isSubsetOf(superset)).toBe(true);
+    assert.isTrue(subset.isSubsetOf(superset));
   });
 
   test('should return true for equal sets', () => {
@@ -556,7 +556,7 @@ describe('ISet.isSubsetOf', () => {
 
     const set2 = ISet.create<number>([1, 2, 3]);
 
-    expect(set1.isSubsetOf(set2)).toBe(true);
+    assert.isTrue(set1.isSubsetOf(set2));
   });
 
   test('should return false for non-subset', () => {
@@ -564,7 +564,7 @@ describe('ISet.isSubsetOf', () => {
 
     const set2 = ISet.create<number>([1, 2, 3, 4]);
 
-    expect(set1.isSubsetOf(set2)).toBe(false);
+    assert.isFalse(set1.isSubsetOf(set2));
   });
 });
 
@@ -576,7 +576,7 @@ describe('ISet.isSupersetOf', () => {
 
     expectType<typeof s0.isSupersetOf, (other: ISet<number>) => boolean>('<=');
 
-    expect(s0.isSupersetOf(s1)).toBe(true);
+    assert.isTrue(s0.isSupersetOf(s1));
   });
 
   test('case 2', () => {
@@ -584,7 +584,7 @@ describe('ISet.isSupersetOf', () => {
 
     const s1 = ISet.create<number>([1, 2, 3]);
 
-    expect(s0.isSupersetOf(s1)).toBe(false);
+    assert.isFalse(s0.isSupersetOf(s1));
   });
 
   test('case 3', () => {
@@ -592,7 +592,7 @@ describe('ISet.isSupersetOf', () => {
 
     const s1 = ISet.create<number>([]);
 
-    expect(s0.isSupersetOf(s1)).toBe(true);
+    assert.isTrue(s0.isSupersetOf(s1));
   });
 
   test('should return true for superset relationship', () => {
@@ -600,7 +600,7 @@ describe('ISet.isSupersetOf', () => {
 
     const subset = ISet.create<number>([1, 2]);
 
-    expect(superset.isSupersetOf(subset)).toBe(true);
+    assert.isTrue(superset.isSupersetOf(subset));
   });
 
   test('should return true for equal sets', () => {
@@ -608,7 +608,7 @@ describe('ISet.isSupersetOf', () => {
 
     const set2 = ISet.create<number>([1, 2, 3]);
 
-    expect(set1.isSupersetOf(set2)).toBe(true);
+    assert.isTrue(set1.isSupersetOf(set2));
   });
 
   test('should return false for non-superset', () => {
@@ -616,7 +616,7 @@ describe('ISet.isSupersetOf', () => {
 
     const set2 = ISet.create<number>([1, 2, 3, 4]);
 
-    expect(set1.isSupersetOf(set2)).toBe(false);
+    assert.isFalse(set1.isSupersetOf(set2));
   });
 });
 
@@ -656,9 +656,9 @@ describe('ISet.subtract', () => {
 
     expect(result.size).toBe(2);
 
-    expect(result.has(1)).toBe(true);
+    assert.isTrue(result.has(1));
 
-    expect(result.has(2)).toBe(true);
+    assert.isTrue(result.has(2));
   });
 
   test('should return empty set when all elements are removed', () => {
@@ -668,7 +668,7 @@ describe('ISet.subtract', () => {
 
     const result = set1.subtract(set2);
 
-    expect(result.isEmpty).toBe(true);
+    assert.isTrue(result.isEmpty);
   });
 });
 
@@ -714,9 +714,9 @@ describe('ISet.intersection', () => {
 
     expect(result.size).toBe(2);
 
-    expect(result.has(3)).toBe(true);
+    assert.isTrue(result.has(3));
 
-    expect(result.has(4)).toBe(true);
+    assert.isTrue(result.has(4));
   });
 
   test('should return empty set when no common elements', () => {
@@ -726,7 +726,7 @@ describe('ISet.intersection', () => {
 
     const result = ISet.intersection(set1, set2);
 
-    expect(result.isEmpty).toBe(true);
+    assert.isTrue(result.isEmpty);
   });
 });
 
@@ -768,9 +768,9 @@ describe('ISet.intersect', () => {
 
     expect(result.size).toBe(2);
 
-    expect(result.has(3)).toBe(true);
+    assert.isTrue(result.has(3));
 
-    expect(result.has(4)).toBe(true);
+    assert.isTrue(result.has(4));
   });
 });
 
@@ -816,15 +816,15 @@ describe('ISet.union', () => {
 
     expect(result.size).toBe(5);
 
-    expect(result.has(1)).toBe(true);
+    assert.isTrue(result.has(1));
 
-    expect(result.has(2)).toBe(true);
+    assert.isTrue(result.has(2));
 
-    expect(result.has(3)).toBe(true);
+    assert.isTrue(result.has(3));
 
-    expect(result.has(4)).toBe(true);
+    assert.isTrue(result.has(4));
 
-    expect(result.has(5)).toBe(true);
+    assert.isTrue(result.has(5));
   });
 
   describe('instance method', () => {
@@ -866,15 +866,15 @@ describe('ISet.union', () => {
 
       expect(result.size).toBe(5);
 
-      expect(result.has(1)).toBe(true);
+      assert.isTrue(result.has(1));
 
-      expect(result.has(2)).toBe(true);
+      assert.isTrue(result.has(2));
 
-      expect(result.has(3)).toBe(true);
+      assert.isTrue(result.has(3));
 
-      expect(result.has(4)).toBe(true);
+      assert.isTrue(result.has(4));
 
-      expect(result.has(5)).toBe(true);
+      assert.isTrue(result.has(5));
     });
   });
 });
@@ -1033,11 +1033,11 @@ describe('ISet.toRawSet', () => {
 
     expect(rawSet.size).toBe(3);
 
-    expect(rawSet.has(1)).toBe(true);
+    assert.isTrue(rawSet.has(1));
 
-    expect(rawSet.has(2)).toBe(true);
+    assert.isTrue(rawSet.has(2));
 
-    expect(rawSet.has(3)).toBe(true);
+    assert.isTrue(rawSet.has(3));
   });
 
   test('should return empty ReadonlySet for empty ISet', () => {
@@ -1055,7 +1055,7 @@ describe('ISet.equal', () => {
 
     const set2 = ISet.create([3, 2, 1]); // Different order
 
-    expect(ISet.equal(set1, set2)).toBe(true);
+    assert.isTrue(ISet.equal(set1, set2));
   });
 
   test('should return false for sets with different sizes', () => {
@@ -1063,7 +1063,7 @@ describe('ISet.equal', () => {
 
     const set2 = ISet.create<'a' | 'b' | 'c' | 'd'>(['a', 'b', 'c']);
 
-    expect(ISet.equal(set1, set2)).toBe(false);
+    assert.isFalse(ISet.equal(set1, set2));
   });
 
   test('should return false for sets with different elements', () => {
@@ -1071,7 +1071,7 @@ describe('ISet.equal', () => {
 
     const set2 = ISet.create<'a' | 'b' | 'c' | 'd'>(['a', 'b', 'd']);
 
-    expect(ISet.equal(set1, set2)).toBe(false);
+    assert.isFalse(ISet.equal(set1, set2));
   });
 
   test('should return true for empty sets', () => {
@@ -1079,7 +1079,7 @@ describe('ISet.equal', () => {
 
     const set2 = ISet.create<string>([]);
 
-    expect(ISet.equal(set1, set2)).toBe(true);
+    assert.isTrue(ISet.equal(set1, set2));
   });
 
   test('should handle sets with special values', () => {
@@ -1087,7 +1087,7 @@ describe('ISet.equal', () => {
 
     const set2 = ISet.create([undefined, Number.NaN, null]);
 
-    expect(ISet.equal(set1, set2)).toBe(true);
+    assert.isTrue(ISet.equal(set1, set2));
   });
 });
 
@@ -1101,11 +1101,11 @@ describe('ISet.diff', () => {
 
     expect(diff.deleted.size).toBe(1);
 
-    expect(diff.deleted.has('a')).toBe(true);
+    assert.isTrue(diff.deleted.has('a'));
 
     expect(diff.added.size).toBe(1);
 
-    expect(diff.added.has('d')).toBe(true);
+    assert.isTrue(diff.added.has('d'));
   });
 
   test('should handle no changes', () => {
@@ -1115,9 +1115,9 @@ describe('ISet.diff', () => {
 
     const diff = ISet.diff(set1, set2);
 
-    expect(diff.deleted.isEmpty).toBe(true);
+    assert.isTrue(diff.deleted.isEmpty);
 
-    expect(diff.added.isEmpty).toBe(true);
+    assert.isTrue(diff.added.isEmpty);
   });
 
   test('should handle complete replacement', () => {
@@ -1129,15 +1129,15 @@ describe('ISet.diff', () => {
 
     expect(diff.deleted.size).toBe(2);
 
-    expect(diff.deleted.has('a')).toBe(true);
+    assert.isTrue(diff.deleted.has('a'));
 
-    expect(diff.deleted.has('b')).toBe(true);
+    assert.isTrue(diff.deleted.has('b'));
 
     expect(diff.added.size).toBe(2);
 
-    expect(diff.added.has('c')).toBe(true);
+    assert.isTrue(diff.added.has('c'));
 
-    expect(diff.added.has('d')).toBe(true);
+    assert.isTrue(diff.added.has('d'));
   });
 
   test('should handle empty sets', () => {
@@ -1147,7 +1147,7 @@ describe('ISet.diff', () => {
 
     const diff1 = ISet.diff(emptySet, nonEmptySet);
 
-    expect(diff1.deleted.isEmpty).toBe(true);
+    assert.isTrue(diff1.deleted.isEmpty);
 
     expect(diff1.added.size).toBe(2);
 
@@ -1155,7 +1155,7 @@ describe('ISet.diff', () => {
 
     expect(diff2.deleted.size).toBe(2);
 
-    expect(diff2.added.isEmpty).toBe(true);
+    assert.isTrue(diff2.added.isEmpty);
   });
 });
 
@@ -1171,13 +1171,13 @@ describe('ISet.withMutations', () => {
 
     expect(updated.size).toBe(3);
 
-    expect(updated.has('b')).toBe(true);
+    assert.isTrue(updated.has('b'));
 
-    expect(updated.has('c')).toBe(true);
+    assert.isTrue(updated.has('c'));
 
-    expect(updated.has('d')).toBe(true);
+    assert.isTrue(updated.has('d'));
 
-    expect(updated.has('a')).toBe(false);
+    assert.isFalse(updated.has('a'));
   });
 
   test('should handle empty mutations array', () => {
@@ -1187,7 +1187,7 @@ describe('ISet.withMutations', () => {
 
     expect(updated.size).toBe(set.size);
 
-    expect(ISet.equal(set, updated)).toBe(true);
+    assert.isTrue(ISet.equal(set, updated));
   });
 
   test('should handle duplicate operations', () => {
@@ -1201,9 +1201,9 @@ describe('ISet.withMutations', () => {
 
     expect(updated.size).toBe(2);
 
-    expect(updated.has('a')).toBe(true);
+    assert.isTrue(updated.has('a'));
 
-    expect(updated.has('b')).toBe(true);
+    assert.isTrue(updated.has('b'));
   });
 });
 
@@ -1261,7 +1261,7 @@ describe('edge cases', () => {
   test('should handle NaN correctly', () => {
     const set = ISet.create([Number.NaN, 1, 2]);
 
-    expect(set.has(Number.NaN)).toBe(true);
+    assert.isTrue(set.has(Number.NaN));
 
     expect(set.size).toBe(3);
   });
@@ -1271,9 +1271,9 @@ describe('edge cases', () => {
 
     expect(set.size).toBe(2);
 
-    expect(set.has(true)).toBe(true);
+    assert.isTrue(set.has(true));
 
-    expect(set.has(false)).toBe(true);
+    assert.isTrue(set.has(false));
   });
 
   test('should handle null and undefined', () => {
@@ -1281,9 +1281,9 @@ describe('edge cases', () => {
 
     expect(set.size).toBe(2);
 
-    expect(set.has(null)).toBe(true);
+    assert.isTrue(set.has(null));
 
-    expect(set.has(undefined)).toBe(true);
+    assert.isTrue(set.has(undefined));
   });
 
   test('should handle symbols by reference', () => {
@@ -1295,11 +1295,11 @@ describe('edge cases', () => {
 
     expect(set.size).toBe(2);
 
-    expect(set.has(sym1)).toBe(true);
+    assert.isTrue(set.has(sym1));
 
-    expect(set.has(sym2)).toBe(true);
+    assert.isTrue(set.has(sym2));
 
-    expect(set.has(Symbol('test'))).toBe(false); // Different symbol
+    assert.isFalse(set.has(Symbol('test'))); // Different symbol
   });
 });
 
@@ -1313,9 +1313,9 @@ describe('immutability', () => {
 
     expect(modified.size).toBe(4);
 
-    expect(original.has(4)).toBe(false);
+    assert.isFalse(original.has(4));
 
-    expect(modified.has(4)).toBe(true);
+    assert.isTrue(modified.has(4));
   });
 
   test('should not modify original set when deleting', () => {
@@ -1327,9 +1327,9 @@ describe('immutability', () => {
 
     expect(modified.size).toBe(2);
 
-    expect(original.has(2)).toBe(true);
+    assert.isTrue(original.has(2));
 
-    expect(modified.has(2)).toBe(false);
+    assert.isFalse(modified.has(2));
   });
 
   test('should not modify original set when filtering', () => {
@@ -1341,9 +1341,9 @@ describe('immutability', () => {
 
     expect(filtered.size).toBe(2);
 
-    expect(original.has(1)).toBe(true);
+    assert.isTrue(original.has(1));
 
-    expect(filtered.has(1)).toBe(false);
+    assert.isFalse(filtered.has(1));
   });
 
   test('should not modify original set when mapping', () => {
@@ -1355,11 +1355,11 @@ describe('immutability', () => {
 
     expect(mapped.size).toBe(3);
 
-    expect(original.has(1)).toBe(true);
+    assert.isTrue(original.has(1));
 
-    expect(mapped.has(1)).toBe(false);
+    assert.isFalse(mapped.has(1));
 
-    expect(mapped.has(2)).toBe(true);
+    assert.isTrue(mapped.has(2));
   });
 
   test('should not modify original sets during set operations', () => {

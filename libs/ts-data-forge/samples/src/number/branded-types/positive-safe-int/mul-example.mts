@@ -7,6 +7,6 @@ const product = PositiveSafeInt.mul(
   asPositiveSafeInt(20),
 );
 
-assert(product === 1000);
+assert.isTrue(product === 1000);
 
-assert.ok(PositiveSafeInt.is(product));
+assert.isTrue(PositiveSafeInt.is(product));

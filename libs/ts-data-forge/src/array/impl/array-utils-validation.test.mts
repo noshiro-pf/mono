@@ -13,25 +13,25 @@ import {
 describe('Arr validations', () => {
   describe(isArray, () => {
     test('should return true for arrays', () => {
-      expect(isArray([1, 2, 3])).toBe(true);
+      assert.isTrue(isArray([1, 2, 3]));
 
-      expect(isArray([])).toBe(true);
+      assert.isTrue(isArray([]));
 
-      expect(isArray(['a', 'b'])).toBe(true);
+      assert.isTrue(isArray(['a', 'b']));
     });
 
     test('should return false for non-arrays', () => {
-      expect(isArray('hello')).toBe(false);
+      assert.isFalse(isArray('hello'));
 
-      expect(isArray(123)).toBe(false);
+      assert.isFalse(isArray(123));
 
-      expect(isArray(null)).toBe(false);
+      assert.isFalse(isArray(null));
 
-      expect(isArray(undefined)).toBe(false);
+      assert.isFalse(isArray(undefined));
 
-      expect(isArray({})).toBe(false);
+      assert.isFalse(isArray({}));
 
-      expect(isArray(new Set())).toBe(false);
+      assert.isFalse(isArray(new Set()));
     });
 
     test('should refine union types correctly', () => {
@@ -139,23 +139,23 @@ describe('Arr validations', () => {
     });
 
     test('should return true for arrays (additional)', () => {
-      expect(isArray([])).toBe(true);
+      assert.isTrue(isArray([]));
 
-      expect(isArray([1, 2, 3])).toBe(true);
+      assert.isTrue(isArray([1, 2, 3]));
 
-      expect(isArray(['a', 'b'])).toBe(true);
+      assert.isTrue(isArray(['a', 'b']));
     });
 
     test('should return false for non-arrays (additional)', () => {
-      expect(isArray('string')).toBe(false);
+      assert.isFalse(isArray('string'));
 
-      expect(isArray(123)).toBe(false);
+      assert.isFalse(isArray(123));
 
-      expect(isArray({})).toBe(false);
+      assert.isFalse(isArray({}));
 
-      expect(isArray(null)).toBe(false);
+      assert.isFalse(isArray(null));
 
-      expect(isArray(undefined)).toBe(false);
+      assert.isFalse(isArray(undefined));
     });
 
     test('should work as type guard (additional)', () => {
@@ -171,7 +171,7 @@ describe('Arr validations', () => {
     test('should handle array-like objects', () => {
       const arrayLike = { 0: 'a', 1: 'b', length: 2 };
 
-      expect(isArray(arrayLike)).toBe(false);
+      assert.isFalse(isArray(arrayLike));
     });
 
     describe('comprehensive type guard tests', () => {
@@ -377,11 +377,11 @@ describe('Arr validations', () => {
     expectType<typeof result, boolean>('=');
 
     test('case 1', () => {
-      expect(result).toBe(false);
+      assert.isFalse(result);
     });
 
     test('case 2', () => {
-      expect(isEmpty([])).toBe(true);
+      assert.isTrue(isEmpty([]));
     });
   });
 
@@ -393,11 +393,11 @@ describe('Arr validations', () => {
     expectType<typeof result, boolean>('=');
 
     test('case 1', () => {
-      expect(result).toBe(true);
+      assert.isTrue(result);
     });
 
     test('case 2', () => {
-      expect(isNonEmpty([])).toBe(false);
+      assert.isFalse(isNonEmpty([]));
     });
   });
 
@@ -405,7 +405,7 @@ describe('Arr validations', () => {
     test('should return true if array has specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      expect(isArrayOfLength(arr, 3)).toBe(true);
+      assert.isTrue(isArrayOfLength(arr, 3));
 
       if (isArrayOfLength(arr, 3)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
@@ -415,13 +415,13 @@ describe('Arr validations', () => {
     test('should return false if array does not have specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      expect(isArrayOfLength(arr, 2)).toBe(false);
+      assert.isFalse(isArrayOfLength(arr, 2));
     });
 
     test('should return true for empty array and length 0', () => {
       const arr = [] as const;
 
-      expect(isArrayOfLength(arr, 0)).toBe(true);
+      assert.isTrue(isArrayOfLength(arr, 0));
 
       if (isArrayOfLength(arr, 0)) {
         expectType<typeof arr, readonly []>('=');
@@ -431,47 +431,47 @@ describe('Arr validations', () => {
     test('should return false for non-empty array and length 0', () => {
       const arr = [1] as const;
 
-      expect(isArrayOfLength(arr, 0)).toBe(false);
+      assert.isFalse(isArrayOfLength(arr, 0));
     });
 
     test('should work with unknown array type', () => {
       const arr: number[] = [1, 2];
 
-      expect(isArrayOfLength(arr, 2)).toBe(true);
+      assert.isTrue(isArrayOfLength(arr, 2));
 
       if (isArrayOfLength(arr, 2)) {
         expectType<typeof arr, number[] & ArrayOfLength<2, number>>('=');
       }
 
-      expect(isArrayOfLength(arr, 3)).toBe(false);
+      assert.isFalse(isArrayOfLength(arr, 3));
     });
 
     test('should work with unknown readonly array type', () => {
       const arr: readonly number[] = [1, 2];
 
-      expect(isArrayOfLength(arr, 2)).toBe(true);
+      assert.isTrue(isArrayOfLength(arr, 2));
 
       if (isArrayOfLength(arr, 2)) {
         expectType<typeof arr, ArrayOfLength<2, number>>('=');
       }
 
-      expect(isArrayOfLength(arr, 3)).toBe(false);
+      assert.isFalse(isArrayOfLength(arr, 3));
     });
 
     test('should return true for arrays of exact length (additional)', () => {
-      expect(isArrayOfLength([1, 2, 3], 3)).toBe(true);
+      assert.isTrue(isArrayOfLength([1, 2, 3], 3));
 
-      expect(isArrayOfLength([], 0)).toBe(true);
+      assert.isTrue(isArrayOfLength([], 0));
 
-      expect(isArrayOfLength(['a'], 1)).toBe(true);
+      assert.isTrue(isArrayOfLength(['a'], 1));
     });
 
     test('should return false for arrays of different length (additional)', () => {
-      expect(isArrayOfLength([1, 2, 3], 2)).toBe(false);
+      assert.isFalse(isArrayOfLength([1, 2, 3], 2));
 
-      expect(isArrayOfLength([1, 2, 3], 4)).toBe(false);
+      assert.isFalse(isArrayOfLength([1, 2, 3], 4));
 
-      expect(isArrayOfLength([], 1)).toBe(false);
+      assert.isFalse(isArrayOfLength([], 1));
     });
 
     test('should work as type guard with exact length (additional)', () => {
@@ -489,13 +489,13 @@ describe('Arr validations', () => {
     test('should return true if array length is greater than or equal to specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      expect(isArrayAtLeastLength(arr, 3)).toBe(true);
+      assert.isTrue(isArrayAtLeastLength(arr, 3));
 
       if (isArrayAtLeastLength(arr, 3)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
 
-      expect(isArrayAtLeastLength(arr, 2)).toBe(true);
+      assert.isTrue(isArrayAtLeastLength(arr, 2));
 
       if (isArrayAtLeastLength(arr, 2)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
@@ -505,13 +505,13 @@ describe('Arr validations', () => {
     test('should return false if array length is less than specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      expect(isArrayAtLeastLength(arr, 4)).toBe(false);
+      assert.isFalse(isArrayAtLeastLength(arr, 4));
     });
 
     test('should return true for empty array and length 0', () => {
       const arr = [] as const;
 
-      expect(isArrayAtLeastLength(arr, 0)).toBe(true);
+      assert.isTrue(isArrayAtLeastLength(arr, 0));
 
       if (isArrayAtLeastLength(arr, 0)) {
         expectType<typeof arr, readonly []>('=');
@@ -521,41 +521,43 @@ describe('Arr validations', () => {
     test('should return false for empty array and positive length', () => {
       const arr = [] as const;
 
-      expect(isArrayAtLeastLength(arr, 1)).toBe(false);
+      assert.isFalse(isArrayAtLeastLength(arr, 1));
     });
 
     test('should work with unknown array type', () => {
       const arr: number[] = [1, 2];
 
-      expect(isArrayAtLeastLength(arr, 2)).toBe(true);
+      assert.isTrue(isArrayAtLeastLength(arr, 2));
 
-      if (isArrayAtLeastLength(arr, 2)) {
-        expectType<typeof arr, number[] & ArrayAtLeastLen<2, number>>('=');
-      }
+      expectType<typeof arr, number[] & ArrayAtLeastLen<2, number>>('=');
 
-      expect(isArrayAtLeastLength(arr, 1)).toBe(true);
+      assert.isFalse(isArrayAtLeastLength(arr, 3));
+    });
 
-      if (isArrayAtLeastLength(arr, 1)) {
-        expectType<typeof arr, number[] & ArrayAtLeastLen<1, number>>('=');
-      }
+    test('should work with unknown array type 2', () => {
+      const arr: number[] = [1, 2];
 
-      expect(isArrayAtLeastLength(arr, 3)).toBe(false);
+      assert.isTrue(isArrayAtLeastLength(arr, 1));
+
+      expectType<typeof arr, number[] & ArrayAtLeastLen<1, number>>('=');
+
+      assert.isFalse(isArrayAtLeastLength(arr, 3));
     });
 
     test('should return true for arrays of at least specified length (additional)', () => {
-      expect(isArrayAtLeastLength([1, 2, 3], 3)).toBe(true);
+      assert.isTrue(isArrayAtLeastLength([1, 2, 3], 3));
 
-      expect(isArrayAtLeastLength([1, 2, 3], 2)).toBe(true);
+      assert.isTrue(isArrayAtLeastLength([1, 2, 3], 2));
 
-      expect(isArrayAtLeastLength([1, 2, 3], 1)).toBe(true);
+      assert.isTrue(isArrayAtLeastLength([1, 2, 3], 1));
 
-      expect(isArrayAtLeastLength([1, 2, 3], 0)).toBe(true);
+      assert.isTrue(isArrayAtLeastLength([1, 2, 3], 0));
     });
 
     test('should return false for arrays shorter than specified length (additional)', () => {
-      expect(isArrayAtLeastLength([1, 2, 3], 4)).toBe(false);
+      assert.isFalse(isArrayAtLeastLength([1, 2, 3], 4));
 
-      expect(isArrayAtLeastLength([], 1)).toBe(false);
+      assert.isFalse(isArrayAtLeastLength([], 1));
     });
 
     test('should work as type guard for at least length (additional)', () => {
@@ -575,7 +577,7 @@ describe('Arr validations', () => {
 
       const allEven = every(evens, (n) => n % 2 === 0);
 
-      expect(allEven).toBe(true);
+      assert.isTrue(allEven);
     });
 
     test('should return false when not all elements satisfy predicate', () => {
@@ -583,7 +585,7 @@ describe('Arr validations', () => {
 
       const allEven = every(mixed, (n) => n % 2 === 0);
 
-      expect(allEven).toBe(false);
+      assert.isFalse(allEven);
     });
 
     test('should work as type guard', () => {
@@ -591,7 +593,7 @@ describe('Arr validations', () => {
 
       if (every(mixed, (x): x is string => typeof x === 'string')) {
         // TypeScript narrows mixed to readonly string[] here
-        expect(mixed.every((s) => typeof s === 'string')).toBe(true);
+        assert.isTrue(mixed.every((s) => typeof s === 'string'));
       }
     });
 
@@ -600,9 +602,9 @@ describe('Arr validations', () => {
 
       const allPositive = every(isPositive);
 
-      expect(allPositive([1, 2, 3])).toBe(true);
+      assert.isTrue(allPositive([1, 2, 3]));
 
-      expect(allPositive([1, -2, 3])).toBe(false);
+      assert.isFalse(allPositive([1, -2, 3]));
     });
 
     test('should work with curried type guards', () => {
@@ -623,7 +625,7 @@ describe('Arr validations', () => {
 
       const result = every(empty, (n) => n > 0);
 
-      expect(result).toBe(true);
+      assert.isTrue(result);
     });
 
     test('should pass index to predicate', () => {
@@ -631,7 +633,7 @@ describe('Arr validations', () => {
 
       const indexMatchesValue = every(numbers, (val, idx) => val === idx);
 
-      expect(indexMatchesValue).toBe(true);
+      assert.isTrue(indexMatchesValue);
     });
   });
 
@@ -641,7 +643,7 @@ describe('Arr validations', () => {
 
       const hasEven = some(numbers, (n) => n % 2 === 0);
 
-      expect(hasEven).toBe(true);
+      assert.isTrue(hasEven);
     });
 
     test('should return false when no elements satisfy predicate', () => {
@@ -649,7 +651,7 @@ describe('Arr validations', () => {
 
       const hasEven = some(odds, (n) => n % 2 === 0);
 
-      expect(hasEven).toBe(false);
+      assert.isFalse(hasEven);
     });
 
     test('should work with curried version', () => {
@@ -657,9 +659,9 @@ describe('Arr validations', () => {
 
       const hasNegative = some(isNegative);
 
-      expect(hasNegative([1, 2, -3])).toBe(true);
+      assert.isTrue(hasNegative([1, 2, -3]));
 
-      expect(hasNegative([1, 2, 3])).toBe(false);
+      assert.isFalse(hasNegative([1, 2, 3]));
     });
 
     test('should return false for empty array', () => {
@@ -667,7 +669,7 @@ describe('Arr validations', () => {
 
       const result = some(empty, (n) => n > 0);
 
-      expect(result).toBe(false);
+      assert.isFalse(result);
     });
 
     test('should pass index to predicate', () => {
@@ -678,7 +680,7 @@ describe('Arr validations', () => {
         (val, idx) => val === idx * 10,
       );
 
-      expect(hasValueMatchingIndex).toBe(true);
+      assert.isTrue(hasValueMatchingIndex);
     });
   });
 
@@ -686,38 +688,38 @@ describe('Arr validations', () => {
     test('should return true for valid indices', () => {
       const array = ['a', 'b', 'c'];
 
-      expect(indexIsInRange(array, 0)).toBe(true);
+      assert.isTrue(indexIsInRange(array, 0));
 
-      expect(indexIsInRange(array, 1)).toBe(true);
+      assert.isTrue(indexIsInRange(array, 1));
 
-      expect(indexIsInRange(array, 2)).toBe(true);
+      assert.isTrue(indexIsInRange(array, 2));
     });
 
     test('should return false for invalid indices', () => {
       const array = ['a', 'b', 'c'];
 
-      expect(indexIsInRange(array, 3)).toBe(false);
+      assert.isFalse(indexIsInRange(array, 3));
 
-      expect(indexIsInRange(array, 10)).toBe(false);
+      assert.isFalse(indexIsInRange(array, 10));
     });
 
     test('should work with empty array', () => {
       const empty: readonly string[] = [];
 
-      expect(indexIsInRange(empty, 0)).toBe(false);
+      assert.isFalse(indexIsInRange(empty, 0));
 
       // @ts-expect-error negative indices should not be allowed
-      expect(indexIsInRange(empty, -1)).toBe(false);
+      assert.isFalse(indexIsInRange(empty, -1));
     });
 
     test('should be type error with floating point indices', () => {
       const array = [1, 2, 3];
 
       // @ts-expect-error floating point indices should not be allowed
-      expect(indexIsInRange(array, 1.5)).toBe(true); // JavaScript arrays accept floating point indices
+      assert.isTrue(indexIsInRange(array, 1.5)); // JavaScript arrays accept floating point indices
 
       // @ts-expect-error floating point indices should not be allowed
-      expect(indexIsInRange(array, 3.1)).toBe(false);
+      assert.isFalse(indexIsInRange(array, 3.1));
     });
   });
 });

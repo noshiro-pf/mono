@@ -12,4 +12,4 @@ const empty = pipe(Optional.none as Optional<number>).mapOptional(
   (value) => value * 2,
 );
 
-assert.ok(Optional.isNone(empty.value));
+assert.isTrue(Optional.isNone(empty.value));

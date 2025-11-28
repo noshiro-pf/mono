@@ -12,7 +12,7 @@ describe(createPromise, () => {
 
     const result = await resultPromise;
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toBe(42);
@@ -26,7 +26,7 @@ describe(createPromise, () => {
       reject(rejection);
     });
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     if (Result.isErr(result)) {
       expect(result.value).toBe(rejection);
@@ -38,7 +38,7 @@ describe(createPromise, () => {
       reject('failure');
     });
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     if (Result.isErr(result)) {
       expectType<typeof result.value, string>('=');

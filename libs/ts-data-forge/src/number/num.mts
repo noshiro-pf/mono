@@ -26,7 +26,7 @@ export namespace Num {
    *
    * const result = Num.from(input);
    *
-   * assert(result === 123.45);
+   * assert.isTrue(result === 123.45);
    * ```
    *
    * @param n The value to convert.
@@ -51,10 +51,10 @@ export namespace Num {
    *   // eslint-disable-next-line total-functions/no-partial-division
    *   const inverted = 1 / value;
    *
-   *   assert(inverted === 0.2);
+   *   assert.isTrue(inverted === 0.2);
    * }
    *
-   * assert.notOk(Num.isNonZero(0));
+   * assert.isFalse(Num.isNonZero(0));
    * ```
    *
    * @template N - The numeric literal type or number type to check
@@ -83,10 +83,10 @@ export namespace Num {
    * if (Num.isNonNegative(candidate)) {
    *   const index: number = candidate;
    *
-   *   assert(index === 10);
+   *   assert.isTrue(index === 10);
    * }
    *
-   * assert.notOk(Num.isNonNegative(-1));
+   * assert.isFalse(Num.isNonNegative(-1));
    * ```
    *
    * @template N - The numeric literal type or number type to check
@@ -111,10 +111,10 @@ export namespace Num {
    * const amount = 42;
    *
    * if (Num.isPositive(amount)) {
-   *   assert.ok(amount > 0);
+   *   assert.isTrue(amount > 0);
    * }
    *
-   * assert.notOk(Num.isPositive(0));
+   * assert.isFalse(Num.isPositive(0));
    * ```
    *
    * @template N - The numeric literal type or number type to check
@@ -135,9 +135,9 @@ export namespace Num {
    * ```ts
    * const isGrade = Num.isInRange(0, 100);
    *
-   * assert.ok(isGrade(50));
+   * assert.isTrue(isGrade(50));
    *
-   * assert.notOk(isGrade(100));
+   * assert.isFalse(isGrade(100));
    * ```
    *
    * @param lowerBound The lower bound (inclusive).
@@ -159,9 +159,9 @@ export namespace Num {
    * ```ts
    * const isPercentage = Num.isInRangeInclusive(0, 100);
    *
-   * assert.ok(isPercentage(100));
+   * assert.isTrue(isPercentage(100));
    *
-   * assert.notOk(isPercentage(-1));
+   * assert.isFalse(isPercentage(-1));
    * ```
    *
    * @param lowerBound The lower bound (inclusive).
@@ -219,11 +219,11 @@ export namespace Num {
    * ```ts
    * const indexGuard = Num.isUintInRange(0, 5);
    *
-   * assert.ok(indexGuard(3));
+   * assert.isTrue(indexGuard(3));
    *
-   * assert.notOk(indexGuard(5));
+   * assert.isFalse(indexGuard(5));
    *
-   * assert.notOk(indexGuard(-1));
+   * assert.isFalse(indexGuard(-1));
    * ```
    *
    * @template L - The lower bound as a SmallUint literal type
@@ -255,9 +255,9 @@ export namespace Num {
    * ```ts
    * const inclusiveGuard = Num.isUintInRangeInclusive(0, 5);
    *
-   * assert.ok(inclusiveGuard(5));
+   * assert.isTrue(inclusiveGuard(5));
    *
-   * assert.notOk(inclusiveGuard(6));
+   * assert.isFalse(inclusiveGuard(6));
    * ```
    *
    * @template L - The lower bound as a SmallUint literal type
@@ -284,15 +284,15 @@ export namespace Num {
    * @example
    *
    * ```ts
-   * assert(Num.clamp(150, 0, 100) === 100);
+   * assert.isTrue(Num.clamp(150, 0, 100) === 100);
    *
-   * assert(Num.clamp(-50, 0, 100) === 0);
+   * assert.isTrue(Num.clamp(-50, 0, 100) === 0);
    *
    * const clampToPercentage = Num.clamp(0, 100);
    *
-   * assert(clampToPercentage(75) === 75);
+   * assert.isTrue(clampToPercentage(75) === 75);
    *
-   * assert(clampToPercentage(150) === 100);
+   * assert.isTrue(clampToPercentage(150) === 100);
    * ```
    */
   export function clamp(

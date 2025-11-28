@@ -67,31 +67,31 @@ describe('NonNegativeFiniteNumber test', () => {
 
   describe(isNonNegativeFiniteNumber, () => {
     test('correctly identifies non-negative finite numbers', () => {
-      expect(isNonNegativeFiniteNumber(0)).toBe(true);
+      assert.isTrue(isNonNegativeFiniteNumber(0));
 
-      expect(isNonNegativeFiniteNumber(1)).toBe(true);
+      assert.isTrue(isNonNegativeFiniteNumber(1));
 
-      expect(isNonNegativeFiniteNumber(3.14)).toBe(true);
+      assert.isTrue(isNonNegativeFiniteNumber(3.14));
 
-      expect(isNonNegativeFiniteNumber(0.5)).toBe(true);
+      assert.isTrue(isNonNegativeFiniteNumber(0.5));
 
-      expect(isNonNegativeFiniteNumber(Number.MAX_VALUE)).toBe(true);
+      assert.isTrue(isNonNegativeFiniteNumber(Number.MAX_VALUE));
     });
 
     test('correctly identifies negative numbers', () => {
-      expect(isNonNegativeFiniteNumber(-1)).toBe(false);
+      assert.isFalse(isNonNegativeFiniteNumber(-1));
 
-      expect(isNonNegativeFiniteNumber(-0.1)).toBe(false);
+      assert.isFalse(isNonNegativeFiniteNumber(-0.1));
 
-      expect(isNonNegativeFiniteNumber(-Number.MAX_VALUE)).toBe(false);
+      assert.isFalse(isNonNegativeFiniteNumber(-Number.MAX_VALUE));
     });
 
     test('correctly identifies non-finite numbers', () => {
-      expect(isNonNegativeFiniteNumber(Number.NaN)).toBe(false);
+      assert.isFalse(isNonNegativeFiniteNumber(Number.NaN));
 
-      expect(isNonNegativeFiniteNumber(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonNegativeFiniteNumber(Number.POSITIVE_INFINITY));
 
-      expect(isNonNegativeFiniteNumber(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonNegativeFiniteNumber(Number.NEGATIVE_INFINITY));
     });
   });
 
@@ -198,7 +198,7 @@ describe('NonNegativeFiniteNumber test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonNegativeFiniteNumber.is(result)).toBe(true);
+        assert.isTrue(NonNegativeFiniteNumber.is(result));
 
         expect(result).toBeGreaterThanOrEqual(0);
       }

@@ -32,8 +32,8 @@ const rgb = tp(255, 128, 0);
 
 expectType<typeof rgb, readonly [255, 128, 0]>('=');
 
-assert(rgb[0] === 255);
+assert.isTrue(rgb[0] === 255);
 
-assert(rgb[1] === 128);
+assert.isTrue(rgb[1] === 128);
 
-assert(rgb[2] === 0);
+assert.isTrue(rgb[2] === 0);

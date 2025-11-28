@@ -18,7 +18,7 @@ import { OkTypeTagName } from './tag.mjs';
  *   value: { id: 1 },
  * });
  *
- * assert.ok(Result.isErr(failure));
+ * assert.isTrue(Result.isErr(failure));
  * ```
  *
  * @template S The type of the success value.

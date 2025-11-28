@@ -20,7 +20,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('should return true for equal arrays of numbers', () => {
-        expect(result).toBe(true);
+        assert.isTrue(result);
       });
     }
 
@@ -34,7 +34,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('should return false for different arrays of numbers', () => {
-        expect(result).toBe(false);
+        assert.isFalse(result);
       });
     }
 
@@ -48,7 +48,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('should return false for arrays of different lengths', () => {
-        expect(result).toBe(false);
+        assert.isFalse(result);
       });
     }
 
@@ -62,7 +62,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('should return true for equal arrays of strings', () => {
-        expect(result).toBe(true);
+        assert.isTrue(result);
       });
     }
 
@@ -76,7 +76,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('should return true for empty arrays', () => {
-        expect(result).toBe(true);
+        assert.isTrue(result);
       });
     }
 
@@ -91,7 +91,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('should return false for arrays of objects with default equality (reference check)', () => {
-        expect(result).toBe(false);
+        assert.isFalse(result);
       });
     }
 
@@ -109,7 +109,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('should return true for arrays of same object references', () => {
-        expect(result).toBe(true);
+        assert.isTrue(result);
       });
     }
 
@@ -127,7 +127,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('should return true for arrays of objects with custom equality function', () => {
-        expect(result).toBe(true);
+        assert.isTrue(result);
       });
     }
   });
@@ -143,7 +143,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('case 1', () => {
-        expect(result).toBe(true);
+        assert.isTrue(result);
       });
     }
 
@@ -157,7 +157,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('case 2', () => {
-        expect(result).toBe(false);
+        assert.isFalse(result);
       });
     }
   });
@@ -173,13 +173,13 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('case 1', () => {
-        expect(result).toBe(false);
+        assert.isFalse(result);
       });
 
       const result2 = isSuperset(xs, ys);
 
       test('case 2', () => {
-        expect(result2).toBe(true);
+        assert.isTrue(result2);
       });
     }
 
@@ -193,7 +193,7 @@ describe('Arr set operations', () => {
       expectType<typeof result, boolean>('=');
 
       test('case 3', () => {
-        expect(result).toBe(false);
+        assert.isFalse(result);
       });
     }
   });

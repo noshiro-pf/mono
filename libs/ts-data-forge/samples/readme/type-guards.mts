@@ -22,8 +22,8 @@ if (isNonNullObject(value)) {
 }
 
 // Example usage
-assert(processData({ name: 'Alice' }) === 'Hello, Alice!');
+assert.isTrue(processData({ name: 'Alice' }) === 'Hello, Alice!');
 
-assert(processData({ age: 30 }) === undefined);
+assert.isTrue(processData({ age: 30 }) === undefined);
 
-assert(processData('not an object') === undefined);
+assert.isTrue(processData('not an object') === undefined);

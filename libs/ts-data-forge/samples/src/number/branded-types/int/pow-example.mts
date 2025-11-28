@@ -8,4 +8,4 @@ const exponent = asInt(5);
 
 const power = Int.pow(base, exponent);
 
-assert(power === 32);
+assert.isTrue(power === 32);

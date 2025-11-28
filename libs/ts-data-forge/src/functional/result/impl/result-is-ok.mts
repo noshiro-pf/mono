@@ -14,10 +14,10 @@ import { type NarrowToOk } from './types.mjs';
  * if (Result.isOk(operation)) {
  *   const value: number = operation.value;
  *
- *   assert(value === 3);
+ *   assert.isTrue(value === 3);
  * }
  *
- * assert.ok(Result.isErr(failure));
+ * assert.isTrue(Result.isErr(failure));
  * ```
  */
 export const isOk = <R extends UnknownResult>(

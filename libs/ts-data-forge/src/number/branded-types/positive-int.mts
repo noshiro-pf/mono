@@ -38,11 +38,11 @@ const {
  * @example
  *
  * ```ts
- * assert.ok(isPositiveInt(5));
+ * assert.isTrue(isPositiveInt(5));
  *
- * assert.notOk(isPositiveInt(0));
+ * assert.isFalse(isPositiveInt(0));
  *
- * assert.ok(PositiveInt.is(10));
+ * assert.isTrue(PositiveInt.is(10));
  * ```
  *
  * @param value - The value to check
@@ -62,9 +62,9 @@ export const isPositiveInt = is;
  * ```ts
  * const branded = asPositiveInt(7);
  *
- * assert(branded === 7);
+ * assert.isTrue(branded === 7);
  *
- * assert.ok(PositiveInt.is(branded));
+ * assert.isTrue(PositiveInt.is(branded));
  * ```
  *
  * @param value - The value to cast
@@ -96,11 +96,11 @@ export const PositiveInt = {
    * @example
    *
    * ```ts
-   * assert.ok(isPositiveInt(5));
+   * assert.isTrue(isPositiveInt(5));
    *
-   * assert.notOk(isPositiveInt(0));
+   * assert.isFalse(isPositiveInt(0));
    *
-   * assert.ok(PositiveInt.is(10));
+   * assert.isTrue(PositiveInt.is(10));
    * ```
    *
    * @param value - The value to check
@@ -131,7 +131,7 @@ export const PositiveInt = {
    *   asPositiveInt(12),
    * );
    *
-   * assert(smallest === 3);
+   * assert.isTrue(smallest === 3);
    * ```
    *
    * @param values - The positive integers to compare (at least one required)
@@ -151,7 +151,7 @@ export const PositiveInt = {
    *   asPositiveInt(12),
    * );
    *
-   * assert(largest === 12);
+   * assert.isTrue(largest === 12);
    * ```
    *
    * @param values - The positive integers to compare (at least one required)
@@ -172,9 +172,9 @@ export const PositiveInt = {
    *
    * const withinRange = PositiveInt.clamp(10);
    *
-   * assert(belowRange === 1);
+   * assert.isTrue(belowRange === 1);
    *
-   * assert(withinRange === 10);
+   * assert.isTrue(withinRange === 10);
    * ```
    *
    * @param value - The number to clamp
@@ -197,9 +197,9 @@ export const PositiveInt = {
    *
    * const randomValue = PositiveInt.random(min, max);
    *
-   * assert.ok(PositiveInt.is(randomValue));
+   * assert.isTrue(PositiveInt.is(randomValue));
    *
-   * assert.ok(randomValue >= 3 && randomValue <= 6);
+   * assert.isTrue(randomValue >= 3 && randomValue <= 6);
    * ```
    *
    * @param min - The minimum value (inclusive, must be >= 1)
@@ -221,7 +221,7 @@ export const PositiveInt = {
    *
    * const power = PositiveInt.pow(base, exponent);
    *
-   * assert(power === 16);
+   * assert.isTrue(power === 16);
    * ```
    *
    * @param a - The base positive integer
@@ -238,7 +238,7 @@ export const PositiveInt = {
    * ```ts
    * const sum = PositiveInt.add(asPositiveInt(4), asPositiveInt(5));
    *
-   * assert(sum === 9);
+   * assert.isTrue(sum === 9);
    * ```
    *
    * @param a - First positive integer
@@ -258,7 +258,7 @@ export const PositiveInt = {
    * ```ts
    * const difference = PositiveInt.sub(asPositiveInt(5), asPositiveInt(7));
    *
-   * assert(difference === 1);
+   * assert.isTrue(difference === 1);
    * ```
    *
    * @param a - The minuend (positive integer)
@@ -275,7 +275,7 @@ export const PositiveInt = {
    * ```ts
    * const product = PositiveInt.mul(asPositiveInt(3), asPositiveInt(7));
    *
-   * assert(product === 21);
+   * assert.isTrue(product === 21);
    * ```
    *
    * @param a - First positive integer
@@ -299,9 +299,9 @@ export const PositiveInt = {
    *
    * const clamped = PositiveInt.div(asPositiveInt(3), asPositiveInt(10));
    *
-   * assert(quotient === 4);
+   * assert.isTrue(quotient === 4);
    *
-   * assert(clamped === 1);
+   * assert.isTrue(clamped === 1);
    * ```
    *
    * @param a - The dividend (positive integer)

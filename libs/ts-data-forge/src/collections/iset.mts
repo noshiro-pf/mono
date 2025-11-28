@@ -39,7 +39,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * ```ts
    * const set = ISet.create([1, 2, 3]);
    *
-   * assert(set.size === 3);
+   * assert.isTrue(set.size === 3);
    * ```
    */
   size: SizeType.Arr;
@@ -54,9 +54,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * const filledSet = ISet.create([1, 2]);
    *
-   * assert.ok(emptySet.isEmpty);
+   * assert.isTrue(emptySet.isEmpty);
    *
-   * assert.notOk(filledSet.isEmpty);
+   * assert.isFalse(filledSet.isEmpty);
    * ```
    */
   isEmpty: boolean;
@@ -70,9 +70,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * ```ts
    * const set = ISet.create(['apple', 'banana']);
    *
-   * assert.ok(set.has('apple'));
+   * assert.isTrue(set.has('apple'));
    *
-   * assert.notOk(set.has('cherry'));
+   * assert.isFalse(set.has('cherry'));
    * ```
    *
    * @param key The element to check.
@@ -94,9 +94,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * const narrowed = numbers.every((value): value is 2 | 4 | 6 => value % 2 === 0);
    *
-   * assert.ok(allEven);
+   * assert.isTrue(allEven);
    *
-   * assert.ok(narrowed);
+   * assert.isTrue(narrowed);
    * ```
    *
    * @param predicate A function to test each element.
@@ -122,9 +122,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * ```ts
    * const numbers = ISet.create([1, 3, 5]);
    *
-   * assert.ok(numbers.some((value) => value > 4));
+   * assert.isTrue(numbers.some((value) => value > 4));
    *
-   * assert.notOk(numbers.some((value) => value > 10));
+   * assert.isFalse(numbers.some((value) => value > 10));
    * ```
    *
    * @param predicate A function to test each element.
@@ -149,7 +149,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * assert.deepStrictEqual(Array.from(withThree), [1, 2, 3]);
    *
-   * assert(unchanged === base);
+   * assert.isTrue(unchanged === base);
    * ```
    *
    * @param key The element to add.
@@ -171,7 +171,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * assert.deepStrictEqual(Array.from(withoutTwo), [1, 3]);
    *
-   * assert(unchanged === base);
+   * assert.isTrue(unchanged === base);
    * ```
    *
    * @param key The element to delete.
@@ -296,9 +296,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * const superset = ISet.create<number>([1, 2, 3]);
    *
-   * assert.ok(subset.isSubsetOf(superset));
+   * assert.isTrue(subset.isSubsetOf(superset));
    *
-   * assert.notOk(superset.isSubsetOf(subset));
+   * assert.isFalse(superset.isSubsetOf(subset));
    * ```
    *
    * @param set The other set.
@@ -317,9 +317,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * const subset = ISet.create<string>(['a', 'c']);
    *
-   * assert.ok(superset.isSupersetOf(subset));
+   * assert.isTrue(superset.isSupersetOf(subset));
    *
-   * assert.notOk(subset.isSupersetOf(superset));
+   * assert.isFalse(subset.isSupersetOf(superset));
    * ```
    *
    * @param set The other set.
@@ -497,9 +497,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * const raw = set.toRawSet();
    *
-   * assert.ok(is.set(raw));
+   * assert.isTrue(is.set(raw));
    *
-   * assert.ok(raw.has('alpha'));
+   * assert.isTrue(raw.has('alpha'));
    * ```
    *
    * @returns The raw ReadonlySet instance.
@@ -584,9 +584,9 @@ export namespace ISet {
    *
    * const third = ISet.create<number>([1, 3]);
    *
-   * assert.ok(ISet.equal(first, second));
+   * assert.isTrue(ISet.equal(first, second));
    *
-   * assert.notOk(ISet.equal(first, third));
+   * assert.isFalse(ISet.equal(first, third));
    * ```
    *
    * @template K The type of the elements.

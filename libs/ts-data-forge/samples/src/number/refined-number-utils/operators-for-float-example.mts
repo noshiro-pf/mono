@@ -30,12 +30,12 @@ const boundedRandom = floatOps.random(
 
 const nonZeroRandom = floatOps.randomNonZero();
 
-assert(sum === 50);
+assert.isTrue(sum === 50);
 
-assert(ratio === 5);
+assert.isTrue(ratio === 5);
 
-assert.ok(clamped >= Number.MIN_VALUE);
+assert.isTrue(clamped >= Number.MIN_VALUE);
 
-assert.ok(boundedRandom >= 10 && boundedRandom <= 20);
+assert.isTrue(boundedRandom >= 10 && boundedRandom <= 20);
 
-assert.ok(nonZeroRandom > 0);
+assert.isTrue(nonZeroRandom > 0);

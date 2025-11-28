@@ -4,6 +4,6 @@ import { PositiveInt, asPositiveInt } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const branded = asPositiveInt(7);
 
-assert(branded === 7);
+assert.isTrue(branded === 7);
 
-assert.ok(PositiveInt.is(branded));
+assert.isTrue(PositiveInt.is(branded));

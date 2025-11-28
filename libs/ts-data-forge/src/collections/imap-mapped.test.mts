@@ -150,9 +150,9 @@ describe('IMapMapped.equal', () => {
     // Test structural equality, not reference equality
     expect(map1.size).toBe(map2.size);
 
-    expect(map1.has({ id: 1, type: 'user' })).toBe(true);
+    assert.isTrue(map1.has({ id: 1, type: 'user' }));
 
-    expect(map2.has({ id: 1, type: 'user' })).toBe(true);
+    assert.isTrue(map2.has({ id: 1, type: 'user' }));
 
     expect(Optional.unwrap(map1.get({ id: 1, type: 'user' }))).toBe(
       Optional.unwrap(map2.get({ id: 1, type: 'user' })),
@@ -178,7 +178,7 @@ describe('IMapMapped.equal', () => {
       stringToTestKey,
     );
 
-    expect(IMapMapped.equal(map1, map2)).toBe(false);
+    assert.isFalse(IMapMapped.equal(map1, map2));
   });
 
   test('should return false for maps with different keys', () => {
@@ -200,7 +200,7 @@ describe('IMapMapped.equal', () => {
       stringToTestKey,
     );
 
-    expect(IMapMapped.equal(map1, map2)).toBe(false);
+    assert.isFalse(IMapMapped.equal(map1, map2));
   });
 
   test('should return true for empty maps', () => {
@@ -216,7 +216,7 @@ describe('IMapMapped.equal', () => {
       stringToTestKey,
     );
 
-    expect(IMapMapped.equal(map1, map2)).toBe(true);
+    assert.isTrue(IMapMapped.equal(map1, map2));
   });
 });
 
@@ -248,7 +248,7 @@ describe('IMapMapped.has', () => {
       fromKey,
     );
 
-    expect(s0.has({ v: 3 })).toBe(true);
+    assert.isTrue(s0.has({ v: 3 }));
   });
 
   test('case 2', () => {
@@ -262,7 +262,7 @@ describe('IMapMapped.has', () => {
       fromKey,
     );
 
-    expect(s0.has({ v: 4 })).toBe(false);
+    assert.isFalse(s0.has({ v: 4 }));
   });
 
   test('case 3', () => {
@@ -272,7 +272,7 @@ describe('IMapMapped.has', () => {
       fromKey,
     );
 
-    expect(s0.has({ v: 3 })).toBe(false);
+    assert.isFalse(s0.has({ v: 3 }));
   });
 });
 
@@ -438,7 +438,7 @@ describe('IMapMapped.update', () => {
 
     expect(updated).toBe(map);
 
-    expect(Optional.isNone(updated.get({ id: 2, type: 'user' }))).toBe(true);
+    assert.isTrue(Optional.isNone(updated.get({ id: 2, type: 'user' })));
   });
 });
 
@@ -560,7 +560,7 @@ describe('IMapMapped.every', () => {
       stringToTestKey,
     );
 
-    expect(map.every((value) => typeof value === 'string')).toBe(true);
+    assert.isTrue(map.every((value) => typeof value === 'string'));
   });
 
   test('should return false when some values do not satisfy predicate', () => {
@@ -573,7 +573,7 @@ describe('IMapMapped.every', () => {
       stringToTestKey,
     );
 
-    expect(map.every((value) => value.length > 5)).toBe(false);
+    assert.isFalse(map.every((value) => value.length > 5));
   });
 
   test('should return true for empty map', () => {
@@ -583,7 +583,7 @@ describe('IMapMapped.every', () => {
       stringToTestKey,
     );
 
-    expect(map.every((value) => value.length > 0)).toBe(true);
+    assert.isTrue(map.every((value) => value.length > 0));
   });
 });
 
@@ -599,7 +599,7 @@ describe('IMapMapped.some', () => {
     );
 
     // eslint-disable-next-line unicorn/prefer-includes
-    expect(map.some((value) => value === 'Alice')).toBe(true);
+    assert.isTrue(map.some((value) => value === 'Alice'));
   });
 
   test('should return false when no values satisfy predicate', () => {
@@ -613,7 +613,7 @@ describe('IMapMapped.some', () => {
     );
 
     // eslint-disable-next-line unicorn/prefer-includes
-    expect(map.some((value) => value === 'Charlie')).toBe(false);
+    assert.isFalse(map.some((value) => value === 'Charlie'));
   });
 
   test('should return false for empty map', () => {
@@ -623,7 +623,7 @@ describe('IMapMapped.some', () => {
       stringToTestKey,
     );
 
-    expect(map.some((value) => value.length > 0)).toBe(false);
+    assert.isFalse(map.some((value) => value.length > 0));
   });
 });
 
@@ -724,9 +724,7 @@ describe('IMapMapped.mapKeys', () => {
 
     const transformed = map.mapKeys((key) => ({ ...key, id: key.id * 10 }));
 
-    expect(Optional.isNone(transformed.get({ id: 1, type: 'user' }))).toBe(
-      true,
-    );
+    assert.isTrue(Optional.isNone(transformed.get({ id: 1, type: 'user' })));
 
     expect(Optional.unwrap(transformed.get({ id: 10, type: 'user' }))).toBe(
       'Alice',

@@ -10,6 +10,6 @@ const hasEven = Arr.some(numbers, (value) => value % 2 === 0);
 
 const hasShortName = Arr.some(words, (value) => value.length <= 3);
 
-assert.notOk(hasEven);
+assert.isFalse(hasEven);
 
-assert.ok(hasShortName);
+assert.isTrue(hasShortName);

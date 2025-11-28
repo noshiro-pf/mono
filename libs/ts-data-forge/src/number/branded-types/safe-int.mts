@@ -42,11 +42,11 @@ const {
  * @example
  *
  * ```ts
- * assert.ok(isSafeInt(Number.MAX_SAFE_INTEGER));
+ * assert.isTrue(isSafeInt(Number.MAX_SAFE_INTEGER));
  *
- * assert.notOk(isSafeInt(Number.MAX_SAFE_INTEGER + 0.5));
+ * assert.isFalse(isSafeInt(Number.MAX_SAFE_INTEGER + 0.5));
  *
- * assert.ok(SafeInt.is(Number.MIN_SAFE_INTEGER));
+ * assert.isTrue(SafeInt.is(Number.MIN_SAFE_INTEGER));
  * ```
  *
  * @param value - The value to check
@@ -66,9 +66,9 @@ export const isSafeInt = is;
  * ```ts
  * const branded = asSafeInt(123);
  *
- * assert(branded === 123);
+ * assert.isTrue(branded === 123);
  *
- * assert.ok(SafeInt.is(branded));
+ * assert.isTrue(SafeInt.is(branded));
  * ```
  *
  * @param value - The value to cast
@@ -100,11 +100,11 @@ export const SafeInt = {
    * @example
    *
    * ```ts
-   * assert.ok(isSafeInt(Number.MAX_SAFE_INTEGER));
+   * assert.isTrue(isSafeInt(Number.MAX_SAFE_INTEGER));
    *
-   * assert.notOk(isSafeInt(Number.MAX_SAFE_INTEGER + 0.5));
+   * assert.isFalse(isSafeInt(Number.MAX_SAFE_INTEGER + 0.5));
    *
-   * assert.ok(SafeInt.is(Number.MIN_SAFE_INTEGER));
+   * assert.isTrue(SafeInt.is(Number.MIN_SAFE_INTEGER));
    * ```
    *
    * @param value - The value to check
@@ -140,9 +140,9 @@ export const SafeInt = {
    *
    * const absolute = SafeInt.abs(negative);
    *
-   * assert(absolute === 900);
+   * assert.isTrue(absolute === 900);
    *
-   * assert.ok(SafeInt.is(absolute));
+   * assert.isTrue(SafeInt.is(absolute));
    * ```
    *
    * @param a - The safe integer value
@@ -158,7 +158,7 @@ export const SafeInt = {
    * ```ts
    * const smallest = SafeInt.min(asSafeInt(25), asSafeInt(-14), asSafeInt(99));
    *
-   * assert(smallest === -14);
+   * assert.isTrue(smallest === -14);
    * ```
    *
    * @param values - The safe integers to compare (at least one required)
@@ -174,7 +174,7 @@ export const SafeInt = {
    * ```ts
    * const largest = SafeInt.max(asSafeInt(25), asSafeInt(-14), asSafeInt(99));
    *
-   * assert(largest === 99);
+   * assert.isTrue(largest === 99);
    * ```
    *
    * @param values - The safe integers to compare (at least one required)
@@ -194,11 +194,11 @@ export const SafeInt = {
    *
    * const belowRange = SafeInt.clamp(-1e20);
    *
-   * assert(aboveRange === Number.MAX_SAFE_INTEGER);
+   * assert.isTrue(aboveRange === Number.MAX_SAFE_INTEGER);
    *
-   * assert(withinRange === 123);
+   * assert.isTrue(withinRange === 123);
    *
-   * assert(belowRange === Number.MIN_SAFE_INTEGER);
+   * assert.isTrue(belowRange === Number.MIN_SAFE_INTEGER);
    * ```
    *
    * @param value The number to clamp.
@@ -222,9 +222,9 @@ export const SafeInt = {
    *
    * const randomValue = SafeInt.random(min, max);
    *
-   * assert.ok(SafeInt.is(randomValue));
+   * assert.isTrue(SafeInt.is(randomValue));
    *
-   * assert.ok(randomValue >= -10 && randomValue <= 10);
+   * assert.isTrue(randomValue >= -10 && randomValue <= 10);
    * ```
    *
    * @param min - The minimum value (inclusive)
@@ -245,9 +245,9 @@ export const SafeInt = {
    *
    * const power = SafeInt.pow(base, exponent);
    *
-   * assert(power === 243);
+   * assert.isTrue(power === 243);
    *
-   * assert.ok(SafeInt.is(power));
+   * assert.isTrue(SafeInt.is(power));
    * ```
    *
    * @param a The base SafeInt.
@@ -264,9 +264,9 @@ export const SafeInt = {
    * ```ts
    * const sum = SafeInt.add(asSafeInt(9), asSafeInt(4));
    *
-   * assert(sum === 13);
+   * assert.isTrue(sum === 13);
    *
-   * assert.ok(SafeInt.is(sum));
+   * assert.isTrue(SafeInt.is(sum));
    * ```
    *
    * @param a The first SafeInt.
@@ -283,9 +283,9 @@ export const SafeInt = {
    * ```ts
    * const difference = SafeInt.sub(asSafeInt(9), asSafeInt(14));
    *
-   * assert(difference === -5);
+   * assert.isTrue(difference === -5);
    *
-   * assert.ok(SafeInt.is(difference));
+   * assert.isTrue(SafeInt.is(difference));
    * ```
    *
    * @param a The minuend SafeInt.
@@ -302,9 +302,9 @@ export const SafeInt = {
    * ```ts
    * const product = SafeInt.mul(asSafeInt(-8), asSafeInt(7));
    *
-   * assert(product === -56);
+   * assert.isTrue(product === -56);
    *
-   * assert.ok(SafeInt.is(product));
+   * assert.isTrue(SafeInt.is(product));
    * ```
    *
    * @param a The first SafeInt.
@@ -324,9 +324,9 @@ export const SafeInt = {
    * ```ts
    * const quotient = SafeInt.div(asSafeInt(-17), asSafeInt(5));
    *
-   * assert(quotient === -4);
+   * assert.isTrue(quotient === -4);
    *
-   * assert.ok(SafeInt.is(quotient));
+   * assert.isTrue(SafeInt.is(quotient));
    * ```
    *
    * @param a - The dividend

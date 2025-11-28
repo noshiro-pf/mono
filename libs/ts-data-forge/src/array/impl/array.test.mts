@@ -10,11 +10,11 @@ describe('Array.every', () => {
   }
 
   test('case 1', () => {
-    expect(xs.every((x): x is 1 => x === 1)).toBe(false);
+    assert.isFalse(xs.every((x): x is 1 => x === 1));
   });
 
   test('case 2', () => {
-    expect(xs.every((x) => 1 <= x && x <= 3)).toBe(true);
+    assert.isTrue(xs.every((x) => 1 <= x && x <= 3));
   });
 });
 
@@ -22,11 +22,11 @@ describe('Array.some', () => {
   const xs = [1, 2, 3] as const;
 
   test('case 1', () => {
-    expect(xs.some((x): x is 1 => x === 1)).toBe(true);
+    assert.isTrue(xs.some((x): x is 1 => x === 1));
   });
 
   test('case 2', () => {
-    expect(xs.some((x) => x <= 1 && 3 <= x)).toBe(false);
+    assert.isFalse(xs.some((x) => x <= 1 && 3 <= x));
   });
 });
 
@@ -54,7 +54,7 @@ describe('Array.includes', () => {
     expectType<typeof result, boolean>('=');
 
     test('case 1', () => {
-      expect(result).toBe(true);
+      assert.isTrue(result);
     });
   }
 
@@ -66,7 +66,7 @@ describe('Array.includes', () => {
     expectType<typeof result, boolean>('=');
 
     test('case 2', () => {
-      expect(result).toBe(false);
+      assert.isFalse(result);
     });
   }
 });

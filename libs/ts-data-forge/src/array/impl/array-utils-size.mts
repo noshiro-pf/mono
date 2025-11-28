@@ -12,9 +12,9 @@
  *
  * const sizeOfLetters = Arr.size(letters);
  *
- * assert(sizeOfNumbers === 3);
+ * assert.isTrue(sizeOfNumbers === 3);
  *
- * assert(sizeOfLetters === 0);
+ * assert.isTrue(sizeOfLetters === 0);
  * ```
  */
 export const size = <const Ar extends readonly unknown[]>(

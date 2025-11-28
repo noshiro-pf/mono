@@ -4,4 +4,4 @@ import { PositiveInt, asPositiveInt } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const product = PositiveInt.mul(asPositiveInt(3), asPositiveInt(7));
 
-assert(product === 21);
+assert.isTrue(product === 21);

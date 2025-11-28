@@ -29,14 +29,14 @@ const roundedClamp = intOps.clamp(1.5);
 
 const randomValue = intOps.random();
 
-assert(sum === 10);
+assert.isTrue(sum === 10);
 
-assert(difference === 2);
+assert.isTrue(difference === 2);
 
-assert(product === 24);
+assert.isTrue(product === 24);
 
-assert(quotient === 3);
+assert.isTrue(quotient === 3);
 
-assert(roundedClamp === 2);
+assert.isTrue(roundedClamp === 2);
 
-assert.ok(Number.isSafeInteger(randomValue));
+assert.isTrue(Number.isSafeInteger(randomValue));

@@ -2,10 +2,10 @@
 import { PositiveSafeInt, isPositiveSafeInt } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
-assert.ok(isPositiveSafeInt(1));
+assert.isTrue(isPositiveSafeInt(1));
 
-assert.ok(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
+assert.isTrue(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
 
-assert.notOk(isPositiveSafeInt(0));
+assert.isFalse(isPositiveSafeInt(0));
 
-assert.ok(PositiveSafeInt.is(42));
+assert.isTrue(PositiveSafeInt.is(42));

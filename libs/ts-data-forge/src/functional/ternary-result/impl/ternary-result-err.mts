@@ -10,7 +10,7 @@ import { ErrTypeTagName } from './tag.mjs';
  *
  * assert.strictEqual(failure.$$tag, 'ts-data-forge::Result.err');
  *
- * assert.ok(TernaryResult.isErr(failure));
+ * assert.isTrue(TernaryResult.isErr(failure));
  * ```
  */
 export const err = <const E,>(value: E): TernaryErr<E> => ({

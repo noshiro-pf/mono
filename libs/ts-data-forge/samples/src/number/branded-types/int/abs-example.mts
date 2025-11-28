@@ -6,6 +6,6 @@ const negative = asInt(-12);
 
 const absolute = Int.abs(negative);
 
-assert(absolute === 12);
+assert.isTrue(absolute === 12);
 
-assert.ok(Int.is(absolute));
+assert.isTrue(Int.is(absolute));

@@ -24,4 +24,4 @@ const unchanged = base.delete({ x: 3, tag: 'c' });
 
 assert.deepStrictEqual(Array.from(withoutSecond), [{ x: 1, tag: 'a' }]);
 
-assert(unchanged === base);
+assert.isTrue(unchanged === base);

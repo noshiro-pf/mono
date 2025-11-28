@@ -6,4 +6,4 @@ const input = '123.45';
 
 const result = Num.from(input);
 
-assert(result === 123.45);
+assert.isTrue(result === 123.45);

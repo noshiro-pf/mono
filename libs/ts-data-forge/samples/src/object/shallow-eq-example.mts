@@ -8,9 +8,9 @@ const obj2 = { name: 'Alice', age: 30 };
 
 const obj3 = { name: 'Alice', age: 31 };
 
-assert.ok(Obj.shallowEq(obj1, obj2));
+assert.isTrue(Obj.shallowEq(obj1, obj2));
 
-assert.notOk(Obj.shallowEq(obj1, obj3));
+assert.isFalse(Obj.shallowEq(obj1, obj3));
 
 // Custom equality function
 const obj4 = { value: 1 };
@@ -25,4 +25,4 @@ const closeEnough = (a: unknown, b: unknown): boolean => {
   return Object.is(a, b);
 };
 
-assert.ok(Obj.shallowEq(obj4, obj5, closeEnough));
+assert.isTrue(Obj.shallowEq(obj4, obj5, closeEnough));

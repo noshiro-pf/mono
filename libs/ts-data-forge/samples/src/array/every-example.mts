@@ -10,6 +10,6 @@ const allEven = Arr.every(numbers, (value) => value % 2 === 0);
 
 const allStartWithA = Arr.every(words, (value) => value.startsWith('A'));
 
-assert.ok(allEven);
+assert.isTrue(allEven);
 
-assert.notOk(allStartWithA);
+assert.isFalse(allStartWithA);

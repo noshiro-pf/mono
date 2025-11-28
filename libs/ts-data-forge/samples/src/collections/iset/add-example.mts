@@ -10,4 +10,4 @@ const unchanged = base.add(2);
 
 assert.deepStrictEqual(Array.from(withThree), [1, 2, 3]);
 
-assert(unchanged === base);
+assert.isTrue(unchanged === base);

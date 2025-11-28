@@ -6,6 +6,6 @@ const belowRange = PositiveInt.clamp(0);
 
 const withinRange = PositiveInt.clamp(10);
 
-assert(belowRange === 1);
+assert.isTrue(belowRange === 1);
 
-assert(withinRange === 10);
+assert.isTrue(withinRange === 10);

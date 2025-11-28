@@ -77,39 +77,39 @@ describe('NonZeroInt16 test', () => {
 
   describe(isNonZeroInt16, () => {
     test('correctly identifies non-zero int16 values', () => {
-      expect(isNonZeroInt16(1)).toBe(true);
+      assert.isTrue(isNonZeroInt16(1));
 
-      expect(isNonZeroInt16(-1)).toBe(true);
+      assert.isTrue(isNonZeroInt16(-1));
 
-      expect(isNonZeroInt16(32_767)).toBe(true);
+      assert.isTrue(isNonZeroInt16(32_767));
 
-      expect(isNonZeroInt16(-32_768)).toBe(true);
+      assert.isTrue(isNonZeroInt16(-32_768));
     });
 
     test('correctly identifies zero', () => {
-      expect(isNonZeroInt16(0)).toBe(false);
+      assert.isFalse(isNonZeroInt16(0));
     });
 
     test('correctly identifies values outside int16 range', () => {
-      expect(isNonZeroInt16(32_768)).toBe(false);
+      assert.isFalse(isNonZeroInt16(32_768));
 
-      expect(isNonZeroInt16(-32_769)).toBe(false);
+      assert.isFalse(isNonZeroInt16(-32_769));
 
-      expect(isNonZeroInt16(65_536)).toBe(false);
+      assert.isFalse(isNonZeroInt16(65_536));
 
-      expect(isNonZeroInt16(-65_536)).toBe(false);
+      assert.isFalse(isNonZeroInt16(-65_536));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isNonZeroInt16(Number.NaN)).toBe(false);
+      assert.isFalse(isNonZeroInt16(Number.NaN));
 
-      expect(isNonZeroInt16(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroInt16(Number.POSITIVE_INFINITY));
 
-      expect(isNonZeroInt16(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroInt16(Number.NEGATIVE_INFINITY));
 
-      expect(isNonZeroInt16(1.2)).toBe(false);
+      assert.isFalse(isNonZeroInt16(1.2));
 
-      expect(isNonZeroInt16(-3.4)).toBe(false);
+      assert.isFalse(isNonZeroInt16(-3.4));
     });
   });
 
@@ -217,9 +217,9 @@ describe('NonZeroInt16 test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroInt16.is(result)).toBe(true);
+        assert.isTrue(NonZeroInt16.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).not.toBe(0);
       }

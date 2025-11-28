@@ -8,4 +8,4 @@ const withoutLast = Arr.butLast(queue);
 
 assert.deepStrictEqual(withoutLast, ['task-1', 'task-2']);
 
-assert(withoutLast.length === 2);
+assert.isTrue(withoutLast.length === 2);

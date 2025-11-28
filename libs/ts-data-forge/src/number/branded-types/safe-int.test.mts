@@ -69,41 +69,41 @@ describe('SafeInt test', () => {
 
   describe('SafeInt.is', () => {
     test('correctly identifies safe integers', () => {
-      expect(SafeInt.is(0)).toBe(true);
+      assert.isTrue(SafeInt.is(0));
 
-      expect(SafeInt.is(1)).toBe(true);
+      assert.isTrue(SafeInt.is(1));
 
-      expect(SafeInt.is(-1)).toBe(true);
+      assert.isTrue(SafeInt.is(-1));
 
-      expect(SafeInt.is(42)).toBe(true);
+      assert.isTrue(SafeInt.is(42));
 
-      expect(SafeInt.is(-42)).toBe(true);
+      assert.isTrue(SafeInt.is(-42));
 
-      expect(SafeInt.is(Number.MAX_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(SafeInt.is(Number.MAX_SAFE_INTEGER));
 
-      expect(SafeInt.is(Number.MIN_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(SafeInt.is(Number.MIN_SAFE_INTEGER));
     });
 
     test('correctly identifies values outside safe integer range', () => {
-      expect(SafeInt.is(Number.MAX_SAFE_INTEGER + 1)).toBe(false);
+      assert.isFalse(SafeInt.is(Number.MAX_SAFE_INTEGER + 1));
 
-      expect(SafeInt.is(Number.MIN_SAFE_INTEGER - 1)).toBe(false);
+      assert.isFalse(SafeInt.is(Number.MIN_SAFE_INTEGER - 1));
 
-      expect(SafeInt.is(Number.MAX_VALUE)).toBe(false);
+      assert.isFalse(SafeInt.is(Number.MAX_VALUE));
 
-      expect(SafeInt.is(-Number.MAX_VALUE)).toBe(false);
+      assert.isFalse(SafeInt.is(-Number.MAX_VALUE));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(SafeInt.is(Number.NaN)).toBe(false);
+      assert.isFalse(SafeInt.is(Number.NaN));
 
-      expect(SafeInt.is(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(SafeInt.is(Number.POSITIVE_INFINITY));
 
-      expect(SafeInt.is(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(SafeInt.is(Number.NEGATIVE_INFINITY));
 
-      expect(SafeInt.is(1.2)).toBe(false);
+      assert.isFalse(SafeInt.is(1.2));
 
-      expect(SafeInt.is(-3.4)).toBe(false);
+      assert.isFalse(SafeInt.is(-3.4));
     });
   });
 
@@ -202,9 +202,9 @@ describe('SafeInt test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(SafeInt.is(result)).toBe(true);
+        assert.isTrue(SafeInt.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
       }
     });
 

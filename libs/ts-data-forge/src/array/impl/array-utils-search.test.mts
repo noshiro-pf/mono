@@ -18,7 +18,7 @@ describe('Arr search operations', () => {
 
       const firstEven = find(numbers, (n) => n % 2 === 0);
 
-      expect(Optional.isSome(firstEven)).toBe(true);
+      assert.isTrue(Optional.isSome(firstEven));
 
       expect(Optional.unwrap(firstEven)).toBe(2);
     });
@@ -28,7 +28,7 @@ describe('Arr search operations', () => {
 
       const firstEven = find(odds, (n) => n % 2 === 0);
 
-      expect(Optional.isNone(firstEven)).toBe(true);
+      assert.isTrue(Optional.isNone(firstEven));
     });
 
     test('should work with curried version', () => {
@@ -40,11 +40,11 @@ describe('Arr search operations', () => {
 
       const result2 = findEven([1, 3, 5]);
 
-      expect(Optional.isSome(result1)).toBe(true);
+      assert.isTrue(Optional.isSome(result1));
 
       expect(Optional.unwrap(result1)).toBe(2);
 
-      expect(Optional.isNone(result2)).toBe(true);
+      assert.isTrue(Optional.isNone(result2));
     });
 
     test('should work with type guard predicate', () => {
@@ -57,7 +57,7 @@ describe('Arr search operations', () => {
 
       expectType<typeof firstString, Optional<string>>('=');
 
-      expect(Optional.isSome(firstString)).toBe(true);
+      assert.isTrue(Optional.isSome(firstString));
 
       expect(Optional.unwrap(firstString)).toBe('a');
     });
@@ -87,7 +87,7 @@ describe('Arr search operations', () => {
 
       const result = find(empty, () => true);
 
-      expect(Optional.isNone(result)).toBe(true);
+      assert.isTrue(Optional.isNone(result));
     });
   });
 
@@ -97,7 +97,7 @@ describe('Arr search operations', () => {
 
       const lastEven = findLast(numbers, (n) => n % 2 === 0);
 
-      expect(Optional.isSome(lastEven)).toBe(true);
+      assert.isTrue(Optional.isSome(lastEven));
 
       expect(Optional.unwrap(lastEven)).toBe(4);
     });
@@ -107,7 +107,7 @@ describe('Arr search operations', () => {
 
       const lastEven = findLast(odds, (n) => n % 2 === 0);
 
-      expect(Optional.isNone(lastEven)).toBe(true);
+      assert.isTrue(Optional.isNone(lastEven));
     });
 
     test('should work with curried version', () => {
@@ -117,7 +117,7 @@ describe('Arr search operations', () => {
 
       const result = findLastPositive([-1, 2, -3, 4]);
 
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       expect(Optional.unwrap(result)).toBe(4);
     });
@@ -127,7 +127,7 @@ describe('Arr search operations', () => {
 
       const result = findLast(empty, (n) => n > 0);
 
-      expect(Optional.isNone(result)).toBe(true);
+      assert.isTrue(Optional.isNone(result));
     });
 
     test('should pass index and array to predicate', () => {

@@ -56,31 +56,31 @@ describe('Int test', () => {
 
   describe(isInt, () => {
     test('correctly identifies integers', () => {
-      expect(isInt(0)).toBe(true);
+      assert.isTrue(isInt(0));
 
-      expect(isInt(1)).toBe(true);
+      assert.isTrue(isInt(1));
 
-      expect(isInt(-1)).toBe(true);
+      assert.isTrue(isInt(-1));
 
-      expect(isInt(42)).toBe(true);
+      assert.isTrue(isInt(42));
 
-      expect(isInt(-42)).toBe(true);
+      assert.isTrue(isInt(-42));
 
-      expect(isInt(Number.MAX_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isInt(Number.MAX_SAFE_INTEGER));
 
-      expect(isInt(Number.MIN_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isInt(Number.MIN_SAFE_INTEGER));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isInt(Number.NaN)).toBe(false);
+      assert.isFalse(isInt(Number.NaN));
 
-      expect(isInt(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isInt(Number.POSITIVE_INFINITY));
 
-      expect(isInt(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isInt(Number.NEGATIVE_INFINITY));
 
-      expect(isInt(1.2)).toBe(false);
+      assert.isFalse(isInt(1.2));
 
-      expect(isInt(-3.4)).toBe(false);
+      assert.isFalse(isInt(-3.4));
     });
   });
 
@@ -167,9 +167,9 @@ describe('Int test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(Int.is(result)).toBe(true);
+        assert.isTrue(Int.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
       }
     });
   });

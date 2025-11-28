@@ -44,18 +44,18 @@ export type Stack<T> = Readonly<{
    * ```ts
    * const stack = createStack<string>();
    *
-   * assert.ok(stack.isEmpty);
+   * assert.isTrue(stack.isEmpty);
    *
-   * assert(stack.size === 0);
+   * assert.isTrue(stack.size === 0);
    *
    * stack.push('first');
    *
    * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
-   * assert.notOk(stack.isEmpty);
+   * assert.isFalse(stack.isEmpty);
    *
-   * assert(stack.size === 2);
+   * assert.isTrue(stack.size === 2);
    *
    * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
    *
@@ -65,7 +65,7 @@ export type Stack<T> = Readonly<{
    *
    * const seededStack = createStack([10, 20, 30]);
    *
-   * assert(seededStack.size === 3);
+   * assert.isTrue(seededStack.size === 3);
    *
    * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
    * ```
@@ -80,18 +80,18 @@ export type Stack<T> = Readonly<{
    * ```ts
    * const stack = createStack<string>();
    *
-   * assert.ok(stack.isEmpty);
+   * assert.isTrue(stack.isEmpty);
    *
-   * assert(stack.size === 0);
+   * assert.isTrue(stack.size === 0);
    *
    * stack.push('first');
    *
    * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
-   * assert.notOk(stack.isEmpty);
+   * assert.isFalse(stack.isEmpty);
    *
-   * assert(stack.size === 2);
+   * assert.isTrue(stack.size === 2);
    *
    * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
    *
@@ -101,7 +101,7 @@ export type Stack<T> = Readonly<{
    *
    * const seededStack = createStack([10, 20, 30]);
    *
-   * assert(seededStack.size === 3);
+   * assert.isTrue(seededStack.size === 3);
    *
    * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
    * ```
@@ -116,18 +116,18 @@ export type Stack<T> = Readonly<{
    * ```ts
    * const stack = createStack<string>();
    *
-   * assert.ok(stack.isEmpty);
+   * assert.isTrue(stack.isEmpty);
    *
-   * assert(stack.size === 0);
+   * assert.isTrue(stack.size === 0);
    *
    * stack.push('first');
    *
    * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
-   * assert.notOk(stack.isEmpty);
+   * assert.isFalse(stack.isEmpty);
    *
-   * assert(stack.size === 2);
+   * assert.isTrue(stack.size === 2);
    *
    * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
    *
@@ -137,7 +137,7 @@ export type Stack<T> = Readonly<{
    *
    * const seededStack = createStack([10, 20, 30]);
    *
-   * assert(seededStack.size === 3);
+   * assert.isTrue(seededStack.size === 3);
    *
    * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
    * ```
@@ -155,18 +155,18 @@ export type Stack<T> = Readonly<{
    * ```ts
    * const stack = createStack<string>();
    *
-   * assert.ok(stack.isEmpty);
+   * assert.isTrue(stack.isEmpty);
    *
-   * assert(stack.size === 0);
+   * assert.isTrue(stack.size === 0);
    *
    * stack.push('first');
    *
    * // eslint-disable-next-line unicorn/prefer-single-call
    * stack.push('second');
    *
-   * assert.notOk(stack.isEmpty);
+   * assert.isFalse(stack.isEmpty);
    *
-   * assert(stack.size === 2);
+   * assert.isTrue(stack.size === 2);
    *
    * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
    *
@@ -176,7 +176,7 @@ export type Stack<T> = Readonly<{
    *
    * const seededStack = createStack([10, 20, 30]);
    *
-   * assert(seededStack.size === 3);
+   * assert.isTrue(seededStack.size === 3);
    *
    * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
    * ```
@@ -356,18 +356,18 @@ class StackClass<T> implements Stack<T> {
  * ```ts
  * const stack = createStack<string>();
  *
- * assert.ok(stack.isEmpty);
+ * assert.isTrue(stack.isEmpty);
  *
- * assert(stack.size === 0);
+ * assert.isTrue(stack.size === 0);
  *
  * stack.push('first');
  *
  * // eslint-disable-next-line unicorn/prefer-single-call
  * stack.push('second');
  *
- * assert.notOk(stack.isEmpty);
+ * assert.isFalse(stack.isEmpty);
  *
- * assert(stack.size === 2);
+ * assert.isTrue(stack.size === 2);
  *
  * assert.deepStrictEqual(stack.pop(), Optional.some('second'));
  *
@@ -377,7 +377,7 @@ class StackClass<T> implements Stack<T> {
  *
  * const seededStack = createStack([10, 20, 30]);
  *
- * assert(seededStack.size === 3);
+ * assert.isTrue(seededStack.size === 3);
  *
  * assert.deepStrictEqual(seededStack.pop(), Optional.some(30));
  * ```

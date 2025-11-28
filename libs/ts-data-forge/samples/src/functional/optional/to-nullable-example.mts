@@ -6,6 +6,6 @@ const someNumber = Optional.some(42);
 
 const noneNumber = Optional.none as Optional<number>;
 
-assert(Optional.toNullable(someNumber) === 42);
+assert.isTrue(Optional.toNullable(someNumber) === 42);
 
-assert(Optional.toNullable(noneNumber) === undefined);
+assert.isTrue(Optional.toNullable(noneNumber) === undefined);

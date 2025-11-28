@@ -11,6 +11,6 @@ const allEven = map.every((value) => value % 2 === 0);
 
 const isNarrowed = map.every((value): value is 2 | 4 => value % 2 === 0);
 
-assert.ok(allEven);
+assert.isTrue(allEven);
 
-assert.ok(isNarrowed);
+assert.isTrue(isNarrowed);

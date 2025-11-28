@@ -67,7 +67,7 @@ describe(castDeepMutable, () => {
       };
     };
 
-    expectType<typeof mut_state, MutableState>('~=');
+    expectType<typeof mut_state, MutableState>('=');
 
     mut_state.user.profile.tags.push('editor');
 

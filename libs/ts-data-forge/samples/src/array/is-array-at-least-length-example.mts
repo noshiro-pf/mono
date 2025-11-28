@@ -6,10 +6,10 @@ const queue: readonly string[] = ['task-1', 'task-2'];
 
 const emptyQueue: readonly string[] = [];
 
-assert.ok(Arr.isArrayAtLeastLength(queue, 1));
+assert.isTrue(Arr.isArrayAtLeastLength(queue, 1));
 
-assert.notOk(Arr.isArrayAtLeastLength(emptyQueue, 1));
+assert.isFalse(Arr.isArrayAtLeastLength(emptyQueue, 1));
 
 if (Arr.isArrayAtLeastLength(queue, 1)) {
-  assert(queue[0] === 'task-1');
+  assert.isTrue(queue[0] === 'task-1');
 }

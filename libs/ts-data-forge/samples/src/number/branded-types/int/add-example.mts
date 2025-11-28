@@ -4,4 +4,4 @@ import { Int, asInt } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const sum = Int.add(asInt(12), asInt(8));
 
-assert(sum === 20);
+assert.isTrue(sum === 20);

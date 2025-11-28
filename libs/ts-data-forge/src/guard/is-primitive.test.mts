@@ -4,9 +4,9 @@ import { isSymbol } from './is-type.mjs';
 
 describe(isPrimitive, () => {
   test('should return true for string primitives', () => {
-    expect(isPrimitive('hello')).toBe(true);
+    assert.isTrue(isPrimitive('hello'));
 
-    expect(isPrimitive('')).toBe(true);
+    assert.isTrue(isPrimitive(''));
 
     const value: unknown = 'test';
 
@@ -19,77 +19,77 @@ describe(isPrimitive, () => {
   });
 
   test('should return true for number primitives', () => {
-    expect(isPrimitive(42)).toBe(true);
+    assert.isTrue(isPrimitive(42));
 
-    expect(isPrimitive(0)).toBe(true);
+    assert.isTrue(isPrimitive(0));
 
-    expect(isPrimitive(-3.14)).toBe(true);
+    assert.isTrue(isPrimitive(-3.14));
 
-    expect(isPrimitive(Number.NaN)).toBe(true);
+    assert.isTrue(isPrimitive(Number.NaN));
 
-    expect(isPrimitive(Number.POSITIVE_INFINITY)).toBe(true);
+    assert.isTrue(isPrimitive(Number.POSITIVE_INFINITY));
   });
 
   test('should return true for boolean primitives', () => {
-    expect(isPrimitive(true)).toBe(true);
+    assert.isTrue(isPrimitive(true));
 
-    expect(isPrimitive(false)).toBe(true);
+    assert.isTrue(isPrimitive(false));
   });
 
   test('should return true for symbol primitives', () => {
-    expect(isPrimitive(Symbol('test'))).toBe(true);
+    assert.isTrue(isPrimitive(Symbol('test')));
 
-    expect(isPrimitive(Symbol.iterator)).toBe(true);
+    assert.isTrue(isPrimitive(Symbol.iterator));
   });
 
   test('should return true for bigint primitives', () => {
-    expect(isPrimitive(123n)).toBe(true);
+    assert.isTrue(isPrimitive(123n));
 
-    expect(isPrimitive(0n)).toBe(true);
+    assert.isTrue(isPrimitive(0n));
 
-    expect(isPrimitive(-123n)).toBe(true);
+    assert.isTrue(isPrimitive(-123n));
   });
 
   test('should return true for null', () => {
     // Note: null is considered an object by typeof, so isPrimitive returns false
-    expect(isPrimitive(null)).toBe(true);
+    assert.isTrue(isPrimitive(null));
   });
 
   test('should return true for undefined', () => {
-    expect(isPrimitive(undefined)).toBe(true);
+    assert.isTrue(isPrimitive(undefined));
   });
 
   test('should return false for objects', () => {
-    expect(isPrimitive({})).toBe(false);
+    assert.isFalse(isPrimitive({}));
 
-    expect(isPrimitive({ a: 1 })).toBe(false);
+    assert.isFalse(isPrimitive({ a: 1 }));
 
-    expect(isPrimitive(new Date())).toBe(false);
+    assert.isFalse(isPrimitive(new Date()));
   });
 
   test('should return false for arrays', () => {
-    expect(isPrimitive([])).toBe(false);
+    assert.isFalse(isPrimitive([]));
 
-    expect(isPrimitive([1, 2, 3])).toBe(false);
+    assert.isFalse(isPrimitive([1, 2, 3]));
   });
 
   test('should return false for functions', () => {
-    expect(isPrimitive(() => {})).toBe(false);
+    assert.isFalse(isPrimitive(() => {}));
 
-    expect(isPrimitive(() => {})).toBe(false);
+    assert.isFalse(isPrimitive(() => {}));
 
-    expect(isPrimitive(async () => {})).toBe(false);
+    assert.isFalse(isPrimitive(async () => {}));
   });
 
   test('should return false for boxed primitives', () => {
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isPrimitive(new String('hello'))).toBe(false);
+    assert.isFalse(isPrimitive(new String('hello')));
 
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isPrimitive(new Number(42))).toBe(false);
+    assert.isFalse(isPrimitive(new Number(42)));
 
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isPrimitive(new Boolean(true))).toBe(false);
+    assert.isFalse(isPrimitive(new Boolean(true)));
   });
 
   test('should narrow types correctly in conditional', () => {
@@ -120,7 +120,7 @@ describe(isPrimitive, () => {
 
     expect(primitives[4]).toBeUndefined();
 
-    expect(isSymbol(primitives[5])).toBe(true);
+    assert.isTrue(isSymbol(primitives[5]));
 
     assert.deepStrictEqual(nonPrimitives, [{}, []]);
   });

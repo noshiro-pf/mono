@@ -8,6 +8,6 @@ const max = asPositiveInt(6);
 
 const randomValue = PositiveInt.random(min, max);
 
-assert.ok(PositiveInt.is(randomValue));
+assert.isTrue(PositiveInt.is(randomValue));
 
-assert.ok(randomValue >= 3 && randomValue <= 6);
+assert.isTrue(randomValue >= 3 && randomValue <= 6);

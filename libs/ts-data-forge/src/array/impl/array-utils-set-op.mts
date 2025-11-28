@@ -10,9 +10,9 @@
  *
  * const differentNumbers = [1, 2, 4] as const;
  *
- * assert.ok(Arr.eq(numbers, sameNumbers));
+ * assert.isTrue(Arr.eq(numbers, sameNumbers));
  *
- * assert.notOk(Arr.eq(numbers, differentNumbers));
+ * assert.isFalse(Arr.eq(numbers, differentNumbers));
  * ```
  */
 export const eq = <E,>(
@@ -43,9 +43,9 @@ export const equal = eq;
  *
  * const notSubset = [2, 4] as const;
  *
- * assert.ok(Arr.isSubset(subset, superset));
+ * assert.isTrue(Arr.isSubset(subset, superset));
  *
- * assert.notOk(Arr.isSubset(notSubset, superset));
+ * assert.isFalse(Arr.isSubset(notSubset, superset));
  * ```
  */
 export const isSubset = <E1 extends Primitive, E2 extends Primitive = E1>(
@@ -69,11 +69,11 @@ export const isSubset = <E1 extends Primitive, E2 extends Primitive = E1>(
  *
  * const notSuperset = ['a', 'd'] as const;
  *
- * assert.ok(Arr.isSuperset(potentialSuperset, subset));
+ * assert.isTrue(Arr.isSuperset(potentialSuperset, subset));
  *
- * assert.notOk(Arr.isSuperset(subset, potentialSuperset));
+ * assert.isFalse(Arr.isSuperset(subset, potentialSuperset));
  *
- * assert.notOk(Arr.isSuperset(potentialSuperset, notSuperset));
+ * assert.isFalse(Arr.isSuperset(potentialSuperset, notSuperset));
  * ```
  */
 export const isSuperset = <E1 extends Primitive, E2 extends Primitive = E1>(

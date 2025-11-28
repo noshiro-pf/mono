@@ -6,6 +6,6 @@ const quotient = PositiveInt.div(asPositiveInt(9), asPositiveInt(2));
 
 const clamped = PositiveInt.div(asPositiveInt(3), asPositiveInt(10));
 
-assert(quotient === 4);
+assert.isTrue(quotient === 4);
 
-assert(clamped === 1);
+assert.isTrue(clamped === 1);

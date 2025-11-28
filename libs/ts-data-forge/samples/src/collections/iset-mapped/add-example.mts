@@ -24,4 +24,4 @@ assert.deepStrictEqual(Array.from(withNew), [
   { x: 2, tag: 'b' },
 ]);
 
-assert(unchanged === base);
+assert.isTrue(unchanged === base);

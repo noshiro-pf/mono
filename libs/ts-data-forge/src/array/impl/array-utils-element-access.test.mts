@@ -10,7 +10,7 @@ describe('Arr element access', () => {
 
       const result = at(array, asUint32(1000));
 
-      expect(Optional.isNone(result)).toBe(true);
+      assert.isTrue(Optional.isNone(result));
     });
 
     test('should handle very large negative indices', () => {
@@ -18,7 +18,7 @@ describe('Arr element access', () => {
 
       const result = at(array, asInt32(-1000));
 
-      expect(Optional.isNone(result)).toBe(true);
+      assert.isTrue(Optional.isNone(result));
     });
 
     test('should work with valid indices', () => {
@@ -26,7 +26,7 @@ describe('Arr element access', () => {
 
       const result = at(array, 1);
 
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
         expect(result.value).toBe(20);
@@ -38,7 +38,7 @@ describe('Arr element access', () => {
 
       const result = atIndex2([10, 20, 30, 40]);
 
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
         expect(result.value).toBe(30);
@@ -54,7 +54,7 @@ describe('Arr element access', () => {
 
       expectType<typeof h, Some<1>>('=');
 
-      expect(Optional.isSome(h)).toBe(true);
+      assert.isTrue(Optional.isSome(h));
 
       if (Optional.isSome(h)) {
         expect(h.value).toBe(1);
@@ -68,7 +68,7 @@ describe('Arr element access', () => {
 
       expectType<typeof h, Some<number>>('=');
 
-      expect(Optional.isSome(h)).toBe(true);
+      assert.isTrue(Optional.isSome(h));
 
       if (Optional.isSome(h)) {
         expect(h.value).toBe(1);
@@ -82,7 +82,7 @@ describe('Arr element access', () => {
 
       expectType<typeof h, Optional<number>>('=');
 
-      expect(Optional.isSome(h)).toBe(true);
+      assert.isTrue(Optional.isSome(h));
 
       if (Optional.isSome(h)) {
         expect(h.value).toBe(1);
@@ -96,19 +96,19 @@ describe('Arr element access', () => {
 
       expectType<typeof h, None>('=');
 
-      expect(Optional.isNone(h)).toBe(true);
+      assert.isTrue(Optional.isNone(h));
     });
 
     test('should return none for empty array', () => {
       const result = head([]);
 
-      expect(Optional.isNone(result)).toBe(true);
+      assert.isTrue(Optional.isNone(result));
     });
 
     test('should work with single element array', () => {
       const result = head([42]);
 
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
         expect(result.value).toBe(42);
@@ -124,7 +124,7 @@ describe('Arr element access', () => {
 
       expectType<typeof l, Some<3>>('=');
 
-      expect(Optional.isSome(l)).toBe(true);
+      assert.isTrue(Optional.isSome(l));
 
       if (Optional.isSome(l)) {
         expect(l.value).toBe(3);
@@ -138,7 +138,7 @@ describe('Arr element access', () => {
 
       expectType<typeof l, Some<number>>('=');
 
-      expect(Optional.isSome(l)).toBe(true);
+      assert.isTrue(Optional.isSome(l));
 
       if (Optional.isSome(l)) {
         expect(l.value).toBe(3);
@@ -152,7 +152,7 @@ describe('Arr element access', () => {
 
       expectType<typeof l, Optional<number>>('=');
 
-      expect(Optional.isSome(l)).toBe(true);
+      assert.isTrue(Optional.isSome(l));
 
       if (Optional.isSome(l)) {
         expect(l.value).toBe(3);
@@ -166,19 +166,19 @@ describe('Arr element access', () => {
 
       expectType<typeof l, None>('=');
 
-      expect(Optional.isNone(l)).toBe(true);
+      assert.isTrue(Optional.isNone(l));
     });
 
     test('should return none for empty array', () => {
       const result = last([]);
 
-      expect(Optional.isNone(result)).toBe(true);
+      assert.isTrue(Optional.isNone(result));
     });
 
     test('should work with single element array', () => {
       const result = last([42]);
 
-      expect(Optional.isSome(result)).toBe(true);
+      assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
         expect(result.value).toBe(42);

@@ -88,47 +88,47 @@ describe('PositiveSafeInt test', () => {
 
   describe(isPositiveSafeInt, () => {
     test('correctly identifies positive safe integers', () => {
-      expect(isPositiveSafeInt(1)).toBe(true);
+      assert.isTrue(isPositiveSafeInt(1));
 
-      expect(isPositiveSafeInt(2)).toBe(true);
+      assert.isTrue(isPositiveSafeInt(2));
 
-      expect(isPositiveSafeInt(42)).toBe(true);
+      assert.isTrue(isPositiveSafeInt(42));
 
-      expect(isPositiveSafeInt(100)).toBe(true);
+      assert.isTrue(isPositiveSafeInt(100));
 
-      expect(isPositiveSafeInt(Number.MAX_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isPositiveSafeInt(Number.MAX_SAFE_INTEGER));
     });
 
     test('correctly identifies zero', () => {
-      expect(isPositiveSafeInt(0)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(0));
 
-      expect(isPositiveSafeInt(-0)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(-0));
     });
 
     test('correctly identifies negative integers', () => {
-      expect(isPositiveSafeInt(-1)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(-1));
 
-      expect(isPositiveSafeInt(-42)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(-42));
 
-      expect(isPositiveSafeInt(Number.MIN_SAFE_INTEGER)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(Number.MIN_SAFE_INTEGER));
     });
 
     test('correctly identifies values outside safe integer range', () => {
-      expect(isPositiveSafeInt(Number.MAX_SAFE_INTEGER + 1)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(Number.MAX_SAFE_INTEGER + 1));
 
-      expect(isPositiveSafeInt(Number.MAX_VALUE)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(Number.MAX_VALUE));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isPositiveSafeInt(Number.NaN)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(Number.NaN));
 
-      expect(isPositiveSafeInt(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(Number.POSITIVE_INFINITY));
 
-      expect(isPositiveSafeInt(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(Number.NEGATIVE_INFINITY));
 
-      expect(isPositiveSafeInt(1.2)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(1.2));
 
-      expect(isPositiveSafeInt(-3.4)).toBe(false);
+      assert.isFalse(isPositiveSafeInt(-3.4));
     });
   });
 
@@ -236,9 +236,9 @@ describe('PositiveSafeInt test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(PositiveSafeInt.is(result)).toBe(true);
+        assert.isTrue(PositiveSafeInt.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).toBeGreaterThan(0);
       }

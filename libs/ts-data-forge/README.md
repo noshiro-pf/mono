@@ -171,7 +171,7 @@ const maybeValue = Optional.some(42);
 
 const doubled = Optional.map(maybeValue, (x) => x * 2);
 
-assert(Optional.unwrapOr(doubled, 0) === 84);
+assert.isTrue(Optional.unwrapOr(doubled, 0) === 84);
 
 // Result for error handling
 const success = Result.ok(42);
@@ -201,19 +201,19 @@ const handleStatus = (status: Status, data?: string): string =>
         error: 'An error occurred',
     });
 
-assert(handleStatus('loading') === 'Please wait...');
+assert.isTrue(handleStatus('loading') === 'Please wait...');
 
-assert(handleStatus('success', 'Hello') === 'Data: Hello');
+assert.isTrue(handleStatus('success', 'Hello') === 'Data: Hello');
 
-assert(handleStatus('error') === 'An error occurred');
+assert.isTrue(handleStatus('error') === 'An error occurred');
 
 // Pattern matching with Result
 const processResult = (result: Result<number, string>): string =>
     Result.isOk(result) ? `Success: ${result.value}` : `Error: ${result.value}`;
 
-assert(processResult(Result.ok(42)) === 'Success: 42');
+assert.isTrue(processResult(Result.ok(42)) === 'Success: 42');
 
-assert(processResult(Result.err('Failed')) === 'Error: Failed');
+assert.isTrue(processResult(Result.err('Failed')) === 'Error: Failed');
 ```
 
 ### 3. Number Utilities with `Num` and Branded Number Types
@@ -224,34 +224,34 @@ The `Num` object provides safe and convenient functions for numerical operations
 import { Num } from 'ts-data-forge';
 
 // Basic conversions
-assert(Num.from('123') === 123);
+assert.isTrue(Num.from('123') === 123);
 
-assert(Number.isNaN(Num.from('abc')));
+assert.isTrue(Number.isNaN(Num.from('abc')));
 
 // Range checking
 const inRange = Num.isInRange(0, 10);
 
-assert(inRange(5));
+assert.isTrue(inRange(5));
 
-assert(inRange(0)); // (inclusive lower bound)
+assert.isTrue(inRange(0)); // (inclusive lower bound)
 
-assert(!inRange(10)); // (exclusive upper bound)
+assert.isFalse(inRange(10)); // (exclusive upper bound)
 
 // Clamping values
 const clamp = Num.clamp(0, 100);
 
-assert(clamp(150) === 100);
+assert.isTrue(clamp(150) === 100);
 
-assert(clamp(-10) === 0);
+assert.isTrue(clamp(-10) === 0);
 
 // Rounding utilities
 const round2 = Num.round(2);
 
-assert(round2(3.141_59) === 3.14);
+assert.isTrue(round2(3.141_59) === 3.14);
 
-assert(Num.roundAt(3.141_59, 3) === 3.142);
+assert.isTrue(Num.roundAt(3.141_59, 3) === 3.142);
 
-assert(Num.roundToInt(3.7) === 4);
+assert.isTrue(Num.roundToInt(3.7) === 4);
 
 // Type guards
 const value = 5; // example value
@@ -260,7 +260,7 @@ if (Num.isNonZero(value)) {
     // value is guaranteed to be non-zero
     const result = Num.div(10, value); // Safe division
 
-    assert(result === 2);
+    assert.isTrue(result === 2);
 }
 ```
 
@@ -291,13 +291,13 @@ const finite = asFiniteNumber(3.14); // FiniteNumber - finite floating-point
 
 const safeInt = asSafeInt(42); // SafeInt - integer in safe range
 
-assert(integer === 42);
+assert.isTrue(integer === 42);
 
-assert(unsigned === 42);
+assert.isTrue(unsigned === 42);
 
-assert(finite === 3.14);
+assert.isTrue(finite === 3.14);
 
-assert(safeInt === 42);
+assert.isTrue(safeInt === 42);
 
 // This line would cause a runtime error:
 assert.throw(() => {
@@ -309,39 +309,39 @@ const int16 = asInt16(1000); // Int16: [-32768, 32767]
 
 const uint32 = asUint32(3_000_000_000); // Uint32: [0, 4294967295]
 
-assert(int16 === 1000);
+assert.isTrue(int16 === 1000);
 
-assert(uint32 === 3_000_000_000);
+assert.isTrue(uint32 === 3_000_000_000);
 
 // Non-zero and positive variants
 const nonZeroInt = asNonZeroInt(5); // NonZeroInt - excludes zero
 
 const positiveInt = asPositiveInt(10); // PositiveInt - excludes zero and negatives
 
-assert(nonZeroInt === 5);
+assert.isTrue(nonZeroInt === 5);
 
-assert(positiveInt === 10);
+assert.isTrue(positiveInt === 10);
 
 // Type-safe arithmetic with automatic clamping
 const sum = Int16.add(int16, asInt16(2000)); // Int16 (3000)
 
 const clamped = Int16.clamp(100_000); // Int16 (32767 - clamped to MAX_VALUE)
 
-assert(sum === 3000);
+assert.isTrue(sum === 3000);
 
-assert(clamped === 32_767);
+assert.isTrue(clamped === 32_767);
 
 // Safe division with non-zero types
 const ratio = NonZeroInt.div(asNonZeroInt(10), nonZeroInt); // No division by zero risk
 
-assert(ratio === 2);
+assert.isTrue(ratio === 2);
 
 // Random generation within type constraints
 const randomInt16 = Int16.random(); // Int16 (random value in valid range)
 
-assert(-32_768 <= randomInt16);
+assert.isTrue(-32_768 <= randomInt16);
 
-assert(randomInt16 <= 32_767);
+assert.isTrue(randomInt16 <= 32_767);
 ```
 
 ### 4. Array Utilities with `Arr`
@@ -356,14 +356,14 @@ const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
 // Reduction
 const sum = Arr.sum(numbers);
 
-assert(sum === 20);
+assert.isTrue(sum === 20);
 
 // Type-safe length checking
 if (Arr.isArrayAtLeastLength(numbers, 2)) {
     // numbers is now guaranteed to have at least 2 elements
     expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
 
-    assert(numbers[1] === 2); // Safe access to index 1
+    assert.isTrue(numbers[1] === 2); // Safe access to index 1
 }
 
 // Take first n elements
@@ -400,7 +400,7 @@ assert.deepStrictEqual(
 );
 
 if (Optional.isSome(oldestPerson)) {
-    assert(oldestPerson.value.name === 'Charlie');
+    assert.isTrue(oldestPerson.value.name === 'Charlie');
 }
 ```
 
@@ -419,11 +419,11 @@ const mapWithOne = originalMap.set('one', 1);
 const mapWithTwo = mapWithOne.set('two', 2);
 
 // Original map is unchanged
-assert(originalMap.size === 0);
+assert.isTrue(originalMap.size === 0);
 
 assert.deepStrictEqual(mapWithTwo.get('one'), Optional.some(1));
 
-assert(!mapWithTwo.has('three'));
+assert.isFalse(mapWithTwo.has('three'));
 
 // Using pipe for fluent updates
 const sequence = Arr.seq(10); // [0, 1, 2, ..., 9]
@@ -436,7 +436,7 @@ const skipped = Arr.skip(pairs, 1); // [[1, "1"], ..., [9, "9"]]
 
 const idMap = IMap.create<number, string>(skipped);
 
-assert(idMap.size === 9);
+assert.isTrue(idMap.size === 9);
 
 // Efficient batch updates with withMutations
 const idMapUpdated = idMap.withMutations([
@@ -445,18 +445,18 @@ const idMapUpdated = idMap.withMutations([
     { type: 'delete', key: 4 },
 ]);
 
-assert(idMapUpdated.size === 9);
+assert.isTrue(idMapUpdated.size === 9);
 
 // ISet usage
 const originalSet = ISet.create<number>([]);
 
 const setWithItems = originalSet.add(1).add(2).add(1); // Duplicate ignored
 
-assert(originalSet.size === 0); // (unchanged)
+assert.isTrue(originalSet.size === 0); // (unchanged)
 
-assert(setWithItems.has(1));
+assert.isTrue(setWithItems.has(1));
 
-assert(setWithItems.size === 2);
+assert.isTrue(setWithItems.size === 2);
 ```
 
 ### 6. Type Guards
@@ -488,11 +488,11 @@ if (isNonNullObject(value)) {
 }
 
 // Example usage
-assert(processData({ name: 'Alice' }) === 'Hello, Alice!');
+assert.isTrue(processData({ name: 'Alice' }) === 'Hello, Alice!');
 
-assert(processData({ age: 30 }) === undefined);
+assert.isTrue(processData({ age: 30 }) === undefined);
 
-assert(processData('not an object') === undefined);
+assert.isTrue(processData('not an object') === undefined);
 ```
 
 ### 7. Iteration with `range`
@@ -590,6 +590,8 @@ assert.deepStrictEqual(initialState.items, ['item1', 'item2']);
 
 assert.deepStrictEqual(updatedState.items, ['newItem1', 'newItem2']);
 ```
+
+**Note**: While [immer](https://immerjs.github.io/immer/) provides `castDraft` with similar usage, it recursively converts types to mutable, resulting in a more complex (fat) type implementation. When you only need shallow mutability conversion, using `castMutable` can potentially reduce type-checking computation overhead.
 
 ## Modules Overview
 

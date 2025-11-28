@@ -59,7 +59,7 @@ describe('Arr creations', () => {
       expect(result).toHaveLength(1000);
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      expect(result.every((x) => x === 0)).toBe(true);
+      assert.isTrue(result.every((x) => x === 0));
     });
 
     test('should work with curried version', () => {

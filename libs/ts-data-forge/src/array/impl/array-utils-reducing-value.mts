@@ -206,9 +206,9 @@ export function maxBy<E, V>(
  *
  * const withCurried = Arr.count<string>((word) => word.includes('a'))(words);
  *
- * assert(longWords === 2);
+ * assert.isTrue(longWords === 2);
  *
- * assert(withCurried === 2);
+ * assert.isTrue(withCurried === 2);
  * ```
  */
 export function count<const Ar extends readonly unknown[]>(
@@ -324,9 +324,9 @@ export function countBy<E, G extends MapSetKeyType>(
  *   'items',
  * )(words);
  *
- * assert(totalLength === 11);
+ * assert.isTrue(totalLength === 11);
  *
- * assert(concat === 'items-Ada-Lovelace');
+ * assert.isTrue(concat === 'items-Ada-Lovelace');
  * ```
  */
 export function foldl<const Ar extends readonly unknown[], P>(
@@ -401,9 +401,9 @@ export function foldl<E, P>(
  *   '',
  * )(numbers);
  *
- * assert(subtractRight === -6);
+ * assert.isTrue(subtractRight === -6);
  *
- * assert(joinFromRight === '321');
+ * assert.isTrue(joinFromRight === '321');
  * ```
  */
 export function foldr<const Ar extends readonly unknown[], P>(
@@ -477,9 +477,9 @@ export function foldr<E, P>(
  *
  * const totalNegatives = Arr.sum(negatives);
  *
- * assert(total === 10);
+ * assert.isTrue(total === 10);
  *
- * assert(totalNegatives === 6);
+ * assert.isTrue(totalNegatives === 6);
  * ```
  */
 export function sum(array: readonly []): 0;

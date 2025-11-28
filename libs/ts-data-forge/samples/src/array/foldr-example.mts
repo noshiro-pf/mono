@@ -11,6 +11,6 @@ const joinFromRight = Arr.foldr<number, string>(
   '',
 )(numbers);
 
-assert(subtractRight === -6);
+assert.isTrue(subtractRight === -6);
 
-assert(joinFromRight === '321');
+assert.isTrue(joinFromRight === '321');

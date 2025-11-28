@@ -2,8 +2,8 @@
 import { Uint, isUint } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
-assert.ok(isUint(4));
+assert.isTrue(isUint(4));
 
-assert.notOk(isUint(-1));
+assert.isFalse(isUint(-1));
 
-assert.ok(Uint.is(0));
+assert.isTrue(Uint.is(0));

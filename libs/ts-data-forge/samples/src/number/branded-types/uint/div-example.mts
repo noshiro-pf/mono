@@ -4,4 +4,4 @@ import { Uint, asUint } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const quotient = Uint.div(asUint(10), asUint(4));
 
-assert(quotient === 2);
+assert.isTrue(quotient === 2);

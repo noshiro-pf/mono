@@ -72,13 +72,13 @@ describe('parse', () => {
   });
 
   test('should return error for invalid JSON', () => {
-    expect(Result.isErr(Json.parse('invalid'))).toBe(true);
+    assert.isTrue(Result.isErr(Json.parse('invalid')));
 
-    expect(Result.isErr(Json.parse('{missing quotes: true}'))).toBe(true);
+    assert.isTrue(Result.isErr(Json.parse('{missing quotes: true}')));
 
-    expect(Result.isErr(Json.parse('[1,2,]'))).toBe(true); // Trailing comma
+    assert.isTrue(Result.isErr(Json.parse('[1,2,]'))); // Trailing comma
 
-    expect(Result.isErr(Json.parse('undefined'))).toBe(true);
+    assert.isTrue(Result.isErr(Json.parse('undefined')));
   });
 
   test('should return parsed value for valid JSON', () => {
@@ -96,15 +96,15 @@ describe('parse', () => {
   });
 
   test('should return error for invalid JSON cases', () => {
-    expect(Result.isErr(Json.parse('invalid'))).toBe(true);
+    assert.isTrue(Result.isErr(Json.parse('invalid')));
 
-    expect(Result.isErr(Json.parse('{bad json}'))).toBe(true);
+    assert.isTrue(Result.isErr(Json.parse('{bad json}')));
 
-    expect(Result.isErr(Json.parse('[1,2,]'))).toBe(true);
+    assert.isTrue(Result.isErr(Json.parse('[1,2,]')));
 
-    expect(Result.isErr(Json.parse('undefined'))).toBe(true);
+    assert.isTrue(Result.isErr(Json.parse('undefined')));
 
-    expect(Result.isErr(Json.parse(''))).toBe(true);
+    assert.isTrue(Result.isErr(Json.parse('')));
   });
 
   test('should handle edge cases', () => {
@@ -138,7 +138,7 @@ describe('parse', () => {
 
     const result = Json.parse(jsonString, dateReviver);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (
       Result.isOk(result) &&
@@ -166,7 +166,7 @@ describe('parse', () => {
       transformReviver,
     );
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toHaveProperty('number');
@@ -289,7 +289,7 @@ describe('stringify', () => {
     );
 
     // BigInt should cause an error
-    expect(Result.isErr(Json.stringify(123n))).toBe(true);
+    assert.isTrue(Result.isErr(Json.stringify(123n)));
   });
 
   test('should handle circular references', () => {
@@ -298,7 +298,7 @@ describe('stringify', () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     mut_obj.circular = mut_obj;
 
-    expect(Result.isErr(Json.stringify(mut_obj))).toBe(true);
+    assert.isTrue(Result.isErr(Json.stringify(mut_obj)));
   });
 
   test('should handle objects with toJSON method', () => {
@@ -346,7 +346,7 @@ describe('stringify', () => {
 
     const result = Json.stringify(data, secureReplacer);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toContain('[REDACTED]');
@@ -360,7 +360,7 @@ describe('stringify', () => {
 
     const result = Json.stringify(data, undefined, 2);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toContain('\n');
@@ -374,7 +374,7 @@ describe('stringify', () => {
 
     const result = Json.stringify(data, undefined, '\t');
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toContain('\n');
@@ -396,10 +396,10 @@ describe('stringifySelected', () => {
 
     const result = Json.stringifySelected(user, ['id', 'name', 'email']);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
-      assert(isString(result.value));
+      assert.isTrue(isString(result.value));
 
       const parsed: unknown = JSON.parse(result.value);
 
@@ -432,15 +432,15 @@ describe('stringifySelected', () => {
       'total',
     ]);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
-      assert(isString(result.value));
+      assert.isTrue(isString(result.value));
 
       const parsed: unknown = JSON.parse(result.value);
 
       if (isRecord(parsed) && hasKey(parsed, 'users')) {
-        expect(isRecord(parsed.users)).toBe(false);
+        assert.isFalse(isRecord(parsed.users));
 
         expect(parsed.users).toHaveLength(2);
 
@@ -470,16 +470,16 @@ describe('stringifySelected', () => {
 
     const result = Json.stringifySelected(matrix, [0, 1]);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
-      assert(isString(result.value));
+      assert.isTrue(isString(result.value));
 
       const parsed: unknown = JSON.parse(result.value);
 
       // Note: stringifySelected works with JSON.stringify's replacer parameter
       // which may not work as expected with arrays
-      expect(Array.isArray(parsed)).toBe(true);
+      assert.isTrue(Array.isArray(parsed));
 
       expect(parsed).toHaveLength(3);
     }
@@ -490,7 +490,7 @@ describe('stringifySelected', () => {
 
     const result = Json.stringifySelected(data, ['a', 'b', 'c'], 2);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toContain('\n');
@@ -504,7 +504,7 @@ describe('stringifySelected', () => {
 
     const result = Json.stringifySelected(data, []);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toBe('{}');
@@ -516,10 +516,10 @@ describe('stringifySelected', () => {
 
     const result = Json.stringifySelected(data, undefined);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
-      assert(isString(result.value));
+      assert.isTrue(isString(result.value));
 
       const parsed: unknown = JSON.parse(result.value);
 
@@ -537,7 +537,7 @@ describe('stringifySelected', () => {
     const result = Json.stringifySelected(mut_circular, ['name', 'self']);
 
     // Note: JSON.stringify may handle circular references differently depending on the replacer
-    expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isOk(result) || Result.isErr(result));
 
     if (Result.isErr(result)) {
       expectTypeOf(result.value).toBeString();
@@ -556,7 +556,7 @@ describe('stringifySortedKey', () => {
 
     const result = Json.stringifySortedKey(unsortedObj);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toBe(
@@ -584,10 +584,10 @@ describe('stringifySortedKey', () => {
 
     const result = Json.stringifySortedKey(nestedObj);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
-      assert(isString(result.value));
+      assert.isTrue(isString(result.value));
 
       const parsed: unknown = JSON.parse(result.value);
 
@@ -626,10 +626,10 @@ describe('stringifySortedKey', () => {
 
     const result = Json.stringifySortedKey(dataWithArrays);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
-      assert(isString(result.value));
+      assert.isTrue(isString(result.value));
 
       const parsed: unknown = JSON.parse(result.value);
 
@@ -673,7 +673,7 @@ describe('stringifySortedKey', () => {
 
     const result = Json.stringifySortedKey(obj, 2);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toContain('\n');
@@ -693,9 +693,9 @@ describe('stringifySortedKey', () => {
 
     const result2 = Json.stringifySortedKey(obj2);
 
-    expect(Result.isOk(result1)).toBe(true);
+    assert.isTrue(Result.isOk(result1));
 
-    expect(Result.isOk(result2)).toBe(true);
+    assert.isTrue(Result.isOk(result2));
 
     if (Result.isOk(result1) && Result.isOk(result2)) {
       expect(result1.value).toBe(result2.value);
@@ -719,7 +719,7 @@ describe('stringifySortedKey', () => {
       const result = Json.stringifySortedKey(mut_problematicObj);
 
       // This may throw due to circular reference during key extraction
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       if (Result.isErr(result)) {
         expectTypeOf(result.value).toBeString();
@@ -733,7 +733,7 @@ describe('stringifySortedKey', () => {
   test('should handle empty object', () => {
     const result = Json.stringifySortedKey({});
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
       expect(result.value).toBe('{}');
@@ -755,10 +755,10 @@ describe('stringifySortedKey', () => {
 
     const result = Json.stringifySortedKey(deep);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     if (Result.isOk(result)) {
-      assert(isString(result.value));
+      assert.isTrue(isString(result.value));
 
       const parsed: unknown = JSON.parse(result.value);
 

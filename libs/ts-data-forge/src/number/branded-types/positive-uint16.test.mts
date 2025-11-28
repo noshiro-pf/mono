@@ -81,41 +81,41 @@ describe('PositiveUint16 test', () => {
 
   describe(isPositiveUint16, () => {
     test('correctly identifies positive uint16 values', () => {
-      expect(isPositiveUint16(1)).toBe(true);
+      assert.isTrue(isPositiveUint16(1));
 
-      expect(isPositiveUint16(1000)).toBe(true);
+      assert.isTrue(isPositiveUint16(1000));
 
-      expect(isPositiveUint16(65_535)).toBe(true);
+      assert.isTrue(isPositiveUint16(65_535));
 
-      expect(isPositiveUint16(32_768)).toBe(true);
+      assert.isTrue(isPositiveUint16(32_768));
     });
 
     test('correctly identifies zero', () => {
-      expect(isPositiveUint16(0)).toBe(false);
+      assert.isFalse(isPositiveUint16(0));
     });
 
     test('correctly identifies values outside uint16 range', () => {
-      expect(isPositiveUint16(65_536)).toBe(false);
+      assert.isFalse(isPositiveUint16(65_536));
 
-      expect(isPositiveUint16(100_000)).toBe(false);
+      assert.isFalse(isPositiveUint16(100_000));
     });
 
     test('correctly identifies negative integers', () => {
-      expect(isPositiveUint16(-1)).toBe(false);
+      assert.isFalse(isPositiveUint16(-1));
 
-      expect(isPositiveUint16(-42)).toBe(false);
+      assert.isFalse(isPositiveUint16(-42));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isPositiveUint16(Number.NaN)).toBe(false);
+      assert.isFalse(isPositiveUint16(Number.NaN));
 
-      expect(isPositiveUint16(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isPositiveUint16(Number.POSITIVE_INFINITY));
 
-      expect(isPositiveUint16(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isPositiveUint16(Number.NEGATIVE_INFINITY));
 
-      expect(isPositiveUint16(1.2)).toBe(false);
+      assert.isFalse(isPositiveUint16(1.2));
 
-      expect(isPositiveUint16(-3.4)).toBe(false);
+      assert.isFalse(isPositiveUint16(-3.4));
     });
   });
 
@@ -217,9 +217,9 @@ describe('PositiveUint16 test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(PositiveUint16.is(result)).toBe(true);
+        assert.isTrue(PositiveUint16.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).toBeGreaterThan(0);
       }

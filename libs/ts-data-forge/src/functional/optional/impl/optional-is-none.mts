@@ -11,7 +11,7 @@ import { type NarrowToNone } from './types.mjs';
  *
  * if (Optional.isNone(optionalValue)) {
  *   // Type narrowed to None
- *   assert.ok(true); // optionalValue is None
+ *   assert.isTrue(true); // optionalValue is None
  * }
  * ```
  *

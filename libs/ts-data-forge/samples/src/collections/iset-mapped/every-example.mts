@@ -24,6 +24,6 @@ const narrowed = set.every(
   (point): point is Readonly<{ x: 2 | 4; tag: 'even' }> => point.x % 2 === 0,
 );
 
-assert.ok(allEven);
+assert.isTrue(allEven);
 
-assert.ok(narrowed);
+assert.isTrue(narrowed);

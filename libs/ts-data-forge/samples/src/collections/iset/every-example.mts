@@ -8,6 +8,6 @@ const allEven = numbers.every((value) => value % 2 === 0);
 
 const narrowed = numbers.every((value): value is 2 | 4 | 6 => value % 2 === 0);
 
-assert.ok(allEven);
+assert.isTrue(allEven);
 
-assert.ok(narrowed);
+assert.isTrue(narrowed);

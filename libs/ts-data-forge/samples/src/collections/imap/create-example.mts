@@ -7,6 +7,6 @@ const map = IMap.create<string, number | string>([
   ['status', 'active'],
 ]);
 
-assert(map.size === 2);
+assert.isTrue(map.size === 2);
 
 assert.deepStrictEqual(map.get('status'), Optional.some('active'));

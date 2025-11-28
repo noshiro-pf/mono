@@ -8,4 +8,4 @@ const divisor = asInt(5);
 
 const quotient = Int.div(dividend, divisor);
 
-assert(quotient === 3);
+assert.isTrue(quotient === 3);

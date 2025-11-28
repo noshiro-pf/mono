@@ -61,7 +61,6 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 {
   type R = Readonly<{ a: 0 }> | Readonly<{ b: 1 }>;
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const obj: R = { a: 0 } as R;
 
   if (hasKey(obj, 'a')) {
@@ -82,7 +81,6 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
     | Readonly<{ b: 2 }>
     | Readonly<{ c: 3 }>;
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const obj: R = { a: 0 } as R;
 
   if (hasKey(obj, 'a') && hasKey(obj, 'b')) {
@@ -101,7 +99,6 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
     | Readonly<{ a: 1; b: 1 }>
     | Readonly<{ b: 2 }>;
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const obj: R = { a: 0 } as R;
 
   expectType<
@@ -193,7 +190,6 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
         | Readonly<{ b: 2 }>
         | Record<string, number>;
 
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const o2 = { b: 2 } as O;
 
       if (hasOwnNaive(o2, 'a')) {
@@ -212,7 +208,6 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
         | Readonly<{ a: 1; b: 1 }>
         | Readonly<{ b: 2 }>;
 
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const o2 = { b: 2 } as O;
 
       if (hasOwnNaive(o2, 'a')) {

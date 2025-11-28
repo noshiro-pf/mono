@@ -5,7 +5,7 @@ import { Num } from 'ts-data-forge';
 const amount = 42;
 
 if (Num.isPositive(amount)) {
-  assert.ok(amount > 0);
+  assert.isTrue(amount > 0);
 }
 
-assert.notOk(Num.isPositive(0));
+assert.isFalse(Num.isPositive(0));

@@ -33,6 +33,6 @@ const third = ISetMapped.create<Point, string>(
   fromKey,
 );
 
-assert.ok(ISetMapped.equal(first, second));
+assert.isTrue(ISetMapped.equal(first, second));
 
-assert.notOk(ISetMapped.equal(first, third));
+assert.isFalse(ISetMapped.equal(first, third));

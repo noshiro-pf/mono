@@ -19,7 +19,7 @@ type UnwrapPromise<P extends Promise<unknown>> =
  *
  * assert.deepStrictEqual(resolved, TernaryResult.ok('ok'));
  *
- * assert.ok(TernaryResult.isErr(rejected));
+ * assert.isTrue(TernaryResult.isErr(rejected));
  * ```
  */
 export const fromPromise = <P extends Promise<unknown>>(

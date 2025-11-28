@@ -19,11 +19,11 @@ import { type UnwrapErr } from './types.mjs';
  * // Result.unwrapErr returns undefined for Ok results
  *
  * // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
- * assert(Result.unwrapErr(okResult) === undefined);
+ * assert.isTrue(Result.unwrapErr(okResult) === undefined);
  *
  * // Result.unwrapErr returns the error value for Err results
  *
- * assert(Result.unwrapErr(errResult) === 'problem');
+ * assert.isTrue(Result.unwrapErr(errResult) === 'problem');
  * ```
  *
  * @template R The `UnknownResult` type to unwrap.

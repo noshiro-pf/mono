@@ -6,6 +6,6 @@ const maybeOptional = Optional.some('value');
 
 const notOptional = { $$tag: 'ts-data-forge::Optional.some' };
 
-assert.ok(Optional.isOptional(maybeOptional));
+assert.isTrue(Optional.isOptional(maybeOptional));
 
-assert.notOk(Optional.isOptional(notOptional));
+assert.isFalse(Optional.isOptional(notOptional));

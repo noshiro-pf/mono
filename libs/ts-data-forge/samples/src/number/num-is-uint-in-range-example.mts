@@ -4,8 +4,8 @@ import { Num } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const indexGuard = Num.isUintInRange(0, 5);
 
-assert.ok(indexGuard(3));
+assert.isTrue(indexGuard(3));
 
-assert.notOk(indexGuard(5));
+assert.isFalse(indexGuard(5));
 
-assert.notOk(indexGuard(-1));
+assert.isFalse(indexGuard(-1));

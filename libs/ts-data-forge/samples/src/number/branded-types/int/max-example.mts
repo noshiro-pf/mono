@@ -4,4 +4,4 @@ import { Int, asInt } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const largest = Int.max(asInt(7), asInt(-3), asInt(2));
 
-assert(largest === 7);
+assert.isTrue(largest === 7);

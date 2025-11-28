@@ -24,6 +24,6 @@ const superset = ISetMapped.create<Point, string>(
   fromKey,
 );
 
-assert.ok(subset.isSubsetOf(superset));
+assert.isTrue(subset.isSubsetOf(superset));
 
-assert.notOk(superset.isSubsetOf(subset));
+assert.isFalse(superset.isSubsetOf(subset));

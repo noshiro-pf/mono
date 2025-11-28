@@ -38,11 +38,11 @@ const {
  * @example
  *
  * ```ts
- * assert.ok(isInt(5));
+ * assert.isTrue(isInt(5));
  *
- * assert.notOk(isInt(5.25));
+ * assert.isFalse(isInt(5.25));
  *
- * assert.ok(Int.is(-10));
+ * assert.isTrue(Int.is(-10));
  * ```
  *
  * @param value - The value to check
@@ -62,9 +62,9 @@ export const isInt = is;
  * ```ts
  * const branded = asInt(42);
  *
- * assert(branded === 42);
+ * assert.isTrue(branded === 42);
  *
- * assert.ok(Int.is(branded));
+ * assert.isTrue(Int.is(branded));
  * ```
  *
  * @param value - The value to cast
@@ -91,11 +91,11 @@ export const Int = {
    * @example
    *
    * ```ts
-   * assert.ok(isInt(5));
+   * assert.isTrue(isInt(5));
    *
-   * assert.notOk(isInt(5.25));
+   * assert.isFalse(isInt(5.25));
    *
-   * assert.ok(Int.is(-10));
+   * assert.isTrue(Int.is(-10));
    * ```
    *
    * @param value - The value to check
@@ -118,9 +118,9 @@ export const Int = {
    *
    * const absolute = Int.abs(negative);
    *
-   * assert(absolute === 12);
+   * assert.isTrue(absolute === 12);
    *
-   * assert.ok(Int.is(absolute));
+   * assert.isTrue(Int.is(absolute));
    * ```
    *
    * @param a - The integer value
@@ -136,7 +136,7 @@ export const Int = {
    * ```ts
    * const smallest = Int.min(asInt(7), asInt(-3), asInt(2));
    *
-   * assert(smallest === -3);
+   * assert.isTrue(smallest === -3);
    * ```
    *
    * @param values - The integers to compare (at least one required)
@@ -152,7 +152,7 @@ export const Int = {
    * ```ts
    * const largest = Int.max(asInt(7), asInt(-3), asInt(2));
    *
-   * assert(largest === 7);
+   * assert.isTrue(largest === 7);
    * ```
    *
    * @param values - The integers to compare (at least one required)
@@ -175,9 +175,9 @@ export const Int = {
    *
    * const randomValue = Int.random(min, max);
    *
-   * assert.ok(Int.is(randomValue));
+   * assert.isTrue(Int.is(randomValue));
    *
-   * assert.ok(randomValue >= 1 && randomValue <= 6);
+   * assert.isTrue(randomValue >= 1 && randomValue <= 6);
    * ```
    *
    * @param min - The minimum value (inclusive)
@@ -198,7 +198,7 @@ export const Int = {
    *
    * const power = Int.pow(base, exponent);
    *
-   * assert(power === 32);
+   * assert.isTrue(power === 32);
    * ```
    *
    * @param a - The base integer
@@ -215,7 +215,7 @@ export const Int = {
    * ```ts
    * const sum = Int.add(asInt(12), asInt(8));
    *
-   * assert(sum === 20);
+   * assert.isTrue(sum === 20);
    * ```
    *
    * @param a - First integer
@@ -232,7 +232,7 @@ export const Int = {
    * ```ts
    * const difference = Int.sub(asInt(12), asInt(8));
    *
-   * assert(difference === 4);
+   * assert.isTrue(difference === 4);
    * ```
    *
    * @param a - First integer
@@ -249,7 +249,7 @@ export const Int = {
    * ```ts
    * const product = Int.mul(asInt(-4), asInt(6));
    *
-   * assert(product === -24);
+   * assert.isTrue(product === -24);
    * ```
    *
    * @param a - First integer
@@ -273,7 +273,7 @@ export const Int = {
    *
    * const quotient = Int.div(dividend, divisor);
    *
-   * assert(quotient === 3);
+   * assert.isTrue(quotient === 3);
    * ```
    *
    * @param a - The dividend

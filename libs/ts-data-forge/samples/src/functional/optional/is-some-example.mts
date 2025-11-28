@@ -7,5 +7,5 @@ const optionalNumber = Optional.some(42);
 if (Optional.isSome(optionalNumber)) {
   const value: number = optionalNumber.value;
 
-  assert(value === 42);
+  assert.isTrue(value === 42);
 }

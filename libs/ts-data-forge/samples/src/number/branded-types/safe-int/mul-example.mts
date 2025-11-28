@@ -4,6 +4,6 @@ import { SafeInt, asSafeInt } from 'ts-data-forge';
 // embed-sample-code-ignore-above
 const product = SafeInt.mul(asSafeInt(-8), asSafeInt(7));
 
-assert(product === -56);
+assert.isTrue(product === -56);
 
-assert.ok(SafeInt.is(product));
+assert.isTrue(SafeInt.is(product));

@@ -9,7 +9,7 @@ describe('Queue test', () => {
     test('should be empty if initialized without values', () => {
       const q = createQueue();
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
 
       expect(q.size).toBe(0);
     });
@@ -17,7 +17,7 @@ describe('Queue test', () => {
     test('should not be empty if initialized with values', () => {
       const q = createQueue([1, 2, 3]);
 
-      expect(q.isEmpty).toBe(false);
+      assert.isFalse(q.isEmpty);
 
       expect(q.size).toBe(3);
     });
@@ -34,7 +34,7 @@ describe('Queue test', () => {
     test('should increase size and not be empty after enqueueing to an empty queue', () => {
       mut_q.enqueue(1);
 
-      expect(mut_q.isEmpty).toBe(false);
+      assert.isFalse(mut_q.isEmpty);
 
       expect(mut_q.size).toBe(1);
     });
@@ -54,9 +54,9 @@ describe('Queue test', () => {
 
       const result = q.dequeue();
 
-      expect(Optional.isNone(result)).toBe(true);
+      assert.isTrue(Optional.isNone(result));
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
 
       expect(q.size).toBe(0);
     });
@@ -68,7 +68,7 @@ describe('Queue test', () => {
 
       const result1 = q.dequeue(); // Dequeues 1 (first element)
 
-      expect(Optional.isSome(result1)).toBe(true);
+      assert.isTrue(Optional.isSome(result1));
 
       if (Optional.isSome(result1)) {
         expect(result1.value).toBe(1);
@@ -78,7 +78,7 @@ describe('Queue test', () => {
 
       const result2 = q.dequeue(); // Dequeues 2
 
-      expect(Optional.isSome(result2)).toBe(true);
+      assert.isTrue(Optional.isSome(result2));
 
       if (Optional.isSome(result2)) {
         expect(result2.value).toBe(2);
@@ -94,13 +94,13 @@ describe('Queue test', () => {
 
       q.dequeue(); // Dequeues 2
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
 
       expect(q.size).toBe(0);
 
       const result = q.dequeue(); // Dequeue from empty
 
-      expect(Optional.isNone(result)).toBe(true);
+      assert.isTrue(Optional.isNone(result));
     });
   });
 
@@ -118,27 +118,27 @@ describe('Queue test', () => {
 
       let mut_result = q.dequeue(); // Dequeues 1 (first in)
 
-      expect(Optional.isSome(mut_result) && mut_result.value === 1).toBe(true);
+      assert.isTrue(Optional.isSome(mut_result) && mut_result.value === 1);
 
       expect(q.size).toBe(2);
 
       mut_result = q.dequeue(); // Dequeues 2
 
-      expect(Optional.isSome(mut_result) && mut_result.value === 2).toBe(true);
+      assert.isTrue(Optional.isSome(mut_result) && mut_result.value === 2);
 
       expect(q.size).toBe(1);
 
       mut_result = q.dequeue(); // Dequeues 3
 
-      expect(Optional.isSome(mut_result) && mut_result.value === 3).toBe(true);
+      assert.isTrue(Optional.isSome(mut_result) && mut_result.value === 3);
 
       expect(q.size).toBe(0);
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
 
       mut_result = q.dequeue();
 
-      expect(Optional.isNone(mut_result)).toBe(true);
+      assert.isTrue(Optional.isNone(mut_result));
     });
 
     test('initial values are dequeued in the same order (FIFO)', () => {
@@ -148,17 +148,17 @@ describe('Queue test', () => {
 
       const result1 = q.dequeue(); // Dequeues 1 (first element)
 
-      expect(Optional.isSome(result1) && result1.value === 1).toBe(true);
+      assert.isTrue(Optional.isSome(result1) && result1.value === 1);
 
       const result2 = q.dequeue(); // Dequeues 2
 
-      expect(Optional.isSome(result2) && result2.value === 2).toBe(true);
+      assert.isTrue(Optional.isSome(result2) && result2.value === 2);
 
       const result3 = q.dequeue(); // Dequeues 3
 
-      expect(Optional.isSome(result3) && result3.value === 3).toBe(true);
+      assert.isTrue(Optional.isSome(result3) && result3.value === 3);
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
     });
 
     test('mixed enqueue and dequeue operations maintain FIFO order', () => {
@@ -170,7 +170,7 @@ describe('Queue test', () => {
 
       const result1 = q.dequeue();
 
-      expect(Optional.isSome(result1) && result1.value === 'A').toBe(true);
+      assert.isTrue(Optional.isSome(result1) && result1.value === 'A');
 
       q.enqueue('C');
 
@@ -178,17 +178,17 @@ describe('Queue test', () => {
 
       const result2 = q.dequeue();
 
-      expect(Optional.isSome(result2) && result2.value === 'B').toBe(true);
+      assert.isTrue(Optional.isSome(result2) && result2.value === 'B');
 
       const result3 = q.dequeue();
 
-      expect(Optional.isSome(result3) && result3.value === 'C').toBe(true);
+      assert.isTrue(Optional.isSome(result3) && result3.value === 'C');
 
       const result4 = q.dequeue();
 
-      expect(Optional.isSome(result4) && result4.value === 'D').toBe(true);
+      assert.isTrue(Optional.isSome(result4) && result4.value === 'D');
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
     });
   });
 
@@ -226,7 +226,7 @@ describe('Queue test', () => {
 
       expect(Optional.unwrap(q.dequeue())).toBe(8);
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
     });
 
     test('should automatically resize when buffer becomes full', () => {
@@ -243,10 +243,10 @@ describe('Queue test', () => {
       for (const i of range(1, 21)) {
         const result = q.dequeue();
 
-        expect(Optional.isSome(result) && result.value === i).toBe(true);
+        assert.isTrue(Optional.isSome(result) && result.value === i);
       }
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
     });
 
     test('should handle multiple resize operations', () => {
@@ -280,7 +280,7 @@ describe('Queue test', () => {
         expect(Optional.unwrap(q.dequeue())).toBe(i);
       }
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
     });
 
     test('should handle edge case of single element operations', () => {
@@ -294,11 +294,9 @@ describe('Queue test', () => {
 
         const result = q.dequeue();
 
-        expect(Optional.isSome(result) && result.value === `item-${i}`).toBe(
-          true,
-        );
+        assert.isTrue(Optional.isSome(result) && result.value === `item-${i}`);
 
-        expect(q.isEmpty).toBe(true);
+        assert.isTrue(q.isEmpty);
       }
     });
 
@@ -314,7 +312,7 @@ describe('Queue test', () => {
         expect(Optional.unwrap(q.dequeue())).toBe(i);
       }
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
     });
 
     test('should properly clean up references for garbage collection', () => {
@@ -331,17 +329,17 @@ describe('Queue test', () => {
       for (const i of range(0, 5)) {
         const result = q.dequeue();
 
-        expect(Optional.isSome(result) && result.value.id === i).toBe(true);
+        assert.isTrue(Optional.isSome(result) && result.value.id === i);
       }
 
       // Remaining objects should still be accessible
       for (const i of range(5, 10)) {
         const result = q.dequeue();
 
-        expect(Optional.isSome(result) && result.value.id === i).toBe(true);
+        assert.isTrue(Optional.isSome(result) && result.value.id === i);
       }
 
-      expect(q.isEmpty).toBe(true);
+      assert.isTrue(q.isEmpty);
     });
   });
 });

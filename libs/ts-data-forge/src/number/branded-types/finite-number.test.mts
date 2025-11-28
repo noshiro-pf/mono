@@ -53,27 +53,29 @@ describe('FiniteNumber test', () => {
 
   describe('FiniteNumber.is', () => {
     test('correctly identifies finite numbers', () => {
-      expect(FiniteNumber.is(0)).toBe(true);
+      assert.isTrue(FiniteNumber.is(0));
 
-      expect(FiniteNumber.is(1)).toBe(true);
+      assert.isTrue(FiniteNumber.is(1));
 
-      expect(FiniteNumber.is(-1)).toBe(true);
+      assert.isTrue(FiniteNumber.is(-1));
 
-      expect(FiniteNumber.is(3.14)).toBe(true);
+      assert.isTrue(FiniteNumber.is(3.14));
 
-      expect(FiniteNumber.is(-2.5)).toBe(true);
+      assert.isTrue(FiniteNumber.is(-2.5));
 
-      expect(FiniteNumber.is(Number.MAX_VALUE)).toBe(true);
+      assert.isTrue(FiniteNumber.is(-Number.MAX_VALUE));
 
-      expect(FiniteNumber.is(-Number.MAX_VALUE)).toBe(true);
+      assert.isTrue(FiniteNumber.is(Number.MAX_VALUE));
+
+      expectType<FiniteNumber, typeof Number.MAX_VALUE>('=');
     });
 
     test('correctly identifies non-finite numbers', () => {
-      expect(FiniteNumber.is(Number.NaN)).toBe(false);
+      assert.isFalse(FiniteNumber.is(Number.NaN));
 
-      expect(FiniteNumber.is(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(FiniteNumber.is(Number.POSITIVE_INFINITY));
 
-      expect(FiniteNumber.is(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(FiniteNumber.is(Number.NEGATIVE_INFINITY));
     });
   });
 
@@ -160,7 +162,7 @@ describe('FiniteNumber test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(FiniteNumber.is(result)).toBe(true);
+        assert.isTrue(FiniteNumber.is(result));
       }
     });
   });

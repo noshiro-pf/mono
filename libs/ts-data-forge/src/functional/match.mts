@@ -34,7 +34,7 @@ import { keyIsIn } from '../guard/index.mjs';
  *   published: 'Complete',
  * });
  *
- * assert(message === 'Work in progress');
+ * assert.isTrue(message === 'Work in progress');
  * ```
  *
  * @param target - The value to match against

@@ -23,9 +23,9 @@
  * const maybeKey: string = 'name';
  *
  * if (keyIsIn(maybeKey, user)) {
- *   assert(user[maybeKey] === 'Ada');
+ *   assert.isTrue(user[maybeKey] === 'Ada');
  * } else {
- *   assert.fail('Expected a known key.');
+ *   assert.fail();
  * }
  * ```
  *

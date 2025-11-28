@@ -6,6 +6,6 @@ const errResult = Result.err(new Error('broken'));
 
 const okResult = Result.ok('value');
 
-assert(Result.unwrapErrThrow(errResult).message === 'broken');
+assert.isTrue(Result.unwrapErrThrow(errResult).message === 'broken');
 
 assert.throws(() => Result.unwrapErrThrow(okResult), /Expected Err/u);

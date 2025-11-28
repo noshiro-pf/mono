@@ -8,8 +8,8 @@ const withinRange = SafeInt.clamp(123);
 
 const belowRange = SafeInt.clamp(-1e20);
 
-assert(aboveRange === Number.MAX_SAFE_INTEGER);
+assert.isTrue(aboveRange === Number.MAX_SAFE_INTEGER);
 
-assert(withinRange === 123);
+assert.isTrue(withinRange === 123);
 
-assert(belowRange === Number.MIN_SAFE_INTEGER);
+assert.isTrue(belowRange === Number.MIN_SAFE_INTEGER);

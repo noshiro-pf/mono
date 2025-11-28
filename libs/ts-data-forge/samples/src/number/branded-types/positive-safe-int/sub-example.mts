@@ -7,6 +7,6 @@ const difference = PositiveSafeInt.sub(
   asPositiveSafeInt(20),
 );
 
-assert(difference === 1);
+assert.isTrue(difference === 1);
 
-assert.ok(PositiveSafeInt.is(difference));
+assert.isTrue(PositiveSafeInt.is(difference));

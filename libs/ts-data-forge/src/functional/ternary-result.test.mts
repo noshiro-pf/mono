@@ -10,15 +10,15 @@ describe('TernaryResult test', () => {
 
     const err = TernaryResult.err(new Error('boom'));
 
-    expect(TernaryResult.isOk(ok)).toBe(true);
+    assert.isTrue(TernaryResult.isOk(ok));
 
-    expect(TernaryResult.isWarn(warn)).toBe(true);
+    assert.isTrue(TernaryResult.isWarn(warn));
 
-    expect(TernaryResult.isErr(err)).toBe(true);
+    assert.isTrue(TernaryResult.isErr(err));
 
-    expect(TernaryResult.isTernaryResult(ok)).toBe(true);
+    assert.isTrue(TernaryResult.isTernaryResult(ok));
 
-    expect(TernaryResult.isTernaryResult({})).toBe(false);
+    assert.isFalse(TernaryResult.isTernaryResult({}));
 
     expectType<typeof ok, TernaryResult<number, never, never>>('<=');
 
@@ -85,7 +85,7 @@ describe('TernaryResult test', () => {
 
     expect(TernaryResult.unwrapOk(okResult)).toBe(3);
 
-    expect(TernaryResult.isWarn(warnResult)).toBe(true);
+    assert.isTrue(TernaryResult.isWarn(warnResult));
 
     if (TernaryResult.isWarn(warnResult)) {
       expect(warnResult.value).toBe(3);
@@ -242,7 +242,7 @@ describe('TernaryResult test', () => {
       Promise.reject(new Error('bad')),
     );
 
-    expect(TernaryResult.isErr(rejected)).toBe(true);
+    assert.isTrue(TernaryResult.isErr(rejected));
   });
 
   test('fromThrowable converts thrown values', () => {
@@ -255,7 +255,7 @@ describe('TernaryResult test', () => {
       throw new Error('boom');
     });
 
-    expect(TernaryResult.isErr(errorResult)).toBe(true);
+    assert.isTrue(TernaryResult.isErr(errorResult));
   });
 
   test('unwrapOkOr curried version', () => {

@@ -14,7 +14,7 @@ import { type Unwrap } from './types.mjs';
  * ```ts
  * const present = Optional.some('available');
  *
- * assert(Optional.unwrapThrow(present) === 'available');
+ * assert.isTrue(Optional.unwrapThrow(present) === 'available');
  *
  * assert.throws(
  *   () => Optional.unwrapThrow(Optional.none),

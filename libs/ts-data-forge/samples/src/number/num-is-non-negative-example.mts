@@ -7,7 +7,7 @@ const candidate = 10;
 if (Num.isNonNegative(candidate)) {
   const index: number = candidate;
 
-  assert(index === 10);
+  assert.isTrue(index === 10);
 }
 
-assert.notOk(Num.isNonNegative(-1));
+assert.isFalse(Num.isNonNegative(-1));

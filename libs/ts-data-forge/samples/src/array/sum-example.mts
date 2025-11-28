@@ -10,6 +10,6 @@ const total = Arr.sum(numbers);
 
 const totalNegatives = Arr.sum(negatives);
 
-assert(total === 10);
+assert.isTrue(total === 10);
 
-assert(totalNegatives === 6);
+assert.isTrue(totalNegatives === 6);

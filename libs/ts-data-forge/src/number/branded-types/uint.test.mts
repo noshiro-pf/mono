@@ -60,35 +60,35 @@ describe('Uint test', () => {
 
   describe(isUint, () => {
     test('correctly identifies unsigned integers', () => {
-      expect(isUint(0)).toBe(true);
+      assert.isTrue(isUint(0));
 
-      expect(isUint(1)).toBe(true);
+      assert.isTrue(isUint(1));
 
-      expect(isUint(42)).toBe(true);
+      assert.isTrue(isUint(42));
 
-      expect(isUint(100)).toBe(true);
+      assert.isTrue(isUint(100));
 
-      expect(isUint(Number.MAX_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isUint(Number.MAX_SAFE_INTEGER));
     });
 
     test('correctly identifies negative integers', () => {
-      expect(isUint(-1)).toBe(false);
+      assert.isFalse(isUint(-1));
 
-      expect(isUint(-42)).toBe(false);
+      assert.isFalse(isUint(-42));
 
-      expect(isUint(Number.MIN_SAFE_INTEGER)).toBe(false);
+      assert.isFalse(isUint(Number.MIN_SAFE_INTEGER));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isUint(Number.NaN)).toBe(false);
+      assert.isFalse(isUint(Number.NaN));
 
-      expect(isUint(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isUint(Number.POSITIVE_INFINITY));
 
-      expect(isUint(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isUint(Number.NEGATIVE_INFINITY));
 
-      expect(isUint(1.2)).toBe(false);
+      assert.isFalse(isUint(1.2));
 
-      expect(isUint(-3.4)).toBe(false);
+      assert.isFalse(isUint(-3.4));
     });
   });
 
@@ -175,9 +175,9 @@ describe('Uint test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(Uint.is(result)).toBe(true);
+        assert.isTrue(Uint.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).toBeGreaterThanOrEqual(0);
       }

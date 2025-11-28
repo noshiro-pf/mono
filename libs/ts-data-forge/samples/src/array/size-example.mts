@@ -10,6 +10,6 @@ const sizeOfNumbers = Arr.size(numbers);
 
 const sizeOfLetters = Arr.size(letters);
 
-assert(sizeOfNumbers === 3);
+assert.isTrue(sizeOfNumbers === 3);
 
-assert(sizeOfLetters === 0);
+assert.isTrue(sizeOfLetters === 0);

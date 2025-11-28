@@ -73,37 +73,37 @@ describe('PositiveFiniteNumber test', () => {
 
   describe(isPositiveFiniteNumber, () => {
     test('correctly identifies positive finite numbers', () => {
-      expect(isPositiveFiniteNumber(1)).toBe(true);
+      assert.isTrue(isPositiveFiniteNumber(1));
 
-      expect(isPositiveFiniteNumber(3.14)).toBe(true);
+      assert.isTrue(isPositiveFiniteNumber(3.14));
 
-      expect(isPositiveFiniteNumber(0.5)).toBe(true);
+      assert.isTrue(isPositiveFiniteNumber(0.5));
 
-      expect(isPositiveFiniteNumber(Number.MIN_VALUE)).toBe(true);
+      assert.isTrue(isPositiveFiniteNumber(Number.MIN_VALUE));
 
-      expect(isPositiveFiniteNumber(Number.MAX_VALUE)).toBe(true);
+      assert.isTrue(isPositiveFiniteNumber(Number.MAX_VALUE));
     });
 
     test('correctly identifies zero', () => {
-      expect(isPositiveFiniteNumber(0)).toBe(false);
+      assert.isFalse(isPositiveFiniteNumber(0));
 
-      expect(isPositiveFiniteNumber(-0)).toBe(false);
+      assert.isFalse(isPositiveFiniteNumber(-0));
     });
 
     test('correctly identifies negative numbers', () => {
-      expect(isPositiveFiniteNumber(-1)).toBe(false);
+      assert.isFalse(isPositiveFiniteNumber(-1));
 
-      expect(isPositiveFiniteNumber(-0.1)).toBe(false);
+      assert.isFalse(isPositiveFiniteNumber(-0.1));
 
-      expect(isPositiveFiniteNumber(-Number.MAX_VALUE)).toBe(false);
+      assert.isFalse(isPositiveFiniteNumber(-Number.MAX_VALUE));
     });
 
     test('correctly identifies non-finite numbers', () => {
-      expect(isPositiveFiniteNumber(Number.NaN)).toBe(false);
+      assert.isFalse(isPositiveFiniteNumber(Number.NaN));
 
-      expect(isPositiveFiniteNumber(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isPositiveFiniteNumber(Number.POSITIVE_INFINITY));
 
-      expect(isPositiveFiniteNumber(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isPositiveFiniteNumber(Number.NEGATIVE_INFINITY));
     });
   });
 
@@ -219,7 +219,7 @@ describe('PositiveFiniteNumber test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(PositiveFiniteNumber.is(result)).toBe(true);
+        assert.isTrue(PositiveFiniteNumber.is(result));
 
         expect(result).toBeGreaterThan(0);
       }

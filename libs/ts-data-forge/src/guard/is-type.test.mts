@@ -20,19 +20,19 @@ import {
 
 describe(isUndefined, () => {
   test('should return true for undefined', () => {
-    expect(isUndefined(undefined)).toBe(true);
+    assert.isTrue(isUndefined(undefined));
   });
 
   test('should return false for non-undefined values', () => {
-    expect(isUndefined(null)).toBe(false);
+    assert.isFalse(isUndefined(null));
 
-    expect(isUndefined(0)).toBe(false);
+    assert.isFalse(isUndefined(0));
 
-    expect(isUndefined('')).toBe(false);
+    assert.isFalse(isUndefined(''));
 
-    expect(isUndefined(false)).toBe(false);
+    assert.isFalse(isUndefined(false));
 
-    expect(isUndefined({})).toBe(false);
+    assert.isFalse(isUndefined({}));
   });
 
   test('should act as a type guard', () => {
@@ -46,17 +46,17 @@ describe(isUndefined, () => {
 
 describe(isNotUndefined, () => {
   test('should return false for undefined', () => {
-    expect(isNotUndefined(undefined)).toBe(false);
+    assert.isFalse(isNotUndefined(undefined));
   });
 
   test('should return true for non-undefined values', () => {
-    expect(isNotUndefined(null)).toBe(true);
+    assert.isTrue(isNotUndefined(null));
 
-    expect(isNotUndefined(0)).toBe(true);
+    assert.isTrue(isNotUndefined(0));
 
-    expect(isNotUndefined('')).toBe(true);
+    assert.isTrue(isNotUndefined(''));
 
-    expect(isNotUndefined(false)).toBe(true);
+    assert.isTrue(isNotUndefined(false));
   });
 
   test('should narrow types correctly', () => {
@@ -70,19 +70,19 @@ describe(isNotUndefined, () => {
 
 describe(isNull, () => {
   test('should return true for null', () => {
-    expect(isNull(null)).toBe(true);
+    assert.isTrue(isNull(null));
   });
 
   test('should return false for non-null values', () => {
-    expect(isNull(undefined)).toBe(false);
+    assert.isFalse(isNull(undefined));
 
-    expect(isNull(0)).toBe(false);
+    assert.isFalse(isNull(0));
 
-    expect(isNull('')).toBe(false);
+    assert.isFalse(isNull(''));
 
-    expect(isNull(false)).toBe(false);
+    assert.isFalse(isNull(false));
 
-    expect(isNull({})).toBe(false);
+    assert.isFalse(isNull({}));
   });
 
   test('should act as a type guard', () => {
@@ -96,15 +96,15 @@ describe(isNull, () => {
 
 describe(isNotNull, () => {
   test('should return false for null', () => {
-    expect(isNotNull(null)).toBe(false);
+    assert.isFalse(isNotNull(null));
   });
 
   test('should return true for non-null values', () => {
-    expect(isNotNull(undefined)).toBe(true);
+    assert.isTrue(isNotNull(undefined));
 
-    expect(isNotNull(0)).toBe(true);
+    assert.isTrue(isNotNull(0));
 
-    expect(isNotNull('')).toBe(true);
+    assert.isTrue(isNotNull(''));
   });
 
   test('should narrow types correctly', () => {
@@ -118,26 +118,26 @@ describe(isNotNull, () => {
 
 describe(isString, () => {
   test('should return true for strings', () => {
-    expect(isString('')).toBe(true);
+    assert.isTrue(isString(''));
 
-    expect(isString('hello')).toBe(true);
+    assert.isTrue(isString('hello'));
 
-    expect(isString('123')).toBe(true);
+    assert.isTrue(isString('123'));
 
-    expect(isString(`template`)).toBe(true);
+    assert.isTrue(isString(`template`));
   });
 
   test('should return false for non-strings', () => {
-    expect(isString(123)).toBe(false);
+    assert.isFalse(isString(123));
 
-    expect(isString(true)).toBe(false);
+    assert.isFalse(isString(true));
 
-    expect(isString(null)).toBe(false);
+    assert.isFalse(isString(null));
 
-    expect(isString(undefined)).toBe(false);
+    assert.isFalse(isString(undefined));
 
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isString(new String('hello'))).toBe(false);
+    assert.isFalse(isString(new String('hello')));
   });
 
   test('should act as a type guard', () => {
@@ -153,30 +153,30 @@ describe(isString, () => {
 
 describe(isNumber, () => {
   test('should return true for numbers', () => {
-    expect(isNumber(0)).toBe(true);
+    assert.isTrue(isNumber(0));
 
-    expect(isNumber(42)).toBe(true);
+    assert.isTrue(isNumber(42));
 
-    expect(isNumber(-3.14)).toBe(true);
+    assert.isTrue(isNumber(-3.14));
 
-    expect(isNumber(Number.NaN)).toBe(true);
+    assert.isTrue(isNumber(Number.NaN));
 
-    expect(isNumber(Number.POSITIVE_INFINITY)).toBe(true);
+    assert.isTrue(isNumber(Number.POSITIVE_INFINITY));
 
-    expect(isNumber(Number.NEGATIVE_INFINITY)).toBe(true);
+    assert.isTrue(isNumber(Number.NEGATIVE_INFINITY));
   });
 
   test('should return false for non-numbers', () => {
-    expect(isNumber('123')).toBe(false);
+    assert.isFalse(isNumber('123'));
 
-    expect(isNumber(true)).toBe(false);
+    assert.isFalse(isNumber(true));
 
-    expect(isNumber(null)).toBe(false);
+    assert.isFalse(isNumber(null));
 
-    expect(isNumber(123n)).toBe(false);
+    assert.isFalse(isNumber(123n));
 
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isNumber(new Number(42))).toBe(false);
+    assert.isFalse(isNumber(new Number(42)));
   });
 
   test('should act as a type guard', () => {
@@ -192,21 +192,21 @@ describe(isNumber, () => {
 
 describe(isBigint, () => {
   test('should return true for bigints', () => {
-    expect(isBigint(0n)).toBe(true);
+    assert.isTrue(isBigint(0n));
 
-    expect(isBigint(123n)).toBe(true);
+    assert.isTrue(isBigint(123n));
 
-    expect(isBigint(-456n)).toBe(true);
+    assert.isTrue(isBigint(-456n));
   });
 
   test('should return false for non-bigints', () => {
-    expect(isBigint(123)).toBe(false);
+    assert.isFalse(isBigint(123));
 
-    expect(isBigint('123')).toBe(false);
+    assert.isFalse(isBigint('123'));
 
-    expect(isBigint(true)).toBe(false);
+    assert.isFalse(isBigint(true));
 
-    expect(isBigint(null)).toBe(false);
+    assert.isFalse(isBigint(null));
   });
 
   test('should act as a type guard', () => {
@@ -222,22 +222,22 @@ describe(isBigint, () => {
 
 describe(isBoolean, () => {
   test('should return true for booleans', () => {
-    expect(isBoolean(true)).toBe(true);
+    assert.isTrue(isBoolean(true));
 
-    expect(isBoolean(false)).toBe(true);
+    assert.isTrue(isBoolean(false));
   });
 
   test('should return false for non-booleans', () => {
-    expect(isBoolean(1)).toBe(false);
+    assert.isFalse(isBoolean(1));
 
-    expect(isBoolean(0)).toBe(false);
+    assert.isFalse(isBoolean(0));
 
-    expect(isBoolean('true')).toBe(false);
+    assert.isFalse(isBoolean('true'));
 
-    expect(isBoolean(null)).toBe(false);
+    assert.isFalse(isBoolean(null));
 
     // eslint-disable-next-line unicorn/new-for-builtins
-    expect(isBoolean(new Boolean(true))).toBe(false);
+    assert.isFalse(isBoolean(new Boolean(true)));
   });
 
   test('should act as a type guard', () => {
@@ -246,26 +246,26 @@ describe(isBoolean, () => {
     if (isBoolean(value)) {
       expectType<typeof value, boolean>('=');
 
-      expect(!value).toBe(false);
+      assert.isTrue(value);
     }
   });
 });
 
 describe(isSymbol, () => {
   test('should return true for symbols', () => {
-    expect(isSymbol(Symbol())).toBe(true);
+    assert.isTrue(isSymbol(Symbol()));
 
-    expect(isSymbol(Symbol('test'))).toBe(true);
+    assert.isTrue(isSymbol(Symbol('test')));
 
-    expect(isSymbol(Symbol.iterator)).toBe(true);
+    assert.isTrue(isSymbol(Symbol.iterator));
   });
 
   test('should return false for non-symbols', () => {
-    expect(isSymbol('symbol')).toBe(false);
+    assert.isFalse(isSymbol('symbol'));
 
-    expect(isSymbol(123)).toBe(false);
+    assert.isFalse(isSymbol(123));
 
-    expect(isSymbol(null)).toBe(false);
+    assert.isFalse(isSymbol(null));
   });
 
   test('should act as a type guard', () => {
@@ -281,27 +281,27 @@ describe(isSymbol, () => {
 
 describe(isNotBoolean, () => {
   test('should return false for boolean values', () => {
-    expect(isNotBoolean(true)).toBe(false);
+    assert.isFalse(isNotBoolean(true));
 
-    expect(isNotBoolean(false)).toBe(false);
+    assert.isFalse(isNotBoolean(false));
   });
 
   test('should return true for non-boolean values', () => {
-    expect(isNotBoolean(0)).toBe(true);
+    assert.isTrue(isNotBoolean(0));
 
-    expect(isNotBoolean(1)).toBe(true);
+    assert.isTrue(isNotBoolean(1));
 
-    expect(isNotBoolean('true')).toBe(true);
+    assert.isTrue(isNotBoolean('true'));
 
-    expect(isNotBoolean('false')).toBe(true);
+    assert.isTrue(isNotBoolean('false'));
 
-    expect(isNotBoolean(null)).toBe(true);
+    assert.isTrue(isNotBoolean(null));
 
-    expect(isNotBoolean(undefined)).toBe(true);
+    assert.isTrue(isNotBoolean(undefined));
 
-    expect(isNotBoolean({})).toBe(true);
+    assert.isTrue(isNotBoolean({}));
 
-    expect(isNotBoolean([])).toBe(true);
+    assert.isTrue(isNotBoolean([]));
   });
 
   test('should act as a type guard', () => {
@@ -311,44 +311,44 @@ describe(isNotBoolean, () => {
       expectType<typeof value, string | number>('<=');
 
       // Should not have boolean methods
-      expect(typeof value === 'string' || typeof value === 'number').toBe(true);
+      assert.isTrue(typeof value === 'string' || typeof value === 'number');
     }
   });
 });
 
 describe(isNotNumber, () => {
   test('should return false for number values', () => {
-    expect(isNotNumber(0)).toBe(false);
+    assert.isFalse(isNotNumber(0));
 
-    expect(isNotNumber(42)).toBe(false);
+    assert.isFalse(isNotNumber(42));
 
-    expect(isNotNumber(-3.14)).toBe(false);
+    assert.isFalse(isNotNumber(-3.14));
 
-    expect(isNotNumber(Number.NaN)).toBe(false);
+    assert.isFalse(isNotNumber(Number.NaN));
 
-    expect(isNotNumber(Number.POSITIVE_INFINITY)).toBe(false);
+    assert.isFalse(isNotNumber(Number.POSITIVE_INFINITY));
 
-    expect(isNotNumber(Number.NEGATIVE_INFINITY)).toBe(false);
+    assert.isFalse(isNotNumber(Number.NEGATIVE_INFINITY));
   });
 
   test('should return true for non-number values', () => {
-    expect(isNotNumber('123')).toBe(true);
+    assert.isTrue(isNotNumber('123'));
 
-    expect(isNotNumber(true)).toBe(true);
+    assert.isTrue(isNotNumber(true));
 
-    expect(isNotNumber(false)).toBe(true);
+    assert.isTrue(isNotNumber(false));
 
-    expect(isNotNumber(null)).toBe(true);
+    assert.isTrue(isNotNumber(null));
 
-    expect(isNotNumber(undefined)).toBe(true);
+    assert.isTrue(isNotNumber(undefined));
 
-    expect(isNotNumber(123n)).toBe(true);
+    assert.isTrue(isNotNumber(123n));
 
-    expect(isNotNumber({})).toBe(true);
+    assert.isTrue(isNotNumber({}));
 
-    expect(isNotNumber([])).toBe(true);
+    assert.isTrue(isNotNumber([]));
 
-    expect(isNotNumber(Symbol('test'))).toBe(true);
+    assert.isTrue(isNotNumber(Symbol('test')));
   });
 
   test('should act as a type guard', () => {
@@ -357,38 +357,36 @@ describe(isNotNumber, () => {
     if (isNotNumber(value)) {
       expectType<typeof value, string | boolean>('<=');
 
-      expect(typeof value === 'string' || typeof value === 'boolean').toBe(
-        true,
-      );
+      assert.isTrue(typeof value === 'string' || typeof value === 'boolean');
     }
   });
 });
 
 describe(isNotBigint, () => {
   test('should return false for bigint values', () => {
-    expect(isNotBigint(0n)).toBe(false);
+    assert.isFalse(isNotBigint(0n));
 
-    expect(isNotBigint(123n)).toBe(false);
+    assert.isFalse(isNotBigint(123n));
 
-    expect(isNotBigint(-456n)).toBe(false);
+    assert.isFalse(isNotBigint(-456n));
   });
 
   test('should return true for non-bigint values', () => {
-    expect(isNotBigint(123)).toBe(true);
+    assert.isTrue(isNotBigint(123));
 
-    expect(isNotBigint('123')).toBe(true);
+    assert.isTrue(isNotBigint('123'));
 
-    expect(isNotBigint(true)).toBe(true);
+    assert.isTrue(isNotBigint(true));
 
-    expect(isNotBigint(false)).toBe(true);
+    assert.isTrue(isNotBigint(false));
 
-    expect(isNotBigint(null)).toBe(true);
+    assert.isTrue(isNotBigint(null));
 
-    expect(isNotBigint(undefined)).toBe(true);
+    assert.isTrue(isNotBigint(undefined));
 
-    expect(isNotBigint({})).toBe(true);
+    assert.isTrue(isNotBigint({}));
 
-    expect(isNotBigint(Symbol('test'))).toBe(true);
+    assert.isTrue(isNotBigint(Symbol('test')));
   });
 
   test('should act as a type guard', () => {
@@ -404,33 +402,33 @@ describe(isNotBigint, () => {
 
 describe(isNotString, () => {
   test('should return false for string values', () => {
-    expect(isNotString('')).toBe(false);
+    assert.isFalse(isNotString(''));
 
-    expect(isNotString('hello')).toBe(false);
+    assert.isFalse(isNotString('hello'));
 
-    expect(isNotString('123')).toBe(false);
+    assert.isFalse(isNotString('123'));
 
-    expect(isNotString(`template`)).toBe(false);
+    assert.isFalse(isNotString(`template`));
   });
 
   test('should return true for non-string values', () => {
-    expect(isNotString(123)).toBe(true);
+    assert.isTrue(isNotString(123));
 
-    expect(isNotString(true)).toBe(true);
+    assert.isTrue(isNotString(true));
 
-    expect(isNotString(false)).toBe(true);
+    assert.isTrue(isNotString(false));
 
-    expect(isNotString(null)).toBe(true);
+    assert.isTrue(isNotString(null));
 
-    expect(isNotString(undefined)).toBe(true);
+    assert.isTrue(isNotString(undefined));
 
-    expect(isNotString({})).toBe(true);
+    assert.isTrue(isNotString({}));
 
-    expect(isNotString([])).toBe(true);
+    assert.isTrue(isNotString([]));
 
-    expect(isNotString(Symbol('test'))).toBe(true);
+    assert.isTrue(isNotString(Symbol('test')));
 
-    expect(isNotString(123n)).toBe(true);
+    assert.isTrue(isNotString(123n));
   });
 
   test('should act as a type guard', () => {
@@ -439,40 +437,38 @@ describe(isNotString, () => {
     if (isNotString(value)) {
       expectType<typeof value, number | boolean>('<=');
 
-      expect(typeof value === 'number' || typeof value === 'boolean').toBe(
-        true,
-      );
+      assert.isTrue(typeof value === 'number' || typeof value === 'boolean');
     }
   });
 });
 
 describe(isNotSymbol, () => {
   test('should return false for symbol values', () => {
-    expect(isNotSymbol(Symbol())).toBe(false);
+    assert.isFalse(isNotSymbol(Symbol()));
 
-    expect(isNotSymbol(Symbol('test'))).toBe(false);
+    assert.isFalse(isNotSymbol(Symbol('test')));
 
-    expect(isNotSymbol(Symbol.iterator)).toBe(false);
+    assert.isFalse(isNotSymbol(Symbol.iterator));
   });
 
   test('should return true for non-symbol values', () => {
-    expect(isNotSymbol('symbol')).toBe(true);
+    assert.isTrue(isNotSymbol('symbol'));
 
-    expect(isNotSymbol(123)).toBe(true);
+    assert.isTrue(isNotSymbol(123));
 
-    expect(isNotSymbol(true)).toBe(true);
+    assert.isTrue(isNotSymbol(true));
 
-    expect(isNotSymbol(false)).toBe(true);
+    assert.isTrue(isNotSymbol(false));
 
-    expect(isNotSymbol(null)).toBe(true);
+    assert.isTrue(isNotSymbol(null));
 
-    expect(isNotSymbol(undefined)).toBe(true);
+    assert.isTrue(isNotSymbol(undefined));
 
-    expect(isNotSymbol({})).toBe(true);
+    assert.isTrue(isNotSymbol({}));
 
-    expect(isNotSymbol([])).toBe(true);
+    assert.isTrue(isNotSymbol([]));
 
-    expect(isNotSymbol(123n)).toBe(true);
+    assert.isTrue(isNotSymbol(123n));
   });
 
   test('should act as a type guard', () => {
@@ -481,34 +477,34 @@ describe(isNotSymbol, () => {
     if (isNotSymbol(value)) {
       expectType<typeof value, string | number>('<=');
 
-      expect(typeof value === 'string' || typeof value === 'number').toBe(true);
+      assert.isTrue(typeof value === 'string' || typeof value === 'number');
     }
   });
 });
 
 describe(isNullish, () => {
   test('should return true for null and undefined', () => {
-    expect(isNullish(null)).toBe(true);
+    assert.isTrue(isNullish(null));
 
-    expect(isNullish(undefined)).toBe(true);
+    assert.isTrue(isNullish(undefined));
   });
 
   test('should return false for non-nullish values', () => {
-    expect(isNullish(0)).toBe(false);
+    assert.isFalse(isNullish(0));
 
-    expect(isNullish(false)).toBe(false);
+    assert.isFalse(isNullish(false));
 
-    expect(isNullish('')).toBe(false);
+    assert.isFalse(isNullish(''));
 
-    expect(isNullish('null')).toBe(false);
+    assert.isFalse(isNullish('null'));
 
-    expect(isNullish('undefined')).toBe(false);
+    assert.isFalse(isNullish('undefined'));
 
-    expect(isNullish({})).toBe(false);
+    assert.isFalse(isNullish({}));
 
-    expect(isNullish([])).toBe(false);
+    assert.isFalse(isNullish([]));
 
-    expect(isNullish(Number.NaN)).toBe(false);
+    assert.isFalse(isNullish(Number.NaN));
   });
 
   test('should act as a type guard', () => {
@@ -524,39 +520,39 @@ describe(isNullish, () => {
 
   test('should handle edge cases', () => {
     // Test that it uses loose equality (==)
-    expect(isNullish(null)).toBe(true);
+    assert.isTrue(isNullish(null));
 
-    expect(isNullish(undefined)).toBe(true);
+    assert.isTrue(isNullish(undefined));
   });
 });
 
 describe(isNonNullish, () => {
   test('should return false for null and undefined', () => {
-    expect(isNonNullish(null)).toBe(false);
+    assert.isFalse(isNonNullish(null));
 
-    expect(isNonNullish(undefined)).toBe(false);
+    assert.isFalse(isNonNullish(undefined));
   });
 
   test('should return true for non-nullish values', () => {
-    expect(isNonNullish(0)).toBe(true);
+    assert.isTrue(isNonNullish(0));
 
-    expect(isNonNullish(false)).toBe(true);
+    assert.isTrue(isNonNullish(false));
 
-    expect(isNonNullish('')).toBe(true);
+    assert.isTrue(isNonNullish(''));
 
-    expect(isNonNullish('null')).toBe(true);
+    assert.isTrue(isNonNullish('null'));
 
-    expect(isNonNullish('undefined')).toBe(true);
+    assert.isTrue(isNonNullish('undefined'));
 
-    expect(isNonNullish({})).toBe(true);
+    assert.isTrue(isNonNullish({}));
 
-    expect(isNonNullish([])).toBe(true);
+    assert.isTrue(isNonNullish([]));
 
-    expect(isNonNullish(Number.NaN)).toBe(true);
+    assert.isTrue(isNonNullish(Number.NaN));
 
-    expect(isNonNullish(Symbol('test'))).toBe(true);
+    assert.isTrue(isNonNullish(Symbol('test')));
 
-    expect(isNonNullish(123n)).toBe(true);
+    assert.isTrue(isNonNullish(123n));
   });
 
   test('should act as a type guard', () => {

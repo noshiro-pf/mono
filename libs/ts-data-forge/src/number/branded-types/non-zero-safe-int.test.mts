@@ -85,45 +85,45 @@ describe('NonZeroSafeInt test', () => {
 
   describe(isNonZeroSafeInt, () => {
     test('correctly identifies non-zero safe integers', () => {
-      expect(isNonZeroSafeInt(1)).toBe(true);
+      assert.isTrue(isNonZeroSafeInt(1));
 
-      expect(isNonZeroSafeInt(-1)).toBe(true);
+      assert.isTrue(isNonZeroSafeInt(-1));
 
-      expect(isNonZeroSafeInt(42)).toBe(true);
+      assert.isTrue(isNonZeroSafeInt(42));
 
-      expect(isNonZeroSafeInt(-42)).toBe(true);
+      assert.isTrue(isNonZeroSafeInt(-42));
 
-      expect(isNonZeroSafeInt(Number.MAX_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isNonZeroSafeInt(Number.MAX_SAFE_INTEGER));
 
-      expect(isNonZeroSafeInt(Number.MIN_SAFE_INTEGER)).toBe(true);
+      assert.isTrue(isNonZeroSafeInt(Number.MIN_SAFE_INTEGER));
     });
 
     test('correctly identifies zero', () => {
-      expect(isNonZeroSafeInt(0)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(0));
 
-      expect(isNonZeroSafeInt(-0)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(-0));
     });
 
     test('correctly identifies values outside safe integer range', () => {
-      expect(isNonZeroSafeInt(Number.MAX_SAFE_INTEGER + 1)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(Number.MAX_SAFE_INTEGER + 1));
 
-      expect(isNonZeroSafeInt(Number.MIN_SAFE_INTEGER - 1)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(Number.MIN_SAFE_INTEGER - 1));
 
-      expect(isNonZeroSafeInt(Number.MAX_VALUE)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(Number.MAX_VALUE));
 
-      expect(isNonZeroSafeInt(-Number.MAX_VALUE)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(-Number.MAX_VALUE));
     });
 
     test('correctly identifies non-integers', () => {
-      expect(isNonZeroSafeInt(Number.NaN)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(Number.NaN));
 
-      expect(isNonZeroSafeInt(Number.POSITIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(Number.POSITIVE_INFINITY));
 
-      expect(isNonZeroSafeInt(Number.NEGATIVE_INFINITY)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(Number.NEGATIVE_INFINITY));
 
-      expect(isNonZeroSafeInt(1.2)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(1.2));
 
-      expect(isNonZeroSafeInt(-3.4)).toBe(false);
+      assert.isFalse(isNonZeroSafeInt(-3.4));
     });
   });
 
@@ -243,9 +243,9 @@ describe('NonZeroSafeInt test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroSafeInt.is(result)).toBe(true);
+        assert.isTrue(NonZeroSafeInt.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).not.toBe(0);
       }
@@ -263,9 +263,9 @@ describe('NonZeroSafeInt test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroSafeInt.is(result)).toBe(true);
+        assert.isTrue(NonZeroSafeInt.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).not.toBe(0);
       }
@@ -283,9 +283,9 @@ describe('NonZeroSafeInt test', () => {
 
         expect(result).toBeLessThanOrEqual(max);
 
-        expect(NonZeroSafeInt.is(result)).toBe(true);
+        assert.isTrue(NonZeroSafeInt.is(result));
 
-        expect(Number.isInteger(result)).toBe(true);
+        assert.isTrue(Number.isInteger(result));
 
         expect(result).not.toBe(0);
       }

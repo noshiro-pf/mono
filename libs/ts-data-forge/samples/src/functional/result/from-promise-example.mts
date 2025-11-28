@@ -12,4 +12,4 @@ const rejected = await failurePromise;
 
 assert.deepStrictEqual(resolved, Result.ok('ok'));
 
-assert.ok(Result.isErr(rejected));
+assert.isTrue(Result.isErr(rejected));

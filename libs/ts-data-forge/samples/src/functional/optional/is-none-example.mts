@@ -6,5 +6,5 @@ const optionalValue = Optional.none as Optional<number>;
 
 if (Optional.isNone(optionalValue)) {
   // Type narrowed to None
-  assert.ok(true); // optionalValue is None
+  assert.isTrue(true); // optionalValue is None
 }

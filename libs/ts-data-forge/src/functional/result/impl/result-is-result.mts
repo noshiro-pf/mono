@@ -13,11 +13,11 @@ import { ErrTypeTagName, OkTypeTagName } from './tag.mjs';
  *
  * const notResult = { $$tag: 'ts-data-forge::Result.ok' };
  *
- * assert.ok(Result.isResult(okValue));
+ * assert.isTrue(Result.isResult(okValue));
  *
- * assert.ok(Result.isResult(errValue));
+ * assert.isTrue(Result.isResult(errValue));
  *
- * assert.notOk(Result.isResult(notResult));
+ * assert.isFalse(Result.isResult(notResult));
  * ```
  */
 export const isResult = (maybeResult: unknown): maybeResult is UnknownResult =>

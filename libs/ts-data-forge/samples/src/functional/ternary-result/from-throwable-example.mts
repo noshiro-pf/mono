@@ -10,4 +10,4 @@ const failure = TernaryResult.fromThrowable(() => {
 
 assert.deepStrictEqual(success, TernaryResult.ok(2));
 
-assert.ok(TernaryResult.isErr(failure));
+assert.isTrue(TernaryResult.isErr(failure));
