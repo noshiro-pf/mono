@@ -1,3 +1,9 @@
+## [4.0.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.2...v4.0.3) (2025-11-29)
+
+### Bug Fixes
+
+- fix package.json files field ([#163](https://github.com/noshiro-pf/eslint-config-typed/issues/163)) ([5eaac51](https://github.com/noshiro-pf/eslint-config-typed/commit/5eaac519f67f3653d353d58da8f0edccd8feae8a))
+
 ## [4.0.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.1...v4.0.2) (2025-11-28)
 
 ### Bug Fixes
