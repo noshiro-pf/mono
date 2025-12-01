@@ -16,13 +16,12 @@
     "TSES",
     "tsutils"
   ],
-  "flagWords": [],
   "ignorePaths": [
-    "eslint.config.mts",
-    "./pnpm-lock.yaml",
-    "./pnpm-workspace.yaml",
-    "github/**",
-    "test/**",
-    "agents/common/**"
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "dist/**",
+    "docs/**",
+    "agents/common/**",
+    "test/**"
   ]
 }

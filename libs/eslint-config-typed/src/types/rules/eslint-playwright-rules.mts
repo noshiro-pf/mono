@@ -36,6 +36,14 @@ namespace ExpectExpect {
    *           }
    *         ],
    *         "type": "array"
+   *       },
+   *       "assertFunctionPatterns": {
+   *         "items": [
+   *           {
+   *             "type": "string"
+   *           }
+   *         ],
+   *         "type": "array"
    *       }
    *     },
    *     "type": "object"
@@ -45,6 +53,7 @@ namespace ExpectExpect {
    */
   export type Options = Readonly<{
     assertFunctionNames?: readonly [] | readonly [string];
+    assertFunctionPatterns?: readonly [] | readonly [string];
   }>;
 
   export type RuleEntry =
