@@ -28,6 +28,6 @@ const isJsonString = (str: string): str is JsonString => {
 
 if (import.meta.vitest !== undefined) {
   test('defaultJsonString', () => {
-    expect(isJsonString(defaultJsonString)).toBe(true);
+    assert.isTrue(isJsonString(defaultJsonString));
   });
 }

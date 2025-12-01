@@ -37,7 +37,7 @@ const EvenNumber = t.refine({
 // Usage in validation
 const uuidResult = Uuid.validate('6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b');
 
-assert(t.Result.isOk(uuidResult));
+assert.isTrue(t.Result.isOk(uuidResult));
 
 if (t.Result.isOk(uuidResult)) {
   const validUuid = uuidResult.value; // string, guaranteed to be valid Uuid format
@@ -47,7 +47,7 @@ if (t.Result.isOk(uuidResult)) {
 
 const positiveResult = PositiveNumber.validate(42);
 
-assert(t.Result.isOk(positiveResult));
+assert.isTrue(t.Result.isOk(positiveResult));
 
 if (t.Result.isOk(positiveResult)) {
   const positiveNum = positiveResult.value; // number, guaranteed to be > 0
@@ -56,11 +56,11 @@ if (t.Result.isOk(positiveResult)) {
 }
 
 // Invalid cases
-assert(!Uuid.is('invalid-uuid'));
+assert.isFalse(Uuid.is('invalid-uuid'));
 
-assert(!PositiveNumber.is(-5));
+assert.isFalse(PositiveNumber.is(-5));
 
-assert(!EvenNumber.is(7));
+assert.isFalse(EvenNumber.is(7));
 
 // Use in record schemas
 const UserProfile = t.record({
@@ -78,7 +78,7 @@ const userData = {
   level: 4, // ✅ even number
 } as const satisfies UserProfile;
 
-assert(UserProfile.is(userData));
+assert.isTrue(UserProfile.is(userData));
 
 const invalidData = {
   id: 'user123', // ❌ invalid uuid format
@@ -88,7 +88,7 @@ const invalidData = {
 
 const result = UserProfile.validate(invalidData);
 
-assert(t.Result.isErr(result));
+assert.isTrue(t.Result.isErr(result));
 
 assert.deepStrictEqual(
   t.validationErrorsToMessages(

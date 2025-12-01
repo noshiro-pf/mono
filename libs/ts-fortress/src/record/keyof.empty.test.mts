@@ -6,9 +6,9 @@ describe('keyof (empty record)', () => {
   const T = keyof(record({}));
 
   test('is/validate/fill for undefined', () => {
-    expect(T.is(undefined)).toBe(true);
+    assert.isTrue(T.is(undefined));
 
-    expect(Result.isOk(T.validate(undefined))).toBe(true);
+    assert.isTrue(Result.isOk(T.validate(undefined)));
 
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(T.fill('anything')).toBeUndefined();

@@ -49,11 +49,11 @@ describe('record allowExcessProperties option', () => {
       extra: 'not allowed',
     };
 
-    expect(strictRecord.is(dataWithExcess)).toBe(false);
+    assert.isFalse(strictRecord.is(dataWithExcess));
 
     const result = strictRecord.validate(dataWithExcess);
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     const resultError = Result.unwrapErrThrow(result);
 
@@ -81,11 +81,11 @@ describe('record allowExcessProperties option', () => {
       age: 25,
     };
 
-    expect(strictRecord.is(validData)).toBe(true);
+    assert.isTrue(strictRecord.is(validData));
 
     const result = strictRecord.validate(validData);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     const resultValue = Result.unwrapThrow(result);
 
@@ -100,7 +100,7 @@ describe('record allowExcessProperties option', () => {
 
     const result = strictRecord.validate(input);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     const resultValue1 = Result.unwrapThrow(result);
 
@@ -114,11 +114,11 @@ describe('record allowExcessProperties option', () => {
       extra: 'allowed',
     };
 
-    expect(permissiveRecord.is(dataWithExcess)).toBe(true);
+    assert.isTrue(permissiveRecord.is(dataWithExcess));
 
     const result = permissiveRecord.validate(dataWithExcess);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     const resultValue2 = Result.unwrapThrow(result);
 
@@ -135,7 +135,7 @@ describe('record allowExcessProperties option', () => {
 
     const result = permissiveRecord.validate(input);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     const resultValue3 = Result.unwrapThrow(result);
 
@@ -149,11 +149,11 @@ describe('record allowExcessProperties option', () => {
       extra: 'stripped by default',
     };
 
-    expect(defaultRecord.is(dataWithExcess)).toBe(true);
+    assert.isTrue(defaultRecord.is(dataWithExcess));
 
     const result = defaultRecord.validate(dataWithExcess);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     const resultValue4 = Result.unwrapThrow(result);
 
@@ -169,7 +169,7 @@ describe('record allowExcessProperties option', () => {
 
     const result = defaultRecord.validate(input);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     const resultValue5 = Result.unwrapThrow(result);
 
@@ -191,7 +191,7 @@ describe('record allowExcessProperties option', () => {
 
     const result = stripRecord.validate(dataWithExcess);
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
 
     const resultValue = Result.unwrapThrow(result);
 
@@ -211,7 +211,7 @@ describe('record allowExcessProperties option', () => {
 
     const result = strictRecord.validate(dataWithMultipleExcess);
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     const resultError1 = Result.unwrapErrThrow(result);
 
@@ -250,7 +250,7 @@ describe('record allowExcessProperties option', () => {
 
     const result = strictRecord.validate(invalidData);
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     const resultError2 = Result.unwrapErrThrow(result);
 

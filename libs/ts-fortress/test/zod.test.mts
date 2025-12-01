@@ -26,7 +26,7 @@ test('JsonValueZod', () => {
     ]),
   );
 
-  expect(JsonValueZod.safeParse({ a: 1, b: [1, 2, 3] }).success).toBe(true);
+  assert.isTrue(JsonValueZod.safeParse({ a: 1, b: [1, 2, 3] }).success);
 });
 
 test('WrongSchema', () => {
@@ -40,37 +40,39 @@ test('WrongSchema', () => {
 
   expect(
     () => WrongSchema.safeParse({ key1: 1, key2: 'string' }).success,
-  ).toThrow(new Error('Invalid element at key "key1": expected a Zod schema'));
+  ).toThrowError(
+    new Error('Invalid element at key "key1": expected a Zod schema'),
+  );
 });
 
 describe('api check', () => {
   test('maxLength', () => {
     const s = z.string().check(z.maxLength(5));
 
-    expect(s.safeParse('12').success).toBe(true);
+    assert.isTrue(s.safeParse('12').success);
 
-    expect(s.safeParse('1234').success).toBe(true);
+    assert.isTrue(s.safeParse('1234').success);
 
-    expect(s.safeParse('123456').success).toBe(false);
+    assert.isFalse(s.safeParse('123456').success);
   });
 
   test('maxLength2', () => {
     const s = z.string().max(5);
 
-    expect(s.safeParse('12').success).toBe(true);
+    assert.isTrue(s.safeParse('12').success);
 
-    expect(s.safeParse('1234').success).toBe(true);
+    assert.isTrue(s.safeParse('1234').success);
 
-    expect(s.safeParse('123456').success).toBe(false);
+    assert.isFalse(s.safeParse('123456').success);
   });
 
   test('max and min', () => {
     const s = z.string().min(3).max(5);
 
-    expect(s.safeParse('12').success).toBe(false);
+    assert.isFalse(s.safeParse('12').success);
 
-    expect(s.safeParse('1234').success).toBe(true);
+    assert.isTrue(s.safeParse('1234').success);
 
-    expect(s.safeParse('123456').success).toBe(false);
+    assert.isFalse(s.safeParse('123456').success);
   });
 });

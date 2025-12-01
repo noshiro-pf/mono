@@ -41,7 +41,7 @@ describe(union, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      assert.isTrue(targetType.is(x));
     });
 
     test('truthy case 2', () => {
@@ -53,7 +53,7 @@ describe(union, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      assert.isTrue(targetType.is(x));
     });
 
     test('falsy case', () => {
@@ -65,7 +65,7 @@ describe(union, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -77,7 +77,7 @@ describe(union, () => {
         '=',
       );
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -87,7 +87,7 @@ describe(union, () => {
     test('falsy case', () => {
       const result = targetType.validate(5);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -112,7 +112,7 @@ describe(union, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 

@@ -46,7 +46,7 @@ describe(string, () => {
         expectType<typeof v, unknown>('=');
       }
 
-      expect(str.is(v)).toBe(true);
+      assert.isTrue(str.is(v));
     });
 
     test.each([
@@ -67,7 +67,7 @@ describe(string, () => {
         expectType<typeof v, unknown>('=');
       }
 
-      expect(str.is(v)).toBe(false);
+      assert.isFalse(str.is(v));
     });
   });
 
@@ -79,7 +79,7 @@ describe(string, () => {
 
       expect(() => {
         assertIs(value);
-      }).not.toThrow();
+      }).not.toThrowError();
     });
 
     test('invalid value throws', () => {
@@ -87,7 +87,7 @@ describe(string, () => {
 
       expect(() => {
         assertIs(value);
-      }).toThrow(/Error: expected <string> value/u);
+      }).toThrowError(/Error: expected <string> value/u);
     });
   });
 
@@ -103,7 +103,7 @@ describe(string, () => {
     test('invalid value throws error', () => {
       const value: unknown = 42;
 
-      expect(() => str.cast(value)).toThrow(
+      expect(() => str.cast(value)).toThrowError(
         'Error: expected <string> value but <number> type value `42` was passed.',
       );
     });
@@ -113,7 +113,7 @@ describe(string, () => {
 
       const value: unknown = 42;
 
-      expect(() => strWithDefault.cast(value)).toThrow(
+      expect(() => strWithDefault.cast(value)).toThrowError(
         'Error: expected <string> value but <number> type value `42` was passed.',
       );
     });
@@ -169,7 +169,7 @@ describe(string, () => {
 
       const result = str.validate(value);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -181,7 +181,7 @@ describe(string, () => {
 
       const result = str.validate(value);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -193,7 +193,7 @@ describe(string, () => {
 
       const result = str.validate(value);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -213,7 +213,7 @@ describe(string, () => {
 
       const result = str.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue2 = Result.unwrapThrow(result);
 
@@ -228,7 +228,7 @@ describe('string with constraints', () => {
 
     expectType<typeof type, Type<string>>('=');
 
-    expect(type.is('')).toBe(true);
+    assert.isTrue(type.is(''));
   });
 
   describe('string constrained by startsWith', () => {
@@ -237,22 +237,22 @@ describe('string with constraints', () => {
 
       expectType<typeof type, Type<`ab${string}`>>('=');
 
-      expect(type.is('ab')).toBe(true);
+      assert.isTrue(type.is('ab'));
 
-      expect(type.is('abcde__')).toBe(true);
+      assert.isTrue(type.is('abcde__'));
 
-      expect(type.is('cab')).toBe(false);
+      assert.isFalse(type.is('cab'));
     });
 
     test('rejects invalid default value', () => {
       expect(() =>
         // @ts-expect-error "cab" does not start with "ab"
         string('cab', { startsWith: 'ab' }),
-      ).toThrow('startsWith = ab');
+      ).toThrowError('startsWith = ab');
     });
 
     test('empty startsWith', () => {
-      expect(string('abc', { startsWith: '' }).is('abc')).toBe(true);
+      assert.isTrue(string('abc', { startsWith: '' }).is('abc'));
     });
   });
 
@@ -262,22 +262,22 @@ describe('string with constraints', () => {
 
       expectType<TypeOf<typeof type>, `${string}ghi`>('=');
 
-      expect(type.is('ghi')).toBe(true);
+      assert.isTrue(type.is('ghi'));
 
-      expect(type.is('xyz_ghi')).toBe(true);
+      assert.isTrue(type.is('xyz_ghi'));
 
-      expect(type.is('xyz')).toBe(false);
+      assert.isFalse(type.is('xyz'));
     });
 
     test('rejects invalid default value', () => {
       expect(() =>
         // @ts-expect-error "abc" does not end with "ba"
         string('abc', { endsWith: 'ba' }),
-      ).toThrow('endsWith = ba');
+      ).toThrowError('endsWith = ba');
     });
 
     test('empty endsWith', () => {
-      expect(string('abc', { endsWith: '' }).is('abc')).toBe(true);
+      assert.isTrue(string('abc', { endsWith: '' }).is('abc'));
     });
   });
 
@@ -287,22 +287,22 @@ describe('string with constraints', () => {
 
       expectType<TypeOf<typeof type>, `${string}def${string}`>('=');
 
-      expect(type.is('def')).toBe(true);
+      assert.isTrue(type.is('def'));
 
-      expect(type.is('xyz_def_uvw')).toBe(true);
+      assert.isTrue(type.is('xyz_def_uvw'));
 
-      expect(type.is('xyz_uvw')).toBe(false);
+      assert.isFalse(type.is('xyz_uvw'));
     });
 
     test('rejects invalid default value', () => {
       expect(() =>
         // @ts-expect-error "abc" does not include "def"
         string('abc', { includes: 'def' }),
-      ).toThrow('includes = def');
+      ).toThrowError('includes = def');
     });
 
     test('empty includes', () => {
-      expect(string('abc', { includes: '' }).is('abc')).toBe(true);
+      assert.isTrue(string('abc', { includes: '' }).is('abc'));
     });
   });
 
@@ -312,16 +312,16 @@ describe('string with constraints', () => {
 
       expectType<typeof type, Type<string>>('=');
 
-      expect(type.is('abcde__')).toBe(true);
+      assert.isTrue(type.is('abcde__'));
 
-      expect(type.is('ABC')).toBe(false);
+      assert.isFalse(type.is('ABC'));
     });
 
     test('rejects invalid default value', () => {
       expect(() =>
         // @ts-expect-error "ABCDEFGHI" is not assignable if lowercase is true
         string('ABCDEFGHI', { lowercase: true }),
-      ).toThrow('lowercase = true');
+      ).toThrowError('lowercase = true');
     });
   });
 
@@ -331,16 +331,16 @@ describe('string with constraints', () => {
 
       expectType<typeof type, Type<string>>('=');
 
-      expect(type.is('ABC')).toBe(true);
+      assert.isTrue(type.is('ABC'));
 
-      expect(type.is('abc')).toBe(false);
+      assert.isFalse(type.is('abc'));
     });
 
     test('rejects invalid default value', () => {
       expect(() =>
         // @ts-expect-error "abcdefghi" is not assignable if uppercase is true
         string('abcdefghi', { uppercase: true }),
-      ).toThrow('uppercase = true');
+      ).toThrowError('uppercase = true');
     });
   });
 
@@ -350,16 +350,16 @@ describe('string with constraints', () => {
 
       expectType<typeof type, Type<string>>('=');
 
-      expect(type.is('value')).toBe(true);
+      assert.isTrue(type.is('value'));
 
-      expect(type.is('')).toBe(false);
+      assert.isFalse(type.is(''));
     });
 
     test('rejects invalid default value', () => {
       expect(() =>
         // @ts-expect-error "" is not assignable if nonempty is true
         string('', { nonempty: true }),
-      ).toThrow('nonempty = true');
+      ).toThrowError('nonempty = true');
     });
   });
 
@@ -369,16 +369,16 @@ describe('string with constraints', () => {
 
       expectType<typeof type, Type<string>>('=');
 
-      expect(type.is('hello')).toBe(true);
+      assert.isTrue(type.is('hello'));
 
-      expect(type.is('hi')).toBe(false);
+      assert.isFalse(type.is('hi'));
     });
 
     test('rejects invalid default value', () => {
       expect(() =>
         // @ts-expect-error "hi" is not assignable if minLength is 3
         string('hi', { minLength: 3 }),
-      ).toThrow('minLength = 3');
+      ).toThrowError('minLength = 3');
     });
 
     test('negative minLength', () => {
@@ -386,9 +386,9 @@ describe('string with constraints', () => {
 
       expectType<typeof type, Type<string>>('=');
 
-      expect(type.is('hello')).toBe(true);
+      assert.isTrue(type.is('hello'));
 
-      expect(type.is('hi')).toBe(true);
+      assert.isTrue(type.is('hi'));
     });
   });
 
@@ -398,16 +398,16 @@ describe('string with constraints', () => {
 
       expectType<typeof type, Type<string>>('=');
 
-      expect(type.is('tiny')).toBe(true);
+      assert.isTrue(type.is('tiny'));
 
-      expect(type.is('excessive')).toBe(false);
+      assert.isFalse(type.is('excessive'));
     });
 
     test('rejects invalid default value', () => {
       expect(() =>
         // @ts-expect-error "too-long" is not assignable if maxLength is 5
         string('too-long', { maxLength: 5 }),
-      ).toThrow('maxLength = 5');
+      ).toThrowError('maxLength = 5');
     });
   });
 
@@ -419,15 +419,15 @@ describe('string with constraints', () => {
 
       expectType<typeof type, Type<string>>('=');
 
-      expect(type.is('67890')).toBe(true);
+      assert.isTrue(type.is('67890'));
 
-      expect(type.is('abc123')).toBe(false);
+      assert.isFalse(type.is('abc123'));
     });
 
     test('rejects invalid default value', () => {
       const numeric = /^\d+$/u;
 
-      expect(() => string('abc', { regex: numeric })).toThrow(
+      expect(() => string('abc', { regex: numeric })).toThrowError(
         String.raw`regex = ^\d+$`,
       );
     });
@@ -440,20 +440,20 @@ describe('string with constraints', () => {
 
         expectType<TypeOf<typeof type>, `ab${string}` & `${string}ba`>('=');
 
-        expect(type.is('aba')).toBe(true);
+        assert.isTrue(type.is('aba'));
 
-        expect(type.is('abba')).toBe(true);
+        assert.isTrue(type.is('abba'));
 
-        expect(type.is('abca')).toBe(false);
+        assert.isFalse(type.is('abca'));
 
-        expect(type.is('caba')).toBe(false);
+        assert.isFalse(type.is('caba'));
       });
 
       test('rejects invalid default value', () => {
         expect(() =>
           // @ts-expect-error "abba" does not end with "zz"
           string('abba', { startsWith: 'ab', endsWith: 'zz' }),
-        ).toThrow('endsWith = zz');
+        ).toThrowError('endsWith = zz');
       });
     });
 
@@ -470,15 +470,15 @@ describe('string with constraints', () => {
           `ab${string}` & `${string}cd${string}` & `${string}ef`
         >('=');
 
-        expect(type.is('abcdef')).toBe(true);
+        assert.isTrue(type.is('abcdef'));
 
-        expect(type.is('abXXcdef')).toBe(true);
+        assert.isTrue(type.is('abXXcdef'));
 
-        expect(type.is('ab__ef')).toBe(false);
+        assert.isFalse(type.is('ab__ef'));
 
-        expect(type.is('zzcdef')).toBe(false);
+        assert.isFalse(type.is('zzcdef'));
 
-        expect(type.is('abcdefx')).toBe(false);
+        assert.isFalse(type.is('abcdefx'));
       });
 
       test('rejects invalid default value', () => {
@@ -489,7 +489,7 @@ describe('string with constraints', () => {
             includes: 'cd',
             endsWith: 'hi',
           }),
-        ).toThrow('endsWith = hi');
+        ).toThrowError('endsWith = hi');
 
         expect(() =>
           // @ts-expect-error "abcdhi" does not includes "cd"
@@ -498,7 +498,7 @@ describe('string with constraints', () => {
             includes: 'cd',
             endsWith: 'hi',
           }),
-        ).toThrow('includes = cd');
+        ).toThrowError('includes = cd');
       });
     });
 
@@ -508,18 +508,18 @@ describe('string with constraints', () => {
 
         expectType<typeof type, Type<string>>('=');
 
-        expect(type.is('1234')).toBe(true);
+        assert.isTrue(type.is('1234'));
 
-        expect(type.is('ABCD')).toBe(false);
+        assert.isFalse(type.is('ABCD'));
 
-        expect(type.is('abcd')).toBe(false);
+        assert.isFalse(type.is('abcd'));
       });
 
       test('rejects invalid default value', () => {
         expect(() =>
           // @ts-expect-error "Ab" is neither strictly uppercase nor lowercase
           string('Ab', { uppercase: true, lowercase: true }),
-        ).toThrow('uppercase = true');
+        ).toThrowError('uppercase = true');
       });
     });
 
@@ -533,13 +533,13 @@ describe('string with constraints', () => {
 
         expectType<typeof type, Type<string>>('=');
 
-        expect(type.is('value')).toBe(true);
+        assert.isTrue(type.is('value'));
 
-        expect(type.is('')).toBe(false);
+        assert.isFalse(type.is(''));
 
-        expect(type.is('hi')).toBe(false);
+        assert.isFalse(type.is('hi'));
 
-        expect(type.is('extra-long-token')).toBe(false);
+        assert.isFalse(type.is('extra-long-token'));
       });
 
       test('rejects invalid default value', () => {
@@ -550,7 +550,7 @@ describe('string with constraints', () => {
             minLength: 3,
             maxLength: 8,
           }),
-        ).toThrow(
+        ).toThrowError(
           'defaultValue "extra-long-token" for string does not satisfy the constraint maxLength = 8',
         );
       });
@@ -563,7 +563,7 @@ describe('string with constraints', () => {
             minLength: 8,
             maxLength: 3,
           }),
-        ).toThrow(
+        ).toThrowError(
           'defaultValue "1234" for string does not satisfy the constraint minLength = 8',
         );
       });
@@ -580,13 +580,13 @@ describe('string with constraints', () => {
 
         expectType<typeof type, Type<`${string}feature${string}`>>('=');
 
-        expect(type.is('feature-toggle')).toBe(true);
+        assert.isTrue(type.is('feature-toggle'));
 
-        expect(type.is('featureflag')).toBe(true);
+        assert.isTrue(type.is('featureflag'));
 
-        expect(type.is('feature_flag')).toBe(false);
+        assert.isFalse(type.is('feature_flag'));
 
-        expect(type.is('flag')).toBe(false);
+        assert.isFalse(type.is('flag'));
       });
 
       test('rejects invalid default value', () => {
@@ -594,7 +594,7 @@ describe('string with constraints', () => {
 
         expect(() =>
           string('featureFLAG', { includes: 'feature', regex: slug }),
-        ).toThrow('regex = ^[a-z-]+$');
+        ).toThrowError('regex = ^[a-z-]+$');
       });
     });
 
@@ -610,13 +610,13 @@ describe('string with constraints', () => {
 
         expectType<typeof type, Type<string>>('=');
 
-        expect(type.is('6789')).toBe(true);
+        assert.isTrue(type.is('6789'));
 
-        expect(type.is('6789012')).toBe(false);
+        assert.isFalse(type.is('6789012'));
 
-        expect(type.is('678')).toBe(false);
+        assert.isFalse(type.is('678'));
 
-        expect(type.is('67a9')).toBe(false);
+        assert.isFalse(type.is('67a9'));
       });
 
       test('rejects invalid default value', () => {
@@ -629,7 +629,7 @@ describe('string with constraints', () => {
             maxLength: 6,
             regex: digits,
           }),
-        ).toThrow('maxLength = 6');
+        ).toThrowError('maxLength = 6');
       });
     });
   });

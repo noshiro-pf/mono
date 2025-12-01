@@ -14,6 +14,7 @@ import { record } from './record.mjs';
  */
 export const partial = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   const KeysToBeOptional extends NonEmptyArray<keyof R & string>,
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
@@ -57,6 +58,7 @@ export const partial = <
 
 type PartialTypeShape<
   R extends ReadonlyRecord<string, Type<unknown>>,
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined,
 > =
   TypeEq<KeysToBeOptional, undefined> extends true
@@ -76,6 +78,7 @@ type PartiallyOptionalType<
 
 export type PartialType<
   R extends ReadonlyRecord<string, Type<unknown>>,
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined,
   ExcessValidation extends ExcessPropertyBehavior = 'strip',
 > = RecordType<PartialTypeShape<R, KeysToBeOptional>, ExcessValidation>;

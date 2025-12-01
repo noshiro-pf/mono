@@ -22,7 +22,7 @@ describe(boolean, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      assert.isTrue(targetType.is(x));
     });
 
     test('falsy case', () => {
@@ -34,7 +34,7 @@ describe(boolean, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -42,17 +42,17 @@ describe(boolean, () => {
     test('truthy case', () => {
       const result = targetType.validate(true);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
-      expect(resultValue).toBe(true);
+      assert.isTrue(resultValue);
     });
 
     test('falsy case', () => {
       const result = targetType.validate('not a boolean');
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -76,7 +76,7 @@ describe(boolean, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -93,7 +93,7 @@ describe(boolean, () => {
 
       expect(() => {
         assertIs(x);
-      }).not.toThrow();
+      }).not.toThrowError();
     });
 
     test('falsy case', () => {
@@ -104,7 +104,7 @@ describe(boolean, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrow('Error');
+      }).toThrowError('Error');
     });
   });
 
@@ -112,13 +112,13 @@ describe(boolean, () => {
     test('truthy case', () => {
       const x: unknown = true;
 
-      expect(targetType.cast(x)).toBe(true);
+      assert.isTrue(targetType.cast(x));
     });
 
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Error');
+      expect(() => targetType.cast(x)).toThrowError('Error');
     });
   });
 
@@ -126,13 +126,13 @@ describe(boolean, () => {
     test('noop', () => {
       const x: unknown = true;
 
-      expect(targetType.fill(x)).toBe(true);
+      assert.isTrue(targetType.fill(x));
     });
 
     test('fill with the default value', () => {
       const x: unknown = 'not a boolean';
 
-      expect(targetType.fill(x)).toBe(false);
+      assert.isFalse(targetType.fill(x));
     });
   });
 });

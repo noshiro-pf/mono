@@ -26,7 +26,7 @@ const ReportStatus = t.intersection(
 );
 
 // embed-sample-code-ignore-below
-assert(
+assert.isTrue(
   ReportStatus.defaultValue ===
     ('succeeded' satisfies t.TypeOf<typeof ReportStatus>),
 );

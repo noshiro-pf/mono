@@ -30,7 +30,7 @@ describe(keyValueRecord, () => {
         expectType<typeof x, UnknownRecord>('=');
       }
 
-      expect(strNumRecord.is(x)).toBe(true);
+      assert.isTrue(strNumRecord.is(x));
     });
 
     test('falsy case', () => {
@@ -46,7 +46,7 @@ describe(keyValueRecord, () => {
         expectType<typeof x, UnknownRecord>('=');
       }
 
-      expect(strNumRecord.is(x)).toBe(false);
+      assert.isFalse(strNumRecord.is(x));
     });
   });
 
@@ -65,7 +65,7 @@ describe(keyValueRecord, () => {
         Result<StrNumRecord, readonly ValidationError[]>
       >('=');
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -85,7 +85,7 @@ describe(keyValueRecord, () => {
 
       const result = strNumRecord.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -101,7 +101,7 @@ describe(keyValueRecord, () => {
 
       const result = strNumRecord.validate(x);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 

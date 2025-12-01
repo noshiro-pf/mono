@@ -14,7 +14,7 @@ describe(valueof, () => {
 
     expect(V.defaultValue).toBe(undefinedType.defaultValue);
 
-    expect(Result.isOk(V.validate(undefined))).toBe(true);
+    assert.isTrue(Result.isOk(V.validate(undefined)));
 
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(V.fill('anything')).toBeUndefined();
@@ -29,9 +29,9 @@ describe(valueof, () => {
 
     expectType<T, string>('=');
 
-    expect(Result.isOk(V.validate('x'))).toBe(true);
+    assert.isTrue(Result.isOk(V.validate('x')));
 
-    expect(Result.isErr(V.validate(1))).toBe(true);
+    assert.isTrue(Result.isErr(V.validate(1)));
   });
 
   test('multiple fields returns union type', () => {
@@ -43,10 +43,10 @@ describe(valueof, () => {
 
     expectType<T, number | string>('=');
 
-    expect(V.is(1)).toBe(true);
+    assert.isTrue(V.is(1));
 
-    expect(V.is('s')).toBe(true);
+    assert.isTrue(V.is('s'));
 
-    expect(V.is(false)).toBe(false);
+    assert.isFalse(V.is(false));
   });
 });

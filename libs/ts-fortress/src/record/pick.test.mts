@@ -57,7 +57,7 @@ describe(pick, () => {
         expectType<typeof x, UnknownRecord>('=');
       }
 
-      expect(ym.is(x)).toBe(true);
+      assert.isTrue(ym.is(x));
     });
 
     test('falsy case', () => {
@@ -72,7 +72,7 @@ describe(pick, () => {
         expectType<typeof x, UnknownRecord>('=');
       }
 
-      expect(ym.is(x)).toBe(false);
+      assert.isFalse(ym.is(x));
     });
   });
 
@@ -85,7 +85,7 @@ describe(pick, () => {
 
       const result = ym.validate(x);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -106,7 +106,7 @@ describe(pick, () => {
 
       const result = ym.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -126,7 +126,7 @@ describe(pick, () => {
 
       const result = ymEased.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -142,7 +142,7 @@ describe(pick, () => {
 
       const result = ym.validate(x);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue2 = Result.unwrapThrow(result);
 
@@ -167,7 +167,7 @@ describe(pick, () => {
 
       const result = ym.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue3 = Result.unwrapThrow(result);
 
@@ -188,7 +188,7 @@ describe(pick, () => {
 
       const result = ymEased.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue3 = Result.unwrapThrow(result);
 
@@ -203,7 +203,7 @@ describe(pick, () => {
 
       const result = ym.validate(x);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 

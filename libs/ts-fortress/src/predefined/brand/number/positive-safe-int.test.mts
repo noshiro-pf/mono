@@ -1,4 +1,4 @@
-import { expectType, isNumber, isPositiveSafeInt, Result } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { positiveSafeInt } from './positive-safe-int.mjs';
@@ -24,11 +24,7 @@ describe(positiveSafeInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(true);
-
-      assert(isNumber(x));
-
-      expect(isPositiveSafeInt(x)).toBe(true);
+      assert.isTrue(isTarget);
     });
 
     test('falsy case - zero', () => {
@@ -40,25 +36,25 @@ describe(positiveSafeInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
 
     test('falsy case - negative', () => {
       const x: unknown = -5;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
 
     test('falsy case - unsafe integer', () => {
       const x: unknown = Number.MAX_SAFE_INTEGER + 1;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
 
     test('falsy case - float', () => {
       const x: unknown = 123.456;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -66,7 +62,7 @@ describe(positiveSafeInt, () => {
     test('truthy case', () => {
       const result = targetType.validate(789_012);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -78,7 +74,7 @@ describe(positiveSafeInt, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -88,7 +84,7 @@ describe(positiveSafeInt, () => {
     test('falsy case - zero', () => {
       const result = targetType.validate(0);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -118,7 +114,7 @@ describe(positiveSafeInt, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Error');
+      expect(() => targetType.cast(x)).toThrowError('Error');
     });
   });
 

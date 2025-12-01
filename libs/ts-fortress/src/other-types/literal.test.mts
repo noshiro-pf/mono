@@ -29,7 +29,7 @@ describe(literal, () => {
           expectType<typeof value, unknown>('=');
         }
 
-        expect(hello.is(value)).toBe(true);
+        assert.isTrue(hello.is(value));
       });
 
       test('different string returns false', () => {
@@ -41,13 +41,13 @@ describe(literal, () => {
           expectType<typeof value, unknown>('=');
         }
 
-        expect(hello.is(value)).toBe(false);
+        assert.isFalse(hello.is(value));
       });
 
       test('non-string returns false', () => {
         const value: unknown = 42;
 
-        expect(hello.is(value)).toBe(false);
+        assert.isFalse(hello.is(value));
       });
     });
 
@@ -59,9 +59,9 @@ describe(literal, () => {
 
         expectType<Empty, ''>('=');
 
-        expect(empty.is('')).toBe(true);
+        assert.isTrue(empty.is(''));
 
-        expect(empty.is(' ')).toBe(false);
+        assert.isFalse(empty.is(' '));
       });
 
       test('whitespace literal', () => {
@@ -71,11 +71,11 @@ describe(literal, () => {
 
         expectType<Whitespace, '   '>('=');
 
-        expect(whitespace.is('   ')).toBe(true);
+        assert.isTrue(whitespace.is('   '));
 
-        expect(whitespace.is('  ')).toBe(false);
+        assert.isFalse(whitespace.is('  '));
 
-        expect(whitespace.is('    ')).toBe(false);
+        assert.isFalse(whitespace.is('    '));
       });
 
       test('emoji literal', () => {
@@ -85,9 +85,9 @@ describe(literal, () => {
 
         expectType<Emoji, '🎉'>('=');
 
-        expect(emoji.is('🎉')).toBe(true);
+        assert.isTrue(emoji.is('🎉'));
 
-        expect(emoji.is('🎊')).toBe(false);
+        assert.isFalse(emoji.is('🎊'));
       });
 
       test('multiline literal', () => {
@@ -97,9 +97,9 @@ describe(literal, () => {
 
         expectType<Multiline, 'line1\nline2'>('=');
 
-        expect(multiline.is('line1\nline2')).toBe(true);
+        assert.isTrue(multiline.is('line1\nline2'));
 
-        expect(multiline.is(String.raw`line1\nline2`)).toBe(false);
+        assert.isFalse(multiline.is(String.raw`line1\nline2`));
       });
     });
 
@@ -109,7 +109,7 @@ describe(literal, () => {
 
         const result = hello.validate(value);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue = Result.unwrapThrow(result);
 
@@ -121,7 +121,7 @@ describe(literal, () => {
 
         const result = hello.validate(value);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError = Result.unwrapErrThrow(result);
 
@@ -141,7 +141,7 @@ describe(literal, () => {
 
         const result = hello.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue1 = Result.unwrapThrow(result);
 
@@ -161,7 +161,7 @@ describe(literal, () => {
       test('invalid value throws error', () => {
         const value: unknown = 'world';
 
-        expect(() => hello.cast(value)).toThrow(
+        expect(() => hello.cast(value)).toThrowError(
           'Error: expected <literal("hello")> value but <string> type value "world" was passed.',
         );
       });
@@ -219,7 +219,7 @@ describe(literal, () => {
           expectType<typeof value, unknown>('=');
         }
 
-        expect(literal42.is(value)).toBe(true);
+        assert.isTrue(literal42.is(value));
       });
 
       test('different number returns false', () => {
@@ -231,13 +231,13 @@ describe(literal, () => {
           expectType<typeof value, unknown>('=');
         }
 
-        expect(literal42.is(value)).toBe(false);
+        assert.isFalse(literal42.is(value));
       });
 
       test('non-number returns false', () => {
         const value: unknown = '42';
 
-        expect(literal42.is(value)).toBe(false);
+        assert.isFalse(literal42.is(value));
       });
     });
 
@@ -249,11 +249,11 @@ describe(literal, () => {
 
         expectType<Zero, 0>('=');
 
-        expect(zero.is(0)).toBe(true);
+        assert.isTrue(zero.is(0));
 
-        expect(zero.is(-0)).toBe(true); // JavaScript treats 0 and -0 as equal
+        assert.isTrue(zero.is(-0)); // JavaScript treats 0 and -0 as equal
 
-        expect(zero.is(1)).toBe(false);
+        assert.isFalse(zero.is(1));
       });
 
       test('negative literal', () => {
@@ -263,9 +263,9 @@ describe(literal, () => {
 
         expectType<Negative, -100>('=');
 
-        expect(negative.is(-100)).toBe(true);
+        assert.isTrue(negative.is(-100));
 
-        expect(negative.is(100)).toBe(false);
+        assert.isFalse(negative.is(100));
       });
 
       test('decimal literal', () => {
@@ -275,9 +275,9 @@ describe(literal, () => {
 
         expectType<Pi, 3.14>('=');
 
-        expect(pi.is(3.14)).toBe(true);
+        assert.isTrue(pi.is(3.14));
 
-        expect(pi.is(3.141)).toBe(false);
+        assert.isFalse(pi.is(3.141));
       });
     });
 
@@ -287,7 +287,7 @@ describe(literal, () => {
 
         const result = literal42.validate(value);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue2 = Result.unwrapThrow(result);
 
@@ -299,7 +299,7 @@ describe(literal, () => {
 
         const result = literal42.validate(value);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError1 = Result.unwrapErrThrow(result);
 
@@ -319,7 +319,7 @@ describe(literal, () => {
 
         const result = literal42.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue3 = Result.unwrapThrow(result);
 
@@ -351,7 +351,7 @@ describe(literal, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(true);
+        assert.isTrue(targetType.is(x));
       });
 
       test('falsy case - different bigint', () => {
@@ -363,13 +363,13 @@ describe(literal, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(false);
+        assert.isFalse(targetType.is(x));
       });
 
       test('falsy case - non-bigint', () => {
         const x: unknown = 42;
 
-        expect(targetType.is(x)).toBe(false);
+        assert.isFalse(targetType.is(x));
       });
     });
 
@@ -377,7 +377,7 @@ describe(literal, () => {
       test('truthy case', () => {
         const result = targetType.validate(42n);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue4 = Result.unwrapThrow(result);
 
@@ -387,7 +387,7 @@ describe(literal, () => {
       test('falsy case - different bigint', () => {
         const result = targetType.validate(99n);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError2 = Result.unwrapErrThrow(result);
 
@@ -409,7 +409,7 @@ describe(literal, () => {
       test('falsy case - non-bigint', () => {
         const result = targetType.validate('not a bigint');
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError3 = Result.unwrapErrThrow(result);
 
@@ -433,7 +433,7 @@ describe(literal, () => {
 
         const result = targetType.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue5 = Result.unwrapThrow(result);
 
@@ -451,7 +451,7 @@ describe(literal, () => {
       test('falsy case', () => {
         const x: unknown = 123n;
 
-        expect(() => targetType.cast(x)).toThrow('Error');
+        expect(() => targetType.cast(x)).toThrowError('Error');
       });
     });
 
@@ -494,7 +494,7 @@ describe(literal, () => {
             expectType<typeof x, unknown>('=');
           }
 
-          expect(targetType.is(x)).toBe(true);
+          assert.isTrue(targetType.is(x));
         });
 
         test('falsy case - different boolean', () => {
@@ -506,13 +506,13 @@ describe(literal, () => {
             expectType<typeof x, unknown>('=');
           }
 
-          expect(targetType.is(x)).toBe(false);
+          assert.isFalse(targetType.is(x));
         });
 
         test('falsy case - non-boolean', () => {
           const x: unknown = 'true';
 
-          expect(targetType.is(x)).toBe(false);
+          assert.isFalse(targetType.is(x));
         });
       });
 
@@ -520,7 +520,7 @@ describe(literal, () => {
         test('truthy case', () => {
           const result = targetType.validate(true);
 
-          expect(Result.isOk(result)).toBe(true);
+          assert.isTrue(Result.isOk(result));
 
           const resultValue6 = Result.unwrapThrow(result);
 
@@ -530,7 +530,7 @@ describe(literal, () => {
         test('falsy case - different boolean', () => {
           const result = targetType.validate(false);
 
-          expect(Result.isErr(result)).toBe(true);
+          assert.isTrue(Result.isErr(result));
 
           const resultError4 = Result.unwrapErrThrow(result);
 
@@ -552,7 +552,7 @@ describe(literal, () => {
         test('falsy case - non-boolean', () => {
           const result = targetType.validate('not a boolean');
 
-          expect(Result.isErr(result)).toBe(true);
+          assert.isTrue(Result.isErr(result));
 
           const resultError5 = Result.unwrapErrThrow(result);
 
@@ -576,7 +576,7 @@ describe(literal, () => {
 
           const result = targetType.validate(input);
 
-          expect(Result.isOk(result)).toBe(true);
+          assert.isTrue(Result.isOk(result));
 
           const resultValue7 = Result.unwrapThrow(result);
 
@@ -594,7 +594,7 @@ describe(literal, () => {
         test('falsy case', () => {
           const x: unknown = false;
 
-          expect(() => targetType.cast(x)).toThrow('Error');
+          expect(() => targetType.cast(x)).toThrowError('Error');
         });
       });
 
@@ -628,13 +628,13 @@ describe(literal, () => {
         test('truthy case - exact literal match', () => {
           const x: unknown = false;
 
-          expect(targetType.is(x)).toBe(true);
+          assert.isTrue(targetType.is(x));
         });
 
         test('falsy case - different boolean', () => {
           const x: unknown = true;
 
-          expect(targetType.is(x)).toBe(false);
+          assert.isFalse(targetType.is(x));
         });
       });
 
@@ -642,7 +642,7 @@ describe(literal, () => {
         test('truthy case', () => {
           const result = targetType.validate(false);
 
-          expect(Result.isOk(result)).toBe(true);
+          assert.isTrue(Result.isOk(result));
 
           const resultValue8 = Result.unwrapThrow(result);
 
@@ -652,7 +652,7 @@ describe(literal, () => {
         test('falsy case - different boolean', () => {
           const result = targetType.validate(true);
 
-          expect(Result.isErr(result)).toBe(true);
+          assert.isTrue(Result.isErr(result));
 
           const resultError6 = Result.unwrapErrThrow(result);
 
@@ -676,7 +676,7 @@ describe(literal, () => {
 
           const result = targetType.validate(input);
 
-          expect(Result.isOk(result)).toBe(true);
+          assert.isTrue(Result.isOk(result));
 
           const resultValue9 = Result.unwrapThrow(result);
 

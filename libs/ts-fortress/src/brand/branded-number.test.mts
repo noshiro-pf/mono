@@ -24,25 +24,25 @@ describe('simpleBrandedNumber', () => {
 
     describe('is', () => {
       test('returns true for any number', () => {
-        expect(userIdType.is(123)).toBe(true);
+        assert.isTrue(userIdType.is(123));
 
-        expect(userIdType.is(-456)).toBe(true);
+        assert.isTrue(userIdType.is(-456));
 
-        expect(userIdType.is(0)).toBe(true);
+        assert.isTrue(userIdType.is(0));
 
-        expect(userIdType.is(3.14)).toBe(true);
+        assert.isTrue(userIdType.is(3.14));
       });
 
       test('returns false for non-numbers', () => {
-        expect(userIdType.is('123')).toBe(false);
+        assert.isFalse(userIdType.is('123'));
 
-        expect(userIdType.is(null)).toBe(false);
+        assert.isFalse(userIdType.is(null));
 
-        expect(userIdType.is(undefined)).toBe(false);
+        assert.isFalse(userIdType.is(undefined));
 
-        expect(userIdType.is({})).toBe(false);
+        assert.isFalse(userIdType.is({}));
 
-        expect(userIdType.is([])).toBe(false);
+        assert.isFalse(userIdType.is([]));
       });
     });
 
@@ -52,7 +52,7 @@ describe('simpleBrandedNumber', () => {
 
         const result = userIdType.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue = Result.unwrapThrow(result);
 
@@ -62,7 +62,7 @@ describe('simpleBrandedNumber', () => {
       test('succeeds for valid numbers', () => {
         const result = userIdType.validate(42);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue1 = Result.unwrapThrow(result);
 
@@ -72,7 +72,7 @@ describe('simpleBrandedNumber', () => {
       test('fails for non-numbers', () => {
         const result = userIdType.validate('not a number');
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError = Result.unwrapErrThrow(result);
 
@@ -98,7 +98,7 @@ describe('simpleBrandedNumber', () => {
       });
 
       test('throws for invalid values', () => {
-        expect(() => userIdType.cast('invalid')).toThrow('Error');
+        expect(() => userIdType.cast('invalid')).toThrowError('Error');
       });
     });
 
@@ -135,7 +135,7 @@ describe('simpleBrandedNumber', () => {
 
         const result = scoreType.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue2 = Result.unwrapThrow(result);
 
@@ -145,7 +145,7 @@ describe('simpleBrandedNumber', () => {
       test('succeeds for valid numbers', () => {
         const result = scoreType.validate(85);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue3 = Result.unwrapThrow(result);
 
@@ -155,7 +155,7 @@ describe('simpleBrandedNumber', () => {
       test('fails for non-numbers', () => {
         const result = scoreType.validate('invalid');
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError1 = Result.unwrapErrThrow(result);
 
@@ -203,7 +203,7 @@ describe('simpleBrandedNumber', () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isPrice).toBe(true);
+      assert.isTrue(isPrice);
 
       expect(x).toBe(29.99);
     });

@@ -55,7 +55,7 @@ describe(arrayOfLength, () => {
         expectType<typeof ys, unknown>('=');
       }
 
-      expect(xs.is(ys)).toBe(true);
+      assert.isTrue(xs.is(ys));
     });
 
     test('falsy case 1', () => {
@@ -67,7 +67,7 @@ describe(arrayOfLength, () => {
         expectType<typeof ys, unknown>('=');
       }
 
-      expect(xs.is(ys)).toBe(false);
+      assert.isFalse(xs.is(ys));
     });
 
     test('falsy case 2', () => {
@@ -79,7 +79,7 @@ describe(arrayOfLength, () => {
         expectType<typeof ys, unknown>('=');
       }
 
-      expect(xs.is(ys)).toBe(false);
+      assert.isFalse(xs.is(ys));
     });
   });
 
@@ -91,7 +91,7 @@ describe(arrayOfLength, () => {
 
       expectType<typeof result, Result<Xs, readonly ValidationError[]>>('=');
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -103,7 +103,7 @@ describe(arrayOfLength, () => {
 
       const result = xs.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -115,7 +115,7 @@ describe(arrayOfLength, () => {
 
       const result = xs.validate(ys);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -143,7 +143,7 @@ describe(arrayOfLength, () => {
 
       const result = xs.validate(ys);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError1 = Result.unwrapErrThrow(result);
 

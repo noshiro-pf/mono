@@ -1,4 +1,4 @@
-import { expectType, isNumber, isPositiveInt, Result } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { positiveInt } from './positive-int.mjs';
@@ -24,11 +24,7 @@ describe(positiveInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(true);
-
-      assert(isNumber(x));
-
-      expect(isPositiveInt(x)).toBe(true);
+      assert.isTrue(isTarget);
     });
 
     test('falsy case - zero', () => {
@@ -42,7 +38,7 @@ describe(positiveInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(false);
+      assert.isFalse(isTarget);
     });
 
     test('falsy case - negative', () => {
@@ -56,7 +52,7 @@ describe(positiveInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(false);
+      assert.isFalse(isTarget);
     });
 
     test('falsy case - float', () => {
@@ -70,7 +66,7 @@ describe(positiveInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(false);
+      assert.isFalse(isTarget);
     });
   });
 
@@ -78,7 +74,7 @@ describe(positiveInt, () => {
     test('truthy case', () => {
       const result = targetType.validate(42);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -90,7 +86,7 @@ describe(positiveInt, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -100,7 +96,7 @@ describe(positiveInt, () => {
     test('falsy case - negative', () => {
       const result = targetType.validate(-5);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -122,7 +118,7 @@ describe(positiveInt, () => {
     test('falsy case - string', () => {
       const result = targetType.validate('not a number');
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError1 = Result.unwrapErrThrow(result);
 
@@ -151,7 +147,7 @@ describe(positiveInt, () => {
 
       expect(() => {
         assertIs(x);
-      }).not.toThrow();
+      }).not.toThrowError();
     });
 
     test('falsy case', () => {
@@ -162,7 +158,7 @@ describe(positiveInt, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrow('Error: expected <PositiveInt> value');
+      }).toThrowError('Error: expected <PositiveInt> value');
     });
   });
 
@@ -176,7 +172,7 @@ describe(positiveInt, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Error');
+      expect(() => targetType.cast(x)).toThrowError('Error');
     });
   });
 

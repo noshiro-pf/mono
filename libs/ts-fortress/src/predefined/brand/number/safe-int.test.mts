@@ -22,7 +22,7 @@ describe(safeInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      assert.isTrue(targetType.is(x));
     });
 
     test('falsy case - unsafe integer', () => {
@@ -34,7 +34,7 @@ describe(safeInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
 
     test('falsy case - float', () => {
@@ -46,7 +46,7 @@ describe(safeInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -54,7 +54,7 @@ describe(safeInt, () => {
     test('truthy case', () => {
       const result = targetType.validate(-42);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -66,7 +66,7 @@ describe(safeInt, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -76,7 +76,7 @@ describe(safeInt, () => {
     test('falsy case - unsafe integer', () => {
       const result = targetType.validate(Number.MAX_SAFE_INTEGER + 1);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -106,7 +106,7 @@ describe(safeInt, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Error');
+      expect(() => targetType.cast(x)).toThrowError('Error');
     });
   });
 

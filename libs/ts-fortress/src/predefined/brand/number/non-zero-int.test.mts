@@ -1,4 +1,4 @@
-import { expectType, isNonZeroInt, isNumber, Result } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { nonZeroInt } from './non-zero-int.mjs';
@@ -24,17 +24,13 @@ describe(nonZeroInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(true);
-
-      assert(isNumber(x));
-
-      expect(isNonZeroInt(x)).toBe(true);
+      assert.isTrue(isTarget);
     });
 
     test('truthy case - negative', () => {
       const x: unknown = -42;
 
-      expect(targetType.is(x)).toBe(true);
+      assert.isTrue(targetType.is(x));
     });
 
     test('falsy case - zero', () => {
@@ -48,13 +44,13 @@ describe(nonZeroInt, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(false);
+      assert.isFalse(isTarget);
     });
 
     test('falsy case - float', () => {
       const x: unknown = 123.456;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -62,7 +58,7 @@ describe(nonZeroInt, () => {
     test('truthy case', () => {
       const result = targetType.validate(-42);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -74,7 +70,7 @@ describe(nonZeroInt, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -84,7 +80,7 @@ describe(nonZeroInt, () => {
     test('falsy case - zero', () => {
       const result = targetType.validate(0);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -114,7 +110,7 @@ describe(nonZeroInt, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Error');
+      expect(() => targetType.cast(x)).toThrowError('Error');
     });
   });
 

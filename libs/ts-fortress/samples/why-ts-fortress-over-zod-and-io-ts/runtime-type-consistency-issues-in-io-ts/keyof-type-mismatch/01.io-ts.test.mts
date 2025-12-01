@@ -10,9 +10,9 @@ const T = t.keyof({
 });
 
 // ❌ Runtime behavior is inconsistent with TypeScript types!
-assert(!isRight(T.decode(0))); // number 0 is rejected
+assert.isFalse(isRight(T.decode(0))); // number 0 is rejected
 
-assert(isRight(T.decode('0'))); // string "0" is accepted
+assert.isTrue(isRight(T.decode('0'))); // string "0" is accepted
 
 type T = t.TypeOf<typeof T>;
 // ↑ TypeScript infers: 0 | 1 | 2 | 3 | 4 (number literals)

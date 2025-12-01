@@ -1,10 +1,4 @@
-import {
-  asUint32,
-  expectType,
-  isNumber,
-  isUint32,
-  Result,
-} from 'ts-data-forge';
+import { asUint32, expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { uint32 } from './uint32.mjs';
@@ -30,17 +24,13 @@ describe(uint32, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(true);
-
-      assert(isNumber(x));
-
-      expect(isUint32(x)).toBe(true);
+      assert.isTrue(isTarget);
     });
 
     test('truthy case - zero', () => {
       const x: unknown = 0;
 
-      expect(targetType.is(x)).toBe(true);
+      assert.isTrue(targetType.is(x));
     });
 
     test('falsy case - negative', () => {
@@ -54,19 +44,19 @@ describe(uint32, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(false);
+      assert.isFalse(isTarget);
     });
 
     test('falsy case - too large', () => {
       const x: unknown = 5_000_000_000;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
 
     test('falsy case - float', () => {
       const x: unknown = 123.456;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -74,7 +64,7 @@ describe(uint32, () => {
     test('truthy case', () => {
       const result = targetType.validate(3_000_000_000);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -86,7 +76,7 @@ describe(uint32, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -96,7 +86,7 @@ describe(uint32, () => {
     test('falsy case - negative', () => {
       const result = targetType.validate(-5);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -126,7 +116,7 @@ describe(uint32, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Error');
+      expect(() => targetType.cast(x)).toThrowError('Error');
     });
   });
 

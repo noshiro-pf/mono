@@ -28,7 +28,7 @@ const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
   ? tf.validationErrorsToMessages(tsFortressResult.value)
   : [];
 
-assert.equal(
+assert.strictEqual(
   tsFortressErrorMessages[0],
   `Error at user.profile.age: expected <number> value but <string> type value "not-a-number" was passed.`,
 );

@@ -24,27 +24,27 @@ describe('simpleBrandedString', () => {
 
     describe('is', () => {
       test('returns true for any string', () => {
-        expect(userNameType.is('alice')).toBe(true);
+        assert.isTrue(userNameType.is('alice'));
 
-        expect(userNameType.is('bob123')).toBe(true);
+        assert.isTrue(userNameType.is('bob123'));
 
-        expect(userNameType.is('')).toBe(true);
+        assert.isTrue(userNameType.is(''));
 
-        expect(userNameType.is('special@chars!')).toBe(true);
+        assert.isTrue(userNameType.is('special@chars!'));
       });
 
       test('returns false for non-strings', () => {
-        expect(userNameType.is(123)).toBe(false);
+        assert.isFalse(userNameType.is(123));
 
-        expect(userNameType.is(null)).toBe(false);
+        assert.isFalse(userNameType.is(null));
 
-        expect(userNameType.is(undefined)).toBe(false);
+        assert.isFalse(userNameType.is(undefined));
 
-        expect(userNameType.is({})).toBe(false);
+        assert.isFalse(userNameType.is({}));
 
-        expect(userNameType.is([])).toBe(false);
+        assert.isFalse(userNameType.is([]));
 
-        expect(userNameType.is(true)).toBe(false);
+        assert.isFalse(userNameType.is(true));
       });
     });
 
@@ -54,7 +54,7 @@ describe('simpleBrandedString', () => {
 
         const result = userNameType.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue = Result.unwrapThrow(result);
 
@@ -64,7 +64,7 @@ describe('simpleBrandedString', () => {
       test('succeeds for valid strings', () => {
         const result = userNameType.validate('john_doe');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue1 = Result.unwrapThrow(result);
 
@@ -74,7 +74,7 @@ describe('simpleBrandedString', () => {
       test('fails for non-strings', () => {
         const result = userNameType.validate(42);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError = Result.unwrapErrThrow(result);
 
@@ -100,7 +100,7 @@ describe('simpleBrandedString', () => {
       });
 
       test('throws for invalid values', () => {
-        expect(() => userNameType.cast(123)).toThrow('Error');
+        expect(() => userNameType.cast(123)).toThrowError('Error');
       });
     });
 
@@ -137,7 +137,7 @@ describe('simpleBrandedString', () => {
 
         const result = categoryType.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue2 = Result.unwrapThrow(result);
 
@@ -147,7 +147,7 @@ describe('simpleBrandedString', () => {
       test('succeeds for valid strings', () => {
         const result = categoryType.validate('technology');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue3 = Result.unwrapThrow(result);
 
@@ -157,7 +157,7 @@ describe('simpleBrandedString', () => {
       test('fails for non-strings', () => {
         const result = categoryType.validate(null);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError1 = Result.unwrapErrThrow(result);
 
@@ -205,7 +205,7 @@ describe('simpleBrandedString', () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isEmail).toBe(true);
+      assert.isTrue(isEmail);
 
       expect(x).toBe('user@example.com');
     });

@@ -74,7 +74,7 @@ describe(required, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(true);
+        assert.isTrue(ymd.is(x));
       });
 
       test('falsy case - missing required property', () => {
@@ -90,7 +90,7 @@ describe(required, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(false);
+        assert.isFalse(ymd.is(x));
       });
 
       test('falsy case - wrong type', () => {
@@ -106,7 +106,7 @@ describe(required, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(false);
+        assert.isFalse(ymd.is(x));
       });
     });
 
@@ -122,7 +122,7 @@ describe(required, () => {
 
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue = Result.unwrapThrow(result);
 
@@ -142,7 +142,7 @@ describe(required, () => {
 
         const result = ymd.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue1 = Result.unwrapThrow(result);
 
@@ -172,7 +172,7 @@ describe(required, () => {
 
         const result = ymdAllow.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue1 = Result.unwrapThrow(result);
 
@@ -191,7 +191,7 @@ describe(required, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError = Result.unwrapErrThrow(result);
 
@@ -226,7 +226,7 @@ describe(required, () => {
 
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue2 = Result.unwrapThrow(result);
 
@@ -251,7 +251,7 @@ describe(required, () => {
 
         const result = ymd.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue3 = Result.unwrapThrow(result);
 
@@ -273,7 +273,7 @@ describe(required, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError1 = Result.unwrapErrThrow(result);
 
@@ -309,7 +309,7 @@ describe(required, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError2 = Result.unwrapErrThrow(result);
 
@@ -411,7 +411,7 @@ describe(required, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(true);
+        assert.isTrue(ymd.is(x));
       });
 
       test('truthy case - with optional field', () => {
@@ -427,7 +427,7 @@ describe(required, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(true);
+        assert.isTrue(ymd.is(x));
       });
 
       test('falsy case - missing required field', () => {
@@ -443,7 +443,7 @@ describe(required, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(false);
+        assert.isFalse(ymd.is(x));
       });
 
       test('falsy case - wrong type in required field', () => {
@@ -459,7 +459,7 @@ describe(required, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(false);
+        assert.isFalse(ymd.is(x));
       });
 
       test('falsy case - wrong type in optional field', () => {
@@ -475,7 +475,7 @@ describe(required, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(false);
+        assert.isFalse(ymd.is(x));
       });
     });
 
@@ -490,7 +490,7 @@ describe(required, () => {
 
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue4 = Result.unwrapThrow(result);
 
@@ -508,7 +508,7 @@ describe(required, () => {
 
         const result = ymd.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue5 = Result.unwrapThrow(result);
 
@@ -539,7 +539,7 @@ describe(required, () => {
 
         const result = ymdAllow.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue5 = Result.unwrapThrow(result);
 
@@ -558,7 +558,7 @@ describe(required, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue6 = Result.unwrapThrow(result);
 
@@ -578,7 +578,7 @@ describe(required, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError3 = Result.unwrapErrThrow(result);
 
@@ -611,7 +611,7 @@ describe(required, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError4 = Result.unwrapErrThrow(result);
 

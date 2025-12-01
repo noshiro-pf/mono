@@ -23,7 +23,7 @@ const UInt16 = t.uint16(0);
 // Usage
 const userIdResult = UserId.validate('user_123');
 
-assert(t.Result.isOk(userIdResult));
+assert.isTrue(t.Result.isOk(userIdResult));
 
 if (t.Result.isOk(userIdResult)) {
   const id: UserId = userIdResult.value;

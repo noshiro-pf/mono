@@ -24,9 +24,9 @@ const C = t.partial(
   if (t.Result.isOk(result)) {
     assert.deepStrictEqual(result.value, { A: 1 }); // Correct! No unexpected fields
 
-    assert(A.is(result.value)); // Correct
+    assert.isTrue(A.is(result.value)); // Correct
 
-    assert(!B.is(result.value)); // Correct! B requires field B
+    assert.isFalse(B.is(result.value)); // Correct! B requires field B
   }
 }
 
@@ -39,8 +39,8 @@ const C = t.partial(
   if (t.Result.isOk(result)) {
     assert.deepStrictEqual(result.value, { A: 1 }); // Correct and consistent
 
-    assert(A.is(result.value)); // Correct
+    assert.isTrue(A.is(result.value)); // Correct
 
-    assert(C.is(result.value)); // Consistent! ts-fortress partial types allow extra fields
+    assert.isTrue(C.is(result.value)); // Consistent! ts-fortress partial types allow extra fields
   }
 }

@@ -30,7 +30,7 @@ describe(uintRange, () => {
         expectType<typeof x, number>('=');
       }
 
-      expect(month.is(x)).toBe(true);
+      assert.isTrue(month.is(x));
     });
 
     test('falsy case', () => {
@@ -42,7 +42,7 @@ describe(uintRange, () => {
         expectType<typeof x, number>('=');
       }
 
-      expect(month.is(x)).toBe(false);
+      assert.isFalse(month.is(x));
     });
   });
 
@@ -52,7 +52,7 @@ describe(uintRange, () => {
 
       expectType<typeof result, Result<Month, readonly ValidationError[]>>('=');
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -64,7 +64,7 @@ describe(uintRange, () => {
 
       const result = month.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -74,7 +74,7 @@ describe(uintRange, () => {
     test('falsy case', () => {
       const result = month.validate(13);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 

@@ -2,6 +2,10 @@
 
 TypeScript-first schema validation library with static type inference.
 
+## Documentation
+
+- API reference: <https://noshiro-pf.github.io/ts-fortress/>
+
 [![npm version](https://img.shields.io/npm/v/ts-fortress.svg)](https://www.npmjs.com/package/ts-fortress)
 [![npm downloads](https://img.shields.io/npm/dm/ts-fortress.svg)](https://www.npmjs.com/package/ts-fortress)
 [![License](https://img.shields.io/npm/l/ts-fortress.svg)](./LICENSE)
@@ -71,13 +75,13 @@ const userData = {
     isActive: true,
 } as const;
 
-assert(User.is(userData));
+assert.isTrue(User.is(userData));
 
 if (User.is(userData)) {
     // userData is now typed as User
     userData satisfies User;
 
-    assert.equal(
+    assert.strictEqual(
         `User: ${userData.name}, Age: ${userData.age}`,
         'User: John Doe, Age: 30',
     );
@@ -143,11 +147,11 @@ type UserProfile = t.TypeOf<typeof UserProfile>;
 
 // Important: Default value filling only occurs when fill() is called
 // The is() and validate() functions can still detect missing keys
-assert(!UserProfile.is(partialData)); // missing required keys
+assert.isFalse(UserProfile.is(partialData)); // missing required keys
 
 const result = UserProfile.validate(partialData);
 
-assert(t.Result.isErr(result));
+assert.isTrue(t.Result.isErr(result));
 
 assert.deepStrictEqual(
     t.validationErrorsToMessages(
@@ -405,19 +409,19 @@ const validData = { name: 'Alice', age: 30 } as const;
 
 const result = User.validate(validData);
 
-assert(t.Result.isOk(result));
+assert.isTrue(t.Result.isOk(result));
 
 // In strip mode (default), a new object is created even without excess properties
 assert.deepStrictEqual(result.value, { name: 'Alice', age: 30 });
 
-assert.notEqual(result.value, validData);
+assert.notStrictEqual(result.value, validData);
 
 // Error case - provides detailed error information
 const invalidData = { name: 'Bob', age: 'thirty' } as const;
 
 const errorResult = User.validate(invalidData);
 
-assert(t.Result.isErr(errorResult));
+assert.isTrue(t.Result.isErr(errorResult));
 
 assert.deepStrictEqual(errorResult.value, [
     {
@@ -494,7 +498,7 @@ import * as t from 'ts-fortress';
 
 const Port = t.number(8080);
 
-assert(Port.cast(3000) === 3000); // 3000 is a valid number
+assert.isTrue(Port.cast(3000) === 3000); // 3000 is a valid number
 
 try {
     Port.cast('invalid'); // Throws Error!
@@ -642,13 +646,13 @@ const PermissiveUserType = t.record(
 // Example usage - both StrictUserType and StrictUserTypeAlias behave identically
 const strictData = { id: '123', name: 'John', extra: 'not allowed' };
 
-assert(!StrictUserType.is(strictData)); // 'extra' property causes rejection
+assert.isFalse(StrictUserType.is(strictData)); // 'extra' property causes rejection
 
-assert(!StrictUserTypeAlias.is(strictData)); // same as above
+assert.isFalse(StrictUserTypeAlias.is(strictData)); // same as above
 
 const permissiveData = { id: '123', name: 'John', extra: 'allowed' };
 
-assert(PermissiveUserType.is(permissiveData)); // 'extra' property is allowed
+assert.isTrue(PermissiveUserType.is(permissiveData)); // 'extra' property is allowed
 
 // strictRecord provides cleaner syntax for strict validation
 const UserSchema = t.strictRecord({
@@ -708,7 +712,7 @@ const EvenNumber = t.refine({
 // Usage in validation
 const uuidResult = Uuid.validate('6ec0bd7f-11c0-43da-975e-2a8ad9ebae0b');
 
-assert(t.Result.isOk(uuidResult));
+assert.isTrue(t.Result.isOk(uuidResult));
 
 if (t.Result.isOk(uuidResult)) {
     const validUuid = uuidResult.value; // string, guaranteed to be valid Uuid format
@@ -716,18 +720,18 @@ if (t.Result.isOk(uuidResult)) {
 
 const positiveResult = PositiveNumber.validate(42);
 
-assert(t.Result.isOk(positiveResult));
+assert.isTrue(t.Result.isOk(positiveResult));
 
 if (t.Result.isOk(positiveResult)) {
     const positiveNum = positiveResult.value; // number, guaranteed to be > 0
 }
 
 // Invalid cases
-assert(!Uuid.is('invalid-uuid'));
+assert.isFalse(Uuid.is('invalid-uuid'));
 
-assert(!PositiveNumber.is(-5));
+assert.isFalse(PositiveNumber.is(-5));
 
-assert(!EvenNumber.is(7));
+assert.isFalse(EvenNumber.is(7));
 
 // Use in record schemas
 const UserProfile = t.record({
@@ -745,7 +749,7 @@ const userData = {
     level: 4, // ✅ even number
 } as const satisfies UserProfile;
 
-assert(UserProfile.is(userData));
+assert.isTrue(UserProfile.is(userData));
 
 const invalidData = {
     id: 'user123', // ❌ invalid uuid format
@@ -755,7 +759,7 @@ const invalidData = {
 
 const result = UserProfile.validate(invalidData);
 
-assert(t.Result.isErr(result));
+assert.isTrue(t.Result.isErr(result));
 
 assert.deepStrictEqual(
     t.validationErrorsToMessages(
@@ -839,7 +843,7 @@ const UInt16 = t.uint16(0);
 // Usage
 const userIdResult = UserId.validate('user_123');
 
-assert(t.Result.isOk(userIdResult));
+assert.isTrue(t.Result.isOk(userIdResult));
 
 if (t.Result.isOk(userIdResult)) {
     const id: UserId = userIdResult.value;
@@ -920,7 +924,7 @@ const invalidData = { name: 123, age: 'not a number' };
 
 const result = User.validate(invalidData);
 
-assert(t.Result.isErr(result));
+assert.isTrue(t.Result.isErr(result));
 
 // result.value is an array of ValidationError objects
 
@@ -979,7 +983,7 @@ const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
 
 const strictResult = StrictType.validate(dataWithExcess);
 
-assert(t.Result.isErr(strictResult));
+assert.isTrue(t.Result.isErr(strictResult));
 
 assert.deepStrictEqual(strictResult.value, [
     {

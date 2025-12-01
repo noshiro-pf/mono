@@ -23,7 +23,7 @@ describe('undefined type', () => {
         expectType<typeof value, {} | null>('=');
       }
 
-      expect(undefinedType.is(value)).toBe(true);
+      assert.isTrue(undefinedType.is(value));
     });
 
     test('null returns false', () => {
@@ -35,7 +35,7 @@ describe('undefined type', () => {
         expectType<typeof value, {} | null>('=');
       }
 
-      expect(undefinedType.is(value)).toBe(false);
+      assert.isFalse(undefinedType.is(value));
     });
 
     test.each([0, '', false, Number.NaN, {}, [], 'undefined', 42, true, null])(
@@ -47,7 +47,7 @@ describe('undefined type', () => {
           expectType<typeof u, {} | null>('=');
         }
 
-        expect(undefinedType.is(u)).toBe(false);
+        assert.isFalse(undefinedType.is(u));
       },
     );
   });
@@ -58,7 +58,7 @@ describe('undefined type', () => {
 
       expect(() => {
         undefinedType.assertIs(value);
-      }).not.toThrow();
+      }).not.toThrowError();
     });
 
     test('non-undefined throws', () => {
@@ -66,7 +66,7 @@ describe('undefined type', () => {
 
       expect(() => {
         undefinedType.assertIs(value);
-      }).toThrow(
+      }).toThrowError(
         'Error: expected <undefined> value but <object> type value `null` was passed.',
       );
     });
@@ -86,7 +86,7 @@ describe('undefined type', () => {
 
       expect(() => {
         undefinedType.cast(value);
-      }).toThrow(
+      }).toThrowError(
         'Error: expected <undefined> value but <object> type value `null` was passed.',
       );
     });
@@ -96,7 +96,7 @@ describe('undefined type', () => {
       (v) => {
         expect(() => {
           undefinedType.cast(v);
-        }).toThrow(
+        }).toThrowError(
           /^Error: expected <undefined> value but <.*> type value .+\.$/u,
         );
       },
@@ -136,7 +136,7 @@ describe('undefined type', () => {
 
       const result = undefinedType.validate(value);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -148,7 +148,7 @@ describe('undefined type', () => {
 
       const result = undefinedType.validate(value);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -168,7 +168,7 @@ describe('undefined type', () => {
 
       const result = undefinedType.validate(value);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError1 = Result.unwrapErrThrow(result);
 
@@ -188,7 +188,7 @@ describe('undefined type', () => {
 
       const result = undefinedType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 

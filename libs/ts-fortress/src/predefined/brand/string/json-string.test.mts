@@ -23,21 +23,21 @@ describe(jsonString, () => {
   test.each(['{"foo":1}', '{"nested":{"bar":[1,2]}}', '[]'] as const)(
     'accepts $0',
     (s) => {
-      expect(baseType.is(s)).toBe(true);
+      assert.isTrue(baseType.is(s));
     },
   );
 
   test.each(['not-json', '{"unterminated"', '123', 'null'] as const)(
     'rejects $0',
     (s) => {
-      expect(baseType.is(s)).toBe(false);
+      assert.isFalse(baseType.is(s));
     },
   );
 
   test('validate yields detailed errors for invalid strings', () => {
     const result = baseType.validate('not-json');
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     if (!Result.isErr(result)) {
       throw new Error('Expected validation failure');
@@ -65,6 +65,6 @@ describe(jsonString, () => {
   test('cast returns parsed string when valid, throws otherwise', () => {
     expect(baseType.cast('{"foo":1}')).toBe('{"foo":1}');
 
-    expect(() => baseType.cast('invalid')).toThrow('Error');
+    expect(() => baseType.cast('invalid')).toThrowError('Error');
   });
 });

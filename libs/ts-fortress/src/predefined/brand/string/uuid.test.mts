@@ -33,7 +33,7 @@ describe(uuid, () => {
     nilUuid,
     maxUuid,
   ] as const)('accepts $0', (u) => {
-    expect(baseType.is(u)).toBe(true);
+    assert.isTrue(baseType.is(u));
   });
 
   test.each([
@@ -41,13 +41,13 @@ describe(uuid, () => {
     '550e8400e29b41d4a716446655440000',
     '550e8400-e29b-41d4-a716-44665544000',
   ] as const)('rejects $0', (u) => {
-    expect(baseType.is(u)).toBe(false);
+    assert.isFalse(baseType.is(u));
   });
 
   test('validate surfaces details for invalid strings', () => {
     const result = baseType.validate('not-a-uuid');
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     if (!Result.isErr(result)) {
       throw new Error('Expected validation failure');
@@ -79,15 +79,15 @@ describe(uuidV4, () => {
   expectType<typeof v4Type.defaultValue, UuidV4Type>('=');
 
   test('recognizes version 4 UUIDs only', () => {
-    expect(v4Type.is(uuidV4Example)).toBe(true);
+    assert.isTrue(v4Type.is(uuidV4Example));
 
-    expect(v4Type.is(uuidV6Example)).toBe(false);
+    assert.isFalse(v4Type.is(uuidV6Example));
   });
 
   test('validate reports version mismatch', () => {
     const result = v4Type.validate(uuidV6Example);
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     if (!Result.isErr(result)) {
       throw new Error('Expected validation failure');
@@ -113,11 +113,11 @@ describe(uuidV6, () => {
   const v6Type = uuidV6();
 
   test('recognizes only version 6 UUIDs', () => {
-    expect(v6Type.is(uuidV6Example)).toBe(true);
+    assert.isTrue(v6Type.is(uuidV6Example));
 
-    expect(v6Type.is(uuidV4Example)).toBe(false);
+    assert.isFalse(v6Type.is(uuidV4Example));
 
-    expect(v6Type.is(uuidV7Example)).toBe(false);
+    assert.isFalse(v6Type.is(uuidV7Example));
   });
 });
 
@@ -125,10 +125,10 @@ describe(uuidV7, () => {
   const v7Type = uuidV7();
 
   test('recognizes only version 7 UUIDs', () => {
-    expect(v7Type.is(uuidV7Example)).toBe(true);
+    assert.isTrue(v7Type.is(uuidV7Example));
 
-    expect(v7Type.is(uuidV4Example)).toBe(false);
+    assert.isFalse(v7Type.is(uuidV4Example));
 
-    expect(v7Type.is(uuidV6Example)).toBe(false);
+    assert.isFalse(v7Type.is(uuidV6Example));
   });
 });

@@ -59,7 +59,7 @@ describe(tuple, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      assert.isTrue(targetType.is(x));
     });
 
     test('falsy case', () => {
@@ -71,7 +71,7 @@ describe(tuple, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -85,7 +85,7 @@ describe(tuple, () => {
         '=',
       );
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -97,7 +97,7 @@ describe(tuple, () => {
 
       const result = targetType.validate(x);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -117,7 +117,7 @@ describe(tuple, () => {
 
       const result = targetType.validate(x);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError1 = Result.unwrapErrThrow(result);
 
@@ -141,7 +141,7 @@ describe(tuple, () => {
 
       const result = targetType.validate(x);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError2 = Result.unwrapErrThrow(result);
 
@@ -173,7 +173,7 @@ describe(tuple, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 

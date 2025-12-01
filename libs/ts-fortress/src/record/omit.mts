@@ -10,6 +10,7 @@ import { record } from './record.mjs';
 /** Creates a record type with keys omitted. */
 export const omit = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   const KeysToOmit extends readonly (keyof R & string)[],
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(

@@ -19,19 +19,19 @@ describe(intRange, () => {
 
   describe('is', () => {
     test('valid cases', () => {
-      expect(rng.is(-2)).toBe(true);
+      assert.isTrue(rng.is(-2));
 
-      expect(rng.is(0)).toBe(true);
+      assert.isTrue(rng.is(0));
 
-      expect(rng.is(2)).toBe(true);
+      assert.isTrue(rng.is(2));
     });
 
     test('invalid cases', () => {
-      expect(rng.is(-3)).toBe(false);
+      assert.isFalse(rng.is(-3));
 
-      expect(rng.is(3)).toBe(false); // end is exclusive
+      assert.isFalse(rng.is(3)); // end is exclusive
 
-      expect(rng.is(1.5)).toBe(false); // not integer
+      assert.isFalse(rng.is(1.5)); // not integer
     });
   });
 
@@ -39,7 +39,7 @@ describe(intRange, () => {
     test('ok', () => {
       const result = rng.validate(1);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -49,7 +49,7 @@ describe(intRange, () => {
     test('error shape and message', () => {
       const result = rng.validate(3);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 

@@ -84,7 +84,7 @@ describe('nested record', () => {
         expectType<typeof x, UnknownRecord>('=');
       }
 
-      expect(nestedRecord.is(x)).toBe(true);
+      assert.isTrue(nestedRecord.is(x));
     });
 
     test('falsy case', () => {
@@ -105,7 +105,7 @@ describe('nested record', () => {
         expectType<typeof x, UnknownRecord>('=');
       }
 
-      expect(nestedRecord.is(x)).toBe(false);
+      assert.isFalse(nestedRecord.is(x));
     });
   });
 
@@ -124,7 +124,7 @@ describe('nested record', () => {
 
       const result = nestedRecord.validate(x);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -382,7 +382,7 @@ describe('advanced type', () => {
       ],
     };
 
-    expect(AdvancedNodeType.is(valid)).toBe(true);
+    assert.isTrue(AdvancedNodeType.is(valid));
 
     if (AdvancedNodeType.is(valid)) {
       expectType<typeof valid, AdvancedNode>('=');
@@ -403,7 +403,7 @@ describe('advanced type', () => {
 
     const result = AdvancedNodeType.validate(invalid);
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     if (!Result.isErr(result)) {
       throw new Error('Expected validation to fail');

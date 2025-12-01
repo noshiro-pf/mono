@@ -16,7 +16,7 @@ describe('pick - allowExcessProperties propagation', () => {
 
     // Should reject excess properties
 
-    expect(t.is({ a: '', b: 1, extra: 'x' })).toBe(false);
+    assert.isFalse(t.is({ a: '', b: 1, extra: 'x' }));
   });
 
   test('overrides allowExcessProperties when provided', () => {
@@ -27,6 +27,6 @@ describe('pick - allowExcessProperties propagation', () => {
 
     // Should allow excess properties now
 
-    expect(t.is({ a: '', b: 1, extra: 'x' })).toBe(true);
+    assert.isTrue(t.is({ a: '', b: 1, extra: 'x' }));
   });
 });

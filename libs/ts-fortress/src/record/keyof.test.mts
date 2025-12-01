@@ -32,7 +32,7 @@ describe(keyof, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(ymdKey.is(x)).toBe(true);
+      assert.isTrue(ymdKey.is(x));
     });
 
     test('falsy case', () => {
@@ -44,7 +44,7 @@ describe(keyof, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(ymdKey.is(x)).toBe(false);
+      assert.isFalse(ymdKey.is(x));
     });
   });
 
@@ -54,7 +54,7 @@ describe(keyof, () => {
 
       const result = ymdKey.validate(x);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -68,7 +68,7 @@ describe(keyof, () => {
 
       const result = ymdKey.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -80,7 +80,7 @@ describe(keyof, () => {
 
       const result = ymdKey.validate(x);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 

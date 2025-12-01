@@ -25,7 +25,7 @@ describe('null type', () => {
         expectType<typeof value, {} | undefined>('=');
       }
 
-      expect(nullType.is(value)).toBe(true);
+      assert.isTrue(nullType.is(value));
     });
 
     test('undefined returns false', () => {
@@ -37,7 +37,7 @@ describe('null type', () => {
         expectType<typeof value, {} | undefined>('=');
       }
 
-      expect(nullType.is(value)).toBe(false);
+      assert.isFalse(nullType.is(value));
     });
 
     test.each([0, '', false, Number.NaN, {}, [], 'null', 42, true])(
@@ -49,7 +49,7 @@ describe('null type', () => {
           expectType<typeof v, {} | undefined>('=');
         }
 
-        expect(nullType.is(v)).toBe(false);
+        assert.isFalse(nullType.is(v));
       },
     );
   });
@@ -60,7 +60,7 @@ describe('null type', () => {
 
       expect(() => {
         nullType.assertIs(value);
-      }).not.toThrow();
+      }).not.toThrowError();
     });
 
     test('non-null throws', () => {
@@ -68,7 +68,7 @@ describe('null type', () => {
 
       expect(() => {
         nullType.assertIs(value);
-      }).toThrow(
+      }).toThrowError(
         'Error: expected <null> value but <undefined> type value `undefined` was passed.',
       );
     });
@@ -86,7 +86,7 @@ describe('null type', () => {
     test('non-null throws error', () => {
       const value: unknown = undefined;
 
-      expect(() => nullType.cast(value)).toThrow(
+      expect(() => nullType.cast(value)).toThrowError(
         'Error: expected <null> value but <undefined> type value `undefined` was passed.',
       );
     });
@@ -94,7 +94,7 @@ describe('null type', () => {
     test.each([0, '', false, undefined, 42, 'hello'])(
       'nullType.cast($0) should throw error',
       (value) => {
-        expect(() => nullType.cast(value)).toThrow(
+        expect(() => nullType.cast(value)).toThrowError(
           /Error: expected <null> value but <(number|string|boolean|undefined)> type value/u,
         );
       },
@@ -134,7 +134,7 @@ describe('null type', () => {
 
       const result = nullType.validate(value);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -146,7 +146,7 @@ describe('null type', () => {
 
       const result = nullType.validate(value);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -166,7 +166,7 @@ describe('null type', () => {
 
       const result = nullType.validate(value);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError1 = Result.unwrapErrThrow(result);
 
@@ -186,7 +186,7 @@ describe('null type', () => {
 
       const result = nullType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 

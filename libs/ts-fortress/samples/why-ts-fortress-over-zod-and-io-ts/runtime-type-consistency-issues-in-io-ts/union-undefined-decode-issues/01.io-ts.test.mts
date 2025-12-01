@@ -28,9 +28,9 @@ const C = t.partial({
 
     assert.deepStrictEqual(res.right, actual);
 
-    assert.ok(A.is(res.right)); // ok
+    assert.isTrue(A.is(res.right)); // ok
 
-    assert.notOk(!B.is(res.right)); // NG (expected: false)
+    assert.isTrue(B.is(res.right)); // NG (expected: false)
   }
 }
 
@@ -49,8 +49,8 @@ const C = t.partial({
 
     assert.deepStrictEqual(res.right, actual);
 
-    assert(A.is(res.right)); // ok
+    assert.isTrue(A.is(res.right)); // ok
 
-    assert(C.is(res.right)); // ok
+    assert.isTrue(C.is(res.right)); // ok
   }
 }

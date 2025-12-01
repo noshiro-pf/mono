@@ -41,41 +41,41 @@ describe('recursive', () => {
   });
 
   test('JsonValue - primitive values', () => {
-    expect(JsonValue.is(true)).toBe(true);
+    assert.isTrue(JsonValue.is(true));
 
-    expect(JsonValue.is(false)).toBe(true);
+    assert.isTrue(JsonValue.is(false));
 
-    expect(JsonValue.is(42)).toBe(true);
+    assert.isTrue(JsonValue.is(42));
 
-    expect(JsonValue.is(3.14)).toBe(true);
+    assert.isTrue(JsonValue.is(3.14));
 
-    expect(JsonValue.is('hello')).toBe(true);
+    assert.isTrue(JsonValue.is('hello'));
 
-    expect(JsonValue.is(null)).toBe(true);
+    assert.isTrue(JsonValue.is(null));
 
-    expect(JsonValue.is(undefined)).toBe(false);
+    assert.isFalse(JsonValue.is(undefined));
   });
 
   test('JsonValue - arrays', () => {
-    expect(JsonValue.is([])).toBe(true);
+    assert.isTrue(JsonValue.is([]));
 
-    expect(JsonValue.is([1, 2, 3])).toBe(true);
+    assert.isTrue(JsonValue.is([1, 2, 3]));
 
-    expect(JsonValue.is(['a', 'b', 'c'])).toBe(true);
+    assert.isTrue(JsonValue.is(['a', 'b', 'c']));
 
-    expect(JsonValue.is([true, false, null])).toBe(true);
+    assert.isTrue(JsonValue.is([true, false, null]));
 
-    expect(JsonValue.is([1, 'a', true, null])).toBe(true);
+    assert.isTrue(JsonValue.is([1, 'a', true, null]));
   });
 
   test('JsonValue - objects', () => {
-    expect(JsonValue.is({})).toBe(true);
+    assert.isTrue(JsonValue.is({}));
 
-    expect(JsonValue.is({ a: 1 })).toBe(true);
+    assert.isTrue(JsonValue.is({ a: 1 }));
 
-    expect(JsonValue.is({ a: 1, b: 'hello' })).toBe(true);
+    assert.isTrue(JsonValue.is({ a: 1, b: 'hello' }));
 
-    expect(JsonValue.is({ a: 1, b: [1, 2, 3] })).toBe(true);
+    assert.isTrue(JsonValue.is({ a: 1, b: [1, 2, 3] }));
   });
 
   test('JsonValue - nested structures', () => {
@@ -104,7 +104,7 @@ describe('recursive', () => {
       },
     };
 
-    expect(JsonValue.is(nestedData)).toBe(true);
+    assert.isTrue(JsonValue.is(nestedData));
   });
 
   test('JsonValue - deeply nested arrays', () => {
@@ -119,7 +119,7 @@ describe('recursive', () => {
       ],
     ];
 
-    expect(JsonValue.is(deepArray)).toBe(true);
+    assert.isTrue(JsonValue.is(deepArray));
   });
 
   test('JsonValue - mixed nested structure', () => {
@@ -149,15 +149,15 @@ describe('recursive', () => {
       },
     };
 
-    expect(JsonValue.is(mixedData)).toBe(true);
+    assert.isTrue(JsonValue.is(mixedData));
   });
 
   test('JsonValue - invalid values', () => {
-    expect(JsonValue.is(undefined)).toBe(false);
+    assert.isFalse(JsonValue.is(undefined));
 
-    expect(JsonValue.is(Symbol('test'))).toBe(false);
+    assert.isFalse(JsonValue.is(Symbol('test')));
 
-    expect(JsonValue.is(() => 'function')).toBe(false);
+    assert.isFalse(JsonValue.is(() => 'function'));
 
     // Note: keyValueRecord accepts any object with string keys, including Date/Set/Map
     // This is expected behavior for keyValueRecord, which doesn't distinguish
@@ -178,7 +178,7 @@ describe('recursive', () => {
     // Fill with default value for invalid input
     const defaultResult = JsonValue.fill(undefined);
 
-    expect(JsonValue.is(defaultResult)).toBe(true);
+    assert.isTrue(JsonValue.is(defaultResult));
   });
 
   // Test other recursive structures
@@ -206,13 +206,11 @@ describe('recursive', () => {
       },
     };
 
-    expect(LinkedListNumber.is(list)).toBe(true);
+    assert.isTrue(LinkedListNumber.is(list));
 
-    expect(LinkedListNumber.is({ value: 1, next: null })).toBe(true);
+    assert.isTrue(LinkedListNumber.is({ value: 1, next: null }));
 
-    expect(LinkedListNumber.is({ value: 'not a number', next: null })).toBe(
-      false,
-    );
+    assert.isFalse(LinkedListNumber.is({ value: 'not a number', next: null }));
   });
 
   test('Tree structure', () => {
@@ -247,10 +245,10 @@ describe('recursive', () => {
       ],
     };
 
-    expect(TreeNodeString.is(tree)).toBe(true);
+    assert.isTrue(TreeNodeString.is(tree));
 
-    expect(TreeNodeString.is({ value: 'node', children: [] })).toBe(true);
+    assert.isTrue(TreeNodeString.is({ value: 'node', children: [] }));
 
-    expect(TreeNodeString.is({ value: 123, children: [] })).toBe(false);
+    assert.isFalse(TreeNodeString.is({ value: 123, children: [] }));
   });
 });

@@ -34,7 +34,7 @@ const zodErrorMessages = zodResult.success
   ? ''
   : z.prettifyError(zodResult.error);
 
-assert.equal(
+assert.strictEqual(
   zodErrorMessages,
   '✖ Invalid input: expected number, received string\n  → at user.profile.age',
 );

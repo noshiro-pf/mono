@@ -15,9 +15,9 @@ type T = t.TypeOf<typeof T>;
 // ↑ TypeScript correctly infers: "0" | "1" | "2" | "3" | "4" (string literals)
 
 // ✅ Runtime behavior matches TypeScript types exactly
-assert(t.Result.isErr(T.validate(0))); // ❌ Fails correctly - number 0 is rejected
+assert.isTrue(t.Result.isErr(T.validate(0))); // ❌ Fails correctly - number 0 is rejected
 
-assert(t.Result.isOk(T.validate('0'))); // ✅ Success - string "0" is accepted
+assert.isTrue(t.Result.isOk(T.validate('0'))); // ✅ Success - string "0" is accepted
 
 // For this use case, if you want to define a union type of numeric literals, you can use `uintRange` from ts-fortress:
 
@@ -26,9 +26,9 @@ const U = t.uintRange({ start: 0, end: 5 });
 type U = t.TypeOf<typeof U>;
 // ↑ TypeScript correctly infers: 0 | 1 | 2 | 3 | 4 (number literals)
 
-assert(t.Result.isErr(U.validate('0'))); // ❌ Fails - string "0" is rejected
+assert.isTrue(t.Result.isErr(U.validate('0'))); // ❌ Fails - string "0" is rejected
 
-assert(t.Result.isOk(U.validate(0))); // ✅ Success - number 0 is accepted
+assert.isTrue(t.Result.isOk(U.validate(0))); // ✅ Success - number 0 is accepted
 
 // embed-sample-code-ignore-below
 // eslint-disable-next-line import-x/first

@@ -40,11 +40,11 @@ type UserProfile = t.TypeOf<typeof UserProfile>;
 
 // Important: Default value filling only occurs when fill() is called
 // The is() and validate() functions can still detect missing keys
-assert(!UserProfile.is(partialData)); // missing required keys
+assert.isFalse(UserProfile.is(partialData)); // missing required keys
 
 const result = UserProfile.validate(partialData);
 
-assert(t.Result.isErr(result));
+assert.isTrue(t.Result.isErr(result));
 
 assert.deepStrictEqual(
   t.validationErrorsToMessages(

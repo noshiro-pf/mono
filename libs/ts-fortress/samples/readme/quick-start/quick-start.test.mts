@@ -33,13 +33,13 @@ const userData = {
   isActive: true,
 } as const;
 
-assert(User.is(userData));
+assert.isTrue(User.is(userData));
 
 if (User.is(userData)) {
   // userData is now typed as User
   userData satisfies User;
 
-  assert.equal(
+  assert.strictEqual(
     `User: ${userData.name}, Age: ${userData.age}`,
     'User: John Doe, Age: 30',
   );

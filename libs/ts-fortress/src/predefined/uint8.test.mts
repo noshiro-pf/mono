@@ -14,15 +14,15 @@ describe(uint8, () => {
   });
 
   test('valid boundaries', () => {
-    expect(Result.isOk(t0.validate(0))).toBe(true);
+    assert.isTrue(Result.isOk(t0.validate(0)));
 
-    expect(Result.isOk(t0.validate(255))).toBe(true);
+    assert.isTrue(Result.isOk(t0.validate(255)));
   });
 
   test('exclusive end', () => {
     const t = uint8(7);
 
-    expect(Result.isErr(t.validate(256))).toBe(true);
+    assert.isTrue(Result.isErr(t.validate(256)));
 
     expect(t.fill(999)).toBe(7);
 

@@ -24,7 +24,7 @@ describe(symbol, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(true);
+      assert.isTrue(targetType.is(x));
     });
 
     test('falsy case', () => {
@@ -36,7 +36,7 @@ describe(symbol, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -46,7 +46,7 @@ describe(symbol, () => {
 
       const result = targetType.validate(testSym);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -56,7 +56,7 @@ describe(symbol, () => {
     test('falsy case', () => {
       const result = targetType.validate('not a symbol');
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -80,7 +80,7 @@ describe(symbol, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -96,7 +96,7 @@ describe(symbol, () => {
 
       expect(() => {
         assertIs(x);
-      }).not.toThrow();
+      }).not.toThrowError();
     });
 
     test('falsy case', () => {
@@ -106,7 +106,7 @@ describe(symbol, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrow('Error');
+      }).toThrowError('Error');
     });
   });
 
@@ -122,7 +122,7 @@ describe(symbol, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Error');
+      expect(() => targetType.cast(x)).toThrowError('Error');
     });
   });
 

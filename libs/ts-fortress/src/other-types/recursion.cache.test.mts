@@ -23,7 +23,7 @@ describe('recursion - caching and defaultValue', () => {
 
     // Using is()/fill()/validate() does not trigger additional definition calls
 
-    expect(T.is({ x: 2 })).toBe(true);
+    assert.isTrue(T.is({ x: 2 }));
 
     assert.deepStrictEqual(T.fill({}), { x: 1 });
 
@@ -49,7 +49,7 @@ describe('recursion - caching and defaultValue', () => {
 
     // validate triggers definition exactly once
 
-    expect(T.is({ x: 7 })).toBe(true);
+    assert.isTrue(T.is({ x: 7 }));
 
     expect(mut_calls).toBe(1);
   });

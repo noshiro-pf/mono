@@ -7,7 +7,7 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export const intRange = <Start extends Int8 | -128, End extends Int8 | 128>({
+export const intRange = <Start extends Int8, End extends Int8 | 128>({
   end,
   start,
   ...options
@@ -66,7 +66,7 @@ type NegativeRange = NegativeIndex<128>;
 
 type PositiveRange = IndexInclusive<128>;
 
-type IntRange<Start extends Int8 | -128, End extends Int8 | 128> =
+type IntRange<Start extends Int8, End extends Int8 | 128> =
   BoolAnd<
     TypeExtends<Start, PositiveRange>,
     TypeExtends<End, PositiveRange>

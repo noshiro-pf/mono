@@ -13,7 +13,7 @@ const invalidData = { name: 123, age: 'not a number' };
 
 const result = User.validate(invalidData);
 
-assert(t.Result.isErr(result));
+assert.isTrue(t.Result.isErr(result));
 
 // result.value is an array of ValidationError objects
 
@@ -72,7 +72,7 @@ const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
 
 const strictResult = StrictType.validate(dataWithExcess);
 
-assert(t.Result.isErr(strictResult));
+assert.isTrue(t.Result.isErr(strictResult));
 
 assert.deepStrictEqual(strictResult.value, [
   {

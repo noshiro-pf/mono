@@ -43,7 +43,7 @@ describe(omit, () => {
         expectType<typeof x, UnknownRecord>('=');
       }
 
-      expect(ym.is(x)).toBe(true);
+      assert.isTrue(ym.is(x));
     });
 
     test('falsy case', () => {
@@ -58,7 +58,7 @@ describe(omit, () => {
         expectType<typeof x, UnknownRecord>('=');
       }
 
-      expect(ym.is(x)).toBe(false);
+      assert.isFalse(ym.is(x));
     });
   });
 
@@ -71,7 +71,7 @@ describe(omit, () => {
 
       const result = ym.validate(x);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -91,7 +91,7 @@ describe(omit, () => {
 
       const result = ym.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -121,7 +121,7 @@ describe(omit, () => {
 
       const result = ymAllow.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -140,7 +140,7 @@ describe(omit, () => {
 
       const result = ym.validate(x);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue2 = Result.unwrapThrow(result);
 
@@ -165,7 +165,7 @@ describe(omit, () => {
 
       const result = ym.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue3 = Result.unwrapThrow(result);
 
@@ -186,7 +186,7 @@ describe(omit, () => {
 
       const result = ym.validate(x);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 

@@ -48,7 +48,7 @@ describe(intersection, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(true);
+        assert.isTrue(targetType.is(x));
       });
 
       test('truthy case 2', () => {
@@ -60,7 +60,7 @@ describe(intersection, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(true);
+        assert.isTrue(targetType.is(x));
       });
 
       test('falsy case', () => {
@@ -72,7 +72,7 @@ describe(intersection, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(false);
+        assert.isFalse(targetType.is(x));
       });
     });
 
@@ -85,7 +85,7 @@ describe(intersection, () => {
           Result<TargetType, readonly ValidationError[]>
         >('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue = Result.unwrapThrow(result);
 
@@ -97,7 +97,7 @@ describe(intersection, () => {
 
         const result = targetType.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue1 = Result.unwrapThrow(result);
 
@@ -107,7 +107,7 @@ describe(intersection, () => {
       test('falsy case', () => {
         const result = targetType.validate({ x: 0, y: 1 });
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError = Result.unwrapErrThrow(result);
 
@@ -190,7 +190,7 @@ describe(intersection, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(true);
+        assert.isTrue(targetType.is(x));
       });
 
       test('falsy case', () => {
@@ -202,7 +202,7 @@ describe(intersection, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(false);
+        assert.isFalse(targetType.is(x));
       });
     });
 
@@ -215,7 +215,7 @@ describe(intersection, () => {
           Result<TargetType, readonly ValidationError[]>
         >('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue2 = Result.unwrapThrow(result);
 
@@ -227,7 +227,7 @@ describe(intersection, () => {
 
         const result = targetType.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue3 = Result.unwrapThrow(result);
 
@@ -237,7 +237,7 @@ describe(intersection, () => {
       test('falsy case', () => {
         const result = targetType.validate('aaa');
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError1 = Result.unwrapErrThrow(result);
 
@@ -324,7 +324,7 @@ describe(intersection, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(true);
+        assert.isTrue(targetType.is(x));
       });
 
       test('falsy case 1', () => {
@@ -336,7 +336,7 @@ describe(intersection, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(false);
+        assert.isFalse(targetType.is(x));
       });
 
       test('falsy case 2', () => {
@@ -348,7 +348,7 @@ describe(intersection, () => {
           expectType<typeof x, unknown>('=');
         }
 
-        expect(targetType.is(x)).toBe(false);
+        assert.isFalse(targetType.is(x));
       });
     });
 
@@ -361,7 +361,7 @@ describe(intersection, () => {
           Result<TargetType, readonly ValidationError[]>
         >('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue4 = Result.unwrapThrow(result);
 
@@ -373,7 +373,7 @@ describe(intersection, () => {
 
         const result = targetType.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue5 = Result.unwrapThrow(result);
 
@@ -383,7 +383,7 @@ describe(intersection, () => {
       test('falsy case', () => {
         const result = targetType.validate(7);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError2 = Result.unwrapErrThrow(result);
 

@@ -25,7 +25,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
 
   const typeName = options?.typeName ?? 'key-value-record';
 
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/consistent-type-assertions
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const defaultValue = {} as T;
 
   const validate: Type<T>['validate'] = (a) => {

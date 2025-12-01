@@ -18,19 +18,19 @@ describe(strictRecord, () => {
     test('valid data without excess properties', () => {
       const validUser = { name: 'John', age: 30 };
 
-      expect(userType.is(validUser)).toBe(true);
+      assert.isTrue(userType.is(validUser));
     });
 
     test('rejects data with excess properties', () => {
       const userWithExtra = { name: 'John', age: 30, extra: 'not allowed' };
 
-      expect(userType.is(userWithExtra)).toBe(false);
+      assert.isFalse(userType.is(userWithExtra));
     });
 
     test('rejects invalid property types', () => {
       const invalidUser = { name: 'John', age: 'thirty' };
 
-      expect(userType.is(invalidUser)).toBe(false);
+      assert.isFalse(userType.is(invalidUser));
     });
   });
 
@@ -40,7 +40,7 @@ describe(strictRecord, () => {
 
       const result = userType.validate(validUser);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -57,7 +57,7 @@ describe(strictRecord, () => {
 
       const result = userType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -69,7 +69,7 @@ describe(strictRecord, () => {
 
       const result = userType.validate(userWithExtra);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -96,7 +96,7 @@ describe(strictRecord, () => {
 
       const result = userType.validate(invalidUser);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError1 = Result.unwrapErrThrow(result);
 
@@ -116,7 +116,7 @@ describe(strictRecord, () => {
 
       const result = userType.validate(incompleteUser);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError2 = Result.unwrapErrThrow(result);
 
@@ -144,21 +144,21 @@ describe(strictRecord, () => {
     test('regular record allows excess properties', () => {
       const dataWithExtra = { name: 'John', age: 30, extra: 'allowed' };
 
-      expect(regularRecord.is(dataWithExtra)).toBe(true);
+      assert.isTrue(regularRecord.is(dataWithExtra));
 
-      expect(
+      assert.isFalse(
         strictRecord({ name: string(), age: number() }).is(dataWithExtra),
-      ).toBe(false);
+      );
     });
 
     test('both reject invalid property types', () => {
       const invalidData = { name: 'John', age: 'thirty' };
 
-      expect(regularRecord.is(invalidData)).toBe(false);
+      assert.isFalse(regularRecord.is(invalidData));
 
-      expect(
+      assert.isFalse(
         strictRecord({ name: string(), age: number() }).is(invalidData),
-      ).toBe(false);
+      );
     });
   });
 
@@ -178,7 +178,7 @@ describe(strictRecord, () => {
         extra: 'not allowed',
       });
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError3 = Result.unwrapErrThrow(result);
 

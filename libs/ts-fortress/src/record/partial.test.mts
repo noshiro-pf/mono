@@ -74,7 +74,7 @@ describe(partial, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(true);
+        assert.isTrue(ymd.is(x));
       });
 
       test('falsy case', () => {
@@ -90,7 +90,7 @@ describe(partial, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(false);
+        assert.isFalse(ymd.is(x));
       });
     });
 
@@ -106,7 +106,7 @@ describe(partial, () => {
 
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue = Result.unwrapThrow(result);
 
@@ -126,7 +126,7 @@ describe(partial, () => {
 
         const result = ymd.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue1 = Result.unwrapThrow(result);
 
@@ -156,7 +156,7 @@ describe(partial, () => {
 
         const result = ymdAllow.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue1 = Result.unwrapThrow(result);
 
@@ -173,7 +173,7 @@ describe(partial, () => {
 
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue2 = Result.unwrapThrow(result);
 
@@ -185,7 +185,7 @@ describe(partial, () => {
 
         const result = ymd.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue3 = Result.unwrapThrow(result);
 
@@ -211,7 +211,7 @@ describe(partial, () => {
 
         const result = ymdAllow.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue3 = Result.unwrapThrow(result);
 
@@ -233,7 +233,7 @@ describe(partial, () => {
 
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue4 = Result.unwrapThrow(result);
 
@@ -258,7 +258,7 @@ describe(partial, () => {
 
         const result = ymd.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue5 = Result.unwrapThrow(result);
 
@@ -280,7 +280,7 @@ describe(partial, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError = Result.unwrapErrThrow(result);
 
@@ -315,7 +315,7 @@ describe(partial, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError1 = Result.unwrapErrThrow(result);
 
@@ -417,7 +417,7 @@ describe(partial, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(true);
+        assert.isTrue(ymd.is(x));
       });
 
       test('falsy case 1', () => {
@@ -433,7 +433,7 @@ describe(partial, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(false);
+        assert.isFalse(ymd.is(x));
       });
 
       test('falsy case 2', () => {
@@ -447,7 +447,7 @@ describe(partial, () => {
           expectType<typeof x, UnknownRecord>('=');
         }
 
-        expect(ymd.is(x)).toBe(false);
+        assert.isFalse(ymd.is(x));
       });
     });
 
@@ -462,7 +462,7 @@ describe(partial, () => {
 
         expectType<typeof result, Result<Ymd, readonly ValidationError[]>>('=');
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue6 = Result.unwrapThrow(result);
 
@@ -480,7 +480,7 @@ describe(partial, () => {
 
         const result = ymd.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue7 = Result.unwrapThrow(result);
 
@@ -511,7 +511,7 @@ describe(partial, () => {
 
         const result = ymdAllow.validate(input);
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         const resultValue7 = Result.unwrapThrow(result);
 
@@ -530,7 +530,7 @@ describe(partial, () => {
 
         const result = ymd.validate(x);
 
-        expect(Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isErr(result));
 
         const resultError2 = Result.unwrapErrThrow(result);
 

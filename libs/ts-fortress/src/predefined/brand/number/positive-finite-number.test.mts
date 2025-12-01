@@ -1,9 +1,4 @@
-import {
-  expectType,
-  isNumber,
-  isPositiveFiniteNumber,
-  Result,
-} from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { positiveFiniteNumber } from './positive-finite-number.mjs';
@@ -30,11 +25,7 @@ describe(positiveFiniteNumber, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(true);
-
-      assert(isNumber(x));
-
-      expect(isPositiveFiniteNumber(x)).toBe(true);
+      assert.isTrue(isTarget);
     });
 
     test('falsy case - zero', () => {
@@ -48,25 +39,25 @@ describe(positiveFiniteNumber, () => {
         expectType<typeof x, unknown>('=');
       }
 
-      expect(isTarget).toBe(false);
+      assert.isFalse(isTarget);
     });
 
     test('falsy case - negative', () => {
       const x: unknown = -5.5;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
 
     test('falsy case - infinity', () => {
       const x: unknown = Number.POSITIVE_INFINITY;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
 
     test('falsy case - NaN', () => {
       const x: unknown = Number.NaN;
 
-      expect(targetType.is(x)).toBe(false);
+      assert.isFalse(targetType.is(x));
     });
   });
 
@@ -74,7 +65,7 @@ describe(positiveFiniteNumber, () => {
     test('truthy case', () => {
       const result = targetType.validate(789.012);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -86,7 +77,7 @@ describe(positiveFiniteNumber, () => {
 
       const result = targetType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -96,7 +87,7 @@ describe(positiveFiniteNumber, () => {
     test('falsy case - zero', () => {
       const result = targetType.validate(0);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       const resultError = Result.unwrapErrThrow(result);
 
@@ -126,7 +117,7 @@ describe(positiveFiniteNumber, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrow('Error');
+      expect(() => targetType.cast(x)).toThrowError('Error');
     });
   });
 

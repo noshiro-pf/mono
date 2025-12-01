@@ -26,7 +26,7 @@ test('JsonValueIoTs', () => {
       ]),
   );
 
-  expect(JsonValueIoTs.is({ a: 1, b: [1, 2, 3] })).toBe(true);
+  assert.isTrue(JsonValueIoTs.is({ a: 1, b: [1, 2, 3] }));
 });
 
 describe('inconsistent keyof type', () => {
@@ -41,9 +41,9 @@ describe('inconsistent keyof type', () => {
 
     // ❌ Runtime behavior is inconsistent with TypeScript types!
 
-    expect(T.is(0)).toBe(false); // false (fails) - number 0 is rejected
+    assert.isFalse(T.is(0)); // false (fails) - number 0 is rejected
 
-    expect(T.is('0')).toBe(true); // true (succeeds) - string "0" is accepted
+    assert.isTrue(T.is('0')); // true (succeeds) - string "0" is accepted
 
     type T = t.TypeOf<typeof T>;
 
@@ -65,9 +65,9 @@ describe('inconsistent keyof type', () => {
 
     // ✅ ts-fortress correctly handles numeric keys as strings
 
-    expect(T.is(0)).toBe(false); // false - number 0 is rejected
+    assert.isFalse(T.is(0)); // false - number 0 is rejected
 
-    expect(T.is('0')).toBe(true); // true - string "0" is accepted
+    assert.isTrue(T.is('0')); // true - string "0" is accepted
 
     type T = (typeof T)['defaultValue'];
 
@@ -116,9 +116,9 @@ describe('union + undefined decode issues', () => {
 
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct
 
-      expect(A.is(right)).toBe(true); // ✅ correct
+      assert.isTrue(A.is(right)); // ✅ correct
 
-      expect(B.is(right)).toBe(false); // ✅ correct
+      assert.isFalse(B.is(right)); // ✅ correct
     });
 
     test('UnionBA', () => {
@@ -134,9 +134,9 @@ describe('union + undefined decode issues', () => {
 
       assert.deepStrictEqual(right, { A: 1, B: undefined }); // ❌ incorrect (expected to be { A: 1 })
 
-      expect(A.is(right)).toBe(true); // ✅ correct
+      assert.isTrue(A.is(right)); // ✅ correct
 
-      expect(B.is(right)).toBe(true); // ❌ incorrect (expected to be false)
+      assert.isTrue(B.is(right)); // ❌ incorrect (expected to be false)
     });
 
     test('UnionAC', () => {
@@ -152,9 +152,9 @@ describe('union + undefined decode issues', () => {
 
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct
 
-      expect(A.is(right)).toBe(true); // ✅ correct
+      assert.isTrue(A.is(right)); // ✅ correct
 
-      expect(C.is(right)).toBe(true); // ✅ correct (partial type accepts it)
+      assert.isTrue(C.is(right)); // ✅ correct (partial type accepts it)
     });
 
     test('UnionCA', () => {
@@ -170,9 +170,9 @@ describe('union + undefined decode issues', () => {
 
       assert.deepStrictEqual(right, { A: 1 }); // ✅ correct (not {})
 
-      expect(A.is(right)).toBe(true); // ✅ correct
+      assert.isTrue(A.is(right)); // ✅ correct
 
-      expect(C.is(right)).toBe(true); // ✅ correct
+      assert.isTrue(C.is(right)); // ✅ correct
     });
   });
 
@@ -204,57 +204,57 @@ describe('union + undefined decode issues', () => {
     test('UnionAB', () => {
       const res = UnionAB.validate(target);
 
-      expect(Result.isOk(res)).toBe(true); // should succeed
+      assert.isTrue(Result.isOk(res)); // should succeed
 
       const resValue = Result.unwrapThrow(res);
 
       assert.deepStrictEqual(resValue, { A: 1 }); // ✅ correct
 
-      expect(A.is(resValue)).toBe(true); // ✅ correct
+      assert.isTrue(A.is(resValue)); // ✅ correct
 
-      expect(B.is(resValue)).toBe(false); // ✅ correct
+      assert.isFalse(B.is(resValue)); // ✅ correct
     });
 
     test('UnionBA', () => {
       const res = UnionBA.validate(target);
 
-      expect(Result.isOk(res)).toBe(true); // should succeed
+      assert.isTrue(Result.isOk(res)); // should succeed
 
       const resValue1 = Result.unwrapThrow(res);
 
       assert.deepStrictEqual(resValue1, { A: 1 }); // ✅ correct (not { A: 1, B: undefined })
 
-      expect(A.is(resValue1)).toBe(true); // ✅ correct
+      assert.isTrue(A.is(resValue1)); // ✅ correct
 
-      expect(B.is(resValue1)).toBe(false); // ✅ correct (not true)
+      assert.isFalse(B.is(resValue1)); // ✅ correct (not true)
     });
 
     test('UnionAC', () => {
       const res = UnionAC.validate(target);
 
-      expect(Result.isOk(res)).toBe(true); // should succeed
+      assert.isTrue(Result.isOk(res)); // should succeed
 
       const resValue2 = Result.unwrapThrow(res);
 
       assert.deepStrictEqual(resValue2, { A: 1 }); // ✅ correct
 
-      expect(A.is(resValue2)).toBe(true); // ✅ correct
+      assert.isTrue(A.is(resValue2)); // ✅ correct
 
-      expect(C.is(resValue2)).toBe(true); // ✅ correct (partial type accepts it)
+      assert.isTrue(C.is(resValue2)); // ✅ correct (partial type accepts it)
     });
 
     test('UnionCA', () => {
       const res = UnionCA.validate(target);
 
-      expect(Result.isOk(res)).toBe(true); // should succeed
+      assert.isTrue(Result.isOk(res)); // should succeed
 
       const resValue3 = Result.unwrapThrow(res);
 
       assert.deepStrictEqual(resValue3, { A: 1 }); // ✅ correct (not {})
 
-      expect(A.is(resValue3)).toBe(true); // ✅ correct
+      assert.isTrue(A.is(resValue3)); // ✅ correct
 
-      expect(C.is(resValue3)).toBe(true); // ✅ correct
+      assert.isTrue(C.is(resValue3)); // ✅ correct
     });
   });
 });

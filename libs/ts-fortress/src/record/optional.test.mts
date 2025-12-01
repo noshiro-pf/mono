@@ -32,17 +32,17 @@ describe(optional, () => {
 
   describe(isOptionalProperty, () => {
     test('returns true for optional property', () => {
-      expect(isOptionalProperty(optionalNumber)).toBe(true);
+      assert.isTrue(isOptionalProperty(optionalNumber));
     });
 
     test('returns false for non-optional property', () => {
-      expect(isOptionalProperty(numberType)).toBe(false);
+      assert.isFalse(isOptionalProperty(numberType));
     });
 
     test('returns false for object without optional key', () => {
       const { optional: _, ...obj } = { ...numberType };
 
-      expect(isOptionalProperty(obj)).toBe(false);
+      assert.isFalse(isOptionalProperty(obj));
     });
   });
 });

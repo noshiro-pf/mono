@@ -99,17 +99,17 @@ describe(iso8601, () => {
   expectType<typeof baseType.defaultValue, Iso8601Type>('=');
 
   test.each(validSamples)('should accept $0', (e) => {
-    expect(baseType.is(e)).toBe(true);
+    assert.isTrue(baseType.is(e));
   });
 
   test.each(invalidSamples)('should reject $0', (e) => {
-    expect(baseType.is(e)).toBe(false);
+    assert.isFalse(baseType.is(e));
   });
 
   test.each(expandedYearFormats)(
     'currently rejects expanded year formats $0',
     (e) => {
-      expect(baseType.is(e)).toBe(false);
+      assert.isFalse(baseType.is(e));
     },
   );
 
@@ -120,9 +120,9 @@ describe(iso8601, () => {
       strictSeparator: false,
     });
 
-    expect(strictType.is('2008-02-29')).toBe(true);
+    assert.isTrue(strictType.is('2008-02-29'));
 
-    expect(strictType.is('2009-02-29')).toBe(false);
+    assert.isFalse(strictType.is('2009-02-29'));
   });
 
   test('strictSeparator mode enforces the T delimiter', () => {
@@ -132,15 +132,15 @@ describe(iso8601, () => {
       strictSeparator: true,
     });
 
-    expect(type.is('2009-05-19T14:39:22')).toBe(true);
+    assert.isTrue(type.is('2009-05-19T14:39:22'));
 
-    expect(type.is('2009-05-19 14:39:22')).toBe(false);
+    assert.isFalse(type.is('2009-05-19 14:39:22'));
   });
 
   test('validate yields detailed errors for invalid strings', () => {
     const result = baseType.validate('not-an-iso-date');
 
-    expect(Result.isErr(result)).toBe(true);
+    assert.isTrue(Result.isErr(result));
 
     if (!Result.isErr(result)) {
       throw new Error('Expected validation failure');
@@ -166,7 +166,7 @@ describe(iso8601, () => {
 
     expect(baseType.fill(value)).toBe(value);
 
-    expect(() => baseType.cast(value)).not.toThrow();
+    expect(() => baseType.cast(value)).not.toThrowError();
   });
 
   test('fill falls back to default for invalid values', () => {

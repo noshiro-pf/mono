@@ -80,10 +80,10 @@ describe(email, () => {
   expectType<typeof baseType.defaultValue, EmailType>('=');
 
   test.each(validSamples)('should accept $0', (e) => {
-    expect(baseType.is(e)).toBe(true);
+    assert.isTrue(baseType.is(e));
   });
 
   test.each(invalidSamples)('should reject $0', (e) => {
-    expect(baseType.is(e)).toBe(false);
+    assert.isFalse(baseType.is(e));
   });
 });

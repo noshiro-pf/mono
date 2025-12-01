@@ -28,7 +28,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = pickedType.validate(dataWithExcess);
 
-      assert(Result.isErr(result));
+      assert.isTrue(Result.isErr(result));
 
       assert.deepStrictEqual(result.value, [
         {
@@ -53,7 +53,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = pickedType.validate(validData);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -67,7 +67,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = pickedType.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
@@ -84,7 +84,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = omittedType.validate(dataWithExcess);
 
-      assert(Result.isErr(result));
+      assert.isTrue(Result.isErr(result));
 
       assert.deepStrictEqual(result.value, [
         {
@@ -111,7 +111,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = partialType.validate(dataWithExcess);
 
-      assert(Result.isErr(result));
+      assert.isTrue(Result.isErr(result));
 
       assert.deepStrictEqual(result.value, [
         {
@@ -140,7 +140,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = strictRecord.validate(data);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
     });
 
     test('strictRecord validate returns input as-is for OK cases', () => {
@@ -148,7 +148,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = strictRecord.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue2 = Result.unwrapThrow(result);
 
@@ -160,7 +160,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = permissiveRecord.validate(data);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -177,7 +177,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = permissiveRecord.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue3 = Result.unwrapThrow(result);
 
@@ -198,7 +198,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = strictPicked.validate(data);
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
     });
 
     test('pick from default record strips excess properties', () => {
@@ -208,7 +208,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = permissivePicked.validate(data);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue = Result.unwrapThrow(result);
 
@@ -226,7 +226,7 @@ describe('record strict composition - simple tests', () => {
 
       const result = permissivePicked.validate(input);
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const resultValue4 = Result.unwrapThrow(result);
 
