@@ -15,7 +15,6 @@
     "tscw",
     "XNOR"
   ],
-  "flagWords": [],
   "ignorePaths": [
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
