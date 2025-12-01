@@ -75,7 +75,7 @@ const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
 };
 
 const runStep = async (
-  promise: Promise<Result<unknown, unknown>>,
+  promise: Promise<UnknownResult>,
   errorMsg: string,
 ): Promise<void> => {
   const result = await promise;
