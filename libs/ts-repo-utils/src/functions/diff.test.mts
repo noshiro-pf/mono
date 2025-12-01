@@ -99,10 +99,10 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          expect(Array.isArray(result.value)).toBe(true);
+          assert.isTrue(Array.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -124,7 +124,7 @@ describe('diff', () => {
 
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -157,7 +157,7 @@ describe('diff', () => {
 
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -199,7 +199,7 @@ describe('diff', () => {
 
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -221,7 +221,7 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -247,7 +247,7 @@ describe('diff', () => {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
         // Should always return a Result, either Ok or Err
-        expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isOk(result) || Result.isErr(result));
       } finally {
         await cleanup();
       }
@@ -261,7 +261,7 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -288,10 +288,10 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          expect(Array.isArray(result.value)).toBe(true);
+          assert.isTrue(Array.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -308,10 +308,10 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getStagedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          expect(Array.isArray(result.value)).toBe(true);
+          assert.isTrue(Array.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -336,7 +336,7 @@ describe('diff', () => {
 
         const result = await repoFunctions.getStagedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -374,7 +374,7 @@ describe('diff', () => {
 
         const result = await repoFunctions.getStagedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -420,7 +420,7 @@ describe('diff', () => {
           silent: true,
         });
 
-        expect(Result.isOk(resultExclude)).toBe(true);
+        assert.isTrue(Result.isOk(resultExclude));
 
         if (Result.isOk(resultExclude)) {
           const files = resultExclude.value;
@@ -444,7 +444,7 @@ describe('diff', () => {
             silent: true,
           });
 
-          expect(Result.isOk(resultInclude)).toBe(true);
+          assert.isTrue(Result.isOk(resultInclude));
 
           if (Result.isOk(resultInclude)) {
             const files = resultInclude.value;
@@ -470,7 +470,7 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getStagedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -495,10 +495,10 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getStagedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          expect(Array.isArray(result.value)).toBe(true);
+          assert.isTrue(Array.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -514,7 +514,7 @@ describe('diff', () => {
         const result = await repoFunctions.getStagedFiles({ silent: true });
 
         // Should always return a Result, either Ok or Err
-        expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isOk(result) || Result.isErr(result));
       } finally {
         await cleanup();
       }
@@ -530,10 +530,10 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          expect(Array.isArray(result.value)).toBe(true);
+          assert.isTrue(Array.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -565,7 +565,7 @@ describe('diff', () => {
 
         const result = await repoFunctions.getModifiedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -612,7 +612,7 @@ describe('diff', () => {
 
         const result = await repoFunctions.getModifiedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -654,7 +654,7 @@ describe('diff', () => {
           silent: true,
         });
 
-        expect(Result.isOk(resultExclude)).toBe(true);
+        assert.isTrue(Result.isOk(resultExclude));
 
         if (Result.isOk(resultExclude)) {
           const files = resultExclude.value;
@@ -668,7 +668,7 @@ describe('diff', () => {
           silent: true,
         });
 
-        expect(Result.isOk(resultInclude)).toBe(true);
+        assert.isTrue(Result.isOk(resultInclude));
 
         if (Result.isOk(resultInclude)) {
           const files = resultInclude.value;
@@ -688,7 +688,7 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
           const files = result.value;
@@ -713,10 +713,10 @@ describe('diff', () => {
       try {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
 
-        expect(Result.isOk(result)).toBe(true);
+        assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          expect(Array.isArray(result.value)).toBe(true);
+          assert.isTrue(Array.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -732,7 +732,7 @@ describe('diff', () => {
         const result = await repoFunctions.getModifiedFiles({ silent: true });
 
         // Should always return a Result, either Ok or Err
-        expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isOk(result) || Result.isErr(result));
       } finally {
         await cleanup();
       }
@@ -763,7 +763,7 @@ describe('diff', () => {
           silent: true,
         });
 
-        expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
+        assert.isTrue(Result.isOk(result) || Result.isErr(result));
       } finally {
         await cleanup();
       }

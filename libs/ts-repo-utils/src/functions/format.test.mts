@@ -74,7 +74,7 @@ describe(formatFilesGlob, () => {
       // Format TypeScript files
       const result = await formatFilesGlob(`${testDir}/*.ts`, { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Check that files were formatted
       const content1 = await readTestFile(file1);
@@ -113,7 +113,7 @@ describe(formatFilesGlob, () => {
       silent: true,
     });
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
   });
 
   test('should handle nested directories with glob pattern', async () => {
@@ -136,7 +136,7 @@ describe(formatFilesGlob, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Check that nested file was formatted
       const content = await readTestFile(nestedFile);
@@ -203,7 +203,7 @@ describe(formatFiles, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Check formatted content
       const content1 = await readTestFile(file1);
@@ -235,7 +235,7 @@ describe(formatFiles, () => {
       silent: true,
     });
 
-    expect(Result.isOk(result)).toBe(true);
+    assert.isTrue(Result.isOk(result));
   });
 });
 
@@ -304,7 +304,7 @@ describe(formatUncommittedFiles, () => {
 
       const result = await formatUncommittedFiles({ silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Verify all git functions were called
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
@@ -345,7 +345,7 @@ describe(formatUncommittedFiles, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
 
@@ -376,7 +376,7 @@ describe(formatUncommittedFiles, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       expect(getUntrackedFiles).not.toHaveBeenCalled();
 
@@ -407,7 +407,7 @@ describe(formatUncommittedFiles, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       expect(getUntrackedFiles).not.toHaveBeenCalled();
 
@@ -450,7 +450,7 @@ describe(formatUncommittedFiles, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       expect(getUntrackedFiles).toHaveBeenCalledWith({ silent: true });
 
@@ -481,7 +481,7 @@ describe(formatUncommittedFiles, () => {
 
       const result = await formatUncommittedFiles({ silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Verify file was formatted (only once despite appearing in all categories)
       const content = await fs.readFile(duplicateFile, 'utf8');
@@ -504,7 +504,7 @@ describe(formatUncommittedFiles, () => {
 
       const result = await formatUncommittedFiles({ silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
     } finally {
       await cleanupTest();
     }
@@ -525,7 +525,7 @@ describe(formatUncommittedFiles, () => {
         silent: true,
       });
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       if (Result.isErr(result)) {
         assert.deepStrictEqual(result.value, error);
@@ -550,7 +550,7 @@ describe(formatUncommittedFiles, () => {
         silent: true,
       });
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       if (Result.isErr(result)) {
         assert.deepStrictEqual(result.value, error);
@@ -575,7 +575,7 @@ describe(formatUncommittedFiles, () => {
         silent: true,
       });
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       if (Result.isErr(result)) {
         assert.deepStrictEqual(result.value, error);
@@ -605,12 +605,12 @@ describe(formatUncommittedFiles, () => {
 
       const result1 = await formatUncommittedFiles({ silent: false });
 
-      expect(Result.isOk(result1)).toBe(true);
+      assert.isTrue(Result.isOk(result1));
       // With silent: false, console output may occur
 
       const result2 = await formatUncommittedFiles({ silent: true });
 
-      expect(Result.isOk(result2)).toBe(true);
+      assert.isTrue(Result.isOk(result2));
       // With silent: true, console output should be suppressed
 
       vi.unstubAllGlobals();
@@ -643,7 +643,7 @@ describe(formatUncommittedFiles, () => {
 
       const result = await formatUncommittedFiles({ silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       const content = await fs.readFile(path.join(testDir, testFile), 'utf8');
 
@@ -682,7 +682,7 @@ describe(formatUncommittedFiles, () => {
       const result = await formatUncommittedFiles({ silent: true });
 
       // Should handle error gracefully
-      expect(Result.isOk(result) || Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isOk(result) || Result.isErr(result));
     } finally {
       await cleanupTest();
     }
@@ -733,7 +733,7 @@ describe(formatDiffFrom, () => {
 
       const result = await formatDiffFrom('main', { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Check file was formatted
       const content = await readTestFile(file1);
@@ -787,7 +787,7 @@ describe(formatDiffFrom, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Check both files were formatted
       const diffContent = await readTestFile(diffFile);
@@ -841,7 +841,7 @@ describe(formatDiffFrom, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Verify both functions were called
       expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
@@ -902,7 +902,7 @@ describe(formatDiffFrom, () => {
       // Test default behavior (no options provided)
       const result = await formatDiffFrom('main', { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Check all files were formatted
       const diffContent = await readTestFile(diffFile);
@@ -976,7 +976,7 @@ describe(formatDiffFrom, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Check both files were formatted
       const diffContent = await readTestFile(diffFile);
@@ -1033,7 +1033,7 @@ describe(formatDiffFrom, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Verify all functions were called
       expect(getDiffFrom).toHaveBeenCalledWith('main', { silent: true });
@@ -1084,7 +1084,7 @@ describe(formatDiffFrom, () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       // Check only diff file was formatted
       const diffContent = await readTestFile(diffFile);

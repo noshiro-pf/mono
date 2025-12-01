@@ -28,7 +28,7 @@ describe('exec-async', () => {
     test('should execute simple command successfully', async () => {
       const result = await $('echo "hello world"', { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('hello world');
@@ -40,7 +40,7 @@ describe('exec-async', () => {
     test('should execute command with multiple lines of output', async () => {
       const result = await $('echo "line1\nline2\nline3"', { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('line1\nline2\nline3');
@@ -52,7 +52,7 @@ describe('exec-async', () => {
     test('should handle empty output', async () => {
       const result = await $('true', { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value.stdout).toBe('');
@@ -66,7 +66,7 @@ describe('exec-async', () => {
     test('should handle command not found error', async () => {
       const result = await $('nonexistent_command_xyz', { silent: true });
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       if (Result.isErr(result)) {
         expect(result.value).toBeDefined();
@@ -78,7 +78,7 @@ describe('exec-async', () => {
     test('should handle exit code error', async () => {
       const result = await $('exit 1', { silent: true });
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       if (Result.isErr(result)) {
         expect(result.value).toBeDefined();
@@ -92,7 +92,7 @@ describe('exec-async', () => {
         silent: true,
       });
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
 
       if (Result.isErr(result)) {
         expect(result.value).toBeDefined();
@@ -128,7 +128,7 @@ describe('exec-async', () => {
     test('should return string with default encoding', async () => {
       const result = await $('echo "test"', { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expectTypeOf(result.value.stdout).toBeString();
@@ -141,24 +141,24 @@ describe('exec-async', () => {
         encoding: 'buffer',
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
-        expect(Buffer.isBuffer(result.value.stdout)).toBe(true);
+        assert.isTrue(Buffer.isBuffer(result.value.stdout));
 
-        expect(Buffer.isBuffer(result.value.stderr)).toBe(true);
+        assert.isTrue(Buffer.isBuffer(result.value.stderr));
       }
     });
 
     test('should return Buffer with null encoding', async () => {
       const result = await $('echo "test"', { silent: true, encoding: null });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
-        expect(Buffer.isBuffer(result.value.stdout)).toBe(true);
+        assert.isTrue(Buffer.isBuffer(result.value.stdout));
 
-        expect(Buffer.isBuffer(result.value.stderr)).toBe(true);
+        assert.isTrue(Buffer.isBuffer(result.value.stderr));
       }
     });
 
@@ -168,7 +168,7 @@ describe('exec-async', () => {
         encoding: 'utf8',
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expectTypeOf(result.value.stdout).toBeString();
@@ -184,7 +184,7 @@ describe('exec-async', () => {
         silent: true,
       });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('hello world');
@@ -194,7 +194,7 @@ describe('exec-async', () => {
     test('should handle command chaining with &&', async () => {
       const result = await $('echo "first" && echo "second"', { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('first\nsecond');
@@ -204,7 +204,7 @@ describe('exec-async', () => {
     test('should handle command chaining with ;', async () => {
       const result = await $('echo "first"; echo "second"', { silent: true });
 
-      expect(Result.isOk(result)).toBe(true);
+      assert.isTrue(Result.isOk(result));
 
       if (Result.isOk(result)) {
         expect(result.value.stdout.trim()).toBe('first\nsecond');
@@ -216,7 +216,7 @@ describe('exec-async', () => {
         silent: true,
       });
 
-      expect(Result.isErr(result)).toBe(true);
+      assert.isTrue(Result.isErr(result));
     });
   });
 
