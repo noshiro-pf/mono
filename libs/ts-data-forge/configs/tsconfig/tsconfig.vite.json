@@ -3,7 +3,6 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "types": [
-      // "vitest/globals",
       "eslint-config-typed/vitest",
       "vitest/importMeta"
     ]
