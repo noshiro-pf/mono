@@ -9,39 +9,39 @@ import {
 describe('NonZeroFiniteNumber test', () => {
   describe(asNonZeroFiniteNumber, () => {
     test('accepts valid non-zero finite numbers', () => {
-      expect(() => asNonZeroFiniteNumber(1)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(1)).not.toThrowError();
 
-      expect(() => asNonZeroFiniteNumber(-1)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(-1)).not.toThrowError();
 
-      expect(() => asNonZeroFiniteNumber(3.14)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(3.14)).not.toThrowError();
 
-      expect(() => asNonZeroFiniteNumber(-2.5)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(-2.5)).not.toThrowError();
 
-      expect(() => asNonZeroFiniteNumber(0.001)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(0.001)).not.toThrowError();
 
-      expect(() => asNonZeroFiniteNumber(-0.001)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(-0.001)).not.toThrowError();
 
-      expect(() => asNonZeroFiniteNumber(Number.MAX_VALUE)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(Number.MAX_VALUE)).not.toThrowError();
 
-      expect(() => asNonZeroFiniteNumber(-Number.MAX_VALUE)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(-Number.MAX_VALUE)).not.toThrowError();
     });
 
     test('rejects zero', () => {
-      expect(() => asNonZeroFiniteNumber(0)).toThrow(TypeError);
+      expect(() => asNonZeroFiniteNumber(0)).toThrowError(TypeError);
 
-      expect(() => asNonZeroFiniteNumber(-0)).toThrow(TypeError);
+      expect(() => asNonZeroFiniteNumber(-0)).toThrowError(TypeError);
     });
 
     test('rejects non-finite numbers', () => {
-      expect(() => asNonZeroFiniteNumber(Number.NaN)).toThrow(TypeError);
+      expect(() => asNonZeroFiniteNumber(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asNonZeroFiniteNumber(Number.POSITIVE_INFINITY)).toThrow(
-        TypeError,
-      );
+      expect(() =>
+        asNonZeroFiniteNumber(Number.POSITIVE_INFINITY),
+      ).toThrowError(TypeError);
 
-      expect(() => asNonZeroFiniteNumber(Number.NEGATIVE_INFINITY)).toThrow(
-        TypeError,
-      );
+      expect(() =>
+        asNonZeroFiniteNumber(Number.NEGATIVE_INFINITY),
+      ).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -60,7 +60,7 @@ describe('NonZeroFiniteNumber test', () => {
     ] as const)(
       `asNonZeroFiniteNumber($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asNonZeroFiniteNumber(value)).toThrow(
+        expect(() => asNonZeroFiniteNumber(value)).toThrowError(
           new TypeError(`Expected a non-zero finite number, got: ${value}`),
         );
       },

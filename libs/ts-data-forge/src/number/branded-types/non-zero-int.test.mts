@@ -5,35 +5,39 @@ import { asNonZeroInt, isNonZeroInt, NonZeroInt } from './non-zero-int.mjs';
 describe('NonZeroInt test', () => {
   describe(asNonZeroInt, () => {
     test('accepts valid non-zero integers', () => {
-      expect(() => asNonZeroInt(1)).not.toThrow();
+      expect(() => asNonZeroInt(1)).not.toThrowError();
 
-      expect(() => asNonZeroInt(-1)).not.toThrow();
+      expect(() => asNonZeroInt(-1)).not.toThrowError();
 
-      expect(() => asNonZeroInt(42)).not.toThrow();
+      expect(() => asNonZeroInt(42)).not.toThrowError();
 
-      expect(() => asNonZeroInt(-42)).not.toThrow();
+      expect(() => asNonZeroInt(-42)).not.toThrowError();
 
-      expect(() => asNonZeroInt(Number.MAX_SAFE_INTEGER)).not.toThrow();
+      expect(() => asNonZeroInt(Number.MAX_SAFE_INTEGER)).not.toThrowError();
 
-      expect(() => asNonZeroInt(Number.MIN_SAFE_INTEGER)).not.toThrow();
+      expect(() => asNonZeroInt(Number.MIN_SAFE_INTEGER)).not.toThrowError();
     });
 
     test('rejects zero', () => {
-      expect(() => asNonZeroInt(0)).toThrow(TypeError);
+      expect(() => asNonZeroInt(0)).toThrowError(TypeError);
 
-      expect(() => asNonZeroInt(-0)).toThrow(TypeError);
+      expect(() => asNonZeroInt(-0)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asNonZeroInt(Number.NaN)).toThrow(TypeError);
+      expect(() => asNonZeroInt(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asNonZeroInt(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asNonZeroInt(Number.POSITIVE_INFINITY)).toThrowError(
+        TypeError,
+      );
 
-      expect(() => asNonZeroInt(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asNonZeroInt(Number.NEGATIVE_INFINITY)).toThrowError(
+        TypeError,
+      );
 
-      expect(() => asNonZeroInt(1.2)).toThrow(TypeError);
+      expect(() => asNonZeroInt(1.2)).toThrowError(TypeError);
 
-      expect(() => asNonZeroInt(-3.4)).toThrow(TypeError);
+      expect(() => asNonZeroInt(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -52,7 +56,7 @@ describe('NonZeroInt test', () => {
       { name: '-3.4', value: -3.4 },
       { name: '0', value: 0 },
     ] as const)(`asNonZeroInt($name) should throw a TypeError`, ({ value }) => {
-      expect(() => asNonZeroInt(value)).toThrow(
+      expect(() => asNonZeroInt(value)).toThrowError(
         new TypeError(`Expected a non-zero integer, got: ${value}`),
       );
     });

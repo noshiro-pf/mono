@@ -118,11 +118,11 @@ describe('parse', () => {
   });
 
   test('should not throw errors', () => {
-    expect(() => Json.parse('{{{')).not.toThrow();
+    expect(() => Json.parse('{{{')).not.toThrowError();
 
-    expect(() => Json.parse('null null')).not.toThrow();
+    expect(() => Json.parse('null null')).not.toThrowError();
 
-    expect(() => Json.parse(String(undefined))).not.toThrow();
+    expect(() => Json.parse(String(undefined))).not.toThrowError();
   });
 
   test('should use reviver function to transform values', () => {
@@ -323,9 +323,9 @@ describe('stringify', () => {
 
     mut_circularArray.push(mut_circularArray);
 
-    expect(() => Json.stringify(mut_circularArray)).not.toThrow();
+    expect(() => Json.stringify(mut_circularArray)).not.toThrowError();
 
-    expect(() => Json.stringify({ fn: () => {} })).not.toThrow();
+    expect(() => Json.stringify({ fn: () => {} })).not.toThrowError();
   });
 
   test('should use replacer function to filter values', () => {

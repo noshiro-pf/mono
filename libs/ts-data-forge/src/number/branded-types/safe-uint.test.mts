@@ -5,41 +5,47 @@ import { asSafeUint, isSafeUint, SafeUint } from './safe-uint.mjs';
 describe('SafeUint test', () => {
   describe(asSafeUint, () => {
     test('accepts valid safe unsigned integers', () => {
-      expect(() => asSafeUint(0)).not.toThrow();
+      expect(() => asSafeUint(0)).not.toThrowError();
 
-      expect(() => asSafeUint(1)).not.toThrow();
+      expect(() => asSafeUint(1)).not.toThrowError();
 
-      expect(() => asSafeUint(42)).not.toThrow();
+      expect(() => asSafeUint(42)).not.toThrowError();
 
-      expect(() => asSafeUint(100)).not.toThrow();
+      expect(() => asSafeUint(100)).not.toThrowError();
 
-      expect(() => asSafeUint(Number.MAX_SAFE_INTEGER)).not.toThrow();
+      expect(() => asSafeUint(Number.MAX_SAFE_INTEGER)).not.toThrowError();
     });
 
     test('rejects negative numbers', () => {
-      expect(() => asSafeUint(-1)).toThrow(TypeError);
+      expect(() => asSafeUint(-1)).toThrowError(TypeError);
 
-      expect(() => asSafeUint(-42)).toThrow(TypeError);
+      expect(() => asSafeUint(-42)).toThrowError(TypeError);
 
-      expect(() => asSafeUint(Number.MIN_SAFE_INTEGER)).toThrow(TypeError);
+      expect(() => asSafeUint(Number.MIN_SAFE_INTEGER)).toThrowError(TypeError);
     });
 
     test('rejects values outside safe integer range', () => {
-      expect(() => asSafeUint(Number.MAX_SAFE_INTEGER + 1)).toThrow(TypeError);
+      expect(() => asSafeUint(Number.MAX_SAFE_INTEGER + 1)).toThrowError(
+        TypeError,
+      );
 
-      expect(() => asSafeUint(Number.MAX_VALUE)).toThrow(TypeError);
+      expect(() => asSafeUint(Number.MAX_VALUE)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asSafeUint(Number.NaN)).toThrow(TypeError);
+      expect(() => asSafeUint(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asSafeUint(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asSafeUint(Number.POSITIVE_INFINITY)).toThrowError(
+        TypeError,
+      );
 
-      expect(() => asSafeUint(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asSafeUint(Number.NEGATIVE_INFINITY)).toThrowError(
+        TypeError,
+      );
 
-      expect(() => asSafeUint(1.2)).toThrow(TypeError);
+      expect(() => asSafeUint(1.2)).toThrowError(TypeError);
 
-      expect(() => asSafeUint(-3.4)).toThrow(TypeError);
+      expect(() => asSafeUint(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -60,7 +66,7 @@ describe('SafeUint test', () => {
       { name: '-3.4', value: -3.4 },
       { name: '-1', value: -1 },
     ] as const)(`asSafeUint($name) should throw a TypeError`, ({ value }) => {
-      expect(() => asSafeUint(value)).toThrow(
+      expect(() => asSafeUint(value)).toThrowError(
         new TypeError(`Expected a non-negative safe integer, got: ${value}`),
       );
     });

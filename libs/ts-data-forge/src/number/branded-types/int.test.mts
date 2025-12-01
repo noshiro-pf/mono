@@ -6,31 +6,31 @@ import { asNonZeroInt } from './non-zero-int.mjs';
 describe('Int test', () => {
   describe(asInt, () => {
     test('accepts valid integers', () => {
-      expect(() => asInt(0)).not.toThrow();
+      expect(() => asInt(0)).not.toThrowError();
 
-      expect(() => asInt(1)).not.toThrow();
+      expect(() => asInt(1)).not.toThrowError();
 
-      expect(() => asInt(-1)).not.toThrow();
+      expect(() => asInt(-1)).not.toThrowError();
 
-      expect(() => asInt(42)).not.toThrow();
+      expect(() => asInt(42)).not.toThrowError();
 
-      expect(() => asInt(-42)).not.toThrow();
+      expect(() => asInt(-42)).not.toThrowError();
 
-      expect(() => asInt(Number.MAX_SAFE_INTEGER)).not.toThrow();
+      expect(() => asInt(Number.MAX_SAFE_INTEGER)).not.toThrowError();
 
-      expect(() => asInt(Number.MIN_SAFE_INTEGER)).not.toThrow();
+      expect(() => asInt(Number.MIN_SAFE_INTEGER)).not.toThrowError();
     });
 
     test('rejects non-integers', () => {
-      expect(() => asInt(Number.NaN)).toThrow(TypeError);
+      expect(() => asInt(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asInt(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asInt(Number.POSITIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asInt(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asInt(Number.NEGATIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asInt(1.2)).toThrow(TypeError);
+      expect(() => asInt(1.2)).toThrowError(TypeError);
 
-      expect(() => asInt(-3.4)).toThrow(TypeError);
+      expect(() => asInt(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -48,7 +48,7 @@ describe('Int test', () => {
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
     ] as const)(`asInt($name) should throw a TypeError`, ({ value }) => {
-      expect(() => asInt(value)).toThrow(
+      expect(() => asInt(value)).toThrowError(
         new TypeError(`Expected an integer, got: ${value}`),
       );
     });

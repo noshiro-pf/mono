@@ -9,55 +9,57 @@ import {
 describe('PositiveSafeInt test', () => {
   describe(asPositiveSafeInt, () => {
     test('accepts valid positive safe integers', () => {
-      expect(() => asPositiveSafeInt(1)).not.toThrow();
+      expect(() => asPositiveSafeInt(1)).not.toThrowError();
 
-      expect(() => asPositiveSafeInt(2)).not.toThrow();
+      expect(() => asPositiveSafeInt(2)).not.toThrowError();
 
-      expect(() => asPositiveSafeInt(42)).not.toThrow();
+      expect(() => asPositiveSafeInt(42)).not.toThrowError();
 
-      expect(() => asPositiveSafeInt(100)).not.toThrow();
+      expect(() => asPositiveSafeInt(100)).not.toThrowError();
 
-      expect(() => asPositiveSafeInt(Number.MAX_SAFE_INTEGER)).not.toThrow();
+      expect(() =>
+        asPositiveSafeInt(Number.MAX_SAFE_INTEGER),
+      ).not.toThrowError();
     });
 
     test('rejects zero', () => {
-      expect(() => asPositiveSafeInt(0)).toThrow(TypeError);
+      expect(() => asPositiveSafeInt(0)).toThrowError(TypeError);
 
-      expect(() => asPositiveSafeInt(-0)).toThrow(TypeError);
+      expect(() => asPositiveSafeInt(-0)).toThrowError(TypeError);
     });
 
     test('rejects negative integers', () => {
-      expect(() => asPositiveSafeInt(-1)).toThrow(TypeError);
+      expect(() => asPositiveSafeInt(-1)).toThrowError(TypeError);
 
-      expect(() => asPositiveSafeInt(-42)).toThrow(TypeError);
+      expect(() => asPositiveSafeInt(-42)).toThrowError(TypeError);
 
-      expect(() => asPositiveSafeInt(Number.MIN_SAFE_INTEGER)).toThrow(
+      expect(() => asPositiveSafeInt(Number.MIN_SAFE_INTEGER)).toThrowError(
         TypeError,
       );
     });
 
     test('rejects values outside safe integer range', () => {
-      expect(() => asPositiveSafeInt(Number.MAX_SAFE_INTEGER + 1)).toThrow(
+      expect(() => asPositiveSafeInt(Number.MAX_SAFE_INTEGER + 1)).toThrowError(
         TypeError,
       );
 
-      expect(() => asPositiveSafeInt(Number.MAX_VALUE)).toThrow(TypeError);
+      expect(() => asPositiveSafeInt(Number.MAX_VALUE)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asPositiveSafeInt(Number.NaN)).toThrow(TypeError);
+      expect(() => asPositiveSafeInt(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asPositiveSafeInt(Number.POSITIVE_INFINITY)).toThrow(
+      expect(() => asPositiveSafeInt(Number.POSITIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asPositiveSafeInt(Number.NEGATIVE_INFINITY)).toThrow(
+      expect(() => asPositiveSafeInt(Number.NEGATIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asPositiveSafeInt(1.2)).toThrow(TypeError);
+      expect(() => asPositiveSafeInt(1.2)).toThrowError(TypeError);
 
-      expect(() => asPositiveSafeInt(-3.4)).toThrow(TypeError);
+      expect(() => asPositiveSafeInt(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -79,7 +81,7 @@ describe('PositiveSafeInt test', () => {
     ] as const)(
       `asPositiveSafeInt($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asPositiveSafeInt(value)).toThrow(
+        expect(() => asPositiveSafeInt(value)).toThrowError(
           new TypeError(`Expected a positive safe integer, got: ${value}`),
         );
       },

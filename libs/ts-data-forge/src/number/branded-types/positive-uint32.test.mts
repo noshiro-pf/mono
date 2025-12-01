@@ -9,45 +9,45 @@ import {
 describe('PositiveUint32 test', () => {
   describe(asPositiveUint32, () => {
     test('accepts valid positive uint32 values', () => {
-      expect(() => asPositiveUint32(1)).not.toThrow();
+      expect(() => asPositiveUint32(1)).not.toThrowError();
 
-      expect(() => asPositiveUint32(1000)).not.toThrow();
+      expect(() => asPositiveUint32(1000)).not.toThrowError();
 
-      expect(() => asPositiveUint32(4_294_967_295)).not.toThrow(); // 2^32 - 1
+      expect(() => asPositiveUint32(4_294_967_295)).not.toThrowError(); // 2^32 - 1
 
-      expect(() => asPositiveUint32(2_147_483_648)).not.toThrow(); // 2^31
+      expect(() => asPositiveUint32(2_147_483_648)).not.toThrowError(); // 2^31
     });
 
     test('rejects zero', () => {
-      expect(() => asPositiveUint32(0)).toThrow(TypeError);
+      expect(() => asPositiveUint32(0)).toThrowError(TypeError);
     });
 
     test('rejects values outside uint32 range', () => {
-      expect(() => asPositiveUint32(4_294_967_296)).toThrow(TypeError); // 2^32
+      expect(() => asPositiveUint32(4_294_967_296)).toThrowError(TypeError); // 2^32
 
-      expect(() => asPositiveUint32(10_000_000_000)).toThrow(TypeError);
+      expect(() => asPositiveUint32(10_000_000_000)).toThrowError(TypeError);
     });
 
     test('rejects negative integers', () => {
-      expect(() => asPositiveUint32(-1)).toThrow(TypeError);
+      expect(() => asPositiveUint32(-1)).toThrowError(TypeError);
 
-      expect(() => asPositiveUint32(-42)).toThrow(TypeError);
+      expect(() => asPositiveUint32(-42)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asPositiveUint32(Number.NaN)).toThrow(TypeError);
+      expect(() => asPositiveUint32(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asPositiveUint32(Number.POSITIVE_INFINITY)).toThrow(
+      expect(() => asPositiveUint32(Number.POSITIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asPositiveUint32(Number.NEGATIVE_INFINITY)).toThrow(
+      expect(() => asPositiveUint32(Number.NEGATIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asPositiveUint32(1.2)).toThrow(TypeError);
+      expect(() => asPositiveUint32(1.2)).toThrowError(TypeError);
 
-      expect(() => asPositiveUint32(-3.4)).toThrow(TypeError);
+      expect(() => asPositiveUint32(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -70,7 +70,7 @@ describe('PositiveUint32 test', () => {
     ] as const)(
       `asPositiveUint32($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asPositiveUint32(value)).toThrow(
+        expect(() => asPositiveUint32(value)).toThrowError(
           new TypeError(
             `Expected a positive integer in [1, 2^32), got: ${value}`,
           ),

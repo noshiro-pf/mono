@@ -9,45 +9,45 @@ import {
 describe('NonZeroUint32 test', () => {
   describe(asNonZeroUint32, () => {
     test('accepts valid non-zero uint32 values', () => {
-      expect(() => asNonZeroUint32(1)).not.toThrow();
+      expect(() => asNonZeroUint32(1)).not.toThrowError();
 
-      expect(() => asNonZeroUint32(1000)).not.toThrow();
+      expect(() => asNonZeroUint32(1000)).not.toThrowError();
 
-      expect(() => asNonZeroUint32(4_294_967_295)).not.toThrow(); // 2^32 - 1
+      expect(() => asNonZeroUint32(4_294_967_295)).not.toThrowError(); // 2^32 - 1
 
-      expect(() => asNonZeroUint32(2_147_483_648)).not.toThrow(); // 2^31
+      expect(() => asNonZeroUint32(2_147_483_648)).not.toThrowError(); // 2^31
     });
 
     test('rejects zero', () => {
-      expect(() => asNonZeroUint32(0)).toThrow(TypeError);
+      expect(() => asNonZeroUint32(0)).toThrowError(TypeError);
     });
 
     test('rejects values outside uint32 range', () => {
-      expect(() => asNonZeroUint32(4_294_967_296)).toThrow(TypeError); // 2^32
+      expect(() => asNonZeroUint32(4_294_967_296)).toThrowError(TypeError); // 2^32
 
-      expect(() => asNonZeroUint32(10_000_000_000)).toThrow(TypeError);
+      expect(() => asNonZeroUint32(10_000_000_000)).toThrowError(TypeError);
     });
 
     test('rejects negative integers', () => {
-      expect(() => asNonZeroUint32(-1)).toThrow(TypeError);
+      expect(() => asNonZeroUint32(-1)).toThrowError(TypeError);
 
-      expect(() => asNonZeroUint32(-42)).toThrow(TypeError);
+      expect(() => asNonZeroUint32(-42)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asNonZeroUint32(Number.NaN)).toThrow(TypeError);
+      expect(() => asNonZeroUint32(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asNonZeroUint32(Number.POSITIVE_INFINITY)).toThrow(
+      expect(() => asNonZeroUint32(Number.POSITIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asNonZeroUint32(Number.NEGATIVE_INFINITY)).toThrow(
+      expect(() => asNonZeroUint32(Number.NEGATIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asNonZeroUint32(1.2)).toThrow(TypeError);
+      expect(() => asNonZeroUint32(1.2)).toThrowError(TypeError);
 
-      expect(() => asNonZeroUint32(-3.4)).toThrow(TypeError);
+      expect(() => asNonZeroUint32(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -70,7 +70,7 @@ describe('NonZeroUint32 test', () => {
     ] as const)(
       `asNonZeroUint32($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asNonZeroUint32(value)).toThrow(
+        expect(() => asNonZeroUint32(value)).toThrowError(
           new TypeError(
             `Expected a non-zero integer in [1, 2^32), got: ${value}`,
           ),

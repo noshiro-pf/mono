@@ -5,35 +5,35 @@ import { asUint, isUint, Uint } from './uint.mjs';
 describe('Uint test', () => {
   describe(asUint, () => {
     test('accepts valid unsigned integers', () => {
-      expect(() => asUint(0)).not.toThrow();
+      expect(() => asUint(0)).not.toThrowError();
 
-      expect(() => asUint(1)).not.toThrow();
+      expect(() => asUint(1)).not.toThrowError();
 
-      expect(() => asUint(42)).not.toThrow();
+      expect(() => asUint(42)).not.toThrowError();
 
-      expect(() => asUint(100)).not.toThrow();
+      expect(() => asUint(100)).not.toThrowError();
 
-      expect(() => asUint(Number.MAX_SAFE_INTEGER)).not.toThrow();
+      expect(() => asUint(Number.MAX_SAFE_INTEGER)).not.toThrowError();
     });
 
     test('rejects negative integers', () => {
-      expect(() => asUint(-1)).toThrow(TypeError);
+      expect(() => asUint(-1)).toThrowError(TypeError);
 
-      expect(() => asUint(-42)).toThrow(TypeError);
+      expect(() => asUint(-42)).toThrowError(TypeError);
 
-      expect(() => asUint(Number.MIN_SAFE_INTEGER)).toThrow(TypeError);
+      expect(() => asUint(Number.MIN_SAFE_INTEGER)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asUint(Number.NaN)).toThrow(TypeError);
+      expect(() => asUint(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asUint(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asUint(Number.POSITIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asUint(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asUint(Number.NEGATIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asUint(1.2)).toThrow(TypeError);
+      expect(() => asUint(1.2)).toThrowError(TypeError);
 
-      expect(() => asUint(-3.4)).toThrow(TypeError);
+      expect(() => asUint(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -52,7 +52,7 @@ describe('Uint test', () => {
       { name: '-3.4', value: -3.4 },
       { name: '-1', value: -1 },
     ] as const)(`asUint($name) should throw a TypeError`, ({ value }) => {
-      expect(() => asUint(value)).toThrow(
+      expect(() => asUint(value)).toThrowError(
         new TypeError(`Expected a non-negative integer, got: ${value}`),
       );
     });

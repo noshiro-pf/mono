@@ -6,37 +6,37 @@ import { asUint16, isUint16, Uint16 } from './uint16.mjs';
 describe('Uint16 test', () => {
   describe(asUint16, () => {
     test('accepts valid uint16 values', () => {
-      expect(() => asUint16(0)).not.toThrow();
+      expect(() => asUint16(0)).not.toThrowError();
 
-      expect(() => asUint16(1)).not.toThrow();
+      expect(() => asUint16(1)).not.toThrowError();
 
-      expect(() => asUint16(65_535)).not.toThrow(); // 2^16 - 1
+      expect(() => asUint16(65_535)).not.toThrowError(); // 2^16 - 1
 
-      expect(() => asUint16(32_768)).not.toThrow(); // 2^15
+      expect(() => asUint16(32_768)).not.toThrowError(); // 2^15
     });
 
     test('rejects values outside uint16 range', () => {
-      expect(() => asUint16(65_536)).toThrow(TypeError); // 2^16
+      expect(() => asUint16(65_536)).toThrowError(TypeError); // 2^16
 
-      expect(() => asUint16(100_000)).toThrow(TypeError);
+      expect(() => asUint16(100_000)).toThrowError(TypeError);
     });
 
     test('rejects negative integers', () => {
-      expect(() => asUint16(-1)).toThrow(TypeError);
+      expect(() => asUint16(-1)).toThrowError(TypeError);
 
-      expect(() => asUint16(-42)).toThrow(TypeError);
+      expect(() => asUint16(-42)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asUint16(Number.NaN)).toThrow(TypeError);
+      expect(() => asUint16(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asUint16(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asUint16(Number.POSITIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asUint16(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asUint16(Number.NEGATIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asUint16(1.2)).toThrow(TypeError);
+      expect(() => asUint16(1.2)).toThrowError(TypeError);
 
-      expect(() => asUint16(-3.4)).toThrow(TypeError);
+      expect(() => asUint16(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -55,7 +55,7 @@ describe('Uint16 test', () => {
       { name: '-3.4', value: -3.4 },
       { name: '-1', value: -1 },
     ] as const)(`asUint16($name) should throw a TypeError`, ({ value }) => {
-      expect(() => asUint16(value)).toThrow(
+      expect(() => asUint16(value)).toThrowError(
         new TypeError(
           `Expected a non-negative integer less than 2^16, got: ${value}`,
         ),

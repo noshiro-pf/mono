@@ -9,39 +9,43 @@ import {
 describe('NonZeroInt16 test', () => {
   describe(asNonZeroInt16, () => {
     test('accepts valid non-zero int16 values', () => {
-      expect(() => asNonZeroInt16(1)).not.toThrow();
+      expect(() => asNonZeroInt16(1)).not.toThrowError();
 
-      expect(() => asNonZeroInt16(-1)).not.toThrow();
+      expect(() => asNonZeroInt16(-1)).not.toThrowError();
 
-      expect(() => asNonZeroInt16(32_767)).not.toThrow(); // 2^15 - 1
+      expect(() => asNonZeroInt16(32_767)).not.toThrowError(); // 2^15 - 1
 
-      expect(() => asNonZeroInt16(-32_768)).not.toThrow(); // -2^15
+      expect(() => asNonZeroInt16(-32_768)).not.toThrowError(); // -2^15
     });
 
     test('rejects zero', () => {
-      expect(() => asNonZeroInt16(0)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(0)).toThrowError(TypeError);
     });
 
     test('rejects values outside int16 range', () => {
-      expect(() => asNonZeroInt16(32_768)).toThrow(TypeError); // 2^15
+      expect(() => asNonZeroInt16(32_768)).toThrowError(TypeError); // 2^15
 
-      expect(() => asNonZeroInt16(-32_769)).toThrow(TypeError); // -2^15 - 1
+      expect(() => asNonZeroInt16(-32_769)).toThrowError(TypeError); // -2^15 - 1
 
-      expect(() => asNonZeroInt16(65_536)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(65_536)).toThrowError(TypeError);
 
-      expect(() => asNonZeroInt16(-65_536)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(-65_536)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asNonZeroInt16(Number.NaN)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asNonZeroInt16(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(Number.POSITIVE_INFINITY)).toThrowError(
+        TypeError,
+      );
 
-      expect(() => asNonZeroInt16(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(Number.NEGATIVE_INFINITY)).toThrowError(
+        TypeError,
+      );
 
-      expect(() => asNonZeroInt16(1.2)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(1.2)).toThrowError(TypeError);
 
-      expect(() => asNonZeroInt16(-3.4)).toThrow(TypeError);
+      expect(() => asNonZeroInt16(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -66,7 +70,7 @@ describe('NonZeroInt16 test', () => {
     ] as const)(
       `asNonZeroInt16($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asNonZeroInt16(value)).toThrow(
+        expect(() => asNonZeroInt16(value)).toThrowError(
           new TypeError(
             `Expected a non-zero integer in [-2^15, 2^15), got: ${value}`,
           ),

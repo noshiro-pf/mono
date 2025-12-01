@@ -6,37 +6,37 @@ import { asNonZeroInt32 } from './non-zero-int32.mjs';
 describe('Int32 test', () => {
   describe(asInt32, () => {
     test('accepts valid int32 values', () => {
-      expect(() => asInt32(0)).not.toThrow();
+      expect(() => asInt32(0)).not.toThrowError();
 
-      expect(() => asInt32(1)).not.toThrow();
+      expect(() => asInt32(1)).not.toThrowError();
 
-      expect(() => asInt32(-1)).not.toThrow();
+      expect(() => asInt32(-1)).not.toThrowError();
 
-      expect(() => asInt32(2_147_483_647)).not.toThrow(); // 2^31 - 1
+      expect(() => asInt32(2_147_483_647)).not.toThrowError(); // 2^31 - 1
 
-      expect(() => asInt32(-2_147_483_648)).not.toThrow(); // -2^31
+      expect(() => asInt32(-2_147_483_648)).not.toThrowError(); // -2^31
     });
 
     test('rejects values outside int32 range', () => {
-      expect(() => asInt32(2_147_483_648)).toThrow(TypeError); // 2^31
+      expect(() => asInt32(2_147_483_648)).toThrowError(TypeError); // 2^31
 
-      expect(() => asInt32(-2_147_483_649)).toThrow(TypeError); // -2^31 - 1
+      expect(() => asInt32(-2_147_483_649)).toThrowError(TypeError); // -2^31 - 1
 
-      expect(() => asInt32(4_294_967_296)).toThrow(TypeError);
+      expect(() => asInt32(4_294_967_296)).toThrowError(TypeError);
 
-      expect(() => asInt32(-4_294_967_296)).toThrow(TypeError);
+      expect(() => asInt32(-4_294_967_296)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asInt32(Number.NaN)).toThrow(TypeError);
+      expect(() => asInt32(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asInt32(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asInt32(Number.POSITIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asInt32(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asInt32(Number.NEGATIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asInt32(1.2)).toThrow(TypeError);
+      expect(() => asInt32(1.2)).toThrowError(TypeError);
 
-      expect(() => asInt32(-3.4)).toThrow(TypeError);
+      expect(() => asInt32(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -58,7 +58,7 @@ describe('Int32 test', () => {
       { name: '1.2', value: 1.2 },
       { name: '-3.4', value: -3.4 },
     ] as const)(`asInt32($name) should throw a TypeError`, ({ value }) => {
-      expect(() => asInt32(value)).toThrow(
+      expect(() => asInt32(value)).toThrowError(
         new TypeError(`Expected an integer in [-2^31, 2^31), got: ${value}`),
       );
     });

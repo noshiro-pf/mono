@@ -248,7 +248,7 @@ describe('Result test', () => {
     test('throws on Err result', () => {
       const result = Result.err('error message');
 
-      expect(() => Result.unwrapThrow(result)).toThrow('error message');
+      expect(() => Result.unwrapThrow(result)).toThrowError('error message');
     });
   });
 
@@ -589,7 +589,7 @@ describe('Result test', () => {
     test('should throw for Ok', () => {
       const result = Result.ok(42);
 
-      expect(() => Result.unwrapErrThrow(result)).toThrow(
+      expect(() => Result.unwrapErrThrow(result)).toThrowError(
         'Expected Err but got Ok: 42',
       );
     });
@@ -599,7 +599,7 @@ describe('Result test', () => {
 
       expect(() =>
         Result.unwrapErrThrow(result, (obj) => `Object(id=${obj.id})`),
-      ).toThrow('Expected Err but got Ok: Object(id=1)');
+      ).toThrowError('Expected Err but got Ok: Object(id=1)');
     });
   });
 
@@ -665,9 +665,9 @@ describe('Result test', () => {
     test('should throw custom error for Err result', () => {
       const result = Result.err('failed');
 
-      expect(() => Result.expectToBe(result, 'Operation must succeed')).toThrow(
-        'Operation must succeed',
-      );
+      expect(() =>
+        Result.expectToBe(result, 'Operation must succeed'),
+      ).toThrowError('Operation must succeed');
     });
 
     test('should support curried form', () => {
@@ -681,7 +681,9 @@ describe('Result test', () => {
 
       const errResult: Result<string, string> = Result.err('failed');
 
-      expect(() => mustBeOk(errResult)).toThrow('Expected successful result');
+      expect(() => mustBeOk(errResult)).toThrowError(
+        'Expected successful result',
+      );
     });
 
     test('should work with pipe when curried', () => {
@@ -693,7 +695,7 @@ describe('Result test', () => {
 
       expect(
         () => pipe(Result.err('validation error')).map(mustBeOk).value,
-      ).toThrow('Validation failed');
+      ).toThrowError('Validation failed');
     });
   });
 

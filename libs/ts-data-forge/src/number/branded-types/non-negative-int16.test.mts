@@ -10,43 +10,43 @@ import { asPositiveInt16 } from './positive-int16.mjs';
 describe('NonNegativeInt16 test', () => {
   describe(asNonNegativeInt16, () => {
     test('accepts valid non-negative int16 values', () => {
-      expect(() => asNonNegativeInt16(0)).not.toThrow();
+      expect(() => asNonNegativeInt16(0)).not.toThrowError();
 
-      expect(() => asNonNegativeInt16(1)).not.toThrow();
+      expect(() => asNonNegativeInt16(1)).not.toThrowError();
 
-      expect(() => asNonNegativeInt16(1000)).not.toThrow();
+      expect(() => asNonNegativeInt16(1000)).not.toThrowError();
 
-      expect(() => asNonNegativeInt16(32_767)).not.toThrow(); // 2^15 - 1
+      expect(() => asNonNegativeInt16(32_767)).not.toThrowError(); // 2^15 - 1
     });
 
     test('rejects negative integers', () => {
-      expect(() => asNonNegativeInt16(-1)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(-1)).toThrowError(TypeError);
 
-      expect(() => asNonNegativeInt16(-42)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(-42)).toThrowError(TypeError);
 
-      expect(() => asNonNegativeInt16(-32_768)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(-32_768)).toThrowError(TypeError);
     });
 
     test('rejects values outside int16 range', () => {
-      expect(() => asNonNegativeInt16(32_768)).toThrow(TypeError); // 2^15
+      expect(() => asNonNegativeInt16(32_768)).toThrowError(TypeError); // 2^15
 
-      expect(() => asNonNegativeInt16(65_536)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(65_536)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asNonNegativeInt16(Number.NaN)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asNonNegativeInt16(Number.POSITIVE_INFINITY)).toThrow(
+      expect(() => asNonNegativeInt16(Number.POSITIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asNonNegativeInt16(Number.NEGATIVE_INFINITY)).toThrow(
+      expect(() => asNonNegativeInt16(Number.NEGATIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asNonNegativeInt16(1.2)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(1.2)).toThrowError(TypeError);
 
-      expect(() => asNonNegativeInt16(-3.4)).toThrow(TypeError);
+      expect(() => asNonNegativeInt16(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -68,7 +68,7 @@ describe('NonNegativeInt16 test', () => {
     ] as const)(
       `asNonNegativeInt16($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asNonNegativeInt16(value)).toThrow(
+        expect(() => asNonNegativeInt16(value)).toThrowError(
           new TypeError(
             `Expected a non-negative integer in [0, 2^15), got: ${value}`,
           ),

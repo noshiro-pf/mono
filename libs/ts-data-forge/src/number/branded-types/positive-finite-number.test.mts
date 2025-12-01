@@ -9,43 +9,43 @@ import {
 describe('PositiveFiniteNumber test', () => {
   describe(asPositiveFiniteNumber, () => {
     test('accepts valid positive finite numbers', () => {
-      expect(() => asPositiveFiniteNumber(1)).not.toThrow();
+      expect(() => asPositiveFiniteNumber(1)).not.toThrowError();
 
-      expect(() => asPositiveFiniteNumber(3.14)).not.toThrow();
+      expect(() => asPositiveFiniteNumber(3.14)).not.toThrowError();
 
-      expect(() => asPositiveFiniteNumber(0.5)).not.toThrow();
+      expect(() => asPositiveFiniteNumber(0.5)).not.toThrowError();
 
-      expect(() => asPositiveFiniteNumber(Number.MIN_VALUE)).not.toThrow();
+      expect(() => asPositiveFiniteNumber(Number.MIN_VALUE)).not.toThrowError();
 
-      expect(() => asPositiveFiniteNumber(Number.MAX_VALUE)).not.toThrow();
+      expect(() => asPositiveFiniteNumber(Number.MAX_VALUE)).not.toThrowError();
     });
 
     test('rejects zero', () => {
-      expect(() => asPositiveFiniteNumber(0)).toThrow(TypeError);
+      expect(() => asPositiveFiniteNumber(0)).toThrowError(TypeError);
 
-      expect(() => asPositiveFiniteNumber(-0)).toThrow(TypeError);
+      expect(() => asPositiveFiniteNumber(-0)).toThrowError(TypeError);
     });
 
     test('rejects negative numbers', () => {
-      expect(() => asPositiveFiniteNumber(-1)).toThrow(TypeError);
+      expect(() => asPositiveFiniteNumber(-1)).toThrowError(TypeError);
 
-      expect(() => asPositiveFiniteNumber(-0.1)).toThrow(TypeError);
+      expect(() => asPositiveFiniteNumber(-0.1)).toThrowError(TypeError);
 
-      expect(() => asPositiveFiniteNumber(-Number.MAX_VALUE)).toThrow(
+      expect(() => asPositiveFiniteNumber(-Number.MAX_VALUE)).toThrowError(
         TypeError,
       );
     });
 
     test('rejects non-finite numbers', () => {
-      expect(() => asPositiveFiniteNumber(Number.NaN)).toThrow(TypeError);
+      expect(() => asPositiveFiniteNumber(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asPositiveFiniteNumber(Number.POSITIVE_INFINITY)).toThrow(
-        TypeError,
-      );
+      expect(() =>
+        asPositiveFiniteNumber(Number.POSITIVE_INFINITY),
+      ).toThrowError(TypeError);
 
-      expect(() => asPositiveFiniteNumber(Number.NEGATIVE_INFINITY)).toThrow(
-        TypeError,
-      );
+      expect(() =>
+        asPositiveFiniteNumber(Number.NEGATIVE_INFINITY),
+      ).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -64,7 +64,7 @@ describe('PositiveFiniteNumber test', () => {
     ] as const)(
       `asPositiveFiniteNumber($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asPositiveFiniteNumber(value)).toThrow(
+        expect(() => asPositiveFiniteNumber(value)).toThrowError(
           new TypeError(`Expected a positive finite number, got: ${value}`),
         );
       },

@@ -7,5 +7,11 @@
 // > you do not want to ignore any files.
 
 module.exports = {
-  ignorePatterns: ['**/node_modules/**', 'dist', '.eslintrc.cjs'],
+  ignorePatterns: [
+    '**/node_modules/**',
+    'dist',
+    'docs',
+    'agents/**',
+    '.eslintrc.cjs',
+  ],
 };

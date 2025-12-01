@@ -6,37 +6,37 @@ import { asUint32, isUint32, Uint32 } from './uint32.mjs';
 describe('Uint32 test', () => {
   describe(asUint32, () => {
     test('accepts valid uint32 values', () => {
-      expect(() => asUint32(0)).not.toThrow();
+      expect(() => asUint32(0)).not.toThrowError();
 
-      expect(() => asUint32(1)).not.toThrow();
+      expect(() => asUint32(1)).not.toThrowError();
 
-      expect(() => asUint32(4_294_967_295)).not.toThrow(); // 2^32 - 1
+      expect(() => asUint32(4_294_967_295)).not.toThrowError(); // 2^32 - 1
 
-      expect(() => asUint32(2_147_483_648)).not.toThrow(); // 2^31
+      expect(() => asUint32(2_147_483_648)).not.toThrowError(); // 2^31
     });
 
     test('rejects values outside uint32 range', () => {
-      expect(() => asUint32(4_294_967_296)).toThrow(TypeError); // 2^32
+      expect(() => asUint32(4_294_967_296)).toThrowError(TypeError); // 2^32
 
-      expect(() => asUint32(10_000_000_000)).toThrow(TypeError);
+      expect(() => asUint32(10_000_000_000)).toThrowError(TypeError);
     });
 
     test('rejects negative integers', () => {
-      expect(() => asUint32(-1)).toThrow(TypeError);
+      expect(() => asUint32(-1)).toThrowError(TypeError);
 
-      expect(() => asUint32(-42)).toThrow(TypeError);
+      expect(() => asUint32(-42)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asUint32(Number.NaN)).toThrow(TypeError);
+      expect(() => asUint32(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asUint32(Number.POSITIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asUint32(Number.POSITIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asUint32(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
+      expect(() => asUint32(Number.NEGATIVE_INFINITY)).toThrowError(TypeError);
 
-      expect(() => asUint32(1.2)).toThrow(TypeError);
+      expect(() => asUint32(1.2)).toThrowError(TypeError);
 
-      expect(() => asUint32(-3.4)).toThrow(TypeError);
+      expect(() => asUint32(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -55,7 +55,7 @@ describe('Uint32 test', () => {
       { name: '-3.4', value: -3.4 },
       { name: '-1', value: -1 },
     ] as const)(`asUint32($name) should throw a TypeError`, ({ value }) => {
-      expect(() => asUint32(value)).toThrow(
+      expect(() => asUint32(value)).toThrowError(
         new TypeError(
           `Expected a non-negative integer less than 2^32, got: ${value}`,
         ),

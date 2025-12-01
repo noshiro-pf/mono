@@ -35,7 +35,7 @@ describe('Uint8 test', () => {
       { value: Number.POSITIVE_INFINITY, name: 'Infinity' },
       { value: Number.NEGATIVE_INFINITY, name: '-Infinity' },
     ])('asUint8($name) should throw TypeError', ({ value }) => {
-      expect(() => asUint8(value)).toThrow(TypeError);
+      expect(() => asUint8(value)).toThrowError(TypeError);
     });
   });
 

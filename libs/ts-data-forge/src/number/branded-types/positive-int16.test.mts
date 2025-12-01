@@ -9,43 +9,43 @@ import {
 describe('PositiveInt16 test', () => {
   describe(asPositiveInt16, () => {
     test('accepts valid positive int16 values', () => {
-      expect(() => asPositiveInt16(1)).not.toThrow();
+      expect(() => asPositiveInt16(1)).not.toThrowError();
 
-      expect(() => asPositiveInt16(1000)).not.toThrow();
+      expect(() => asPositiveInt16(1000)).not.toThrowError();
 
-      expect(() => asPositiveInt16(32_767)).not.toThrow(); // 2^15 - 1
+      expect(() => asPositiveInt16(32_767)).not.toThrowError(); // 2^15 - 1
     });
 
     test('rejects zero', () => {
-      expect(() => asPositiveInt16(0)).toThrow(TypeError);
+      expect(() => asPositiveInt16(0)).toThrowError(TypeError);
     });
 
     test('rejects values outside int16 range', () => {
-      expect(() => asPositiveInt16(32_768)).toThrow(TypeError); // 2^15
+      expect(() => asPositiveInt16(32_768)).toThrowError(TypeError); // 2^15
 
-      expect(() => asPositiveInt16(65_536)).toThrow(TypeError);
+      expect(() => asPositiveInt16(65_536)).toThrowError(TypeError);
     });
 
     test('rejects negative integers', () => {
-      expect(() => asPositiveInt16(-1)).toThrow(TypeError);
+      expect(() => asPositiveInt16(-1)).toThrowError(TypeError);
 
-      expect(() => asPositiveInt16(-42)).toThrow(TypeError);
+      expect(() => asPositiveInt16(-42)).toThrowError(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asPositiveInt16(Number.NaN)).toThrow(TypeError);
+      expect(() => asPositiveInt16(Number.NaN)).toThrowError(TypeError);
 
-      expect(() => asPositiveInt16(Number.POSITIVE_INFINITY)).toThrow(
+      expect(() => asPositiveInt16(Number.POSITIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asPositiveInt16(Number.NEGATIVE_INFINITY)).toThrow(
+      expect(() => asPositiveInt16(Number.NEGATIVE_INFINITY)).toThrowError(
         TypeError,
       );
 
-      expect(() => asPositiveInt16(1.2)).toThrow(TypeError);
+      expect(() => asPositiveInt16(1.2)).toThrowError(TypeError);
 
-      expect(() => asPositiveInt16(-3.4)).toThrow(TypeError);
+      expect(() => asPositiveInt16(-3.4)).toThrowError(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -68,7 +68,7 @@ describe('PositiveInt16 test', () => {
     ] as const)(
       `asPositiveInt16($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asPositiveInt16(value)).toThrow(
+        expect(() => asPositiveInt16(value)).toThrowError(
           new TypeError(
             `Expected a positive integer in [1, 2^15), got: ${value}`,
           ),
