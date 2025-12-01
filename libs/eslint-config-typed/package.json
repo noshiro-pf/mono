@@ -31,7 +31,7 @@
     "dist",
     "README.md",
     "LICENSE",
-    "vitest-globals.d.mts"
+    "vitest-globals.d.ts"
   ],
   "scripts": {
     "apply-type-transformations": "tsx ./scripts/gen-eslint-rules/codemod/apply-type-transformations.mts",

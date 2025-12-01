@@ -7,5 +7,5 @@
       "vitest/importMeta"
     ]
   },
-  "include": ["../../vitest-globals.d.mts"]
+  "include": ["../../vitest-globals.d.ts"]
 }
