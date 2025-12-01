@@ -122,6 +122,7 @@
   "peerDependencies": {
     "typescript": ">=4.8"
   },
+  "packageManager": "pnpm@10.24.0",
   "volta": {
     "node": "25.0.0",
     "npm": "11.6.2"
