@@ -5,13 +5,11 @@
   "caseSensitive": false,
   "ignoreRandomStrings": true,
   "words": ["noshiro", "testw", "tscw"],
-  "flagWords": [],
   "ignorePaths": [
-    "eslint.config.js",
-    "./pnpm-lock.yaml",
-    "./pnpm-workspace.yaml",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "dist/**",
     "docs/**",
-    "BREAKING_CHANGE_GUIDE.md",
-    "github/**"
+    "agents/common/**"
   ]
 }
