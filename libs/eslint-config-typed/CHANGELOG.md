@@ -1,3 +1,9 @@
+## [4.0.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.3...v4.0.4) (2025-12-01)
+
+### Bug Fixes
+
+- rename vitest-globals to allow writing tsconfig types field without extensions ([#164](https://github.com/noshiro-pf/eslint-config-typed/issues/164)) ([6527665](https://github.com/noshiro-pf/eslint-config-typed/commit/6527665d2a4d5307e01969c2b917825a985952f4))
+
 ## [4.0.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.2...v4.0.3) (2025-11-29)
 
 ### Bug Fixes
