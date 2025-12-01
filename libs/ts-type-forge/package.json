@@ -38,6 +38,8 @@
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx ./scripts/cmd/embed-samples.mts",
+    "doc:preview": "vite preview --config ./configs/vite.doc.config.ts",
+    "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
     "fmt:full": "prettier --write .",
@@ -48,7 +50,6 @@
     "gh:backup-all": "gh-backup-all",
     "gh:backup-repository-settings": "gh-backup-repository-settings",
     "gh:backup-rulesets": "gh-backup-rulesets",
-    "gi": "run-s fmt",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
@@ -86,11 +87,16 @@
     "tslib": "^2.8.1",
     "tsx": "^4.20.6",
     "typedoc": "^0.28.14",
-    "typedoc-plugin-markdown": "^4.9.0",
-    "typescript": "^5.9.3"
+    "typedoc-github-theme": "^0.3.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.6"
+  },
+  "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=8.0.0"
   },
   "volta": {
-    "node": "25.0.0",
-    "npm": "11.6.2"
+    "node": "25.0.0"
   }
 }

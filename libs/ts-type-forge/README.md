@@ -1,6 +1,11 @@
 # ts-type-forge
 
 [![npm version](https://img.shields.io/npm/v/ts-type-forge.svg)](https://www.npmjs.com/package/ts-type-forge)
+
+## Documentation
+
+- API reference: <https://noshiro-pf.github.io/ts-type-forge/>
+
 [![npm downloads](https://img.shields.io/npm/dm/ts-type-forge.svg)](https://www.npmjs.com/package/ts-type-forge)
 [![License](https://img.shields.io/npm/l/ts-type-forge.svg)](./LICENSE)
 
