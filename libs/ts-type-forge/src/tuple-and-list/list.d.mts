@@ -148,7 +148,8 @@ declare namespace List {
   type SetAt<T extends readonly unknown[], I extends number, V> =
     IsFixedLengthList<T> extends true
       ? Tuple.SetAt<T, I, V>
-      : readonly (T[number] | V)[];
+      : // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+        readonly (T[number] | V)[];
 
   /**
    * Flattens a nested readonly array/tuple `T` by one level.
