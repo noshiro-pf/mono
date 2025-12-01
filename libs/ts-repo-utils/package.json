@@ -44,6 +44,8 @@
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx ./scripts/cmd/embed-samples.mts",
+    "doc:preview": "vite preview --config ./configs/vite.doc.config.ts",
+    "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "pnpm run z:format-uncommitted",
     "fmt:diff": "pnpm run z:format-diff-from origin/main",
     "fmt:full": "prettier --write .",
@@ -122,13 +124,15 @@
     "tslib": "^2.8.1",
     "tsx": "^4.20.6",
     "typedoc": "^0.28.15",
-    "typedoc-plugin-markdown": "^4.9.0",
+    "typedoc-github-theme": "^0.3.1",
     "typescript": "^5.9.3",
+    "vite": "^7.2.6",
     "vitest": "^4.0.9"
   },
   "peerDependencies": {
     "prettier": "^3.6.2"
   },
+  "packageManager": "pnpm@10.24.0",
   "volta": {
     "node": "25.0.0",
     "npm": "11.6.2"

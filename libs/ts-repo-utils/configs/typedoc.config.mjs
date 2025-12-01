@@ -4,18 +4,23 @@ const srcDir = path.resolve(import.meta.dirname, '../src');
 
 const outDir = path.resolve(import.meta.dirname, '../docs');
 
-/** @type { Partial<import("typedoc").TypeDocOptions & import("typedoc-plugin-markdown").PluginOptions>} */
+/** @type {Partial<import('typedoc').TypeDocOptions>} */
 const config = {
-  plugin: ['typedoc-plugin-markdown'],
-  router: 'module',
+  plugin: ['typedoc-github-theme'],
   entryPoints: [`${srcDir}/**/*.mts`],
-  exclude: ['./index.mts', './**/*.test.mts'].map((p) =>
-    path.resolve(srcDir, p),
-  ),
+  exclude: [
+    './**/index.mts',
+    './**/*.test.mts',
+    './entry-point.mts',
+    './globals.d.mts',
+  ].map((p) => path.resolve(srcDir, p)),
   out: outDir,
   gitRevision: 'main',
+  headings: {
+    document: true,
+    readme: false,
+  },
   excludeInternal: true,
-  mergeReadme: true,
 };
 
 export default config;
