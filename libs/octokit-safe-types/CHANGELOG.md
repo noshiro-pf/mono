@@ -1,3 +1,9 @@
+## [1.2.2](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.1...v1.2.2) (2025-12-01)
+
+### Bug Fixes
+
+- bump ts-data-forge from 5.1.0 to 6.0.0 ([#75](https://github.com/noshiro-pf/octokit-safe-types/issues/75)) ([9a3f374](https://github.com/noshiro-pf/octokit-safe-types/commit/9a3f374246997c6605e096cfe7eb12aa4e562069))
+
 ## [1.2.1](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.0...v1.2.1) (2025-11-24)
 
 ### Bug Fixes
