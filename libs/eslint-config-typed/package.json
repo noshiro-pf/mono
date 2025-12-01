@@ -21,7 +21,7 @@
       }
     },
     "./vitest-globals": {
-      "types": "./vitest-globals.d.mts"
+      "types": "./vitest-globals.d.ts"
     }
   },
   "module": "./dist/entry-point.mjs",

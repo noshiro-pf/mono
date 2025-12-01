@@ -18,6 +18,6 @@
     "./eslint.config.mts",
     "./release.config.js",
     "./.markdownlint-cli2.mjs",
-    "./vitest-globals.d.mts"
+    "vitest-globals.d.ts"
   ]
 }
