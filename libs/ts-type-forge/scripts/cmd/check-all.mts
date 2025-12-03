@@ -27,6 +27,12 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
+    startMessage: 'Running tests',
+    action: () => runCmdStep('pnpm run test', 'Tests failed'),
+    successMessage: 'Tests passed',
+  });
+
+  await logStep({
     startMessage: 'Running lint fixes',
     action: () => runCmdStep('pnpm run lint:fix', 'Linting failed'),
     successMessage: 'Lint fixes applied',
