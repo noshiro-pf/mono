@@ -45,7 +45,7 @@
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "doc:embed-doc": "tsx ./scripts/cmd/embed-samples.mts",
     "doc:embed-jsdoc": "tsx ./scripts/cmd/embed-jsdoc-examples.mts",
-    "doc:preview": "vite preview --config ./configs/vite.doc.config.ts",
+    "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",
     "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
@@ -71,7 +71,7 @@
     "tscw": "tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "tsc --noEmit",
     "update-packages": "pnpm update --latest",
-    "z:vitest": "vitest --config ./configs/vitest.config.ts"
+    "z:vitest": "vitest --config ./configs/vitest.config.mts"
   },
   "dependencies": {
     "@sindresorhus/is": "^7.1.1",
@@ -93,6 +93,8 @@
     "@semantic-release/release-notes-generator": "14.1.0",
     "@types/node": "24.10.1",
     "@types/react": "19.2.7",
+    "@vitest/browser-playwright": "4.0.14",
+    "@vitest/coverage-istanbul": "4.0.14",
     "@vitest/coverage-v8": "4.0.14",
     "@vitest/ui": "4.0.14",
     "conventional-changelog-conventionalcommits": "9.1.0",
@@ -105,6 +107,7 @@
     "markdownlint": "0.39.0",
     "markdownlint-cli2": "0.19.1",
     "npm-run-all2": "8.0.4",
+    "playwright": "^1.57.0",
     "prettier": "3.7.3",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "2.5.20",
