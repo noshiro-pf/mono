@@ -49,7 +49,7 @@
     // Don't include @types/* by default
     "types": [],
 
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
 
     // Completeness
     "skipLibCheck": true
