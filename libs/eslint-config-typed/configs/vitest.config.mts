@@ -1,9 +1,10 @@
 import * as path from 'node:path';
-import { defineConfig } from 'vitest/config';
+import { type ViteUserConfig } from 'vitest/config';
+import { type CoverageOptions } from 'vitest/node';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 
 // https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
-export default defineConfig({
+const config = (): ViteUserConfig => ({
   test: {
     globals: true,
     dir: projectRootPath,
@@ -21,11 +22,15 @@ export default defineConfig({
       ),
     },
     testTimeout: 30000,
-    coverage: {
-      provider: 'v8',
-      reporter: ['html', 'lcov', 'text'],
-      include: ['src/**/*.{mts,tsx}'],
-      exclude: ['**/index.mts', 'src/entry-point.mts'],
-    },
+    coverage: coverageSettings('v8'),
   },
 });
+
+const coverageSettings = (provider: 'v8' | 'istanbul'): CoverageOptions => ({
+  provider,
+  reporter: ['html', 'lcov', 'text'],
+  include: ['src/**/*.{mts,tsx}'],
+  exclude: ['**/index.mts', 'src/entry-point.mts'],
+});
+
+export default config();
