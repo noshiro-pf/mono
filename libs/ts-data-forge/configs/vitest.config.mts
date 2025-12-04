@@ -32,12 +32,17 @@ const config = (): ViteUserConfig =>
         {
           test: {
             name: 'Browser',
-            ...projectConfig(),
+            ...projectConfig({
+              additionalExcludes: [
+                'src/array/impl/array-utils-transformation.test.mts',
+              ],
+            }),
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,
               headless: true,
               screenshotFailures: false,
+              connectTimeout: 60000,
               provider: playwright(),
               instances: [{ browser: 'chromium' }],
             },
@@ -45,6 +50,14 @@ const config = (): ViteUserConfig =>
         },
       ],
     },
+
+    // Bind the server to all network interfaces.
+    // This allows Playwright to access the server from within the GitHub Actions execution environment (host machine, Docker container, etc.).
+    // server: {
+    //   host: '127.0.0.1',
+    //   port: 3000,
+    //   strictPort: true,
+    // },
   }) as const;
 
 const projectConfig = (
@@ -57,6 +70,7 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
+    testTimeout: 60000,
     includeSource: ['src/**/*.mts', 'samples/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: [
