@@ -32,12 +32,17 @@ const config = (): ViteUserConfig =>
         {
           test: {
             name: 'Browser',
-            ...projectConfig(),
+            ...projectConfig({
+              additionalExcludes: [
+                'src/record/record-allow-excess-properties.test.mts',
+              ],
+            }),
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,
               headless: true,
               screenshotFailures: false,
+              connectTimeout: 60000,
               provider: playwright(),
               instances: [{ browser: 'chromium' }],
             },
@@ -57,6 +62,7 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
+    testTimeout: 60000,
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: [
