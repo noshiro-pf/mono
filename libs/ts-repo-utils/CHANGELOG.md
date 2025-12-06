@@ -1,3 +1,9 @@
+## [7.9.5](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.4...v7.9.5) (2025-12-06)
+
+### Bug Fixes
+
+- support pnpm in isDirectlyExecuted ([#226](https://github.com/noshiro-pf/ts-repo-utils/issues/226)) ([8b69c94](https://github.com/noshiro-pf/ts-repo-utils/commit/8b69c94a8ffd12645137b1d26aba14d4345d76c8))
+
 ## [7.9.4](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.3...v7.9.4) (2025-12-01)
 
 ### Bug Fixes
