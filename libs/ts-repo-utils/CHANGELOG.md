@@ -1,3 +1,9 @@
+## [7.9.6](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.5...v7.9.6) (2025-12-10)
+
+### Bug Fixes
+
+- set minimumReleaseAge ([#235](https://github.com/noshiro-pf/ts-repo-utils/issues/235)) ([f005eed](https://github.com/noshiro-pf/ts-repo-utils/commit/f005eed9ca669366a2e4e275800c0e8dbe87ddc9))
+
 ## [7.9.5](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.4...v7.9.5) (2025-12-06)
 
 ### Bug Fixes
