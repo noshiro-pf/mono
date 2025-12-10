@@ -4,7 +4,8 @@
     "useDefineForClassFields": true,
     "types": [
       // "vitest/globals",
-      "vitest/importMeta"
+      "vitest/importMeta",
+      "node"
     ]
   },
   "include": ["../../vitest-globals.d.ts"]

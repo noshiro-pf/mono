@@ -1,4 +1,4 @@
-import { Result, unknownToString } from 'ts-data-forge';
+import { unknownToString } from 'ts-data-forge';
 import { assertPathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -43,7 +43,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     await logStep({
       startMessage: 'Generating index files',
       action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
-      successMessage: 'Generating index files completed',
+      successMessage: 'Index files generated',
     });
 
     await logStep({

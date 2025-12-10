@@ -1,4 +1,3 @@
-import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 
 /**
@@ -59,7 +58,7 @@ const checkAll = async (): Promise<void> => {
         'pnpm run gh:backup-all',
         'Backing up repository settings failed',
       ),
-    successMessage: 'Successfully back up repository settings',
+    successMessage: 'Repository settings backed up',
   });
 
   echo('✅ All checks completed successfully!\n');

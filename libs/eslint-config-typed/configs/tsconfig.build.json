@@ -9,8 +9,7 @@
     "declarationMap": true,
     "outDir": "../dist",
     "declarationDir": "../dist",
-    "rootDir": "../src",
-    "types": ["node"]
+    "rootDir": "../src"
   },
   "include": ["../src"],
   "exclude": ["../src/**/*.test.mts"]
