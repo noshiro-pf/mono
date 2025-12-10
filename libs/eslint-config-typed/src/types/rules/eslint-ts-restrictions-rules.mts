@@ -76,61 +76,75 @@ namespace NoRestrictedCastName {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "items": {
-   *     "oneOf": [
-   *       {
-   *         "type": "string"
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "name": {
-   *             "type": "string"
-   *           },
-   *           "fixWith": {
-   *             "type": "object",
-   *             "oneOf": [
-   *               {
-   *                 "type": "object",
-   *                 "properties": {
-   *                   "kind": {
-   *                     "type": "string",
-   *                     "enum": ["type"]
-   *                   },
-   *                   "name": {
-   *                     "type": "string"
-   *                   }
-   *                 },
-   *                 "required": ["kind", "name"],
-   *                 "additionalProperties": false
-   *               },
-   *               {
-   *                 "type": "object",
-   *                 "properties": {
-   *                   "kind": {
-   *                     "type": "string",
-   *                     "enum": ["function"]
-   *                   },
-   *                   "name": {
-   *                     "type": "string"
-   *                   }
-   *                 },
-   *                 "required": ["kind", "name"],
-   *                 "additionalProperties": false
-   *               }
-   *             ]
-   *           }
+   * [
+   *   {
+   *     "type": "array",
+   *     "items": {
+   *       "oneOf": [
+   *         {
+   *           "type": "string"
    *         },
-   *         "required": ["name"],
-   *         "additionalProperties": false
-   *       }
-   *     ]
-   *   },
-   *   "uniqueItems": true,
-   *   "minItems": 0
-   * }
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "name": {
+   *               "type": "string"
+   *             },
+   *             "fixWith": {
+   *               "type": "object",
+   *               "oneOf": [
+   *                 {
+   *                   "type": "object",
+   *                   "properties": {
+   *                     "kind": {
+   *                       "type": "string",
+   *                       "enum": [
+   *                         "type"
+   *                       ]
+   *                     },
+   *                     "name": {
+   *                       "type": "string"
+   *                     }
+   *                   },
+   *                   "required": [
+   *                     "kind",
+   *                     "name"
+   *                   ],
+   *                   "additionalProperties": false
+   *                 },
+   *                 {
+   *                   "type": "object",
+   *                   "properties": {
+   *                     "kind": {
+   *                       "type": "string",
+   *                       "enum": [
+   *                         "function"
+   *                       ]
+   *                     },
+   *                     "name": {
+   *                       "type": "string"
+   *                     }
+   *                   },
+   *                   "required": [
+   *                     "kind",
+   *                     "name"
+   *                   ],
+   *                   "additionalProperties": false
+   *                 }
+   *               ]
+   *             }
+   *           },
+   *           "required": [
+   *             "name"
+   *           ],
+   *           "additionalProperties": false
+   *         }
+   *       ]
+   *     },
+   *     "uniqueItems": true,
+   *     "minItems": 0
+   *   }
+   * ]
    * ```
    */
   /** @minItems 0 */
@@ -175,31 +189,35 @@ namespace NoRestrictedSyntax {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "items": {
-   *     "oneOf": [
-   *       {
-   *         "type": "string"
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "selector": {
-   *             "type": "string"
-   *           },
-   *           "message": {
-   *             "type": "string"
-   *           }
+   * [
+   *   {
+   *     "type": "array",
+   *     "items": {
+   *       "oneOf": [
+   *         {
+   *           "type": "string"
    *         },
-   *         "required": ["selector"],
-   *         "additionalProperties": false
-   *       }
-   *     ]
-   *   },
-   *   "uniqueItems": true,
-   *   "minItems": 0
-   * }
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "selector": {
+   *               "type": "string"
+   *             },
+   *             "message": {
+   *               "type": "string"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector"
+   *           ],
+   *           "additionalProperties": false
+   *         }
+   *       ]
+   *     },
+   *     "uniqueItems": true,
+   *     "minItems": 0
+   *   }
+   * ]
    * ```
    */
   /** @minItems 0 */

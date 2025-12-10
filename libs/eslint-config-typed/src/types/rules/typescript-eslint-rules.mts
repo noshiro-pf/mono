@@ -59,11 +59,11 @@ namespace ArrayType {
    *     "additionalProperties": false,
    *     "properties": {
    *       "default": {
-   *         "$ref": "#/items/0/$defs/arrayOption",
+   *         "$ref": "#/$defs/arrayOption",
    *         "description": "The array type expected for mutable cases."
    *       },
    *       "readonly": {
-   *         "$ref": "#/items/0/$defs/arrayOption",
+   *         "$ref": "#/$defs/arrayOption",
    *         "description": "The array type expected for readonly cases. If omitted, the value for `default` will be used."
    *       }
    *     }
@@ -159,19 +159,19 @@ namespace BanTsComment {
    *         "description": "A minimum character length for descriptions when `allow-with-description` is enabled."
    *       },
    *       "ts-check": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema",
+   *         "$ref": "#/$defs/directiveConfigSchema",
    *         "description": "Whether allow ts-check directives, and with which restrictions."
    *       },
    *       "ts-expect-error": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema",
+   *         "$ref": "#/$defs/directiveConfigSchema",
    *         "description": "Whether and when expect-error directives, and with which restrictions."
    *       },
    *       "ts-ignore": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema",
+   *         "$ref": "#/$defs/directiveConfigSchema",
    *         "description": "Whether allow ts-ignore directives, and with which restrictions."
    *       },
    *       "ts-nocheck": {
-   *         "$ref": "#/items/0/$defs/directiveConfigSchema",
+   *         "$ref": "#/$defs/directiveConfigSchema",
    *         "description": "Whether allow ts-nocheck directives, and with which restrictions."
    *       }
    *     }
@@ -988,7 +988,7 @@ namespace ExplicitMemberAccessibility {
    *     "additionalProperties": false,
    *     "properties": {
    *       "accessibility": {
-   *         "$ref": "#/items/0/$defs/accessibilityLevel",
+   *         "$ref": "#/$defs/accessibilityLevel",
    *         "description": "Which accessibility modifier is required to exist or not exist."
    *       },
    *       "ignoredMethodNames": {
@@ -1004,23 +1004,23 @@ namespace ExplicitMemberAccessibility {
    *         "description": "Changes to required accessibility modifiers for specific kinds of class members.",
    *         "properties": {
    *           "accessors": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "$ref": "#/$defs/accessibilityLevel",
    *             "description": "Which member accessibility modifier requirements to apply for accessors."
    *           },
    *           "constructors": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "$ref": "#/$defs/accessibilityLevel",
    *             "description": "Which member accessibility modifier requirements to apply for constructors."
    *           },
    *           "methods": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "$ref": "#/$defs/accessibilityLevel",
    *             "description": "Which member accessibility modifier requirements to apply for methods."
    *           },
    *           "parameterProperties": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "$ref": "#/$defs/accessibilityLevel",
    *             "description": "Which member accessibility modifier requirements to apply for parameterProperties."
    *           },
    *           "properties": {
-   *             "$ref": "#/items/0/$defs/accessibilityLevel",
+   *             "$ref": "#/$defs/accessibilityLevel",
    *             "description": "Which member accessibility modifier requirements to apply for properties."
    *           }
    *         }
@@ -1181,39 +1181,45 @@ namespace InitDeclarations {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "ignoreForLoopInit": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "never"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ignoreForLoopInit": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -1509,12 +1515,12 @@ namespace MemberOrdering {
    *             "items": {
    *               "oneOf": [
    *                 {
-   *                   "$ref": "#/items/0/$defs/allItems"
+   *                   "$ref": "#/$defs/allItems"
    *                 },
    *                 {
    *                   "type": "array",
    *                   "items": {
-   *                     "$ref": "#/items/0/$defs/allItems"
+   *                     "$ref": "#/$defs/allItems"
    *                   }
    *                 }
    *               ]
@@ -1531,12 +1537,12 @@ namespace MemberOrdering {
    *                     "items": {
    *                       "oneOf": [
    *                         {
-   *                           "$ref": "#/items/0/$defs/allItems"
+   *                           "$ref": "#/$defs/allItems"
    *                         },
    *                         {
    *                           "type": "array",
    *                           "items": {
-   *                             "$ref": "#/items/0/$defs/allItems"
+   *                             "$ref": "#/$defs/allItems"
    *                           }
    *                         }
    *                       ]
@@ -1551,10 +1557,10 @@ namespace MemberOrdering {
    *                 ]
    *               },
    *               "optionalityOrder": {
-   *                 "$ref": "#/items/0/$defs/optionalityOrderOptions"
+   *                 "$ref": "#/$defs/optionalityOrderOptions"
    *               },
    *               "order": {
-   *                 "$ref": "#/items/0/$defs/orderOptions"
+   *                 "$ref": "#/$defs/orderOptions"
    *               }
    *             }
    *           }
@@ -1573,12 +1579,12 @@ namespace MemberOrdering {
    *             "items": {
    *               "oneOf": [
    *                 {
-   *                   "$ref": "#/items/0/$defs/typeItems"
+   *                   "$ref": "#/$defs/typeItems"
    *                 },
    *                 {
    *                   "type": "array",
    *                   "items": {
-   *                     "$ref": "#/items/0/$defs/typeItems"
+   *                     "$ref": "#/$defs/typeItems"
    *                   }
    *                 }
    *               ]
@@ -1595,12 +1601,12 @@ namespace MemberOrdering {
    *                     "items": {
    *                       "oneOf": [
    *                         {
-   *                           "$ref": "#/items/0/$defs/typeItems"
+   *                           "$ref": "#/$defs/typeItems"
    *                         },
    *                         {
    *                           "type": "array",
    *                           "items": {
-   *                             "$ref": "#/items/0/$defs/typeItems"
+   *                             "$ref": "#/$defs/typeItems"
    *                           }
    *                         }
    *                       ]
@@ -1615,10 +1621,10 @@ namespace MemberOrdering {
    *                 ]
    *               },
    *               "optionalityOrder": {
-   *                 "$ref": "#/items/0/$defs/optionalityOrderOptions"
+   *                 "$ref": "#/$defs/optionalityOrderOptions"
    *               },
    *               "order": {
-   *                 "$ref": "#/items/0/$defs/orderOptions"
+   *                 "$ref": "#/$defs/orderOptions"
    *               }
    *             }
    *           }
@@ -1628,23 +1634,23 @@ namespace MemberOrdering {
    *     "additionalProperties": false,
    *     "properties": {
    *       "classes": {
-   *         "$ref": "#/items/0/$defs/baseConfig",
+   *         "$ref": "#/$defs/baseConfig",
    *         "description": "Which ordering to enforce for classes."
    *       },
    *       "classExpressions": {
-   *         "$ref": "#/items/0/$defs/baseConfig",
+   *         "$ref": "#/$defs/baseConfig",
    *         "description": "Which ordering to enforce for classExpressions."
    *       },
    *       "default": {
-   *         "$ref": "#/items/0/$defs/baseConfig",
+   *         "$ref": "#/$defs/baseConfig",
    *         "description": "Which ordering to enforce for default."
    *       },
    *       "interfaces": {
-   *         "$ref": "#/items/0/$defs/typesConfig",
+   *         "$ref": "#/$defs/typesConfig",
    *         "description": "Which ordering to enforce for interfaces."
    *       },
    *       "typeLiterals": {
-   *         "$ref": "#/items/0/$defs/typesConfig",
+   *         "$ref": "#/$defs/typesConfig",
    *         "description": "Which ordering to enforce for typeLiterals."
    *       }
    *     }
@@ -1935,1708 +1941,1906 @@ namespace NamingConvention {
    * ### schema
    *
    * ```json
-   * {
-   *   "$defs": {
-   *     "predefinedFormats": {
-   *       "enum": [
-   *         "camelCase",
-   *         "strictCamelCase",
-   *         "PascalCase",
-   *         "StrictPascalCase",
-   *         "snake_case",
-   *         "UPPER_CASE"
-   *       ],
-   *       "type": "string"
-   *     },
-   *     "typeModifiers": {
-   *       "enum": ["boolean", "string", "number", "function", "array"],
-   *       "type": "string"
-   *     },
-   *     "underscoreOptions": {
-   *       "enum": [
-   *         "forbid",
-   *         "allow",
-   *         "require",
-   *         "requireDouble",
-   *         "allowDouble",
-   *         "allowSingleOrDouble"
-   *       ],
-   *       "type": "string"
-   *     },
-   *     "formatOptionsConfig": {
-   *       "oneOf": [
-   *         {
-   *           "additionalItems": false,
-   *           "items": {
-   *             "$ref": "#/$defs/predefinedFormats"
-   *           },
-   *           "type": "array"
-   *         },
-   *         {
-   *           "type": "null"
-   *         }
-   *       ]
-   *     },
-   *     "matchRegexConfig": {
-   *       "additionalProperties": false,
-   *       "properties": {
-   *         "match": {
-   *           "type": "boolean"
-   *         },
-   *         "regex": {
-   *           "type": "string"
-   *         }
-   *       },
-   *       "required": ["match", "regex"],
-   *       "type": "object"
-   *     },
-   *     "prefixSuffixConfig": {
-   *       "additionalItems": false,
-   *       "items": {
-   *         "minLength": 1,
+   * [
+   *   {
+   *     "$defs": {
+   *       "predefinedFormats": {
+   *         "enum": [
+   *           "camelCase",
+   *           "strictCamelCase",
+   *           "PascalCase",
+   *           "StrictPascalCase",
+   *           "snake_case",
+   *           "UPPER_CASE"
+   *         ],
    *         "type": "string"
    *       },
-   *       "type": "array"
-   *     }
-   *   },
-   *   "additionalItems": false,
-   *   "items": {
-   *     "oneOf": [
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Multiple selectors in one config",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "modifiers": {
+   *       "typeModifiers": {
+   *         "enum": [
+   *           "boolean",
+   *           "string",
+   *           "number",
+   *           "function",
+   *           "array"
+   *         ],
+   *         "type": "string"
+   *       },
+   *       "underscoreOptions": {
+   *         "enum": [
+   *           "forbid",
+   *           "allow",
+   *           "require",
+   *           "requireDouble",
+   *           "allowDouble",
+   *           "allowSingleOrDouble"
+   *         ],
+   *         "type": "string"
+   *       },
+   *       "formatOptionsConfig": {
+   *         "oneOf": [
+   *           {
    *             "additionalItems": false,
    *             "items": {
-   *               "enum": [
-   *                 "const",
-   *                 "readonly",
-   *                 "static",
-   *                 "public",
-   *                 "protected",
-   *                 "private",
-   *                 "#private",
-   *                 "abstract",
-   *                 "destructured",
-   *                 "global",
-   *                 "exported",
-   *                 "unused",
-   *                 "requiresQuotes",
-   *                 "override",
-   *                 "async",
-   *                 "default",
-   *                 "namespace"
-   *               ],
-   *               "type": "string"
+   *               "$ref": "#/$defs/predefinedFormats"
    *             },
    *             "type": "array"
    *           },
-   *           "selector": {
-   *             "additionalItems": false,
-   *             "items": {
+   *           {
+   *             "type": "null"
+   *           }
+   *         ]
+   *       },
+   *       "matchRegexConfig": {
+   *         "additionalProperties": false,
+   *         "properties": {
+   *           "match": {
+   *             "type": "boolean"
+   *           },
+   *           "regex": {
+   *             "type": "string"
+   *           }
+   *         },
+   *         "required": [
+   *           "match",
+   *           "regex"
+   *         ],
+   *         "type": "object"
+   *       },
+   *       "prefixSuffixConfig": {
+   *         "additionalItems": false,
+   *         "items": {
+   *           "minLength": 1,
+   *           "type": "string"
+   *         },
+   *         "type": "array"
+   *       }
+   *     },
+   *     "additionalItems": false,
+   *     "items": {
+   *       "oneOf": [
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Multiple selectors in one config",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "const",
+   *                   "readonly",
+   *                   "static",
+   *                   "public",
+   *                   "protected",
+   *                   "private",
+   *                   "#private",
+   *                   "abstract",
+   *                   "destructured",
+   *                   "global",
+   *                   "exported",
+   *                   "unused",
+   *                   "requiresQuotes",
+   *                   "override",
+   *                   "async",
+   *                   "default",
+   *                   "namespace"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "selector": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "default",
+   *                   "variableLike",
+   *                   "memberLike",
+   *                   "typeLike",
+   *                   "method",
+   *                   "property",
+   *                   "accessor",
+   *                   "variable",
+   *                   "function",
+   *                   "parameter",
+   *                   "parameterProperty",
+   *                   "classicAccessor",
+   *                   "enumMember",
+   *                   "classMethod",
+   *                   "objectLiteralMethod",
+   *                   "typeMethod",
+   *                   "classProperty",
+   *                   "objectLiteralProperty",
+   *                   "typeProperty",
+   *                   "autoAccessor",
+   *                   "class",
+   *                   "interface",
+   *                   "typeAlias",
+   *                   "enum",
+   *                   "typeParameter",
+   *                   "import"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'default'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
    *               "enum": [
-   *                 "default",
-   *                 "variableLike",
-   *                 "memberLike",
-   *                 "typeLike",
-   *                 "method",
-   *                 "property",
-   *                 "accessor",
-   *                 "variable",
-   *                 "function",
-   *                 "parameter",
-   *                 "parameterProperty",
-   *                 "classicAccessor",
-   *                 "enumMember",
-   *                 "classMethod",
-   *                 "objectLiteralMethod",
-   *                 "typeMethod",
-   *                 "classProperty",
-   *                 "objectLiteralProperty",
-   *                 "typeProperty",
-   *                 "autoAccessor",
-   *                 "class",
-   *                 "interface",
-   *                 "typeAlias",
-   *                 "enum",
-   *                 "typeParameter",
+   *                 "default"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "const",
+   *                   "readonly",
+   *                   "static",
+   *                   "public",
+   *                   "protected",
+   *                   "private",
+   *                   "#private",
+   *                   "abstract",
+   *                   "destructured",
+   *                   "global",
+   *                   "exported",
+   *                   "unused",
+   *                   "requiresQuotes",
+   *                   "override",
+   *                   "async",
+   *                   "default",
+   *                   "namespace"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'variableLike'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "variableLike"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "unused",
+   *                   "async"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'variable'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "variable"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "const",
+   *                   "destructured",
+   *                   "exported",
+   *                   "global",
+   *                   "unused",
+   *                   "async"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'function'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "function"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "exported",
+   *                   "global",
+   *                   "unused",
+   *                   "async"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'parameter'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "parameter"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "destructured",
+   *                   "unused"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'memberLike'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "memberLike"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "private",
+   *                   "#private",
+   *                   "protected",
+   *                   "public",
+   *                   "readonly",
+   *                   "requiresQuotes",
+   *                   "static",
+   *                   "override",
+   *                   "async"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'classProperty'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "classProperty"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "private",
+   *                   "#private",
+   *                   "protected",
+   *                   "public",
+   *                   "readonly",
+   *                   "requiresQuotes",
+   *                   "static",
+   *                   "override"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'objectLiteralProperty'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "objectLiteralProperty"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "public",
+   *                   "requiresQuotes"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'typeProperty'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "typeProperty"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "public",
+   *                   "readonly",
+   *                   "requiresQuotes"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'parameterProperty'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "parameterProperty"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "private",
+   *                   "protected",
+   *                   "public",
+   *                   "readonly"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'property'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "property"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "private",
+   *                   "#private",
+   *                   "protected",
+   *                   "public",
+   *                   "readonly",
+   *                   "requiresQuotes",
+   *                   "static",
+   *                   "override",
+   *                   "async"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'classMethod'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "classMethod"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "private",
+   *                   "#private",
+   *                   "protected",
+   *                   "public",
+   *                   "requiresQuotes",
+   *                   "static",
+   *                   "override",
+   *                   "async"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'objectLiteralMethod'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "objectLiteralMethod"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "public",
+   *                   "requiresQuotes",
+   *                   "async"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'typeMethod'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "typeMethod"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "public",
+   *                   "requiresQuotes"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'method'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "method"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "private",
+   *                   "#private",
+   *                   "protected",
+   *                   "public",
+   *                   "requiresQuotes",
+   *                   "static",
+   *                   "override",
+   *                   "async"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'classicAccessor'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "classicAccessor"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "private",
+   *                   "protected",
+   *                   "public",
+   *                   "requiresQuotes",
+   *                   "static",
+   *                   "override"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'autoAccessor'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "autoAccessor"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "private",
+   *                   "protected",
+   *                   "public",
+   *                   "requiresQuotes",
+   *                   "static",
+   *                   "override"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'accessor'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "accessor"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "private",
+   *                   "protected",
+   *                   "public",
+   *                   "requiresQuotes",
+   *                   "static",
+   *                   "override"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             },
+   *             "types": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "$ref": "#/$defs/typeModifiers"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'enumMember'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "enumMember"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "requiresQuotes"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'typeLike'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "typeLike"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "exported",
+   *                   "unused"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'class'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "class"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "abstract",
+   *                   "exported",
+   *                   "unused"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'interface'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "interface"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "exported",
+   *                   "unused"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'typeAlias'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "typeAlias"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "exported",
+   *                   "unused"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'enum'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "enum"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "exported",
+   *                   "unused"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'typeParameter'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
+   *                 "typeParameter"
+   *               ],
+   *               "type": "string"
+   *             },
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "unused"
+   *                 ],
+   *                 "type": "string"
+   *               },
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "description": "Selector 'import'",
+   *           "properties": {
+   *             "custom": {
+   *               "$ref": "#/$defs/matchRegexConfig"
+   *             },
+   *             "failureMessage": {
+   *               "type": "string"
+   *             },
+   *             "format": {
+   *               "$ref": "#/$defs/formatOptionsConfig"
+   *             },
+   *             "leadingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "prefix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "suffix": {
+   *               "$ref": "#/$defs/prefixSuffixConfig"
+   *             },
+   *             "trailingUnderscore": {
+   *               "$ref": "#/$defs/underscoreOptions"
+   *             },
+   *             "filter": {
+   *               "oneOf": [
+   *                 {
+   *                   "minLength": 1,
+   *                   "type": "string"
+   *                 },
+   *                 {
+   *                   "$ref": "#/$defs/matchRegexConfig"
+   *                 }
+   *               ]
+   *             },
+   *             "selector": {
+   *               "enum": [
    *                 "import"
    *               ],
    *               "type": "string"
    *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'default'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
+   *             "modifiers": {
+   *               "additionalItems": false,
+   *               "items": {
+   *                 "enum": [
+   *                   "default",
+   *                   "namespace"
+   *                 ],
    *                 "type": "string"
    *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["default"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "const",
-   *                 "readonly",
-   *                 "static",
-   *                 "public",
-   *                 "protected",
-   *                 "private",
-   *                 "#private",
-   *                 "abstract",
-   *                 "destructured",
-   *                 "global",
-   *                 "exported",
-   *                 "unused",
-   *                 "requiresQuotes",
-   *                 "override",
-   *                 "async",
-   *                 "default",
-   *                 "namespace"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'variableLike'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["variableLike"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["unused", "async"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'variable'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["variable"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "const",
-   *                 "destructured",
-   *                 "exported",
-   *                 "global",
-   *                 "unused",
-   *                 "async"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'function'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["function"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["exported", "global", "unused", "async"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'parameter'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["parameter"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["destructured", "unused"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'memberLike'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["memberLike"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "abstract",
-   *                 "private",
-   *                 "#private",
-   *                 "protected",
-   *                 "public",
-   *                 "readonly",
-   *                 "requiresQuotes",
-   *                 "static",
-   *                 "override",
-   *                 "async"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'classProperty'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["classProperty"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "abstract",
-   *                 "private",
-   *                 "#private",
-   *                 "protected",
-   *                 "public",
-   *                 "readonly",
-   *                 "requiresQuotes",
-   *                 "static",
-   *                 "override"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'objectLiteralProperty'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["objectLiteralProperty"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["public", "requiresQuotes"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'typeProperty'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["typeProperty"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["public", "readonly", "requiresQuotes"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'parameterProperty'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["parameterProperty"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["private", "protected", "public", "readonly"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'property'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["property"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "abstract",
-   *                 "private",
-   *                 "#private",
-   *                 "protected",
-   *                 "public",
-   *                 "readonly",
-   *                 "requiresQuotes",
-   *                 "static",
-   *                 "override",
-   *                 "async"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'classMethod'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["classMethod"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "abstract",
-   *                 "private",
-   *                 "#private",
-   *                 "protected",
-   *                 "public",
-   *                 "requiresQuotes",
-   *                 "static",
-   *                 "override",
-   *                 "async"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'objectLiteralMethod'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["objectLiteralMethod"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["public", "requiresQuotes", "async"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'typeMethod'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["typeMethod"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["public", "requiresQuotes"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'method'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["method"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "abstract",
-   *                 "private",
-   *                 "#private",
-   *                 "protected",
-   *                 "public",
-   *                 "requiresQuotes",
-   *                 "static",
-   *                 "override",
-   *                 "async"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'classicAccessor'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["classicAccessor"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "abstract",
-   *                 "private",
-   *                 "protected",
-   *                 "public",
-   *                 "requiresQuotes",
-   *                 "static",
-   *                 "override"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'autoAccessor'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["autoAccessor"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "abstract",
-   *                 "private",
-   *                 "protected",
-   *                 "public",
-   *                 "requiresQuotes",
-   *                 "static",
-   *                 "override"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'accessor'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["accessor"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": [
-   *                 "abstract",
-   *                 "private",
-   *                 "protected",
-   *                 "public",
-   *                 "requiresQuotes",
-   *                 "static",
-   *                 "override"
-   *               ],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           },
-   *           "types": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "$ref": "#/$defs/typeModifiers"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'enumMember'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["enumMember"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["requiresQuotes"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'typeLike'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["typeLike"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["abstract", "exported", "unused"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'class'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["class"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["abstract", "exported", "unused"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'interface'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["interface"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["exported", "unused"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'typeAlias'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["typeAlias"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["exported", "unused"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'enum'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["enum"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["exported", "unused"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'typeParameter'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["typeParameter"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["unused"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       },
-   *       {
-   *         "additionalProperties": false,
-   *         "description": "Selector 'import'",
-   *         "properties": {
-   *           "custom": {
-   *             "$ref": "#/$defs/matchRegexConfig"
-   *           },
-   *           "failureMessage": {
-   *             "type": "string"
-   *           },
-   *           "format": {
-   *             "$ref": "#/$defs/formatOptionsConfig"
-   *           },
-   *           "leadingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "prefix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "suffix": {
-   *             "$ref": "#/$defs/prefixSuffixConfig"
-   *           },
-   *           "trailingUnderscore": {
-   *             "$ref": "#/$defs/underscoreOptions"
-   *           },
-   *           "filter": {
-   *             "oneOf": [
-   *               {
-   *                 "minLength": 1,
-   *                 "type": "string"
-   *               },
-   *               {
-   *                 "$ref": "#/$defs/matchRegexConfig"
-   *               }
-   *             ]
-   *           },
-   *           "selector": {
-   *             "enum": ["import"],
-   *             "type": "string"
-   *           },
-   *           "modifiers": {
-   *             "additionalItems": false,
-   *             "items": {
-   *               "enum": ["default", "namespace"],
-   *               "type": "string"
-   *             },
-   *             "type": "array"
-   *           }
-   *         },
-   *         "required": ["selector", "format"],
-   *         "type": "object"
-   *       }
-   *     ]
-   *   },
-   *   "type": "array"
-   * }
+   *               "type": "array"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector",
+   *             "format"
+   *           ],
+   *           "type": "object"
+   *         }
+   *       ]
+   *     },
+   *     "type": "array"
+   *   }
+   * ]
    * ```
    */
   export type FormatOptionsConfig = readonly PredefinedFormats[] | null;
@@ -6238,169 +6442,176 @@ namespace NoRestrictedImports {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": {
-   *         "anyOf": [
-   *           {
-   *             "type": "string"
-   *           },
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": {
+   *           "anyOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "type": "object",
+   *               "additionalProperties": false,
+   *               "properties": {
+   *                 "name": {
+   *                   "type": "string"
+   *                 },
+   *                 "message": {
+   *                   "type": "string",
+   *                   "minLength": 1
+   *                 },
+   *                 "importNames": {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "allowImportNames": {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "allowTypeImports": {
+   *                   "type": "boolean",
+   *                   "description": "Whether to allow type-only imports for a path."
+   *                 }
+   *               },
+   *               "required": [
+   *                 "name"
+   *               ]
+   *             }
+   *           ]
+   *         },
+   *         "uniqueItems": true
+   *       },
+   *       {
+   *         "type": "array",
+   *         "additionalItems": false,
+   *         "items": [
    *           {
    *             "type": "object",
    *             "additionalProperties": false,
    *             "properties": {
-   *               "name": {
-   *                 "type": "string"
-   *               },
-   *               "message": {
-   *                 "type": "string",
-   *                 "minLength": 1
-   *               },
-   *               "importNames": {
+   *               "paths": {
    *                 "type": "array",
    *                 "items": {
-   *                   "type": "string"
-   *                 }
+   *                   "anyOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "additionalProperties": false,
+   *                       "properties": {
+   *                         "name": {
+   *                           "type": "string"
+   *                         },
+   *                         "message": {
+   *                           "type": "string",
+   *                           "minLength": 1
+   *                         },
+   *                         "importNames": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "allowImportNames": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "allowTypeImports": {
+   *                           "type": "boolean",
+   *                           "description": "Whether to allow type-only imports for a path."
+   *                         }
+   *                       },
+   *                       "required": [
+   *                         "name"
+   *                       ]
+   *                     }
+   *                   ]
+   *                 },
+   *                 "uniqueItems": true
    *               },
-   *               "allowImportNames": {
-   *                 "type": "array",
-   *                 "items": {
-   *                   "type": "string"
-   *                 }
-   *               },
-   *               "allowTypeImports": {
-   *                 "type": "boolean",
-   *                 "description": "Whether to allow type-only imports for a path."
-   *               }
-   *             },
-   *             "required": ["name"]
-   *           }
-   *         ]
-   *       },
-   *       "uniqueItems": true
-   *     },
-   *     {
-   *       "type": "array",
-   *       "additionalItems": false,
-   *       "items": [
-   *         {
-   *           "type": "object",
-   *           "additionalProperties": false,
-   *           "properties": {
-   *             "paths": {
-   *               "type": "array",
-   *               "items": {
+   *               "patterns": {
    *                 "anyOf": [
    *                   {
-   *                     "type": "string"
+   *                     "type": "array",
+   *                     "items": {
+   *                       "type": "string"
+   *                     },
+   *                     "uniqueItems": true
    *                   },
    *                   {
-   *                     "type": "object",
-   *                     "additionalProperties": false,
-   *                     "properties": {
-   *                       "name": {
-   *                         "type": "string"
-   *                       },
-   *                       "message": {
-   *                         "type": "string",
-   *                         "minLength": 1
-   *                       },
-   *                       "importNames": {
-   *                         "type": "array",
-   *                         "items": {
+   *                     "type": "array",
+   *                     "items": {
+   *                       "type": "object",
+   *                       "additionalProperties": false,
+   *                       "properties": {
+   *                         "importNames": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           },
+   *                           "minItems": 1,
+   *                           "uniqueItems": true
+   *                         },
+   *                         "allowImportNames": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           },
+   *                           "minItems": 1,
+   *                           "uniqueItems": true
+   *                         },
+   *                         "group": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           },
+   *                           "minItems": 1,
+   *                           "uniqueItems": true
+   *                         },
+   *                         "regex": {
    *                           "type": "string"
-   *                         }
-   *                       },
-   *                       "allowImportNames": {
-   *                         "type": "array",
-   *                         "items": {
+   *                         },
+   *                         "importNamePattern": {
    *                           "type": "string"
+   *                         },
+   *                         "allowImportNamePattern": {
+   *                           "type": "string"
+   *                         },
+   *                         "message": {
+   *                           "type": "string",
+   *                           "minLength": 1
+   *                         },
+   *                         "caseSensitive": {
+   *                           "type": "boolean"
+   *                         },
+   *                         "allowTypeImports": {
+   *                           "type": "boolean",
+   *                           "description": "Whether to allow type-only imports for a path."
    *                         }
-   *                       },
-   *                       "allowTypeImports": {
-   *                         "type": "boolean",
-   *                         "description": "Whether to allow type-only imports for a path."
    *                       }
    *                     },
-   *                     "required": ["name"]
+   *                     "uniqueItems": true
    *                   }
    *                 ]
-   *               },
-   *               "uniqueItems": true
-   *             },
-   *             "patterns": {
-   *               "anyOf": [
-   *                 {
-   *                   "type": "array",
-   *                   "items": {
-   *                     "type": "string"
-   *                   },
-   *                   "uniqueItems": true
-   *                 },
-   *                 {
-   *                   "type": "array",
-   *                   "items": {
-   *                     "type": "object",
-   *                     "additionalProperties": false,
-   *                     "properties": {
-   *                       "importNames": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         },
-   *                         "minItems": 1,
-   *                         "uniqueItems": true
-   *                       },
-   *                       "allowImportNames": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         },
-   *                         "minItems": 1,
-   *                         "uniqueItems": true
-   *                       },
-   *                       "group": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         },
-   *                         "minItems": 1,
-   *                         "uniqueItems": true
-   *                       },
-   *                       "regex": {
-   *                         "type": "string"
-   *                       },
-   *                       "importNamePattern": {
-   *                         "type": "string"
-   *                       },
-   *                       "allowImportNamePattern": {
-   *                         "type": "string"
-   *                       },
-   *                       "message": {
-   *                         "type": "string",
-   *                         "minLength": 1
-   *                       },
-   *                       "caseSensitive": {
-   *                         "type": "boolean"
-   *                       },
-   *                       "allowTypeImports": {
-   *                         "type": "boolean",
-   *                         "description": "Whether to allow type-only imports for a path."
-   *                       }
-   *                     }
-   *                   },
-   *                   "uniqueItems": true
-   *                 }
-   *               ]
+   *               }
    *             }
    *           }
-   *         }
-   *       ]
-   *     }
-   *   ]
-   * }
+   *         ],
+   *         "minItems": 1
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -6520,7 +6731,7 @@ namespace NoRestrictedTypes {
    *       "types": {
    *         "type": "object",
    *         "additionalProperties": {
-   *           "$ref": "#/items/0/$defs/banConfig"
+   *           "$ref": "#/$defs/banConfig"
    *         },
    *         "description": "An object whose keys are the types you want to ban, and the values are error messages."
    *       }
@@ -6744,35 +6955,35 @@ namespace NoTypeAlias {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowAliases": {
-   *         "$ref": "#/items/0/$defs/expandedOptions",
+   *         "$ref": "#/$defs/expandedOptions",
    *         "description": "Whether to allow direct one-to-one type aliases."
    *       },
    *       "allowCallbacks": {
-   *         "$ref": "#/items/0/$defs/simpleOptions",
+   *         "$ref": "#/$defs/simpleOptions",
    *         "description": "Whether to allow type aliases for callbacks."
    *       },
    *       "allowConditionalTypes": {
-   *         "$ref": "#/items/0/$defs/simpleOptions",
+   *         "$ref": "#/$defs/simpleOptions",
    *         "description": "Whether to allow type aliases for conditional types."
    *       },
    *       "allowConstructors": {
-   *         "$ref": "#/items/0/$defs/simpleOptions",
+   *         "$ref": "#/$defs/simpleOptions",
    *         "description": "Whether to allow type aliases with constructors."
    *       },
    *       "allowGenerics": {
-   *         "$ref": "#/items/0/$defs/simpleOptions",
+   *         "$ref": "#/$defs/simpleOptions",
    *         "description": "Whether to allow type aliases with generic types."
    *       },
    *       "allowLiterals": {
-   *         "$ref": "#/items/0/$defs/expandedOptions",
+   *         "$ref": "#/$defs/expandedOptions",
    *         "description": "Whether to allow type aliases with object literal types."
    *       },
    *       "allowMappedTypes": {
-   *         "$ref": "#/items/0/$defs/expandedOptions",
+   *         "$ref": "#/$defs/expandedOptions",
    *         "description": "Whether to allow type aliases with mapped types."
    *       },
    *       "allowTupleTypes": {
-   *         "$ref": "#/items/0/$defs/expandedOptions",
+   *         "$ref": "#/$defs/expandedOptions",
    *         "description": "Whether to allow type aliases with tuple types."
    *       }
    *     }
@@ -7964,7 +8175,7 @@ namespace ParameterProperties {
    *         "type": "array",
    *         "description": "Whether to allow certain kinds of properties to be ignored.",
    *         "items": {
-   *           "$ref": "#/items/0/$defs/modifier"
+   *           "$ref": "#/$defs/modifier"
    *         }
    *       },
    *       "prefer": {
@@ -9436,7 +9647,6 @@ namespace ReturnAwait {
    * ```json
    * [
    *   {
-   *     "type": "string",
    *     "oneOf": [
    *       {
    *         "type": "string",

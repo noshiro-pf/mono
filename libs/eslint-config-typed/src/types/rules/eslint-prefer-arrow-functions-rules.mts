@@ -65,8 +65,12 @@ namespace PreferArrowFunctions {
    *       },
    *       "returnStyle": {
    *         "default": "unchanged",
-   *         "pattern": "^(explicit|implicit|unchanged)$",
-   *         "type": "string"
+   *         "type": "string",
+   *         "enum": [
+   *           "explicit",
+   *           "implicit",
+   *           "unchanged"
+   *         ]
    *       },
    *       "singleReturnOnly": {
    *         "default": false,

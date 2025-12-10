@@ -1996,6 +1996,47 @@ namespace ValidTitle {
    * [
    *   {
    *     "type": "object",
+   *     "additionalProperties": false,
+   *     "definitions": {
+   *       "PatternOrPatternArray": {
+   *         "oneOf": [
+   *           {
+   *             "type": "string"
+   *           },
+   *           {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string"
+   *             },
+   *             "minItems": 1,
+   *             "maxItems": 2,
+   *             "additionalItems": false
+   *           }
+   *         ]
+   *       },
+   *       "MustMatchType": {
+   *         "oneOf": [
+   *           {
+   *             "$ref": "#/definitions/PatternOrPatternArray"
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "describe": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               },
+   *               "test": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               },
+   *               "it": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     },
    *     "properties": {
    *       "ignoreTypeOfDescribeName": {
    *         "type": "boolean",
@@ -2010,54 +2051,14 @@ namespace ValidTitle {
    *         "items": {
    *           "type": "string"
    *         }
+   *       },
+   *       "mustMatch": {
+   *         "$ref": "#/definitions/MustMatchType"
+   *       },
+   *       "mustNotMatch": {
+   *         "$ref": "#/definitions/MustMatchType"
    *       }
-   *     },
-   *     "patternProperties": {
-   *       "^must(?:Not)?Match$": {
-   *         "oneOf": [
-   *           {
-   *             "type": "string"
-   *           },
-   *           {
-   *             "type": "array",
-   *             "items": {
-   *               "type": "string"
-   *             },
-   *             "minItems": 1,
-   *             "maxItems": 2,
-   *             "additionalItems": false
-   *           },
-   *           {
-   *             "type": "object",
-   *             "propertyNames": {
-   *               "type": "string",
-   *               "enum": [
-   *                 "describe",
-   *                 "test",
-   *                 "it"
-   *               ]
-   *             },
-   *             "additionalProperties": {
-   *               "oneOf": [
-   *                 {
-   *                   "type": "string"
-   *                 },
-   *                 {
-   *                   "type": "array",
-   *                   "items": {
-   *                     "type": "string"
-   *                   },
-   *                   "minItems": 1,
-   *                   "maxItems": 2,
-   *                   "additionalItems": false
-   *                 }
-   *               ]
-   *             }
-   *           }
-   *         ]
-   *       }
-   *     },
-   *     "additionalProperties": false
+   *     }
    *   }
    * ]
    * ```

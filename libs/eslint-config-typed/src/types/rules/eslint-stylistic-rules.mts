@@ -147,57 +147,66 @@ namespace ArrayElementNewline {
    * ### schema
    *
    * ```json
-   * {
-   *   "definitions": {
-   *     "basicConfig": {
-   *       "oneOf": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["always", "never", "consistent"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "consistent": {
-   *               "type": "boolean"
-   *             },
-   *             "multiline": {
-   *               "type": "boolean"
-   *             },
-   *             "minItems": {
-   *               "type": ["integer", "null"],
-   *               "minimum": 0
-   *             }
+   * [
+   *   {
+   *     "definitions": {
+   *       "basicConfig": {
+   *         "oneOf": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always",
+   *               "never",
+   *               "consistent"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "items": [
-   *     {
-   *       "oneOf": [
-   *         {
-   *           "$ref": "#/definitions/basicConfig"
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "ArrayExpression": {
-   *               "$ref": "#/definitions/basicConfig"
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "consistent": {
+   *                 "type": "boolean"
+   *               },
+   *               "multiline": {
+   *                 "type": "boolean"
+   *               },
+   *               "minItems": {
+   *                 "type": [
+   *                   "integer",
+   *                   "null"
+   *                 ],
+   *                 "minimum": 0
+   *               }
    *             },
-   *             "ArrayPattern": {
-   *               "$ref": "#/definitions/basicConfig"
-   *             }
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     },
+   *     "type": "array",
+   *     "items": [
+   *       {
+   *         "oneOf": [
+   *           {
+   *             "$ref": "#/definitions/basicConfig"
    *           },
-   *           "additionalProperties": false,
-   *           "minProperties": 1
-   *         }
-   *       ]
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ArrayExpression": {
+   *                 "$ref": "#/definitions/basicConfig"
+   *               },
+   *               "ArrayPattern": {
+   *                 "$ref": "#/definitions/basicConfig"
+   *               }
+   *             },
+   *             "additionalProperties": false,
+   *             "minProperties": 1
+   *           }
+   *         ]
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -436,71 +445,78 @@ namespace CommaDangle {
    * ### schema
    *
    * ```json
-   * {
-   *   "$defs": {
-   *     "value": {
-   *       "type": "string",
-   *       "enum": ["always-multiline", "always", "never", "only-multiline"]
+   * [
+   *   {
+   *     "$defs": {
+   *       "value": {
+   *         "type": "string",
+   *         "enum": [
+   *           "always-multiline",
+   *           "always",
+   *           "never",
+   *           "only-multiline"
+   *         ]
+   *       },
+   *       "valueWithIgnore": {
+   *         "type": "string",
+   *         "enum": [
+   *           "always-multiline",
+   *           "always",
+   *           "never",
+   *           "only-multiline",
+   *           "ignore"
+   *         ]
+   *       }
    *     },
-   *     "valueWithIgnore": {
-   *       "type": "string",
-   *       "enum": [
-   *         "always-multiline",
-   *         "always",
-   *         "never",
-   *         "only-multiline",
-   *         "ignore"
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "items": [
-   *     {
-   *       "oneOf": [
-   *         {
-   *           "$ref": "#/$defs/value"
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "arrays": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "objects": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "imports": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "exports": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "functions": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "importAttributes": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "dynamicImports": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "enums": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "generics": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             },
-   *             "tuples": {
-   *               "$ref": "#/$defs/valueWithIgnore"
-   *             }
+   *     "type": "array",
+   *     "items": [
+   *       {
+   *         "oneOf": [
+   *           {
+   *             "$ref": "#/$defs/value"
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ]
-   *     }
-   *   ],
-   *   "additionalItems": false
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "arrays": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "objects": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "imports": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "exports": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "functions": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "importAttributes": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "dynamicImports": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "enums": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "generics": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               },
+   *               "tuples": {
+   *                 "$ref": "#/$defs/valueWithIgnore"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     ],
+   *     "additionalItems": false
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -1606,53 +1622,59 @@ namespace FunctionCallSpacing {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["never"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["always"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "allowNewlines": {
-   *               "type": "boolean"
-   *             },
-   *             "optionalChain": {
-   *               "type": "object",
-   *               "properties": {
-   *                 "before": {
-   *                   "type": "boolean"
-   *                 },
-   *                 "after": {
-   *                   "type": "boolean"
-   *                 }
-   *               },
-   *               "additionalProperties": false
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "never"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "allowNewlines": {
+   *                 "type": "boolean"
+   *               },
+   *               "optionalChain": {
+   *                 "type": "object",
+   *                 "properties": {
+   *                   "before": {
+   *                     "type": "boolean"
+   *                   },
+   *                   "after": {
+   *                     "type": "boolean"
+   *                   }
+   *                 },
+   *                 "additionalProperties": false
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -2771,121 +2793,147 @@ namespace JsxCurlySpacing {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "items": [
-   *     {
-   *       "anyOf": [
-   *         {
-   *           "type": "object",
-   *           "additionalProperties": false,
-   *           "properties": {
-   *             "when": {
-   *               "type": "string",
-   *               "enum": ["always", "never"]
-   *             },
-   *             "allowMultiline": {
-   *               "type": "boolean"
-   *             },
-   *             "spacing": {
-   *               "type": "object",
-   *               "properties": {
-   *                 "objectLiterals": {
-   *                   "type": "string",
-   *                   "enum": ["always", "never"]
-   *                 }
+   * [
+   *   {
+   *     "type": "array",
+   *     "items": [
+   *       {
+   *         "anyOf": [
+   *           {
+   *             "type": "object",
+   *             "additionalProperties": false,
+   *             "properties": {
+   *               "when": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "always",
+   *                   "never"
+   *                 ]
    *               },
-   *               "additionalProperties": false
-   *             },
-   *             "attributes": {
-   *               "anyOf": [
-   *                 {
-   *                   "type": "object",
-   *                   "properties": {
-   *                     "when": {
-   *                       "type": "string",
-   *                       "enum": ["always", "never"]
-   *                     },
-   *                     "allowMultiline": {
-   *                       "type": "boolean"
-   *                     },
-   *                     "spacing": {
-   *                       "type": "object",
-   *                       "properties": {
-   *                         "objectLiterals": {
-   *                           "type": "string",
-   *                           "enum": ["always", "never"]
-   *                         }
-   *                       },
-   *                       "additionalProperties": false
-   *                     }
-   *                   },
-   *                   "additionalProperties": false
+   *               "allowMultiline": {
+   *                 "type": "boolean"
+   *               },
+   *               "spacing": {
+   *                 "type": "object",
+   *                 "properties": {
+   *                   "objectLiterals": {
+   *                     "type": "string",
+   *                     "enum": [
+   *                       "always",
+   *                       "never"
+   *                     ]
+   *                   }
    *                 },
-   *                 {
-   *                   "type": "boolean"
-   *                 }
-   *               ]
-   *             },
-   *             "children": {
-   *               "anyOf": [
-   *                 {
-   *                   "type": "object",
-   *                   "properties": {
-   *                     "when": {
-   *                       "type": "string",
-   *                       "enum": ["always", "never"]
-   *                     },
-   *                     "allowMultiline": {
-   *                       "type": "boolean"
-   *                     },
-   *                     "spacing": {
-   *                       "type": "object",
-   *                       "properties": {
-   *                         "objectLiterals": {
-   *                           "type": "string",
-   *                           "enum": ["always", "never"]
-   *                         }
+   *                 "additionalProperties": false
+   *               },
+   *               "attributes": {
+   *                 "anyOf": [
+   *                   {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "when": {
+   *                         "type": "string",
+   *                         "enum": [
+   *                           "always",
+   *                           "never"
+   *                         ]
    *                       },
-   *                       "additionalProperties": false
-   *                     }
+   *                       "allowMultiline": {
+   *                         "type": "boolean"
+   *                       },
+   *                       "spacing": {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "objectLiterals": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "always",
+   *                               "never"
+   *                             ]
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       }
+   *                     },
+   *                     "additionalProperties": false
    *                   },
-   *                   "additionalProperties": false
-   *                 },
-   *                 {
-   *                   "type": "boolean"
-   *                 }
-   *               ]
-   *             }
-   *           }
-   *         },
-   *         {
-   *           "type": "string",
-   *           "enum": ["always", "never"]
-   *         }
-   *       ]
-   *     },
-   *     {
-   *       "type": "object",
-   *       "properties": {
-   *         "allowMultiline": {
-   *           "type": "boolean"
-   *         },
-   *         "spacing": {
-   *           "type": "object",
-   *           "properties": {
-   *             "objectLiterals": {
-   *               "type": "string",
-   *               "enum": ["always", "never"]
+   *                   {
+   *                     "type": "boolean"
+   *                   }
+   *                 ]
+   *               },
+   *               "children": {
+   *                 "anyOf": [
+   *                   {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "when": {
+   *                         "type": "string",
+   *                         "enum": [
+   *                           "always",
+   *                           "never"
+   *                         ]
+   *                       },
+   *                       "allowMultiline": {
+   *                         "type": "boolean"
+   *                       },
+   *                       "spacing": {
+   *                         "type": "object",
+   *                         "properties": {
+   *                           "objectLiterals": {
+   *                             "type": "string",
+   *                             "enum": [
+   *                               "always",
+   *                               "never"
+   *                             ]
+   *                           }
+   *                         },
+   *                         "additionalProperties": false
+   *                       }
+   *                     },
+   *                     "additionalProperties": false
+   *                   },
+   *                   {
+   *                     "type": "boolean"
+   *                   }
+   *                 ]
+   *               }
    *             }
    *           },
-   *           "additionalProperties": false
-   *         }
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always",
+   *               "never"
+   *             ]
+   *           }
+   *         ]
    *       },
-   *       "additionalProperties": false
-   *     }
-   *   ]
-   * }
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "allowMultiline": {
+   *             "type": "boolean"
+   *           },
+   *           "spacing": {
+   *             "type": "object",
+   *             "properties": {
+   *               "objectLiterals": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "always",
+   *                   "never"
+   *                 ]
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -5877,10 +5925,10 @@ namespace ExpListStyle {
    *         "additionalProperties": false,
    *         "properties": {
    *           "singleLine": {
-   *             "$ref": "#/items/0/$defs/singleLineConfig"
+   *             "$ref": "#/$defs/singleLineConfig"
    *           },
    *           "multiline": {
-   *             "$ref": "#/items/0/$defs/multiLineConfig"
+   *             "$ref": "#/$defs/multiLineConfig"
    *           }
    *         }
    *       }
@@ -5889,92 +5937,92 @@ namespace ExpListStyle {
    *     "additionalProperties": false,
    *     "properties": {
    *       "singleLine": {
-   *         "$ref": "#/items/0/$defs/singleLineConfig"
+   *         "$ref": "#/$defs/singleLineConfig"
    *       },
    *       "multiLine": {
-   *         "$ref": "#/items/0/$defs/multiLineConfig"
+   *         "$ref": "#/$defs/multiLineConfig"
    *       },
    *       "overrides": {
    *         "type": "object",
    *         "additionalProperties": false,
    *         "properties": {
    *           "[]": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "{}": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "<>": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "()": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "ArrayExpression": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "ArrayPattern": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "ArrowFunctionExpression": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "CallExpression": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "ExportNamedDeclaration": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "FunctionDeclaration": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "FunctionExpression": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "ImportDeclaration": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "ImportAttributes": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "NewExpression": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "ObjectExpression": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "ObjectPattern": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "TSDeclareFunction": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "TSFunctionType": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "TSInterfaceBody": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "TSEnumBody": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "TSTupleType": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "TSTypeLiteral": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "TSTypeParameterDeclaration": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "TSTypeParameterInstantiation": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "JSONArrayExpression": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           },
    *           "JSONObjectExpression": {
-   *             "$ref": "#/items/0/$defs/baseConfig"
+   *             "$ref": "#/$defs/baseConfig"
    *           }
    *         }
    *       }
@@ -6383,7 +6431,7 @@ namespace MemberDelimiterStyle {
    *             "type": "object",
    *             "properties": {
    *               "delimiter": {
-   *                 "$ref": "#/items/0/$defs/multiLineOption"
+   *                 "$ref": "#/$defs/multiLineOption"
    *               },
    *               "requireLast": {
    *                 "type": "boolean"
@@ -6395,7 +6443,7 @@ namespace MemberDelimiterStyle {
    *             "type": "object",
    *             "properties": {
    *               "delimiter": {
-   *                 "$ref": "#/items/0/$defs/singleLineOption"
+   *                 "$ref": "#/$defs/singleLineOption"
    *               },
    *               "requireLast": {
    *                 "type": "boolean"
@@ -6413,7 +6461,7 @@ namespace MemberDelimiterStyle {
    *         "type": "object",
    *         "properties": {
    *           "delimiter": {
-   *             "$ref": "#/items/0/$defs/multiLineOption"
+   *             "$ref": "#/$defs/multiLineOption"
    *           },
    *           "requireLast": {
    *             "type": "boolean"
@@ -6425,7 +6473,7 @@ namespace MemberDelimiterStyle {
    *         "type": "object",
    *         "properties": {
    *           "delimiter": {
-   *             "$ref": "#/items/0/$defs/singleLineOption"
+   *             "$ref": "#/$defs/singleLineOption"
    *           },
    *           "requireLast": {
    *             "type": "boolean"
@@ -6437,10 +6485,10 @@ namespace MemberDelimiterStyle {
    *         "type": "object",
    *         "properties": {
    *           "interface": {
-   *             "$ref": "#/items/0/$defs/delimiterConfig"
+   *             "$ref": "#/$defs/delimiterConfig"
    *           },
    *           "typeLiteral": {
-   *             "$ref": "#/items/0/$defs/delimiterConfig"
+   *             "$ref": "#/$defs/delimiterConfig"
    *           }
    *         },
    *         "additionalProperties": false
@@ -6513,42 +6561,49 @@ namespace MultilineCommentStyle {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["starred-block", "bare-block"],
-   *           "type": "string"
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["separate-lines"],
-   *           "type": "string"
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "checkJSDoc": {
-   *               "type": "boolean"
-   *             },
-   *             "checkExclamation": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "starred-block",
+   *               "bare-block"
+   *             ],
+   *             "type": "string"
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "separate-lines"
+   *             ],
+   *             "type": "string"
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "checkJSDoc": {
+   *                 "type": "boolean"
+   *               },
+   *               "checkExclamation": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -6772,97 +6827,108 @@ namespace NoExtraParens {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["functions"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["all"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "conditionalAssign": {
-   *               "type": "boolean"
-   *             },
-   *             "ternaryOperandBinaryExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "nestedBinaryExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "returnAssign": {
-   *               "type": "boolean"
-   *             },
-   *             "ignoreJSX": {
-   *               "type": "string",
-   *               "enum": ["none", "all", "single-line", "multi-line"]
-   *             },
-   *             "enforceForArrowConditionals": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForSequenceExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForNewInMemberExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForFunctionPrototypeMethods": {
-   *               "type": "boolean"
-   *             },
-   *             "allowParensAfterCommentPattern": {
-   *               "type": "string"
-   *             },
-   *             "nestedConditionalExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "allowNodesInSpreadElement": {
-   *               "type": "object",
-   *               "properties": {
-   *                 "ConditionalExpression": {
-   *                   "type": "boolean"
-   *                 },
-   *                 "LogicalExpression": {
-   *                   "type": "boolean"
-   *                 },
-   *                 "AwaitExpression": {
-   *                   "type": "boolean"
-   *                 }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "functions"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "all"
+   *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "conditionalAssign": {
+   *                 "type": "boolean"
    *               },
-   *               "additionalProperties": false
-   *             },
-   *             "ignoredNodes": {
-   *               "type": "array",
-   *               "items": {
+   *               "ternaryOperandBinaryExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "nestedBinaryExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "returnAssign": {
+   *                 "type": "boolean"
+   *               },
+   *               "ignoreJSX": {
    *                 "type": "string",
-   *                 "not": {
+   *                 "enum": [
+   *                   "none",
+   *                   "all",
+   *                   "single-line",
+   *                   "multi-line"
+   *                 ]
+   *               },
+   *               "enforceForArrowConditionals": {
+   *                 "type": "boolean"
+   *               },
+   *               "enforceForSequenceExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "enforceForNewInMemberExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "enforceForFunctionPrototypeMethods": {
+   *                 "type": "boolean"
+   *               },
+   *               "allowParensAfterCommentPattern": {
+   *                 "type": "string"
+   *               },
+   *               "nestedConditionalExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "allowNodesInSpreadElement": {
+   *                 "type": "object",
+   *                 "properties": {
+   *                   "ConditionalExpression": {
+   *                     "type": "boolean"
+   *                   },
+   *                   "LogicalExpression": {
+   *                     "type": "boolean"
+   *                   },
+   *                   "AwaitExpression": {
+   *                     "type": "boolean"
+   *                   }
+   *                 },
+   *                 "additionalProperties": false
+   *               },
+   *               "ignoredNodes": {
+   *                 "type": "array",
+   *                 "items": {
    *                   "type": "string",
-   *                   "pattern": ":exit$"
+   *                   "not": {
+   *                     "type": "string",
+   *                     "pattern": ":exit$"
+   *                   }
    *                 }
    *               }
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -8211,109 +8277,119 @@ namespace PaddingLineBetweenStatements {
    * ### schema
    *
    * ```json
-   * {
-   *   "$defs": {
-   *     "paddingType": {
-   *       "type": "string",
-   *       "enum": ["any", "never", "always"]
-   *     },
-   *     "statementType": {
-   *       "type": "string",
-   *       "enum": [
-   *         "*",
-   *         "exports",
-   *         "require",
-   *         "directive",
-   *         "iife",
-   *         "block",
-   *         "empty",
-   *         "function",
-   *         "ts-method",
-   *         "break",
-   *         "case",
-   *         "class",
-   *         "continue",
-   *         "debugger",
-   *         "default",
-   *         "do",
-   *         "for",
-   *         "if",
-   *         "import",
-   *         "switch",
-   *         "throw",
-   *         "try",
-   *         "while",
-   *         "with",
-   *         "cjs-export",
-   *         "cjs-import",
-   *         "enum",
-   *         "interface",
-   *         "function-overload",
-   *         "block-like",
-   *         "singleline-block-like",
-   *         "multiline-block-like",
-   *         "expression",
-   *         "singleline-expression",
-   *         "multiline-expression",
-   *         "return",
-   *         "singleline-return",
-   *         "multiline-return",
-   *         "export",
-   *         "singleline-export",
-   *         "multiline-export",
-   *         "var",
-   *         "singleline-var",
-   *         "multiline-var",
-   *         "let",
-   *         "singleline-let",
-   *         "multiline-let",
-   *         "const",
-   *         "singleline-const",
-   *         "multiline-const",
-   *         "using",
-   *         "singleline-using",
-   *         "multiline-using",
-   *         "type",
-   *         "singleline-type",
-   *         "multiline-type"
-   *       ]
-   *     },
-   *     "statementOption": {
-   *       "anyOf": [
-   *         {
-   *           "$ref": "#/$defs/statementType"
-   *         },
-   *         {
-   *           "type": "array",
-   *           "items": {
+   * [
+   *   {
+   *     "$defs": {
+   *       "paddingType": {
+   *         "type": "string",
+   *         "enum": [
+   *           "any",
+   *           "never",
+   *           "always"
+   *         ]
+   *       },
+   *       "statementType": {
+   *         "type": "string",
+   *         "enum": [
+   *           "*",
+   *           "exports",
+   *           "require",
+   *           "directive",
+   *           "iife",
+   *           "block",
+   *           "empty",
+   *           "function",
+   *           "ts-method",
+   *           "break",
+   *           "case",
+   *           "class",
+   *           "continue",
+   *           "debugger",
+   *           "default",
+   *           "do",
+   *           "for",
+   *           "if",
+   *           "import",
+   *           "switch",
+   *           "throw",
+   *           "try",
+   *           "while",
+   *           "with",
+   *           "cjs-export",
+   *           "cjs-import",
+   *           "enum",
+   *           "interface",
+   *           "function-overload",
+   *           "block-like",
+   *           "singleline-block-like",
+   *           "multiline-block-like",
+   *           "expression",
+   *           "singleline-expression",
+   *           "multiline-expression",
+   *           "return",
+   *           "singleline-return",
+   *           "multiline-return",
+   *           "export",
+   *           "singleline-export",
+   *           "multiline-export",
+   *           "var",
+   *           "singleline-var",
+   *           "multiline-var",
+   *           "let",
+   *           "singleline-let",
+   *           "multiline-let",
+   *           "const",
+   *           "singleline-const",
+   *           "multiline-const",
+   *           "using",
+   *           "singleline-using",
+   *           "multiline-using",
+   *           "type",
+   *           "singleline-type",
+   *           "multiline-type"
+   *         ]
+   *       },
+   *       "statementOption": {
+   *         "anyOf": [
+   *           {
    *             "$ref": "#/$defs/statementType"
    *           },
-   *           "minItems": 1,
-   *           "uniqueItems": true,
-   *           "additionalItems": false
-   *         }
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "additionalItems": false,
-   *   "items": {
-   *     "type": "object",
-   *     "properties": {
-   *       "blankLine": {
-   *         "$ref": "#/$defs/paddingType"
-   *       },
-   *       "prev": {
-   *         "$ref": "#/$defs/statementOption"
-   *       },
-   *       "next": {
-   *         "$ref": "#/$defs/statementOption"
+   *           {
+   *             "type": "array",
+   *             "items": {
+   *               "$ref": "#/$defs/statementType"
+   *             },
+   *             "minItems": 1,
+   *             "uniqueItems": true,
+   *             "additionalItems": false
+   *           }
+   *         ]
    *       }
    *     },
-   *     "additionalProperties": false,
-   *     "required": ["blankLine", "prev", "next"]
+   *     "type": "array",
+   *     "additionalItems": false,
+   *     "items": {
+   *       "type": "object",
+   *       "properties": {
+   *         "blankLine": {
+   *           "$ref": "#/$defs/paddingType"
+   *         },
+   *         "prev": {
+   *           "$ref": "#/$defs/statementOption"
+   *         },
+   *         "next": {
+   *           "$ref": "#/$defs/statementOption"
+   *         }
+   *       },
+   *       "additionalProperties": false,
+   *       "required": [
+   *         "blankLine",
+   *         "prev",
+   *         "next"
+   *       ]
+   *     }
    *   }
-   * }
+   * ]
    * ```
    */
   export type PaddingType = 'any' | 'never' | 'always';
@@ -8411,57 +8487,59 @@ namespace QuoteProps {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": [
-   *             "always",
-   *             "as-needed",
-   *             "consistent",
-   *             "consistent-as-needed"
-   *           ]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": [
-   *             "always",
-   *             "as-needed",
-   *             "consistent",
-   *             "consistent-as-needed"
-   *           ]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "keywords": {
-   *               "type": "boolean"
-   *             },
-   *             "unnecessary": {
-   *               "type": "boolean"
-   *             },
-   *             "numbers": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always",
+   *               "as-needed",
+   *               "consistent",
+   *               "consistent-as-needed"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always",
+   *               "as-needed",
+   *               "consistent",
+   *               "consistent-as-needed"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "keywords": {
+   *                 "type": "boolean"
+   *               },
+   *               "unnecessary": {
+   *                 "type": "boolean"
+   *               },
+   *               "numbers": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -8621,54 +8699,64 @@ namespace Semi {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "beforeStatementContinuationChars": {
-   *               "type": "string",
-   *               "enum": ["always", "any", "never"]
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "never"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["always"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "omitLastInOneLineBlock": {
-   *               "type": "boolean"
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "beforeStatementContinuationChars": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "always",
+   *                   "any",
+   *                   "never"
+   *                 ]
+   *               }
    *             },
-   *             "omitLastInOneLineClassBody": {
-   *               "type": "boolean"
-   *             }
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "omitLastInOneLineBlock": {
+   *                 "type": "boolean"
+   *               },
+   *               "omitLastInOneLineClassBody": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -9398,22 +9486,22 @@ namespace TypeAnnotationSpacing {
    *         "type": "object",
    *         "properties": {
    *           "colon": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
+   *             "$ref": "#/$defs/spacingConfig"
    *           },
    *           "arrow": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
+   *             "$ref": "#/$defs/spacingConfig"
    *           },
    *           "variable": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
+   *             "$ref": "#/$defs/spacingConfig"
    *           },
    *           "parameter": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
+   *             "$ref": "#/$defs/spacingConfig"
    *           },
    *           "property": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
+   *             "$ref": "#/$defs/spacingConfig"
    *           },
    *           "returnType": {
-   *             "$ref": "#/items/0/$defs/spacingConfig"
+   *             "$ref": "#/$defs/spacingConfig"
    *           }
    *         },
    *         "additionalProperties": false

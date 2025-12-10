@@ -276,156 +276,198 @@ namespace Extensions {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["always", "ignorePackages", "never"]
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["always", "ignorePackages", "never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "pattern": {
-   *               "type": "object",
-   *               "patternProperties": {
-   *                 ".*": {
-   *                   "type": "string",
-   *                   "enum": ["always", "ignorePackages", "never"]
-   *                 }
-   *               }
-   *             },
-   *             "ignorePackages": {
-   *               "type": "boolean"
-   *             },
-   *             "checkTypeImports": {
-   *               "type": "boolean"
-   *             },
-   *             "pathGroupOverrides": {
-   *               "type": "array",
-   *               "items": {
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always",
+   *               "ignorePackages",
+   *               "never"
+   *             ]
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always",
+   *               "ignorePackages",
+   *               "never"
+   *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "pattern": {
    *                 "type": "object",
-   *                 "properties": {
-   *                   "pattern": {
-   *                     "type": "string"
-   *                   },
-   *                   "patternOptions": {
-   *                     "type": "object"
-   *                   },
-   *                   "action": {
+   *                 "patternProperties": {
+   *                   ".*": {
    *                     "type": "string",
-   *                     "enum": ["enforce", "ignore"]
+   *                     "enum": [
+   *                       "always",
+   *                       "ignorePackages",
+   *                       "never"
+   *                     ]
    *                   }
-   *                 },
-   *                 "additionalProperties": false,
-   *                 "required": ["pattern", "action"]
-   *               }
-   *             },
-   *             "fix": {
-   *               "type": "boolean"
-   *             }
-   *           }
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "pattern": {
-   *               "type": "object",
-   *               "patternProperties": {
-   *                 ".*": {
-   *                   "type": "string",
-   *                   "enum": ["always", "ignorePackages", "never"]
    *                 }
+   *               },
+   *               "ignorePackages": {
+   *                 "type": "boolean"
+   *               },
+   *               "checkTypeImports": {
+   *                 "type": "boolean"
+   *               },
+   *               "pathGroupOverrides": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "object",
+   *                   "properties": {
+   *                     "pattern": {
+   *                       "type": "string"
+   *                     },
+   *                     "patternOptions": {
+   *                       "type": "object"
+   *                     },
+   *                     "action": {
+   *                       "type": "string",
+   *                       "enum": [
+   *                         "enforce",
+   *                         "ignore"
+   *                       ]
+   *                     }
+   *                   },
+   *                   "additionalProperties": false,
+   *                   "required": [
+   *                     "pattern",
+   *                     "action"
+   *                   ]
+   *                 }
+   *               },
+   *               "fix": {
+   *                 "type": "boolean"
    *               }
-   *             },
-   *             "ignorePackages": {
-   *               "type": "boolean"
-   *             },
-   *             "checkTypeImports": {
-   *               "type": "boolean"
-   *             },
-   *             "pathGroupOverrides": {
-   *               "type": "array",
-   *               "items": {
+   *             }
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "pattern": {
    *                 "type": "object",
-   *                 "properties": {
-   *                   "pattern": {
-   *                     "type": "string"
-   *                   },
-   *                   "patternOptions": {
-   *                     "type": "object"
-   *                   },
-   *                   "action": {
+   *                 "patternProperties": {
+   *                   ".*": {
    *                     "type": "string",
-   *                     "enum": ["enforce", "ignore"]
+   *                     "enum": [
+   *                       "always",
+   *                       "ignorePackages",
+   *                       "never"
+   *                     ]
    *                   }
-   *                 },
-   *                 "additionalProperties": false,
-   *                 "required": ["pattern", "action"]
+   *                 }
+   *               },
+   *               "ignorePackages": {
+   *                 "type": "boolean"
+   *               },
+   *               "checkTypeImports": {
+   *                 "type": "boolean"
+   *               },
+   *               "pathGroupOverrides": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "object",
+   *                   "properties": {
+   *                     "pattern": {
+   *                       "type": "string"
+   *                     },
+   *                     "patternOptions": {
+   *                       "type": "object"
+   *                     },
+   *                     "action": {
+   *                       "type": "string",
+   *                       "enum": [
+   *                         "enforce",
+   *                         "ignore"
+   *                       ]
+   *                     }
+   *                   },
+   *                   "additionalProperties": false,
+   *                   "required": [
+   *                     "pattern",
+   *                     "action"
+   *                   ]
+   *                 }
+   *               },
+   *               "fix": {
+   *                 "type": "boolean"
    *               }
-   *             },
-   *             "fix": {
-   *               "type": "boolean"
    *             }
    *           }
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["always", "ignorePackages", "never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "patternProperties": {
-   *             ".*": {
-   *               "type": "string",
-   *               "enum": ["always", "ignorePackages", "never"]
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "always",
+   *               "ignorePackages",
+   *               "never"
+   *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "patternProperties": {
+   *               ".*": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "always",
+   *                   "ignorePackages",
+   *                   "never"
+   *                 ]
+   *               }
    *             }
    *           }
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "object",
-   *           "patternProperties": {
-   *             ".*": {
-   *               "type": "string",
-   *               "enum": ["always", "ignorePackages", "never"]
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "object",
+   *             "patternProperties": {
+   *               ".*": {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "always",
+   *                   "ignorePackages",
+   *                   "never"
+   *                 ]
+   *               }
    *             }
    *           }
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *         ],
+   *         "additionalItems": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -1257,41 +1299,45 @@ namespace NoCommonjs {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "string",
-   *           "enum": ["allow-primitive-modules"]
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "allowPrimitiveModules": {
-   *               "type": "boolean"
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "allow-primitive-modules"
+   *             ]
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "allowPrimitiveModules": {
+   *                 "type": "boolean"
+   *               },
+   *               "allowRequire": {
+   *                 "type": "boolean"
+   *               },
+   *               "allowConditionalRequire": {
+   *                 "type": "boolean"
+   *               }
    *             },
-   *             "allowRequire": {
-   *               "type": "boolean"
-   *             },
-   *             "allowConditionalRequire": {
-   *               "type": "boolean"
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =

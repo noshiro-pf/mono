@@ -30,20 +30,16 @@ namespace ExpectExpect {
    *     "additionalProperties": false,
    *     "properties": {
    *       "assertFunctionNames": {
-   *         "items": [
-   *           {
-   *             "type": "string"
-   *           }
-   *         ],
-   *         "type": "array"
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
    *       },
    *       "assertFunctionPatterns": {
-   *         "items": [
-   *           {
-   *             "type": "string"
-   *           }
-   *         ],
-   *         "type": "array"
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
    *       }
    *     },
    *     "type": "object"
@@ -52,8 +48,8 @@ namespace ExpectExpect {
    * ```
    */
   export type Options = Readonly<{
-    assertFunctionNames?: readonly [] | readonly [string];
-    assertFunctionPatterns?: readonly [] | readonly [string];
+    assertFunctionNames?: readonly string[];
+    assertFunctionPatterns?: readonly string[];
   }>;
 
   export type RuleEntry =
@@ -1389,8 +1385,9 @@ namespace ValidTitle {
    * [
    *   {
    *     "additionalProperties": false,
-   *     "patternProperties": {
-   *       "^must(?:Not)?Match$": {
+   *     "type": "object",
+   *     "definitions": {
+   *       "PatternOrPatternArray": {
    *         "oneOf": [
    *           {
    *             "type": "string"
@@ -1403,32 +1400,28 @@ namespace ValidTitle {
    *             "maxItems": 2,
    *             "minItems": 1,
    *             "type": "array"
+   *           }
+   *         ]
+   *       },
+   *       "MustMatchType": {
+   *         "oneOf": [
+   *           {
+   *             "$ref": "#/definitions/PatternOrPatternArray"
    *           },
    *           {
-   *             "additionalProperties": {
-   *               "oneOf": [
-   *                 {
-   *                   "type": "string"
-   *                 },
-   *                 {
-   *                   "additionalItems": false,
-   *                   "items": {
-   *                     "type": "string"
-   *                   },
-   *                   "maxItems": 2,
-   *                   "minItems": 1,
-   *                   "type": "array"
-   *                 }
-   *               ]
+   *             "type": "object",
+   *             "properties": {
+   *               "describe": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               },
+   *               "test": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               },
+   *               "step": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               }
    *             },
-   *             "propertyNames": {
-   *               "enum": [
-   *                 "describe",
-   *                 "test",
-   *                 "step"
-   *               ]
-   *             },
-   *             "type": "object"
+   *             "additionalProperties": false
    *           }
    *         ]
    *       }
@@ -1455,9 +1448,14 @@ namespace ValidTitle {
    *       "ignoreTypeOfTestName": {
    *         "default": false,
    *         "type": "boolean"
+   *       },
+   *       "mustMatch": {
+   *         "$ref": "#/definitions/MustMatchType"
+   *       },
+   *       "mustNotMatch": {
+   *         "$ref": "#/definitions/MustMatchType"
    *       }
-   *     },
-   *     "type": "object"
+   *     }
    *   }
    * ]
    * ```

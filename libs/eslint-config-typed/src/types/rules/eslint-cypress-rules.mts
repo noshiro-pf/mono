@@ -214,7 +214,6 @@ namespace UnsafeToChainCommand {
    * ```json
    * [
    *   {
-   *     "title": "rules",
    *     "description": "disallow actions within chains",
    *     "type": "object",
    *     "properties": {
@@ -223,7 +222,8 @@ namespace UnsafeToChainCommand {
    *         "description": "An additional list of methods to check for unsafe chaining.",
    *         "default": []
    *       }
-   *     }
+   *     },
+   *     "title": "Options"
    *   }
    * ]
    * ```

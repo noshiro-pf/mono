@@ -23,7 +23,10 @@ import {
   enforceObjectShorthandTupleLength,
   expandBooleanObjectProperties,
   expandMustMatchPatternProperties,
+  normalizeExpectExpectSchema,
   normalizeJsxBooleanValueSchema,
+  normalizeJsxPascalCaseSchema,
+  normalizeNoKeywordPrefixSchema,
   removeArrayTypeFromSchema,
   removeStringTypeFromSchema,
   renameTitleToOptions,
@@ -67,7 +70,7 @@ export const generateRulesTypeCore = async (
       docs: string;
       deprecated: boolean | DeprecatedInfo;
       schema: JSONSchema4[];
-      rawSchema: JSONSchema4 | JSONSchema4[];
+      schemaToPrint: JSONSchema4 | JSONSchema4[];
     }[]
   > = rules.map(([ruleName, { meta }]) => {
     const fixedSchema: readonly JSONSchema4[] = normalizeSchemaToArray(
@@ -118,6 +121,13 @@ export const generateRulesTypeCore = async (
       }
 
       if (
+        pluginName === 'eslint-plugin-playwright' &&
+        ruleName === 'expect-expect'
+      ) {
+        return normalizeExpectExpectSchema(s);
+      }
+
+      if (
         pluginName === 'eslint-plugin-prefer-arrow-functions' &&
         ruleName === 'prefer-arrow-functions'
       ) {
@@ -149,6 +159,20 @@ export const generateRulesTypeCore = async (
         return normalizeJsxBooleanValueSchema(s);
       }
 
+      if (
+        pluginName === 'eslint-plugin-react' &&
+        ruleName === 'jsx-pascal-case'
+      ) {
+        return normalizeJsxPascalCaseSchema(s);
+      }
+
+      if (
+        pluginName === 'eslint-plugin-unicorn' &&
+        ruleName === 'no-keyword-prefix'
+      ) {
+        return normalizeNoKeywordPrefixSchema(s);
+      }
+
       return s;
     });
 
@@ -156,7 +180,8 @@ export const generateRulesTypeCore = async (
       ruleName,
       schema: fixedSchema,
       deprecated: meta?.deprecated ?? false,
-      rawSchema: falseToUndefined(meta?.schema) ?? [],
+      // schemaToPrint: falseToUndefined(meta?.schema) ?? [],
+      schemaToPrint: fixedSchema,
       docs: metaToString(meta),
     };
   });
@@ -178,7 +203,7 @@ const createResult = async (
       docs: string;
       deprecated: boolean | DeprecatedInfo;
       schema: JSONSchema4[];
-      rawSchema: JSONSchema4 | JSONSchema4[];
+      schemaToPrint: JSONSchema4 | JSONSchema4[];
     }[]
   >,
   typeName: string,
@@ -197,12 +222,18 @@ const createResult = async (
     '',
   ];
 
-  for (const { deprecated, docs, rawSchema, ruleName, schema } of schemaList) {
+  for (const {
+    deprecated,
+    docs,
+    schemaToPrint,
+    ruleName,
+    schema,
+  } of schemaList) {
     mut_resultToWrite.push(docs, `namespace ${toCapitalCase(ruleName)} {`);
 
     if (isDeprecated(deprecated)) {
       if (schema.length > 0) {
-        mut_resultToWrite.push(...rawSchemaToString(rawSchema));
+        mut_resultToWrite.push(...rawSchemaToString(schemaToPrint));
       }
 
       mut_resultToWrite.push('  export type RuleEntry = 0;', '');
@@ -218,7 +249,7 @@ const createResult = async (
           break;
 
         case 1: {
-          mut_resultToWrite.push(...rawSchemaToString(rawSchema));
+          mut_resultToWrite.push(...rawSchemaToString(schemaToPrint));
 
           const sc = schema[0];
 
@@ -252,7 +283,7 @@ const createResult = async (
         }
 
         default: {
-          mut_resultToWrite.push(...rawSchemaToString(rawSchema));
+          mut_resultToWrite.push(...rawSchemaToString(schemaToPrint));
 
           const schemasWithDefaults = schema.map((s) =>
             addDefaultValuesToDescription(s),

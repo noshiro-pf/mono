@@ -545,60 +545,76 @@ namespace ImportStyle {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "additionalItems": false,
-   *   "items": [
-   *     {
-   *       "type": "object",
-   *       "additionalProperties": false,
-   *       "properties": {
-   *         "checkImport": {
-   *           "type": "boolean"
-   *         },
-   *         "checkDynamicImport": {
-   *           "type": "boolean"
-   *         },
-   *         "checkExportFrom": {
-   *           "type": "boolean"
-   *         },
-   *         "checkRequire": {
-   *           "type": "boolean"
-   *         },
-   *         "extendDefaultStyles": {
-   *           "type": "boolean"
-   *         },
-   *         "styles": {
-   *           "$ref": "#/definitions/moduleStyles"
+   * [
+   *   {
+   *     "type": "array",
+   *     "additionalItems": false,
+   *     "items": [
+   *       {
+   *         "type": "object",
+   *         "additionalProperties": false,
+   *         "properties": {
+   *           "checkImport": {
+   *             "type": "boolean"
+   *           },
+   *           "checkDynamicImport": {
+   *             "type": "boolean"
+   *           },
+   *           "checkExportFrom": {
+   *             "type": "boolean"
+   *           },
+   *           "checkRequire": {
+   *             "type": "boolean"
+   *           },
+   *           "extendDefaultStyles": {
+   *             "type": "boolean"
+   *           },
+   *           "styles": {
+   *             "$ref": "#/definitions/moduleStyles"
+   *           }
    *         }
    *       }
-   *     }
-   *   ],
-   *   "definitions": {
-   *     "moduleStyles": {
-   *       "type": "object",
-   *       "additionalProperties": {
-   *         "$ref": "#/definitions/styles"
-   *       }
-   *     },
-   *     "styles": {
-   *       "anyOf": [
-   *         {
-   *           "enum": [false]
-   *         },
-   *         {
-   *           "$ref": "#/definitions/booleanObject"
+   *     ],
+   *     "definitions": {
+   *       "moduleStyles": {
+   *         "type": "object",
+   *         "additionalProperties": {
+   *           "$ref": "#/definitions/styles"
    *         }
-   *       ]
-   *     },
-   *     "booleanObject": {
-   *       "type": "object",
-   *       "additionalProperties": {
-   *         "type": "boolean"
+   *       },
+   *       "styles": {
+   *         "anyOf": [
+   *           {
+   *             "enum": [
+   *               false
+   *             ]
+   *           },
+   *           {
+   *             "$ref": "#/definitions/booleanObject"
+   *           }
+   *         ]
+   *       },
+   *       "booleanObject": {
+   *         "type": "object",
+   *         "properties": {
+   *           "default": {
+   *             "type": "boolean"
+   *           },
+   *           "named": {
+   *             "type": "boolean"
+   *           },
+   *           "namespace": {
+   *             "type": "boolean"
+   *           },
+   *           "unassigned": {
+   *             "type": "boolean"
+   *           }
+   *         },
+   *         "additionalProperties": false
    *       }
    *     }
    *   }
-   * }
+   * ]
    * ```
    */
   export type Options =
@@ -1152,13 +1168,11 @@ namespace NoKeywordPrefix {
    *     "properties": {
    *       "disallowedPrefixes": {
    *         "type": "array",
-   *         "items": [
-   *           {
-   *             "type": "string"
-   *           }
-   *         ],
    *         "minItems": 0,
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "items": {
+   *           "type": "string"
+   *         }
    *       },
    *       "checkProperties": {
    *         "type": "boolean"
@@ -1173,7 +1187,7 @@ namespace NoKeywordPrefix {
    */
   export type Options = Readonly<{
     /** @minItems 0 */
-    disallowedPrefixes?: readonly [] | readonly [string];
+    disallowedPrefixes?: readonly string[];
     checkProperties?: boolean;
     onlyCamelCase?: boolean;
   }>;
@@ -3418,78 +3432,88 @@ namespace PreventAbbreviations {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "additionalItems": false,
-   *   "items": [
-   *     {
-   *       "type": "object",
-   *       "additionalProperties": false,
-   *       "properties": {
-   *         "checkProperties": {
-   *           "type": "boolean"
-   *         },
-   *         "checkVariables": {
-   *           "type": "boolean"
-   *         },
-   *         "checkDefaultAndNamespaceImports": {
-   *           "type": ["boolean", "string"],
-   *           "pattern": "internal"
-   *         },
-   *         "checkShorthandImports": {
-   *           "type": ["boolean", "string"],
-   *           "pattern": "internal"
-   *         },
-   *         "checkShorthandProperties": {
-   *           "type": "boolean"
-   *         },
-   *         "checkFilenames": {
-   *           "type": "boolean"
-   *         },
-   *         "extendDefaultReplacements": {
-   *           "type": "boolean"
-   *         },
-   *         "replacements": {
-   *           "$ref": "#/definitions/abbreviations"
-   *         },
-   *         "extendDefaultAllowList": {
-   *           "type": "boolean"
-   *         },
-   *         "allowList": {
-   *           "$ref": "#/definitions/booleanObject"
-   *         },
-   *         "ignore": {
-   *           "type": "array",
-   *           "uniqueItems": true
+   * [
+   *   {
+   *     "type": "array",
+   *     "additionalItems": false,
+   *     "items": [
+   *       {
+   *         "type": "object",
+   *         "additionalProperties": false,
+   *         "properties": {
+   *           "checkProperties": {
+   *             "type": "boolean"
+   *           },
+   *           "checkVariables": {
+   *             "type": "boolean"
+   *           },
+   *           "checkDefaultAndNamespaceImports": {
+   *             "type": [
+   *               "boolean",
+   *               "string"
+   *             ],
+   *             "pattern": "internal"
+   *           },
+   *           "checkShorthandImports": {
+   *             "type": [
+   *               "boolean",
+   *               "string"
+   *             ],
+   *             "pattern": "internal"
+   *           },
+   *           "checkShorthandProperties": {
+   *             "type": "boolean"
+   *           },
+   *           "checkFilenames": {
+   *             "type": "boolean"
+   *           },
+   *           "extendDefaultReplacements": {
+   *             "type": "boolean"
+   *           },
+   *           "replacements": {
+   *             "$ref": "#/definitions/abbreviations"
+   *           },
+   *           "extendDefaultAllowList": {
+   *             "type": "boolean"
+   *           },
+   *           "allowList": {
+   *             "$ref": "#/definitions/booleanObject"
+   *           },
+   *           "ignore": {
+   *             "type": "array",
+   *             "uniqueItems": true
+   *           }
    *         }
    *       }
-   *     }
-   *   ],
-   *   "definitions": {
-   *     "abbreviations": {
-   *       "type": "object",
-   *       "additionalProperties": {
-   *         "$ref": "#/definitions/replacements"
-   *       }
-   *     },
-   *     "replacements": {
-   *       "anyOf": [
-   *         {
-   *           "enum": [false]
-   *         },
-   *         {
-   *           "$ref": "#/definitions/booleanObject"
+   *     ],
+   *     "definitions": {
+   *       "abbreviations": {
+   *         "type": "object",
+   *         "additionalProperties": {
+   *           "$ref": "#/definitions/replacements"
    *         }
-   *       ]
-   *     },
-   *     "booleanObject": {
-   *       "type": "object",
-   *       "additionalProperties": {
-   *         "type": "boolean"
+   *       },
+   *       "replacements": {
+   *         "anyOf": [
+   *           {
+   *             "enum": [
+   *               false
+   *             ]
+   *           },
+   *           {
+   *             "$ref": "#/definitions/booleanObject"
+   *           }
+   *         ]
+   *       },
+   *       "booleanObject": {
+   *         "type": "object",
+   *         "additionalProperties": {
+   *           "type": "boolean"
+   *         }
    *       }
    *     }
    *   }
-   * }
+   * ]
    * ```
    */
   export type Options =

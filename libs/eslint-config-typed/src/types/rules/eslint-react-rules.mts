@@ -930,71 +930,77 @@ namespace JsxBooleanValue {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always", "never"]
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "additionalProperties": false,
-   *           "properties": {
-   *             "never": {
-   *               "type": "array",
-   *               "items": {
-   *                 "type": "string",
-   *                 "minLength": 1
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [],
+   *         "additionalItems": false,
+   *         "minItems": 0,
+   *         "maxItems": 0
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always"
+   *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "additionalProperties": false,
+   *             "properties": {
+   *               "never": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "string",
+   *                   "minLength": 1
+   *                 },
+   *                 "uniqueItems": true
    *               },
-   *               "uniqueItems": true
-   *             },
-   *             "assumeUndefinedIsFalse": {
-   *               "type": "boolean"
+   *               "assumeUndefinedIsFalse": {
+   *                 "type": "boolean"
+   *               }
    *             }
    *           }
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "additionalProperties": false,
-   *           "properties": {
-   *             "always": {
-   *               "type": "array",
-   *               "items": {
-   *                 "type": "string",
-   *                 "minLength": 1
+   *         ],
+   *         "additionalItems": false,
+   *         "minItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "never"
+   *             ]
+   *           },
+   *           {
+   *             "type": "object",
+   *             "additionalProperties": false,
+   *             "properties": {
+   *               "always": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "string",
+   *                   "minLength": 1
+   *                 },
+   *                 "uniqueItems": true
    *               },
-   *               "uniqueItems": true
-   *             },
-   *             "assumeUndefinedIsFalse": {
-   *               "type": "boolean"
+   *               "assumeUndefinedIsFalse": {
+   *                 "type": "boolean"
+   *               }
    *             }
    *           }
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *         ],
+   *         "additionalItems": false,
+   *         "minItems": 1
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -1218,84 +1224,98 @@ namespace JsxCurlySpacing {
    * ### schema
    *
    * ```json
-   * {
-   *   "definitions": {
-   *     "basicConfig": {
-   *       "type": "object",
-   *       "properties": {
-   *         "when": {
-   *           "enum": ["always", "never"]
-   *         },
-   *         "allowMultiline": {
-   *           "type": "boolean"
-   *         },
-   *         "spacing": {
-   *           "type": "object",
-   *           "properties": {
-   *             "objectLiterals": {
-   *               "enum": ["always", "never"]
-   *             }
-   *           }
-   *         }
-   *       }
-   *     },
-   *     "basicConfigOrBoolean": {
-   *       "anyOf": [
-   *         {
-   *           "$ref": "#/definitions/basicConfig"
-   *         },
-   *         {
-   *           "type": "boolean"
-   *         }
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "items": [
-   *     {
-   *       "anyOf": [
-   *         {
-   *           "allOf": [
-   *             {
-   *               "$ref": "#/definitions/basicConfig"
-   *             },
-   *             {
-   *               "type": "object",
-   *               "properties": {
-   *                 "attributes": {
-   *                   "$ref": "#/definitions/basicConfigOrBoolean"
-   *                 },
-   *                 "children": {
-   *                   "$ref": "#/definitions/basicConfigOrBoolean"
-   *                 }
+   * [
+   *   {
+   *     "definitions": {
+   *       "basicConfig": {
+   *         "type": "object",
+   *         "properties": {
+   *           "when": {
+   *             "enum": [
+   *               "always",
+   *               "never"
+   *             ]
+   *           },
+   *           "allowMultiline": {
+   *             "type": "boolean"
+   *           },
+   *           "spacing": {
+   *             "type": "object",
+   *             "properties": {
+   *               "objectLiterals": {
+   *                 "enum": [
+   *                   "always",
+   *                   "never"
+   *                 ]
    *               }
-   *             }
-   *           ]
-   *         },
-   *         {
-   *           "enum": ["always", "never"]
-   *         }
-   *       ]
-   *     },
-   *     {
-   *       "type": "object",
-   *       "properties": {
-   *         "allowMultiline": {
-   *           "type": "boolean"
-   *         },
-   *         "spacing": {
-   *           "type": "object",
-   *           "properties": {
-   *             "objectLiterals": {
-   *               "enum": ["always", "never"]
    *             }
    *           }
    *         }
    *       },
-   *       "additionalProperties": false
-   *     }
-   *   ]
-   * }
+   *       "basicConfigOrBoolean": {
+   *         "anyOf": [
+   *           {
+   *             "$ref": "#/definitions/basicConfig"
+   *           },
+   *           {
+   *             "type": "boolean"
+   *           }
+   *         ]
+   *       }
+   *     },
+   *     "type": "array",
+   *     "items": [
+   *       {
+   *         "anyOf": [
+   *           {
+   *             "allOf": [
+   *               {
+   *                 "$ref": "#/definitions/basicConfig"
+   *               },
+   *               {
+   *                 "type": "object",
+   *                 "properties": {
+   *                   "attributes": {
+   *                     "$ref": "#/definitions/basicConfigOrBoolean"
+   *                   },
+   *                   "children": {
+   *                     "$ref": "#/definitions/basicConfigOrBoolean"
+   *                   }
+   *                 }
+   *               }
+   *             ]
+   *           },
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "never"
+   *             ]
+   *           }
+   *         ]
+   *       },
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "allowMultiline": {
+   *             "type": "boolean"
+   *           },
+   *           "spacing": {
+   *             "type": "object",
+   *             "properties": {
+   *               "objectLiterals": {
+   *                 "enum": [
+   *                   "always",
+   *                   "never"
+   *                 ]
+   *               }
+   *             }
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -2404,61 +2424,66 @@ namespace JsxNoScriptUrl {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "array",
-   *           "uniqueItems": true,
-   *           "items": {
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "object",
+   *               "properties": {
+   *                 "name": {
+   *                   "type": "string"
+   *                 },
+   *                 "props": {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "string",
+   *                     "uniqueItems": true
+   *                   }
+   *                 }
+   *               },
+   *               "required": [
+   *                 "name",
+   *                 "props"
+   *               ],
+   *               "additionalProperties": false
+   *             }
+   *           },
+   *           {
    *             "type": "object",
    *             "properties": {
-   *               "name": {
-   *                 "type": "string"
-   *               },
-   *               "props": {
-   *                 "type": "array",
-   *                 "items": {
-   *                   "type": "string",
-   *                   "uniqueItems": true
-   *                 }
+   *               "includeFromSettings": {
+   *                 "type": "boolean"
    *               }
    *             },
-   *             "required": ["name", "props"],
-   *             "additionalProperties": false
+   *             "additionalItems": false
    *           }
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "includeFromSettings": {
-   *               "type": "boolean"
-   *             }
-   *           },
-   *           "additionalItems": false
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "includeFromSettings": {
-   *               "type": "boolean"
-   *             }
-   *           },
-   *           "additionalItems": false
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "includeFromSettings": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalItems": false
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -2793,14 +2818,12 @@ namespace JsxPascalCase {
    *         "type": "boolean"
    *       },
    *       "ignore": {
-   *         "items": [
-   *           {
-   *             "type": "string"
-   *           }
-   *         ],
    *         "minItems": 0,
    *         "type": "array",
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "items": {
+   *           "type": "string"
+   *         }
    *       }
    *     },
    *     "additionalProperties": false
@@ -2813,7 +2836,7 @@ namespace JsxPascalCase {
     allowLeadingUnderscore?: boolean;
     allowNamespace?: boolean;
     /** @minItems 0 */
-    ignore?: readonly [] | readonly [string];
+    ignore?: readonly string[];
   }>;
 
   export type RuleEntry =

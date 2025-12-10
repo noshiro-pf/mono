@@ -229,53 +229,62 @@ namespace ArrayElementNewline {
    * ### schema
    *
    * ```json
-   * {
-   *   "definitions": {
-   *     "basicConfig": {
-   *       "oneOf": [
-   *         {
-   *           "enum": ["always", "never", "consistent"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "multiline": {
-   *               "type": "boolean"
-   *             },
-   *             "minItems": {
-   *               "type": ["integer", "null"],
-   *               "minimum": 0
-   *             }
+   * [
+   *   {
+   *     "definitions": {
+   *       "basicConfig": {
+   *         "oneOf": [
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "never",
+   *               "consistent"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "items": [
-   *     {
-   *       "oneOf": [
-   *         {
-   *           "$ref": "#/definitions/basicConfig"
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "ArrayExpression": {
-   *               "$ref": "#/definitions/basicConfig"
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "multiline": {
+   *                 "type": "boolean"
+   *               },
+   *               "minItems": {
+   *                 "type": [
+   *                   "integer",
+   *                   "null"
+   *                 ],
+   *                 "minimum": 0
+   *               }
    *             },
-   *             "ArrayPattern": {
-   *               "$ref": "#/definitions/basicConfig"
-   *             }
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     },
+   *     "type": "array",
+   *     "items": [
+   *       {
+   *         "oneOf": [
+   *           {
+   *             "$ref": "#/definitions/basicConfig"
    *           },
-   *           "additionalProperties": false,
-   *           "minProperties": 1
-   *         }
-   *       ]
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ArrayExpression": {
+   *                 "$ref": "#/definitions/basicConfig"
+   *               },
+   *               "ArrayPattern": {
+   *                 "$ref": "#/definitions/basicConfig"
+   *               }
+   *             },
+   *             "additionalProperties": false,
+   *             "minProperties": 1
+   *           }
+   *         ]
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -300,39 +309,46 @@ namespace ArrowBodyStyle {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always", "never"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["as-needed"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "requireReturnForObjectLiteral": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "never"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "as-needed"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "requireReturnForObjectLiteral": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -815,54 +831,61 @@ namespace CommaDangle {
    * ### schema
    *
    * ```json
-   * {
-   *   "definitions": {
-   *     "value": {
-   *       "enum": ["always-multiline", "always", "never", "only-multiline"]
+   * [
+   *   {
+   *     "definitions": {
+   *       "value": {
+   *         "enum": [
+   *           "always-multiline",
+   *           "always",
+   *           "never",
+   *           "only-multiline"
+   *         ]
+   *       },
+   *       "valueWithIgnore": {
+   *         "enum": [
+   *           "always-multiline",
+   *           "always",
+   *           "ignore",
+   *           "never",
+   *           "only-multiline"
+   *         ]
+   *       }
    *     },
-   *     "valueWithIgnore": {
-   *       "enum": [
-   *         "always-multiline",
-   *         "always",
-   *         "ignore",
-   *         "never",
-   *         "only-multiline"
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "items": [
-   *     {
-   *       "oneOf": [
-   *         {
-   *           "$ref": "#/definitions/value"
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "arrays": {
-   *               "$ref": "#/definitions/valueWithIgnore"
-   *             },
-   *             "objects": {
-   *               "$ref": "#/definitions/valueWithIgnore"
-   *             },
-   *             "imports": {
-   *               "$ref": "#/definitions/valueWithIgnore"
-   *             },
-   *             "exports": {
-   *               "$ref": "#/definitions/valueWithIgnore"
-   *             },
-   *             "functions": {
-   *               "$ref": "#/definitions/valueWithIgnore"
-   *             }
+   *     "type": "array",
+   *     "items": [
+   *       {
+   *         "oneOf": [
+   *           {
+   *             "$ref": "#/definitions/value"
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ]
-   *     }
-   *   ],
-   *   "additionalItems": false
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "arrays": {
+   *                 "$ref": "#/definitions/valueWithIgnore"
+   *               },
+   *               "objects": {
+   *                 "$ref": "#/definitions/valueWithIgnore"
+   *               },
+   *               "imports": {
+   *                 "$ref": "#/definitions/valueWithIgnore"
+   *               },
+   *               "exports": {
+   *                 "$ref": "#/definitions/valueWithIgnore"
+   *               },
+   *               "functions": {
+   *                 "$ref": "#/definitions/valueWithIgnore"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     ],
+   *     "additionalItems": false
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -1117,14 +1140,16 @@ namespace ConsistentThis {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "items": {
-   *     "type": "string",
-   *     "minLength": 1
-   *   },
-   *   "uniqueItems": true
-   * }
+   * [
+   *   {
+   *     "type": "array",
+   *     "items": {
+   *       "type": "string",
+   *       "minLength": 1
+   *     },
+   *     "uniqueItems": true
+   *   }
+   * ]
    * ```
    */
   export type Options = readonly string[];
@@ -1171,33 +1196,43 @@ namespace Curly {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["all"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["multi", "multi-line", "multi-or-nest"]
-   *         },
-   *         {
-   *           "enum": ["consistent"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "all"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "multi",
+   *               "multi-line",
+   *               "multi-or-nest"
+   *             ]
+   *           },
+   *           {
+   *             "enum": [
+   *               "consistent"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -1419,37 +1454,48 @@ namespace Eqeqeq {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "null": {
-   *               "enum": ["always", "never", "ignore"]
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["smart", "allow-null"]
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "null": {
+   *                 "enum": [
+   *                   "always",
+   *                   "never",
+   *                   "ignore"
+   *                 ]
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "smart",
+   *               "allow-null"
+   *             ]
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -1506,39 +1552,45 @@ namespace FuncCallSpacing {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["never"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "allowNewlines": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "never"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "allowNewlines": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -1563,49 +1615,54 @@ namespace FuncNameMatching {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "additionalItems": false,
-   *       "items": [
-   *         {
-   *           "enum": ["always", "never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "considerPropertyDescriptor": {
-   *               "type": "boolean"
-   *             },
-   *             "includeCommonJSModuleExports": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "additionalItems": false,
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "never"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ]
-   *     },
-   *     {
-   *       "type": "array",
-   *       "additionalItems": false,
-   *       "items": [
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "considerPropertyDescriptor": {
-   *               "type": "boolean"
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "considerPropertyDescriptor": {
+   *                 "type": "boolean"
+   *               },
+   *               "includeCommonJSModuleExports": {
+   *                 "type": "boolean"
+   *               }
    *             },
-   *             "includeCommonJSModuleExports": {
-   *               "type": "boolean"
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ]
-   *     }
-   *   ]
-   * }
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       },
+   *       {
+   *         "type": "array",
+   *         "additionalItems": false,
+   *         "items": [
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "considerPropertyDescriptor": {
+   *                 "type": "boolean"
+   *               },
+   *               "includeCommonJSModuleExports": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -1649,27 +1706,33 @@ namespace FuncNames {
    * ### schema
    *
    * ```json
-   * {
-   *   "definitions": {
-   *     "value": {
-   *       "enum": ["always", "as-needed", "never"]
-   *     }
-   *   },
-   *   "items": [
-   *     {
-   *       "$ref": "#/definitions/value"
+   * [
+   *   {
+   *     "definitions": {
+   *       "value": {
+   *         "enum": [
+   *           "always",
+   *           "as-needed",
+   *           "never"
+   *         ]
+   *       }
    *     },
-   *     {
-   *       "type": "object",
-   *       "properties": {
-   *         "generators": {
-   *           "$ref": "#/definitions/value"
-   *         }
+   *     "items": [
+   *       {
+   *         "$ref": "#/definitions/value"
    *       },
-   *       "additionalProperties": false
-   *     }
-   *   ]
-   * }
+   *       {
+   *         "type": "object",
+   *         "properties": {
+   *           "generators": {
+   *             "$ref": "#/definitions/value"
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -2137,13 +2200,15 @@ namespace IdBlacklist {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "items": {
-   *     "type": "string"
-   *   },
-   *   "uniqueItems": true
-   * }
+   * [
+   *   {
+   *     "type": "array",
+   *     "items": {
+   *       "type": "string"
+   *     },
+   *     "uniqueItems": true
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -2167,13 +2232,15 @@ namespace IdDenylist {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "items": {
-   *     "type": "string"
-   *   },
-   *   "uniqueItems": true
-   * }
+   * [
+   *   {
+   *     "type": "array",
+   *     "items": {
+   *       "type": "string"
+   *     },
+   *     "uniqueItems": true
+   *   }
+   * ]
    * ```
    */
   export type Options = readonly string[];
@@ -2814,39 +2881,45 @@ namespace InitDeclarations {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "ignoreForLoopInit": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "never"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ignoreForLoopInit": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -4323,38 +4396,39 @@ namespace LogicalAssignmentOperators {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "oneOf": [
-   *     {
-   *       "items": [
-   *         {
-   *           "const": "always"
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "enforceForIfStatements": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "oneOf": [
+   *       {
+   *         "items": [
+   *           {
+   *             "const": "always"
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     },
-   *     {
-   *       "items": [
-   *         {
-   *           "const": "never"
-   *         }
-   *       ],
-   *       "minItems": 1,
-   *       "maxItems": 1
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "enforceForIfStatements": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       },
+   *       {
+   *         "items": [
+   *           {
+   *             "const": "never"
+   *           }
+   *         ],
+   *         "minItems": 1,
+   *         "maxItems": 1
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -5015,37 +5089,44 @@ namespace MultilineCommentStyle {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["starred-block", "bare-block"]
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["separate-lines"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "checkJSDoc": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "starred-block",
+   *               "bare-block"
+   *             ]
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "separate-lines"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "checkJSDoc": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "additionalItems": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -6435,66 +6516,77 @@ namespace NoExtraParens {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["functions"]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["all"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "conditionalAssign": {
-   *               "type": "boolean"
-   *             },
-   *             "ternaryOperandBinaryExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "nestedBinaryExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "returnAssign": {
-   *               "type": "boolean"
-   *             },
-   *             "ignoreJSX": {
-   *               "enum": ["none", "all", "single-line", "multi-line"]
-   *             },
-   *             "enforceForArrowConditionals": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForSequenceExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForNewInMemberExpressions": {
-   *               "type": "boolean"
-   *             },
-   *             "enforceForFunctionPrototypeMethods": {
-   *               "type": "boolean"
-   *             },
-   *             "allowParensAfterCommentPattern": {
-   *               "type": "string"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "functions"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "all"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "conditionalAssign": {
+   *                 "type": "boolean"
+   *               },
+   *               "ternaryOperandBinaryExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "nestedBinaryExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "returnAssign": {
+   *                 "type": "boolean"
+   *               },
+   *               "ignoreJSX": {
+   *                 "enum": [
+   *                   "none",
+   *                   "all",
+   *                   "single-line",
+   *                   "multi-line"
+   *                 ]
+   *               },
+   *               "enforceForArrowConditionals": {
+   *                 "type": "boolean"
+   *               },
+   *               "enforceForSequenceExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "enforceForNewInMemberExpressions": {
+   *                 "type": "boolean"
+   *               },
+   *               "enforceForFunctionPrototypeMethods": {
+   *                 "type": "boolean"
+   *               },
+   *               "allowParensAfterCommentPattern": {
+   *                 "type": "string"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -8352,83 +8444,92 @@ namespace NoRestrictedGlobals {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": {
-   *         "oneOf": [
-   *           {
-   *             "type": "string"
-   *           },
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "type": "object",
+   *               "properties": {
+   *                 "name": {
+   *                   "type": "string"
+   *                 },
+   *                 "message": {
+   *                   "type": "string"
+   *                 }
+   *               },
+   *               "required": [
+   *                 "name"
+   *               ],
+   *               "additionalProperties": false
+   *             }
+   *           ]
+   *         },
+   *         "uniqueItems": true,
+   *         "minItems": 0
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
    *           {
    *             "type": "object",
    *             "properties": {
-   *               "name": {
-   *                 "type": "string"
+   *               "globals": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "oneOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "type": "string"
+   *                         },
+   *                         "message": {
+   *                           "type": "string"
+   *                         }
+   *                       },
+   *                       "required": [
+   *                         "name"
+   *                       ],
+   *                       "additionalProperties": false
+   *                     }
+   *                   ]
+   *                 },
+   *                 "uniqueItems": true,
+   *                 "minItems": 0
    *               },
-   *               "message": {
-   *                 "type": "string"
+   *               "checkGlobalObject": {
+   *                 "type": "boolean"
+   *               },
+   *               "globalObjects": {
+   *                 "type": "array",
+   *                 "items": {
+   *                   "type": "string"
+   *                 },
+   *                 "uniqueItems": true
    *               }
    *             },
-   *             "required": ["name"],
+   *             "required": [
+   *               "globals"
+   *             ],
    *             "additionalProperties": false
    *           }
-   *         ]
-   *       },
-   *       "uniqueItems": true,
-   *       "minItems": 0
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "globals": {
-   *               "type": "array",
-   *               "items": {
-   *                 "oneOf": [
-   *                   {
-   *                     "type": "string"
-   *                   },
-   *                   {
-   *                     "type": "object",
-   *                     "properties": {
-   *                       "name": {
-   *                         "type": "string"
-   *                       },
-   *                       "message": {
-   *                         "type": "string"
-   *                       }
-   *                     },
-   *                     "required": ["name"],
-   *                     "additionalProperties": false
-   *                   }
-   *                 ]
-   *               },
-   *               "uniqueItems": true,
-   *               "minItems": 0
-   *             },
-   *             "checkGlobalObject": {
-   *               "type": "boolean"
-   *             },
-   *             "globalObjects": {
-   *               "type": "array",
-   *               "items": {
-   *                 "type": "string"
-   *               },
-   *               "uniqueItems": true
-   *             }
-   *           },
-   *           "required": ["globals"],
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *         ],
+   *         "additionalItems": false,
+   *         "minItems": 1
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -8478,217 +8579,234 @@ namespace NoRestrictedImports {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": {
-   *         "anyOf": [
-   *           {
-   *             "type": "string"
-   *           },
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": {
+   *           "anyOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "type": "object",
+   *               "properties": {
+   *                 "name": {
+   *                   "type": "string"
+   *                 },
+   *                 "message": {
+   *                   "type": "string",
+   *                   "minLength": 1
+   *                 },
+   *                 "importNames": {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "allowImportNames": {
+   *                   "type": "array",
+   *                   "items": {
+   *                     "type": "string"
+   *                   }
+   *                 },
+   *                 "allowTypeImports": {
+   *                   "type": "boolean",
+   *                   "description": "Whether to allow type-only imports for a path."
+   *                 }
+   *               },
+   *               "additionalProperties": false,
+   *               "required": [
+   *                 "name"
+   *               ],
+   *               "not": {
+   *                 "required": [
+   *                   "importNames",
+   *                   "allowImportNames"
+   *                 ]
+   *               }
+   *             }
+   *           ]
+   *         },
+   *         "uniqueItems": true
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
    *           {
    *             "type": "object",
    *             "properties": {
-   *               "name": {
-   *                 "type": "string"
-   *               },
-   *               "message": {
-   *                 "type": "string",
-   *                 "minLength": 1
-   *               },
-   *               "importNames": {
+   *               "paths": {
    *                 "type": "array",
    *                 "items": {
-   *                   "type": "string"
-   *                 }
+   *                   "anyOf": [
+   *                     {
+   *                       "type": "string"
+   *                     },
+   *                     {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "name": {
+   *                           "type": "string"
+   *                         },
+   *                         "message": {
+   *                           "type": "string",
+   *                           "minLength": 1
+   *                         },
+   *                         "importNames": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "allowImportNames": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           }
+   *                         },
+   *                         "allowTypeImports": {
+   *                           "type": "boolean",
+   *                           "description": "Whether to allow type-only imports for a path."
+   *                         }
+   *                       },
+   *                       "additionalProperties": false,
+   *                       "required": [
+   *                         "name"
+   *                       ],
+   *                       "not": {
+   *                         "required": [
+   *                           "importNames",
+   *                           "allowImportNames"
+   *                         ]
+   *                       }
+   *                     }
+   *                   ]
+   *                 },
+   *                 "uniqueItems": true
    *               },
-   *               "allowImportNames": {
-   *                 "type": "array",
-   *                 "items": {
-   *                   "type": "string"
-   *                 }
-   *               },
-   *               "allowTypeImports": {
-   *                 "type": "boolean",
-   *                 "description": "Whether to allow type-only imports for a path."
-   *               }
-   *             },
-   *             "additionalProperties": false,
-   *             "required": ["name"],
-   *             "not": {
-   *               "required": ["importNames", "allowImportNames"]
-   *             }
-   *           }
-   *         ]
-   *       },
-   *       "uniqueItems": true
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "paths": {
-   *               "type": "array",
-   *               "items": {
+   *               "patterns": {
    *                 "anyOf": [
    *                   {
-   *                     "type": "string"
+   *                     "type": "array",
+   *                     "items": {
+   *                       "type": "string"
+   *                     },
+   *                     "uniqueItems": true
    *                   },
    *                   {
-   *                     "type": "object",
-   *                     "properties": {
-   *                       "name": {
-   *                         "type": "string"
-   *                       },
-   *                       "message": {
-   *                         "type": "string",
-   *                         "minLength": 1
-   *                       },
-   *                       "importNames": {
-   *                         "type": "array",
-   *                         "items": {
+   *                     "type": "array",
+   *                     "items": {
+   *                       "type": "object",
+   *                       "properties": {
+   *                         "importNames": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           },
+   *                           "minItems": 1,
+   *                           "uniqueItems": true
+   *                         },
+   *                         "allowImportNames": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           },
+   *                           "minItems": 1,
+   *                           "uniqueItems": true
+   *                         },
+   *                         "group": {
+   *                           "type": "array",
+   *                           "items": {
+   *                             "type": "string"
+   *                           },
+   *                           "minItems": 1,
+   *                           "uniqueItems": true
+   *                         },
+   *                         "regex": {
    *                           "type": "string"
+   *                         },
+   *                         "importNamePattern": {
+   *                           "type": "string"
+   *                         },
+   *                         "allowImportNamePattern": {
+   *                           "type": "string"
+   *                         },
+   *                         "message": {
+   *                           "type": "string",
+   *                           "minLength": 1
+   *                         },
+   *                         "caseSensitive": {
+   *                           "type": "boolean"
+   *                         },
+   *                         "allowTypeImports": {
+   *                           "type": "boolean",
+   *                           "description": "Whether to allow type-only imports for a pattern."
    *                         }
    *                       },
-   *                       "allowImportNames": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         }
+   *                       "additionalProperties": false,
+   *                       "not": {
+   *                         "anyOf": [
+   *                           {
+   *                             "required": [
+   *                               "importNames",
+   *                               "allowImportNames"
+   *                             ]
+   *                           },
+   *                           {
+   *                             "required": [
+   *                               "importNamePattern",
+   *                               "allowImportNamePattern"
+   *                             ]
+   *                           },
+   *                           {
+   *                             "required": [
+   *                               "importNames",
+   *                               "allowImportNamePattern"
+   *                             ]
+   *                           },
+   *                           {
+   *                             "required": [
+   *                               "importNamePattern",
+   *                               "allowImportNames"
+   *                             ]
+   *                           },
+   *                           {
+   *                             "required": [
+   *                               "allowImportNames",
+   *                               "allowImportNamePattern"
+   *                             ]
+   *                           }
+   *                         ]
    *                       },
-   *                       "allowTypeImports": {
-   *                         "type": "boolean",
-   *                         "description": "Whether to allow type-only imports for a path."
-   *                       }
-   *                     },
-   *                     "additionalProperties": false,
-   *                     "required": ["name"],
-   *                     "not": {
-   *                       "required": ["importNames", "allowImportNames"]
-   *                     }
-   *                   }
-   *                 ]
-   *               },
-   *               "uniqueItems": true
-   *             },
-   *             "patterns": {
-   *               "anyOf": [
-   *                 {
-   *                   "type": "array",
-   *                   "items": {
-   *                     "type": "string"
-   *                   },
-   *                   "uniqueItems": true
-   *                 },
-   *                 {
-   *                   "type": "array",
-   *                   "items": {
-   *                     "type": "object",
-   *                     "properties": {
-   *                       "importNames": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         },
-   *                         "minItems": 1,
-   *                         "uniqueItems": true
-   *                       },
-   *                       "allowImportNames": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         },
-   *                         "minItems": 1,
-   *                         "uniqueItems": true
-   *                       },
-   *                       "group": {
-   *                         "type": "array",
-   *                         "items": {
-   *                           "type": "string"
-   *                         },
-   *                         "minItems": 1,
-   *                         "uniqueItems": true
-   *                       },
-   *                       "regex": {
-   *                         "type": "string"
-   *                       },
-   *                       "importNamePattern": {
-   *                         "type": "string"
-   *                       },
-   *                       "allowImportNamePattern": {
-   *                         "type": "string"
-   *                       },
-   *                       "message": {
-   *                         "type": "string",
-   *                         "minLength": 1
-   *                       },
-   *                       "caseSensitive": {
-   *                         "type": "boolean"
-   *                       },
-   *                       "allowTypeImports": {
-   *                         "type": "boolean",
-   *                         "description": "Whether to allow type-only imports for a pattern."
-   *                       }
-   *                     },
-   *                     "additionalProperties": false,
-   *                     "not": {
-   *                       "anyOf": [
+   *                       "oneOf": [
    *                         {
    *                           "required": [
-   *                             "importNames",
-   *                             "allowImportNames"
+   *                             "group"
    *                           ]
    *                         },
    *                         {
    *                           "required": [
-   *                             "importNamePattern",
-   *                             "allowImportNamePattern"
-   *                           ]
-   *                         },
-   *                         {
-   *                           "required": [
-   *                             "importNames",
-   *                             "allowImportNamePattern"
-   *                           ]
-   *                         },
-   *                         {
-   *                           "required": [
-   *                             "importNamePattern",
-   *                             "allowImportNames"
-   *                           ]
-   *                         },
-   *                         {
-   *                           "required": [
-   *                             "allowImportNames",
-   *                             "allowImportNamePattern"
+   *                             "regex"
    *                           ]
    *                         }
    *                       ]
    *                     },
-   *                     "oneOf": [
-   *                       {
-   *                         "required": ["group"]
-   *                       },
-   *                       {
-   *                         "required": ["regex"]
-   *                       }
-   *                     ]
-   *                   },
-   *                   "uniqueItems": true
-   *                 }
-   *               ]
-   *             }
-   *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *                     "uniqueItems": true
+   *                   }
+   *                 ]
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "additionalItems": false,
+   *         "minItems": 1
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -8746,77 +8864,83 @@ namespace NoRestrictedModules {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": {
-   *         "anyOf": [
-   *           {
-   *             "type": "string"
-   *           },
-   *           {
-   *             "type": "object",
-   *             "properties": {
-   *               "name": {
-   *                 "type": "string"
-   *               },
-   *               "message": {
-   *                 "type": "string",
-   *                 "minLength": 1
-   *               }
-   *             },
-   *             "additionalProperties": false,
-   *             "required": ["name"]
-   *           }
-   *         ]
-   *       },
-   *       "uniqueItems": true
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": {
-   *         "type": "object",
-   *         "properties": {
-   *           "paths": {
-   *             "type": "array",
-   *             "items": {
-   *               "anyOf": [
-   *                 {
-   *                   "type": "string"
-   *                 },
-   *                 {
-   *                   "type": "object",
-   *                   "properties": {
-   *                     "name": {
-   *                       "type": "string"
-   *                     },
-   *                     "message": {
-   *                       "type": "string",
-   *                       "minLength": 1
-   *                     }
-   *                   },
-   *                   "additionalProperties": false,
-   *                   "required": ["name"]
-   *                 }
-   *               ]
-   *             },
-   *             "uniqueItems": true
-   *           },
-   *           "patterns": {
-   *             "type": "array",
-   *             "items": {
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": {
+   *           "anyOf": [
+   *             {
    *               "type": "string"
    *             },
-   *             "uniqueItems": true
-   *           }
+   *             {
+   *               "type": "object",
+   *               "properties": {
+   *                 "name": {
+   *                   "type": "string"
+   *                 },
+   *                 "message": {
+   *                   "type": "string",
+   *                   "minLength": 1
+   *                 }
+   *               },
+   *               "additionalProperties": false,
+   *               "required": [
+   *                 "name"
+   *               ]
+   *             }
+   *           ]
    *         },
-   *         "additionalProperties": false
+   *         "uniqueItems": true
    *       },
-   *       "additionalItems": false
-   *     }
-   *   ]
-   * }
+   *       {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "object",
+   *           "properties": {
+   *             "paths": {
+   *               "type": "array",
+   *               "items": {
+   *                 "anyOf": [
+   *                   {
+   *                     "type": "string"
+   *                   },
+   *                   {
+   *                     "type": "object",
+   *                     "properties": {
+   *                       "name": {
+   *                         "type": "string"
+   *                       },
+   *                       "message": {
+   *                         "type": "string",
+   *                         "minLength": 1
+   *                       }
+   *                     },
+   *                     "additionalProperties": false,
+   *                     "required": [
+   *                       "name"
+   *                     ]
+   *                   }
+   *                 ]
+   *               },
+   *               "uniqueItems": true
+   *             },
+   *             "patterns": {
+   *               "type": "array",
+   *               "items": {
+   *                 "type": "string"
+   *               },
+   *               "uniqueItems": true
+   *             }
+   *           },
+   *           "additionalProperties": false
+   *         },
+   *         "additionalItems": false
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -8840,57 +8964,69 @@ namespace NoRestrictedProperties {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "items": {
-   *     "type": "object",
-   *     "properties": {
-   *       "object": {
-   *         "type": "string"
-   *       },
-   *       "property": {
-   *         "type": "string"
-   *       },
-   *       "allowObjects": {
-   *         "type": "array",
-   *         "items": {
+   * [
+   *   {
+   *     "type": "array",
+   *     "items": {
+   *       "type": "object",
+   *       "properties": {
+   *         "object": {
    *           "type": "string"
    *         },
-   *         "uniqueItems": true
-   *       },
-   *       "allowProperties": {
-   *         "type": "array",
-   *         "items": {
+   *         "property": {
    *           "type": "string"
    *         },
-   *         "uniqueItems": true
+   *         "allowObjects": {
+   *           "type": "array",
+   *           "items": {
+   *             "type": "string"
+   *           },
+   *           "uniqueItems": true
+   *         },
+   *         "allowProperties": {
+   *           "type": "array",
+   *           "items": {
+   *             "type": "string"
+   *           },
+   *           "uniqueItems": true
+   *         },
+   *         "message": {
+   *           "type": "string"
+   *         }
    *       },
-   *       "message": {
-   *         "type": "string"
-   *       }
-   *     },
-   *     "anyOf": [
-   *       {
-   *         "required": ["object"]
-   *       },
-   *       {
-   *         "required": ["property"]
-   *       }
-   *     ],
-   *     "not": {
    *       "anyOf": [
    *         {
-   *           "required": ["allowObjects", "object"]
+   *           "required": [
+   *             "object"
+   *           ]
    *         },
    *         {
-   *           "required": ["allowProperties", "property"]
+   *           "required": [
+   *             "property"
+   *           ]
    *         }
-   *       ]
+   *       ],
+   *       "not": {
+   *         "anyOf": [
+   *           {
+   *             "required": [
+   *               "allowObjects",
+   *               "object"
+   *             ]
+   *           },
+   *           {
+   *             "required": [
+   *               "allowProperties",
+   *               "property"
+   *             ]
+   *           }
+   *         ]
+   *       },
+   *       "additionalProperties": false
    *     },
-   *     "additionalProperties": false
-   *   },
-   *   "uniqueItems": true
-   * }
+   *     "uniqueItems": true
+   *   }
+   * ]
    * ```
    */
   export type Options = readonly Readonly<Record<string, unknown>>[];
@@ -8919,31 +9055,35 @@ namespace NoRestrictedSyntax {
    * ### schema
    *
    * ```json
-   * {
-   *   "type": "array",
-   *   "items": {
-   *     "oneOf": [
-   *       {
-   *         "type": "string"
-   *       },
-   *       {
-   *         "type": "object",
-   *         "properties": {
-   *           "selector": {
-   *             "type": "string"
-   *           },
-   *           "message": {
-   *             "type": "string"
-   *           }
+   * [
+   *   {
+   *     "type": "array",
+   *     "items": {
+   *       "oneOf": [
+   *         {
+   *           "type": "string"
    *         },
-   *         "required": ["selector"],
-   *         "additionalProperties": false
-   *       }
-   *     ]
-   *   },
-   *   "uniqueItems": true,
-   *   "minItems": 0
-   * }
+   *         {
+   *           "type": "object",
+   *           "properties": {
+   *             "selector": {
+   *               "type": "string"
+   *             },
+   *             "message": {
+   *               "type": "string"
+   *             }
+   *           },
+   *           "required": [
+   *             "selector"
+   *           ],
+   *           "additionalProperties": false
+   *         }
+   *       ]
+   *     },
+   *     "uniqueItems": true,
+   *     "minItems": 0
+   *   }
+   * ]
    * ```
    */
   /** @minItems 0 */
@@ -10937,74 +11077,83 @@ namespace ObjectShorthand {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": [
-   *             "always",
-   *             "methods",
-   *             "properties",
-   *             "never",
-   *             "consistent",
-   *             "consistent-as-needed"
-   *           ]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always", "methods", "properties"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "avoidQuotes": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "methods",
+   *               "properties",
+   *               "never",
+   *               "consistent",
+   *               "consistent-as-needed"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "methods",
+   *               "properties"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always", "methods"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "ignoreConstructors": {
-   *               "type": "boolean"
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "avoidQuotes": {
+   *                 "type": "boolean"
+   *               }
    *             },
-   *             "methodsIgnorePattern": {
-   *               "type": "string"
-   *             },
-   *             "avoidQuotes": {
-   *               "type": "boolean"
-   *             },
-   *             "avoidExplicitReturnArrows": {
-   *               "type": "boolean"
-   *             }
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 2,
+   *         "maxItems": 2
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "methods"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "ignoreConstructors": {
+   *                 "type": "boolean"
+   *               },
+   *               "methodsIgnorePattern": {
+   *                 "type": "string"
+   *               },
+   *               "avoidQuotes": {
+   *                 "type": "boolean"
+   *               },
+   *               "avoidExplicitReturnArrows": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 2,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type Options =
@@ -11369,58 +11518,19 @@ namespace PaddingLineBetweenStatements {
    * ### schema
    *
    * ```json
-   * {
-   *   "definitions": {
-   *     "paddingType": {
-   *       "enum": ["any", "never", "always"]
-   *     },
-   *     "statementType": {
-   *       "anyOf": [
-   *         {
-   *           "enum": [
-   *             "*",
-   *             "block-like",
-   *             "cjs-export",
-   *             "cjs-import",
-   *             "directive",
-   *             "expression",
-   *             "iife",
-   *             "multiline-block-like",
-   *             "multiline-expression",
-   *             "multiline-const",
-   *             "multiline-let",
-   *             "multiline-var",
-   *             "singleline-const",
-   *             "singleline-let",
-   *             "singleline-var",
-   *             "block",
-   *             "empty",
-   *             "function",
-   *             "break",
-   *             "case",
-   *             "class",
-   *             "const",
-   *             "continue",
-   *             "debugger",
-   *             "default",
-   *             "do",
-   *             "export",
-   *             "for",
-   *             "if",
-   *             "import",
-   *             "let",
-   *             "return",
-   *             "switch",
-   *             "throw",
-   *             "try",
-   *             "var",
-   *             "while",
-   *             "with"
-   *           ]
-   *         },
-   *         {
-   *           "type": "array",
-   *           "items": {
+   * [
+   *   {
+   *     "definitions": {
+   *       "paddingType": {
+   *         "enum": [
+   *           "any",
+   *           "never",
+   *           "always"
+   *         ]
+   *       },
+   *       "statementType": {
+   *         "anyOf": [
+   *           {
    *             "enum": [
    *               "*",
    *               "block-like",
@@ -11462,30 +11572,79 @@ namespace PaddingLineBetweenStatements {
    *               "with"
    *             ]
    *           },
-   *           "minItems": 1,
-   *           "uniqueItems": true
-   *         }
-   *       ]
-   *     }
-   *   },
-   *   "type": "array",
-   *   "items": {
-   *     "type": "object",
-   *     "properties": {
-   *       "blankLine": {
-   *         "$ref": "#/definitions/paddingType"
-   *       },
-   *       "prev": {
-   *         "$ref": "#/definitions/statementType"
-   *       },
-   *       "next": {
-   *         "$ref": "#/definitions/statementType"
+   *           {
+   *             "type": "array",
+   *             "items": {
+   *               "enum": [
+   *                 "*",
+   *                 "block-like",
+   *                 "cjs-export",
+   *                 "cjs-import",
+   *                 "directive",
+   *                 "expression",
+   *                 "iife",
+   *                 "multiline-block-like",
+   *                 "multiline-expression",
+   *                 "multiline-const",
+   *                 "multiline-let",
+   *                 "multiline-var",
+   *                 "singleline-const",
+   *                 "singleline-let",
+   *                 "singleline-var",
+   *                 "block",
+   *                 "empty",
+   *                 "function",
+   *                 "break",
+   *                 "case",
+   *                 "class",
+   *                 "const",
+   *                 "continue",
+   *                 "debugger",
+   *                 "default",
+   *                 "do",
+   *                 "export",
+   *                 "for",
+   *                 "if",
+   *                 "import",
+   *                 "let",
+   *                 "return",
+   *                 "switch",
+   *                 "throw",
+   *                 "try",
+   *                 "var",
+   *                 "while",
+   *                 "with"
+   *               ]
+   *             },
+   *             "minItems": 1,
+   *             "uniqueItems": true
+   *           }
+   *         ]
    *       }
    *     },
-   *     "additionalProperties": false,
-   *     "required": ["blankLine", "prev", "next"]
+   *     "type": "array",
+   *     "items": {
+   *       "type": "object",
+   *       "properties": {
+   *         "blankLine": {
+   *           "$ref": "#/definitions/paddingType"
+   *         },
+   *         "prev": {
+   *           "$ref": "#/definitions/statementType"
+   *         },
+   *         "next": {
+   *           "$ref": "#/definitions/statementType"
+   *         }
+   *       },
+   *       "additionalProperties": false,
+   *       "required": [
+   *         "blankLine",
+   *         "prev",
+   *         "next"
+   *       ]
+   *     }
    *   }
-   * }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -12037,55 +12196,57 @@ namespace QuoteProps {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": [
-   *             "always",
-   *             "as-needed",
-   *             "consistent",
-   *             "consistent-as-needed"
-   *           ]
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 1
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": [
-   *             "always",
-   *             "as-needed",
-   *             "consistent",
-   *             "consistent-as-needed"
-   *           ]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "keywords": {
-   *               "type": "boolean"
-   *             },
-   *             "unnecessary": {
-   *               "type": "boolean"
-   *             },
-   *             "numbers": {
-   *               "type": "boolean"
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "as-needed",
+   *               "consistent",
+   *               "consistent-as-needed"
+   *             ]
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 1
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always",
+   *               "as-needed",
+   *               "consistent",
+   *               "consistent-as-needed"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "keywords": {
+   *                 "type": "boolean"
+   *               },
+   *               "unnecessary": {
+   *                 "type": "boolean"
+   *               },
+   *               "numbers": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
@@ -12355,51 +12516,61 @@ namespace Semi {
    * ### schema
    *
    * ```json
-   * {
-   *   "anyOf": [
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["never"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "beforeStatementContinuationChars": {
-   *               "enum": ["always", "any", "never"]
-   *             }
+   * [
+   *   {
+   *     "anyOf": [
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "never"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     },
-   *     {
-   *       "type": "array",
-   *       "items": [
-   *         {
-   *           "enum": ["always"]
-   *         },
-   *         {
-   *           "type": "object",
-   *           "properties": {
-   *             "omitLastInOneLineBlock": {
-   *               "type": "boolean"
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "beforeStatementContinuationChars": {
+   *                 "enum": [
+   *                   "always",
+   *                   "any",
+   *                   "never"
+   *                 ]
+   *               }
    *             },
-   *             "omitLastInOneLineClassBody": {
-   *               "type": "boolean"
-   *             }
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       },
+   *       {
+   *         "type": "array",
+   *         "items": [
+   *           {
+   *             "enum": [
+   *               "always"
+   *             ]
    *           },
-   *           "additionalProperties": false
-   *         }
-   *       ],
-   *       "minItems": 0,
-   *       "maxItems": 2
-   *     }
-   *   ]
-   * }
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "omitLastInOneLineBlock": {
+   *                 "type": "boolean"
+   *               },
+   *               "omitLastInOneLineClassBody": {
+   *                 "type": "boolean"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ],
+   *         "minItems": 0,
+   *         "maxItems": 2
+   *       }
+   *     ]
+   *   }
+   * ]
    * ```
    */
   export type RuleEntry = 0;
