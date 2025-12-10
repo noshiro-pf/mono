@@ -10,5 +10,5 @@ minimumReleaseAgeExclude:
   - ts-fortress
   - ts-repo-utils
   - eslint-config-typed
-  - octokit-types
+  - octokit-safe-types
   - github-settings-as-code
