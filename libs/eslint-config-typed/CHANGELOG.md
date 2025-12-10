@@ -1,3 +1,9 @@
+## [4.0.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.6...v4.0.7) (2025-12-10)
+
+### Bug Fixes
+
+- fix some schemas ([#182](https://github.com/noshiro-pf/eslint-config-typed/issues/182)) ([8d455fe](https://github.com/noshiro-pf/eslint-config-typed/commit/8d455fed997b33af0c20b846645377580df163fd))
+
 ## [4.0.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.5...v4.0.6) (2025-12-10)
 
 ### Bug Fixes
