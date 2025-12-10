@@ -1,4 +1,4 @@
-import { Result } from 'ts-repo-utils';
+import 'ts-repo-utils';
 
 /**
  * Runs all validation and build steps for the project.

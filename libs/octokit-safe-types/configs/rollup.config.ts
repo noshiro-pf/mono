@@ -1,6 +1,7 @@
 import * as rollupPluginReplace from '@rollup/plugin-replace';
 import * as rollupPluginStrip from '@rollup/plugin-strip';
 import * as rollupPluginTypescript from '@rollup/plugin-typescript';
+import { defineConfig } from 'rollup';
 import 'ts-repo-utils';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
@@ -15,7 +16,7 @@ const input = await glob(path.resolve(srcDir, './**/*.mts'), {
   ignore: ['**/*.test.mts', './**/*.d.mts'],
 });
 
-export default {
+export default defineConfig({
   input,
   output: {
     format: 'es',
@@ -47,4 +48,4 @@ export default {
       include: '**/*.(mts|ts|mjs|js)',
     }),
   ],
-};
+});
