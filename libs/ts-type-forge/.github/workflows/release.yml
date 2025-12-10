@@ -6,7 +6,7 @@ on:
       - main # Trigger a push to the main branch
 
 permissions:
-  id-token: write  # Required for OIDC
+  id-token: write # Required for OIDC
   contents: write # To allow semantic-release to update package.json, create tags, and create releases
   issues: write # To allow semantic-release to comment release notes on related issues/PRs
   pull-requests: write # To allow semantic-release to comment release notes into the associated PR
