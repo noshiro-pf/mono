@@ -1,3 +1,9 @@
+## [4.0.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.5...v4.0.6) (2025-12-10)
+
+### Bug Fixes
+
+- set minimumReleaseAge ([#181](https://github.com/noshiro-pf/eslint-config-typed/issues/181)) ([f0d5737](https://github.com/noshiro-pf/eslint-config-typed/commit/f0d5737dc34e76e5ebf3b8a18cc4b5daa91e6b79))
+
 ## [4.0.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.4...v4.0.5) (2025-12-01)
 
 ### Bug Fixes
