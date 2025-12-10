@@ -24,13 +24,14 @@
     "gh-backup-rulesets": "./dist/github/ruleset/backup.mjs"
   },
   "files": [
-    "dist",
     "src",
+    "dist",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
     "build": "tsx ./scripts/cmd/build.mts",
+    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
     "check-all": "tsx ./scripts/cmd/check-all.mts",
     "check:ext": "tsx ./scripts/cmd/check-ext.mts",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
@@ -83,11 +84,11 @@
     "cspell": "9.4.0",
     "eslint": "9.39.1",
     "eslint-config-typed": "4.0.5",
-    "fast-glob": "3.3.3",
     "jiti": "2.6.1",
     "markdownlint": "0.39.0",
     "markdownlint-cli2": "0.19.1",
     "npm-run-all2": "8.0.4",
+    "playwright": "1.57.0",
     "prettier": "3.7.3",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "2.5.20",
@@ -101,8 +102,11 @@
     "vitest": "4.0.14"
   },
   "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=8.0.0"
+  },
   "volta": {
-    "node": "25.0.0",
-    "npm": "11.6.2"
+    "node": "25.0.0"
   }
 }
