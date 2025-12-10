@@ -78,4 +78,4 @@ export default [
       'functional/immutable-data': 'off',
     }),
   },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];

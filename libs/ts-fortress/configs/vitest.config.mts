@@ -6,10 +6,14 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
 
 type ViteUserConfig = DeepReadonly<ViteUserConfig_>;
 
+// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+const CI: boolean = !!process.env['CI'];
+
 // https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
 const config = (): ViteUserConfig =>
   ({
     test: {
+      maxConcurrency: CI ? 1 : 5,
       alias: {
         'ts-fortress': path.resolve(projectRootPath, './src/entry-point.mts'),
       },
@@ -35,6 +39,7 @@ const config = (): ViteUserConfig =>
             ...projectConfig({
               additionalExcludes: [
                 'src/record/record-allow-excess-properties.test.mts',
+                'test/io-ts.test.mts',
               ],
             }),
             // https://vitest.dev/config/browser/playwright
@@ -63,6 +68,7 @@ const projectConfig = (
     restoreMocks: true,
     hideSkippedTests: true,
     testTimeout: 60000,
+    hookTimeout: 60000,
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: [
