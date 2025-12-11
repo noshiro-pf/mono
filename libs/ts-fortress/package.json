@@ -54,17 +54,18 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
-    "test": "pnpm run z:vitest --project='Node.js' run",
+    "test": "pnpm run z:vitest:node run",
     "test:browser": "pnpm run z:vitest --project='Browser' run",
-    "test:cov": "pnpm run z:vitest --project='Node.js' run --coverage",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
     "test:cov:ui": "vite preview --outDir ./coverage",
-    "test:ui": "pnpm run z:vitest --ui",
-    "testw": "pnpm run z:vitest watch",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "testw": "pnpm run z:vitest:node watch",
     "tsc": "tsc --noEmit",
     "tscw": "tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "tsc --noEmit",
     "update-packages": "pnpm update --latest",
-    "z:vitest": "vitest --config ./configs/vitest.config.mts"
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "vitest --config ./configs/vitest.config.mts --project='Node.js'"
   },
   "dependencies": {
     "@sindresorhus/is": "^7.1.1",
