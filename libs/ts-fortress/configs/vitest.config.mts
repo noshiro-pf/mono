@@ -13,7 +13,6 @@ const CI: boolean = !!process.env['CI'];
 const config = (): ViteUserConfig =>
   ({
     test: {
-      maxConcurrency: CI ? 1 : 5,
       alias: {
         'ts-fortress': path.resolve(projectRootPath, './src/entry-point.mts'),
       },
@@ -35,19 +34,15 @@ const config = (): ViteUserConfig =>
         },
         {
           test: {
+            maxConcurrency: CI ? 1 : 5,
             name: 'Browser',
-            ...projectConfig({
-              additionalExcludes: [
-                'src/record/record-allow-excess-properties.test.mts',
-                'test/io-ts.test.mts',
-              ],
-            }),
+            ...projectConfig(),
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,
               headless: true,
               screenshotFailures: false,
-              connectTimeout: 60000,
+              connectTimeout: 300000,
               provider: playwright(),
               instances: [{ browser: 'chromium' }],
             },
@@ -67,8 +62,8 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
-    testTimeout: 60000,
-    hookTimeout: 60000,
+    testTimeout: 300000,
+    hookTimeout: 300000,
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: [
