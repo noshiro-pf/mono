@@ -6,18 +6,16 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
 
 type ViteUserConfig = DeepReadonly<ViteUserConfig_>;
 
-// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-const CI: boolean = !!process.env['CI'];
-
 // https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
 const config = (): ViteUserConfig =>
   ({
     test: {
+      coverage: coverageSettings(),
+
       alias: {
         'ts-fortress': path.resolve(projectRootPath, './src/entry-point.mts'),
       },
-      passWithNoTests: true,
-      coverage: coverageSettings('istanbul'),
+
       projects: [
         {
           test: {
@@ -34,7 +32,6 @@ const config = (): ViteUserConfig =>
         },
         {
           test: {
-            maxConcurrency: CI ? 1 : 5,
             name: 'Browser',
             ...projectConfig(),
             // https://vitest.dev/config/browser/playwright
@@ -42,10 +39,12 @@ const config = (): ViteUserConfig =>
               enabled: true,
               headless: true,
               screenshotFailures: false,
-              connectTimeout: 300000,
               provider: playwright(),
               instances: [{ browser: 'chromium' }],
             },
+          },
+          optimizeDeps: {
+            include: ['ts-data-forge', 'io-ts', 'zod', 'io-ts/PathReporter'],
           },
         },
       ],
@@ -62,8 +61,6 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
-    testTimeout: 300000,
-    hookTimeout: 300000,
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: [
@@ -74,11 +71,9 @@ const projectConfig = (
     ],
   }) as const;
 
-const coverageSettings = (
-  provider: 'v8' | 'istanbul',
-): DeepReadonly<CoverageOptions> =>
+const coverageSettings = (): DeepReadonly<CoverageOptions> =>
   ({
-    provider,
+    provider: 'v8',
     reporter: ['html', 'lcov', 'text'],
     include: ['src/**/*.{mts,tsx}'],
     exclude: ['**/index.mts', 'src/entry-point.mts'],

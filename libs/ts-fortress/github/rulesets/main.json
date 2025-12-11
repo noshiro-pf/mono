@@ -74,11 +74,15 @@
             "integration_id": 15368
           },
           {
-            "context": "test-coverage (test)",
+            "context": "test (test)",
             "integration_id": 15368
           },
           {
-            "context": "test-coverage (test:cov)",
+            "context": "test (test:browser)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test (test:cov)",
             "integration_id": 15368
           }
         ]
