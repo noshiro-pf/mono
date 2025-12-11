@@ -1,4 +1,4 @@
-import { Result, unknownToString } from 'ts-data-forge';
+import { unknownToString } from 'ts-data-forge';
 import { formatFiles } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { extractSampleCode } from './embed-samples-shared.mjs';

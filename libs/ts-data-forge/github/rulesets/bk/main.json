@@ -40,7 +40,6 @@
         "require_code_owner_review": true,
         "require_last_push_approval": false,
         "required_review_thread_resolution": true,
-        "automatic_copilot_code_review_enabled": true,
         "allowed_merge_methods": ["squash"]
       }
     },
@@ -67,10 +66,6 @@
             "integration_id": 15368
           },
           {
-            "context": "style-check (md)",
-            "integration_id": 15368
-          },
-          {
             "context": "lint-and-build (build)",
             "integration_id": 15368
           },
@@ -79,11 +74,15 @@
             "integration_id": 15368
           },
           {
-            "context": "test",
+            "context": "test (test)",
             "integration_id": 15368
           },
           {
-            "context": "backup-repository-settings",
+            "context": "test (test:browser)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test (test:cov)",
             "integration_id": 15368
           }
         ]

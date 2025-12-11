@@ -85,4 +85,4 @@ export default [
       '@typescript-eslint/no-unnecessary-condition': 'off',
     }),
   },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];

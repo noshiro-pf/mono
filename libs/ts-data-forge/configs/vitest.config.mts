@@ -10,11 +10,12 @@ type ViteUserConfig = DeepReadonly<ViteUserConfig_>;
 const config = (): ViteUserConfig =>
   ({
     test: {
+      coverage: coverageSettings(),
+
       alias: {
         'ts-data-forge': path.resolve(projectRootPath, './src/entry-point.mts'),
       },
-      passWithNoTests: true,
-      coverage: coverageSettings('istanbul'),
+
       projects: [
         {
           test: {
@@ -32,32 +33,22 @@ const config = (): ViteUserConfig =>
         {
           test: {
             name: 'Browser',
-            ...projectConfig({
-              additionalExcludes: [
-                'src/array/impl/array-utils-transformation.test.mts',
-              ],
-            }),
+            ...projectConfig(),
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,
               headless: true,
               screenshotFailures: false,
-              connectTimeout: 60000,
               provider: playwright(),
               instances: [{ browser: 'chromium' }],
             },
           },
+          optimizeDeps: {
+            include: ['@sindresorhus/is'],
+          },
         },
       ],
     },
-
-    // Bind the server to all network interfaces.
-    // This allows Playwright to access the server from within the GitHub Actions execution environment (host machine, Docker container, etc.).
-    // server: {
-    //   host: '127.0.0.1',
-    //   port: 3000,
-    //   strictPort: true,
-    // },
   }) as const;
 
 const projectConfig = (
@@ -70,7 +61,6 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
-    testTimeout: 60000,
     includeSource: ['src/**/*.mts', 'samples/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: [
@@ -81,11 +71,9 @@ const projectConfig = (
     ],
   }) as const;
 
-const coverageSettings = (
-  provider: 'v8' | 'istanbul',
-): DeepReadonly<CoverageOptions> =>
+const coverageSettings = (): DeepReadonly<CoverageOptions> =>
   ({
-    provider,
+    provider: 'v8',
     reporter: ['html', 'lcov', 'text'],
     include: ['src/**/*.{mts,tsx}'],
     exclude: ['**/index.mts', 'src/entry-point.mts'],

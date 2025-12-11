@@ -54,7 +54,7 @@ const checkAll = async (): Promise<void> => {
     startMessage: 'Backing up repository settings',
     action: () =>
       runCmdStep(
-        'pnpm exec gh-backup-all',
+        'pnpm run gh:backup-all',
         'Backing up repository settings failed',
       ),
     successMessage: 'Repository settings backed up',
