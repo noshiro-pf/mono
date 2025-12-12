@@ -47,7 +47,7 @@ export const genDocs = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Formatting files',
-    action: () => runCmdStep('pnpm run fmt:diff', 'File formatting failed'),
+    action: () => runCmdStep('pnpm run fmt', 'File formatting failed'),
     successMessage: 'Formatting completed',
   });
 
