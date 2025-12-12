@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 import { type ViteUserConfig as ViteUserConfig_ } from 'vitest/config';
-import { type CoverageOptions } from 'vitest/node';
+import { type CoverageOptions, type ProjectConfig } from 'vitest/node';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 
 type ViteUserConfig = DeepReadonly<ViteUserConfig_>;
@@ -9,32 +9,60 @@ type ViteUserConfig = DeepReadonly<ViteUserConfig_>;
 const config = (): ViteUserConfig =>
   ({
     test: {
-      globals: true,
-      dir: projectRootPath,
-      includeSource: ['src/**/*.mts'],
-      typecheck: {
-        tsconfig: path.resolve(projectRootPath, './configs/tsconfig.test.json'),
-      },
+      coverage: coverageSettings(),
+
       alias: {
         'github-settings-as-code': path.resolve(
           projectRootPath,
           './src/entry-point.mts',
         ),
       },
+
       passWithNoTests: true,
-      restoreMocks: true,
-      hideSkippedTests: true,
-      coverage: coverageSettings('v8'),
+      projects: [
+        {
+          test: {
+            name: 'Node.js',
+            environment: 'node',
+            ...projectConfig(),
+            typecheck: {
+              tsconfig: path.resolve(
+                projectRootPath,
+                './configs/tsconfig.test.json',
+              ),
+            },
+          },
+        },
+      ],
     },
   }) as const;
 
-const coverageSettings = (
-  provider: 'v8' | 'istanbul',
-): DeepReadonly<CoverageOptions> => ({
-  provider,
-  reporter: ['html', 'lcov', 'text'],
-  include: ['src/**/*.mts'],
-  exclude: ['**/index.mts', 'src/entry-point.mts'],
-});
+const projectConfig = (
+  options?: Readonly<{
+    additionalExcludes?: readonly string[];
+  }>,
+): DeepReadonly<ProjectConfig> =>
+  ({
+    dir: projectRootPath,
+    globals: true,
+    restoreMocks: true,
+    hideSkippedTests: true,
+    includeSource: ['src/**/*.mts', 'scripts/**/*.mts', 'samples/**/*.mts'],
+    include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
+    exclude: [
+      '**/*.d.mts',
+      '**/index.mts',
+      'src/entry-point.mts',
+      ...(options?.additionalExcludes ?? []),
+    ],
+  }) as const;
+
+const coverageSettings = (): DeepReadonly<CoverageOptions> =>
+  ({
+    provider: 'v8',
+    reporter: ['html', 'lcov', 'text'],
+    include: ['src/**/*.{mts,tsx}'],
+    exclude: ['**/index.mts', 'src/entry-point.mts'],
+  }) as const;
 
 export default config();
