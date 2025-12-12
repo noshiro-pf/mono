@@ -39,6 +39,12 @@ export const genDocs = async (): Promise<void> => {
     successMessage: 'Markdown linting completed',
   });
 
+  await logStep({
+    startMessage: 'Formatting files',
+    action: () => runCmdStep('pnpm run fmt:diff', 'Formatting failed'),
+    successMessage: 'Formatting completed',
+  });
+
   echo('✅ Documentation generation completed successfully!\n');
 };
 
