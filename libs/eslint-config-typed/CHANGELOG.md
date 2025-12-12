@@ -1,3 +1,9 @@
+## [4.0.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.6...v4.0.7) (2025-12-12)
+
+### Bug Fixes
+
+- fix react-coding-style/display-name behavior ([#185](https://github.com/noshiro-pf/eslint-config-typed/issues/185)) ([f09be91](https://github.com/noshiro-pf/eslint-config-typed/commit/f09be9189a2774c2662e01e28cdb3d1ee03dd9fd))
+
 ## [4.0.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.5...v4.0.6) (2025-12-11)
 
 ### Bug Fixes
