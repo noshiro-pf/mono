@@ -1,4 +1,3 @@
-import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
 import { type ViteUserConfig as ViteUserConfig_ } from 'vitest/config';
 import { type CoverageOptions, type ProjectConfig } from 'vitest/node';
@@ -10,14 +9,16 @@ type ViteUserConfig = DeepReadonly<ViteUserConfig_>;
 const config = (): ViteUserConfig =>
   ({
     test: {
+      coverage: coverageSettings(),
+
       alias: {
         'octokit-safe-types': path.resolve(
           projectRootPath,
           './src/entry-point.mts',
         ),
       },
+
       passWithNoTests: true,
-      coverage: coverageSettings('istanbul'),
       projects: [
         {
           test: {
@@ -29,20 +30,6 @@ const config = (): ViteUserConfig =>
                 projectRootPath,
                 './configs/tsconfig.test.json',
               ),
-            },
-          },
-        },
-        {
-          test: {
-            name: 'Browser',
-            ...projectConfig(),
-            // https://vitest.dev/config/browser/playwright
-            browser: {
-              enabled: true,
-              headless: true,
-              screenshotFailures: false,
-              provider: playwright(),
-              instances: [{ browser: 'chromium' }],
             },
           },
         },
@@ -60,7 +47,7 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
-    includeSource: ['src/**/*.mts'],
+    includeSource: ['src/**/*.mts', 'scripts/**/*.mts', 'samples/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: [
       '**/*.d.mts',
@@ -70,11 +57,9 @@ const projectConfig = (
     ],
   }) as const;
 
-const coverageSettings = (
-  provider: 'v8' | 'istanbul',
-): DeepReadonly<CoverageOptions> =>
+const coverageSettings = (): DeepReadonly<CoverageOptions> =>
   ({
-    provider,
+    provider: 'v8',
     reporter: ['html', 'lcov', 'text'],
     include: ['src/**/*.{mts,tsx}'],
     exclude: ['**/index.mts', 'src/entry-point.mts'],

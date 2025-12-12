@@ -45,9 +45,9 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
-    startMessage: 'Formatting code',
-    action: () => runCmdStep('pnpm run fmt', 'Formatting failed'),
-    successMessage: 'Code formatted',
+    startMessage: 'Generating documentation',
+    action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
+    successMessage: 'Documentation generated',
   });
 
   await logStep({

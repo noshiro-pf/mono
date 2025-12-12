@@ -58,7 +58,7 @@
             "integration_id": 15368
           },
           {
-            "context": "style-check (md)",
+            "context": "style-check (doc)",
             "integration_id": 15368
           },
           {
@@ -74,7 +74,11 @@
             "integration_id": 15368
           },
           {
-            "context": "test-coverage",
+            "context": "test (test)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test (test:cov)",
             "integration_id": 15368
           }
         ]

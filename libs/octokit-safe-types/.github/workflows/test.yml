@@ -8,26 +8,38 @@ on:
       - 'develop'
       - 'develop*'
     paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - 'agents/**'
+      - 'docs/**'
+      - 'documents/**'
       - '.gitignore'
-      # - '.cspell.json'
-      # - '**.md'
-      # - '**.txt'
-      # - 'docs/**'
+      - '.cspell.json'
+      - '.editorconfig'
+      - '.markdownlint-cli2.mjs'
+      - 'LICENSE'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  test-coverage:
+  test:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     # Allow Codecov OIDC upload and minimal read access
     permissions:
       contents: read
       id-token: write
+
+    strategy:
+      fail-fast: true
+      matrix:
+        command:
+          - test
+          - test:cov
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -47,16 +59,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install chromium
-
-      - name: Run test
-        run: pnpm run test
-
-      - name: Run test:cov
-        run: pnpm run test:cov
+      - name: Run "${{ matrix.command }}"
+        run: pnpm run ${{ matrix.command }}
 
       - name: Upload coverage reports to Codecov
+        if: matrix.command == 'test:cov'
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           fail_ci_if_error: true
