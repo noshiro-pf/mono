@@ -184,7 +184,8 @@ namespace BanUseImperativeHandleHook {
 }
 
 /**
- * Require displayName property for React components created with React.memo
+ * Require React.memo components to define displayName matching the component
+ * name
  *
  * ```md
  * | key        | value      |
@@ -202,9 +203,20 @@ namespace DisplayName {
    *   {
    *     "type": "object",
    *     "properties": {
-   *       "ignoreTranspilerName": {
-   *         "type": "boolean",
-   *         "description": "When true, ignores components that get displayName from variable name"
+   *       "ignoreName": {
+   *         "description": "Component names allowed to have displayName different from the variable name.",
+   *         "oneOf": [
+   *           {
+   *             "type": "string"
+   *           },
+   *           {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string"
+   *             },
+   *             "minItems": 0
+   *           }
+   *         ]
    *       }
    *     },
    *     "additionalProperties": false
@@ -213,8 +225,11 @@ namespace DisplayName {
    * ```
    */
   export type Options = Readonly<{
-    /** When true, ignores components that get displayName from variable name */
-    ignoreTranspilerName?: boolean;
+    /**
+     * Component names allowed to have displayName different from the variable
+     * name.
+     */
+    ignoreName?: string | readonly string[];
   }>;
 
   export type RuleEntry =

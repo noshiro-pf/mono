@@ -46,9 +46,8 @@ const checkAll = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Generating documentation',
-    action: () =>
-      runCmdStep('pnpm run doc:embed', 'Documentation embedding failed'),
-    successMessage: 'Documents generated',
+    action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
+    successMessage: 'Documentation generated',
   });
 
   await logStep({

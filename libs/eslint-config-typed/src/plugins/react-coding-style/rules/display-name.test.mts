@@ -41,6 +41,13 @@ describe('display-name', () => {
             const notAComponent = someFunction();
           `,
         },
+        {
+          name: 'Exported component with displayName',
+          code: dedent`
+            export const MyComponent = React.memo(() => <div>Hello</div>);
+            MyComponent.displayName = 'MyComponent';
+          `,
+        },
       ],
       invalid: [
         {
@@ -51,6 +58,26 @@ describe('display-name', () => {
           errors: [{ messageId: 'missingDisplayName' }],
         },
         {
+          name: 'Exported component without displayName',
+          code: dedent`
+            export const MyComponent = React.memo(() => <div>Hello</div>);
+          `,
+          errors: [{ messageId: 'missingDisplayName' }],
+        },
+        {
+          name: 'Component with mismatched displayName',
+          code: dedent`
+            const MyComponent = React.memo(() => <div>Hello</div>);
+            MyComponent.displayName = 'Other';
+          `,
+          errors: [
+            {
+              messageId: 'mismatchedDisplayName',
+              data: { componentName: 'MyComponent' },
+            },
+          ],
+        },
+        {
           name: 'Named import without displayName',
           code: dedent`
             import { memo } from 'react';
@@ -58,19 +85,47 @@ describe('display-name', () => {
           `,
           errors: [{ messageId: 'missingDisplayName' }],
         },
+        {
+          name: 'Named import with mismatched displayName',
+          code: dedent`
+            import { memo } from 'react';
+            const MyComponent = memo(() => <div>Hello</div>);
+            MyComponent.displayName = 'Component';
+          `,
+          errors: [
+            {
+              messageId: 'mismatchedDisplayName',
+              data: { componentName: 'MyComponent' },
+            },
+          ],
+        },
+        {
+          name: 'Exported component with mismatched displayName',
+          code: dedent`
+            export const MyComponent = React.memo(() => <div>Hello</div>);
+            MyComponent.displayName = 'Component';
+          `,
+          errors: [
+            {
+              messageId: 'mismatchedDisplayName',
+              data: { componentName: 'MyComponent' },
+            },
+          ],
+        },
       ],
     });
   });
 
-  describe('ignoreTranspilerName option', () => {
-    tester.run('display-name with ignoreTranspilerName', displayNameRule, {
+  describe('ignoreName option', () => {
+    tester.run('display-name with ignoreName', displayNameRule, {
       valid: [
         {
-          name: 'Component without displayName (ignored)',
+          name: 'Component with mismatched displayName (ignored)',
           code: dedent`
             const MyComponent = React.memo(() => <div>Hello</div>);
+            MyComponent.displayName = 'Other';
           `,
-          options: [{ ignoreTranspilerName: true }],
+          options: [{ ignoreName: 'MyComponent' }],
         },
         {
           name: 'Component with displayName',
@@ -78,10 +133,19 @@ describe('display-name', () => {
             const MyComponent = React.memo(() => <div>Hello</div>);
             MyComponent.displayName = 'MyComponent';
           `,
-          options: [{ ignoreTranspilerName: true }],
+          options: [{ ignoreName: ['MyComponent'] }],
         },
       ],
-      invalid: [],
+      invalid: [
+        {
+          name: 'Component without displayName is still reported',
+          code: dedent`
+            const MyComponent = React.memo(() => <div>Hello</div>);
+          `,
+          options: [{ ignoreName: ['MyComponent'] }],
+          errors: [{ messageId: 'missingDisplayName' }],
+        },
+      ],
     });
   });
 });

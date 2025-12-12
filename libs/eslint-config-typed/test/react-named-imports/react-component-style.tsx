@@ -182,3 +182,18 @@ TooooooooooooooooooooooooLongComponentName.displayName =
   'TooooooooooooooooooooooooLongComponentName';
 
 noop(TooooooooooooooooooooooooLongComponentName);
+
+// NG
+export const MismatchedDisplayName = memo<Props>(({ numList }) => (
+  <div>{numList.length}</div>
+));
+
+MismatchedDisplayName.displayName =
+  // eslint-disable-next-line react-coding-style/display-name
+  'MismatchedDisplayName_WrongDisplayName';
+
+// NG
+// eslint-disable-next-line react-coding-style/display-name
+export const MissingDisplayName = memo<Props>(({ numList }) => (
+  <div>{numList.length}</div>
+));

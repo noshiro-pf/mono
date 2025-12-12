@@ -29,7 +29,7 @@ export const eslintReactRules = {
   /** Enforce consistent usage of props destructuring. */
   'react/destructuring-assignment': withDefaultOption('error'),
 
-  'react/display-name': withDefaultOption('error'),
+  'react/display-name': 'off', // Covered by react-coding-style/display-name
   'react/forbid-component-props': ['error', { forbid: ['className'] }],
   'react/forbid-dom-props': withDefaultOption('error'),
   'react/forbid-elements': withDefaultOption('error'),

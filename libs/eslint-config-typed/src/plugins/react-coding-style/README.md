@@ -37,11 +37,11 @@ export const MemoWithoutProps = React.memo(() => <div>{1}</div>);
 
 ## `display-name`
 
-Requires React components created with `React.memo` to have a `displayName` property for better debugging in React DevTools.
+Requires React components created with `React.memo` to have a `displayName` property that matches the component name for better debugging in React DevTools.
 
 **Options:**
 
-- `ignoreTranspilerName` (boolean, default: `false`): When true, ignores components that get displayName from variable name (many transpilers add this automatically).
+- `ignoreName` (string | string[], default: `[]`): Component names allowed to have a `displayName` different from their variable name.
 
 **Examples:**
 
@@ -53,6 +53,7 @@ const MyComponent = React.memo(() => <div>Hello</div>);
 const MyComponent = React.memo(() => <div>Hello</div>);
 MyComponent.displayName = 'MyComponent';
 
-// ✅ Good (with ignoreTranspilerName: true)
+// ✅ Good (mismatch allowed with ignoreName)
 const MyComponent = React.memo(() => <div>Hello</div>);
+MyComponent.displayName = 'SomeOtherName';
 ```
