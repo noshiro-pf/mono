@@ -1,3 +1,9 @@
+## [4.0.8](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.7...v4.0.8) (2025-12-14)
+
+### Bug Fixes
+
+- fix useMemoHooksStyleRule to handle const assertion correctly ([#188](https://github.com/noshiro-pf/eslint-config-typed/issues/188)) ([8e17804](https://github.com/noshiro-pf/eslint-config-typed/commit/8e178046d469238c0facb6a9724e685683a1f879))
+
 ## [4.0.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.6...v4.0.7) (2025-12-12)
 
 ### Bug Fixes
