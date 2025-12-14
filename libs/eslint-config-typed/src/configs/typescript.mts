@@ -84,6 +84,10 @@ export const eslintConfigForTypeScript = ({
       files: ['**/*.d.{ts,mts,cts}'],
       rules: defineKnownRules({
         '@typescript-eslint/triple-slash-reference': 'off',
+
+        // Because interface is often used
+        '@typescript-eslint/consistent-type-definitions': 'off',
+
         'import-x/unambiguous': 'off',
       }),
     },

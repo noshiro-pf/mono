@@ -30,9 +30,9 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
       const parent = node.parent;
 
       if (
-        parent.type === AST_NODE_TYPES.TSAsExpression ||
-        parent.type === AST_NODE_TYPES.TSTypeAssertion ||
-        parent.type === AST_NODE_TYPES.TSSatisfiesExpression
+        (parent.type === AST_NODE_TYPES.TSAsExpression ||
+          parent.type === AST_NODE_TYPES.TSTypeAssertion) &&
+        !isConstAssertion(parent.typeAnnotation)
       ) {
         context.report({
           node: castDeepMutable(parent),
@@ -72,13 +72,14 @@ const checkNodeForTypeAnnotations = (
 ): void => {
   if (
     node.type === AST_NODE_TYPES.TSAsExpression ||
-    node.type === AST_NODE_TYPES.TSTypeAssertion ||
-    node.type === AST_NODE_TYPES.TSSatisfiesExpression
+    node.type === AST_NODE_TYPES.TSTypeAssertion
   ) {
-    context.report({
-      node: castDeepMutable(node),
-      messageId: 'disallowUseMemoTypeAnnotation',
-    });
+    if (!isConstAssertion(node.typeAnnotation)) {
+      context.report({
+        node: castDeepMutable(node),
+        messageId: 'disallowUseMemoTypeAnnotation',
+      });
+    }
 
     return;
   }
@@ -115,4 +116,18 @@ const checkNodeForTypeAnnotations = (
       nodeWithArgument.argument as DeepReadonly<TSESTree.Node>,
     );
   }
+};
+
+const isConstAssertion = (
+  node: DeepReadonly<TSESTree.Node> | undefined,
+): node is TSESTree.TSTypeReference => {
+  if (node === undefined) {
+    return false;
+  }
+
+  return (
+    node.type === AST_NODE_TYPES.TSTypeReference &&
+    node.typeName.type === AST_NODE_TYPES.Identifier &&
+    node.typeName.name === 'const'
+  );
 };

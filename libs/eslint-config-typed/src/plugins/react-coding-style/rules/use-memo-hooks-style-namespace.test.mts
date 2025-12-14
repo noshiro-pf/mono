@@ -28,12 +28,14 @@ describe('use-memo-hooks-style', () => {
             import * as React from 'react';
 
             type Props = Readonly<{
-              readonly value: number;
+              value: number;
             }>;
 
             const Component = React.memo<Props>((props) => {
               const memoized = React.useMemo<number>(() => props.value, [props.value]);
+
               const typed: number = React.useMemo(() => props.value, [props.value]);
+
               return <div />;
             });
           `,
@@ -54,6 +56,40 @@ describe('use-memo-hooks-style', () => {
             const value = useMemo(() => 42) as number;
           `,
         },
+        {
+          name: 'Allow satisfies expression',
+          code: dedent`
+            import * as React from 'react';
+
+            type Props = Readonly<{
+              value: number;
+            }>;
+
+            const Component = React.memo<Props>((props) => {
+              const value = React.useMemo(() => props.value, [props.value]) satisfies number;
+
+              const inner = React.useMemo(() => props.value satisfies number, [props.value]);
+
+              return inner + value;
+            });
+          `,
+        },
+        {
+          name: 'Allow const assertion',
+          code: dedent`
+            import * as React from 'react';
+
+            type Props = Readonly<{
+              value: number;
+            }>;
+
+            const Component = React.memo<Props>((props) => {
+              const value = React.useMemo(() => ({ v: props.value }) as const, [props.value]);
+
+              return value;
+            });
+          `,
+        },
       ],
       invalid: [
         {
@@ -62,7 +98,7 @@ describe('use-memo-hooks-style', () => {
             import * as React from 'react';
 
             type Props = Readonly<{
-              readonly value: number;
+              value: number;
             }>;
 
             const Component = React.memo<Props>((props) => {
@@ -82,7 +118,7 @@ describe('use-memo-hooks-style', () => {
             import * as React from 'react';
 
             type Props = Readonly<{
-              readonly value: number;
+              value: number;
             }>;
 
             const Component = React.memo<Props>((props) => {
@@ -102,11 +138,11 @@ describe('use-memo-hooks-style', () => {
             import * as React from 'react';
 
             type Props = Readonly<{
-              readonly value: number;
+              value: number;
             }>;
 
             const Component = React.memo<Props>((props) => {
-              const value = React.useMemo(() => props.value as number, [props.value]) ;
+              const value = React.useMemo(() => props.value as number, [props.value]);
               return value;
             });
           `,
@@ -117,16 +153,16 @@ describe('use-memo-hooks-style', () => {
           ],
         },
         {
-          name: 'Disallow satisfies expression',
+          name: 'Disallow return type annotation even with satisfies',
           code: dedent`
             import * as React from 'react';
 
             type Props = Readonly<{
-              readonly value: number;
+              value: number;
             }>;
 
             const Component = React.memo<Props>((props) => {
-              const value = React.useMemo(() => props.value, [props.value]) satisfies number;
+              const value = React.useMemo((): number => props.value, [props.value]) satisfies number;
               return value;
             });
           `,
@@ -137,16 +173,16 @@ describe('use-memo-hooks-style', () => {
           ],
         },
         {
-          name: 'Disallow satisfies expression (inner)',
+          name: 'Disallow return type annotation even with const assertion',
           code: dedent`
             import * as React from 'react';
 
             type Props = Readonly<{
-              readonly value: number;
+              value: number;
             }>;
 
             const Component = React.memo<Props>((props) => {
-              const value = React.useMemo(() => props.value satisfies number, [props.value]);
+              const value = React.useMemo((): number => props.value, [props.value]) as const;
               return value;
             });
           `,
