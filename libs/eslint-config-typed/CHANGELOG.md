@@ -1,3 +1,9 @@
+## [4.0.9](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.8...v4.0.9) (2025-12-15)
+
+### Bug Fixes
+
+- bump @vitest/eslint-plugin from 1.5.1 to 1.5.2 ([#189](https://github.com/noshiro-pf/eslint-config-typed/issues/189)) ([546c63a](https://github.com/noshiro-pf/eslint-config-typed/commit/546c63ac45c1051a18544870930ed8a775e31ab3))
+
 ## [4.0.8](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.7...v4.0.8) (2025-12-14)
 
 ### Bug Fixes
