@@ -140,7 +140,7 @@
     "json-schema": "0.4.0",
     "json-schema-to-typescript": "15.0.4",
     "markdownlint": "0.40.0",
-    "markdownlint-cli2": "0.19.1",
+    "markdownlint-cli2": "0.20.0",
     "npm-run-all2": "8.0.4",
     "prettier": "3.7.4",
     "prettier-plugin-jsdoc": "1.7.0",
