@@ -1,3 +1,9 @@
+# [4.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.9...v4.1.0) (2025-12-21)
+
+### Features
+
+- add eslint-plugin-immer-coding-style ([#192](https://github.com/noshiro-pf/eslint-config-typed/issues/192)) ([97ccdbc](https://github.com/noshiro-pf/eslint-config-typed/commit/97ccdbc2a8d1a7340e45aef2e9174491525e39b0))
+
 ## [4.0.9](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.8...v4.0.9) (2025-12-15)
 
 ### Bug Fixes
