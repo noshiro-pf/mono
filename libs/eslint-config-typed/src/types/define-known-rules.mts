@@ -2,6 +2,7 @@ import {
   type EslintArrayFuncRules,
   type EslintCypressRules,
   type EslintFunctionalRules,
+  type EslintImmerCodingStyleRules,
   type EslintImportsRules,
   type EslintJestRules,
   type EslintJsxA11yRules,
@@ -60,6 +61,7 @@ type KnownRules = DeepReadonly<
     EslintUnicornRules &
     EslintVitestRules &
     EslintVitestCodingStyleRules &
+    EslintImmerCodingStyleRules &
     EslintReactCodingStyleRules &
     TypeScriptEslintRules
 >;

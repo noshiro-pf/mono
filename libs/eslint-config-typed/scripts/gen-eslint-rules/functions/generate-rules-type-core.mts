@@ -3,6 +3,7 @@ import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { compile, type Options } from 'json-schema-to-typescript';
 import { castDeepMutable } from 'ts-data-forge';
 import { type Rule, type Rules } from '../../../src/index.mjs';
+import { immerCodingStyleRules } from '../../../src/plugins/immer-coding-style/rules/rules.mjs';
 import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/rules/rules.mjs';
 import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
 import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/index.mjs';
@@ -428,6 +429,10 @@ const getRules = async (
     case eslintPlugins.EslintVitestCodingStyleRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Object.entries(vitestCodingStyleRules as unknown as Rules);
+
+    case eslintPlugins.EslintImmerCodingStyleRules.pluginName:
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Object.entries(immerCodingStyleRules as unknown as Rules);
 
     case eslintPlugins.EslintTotalFunctions.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion

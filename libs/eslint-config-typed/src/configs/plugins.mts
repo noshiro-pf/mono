@@ -55,6 +55,7 @@ import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 // import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
 // import eslintPluginTreeShakable from 'eslint-plugin-tree-shakable';
 import {
+  eslintPluginImmerCodingStyle,
   eslintPluginReactCodingStyle,
   eslintPluginStrictDependencies,
   eslintPluginTotalFunctions,
@@ -94,6 +95,7 @@ export const plugins: Record<
   | 'strict-dependencies'
   | 'ts-restrictions'
   | 'react-coding-style'
+  | 'immer-coding-style'
   | 'vitest-coding-style',
   Omit<ESLintPlugin, 'configs'>
 > = {
@@ -132,5 +134,6 @@ export const plugins: Record<
   'strict-dependencies': eslintPluginStrictDependencies,
   'ts-restrictions': eslintPluginTsRestrictions,
   'react-coding-style': eslintPluginReactCodingStyle,
+  'immer-coding-style': eslintPluginImmerCodingStyle,
   'vitest-coding-style': eslintPluginVitestCodingStyle,
 } as const satisfies FlatConfig['plugins'];

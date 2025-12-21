@@ -2,6 +2,7 @@ import { allExtensionsStr } from '../constants/index.mjs';
 import {
   eslintArrayFuncRules,
   eslintFunctionalRules,
+  eslintImmerCodingStyleRules,
   eslintImportsRules,
   eslintMathRules,
   eslintPluginSortDestructureKeysRules,
@@ -55,6 +56,7 @@ export const eslintConfigForTypeScript = ({
         ...eslintTreeShakableRules,
         ...eslintPluginSortDestructureKeysRules,
         ...eslintTsRestrictionsRules,
+        ...eslintImmerCodingStyleRules,
 
         'strict-dependencies/strict-dependencies': ['error', []],
 

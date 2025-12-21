@@ -173,6 +173,12 @@ export const eslintPlugins = {
     rulePrefix: 'vitest-coding-style/',
     outputFileName: 'eslint-vitest-coding-style-rules.mts',
   },
+  EslintImmerCodingStyleRules: {
+    typeName: 'EslintImmerCodingStyleRules',
+    pluginName: 'eslint-plugin-immer-coding-style',
+    rulePrefix: 'immer-coding-style/',
+    outputFileName: 'eslint-immer-coding-style-rules.mts',
+  },
   EslintTsRestrictionsRules: {
     typeName: 'EslintTsRestrictionsRules',
     pluginName: 'eslint-plugin-ts-restrictions',

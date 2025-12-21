@@ -198,6 +198,9 @@ importers:
       github-settings-as-code:
         specifier: 1.0.6
         version: 1.0.6(prettier@3.7.4)(typescript@5.9.3)
+      immer:
+        specifier: ^11.0.1
+        version: 11.0.1
       jiti:
         specifier: 2.6.1
         version: 2.6.1
@@ -2767,6 +2770,9 @@ packages:
   ignore@7.0.5:
     resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
     engines: {node: '>= 4'}
+
+  immer@11.0.1:
+    resolution: {integrity: sha512-naDCyggtcBWANtIrjQEajhhBEuL9b0Zg4zmlWK2CzS6xCWSE39/vvf4LqnMjUAWHBhot4m9MHCM/Z+mfWhUkiA==}
 
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
@@ -7191,6 +7197,8 @@ snapshots:
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
+
+  immer@11.0.1: {}
 
   import-fresh@3.3.1:
     dependencies:
