@@ -121,6 +121,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/array/foldl-example.mts',
       'samples/src/array/foldr-example.mts',
       'samples/src/array/sum-example.mts',
+      'samples/src/array/sum-by-example.mts',
       'samples/src/array/join-example.mts',
     ],
   },

@@ -497,6 +497,54 @@ export function sum(array: readonly number[]): number {
 }
 
 /**
+ * Calculates the sum of numbers in an array.
+ *
+ * @example
+ *
+ * ```ts
+ * const numbers = [
+ *   { value: 1 },
+ *   { value: 2 },
+ *   { value: 3 },
+ *   { value: 4 },
+ * ] as const;
+ *
+ * const negatives = [{ value: 3 }, { value: -2 }, { value: 5 }] as const;
+ *
+ * const total = Arr.sumBy(numbers, (item) => item.value);
+ *
+ * const totalNegatives = Arr.sumBy(negatives, (item) => item.value);
+ *
+ * assert.isTrue(total === 10);
+ *
+ * assert.isTrue(totalNegatives === 6);
+ * ```
+ */
+export function sumBy(array: readonly [], mapFn: (item: unknown) => number): 0;
+
+export function sumBy<N extends Uint, E>(
+  array: readonly E[],
+  mapFn: (item: E) => N,
+): Uint;
+
+export function sumBy<N extends Int, E>(
+  array: readonly E[],
+  mapFn: (item: E) => N,
+): Int;
+
+export function sumBy<N extends number, E>(
+  array: readonly E[],
+  mapFn: (item: E) => N,
+): number;
+
+export function sumBy<N extends number, E>(
+  array: readonly E[],
+  mapFn: (item: E) => N,
+): number {
+  return array.reduce((prev, curr) => prev + mapFn(curr), 0);
+}
+
+/**
  * Joins array elements into a string.
  *
  * @example
