@@ -1,3 +1,9 @@
+# [4.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.1.0...v4.2.0) (2025-12-27)
+
+### Features
+
+- add new ESLint rules for Jest, Testing Library, Vitest, and TypeScript ([#199](https://github.com/noshiro-pf/eslint-config-typed/issues/199)) ([e98eede](https://github.com/noshiro-pf/eslint-config-typed/commit/e98eede7b1ab93439b42b7937780a36ced4f3cee))
+
 # [4.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.9...v4.1.0) (2025-12-21)
 
 ### Features
