@@ -1,4 +1,4 @@
-// Example: src/array/array-utils.mts (sum)
+// Example: src/array/array-utils.mts (sumBy)
 import { Arr } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above

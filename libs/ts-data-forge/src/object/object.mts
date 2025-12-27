@@ -370,7 +370,6 @@ export namespace Obj {
         : TypeEq<Entries['length'], 0> extends true
           ? K
           : ValuesOfEntriesImpl<
-              // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
               K | Entries[0][1],
               List.Tail<Entries>,
               Decrement<RemainingNumRecursions>

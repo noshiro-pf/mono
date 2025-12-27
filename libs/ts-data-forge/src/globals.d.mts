@@ -13,8 +13,7 @@ type ArgArrayIndex<Ar extends readonly unknown[]> =
 
 type ArgArrayIndexWithNegative<Ar extends readonly unknown[]> =
   IsFixedLengthList<Ar> extends true
-    ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-        IndexOfTuple<[...Ar, 0]> | NegativeIndexOfTuple<Ar>
+    ? IndexOfTuple<[...Ar, 0]> | NegativeIndexOfTuple<Ar>
     : SizeType.ArgArrWithNegative;
 
 // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/length

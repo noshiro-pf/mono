@@ -497,7 +497,7 @@ export function sum(array: readonly number[]): number {
 }
 
 /**
- * Calculates the sum of numbers in an array.
+ * Calculates the sum of values in an array by applying a mapping function to each element.
  *
  * @example
  *

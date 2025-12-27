@@ -20,13 +20,10 @@ export function set<const Ar extends readonly unknown[], const V = Ar[number]>(
   index: ArgArrayIndex<Ar>,
   newValue: V,
 ): IsFixedLengthList<Ar> extends true
-  ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    Readonly<{ [K in keyof Ar]: Ar[K] | V }>
+  ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
   : Ar extends NonEmptyArray<unknown>
-    ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      NonEmptyArray<Ar[number] | V>
-    : // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      readonly (Ar[number] | V)[];
+    ? NonEmptyArray<Ar[number] | V>
+    : readonly (Ar[number] | V)[];
 
 // curried version
 export function set<const V>(
@@ -35,13 +32,10 @@ export function set<const V>(
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
 ) => IsFixedLengthList<Ar> extends true
-  ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    Readonly<{ [K in keyof Ar]: Ar[K] | V }>
+  ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
   : Ar extends NonEmptyArray<unknown>
-    ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      NonEmptyArray<Ar[number] | V>
-    : // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      readonly (Ar[number] | V)[];
+    ? NonEmptyArray<Ar[number] | V>
+    : readonly (Ar[number] | V)[];
 
 export function set<E, const V = E>(
   ...args:
@@ -92,13 +86,10 @@ export function toUpdated<
   index: ArgArrayIndex<Ar>,
   updater: (prev: Ar[number]) => V,
 ): IsFixedLengthList<Ar> extends true
-  ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    Readonly<{ [K in keyof Ar]: Ar[K] | V }>
+  ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
   : Ar extends NonEmptyArray<unknown>
-    ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      NonEmptyArray<Ar[number] | V>
-    : // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      readonly (Ar[number] | V)[];
+    ? NonEmptyArray<Ar[number] | V>
+    : readonly (Ar[number] | V)[];
 
 // curried version
 export function toUpdated<E, const V = E>(
@@ -162,10 +153,8 @@ export function toInserted<
   index: ArgArrayIndexWithNegative<Ar>,
   newValue: V,
 ): IsFixedLengthList<Ar> extends true
-  ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    ArrayOfLength<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
-  : // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    NonEmptyArray<Ar[number] | V>;
+  ? ArrayOfLength<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
+  : NonEmptyArray<Ar[number] | V>;
 
 // curried version
 export function toInserted<const V>(
@@ -174,10 +163,8 @@ export function toInserted<const V>(
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
 ) => IsFixedLengthList<Ar> extends true
-  ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    ArrayOfLength<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
-  : // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    NonEmptyArray<Ar[number] | V>;
+  ? ArrayOfLength<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
+  : NonEmptyArray<Ar[number] | V>;
 
 export function toInserted<E, const V = E>(
   ...args:
@@ -429,13 +416,10 @@ export function toRangeFilled<const Ar extends readonly unknown[], const V>(
     end: ArgArrayIndexWithNegative<Ar>,
   ],
 ): IsFixedLengthList<Ar> extends true
-  ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    ArrayOfLength<Ar['length'], V | Ar[number]>
+  ? ArrayOfLength<Ar['length'], V | Ar[number]>
   : Ar extends NonEmptyArray<unknown>
-    ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      NonEmptyArray<V | Ar[number]>
-    : // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      readonly (V | Ar[number])[];
+    ? NonEmptyArray<V | Ar[number]>
+    : readonly (V | Ar[number])[];
 
 // curried version
 export function toRangeFilled<const V>(
@@ -447,13 +431,10 @@ export function toRangeFilled<const V>(
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
 ) => IsFixedLengthList<Ar> extends true
-  ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    ArrayOfLength<Ar['length'], V | Ar[number]>
+  ? ArrayOfLength<Ar['length'], V | Ar[number]>
   : Ar extends NonEmptyArray<unknown>
-    ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      NonEmptyArray<V | Ar[number]>
-    : // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-      readonly (V | Ar[number])[];
+    ? NonEmptyArray<V | Ar[number]>
+    : readonly (V | Ar[number])[];
 
 export function toRangeFilled<E, const V>(
   ...args:
