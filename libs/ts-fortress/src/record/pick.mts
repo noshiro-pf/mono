@@ -10,7 +10,6 @@ import { record } from './record.mjs';
 /** Creates a record type with keys picked. */
 export const pick = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   const KeysToPick extends readonly (keyof R & string)[],
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(

@@ -18,7 +18,6 @@ import { record } from './record.mjs';
  */
 export const required = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   const KeysToBeRequired extends NonEmptyArray<keyof R & string>,
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
@@ -73,7 +72,6 @@ const makeRequired = <T extends Type<unknown>>(
 
 type RequiredTypeShape<
   R extends ReadonlyRecord<string, Type<unknown>>,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
 > =
   TypeEq<KeysToBeRequired, undefined> extends true
@@ -93,7 +91,6 @@ type PartiallyRequiredType<
 
 export type RequiredType<
   R extends ReadonlyRecord<string, Type<unknown>>,
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
   ExcessValidation extends ExcessPropertyBehavior = 'strip',
 > = RecordType<RequiredTypeShape<R, KeysToBeRequired>, ExcessValidation>;

@@ -42,8 +42,7 @@ export const record = <
   }>,
 ): RecordType<R, ExcessValidation> => {
   type T = ExcessValidation extends 'allow'
-    ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-        TsFortressInternal.RecordTypeValue<R> | UnknownRecord
+    ? TsFortressInternal.RecordTypeValue<R> | UnknownRecord
     : TsFortressInternal.RecordTypeValue<R>;
 
   const sourceKeys = new Set(Object.keys(shape));

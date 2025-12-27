@@ -46,8 +46,7 @@ export type RecordType<
   ExcessPropertyValidation extends ExcessPropertyBehavior = 'strip',
 > = Type<
   ExcessPropertyValidation extends 'allow'
-    ? // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-        TsFortressInternal.RecordTypeValue<R> | UnknownRecord
+    ? TsFortressInternal.RecordTypeValue<R> | UnknownRecord
     : TsFortressInternal.RecordTypeValue<R>
 > &
   Readonly<{
