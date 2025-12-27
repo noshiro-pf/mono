@@ -1,3 +1,9 @@
+# [6.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.1.0...v6.2.0) (2025-12-27)
+
+### Features
+
+- change typeName of literal ([#178](https://github.com/noshiro-pf/ts-fortress/issues/178)) ([dfef3fb](https://github.com/noshiro-pf/ts-fortress/commit/dfef3fb2891e766c642fabb8846d5a68b4a0f699))
+
 # [6.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.0.1...v6.1.0) (2025-11-15)
 
 ### Features
