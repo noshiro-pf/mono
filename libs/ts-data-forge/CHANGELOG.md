@@ -1,3 +1,9 @@
+# [6.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.0.0...v6.1.0) (2025-12-27)
+
+### Features
+
+- add Arr.sumBy ([#250](https://github.com/noshiro-pf/ts-data-forge/issues/250)) ([b7b6af9](https://github.com/noshiro-pf/ts-data-forge/commit/b7b6af9aafb508bc546a5f09a31f1f80251b77e5))
+
 # [6.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v5.1.1...v6.0.0) (2025-11-28)
 
 ### Features
