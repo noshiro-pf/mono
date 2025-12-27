@@ -7857,6 +7857,25 @@ namespace NoUselessConstructor {
 }
 
 /**
+ * Disallow default values that will never be used
+ *
+ * @link https://typescript-eslint.io/rules/no-useless-default-assignment
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | fixable              | code       |
+ *  | recommended          | strict     |
+ *  | requiresTypeChecking | true       |
+ *  ```
+ */
+namespace NoUselessDefaultAssignment {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Disallow empty exports that don't change anything in a module file
  *
  * @link https://typescript-eslint.io/rules/no-useless-empty-export
@@ -10268,6 +10287,7 @@ export type TypeScriptEslintRules = Readonly<{
   '@typescript-eslint/no-unused-vars': NoUnusedVars.RuleEntry;
   '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.RuleEntry;
   '@typescript-eslint/no-useless-constructor': NoUselessConstructor.RuleEntry;
+  '@typescript-eslint/no-useless-default-assignment': NoUselessDefaultAssignment.RuleEntry;
   '@typescript-eslint/no-useless-empty-export': NoUselessEmptyExport.RuleEntry;
   '@typescript-eslint/no-wrapper-object-types': NoWrapperObjectTypes.RuleEntry;
   '@typescript-eslint/non-nullable-type-assertion-style': NonNullableTypeAssertionStyle.RuleEntry;

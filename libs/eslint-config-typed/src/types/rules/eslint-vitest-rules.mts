@@ -921,6 +921,23 @@ namespace NoTestReturnStatement {
 }
 
 /**
+ * Disallow unnecessary async function wrapper for expected promises
+ *
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-unneeded-async-expect-function.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoUnneededAsyncExpectFunction {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Enforce padding around `afterAll` blocks
  *
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-after-all-blocks.md
@@ -2138,6 +2155,7 @@ export type EslintVitestRules = Readonly<{
   'vitest/no-standalone-expect': NoStandaloneExpect.RuleEntry;
   'vitest/no-test-prefixes': NoTestPrefixes.RuleEntry;
   'vitest/no-test-return-statement': NoTestReturnStatement.RuleEntry;
+  'vitest/no-unneeded-async-expect-function': NoUnneededAsyncExpectFunction.RuleEntry;
   'vitest/padding-around-after-all-blocks': PaddingAroundAfterAllBlocks.RuleEntry;
   'vitest/padding-around-after-each-blocks': PaddingAroundAfterEachBlocks.RuleEntry;
   'vitest/padding-around-all': PaddingAroundAll.RuleEntry;

@@ -867,6 +867,22 @@ namespace PreferUserEvent {
 }
 
 /**
+ * Suggest using userEvent with setup() instead of direct methods
+ *
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-user-event-setup.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace PreferUserEventSetup {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Enforce a valid naming for return value from `render`
  *
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/render-result-naming-convention.md
@@ -910,6 +926,7 @@ export type EslintTestingLibraryRules = Readonly<{
   'testing-library/prefer-query-matchers': PreferQueryMatchers.RuleEntry;
   'testing-library/prefer-screen-queries': PreferScreenQueries.RuleEntry;
   'testing-library/prefer-user-event': PreferUserEvent.RuleEntry;
+  'testing-library/prefer-user-event-setup': PreferUserEventSetup.RuleEntry;
   'testing-library/render-result-naming-convention': RenderResultNamingConvention.RuleEntry;
 }>;
 

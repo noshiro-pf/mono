@@ -117,6 +117,7 @@ export const eslintVitestRules = {
     },
   ],
   'vitest/require-import-vi-mock': 'error',
+  'vitest/no-unneeded-async-expect-function': 'error',
 
   // deprecated
   'vitest/no-done-callback': 0,

@@ -30,6 +30,7 @@ export const eslintTestingLibraryRules = {
   'testing-library/prefer-screen-queries': 'error',
   'testing-library/render-result-naming-convention': 'error',
   'testing-library/no-test-id-queries': 'error',
+  'testing-library/prefer-user-event-setup': 'error',
 
   'testing-library/consistent-data-testid': 'off',
   'testing-library/prefer-explicit-assert': 'off',
