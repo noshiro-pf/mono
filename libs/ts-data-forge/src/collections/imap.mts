@@ -575,7 +575,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *
    * const raw = map.toRawMap();
    *
-   * assert.isTrue(is.map(raw));
+   * assert.isTrue(isMap(raw));
    *
    * assert.isTrue(raw.get('key') === 1);
    * ```

@@ -497,7 +497,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * const raw = set.toRawSet();
    *
-   * assert.isTrue(is.set(raw));
+   * assert.isTrue(isSet(raw));
    *
    * assert.isTrue(raw.has('alpha'));
    * ```

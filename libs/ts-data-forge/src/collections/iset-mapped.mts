@@ -846,7 +846,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *
    * const raw = set.toRawSet();
    *
-   * assert.isTrue(is.set(raw));
+   * assert.isTrue(isSet(raw));
    *
    * assert.isTrue(raw.has(toKey({ x: 1, tag: 'a' })));
    * ```

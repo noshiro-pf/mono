@@ -1,5 +1,5 @@
 // Example: src/collections/iset-mapped.mts (toRawSet)
-import is from '@sindresorhus/is';
+import { isSet } from '@sindresorhus/is';
 import { ISetMapped } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
@@ -18,6 +18,6 @@ const set = ISetMapped.create<Point, string>(
 
 const raw = set.toRawSet();
 
-assert.isTrue(is.set(raw));
+assert.isTrue(isSet(raw));
 
 assert.isTrue(raw.has(toKey({ x: 1, tag: 'a' })));
