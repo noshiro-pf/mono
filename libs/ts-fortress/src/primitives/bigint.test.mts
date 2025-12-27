@@ -67,7 +67,7 @@ describe(bigint, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <bigint> value but <number> type value `123` was passed.',
+        'Error: expected <bigint> type but <number> type value `123` was passed.',
       ]);
     });
 

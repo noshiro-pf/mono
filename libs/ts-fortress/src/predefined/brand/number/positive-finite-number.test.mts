@@ -102,7 +102,7 @@ describe(positiveFiniteNumber, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <PositiveFiniteNumber> value but <number> type value `0` was passed.',
+        'Error: expected <PositiveFiniteNumber> type but <number> type value `0` was passed.',
       ]);
     });
   });

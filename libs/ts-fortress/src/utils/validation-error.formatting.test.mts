@@ -34,7 +34,7 @@ describe('validation-error formatting details', () => {
     );
 
     expect(msg).toBe(
-      'Error: expected <string> value but <string> type value was passed.',
+      'Error: expected <string> type but <string> type value was passed.',
     );
   });
 
@@ -53,7 +53,7 @@ describe('validation-error formatting details', () => {
     );
 
     expect(msg).toBe(
-      'Error at p: expected <number> value but <number> type value was passed.',
+      'Error at p: expected <number> type but <number> type value was passed.',
     );
   });
 });

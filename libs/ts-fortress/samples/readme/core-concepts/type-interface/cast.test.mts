@@ -10,7 +10,7 @@ try {
   assert.deepStrictEqual(
     error,
     new Error(
-      'Error: expected <number> value but <string> type value "invalid" was passed.',
+      'Error: expected <number> type but <string> type value "invalid" was passed.',
     ),
   );
 }

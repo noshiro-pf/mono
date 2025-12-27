@@ -99,7 +99,7 @@ describe(positiveSafeInt, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <PositiveSafeInt> value but <number> type value `0` was passed.',
+        'Error: expected <PositiveSafeInt> type but <number> type value `0` was passed.',
       ]);
     });
   });

@@ -135,7 +135,7 @@ describe('union - record and array', () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { { x: number, y: number }, string[], number[] } but <number> type value `123` was passed.',
+        'Error: expected one of <{ x: number, y: number }>, <string[]>, <number[]> but <number> type value `123` was passed.',
       ]);
     });
 

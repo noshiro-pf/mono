@@ -134,7 +134,7 @@ describe('union - record and primitive', () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { { id: number, name: string }, string, number } but <boolean> type value `true` was passed.',
+        'Error: expected one of <{ id: number, name: string }>, <string>, <number> but <boolean> type value `true` was passed.',
       ]);
     });
 

@@ -165,8 +165,8 @@ describe(arrayOfLength, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-        'Error at 1: expected <number> value but <string> type value "1" was passed.',
-        'Error at 2: expected <number> value but <string> type value "" was passed.',
+        'Error at 1: expected <number> type but <string> type value "1" was passed.',
+        'Error at 2: expected <number> type but <string> type value "" was passed.',
       ]);
     });
   });

@@ -67,7 +67,7 @@ describe(boolean, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <boolean> value but <string> type value "not a boolean" was passed.',
+        'Error: expected <boolean> type but <string> type value "not a boolean" was passed.',
       ]);
     });
 

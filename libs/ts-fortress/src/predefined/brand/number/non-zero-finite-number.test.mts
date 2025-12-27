@@ -102,7 +102,7 @@ describe(nonZeroFiniteNumber, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <NonZeroFiniteNumber> value but <number> type value `0` was passed.',
+        'Error: expected <NonZeroFiniteNumber> type but <number> type value `0` was passed.',
       ]);
     });
   });

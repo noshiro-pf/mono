@@ -152,16 +152,16 @@ describe('union - nested arrays', () => {
       assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: 'not array',
-        expectedType: '(number[][] | string[] | literal(0))',
-        typeName: '(number[][] | string[] | literal(0))',
+        expectedType: '(number[][] | string[] | 0)',
+        typeName: '(number[][] | string[] | 0)',
         details: {
           kind: 'union',
-          typeNames: ['number[][]', 'string[]', 'literal(0)'],
+          typeNames: ['number[][]', 'string[]', '0'],
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { number[][], string[], literal(0) } but <string> type value "not array" was passed.',
+        'Error: expected one of <number[][]>, <string[]>, <0> but <string> type value "not array" was passed.',
       ]);
     });
 

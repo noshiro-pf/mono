@@ -94,16 +94,16 @@ describe(union, () => {
       assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: 5,
-        expectedType: '({ x: number, y: number } | literal(3) | literal("2"))',
-        typeName: '({ x: number, y: number } | literal(3) | literal("2"))',
+        expectedType: '({ x: number, y: number } | 3 | "2")',
+        typeName: '({ x: number, y: number } | 3 | "2")',
         details: {
           kind: 'union',
-          typeNames: ['{ x: number, y: number }', 'literal(3)', 'literal("2")'],
+          typeNames: ['{ x: number, y: number }', '3', '"2"'],
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { { x: number, y: number }, literal(3), literal("2") } but <number> type value `5` was passed.',
+        'Error: expected one of <{ x: number, y: number }>, <3>, <"2"> but <number> type value `5` was passed.',
       ]);
     });
 

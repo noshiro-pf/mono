@@ -71,7 +71,7 @@ describe(symbol, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <symbol> value but <string> type value "not a symbol" was passed.',
+        'Error: expected <symbol> type but <string> type value "not a symbol" was passed.',
       ]);
     });
 

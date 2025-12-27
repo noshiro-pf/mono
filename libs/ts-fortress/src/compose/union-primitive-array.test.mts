@@ -123,7 +123,7 @@ describe('union - primitive and array', () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { string, number[], string[] } but <number> type value `42` was passed.',
+        'Error: expected one of <string>, <number[]>, <string[]> but <number> type value `42` was passed.',
       ]);
     });
 

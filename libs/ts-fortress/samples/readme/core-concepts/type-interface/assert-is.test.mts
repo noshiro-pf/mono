@@ -20,7 +20,7 @@ try {
   assert.deepStrictEqual(
     error,
     new Error(
-      `\nError: expected <number> value but <string> type value "not a number" was passed.`,
+      `\nError: expected <number> type but <string> type value "not a number" was passed.`,
     ),
   );
 }
@@ -52,7 +52,7 @@ try {
   assert.deepStrictEqual(
     error,
     new Error(
-      `\nError at id: expected <string> value but <number> type value \`123\` was passed.`,
+      `\nError at id: expected <string> type but <number> type value \`123\` was passed.`,
     ),
   );
 }

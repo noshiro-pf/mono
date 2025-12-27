@@ -101,7 +101,7 @@ describe(nonNegativeFiniteNumber, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <NonNegativeFiniteNumber> value but <number> type value `-5.5` was passed.',
+        'Error: expected <NonNegativeFiniteNumber> type but <number> type value `-5.5` was passed.',
       ]);
     });
   });

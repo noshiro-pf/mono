@@ -114,16 +114,16 @@ describe('union - primitive and literal', () => {
       assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: null,
-        expectedType: '(string | literal(42) | number)',
-        typeName: '(string | literal(42) | number)',
+        expectedType: '(string | 42 | number)',
+        typeName: '(string | 42 | number)',
         details: {
           kind: 'union',
-          typeNames: ['string', 'literal(42)', 'number'],
+          typeNames: ['string', '42', 'number'],
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { string, literal(42), number } but <object> type value `null` was passed.',
+        'Error: expected one of <string>, <42>, <number> but <object> type value `null` was passed.',
       ]);
     });
 

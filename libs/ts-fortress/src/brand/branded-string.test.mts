@@ -19,7 +19,7 @@ describe('simpleBrandedString', () => {
     test('creates branded string type with default value empty string', () => {
       expect(userNameType.defaultValue).toBe('');
 
-      expect(userNameType.typeName).toBe('"UserName"');
+      expect(userNameType.typeName).toBe('UserName');
     });
 
     describe('is', () => {
@@ -89,7 +89,7 @@ describe('simpleBrandedString', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-          'Error: expected <string> value but <number> type value `42` was passed.',
+          'Error: expected <string> type but <number> type value `42` was passed.',
         ]);
       });
     });
@@ -128,7 +128,7 @@ describe('simpleBrandedString', () => {
     test('creates branded string type with custom default value', () => {
       expect(categoryType.defaultValue).toBe('general');
 
-      expect(categoryType.typeName).toBe('"Category"');
+      expect(categoryType.typeName).toBe('Category');
     });
 
     describe('validate', () => {
@@ -172,7 +172,7 @@ describe('simpleBrandedString', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-          'Error: expected <string> value but <object> type value `null` was passed.',
+          'Error: expected <string> type but <object> type value `null` was passed.',
         ]);
       });
     });
@@ -233,9 +233,9 @@ describe('simpleBrandedString', () => {
 
       expectType<LastName, Brand<string, 'LastName'>>('=');
 
-      expect(firstNameType.typeName).toBe('"FirstName"');
+      expect(firstNameType.typeName).toBe('FirstName');
 
-      expect(lastNameType.typeName).toBe('"LastName"');
+      expect(lastNameType.typeName).toBe('LastName');
     });
   });
 });

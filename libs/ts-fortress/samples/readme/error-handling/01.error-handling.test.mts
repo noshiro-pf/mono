@@ -38,8 +38,8 @@ assert.deepStrictEqual(result.value, [
 const messages = t.validationErrorsToMessages(result.value);
 
 assert.deepStrictEqual(messages, [
-  'Error at name: expected <string> value but <number> type value `123` was passed.',
-  'Error at age: expected <number> value but <string> type value "not a number" was passed.',
+  'Error at name: expected <string> type but <number> type value `123` was passed.',
+  'Error at age: expected <number> type but <string> type value "not a number" was passed.',
 ]);
 
 const assertIsUser: (a: unknown) => asserts a is User = User.assertIs;
@@ -51,7 +51,7 @@ try {
   assert.deepStrictEqual(
     error,
     new Error(
-      '\nError at name: expected <string> value but <number> type value `123` was passed.,\nError at age: expected <number> value but <string> type value "not a number" was passed.',
+      '\nError at name: expected <string> type but <number> type value `123` was passed.,\nError at age: expected <number> type but <string> type value "not a number" was passed.',
     ),
   );
 }

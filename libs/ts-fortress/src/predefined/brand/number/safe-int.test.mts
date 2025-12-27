@@ -91,7 +91,7 @@ describe(safeInt, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <SafeInt> value but <number> type value `9007199254740992` was passed.',
+        'Error: expected <SafeInt> type but <number> type value `9007199254740992` was passed.',
       ]);
     });
   });

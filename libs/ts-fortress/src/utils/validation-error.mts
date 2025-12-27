@@ -1,4 +1,4 @@
-import { isString, pipe, unknownToString } from 'ts-data-forge';
+import { isString, match, pipe, unknownToString } from 'ts-data-forge';
 
 export type ValidationErrorDetails = Readonly<
   | {
@@ -113,7 +113,7 @@ export const validationErrorToMessage = (
         s.length <= maxLengthToPrintActualValue ? ` \`${s}\`` : '',
       ).value;
 
-  return `${pathPrefix}expected <${error.expectedType}> value but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+  return `${pathPrefix}expected <${error.expectedType}> type but <${actualTypeStr}> type value${actualValueStr} was passed.`;
 };
 
 const createDetailsMessage = (
@@ -133,42 +133,59 @@ const createDetailsMessage = (
   switch (error.details?.kind) {
     case undefined:
       return undefined;
+
     case 'custom':
       return error.details.message;
+
+    case 'integer-range':
+      return `expected an integer between ${error.details.start} and ${error.details.endExclusive - 1} but${actualValueStr} was passed.`;
+
+    case 'tuple-length':
+      return `expected tuple of length ${error.details.expectedLength} but length ${error.details.actualLength} was passed.`;
+
+    case 'array-length':
+      return `expected array of length ${error.details.expectedLength} but length ${error.details.actualLength} was passed.`;
+
+    case 'array-min-length':
+      return `expected array of length ${error.details.minLength} or more but length ${error.details.actualLength} was passed.`;
+
+    case 'non-empty-array':
+      return 'expected non-empty array but empty array was passed.';
+
+    case 'missing-key':
+      return `missing required key "${error.details.key}".`;
+
+    case 'excess-key':
+      return `excess property "${error.details.key}" is not allowed.`;
+
+    case 'intersection':
+      return `expected value to match all types of <${error.details.typeNames.join('>, <')}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+
     case 'enum':
       return `expected one of { ${error.details.values
         .map((value) => String(value))
         .join(', ')} } but${actualValueStr} was passed.`;
-    case 'integer-range':
-      return `expected an integer between ${error.details.start} and ${error.details.endExclusive - 1} but${actualValueStr} was passed.`;
-    case 'tuple-length':
-      return `expected tuple of length ${error.details.expectedLength} but length ${error.details.actualLength} was passed.`;
-    case 'array-length':
-      return `expected array of length ${error.details.expectedLength} but length ${error.details.actualLength} was passed.`;
-    case 'array-min-length':
-      return `expected array of length ${error.details.minLength} or more but length ${error.details.actualLength} was passed.`;
-    case 'non-empty-array':
-      return 'expected non-empty array but empty array was passed.';
-    case 'missing-key':
-      return `missing required key "${error.details.key}".`;
-    case 'excess-key':
-      return `excess property "${error.details.key}" is not allowed.`;
-    case 'intersection':
-      return `expected value to match all types of { ${error.details.typeNames.join(', ')} } but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+
     case 'union':
-      return `expected one of { ${error.details.typeNames.join(', ')} } but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+      return `expected one of <${error.details.typeNames.join('>, <')}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+
     case 'record-entry':
-      return error.details.entry === 'key'
-        ? `expected record key to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`
-        : `expected record value to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+      return match(error.details.entry, {
+        key: `expected record key type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`,
+        value: `expected record value type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`,
+      });
+
     case 'map-entry':
-      return error.details.entry === 'key'
-        ? `expected Map key to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`
-        : `expected Map value to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+      return match(error.details.entry, {
+        key: `expected Map key type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`,
+        value: `expected Map value type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`,
+      });
+
     case 'set-element':
-      return `expected Set element to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+      return `expected Set element type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+
     case 'brand':
-      return `expected value to satisfy constraint: <${error.details.description}>.`;
+      return `expected value to satisfy constraint: ${error.details.description}.`;
   }
 };
 

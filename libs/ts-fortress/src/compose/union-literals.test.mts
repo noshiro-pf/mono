@@ -72,16 +72,16 @@ describe('union - literals only', () => {
       assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: 'purple',
-        expectedType: '(literal("red") | literal("green") | literal("blue"))',
-        typeName: '(literal("red") | literal("green") | literal("blue"))',
+        expectedType: '("red" | "green" | "blue")',
+        typeName: '("red" | "green" | "blue")',
         details: {
           kind: 'union',
-          typeNames: ['literal("red")', 'literal("green")', 'literal("blue")'],
+          typeNames: ['"red"', '"green"', '"blue"'],
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { literal("red"), literal("green"), literal("blue") } but <string> type value "purple" was passed.',
+        'Error: expected one of <"red">, <"green">, <"blue"> but <string> type value "purple" was passed.',
       ]);
     });
 

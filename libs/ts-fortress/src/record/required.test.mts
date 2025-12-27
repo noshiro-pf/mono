@@ -295,8 +295,8 @@ describe(required, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-          'Error at month: expected <number> value but <string> type value "ab" was passed.',
-          'Error at date: expected <number> value but <string> type value "cd" was passed.',
+          'Error at month: expected <number> type but <string> type value "ab" was passed.',
+          'Error at date: expected <number> type but <string> type value "cd" was passed.',
         ]);
       });
 
@@ -324,7 +324,7 @@ describe(required, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
-          'Error at month: expected <number> value but <string> type value "ab" was passed.',
+          'Error at month: expected <number> type but <string> type value "ab" was passed.',
         ]);
       });
     });
@@ -633,8 +633,8 @@ describe(required, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError4), [
-          'Error at month: expected <number> value but <string> type value "ab" was passed.',
-          'Error at date: expected <number> value but <string> type value "cd" was passed.',
+          'Error at month: expected <number> type but <string> type value "ab" was passed.',
+          'Error at date: expected <number> type but <string> type value "cd" was passed.',
         ]);
       });
     });

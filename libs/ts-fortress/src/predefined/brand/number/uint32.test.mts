@@ -101,7 +101,7 @@ describe(uint32, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <Uint32> value but <number> type value `-5` was passed.',
+        'Error: expected <Uint32> type but <number> type value `-5` was passed.',
       ]);
     });
   });

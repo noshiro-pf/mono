@@ -115,16 +115,16 @@ describe('union - literal and array', () => {
       assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: { key: 'value' },
-        expectedType: '(literal("none") | number[] | literal(false))',
-        typeName: '(literal("none") | number[] | literal(false))',
+        expectedType: '("none" | number[] | false)',
+        typeName: '("none" | number[] | false)',
         details: {
           kind: 'union',
-          typeNames: ['literal("none")', 'number[]', 'literal(false)'],
+          typeNames: ['"none"', 'number[]', 'false'],
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { literal("none"), number[], literal(false) } but <object> type value `{"key":"value"}` was passed.',
+        'Error: expected one of <"none">, <number[]>, <false> but <object> type value `{"key":"value"}` was passed.',
       ]);
     });
 

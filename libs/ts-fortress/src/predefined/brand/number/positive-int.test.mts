@@ -111,7 +111,7 @@ describe(positiveInt, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <PositiveInt> value but <number> type value `-5` was passed.',
+        'Error: expected <PositiveInt> type but <number> type value `-5` was passed.',
       ]);
     });
 
@@ -133,7 +133,7 @@ describe(positiveInt, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-        'Error: expected <number> value but <string> type value "not a number" was passed.',
+        'Error: expected <number> type but <string> type value "not a number" was passed.',
       ]);
     });
   });
@@ -158,7 +158,7 @@ describe(positiveInt, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrowError('Error: expected <PositiveInt> value');
+      }).toThrowError('Error: expected <PositiveInt> type');
     });
   });
 

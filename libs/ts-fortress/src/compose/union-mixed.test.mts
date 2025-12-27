@@ -149,22 +149,16 @@ describe('union - mixed types', () => {
       assert.deepStrictEqual(resultError[0], {
         path: [],
         actualValue: null,
-        expectedType:
-          '(literal("empty") | number | { status: string } | number[])',
-        typeName: '(literal("empty") | number | { status: string } | number[])',
+        expectedType: '("empty" | number | { status: string } | number[])',
+        typeName: '("empty" | number | { status: string } | number[])',
         details: {
           kind: 'union',
-          typeNames: [
-            'literal("empty")',
-            'number',
-            '{ status: string }',
-            'number[]',
-          ],
+          typeNames: ['"empty"', 'number', '{ status: string }', 'number[]'],
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { literal("empty"), number, { status: string }, number[] } but <object> type value `null` was passed.',
+        'Error: expected one of <"empty">, <number>, <{ status: string }>, <number[]> but <object> type value `null` was passed.',
       ]);
     });
 

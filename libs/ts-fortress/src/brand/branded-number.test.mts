@@ -19,7 +19,7 @@ describe('simpleBrandedNumber', () => {
     test('creates branded number type with default value 0', () => {
       expect(userIdType.defaultValue).toBe(0);
 
-      expect(userIdType.typeName).toBe('"UserId"');
+      expect(userIdType.typeName).toBe('UserId');
     });
 
     describe('is', () => {
@@ -87,7 +87,7 @@ describe('simpleBrandedNumber', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-          'Error: expected <number> value but <string> type value "not a number" was passed.',
+          'Error: expected <number> type but <string> type value "not a number" was passed.',
         ]);
       });
     });
@@ -126,7 +126,7 @@ describe('simpleBrandedNumber', () => {
     test('creates branded number type with custom default value', () => {
       expect(scoreType.defaultValue).toBe(100);
 
-      expect(scoreType.typeName).toBe('"Score"');
+      expect(scoreType.typeName).toBe('Score');
     });
 
     describe('validate', () => {
@@ -170,7 +170,7 @@ describe('simpleBrandedNumber', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-          'Error: expected <number> value but <string> type value "invalid" was passed.',
+          'Error: expected <number> type but <string> type value "invalid" was passed.',
         ]);
       });
     });

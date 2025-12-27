@@ -129,8 +129,8 @@ describe(literal, () => {
           {
             path: [],
             actualValue: 'world',
-            expectedType: 'literal("hello")',
-            typeName: 'literal("hello")',
+            expectedType: '"hello"',
+            typeName: '"hello"',
             details: undefined,
           },
         ]);
@@ -162,7 +162,7 @@ describe(literal, () => {
         const value: unknown = 'world';
 
         expect(() => hello.cast(value)).toThrowError(
-          'Error: expected <literal("hello")> value but <string> type value "world" was passed.',
+          'Error: expected <"hello"> type but <string> type value "world" was passed.',
         );
       });
     });
@@ -307,8 +307,8 @@ describe(literal, () => {
           {
             path: [],
             actualValue: 43,
-            expectedType: 'literal(42)',
-            typeName: 'literal(42)',
+            expectedType: '42',
+            typeName: '42',
             details: undefined,
           },
         ]);
@@ -338,7 +338,7 @@ describe(literal, () => {
     expectType<typeof targetType.defaultValue, TargetType>('=');
 
     test('type name includes literal value', () => {
-      expect(targetType.typeName).toBe('literal(42n)');
+      expect(targetType.typeName).toBe('42n');
     });
 
     describe('is', () => {
@@ -395,14 +395,14 @@ describe(literal, () => {
           {
             path: [],
             actualValue: 99n,
-            expectedType: 'literal(42n)',
-            typeName: 'literal(42n)',
+            expectedType: '42n',
+            typeName: '42n',
             details: undefined,
           },
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
-          'Error: expected <literal(42n)> value but <bigint> type value `99n` was passed.',
+          'Error: expected <42n> type but <bigint> type value `99n` was passed.',
         ]);
       });
 
@@ -417,14 +417,14 @@ describe(literal, () => {
           {
             path: [],
             actualValue: 'not a bigint',
-            expectedType: 'literal(42n)',
-            typeName: 'literal(42n)',
+            expectedType: '42n',
+            typeName: '42n',
             details: undefined,
           },
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError3), [
-          'Error: expected <literal(42n)> value but <string> type value "not a bigint" was passed.',
+          'Error: expected <42n> type but <string> type value "not a bigint" was passed.',
         ]);
       });
 
@@ -481,7 +481,7 @@ describe(literal, () => {
       expectType<typeof targetType.defaultValue, TargetType>('=');
 
       test('type name includes literal value', () => {
-        expect(targetType.typeName).toBe('literal(true)');
+        expect(targetType.typeName).toBe('true');
       });
 
       describe('is', () => {
@@ -538,14 +538,14 @@ describe(literal, () => {
             {
               path: [],
               actualValue: false,
-              expectedType: 'literal(true)',
-              typeName: 'literal(true)',
+              expectedType: 'true',
+              typeName: 'true',
               details: undefined,
             },
           ]);
 
           assert.deepStrictEqual(validationErrorsToMessages(resultError4), [
-            'Error: expected <literal(true)> value but <boolean> type value `false` was passed.',
+            'Error: expected <true> type but <boolean> type value `false` was passed.',
           ]);
         });
 
@@ -560,14 +560,14 @@ describe(literal, () => {
             {
               path: [],
               actualValue: 'not a boolean',
-              expectedType: 'literal(true)',
-              typeName: 'literal(true)',
+              expectedType: 'true',
+              typeName: 'true',
               details: undefined,
             },
           ]);
 
           assert.deepStrictEqual(validationErrorsToMessages(resultError5), [
-            'Error: expected <literal(true)> value but <string> type value "not a boolean" was passed.',
+            'Error: expected <true> type but <string> type value "not a boolean" was passed.',
           ]);
         });
 
@@ -621,7 +621,7 @@ describe(literal, () => {
       expectType<TargetType, false>('=');
 
       test('type name includes literal value', () => {
-        expect(targetType.typeName).toBe('literal(false)');
+        expect(targetType.typeName).toBe('false');
       });
 
       describe('is', () => {
@@ -660,14 +660,14 @@ describe(literal, () => {
             {
               path: [],
               actualValue: true,
-              expectedType: 'literal(false)',
-              typeName: 'literal(false)',
+              expectedType: 'false',
+              typeName: 'false',
               details: undefined,
             },
           ]);
 
           assert.deepStrictEqual(validationErrorsToMessages(resultError6), [
-            'Error: expected <literal(false)> value but <boolean> type value `true` was passed.',
+            'Error: expected <false> type but <boolean> type value `true` was passed.',
           ]);
         });
 

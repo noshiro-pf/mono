@@ -95,7 +95,7 @@ describe(int16, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <Int16> value but <number> type value `50000` was passed.',
+        'Error: expected <Int16> type but <number> type value `50000` was passed.',
       ]);
     });
   });

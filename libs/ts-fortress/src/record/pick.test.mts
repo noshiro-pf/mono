@@ -218,7 +218,7 @@ describe(pick, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error at month: expected <number> value but <string> type value "ab" was passed.',
+        'Error at month: expected <number> type but <string> type value "ab" was passed.',
       ]);
     });
   });

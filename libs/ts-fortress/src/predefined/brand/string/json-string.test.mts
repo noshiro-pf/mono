@@ -54,7 +54,7 @@ describe(jsonString, () => {
     ]);
 
     assert.deepStrictEqual(validationErrorsToMessages(result.value), [
-      'Error: expected <JsonString> value but <string> type value "not-json" was passed.',
+      'Error: expected <JsonString> type but <string> type value "not-json" was passed.',
     ]);
   });
 

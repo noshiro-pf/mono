@@ -140,7 +140,7 @@ describe('union - nested records', () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { { type: string, data: { value: number } }, { kind: string, config: { enabled: string } } } but <object> type value `{"invalid":"data"}` was passed.',
+        'Error: expected one of <{ type: string, data: { value: number } }>, <{ kind: string, config: { enabled: string } }> but <object> type value `{"invalid":"data"}` was passed.',
       ]);
     });
 

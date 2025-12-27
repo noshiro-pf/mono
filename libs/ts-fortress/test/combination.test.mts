@@ -168,8 +168,8 @@ describe('nested record', () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error at xs.1: expected <Int> value but <number> type value `2.2` was passed.',
-        'Error at xs.2: expected <Int> value but <number> type value `3.3` was passed.',
+        'Error at xs.1: expected <Int> type but <number> type value `2.2` was passed.',
+        'Error at xs.2: expected <Int> type but <number> type value `3.3` was passed.',
         'Error at rec.a: expected an integer between 0 and 10 but `123` was passed.',
         'Error at rec.b: expected an integer between 0 and 10 but `234` was passed.',
       ]);
@@ -412,20 +412,20 @@ describe('advanced type', () => {
     const messages = validationErrorsToMessages(result.value);
 
     assert.deepStrictEqual(messages, [
-      'Error: expected value to match all types of { { id: "Identifier", status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<"Tag"> | undefined) }, Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }> } but <object> type value was passed.',
-      'Error at status: expected one of { enum, null, undefined } but <string> type value "unknown" was passed.',
+      'Error: expected value to match all types of <{ id: Identifier, status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<Tag> | undefined) }>, <Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }>> but <object> type value was passed.',
+      'Error at status: expected one of <enum>, <null>, <undefined> but <string> type value "unknown" was passed.',
       'Error at coordinates.1: expected an integer between -128 and 127 but `190` was passed.',
-      'Error at palette: expected value to match all types of { NonEmptyArray<EvenRange>, ArrayOfLength<2, EvenRange> } but <object> type value `[1,3,5]` was passed.',
-      'Error at palette.0: expected <EvenRange> value but <number> type value `1` was passed.',
-      'Error at palette.1: expected <EvenRange> value but <number> type value `3` was passed.',
-      'Error at palette.2: expected <EvenRange> value but <number> type value `5` was passed.',
-      'Error at palette: expected value to match all types of { NonEmptyArray<EvenRange>, ArrayOfLength<2, EvenRange> } but <object> type value `[1,3,5]` was passed.',
+      'Error at palette: expected value to match all types of <NonEmptyArray<EvenRange>>, <ArrayOfLength<2, EvenRange>> but <object> type value `[1,3,5]` was passed.',
+      'Error at palette.0: expected <EvenRange> type but <number> type value `1` was passed.',
+      'Error at palette.1: expected <EvenRange> type but <number> type value `3` was passed.',
+      'Error at palette.2: expected <EvenRange> type but <number> type value `5` was passed.',
+      'Error at palette: expected value to match all types of <NonEmptyArray<EvenRange>>, <ArrayOfLength<2, EvenRange>> but <object> type value `[1,3,5]` was passed.',
       'Error at palette: expected array of length 2 but length 3 was passed.',
-      'Error at metrics: expected one of { key-value-record, undefined } but <object> type value `{"alpha":1}` was passed.',
-      'Error at tags: expected one of { NonEmptyArray<"Tag">, undefined } but <object> type value `[]` was passed.',
-      'Error: expected value to match all types of { { id: "Identifier", status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<"Tag"> | undefined) }, Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }> } but <object> type value was passed.',
-      'Error at extras: expected one of { key-value-record, undefined } but <object> type value was passed.',
-      'Error at children: expected one of { AdvancedNode[], undefined } but <object> type value `[{}]` was passed.',
+      'Error at metrics: expected one of <key-value-record>, <undefined> but <object> type value `{"alpha":1}` was passed.',
+      'Error at tags: expected one of <NonEmptyArray<Tag>>, <undefined> but <object> type value `[]` was passed.',
+      'Error: expected value to match all types of <{ id: Identifier, status: (enum | null | undefined), coordinates: tuple, palette: (NonEmptyArray<EvenRange> & ArrayOfLength<2, EvenRange>), metrics: (key-value-record | undefined), tags: (NonEmptyArray<Tag> | undefined) }>, <Partial<{ extras: (key-value-record | undefined), children: (AdvancedNode[] | undefined) }>> but <object> type value was passed.',
+      'Error at extras: expected one of <key-value-record>, <undefined> but <object> type value was passed.',
+      'Error at children: expected one of <AdvancedNode[]>, <undefined> but <object> type value `[{}]` was passed.',
     ]);
   });
 

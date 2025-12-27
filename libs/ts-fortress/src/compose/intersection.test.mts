@@ -149,7 +149,7 @@ describe(intersection, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-          'Error: expected value to match all types of { { x: number, y: number }, { z: number, w: number } } but <object> type value `{"x":0,"y":1}` was passed.',
+          'Error: expected value to match all types of <{ x: number, y: number }>, <{ z: number, w: number }> but <object> type value `{"x":0,"y":1}` was passed.',
           'Error at z: missing required key "z".',
           'Error at w: missing required key "w".',
         ]);
@@ -279,10 +279,10 @@ describe(intersection, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-          'Error: expected value to match all types of { number, number } but <string> type value "aaa" was passed.',
-          'Error: expected <number> value but <string> type value "aaa" was passed.',
-          'Error: expected value to match all types of { number, number } but <string> type value "aaa" was passed.',
-          'Error: expected <number> value but <string> type value "aaa" was passed.',
+          'Error: expected value to match all types of <number>, <number> but <string> type value "aaa" was passed.',
+          'Error: expected <number> type but <string> type value "aaa" was passed.',
+          'Error: expected value to match all types of <number>, <number> but <string> type value "aaa" was passed.',
+          'Error: expected <number> type but <string> type value "aaa" was passed.',
         ]);
       });
     });
@@ -433,9 +433,9 @@ describe(intersection, () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
-          'Error: expected value to match all types of { uintRange(0, 5), uintRange(1, 7) } but <number> type value `7` was passed.',
+          'Error: expected value to match all types of <uintRange(0, 5)>, <uintRange(1, 7)> but <number> type value `7` was passed.',
           'Error: expected an integer between 0 and 4 but `7` was passed.',
-          'Error: expected value to match all types of { uintRange(0, 5), uintRange(1, 7) } but <number> type value `7` was passed.',
+          'Error: expected value to match all types of <uintRange(0, 5)>, <uintRange(1, 7)> but <number> type value `7` was passed.',
           'Error: expected an integer between 1 and 6 but `7` was passed.',
         ]);
       });

@@ -142,7 +142,7 @@ describe(arrayAtLeastLength, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <array> value but <string> type value "foo" was passed.',
+        'Error: expected <array> type but <string> type value "foo" was passed.',
       ]);
     });
 
@@ -194,7 +194,7 @@ describe(arrayAtLeastLength, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error at 1: expected <number> value but <string> type value "2" was passed.',
+        'Error at 1: expected <number> type but <string> type value "2" was passed.',
       ]);
     });
   });

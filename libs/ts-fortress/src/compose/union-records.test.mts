@@ -122,7 +122,7 @@ describe('union - records only', () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of { { kind: string, value: number }, { type: string, data: string } } but <object> type value was passed.',
+        'Error: expected one of <{ kind: string, value: number }>, <{ type: string, data: string }> but <object> type value was passed.',
       ]);
     });
 

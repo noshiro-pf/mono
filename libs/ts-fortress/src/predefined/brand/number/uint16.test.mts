@@ -101,7 +101,7 @@ describe(uint16, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <Uint16> value but <number> type value `-5` was passed.',
+        'Error: expected <Uint16> type but <number> type value `-5` was passed.',
       ]);
     });
   });

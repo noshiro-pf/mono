@@ -89,7 +89,7 @@ describe(int32, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <Int32> value but <number> type value `3000000000` was passed.',
+        'Error: expected <Int32> type but <number> type value `3000000000` was passed.',
       ]);
     });
   });

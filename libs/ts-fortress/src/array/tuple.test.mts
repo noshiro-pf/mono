@@ -163,8 +163,8 @@ describe(tuple, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError2), [
-        'Error at 0.x: expected <number> value but <string> type value "str" was passed.',
-        'Error at 0.y: expected <number> value but <string> type value "str" was passed.',
+        'Error at 0.x: expected <number> type but <string> type value "str" was passed.',
+        'Error at 0.y: expected <number> type but <string> type value "str" was passed.',
       ]);
     });
 

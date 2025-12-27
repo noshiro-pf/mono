@@ -157,7 +157,7 @@ describe(iso8601, () => {
     ]);
 
     assert.deepStrictEqual(validationErrorsToMessages(result.value), [
-      'Error: expected <Iso8601> value but <string> type value "not-an-iso-date" was passed.',
+      'Error: expected <Iso8601> type but <string> type value "not-an-iso-date" was passed.',
     ]);
   });
 

@@ -79,7 +79,7 @@ describe(int, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <Int> value but <number> type value `42.5` was passed.',
+        'Error: expected <Int> type but <number> type value `42.5` was passed.',
       ]);
     });
 
@@ -101,7 +101,7 @@ describe(int, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-        'Error: expected <number> value but <string> type value "not a number" was passed.',
+        'Error: expected <number> type but <string> type value "not a number" was passed.',
       ]);
     });
 
@@ -138,7 +138,7 @@ describe(int, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrowError('Error: expected <Int> value');
+      }).toThrowError('Error: expected <Int> type');
     });
   });
 

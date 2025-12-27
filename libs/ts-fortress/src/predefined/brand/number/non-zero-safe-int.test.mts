@@ -102,7 +102,7 @@ describe(nonZeroSafeInt, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <NonZeroSafeInt> value but <number> type value `0` was passed.',
+        'Error: expected <NonZeroSafeInt> type but <number> type value `0` was passed.',
       ]);
     });
   });

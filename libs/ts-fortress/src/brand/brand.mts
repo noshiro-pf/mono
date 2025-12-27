@@ -72,7 +72,7 @@ export const brand = <
       ).value;
 
   return createType({
-    typeName: brandKeysStr,
+    typeName: typeNameFilled,
     defaultValue,
     validate,
   });

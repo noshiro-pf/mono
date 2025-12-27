@@ -121,7 +121,7 @@ describe(finiteNumber, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-        'Error: expected <number> value but <string> type value "not a number" was passed.',
+        'Error: expected <number> type but <string> type value "not a number" was passed.',
       ]);
     });
   });
@@ -146,7 +146,7 @@ describe(finiteNumber, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrowError('Error: expected <FiniteNumber> value');
+      }).toThrowError('Error: expected <FiniteNumber> type');
     });
   });
 

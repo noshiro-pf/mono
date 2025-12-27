@@ -101,7 +101,7 @@ describe(safeUint, () => {
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <SafeUint> value but <number> type value `-5` was passed.',
+        'Error: expected <SafeUint> type but <number> type value `-5` was passed.',
       ]);
     });
   });

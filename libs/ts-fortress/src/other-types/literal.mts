@@ -9,10 +9,10 @@ export const literal = <
 ): Type<L> =>
   createPrimitiveType({
     typeName: isString(value)
-      ? `literal("${value}")`
+      ? `"${value}"`
       : isBigint(value)
-        ? `literal(${value}n)`
-        : `literal(${value})`,
+        ? `${value}n`
+        : value.toString(),
     defaultValue: value,
     is: (u: unknown): u is L => u === value,
   });
