@@ -1,3 +1,9 @@
+# [4.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.2.1...v4.3.0) (2025-12-30)
+
+### Features
+
+- ts-data-forge rules ([#205](https://github.com/noshiro-pf/eslint-config-typed/issues/205)) ([a519183](https://github.com/noshiro-pf/eslint-config-typed/commit/a519183a179149e605214fcb4800c0e734e5e46d))
+
 ## [4.2.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.2.0...v4.2.1) (2025-12-29)
 
 ### Bug Fixes
