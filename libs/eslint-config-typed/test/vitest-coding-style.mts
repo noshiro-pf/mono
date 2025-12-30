@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable unicorn/consistent-function-scoping */
 
+import { Arr } from 'ts-data-forge';
 import { noop } from './noop.mjs';
 
 describe('vitest-coding-style', () => {
@@ -29,7 +30,7 @@ describe('vitest-coding-style', () => {
 
     assert.isFalse(type);
 
-    assert.isTrue(Array.isArray([]));
+    assert.isTrue(Arr.isArray([]));
   });
 
   test('removed APIs', () => {
@@ -47,7 +48,7 @@ describe('vitest-coding-style', () => {
 
     // @ts-expect-error removed in OverriddenAssert
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-assert
-    assert.ok(Array.isArray([]));
+    assert.ok(Arr.isArray([]));
   });
 
   test('expect(non-boolean).toBe(boolean)', () => {
@@ -60,10 +61,10 @@ describe('vitest-coding-style', () => {
 
   test('expect(boolean).toBe(boolean)', () => {
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-false-over-expect-false
-    expect(Array.isArray({})).toBe(false);
+    expect(Arr.isArray({})).toBe(false);
 
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-expect-true
-    expect(Array.isArray([{}]) satisfies boolean).toBe(true);
+    expect(Arr.isArray([{}]) satisfies boolean).toBe(true);
   });
 
   // eslint-disable-next-line vitest/expect-expect
@@ -78,21 +79,21 @@ describe('vitest-coding-style', () => {
   test('prefer-assert-is-true-over-assert', () => {
     // @ts-expect-error removed in OverriddenAssert
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-assert
-    assert.isOk(Array.isArray([]));
+    assert.isOk(Arr.isArray([]));
 
     // @ts-expect-error removed in OverriddenAssert
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-assert
-    assert.ok(Array.isArray([]));
+    assert.ok(Arr.isArray([]));
   });
 
   test('prefer-assert-is-false-over-assert-not-ok', () => {
     // @ts-expect-error removed in OverriddenAssert
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-false-over-assert-not-ok
-    assert.isNotOk(Array.isArray([]));
+    assert.isNotOk(Arr.isArray([]));
 
     // @ts-expect-error removed in OverriddenAssert
     // eslint-disable-next-line vitest-coding-style/prefer-assert-is-false-over-assert-not-ok
-    assert.notOk(Array.isArray([]));
+    assert.notOk(Arr.isArray([]));
   });
 
   test('prefer-assert-deep-strict-equal-over-deep-equal', () => {

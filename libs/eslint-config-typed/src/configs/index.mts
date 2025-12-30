@@ -1,5 +1,6 @@
 export * from './browser.mjs';
 export * from './cypress.mjs';
+export * from './immer.mjs';
 export * from './jest.mjs';
 export * from './nodejs.mjs';
 export * from './playwright.mjs';
@@ -7,6 +8,7 @@ export * from './plugins.mjs';
 export * from './preact.mjs';
 export * from './react.mjs';
 export * from './testing-library.mjs';
+export * from './ts-data-forge.mjs';
 export * from './typescript-without-rules.mjs';
 export * from './typescript.mjs';
 export * from './vitest.mjs';

@@ -60,6 +60,7 @@ import {
   eslintPluginStrictDependencies,
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
+  eslintPluginTsDataForge,
   eslintPluginTsRestrictions,
   eslintPluginVitestCodingStyle,
 } from '../plugins/index.mjs';
@@ -94,6 +95,7 @@ export const plugins: Record<
   | 'total-functions'
   | 'strict-dependencies'
   | 'ts-restrictions'
+  | 'ts-data-forge'
   | 'react-coding-style'
   | 'immer-coding-style'
   | 'vitest-coding-style',
@@ -133,6 +135,7 @@ export const plugins: Record<
   'total-functions': eslintPluginTotalFunctions,
   'strict-dependencies': eslintPluginStrictDependencies,
   'ts-restrictions': eslintPluginTsRestrictions,
+  'ts-data-forge': eslintPluginTsDataForge,
   'react-coding-style': eslintPluginReactCodingStyle,
   'immer-coding-style': eslintPluginImmerCodingStyle,
   'vitest-coding-style': eslintPluginVitestCodingStyle,

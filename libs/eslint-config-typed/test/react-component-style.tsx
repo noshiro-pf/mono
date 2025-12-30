@@ -1,6 +1,7 @@
 // cspell-ignore-file
 
 import * as React from 'react';
+import { Arr } from 'ts-data-forge';
 import { noop } from './noop.mjs';
 
 type Props = Readonly<{
@@ -9,10 +10,7 @@ type Props = Readonly<{
 
 // OK
 export const Ok = React.memo<Props>((props) => {
-  const sum = React.useMemo(
-    () => props.numList.reduce((a, b) => a + b, 0),
-    [props.numList],
-  );
+  const sum = React.useMemo(() => Arr.sum(props.numList), [props.numList]);
 
   return <div>{sum}</div>;
 });
@@ -52,10 +50,7 @@ MemoWithoutPropsWithUnnecessaryTypeArg.displayName =
 // NG
 // eslint-disable-next-line react-coding-style/props-type-annotation-style
 export const ArgAnnotated = React.memo<Props>((props: Props) => {
-  const sum = React.useMemo(
-    () => props.numList.reduce((a, b) => a + b, 0),
-    [props.numList],
-  );
+  const sum = React.useMemo(() => Arr.sum(props.numList), [props.numList]);
 
   return <div>{sum}</div>;
 });
@@ -66,10 +61,7 @@ ArgAnnotated.displayName = 'ArgAnnotated';
 export const ArgAnnotatedAsInline = React.memo<Props>(
   // eslint-disable-next-line react-coding-style/props-type-annotation-style, @typescript-eslint/prefer-readonly-parameter-types, react/prefer-read-only-props
   (props: { numList: readonly number[] }) => {
-    const sum = React.useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = React.useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   },
@@ -81,10 +73,7 @@ ArgAnnotatedAsInline.displayName = 'ArgAnnotatedAsInline';
 export const ArgAnnotatedAsInlineWithTypeReference = React.memo<Props>(
   // eslint-disable-next-line react-coding-style/props-type-annotation-style
   (props: Readonly<{ numList: readonly number[] }>) => {
-    const sum = React.useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = React.useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   },
@@ -99,10 +88,7 @@ export const MemoWithoutTypeArgument: React.MemoExoticComponent<
 > =
   // eslint-disable-next-line react-coding-style/react-memo-type-parameter
   React.memo((props) => {
-    const sum = React.useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = React.useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   });
@@ -130,10 +116,7 @@ MemoAnnotatedAsAny.displayName = 'MemoAnnotatedAsAny';
 // eslint-disable-next-line react-coding-style/react-memo-type-parameter
 export const MemoAnnotatedAsInline = React.memo<{ numList: readonly number[] }>(
   (props) => {
-    const sum = React.useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = React.useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   },
@@ -146,10 +129,7 @@ export const MemoAnnotatedAsInlineWithTypeReference = React.memo<
   // eslint-disable-next-line react-coding-style/react-memo-type-parameter
   Readonly<{ numList: readonly number[] }>
 >((props) => {
-  const sum = React.useMemo(
-    () => props.numList.reduce((a, b) => a + b, 0),
-    [props.numList],
-  );
+  const sum = React.useMemo(() => Arr.sum(props.numList), [props.numList]);
 
   return <div>{sum}</div>;
 });
@@ -160,10 +140,7 @@ MemoAnnotatedAsInlineWithTypeReference.displayName =
 // NG
 // eslint-disable-next-line react-coding-style/react-memo-props-argument-name
 export const ArgSpread = React.memo<Props>(({ numList }) => {
-  const sum = React.useMemo(
-    () => numList.reduce((a, b) => a + b, 0),
-    [numList],
-  );
+  const sum = React.useMemo(() => Arr.sum(numList), [numList]);
 
   return <div>{sum}</div>;
 });
@@ -174,10 +151,7 @@ ArgSpread.displayName = 'ArgSpread';
 // eslint-disable-next-line react-coding-style/component-name
 const TooooooooooooooooooooooooLongComponentName = React.memo<Props>(
   (props) => {
-    const sum = React.useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = React.useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   },

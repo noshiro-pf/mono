@@ -660,6 +660,10 @@ This type definition provides overridden `Chai.Assert` type:
 | `ban-use-imperative-handle-hook` | Forbid `React.useImperativeHandle`; move logic to the parent component                                                |
 | `display-name`                   | Require explicit `displayName` on React.memo components                                                               |
 
+#### ts-data-forge
+
+**`eslintPluginTsDataForge`** - Custom ESLint plugin for [`ts-data-forge`](https://github.com/noshiro-pf/ts-data-forge).
+
 ### Type Definitions
 
 All rules and configurations come with complete TypeScript type definitions:

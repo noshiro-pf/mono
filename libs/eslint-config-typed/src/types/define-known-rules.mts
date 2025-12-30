@@ -25,6 +25,7 @@ import {
   type EslintTestingLibraryRules,
   type EslintTotalFunctionsRules,
   type EslintTreeShakableRules,
+  type EslintTsDataForgeRules,
   type EslintTsRestrictionsRules,
   type EslintUnicornRules,
   type EslintVitestCodingStyleRules,
@@ -62,6 +63,7 @@ type KnownRules = DeepReadonly<
     EslintVitestRules &
     EslintVitestCodingStyleRules &
     EslintImmerCodingStyleRules &
+    EslintTsDataForgeRules &
     EslintReactCodingStyleRules &
     TypeScriptEslintRules
 >;

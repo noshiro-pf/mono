@@ -95,7 +95,7 @@ export const eslintVitestRules = {
   'vitest/prefer-called-times': 'off',
   'vitest/prefer-describe-function-title': 'error',
   'vitest/prefer-expect-type-of': 'error',
-  'vitest/prefer-import-in-mock': 'error',
+  'vitest/prefer-import-in-mock': withDefaultOption('error'),
   'vitest/prefer-strict-boolean-matchers': 'error',
   'vitest/prefer-vi-mocked': 'error',
   'vitest/require-mock-type-parameters': 'off',
@@ -116,8 +116,8 @@ export const eslintVitestRules = {
       suite: 'each',
     },
   ],
-  'vitest/require-import-vi-mock': 'error',
   'vitest/no-unneeded-async-expect-function': 'error',
+  'vitest/prefer-to-have-been-called-times': 'error',
 
   // deprecated
   'vitest/no-done-callback': 0,

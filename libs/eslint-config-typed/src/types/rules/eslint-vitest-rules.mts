@@ -1350,7 +1350,33 @@ namespace PreferHooksOnTop {
  *  ```
  */
 namespace PreferImportInMock {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "fixable": {
+   *         "type": "boolean",
+   *         "default": true
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /** @default true */
+    fixable?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1642,6 +1668,23 @@ namespace PreferToContain {
 }
 
 /**
+ * Suggest using `toHaveBeenCalledTimes()`
+ *
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-have-been-called-times.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferToHaveBeenCalledTimes {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Enforce using toHaveLength()
  *
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-have-length.md
@@ -1756,25 +1799,6 @@ namespace RequireHook {
     | 'off'
     | Linter.Severity
     | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
-}
-
-/**
- * Require usage of import in vi.mock()
- *
- * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-import-vi-mock.md
- *
- *  ```md
- *  | key                  | value      |
- *  | :------------------- | :--------- |
- *  | type                 | suggestion |
- *  | deprecated           | false      |
- *  | fixable              | code       |
- *  | recommended          | false      |
- *  | requiresTypeChecking | false      |
- *  ```
- */
-namespace RequireImportViMock {
-  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -2190,12 +2214,12 @@ export type EslintVitestRules = Readonly<{
   'vitest/prefer-to-be-truthy': PreferToBeTruthy.RuleEntry;
   'vitest/prefer-to-be': PreferToBe.RuleEntry;
   'vitest/prefer-to-contain': PreferToContain.RuleEntry;
+  'vitest/prefer-to-have-been-called-times': PreferToHaveBeenCalledTimes.RuleEntry;
   'vitest/prefer-to-have-length': PreferToHaveLength.RuleEntry;
   'vitest/prefer-todo': PreferTodo.RuleEntry;
   'vitest/prefer-vi-mocked': PreferViMocked.RuleEntry;
   'vitest/require-awaited-expect-poll': RequireAwaitedExpectPoll.RuleEntry;
   'vitest/require-hook': RequireHook.RuleEntry;
-  'vitest/require-import-vi-mock': RequireImportViMock.RuleEntry;
   'vitest/require-local-test-context-for-concurrent-snapshots': RequireLocalTestContextForConcurrentSnapshots.RuleEntry;
   'vitest/require-mock-type-parameters': RequireMockTypeParameters.RuleEntry;
   'vitest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
@@ -2225,6 +2249,7 @@ export type EslintVitestRulesOption = Readonly<{
   'vitest/no-restricted-vi-methods': NoRestrictedViMethods.Options;
   'vitest/no-standalone-expect': NoStandaloneExpect.Options;
   'vitest/prefer-expect-assertions': PreferExpectAssertions.Options;
+  'vitest/prefer-import-in-mock': PreferImportInMock.Options;
   'vitest/prefer-lowercase-title': PreferLowercaseTitle.Options;
   'vitest/prefer-snapshot-hint': PreferSnapshotHint.Options;
   'vitest/require-hook': RequireHook.Options;

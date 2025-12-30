@@ -171,20 +171,19 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
 
       const objectProps = getObjectTypeProperties(type);
 
-      const destructuredProps = new Set<string>();
+      const mut_destructuredProps = new Set<string>();
 
       for (const prop of node.id.properties) {
         if (
           prop.type === AST_NODE_TYPES.Property &&
           prop.key.type === AST_NODE_TYPES.Identifier
         ) {
-          // eslint-disable-next-line functional/immutable-data
-          destructuredProps.add(prop.key.name);
+          mut_destructuredProps.add(prop.key.name);
         }
       }
 
       const missingProps = objectProps.filter(
-        (prop) => !destructuredProps.has(prop),
+        (prop) => !mut_destructuredProps.has(prop),
       );
 
       if (missingProps.length > 0) {
@@ -218,20 +217,19 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
 
             const objectProps = getObjectTypeProperties(type);
 
-            const destructuredProps = new Set<string>();
+            const mut_destructuredProps = new Set<string>();
 
             for (const prop of param.properties) {
               if (
                 prop.type === AST_NODE_TYPES.Property &&
                 prop.key.type === AST_NODE_TYPES.Identifier
               ) {
-                // eslint-disable-next-line functional/immutable-data
-                destructuredProps.add(prop.key.name);
+                mut_destructuredProps.add(prop.key.name);
               }
             }
 
             const missingProps = objectProps.filter(
-              (prop) => !destructuredProps.has(prop),
+              (prop) => !mut_destructuredProps.has(prop),
             );
 
             if (missingProps.length > 0) {

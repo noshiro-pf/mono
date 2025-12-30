@@ -185,6 +185,12 @@ export const eslintPlugins = {
     rulePrefix: 'ts-restrictions/',
     outputFileName: 'eslint-ts-restrictions-rules.mts',
   },
+  EslintTsDataForgeRules: {
+    typeName: 'EslintTsDataForgeRules',
+    pluginName: 'eslint-plugin-ts-data-forge',
+    rulePrefix: 'ts-data-forge/',
+    outputFileName: 'eslint-ts-data-forge-rules.mts',
+  },
 } as const satisfies Record<
   string,
   {

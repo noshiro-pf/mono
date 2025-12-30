@@ -23,6 +23,7 @@ export * from './eslint-stylistic-rules.mjs';
 export * from './eslint-testing-library-rules.mjs';
 export * from './eslint-total-functions-rules.mjs';
 export * from './eslint-tree-shakable-rules.mjs';
+export * from './eslint-ts-data-forge-rules.mjs';
 export * from './eslint-ts-restrictions-rules.mjs';
 export * from './eslint-unicorn-rules.mjs';
 export * from './eslint-vitest-coding-style-rules.mjs';

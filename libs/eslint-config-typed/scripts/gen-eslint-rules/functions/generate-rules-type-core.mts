@@ -8,6 +8,7 @@ import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/r
 import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
 import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/index.mjs';
 import { treeShakableRules } from '../../../src/plugins/tree-shakable/rules/index.mjs';
+import { tsDataForgeRules } from '../../../src/plugins/ts-data-forge/rules/rules.mjs';
 import { tsRestrictionsRules } from '../../../src/plugins/ts-restrictions/rules/rules.mjs';
 import { vitestCodingStyleRules } from '../../../src/plugins/vitest-coding-style/rules/rules.mjs';
 import { eslintPlugins } from '../constants/eslint-plugins.mjs';
@@ -421,6 +422,10 @@ const getRules = async (
     case eslintPlugins.EslintTsRestrictionsRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Object.entries(tsRestrictionsRules as unknown as Rules);
+
+    case eslintPlugins.EslintTsDataForgeRules.pluginName:
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Object.entries(tsDataForgeRules as unknown as Rules);
 
     case eslintPlugins.EslintReactCodingStyleRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion

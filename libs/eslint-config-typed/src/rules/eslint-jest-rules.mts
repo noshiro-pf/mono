@@ -87,4 +87,7 @@ export const eslintJestRules = {
   'jest/prefer-to-have-been-called-times': 'error',
 
   'jest/valid-mock-module-path': withDefaultOption('error'),
+  'jest/no-error-equal': 'error',
+  'jest/no-unnecessary-assertion': 'error',
+  'jest/valid-expect-with-promise': 'error',
 } as const satisfies EslintJestRules;

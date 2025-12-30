@@ -7,7 +7,7 @@ import { resolveImportPath } from './resolve-import-path.mjs';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 type TypeScriptModule = typeof import('typescript');
 
-const actualFunctions = vi.hoisted<{
+const mut_actualFunctions = vi.hoisted<{
   findConfigFile?: TypeScriptModule['findConfigFile'];
   getParsedCommandLineOfConfigFile?: TypeScriptModule['getParsedCommandLineOfConfigFile'];
 }>(() => ({
@@ -18,11 +18,9 @@ const actualFunctions = vi.hoisted<{
 vi.mock(import('typescript'), async () => {
   const actual = await vi.importActual<TypeScriptModule>('typescript');
 
-  // eslint-disable-next-line functional/immutable-data
-  actualFunctions.findConfigFile = actual.findConfigFile;
+  mut_actualFunctions.findConfigFile = actual.findConfigFile;
 
-  // eslint-disable-next-line functional/immutable-data
-  actualFunctions.getParsedCommandLineOfConfigFile =
+  mut_actualFunctions.getParsedCommandLineOfConfigFile =
     actual.getParsedCommandLineOfConfigFile;
 
   return {
@@ -100,13 +98,13 @@ type FixtureName = keyof typeof compilerOptionsByFixture;
 
 const restoreActual = (): void => {
   if (
-    actualFunctions.findConfigFile !== undefined &&
-    actualFunctions.getParsedCommandLineOfConfigFile !== undefined
+    mut_actualFunctions.findConfigFile !== undefined &&
+    mut_actualFunctions.getParsedCommandLineOfConfigFile !== undefined
   ) {
-    mockFindConfigFile.mockImplementation(actualFunctions.findConfigFile);
+    mockFindConfigFile.mockImplementation(mut_actualFunctions.findConfigFile);
 
     mockGetParsedCommandLine.mockImplementation(
-      actualFunctions.getParsedCommandLineOfConfigFile,
+      mut_actualFunctions.getParsedCommandLineOfConfigFile,
     );
   }
 };

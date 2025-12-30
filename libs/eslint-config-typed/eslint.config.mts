@@ -2,6 +2,7 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForReact,
+  eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
@@ -144,16 +145,18 @@ export default [
 
   ...eslintConfigForReact(['test/**/*.{mts,tsx}']),
 
+  eslintConfigForTsDataForge(['test/**/*.{mts,tsx}']),
+
   {
     files: ['test/**'],
     rules: defineKnownRules({
       'ts-restrictions/no-restricted-cast-name': [
         'error',
         {
-          name: 'Int',
+          name: 'MyInt',
           fixWith: {
             kind: 'function',
-            name: 'asInt',
+            name: 'asMyInt',
           },
         },
       ],

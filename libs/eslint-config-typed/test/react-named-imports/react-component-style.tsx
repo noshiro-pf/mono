@@ -1,6 +1,7 @@
 // cspell-ignore-file
 
 import { memo, useMemo, type JSX, type MemoExoticComponent } from 'react';
+import { Arr } from 'ts-data-forge';
 import { noop } from '../noop.mjs';
 
 type Props = Readonly<{
@@ -9,10 +10,7 @@ type Props = Readonly<{
 
 // OK
 export const Ok = memo<Props>((props) => {
-  const sum = useMemo(
-    () => props.numList.reduce((a, b) => a + b, 0),
-    [props.numList],
-  );
+  const sum = useMemo(() => Arr.sum(props.numList), [props.numList]);
 
   return <div>{sum}</div>;
 });
@@ -52,10 +50,7 @@ MemoWithoutPropsWithUnnecessaryTypeArg.displayName =
 // NG
 // eslint-disable-next-line react-coding-style/props-type-annotation-style
 export const ArgAnnotated = memo<Props>((props: Props) => {
-  const sum = useMemo(
-    () => props.numList.reduce((a, b) => a + b, 0),
-    [props.numList],
-  );
+  const sum = useMemo(() => Arr.sum(props.numList), [props.numList]);
 
   return <div>{sum}</div>;
 });
@@ -66,10 +61,7 @@ ArgAnnotated.displayName = 'ArgAnnotated';
 export const ArgAnnotatedAsInline = memo<Props>(
   // eslint-disable-next-line react-coding-style/props-type-annotation-style, @typescript-eslint/prefer-readonly-parameter-types, react/prefer-read-only-props
   (props: { numList: readonly number[] }) => {
-    const sum = useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   },
@@ -81,10 +73,7 @@ ArgAnnotatedAsInline.displayName = 'ArgAnnotatedAsInline';
 export const ArgAnnotatedAsInlineWithTypeReference = memo<Props>(
   // eslint-disable-next-line react-coding-style/props-type-annotation-style
   (props: Readonly<{ numList: readonly number[] }>) => {
-    const sum = useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   },
@@ -99,10 +88,7 @@ export const MemoWithoutTypeArgument: MemoExoticComponent<
 > =
   // eslint-disable-next-line react-coding-style/react-memo-type-parameter
   memo((props) => {
-    const sum = useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   });
@@ -130,10 +116,7 @@ MemoAnnotatedAsAny.displayName = 'MemoAnnotatedAsAny';
 // eslint-disable-next-line react-coding-style/react-memo-type-parameter
 export const MemoAnnotatedAsInline = memo<{ numList: readonly number[] }>(
   (props) => {
-    const sum = useMemo(
-      () => props.numList.reduce((a, b) => a + b, 0),
-      [props.numList],
-    );
+    const sum = useMemo(() => Arr.sum(props.numList), [props.numList]);
 
     return <div>{sum}</div>;
   },
@@ -146,10 +129,7 @@ export const MemoAnnotatedAsInlineWithTypeReference = memo<
   // eslint-disable-next-line react-coding-style/react-memo-type-parameter
   Readonly<{ numList: readonly number[] }>
 >((props) => {
-  const sum = useMemo(
-    () => props.numList.reduce((a, b) => a + b, 0),
-    [props.numList],
-  );
+  const sum = useMemo(() => Arr.sum(props.numList), [props.numList]);
 
   return <div>{sum}</div>;
 });
@@ -160,7 +140,7 @@ MemoAnnotatedAsInlineWithTypeReference.displayName =
 // NG
 // eslint-disable-next-line react-coding-style/react-memo-props-argument-name
 export const ArgSpread = memo<Props>(({ numList }) => {
-  const sum = useMemo(() => numList.reduce((a, b) => a + b, 0), [numList]);
+  const sum = useMemo(() => Arr.sum(numList), [numList]);
 
   return <div>{sum}</div>;
 });
@@ -170,10 +150,7 @@ ArgSpread.displayName = 'ArgSpread';
 // NG
 // eslint-disable-next-line react-coding-style/component-name
 const TooooooooooooooooooooooooLongComponentName = memo<Props>((props) => {
-  const sum = useMemo(
-    () => props.numList.reduce((a, b) => a + b, 0),
-    [props.numList],
-  );
+  const sum = useMemo(() => Arr.sum(props.numList), [props.numList]);
 
   return <div>{sum}</div>;
 });

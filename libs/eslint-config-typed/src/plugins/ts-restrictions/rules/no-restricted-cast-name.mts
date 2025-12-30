@@ -62,7 +62,7 @@ const getTypeName = (
     }
 
     if (typeName.type === AST_NODE_TYPES.TSQualifiedName) {
-      const parts: string[] = [];
+      const mut_parts: string[] = [];
 
       // eslint-disable-next-line functional/no-let
       let current:
@@ -72,8 +72,7 @@ const getTypeName = (
       while (current.type === AST_NODE_TYPES.TSQualifiedName) {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (current.right.type === AST_NODE_TYPES.Identifier) {
-          // eslint-disable-next-line functional/immutable-data
-          parts.unshift(current.right.name);
+          mut_parts.unshift(current.right.name);
         }
 
         if (
@@ -87,11 +86,10 @@ const getTypeName = (
       }
 
       if (current.type === AST_NODE_TYPES.Identifier) {
-        // eslint-disable-next-line functional/immutable-data
-        parts.unshift(current.name);
+        mut_parts.unshift(current.name);
       }
 
-      return parts.join('.');
+      return mut_parts.join('.');
     }
   }
 
@@ -157,15 +155,13 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
   create: (context) => {
     const options = context.options;
 
-    const restrictedTypes = new Map<string, FixWithOption | undefined>();
+    const mut_restrictedTypes = new Map<string, FixWithOption | undefined>();
 
     for (const option of options) {
       if (typeof option === 'string') {
-        // eslint-disable-next-line functional/immutable-data
-        restrictedTypes.set(option, undefined);
+        mut_restrictedTypes.set(option, undefined);
       } else {
-        // eslint-disable-next-line functional/immutable-data
-        restrictedTypes.set(option.name, option.fixWith);
+        mut_restrictedTypes.set(option.name, option.fixWith);
       }
     }
 
@@ -207,9 +203,9 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
 
         if (typeName === undefined) return;
 
-        const fixWith = restrictedTypes.get(typeName);
+        const fixWith = mut_restrictedTypes.get(typeName);
 
-        if (fixWith === undefined && !restrictedTypes.has(typeName)) return;
+        if (fixWith === undefined && !mut_restrictedTypes.has(typeName)) return;
 
         context.report({
           node: node.typeAnnotation,
@@ -233,9 +229,9 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
 
         if (typeName === undefined) return;
 
-        const fixWith = restrictedTypes.get(typeName);
+        const fixWith = mut_restrictedTypes.get(typeName);
 
-        if (fixWith === undefined && !restrictedTypes.has(typeName)) return;
+        if (fixWith === undefined && !mut_restrictedTypes.has(typeName)) return;
 
         context.report({
           node: node.typeAnnotation,
