@@ -6,7 +6,7 @@ minimumReleaseAge: 10080 # = 7 days
 minimumReleaseAgeExclude:
   - '@types/**'
   - ts-type-forge
-  # - ts-data-forge
+  - ts-data-forge
   - ts-fortress
   - ts-repo-utils
   - eslint-config-typed

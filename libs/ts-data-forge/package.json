@@ -101,7 +101,7 @@
     "conventional-changelog-conventionalcommits": "9.1.0",
     "cspell": "9.4.0",
     "eslint": "9.39.2",
-    "eslint-config-typed": "4.1.0",
+    "eslint-config-typed": "4.3.0",
     "github-settings-as-code": "1.0.6",
     "immer": "11.1.0",
     "jiti": "2.6.1",
