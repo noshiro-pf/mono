@@ -1,3 +1,9 @@
+## [7.9.7](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.6...v7.9.7) (2025-12-31)
+
+### Bug Fixes
+
+- update dependencies ([#248](https://github.com/noshiro-pf/ts-repo-utils/issues/248)) ([1430081](https://github.com/noshiro-pf/ts-repo-utils/commit/14300813270383f9e057c578cf1e2136d6f2ff62))
+
 ## [7.9.6](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.5...v7.9.6) (2025-12-10)
 
 ### Bug Fixes
