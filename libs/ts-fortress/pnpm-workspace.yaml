@@ -7,7 +7,7 @@ minimumReleaseAgeExclude:
   - '@types/**'
   - ts-type-forge
   - ts-data-forge
-  # - ts-fortress
+  - ts-fortress
   - ts-repo-utils
   - eslint-config-typed
   - octokit-safe-types
