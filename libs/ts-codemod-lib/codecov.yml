@@ -1,0 +1,19 @@
+# Codecov configuration
+# See: https://docs.codecov.com/docs/codecov-yaml
+
+coverage:
+  status:
+    project:
+      default:
+        # Make this status informational only (won't block PRs)
+        informational: true
+    patch:
+      default:
+        # Make this status informational only (won't block PRs)
+        informational: true
+
+# Comment settings (optional)
+comment:
+  layout: 'reach, diff, flags, files'
+  behavior: default
+  require_changes: false

@@ -1,0 +1,65 @@
+name: Lint and Build
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'develop*'
+    paths-ignore:
+      - '.gitignore'
+      # - '.cspell.json'
+      # - '**.md'
+      # - '**.txt'
+      # - 'docs/**'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  lint-and-build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: true
+      matrix:
+        command:
+          - lint:fix
+          - build
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0 # To allow check-should-run-type-checks to get the diff from main
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+        id: setup_node_id
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # NOTE: To include this workflow in the branch protection rule status check,
+      # skip each step instead of skipping the entire workflow with paths-ignore.
+      - name: Check diff
+        id: check_diff_type
+        run: pnpm exec check-should-run-type-checks
+
+      - name: Run "${{ matrix.command }}"
+        if: steps.check_diff_type.outputs.should_run == 'true'
+        run: pnpm run ${{ matrix.command }}
+
+      - name: Check if there is no file diff
+        run: pnpm exec assert-repo-is-clean
