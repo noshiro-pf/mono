@@ -5,7 +5,7 @@
   ],
   "compilerOptions": {
     "paths": {
-      "typescript-template": ["./src/entry-point.mts"]
+      "ts-codemod-lib": ["./src/entry-point.mts"]
     }
   },
   "include": [

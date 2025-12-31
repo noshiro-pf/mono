@@ -51,7 +51,7 @@ jobs:
         run: pnpm run test
 
       - name: Run semantic-release
-        run: pnpm exec semantic-release --dry-run # Remove `--dry-run` for actual release
+        run: pnpm exec semantic-release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Used for npm publish

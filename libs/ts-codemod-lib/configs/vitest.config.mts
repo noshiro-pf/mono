@@ -13,7 +13,7 @@ const config = (): ViteUserConfig =>
       coverage: coverageSettings(),
 
       alias: {
-        'typescript-template': path.resolve(
+        'ts-codemod-lib': path.resolve(
           projectRootPath,
           './src/entry-point.mts',
         ),

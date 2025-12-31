@@ -1,13 +1,16 @@
 {
-  "name": "typescript-template",
+  "name": "ts-codemod-lib",
   "version": "0.1.0",
   "private": false,
   "keywords": [
-    "typescript"
+    "typescript",
+    "codemod",
+    "ast",
+    "transformation"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noshiro-pf/typescript-template.git"
+    "url": "git+https://github.com/noshiro-pf/ts-codemod-lib.git"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
