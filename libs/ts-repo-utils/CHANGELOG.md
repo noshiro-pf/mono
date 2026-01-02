@@ -1,3 +1,9 @@
+# [8.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.7...v8.0.0) (2026-01-02)
+
+### Features
+
+- **breaking:** change glob to return Result ([#249](https://github.com/noshiro-pf/ts-repo-utils/issues/249)) ([8d477a3](https://github.com/noshiro-pf/ts-repo-utils/commit/8d477a3934245aa424219a3207cf28f9eef185de))
+
 ## [7.9.7](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.6...v7.9.7) (2025-12-31)
 
 ### Bug Fixes
