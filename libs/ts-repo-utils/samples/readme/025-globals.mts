@@ -18,7 +18,11 @@ const configJson: string = await fs.readFile('./config.json', {
 
 const home = os.homedir();
 
-const files: readonly string[] = await glob('**/*.ts');
+const filesResult = await glob('**/*.ts');
+
+const files: readonly string[] = Result.isOk(filesResult)
+  ? filesResult.value
+  : [];
 
 if (isDirectlyExecuted(import.meta.url)) {
   echo('Running as CLI');

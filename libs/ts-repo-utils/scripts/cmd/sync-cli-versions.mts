@@ -1,3 +1,4 @@
+import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -20,7 +21,15 @@ const syncCliVersions = async (): Promise<void> => {
   // Step 2: Find all CLI command files
   const cmdDir = path.resolve(projectRootPath, './src/cmd');
 
-  const cliFiles = await glob('*.mts', { cwd: cmdDir, absolute: true });
+  const cliFilesResult = await glob('*.mts', { cwd: cmdDir, absolute: true });
+
+  if (Result.isErr(cliFilesResult)) {
+    echo(`❌ Failed to find CLI files: ${String(cliFilesResult.value)}`);
+
+    process.exit(1);
+  }
+
+  const cliFiles = cliFilesResult.value;
 
   echo(`Found ${cliFiles.length} CLI files to update:`);
 

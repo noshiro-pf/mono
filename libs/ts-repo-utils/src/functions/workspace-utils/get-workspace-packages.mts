@@ -35,12 +35,18 @@ export const getWorkspacePackages = async (
   );
 
   const packagePromises = workspacePatterns.map(async (pattern) => {
-    const matches = await glob(pattern, {
+    const globResult = await glob(pattern, {
       cwd: rootPackageJsonDir,
       ignore: ['**/node_modules/**'],
       onlyDirectories: true,
       absolute: true,
     });
+
+    if (Result.isErr(globResult)) {
+      return [];
+    }
+
+    const matches = globResult.value;
 
     const packageJsonList: readonly (
       | readonly [string, JsonValue]

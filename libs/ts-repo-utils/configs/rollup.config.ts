@@ -2,6 +2,7 @@ import * as rollupPluginReplace from '@rollup/plugin-replace';
 import * as rollupPluginStrip from '@rollup/plugin-strip';
 import * as rollupPluginTypescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
+import { castMutable, Result } from 'ts-data-forge';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 import '../src/node-global.mjs';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
@@ -12,12 +13,18 @@ const configDir = path.resolve(projectRootPath, './configs');
 
 const srcDir = path.resolve(projectRootPath, './src');
 
-const input = await glob(path.resolve(srcDir, './**/*.mts'), {
+const inputResult = await glob(path.resolve(srcDir, './**/*.mts'), {
   ignore: ['**/*.test.mts', './**/*.d.mts'],
 });
 
+if (Result.isErr(inputResult)) {
+  throw new Error(`Failed to glob input files: ${String(inputResult.value)}`);
+}
+
+const input = inputResult.value;
+
 export default defineConfig({
-  input,
+  input: castMutable(input),
   output: {
     format: 'es',
     dir: path.resolve(configDir, outDirRelative),

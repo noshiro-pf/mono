@@ -120,11 +120,18 @@ const getFilesWithIncorrectExtension = async (
     path.isAbsolute(pattern) ? pattern : `${dir}/${pattern}`,
   );
 
-  const files = await glob(`${dir}/**/*`, {
+  const filesResult = await glob(`${dir}/**/*`, {
     ignore: absoluteIgnorePatterns,
   });
 
-  // Type assertion: glob always returns string[] for this use case
+  if (Result.isErr(filesResult)) {
+    throw new Error(
+      `Failed to glob files in ${dir}: ${String(filesResult.value)}`,
+    );
+  }
+
+  const files = filesResult.value;
+
   return files.filter(
     (file) => !expectedExtensions.some((ext) => file.endsWith(ext)),
   );

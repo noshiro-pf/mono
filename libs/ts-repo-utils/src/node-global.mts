@@ -1,11 +1,11 @@
 /* eslint-disable import-x/no-internal-modules */
-import glob_ from 'fast-glob';
 import * as fs_ from 'node:fs/promises';
 import * as os_ from 'node:os';
 import * as path_ from 'node:path';
 import { chdir as chdir_ } from 'node:process';
 import { Result as Result_ } from 'ts-data-forge';
 import { $ as $_ } from './functions/exec-async.mjs';
+import { glob as glob_ } from './functions/glob.mjs';
 import { isDirectlyExecuted as isDirectlyExecuted_ } from './functions/is-directly-executed.mjs';
 
 const globalsDef = {
@@ -15,6 +15,7 @@ const globalsDef = {
   fs: fs_,
   // eslint-disable-next-line tree-shakable/import-star
   os: os_,
+
   glob: glob_,
 
   $: $_,

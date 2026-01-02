@@ -213,28 +213,32 @@ export const formatFilesGlob = async (
 
   const conditionalEcho = silent ? () => {} : echo;
 
-  try {
-    // Find all files matching the glob
-    const files = await glob(pathGlob, {
-      absolute: true,
-      ignore: ignore === false ? [] : ['**/node_modules/**', '**/.git/**'],
-      dot: true,
-    });
+  // Find all files matching the glob
+  const globResult = await glob(pathGlob, {
+    absolute: true,
+    ignore: ignore === false ? [] : ['**/node_modules/**', '**/.git/**'],
+    dot: true,
+  });
 
-    if (files.length === 0) {
-      conditionalEcho('No files found matching pattern:', pathGlob);
+  if (Result.isErr(globResult)) {
+    const error = globResult.value;
 
-      return Result.ok(undefined);
-    }
-
-    return await formatFiles(files, { silent, ignoreUnknown, ignore });
-  } catch (error) {
     if (!silent) {
       console.error('Error in formatFiles:', error);
     }
 
     return Result.err(error);
   }
+
+  const files = globResult.value;
+
+  if (files.length === 0) {
+    conditionalEcho('No files found matching pattern:', pathGlob);
+
+    return Result.ok(undefined);
+  }
+
+  return formatFiles(files, { silent, ignoreUnknown, ignore });
 };
 
 /**

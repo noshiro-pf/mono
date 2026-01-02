@@ -81,6 +81,7 @@
     "z:vitest:node": "vitest --config ./configs/vitest.config.mts --project='Node.js'"
   },
   "dependencies": {
+    "@nodelib/fs.walk": "^3.0.1",
     "@sindresorhus/is": "^7.1.1",
     "@types/micromatch": "^4.0.10",
     "cmd-ts": "^0.14.3",
