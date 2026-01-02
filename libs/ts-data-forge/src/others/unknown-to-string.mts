@@ -1,5 +1,4 @@
-import { isError } from '@sindresorhus/is';
-import { isNonNullish } from '../guard/index.mjs';
+import { isDate, isError, isMap, isRegExp, isSet } from '@sindresorhus/is';
 
 /**
  * Converts an unknown value to its string representation in a type-safe manner.
@@ -17,6 +16,11 @@ import { isNonNullish } from '../guard/index.mjs';
  * - Functions: converted to their string representation
  * - null: returns "null" (not "null" from JSON)
  * - undefined: returns "undefined"
+ * - Date: converted to ISO string
+ * - RegExp: converted to regex literal string
+ * - Map: converted to Map representation with entries
+ * - Set: converted to Set representation with values
+ * - Error: returns error message
  * - Objects: JSON stringified (with optional pretty printing)
  *
  * @param value - The unknown value to convert to string
@@ -47,25 +51,61 @@ export const unknownToString = (
     case 'function':
       return value.toString();
 
-    case 'object':
-      if (!isNonNullish(value)) {
+    case 'undefined':
+      return 'undefined';
+
+    case 'object': {
+      if (value === null) {
         return 'null';
       }
 
       try {
-        const stringified =
-          options?.prettyPrintObject === true
-            ? JSON.stringify(value, undefined, 2)
-            : JSON.stringify(value);
+        // Special handling for Date
+        if (isDate(value)) {
+          return value.toISOString();
+        }
 
-        return stringified;
+        // Special handling for RegExp
+        if (isRegExp(value)) {
+          return value.toString();
+        }
+
+        if (isError(value)) {
+          return value.message;
+        }
+
+        const prettyPrintObject = options?.prettyPrintObject === true;
+
+        // Special handling for Map
+        if (isMap(value)) {
+          const entries = Array.from(value.entries());
+
+          const entriesStr = prettyPrintObject
+            ? JSON.stringify(entries, undefined, 2)
+            : JSON.stringify(entries);
+
+          return `Map(${entriesStr})`;
+        }
+
+        // Special handling for Set
+        if (isSet(value)) {
+          const values = Array.from(value.values());
+
+          const valuesStr = prettyPrintObject
+            ? JSON.stringify(values, undefined, 2)
+            : JSON.stringify(values);
+
+          return `Set(${valuesStr})`;
+        }
+
+        return prettyPrintObject
+          ? JSON.stringify(value, undefined, 2)
+          : JSON.stringify(value);
       } catch (error) {
         return isError(error)
           ? error.message
           : '[Circular or Non-serializable]';
       }
-
-    case 'undefined':
-      return 'undefined';
+    }
   }
 };
