@@ -1,3 +1,9 @@
+# [6.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.1.1...v6.2.0) (2026-01-02)
+
+### Features
+
+- Improved handling of objects in unknownToString ([#255](https://github.com/noshiro-pf/ts-data-forge/issues/255)) ([121814b](https://github.com/noshiro-pf/ts-data-forge/commit/121814bdff20fa227aa8e82ebe4b98bd11969e1e))
+
 ## [6.1.1](https://github.com/noshiro-pf/ts-data-forge/compare/v6.1.0...v6.1.1) (2025-12-27)
 
 ### Bug Fixes
