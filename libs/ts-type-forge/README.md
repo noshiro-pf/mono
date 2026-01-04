@@ -21,7 +21,7 @@ This library offers a comprehensive suite of type-level utilities, including:
 - **Array and Tuple Utilities**: Type-safe operations with `List` and `Tuple` namespaces for complex array manipulations.
 - **Record Manipulation**: Deep operations like `DeepReadonly`, `DeepPartial`, and advanced path-based record updates.
 - **Type-Level Arithmetic**: Integer operations, ranges (`UintRange`), and mathematical type computations.
-- **Global Type Availability**: No need for import statements when using Triple-Slash Directives.
+- **Global Type Availability**: **No need for import statements** when using Triple-Slash Directives.
 - **Zero Runtime Cost**: Pure type-level operations with no runtime dependencies.
 - **Comprehensive Testing**: Thoroughly tested for type correctness with custom type-testing utilities.
 
@@ -68,7 +68,7 @@ ts-type-forge works best with strict TypeScript settings:
 There are two ways to use the types provided by `ts-type-forge`:
 
 1. **Triple-Slash Directive (Recommended for global availability):**
-   Add `/// <reference types="ts-type-forge" />` to any `.ts` file in your project (e.g., `globals.d.ts` or at the top of a frequently used file). This makes all types from `ts-type-forge` globally available without needing explicit imports.
+   Add `/// <reference types="ts-type-forge" />` to any `.ts` file in your project (e.g., `globals.d.ts` or at the top of a frequently used file included in the tsconfig.json). This makes all types from `ts-type-forge` globally available without needing explicit imports.
 
     ```ts
     // src/globals.d.ts or any other .ts file
@@ -218,7 +218,6 @@ const config: ReadonlyConfig = {
 };
 
 // @ts-expect-error Cannot assign to 'port' because it is a read-only property
-// eslint-disable-next-line unicorn/no-immediate-mutation
 config.port = 8081;
 
 // @ts-expect-error Cannot assign to 'host' because it is a read-only property

@@ -70,6 +70,7 @@ export default [
       'import-x/no-internal-modules': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       'functional/immutable-data': 'off',
+      'unicorn/no-immediate-mutation': 'off',
     }),
   },
 ] satisfies readonly FlatConfig[];

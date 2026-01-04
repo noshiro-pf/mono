@@ -28,7 +28,6 @@ const config: ReadonlyConfig = {
 };
 
 // @ts-expect-error Cannot assign to 'port' because it is a read-only property
-// eslint-disable-next-line unicorn/no-immediate-mutation
 config.port = 8081;
 
 // @ts-expect-error Cannot assign to 'host' because it is a read-only property
