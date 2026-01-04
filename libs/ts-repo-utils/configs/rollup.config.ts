@@ -2,7 +2,7 @@ import * as rollupPluginReplace from '@rollup/plugin-replace';
 import * as rollupPluginStrip from '@rollup/plugin-strip';
 import * as rollupPluginTypescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
-import { castMutable, Result } from 'ts-data-forge';
+import { castMutable, Result, unknownToString } from 'ts-data-forge';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 import '../src/node-global.mjs';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
@@ -18,13 +18,13 @@ const inputResult = await glob(path.resolve(srcDir, './**/*.mts'), {
 });
 
 if (Result.isErr(inputResult)) {
-  throw new Error(`Failed to glob input files: ${String(inputResult.value)}`);
+  throw new Error(
+    `Failed to glob input files: ${unknownToString(inputResult.value)}`,
+  );
 }
 
-const input = inputResult.value;
-
 export default defineConfig({
-  input: castMutable(input),
+  input: castMutable(inputResult.value),
   output: {
     format: 'es',
     dir: path.resolve(configDir, outDirRelative),
