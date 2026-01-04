@@ -1,3 +1,9 @@
+## [8.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.0.0...v8.0.1) (2026-01-04)
+
+### Bug Fixes
+
+- fix glob ([#250](https://github.com/noshiro-pf/ts-repo-utils/issues/250)) ([d7eefb0](https://github.com/noshiro-pf/ts-repo-utils/commit/d7eefb08976cc317968ec33c88b01c50205f2fb5))
+
 # [8.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v7.9.7...v8.0.0) (2026-01-02)
 
 ### Features
