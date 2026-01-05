@@ -1,3 +1,9 @@
+## [6.2.1](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.0...v6.2.1) (2026-01-05)
+
+### Bug Fixes
+
+- bump @sindresorhus/is from 7.1.1 to 7.2.0 ([#180](https://github.com/noshiro-pf/ts-fortress/issues/180)) ([1561fd6](https://github.com/noshiro-pf/ts-fortress/commit/1561fd6d1d9c698e107dc7c0d36a9c7c1e9c33ad))
+
 # [6.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.1.0...v6.2.0) (2025-12-27)
 
 ### Features
