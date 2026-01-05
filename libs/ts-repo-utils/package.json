@@ -82,7 +82,7 @@
   },
   "dependencies": {
     "@nodelib/fs.walk": "^3.0.1",
-    "@sindresorhus/is": "^7.1.1",
+    "@sindresorhus/is": "^7.2.0",
     "@types/micromatch": "^4.0.10",
     "cmd-ts": "^0.14.3",
     "fast-glob": "^3.3.3",
