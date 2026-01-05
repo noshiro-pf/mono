@@ -1,3 +1,9 @@
+## [4.3.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.3.0...v4.3.1) (2026-01-05)
+
+### Bug Fixes
+
+- bump @sindresorhus/is from 7.1.1 to 7.2.0 ([#206](https://github.com/noshiro-pf/eslint-config-typed/issues/206)) ([1669d03](https://github.com/noshiro-pf/eslint-config-typed/commit/1669d0338d96a6118340c202eac74da2f16927f0))
+
 # [4.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.2.1...v4.3.0) (2025-12-30)
 
 ### Features
