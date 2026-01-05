@@ -76,7 +76,7 @@
     "z:vitest:node": "vitest --config ./configs/vitest.config.mts --project='Node.js'"
   },
   "dependencies": {
-    "@sindresorhus/is": "^7.1.1",
+    "@sindresorhus/is": "^7.2.0",
     "ts-type-forge": "^2.3.0"
   },
   "devDependencies": {

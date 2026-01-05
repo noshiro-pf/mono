@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@sindresorhus/is':
-        specifier: ^7.1.1
-        version: 7.1.1
+        specifier: ^7.2.0
+        version: 7.2.0
       ts-type-forge:
         specifier: ^2.3.0
         version: 2.3.0
@@ -1177,8 +1177,8 @@ packages:
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
 
-  '@sindresorhus/is@7.1.1':
-    resolution: {integrity: sha512-rO92VvpgMc3kfiTjGT52LEtJ8Yc5kCWhZjLQ3LwlA4pSgPpQO7bVpYXParOD8Jwf+cVQECJo3yP/4I8aZtUQTQ==}
+  '@sindresorhus/is@7.2.0':
+    resolution: {integrity: sha512-P1Cz1dWaFfR4IR+U13mqqiGsLFf1KbayybWwdd2vfctdV6hDpUkgCY0nKOLLTMSoRd/jJNjtbqzf13K8DCCXQw==}
     engines: {node: '>=18'}
 
   '@sindresorhus/merge-streams@4.0.0':
@@ -5507,7 +5507,7 @@ snapshots:
 
   '@sindresorhus/is@4.6.0': {}
 
-  '@sindresorhus/is@7.1.1': {}
+  '@sindresorhus/is@7.2.0': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
@@ -6594,7 +6594,7 @@ snapshots:
   eslint-config-typed@4.3.0(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.16):
     dependencies:
       '@eslint/js': 9.39.2
-      '@sindresorhus/is': 7.1.1
+      '@sindresorhus/is': 7.2.0
       '@stylistic/eslint-plugin': 5.6.1(eslint@9.39.2(jiti@2.6.1))
       '@types/eslint': 9.6.1
       '@typescript-eslint/eslint-plugin': 8.50.1(@typescript-eslint/parser@8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -8841,13 +8841,13 @@ snapshots:
 
   ts-data-forge@5.1.1(typescript@5.9.3):
     dependencies:
-      '@sindresorhus/is': 7.1.1
+      '@sindresorhus/is': 7.2.0
       ts-type-forge: 2.3.0
       typescript: 5.9.3
 
   ts-data-forge@6.1.1(typescript@5.9.3):
     dependencies:
-      '@sindresorhus/is': 7.1.1
+      '@sindresorhus/is': 7.2.0
       ts-type-forge: 2.3.0
       typescript: 5.9.3
 
@@ -8858,7 +8858,7 @@ snapshots:
 
   ts-fortress@6.2.0(typescript@5.9.3):
     dependencies:
-      '@sindresorhus/is': 7.1.1
+      '@sindresorhus/is': 7.2.0
       ts-data-forge: 6.1.1(typescript@5.9.3)
       ts-type-forge: 2.3.0
     transitivePeerDependencies:
@@ -8866,7 +8866,7 @@ snapshots:
 
   ts-repo-utils@7.9.5(prettier@3.7.4)(typescript@5.9.3):
     dependencies:
-      '@sindresorhus/is': 7.1.1
+      '@sindresorhus/is': 7.2.0
       '@types/micromatch': 4.0.10
       cmd-ts: 0.14.3
       fast-glob: 3.3.3
@@ -8881,7 +8881,7 @@ snapshots:
   ts-repo-utils@8.0.0(prettier@3.7.4)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
-      '@sindresorhus/is': 7.1.1
+      '@sindresorhus/is': 7.2.0
       '@types/micromatch': 4.0.10
       cmd-ts: 0.14.3
       fast-glob: 3.3.3
