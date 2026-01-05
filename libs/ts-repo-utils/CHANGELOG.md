@@ -1,3 +1,9 @@
+## [8.0.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.0.1...v8.0.2) (2026-01-05)
+
+### Bug Fixes
+
+- bump @sindresorhus/is from 7.1.1 to 7.2.0 ([#251](https://github.com/noshiro-pf/ts-repo-utils/issues/251)) ([cf98678](https://github.com/noshiro-pf/ts-repo-utils/commit/cf98678267b7415ea1a7edb48a5de56db91dcf25))
+
 ## [8.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.0.0...v8.0.1) (2026-01-04)
 
 ### Bug Fixes
