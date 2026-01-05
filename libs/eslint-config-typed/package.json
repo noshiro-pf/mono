@@ -72,7 +72,7 @@
   },
   "dependencies": {
     "@eslint/js": "9.39.2",
-    "@sindresorhus/is": "^7.1.1",
+    "@sindresorhus/is": "^7.2.0",
     "@stylistic/eslint-plugin": "^5.6.1",
     "@types/eslint": "9.6.1",
     "@typescript-eslint/eslint-plugin": "8.50.1",
