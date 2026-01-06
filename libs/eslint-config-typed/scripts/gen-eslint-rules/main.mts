@@ -104,7 +104,13 @@ const generate = async (
 const lintFix = async (
   targetFileNames?: NonEmptyArray<string>,
 ): Promise<Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>> => {
-  const allFiles: readonly string[] = await glob(`${outDir}/*.mts`);
+  const globResult = await glob(`${outDir}/*.mts`);
+
+  if (Result.isErr(globResult)) {
+    return { type: 'error', error: globResult.value };
+  }
+
+  const allFiles: readonly string[] = globResult.value;
 
   const targetFiles =
     targetFileNames === undefined

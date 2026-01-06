@@ -61,6 +61,7 @@ export const eslintVitestRules = {
   'vitest/prefer-snapshot-hint': withDefaultOption('error'),
   'vitest/prefer-spy-on': 'error',
   'vitest/prefer-todo': 'error',
+  'vitest/prefer-mock-return-shorthand': 'error',
 
   /* eslint-plugin-vitest specific rules */
 

@@ -36,10 +36,7 @@ export const reactMemoPropsArgumentNameRule: TSESLint.RuleModule<MessageIds> = {
       const arrowFunction = getReactMemoArrowFunction(node);
 
       // Detect `React.memo<Props>(({ prop1, prop2 }) => { ... })`
-      if (
-        arrowFunction === undefined ||
-        arrowFunction.body.type !== AST_NODE_TYPES.BlockStatement
-      ) {
+      if (arrowFunction?.body.type !== AST_NODE_TYPES.BlockStatement) {
         return;
       }
 

@@ -60,6 +60,7 @@ export const eslintJestRules = {
   'jest/prefer-snapshot-hint': withDefaultOption('error'),
   'jest/prefer-spy-on': 'error',
   'jest/prefer-todo': 'error',
+  'jest/prefer-mock-return-shorthand': 'error',
 
   /* eslint-plugin-jest specific rules */
 

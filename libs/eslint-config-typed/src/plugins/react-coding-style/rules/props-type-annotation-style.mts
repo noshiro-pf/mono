@@ -31,19 +31,13 @@ export const propsTypeAnnotationStyleRule: TSESLint.RuleModule<MessageIds> = {
 
       const arrowFunction = getReactMemoArrowFunction(node);
 
-      if (
-        arrowFunction === undefined ||
-        arrowFunction.body.type !== AST_NODE_TYPES.BlockStatement
-      ) {
+      if (arrowFunction?.body.type !== AST_NODE_TYPES.BlockStatement) {
         return;
       }
 
       const [firstParam] = arrowFunction.params;
 
-      if (
-        firstParam === undefined ||
-        firstParam.type !== AST_NODE_TYPES.Identifier
-      ) {
+      if (firstParam?.type !== AST_NODE_TYPES.Identifier) {
         return;
       }
 

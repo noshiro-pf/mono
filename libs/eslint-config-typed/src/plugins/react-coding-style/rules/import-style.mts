@@ -84,8 +84,8 @@ export const importStyleRule: TSESLint.RuleModule<MessageIds, Options> = {
             const [firstSpecifier] = node.specifiers;
 
             if (
-              firstSpecifier === undefined ||
-              firstSpecifier.type !== AST_NODE_TYPES.ImportNamespaceSpecifier ||
+              firstSpecifier?.type !==
+                AST_NODE_TYPES.ImportNamespaceSpecifier ||
               node.specifiers.length !== 1
             ) {
               context.report({

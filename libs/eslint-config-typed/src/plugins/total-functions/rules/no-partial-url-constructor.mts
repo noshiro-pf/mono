@@ -49,8 +49,7 @@ export const noPartialUrlConstructor = createRule({
         ) {
           if (
             node.arguments.length === 1 &&
-            node.arguments[0] !== undefined &&
-            node.arguments[0].type === AST_NODE_TYPES.Literal &&
+            node.arguments[0]?.type === AST_NODE_TYPES.Literal &&
             typeof node.arguments[0].value === 'string'
           ) {
             if (!isValidUrl(node.arguments[0].value)) {
@@ -65,11 +64,9 @@ export const noPartialUrlConstructor = createRule({
 
           if (
             node.arguments.length === 2 &&
-            node.arguments[0] !== undefined &&
-            node.arguments[0].type === AST_NODE_TYPES.Literal &&
+            node.arguments[0]?.type === AST_NODE_TYPES.Literal &&
             typeof node.arguments[0].value === 'string' &&
-            node.arguments[1] !== undefined &&
-            node.arguments[1].type === AST_NODE_TYPES.Literal &&
+            node.arguments[1]?.type === AST_NODE_TYPES.Literal &&
             typeof node.arguments[1].value === 'string'
           ) {
             if (!isValidUrl(node.arguments[0].value, node.arguments[1].value)) {

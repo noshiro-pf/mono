@@ -4807,7 +4807,6 @@ namespace NoDuplicateTypeConstituents {
  *  | :---------- | :--------- |
  *  | type        | suggestion |
  *  | deprecated  | false      |
- *  | fixable     | code       |
  *  | recommended | strict     |
  *  ```
  */

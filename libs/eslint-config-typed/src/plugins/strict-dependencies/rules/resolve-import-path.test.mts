@@ -118,13 +118,13 @@ const useFixture = (fixtureName: FixtureName | undefined): void => {
 
   const compilerOptions = compilerOptionsByFixture[fixtureName];
 
-  mockFindConfigFile.mockImplementation(() => 'tsconfig.json');
+  mockFindConfigFile.mockReturnValue('tsconfig.json');
 
-  mockGetParsedCommandLine.mockImplementation(() => ({
+  mockGetParsedCommandLine.mockReturnValue({
     options: { ...compilerOptions },
     fileNames: [],
     errors: [],
-  }));
+  });
 };
 
 const aliasCases = [

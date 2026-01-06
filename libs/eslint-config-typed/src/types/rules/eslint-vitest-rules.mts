@@ -1486,6 +1486,24 @@ namespace PreferMockPromiseShorthand {
 }
 
 /**
+ * Prefer mock return shorthands
+ *
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-mock-return-shorthand.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferMockReturnShorthand {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Enforce including a hint with external snapshots
  *
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-snapshot-hint.md
@@ -2205,6 +2223,7 @@ export type EslintVitestRules = Readonly<{
   'vitest/prefer-importing-vitest-globals': PreferImportingVitestGlobals.RuleEntry;
   'vitest/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
   'vitest/prefer-mock-promise-shorthand': PreferMockPromiseShorthand.RuleEntry;
+  'vitest/prefer-mock-return-shorthand': PreferMockReturnShorthand.RuleEntry;
   'vitest/prefer-snapshot-hint': PreferSnapshotHint.RuleEntry;
   'vitest/prefer-spy-on': PreferSpyOn.RuleEntry;
   'vitest/prefer-strict-boolean-matchers': PreferStrictBooleanMatchers.RuleEntry;

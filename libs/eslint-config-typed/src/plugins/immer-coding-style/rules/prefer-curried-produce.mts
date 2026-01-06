@@ -40,8 +40,7 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
         const param = node.params[0];
 
         if (
-          param === undefined ||
-          param.type !== AST_NODE_TYPES.Identifier ||
+          param?.type !== AST_NODE_TYPES.Identifier ||
           param.name.length === 0
         ) {
           return;

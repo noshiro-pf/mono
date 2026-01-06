@@ -48,8 +48,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
       ForStatement: (node) => {
         // Check init: let i = begin
         if (
-          node.init === null ||
-          node.init.type !== AST_NODE_TYPES.VariableDeclaration ||
+          node.init?.type !== AST_NODE_TYPES.VariableDeclaration ||
           node.init.kind !== 'let' ||
           !Arr.isArrayOfLength(node.init.declarations, 1)
         ) {
@@ -71,8 +70,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
 
         // Check test: i < end
         if (
-          node.test === null ||
-          node.test.type !== AST_NODE_TYPES.BinaryExpression ||
+          node.test?.type !== AST_NODE_TYPES.BinaryExpression ||
           node.test.operator !== '<' ||
           node.test.left.type !== AST_NODE_TYPES.Identifier ||
           node.test.left.name !== varName
