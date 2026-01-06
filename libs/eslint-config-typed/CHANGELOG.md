@@ -1,3 +1,9 @@
+# [4.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.3.1...v4.4.0) (2026-01-06)
+
+### Features
+
+- improve error handling in lintFix function and update ESLint rules ([#210](https://github.com/noshiro-pf/eslint-config-typed/issues/210)) ([ddf5721](https://github.com/noshiro-pf/eslint-config-typed/commit/ddf57213a42fad1fff56720eab1cf8409b02ca23))
+
 ## [4.3.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.3.0...v4.3.1) (2026-01-05)
 
 ### Bug Fixes
