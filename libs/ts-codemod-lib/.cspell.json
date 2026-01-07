@@ -4,7 +4,7 @@
   "allowCompoundWords": true,
   "caseSensitive": false,
   "ignoreRandomStrings": true,
-  "words": ["noshiro", "testw", "tscw"],
+  "words": ["noshiro", "testw", "tscw", "klass"],
   "ignorePaths": [
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",

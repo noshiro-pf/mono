@@ -24,9 +24,7 @@ const config = (): ViteUserConfig =>
           test: {
             name: 'Node.js',
             environment: 'node',
-            ...projectConfig({
-              additionalExcludes: ['src/browser/**'],
-            }),
+            ...projectConfig(),
             typecheck: {
               tsconfig: path.resolve(
                 projectRootPath,
@@ -38,9 +36,7 @@ const config = (): ViteUserConfig =>
         {
           test: {
             name: 'Browser',
-            ...projectConfig({
-              additionalExcludes: ['src/node/**'],
-            }),
+            ...projectConfig(),
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,
@@ -51,7 +47,16 @@ const config = (): ViteUserConfig =>
             },
           },
           optimizeDeps: {
-            include: [],
+            include: [
+              'dedent',
+              'typescript',
+              'ts-morph',
+              'ts-data-forge',
+              'prettier/parser-typescript',
+              'prettier/plugins/babel',
+              'prettier/plugins/estree',
+              'prettier/standalone',
+            ],
           },
         },
       ],
@@ -68,12 +73,11 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
-    includeSource: ['src/**/*.mts', 'samples/**/*.mts'],
-    include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
+    includeSource: ['src/functions/**/*.mts', 'samples/**/*.mts'],
+    include: ['src/functions/**/*.test.mts'],
     exclude: [
       '**/*.d.mts',
       '**/index.mts',
-      'src/entry-point.mts',
       ...(options?.additionalExcludes ?? []),
     ],
   }) as const;

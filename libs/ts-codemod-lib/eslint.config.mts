@@ -21,6 +21,13 @@ export default [
   eslintConfigForVitest(),
 
   {
+    files: ['src/**/*.mts'],
+    rules: defineKnownRules({
+      'import-x/no-unassigned-import': 'off',
+    }),
+  },
+
+  {
     files: ['test/**/*.mts', '**/*.test.mts'],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',
@@ -30,6 +37,7 @@ export default [
       '@typescript-eslint/no-restricted-types': 'off',
       '@typescript-eslint/no-redundant-type-constituents': 'off',
       'unicorn/consistent-function-scoping': 'off',
+      'import-x/no-internal-modules': 'off',
     }),
   },
 

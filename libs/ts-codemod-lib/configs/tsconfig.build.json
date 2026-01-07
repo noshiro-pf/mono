@@ -4,6 +4,8 @@
     "./tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
