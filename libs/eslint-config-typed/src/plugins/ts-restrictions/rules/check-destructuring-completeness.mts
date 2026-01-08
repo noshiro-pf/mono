@@ -161,6 +161,13 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
 
       if (!shouldCheck) return;
 
+      // If rest element is used, skip completeness check
+      const hasRestElement = node.id.properties.some(
+        (prop) => prop.type === AST_NODE_TYPES.RestElement,
+      );
+
+      if (hasRestElement) return;
+
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       const tsNode = esTreeNodeToTSNodeMap.get(node.init as never);
 
@@ -207,6 +214,13 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
 
         for (const param of node.params) {
           if (param.type === AST_NODE_TYPES.ObjectPattern) {
+            // If rest element is used, skip completeness check
+            const hasRestElement = param.properties.some(
+              (prop) => prop.type === AST_NODE_TYPES.RestElement,
+            );
+
+            if (hasRestElement) continue;
+
             // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             const tsNode = esTreeNodeToTSNodeMap.get(param as never);
 

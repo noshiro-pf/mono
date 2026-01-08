@@ -94,6 +94,38 @@ describe('check-destructuring-completeness', () => {
           `,
         },
         {
+          name: 'allows rest parameter without directive comment',
+          code: dedent`
+            const obj = { a: 1, b: 2, c: 3 };
+            const { a, ...rest } = obj;
+          `,
+        },
+        {
+          name: 'allows rest parameter with directive comment',
+          code: dedent`
+            const obj = { a: 1, b: 2, c: 3 };
+            // @check-destructuring-completeness
+            const { a, ...rest } = obj;
+          `,
+        },
+        {
+          name: 'allows rest parameter in React component props',
+          code: dedent`
+            type Props = { a: number; b: string; c: boolean };
+            const MyComponent = ({ a, ...rest }: Props) => <div>{a}</div>;
+          `,
+        },
+        {
+          name: 'allows rest parameter in internal destructuring',
+          code: dedent`
+            type Props = { a: number; b: string; c: boolean };
+            const MyComponent = (props: Props) => {
+              const { a, ...rest } = props;
+              return <div>{a}</div>;
+            };
+          `,
+        },
+        {
           name: 'does not check React component props when disabled - parameter',
           code: dedent`
             type Props = { a: number; b: string; c: boolean };
