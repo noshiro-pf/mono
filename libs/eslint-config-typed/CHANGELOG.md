@@ -1,3 +1,9 @@
+## [4.4.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.4.0...v4.4.1) (2026-01-08)
+
+### Bug Fixes
+
+- support rest parameters in check-destructuring-completeness ([#211](https://github.com/noshiro-pf/eslint-config-typed/issues/211)) ([7f2a032](https://github.com/noshiro-pf/eslint-config-typed/commit/7f2a032ca70ed8c6421346342102d7fb49e3a3d3))
+
 # [4.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.3.1...v4.4.0) (2026-01-06)
 
 ### Features
