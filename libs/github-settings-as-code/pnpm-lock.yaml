@@ -15,8 +15,8 @@ importers:
         specifier: ^17.2.3
         version: 17.2.3
       octokit-safe-types:
-        specifier: ^1.2.2
-        version: 1.2.2(typescript@5.9.3)
+        specifier: ^1.2.3
+        version: 1.2.3(typescript@5.9.3)
       ts-data-forge:
         specifier: ^6.1.1
         version: 6.1.1(typescript@5.9.3)
@@ -3139,8 +3139,8 @@ packages:
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
-  octokit-safe-types@1.2.2:
-    resolution: {integrity: sha512-sR2y5nZOS2pacuci811ve6rvtk0zA3Nqa7c6Ip3jf1X+E36OoDiuM2YdPmQoV9Cm9c5rDTK4MU9A6C8rDs4nCg==}
+  octokit-safe-types@1.2.3:
+    resolution: {integrity: sha512-ThR+wiMrfLOu4Yh307yzF1xqHw0Hm5oCeUmc/xHSF7xdPsNljjXisCrftV7wyY7ryLs2A6/F/QtBOlPxgWSz4A==}
 
   onetime@5.1.2:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
@@ -7466,7 +7466,7 @@ snapshots:
 
   obug@2.1.1: {}
 
-  octokit-safe-types@1.2.2(typescript@5.9.3):
+  octokit-safe-types@1.2.3(typescript@5.9.3):
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
