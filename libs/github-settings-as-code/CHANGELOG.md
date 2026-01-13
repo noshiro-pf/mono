@@ -1,3 +1,9 @@
+## [1.0.9](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.8...v1.0.9) (2026-01-13)
+
+### Bug Fixes
+
+- bump octokit-safe-types from 1.2.2 to 1.2.3 ([#35](https://github.com/noshiro-pf/github-settings-as-code/issues/35)) ([942bc04](https://github.com/noshiro-pf/github-settings-as-code/commit/942bc04f28578a4bf946164d9634b2ab39ff3d41))
+
 ## [1.0.8](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.7...v1.0.8) (2026-01-13)
 
 ### Bug Fixes
