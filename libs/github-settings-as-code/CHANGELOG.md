@@ -1,3 +1,9 @@
+## [1.0.8](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.7...v1.0.8) (2026-01-13)
+
+### Bug Fixes
+
+- bump ts-repo-utils from 7.9.5 to 8.0.2 ([#33](https://github.com/noshiro-pf/github-settings-as-code/issues/33)) ([1a48960](https://github.com/noshiro-pf/github-settings-as-code/commit/1a48960f2bb18e2711a4fa1847cac6f684b90d1e))
+
 ## [1.0.7](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.6...v1.0.7) (2025-12-31)
 
 ### Bug Fixes
