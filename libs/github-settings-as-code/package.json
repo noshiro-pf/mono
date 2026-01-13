@@ -67,7 +67,7 @@
     "@octokit/core": "7.0.6",
     "dotenv": "^17.2.3",
     "octokit-safe-types": "^1.2.3",
-    "ts-data-forge": "^6.1.1",
+    "ts-data-forge": "^6.2.1",
     "ts-fortress": "^6.2.1",
     "ts-repo-utils": "^8.0.2"
   },
