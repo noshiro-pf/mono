@@ -24,8 +24,8 @@ importers:
         specifier: ^6.2.0
         version: 6.2.0(typescript@5.9.3)
       ts-repo-utils:
-        specifier: ^7.9.5
-        version: 7.9.5(prettier@3.7.4)(typescript@5.9.3)
+        specifier: ^8.0.2
+        version: 8.0.2(prettier@3.7.4)(typescript@5.9.3)
     devDependencies:
       '@semantic-release/changelog':
         specifier: 6.0.3
@@ -686,13 +686,25 @@ packages:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
 
+  '@nodelib/fs.scandir@4.0.1':
+    resolution: {integrity: sha512-vAkI715yhnmiPupY+dq+xenu5Tdf2TBQ66jLvBIcCddtz+5Q8LbMKaf9CIJJreez8fQ8fgaY+RaywQx8RJIWpw==}
+    engines: {node: '>=18.18.0'}
+
   '@nodelib/fs.stat@2.0.5':
     resolution: {integrity: sha512-RkhPPp2zrqDAQA/2jNhnztcPAlv64XdhIp7a7454A5ovI7Bukxgt7MX7udwAu3zg1DcpPU0rz3VV1SeaqvY4+A==}
     engines: {node: '>= 8'}
 
+  '@nodelib/fs.stat@4.0.0':
+    resolution: {integrity: sha512-ctr6bByzksKRCV0bavi8WoQevU6plSp2IkllIsEqaiKe2mwNNnaluhnRhcsgGZHrrHk57B3lf95MkLMO3STYcg==}
+    engines: {node: '>=18.18.0'}
+
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@nodelib/fs.walk@3.0.1':
+    resolution: {integrity: sha512-nIh/M6Kh3ZtOmlY00DaUYB4xeeV6F3/ts1l29iwl3/cfyY/OuCfUx+v08zgx8TKPTifXRcjjqVQ4KB2zOYSbyw==}
+    engines: {node: '>=18.18.0'}
 
   '@octokit/auth-token@6.0.0':
     resolution: {integrity: sha512-P4YJBPdPSpWTQ1NU4XYdvHvXJJDxM6YwpS0FZHRgP7YFkdVxsWcpWGy/NVqlAA7PcPCnMacXlRm1y2PFZRWL/w==}
@@ -959,6 +971,10 @@ packages:
 
   '@sindresorhus/is@7.1.1':
     resolution: {integrity: sha512-rO92VvpgMc3kfiTjGT52LEtJ8Yc5kCWhZjLQ3LwlA4pSgPpQO7bVpYXParOD8Jwf+cVQECJo3yP/4I8aZtUQTQ==}
+    engines: {node: '>=18'}
+
+  '@sindresorhus/is@7.2.0':
+    resolution: {integrity: sha512-P1Cz1dWaFfR4IR+U13mqqiGsLFf1KbayybWwdd2vfctdV6hDpUkgCY0nKOLLTMSoRd/jJNjtbqzf13K8DCCXQw==}
     engines: {node: '>=18'}
 
   '@sindresorhus/merge-streams@4.0.0':
@@ -3779,11 +3795,12 @@ packages:
   ts-fortress@6.2.0:
     resolution: {integrity: sha512-ae3JDB7IFjajTBBZWsXabEBXXLdfYciNES1W4Yrjr/IBoGnga9kcYfjZ8i+SO0YimRywimzG6/ZAgdaBNEOu8w==}
 
-  ts-repo-utils@7.9.5:
-    resolution: {integrity: sha512-ET4dQAQYV9tQbiWL+vxAafdR445KTFFp7WAxWqVhrqTWJiAJPJ74p0m31iCC/AsaemExP+CoTPVi86NYsNEn9Q==}
+  ts-repo-utils@8.0.2:
+    resolution: {integrity: sha512-HgstcPr7azrpPgVOQgnv4ML7F8kctBdMTHvaNmkMjva43jyXCu9IKIm2XDfL9I0D6+Fslcb7OrcVKZprMRGYrg==}
+    engines: {node: '>=22', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
-      prettier: ^3.7.3
+      prettier: '>=3.0.0'
 
   ts-type-forge@2.3.0:
     resolution: {integrity: sha512-uw0cVIRqy/wBU4KoQQf8udxfnzz50IXBEOUKlgYRICu7EpUxHhe8BLrFkxQH40gEI13HheFKvkT2fTRiXf2UDA==}
@@ -4658,11 +4675,23 @@ snapshots:
       '@nodelib/fs.stat': 2.0.5
       run-parallel: 1.2.0
 
+  '@nodelib/fs.scandir@4.0.1':
+    dependencies:
+      '@nodelib/fs.stat': 4.0.0
+      run-parallel: 1.2.0
+
   '@nodelib/fs.stat@2.0.5': {}
+
+  '@nodelib/fs.stat@4.0.0': {}
 
   '@nodelib/fs.walk@1.2.8':
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
+      fastq: 1.20.1
+
+  '@nodelib/fs.walk@3.0.1':
+    dependencies:
+      '@nodelib/fs.scandir': 4.0.1
       fastq: 1.20.1
 
   '@octokit/auth-token@6.0.0': {}
@@ -4944,6 +4973,8 @@ snapshots:
   '@sindresorhus/is@4.6.0': {}
 
   '@sindresorhus/is@7.1.1': {}
+
+  '@sindresorhus/is@7.2.0': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
@@ -8169,9 +8200,10 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  ts-repo-utils@7.9.5(prettier@3.7.4)(typescript@5.9.3):
+  ts-repo-utils@8.0.2(prettier@3.7.4)(typescript@5.9.3):
     dependencies:
-      '@sindresorhus/is': 7.1.1
+      '@nodelib/fs.walk': 3.0.1
+      '@sindresorhus/is': 7.2.0
       '@types/micromatch': 4.0.10
       cmd-ts: 0.14.3
       fast-glob: 3.3.3
