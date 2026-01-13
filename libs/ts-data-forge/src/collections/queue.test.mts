@@ -1,7 +1,7 @@
 import { Arr } from '../array/index.mjs';
 import { Optional } from '../functional/index.mjs';
 import { range } from '../iterator/index.mjs';
-import { asUint32 } from '../number/index.mjs';
+import { asUint32, Uint32 } from '../number/index.mjs';
 import { createQueue, type Queue } from './queue.mjs';
 
 describe('Queue test', () => {
@@ -229,6 +229,171 @@ describe('Queue test', () => {
       assert.isTrue(q.isEmpty);
     });
 
+    test('should handle tail wrapping around to index 0', () => {
+      const q = createQueue<number>();
+
+      // Initial capacity is 8, fill up to 7 elements (leaving one space)
+      for (const i of range(1, 8)) {
+        q.enqueue(i);
+      }
+
+      // Dequeue 3 elements to move head forward
+      expect(Optional.unwrap(q.dequeue())).toBe(1);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(2);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(3);
+
+      // Now head=3, tail=7, size=4
+      // Add one more element - tail should wrap to 0
+      q.enqueue(8);
+
+      // tail is now 0, head is 3
+      // Add more to confirm wraparound works
+      q.enqueue(9);
+
+      q.enqueue(10);
+
+      // Verify all elements in correct order
+      expect(Optional.unwrap(q.dequeue())).toBe(4);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(5);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(6);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(7);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(8);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(9);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(10);
+
+      assert.isTrue(q.isEmpty);
+    });
+
+    test('should handle head wrapping around to index 0', () => {
+      const q = createQueue<number>();
+
+      // Fill to capacity-1, dequeue all, then add one
+      for (const i of range(1, 8)) {
+        q.enqueue(i);
+      }
+
+      // Dequeue all to move head to index 7
+      for (const i of range(1, 8)) {
+        expect(Optional.unwrap(q.dequeue())).toBe(i);
+      }
+
+      // Now head=7, tail=7, size=0
+      // Add element - tail becomes 0 (wrapped)
+      q.enqueue(100);
+
+      // Add more elements
+      q.enqueue(101);
+
+      q.enqueue(102);
+
+      // Dequeue all - head should wrap from 7 to 0 to 1 to 2
+      expect(Optional.unwrap(q.dequeue())).toBe(100);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(101);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(102);
+
+      assert.isTrue(q.isEmpty);
+    });
+
+    test('should handle filling buffer to exact capacity', () => {
+      const q = createQueue<number>();
+
+      // Initial capacity is 8, fill exactly 8 elements
+      for (const i of range(1, 9)) {
+        q.enqueue(i);
+      }
+
+      expect(q.size).toBe(8);
+
+      // This should trigger resize
+      q.enqueue(9);
+
+      expect(q.size).toBe(9);
+
+      // Verify all elements are in correct order
+      for (const i of range(1, 10)) {
+        expect(Optional.unwrap(q.dequeue())).toBe(i);
+      }
+
+      assert.isTrue(q.isEmpty);
+    });
+
+    test('should correctly resize when head is not at index 0', () => {
+      const q = createQueue<number>();
+
+      // Fill buffer
+      for (const i of range(1, 9)) {
+        q.enqueue(i);
+      }
+
+      // Dequeue some to move head forward
+      expect(Optional.unwrap(q.dequeue())).toBe(1);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(2);
+
+      expect(Optional.unwrap(q.dequeue())).toBe(3);
+
+      // Now head=3, tail=0 (wrapped), size=5
+      // Add elements until we need to resize
+      q.enqueue(9);
+
+      q.enqueue(10);
+
+      q.enqueue(11);
+
+      // Now buffer is full again (size=8), next enqueue triggers resize
+      q.enqueue(12); // Triggers resize with head != 0
+
+      expect(q.size).toBe(9);
+
+      // Verify correct order after resize
+      for (const i of range(4, 13)) {
+        expect(Optional.unwrap(q.dequeue())).toBe(i);
+      }
+
+      assert.isTrue(q.isEmpty);
+    });
+
+    test('should handle alternating enqueue/dequeue cycles with wraparound', () => {
+      const q = createQueue<number>();
+
+      let mut_counter = 0;
+
+      // Perform multiple cycles of filling and partial emptying
+      for (const _cycle of range(5)) {
+        // Add 10 elements
+        for (const _i of range(10)) {
+          mut_counter += 1;
+
+          q.enqueue(mut_counter);
+        }
+
+        // Remove 7 elements
+        for (const _i of range(7)) {
+          q.dequeue();
+        }
+      }
+
+      // Queue should have 15 elements remaining (5 cycles * 3 net adds)
+      expect(q.size).toBe(15);
+
+      // Verify remaining elements are in correct order
+      for (const i of range(36, 51)) {
+        expect(Optional.unwrap(q.dequeue())).toBe(i);
+      }
+
+      assert.isTrue(q.isEmpty);
+    });
+
     test('should automatically resize when buffer becomes full', () => {
       const q = createQueue<number>();
 
@@ -337,6 +502,135 @@ describe('Queue test', () => {
         const result = q.dequeue();
 
         assert.isTrue(Optional.isSome(result) && result.value.id === i);
+      }
+
+      assert.isTrue(q.isEmpty);
+    });
+  });
+
+  describe('Large-scale operations', () => {
+    test('should handle 1000 elements enqueue/dequeue correctly', () => {
+      const q = createQueue<number>();
+
+      const elementCount = asUint32(1000);
+
+      // Enqueue 1000 elements
+      for (const i of range(1, Uint32.add(elementCount, 1))) {
+        q.enqueue(i);
+      }
+
+      expect(q.size).toBe(elementCount);
+
+      // Dequeue all elements and verify order
+      for (const i of range(1, Uint32.add(elementCount, 1))) {
+        const result = q.dequeue();
+
+        assert.isTrue(Optional.isSome(result) && result.value === i);
+      }
+
+      assert.isTrue(q.isEmpty);
+    });
+
+    test('should handle mixed operations with 1000 elements', () => {
+      const q = createQueue<number>();
+
+      const mut_expected: number[] = [];
+
+      // Pattern: enqueue 5, dequeue 3, repeat
+      for (const cycle of range(200)) {
+        const baseValue = cycle * 5;
+
+        // Enqueue 5 elements
+        for (const offset of range(5)) {
+          const value = baseValue + offset + 1;
+
+          q.enqueue(value);
+
+          mut_expected.push(value);
+        }
+
+        // Dequeue 3 elements
+        for (const _i of range(3)) {
+          const result = q.dequeue();
+
+          const expected = mut_expected.shift();
+
+          assert.isTrue(
+            Optional.isSome(result) &&
+              expected !== undefined &&
+              result.value === expected,
+          );
+        }
+      }
+
+      // Verify remaining elements
+      expect(q.size).toBe(mut_expected.length);
+
+      for (const expected of mut_expected) {
+        const result = q.dequeue();
+
+        assert.isTrue(Optional.isSome(result) && result.value === expected);
+      }
+
+      assert.isTrue(q.isEmpty);
+    });
+
+    test('should handle stress test with random operations', () => {
+      const q = createQueue<number>();
+
+      const mut_expected: number[] = [];
+
+      let mut_counter = 0;
+
+      // Perform 1000 random operations
+      for (const _i of range(asUint32(1000))) {
+        // Randomly decide to enqueue or dequeue
+        const shouldEnqueue = mut_expected.length === 0 || Math.random() < 0.6;
+
+        if (shouldEnqueue) {
+          mut_counter += 1;
+
+          q.enqueue(mut_counter);
+
+          mut_expected.push(mut_counter);
+        } else {
+          const result = q.dequeue();
+
+          const expected = mut_expected.shift();
+
+          assert.isTrue(
+            Optional.isSome(result) &&
+              expected !== undefined &&
+              result.value === expected,
+          );
+        }
+      }
+
+      // Verify final state
+      expect(q.size).toBe(mut_expected.length);
+
+      // Drain remaining elements
+      for (const expected of mut_expected) {
+        const result = q.dequeue();
+
+        assert.isTrue(Optional.isSome(result) && result.value === expected);
+      }
+
+      assert.isTrue(q.isEmpty);
+    });
+
+    test('should handle large initial values array', () => {
+      const largeArray = Arr.range(1, asUint32(1001));
+
+      const q = createQueue(largeArray);
+
+      expect(q.size).toBe(1000);
+
+      // Verify all elements in correct order
+      for (const i of range(1, asUint32(1001))) {
+        const result = q.dequeue();
+
+        assert.isTrue(Optional.isSome(result) && result.value === i);
       }
 
       assert.isTrue(q.isEmpty);
