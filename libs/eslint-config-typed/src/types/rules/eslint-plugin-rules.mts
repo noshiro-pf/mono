@@ -161,6 +161,23 @@ namespace NoIdenticalTests {
 }
 
 /**
+ * Require suggestions to have different `messageId` than their parent report
+ *
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-matching-violation-suggest-message-ids.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoMatchingViolationSuggestMessageIds {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Disallow using the `meta.replacedBy` rule property
  *
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-meta-replaced-by.md
@@ -948,6 +965,7 @@ export type EslintPluginRules = Readonly<{
   'eslint-plugin/no-deprecated-context-methods': NoDeprecatedContextMethods.RuleEntry;
   'eslint-plugin/no-deprecated-report-api': NoDeprecatedReportApi.RuleEntry;
   'eslint-plugin/no-identical-tests': NoIdenticalTests.RuleEntry;
+  'eslint-plugin/no-matching-violation-suggest-message-ids': NoMatchingViolationSuggestMessageIds.RuleEntry;
   'eslint-plugin/no-meta-replaced-by': NoMetaReplacedBy.RuleEntry;
   'eslint-plugin/no-meta-schema-default': NoMetaSchemaDefault.RuleEntry;
   'eslint-plugin/no-missing-message-ids': NoMissingMessageIds.RuleEntry;

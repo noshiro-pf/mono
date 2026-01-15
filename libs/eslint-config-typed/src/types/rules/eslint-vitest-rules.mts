@@ -433,7 +433,33 @@ namespace NoCommentedOutTests {
  *  ```
  */
 namespace NoConditionalExpect {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "expectAssertions": {
+   *         "description": "Enable/disable whether expect.assertions() is taken into account",
+   *         "type": "boolean"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /** Enable/disable whether expect.assertions() is taken into account */
+    expectAssertions?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -1820,6 +1846,23 @@ namespace RequireHook {
 }
 
 /**
+ * Require tests to declare a timeout
+ *
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-test-timeout.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTestTimeout {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * Require local Test Context for concurrent snapshot tests
  *
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-local-test-context-for-concurrent-snapshots.md
@@ -2239,6 +2282,7 @@ export type EslintVitestRules = Readonly<{
   'vitest/prefer-vi-mocked': PreferViMocked.RuleEntry;
   'vitest/require-awaited-expect-poll': RequireAwaitedExpectPoll.RuleEntry;
   'vitest/require-hook': RequireHook.RuleEntry;
+  'vitest/require-test-timeout': RequireTestTimeout.RuleEntry;
   'vitest/require-local-test-context-for-concurrent-snapshots': RequireLocalTestContextForConcurrentSnapshots.RuleEntry;
   'vitest/require-mock-type-parameters': RequireMockTypeParameters.RuleEntry;
   'vitest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
@@ -2261,6 +2305,7 @@ export type EslintVitestRulesOption = Readonly<{
   'vitest/expect-expect': ExpectExpect.Options;
   'vitest/max-expects': MaxExpects.Options;
   'vitest/max-nested-describe': MaxNestedDescribe.Options;
+  'vitest/no-conditional-expect': NoConditionalExpect.Options;
   'vitest/no-focused-tests': NoFocusedTests.Options;
   'vitest/no-hooks': NoHooks.Options;
   'vitest/no-large-snapshots': NoLargeSnapshots.Options;

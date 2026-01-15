@@ -223,6 +223,7 @@ namespace UnsafeToChainCommand {
    *         "default": []
    *       }
    *     },
+   *     "additionalProperties": false,
    *     "title": "Options"
    *   }
    * ]
@@ -236,7 +237,6 @@ namespace UnsafeToChainCommand {
      * @default [ ]
      */
     methods?: readonly unknown[];
-    [k: string]: unknown;
   }>;
 
   export type RuleEntry =

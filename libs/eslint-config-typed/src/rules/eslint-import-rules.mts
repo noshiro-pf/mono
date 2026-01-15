@@ -99,7 +99,6 @@ export const eslintImportsRules = {
     },
   ],
 
-  'import-x/prefer-default-export': 'off',
   'import-x/max-dependencies': 'off',
   'import-x/no-unassigned-import': [
     'error',
@@ -119,6 +118,7 @@ export const eslintImportsRules = {
    * reflected on the import side
    */
   'import-x/no-default-export': 'error',
+  'import-x/prefer-default-export': 'off',
 
   'import-x/no-named-export': 'off',
   'import-x/no-anonymous-default-export': withDefaultOption('error'),

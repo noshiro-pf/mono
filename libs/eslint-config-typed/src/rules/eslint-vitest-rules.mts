@@ -6,7 +6,7 @@ export const eslintVitestRules = {
   'vitest/max-expects': 'off',
   'vitest/max-nested-describe': withDefaultOption('error'),
   'vitest/no-commented-out-tests': 'off',
-  'vitest/no-conditional-expect': 'error',
+  'vitest/no-conditional-expect': withDefaultOption('error'),
   'vitest/no-conditional-in-test': 'off',
   'vitest/no-duplicate-hooks': 'error',
   'vitest/no-hooks': withDefaultOption('error'),
@@ -119,6 +119,9 @@ export const eslintVitestRules = {
   ],
   'vitest/no-unneeded-async-expect-function': 'error',
   'vitest/prefer-to-have-been-called-times': 'error',
+
+  // This rule is enabled on an as-needed basis on a per-project basis, not by default.
+  'vitest/require-test-timeout': 'off',
 
   // deprecated
   'vitest/no-done-callback': 0,

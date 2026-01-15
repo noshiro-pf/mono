@@ -35,4 +35,5 @@ export const eslintPluginRules = {
   'eslint-plugin/no-meta-replaced-by': 'error',
   'eslint-plugin/require-test-case-name': withDefaultOption('error'),
   'eslint-plugin/unique-test-case-names': 'error',
+  'eslint-plugin/no-matching-violation-suggest-message-ids': 'error',
 } as const satisfies EslintPluginRules;
