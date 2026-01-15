@@ -1,3 +1,9 @@
+# [4.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.4.1...v4.5.0) (2026-01-15)
+
+### Features
+
+- update ESLint rules and types ([#218](https://github.com/noshiro-pf/eslint-config-typed/issues/218)) ([7b9000e](https://github.com/noshiro-pf/eslint-config-typed/commit/7b9000ea8622f306c26ed74d60e758b50b2d4112))
+
 ## [4.4.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.4.0...v4.4.1) (2026-01-08)
 
 ### Bug Fixes
