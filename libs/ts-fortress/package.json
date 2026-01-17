@@ -93,7 +93,7 @@
     "eslint-config-typed": "4.3.0",
     "fast-glob": "3.3.3",
     "fp-ts": "2.16.11",
-    "github-settings-as-code": "1.0.6",
+    "github-settings-as-code": "1.0.7",
     "io-ts": "2.2.22",
     "jiti": "2.6.1",
     "markdownlint": "0.40.0",
