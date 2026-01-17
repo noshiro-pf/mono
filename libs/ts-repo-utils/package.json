@@ -78,7 +78,7 @@
     "z:format-uncommitted": "tsx ./src/cmd/format-uncommitted.mts",
     "z:gen-index-ts": "tsx ./src/cmd/gen-index-ts.mts",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
-    "z:vitest:node": "vitest --config ./configs/vitest.config.mts --project='Node.js'"
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
     "@nodelib/fs.walk": "^3.0.1",
