@@ -43,7 +43,7 @@ export default {
     // 4. Run prettier and build before committing.
     [
       '@semantic-release/exec',
-      { prepareCmd: 'pnpm run fmt && pnpm run build' },
+      { prepareCmd: 'pnpm run fmt && pnpm run build && pnpm run test' },
     ],
 
     // 4-a. Update the version field in package.json with the next version number.
