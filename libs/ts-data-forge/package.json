@@ -103,7 +103,7 @@
     "dedent": "^1.7.1",
     "eslint": "9.39.2",
     "eslint-config-typed": "4.3.0",
-    "github-settings-as-code": "1.0.6",
+    "github-settings-as-code": "1.0.7",
     "immer": "11.1.3",
     "jiti": "2.6.1",
     "markdownlint": "0.40.0",

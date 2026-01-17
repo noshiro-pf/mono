@@ -85,8 +85,8 @@ importers:
         specifier: 4.3.0
         version: 4.3.0(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.50.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.16)
       github-settings-as-code:
-        specifier: 1.0.6
-        version: 1.0.6(prettier@3.7.4)(typescript@5.9.3)
+        specifier: 1.0.7
+        version: 1.0.7(prettier@3.7.4)(typescript@5.9.3)
       immer:
         specifier: 11.1.3
         version: 11.1.3
@@ -2561,8 +2561,9 @@ packages:
   git-log-parser@1.2.1:
     resolution: {integrity: sha512-PI+sPDvHXNPl5WNOErAK05s3j0lgwUzMN6o8cyQrDaKfT3qd7TmNJKeXX+SknI5I0QhG5fVPAEwSY4tRGDtYoQ==}
 
-  github-settings-as-code@1.0.6:
-    resolution: {integrity: sha512-5luVYvvyUWCajaxj9JVxNa9TSaKnSn1MqQTXmEK4DL8CIYccKPtKz86MYb9utgQZepRjJ8189xUfJp1uQkI4mw==}
+  github-settings-as-code@1.0.7:
+    resolution: {integrity: sha512-vGX9E09flUO53j/A0NzEEF+VnOXKqPZOQj4ReUUfHmWHCJkYHzWbtqoAqqG6Nx1XdVmL8G2krUzVPCYPrlEs9g==}
+    engines: {node: '>=22', pnpm: '>=8.0.0'}
     hasBin: true
 
   glob-parent@5.1.2:
@@ -3430,8 +3431,8 @@ packages:
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
-  octokit-safe-types@1.2.2:
-    resolution: {integrity: sha512-sR2y5nZOS2pacuci811ve6rvtk0zA3Nqa7c6Ip3jf1X+E36OoDiuM2YdPmQoV9Cm9c5rDTK4MU9A6C8rDs4nCg==}
+  octokit-safe-types@1.2.3:
+    resolution: {integrity: sha512-ThR+wiMrfLOu4Yh307yzF1xqHw0Hm5oCeUmc/xHSF7xdPsNljjXisCrftV7wyY7ryLs2A6/F/QtBOlPxgWSz4A==}
 
   onetime@5.1.2:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
@@ -4109,11 +4110,6 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-data-forge@5.1.1:
-    resolution: {integrity: sha512-YUJjyoSqiIS8Wz56Atc+ZUbDTp8W9wo4bkiB3zm6EdQAKdhyYHaadb15mLhttSJ8VpitLtbXJ2/xX4QdQIQVnA==}
-    peerDependencies:
-      typescript: '>=4.8'
-
   ts-data-forge@6.1.1:
     resolution: {integrity: sha512-4q8asmkVu2elIQlfdd4mJ3F4YbEz3cV45OUrgAxFKowfiGPbdQI13LjtR9YlbKrGHEeqozxYXBwy8zCoXpVlNg==}
     peerDependencies:
@@ -4129,8 +4125,8 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@6.2.0:
-    resolution: {integrity: sha512-ae3JDB7IFjajTBBZWsXabEBXXLdfYciNES1W4Yrjr/IBoGnga9kcYfjZ8i+SO0YimRywimzG6/ZAgdaBNEOu8w==}
+  ts-fortress@6.2.2:
+    resolution: {integrity: sha512-m6kyOMx0y0RMRit0OXCUWjo8PoteG4qEmqHHJbA9jxYPPvDV4ypC8wvJhU5fG04YoabyZdZFXhDADYWihDfeUQ==}
 
   ts-repo-utils@7.9.7:
     resolution: {integrity: sha512-wfXIDDRyeLlTm/+CU88pSRfui9zq9RqIMBn8QSnned858cqcB05dsLDDHmAM7QI0jMCdWwD5euwi0Efy954Uzw==}
@@ -7235,13 +7231,13 @@ snapshots:
       through2: 2.0.5
       traverse: 0.6.8
 
-  github-settings-as-code@1.0.6(prettier@3.7.4)(typescript@5.9.3):
+  github-settings-as-code@1.0.7(prettier@3.7.4)(typescript@5.9.3):
     dependencies:
       '@octokit/core': 7.0.6
       dotenv: 17.2.3
-      octokit-safe-types: 1.2.2(typescript@5.9.3)
-      ts-data-forge: 5.1.1(typescript@5.9.3)
-      ts-fortress: 6.2.0(typescript@5.9.3)
+      octokit-safe-types: 1.2.3(typescript@5.9.3)
+      ts-data-forge: 6.2.1(typescript@5.9.3)
+      ts-fortress: 6.2.2(typescript@5.9.3)
       ts-repo-utils: 7.9.7(prettier@3.7.4)(typescript@5.9.3)
     transitivePeerDependencies:
       - prettier
@@ -8127,12 +8123,12 @@ snapshots:
 
   obug@2.1.1: {}
 
-  octokit-safe-types@1.2.2(typescript@5.9.3):
+  octokit-safe-types@1.2.3(typescript@5.9.3):
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
       ts-data-forge: 6.2.1(typescript@5.9.3)
-      ts-fortress: 6.2.0(typescript@5.9.3)
+      ts-fortress: 6.2.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8874,12 +8870,6 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-data-forge@5.1.1(typescript@5.9.3):
-    dependencies:
-      '@sindresorhus/is': 7.2.0
-      ts-type-forge: 2.3.0
-      typescript: 5.9.3
-
   ts-data-forge@6.1.1(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
@@ -8897,7 +8887,7 @@ snapshots:
       picomatch: 4.0.3
       typescript: 5.9.3
 
-  ts-fortress@6.2.0(typescript@5.9.3):
+  ts-fortress@6.2.2(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
       ts-data-forge: 6.2.1(typescript@5.9.3)
