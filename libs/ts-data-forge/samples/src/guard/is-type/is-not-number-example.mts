@@ -1,9 +1,15 @@
 // Example: src/guard/is-type.mts (isNotNumber)
 import { isNotNumber } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const mixed: unknown[] = [1, '2', 3];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const mixed: unknown[] = [1, '2', 3];
 
-const nonNumbers = mixed.filter(isNotNumber);
+    const nonNumbers = mixed.filter(isNotNumber);
 
-assert.deepStrictEqual(nonNumbers, ['2']);
+    assert.deepStrictEqual(nonNumbers, ['2']);
+
+    // embed-sample-code-ignore-below
+  });
+}

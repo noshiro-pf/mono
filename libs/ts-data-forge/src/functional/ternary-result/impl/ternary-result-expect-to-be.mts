@@ -14,7 +14,10 @@ import { type UnwrapOk } from './types.mjs';
  *
  * const expectResult = TernaryResult.expectToBe<string>('needs value');
  *
- * assert.throws(() => expectResult(TernaryResult.err('oops')), /needs value/u);
+ * assert.throws(
+ *   () => expectResult(TernaryResult.err('oops')),
+ *   /needs value/u,
+ * );
  * ```
  */
 export function expectToBe<R extends UnknownTernaryResult>(

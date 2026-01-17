@@ -15,7 +15,10 @@ import { type UnwrapOk } from './types.mjs';
  *
  * assert.deepStrictEqual(TernaryResult.toOptional(okValue), Optional.some(7));
  *
- * assert.deepStrictEqual(TernaryResult.toOptional(warnValue), Optional.some(7));
+ * assert.deepStrictEqual(
+ *   TernaryResult.toOptional(warnValue),
+ *   Optional.some(7),
+ * );
  * ```
  */
 export const toOptional = <R extends UnknownTernaryResult>(

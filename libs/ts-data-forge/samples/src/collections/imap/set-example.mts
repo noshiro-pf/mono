@@ -1,20 +1,26 @@
 // Example: src/collections/imap.mts (set)
 import { IMap, Optional } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const entries = [['count', 1]] satisfies readonly (readonly [
-  'count' | 'status',
-  number | string,
-])[];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const entries = [['count', 1]] satisfies readonly (readonly [
+      'count' | 'status',
+      number | string,
+    ])[];
 
-const base = IMap.create<'count' | 'status', number | string>(entries);
+    const base = IMap.create<'count' | 'status', number | string>(entries);
 
-const updated = base.set('count', 2);
+    const updated = base.set('count', 2);
 
-const extended = base.set('status', 'ok');
+    const extended = base.set('status', 'ok');
 
-assert.deepStrictEqual(base.get('count'), Optional.some(1));
+    assert.deepStrictEqual(base.get('count'), Optional.some(1));
 
-assert.deepStrictEqual(updated.get('count'), Optional.some(2));
+    assert.deepStrictEqual(updated.get('count'), Optional.some(2));
 
-assert.deepStrictEqual(extended.get('status'), Optional.some('ok'));
+    assert.deepStrictEqual(extended.get('status'), Optional.some('ok'));
+
+    // embed-sample-code-ignore-below
+  });
+}

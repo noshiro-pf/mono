@@ -9,7 +9,10 @@ import { warn } from './ternary-result-warn.mjs';
  * @example
  *
  * ```ts
- * const okPair = TernaryResult.zip(TernaryResult.ok('left'), TernaryResult.ok(1));
+ * const okPair = TernaryResult.zip(
+ *   TernaryResult.ok('left'),
+ *   TernaryResult.ok(1),
+ * );
  *
  * const warnPair = TernaryResult.zip(
  *   TernaryResult.warn('left', 'warn'),

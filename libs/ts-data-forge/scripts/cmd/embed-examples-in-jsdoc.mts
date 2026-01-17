@@ -1,8 +1,8 @@
 import { Result } from 'ts-data-forge';
 import { formatFiles } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
-import { sourceFileMappings } from './embed-jsdoc-examples-map.mjs';
-import { extractSampleCode } from './embed-samples-shared.mjs';
+import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
+import { extractSampleCode } from './embed-examples-utils.mjs';
 
 const codeBlockStart = '```ts';
 
@@ -13,7 +13,7 @@ const codeBlockEnd = '```';
  * files. Replaces code blocks sequentially in the order defined in
  * sourceFileMappings.
  */
-export const embedJsDocExamples = async (): Promise<
+export const embedExamplesInJsDoc = async (): Promise<
   Result<undefined, unknown>
 > => {
   try {
@@ -104,7 +104,7 @@ export const embedJsDocExamples = async (): Promise<
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const result = await embedJsDocExamples();
+  const result = await embedExamplesInJsDoc();
 
   if (Result.isErr(result)) {
     console.error(result.value);

@@ -167,7 +167,10 @@ export function minBy<E, V>(
  *
  * assert.deepStrictEqual(mostStars, Optional.some({ id: 'b', stars: 30 }));
  *
- * assert.deepStrictEqual(smallestStars, Optional.some({ id: 'a', stars: 10 }));
+ * assert.deepStrictEqual(
+ *   smallestStars,
+ *   Optional.some({ id: 'a', stars: 10 }),
+ * );
  * ```
  */
 export function maxBy<const Ar extends readonly unknown[]>(

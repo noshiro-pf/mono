@@ -1,9 +1,15 @@
 // Example: src/number/branded-types/positive-safe-int.mts (asPositiveSafeInt)
 import { PositiveSafeInt, asPositiveSafeInt } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const branded = asPositiveSafeInt(128);
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const branded = asPositiveSafeInt(128);
 
-assert.isTrue(branded === 128);
+    assert.isTrue(branded === 128);
 
-assert.isTrue(PositiveSafeInt.is(branded));
+    assert.isTrue(PositiveSafeInt.is(branded));
+
+    // embed-sample-code-ignore-below
+  });
+}

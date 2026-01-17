@@ -1,7 +1,7 @@
 import { unknownToString } from 'ts-data-forge';
 import { formatFiles } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
-import { extractSampleCode } from './embed-samples-shared.mjs';
+import { extractSampleCode } from './embed-examples-utils.mjs';
 
 const codeBlockStart = '```tsx';
 
@@ -27,12 +27,13 @@ const documents: DeepReadonly<
       'type-guards.mts',
       'iteration-range.mts',
       'mutability-utilities.tsx',
+      'mutability-utilities2.mts',
     ],
   },
 ] as const;
 
 /** Embeds sample code from ./samples/readme directory into README.md */
-export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
+export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
   try {
     for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
       const markdownContent = await fs.readFile(mdPath, 'utf8');
@@ -97,7 +98,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const result = await embedSamples();
+  const result = await embedExamples();
 
   if (Result.isErr(result)) {
     console.error(result.value);

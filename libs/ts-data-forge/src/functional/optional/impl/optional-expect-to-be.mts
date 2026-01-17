@@ -11,7 +11,9 @@ import { type Unwrap } from './types.mjs';
  * ```ts
  * const optionalValue = Optional.some('data');
  *
- * assert.isTrue(Optional.expectToBe(optionalValue, 'value expected') === 'data');
+ * assert.isTrue(
+ *   Optional.expectToBe(optionalValue, 'value expected') === 'data',
+ * );
  *
  * const expectValue = Optional.expectToBe<string>('missing optional');
  *

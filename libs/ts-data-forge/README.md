@@ -137,6 +137,7 @@ Here are some examples of how to use utilities from `ts-data-forge`:
 The `expectType` utility allows you to make assertions about types at compile time. This is useful for ensuring type correctness in complex type manipulations or when refactoring.
 
 ```tsx
+/* eslint-disable vitest/expect-expect */
 import { expectType } from 'ts-data-forge';
 
 type User = { id: number; name: string };
@@ -536,12 +537,11 @@ Safely work with readonly types when interfacing with mutable APIs.
 
 ```tsx
 import { Autocomplete, TextField } from '@mui/material';
-import { produce } from 'immer';
 import type * as React from 'react';
 import { castMutable } from 'ts-data-forge';
 
 // Example: Material-UI Autocomplete
-export const SomeComponent: React.FC = () => (
+const SomeComponent: React.FC = () => (
     <Autocomplete
         options={castMutable(readonlyOptions)}
         renderInput={({
@@ -569,7 +569,14 @@ export const SomeComponent: React.FC = () => (
     />
 );
 
-const readonlyOptions: readonly string[] = ['Option 1', 'Option 2', 'Option 3'];
+const readonlyOptions = ['Option 1', 'Option 2', 'Option 3'] as const;
+```
+
+```tsx
+import { produce } from 'immer';
+import { castMutable } from 'ts-data-forge';
+
+// Example: Immer produce function
 
 type State = Readonly<{
     items: readonly string[];
@@ -579,7 +586,7 @@ const initialState: State = {
     items: ['item1', 'item2'],
 } as const;
 
-const newItems: readonly string[] = ['newItem1', 'newItem2'];
+const newItems = ['newItem1', 'newItem2'] as const;
 
 const updatedState = produce(initialState, (draft) => {
     // draft.items expects mutable array, but newItems is readonly

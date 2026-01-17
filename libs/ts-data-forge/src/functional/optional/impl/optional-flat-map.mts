@@ -25,7 +25,10 @@ import { type Unwrap } from './types.mjs';
  *
  * assert.deepStrictEqual(flatMapParse(Optional.some('5')), Optional.some(5));
  *
- * assert.deepStrictEqual(flatMapParse(Optional.some('invalid')), Optional.none);
+ * assert.deepStrictEqual(
+ *   flatMapParse(Optional.some('invalid')),
+ *   Optional.none,
+ * );
  * ```
  *
  * @template O The input `UnknownOptional` type.

@@ -1,16 +1,22 @@
 // Example: src/functional/result.mts (Result.unwrapOk)
 import { Result } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const okResult = Result.ok(42);
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const okResult = Result.ok(42);
 
-const errResult = Result.err('oops');
+    const errResult = Result.err('oops');
 
-// Result.unwrapOk returns the value for Ok results
+    // Result.unwrapOk returns the value for Ok results
 
-assert.isTrue(Result.unwrapOk(okResult) === 42);
+    assert.isTrue(Result.unwrapOk(okResult) === 42);
 
-// Result.unwrapOk returns undefined for Err results
+    // Result.unwrapOk returns undefined for Err results
 
-// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-assert.isTrue(Result.unwrapOk(errResult) === undefined);
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+    assert.isTrue(Result.unwrapOk(errResult) === undefined);
+
+    // embed-sample-code-ignore-below
+  });
+}

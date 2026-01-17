@@ -43,8 +43,8 @@
     "clean:logs": "npx rimraf ./*.log",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
-    "doc:embed-doc": "tsx ./scripts/cmd/embed-samples.mts",
-    "doc:embed-jsdoc": "tsx ./scripts/cmd/embed-jsdoc-examples.mts",
+    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
+    "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",
     "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "format-uncommitted",
@@ -73,7 +73,7 @@
     "type-check": "tsc --noEmit",
     "update-packages": "pnpm update --latest",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
-    "z:vitest:node": "vitest --config ./configs/vitest.config.mts --project='Node.js'"
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
     "@sindresorhus/is": "^7.2.0",

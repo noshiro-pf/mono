@@ -24,7 +24,10 @@ import { type NarrowToOk } from './types.mjs';
  *   Result.ok('default'),
  * );
  *
- * assert.deepStrictEqual(orElseFallback(Result.ok('value')), Result.ok('value'));
+ * assert.deepStrictEqual(
+ *   orElseFallback(Result.ok('value')),
+ *   Result.ok('value'),
+ * );
  * ```
  *
  * @template R The input `UnknownResult` type.

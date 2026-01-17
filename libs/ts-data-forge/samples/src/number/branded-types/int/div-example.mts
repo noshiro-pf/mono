@@ -1,11 +1,17 @@
 // Example: src/number/branded-types/int.mts (Int.div)
 import { Int, asInt } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const dividend = asInt(17);
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const dividend = asInt(17);
 
-const divisor = asInt(5);
+    const divisor = asInt(5);
 
-const quotient = Int.div(dividend, divisor);
+    const quotient = Int.div(dividend, divisor);
 
-assert.isTrue(quotient === 3);
+    assert.isTrue(quotient === 3);
+
+    // embed-sample-code-ignore-below
+  });
+}

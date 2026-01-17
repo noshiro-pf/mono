@@ -60,6 +60,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build src
+        run: pnpm run build:min
+
       - name: Install Playwright Browsers
         if: matrix.command == 'test:browser'
         run: pnpm exec playwright install chromium

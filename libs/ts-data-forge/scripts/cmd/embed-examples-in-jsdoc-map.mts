@@ -18,7 +18,7 @@ type SourceFileMapping = Readonly<{
  * 2. Add the source file path and its sample files to this mapping in the order
  *   they appear in the source file (top to bottom).
  *
- * 3. Run: pnpm run doc:embed-jsdoc (or pnpm exec tsx scripts/cmd/embed-jsdoc-examples.mts)
+ * 3. Run: pnpm run doc:embed:jsdoc (or pnpm exec tsx scripts/cmd/embed-examples-in-jsdoc.mts)
  *
  * The script will replace each ```ts block sequentially with the corresponding sample code.
  */

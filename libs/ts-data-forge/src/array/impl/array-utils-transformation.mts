@@ -15,9 +15,9 @@ import { size } from './array-utils-size.mjs';
  *
  * const doubled = Arr.map(numbers, (value) => value * 2);
  *
- * const indexed = Arr.map<number, string>((value, index) => `${index}:${value}`)(
- *   numbers,
- * );
+ * const indexed = Arr.map<number, string>(
+ *   (value, index) => `${index}:${value}`,
+ * )(numbers);
  *
  * assert.deepStrictEqual(doubled, [2, 4, 6]);
  *
@@ -65,7 +65,11 @@ export function map<A, B>(
  * ```ts
  * const changes = [5, -2, 3] as const;
  *
- * const runningTotals = Arr.scan(changes, (total, change) => total + change, 0);
+ * const runningTotals = Arr.scan(
+ *   changes,
+ *   (total, change) => total + change,
+ *   0,
+ * );
  *
  * const runningTotalsFromCurried = Arr.scan(
  *   (total: number, change: number) => total + change,
@@ -244,7 +248,10 @@ export const toSorted = <const Ar extends readonly unknown[]>(
  *
  * assert.deepStrictEqual(byIssueCount, expectedByIssues);
  *
- * assert.deepStrictEqual(byIssueCountDescending, expectedByIssueCountDescending);
+ * assert.deepStrictEqual(
+ *   byIssueCountDescending,
+ *   expectedByIssueCountDescending,
+ * );
  * ```
  */
 export function toSortedBy<const Ar extends readonly unknown[]>(

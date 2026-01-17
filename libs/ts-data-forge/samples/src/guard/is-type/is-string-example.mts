@@ -1,9 +1,15 @@
 // Example: src/guard/is-type.mts (isString)
 import { isString } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const values: unknown[] = ['Ada', 42, 'Lovelace'];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const values: unknown[] = ['Ada', 42, 'Lovelace'];
 
-const strings = values.filter(isString);
+    const strings = values.filter(isString);
 
-assert.deepStrictEqual(strings, ['Ada', 'Lovelace']);
+    assert.deepStrictEqual(strings, ['Ada', 'Lovelace']);
+
+    // embed-sample-code-ignore-below
+  });
+}

@@ -20,7 +20,7 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *
  * assert.isTrue(Result.unwrapThrow(okResult) === 'data');
  *
- * assert.throws(() => Result.unwrapThrow(errResult), /fail/u);
+ * assert.throws(() => Result.unwrapThrow(errResult), Error, 'fail');
  * ```
  *
  * @template R The `UnknownResult` type to unwrap.

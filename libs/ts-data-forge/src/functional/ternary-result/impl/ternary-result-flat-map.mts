@@ -23,7 +23,10 @@ import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
  *   parse,
  * );
  *
- * const errPassthrough = TernaryResult.flatMap(TernaryResult.err('oops'), parse);
+ * const errPassthrough = TernaryResult.flatMap(
+ *   TernaryResult.err('oops'),
+ *   parse,
+ * );
  *
  * assert.deepStrictEqual(doubled, TernaryResult.ok(6));
  *

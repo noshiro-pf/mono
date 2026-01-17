@@ -1,34 +1,40 @@
 // Example: src/json/json.mts (stringify)
 import { isString, Json, Result } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const data = { name: 'Bob', age: 25, active: true };
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const data = { name: 'Bob', age: 25, active: true };
 
-// Basic stringify
-const basic = Json.stringify(data);
+    // Basic stringify
+    const basic = Json.stringify(data);
 
-assert.isTrue(Result.isOk(basic));
+    assert.isTrue(Result.isOk(basic));
 
-if (Result.isOk(basic)) {
-  assert.isTrue(basic.value === '{"name":"Bob","age":25,"active":true}');
-}
+    if (Result.isOk(basic)) {
+      assert.isTrue(basic.value === '{"name":"Bob","age":25,"active":true}');
+    }
 
-// With formatting
-const formatted = Json.stringify(data, undefined, 2);
+    // With formatting
+    const formatted = Json.stringify(data, undefined, 2);
 
-assert.isTrue(Result.isOk(formatted));
+    assert.isTrue(Result.isOk(formatted));
 
-// With replacer
-const filtered = Json.stringify(data, (key, value) => {
-  if (key === 'age') return undefined; // omit age field
+    // With replacer
+    const filtered = Json.stringify(data, (key, value) => {
+      if (key === 'age') return undefined; // omit age field
 
-  return value;
-});
+      return value;
+    });
 
-assert.isTrue(Result.isOk(filtered));
+    assert.isTrue(Result.isOk(filtered));
 
-if (Result.isOk(filtered)) {
-  assert.isTrue(isString(filtered.value));
+    if (Result.isOk(filtered)) {
+      assert.isTrue(isString(filtered.value));
 
-  assert.isFalse(filtered.value.includes('age'));
+      assert.isFalse(filtered.value.includes('age'));
+    }
+
+    // embed-sample-code-ignore-below
+  });
 }

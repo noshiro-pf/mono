@@ -1,13 +1,19 @@
 // Example: src/array/array-utils.mts (generateAsync)
 import { Arr } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const values = await Arr.generateAsync(async function* () {
-  yield 'Ada';
+if (import.meta.vitest !== undefined) {
+  test('main', async () => {
+    // embed-sample-code-ignore-above
+    const values = await Arr.generateAsync(async function* () {
+      yield 'Ada';
 
-  await Promise.resolve();
+      await Promise.resolve();
 
-  yield 'Lovelace';
-});
+      yield 'Lovelace';
+    });
 
-assert.deepStrictEqual(values, ['Ada', 'Lovelace']);
+    assert.deepStrictEqual(values, ['Ada', 'Lovelace']);
+
+    // embed-sample-code-ignore-below
+  });
+}

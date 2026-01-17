@@ -1,13 +1,19 @@
 // Example: src/array/array-utils.mts (toFilled)
 import { Arr } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const base = [1, 2, 3];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const base = [1, 2, 3];
 
-const filled = Arr.toFilled(base, 0);
+    const filled = Arr.toFilled(base, 0);
 
-const filledCurried = Arr.toFilled('x')(base);
+    const filledCurried = Arr.toFilled('x')(base);
 
-assert.deepStrictEqual(filled, [0, 0, 0]);
+    assert.deepStrictEqual(filled, [0, 0, 0]);
 
-assert.deepStrictEqual(filledCurried, ['x', 'x', 'x']);
+    assert.deepStrictEqual(filledCurried, ['x', 'x', 'x']);
+
+    // embed-sample-code-ignore-below
+  });
+}

@@ -1,20 +1,27 @@
+/* eslint-disable vitest/expect-expect */
 import { expectType } from 'ts-data-forge';
 
-type User = { id: number; name: string };
+/* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
+  /* embed-sample-code-ignore-this-line */ test('main', () => {
+    type User = { id: number; name: string };
 
-type Admin = { id: number; name: string; role: 'admin' };
+    type Admin = { id: number; name: string; role: 'admin' };
 
-// Assert that Admin extends User
-expectType<Admin, User>('<=');
+    // Assert that Admin extends User
+    expectType<Admin, User>('<=');
 
-// Assert that User does not extend Admin
-expectType<User, Admin>('!<=');
+    // Assert that User does not extend Admin
+    expectType<User, Admin>('!<=');
 
-// Assert exact type equality
-expectType<{ x: number }, { x: number }>('=');
+    // Assert exact type equality
+    expectType<{ x: number }, { x: number }>('=');
 
-// The following would cause a compile-time error:
-// expectType<User, Admin>("="); // Error: Type 'User' is not strictly equal to type 'Admin'.
+    // The following would cause a compile-time error:
+    // expectType<User, Admin>("="); // Error: Type 'User' is not strictly equal to type 'Admin'.
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-expectType<User, any>('!='); // Error: Comparisons with `any` are also strictly checked.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectType<User, any>('!='); // Error: Comparisons with `any` are also strictly checked.
+
+    // embed-sample-code-ignore-below
+  });
+}

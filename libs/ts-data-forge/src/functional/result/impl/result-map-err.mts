@@ -15,7 +15,9 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *
  * const untouchedOk = Result.mapErr(okValue, (error) => error.toUpperCase());
  *
- * const uppercasedErr = Result.mapErr(errValue, (error) => error.toUpperCase());
+ * const uppercasedErr = Result.mapErr(errValue, (error) =>
+ *   error.toUpperCase(),
+ * );
  *
  * assert.deepStrictEqual(untouchedOk, Result.ok(3));
  *

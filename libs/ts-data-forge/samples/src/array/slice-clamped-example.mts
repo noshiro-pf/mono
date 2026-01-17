@@ -1,13 +1,19 @@
 // Example: src/array/array-utils.mts (sliceClamped)
 import { Arr } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const letters = ['a', 'b', 'c', 'd', 'e'];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const letters = ['a', 'b', 'c', 'd', 'e'];
 
-const lastThree = Arr.sliceClamped(letters, -3, 10);
+    const lastThree = Arr.sliceClamped(letters, -3, 10);
 
-const middleTwo = Arr.sliceClamped(1, 3)(letters);
+    const middleTwo = Arr.sliceClamped(1, 3)(letters);
 
-assert.deepStrictEqual(lastThree, ['a', 'b', 'c', 'd', 'e']);
+    assert.deepStrictEqual(lastThree, ['a', 'b', 'c', 'd', 'e']);
 
-assert.deepStrictEqual(middleTwo, ['b', 'c']);
+    assert.deepStrictEqual(middleTwo, ['b', 'c']);
+
+    // embed-sample-code-ignore-below
+  });
+}

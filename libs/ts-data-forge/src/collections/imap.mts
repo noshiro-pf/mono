@@ -569,7 +569,10 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * @example
    *
    * ```ts
-   * const entries = [['key', 1]] satisfies readonly (readonly [string, number])[];
+   * const entries = [['key', 1]] satisfies readonly (readonly [
+   *   string,
+   *   number,
+   * ])[];
    *
    * const map = IMap.create(entries);
    *

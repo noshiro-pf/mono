@@ -1,9 +1,15 @@
 // Example: src/guard/is-type.mts (isBigint)
 import { isBigint } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const values: unknown[] = [1n, 2, 3n];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const values: unknown[] = [1n, 2, 3n];
 
-const bigints = values.filter(isBigint);
+    const bigints = values.filter(isBigint);
 
-assert.deepStrictEqual(bigints, [1n, 3n]);
+    assert.deepStrictEqual(bigints, [1n, 3n]);
+
+    // embed-sample-code-ignore-below
+  });
+}

@@ -291,11 +291,13 @@ export namespace Json {
    *   );
    *
    *   assert.isTrue(
-   *     formatted.value.indexOf('"mango"') < formatted.value.indexOf('"nested"'),
+   *     formatted.value.indexOf('"mango"') <
+   *       formatted.value.indexOf('"nested"'),
    *   );
    *
    *   assert.isTrue(
-   *     formatted.value.indexOf('"nested"') < formatted.value.indexOf('"zebra"'),
+   *     formatted.value.indexOf('"nested"') <
+   *       formatted.value.indexOf('"zebra"'),
    *   );
    * }
    * ```

@@ -1,13 +1,11 @@
 import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
-import { type ViteUserConfig as ViteUserConfig_ } from 'vitest/config';
+import { type ViteUserConfig } from 'vitest/config';
 import { type CoverageOptions, type ProjectConfig } from 'vitest/node';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 
-type ViteUserConfig = DeepReadonly<ViteUserConfig_>;
-
 // https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
-const config = (): ViteUserConfig =>
+const config = () =>
   ({
     test: {
       coverage: coverageSettings(),
@@ -33,7 +31,7 @@ const config = (): ViteUserConfig =>
         {
           test: {
             name: 'Browser',
-            ...projectConfig(),
+            ...projectConfig({ additionalExcludes: ['samples/**/*'] }),
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,
@@ -49,34 +47,34 @@ const config = (): ViteUserConfig =>
         },
       ],
     },
-  }) as const;
+  }) as const satisfies ViteUserConfig;
 
 const projectConfig = (
   options?: Readonly<{
     additionalExcludes?: readonly string[];
   }>,
-): DeepReadonly<ProjectConfig> =>
+) =>
   ({
     dir: projectRootPath,
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
     includeSource: ['src/**/*.mts', 'samples/**/*.mts'],
-    include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
+    include: ['src/**/*.test.mts', 'test/**/*.test.mts', 'samples/**/*.mts'],
     exclude: [
       '**/*.d.mts',
       '**/index.mts',
       'src/entry-point.mts',
       ...(options?.additionalExcludes ?? []),
     ],
-  }) as const;
+  }) as const satisfies ProjectConfig;
 
-const coverageSettings = (): DeepReadonly<CoverageOptions> =>
+const coverageSettings = () =>
   ({
     provider: 'v8',
     reporter: ['html', 'lcov', 'text'],
-    include: ['src/**/*.{mts,tsx}'],
+    include: ['src/**/*.mts'],
     exclude: ['**/index.mts', 'src/entry-point.mts'],
-  }) as const;
+  }) as const satisfies CoverageOptions;
 
 export default config();

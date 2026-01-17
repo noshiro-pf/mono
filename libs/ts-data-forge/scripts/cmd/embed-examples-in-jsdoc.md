@@ -36,7 +36,7 @@ Add `@example` blocks to the JSDoc comments.
 
 ### 2. Add Mapping Definition
 
-Add mappings of source files to their sample files in `sourceFileMappings` within `scripts/cmd/embed-jsdoc-examples.mts`. Sample files must be listed in the order they appear in the source file (from top to bottom).
+Add mappings of source files to their sample files in `sourceFileMappings` within `scripts/cmd/embed-examples-in-jsdoc-map.mts`. Sample files must be listed in the order they appear in the source file (from top to bottom).
 
 ```typescript
 const sourceFileMappings: readonly SourceFileMapping[] = [
@@ -55,18 +55,18 @@ const sourceFileMappings: readonly SourceFileMapping[] = [
 ### 3. Run the Script
 
 ```bash
-npm run doc:embed-jsdoc
+npm run doc:embed:jsdoc
 ```
 
 Or run directly:
 
 ```bash
-npx tsx scripts/cmd/embed-jsdoc-examples.mts
+npx tsx scripts/cmd/embed-examples-in-jsdoc.mts
 ```
 
 ## How It Works
 
-### embed-jsdoc-examples.mts
+### embed-examples-in-jsdoc.mts
 
 1. Reads each source file defined in `sourceFileMappings`
 2. For each sample file:
@@ -81,7 +81,7 @@ You can control the embedded range within sample files using the following keywo
 
 - `// embed-sample-code-ignore-above`: Code above this line will not be embedded
 - `// embed-sample-code-ignore-below`: Code below this line will not be embedded
-- `IGNORE_EMBEDDING(...)`: This entire line will be excluded
+- `/* embed-sample-code-ignore-this-line */ ...`: This entire line will be excluded
 
 **Example:**
 
@@ -92,6 +92,8 @@ You can control the embedded range within sample files using the following keywo
 import { Arr } from 'ts-data-forge';
 
 const result = Arr.at([1, 2, 3], 1);
+
+/* embed-sample-code-ignore-this-line */ console.log(result); // This line will not be embedded
 // embed-sample-code-ignore-below
 
 // This comment will not be embedded

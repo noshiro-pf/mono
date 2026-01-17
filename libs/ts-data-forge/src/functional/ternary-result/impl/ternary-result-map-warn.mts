@@ -10,7 +10,10 @@ import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
  * ```ts
  * const warnValue = TernaryResult.warn(2, 'slow');
  *
- * const mappedWarn = TernaryResult.mapWarn(warnValue, (warning) => `${warning}!`);
+ * const mappedWarn = TernaryResult.mapWarn(
+ *   warnValue,
+ *   (warning) => `${warning}!`,
+ * );
  *
  * const okPassthrough = TernaryResult.mapWarn(
  *   TernaryResult.ok(3),

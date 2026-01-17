@@ -1,18 +1,24 @@
 // Example: src/functional/match.mts (match exhaustive)
 import { match } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-type Status = 'draft' | 'review' | 'published';
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    type Status = 'draft' | 'review' | 'published';
 
-const status: Status = 'draft';
+    const status: Status = 'draft';
 
-const message = match<
-  Status,
-  { draft: string; review: string; published: string }
->(status, {
-  draft: 'Work in progress',
-  review: 'Awaiting feedback',
-  published: 'Complete',
-});
+    const message = match<
+      Status,
+      { draft: string; review: string; published: string }
+    >(status, {
+      draft: 'Work in progress',
+      review: 'Awaiting feedback',
+      published: 'Complete',
+    });
 
-assert.isTrue(message === 'Work in progress');
+    assert.isTrue(message === 'Work in progress');
+
+    // embed-sample-code-ignore-below
+  });
+}

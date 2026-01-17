@@ -1,9 +1,15 @@
 // Example: src/guard/is-type.mts (isNull)
 import { isNull } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const values: readonly (number | null)[] = [null, 5] as const;
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const values: readonly (number | null)[] = [null, 5] as const;
 
-const nullValues = values.filter(isNull);
+    const nullValues = values.filter(isNull);
 
-assert.deepStrictEqual(nullValues, [null]);
+    assert.deepStrictEqual(nullValues, [null]);
+
+    // embed-sample-code-ignore-below
+  });
+}

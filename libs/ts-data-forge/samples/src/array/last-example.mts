@@ -1,15 +1,21 @@
 // Example: src/array/array-utils.mts (last)
 import { Arr, Optional } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const queue = ['first', 'second'];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const queue = ['first', 'second'];
 
-const emptyQueue: string[] = [];
+    const emptyQueue: string[] = [];
 
-const lastValue = Arr.last(queue);
+    const lastValue = Arr.last(queue);
 
-const none = Arr.last(emptyQueue);
+    const none = Arr.last(emptyQueue);
 
-assert.deepStrictEqual(lastValue, Optional.some('second'));
+    assert.deepStrictEqual(lastValue, Optional.some('second'));
 
-assert.deepStrictEqual(none, Optional.none);
+    assert.deepStrictEqual(none, Optional.none);
+
+    // embed-sample-code-ignore-below
+  });
+}

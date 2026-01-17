@@ -1,9 +1,15 @@
 // Example: src/guard/is-type.mts (isNullish)
 import { isNullish } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const values: (string | null | undefined)[] = ['Ada', null, undefined];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const values: (string | null | undefined)[] = ['Ada', null, undefined];
 
-const nullishValues = values.filter(isNullish);
+    const nullishValues = values.filter(isNullish);
 
-assert.deepStrictEqual(nullishValues, [null, undefined]);
+    assert.deepStrictEqual(nullishValues, [null, undefined]);
+
+    // embed-sample-code-ignore-below
+  });
+}

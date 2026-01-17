@@ -23,7 +23,10 @@ import { type Unwrap } from './types.mjs';
  *
  * const orElseFallback = Optional.orElse(Optional.some('default'));
  *
- * assert.deepStrictEqual(orElseFallback(Optional.none), Optional.some('default'));
+ * assert.deepStrictEqual(
+ *   orElseFallback(Optional.none),
+ *   Optional.some('default'),
+ * );
  *
  * assert.deepStrictEqual(
  *   orElseFallback(Optional.some('value')),

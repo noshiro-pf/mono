@@ -9,7 +9,10 @@ import { type UnwrapErr } from './types.mjs';
  * ```ts
  * const okValue = TernaryResult.ok('value');
  *
- * assert.strictEqual(TernaryResult.unwrapErrOr(okValue, 'default'), 'default');
+ * assert.strictEqual(
+ *   TernaryResult.unwrapErrOr(okValue, 'default'),
+ *   'default',
+ * );
  *
  * const unwrapErr = TernaryResult.unwrapErrOr('fallback error');
  *

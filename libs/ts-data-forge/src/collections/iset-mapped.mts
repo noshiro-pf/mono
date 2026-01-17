@@ -153,7 +153,8 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * const allEven = set.every((point) => point.x % 2 === 0);
    *
    * const narrowed = set.every(
-   *   (point): point is Readonly<{ x: 2 | 4; tag: 'even' }> => point.x % 2 === 0,
+   *   (point): point is Readonly<{ x: 2 | 4; tag: 'even' }> =>
+   *     point.x % 2 === 0,
    * );
    *
    * assert.isTrue(allEven);

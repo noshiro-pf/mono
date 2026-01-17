@@ -257,7 +257,9 @@ export function findIndex<E>(
  * const lastIndexOfB = Arr.findLastIndex(letters, (letter) => letter === 'b');
  *
  * // eslint-disable-next-line unicorn/prefer-array-index-of
- * const notFound = Arr.findLastIndex<string>((letter) => letter === 'z')(letters);
+ * const notFound = Arr.findLastIndex<string>((letter) => letter === 'z')(
+ *   letters,
+ * );
  *
  * assert.isTrue(lastIndexOfB === 3);
  *

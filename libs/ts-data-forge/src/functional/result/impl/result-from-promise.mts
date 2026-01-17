@@ -20,7 +20,9 @@ type UnwrapPromise<P extends Promise<unknown>> =
  * ```ts
  * const successPromise = Result.fromPromise(Promise.resolve('ok'));
  *
- * const failurePromise = Result.fromPromise(Promise.reject(new Error('fail')));
+ * const failurePromise = Result.fromPromise(
+ *   Promise.reject(new Error('fail')),
+ * );
  *
  * const resolved = await successPromise;
  *

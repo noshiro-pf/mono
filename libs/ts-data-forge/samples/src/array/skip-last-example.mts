@@ -1,13 +1,19 @@
 // Example: src/array/array-utils.mts (skipLast)
 import { Arr } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-const values = ['a', 'b', 'c', 'd'];
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    const values = ['a', 'b', 'c', 'd'];
 
-const withoutLastTwo = Arr.skipLast(values, 2);
+    const withoutLastTwo = Arr.skipLast(values, 2);
 
-const withoutLastThree = Arr.skipLast(3)(values);
+    const withoutLastThree = Arr.skipLast(3)(values);
 
-assert.deepStrictEqual(withoutLastTwo, ['a', 'b']);
+    assert.deepStrictEqual(withoutLastTwo, ['a', 'b']);
 
-assert.deepStrictEqual(withoutLastThree, ['a']);
+    assert.deepStrictEqual(withoutLastThree, ['a']);
+
+    // embed-sample-code-ignore-below
+  });
+}

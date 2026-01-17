@@ -1,30 +1,36 @@
 // Example: src/collections/iset-mapped.mts (forEach)
 import { ISetMapped } from 'ts-data-forge';
 
-// embed-sample-code-ignore-above
-type Point = Readonly<{ x: number; tag: string }>;
+if (import.meta.vitest !== undefined) {
+  test('main', () => {
+    // embed-sample-code-ignore-above
+    type Point = Readonly<{ x: number; tag: string }>;
 
-const toKey = (point: Point) => JSON.stringify(point);
+    const toKey = (point: Point) => JSON.stringify(point);
 
-// eslint-disable-next-line total-functions/no-unsafe-type-assertion
-const fromKey = (key: string) => JSON.parse(key) as Point;
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    const fromKey = (key: string) => JSON.parse(key) as Point;
 
-const set = ISetMapped.create<Point, string>(
-  [
-    { x: 1, tag: 'a' },
-    { x: 2, tag: 'b' },
-  ],
-  toKey,
-  fromKey,
-);
+    const set = ISetMapped.create<Point, string>(
+      [
+        { x: 1, tag: 'a' },
+        { x: 2, tag: 'b' },
+      ],
+      toKey,
+      fromKey,
+    );
 
-const collected: Point[] = [];
+    const collected: Point[] = [];
 
-for (const point of set) {
-  collected.push(point);
+    for (const point of set) {
+      collected.push(point);
+    }
+
+    assert.deepStrictEqual(collected, [
+      { x: 1, tag: 'a' },
+      { x: 2, tag: 'b' },
+    ]);
+
+    // embed-sample-code-ignore-below
+  });
 }
-
-assert.deepStrictEqual(collected, [
-  { x: 1, tag: 'a' },
-  { x: 2, tag: 'b' },
-]);
