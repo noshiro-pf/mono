@@ -181,16 +181,38 @@ const mapped = Result.map(success, (x) => x * 2);
 
 assert.deepStrictEqual(mapped, Result.ok(84));
 
-// Advanced pipe usage
+// Advanced pipe usage with Optional
 const processNumber = (input: number): Optional<number> =>
     pipe(input)
         .map((x) => x * 2) // Regular transformation
         .map((x) => x + 10) // Chain transformations
-        .map((x) => (x > 50 ? Optional.some(x / 2) : Optional.none)).value; // Get the result
+        .map((x) => (x > 50 ? Optional.some(x / 2) : Optional.none)) // Optional<Optional<number>>
+        .mapOptional((x) => x).value; // Flatten to Optional<number>
 
 assert.deepStrictEqual(processNumber(30), Optional.some(35));
 
 assert.deepStrictEqual(processNumber(10), Optional.none);
+
+// Using pipe with Result operations
+const divideAndFormat = (
+    numerator: number,
+    denominator: number,
+): Result<string, string> =>
+    pipe(denominator)
+        .map((d) => (d !== 0 ? Result.ok(d) : Result.err('Division by zero')))
+        .map((result) => Result.map(result, (d) => numerator / d))
+        .map((result) =>
+            Result.map(result, (value) => `Result: ${value.toFixed(2)}`),
+        )
+        .map((result) => Result.mapErr(result, (error) => `Error: ${error}`))
+        .value;
+
+assert.deepStrictEqual(divideAndFormat(10, 2), Result.ok('Result: 5.00'));
+
+assert.deepStrictEqual(
+    divideAndFormat(10, 0),
+    Result.err('Error: Division by zero'),
+);
 
 // Pattern matching with match
 type Status = 'loading' | 'success' | 'error';
