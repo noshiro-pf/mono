@@ -1,3 +1,9 @@
+# [4.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.5.0...v4.6.0) (2026-01-22)
+
+### Features
+
+- add new Playwright rules and update existing ones ([#224](https://github.com/noshiro-pf/eslint-config-typed/issues/224)) ([5c88361](https://github.com/noshiro-pf/eslint-config-typed/commit/5c88361c046117c9acd304ec4fee525ba16e7653))
+
 # [4.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.4.1...v4.5.0) (2026-01-15)
 
 ### Features
