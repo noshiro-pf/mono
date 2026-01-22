@@ -7607,11 +7607,13 @@ namespace NoUnusedPrivateClassMembers {
  * @link https://typescript-eslint.io/rules/no-unused-vars
  *
  *  ```md
- *  | key         | value       |
- *  | :---------- | :---------- |
- *  | type        | problem     |
- *  | deprecated  | false       |
- *  | recommended | recommended |
+ *  | key            | value       |
+ *  | :------------- | :---------- |
+ *  | type           | problem     |
+ *  | deprecated     | false       |
+ *  | fixable        | code        |
+ *  | hasSuggestions | true        |
+ *  | recommended    | recommended |
  *  ```
  */
 namespace NoUnusedVars {
@@ -7662,6 +7664,17 @@ namespace NoUnusedVars {
    *           "destructuredArrayIgnorePattern": {
    *             "type": "string",
    *             "description": "Regular expressions of destructured array variable names to not check for usage."
+   *           },
+   *           "enableAutofixRemoval": {
+   *             "type": "object",
+   *             "additionalProperties": false,
+   *             "description": "Configurable automatic fixes for different types of unused variables.",
+   *             "properties": {
+   *               "imports": {
+   *                 "type": "boolean",
+   *                 "description": "Whether to enable automatic removal of unused imports."
+   *               }
+   *             }
    *           },
    *           "ignoreClassWithStaticInitBlock": {
    *             "type": "boolean",
@@ -7717,6 +7730,11 @@ namespace NoUnusedVars {
          * for usage.
          */
         destructuredArrayIgnorePattern?: string;
+        /** Configurable automatic fixes for different types of unused variables. */
+        enableAutofixRemoval?: Readonly<{
+          /** Whether to enable automatic removal of unused imports. */
+          imports?: boolean;
+        }>;
         /**
          * Whether to ignore classes with at least one static initialization
          * block.
@@ -9876,6 +9894,53 @@ namespace StrictBooleanExpressions {
 }
 
 /**
+ * Disallow passing a value-returning function in a position accepting a void
+ * function
+ *
+ * @link https://typescript-eslint.io/rules/strict-void-return
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace StrictVoidReturn {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allowReturnAny": {
+   *         "type": "boolean",
+   *         "description": "Whether to allow functions returning `any` to be used in place expecting a `void` function."
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether to allow functions returning `any` to be used in place expecting
+     * a `void` function.
+     */
+    allowReturnAny?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * Require switch-case statements to be exhaustive
  *
  * @link https://typescript-eslint.io/rules/switch-exhaustiveness-check
@@ -10318,6 +10383,7 @@ export type TypeScriptEslintRules = Readonly<{
   '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.RuleEntry;
   '@typescript-eslint/return-await': ReturnAwait.RuleEntry;
   '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.RuleEntry;
+  '@typescript-eslint/strict-void-return': StrictVoidReturn.RuleEntry;
   '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.RuleEntry;
   '@typescript-eslint/triple-slash-reference': TripleSlashReference.RuleEntry;
   '@typescript-eslint/unbound-method': UnboundMethod.RuleEntry;
@@ -10404,6 +10470,7 @@ export type TypeScriptEslintRulesOption = Readonly<{
   '@typescript-eslint/restrict-template-expressions': RestrictTemplateExpressions.Options;
   '@typescript-eslint/return-await': ReturnAwait.Options;
   '@typescript-eslint/strict-boolean-expressions': StrictBooleanExpressions.Options;
+  '@typescript-eslint/strict-void-return': StrictVoidReturn.Options;
   '@typescript-eslint/switch-exhaustiveness-check': SwitchExhaustivenessCheck.Options;
   '@typescript-eslint/triple-slash-reference': TripleSlashReference.Options;
   '@typescript-eslint/unbound-method': UnboundMethod.Options;

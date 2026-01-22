@@ -98,7 +98,6 @@ export const eslintStylisticRules = {
   '@stylistic/jsx-function-call-newline': 'off',
   '@stylistic/jsx-pascal-case': 'off',
   '@stylistic/jsx-self-closing-comp': 'off',
-  '@stylistic/jsx-sort-props': 'off',
   '@stylistic/line-comment-position': 'off',
   '@stylistic/lines-between-class-members': 'off',
   '@stylistic/multiline-comment-style': 'off',
@@ -122,4 +121,6 @@ export const eslintStylisticRules = {
       next: 'case',
     },
   ],
+
+  '@stylistic/jsx-sort-props': 0,
 } as const satisfies EslintStylisticRules;

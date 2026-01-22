@@ -3621,7 +3621,7 @@ namespace JsxSelfClosingComp {
  *  | key        | value  |
  *  | :--------- | :----- |
  *  | type       | layout |
- *  | deprecated | false  |
+ *  | deprecated | true   |
  *  | fixable    | code   |
  *  ```
  */
@@ -3687,24 +3687,7 @@ namespace JsxSortProps {
    * ]
    * ```
    */
-  export type Options = Readonly<{
-    callbacksLast?: boolean;
-    shorthandFirst?: boolean;
-    shorthandLast?: boolean;
-    /** @default 'ignore' */
-    multiline?: 'ignore' | 'first' | 'last';
-    ignoreCase?: boolean;
-    noSortAlphabetically?: boolean;
-    reservedFirst?: readonly string[] | boolean;
-    reservedLast?: readonly string[];
-    /** @default 'auto' */
-    locale?: string;
-  }>;
-
-  export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -9489,7 +9472,17 @@ namespace TypeAnnotationSpacing {
    *             "$ref": "#/$defs/spacingConfig"
    *           },
    *           "arrow": {
-   *             "$ref": "#/$defs/spacingConfig"
+   *             "oneOf": [
+   *               {
+   *                 "type": "string",
+   *                 "enum": [
+   *                   "ignore"
+   *                 ]
+   *               },
+   *               {
+   *                 "$ref": "#/$defs/spacingConfig"
+   *               }
+   *             ]
    *           },
    *           "variable": {
    *             "$ref": "#/$defs/spacingConfig"
@@ -9517,7 +9510,7 @@ namespace TypeAnnotationSpacing {
     after?: boolean;
     overrides?: Readonly<{
       colon?: SpacingConfig;
-      arrow?: SpacingConfig;
+      arrow?: 'ignore' | SpacingConfig;
       variable?: SpacingConfig;
       parameter?: SpacingConfig;
       property?: SpacingConfig;
@@ -9739,7 +9732,6 @@ export type EslintStylisticRules = Readonly<{
   '@stylistic/jsx-pascal-case': JsxPascalCase.RuleEntry;
   '@stylistic/jsx-quotes': JsxQuotes.RuleEntry;
   '@stylistic/jsx-self-closing-comp': JsxSelfClosingComp.RuleEntry;
-  '@stylistic/jsx-sort-props': JsxSortProps.RuleEntry;
   '@stylistic/jsx-tag-spacing': JsxTagSpacing.RuleEntry;
   '@stylistic/jsx-wrap-multilines': JsxWrapMultilines.RuleEntry;
   '@stylistic/key-spacing': KeySpacing.RuleEntry;
@@ -9800,6 +9792,7 @@ export type EslintStylisticRules = Readonly<{
   // deprecated
   '@stylistic/jsx-indent': JsxIndent.RuleEntry;
   '@stylistic/jsx-props-no-multi-spaces': JsxPropsNoMultiSpaces.RuleEntry;
+  '@stylistic/jsx-sort-props': JsxSortProps.RuleEntry;
 }>;
 
 export type EslintStylisticRulesOption = Readonly<{
@@ -9848,7 +9841,6 @@ export type EslintStylisticRulesOption = Readonly<{
   '@stylistic/jsx-pascal-case': JsxPascalCase.Options;
   '@stylistic/jsx-quotes': JsxQuotes.Options;
   '@stylistic/jsx-self-closing-comp': JsxSelfClosingComp.Options;
-  '@stylistic/jsx-sort-props': JsxSortProps.Options;
   '@stylistic/jsx-tag-spacing': JsxTagSpacing.Options;
   '@stylistic/jsx-wrap-multilines': JsxWrapMultilines.Options;
   '@stylistic/key-spacing': KeySpacing.Options;

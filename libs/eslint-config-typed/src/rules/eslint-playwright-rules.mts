@@ -66,4 +66,6 @@ export const eslintPlaywrightRules = {
   'playwright/no-wait-for-navigation': 'error',
   'playwright/valid-test-tags': withDefaultOption('error'),
   'playwright/no-unused-locators': 'error',
+  'playwright/consistent-spacing-between-blocks': 'error',
+  'playwright/no-restricted-locators': withDefaultOption('error'),
 } as const satisfies EslintPlaywrightRules;
