@@ -85,7 +85,15 @@ const processFile = async (
 };
 
 export const genTypeDefinitions = async (): Promise<void> => {
-  const dtsFiles = await glob(`${srcDir}/**/*.d.mts`);
+  const getDesFilesResult = await glob(`${srcDir}/**/*.d.mts`);
+
+  if (Result.isErr(getDesFilesResult)) {
+    console.error(getDesFilesResult.value);
+
+    return;
+  }
+
+  const dtsFiles = getDesFilesResult.value;
 
   const allTypes: DeepReadonly<
     {

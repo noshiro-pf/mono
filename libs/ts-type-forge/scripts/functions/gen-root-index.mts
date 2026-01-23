@@ -4,7 +4,15 @@ export const genRootIndex = async (
 ): Promise<void> => {
   console.log(`Searching for .d.mts files in ${srcDir}...`);
 
-  const dtsFiles: readonly string[] = await getDtsFiles(srcDir, indexFilePath);
+  const getDesFilesResult = await getDtsFiles(srcDir, indexFilePath);
+
+  if (Result.isErr(getDesFilesResult)) {
+    console.error(getDesFilesResult.value);
+
+    return;
+  }
+
+  const dtsFiles = getDesFilesResult.value;
 
   if (dtsFiles.length === 0) {
     console.log('No .d.mts files found (excluding index.d.mts).');
@@ -41,8 +49,10 @@ export const genRootIndex = async (
 const getDtsFiles = async (
   srcDir: string,
   indexFilePath: string,
-): Promise<readonly string[]> => {
-  const dtsFiles = await glob(`${srcDir}/**/*.d.mts`);
+): Promise<Result<readonly string[], unknown>> => {
+  const globResult = await glob(`${srcDir}/**/*.d.mts`);
 
-  return dtsFiles.filter((filePath) => filePath !== indexFilePath);
+  return Result.map(globResult, (dtsFiles) =>
+    dtsFiles.filter((filePath) => filePath !== indexFilePath),
+  );
 };
