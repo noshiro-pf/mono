@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.0.1...v1.1.0) (2026-01-23)
+
+### Features
+
+- add transformer and CLI commands ([#12](https://github.com/noshiro-pf/ts-codemod-lib/issues/12)) ([3f99181](https://github.com/noshiro-pf/ts-codemod-lib/commit/3f991814ef30bc7ed0197b5720edf41ec0f01fd4))
+
 ## [1.0.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.0.0...v1.0.1) (2026-01-11)
 
 ### Bug Fixes
