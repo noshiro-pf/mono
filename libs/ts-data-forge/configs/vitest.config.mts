@@ -42,7 +42,7 @@ const config = () =>
             },
           },
           optimizeDeps: {
-            include: ['@sindresorhus/is'],
+            include: ['@sindresorhus/is', 'dedent'],
           },
         },
       ],
