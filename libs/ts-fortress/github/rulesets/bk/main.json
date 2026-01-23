@@ -84,6 +84,22 @@
           {
             "context": "test (test:cov)",
             "integration_id": 15368
+          },
+          {
+            "context": "test-node-versions (20.20.0)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test-node-versions (22.22.0)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test-node-versions (24.13.0)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test-node-versions (25.4.0)",
+            "integration_id": 15368
           }
         ]
       }
