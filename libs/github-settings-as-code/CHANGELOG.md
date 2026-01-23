@@ -1,3 +1,9 @@
+## [1.0.12](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.11...v1.0.12) (2026-01-23)
+
+### Bug Fixes
+
+- Change node version requirements ([#42](https://github.com/noshiro-pf/github-settings-as-code/issues/42)) ([6084383](https://github.com/noshiro-pf/github-settings-as-code/commit/608438359f1d2c50b485338ccd4af66c53bea8c1))
+
 ## [1.0.11](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.10...v1.0.11) (2026-01-13)
 
 ### Bug Fixes
