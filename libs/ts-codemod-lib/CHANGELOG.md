@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.0...v1.1.1) (2026-01-23)
+
+### Bug Fixes
+
+- change node version requirements ([#13](https://github.com/noshiro-pf/ts-codemod-lib/issues/13)) ([1bb382e](https://github.com/noshiro-pf/ts-codemod-lib/commit/1bb382e24a9c6ec66a9f01ee09adafc7386184b7))
+
 # [1.1.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.0.1...v1.1.0) (2026-01-23)
 
 ### Features
