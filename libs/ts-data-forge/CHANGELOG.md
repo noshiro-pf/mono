@@ -1,3 +1,9 @@
+## [6.2.2](https://github.com/noshiro-pf/ts-data-forge/compare/v6.2.1...v6.2.2) (2026-01-23)
+
+### Bug Fixes
+
+- Change node version requirements ([#271](https://github.com/noshiro-pf/ts-data-forge/issues/271)) ([7ff7993](https://github.com/noshiro-pf/ts-data-forge/commit/7ff7993870993361d2638c99306517012942c3bc))
+
 ## [6.2.1](https://github.com/noshiro-pf/ts-data-forge/compare/v6.2.0...v6.2.1) (2026-01-05)
 
 ### Bug Fixes
