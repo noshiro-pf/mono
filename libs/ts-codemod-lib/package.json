@@ -129,7 +129,7 @@
   },
   "packageManager": "pnpm@10.27.0",
   "engines": {
-    "node": ">=22",
+    "node": ">=20.11.0",
     "pnpm": ">=8.0.0"
   },
   "volta": {
