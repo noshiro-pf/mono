@@ -1,3 +1,9 @@
+# [6.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.2.2...v6.3.0) (2026-01-23)
+
+### Features
+
+- add debounce function ([#273](https://github.com/noshiro-pf/ts-data-forge/issues/273)) ([f07c7e6](https://github.com/noshiro-pf/ts-data-forge/commit/f07c7e64e2fcbea537392895d4adddb7218d38d8))
+
 ## [6.2.2](https://github.com/noshiro-pf/ts-data-forge/compare/v6.2.1...v6.2.2) (2026-01-23)
 
 ### Bug Fixes
