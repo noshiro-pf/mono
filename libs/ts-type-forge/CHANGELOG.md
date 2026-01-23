@@ -1,3 +1,9 @@
+## [2.3.1](https://github.com/noshiro-pf/ts-type-forge/compare/v2.3.0...v2.3.1) (2026-01-23)
+
+### Bug Fixes
+
+- Change node version requirements ([#264](https://github.com/noshiro-pf/ts-type-forge/issues/264)) ([f8f88b9](https://github.com/noshiro-pf/ts-type-forge/commit/f8f88b906f01a30ce4ce79a79ed8309cf1164af8))
+
 # [2.3.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.2.0...v2.3.0) (2025-10-15)
 
 ### Features
