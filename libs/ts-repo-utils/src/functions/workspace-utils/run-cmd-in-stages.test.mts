@@ -36,7 +36,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
     const processExitSpy = vi
       .spyOn(process, 'exit')
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      .mockImplementation((): never => undefined as never);
+      .mockReturnValue(undefined as never);
 
     return { consoleLogSpy, consoleErrorSpy, processExitSpy };
   };

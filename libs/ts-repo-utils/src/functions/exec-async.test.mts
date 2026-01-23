@@ -512,7 +512,7 @@ describe('exec-async', () => {
       const stderrWriteSpy = vi
         // eslint-disable-next-line vitest/no-restricted-vi-methods
         .spyOn(process.stderr, 'write')
-        .mockImplementation(() => true);
+        .mockReturnValue(true);
 
       try {
         await withSilentEcho(async () => {
