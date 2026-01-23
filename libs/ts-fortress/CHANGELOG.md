@@ -1,3 +1,9 @@
+## [6.2.3](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.2...v6.2.3) (2026-01-23)
+
+### Bug Fixes
+
+- Change node version requirements ([#191](https://github.com/noshiro-pf/ts-fortress/issues/191)) ([0b14a4a](https://github.com/noshiro-pf/ts-fortress/commit/0b14a4aac400dfd3707e9a391ac1b61f9df4987c))
+
 ## [6.2.2](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.1...v6.2.2) (2026-01-17)
 
 ### Bug Fixes
