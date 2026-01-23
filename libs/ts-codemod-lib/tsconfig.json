@@ -12,6 +12,7 @@
     "./src",
     "./test",
     "./samples",
+    "./test-code",
     "./scripts",
     "./configs",
     "./.eslintrc.cjs",

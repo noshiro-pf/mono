@@ -10,7 +10,7 @@ const thisDir = import.meta.dirname;
 
 export default [
   {
-    ignores: ['.eslintrc.cjs', 'docs/**', 'agents/**'],
+    ignores: ['.eslintrc.cjs', 'docs/**', 'agents/**', 'test-code/**'],
   },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
@@ -21,7 +21,7 @@ export default [
   eslintConfigForVitest(),
 
   {
-    files: ['src/**/*.mts'],
+    files: ['src/**/*.mts', 'samples/**/*.mts'],
     rules: defineKnownRules({
       'import-x/no-unassigned-import': 'off',
     }),
@@ -36,6 +36,7 @@ export default [
       '@typescript-eslint/consistent-indexed-object-style': 'off',
       '@typescript-eslint/no-restricted-types': 'off',
       '@typescript-eslint/no-redundant-type-constituents': 'off',
+      '@typescript-eslint/consistent-type-definitions': 'off',
       'unicorn/consistent-function-scoping': 'off',
       'import-x/no-internal-modules': 'off',
     }),

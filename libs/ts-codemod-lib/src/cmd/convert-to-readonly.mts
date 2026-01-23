@@ -162,11 +162,13 @@ const transformOneFile = async (
 
   const fileName = path.basename(filePath);
 
+  const isTsx = fileName.endsWith('.tsx') || fileName.endsWith('.jsx');
+
   try {
     const originalCode = await fs.readFile(filePath, 'utf8');
 
     // Transform the code with all transformers
-    const transformedCode = transformSourceCode(originalCode, false, [
+    const transformedCode = transformSourceCode(originalCode, isTsx, [
       convertToReadonlyTypeTransformer(),
     ]);
 
