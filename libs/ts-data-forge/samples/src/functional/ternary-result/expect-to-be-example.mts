@@ -2,7 +2,7 @@
 import { TernaryResult } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
-  test('main', () => {
+  test('main', (): void => {
     // embed-sample-code-ignore-above
     const okValue = TernaryResult.ok('ready');
 
@@ -10,10 +10,11 @@ if (import.meta.vitest !== undefined) {
 
     const expectResult = TernaryResult.expectToBe<string>('needs value');
 
-    assert.throws(
-      () => expectResult(TernaryResult.err('oops')),
-      /needs value/u,
-    );
+    const throwTest = (): void => {
+      expectResult(TernaryResult.err('oops'));
+    };
+
+    assert.throws(throwTest, /needs value/u);
 
     // embed-sample-code-ignore-below
   });

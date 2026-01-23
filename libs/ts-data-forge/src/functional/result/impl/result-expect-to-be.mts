@@ -15,7 +15,11 @@ import { type UnwrapOk } from './types.mjs';
  *
  * const expectResult = Result.expectToBe<string>('missing result');
  *
- * assert.throws(() => expectResult(Result.err('boom')), /missing result/u);
+ * const throwTest = (): void => {
+ *   expectResult(Result.err('boom'));
+ * };
+ *
+ * assert.throws(throwTest, /missing result/u);
  *
  * assert.isTrue(expectResult(Result.ok('value')) === 'value');
  * ```

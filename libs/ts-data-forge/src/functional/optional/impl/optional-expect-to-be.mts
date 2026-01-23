@@ -17,7 +17,11 @@ import { type Unwrap } from './types.mjs';
  *
  * const expectValue = Optional.expectToBe<string>('missing optional');
  *
- * assert.throws(() => expectValue(Optional.none), /missing optional/u);
+ * const throwTest = (): void => {
+ *   expectValue(Optional.none);
+ * };
+ *
+ * assert.throws(throwTest, /missing optional/u);
  *
  * assert.isTrue(expectValue(Optional.some('present')) === 'present');
  * ```

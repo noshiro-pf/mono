@@ -2,16 +2,17 @@
 import { TernaryResult } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
-  test('main', () => {
+  test('main', (): void => {
     // embed-sample-code-ignore-above
     const okValue = TernaryResult.ok('ready');
 
     assert.strictEqual(TernaryResult.unwrapThrow(okValue), 'ready');
 
-    assert.throws(
-      () => TernaryResult.unwrapThrow(TernaryResult.warn('warn', 'warned')),
-      /Expected Ok/u,
-    );
+    const throwTest = (): void => {
+      TernaryResult.unwrapThrow(TernaryResult.warn('warn', 'warned'));
+    };
+
+    assert.throws(throwTest, /Expected Ok/u);
 
     // embed-sample-code-ignore-below
   });

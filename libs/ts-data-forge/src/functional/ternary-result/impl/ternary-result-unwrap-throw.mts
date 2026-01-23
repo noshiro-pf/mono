@@ -13,10 +13,11 @@ import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
  *
  * assert.strictEqual(TernaryResult.unwrapThrow(okValue), 'ready');
  *
- * assert.throws(
- *   () => TernaryResult.unwrapThrow(TernaryResult.warn('warn', 'warned')),
- *   /Expected Ok/u,
- * );
+ * const throwTest = (): void => {
+ *   TernaryResult.unwrapThrow(TernaryResult.warn('warn', 'warned'));
+ * };
+ *
+ * assert.throws(throwTest, /Expected Ok/u);
  * ```
  */
 export const unwrapThrow = <R extends UnknownTernaryResult>(

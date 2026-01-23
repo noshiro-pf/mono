@@ -760,8 +760,10 @@ describe('Arr creations', () => {
       const result = await generateAsync<number>(async function* () {
         // eslint-disable-next-line functional/no-let
         for (let i = 0; i < 3; i++) {
-          // eslint-disable-next-line no-promise-executor-return, no-await-in-loop
-          await new Promise((resolve) => setTimeout(resolve, 0));
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, 0);
+          });
 
           yield i;
         }

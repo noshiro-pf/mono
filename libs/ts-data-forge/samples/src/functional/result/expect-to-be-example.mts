@@ -2,7 +2,7 @@
 import { Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
-  test('main', () => {
+  test('main', (): void => {
     // embed-sample-code-ignore-above
     const okValue = Result.ok('data');
 
@@ -10,7 +10,11 @@ if (import.meta.vitest !== undefined) {
 
     const expectResult = Result.expectToBe<string>('missing result');
 
-    assert.throws(() => expectResult(Result.err('boom')), /missing result/u);
+    const throwTest = (): void => {
+      expectResult(Result.err('boom'));
+    };
+
+    assert.throws(throwTest, /missing result/u);
 
     assert.isTrue(expectResult(Result.ok('value')) === 'value');
 

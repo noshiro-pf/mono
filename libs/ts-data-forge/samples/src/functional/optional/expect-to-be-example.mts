@@ -2,7 +2,7 @@
 import { Optional } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
-  test('main', () => {
+  test('main', (): void => {
     // embed-sample-code-ignore-above
     const optionalValue = Optional.some('data');
 
@@ -12,7 +12,11 @@ if (import.meta.vitest !== undefined) {
 
     const expectValue = Optional.expectToBe<string>('missing optional');
 
-    assert.throws(() => expectValue(Optional.none), /missing optional/u);
+    const throwTest = (): void => {
+      expectValue(Optional.none);
+    };
+
+    assert.throws(throwTest, /missing optional/u);
 
     assert.isTrue(expectValue(Optional.some('present')) === 'present');
 

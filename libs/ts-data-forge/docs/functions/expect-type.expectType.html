@@ -4,13 +4,16 @@ has no runtime effect. It is primarily used in test files to verify that
 TypeScript's type inference and type relationships work as expected. The
 function will cause TypeScript compilation errors if the specified type
 relationship does not hold.</p>
-<h2 id="supported-type-relations" class="tsd-anchor-link">Supported Type Relations<a href="#supported-type-relations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><h3 id="equality-relations" class="tsd-anchor-link">Equality Relations<a href="#equality-relations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<h2 id="supported-type-relations" class="tsd-anchor-link">Supported Type Relations<a href="#supported-type-relations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="equality-relations" class="tsd-anchor-link">Equality Relations<a href="#equality-relations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
 <li><strong><code>&quot;=&quot;</code> (strict equality)</strong>: Asserts that types <code>A</code> and <code>B</code> are exactly the
 same type. Uses TypeScript's internal type equality checking.</li>
 <li><strong><code>&quot;!=&quot;</code> (strict inequality)</strong>: Asserts that types <code>A</code> and <code>B</code> are not
 exactly the same type.</li>
 </ul>
-<h3 id="assignability-relations" class="tsd-anchor-link">Assignability Relations<a href="#assignability-relations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<h3 id="assignability-relations" class="tsd-anchor-link">Assignability Relations<a href="#assignability-relations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
 <li><strong><code>&quot;~=&quot;</code> (mutual assignability)</strong>: Asserts that <code>A</code> extends <code>B</code> AND <code>B</code>
 extends <code>A</code>. Types are structurally equivalent and mutually assignable.</li>
 <li><strong><code>&quot;&lt;=&quot;</code> (subtype relation)</strong>: Asserts that type <code>A</code> extends (is assignable
@@ -18,11 +21,13 @@ to) type <code>B</code>. Type <code>A</code> is a subtype of <code>B</code>.</li
 <li><strong><code>&quot;&gt;=&quot;</code> (supertype relation)</strong>: Asserts that type <code>B</code> extends (is assignable
 to) type <code>A</code>. Type <code>A</code> is a supertype of <code>B</code>.</li>
 </ul>
-<h3 id="negative-assignability-relations" class="tsd-anchor-link">Negative Assignability Relations<a href="#negative-assignability-relations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<h3 id="negative-assignability-relations" class="tsd-anchor-link">Negative Assignability Relations<a href="#negative-assignability-relations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
 <li><strong><code>&quot;!&lt;=&quot;</code> (not subtype)</strong>: Asserts that type <code>A</code> does NOT extend type <code>B</code>.</li>
 <li><strong><code>&quot;!&gt;=&quot;</code> (not supertype)</strong>: Asserts that type <code>B</code> does NOT extend type <code>A</code>.</li>
 </ul>
-<h2 id="type-parameter-constraints" class="tsd-anchor-link">Type Parameter Constraints<a href="#type-parameter-constraints" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></div><section class="tsd-panel"><h4>Type Parameters</h4><ul class="tsd-type-parameter-list"><li><span id="expecttypea"><span class="tsd-kind-type-parameter">A</span></span><div class="tsd-comment tsd-typography"><p>The first type for comparison. Can be any TypeScript type
+<h2 id="type-parameter-constraints" class="tsd-anchor-link">Type Parameter Constraints<a href="#type-parameter-constraints" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+</div><section class="tsd-panel"><h4>Type Parameters</h4><ul class="tsd-type-parameter-list"><li><span id="expecttypea"><span class="tsd-kind-type-parameter">A</span></span><div class="tsd-comment tsd-typography"><p>The first type for comparison. Can be any TypeScript type
 including:</p>
 <ul>
 <li>Primitive types (string, number, boolean, etc.)</li>
@@ -39,7 +44,8 @@ the available operators based on the actual relationship between types <code>A</
 and <code>B</code>. If an invalid relationship is specified, TypeScript will show a
 compilation error.</p>
 <p>Combine <code>expectType</code> with runtime assertions for comprehensive testing:</p>
-<h2 id="important-notes" class="tsd-anchor-link">Important Notes<a href="#important-notes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<h2 id="important-notes" class="tsd-anchor-link">Important Notes<a href="#important-notes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
 <li><strong>Compile-time only</strong>: This function has no runtime behavior and will be
 optimized away.</li>
 <li><strong>Type inference</strong>: The available relation operators are automatically
