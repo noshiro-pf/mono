@@ -1,3 +1,9 @@
+## [8.0.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.0.2...v8.0.3) (2026-01-23)
+
+### Bug Fixes
+
+- fixed Node.js version restrictions ([#261](https://github.com/noshiro-pf/ts-repo-utils/issues/261)) ([17956df](https://github.com/noshiro-pf/ts-repo-utils/commit/17956df99c3b947356d8598f3076db56ec02674e))
+
 ## [8.0.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.0.1...v8.0.2) (2026-01-05)
 
 ### Bug Fixes
