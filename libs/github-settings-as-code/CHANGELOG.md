@@ -1,3 +1,9 @@
+# [1.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.12...v1.1.0) (2026-01-24)
+
+### Features
+
+- add a variable ([99575b6](https://github.com/noshiro-pf/github-settings-as-code/commit/99575b6719fd4c11bf3430e786c41ba4fe999bca))
+
 ## [1.0.12](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.0.11...v1.0.12) (2026-01-23)
 
 ### Bug Fixes
