@@ -1,0 +1,66 @@
+name: Style Check
+
+on:
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'develop*'
+    paths-ignore:
+      - '**.png'
+      - '**.jpg'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  style-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: true
+      matrix:
+        command:
+          - fmt:full
+          - md
+          - cspell
+          - ws:doc
+          - ws:check:ext
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Fetch main
+        run: git fetch origin main
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+
+      - name: Cache Node.js modules
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.OS }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ matrix.command }}
+          restore-keys: |
+            ${{ runner.OS }}-pnpm-
+            ${{ runner.OS }}-
+
+      - name: Set up Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version-file: 'package.json'
+          registry-url: https://npm.pkg.github.com/
+          scope: '@noshiro-pf'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run "${{ matrix.command }}"
+        run: pnpm run ${{ matrix.command }}
+
+      - name: Check if there is no file diff
+        run: pnpm exec assert-repo-is-clean

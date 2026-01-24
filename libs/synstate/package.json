@@ -1,0 +1,114 @@
+{
+  "name": "typescript-monorepo-template",
+  "version": "0.1.0",
+  "private": true,
+  "keywords": [
+    "typescript",
+    "monorepo"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/typescript-monorepo-template.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "workspaces": [
+    "packages/**"
+  ],
+  "scripts": {
+    "check:root": "pnpm run '/check:root:.*/'",
+    "check:root:lint": "pnpm run z:eslint ./{scripts,configs}/**/*.mts --fix",
+    "check:root:type": "tsc -p ./tsconfig.json --noEmit",
+    "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "ci:publish": "pnpm run ws:build && pnpm publish -r",
+    "ci:version-packages": "pnpm changeset version && pnpm install --no-frozen-lockfile",
+    "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
+    "fmt": "format-uncommitted",
+    "fmt:diff": "format-diff-from origin/main",
+    "fmt:full": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write .",
+    "gh:apply-all": "gh-apply-all",
+    "gh:apply-repository-settings": "gh-apply-repository-settings",
+    "gh:apply-rulesets": "gh-apply-rulesets",
+    "gh:apply-variables": "gh-apply-variables",
+    "gh:backup-all": "gh-backup-all",
+    "gh:backup-repository-settings": "gh-backup-repository-settings",
+    "gh:backup-rulesets": "gh-backup-rulesets",
+    "md": "markdownlint-cli2",
+    "update-dependencies": "pnpm update --latest -r",
+    "ws:build": "tsx ./scripts/cmd/ws-build-stages.mts",
+    "ws:check:ext": "pnpm run --recursive --if-present check:ext",
+    "ws:doc": "pnpm run --recursive --if-present doc",
+    "ws:gi": "pnpm run --recursive --if-present gi",
+    "ws:lint": "pnpm run --recursive --if-present lint",
+    "ws:lint:fix": "pnpm run --recursive --if-present lint:fix",
+    "ws:test": "pnpm run --recursive --if-present test",
+    "ws:test:cov": "pnpm run --recursive --if-present test:cov",
+    "ws:tsc": "pnpm run --recursive --if-present tsc",
+    "ws:type-check": "pnpm run --recursive --if-present type-check",
+    "z:eslint": "NODE_OPTIONS='--max-old-space-size=6144' TIMING=1 eslint"
+  },
+  "devDependencies": {
+    "@changesets/cli": "2.29.8",
+    "@rollup/plugin-json": "6.1.0",
+    "@rollup/plugin-replace": "6.0.3",
+    "@rollup/plugin-strip": "3.0.4",
+    "@rollup/plugin-typescript": "12.3.0",
+    "@types/node": "25.0.10",
+    "@vitest/browser-playwright": "4.0.18",
+    "@vitest/coverage-v8": "4.0.18",
+    "@vitest/ui": "4.0.18",
+    "conventional-changelog-conventionalcommits": "9.1.0",
+    "cspell": "9.6.0",
+    "dedent": "1.7.1",
+    "eslint": "9.39.2",
+    "eslint-config-typed": "4.6.0",
+    "github-settings-as-code": "1.0.12",
+    "jiti": "2.6.1",
+    "markdownlint": "0.40.0",
+    "markdownlint-cli2": "0.20.0",
+    "npm-run-all2": "8.0.4",
+    "playwright": "^1.58.0",
+    "prettier": "3.8.1",
+    "prettier-plugin-organize-imports": "4.3.0",
+    "prettier-plugin-packagejson": "3.0.0",
+    "rollup": "4.56.0",
+    "ts-data-forge": "6.2.2",
+    "ts-repo-utils": "8.0.3",
+    "ts-type-forge": "2.3.0",
+    "tslib": "2.8.1",
+    "tsx": "4.21.0",
+    "typedoc": "0.28.16",
+    "typedoc-github-theme": "^0.3.1",
+    "typedoc-plugin-markdown": "^4.9.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.1",
+    "vitest": "4.0.18"
+  },
+  "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=20.11.0",
+    "pnpm": ">=8.0.0"
+  },
+  "volta": {
+    "node": "25.2.1"
+  }
+}

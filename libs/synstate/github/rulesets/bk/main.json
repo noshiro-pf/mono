@@ -1,0 +1,110 @@
+{
+  "id": 6612138,
+  "name": "main",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [
+    {
+      "actor_id": 5,
+      "actor_type": "RepositoryRole",
+      "bypass_mode": "always"
+    }
+  ],
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": ["~DEFAULT_BRANCH", "refs/heads/main"]
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "required_linear_history"
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": true,
+        "required_reviewers": [],
+        "require_code_owner_review": true,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true,
+        "allowed_merge_methods": ["squash"]
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": true,
+        "required_status_checks": [
+          {
+            "context": "style-check (cspell)",
+            "integration_id": 15368
+          },
+          {
+            "context": "style-check (md)",
+            "integration_id": 15368
+          },
+          {
+            "context": "style-check (ws:check:ext)",
+            "integration_id": 15368
+          },
+          {
+            "context": "style-check (ws:doc)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (ws:test:cov)",
+            "integration_id": 15368
+          },
+          {
+            "context": "style-check (fmt:full)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (check:root)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (ws:lint:fix)",
+            "integration_id": 15368
+          },
+          {
+            "context": "type-check (ws:type-check)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test-node-versions (20.20.0)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test-node-versions (22.22.0)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test-node-versions (24.13.0)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test-node-versions (25.4.0)",
+            "integration_id": 15368
+          }
+        ]
+      }
+    },
+    {
+      "type": "copilot_code_review",
+      "parameters": {
+        "review_on_push": false,
+        "review_draft_pull_requests": false
+      }
+    }
+  ]
+}

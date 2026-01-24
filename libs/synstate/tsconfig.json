@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "./configs/tsconfig/tsconfig.type-check.json",
+    "./configs/tsconfig/tsconfig.vite.json"
+  ],
+  "include": [
+    "./scripts/**/*",
+    "./configs/**/*",
+    "./**/eslint.config.mts",
+    "./**/configs/**/*.mts",
+    "./**/configs/**/*.ts",
+    "./**/vite.config.mts",
+    "./.markdownlint-cli2.mjs"
+  ]
+}

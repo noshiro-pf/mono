@@ -1,0 +1,58 @@
+{
+  "name": "@noshiro-pf/package-b",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/typescript-monorepo-template.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx ./scripts/cmd/build.mts",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "doc": "tsx ./scripts/cmd/gen-docs.mts",
+    "doc:embed": "tsx ./scripts/cmd/embed-samples.mts",
+    "doc:preview": "vite preview --config ./configs/vite.doc.config.ts",
+    "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
+    "fmt": "prettier --write .",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest:node run",
+    "test:browser": "pnpm run z:vitest --project='Browser' run",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "test:cov:ui": "vite preview --outDir ./coverage",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "tsc --noEmit",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "update-packages": "pnpm update --latest",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
