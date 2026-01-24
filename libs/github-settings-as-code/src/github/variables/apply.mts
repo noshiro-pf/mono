@@ -17,6 +17,10 @@ export const applyVariables = async (): Promise<void> => {
       name: 'SEMANTIC_RELEASE_GIT_PERMISSION_BOT_APP_ID',
       value: '1442563',
     },
+    {
+      name: 'CHANGESETS_BOT_APP_ID',
+      value: '1576218',
+    },
   ] as const;
 
   const variableListSaved = await listRepoVariables();
