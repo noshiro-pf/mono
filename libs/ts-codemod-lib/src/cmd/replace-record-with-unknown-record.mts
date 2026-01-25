@@ -11,8 +11,8 @@ import {
 } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
-  name: 'replace-record-with-unknown-record-cli',
-  version: '1.0.0',
+  name: 'replace-record-with-unknown-record',
+  version: '1.1.1',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

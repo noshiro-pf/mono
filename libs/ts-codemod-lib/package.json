@@ -14,7 +14,9 @@
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/cmd/*.mjs"
+  ],
   "type": "module",
   "exports": {
     ".": {
@@ -66,8 +68,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
+    "prepare-release": "run-s sync-cli-versions fmt build doc",
     "run:cmd": "tsx ./src/cmd/convert-to-readonly.mts ./test/sample1.mts",
     "run:test": "tsx ./scripts/test-code/transform-test-code.mts",
+    "sync-cli-versions": "tsx scripts/cmd/sync-cli-versions.mts",
     "test": "pnpm run z:vitest:node run",
     "test:browser": "pnpm run z:vitest --project='Browser' run",
     "test:cov": "pnpm run z:vitest:node run --coverage",

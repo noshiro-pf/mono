@@ -40,22 +40,28 @@ export default {
     // 3. Write the release notes content generated in step 2 to the Changelog file.
     '@semantic-release/changelog',
 
-    // 4. Run prettier and build before committing.
-    [
-      '@semantic-release/exec',
-      { prepareCmd: 'pnpm run fmt && pnpm run build && pnpm run test' },
-    ],
-
     // 4-a. Update the version field in package.json with the next version number.
-    // 4-b. Publish the package to npmjs.
-    // 4-c. Run `npm dist-tag` command to add a tag to the package published on npmjs.
-    '@semantic-release/npm',
+    // (This happens first so sync-cli-versions can read the new version)
+    { path: '@semantic-release/npm', npmPublish: false },
+
+    // 4-b. Sync CLI versions, format, build, and generate docs after version update.
+    ['@semantic-release/exec', { prepareCmd: 'pnpm run prepare-release' }],
+
+    // 4-c. Publish the package to npmjs (after all files are updated).
+    // 4-d. Run `npm dist-tag` command to add a tag to the package published on npmjs.
+    { path: '@semantic-release/npm', npmPublish: true },
 
     // 5. Commit the changes of assets generated during the release flow to the repository.
     [
       '@semantic-release/git',
       {
-        assets: ['CHANGELOG.md', 'package.json', 'pnpm-lock.yaml'],
+        assets: [
+          'CHANGELOG.md',
+          'package.json',
+          'pnpm-lock.yaml',
+          'src/cmd/*.mts', // CLI commands with updated versions
+          'docs/**/*.md', // Generated documentation
+        ],
         message:
           // eslint-disable-next-line no-template-curly-in-string
           'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',

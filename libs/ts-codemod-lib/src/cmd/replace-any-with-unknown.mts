@@ -11,8 +11,8 @@ import {
 } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
-  name: 'replace-any-with-unknown-cli',
-  version: '1.0.0',
+  name: 'replace-any-with-unknown',
+  version: '1.1.1',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

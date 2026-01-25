@@ -43,7 +43,9 @@ export const convertToReadonlyTypeTransformer =
     const DeepReadonlyTypeName =
       options?.DeepReadonly?.typeName ?? 'DeepReadonly';
 
-    const ignorePrefixes = ISet.create(options?.ignorePrefixes ?? ['mut_']);
+    const ignorePrefixes = ISet.create(
+      options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_'],
+    );
 
     const optionsInternal: ReadonlyTransformerOptionsInternal = {
       DeepReadonly: {
