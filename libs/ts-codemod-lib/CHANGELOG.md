@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.1...v1.1.2) (2026-01-25)
+
+### Bug Fixes
+
+- update default ignorePrefixes of convert-to-readonly and remove "-cli" suffix from commands name ([#14](https://github.com/noshiro-pf/ts-codemod-lib/issues/14)) ([0462ba9](https://github.com/noshiro-pf/ts-codemod-lib/commit/0462ba999f80ac6d508f6287a5232c2363f3aff5))
+
 ## [1.1.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.0...v1.1.1) (2026-01-23)
 
 ### Bug Fixes

@@ -12,7 +12,7 @@ import {
 
 const cmdDef = cmd.command({
   name: 'append-as-const',
-  version: '1.1.1',
+  version: '1.1.2',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,
