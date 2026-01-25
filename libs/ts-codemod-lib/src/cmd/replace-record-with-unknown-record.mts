@@ -12,7 +12,7 @@ import {
 
 const cmdDef = cmd.command({
   name: 'replace-record-with-unknown-record',
-  version: '1.1.2',
+  version: '1.1.3',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

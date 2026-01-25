@@ -1,3 +1,9 @@
+## [1.1.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.2...v1.1.3) (2026-01-25)
+
+### Bug Fixes
+
+- fix convertToReadonlyTypeTransformer behavior for `"aaa" & {}` ([#16](https://github.com/noshiro-pf/ts-codemod-lib/issues/16)) ([93f045e](https://github.com/noshiro-pf/ts-codemod-lib/commit/93f045ea6c520e57ff218e2bd5fa28bd32baf00c))
+
 ## [1.1.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.1...v1.1.2) (2026-01-25)
 
 ### Bug Fixes

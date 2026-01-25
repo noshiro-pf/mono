@@ -12,7 +12,7 @@ import {
 
 const cmdDef = cmd.command({
   name: 'replace-any-with-unknown',
-  version: '1.1.2',
+  version: '1.1.3',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,
