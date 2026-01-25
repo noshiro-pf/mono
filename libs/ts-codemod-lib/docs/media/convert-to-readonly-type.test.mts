@@ -969,10 +969,12 @@ describe(convertToReadonlyTypeTransformer, () => {
         source: dedent`
           type foo = {};
           type bar = Readonly<{}>;
+          type baz = "aaa" & {};
         `,
         expected: dedent`
           type foo = {};
           type bar = Readonly<{}>;
+          type baz = "aaa" & {};
         `,
       },
       {

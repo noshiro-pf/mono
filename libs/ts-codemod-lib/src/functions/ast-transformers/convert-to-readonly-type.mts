@@ -15,6 +15,7 @@ import {
   isReadonlyTupleOrArrayTypeNode,
   isReadonlyTupleTypeNode,
   isReadonlyTypeReferenceNode,
+  type ReadonlyTypeReferenceNode,
   removeParentheses,
   unwrapReadonlyTypeArgText,
   wrapWithParentheses,
@@ -116,6 +117,8 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
    * A mute keywords to ignore the readonly conversion.
    *
    * (e.g. `"mut_"`)
+   *
+   * @default ['mut_', '#mut_', '_mut_']
    */
   ignorePrefixes?: string[];
 
@@ -1103,12 +1106,31 @@ const transformUnionOrIntersectionTypeNodeImpl = (
 
   options.debugPrint({ primitives, arraysAndTuples, typeLiterals, others });
 
-  const typeLiteralsWrappedWithReadonly: readonly [] | readonly [string] =
+  // Separate empty type literals from non-empty ones when ignoreEmptyObjectTypes is true
+  const isEmptyTypeLiteral = (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    n: tsm.TypeLiteralNode | ReadonlyTypeReferenceNode,
+  ): boolean =>
+    n.isKind(tsm.SyntaxKind.TypeLiteral) && n.getMembers().length === 0;
+
+  const nonEmptyTypeLiterals =
     typeLiterals === undefined
+      ? undefined
+      : options.ignoreEmptyObjectTypes
+        ? typeLiterals.nodes.filter((n) => !isEmptyTypeLiteral(n))
+        : typeLiterals.nodes;
+
+  const emptyTypeLiterals =
+    typeLiterals === undefined || !options.ignoreEmptyObjectTypes
+      ? undefined
+      : typeLiterals.nodes.filter((n) => isEmptyTypeLiteral(n));
+
+  const typeLiteralsWrappedWithReadonly: readonly [] | readonly [string] =
+    nonEmptyTypeLiterals === undefined || nonEmptyTypeLiterals.length === 0
       ? []
       : [
           unionToString({
-            types: typeLiterals.nodes.map((n) =>
+            types: nonEmptyTypeLiterals.map((n) =>
               isReadonlyTypeReferenceNode(n)
                 ? // NOTE: Readonly<A & B> -> (A & B)
                   unwrapReadonlyTypeArgText(n)
@@ -1131,10 +1153,27 @@ const transformUnionOrIntersectionTypeNodeImpl = (
       arraysAndTuples,
       (a) => [a.nodes.map((n) => n.getFullText()), a.firstPosition] as const,
     ),
-    mapNullable(
-      typeLiterals,
-      (a) => [typeLiteralsWrappedWithReadonly, a.firstPosition] as const,
-    ),
+    nonEmptyTypeLiterals !== undefined && nonEmptyTypeLiterals.length > 0
+      ? mapNullable(
+          typeLiterals,
+          (a) => [typeLiteralsWrappedWithReadonly, a.firstPosition] as const,
+        )
+      : undefined,
+    emptyTypeLiterals !== undefined && emptyTypeLiterals.length > 0
+      ? mapNullable(
+          typeLiterals,
+          (a) =>
+            [
+              emptyTypeLiterals.map((n) => n.getFullText()),
+              // Use a position after non-empty type literals if they exist
+              a.firstPosition +
+                (nonEmptyTypeLiterals !== undefined &&
+                nonEmptyTypeLiterals.length > 0
+                  ? 0.5
+                  : 0),
+            ] as const,
+        )
+      : undefined,
     mapNullable(
       others,
       (a) =>
