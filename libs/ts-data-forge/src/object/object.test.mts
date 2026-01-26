@@ -71,9 +71,9 @@ describe('pick', () => {
       password: 'secret123',
     } as const;
 
-    const result = pipe(user).map(pickVisible).value satisfies {
+    const result = pipe(user).map(pickVisible).value satisfies Readonly<{
       name: string;
-    };
+    }>;
 
     assert.deepStrictEqual(result, { name: 'Alice' });
   });
@@ -137,10 +137,10 @@ describe('omit', () => {
       password: 'secret123',
     } as const;
 
-    const result = pipe(user).map(omitSensitive).value satisfies {
+    const result = pipe(user).map(omitSensitive).value satisfies Readonly<{
       id: number;
       name: string;
-    };
+    }>;
 
     assert.deepStrictEqual(result, { id: 1, name: 'Alice' });
   });
@@ -165,7 +165,9 @@ describe('fromEntries', () => {
   });
 
   test('should produce partial record when keys are unions', () => {
-    const dynamicEntries: ['name' | 'email', string][] = [['name', 'Alice']];
+    const dynamicEntries: readonly (readonly ['name' | 'email', string])[] = [
+      ['name', 'Alice'],
+    ];
 
     const result = Obj.fromEntries(dynamicEntries) satisfies Partial<
       Readonly<Record<'name' | 'email', string>>

@@ -63,9 +63,9 @@ export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
  * @example
  *
  * ```ts
- * const users: readonly { id: number }[] = [{ id: 1 }];
+ * const users: readonly Readonly<{ id: number }>[] = [{ id: 1 }];
  *
- * const emptyUsers: readonly { id: number }[] = [];
+ * const emptyUsers: readonly Readonly<{ id: number }>[] = [];
  *
  * assert.isTrue(Arr.isNonEmpty(users));
  *

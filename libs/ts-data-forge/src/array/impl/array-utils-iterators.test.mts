@@ -20,6 +20,7 @@ describe(entries, () => {
 
     const es = Array.from(entries(tuple));
 
+    // transformer-ignore-next-line
     expectType<typeof es, (readonly [Uint32, 10 | 20 | 30])[]>('=');
 
     assert.deepStrictEqual(es, [
@@ -30,7 +31,7 @@ describe(entries, () => {
   });
 
   test('should work with empty array', () => {
-    const empty: string[] = [];
+    const empty: readonly string[] = [];
 
     const es = Array.from(entries(empty));
 
@@ -42,6 +43,7 @@ describe(entries, () => {
 
     const es = Array.from(entries(mixed));
 
+    // transformer-ignore-next-line
     expectType<typeof es, (readonly [Uint32, 1 | 'hello' | true])[]>('=');
 
     assert.deepStrictEqual(es, [
@@ -68,13 +70,14 @@ describe(values, () => {
 
     const vs = Array.from(values(tuple));
 
+    // transformer-ignore-next-line
     expectType<typeof vs, ('a' | 'b' | 'c')[]>('=');
 
     assert.deepStrictEqual(vs, ['a', 'b', 'c']);
   });
 
   test('should work with empty array', () => {
-    const empty: number[] = [];
+    const empty: readonly number[] = [];
 
     const vs = Array.from(values(empty));
 
@@ -86,6 +89,7 @@ describe(values, () => {
 
     const vs = Array.from(values(mixed));
 
+    // transformer-ignore-next-line
     expectType<typeof vs, (1 | 'hello' | null)[]>('=');
 
     assert.deepStrictEqual(vs, [1, 'hello', null]);
@@ -106,13 +110,14 @@ describe(indices, () => {
 
     const ks = Array.from(indices(tuple));
 
+    // transformer-ignore-next-line
     expectType<typeof ks, Uint32[]>('=');
 
     assert.deepStrictEqual(ks, [asUint32(0), asUint32(1)]);
   });
 
   test('should work with empty array', () => {
-    const empty: string[] = [];
+    const empty: readonly string[] = [];
 
     const ks = Array.from(indices(empty));
 

@@ -4,52 +4,42 @@ import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 test('hasKey type inferences', () => {
   {
     expectType<
-      HasKeyReturnType<Readonly<{ a: 0 }> | Readonly<{ b: 1 }>, 'a'>,
+      HasKeyReturnType<Readonly<{ a: 0 } | { b: 1 }>, 'a'>,
       Readonly<{ a: 0 }>
     >('=');
 
     expectType<
-      HasKeyReturnType<Readonly<{ a: 0 }> | Readonly<{ b: 1 }>, 'b'>,
+      HasKeyReturnType<Readonly<{ a: 0 } | { b: 1 }>, 'b'>,
       Readonly<{ b: 1 }>
     >('=');
 
-    expectType<
-      HasKeyReturnType<Readonly<{ a: 0 }> | Readonly<{ b: 1 }>, 'd'>,
-      never
-    >('=');
+    expectType<HasKeyReturnType<Readonly<{ a: 0 } | { b: 1 }>, 'd'>, never>(
+      '=',
+    );
 
     expectType<
       HasKeyReturnType<
-        | Readonly<{ a: 0 }>
-        | Readonly<{ a: 1; b: 1 }>
-        | Readonly<{ b: 2 }>
-        | Readonly<{ c: 3 }>,
+        Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 } | { c: 3 }>,
         'a'
       >,
-      Readonly<{ a: 0 }> | Readonly<{ a: 1; b: 1 }>
+      Readonly<{ a: 0 } | { a: 1; b: 1 }>
     >('=');
 
     expectType<
       HasKeyReturnType<
-        | Readonly<{ a: 0 }>
-        | Readonly<{ a: 1; b: 1 }>
-        | Readonly<{ b: 2 }>
-        | Readonly<{ c: 3 }>,
+        Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 } | { c: 3 }>,
         'b'
       >,
-      Readonly<{ a: 1; b: 1 }> | Readonly<{ b: 2 }>
+      Readonly<{ a: 1; b: 1 } | { b: 2 }>
     >('=');
 
     expectType<
       HasKeyReturnType<
         | ReadonlyRecord<string, number>
-        | Readonly<{ a: 0 }>
-        | Readonly<{ a: 1; b: 1 }>
-        | Readonly<{ b: 2 }>,
+        | Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 }>,
         'a'
       >,
-      | Readonly<{ a: 0 }>
-      | Readonly<{ a: 1; b: 1 }>
+      | Readonly<{ a: 0 } | { a: 1; b: 1 }>
       | (ReadonlyRecord<'a', number> & ReadonlyRecord<string, number>)
     >('=');
 
@@ -60,7 +50,7 @@ test('hasKey type inferences', () => {
   }
 
   {
-    type R = Readonly<{ a: 0 }> | Readonly<{ b: 1 }>;
+    type R = Readonly<{ a: 0 } | { b: 1 }>;
 
     const obj: R = { a: 0 } as R;
 
@@ -76,11 +66,7 @@ test('hasKey type inferences', () => {
   }
 
   {
-    type R =
-      | Readonly<{ a: 0 }>
-      | Readonly<{ a: 1; b: 1 }>
-      | Readonly<{ b: 2 }>
-      | Readonly<{ c: 3 }>;
+    type R = Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 } | { c: 3 }>;
 
     const obj: R = { a: 0 } as R;
 
@@ -96,18 +82,14 @@ test('hasKey type inferences', () => {
   {
     type R =
       | ReadonlyRecord<string, number>
-      | Readonly<{ a: 0 }>
-      | Readonly<{ a: 1; b: 1 }>
-      | Readonly<{ b: 2 }>;
+      | Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 }>;
 
     const obj: R = { a: 0 } as R;
 
     expectType<
       R,
       | ReadonlyRecord<string, number>
-      | Readonly<{ a: 0 }>
-      | Readonly<{ a: 1; b: 1 }>
-      | Readonly<{ b: 2 }>
+      | Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 }>
     >('=');
 
     if (hasKey(obj, 'a')) {
@@ -115,8 +97,7 @@ test('hasKey type inferences', () => {
 
       expectType<
         typeof obj,
-        | Readonly<{ a: 0 }>
-        | Readonly<{ a: 1; b: 1 }>
+        | Readonly<{ a: 0 } | { a: 1; b: 1 }>
         | (ReadonlyRecord<'a', number> & ReadonlyRecord<string, number>)
       >('=');
     }

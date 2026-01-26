@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const id = Symbol('id');
 
-    const tokens: unknown[] = [id, 'shared'];
+    const tokens: readonly unknown[] = [id, 'shared'];
 
     const nonSymbols = tokens.filter(isNotSymbol);
 

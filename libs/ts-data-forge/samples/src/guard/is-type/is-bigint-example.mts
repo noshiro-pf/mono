@@ -4,7 +4,7 @@ import { isBigint } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const values: unknown[] = [1n, 2, 3n];
+    const values: readonly unknown[] = [1n, 2, 3n];
 
     const bigints = values.filter(isBigint);
 

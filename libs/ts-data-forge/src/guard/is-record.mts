@@ -25,7 +25,7 @@ import { isNonNullObject } from './is-non-null-object.mjs';
  * @example
  *
  * ```ts
- * const entries: unknown[] = [{ id: 1 }, 'str', 0, null];
+ * const entries: readonly unknown[] = [{ id: 1 }, 'str', 0, null];
  *
  * const records = entries.filter(isRecord);
  *

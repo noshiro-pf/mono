@@ -7,6 +7,7 @@ describe(castMutable, () => {
 
     const mut_array = castMutable(readonlyArray);
 
+    // transformer-ignore-next-line
     expectType<typeof mut_array, number[]>('=');
 
     mut_array.push(4);
@@ -24,6 +25,7 @@ describe(castMutable, () => {
 
     const mut_user = castMutable(readonlyUser);
 
+    // transformer-ignore-next-line
     expectType<typeof mut_user, { name: string; age: number }>('=');
 
     mut_user.age = 31;
@@ -39,12 +41,12 @@ describe(castMutable, () => {
 describe(castDeepMutable, () => {
   test('should enable deep mutations on nested readonly structures', () => {
     type ReadonlyState = Readonly<{
-      user: {
-        profile: {
+      user: Readonly<{
+        profile: Readonly<{
           name: string;
           tags: readonly string[];
-        };
-      };
+        }>;
+      }>;
     }>;
 
     const readonlyState: ReadonlyState = {
@@ -58,6 +60,7 @@ describe(castDeepMutable, () => {
 
     const mut_state = castDeepMutable(readonlyState);
 
+    // transformer-ignore-next-line
     type MutableState = {
       user: {
         profile: {

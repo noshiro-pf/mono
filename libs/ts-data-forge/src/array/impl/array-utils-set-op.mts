@@ -103,8 +103,9 @@ export const setIntersection = <
   array1: readonly E1[],
   array2: readonly E2[],
 ): readonly (E1 & E2)[] =>
+  // transformer-ignore-next-line
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  array1.filter((e) => array2.includes(e as E1 & E2)) as (E1 & E2)[];
+  (array1 as readonly (E1 & E2)[]).filter((e) => array2.includes(e));
 
 /**
  * Returns the set difference of two arrays (elements in first but not in second).

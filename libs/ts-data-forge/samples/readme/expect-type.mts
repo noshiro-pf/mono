@@ -3,9 +3,9 @@ import { expectType } from 'ts-data-forge';
 
 /* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
   /* embed-sample-code-ignore-this-line */ test('main', () => {
-    type User = { id: number; name: string };
+    type User = Readonly<{ id: number; name: string }>;
 
-    type Admin = { id: number; name: string; role: 'admin' };
+    type Admin = Readonly<{ id: number; name: string; role: 'admin' }>;
 
     // Assert that Admin extends User
     expectType<Admin, User>('<=');
@@ -14,7 +14,7 @@ import { expectType } from 'ts-data-forge';
     expectType<User, Admin>('!<=');
 
     // Assert exact type equality
-    expectType<{ x: number }, { x: number }>('=');
+    expectType<Readonly<{ x: number }>, Readonly<{ x: number }>>('=');
 
     // The following would cause a compile-time error:
     // expectType<User, Admin>("="); // Error: Type 'User' is not strictly equal to type 'Admin'.

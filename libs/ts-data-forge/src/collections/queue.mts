@@ -205,19 +205,19 @@ export type Queue<T> = Readonly<{
  */
 class QueueClass<T> implements Queue<T> {
   /** @internal Circular buffer to store queue elements. */
-  #buffer: (T | undefined)[];
+  #mut_buffer: (T | undefined)[];
 
   /** @internal Index of the first element (front of queue). */
-  #head: number;
+  #mut_head: number;
 
   /** @internal Index where the next element will be added (back of queue). */
-  #tail: number;
+  #mut_tail: number;
 
   /** @internal Current number of elements in the queue. */
   #mut_size: number;
 
   /** @internal Current capacity of the buffer. */
-  #capacity: number;
+  #mut_capacity: number;
 
   /** @internal Initial capacity for new queues. */
   static readonly #INITIAL_CAPACITY = 8;
@@ -232,18 +232,18 @@ class QueueClass<T> implements Queue<T> {
       Math.max(QueueClass.#INITIAL_CAPACITY, initialValues.length * 2),
     );
 
-    this.#buffer = Array.from<unknown, T | undefined>(
+    this.#mut_buffer = Array.from<unknown, T | undefined>(
       { length: initialCapacity },
       () => undefined,
     );
 
-    this.#head = 0;
+    this.#mut_head = 0;
 
-    this.#tail = 0;
+    this.#mut_tail = 0;
 
     this.#mut_size = 0;
 
-    this.#capacity = initialCapacity;
+    this.#mut_capacity = initialCapacity;
 
     // Add initial values
     for (const value of initialValues) {
@@ -281,11 +281,11 @@ class QueueClass<T> implements Queue<T> {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const element = this.#buffer[this.#head]!;
+    const element = this.#mut_buffer[this.#mut_head]!;
 
-    this.#buffer[this.#head] = undefined; // Clear reference for garbage collection
+    this.#mut_buffer[this.#mut_head] = undefined; // Clear reference for garbage collection
 
-    this.#head = (this.#head + 1) % this.#capacity;
+    this.#mut_head = (this.#mut_head + 1) % this.#mut_capacity;
 
     this.#mut_size -= 1;
 
@@ -311,13 +311,13 @@ class QueueClass<T> implements Queue<T> {
    */
   enqueue(value: T): void {
     // Resize if buffer is full
-    if (this.#mut_size === this.#capacity) {
+    if (this.#mut_size === this.#mut_capacity) {
       this.#resize();
     }
 
-    this.#buffer[this.#tail] = value;
+    this.#mut_buffer[this.#mut_tail] = value;
 
-    this.#tail = (this.#tail + 1) % this.#capacity;
+    this.#mut_tail = (this.#mut_tail + 1) % this.#mut_capacity;
 
     this.#mut_size += 1;
   }
@@ -328,7 +328,7 @@ class QueueClass<T> implements Queue<T> {
    * Doubles the capacity and reorganizes elements to maintain queue order.
    */
   #resize(): void {
-    const newCapacity = asUint32(this.#capacity * 2);
+    const newCapacity = asUint32(this.#mut_capacity * 2);
 
     const newBuffer = Array.from<unknown, T | undefined>(
       { length: newCapacity },
@@ -337,18 +337,18 @@ class QueueClass<T> implements Queue<T> {
 
     // Copy elements in order from head to tail
     for (const i of range(asSafeUint(this.#mut_size))) {
-      const sourceIndex = (this.#head + i) % this.#capacity;
+      const sourceIndex = (this.#mut_head + i) % this.#mut_capacity;
 
-      newBuffer[i] = this.#buffer[sourceIndex];
+      newBuffer[i] = this.#mut_buffer[sourceIndex];
     }
 
-    this.#buffer = newBuffer;
+    this.#mut_buffer = newBuffer;
 
-    this.#head = 0;
+    this.#mut_head = 0;
 
-    this.#tail = this.#mut_size;
+    this.#mut_tail = this.#mut_size;
 
-    this.#capacity = newCapacity;
+    this.#mut_capacity = newCapacity;
   }
 }
 

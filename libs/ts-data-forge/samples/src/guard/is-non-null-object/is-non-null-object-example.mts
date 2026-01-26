@@ -4,7 +4,7 @@ import { isNonNullObject } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const mixed: unknown[] = [{ id: 1 }, null, 'Ada'] as const;
+    const mixed: readonly unknown[] = [{ id: 1 }, null, 'Ada'] as const;
 
     const objects = mixed.filter(isNonNullObject);
 

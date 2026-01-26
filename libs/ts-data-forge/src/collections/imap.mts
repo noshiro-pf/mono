@@ -389,13 +389,13 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *   ['b', 2],
    * ]);
    *
-   * const entries: (readonly [string, number])[] = [];
+   * const mut_entries: (readonly [string, number])[] = [];
    *
    * for (const [key, value] of map.entries()) {
-   *   entries.push([key, value]);
+   *   mut_entries.push([key, value]);
    * }
    *
-   * assert.deepStrictEqual(entries, [
+   * assert.deepStrictEqual(mut_entries, [
    *   ['a', 1],
    *   ['b', 2],
    * ]);

@@ -43,7 +43,7 @@ describe('isError from @sindresorhus/is', () => {
 
   test('should return true for Error subclass with additional properties', () => {
     class ExtendedError extends Error {
-      code: number;
+      readonly code: number;
 
       constructor(message: string, code: number) {
         super(message);

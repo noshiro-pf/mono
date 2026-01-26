@@ -6,13 +6,13 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const set = ISet.create(['alpha', 'beta']);
 
-    const collected: string[] = [];
+    const mut_collected: string[] = [];
 
     for (const value of set) {
-      collected.push(value);
+      mut_collected.push(value);
     }
 
-    assert.deepStrictEqual(collected, ['alpha', 'beta']);
+    assert.deepStrictEqual(mut_collected, ['alpha', 'beta']);
 
     // embed-sample-code-ignore-below
   });

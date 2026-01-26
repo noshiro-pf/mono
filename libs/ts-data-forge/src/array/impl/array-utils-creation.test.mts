@@ -141,6 +141,7 @@ describe('Arr creations', () => {
 
       const result = create(2, obj);
 
+      // transformer-ignore-next-line
       expectType<typeof result, readonly [{ id: number }, { id: number }]>(
         '~=',
       );
@@ -229,6 +230,7 @@ describe('Arr creations', () => {
 
       const copied = copy(original);
 
+      // transformer-ignore-next-line
       expectType<typeof copied, readonly [{ id: number }, { id: number }]>('=');
 
       assert.deepStrictEqual(copied, original);
@@ -271,6 +273,7 @@ describe('Arr creations', () => {
 
       const copied = copy(mut_original);
 
+      // transformer-ignore-next-line
       expectType<typeof copied, number[]>('=');
 
       assert.deepStrictEqual(copied, mut_original);
@@ -673,13 +676,18 @@ describe('Arr creations', () => {
     });
 
     test('generator with complex data types', () => {
-      const result = generate<{ id: number; name: string }>(function* () {
-        yield { id: 1, name: 'Alice' };
+      const result = generate<Readonly<{ id: number; name: string }>>(
+        function* () {
+          yield { id: 1, name: 'Alice' };
 
-        yield { id: 2, name: 'Bob' };
-      });
+          yield { id: 2, name: 'Bob' };
+        },
+      );
 
-      expectType<typeof result, readonly { id: number; name: string }[]>('=');
+      expectType<
+        typeof result,
+        readonly Readonly<{ id: number; name: string }>[]
+      >('=');
 
       assert.deepStrictEqual(result, [
         { id: 1, name: 'Alice' },

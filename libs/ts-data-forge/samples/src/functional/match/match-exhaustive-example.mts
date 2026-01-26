@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
 
     const message = match<
       Status,
-      { draft: string; review: string; published: string }
+      Readonly<{ draft: string; review: string; published: string }>
     >(status, {
       draft: 'Work in progress',
       review: 'Awaiting feedback',

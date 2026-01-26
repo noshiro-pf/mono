@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const queue = ['first', 'second'];
 
-    const emptyQueue: string[] = [];
+    const emptyQueue: readonly string[] = [];
 
     const lastValue = Arr.last(queue);
 

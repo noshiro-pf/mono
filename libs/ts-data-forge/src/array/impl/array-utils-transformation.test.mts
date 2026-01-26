@@ -164,6 +164,7 @@ describe('Arr transformations', () => {
 
       const _nativeResult = xs.toReversed();
 
+      // transformer-ignore-next-line
       expectType<typeof _nativeResult, (1 | 2 | 3)[]>('=');
 
       const result = toReversed([1, 2, 3]);
@@ -318,7 +319,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly { value: number }[] = [];
+      const empty: readonly Readonly<{ value: number }>[] = [];
 
       const result = toSortedBy(empty, (item) => item.value);
 
@@ -326,7 +327,7 @@ describe('Arr transformations', () => {
     });
 
     test('toSortedBy should work with empty array', () => {
-      const empty: readonly { value: number }[] = [];
+      const empty: readonly Readonly<{ value: number }>[] = [];
 
       const result = toSortedBy(empty, (item) => item.value);
 
@@ -344,7 +345,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with type guards', () => {
-      const mixed: (string | number | null)[] = [
+      const mixed: readonly (string | number | null)[] = [
         'hello',
         42,
         null,
@@ -392,7 +393,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: number[] = [];
+      const empty: readonly number[] = [];
 
       const result = filter(empty, (n) => n > 0);
 
@@ -489,7 +490,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly { id: number }[] = [];
+      const empty: readonly Readonly<{ id: number }>[] = [];
 
       const result = uniqBy(empty, (item) => item.id);
 
@@ -609,7 +610,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty arrays', () => {
-      const empty: string[] = [];
+      const empty: readonly string[] = [];
 
       const result = flatMap(empty, (s) => s.split(''));
 
@@ -833,14 +834,14 @@ describe('Arr transformations', () => {
       typeof result,
       IMap<
         1 | 2 | 3,
-        readonly (
-          | Readonly<{ x: 1; y: 1 }>
-          | Readonly<{ x: 1; y: 2 }>
-          | Readonly<{ x: 1; y: 3 }>
-          | Readonly<{ x: 2; y: 1 }>
-          | Readonly<{ x: 2; y: 2 }>
-          | Readonly<{ x: 3; y: 1 }>
-        )[]
+        readonly Readonly<
+          | { x: 1; y: 1 }
+          | { x: 1; y: 2 }
+          | { x: 1; y: 3 }
+          | { x: 2; y: 1 }
+          | { x: 2; y: 2 }
+          | { x: 3; y: 1 }
+        >[]
       >
     >('=');
 
@@ -849,14 +850,14 @@ describe('Arr transformations', () => {
         result,
         IMap.create<
           1 | 2 | 3,
-          readonly (
-            | Readonly<{ x: 1; y: 1 }>
-            | Readonly<{ x: 1; y: 2 }>
-            | Readonly<{ x: 1; y: 3 }>
-            | Readonly<{ x: 2; y: 1 }>
-            | Readonly<{ x: 2; y: 2 }>
-            | Readonly<{ x: 3; y: 1 }>
-          )[]
+          readonly Readonly<
+            | { x: 1; y: 1 }
+            | { x: 1; y: 2 }
+            | { x: 1; y: 3 }
+            | { x: 2; y: 1 }
+            | { x: 2; y: 2 }
+            | { x: 3; y: 1 }
+          >[]
         >([
           [
             1,

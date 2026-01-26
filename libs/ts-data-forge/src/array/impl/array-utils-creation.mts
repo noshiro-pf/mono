@@ -145,9 +145,7 @@ export const copy = <const Ar extends readonly unknown[]>(array: Ar): Ar =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   array.slice() as unknown as Ar;
 
-type LT = Readonly<{
-  [N in SmallUint]: Index<N>;
-}>;
+type LT = Readonly<{ [N in SmallUint]: Index<N> }>;
 
 type RangeList<S extends SmallUint, E extends SmallUint> =
   BoolOr<IsUnion<S>, IsUnion<E>> extends true

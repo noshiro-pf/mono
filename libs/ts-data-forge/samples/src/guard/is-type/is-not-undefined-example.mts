@@ -4,7 +4,7 @@ import { isNotUndefined } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const values: (number | undefined)[] = [1, undefined, 2];
+    const values: readonly (number | undefined)[] = [1, undefined, 2];
 
     const definedValues = values.filter(isNotUndefined);
 

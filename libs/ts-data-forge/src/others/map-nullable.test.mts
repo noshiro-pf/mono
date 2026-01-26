@@ -48,13 +48,13 @@ describe(mapNullable, () => {
     });
 
     test('should work with nullable object properties', () => {
-      const user: { name?: string } = { name: 'Bob' };
+      const user: Readonly<{ name?: string }> = { name: 'Bob' };
 
       const result = mapNullable(user.name, (name) => name.toUpperCase());
 
       expect(result).toBe('BOB');
 
-      const userWithoutName: { name?: string } = {};
+      const userWithoutName: Readonly<{ name?: string }> = {};
 
       const resultEmpty = mapNullable(userWithoutName.name, (name) =>
         name.toUpperCase(),
@@ -190,7 +190,7 @@ describe(mapNullable, () => {
       expect(result).toBe(3);
 
       const nullResult = mapNullable(
-        null as number[] | null,
+        null as readonly number[] | null,
         (arr) => arr.length,
       );
 

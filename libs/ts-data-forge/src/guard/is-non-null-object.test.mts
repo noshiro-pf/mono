@@ -89,7 +89,7 @@ describe(isNonNullObject, () => {
   });
 
   test('should work in filter operations', () => {
-    const mixed: unknown[] = [
+    const mixed: readonly unknown[] = [
       'string',
       42,
       { a: 1 },

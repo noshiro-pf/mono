@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const users = [{ id: 1 }, { id: 2 }];
 
-    const empty: { id: number }[] = [];
+    const empty: readonly Readonly<{ id: number }>[] = [];
 
     const first = Arr.head(users);
 

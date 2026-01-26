@@ -4,7 +4,11 @@ import { isNonNullish } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const values: (string | null | undefined)[] = ['Ada', null, undefined];
+    const values: readonly (string | null | undefined)[] = [
+      'Ada',
+      null,
+      undefined,
+    ];
 
     const definedValues = values.filter(isNonNullish);
 

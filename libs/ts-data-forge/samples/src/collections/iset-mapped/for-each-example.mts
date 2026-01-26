@@ -20,13 +20,13 @@ if (import.meta.vitest !== undefined) {
       fromKey,
     );
 
-    const collected: Point[] = [];
+    const mut_collected: Point[] = [];
 
     for (const point of set) {
-      collected.push(point);
+      mut_collected.push(point);
     }
 
-    assert.deepStrictEqual(collected, [
+    assert.deepStrictEqual(mut_collected, [
       { x: 1, tag: 'a' },
       { x: 2, tag: 'b' },
     ]);

@@ -481,7 +481,7 @@ describe('Queue test', () => {
     });
 
     test('should properly clean up references for garbage collection', () => {
-      const q = createQueue<{ id: number }>();
+      const q = createQueue<Readonly<{ id: number }>>();
 
       const objects = Arr.seq(10).map((i) => ({ id: i }));
 

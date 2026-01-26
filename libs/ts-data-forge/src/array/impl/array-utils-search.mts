@@ -15,7 +15,9 @@ import { asUint32 } from '../../number/index.mjs';
  *
  * const found = Arr.find(users, (user) => user.id === 2);
  *
- * const missing = Arr.find<{ id: number }>((user) => user.id === 3)(users);
+ * const missing = Arr.find<Readonly<{ id: number }>>((user) => user.id === 3)(
+ *   users,
+ * );
  *
  * assert.deepStrictEqual(found, Optional.some({ id: 2, name: 'Grace' }));
  *
@@ -225,7 +227,7 @@ export function findIndex<E>(
           arr: readonly E[],
         ) => boolean,
       ]
-): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
+): SizeType.Arr | ((array: readonly E[]) => SizeType.Arr | -1) | -1 {
   switch (args.length) {
     case 2: {
       const [array, predicate] = args;
@@ -292,7 +294,7 @@ export function findLastIndex<E>(
           arr: readonly E[],
         ) => boolean,
       ]
-): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
+): SizeType.Arr | ((array: readonly E[]) => SizeType.Arr | -1) | -1 {
   switch (args.length) {
     case 2: {
       const [array, predicate] = args;
@@ -350,7 +352,7 @@ export function indexOf<E>(
   ...args:
     | readonly [array: readonly E[], searchElement: E]
     | readonly [searchElement: E]
-): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
+): SizeType.Arr | ((array: readonly E[]) => SizeType.Arr | -1) | -1 {
   switch (args.length) {
     case 2: {
       const [array, searchElement] = args;
@@ -418,7 +420,7 @@ export function indexOfFrom<E>(
         fromIndex: SizeType.ArgArrWithNegative,
       ]
     | readonly [searchElement: E, fromIndex: SizeType.ArgArrWithNegative]
-): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
+): SizeType.Arr | ((array: readonly E[]) => SizeType.Arr | -1) | -1 {
   switch (args.length) {
     case 3: {
       const [array, searchElement, fromIndex] = args;
@@ -477,7 +479,7 @@ export function lastIndexOf<E>(
   ...args:
     | readonly [array: readonly E[], searchElement: E]
     | readonly [searchElement: E]
-): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
+): SizeType.Arr | ((array: readonly E[]) => SizeType.Arr | -1) | -1 {
   switch (args.length) {
     case 2: {
       const [array, searchElement] = args;
@@ -545,7 +547,7 @@ export function lastIndexOfFrom<E>(
         fromIndex: SizeType.ArgArrWithNegative,
       ]
     | readonly [searchElement: E, fromIndex: SizeType.ArgArrWithNegative]
-): SizeType.Arr | -1 | ((array: readonly E[]) => SizeType.Arr | -1) {
+): SizeType.Arr | ((array: readonly E[]) => SizeType.Arr | -1) | -1 {
   switch (args.length) {
     case 3: {
       const [array, searchElement, fromIndex] = args;

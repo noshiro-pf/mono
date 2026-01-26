@@ -27,7 +27,7 @@ import { keyIsIn } from '../guard/index.mjs';
  *
  * const message = match<
  *   Status,
- *   { draft: string; review: string; published: string }
+ *   Readonly<{ draft: string; review: string; published: string }>
  * >(status, {
  *   draft: 'Work in progress',
  *   review: 'Awaiting feedback',
@@ -104,11 +104,15 @@ type StrictPropertyCheck<T, ExpectedKeys extends PropertyKey> =
 type AllCasesCovered<Case extends PropertyKey, R> =
   TypeEq<Case, keyof R> extends true ? true : false;
 
-expectType<AllCasesCovered<'a' | 'b', { a: 1; b: 2 }>, true>('=');
+expectType<AllCasesCovered<'a' | 'b', Readonly<{ a: 1; b: 2 }>>, true>('=');
 
-expectType<AllCasesCovered<'a' | 'b' | 'c', { a: 1; b: 2 }>, false>('=');
+expectType<AllCasesCovered<'a' | 'b' | 'c', Readonly<{ a: 1; b: 2 }>>, false>(
+  '=',
+);
 
-expectType<AllCasesCovered<'a' | 'b', { a: 1; b: 2; c: 3 }>, false>('=');
+expectType<AllCasesCovered<'a' | 'b', Readonly<{ a: 1; b: 2; c: 3 }>>, false>(
+  '=',
+);
 
 expectType<AllCasesCovered<string, Record<string, string>>, true>('=');
 
@@ -126,15 +130,20 @@ type IsLiteralUnionFullyCovered<
     ? AllCasesCovered<Case, R>
     : false;
 
-expectType<IsLiteralUnionFullyCovered<'a' | 'b', { a: 1; b: 2 }>, true>('=');
+expectType<
+  IsLiteralUnionFullyCovered<'a' | 'b', Readonly<{ a: 1; b: 2 }>>,
+  true
+>('=');
 
-expectType<IsLiteralUnionFullyCovered<'a' | 'b' | 'c', { a: 1; b: 2 }>, false>(
-  '=',
-);
+expectType<
+  IsLiteralUnionFullyCovered<'a' | 'b' | 'c', Readonly<{ a: 1; b: 2 }>>,
+  false
+>('=');
 
-expectType<IsLiteralUnionFullyCovered<'a' | 'b', { a: 1; b: 2; c: 3 }>, false>(
-  '=',
-);
+expectType<
+  IsLiteralUnionFullyCovered<'a' | 'b', Readonly<{ a: 1; b: 2; c: 3 }>>,
+  false
+>('=');
 
 expectType<IsLiteralUnionFullyCovered<string, Record<string, string>>, false>(
   '=',
@@ -142,7 +151,7 @@ expectType<IsLiteralUnionFullyCovered<string, Record<string, string>>, false>(
 
 expectType<
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-  IsLiteralUnionFullyCovered<'a' | 'b' | string, { a: 1; b: 2 }>,
+  IsLiteralUnionFullyCovered<'a' | 'b' | string, Readonly<{ a: 1; b: 2 }>>,
   false
 >('=');
 

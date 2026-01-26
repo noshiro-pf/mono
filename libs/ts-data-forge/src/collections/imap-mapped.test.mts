@@ -5,7 +5,7 @@ const toKey = (a: Readonly<{ v: number }>): number => a.v;
 
 const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k });
 
-type TestKey = { id: number; type: string };
+type TestKey = Readonly<{ id: number; type: string }>;
 
 const testKeyToString = (key: Readonly<TestKey>): string =>
   `${key.type}_${key.id}`;
@@ -95,7 +95,10 @@ describe('IMapMapped.create', () => {
   });
 
   test('should handle complex key transformations', () => {
-    type ComplexKey = { nested: { id: number }; arr: number[] };
+    type ComplexKey = Readonly<{
+      nested: Readonly<{ id: number }>;
+      arr: readonly number[];
+    }>;
 
     const complexKeyToString = (
       key: DeepReadonly<{

@@ -4,7 +4,7 @@ import { isString } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const values: unknown[] = ['Ada', 42, 'Lovelace'];
+    const values: readonly unknown[] = ['Ada', 42, 'Lovelace'];
 
     const strings = values.filter(isString);
 

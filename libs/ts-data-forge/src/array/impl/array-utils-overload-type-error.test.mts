@@ -145,7 +145,7 @@ describe('Array overloaded functions - type error validation', () => {
     });
 
     test('spread with incorrect types should cause errors', () => {
-      const invalidArgs: [string[], (x: string) => number] = [
+      const invalidArgs: readonly [readonly string[], (x: string) => number] = [
         ['a'],
         (x) => x.length,
       ];

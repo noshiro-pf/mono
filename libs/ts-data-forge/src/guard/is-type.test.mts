@@ -566,7 +566,7 @@ describe(isNonNullish, () => {
   });
 
   test('should work with array filtering', () => {
-    const items: (string | null | undefined)[] = [
+    const items: readonly (string | null | undefined)[] = [
       'hello',
       null,
       'world',
@@ -576,7 +576,7 @@ describe(isNonNullish, () => {
 
     const definedItems = items.filter(isNonNullish);
 
-    expectType<typeof definedItems, string[]>('<=');
+    expectType<typeof definedItems, readonly string[]>('<=');
 
     expect(definedItems).toHaveLength(3);
 
@@ -609,7 +609,7 @@ describe('type guard behavior in complex scenarios', () => {
   });
 
   test('should work with array operations', () => {
-    const mixed: (string | number | boolean | null | undefined)[] = [
+    const mixed: readonly (string | number | boolean | null | undefined)[] = [
       'hello',
       42,
       true,
@@ -622,15 +622,15 @@ describe('type guard behavior in complex scenarios', () => {
 
     const nonNullish = mixed.filter(isNonNullish);
 
-    expectType<typeof nonNullish, (string | number | boolean)[]>('<=');
+    expectType<typeof nonNullish, readonly (string | number | boolean)[]>('<=');
 
     const nonBooleans = nonNullish.filter(isNotBoolean);
 
-    expectType<typeof nonBooleans, (string | number)[]>('<=');
+    expectType<typeof nonBooleans, readonly (string | number)[]>('<=');
 
     const strings = nonBooleans.filter(isNotNumber);
 
-    expectType<typeof strings, string[]>('<=');
+    expectType<typeof strings, readonly string[]>('<=');
 
     assert.deepStrictEqual(strings, ['hello', 'world']);
   });

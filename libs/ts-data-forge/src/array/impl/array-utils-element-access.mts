@@ -66,7 +66,7 @@ export function at<E>(
  * ```ts
  * const users = [{ id: 1 }, { id: 2 }];
  *
- * const empty: { id: number }[] = [];
+ * const empty: readonly Readonly<{ id: number }>[] = [];
  *
  * const first = Arr.head(users);
  *
@@ -97,7 +97,7 @@ export const head = <const Ar extends readonly unknown[]>(
  * ```ts
  * const queue = ['first', 'second'];
  *
- * const emptyQueue: string[] = [];
+ * const emptyQueue: readonly string[] = [];
  *
  * const lastValue = Arr.last(queue);
  *

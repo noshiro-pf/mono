@@ -37,6 +37,7 @@ describe('Array.flat', () => {
 
   expectType<
     typeof result,
+    // transformer-ignore-next-line
     (readonly [5, 6, readonly [7, 8]] | 1 | 2 | 3 | 4)[]
   >('=');
 
@@ -137,6 +138,7 @@ describe('Array.filter', () => {
 
     const filtered = xs.filter((x): x is 1 | 3 => x % 2 === 1);
 
+    // transformer-ignore-next-line
     expectType<typeof filtered, (1 | 3)[]>('=');
 
     test('case 1', () => {
@@ -149,6 +151,7 @@ describe('Array.filter', () => {
 
     const filtered = xs.filter((x) => x % 2 === 1);
 
+    // transformer-ignore-next-line
     expectType<typeof filtered, (1 | 2 | 3)[]>('=');
 
     test('case 2', () => {

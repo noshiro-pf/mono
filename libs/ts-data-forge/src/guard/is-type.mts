@@ -9,7 +9,7 @@
  * @example
  *
  * ```ts
- * const values: (number | undefined)[] = [1, undefined, 2];
+ * const values: readonly (number | undefined)[] = [1, undefined, 2];
  *
  * const undefinedValues = values.filter(isUndefined);
  *
@@ -34,7 +34,7 @@ export const isUndefined = (u: unknown): u is undefined => u === undefined;
  * @example
  *
  * ```ts
- * const values: (number | undefined)[] = [1, undefined, 2];
+ * const values: readonly (number | undefined)[] = [1, undefined, 2];
  *
  * const definedValues = values.filter(isNotUndefined);
  *
@@ -60,7 +60,7 @@ export const isNotUndefined = <T,>(u: T): u is RelaxedExclude<T, undefined> =>
  * @example
  *
  * ```ts
- * const flags: unknown[] = [true, 'no', false];
+ * const flags: readonly unknown[] = [true, 'no', false];
  *
  * const booleans = flags.filter(isBoolean);
  *
@@ -84,7 +84,7 @@ export const isBoolean = (u: unknown): u is boolean => typeof u === 'boolean';
  * @example
  *
  * ```ts
- * const flags: unknown[] = [true, 'no', false];
+ * const flags: readonly unknown[] = [true, 'no', false];
  *
  * const nonBooleans = flags.filter(isNotBoolean);
  *
@@ -111,7 +111,7 @@ export const isNotBoolean = <T,>(u: T): u is RelaxedExclude<T, boolean> =>
  * @example
  *
  * ```ts
- * const mixed: unknown[] = [1, '2', 3];
+ * const mixed: readonly unknown[] = [1, '2', 3];
  *
  * const numbers = mixed.filter(isNumber);
  *
@@ -135,7 +135,7 @@ export const isNumber = (u: unknown): u is number => typeof u === 'number';
  * @example
  *
  * ```ts
- * const mixed: unknown[] = [1, '2', 3];
+ * const mixed: readonly unknown[] = [1, '2', 3];
  *
  * const nonNumbers = mixed.filter(isNotNumber);
  *
@@ -161,7 +161,7 @@ export const isNotNumber = <T,>(u: T): u is RelaxedExclude<T, number> =>
  * @example
  *
  * ```ts
- * const values: unknown[] = [1n, 2, 3n];
+ * const values: readonly unknown[] = [1n, 2, 3n];
  *
  * const bigints = values.filter(isBigint);
  *
@@ -185,7 +185,7 @@ export const isBigint = (u: unknown): u is bigint => typeof u === 'bigint';
  * @example
  *
  * ```ts
- * const values: unknown[] = [1n, 2, 3n];
+ * const values: readonly unknown[] = [1n, 2, 3n];
  *
  * const nonBigints = values.filter(isNotBigint);
  *
@@ -212,7 +212,7 @@ export const isNotBigint = <T,>(u: T): u is RelaxedExclude<T, bigint> =>
  * @example
  *
  * ```ts
- * const values: unknown[] = ['Ada', 42, 'Lovelace'];
+ * const values: readonly unknown[] = ['Ada', 42, 'Lovelace'];
  *
  * const strings = values.filter(isString);
  *
@@ -236,7 +236,7 @@ export const isString = (u: unknown): u is string => typeof u === 'string';
  * @example
  *
  * ```ts
- * const values: unknown[] = ['Ada', 42, 'Lovelace'];
+ * const values: readonly unknown[] = ['Ada', 42, 'Lovelace'];
  *
  * const nonStrings = values.filter(isNotString);
  *
@@ -266,7 +266,7 @@ export const isNotString = <T,>(u: T): u is RelaxedExclude<T, string> =>
  *
  * const shared = Symbol.for('shared');
  *
- * const tokens: unknown[] = [id, 'shared', shared];
+ * const tokens: readonly unknown[] = [id, 'shared', shared];
  *
  * const symbols = tokens.filter(isSymbol);
  *
@@ -292,7 +292,7 @@ export const isSymbol = (u: unknown): u is symbol => typeof u === 'symbol';
  * ```ts
  * const id = Symbol('id');
  *
- * const tokens: unknown[] = [id, 'shared'];
+ * const tokens: readonly unknown[] = [id, 'shared'];
  *
  * const nonSymbols = tokens.filter(isNotSymbol);
  *
@@ -343,7 +343,7 @@ export const isNull = (u: unknown): u is null => u === null;
  * @example
  *
  * ```ts
- * const values: (number | null)[] = [null, 5];
+ * const values: readonly (number | null)[] = [null, 5];
  *
  * const nonNullValues = values.filter(isNotNull);
  *
@@ -372,7 +372,11 @@ export const isNotNull = <T,>(u: T | null): u is T => u !== null;
  * @example
  *
  * ```ts
- * const values: (string | null | undefined)[] = ['Ada', null, undefined];
+ * const values: readonly (string | null | undefined)[] = [
+ *   'Ada',
+ *   null,
+ *   undefined,
+ * ];
  *
  * const nullishValues = values.filter(isNullish);
  *
@@ -401,7 +405,11 @@ export const isNullish = (u: unknown): u is null | undefined => u == null;
  * @example
  *
  * ```ts
- * const values: (string | null | undefined)[] = ['Ada', null, undefined];
+ * const values: readonly (string | null | undefined)[] = [
+ *   'Ada',
+ *   null,
+ *   undefined,
+ * ];
  *
  * const definedValues = values.filter(isNonNullish);
  *

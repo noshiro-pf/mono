@@ -507,6 +507,7 @@ describe('stringifySelected', () => {
   });
 
   test('should handle circular references with error', () => {
+    // transformer-ignore-next-line
     type CircularType = { name: string; self?: CircularType };
 
     const mut_circular: CircularType = { name: 'test' };
@@ -669,6 +670,7 @@ describe('stringifySortedKey', () => {
 
   test('should handle problematic objects', () => {
     try {
+      // transformer-ignore-next-line
       type CircularObj = {
         normal: string;
         circular: { self?: CircularObj };

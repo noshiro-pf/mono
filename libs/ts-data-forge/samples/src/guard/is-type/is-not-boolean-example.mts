@@ -4,7 +4,7 @@ import { isNotBoolean } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const flags: unknown[] = [true, 'no', false];
+    const flags: readonly unknown[] = [true, 'no', false];
 
     const nonBooleans = flags.filter(isNotBoolean);
 

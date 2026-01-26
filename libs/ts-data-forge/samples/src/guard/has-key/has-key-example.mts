@@ -4,7 +4,7 @@ import { hasKey } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const maybeUser: { id?: number; name?: string } = { id: 42 };
+    const maybeUser: Readonly<{ id?: number; name?: string }> = { id: 42 };
 
     if (hasKey(maybeUser, 'id')) {
       // `maybeUser` is now known to have an `id` property.

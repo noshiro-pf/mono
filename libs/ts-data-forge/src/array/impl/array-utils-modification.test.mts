@@ -104,7 +104,7 @@ describe('Arr modifications', () => {
     });
 
     test('case 4 (number[])', () => {
-      const xs: number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3];
 
       const result = toRemoved(xs, 5);
 
@@ -134,7 +134,7 @@ describe('Arr modifications', () => {
     });
 
     test('case 2', () => {
-      const xs: number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3];
 
       const result = toPushed(xs, 4 as const);
 
@@ -164,7 +164,7 @@ describe('Arr modifications', () => {
     });
 
     test('case 2', () => {
-      const xs: number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3];
 
       const result = toUnshifted(xs, 4 as const);
 

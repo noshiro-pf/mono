@@ -75,7 +75,7 @@ describe(isNonEmptyString, () => {
   });
 
   test('should work in filter operations', () => {
-    const mixed: unknown[] = [
+    const mixed: readonly unknown[] = [
       'valid',
       '',
       null,

@@ -274,7 +274,7 @@ export namespace Obj {
    * });
    *
    * // Dynamic length array - Partial type applied
-   * const dynamicEntries: (readonly ['x' | 'y', number])[] = [
+   * const dynamicEntries: readonly (readonly ['x' | 'y', number])[] = [
    *   ['x', 10],
    *   ['y', 20],
    * ];

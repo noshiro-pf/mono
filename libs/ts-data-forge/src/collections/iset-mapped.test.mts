@@ -5,7 +5,7 @@ const toKey = (a: Readonly<{ v: number }>): number => a.v;
 const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k });
 
 // Test types for additional functionality
-type TestElement = { id: number; type: string };
+type TestElement = Readonly<{ id: number; type: string }>;
 
 const testElementToString = (el: Readonly<TestElement>): string =>
   `${el.type}_${el.id}`;

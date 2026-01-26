@@ -19,7 +19,7 @@
  * @example
  *
  * ```ts
- * const mixed: unknown[] = [{ id: 1 }, null, 'Ada'] as const;
+ * const mixed: readonly unknown[] = [{ id: 1 }, null, 'Ada'] as const;
  *
  * const objects = mixed.filter(isNonNullObject);
  *

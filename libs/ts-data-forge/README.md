@@ -39,7 +39,7 @@ This library offers a range of utilities, including:
 ## Installation
 
 ```bash
-npm install ts-data-forge
+npm add ts-data-forge
 ```
 
 Or with other package managers:
@@ -140,9 +140,9 @@ The `expectType` utility allows you to make assertions about types at compile ti
 /* eslint-disable vitest/expect-expect */
 import { expectType } from 'ts-data-forge';
 
-type User = { id: number; name: string };
+type User = Readonly<{ id: number; name: string }>;
 
-type Admin = { id: number; name: string; role: 'admin' };
+type Admin = Readonly<{ id: number; name: string; role: 'admin' }>;
 
 // Assert that Admin extends User
 expectType<Admin, User>('<=');
@@ -151,7 +151,7 @@ expectType<Admin, User>('<=');
 expectType<User, Admin>('!<=');
 
 // Assert exact type equality
-expectType<{ x: number }, { x: number }>('=');
+expectType<Readonly<{ x: number }>, Readonly<{ x: number }>>('=');
 
 // The following would cause a compile-time error:
 // expectType<User, Admin>("="); // Error: Type 'User' is not strictly equal to type 'Admin'.

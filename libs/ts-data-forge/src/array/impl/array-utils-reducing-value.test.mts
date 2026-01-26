@@ -152,11 +152,11 @@ describe('Arr reducing value', () => {
     });
 
     test('case 2: empty array', () => {
-      const arr: readonly { x: number }[] = [];
+      const arr: readonly Readonly<{ x: number }>[] = [];
 
       const res = minBy(arr, (a) => a.x);
 
-      expectType<typeof res, Optional<{ x: number }>>('=');
+      expectType<typeof res, Optional<Readonly<{ x: number }>>>('=');
 
       assert.isTrue(Optional.isNone(res));
     });
@@ -228,11 +228,11 @@ describe('Arr reducing value', () => {
     });
 
     test('case 2: empty array', () => {
-      const arr: readonly { x: number }[] = [];
+      const arr: readonly Readonly<{ x: number }>[] = [];
 
       const res = maxBy(arr, (a) => a.x);
 
-      expectType<typeof res, Optional<{ x: number }>>('=');
+      expectType<typeof res, Optional<Readonly<{ x: number }>>>('=');
 
       assert.isTrue(Optional.isNone(res));
     });
@@ -332,7 +332,7 @@ describe('Arr reducing value', () => {
     });
 
     test('case 2: empty array', () => {
-      const arr: readonly { x: number }[] = [];
+      const arr: readonly Readonly<{ x: number }>[] = [];
 
       const res = countBy(arr, (a) => a.x);
 

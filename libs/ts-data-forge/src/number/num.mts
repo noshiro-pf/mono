@@ -184,9 +184,7 @@ export namespace Num {
    * - LT[3] = 0 | 1 | 2
    * - LT[5] = 0 | 1 | 2 | 3 | 4
    */
-  type LT = {
-    [N in SmallUint]: Index<N>;
-  };
+  type LT = Readonly<{ [N in SmallUint]: Index<N> }>;
 
   /**
    * @template N - A SmallUint representing the inclusive upper bound
@@ -198,9 +196,7 @@ export namespace Num {
    * - LEQ[3] = 0 | 1 | 2 | 3
    * - LEQ[5] = 0 | 1 | 2 | 3 | 4 | 5
    */
-  type LEQ = {
-    [N in SmallUint]: Index<N> | N;
-  };
+  type LEQ = Readonly<{ [N in SmallUint]: Index<N> | N }>;
 
   /**
    * Creates a type guard that checks if a number is an unsigned integer within

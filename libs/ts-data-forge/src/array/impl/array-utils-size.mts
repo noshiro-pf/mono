@@ -6,7 +6,7 @@
  * ```ts
  * const numbers = [1, 2, 3] as const;
  *
- * const letters: string[] = [];
+ * const letters: readonly string[] = [];
  *
  * const sizeOfNumbers = Arr.size(numbers);
  *

@@ -93,7 +93,7 @@ describe(isPrimitive, () => {
   });
 
   test('should narrow types correctly in conditional', () => {
-    const values: unknown[] = [
+    const values: readonly unknown[] = [
       'string',
       42,
       true,

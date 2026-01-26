@@ -200,13 +200,13 @@ export type Stack<T> = Readonly<{
  */
 class StackClass<T> implements Stack<T> {
   /** @internal Dynamic array to store stack elements. */
-  #buffer: (T | undefined)[];
+  #mut_buffer: (T | undefined)[];
 
   /** @internal Current number of elements in the stack. */
   #mut_size: Uint32;
 
   /** @internal Current capacity of the buffer. */
-  #capacity: Uint32;
+  #mut_capacity: Uint32;
 
   /** @internal Initial capacity for new stacks. */
   static readonly #INITIAL_CAPACITY = 8;
@@ -221,14 +221,14 @@ class StackClass<T> implements Stack<T> {
       Math.max(StackClass.#INITIAL_CAPACITY, initialValues.length * 2),
     );
 
-    this.#buffer = Array.from<unknown, T | undefined>(
+    this.#mut_buffer = Array.from<unknown, T | undefined>(
       { length: initialCapacity },
       () => undefined,
     );
 
     this.#mut_size = asUint32(0);
 
-    this.#capacity = initialCapacity;
+    this.#mut_capacity = initialCapacity;
 
     // Add initial values
     for (const value of initialValues) {
@@ -268,9 +268,9 @@ class StackClass<T> implements Stack<T> {
     this.#mut_size = Uint32.sub(this.#mut_size, 1);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const element = this.#buffer[this.#mut_size]!;
+    const element = this.#mut_buffer[this.#mut_size]!;
 
-    this.#buffer[this.#mut_size] = undefined; // Clear reference for garbage collection
+    this.#mut_buffer[this.#mut_size] = undefined; // Clear reference for garbage collection
 
     return Optional.some(element);
   }
@@ -294,11 +294,11 @@ class StackClass<T> implements Stack<T> {
    */
   push(value: T): void {
     // Resize if buffer is full
-    if (this.#mut_size === this.#capacity) {
+    if (this.#mut_size === this.#mut_capacity) {
       this.#resize();
     }
 
-    this.#buffer[this.#mut_size] = value;
+    this.#mut_buffer[this.#mut_size] = value;
 
     this.#mut_size = Uint32.add(this.#mut_size, 1);
   }
@@ -309,7 +309,7 @@ class StackClass<T> implements Stack<T> {
    * Doubles the capacity while preserving all elements.
    */
   #resize(): void {
-    const newCapacity = asUint32(this.#capacity * 2);
+    const newCapacity = asUint32(this.#mut_capacity * 2);
 
     const newBuffer = Array.from<unknown, T | undefined>(
       { length: newCapacity },
@@ -318,12 +318,12 @@ class StackClass<T> implements Stack<T> {
 
     // Copy existing elements
     for (const i of range(this.#mut_size)) {
-      newBuffer[i] = this.#buffer[i];
+      newBuffer[i] = this.#mut_buffer[i];
     }
 
-    this.#buffer = newBuffer;
+    this.#mut_buffer = newBuffer;
 
-    this.#capacity = newCapacity;
+    this.#mut_capacity = newCapacity;
   }
 }
 

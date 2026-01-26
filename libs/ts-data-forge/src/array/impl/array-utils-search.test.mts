@@ -123,7 +123,7 @@ describe('Arr search operations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: number[] = [];
+      const empty: readonly number[] = [];
 
       const result = findLast(empty, (n) => n > 0);
 
@@ -206,7 +206,7 @@ describe('Arr search operations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: number[] = [];
+      const empty: readonly number[] = [];
 
       const result = findLastIndex(empty, (n) => n > 0);
 

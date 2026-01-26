@@ -8,7 +8,7 @@ import { copy, create } from './array-utils-creation.mjs';
  * @example
  *
  * ```ts
- * const scores: number[] = [10, 20, 30];
+ * const scores: readonly number[] = [10, 20, 30];
  *
  * const updated = Arr.set(scores, 1, 25);
  *
@@ -46,8 +46,7 @@ export function set<E, const V = E>(
     case 3: {
       const [array, index, newValue] = args;
 
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      return (array as (E | V)[]).with(index, newValue);
+      return (array as readonly (E | V)[]).with(index, newValue);
     }
 
     case 2: {
@@ -64,7 +63,7 @@ export function set<E, const V = E>(
  * @example
  *
  * ```ts
- * const temperatures: number[] = [20, 21, 22];
+ * const temperatures: readonly number[] = [20, 21, 22];
  *
  * const increased = Arr.toUpdated(temperatures, 1, (value) => value + 5);
  *
@@ -116,8 +115,8 @@ export function toUpdated<E, V = E>(
     case 3: {
       const [array, index, updater] = args;
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, total-functions/no-unsafe-type-assertion
-      return (array as (E | V)[]).with(index, updater(array[index]!));
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return (array as readonly (E | V)[]).with(index, updater(array[index]!));
     }
 
     case 2: {

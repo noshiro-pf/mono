@@ -36,7 +36,7 @@ describe('Arr validations', () => {
 
     test('should refine union types correctly', () => {
       const processValue = (
-        value: string | readonly number[] | null,
+        value: string | null | readonly number[],
       ): number => {
         if (isArray(value)) {
           // value should be typed as number[]
@@ -66,10 +66,10 @@ describe('Arr validations', () => {
     });
 
     test('should work with mutable arrays', () => {
-      const mutableArray: number[] = [1, 2, 3];
+      const mutableArray: readonly number[] = [1, 2, 3];
 
       if (isArray(mutableArray)) {
-        expectType<typeof mutableArray, number[]>('=');
+        expectType<typeof mutableArray, readonly number[]>('=');
 
         expect(mutableArray).toHaveLength(3);
       }
@@ -108,10 +108,10 @@ describe('Arr validations', () => {
         value:
           | string
           | boolean
-          | readonly number[]
-          | Readonly<{ a: number }>
           | unknown
-          | object,
+          | object
+          | readonly number[]
+          | Readonly<{ a: number }>,
       ): number => {
         if (isArray(value)) {
           // Only number[] should remain
@@ -123,7 +123,7 @@ describe('Arr validations', () => {
         // Non-array types
         expectType<
           typeof value,
-          string | boolean | Readonly<{ a: number }> | unknown | object
+          string | boolean | unknown | object | Readonly<{ a: number }>
         >('=');
 
         return -1;
@@ -273,7 +273,7 @@ describe('Arr validations', () => {
       });
 
       test('should handle intersection types', () => {
-        type TaggedArray = readonly number[] & { tag: string };
+        type TaggedArray = readonly number[] & Readonly<{ tag: string }>;
 
         const tagged = Object.assign([1, 2, 3], { tag: 'test' }) as TaggedArray;
 
@@ -297,8 +297,10 @@ describe('Arr validations', () => {
 
       test('should handle complex union discrimination', () => {
         type ComplexUnion =
-          | { type: 'array'; data: readonly string[] }
-          | { type: 'object'; data: Record<string, unknown> }
+          | Readonly<
+              | { type: 'array'; data: readonly string[] }
+              | { type: 'object'; data: Record<string, unknown> }
+            >
           | readonly number[]
           | string
           | null;
@@ -325,8 +327,10 @@ describe('Arr validations', () => {
 
           expectType<
             typeof value,
-            | { type: 'array'; data: readonly string[] }
-            | { type: 'object'; data: Record<string, unknown> }
+            Readonly<
+              | { type: 'array'; data: readonly string[] }
+              | { type: 'object'; data: Record<string, unknown> }
+            >
           >('=');
 
           return -1;
@@ -435,15 +439,16 @@ describe('Arr validations', () => {
     });
 
     test('should work with unknown array type', () => {
-      const arr: number[] = [1, 2];
+      const mut_arr: number[] = [1, 2];
 
-      assert.isTrue(isArrayOfLength(arr, 2));
+      assert.isTrue(isArrayOfLength(mut_arr, 2));
 
-      if (isArrayOfLength(arr, 2)) {
-        expectType<typeof arr, number[] & ArrayOfLength<2, number>>('=');
+      if (isArrayOfLength(mut_arr, 2)) {
+        // transformer-ignore-next-line
+        expectType<typeof mut_arr, number[] & ArrayOfLength<2, number>>('=');
       }
 
-      assert.isFalse(isArrayOfLength(arr, 3));
+      assert.isFalse(isArrayOfLength(mut_arr, 3));
     });
 
     test('should work with unknown readonly array type', () => {
@@ -525,23 +530,25 @@ describe('Arr validations', () => {
     });
 
     test('should work with unknown array type', () => {
-      const arr: number[] = [1, 2];
+      const mut_arr: number[] = [1, 2];
 
-      assert.isTrue(isArrayAtLeastLength(arr, 2));
+      assert.isTrue(isArrayAtLeastLength(mut_arr, 2));
 
-      expectType<typeof arr, number[] & ArrayAtLeastLen<2, number>>('=');
+      // transformer-ignore-next-line
+      expectType<typeof mut_arr, number[] & ArrayAtLeastLen<2, number>>('=');
 
-      assert.isFalse(isArrayAtLeastLength(arr, 3));
+      assert.isFalse(isArrayAtLeastLength(mut_arr, 3));
     });
 
     test('should work with unknown array type 2', () => {
-      const arr: number[] = [1, 2];
+      const mut_arr: number[] = [1, 2];
 
-      assert.isTrue(isArrayAtLeastLength(arr, 1));
+      assert.isTrue(isArrayAtLeastLength(mut_arr, 1));
 
-      expectType<typeof arr, number[] & ArrayAtLeastLen<1, number>>('=');
+      // transformer-ignore-next-line
+      expectType<typeof mut_arr, number[] & ArrayAtLeastLen<1, number>>('=');
 
-      assert.isFalse(isArrayAtLeastLength(arr, 3));
+      assert.isFalse(isArrayAtLeastLength(mut_arr, 3));
     });
 
     test('should return true for arrays of at least specified length (additional)', () => {
@@ -589,7 +596,7 @@ describe('Arr validations', () => {
     });
 
     test('should work as type guard', () => {
-      const mixed: (string | number)[] = ['hello', 'world'];
+      const mixed: readonly (string | number)[] = ['hello', 'world'];
 
       if (every(mixed, (x): x is string => typeof x === 'string')) {
         // TypeScript narrows mixed to readonly string[] here
@@ -612,7 +619,7 @@ describe('Arr validations', () => {
 
       const allStrings = every(isString);
 
-      const data: unknown[] = ['a', 'b', 'c'];
+      const data: readonly unknown[] = ['a', 'b', 'c'];
 
       if (allStrings(data)) {
         // TypeScript narrows data to readonly string[] here
@@ -621,7 +628,7 @@ describe('Arr validations', () => {
     });
 
     test('should return true for empty array', () => {
-      const empty: number[] = [];
+      const empty: readonly number[] = [];
 
       const result = every(empty, (n) => n > 0);
 
@@ -665,7 +672,7 @@ describe('Arr validations', () => {
     });
 
     test('should return false for empty array', () => {
-      const empty: number[] = [];
+      const empty: readonly number[] = [];
 
       const result = some(empty, (n) => n > 0);
 
