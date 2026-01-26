@@ -56,10 +56,10 @@ export type RecordType<
   }>;
 
 expectType<
-  RecordType<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
+  RecordType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>,
   Type<Readonly<{ a: 0; b: 1; c: 2 }>> &
     Readonly<{
-      shape: { a: Type<0>; b: Type<1>; c: Type<2> };
+      shape: Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>;
       excessPropertyValidation: 'strip';
       excessPropertyFill: ExcessPropertyFillBehavior;
     }>
@@ -78,26 +78,20 @@ export namespace TsFortressInternal {
     OptionalKeys extends keyof A,
   > =
     TypeEq<OptionalKeys, never> extends true
-      ? Readonly<{
-          [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
-        }>
+      ? Readonly<{ [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]> }>
       : TypeEq<keyof A, OptionalKeys> extends true
-        ? Readonly<
-            MergeIntersection<{
-              [key in OptionalKeys]?: TypeOf<A[key]>;
-            }>
+        ? MergeIntersection<
+            Readonly<{ [key in OptionalKeys]?: TypeOf<A[key]> }>
           >
-        : Readonly<
-            MergeIntersection<
-              {
-                [key in OptionalKeys]?: TypeOf<A[key]>;
-              } & {
+        : MergeIntersection<
+            Readonly<
+              { [key in OptionalKeys]?: TypeOf<A[key]> } & {
                 [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
               }
             >
           >;
 
   type OptionalTypeKeys<A extends ReadonlyRecord<string, Type<unknown>>> = {
-    [K in keyof A]: A[K] extends { optional: true } ? K : never;
+    [K in keyof A]: A[K] extends Readonly<{ optional: true }> ? K : never;
   }[keyof A];
 }

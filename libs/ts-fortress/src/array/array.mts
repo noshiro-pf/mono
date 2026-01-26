@@ -11,10 +11,12 @@ import {
 
 export const array = <A,>(
   elementType: Type<A>,
-  options?: PartialReadonly<{
-    typeName: string;
-    defaultValue: readonly A[];
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: readonly A[];
+    }>
+  >,
 ): Type<readonly A[]> => {
   type T = readonly A[];
 

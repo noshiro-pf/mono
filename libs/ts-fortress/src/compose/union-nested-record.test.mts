@@ -32,14 +32,16 @@ describe('union - nested records', () => {
 
   expectType<
     TargetType,
-    | Readonly<{
-        type: string;
-        data: Readonly<{ value: number }>;
-      }>
-    | Readonly<{
-        kind: string;
-        config: Readonly<{ enabled: string }>;
-      }>
+    Readonly<
+      | {
+          type: string;
+          data: Readonly<{ value: number }>;
+        }
+      | {
+          kind: string;
+          config: Readonly<{ enabled: string }>;
+        }
+    >
   >('=');
 
   expectType<typeof targetType.defaultValue, TargetType>('=');

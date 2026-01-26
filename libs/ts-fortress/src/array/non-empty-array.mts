@@ -11,10 +11,12 @@ import {
 
 export const nonEmptyArray = <A,>(
   elementType: Type<A>,
-  options?: PartialReadonly<{
-    typeName: string;
-    defaultValue: NonEmptyArray<A>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: NonEmptyArray<A>;
+    }>
+  >,
 ): Type<NonEmptyArray<A>> => {
   type T = NonEmptyArray<A>;
 

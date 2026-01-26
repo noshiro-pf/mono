@@ -4,11 +4,13 @@ import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 export const recursion = <A,>(
   typeName: string,
   definition: () => Type<A>,
-  options?: PartialReadonly<{
-    defaultValue: A;
-  }>,
+  options?: Partial<
+    Readonly<{
+      defaultValue: A;
+    }>
+  >,
 ): Type<A> => {
-  const cache: {
+  const mut_cache: {
     innerType: Type<A> | undefined;
     computedDefaultValue: A | undefined;
   } = {
@@ -17,10 +19,9 @@ export const recursion = <A,>(
   };
 
   const getInnerType = (): Type<A> => {
-    // eslint-disable-next-line functional/immutable-data
-    cache.innerType ??= definition();
+    mut_cache.innerType ??= definition();
 
-    return cache.innerType;
+    return mut_cache.innerType;
   };
 
   const validate: Type<A>['validate'] = (a) => getInnerType().validate(a);
@@ -36,10 +37,9 @@ export const recursion = <A,>(
         return options.defaultValue;
       }
 
-      // eslint-disable-next-line functional/immutable-data
-      cache.computedDefaultValue ??= getInnerType().defaultValue;
+      mut_cache.computedDefaultValue ??= getInnerType().defaultValue;
 
-      return cache.computedDefaultValue;
+      return mut_cache.computedDefaultValue;
     },
     fill,
     validate,

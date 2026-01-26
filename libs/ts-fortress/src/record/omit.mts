@@ -15,11 +15,13 @@ export const omit = <
 >(
   recordType: RecordType<R, ExcessValidation>,
   keysToOmit: KeysToOmit,
-  options?: PartialReadonly<{
-    typeName: string;
-    excessPropertyValidation: ExcessValidation;
-    excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      excessPropertyValidation: ExcessValidation;
+      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+    }>
+  >,
 ): OmittedType<R, KeysToOmit, ExcessValidation> =>
   record(Obj.omit(recordType.shape, keysToOmit), {
     typeName:
@@ -38,27 +40,17 @@ export type OmittedType<
 > = RecordType<Omit<R, ArrayElement<KeysToOmit>>, ExcessValidation>;
 
 expectType<
-  Omit<{ a: Type<0>; b: Type<1>; c: Type<2> }, 'a' | 'b'>,
-  {
+  Omit<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>,
+  Readonly<{
     c: Type<2>;
-  }
+  }>
 >('=');
 
 expectType<
-  RecordType<Omit<{ a: Type<0>; b: Type<1>; c: Type<2> }, 'a' | 'b'>>,
+  RecordType<Omit<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>>,
   Type<Readonly<{ c: 2 }>> &
     Readonly<{
-      shape: { c: Type<2> };
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  OmittedType<{ a: Type<0>; b: Type<1>; c: Type<2> }, ['a', 'b']>,
-  Type<Readonly<{ c: 2 }>> &
-    Readonly<{
-      shape: { c: Type<2> };
+      shape: Readonly<{ c: Type<2> }>;
       excessPropertyValidation: 'strip';
       excessPropertyFill: 'allow' | 'strip';
     }>
@@ -66,9 +58,22 @@ expectType<
 
 expectType<
   OmittedType<
-    { a: Type<0>; b: Type<1>; c: Type<2> },
+    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
+    readonly ['a', 'b']
+  >,
+  Type<Readonly<{ c: 2 }>> &
+    Readonly<{
+      shape: Readonly<{ c: Type<2> }>;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
+    }>
+>('=');
+
+expectType<
+  OmittedType<
+    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
     // @ts-expect-error key "d" doesn't exist
-    ['a', 'd']
+    readonly ['a', 'd']
   >,
   0
 >('!=');

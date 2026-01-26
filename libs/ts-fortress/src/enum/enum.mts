@@ -9,10 +9,12 @@ import {
 
 export const enumType = <const Values extends NonEmptyArray<Primitive>>(
   values: Values,
-  options?: PartialReadonly<{
-    typeName: string;
-    defaultValue: ArrayElement<Values>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: ArrayElement<Values>;
+    }>
+  >,
 ): Type<ArrayElement<Values>> => {
   type T = ArrayElement<Values>;
 

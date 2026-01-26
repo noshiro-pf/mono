@@ -5,9 +5,11 @@ import { type Type } from '../../../type.mjs';
  * @link https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
  */
 export const email = (
-  options?: PartialReadonly<{
-    defaultValue: string;
-  }>,
+  options?: Partial<
+    Readonly<{
+      defaultValue: string;
+    }>
+  >,
 ): Type<Email> =>
   brandedString({
     is: (s): s is Email => regexpEmailAddress.test(s),

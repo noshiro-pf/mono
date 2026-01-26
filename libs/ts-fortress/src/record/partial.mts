@@ -18,12 +18,14 @@ export const partial = <
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
   recordType: RecordType<R, ExcessValidation>,
-  options?: PartialReadonly<{
-    keysToBeOptional: KeysToBeOptional;
-    typeName: string;
-    excessPropertyValidation: ExcessValidation;
-    excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      keysToBeOptional: KeysToBeOptional;
+      typeName: string;
+      excessPropertyValidation: ExcessValidation;
+      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+    }>
+  >,
 ): PartialType<R, KeysToBeOptional, ExcessValidation> => {
   const typeNameFilled: string =
     options?.typeName ??
@@ -63,16 +65,15 @@ type PartialTypeShape<
     ? FullyOptionalType<R>
     : PartiallyOptionalType<R, ArrayElement<KeysToBeOptional>>;
 
-type FullyOptionalType<R extends ReadonlyRecord<string, Type<unknown>>> = {
-  readonly [P in keyof R]: OptionalPropertyType<R[P]>;
-};
+type FullyOptionalType<R extends ReadonlyRecord<string, Type<unknown>>> =
+  Readonly<{ [P in keyof R]: OptionalPropertyType<R[P]> }>;
 
 type PartiallyOptionalType<
   R extends ReadonlyRecord<string, Type<unknown>>,
   K extends keyof R,
-> = {
-  readonly [P in keyof R]: P extends K ? OptionalPropertyType<R[P]> : R[P];
-};
+> = Readonly<{
+  [P in keyof R]: P extends K ? OptionalPropertyType<R[P]> : R[P];
+}>;
 
 export type PartialType<
   R extends ReadonlyRecord<string, Type<unknown>>,
@@ -81,7 +82,10 @@ export type PartialType<
 > = RecordType<PartialTypeShape<R, KeysToBeOptional>, ExcessValidation>;
 
 expectType<
-  PartialTypeShape<{ a: Type<0>; b: Type<1>; c: Type<2> }, ['a']>,
+  PartialTypeShape<
+    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
+    readonly ['a']
+  >,
   Readonly<{
     a: OptionalPropertyType<Type<0>>;
     b: Type<1>;
@@ -142,7 +146,7 @@ expectType<
 >('=');
 
 expectType<
-  PartialType<{ a: Type<0>; b: Type<1>; c: Type<2> }, ['a']>,
+  PartialType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, readonly ['a']>,
   Type<
     Readonly<{
       a?: 0;
@@ -162,7 +166,10 @@ expectType<
 >('=');
 
 expectType<
-  PartialType<{ a: Type<0>; b: Type<1>; c: Type<2> }, ['a', 'b']>,
+  PartialType<
+    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
+    readonly ['a', 'b']
+  >,
   Type<
     Readonly<{
       a?: 0;
@@ -182,7 +189,7 @@ expectType<
 >('=');
 
 expectType<
-  PartialType<{ a: Type<0>; b: Type<1>; c: Type<2> }, undefined>,
+  PartialType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, undefined>,
   Type<
     Readonly<{
       a?: 0;
@@ -203,9 +210,9 @@ expectType<
 
 expectType<
   PartialType<
-    { a: Type<0>; b: Type<1>; c: Type<2> },
+    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
     // @ts-expect-error key "d" doesn't exist
-    ['a', 'd']
+    readonly ['a', 'd']
   >,
   0
 >('!=');

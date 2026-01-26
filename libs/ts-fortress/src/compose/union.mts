@@ -10,10 +10,12 @@ import {
 
 export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
   types: Types,
-  options?: PartialReadonly<{
-    typeName: string;
-    defaultType: UnionType<Types>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultType: UnionType<Types>;
+    }>
+  >,
 ): UnionType<Types> => {
   type T = UnionTypeValue<Types>;
 
@@ -70,11 +72,19 @@ namespace TsFortressInternal {
 }
 
 expectType<
-  UnionType<[Type<{ a: 0; b: 0 }>, Type<{ b: 0; c: 0 }>]>,
-  Type<{ a: 0; b: 0 } | { b: 0; c: 0 }>
+  UnionType<
+    readonly [Type<Readonly<{ a: 0; b: 0 }>>, Type<Readonly<{ b: 0; c: 0 }>>]
+  >,
+  Type<Readonly<{ a: 0; b: 0 } | { b: 0; c: 0 }>>
 >('=');
 
 expectType<
-  UnionType<[Type<{ a: 0; b: 0 }>, Type<{ b: 0; c: 0 }>, Type<{ e: 0; f: 0 }>]>,
-  Type<{ a: 0; b: 0 } | { b: 0; c: 0 } | { e: 0; f: 0 }>
+  UnionType<
+    readonly [
+      Type<Readonly<{ a: 0; b: 0 }>>,
+      Type<Readonly<{ b: 0; c: 0 }>>,
+      Type<Readonly<{ e: 0; f: 0 }>>,
+    ]
+  >,
+  Type<Readonly<{ a: 0; b: 0 } | { b: 0; c: 0 } | { e: 0; f: 0 }>>
 >('=');

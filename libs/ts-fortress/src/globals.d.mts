@@ -1,7 +1,5 @@
 /// <reference types="ts-type-forge" />
 
-type PartialReadonly<T> = Partial<Readonly<T>>;
-
 type Iso8601 = Brand<string, 'Iso8601'>;
 
 type Email = Brand<string, 'Email'>;

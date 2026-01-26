@@ -9,7 +9,7 @@ type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
 export const brand = <
   const A extends StrictExtract<Primitive, string | number | bigint | boolean>,
   const BrandTrueKeys extends readonly string[],
-  const BrandFalseKeys extends readonly string[] = [],
+  const BrandFalseKeys extends readonly string[] = readonly [],
 >({
   baseType,
   brandFalseKeys,

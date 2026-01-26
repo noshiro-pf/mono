@@ -16,7 +16,7 @@ describe('union - literal and array', () => {
 
   type TargetType = TypeOf<typeof targetType>;
 
-  expectType<TargetType, 'none' | readonly number[] | false>('=');
+  expectType<TargetType, 'none' | false | readonly number[]>('=');
 
   expectType<typeof targetType.defaultValue, TargetType>('=');
 

@@ -23,14 +23,16 @@ describe('union - records only', () => {
 
   expectType<
     TargetType,
-    | Readonly<{
-        kind: string;
-        value: number;
-      }>
-    | Readonly<{
-        type: string;
-        data: string;
-      }>
+    Readonly<
+      | {
+          kind: string;
+          value: number;
+        }
+      | {
+          type: string;
+          data: string;
+        }
+    >
   >('=');
 
   expectType<typeof targetType.defaultValue, TargetType>('=');

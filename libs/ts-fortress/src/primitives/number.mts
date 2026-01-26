@@ -109,20 +109,22 @@ export function number<C extends Constraints>(
   });
 }
 
-type Constraints = PartialReadonly<{
-  gt: number;
-  gte: number;
-  min: number;
-  lt: number;
-  lte: number;
-  max: number;
-  negative: boolean;
-  nonNegative: boolean;
-  positive: boolean;
-  nonPositive: boolean;
-  multipleOf: number;
-  step: number;
-}>;
+type Constraints = Partial<
+  Readonly<{
+    gt: number;
+    gte: number;
+    min: number;
+    lt: number;
+    lte: number;
+    max: number;
+    negative: boolean;
+    nonNegative: boolean;
+    positive: boolean;
+    nonPositive: boolean;
+    multipleOf: number;
+    step: number;
+  }>
+>;
 
 type DefaultValueType<
   N extends number,
@@ -132,25 +134,17 @@ type DefaultValueType<
   DefaultValueWhenPositiveIsOn<N, R> &
   DefaultValueWhenNonPositiveIsOn<N, R>;
 
-type DefaultValueWhenNegativeIsOn<
-  N extends number,
-  R extends Constraints,
-> = R extends { negative: true } ? NegativeNumber<N> : number;
+type DefaultValueWhenNegativeIsOn<N extends number, R extends Constraints> =
+  R extends Readonly<{ negative: true }> ? NegativeNumber<N> : number;
 
-type DefaultValueWhenNonNegativeIsOn<
-  N extends number,
-  R extends Constraints,
-> = R extends { nonNegative: true } ? NonNegativeNumber<N> : number;
+type DefaultValueWhenNonNegativeIsOn<N extends number, R extends Constraints> =
+  R extends Readonly<{ nonNegative: true }> ? NonNegativeNumber<N> : number;
 
-type DefaultValueWhenPositiveIsOn<
-  N extends number,
-  R extends Constraints,
-> = R extends { positive: true } ? PositiveNumber<N> : number;
+type DefaultValueWhenPositiveIsOn<N extends number, R extends Constraints> =
+  R extends Readonly<{ positive: true }> ? PositiveNumber<N> : number;
 
-type DefaultValueWhenNonPositiveIsOn<
-  N extends number,
-  R extends Constraints,
-> = R extends { nonPositive: true } ? NonPositiveNumber<N> : number;
+type DefaultValueWhenNonPositiveIsOn<N extends number, R extends Constraints> =
+  R extends Readonly<{ nonPositive: true }> ? NonPositiveNumber<N> : number;
 
 type NegativeNumber<N extends number> = number extends N
   ? number

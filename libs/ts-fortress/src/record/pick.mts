@@ -15,11 +15,13 @@ export const pick = <
 >(
   recordType: RecordType<R, ExcessValidation>,
   keysToPick: KeysToPick,
-  options?: PartialReadonly<{
-    typeName: string;
-    excessPropertyValidation: ExcessValidation;
-    excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      excessPropertyValidation: ExcessValidation;
+      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+    }>
+  >,
 ): PickedType<R, KeysToPick, ExcessValidation> =>
   record(Obj.pick(recordType.shape, keysToPick), {
     typeName:
@@ -38,28 +40,18 @@ export type PickedType<
 > = RecordType<Pick<R, ArrayElement<KeysToPick>>, ExcessValidation>;
 
 expectType<
-  Pick<{ a: Type<0>; b: Type<1>; c: Type<2> }, 'a' | 'b'>,
-  {
+  Pick<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>,
+  Readonly<{
     a: Type<0>;
     b: Type<1>;
-  }
+  }>
 >('=');
 
 expectType<
-  RecordType<Pick<{ a: Type<0>; b: Type<1>; c: Type<2> }, 'a' | 'b'>>,
+  RecordType<Pick<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>>,
   Type<Readonly<{ a: 0; b: 1 }>> &
     Readonly<{
-      shape: { a: Type<0>; b: Type<1> };
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  PickedType<{ a: Type<0>; b: Type<1>; c: Type<2> }, ['a', 'b']>,
-  Type<Readonly<{ a: 0; b: 1 }>> &
-    Readonly<{
-      shape: { a: Type<0>; b: Type<1> };
+      shape: Readonly<{ a: Type<0>; b: Type<1> }>;
       excessPropertyValidation: 'strip';
       excessPropertyFill: 'allow' | 'strip';
     }>
@@ -67,9 +59,22 @@ expectType<
 
 expectType<
   PickedType<
-    { a: Type<0>; b: Type<1>; c: Type<2> },
+    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
+    readonly ['a', 'b']
+  >,
+  Type<Readonly<{ a: 0; b: 1 }>> &
+    Readonly<{
+      shape: Readonly<{ a: Type<0>; b: Type<1> }>;
+      excessPropertyValidation: 'strip';
+      excessPropertyFill: 'allow' | 'strip';
+    }>
+>('=');
+
+expectType<
+  PickedType<
+    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
     // @ts-expect-error key "d" doesn't exist
-    ['a', 'd']
+    readonly ['a', 'd']
   >,
   0
 >('!=');

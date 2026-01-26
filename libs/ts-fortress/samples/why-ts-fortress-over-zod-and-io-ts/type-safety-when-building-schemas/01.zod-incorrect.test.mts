@@ -16,6 +16,7 @@ import { expectType } from 'ts-data-forge';
 
 expectType<
   SomeObjectIncorrect,
+  // transformer-ignore-next-line
   {
     key1: unknown;
     key2: unknown;

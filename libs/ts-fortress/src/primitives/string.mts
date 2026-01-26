@@ -112,17 +112,19 @@ export function string<C extends Constraints>(
   });
 }
 
-type Constraints = PartialReadonly<{
-  startsWith: string;
-  endsWith: string;
-  includes: string;
-  uppercase: boolean;
-  lowercase: boolean;
-  nonempty: boolean;
-  minLength: number;
-  maxLength: number;
-  regex: DeepReadonly<RegExp>;
-}>;
+type Constraints = Partial<
+  Readonly<{
+    startsWith: string;
+    endsWith: string;
+    includes: string;
+    uppercase: boolean;
+    lowercase: boolean;
+    nonempty: boolean;
+    minLength: number;
+    maxLength: number;
+    regex: DeepReadonly<RegExp>;
+  }>
+>;
 
 type DefaultValueType<
   S extends string,
@@ -141,56 +143,49 @@ type ConstraintsResultType<R extends Constraints> =
     DefaultValueWhenEndsWithIsOn<R> &
     DefaultValueWhenIncludesIsOn<R>;
 
-type DefaultValueWhenStartsWithIsOn<R extends Constraints> = R extends {
-  startsWith: infer S extends string;
-}
-  ? `${S}${string}`
-  : string;
+type DefaultValueWhenStartsWithIsOn<R extends Constraints> =
+  R extends Readonly<{
+    startsWith: infer S extends string;
+  }>
+    ? `${S}${string}`
+    : string;
 
-type DefaultValueWhenEndsWithIsOn<R extends Constraints> = R extends {
-  endsWith: infer E extends string;
-}
-  ? `${string}${E}`
-  : string;
+type DefaultValueWhenEndsWithIsOn<R extends Constraints> =
+  R extends Readonly<{
+    endsWith: infer E extends string;
+  }>
+    ? `${string}${E}`
+    : string;
 
-type DefaultValueWhenIncludesIsOn<R extends Constraints> = R extends {
-  includes: infer M extends string;
-}
-  ? `${string}${M}${string}`
-  : string;
+type DefaultValueWhenIncludesIsOn<R extends Constraints> =
+  R extends Readonly<{
+    includes: infer M extends string;
+  }>
+    ? `${string}${M}${string}`
+    : string;
 
-type DefaultValueWhenUppercaseIsOn<
-  S extends string,
-  R extends Constraints,
-> = R extends { uppercase: true } ? CastUppercase<S> : string;
+type DefaultValueWhenUppercaseIsOn<S extends string, R extends Constraints> =
+  R extends Readonly<{ uppercase: true }> ? CastUppercase<S> : string;
 
-type DefaultValueWhenLowercaseIsOn<
-  S extends string,
-  R extends Constraints,
-> = R extends { lowercase: true } ? CastLowercase<S> : string;
+type DefaultValueWhenLowercaseIsOn<S extends string, R extends Constraints> =
+  R extends Readonly<{ lowercase: true }> ? CastLowercase<S> : string;
 
 type CastLowercase<S extends string> = S extends Lowercase<S> ? S : never;
 
 type CastUppercase<S extends string> = S extends Uppercase<S> ? S : never;
 
-type DefaultValueWhenNonemptyIsOn<
-  S extends string,
-  R extends Constraints,
-> = R extends { nonempty: true } ? NonEmptyString<S> : string;
+type DefaultValueWhenNonemptyIsOn<S extends string, R extends Constraints> =
+  R extends Readonly<{ nonempty: true }> ? NonEmptyString<S> : string;
 
-type DefaultValueWhenMinLengthIsOn<
-  S extends string,
-  R extends Constraints,
-> = R extends { minLength: infer M extends number }
-  ? StringWithMinLength<S, M>
-  : string;
+type DefaultValueWhenMinLengthIsOn<S extends string, R extends Constraints> =
+  R extends Readonly<{ minLength: infer M extends number }>
+    ? StringWithMinLength<S, M>
+    : string;
 
-type DefaultValueWhenMaxLengthIsOn<
-  S extends string,
-  R extends Constraints,
-> = R extends { maxLength: infer M extends number }
-  ? StringWithMaxLength<S, M>
-  : string;
+type DefaultValueWhenMaxLengthIsOn<S extends string, R extends Constraints> =
+  R extends Readonly<{ maxLength: infer M extends number }>
+    ? StringWithMaxLength<S, M>
+    : string;
 
 type NonEmptyString<S extends string> = string extends S
   ? string
@@ -207,7 +202,7 @@ type StringWithMaxLength<S extends string, N extends number> =
 type HasLengthAtLeast<
   S extends string,
   N extends number,
-  Acc extends unknown[] = [],
+  Acc extends readonly unknown[] = readonly [],
 > = string extends S
   ? true
   : IsNegative<N> extends true
@@ -217,13 +212,13 @@ type HasLengthAtLeast<
       : S extends ''
         ? false
         : S extends `${infer _}${infer Rest}`
-          ? HasLengthAtLeast<Rest, N, [...Acc, unknown]>
+          ? HasLengthAtLeast<Rest, N, readonly [...Acc, unknown]>
           : false;
 
 type HasLengthAtMost<
   S extends string,
   N extends number,
-  Acc extends unknown[] = [],
+  Acc extends readonly unknown[] = readonly [],
 > = string extends S
   ? true
   : IsNegative<N> extends true
@@ -233,7 +228,7 @@ type HasLengthAtMost<
       : Acc['length'] extends N
         ? false
         : S extends `${infer _}${infer Rest}`
-          ? HasLengthAtMost<Rest, N, [...Acc, unknown]>
+          ? HasLengthAtMost<Rest, N, readonly [...Acc, unknown]>
           : false;
 
 type IsNegative<N extends number> = `${N}` extends `-${string}` ? true : false;

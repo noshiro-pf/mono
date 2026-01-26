@@ -11,9 +11,11 @@ import {
 export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
   types: Types,
   defaultType: IntersectionType<Types>,
-  options?: PartialReadonly<{
-    typeName: string;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+    }>
+  >,
 ): IntersectionType<Types> => {
   type T = IntersectionTypeValue<Types>;
 
@@ -78,27 +80,35 @@ namespace TsFortressInternal {
     Types extends NonEmptyArray<Type<unknown>>,
   > = Intersection<Cast0<UnwrapTypeList<Types>>>;
 
-  type Cast0<T> = [T] extends [NonEmptyArray<unknown>] ? T : never;
+  type Cast0<T> = readonly [T] extends readonly [NonEmptyArray<unknown>]
+    ? T
+    : never;
 }
 
 expectType<
   IntersectionType<
-    [
-      Type<{
-        a: 0;
-        b: 0;
-      }>,
-      Type<{
-        b: 0;
-        c: 0;
-      }>,
+    readonly [
+      Type<
+        Readonly<{
+          a: 0;
+          b: 0;
+        }>
+      >,
+      Type<
+        Readonly<{
+          b: 0;
+          c: 0;
+        }>
+      >,
     ]
   >,
-  Type<{
-    a: 0;
-    b: 0;
-    c: 0;
-  }>
+  Type<
+    Readonly<{
+      a: 0;
+      b: 0;
+      c: 0;
+    }>
+  >
 >('=');
 
 type UnwrapTypeList<Types extends readonly Type<unknown>[]> =
@@ -107,108 +117,115 @@ type UnwrapTypeList<Types extends readonly Type<unknown>[]> =
 namespace TsFortressInternal {
   export type UnwrapTypeImpl<Types extends readonly unknown[]> =
     Types extends readonly []
-      ? []
+      ? readonly []
       : Types extends readonly [infer Head, ...infer Tail]
         ? readonly [TypeOf<Cast1<Head>>, ...UnwrapTypeImpl<Tail>]
         : never;
 
+  // transformer-ignore-next-line
   type Cast1<T> = [T] extends [Type<unknown>] ? T : never;
 }
 
 expectType<
   TypeOf<
-    Type<{
-      a: 0;
-      b: 0;
-    }>
+    Type<
+      Readonly<{
+        a: 0;
+        b: 0;
+      }>
+    >
   >,
-  {
+  Readonly<{
     a: 0;
     b: 0;
-  }
+  }>
 >('=');
 
 expectType<
   UnwrapTypeList<
-    [
-      Type<{
-        a: 0;
-        b: 0;
-      }>,
-      Type<{
-        b: 0;
-        c: 0;
-      }>,
+    readonly [
+      Type<
+        Readonly<{
+          a: 0;
+          b: 0;
+        }>
+      >,
+      Type<
+        Readonly<{
+          b: 0;
+          c: 0;
+        }>
+      >,
     ]
   >,
   readonly [
-    {
+    Readonly<{
       a: 0;
       b: 0;
-    },
-    {
+    }>,
+    Readonly<{
       b: 0;
       c: 0;
-    },
+    }>,
   ]
 >('=');
 
 expectType<
   Intersection<
-    [
-      {
+    readonly [
+      Readonly<{
         a: 0;
         b: 0;
-      },
-      {
+      }>,
+      Readonly<{
         b: 0;
         c: 0;
-      },
+      }>,
     ]
   >,
-  {
+  Readonly<{
     a: 0;
     b: 0;
     c: 0;
-  }
+  }>
 >('=');
 
 expectType<
   Intersection<
-    [
-      {
+    readonly [
+      Readonly<{
         a: 0;
         b: 0;
-      },
-      {
+      }>,
+      Readonly<{
         b: 0;
         c: 0;
-      },
-      {
+      }>,
+      Readonly<{
         c: 0;
         d: 0;
-      },
+      }>,
     ]
   >,
-  {
+  Readonly<{
     a: 0;
     b: 0;
     c: 0;
     d: 0;
-  }
+  }>
 >('=');
 
 expectType<
   Intersection<
-    [
-      {
+    readonly [
+      Readonly<{
         a: 0;
         b: 0;
-      },
-      {
+      }>,
+      Readonly<{
         b: 1;
         c: 0;
-      },
+      }>,
     ]
   >,
   never

@@ -6,9 +6,11 @@ import { type Type } from '../../../type.mjs';
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators
  */
 export const jsonString = (
-  options?: PartialReadonly<{
-    defaultValue: string;
-  }>,
+  options?: Partial<
+    Readonly<{
+      defaultValue: string;
+    }>
+  >,
 ): Type<JsonString> =>
   brandedString({
     is: isJsonString,

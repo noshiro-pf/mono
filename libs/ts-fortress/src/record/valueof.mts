@@ -5,9 +5,11 @@ import { type RecordType, type Type } from '../type.mjs';
 
 export const valueof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   recordType: RecordType<R>,
-  options?: PartialReadonly<{
-    typeName: string;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+    }>
+  >,
 ): ValueOfType<R> => {
   const types = Object.values(recordType.shape);
 
@@ -38,18 +40,18 @@ type ValueOfType<R extends ReadonlyRecord<string, Type<unknown>>> =
 expectType<ValueOfType<{}>, Type<undefined>>('=');
 
 expectType<
-  ValueOfType<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
+  ValueOfType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>,
   Type<0 | 1 | 2>
 >('=');
 
 expectType<
-  ValueOfType<{ x: Type<string>; y: Type<number>; z: Type<boolean> }>,
+  ValueOfType<Readonly<{ x: Type<string>; y: Type<number>; z: Type<boolean> }>>,
   Type<string | number | boolean>
 >('=');
 
 expectType<
-  ValueOfType<{ same: Type<string>; value: Type<string> }>,
+  ValueOfType<Readonly<{ same: Type<string>; value: Type<string> }>>,
   Type<string>
 >('=');
 
-expectType<ValueOfType<{ never: Type<never> }>, Type<never>>('=');
+expectType<ValueOfType<Readonly<{ never: Type<never> }>>, Type<never>>('=');

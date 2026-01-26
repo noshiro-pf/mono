@@ -9,15 +9,17 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-type MapTuple<T extends readonly Type<unknown>[]> = {
-  readonly [K in keyof T]: TypeOf<T[K]>;
-};
+type MapTuple<T extends readonly Type<unknown>[]> = Readonly<{
+  [K in keyof T]: TypeOf<T[K]>;
+}>;
 
 export const tuple = <const A extends readonly Type<unknown>[]>(
   types: A,
-  options?: PartialReadonly<{
-    typeName: string;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+    }>
+  >,
 ): Type<MapTuple<A>> => {
   type T = MapTuple<A>;
 

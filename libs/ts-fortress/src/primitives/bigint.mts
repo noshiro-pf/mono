@@ -126,20 +126,22 @@ export function bigint<C extends Constraints>(
   });
 }
 
-type Constraints = PartialReadonly<{
-  gt: bigint;
-  gte: bigint;
-  min: bigint;
-  lt: bigint;
-  lte: bigint;
-  max: bigint;
-  negative: boolean;
-  nonNegative: boolean;
-  positive: boolean;
-  nonPositive: boolean;
-  multipleOf: bigint;
-  step: bigint;
-}>;
+type Constraints = Partial<
+  Readonly<{
+    gt: bigint;
+    gte: bigint;
+    min: bigint;
+    lt: bigint;
+    lte: bigint;
+    max: bigint;
+    negative: boolean;
+    nonNegative: boolean;
+    positive: boolean;
+    nonPositive: boolean;
+    multipleOf: bigint;
+    step: bigint;
+  }>
+>;
 
 type DefaultValueType<
   B extends bigint,
@@ -149,25 +151,17 @@ type DefaultValueType<
   DefaultValueWhenPositiveIsOn<B, R> &
   DefaultValueWhenNonPositiveIsOn<B, R>;
 
-type DefaultValueWhenNegativeIsOn<
-  B extends bigint,
-  R extends Constraints,
-> = R extends { negative: true } ? NegativeBigint<B> : bigint;
+type DefaultValueWhenNegativeIsOn<B extends bigint, R extends Constraints> =
+  R extends Readonly<{ negative: true }> ? NegativeBigint<B> : bigint;
 
-type DefaultValueWhenNonNegativeIsOn<
-  B extends bigint,
-  R extends Constraints,
-> = R extends { nonNegative: true } ? NonNegativeBigint<B> : bigint;
+type DefaultValueWhenNonNegativeIsOn<B extends bigint, R extends Constraints> =
+  R extends Readonly<{ nonNegative: true }> ? NonNegativeBigint<B> : bigint;
 
-type DefaultValueWhenPositiveIsOn<
-  B extends bigint,
-  R extends Constraints,
-> = R extends { positive: true } ? PositiveBigint<B> : bigint;
+type DefaultValueWhenPositiveIsOn<B extends bigint, R extends Constraints> =
+  R extends Readonly<{ positive: true }> ? PositiveBigint<B> : bigint;
 
-type DefaultValueWhenNonPositiveIsOn<
-  B extends bigint,
-  R extends Constraints,
-> = R extends { nonPositive: true } ? NonPositiveBigint<B> : bigint;
+type DefaultValueWhenNonPositiveIsOn<B extends bigint, R extends Constraints> =
+  R extends Readonly<{ nonPositive: true }> ? NonPositiveBigint<B> : bigint;
 
 type NegativeBigint<B extends bigint> = bigint extends B
   ? bigint

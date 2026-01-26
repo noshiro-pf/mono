@@ -20,26 +20,28 @@ export const record = <
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
   shape: R,
-  options?: PartialReadonly<{
-    typeName: string;
+  options?: Partial<
+    Readonly<{
+      typeName: string;
 
-    /**
-     * Behavior when validating objects with excess properties.
-     * - 'allow': Accept excess properties
-     * - 'strip': Remove excess properties from the result (default)
-     * - 'error': Reject objects with excess properties
-     * @default 'strip'
-     */
-    excessPropertyValidation: ExcessValidation;
+      /**
+       * Behavior when validating objects with excess properties.
+       * - 'allow': Accept excess properties
+       * - 'strip': Remove excess properties from the result (default)
+       * - 'error': Reject objects with excess properties
+       * @default 'strip'
+       */
+      excessPropertyValidation: ExcessValidation;
 
-    /**
-     * Behavior when filling objects with excess properties.
-     * - 'allow': Keep excess properties in the result
-     * - 'strip': Remove excess properties from the result (default)
-     * @default 'strip'
-     */
-    excessPropertyFill: ExcessPropertyFillBehavior;
-  }>,
+      /**
+       * Behavior when filling objects with excess properties.
+       * - 'allow': Keep excess properties in the result
+       * - 'strip': Remove excess properties from the result (default)
+       * @default 'strip'
+       */
+      excessPropertyFill: ExcessPropertyFillBehavior;
+    }>
+  >,
 ): RecordType<R, ExcessValidation> => {
   type T = ExcessValidation extends 'allow'
     ? TsFortressInternal.RecordTypeValue<R> | UnknownRecord
@@ -224,9 +226,11 @@ export const strictRecord = <
   const R extends ReadonlyRecord<string, Type<unknown>>,
 >(
   source: R,
-  options?: PartialReadonly<{
-    typeName: string;
-    excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+    }>
+  >,
 ): RecordType<R, 'error'> =>
   record(source, { ...options, excessPropertyValidation: 'error' });

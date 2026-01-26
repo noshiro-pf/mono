@@ -183,7 +183,7 @@ describe('recursive', () => {
 
   // Test other recursive structures
   test('Linked list structure', () => {
-    type LinkedList<T> = { value: T; next: LinkedList<T> | null };
+    type LinkedList<T> = Readonly<{ value: T; next: LinkedList<T> | null }>;
 
     const LinkedListNumber: Type<LinkedList<number>> = recursion(
       'LinkedList<number>',

@@ -12,10 +12,12 @@ export const mergeRecords = <
   const Types extends NonEmptyArray<Type<UnknownRecord>>,
 >(
   types: Types,
-  options?: PartialReadonly<{
-    typeName: string;
-    defaultType: IntersectionType<Types>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultType: IntersectionType<Types>;
+    }>
+  >,
 ): IntersectionType<Types> => {
   type T = IntersectionTypeValue<Types>;
 
@@ -93,28 +95,99 @@ namespace TsFortressInternal {
 
   type UnwrapTypeImpl<Types extends readonly unknown[]> =
     Types extends readonly []
-      ? []
+      ? readonly []
       : Types extends readonly [infer Head, ...infer Tail]
         ? readonly [TypeOf<Cast1<Head>>, ...UnwrapTypeImpl<Tail>]
         : never;
 
+  // transformer-ignore-next-line
   type Cast1<T> = [T] extends [Type<UnknownRecord>] ? T : never;
 }
 
 expectType<
   IntersectionType<
-    [
-      Type<{
+    readonly [
+      Type<
+        Readonly<{
+          a: 0;
+          b: 0;
+        }>
+      >,
+      Type<
+        Readonly<{
+          b: 0;
+          c: 0;
+        }>
+      >,
+    ]
+  >,
+  Type<
+    Readonly<{
+      a: 0;
+      b: 0;
+      c: 0;
+    }>
+  >
+>('=');
+
+expectType<
+  TypeOf<
+    Type<
+      Readonly<{
+        a: 0;
+        b: 0;
+      }>
+    >
+  >,
+  Readonly<{
+    a: 0;
+    b: 0;
+  }>
+>('=');
+
+expectType<
+  TsFortressInternal.UnwrapTypeList<
+    readonly [
+      Type<
+        Readonly<{
+          a: 0;
+          b: 0;
+        }>
+      >,
+      Type<
+        Readonly<{
+          b: 0;
+          c: 0;
+        }>
+      >,
+    ]
+  >,
+  readonly [
+    Readonly<{
+      a: 0;
+      b: 0;
+    }>,
+    Readonly<{
+      b: 0;
+      c: 0;
+    }>,
+  ]
+>('=');
+
+expectType<
+  Intersection<
+    readonly [
+      Readonly<{
         a: 0;
         b: 0;
       }>,
-      Type<{
+      Readonly<{
         b: 0;
         c: 0;
       }>,
     ]
   >,
-  Type<{
+  Readonly<{
     a: 0;
     b: 0;
     c: 0;
@@ -122,99 +195,41 @@ expectType<
 >('=');
 
 expectType<
-  TypeOf<
-    Type<{
-      a: 0;
-      b: 0;
-    }>
-  >,
-  {
-    a: 0;
-    b: 0;
-  }
->('=');
-
-expectType<
-  TsFortressInternal.UnwrapTypeList<
-    [
-      Type<{
+  Intersection<
+    readonly [
+      Readonly<{
         a: 0;
         b: 0;
       }>,
-      Type<{
+      Readonly<{
         b: 0;
         c: 0;
       }>,
-    ]
-  >,
-  readonly [
-    {
-      a: 0;
-      b: 0;
-    },
-    {
-      b: 0;
-      c: 0;
-    },
-  ]
->('=');
-
-expectType<
-  Intersection<
-    [
-      {
-        a: 0;
-        b: 0;
-      },
-      {
-        b: 0;
-        c: 0;
-      },
-    ]
-  >,
-  {
-    a: 0;
-    b: 0;
-    c: 0;
-  }
->('=');
-
-expectType<
-  Intersection<
-    [
-      {
-        a: 0;
-        b: 0;
-      },
-      {
-        b: 0;
-        c: 0;
-      },
-      {
+      Readonly<{
         c: 0;
         d: 0;
-      },
+      }>,
     ]
   >,
-  {
+  Readonly<{
     a: 0;
     b: 0;
     c: 0;
     d: 0;
-  }
+  }>
 >('=');
 
 expectType<
   Intersection<
-    [
-      {
+    readonly [
+      Readonly<{
         a: 0;
         b: 0;
-      },
-      {
+      }>,
+      Readonly<{
         b: 1;
         c: 0;
-      },
+      }>,
     ]
   >,
   never

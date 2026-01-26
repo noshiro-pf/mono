@@ -32,7 +32,7 @@ assert.deepStrictEqual(result.value, [
     typeName: 'number',
     details: undefined,
   },
-] satisfies t.ValidationError[]);
+] satisfies readonly t.ValidationError[]);
 
 // Convert to string messages
 const messages = t.validationErrorsToMessages(result.value);

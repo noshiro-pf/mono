@@ -18,6 +18,7 @@ type SomeObject = z.infer<typeof SomeObject>;
 
 expectType<
   SomeObject,
+  // transformer-ignore-next-line:
   {
     key1: 1;
     key2: string;

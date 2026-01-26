@@ -12,10 +12,12 @@ import {
 export const arrayAtLeastLength = <A, N extends SmallUint>(
   size: N,
   elementType: Type<A>,
-  options?: PartialReadonly<{
-    typeName: string;
-    defaultValue: ArrayAtLeastLen<N, A>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: ArrayAtLeastLen<N, A>;
+    }>
+  >,
 ): Type<ArrayAtLeastLen<N, A>> => {
   type T = ArrayAtLeastLen<N, A>;
 

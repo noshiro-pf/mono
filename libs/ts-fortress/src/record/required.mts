@@ -22,12 +22,14 @@ export const required = <
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
   recordType: RecordType<R, ExcessValidation>,
-  options?: PartialReadonly<{
-    keysToBeRequired: KeysToBeRequired;
-    typeName: string;
-    excessPropertyValidation: ExcessValidation;
-    excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
-  }>,
+  options?: Partial<
+    Readonly<{
+      keysToBeRequired: KeysToBeRequired;
+      typeName: string;
+      excessPropertyValidation: ExcessValidation;
+      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+    }>
+  >,
 ): RequiredType<R, KeysToBeRequired, ExcessValidation> => {
   const typeNameFilled: string =
     options?.typeName ??
@@ -78,16 +80,15 @@ type RequiredTypeShape<
     ? FullyRequiredType<R>
     : PartiallyRequiredType<R, ArrayElement<KeysToBeRequired>>;
 
-type FullyRequiredType<R extends ReadonlyRecord<string, Type<unknown>>> = {
-  readonly [P in keyof R]: RequiredPropertyType<R[P]>;
-};
+type FullyRequiredType<R extends ReadonlyRecord<string, Type<unknown>>> =
+  Readonly<{ [P in keyof R]: RequiredPropertyType<R[P]> }>;
 
 type PartiallyRequiredType<
   R extends ReadonlyRecord<string, Type<unknown>>,
   K extends keyof R,
-> = {
-  readonly [P in keyof R]: P extends K ? RequiredPropertyType<R[P]> : R[P];
-};
+> = Readonly<{
+  [P in keyof R]: P extends K ? RequiredPropertyType<R[P]> : R[P];
+}>;
 
 export type RequiredType<
   R extends ReadonlyRecord<string, Type<unknown>>,
@@ -97,12 +98,12 @@ export type RequiredType<
 
 expectType<
   RequiredTypeShape<
-    {
+    Readonly<{
       a: OptionalPropertyType<Type<0>>;
       b: Type<1>;
       c: OptionalPropertyType<Type<2>>;
-    },
-    ['a']
+    }>,
+    readonly ['a']
   >,
   Readonly<{
     a: Type<0>;
@@ -165,12 +166,12 @@ expectType<
 
 expectType<
   RequiredType<
-    {
+    Readonly<{
       a: OptionalPropertyType<Type<0>>;
       b: Type<1>;
       c: OptionalPropertyType<Type<2>>;
-    },
-    ['a']
+    }>,
+    readonly ['a']
   >,
   Type<
     Readonly<{
@@ -192,12 +193,12 @@ expectType<
 
 expectType<
   RequiredType<
-    {
+    Readonly<{
       a: OptionalPropertyType<Type<0>>;
       b: OptionalPropertyType<Type<1>>;
       c: Type<2>;
-    },
-    ['a', 'b']
+    }>,
+    readonly ['a', 'b']
   >,
   Type<
     Readonly<{
@@ -219,11 +220,11 @@ expectType<
 
 expectType<
   RequiredType<
-    {
+    Readonly<{
       a: OptionalPropertyType<Type<0>>;
       b: OptionalPropertyType<Type<1>>;
       c: OptionalPropertyType<Type<2>>;
-    },
+    }>,
     undefined
   >,
   Type<
@@ -246,13 +247,13 @@ expectType<
 
 expectType<
   RequiredType<
-    {
+    Readonly<{
       a: OptionalPropertyType<Type<0>>;
       b: Type<1>;
       c: OptionalPropertyType<Type<2>>;
-    },
+    }>,
     // @ts-expect-error key "d" doesn't exist
-    ['a', 'd']
+    readonly ['a', 'd']
   >,
   0
 >('!=');
