@@ -970,11 +970,15 @@ describe(convertToReadonlyTypeTransformer, () => {
           type foo = {};
           type bar = Readonly<{}>;
           type baz = "aaa" & {};
+
+          type Fn = (key: K | (WidenLiteral<K> & {})) => Optional<V>;
         `,
         expected: dedent`
           type foo = {};
           type bar = Readonly<{}>;
           type baz = "aaa" & {};
+
+          type Fn = (key: K | (WidenLiteral<K> & {})) => Optional<V>;
         `,
       },
       {
