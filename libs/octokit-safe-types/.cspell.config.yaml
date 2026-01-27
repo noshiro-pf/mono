@@ -1,0 +1,15 @@
+version: '0.2'
+language: en
+allowCompoundWords: true
+caseSensitive: false
+ignoreRandomStrings: true
+words:
+  - noshiro
+  - testw
+  - tscw
+ignorePaths:
+  - pnpm-lock.yaml
+  - pnpm-workspace.yaml
+  - dist/**
+  - docs/**
+  - agents/common/**
