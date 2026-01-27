@@ -1,3 +1,9 @@
+# [8.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.0.3...v8.1.0) (2026-01-27)
+
+### Features
+
+- support yaml format cspell config ([#269](https://github.com/noshiro-pf/ts-repo-utils/issues/269)) ([73001e1](https://github.com/noshiro-pf/ts-repo-utils/commit/73001e11400b0f7f06e6858565c84cc76f819b73))
+
 ## [8.0.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.0.2...v8.0.3) (2026-01-23)
 
 ### Bug Fixes

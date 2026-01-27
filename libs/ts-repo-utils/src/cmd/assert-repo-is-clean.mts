@@ -5,7 +5,7 @@ import { assertRepoIsClean } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
   name: 'assert-repo-is-clean-cli',
-  version: '8.0.3',
+  version: '8.1.0',
   args: {
     silent: cmd.flag({
       long: 'silent',
