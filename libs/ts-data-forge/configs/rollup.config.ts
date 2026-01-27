@@ -25,10 +25,8 @@ if (Result.isErr(globResult)) {
   );
 }
 
-const input = globResult.value;
-
 export default defineConfig({
-  input: castMutable(input),
+  input: castMutable(globResult.value),
   output: {
     format: 'es',
     dir: path.resolve(configDir, outDirRelative),

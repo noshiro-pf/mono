@@ -1,0 +1,33 @@
+version: '0.2'
+language: en
+allowCompoundWords: true
+caseSensitive: false
+ignoreRandomStrings: true
+words:
+  - bivariant
+  - contravariance
+  - darkred
+  - foldl
+  - foldr
+  - funcs
+  - iset
+  - LEQC
+  - NAND
+  - noshiro
+  - nums
+  - sindresorhus
+  - strs
+  - testw
+  - tscw
+  - unmemoized
+  - unshift
+  - unshifted
+  - Unstringifiable
+  - uppercased
+  - XNOR
+ignorePaths:
+  - pnpm-lock.yaml
+  - pnpm-workspace.yaml
+  - dist/**
+  - docs/**
+  - agents/common/**
