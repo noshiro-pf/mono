@@ -43,10 +43,10 @@ import { getDiffFrom } from './diff.mjs';
  * @param options.pathsIgnore - Array of patterns to ignore when determining if
  *   type checks should run. Supports three pattern types:
  *
- *   - **Exact file matches**: e.g., `.cspell.json` matches only that file
+ *   - **Exact file matches**: e.g., `.cspell.config.yaml` matches only that file
  *   - **Directory prefixes**: e.g., `docs/` matches any file in docs directory
  *   - **File extensions**: e.g., `**.md` matches any markdown file Defaults to:
- *       `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json',
+ *       `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.cspell.config.yaml',
  *       '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore',
  *       '.prettierrc', 'docs/', '**.md', '**.txt']`
  *
@@ -67,6 +67,7 @@ export const checkShouldRunTypeChecks = async (
     '.editorconfig',
     '.gitignore',
     '.cspell.json',
+    '.cspell.config.yaml',
     '.markdownlint-cli2.mjs',
     '.npmignore',
     '.prettierignore',

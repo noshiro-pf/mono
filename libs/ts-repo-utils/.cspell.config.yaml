@@ -1,0 +1,21 @@
+version: '0.2'
+language: en
+allowCompoundWords: true
+caseSensitive: false
+ignoreRandomStrings: true
+words:
+  - chdir
+  - envrc
+  - myorg
+  - noshiro
+  - sindresorhus
+  - testw
+  - tscw
+  - unstub
+  - wireit
+ignorePaths:
+  - pnpm-lock.yaml
+  - pnpm-workspace.yaml
+  - dist/**
+  - docs/**
+  - agents/common/**

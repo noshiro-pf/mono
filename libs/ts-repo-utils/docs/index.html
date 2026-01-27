@@ -104,10 +104,10 @@
 <ul>
 <li><code>--paths-ignore</code> - Patterns to ignore when checking if type checks should run (optional, can be specified multiple times)
 <ul>
-<li>Supports exact file matches: <code>.cspell.json</code></li>
+<li>Supports exact file matches: <code>.cspell.config.yaml</code></li>
 <li>Directory prefixes: <code>docs/</code> (matches any file in docs directory)</li>
 <li>File extensions: <code>**.md</code> (matches any markdown file)</li>
-<li>Default: <code>['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']</code></li>
+<li>Default: <code>['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']</code></li>
 </ul>
 </li>
 <li><code>--base-branch</code> - Base branch to compare against for determining changed files (default: <code>origin/main</code>)</li>
@@ -237,10 +237,10 @@ Runs <code>git diff --name-only &lt;base&gt; [--diff-filter=d]</code></p>
 <ul>
 <li><code>pathsIgnore?</code> - Patterns to ignore when checking if type checks should run:
 <ul>
-<li>Exact file matches: <code>.cspell.json</code></li>
+<li>Exact file matches: <code>.cspell.config.yaml</code></li>
 <li>Directory prefixes: <code>docs/</code> (matches any file in docs directory)</li>
 <li>File extensions: <code>**.md</code> (matches any markdown file)</li>
-<li>Default: <code>['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']</code></li>
+<li>Default: <code>['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']</code></li>
 </ul>
 </li>
 <li><code>baseBranch?</code> - Base branch to compare against (default: <code>origin/main</code>)</li>

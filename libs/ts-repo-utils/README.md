@@ -190,10 +190,10 @@ npm exec -- check-should-run-type-checks \
 **Options:**
 
 - `--paths-ignore` - Patterns to ignore when checking if type checks should run (optional, can be specified multiple times)
-    - Supports exact file matches: `.cspell.json`
+    - Supports exact file matches: `.cspell.config.yaml`
     - Directory prefixes: `docs/` (matches any file in docs directory)
     - File extensions: `**.md` (matches any markdown file)
-    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
 - `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`)
 
 **GitHub Actions Integration:**
@@ -494,10 +494,10 @@ await formatUncommittedFiles({
 **Options:**
 
 - `pathsIgnore?` - Patterns to ignore when checking if type checks should run:
-    - Exact file matches: `.cspell.json`
+    - Exact file matches: `.cspell.config.yaml`
     - Directory prefixes: `docs/` (matches any file in docs directory)
     - File extensions: `**.md` (matches any markdown file)
-    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
 - `baseBranch?` - Base branch to compare against (default: `origin/main`)
 
 ### Code Formatting Utilities
