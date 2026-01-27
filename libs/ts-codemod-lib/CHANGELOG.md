@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.3...v1.2.0) (2026-01-27)
+
+### Features
+
+- improve transformer-ignore feature ([#18](https://github.com/noshiro-pf/ts-codemod-lib/issues/18)) ([c0202d1](https://github.com/noshiro-pf/ts-codemod-lib/commit/c0202d187a3912abb178ab07c9c7cbee74141c16))
+
 ## [1.1.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.2...v1.1.3) (2026-01-25)
 
 ### Bug Fixes
