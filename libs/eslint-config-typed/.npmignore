@@ -4,6 +4,6 @@ scripts
 test
 
 tsconfig.json
-.cspell.json
+.cspell.config.yaml
 .prettierrc
 pnpm-lock.yaml
