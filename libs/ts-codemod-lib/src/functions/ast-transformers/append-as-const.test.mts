@@ -184,6 +184,64 @@ describe(appendAsConstTransformer, () => {
         const transformedObject = { y: false }; // This should be skipped
       `,
     },
+    {
+      name: 'Transformer-specific ignore comment (next line)',
+      source: dedent`
+        const a = [1, 2, 3];
+        // transformer-ignore-next-line append-as-const
+        const b = [4, 5, 6];
+        const c = [7, 8, 9];
+      `,
+      expected: dedent`
+        const a = [1, 2, 3] as const;
+        // transformer-ignore-next-line append-as-const
+        const b = [4, 5, 6];
+        const c = [7, 8, 9] as const;
+      `,
+    },
+    {
+      name: 'Transformer-specific ignore comment (file scope)',
+      source: dedent`
+        /* transformer-ignore append-as-const */
+        const a = [1, 2, 3];
+        const b = { x: 1 };
+      `,
+      expected: dedent`
+        /* transformer-ignore append-as-const */
+        const a = [1, 2, 3];
+        const b = { x: 1 };
+      `,
+    },
+    {
+      name: 'Multiple transformers in ignore comment',
+      source: dedent`
+        const a = [1, 2, 3];
+        // transformer-ignore-next-line append-as-const, replace-any-with-unknown
+        const b = [4, 5, 6];
+        const c = [7, 8, 9];
+      `,
+      expected: dedent`
+        const a = [1, 2, 3] as const;
+        // transformer-ignore-next-line append-as-const, replace-any-with-unknown
+        const b = [4, 5, 6];
+        const c = [7, 8, 9] as const;
+      `,
+    },
+    {
+      name: 'Wrong transformer name should not affect',
+      source: dedent`
+        const a = [1, 2, 3];
+        // transformer-ignore-next-line some-other-transformer
+        const b = [4, 5, 6];
+        const c = [7, 8, 9];
+      `,
+      expected: dedent`
+        const a = [1, 2, 3] as const;
+        // transformer-ignore-next-line some-other-transformer
+        const b = [4, 5, 6] as const;
+        const c = [7, 8, 9] as const;
+      `,
+    },
     // Cases where the transformer doesn't modify the code
     {
       name: 'Primitive literal - number',

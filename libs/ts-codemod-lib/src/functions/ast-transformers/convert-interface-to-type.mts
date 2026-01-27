@@ -8,8 +8,8 @@ import { type TsMorphTransformer } from './types.mjs';
  * interface による型定義を type による型定義に変換する。
  * @typescript-eslint/consistent-type-definitions: ["error", "type"] と同等の動作
  */
-export const convertInterfaceToTypeTransformer =
-  (): TsMorphTransformer => (sourceAst) => {
+export const convertInterfaceToTypeTransformer = (): TsMorphTransformer => {
+  const transformer: TsMorphTransformer = (sourceAst) => {
     const processInterfaces = (
       container: tsm.SourceFile | tsm.ModuleDeclaration,
     ): void => {
@@ -117,3 +117,9 @@ export const convertInterfaceToTypeTransformer =
       processInterfaces(namespace);
     }
   };
+
+  // eslint-disable-next-line functional/immutable-data
+  transformer.transformerName = 'convert-interface-to-type';
+
+  return transformer;
+};

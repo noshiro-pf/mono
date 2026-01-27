@@ -9,7 +9,7 @@ on:
       - 'develop*'
     paths-ignore:
       - '.gitignore'
-      # - '.cspell.json'
+      # - '.cspell.config.yaml'
       # - '**.md'
       # - '**.txt'
       # - 'docs/**'

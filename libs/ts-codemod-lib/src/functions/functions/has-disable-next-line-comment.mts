@@ -1,14 +1,23 @@
 import * as tsm from 'ts-morph';
-import { IGNORE_LINE_COMMENT_TEXT } from '../constants/index.mjs';
+import { IGNORE_LINE_COMMENT_PREFIX } from '../constants/index.mjs';
 
 /**
  * Checks if a given ts-morph Node is immediately preceded by a
- * '// transformer-ignore-next-line' comment.
+ * '// transformer-ignore-next-line' comment, optionally filtered by transformer name(s).
  *
  * @param node - The ts-morph Node to check.
+ * @param transformerName - Optional transformer name to check for specific ignore directive.
+ *                          If provided, only ignores if the comment specifies this transformer.
+ *                          Supports ESLint-style syntax like:
+ *                          - `// transformer-ignore-next-line` (ignores all transformers)
+ *                          - `// transformer-ignore-next-line append-as-const` (specific transformer)
+ *                          - `// transformer-ignore-next-line append-as-const, replace-any-with-unknown` (multiple transformers)
  * @returns True if the node is preceded by the ignore comment on the immediately previous line, false otherwise.
  */
-export const hasDisableNextLineComment = (node: tsm.Node): boolean => {
+export const hasDisableNextLineComment = (
+  node: tsm.Node,
+  transformerName?: string,
+): boolean => {
   const nodeStartLine = node.getStartLineNumber();
 
   // Cannot be ignored if it's on the first line
@@ -33,11 +42,33 @@ export const hasDisableNextLineComment = (node: tsm.Node): boolean => {
     // Check if the comment is on the immediately preceding line
     if (nodeStartLine === commentEndLine + 1) {
       // Check if it's a single-line comment containing the specific ignore text
-      if (
-        commentRange.getKind() === tsm.SyntaxKind.SingleLineCommentTrivia &&
-        commentRange.getText().trim().includes(IGNORE_LINE_COMMENT_TEXT)
-      ) {
-        return true;
+      if (commentRange.getKind() === tsm.SyntaxKind.SingleLineCommentTrivia) {
+        const commentText = commentRange.getText().trim();
+
+        if (commentText.includes(IGNORE_LINE_COMMENT_PREFIX)) {
+          // Extract the part after the prefix
+          const afterPrefix = commentText
+            .slice(commentText.indexOf(IGNORE_LINE_COMMENT_PREFIX))
+            .replace(IGNORE_LINE_COMMENT_PREFIX, '')
+            .trim();
+
+          // If no transformer name specified, check if comment applies to all transformers
+          if (transformerName === undefined) {
+            return true;
+          }
+
+          // If no specific transformers listed in comment, it applies to all
+          if (afterPrefix === '') {
+            return true;
+          }
+
+          // Check if the transformer name is in the comma-separated list
+          const targetTransformers = afterPrefix
+            .split(',')
+            .map((name) => name.trim());
+
+          return targetTransformers.includes(transformerName);
+        }
       }
 
       // If we found *any* comment on the preceding line, but it wasn't

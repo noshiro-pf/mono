@@ -136,5 +136,63 @@ describe(replaceAnyWithUnknownTransformer, () => {
         type C = any; // Should remain any
       `,
     },
+    {
+      name: 'Transformer-specific ignore comment (next line)',
+      source: dedent`
+        type A = any;
+        // transformer-ignore-next-line replace-any-with-unknown
+        type B = any;
+        type C = any;
+      `,
+      expected: dedent`
+        type A = unknown;
+        // transformer-ignore-next-line replace-any-with-unknown
+        type B = any;
+        type C = unknown;
+      `,
+    },
+    {
+      name: 'Transformer-specific ignore comment (file scope)',
+      source: dedent`
+        /* transformer-ignore replace-any-with-unknown */
+        type A = any;
+        type B = any;
+      `,
+      expected: dedent`
+        /* transformer-ignore replace-any-with-unknown */
+        type A = any;
+        type B = any;
+      `,
+    },
+    {
+      name: 'Multiple transformers in ignore comment',
+      source: dedent`
+        type A = any;
+        // transformer-ignore-next-line replace-any-with-unknown, append-as-const
+        type B = any;
+        type C = any;
+      `,
+      expected: dedent`
+        type A = unknown;
+        // transformer-ignore-next-line replace-any-with-unknown, append-as-const
+        type B = any;
+        type C = unknown;
+      `,
+    },
+    {
+      name: 'Wrong transformer name should not affect',
+      source: dedent`
+        type A = any;
+        // transformer-ignore-next-line some-other-transformer
+        type B = any;
+        type C = any;
+      `,
+      expected: dedent`
+        type A = unknown;
+        // transformer-ignore-next-line some-other-transformer
+        type B = unknown;
+        type C = unknown;
+      `,
+    },
   ])('$name', testFn);
 });

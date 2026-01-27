@@ -6,20 +6,29 @@ import {
 } from '../functions/index.mjs';
 import { type TsMorphTransformer } from './types.mjs';
 
-export const appendAsConstTransformer =
-  (options?: AppendAsConstTransformerOptions): TsMorphTransformer =>
-  (sourceAst) => {
-    const ignorePrefixes = ISet.create(options?.ignorePrefixes ?? ['mut_']);
+const TRANSFORMER_NAME = 'append-as-const';
 
-    const optionsInternal: AppendAsConstTransformerOptionsInternal = {
-      applyLevel: options?.applyLevel ?? 'avoidInFunctionArgs',
-      ignoredPrefixes: ignorePrefixes,
-    };
+export const appendAsConstTransformer = (
+  options?: AppendAsConstTransformerOptions,
+): TsMorphTransformer => {
+  const ignorePrefixes = ISet.create(options?.ignorePrefixes ?? ['mut_']);
 
+  const optionsInternal: AppendAsConstTransformerOptionsInternal = {
+    applyLevel: options?.applyLevel ?? 'avoidInFunctionArgs',
+    ignoredPrefixes: ignorePrefixes,
+  };
+
+  const transformer: TsMorphTransformer = (sourceAst) => {
     for (const node of sourceAst.getChildren()) {
       transformNode(node, optionsInternal);
     }
   };
+
+  // eslint-disable-next-line functional/immutable-data
+  transformer.transformerName = TRANSFORMER_NAME;
+
+  return transformer;
+};
 
 export type AppendAsConstTransformerOptions = DeepReadonly<{
   applyLevel?: 'all' | 'avoidInFunctionArgs';
@@ -43,7 +52,7 @@ const transformNode = (
   node: tsm.Node,
   options: AppendAsConstTransformerOptionsInternal,
 ): void => {
-  if (hasDisableNextLineComment(node)) {
+  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
     console.debug('skipped by disable-next-line comment');
 
     return;

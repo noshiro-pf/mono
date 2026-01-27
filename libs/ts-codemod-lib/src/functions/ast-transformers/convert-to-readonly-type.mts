@@ -29,43 +29,52 @@ import {
 } from './readonly-transformer-helpers/index.mjs';
 import { type TsMorphTransformer } from './types.mjs';
 
-export const convertToReadonlyTypeTransformer =
-  (options?: ReadonlyTransformerOptions): TsMorphTransformer =>
-  (sourceAst) => {
-    if (
-      options?.DeepReadonly?.typeName !== undefined &&
-      invalidDeepReadonlyTypeName.has(options.DeepReadonly.typeName)
-    ) {
-      throw new Error(
-        `Invalid DeepReadonly typeName "${options.DeepReadonly.typeName}" passed to convertToReadonlyType`,
-      );
-    }
+const TRANSFORMER_NAME = 'convert-to-readonly-type';
 
-    const DeepReadonlyTypeName =
-      options?.DeepReadonly?.typeName ?? 'DeepReadonly';
-
-    const ignorePrefixes = ISet.create(
-      options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_'],
+export const convertToReadonlyTypeTransformer = (
+  options?: ReadonlyTransformerOptions,
+): TsMorphTransformer => {
+  if (
+    options?.DeepReadonly?.typeName !== undefined &&
+    invalidDeepReadonlyTypeName.has(options.DeepReadonly.typeName)
+  ) {
+    throw new Error(
+      `Invalid DeepReadonly typeName "${options.DeepReadonly.typeName}" passed to convertToReadonlyType`,
     );
+  }
 
-    const optionsInternal: ReadonlyTransformerOptionsInternal = {
-      DeepReadonly: {
-        typeName: DeepReadonlyTypeName,
-        applyLevel: 'keep',
-      },
-      ignoreEmptyObjectTypes: options?.ignoreEmptyObjectTypes ?? true,
-      ignoredPrefixes: ignorePrefixes,
-      debugPrint: options?.debug === true ? console.debug : () => {},
-      replaceNode:
-        options?.debug === true
-          ? replaceNodeWithDebugPrint
-          : (node, newNodeText) => node.replaceWithText(newNodeText),
-    };
+  const DeepReadonlyTypeName =
+    options?.DeepReadonly?.typeName ?? 'DeepReadonly';
 
+  const ignorePrefixes = ISet.create(
+    options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_'],
+  );
+
+  const optionsInternal: ReadonlyTransformerOptionsInternal = {
+    DeepReadonly: {
+      typeName: DeepReadonlyTypeName,
+      applyLevel: 'keep',
+    },
+    ignoreEmptyObjectTypes: options?.ignoreEmptyObjectTypes ?? true,
+    ignoredPrefixes: ignorePrefixes,
+    debugPrint: options?.debug === true ? console.debug : () => {},
+    replaceNode:
+      options?.debug === true
+        ? replaceNodeWithDebugPrint
+        : (node, newNodeText) => node.replaceWithText(newNodeText),
+  };
+
+  const transformer: TsMorphTransformer = (sourceAst) => {
     for (const node of sourceAst.getChildren()) {
       transformNode(node, initialReadonlyContext, optionsInternal);
     }
   };
+
+  // eslint-disable-next-line functional/immutable-data
+  transformer.transformerName = TRANSFORMER_NAME;
+
+  return transformer;
+};
 
 export type ReadonlyTransformerOptions = DeepReadonly<{
   /**
@@ -168,7 +177,7 @@ const transformNode = (
     options.debugPrint();
   }
 
-  if (hasDisableNextLineComment(node)) {
+  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
     options.debugPrint('skipped by disable-next-line comment');
 
     return;
@@ -1355,7 +1364,7 @@ const transformIndexSignatureDeclaration = (
   >,
   options: ReadonlyTransformerOptionsInternal,
 ): void => {
-  if (hasDisableNextLineComment(node)) {
+  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
     options.debugPrint('skipped index signature by disable-next-line comment');
 
     return;
