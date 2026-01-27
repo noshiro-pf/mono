@@ -12,7 +12,7 @@ on:
       - 'docs/**'
       - 'documents/**'
       - '.gitignore'
-      - '.cspell.json'
+      - '.cspell.config.yaml'
       - '.editorconfig'
       - '.markdownlint-cli2.mjs'
       - 'LICENSE'
