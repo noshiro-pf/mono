@@ -12,7 +12,7 @@ import {
 
 const cmdDef = cmd.command({
   name: 'convert-interface-to-type',
-  version: '1.3.0',
+  version: '1.3.1',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

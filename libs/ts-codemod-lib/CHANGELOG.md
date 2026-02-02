@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.3.0...v1.3.1) (2026-02-02)
+
+### Bug Fixes
+
+- prevent append-as-const to remove necessary `as const` ([#23](https://github.com/noshiro-pf/ts-codemod-lib/issues/23)) ([6899093](https://github.com/noshiro-pf/ts-codemod-lib/commit/68990938b1a6a70f59a7630b1895277891e22383))
+
 # [1.3.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.2.0...v1.3.0) (2026-02-02)
 
 ### Features
