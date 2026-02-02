@@ -80,7 +80,7 @@ importers:
         version: 3.3.3
       github-settings-as-code:
         specifier: 1.0.11
-        version: 1.0.11(prettier@3.8.0)(typescript@5.9.3)
+        version: 1.0.11(prettier@3.8.1)(typescript@5.9.3)
       jiti:
         specifier: 2.6.1
         version: 2.6.1
@@ -97,14 +97,14 @@ importers:
         specifier: 1.57.0
         version: 1.57.0
       prettier:
-        specifier: 3.8.0
-        version: 3.8.0
+        specifier: 3.8.1
+        version: 3.8.1
       prettier-plugin-organize-imports:
         specifier: 4.3.0
-        version: 4.3.0(prettier@3.8.0)(typescript@5.9.3)
+        version: 4.3.0(prettier@3.8.1)(typescript@5.9.3)
       prettier-plugin-packagejson:
         specifier: 3.0.0
-        version: 3.0.0(prettier@3.8.0)
+        version: 3.0.0(prettier@3.8.1)
       rollup:
         specifier: 4.55.2
         version: 4.55.2
@@ -113,7 +113,7 @@ importers:
         version: 25.0.2(typescript@5.9.3)
       ts-repo-utils:
         specifier: 8.1.0
-        version: 8.1.0(prettier@3.8.0)(typescript@5.9.3)
+        version: 8.1.0(prettier@3.8.1)(typescript@5.9.3)
       ts-type-forge:
         specifier: 2.3.0
         version: 2.3.0
@@ -3427,8 +3427,8 @@ packages:
       prettier:
         optional: true
 
-  prettier@3.8.0:
-    resolution: {integrity: sha512-yEPsovQfpxYfgWNhCfECjG5AQaO+K3dp6XERmOepyPDVqcJm+bjyCVO3pmU+nAPe0N5dDvekfGezt/EIiRe1TA==}
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -6724,14 +6724,14 @@ snapshots:
       through2: 2.0.5
       traverse: 0.6.8
 
-  github-settings-as-code@1.0.11(prettier@3.8.0)(typescript@5.9.3):
+  github-settings-as-code@1.0.11(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
       '@octokit/core': 7.0.6
       dotenv: 17.2.3
       octokit-safe-types: 1.2.5(typescript@5.9.3)
       ts-data-forge: 6.3.0(typescript@5.9.3)
       ts-fortress: 6.2.2(typescript@5.9.3)
-      ts-repo-utils: 8.1.0(prettier@3.8.0)(typescript@5.9.3)
+      ts-repo-utils: 8.1.0(prettier@3.8.1)(typescript@5.9.3)
     transitivePeerDependencies:
       - prettier
       - supports-color
@@ -7775,18 +7775,18 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-organize-imports@4.3.0(prettier@3.8.0)(typescript@5.9.3):
+  prettier-plugin-organize-imports@4.3.0(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
-      prettier: 3.8.0
+      prettier: 3.8.1
       typescript: 5.9.3
 
-  prettier-plugin-packagejson@3.0.0(prettier@3.8.0):
+  prettier-plugin-packagejson@3.0.0(prettier@3.8.1):
     dependencies:
       sort-package-json: 3.6.0
     optionalDependencies:
-      prettier: 3.8.0
+      prettier: 3.8.1
 
-  prettier@3.8.0: {}
+  prettier@3.8.1: {}
 
   pretty-ms@9.3.0:
     dependencies:
@@ -8339,7 +8339,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  ts-repo-utils@8.1.0(prettier@3.8.0)(typescript@5.9.3):
+  ts-repo-utils@8.1.0(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 7.2.0
@@ -8347,7 +8347,7 @@ snapshots:
       cmd-ts: 0.14.3
       fast-glob: 3.3.3
       micromatch: 4.0.8
-      prettier: 3.8.0
+      prettier: 3.8.1
       ts-data-forge: 6.3.0(typescript@5.9.3)
       tsx: 4.21.0
     transitivePeerDependencies:
