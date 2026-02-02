@@ -102,7 +102,7 @@
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
     "eslint-plugin-testing-library": "7.15.4",
     "eslint-plugin-unicorn": "62.0.0",
-    "globals": "17.0.0",
+    "globals": "17.1.0",
     "is-glob": "^4.0.3",
     "is-immutable-type": "5.0.1",
     "micromatch": "^4.0.8",
