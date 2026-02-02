@@ -11,7 +11,9 @@ const TRANSFORMER_NAME = 'append-as-const';
 export const appendAsConstTransformer = (
   options?: AppendAsConstTransformerOptions,
 ): TsMorphTransformer => {
-  const ignorePrefixes = ISet.create(options?.ignorePrefixes ?? ['mut_']);
+  const ignorePrefixes = ISet.create(
+    options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_', 'draft'],
+  );
 
   const optionsInternal: AppendAsConstTransformerOptionsInternal = {
     applyLevel: options?.applyLevel ?? 'avoidInFunctionArgs',
@@ -37,6 +39,8 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
    * A mute keywords to ignore the readonly conversion.
    *
    * (e.g. `"mut_"`)
+   *
+   * @default ['mut_', '#mut_', '_mut_', 'draft']
    */
   ignorePrefixes?: string[];
 
@@ -134,7 +138,10 @@ const transformNode = (
   }
 };
 
-const removeAsConstRecursively = (node: tsm.Node): void => {
+const removeAsConstRecursively = (
+  node: tsm.Node,
+  insideSpreadWithConditional: boolean = false,
+): void => {
   if (hasDisableNextLineComment(node)) {
     console.debug('skipped by disable-next-line comment');
 
@@ -142,19 +149,78 @@ const removeAsConstRecursively = (node: tsm.Node): void => {
   }
 
   if (isAsConstNode(node)) {
+    // If we're inside a spread element with conditional, keep the `as const`
+    if (insideSpreadWithConditional) {
+      return;
+    }
+
     // Extract node.expression to remove `as const` and recursively call the function
     // to remove `as const` from nested nodes
     // Example: `[[1,2] as const, [3,4]] as const` -> `[[1,2], [3,4]]`
-    removeAsConstRecursively(node.getExpression());
+    removeAsConstRecursively(node.getExpression(), insideSpreadWithConditional);
 
     node.replaceWithText(node.getExpression().getText());
 
     return;
   }
 
-  for (const child of node.getChildren()) {
-    removeAsConstRecursively(child);
+  // If we're inside a spread with conditional and encounter array/object literal without `as const`, add it
+  if (insideSpreadWithConditional) {
+    if (tsm.Node.isArrayLiteralExpression(node)) {
+      // Don't add `as const` to empty arrays
+      if (node.getElements().length === 0) {
+        return;
+      }
+
+      // Add `as const` to the array itself, but don't recursively process elements
+      // Elements will be processed normally by the outer transform
+      node.replaceWithText(`${node.getText()} as const`);
+
+      return;
+    }
+
+    if (tsm.Node.isObjectLiteralExpression(node)) {
+      // Don't add `as const` to empty objects
+      if (node.getProperties().length === 0) {
+        return;
+      }
+
+      // Add `as const` to the object itself, but don't recursively process properties
+      node.replaceWithText(`${node.getText()} as const`);
+
+      return;
+    }
   }
+
+  // Mark that we're inside a spread element's expression only if it contains conditional
+  // Example: `...(flag ? [1, 2] as const : [])` keeps inner `as const`
+  // Example: `...[1, 2] as const` removes inner `as const`
+  if (tsm.Node.isSpreadElement(node)) {
+    const expression = node.getExpression();
+
+    const hasConditional = containsConditionalExpression(expression);
+
+    removeAsConstRecursively(expression, hasConditional);
+
+    return;
+  }
+
+  for (const child of node.getChildren()) {
+    removeAsConstRecursively(child, insideSpreadWithConditional);
+  }
+};
+
+const containsConditionalExpression = (node: tsm.Node): boolean => {
+  if (tsm.Node.isConditionalExpression(node)) {
+    return true;
+  }
+
+  // Check children recursively, but stop at AsExpression boundaries
+  if (isAsConstNode(node)) {
+    return false;
+  }
+
+  return node.getChildren().some(containsConditionalExpression);
 };
 
 const removeParenthesis = (node: tsm.Node): tsm.Node =>

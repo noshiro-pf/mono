@@ -393,5 +393,122 @@ describe(appendAsConstTransformer, () => {
           }) as const;
       `,
     },
+    {
+      name: 'Nested as const inside spread operator with conditional should be kept',
+      source: dedent`
+        const flag = true as boolean;
+
+        type Elem =
+          | Readonly<{ a: 'str0' }>
+          | Readonly<{ b: 'str1' }>
+          | Readonly<{ c: 'str2' }>;
+
+        const a = [
+          { a: 'str0' },
+          ...(flag ? ([{ b: 'str1' }, { c: 'str2' }] as const) : []),
+        ] as const satisfies readonly Elem[];
+      `,
+      expected: dedent`
+        const flag = true as boolean;
+
+        type Elem =
+          | Readonly<{ a: 'str0' }>
+          | Readonly<{ b: 'str1' }>
+          | Readonly<{ c: 'str2' }>;
+
+        const a = [
+          { a: 'str0' },
+          ...(flag ? ([{ b: 'str1' }, { c: 'str2' }] as const) : []),
+        ] as const satisfies readonly Elem[];
+      `,
+    },
+    {
+      name: 'Spread with conditional without as const should add as const to inner array',
+      source: dedent`
+        const flag = true as boolean;
+
+        type Elem =
+          | Readonly<{ a: 'str0' }>
+          | Readonly<{ b: 'str1' }>
+          | Readonly<{ c: 'str2' }>;
+
+        const a = [
+          { a: 'str0' },
+          ...(flag ? [{ b: 'str1' }, { c: 'str2' }] : []),
+        ] as const satisfies readonly Elem[];
+      `,
+      expected: dedent`
+        const flag = true as boolean;
+
+        type Elem =
+          | Readonly<{ a: 'str0' }>
+          | Readonly<{ b: 'str1' }>
+          | Readonly<{ c: 'str2' }>;
+
+        const a = [
+          { a: 'str0' },
+          ...(flag ? [{ b: 'str1' }, { c: 'str2' }] as const : []),
+        ] as const satisfies readonly Elem[];
+      `,
+    },
+    {
+      name: 'Simple spread without conditional should remove inner as const',
+      source: dedent`
+        const a = [
+          1,
+          ...[2, 3] as const,
+        ] as const;
+      `,
+      expected: dedent`
+        const a = [
+          1,
+          ...[2, 3],
+        ] as const;
+      `,
+    },
+    {
+      name: 'Multiple simple spreads should remove inner as const',
+      source: dedent`
+        const c = [
+          ...[1, 2] as const,
+          ...[3, 4] as const,
+        ] as const;
+      `,
+      expected: dedent`
+        const c = [
+          ...[1, 2],
+          ...[3, 4],
+        ] as const;
+      `,
+    },
+    {
+      name: 'Nested as const inside spread operator without conditional statement should be removed',
+      source: dedent`
+        const flag = true as boolean;
+
+        type Elem =
+          | Readonly<{ a: 'str0' }>
+          | Readonly<{ b: 'str1' }>
+          | Readonly<{ c: 'str2' }>;
+
+        const a = [
+          { a: 'str0' },
+          ...([{ b: 'str1' }, { c: 'str2' }] as const),
+        ] as const satisfies readonly Elem[];
+      `,
+      expected: dedent`
+        const flag = true as boolean;
+
+        type Elem =
+          | Readonly<{ a: 'str0' }>
+          | Readonly<{ b: 'str1' }>
+          | Readonly<{ c: 'str2' }>;
+
+        const a = [
+          { a: 'str0' },
+          ...[{ b: 'str1' }, { c: 'str2' }],
+        ] as const satisfies readonly Elem[];
+      `,
+    },
   ])('$name', testFn);
 });
