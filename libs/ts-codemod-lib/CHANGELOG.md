@@ -1,3 +1,9 @@
+# [1.3.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.2.0...v1.3.0) (2026-02-02)
+
+### Features
+
+- add ignore keywords ([#22](https://github.com/noshiro-pf/ts-codemod-lib/issues/22)) ([8707ef9](https://github.com/noshiro-pf/ts-codemod-lib/commit/8707ef9e5e209c97e0514f49cf00a6148628f404))
+
 # [1.2.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.1.3...v1.2.0) (2026-01-27)
 
 ### Features
