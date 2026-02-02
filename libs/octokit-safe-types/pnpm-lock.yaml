@@ -79,8 +79,8 @@ importers:
         specifier: 3.3.3
         version: 3.3.3
       github-settings-as-code:
-        specifier: 1.0.11
-        version: 1.0.11(prettier@3.8.1)(typescript@5.9.3)
+        specifier: 1.1.0
+        version: 1.1.0(prettier@3.8.1)(typescript@5.9.3)
       jiti:
         specifier: 2.6.1
         version: 2.6.1
@@ -2361,9 +2361,9 @@ packages:
   git-log-parser@1.2.1:
     resolution: {integrity: sha512-PI+sPDvHXNPl5WNOErAK05s3j0lgwUzMN6o8cyQrDaKfT3qd7TmNJKeXX+SknI5I0QhG5fVPAEwSY4tRGDtYoQ==}
 
-  github-settings-as-code@1.0.11:
-    resolution: {integrity: sha512-DyYiDCo++fCpxlPnLzPN1256lghUBevKIdoDH1Yo8Z7hwkx8d8e/Bywfu+S0t6wjdteanUctnf7Bwdk5an1aSw==}
-    engines: {node: '>=22', pnpm: '>=8.0.0'}
+  github-settings-as-code@1.1.0:
+    resolution: {integrity: sha512-TIKmavEhRA4SSRTt5OCH0Wc//KP1WG+8VctEYPHeYNUCmJToMHYUmSbqFAx2km+7UUHDCHFTaEyykXYvExs2pg==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
 
   glob-parent@5.1.2:
@@ -3222,8 +3222,9 @@ packages:
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
-  octokit-safe-types@1.2.5:
-    resolution: {integrity: sha512-Us4puncme3rQNdispIrwjPQjh3HH82PYtYGyCSI/RzDJTczsjsoxRTq/ZlQEy2oF6BlqzQTdPjfxeQBSxI89oQ==}
+  octokit-safe-types@1.2.6:
+    resolution: {integrity: sha512-88MBVKDrptCSLd5v5AXdEDGfdxirOivFCVclg7yLxvOeJ6u49f/WU7+ezWxEOgxA+jK5RPpz+nKKctA2f94yoA==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   onetime@5.1.2:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
@@ -6744,11 +6745,11 @@ snapshots:
       through2: 2.0.5
       traverse: 0.6.8
 
-  github-settings-as-code@1.0.11(prettier@3.8.1)(typescript@5.9.3):
+  github-settings-as-code@1.1.0(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
       '@octokit/core': 7.0.6
       dotenv: 17.2.3
-      octokit-safe-types: 1.2.5(typescript@5.9.3)
+      octokit-safe-types: 1.2.6(typescript@5.9.3)
       ts-data-forge: 6.3.0(typescript@5.9.3)
       ts-fortress: 6.2.3(typescript@5.9.3)
       ts-repo-utils: 8.1.0(prettier@3.8.1)(typescript@5.9.3)
@@ -7622,7 +7623,7 @@ snapshots:
 
   obug@2.1.1: {}
 
-  octokit-safe-types@1.2.5(typescript@5.9.3):
+  octokit-safe-types@1.2.6(typescript@5.9.3):
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
