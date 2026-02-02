@@ -1,3 +1,9 @@
+## [6.2.4](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.3...v6.2.4) (2026-02-02)
+
+### Bug Fixes
+
+- bump ts-type-forge from 2.3.0 to 2.3.1 ([#200](https://github.com/noshiro-pf/ts-fortress/issues/200)) ([3671788](https://github.com/noshiro-pf/ts-fortress/commit/36717888cf4b82c80b79b5b514bd5298c25d1b78))
+
 ## [6.2.3](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.2...v6.2.3) (2026-01-23)
 
 ### Bug Fixes
