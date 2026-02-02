@@ -19,7 +19,7 @@ importers:
         version: 6.3.0(typescript@5.9.3)
       ts-fortress:
         specifier: ^6.2.2
-        version: 6.2.2(typescript@5.9.3)
+        version: 6.2.3(typescript@5.9.3)
     devDependencies:
       '@rollup/plugin-replace':
         specifier: 6.0.3
@@ -3880,8 +3880,9 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@6.2.2:
-    resolution: {integrity: sha512-m6kyOMx0y0RMRit0OXCUWjo8PoteG4qEmqHHJbA9jxYPPvDV4ypC8wvJhU5fG04YoabyZdZFXhDADYWihDfeUQ==}
+  ts-fortress@6.2.3:
+    resolution: {integrity: sha512-X27IM9w7fCoasB8lRv9vfS472xNEbKXB21wctUhbuQiTK09sB3DABOV/bSg6v3lXr//I1hNnHM58D09G/NjI1Q==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   ts-repo-utils@8.1.0:
     resolution: {integrity: sha512-xe75D4Zjw/x9RtxKf6ctCqAiBGjjBD9Dtc5UyVmnI/HhwzYI3UuLDpqd0Xo0O7KnZvnbGbRnrAJp39Em1N+nbw==}
@@ -6749,7 +6750,7 @@ snapshots:
       dotenv: 17.2.3
       octokit-safe-types: 1.2.5(typescript@5.9.3)
       ts-data-forge: 6.3.0(typescript@5.9.3)
-      ts-fortress: 6.2.2(typescript@5.9.3)
+      ts-fortress: 6.2.3(typescript@5.9.3)
       ts-repo-utils: 8.1.0(prettier@3.8.1)(typescript@5.9.3)
     transitivePeerDependencies:
       - prettier
@@ -7626,7 +7627,7 @@ snapshots:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
       ts-data-forge: 6.3.0(typescript@5.9.3)
-      ts-fortress: 6.2.2(typescript@5.9.3)
+      ts-fortress: 6.2.3(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8350,7 +8351,7 @@ snapshots:
       picomatch: 4.0.3
       typescript: 5.9.3
 
-  ts-fortress@6.2.2(typescript@5.9.3):
+  ts-fortress@6.2.3(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
       ts-data-forge: 6.3.0(typescript@5.9.3)
