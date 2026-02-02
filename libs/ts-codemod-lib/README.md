@@ -41,6 +41,13 @@ This library provides TypeScript AST transformers that can be used to automatica
 
 Appends `as const` to array literals and object literals to make them readonly constants. This transformer helps in creating immutable data structures by automatically adding the TypeScript `as const` assertion.
 
+Options:
+
+- `applyLevel`: `'all'` or `'avoidInFunctionArgs'` (default: `'avoidInFunctionArgs'`)
+    - `'avoidInFunctionArgs'`: Avoids adding `as const` inside function call arguments
+    - `'all'`: Applies `as const` everywhere
+- `ignorePrefixes`: Array of string prefixes for identifiers that should not have `as const` added (default: `['mut_', '#mut_', '_mut_', 'draft']`)
+
 Example:
 
 ```ts
@@ -61,8 +68,8 @@ Converts TypeScript type definitions to readonly types. This transformer helps i
 
 Options:
 
-- `ignorePrefixes`: Array of string prefixes for identifiers that should not be made readonly
-- `DeepReadonlyTypeName`: Custom name for the DeepReadonly type utility (defaults to "DeepReadonly")
+- `ignorePrefixes`: Array of string prefixes for identifiers that should not be made readonly (default: `['mut_', '#mut_', '_mut_', 'draft']`)
+- `DeepReadonly.typeName`: Custom name for the DeepReadonly type utility (default: `"DeepReadonly"`)
 
 Example:
 
@@ -155,6 +162,8 @@ type Data2 = UnknownRecord;
 ### Disabling Transformers
 
 - Nodes on the line immediately following a `// transformer-ignore-next-line` comment will be skipped.
+    - You can specify transformer names to ignore: `// transformer-ignore-next-line append-as-const, replace-any-with-unknown`
+    - If no transformer names are specified, all transformers will be skipped.
 - Files containing a `/* transformer-ignore */` comment will be skipped entirely.
 
 Examples:
