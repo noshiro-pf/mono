@@ -3374,6 +3374,15 @@ describe(convertToReadonlyTypeTransformer, () => {
         `,
         options: { ignorePrefixes: ['mut_'] },
       },
+      {
+        name: 'Arrow function parameters with "draft" prefix (default)',
+        source: dedent`
+          const handler = (draft: Event[], event: CustomEvent[]) => {};
+        `,
+        expected: dedent`
+          const handler = (draft: Event[], event: readonly CustomEvent[]) => {};
+        `,
+      },
     ])('$name', testFn);
   });
 

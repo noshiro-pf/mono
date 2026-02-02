@@ -47,7 +47,7 @@ export const convertToReadonlyTypeTransformer = (
     options?.DeepReadonly?.typeName ?? 'DeepReadonly';
 
   const ignorePrefixes = ISet.create(
-    options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_'],
+    options?.ignorePrefixes ?? ['mut_', '#mut_', '_mut_', 'draft'],
   );
 
   const optionsInternal: ReadonlyTransformerOptionsInternal = {
@@ -127,7 +127,7 @@ export type ReadonlyTransformerOptions = DeepReadonly<{
    *
    * (e.g. `"mut_"`)
    *
-   * @default ['mut_', '#mut_', '_mut_']
+   * @default ['mut_', '#mut_', '_mut_', 'draft']
    */
   ignorePrefixes?: string[];
 

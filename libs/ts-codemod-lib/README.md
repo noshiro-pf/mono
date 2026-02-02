@@ -335,10 +335,6 @@ This is more efficient as it avoids the overhead of parsing and printing before 
 
 ### Apply Transformers to `src` Directory
 
-```sh
-npm install -D glob prettier
-```
-
 ```tsx
 import * as fs from 'node:fs/promises';
 import {
