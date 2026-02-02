@@ -1,3 +1,9 @@
+## [4.6.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.0...v4.6.1) (2026-02-02)
+
+### Bug Fixes
+
+- bump globals from 17.0.0 to 17.1.0 ([#239](https://github.com/noshiro-pf/eslint-config-typed/issues/239)) ([665412b](https://github.com/noshiro-pf/eslint-config-typed/commit/665412b101d75ddbaf3c39926b122eb0dfab92ee))
+
 # [4.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.5.0...v4.6.0) (2026-01-22)
 
 ### Features
