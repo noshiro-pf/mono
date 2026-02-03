@@ -1,3 +1,9 @@
+## [6.3.1](https://github.com/noshiro-pf/ts-data-forge/compare/v6.3.0...v6.3.1) (2026-02-03)
+
+### Bug Fixes
+
+- bump ts-type-forge from 2.3.0 to 2.3.1 ([#286](https://github.com/noshiro-pf/ts-data-forge/issues/286)) ([ab35432](https://github.com/noshiro-pf/ts-data-forge/commit/ab35432c67d315e29b164c27710c288ad8686606))
+
 # [6.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.2.2...v6.3.0) (2026-01-23)
 
 ### Features
