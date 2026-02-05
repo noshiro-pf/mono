@@ -1,4 +1,4 @@
-import { Arr, isRecord, Result, tp } from 'ts-data-forge';
+import { Arr, isRecord, memoizeFunction, Result, tp } from 'ts-data-forge';
 import {
   type ExcessPropertyBehavior,
   type ExcessPropertyFillBehavior,
@@ -59,11 +59,15 @@ export const record = <
 
   const excessPropertyFill = options?.excessPropertyFill ?? 'strip';
 
-  const defaultValue: Type<T>['defaultValue'] =
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    Object.fromEntries(
-      Object.entries(shape).map(([key, value]) => tp(key, value.defaultValue)),
-    ) as T;
+  const getDefaultValue = memoizeFunction(
+    (): T =>
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      Object.fromEntries(
+        Object.entries(shape).map(([key, value]) =>
+          tp(key, value.defaultValue),
+        ),
+      ) as T,
+  );
 
   const stripExcessProperties = (obj: ReadonlyRecord<string, unknown>): T =>
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -155,7 +159,7 @@ export const record = <
 
   const fill: Type<T>['fill'] = (a) => {
     if (!isRecord(a)) {
-      return defaultValue;
+      return getDefaultValue();
     }
 
     // Handle excess properties based on fill option
@@ -188,7 +192,9 @@ export const record = <
 
   return {
     typeName: typeNameFilled,
-    defaultValue,
+    get defaultValue() {
+      return getDefaultValue();
+    },
     fill,
     validate,
     is: createIsFn(validate),

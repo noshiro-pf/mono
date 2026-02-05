@@ -1,4 +1,4 @@
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, memoizeFunction, Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -20,10 +20,12 @@ export const nonEmptyArray = <A,>(
 ): Type<NonEmptyArray<A>> => {
   type T = NonEmptyArray<A>;
 
-  const {
-    defaultValue = Arr.newArray(1, elementType.defaultValue),
-    typeName = `NonEmptyArray<${elementType.typeName}>`,
-  } = options ?? {};
+  const typeName =
+    options?.typeName ?? `NonEmptyArray<${elementType.typeName}>`;
+
+  const getDefaultValue = memoizeFunction(
+    (): T => options?.defaultValue ?? Arr.newArray(1, elementType.defaultValue),
+  );
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {
@@ -72,11 +74,13 @@ export const nonEmptyArray = <A,>(
   const fill: Type<T>['fill'] = (a) =>
     Arr.isArray(a) && Arr.isNonEmpty(a)
       ? Arr.map(a, (e) => elementType.fill(e))
-      : defaultValue;
+      : getDefaultValue();
 
   return {
     typeName,
-    defaultValue,
+    get defaultValue() {
+      return getDefaultValue();
+    },
     fill,
     validate,
     is: createIsFn(validate),

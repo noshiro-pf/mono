@@ -1,4 +1,4 @@
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, memoizeFunction, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -25,7 +25,7 @@ export const SetType = <T extends Type<unknown>>(
 
   const typeName = options?.typeName ?? 'Set';
 
-  const defaultValue: S = new Set();
+  const getDefaultValue = memoizeFunction((): S => new Set());
 
   const validate: Type<S>['validate'] = (a) => {
     if (!isSet(a)) {
@@ -68,13 +68,15 @@ export const SetType = <T extends Type<unknown>>(
   };
 
   const fill: Type<S>['fill'] = (a) =>
-    isSet(a)
-      ? (new Set(Array.from(a.values()).filter((v) => elementType.is(v))) as S)
-      : defaultValue;
+    !isSet(a)
+      ? getDefaultValue()
+      : (new Set(Array.from(a.values()).filter((v) => elementType.is(v))) as S);
 
   return {
     typeName,
-    defaultValue,
+    get defaultValue() {
+      return getDefaultValue();
+    },
     fill,
     validate,
     is: createIsFn(validate),

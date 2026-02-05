@@ -9,7 +9,7 @@ await assertExt({
     },
     {
       path: path.resolve(projectRootPath, './scripts'),
-      extension: '.mts',
+      extension: ['.mts', '.md'],
     },
   ],
 });

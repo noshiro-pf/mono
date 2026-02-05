@@ -1,4 +1,10 @@
-import { expectType, isNumber, Num, Result } from 'ts-data-forge';
+import {
+  expectType,
+  isNumber,
+  memoizeFunction,
+  Num,
+  Result,
+} from 'ts-data-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -21,10 +27,10 @@ export const intRange = <Start extends Int8, End extends Int8 | 128>({
 
   const typeNameFilled = options.typeName ?? `intRange(${start}, ${end})`;
 
-  const defaultValue: T =
-    options.defaultValue ??
+  const getDefaultValue = memoizeFunction(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    (start as T);
+    (): T => options.defaultValue ?? (start as T),
+  );
 
   const validate: Type<T>['validate'] = (a) => {
     if (!(isNumber(a) && Number.isInteger(a) && Num.isInRange(start, end)(a))) {
@@ -49,11 +55,13 @@ export const intRange = <Start extends Int8, End extends Int8 | 128>({
 
   const is = createIsFn<T>(validate);
 
-  const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultValue);
+  const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultValue());
 
   return {
     typeName: typeNameFilled,
-    defaultValue,
+    get defaultValue() {
+      return getDefaultValue();
+    },
     fill,
     validate,
     is,

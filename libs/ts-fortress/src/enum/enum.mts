@@ -1,4 +1,4 @@
-import { ISet, Result } from 'ts-data-forge';
+import { ISet, memoizeFunction, Result } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -22,10 +22,10 @@ export const enumType = <const Values extends NonEmptyArray<Primitive>>(
 
   const typeName = options?.typeName ?? 'enum';
 
-  const defaultValue =
-    options?.defaultValue ??
+  const getDefaultValue = memoizeFunction(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    (values[0] as ArrayElement<Values>);
+    (): T => options?.defaultValue ?? (values[0] as ArrayElement<Values>),
+  );
 
   const validate: Type<T>['validate'] = (a) =>
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -47,11 +47,13 @@ export const enumType = <const Values extends NonEmptyArray<Primitive>>(
 
   const is = createIsFn<T>(validate);
 
-  const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultValue);
+  const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultValue());
 
   return {
     typeName: options?.typeName ?? 'enum',
-    defaultValue,
+    get defaultValue() {
+      return getDefaultValue();
+    },
     fill,
     validate,
     is,

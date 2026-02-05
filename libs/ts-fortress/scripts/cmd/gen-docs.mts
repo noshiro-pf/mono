@@ -1,7 +1,8 @@
 import { unknownToString } from 'ts-data-forge';
 import { assertPathExists } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
-import { embedSamples } from './embed-samples.mjs';
+import { embedExamplesInJsDoc } from './embed-examples-in-jsdoc.mjs';
+import { embedExamples } from './embed-examples.mjs';
 
 const TYPEDOC_CONFIG = path.resolve(
   projectRootPath,
@@ -19,8 +20,15 @@ export const genDocs = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Embedding sample code into README',
-    action: () => runStep(embedSamples(), 'Sample embedding failed'),
+    action: () => runStep(embedExamples(), 'Sample embedding failed'),
     successMessage: 'Sample code embedded into README',
+  });
+
+  await logStep({
+    startMessage: 'Embedding sample code into JSDoc',
+    action: () =>
+      runStep(embedExamplesInJsDoc(), 'Sample embedding into JSDoc failed'),
+    successMessage: 'Sample code embedded into JSDoc',
   });
 
   await logStep({

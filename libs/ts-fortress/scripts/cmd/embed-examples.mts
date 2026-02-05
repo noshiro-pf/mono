@@ -1,14 +1,11 @@
-import { pipe, unknownToString } from 'ts-data-forge';
+import { unknownToString } from 'ts-data-forge';
 import { formatFiles } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
+import { extractSampleCode } from './embed-examples-utils.mjs';
 
 const codeBlockStart = '```tsx';
 
 const codeBlockEnd = '```';
-
-const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
-
-const ignoreBelowKeyword = '// embed-sample-code-ignore-below';
 
 const documents: DeepReadonly<
   {
@@ -79,7 +76,7 @@ const documents: DeepReadonly<
 ] as const;
 
 /** Embeds sample code from ./samples/readme directory into README.md */
-export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
+export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
   try {
     for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
       const markdownContent = await fs.readFile(mdPath, 'utf8');
@@ -91,18 +88,12 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
       for (const sampleCodeFile of sampleCodeFiles) {
         const samplePath = path.resolve(samplesDir, sampleCodeFile);
 
+        // Read sample content
         const sampleContent = await fs.readFile(samplePath, 'utf8');
 
-        const sampleContentSliced = sampleContent
-          .slice(
-            pipe(sampleContent.indexOf(ignoreAboveKeyword)).map((i) =>
-              i === -1 ? 0 : i + ignoreAboveKeyword.length,
-            ).value,
-            sampleContent.indexOf(ignoreBelowKeyword),
-          )
-          .replaceAll(/IGNORE_EMBEDDING\(.*\);\n/gu, '')
-          .trim();
+        const sampleContentSliced = extractSampleCode(sampleContent);
 
+        // Find next code block
         const codeBlockStartIndex = mut_rest.indexOf(codeBlockStart);
 
         if (codeBlockStartIndex === -1) {
@@ -150,7 +141,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const result = await embedSamples();
+  const result = await embedExamples();
 
   if (Result.isErr(result)) {
     console.error(result.value);

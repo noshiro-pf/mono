@@ -1,4 +1,4 @@
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, memoizeFunction, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -23,12 +23,11 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
 ): Type<MapTuple<A>> => {
   type T = MapTuple<A>;
 
-  const { typeName = 'tuple' } = options ?? {};
+  const typeName = options?.typeName ?? 'tuple';
 
-  const defaultValue = Arr.map(
-    types,
-    (t) => t.defaultValue,
-  ) satisfies MapTuple<A>;
+  const getDefaultValue = memoizeFunction(
+    (): MapTuple<A> => Arr.map(types, (t) => t.defaultValue) as MapTuple<A>,
+  );
 
   const validate: Type<T>['validate'] = (a) => {
     if (!Arr.isArray(a)) {
@@ -78,13 +77,15 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
 
   const fill: Type<T>['fill'] = (a) =>
     !Arr.isArray(a)
-      ? defaultValue
+      ? getDefaultValue()
       : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 
   return {
     typeName,
-    defaultValue,
+    get defaultValue() {
+      return getDefaultValue();
+    },
     fill,
     validate,
     is: createIsFn(validate),

@@ -4,7 +4,9 @@ import { createAssertFn, createCastFn } from '../utils/index.mjs';
 
 export const unknown = (defaultValue?: unknown): Type<unknown> => ({
   typeName: 'unknown',
-  defaultValue,
+  get defaultValue() {
+    return defaultValue;
+  },
   is,
   fill: (a) => a,
   validate,

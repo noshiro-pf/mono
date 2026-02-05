@@ -4,6 +4,7 @@ import { union } from '../compose/index.mjs';
 import { boolean, nullType, number, string } from '../primitives/index.mjs';
 import { keyValueRecord, record } from '../record/index.mjs';
 import { type Type, type TypeOf } from '../type.mjs';
+import { literal } from './literal.mjs';
 import { recursion } from './recursion.mjs';
 
 describe('recursive', () => {
@@ -250,5 +251,36 @@ describe('recursive', () => {
     assert.isTrue(TreeNodeString.is({ value: 'node', children: [] }));
 
     assert.isFalse(TreeNodeString.is({ value: 123, children: [] }));
+  });
+
+  test('Mutual recursion - demonstrates lazy evaluation', () => {
+    type EvenNumber = Readonly<{ type: 'even'; next: OddNumber | null }>;
+
+    type OddNumber = Readonly<{ type: 'odd'; next: EvenNumber | null }>;
+
+    // With _getDefaultValue, type definitions are created without immediate evaluation
+    const EvenNumber: Type<EvenNumber> = recursion('EvenNumber', () =>
+      record({
+        type: literal('even'),
+        next: union([nullType, OddNumber]), // nullType first to compute defaultValue
+      }),
+    );
+
+    const OddNumber: Type<OddNumber> = recursion('OddNumber', () =>
+      record({
+        type: literal('odd'),
+        next: union([nullType, EvenNumber]), // nullType first to compute defaultValue
+      }),
+    );
+
+    // Type checking works fine
+    assert.isTrue(OddNumber.is({ type: 'odd', next: null }));
+
+    assert.isTrue(EvenNumber.is({ type: 'even', next: null }));
+
+    // defaultValue is accessible when terminal types are first
+    const evenDefault = EvenNumber.defaultValue;
+
+    assert.isTrue(EvenNumber.is(evenDefault));
   });
 });

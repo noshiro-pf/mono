@@ -1,4 +1,4 @@
-import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { Arr, memoizeFunction, Result, unknownToString } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -30,7 +30,7 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
 
   const typeName = options?.typeName ?? 'Map';
 
-  const defaultValue: M = new Map();
+  const getDefaultValue = memoizeFunction((): M => new Map());
 
   const validate: Type<M>['validate'] = (a) => {
     if (!isMap(a)) {
@@ -96,17 +96,19 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
   };
 
   const fill: Type<M>['fill'] = (a) =>
-    isMap(a)
-      ? (new Map(
+    !isMap(a)
+      ? getDefaultValue()
+      : (new Map(
           Array.from(a.entries()).filter(
             ([k, v]) => keyType.is(k) && valueType.is(v),
           ),
-        ) as M)
-      : defaultValue;
+        ) as M);
 
   return {
     typeName,
-    defaultValue,
+    get defaultValue() {
+      return getDefaultValue();
+    },
     fill,
     validate,
     is: createIsFn(validate),

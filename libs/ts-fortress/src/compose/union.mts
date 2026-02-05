@@ -1,4 +1,4 @@
-import { Result, expectType } from 'ts-data-forge';
+import { Result, expectType, memoizeFunction } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -19,8 +19,11 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
 ): UnionType<Types> => {
   type T = UnionTypeValue<Types>;
 
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  const defaultType = options?.defaultType ?? (types[0] as UnionType<Types>);
+  const getDefaultType = memoizeFunction(
+    (): UnionType<Types> =>
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      options?.defaultType ?? (types[0] as UnionType<Types>),
+  );
 
   const typeNameFilled: string =
     options?.typeName ?? `(${toUnionString(types.map((a) => a.typeName))})`;
@@ -44,11 +47,13 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
 
   const is = createIsFn<T>(validate);
 
-  const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultType.fill(a));
+  const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultType().fill(a));
 
   return {
     typeName: typeNameFilled,
-    defaultValue: defaultType.defaultValue,
+    get defaultValue() {
+      return getDefaultType().defaultValue;
+    },
     fill,
     validate,
     is,

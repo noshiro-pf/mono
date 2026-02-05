@@ -1,4 +1,10 @@
-import { Arr, expectType, isRecord, Result } from 'ts-data-forge';
+import {
+  Arr,
+  expectType,
+  isRecord,
+  memoizeFunction,
+  Result,
+} from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -67,13 +73,17 @@ export const mergeRecords = <
             : types.map((t) => t.fill(a)),
         ));
 
-  const defaultValue: Type<T>['defaultValue'] =
-    options?.defaultType?.defaultValue ??
-    mergeRecordValues(types.map((t) => t.defaultValue));
+  const getDefaultValue = memoizeFunction(
+    (): Type<T>['defaultValue'] =>
+      options?.defaultType?.defaultValue ??
+      mergeRecordValues(types.map((t) => t.defaultValue)),
+  );
 
   return {
     typeName: typeNameFilled,
-    defaultValue,
+    get defaultValue() {
+      return getDefaultValue();
+    },
     fill,
     validate,
     is,
