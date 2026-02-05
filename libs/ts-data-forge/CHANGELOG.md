@@ -1,3 +1,9 @@
+# [6.4.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.3.1...v6.4.0) (2026-02-05)
+
+### Features
+
+- add better support of zero-argument functions to memoizeFunction ([#289](https://github.com/noshiro-pf/ts-data-forge/issues/289)) ([7a8c48b](https://github.com/noshiro-pf/ts-data-forge/commit/7a8c48b8b4648c2b0f7994946ca0bc1a7f3d49e3))
+
 ## [6.3.1](https://github.com/noshiro-pf/ts-data-forge/compare/v6.3.0...v6.3.1) (2026-02-03)
 
 ### Bug Fixes
