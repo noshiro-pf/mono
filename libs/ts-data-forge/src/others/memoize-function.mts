@@ -21,33 +21,51 @@
  *   key)
  * @param fn - The pure function to memoize
  * @param argsToCacheKey - Function that converts arguments to a unique cache
- *   key
+ *   key. Optional for zero-argument functions.
  * @returns A memoized version of the input function with the same signature
  *
  * @see https://en.wikipedia.org/wiki/Memoization
  */
-export const memoizeFunction = <
-  const A extends readonly unknown[],
+export function memoizeFunction<R>(fn: () => R): () => R;
+
+export function memoizeFunction<
+  Arg0,
+  const RestArgs extends readonly unknown[],
   R,
   K extends Primitive,
 >(
-  fn: (...args: A) => R,
-  argsToCacheKey: (...args: A) => K,
-): ((...args: A) => R) => {
-  const mut_cache = new Map<K, R>();
+  fn: (arg0: Arg0, ...args: RestArgs) => R,
+  argsToCacheKey: (arg0: Arg0, ...args: RestArgs) => K,
+): (arg0: Arg0, ...args: RestArgs) => R;
 
-  return (...args: A): R => {
-    const key = argsToCacheKey(...args);
+export function memoizeFunction<
+  const Args extends readonly unknown[],
+  R,
+  K extends Primitive,
+>(
+  fn: (...args: Args) => R,
+  argsToCacheKey?: (...args: Args) => K,
+): (...args: Args) => R {
+  type CacheEntry = Readonly<{ value: R }>;
 
-    if (mut_cache.has(key)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return mut_cache.get(key)!;
-    } else {
-      const result = fn(...args);
+  const mut_cache = new Map<K | symbol, CacheEntry>();
 
-      mut_cache.set(key, result);
+  const defaultKey = Symbol('memoize-default-key');
 
-      return result;
+  return (...args: Args): R => {
+    const key: K | symbol =
+      argsToCacheKey === undefined ? defaultKey : argsToCacheKey(...args);
+
+    const cached = mut_cache.get(key);
+
+    if (cached !== undefined) {
+      return cached.value;
     }
+
+    const result = fn(...args);
+
+    mut_cache.set(key, { value: result });
+
+    return result;
   };
-};
+}

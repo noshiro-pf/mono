@@ -148,6 +148,31 @@ describe(memoizeFunction, () => {
     expect(mockFn).toHaveBeenCalledTimes(2);
   });
 
+  test('should work with zero-argument functions without key mapper', () => {
+    const mockFn = vi.fn(() => Math.random());
+
+    const memoized = memoizeFunction(mockFn);
+
+    // First call
+    const result1 = memoized();
+
+    expect(mockFn).toHaveBeenCalledOnce();
+
+    // Second call - should use cache and return the same random value
+    const result2 = memoized();
+
+    expect(mockFn).toHaveBeenCalledOnce();
+
+    expect(result2).toBe(result1);
+
+    // Third call - still using cache
+    const result3 = memoized();
+
+    expect(mockFn).toHaveBeenCalledOnce();
+
+    expect(result3).toBe(result1);
+  });
+
   test('should maintain separate caches for different memoized functions', () => {
     const fn1 = vi.fn((x: number) => x * 2);
 
