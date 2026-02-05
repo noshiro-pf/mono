@@ -1,3 +1,9 @@
+## [6.2.5](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.4...v6.2.5) (2026-02-05)
+
+### Bug Fixes
+
+- use getter to avoid infinite recursion when using recursion type ([#207](https://github.com/noshiro-pf/ts-fortress/issues/207)) ([f7f399a](https://github.com/noshiro-pf/ts-fortress/commit/f7f399ab8a3c16290bb910a9c270e2860e066419))
+
 ## [6.2.4](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.3...v6.2.4) (2026-02-02)
 
 ### Bug Fixes
