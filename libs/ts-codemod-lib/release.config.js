@@ -1,5 +1,9 @@
 export default {
-  branches: ['main'],
+  branches: [
+    'main',
+    { name: 'alpha', prerelease: true },
+    { name: 'beta', prerelease: true },
+  ],
   plugins: [
     // 1. Determine the next version number from commit history.
     [
