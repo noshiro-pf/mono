@@ -1,5 +1,4 @@
 /* eslint-disable tree-shakable/import-star */
-/* eslint-disable import-x/namespace */
 /* eslint-disable vitest/expect-expect */
 import dedent from 'dedent';
 import * as prettierPluginEstree from 'prettier/plugins/estree';

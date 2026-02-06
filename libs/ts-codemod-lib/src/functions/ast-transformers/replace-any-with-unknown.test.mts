@@ -1,4 +1,3 @@
-/* eslint-disable import-x/namespace */
 /* eslint-disable tree-shakable/import-star */
 /* eslint-disable vitest/expect-expect */
 import dedent from 'dedent';
