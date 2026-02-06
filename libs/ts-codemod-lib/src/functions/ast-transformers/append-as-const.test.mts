@@ -689,6 +689,27 @@ describe(appendAsConstTransformer, () => {
         source: 'const obj = { set value(v) { } };',
         expected: 'const obj = { set value(v) { } } as const;',
       },
+      {
+        name: 'import statements (should be skipped)',
+        source: ' import * as ts from "typescript"; import("./module")',
+        expected: ' import * as ts from "typescript"; import("./module")',
+      },
+      {
+        name: 'directives (should be skipped)',
+        source: '"use strict";',
+        expected: '"use strict";',
+        debug: true,
+      },
+      {
+        name: 'object key',
+        source: 'const a = { "key": 1 };',
+        expected: 'const a = { "key": 1 } as const;',
+      },
+      {
+        name: 'computed key',
+        source: 'const a = { ["key"]: 1 };',
+        expected: 'const a = { ["key"]: 1 } as const;',
+      },
     ])('$name', testFn);
   });
 });

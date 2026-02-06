@@ -84,29 +84,31 @@ const transformNode = (
   context: AsConstContext,
   options: AppendAsConstTransformerOptionsInternal,
 ): void => {
-  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
-    options.debugPrint('skipped by disable-next-line comment');
-
-    return;
-  }
-
   options.debugPrint(node.getKindName(), node.getText());
-
-  if (
-    options.applyLevel === 'avoidInFunctionArgs' &&
-    tsm.Node.isCallExpression(node)
-  ) {
-    return;
-  }
 
   if (
     node.isKind(tsm.SyntaxKind.LiteralType) ||
     node.isKind(tsm.SyntaxKind.TypeLiteral) ||
     node.isKind(tsm.SyntaxKind.TypeReference) ||
     node.isKind(tsm.SyntaxKind.UnionType) ||
-    node.isKind(tsm.SyntaxKind.TypeAliasDeclaration)
+    node.isKind(tsm.SyntaxKind.TypeAliasDeclaration) ||
+    node.isKind(tsm.SyntaxKind.ImportDeclaration) ||
+    isDirective(node)
   ) {
-    return; // skip type annotations
+    return; // skip type annotations, import declarations, and directives
+  }
+
+  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
+    options.debugPrint('skipped by disable-next-line comment');
+
+    return;
+  }
+
+  if (
+    options.applyLevel === 'avoidInFunctionArgs' &&
+    tsm.Node.isCallExpression(node)
+  ) {
+    return;
   }
 
   if (
@@ -127,15 +129,6 @@ const transformNode = (
   }
 
   if (node.isKind(tsm.SyntaxKind.TemplateExpression)) {
-    options.debugPrint(node.getKindName(), node.getText());
-
-    options.debugPrint(
-      node
-        .getChildren()
-        .map((c) => c.getText())
-        .join(''),
-    );
-
     options.replaceNode(node, `${node.getText()} as const`);
 
     return;
@@ -196,8 +189,6 @@ const transformNode = (
 
   // `as const` node
   if (isAsConstNode(node)) {
-    options.debugPrint(node.getKindName(), node.getText());
-
     if (context.isDirectUnderConstInitializer) {
       // In const variable declarations, remove `as const` first and then re-append it later if needed
 
@@ -305,8 +296,6 @@ const transformNode = (
   }
 
   if (tsm.Node.isArrayLiteralExpression(node)) {
-    // options.debugPrint(node.getKindName(), node.getText());
-
     for (const el of node.getElements()) {
       transformNode(
         el,
@@ -476,4 +465,24 @@ const checkIfPropertyNameShouldBeIgnored = (
         return false;
       }).value)
   );
+};
+
+const isDirective = (node: tsm.Node): boolean => {
+  if (!tsm.Node.isStringLiteral(node)) return false;
+
+  const parent = node.getParent();
+
+  // 1. 親が ExpressionStatement であることを確認
+  if (tsm.Node.isExpressionStatement(parent)) {
+    // 2. その ExpressionStatement の子がこの StringLiteral だけである
+    // かつ、ソースファイルやブロックの先頭付近にある
+    const expression = parent.getExpression();
+
+    if (expression === node) {
+      // "use strict" や "use client" などの文字列そのものが文（Statement）になっている
+      return true;
+    }
+  }
+
+  return false;
 };
