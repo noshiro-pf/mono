@@ -8,7 +8,7 @@ import { runTransformerCLI } from './run-transformer-cli.mjs';
 
 const cmdDef = cmd.command({
   name: 'append-as-const',
-  version: '1.4.0',
+  version: '1.4.1',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

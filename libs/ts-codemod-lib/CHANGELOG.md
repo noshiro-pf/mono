@@ -1,3 +1,9 @@
+## [1.4.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.4.0...v1.4.1) (2026-02-06)
+
+### Bug Fixes
+
+- fix append-as-const transformer ([#34](https://github.com/noshiro-pf/ts-codemod-lib/issues/34)) ([c59e6b7](https://github.com/noshiro-pf/ts-codemod-lib/commit/c59e6b78fa70cb3d286e4d65797d8607630bd170))
+
 # [1.4.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.3.1...v1.4.0) (2026-02-06)
 
 ### Features
