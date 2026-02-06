@@ -1,3 +1,9 @@
+## [1.4.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.4.1...v1.4.2) (2026-02-06)
+
+### Bug Fixes
+
+- prevent append-as-const to add const assertion to import statements or directives ([#36](https://github.com/noshiro-pf/ts-codemod-lib/issues/36)) ([c0a8334](https://github.com/noshiro-pf/ts-codemod-lib/commit/c0a8334cc461d818b5a28c020fe0bf88644ee5b9))
+
 ## [1.4.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.4.0...v1.4.1) (2026-02-06)
 
 ### Bug Fixes
