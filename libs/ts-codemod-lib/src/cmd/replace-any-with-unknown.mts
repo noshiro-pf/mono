@@ -8,7 +8,7 @@ import { runTransformerCLI } from './run-transformer-cli.mjs';
 
 const cmdDef = cmd.command({
   name: 'replace-any-with-unknown',
-  version: '1.3.1',
+  version: '1.4.0',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

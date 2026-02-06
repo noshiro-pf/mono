@@ -1,3 +1,9 @@
+# [1.4.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.3.1...v1.4.0) (2026-02-06)
+
+### Features
+
+- add uncommitted flag option ([#33](https://github.com/noshiro-pf/ts-codemod-lib/issues/33)) ([a334bae](https://github.com/noshiro-pf/ts-codemod-lib/commit/a334bae93950bc37d1dbba9bdec87a1183ec30fb))
+
 ## [1.3.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.3.0...v1.3.1) (2026-02-02)
 
 ### Bug Fixes
