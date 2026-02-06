@@ -146,8 +146,7 @@ type ReadonlyTransformerOptionsInternal = Readonly<{
 
   ignoredPrefixes: ISet<string>;
 
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- ts-morph uses mutable types
-  debugPrint: (...args: unknown[]) => void;
+  debugPrint: (...args: readonly unknown[]) => void;
   replaceNode: (node: tsm.Node, newNodeText: string) => void;
 }>;
 

@@ -1,9 +1,10 @@
-import { ISet } from 'ts-data-forge';
+import { Arr, expectType, ISet, pipe } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import {
   hasDisableNextLineComment,
   isAsConstNode,
 } from '../functions/index.mjs';
+import { replaceNodeWithDebugPrint } from '../utils/index.mjs';
 import { type TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'append-as-const';
@@ -18,11 +19,25 @@ export const appendAsConstTransformer = (
   const optionsInternal: AppendAsConstTransformerOptionsInternal = {
     applyLevel: options?.applyLevel ?? 'avoidInFunctionArgs',
     ignoredPrefixes: ignorePrefixes,
+
+    debugPrint: options?.debug === true ? console.debug : () => {},
+    replaceNode:
+      options?.debug === true
+        ? replaceNodeWithDebugPrint
+        : (node, newNodeText) => node.replaceWithText(newNodeText),
   };
 
   const transformer: TsMorphTransformer = (sourceAst) => {
     for (const node of sourceAst.getChildren()) {
-      transformNode(node, optionsInternal);
+      transformNode(
+        node,
+        {
+          isUnderConstContext: false,
+          isDirectUnderConstInitializer: false,
+          isUnderSpreadElement: false,
+        },
+        optionsInternal,
+      );
     }
   };
 
@@ -44,46 +59,38 @@ export type AppendAsConstTransformerOptions = DeepReadonly<{
    */
   ignorePrefixes?: string[];
 
-  ignoreConstTypeParameter?: boolean;
+  // TODO
+  // ignoreConstTypeParameter?: boolean;
+
+  debug?: boolean;
 }>;
 
 type AppendAsConstTransformerOptionsInternal = DeepReadonly<{
   applyLevel: 'all' | 'avoidInFunctionArgs';
   ignoredPrefixes: ISet<string>;
+
+  debugPrint: (...args: readonly unknown[]) => void;
+  replaceNode: (node: tsm.Node, newNodeText: string) => void;
+}>;
+
+type AsConstContext = Readonly<{
+  isUnderConstContext: boolean;
+  isDirectUnderConstInitializer: boolean;
+  isUnderSpreadElement: boolean;
 }>;
 
 const transformNode = (
   node: tsm.Node,
+  context: AsConstContext,
   options: AppendAsConstTransformerOptionsInternal,
 ): void => {
   if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
-    console.debug('skipped by disable-next-line comment');
+    options.debugPrint('skipped by disable-next-line comment');
 
     return;
   }
 
-  // check for ignorePrefix
-  if (node.isKind(tsm.SyntaxKind.VariableDeclaration)) {
-    const nodeName = node.getName();
-
-    if (options.ignoredPrefixes.some((p) => nodeName.startsWith(p))) {
-      // Skip conversion for variable declarations with ignored prefixes
-      // Example: const mut_foo: string[] = []; -> remains as is, without appending `as const`
-      console.debug('skipped variable declaration by ignorePrefixes');
-
-      return;
-    }
-
-    // TODO: Support ignoredPrefixes in ArrayBindingPattern
-    // if (ts.isArrayBindingPattern(nodeName)) {
-    //   // for (const [i, el] of nodeName.elements.entries())
-    // }
-
-    // TODO: Support ignoredPrefixes in ObjectBindingPattern
-    // if (ts.isObjectBindingPattern(nodeName)) {
-    //   // for (const [i, el] of nodeName.elements.entries())
-    // }
-  }
+  options.debugPrint(node.getKindName(), node.getText());
 
   if (
     options.applyLevel === 'avoidInFunctionArgs' &&
@@ -92,138 +99,381 @@ const transformNode = (
     return;
   }
 
-  // `as const` node
-  if (isAsConstNode(node)) {
-    const expression = removeParenthesis(node.getExpression());
+  if (
+    node.isKind(tsm.SyntaxKind.LiteralType) ||
+    node.isKind(tsm.SyntaxKind.TypeLiteral) ||
+    node.isKind(tsm.SyntaxKind.TypeReference) ||
+    node.isKind(tsm.SyntaxKind.UnionType) ||
+    node.isKind(tsm.SyntaxKind.TypeAliasDeclaration)
+  ) {
+    return; // skip type annotations
+  }
 
-    if (
-      !tsm.Node.isArrayLiteralExpression(expression) &&
-      !tsm.Node.isObjectLiteralExpression(expression)
-    ) {
-      // `as const` is not needed for primitive types
-      // Example: `0 as const` -> `0`
-      node.replaceWithText(expression.getText());
+  if (
+    node.isKind(tsm.SyntaxKind.NoSubstitutionTemplateLiteral) || // `abc`
+    node.isKind(tsm.SyntaxKind.NumericLiteral) || // 123
+    node.isKind(tsm.SyntaxKind.BigIntLiteral) || // 123n
+    node.isKind(tsm.SyntaxKind.StringLiteral) || // 'abc'
+    node.isKind(tsm.SyntaxKind.TrueKeyword) || // true
+    node.isKind(tsm.SyntaxKind.FalseKeyword) // false
+  ) {
+    if (context.isDirectUnderConstInitializer || context.isUnderConstContext) {
+      return;
+    }
+
+    options.replaceNode(node, `${node.getText()} as const`);
+
+    return;
+  }
+
+  if (node.isKind(tsm.SyntaxKind.TemplateExpression)) {
+    options.debugPrint(node.getKindName(), node.getText());
+
+    options.debugPrint(
+      node
+        .getChildren()
+        .map((c) => c.getText())
+        .join(''),
+    );
+
+    options.replaceNode(node, `${node.getText()} as const`);
+
+    return;
+  }
+
+  if (node.isKind(tsm.SyntaxKind.VariableDeclaration)) {
+    const nodeName = node.getName();
+
+    // check for ignorePrefix
+    if (options.ignoredPrefixes.some((p) => nodeName.startsWith(p))) {
+      // Skip conversion for variable declarations with ignored prefixes
+      // Example: const mut_foo: string[] = []; -> remains as is, without appending `as const`
+      options.debugPrint('skipped variable declaration by ignorePrefixes');
 
       return;
     }
 
-    // Avoid appending `as const` twice
-    removeAsConstRecursively(node.getExpression());
+    const initializer = node.getInitializer();
+
+    if (initializer === undefined) {
+      return;
+    }
+
+    const declarationKindKeywords = node
+      .getVariableStatement()
+      ?.getDeclarationKindKeywords()
+      .map((k) => k.getText());
+
+    if (
+      declarationKindKeywords !== undefined &&
+      Arr.isArrayOfLength(declarationKindKeywords, 1)
+    ) {
+      transformNode(
+        initializer,
+        {
+          isDirectUnderConstInitializer: declarationKindKeywords[0] === 'const',
+          isUnderConstContext: false,
+          isUnderSpreadElement: context.isUnderSpreadElement,
+        },
+        options,
+      );
+
+      return;
+    }
+
+    // const [a, b] = ...;
+    // TODO: Support ignoredPrefixes in ArrayBindingPattern
+    // if (ts.isArrayBindingPattern(nodeName)) {
+    //   // for (const [i, el] of nodeName.elements.entries())
+    // }
+
+    // const { x, y } = ...;
+    // TODO: Support ignoredPrefixes in ObjectBindingPattern
+    // if (ts.isObjectBindingPattern(nodeName)) {
+    //   // for (const [i, el] of nodeName.elements.entries())
+    // }
+  }
+
+  // `as const` node
+  if (isAsConstNode(node)) {
+    options.debugPrint(node.getKindName(), node.getText());
+
+    if (context.isDirectUnderConstInitializer) {
+      // In const variable declarations, remove `as const` first and then re-append it later if needed
+
+      transformNode(
+        node.getExpression(),
+        {
+          isUnderConstContext: false,
+          isDirectUnderConstInitializer: true,
+          isUnderSpreadElement: context.isUnderSpreadElement,
+        },
+        options,
+      );
+
+      options.replaceNode(
+        node,
+        // The expression may be marked "as const"
+        node.getExpression().getText(),
+      ); // remove `as const`
+
+      return;
+    }
+
+    if (context.isUnderConstContext) {
+      transformNode(
+        node.getExpression(),
+        {
+          isUnderConstContext: true,
+          isDirectUnderConstInitializer: false,
+          isUnderSpreadElement: context.isUnderSpreadElement,
+        },
+        options,
+      );
+
+      options.replaceNode(
+        node,
+        // The expression may be marked "as const"
+        node.getExpression().getText(),
+      ); // remove `as const`
+
+      return;
+    }
+
+    transformNode(
+      node.getExpression(),
+      {
+        isUnderConstContext: true,
+        isDirectUnderConstInitializer: false,
+        isUnderSpreadElement: context.isUnderSpreadElement,
+      },
+      options,
+    );
+
+    return;
+  }
+
+  if (tsm.Node.isAsExpression(node)) {
+    return;
+  }
+
+  if (tsm.Node.isSpreadElement(node)) {
+    transformNode(
+      node.getExpression(),
+      {
+        isDirectUnderConstInitializer: false,
+        isUnderConstContext: context.isUnderConstContext,
+        isUnderSpreadElement: true,
+      },
+      options,
+    );
+
+    return;
+  }
+
+  if (tsm.Node.isConditionalExpression(node)) {
+    if (context.isUnderSpreadElement) {
+      // When under spread element, keep `as const` in both branches
+      transformNode(
+        node.getWhenTrue(),
+        {
+          isDirectUnderConstInitializer: false,
+          isUnderConstContext: false,
+          isUnderSpreadElement: false,
+        },
+        options,
+      );
+
+      transformNode(
+        node.getWhenFalse(),
+        {
+          isDirectUnderConstInitializer: false,
+          isUnderConstContext: false,
+          isUnderSpreadElement: false,
+        },
+        options,
+      );
+    }
+
+    return;
+  }
+
+  if (tsm.Node.isParenthesizedExpression(node)) {
+    transformNode(node.getExpression(), context, options);
 
     return;
   }
 
   if (tsm.Node.isArrayLiteralExpression(node)) {
+    // options.debugPrint(node.getKindName(), node.getText());
+
     for (const el of node.getElements()) {
-      removeAsConstRecursively(el);
+      transformNode(
+        el,
+        {
+          isUnderConstContext: true, // [...] as const
+          isDirectUnderConstInitializer: false,
+          isUnderSpreadElement: context.isUnderSpreadElement,
+        },
+        options,
+      );
     }
 
-    node.replaceWithText(`${node.getText()} as const`);
+    if (!context.isUnderConstContext) {
+      options.replaceNode(node, `${node.getText()} as const`);
+    }
 
     return;
   }
 
   if (tsm.Node.isObjectLiteralExpression(node)) {
     for (const el of node.getProperties()) {
-      removeAsConstRecursively(el);
+      transformNode(
+        el,
+        {
+          isUnderConstContext: true, // {...} as const
+          isDirectUnderConstInitializer: false,
+          isUnderSpreadElement: context.isUnderSpreadElement,
+        },
+        options,
+      );
     }
 
-    node.replaceWithText(`${node.getText()} as const`);
+    if (!context.isUnderConstContext) {
+      options.replaceNode(node, `${node.getText()} as const`);
+    }
+
+    return;
+  }
+
+  if (node.isKind(tsm.SyntaxKind.ClassDeclaration)) {
+    // Skip conversion for class declarations with ignored prefixes
+    // Example: class mut_Class {...} -> properties remain without readonly
+    if (
+      options.ignoredPrefixes.some(
+        (p) => node.getName()?.startsWith(p) === true,
+      )
+    ) {
+      return;
+    }
+
+    transformClassDeclarationNode(node, context, options);
 
     return;
   }
 
   for (const child of node.getChildren()) {
-    transformNode(child, options);
+    transformNode(
+      child,
+      {
+        isDirectUnderConstInitializer: false,
+        isUnderConstContext: context.isUnderConstContext,
+        isUnderSpreadElement: context.isUnderSpreadElement,
+      },
+      options,
+    );
   }
 };
 
-const removeAsConstRecursively = (
-  node: tsm.Node,
-  insideSpreadWithConditional: boolean = false,
+const transformClassDeclarationNode = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.ClassDeclaration,
+  context: AsConstContext,
+  options: AppendAsConstTransformerOptionsInternal,
 ): void => {
-  if (hasDisableNextLineComment(node)) {
-    console.debug('skipped by disable-next-line comment');
+  for (const mb of node.getMembers()) {
+    if (hasDisableNextLineComment(mb)) {
+      options.debugPrint('skipped member by disable-next-line comment');
 
-    return;
-  }
-
-  if (isAsConstNode(node)) {
-    // If we're inside a spread element with conditional, keep the `as const`
-    if (insideSpreadWithConditional) {
-      return;
+      continue;
     }
 
-    // Extract node.expression to remove `as const` and recursively call the function
-    // to remove `as const` from nested nodes
-    // Example: `[[1,2] as const, [3,4]] as const` -> `[[1,2], [3,4]]`
-    removeAsConstRecursively(node.getExpression(), insideSpreadWithConditional);
+    if (mb.isKind(tsm.SyntaxKind.PropertyDeclaration)) {
+      if (!checkIfPropertyNameShouldBeIgnored(mb.getNameNode(), options)) {
+        const type = mb.getTypeNode();
 
-    node.replaceWithText(node.getExpression().getText());
+        if (type !== undefined) {
+          transformNode(
+            type,
+            {
+              isDirectUnderConstInitializer: false,
+              isUnderConstContext: false,
+              isUnderSpreadElement: context.isUnderSpreadElement,
+            },
+            options,
+          );
+        }
 
-    return;
-  }
+        const initializer = mb.getInitializer();
 
-  // If we're inside a spread with conditional and encounter array/object literal without `as const`, add it
-  if (insideSpreadWithConditional) {
-    if (tsm.Node.isArrayLiteralExpression(node)) {
-      // Don't add `as const` to empty arrays
-      if (node.getElements().length === 0) {
-        return;
+        if (initializer !== undefined) {
+          transformNode(
+            initializer,
+            {
+              isDirectUnderConstInitializer: false,
+              isUnderConstContext: false,
+              isUnderSpreadElement: context.isUnderSpreadElement,
+            },
+            options,
+          );
+        }
       }
 
-      // Add `as const` to the array itself, but don't recursively process elements
-      // Elements will be processed normally by the outer transform
-      node.replaceWithText(`${node.getText()} as const`);
-
-      return;
+      continue;
     }
 
-    if (tsm.Node.isObjectLiteralExpression(node)) {
-      // Don't add `as const` to empty objects
-      if (node.getProperties().length === 0) {
-        return;
-      }
-
-      // Add `as const` to the object itself, but don't recursively process properties
-      node.replaceWithText(`${node.getText()} as const`);
-
-      return;
-    }
-  }
-
-  // Mark that we're inside a spread element's expression only if it contains conditional
-  // Example: `...(flag ? [1, 2] as const : [])` keeps inner `as const`
-  // Example: `...[1, 2] as const` removes inner `as const`
-  if (tsm.Node.isSpreadElement(node)) {
-    const expression = node.getExpression();
-
-    const hasConditional = containsConditionalExpression(expression);
-
-    removeAsConstRecursively(expression, hasConditional);
-
-    return;
-  }
-
-  for (const child of node.getChildren()) {
-    removeAsConstRecursively(child, insideSpreadWithConditional);
+    transformNode(
+      mb,
+      {
+        isDirectUnderConstInitializer: false,
+        isUnderConstContext: false,
+        isUnderSpreadElement: context.isUnderSpreadElement,
+      },
+      options,
+    );
   }
 };
 
-const containsConditionalExpression = (node: tsm.Node): boolean => {
-  if (tsm.Node.isConditionalExpression(node)) {
-    return true;
-  }
+const checkIfPropertyNameShouldBeIgnored = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  nameNode: tsm.PropertyName,
+  options: AppendAsConstTransformerOptionsInternal,
+): boolean => {
+  expectType<typeof nameNode, tsm.PropertyName>('=');
 
-  // Check children recursively, but stop at AsExpression boundaries
-  if (isAsConstNode(node)) {
-    return false;
-  }
+  expectType<
+    tsm.PropertyName,
+    | tsm.NumericLiteral // skip
+    | tsm.BigIntLiteral // skip
+    | tsm.NoSubstitutionTemplateLiteral // invalid syntax
+    | tsm.Identifier // mut_x: number[]
+    | tsm.StringLiteral // "mut_x": number[]
+    | tsm.PrivateIdentifier // #memberName: number[] (class only)
+    | tsm.ComputedPropertyName // [`mut_x`]: number[]
+  >('=');
 
-  return node.getChildren().some(containsConditionalExpression);
+  return (
+    (nameNode.isKind(tsm.SyntaxKind.Identifier) &&
+      pipe(nameNode.getText()).map((nm) =>
+        options.ignoredPrefixes.some((p) => nm.startsWith(p)),
+      ).value) ||
+    (nameNode.isKind(tsm.SyntaxKind.StringLiteral) &&
+      pipe(nameNode.getLiteralValue()).map((nm) =>
+        options.ignoredPrefixes.some((p) => nm.startsWith(p)),
+      ).value) ||
+    (nameNode.isKind(tsm.SyntaxKind.PrivateIdentifier) &&
+      pipe(nameNode.getText()).map((nm) =>
+        options.ignoredPrefixes.some((p) => nm.startsWith(`#${p}`)),
+      ).value) ||
+    (nameNode.isKind(tsm.SyntaxKind.ComputedPropertyName) &&
+      pipe(nameNode.getExpression()).map((exp) => {
+        if (exp.isKind(tsm.SyntaxKind.StringLiteral)) {
+          const nm = exp.getLiteralValue();
+
+          return options.ignoredPrefixes.some((p) => nm.startsWith(p));
+        }
+
+        return false;
+      }).value)
+  );
 };
-
-const removeParenthesis = (node: tsm.Node): tsm.Node =>
-  tsm.Node.isParenthesizedExpression(node)
-    ? removeParenthesis(node.getExpression())
-    : node;
