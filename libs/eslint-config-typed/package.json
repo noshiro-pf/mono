@@ -111,7 +111,7 @@
     "typescript-eslint": "8.53.1"
   },
   "devDependencies": {
-    "@eslint/core": "1.0.1",
+    "@eslint/core": "1.1.0",
     "@rollup/plugin-replace": "6.0.3",
     "@rollup/plugin-strip": "3.0.4",
     "@rollup/plugin-typescript": "12.3.0",
