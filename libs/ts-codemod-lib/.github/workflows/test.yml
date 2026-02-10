@@ -68,7 +68,19 @@ jobs:
         run: pnpm exec playwright install chromium
 
       - name: Run "${{ matrix.command }}"
+        if: matrix.command != 'test:browser'
         run: pnpm run ${{ matrix.command }}
+
+      # Source - https://stackoverflow.com/a/71583518
+      # Posted by VonC, modified by community. See post 'Timeline' for change history
+      # Retrieved 2026-02-10, License - CC BY-SA 4.0
+      - name: Run 'test:browser' with retry
+        if: matrix.command == 'test:browser'
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: pnpm run ${{ matrix.command }}
 
       - name: Upload coverage reports to Codecov
         if: matrix.command == 'test:cov'

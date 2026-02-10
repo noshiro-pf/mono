@@ -1214,7 +1214,7 @@ const unionToString = ({
   wrapWithReadonly: boolean | string;
 }>): string =>
   types.length === 0
-    ? ('never' as const)
+    ? 'never'
     : Arr.isArrayOfLength(types, 1)
       ? wrapWithReadonly === false
         ? wrapWithParentheses(types[0])

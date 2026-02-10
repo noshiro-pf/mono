@@ -345,7 +345,7 @@ const transformNode = (
     transformNode(
       node.getWhenTrue(),
       {
-        isDirectUnderConstInitializer: false,
+        isDirectUnderConstInitializer: context.isDirectUnderConstInitializer,
         isUnderConstContext: false,
       },
       options,
@@ -354,7 +354,7 @@ const transformNode = (
     transformNode(
       node.getWhenFalse(),
       {
-        isDirectUnderConstInitializer: false,
+        isDirectUnderConstInitializer: context.isDirectUnderConstInitializer,
         isUnderConstContext: false,
       },
       options,

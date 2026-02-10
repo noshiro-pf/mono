@@ -254,6 +254,95 @@ describe(appendAsConstTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('Conditional expressions', () => {
+    test.each([
+      {
+        name: 'nested ternary with string literals',
+        source: dedent`
+          const checkboxState =
+            0 < numSelectedInPage && numSelectedInPage < list.length
+              ? 'indeterminate'
+              : 0 < list.length && numSelectedInPage === list.length
+                ? 'checked'
+                : 'unchecked';
+        `,
+        expected: dedent`
+          const checkboxState =
+            0 < numSelectedInPage && numSelectedInPage < list.length
+              ? 'indeterminate'
+              : 0 < list.length && numSelectedInPage === list.length
+                ? 'checked'
+                : 'unchecked';
+        `,
+      },
+      {
+        name: 'ternary with array literals',
+        source: 'const result = condition ? [1, 2, 3] : [4, 5, 6];',
+        expected:
+          'const result = condition ? [1, 2, 3] as const : [4, 5, 6] as const;',
+      },
+      {
+        name: 'ternary with object literals',
+        source: 'const result = flag ? { x: 1 } : { y: 2 };',
+        expected:
+          'const result = flag ? { x: 1 } as const : { y: 2 } as const;',
+      },
+      {
+        name: 'ternary with mixed primitives and objects',
+        source: 'const result = flag ? { x: 1 } : null;',
+        expected: 'const result = flag ? { x: 1 } as const : null;',
+      },
+      {
+        name: 'ternary with nested arrays',
+        source: 'const result = flag ? [[1, 2], [3, 4]] : [[5, 6]];',
+        expected:
+          'const result = flag ? [[1, 2], [3, 4]] as const : [[5, 6]] as const;',
+      },
+      {
+        name: 'ternary with empty array',
+        source: 'const result = flag ? [1, 2] : [];',
+        expected: 'const result = flag ? [1, 2] as const : [] as const;',
+      },
+      {
+        name: 'ternary with empty object',
+        source: 'const result = flag ? { x: 1 } : {};',
+        expected: 'const result = flag ? { x: 1 } as const : {} as const;',
+      },
+      {
+        name: 'deeply nested ternary',
+        source: 'const result = a ? [1] : b ? [2] : c ? [3] : [4];',
+        expected:
+          'const result = a ? [1] as const : b ? [2] as const : c ? [3] as const : [4] as const;',
+      },
+      {
+        name: 'ternary inside array',
+        source: 'const arr = [flag ? 1 : 2, flag ? [3] : [4]];',
+        expected: dedent`
+          const arr = [
+            flag ? (1 as const) : (2 as const),
+            flag ? ([3] as const) : ([4] as const),
+          ] as const;
+        `,
+      },
+      {
+        name: 'ternary inside object',
+        source: 'const obj = { a: flag ? [1] : [2], b: 3 };',
+        expected:
+          'const obj = { a: flag ? [1] as const : [2] as const, b: 3 } as const;',
+      },
+      {
+        name: 'ternary with already existing as const',
+        source: 'const result = flag ? [1, 2] as const : [3, 4];',
+        expected: 'const result = flag ? [1, 2] as const : [3, 4] as const;',
+      },
+      {
+        name: 'ternary with as const on both branches',
+        source: 'const result = flag ? [1, 2] as const : [3, 4] as const;',
+        expected: 'const result = flag ? [1, 2] as const : [3, 4] as const;',
+      },
+    ])('$name', testFn);
+  });
+
   describe('Spread syntax', () => {
     test.each([
       {

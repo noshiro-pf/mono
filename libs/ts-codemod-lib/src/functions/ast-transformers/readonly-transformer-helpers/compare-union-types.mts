@@ -13,11 +13,11 @@ export const compareUnionIntersectionTypes = (
 
 const mapRank = (t: DeepReadonly<tsm.TypeNode>): 0 | 1 | 2 | 3 =>
   isAtomicTypeNode(t)
-    ? (0 as const)
+    ? 0
     : t.isKind(tsm.SyntaxKind.ArrayType) ||
         t.isKind(tsm.SyntaxKind.TupleType) ||
         isReadonlyTupleOrArrayTypeNode(t)
-      ? (1 as const)
+      ? 1
       : t.isKind(tsm.SyntaxKind.TypeLiteral)
-        ? (2 as const)
-        : (3 as const);
+        ? 2
+        : 3;

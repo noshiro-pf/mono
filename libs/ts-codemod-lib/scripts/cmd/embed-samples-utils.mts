@@ -12,8 +12,7 @@ export const extractSampleCode = (content: string): string => {
 
   const endIndex = content.indexOf(ignoreBelowKeyword);
 
-  const start =
-    startIndex === -1 ? (0 as const) : startIndex + ignoreAboveKeyword.length;
+  const start = startIndex === -1 ? 0 : startIndex + ignoreAboveKeyword.length;
 
   const end = endIndex === -1 ? content.length : endIndex;
 
