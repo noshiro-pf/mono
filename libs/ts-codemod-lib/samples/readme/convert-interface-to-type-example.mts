@@ -4,8 +4,6 @@ import { expectType } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 // Before
-// embed-sample-code-ignore-above
-// Before
 /* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line convert-interface-to-type
 interface User {
   id: number;

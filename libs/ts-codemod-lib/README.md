@@ -103,8 +103,6 @@ Example:
 
 ```ts
 // Before
-// embed-sample-code-ignore-above
-// Before
 interface User {
     id: number;
     name: string;
