@@ -991,6 +991,19 @@ const transformClassDeclarationNode = (
       continue;
     }
 
+    // MethodDeclaration, GetAccessorDeclaration, SetAccessorDeclaration
+    // Check if method name has ignored prefix (e.g., mut_)
+    if (
+      (mb.isKind(tsm.SyntaxKind.MethodDeclaration) ||
+        mb.isKind(tsm.SyntaxKind.GetAccessor) ||
+        mb.isKind(tsm.SyntaxKind.SetAccessor)) &&
+      checkIfPropertyNameShouldBeIgnored(mb.getNameNode(), options)
+    ) {
+      options.debugPrint('skipped method by ignored prefix');
+
+      continue;
+    }
+
     transformNode(mb, initialReadonlyContext, options);
   }
 

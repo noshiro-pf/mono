@@ -1488,6 +1488,193 @@ describe(convertToReadonlyTransformer, () => {
             }
           `,
         },
+        {
+          name: 'Class method with "mut_" prefix in name',
+          source: dedent`
+            class Util {
+              #mut_getMutableMap(): Map<K, V> {
+
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              #mut_getMutableMap(): Map<K, V> {
+
+              }
+            }
+          `,
+        },
+        {
+          name: 'Static method with "mut_" prefix',
+          source: dedent`
+            class Util {
+              static mut_getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              static mut_getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+        },
+        {
+          name: 'Getter with "mut_" prefix',
+          source: dedent`
+            class Util {
+              get mut_mutableData(): string[] {
+                return [];
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              get mut_mutableData(): string[] {
+                return [];
+              }
+            }
+          `,
+        },
+        {
+          name: 'Setter with "mut_" prefix',
+          source: dedent`
+            class Util {
+              set mut_mutableData(value: string[]) {
+                // do something
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              set mut_mutableData(value: string[]) {
+                // do something
+              }
+            }
+          `,
+        },
+        {
+          name: 'Async method with "mut_" prefix',
+          source: dedent`
+            class Util {
+              async mut_fetchMutableData(): Promise<Map<string, unknown>> {
+                return new Map();
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              async mut_fetchMutableData(): Promise<Map<string, unknown>> {
+                return new Map();
+              }
+            }
+          `,
+        },
+        {
+          name: 'Static async method with "mut_" prefix',
+          source: dedent`
+            class Util {
+              static async mut_fetchMutableData(): Promise<Map<string, unknown>> {
+                return new Map();
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              static async mut_fetchMutableData(): Promise<Map<string, unknown>> {
+                return new Map();
+              }
+            }
+          `,
+        },
+        {
+          name: 'Private method with "mut_" prefix',
+          source: dedent`
+            class Util {
+              private mut_getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              private mut_getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+        },
+        {
+          name: 'Protected method with "mut_" prefix',
+          source: dedent`
+            class Util {
+              protected mut_getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              protected mut_getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+        },
+        {
+          name: 'Method with "_mut_" prefix',
+          source: dedent`
+            class Util {
+              _mut_getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              _mut_getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+        },
+        {
+          name: 'Method with "draft" prefix',
+          source: dedent`
+            class Util {
+              draftGetMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              draftGetMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+        },
+        {
+          name: 'Method without mut_ prefix should be transformed',
+          source: dedent`
+            class Util {
+              getMutableMap(): Map<K, V> {
+                return new Map();
+              }
+            }
+          `,
+          expected: dedent`
+            class Util {
+              getMutableMap(): ReadonlyMap<K, V> {
+                return new Map();
+              }
+            }
+          `,
+        },
       ])('$name', testFn);
     });
 
