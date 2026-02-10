@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.0...v2.0.1) (2026-02-10)
+
+### Bug Fixes
+
+- fix as-const transformer ([#38](https://github.com/noshiro-pf/ts-codemod-lib/issues/38)) ([f9c24eb](https://github.com/noshiro-pf/ts-codemod-lib/commit/f9c24eb99d9cd1821818fa0cc52bdfdcbebc3dd3))
+
 # [2.0.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v1.4.2...v2.0.0) (2026-02-10)
 
 ### Features
