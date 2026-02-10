@@ -2,7 +2,7 @@ import dedent from 'dedent';
 import {
   appendAsConstTransformer,
   convertInterfaceToTypeTransformer,
-  convertToReadonlyTypeTransformer,
+  convertToReadonlyTransformer,
   replaceAnyWithUnknownTransformer,
   replaceRecordWithUnknownRecordTransformer,
   transformSourceCode,
@@ -40,7 +40,7 @@ const isTsx = false;
 const transformedCode = transformSourceCode(originalCode, isTsx, [
   convertInterfaceToTypeTransformer(),
   replaceRecordWithUnknownRecordTransformer(),
-  convertToReadonlyTypeTransformer(),
+  convertToReadonlyTransformer(),
   appendAsConstTransformer(),
   replaceAnyWithUnknownTransformer(),
 ]);

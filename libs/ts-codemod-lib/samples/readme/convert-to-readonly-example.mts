@@ -3,6 +3,7 @@ import { expectType } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 // Before
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line
 type User = {
   id: number;
   description: string;
@@ -25,6 +26,7 @@ if (import.meta.vitest !== undefined) {
   test('convert-to-readonly-example', () => {
     expectType<
       User,
+      /* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line
       {
         id: number;
         description: string;

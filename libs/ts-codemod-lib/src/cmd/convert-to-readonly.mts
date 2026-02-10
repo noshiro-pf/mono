@@ -3,11 +3,13 @@
 import * as cmd from 'cmd-ts';
 import { Result } from 'ts-data-forge';
 import 'ts-repo-utils';
-import { convertToReadonlyTypeTransformer } from '../functions/index.mjs';
+import { convertToReadonlyTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
+const transformer = convertToReadonlyTransformer();
+
 const cmdDef = cmd.command({
-  name: 'convert-to-readonly',
+  name: transformer.name,
   version: '1.4.2',
   args: {
     baseDir: cmd.positional({
@@ -42,7 +44,7 @@ const cmdDef = cmd.command({
           uncommitted: args.uncommitted ?? false,
           silent: args.silent ?? false,
         },
-        [convertToReadonlyTypeTransformer()],
+        [transformer],
       );
 
       if (Result.isErr(result)) {

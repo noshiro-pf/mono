@@ -12,7 +12,9 @@ const syncCliVersions = async (): Promise<void> => {
   const packageJsonContent = await fs.readFile(packageJsonPath, 'utf8');
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  const packageJson = JSON.parse(packageJsonContent) as { version: string };
+  const packageJson = JSON.parse(packageJsonContent) as Readonly<{
+    version: string;
+  }>;
 
   const targetVersion = packageJson.version;
 

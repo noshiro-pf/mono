@@ -1,8 +1,10 @@
 /* eslint-disable import-x/unambiguous, vitest/expect-expect */
 // embed-sample-code-ignore-above
 // Before
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line append-as-const
 const arr = [1, 2, 3];
 
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line append-as-const
 const obj = { a: 1, b: 2 };
 
 // After

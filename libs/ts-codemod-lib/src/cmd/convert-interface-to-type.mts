@@ -6,8 +6,10 @@ import 'ts-repo-utils';
 import { convertInterfaceToTypeTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
+const transformer = convertInterfaceToTypeTransformer();
+
 const cmdDef = cmd.command({
-  name: 'convert-interface-to-type',
+  name: transformer.name,
   version: '1.4.2',
   args: {
     baseDir: cmd.positional({
@@ -42,7 +44,7 @@ const cmdDef = cmd.command({
           uncommitted: args.uncommitted ?? false,
           silent: args.silent ?? false,
         },
-        [convertInterfaceToTypeTransformer()],
+        [transformer],
       );
 
       if (Result.isErr(result)) {

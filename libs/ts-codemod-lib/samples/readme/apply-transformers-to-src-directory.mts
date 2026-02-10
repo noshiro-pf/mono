@@ -4,7 +4,7 @@ import * as fs from 'node:fs/promises';
 import {
   appendAsConstTransformer,
   convertInterfaceToTypeTransformer,
-  convertToReadonlyTypeTransformer,
+  convertToReadonlyTransformer,
   replaceAnyWithUnknownTransformer,
   replaceRecordWithUnknownRecordTransformer,
   transformSourceCode,
@@ -27,7 +27,7 @@ for await (const filePath of fs.glob('path/to/src/**/*.{mts,tsx}')) {
   const transformedCode = transformSourceCode(originalCode, isTsx, [
     convertInterfaceToTypeTransformer(),
     replaceRecordWithUnknownRecordTransformer(),
-    convertToReadonlyTypeTransformer(),
+    convertToReadonlyTransformer(),
     appendAsConstTransformer(),
     replaceAnyWithUnknownTransformer(),
   ]);

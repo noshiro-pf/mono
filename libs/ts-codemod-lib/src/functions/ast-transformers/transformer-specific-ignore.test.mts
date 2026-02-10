@@ -5,7 +5,7 @@ import * as prettierPluginEstree from 'prettier/plugins/estree';
 import * as prettierPluginTypeScript from 'prettier/plugins/typescript';
 import * as prettier from 'prettier/standalone';
 import { appendAsConstTransformer } from './append-as-const.mjs';
-import { convertToReadonlyTypeTransformer } from './convert-to-readonly-type.mjs';
+import { convertToReadonlyTransformer } from './convert-to-readonly.mjs';
 import { replaceAnyWithUnknownTransformer } from './replace-any-with-unknown.mjs';
 import { transformSourceCode } from './transform-source-code.mjs';
 
@@ -30,7 +30,7 @@ const testFn = async ({
     transformSourceCode(source, false, [
       replaceAnyWithUnknownTransformer(),
       appendAsConstTransformer(),
-      convertToReadonlyTypeTransformer(),
+      convertToReadonlyTransformer(),
     ]),
   );
 
@@ -99,14 +99,14 @@ describe('Transformer-specific ignore comments (Integration)', () => {
     {
       name: 'Ignore multiple specific transformers for entire file',
       source: dedent`
-        /* transformer-ignore replace-any-with-unknown, convert-to-readonly-type */
+        /* transformer-ignore replace-any-with-unknown, convert-to-readonly */
         type A = any; // Should remain any
         const b = [1, 2, 3]; // Should have as const
         type C = number[]; // Should remain mutable
         type D = any; // Should remain any
       `,
       expected: dedent`
-        /* transformer-ignore replace-any-with-unknown, convert-to-readonly-type */
+        /* transformer-ignore replace-any-with-unknown, convert-to-readonly */
         type A = any; // Should remain any
         const b = [1, 2, 3] as const; // Should have as const
         type C = number[]; // Should remain mutable
@@ -123,7 +123,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         // transformer-ignore-next-line append-as-const
         const d = [4, 5, 6];
         type E = number[];
-        // transformer-ignore-next-line convert-to-readonly-type
+        // transformer-ignore-next-line convert-to-readonly
         type F = string[];
       `,
       expected: dedent`
@@ -134,7 +134,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         // transformer-ignore-next-line append-as-const
         const d = [4, 5, 6];
         type E = readonly number[];
-        // transformer-ignore-next-line convert-to-readonly-type
+        // transformer-ignore-next-line convert-to-readonly
         type F = string[];
       `,
     },

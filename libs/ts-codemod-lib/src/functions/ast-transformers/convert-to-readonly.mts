@@ -10,7 +10,7 @@ import {
 import * as tsm from 'ts-morph';
 import {
   hasDisableNextLineComment,
-  isPrimitiveTypeNode,
+  isAtomicTypeNode,
   isReadonlyArrayTypeNode,
   isReadonlyTupleOrArrayTypeNode,
   isReadonlyTupleTypeNode,
@@ -29,9 +29,9 @@ import {
 } from './readonly-transformer-helpers/index.mjs';
 import { type TsMorphTransformer } from './types.mjs';
 
-const TRANSFORMER_NAME = 'convert-to-readonly-type';
+const TRANSFORMER_NAME = 'convert-to-readonly';
 
-export const convertToReadonlyTypeTransformer = (
+export const convertToReadonlyTransformer = (
   options?: ReadonlyTransformerOptions,
 ): TsMorphTransformer => {
   if (
@@ -62,18 +62,16 @@ export const convertToReadonlyTypeTransformer = (
       options?.debug === true
         ? replaceNodeWithDebugPrint
         : (node, newNodeText) => node.replaceWithText(newNodeText),
+  } as const;
+
+  return {
+    name: TRANSFORMER_NAME,
+    transform: (sourceAst) => {
+      for (const node of sourceAst.getChildren()) {
+        transformNode(node, initialReadonlyContext, optionsInternal);
+      }
+    },
   };
-
-  const transformer: TsMorphTransformer = (sourceAst) => {
-    for (const node of sourceAst.getChildren()) {
-      transformNode(node, initialReadonlyContext, optionsInternal);
-    }
-  };
-
-  // eslint-disable-next-line functional/immutable-data
-  transformer.transformerName = TRANSFORMER_NAME;
-
-  return transformer;
 };
 
 export type ReadonlyTransformerOptions = DeepReadonly<{
@@ -539,7 +537,7 @@ const transformTypeReferenceNode = (
     }
 
     // Readonly<number> -> number
-    if (isPrimitiveTypeNode(T)) {
+    if (isAtomicTypeNode(T)) {
       options.replaceNode(node, T.getFullText());
 
       return;
@@ -614,7 +612,7 @@ const transformTypeReferenceNode = (
     }
 
     // Readonly<number> -> number
-    if (isPrimitiveTypeNode(T)) {
+    if (isAtomicTypeNode(T)) {
       options.replaceNode(node, T.getFullText());
 
       return;
@@ -626,7 +624,7 @@ const transformTypeReferenceNode = (
     // DeepReadonly<P[][]> -> DeepReadonly<P[][]>
     if (
       T.isKind(tsm.SyntaxKind.ArrayType) &&
-      isPrimitiveTypeNode(T.getElementTypeNode())
+      isAtomicTypeNode(T.getElementTypeNode())
     ) {
       options.replaceNode(
         node,
@@ -640,7 +638,7 @@ const transformTypeReferenceNode = (
     // DeepReadonly<[P1, P2, P3]> -> readonly [P1, P2, P3]
     if (
       T.isKind(tsm.SyntaxKind.TupleType) &&
-      T.getElements().every(isPrimitiveTypeNode)
+      T.getElements().every(isAtomicTypeNode)
     ) {
       options.replaceNode(
         node,
@@ -1255,7 +1253,7 @@ const transformParenthesizedTypeNode = (
     T.isKind(tsm.SyntaxKind.TupleType) ||
     // remove () if T is PrimitiveTypeNode
     // e.g. `(number) |-> number`
-    isPrimitiveTypeNode(T) ||
+    isAtomicTypeNode(T) ||
     // remove () if T is TypeLiteralNode
     // e.g. `({ member: V }) |-> { member: V }`
     T.isKind(tsm.SyntaxKind.TypeLiteral)
@@ -1404,28 +1402,32 @@ const checkIfPropertyNameShouldBeIgnored = (
 
   expectType<
     tsm.PropertyName,
-    | tsm.NumericLiteral // skip
-    | tsm.BigIntLiteral // skip
-    | tsm.NoSubstitutionTemplateLiteral // invalid syntax
-    | tsm.Identifier // mut_x: number[]
-    | tsm.StringLiteral // "mut_x": number[]
-    | tsm.PrivateIdentifier // #memberName: number[] (class only)
+    | tsm.NumericLiteral
+    | tsm.BigIntLiteral
+    | tsm.NoSubstitutionTemplateLiteral
+    | tsm.Identifier
+    | tsm.StringLiteral
+    | tsm.PrivateIdentifier
     | tsm.ComputedPropertyName // [`mut_x`]: number[]
   >('=');
 
   return (
+    // mut_x: number[]
     (nameNode.isKind(tsm.SyntaxKind.Identifier) &&
       pipe(nameNode.getText()).map((nm) =>
         options.ignoredPrefixes.some((p) => nm.startsWith(p)),
       ).value) ||
+    // "mut_x": number[]
     (nameNode.isKind(tsm.SyntaxKind.StringLiteral) &&
       pipe(nameNode.getLiteralValue()).map((nm) =>
         options.ignoredPrefixes.some((p) => nm.startsWith(p)),
       ).value) ||
+    //  #memberName: number[] (class only)
     (nameNode.isKind(tsm.SyntaxKind.PrivateIdentifier) &&
       pipe(nameNode.getText()).map((nm) =>
         options.ignoredPrefixes.some((p) => nm.startsWith(`#${p}`)),
       ).value) ||
+    // [`mut_x`]: number[]
     (nameNode.isKind(tsm.SyntaxKind.ComputedPropertyName) &&
       pipe(nameNode.getExpression()).map((exp) => {
         if (exp.isKind(tsm.SyntaxKind.StringLiteral)) {

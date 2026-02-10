@@ -2,7 +2,7 @@ import { ISet } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 
 // Define the set of SyntaxKinds that represent primitive type keywords
-const primitiveKeywordKinds = ISet.create<tsm.SyntaxKind>([
+const atomicTypeKeywordKinds = ISet.create<tsm.SyntaxKind>([
   tsm.SyntaxKind.StringKeyword,
   tsm.SyntaxKind.BooleanKeyword,
   tsm.SyntaxKind.NumberKeyword,
@@ -16,7 +16,8 @@ const primitiveKeywordKinds = ISet.create<tsm.SyntaxKind>([
   tsm.SyntaxKind.NeverKeyword,
 ]);
 
-export type PrimitiveTypeNode = tsm.Node &
+// transformer-ignore-next-line convert-to-readonly
+export type AtomicTypeNode = tsm.Node &
   Readonly<
     | tsm.LiteralTypeNode
     | tsm.TemplateLiteralTypeNode
@@ -45,9 +46,7 @@ export type PrimitiveTypeNode = tsm.Node &
  * @returns True if the node represents a primitive type node, false otherwise.
  *          Acts as a type guard.
  */
-export const isPrimitiveTypeNode = (
-  node: tsm.Node,
-): node is PrimitiveTypeNode => {
+export const isAtomicTypeNode = (node: tsm.Node): node is AtomicTypeNode => {
   // Check for literal types (null, "aaa", 1.23, 456n, true, false)
   if (node.isKind(tsm.SyntaxKind.LiteralType)) {
     return true;
@@ -61,7 +60,7 @@ export const isPrimitiveTypeNode = (
   // Check if it's a TypeNode and its kind is one of the primitive keywords
   // Node.isTypeNode(node) ensures we only check nodes that represent types
   // if (ts.Node.isTypeNode(node) && primitiveKeywordKinds.has(node.getKind())) {
-  if (primitiveKeywordKinds.has(node.getKind())) {
+  if (atomicTypeKeywordKinds.has(node.getKind())) {
     return true;
   }
 
@@ -96,7 +95,7 @@ if (import.meta.vitest !== undefined) {
     return sourceFile.getFirstDescendantByKind(kind) as T | undefined;
   };
 
-  describe('isPrimitiveTypeNode', () => {
+  describe('isAtomicTypeNode', () => {
     describe('positive cases', () => {
       test.each([
         {
@@ -195,7 +194,7 @@ if (import.meta.vitest !== undefined) {
 
         expect(node.getKind()).toBe(kind);
 
-        assert.isTrue(isPrimitiveTypeNode(node));
+        assert.isTrue(isAtomicTypeNode(node));
       });
     });
 
@@ -266,7 +265,7 @@ if (import.meta.vitest !== undefined) {
 
         expect(node.getKind()).toBe(kind); // Verify node type
 
-        assert.isFalse(isPrimitiveTypeNode(node));
+        assert.isFalse(isAtomicTypeNode(node));
       });
 
       test.each([
@@ -294,7 +293,7 @@ if (import.meta.vitest !== undefined) {
           throw new Error('Node should be defined');
         }
 
-        assert.isFalse(isPrimitiveTypeNode(node));
+        assert.isFalse(isAtomicTypeNode(node));
       });
     });
   });

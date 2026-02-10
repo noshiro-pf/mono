@@ -6,8 +6,10 @@ import 'ts-repo-utils';
 import { replaceRecordWithUnknownRecordTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
+const transformer = replaceRecordWithUnknownRecordTransformer();
+
 const cmdDef = cmd.command({
-  name: 'replace-record-with-unknown-record',
+  name: transformer.name,
   version: '1.4.2',
   args: {
     baseDir: cmd.positional({
@@ -42,7 +44,7 @@ const cmdDef = cmd.command({
           uncommitted: args.uncommitted ?? false,
           silent: args.silent ?? false,
         },
-        [replaceRecordWithUnknownRecordTransformer()],
+        [transformer],
       );
 
       if (Result.isErr(result)) {

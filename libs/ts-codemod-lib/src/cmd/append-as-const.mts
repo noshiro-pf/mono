@@ -6,8 +6,10 @@ import 'ts-repo-utils';
 import { appendAsConstTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
+const transformer = appendAsConstTransformer();
+
 const cmdDef = cmd.command({
-  name: 'append-as-const',
+  name: transformer.name,
   version: '1.4.2',
   args: {
     baseDir: cmd.positional({
@@ -42,7 +44,7 @@ const cmdDef = cmd.command({
           uncommitted: args.uncommitted ?? false,
           silent: args.silent ?? false,
         },
-        [appendAsConstTransformer()],
+        [transformer],
       );
 
       if (Result.isErr(result)) {

@@ -1,6 +1,6 @@
 import * as tsm from 'ts-morph';
 import {
-  isPrimitiveTypeNode,
+  isAtomicTypeNode,
   isReadonlyTupleOrArrayTypeNode,
 } from '../../functions/index.mjs';
 
@@ -13,7 +13,7 @@ export const compareUnionIntersectionTypes = (
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const mapRank = (t: tsm.TypeNode): number =>
-  isPrimitiveTypeNode(t)
+  isAtomicTypeNode(t)
     ? 0
     : t.isKind(tsm.SyntaxKind.ArrayType) ||
         t.isKind(tsm.SyntaxKind.TupleType) ||

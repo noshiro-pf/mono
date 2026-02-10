@@ -1,11 +1,11 @@
 import { Arr, expectType } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
-import { isPrimitiveTypeNode } from './is-primitive-type-node.mjs';
+import { isAtomicTypeNode } from './is-atomic-type-node.mjs';
 
 export const isShallowReadonlyTypeNode = (node: tsm.Node): boolean =>
   isReadonlyTupleOrArrayTypeNode(node) ||
   isReadonlyTypeReferenceNode(node) ||
-  isPrimitiveTypeNode(node);
+  isAtomicTypeNode(node);
 
 export const isReadonlyTupleOrArrayTypeNode = (
   node: tsm.Node,

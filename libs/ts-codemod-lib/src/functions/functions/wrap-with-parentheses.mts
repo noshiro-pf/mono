@@ -1,2 +1,2 @@
-export const wrapWithParentheses = (nodeStr: string): string =>
-  `(${nodeStr.trim()})`;
+export const wrapWithParentheses = (nodeStr: string): `(${string})` =>
+  `(${nodeStr.trim()})` as const;

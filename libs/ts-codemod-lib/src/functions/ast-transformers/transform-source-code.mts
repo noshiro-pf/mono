@@ -50,7 +50,6 @@ const shouldSkipFile = (
 export const transformSourceCode = (
   code: string,
   isTsx: boolean,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   transformers: readonly TsMorphTransformer[],
   debug: boolean = false,
 ): string => {
@@ -69,19 +68,19 @@ export const transformSourceCode = (
   );
 
   for (const transformer of transformers) {
-    const transformerName = transformer.transformerName;
+    const transformerName = transformer.name;
 
     if (shouldSkipFile(code, transformerName)) {
       if (debug) {
         console.debug(
-          `skipped by ignore-file comment${transformerName !== undefined ? ` for transformer: ${transformerName}` : ''}`,
+          `skipped by ignore-file comment for transformer: ${transformerName}`,
         );
       }
 
       continue;
     }
 
-    transformer(sourceAst);
+    transformer.transform(sourceAst);
   }
 
   return sourceAst.getFullText();

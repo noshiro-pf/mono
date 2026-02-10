@@ -2,124 +2,131 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types -- ts-morph uses mutable types */
 import { Arr } from 'ts-data-forge';
 import type * as tsm from 'ts-morph';
+import { hasDisableNextLineComment } from '../functions/index.mjs';
 import { type TsMorphTransformer } from './types.mjs';
+
+const TRANSFORMER_NAME = 'convert-interface-to-type';
 
 /**
  * interface による型定義を type による型定義に変換する。
  * @typescript-eslint/consistent-type-definitions: ["error", "type"] と同等の動作
  */
-export const convertInterfaceToTypeTransformer = (): TsMorphTransformer => {
-  const transformer: TsMorphTransformer = (sourceAst) => {
-    const processInterfaces = (
-      container: tsm.SourceFile | tsm.ModuleDeclaration,
-    ): void => {
-      const interfaces = container.getInterfaces();
+export const convertInterfaceToTypeTransformer = (): TsMorphTransformer =>
+  ({
+    name: TRANSFORMER_NAME,
+    transform: (sourceAst) => {
+      const processInterfaces = (
+        container: tsm.SourceFile | tsm.ModuleDeclaration,
+      ): void => {
+        const interfaces = container.getInterfaces();
 
-      for (const interfaceDecl of interfaces) {
-        convertInterfaceToType(interfaceDecl);
-      }
-    };
+        for (const interfaceDecl of interfaces) {
+          if (hasDisableNextLineComment(interfaceDecl, TRANSFORMER_NAME)) {
+            continue;
+          }
 
-    const convertInterfaceToType = (
-      interfaceDecl: tsm.InterfaceDeclaration,
-    ): void => {
-      const interfaceName = interfaceDecl.getName();
-
-      const typeParameters = interfaceDecl.getTypeParameters();
-
-      const extendsExpressions = interfaceDecl.getExtends();
-
-      const members = interfaceDecl.getMembers();
-
-      // Build type parameters string
-      const typeParamsStr =
-        typeParameters.length > 0
-          ? `<${typeParameters.map((tp) => tp.getText()).join(', ')}>`
-          : '';
-
-      // Build type literal from members
-      const mut_typeBody: string = (() => {
-        if (extendsExpressions.length === 0) {
-          // No extends: simple type literal
-          return buildTypeLiteral(members);
+          convertInterfaceToType(interfaceDecl);
         }
+      };
 
-        if (members.length === 0) {
-          // Only extends, no own members: union of extended types
-          const extendedTypes = extendsExpressions.map((ext) => ext.getText());
+      const convertInterfaceToType = (
+        interfaceDecl: tsm.InterfaceDeclaration,
+      ): void => {
+        const interfaceName = interfaceDecl.getName();
 
-          return Arr.isArrayOfLength(extendedTypes, 1)
-            ? extendedTypes[0]
-            : extendedTypes.join(' & ');
-        }
+        const typeParameters = interfaceDecl.getTypeParameters();
 
-        // Both extends and own members: intersection
-        const extendedTypesWithMembers = extendsExpressions.map((ext) =>
-          ext.getText(),
-        );
+        const extendsExpressions = interfaceDecl.getExtends();
 
-        const ownType = buildTypeLiteral(members);
+        const members = interfaceDecl.getMembers();
 
-        return [...extendedTypesWithMembers, ownType].join(' & ');
-      })();
+        // Build type parameters string
+        const typeParamsStr =
+          typeParameters.length > 0
+            ? `<${typeParameters.map((tp) => tp.getText()).join(', ')}>`
+            : '';
 
-      // Get export keyword
-      const isExported = interfaceDecl.isExported();
+        // Build type literal from members
+        const mut_typeBody: string = (() => {
+          if (extendsExpressions.length === 0) {
+            // No extends: simple type literal
+            return buildTypeLiteral(members);
+          }
 
-      const exportKeyword = isExported ? 'export ' : '';
+          if (members.length === 0) {
+            // Only extends, no own members: union of extended types
+            const extendedTypes = extendsExpressions.map((ext) =>
+              ext.getText(),
+            );
 
-      // Get leading comments (including JSDoc)
-      const leadingComments = interfaceDecl.getLeadingCommentRanges();
+            return Arr.isArrayOfLength(extendedTypes, 1)
+              ? extendedTypes[0]
+              : extendedTypes.join(' & ');
+          }
 
-      const commentTexts = leadingComments
-        .map((range) => range.getText())
-        .join('\n');
+          // Both extends and own members: intersection
+          const extendedTypesWithMembers = extendsExpressions.map((ext) =>
+            ext.getText(),
+          );
 
-      const jsDocText = commentTexts.length > 0 ? `${commentTexts}\n` : '';
+          const ownType = buildTypeLiteral(members);
 
-      // Replace interface with type alias
-      const typeAliasText = `${jsDocText}${exportKeyword}type ${interfaceName}${typeParamsStr} = ${mut_typeBody};`;
+          return [...extendedTypesWithMembers, ownType].join(' & ');
+        })();
 
-      interfaceDecl.replaceWithText(typeAliasText);
-    };
+        // Get export keyword
+        const isExported = interfaceDecl.isExported();
 
-    const buildTypeLiteral = (
-      members: readonly tsm.TypeElementTypes[],
-    ): string => {
-      if (members.length === 0) {
-        return 'Record<string, never>';
-      }
+        const exportKeyword = isExported ? 'export ' : '';
 
-      const memberTexts = members.map((member) => {
-        // Preserve comments
-        const leadingComments = member
-          .getLeadingCommentRanges()
+        // Get leading comments (including JSDoc)
+        const leadingComments = interfaceDecl.getLeadingCommentRanges();
+
+        const commentTexts = leadingComments
           .map((range) => range.getText())
           .join('\n');
 
-        const memberText = member.getText();
+        const jsDocText = commentTexts.length > 0 ? `${commentTexts}\n` : '';
 
-        return leadingComments.length > 0
-          ? `${leadingComments}\n${memberText}`
-          : memberText;
-      });
+        // Replace interface with type alias
+        const typeAliasText =
+          `${jsDocText}${exportKeyword}type ${interfaceName}${typeParamsStr} = ${mut_typeBody};` as const;
 
-      return `{\n  ${memberTexts.join('\n  ')}\n}`;
-    };
+        interfaceDecl.replaceWithText(typeAliasText);
+      };
 
-    // Process top-level interface declarations
-    processInterfaces(sourceAst);
+      const buildTypeLiteral = (
+        members: readonly tsm.TypeElementTypes[],
+      ): string => {
+        if (members.length === 0) {
+          return 'Record<string, never>';
+        }
 
-    // Process interfaces inside namespaces/modules
-    const namespaces = sourceAst.getModules();
+        const memberTexts = members.map((member) => {
+          // Preserve comments
+          const leadingComments = member
+            .getLeadingCommentRanges()
+            .map((range) => range.getText())
+            .join('\n');
 
-    for (const namespace of namespaces) {
-      processInterfaces(namespace);
-    }
-  };
+          const memberText = member.getText();
 
-  // eslint-disable-next-line functional/immutable-data
-  transformer.transformerName = 'convert-interface-to-type';
+          return leadingComments.length > 0
+            ? `${leadingComments}\n${memberText}`
+            : memberText;
+        });
 
-  return transformer;
-};
+        return `{\n  ${memberTexts.join('\n  ')}\n}`;
+      };
+
+      // Process top-level interface declarations
+      processInterfaces(sourceAst);
+
+      // Process interfaces inside namespaces/modules
+      const namespaces = sourceAst.getModules();
+
+      for (const namespace of namespaces) {
+        processInterfaces(namespace);
+      }
+    },
+  }) as const;

@@ -74,9 +74,9 @@ describe(appendAsConstTransformer, () => {
         expected: 'const u = undefined;',
       },
       {
-        name: 'constant declaration with primitive number initializer in parentheses',
-        source: 'const foo = (1) as const;',
-        expected: 'const foo = 1;',
+        name: 'Regex literal with as const should remove as const',
+        source: 'const regex = /test/ as const;',
+        expected: 'const regex = /test/;',
       },
     ])('$name', testFn);
   });
@@ -104,6 +104,7 @@ describe(appendAsConstTransformer, () => {
         expected: 'const greeting = `hello`;',
       },
       {
+        name: 'template expression with variable substitution (should add as const)',
         source: dedent`
           const x = "aaa";
           const foo = \`\${x}bbb\`;
@@ -122,6 +123,11 @@ describe(appendAsConstTransformer, () => {
         name: 'simple array',
         source: 'const foo = [1, 2, 3];',
         expected: 'const foo = [1, 2, 3] as const;',
+      },
+      {
+        name: 'array already has as const',
+        source: 'const arr = [1, 2, 3] as const;',
+        expected: 'const arr = [1, 2, 3] as const;',
       },
       {
         name: 'empty array',
@@ -167,6 +173,11 @@ describe(appendAsConstTransformer, () => {
         name: 'simple object',
         source: 'const obj = { a: 1, b: 2 };',
         expected: 'const obj = { a: 1, b: 2 } as const;',
+      },
+      {
+        name: 'object already has as const',
+        source: 'const obj = { a: 1 } as const;',
+        expected: 'const obj = { a: 1 } as const;',
       },
       {
         name: 'empty object',
@@ -228,6 +239,11 @@ describe(appendAsConstTransformer, () => {
         name: 'should remove primitive as const in nested object and add as const to top level',
         source: 'const obj = { data: { value: 123 as const } };',
         expected: 'const obj = { data: { value: 123 } } as const;',
+      },
+      {
+        name: 'satisfies without as const should add as const',
+        source: 'const a = [1, 2] satisfies readonly number[];',
+        expected: 'const a = [1, 2] as const satisfies readonly number[];',
       },
     ])('$name', testFn);
   });
@@ -406,34 +422,29 @@ describe(appendAsConstTransformer, () => {
   describe('Function contexts', () => {
     test.each([
       {
-        name: 'function return statement',
+        name: 'function return statement (not transformed - out of scope)',
         source: 'function foo() { return [1, 2, 3]; }',
-        expected: 'function foo() { return [1, 2, 3] as const; }',
+        expected: 'function foo() { return [1, 2, 3]; }',
       },
       {
         name: 'arrow function return',
         source: 'const foo = () => ({ a: 1, b: 2 });',
-        expected: 'const foo = () => ({ a: 1, b: 2 } as const);',
+        expected: 'const foo = () => ({ a: 1, b: 2 }) as const;',
       },
       {
-        name: 'array already has as const',
-        source: 'const arr = [1, 2, 3] as const;',
-        expected: 'const arr = [1, 2, 3] as const;',
+        name: 'arrow function with return statement (not transformed - out of scope)',
+        source: 'const foo = () => { return { a: 1, b: 2 } };',
+        expected: 'const foo = () => { return { a: 1, b: 2 } };',
       },
       {
-        name: 'object already has as const',
-        source: 'const obj = { a: 1 } as const;',
-        expected: 'const obj = { a: 1 } as const;',
-      },
-      {
-        name: 'array in function parameter default value',
+        name: 'array in function parameter default value (not transformed - out of scope)',
         source: 'function foo(a = [1, 2]) { return a; }',
-        expected: 'function foo(a = [1, 2] as const) { return a; }',
+        expected: 'function foo(a = [1, 2]) { return a; }',
       },
       {
-        name: 'object in function parameter default value',
+        name: 'object in function parameter default value (not transformed - out of scope)',
         source: 'function foo(a = { b: 1 }) { return a; }',
-        expected: 'function foo(a = { b: 1 } as const) { return a; }',
+        expected: 'function foo(a = { b: 1 }) { return a; }',
       },
       {
         name: 'object in function call argument (not transformed with avoidInFunctionArgs)',
@@ -448,6 +459,23 @@ describe(appendAsConstTransformer, () => {
               type: SomeTypeSymbol,
               value
             });
+        `,
+        expected: dedent`
+          export const some = <const S,>(value: S): Some<S> =>
+            ({
+              type: SomeTypeSymbol,
+              value
+            }) as const;
+        `,
+      },
+      {
+        name: 'arrow function with generic type parameter (should keep existing as const)',
+        source: dedent`
+          export const some = <const S,>(value: S): Some<S> =>
+            ({
+              type: SomeTypeSymbol,
+              value
+            }) as const;
         `,
         expected: dedent`
           export const some = <const S,>(value: S): Some<S> =>
@@ -623,9 +651,9 @@ describe(appendAsConstTransformer, () => {
         expected: 'const date = new Date();',
       },
       {
-        name: 'class declaration',
+        name: 'class declaration (not transformed - out of scope)',
         source: 'class MyClass { prop = 1; }',
-        expected: 'class MyClass { prop = 1 as const; }',
+        expected: 'class MyClass { prop = 1; }',
       },
       {
         name: 'class declaration with mut_ prefix',
@@ -633,26 +661,14 @@ describe(appendAsConstTransformer, () => {
         expected: 'class MyClass { mut_prop = 1; }',
       },
       {
-        name: 'arrow function',
-        source: dedent`
-          export const some = <const S,>(value: S): Some<S> =>
-            ({
-              type: SomeTypeSymbol,
-              value
-            }) as const;
-        `,
-        expected: dedent`
-          export const some = <const S,>(value: S): Some<S> =>
-            ({
-              type: SomeTypeSymbol,
-              value
-            }) as const;
-        `,
-      },
-      {
         name: 'Object with computed property',
         source: "const obj = { ['key']: [1, 2] };",
         expected: "const obj = { ['key']: [1, 2] } as const;",
+      },
+      {
+        name: 'constant declaration with primitive number initializer in parentheses',
+        source: 'const foo = (1) as const;',
+        expected: 'const foo = 1;',
       },
       {
         name: 'Parenthesized array expression',
@@ -668,16 +684,6 @@ describe(appendAsConstTransformer, () => {
         name: 'Object with method that returns array (method body not transformed)',
         source: 'const obj = { method() { return [1, 2]; } };',
         expected: 'const obj = { method() { return [1, 2]; } } as const;',
-      },
-      {
-        name: 'Regex literal with as const should remove as const',
-        source: 'const regex = /test/ as const;',
-        expected: 'const regex = /test/;',
-      },
-      {
-        name: 'satisfies without as const should add as const',
-        source: 'const a = [1, 2] satisfies readonly number[];',
-        expected: 'const a = [1, 2] as const satisfies readonly number[];',
       },
       {
         name: 'Object with getter (getter body not transformed)',
@@ -698,7 +704,6 @@ describe(appendAsConstTransformer, () => {
         name: 'directives (should be skipped)',
         source: '"use strict";',
         expected: '"use strict";',
-        debug: true,
       },
       {
         name: 'object key',

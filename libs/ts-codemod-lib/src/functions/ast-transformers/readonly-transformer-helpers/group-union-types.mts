@@ -1,10 +1,10 @@
 import * as tsm from 'ts-morph';
 import {
-  isPrimitiveTypeNode,
+  isAtomicTypeNode,
   isReadonlyTupleOrArrayTypeNode,
   isReadonlyTypeReferenceNode,
   removeParentheses,
-  type PrimitiveTypeNode,
+  type AtomicTypeNode,
   type ReadonlyArrayTypeNode,
   type ReadonlyTupleTypeNode,
   type ReadonlyTypeReferenceNode,
@@ -17,7 +17,7 @@ export const groupUnionIntersectionTypes = (
   primitives:
     | Readonly<{
         firstPosition: number;
-        nodes: readonly PrimitiveTypeNode[];
+        nodes: readonly AtomicTypeNode[];
       }>
     | undefined;
 
@@ -51,7 +51,7 @@ export const groupUnionIntersectionTypes = (
     primitives:
       | Readonly<{
           firstPosition: number;
-          nodes: PrimitiveTypeNode[];
+          nodes: AtomicTypeNode[];
         }>
       | undefined;
 
@@ -91,7 +91,7 @@ export const groupUnionIntersectionTypes = (
     const t = removeParentheses(t_);
 
     // isReadonlyTypeReferenceNode
-    if (isPrimitiveTypeNode(t)) {
+    if (isAtomicTypeNode(t)) {
       if (mut_grouped.primitives === undefined) {
         mut_grouped.primitives = {
           firstPosition: i,

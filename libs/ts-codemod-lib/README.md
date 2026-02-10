@@ -62,7 +62,7 @@ const arr2 = [1, 2, 3] as const;
 const obj2 = { a: 1, b: 2 } as const;
 ```
 
-### 2. `convertToReadonlyTypeTransformer`
+### 2. `convertToReadonlyTransformer`
 
 Converts TypeScript type definitions to readonly types. This transformer helps in creating more type-safe code by making types readonly where appropriate. It also normalizes nested readonly types (e.g., `Readonly<Readonly<T>>` becomes `Readonly<T>`).
 
@@ -102,6 +102,8 @@ Converts TypeScript interface declarations to type aliases. This transformer hel
 Example:
 
 ```ts
+// Before
+// embed-sample-code-ignore-above
 // Before
 interface User {
     id: number;
@@ -179,9 +181,10 @@ type Config = {
     settings: { timeout: number };
 };
 
-// After applying convertToReadonlyTypeTransformer
+// After applying convertToReadonlyTransformer
 type Config2 = Readonly<{
     apiKey: string;
+    // transformer-ignore-next-line
     mutableOptions: string[]; // Not made Readonly because it was skipped
     settings: Readonly<{ timeout: number }>;
 }>;
@@ -263,7 +266,7 @@ import dedent from 'dedent';
 import {
     appendAsConstTransformer,
     convertInterfaceToTypeTransformer,
-    convertToReadonlyTypeTransformer,
+    convertToReadonlyTransformer,
     replaceAnyWithUnknownTransformer,
     replaceRecordWithUnknownRecordTransformer,
     transformSourceCode,
@@ -301,7 +304,7 @@ const isTsx = false;
 const transformedCode = transformSourceCode(originalCode, isTsx, [
     convertInterfaceToTypeTransformer(),
     replaceRecordWithUnknownRecordTransformer(),
-    convertToReadonlyTypeTransformer(),
+    convertToReadonlyTransformer(),
     appendAsConstTransformer(),
     replaceAnyWithUnknownTransformer(),
 ]);
@@ -349,7 +352,7 @@ import * as fs from 'node:fs/promises';
 import {
     appendAsConstTransformer,
     convertInterfaceToTypeTransformer,
-    convertToReadonlyTypeTransformer,
+    convertToReadonlyTransformer,
     replaceAnyWithUnknownTransformer,
     replaceRecordWithUnknownRecordTransformer,
     transformSourceCode,
@@ -372,7 +375,7 @@ for await (const filePath of fs.glob('path/to/src/**/*.{mts,tsx}')) {
     const transformedCode = transformSourceCode(originalCode, isTsx, [
         convertInterfaceToTypeTransformer(),
         replaceRecordWithUnknownRecordTransformer(),
-        convertToReadonlyTypeTransformer(),
+        convertToReadonlyTransformer(),
         appendAsConstTransformer(),
         replaceAnyWithUnknownTransformer(),
     ]);
@@ -406,7 +409,7 @@ node codemod.mjs
         return { success: true };
     }
 
-    // After applying convertToReadonlyTypeTransformer
+    // After applying convertToReadonlyTransformer
     /**
      * Processes user data.
      * @param {object} user - The user object. // JSDoc type is not changed

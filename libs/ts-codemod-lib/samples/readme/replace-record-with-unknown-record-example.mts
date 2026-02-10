@@ -3,10 +3,13 @@ import { expectType } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 // Before
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line replace-record-with-unknown-record, convert-to-readonly
 type Config = Record<string, unknown>;
 
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line replace-record-with-unknown-record, convert-to-readonly
 type ReadonlyConfig = Readonly<Record<string, unknown>>;
 
+/* embed-sample-code-ignore-this-line */ // transformer-ignore-next-line replace-record-with-unknown-record, convert-to-readonly
 type Data = Record<string, unknown>;
 
 // After

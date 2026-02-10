@@ -6,8 +6,10 @@ import 'ts-repo-utils';
 import { replaceAnyWithUnknownTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
+const transformer = replaceAnyWithUnknownTransformer();
+
 const cmdDef = cmd.command({
-  name: 'replace-any-with-unknown',
+  name: transformer.name,
   version: '1.4.2',
   args: {
     baseDir: cmd.positional({
@@ -42,7 +44,7 @@ const cmdDef = cmd.command({
           uncommitted: args.uncommitted ?? false,
           silent: args.silent ?? false,
         },
-        [replaceAnyWithUnknownTransformer()],
+        [transformer],
       );
 
       if (Result.isErr(result)) {

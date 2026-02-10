@@ -4,7 +4,7 @@ import { convertInterfaceToTypeTransformer } from './convert-interface-to-type.m
 
 describe(convertInterfaceToTypeTransformer, () => {
   test('converts simple interface to type', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -18,7 +18,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -31,7 +31,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   });
 
   test('converts exported interface to exported type', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -45,7 +45,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -58,7 +58,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   });
 
   test('converts interface with type parameters', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -71,7 +71,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -83,7 +83,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   });
 
   test('converts interface with extends', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -100,7 +100,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -116,7 +116,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   });
 
   test('converts interface extending multiple interfaces', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -137,7 +137,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -157,7 +157,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   });
 
   test('converts interface with only extends and no own members', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -172,7 +172,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -186,7 +186,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   });
 
   test('converts empty interface', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -197,7 +197,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -211,7 +211,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   test.todo('converts interface with JSDoc comment');
 
   test('converts interface inside namespace', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -226,7 +226,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -240,7 +240,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   });
 
   test('converts interface with optional properties', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -254,7 +254,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`
@@ -267,7 +267,7 @@ describe(convertInterfaceToTypeTransformer, () => {
   });
 
   test('converts interface with readonly properties', () => {
-    const project = new Project({ useInMemoryFileSystem: true });
+    const project = new Project({ useInMemoryFileSystem: true } as const);
 
     const sourceFile = project.createSourceFile(
       'test.ts',
@@ -281,7 +281,7 @@ describe(convertInterfaceToTypeTransformer, () => {
 
     const transformer = convertInterfaceToTypeTransformer();
 
-    transformer(sourceFile);
+    transformer.transform(sourceFile);
 
     expect(sourceFile.getText()).toBe(
       dedent`

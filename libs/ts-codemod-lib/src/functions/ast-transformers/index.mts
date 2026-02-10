@@ -1,6 +1,6 @@
 export * from './append-as-const.mjs';
 export * from './convert-interface-to-type.mjs';
-export * from './convert-to-readonly-type.mjs';
+export * from './convert-to-readonly.mjs';
 export * from './readonly-transformer-helpers/index.mjs';
 export * from './replace-any-with-unknown.mjs';
 export * from './replace-record-with-unknown-record.mjs';

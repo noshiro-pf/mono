@@ -1,10 +1,11 @@
+/* transformer-ignore */
 /* eslint-disable security/detect-non-literal-fs-filename */
 // embed-sample-code-ignore-above
 import * as fs from 'node:fs/promises';
 import {
   appendAsConstTransformer,
   convertInterfaceToTypeTransformer,
-  convertToReadonlyTypeTransformer,
+  convertToReadonlyTransformer,
   replaceAnyWithUnknownTransformer,
   replaceRecordWithUnknownRecordTransformer,
   transformSourceCode,
@@ -24,7 +25,7 @@ import {
       const transformedCode = transformSourceCode(originalCode, isTsx, [
         convertInterfaceToTypeTransformer(),
         replaceRecordWithUnknownRecordTransformer(),
-        convertToReadonlyTypeTransformer(),
+        convertToReadonlyTransformer(),
         appendAsConstTransformer(),
         replaceAnyWithUnknownTransformer(),
       ]);
