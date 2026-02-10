@@ -1,3 +1,9 @@
+## [2.0.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.2...v2.0.3) (2026-02-10)
+
+### Bug Fixes
+
+- fix convert-to-readonly to recognize mut prefix of class methods ([#40](https://github.com/noshiro-pf/ts-codemod-lib/issues/40)) ([a156242](https://github.com/noshiro-pf/ts-codemod-lib/commit/a1562426992c366e3ecb9219b5f05b1a512739b5))
+
 ## [2.0.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.1...v2.0.2) (2026-02-10)
 
 ### Bug Fixes
