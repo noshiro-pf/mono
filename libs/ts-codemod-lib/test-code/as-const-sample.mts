@@ -17,4 +17,17 @@ const b = [
   ...[{ b: 'str1' }, { c: 'str2' }],
 ] as const satisfies readonly Elem[];
 
-noop(a, b);
+const c = {
+  key0: 'str0',
+  key1: flag ? [{ b: 'str1' }, { c: 'str2' }] : [],
+} as const satisfies Readonly<{ key0: 'str0'; key1: readonly Elem[] }>;
+
+const d = {
+  key0: 'str0',
+  key1: flag ? ([{ b: 'str1' }, { c: 'str2' }] as const) : [],
+} as const satisfies Readonly<{
+  key0: 'str0';
+  key1: readonly [Elem, Elem] | readonly [];
+}>;
+
+noop(a, b, c, d);

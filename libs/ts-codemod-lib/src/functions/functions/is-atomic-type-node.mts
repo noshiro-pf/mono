@@ -46,7 +46,9 @@ export type AtomicTypeNode = tsm.Node &
  * @returns True if the node represents a primitive type node, false otherwise.
  *          Acts as a type guard.
  */
-export const isAtomicTypeNode = (node: tsm.Node): node is AtomicTypeNode => {
+export const isAtomicTypeNode = (
+  node: DeepReadonly<tsm.Node>,
+): node is AtomicTypeNode => {
   // Check for literal types (null, "aaa", 1.23, 456n, true, false)
   if (node.isKind(tsm.SyntaxKind.LiteralType)) {
     return true;

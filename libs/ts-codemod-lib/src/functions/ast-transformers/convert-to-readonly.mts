@@ -1133,8 +1133,8 @@ const transformUnionOrIntersectionTypeNodeImpl = (
 
   const typeLiteralsWrappedWithReadonly: readonly [] | readonly [string] =
     nonEmptyTypeLiterals === undefined || nonEmptyTypeLiterals.length === 0
-      ? []
-      : [
+      ? ([] as const)
+      : ([
           unionToString({
             types: nonEmptyTypeLiterals.map((n) =>
               isReadonlyTypeReferenceNode(n)
@@ -1147,7 +1147,7 @@ const transformUnionOrIntersectionTypeNodeImpl = (
               nextReadonlyContextValue.type !== 'DeepReadonly' &&
               nextReadonlyContextValue.indexedAccessDepth === 0,
           }),
-        ];
+        ] as const);
 
   // Sort by first occurrence (preserving the original union order as much as possible)
   const sorted: readonly string[] = [
@@ -1214,14 +1214,14 @@ const unionToString = ({
   wrapWithReadonly: boolean | string;
 }>): string =>
   types.length === 0
-    ? 'never'
+    ? ('never' as const)
     : Arr.isArrayOfLength(types, 1)
       ? wrapWithReadonly === false
         ? wrapWithParentheses(types[0])
-        : `${isString(wrapWithReadonly) ? wrapWithReadonly : 'Readonly'}<${types[0]}>`
+        : (`${isString(wrapWithReadonly) ? wrapWithReadonly : 'Readonly'}<${types[0]}>` as const)
       : wrapWithReadonly === false
         ? wrapWithParentheses(types.join(` ${op} `))
-        : `${isString(wrapWithReadonly) ? wrapWithReadonly : 'Readonly'}<${types.join(` ${op} `)}>`;
+        : (`${isString(wrapWithReadonly) ? wrapWithReadonly : 'Readonly'}<${types.join(` ${op} `)}>` as const);
 
 /** Convert ((T)) -> (T) recursively */
 const transformParenthesizedTypeNode = (

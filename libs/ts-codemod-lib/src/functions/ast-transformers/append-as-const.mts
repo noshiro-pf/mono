@@ -38,7 +38,6 @@ export const appendAsConstTransformer = (
           {
             isUnderConstContext: false,
             isDirectUnderConstInitializer: false,
-            isUnderSpreadElement: false,
           },
           optionsInternal,
         );
@@ -77,9 +76,19 @@ type AppendAsConstTransformerOptionsInternal = DeepReadonly<{
 }>;
 
 type AsConstContext = Readonly<{
+  /**
+   * Whether the current node is under an `as const` context.
+   *
+   * (e.g. `[1, 2, {x: 3}] as const`  --> `isUnderConstContext` is true for `[1, 2, {x: 3}]` and its children `{x: 3}`)
+   */
   isUnderConstContext: boolean;
+
+  /**
+   * Whether the current node is directly under a `const` variable initializer.
+   *
+   * (e.g. `const foo = [1, 2, 3];`  --> `isDirectUnderConstInitializer` is true for `[1, 2, 3]`)
+   */
   isDirectUnderConstInitializer: boolean;
-  isUnderSpreadElement: boolean;
 }>;
 
 const transformNode = (
@@ -92,6 +101,19 @@ const transformNode = (
   }
 
   options.debugPrint(node.getKindName(), node.getText(), { context });
+
+  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
+    options.debugPrint('skipped by disable-next-line comment');
+
+    return;
+  }
+
+  if (
+    options.applyLevel === 'avoidInFunctionArgs' &&
+    tsm.Node.isCallExpression(node)
+  ) {
+    return;
+  }
 
   if (node.isKind(tsm.SyntaxKind.VariableDeclaration)) {
     const nodeName = node.getName();
@@ -134,7 +156,6 @@ const transformNode = (
         {
           isDirectUnderConstInitializer: declarationKindKeywords[0] === 'const',
           isUnderConstContext: false,
-          isUnderSpreadElement: context.isUnderSpreadElement,
         },
         options,
       );
@@ -155,16 +176,49 @@ const transformNode = (
     // }
   }
 
-  if (hasDisableNextLineComment(node, TRANSFORMER_NAME)) {
-    options.debugPrint('skipped by disable-next-line comment');
+  // Skip already type asserted nodes
+  if (tsm.Node.isAsExpression(node) && !isAsConstNode(node)) {
+    return;
+  }
+
+  // pass by ([(X)] -> X)
+  if (tsm.Node.isParenthesizedExpression(node)) {
+    transformNode(node.getExpression(), context, options);
 
     return;
   }
 
-  if (
-    options.applyLevel === 'avoidInFunctionArgs' &&
-    tsm.Node.isCallExpression(node)
-  ) {
+  // pass by ([X satisfies ...] -> X)
+  if (tsm.Node.isSatisfiesExpression(node)) {
+    transformNode(node.getExpression(), context, options);
+
+    return;
+  }
+
+  // pass by property initializer ([key: value] -> value)
+  if (tsm.Node.isPropertyAssignment(node)) {
+    const initializer = node.getInitializer();
+
+    if (initializer !== undefined) {
+      transformNode(initializer, context, options);
+    }
+
+    return;
+  }
+
+  // pass by arrow function body ([() => X] -> X)
+  if (tsm.Node.isArrowFunction(node)) {
+    const body = node.getBody();
+
+    transformNode(body, context, options);
+
+    return;
+  }
+
+  // pass by spread element ([...X] -> X)
+  if (tsm.Node.isSpreadElement(node)) {
+    transformNode(node.getExpression(), context, options);
+
     return;
   }
 
@@ -176,149 +230,20 @@ const transformNode = (
     node.isKind(tsm.SyntaxKind.TrueKeyword) || // true
     node.isKind(tsm.SyntaxKind.FalseKeyword) // false
   ) {
-    if (context.isDirectUnderConstInitializer || context.isUnderConstContext) {
-      return;
+    if (
+      !context.isDirectUnderConstInitializer &&
+      !context.isUnderConstContext
+    ) {
+      options.replaceNode(node, `${node.getText()} as const`);
     }
-
-    options.replaceNode(node, `${node.getText()} as const`);
 
     return;
   }
 
   if (node.isKind(tsm.SyntaxKind.TemplateExpression)) {
-    options.replaceNode(node, `${node.getText()} as const`);
-
-    return;
-  }
-
-  // `as const` node
-  if (isAsConstNode(node)) {
-    if (context.isDirectUnderConstInitializer) {
-      // In const variable declarations, remove `as const` first and then re-append it later if needed
-
-      transformNode(
-        node.getExpression(),
-        {
-          isUnderConstContext: false,
-          isDirectUnderConstInitializer: true,
-          isUnderSpreadElement: context.isUnderSpreadElement,
-        },
-        options,
-      );
-
-      options.replaceNode(
-        node,
-        // The expression may be marked "as const"
-        node.getExpression().getText(),
-      ); // remove `as const`
-
-      return;
+    if (!context.isUnderConstContext) {
+      options.replaceNode(node, `${node.getText()} as const`);
     }
-
-    if (context.isUnderConstContext) {
-      transformNode(
-        node.getExpression(),
-        {
-          isUnderConstContext: true,
-          isDirectUnderConstInitializer: false,
-          isUnderSpreadElement: context.isUnderSpreadElement,
-        },
-        options,
-      );
-
-      options.replaceNode(
-        node,
-        // The expression may be marked "as const"
-        node.getExpression().getText(),
-      ); // remove `as const`
-
-      return;
-    }
-
-    transformNode(
-      node.getExpression(),
-      {
-        isUnderConstContext: true,
-        isDirectUnderConstInitializer: false,
-        isUnderSpreadElement: context.isUnderSpreadElement,
-      },
-      options,
-    );
-
-    return;
-  }
-
-  if (tsm.Node.isAsExpression(node)) {
-    return;
-  }
-
-  if (tsm.Node.isSpreadElement(node)) {
-    transformNode(
-      node.getExpression(),
-      {
-        isDirectUnderConstInitializer: false,
-        isUnderConstContext: context.isUnderConstContext,
-        isUnderSpreadElement: true,
-      },
-      options,
-    );
-
-    return;
-  }
-
-  if (tsm.Node.isConditionalExpression(node)) {
-    if (context.isUnderSpreadElement) {
-      // When under spread element, keep `as const` in both branches
-      transformNode(
-        node.getWhenTrue(),
-        {
-          isDirectUnderConstInitializer: false,
-          isUnderConstContext: false,
-          isUnderSpreadElement: false,
-        },
-        options,
-      );
-
-      transformNode(
-        node.getWhenFalse(),
-        {
-          isDirectUnderConstInitializer: false,
-          isUnderConstContext: false,
-          isUnderSpreadElement: false,
-        },
-        options,
-      );
-    }
-
-    return;
-  }
-
-  if (tsm.Node.isParenthesizedExpression(node)) {
-    transformNode(node.getExpression(), context, options);
-
-    return;
-  }
-
-  if (tsm.Node.isSatisfiesExpression(node)) {
-    transformNode(node.getExpression(), context, options);
-
-    return;
-  }
-
-  if (tsm.Node.isPropertyAssignment(node)) {
-    const initializer = node.getInitializer();
-
-    if (initializer !== undefined) {
-      transformNode(initializer, context, options);
-    }
-
-    return;
-  }
-
-  if (tsm.Node.isArrowFunction(node)) {
-    const body = node.getBody();
-
-    transformNode(body, context, options);
 
     return;
   }
@@ -330,7 +255,6 @@ const transformNode = (
         {
           isUnderConstContext: true, // [...] as const
           isDirectUnderConstInitializer: false,
-          isUnderSpreadElement: context.isUnderSpreadElement,
         },
         options,
       );
@@ -350,7 +274,6 @@ const transformNode = (
         {
           isUnderConstContext: true, // {...} as const
           isDirectUnderConstInitializer: false,
-          isUnderSpreadElement: context.isUnderSpreadElement,
         },
         options,
       );
@@ -360,18 +283,83 @@ const transformNode = (
       options.replaceNode(node, `${node.getText()} as const`);
     }
 
-    // return;
+    return;
   }
 
-  // for (const child of node.getChildren()) {
-  //   transformNode(
-  //     child,
-  //     {
-  //       isDirectUnderConstInitializer: false,
-  //       isUnderConstContext: context.isUnderConstContext,
-  //       isUnderSpreadElement: context.isUnderSpreadElement,
-  //     },
-  //     options,
-  //   );
-  // }
+  // `as const` node
+  if (isAsConstNode(node)) {
+    if (context.isDirectUnderConstInitializer) {
+      // In const variable declarations, remove `as const` first and then re-append it later if needed
+
+      transformNode(
+        node.getExpression(),
+        {
+          isUnderConstContext: false,
+          isDirectUnderConstInitializer: true,
+        },
+        options,
+      );
+
+      options.replaceNode(
+        node,
+        // The expression may be marked "as const"
+        node.getExpression().getText(),
+      ); // remove `as const`
+
+      return;
+    }
+
+    if (context.isUnderConstContext) {
+      transformNode(
+        node.getExpression(),
+        {
+          isUnderConstContext: true,
+          isDirectUnderConstInitializer: false,
+        },
+        options,
+      );
+
+      options.replaceNode(
+        node,
+        // The expression may be marked "as const"
+        node.getExpression().getText(),
+      ); // remove `as const`
+
+      return;
+    }
+
+    transformNode(
+      node.getExpression(),
+      {
+        isUnderConstContext: true,
+        isDirectUnderConstInitializer: false,
+      },
+      options,
+    );
+
+    return;
+  }
+
+  if (tsm.Node.isConditionalExpression(node)) {
+    // For conditional expressions, traverse both branches in a non-const context
+    transformNode(
+      node.getWhenTrue(),
+      {
+        isDirectUnderConstInitializer: false,
+        isUnderConstContext: false,
+      },
+      options,
+    );
+
+    transformNode(
+      node.getWhenFalse(),
+      {
+        isDirectUnderConstInitializer: false,
+        isUnderConstContext: false,
+      },
+      options,
+    );
+
+    // return;
+  }
 };

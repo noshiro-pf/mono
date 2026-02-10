@@ -50,11 +50,11 @@ export const nextReadonlyContext = <
   indexedAccessDepth: SafeUintWithSmallInt;
 }> =>
   curr.type === 'DeepReadonly'
-    ? {
+    ? ({
         type: 'DeepReadonly',
         indexedAccessDepth: SafeUint.MAX_VALUE,
-      }
-    : {
+      } as const)
+    : ({
         type: next,
         indexedAccessDepth: match(indexedAccessDepthChange, {
           decr: SafeUint.sub(curr.indexedAccessDepth, 1),
@@ -62,4 +62,4 @@ export const nextReadonlyContext = <
           incr: SafeUint.add(curr.indexedAccessDepth, 1),
           infinity: SafeUint.MAX_VALUE,
         }),
-      };
+      } as const);

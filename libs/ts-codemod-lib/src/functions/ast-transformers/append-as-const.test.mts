@@ -117,7 +117,7 @@ describe(appendAsConstTransformer, () => {
     ])('$name', testFn);
   });
 
-  describe('Basic array and object transformations', () => {
+  describe('Basic array transformations', () => {
     test.each([
       {
         name: 'simple array',
@@ -155,20 +155,26 @@ describe(appendAsConstTransformer, () => {
         expected: 'const arr = [[1, 2], [3, 4]] as const;',
       },
       {
-        name: 'array with strings',
-        source: "const strArray = ['a', 'b', 'c'];",
-        expected: "const strArray = ['a', 'b', 'c'] as const;",
-      },
-      {
         name: 'array with mixed types',
-        source: "const mixed = [1, 'a', true, null];",
-        expected: "const mixed = [1, 'a', true, null] as const;",
+        source: dedent`
+          const x = 1;
+          const strArray = ['a', \`b\`, \`c\${x}\` as const, 4, true, null];
+        `,
+        expected: dedent`
+          const x = 1;
+          const strArray = ['a', \`b\`, \`c\${x}\`, 4, true, null] as const;
+        `,
       },
       {
         name: 'should remove as const from boolean literal inside array and add as const to top level',
         source: 'const arr = [true as const, false];',
         expected: 'const arr = [true, false] as const;',
       },
+    ])('$name', testFn);
+  });
+
+  describe('Basic object transformations', () => {
+    test.each([
       {
         name: 'simple object',
         source: 'const obj = { a: 1, b: 2 };',

@@ -45,6 +45,7 @@ const config = () =>
               provider: playwright(),
               instances: [{ browser: 'chromium' }],
             },
+            retry: 2,
           },
           optimizeDeps: {
             include: [

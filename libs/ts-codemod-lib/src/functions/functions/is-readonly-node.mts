@@ -8,7 +8,7 @@ export const isShallowReadonlyTypeNode = (node: tsm.Node): boolean =>
   isAtomicTypeNode(node);
 
 export const isReadonlyTupleOrArrayTypeNode = (
-  node: tsm.Node,
+  node: DeepReadonly<tsm.Node>,
 ): node is ReadonlyArrayTypeNode | ReadonlyTupleTypeNode =>
   node.isKind(tsm.SyntaxKind.TypeOperator) &&
   node.getOperator() === tsm.SyntaxKind.ReadonlyKeyword &&
@@ -23,7 +23,7 @@ export type ReadonlyArrayTypeNode = tsm.TypeNode &
   }>;
 
 export const isReadonlyArrayTypeNode = (
-  node: tsm.Node,
+  node: DeepReadonly<tsm.Node>,
 ): node is ReadonlyArrayTypeNode =>
   node.isKind(tsm.SyntaxKind.TypeOperator) &&
   node.getOperator() === tsm.SyntaxKind.ReadonlyKeyword &&
@@ -97,7 +97,7 @@ export type ReadonlyTupleTypeNode = tsm.TypeNode &
   }>;
 
 export const isReadonlyTupleTypeNode = (
-  node: tsm.Node,
+  node: DeepReadonly<tsm.Node>,
 ): node is ReadonlyTupleTypeNode =>
   node.isKind(tsm.SyntaxKind.TypeOperator) &&
   node.getOperator() === tsm.SyntaxKind.ReadonlyKeyword &&
@@ -162,7 +162,7 @@ export type ReadonlyTypeReferenceNode = tsm.TypeNode &
   }>;
 
 export const isReadonlyTypeReferenceNode = (
-  node: tsm.Node,
+  node: DeepReadonly<tsm.Node>,
 ): node is ReadonlyTypeReferenceNode => {
   if (!node.isKind(tsm.SyntaxKind.TypeReference)) {
     return false;
