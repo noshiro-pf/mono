@@ -1,3 +1,9 @@
+# [6.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.5...v6.3.0) (2026-02-11)
+
+### Features
+
+- add forceUndefinedDefault option to optional API for recursion type ([#213](https://github.com/noshiro-pf/ts-fortress/issues/213)) ([10f83b2](https://github.com/noshiro-pf/ts-fortress/commit/10f83b2dd36d21d2e09dbacfb9cee092171c16fa))
+
 ## [6.2.5](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.4...v6.2.5) (2026-02-05)
 
 ### Bug Fixes
