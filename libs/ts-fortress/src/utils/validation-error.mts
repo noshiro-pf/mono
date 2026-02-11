@@ -6,6 +6,9 @@ export type ValidationErrorDetails = Readonly<
       message: string;
     }
   | {
+      kind: 'template-literal';
+    }
+  | {
       kind: 'enum';
       values: readonly unknown[];
     }
@@ -137,6 +140,9 @@ const createDetailsMessage = (
 
     case 'custom':
       return error.details.message;
+
+    case 'template-literal':
+      return `expected <${error.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
 
     case 'integer-range':
       return `expected an integer between ${error.details.start} and ${error.details.endExclusive - 1} but${actualValueStr} was passed.`;

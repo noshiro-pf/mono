@@ -39,4 +39,12 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/other-types/recursion/mutually-recursive-with-optional-example.mts',
     ],
   },
+  {
+    sourcePath: 'src/other-types/template-literal.mts',
+    sampleFiles: [
+      'samples/src/other-types/template-literal/path-string.mts',
+      'samples/src/other-types/template-literal/http-url.mts',
+      'samples/src/other-types/template-literal/semver.mts',
+    ],
+  },
 ] as const;
