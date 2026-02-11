@@ -123,7 +123,10 @@ export const groupUnionIntersectionTypes = (
 
     if (
       t.isKind(tsm.SyntaxKind.TypeLiteral) ||
-      isReadonlyTypeReferenceNode(t)
+      (isReadonlyTypeReferenceNode(t) &&
+        // Readonly<TypeReference> should go to 'others' group to preserve the Readonly<> wrapper
+        // Readonly<TypeLiteral> should stay in 'typeLiterals' group for normalization
+        !t.getTypeArguments()[0].isKind(tsm.SyntaxKind.TypeReference))
     ) {
       if (mut_grouped.typeLiterals === undefined) {
         mut_grouped.typeLiterals = {
