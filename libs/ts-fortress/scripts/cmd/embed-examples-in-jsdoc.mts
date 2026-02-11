@@ -1,4 +1,4 @@
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import { formatFiles } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
@@ -89,7 +89,7 @@ export const embedExamplesInJsDoc = async (): Promise<
       mut_modifiedFiles.push(sourceFilePath);
     }
 
-    if (mut_modifiedFiles.length > 0) {
+    if (Arr.isNonEmpty(mut_modifiedFiles)) {
       console.log(`\nFormatting ${mut_modifiedFiles.length} modified files...`);
 
       await formatFiles(mut_modifiedFiles);

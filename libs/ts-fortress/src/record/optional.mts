@@ -1,3 +1,4 @@
+import { hasKey } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
 
 export type OptionalPropertyType<T extends Type<unknown>> = T &
@@ -105,5 +106,4 @@ export const optional = <T extends Type<unknown>>(
 
 export const isOptionalProperty = <T extends Type<unknown>>(
   t: T,
-): t is OptionalPropertyType<T> =>
-  Object.hasOwn(t, 'optional') && t.optional === true;
+): t is OptionalPropertyType<T> => hasKey(t, 'optional') && t.optional === true;

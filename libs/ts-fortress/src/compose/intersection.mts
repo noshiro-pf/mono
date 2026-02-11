@@ -45,7 +45,7 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
       }
     });
 
-    if (errors.length > 0) {
+    if (Arr.isNonEmpty(errors)) {
       return Result.err(errors);
     }
 

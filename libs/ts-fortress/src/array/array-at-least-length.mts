@@ -69,7 +69,7 @@ export const arrayAtLeastLength = <A, N extends SmallUint>(
       }
     });
 
-    if (errors.length > 0) {
+    if (Arr.isNonEmpty(errors)) {
       return Result.err(errors);
     }
 

@@ -1,11 +1,10 @@
-import { expectType, Result } from 'ts-data-forge';
+import { asNonZeroFiniteNumber, expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { nonZeroFiniteNumber } from './non-zero-finite-number.mjs';
 
 describe(nonZeroFiniteNumber, () => {
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  const targetType = nonZeroFiniteNumber(1.5 as NonZeroFiniteNumber);
+  const targetType = nonZeroFiniteNumber(asNonZeroFiniteNumber(1.5));
 
   type TargetType = TypeOf<typeof targetType>;
 

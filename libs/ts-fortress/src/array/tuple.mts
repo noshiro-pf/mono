@@ -41,6 +41,7 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
       ]);
     }
 
+    // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
     if (a.length !== types.length) {
       return Result.err([
         {
@@ -67,7 +68,7 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
       }
     });
 
-    if (errors.length > 0) {
+    if (Arr.isNonEmpty(errors)) {
       return Result.err(errors);
     }
 

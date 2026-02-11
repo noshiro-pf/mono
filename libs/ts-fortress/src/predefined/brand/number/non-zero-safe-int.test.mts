@@ -1,11 +1,10 @@
-import { expectType, Result } from 'ts-data-forge';
+import { asNonZeroSafeInt, expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { nonZeroSafeInt } from './non-zero-safe-int.mjs';
 
 describe(nonZeroSafeInt, () => {
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  const targetType = nonZeroSafeInt(1 as NonZeroSafeInt);
+  const targetType = nonZeroSafeInt(asNonZeroSafeInt(1));
 
   type TargetType = TypeOf<typeof targetType>;
 

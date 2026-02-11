@@ -1,4 +1,4 @@
-import { isString, match, pipe, unknownToString } from 'ts-data-forge';
+import { Arr, isString, match, pipe, unknownToString } from 'ts-data-forge';
 
 export type ValidationErrorDetails = Readonly<
   | {
@@ -91,10 +91,9 @@ export const validationErrorToMessage = (
   error: ValidationError,
   maxLengthToPrintActualValue: number = 20,
 ): string => {
-  const pathPrefix =
-    error.path.length > 0
-      ? (`Error at ${error.path.join('.')}: ` as const)
-      : 'Error: ';
+  const pathPrefix = Arr.isNonEmpty(error.path)
+    ? (`Error at ${error.path.join('.')}: ` as const)
+    : 'Error: ';
 
   const detailsMessage = createDetailsMessage(
     error,

@@ -1,4 +1,4 @@
-import { isString } from 'ts-data-forge';
+import { Arr, isString } from 'ts-data-forge';
 import { refine } from '../other-types/index.mjs';
 import { type Type } from '../type.mjs';
 import { createPrimitiveType } from '../utils/index.mjs';
@@ -20,7 +20,10 @@ export function string<C extends Constraints>(
     is: isString,
   });
 
-  if (constraints === undefined || Object.keys(constraints).length === 0) {
+  if (
+    constraints === undefined ||
+    Arr.isArrayOfLength(Object.keys(constraints), 0)
+  ) {
     return baseType;
   }
 

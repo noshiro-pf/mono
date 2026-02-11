@@ -60,7 +60,7 @@ export const SetType = <T extends Type<unknown>>(
       }
     });
 
-    if (errors.length > 0) {
+    if (Arr.isNonEmpty(errors)) {
       return Result.err(errors);
     }
 

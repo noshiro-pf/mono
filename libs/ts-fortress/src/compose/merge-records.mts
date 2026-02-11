@@ -53,7 +53,7 @@ export const mergeRecords = <
       }
     });
 
-    if (errors.length > 0) {
+    if (Arr.isNonEmpty(errors)) {
       return Result.err(errors);
     }
 

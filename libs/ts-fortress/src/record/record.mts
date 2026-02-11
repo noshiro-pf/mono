@@ -1,4 +1,11 @@
-import { Arr, isRecord, memoizeFunction, Result, tp } from 'ts-data-forge';
+import {
+  Arr,
+  hasKey,
+  isRecord,
+  memoizeFunction,
+  Result,
+  tp,
+} from 'ts-data-forge';
 import {
   type ExcessPropertyBehavior,
   type ExcessPropertyFillBehavior,
@@ -90,7 +97,7 @@ export const record = <
     const defaultErrors: readonly ValidationError[] = Arr.generate(
       function* () {
         for (const [k, valueType] of Object.entries(shape)) {
-          if (!Object.hasOwn(a, k)) {
+          if (!hasKey(a, k)) {
             if (shape[k]?.optional !== true) {
               yield {
                 path: [k],
@@ -124,13 +131,13 @@ export const record = <
 
     switch (excessPropertyValidation) {
       case 'allow':
-        return defaultErrors.length > 0
+        return Arr.isNonEmpty(defaultErrors)
           ? Result.err(defaultErrors)
           : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             Result.ok(a as T);
 
       case 'strip':
-        return defaultErrors.length > 0
+        return Arr.isNonEmpty(defaultErrors)
           ? Result.err(defaultErrors)
           : Result.ok(stripExcessProperties(a));
 
@@ -154,7 +161,7 @@ export const record = <
         // Combine all errors
         const allErrors = [...defaultErrors, ...excessErrors] as const;
 
-        return allErrors.length > 0
+        return Arr.isNonEmpty(allErrors)
           ? Result.err(allErrors)
           : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
             Result.ok(a as T);
@@ -177,7 +184,7 @@ export const record = <
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return Object.fromEntries([
           ...Object.entries(shape).map(([k, v]) => {
-            if (Object.hasOwn(a, k)) {
+            if (hasKey(a, k)) {
               const value = a[k];
 
               // For optional fields, if the value is undefined, keep it as undefined
@@ -199,7 +206,7 @@ export const record = <
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return Object.fromEntries(
           Object.entries(shape).map(([k, v]) => {
-            if (Object.hasOwn(a, k)) {
+            if (hasKey(a, k)) {
               const value = a[k];
 
               // For optional fields, if the value is undefined, keep it as undefined

@@ -1,11 +1,10 @@
-import { expectType, Result } from 'ts-data-forge';
+import { asPositiveFiniteNumber, expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { positiveFiniteNumber } from './positive-finite-number.mjs';
 
 describe(positiveFiniteNumber, () => {
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  const targetType = positiveFiniteNumber(1.5 as PositiveFiniteNumber);
+  const targetType = positiveFiniteNumber(asPositiveFiniteNumber(1.5));
 
   type TargetType = TypeOf<typeof targetType>;
 

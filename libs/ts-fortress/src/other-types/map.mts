@@ -88,7 +88,7 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
       }
     });
 
-    if (errors.length > 0) {
+    if (Arr.isNonEmpty(errors)) {
       return Result.err(errors);
     }
 

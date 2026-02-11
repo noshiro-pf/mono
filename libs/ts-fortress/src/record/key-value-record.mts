@@ -86,7 +86,7 @@ export const keyValueRecord = <K extends Type<string>, V extends Type<unknown>>(
       }
     });
 
-    if (errors.length > 0) {
+    if (Arr.isNonEmpty(errors)) {
       return Result.err(errors);
     }
 

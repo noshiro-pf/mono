@@ -97,7 +97,7 @@
     "conventional-changelog-conventionalcommits": "9.1.0",
     "cspell": "9.6.3",
     "eslint": "9.39.2",
-    "eslint-config-typed": "4.6.1",
+    "eslint-config-typed": "4.6.2",
     "fast-glob": "3.3.3",
     "fp-ts": "2.16.11",
     "github-settings-as-code": "1.1.2",
