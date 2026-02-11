@@ -19,7 +19,12 @@ export const expandBooleanObjectProperties = (
       booleanObjectDef.type === 'object' &&
       booleanObjectDef.additionalProperties !== undefined
     ) {
-      const propertyKeys = ['default', 'named', 'namespace', 'unassigned'];
+      const propertyKeys = [
+        'default',
+        'named',
+        'namespace',
+        'unassigned',
+      ] as const;
 
       const mut_properties: Record<string, JSONSchema4> = {};
 

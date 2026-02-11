@@ -57,28 +57,31 @@ export const noHiddenTypeAssertions = createRule({
       const next = isTypeReferenceNode(type)
         ? (type.typeArguments ?? [])
         : isConditionalTypeNode(type)
-          ? [type.checkType, type.trueType, type.falseType]
+          ? ([type.checkType, type.trueType, type.falseType] as const)
           : isIndexedAccessTypeNode(type)
-            ? [type.objectType, type.indexType]
+            ? ([type.objectType, type.indexType] as const)
             : isFunctionTypeNode(type)
-              ? [type.type, ...parametersToTypeNodes(type.parameters, depth)]
+              ? ([
+                  type.type,
+                  ...parametersToTypeNodes(type.parameters, depth),
+                ] as const)
               : isTupleTypeNode(type)
                 ? type.elements
                 : isNamedTupleMember(type)
-                  ? [type.type]
+                  ? ([type.type] as const)
                   : isTypeLiteralNode(type)
                     ? type.members.flatMap((m) =>
                         hasTypeNode(m) ? [m.type] : [],
                       )
                     : isArrayTypeNode(type)
-                      ? [type.elementType]
+                      ? ([type.elementType] as const)
                       : isTypeOperatorNode(type)
-                        ? [type.type]
+                        ? ([type.type] as const)
                         : isUnionTypeNode(type)
                           ? type.types
                           : isIntersectionTypeNode(type)
                             ? type.types
-                            : [];
+                            : ([] as const);
 
       return [type, ...next.flatMap(explodeTypeNode)] as const;
     };

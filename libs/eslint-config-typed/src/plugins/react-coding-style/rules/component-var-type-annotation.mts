@@ -34,7 +34,7 @@ export const componentVarTypeAnnotationRule: TSESLint.RuleModule<MessageIds> = {
     },
   }),
   defaultOptions: [],
-};
+} as const;
 
 const isReactFunctionalComponentReference = (
   node: DeepReadonly<TSESTree.EntityName>,

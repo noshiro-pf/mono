@@ -128,4 +128,4 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;

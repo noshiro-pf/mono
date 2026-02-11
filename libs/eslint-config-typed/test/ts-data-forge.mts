@@ -51,7 +51,7 @@ import { noop } from './noop.mjs';
 }
 
 {
-  const xs = [1, 2, 3];
+  const xs = [1, 2, 3] as readonly number[];
 
   // eslint-disable-next-line ts-data-forge/prefer-arr-sum
   const sum = xs.reduce((a, b) => a + b, 0);
@@ -60,7 +60,7 @@ import { noop } from './noop.mjs';
 }
 
 {
-  const xs = [0, 0, 0];
+  const xs = [0, 0, 0] as readonly number[];
 
   // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
   if (xs.length === 3) {
@@ -69,7 +69,7 @@ import { noop } from './noop.mjs';
 }
 
 {
-  const xs = [0, 0, 0];
+  const xs = [0, 0, 0] as readonly number[];
 
   // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-at-least-length
   if (xs.length >= 3) {
@@ -79,7 +79,7 @@ import { noop } from './noop.mjs';
 
 {
   // eslint-disable-next-line @typescript-eslint/no-restricted-types
-  const u: object = {};
+  const u: object = {} as const;
 
   // eslint-disable-next-line ts-data-forge/prefer-is-record-and-has-key
   if (Object.hasOwn(u, 'key')) {

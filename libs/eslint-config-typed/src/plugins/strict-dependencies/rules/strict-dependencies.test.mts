@@ -67,7 +67,7 @@ const runRule = (
         [`${pluginName}/${ruleId}`]: ['error', ...options],
       },
     },
-  ];
+  ] as const;
 
   return linter.verify(code, config, filename);
 };

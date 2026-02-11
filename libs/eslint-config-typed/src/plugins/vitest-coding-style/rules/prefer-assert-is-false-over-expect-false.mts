@@ -72,4 +72,4 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
       },
     };
   },
-};
+} as const;

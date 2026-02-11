@@ -125,25 +125,23 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
               fix: (fixer) => {
                 const replacement = `(isRecord(${objText}) && hasKey(${objText}, ${keyText}))`;
 
-                const importsToAdd: string[] = [];
+                const mut_importsToAdd: string[] = [];
 
                 if (!hasIsRecordImport) {
-                  // eslint-disable-next-line functional/immutable-data
-                  importsToAdd.push('isRecord');
+                  mut_importsToAdd.push('isRecord');
                 }
 
                 if (!hasHasKeyImport) {
-                  // eslint-disable-next-line functional/immutable-data
-                  importsToAdd.push('hasKey');
+                  mut_importsToAdd.push('hasKey');
                 }
 
                 const importFixes =
-                  index === 0 && importsToAdd.length > 0
+                  index === 0 && mut_importsToAdd.length > 0
                     ? buildImportFixes(
                         fixer,
                         program,
                         tsDataForgeImport,
-                        importsToAdd,
+                        mut_importsToAdd,
                       )
                     : [];
 
@@ -155,4 +153,4 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
       };
     },
     defaultOptions: [],
-  };
+  } as const;

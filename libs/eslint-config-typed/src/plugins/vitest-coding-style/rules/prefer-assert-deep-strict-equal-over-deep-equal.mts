@@ -39,4 +39,4 @@ export const preferAssertDeepStrictEqualOverDeepEqualRule: TSESLint.RuleModule<
       }
     },
   }),
-};
+} as const;

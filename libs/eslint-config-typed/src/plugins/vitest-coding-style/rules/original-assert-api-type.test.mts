@@ -3,6 +3,7 @@ import { expectType } from 'ts-data-forge';
 import { type assert as originalAssert } from 'vitest';
 
 test('original assert exposes only supported APIs', () => {
+  // transformer-ignore-next-line
   expectType<
     StrictExclude<
       keyof typeof originalAssert,

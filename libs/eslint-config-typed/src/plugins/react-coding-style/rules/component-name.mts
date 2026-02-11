@@ -96,4 +96,4 @@ export const componentNameRule: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;

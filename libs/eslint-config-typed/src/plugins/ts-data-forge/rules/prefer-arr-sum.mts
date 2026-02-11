@@ -266,4 +266,4 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;

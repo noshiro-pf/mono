@@ -18,7 +18,7 @@ const isReactMemberExpression = (
  * Check if the given identifier is imported from "react"
  */
 const isImportedFromReact = (
-  context: DeepReadonly<TSESLint.RuleContext<string, readonly unknown[]>>,
+  context: DeepReadonly<TSESLint.RuleContext<string, unknown[]>>,
   identifierName: string,
 ): boolean => {
   const sourceCode = context.sourceCode;
@@ -32,7 +32,7 @@ const isImportedFromReact = (
   }
 
   // Search through all scopes for the variable
-  const scopes = [globalScope, ...globalScope.childScopes];
+  const scopes = [globalScope, ...globalScope.childScopes] as const;
 
   const variables = scopes
     .map((scope) => scope.set.get(identifierName))
@@ -79,7 +79,7 @@ const isImportedFromReact = (
  * Verifies that the identifier is actually imported from "react".
  */
 export const isReactApiCall = (
-  context: DeepReadonly<TSESLint.RuleContext<string, readonly unknown[]>>,
+  context: DeepReadonly<TSESLint.RuleContext<string, unknown[]>>,
   node: DeepReadonly<TSESTree.CallExpression>,
   apiName: string,
 ): boolean => {

@@ -64,4 +64,4 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
       }
     },
   }),
-};
+} as const;

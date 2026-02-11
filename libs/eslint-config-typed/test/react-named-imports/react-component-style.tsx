@@ -1,4 +1,5 @@
 // cspell-ignore-file
+/* transformer-ignore convert-to-readonly  */
 
 import { memo, useMemo, type JSX, type MemoExoticComponent } from 'react';
 import { Arr } from 'ts-data-forge';

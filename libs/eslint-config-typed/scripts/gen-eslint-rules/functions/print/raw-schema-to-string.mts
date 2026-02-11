@@ -7,8 +7,8 @@ export const rawSchemaToString = (
   rawSchema: JSONSchema4 | readonly JSONSchema4[] | undefined,
 ): readonly string[] =>
   rawSchema === undefined
-    ? []
-    : [
+    ? ([] as const)
+    : ([
         '  /**',
         '   * ### schema',
         '   *',
@@ -20,4 +20,4 @@ export const rawSchemaToString = (
           .join('\n'),
         '  * ```',
         '  */',
-      ];
+      ] as const);

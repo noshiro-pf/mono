@@ -16,4 +16,4 @@ export default [
   ...eslintConfigForReact(),
   eslintConfigForVitest(),
   eslintConfigForTestingLibrary(),
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];

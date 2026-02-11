@@ -65,4 +65,4 @@ export const reactMemoPropsArgumentNameRule: TSESLint.RuleModule<MessageIds> = {
     },
   }),
   defaultOptions: [],
-};
+} as const;

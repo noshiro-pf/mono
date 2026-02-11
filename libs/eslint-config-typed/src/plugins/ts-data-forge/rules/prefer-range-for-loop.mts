@@ -176,4 +176,4 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;

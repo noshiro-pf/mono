@@ -66,7 +66,9 @@ export const expandMustMatchPatternProperties = (
 
         const propertyNames =
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          mut_objectOption['propertyNames'] as { enum: readonly string[] };
+          mut_objectOption['propertyNames'] as Readonly<{
+            enum: readonly string[];
+          }>;
 
         for (const propName of propertyNames.enum) {
           if (typeof propName === 'string') {

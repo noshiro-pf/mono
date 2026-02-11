@@ -29,4 +29,4 @@ export default [
       ],
     }),
   },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];

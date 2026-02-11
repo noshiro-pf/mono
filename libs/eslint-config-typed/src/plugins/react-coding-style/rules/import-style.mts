@@ -110,4 +110,4 @@ export const importStyleRule: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;

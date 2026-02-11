@@ -25,13 +25,15 @@ export const addDefaultValuesToDescription = (
     if (prop.default !== undefined) {
       const defaultValue =
         typeof prop.default === 'string'
-          ? `"${prop.default}"`
+          ? (`"${prop.default}"` as const)
           : Arr.isArray(prop.default) && prop.default.length === 0
             ? '[]'
             : JSON.stringify(prop.default);
 
       const existingDescription =
-        prop.description !== undefined ? `${prop.description}\n\n` : '';
+        prop.description !== undefined
+          ? (`${prop.description}\n\n` as const)
+          : '';
 
       mut_newProperties[key] = {
         ...prop,

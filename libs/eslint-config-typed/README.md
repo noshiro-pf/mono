@@ -244,7 +244,7 @@ export default [
             ],
         }),
     },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 ### withDefaultOption utility
@@ -293,7 +293,7 @@ export default [
             ],
         }),
     },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 ### TypeScript Configuration Files
@@ -316,7 +316,7 @@ export default [
         packageDirs: [thisDir],
     }),
     eslintConfigForVitest(),
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 For details, see <https://eslint.org/docs/latest/use/configure/configuration-files#typescript-configuration-files>.
@@ -356,7 +356,7 @@ export default [
             'import-x/no-extraneous-dependencies': 'off',
         }),
     },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 ### Node.js TypeScript Project
@@ -383,7 +383,7 @@ export default [
             'no-console': 'off',
         }),
     },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 ### React + Testing Libraries
@@ -407,7 +407,7 @@ export default [
     ...eslintConfigForReact(),
     eslintConfigForVitest(),
     eslintConfigForTestingLibrary(),
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 ## VS Code Integration
@@ -586,7 +586,7 @@ export default [
             ],
         }),
     },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 #### vitest-coding-style
@@ -773,7 +773,7 @@ export default [
             ],
         }),
     },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 ### Use RulesOptions Types
@@ -794,7 +794,7 @@ export const restrictedSyntax = [
         message:
             'The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`.',
     },
-] satisfies EslintRulesOption['no-restricted-syntax'];
+] as const satisfies EslintRulesOption['no-restricted-syntax'];
 ```
 
 ```tsx
@@ -859,7 +859,7 @@ export default [
             'import-x/no-unassigned-import': 'off',
         }),
     },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];
 ```
 
 ## Troubleshooting

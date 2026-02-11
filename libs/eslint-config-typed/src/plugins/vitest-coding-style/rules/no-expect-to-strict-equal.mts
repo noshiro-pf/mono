@@ -82,17 +82,19 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
       },
     };
   },
-};
+} as const;
 
 const isToStrictEqualInvocation = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.CallExpression,
-): node is TSESTree.CallExpression & {
-  callee: TSESTree.MemberExpression & {
-    object: TSESTree.CallExpression;
-    property: TSESTree.Identifier;
-  };
-} => {
+): node is TSESTree.CallExpression &
+  Readonly<{
+    callee: TSESTree.MemberExpression &
+      Readonly<{
+        object: TSESTree.CallExpression;
+        property: TSESTree.Identifier;
+      }>;
+  }> => {
   if (
     node.callee.type !== AST_NODE_TYPES.MemberExpression ||
     node.optional ||
@@ -112,9 +114,10 @@ const isToStrictEqualInvocation = (
 const isExpectCall = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: TSESTree.CallExpression,
-): node is TSESTree.CallExpression & {
-  callee: TSESTree.Identifier;
-} =>
+): node is TSESTree.CallExpression &
+  Readonly<{
+    callee: TSESTree.Identifier;
+  }> =>
   node.callee.type === AST_NODE_TYPES.Identifier &&
   node.callee.name === 'expect';
 

@@ -78,7 +78,7 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
     };
   },
   defaultOptions: [],
-};
+} as const;
 
 type ReportContext = Readonly<{
   arrowFunction: DeepReadonly<TSESTree.ArrowFunctionExpression>;
@@ -90,7 +90,7 @@ type ReportContext = Readonly<{
 }>;
 
 const report = (
-  context: DeepReadonly<TSESLint.RuleContext<MessageIds, readonly []>>,
+  context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,
   {
     arrowFunction,
     callExpression,
@@ -112,7 +112,8 @@ const report = (
     )
     .join(', ');
 
-  const replacement = `${calleeText}${typeParametersText}(${remainingArgumentsText})`;
+  const replacement =
+    `${calleeText}${typeParametersText}(${remainingArgumentsText})` as const;
 
   context.report({
     node: castDeepMutable(arrowFunction),
@@ -142,7 +143,7 @@ const isSameIdentifier = (
   node.type === AST_NODE_TYPES.Identifier && node.name === expectedName;
 
 const hasOtherReferences = (
-  context: DeepReadonly<TSESLint.RuleContext<MessageIds, readonly []>>,
+  context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,
   parameterName: string,
   baseIdentifier: DeepReadonly<TSESTree.Identifier>,
 ): boolean => {
@@ -168,9 +169,10 @@ const getTypeArguments = (
 
   if (isRecord(mutableNode) && hasKey(mutableNode, 'typeArguments')) {
     return (
-      mutableNode as TSESTree.CallExpression & {
-        typeArguments?: TSESTree.TSTypeParameterInstantiation;
-      }
+      mutableNode as TSESTree.CallExpression &
+        Readonly<{
+          typeArguments?: TSESTree.TSTypeParameterInstantiation;
+        }>
     ).typeArguments;
   }
 

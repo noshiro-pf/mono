@@ -15,9 +15,9 @@ describe('vitest-coding-style', () => {
 
   const type: boolean = typeof noop === 'function';
 
-  const a = {};
+  const a = {} as const;
 
-  const b = {};
+  const b = {} as const;
 
   const foo = true as boolean;
 

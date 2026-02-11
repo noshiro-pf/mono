@@ -108,7 +108,7 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;
 
 const getBrandedNumberTypeInfo = (
   typeAnnotation: DeepReadonly<TSESTree.TypeNode>,

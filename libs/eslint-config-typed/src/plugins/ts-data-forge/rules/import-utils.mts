@@ -43,11 +43,12 @@ export const buildImportFixes = (
 ): readonly TSESLint.RuleFix[] => {
   const specifierText = requiredNames.join(', ');
 
-  const importStatement = `import { ${specifierText} } from '${TS_DATA_FORGE_MODULE}';`;
+  const importStatement =
+    `import { ${specifierText} } from '${TS_DATA_FORGE_MODULE}';` as const;
 
   const newLine = '\n';
 
-  const insertionText = `${importStatement}${newLine}`;
+  const insertionText = `${importStatement}${newLine}` as const;
 
   // Always insert at the beginning of the file
   // (organize-imports will handle merging/deduplication)

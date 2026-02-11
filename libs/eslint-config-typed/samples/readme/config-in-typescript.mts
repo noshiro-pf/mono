@@ -13,4 +13,4 @@ export default [
     packageDirs: [thisDir],
   }),
   eslintConfigForVitest(),
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];

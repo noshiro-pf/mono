@@ -40,4 +40,4 @@ export const preferAssertIsFalseOverAssertNotOkRule: TSESLint.RuleModule<
       }
     },
   }),
-};
+} as const;

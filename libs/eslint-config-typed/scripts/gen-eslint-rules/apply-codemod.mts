@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
+import {
+  convertInterfaceToTypeTransformer,
+  convertToReadonlyTransformer,
+  replaceRecordWithUnknownRecordTransformer,
+  transformSourceCode,
+} from 'ts-codemod-lib';
 import { Arr } from 'ts-data-forge';
 import 'ts-repo-utils';
-import { projectRootPath } from '../../project-root-path.mjs';
-import { convertToReadonlyTypeTransformer } from './ast-transformers/convert-to-readonly-type.mjs';
-import { convertInterfaceToTypeTransformer } from './ast-transformers/index.mjs';
-import { replaceRecordWithUnknownRecordTransformer } from './ast-transformers/replace-record-with-unknown-record.mjs';
-import { transformSourceCode } from './ast-transformers/transform-source-code.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
 
 const TYPES_RULES_DIR = path.resolve(projectRootPath, 'src/types/rules');
 
@@ -94,7 +96,7 @@ export const applyTransformationsToFile = async (
     // Transform the code with all transformers
     const transformedCode = transformSourceCode(originalCode, false, [
       convertInterfaceToTypeTransformer(),
-      convertToReadonlyTypeTransformer(),
+      convertToReadonlyTransformer(),
       replaceRecordWithUnknownRecordTransformer(),
     ]);
 

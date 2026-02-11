@@ -64,10 +64,10 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
     },
   }),
   defaultOptions: [],
-};
+} as const;
 
 const checkNodeForTypeAnnotations = (
-  context: DeepReadonly<TSESLint.RuleContext<MessageIds, readonly []>>,
+  context: DeepReadonly<TSESLint.RuleContext<MessageIds, []>>,
   node: DeepReadonly<TSESTree.Node>,
 ): void => {
   if (

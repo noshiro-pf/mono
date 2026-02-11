@@ -83,7 +83,7 @@ export const preferIsNonNullObject: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;
 
 const getNonNullObjectIdentifierName = (
   node: DeepReadonly<TSESTree.LogicalExpression>,

@@ -31,7 +31,7 @@ const reactApiRule: TSESLint.RuleModule<'reactApiDetected', readonly []> = {
       }
     },
   }),
-};
+} as const;
 
 const reactMemoArrowRule: TSESLint.RuleModule<'arrowDetected', readonly []> = {
   meta: {
@@ -58,7 +58,7 @@ const reactMemoArrowRule: TSESLint.RuleModule<'arrowDetected', readonly []> = {
       }
     },
   }),
-};
+} as const;
 
 describe('shared helpers', () => {
   tester.run('isReactApiCall', reactApiRule, {

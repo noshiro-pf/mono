@@ -130,7 +130,7 @@ export const preferArrIsArrayAtLeastLength: TSESLint.RuleModule<
     };
   },
   defaultOptions: [],
-};
+} as const;
 
 const isLengthAccess = (
   node: DeepReadonly<TSESTree.Expression>,

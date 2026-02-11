@@ -188,7 +188,7 @@ export const strictDependenciesRule: TSESLint.RuleModule<
     };
   },
   defaultOptions: [[]],
-};
+} as const;
 
 /**
  * pathのmatcher。

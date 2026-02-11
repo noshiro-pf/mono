@@ -32,7 +32,7 @@ export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
           Boolean(docs.requiresTypeChecking)
         : undefined,
     ],
-  ];
+  ] as const;
 
   const keyValuesStr: DeepReadonly<[string, string][]> = keyValue
     .filter(([_key, value]) => value != null)
@@ -57,8 +57,8 @@ export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
     '/**',
     description == null
       ? undefined
-      : ` * @description ${removeMultiLineCommentCharacter(description)}`,
-    url == null ? undefined : ` * @link ${url}`,
+      : (` * @description ${removeMultiLineCommentCharacter(description)}` as const),
+    url == null ? undefined : (` * @link ${url}` as const),
     ' *',
     ' *  ```md',
     ` *  | ${tableHeader[0].padEnd(
@@ -78,7 +78,7 @@ export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
     ),
     ' *  ```',
     ' */',
-  ];
+  ] as const;
 
   return result.filter((line) => line !== undefined).join('\n');
 };

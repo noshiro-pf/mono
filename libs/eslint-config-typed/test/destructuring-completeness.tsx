@@ -2,7 +2,7 @@ import * as React from 'react';
 import { noop } from './noop.mjs';
 
 {
-  const obj = { a: 1, b: 2, c: 3 };
+  const obj = { a: 1, b: 2, c: 3 } as const;
 
   // @check-destructuring-completeness
   // eslint-disable-next-line ts-restrictions/check-destructuring-completeness
@@ -15,11 +15,11 @@ import { noop } from './noop.mjs';
 }
 
 {
-  const obj: { a: number; b: string; c: boolean } = {
+  const obj: Readonly<{ a: number; b: string; c: boolean }> = {
     a: 1,
     b: 'hello',
     c: true,
-  };
+  } as const;
 
   // @check-destructuring-completeness
   // eslint-disable-next-line ts-restrictions/check-destructuring-completeness

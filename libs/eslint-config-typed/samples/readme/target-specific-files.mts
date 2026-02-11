@@ -29,4 +29,4 @@ export default [
       'import-x/no-unassigned-import': 'off',
     }),
   },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];

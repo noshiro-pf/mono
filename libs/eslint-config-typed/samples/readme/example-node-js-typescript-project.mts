@@ -19,4 +19,4 @@ export default [
       'no-console': 'off',
     }),
   },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];

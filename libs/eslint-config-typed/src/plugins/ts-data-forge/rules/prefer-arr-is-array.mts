@@ -76,7 +76,7 @@ export const preferArrIsArray: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;
 
 const isArrayIsArrayCall = (
   node: DeepReadonly<TSESTree.CallExpression>,

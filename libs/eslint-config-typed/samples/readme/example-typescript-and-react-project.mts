@@ -28,4 +28,4 @@ export default [
       'import-x/no-extraneous-dependencies': 'off',
     }),
   },
-] satisfies FlatConfig[];
+] satisfies readonly FlatConfig[];

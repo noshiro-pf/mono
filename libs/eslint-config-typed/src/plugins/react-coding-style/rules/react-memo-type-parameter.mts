@@ -84,7 +84,7 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
     },
   }),
   defaultOptions: [],
-};
+} as const;
 
 const isPropsTypeReference = (
   node: DeepReadonly<TSESTree.TypeNode> | undefined,

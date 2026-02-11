@@ -127,10 +127,10 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [{ ignoreName: [] }],
-};
+} as const;
 
 const normalizeNames = (
-  names: string | readonly string[] | undefined,
+  names: string | undefined | readonly string[],
 ): ReadonlySet<string> => {
   if (names === undefined) {
     return new Set();

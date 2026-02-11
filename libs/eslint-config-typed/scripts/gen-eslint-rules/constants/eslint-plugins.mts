@@ -193,7 +193,7 @@ export const eslintPlugins = {
   },
 } as const satisfies Record<
   string,
-  {
+  Readonly<{
     typeName: `${string}Rules`;
     pluginName:
       | '@typescript-eslint/eslint-plugin'
@@ -203,5 +203,5 @@ export const eslintPlugins = {
       | `eslint-plugin-${string}`;
     rulePrefix: `${string}/`;
     outputFileName: `${string}.mts`;
-  }
+  }>
 >;

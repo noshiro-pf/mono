@@ -5,7 +5,7 @@ import 'ts-repo-utils';
 import {
   applyTransformationsToFile,
   applyTypeTransformations,
-} from './codemod/apply-type-transformations.mjs';
+} from './apply-codemod.mjs';
 import { eslintPlugins } from './constants/eslint-plugins.mjs';
 import { generateRulesTypeCore } from './functions/generate-rules-type-core.mjs';
 

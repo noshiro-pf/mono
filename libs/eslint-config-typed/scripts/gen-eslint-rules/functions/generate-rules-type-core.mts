@@ -402,7 +402,7 @@ const createRulePrefix = (
     ? ''
     : rulePrefixOrNull !== undefined && rulePrefixOrNull !== ''
       ? rulePrefixOrNull
-      : `${pluginName.replace(/^eslint-plugin-/u, '')}/`;
+      : (`${pluginName.replace(/^eslint-plugin-/u, '')}/` as const);
 
 /**
  * プラグイン名から対応するルール一覧を取得する。組み込みルールとカスタムルールを統一的に扱う

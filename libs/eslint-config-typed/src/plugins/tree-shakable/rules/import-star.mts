@@ -26,7 +26,7 @@ export const importStarRule: TSESLint.RuleModule<MessageIds> = {
     },
   }),
   defaultOptions: [],
-};
+} as const;
 
 const getModuleSpecifier = (node: TSESTree.ImportNamespaceSpecifier): string =>
   node.parent.source.value;

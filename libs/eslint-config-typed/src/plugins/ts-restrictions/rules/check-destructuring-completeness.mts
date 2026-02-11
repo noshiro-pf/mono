@@ -261,7 +261,7 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
     };
   },
   defaultOptions: [{ alwaysCheckReactComponentProps: true }],
-};
+} as const;
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const getObjectTypeProperties = (type: ts.Type): readonly string[] => {
@@ -307,13 +307,13 @@ const isReactComponentFunction = (
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (argument === null || argument === undefined) return false;
 
-        const argType = (argument as { type?: string }).type;
+        const argType = (argument as Readonly<{ type?: string }>).type;
 
         return argType === 'JSXElement' || argType === 'JSXFragment';
       });
     }
 
-    const bodyType = (body as { type?: string }).type;
+    const bodyType = (body as Readonly<{ type?: string }>).type;
 
     return bodyType === 'JSXElement' || bodyType === 'JSXFragment';
   }

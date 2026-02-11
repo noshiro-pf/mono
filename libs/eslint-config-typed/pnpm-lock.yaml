@@ -240,6 +240,9 @@ importers:
       semantic-release:
         specifier: 25.0.3
         version: 25.0.3(typescript@5.9.3)
+      ts-codemod-lib:
+        specifier: ^2.0.3
+        version: 2.0.3
       ts-fortress:
         specifier: 6.2.5
         version: 6.2.5(typescript@5.9.3)
@@ -4030,6 +4033,11 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  ts-codemod-lib@2.0.3:
+    resolution: {integrity: sha512-0I223+iBjOP/xQpODMl45+dE1uYbujOZOo04xtDiOCf8jUhYiNhr092V5+BzJBhnmRYRspOTh2YKlEQS1kYZiA==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
+    hasBin: true
 
   ts-data-forge@6.4.0:
     resolution: {integrity: sha512-aOroHGSY4BtfxHa29hKKDn82Pu1HFcqZwHMcA8/nRdztXEwXz2NfYN2xBKvRaE6RJzRgNiitAdZGrXpyTOSp/Q==}
@@ -8487,6 +8495,15 @@ snapshots:
   ts-api-utils@2.4.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
+
+  ts-codemod-lib@2.0.3:
+    dependencies:
+      cmd-ts: 0.14.3
+      dedent: 1.7.1
+      ts-morph: 27.0.2
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
 
   ts-data-forge@6.4.0(typescript@5.9.3):
     dependencies:

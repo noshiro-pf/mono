@@ -4,15 +4,16 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 
-type FixWithOption =
-  | Readonly<{
+type FixWithOption = Readonly<
+  | {
       kind: 'type';
       name: string;
-    }>
-  | Readonly<{
+    }
+  | {
       kind: 'function';
       name: string;
-    }>;
+    }
+>;
 
 type RestrictedCastOption =
   | string
@@ -251,4 +252,4 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
   defaultOptions: [],
-};
+} as const;

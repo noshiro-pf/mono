@@ -28,4 +28,4 @@ export const banUseImperativeHandleHook: TSESLint.RuleModule<MessageIds> = {
     },
   }),
   defaultOptions: [],
-};
+} as const;

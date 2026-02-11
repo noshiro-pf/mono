@@ -11,4 +11,4 @@ export const restrictedSyntax = [
     message:
       'The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`.',
   },
-] satisfies EslintRulesOption['no-restricted-syntax'];
+] as const satisfies EslintRulesOption['no-restricted-syntax'];

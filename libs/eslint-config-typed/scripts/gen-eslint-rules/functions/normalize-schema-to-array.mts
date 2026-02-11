@@ -8,4 +8,8 @@ export const normalizeSchemaToArray = (
   schema: JSONSchema4 | readonly JSONSchema4[] | undefined,
 ): readonly JSONSchema4[] =>
   // Some plugins violate the JSONSchema4 | JSONSchema4[] | undefined contract, so absorb that inconsistency here.
-  typeof schema !== 'object' ? [] : Arr.isArray(schema) ? schema : [schema];
+  typeof schema !== 'object'
+    ? ([] as const)
+    : Arr.isArray(schema)
+      ? schema
+      : ([schema] as const);

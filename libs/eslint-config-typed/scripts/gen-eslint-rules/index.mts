@@ -1,4 +1,4 @@
-export * from './codemod/index.mjs';
+export * from './apply-codemod.mjs';
 export * from './constants/index.mjs';
 export * from './functions/index.mjs';
 export * from './main.mjs';

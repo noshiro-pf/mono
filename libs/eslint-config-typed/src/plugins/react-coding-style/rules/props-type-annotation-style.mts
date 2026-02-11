@@ -50,4 +50,4 @@ export const propsTypeAnnotationStyleRule: TSESLint.RuleModule<MessageIds> = {
     },
   }),
   defaultOptions: [],
-};
+} as const;
