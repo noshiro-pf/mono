@@ -36,6 +36,7 @@ type Props = Readonly<{
   bar: string;
 }>;
 
+// eslint-disable-next-line react-refresh/only-export-components
 const PropsDestructuring = React.memo<Props>((props) => {
   // eslint-disable-next-line ts-restrictions/check-destructuring-completeness
   const { foo } = props;

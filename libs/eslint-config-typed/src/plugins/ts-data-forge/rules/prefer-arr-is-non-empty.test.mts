@@ -21,6 +21,13 @@ describe('prefer-arr-is-non-empty', () => {
   tester.run('prefer-arr-is-non-empty', preferArrIsNonEmpty, {
     valid: [
       {
+        name: 'ignores non-array types',
+        code: dedent`
+          const str = "hello";
+          const ok = str.length > 0;
+        `,
+      },
+      {
         name: 'ignores other comparisons',
         code: dedent`
           const xs = [1, 2, 3];

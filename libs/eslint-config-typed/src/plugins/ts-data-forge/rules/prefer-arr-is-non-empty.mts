@@ -35,6 +35,8 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
 
     const tsDataForgeImport = getTsDataForgeImport(program);
 
+    const services = context.sourceCode.parserServices;
+
     const mut_nodesToFix: {
       node: TSESTree.BinaryExpression;
       arrayExpression: TSESTree.Expression;
@@ -62,9 +64,32 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
+        const arrayExpression = lengthSide.object;
+
+        // Check if arrayExpression is actually an array type
+        if (services?.program !== undefined && services.program !== null) {
+          const checker = services.program.getTypeChecker();
+
+          const tsNode = services.esTreeNodeToTSNodeMap?.get(arrayExpression);
+
+          if (tsNode !== undefined) {
+            const type = checker.getTypeAtLocation(tsNode);
+
+            // Check if it's an array type or tuple type
+            const isArrayType =
+              checker.isArrayType(type) || checker.isTupleType(type);
+
+            if (!isArrayType) return;
+          } else {
+            return;
+          }
+        } else {
+          return;
+        }
+
         mut_nodesToFix.push({
           node,
-          arrayExpression: lengthSide.object,
+          arrayExpression,
         });
       },
       'Program:exit': () => {

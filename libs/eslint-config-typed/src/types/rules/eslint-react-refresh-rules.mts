@@ -16,6 +16,12 @@ namespace OnlyExportComponents {
    *   {
    *     "type": "object",
    *     "properties": {
+   *       "extraHOCs": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
    *       "allowExportNames": {
    *         "type": "array",
    *         "items": {
@@ -24,12 +30,6 @@ namespace OnlyExportComponents {
    *       },
    *       "allowConstantExport": {
    *         "type": "boolean"
-   *       },
-   *       "customHOCs": {
-   *         "type": "array",
-   *         "items": {
-   *           "type": "string"
-   *         }
    *       },
    *       "checkJS": {
    *         "type": "boolean"
@@ -41,9 +41,9 @@ namespace OnlyExportComponents {
    * ```
    */
   export type Options = Readonly<{
+    extraHOCs?: readonly string[];
     allowExportNames?: readonly string[];
     allowConstantExport?: boolean;
-    customHOCs?: readonly string[];
     checkJS?: boolean;
   }>;
 

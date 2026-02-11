@@ -263,8 +263,7 @@ namespace ArrowParens {
    *     "type": "object",
    *     "properties": {
    *       "requireForBlockBody": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -275,7 +274,6 @@ namespace ArrowParens {
   export type Options0 = 'always' | 'as-needed';
 
   export type Options1 = Readonly<{
-    /** @default false */
     requireForBlockBody?: boolean;
   }>;
 
@@ -309,12 +307,10 @@ namespace ArrowSpacing {
    *     "type": "object",
    *     "properties": {
    *       "before": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "after": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -323,9 +319,7 @@ namespace ArrowSpacing {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
     before?: boolean;
-    /** @default true */
     after?: boolean;
   }>;
 
@@ -404,8 +398,7 @@ namespace BraceStyle {
    *     "type": "object",
    *     "properties": {
    *       "allowSingleLine": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -416,7 +409,6 @@ namespace BraceStyle {
   export type Options0 = '1tbs' | 'stroustrup' | 'allman';
 
   export type Options1 = Readonly<{
-    /** @default false */
     allowSingleLine?: boolean;
   }>;
 
@@ -579,12 +571,10 @@ namespace CommaSpacing {
    *     "type": "object",
    *     "properties": {
    *       "before": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "after": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -593,9 +583,7 @@ namespace CommaSpacing {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     before?: boolean;
-    /** @default true */
     after?: boolean;
   }>;
 
@@ -689,8 +677,7 @@ namespace ComputedPropertySpacing {
    *     "type": "object",
    *     "properties": {
    *       "enforceForClassMembers": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -701,7 +688,6 @@ namespace ComputedPropertySpacing {
   export type Options0 = 'always' | 'never';
 
   export type Options1 = Readonly<{
-    /** @default true */
     enforceForClassMembers?: boolean;
   }>;
 
@@ -2015,8 +2001,7 @@ namespace Indent {
    *     "properties": {
    *       "SwitchCase": {
    *         "type": "integer",
-   *         "minimum": 0,
-   *         "default": 0
+   *         "minimum": 0
    *       },
    *       "VariableDeclarator": {
    *         "oneOf": [
@@ -2280,8 +2265,7 @@ namespace Indent {
    *         ]
    *       },
    *       "flatTernaryExpressions": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "offsetTernaryExpressions": {
    *         "oneOf": [
@@ -2303,8 +2287,7 @@ namespace Indent {
    *             },
    *             "additionalProperties": false
    *           }
-   *         ],
-   *         "default": false
+   *         ]
    *       },
    *       "offsetTernaryExpressionsOffsetCallExpressions": {
    *         "type": "boolean"
@@ -2320,12 +2303,10 @@ namespace Indent {
    *         }
    *       },
    *       "ignoreComments": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "tabLength": {
-   *         "type": "number",
-   *         "default": 4
+   *         "type": "number"
    *       }
    *     },
    *     "additionalProperties": false
@@ -2336,7 +2317,6 @@ namespace Indent {
   export type Options0 = 'tab' | number;
 
   export type Options1 = Readonly<{
-    /** @default 0 */
     SwitchCase?: number;
     VariableDeclarator?:
       | (number | ('first' | 'off'))
@@ -2368,9 +2348,7 @@ namespace Indent {
     ArrayExpression?: number | ('first' | 'off');
     ObjectExpression?: number | ('first' | 'off');
     ImportDeclaration?: number | ('first' | 'off');
-    /** @default false */
     flatTernaryExpressions?: boolean;
-    /** @default false */
     offsetTernaryExpressions?:
       | boolean
       | Readonly<{
@@ -2380,9 +2358,7 @@ namespace Indent {
         }>;
     offsetTernaryExpressionsOffsetCallExpressions?: boolean;
     ignoredNodes?: readonly string[];
-    /** @default false */
     ignoreComments?: boolean;
-    /** @default 4 */
     tabLength?: number;
   }>;
 
@@ -2610,8 +2586,7 @@ namespace JsxClosingTagLocation {
    *         "enum": [
    *           "tag-aligned",
    *           "line-aligned"
-   *         ],
-   *         "default": "tag-aligned"
+   *         ]
    *       }
    *     ]
    *   }
@@ -3357,11 +3332,9 @@ namespace JsxNewline {
    *     "type": "object",
    *     "properties": {
    *       "prevent": {
-   *         "default": false,
    *         "type": "boolean"
    *       },
    *       "allowMultilines": {
-   *         "default": false,
    *         "type": "boolean"
    *       }
    *     },
@@ -3388,9 +3361,7 @@ namespace JsxNewline {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     prevent?: boolean;
-    /** @default false */
     allowMultilines?: boolean;
   }>;
 
@@ -3432,9 +3403,6 @@ namespace JsxOneExpressionPerLine {
    *           "non-jsx"
    *         ]
    *       }
-   *     },
-   *     "default": {
-   *       "allow": "none"
    *     },
    *     "additionalProperties": false
    *   }
@@ -3586,11 +3554,9 @@ namespace JsxSelfClosingComp {
    *     "type": "object",
    *     "properties": {
    *       "component": {
-   *         "default": true,
    *         "type": "boolean"
    *       },
    *       "html": {
-   *         "default": true,
    *         "type": "boolean"
    *       }
    *     },
@@ -3600,9 +3566,7 @@ namespace JsxSelfClosingComp {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
     component?: boolean;
-    /** @default true */
     html?: boolean;
   }>;
 
@@ -3649,8 +3613,7 @@ namespace JsxSortProps {
    *           "ignore",
    *           "first",
    *           "last"
-   *         ],
-   *         "default": "ignore"
+   *         ]
    *       },
    *       "ignoreCase": {
    *         "type": "boolean"
@@ -3678,8 +3641,7 @@ namespace JsxSortProps {
    *         }
    *       },
    *       "locale": {
-   *         "type": "string",
-   *         "default": "auto"
+   *         "type": "string"
    *       }
    *     },
    *     "additionalProperties": false
@@ -3747,12 +3709,6 @@ namespace JsxTagSpacing {
    *           "allow"
    *         ]
    *       }
-   *     },
-   *     "default": {
-   *       "closingSlash": "never",
-   *       "beforeSelfClosing": "always",
-   *       "afterOpening": "never",
-   *       "beforeClosing": "allow"
    *     },
    *     "additionalProperties": false
    *   }
@@ -4264,12 +4220,10 @@ namespace KeywordSpacing {
    *     "type": "object",
    *     "properties": {
    *       "before": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "after": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "overrides": {
    *         "type": "object",
@@ -5172,9 +5126,7 @@ namespace KeywordSpacing {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
     before?: boolean;
-    /** @default true */
     after?: boolean;
     overrides?: Readonly<{
       abstract?: Readonly<{
@@ -5611,28 +5563,22 @@ namespace LinesAroundComment {
    *     "type": "object",
    *     "properties": {
    *       "beforeBlockComment": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "afterBlockComment": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "beforeLineComment": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "afterLineComment": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowBlockStart": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowBlockEnd": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowClassStart": {
    *         "type": "boolean"
@@ -5692,17 +5638,11 @@ namespace LinesAroundComment {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
     beforeBlockComment?: boolean;
-    /** @default false */
     afterBlockComment?: boolean;
-    /** @default false */
     beforeLineComment?: boolean;
-    /** @default false */
     afterLineComment?: boolean;
-    /** @default false */
     allowBlockStart?: boolean;
-    /** @default false */
     allowBlockEnd?: boolean;
     allowClassStart?: boolean;
     allowClassEnd?: boolean;
@@ -5810,12 +5750,10 @@ namespace LinesBetweenClassMembers {
    *     "type": "object",
    *     "properties": {
    *       "exceptAfterSingleLine": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "exceptAfterOverload": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -5842,9 +5780,7 @@ namespace LinesBetweenClassMembers {
     | ('always' | 'never');
 
   export type Options1 = Readonly<{
-    /** @default false */
     exceptAfterSingleLine?: boolean;
-    /** @default true */
     exceptAfterOverload?: boolean;
   }>;
 
@@ -6295,8 +6231,7 @@ namespace MaxStatementsPerLine {
    *     "properties": {
    *       "max": {
    *         "type": "integer",
-   *         "minimum": 1,
-   *         "default": 1
+   *         "minimum": 1
    *       },
    *       "ignoredNodes": {
    *         "type": "array",
@@ -6336,7 +6271,6 @@ namespace MaxStatementsPerLine {
    * ```
    */
   export type Options = Readonly<{
-    /** @default 1 */
     max?: number;
     ignoredNodes?: readonly (
       | 'BreakStatement'
@@ -6638,8 +6572,7 @@ namespace MultilineTernary {
    *     "type": "object",
    *     "properties": {
    *       "ignoreJSX": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6650,7 +6583,6 @@ namespace MultilineTernary {
   export type Options0 = 'always' | 'always-multiline' | 'never';
 
   export type Options1 = Readonly<{
-    /** @default false */
     ignoreJSX?: boolean;
   }>;
 
@@ -6723,8 +6655,7 @@ namespace NewlinePerChainedCall {
    *       "ignoreChainWithDepth": {
    *         "type": "integer",
    *         "minimum": 1,
-   *         "maximum": 10,
-   *         "default": 2
+   *         "maximum": 10
    *       }
    *     },
    *     "additionalProperties": false
@@ -6733,7 +6664,6 @@ namespace NewlinePerChainedCall {
    * ```
    */
   export type Options = Readonly<{
-    /** @default 2 */
     ignoreChainWithDepth?: number;
   }>;
 
@@ -6766,12 +6696,10 @@ namespace NoConfusingArrow {
    *     "type": "object",
    *     "properties": {
    *       "allowParens": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "onlyOneSimpleParam": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -6780,9 +6708,7 @@ namespace NoConfusingArrow {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
     allowParens?: boolean;
-    /** @default false */
     onlyOneSimpleParam?: boolean;
   }>;
 
@@ -7044,8 +6970,7 @@ namespace NoMixedOperators {
    *         "uniqueItems": true
    *       },
    *       "allowSamePrecedence": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7143,7 +7068,6 @@ namespace NoMixedOperators {
         | '??'
       )[],
     ])[];
-    /** @default true */
     allowSamePrecedence?: boolean;
   }>;
 
@@ -7227,12 +7151,10 @@ namespace NoMultiSpaces {
    *         "additionalProperties": false
    *       },
    *       "ignoreEOLComments": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "includeTabs": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7242,9 +7164,7 @@ namespace NoMultiSpaces {
    */
   export type Options = Readonly<{
     exceptions?: Readonly<Record<string, boolean>>;
-    /** @default false */
     ignoreEOLComments?: boolean;
-    /** @default true */
     includeTabs?: boolean;
   }>;
 
@@ -7331,8 +7251,7 @@ namespace NoTabs {
    *     "type": "object",
    *     "properties": {
    *       "allowIndentationTabs": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7341,7 +7260,6 @@ namespace NoTabs {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     allowIndentationTabs?: boolean;
   }>;
 
@@ -7374,12 +7292,10 @@ namespace NoTrailingSpaces {
    *     "type": "object",
    *     "properties": {
    *       "skipBlankLines": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreComments": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7388,9 +7304,7 @@ namespace NoTrailingSpaces {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     skipBlankLines?: boolean;
-    /** @default false */
     ignoreComments?: boolean;
   }>;
 
@@ -8017,8 +7931,7 @@ namespace ObjectPropertyNewline {
    *     "type": "object",
    *     "properties": {
    *       "allowAllPropertiesOnSameLine": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -8027,7 +7940,6 @@ namespace ObjectPropertyNewline {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     allowAllPropertiesOnSameLine?: boolean;
   }>;
 
@@ -8789,12 +8701,10 @@ namespace SemiSpacing {
    *     "type": "object",
    *     "properties": {
    *       "before": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "after": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -8803,9 +8713,7 @@ namespace SemiSpacing {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     before?: boolean;
-    /** @default true */
     after?: boolean;
   }>;
 
@@ -9108,12 +9016,10 @@ namespace SpaceInfixOps {
    *     "type": "object",
    *     "properties": {
    *       "int32Hint": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreTypes": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9122,9 +9028,7 @@ namespace SpaceInfixOps {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     int32Hint?: boolean;
-    /** @default false */
     ignoreTypes?: boolean;
   }>;
 
@@ -9157,12 +9061,10 @@ namespace SpaceUnaryOps {
    *     "type": "object",
    *     "properties": {
    *       "words": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       },
    *       "nonwords": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "overrides": {
    *         "type": "object",
@@ -9177,9 +9079,7 @@ namespace SpaceUnaryOps {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
     words?: boolean;
-    /** @default false */
     nonwords?: boolean;
     overrides?: Readonly<Record<string, boolean>>;
   }>;
@@ -9265,8 +9165,7 @@ namespace SpacedComment {
    *             }
    *           },
    *           "balanced": {
-   *             "type": "boolean",
-   *             "default": false
+   *             "type": "boolean"
    *           }
    *         },
    *         "additionalProperties": false
@@ -9323,12 +9222,10 @@ namespace SwitchColonSpacing {
    *     "type": "object",
    *     "properties": {
    *       "before": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "after": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9337,9 +9234,7 @@ namespace SwitchColonSpacing {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     before?: boolean;
-    /** @default true */
     after?: boolean;
   }>;
 
@@ -9594,8 +9489,7 @@ namespace WrapIife {
    *     "type": "object",
    *     "properties": {
    *       "functionPrototypeMethods": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -9606,7 +9500,6 @@ namespace WrapIife {
   export type Options0 = 'outside' | 'inside' | 'any';
 
   export type Options1 = Readonly<{
-    /** @default false */
     functionPrototypeMethods?: boolean;
   }>;
 

@@ -123,7 +123,7 @@ export const preferIsRecordAndHasKey: TSESLint.RuleModule<MessageIds, Options> =
                 keyName: keyText,
               },
               fix: (fixer) => {
-                const replacement = `isRecord(${objText}) && hasKey(${objText}, ${keyText})`;
+                const replacement = `(isRecord(${objText}) && hasKey(${objText}, ${keyText}))`;
 
                 const importsToAdd: string[] = [];
 

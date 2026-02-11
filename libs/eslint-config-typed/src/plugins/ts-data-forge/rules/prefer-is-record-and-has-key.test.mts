@@ -45,7 +45,7 @@ describe('prefer-is-record-and-has-key', () => {
         output: dedent`
           import { isRecord, hasKey } from 'ts-data-forge';
           const obj = { a: 1 };
-          const ok = isRecord(obj) && hasKey(obj, 'a');
+          const ok = (isRecord(obj) && hasKey(obj, 'a'));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
@@ -58,7 +58,7 @@ describe('prefer-is-record-and-has-key', () => {
         output: dedent`
           import { isRecord, hasKey } from 'ts-data-forge';
           const obj = { a: 1 };
-          const ok = isRecord(obj) && hasKey(obj, 'a');
+          const ok = (isRecord(obj) && hasKey(obj, 'a'));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
@@ -73,7 +73,7 @@ describe('prefer-is-record-and-has-key', () => {
           import { isRecord, hasKey } from 'ts-data-forge';
           const obj = { a: 1 };
           const key = 'a';
-          const ok = isRecord(obj) && hasKey(obj, key);
+          const ok = (isRecord(obj) && hasKey(obj, key));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
@@ -88,7 +88,7 @@ describe('prefer-is-record-and-has-key', () => {
           import { isRecord, hasKey } from 'ts-data-forge';
           const obj = { a: 1 };
           const key = 'a';
-          const ok = isRecord(obj) && hasKey(obj, key);
+          const ok = (isRecord(obj) && hasKey(obj, key));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
@@ -105,7 +105,7 @@ describe('prefer-is-record-and-has-key', () => {
           import { isRecord } from 'ts-data-forge';
 
           const obj = { a: 1 };
-          const ok = isRecord(obj) && hasKey(obj, 'a');
+          const ok = (isRecord(obj) && hasKey(obj, 'a'));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
@@ -122,7 +122,7 @@ describe('prefer-is-record-and-has-key', () => {
           import { hasKey } from 'ts-data-forge';
 
           const obj = { a: 1 };
-          const ok = isRecord(obj) && hasKey(obj, 'a');
+          const ok = (isRecord(obj) && hasKey(obj, 'a'));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
@@ -138,7 +138,7 @@ describe('prefer-is-record-and-has-key', () => {
           import { isRecord, hasKey } from 'ts-data-forge';
 
           const obj = { a: 1 };
-          const ok = isRecord(obj) && hasKey(obj, 'a');
+          const ok = (isRecord(obj) && hasKey(obj, 'a'));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
@@ -152,8 +152,8 @@ describe('prefer-is-record-and-has-key', () => {
         output: dedent`
           import { isRecord, hasKey } from 'ts-data-forge';
           const obj = { a: 1 };
-          const ok1 = isRecord(obj) && hasKey(obj, 'a');
-          const ok2 = isRecord(obj) && hasKey(obj, 'b');
+          const ok1 = (isRecord(obj) && hasKey(obj, 'a'));
+          const ok2 = (isRecord(obj) && hasKey(obj, 'b'));
         `,
         errors: [
           { messageId: 'useIsRecordAndHasKey' },
@@ -169,7 +169,7 @@ describe('prefer-is-record-and-has-key', () => {
         output: dedent`
           import { isRecord, hasKey } from 'ts-data-forge';
           const data = { nested: { value: 1 } };
-          const ok = isRecord(data.nested) && hasKey(data.nested, 'value');
+          const ok = (isRecord(data.nested) && hasKey(data.nested, 'value'));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },
@@ -182,7 +182,33 @@ describe('prefer-is-record-and-has-key', () => {
         output: dedent`
           import { isRecord, hasKey } from 'ts-data-forge';
           const data = { nested: { value: 1 } };
-          const ok = isRecord(data.nested) && hasKey(data.nested, 'value');
+          const ok = (isRecord(data.nested) && hasKey(data.nested, 'value'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'correctly wraps negated Object.hasOwn with parentheses',
+        code: dedent`
+          const obj = { a: 1 };
+          const ok = !Object.hasOwn(obj, 'a');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-data-forge';
+          const obj = { a: 1 };
+          const ok = !(isRecord(obj) && hasKey(obj, 'a'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'correctly wraps negated key in obj with parentheses',
+        code: dedent`
+          const obj = { a: 1 };
+          const ok = !('a' in obj);
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-data-forge';
+          const obj = { a: 1 };
+          const ok = !((isRecord(obj) && hasKey(obj, 'a')));
         `,
         errors: [{ messageId: 'useIsRecordAndHasKey' }],
       },

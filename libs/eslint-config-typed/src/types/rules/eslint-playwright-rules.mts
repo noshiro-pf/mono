@@ -1361,13 +1361,15 @@ namespace ValidExpectInPromise {
 /**
  * Enforce valid tag format in Playwright test blocks and titles
  *
- * ```md
- * | key         | value   |
- * | :---------- | :------ |
- * | type        | problem |
- * | deprecated  | false   |
- * | recommended | true    |
- * ```
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/valid-test-tags.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
  */
 namespace ValidTestTags {
   /**
