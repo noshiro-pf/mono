@@ -107,6 +107,11 @@ export const record = <
             // The case where the key exists in the object
             const v = a[k];
 
+            // Skip validation for optional fields with undefined values
+            if (valueType.optional === true && v === undefined) {
+              continue;
+            }
+
             const res = valueType.validate(v);
 
             if (Result.isErr(res)) {
@@ -171,9 +176,20 @@ export const record = <
 
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return Object.fromEntries([
-          ...Object.entries(shape).map(([k, v]) =>
-            tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue),
-          ),
+          ...Object.entries(shape).map(([k, v]) => {
+            if (Object.hasOwn(a, k)) {
+              const value = a[k];
+
+              // For optional fields, if the value is undefined, keep it as undefined
+              if (v.optional === true && value === undefined) {
+                return tp(k, undefined);
+              }
+
+              return tp(k, v.fill(value));
+            }
+
+            return tp(k, v.defaultValue);
+          }),
           ...excessEntries,
         ]) as T;
       }
@@ -182,9 +198,20 @@ export const record = <
         // For 'strip' or 'error' (treated as 'strip' for fill), return only defined keys
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         return Object.fromEntries(
-          Object.entries(shape).map(([k, v]) =>
-            tp(k, Object.hasOwn(a, k) ? v.fill(a[k]) : v.defaultValue),
-          ),
+          Object.entries(shape).map(([k, v]) => {
+            if (Object.hasOwn(a, k)) {
+              const value = a[k];
+
+              // For optional fields, if the value is undefined, keep it as undefined
+              if (v.optional === true && value === undefined) {
+                return tp(k, undefined);
+              }
+
+              return tp(k, v.fill(value));
+            }
+
+            return tp(k, v.defaultValue);
+          }),
         ) as T;
       }
     }

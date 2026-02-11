@@ -1,8 +1,18 @@
 import { expectType } from 'ts-data-forge';
 import { array } from '../array/index.mjs';
-import { union } from '../compose/index.mjs';
+import { brandedString } from '../brand/index.mjs';
+import { mergeRecords, union } from '../compose/index.mjs';
 import { boolean, nullType, number, string } from '../primitives/index.mjs';
-import { keyValueRecord, record } from '../record/index.mjs';
+import {
+  keyof,
+  keyValueRecord,
+  omit,
+  optional,
+  partial,
+  pick,
+  record,
+  valueof,
+} from '../record/index.mjs';
 import { type Type, type TypeOf } from '../type.mjs';
 import { literal } from './literal.mjs';
 import { recursion } from './recursion.mjs';
@@ -282,5 +292,507 @@ describe('recursive', () => {
     const evenDefault = EvenNumber.defaultValue;
 
     assert.isTrue(EvenNumber.is(evenDefault));
+  });
+
+  test('Mutual recursion - demonstrates lazy evaluation with optional', () => {
+    type EvenNumber = Readonly<{ type: 'even'; next?: OddNumber }>;
+
+    type OddNumber = Readonly<{ type: 'odd'; next?: EvenNumber }>;
+
+    // With _getDefaultValue, type definitions are created without immediate evaluation
+    const EvenNumber: Type<EvenNumber> = recursion('EvenNumber', () =>
+      record({
+        type: literal('even'),
+        next: optional(OddNumber, { forceUndefinedDefault: true }), // Force undefined to avoid infinite loop
+      }),
+    );
+
+    const OddNumber: Type<OddNumber> = recursion('OddNumber', () =>
+      record({
+        type: literal('odd'),
+        next: optional(EvenNumber, { forceUndefinedDefault: true }), // Force undefined to avoid infinite loop
+      }),
+    );
+
+    // Type checking works fine
+    assert.isTrue(OddNumber.is({ type: 'odd' }));
+
+    assert.isTrue(EvenNumber.is({ type: 'even' }));
+
+    // defaultValue is accessible when terminal types are first
+    const evenDefault = EvenNumber.defaultValue;
+
+    assert.isTrue(EvenNumber.is(evenDefault));
+  });
+
+  describe('recursive types with various type operations', () => {
+    test('recursion with pick and omit', () => {
+      // Define the shape first, then use pick/omit on it
+      const NodeShape = {
+        id: string(),
+        value: number(0),
+        metadata: string(''),
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        children: array({} as Type<unknown>), // Placeholder for recursion
+      } as const;
+
+      // Pick only id and children
+      const NodePickedShape = pick(record(NodeShape), ['id', 'children']).shape;
+
+      const NodePicked: Type<
+        Readonly<{
+          id: string;
+          children: readonly Readonly<{
+            id: string;
+            children: readonly unknown[];
+          }>[];
+        }>
+      > = recursion('NodePicked', () =>
+        record({
+          id: NodePickedShape.id,
+          children: array(NodePicked),
+        }),
+      );
+
+      const validNode = {
+        id: 'node1',
+        children: [{ id: 'child1', children: [] }],
+      } as const;
+
+      assert.isTrue(NodePicked.is(validNode));
+
+      // Omit metadata
+      const NodeOmittedShape = omit(record(NodeShape), ['metadata']).shape;
+
+      const NodeOmitted: Type<
+        Readonly<{
+          id: string;
+          value: number;
+          children: readonly Readonly<{
+            id: string;
+            value: number;
+            children: readonly unknown[];
+          }>[];
+        }>
+      > = recursion('NodeOmitted', () =>
+        record({
+          id: NodeOmittedShape.id,
+          value: NodeOmittedShape.value,
+          children: array(NodeOmitted),
+        }),
+      );
+
+      const validOmitted = {
+        id: 'node2',
+        value: 42,
+        children: [],
+      } as const;
+
+      assert.isTrue(NodeOmitted.is(validOmitted));
+    });
+
+    test('recursion with partial and required', () => {
+      type Task = Readonly<{
+        id: string;
+        title?: string;
+        done?: boolean;
+        subtasks?: readonly Readonly<{ id: string }>[];
+      }>;
+
+      // Use partial on the shape components
+      const TaskIdType = string();
+
+      const TaskTitleType = optional(string(''));
+
+      const TaskDoneType = optional(boolean(false));
+
+      const TaskPartial: Type<Task> = recursion('TaskPartial', () =>
+        record({
+          id: TaskIdType,
+          title: TaskTitleType,
+          done: TaskDoneType,
+          subtasks: optional(array(TaskPartial), {
+            forceUndefinedDefault: true,
+          }),
+        }),
+      );
+
+      const validPartial = {
+        id: 'task1',
+      } as const;
+
+      assert.isTrue(TaskPartial.is(validPartial));
+
+      const validWithSubtasks = {
+        id: 'task2',
+        subtasks: [{ id: 'subtask1' }],
+      } as const;
+
+      assert.isTrue(TaskPartial.is(validWithSubtasks));
+
+      // Use required version
+      const TaskRequired: Type<
+        Readonly<{
+          id: string;
+          title: string;
+          done: boolean;
+          subtasks: readonly Readonly<{
+            id: string;
+            title: string;
+            done: boolean;
+          }>[];
+        }>
+      > = recursion('TaskRequired', () =>
+        record({
+          id: TaskIdType,
+          title: string(''),
+          done: boolean(false),
+          subtasks: array(TaskRequired),
+        }),
+      );
+
+      const validRequired = {
+        id: 'task3',
+        title: 'Do something',
+        done: false,
+        subtasks: [],
+      } as const;
+
+      assert.isTrue(TaskRequired.is(validRequired));
+    });
+
+    test('recursion with keyof and valueof', () => {
+      type Config = Readonly<{
+        name: string;
+        value: number;
+        nested: Config | null;
+      }>;
+
+      const ConfigShape = {
+        name: string(),
+        value: number(0),
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        nested: union([nullType, {} as Type<Config>]),
+      } as const;
+
+      const ConfigType: Type<Config> = recursion(
+        'Config',
+        () => record(ConfigShape),
+        {
+          defaultValue: {
+            name: '',
+            value: 0,
+            nested: null,
+          },
+        },
+      );
+
+      // Validate a config instance
+      const validConfig = {
+        name: 'test',
+        value: 42,
+        nested: null,
+      } as const;
+
+      assert.isTrue(ConfigType.is(validConfig));
+
+      // Get keys from the shape
+      const ConfigKeys = keyof(record(ConfigShape));
+
+      assert.isTrue(ConfigKeys.is('name'));
+
+      assert.isTrue(ConfigKeys.is('value'));
+
+      assert.isTrue(ConfigKeys.is('nested'));
+
+      assert.isFalse(ConfigKeys.is('invalid'));
+
+      // Get values from the shape
+      const ConfigValues = valueof(record(ConfigShape));
+
+      assert.isTrue(ConfigValues.is('test'));
+
+      assert.isTrue(ConfigValues.is(42));
+
+      assert.isTrue(ConfigValues.is(null));
+    });
+
+    test('recursion with branded types', () => {
+      type NodeId = Brand<string, 'NodeId'>;
+
+      type BrandedNode = Readonly<{
+        id: NodeId;
+        children: readonly BrandedNode[];
+      }>;
+
+      const NodeIdType = brandedString<'NodeId'>({
+        typeName: 'NodeId',
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        defaultValue: 'node-default' as Brand<string, 'NodeId'>,
+      });
+
+      const BrandedNodeType: Type<BrandedNode> = recursion('BrandedNode', () =>
+        record({
+          id: NodeIdType,
+          children: array(BrandedNodeType),
+        }),
+      );
+
+      const validId = NodeIdType.cast('node-123');
+
+      const validNode = {
+        id: validId,
+        children: [],
+      } as const;
+
+      assert.isTrue(BrandedNodeType.is(validNode));
+
+      const validNested = {
+        id: validId,
+        children: [{ id: NodeIdType.cast('child-1'), children: [] }],
+      } as const;
+
+      assert.isTrue(BrandedNodeType.is(validNested));
+    });
+
+    test('recursion with mergeRecords', () => {
+      type BaseEntity = Readonly<{
+        id: string;
+        name: string;
+      }>;
+
+      type Versioned = Readonly<{
+        version: number;
+      }>;
+
+      type VersionedEntity = BaseEntity &
+        Versioned &
+        Readonly<{
+          parent: VersionedEntity | null;
+        }>;
+
+      const BaseEntityType = record({
+        id: string(),
+        name: string(''),
+      });
+
+      const VersionedType = record({
+        version: number(1),
+      });
+
+      const VersionedEntityType: Type<VersionedEntity> = recursion(
+        'VersionedEntity',
+        () =>
+          mergeRecords([
+            BaseEntityType,
+            VersionedType,
+            record({
+              parent: union([nullType, VersionedEntityType]),
+            }),
+          ]),
+      );
+
+      const validEntity = {
+        id: 'entity1',
+        name: 'Root',
+        version: 1,
+        parent: null,
+      } as const;
+
+      assert.isTrue(VersionedEntityType.is(validEntity));
+
+      const validNested = {
+        id: 'entity2',
+        name: 'Child',
+        version: 2,
+        parent: {
+          id: 'entity1',
+          name: 'Parent',
+          version: 1,
+          parent: null,
+        },
+      } as const;
+
+      assert.isTrue(VersionedEntityType.is(validNested));
+    });
+
+    test('nested recursion - recursion within recursion', () => {
+      // File system with both files and directories
+      type FileNode = Readonly<{
+        type: 'file';
+        name: string;
+        size: number;
+      }>;
+
+      type Directory = Readonly<{
+        type: 'directory';
+        name: string;
+        contents: readonly FileSystemNode[];
+      }>;
+
+      type FileSystemNode = FileNode | Directory;
+
+      const FileNodeType = record({
+        type: literal('file'),
+        name: string(),
+        size: number(0),
+      });
+
+      const DirectoryType: Type<Directory> = recursion('Directory', () =>
+        record({
+          type: literal('directory'),
+          name: string(),
+          contents: array(FileSystemNodeType),
+        }),
+      );
+
+      const FileSystemNodeType: Type<FileSystemNode> = recursion(
+        'FileSystemNode',
+        () => union([FileNodeType, DirectoryType]),
+      );
+
+      const validFile = {
+        type: 'file',
+        name: 'test.txt',
+        size: 1024,
+      } as const;
+
+      assert.isTrue(FileSystemNodeType.is(validFile));
+
+      const validDirectory = {
+        type: 'directory',
+        name: 'folder',
+        contents: [
+          {
+            type: 'file',
+            name: 'file1.txt',
+            size: 512,
+          },
+          {
+            type: 'directory',
+            name: 'subfolder',
+            contents: [
+              {
+                type: 'file',
+                name: 'file2.txt',
+                size: 256,
+              },
+            ],
+          },
+        ],
+      } as const;
+
+      assert.isTrue(FileSystemNodeType.is(validDirectory));
+    });
+
+    test('recursion with keyValueRecord', () => {
+      type NestedConfig = ReadonlyRecord<string, string | number | unknown>;
+
+      const NestedConfigType: Type<NestedConfig> = recursion(
+        'NestedConfig',
+        () =>
+          keyValueRecord(
+            string(),
+            union([string(), number(), NestedConfigType]),
+          ),
+      );
+
+      const validConfig = {
+        host: 'localhost',
+        port: 3000,
+        database: {
+          host: 'db.local',
+          port: 5432,
+          credentials: {
+            username: 'admin',
+            password: 'secret',
+          },
+        },
+      } as const;
+
+      assert.isTrue(NestedConfigType.is(validConfig));
+
+      const invalidConfig = {
+        host: 'localhost',
+        port: 3000,
+        invalid: true, // boolean is not allowed
+      } as const;
+
+      assert.isFalse(NestedConfigType.is(invalidConfig));
+    });
+
+    test('complex recursion with multiple type operations', () => {
+      // Graph node with all operations combined
+      type NodeId = Brand<string, 'NodeId'>;
+
+      type BaseNode = Readonly<{
+        id: NodeId;
+        label: string;
+      }>;
+
+      type NodeMetadata = Readonly<{
+        createdAt: number;
+        tags: readonly string[];
+      }>;
+
+      type GraphNode = BaseNode &
+        Partial<NodeMetadata> &
+        Readonly<{
+          edges: ReadonlyRecord<string, GraphNode | null>;
+        }>;
+
+      const NodeIdType = brandedString<'NodeId'>({
+        typeName: 'NodeId',
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        defaultValue: 'node-default' as Brand<string, 'NodeId'>,
+      });
+
+      const BaseNodeType = record({
+        id: NodeIdType,
+        label: string(''),
+      });
+
+      const NodeMetadataType = record({
+        createdAt: number(0),
+        tags: array(string()),
+      });
+
+      const NodeMetadataPartial = partial(NodeMetadataType);
+
+      const GraphNodeType: Type<GraphNode> = recursion('GraphNode', () =>
+        mergeRecords([
+          BaseNodeType,
+          NodeMetadataPartial,
+          record({
+            edges: keyValueRecord(string(), union([nullType, GraphNodeType])),
+          }),
+        ]),
+      );
+
+      const node1 = {
+        id: NodeIdType.cast('node-1'),
+        label: 'Node 1',
+        createdAt: 1234567890,
+        tags: ['important'],
+        edges: {},
+      } as const;
+
+      assert.isTrue(GraphNodeType.is(node1));
+
+      const node2 = {
+        id: NodeIdType.cast('node-2'),
+        label: 'Node 2',
+        edges: {
+          next: {
+            id: NodeIdType.cast('node-3'),
+            label: 'Node 3',
+            edges: {},
+          },
+          prev: null,
+        },
+      } as const;
+
+      assert.isTrue(GraphNodeType.is(node2));
+    });
   });
 });

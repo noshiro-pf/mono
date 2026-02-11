@@ -30,6 +30,13 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/other-types/recursion/tree-node-example.mts',
       'samples/src/other-types/recursion/mutually-recursive-example.mts',
       'samples/src/other-types/recursion/mutually-recursive-explicit-example.mts',
+      'samples/src/other-types/recursion/mutually-recursive-with-optional-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/record/optional.mts',
+    sampleFiles: [
+      'samples/src/other-types/recursion/mutually-recursive-with-optional-example.mts',
     ],
   },
 ] as const;

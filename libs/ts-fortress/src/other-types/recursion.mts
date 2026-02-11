@@ -109,13 +109,40 @@ import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
  * );
  * ```
  *
+ * @example
+ * // Mutually recursive types with optional fields
+ * ```ts
+ * import * as t from 'ts-fortress';
+ *
+ * type EvenNumber = Readonly<{ type: 'even'; next?: OddNumber }>;
+ *
+ * type OddNumber = Readonly<{ type: 'odd'; next?: EvenNumber }>;
+ *
+ * // When using optional fields in mutually recursive types,
+ * // use forceUndefinedDefault to avoid infinite loops when accessing defaultValue
+ * const EvenNumber: t.Type<EvenNumber> = t.recursion('EvenNumber', () =>
+ *   t.record({
+ *     type: t.literal('even'),
+ *     next: t.optional(OddNumber, { forceUndefinedDefault: true }),
+ *   }),
+ * );
+ *
+ * const OddNumber: t.Type<OddNumber> = t.recursion('OddNumber', () =>
+ *   t.record({
+ *     type: t.literal('odd'),
+ *     next: t.optional(EvenNumber, { forceUndefinedDefault: true }),
+ *   }),
+ * );
+ * ```
+ *
  * @remarks
  * **Important Notes:**
  * - The `definition` function is called lazily on first use, enabling self-reference
  * - For mutually recursive types, accessing `defaultValue` may cause infinite loops
  *   unless proper precautions are taken:
  *   1. Place terminal types (like `nullType`) first in union types, OR
- *   2. Provide an explicit `defaultValue` in options
+ *   2. Provide an explicit `defaultValue` in options, OR
+ *   3. Use `optional()` with `forceUndefinedDefault: true` for optional fields
  * - The type definition itself (validation, type checking) works fine regardless of
  *   union ordering or defaultValue specification
  */
