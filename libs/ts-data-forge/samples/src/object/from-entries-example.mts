@@ -23,7 +23,7 @@ if (import.meta.vitest !== undefined) {
     const dynamicEntries: readonly (readonly ['x' | 'y', number])[] = [
       ['x', 10],
       ['y', 20],
-    ];
+    ] as const;
 
     const obj2 = Obj.fromEntries(dynamicEntries);
 

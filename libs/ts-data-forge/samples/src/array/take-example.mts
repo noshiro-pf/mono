@@ -4,7 +4,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const values = [1, 2, 3, 4];
+    const values = [1, 2, 3, 4] as const;
 
     const firstTwo = Arr.take(values, 2);
 

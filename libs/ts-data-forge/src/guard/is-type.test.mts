@@ -572,7 +572,7 @@ describe(isNonNullish, () => {
       'world',
       undefined,
       'test',
-    ];
+    ] as const;
 
     const definedItems = items.filter(isNonNullish);
 
@@ -618,7 +618,7 @@ describe('type guard behavior in complex scenarios', () => {
       undefined,
       false,
       123,
-    ];
+    ] as const;
 
     const nonNullish = mixed.filter(isNonNullish);
 

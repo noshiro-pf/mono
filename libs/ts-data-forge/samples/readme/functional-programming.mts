@@ -71,8 +71,8 @@ import { match, Optional, pipe, Result } from 'ts-data-forge';
     // Pattern matching with Result
     const processResult = (result: Result<number, string>): string =>
       Result.isOk(result)
-        ? `Success: ${result.value}`
-        : `Error: ${result.value}`;
+        ? (`Success: ${result.value}` as const)
+        : (`Error: ${result.value}` as const);
 
     assert.isTrue(processResult(Result.ok(42)) === 'Success: 42');
 

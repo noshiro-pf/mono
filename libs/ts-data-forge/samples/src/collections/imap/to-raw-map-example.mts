@@ -5,7 +5,7 @@ import { IMap } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const entries = [['key', 1]] satisfies readonly (readonly [
+    const entries = [['key', 1]] as const satisfies readonly (readonly [
       string,
       number,
     ])[];

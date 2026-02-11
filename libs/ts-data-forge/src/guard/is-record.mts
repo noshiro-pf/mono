@@ -25,7 +25,7 @@ import { isNonNullObject } from './is-non-null-object.mjs';
  * @example
  *
  * ```ts
- * const entries: readonly unknown[] = [{ id: 1 }, 'str', 0, null];
+ * const entries: readonly unknown[] = [{ id: 1 }, 'str', 0, null] as const;
  *
  * const records = entries.filter(isRecord);
  *
@@ -58,7 +58,7 @@ export const isRecord = (u: unknown): u is UnknownRecord => isNonNullObject(u);
  *
  * @example
  * ```ts
- * const obj: unknown = { foo: 1 };
+ * const obj: unknown = { foo: 1 } as const;
  *
  * if (isMutableRecord(obj)) {
  *   obj['bar'] = 2; // Safe: obj is now known to be a mutable record

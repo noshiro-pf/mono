@@ -54,7 +54,7 @@ describe('parse', () => {
           array: [1, 2, { level3: 'deep' }],
         },
       },
-    };
+    } as const;
 
     assert.deepStrictEqual(Json.parse(json), Result.ok(expected));
   });
@@ -227,7 +227,7 @@ describe('stringify', () => {
           array: [1, 2, { level3: 'deep' }],
         },
       },
-    };
+    } as const;
 
     assert.deepStrictEqual(
       Json.stringify(nested),
@@ -301,7 +301,7 @@ describe('stringify', () => {
   test('should handle objects with toJSON method', () => {
     const obj = {
       toJSON: () => ({ custom: 'value' }),
-    };
+    } as const;
 
     assert.deepStrictEqual(
       Json.stringify(obj),
@@ -333,7 +333,7 @@ describe('stringify', () => {
       name: 'John',
       password: 'secret123',
       email: 'john@example.com',
-    };
+    } as const;
 
     const secureReplacer = (key: string, value: unknown): unknown => {
       if (key === 'password') return '[REDACTED]';
@@ -351,7 +351,7 @@ describe('stringify', () => {
   });
 
   test('should format output with space parameter (number)', () => {
-    const data = { a: 1, b: 2 };
+    const data = { a: 1, b: 2 } as const;
 
     const result = Json.stringify(data, undefined, 2);
 
@@ -363,7 +363,7 @@ describe('stringify', () => {
   });
 
   test('should format output with space parameter (string)', () => {
-    const data = { a: 1, b: 2 };
+    const data = { a: 1, b: 2 } as const;
 
     const result = Json.stringify(data, undefined, '\t');
 
@@ -383,7 +383,7 @@ describe('stringifySelected', () => {
       email: 'alice@example.com',
       password: 'secret123',
       lastLogin: '2023-12-01',
-    };
+    } as const;
 
     const result = Json.stringifySelected(user, ['id', 'name', 'email']);
 
@@ -411,7 +411,7 @@ describe('stringifySelected', () => {
         { id: 2, name: 'Bob', secret: 'hidden2' },
       ],
       metadata: { total: 2, page: 1, internal: 'secret' },
-    };
+    } as const;
 
     const result = Json.stringifySelected(data, [
       'users',
@@ -453,7 +453,7 @@ describe('stringifySelected', () => {
       [1, 2, 3, 4],
       [5, 6, 7, 8],
       [9, 10, 11, 12],
-    ];
+    ] as const;
 
     const result = Json.stringifySelected(matrix, [0, 1]);
 
@@ -465,13 +465,14 @@ describe('stringifySelected', () => {
 
     // Note: stringifySelected works with JSON.stringify's replacer parameter
     // which may not work as expected with arrays
+    // eslint-disable-next-line ts-data-forge/prefer-arr-is-array
     assert.isTrue(Array.isArray(parsed));
 
     expect(parsed).toHaveLength(3);
   });
 
   test('should handle formatting with space parameter', () => {
-    const data = { a: 1, b: { c: 2 } };
+    const data = { a: 1, b: { c: 2 } } as const;
 
     const result = Json.stringifySelected(data, ['a', 'b', 'c'], 2);
 
@@ -483,7 +484,7 @@ describe('stringifySelected', () => {
   });
 
   test('should handle empty selection array', () => {
-    const data = { a: 1, b: 2, c: 3 };
+    const data = { a: 1, b: 2, c: 3 } as const;
 
     const result = Json.stringifySelected(data, []);
 
@@ -493,7 +494,7 @@ describe('stringifySelected', () => {
   });
 
   test('should handle undefined properties parameter', () => {
-    const data = { a: 1, b: 2 };
+    const data = { a: 1, b: 2 } as const;
 
     const result = Json.stringifySelected(data, undefined);
 
@@ -532,7 +533,7 @@ describe('stringifySortedKey', () => {
       apple: 'fruit',
       banana: 'fruit',
       aardvark: 'animal',
-    };
+    } as const;
 
     const result = Json.stringifySortedKey(unsortedObj);
 
@@ -558,7 +559,7 @@ describe('stringifySortedKey', () => {
         theme: 'dark',
         language: 'en',
       },
-    };
+    } as const;
 
     const result = Json.stringifySortedKey(nestedObj);
 
@@ -598,7 +599,7 @@ describe('stringifySortedKey', () => {
         created: '2023-12-01',
         author: 'system',
       },
-    };
+    } as const;
 
     const result = Json.stringifySortedKey(dataWithArrays);
 
@@ -639,7 +640,7 @@ describe('stringifySortedKey', () => {
   });
 
   test('should handle formatting with space parameter', () => {
-    const obj = { b: 2, a: 1 };
+    const obj = { b: 2, a: 1 } as const;
 
     const result = Json.stringifySortedKey(obj, 2);
 
@@ -653,9 +654,9 @@ describe('stringifySortedKey', () => {
   });
 
   test('should produce deterministic output', () => {
-    const obj1 = { c: 3, a: 1, b: 2 };
+    const obj1 = { c: 3, a: 1, b: 2 } as const;
 
-    const obj2 = { b: 2, a: 1, c: 3 };
+    const obj2 = { b: 2, a: 1, c: 3 } as const;
 
     const result1 = Json.stringifySortedKey(obj1);
 
@@ -716,7 +717,7 @@ describe('stringifySortedKey', () => {
           },
         },
       },
-    };
+    } as const;
 
     const result = Json.stringifySortedKey(deep);
 

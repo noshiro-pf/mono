@@ -14,7 +14,7 @@ import {
 describe('Arr search operations', () => {
   describe(find, () => {
     test('should find first element matching predicate', () => {
-      const numbers = [1, 2, 3, 4, 5];
+      const numbers = [1, 2, 3, 4, 5] as const;
 
       const firstEven = find(numbers, (n) => n % 2 === 0);
 
@@ -24,7 +24,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return None when no element matches', () => {
-      const odds = [1, 3, 5];
+      const odds = [1, 3, 5] as const;
 
       const firstEven = find(odds, (n) => n % 2 === 0);
 
@@ -48,7 +48,7 @@ describe('Arr search operations', () => {
     });
 
     test('should work with type guard predicate', () => {
-      const values: readonly (string | number)[] = [1, 'a', 2, 'b'];
+      const values: readonly (string | number)[] = [1, 'a', 2, 'b'] as const;
 
       const firstString = find(
         values,
@@ -63,7 +63,7 @@ describe('Arr search operations', () => {
     });
 
     test('should provide index and array to predicate', () => {
-      const numbers = [10, 20, 30];
+      const numbers = [10, 20, 30] as readonly number[];
 
       const foundWithIndex = find(numbers, (value, index, arr) => {
         expect(arr).toBe(numbers);
@@ -75,7 +75,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return first match when multiple elements match', () => {
-      const numbers = [2, 4, 6, 8];
+      const numbers = [2, 4, 6, 8] as const;
 
       const firstEven = find(numbers, (n) => n % 2 === 0);
 
@@ -83,7 +83,7 @@ describe('Arr search operations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const result = find(empty, () => true);
 
@@ -93,7 +93,7 @@ describe('Arr search operations', () => {
 
   describe(findLast, () => {
     test('should find last element matching predicate', () => {
-      const numbers = [1, 2, 3, 4, 5];
+      const numbers = [1, 2, 3, 4, 5] as const;
 
       const lastEven = findLast(numbers, (n) => n % 2 === 0);
 
@@ -103,7 +103,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return None when no element matches', () => {
-      const odds = [1, 3, 5];
+      const odds = [1, 3, 5] as const;
 
       const lastEven = findLast(odds, (n) => n % 2 === 0);
 
@@ -123,7 +123,7 @@ describe('Arr search operations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const result = findLast(empty, (n) => n > 0);
 
@@ -131,7 +131,7 @@ describe('Arr search operations', () => {
     });
 
     test('should pass index and array to predicate', () => {
-      const numbers = [10, 20, 30, 40];
+      const numbers = [10, 20, 30, 40] as readonly number[];
 
       const lastWithIndex2 = findLast(numbers, (_, idx, arr) => {
         expect(arr).toBe(numbers);
@@ -143,7 +143,7 @@ describe('Arr search operations', () => {
     });
 
     test('should find last occurrence', () => {
-      const numbers = [1, 2, 2, 3, 2, 4];
+      const numbers = [1, 2, 2, 3, 2, 4] as const;
 
       const lastTwo = findLast(numbers, (n) => n === 2);
 
@@ -158,7 +158,7 @@ describe('Arr search operations', () => {
 
   describe(findIndex, () => {
     test('should find index of matching element', () => {
-      const arr = ['a', 'b', 'c'];
+      const arr = ['a', 'b', 'c'] as readonly string[];
 
       const result = findIndex(arr, (x) => x === 'b');
 
@@ -170,7 +170,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return None for no match', () => {
-      const arr = ['a', 'b', 'c'];
+      const arr = ['a', 'b', 'c'] as readonly string[];
 
       const result = findIndex(arr, (x) => x === 'd');
 
@@ -180,7 +180,7 @@ describe('Arr search operations', () => {
 
   describe(findLastIndex, () => {
     test('should find last index matching predicate', () => {
-      const numbers = [1, 2, 3, 4, 2, 5];
+      const numbers = [1, 2, 3, 4, 2, 5] as const;
 
       const lastTwoIndex = findLastIndex(numbers, (n) => n === 2);
 
@@ -188,7 +188,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return -1 when no element matches', () => {
-      const odds = [1, 3, 5];
+      const odds = [1, 3, 5] as const;
 
       const lastEvenIndex = findLastIndex(odds, (n) => n % 2 === 0);
 
@@ -206,7 +206,7 @@ describe('Arr search operations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const result = findLastIndex(empty, (n) => n > 0);
 
@@ -214,7 +214,7 @@ describe('Arr search operations', () => {
     });
 
     test('should pass index and array to predicate', () => {
-      const numbers = [10, 20, 30, 40];
+      const numbers = [10, 20, 30, 40] as const;
 
       const lastWithIndex2OrHigher = findLastIndex(numbers, (_, idx, arr) => {
         expect(arr).toBe(numbers);
@@ -232,7 +232,7 @@ describe('Arr search operations', () => {
         { id: 3, active: true },
         { id: 4, active: false },
         { id: 5, active: true },
-      ];
+      ] as const;
 
       const lastActiveIndex = findLastIndex(data, (item) => item.active);
 
@@ -249,7 +249,7 @@ describe('Arr search operations', () => {
 
     test('should search from end to beginning', () => {
       // Verify search order by using side effects
-      const numbers = [1, 2, 3, 4, 5];
+      const numbers = [1, 2, 3, 4, 5] as const;
 
       const mut_searchOrder: number[] = [];
 
@@ -264,7 +264,7 @@ describe('Arr search operations', () => {
     });
 
     test('should handle single element array', () => {
-      const single = [42];
+      const single = [42] as readonly number[];
 
       const foundIndex = findLastIndex(single, (n) => n === 42);
 
@@ -276,7 +276,7 @@ describe('Arr search operations', () => {
     });
 
     test('should work with string arrays', () => {
-      const words = ['hello', 'world', 'test', 'hello', 'end'];
+      const words = ['hello', 'world', 'test', 'hello', 'end'] as const;
 
       const lastHelloIndex = findLastIndex(words, (word) => word === 'hello');
 
@@ -286,7 +286,7 @@ describe('Arr search operations', () => {
 
   describe(indexOf, () => {
     test('should find index of element', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as readonly string[];
 
       const result = indexOf(arr, 'b');
 
@@ -300,7 +300,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return -1 for non-existent element', () => {
-      const arr = ['a', 'b', 'c'];
+      const arr = ['a', 'b', 'c'] as readonly string[];
 
       const result = indexOf(arr, 'd');
 
@@ -310,7 +310,7 @@ describe('Arr search operations', () => {
 
   describe(indexOfFrom, () => {
     test('should find index of element from specified index', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as readonly string[];
 
       const result = indexOfFrom(arr, 'b', 2);
 
@@ -324,7 +324,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return -1 when element not found from index', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as const;
 
       const result = indexOfFrom(arr, 'a', 1);
 
@@ -332,7 +332,7 @@ describe('Arr search operations', () => {
     });
 
     test('should find first occurrence when fromIndex is 0', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as const;
 
       const result = indexOfFrom(arr, 'b', 0);
 
@@ -340,7 +340,7 @@ describe('Arr search operations', () => {
     });
 
     test('should handle negative fromIndex', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as const;
 
       const result = indexOfFrom(arr, 'b', -2);
 
@@ -348,7 +348,7 @@ describe('Arr search operations', () => {
     });
 
     test('should handle fromIndex beyond array length', () => {
-      const arr = ['a', 'b', 'c'];
+      const arr = ['a', 'b', 'c'] as readonly string[];
 
       const result = indexOfFrom(arr, 'a', 10);
 
@@ -358,7 +358,7 @@ describe('Arr search operations', () => {
 
   describe(lastIndexOf, () => {
     test('should find last index of element', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as readonly string[];
 
       const result = lastIndexOf(arr, 'b');
 
@@ -372,7 +372,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return -1 for non-existent element', () => {
-      const arr = ['a', 'b', 'c'];
+      const arr = ['a', 'b', 'c'] as readonly string[];
 
       const result = lastIndexOf(arr, 'd');
 
@@ -382,7 +382,7 @@ describe('Arr search operations', () => {
 
   describe(lastIndexOfFrom, () => {
     test('should find last index of element from specified index', () => {
-      const arr = ['a', 'b', 'c', 'b', 'e'];
+      const arr = ['a', 'b', 'c', 'b', 'e'] as readonly string[];
 
       const result = lastIndexOfFrom(arr, 'b', 2);
 
@@ -396,7 +396,7 @@ describe('Arr search operations', () => {
     });
 
     test('should return -1 when element not found before index', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as const;
 
       const result = lastIndexOfFrom(arr, 'b', 0);
 
@@ -404,7 +404,7 @@ describe('Arr search operations', () => {
     });
 
     test('should find last occurrence when fromIndex covers all elements', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as readonly string[];
 
       const result = lastIndexOfFrom(arr, 'b', 10);
 
@@ -412,7 +412,7 @@ describe('Arr search operations', () => {
     });
 
     test('should handle negative fromIndex', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as const;
 
       const result = lastIndexOfFrom(arr, 'b', -1);
 
@@ -420,7 +420,7 @@ describe('Arr search operations', () => {
     });
 
     test('should handle fromIndex of 0', () => {
-      const arr = ['a', 'b', 'c', 'b'];
+      const arr = ['a', 'b', 'c', 'b'] as const;
 
       const result = lastIndexOfFrom(arr, 'a', 0);
 

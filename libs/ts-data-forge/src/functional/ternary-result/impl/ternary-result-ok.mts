@@ -14,7 +14,8 @@ import { OkTypeTagName } from './tag.mjs';
  * });
  * ```
  */
-export const ok = <const S,>(value: S): TernaryOk<S> => ({
-  $$tag: OkTypeTagName,
-  value,
-});
+export const ok = <const S,>(value: S): TernaryOk<S> =>
+  ({
+    $$tag: OkTypeTagName,
+    value,
+  }) as const;

@@ -137,14 +137,15 @@ describe('Arr creations', () => {
     });
 
     test('fixed length with object (shallow copy)', () => {
-      const obj = { id: 1 };
+      const obj = { id: 1 } as const;
 
       const result = create(2, obj);
 
       // transformer-ignore-next-line
-      expectType<typeof result, readonly [{ id: number }, { id: number }]>(
-        '~=',
-      );
+      expectType<
+        typeof result,
+        readonly [Readonly<{ id: 1 }>, Readonly<{ id: 1 }>]
+      >('~=');
 
       assert.deepStrictEqual(result, [obj, obj]);
 
@@ -182,7 +183,7 @@ describe('Arr creations', () => {
     });
 
     test('should create array with object values', () => {
-      const obj = { a: 1 };
+      const obj = { a: 1 } as const;
 
       const result = create(2, obj);
 
@@ -222,16 +223,19 @@ describe('Arr creations', () => {
     });
 
     test('should create a shallow copy of an array of objects', () => {
-      const obj1 = { id: 1 };
+      const obj1 = { id: 1 } as const;
 
-      const obj2 = { id: 2 };
+      const obj2 = { id: 2 } as const;
 
       const original = [obj1, obj2] as const;
 
       const copied = copy(original);
 
       // transformer-ignore-next-line
-      expectType<typeof copied, readonly [{ id: number }, { id: number }]>('=');
+      expectType<
+        typeof copied,
+        readonly [Readonly<{ id: 1 }>, Readonly<{ id: 2 }>]
+      >('=');
 
       assert.deepStrictEqual(copied, original);
 
@@ -766,8 +770,7 @@ describe('Arr creations', () => {
 
     test('should handle async generator with delays', async () => {
       const result = await generateAsync<number>(async function* () {
-        // eslint-disable-next-line functional/no-let
-        for (let i = 0; i < 3; i++) {
+        for (const i of range(0, 3)) {
           // eslint-disable-next-line no-await-in-loop
           await new Promise<void>((resolve) => {
             setTimeout(resolve, 0);

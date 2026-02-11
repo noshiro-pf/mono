@@ -6,7 +6,7 @@ import { asUint32, Num } from '../../number/index.mjs';
  * @example
  *
  * ```ts
- * const maybeArray: unknown = [1, 2, 3];
+ * const maybeArray: unknown = [1, 2, 3] as const;
  *
  * const maybeValue: unknown = 'Ada';
  *
@@ -20,6 +20,7 @@ import { asUint32, Num } from '../../number/index.mjs';
  * ```
  */
 export const isArray = <E,>(value: E): value is FilterArray<E> =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array
   Array.isArray(value);
 
 type FilterArray<T> = T extends T
@@ -55,6 +56,7 @@ type Cast<A, B> = A extends B ? A : never;
  * ```
  */
 export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
   array.length === 0;
 
 /**
@@ -63,9 +65,9 @@ export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
  * @example
  *
  * ```ts
- * const users: readonly Readonly<{ id: number }>[] = [{ id: 1 }];
+ * const users: readonly Readonly<{ id: number }>[] = [{ id: 1 }] as const;
  *
- * const emptyUsers: readonly Readonly<{ id: number }>[] = [];
+ * const emptyUsers: readonly Readonly<{ id: number }>[] = [] as const;
  *
  * assert.isTrue(Arr.isNonEmpty(users));
  *
@@ -78,7 +80,9 @@ export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
  */
 export const isNonEmpty = <E,>(
   array: readonly E[],
-): array is NonEmptyArray<E> => array.length > 0;
+): array is NonEmptyArray<E> =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-non-empty
+  array.length > 0;
 
 /**
  * Checks if an array has a specific length.
@@ -86,9 +90,9 @@ export const isNonEmpty = <E,>(
  * @example
  *
  * ```ts
- * const pair: readonly number[] = [1, 2];
+ * const pair: readonly number[] = [1, 2] as const;
  *
- * const triple: readonly number[] = [1, 2, 3];
+ * const triple: readonly number[] = [1, 2, 3] as const;
  *
  * assert.isTrue(Arr.isArrayOfLength(pair, 2));
  *
@@ -102,7 +106,9 @@ export const isNonEmpty = <E,>(
 export const isArrayOfLength = <E, N extends SizeType.ArgArr>(
   array: readonly E[],
   len: N,
-): array is ArrayOfLength<N, E> => array.length === len;
+): array is ArrayOfLength<N, E> =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
+  array.length === len;
 
 /**
  * Checks if an array has at least a specific length.
@@ -110,9 +116,9 @@ export const isArrayOfLength = <E, N extends SizeType.ArgArr>(
  * @example
  *
  * ```ts
- * const queue: readonly string[] = ['task-1', 'task-2'];
+ * const queue: readonly string[] = ['task-1', 'task-2'] as const;
  *
- * const emptyQueue: readonly string[] = [];
+ * const emptyQueue: readonly string[] = [] as const;
  *
  * assert.isTrue(Arr.isArrayAtLeastLength(queue, 1));
  *
@@ -126,7 +132,9 @@ export const isArrayOfLength = <E, N extends SizeType.ArgArr>(
 export const isArrayAtLeastLength = <E, N extends SizeType.ArgArr>(
   array: readonly E[],
   len: N,
-): array is ArrayAtLeastLen<N, E> => array.length >= len;
+): array is ArrayAtLeastLen<N, E> =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-at-least-length
+  array.length >= len;
 
 /**
  * Tests whether all elements in an array pass a test implemented by a predicate.

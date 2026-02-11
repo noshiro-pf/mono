@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
 
     const errValue = Result.err(new Error('failure'));
 
-    const notResult = { $$tag: 'ts-data-forge::Result.ok' };
+    const notResult = { $$tag: 'ts-data-forge::Result.ok' } as const;
 
     assert.isTrue(Result.isResult(okValue));
 

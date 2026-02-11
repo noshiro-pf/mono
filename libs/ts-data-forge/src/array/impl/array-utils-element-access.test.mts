@@ -6,7 +6,7 @@ import { at, head, last } from './array-utils-element-access.mjs';
 describe('Arr element access', () => {
   describe(at, () => {
     test('should handle very large positive indices', () => {
-      const array = [1, 2, 3];
+      const array = [1, 2, 3] as readonly number[];
 
       const result = at(array, asUint32(1000));
 
@@ -14,7 +14,7 @@ describe('Arr element access', () => {
     });
 
     test('should handle very large negative indices', () => {
-      const array = [1, 2, 3];
+      const array = [1, 2, 3] as readonly number[];
 
       const result = at(array, asInt32(-1000));
 
@@ -22,7 +22,7 @@ describe('Arr element access', () => {
     });
 
     test('should work with valid indices', () => {
-      const array = [10, 20, 30];
+      const array = [10, 20, 30] as const;
 
       const result = at(array, 1);
 
@@ -62,7 +62,7 @@ describe('Arr element access', () => {
     });
 
     test('case 2', () => {
-      const xs: MutableNonEmptyArray<number> = [1, 2, 3];
+      const xs: MutableNonEmptyArray<number> = [1, 2, 3] as const;
 
       const h = head(xs);
 
@@ -132,7 +132,7 @@ describe('Arr element access', () => {
     });
 
     test('case 2', () => {
-      const xs: MutableNonEmptyArray<number> = [1, 2, 3];
+      const xs: MutableNonEmptyArray<number> = [1, 2, 3] as const;
 
       const l = last(xs);
 

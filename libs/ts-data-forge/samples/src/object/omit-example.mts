@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
       email: 'charlie@example.com',
       password: 'secret123',
       internalNote: 'VIP customer',
-    };
+    } as const;
 
     // Direct usage - remove sensitive fields
     const safeUser = Obj.omit(user, ['password', 'internalNote']);

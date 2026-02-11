@@ -16,7 +16,7 @@ import { hasKey, isNonNullObject, isRecord } from 'ts-data-forge';
     };
 
     // Non-null object checking
-    const value: unknown = { key: 'value' };
+    const value: unknown = { key: 'value' } as const;
 
     if (isNonNullObject(value)) {
       // value is guaranteed to be a non-null object

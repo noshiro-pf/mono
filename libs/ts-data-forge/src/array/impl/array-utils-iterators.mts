@@ -37,7 +37,7 @@ export const entries = function* <E>(
  * @example
  *
  * ```ts
- * const players = ['Ada', 'Grace', 'Alan'];
+ * const players = ['Ada', 'Grace', 'Alan'] as readonly string[];
  *
  * const valueList = Array.from(Arr.values(players));
  *

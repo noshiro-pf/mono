@@ -7,7 +7,10 @@ if (import.meta.vitest !== undefined) {
     const entries = [
       ['alice', 10],
       ['bob', 8],
-    ] satisfies readonly (readonly ['alice' | 'bob' | 'charlie', number])[];
+    ] as const satisfies readonly (readonly [
+      'alice' | 'bob' | 'charlie',
+      number,
+    ])[];
 
     const scores = IMap.create<'alice' | 'bob' | 'charlie', number>(entries);
 

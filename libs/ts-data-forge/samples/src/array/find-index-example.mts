@@ -4,7 +4,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const letters = ['a', 'b', 'c'];
+    const letters = ['a', 'b', 'c'] as const;
 
     const indexOfB = Arr.findIndex(letters, (letter) => letter === 'b');
 

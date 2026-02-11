@@ -19,7 +19,8 @@ import { SomeTypeTagName } from './tag.mjs';
  * @param value The value to wrap in an {@link Some}.
  * @returns An {@link Some}<S> containing the value.
  */
-export const some = <const S,>(value: S): Some<S> => ({
-  $$tag: SomeTypeTagName,
-  value,
-});
+export const some = <const S,>(value: S): Some<S> =>
+  ({
+    $$tag: SomeTypeTagName,
+    value,
+  }) as const;

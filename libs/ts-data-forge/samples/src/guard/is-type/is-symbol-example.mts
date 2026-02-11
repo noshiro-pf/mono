@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
 
     const shared = Symbol.for('shared');
 
-    const tokens: readonly unknown[] = [id, 'shared', shared];
+    const tokens: readonly unknown[] = [id, 'shared', shared] as const;
 
     const symbols = tokens.filter(isSymbol);
 

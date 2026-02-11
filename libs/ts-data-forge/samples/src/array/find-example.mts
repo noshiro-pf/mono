@@ -7,7 +7,7 @@ if (import.meta.vitest !== undefined) {
     const users = [
       { id: 1, name: 'Ada' },
       { id: 2, name: 'Grace' },
-    ];
+    ] as const;
 
     const found = Arr.find(users, (user) => user.id === 2);
 

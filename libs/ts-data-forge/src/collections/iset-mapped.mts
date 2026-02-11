@@ -60,7 +60,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * const points: readonly Point[] = [
    *   { x: 1, tag: 'a' },
    *   { x: 2, tag: 'b' },
-   * ];
+   * ] as const;
    *
    * const set = ISetMapped.create<Point, string>(points, toKey, fromKey);
    *
@@ -313,7 +313,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * >[] = [
    *   { type: 'add', key: { x: 3, tag: 'c' } },
    *   { type: 'delete', key: { x: 1, tag: 'a' } },
-   * ];
+   * ] as const;
    *
    * const mutated = base.withMutations(actions);
    *
@@ -1056,10 +1056,11 @@ export namespace ISetMapped {
   export const diff = <K, KM extends MapSetKeyType>(
     oldSet: ISetMapped<K, KM>,
     newSet: ISetMapped<K, KM>,
-  ): ReadonlyRecord<'added' | 'deleted', ISetMapped<K, KM>> => ({
-    deleted: oldSet.subtract(newSet),
-    added: newSet.subtract(oldSet),
-  });
+  ): ReadonlyRecord<'added' | 'deleted', ISetMapped<K, KM>> =>
+    ({
+      deleted: oldSet.subtract(newSet),
+      added: newSet.subtract(oldSet),
+    }) as const;
 
   /**
    * Computes the intersection of two ISetMapped instances.

@@ -4,7 +4,7 @@ import { isString, Json, Result } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const data = { name: 'Bob', age: 25, active: true };
+    const data = { name: 'Bob', age: 25, active: true } as const;
 
     // Basic stringify
     const basic = Json.stringify(data);

@@ -194,7 +194,7 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * >[] = [
    *   { type: 'add', key: 'c' },
    *   { type: 'delete', key: 'a' },
-   * ];
+   * ] as const;
    *
    * const mutated = base.withMutations(actions);
    *
@@ -637,10 +637,11 @@ export namespace ISet {
   export const diff = <K extends MapSetKeyType>(
     oldSet: ISet<K>,
     newSet: ISet<K>,
-  ): ReadonlyRecord<'added' | 'deleted', ISet<K>> => ({
-    deleted: oldSet.subtract(newSet),
-    added: newSet.subtract(oldSet),
-  });
+  ): ReadonlyRecord<'added' | 'deleted', ISet<K>> =>
+    ({
+      deleted: oldSet.subtract(newSet),
+      added: newSet.subtract(oldSet),
+    }) as const;
 
   /**
    * Computes the intersection of two ISet instances.

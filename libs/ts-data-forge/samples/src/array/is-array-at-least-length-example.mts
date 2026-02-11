@@ -4,9 +4,9 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const queue: readonly string[] = ['task-1', 'task-2'];
+    const queue: readonly string[] = ['task-1', 'task-2'] as const;
 
-    const emptyQueue: readonly string[] = [];
+    const emptyQueue: readonly string[] = [] as const;
 
     assert.isTrue(Arr.isArrayAtLeastLength(queue, 1));
 

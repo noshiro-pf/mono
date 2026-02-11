@@ -1,4 +1,4 @@
-import { pipe } from 'ts-data-forge';
+import { Arr, pipe } from 'ts-data-forge';
 
 const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
 
@@ -39,7 +39,7 @@ const normalizeIndent = (source: string): string => {
       return match !== null ? match[0].length : 0;
     });
 
-  if (indents.length === 0) {
+  if (Arr.isArrayOfLength(indents, 0)) {
     return source;
   }
 

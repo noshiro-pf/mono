@@ -878,9 +878,9 @@ describe('IMap.forEach', () => {
       [7, 70],
     ] as const);
 
-    const keys = [1, 3, 5, 6, 7];
+    const keys = [1, 3, 5, 6, 7] as const;
 
-    const values = [10, 30, 50, 60, 70];
+    const values = [10, 30, 50, 60, 70] as const;
 
     for (const [key, value] of m0.entries()) {
       expect(keys).toContain(key);
@@ -935,7 +935,7 @@ describe('IMap.keys', () => {
       [7, 70],
     ] as const);
 
-    const keys = [1, 3, 5, 6, 7];
+    const keys = [1, 3, 5, 6, 7] as const;
 
     for (const k of m0.keys()) {
       expect(keys).toContain(k);
@@ -953,7 +953,7 @@ describe('IMap.values', () => {
       [7, 70],
     ]);
 
-    const values = [10, 30, 50, 60, 70];
+    const values = [10, 30, 50, 60, 70] as const;
 
     for (const v of m0.values()) {
       expect(values).toContain(v);
@@ -971,9 +971,9 @@ describe('IMap.entries', () => {
       [7, 70],
     ]);
 
-    const keys = [1, 3, 5, 6, 7];
+    const keys = [1, 3, 5, 6, 7] as const;
 
-    const values = [10, 30, 50, 60, 70];
+    const values = [10, 30, 50, 60, 70] as const;
 
     for (const [k, v] of m0.entries()) {
       expect(keys).toContain(k);

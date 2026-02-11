@@ -6,7 +6,7 @@ import { Optional, pipe } from '../../functional/index.mjs';
  * @example
  *
  * ```ts
- * const letters: readonly string[] = ['a', 'b', 'c'];
+ * const letters: readonly string[] = ['a', 'b', 'c'] as const;
  *
  * const two = Arr.at(letters, 1);
  *
@@ -64,9 +64,9 @@ export function at<E>(
  * @example
  *
  * ```ts
- * const users = [{ id: 1 }, { id: 2 }];
+ * const users = [{ id: 1 }, { id: 2 }] as const;
  *
- * const empty: readonly Readonly<{ id: number }>[] = [];
+ * const empty: readonly Readonly<{ id: number }>[] = [] as const;
  *
  * const first = Arr.head(users);
  *
@@ -95,9 +95,9 @@ export const head = <const Ar extends readonly unknown[]>(
  * @example
  *
  * ```ts
- * const queue = ['first', 'second'];
+ * const queue = ['first', 'second'] as const;
  *
- * const emptyQueue: readonly string[] = [];
+ * const emptyQueue: readonly string[] = [] as const;
  *
  * const lastValue = Arr.last(queue);
  *

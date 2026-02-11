@@ -11,7 +11,7 @@ import { asUint32 } from '../../number/index.mjs';
  * const users = [
  *   { id: 1, name: 'Ada' },
  *   { id: 2, name: 'Grace' },
- * ];
+ * ] as const;
  *
  * const found = Arr.find(users, (user) => user.id === 2);
  *
@@ -100,7 +100,7 @@ export function find<E>(
  * @example
  *
  * ```ts
- * const numbers = [1, 3, 2, 4, 5];
+ * const numbers = [1, 3, 2, 4, 5] as const;
  *
  * const lastEven = Arr.findLast(numbers, (n) => n % 2 === 0);
  *
@@ -187,7 +187,7 @@ export function findLast<E>(
  * @example
  *
  * ```ts
- * const letters = ['a', 'b', 'c'];
+ * const letters = ['a', 'b', 'c'] as const;
  *
  * const indexOfB = Arr.findIndex(letters, (letter) => letter === 'b');
  *
@@ -254,7 +254,7 @@ export function findIndex<E>(
  * @example
  *
  * ```ts
- * const letters = ['a', 'b', 'c', 'b'];
+ * const letters = ['a', 'b', 'c', 'b'] as const;
  *
  * const lastIndexOfB = Arr.findLastIndex(letters, (letter) => letter === 'b');
  *
@@ -321,7 +321,7 @@ export function findLastIndex<E>(
  * @example
  *
  * ```ts
- * const fruits = ['apple', 'banana', 'orange', 'banana'];
+ * const fruits = ['apple', 'banana', 'orange', 'banana'] as readonly string[];
  *
  * const indexOfBanana = Arr.indexOf(fruits, 'banana');
  *
@@ -376,7 +376,7 @@ export function indexOf<E>(
  * @example
  *
  * ```ts
- * const fruits = ['apple', 'banana', 'orange', 'banana'];
+ * const fruits = ['apple', 'banana', 'orange', 'banana'] as readonly string[];
  *
  * // Search for 'banana' starting from index 1
  * const firstBanana = Arr.indexOfFrom(fruits, 'banana', 1);
@@ -444,7 +444,7 @@ export function indexOfFrom<E>(
  * @example
  *
  * ```ts
- * const fruits = ['apple', 'banana', 'orange', 'banana'];
+ * const fruits = ['apple', 'banana', 'orange', 'banana'] as readonly string[];
  *
  * const lastBanana = Arr.lastIndexOf(fruits, 'banana');
  *
@@ -503,7 +503,7 @@ export function lastIndexOf<E>(
  * @example
  *
  * ```ts
- * const fruits = ['apple', 'banana', 'orange', 'banana', 'grape'];
+ * const fruits = ['apple', 'banana', 'orange', 'banana', 'grape'] as const;
  *
  * // Search backwards for 'banana' from index 3
  * const lastBananaFrom3 = Arr.lastIndexOfFrom(fruits, 'banana', 3);

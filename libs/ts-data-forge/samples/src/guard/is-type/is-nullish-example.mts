@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
       'Ada',
       null,
       undefined,
-    ];
+    ] as const;
 
     const nullishValues = values.filter(isNullish);
 

@@ -4,7 +4,7 @@ import { isRecord } from './is-record.mjs';
 describe(isRecord, () => {
   describe('arrays are Records', () => {
     test('number[] is assignable to Record<number, unknown>', () => {
-      const arr: Record<number, unknown> = [1, 2, 3];
+      const arr: Record<number, unknown> = [1, 2, 3] as const;
 
       const unk: unknown = arr;
 
@@ -14,7 +14,7 @@ describe(isRecord, () => {
     });
 
     test('string[] is assignable to Record<number, unknown>', () => {
-      const arr: Record<number, unknown> = ['1', '2', '3'];
+      const arr: Record<number, unknown> = ['1', '2', '3'] as const;
 
       const unk: unknown = arr;
 

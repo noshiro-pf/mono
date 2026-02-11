@@ -4,7 +4,7 @@ import { Arr, Optional } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const letters: readonly string[] = ['a', 'b', 'c'];
+    const letters: readonly string[] = ['a', 'b', 'c'] as const;
 
     const two = Arr.at(letters, 1);
 

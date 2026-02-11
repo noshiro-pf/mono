@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const maybeOptional = Optional.some('value');
 
-    const notOptional = { $$tag: 'ts-data-forge::Optional.some' };
+    const notOptional = { $$tag: 'ts-data-forge::Optional.some' } as const;
 
     assert.isTrue(Optional.isOptional(maybeOptional));
 

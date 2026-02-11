@@ -11,7 +11,7 @@ if (import.meta.vitest !== undefined) {
     >[] = [
       { type: 'add', key: 'c' },
       { type: 'delete', key: 'a' },
-    ];
+    ] as const;
 
     const mutated = base.withMutations(actions);
 

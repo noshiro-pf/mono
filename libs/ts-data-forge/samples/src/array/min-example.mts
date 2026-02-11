@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const values = [5, 3, 9] as const;
 
-    const empty: readonly number[] = [];
+    const empty: readonly number[] = [] as const;
 
     const smallest = Arr.min(values);
 

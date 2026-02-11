@@ -1,4 +1,4 @@
-import { isRecord } from '../../../guard/index.mjs';
+import { hasKey, isRecord } from '../../../guard/index.mjs';
 import { NoneTypeTagName, SomeTypeTagName } from './tag.mjs';
 
 /**
@@ -9,7 +9,7 @@ import { NoneTypeTagName, SomeTypeTagName } from './tag.mjs';
  * ```ts
  * const maybeOptional = Optional.some('value');
  *
- * const notOptional = { $$tag: 'ts-data-forge::Optional.some' };
+ * const notOptional = { $$tag: 'ts-data-forge::Optional.some' } as const;
  *
  * assert.isTrue(Optional.isOptional(maybeOptional));
  *
@@ -23,7 +23,7 @@ export const isOptional = (
   maybeOptional: unknown,
 ): maybeOptional is Optional<unknown> =>
   isRecord(maybeOptional) &&
-  Object.hasOwn(maybeOptional, '$$tag') &&
-  ((maybeOptional['$$tag'] === SomeTypeTagName &&
-    Object.hasOwn(maybeOptional, 'value')) ||
-    maybeOptional['$$tag'] === NoneTypeTagName);
+  hasKey(maybeOptional, '$$tag') &&
+  ((maybeOptional.$$tag === SomeTypeTagName &&
+    hasKey(maybeOptional, 'value')) ||
+    maybeOptional.$$tag === NoneTypeTagName);

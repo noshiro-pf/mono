@@ -4,7 +4,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const words = ['Ada', 'Lovelace'];
+    const words = ['Ada', 'Lovelace'] as const;
 
     const totalLength = Arr.foldl(words, (acc, word) => acc + word.length, 0);
 

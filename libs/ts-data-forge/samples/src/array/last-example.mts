@@ -4,9 +4,9 @@ import { Arr, Optional } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const queue = ['first', 'second'];
+    const queue = ['first', 'second'] as const;
 
-    const emptyQueue: readonly string[] = [];
+    const emptyQueue: readonly string[] = [] as const;
 
     const lastValue = Arr.last(queue);
 

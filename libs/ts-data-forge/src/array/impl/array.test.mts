@@ -60,7 +60,7 @@ describe('Array.includes', () => {
   }
 
   {
-    const xs: readonly number[] = [2, 1, 3];
+    const xs: readonly number[] = [2, 1, 3] as const;
 
     const result = xs.includes(4);
 

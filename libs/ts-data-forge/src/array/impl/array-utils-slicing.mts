@@ -65,7 +65,7 @@ export const butLast = <const Ar extends readonly unknown[]>(
  * @example
  *
  * ```ts
- * const values = [1, 2, 3, 4];
+ * const values = [1, 2, 3, 4] as const;
  *
  * const firstTwo = Arr.take(values, 2);
  *
@@ -128,7 +128,7 @@ export function take<E>(
  * @example
  *
  * ```ts
- * const values = [1, 2, 3, 4];
+ * const values = [1, 2, 3, 4] as const;
  *
  * const lastTwo = Arr.takeLast(values, 2);
  *
@@ -241,7 +241,7 @@ export function skip<E>(
  * @example
  *
  * ```ts
- * const values = ['a', 'b', 'c', 'd'];
+ * const values = ['a', 'b', 'c', 'd'] as const;
  *
  * const withoutLastTwo = Arr.skipLast(values, 2);
  *

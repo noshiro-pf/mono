@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
       email: 'bob@example.com',
       password: 'secret',
       role: 'admin',
-    };
+    } as const;
 
     // Direct usage
     const publicInfo = Obj.pick(user, ['id', 'name', 'role']);

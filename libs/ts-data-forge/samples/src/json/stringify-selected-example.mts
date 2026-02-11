@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
       email: 'charlie@example.com',
       password: 'secret123',
       role: 'admin',
-    };
+    } as const;
 
     // Select only safe properties to serialize
     const safeJson = Json.stringifySelected(user, ['id', 'name', 'role']);

@@ -4,7 +4,7 @@ import { IMap, Optional } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const entries = [['count', 1]] satisfies readonly (readonly [
+    const entries = [['count', 1]] as const satisfies readonly (readonly [
       'count' | 'status',
       number | string,
     ])[];

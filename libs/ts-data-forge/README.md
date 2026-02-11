@@ -232,7 +232,9 @@ assert.isTrue(handleStatus('error') === 'An error occurred');
 
 // Pattern matching with Result
 const processResult = (result: Result<number, string>): string =>
-    Result.isOk(result) ? `Success: ${result.value}` : `Error: ${result.value}`;
+    Result.isOk(result)
+        ? (`Success: ${result.value}` as const)
+        : (`Error: ${result.value}` as const);
 
 assert.isTrue(processResult(Result.ok(42)) === 'Success: 42');
 
@@ -374,7 +376,7 @@ The `Arr` object provides a rich set of functions for array manipulation.
 ```tsx
 import { Arr, expectType, Optional } from 'ts-data-forge';
 
-const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
+const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3] as const;
 
 // Reduction
 const sum = Arr.sum(numbers);
@@ -503,7 +505,7 @@ const processData = (data: unknown): string | undefined => {
 };
 
 // Non-null object checking
-const value: unknown = { key: 'value' };
+const value: unknown = { key: 'value' } as const;
 
 if (isNonNullObject(value)) {
     // value is guaranteed to be a non-null object

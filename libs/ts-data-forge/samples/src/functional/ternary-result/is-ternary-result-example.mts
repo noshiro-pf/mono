@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
 
     const warnValue = TernaryResult.warn('done', 'retry later');
 
-    const notResult = { $$tag: 'ts-data-forge::Result.ok' };
+    const notResult = { $$tag: 'ts-data-forge::Result.ok' } as const;
 
     assert.isTrue(TernaryResult.isTernaryResult(okValue));
 

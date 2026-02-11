@@ -2,13 +2,13 @@ import { ISetMapped } from './iset-mapped.mjs';
 
 const toKey = (a: Readonly<{ v: number }>): number => a.v;
 
-const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k });
+const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k }) as const;
 
 // Test types for additional functionality
 type TestElement = Readonly<{ id: number; type: string }>;
 
 const testElementToString = (el: Readonly<TestElement>): string =>
-  `${el.type}_${el.id}`;
+  `${el.type}_${el.id}` as const;
 
 const stringToTestElement = (str: string): TestElement => {
   const [type, idStr] = str.split('_');
@@ -185,7 +185,7 @@ describe('ISetMapped.forEach', () => {
       fromKey,
     );
 
-    const elements = [{ v: 1 }, { v: 2 }, { v: 3 }];
+    const elements = [{ v: 1 }, { v: 2 }, { v: 3 }] as const;
 
     for (const el of s0) {
       expect(elements).toContainEqual(el);
@@ -201,7 +201,7 @@ describe('ISetMapped.keys', () => {
       fromKey,
     );
 
-    const elements = [{ v: 1 }, { v: 2 }, { v: 3 }];
+    const elements = [{ v: 1 }, { v: 2 }, { v: 3 }] as const;
 
     for (const k of s0.keys()) {
       expect(elements).toContainEqual(k);
@@ -217,7 +217,7 @@ describe('ISetMapped.values', () => {
       fromKey,
     );
 
-    const elements = [{ v: 1 }, { v: 2 }, { v: 3 }];
+    const elements = [{ v: 1 }, { v: 2 }, { v: 3 }] as const;
 
     for (const v of s0.values()) {
       expect(elements).toContainEqual(v);
@@ -233,7 +233,7 @@ describe('ISetMapped.entries', () => {
       fromKey,
     );
 
-    const elements = [{ v: 1 }, { v: 2 }, { v: 3 }];
+    const elements = [{ v: 1 }, { v: 2 }, { v: 3 }] as const;
 
     for (const [k, v] of s0.entries()) {
       expect(elements).toContainEqual(k);

@@ -20,6 +20,7 @@ export const eq = <E,>(
   array2: readonly E[],
   equality: (a: E, b: E) => boolean = Object.is,
 ): boolean =>
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
   array1.length === array2.length &&
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   array1.every((v, i) => equality(v, array2[i]!));

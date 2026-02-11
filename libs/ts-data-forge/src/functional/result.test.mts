@@ -821,7 +821,7 @@ describe('Result test', () => {
     });
 
     test('should return Ok with object when function succeeds', () => {
-      const obj = { name: 'test', value: 123 };
+      const obj = { name: 'test', value: 123 } as const;
 
       const result = Result.fromThrowable(() => obj);
 
@@ -901,7 +901,7 @@ describe('Result test', () => {
     });
 
     test('should work with array access', () => {
-      const arr = [1, 2, 3];
+      const arr = [1, 2, 3] as readonly number[];
 
       // This won't throw, but demonstrates the pattern
       const result = Result.fromThrowable(() => {

@@ -585,7 +585,8 @@ describe('Queue test', () => {
       // Perform 1000 random operations
       for (const _i of range(asUint32(1000))) {
         // Randomly decide to enqueue or dequeue
-        const shouldEnqueue = mut_expected.length === 0 || Math.random() < 0.6;
+        const shouldEnqueue =
+          Arr.isArrayOfLength(mut_expected, 0) || Math.random() < 0.6;
 
         if (shouldEnqueue) {
           mut_counter += 1;

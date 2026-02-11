@@ -4,7 +4,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const numbers = [1, 2, 3];
+    const numbers = [1, 2, 3] as const;
 
     const subtractRight = Arr.foldr(numbers, (acc, value) => acc - value, 0);
 

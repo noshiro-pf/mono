@@ -4,9 +4,9 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const users: readonly Readonly<{ id: number }>[] = [{ id: 1 }];
+    const users: readonly Readonly<{ id: number }>[] = [{ id: 1 }] as const;
 
-    const emptyUsers: readonly Readonly<{ id: number }>[] = [];
+    const emptyUsers: readonly Readonly<{ id: number }>[] = [] as const;
 
     assert.isTrue(Arr.isNonEmpty(users));
 

@@ -4,9 +4,9 @@ import { Arr, Optional } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const users = [{ id: 1 }, { id: 2 }];
+    const users = [{ id: 1 }, { id: 2 }] as const;
 
-    const empty: readonly Readonly<{ id: number }>[] = [];
+    const empty: readonly Readonly<{ id: number }>[] = [] as const;
 
     const first = Arr.head(users);
 

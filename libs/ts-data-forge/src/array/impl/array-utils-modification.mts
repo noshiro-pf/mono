@@ -8,7 +8,7 @@ import { copy, create } from './array-utils-creation.mjs';
  * @example
  *
  * ```ts
- * const scores: readonly number[] = [10, 20, 30];
+ * const scores: readonly number[] = [10, 20, 30] as const;
  *
  * const updated = Arr.set(scores, 1, 25);
  *
@@ -63,7 +63,7 @@ export function set<E, const V = E>(
  * @example
  *
  * ```ts
- * const temperatures: readonly number[] = [20, 21, 22];
+ * const temperatures: readonly number[] = [20, 21, 22] as const;
  *
  * const increased = Arr.toUpdated(temperatures, 1, (value) => value + 5);
  *
@@ -341,7 +341,7 @@ export function toUnshifted<Ar extends readonly unknown[], const V>(
  * @example
  *
  * ```ts
- * const base = [1, 2, 3];
+ * const base = [1, 2, 3] as const;
  *
  * const filled = Arr.toFilled(base, 0);
  *
@@ -396,7 +396,7 @@ export function toFilled<E>(
  * @example
  *
  * ```ts
- * const base = [0, 1, 2, 3, 4];
+ * const base = [0, 1, 2, 3, 4] as const;
  *
  * const filledMiddle = Arr.toRangeFilled(base, 9, [1, 4]);
  *

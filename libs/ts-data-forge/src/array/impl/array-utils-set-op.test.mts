@@ -96,9 +96,9 @@ describe('Arr set operations', () => {
     }
 
     {
-      const objA = { a: 1 };
+      const objA = { a: 1 } as const;
 
-      const objB = { b: 2 };
+      const objB = { b: 2 } as const;
 
       const xs = [objA, objB] as const;
 

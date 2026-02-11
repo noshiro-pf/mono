@@ -2,7 +2,7 @@ import { Arr, expectType, Optional } from 'ts-data-forge';
 
 /* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
   /* embed-sample-code-ignore-this-line */ test('main', () => {
-    const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
+    const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3] as const;
 
     // Reduction
     const sum = Arr.sum(numbers);

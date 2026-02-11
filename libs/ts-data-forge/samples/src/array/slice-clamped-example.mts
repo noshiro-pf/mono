@@ -4,7 +4,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const letters = ['a', 'b', 'c', 'd', 'e'];
+    const letters = ['a', 'b', 'c', 'd', 'e'] as readonly string[];
 
     const lastThree = Arr.sliceClamped(letters, -3, 10);
 

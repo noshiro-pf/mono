@@ -13,7 +13,8 @@ import { ErrTypeTagName } from './tag.mjs';
  * assert.isTrue(TernaryResult.isErr(failure));
  * ```
  */
-export const err = <const E,>(value: E): TernaryErr<E> => ({
-  $$tag: ErrTypeTagName,
-  value,
-});
+export const err = <const E,>(value: E): TernaryErr<E> =>
+  ({
+    $$tag: ErrTypeTagName,
+    value,
+  }) as const;

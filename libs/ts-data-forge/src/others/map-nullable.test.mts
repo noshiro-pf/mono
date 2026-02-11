@@ -37,7 +37,7 @@ describe(mapNullable, () => {
     });
 
     test('should work with complex transformations', () => {
-      const user = { name: 'Alice', age: 30 };
+      const user = { name: 'Alice', age: 30 } as const;
 
       const result = mapNullable(
         user,
@@ -48,13 +48,13 @@ describe(mapNullable, () => {
     });
 
     test('should work with nullable object properties', () => {
-      const user: Readonly<{ name?: string }> = { name: 'Bob' };
+      const user: Readonly<{ name?: string }> = { name: 'Bob' } as const;
 
       const result = mapNullable(user.name, (name) => name.toUpperCase());
 
       expect(result).toBe('BOB');
 
-      const userWithoutName: Readonly<{ name?: string }> = {};
+      const userWithoutName: Readonly<{ name?: string }> = {} as const;
 
       const resultEmpty = mapNullable(userWithoutName.name, (name) =>
         name.toUpperCase(),
@@ -102,7 +102,7 @@ describe(mapNullable, () => {
         (u: Readonly<{ name: string; age: number }>) => u.name,
       );
 
-      const user = { name: 'Charlie', age: 25 };
+      const user = { name: 'Charlie', age: 25 } as const;
 
       const result1 = getName(user);
 
@@ -201,7 +201,7 @@ describe(mapNullable, () => {
       const data = {
         user: { profile: { name: 'Alice' } },
         settings: { theme: 'dark' },
-      };
+      } as const;
 
       const result = mapNullable(data, (d) => d.user.profile.name);
 
@@ -277,7 +277,7 @@ describe(mapNullable, () => {
             email: 'john@example.com',
           },
         },
-      };
+      } as const;
 
       const extractUserName = mapNullable(
         (r: ApiResponse) => r.data?.user?.name,
@@ -301,7 +301,7 @@ describe(mapNullable, () => {
       const formData: FormDataType = {
         email: 'test@example.com',
         age: '25',
-      };
+      } as const;
 
       const extractAge = mapNullable((data: FormDataType) => data.age);
 
@@ -331,7 +331,7 @@ describe(mapNullable, () => {
       const incompleteFormData: FormDataType = {
         email: 'test@example.com',
         // age is missing
-      };
+      } as const;
 
       const extractAge = mapNullable((data: FormDataType) => data.age);
 

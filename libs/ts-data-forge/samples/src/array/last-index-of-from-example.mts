@@ -5,7 +5,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const fruits = ['apple', 'banana', 'orange', 'banana', 'grape'];
+    const fruits = ['apple', 'banana', 'orange', 'banana', 'grape'] as const;
 
     // Search backwards for 'banana' from index 3
     const lastBananaFrom3 = Arr.lastIndexOfFrom(fruits, 'banana', 3);

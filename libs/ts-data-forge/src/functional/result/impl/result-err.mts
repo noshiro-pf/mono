@@ -25,7 +25,8 @@ import { ErrTypeTagName } from './tag.mjs';
  * @param value The error value.
  * @returns A `Result.Err<E>` containing the value.
  */
-export const err = <const E,>(value: E): Err<E> => ({
-  $$tag: ErrTypeTagName,
-  value,
-});
+export const err = <const E,>(value: E): Err<E> =>
+  ({
+    $$tag: ErrTypeTagName,
+    value,
+  }) as const;

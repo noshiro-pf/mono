@@ -116,7 +116,7 @@ describe('Arr', () => {
     });
 
     test('should slice with clamped indices', () => {
-      const array = [1, 2, 3, 4, 5];
+      const array = [1, 2, 3, 4, 5] as const;
 
       const result = sliceClamped(array, 1, 3);
 
@@ -124,7 +124,7 @@ describe('Arr', () => {
     });
 
     test('should clamp start index below 0', () => {
-      const array = [1, 2, 3, 4, 5];
+      const array = [1, 2, 3, 4, 5] as readonly number[];
 
       const result = sliceClamped(array, -10, 3);
 
@@ -132,7 +132,7 @@ describe('Arr', () => {
     });
 
     test('should clamp end index above length', () => {
-      const array = [1, 2, 3, 4, 5];
+      const array = [1, 2, 3, 4, 5] as readonly number[];
 
       const result = sliceClamped(array, asUint32(2), asUint32(100));
 
@@ -140,7 +140,7 @@ describe('Arr', () => {
     });
 
     test('should work with both indices out of range', () => {
-      const array = [1, 2, 3];
+      const array = [1, 2, 3] as readonly number[];
 
       const result = sliceClamped(array, asInt32(-10), asUint32(100));
 
@@ -148,7 +148,7 @@ describe('Arr', () => {
     });
 
     test('should work with empty array', () => {
-      const array: readonly number[] = [];
+      const array: readonly number[] = [] as const;
 
       const result = sliceClamped(array, 0, 5);
 

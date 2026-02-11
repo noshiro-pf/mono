@@ -84,7 +84,7 @@ describe('isError from @sindresorhus/is', () => {
       name: 'Error',
       message: 'This is not a real error',
       stack: 'fake stack trace',
-    };
+    } as const;
 
     assert.isFalse(isErrorBySindreSorhus(errorLikeObject));
   });

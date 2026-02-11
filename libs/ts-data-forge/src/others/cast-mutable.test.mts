@@ -3,7 +3,7 @@ import { castDeepMutable, castMutable } from './cast-mutable.mjs';
 
 describe(castMutable, () => {
   test('should allow mutating arrays that were readonly', () => {
-    const readonlyArray: readonly number[] = [1, 2, 3];
+    const readonlyArray: readonly number[] = [1, 2, 3] as const;
 
     const mut_array = castMutable(readonlyArray);
 
@@ -21,7 +21,7 @@ describe(castMutable, () => {
     const readonlyUser: Readonly<{ name: string; age: number }> = {
       name: 'Alice',
       age: 30,
-    };
+    } as const;
 
     const mut_user = castMutable(readonlyUser);
 
@@ -56,7 +56,7 @@ describe(castDeepMutable, () => {
           tags: ['admin', 'owner'],
         },
       },
-    };
+    } as const;
 
     const mut_state = castDeepMutable(readonlyState);
 

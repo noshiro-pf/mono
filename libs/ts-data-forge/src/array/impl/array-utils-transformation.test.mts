@@ -65,7 +65,7 @@ describe('Arr transformations', () => {
 
   describe(scan, () => {
     test('should compute running sum', () => {
-      const numbers = [1, 2, 3, 4];
+      const numbers = [1, 2, 3, 4] as const;
 
       const runningSum = scan(numbers, (acc, curr) => acc + curr, 0);
 
@@ -75,7 +75,7 @@ describe('Arr transformations', () => {
     });
 
     test('should include initial value as first element', () => {
-      const numbers = [10, 20, 30];
+      const numbers = [10, 20, 30] as const;
 
       const result = scan(numbers, (acc, curr) => acc + curr, 100);
 
@@ -97,7 +97,7 @@ describe('Arr transformations', () => {
     });
 
     test('should provide index to reducer', () => {
-      const numbers = [10, 20, 30];
+      const numbers = [10, 20, 30] as const;
 
       const mut_indices: number[] = [];
 
@@ -115,7 +115,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const result = scan(empty, (acc, curr) => acc + curr, 42);
 
@@ -123,7 +123,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with different accumulator and element types', () => {
-      const strings = ['a', 'b', 'c'];
+      const strings = ['a', 'b', 'c'] as const;
 
       const result = scan(strings, (acc, curr) => acc + curr.length, 0);
 
@@ -133,7 +133,7 @@ describe('Arr transformations', () => {
     });
 
     test('should compute running product', () => {
-      const numbers = [2, 3, 4];
+      const numbers = [2, 3, 4] as const;
 
       const runningProduct = scan(numbers, (acc, curr) => acc * curr, 1);
 
@@ -149,7 +149,7 @@ describe('Arr transformations', () => {
     });
 
     test('should preserve all intermediate values', () => {
-      const numbers = [1, 2, 3];
+      const numbers = [1, 2, 3] as const;
 
       const result = scan(numbers, (acc, curr) => acc - curr, 10);
 
@@ -285,7 +285,7 @@ describe('Arr transformations', () => {
         { name: 'Alice', age: 30 },
         { name: 'Bob', age: 20 },
         { name: 'Charlie', age: 25 },
-      ];
+      ] as readonly Readonly<{ name: string; age: number }>[];
 
       const result = toSortedBy(people, (person) => person.age);
 
@@ -299,7 +299,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with string sorting', () => {
-      const words = ['banana', 'apple', 'cherry'];
+      const words = ['banana', 'apple', 'cherry'] as const;
 
       const result = toSortedBy(
         words,
@@ -311,7 +311,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with custom key extraction', () => {
-      const items = ['hello', 'hi', 'welcome', 'bye'];
+      const items = ['hello', 'hi', 'welcome', 'bye'] as const;
 
       const result = toSortedBy(items, (item) => item.length);
 
@@ -319,7 +319,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly Readonly<{ value: number }>[] = [];
+      const empty: readonly Readonly<{ value: number }>[] = [] as const;
 
       const result = toSortedBy(empty, (item) => item.value);
 
@@ -327,7 +327,7 @@ describe('Arr transformations', () => {
     });
 
     test('toSortedBy should work with empty array', () => {
-      const empty: readonly Readonly<{ value: number }>[] = [];
+      const empty: readonly Readonly<{ value: number }>[] = [] as const;
 
       const result = toSortedBy(empty, (item) => item.value);
 
@@ -337,7 +337,7 @@ describe('Arr transformations', () => {
 
   describe(filter, () => {
     test('should filter array with predicate', () => {
-      const numbers = [1, 2, 3, 4, 5];
+      const numbers = [1, 2, 3, 4, 5] as const;
 
       const evens = filter(numbers, (n) => n % 2 === 0);
 
@@ -351,7 +351,7 @@ describe('Arr transformations', () => {
         null,
         'world',
         123,
-      ];
+      ] as const;
 
       const strings = filter(mixed, (x): x is string => typeof x === 'string');
 
@@ -393,7 +393,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const result = filter(empty, (n) => n > 0);
 
@@ -401,7 +401,7 @@ describe('Arr transformations', () => {
     });
 
     test('should pass index to predicate', () => {
-      const numbers = [10, 20, 30, 40];
+      const numbers = [10, 20, 30, 40] as const;
 
       const evenIndexes = filter(numbers, (_, i) => i % 2 === 0);
 
@@ -423,7 +423,7 @@ describe('Arr transformations', () => {
 
   describe(uniq, () => {
     test('should remove duplicate primitives', () => {
-      const array = [1, 2, 2, 3, 1, 4, 3];
+      const array = [1, 2, 2, 3, 1, 4, 3] as const;
 
       const result = uniq(array);
 
@@ -431,7 +431,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with strings', () => {
-      const array = ['a', 'b', 'a', 'c', 'b'];
+      const array = ['a', 'b', 'a', 'c', 'b'] as const;
 
       const result = uniq(array);
 
@@ -439,7 +439,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const array: readonly number[] = [];
+      const array: readonly number[] = [] as const;
 
       const result = uniq(array);
 
@@ -447,7 +447,7 @@ describe('Arr transformations', () => {
     });
 
     test('should preserve order of first occurrence', () => {
-      const array = [3, 1, 2, 1, 3, 2];
+      const array = [3, 1, 2, 1, 3, 2] as const;
 
       const result = uniq(array);
 
@@ -462,7 +462,7 @@ describe('Arr transformations', () => {
         { id: 2, name: 'Bob' },
         { id: 1, name: 'Alice Duplicate' },
         { id: 3, name: 'Charlie' },
-      ];
+      ] as const;
 
       const result = uniqBy(array, (item) => item.id);
 
@@ -476,7 +476,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with string key function', () => {
-      const words = ['hello', 'world', 'hi', 'welcome'];
+      const words = ['hello', 'world', 'hi', 'welcome'] as const;
 
       const result = uniqBy(words, (word) => word.length);
 
@@ -490,7 +490,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly Readonly<{ id: number }>[] = [];
+      const empty: readonly Readonly<{ id: number }>[] = [] as const;
 
       const result = uniqBy(empty, (item) => item.id);
 
@@ -504,7 +504,7 @@ describe('Arr transformations', () => {
         [1, 2],
         [3, 4],
         [5, 6],
-      ];
+      ] as const;
 
       const flattened = flat(nested);
 
@@ -512,7 +512,7 @@ describe('Arr transformations', () => {
     });
 
     test('should flatten with specified depth', () => {
-      const deepNested = [1, [2, [3, 4]], 5];
+      const deepNested = [1, [2, [3, 4]], 5] as const;
 
       const flat1 = flat(deepNested, 1);
 
@@ -535,7 +535,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty arrays', () => {
-      const withEmpties = [[1], [], [2, 3]];
+      const withEmpties = [[1], [], [2, 3]] as const;
 
       const flattened = flat(withEmpties);
 
@@ -546,7 +546,7 @@ describe('Arr transformations', () => {
       const nested = [
         [1, 2],
         [3, 4],
-      ];
+      ] as const;
 
       const unflattened = flat(nested, 0);
 
@@ -557,7 +557,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with infinite depth', () => {
-      const veryDeep = [1, [2, [3, [4, [5]]]]];
+      const veryDeep = [1, [2, [3, [4, [5]]]]] as const;
 
       const allFlat = flat(veryDeep, SafeUint.MAX_VALUE);
 
@@ -567,7 +567,7 @@ describe('Arr transformations', () => {
 
   describe(flatMap, () => {
     test('should map and flatten results', () => {
-      const words = ['hello', 'world'];
+      const words = ['hello', 'world'] as const;
 
       const chars = flatMap(words, (word) => word.split(''));
 
@@ -594,7 +594,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with numbers', () => {
-      const numbers = [1, 2, 3];
+      const numbers = [1, 2, 3] as const;
 
       const doubled = flatMap(numbers, (n) => [n, n * 2]);
 
@@ -602,7 +602,7 @@ describe('Arr transformations', () => {
     });
 
     test('should pass index to mapping function', () => {
-      const numbers = [10, 20];
+      const numbers = [10, 20] as const;
 
       const result = flatMap(numbers, (n, i) => [n, i]);
 
@@ -610,7 +610,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty arrays', () => {
-      const empty: readonly string[] = [];
+      const empty: readonly string[] = [] as const;
 
       const result = flatMap(empty, (s) => s.split(''));
 
@@ -618,7 +618,7 @@ describe('Arr transformations', () => {
     });
 
     test('should handle mapping to empty arrays', () => {
-      const numbers = [1, 2, 3];
+      const numbers = [1, 2, 3] as const;
 
       const result = flatMap(numbers, (n) => (n % 2 === 0 ? [n] : []));
 
@@ -729,7 +729,7 @@ describe('Arr transformations', () => {
     }
 
     test('should partition array into chunks', () => {
-      const numbers = [1, 2, 3, 4, 5, 6];
+      const numbers = [1, 2, 3, 4, 5, 6] as const;
 
       const result = partition(numbers, 2);
 
@@ -741,7 +741,7 @@ describe('Arr transformations', () => {
     });
 
     test('should handle arrays not evenly divisible by chunk size', () => {
-      const numbers = [1, 2, 3, 4, 5];
+      const numbers = [1, 2, 3, 4, 5] as const;
 
       const result = partition(numbers, 2);
 
@@ -749,7 +749,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with chunk size < 2 (returns empty)', () => {
-      const numbers = [1, 2, 3];
+      const numbers = [1, 2, 3] as const;
 
       const result = partition(numbers, 1);
 
@@ -758,7 +758,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with chunk size larger than array', () => {
-      const numbers = [1, 2];
+      const numbers = [1, 2] as const;
 
       const result = partition(numbers, 5);
 
@@ -766,7 +766,7 @@ describe('Arr transformations', () => {
     });
 
     test('partition should work with empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const result = partition(empty, 2);
 
@@ -884,7 +884,7 @@ describe('Arr transformations', () => {
         { type: 'fruit', name: 'apple' },
         { type: 'vegetable', name: 'carrot' },
         { type: 'fruit', name: 'banana' },
-      ];
+      ] as const;
 
       const grouped = groupBy(array, (item) => item.type);
 
@@ -914,7 +914,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with numeric keys', () => {
-      const numbers = [1, 2, 3, 4, 5, 6];
+      const numbers = [1, 2, 3, 4, 5, 6] as const;
 
       const grouped = groupBy(numbers, (n) => n % 2);
 
@@ -934,7 +934,7 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const grouped = groupBy(empty, (n) => n % 2);
 
@@ -942,7 +942,7 @@ describe('Arr transformations', () => {
     });
 
     test('should handle all elements in same group', () => {
-      const array = [1, 2, 3, 4];
+      const array = [1, 2, 3, 4] as const;
 
       const grouped = groupBy(array, () => 'all');
 
@@ -979,9 +979,9 @@ describe('Arr transformations', () => {
     }
 
     {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
-      const ys: readonly number[] = [4];
+      const ys: readonly number[] = [4] as const;
 
       const zipped = zip(xs, ys);
 
@@ -995,7 +995,7 @@ describe('Arr transformations', () => {
     {
       const xs = [1] as const;
 
-      const ys: readonly number[] = [4, 5, 6];
+      const ys: readonly number[] = [4, 5, 6] as const;
 
       const zipped = zip(xs, ys);
 
@@ -1047,9 +1047,9 @@ describe('Arr transformations', () => {
     // });
 
     test('should zip two arrays', () => {
-      const arr1 = [1, 2, 3];
+      const arr1 = [1, 2, 3] as const;
 
-      const arr2 = ['a', 'b', 'c'];
+      const arr2 = ['a', 'b', 'c'] as const;
 
       const result = zip(arr1, arr2);
 
@@ -1061,9 +1061,9 @@ describe('Arr transformations', () => {
     });
 
     test('should handle arrays of different lengths', () => {
-      const arr1 = [1, 2, 3, 4];
+      const arr1 = [1, 2, 3, 4] as const;
 
-      const arr2 = ['a', 'b'];
+      const arr2 = ['a', 'b'] as const;
 
       const result = zip(arr1, arr2);
 
@@ -1074,9 +1074,9 @@ describe('Arr transformations', () => {
     });
 
     test('should work with empty arrays', () => {
-      const arr1: readonly number[] = [];
+      const arr1: readonly number[] = [] as const;
 
-      const arr2: readonly string[] = [];
+      const arr2: readonly string[] = [] as const;
 
       const result = zip(arr1, arr2);
 
@@ -1084,9 +1084,9 @@ describe('Arr transformations', () => {
     });
 
     test('should handle one empty array', () => {
-      const arr1 = [1, 2, 3];
+      const arr1 = [1, 2, 3] as readonly number[];
 
-      const arr2: readonly string[] = [];
+      const arr2: readonly string[] = [] as const;
 
       const result = zip(arr1, arr2);
 

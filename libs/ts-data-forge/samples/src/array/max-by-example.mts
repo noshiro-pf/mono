@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
       { id: 'a', stars: 10 },
       { id: 'b', stars: 30 },
       { id: 'c', stars: 20 },
-    ];
+    ] as const;
 
     const mostStars = Arr.maxBy(projects, (project) => project.stars);
 

@@ -84,7 +84,7 @@ describe(isNonEmptyString, () => {
       undefined,
       'third',
       false,
-    ];
+    ] as const;
 
     // @ts-expect-error Testing non-string types
     const nonEmptyStrings = mixed.filter(isNonEmptyString);

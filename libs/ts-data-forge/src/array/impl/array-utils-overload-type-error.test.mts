@@ -148,7 +148,7 @@ describe('Array overloaded functions - type error validation', () => {
       const invalidArgs: readonly [readonly string[], (x: string) => number] = [
         ['a'],
         (x) => x.length,
-      ];
+      ] as const;
 
       // @ts-expect-error - Wrong types in tuple for spread
       findIndex(...invalidArgs);

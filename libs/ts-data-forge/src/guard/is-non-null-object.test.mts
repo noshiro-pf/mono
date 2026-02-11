@@ -73,7 +73,7 @@ describe(isNonNullObject, () => {
   });
 
   test('should act as a type guard', () => {
-    const value: unknown = { test: true };
+    const value: unknown = { test: true } as const;
 
     if (isNonNullObject(value)) {
       expectType<typeof value, object>('=');
@@ -81,7 +81,8 @@ describe(isNonNullObject, () => {
   });
 
   test('should narrow nullable object types', () => {
-    const nullable: UnknownRecord | null = Math.random() > 0.5 ? {} : null;
+    const nullable: UnknownRecord | null =
+      Math.random() > 0.5 ? ({} as const) : null;
 
     if (isNonNullObject(nullable)) {
       expectType<typeof nullable, UnknownRecord>('=');
@@ -98,7 +99,7 @@ describe(isNonNullObject, () => {
       [],
       () => {},
       true,
-    ];
+    ] as const;
 
     const objects = mixed.filter(isNonNullObject);
 

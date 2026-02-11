@@ -93,7 +93,7 @@ describe('Arr reducing value', () => {
     });
 
     test('case 3: readonly array', () => {
-      const arr: readonly number[] = [1, 5, 2];
+      const arr: readonly number[] = [1, 5, 2] as const;
 
       const res = max(arr);
 
@@ -107,7 +107,7 @@ describe('Arr reducing value', () => {
     });
 
     test('case 4: empty array', () => {
-      const arr: readonly number[] = [];
+      const arr: readonly number[] = [] as const;
 
       const res = max(arr);
 
@@ -152,7 +152,7 @@ describe('Arr reducing value', () => {
     });
 
     test('case 2: empty array', () => {
-      const arr: readonly Readonly<{ x: number }>[] = [];
+      const arr: readonly Readonly<{ x: number }>[] = [] as const;
 
       const res = minBy(arr, (a) => a.x);
 
@@ -228,7 +228,7 @@ describe('Arr reducing value', () => {
     });
 
     test('case 2: empty array', () => {
-      const arr: readonly Readonly<{ x: number }>[] = [];
+      const arr: readonly Readonly<{ x: number }>[] = [] as const;
 
       const res = maxBy(arr, (a) => a.x);
 
@@ -288,7 +288,7 @@ describe('Arr reducing value', () => {
     });
 
     test('case 2: empty array', () => {
-      const arr: readonly number[] = [];
+      const arr: readonly number[] = [] as const;
 
       const res = count(arr, (x) => x > 0);
 
@@ -332,7 +332,7 @@ describe('Arr reducing value', () => {
     });
 
     test('case 2: empty array', () => {
-      const arr: readonly Readonly<{ x: number }>[] = [];
+      const arr: readonly Readonly<{ x: number }>[] = [] as const;
 
       const res = countBy(arr, (a) => a.x);
 
@@ -485,7 +485,7 @@ describe('Arr reducing value', () => {
 
   describe(join, () => {
     test('should join array elements', () => {
-      const arr = ['Hello', 'World'];
+      const arr = ['Hello', 'World'] as const;
 
       const result = join(arr, ' ');
 
@@ -495,7 +495,7 @@ describe('Arr reducing value', () => {
     });
 
     test('should handle empty separator', () => {
-      const arr = ['a', 'b', 'c'];
+      const arr = ['a', 'b', 'c'] as const;
 
       const result = join(arr, '');
 
@@ -505,7 +505,7 @@ describe('Arr reducing value', () => {
     });
 
     test('should handle undefined separator', () => {
-      const arr = ['a', 'b', 'c'];
+      const arr = ['a', 'b', 'c'] as const;
 
       const result = join(arr);
 

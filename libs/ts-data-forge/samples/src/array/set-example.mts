@@ -4,7 +4,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const scores: readonly number[] = [10, 20, 30];
+    const scores: readonly number[] = [10, 20, 30] as const;
 
     const updated = Arr.set(scores, 1, 25);
 

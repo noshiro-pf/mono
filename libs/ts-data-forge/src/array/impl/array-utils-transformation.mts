@@ -679,7 +679,7 @@ export const concat = <
 >(
   array1: Ar1,
   array2: Ar2,
-): readonly [...Ar1, ...Ar2] => [...array1, ...array2];
+): readonly [...Ar1, ...Ar2] => [...array1, ...array2] as const;
 
 /**
  * Groups elements by a key derived from each element.

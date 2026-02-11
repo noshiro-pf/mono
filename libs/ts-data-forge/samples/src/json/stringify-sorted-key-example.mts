@@ -13,7 +13,7 @@ if (import.meta.vitest !== undefined) {
         alpha: 'a',
         beta: 'b',
       },
-    };
+    } as const;
 
     // Keys will be sorted alphabetically at all levels
     const sorted = Json.stringifySortedKey(unorderedData);

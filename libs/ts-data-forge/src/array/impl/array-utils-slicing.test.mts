@@ -43,7 +43,7 @@ describe('Arr slicing', () => {
 
   describe(butLast, () => {
     test('readonly number[] type', () => {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
       const bl = butLast(xs);
 
@@ -97,7 +97,7 @@ describe('Arr slicing', () => {
     }
 
     {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
       const t = take(xs, 2);
 
@@ -131,7 +131,7 @@ describe('Arr slicing', () => {
     }
 
     {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
       const t = takeLast(xs, 2);
 
@@ -165,7 +165,7 @@ describe('Arr slicing', () => {
     }
 
     {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
       const t = skip(xs, 2);
 
@@ -199,7 +199,7 @@ describe('Arr slicing', () => {
     }
 
     {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
       const t = skipLast(xs, 2);
 

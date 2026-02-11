@@ -47,7 +47,12 @@ describe('pick', () => {
   test('pick should work with pipe when curried', () => {
     const pickIdAndName = Obj.pick(['id', 'name']);
 
-    const user = { id: 1, name: 'Alice', email: 'alice@example.com', age: 30 };
+    const user = {
+      id: 1,
+      name: 'Alice',
+      email: 'alice@example.com',
+      age: 30,
+    } as const;
 
     const result = pipe(user).map(pickIdAndName).value;
 
@@ -103,7 +108,7 @@ describe('omit', () => {
       name: 'Alice',
       email: 'alice@example.com',
       password: 'secret123',
-    };
+    } as const;
 
     const result = pipe(user).map(omitSensitive).value;
 
@@ -113,7 +118,7 @@ describe('omit', () => {
   test('omit should handle empty keys in curried form', () => {
     const omitNone = Obj.omit([]);
 
-    const original = { a: 1, b: 2, c: 3 };
+    const original = { a: 1, b: 2, c: 3 } as const;
 
     const result = omitNone(original);
 
@@ -149,9 +154,9 @@ describe('omit', () => {
 describe('fromEntries', () => {
   test('should build readonly object from fixed entries', () => {
     const entries = [
-      ['name', 'Alice'] as const,
-      ['age', 30 as const],
-      ['active', true as const],
+      ['name', 'Alice'],
+      ['age', 30],
+      ['active', true],
     ] as const;
 
     const result = Obj.fromEntries(entries);
@@ -167,7 +172,7 @@ describe('fromEntries', () => {
   test('should produce partial record when keys are unions', () => {
     const dynamicEntries: readonly (readonly ['name' | 'email', string])[] = [
       ['name', 'Alice'],
-    ];
+    ] as const;
 
     const result = Obj.fromEntries(dynamicEntries) satisfies Partial<
       Readonly<Record<'name' | 'email', string>>

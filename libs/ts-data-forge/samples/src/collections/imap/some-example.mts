@@ -7,7 +7,7 @@ if (import.meta.vitest !== undefined) {
     const entries = [
       ['alice', 3],
       ['bob', 5],
-    ] satisfies readonly (readonly [string, number])[];
+    ] as const satisfies readonly (readonly [string, number])[];
 
     const map = IMap.create(entries);
 

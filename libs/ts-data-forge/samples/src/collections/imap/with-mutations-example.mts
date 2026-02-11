@@ -7,7 +7,7 @@ if (import.meta.vitest !== undefined) {
     const entries = [
       ['a', 1],
       ['b', 2],
-    ] satisfies readonly (readonly ['a' | 'b' | 'c', number])[];
+    ] as const satisfies readonly (readonly ['a' | 'b' | 'c', number])[];
 
     const base = IMap.create<'a' | 'b' | 'c', number>(entries);
 
@@ -19,7 +19,7 @@ if (import.meta.vitest !== undefined) {
       { type: 'set', key: 'c', value: 3 },
       { type: 'update', key: 'b', updater: (value) => value * 10 },
       { type: 'delete', key: 'a' },
-    ];
+    ] as const;
 
     const mutated = base.withMutations(actions);
 

@@ -5,7 +5,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const fruits = ['apple', 'banana', 'orange', 'banana'];
+    const fruits = ['apple', 'banana', 'orange', 'banana'] as readonly string[];
 
     // Search for 'banana' starting from index 1
     const firstBanana = Arr.indexOfFrom(fruits, 'banana', 1);

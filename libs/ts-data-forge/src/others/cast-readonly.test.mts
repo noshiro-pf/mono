@@ -2,7 +2,7 @@ import { castDeepReadonly, castReadonly } from './cast-readonly.mjs';
 
 describe(castReadonly, () => {
   test('should cast mutable array to readonly', () => {
-    const mutableArr = [1, 2, 3];
+    const mutableArr = [1, 2, 3] as const;
 
     const readonlyArr = castReadonly(mutableArr);
 
@@ -12,7 +12,7 @@ describe(castReadonly, () => {
   });
 
   test('should cast mutable object to readonly', () => {
-    const mutableObj = { x: 1, y: 2 };
+    const mutableObj = { x: 1, y: 2 } as const;
 
     const readonlyObj = castReadonly(mutableObj);
 
@@ -22,7 +22,7 @@ describe(castReadonly, () => {
   });
 
   test('should preserve the runtime value', () => {
-    const original = { value: 42 };
+    const original = { value: 42 } as const;
 
     const readonly = castReadonly(original);
 
@@ -52,7 +52,7 @@ describe(castDeepReadonly, () => {
     const mutableNested = {
       a: { b: [1, 2, 3] },
       c: { d: { e: 'value' } },
-    };
+    } as const;
 
     const readonlyNested = castDeepReadonly(mutableNested);
 
@@ -67,6 +67,9 @@ describe(castDeepReadonly, () => {
     const complex = {
       users: [{ id: 1, profile: { name: 'Alice' } }],
       settings: { theme: 'dark', options: { debug: true } },
+    } as {
+      users: { id: number; profile: { name: string } }[];
+      settings: { theme: string; options: { debug: boolean } };
     };
 
     const readonly = castDeepReadonly(complex);
@@ -82,7 +85,7 @@ describe(castDeepReadonly, () => {
     const data = [
       { id: 1, meta: { active: true } },
       { id: 2, meta: { active: false } },
-    ];
+    ] as { id: number; meta: { active: boolean } }[];
 
     const readonly = castDeepReadonly(data);
 

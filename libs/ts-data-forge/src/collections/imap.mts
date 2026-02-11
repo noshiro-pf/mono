@@ -40,7 +40,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['a', 1],
    *   ['b', 2],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -138,7 +138,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['alice', 3],
    *   ['bob', 5],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -188,7 +188,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * @example
    *
    * ```ts
-   * const entries = [['count', 1]] satisfies readonly (readonly [
+   * const entries = [['count', 1]] as const satisfies readonly (readonly [
    *   'count' | 'status',
    *   number | string,
    * ])[];
@@ -221,7 +221,10 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['alice', 10],
    *   ['bob', 8],
-   * ] satisfies readonly (readonly ['alice' | 'bob' | 'charlie', number])[];
+   * ] as const satisfies readonly (readonly [
+   *   'alice' | 'bob' | 'charlie',
+   *   number,
+   * ])[];
    *
    * const scores = IMap.create<'alice' | 'bob' | 'charlie', number>(entries);
    *
@@ -252,7 +255,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['a', 1],
    *   ['b', 2],
-   * ] satisfies readonly (readonly ['a' | 'b' | 'c', number])[];
+   * ] as const satisfies readonly (readonly ['a' | 'b' | 'c', number])[];
    *
    * const base = IMap.create<'a' | 'b' | 'c', number>(entries);
    *
@@ -264,7 +267,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *   { type: 'set', key: 'c', value: 3 },
    *   { type: 'update', key: 'b', updater: (value) => value * 10 },
    *   { type: 'delete', key: 'a' },
-   * ];
+   * ] as const;
    *
    * const mutated = base.withMutations(actions);
    *
@@ -299,7 +302,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['a', 1],
    *   ['b', 2],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -326,7 +329,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['first', 1],
    *   ['second', 2],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -353,7 +356,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['a', 1],
    *   ['b', 2],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -416,7 +419,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['a', 1],
    *   ['b', 2],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -438,7 +441,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['a', 1],
    *   ['b', 2],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -485,7 +488,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['x', 10],
    *   ['y', 20],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -505,7 +508,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['x', 10],
    *   ['y', 20],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -525,7 +528,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['a', 1],
    *   ['b', 2],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *
@@ -549,7 +552,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * const entries = [
    *   ['k1', 'v1'],
    *   ['k2', 'v2'],
-   * ] satisfies readonly (readonly [string, string])[];
+   * ] as const satisfies readonly (readonly [string, string])[];
    *
    * const map = IMap.create(entries);
    *
@@ -569,7 +572,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * @example
    *
    * ```ts
-   * const entries = [['key', 1]] satisfies readonly (readonly [
+   * const entries = [['key', 1]] as const satisfies readonly (readonly [
    *   string,
    *   number,
    * ])[];
@@ -922,7 +925,7 @@ class IMapClass<K extends MapSetKeyType, V>
    * const entries = [
    *   ['first', 1],
    *   ['second', 2],
-   * ] satisfies readonly (readonly [string, number])[];
+   * ] as const satisfies readonly (readonly [string, number])[];
    *
    * const map = IMap.create(entries);
    *

@@ -14,7 +14,7 @@ if (import.meta.vitest !== undefined) {
     const points: readonly Point[] = [
       { x: 1, tag: 'a' },
       { x: 2, tag: 'b' },
-    ];
+    ] as const;
 
     const set = ISetMapped.create<Point, string>(points, toKey, fromKey);
 

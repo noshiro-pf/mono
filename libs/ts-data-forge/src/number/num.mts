@@ -391,7 +391,7 @@ export namespace Num {
    * @param num - The number to round
    * @returns The rounded integer as an Int branded type
    */
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, ts-data-forge/prefer-as-int
   export const roundToInt = (num: number): Int => Math.trunc(num + 0.5) as Int;
 
   /**

@@ -6,7 +6,7 @@ import { Num } from '../../number/index.mjs';
  * @example
  *
  * ```ts
- * const letters = ['a', 'b', 'c', 'd', 'e'];
+ * const letters = ['a', 'b', 'c', 'd', 'e'] as readonly string[];
  *
  * const lastThree = Arr.sliceClamped(letters, -3, 10);
  *

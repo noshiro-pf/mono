@@ -4,7 +4,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const temperatures: readonly number[] = [20, 21, 22];
+    const temperatures: readonly number[] = [20, 21, 22] as const;
 
     const increased = Arr.toUpdated(temperatures, 1, (value) => value + 5);
 

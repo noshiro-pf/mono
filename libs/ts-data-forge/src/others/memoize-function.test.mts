@@ -65,11 +65,11 @@ describe(memoizeFunction, () => {
 
     const memoized = memoizeFunction(mockFn, (user) => user.id);
 
-    const user1 = { id: 1, name: 'Alice' };
+    const user1 = { id: 1, name: 'Alice' } as const;
 
-    const user2 = { id: 1, name: 'Bob' }; // Same id, different name
+    const user2 = { id: 1, name: 'Bob' } as const; // Same id, different name
 
-    const user3 = { id: 2, name: 'Charlie' };
+    const user3 = { id: 2, name: 'Charlie' } as const;
 
     expect(memoized(user1)).toBe('Hello Alice');
 
@@ -216,11 +216,23 @@ describe(memoizeFunction, () => {
       (args) => `${args.category}:${args.subcategory}:${args.id}`,
     );
 
-    const args1 = { category: 'books', subcategory: 'fiction', id: 123 };
+    const args1 = {
+      category: 'books',
+      subcategory: 'fiction',
+      id: 123,
+    } as const;
 
-    const args2 = { category: 'books', subcategory: 'fiction', id: 123 };
+    const args2 = {
+      category: 'books',
+      subcategory: 'fiction',
+      id: 123,
+    } as const;
 
-    const args3 = { category: 'books', subcategory: 'fiction', id: 124 };
+    const args3 = {
+      category: 'books',
+      subcategory: 'fiction',
+      id: 124,
+    } as const;
 
     expect(memoized(args1)).toBe('books/fiction/123');
 

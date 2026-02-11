@@ -4,7 +4,7 @@ import { isRecord } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const entries: readonly unknown[] = [{ id: 1 }, 'str', 0, null];
+    const entries: readonly unknown[] = [{ id: 1 }, 'str', 0, null] as const;
 
     const records = entries.filter(isRecord);
 

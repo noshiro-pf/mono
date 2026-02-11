@@ -93,7 +93,7 @@ export namespace Json {
    * @example
    *
    * ```ts
-   * const data = { name: 'Bob', age: 25, active: true };
+   * const data = { name: 'Bob', age: 25, active: true } as const;
    *
    * // Basic stringify
    * const basic = Json.stringify(data);
@@ -177,7 +177,7 @@ export namespace Json {
    *   email: 'charlie@example.com',
    *   password: 'secret123',
    *   role: 'admin',
-   * };
+   * } as const;
    *
    * // Select only safe properties to serialize
    * const safeJson = Json.stringifySelected(user, ['id', 'name', 'role']);
@@ -262,7 +262,7 @@ export namespace Json {
    *     alpha: 'a',
    *     beta: 'b',
    *   },
-   * };
+   * } as const;
    *
    * // Keys will be sorted alphabetically at all levels
    * const sorted = Json.stringifySortedKey(unorderedData);
@@ -354,6 +354,7 @@ const keysDeepImpl = (
       keysDeepImpl(o, mut_keys);
     }
 
+    // eslint-disable-next-line ts-data-forge/prefer-arr-is-array
     if (Array.isArray(o)) {
       for (const li of o) {
         if (isRecord(li)) {

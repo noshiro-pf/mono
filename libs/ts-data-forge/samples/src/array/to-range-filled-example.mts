@@ -4,7 +4,7 @@ import { Arr } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const base = [0, 1, 2, 3, 4];
+    const base = [0, 1, 2, 3, 4] as const;
 
     const filledMiddle = Arr.toRangeFilled(base, 9, [1, 4]);
 

@@ -102,7 +102,7 @@ describe(isPrimitive, () => {
       null,
       undefined,
       Symbol('test'),
-    ];
+    ] as const;
 
     const primitives = values.filter(isPrimitive);
 

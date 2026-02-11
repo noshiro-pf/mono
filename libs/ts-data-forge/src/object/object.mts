@@ -16,20 +16,20 @@ export namespace Obj {
    * @example
    *
    * ```ts
-   * const obj1 = { name: 'Alice', age: 30 };
+   * const obj1 = { name: 'Alice', age: 30 } as const;
    *
-   * const obj2 = { name: 'Alice', age: 30 };
+   * const obj2 = { name: 'Alice', age: 30 } as const;
    *
-   * const obj3 = { name: 'Alice', age: 31 };
+   * const obj3 = { name: 'Alice', age: 31 } as const;
    *
    * assert.isTrue(Obj.shallowEq(obj1, obj2));
    *
    * assert.isFalse(Obj.shallowEq(obj1, obj3));
    *
    * // Custom equality function
-   * const obj4 = { value: 1 };
+   * const obj4 = { value: 1 } as const;
    *
-   * const obj5 = { value: 1.00001 };
+   * const obj5 = { value: 1.00001 } as const;
    *
    * const closeEnough = (a: unknown, b: unknown): boolean => {
    *   if (typeof a === 'number' && typeof b === 'number') {
@@ -58,6 +58,7 @@ export namespace Obj {
 
     const bEntries = Object.entries(b);
 
+    // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
     if (aEntries.length !== bEntries.length) return false;
 
     return aEntries.every(([k, v]) => eq(b[k], v));
@@ -80,7 +81,7 @@ export namespace Obj {
    *   email: 'bob@example.com',
    *   password: 'secret',
    *   role: 'admin',
-   * };
+   * } as const;
    *
    * // Direct usage
    * const publicInfo = Obj.pick(user, ['id', 'name', 'role']);
@@ -166,7 +167,7 @@ export namespace Obj {
    *   email: 'charlie@example.com',
    *   password: 'secret123',
    *   internalNote: 'VIP customer',
-   * };
+   * } as const;
    *
    * // Direct usage - remove sensitive fields
    * const safeUser = Obj.omit(user, ['password', 'internalNote']);
@@ -277,7 +278,7 @@ export namespace Obj {
    * const dynamicEntries: readonly (readonly ['x' | 'y', number])[] = [
    *   ['x', 10],
    *   ['y', 20],
-   * ];
+   * ] as const;
    *
    * const obj2 = Obj.fromEntries(dynamicEntries);
    *

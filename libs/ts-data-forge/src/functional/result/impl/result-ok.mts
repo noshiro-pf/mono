@@ -25,7 +25,8 @@ import { OkTypeTagName } from './tag.mjs';
  * @param value The success value.
  * @returns A `Result.Ok<S>` containing the value.
  */
-export const ok = <const S,>(value: S): Ok<S> => ({
-  $$tag: OkTypeTagName,
-  value,
-});
+export const ok = <const S,>(value: S): Ok<S> =>
+  ({
+    $$tag: OkTypeTagName,
+    value,
+  }) as const;

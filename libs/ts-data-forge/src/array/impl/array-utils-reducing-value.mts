@@ -14,7 +14,7 @@ import { isNonEmpty } from './array-utils-validation.mjs';
  * ```ts
  * const values = [5, 3, 9] as const;
  *
- * const empty: readonly number[] = [];
+ * const empty: readonly number[] = [] as const;
  *
  * const smallest = Arr.min(values);
  *
@@ -64,7 +64,7 @@ export function min<E extends number>(
  * @example
  *
  * ```ts
- * const values = [5, 3, 9];
+ * const values = [5, 3, 9] as const;
  *
  * const largest = Arr.max(values);
  *
@@ -155,7 +155,7 @@ export function minBy<E, V>(
  *   { id: 'a', stars: 10 },
  *   { id: 'b', stars: 30 },
  *   { id: 'c', stars: 20 },
- * ];
+ * ] as const;
  *
  * const mostStars = Arr.maxBy(projects, (project) => project.stars);
  *
@@ -318,7 +318,7 @@ export function countBy<E, G extends MapSetKeyType>(
  * @example
  *
  * ```ts
- * const words = ['Ada', 'Lovelace'];
+ * const words = ['Ada', 'Lovelace'] as const;
  *
  * const totalLength = Arr.foldl(words, (acc, word) => acc + word.length, 0);
  *
@@ -395,7 +395,7 @@ export function foldl<E, P>(
  * @example
  *
  * ```ts
- * const numbers = [1, 2, 3];
+ * const numbers = [1, 2, 3] as const;
  *
  * const subtractRight = Arr.foldr(numbers, (acc, value) => acc - value, 0);
  *
@@ -496,6 +496,7 @@ export function sum(array: readonly Int[]): Int;
 export function sum(array: readonly number[]): number;
 
 export function sum(array: readonly number[]): number {
+  // eslint-disable-next-line ts-data-forge/prefer-arr-sum
   return array.reduce((prev, curr) => prev + curr, 0);
 }
 

@@ -3,12 +3,12 @@ import { IMapMapped } from './imap-mapped.mjs';
 
 const toKey = (a: Readonly<{ v: number }>): number => a.v;
 
-const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k });
+const fromKey = (k: number): Readonly<{ v: number }> => ({ v: k }) as const;
 
 type TestKey = Readonly<{ id: number; type: string }>;
 
 const testKeyToString = (key: Readonly<TestKey>): string =>
-  `${key.type}_${key.id}`;
+  `${key.type}_${key.id}` as const;
 
 const stringToTestKey = (str: string): TestKey => {
   const [type, idStr] = str.split('_');
@@ -105,7 +105,7 @@ describe('IMapMapped.create', () => {
         nested: { id: number };
         arr: number[];
       }>,
-    ): string => `${key.nested.id}_${key.arr.join(',')}`;
+    ): string => `${key.nested.id}_${key.arr.join(',')}` as const;
 
     const stringToComplexKey = (str: string): ComplexKey => {
       const [idStr, arrStr] = str.split('_');
@@ -777,9 +777,9 @@ describe('IMapMapped.forEach', () => {
       fromKey,
     );
 
-    const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
+    const keys = [{ v: 1 }, { v: 2 }, { v: 3 }] as const;
 
-    const values = ['1', '2', '3'];
+    const values = ['1', '2', '3'] as const;
 
     for (const [key, value] of s0.entries()) {
       expect(keys).toContainEqual(key);
@@ -824,7 +824,7 @@ describe('IMapMapped.keys', () => {
       fromKey,
     );
 
-    const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
+    const keys = [{ v: 1 }, { v: 2 }, { v: 3 }] as const;
 
     for (const k of s0.keys()) {
       expect(keys).toContainEqual(k);
@@ -844,7 +844,7 @@ describe('IMapMapped.values', () => {
       fromKey,
     );
 
-    const values = ['1', '2', '3'];
+    const values = ['1', '2', '3'] as const;
 
     for (const v of s0.values()) {
       expect(values).toContainEqual(v);
@@ -864,9 +864,9 @@ describe('IMapMapped.entries', () => {
       fromKey,
     );
 
-    const keys = [{ v: 1 }, { v: 2 }, { v: 3 }];
+    const keys = [{ v: 1 }, { v: 2 }, { v: 3 }] as const;
 
-    const values = ['1', '2', '3'];
+    const values = ['1', '2', '3'] as const;
 
     for (const [k, v] of s0.entries()) {
       expect(keys).toContainEqual(k);

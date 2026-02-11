@@ -17,7 +17,9 @@
  * @example
  *
  * ```ts
- * const maybeUser: Readonly<{ id?: number; name?: string }> = { id: 42 };
+ * const maybeUser: Readonly<{ id?: number; name?: string }> = {
+ *   id: 42,
+ * } as const;
  *
  * if (hasKey(maybeUser, 'id')) {
  *   // `maybeUser` is now known to have an `id` property.
@@ -43,7 +45,9 @@ export const hasKey = <
 >(
   obj: R,
   key: K,
-): obj is HasKeyReturnType<R, K> => Object.hasOwn(obj, key);
+): obj is HasKeyReturnType<R, K> =>
+  // eslint-disable-next-line ts-data-forge/prefer-is-record-and-has-key
+  Object.hasOwn(obj, key);
 
 /**
  * @internal

@@ -4,7 +4,7 @@ import { entries, indices, values } from './array-utils-iterators.mjs';
 
 describe(entries, () => {
   test('should return array of index-value pairs', () => {
-    const fruits = ['apple', 'banana', 'cherry'];
+    const fruits = ['apple', 'banana', 'cherry'] as const;
 
     const es = Array.from(entries(fruits));
 
@@ -31,7 +31,7 @@ describe(entries, () => {
   });
 
   test('should work with empty array', () => {
-    const empty: readonly string[] = [];
+    const empty: readonly string[] = [] as const;
 
     const es = Array.from(entries(empty));
 
@@ -56,7 +56,7 @@ describe(entries, () => {
 
 describe(values, () => {
   test('should return copy of array values', () => {
-    const numbers = [1, 2, 3];
+    const numbers = [1, 2, 3] as const;
 
     const vs = Array.from(values(numbers));
 
@@ -77,7 +77,7 @@ describe(values, () => {
   });
 
   test('should work with empty array', () => {
-    const empty: readonly number[] = [];
+    const empty: readonly number[] = [] as const;
 
     const vs = Array.from(values(empty));
 
@@ -98,7 +98,7 @@ describe(values, () => {
 
 describe(indices, () => {
   test('should return array of indices', () => {
-    const fruits = ['apple', 'banana', 'cherry'];
+    const fruits = ['apple', 'banana', 'cherry'] as const;
 
     const ks = Array.from(indices(fruits));
 
@@ -117,7 +117,7 @@ describe(indices, () => {
   });
 
   test('should work with empty array', () => {
-    const empty: readonly string[] = [];
+    const empty: readonly string[] = [] as const;
 
     const ks = Array.from(indices(empty));
 

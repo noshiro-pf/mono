@@ -62,7 +62,7 @@ describe(unknownToString, () => {
     });
 
     test('(args) => ({ ret: args })', () => {
-      const fn = (args: unknown): unknown => ({ ret: args });
+      const fn = (args: unknown): unknown => ({ ret: args }) as const;
 
       expect(unknownToString(fn)).toBe('(args) => ({ ret: args })');
 
@@ -72,7 +72,7 @@ describe(unknownToString, () => {
 
   describe('object', () => {
     test('object', () => {
-      const obj = { a: { b: 1 } };
+      const obj = { a: { b: 1 } } as const;
 
       expect(unknownToString(obj)).toBe('{"a":{"b":1}}');
 
@@ -80,7 +80,7 @@ describe(unknownToString, () => {
     });
 
     test('object(prettyPrint=true)', () => {
-      const obj = { a: { b: 1 } };
+      const obj = { a: { b: 1 } } as const;
 
       expect(unknownToString(obj, { prettyPrintObject: true })).toBe(
         dedent`
@@ -95,7 +95,7 @@ describe(unknownToString, () => {
 
     describe('array', () => {
       test('array of primitives', () => {
-        const arr = [1, 2, 3, 'test', true];
+        const arr = [1, 2, 3, 'test', true] as const;
 
         expect(unknownToString(arr)).toBe('[1,2,3,"test",true]');
 
@@ -103,7 +103,7 @@ describe(unknownToString, () => {
       });
 
       test('array of objects', () => {
-        const arr = [{ a: 1 }, { b: 2 }];
+        const arr = [{ a: 1 }, { b: 2 }] as const;
 
         expect(unknownToString(arr)).toBe('[{"a":1},{"b":2}]');
 
@@ -120,7 +120,7 @@ describe(unknownToString, () => {
         const nestedArray = [
           [1, 2],
           [3, 4],
-        ];
+        ] as const;
 
         expect(unknownToString(nestedArray)).toBe('[[1,2],[3,4]]');
 
@@ -128,7 +128,7 @@ describe(unknownToString, () => {
       });
 
       test('array with prettyPrint', () => {
-        const arr = [1, { a: 2 }, 3];
+        const arr = [1, { a: 2 }, 3] as const;
 
         expect(
           unknownToString(arr, {
@@ -288,7 +288,7 @@ describe(unknownToString, () => {
         // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw 'custom failure';
       },
-    };
+    } as const;
 
     expect(unknownToString(value)).toBe('[Circular or Non-serializable]');
   });

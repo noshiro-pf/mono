@@ -104,7 +104,7 @@ describe('Arr modifications', () => {
     });
 
     test('case 4 (number[])', () => {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
       const result = toRemoved(xs, 5);
 
@@ -134,7 +134,7 @@ describe('Arr modifications', () => {
     });
 
     test('case 2', () => {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
       const result = toPushed(xs, 4 as const);
 
@@ -164,7 +164,7 @@ describe('Arr modifications', () => {
     });
 
     test('case 2', () => {
-      const xs: readonly number[] = [1, 2, 3];
+      const xs: readonly number[] = [1, 2, 3] as const;
 
       const result = toUnshifted(xs, 4 as const);
 
@@ -184,7 +184,7 @@ describe('Arr modifications', () => {
 
   describe(toFilled, () => {
     test('should fill entire array with value', () => {
-      const arr = [1, 2, 3, 4, 5];
+      const arr = [1, 2, 3, 4, 5] as const;
 
       const result = toFilled(arr, 0);
 
@@ -194,7 +194,7 @@ describe('Arr modifications', () => {
     test('should work with curried version', () => {
       const fillWithZero = toFilled(0);
 
-      const arr = [1, 2, 3];
+      const arr = [1, 2, 3] as const;
 
       const result = fillWithZero(arr);
 
@@ -204,7 +204,7 @@ describe('Arr modifications', () => {
 
   describe(toRangeFilled, () => {
     test('should fill array with range', () => {
-      const arr = [1, 2, 3, 4, 5];
+      const arr = [1, 2, 3, 4, 5] as const;
 
       const result = toRangeFilled(arr, 0, [1, 4]);
 
@@ -212,7 +212,7 @@ describe('Arr modifications', () => {
     });
 
     test('should fill with range starting from 0', () => {
-      const arr = [1, 2, 3, 4, 5];
+      const arr = [1, 2, 3, 4, 5] as const;
 
       const result = toRangeFilled(arr, 9, [0, 3]);
 
@@ -220,7 +220,7 @@ describe('Arr modifications', () => {
     });
 
     test('should handle empty range', () => {
-      const arr = [1, 2, 3];
+      const arr = [1, 2, 3] as const;
 
       const result = toRangeFilled(arr, 0, [2, 2]);
 
@@ -228,7 +228,7 @@ describe('Arr modifications', () => {
     });
 
     test('should clamp range to array bounds', () => {
-      const arr = [1, 2, 3];
+      const arr = [1, 2, 3] as readonly number[];
 
       const result = toRangeFilled(arr, 0, [1, 10]);
 
@@ -236,7 +236,7 @@ describe('Arr modifications', () => {
     });
 
     test('should handle negative start (clamped to 0)', () => {
-      const arr = [1, 2, 3];
+      const arr = [1, 2, 3] as readonly number[];
 
       const result = toRangeFilled(arr, 9, [-5, 2]);
 
@@ -252,14 +252,14 @@ describe('Arr modifications', () => {
     });
 
     test('A non-integer starting value should result in a type error', () => {
-      const arr = [1, 2, 3];
+      const arr = [1, 2, 3] as const;
 
       // @ts-expect-error start must be an integer
       assert.deepStrictEqual(toRangeFilled(arr, 0, [1.5, 3]), [1, 0, 0]);
     });
 
     test('A non-integer ending value should result in a type error', () => {
-      const arr = [1, 2, 3];
+      const arr = [1, 2, 3] as const;
 
       // @ts-expect-error end must be an integer
       assert.deepStrictEqual(toRangeFilled(arr, 0, [1, 2.5]), [1, 0, 3]);

@@ -56,7 +56,7 @@ describe('Arr validations', () => {
     });
 
     test('should work with readonly arrays', () => {
-      const readonlyArray: readonly number[] = [1, 2, 3];
+      const readonlyArray: readonly number[] = [1, 2, 3] as const;
 
       if (isArray(readonlyArray)) {
         expectType<typeof readonlyArray, readonly number[]>('=');
@@ -66,10 +66,11 @@ describe('Arr validations', () => {
     });
 
     test('should work with mutable arrays', () => {
-      const mutableArray: readonly number[] = [1, 2, 3];
+      // transformer-ignore-next-line convert-to-readonly, append-as-const
+      const mutableArray: number[] = [1, 2, 3];
 
       if (isArray(mutableArray)) {
-        expectType<typeof mutableArray, readonly number[]>('=');
+        expectType<typeof mutableArray, number[]>('=');
 
         expect(mutableArray).toHaveLength(3);
       }
@@ -159,7 +160,7 @@ describe('Arr validations', () => {
     });
 
     test('should work as type guard (additional)', () => {
-      const value: unknown = [1, 2, 3];
+      const value: unknown = [1, 2, 3] as const;
 
       if (isArray(value)) {
         expectType<typeof value, readonly unknown[]>('=');
@@ -169,14 +170,14 @@ describe('Arr validations', () => {
     });
 
     test('should handle array-like objects', () => {
-      const arrayLike = { 0: 'a', 1: 'b', length: 2 };
+      const arrayLike = { 0: 'a', 1: 'b', length: 2 } as const;
 
       assert.isFalse(isArray(arrayLike));
     });
 
     describe('comprehensive type guard tests', () => {
       test('should narrow unknown type to array', () => {
-        const value: unknown = [1, 2, 3];
+        const value: unknown = [1, 2, 3] as const;
 
         if (isArray(value)) {
           expectType<typeof value, readonly unknown[]>('=');
@@ -186,7 +187,7 @@ describe('Arr validations', () => {
       });
 
       test('should handle any type', () => {
-        const value: any = [1, 2, 3];
+        const value: any = [1, 2, 3] as const;
 
         if (isArray(value)) {
           expectType<typeof value, readonly unknown[]>('=');
@@ -194,7 +195,7 @@ describe('Arr validations', () => {
       });
 
       test('should work with nested arrays', () => {
-        const nested: readonly (readonly number[])[] = [[1], [2], [3]];
+        const nested: readonly (readonly number[])[] = [[1], [2], [3]] as const;
 
         if (isArray(nested)) {
           expectType<typeof nested, readonly (readonly number[])[]>('=');
@@ -202,7 +203,7 @@ describe('Arr validations', () => {
       });
 
       test('should distinguish between array and tuple types', () => {
-        const tuple: readonly [1, 2, 3] = [1, 2, 3];
+        const tuple: readonly [1, 2, 3] = [1, 2, 3] as const;
 
         if (isArray(tuple)) {
           expectType<typeof tuple, readonly [1, 2, 3]>('=');
@@ -210,7 +211,7 @@ describe('Arr validations', () => {
       });
 
       test('should work with empty tuple type', () => {
-        const emptyTuple: readonly [] = [];
+        const emptyTuple: readonly [] = [] as const;
 
         if (isArray(emptyTuple)) {
           expectType<typeof emptyTuple, readonly []>('=');
@@ -223,7 +224,7 @@ describe('Arr validations', () => {
           | readonly number[]
           | readonly boolean[];
 
-        const mixedArray: MixedArrayUnion = [1, 2, 3];
+        const mixedArray: MixedArrayUnion = [1, 2, 3] as const;
 
         if (isArray(mixedArray)) {
           expectType<typeof mixedArray, MixedArrayUnion>('<=');
@@ -354,7 +355,11 @@ describe('Arr validations', () => {
       });
 
       test('should handle arrays with mixed element types', () => {
-        const mixed: readonly (string | number | boolean)[] = [1, 'two', true];
+        const mixed: readonly (string | number | boolean)[] = [
+          1,
+          'two',
+          true,
+        ] as const;
 
         if (isArray(mixed)) {
           expectType<typeof mixed, readonly (string | number | boolean)[]>('=');
@@ -452,7 +457,7 @@ describe('Arr validations', () => {
     });
 
     test('should work with unknown readonly array type', () => {
-      const arr: readonly number[] = [1, 2];
+      const arr: readonly number[] = [1, 2] as const;
 
       assert.isTrue(isArrayOfLength(arr, 2));
 
@@ -480,7 +485,7 @@ describe('Arr validations', () => {
     });
 
     test('should work as type guard with exact length (additional)', () => {
-      const array: readonly number[] = [1, 2, 3];
+      const array: readonly number[] = [1, 2, 3] as const;
 
       if (isArrayOfLength(array, 3)) {
         expectType<typeof array, ArrayOfLength<3, number>>('=');
@@ -568,7 +573,7 @@ describe('Arr validations', () => {
     });
 
     test('should work as type guard for at least length (additional)', () => {
-      const array: readonly number[] = [1, 2, 3];
+      const array: readonly number[] = [1, 2, 3] as const;
 
       if (isArrayAtLeastLength(array, 2)) {
         expectType<typeof array, ArrayAtLeastLen<2, number>>('=');
@@ -580,7 +585,7 @@ describe('Arr validations', () => {
 
   describe(every, () => {
     test('should return true when all elements satisfy predicate', () => {
-      const evens = [2, 4, 6, 8];
+      const evens = [2, 4, 6, 8] as const;
 
       const allEven = every(evens, (n) => n % 2 === 0);
 
@@ -588,7 +593,7 @@ describe('Arr validations', () => {
     });
 
     test('should return false when not all elements satisfy predicate', () => {
-      const mixed = [2, 3, 4, 6];
+      const mixed = [2, 3, 4, 6] as const;
 
       const allEven = every(mixed, (n) => n % 2 === 0);
 
@@ -596,7 +601,7 @@ describe('Arr validations', () => {
     });
 
     test('should work as type guard', () => {
-      const mixed: readonly (string | number)[] = ['hello', 'world'];
+      const mixed: readonly (string | number)[] = ['hello', 'world'] as const;
 
       if (every(mixed, (x): x is string => typeof x === 'string')) {
         // TypeScript narrows mixed to readonly string[] here
@@ -619,7 +624,7 @@ describe('Arr validations', () => {
 
       const allStrings = every(isString);
 
-      const data: readonly unknown[] = ['a', 'b', 'c'];
+      const data: readonly unknown[] = ['a', 'b', 'c'] as const;
 
       if (allStrings(data)) {
         // TypeScript narrows data to readonly string[] here
@@ -628,7 +633,7 @@ describe('Arr validations', () => {
     });
 
     test('should return true for empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const result = every(empty, (n) => n > 0);
 
@@ -636,7 +641,7 @@ describe('Arr validations', () => {
     });
 
     test('should pass index to predicate', () => {
-      const numbers = [0, 1, 2, 3];
+      const numbers = [0, 1, 2, 3] as readonly number[];
 
       const indexMatchesValue = every(numbers, (val, idx) => val === idx);
 
@@ -646,7 +651,7 @@ describe('Arr validations', () => {
 
   describe(some, () => {
     test('should return true when at least one element satisfies predicate', () => {
-      const numbers = [1, 3, 5, 8];
+      const numbers = [1, 3, 5, 8] as const;
 
       const hasEven = some(numbers, (n) => n % 2 === 0);
 
@@ -654,7 +659,7 @@ describe('Arr validations', () => {
     });
 
     test('should return false when no elements satisfy predicate', () => {
-      const odds = [1, 3, 5, 7];
+      const odds = [1, 3, 5, 7] as const;
 
       const hasEven = some(odds, (n) => n % 2 === 0);
 
@@ -672,7 +677,7 @@ describe('Arr validations', () => {
     });
 
     test('should return false for empty array', () => {
-      const empty: readonly number[] = [];
+      const empty: readonly number[] = [] as const;
 
       const result = some(empty, (n) => n > 0);
 
@@ -680,7 +685,7 @@ describe('Arr validations', () => {
     });
 
     test('should pass index to predicate', () => {
-      const numbers = [10, 10, 10, 30];
+      const numbers = [10, 10, 10, 30] as const;
 
       const hasValueMatchingIndex = some(
         numbers,
@@ -693,7 +698,7 @@ describe('Arr validations', () => {
 
   describe(indexIsInRange, () => {
     test('should return true for valid indices', () => {
-      const array = ['a', 'b', 'c'];
+      const array = ['a', 'b', 'c'] as const;
 
       assert.isTrue(indexIsInRange(array, 0));
 
@@ -703,7 +708,7 @@ describe('Arr validations', () => {
     });
 
     test('should return false for invalid indices', () => {
-      const array = ['a', 'b', 'c'];
+      const array = ['a', 'b', 'c'] as const;
 
       assert.isFalse(indexIsInRange(array, 3));
 
@@ -711,7 +716,7 @@ describe('Arr validations', () => {
     });
 
     test('should work with empty array', () => {
-      const empty: readonly string[] = [];
+      const empty: readonly string[] = [] as const;
 
       assert.isFalse(indexIsInRange(empty, 0));
 
@@ -720,7 +725,7 @@ describe('Arr validations', () => {
     });
 
     test('should be type error with floating point indices', () => {
-      const array = [1, 2, 3];
+      const array = [1, 2, 3] as const;
 
       // @ts-expect-error floating point indices should not be allowed
       assert.isTrue(indexIsInRange(array, 1.5)); // JavaScript arrays accept floating point indices

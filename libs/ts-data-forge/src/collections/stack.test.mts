@@ -153,9 +153,9 @@ describe('Stack test', () => {
 
     const stack = createStack<Item>();
 
-    const item1: Item = { id: 1, name: 'first' };
+    const item1: Item = { id: 1, name: 'first' } as const;
 
-    const item2: Item = { id: 2, name: 'second' };
+    const item2: Item = { id: 2, name: 'second' } as const;
 
     stack.push(item1);
 
@@ -198,7 +198,7 @@ describe('Stack test', () => {
   });
 
   test('should not mutate initial values array', () => {
-    const initialValues = [1, 2, 3];
+    const initialValues = [1, 2, 3] as readonly number[];
 
     const originalLength = initialValues.length;
 

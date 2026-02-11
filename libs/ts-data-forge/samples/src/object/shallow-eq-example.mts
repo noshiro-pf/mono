@@ -5,20 +5,20 @@ import { Obj } from 'ts-data-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const obj1 = { name: 'Alice', age: 30 };
+    const obj1 = { name: 'Alice', age: 30 } as const;
 
-    const obj2 = { name: 'Alice', age: 30 };
+    const obj2 = { name: 'Alice', age: 30 } as const;
 
-    const obj3 = { name: 'Alice', age: 31 };
+    const obj3 = { name: 'Alice', age: 31 } as const;
 
     assert.isTrue(Obj.shallowEq(obj1, obj2));
 
     assert.isFalse(Obj.shallowEq(obj1, obj3));
 
     // Custom equality function
-    const obj4 = { value: 1 };
+    const obj4 = { value: 1 } as const;
 
-    const obj5 = { value: 1.00001 };
+    const obj5 = { value: 1.00001 } as const;
 
     const closeEnough = (a: unknown, b: unknown): boolean => {
       if (typeof a === 'number' && typeof b === 'number') {
