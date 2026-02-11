@@ -47,7 +47,7 @@ describe(arrayOfLength, () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const ys: unknown = [5, 6, 7, 8];
+      const ys: unknown = [5, 6, 7, 8] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -59,7 +59,7 @@ describe(arrayOfLength, () => {
     });
 
     test('falsy case 1', () => {
-      const ys: unknown = [];
+      const ys: unknown = [] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -71,7 +71,7 @@ describe(arrayOfLength, () => {
     });
 
     test('falsy case 2', () => {
-      const ys: unknown = ['1', '', 3];
+      const ys: unknown = ['1', '', 3] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -85,7 +85,7 @@ describe(arrayOfLength, () => {
 
   describe('validate', () => {
     test('truthy case', () => {
-      const ys: unknown = [5, 6, 7, 8];
+      const ys: unknown = [5, 6, 7, 8] as const;
 
       const result = xs.validate(ys);
 
@@ -99,7 +99,7 @@ describe(arrayOfLength, () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = [5, 6, 7, 8];
+      const input = [5, 6, 7, 8] as const;
 
       const result = xs.validate(input);
 
@@ -111,7 +111,7 @@ describe(arrayOfLength, () => {
     });
 
     test('falsy case 1', () => {
-      const ys: unknown = [];
+      const ys: unknown = [] as const;
 
       const result = xs.validate(ys);
 
@@ -139,7 +139,7 @@ describe(arrayOfLength, () => {
     });
 
     test('falsy case 2', () => {
-      const ys: unknown = [0, '1', '', 3];
+      const ys: unknown = [0, '1', '', 3] as const;
 
       const result = xs.validate(ys);
 
@@ -173,19 +173,19 @@ describe(arrayOfLength, () => {
 
   describe('fill', () => {
     test('noop', () => {
-      const ys: unknown = [1, 2, 3];
+      const ys: unknown = [1, 2, 3] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [1, 2, 3, 0]);
     });
 
     test('fill with the default value', () => {
-      const ys: unknown = ['1', '', 3];
+      const ys: unknown = ['1', '', 3] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [0, 0, 3, 0]);
     });
 
     test('fill empty array', () => {
-      const ys: unknown = [];
+      const ys: unknown = [] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [0, 0, 0, 0]);
     });

@@ -66,7 +66,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           date: 12,
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -82,7 +82,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           // missing date - this should fail since date is now required
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -98,7 +98,7 @@ describe(required, () => {
           year: 2000,
           month: 'ab',
           date: 'cd',
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -116,7 +116,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           date: 25,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -138,7 +138,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           date: 25,
-        };
+        } as const;
 
         const result = ymd.validate(input);
 
@@ -168,7 +168,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           date: 25,
-        };
+        } as const;
 
         const result = ymdAllow.validate(input);
 
@@ -187,7 +187,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           // missing date - this should fail since date is now required
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -220,7 +220,7 @@ describe(required, () => {
           month: 12,
           date: 25,
           aaa: 999,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -247,7 +247,7 @@ describe(required, () => {
           month: 12,
           date: 25,
           aaa: 999,
-        };
+        } as const;
 
         const result = ymd.validate(input);
 
@@ -269,7 +269,7 @@ describe(required, () => {
           year: 2000,
           month: 'ab',
           date: 'cd',
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -305,7 +305,7 @@ describe(required, () => {
           year: 2000,
           month: 'ab',
           date: 12,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -331,7 +331,7 @@ describe(required, () => {
 
     describe('fill', () => {
       test('from an empty record', () => {
-        const x: UnknownRecord = {};
+        const x: UnknownRecord = {} as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 1900,
@@ -345,7 +345,7 @@ describe(required, () => {
           year: 2000,
           month: 999,
           date: 999,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -357,7 +357,7 @@ describe(required, () => {
       test('from a partial record', () => {
         const x: UnknownRecord = {
           year: 2000,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -370,7 +370,7 @@ describe(required, () => {
         const x: UnknownRecord = {
           year: 2000,
           aaaaa: 9999,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -403,7 +403,7 @@ describe(required, () => {
         const x: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -419,7 +419,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           date: 15,
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -435,7 +435,7 @@ describe(required, () => {
           year: 2000,
           // missing month
           date: 15,
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -451,7 +451,7 @@ describe(required, () => {
           year: 2000,
           month: 'ab',
           date: 'cd',
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -467,7 +467,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           date: 'cd',
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -484,7 +484,7 @@ describe(required, () => {
         const x: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -504,7 +504,7 @@ describe(required, () => {
         const input: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         const result = ymd.validate(input);
 
@@ -535,7 +535,7 @@ describe(required, () => {
         const input: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         const result = ymdAllow.validate(input);
 
@@ -554,7 +554,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           date: 15,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -574,7 +574,7 @@ describe(required, () => {
           year: 2000,
           // missing month
           date: 15,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -607,7 +607,7 @@ describe(required, () => {
           year: 2000,
           month: 'ab',
           date: 'cd',
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -641,7 +641,7 @@ describe(required, () => {
 
     describe('fill', () => {
       test('from an empty record', () => {
-        const x: UnknownRecord = {};
+        const x: UnknownRecord = {} as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 1900,
@@ -655,7 +655,7 @@ describe(required, () => {
           year: 2000,
           month: 999,
           date: 999,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -668,7 +668,7 @@ describe(required, () => {
         const x: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -681,7 +681,7 @@ describe(required, () => {
         const x: UnknownRecord = {
           year: 2000,
           // missing month - fill should provide default
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -695,7 +695,7 @@ describe(required, () => {
           year: 2000,
           month: 12,
           aaaaa: 9999,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,

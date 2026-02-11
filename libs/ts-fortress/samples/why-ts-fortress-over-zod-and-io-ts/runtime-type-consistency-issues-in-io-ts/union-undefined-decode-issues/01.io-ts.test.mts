@@ -20,11 +20,11 @@ const C = t.partial({
   const res = UnionBA.decode({ A: 1 });
 
   if (isRight(res)) {
-    const expected = { A: 1 };
+    const expected = { A: 1 } as const;
 
     assert.notDeepEqual(res.right, expected); // NG
 
-    const actual = { A: 1, B: undefined };
+    const actual = { A: 1, B: undefined } as const;
 
     assert.deepStrictEqual(res.right, actual);
 
@@ -41,11 +41,11 @@ const C = t.partial({
   const res = UnionCA.decode({ A: 1 });
 
   if (isRight(res)) {
-    const expected = {};
+    const expected = {} as const;
 
     assert.notDeepEqual(res.right, expected); // NG
 
-    const actual = { A: 1 };
+    const actual = { A: 1 } as const;
 
     assert.deepStrictEqual(res.right, actual);
 

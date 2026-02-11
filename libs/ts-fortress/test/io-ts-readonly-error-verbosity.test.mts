@@ -65,7 +65,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
     const invalidData = {
       name: 'John',
       age: 'twenty-five', // should be number
-    };
+    } as const;
 
     // Get io-ts error messages
     const ioTsResult = IoTsSimpleReadonly.decode(invalidData);
@@ -84,7 +84,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
 
     const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
       ? tf.validationErrorsToMessages(tsFortressResult.value)
-      : [];
+      : ([] as const);
 
     // io-ts adds unnecessary "Readonly<...>" wrapper
 
@@ -161,7 +161,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
           age: 'not-a-number', // should be number
         },
       },
-    };
+    } as const;
 
     // Get io-ts error messages
     const ioTsResult = IoTsNestedReadonly.decode(invalidData);
@@ -180,7 +180,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
 
     const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
       ? tf.validationErrorsToMessages(tsFortressResult.value)
-      : [];
+      : ([] as const);
 
     // io-ts produces extremely verbose error with triple nested Readonly wrappers
 
@@ -265,7 +265,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
           score: false, // error 3
         },
       },
-    };
+    } as const;
 
     // Get io-ts error messages
     const ioTsResult = IoTsComplexReadonly.decode(invalidData);
@@ -284,7 +284,7 @@ describe('Error message comparison: io-ts vs zod vs ts-fortress', () => {
 
     const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
       ? tf.validationErrorsToMessages(tsFortressResult.value)
-      : [];
+      : ([] as const);
 
     // io-ts produces multiple extremely verbose error messages
 

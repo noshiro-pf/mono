@@ -6,7 +6,7 @@ const invalidData = {
       age: 'not-a-number', // should be number
     },
   },
-};
+} as const;
 
 // embed-sample-code-ignore-above
 
@@ -26,7 +26,7 @@ const tsFortressResult = TsFortressNestedType.validate(invalidData);
 
 const tsFortressErrorMessages = tf.Result.isErr(tsFortressResult)
   ? tf.validationErrorsToMessages(tsFortressResult.value)
-  : [];
+  : ([] as const);
 
 assert.strictEqual(
   tsFortressErrorMessages[0],

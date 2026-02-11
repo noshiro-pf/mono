@@ -58,7 +58,7 @@ describe('union - mixed types', () => {
     });
 
     test('truthy case - record', () => {
-      const x: unknown = { status: 'ok' };
+      const x: unknown = { status: 'ok' } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -70,7 +70,7 @@ describe('union - mixed types', () => {
     });
 
     test('truthy case - array', () => {
-      const x: unknown = [1, 2, 3];
+      const x: unknown = [1, 2, 3] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -163,7 +163,7 @@ describe('union - mixed types', () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = [5, 10];
+      const input = [5, 10] as const;
 
       const result = targetType.validate(input);
 
@@ -189,13 +189,13 @@ describe('union - mixed types', () => {
     });
 
     test('noop - record', () => {
-      const x: unknown = { status: 'running' };
+      const x: unknown = { status: 'running' } as const;
 
       assert.deepStrictEqual(targetType.fill(x), { status: 'running' });
     });
 
     test('noop - array', () => {
-      const x: unknown = [100, 200];
+      const x: unknown = [100, 200] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [100, 200]);
     });

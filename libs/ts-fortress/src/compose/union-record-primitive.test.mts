@@ -32,7 +32,7 @@ describe('union - record and primitive', () => {
 
   describe('is', () => {
     test('truthy case - record', () => {
-      const x: unknown = { id: 123, name: 'test' };
+      const x: unknown = { id: 123, name: 'test' } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -68,7 +68,7 @@ describe('union - record and primitive', () => {
     });
 
     test('falsy case', () => {
-      const x: unknown = [1, 2, 3];
+      const x: unknown = [1, 2, 3] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -139,7 +139,7 @@ describe('union - record and primitive', () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = { id: 1, name: 'original' };
+      const input = { id: 1, name: 'original' } as const;
 
       const result = targetType.validate(input);
 
@@ -153,7 +153,7 @@ describe('union - record and primitive', () => {
 
   describe('fill', () => {
     test('noop - record', () => {
-      const x: unknown = { id: 5, name: 'test' };
+      const x: unknown = { id: 5, name: 'test' } as const;
 
       assert.deepStrictEqual(targetType.fill(x), { id: 5, name: 'test' });
     });

@@ -47,7 +47,7 @@ describe(arrayAtLeastLength, () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const ys: unknown = [4, 5, 6, 7];
+      const ys: unknown = [4, 5, 6, 7] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -59,7 +59,7 @@ describe(arrayAtLeastLength, () => {
     });
 
     test('falsy case 1', () => {
-      const ys: unknown = [1, 2];
+      const ys: unknown = [1, 2] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -71,7 +71,7 @@ describe(arrayAtLeastLength, () => {
     });
 
     test('falsy case 2', () => {
-      const ys: unknown = [1, '2', 3];
+      const ys: unknown = [1, '2', 3] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -97,7 +97,7 @@ describe(arrayAtLeastLength, () => {
 
   describe('validate', () => {
     test('truthy case', () => {
-      const ys: unknown = [4, 5, 6, 7];
+      const ys: unknown = [4, 5, 6, 7] as const;
 
       const result = xs.validate(ys);
 
@@ -111,7 +111,7 @@ describe(arrayAtLeastLength, () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = [4, 5, 6];
+      const input = [4, 5, 6] as const;
 
       const result = xs.validate(input);
 
@@ -147,7 +147,7 @@ describe(arrayAtLeastLength, () => {
     });
 
     test('falsy case 2', () => {
-      const ys: unknown = [1, 2];
+      const ys: unknown = [1, 2] as const;
 
       const result = xs.validate(ys);
 
@@ -175,7 +175,7 @@ describe(arrayAtLeastLength, () => {
     });
 
     test('falsy case 3', () => {
-      const ys: unknown = [1, '2', 3];
+      const ys: unknown = [1, '2', 3] as const;
 
       const result = xs.validate(ys);
 
@@ -201,13 +201,13 @@ describe(arrayAtLeastLength, () => {
 
   describe('fill', () => {
     test('keeps numeric entries and trims extras', () => {
-      const ys: unknown = [4, 5, 6, 7];
+      const ys: unknown = [4, 5, 6, 7] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [4, 5, 6]);
     });
 
     test('fills missing or invalid entries', () => {
-      const ys: unknown = [4, '5'];
+      const ys: unknown = [4, '5'] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [4, 0, 0]);
     });

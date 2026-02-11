@@ -18,7 +18,7 @@ type SomeObject = z.infer<typeof SomeObject>;
 
 expectType<
   SomeObject,
-  // transformer-ignore-next-line convert-to-readonly-type
+  // transformer-ignore-next-line convert-to-readonly
   {
     key1: 1;
     key2: string;

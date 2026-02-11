@@ -16,19 +16,23 @@ describe(strictRecord, () => {
 
   describe('is', () => {
     test('valid data without excess properties', () => {
-      const validUser = { name: 'John', age: 30 };
+      const validUser = { name: 'John', age: 30 } as const;
 
       assert.isTrue(userType.is(validUser));
     });
 
     test('rejects data with excess properties', () => {
-      const userWithExtra = { name: 'John', age: 30, extra: 'not allowed' };
+      const userWithExtra = {
+        name: 'John',
+        age: 30,
+        extra: 'not allowed',
+      } as const;
 
       assert.isFalse(userType.is(userWithExtra));
     });
 
     test('rejects invalid property types', () => {
-      const invalidUser = { name: 'John', age: 'thirty' };
+      const invalidUser = { name: 'John', age: 'thirty' } as const;
 
       assert.isFalse(userType.is(invalidUser));
     });
@@ -36,7 +40,7 @@ describe(strictRecord, () => {
 
   describe('validate', () => {
     test('truthy case - valid data', () => {
-      const validUser = { name: 'John', age: 30 };
+      const validUser = { name: 'John', age: 30 } as const;
 
       const result = userType.validate(validUser);
 
@@ -53,7 +57,7 @@ describe(strictRecord, () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = { name: 'John', age: 30 };
+      const input = { name: 'John', age: 30 } as const;
 
       const result = userType.validate(input);
 
@@ -65,7 +69,11 @@ describe(strictRecord, () => {
     });
 
     test('falsy case - excess properties', () => {
-      const userWithExtra = { name: 'John', age: 30, extra: 'not allowed' };
+      const userWithExtra = {
+        name: 'John',
+        age: 30,
+        extra: 'not allowed',
+      } as const;
 
       const result = userType.validate(userWithExtra);
 
@@ -92,7 +100,7 @@ describe(strictRecord, () => {
     });
 
     test('falsy case - invalid property type', () => {
-      const invalidUser = { name: 'John', age: 'thirty' };
+      const invalidUser = { name: 'John', age: 'thirty' } as const;
 
       const result = userType.validate(invalidUser);
 
@@ -112,7 +120,7 @@ describe(strictRecord, () => {
     });
 
     test('falsy case - missing required property', () => {
-      const incompleteUser = { name: 'John' };
+      const incompleteUser = { name: 'John' } as const;
 
       const result = userType.validate(incompleteUser);
 
@@ -142,7 +150,11 @@ describe(strictRecord, () => {
     });
 
     test('regular record allows excess properties', () => {
-      const dataWithExtra = { name: 'John', age: 30, extra: 'allowed' };
+      const dataWithExtra = {
+        name: 'John',
+        age: 30,
+        extra: 'allowed',
+      } as const;
 
       assert.isTrue(regularRecord.is(dataWithExtra));
 
@@ -152,7 +164,7 @@ describe(strictRecord, () => {
     });
 
     test('both reject invalid property types', () => {
-      const invalidData = { name: 'John', age: 'thirty' };
+      const invalidData = { name: 'John', age: 'thirty' } as const;
 
       assert.isFalse(regularRecord.is(invalidData));
 
@@ -199,7 +211,7 @@ describe(strictRecord, () => {
 
   describe('fill', () => {
     test('fills missing properties with defaults', () => {
-      const partialData = { name: 'John' };
+      const partialData = { name: 'John' } as const;
 
       const result = userType.fill(partialData);
 
@@ -210,7 +222,7 @@ describe(strictRecord, () => {
     });
 
     test('preserves all valid properties', () => {
-      const validData = { name: 'John', age: 30 };
+      const validData = { name: 'John', age: 30 } as const;
 
       const result = userType.fill(validData);
 

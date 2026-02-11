@@ -58,13 +58,13 @@ const PermissiveUserType = t.record(
 );
 
 // Example usage - both StrictUserType and StrictUserTypeAlias behave identically
-const strictData = { id: '123', name: 'John', extra: 'not allowed' };
+const strictData = { id: '123', name: 'John', extra: 'not allowed' } as const;
 
 assert.isFalse(StrictUserType.is(strictData)); // 'extra' property causes rejection
 
 assert.isFalse(StrictUserTypeAlias.is(strictData)); // same as above
 
-const permissiveData = { id: '123', name: 'John', extra: 'allowed' };
+const permissiveData = { id: '123', name: 'John', extra: 'allowed' } as const;
 
 assert.isTrue(PermissiveUserType.is(permissiveData)); // 'extra' property is allowed
 

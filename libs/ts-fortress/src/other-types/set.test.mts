@@ -205,9 +205,9 @@ test('SetType with complex element types', () => {
 
   expectType<UserSet, ReadonlySet<Readonly<{ id: number; name: string }>>>('=');
 
-  const user1 = { id: 1, name: 'Alice' };
+  const user1 = { id: 1, name: 'Alice' } as const;
 
-  const user2 = { id: 2, name: 'Bob' };
+  const user2 = { id: 2, name: 'Bob' } as const;
 
   const validSet = new Set([user1, user2]);
 

@@ -1,9 +1,7 @@
 /* eslint-disable import-x/first */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-const useState = <T,>(_defaultValue: T): readonly [T, (v: T) => void] => [
-  _defaultValue,
-  () => {},
-];
+const useState = <T,>(_defaultValue: T): readonly [T, (v: T) => void] =>
+  [_defaultValue, () => {}] as const;
 
 const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};
 
@@ -19,7 +17,7 @@ const User = t.record({
 type User = t.TypeOf<typeof User>;
 
 // Use defaultValue for initialization
-const newUser: User = { ...User.defaultValue, id: 'user-123' };
+const newUser: User = { ...User.defaultValue, id: 'user-123' } as const;
 
 // This default value filling process can also be written as follows:
 const newUser2: User = User.fill({ id: 'user-456' });

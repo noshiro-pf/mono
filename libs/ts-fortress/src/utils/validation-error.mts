@@ -92,7 +92,9 @@ export const validationErrorToMessage = (
   maxLengthToPrintActualValue: number = 20,
 ): string => {
   const pathPrefix =
-    error.path.length > 0 ? `Error at ${error.path.join('.')}: ` : 'Error: ';
+    error.path.length > 0
+      ? (`Error at ${error.path.join('.')}: ` as const)
+      : 'Error: ';
 
   const detailsMessage = createDetailsMessage(
     error,
@@ -107,7 +109,7 @@ export const validationErrorToMessage = (
 
   const actualValueStr: string = isString(error.actualValue)
     ? error.actualValue.length <= maxLengthToPrintActualValue
-      ? ` "${error.actualValue}"`
+      ? (` "${error.actualValue}"` as const)
       : ''
     : pipe(unknownToString(error.actualValue)).map((s) =>
         s.length <= maxLengthToPrintActualValue ? ` \`${s}\`` : '',
@@ -124,7 +126,7 @@ const createDetailsMessage = (
 
   const actualValueStr: string = isString(error.actualValue)
     ? error.actualValue.length <= maxLengthToPrintActualValue
-      ? ` "${error.actualValue}"`
+      ? (` "${error.actualValue}"` as const)
       : ''
     : pipe(unknownToString(error.actualValue)).map((s) =>
         s.length <= maxLengthToPrintActualValue ? ` \`${s}\`` : '',
@@ -233,10 +235,11 @@ export const createPrimitiveValidationError = ({
   expectedType: string;
   typeName: string;
   details: ValidationErrorDetails | undefined;
-}>): ValidationError => ({
-  path: [],
-  actualValue,
-  expectedType,
-  typeName,
-  details,
-});
+}>): ValidationError =>
+  ({
+    path: [],
+    actualValue,
+    expectedType,
+    typeName,
+    details,
+  }) as const;

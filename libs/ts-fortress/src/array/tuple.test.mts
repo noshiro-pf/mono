@@ -51,7 +51,7 @@ describe(tuple, () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const x: unknown = [{ x: 1, y: 2 }, 3, '2'];
+      const x: unknown = [{ x: 1, y: 2 }, 3, '2'] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -63,7 +63,7 @@ describe(tuple, () => {
     });
 
     test('falsy case', () => {
-      const x: unknown = [{ x: 'str', y: 'str' }, 3, '2'];
+      const x: unknown = [{ x: 'str', y: 'str' }, 3, '2'] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -77,7 +77,7 @@ describe(tuple, () => {
 
   describe('validate', () => {
     test('truthy case', () => {
-      const x: unknown = [{ x: 1, y: 2 }, 3, '2'];
+      const x: unknown = [{ x: 1, y: 2 }, 3, '2'] as const;
 
       const result = targetType.validate(x);
 
@@ -113,7 +113,7 @@ describe(tuple, () => {
     });
 
     test('falsy case - wrong length', () => {
-      const x: unknown = [{ x: 1, y: 2 }];
+      const x: unknown = [{ x: 1, y: 2 }] as const;
 
       const result = targetType.validate(x);
 
@@ -137,7 +137,7 @@ describe(tuple, () => {
     });
 
     test('falsy case - element validation errors', () => {
-      const x: unknown = [{ x: 'str', y: 'str' }, 3, '2'];
+      const x: unknown = [{ x: 'str', y: 'str' }, 3, '2'] as const;
 
       const result = targetType.validate(x);
 
@@ -189,7 +189,7 @@ describe(tuple, () => {
 
   describe('fill', () => {
     test('noop', () => {
-      const x: unknown = [{ x: 1, y: 2 }, 3, '2'];
+      const x: unknown = [{ x: 1, y: 2 }, 3, '2'] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [{ x: 1, y: 2 }, 3, '2']);
     });
@@ -201,25 +201,25 @@ describe(tuple, () => {
     });
 
     test('fill only the first element with the default value, case 1', () => {
-      const x: unknown = [123, 3, '2'];
+      const x: unknown = [123, 3, '2'] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [{ x: 0, y: 0 }, 3, '2']);
     });
 
     test('fill only the first element with the default value, case 2', () => {
-      const x: unknown = [{ z: 5 }, 3, '2'];
+      const x: unknown = [{ z: 5 }, 3, '2'] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [{ x: 0, y: 0 }, 3, '2']);
     });
 
     test('fill only the second element with the default value', () => {
-      const x: unknown = [{ x: 1, y: 2 }, 0, '2'];
+      const x: unknown = [{ x: 1, y: 2 }, 0, '2'] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [{ x: 1, y: 2 }, 3, '2']);
     });
 
     test('fill only the third element with the default value', () => {
-      const x: unknown = [{ x: 1, y: 2 }, 3, 999];
+      const x: unknown = [{ x: 1, y: 2 }, 3, 999] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [{ x: 1, y: 2 }, 3, '2']);
     });

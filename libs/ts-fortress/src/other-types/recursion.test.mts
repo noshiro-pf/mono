@@ -103,7 +103,7 @@ describe('recursive', () => {
           push: false,
         },
       },
-    };
+    } as const;
 
     assert.isTrue(JsonValue.is(nestedData));
   });
@@ -118,7 +118,7 @@ describe('recursive', () => {
         [7, 8, 9],
         [10, 11, 12],
       ],
-    ];
+    ] as const;
 
     assert.isTrue(JsonValue.is(deepArray));
   });
@@ -148,7 +148,7 @@ describe('recursive', () => {
           timeout: 5000,
         },
       },
-    };
+    } as const;
 
     assert.isTrue(JsonValue.is(mixedData));
   });
@@ -205,7 +205,7 @@ describe('recursive', () => {
           next: null,
         },
       },
-    };
+    } as const;
 
     assert.isTrue(LinkedListNumber.is(list));
 
@@ -244,7 +244,7 @@ describe('recursive', () => {
           children: [{ value: 'leaf3', children: [] }],
         },
       ],
-    };
+    } as const;
 
     assert.isTrue(TreeNodeString.is(tree));
 

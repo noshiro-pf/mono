@@ -40,7 +40,7 @@ describe(optional, () => {
     });
 
     test('returns false for object without optional key', () => {
-      const { optional: _, ...obj } = { ...numberType };
+      const { optional: _, ...obj } = { ...numberType } as const;
 
       assert.isFalse(isOptionalProperty(obj));
     });

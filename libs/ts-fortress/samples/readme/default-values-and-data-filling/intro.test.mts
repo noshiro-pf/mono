@@ -20,7 +20,7 @@ const partialData = {
     // notifications missing - will be filled with default
   },
   // age, email, tags missing - will be filled with defaults
-};
+} as const;
 
 const filledData = UserProfile.fill(partialData);
 

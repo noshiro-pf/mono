@@ -33,7 +33,7 @@ describe('union - record and array', () => {
 
   describe('is', () => {
     test('truthy case - record', () => {
-      const x: unknown = { x: 10, y: 20 };
+      const x: unknown = { x: 10, y: 20 } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -45,7 +45,7 @@ describe('union - record and array', () => {
     });
 
     test('truthy case - string array', () => {
-      const x: unknown = ['a', 'b', 'c'];
+      const x: unknown = ['a', 'b', 'c'] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -57,7 +57,7 @@ describe('union - record and array', () => {
     });
 
     test('truthy case - number array', () => {
-      const x: unknown = [1, 2, 3];
+      const x: unknown = [1, 2, 3] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -140,7 +140,7 @@ describe('union - record and array', () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = { x: 5, y: 10 };
+      const input = { x: 5, y: 10 } as const;
 
       const result = targetType.validate(input);
 
@@ -154,19 +154,19 @@ describe('union - record and array', () => {
 
   describe('fill', () => {
     test('noop - record', () => {
-      const x: unknown = { x: 7, y: 8 };
+      const x: unknown = { x: 7, y: 8 } as const;
 
       assert.deepStrictEqual(targetType.fill(x), { x: 7, y: 8 });
     });
 
     test('noop - string array', () => {
-      const x: unknown = ['p', 'q'];
+      const x: unknown = ['p', 'q'] as const;
 
       assert.deepStrictEqual(targetType.fill(x), ['p', 'q']);
     });
 
     test('noop - number array', () => {
-      const x: unknown = [99, 88];
+      const x: unknown = [99, 88] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [99, 88]);
     });

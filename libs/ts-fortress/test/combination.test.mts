@@ -76,7 +76,7 @@ describe('nested record', () => {
         },
         meta: 3,
         u: undefined,
-      };
+      } as const;
 
       if (nestedRecord.is(x)) {
         expectType<typeof x, NestedRecord>('=');
@@ -97,7 +97,7 @@ describe('nested record', () => {
         },
         meta: 345,
         u: undefined,
-      };
+      } as const;
 
       if (nestedRecord.is(x)) {
         expectType<typeof x, NestedRecord>('=');
@@ -120,7 +120,7 @@ describe('nested record', () => {
         },
         meta: 345,
         u: undefined,
-      };
+      } as const;
 
       const result = nestedRecord.validate(x);
 
@@ -178,7 +178,7 @@ describe('nested record', () => {
 
   describe('fill', () => {
     test('from an empty record', () => {
-      const x: UnknownRecord = {};
+      const x: UnknownRecord = {} as const;
 
       assert.deepStrictEqual(nestedRecord.fill(x), {
         xs: [],
@@ -202,7 +202,7 @@ describe('nested record', () => {
         },
         meta: 345,
         u: undefined,
-      };
+      } as const;
 
       assert.deepStrictEqual(nestedRecord.fill(x), {
         xs: [asInt(-1), asInt(2), asInt(2)],
@@ -222,7 +222,7 @@ describe('nested record', () => {
         rec: {
           a: 3,
         },
-      };
+      } as const;
 
       assert.deepStrictEqual(nestedRecord.fill(x), {
         xs: [asInt(11), asInt(22)],
@@ -245,7 +245,7 @@ describe('nested record', () => {
         },
         u: undefined,
         aaaaa: [9999],
-      };
+      } as const;
 
       assert.deepStrictEqual(nestedRecord.fill(x), {
         xs: [asInt(11), asInt(22)],
@@ -380,7 +380,7 @@ describe('advanced type', () => {
           tags: undefined,
         },
       ],
-    };
+    } as const;
 
     assert.isTrue(AdvancedNodeType.is(valid));
 
@@ -399,7 +399,7 @@ describe('advanced type', () => {
       tags: [],
       extras: { 'setting:1': 'invalid' },
       children: [{}],
-    };
+    } as const;
 
     const result = AdvancedNodeType.validate(invalid);
 
@@ -433,7 +433,7 @@ describe('advanced type', () => {
     const partialNode: UnknownRecord = {
       id: 'id:partial',
       status: undefined,
-    };
+    } as const;
 
     assert.deepStrictEqual(AdvancedNodeType.fill(partialNode), {
       id: Identifier.cast('id:partial'),

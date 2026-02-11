@@ -101,7 +101,7 @@ describe('union + undefined decode issues', () => {
 
     const UnionCA = t.union([C, A]);
 
-    const target = { A: 1 };
+    const target = { A: 1 } as const;
 
     test('UnionAB', () => {
       const res = UnionAB.decode(target);
@@ -199,7 +199,7 @@ describe('union + undefined decode issues', () => {
 
     const UnionCA = f.union([C, A]);
 
-    const target = { A: 1 };
+    const target = { A: 1 } as const;
 
     test('UnionAB', () => {
       const res = UnionAB.validate(target);

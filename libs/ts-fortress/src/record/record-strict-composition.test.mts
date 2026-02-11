@@ -26,7 +26,7 @@ describe('record strict composition tests', () => {
     const pickedType = pick(strictBaseRecord, ['id', 'name']);
 
     test('accepts valid data without excess properties', () => {
-      const validData = { id: '123', name: 'John' };
+      const validData = { id: '123', name: 'John' } as const;
 
       assert.isTrue(pickedType.is(validData));
 
@@ -46,7 +46,7 @@ describe('record strict composition tests', () => {
     });
 
     test('pickedType validate returns input as-is for OK cases', () => {
-      const input = { id: '123', name: 'John' };
+      const input = { id: '123', name: 'John' } as const;
 
       const result = pickedType.validate(input);
 
@@ -58,7 +58,11 @@ describe('record strict composition tests', () => {
     });
 
     test('rejects data with excess properties (inherits strict behavior)', () => {
-      const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
+      const dataWithExcess = {
+        id: '123',
+        name: 'John',
+        extra: 'not allowed',
+      } as const;
 
       assert.isFalse(pickedType.is(dataWithExcess));
 
@@ -85,7 +89,7 @@ describe('record strict composition tests', () => {
     });
 
     test('rejects missing required properties', () => {
-      const incompleteData = { id: '123' }; // missing 'name'
+      const incompleteData = { id: '123' } as const; // missing 'name'
 
       const result = pickedType.validate(incompleteData);
 
@@ -105,7 +109,7 @@ describe('record strict composition tests', () => {
     const omittedType = omit(strictBaseRecord, ['age', 'email']);
 
     test('accepts valid data without excess properties', () => {
-      const validData = { id: '123', name: 'John' };
+      const validData = { id: '123', name: 'John' } as const;
 
       assert.isTrue(omittedType.is(validData));
 
@@ -125,7 +129,7 @@ describe('record strict composition tests', () => {
     });
 
     test('omittedType validate returns input as-is for OK cases', () => {
-      const input = { id: '123', name: 'John' };
+      const input = { id: '123', name: 'John' } as const;
 
       const result = omittedType.validate(input);
 
@@ -137,7 +141,11 @@ describe('record strict composition tests', () => {
     });
 
     test('rejects data with excess properties (inherits strict behavior)', () => {
-      const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
+      const dataWithExcess = {
+        id: '123',
+        name: 'John',
+        extra: 'not allowed',
+      } as const;
 
       assert.isFalse(omittedType.is(dataWithExcess));
 
@@ -164,7 +172,11 @@ describe('record strict composition tests', () => {
     });
 
     test('rejects omitted properties when provided (inherits strictness from base record)', () => {
-      const dataWithOmittedProperty = { id: '123', name: 'John', age: 25 }; // 'age' was omitted but provided
+      const dataWithOmittedProperty = {
+        id: '123',
+        name: 'John',
+        age: 25,
+      } as const; // 'age' was omitted but provided
 
       const result = omittedType.validate(dataWithOmittedProperty);
 
@@ -184,7 +196,7 @@ describe('record strict composition tests', () => {
     const partialType = partial(strictBaseRecord);
 
     test('accepts valid data without excess properties', () => {
-      const validData = { id: '123', name: 'John' };
+      const validData = { id: '123', name: 'John' } as const;
 
       assert.isTrue(partialType.is(validData));
 
@@ -203,7 +215,7 @@ describe('record strict composition tests', () => {
     });
 
     test('partialType validate returns input as-is for OK cases', () => {
-      const input = { id: '123', name: 'John' };
+      const input = { id: '123', name: 'John' } as const;
 
       const result = partialType.validate(input);
 
@@ -215,7 +227,7 @@ describe('record strict composition tests', () => {
     });
 
     test('accepts empty object (all fields optional)', () => {
-      const emptyData = {};
+      const emptyData = {} as const;
 
       assert.isTrue(partialType.is(emptyData));
 
@@ -231,7 +243,7 @@ describe('record strict composition tests', () => {
     });
 
     test('partialType validate returns input as-is for empty object', () => {
-      const input = {};
+      const input = {} as const;
 
       const result = partialType.validate(input);
 
@@ -243,7 +255,11 @@ describe('record strict composition tests', () => {
     });
 
     test('rejects data with excess properties (inherits strict behavior)', () => {
-      const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
+      const dataWithExcess = {
+        id: '123',
+        name: 'John',
+        extra: 'not allowed',
+      } as const;
 
       assert.isFalse(partialType.is(dataWithExcess));
 
@@ -274,7 +290,7 @@ describe('record strict composition tests', () => {
         keysToBeOptional: ['age', 'email'],
       });
 
-      const validData = { id: '123', name: 'John' }; // required fields provided, optional fields omitted
+      const validData = { id: '123', name: 'John' } as const; // required fields provided, optional fields omitted
 
       assert.isTrue(partiallyPartialType.is(validData));
 
@@ -297,7 +313,7 @@ describe('record strict composition tests', () => {
         keysToBeOptional: ['age', 'email'],
       });
 
-      const input = { id: '123', name: 'John' };
+      const input = { id: '123', name: 'John' } as const;
 
       const result = partiallyPartialType.validate(input);
 
@@ -313,7 +329,7 @@ describe('record strict composition tests', () => {
         keysToBeOptional: ['age', 'email'],
       });
 
-      const incompleteData = { id: '123' }; // missing required 'name'
+      const incompleteData = { id: '123' } as const; // missing required 'name'
 
       const result = partiallyPartialType.validate(incompleteData);
 
@@ -360,7 +376,7 @@ describe('record strict composition tests', () => {
         name: 'John',
         age: 25,
         email: 'john@example.com',
-      };
+      } as const;
 
       // mergeRecords validates against each record separately
       // strictRecord1 will reject because it doesn't know about age/email
@@ -386,7 +402,7 @@ describe('record strict composition tests', () => {
         age: 25,
         email: 'john@example.com',
         extra: 'not allowed',
-      };
+      } as const;
 
       assert.isFalse(mergedType.is(dataWithExcess));
 
@@ -410,7 +426,7 @@ describe('record strict composition tests', () => {
     });
 
     test('rejects missing required properties from any merged record', () => {
-      const incompleteData = { id: '123', name: 'John', age: 25 }; // missing 'email'
+      const incompleteData = { id: '123', name: 'John', age: 25 } as const; // missing 'email'
 
       const result = mergedType.validate(incompleteData);
 
@@ -441,7 +457,7 @@ describe('record strict composition tests', () => {
         status: 'active',
         metadata: 'some data',
         extra: 'allowed by permissive record',
-      };
+      } as const;
 
       const result = mixedMergedType.validate(dataWithExcess);
 
@@ -469,7 +485,7 @@ describe('record strict composition tests', () => {
 
       const pickedPartialType = pick(partialType, ['id', 'name']);
 
-      const validData = { id: '123', name: 'John' };
+      const validData = { id: '123', name: 'John' } as const;
 
       assert.isTrue(pickedPartialType.is(validData));
 
@@ -490,7 +506,7 @@ describe('record strict composition tests', () => {
 
       const pickedPartialType = pick(partialType, ['id', 'name']);
 
-      const input = { id: '123', name: 'John' };
+      const input = { id: '123', name: 'John' } as const;
 
       const result = pickedPartialType.validate(input);
 
@@ -506,7 +522,7 @@ describe('record strict composition tests', () => {
 
       const partialPickedType = partial(pickedType);
 
-      const validData = { id: '123' }; // partial allows missing 'name'
+      const validData = { id: '123' } as const; // partial allows missing 'name'
 
       assert.isTrue(partialPickedType.is(validData));
 
@@ -526,7 +542,7 @@ describe('record strict composition tests', () => {
 
       const partialPickedType = partial(pickedType);
 
-      const input = { id: '123' };
+      const input = { id: '123' } as const;
 
       const result = partialPickedType.validate(input);
 
@@ -542,7 +558,11 @@ describe('record strict composition tests', () => {
 
       const pickedPartialType = pick(partialType, ['id', 'name']);
 
-      const dataWithExcess = { id: '123', name: 'John', extra: 'not allowed' };
+      const dataWithExcess = {
+        id: '123',
+        name: 'John',
+        extra: 'not allowed',
+      } as const;
 
       assert.isFalse(pickedPartialType.is(dataWithExcess));
 

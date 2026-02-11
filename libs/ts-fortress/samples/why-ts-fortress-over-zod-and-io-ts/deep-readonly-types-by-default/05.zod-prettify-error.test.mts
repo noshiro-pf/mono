@@ -6,7 +6,7 @@ const invalidData = {
       age: 'not-a-number', // should be number
     },
   },
-};
+} as const;
 
 // embed-sample-code-ignore-above
 

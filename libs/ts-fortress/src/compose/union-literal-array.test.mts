@@ -34,7 +34,7 @@ describe('union - literal and array', () => {
     });
 
     test('truthy case - array', () => {
-      const x: unknown = [1, 2, 3];
+      const x: unknown = [1, 2, 3] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -129,7 +129,7 @@ describe('union - literal and array', () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = [5, 10, 15];
+      const input = [5, 10, 15] as const;
 
       const result = targetType.validate(input);
 
@@ -149,7 +149,7 @@ describe('union - literal and array', () => {
     });
 
     test('noop - array', () => {
-      const x: unknown = [100, 200];
+      const x: unknown = [100, 200] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [100, 200]);
     });

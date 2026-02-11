@@ -147,7 +147,7 @@ export const record = <
         );
 
         // Combine all errors
-        const allErrors = [...defaultErrors, ...excessErrors];
+        const allErrors = [...defaultErrors, ...excessErrors] as const;
 
         return allErrors.length > 0
           ? Result.err(allErrors)

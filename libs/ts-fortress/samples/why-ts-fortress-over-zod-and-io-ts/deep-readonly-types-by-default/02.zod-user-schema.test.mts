@@ -7,7 +7,7 @@ const someData = {
     city: 'city',
   },
   tags: [],
-};
+} as const;
 
 // embed-sample-code-ignore-above
 

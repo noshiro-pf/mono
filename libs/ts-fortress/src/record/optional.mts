@@ -10,10 +10,11 @@ export type RequiredPropertyType<T extends Type<unknown>> = PartiallyOptional<
 
 export const optional = <T extends Type<unknown>>(
   t: T,
-): OptionalPropertyType<T> => ({
-  ...t,
-  optional: true,
-});
+): OptionalPropertyType<T> =>
+  ({
+    ...t,
+    optional: true,
+  }) as OptionalPropertyType<T>;
 
 export const isOptionalProperty = <T extends Type<unknown>>(
   t: T,

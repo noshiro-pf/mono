@@ -22,7 +22,7 @@ describe(keyValueRecord, () => {
         year: 2000,
         month: 12,
         date: 12,
-      };
+      } as const;
 
       if (strNumRecord.is(x)) {
         expectType<typeof x, StrNumRecord>('=');
@@ -38,7 +38,7 @@ describe(keyValueRecord, () => {
         year: 2000,
         month: 'ab',
         date: 'cd',
-      };
+      } as const;
 
       if (strNumRecord.is(x)) {
         expectType<typeof x, StrNumRecord>('=');
@@ -56,7 +56,7 @@ describe(keyValueRecord, () => {
         year: 2000,
         month: 12,
         date: 25,
-      };
+      } as const;
 
       const result = strNumRecord.validate(x);
 
@@ -81,7 +81,7 @@ describe(keyValueRecord, () => {
         year: 2000,
         month: 12,
         date: 25,
-      };
+      } as const;
 
       const result = strNumRecord.validate(input);
 
@@ -97,7 +97,7 @@ describe(keyValueRecord, () => {
         year: 2000,
         month: 'ab',
         date: 'cd',
-      };
+      } as const;
 
       const result = strNumRecord.validate(x);
 
@@ -155,7 +155,7 @@ describe(keyValueRecord, () => {
 
   describe('fill', () => {
     test('from an empty record', () => {
-      const x: UnknownRecord = {};
+      const x: UnknownRecord = {} as const;
 
       assert.deepStrictEqual(strNumRecord.fill(x), {});
     });
@@ -165,7 +165,7 @@ describe(keyValueRecord, () => {
         year: 2000,
         month: 999,
         date: 999,
-      };
+      } as const;
 
       assert.deepStrictEqual(strNumRecord.fill(x), {
         year: 2000,
@@ -178,7 +178,7 @@ describe(keyValueRecord, () => {
       const x: UnknownRecord = {
         year: 2000,
         month: '12',
-      };
+      } as const;
 
       assert.deepStrictEqual(strNumRecord.fill(x), {
         year: 2000,

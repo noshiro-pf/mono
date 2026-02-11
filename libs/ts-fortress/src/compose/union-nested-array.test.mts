@@ -31,7 +31,7 @@ describe('union - nested arrays', () => {
       const x: unknown = [
         [1, 2],
         [3, 4],
-      ];
+      ] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -43,7 +43,7 @@ describe('union - nested arrays', () => {
     });
 
     test('truthy case - string array', () => {
-      const x: unknown = ['a', 'b'];
+      const x: unknown = ['a', 'b'] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -55,7 +55,7 @@ describe('union - nested arrays', () => {
     });
 
     test('truthy case - empty array literal', () => {
-      const x: unknown = [];
+      const x: unknown = [] as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -169,7 +169,7 @@ describe('union - nested arrays', () => {
       const input = [
         [1, 2],
         [3, 4],
-      ];
+      ] as const;
 
       const result = targetType.validate(input);
 
@@ -186,7 +186,7 @@ describe('union - nested arrays', () => {
       const x: unknown = [
         [5, 6],
         [7, 8],
-      ];
+      ] as const;
 
       assert.deepStrictEqual(targetType.fill(x), [
         [5, 6],
@@ -195,13 +195,13 @@ describe('union - nested arrays', () => {
     });
 
     test('noop - string array', () => {
-      const x: unknown = ['a', 'b'];
+      const x: unknown = ['a', 'b'] as const;
 
       assert.deepStrictEqual(targetType.fill(x), ['a', 'b']);
     });
 
     test('noop - empty array', () => {
-      const x: unknown = [];
+      const x: unknown = [] as const;
 
       assert.deepStrictEqual(targetType.fill(x), []);
     });

@@ -9,7 +9,7 @@ const User = t.record({
 
 type User = t.TypeOf<typeof User>;
 
-const invalidData = { name: 123, age: 'not a number' };
+const invalidData = { name: 123, age: 'not a number' } as const;
 
 const result = User.validate(invalidData);
 
@@ -68,7 +68,7 @@ const StrictType = t.record(
   },
 );
 
-const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
+const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' } as const;
 
 const strictResult = StrictType.validate(dataWithExcess);
 

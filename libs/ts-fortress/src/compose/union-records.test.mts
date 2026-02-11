@@ -39,7 +39,7 @@ describe('union - records only', () => {
 
   describe('is', () => {
     test('truthy case - first record', () => {
-      const x: unknown = { kind: 'A', value: 10 };
+      const x: unknown = { kind: 'A', value: 10 } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -51,7 +51,7 @@ describe('union - records only', () => {
     });
 
     test('truthy case - second record', () => {
-      const x: unknown = { type: 'B', data: 'test' };
+      const x: unknown = { type: 'B', data: 'test' } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -63,7 +63,7 @@ describe('union - records only', () => {
     });
 
     test('falsy case', () => {
-      const x: unknown = { invalid: 'field' };
+      const x: unknown = { invalid: 'field' } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -129,7 +129,7 @@ describe('union - records only', () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = { kind: 'original', value: 100 };
+      const input = { kind: 'original', value: 100 } as const;
 
       const result = targetType.validate(input);
 
@@ -143,13 +143,13 @@ describe('union - records only', () => {
 
   describe('fill', () => {
     test('noop - first record', () => {
-      const x: unknown = { kind: 'valid', value: 5 };
+      const x: unknown = { kind: 'valid', value: 5 } as const;
 
       assert.deepStrictEqual(targetType.fill(x), { kind: 'valid', value: 5 });
     });
 
     test('noop - second record', () => {
-      const x: unknown = { type: 'ok', data: 'yes' };
+      const x: unknown = { type: 'ok', data: 'yes' } as const;
 
       assert.deepStrictEqual(targetType.fill(x), { type: 'ok', data: 'yes' });
     });

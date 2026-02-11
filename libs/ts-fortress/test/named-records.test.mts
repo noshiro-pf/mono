@@ -59,7 +59,7 @@ describe('nested record', () => {
             to: { x: 3, y: 4 },
           },
         ],
-      };
+      } as const;
 
       if (Polygon.is(x)) {
         expectType<typeof x, Polygon>('=');
@@ -82,7 +82,7 @@ describe('nested record', () => {
             to: { x: 3.3, y: 4 }, // x is not an integer
           },
         ],
-      };
+      } as const;
 
       if (Polygon.is(x)) {
         expectType<typeof x, Polygon>('=');
@@ -111,7 +111,7 @@ describe('nested record', () => {
             to: { x: 7, y: 8 },
           },
         ],
-      };
+      } as const;
 
       const result = Polygon.validate(x);
 
@@ -170,7 +170,7 @@ describe('nested record', () => {
             to: { x: 3, y: 4 },
           },
         ],
-      };
+      } as const;
 
       const result = Polygon.validate(x);
 
@@ -214,7 +214,7 @@ describe('nested record', () => {
 
   describe('fill', () => {
     test('from an empty record', () => {
-      const x: UnknownRecord = {};
+      const x: UnknownRecord = {} as const;
 
       assert.deepStrictEqual(Polygon.fill(x), {
         vertices: [],
@@ -234,7 +234,7 @@ describe('nested record', () => {
             to: { x: 3.3, y: 4 }, // x will be fixed to default (0)
           },
         ],
-      };
+      } as const;
 
       assert.deepStrictEqual(Polygon.fill(x), {
         vertices: [
@@ -253,7 +253,7 @@ describe('nested record', () => {
     test('from a partial record', () => {
       const x: UnknownRecord = {
         vertices: [{ x: 11, y: 22 }],
-      };
+      } as const;
 
       assert.deepStrictEqual(Polygon.fill(x), {
         vertices: [{ x: asInt(11), y: asInt(22), z: asInt(0) }],
@@ -266,7 +266,7 @@ describe('nested record', () => {
         vertices: [{ x: 11, y: 22, z: 33 }],
         edges: [],
         extraField: 'should be ignored',
-      };
+      } as const;
 
       assert.deepStrictEqual(Polygon.fill(x), {
         vertices: [{ x: asInt(11), y: asInt(22), z: asInt(33) }],

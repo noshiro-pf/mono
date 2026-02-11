@@ -37,7 +37,7 @@ describe(array, () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const ys: unknown = [1, 2, 3];
+      const ys: unknown = [1, 2, 3] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -49,7 +49,7 @@ describe(array, () => {
     });
 
     test('falsy case', () => {
-      const ys: unknown = ['1', '', 3];
+      const ys: unknown = ['1', '', 3] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -63,7 +63,7 @@ describe(array, () => {
 
   describe('validate', () => {
     test('truthy case', () => {
-      const ys: unknown = [1, 2, 3];
+      const ys: unknown = [1, 2, 3] as const;
 
       const result = xs.validate(ys);
 
@@ -77,7 +77,7 @@ describe(array, () => {
     });
 
     test('falsy case', () => {
-      const ys: unknown = ['1', '', 3];
+      const ys: unknown = ['1', '', 3] as const;
 
       assert.isFalse(xs.is(ys));
 
@@ -115,7 +115,7 @@ describe(array, () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = [10, 20, 30];
+      const input = [10, 20, 30] as const;
 
       const result = xs.validate(input);
 
@@ -129,13 +129,13 @@ describe(array, () => {
 
   describe('fill', () => {
     test('noop', () => {
-      const ys: unknown = [1, 2, 3];
+      const ys: unknown = [1, 2, 3] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [1, 2, 3]);
     });
 
     test('fill with the default value', () => {
-      const ys: unknown = ['1', '', 3];
+      const ys: unknown = ['1', '', 3] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [0, 0, 3]);
     });

@@ -33,7 +33,7 @@ describe(mergeRecords, () => {
 
   describe('is', () => {
     test('truthy case', () => {
-      const x: unknown = { x: 0, y: 1, z: 2, w: 3 };
+      const x: unknown = { x: 0, y: 1, z: 2, w: 3 } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -45,7 +45,7 @@ describe(mergeRecords, () => {
     });
 
     test('truthy case 2', () => {
-      const x: unknown = { x: 0, y: 1, z: 2, w: 3, a: 0, b: 0 };
+      const x: unknown = { x: 0, y: 1, z: 2, w: 3, a: 0, b: 0 } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -57,7 +57,7 @@ describe(mergeRecords, () => {
     });
 
     test('falsy case', () => {
-      const x: unknown = { x: 0, y: 1 };
+      const x: unknown = { x: 0, y: 1 } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -85,7 +85,7 @@ describe(mergeRecords, () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = { x: 0, y: 1, z: 2, w: 3 };
+      const input = { x: 0, y: 1, z: 2, w: 3 } as const;
 
       const result = targetType.validate(input);
 
@@ -146,13 +146,13 @@ describe(mergeRecords, () => {
 
   describe('fill', () => {
     test('noop', () => {
-      const x: unknown = { x: 0, y: 1, z: 2, w: 3 };
+      const x: unknown = { x: 0, y: 1, z: 2, w: 3 } as const;
 
       assert.deepStrictEqual(targetType.fill(x), { x: 0, y: 1, z: 2, w: 3 });
     });
 
     test('fill with the default value', () => {
-      const x = { x: 0, y: 1, z: 2 };
+      const x = { x: 0, y: 1, z: 2 } as const;
 
       assert.deepStrictEqual(targetType.fill(x), { x: 0, y: 1, z: 2, w: 0 });
     });

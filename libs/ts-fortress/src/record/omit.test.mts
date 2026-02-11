@@ -35,7 +35,7 @@ describe(omit, () => {
       const x: UnknownRecord = {
         year: 2000,
         month: 12,
-      };
+      } as const;
 
       if (ym.is(x)) {
         expectType<typeof x, Ym>('=');
@@ -50,7 +50,7 @@ describe(omit, () => {
       const x: UnknownRecord = {
         year: 2000,
         month: 'ab',
-      };
+      } as const;
 
       if (ym.is(x)) {
         expectType<typeof x, Ym>('=');
@@ -67,7 +67,7 @@ describe(omit, () => {
       const x: UnknownRecord = {
         year: 2000,
         month: 12,
-      };
+      } as const;
 
       const result = ym.validate(x);
 
@@ -87,7 +87,7 @@ describe(omit, () => {
       const input: UnknownRecord = {
         year: 2000,
         month: 12,
-      };
+      } as const;
 
       const result = ym.validate(input);
 
@@ -117,7 +117,7 @@ describe(omit, () => {
       const input: UnknownRecord = {
         year: 2000,
         month: 12,
-      };
+      } as const;
 
       const result = ymAllow.validate(input);
 
@@ -136,7 +136,7 @@ describe(omit, () => {
         year: 2000,
         month: 12,
         aaa: 999,
-      };
+      } as const;
 
       const result = ym.validate(x);
 
@@ -161,7 +161,7 @@ describe(omit, () => {
         year: 2000,
         month: 12,
         aaa: 999,
-      };
+      } as const;
 
       const result = ym.validate(input);
 
@@ -182,7 +182,7 @@ describe(omit, () => {
       const x: UnknownRecord = {
         year: 2000,
         month: 'ab',
-      };
+      } as const;
 
       const result = ym.validate(x);
 
@@ -208,7 +208,7 @@ describe(omit, () => {
 
   describe('fill', () => {
     test('from an empty record', () => {
-      const x: UnknownRecord = {};
+      const x: UnknownRecord = {} as const;
 
       assert.deepStrictEqual(ym.fill(x), {
         year: 1900,
@@ -220,7 +220,7 @@ describe(omit, () => {
       const x: UnknownRecord = {
         year: 2000,
         month: 999,
-      };
+      } as const;
 
       assert.deepStrictEqual(ym.fill(x), {
         year: 2000,
@@ -231,7 +231,7 @@ describe(omit, () => {
     test('from a partial record', () => {
       const x: UnknownRecord = {
         year: 2000,
-      };
+      } as const;
 
       assert.deepStrictEqual(ym.fill(x), {
         year: 2000,
@@ -243,7 +243,7 @@ describe(omit, () => {
       const x: UnknownRecord = {
         year: 2000,
         aaaaa: 9999,
-      };
+      } as const;
 
       assert.deepStrictEqual(ym.fill(x), {
         year: 2000,

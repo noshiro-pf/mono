@@ -48,7 +48,7 @@ describe('union - nested records', () => {
 
   describe('is', () => {
     test('truthy case - first nested record', () => {
-      const x: unknown = { type: 'A', data: { value: 10 } };
+      const x: unknown = { type: 'A', data: { value: 10 } } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -60,7 +60,7 @@ describe('union - nested records', () => {
     });
 
     test('truthy case - second nested record', () => {
-      const x: unknown = { kind: 'B', config: { enabled: 'yes' } };
+      const x: unknown = { kind: 'B', config: { enabled: 'yes' } } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -72,7 +72,7 @@ describe('union - nested records', () => {
     });
 
     test('falsy case', () => {
-      const x: unknown = { wrong: 'structure' };
+      const x: unknown = { wrong: 'structure' } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -147,7 +147,7 @@ describe('union - nested records', () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = { type: 'original', data: { value: 100 } };
+      const input = { type: 'original', data: { value: 100 } } as const;
 
       const result = targetType.validate(input);
 
@@ -161,7 +161,7 @@ describe('union - nested records', () => {
 
   describe('fill', () => {
     test('noop - first nested record', () => {
-      const x: unknown = { type: 'valid', data: { value: 5 } };
+      const x: unknown = { type: 'valid', data: { value: 5 } } as const;
 
       assert.deepStrictEqual(targetType.fill(x), {
         type: 'valid',
@@ -170,7 +170,7 @@ describe('union - nested records', () => {
     });
 
     test('noop - second nested record', () => {
-      const x: unknown = { kind: 'ok', config: { enabled: 'yes' } };
+      const x: unknown = { kind: 'ok', config: { enabled: 'yes' } } as const;
 
       assert.deepStrictEqual(targetType.fill(x), {
         kind: 'ok',

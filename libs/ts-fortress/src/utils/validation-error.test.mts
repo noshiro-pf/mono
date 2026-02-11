@@ -46,7 +46,7 @@ describe('validation-error', () => {
           typeName: 'number',
           details: undefined,
         },
-      ];
+      ] as const;
 
       const result = prependPathToValidationErrors(errors, 'parent');
 
@@ -92,7 +92,7 @@ describe('validation-error', () => {
           typeName: 'number',
           details: undefined,
         },
-      ];
+      ] as const;
 
       const result = prependIndexToValidationErrors(errors, 5);
 
@@ -145,7 +145,7 @@ describe('validation-error', () => {
           typeName: 'boolean',
           details: undefined,
         },
-      ];
+      ] as const;
 
       assert.deepStrictEqual(validationErrorsToMessages(errors), [
         'Error at user.name: expected <string> type but <number> type value `123` was passed.',
@@ -166,7 +166,7 @@ describe('validation-error', () => {
             message: 'Custom validation message',
           },
         },
-      ];
+      ] as const;
 
       assert.deepStrictEqual(validationErrorsToMessages(errors), [
         'Error at field: Custom validation message',

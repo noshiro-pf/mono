@@ -127,7 +127,7 @@ const partialData = {
         // notifications missing - will be filled with default
     },
     // age, email, tags missing - will be filled with defaults
-};
+} as const;
 
 const filledData = UserProfile.fill(partialData);
 
@@ -534,7 +534,7 @@ const User = t.record({
 type User = t.TypeOf<typeof User>;
 
 // Use defaultValue for initialization
-const newUser: User = { ...User.defaultValue, id: 'user-123' };
+const newUser: User = { ...User.defaultValue, id: 'user-123' } as const;
 
 // This default value filling process can also be written as follows:
 const newUser2: User = User.fill({ id: 'user-456' });
@@ -645,13 +645,13 @@ const PermissiveUserType = t.record(
 );
 
 // Example usage - both StrictUserType and StrictUserTypeAlias behave identically
-const strictData = { id: '123', name: 'John', extra: 'not allowed' };
+const strictData = { id: '123', name: 'John', extra: 'not allowed' } as const;
 
 assert.isFalse(StrictUserType.is(strictData)); // 'extra' property causes rejection
 
 assert.isFalse(StrictUserTypeAlias.is(strictData)); // same as above
 
-const permissiveData = { id: '123', name: 'John', extra: 'allowed' };
+const permissiveData = { id: '123', name: 'John', extra: 'allowed' } as const;
 
 assert.isTrue(PermissiveUserType.is(permissiveData)); // 'extra' property is allowed
 
@@ -927,7 +927,7 @@ const User = t.record({
 
 type User = t.TypeOf<typeof User>;
 
-const invalidData = { name: 123, age: 'not a number' };
+const invalidData = { name: 123, age: 'not a number' } as const;
 
 const result = User.validate(invalidData);
 
@@ -986,7 +986,7 @@ const StrictType = t.record(
     },
 );
 
-const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' };
+const dataWithExcess = { name: 'John', age: 30, extra: 'not allowed' } as const;
 
 const strictResult = StrictType.validate(dataWithExcess);
 

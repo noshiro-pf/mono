@@ -47,7 +47,7 @@ describe('record allowExcessProperties option', () => {
       name: 42,
       age: 25,
       extra: 'not allowed',
-    };
+    } as const;
 
     assert.isFalse(strictRecord.is(dataWithExcess));
 
@@ -79,7 +79,7 @@ describe('record allowExcessProperties option', () => {
     const validData = {
       name: 42,
       age: 25,
-    };
+    } as const;
 
     assert.isTrue(strictRecord.is(validData));
 
@@ -96,7 +96,7 @@ describe('record allowExcessProperties option', () => {
   });
 
   test('strictRecord validate returns input as-is for OK cases', () => {
-    const input = { name: 42, age: 25 };
+    const input = { name: 42, age: 25 } as const;
 
     const result = strictRecord.validate(input);
 
@@ -112,7 +112,7 @@ describe('record allowExcessProperties option', () => {
       name: 42,
       age: 25,
       extra: 'allowed',
-    };
+    } as const;
 
     assert.isTrue(permissiveRecord.is(dataWithExcess));
 
@@ -131,7 +131,7 @@ describe('record allowExcessProperties option', () => {
   });
 
   test('permissiveRecord validate returns input as-is for OK cases', () => {
-    const input = { name: 42, age: 25, extra: 'allowed' };
+    const input = { name: 42, age: 25, extra: 'allowed' } as const;
 
     const result = permissiveRecord.validate(input);
 
@@ -147,7 +147,7 @@ describe('record allowExcessProperties option', () => {
       name: 42,
       age: 25,
       extra: 'stripped by default',
-    };
+    } as const;
 
     assert.isTrue(defaultRecord.is(dataWithExcess));
 
@@ -165,7 +165,7 @@ describe('record allowExcessProperties option', () => {
   });
 
   test('defaultRecord validate returns stripped content for OK cases', () => {
-    const input = { name: 42, age: 25, extra: 'stripped by default' };
+    const input = { name: 42, age: 25, extra: 'stripped by default' } as const;
 
     const result = defaultRecord.validate(input);
 
@@ -187,7 +187,7 @@ describe('record allowExcessProperties option', () => {
       name: 42,
       age: 25,
       extra: 'stripped',
-    };
+    } as const;
 
     const result = stripRecord.validate(dataWithExcess);
 
@@ -207,7 +207,7 @@ describe('record allowExcessProperties option', () => {
       age: 25,
       extra1: 'not allowed 1',
       extra2: 'not allowed 2',
-    };
+    } as const;
 
     const result = strictRecord.validate(dataWithMultipleExcess);
 
@@ -246,7 +246,7 @@ describe('record allowExcessProperties option', () => {
       name: 'invalid', // should be number
       age: 25,
       extra: 'not allowed',
-    };
+    } as const;
 
     const result = strictRecord.validate(invalidData);
 

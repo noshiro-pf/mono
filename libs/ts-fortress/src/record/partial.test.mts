@@ -66,7 +66,7 @@ describe(partial, () => {
           year: 2000,
           month: 12,
           date: 12,
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -82,7 +82,7 @@ describe(partial, () => {
           year: 2000,
           month: 'ab',
           date: 'cd',
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -100,7 +100,7 @@ describe(partial, () => {
           year: 2000,
           month: 12,
           date: 25,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -122,7 +122,7 @@ describe(partial, () => {
           year: 2000,
           month: 12,
           date: 25,
-        };
+        } as const;
 
         const result = ymd.validate(input);
 
@@ -152,7 +152,7 @@ describe(partial, () => {
           year: 2000,
           month: 12,
           date: 25,
-        };
+        } as const;
 
         const result = ymdAllow.validate(input);
 
@@ -167,7 +167,7 @@ describe(partial, () => {
       });
 
       test('truthy case optional keys', () => {
-        const x: UnknownRecord = {};
+        const x: UnknownRecord = {} as const;
 
         const result = ymd.validate(x);
 
@@ -181,7 +181,7 @@ describe(partial, () => {
       });
 
       test('validate returns input as-is for empty object', () => {
-        const input: UnknownRecord = {};
+        const input: UnknownRecord = {} as const;
 
         const result = ymd.validate(input);
 
@@ -207,7 +207,7 @@ describe(partial, () => {
 
         const ymdAllow = partial(ymdBaseAllow);
 
-        const input: UnknownRecord = {};
+        const input: UnknownRecord = {} as const;
 
         const result = ymdAllow.validate(input);
 
@@ -227,7 +227,7 @@ describe(partial, () => {
           month: 12,
           date: 25,
           aaa: 999,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -254,7 +254,7 @@ describe(partial, () => {
           month: 12,
           date: 25,
           aaa: 999,
-        };
+        } as const;
 
         const result = ymd.validate(input);
 
@@ -276,7 +276,7 @@ describe(partial, () => {
           year: 2000,
           month: 'ab',
           date: 'cd',
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -311,7 +311,7 @@ describe(partial, () => {
         const x: UnknownRecord = {
           year: 2000,
           month: 'ab',
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -337,7 +337,7 @@ describe(partial, () => {
 
     describe('fill', () => {
       test('from an empty record', () => {
-        const x: UnknownRecord = {};
+        const x: UnknownRecord = {} as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 1900,
@@ -351,7 +351,7 @@ describe(partial, () => {
           year: 2000,
           month: 999,
           date: 999,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -363,7 +363,7 @@ describe(partial, () => {
       test('from a partial record', () => {
         const x: UnknownRecord = {
           year: 2000,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -376,7 +376,7 @@ describe(partial, () => {
         const x: UnknownRecord = {
           year: 2000,
           aaaaa: 9999,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -409,7 +409,7 @@ describe(partial, () => {
         const x: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -425,7 +425,7 @@ describe(partial, () => {
           year: 2000,
           month: 'ab',
           date: 'cd',
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -439,7 +439,7 @@ describe(partial, () => {
       test('falsy case 2', () => {
         const x: UnknownRecord = {
           date: 'cd',
-        };
+        } as const;
 
         if (ymd.is(x)) {
           expectType<typeof x, Ymd>('=');
@@ -456,7 +456,7 @@ describe(partial, () => {
         const x: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -476,7 +476,7 @@ describe(partial, () => {
         const input: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         const result = ymd.validate(input);
 
@@ -507,7 +507,7 @@ describe(partial, () => {
         const input: UnknownRecord = {
           year: 2000,
           month: 12,
-        };
+        } as const;
 
         const result = ymdAllow.validate(input);
 
@@ -526,7 +526,7 @@ describe(partial, () => {
           year: 2000,
           month: 'ab',
           date: 'cd',
-        };
+        } as const;
 
         const result = ymd.validate(x);
 
@@ -560,7 +560,7 @@ describe(partial, () => {
 
     describe('fill', () => {
       test('from an empty record', () => {
-        const x: UnknownRecord = {};
+        const x: UnknownRecord = {} as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 1900,
@@ -574,7 +574,7 @@ describe(partial, () => {
           year: 2000,
           month: 999,
           date: 999,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -586,7 +586,7 @@ describe(partial, () => {
       test('from a partial record', () => {
         const x: UnknownRecord = {
           year: 2000,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,
@@ -599,7 +599,7 @@ describe(partial, () => {
         const x: UnknownRecord = {
           year: 2000,
           aaaaa: 9999,
-        };
+        } as const;
 
         assert.deepStrictEqual(ymd.fill(x), {
           year: 2000,

@@ -45,7 +45,7 @@ describe(union, () => {
     });
 
     test('truthy case 2', () => {
-      const x: unknown = { x: 1, y: 2 };
+      const x: unknown = { x: 1, y: 2 } as const;
 
       if (targetType.is(x)) {
         expectType<typeof x, TargetType>('=');
@@ -108,7 +108,7 @@ describe(union, () => {
     });
 
     test('validate returns input as-is for OK cases', () => {
-      const input = { x: 10, y: 20 };
+      const input = { x: 10, y: 20 } as const;
 
       const result = targetType.validate(input);
 
@@ -122,7 +122,7 @@ describe(union, () => {
 
   describe('fill', () => {
     test('noop', () => {
-      const x: unknown = { x: 3, y: 4 };
+      const x: unknown = { x: 3, y: 4 } as const;
 
       assert.deepStrictEqual(targetType.fill(x), { x: 3, y: 4 });
     });
