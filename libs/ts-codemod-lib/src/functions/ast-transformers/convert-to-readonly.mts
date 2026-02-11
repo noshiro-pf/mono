@@ -1193,7 +1193,9 @@ const transformUnionOrIntersectionTypeNodeImpl = (
           unionToString({
             types: nonEmptyTypeLiterals.map((n) =>
               isReadonlyTypeReferenceNode(n)
-                ? // NOTE: Readonly<A & B> -> (A & B)
+                ? // NOTE: Readonly<A & B> -> (A & B), Readonly<{ x: X }> -> { x: X }
+                  // NOTE: Readonly<C> (where C is TypeReference) should not reach here anymore
+                  // as it's now classified in the 'others' group
                   unwrapReadonlyTypeArgText(n)
                 : (n satisfies tsm.TypeLiteralNode).getFullText(),
             ),
