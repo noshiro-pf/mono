@@ -1,3 +1,9 @@
+# [6.4.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.3.0...v6.4.0) (2026-02-11)
+
+### Features
+
+- add templateLiteral type ([#215](https://github.com/noshiro-pf/ts-fortress/issues/215)) ([5cc1417](https://github.com/noshiro-pf/ts-fortress/commit/5cc141733840645473bd39d76517ecd8a170f96d))
+
 # [6.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.2.5...v6.3.0) (2026-02-11)
 
 ### Features
