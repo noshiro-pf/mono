@@ -76,7 +76,7 @@ jobs:
       # Retrieved 2026-02-10, License - CC BY-SA 4.0
       - name: Run 'test:browser' with retry
         if: matrix.command == 'test:browser'
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 10
           max_attempts: 3
