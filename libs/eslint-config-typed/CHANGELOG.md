@@ -1,3 +1,9 @@
+## [4.6.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.1...v4.6.2) (2026-02-11)
+
+### Bug Fixes
+
+- fix preferIsRecordAndHasKey fixer ([#245](https://github.com/noshiro-pf/eslint-config-typed/issues/245)) ([8122fc8](https://github.com/noshiro-pf/eslint-config-typed/commit/8122fc8b1077aee8b7cdc81c5501ad0abb879de6))
+
 ## [4.6.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.0...v4.6.1) (2026-02-02)
 
 ### Bug Fixes
