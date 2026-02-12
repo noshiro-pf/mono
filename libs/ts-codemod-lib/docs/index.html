@@ -3,7 +3,7 @@
 <a href="https://www.npmjs.com/package/ts-codemod-lib"><img src="https://img.shields.io/npm/dm/ts-codemod-lib.svg" alt="npm downloads"></a>
 <a href="./LICENSE"><img src="https://img.shields.io/npm/l/ts-codemod-lib.svg" alt="License"></a>
 <a href="https://codecov.io/gh/noshiro-pf/ts-codemod-lib"><img src="https://codecov.io/gh/noshiro-pf/ts-codemod-lib/graph/badge.svg?token=BVx5UgsiVr" alt="codecov"></a></p>
-<p>A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by the TypeScript Compiler API.</p>
+<p>A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by the <a href="https://github.com/dsherret/ts-morph">ts-morph</a>.</p>
 <h2 id="overview" class="tsd-anchor-link">Overview<a href="#overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p><code>ts-codemod-lib</code> provides utilities and ready-to-use transformers for automated TypeScript code transformations. It enables you to programmatically modify TypeScript source code through AST manipulation, making it ideal for large-scale refactoring tasks, enforcing type safety, and promoting immutability.</p>
 <h2 id="features" class="tsd-anchor-link">Features<a href="#features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
@@ -16,7 +16,11 @@
 <li><strong>Selective Transformation</strong>: Support for ignoring specific lines or entire files via comments</li>
 </ul>
 <h2 id="installation" class="tsd-anchor-link">Installation<a href="#installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
-<pre><code class="bash"><span class="hl-0"># Using npm</span><br/><span class="hl-1">npm</span><span class="hl-2"> </span><span class="hl-3">install</span><span class="hl-2"> </span><span class="hl-4">-D</span><span class="hl-2"> </span><span class="hl-3">ts-codemod-lib</span><br/><br/><span class="hl-0"># Using pnpm</span><br/><span class="hl-1">pnpm</span><span class="hl-2"> </span><span class="hl-3">add</span><span class="hl-2"> </span><span class="hl-4">-D</span><span class="hl-2"> </span><span class="hl-3">ts-codemod-lib</span><br/><br/><span class="hl-0"># Using yarn</span><br/><span class="hl-1">yarn</span><span class="hl-2"> </span><span class="hl-3">add</span><span class="hl-2"> </span><span class="hl-4">-D</span><span class="hl-2"> </span><span class="hl-3">ts-codemod-lib</span>
+<pre><code class="bash"><span class="hl-0"># Using npm</span><br/><span class="hl-1">npm</span><span class="hl-2"> </span><span class="hl-3">add</span><span class="hl-2"> </span><span class="hl-3">ts-codemod-lib</span><br/><br/><span class="hl-0"># Using pnpm</span><br/><span class="hl-1">pnpm</span><span class="hl-2"> </span><span class="hl-3">add</span><span class="hl-2"> </span><span class="hl-3">ts-codemod-lib</span><br/><br/><span class="hl-0"># Using yarn</span><br/><span class="hl-1">yarn</span><span class="hl-2"> </span><span class="hl-3">add</span><span class="hl-2"> </span><span class="hl-3">ts-codemod-lib</span>
+</code><button type="button">Copy</button></pre>
+
+<p>For CLI usage:</p>
+<pre><code class="bash"><span class="hl-1">npm</span><span class="hl-2"> </span><span class="hl-3">add</span><span class="hl-2"> </span><span class="hl-4">-D</span><span class="hl-2"> </span><span class="hl-3">ts-codemod-lib</span><span class="hl-2"> </span><span class="hl-3">cmd-ts</span><span class="hl-2"> </span><span class="hl-3">dedent</span><span class="hl-2"> </span><span class="hl-3">ts-repo-utils</span>
 </code><button type="button">Copy</button></pre>
 
 <h2 id="available-transformers" class="tsd-anchor-link">Available Transformers<a href="#available-transformers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>

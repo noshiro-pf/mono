@@ -8,12 +8,9 @@ importers:
 
   .:
     dependencies:
-      cmd-ts:
-        specifier: 0.14.3
-        version: 0.14.3
-      dedent:
-        specifier: 1.7.1
-        version: 1.7.1
+      ts-data-forge:
+        specifier: 6.4.0
+        version: 6.4.0(typescript@5.9.3)
       ts-morph:
         specifier: 27.0.2
         version: 27.0.2
@@ -60,12 +57,18 @@ importers:
       '@vitest/ui':
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18)
+      cmd-ts:
+        specifier: 0.14.3
+        version: 0.14.3
       conventional-changelog-conventionalcommits:
         specifier: 9.1.0
         version: 9.1.0
       cspell:
         specifier: 9.6.3
         version: 9.6.3
+      dedent:
+        specifier: 1.7.1
+        version: 1.7.1
       eslint:
         specifier: 9.39.2
         version: 9.39.2(jiti@2.6.1)
@@ -105,9 +108,6 @@ importers:
       semantic-release:
         specifier: 25.0.3
         version: 25.0.3(typescript@5.9.3)
-      ts-data-forge:
-        specifier: 6.4.0
-        version: 6.4.0(typescript@5.9.3)
       ts-repo-utils:
         specifier: 8.1.0
         version: 8.1.0(prettier@3.8.1)(typescript@5.9.3)

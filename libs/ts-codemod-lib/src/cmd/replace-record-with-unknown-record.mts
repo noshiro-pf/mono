@@ -2,7 +2,6 @@
 
 import * as cmd from 'cmd-ts';
 import { Result } from 'ts-data-forge';
-import 'ts-repo-utils';
 import { replaceRecordWithUnknownRecordTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 

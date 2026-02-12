@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/npm/l/ts-codemod-lib.svg)](./LICENSE)
 [![codecov](https://codecov.io/gh/noshiro-pf/ts-codemod-lib/graph/badge.svg?token=BVx5UgsiVr)](https://codecov.io/gh/noshiro-pf/ts-codemod-lib)
 
-A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by the TypeScript Compiler API.
+A TypeScript library for code transformations using AST (Abstract Syntax Tree) transformers, powered by the [ts-morph](https://github.com/dsherret/ts-morph).
 
 ## Overview
 
@@ -24,13 +24,19 @@ A TypeScript library for code transformations using AST (Abstract Syntax Tree) t
 
 ```bash
 # Using npm
-npm install -D ts-codemod-lib
+npm add ts-codemod-lib
 
 # Using pnpm
-pnpm add -D ts-codemod-lib
+pnpm add ts-codemod-lib
 
 # Using yarn
-yarn add -D ts-codemod-lib
+yarn add ts-codemod-lib
+```
+
+For CLI usage:
+
+```bash
+npm add -D ts-codemod-lib cmd-ts dedent ts-repo-utils
 ```
 
 ## Available Transformers
