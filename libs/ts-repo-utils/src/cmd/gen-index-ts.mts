@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* transformer-ignore convert-to-readonly */
+
 import * as cmd from 'cmd-ts';
 // eslint-disable-next-line import-x/no-internal-modules
 import { type InputOf, type OutputOf } from 'cmd-ts/dist/esm/from.js';
@@ -23,19 +25,23 @@ const extensionType = cmd.extendType(cmd.string, {
 const nonEmptyArray = <T extends cmd.Type<any, any>>(
   t: T,
   commandName: string,
-): cmd.Type<InputOf<T>[], NonEmptyArray<OutputOf<T>>> =>
-  cmd.extendType(cmd.array(t), {
-    from: (arr) => {
-      if (arr.length === 0) {
-        throw new Error(
-          `No value provided for --${commandName}. At least one value is required.`,
-        );
-      }
+): cmd.Type<readonly InputOf<T>[], NonEmptyArray<OutputOf<T>>> =>
+  cmd.extendType(
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    cmd.array(t) as cmd.Type<readonly InputOf<T>[], OutputOf<T>[]>,
+    {
+      from: (arr) => {
+        if (arr.length === 0) {
+          throw new Error(
+            `No value provided for --${commandName}. At least one value is required.`,
+          );
+        }
 
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      return Promise.resolve(arr as unknown as NonEmptyArray<OutputOf<T>>);
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        return Promise.resolve(arr as unknown as NonEmptyArray<OutputOf<T>>);
+      },
     },
-  });
+  );
 
 const cmdDef = cmd.command({
   name: 'gen-index-ts-cli',
@@ -96,6 +102,11 @@ const cmdDef = cmd.command({
       type: cmd.optional(cmd.boolean),
       description: 'If true, suppresses output messages (default: false)',
     }),
+    minDepth: cmd.option({
+      long: 'min-depth',
+      type: cmd.optional(cmd.number),
+      description: 'Minimum depth to start generating index files (default: 0)',
+    }),
   },
   handler: (args) => {
     expectType<typeof args.targetDirectory, string>('=');
@@ -111,6 +122,8 @@ const cmdDef = cmd.command({
     expectType<typeof args.formatCommand, string | undefined>('=');
 
     expectType<typeof args.silent, boolean | undefined>('=');
+
+    expectType<typeof args.minDepth, number | undefined>('=');
 
     main(args).catch((error: unknown) => {
       console.error('An error occurred:', error);
@@ -128,6 +141,7 @@ const main = async ({
   exclude,
   formatCommand,
   silent,
+  minDepth,
 }: Readonly<{
   targetDirectory: string;
   targetExtensions: readonly Ext[];
@@ -136,6 +150,7 @@ const main = async ({
   exclude?: readonly string[] | undefined;
   formatCommand?: string | undefined;
   silent?: boolean | undefined;
+  minDepth?: number | undefined;
 }>): Promise<void> => {
   await genIndex({
     targetDirectory: targetDirectory.includes(',')
@@ -147,6 +162,7 @@ const main = async ({
     indexFileExtension,
     formatCommand,
     silent,
+    minDepth,
   });
 };
 

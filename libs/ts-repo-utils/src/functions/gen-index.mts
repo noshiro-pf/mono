@@ -6,7 +6,7 @@ import { assertPathExists } from './assert-path-exists.mjs';
 /** Configuration for index file generation. */
 export type GenIndexConfig = DeepReadonly<{
   /** Target directories to generate index files for (string or array of strings) */
-  targetDirectory: string | readonly string[];
+  targetDirectory: string | string[];
 
   /**
    * Glob patterns of files or predicate function to exclude from exports
@@ -14,7 +14,7 @@ export type GenIndexConfig = DeepReadonly<{
    * `'**\/*.d.?(c|m)ts'`)
    */
   exclude?:
-    | readonly string[]
+    | string[]
     | ((
         args: Readonly<{
           absolutePath: string;
@@ -24,7 +24,7 @@ export type GenIndexConfig = DeepReadonly<{
       ) => boolean);
 
   /** File extensions of source files to export (default: ['.ts', '.tsx']) */
-  targetExtensions?: readonly `.${string}`[];
+  targetExtensions?: `.${string}`[];
 
   /** File extension of index files to generate (default: '.ts') */
   indexFileExtension?: `.${string}`;
@@ -37,6 +37,9 @@ export type GenIndexConfig = DeepReadonly<{
 
   /** Whether to suppress output during execution (default: false) */
   silent?: boolean;
+
+  /** Minimum depth to start generating index files (default: 0) */
+  minDepth?: number;
 }>;
 
 const defaultConfig = {
@@ -45,6 +48,7 @@ const defaultConfig = {
   indexFileExtension: '.ts',
   exportStatementExtension: '.js', // For ESM imports, .mts resolves to .mjs
   silent: false,
+  minDepth: 0,
 } as const satisfies Required<
   StrictOmit<GenIndexConfig, 'targetDirectory' | 'formatCommand'>
 >;
@@ -63,6 +67,7 @@ type GenIndexConfigInternal = DeepReadonly<{
   indexFileExtension: `.${string}`;
   exportStatementExtension: `.${string}` | 'none';
   silent: boolean;
+  minDepth: number;
 }>;
 
 /**
@@ -84,7 +89,7 @@ export const genIndex = async (
   // Normalize target directories to array
   const targetDirs =
     typeof config.targetDirectory === 'string'
-      ? [config.targetDirectory]
+      ? ([config.targetDirectory] as const)
       : config.targetDirectory;
 
   try {
@@ -103,7 +108,7 @@ export const genIndex = async (
       const resolvedDir = path.resolve(dir);
 
       // eslint-disable-next-line no-await-in-loop
-      await generateIndexFileForDir(resolvedDir, filledConfig);
+      await generateIndexFileForDir(resolvedDir, filledConfig, undefined, 0);
     }
 
     conditionalEcho('✓ Index files generated\n');
@@ -188,6 +193,7 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
       config.indexFileExtension ?? defaultConfig.indexFileExtension,
     exportStatementExtension: exportExtension,
     silent: config.silent ?? defaultConfig.silent,
+    minDepth: config.minDepth ?? defaultConfig.minDepth,
   };
 };
 
@@ -199,12 +205,14 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
  * @param config - The merged configuration object.
  * @param baseDir - The base directory path for calculating relative paths
  *   (optional, defaults to dirPath).
+ * @param currentDepth - The current depth of recursion.
  * @throws Error if directory processing fails.
  */
 const generateIndexFileForDir = async (
   dirPath: string,
   config: GenIndexConfigInternal,
   baseDir?: string,
+  currentDepth: number = 0,
 ): Promise<void> => {
   try {
     const actualBaseDir = baseDir ?? dirPath;
@@ -237,7 +245,12 @@ const generateIndexFileForDir = async (
 
         // Recursively call for subdirectories first
         // eslint-disable-next-line no-await-in-loop
-        await generateIndexFileForDir(entryPath, config, actualBaseDir);
+        await generateIndexFileForDir(
+          entryPath,
+          config,
+          actualBaseDir,
+          currentDepth + 1,
+        );
       } else if (
         entry.isFile() &&
         shouldExportFile({
@@ -250,17 +263,19 @@ const generateIndexFileForDir = async (
       }
     }
 
-    const indexContent = generateIndexContent(
-      mut_subDirectories,
-      mut_filesToExport,
-      config,
-    );
+    if (currentDepth >= config.minDepth) {
+      const indexContent = generateIndexContent(
+        mut_subDirectories,
+        mut_filesToExport,
+        config,
+      );
 
-    const indexPath = path.join(dirPath, `index${config.indexFileExtension}`);
+      const indexPath = path.join(dirPath, `index${config.indexFileExtension}`);
 
-    await fs.writeFile(indexPath, indexContent);
+      await fs.writeFile(indexPath, indexContent);
 
-    echo(`Generated: ${path.relative(process.cwd(), indexPath)}`);
+      echo(`Generated: ${path.relative(process.cwd(), indexPath)}`);
+    }
   } catch (error) {
     throw new Error(
       `Failed to generate index for directory ${dirPath}: ${String(error)}`,
@@ -368,7 +383,7 @@ const generateIndexContent = (
         ? `export * from "./${fileNameWithoutExt}";`
         : `export * from "./${fileNameWithoutExt}${config.exportStatementExtension}";`;
     }),
-  ];
+  ] as const;
 
   return exportStatements.length === 0
     ? 'export {};'

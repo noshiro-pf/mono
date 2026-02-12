@@ -5,17 +5,14 @@ type ExecOptionsCustom = Readonly<{
   silent?: boolean;
 }>;
 
-type ExecOptionsWithStringEncoding = Readonly<
-  childProcess.ExecOptionsWithStringEncoding & ExecOptionsCustom
->;
+type ExecOptionsWithStringEncoding =
+  childProcess.ExecOptionsWithStringEncoding & ExecOptionsCustom;
 
-type ExecOptionsWithBufferEncoding = Readonly<
-  childProcess.ExecOptionsWithBufferEncoding & ExecOptionsCustom
->;
+type ExecOptionsWithBufferEncoding =
+  childProcess.ExecOptionsWithBufferEncoding & ExecOptionsCustom;
 
-type NormalizedExecOptions = Readonly<
-  childProcess.ExecOptions & { encoding?: BufferEncoding | 'buffer' | null }
->;
+type NormalizedExecOptions = childProcess.ExecOptions &
+  Readonly<{ encoding?: BufferEncoding | 'buffer' | null }>;
 
 export type ExecOptions = childProcess.ExecOptions & ExecOptionsCustom;
 

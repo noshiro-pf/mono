@@ -106,7 +106,7 @@ const getStrArrayFromJsonValue = (
   Array.isArray(value[key]) &&
   value[key].every(isString)
     ? value[key]
-    : [];
+    : ([] as const);
 
 const getKeyValueRecordFromJsonValue = (
   value: JsonValue,
@@ -123,6 +123,7 @@ const getKeyValueRecordFromJsonValue = (
   }
 
   const entries = Object.entries(obj).filter(
+    // transformer-ignore-next-line convert-to-readonly
     (entry): entry is [string, string] => isString(entry[1]),
   );
 

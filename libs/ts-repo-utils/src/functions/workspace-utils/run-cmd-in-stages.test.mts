@@ -55,7 +55,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
 
     try {
       // Mock workspace packages
-      const mockPackages: Package[] = [
+      const mockPackages: readonly Package[] = [
         {
           name: 'package-a',
           path: '/test/package-a',
@@ -74,7 +74,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
           packageJson: { name: 'package-c', scripts: { test: 'echo success' } },
           dependencies: {},
         },
-      ];
+      ] as const;
 
       vi.mocked(getWorkspacePackages).mockResolvedValue(mockPackages);
 
@@ -131,7 +131,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
 
     try {
       // Mock workspace packages
-      const mockPackages: Package[] = [
+      const mockPackages: readonly Package[] = [
         {
           name: 'package-a',
           path: '/test/package-a',
@@ -144,7 +144,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
           packageJson: { name: 'package-b', scripts: { test: 'echo test' } },
           dependencies: {},
         },
-      ];
+      ] as const;
 
       vi.mocked(getWorkspacePackages).mockResolvedValue(mockPackages);
 
@@ -184,7 +184,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
 
     try {
       // Mock workspace packages
-      const mockPackages: Package[] = [
+      const mockPackages: readonly Package[] = [
         {
           name: 'package-a',
           path: '/test/package-a',
@@ -206,7 +206,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
           },
           dependencies: {},
         },
-      ];
+      ] as const;
 
       vi.mocked(getWorkspacePackages).mockResolvedValue(mockPackages);
 

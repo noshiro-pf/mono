@@ -111,7 +111,7 @@ const getFilesWithIncorrectExtension = async (
 ): Promise<readonly string[]> => {
   await assertPathExists(dir, 'Directory');
 
-  const defaultIgnorePatterns = ['tsconfig.json', 'globals.d.*'];
+  const defaultIgnorePatterns = ['tsconfig.json', 'globals.d.*'] as const;
 
   const finalIgnorePatterns = ignorePatterns ?? defaultIgnorePatterns;
 

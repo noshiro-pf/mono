@@ -22,7 +22,7 @@ const filesResult = await glob('**/*.ts');
 
 const files: readonly string[] = Result.isOk(filesResult)
   ? filesResult.value
-  : [];
+  : ([] as const);
 
 if (isDirectlyExecuted(import.meta.url)) {
   echo('Running as CLI');

@@ -212,7 +212,7 @@ const executeScript = (
         const packageJsonScripts =
           isRecord(pkg.packageJson) && isRecord(pkg.packageJson['scripts'])
             ? pkg.packageJson['scripts']
-            : {};
+            : ({} as const);
 
         const hasScript = hasKey(packageJsonScripts, scriptName);
 
@@ -222,7 +222,7 @@ const executeScript = (
           return;
         }
 
-        const prefixStr = prefix ? `[${pkg.name}] ` : '';
+        const prefixStr = prefix ? (`[${pkg.name}] ` as const) : '';
 
         const proc = spawn('npm', ['run', scriptName], {
           cwd: pkg.path,

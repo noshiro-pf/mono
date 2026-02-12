@@ -274,14 +274,18 @@ describe(formatUncommittedFiles, () => {
     await setupTest();
 
     try {
-      const untrackedFiles = ['untracked1.ts', 'untracked2.ts'];
+      const untrackedFiles = ['untracked1.ts', 'untracked2.ts'] as const;
 
-      const modifiedFiles = ['modified1.ts', 'modified2.ts'];
+      const modifiedFiles = ['modified1.ts', 'modified2.ts'] as const;
 
-      const stagedFiles = ['staged1.ts', 'staged2.ts'];
+      const stagedFiles = ['staged1.ts', 'staged2.ts'] as const;
 
       // Create test files
-      const allFiles = [...untrackedFiles, ...modifiedFiles, ...stagedFiles];
+      const allFiles = [
+        ...untrackedFiles,
+        ...modifiedFiles,
+        ...stagedFiles,
+      ] as const;
 
       const filePromises = allFiles.map((file) =>
         createTestFile(file, 'const x=1'),
@@ -423,11 +427,11 @@ describe(formatUncommittedFiles, () => {
     await setupTest();
 
     try {
-      const untrackedFiles = ['untracked.ts'];
+      const untrackedFiles = ['untracked.ts'] as const;
 
-      const stagedFiles = ['staged.ts'];
+      const stagedFiles = ['staged.ts'] as const;
 
-      const allFiles = [...untrackedFiles, ...stagedFiles];
+      const allFiles = [...untrackedFiles, ...stagedFiles] as const;
 
       const filePromises = allFiles.map((file) =>
         createTestFile(file, 'const x=1'),
@@ -514,7 +518,7 @@ describe(formatUncommittedFiles, () => {
     await setupTest();
 
     try {
-      const error = { message: 'Git error' };
+      const error = { message: 'Git error' } as const;
 
       vi.mocked(getUntrackedFiles).mockResolvedValue(Result.err(error));
 
@@ -539,7 +543,7 @@ describe(formatUncommittedFiles, () => {
     await setupTest();
 
     try {
-      const error = { message: 'Git error' };
+      const error = { message: 'Git error' } as const;
 
       vi.mocked(getModifiedFiles).mockResolvedValue(Result.err(error));
 
@@ -564,7 +568,7 @@ describe(formatUncommittedFiles, () => {
     await setupTest();
 
     try {
-      const error = { message: 'Git error' };
+      const error = { message: 'Git error' } as const;
 
       vi.mocked(getStagedFiles).mockResolvedValue(Result.err(error));
 

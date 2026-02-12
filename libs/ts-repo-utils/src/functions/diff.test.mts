@@ -12,14 +12,18 @@ import { type ExecResult } from './exec-async.mjs';
 
 describe('diff', () => {
   // Helper function to create a temporary git repository
-  const createTempRepo = async (): Promise<{
-    repoPath: string;
-    cleanup: () => Promise<void>;
-    execInRepo: (
-      cmd: string,
-      options?: Readonly<{ silent?: boolean }>,
-    ) => Promise<Result<{ stdout: string; stderr: string }, unknown>>;
-  }> => {
+  const createTempRepo = async (): Promise<
+    Readonly<{
+      repoPath: string;
+      cleanup: () => Promise<void>;
+      execInRepo: (
+        cmd: string,
+        options?: Readonly<{ silent?: boolean }>,
+      ) => Promise<
+        Result<Readonly<{ stdout: string; stderr: string }>, unknown>
+      >;
+    }>
+  > => {
     const tempDir = await fs.mkdtemp(path.join(tmpdir(), 'temp-repo-'));
 
     const repoPath = tempDir;
@@ -116,7 +120,8 @@ describe('diff', () => {
 
       try {
         // Create a new file in the temp repository
-        const testFileName = `test-new-file-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-new-file-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 
@@ -143,7 +148,8 @@ describe('diff', () => {
 
       try {
         // Create and track a file first
-        const testFileName = `test-modify-file-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-modify-file-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 
@@ -178,9 +184,9 @@ describe('diff', () => {
         // Create multiple test files
         const uuid = crypto.randomUUID();
 
-        const newFile = `test-new-file-${uuid}.tmp`;
+        const newFile = `test-new-file-${uuid}.tmp` as const;
 
-        const modifyFile = `test-modify-file-${uuid}.tmp`;
+        const modifyFile = `test-modify-file-${uuid}.tmp` as const;
 
         const newFilePath = path.join(repoPath, newFile);
 
@@ -325,7 +331,8 @@ describe('diff', () => {
 
       try {
         // Create a new file
-        const testFileName = `test-staged-file-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-staged-file-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 
@@ -357,9 +364,9 @@ describe('diff', () => {
         // Create multiple test files
         const uuid = crypto.randomUUID();
 
-        const file1 = `test-staged-file1-${uuid}.tmp`;
+        const file1 = `test-staged-file1-${uuid}.tmp` as const;
 
-        const file2 = `test-staged-file2-${uuid}.tmp`;
+        const file2 = `test-staged-file2-${uuid}.tmp` as const;
 
         const filePath1 = path.join(repoPath, file1);
 
@@ -394,7 +401,8 @@ describe('diff', () => {
       const repoFunctions = createRepoFunctions(repoPath);
 
       try {
-        const testFileName = `test-deleted-file-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-deleted-file-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 
@@ -547,7 +555,8 @@ describe('diff', () => {
 
       try {
         // Create a new file and commit it first
-        const testFileName = `test-modified-file-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-modified-file-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 
@@ -585,9 +594,9 @@ describe('diff', () => {
       try {
         const uuid = crypto.randomUUID();
 
-        const file1 = `test-modified-file1-${uuid}.tmp`;
+        const file1 = `test-modified-file1-${uuid}.tmp` as const;
 
-        const file2 = `test-modified-file2-${uuid}.tmp`;
+        const file2 = `test-modified-file2-${uuid}.tmp` as const;
 
         const filePath1 = path.join(repoPath, file1);
 
@@ -632,7 +641,8 @@ describe('diff', () => {
       const repoFunctions = createRepoFunctions(repoPath);
 
       try {
-        const testFileName = `test-deleted-modified-file-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-deleted-modified-file-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 
@@ -747,7 +757,8 @@ describe('diff', () => {
 
       try {
         // Create an initial commit to have something to diff against
-        const testFileName = `test-initial-file-${crypto.randomUUID()}.tmp`;
+        const testFileName =
+          `test-initial-file-${crypto.randomUUID()}.tmp` as const;
 
         const testFilePath = path.join(repoPath, testFileName);
 

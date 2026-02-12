@@ -517,11 +517,11 @@ describe('exec-async', () => {
       try {
         await withSilentEcho(async () => {
           // Create a type that represents what exec callback receives
-          type ExecCallbackParams<T extends string | Buffer> = {
+          type ExecCallbackParams<T extends string | Buffer> = Readonly<{
             error: ExecException | null;
             stdout: T;
             stderr: T;
-          };
+          }>;
 
           // Helper to capture exec callback types
           const captureExecTypes = <T extends string | Buffer>(
@@ -535,7 +535,7 @@ describe('exec-async', () => {
 
               // eslint-disable-next-line total-functions/no-unsafe-type-assertion
               stderr: undefined as unknown as T,
-            };
+            } as const;
 
             return emptyParams;
           };
