@@ -1,3 +1,9 @@
+# [8.2.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.1.0...v8.2.0) (2026-02-12)
+
+### Features
+
+- add min-depth option to gen-index-ts ([#282](https://github.com/noshiro-pf/ts-repo-utils/issues/282)) ([ee81eb2](https://github.com/noshiro-pf/ts-repo-utils/commit/ee81eb21bc9ec0873e0ec2adeaca16b56e171f24))
+
 # [8.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.0.3...v8.1.0) (2026-01-27)
 
 ### Features
