@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import * as ts from 'ts-morph';
 
 export const isAsConstNode = (
@@ -42,6 +43,6 @@ export const isAsConstNode = (
   //    and that there are no type arguments (as const doesn't have them)
   return (
     typeNameNode.getText() === 'const' &&
-    typeNode.getTypeArguments().length === 0
+    Arr.isArrayOfLength(typeNode.getTypeArguments(), 0)
   );
 };

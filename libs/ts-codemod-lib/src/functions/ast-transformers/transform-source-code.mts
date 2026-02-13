@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import { type TsMorphTransformer } from './types.mjs';
 
@@ -27,14 +28,14 @@ const shouldSkipFile = (
 
   // If no file-level ignore comment found, don't skip
   if (
-    ignoredTransformers.length === 0 &&
+    Arr.isArrayOfLength(ignoredTransformers, 0) &&
     !/\/\*\s*transformer-ignore\s*.*?\s*\*\//u.test(code)
   ) {
     return false;
   }
 
   // Empty array means ignore all transformers (file-level ignore without specific transformers)
-  if (ignoredTransformers.length === 0) {
+  if (Arr.isArrayOfLength(ignoredTransformers, 0)) {
     return true;
   }
 

@@ -44,7 +44,7 @@ export const runTransformerCLI = async (
 
   const files = filesResult.value;
 
-  if (files.length === 0) {
+  if (Arr.isArrayOfLength(files, 0)) {
     echoIfNotSilent(
       options.uncommitted
         ? 'No uncommitted files found'
@@ -71,7 +71,7 @@ export const runTransformerCLI = async (
       📊 Total:       ${files.length}
   `);
 
-  if (errorFiles.length > 0) {
+  if (Arr.isNonEmpty(errorFiles)) {
     echoIfNotSilent('\nFiles with errors:');
 
     for (const fileName of errorFiles) {
@@ -81,7 +81,7 @@ export const runTransformerCLI = async (
 
   echoIfNotSilent(hr);
 
-  if (errorFiles.length > 0) {
+  if (Arr.isNonEmpty(errorFiles)) {
     return Result.err(undefined);
   }
 

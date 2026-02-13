@@ -825,7 +825,10 @@ const transformTypeLiteralNode = (
   >,
   options: ReadonlyTransformerOptionsInternal,
 ): void => {
-  if (options.ignoreEmptyObjectTypes && node.getMembers().length === 0) {
+  if (
+    options.ignoreEmptyObjectTypes &&
+    Arr.isArrayOfLength(node.getMembers(), 0)
+  ) {
     return;
   }
 
@@ -1130,7 +1133,8 @@ const transformUnionOrIntersectionTypeNodeImpl = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     n: tsm.TypeLiteralNode | ReadonlyTypeReferenceNode,
   ): boolean =>
-    n.isKind(tsm.SyntaxKind.TypeLiteral) && n.getMembers().length === 0;
+    n.isKind(tsm.SyntaxKind.TypeLiteral) &&
+    Arr.isArrayOfLength(n.getMembers(), 0);
 
   const nonEmptyTypeLiterals =
     typeLiterals === undefined
@@ -1145,7 +1149,8 @@ const transformUnionOrIntersectionTypeNodeImpl = (
       : typeLiterals.nodes.filter((n) => isEmptyTypeLiteral(n));
 
   const typeLiteralsWrappedWithReadonly: readonly [] | readonly [string] =
-    nonEmptyTypeLiterals === undefined || nonEmptyTypeLiterals.length === 0
+    nonEmptyTypeLiterals === undefined ||
+    Arr.isArrayOfLength(nonEmptyTypeLiterals, 0)
       ? ([] as const)
       : ([
           unionToString({
@@ -1172,13 +1177,13 @@ const transformUnionOrIntersectionTypeNodeImpl = (
       arraysAndTuples,
       (a) => [a.nodes.map((n) => n.getFullText()), a.firstPosition] as const,
     ),
-    nonEmptyTypeLiterals !== undefined && nonEmptyTypeLiterals.length > 0
+    nonEmptyTypeLiterals !== undefined && Arr.isNonEmpty(nonEmptyTypeLiterals)
       ? mapNullable(
           typeLiterals,
           (a) => [typeLiteralsWrappedWithReadonly, a.firstPosition] as const,
         )
       : undefined,
-    emptyTypeLiterals !== undefined && emptyTypeLiterals.length > 0
+    emptyTypeLiterals !== undefined && Arr.isNonEmpty(emptyTypeLiterals)
       ? mapNullable(
           typeLiterals,
           (a) =>
@@ -1187,7 +1192,7 @@ const transformUnionOrIntersectionTypeNodeImpl = (
               // Use a position after non-empty type literals if they exist
               a.firstPosition +
                 (nonEmptyTypeLiterals !== undefined &&
-                nonEmptyTypeLiterals.length > 0
+                Arr.isNonEmpty(nonEmptyTypeLiterals)
                   ? 0.5
                   : 0),
             ] as const,
@@ -1226,7 +1231,7 @@ const unionToString = ({
   op: '&' | '|';
   wrapWithReadonly: boolean | string;
 }>): string =>
-  types.length === 0
+  Arr.isArrayOfLength(types, 0)
     ? 'never'
     : Arr.isArrayOfLength(types, 1)
       ? wrapWithReadonly === false

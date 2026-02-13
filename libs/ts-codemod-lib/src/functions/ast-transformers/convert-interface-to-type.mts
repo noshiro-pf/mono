@@ -41,19 +41,18 @@ export const convertInterfaceToTypeTransformer = (): TsMorphTransformer =>
         const members = interfaceDecl.getMembers();
 
         // Build type parameters string
-        const typeParamsStr =
-          typeParameters.length > 0
-            ? `<${typeParameters.map((tp) => tp.getText()).join(', ')}>`
-            : '';
+        const typeParamsStr = Arr.isNonEmpty(typeParameters)
+          ? `<${typeParameters.map((tp) => tp.getText()).join(', ')}>`
+          : '';
 
         // Build type literal from members
         const mut_typeBody: string = (() => {
-          if (extendsExpressions.length === 0) {
+          if (Arr.isArrayOfLength(extendsExpressions, 0)) {
             // No extends: simple type literal
             return buildTypeLiteral(members);
           }
 
-          if (members.length === 0) {
+          if (Arr.isArrayOfLength(members, 0)) {
             // Only extends, no own members: union of extended types
             const extendedTypes = extendsExpressions.map((ext) =>
               ext.getText(),
@@ -98,7 +97,7 @@ export const convertInterfaceToTypeTransformer = (): TsMorphTransformer =>
       const buildTypeLiteral = (
         members: readonly tsm.TypeElementTypes[],
       ): string => {
-        if (members.length === 0) {
+        if (Arr.isArrayOfLength(members, 0)) {
           return 'Record<string, never>';
         }
 

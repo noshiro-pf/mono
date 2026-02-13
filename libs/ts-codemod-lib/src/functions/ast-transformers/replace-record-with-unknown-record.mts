@@ -68,7 +68,10 @@ const processDeclarations = (
     if (hasStringUnknownSignature) {
       const properties = interfaceDecl.getProperties();
 
-      if (properties.length === 0 && indexSignatures.length === 1) {
+      if (
+        Arr.isArrayOfLength(properties, 0) &&
+        Arr.isArrayOfLength(indexSignatures, 1)
+      ) {
         // Replace interface with type alias
         const interfaceName = interfaceDecl.getName();
 
@@ -97,7 +100,7 @@ const visitTypeNode = (node: tsm.TypeNode): void => {
     if (node.getTypeName().getText() === 'Readonly') {
       const typeArgs = node.getTypeArguments();
 
-      if (typeArgs.length === 1) {
+      if (Arr.isArrayOfLength(typeArgs, 1)) {
         const typeArg = typeArgs[0];
 
         if (tsm.Node.isTypeLiteral(typeArg)) {
@@ -109,7 +112,7 @@ const visitTypeNode = (node: tsm.TypeNode): void => {
 
           // Check if it has only one index signature [k: string]: unknown
           if (
-            members.length === 1 &&
+            Arr.isArrayOfLength(members, 1) &&
             Arr.isArrayOfLength(indexSigs, 1) &&
             isStringUnknownIndexSignature(indexSigs[0])
           ) {
@@ -139,7 +142,7 @@ const visitTypeNode = (node: tsm.TypeNode): void => {
 
     // Check if it has only one index signature [k: string]: unknown
     if (
-      members.length === 1 &&
+      Arr.isArrayOfLength(members, 1) &&
       Arr.isArrayOfLength(indexSigs, 1) &&
       isStringUnknownIndexSignature(indexSigs[0])
     ) {
@@ -204,9 +207,9 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): void => {
       const typeArgs = node.getTypeArguments();
 
       if (
-        typeArgs.length === 2 &&
-        typeArgs[0]?.getText() === 'string' &&
-        typeArgs[1]?.getText() === 'unknown'
+        Arr.isArrayOfLength(typeArgs, 2) &&
+        typeArgs[0].getText() === 'string' &&
+        typeArgs[1].getText() === 'unknown'
       ) {
         node.replaceWithText('UnknownRecord');
       }
@@ -217,19 +220,19 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): void => {
       // Check if it's Readonly<Record<string, unknown>>
       const typeArgs = node.getTypeArguments();
 
-      if (typeArgs.length === 1) {
+      if (Arr.isArrayOfLength(typeArgs, 1)) {
         const innerType = typeArgs[0];
 
-        if (innerType !== undefined && tsm.Node.isTypeReference(innerType)) {
+        if (tsm.Node.isTypeReference(innerType)) {
           const innerTypeName = innerType.getTypeName().getText();
 
           if (innerTypeName === 'Record') {
             const innerTypeArgs = innerType.getTypeArguments();
 
             if (
-              innerTypeArgs.length === 2 &&
-              innerTypeArgs[0]?.getText() === 'string' &&
-              innerTypeArgs[1]?.getText() === 'unknown'
+              Arr.isArrayOfLength(innerTypeArgs, 2) &&
+              innerTypeArgs[0].getText() === 'string' &&
+              innerTypeArgs[1].getText() === 'unknown'
             ) {
               node.replaceWithText('UnknownRecord');
             }
