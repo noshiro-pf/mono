@@ -1,3 +1,9 @@
+# [6.5.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.4.0...v6.5.0) (2026-02-13)
+
+### Features
+
+- add fastDeepEqual ([#297](https://github.com/noshiro-pf/ts-data-forge/issues/297)) ([3c1a83a](https://github.com/noshiro-pf/ts-data-forge/commit/3c1a83a139e36c79d048f3ec85f86fe45ff7c8b5))
+
 # [6.4.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.3.1...v6.4.0) (2026-02-05)
 
 ### Features
