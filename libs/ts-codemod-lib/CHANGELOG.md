@@ -1,3 +1,9 @@
+## [2.0.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.4...v2.0.5) (2026-02-16)
+
+### Bug Fixes
+
+- improve parentheses handling of convert-to-readonly ([#45](https://github.com/noshiro-pf/ts-codemod-lib/issues/45)) ([46f078b](https://github.com/noshiro-pf/ts-codemod-lib/commit/46f078b331b534c1c75d5a12ba63efeca3596663))
+
 ## [2.0.4](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.3...v2.0.4) (2026-02-12)
 
 ### Bug Fixes

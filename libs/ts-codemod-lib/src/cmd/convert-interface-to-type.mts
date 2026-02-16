@@ -9,7 +9,7 @@ const transformer = convertInterfaceToTypeTransformer();
 
 const cmdDef = cmd.command({
   name: transformer.name,
-  version: '2.0.4',
+  version: '2.0.5',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,
