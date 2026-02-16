@@ -1,3 +1,9 @@
+## [1.2.10](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.9...v1.2.10) (2026-02-16)
+
+### Bug Fixes
+
+- bump ts-fortress from 6.2.3 to 6.2.5 ([#132](https://github.com/noshiro-pf/octokit-safe-types/issues/132)) ([e8ff959](https://github.com/noshiro-pf/octokit-safe-types/commit/e8ff9598724ab0057a0498724cbcf946bab9264e))
+
 ## [1.2.9](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.8...v1.2.9) (2026-02-16)
 
 ### Bug Fixes
