@@ -4,5 +4,6 @@ export * from './is-atomic-type-node.mjs';
 export * from './is-readonly-node.mjs';
 export * from './is-spread-parameter-node.mjs';
 export * from './remove-parentheses.mjs';
+export * from './should-avoid-parentheses-for-readonly.mjs';
 export * from './unwrap-readonly.mjs';
 export * from './wrap-with-parentheses.mjs';

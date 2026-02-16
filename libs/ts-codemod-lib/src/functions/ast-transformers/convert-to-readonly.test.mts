@@ -3816,6 +3816,85 @@ describe(convertToReadonlyTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('shouldAvoidParenthesesForReadonly', () => {
+    test.each([
+      {
+        name: 'Type predicate with array - avoid parentheses',
+        source: dedent`
+          function isStringArray(x: unknown): x is string[] {
+            return Array.isArray(x);
+          }
+        `,
+        expected: dedent`
+          function isStringArray(x: unknown): x is readonly string[] {
+            return Array.isArray(x);
+          }
+        `,
+      },
+      {
+        name: 'Type predicate with tuple - avoid parentheses',
+        source: dedent`
+          function isTuple(x: unknown): x is [string, number] {
+            return Array.isArray(x) && x.length === 2;
+          }
+        `,
+        expected: dedent`
+          function isTuple(x: unknown): x is readonly [string, number] {
+            return Array.isArray(x) && x.length === 2;
+          }
+        `,
+      },
+      {
+        name: 'Type predicate with Readonly<T[]> - avoid parentheses',
+        source: dedent`
+          function isArray(x: unknown): x is Readonly<string[]> {
+            return Array.isArray(x);
+          }
+        `,
+        expected: dedent`
+          function isArray(x: unknown): x is readonly string[] {
+            return Array.isArray(x);
+          }
+        `,
+      },
+      {
+        name: 'Type predicate with Readonly<[T, U]> - avoid parentheses',
+        source: dedent`
+          function isTuple(x: unknown): x is Readonly<[string, number]> {
+            return Array.isArray(x);
+          }
+        `,
+        expected: dedent`
+          function isTuple(x: unknown): x is readonly [string, number] {
+            return Array.isArray(x);
+          }
+        `,
+      },
+      {
+        name: 'Non-type predicate context - keep parentheses (handled by formatter)',
+        source: dedent`
+          type T = Readonly<string[]>;
+        `,
+        expected: dedent`
+          type T = readonly string[];
+        `,
+      },
+      {
+        name: 'Function return type - keep parentheses (handled by formatter)',
+        source: dedent`
+          function foo(): Readonly<number[]> {
+            return [];
+          }
+        `,
+        expected: dedent`
+          function foo(): readonly number[] {
+            return [];
+          }
+        `,
+      },
+    ])('$name', testFn);
+  });
+
   describe('Error Cases', () => {
     test('Invalid DeepReadonlyTypeName', () => {
       expect(() => {

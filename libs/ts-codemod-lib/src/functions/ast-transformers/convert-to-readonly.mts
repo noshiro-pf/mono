@@ -15,10 +15,11 @@ import {
   isReadonlyTupleOrArrayTypeNode,
   isReadonlyTupleTypeNode,
   isReadonlyTypeReferenceNode,
-  type ReadonlyTypeReferenceNode,
   removeParentheses,
+  shouldAvoidParenthesesForReadonly,
   unwrapReadonlyTypeArgText,
   wrapWithParentheses,
+  type ReadonlyTypeReferenceNode,
 } from '../functions/index.mjs';
 import { replaceNodeWithDebugPrint } from '../utils/index.mjs';
 import {
@@ -552,9 +553,13 @@ const transformTypeReferenceNode = (
       T.isKind(tsm.SyntaxKind.ArrayType) ||
       T.isKind(tsm.SyntaxKind.TupleType)
     ) {
+      const readonlyText = `readonly ${T.getFullText()}`;
+
       options.replaceNode(
         node,
-        wrapWithParentheses(`readonly ${T.getFullText()}`),
+        shouldAvoidParenthesesForReadonly(node)
+          ? readonlyText
+          : wrapWithParentheses(readonlyText),
       );
 
       return;
@@ -626,9 +631,13 @@ const transformTypeReferenceNode = (
       T.isKind(tsm.SyntaxKind.ArrayType) &&
       isAtomicTypeNode(T.getElementTypeNode())
     ) {
+      const readonlyText = `readonly ${T.getFullText()}`;
+
       options.replaceNode(
         node,
-        wrapWithParentheses(`readonly ${T.getFullText()}`),
+        shouldAvoidParenthesesForReadonly(node)
+          ? readonlyText
+          : wrapWithParentheses(readonlyText),
       );
 
       return;
@@ -640,9 +649,13 @@ const transformTypeReferenceNode = (
       T.isKind(tsm.SyntaxKind.TupleType) &&
       T.getElements().every(isAtomicTypeNode)
     ) {
+      const readonlyText = `readonly ${T.getFullText()}`;
+
       options.replaceNode(
         node,
-        wrapWithParentheses(`readonly ${T.getFullText()}`),
+        shouldAvoidParenthesesForReadonly(node)
+          ? readonlyText
+          : wrapWithParentheses(readonlyText),
       );
 
       return;
@@ -692,9 +705,13 @@ const transformArrayTypeNode = (
     case 'Readonly':
     case 'none':
       if (readonlyContext.indexedAccessDepth === 0) {
+        const readonlyText = `readonly ${node.getFullText()}`;
+
         options.replaceNode(
           node,
-          wrapWithParentheses(`readonly ${node.getFullText()}`),
+          shouldAvoidParenthesesForReadonly(node)
+            ? readonlyText
+            : wrapWithParentheses(readonlyText),
         );
       }
   }
@@ -735,9 +752,13 @@ const transformTupleTypeNode = (
     case 'Readonly':
     case 'none':
       if (readonlyContext.indexedAccessDepth === 0) {
+        const readonlyText = `readonly ${node.getFullText()}`;
+
         options.replaceNode(
           node,
-          wrapWithParentheses(`readonly ${node.getFullText()}`),
+          shouldAvoidParenthesesForReadonly(node)
+            ? readonlyText
+            : wrapWithParentheses(readonlyText),
         );
       }
   }
