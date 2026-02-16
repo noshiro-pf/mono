@@ -68,7 +68,7 @@
     "dotenv": "^17.2.3",
     "octokit-safe-types": "^1.2.8",
     "ts-data-forge": "^6.3.0",
-    "ts-fortress": "^6.2.4"
+    "ts-fortress": "^6.2.5"
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
