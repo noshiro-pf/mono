@@ -1,3 +1,9 @@
+## [1.1.5](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.4...v1.1.5) (2026-02-16)
+
+### Bug Fixes
+
+- bump ts-fortress from 6.2.4 to 6.2.5 ([#69](https://github.com/noshiro-pf/github-settings-as-code/issues/69)) ([897274f](https://github.com/noshiro-pf/github-settings-as-code/commit/897274ffd8bad85c60eff8b6c2f5ebfb4a7d944e))
+
 ## [1.1.4](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.3...v1.1.4) (2026-02-10)
 
 ### Bug Fixes
