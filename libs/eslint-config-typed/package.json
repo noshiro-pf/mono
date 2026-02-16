@@ -132,7 +132,7 @@
     "@types/is-glob": "4.0.4",
     "@types/json-schema": "7.0.15",
     "@types/micromatch": "4.0.10",
-    "@types/node": "25.2.0",
+    "@types/node": "25.2.2",
     "@types/react": "19.2.13",
     "@typescript-eslint/rule-tester": "8.54.0",
     "@vitest/coverage-v8": "4.0.18",
