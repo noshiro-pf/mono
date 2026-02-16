@@ -82,7 +82,7 @@
     "@vitest/coverage-v8": "4.0.17",
     "@vitest/ui": "4.0.17",
     "conventional-changelog-conventionalcommits": "9.1.0",
-    "cspell": "9.6.3",
+    "cspell": "9.6.4",
     "eslint": "9.39.2",
     "eslint-config-typed": "4.6.1",
     "jiti": "2.6.1",
