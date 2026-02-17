@@ -1,6 +1,6 @@
 {
   "name": "syncflow-preact-hooks",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Reactive Programming Library for TypeScript/JavaScript",
   "repository": {
     "type": "git",
