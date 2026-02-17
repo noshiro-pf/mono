@@ -57,25 +57,21 @@ jobs:
         run: pnpm exec check-should-run-type-checks
 
       - name: Install Playwright Browsers
-        if: matrix.command == 'ws:test:browser' && steps.check_diff_type.outputs.should_run == 'true'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:browser'
         run: pnpm exec playwright install chromium
 
       - name: Build all packages
         run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"
-        if: steps.check_diff_type.outputs.should_run == 'true'
-        run: pnpm run ${{ matrix.command }}
-
-      - name: Run "${{ matrix.command }}"
-        if: matrix.command != 'ws:test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command != 'ws:test:browser'
         run: pnpm run ${{ matrix.command }}
 
       # Source - https://stackoverflow.com/a/71583518
       # Posted by VonC, modified by community. See post 'Timeline' for change history
       # Retrieved 2026-02-10, License - CC BY-SA 4.0
       - name: Run 'ws:test:browser' with retry
-        if: matrix.command == 'ws:test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:browser'
         uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3.0.2
         with:
           timeout_minutes: 10
