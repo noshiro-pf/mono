@@ -1,5 +1,5 @@
 {
-  "name": "syncflow-monorepo",
+  "name": "synstate-monorepo",
   "version": "0.1.0",
   "private": true,
   "keywords": [
@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noshiro-pf/syncflow.git"
+    "url": "git+https://github.com/noshiro-pf/synstate.git"
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",

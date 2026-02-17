@@ -1,0 +1,71 @@
+{
+  "name": "synstate",
+  "version": "0.1.0",
+  "description": "Reactive Programming Library for TypeScript/JavaScript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/synstate.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx ./scripts/cmd/build.mts",
+    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "codemod": "convert-to-readonly '{src,samples,test}/**/*.{mts,tsx}'",
+    "doc": "tsx ./scripts/cmd/gen-docs.mts",
+    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
+    "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
+    "doc:preview": "vite preview --config ./configs/vite.doc.config.ts",
+    "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
+    "fmt": "pnpm run z:prettier .",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest:node run",
+    "test:all": "run-p test test:stream",
+    "test:browser": "pnpm run z:vitest --project='Browser' run",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "test:cov:ui": "vite preview --outDir ./coverage",
+    "test:stream": "pnpm run z:vitest:stream run",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "tsc --noEmit",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "update-packages": "pnpm update --latest",
+    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'",
+    "z:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
+  },
+  "dependencies": {
+    "ts-data-forge": "^6.5.0"
+  },
+  "devDependencies": {
+    "@types/argparse": "^2.0.17",
+    "@types/react": "^19.2.14",
+    "argparse": "^2.0.1",
+    "react": "^19.2.4"
+  }
+}

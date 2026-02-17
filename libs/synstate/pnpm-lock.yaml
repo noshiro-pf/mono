@@ -117,7 +117,7 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(@types/node@25.2.3)(@vitest/browser-playwright@4.0.18)(@vitest/ui@4.0.18)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  packages/syncflow:
+  packages/synstate:
     dependencies:
       ts-data-forge:
         specifier: ^6.5.0
@@ -136,11 +136,11 @@ importers:
         specifier: ^19.2.4
         version: 19.2.4
 
-  packages/syncflow-preact-hooks:
+  packages/synstate-preact-hooks:
     dependencies:
-      syncflow:
+      synstate:
         specifier: workspace:*
-        version: link:../syncflow
+        version: link:../synstate
       ts-data-forge:
         specifier: ^6.5.0
         version: 6.5.0(typescript@5.9.3)
@@ -155,11 +155,11 @@ importers:
         specifier: ^10.28.3
         version: 10.28.3
 
-  packages/syncflow-react-hooks:
+  packages/synstate-react-hooks:
     dependencies:
-      syncflow:
+      synstate:
         specifier: workspace:*
-        version: link:../syncflow
+        version: link:../synstate
       ts-data-forge:
         specifier: ^6.5.0
         version: 6.5.0(typescript@5.9.3)

@@ -49,8 +49,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build syncflow
-        run: pnpm run --filter syncflow build
+      - name: Build synstate
+        run: pnpm run --filter synstate build
 
       - name: Run "${{ matrix.command }}"
         run: pnpm run ${{ matrix.command }}

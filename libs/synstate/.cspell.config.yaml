@@ -7,7 +7,7 @@ words:
   - nums
   - nargs
   - noshiro
-  - syncflow
+  - synstate
   - testw
   - tscw
 ignorePaths:
