@@ -1,7 +1,7 @@
 const config = {
   globs: [
     '**/*.md',
-    '!node_modules',
+    '!**/node_modules',
     '!**/dist/**/*',
     '!**/docs/**/*',
     '!agents/**/*',

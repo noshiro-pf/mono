@@ -31,6 +31,7 @@
 
     // Language and Environment
     "target": "ESNext",
+    "jsx": "react-jsx",
 
     // JavaScript Support
     "allowJs": true,

@@ -1,6 +1,7 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
+  eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -12,6 +13,9 @@ export default [
     tsconfigFileName: 'tsconfig.json',
     packageDirs: [projectRootPath],
   }),
+
+  eslintConfigForTsDataForge(),
+
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
     files: ['scripts/**', 'configs/**'],

@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "syncflow": ["./src/entry-point.mts"]
+    }
+  },
+  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
+}

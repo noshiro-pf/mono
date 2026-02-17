@@ -1,0 +1,66 @@
+import { combine, map, of, withCurrentValueFrom } from '../src/index.mjs';
+
+describe('graph-structure', () => {
+  test('case 1', () => {
+    /*
+     *  [ counter ]
+     *      |
+     *      |
+     *  [ double ]
+     *     |  \
+     *     | [quad]
+     *     |    |
+     *     |    |
+     *  [ combined ]
+     */
+    const source$ = of(0);
+
+    const double$ = source$.pipe(map((x) => x * 2));
+
+    const quad$ = source$.pipe(map((x) => x * 2)).pipe(map((x) => x * 2));
+
+    const combined$ = combine([source$, double$, quad$]);
+
+    expect(source$.depth).toBe(0);
+
+    expect(double$.depth).toBe(1);
+
+    expect(quad$.depth).toBe(2);
+
+    expect(combined$.depth).toBe(3);
+  });
+
+  test('case 2', () => {
+    const source$ = of(0);
+
+    const double$ = source$.pipe(map((x) => x * 2));
+
+    const combined$ = double$.pipe(withCurrentValueFrom(source$));
+
+    expect(source$.depth).toBe(0);
+
+    expect(double$.depth).toBe(1);
+
+    expect(combined$.depth).toBe(2);
+  });
+
+  test('case 3', () => {
+    const source$ = of(0);
+
+    const double$ = source$.pipe(map((x) => x * 2));
+
+    const quad$ = source$.pipe(map((x) => x * 2)).pipe(map((x) => x * 2));
+
+    const combined$ = double$
+      .pipe(withCurrentValueFrom(source$))
+      .pipe(withCurrentValueFrom(quad$));
+
+    expect(source$.depth).toBe(0);
+
+    expect(double$.depth).toBe(1);
+
+    expect(quad$.depth).toBe(2);
+
+    expect(combined$.depth).toBe(3);
+  });
+});
