@@ -51,8 +51,8 @@ importers:
         specifier: 4.6.2
         version: 4.6.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18)
       github-settings-as-code:
-        specifier: 1.1.4
-        version: 1.1.4(typescript@5.9.3)
+        specifier: 1.1.6
+        version: 1.1.6(typescript@5.9.3)
       jiti:
         specifier: 2.6.1
         version: 2.6.1
@@ -2250,8 +2250,8 @@ packages:
   git-hooks-list@4.2.1:
     resolution: {integrity: sha512-WNvqJjOxxs/8ZP9+DWdwWJ7cDsd60NHf39XnD82pDVrKO5q7xfPqpkK6hwEAmBa/ZSEE4IOoR75EzbbIuwGlMw==}
 
-  github-settings-as-code@1.1.4:
-    resolution: {integrity: sha512-I4t/GXHwOuKzV8IzAJKd/47HzIY8s7kru1I85xF7daldunG9KXfzDwEqVIYnW53n09/2X2Ifjbsd4ulhoWW72A==}
+  github-settings-as-code@1.1.6:
+    resolution: {integrity: sha512-TX5EnNPVMZKn26oUmgndl0SQ7LYrduFB383XSnuY3fvdAuw2oa7TrFc5C+R6eIBni3UC6gdCdPSGGzb3gj6DdQ==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
 
@@ -2850,8 +2850,8 @@ packages:
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
-  octokit-safe-types@1.2.8:
-    resolution: {integrity: sha512-8F2Dv6ugl8CWyzZRSbcl71EZv+jVgnfbbc7ItAA4JwotPK78yUOwKI5c89dcgd/HzS1WR+Q9ifrtdUd6U+GWqw==}
+  octokit-safe-types@1.2.10:
+    resolution: {integrity: sha512-2EcPUjkrjabIOe5IWzAq+COY19uBhk42AfGlT/vJrUeLZnVH174f94d4i7SyBe+QKcmi/VrOjB8q8BJTAOXa4w==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   optionator@0.9.4:
@@ -5970,11 +5970,11 @@ snapshots:
 
   git-hooks-list@4.2.1: {}
 
-  github-settings-as-code@1.1.4(typescript@5.9.3):
+  github-settings-as-code@1.1.6(typescript@5.9.3):
     dependencies:
       '@octokit/core': 7.0.6
       dotenv: 17.2.4
-      octokit-safe-types: 1.2.8(typescript@5.9.3)
+      octokit-safe-types: 1.2.10(typescript@5.9.3)
       ts-data-forge: 6.5.0(typescript@5.9.3)
       ts-fortress: 6.4.0(typescript@5.9.3)
     transitivePeerDependencies:
@@ -6667,7 +6667,7 @@ snapshots:
 
   obug@2.1.1: {}
 
-  octokit-safe-types@1.2.8(typescript@5.9.3):
+  octokit-safe-types@1.2.10(typescript@5.9.3):
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
