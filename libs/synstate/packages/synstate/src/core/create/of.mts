@@ -12,11 +12,30 @@ import { type OfObservable } from '../types/index.mjs';
  *
  * @example
  * ```ts
+ * //  Timeline:
+ * //
+ * //  num$    42  | (completes immediately)
+ * //
+ * //  Explanation:
+ * //  - of creates an observable that emits a single value, then completes
+ * //  - Useful for converting a static value into an observable
+ *
  * const num$ = of(42);
  *
- * num$.subscribe((x) => {
- *   console.log(x);
- * }); // logs: 42
+ * const mut_history: number[] = [];
+ *
+ * await new Promise<void>((resolve) => {
+ *   num$.subscribe(
+ *     (x) => {
+ *       mut_history.push(x);
+ *     },
+ *     () => {
+ *       resolve();
+ *     },
+ *   );
+ * });
+ *
+ * assert.deepStrictEqual(mut_history, [42]);
  * ```
  */
 export const of = <A,>(

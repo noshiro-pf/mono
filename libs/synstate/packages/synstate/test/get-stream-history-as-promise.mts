@@ -1,20 +1,20 @@
 import { type Observable } from '../src/index.mjs';
 
-export const getStreamOutputAsPromise = <T,>(
+export const getStreamHistoryAsPromise = <T,>(
   observable$: Observable<T>,
   startSource: () => void,
 ): Promise<readonly T[]> => {
   const ret = new Promise<readonly T[]>((resolve) => {
-    const mut_output: T[] = [];
+    const mut_history: T[] = [];
 
     const subscription = observable$.subscribe(
       (a) => {
-        mut_output.push(a);
+        mut_history.push(a);
       },
       () => {
         subscription.unsubscribe();
 
-        resolve(mut_output);
+        resolve(mut_history);
       },
     );
 

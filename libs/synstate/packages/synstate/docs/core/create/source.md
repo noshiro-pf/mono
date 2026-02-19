@@ -12,7 +12,7 @@
 
 > `const` **subject**: \{\<`A`\>(`initialValue`): [`InitializedSourceObservable`](../types/observable-family.md#initializedsourceobservable)\<`A`\>; \<`A`\>(): [`SourceObservable`](../types/observable-family.md#sourceobservable)\<`A`\>; \} = `source`
 
-Defined in: [core/create/source.mts:40](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/source.mts#L40)
+Defined in: [core/create/source.mts:59](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/source.mts#L59)
 
 Alias for `source()`. Creates a new Observable source.
 
@@ -46,15 +46,34 @@ A SourceObservable that can emit values via `.next()` method
 ##### Example
 
 ```ts
+//  Timeline:
+//
+//  count$    1     2     3     ...
+//
+//  Explanation:
+//  - source creates a new observable that you can manually emit values to
+//  - Use .next() to emit values
+//  - Foundation for building custom observables
+
 const count$ = source<number>();
 
+const mut_history: number[] = [];
+
 count$.subscribe((value) => {
-  console.log(value);
+  mut_history.push(value);
 });
 
 count$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [1]);
+
 count$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+count$.next(3); // logs: 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```
 
 #### Call Signature
@@ -81,15 +100,34 @@ A SourceObservable that can emit values via `.next()` method
 ##### Example
 
 ```ts
+//  Timeline:
+//
+//  count$    1     2     3     ...
+//
+//  Explanation:
+//  - source creates a new observable that you can manually emit values to
+//  - Use .next() to emit values
+//  - Foundation for building custom observables
+
 const count$ = source<number>();
 
+const mut_history: number[] = [];
+
 count$.subscribe((value) => {
-  console.log(value);
+  mut_history.push(value);
 });
 
 count$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [1]);
+
 count$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+count$.next(3); // logs: 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```
 
 #### See
@@ -104,7 +142,7 @@ source
 
 > **source**\<`A`\>(`initialValue`): [`InitializedSourceObservable`](../types/observable-family.md#initializedsourceobservable)\<`A`\>
 
-Defined in: [core/create/source.mts:28](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/source.mts#L28)
+Defined in: [core/create/source.mts:47](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/source.mts#L47)
 
 Creates a new Observable source that can manually emit values.
 This is the primary way to create root observables that start reactive chains.
@@ -132,22 +170,41 @@ A SourceObservable that can emit values via `.next()` method
 ##### Example
 
 ```ts
+//  Timeline:
+//
+//  count$    1     2     3     ...
+//
+//  Explanation:
+//  - source creates a new observable that you can manually emit values to
+//  - Use .next() to emit values
+//  - Foundation for building custom observables
+
 const count$ = source<number>();
 
+const mut_history: number[] = [];
+
 count$.subscribe((value) => {
-  console.log(value);
+  mut_history.push(value);
 });
 
 count$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [1]);
+
 count$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+count$.next(3); // logs: 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```
 
 #### Call Signature
 
 > **source**\<`A`\>(): [`SourceObservable`](../types/observable-family.md#sourceobservable)\<`A`\>
 
-Defined in: [core/create/source.mts:30](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/source.mts#L30)
+Defined in: [core/create/source.mts:49](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/source.mts#L49)
 
 Creates a new Observable source that can manually emit values.
 This is the primary way to create root observables that start reactive chains.
@@ -169,13 +226,32 @@ A SourceObservable that can emit values via `.next()` method
 ##### Example
 
 ```ts
+//  Timeline:
+//
+//  count$    1     2     3     ...
+//
+//  Explanation:
+//  - source creates a new observable that you can manually emit values to
+//  - Use .next() to emit values
+//  - Foundation for building custom observables
+
 const count$ = source<number>();
 
+const mut_history: number[] = [];
+
 count$.subscribe((value) => {
-  console.log(value);
+  mut_history.push(value);
 });
 
 count$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [1]);
+
 count$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+count$.next(3); // logs: 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```

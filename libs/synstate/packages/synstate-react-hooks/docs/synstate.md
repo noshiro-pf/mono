@@ -2212,7 +2212,7 @@ Defined in: synstate/dist/core/class/observable-base-class.d.mts:21
 
 > `const` **attachIndex**: \<`A`\>() => `KeepInitialValueOperator`\<`A`, readonly \[`SafeUint` \| `-1`, `A`\]\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:31
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:46
 
 #### Type Parameters
 
@@ -2230,7 +2230,10 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:31
 
 > `const` **auditTime**: \<`A`\>(`milliSeconds`) => `KeepInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/audit-time.d.mts:2
+Defined in: synstate/dist/core/operators/audit-time.d.mts:61
+
+Emits the last value from the source observable after a specified time window has passed.
+Unlike throttleTime which emits the first value, auditTime emits the last value.
 
 #### Type Parameters
 
@@ -2238,15 +2241,73 @@ Defined in: synstate/dist/core/operators/audit-time.d.mts:2
 
 `A`
 
+The type of values from the source
+
 #### Parameters
 
 ##### milliSeconds
 
 `number`
 
+The audit time window in milliseconds
+
 #### Returns
 
 `KeepInitialValueOperator`\<`A`, `A`\>
+
+An operator that audits emissions from the observable
+
+#### Example
+
+```ts
+//  Timeline (1000ms audit):
+//
+//  Time(ms)  0    100   200   300   400   ...   1000  1100
+//  input$    e1   e2    e3    e4    e5
+//  audited$                                      e5 (emitted at end of window)
+//            |-------1000ms window------>        ^
+//
+//  Explanation:
+//  - auditTime emits the LAST value received during each time window
+//  - Unlike throttleTime (which emits the FIRST value), audit emits the LAST
+//  - At 0-1000ms: e1-e5 are received
+//  - At 1000ms: e5 (the last value in the window) is emitted
+//  - Useful when you want the most recent value after a burst of events
+
+const input$ = source<number>();
+
+const audited$ = input$.pipe(auditTime(200));
+
+const mut_history: number[] = [];
+
+audited$.subscribe((value) => {
+  mut_history.push(value);
+});
+
+input$.next(1);
+
+input$.next(2);
+
+input$.next(3);
+
+assert.deepStrictEqual(mut_history, []);
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 250);
+});
+
+assert.deepStrictEqual(mut_history, [3]);
+
+input$.next(4);
+
+input$.next(5);
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 250);
+});
+
+assert.deepStrictEqual(mut_history, [3, 5]);
+```
 
 ***
 
@@ -2284,7 +2345,7 @@ readonly `N`[]
 
 > `const` **combine**: \<`OS`\>(`parents`) => `CombineObservableRefined`\<`OS`\>
 
-Defined in: synstate/dist/core/combine/combine.d.mts:29
+Defined in: synstate/dist/core/combine/combine.d.mts:59
 
 Combines multiple observables into a single observable that emits an array of their latest values.
 Emits whenever any of the source observables emit, but only after all sources have emitted at least once.
@@ -2314,21 +2375,51 @@ A combined observable emitting tuples of values
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  name$     "Alice"                 "Bob"
+//  age$                25                        30
+//  user$               ["Alice",25]  ["Bob",25]  ["Bob",30]
+//
+//  Explanation:
+//  - combine waits for all sources to emit at least once
+//  - Then emits the latest value from all sources whenever any source emits
+//  - Always emits an array with the latest values from each source
+
 const name$ = source<string>();
 
 const age$ = source<number>();
 
 const user$ = combine([name$, age$]);
 
+const mut_history: (readonly [string, number])[] = [];
+
 user$.subscribe(([name_, age]) => {
-  console.log({ name: name_, age });
+  mut_history.push([name_, age]);
 });
 
-name$.next('Alice');
+name$.next('Alice'); // nothing logged (age$ hasn't emitted yet)
+
+assert.deepStrictEqual(mut_history, []);
 
 age$.next(25); // logs: { name: 'Alice', age: 25 }
 
+assert.deepStrictEqual(mut_history, [['Alice', 25]]);
+
 name$.next('Bob'); // logs: { name: 'Bob', age: 25 }
+
+assert.deepStrictEqual(mut_history, [
+  ['Alice', 25],
+  ['Bob', 25],
+]);
+
+age$.next(30); // logs: { name: 'Bob', age: 30 }
+
+assert.deepStrictEqual(mut_history, [
+  ['Alice', 25],
+  ['Bob', 25],
+  ['Bob', 30],
+]);
 ```
 
 ***
@@ -2337,7 +2428,7 @@ name$.next('Bob'); // logs: { name: 'Bob', age: 25 }
 
 > `const` **combineLatest**: \<`OS`\>(`parents`) => `CombineObservableRefined`\<`OS`\>
 
-Defined in: synstate/dist/core/combine/combine.d.mts:34
+Defined in: synstate/dist/core/combine/combine.d.mts:64
 
 Alias for `combine()`.
 
@@ -2367,7 +2458,7 @@ combine
 
 > `const` **createEventEmitter**: () => readonly \[`Observable`\<`void`\>, () => `void`\]
 
-Defined in: synstate/dist/utils/create-event-emitter.d.mts:19
+Defined in: synstate/dist/utils/create-event-emitter.d.mts:29
 
 Creates an event emitter for void events (events without payload).
 Returns a tuple of [observable, emitter function].
@@ -2383,11 +2474,21 @@ A tuple containing the observable and the emitter function
 ```ts
 const [click$, emitClick] = createEventEmitter();
 
+const mut_clickCount = { value: 0 };
+
 click$.subscribe(() => {
-  console.log('Clicked!');
+  mut_clickCount.value += 1;
 });
 
 emitClick(); // logs: Clicked!
+
+assert.deepStrictEqual(mut_clickCount.value, 1);
+
+emitClick();
+
+emitClick();
+
+assert.deepStrictEqual(mut_clickCount.value, 3);
 ```
 
 ***
@@ -2396,7 +2497,7 @@ emitClick(); // logs: Clicked!
 
 > `const` **createValueEmitter**: \<`A`\>() => readonly \[`Observable`\<`A`\>, (`value`) => `void`\]
 
-Defined in: synstate/dist/utils/create-event-emitter.d.mts:38
+Defined in: synstate/dist/utils/create-event-emitter.d.mts:56
 
 Creates an event emitter with typed payload.
 Returns a tuple of [observable, emitter function].
@@ -2420,11 +2521,19 @@ A tuple containing the observable and the emitter function
 ```ts
 const [message$, emitMessage] = createValueEmitter<string>();
 
+const mut_history: string[] = [];
+
 message$.subscribe((msg) => {
-  console.log(msg);
+  mut_history.push(msg);
 });
 
 emitMessage('Hello'); // logs: Hello
+
+assert.deepStrictEqual(mut_history, ['Hello']);
+
+emitMessage('World');
+
+assert.deepStrictEqual(mut_history, ['Hello', 'World']);
 ```
 
 ***
@@ -2433,7 +2542,7 @@ emitMessage('Hello'); // logs: Hello
 
 > `const` **debounceTime**: \<`A`\>(`milliSeconds`) => `KeepInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/debounce-time.d.mts:30
+Defined in: synstate/dist/core/operators/debounce-time.d.mts:50
 
 Delays emissions from the source observable until a specified time has passed without another emission.
 Useful for handling user input events like typing or scrolling.
@@ -2463,12 +2572,27 @@ An operator that debounces the observable
 #### Example
 
 ```ts
+//  Timeline (300ms debounce):
+//
+//  Time(ms)  0     100    200    300    400    500    600   ...   900   1000
+//  input$    'h'   'he'   'hel'  'hello'
+//  debounced$                                         'hello' (emitted after 300ms silence)
+//
+//  Explanation:
+//  - At 0ms: 'h' is emitted, timer starts
+//  - At 100ms: 'he' is emitted, timer resets
+//  - At 200ms: 'hel' is emitted, timer resets
+//  - At 300ms: 'hello' is emitted, timer resets
+//  - At 600ms: No new emission for 300ms, 'hello' is finally emitted
+
 const input$ = source<string>();
 
 const debounced$ = input$.pipe(debounceTime(300));
 
+const mut_history: string[] = [];
+
 debounced$.subscribe((value) => {
-  console.log(value);
+  mut_history.push(value);
 });
 
 input$.next('h');
@@ -2478,7 +2602,12 @@ input$.next('he');
 input$.next('hel');
 
 input$.next('hello');
-// After 300ms of silence, logs: hello
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 400);
+});
+
+assert.deepStrictEqual(mut_history, ['hello']);
 ```
 
 ***
@@ -2487,7 +2616,7 @@ input$.next('hello');
 
 > `const` **distinctUntilChanged**: \<`A`\>(`eq?`) => `KeepInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/skip-if-no-change.d.mts:32
+Defined in: synstate/dist/core/operators/skip-if-no-change.d.mts:56
 
 Alias for `skipIfNoChange()`.
 
@@ -2517,7 +2646,7 @@ skipIfNoChange
 
 > `const` **flatMap**: \<`A`, `B`\>(`mapToObservable`) => `DropInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/merge-map.d.mts:33
+Defined in: synstate/dist/core/operators/merge-map.d.mts:75
 
 Alias for `mergeMap()`.
 
@@ -2551,7 +2680,7 @@ mergeMap
 
 > `const` **fromArray**: \<`A`\>(`values`, `startManually?`) => `FromArrayObservable`\<`A`\>
 
-Defined in: synstate/dist/core/create/from-array.d.mts:20
+Defined in: synstate/dist/core/create/from-array.d.mts:38
 
 Creates an observable that emits all values from an array sequentially, then completes.
 
@@ -2586,12 +2715,30 @@ An observable that emits array values
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  nums$     1     2     3     | (completes)
+//
+//  Explanation:
+//  - fromArray creates an observable from an array
+//  - Emits all values synchronously, then completes
+
 const nums$ = fromArray([1, 2, 3]);
 
-nums$.subscribe((x) => {
-  console.log(x);
+const mut_history: number[] = [];
+
+await new Promise<void>((resolve) => {
+  nums$.subscribe(
+    (x) => {
+      mut_history.push(x);
+    },
+    () => {
+      resolve();
+    },
+  );
 });
-// logs: 1, 2, 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```
 
 ***
@@ -2600,7 +2747,7 @@ nums$.subscribe((x) => {
 
 > `const` **fromPromise**: \<`A`, `E`\>(`promise`) => `FromPromiseObservable`\<`A`, `E`\>
 
-Defined in: synstate/dist/core/create/from-promise.d.mts:24
+Defined in: synstate/dist/core/create/from-promise.d.mts:46
 
 Creates an observable from a Promise.
 Emits Result.ok when the promise resolves, or Result.err when it rejects.
@@ -2636,15 +2783,37 @@ An observable that emits the promise result
 #### Example
 
 ```ts
-const data$ = fromPromise(fetch('/api/data').then((r) => r.json()));
+//  Timeline:
+//
+//  promise     [pending...]  -> resolved/rejected
+//  data$                     Ok(value) or Err(error)
+//
+//  Explanation:
+//  - fromPromise converts a Promise into an observable
+//  - Emits a Result type: Ok(value) on success, Err(error) on failure
+//  - Completes after emitting the result
+//  - Useful for integrating async operations into reactive flows
 
-data$.subscribe((result) => {
-  if (Result.isOk(result)) {
-    console.log('Data:', result.value);
-  } else {
-    console.error('Error:', result.value);
-  }
+const fetchData = async (): Promise<{ value: number }> => ({ value: 42 });
+
+const data$ = fromPromise(fetchData());
+
+const mut_history: { value: number }[] = [];
+
+await new Promise<void>((resolve) => {
+  data$.subscribe(
+    (result) => {
+      if (Result.isOk(result)) {
+        mut_history.push(result.value);
+      }
+    },
+    () => {
+      resolve();
+    },
+  );
 });
+
+assert.deepStrictEqual(mut_history, [{ value: 42 }]);
 ```
 
 ***
@@ -2653,7 +2822,10 @@ data$.subscribe((result) => {
 
 > `const` **fromSubscribable**: \<`A`, `E`\>(`subscribable`) => `FromSubscribableObservable`\<`A`, `E`\>
 
-Defined in: synstate/dist/core/create/from-subscribable.d.mts:2
+Defined in: synstate/dist/core/create/from-subscribable.d.mts:60
+
+Converts any subscribable object into a SynState Observable.
+Works with objects that have a subscribe(onNext, onError, onComplete) method.
 
 #### Type Parameters
 
@@ -2661,9 +2833,13 @@ Defined in: synstate/dist/core/create/from-subscribable.d.mts:2
 
 `A`
 
+The type of values from the subscribable
+
 ##### E
 
 `E` = `unknown`
+
+The type of errors from the subscribable
 
 #### Parameters
 
@@ -2671,9 +2847,63 @@ Defined in: synstate/dist/core/create/from-subscribable.d.mts:2
 
 `Subscribable`\<`A`\>
 
+An object with a subscribe method
+
 #### Returns
 
 `FromSubscribableObservable`\<`A`, `E`\>
+
+An observable that wraps values in Result type
+
+#### Example
+
+```ts
+//  Explanation:
+//  - fromSubscribable converts any subscribable object into a SynState Observable
+//  - Works with objects that have a subscribe(onNext, onError, onComplete) method
+//  - Wraps values in Result type for error handling
+//  - Useful for integrating with other reactive libraries or custom subscribables
+
+// Example: Converting a custom subscribable
+const customSubscribable = {
+  subscribe: (
+    onNext: (value: number) => void,
+    _onError?: (error: unknown) => void,
+    onComplete?: () => void,
+  ) => {
+    setTimeout(() => {
+      onNext(1);
+
+      onNext(2);
+
+      onNext(3);
+
+      onComplete?.();
+    }, 0);
+
+    return { unsubscribe: () => {} };
+  },
+};
+
+const observable$ = fromSubscribable<number>(customSubscribable);
+
+const mut_history: number[] = [];
+
+await new Promise<void>((resolve) => {
+  observable$.subscribe(
+    (result) => {
+      if (Result.isOk(result)) {
+        mut_history.push(result.value);
+      }
+    },
+    () => {
+      resolve();
+    },
+  );
+});
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
+```
 
 ***
 
@@ -2681,7 +2911,7 @@ Defined in: synstate/dist/core/create/from-subscribable.d.mts:2
 
 > `const` **getKey**: \<`A`, `K`\>(`key`) => `KeepInitialValueOperator`\<`A`, `A`\[`K`\]\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:30
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:45
 
 #### Type Parameters
 
@@ -2727,7 +2957,7 @@ Defined in: synstate/dist/core/utils/utils.d.mts:1
 
 > `const` **interval**: (`milliSeconds`, `startManually?`) => `IntervalObservable`
 
-Defined in: synstate/dist/core/create/interval.d.mts:20
+Defined in: synstate/dist/core/create/interval.d.mts:45
 
 Creates an observable that emits incremental numbers at a specified interval.
 Starts with 0 immediately after subscription, then emits 1, 2, 3, ... every interval.
@@ -2755,12 +2985,37 @@ An observable that emits sequential numbers
 #### Example
 
 ```ts
-const tick$ = interval(1000);
+//  Timeline:
+//
+//  Time(s)   0     1     2     3     4     5
+//  tick$     0     1     2     3     4     5     ...
+//
+//  Explanation:
+//  - interval emits incrementing numbers at specified intervals
+//  - Starts at 0 and continues indefinitely
+//  - Useful for periodic tasks or animations
 
-tick$.subscribe((count) => {
-  console.log(count);
+const tick$ = interval(100);
+
+const mut_history: number[] = [];
+
+const subscription = tick$.subscribe((count) => {
+  mut_history.push(count);
 });
-// logs: 0, 1, 2, 3, ... every second
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 350);
+});
+
+subscription.unsubscribe();
+
+assert.isTrue(Arr.isArrayAtLeastLength(mut_history, 3));
+
+assert.deepStrictEqual(mut_history[0], 0);
+
+assert.deepStrictEqual(mut_history[1], 1);
+
+assert.deepStrictEqual(mut_history[2], 2);
 ```
 
 ***
@@ -2877,7 +3132,7 @@ Defined in: synstate/dist/core/utils/id-maker.d.mts:4
 
 > `const` **map**: \<`A`, `B`\>(`mapFn`) => `KeepInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:27
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:42
 
 #### Type Parameters
 
@@ -2905,7 +3160,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:27
 
 > `const` **mapOptional**: \<`O`, `B`\>(`mapFn`) => `KeepInitialValueOperator`\<`O`, `Optional`\<`B`\>\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:36
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:51
 
 #### Type Parameters
 
@@ -2933,7 +3188,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:36
 
 > `const` **mapResultErr**: \<`R`, `E2`\>(`mapFn`) => `KeepInitialValueOperator`\<`R`, `Result`\<`Result.UnwrapOk`\<`R`\>, `E2`\>\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:38
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:53
 
 #### Type Parameters
 
@@ -2961,7 +3216,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:38
 
 > `const` **mapResultOk**: \<`R`, `S2`\>(`mapFn`) => `KeepInitialValueOperator`\<`R`, `Result`\<`S2`, `Result.UnwrapErr`\<`R`\>\>\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:37
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:52
 
 #### Type Parameters
 
@@ -2989,7 +3244,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:37
 
 > `const` **mapTo**: \<`A`, `B`\>(`value`) => `KeepInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:28
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:43
 
 #### Type Parameters
 
@@ -3017,7 +3272,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:28
 
 > `const` **mapWithIndex**: \<`A`, `B`\>(`mapFn`) => `KeepInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:26
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:41
 
 Transforms each value emitted by the source using a mapping function that also receives the emission index.
 
@@ -3052,17 +3307,32 @@ An operator that maps values with index
 #### Example
 
 ```ts
-const num$ = source<number>();
+//  Timeline:
+//
+//  num$      "a"      "b"      "c"
+//  indexed$  "0: a"   "1: b"   "2: c"
+//
+//  Explanation:
+//  - mapWithIndex transforms each value along with its index
+//  - Index starts at 0 and increments with each emission
+
+const num$ = source<string>();
 
 const indexed$ = num$.pipe(mapWithIndex((x, i) => `${i}: ${x}`));
 
+const mut_history: string[] = [];
+
 indexed$.subscribe((s) => {
-  console.log(s);
+  mut_history.push(s);
 });
 
-num$.next(10); // logs: 0: 10
+num$.next('a'); // 0: a
 
-num$.next(20); // logs: 1: 20
+num$.next('b'); // 1: b
+
+num$.next('c'); // 2: c
+
+assert.deepStrictEqual(mut_history, ['0: a', '1: b', '2: c']);
 ```
 
 ***
@@ -3089,7 +3359,7 @@ readonly `Observable`\<`unknown`\>[]
 
 > `const` **merge**: \<`OS`\>(`parents`) => `MergeObservableRefined`\<`OS`\>
 
-Defined in: synstate/dist/core/combine/merge.d.mts:27
+Defined in: synstate/dist/core/combine/merge.d.mts:53
 
 Merges multiple observables into a single observable that emits all values from all sources.
 Emits whenever any source observable emits a value.
@@ -3119,16 +3389,42 @@ A merged observable emitting values from any source
 #### Example
 
 ```ts
-const clicks$ = source<MouseEvent>();
+//  Timeline:
+//
+//  clicks$   c1          c2                    c3
+//  keys$               k1          k2                    k3
+//  events$   c1        k1    c2    k2          c3        k3
+//
+//  Explanation:
+//  - merge combines multiple observables into one
+//  - Emits values from any source as they arrive
+//  - Order is preserved based on emission time
 
-const keys$ = source<KeyboardEvent>();
+const clicks$ = source<string>();
+
+const keys$ = source<string>();
 
 const events$ = merge([clicks$, keys$]);
 
+const mut_history: string[] = [];
+
 events$.subscribe((event_) => {
-  console.log(event_);
+  mut_history.push(event_);
 });
-// Logs any mouse click or keyboard event
+
+clicks$.next('c1');
+
+assert.deepStrictEqual(mut_history, ['c1']);
+
+keys$.next('k1');
+
+assert.deepStrictEqual(mut_history, ['c1', 'k1']);
+
+clicks$.next('c2');
+
+keys$.next('k2');
+
+assert.deepStrictEqual(mut_history, ['c1', 'k1', 'c2', 'k2']);
 ```
 
 #### Note
@@ -3142,7 +3438,7 @@ subscribing to `parents` and calling `setState` within it.
 
 > `const` **mergeMap**: \<`A`, `B`\>(`mapToObservable`) => `DropInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/merge-map.d.mts:28
+Defined in: synstate/dist/core/operators/merge-map.d.mts:70
 
 Projects each source value to an observable and merges all inner observables.
 Unlike `switchMap`, does not cancel previous inner observables.
@@ -3178,16 +3474,58 @@ An operator that merges mapped observables
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  ids$          1               2               3
+//  requests      fetch(1)        fetch(2)        fetch(3)
+//  users$        result1         result2         result3
+//                (parallel)      (parallel)      (parallel)
+//
+//  Explanation:
+//  - mergeMap runs all inner observables in parallel
+//  - Results are emitted as they arrive (may be out of order)
+//  - Does NOT cancel previous requests
+//  - All requests run concurrently and all results are emitted
+
 const ids$ = source<number>();
 
-const users$ = ids$.pipe(mergeMap((id) => fromPromise(fetchUser(id))));
+const users$ = ids$.pipe(
+  mergeMap((id) => {
+    const result$ = source<{ id: number }>();
 
-users$.subscribe((user) => {
-  console.log(user);
+    setTimeout(() => {
+      result$.next({ id });
+
+      result$.complete();
+    }, 10);
+
+    return result$;
+  }),
+);
+
+const mut_history: { id: number }[] = [];
+
+users$.subscribe((value) => {
+  mut_history.push(value);
 });
-// All requests run in parallel, results merged as they arrive
 
-const fetchUser = async (id: number): Promise<unknown> => ({ id });
+ids$.next(1);
+
+ids$.next(2);
+
+ids$.next(3);
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 200);
+});
+
+assert.deepStrictEqual(mut_history.length, 3);
+
+assert.isTrue(mut_history.some((u) => u.id === 1));
+
+assert.isTrue(mut_history.some((u) => u.id === 2));
+
+assert.isTrue(mut_history.some((u) => u.id === 3));
 ```
 
 #### Note
@@ -3201,7 +3539,7 @@ subscribing to `parentObservable` and calling `setState` within it.
 
 > `const` **of**: \<`A`\>(`value`, `startManually?`) => `OfObservable`\<`A`\>
 
-Defined in: synstate/dist/core/create/of.d.mts:19
+Defined in: synstate/dist/core/create/of.d.mts:38
 
 Creates an observable that emits a single value and then completes.
 
@@ -3236,11 +3574,30 @@ An observable that emits the value
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  num$    42  | (completes immediately)
+//
+//  Explanation:
+//  - of creates an observable that emits a single value, then completes
+//  - Useful for converting a static value into an observable
+
 const num$ = of(42);
 
-num$.subscribe((x) => {
-  console.log(x);
-}); // logs: 42
+const mut_history: number[] = [];
+
+await new Promise<void>((resolve) => {
+  num$.subscribe(
+    (x) => {
+      mut_history.push(x);
+    },
+    () => {
+      resolve();
+    },
+  );
+});
+
+assert.deepStrictEqual(mut_history, [42]);
 ```
 
 ***
@@ -3249,7 +3606,7 @@ num$.subscribe((x) => {
 
 > `const` **pairwise**: \<`A`\>() => `DropInitialValueOperator`\<`A`, readonly \[`A`, `A`\]\>
 
-Defined in: synstate/dist/core/operators/pairwise.d.mts:26
+Defined in: synstate/dist/core/operators/pairwise.d.mts:55
 
 Emits the previous and current values as a pair.
 Does not emit until the source has emitted at least twice.
@@ -3271,19 +3628,48 @@ An operator that pairs consecutive values
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  num$      1     2     3     4
+//  pairs$          [1,2] [2,3] [3,4]
+//
+//  Explanation:
+//  - pairwise emits the current and previous values as a tuple
+//  - Nothing is emitted for the first value (no previous value yet)
+//  - Useful for tracking changes between consecutive values
+
 const num$ = source<number>();
 
 const pairs$ = num$.pipe(pairwise());
 
+const mut_history: (readonly [number, number])[] = [];
+
 pairs$.subscribe(([prev, curr]) => {
-  console.log(prev, curr);
+  mut_history.push([prev, curr]);
 });
 
 num$.next(1); // nothing logged
 
+assert.deepStrictEqual(mut_history, []);
+
 num$.next(2); // logs: 1, 2
 
+assert.deepStrictEqual(mut_history, [[1, 2]]);
+
 num$.next(3); // logs: 2, 3
+
+assert.deepStrictEqual(mut_history, [
+  [1, 2],
+  [2, 3],
+]);
+
+num$.next(4); // logs: 3, 4
+
+assert.deepStrictEqual(mut_history, [
+  [1, 2],
+  [2, 3],
+  [3, 4],
+]);
 ```
 
 ***
@@ -3292,7 +3678,7 @@ num$.next(3); // logs: 2, 3
 
 > `const` **pluck**: \<`A`, `K`\>(`key`) => `KeepInitialValueOperator`\<`A`, `A`\[`K`\]\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:29
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:44
 
 #### Type Parameters
 
@@ -3320,7 +3706,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:29
 
 > `const` **scan**: \<`A`, `B`\>(`reducer`, `initialValue`) => `WithInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/scan.d.mts:29
+Defined in: synstate/dist/core/operators/scan.d.mts:51
 
 Applies an accumulator function over the source observable and emits each intermediate result.
 Similar to Array.reduce but emits accumulated value after each source emission.
@@ -3362,19 +3748,41 @@ An operator that accumulates values
 #### Example
 
 ```ts
+//  Timeline (accumulating sum):
+//
+//  num$    1     2     3     4     5
+//  sum$    1     3     6     10    15
+//          |     |     |     |     |
+//          0+1   1+2   3+3   6+4   10+5
+//
+//  Explanation:
+//  - scan accumulates values over time using a reducer function
+//  - Starting with seed value 0, each emission adds to the accumulator
+//  - Similar to Array.reduce, but for streams
+
 const num$ = source<number>();
 
 const sum$ = num$.pipe(scan((acc, curr) => acc + curr, 0));
 
+const mut_history: number[] = [];
+
 sum$.subscribe((x) => {
-  console.log(x);
+  mut_history.push(x);
 });
+
+assert.deepStrictEqual(mut_history, [0]);
 
 num$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [0, 1]);
+
 num$.next(2); // logs: 3
 
+assert.deepStrictEqual(mut_history, [0, 1, 3]);
+
 num$.next(3); // logs: 6
+
+assert.deepStrictEqual(mut_history, [0, 1, 3, 6]);
 ```
 
 ***
@@ -3383,7 +3791,7 @@ num$.next(3); // logs: 6
 
 > `const` **skip**: \<`A`\>(`n`) => `DropInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/skip-while.d.mts:3
+Defined in: synstate/dist/core/operators/skip-while.d.mts:51
 
 #### Type Parameters
 
@@ -3407,7 +3815,7 @@ Defined in: synstate/dist/core/operators/skip-while.d.mts:3
 
 > `const` **skipIfNoChange**: \<`A`\>(`eq?`) => `KeepInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/skip-if-no-change.d.mts:27
+Defined in: synstate/dist/core/operators/skip-if-no-change.d.mts:51
 
 Skips emissions if the value hasn't changed from the previous emission.
 Uses a custom equality function or Object.is by default.
@@ -3437,19 +3845,43 @@ An operator that skips duplicate consecutive values
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  num$      1     1     2     2     2     3
+//  distinct$ 1           2                 3
+//
+//  Explanation:
+//  - skipIfNoChange filters out consecutive duplicate values
+//  - Uses strict equality (===) for comparison
+//  - Only emits when the value actually changes
+
 const num$ = source<number>();
 
 const distinct$ = num$.pipe(skipIfNoChange());
 
+const mut_history: number[] = [];
+
 distinct$.subscribe((x) => {
-  console.log(x);
+  mut_history.push(x);
 });
 
 num$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [1]);
+
 num$.next(1); // nothing logged
 
+assert.deepStrictEqual(mut_history, [1]);
+
 num$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+num$.next(2); // nothing logged
+
+num$.next(3); // logs: 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```
 
 ***
@@ -3458,13 +3890,17 @@ num$.next(2); // logs: 2
 
 > `const` **skipUntil**: \<`A`\>(`notifier`) => `DropInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/skip-until.d.mts:2
+Defined in: synstate/dist/core/operators/skip-until.d.mts:52
+
+Skips all values from the source observable until the notifier observable emits.
 
 #### Type Parameters
 
 ##### A
 
 `A`
+
+The type of values from the source
 
 #### Parameters
 
@@ -3472,9 +3908,57 @@ Defined in: synstate/dist/core/operators/skip-until.d.mts:2
 
 `Observable`\<`unknown`\>
 
+An observable that signals when to start emitting
+
 #### Returns
 
 `DropInitialValueOperator`\<`A`, `A`\>
+
+An operator that skips values until the notifier emits
+
+#### Example
+
+```ts
+//  Timeline:
+//
+//  num$          1     2     3     start   4     5     6
+//  startNotifier                   X
+//  skipped$                                4     5     6
+//                |------ skipped -------|
+//
+//  Explanation:
+//  - skipUntil ignores all values until the notifier emits
+//  - After the notifier emits, all subsequent values are passed through
+//  - Opposite of takeUntil (which completes when notifier emits)
+
+const num$ = source<number>();
+
+const [startNotifier, start_] = createEventEmitter();
+
+const skipped$ = num$.pipe(skipUntil(startNotifier));
+
+const mut_history: number[] = [];
+
+skipped$.subscribe((x) => {
+  mut_history.push(x);
+});
+
+num$.next(1); // nothing logged
+
+num$.next(2); // nothing logged
+
+assert.deepStrictEqual(mut_history, []);
+
+start_();
+
+num$.next(4); // logs: 4
+
+assert.deepStrictEqual(mut_history, [4]);
+
+num$.next(5); // logs: 5
+
+assert.deepStrictEqual(mut_history, [4, 5]);
+```
 
 ***
 
@@ -3482,7 +3966,10 @@ Defined in: synstate/dist/core/operators/skip-until.d.mts:2
 
 > `const` **skipWhile**: \<`A`\>(`predicate`) => `DropInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/skip-while.d.mts:2
+Defined in: synstate/dist/core/operators/skip-while.d.mts:50
+
+Skips values from the source observable while the predicate returns true.
+Once the predicate returns false, all subsequent values pass through.
 
 #### Type Parameters
 
@@ -3490,15 +3977,62 @@ Defined in: synstate/dist/core/operators/skip-while.d.mts:2
 
 `A`
 
+The type of values from the source
+
 #### Parameters
 
 ##### predicate
 
 (`value`, `index`) => `boolean`
 
+Function to test each value
+
 #### Returns
 
 `DropInitialValueOperator`\<`A`, `A`\>
+
+An operator that skips values while the predicate is true
+
+#### Example
+
+```ts
+//  Timeline:
+//
+//  num$        1     2     3     4     5     6     7
+//  skipped$                      5     6     7
+//              |---- skip -----|
+//
+//  Explanation:
+//  - skipWhile skips values while the predicate returns true
+//  - Once the predicate returns false, all subsequent values pass through
+//  - Unlike filter, the predicate is never checked again after the first false
+
+const num$ = source<number>();
+
+const skipped$ = num$.pipe(skipWhile((x) => x < 5));
+
+const mut_history: number[] = [];
+
+skipped$.subscribe((x) => {
+  mut_history.push(x);
+});
+
+num$.next(1); // nothing logged
+
+num$.next(2); // nothing logged
+
+num$.next(5); // logs: 5
+
+assert.deepStrictEqual(mut_history, [5]);
+
+num$.next(6); // logs: 6
+
+assert.deepStrictEqual(mut_history, [5, 6]);
+
+num$.next(7); // logs: 7
+
+assert.deepStrictEqual(mut_history, [5, 6, 7]);
+```
 
 ***
 
@@ -3506,7 +4040,7 @@ Defined in: synstate/dist/core/operators/skip-while.d.mts:2
 
 > `const` **subject**: *typeof* [`source`](#source)
 
-Defined in: synstate/dist/core/create/source.d.mts:28
+Defined in: synstate/dist/core/create/source.d.mts:47
 
 Alias for `source()`. Creates a new Observable source.
 
@@ -3520,7 +4054,7 @@ source
 
 > `const` **switchMap**: \<`A`, `B`\>(`mapToObservable`) => `DropInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/switch-map.d.mts:30
+Defined in: synstate/dist/core/operators/switch-map.d.mts:64
 
 Projects each source value to an observable, subscribes to it, and emits its values.
 When a new value arrives from the source, the previous inner observable is unsubscribed.
@@ -3556,18 +4090,52 @@ An operator that switches to new observables
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  searchQuery$  "a"       "ab"      "abc"
+//  requests      fetch1    fetch2    fetch3
+//  results$                cancel    cancel    result3
+//                          fetch1    fetch2
+//
+//  Explanation:
+//  - switchMap cancels previous inner observables when a new value arrives
+//  - Only the result from the latest search query is emitted
+//  - Previous ongoing requests are cancelled
+//  - Ideal for search-as-you-type scenarios
+
 const searchQuery$ = source<string>();
 
 const results$ = searchQuery$.pipe(
-  switchMap((query) => fromPromise(fetchResults(query))),
+  switchMap((query) => {
+    const result$ = source<string[]>();
+
+    setTimeout(() => {
+      result$.next([query]);
+
+      result$.complete();
+    }, 10);
+
+    return result$;
+  }),
 );
 
-results$.subscribe((results) => {
-  console.log(results);
-});
-// Only the latest search results are emitted, previous searches are cancelled
+const mut_history: string[][] = [];
 
-const fetchResults = async (_query: string): Promise<readonly unknown[]> => [];
+results$.subscribe((value) => {
+  mut_history.push(value);
+});
+
+searchQuery$.next('a');
+
+searchQuery$.next('ab');
+
+searchQuery$.next('abc');
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 200);
+});
+
+assert.deepStrictEqual(mut_history, [['abc']]);
 ```
 
 #### Note
@@ -3581,7 +4149,7 @@ subscribe to `parentObservable` and call `setState` within it.
 
 > `const` **take**: \<`A`\>(`n`) => `DropInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/take-while.d.mts:3
+Defined in: synstate/dist/core/operators/take-while.d.mts:50
 
 #### Type Parameters
 
@@ -3605,7 +4173,7 @@ Defined in: synstate/dist/core/operators/take-while.d.mts:3
 
 > `const` **takeUntil**: \<`A`\>(`notifier`) => `KeepInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/take-until.d.mts:31
+Defined in: synstate/dist/core/operators/take-until.d.mts:50
 
 Emits values from the source until the notifier observable emits.
 When the notifier emits, this observable completes.
@@ -3635,23 +4203,42 @@ An operator that takes values until notifier emits
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  num$          1         2         stop      3 (ignored)
+//  stopNotifier                      X
+//  limited$      1         2         |------- (completed)
+//
+//  Explanation:
+//  - takeUntil completes the observable when the notifier emits
+//  - After stop() is called, no further values are emitted
+//  - Useful for cleanup and cancellation patterns
+
 const num$ = source<number>();
 
 const [stopNotifier, stop_] = createEventEmitter();
 
 const limited$ = num$.pipe(takeUntil(stopNotifier));
 
+const mut_history: number[] = [];
+
 limited$.subscribe((x) => {
-  console.log(x);
+  mut_history.push(x);
 });
 
 num$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [1]);
+
 num$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
 
 stop_();
 
 num$.next(3); // nothing logged (completed)
+
+assert.deepStrictEqual(mut_history, [1, 2]);
 ```
 
 ***
@@ -3660,7 +4247,10 @@ num$.next(3); // nothing logged (completed)
 
 > `const` **takeWhile**: \<`A`\>(`predicate`) => `DropInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/take-while.d.mts:2
+Defined in: synstate/dist/core/operators/take-while.d.mts:49
+
+Emits values from the source observable while the predicate returns true.
+Completes immediately when the predicate returns false.
 
 #### Type Parameters
 
@@ -3668,15 +4258,61 @@ Defined in: synstate/dist/core/operators/take-while.d.mts:2
 
 `A`
 
+The type of values from the source
+
 #### Parameters
 
 ##### predicate
 
 (`value`, `index`) => `boolean`
 
+Function to test each value
+
 #### Returns
 
 `DropInitialValueOperator`\<`A`, `A`\>
+
+An operator that takes values while the predicate is true
+
+#### Example
+
+```ts
+//  Timeline:
+//
+//  num$      1     2     3     4     5     6 (ignored)
+//  taken$    1     2     3     4     | (completes)
+//
+//  Explanation:
+//  - takeWhile emits values while the predicate returns true
+//  - Completes immediately when the predicate returns false
+//  - No further values are emitted after completion
+
+const num$ = source<number>();
+
+const taken$ = num$.pipe(takeWhile((x) => x < 5));
+
+const mut_history: number[] = [];
+
+taken$.subscribe((x) => {
+  mut_history.push(x);
+});
+
+num$.next(1); // logs: 1
+
+assert.deepStrictEqual(mut_history, [1]);
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+num$.next(5); // nothing logged (completes)
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+num$.next(6); // nothing logged (already completed)
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+```
 
 ***
 
@@ -3684,7 +4320,7 @@ Defined in: synstate/dist/core/operators/take-while.d.mts:2
 
 > `const` **throttleTime**: \<`A`\>(`milliSeconds`) => `KeepInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/throttle-time.d.mts:22
+Defined in: synstate/dist/core/operators/throttle-time.d.mts:61
 
 Emits the first value, then ignores subsequent values for a specified duration.
 After the duration, the next emission is allowed through.
@@ -3714,14 +4350,53 @@ An operator that throttles emissions
 #### Example
 
 ```ts
-const scroll$ = source<Event>();
+//  Timeline (1000ms throttle):
+//
+//  Time(ms)  0    100   200   300   ...   1000  1100  1200  ...   2000  2100
+//  scroll$   e1   e2    e3    e4          e5    e6    e7          e8    e9
+//  throttled$ e1                          e5                      e8
+//             |-------1000ms------>       |------1000ms------>    |------1000ms------>
+//
+//  Explanation:
+//  - throttleTime emits the first value immediately, then ignores subsequent values
+//    for the specified duration (1000ms)
+//  - At 0ms: e1 is emitted immediately
+//  - At 100-300ms: e2, e3, e4 are ignored (within 1000ms window)
+//  - At 1000ms: e5 is emitted (1000ms has passed since e1)
+//  - At 1100-1200ms: e6, e7 are ignored
+//  - At 2000ms: e8 is emitted (1000ms has passed since e5)
 
-const throttled$ = scroll$.pipe(throttleTime(1000));
+const scroll$ = source<number>();
 
-throttled$.subscribe((event_) => {
-  console.log(event_);
+const throttled$ = scroll$.pipe(throttleTime(200));
+
+const mut_history: number[] = [];
+
+throttled$.subscribe((value) => {
+  mut_history.push(value);
 });
-// Emits at most once per second
+
+scroll$.next(1);
+
+assert.deepStrictEqual(mut_history, [1]);
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 50);
+});
+
+scroll$.next(2);
+
+scroll$.next(3);
+
+assert.deepStrictEqual(mut_history, [1]);
+
+await new Promise((resolve) => {
+  setTimeout(resolve, 200);
+});
+
+scroll$.next(4);
+
+assert.deepStrictEqual(mut_history, [1, 4]);
 ```
 
 ***
@@ -3730,7 +4405,7 @@ throttled$.subscribe((event_) => {
 
 > `const` **timer**: (`milliSeconds`, `startManually?`) => `TimerObservable`
 
-Defined in: synstate/dist/core/create/timer.d.mts:19
+Defined in: synstate/dist/core/create/timer.d.mts:38
 
 Creates an observable that emits 0 after a specified delay and then completes.
 
@@ -3757,12 +4432,31 @@ An observable that emits after delay
 #### Example
 
 ```ts
-const delayed$ = timer(1000);
+//  Timeline:
+//
+//  Time(ms)  0     ...   1000
+//  delayed$                X (emits and completes)
+//
+//  Explanation:
+//  - timer emits once after the specified delay, then completes
+//  - Useful for delayed actions or timeouts
 
-delayed$.subscribe(() => {
-  console.log('1 second passed');
+const delayed$ = timer(100);
+
+const mut_history: number[] = [];
+
+await new Promise<void>((resolve) => {
+  delayed$.subscribe(
+    () => {
+      mut_history.push(1);
+    },
+    () => {
+      resolve();
+    },
+  );
 });
-// After 1 second, logs: 1 second passed
+
+assert.deepStrictEqual(mut_history, [1]);
 ```
 
 ***
@@ -3799,7 +4493,7 @@ Defined in: synstate/dist/core/utils/observable-utils.d.mts:2
 
 > `const` **unwrapOptional**: \<`O`\>() => `KeepInitialValueOperator`\<`O`, `Optional.Unwrap`\<`O`\> \| `undefined`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:33
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:48
 
 #### Type Parameters
 
@@ -3817,7 +4511,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:33
 
 > `const` **unwrapResultErr**: \<`R`\>() => `KeepInitialValueOperator`\<`R`, `Result.UnwrapErr`\<`R`\> \| `undefined`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:35
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:50
 
 #### Type Parameters
 
@@ -3835,7 +4529,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:35
 
 > `const` **unwrapResultOk**: \<`R`\>() => `KeepInitialValueOperator`\<`R`, `Result.UnwrapOk`\<`R`\> \| `undefined`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:34
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:49
 
 #### Type Parameters
 
@@ -3853,7 +4547,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:34
 
 > `const` **withBuffered**: \<`A`, `B`\>(`observable`) => `KeepInitialValueOperator`\<`A`, readonly \[`A`, readonly `B`[]\]\>
 
-Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:3
+Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:56
 
 #### Type Parameters
 
@@ -3881,7 +4575,10 @@ Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:3
 
 > `const` **withBufferedFrom**: \<`A`, `B`\>(`observable`) => `KeepInitialValueOperator`\<`A`, readonly \[`A`, readonly `B`[]\]\>
 
-Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:2
+Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:55
+
+Buffers values from the source observable and emits them along with the parent value
+when the parent emits. The buffer is cleared after each emission.
 
 #### Type Parameters
 
@@ -3889,9 +4586,13 @@ Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:2
 
 `A`
 
+The type of values from the parent observable
+
 ##### B
 
 `B`
+
+The type of values from the source observable
 
 #### Parameters
 
@@ -3899,9 +4600,58 @@ Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:2
 
 `Observable`\<`B`\>
 
+The observable whose values will be buffered
+
 #### Returns
 
 `KeepInitialValueOperator`\<`A`, readonly \[`A`, readonly `B`[]\]\>
+
+An operator that emits tuples of [parentValue, bufferedValues]
+
+#### Example
+
+```ts
+//  Timeline:
+//
+//  data$       d1    d2    d3    d4    d5    d6    d7    d8
+//  trigger$                T1                T2                T3
+//  result$                 [T1,[d1,d2,d3]]   [T2,[d4,d5,d6]]   [T3,[d7,d8]]
+//
+//  Explanation:
+//  - withBufferedFrom collects values from the source observable
+//  - When the trigger emits, it emits a tuple of [triggerValue, bufferedValues]
+//  - Buffer is cleared after each emission
+//  - Useful for batching data collection triggered by events
+
+const data$ = source<string>();
+
+const trigger$ = source<number>();
+
+const result$ = trigger$.pipe(withBufferedFrom(data$));
+
+const mut_history: (readonly [number, readonly string[]])[] = [];
+
+result$.subscribe(([triggerValue, bufferedData]) => {
+  mut_history.push([triggerValue, bufferedData]);
+});
+
+data$.next('a');
+
+data$.next('b');
+
+trigger$.next(1);
+
+assert.deepStrictEqual(mut_history, [[1, ['a', 'b']]]);
+
+data$.next('c');
+
+trigger$.next(2);
+
+assert.deepStrictEqual(mut_history, [
+  [1, ['a', 'b']],
+  [2, ['c']],
+]);
+```
 
 ***
 
@@ -3909,7 +4659,10 @@ Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:2
 
 > `const` **withCurrentValueFrom**: \<`A`, `B`\>(`observable`) => `DropInitialValueOperator`\<`A`, readonly \[`A`, `B`\]\>
 
-Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:2
+Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:57
+
+Samples the current value from another observable each time the source emits.
+Emits a tuple of [sourceValue, sampledValue].
 
 #### Type Parameters
 
@@ -3917,9 +4670,13 @@ Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:2
 
 `A`
 
+The type of values from the source observable
+
 ##### B
 
 `B`
+
+The type of values from the sampled observable
 
 #### Parameters
 
@@ -3927,9 +4684,60 @@ Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:2
 
 `Observable`\<`B`\>
 
+The observable to sample from
+
 #### Returns
 
 `DropInitialValueOperator`\<`A`, readonly \[`A`, `B`\]\>
+
+An operator that emits tuples of source and sampled values
+
+#### Example
+
+```ts
+//  Timeline:
+//
+//  name$     "Alice"           "Bob"               "Charlie"
+//  age$                25              30      35              40
+//  result$             ["Alice",25]  ["Bob",30]  ["Bob",35]  ["Charlie",40]
+//
+//  Explanation:
+//  - withCurrentValueFrom samples the current value from another observable
+//  - Emits a tuple [sourceValue, sampledValue] each time the source emits
+//  - Does not emit until both observables have emitted at least once
+//  - Similar to combine, but only emits when the source (not the sampled) emits
+
+const name$ = source<string>();
+
+const age$ = source<number>();
+
+const result$ = name$.pipe(withCurrentValueFrom(age$));
+
+const mut_history: (readonly [string, number])[] = [];
+
+result$.subscribe(([name_, currentAge]) => {
+  mut_history.push([name_, currentAge]);
+});
+
+name$.next('Alice'); // nothing logged (age$ hasn't emitted)
+
+assert.deepStrictEqual(mut_history, []);
+
+age$.next(25);
+
+name$.next('Bob'); // logs: Bob is 25 years old
+
+assert.deepStrictEqual(mut_history, [['Bob', 25]]);
+
+age$.next(30);
+
+name$.next('Charlie'); // logs: Charlie is 30 years old
+
+assert.deepStrictEqual(mut_history, [
+  ['Bob', 25],
+  ['Charlie', 30],
+]);
+```
 
 ***
 
@@ -3937,7 +4745,7 @@ Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:2
 
 > `const` **withIndex**: \<`A`\>() => `KeepInitialValueOperator`\<`A`, readonly \[`SafeUint` \| `-1`, `A`\]\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:32
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:47
 
 #### Type Parameters
 
@@ -3955,7 +4763,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:32
 
 > `const` **withInitialValue**: \<`A`, `I`\>(`initialValue`) => `WithInitialValueOperator`\<`A`, `A` \| `I`\>
 
-Defined in: synstate/dist/core/operators/with-initial-value.d.mts:25
+Defined in: synstate/dist/core/operators/with-initial-value.d.mts:47
 
 Provides an initial value for an observable that doesn't have one.
 The resulting observable will immediately emit the initial value upon subscription,
@@ -3992,15 +4800,37 @@ An operator that sets the initial value
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  num$             1    2    3
+//  withInitial$ 0   1    2    3
+//               ^
+//               initial value
+//
+//  Explanation:
+//  - withInitialValue provides an initial value before the source emits
+//  - Converts an uninitialized observable to an initialized one
+//  - Useful when you need a default value immediately
+
 const num$ = source<number>();
 
 const initialized$ = num$.pipe(withInitialValue(0));
 
+const mut_history: number[] = [];
+
 initialized$.subscribe((x) => {
-  console.log(x);
-}); // immediately logs: 0
+  mut_history.push(x);
+});
+
+assert.deepStrictEqual(mut_history, [0]);
 
 num$.next(1); // logs: 1
+
+assert.deepStrictEqual(mut_history, [0, 1]);
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [0, 1, 2]);
 ```
 
 ***
@@ -4009,7 +4839,7 @@ num$.next(1); // logs: 1
 
 > `const` **withLatestFrom**: \<`A`, `B`\>(`observable`) => `DropInitialValueOperator`\<`A`, readonly \[`A`, `B`\]\>
 
-Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:3
+Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:58
 
 #### Type Parameters
 
@@ -4037,7 +4867,7 @@ Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:3
 
 > `const` **zip**: \<`OS`\>(`parents`) => `ZipObservableRefined`\<`OS`\>
 
-Defined in: synstate/dist/core/combine/zip.d.mts:25
+Defined in: synstate/dist/core/combine/zip.d.mts:50
 
 Combines multiple observables by pairing their emissions by index.
 Waits for all sources to emit their nth value before emitting the nth tuple.
@@ -4068,16 +4898,41 @@ A zipped observable emitting tuples of values
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  letters$  'a'       'b'       'c'
+//  numbers$  1         2         3
+//  zipped$   ['a',1]   ['b',2]   ['c',3]
+//
+//  Explanation:
+//  - zip pairs values by their index from multiple sources
+//  - Waits for all sources to emit at the same index
+//  - Completes when any source completes
+
 const letters$ = fromArray(['a', 'b', 'c']);
 
 const numbers$ = fromArray([1, 2, 3]);
 
 const zipped$ = zip([letters$, numbers$]);
 
-zipped$.subscribe(([letter, num]) => {
-  console.log(letter, num);
+const mut_history: (readonly [string, number])[] = [];
+
+await new Promise<void>((resolve) => {
+  zipped$.subscribe(
+    ([letter, num]) => {
+      mut_history.push([letter, num]);
+    },
+    () => {
+      resolve();
+    },
+  );
 });
-// logs: a 1, b 2, c 3
+
+assert.deepStrictEqual(mut_history, [
+  ['a', 1],
+  ['b', 2],
+  ['c', 3],
+]);
 ```
 
 ## Functions
@@ -4088,7 +4943,7 @@ zipped$.subscribe(([letter, num]) => {
 
 > **filter**\<`A`, `B`\>(`predicate`): `DropInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/filter.d.mts:26
+Defined in: synstate/dist/core/operators/filter.d.mts:51
 
 Filters values emitted by the source observable based on a predicate function.
 Only values that satisfy the predicate will be emitted by the resulting observable.
@@ -4124,24 +4979,49 @@ An operator that filters the observable
 ##### Example
 
 ```ts
+//  Timeline:
+//
+//  num$          1     2     3     4     5     6
+//  even$               2           4           6
+//
+//  Explanation:
+//  - filter passes through only values that satisfy the predicate
+//  - Only even numbers (2, 4, 6) are emitted
+
 const num$ = source<number>();
 
 const even$ = num$.pipe(filter((x) => x % 2 === 0));
 
+const mut_history: number[] = [];
+
 even$.subscribe((x) => {
-  console.log(x);
+  mut_history.push(x);
 });
 
 num$.next(1); // nothing logged
 
 num$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [2]);
+
+num$.next(3); // nothing logged
+
+num$.next(4); // logs: 4
+
+assert.deepStrictEqual(mut_history, [2, 4]);
+
+num$.next(5);
+
+num$.next(6);
+
+assert.deepStrictEqual(mut_history, [2, 4, 6]);
 ```
 
 #### Call Signature
 
 > **filter**\<`A`\>(`predicate`): `DropInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/filter.d.mts:27
+Defined in: synstate/dist/core/operators/filter.d.mts:52
 
 Filters values emitted by the source observable based on a predicate function.
 Only values that satisfy the predicate will be emitted by the resulting observable.
@@ -4171,17 +5051,42 @@ An operator that filters the observable
 ##### Example
 
 ```ts
+//  Timeline:
+//
+//  num$          1     2     3     4     5     6
+//  even$               2           4           6
+//
+//  Explanation:
+//  - filter passes through only values that satisfy the predicate
+//  - Only even numbers (2, 4, 6) are emitted
+
 const num$ = source<number>();
 
 const even$ = num$.pipe(filter((x) => x % 2 === 0));
 
+const mut_history: number[] = [];
+
 even$.subscribe((x) => {
-  console.log(x);
+  mut_history.push(x);
 });
 
 num$.next(1); // nothing logged
 
 num$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [2]);
+
+num$.next(3); // nothing logged
+
+num$.next(4); // logs: 4
+
+assert.deepStrictEqual(mut_history, [2, 4]);
+
+num$.next(5);
+
+num$.next(6);
+
+assert.deepStrictEqual(mut_history, [2, 4, 6]);
 ```
 
 ***
@@ -4192,7 +5097,7 @@ num$.next(2); // logs: 2
 
 > **source**\<`A`\>(`initialValue`): `InitializedSourceObservable`\<`A`\>
 
-Defined in: synstate/dist/core/create/source.d.mts:22
+Defined in: synstate/dist/core/create/source.d.mts:41
 
 Creates a new Observable source that can manually emit values.
 This is the primary way to create root observables that start reactive chains.
@@ -4220,22 +5125,41 @@ A SourceObservable that can emit values via `.next()` method
 ##### Example
 
 ```ts
+//  Timeline:
+//
+//  count$    1     2     3     ...
+//
+//  Explanation:
+//  - source creates a new observable that you can manually emit values to
+//  - Use .next() to emit values
+//  - Foundation for building custom observables
+
 const count$ = source<number>();
 
+const mut_history: number[] = [];
+
 count$.subscribe((value) => {
-  console.log(value);
+  mut_history.push(value);
 });
 
 count$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [1]);
+
 count$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+count$.next(3); // logs: 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```
 
 #### Call Signature
 
 > **source**\<`A`\>(): `SourceObservable`\<`A`\>
 
-Defined in: synstate/dist/core/create/source.d.mts:23
+Defined in: synstate/dist/core/create/source.d.mts:42
 
 Creates a new Observable source that can manually emit values.
 This is the primary way to create root observables that start reactive chains.
@@ -4257,13 +5181,32 @@ A SourceObservable that can emit values via `.next()` method
 ##### Example
 
 ```ts
+//  Timeline:
+//
+//  count$    1     2     3     ...
+//
+//  Explanation:
+//  - source creates a new observable that you can manually emit values to
+//  - Use .next() to emit values
+//  - Foundation for building custom observables
+
 const count$ = source<number>();
 
+const mut_history: number[] = [];
+
 count$.subscribe((value) => {
-  console.log(value);
+  mut_history.push(value);
 });
 
 count$.next(1); // logs: 1
 
+assert.deepStrictEqual(mut_history, [1]);
+
 count$.next(2); // logs: 2
+
+assert.deepStrictEqual(mut_history, [1, 2]);
+
+count$.next(3); // logs: 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```

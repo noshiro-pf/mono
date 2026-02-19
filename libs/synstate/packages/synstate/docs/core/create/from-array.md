@@ -12,7 +12,7 @@
 
 > **fromArray**\<`A`\>(`values`, `startManually?`): [`FromArrayObservable`](../types/observable-family.md#fromarrayobservable)\<`A`\>
 
-Defined in: [core/create/from-array.mts:23](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/from-array.mts#L23)
+Defined in: [core/create/from-array.mts:41](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/from-array.mts#L41)
 
 Creates an observable that emits all values from an array sequentially, then completes.
 
@@ -47,10 +47,28 @@ An observable that emits array values
 #### Example
 
 ```ts
+//  Timeline:
+//
+//  nums$     1     2     3     | (completes)
+//
+//  Explanation:
+//  - fromArray creates an observable from an array
+//  - Emits all values synchronously, then completes
+
 const nums$ = fromArray([1, 2, 3]);
 
-nums$.subscribe((x) => {
-  console.log(x);
+const mut_history: number[] = [];
+
+await new Promise<void>((resolve) => {
+  nums$.subscribe(
+    (x) => {
+      mut_history.push(x);
+    },
+    () => {
+      resolve();
+    },
+  );
 });
-// logs: 1, 2, 3
+
+assert.deepStrictEqual(mut_history, [1, 2, 3]);
 ```

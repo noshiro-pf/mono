@@ -7,7 +7,7 @@ import {
   throttleTime,
   type Observable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 /*
@@ -16,6 +16,7 @@ import { type StreamTestCase } from '../typedef.mjs';
   counter      0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19  20  21  22  23
   filtered         1   2   3               7       9   10      12  13          16  17  18  19  20
   throttleTime     1                       7           10          13          16          19
+                   |--------->             |---------> |---------> |---------> |---------> |--------->
 */
 const createStreams = (
   tick: number,
@@ -61,7 +62,7 @@ export const throttleTimeTestCases: readonly [
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, throttleTime$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(throttleTime$, startSource);
+      return getStreamHistoryAsPromise(throttleTime$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, filtered$, throttleTime$ } =
@@ -88,7 +89,7 @@ export const throttleTimeTestCases: readonly [
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, merged$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(merged$, startSource);
+      return getStreamHistoryAsPromise(merged$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, filtered$, throttleTime$, merged$ } =

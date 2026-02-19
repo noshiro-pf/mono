@@ -65,7 +65,7 @@ export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
 
 // SyncChildObservable
 
-namespace SyncFlowInternals {
+namespace SynStateInternals {
   type Cast<A> = A extends NonEmptyUnknownList ? A : never;
 
   type EveryInitialized<OS extends NonEmptyArray<Observable<unknown>>> =
@@ -164,25 +164,25 @@ namespace SyncFlowInternals {
 }
 
 export type CombineObservable<A extends NonEmptyUnknownList> =
-  SyncFlowInternals.CombineObservableImpl<A>;
+  SynStateInternals.CombineObservableImpl<A>;
 
 export type CombineObservableRefined<
   OS extends NonEmptyArray<Observable<unknown>>,
-> = SyncFlowInternals.CombineObservableRefinedImpl<OS>;
+> = SynStateInternals.CombineObservableRefinedImpl<OS>;
 
 export type ZipObservable<A extends NonEmptyUnknownList> =
-  SyncFlowInternals.ZipObservableImpl<A>;
+  SynStateInternals.ZipObservableImpl<A>;
 
 export type ZipObservableRefined<
   OS extends NonEmptyArray<Observable<unknown>>,
-> = SyncFlowInternals.ZipObservableRefinedImpl<OS>;
+> = SynStateInternals.ZipObservableRefinedImpl<OS>;
 
 export type MergeObservable<A extends NonEmptyUnknownList> =
-  SyncFlowInternals.MergeObservableImpl<A>;
+  SynStateInternals.MergeObservableImpl<A>;
 
 export type MergeObservableRefined<
   OS extends NonEmptyArray<Observable<unknown>>,
-> = SyncFlowInternals.MergeObservableRefinedImpl<OS>;
+> = SynStateInternals.MergeObservableRefinedImpl<OS>;
 
 export type MapWithIndexOperatorObservable<A, B> = SyncChildObservable<
   B,

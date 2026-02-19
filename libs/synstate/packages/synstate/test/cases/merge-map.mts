@@ -6,7 +6,7 @@ import {
   take,
   type Observable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 /*
@@ -83,7 +83,7 @@ export const mergeMapTestCases: readonly [
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
       const { startSource, mergeMap$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(mergeMap$, startSource);
+      return getStreamHistoryAsPromise(mergeMap$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, mergeMap$ } = createStreams(tick);

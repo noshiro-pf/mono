@@ -72,10 +72,14 @@ const projectConfig = (
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,
-    includeSource: castMutable(options?.includeSource) ?? ['src/**/*.mts'],
+    includeSource: castMutable(options?.includeSource) ?? [
+      'src/**/*.mts',
+      'samples/**/*.mts',
+    ],
     include: castMutable(options?.include) ?? [
       'src/**/*.test.mts',
       'test/**/*.test.mts',
+      'samples/**/*.mts',
     ],
     exclude: [
       '**/*.d.mts',

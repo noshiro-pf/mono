@@ -1,14 +1,43 @@
-/* eslint-disable unicorn/prefer-top-level-await */
+/* eslint-disable @typescript-eslint/require-await */
 import { fromPromise } from 'synstate';
 import { Result } from 'ts-data-forge';
-// embed-sample-code-ignore-above
 
-const data$ = fromPromise(fetch('/api/data').then((r) => r.json()));
+if (import.meta.vitest !== undefined) {
+  test(fromPromise, async () => {
+    // embed-sample-code-ignore-above
 
-data$.subscribe((result) => {
-  if (Result.isOk(result)) {
-    console.log('Data:', result.value);
-  } else {
-    console.error('Error:', result.value);
-  }
-});
+    //  Timeline:
+    //
+    //  promise     [pending...]  -> resolved/rejected
+    //  data$                     Ok(value) or Err(error)
+    //
+    //  Explanation:
+    //  - fromPromise converts a Promise into an observable
+    //  - Emits a Result type: Ok(value) on success, Err(error) on failure
+    //  - Completes after emitting the result
+    //  - Useful for integrating async operations into reactive flows
+
+    const fetchData = async (): Promise<{ value: number }> => ({ value: 42 });
+
+    const data$ = fromPromise(fetchData());
+
+    const mut_history: { value: number }[] = [];
+
+    await new Promise<void>((resolve) => {
+      data$.subscribe(
+        (result) => {
+          if (Result.isOk(result)) {
+            mut_history.push(result.value);
+          }
+        },
+        () => {
+          resolve();
+        },
+      );
+    });
+
+    assert.deepStrictEqual(mut_history, [{ value: 42 }]);
+
+    // embed-sample-code-ignore-below
+  });
+}

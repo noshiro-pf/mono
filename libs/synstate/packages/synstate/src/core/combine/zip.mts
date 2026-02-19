@@ -26,16 +26,41 @@ import {
  *
  * @example
  * ```ts
+ * //  Timeline:
+ * //
+ * //  letters$  'a'       'b'       'c'
+ * //  numbers$  1         2         3
+ * //  zipped$   ['a',1]   ['b',2]   ['c',3]
+ * //
+ * //  Explanation:
+ * //  - zip pairs values by their index from multiple sources
+ * //  - Waits for all sources to emit at the same index
+ * //  - Completes when any source completes
+ *
  * const letters$ = fromArray(['a', 'b', 'c']);
  *
  * const numbers$ = fromArray([1, 2, 3]);
  *
  * const zipped$ = zip([letters$, numbers$]);
  *
- * zipped$.subscribe(([letter, num]) => {
- *   console.log(letter, num);
+ * const mut_history: (readonly [string, number])[] = [];
+ *
+ * await new Promise<void>((resolve) => {
+ *   zipped$.subscribe(
+ *     ([letter, num]) => {
+ *       mut_history.push([letter, num]);
+ *     },
+ *     () => {
+ *       resolve();
+ *     },
+ *   );
  * });
- * // logs: a 1, b 2, c 3
+ *
+ * assert.deepStrictEqual(mut_history, [
+ *   ['a', 1],
+ *   ['b', 2],
+ *   ['c', 3],
+ * ]);
  * ```
  */
 export const zip = <const OS extends NonEmptyArray<Observable<unknown>>>(

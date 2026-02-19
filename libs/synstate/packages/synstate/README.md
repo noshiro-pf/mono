@@ -1,11 +1,19 @@
-# SyncFlow
+# SynState
 
-[![npm version](https://img.shields.io/npm/v/ts-data-forge.svg)](https://www.npmjs.com/package/ts-data-forge)
-[![npm downloads](https://img.shields.io/npm/dm/ts-data-forge.svg)](https://www.npmjs.com/package/ts-data-forge)
-[![License](https://img.shields.io/npm/l/ts-data-forge.svg)](./LICENSE)
-[![codecov](https://codecov.io/gh/noshiro-pf/ts-data-forge/branch/main/graph/badge.svg?token=69TA40HACZ)](https://codecov.io/gh/noshiro-pf/ts-data-forge)
+<p align="center">
+  <img src="./assets/synstate-icon.png" alt="SynState Logo" width="400" />
+</p>
 
-**SyncFlow** is a lightweight, type-safe state management library for TypeScript/JavaScript. Perfect for building reactive global state and event-driven systems in React, Vue, and other frameworks.
+<p align="center">
+
+[![npm version](https://img.shields.io/npm/v/synstate.svg)](https://www.npmjs.com/package/synstate)
+[![npm downloads](https://img.shields.io/npm/dm/synstate.svg)](https://www.npmjs.com/package/synstate)
+[![License](https://img.shields.io/npm/l/synstate.svg)](./LICENSE)
+[![codecov](https://codecov.io/gh/noshiro-pf/synstate/graph/badge.svg?token=xrJgTVxMpr)](https://codecov.io/gh/noshiro-pf/synstate)
+
+</p>
+
+**SynState** is a lightweight, high-performance, type-safe state management library for TypeScript/JavaScript. Perfect for building reactive global state and event-driven systems in React, Vue, and other frameworks.
 
 ## Features
 
@@ -13,13 +21,14 @@
 - 📡 **Event System**: Built-in `createValueEmitter`, `createEventEmitter` for event-driven architecture
 - 🔄 **Reactive Updates**: Automatic propagation of state changes to subscribers
 - 🎨 **Type-Safe**: Full TypeScript support with precise type inference
-- 🚀 **Lightweight**: Minimal bundle size, zero external runtime dependencies
-- ⚡ **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
-- 🔧 **Flexible**: Simple state management with optional advanced features
+- 🚀 **Lightweight**: Minimal bundle size with only one external runtime dependency ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge))
+- ⚡ **High Performance**: Optimized for fast state updates and minimal re-renders
+- 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
+- 🔧 **Flexible**: Simple state management with optional advanced Observable-based features (operators like `map`, `filter`, `debounceTime`, `throttleTime`, and combinators like `merge`, `combine`)
 
 ## Documentation
 
-- API reference: <https://noshiro-pf.github.io/synstate/>
+- API reference: TBD <!-- <https://noshiro-pf.github.io/synstate/> -->
 
 ## Installation
 
@@ -42,39 +51,26 @@ pnpm add synstate
 ### Simple State Management
 
 ```tsx
-import { createState } from 'synstate';
-
 // Create a reactive state
 const [state, setState, { updateState }] = createState(0);
 
+const mut_history: number[] = [];
+
 // Subscribe to changes (in React components, Vue watchers, etc.)
 state.subscribe((count: number) => {
-    console.log('Count:', count);
+    mut_history.push(count);
 });
+
+assert.deepStrictEqual(mut_history, [0]);
 
 // Update state
 setState(1);
 
+assert.deepStrictEqual(mut_history, [0, 1]);
+
 updateState((prev: number) => prev + 1);
-```
 
-### Event Emitter
-
-```tsx
-import { createValueEmitter } from 'synstate';
-
-type User = Readonly<{ id: number; name: string }>;
-
-// Create event emitter
-const [userLoggedIn$, emitUserLoggedIn] = createValueEmitter<User>();
-
-// Subscribe to events
-userLoggedIn$.subscribe((user) => {
-    console.log('User logged in:', user.name);
-});
-
-// Emit events
-emitUserLoggedIn({ id: 1, name: 'Alice' });
+assert.deepStrictEqual(mut_history, [0, 1, 2]);
 ```
 
 ### With React
@@ -125,7 +121,7 @@ const UserProfile = (): React.JSX.Element => {
 
 ### State Management
 
-SyncFlow provides simple, intuitive APIs for managing application state:
+SynState provides simple, intuitive APIs for managing application state:
 
 - **`createState`**: Create mutable state with getter/setter
 - **`createReducer`**: Redux-style state management
@@ -141,6 +137,66 @@ Built-in event emitter for event-driven patterns:
 ### Observable (Optional Advanced Feature)
 
 For advanced use cases, you can use observables to build complex reactive data flows. However, most applications will only need `createState`, `createReducer`, and `createValueEmitter`.
+
+## API Reference
+
+<!-- ### State Management (Recommended)
+
+#### createState
+
+Create reactive state with getter and setter.
+
+#### createBooleanState
+
+Specialized state for boolean values.
+
+#### createReducer
+
+Create state with reducer pattern (like Redux).
+
+### Event System
+
+#### createValueEmitter
+
+Create type-safe event emitter with payload.
+
+#### createEventEmitter
+
+Create event emitter without payload.
+-->
+
+### Advanced Features (Optional)
+
+For complex scenarios, SynState provides observable-based APIs:
+
+#### Creation Functions
+
+- `source<T>()`: Create a new observable source
+- `of(value)`: Create observable from a single value
+- `fromArray(array)`: Create observable from array
+- `fromPromise(promise)`: Create observable from promise
+- `interval(ms)`: Emit values at intervals
+- `timer(delay)`: Emit after delay
+
+#### Operators
+
+- `filter(predicate)`: Filter values
+- `map(fn)`: Transform values
+- `scan(reducer, seed)`: Accumulate values
+- `debounceTime(ms)`: Debounce emissions
+- `throttleTime(ms)`: Throttle emissions
+- `skipIfNoChange()`: Skip duplicate values
+- `takeUntil(notifier)`: Complete on notifier emission
+
+#### Combination
+
+- `combine(observables)`: Combine latest values from multiple sources
+- `merge(observables)`: Merge multiple streams
+- `zip(observables)`: Pair values by index
+
+## Examples
+
+### Global Counter State (React)
 
 ```tsx
 import * as React from 'react';
@@ -191,13 +247,7 @@ const ResetButton = (): React.JSX.Element => (
 );
 ```
 
-## API Reference
-
-### State Management (Recommended)
-
-#### createState
-
-Create reactive state with getter and setter:
+### Event-Driven Architecture (React)
 
 ```tsx
 import * as React from 'react';
@@ -261,9 +311,7 @@ const loginUser = async (): Promise<
 > => ({ id: 1, name: 'Alice' });
 ```
 
-#### createBooleanState
-
-Specialized state for boolean values:
+### Todo List with Reducer (React)
 
 ```tsx
 import * as React from 'react';
@@ -343,9 +391,7 @@ const TodoList = (): React.JSX.Element => {
 };
 ```
 
-#### createReducer
-
-Create state with reducer pattern (like Redux):
+### Boolean State (Dark Mode)
 
 ```tsx
 import * as React from 'react';
@@ -381,11 +427,7 @@ const ThemeToggle = (): React.JSX.Element => {
 };
 ```
 
-### Event System
-
-#### createValueEmitter
-
-Create type-safe event emitter with payload:
+### Cross-Component Communication
 
 ```tsx
 import * as React from 'react';
@@ -460,297 +502,6 @@ const ItemList = (): React.JSX.Element => {
 };
 ```
 
-#### createEventEmitter
-
-Create event emitter without payload:
-
-```tsx
-import * as React from 'react';
-import {
-    createState,
-    debounceTime,
-    filter,
-    fromPromise,
-    type Observable,
-    switchMap,
-} from 'synstate';
-import { Result } from 'ts-data-forge';
-
-const [searchState, setSearchState] = createState('');
-
-// Advanced reactive pipeline (optional feature)
-const searchResults$: Observable<
-    Result<readonly Readonly<{ id: string; name: string }>[], unknown>
-> = searchState
-    .pipe(debounceTime(300))
-    .pipe(filter((query) => query.length > 2))
-    .pipe(
-        switchMap((query) =>
-            fromPromise(
-                fetch(`/api/search?q=${query}`).then(
-                    (r) =>
-                        r.json() as Promise<
-                            readonly Readonly<{ id: string; name: string }>[]
-                        >,
-                ),
-            ),
-        ),
-    );
-
-const SearchBox = (): React.JSX.Element => {
-    const [results, setResults] = React.useState<
-        readonly Readonly<{ id: string; name: string }>[]
-    >([]);
-
-    React.useEffect(() => {
-        const sub = searchResults$.subscribe((result) => {
-            if (Result.isOk(result)) {
-                setResults(result.value);
-            }
-        });
-
-        return () => {
-            sub.unsubscribe();
-        };
-    }, []);
-
-    return (
-        <div>
-            <input
-                placeholder={'Search...'}
-                onChange={(e) => {
-                    setSearchState(e.target.value);
-                }}
-            />
-            <ul>
-                {results.map((item) => (
-                    <li key={item.id}>{item.name}</li>
-                ))}
-            </ul>
-        </div>
-    );
-};
-```
-
-### Advanced Features (Optional)
-
-For complex scenarios, SyncFlow provides observable-based APIs:
-
-#### Creation Functions
-
-- `source<T>()`: Create a new observable source
-- `of(value)`: Create observable from a single value
-- `fromArray(array)`: Create observable from array
-- `fromPromise(promise)`: Create observable from promise
-- `interval(ms)`: Emit values at intervals
-- `timer(delay)`: Emit after delay
-
-#### Operators
-
-- `filter(predicate)`: Filter values
-- `map(fn)`: Transform values
-- `scan(reducer, seed)`: Accumulate values
-- `debounceTime(ms)`: Debounce emissions
-- `throttleTime(ms)`: Throttle emissions
-- `skipIfNoChange()`: Skip duplicate values
-- `takeUntil(notifier)`: Complete on notifier emission
-
-#### Combination
-
-- `combine(observables)`: Combine latest values from multiple sources
-- `merge(observables)`: Merge multiple streams
-- `zip(observables)`: Pair values by index
-
-## Examples
-
-### Global Counter State (React)
-
-```tsx
-import { createState } from 'synstate';
-import { useState, useEffect } from 'react';
-
-// Create global state
-export const counterState = createState(0);
-
-// Component 1
-function Counter() {
-    const [count, setCount] = useState(counterState.getSnapshot());
-
-    useEffect(() => {
-        const sub = counterState.state.subscribe(setCount);
-        return () => sub.unsubscribe();
-    }, []);
-
-    return (
-        <div>
-            <p>Count: {count}</p>
-            <button onClick={() => counterState.updateState((n) => n + 1)}>
-                Increment
-            </button>
-        </div>
-    );
-}
-
-// Component 2 (synced automatically)
-function ResetButton() {
-    return <button onClick={() => counterState.resetState()}>Reset</button>;
-}
-```
-
-### Event-Driven Architecture (React)
-
-```tsx
-import { createValueEmitter } from 'synstate';
-import { useEffect } from 'react';
-
-// Global events
-export const [userLoggedIn$, emitUserLoggedIn] = createValueEmitter<{
-    id: number;
-    name: string;
-}>();
-
-export const [userLoggedOut$, emitUserLoggedOut] = createEventEmitter();
-
-// Component that emits events
-function LoginButton() {
-    const handleLogin = async () => {
-        const user = await loginUser();
-        emitUserLoggedIn(user);
-    };
-
-    return <button onClick={handleLogin}>Login</button>;
-}
-
-// Component that listens to events
-function Notification() {
-    const [message, setMessage] = useState('');
-
-    useEffect(() => {
-        const sub1 = userLoggedIn$.subscribe((user) => {
-            setMessage(`Welcome, ${user.name}!`);
-        });
-
-        const sub2 = userLoggedOut$.subscribe(() => {
-            setMessage('Logged out');
-        });
-
-        return () => {
-            sub1.unsubscribe();
-            sub2.unsubscribe();
-        };
-    }, []);
-
-    return message ? <div className="notification">{message}</div> : null;
-}
-```
-
-### Todo List with Reducer (React)
-
-```tsx
-import { createReducer } from 'synstate';
-import { useState, useEffect } from 'react';
-
-type Todo = { id: number; text: string; done: boolean };
-type Action =
-    | { type: 'add'; text: string }
-    | { type: 'toggle'; id: number }
-    | { type: 'remove'; id: number };
-
-const todoState = createReducer<Todo[], Action>((todos, action) => {
-    switch (action.type) {
-        case 'add':
-            return [
-                ...todos,
-                {
-                    id: Date.now(),
-                    text: action.text,
-                    done: false,
-                },
-            ];
-        case 'toggle':
-            return todos.map((t) =>
-                t.id === action.id ? { ...t, done: !t.done } : t,
-            );
-        case 'remove':
-            return todos.filter((t) => t.id !== action.id);
-    }
-}, []);
-
-function TodoList() {
-    const [todos, setTodos] = useState(todoState.getSnapshot());
-
-    useEffect(() => {
-        const sub = todoState.state.subscribe(setTodos);
-        return () => sub.unsubscribe();
-    }, []);
-
-    return (
-        <div>
-            {todos.map((todo) => (
-                <div key={todo.id}>
-                    <input
-                        type="checkbox"
-                        checked={todo.done}
-                        onChange={() =>
-                            todoState.dispatch({
-                                type: 'toggle',
-                                id: todo.id,
-                            })
-                        }
-                    />
-                    <span>{todo.text}</span>
-                </div>
-            ))}
-            <button
-                onClick={() =>
-                    todoState.dispatch({
-                        type: 'add',
-                        text: 'New Todo',
-                    })
-                }
-            >
-                Add Todo
-            </button>
-        </div>
-    );
-}
-```
-
-### Boolean State (Dark Mode)
-
-```tsx
-import { createBooleanState } from 'synstate';
-import { useState, useEffect } from 'react';
-
-export const darkModeState = createBooleanState(false);
-
-function ThemeToggle() {
-    const [isDark, setIsDark] = useState(darkModeState.getSnapshot());
-
-    useEffect(() => {
-        const sub = darkModeState.state.subscribe(setIsDark);
-        return () => sub.unsubscribe();
-    }, []);
-
-    useEffect(() => {
-        document.body.className = isDark ? 'dark' : 'light';
-    }, [isDark]);
-
-    return (
-        <button onClick={() => darkModeState.toggle()}>
-            {isDark ? '🌙' : '☀️'}
-        </button>
-    );
-}
-```
-
-### Cross-Component Communication
-
-```tsx
-import { createValueEmitter, createState } from 'synstate';
-import { useState, useEffect } from 'react';
-```
-
 // Events
 
 ### Advanced: Search with Debounce
@@ -823,11 +574,46 @@ const SearchBox = (): React.JSX.Element => {
 };
 ```
 
-## Why SyncFlow?
+### Advanced: Event Emitter with Throttle
+
+```tsx
+import { createEventEmitter, throttleTime } from 'synstate';
+
+// Create event emitter
+const [refreshClicked, onRefreshClick] = createEventEmitter();
+
+// Subscribe to events
+refreshClicked.subscribe(() => {
+    console.log('Refresh Clicked');
+});
+
+// Throttle refresh clicks to prevent rapid successive executions
+const throttledRefresh = refreshClicked.pipe(throttleTime(2000));
+
+throttledRefresh.subscribe(() => {
+    console.log('Executing refresh...');
+    // Actual refresh logic here
+    // This will be called at most once every 2 seconds
+});
+
+const DataTable = (): React.JSX.Element => (
+    <div>
+        <button onClick={onRefreshClick}>{'Refresh'}</button>
+        <p>
+            {'Data: '}
+            {/* Display data here */}
+        </p>
+    </div>
+);
+```
+
+## Why SynState?
 
 ### Simple State Management, Not Complex Reactive Programming
 
-Unlike RxJS, which can make code harder to read with many operators and complex streams, SyncFlow focuses on **simple, readable state management and event handling**. Most applications only need `createState`, `createReducer`, and `createValueEmitter` - clean, straightforward APIs that developers understand immediately.
+SynState is a state management library for web frontends, similar to Redux, Jotai, Zustand, and MobX. It provides APIs for creating and managing global state across your application.
+
+Under the hood, SynState is built on Observable patterns similar to those provided by RxJS. However, unlike RxJS, which can make code harder to read with many operators and complex streams, SynState focuses on **simple, readable state management and event handling**. Most applications only need `createState`, `createReducer`, and `createValueEmitter` - clean, straightforward APIs that developers understand immediately.
 
 **Advanced reactive features are optional** and only used when you actually need them (like debouncing search input). The library doesn't force you into a reactive programming mindset.
 
@@ -840,7 +626,7 @@ Unlike RxJS, which can make code harder to read with many operators and complex 
 
 ### Use Cases
 
-**Use SyncFlow when you need:**
+**Use SynState when you need:**
 
 - ✅ Global state management across components
 - ✅ Event-driven communication between components
@@ -855,19 +641,7 @@ Unlike RxJS, which can make code harder to read with many operators and complex 
 
 ## Type Safety
 
-SyncFlow maintains full type information:
-
-```tsx
-const userState = createState({ name: 'Alice', age: 25 });
-// state type: Observable<{ name: string; age: number }>
-
-const snapshot = userState.getSnapshot();
-// snapshot type: { name: string; age: number }
-
-const [onClick$, emitClick] = createValueEmitter<MouseEvent>();
-// onClick$ type: Observable<MouseEvent>
-// emitClick type: (event: MouseEvent) => void
-```
+SynState maintains full type information.
 
 ## License
 

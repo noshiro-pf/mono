@@ -1,5 +1,5 @@
 import { fromArray, type Observable } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 const createStream = (): Readonly<{
@@ -23,7 +23,7 @@ export const fromArrayTestCases: readonly [StreamTestCase<number>] = [
     run: (): Promise<readonly number[]> => {
       const { output$, startSource } = createStream();
 
-      return getStreamOutputAsPromise(output$, startSource);
+      return getStreamHistoryAsPromise(output$, startSource);
     },
     preview: (): void => {
       const { output$, startSource } = createStream();

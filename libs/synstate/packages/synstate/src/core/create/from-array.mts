@@ -12,12 +12,30 @@ import { type FromArrayObservable } from '../types/index.mjs';
  *
  * @example
  * ```ts
+ * //  Timeline:
+ * //
+ * //  nums$     1     2     3     | (completes)
+ * //
+ * //  Explanation:
+ * //  - fromArray creates an observable from an array
+ * //  - Emits all values synchronously, then completes
+ *
  * const nums$ = fromArray([1, 2, 3]);
  *
- * nums$.subscribe((x) => {
- *   console.log(x);
+ * const mut_history: number[] = [];
+ *
+ * await new Promise<void>((resolve) => {
+ *   nums$.subscribe(
+ *     (x) => {
+ *       mut_history.push(x);
+ *     },
+ *     () => {
+ *       resolve();
+ *     },
+ *   );
  * });
- * // logs: 1, 2, 3
+ *
+ * assert.deepStrictEqual(mut_history, [1, 2, 3]);
  * ```
  */
 export const fromArray = <A,>(

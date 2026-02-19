@@ -17,12 +17,27 @@ import {
  *
  * @example
  * ```ts
+ * //  Timeline (300ms debounce):
+ * //
+ * //  Time(ms)  0     100    200    300    400    500    600   ...   900   1000
+ * //  input$    'h'   'he'   'hel'  'hello'
+ * //  debounced$                                         'hello' (emitted after 300ms silence)
+ * //
+ * //  Explanation:
+ * //  - At 0ms: 'h' is emitted, timer starts
+ * //  - At 100ms: 'he' is emitted, timer resets
+ * //  - At 200ms: 'hel' is emitted, timer resets
+ * //  - At 300ms: 'hello' is emitted, timer resets
+ * //  - At 600ms: No new emission for 300ms, 'hello' is finally emitted
+ *
  * const input$ = source<string>();
  *
  * const debounced$ = input$.pipe(debounceTime(300));
  *
+ * const mut_history: string[] = [];
+ *
  * debounced$.subscribe((value) => {
- *   console.log(value);
+ *   mut_history.push(value);
  * });
  *
  * input$.next('h');
@@ -32,7 +47,12 @@ import {
  * input$.next('hel');
  *
  * input$.next('hello');
- * // After 300ms of silence, logs: hello
+ *
+ * await new Promise((resolve) => {
+ *   setTimeout(resolve, 400);
+ * });
+ *
+ * assert.deepStrictEqual(mut_history, ['hello']);
  * ```
  */
 export const debounceTime = <A,>(

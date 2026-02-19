@@ -24,6 +24,7 @@ const config = {
     'ol-indent': false, // prefer Prettier's setting
     'list-marker-space': false, // prefer Prettier's setting
     'no-duplicate-heading': { siblings_only: true },
+    'no-inline-html': false,
   },
 };
 

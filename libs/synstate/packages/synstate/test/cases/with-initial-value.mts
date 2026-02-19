@@ -7,7 +7,7 @@ import {
   type Observable,
   type TimerObservable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 /*
@@ -67,7 +67,7 @@ export const withInitialValueTestCases: readonly [
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
       const { startSource, combined1$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(combined1$, startSource);
+      return getStreamHistoryAsPromise(combined1$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, timer$, combined1$ } = createStreams(tick);
@@ -101,7 +101,7 @@ export const withInitialValueTestCases: readonly [
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
       const { startSource, combined2$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(combined2$, startSource);
+      return getStreamHistoryAsPromise(combined2$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, timer$, combined2$ } = createStreams(tick);

@@ -4,7 +4,7 @@ import {
   takeWhile,
   type Observable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 const createStreams = (
@@ -36,7 +36,7 @@ export const takeWhileTestCases: readonly [StreamTestCase<number>] = [
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, takeWhile$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(takeWhile$, startSource);
+      return getStreamHistoryAsPromise(takeWhile$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, takeWhile$ } = createStreams(tick);

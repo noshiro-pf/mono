@@ -12,7 +12,7 @@
 
 > **timer**(`milliSeconds`, `startManually?`): [`TimerObservable`](../types/observable-family.md#timerobservable)
 
-Defined in: [core/create/timer.mts:22](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/timer.mts#L22)
+Defined in: [core/create/timer.mts:41](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/timer.mts#L41)
 
 Creates an observable that emits 0 after a specified delay and then completes.
 
@@ -39,10 +39,29 @@ An observable that emits after delay
 #### Example
 
 ```ts
-const delayed$ = timer(1000);
+//  Timeline:
+//
+//  Time(ms)  0     ...   1000
+//  delayed$                X (emits and completes)
+//
+//  Explanation:
+//  - timer emits once after the specified delay, then completes
+//  - Useful for delayed actions or timeouts
 
-delayed$.subscribe(() => {
-  console.log('1 second passed');
+const delayed$ = timer(100);
+
+const mut_history: number[] = [];
+
+await new Promise<void>((resolve) => {
+  delayed$.subscribe(
+    () => {
+      mut_history.push(1);
+    },
+    () => {
+      resolve();
+    },
+  );
 });
-// After 1 second, logs: 1 second passed
+
+assert.deepStrictEqual(mut_history, [1]);
 ```

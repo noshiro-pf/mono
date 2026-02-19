@@ -5,7 +5,7 @@ import {
   withBufferedFrom,
   type Observable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 /*
@@ -65,7 +65,7 @@ export const withBufferedFromTestCases: readonly [
     run: (tick: number): Promise<DeepReadonly<[number, number[]][]>> => {
       const { startSource, withBufferedFrom$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(withBufferedFrom$, startSource);
+      return getStreamHistoryAsPromise(withBufferedFrom$, startSource);
     },
     preview: (tick: number): void => {
       const {

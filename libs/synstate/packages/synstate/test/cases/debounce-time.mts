@@ -8,7 +8,7 @@ import {
   take,
   type Observable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 /*
@@ -121,7 +121,7 @@ export const debounceTimeTestCases: readonly [
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
       const { startSource, debouncedWithIndex$ } = createStreams1(tick);
 
-      return getStreamOutputAsPromise(debouncedWithIndex$, startSource);
+      return getStreamHistoryAsPromise(debouncedWithIndex$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, filtered$, debounced$, debouncedWithIndex$ } =
@@ -169,7 +169,7 @@ export const debounceTimeTestCases: readonly [
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
       const { startSource, combined$ } = createStreams2(tick);
 
-      return getStreamOutputAsPromise(combined$, startSource);
+      return getStreamHistoryAsPromise(combined$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, even$, debounced$, combined$ } =

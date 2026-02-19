@@ -12,7 +12,7 @@
 
 > **createReducer**\<`S`, `A`\>(`reducer`, `initialState`): readonly \[[`InitializedObservable`](../core/types/observable.md#initializedobservable)\<`S`\>, (`action`) => `S`, () => `S`\]
 
-Defined in: [utils/create-reducer.mts:34](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-reducer.mts#L34)
+Defined in: [utils/create-reducer.mts:46](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-reducer.mts#L46)
 
 Creates a reducer-based state management container following the Redux pattern.
 Actions are dispatched to update the state according to the reducer function.
@@ -66,9 +66,21 @@ const [state, dispatch] = createReducer(
   0,
 );
 
+const mut_history: number[] = [];
+
 state.subscribe((value: number) => {
-  console.log(value);
+  mut_history.push(value);
 });
 
+assert.deepStrictEqual(mut_history, [0]);
+
 dispatch({ type: 'increment' }); // logs: 1
+
+assert.deepStrictEqual(mut_history, [0, 1]);
+
+dispatch({ type: 'increment' });
+
+dispatch({ type: 'decrement' });
+
+assert.deepStrictEqual(mut_history, [0, 1, 2, 1]);
 ```

@@ -12,7 +12,7 @@
 
 > **createBooleanState**(`initialState`): readonly \[[`InitializedObservable`](../core/types/observable.md#initializedobservable)\<`boolean`\>, `Readonly`\<\{ `getSnapshot`: () => `boolean`; `resetState`: () => `boolean`; `setFalse`: () => `void`; `setState`: (`next`) => `boolean`; `setTrue`: () => `void`; `toggle`: () => `boolean`; `updateState`: (`updateFn`) => `boolean`; \}\>\]
 
-Defined in: [utils/create-state.mts:105](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-state.mts#L105)
+Defined in: [utils/create-state.mts:125](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-state.mts#L125)
 
 Creates a reactive boolean state with convenient methods for boolean operations.
 Extends `createState` with boolean-specific helpers like `toggle`, `setTrue`, and `setFalse`.
@@ -36,15 +36,25 @@ An object with the state observable and boolean-specific methods
 ```ts
 const [state, { setTrue, toggle }] = createBooleanState(false);
 
+const mut_history: boolean[] = [];
+
 state.subscribe((value: boolean) => {
-  console.log(value);
-}); // logs: false
+  mut_history.push(value);
+});
+
+assert.deepStrictEqual(mut_history, [false]);
 
 setTrue(); // logs: true
 
+assert.deepStrictEqual(mut_history, [false, true]);
+
 toggle(); // logs: false
 
+assert.deepStrictEqual(mut_history, [false, true, false]);
+
 toggle(); // logs: true
+
+assert.deepStrictEqual(mut_history, [false, true, false, true]);
 ```
 
 ***
@@ -53,7 +63,7 @@ toggle(); // logs: true
 
 > **createState**\<`S`\>(`initialState`): readonly \[[`InitializedObservable`](../core/types/observable.md#initializedobservable)\<`S`\>, (`v`) => `S`, `Readonly`\<\{ `getSnapshot`: () => `S`; `resetState`: () => `S`; `updateState`: (`updateFn`) => `S`; \}\>\]
 
-Defined in: [utils/create-state.mts:48](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-state.mts#L48)
+Defined in: [utils/create-state.mts:58](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-state.mts#L58)
 
 Creates a reactive state container with getter and setter methods.
 Provides a simple state management solution with observable state.
@@ -85,13 +95,23 @@ An object containing the state observable and methods to manipulate it
 ```ts
 const [state, setState, { updateState, resetState }] = createState(0);
 
+const mut_history: number[] = [];
+
 state.subscribe((value: number) => {
-  console.log(value);
-}); // logs: 0
+  mut_history.push(value);
+});
+
+assert.deepStrictEqual(mut_history, [0]);
 
 setState(10); // logs: 10
 
+assert.deepStrictEqual(mut_history, [0, 10]);
+
 updateState((prev: number) => prev + 1); // logs: 11
 
+assert.deepStrictEqual(mut_history, [0, 10, 11]);
+
 resetState(); // logs: 0
+
+assert.deepStrictEqual(mut_history, [0, 10, 11, 0]);
 ```

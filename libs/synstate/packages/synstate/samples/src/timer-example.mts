@@ -1,9 +1,35 @@
 import { timer } from 'synstate';
-// embed-sample-code-ignore-above
 
-const delayed$ = timer(1000);
+if (import.meta.vitest !== undefined) {
+  test(timer, async () => {
+    // embed-sample-code-ignore-above
 
-delayed$.subscribe(() => {
-  console.log('1 second passed');
-});
-// After 1 second, logs: 1 second passed
+    //  Timeline:
+    //
+    //  Time(ms)  0     ...   1000
+    //  delayed$                X (emits and completes)
+    //
+    //  Explanation:
+    //  - timer emits once after the specified delay, then completes
+    //  - Useful for delayed actions or timeouts
+
+    const delayed$ = timer(100);
+
+    const mut_history: number[] = [];
+
+    await new Promise<void>((resolve) => {
+      delayed$.subscribe(
+        () => {
+          mut_history.push(1);
+        },
+        () => {
+          resolve();
+        },
+      );
+    });
+
+    assert.deepStrictEqual(mut_history, [1]);
+
+    // embed-sample-code-ignore-below
+  });
+}

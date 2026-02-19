@@ -12,7 +12,7 @@
 
 > `const` **getKey**: \<`A`, `K`\>(`key`) => [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`A`, `A`\[`K`\]\> = `pluck`
 
-Defined in: [core/operators/map-with-index.mts:64](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L64)
+Defined in: [core/operators/map-with-index.mts:79](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L79)
 
 #### Type Parameters
 
@@ -40,7 +40,7 @@ Defined in: [core/operators/map-with-index.mts:64](https://github.com/noshiro-pf
 
 > `const` **withIndex**: \<`A`\>() => [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`A`, readonly \[`SafeUint` \| `-1`, `A`\]\> = `attachIndex`
 
-Defined in: [core/operators/map-with-index.mts:71](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L71)
+Defined in: [core/operators/map-with-index.mts:86](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L86)
 
 #### Type Parameters
 
@@ -58,7 +58,7 @@ Defined in: [core/operators/map-with-index.mts:71](https://github.com/noshiro-pf
 
 > **attachIndex**\<`A`\>(): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`A`, readonly \[`SafeUint` \| `-1`, `A`\]\>
 
-Defined in: [core/operators/map-with-index.mts:66](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L66)
+Defined in: [core/operators/map-with-index.mts:81](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L81)
 
 #### Type Parameters
 
@@ -76,7 +76,7 @@ Defined in: [core/operators/map-with-index.mts:66](https://github.com/noshiro-pf
 
 > **map**\<`A`, `B`\>(`mapFn`): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`A`, `B`\>
 
-Defined in: [core/operators/map-with-index.mts:54](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L54)
+Defined in: [core/operators/map-with-index.mts:69](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L69)
 
 #### Type Parameters
 
@@ -104,7 +104,7 @@ Defined in: [core/operators/map-with-index.mts:54](https://github.com/noshiro-pf
 
 > **mapOptional**\<`O`, `B`\>(`mapFn`): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`O`, `Optional`\<`B`\>\>
 
-Defined in: [core/operators/map-with-index.mts:90](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L90)
+Defined in: [core/operators/map-with-index.mts:105](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L105)
 
 #### Type Parameters
 
@@ -132,7 +132,7 @@ Defined in: [core/operators/map-with-index.mts:90](https://github.com/noshiro-pf
 
 > **mapResultErr**\<`R`, `E2`\>(`mapFn`): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`R`, `Result`\<`UnwrapOk`\<`R`\>, `E2`\>\>
 
-Defined in: [core/operators/map-with-index.mts:100](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L100)
+Defined in: [core/operators/map-with-index.mts:115](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L115)
 
 #### Type Parameters
 
@@ -160,7 +160,7 @@ Defined in: [core/operators/map-with-index.mts:100](https://github.com/noshiro-p
 
 > **mapResultOk**\<`R`, `S2`\>(`mapFn`): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`R`, `Result`\<`S2`, `UnwrapErr`\<`R`\>\>\>
 
-Defined in: [core/operators/map-with-index.mts:95](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L95)
+Defined in: [core/operators/map-with-index.mts:110](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L110)
 
 #### Type Parameters
 
@@ -188,7 +188,7 @@ Defined in: [core/operators/map-with-index.mts:95](https://github.com/noshiro-pf
 
 > **mapTo**\<`A`, `B`\>(`value`): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`A`, `B`\>
 
-Defined in: [core/operators/map-with-index.mts:57](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L57)
+Defined in: [core/operators/map-with-index.mts:72](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L72)
 
 #### Type Parameters
 
@@ -216,7 +216,7 @@ Defined in: [core/operators/map-with-index.mts:57](https://github.com/noshiro-pf
 
 > **mapWithIndex**\<`A`, `B`\>(`mapFn`): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`A`, `B`\>
 
-Defined in: [core/operators/map-with-index.mts:42](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L42)
+Defined in: [core/operators/map-with-index.mts:57](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L57)
 
 Transforms each value emitted by the source using a mapping function that also receives the emission index.
 
@@ -251,17 +251,32 @@ An operator that maps values with index
 #### Example
 
 ```ts
-const num$ = source<number>();
+//  Timeline:
+//
+//  num$      "a"      "b"      "c"
+//  indexed$  "0: a"   "1: b"   "2: c"
+//
+//  Explanation:
+//  - mapWithIndex transforms each value along with its index
+//  - Index starts at 0 and increments with each emission
+
+const num$ = source<string>();
 
 const indexed$ = num$.pipe(mapWithIndex((x, i) => `${i}: ${x}`));
 
+const mut_history: string[] = [];
+
 indexed$.subscribe((s) => {
-  console.log(s);
+  mut_history.push(s);
 });
 
-num$.next(10); // logs: 0: 10
+num$.next('a'); // 0: a
 
-num$.next(20); // logs: 1: 20
+num$.next('b'); // 1: b
+
+num$.next('c'); // 2: c
+
+assert.deepStrictEqual(mut_history, ['0: a', '1: b', '2: c']);
 ```
 
 ***
@@ -270,7 +285,7 @@ num$.next(20); // logs: 1: 20
 
 > **pluck**\<`A`, `K`\>(`key`): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`A`, `A`\[`K`\]\>
 
-Defined in: [core/operators/map-with-index.mts:60](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L60)
+Defined in: [core/operators/map-with-index.mts:75](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L75)
 
 #### Type Parameters
 
@@ -298,7 +313,7 @@ Defined in: [core/operators/map-with-index.mts:60](https://github.com/noshiro-pf
 
 > **unwrapOptional**\<`O`\>(): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`O`, `Unwrap`\<`O`\> \| `undefined`\>
 
-Defined in: [core/operators/map-with-index.mts:73](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L73)
+Defined in: [core/operators/map-with-index.mts:88](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L88)
 
 #### Type Parameters
 
@@ -316,7 +331,7 @@ Defined in: [core/operators/map-with-index.mts:73](https://github.com/noshiro-pf
 
 > **unwrapResultErr**\<`R`\>(): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`R`, `UnwrapErr`\<`R`\> \| `undefined`\>
 
-Defined in: [core/operators/map-with-index.mts:85](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L85)
+Defined in: [core/operators/map-with-index.mts:100](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L100)
 
 #### Type Parameters
 
@@ -334,7 +349,7 @@ Defined in: [core/operators/map-with-index.mts:85](https://github.com/noshiro-pf
 
 > **unwrapResultOk**\<`R`\>(): [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`R`, `UnwrapOk`\<`R`\> \| `undefined`\>
 
-Defined in: [core/operators/map-with-index.mts:79](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L79)
+Defined in: [core/operators/map-with-index.mts:94](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/map-with-index.mts#L94)
 
 #### Type Parameters
 

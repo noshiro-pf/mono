@@ -12,7 +12,7 @@
 
 > **createEventEmitter**(): readonly \[[`Observable`](../core/types/observable.md#observable)\<`void`\>, () => `void`\]
 
-Defined in: [utils/create-event-emitter.mts:20](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-event-emitter.mts#L20)
+Defined in: [utils/create-event-emitter.mts:30](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-event-emitter.mts#L30)
 
 Creates an event emitter for void events (events without payload).
 Returns a tuple of [observable, emitter function].
@@ -28,11 +28,21 @@ A tuple containing the observable and the emitter function
 ```ts
 const [click$, emitClick] = createEventEmitter();
 
+const mut_clickCount = { value: 0 };
+
 click$.subscribe(() => {
-  console.log('Clicked!');
+  mut_clickCount.value += 1;
 });
 
 emitClick(); // logs: Clicked!
+
+assert.deepStrictEqual(mut_clickCount.value, 1);
+
+emitClick();
+
+emitClick();
+
+assert.deepStrictEqual(mut_clickCount.value, 3);
 ```
 
 ***
@@ -41,7 +51,7 @@ emitClick(); // logs: Clicked!
 
 > **createValueEmitter**\<`A`\>(): readonly \[[`Observable`](../core/types/observable.md#observable)\<`A`\>, (`value`) => `void`\]
 
-Defined in: [utils/create-event-emitter.mts:51](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-event-emitter.mts#L51)
+Defined in: [utils/create-event-emitter.mts:69](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-event-emitter.mts#L69)
 
 Creates an event emitter with typed payload.
 Returns a tuple of [observable, emitter function].
@@ -65,9 +75,17 @@ A tuple containing the observable and the emitter function
 ```ts
 const [message$, emitMessage] = createValueEmitter<string>();
 
+const mut_history: string[] = [];
+
 message$.subscribe((msg) => {
-  console.log(msg);
+  mut_history.push(msg);
 });
 
 emitMessage('Hello'); // logs: Hello
+
+assert.deepStrictEqual(mut_history, ['Hello']);
+
+emitMessage('World');
+
+assert.deepStrictEqual(mut_history, ['Hello', 'World']);
 ```

@@ -24,7 +24,7 @@ Defined in: [core/types/observable-family.mts:241](https://github.com/noshiro-pf
 
 ### CombineObservable
 
-> **CombineObservable**\<`A`\> = `SyncFlowInternals.CombineObservableImpl`\<`A`\>
+> **CombineObservable**\<`A`\> = `SynStateInternals.CombineObservableImpl`\<`A`\>
 
 Defined in: [core/types/observable-family.mts:166](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/types/observable-family.mts#L166)
 
@@ -38,7 +38,7 @@ Defined in: [core/types/observable-family.mts:166](https://github.com/noshiro-pf
 
 ### CombineObservableRefined
 
-> **CombineObservableRefined**\<`OS`\> = `SyncFlowInternals.CombineObservableRefinedImpl`\<`OS`\>
+> **CombineObservableRefined**\<`OS`\> = `SynStateInternals.CombineObservableRefinedImpl`\<`OS`\>
 
 Defined in: [core/types/observable-family.mts:169](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/types/observable-family.mts#L169)
 
@@ -188,7 +188,7 @@ Defined in: [core/types/observable-family.mts:256](https://github.com/noshiro-pf
 
 ### MergeObservable
 
-> **MergeObservable**\<`A`\> = `SyncFlowInternals.MergeObservableImpl`\<`A`\>
+> **MergeObservable**\<`A`\> = `SynStateInternals.MergeObservableImpl`\<`A`\>
 
 Defined in: [core/types/observable-family.mts:180](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/types/observable-family.mts#L180)
 
@@ -202,7 +202,7 @@ Defined in: [core/types/observable-family.mts:180](https://github.com/noshiro-pf
 
 ### MergeObservableRefined
 
-> **MergeObservableRefined**\<`OS`\> = `SyncFlowInternals.MergeObservableRefinedImpl`\<`OS`\>
+> **MergeObservableRefined**\<`OS`\> = `SynStateInternals.MergeObservableRefinedImpl`\<`OS`\>
 
 Defined in: [core/types/observable-family.mts:183](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/types/observable-family.mts#L183)
 
@@ -440,7 +440,7 @@ Defined in: [core/types/observable-family.mts:56](https://github.com/noshiro-pf/
 
 ### ZipObservable
 
-> **ZipObservable**\<`A`\> = `SyncFlowInternals.ZipObservableImpl`\<`A`\>
+> **ZipObservable**\<`A`\> = `SynStateInternals.ZipObservableImpl`\<`A`\>
 
 Defined in: [core/types/observable-family.mts:173](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/types/observable-family.mts#L173)
 
@@ -454,7 +454,7 @@ Defined in: [core/types/observable-family.mts:173](https://github.com/noshiro-pf
 
 ### ZipObservableRefined
 
-> **ZipObservableRefined**\<`OS`\> = `SyncFlowInternals.ZipObservableRefinedImpl`\<`OS`\>
+> **ZipObservableRefined**\<`OS`\> = `SynStateInternals.ZipObservableRefinedImpl`\<`OS`\>
 
 Defined in: [core/types/observable-family.mts:176](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/types/observable-family.mts#L176)
 

@@ -60,6 +60,14 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/debounce-time-example.mts'],
   },
   {
+    sourcePath: 'src/core/operators/throttle-time.mts',
+    sampleFiles: ['samples/src/throttle-time-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/operators/audit-time.mts',
+    sampleFiles: ['samples/src/audit-time-example.mts'],
+  },
+  {
     sourcePath: 'src/core/operators/with-initial-value.mts',
     sampleFiles: ['samples/src/with-initial-value-example.mts'],
   },
@@ -76,6 +84,18 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/take-until-example.mts'],
   },
   {
+    sourcePath: 'src/core/operators/take-while.mts',
+    sampleFiles: ['samples/src/take-while-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/operators/skip-until.mts',
+    sampleFiles: ['samples/src/skip-until-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/operators/skip-while.mts',
+    sampleFiles: ['samples/src/skip-while-example.mts'],
+  },
+  {
     sourcePath: 'src/core/operators/throttle-time.mts',
     sampleFiles: ['samples/src/throttle-time-example.mts'],
   },
@@ -90,6 +110,14 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
     sourcePath: 'src/core/operators/merge-map.mts',
     sampleFiles: ['samples/src/merge-map-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/operators/with-buffered-from.mts',
+    sampleFiles: ['samples/src/with-buffered-from-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/operators/with-current-value-from.mts',
+    sampleFiles: ['samples/src/with-current-value-from-example.mts'],
   },
   // Combination
   {
@@ -124,5 +152,9 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
     sourcePath: 'src/core/create/timer.mts',
     sampleFiles: ['samples/src/timer-example.mts'],
+  },
+  {
+    sourcePath: 'src/core/create/from-subscribable.mts',
+    sampleFiles: ['samples/src/from-subscribable-example.mts'],
   },
 ] as const;

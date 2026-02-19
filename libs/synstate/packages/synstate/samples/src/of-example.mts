@@ -1,8 +1,34 @@
 import { of } from 'synstate';
-// embed-sample-code-ignore-above
 
-const num$ = of(42);
+if (import.meta.vitest !== undefined) {
+  test(of, async () => {
+    // embed-sample-code-ignore-above
 
-num$.subscribe((x) => {
-  console.log(x);
-}); // logs: 42
+    //  Timeline:
+    //
+    //  num$    42  | (completes immediately)
+    //
+    //  Explanation:
+    //  - of creates an observable that emits a single value, then completes
+    //  - Useful for converting a static value into an observable
+
+    const num$ = of(42);
+
+    const mut_history: number[] = [];
+
+    await new Promise<void>((resolve) => {
+      num$.subscribe(
+        (x) => {
+          mut_history.push(x);
+        },
+        () => {
+          resolve();
+        },
+      );
+    });
+
+    assert.deepStrictEqual(mut_history, [42]);
+
+    // embed-sample-code-ignore-below
+  });
+}

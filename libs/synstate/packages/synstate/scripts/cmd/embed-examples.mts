@@ -19,7 +19,6 @@ const documents: DeepReadonly<
     samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
     sampleCodeFiles: [
       '01-simple-state.mts',
-      '02-event-emitter.mts',
       '03-react-example.tsx',
       '04-global-counter.tsx',
       '05-event-driven.tsx',
@@ -27,6 +26,7 @@ const documents: DeepReadonly<
       '07-dark-mode.tsx',
       '08-cross-component.tsx',
       '09-search-debounce.tsx',
+      '10-event-emitter-throttle.tsx',
     ],
   },
 ] as const;

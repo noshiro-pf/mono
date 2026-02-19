@@ -10,11 +10,21 @@ import { source, type Observable } from '../core/index.mjs';
  * ```ts
  * const [click$, emitClick] = createEventEmitter();
  *
+ * const mut_clickCount = { value: 0 };
+ *
  * click$.subscribe(() => {
- *   console.log('Clicked!');
+ *   mut_clickCount.value += 1;
  * });
  *
  * emitClick(); // logs: Clicked!
+ *
+ * assert.deepStrictEqual(mut_clickCount.value, 1);
+ *
+ * emitClick();
+ *
+ * emitClick();
+ *
+ * assert.deepStrictEqual(mut_clickCount.value, 3);
  * ```
  */
 export const createEventEmitter = (): readonly [
@@ -41,11 +51,19 @@ export const createEventEmitter = (): readonly [
  * ```ts
  * const [message$, emitMessage] = createValueEmitter<string>();
  *
+ * const mut_history: string[] = [];
+ *
  * message$.subscribe((msg) => {
- *   console.log(msg);
+ *   mut_history.push(msg);
  * });
  *
  * emitMessage('Hello'); // logs: Hello
+ *
+ * assert.deepStrictEqual(mut_history, ['Hello']);
+ *
+ * emitMessage('World');
+ *
+ * assert.deepStrictEqual(mut_history, ['Hello', 'World']);
  * ```
  */
 export const createValueEmitter = <A,>(): readonly [

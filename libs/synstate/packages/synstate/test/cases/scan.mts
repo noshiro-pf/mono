@@ -1,5 +1,5 @@
 import { interval, scan, take, type Observable } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 const createStreams = (
@@ -31,7 +31,7 @@ export const scanTestCases: readonly [StreamTestCase<number>] = [
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, scan$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(scan$, startSource);
+      return getStreamHistoryAsPromise(scan$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, scan$ } = createStreams(tick);

@@ -1,14 +1,46 @@
 import { filter, source } from 'synstate';
-// embed-sample-code-ignore-above
 
-const num$ = source<number>();
+if (import.meta.vitest !== undefined) {
+  test(filter, () => {
+    // embed-sample-code-ignore-above
 
-const even$ = num$.pipe(filter((x) => x % 2 === 0));
+    //  Timeline:
+    //
+    //  num$          1     2     3     4     5     6
+    //  even$               2           4           6
+    //
+    //  Explanation:
+    //  - filter passes through only values that satisfy the predicate
+    //  - Only even numbers (2, 4, 6) are emitted
 
-even$.subscribe((x) => {
-  console.log(x);
-});
+    const num$ = source<number>();
 
-num$.next(1); // nothing logged
+    const even$ = num$.pipe(filter((x) => x % 2 === 0));
 
-num$.next(2); // logs: 2
+    const mut_history: number[] = [];
+
+    even$.subscribe((x) => {
+      mut_history.push(x);
+    });
+
+    num$.next(1); // nothing logged
+
+    num$.next(2); // logs: 2
+
+    assert.deepStrictEqual(mut_history, [2]);
+
+    num$.next(3); // nothing logged
+
+    num$.next(4); // logs: 4
+
+    assert.deepStrictEqual(mut_history, [2, 4]);
+
+    num$.next(5);
+
+    num$.next(6);
+
+    assert.deepStrictEqual(mut_history, [2, 4, 6]);
+
+    // embed-sample-code-ignore-below
+  });
+}

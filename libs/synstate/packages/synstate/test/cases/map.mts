@@ -1,5 +1,5 @@
 import { interval, map, take, type Observable } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 const createStreams = (
@@ -43,7 +43,7 @@ export const mapTestCases: readonly [
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, double$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(double$, () => {
+      return getStreamHistoryAsPromise(double$, () => {
         startSource();
       });
     },
@@ -67,7 +67,7 @@ export const mapTestCases: readonly [
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, quad1$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(quad1$, startSource);
+      return getStreamHistoryAsPromise(quad1$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, quad1$ } = createStreams(tick);
@@ -89,7 +89,7 @@ export const mapTestCases: readonly [
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, quad2$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(quad2$, startSource);
+      return getStreamHistoryAsPromise(quad2$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, quad2$ } = createStreams(tick);

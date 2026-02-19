@@ -1,6 +1,6 @@
 import { Result } from 'ts-data-forge';
 import { fromPromise, type Observable } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 const valueToEmit = 1;
@@ -24,7 +24,7 @@ export const fromPromiseTestCases: readonly [
     run: (tick: number): Promise<readonly Result<number, unknown>[]> => {
       const source$ = createStream(tick);
 
-      return getStreamOutputAsPromise(source$, () => {});
+      return getStreamHistoryAsPromise(source$, () => {});
     },
     preview: (tick: number): void => {
       const source$ = createStream(tick);

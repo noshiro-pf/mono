@@ -26,17 +26,32 @@ import { withInitialValue } from './with-initial-value.mjs';
  *
  * @example
  * ```ts
- * const num$ = source<number>();
+ * //  Timeline:
+ * //
+ * //  num$      "a"      "b"      "c"
+ * //  indexed$  "0: a"   "1: b"   "2: c"
+ * //
+ * //  Explanation:
+ * //  - mapWithIndex transforms each value along with its index
+ * //  - Index starts at 0 and increments with each emission
+ *
+ * const num$ = source<string>();
  *
  * const indexed$ = num$.pipe(mapWithIndex((x, i) => `${i}: ${x}`));
  *
+ * const mut_history: string[] = [];
+ *
  * indexed$.subscribe((s) => {
- *   console.log(s);
+ *   mut_history.push(s);
  * });
  *
- * num$.next(10); // logs: 0: 10
+ * num$.next('a'); // 0: a
  *
- * num$.next(20); // logs: 1: 20
+ * num$.next('b'); // 1: b
+ *
+ * num$.next('c'); // 2: c
+ *
+ * assert.deepStrictEqual(mut_history, ['0: a', '1: b', '2: c']);
  * ```
  */
 export const mapWithIndex = <A, B>(

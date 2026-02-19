@@ -1,16 +1,52 @@
 import { pairwise, source } from 'synstate';
-// embed-sample-code-ignore-above
 
-const num$ = source<number>();
+if (import.meta.vitest !== undefined) {
+  test(pairwise, () => {
+    // embed-sample-code-ignore-above
 
-const pairs$ = num$.pipe(pairwise());
+    //  Timeline:
+    //
+    //  num$      1     2     3     4
+    //  pairs$          [1,2] [2,3] [3,4]
+    //
+    //  Explanation:
+    //  - pairwise emits the current and previous values as a tuple
+    //  - Nothing is emitted for the first value (no previous value yet)
+    //  - Useful for tracking changes between consecutive values
 
-pairs$.subscribe(([prev, curr]) => {
-  console.log(prev, curr);
-});
+    const num$ = source<number>();
 
-num$.next(1); // nothing logged
+    const pairs$ = num$.pipe(pairwise());
 
-num$.next(2); // logs: 1, 2
+    const mut_history: (readonly [number, number])[] = [];
 
-num$.next(3); // logs: 2, 3
+    pairs$.subscribe(([prev, curr]) => {
+      mut_history.push([prev, curr]);
+    });
+
+    num$.next(1); // nothing logged
+
+    assert.deepStrictEqual(mut_history, []);
+
+    num$.next(2); // logs: 1, 2
+
+    assert.deepStrictEqual(mut_history, [[1, 2]]);
+
+    num$.next(3); // logs: 2, 3
+
+    assert.deepStrictEqual(mut_history, [
+      [1, 2],
+      [2, 3],
+    ]);
+
+    num$.next(4); // logs: 3, 4
+
+    assert.deepStrictEqual(mut_history, [
+      [1, 2],
+      [2, 3],
+      [3, 4],
+    ]);
+
+    // embed-sample-code-ignore-below
+  });
+}

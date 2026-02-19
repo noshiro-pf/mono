@@ -12,7 +12,7 @@
 
 > **merge**\<`OS`\>(`parents`): [`MergeObservableRefined`](../types/observable-family.md#mergeobservablerefined)\<`OS`\>
 
-Defined in: [core/combine/merge.mts:39](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/combine/merge.mts#L39)
+Defined in: [core/combine/merge.mts:65](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/combine/merge.mts#L65)
 
 Merges multiple observables into a single observable that emits all values from all sources.
 Emits whenever any source observable emits a value.
@@ -42,16 +42,42 @@ A merged observable emitting values from any source
 #### Example
 
 ```ts
-const clicks$ = source<MouseEvent>();
+//  Timeline:
+//
+//  clicks$   c1          c2                    c3
+//  keys$               k1          k2                    k3
+//  events$   c1        k1    c2    k2          c3        k3
+//
+//  Explanation:
+//  - merge combines multiple observables into one
+//  - Emits values from any source as they arrive
+//  - Order is preserved based on emission time
 
-const keys$ = source<KeyboardEvent>();
+const clicks$ = source<string>();
+
+const keys$ = source<string>();
 
 const events$ = merge([clicks$, keys$]);
 
+const mut_history: string[] = [];
+
 events$.subscribe((event_) => {
-  console.log(event_);
+  mut_history.push(event_);
 });
-// Logs any mouse click or keyboard event
+
+clicks$.next('c1');
+
+assert.deepStrictEqual(mut_history, ['c1']);
+
+keys$.next('k1');
+
+assert.deepStrictEqual(mut_history, ['c1', 'k1']);
+
+clicks$.next('c2');
+
+keys$.next('k2');
+
+assert.deepStrictEqual(mut_history, ['c1', 'k1', 'c2', 'k2']);
 ```
 
 #### Note

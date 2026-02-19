@@ -34,15 +34,25 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
  * ```ts
  * const [state, setState, { updateState, resetState }] = createState(0);
  *
+ * const mut_history: number[] = [];
+ *
  * state.subscribe((value: number) => {
- *   console.log(value);
- * }); // logs: 0
+ *   mut_history.push(value);
+ * });
+ *
+ * assert.deepStrictEqual(mut_history, [0]);
  *
  * setState(10); // logs: 10
  *
+ * assert.deepStrictEqual(mut_history, [0, 10]);
+ *
  * updateState((prev: number) => prev + 1); // logs: 11
  *
+ * assert.deepStrictEqual(mut_history, [0, 10, 11]);
+ *
  * resetState(); // logs: 0
+ *
+ * assert.deepStrictEqual(mut_history, [0, 10, 11, 0]);
  * ```
  */
 export const createState = <S,>(
@@ -91,15 +101,25 @@ export const createState = <S,>(
  * ```ts
  * const [state, { setTrue, toggle }] = createBooleanState(false);
  *
+ * const mut_history: boolean[] = [];
+ *
  * state.subscribe((value: boolean) => {
- *   console.log(value);
- * }); // logs: false
+ *   mut_history.push(value);
+ * });
+ *
+ * assert.deepStrictEqual(mut_history, [false]);
  *
  * setTrue(); // logs: true
  *
+ * assert.deepStrictEqual(mut_history, [false, true]);
+ *
  * toggle(); // logs: false
  *
+ * assert.deepStrictEqual(mut_history, [false, true, false]);
+ *
  * toggle(); // logs: true
+ *
+ * assert.deepStrictEqual(mut_history, [false, true, false, true]);
  * ```
  */
 export const createBooleanState = (

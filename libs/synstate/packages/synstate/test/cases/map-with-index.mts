@@ -5,7 +5,7 @@ import {
   take,
   type Observable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 const createStreams = (
@@ -51,7 +51,7 @@ export const mapWithIndexTestCases: readonly [
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
       const { startSource, doubleWithIndex$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(doubleWithIndex$, startSource);
+      return getStreamHistoryAsPromise(doubleWithIndex$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, doubleWithIndex$ } = createStreams(tick);

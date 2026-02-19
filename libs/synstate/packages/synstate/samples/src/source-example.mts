@@ -1,12 +1,38 @@
 import { source } from 'synstate';
-// embed-sample-code-ignore-above
 
-const count$ = source<number>();
+if (import.meta.vitest !== undefined) {
+  test(source, () => {
+    // embed-sample-code-ignore-above
 
-count$.subscribe((value) => {
-  console.log(value);
-});
+    //  Timeline:
+    //
+    //  count$    1     2     3     ...
+    //
+    //  Explanation:
+    //  - source creates a new observable that you can manually emit values to
+    //  - Use .next() to emit values
+    //  - Foundation for building custom observables
 
-count$.next(1); // logs: 1
+    const count$ = source<number>();
 
-count$.next(2); // logs: 2
+    const mut_history: number[] = [];
+
+    count$.subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    count$.next(1); // logs: 1
+
+    assert.deepStrictEqual(mut_history, [1]);
+
+    count$.next(2); // logs: 2
+
+    assert.deepStrictEqual(mut_history, [1, 2]);
+
+    count$.next(3); // logs: 3
+
+    assert.deepStrictEqual(mut_history, [1, 2, 3]);
+
+    // embed-sample-code-ignore-below
+  });
+}

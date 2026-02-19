@@ -1,14 +1,31 @@
 import { createBooleanState } from 'synstate';
-// embed-sample-code-ignore-above
 
-const [state, { setTrue, toggle }] = createBooleanState(false);
+if (import.meta.vitest !== undefined) {
+  test(createBooleanState, () => {
+    // embed-sample-code-ignore-above
 
-state.subscribe((value: boolean) => {
-  console.log(value);
-}); // logs: false
+    const [state, { setTrue, toggle }] = createBooleanState(false);
 
-setTrue(); // logs: true
+    const mut_history: boolean[] = [];
 
-toggle(); // logs: false
+    state.subscribe((value: boolean) => {
+      mut_history.push(value);
+    });
 
-toggle(); // logs: true
+    assert.deepStrictEqual(mut_history, [false]);
+
+    setTrue(); // logs: true
+
+    assert.deepStrictEqual(mut_history, [false, true]);
+
+    toggle(); // logs: false
+
+    assert.deepStrictEqual(mut_history, [false, true, false]);
+
+    toggle(); // logs: true
+
+    assert.deepStrictEqual(mut_history, [false, true, false, true]);
+
+    // embed-sample-code-ignore-below
+  });
+}

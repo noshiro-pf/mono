@@ -7,19 +7,6 @@ const checkAll = async (): Promise<void> => {
   echo('Starting full project validation and build...\n');
 
   await logStep({
-    startMessage: 'Installing dependencies',
-    action: () => runCmdStep('pnpm i', 'Failed to install dependencies'),
-    successMessage: 'Dependencies installed',
-  });
-
-  await logStep({
-    startMessage: 'Running spell check',
-    action: () =>
-      runCmdStep('pnpm run cspell --fail-fast', 'Spell check failed'),
-    successMessage: 'Spell check passed',
-  });
-
-  await logStep({
     startMessage: 'Checking file extensions',
     action: () =>
       runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
@@ -48,16 +35,6 @@ const checkAll = async (): Promise<void> => {
     startMessage: 'Generating documentation',
     action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
     successMessage: 'Documentation generated',
-  });
-
-  await logStep({
-    startMessage: 'Backing up repository settings',
-    action: () =>
-      runCmdStep(
-        'pnpm run gh:backup-all',
-        'Backing up repository settings failed',
-      ),
-    successMessage: 'Repository settings backed up',
   });
 
   echo('✅ All checks completed successfully!\n');

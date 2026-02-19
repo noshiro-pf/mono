@@ -1,16 +1,45 @@
 import { scan, source } from 'synstate';
-// embed-sample-code-ignore-above
 
-const num$ = source<number>();
+if (import.meta.vitest !== undefined) {
+  test(scan, () => {
+    // embed-sample-code-ignore-above
 
-const sum$ = num$.pipe(scan((acc, curr) => acc + curr, 0));
+    //  Timeline (accumulating sum):
+    //
+    //  num$    1     2     3     4     5
+    //  sum$    1     3     6     10    15
+    //          |     |     |     |     |
+    //          0+1   1+2   3+3   6+4   10+5
+    //
+    //  Explanation:
+    //  - scan accumulates values over time using a reducer function
+    //  - Starting with seed value 0, each emission adds to the accumulator
+    //  - Similar to Array.reduce, but for streams
 
-sum$.subscribe((x) => {
-  console.log(x);
-});
+    const num$ = source<number>();
 
-num$.next(1); // logs: 1
+    const sum$ = num$.pipe(scan((acc, curr) => acc + curr, 0));
 
-num$.next(2); // logs: 3
+    const mut_history: number[] = [];
 
-num$.next(3); // logs: 6
+    sum$.subscribe((x) => {
+      mut_history.push(x);
+    });
+
+    assert.deepStrictEqual(mut_history, [0]);
+
+    num$.next(1); // logs: 1
+
+    assert.deepStrictEqual(mut_history, [0, 1]);
+
+    num$.next(2); // logs: 3
+
+    assert.deepStrictEqual(mut_history, [0, 1, 3]);
+
+    num$.next(3); // logs: 6
+
+    assert.deepStrictEqual(mut_history, [0, 1, 3, 6]);
+
+    // embed-sample-code-ignore-below
+  });
+}

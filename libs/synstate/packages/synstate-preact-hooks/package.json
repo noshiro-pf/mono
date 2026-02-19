@@ -1,7 +1,7 @@
 {
   "name": "synstate-preact-hooks",
   "version": "0.1.0",
-  "description": "Reactive Programming Library for TypeScript/JavaScript",
+  "description": "Type-safe State Management Library for TypeScript/JavaScript",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/synstate.git"

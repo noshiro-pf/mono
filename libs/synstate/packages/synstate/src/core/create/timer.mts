@@ -11,12 +11,31 @@ import { type TimerObservable } from '../types/index.mjs';
  *
  * @example
  * ```ts
- * const delayed$ = timer(1000);
+ * //  Timeline:
+ * //
+ * //  Time(ms)  0     ...   1000
+ * //  delayed$                X (emits and completes)
+ * //
+ * //  Explanation:
+ * //  - timer emits once after the specified delay, then completes
+ * //  - Useful for delayed actions or timeouts
  *
- * delayed$.subscribe(() => {
- *   console.log('1 second passed');
+ * const delayed$ = timer(100);
+ *
+ * const mut_history: number[] = [];
+ *
+ * await new Promise<void>((resolve) => {
+ *   delayed$.subscribe(
+ *     () => {
+ *       mut_history.push(1);
+ *     },
+ *     () => {
+ *       resolve();
+ *     },
+ *   );
  * });
- * // After 1 second, logs: 1 second passed
+ *
+ * assert.deepStrictEqual(mut_history, [1]);
  * ```
  */
 export const timer = (

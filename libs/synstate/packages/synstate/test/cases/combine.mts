@@ -6,7 +6,7 @@ import {
   take,
   type Observable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 /*
@@ -108,7 +108,7 @@ export const combineTestCases: readonly [
     ): Promise<DeepReadonly<[number, number, number, number, number][]>> => {
       const { startSource, combined$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(combined$, startSource);
+      return getStreamHistoryAsPromise(combined$, startSource);
     },
     preview: (tick: number): void => {
       const {
@@ -154,7 +154,7 @@ export const combineTestCases: readonly [
     run: (tick: number): Promise<readonly number[]> => {
       const { startSource, sum$ } = createStreams2(tick);
 
-      return getStreamOutputAsPromise(sum$, startSource);
+      return getStreamHistoryAsPromise(sum$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, sum$ } = createStreams2(tick);

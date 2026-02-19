@@ -13,15 +13,37 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  *
  * @example
  * ```ts
- * const data$ = fromPromise(fetch('/api/data').then((r) => r.json()));
+ * //  Timeline:
+ * //
+ * //  promise     [pending...]  -> resolved/rejected
+ * //  data$                     Ok(value) or Err(error)
+ * //
+ * //  Explanation:
+ * //  - fromPromise converts a Promise into an observable
+ * //  - Emits a Result type: Ok(value) on success, Err(error) on failure
+ * //  - Completes after emitting the result
+ * //  - Useful for integrating async operations into reactive flows
  *
- * data$.subscribe((result) => {
- *   if (Result.isOk(result)) {
- *     console.log('Data:', result.value);
- *   } else {
- *     console.error('Error:', result.value);
- *   }
+ * const fetchData = async (): Promise<{ value: number }> => ({ value: 42 });
+ *
+ * const data$ = fromPromise(fetchData());
+ *
+ * const mut_history: { value: number }[] = [];
+ *
+ * await new Promise<void>((resolve) => {
+ *   data$.subscribe(
+ *     (result) => {
+ *       if (Result.isOk(result)) {
+ *         mut_history.push(result.value);
+ *       }
+ *     },
+ *     () => {
+ *       resolve();
+ *     },
+ *   );
  * });
+ *
+ * assert.deepStrictEqual(mut_history, [{ value: 42 }]);
  * ```
  */
 export const fromPromise = <A, E = unknown>(

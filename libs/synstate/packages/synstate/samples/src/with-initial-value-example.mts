@@ -1,12 +1,41 @@
 import { source, withInitialValue } from 'synstate';
-// embed-sample-code-ignore-above
 
-const num$ = source<number>();
+if (import.meta.vitest !== undefined) {
+  test(withInitialValue, () => {
+    // embed-sample-code-ignore-above
 
-const initialized$ = num$.pipe(withInitialValue(0));
+    //  Timeline:
+    //
+    //  num$             1    2    3
+    //  withInitial$ 0   1    2    3
+    //               ^
+    //               initial value
+    //
+    //  Explanation:
+    //  - withInitialValue provides an initial value before the source emits
+    //  - Converts an uninitialized observable to an initialized one
+    //  - Useful when you need a default value immediately
 
-initialized$.subscribe((x) => {
-  console.log(x);
-}); // immediately logs: 0
+    const num$ = source<number>();
 
-num$.next(1); // logs: 1
+    const initialized$ = num$.pipe(withInitialValue(0));
+
+    const mut_history: number[] = [];
+
+    initialized$.subscribe((x) => {
+      mut_history.push(x);
+    });
+
+    assert.deepStrictEqual(mut_history, [0]);
+
+    num$.next(1); // logs: 1
+
+    assert.deepStrictEqual(mut_history, [0, 1]);
+
+    num$.next(2); // logs: 2
+
+    assert.deepStrictEqual(mut_history, [0, 1, 2]);
+
+    // embed-sample-code-ignore-below
+  });
+}

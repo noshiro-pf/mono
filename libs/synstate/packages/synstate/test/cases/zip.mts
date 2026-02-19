@@ -5,7 +5,7 @@ import {
   zip,
   type Observable,
 } from '../../src/index.mjs';
-import { getStreamOutputAsPromise } from '../get-stream-output-as-promise.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { type StreamTestCase } from '../typedef.mjs';
 
 /*
@@ -62,7 +62,7 @@ export const zipTestCases: readonly [
     run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
       const { startSource, zipped$ } = createStreams(tick);
 
-      return getStreamOutputAsPromise(zipped$, startSource);
+      return getStreamHistoryAsPromise(zipped$, startSource);
     },
     preview: (tick: number): void => {
       const { startSource, counter$, even$, multiplesOf3$, zipped$ } =

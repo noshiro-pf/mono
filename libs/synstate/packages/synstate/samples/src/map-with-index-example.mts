@@ -1,14 +1,36 @@
 import { mapWithIndex, source } from 'synstate';
-// embed-sample-code-ignore-above
 
-const num$ = source<number>();
+if (import.meta.vitest !== undefined) {
+  test(mapWithIndex, () => {
+    // embed-sample-code-ignore-above
 
-const indexed$ = num$.pipe(mapWithIndex((x, i) => `${i}: ${x}`));
+    //  Timeline:
+    //
+    //  num$      "a"      "b"      "c"
+    //  indexed$  "0: a"   "1: b"   "2: c"
+    //
+    //  Explanation:
+    //  - mapWithIndex transforms each value along with its index
+    //  - Index starts at 0 and increments with each emission
 
-indexed$.subscribe((s) => {
-  console.log(s);
-});
+    const num$ = source<string>();
 
-num$.next(10); // logs: 0: 10
+    const indexed$ = num$.pipe(mapWithIndex((x, i) => `${i}: ${x}`));
 
-num$.next(20); // logs: 1: 20
+    const mut_history: string[] = [];
+
+    indexed$.subscribe((s) => {
+      mut_history.push(s);
+    });
+
+    num$.next('a'); // 0: a
+
+    num$.next('b'); // 1: b
+
+    num$.next('c'); // 2: c
+
+    assert.deepStrictEqual(mut_history, ['0: a', '1: b', '2: c']);
+
+    // embed-sample-code-ignore-below
+  });
+}
