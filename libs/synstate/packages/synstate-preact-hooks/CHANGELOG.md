@@ -1,5 +1,13 @@
 # synstate-preact-hooks
 
+## 0.1.1
+
+### Patch Changes
+
+- fec0a16: Fix README
+- Updated dependencies [fec0a16]
+    - synstate@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
