@@ -1,5 +1,13 @@
 # synstate-preact-hooks
 
+## 0.1.2
+
+### Patch Changes
+
+- 5cb2c32: Updated README.md
+- Updated dependencies [5cb2c32]
+    - synstate@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes
