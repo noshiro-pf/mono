@@ -14,7 +14,7 @@
 
 Defined in: [core/operators/merge-map.mts:90](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/merge-map.mts#L90)
 
-Alias for `mergeMap()`.
+Alias for `mergeMap`.
 
 Projects each source value to an observable and merges all inner observables.
 Unlike `switchMap`, does not cancel previous inner observables.

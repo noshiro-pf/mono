@@ -12,7 +12,9 @@
 
 > `const` **withLatestFrom**: \<`A`, `B`\>(`observable`) => [`DropInitialValueOperator`](../types/observable.md#dropinitialvalueoperator)\<`A`, readonly \[`A`, `B`\]\> = `withCurrentValueFrom`
 
-Defined in: [core/operators/with-current-value-from.mts:73](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/with-current-value-from.mts#L73)
+Defined in: [core/operators/with-current-value-from.mts:77](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/with-current-value-from.mts#L77)
+
+Alias for `withCurrentValueFrom`.
 
 Samples the current value from another observable each time the source emits.
 Emits a tuple of [sourceValue, sampledValue].
@@ -91,6 +93,10 @@ assert.deepStrictEqual(mut_history, [
   ['Charlie', 30],
 ]);
 ```
+
+#### See
+
+withCurrentValueFrom
 
 ## Functions
 

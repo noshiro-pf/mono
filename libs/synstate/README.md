@@ -13,24 +13,24 @@
 
 </p>
 
-**SynState** is a lightweight, high-performance, type-safe state management library for TypeScript/JavaScript. Perfect for building reactive global state and event-driven systems in React, Vue, and other frameworks.
+**SynState** is a lightweight, high-performance, type-safe state management library for TypeScript/JavaScript applications. Perfect for building reactive global state and event-driven systems in React, Vue, and other frameworks.
 
 ## Features
 
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` for global state
 - 📡 **Event System**: Built-in `createValueEmitter`, `createEventEmitter` for event-driven architecture
-- 🔄 **Reactive Updates**: Automatic propagation of state changes to subscribers
+- 🔄 **Reactive Updates**: Automatic propagation of state changes to all subscribers
 - 🎨 **Type-Safe**: Full TypeScript support with precise type inference
 - 🚀 **Lightweight**: Minimal bundle size with only one external runtime dependency ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge))
 - ⚡ **High Performance**: Optimized for fast state updates and minimal re-renders
 - 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
-- 🔧 **Flexible**: Simple state management with optional advanced Observable-based features (operators like `map`, `filter`, `debounceTime`, `throttleTime`, and combinators like `merge`, `combine`)
+- 🔧 **Observable-based**: Built on Observable pattern similar to RxJS, but with a completely independent implementation from scratch — not a wrapper. Offers optional advanced features like operators (`map`, `filter`, `scan`, `debounceTime`) and combinators (`merge`, `combine`)
 
 ## Packages
 
-- [synstate](packages/synstate/README.md) (Core Library)
-- [synstate-react-hooks](packages/synstate-react-hooks/README.md)
-- [synstate-preact-hooks](packages/synstate-preact-hooks/README.md)
+- [synstate](packages/synstate) (Core Library)
+- [synstate-react-hooks](packages/synstate-react-hooks) (React Integration)
+- [synstate-preact-hooks](packages/synstate-preact-hooks) (Preact Integration)
 
 ## For developers
 
@@ -40,7 +40,7 @@
 gh repo clone noshiro-pf/synstate
 git submodule update --init --recursive
 pnpm i
-pnpm ws:build
+pnpm run --filter synstate build # Build packages/synstate
 ```
 
 ## License

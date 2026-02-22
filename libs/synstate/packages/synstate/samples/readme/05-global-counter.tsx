@@ -1,21 +1,15 @@
-import * as React from 'react';
-import { createState } from 'synstate';
+/* eslint-disable import-x/no-extraneous-dependencies */
+// embed-sample-code-ignore-above
+import type * as React from 'react';
+import { createState } from 'synstate-react-hooks';
 
 // Create global state
-export const [counterState, , { updateState, resetState, getSnapshot }] =
+export const [useCounterState, , { updateState, resetState, getSnapshot }] =
   createState(0);
 
 // Component 1
 const Counter = (): React.JSX.Element => {
-  const [count, setCount] = React.useState(getSnapshot());
-
-  React.useEffect(() => {
-    const sub = counterState.subscribe(setCount);
-
-    return () => {
-      sub.unsubscribe();
-    };
-  }, []);
+  const count = useCounterState();
 
   return (
     <div>

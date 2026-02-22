@@ -50,7 +50,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build synstate
-        run: pnpm run --filter synstate build
+        run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"
         run: pnpm run ${{ matrix.command }}

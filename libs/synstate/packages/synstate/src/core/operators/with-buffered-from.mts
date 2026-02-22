@@ -71,7 +71,11 @@ export const withBufferedFrom = <A, B>(
       observable,
     )) as KeepInitialValueOperator<A, readonly [A, readonly B[]]>;
 
-export const withBuffered = withBufferedFrom; // alias
+/**
+ * Alias for `withBufferedFrom`.
+ * @see withBufferedFrom
+ */
+export const withBuffered = withBufferedFrom;
 
 class WithBufferedFromObservableClass<A, B>
   extends SyncChildObservableClass<readonly [A, readonly B[]], readonly [A]>

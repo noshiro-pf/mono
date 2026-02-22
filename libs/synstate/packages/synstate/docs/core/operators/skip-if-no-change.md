@@ -14,7 +14,7 @@
 
 Defined in: [core/operators/skip-if-no-change.mts:73](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/skip-if-no-change.mts#L73)
 
-Alias for `skipIfNoChange()`.
+Alias for `skipIfNoChange`.
 
 Skips emissions if the value hasn't changed from the previous emission.
 Uses a custom equality function or Object.is by default.

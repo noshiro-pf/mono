@@ -67,10 +67,10 @@ export const skipIfNoChange = <A,>(
     )) as KeepInitialValueOperator<A, A>;
 
 /**
- * Alias for `skipIfNoChange()`.
+ * Alias for `skipIfNoChange`.
  * @see skipIfNoChange
  */
-export const distinctUntilChanged = skipIfNoChange; // alias
+export const distinctUntilChanged = skipIfNoChange;
 
 class SkipIfNoChangeObservableClass<A>
   extends SyncChildObservableClass<A, readonly [A]>

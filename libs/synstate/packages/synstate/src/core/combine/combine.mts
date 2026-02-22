@@ -80,10 +80,10 @@ export const combine = <const OS extends NonEmptyArray<Observable<unknown>>>(
   ) as unknown as CombineObservableRefined<OS>;
 
 /**
- * Alias for `combine()`.
+ * Alias for `combine`.
  * @see combine
  */
-export const combineLatest = combine; // alias
+export const combineLatest = combine;
 
 class CombineObservableClass<const A extends NonEmptyUnknownList>
   extends SyncChildObservableClass<A, A>

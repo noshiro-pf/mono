@@ -1,35 +1,22 @@
+/* eslint-disable @typescript-eslint/strict-void-return */
+/* eslint-disable import-x/no-extraneous-dependencies */
 /* eslint-disable functional/immutable-data */
 // embed-sample-code-ignore-above
-import * as React from 'react';
-import { createBooleanState } from 'synstate';
 
-export const [darkModeState, { toggle, getSnapshot }] =
+import * as React from 'react';
+import { createBooleanState } from 'synstate-react-hooks';
+
+export const [useDarkModeState, { toggle: toggleDarkMode }] =
   createBooleanState(false);
 
 const ThemeToggle = (): React.JSX.Element => {
-  const [isDark, setIsDark] = React.useState(getSnapshot());
-
-  React.useEffect(() => {
-    const sub = darkModeState.subscribe(setIsDark);
-
-    return () => {
-      sub.unsubscribe();
-    };
-  }, []);
+  const isDark = useDarkModeState();
 
   React.useEffect(() => {
     document.body.className = isDark ? 'dark' : 'light';
   }, [isDark]);
 
-  return (
-    <button
-      onClick={() => {
-        toggle();
-      }}
-    >
-      {isDark ? '🌙' : '☀️'}
-    </button>
-  );
+  return <button onClick={toggleDarkMode}>{isDark ? '🌙' : '☀️'}</button>;
 };
 
 // embed-sample-code-ignore-below

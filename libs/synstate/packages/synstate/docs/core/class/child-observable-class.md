@@ -104,7 +104,7 @@ Defined in: [core/class/observable-base-class.mts:27](https://github.com/noshiro
 
 ##### parents
 
-> `readonly` **parents**: `Readonly`\<\{ \[P in string \| number \| symbol\]: Observable\<P\[P\<P\>\]\> \}\>
+> `readonly` **parents**: `Readonly`\<\{ \[P in string \| number \| symbol\]: Observable\<P\[P\]\> \}\>
 
 Defined in: [core/class/child-observable-class.mts:78](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/class/child-observable-class.mts#L78)
 
@@ -584,7 +584,7 @@ Defined in: [core/class/observable-base-class.mts:27](https://github.com/noshiro
 
 ##### parents
 
-> `readonly` **parents**: `Readonly`\<\{ \[P in string \| number \| symbol\]: Observable\<P\[P\<P\>\]\> \}\>
+> `readonly` **parents**: `Readonly`\<\{ \[P in string \| number \| symbol\]: Observable\<P\[P\]\> \}\>
 
 Defined in: [core/class/child-observable-class.mts:155](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/class/child-observable-class.mts#L155)
 
@@ -1030,7 +1030,7 @@ Defined in: [core/class/observable-base-class.mts:27](https://github.com/noshiro
 
 ##### parents
 
-> `readonly` **parents**: `Readonly`\<\{ \[P in string \| number \| symbol\]: Observable\<P\[P\<P\>\]\> \}\>
+> `readonly` **parents**: `Readonly`\<\{ \[P in string \| number \| symbol\]: Observable\<P\[P\]\> \}\>
 
 Defined in: [core/class/child-observable-class.mts:155](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/class/child-observable-class.mts#L155)
 

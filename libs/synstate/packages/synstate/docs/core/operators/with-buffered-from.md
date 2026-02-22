@@ -12,7 +12,9 @@
 
 > `const` **withBuffered**: \<`A`, `B`\>(`observable`) => [`KeepInitialValueOperator`](../types/observable.md#keepinitialvalueoperator)\<`A`, readonly \[`A`, readonly `B`[]\]\> = `withBufferedFrom`
 
-Defined in: [core/operators/with-buffered-from.mts:74](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/with-buffered-from.mts#L74)
+Defined in: [core/operators/with-buffered-from.mts:78](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/with-buffered-from.mts#L78)
+
+Alias for `withBufferedFrom`.
 
 Buffers values from the source observable and emits them along with the parent value
 when the parent emits. The buffer is cleared after each emission.
@@ -89,6 +91,10 @@ assert.deepStrictEqual(mut_history, [
   [2, ['c']],
 ]);
 ```
+
+#### See
+
+withBufferedFrom
 
 ## Functions
 

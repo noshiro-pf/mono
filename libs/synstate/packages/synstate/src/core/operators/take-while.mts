@@ -70,12 +70,6 @@ export const takeWhile =
   (parentObservable) =>
     new TakeWhileObservableClass(parentObservable, predicate);
 
-/* Specialized operators */
-
-export const take = <A,>(
-  n: PositiveSafeIntWithSmallInt,
-): DropInitialValueOperator<A, A> => takeWhile((_, index) => index + 1 <= n);
-
 /* implementation */
 
 class TakeWhileObservableClass<A>
@@ -133,7 +127,7 @@ if (import.meta.vitest !== undefined) {
   {
     const s: Observable<number> = source<number>();
 
-    const _d1 = s.pipe(take(3));
+    const _d1 = s.pipe(takeWhile((_, index) => index + 1 <= 3));
 
     expectType<typeof _d1, Observable<number>>('=');
   }
@@ -143,7 +137,7 @@ if (import.meta.vitest !== undefined) {
 
     const m: InitializedObservable<number> = s.pipe(withInitialValue(0));
 
-    const _d = m.pipe(take(3));
+    const _d = m.pipe(takeWhile((_, index) => index + 1 <= 3));
 
     expectType<typeof _d, Observable<number>>('=');
   }

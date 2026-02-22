@@ -22,7 +22,7 @@ Re-exports [AsyncChildObservableClass](core/class/child-observable-class.md#asyn
 
 ### attachIndex
 
-Re-exports [attachIndex](core/operators/map-with-index.md#attachindex)
+Re-exports [attachIndex](core/predefined/operators/attach-index.md#attachindex)
 
 ***
 
@@ -160,7 +160,7 @@ Re-exports [FromSubscribableObservable](core/types/observable-family.md#fromsubs
 
 ### getKey
 
-Re-exports [getKey](core/operators/map-with-index.md#getkey)
+Re-exports [getKey](core/predefined/operators/pluck.md#getkey)
 
 ***
 
@@ -274,31 +274,31 @@ Re-exports [ManagerObservableKind](core/types/observable-kind.md#managerobservab
 
 ### map
 
-Re-exports [map](core/operators/map-with-index.md#map)
+Re-exports [map](core/predefined/operators/map.md#map)
 
 ***
 
 ### mapOptional
 
-Re-exports [mapOptional](core/operators/map-with-index.md#mapoptional)
+Re-exports [mapOptional](core/predefined/operators/map-optional.md#mapoptional)
 
 ***
 
 ### mapResultErr
 
-Re-exports [mapResultErr](core/operators/map-with-index.md#mapresulterr)
+Re-exports [mapResultErr](core/predefined/operators/map-result-err.md#mapresulterr)
 
 ***
 
 ### mapResultOk
 
-Re-exports [mapResultOk](core/operators/map-with-index.md#mapresultok)
+Re-exports [mapResultOk](core/predefined/operators/map-result-ok.md#mapresultok)
 
 ***
 
 ### mapTo
 
-Re-exports [mapTo](core/operators/map-with-index.md#mapto)
+Re-exports [mapTo](core/predefined/operators/map-to.md#mapto)
 
 ***
 
@@ -424,7 +424,7 @@ Re-exports [PairwiseOperatorObservable](core/types/observable-family.md#pairwise
 
 ### pluck
 
-Re-exports [pluck](core/operators/map-with-index.md#pluck)
+Re-exports [pluck](core/predefined/operators/pluck.md#pluck)
 
 ***
 
@@ -454,7 +454,7 @@ Re-exports [ScanOperatorObservable](core/types/observable-family.md#scanoperator
 
 ### skip
 
-Re-exports [skip](core/operators/skip-while.md#skip)
+Re-exports [skip](core/predefined/operators/skip.md#skip)
 
 ***
 
@@ -562,7 +562,7 @@ Re-exports [SyncChildObservableClass](core/class/child-observable-class.md#syncc
 
 ### take
 
-Re-exports [take](core/operators/take-while.md#take)
+Re-exports [take](core/predefined/operators/take.md#take)
 
 ***
 
@@ -634,19 +634,19 @@ Re-exports [Unwrap](core/types/observable.md#unwrap)
 
 ### unwrapOptional
 
-Re-exports [unwrapOptional](core/operators/map-with-index.md#unwrapoptional)
+Re-exports [unwrapOptional](core/predefined/operators/unwrap-optional.md#unwrapoptional)
 
 ***
 
 ### unwrapResultErr
 
-Re-exports [unwrapResultErr](core/operators/map-with-index.md#unwrapresulterr)
+Re-exports [unwrapResultErr](core/predefined/operators/unwrap-result-err.md#unwrapresulterr)
 
 ***
 
 ### unwrapResultOk
 
-Re-exports [unwrapResultOk](core/operators/map-with-index.md#unwrapresultok)
+Re-exports [unwrapResultOk](core/predefined/operators/unwrap-result-ok.md#unwrapresultok)
 
 ***
 
@@ -688,7 +688,7 @@ Re-exports [WithCurrentValueFromOperatorObservable](core/types/observable-family
 
 ### withIndex
 
-Re-exports [withIndex](core/operators/map-with-index.md#withindex)
+Re-exports [withIndex](core/predefined/operators/attach-index.md#withindex)
 
 ***
 

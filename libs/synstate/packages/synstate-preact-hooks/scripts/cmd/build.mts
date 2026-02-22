@@ -10,51 +10,33 @@ const distDir = path.resolve(workspaceRootPath, './dist');
 const build = async (skipCheck: boolean): Promise<void> => {
   echo('Starting build process...\n');
 
-  if (!skipCheck) {
-    await logStep({
-      startMessage: 'Checking file extensions',
-      action: () =>
-        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
-      successMessage: 'File extensions validated',
-    });
-
-    await logStep({
-      startMessage: 'Cleaning dist directory',
-      action: () =>
-        runStep(
-          Result.fromPromise(
-            fs.rm(distDir, {
-              recursive: true,
-              force: true,
-            }),
-          ),
-          'Failed to clean dist directory',
+  await logStep({
+    startMessage: 'Cleaning dist directory',
+    action: () =>
+      runStep(
+        Result.fromPromise(
+          fs.rm(distDir, {
+            recursive: true,
+            force: true,
+          }),
         ),
-      successMessage: 'Cleaned dist directory',
-    });
+        'Failed to clean dist directory',
+      ),
+    successMessage: 'Cleaned dist directory',
+  });
 
-    await logStep({
-      startMessage: 'Generating index files',
-      action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
-      successMessage: 'Index files generated',
-    });
+  await logStep({
+    startMessage: 'Generating index files',
+    action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
+    successMessage: 'Index files generated',
+  });
 
-    await logStep({
-      startMessage: 'Generating re-export file',
-      action: () =>
-        runCmdStep(
-          'pnpm run gen:re-export',
-          'Generating re-export file failed',
-        ),
-      successMessage: 'Re-export file generated',
-    });
-
-    await logStep({
-      startMessage: 'Running type checking',
-      action: () => runCmdStep('tsc --noEmit', 'Type checking failed'),
-      successMessage: 'Type checking passed',
-    });
-  }
+  await logStep({
+    startMessage: 'Generating re-export file',
+    action: () =>
+      runCmdStep('pnpm run gen:re-export', 'Generating re-export file failed'),
+    successMessage: 'Re-export file generated',
+  });
 
   await logStep({
     startMessage: 'Building with Rollup',
@@ -131,6 +113,21 @@ const build = async (skipCheck: boolean): Promise<void> => {
     },
     successMessage: 'Generated dist/tsconfig.json',
   });
+
+  if (!skipCheck) {
+    await logStep({
+      startMessage: 'Checking file extensions',
+      action: () =>
+        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+      successMessage: 'File extensions validated',
+    });
+
+    await logStep({
+      startMessage: 'Running type checking',
+      action: () => runCmdStep('tsc --noEmit', 'Type checking failed'),
+      successMessage: 'Type checking passed',
+    });
+  }
 
   echo('✅ Build completed successfully!\n');
 };

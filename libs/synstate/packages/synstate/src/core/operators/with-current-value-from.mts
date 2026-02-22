@@ -70,7 +70,11 @@ export const withCurrentValueFrom =
   (parentObservable) =>
     new WithCurrentValueFromObservableClass(parentObservable, observable);
 
-export const withLatestFrom = withCurrentValueFrom; // alias
+/**
+ * Alias for `withCurrentValueFrom`.
+ * @see withCurrentValueFrom
+ */
+export const withLatestFrom = withCurrentValueFrom;
 
 class WithCurrentValueFromObservableClass<A, B>
   extends SyncChildObservableClass<readonly [A, B], readonly [A]>

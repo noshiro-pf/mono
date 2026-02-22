@@ -2212,7 +2212,9 @@ Defined in: synstate/dist/core/class/observable-base-class.d.mts:21
 
 > `const` **attachIndex**: \<`A`\>() => `KeepInitialValueOperator`\<`A`, readonly \[`SafeUint` \| `-1`, `A`\]\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:46
+Defined in: synstate/dist/core/predefined/operators/attach-index.d.mts:7
+
+Alias for `withIndex`.
 
 #### Type Parameters
 
@@ -2223,6 +2225,10 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:46
 #### Returns
 
 `KeepInitialValueOperator`\<`A`, readonly \[`SafeUint` \| `-1`, `A`\]\>
+
+#### See
+
+withIndex
 
 ***
 
@@ -2430,7 +2436,7 @@ assert.deepStrictEqual(mut_history, [
 
 Defined in: synstate/dist/core/combine/combine.d.mts:64
 
-Alias for `combine()`.
+Alias for `combine`.
 
 #### Type Parameters
 
@@ -2618,7 +2624,7 @@ assert.deepStrictEqual(mut_history, ['hello']);
 
 Defined in: synstate/dist/core/operators/skip-if-no-change.d.mts:56
 
-Alias for `skipIfNoChange()`.
+Alias for `skipIfNoChange`.
 
 #### Type Parameters
 
@@ -2648,7 +2654,7 @@ skipIfNoChange
 
 Defined in: synstate/dist/core/operators/merge-map.d.mts:75
 
-Alias for `mergeMap()`.
+Alias for `mergeMap`.
 
 #### Type Parameters
 
@@ -2911,7 +2917,9 @@ assert.deepStrictEqual(mut_history, [1, 2, 3]);
 
 > `const` **getKey**: \<`A`, `K`\>(`key`) => `KeepInitialValueOperator`\<`A`, `A`\[`K`\]\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:45
+Defined in: synstate/dist/core/predefined/operators/pluck.d.mts:7
+
+Alias for `pluck`.
 
 #### Type Parameters
 
@@ -2932,6 +2940,10 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:45
 #### Returns
 
 `KeepInitialValueOperator`\<`A`, `A`\[`K`\]\>
+
+#### See
+
+pluck
 
 ***
 
@@ -3132,7 +3144,7 @@ Defined in: synstate/dist/core/utils/id-maker.d.mts:4
 
 > `const` **map**: \<`A`, `B`\>(`mapFn`) => `KeepInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:42
+Defined in: synstate/dist/core/predefined/operators/map.d.mts:2
 
 #### Type Parameters
 
@@ -3160,7 +3172,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:42
 
 > `const` **mapOptional**: \<`O`, `B`\>(`mapFn`) => `KeepInitialValueOperator`\<`O`, `Optional`\<`B`\>\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:51
+Defined in: synstate/dist/core/predefined/operators/map-optional.d.mts:3
 
 #### Type Parameters
 
@@ -3188,7 +3200,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:51
 
 > `const` **mapResultErr**: \<`R`, `E2`\>(`mapFn`) => `KeepInitialValueOperator`\<`R`, `Result`\<`Result.UnwrapOk`\<`R`\>, `E2`\>\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:53
+Defined in: synstate/dist/core/predefined/operators/map-result-err.d.mts:3
 
 #### Type Parameters
 
@@ -3216,7 +3228,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:53
 
 > `const` **mapResultOk**: \<`R`, `S2`\>(`mapFn`) => `KeepInitialValueOperator`\<`R`, `Result`\<`S2`, `Result.UnwrapErr`\<`R`\>\>\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:52
+Defined in: synstate/dist/core/predefined/operators/map-result-ok.d.mts:3
 
 #### Type Parameters
 
@@ -3244,7 +3256,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:52
 
 > `const` **mapTo**: \<`A`, `B`\>(`value`) => `KeepInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:43
+Defined in: synstate/dist/core/predefined/operators/map-to.d.mts:2
 
 #### Type Parameters
 
@@ -3272,7 +3284,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:43
 
 > `const` **mapWithIndex**: \<`A`, `B`\>(`mapFn`) => `KeepInitialValueOperator`\<`A`, `B`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:41
+Defined in: synstate/dist/core/operators/map-with-index.d.mts:40
 
 Transforms each value emitted by the source using a mapping function that also receives the emission index.
 
@@ -3678,7 +3690,7 @@ assert.deepStrictEqual(mut_history, [
 
 > `const` **pluck**: \<`A`, `K`\>(`key`) => `KeepInitialValueOperator`\<`A`, `A`\[`K`\]\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:44
+Defined in: synstate/dist/core/predefined/operators/pluck.d.mts:2
 
 #### Type Parameters
 
@@ -3791,7 +3803,7 @@ assert.deepStrictEqual(mut_history, [0, 1, 3, 6]);
 
 > `const` **skip**: \<`A`\>(`n`) => `DropInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/skip-while.d.mts:51
+Defined in: synstate/dist/core/predefined/operators/skip.d.mts:2
 
 #### Type Parameters
 
@@ -4042,7 +4054,7 @@ assert.deepStrictEqual(mut_history, [5, 6, 7]);
 
 Defined in: synstate/dist/core/create/source.d.mts:47
 
-Alias for `source()`. Creates a new Observable source.
+Alias for `source`. Creates a new Observable source.
 
 #### See
 
@@ -4149,7 +4161,7 @@ subscribe to `parentObservable` and call `setState` within it.
 
 > `const` **take**: \<`A`\>(`n`) => `DropInitialValueOperator`\<`A`, `A`\>
 
-Defined in: synstate/dist/core/operators/take-while.d.mts:50
+Defined in: synstate/dist/core/predefined/operators/take.d.mts:2
 
 #### Type Parameters
 
@@ -4493,7 +4505,7 @@ Defined in: synstate/dist/core/utils/observable-utils.d.mts:2
 
 > `const` **unwrapOptional**: \<`O`\>() => `KeepInitialValueOperator`\<`O`, `Optional.Unwrap`\<`O`\> \| `undefined`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:48
+Defined in: synstate/dist/core/predefined/operators/unwrap-optional.d.mts:3
 
 #### Type Parameters
 
@@ -4511,7 +4523,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:48
 
 > `const` **unwrapResultErr**: \<`R`\>() => `KeepInitialValueOperator`\<`R`, `Result.UnwrapErr`\<`R`\> \| `undefined`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:50
+Defined in: synstate/dist/core/predefined/operators/unwrap-result-err.d.mts:3
 
 #### Type Parameters
 
@@ -4529,7 +4541,7 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:50
 
 > `const` **unwrapResultOk**: \<`R`\>() => `KeepInitialValueOperator`\<`R`, `Result.UnwrapOk`\<`R`\> \| `undefined`\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:49
+Defined in: synstate/dist/core/predefined/operators/unwrap-result-ok.d.mts:3
 
 #### Type Parameters
 
@@ -4547,7 +4559,9 @@ Defined in: synstate/dist/core/operators/map-with-index.d.mts:49
 
 > `const` **withBuffered**: \<`A`, `B`\>(`observable`) => `KeepInitialValueOperator`\<`A`, readonly \[`A`, readonly `B`[]\]\>
 
-Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:56
+Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:60
+
+Alias for `withBufferedFrom`.
 
 #### Type Parameters
 
@@ -4568,6 +4582,10 @@ Defined in: synstate/dist/core/operators/with-buffered-from.d.mts:56
 #### Returns
 
 `KeepInitialValueOperator`\<`A`, readonly \[`A`, readonly `B`[]\]\>
+
+#### See
+
+withBufferedFrom
 
 ***
 
@@ -4745,7 +4763,7 @@ assert.deepStrictEqual(mut_history, [
 
 > `const` **withIndex**: \<`A`\>() => `KeepInitialValueOperator`\<`A`, readonly \[`SafeUint` \| `-1`, `A`\]\>
 
-Defined in: synstate/dist/core/operators/map-with-index.d.mts:47
+Defined in: synstate/dist/core/predefined/operators/attach-index.d.mts:2
 
 #### Type Parameters
 
@@ -4839,7 +4857,9 @@ assert.deepStrictEqual(mut_history, [0, 1, 2]);
 
 > `const` **withLatestFrom**: \<`A`, `B`\>(`observable`) => `DropInitialValueOperator`\<`A`, readonly \[`A`, `B`\]\>
 
-Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:58
+Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:62
+
+Alias for `withCurrentValueFrom`.
 
 #### Type Parameters
 
@@ -4860,6 +4880,10 @@ Defined in: synstate/dist/core/operators/with-current-value-from.d.mts:58
 #### Returns
 
 `DropInitialValueOperator`\<`A`, readonly \[`A`, `B`\]\>
+
+#### See
+
+withCurrentValueFrom
 
 ***
 

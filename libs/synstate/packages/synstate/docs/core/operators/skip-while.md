@@ -8,35 +8,11 @@
 
 ## Functions
 
-### skip()
-
-> **skip**\<`A`\>(`n`): [`DropInitialValueOperator`](../types/observable.md#dropinitialvalueoperator)\<`A`, `A`\>
-
-Defined in: [core/operators/skip-while.mts:73](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/skip-while.mts#L73)
-
-#### Type Parameters
-
-##### A
-
-`A`
-
-#### Parameters
-
-##### n
-
-`PositiveSafeIntWithSmallInt`
-
-#### Returns
-
-[`DropInitialValueOperator`](../types/observable.md#dropinitialvalueoperator)\<`A`, `A`\>
-
-***
-
 ### skipWhile()
 
 > **skipWhile**\<`A`\>(`predicate`): [`DropInitialValueOperator`](../types/observable.md#dropinitialvalueoperator)\<`A`, `A`\>
 
-Defined in: [core/operators/skip-while.mts:65](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/skip-while.mts#L65)
+Defined in: [core/operators/skip-while.mts:59](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/skip-while.mts#L59)
 
 Skips values from the source observable while the predicate returns true.
 Once the predicate returns false, all subsequent values pass through.

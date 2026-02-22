@@ -19,9 +19,10 @@ const documents: DeepReadonly<
     samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
     sampleCodeFiles: [
       '01-simple-state.mts',
-      '03-react-example.tsx',
-      '04-global-counter.tsx',
-      '05-event-driven.tsx',
+      '02-react-example.tsx',
+      '03-react-18-example.tsx',
+      '04-synstate-react-hooks-example.tsx',
+      '05-global-counter.tsx',
       '06-todo-reducer.tsx',
       '07-dark-mode.tsx',
       '08-cross-component.tsx',

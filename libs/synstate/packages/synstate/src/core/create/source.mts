@@ -53,10 +53,10 @@ export function source<A>(...args: readonly A[]): SourceObservable<A> {
 }
 
 /**
- * Alias for `source()`. Creates a new Observable source.
+ * Alias for `source`. Creates a new Observable source.
  * @see source
  */
-export const subject = source; // alias
+export const subject = source;
 
 class SourceObservableClass<A>
   extends RootObservableClass<A>

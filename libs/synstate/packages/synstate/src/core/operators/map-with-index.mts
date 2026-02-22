@@ -1,10 +1,4 @@
-import {
-  Optional,
-  Result,
-  SafeUint,
-  asSafeUint,
-  expectType,
-} from 'ts-data-forge';
+import { Optional, SafeUint, asSafeUint, expectType } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import {
@@ -64,59 +58,6 @@ export const mapWithIndex = <A, B>(
       mapFn,
     )) as KeepInitialValueOperator<A, B>;
 
-/* Specialized operators */
-
-export const map = <A, B>(mapFn: (x: A) => B): KeepInitialValueOperator<A, B> =>
-  mapWithIndex(mapFn);
-
-export const mapTo = <A, B>(value: B): KeepInitialValueOperator<A, B> =>
-  map(() => value);
-
-export const pluck = <A, K extends keyof A>(
-  key: K,
-): KeepInitialValueOperator<A, A[K]> => map((a) => a[key]);
-
-export const getKey = pluck; // alias
-
-export const attachIndex = <A,>(): KeepInitialValueOperator<
-  A,
-  readonly [SafeUint | -1, A]
-> => mapWithIndex((a, i) => [i, a] as const);
-
-export const withIndex = attachIndex; // alias
-
-export const unwrapOptional = <
-  O extends UnknownOptional,
->(): KeepInitialValueOperator<O, Optional.Unwrap<O> | undefined> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  map(Optional.unwrap as Fn<O, Optional.Unwrap<O> | undefined>);
-
-export const unwrapResultOk = <
-  R extends UnknownResult,
->(): KeepInitialValueOperator<R, Result.UnwrapOk<R> | undefined> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  map(Result.unwrapOk as Fn<R, Result.UnwrapOk<R> | undefined>);
-
-export const unwrapResultErr = <
-  R extends UnknownResult,
->(): KeepInitialValueOperator<R, Result.UnwrapErr<R> | undefined> =>
-  map(Result.unwrapErr as Fn<R, Result.UnwrapErr<R> | undefined>);
-
-export const mapOptional = <O extends UnknownOptional, B>(
-  mapFn: (x: Optional.Unwrap<O>) => B,
-): KeepInitialValueOperator<O, Optional<B>> =>
-  map((a) => Optional.map(a, mapFn));
-
-export const mapResultOk = <R extends UnknownResult, S2>(
-  mapFn: (x: Result.UnwrapOk<R>) => S2,
-): KeepInitialValueOperator<R, Result<S2, Result.UnwrapErr<R>>> =>
-  map((a) => Result.map(a, mapFn));
-
-export const mapResultErr = <R extends UnknownResult, E2>(
-  mapFn: (x: Result.UnwrapErr<R>) => E2,
-): KeepInitialValueOperator<R, Result<Result.UnwrapOk<R>, E2>> =>
-  map((a) => Result.mapErr(a, mapFn));
-
 /* implementation */
 
 class MapWithIndexObservableClass<A, B>
@@ -166,7 +107,7 @@ if (import.meta.vitest !== undefined) {
   {
     const s: Observable<number> = source<number>();
 
-    const _d1 = s.pipe(map((x) => x + 1));
+    const _d1 = s.pipe(mapWithIndex((x, i) => x + i));
 
     expectType<typeof _d1, Observable<number>>('=');
   }
@@ -176,7 +117,7 @@ if (import.meta.vitest !== undefined) {
 
     const m: InitializedObservable<number> = s.pipe(withInitialValue(0));
 
-    const _d = m.pipe(map((x) => x + 1));
+    const _d = m.pipe(mapWithIndex((x, i) => x + i));
 
     expectType<typeof _d, InitializedObservable<number>>('=');
   }

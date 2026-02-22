@@ -1,19 +1,25 @@
-import * as React from 'react';
+/* eslint-disable import-x/no-extraneous-dependencies */
+// embed-sample-code-ignore-above
+
+import type * as React from 'react';
 import {
   createState,
   debounceTime,
   filter,
   fromPromise,
-  type Observable,
+  type InitializedObservable,
+  map,
   switchMap,
+  withInitialValue,
 } from 'synstate';
+import { useObservableValue } from 'synstate-react-hooks';
 import { Result } from 'ts-data-forge';
 
 const [searchState, setSearchState] = createState('');
 
-// Advanced reactive pipeline (optional feature)
-const searchResults$: Observable<
-  Result<readonly Readonly<{ id: string; name: string }>[], unknown>
+// Advanced reactive pipeline with debounce and filtering
+const searchResults$: InitializedObservable<
+  readonly Readonly<{ id: string; name: string }>[]
 > = searchState
   .pipe(debounceTime(300))
   .pipe(filter((query) => query.length > 2))
@@ -28,24 +34,13 @@ const searchResults$: Observable<
         ),
       ),
     ),
-  );
+  )
+  .pipe(filter((res) => Result.isOk(res)))
+  .pipe(map((res) => Result.unwrapOk(res)))
+  .pipe(withInitialValue([]));
 
 const SearchBox = (): React.JSX.Element => {
-  const [results, setResults] = React.useState<
-    readonly Readonly<{ id: string; name: string }>[]
-  >([]);
-
-  React.useEffect(() => {
-    const sub = searchResults$.subscribe((result) => {
-      if (Result.isOk(result)) {
-        setResults(result.value);
-      }
-    });
-
-    return () => {
-      sub.unsubscribe();
-    };
-  }, []);
+  const searchResults = useObservableValue(searchResults$);
 
   return (
     <div>
@@ -56,7 +51,7 @@ const SearchBox = (): React.JSX.Element => {
         }}
       />
       <ul>
-        {results.map((item) => (
+        {searchResults.map((item) => (
           <li key={item.id}>{item.name}</li>
         ))}
       </ul>

@@ -1,7 +1,14 @@
-import * as React from 'react';
-import { createReducer } from 'synstate';
+/* eslint-disable import-x/no-extraneous-dependencies */
+// embed-sample-code-ignore-above
 
-type Todo = Readonly<{ id: number; text: string; done: boolean }>;
+import * as React from 'react';
+import { createReducer } from 'synstate-react-hooks';
+
+type Todo = Readonly<{
+  id: number;
+  text: string;
+  done: boolean;
+}>;
 
 type Action = Readonly<
   | { type: 'add'; text: string }
@@ -9,10 +16,9 @@ type Action = Readonly<
   | { type: 'remove'; id: number }
 >;
 
-const [todoState, dispatch, getSnapshot] = createReducer<
-  readonly Todo[],
-  Action
->((todos, action) => {
+const initialTodos: readonly Todo[] = [];
+
+const reducer = (todos: readonly Todo[], action: Action): readonly Todo[] => {
   switch (action.type) {
     case 'add':
       return [
@@ -23,53 +29,66 @@ const [todoState, dispatch, getSnapshot] = createReducer<
           done: false,
         },
       ];
+
     case 'toggle':
       return todos.map((t) =>
         t.id === action.id ? { ...t, done: !t.done } : t,
       );
+
     case 'remove':
       return todos.filter((t) => t.id !== action.id);
   }
-}, []);
+};
+
+const [useTodoState, dispatch] = createReducer<readonly Todo[], Action>(
+  reducer,
+  initialTodos,
+);
+
+const addTodo = (): void => {
+  dispatch({
+    type: 'add',
+    text: 'New Todo',
+  });
+};
 
 const TodoList = (): React.JSX.Element => {
-  const [todos, setTodos] = React.useState(getSnapshot());
+  const todos = useTodoState();
 
-  React.useEffect(() => {
-    const sub = todoState.subscribe(setTodos);
-
-    return () => {
-      sub.unsubscribe();
-    };
-  }, []);
+  const todosWithHandler = React.useMemo(
+    () =>
+      todos.map((todo) => ({
+        ...todo,
+        onToggle: () => {
+          dispatch({
+            type: 'toggle',
+            id: todo.id,
+          });
+        },
+        onRemove: () => {
+          dispatch({
+            type: 'remove',
+            id: todo.id,
+          });
+        },
+      })),
+    [todos],
+  );
 
   return (
     <div>
-      {todos.map((todo) => (
+      {todosWithHandler.map((todo) => (
         <div key={todo.id}>
           <input
             checked={todo.done}
             type={'checkbox'}
-            onChange={() => {
-              dispatch({
-                type: 'toggle',
-                id: todo.id,
-              });
-            }}
+            onChange={todo.onToggle}
           />
           <span>{todo.text}</span>
+          <button onClick={todo.onRemove}>{'Remove'}</button>
         </div>
       ))}
-      <button
-        onClick={() => {
-          dispatch({
-            type: 'add',
-            text: 'New Todo',
-          });
-        }}
-      >
-        {'Add Todo'}
-      </button>
+      <button onClick={addTodo}>{'Add Todo'}</button>
     </div>
   );
 };

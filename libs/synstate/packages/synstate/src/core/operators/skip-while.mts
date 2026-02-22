@@ -1,10 +1,4 @@
-import {
-  Optional,
-  PositiveSafeInt,
-  SafeUint,
-  asSafeUint,
-  pipe,
-} from 'ts-data-forge';
+import { Optional, SafeUint, asSafeUint, pipe } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type DropInitialValueOperator,
@@ -67,15 +61,6 @@ export const skipWhile =
   ): DropInitialValueOperator<A, A> =>
   (parentObservable) =>
     new SkipWhileObservableClass(parentObservable, predicate);
-
-/* Specialized operators */
-
-export const skip = <A,>(
-  n: PositiveSafeIntWithSmallInt,
-): DropInitialValueOperator<A, A> =>
-  !PositiveSafeInt.is(n) ? idFn : skipWhile((_, index) => index + 1 <= n);
-
-const idFn = <T,>(value: T): T => value;
 
 /* implementation */
 

@@ -84,7 +84,7 @@ export const mergeMap =
     new MergeMapObservableClass(parentObservable, mapToObservable);
 
 /**
- * Alias for `mergeMap()`.
+ * Alias for `mergeMap`.
  * @see mergeMap
  */
 export const flatMap = mergeMap;

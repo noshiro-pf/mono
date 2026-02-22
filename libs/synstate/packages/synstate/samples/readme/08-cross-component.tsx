@@ -1,28 +1,22 @@
+/* eslint-disable @typescript-eslint/strict-void-return */
+/* eslint-disable import-x/no-extraneous-dependencies */
+// embed-sample-code-ignore-above
+
 import * as React from 'react';
-import { createEventEmitter, createState, createValueEmitter } from 'synstate';
-
-// Events
-const [onItemAdded$, emitItemAdded] = createValueEmitter<string>();
-
-const [onClearAll$, emitClearAll] = createEventEmitter();
+import { createState } from 'synstate-react-hooks';
 
 // State
-const [itemsState, setItemsState, { updateState, getSnapshot }] = createState<
-  readonly string[]
->([]);
+const [useItemsState, _, { updateState, resetState: resetItemsState }] =
+  createState<readonly string[]>([]);
 
 // Setup event handlers
-onItemAdded$.subscribe((item) => {
+const addItem = (item: string): void => {
   updateState((items: readonly string[]) => [...items, item]);
-});
-
-onClearAll$.subscribe(() => {
-  setItemsState([]);
-});
+};
 
 // Component 1: Add items
 const ItemInput = (): React.JSX.Element => {
-  const [input, setInput] = React.useState('');
+  const [input, setInput] = React.useState<string>('');
 
   return (
     <div>
@@ -34,7 +28,7 @@ const ItemInput = (): React.JSX.Element => {
       />
       <button
         onClick={() => {
-          emitItemAdded(input);
+          addItem(input);
 
           setInput('');
         }}
@@ -47,15 +41,7 @@ const ItemInput = (): React.JSX.Element => {
 
 // Component 2: Display items
 const ItemList = (): React.JSX.Element => {
-  const [items, setItems] = React.useState(getSnapshot());
-
-  React.useEffect(() => {
-    const sub = itemsState.subscribe(setItems);
-
-    return () => {
-      sub.unsubscribe();
-    };
-  }, []);
+  const items = useItemsState();
 
   return (
     <div>
@@ -64,7 +50,7 @@ const ItemList = (): React.JSX.Element => {
           <li key={i}>{item}</li>
         ))}
       </ul>
-      <button onClick={emitClearAll}>{'Clear All'}</button>
+      <button onClick={resetItemsState}>{'Clear All'}</button>
     </div>
   );
 };

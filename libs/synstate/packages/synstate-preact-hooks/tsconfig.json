@@ -4,6 +4,8 @@
     "../../configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "paths": {
       "synstate-react-hooks": ["./src/entry-point.mts"]
     }

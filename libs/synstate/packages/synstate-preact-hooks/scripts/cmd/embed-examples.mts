@@ -17,7 +17,10 @@ const documents: DeepReadonly<
   {
     mdPath: path.resolve(workspaceRootPath, 'README.md'),
     samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
-    sampleCodeFiles: [],
+    sampleCodeFiles: [
+      '01-simple-state.tsx',
+      '02-simple-state-with-additional-api.tsx',
+    ],
   },
 ] as const;
 

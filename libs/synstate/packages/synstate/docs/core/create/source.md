@@ -14,7 +14,7 @@
 
 Defined in: [core/create/source.mts:59](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/source.mts#L59)
 
-Alias for `source()`. Creates a new Observable source.
+Alias for `source`. Creates a new Observable source.
 
 #### Call Signature
 

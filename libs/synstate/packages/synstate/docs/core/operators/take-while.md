@@ -8,30 +8,6 @@
 
 ## Functions
 
-### take()
-
-> **take**\<`A`\>(`n`): [`DropInitialValueOperator`](../types/observable.md#dropinitialvalueoperator)\<`A`, `A`\>
-
-Defined in: [core/operators/take-while.mts:75](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/operators/take-while.mts#L75)
-
-#### Type Parameters
-
-##### A
-
-`A`
-
-#### Parameters
-
-##### n
-
-`PositiveSafeIntWithSmallInt`
-
-#### Returns
-
-[`DropInitialValueOperator`](../types/observable.md#dropinitialvalueoperator)\<`A`, `A`\>
-
-***
-
 ### takeWhile()
 
 > **takeWhile**\<`A`\>(`predicate`): [`DropInitialValueOperator`](../types/observable.md#dropinitialvalueoperator)\<`A`, `A`\>
