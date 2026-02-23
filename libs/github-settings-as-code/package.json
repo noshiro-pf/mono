@@ -87,7 +87,7 @@
     "eslint-config-typed": "4.6.1",
     "jiti": "2.6.1",
     "markdownlint": "0.40.0",
-    "markdownlint-cli2": "0.20.0",
+    "markdownlint-cli2": "0.21.0",
     "npm-run-all2": "8.0.4",
     "playwright": "1.58.2",
     "prettier": "3.8.1",
