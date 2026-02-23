@@ -118,8 +118,8 @@ importers:
         specifier: 25.0.3
         version: 25.0.3(typescript@5.9.3)
       ts-codemod-lib:
-        specifier: ^2.0.4
-        version: 2.0.4(cmd-ts@0.14.3)(dedent@1.7.1)(ts-repo-utils@8.1.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
+        specifier: ^2.0.5
+        version: 2.0.5(cmd-ts@0.14.3)(dedent@1.7.1)(ts-repo-utils@8.1.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
       ts-repo-utils:
         specifier: ^8.1.0
         version: 8.1.0(prettier@3.8.1)(typescript@5.9.3)
@@ -697,6 +697,10 @@ packages:
   '@isaacs/brace-expansion@5.0.1':
     resolution: {integrity: sha512-WMz71T1JS624nWj2n2fnYAuPovhv7EUhk69R6i9dsVyzxt5eM3bjwvgk9L+APE1TRscGysAVMANkB0jh0LQZrQ==}
     engines: {node: 20 || >=22}
+
+  '@isaacs/cliui@9.0.0':
+    resolution: {integrity: sha512-AokJm4tuBHillT+FpMtxQ60n8ObyXBatq7jD2/JA9dxbDDokKQm8KMht5ibGzLVU9IJDIKK4TPKgMHEYMn3lMg==}
+    engines: {node: '>=18'}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1475,6 +1479,10 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
+  balanced-match@4.0.2:
+    resolution: {integrity: sha512-x0K50QvKQ97fdEz2kPehIerj+YTeptKF9hyYkKf6egnwmMWAkADiO0QCzSp0R5xN8FTZgYaBfSaue46Ej62nMg==}
+    engines: {node: 20 || >=22}
+
   baseline-browser-mapping@2.9.19:
     resolution: {integrity: sha512-ipDqC8FrAl/76p2SSWKSI+H9tFwm7vYqXQrItCuiVPt26Km0jS+NzSsBWAaBusvSbQcfJG+JitdMm+wZAgTYqg==}
     hasBin: true
@@ -1490,6 +1498,10 @@ packages:
 
   brace-expansion@2.0.2:
     resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
+
+  brace-expansion@5.0.2:
+    resolution: {integrity: sha512-Pdk8c9poy+YhOgVWw1JNN22/HcivgKWwpxKq04M/jTmHyCZn12WPJebZxdjSa5TmBqISrUSgNYU3eRORljfCCw==}
+    engines: {node: 20 || >=22}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -2761,6 +2773,10 @@ packages:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
     engines: {node: '>= 0.4'}
 
+  jackspeak@4.2.3:
+    resolution: {integrity: sha512-ykkVRwrYvFm1nb2AJfKKYPr0emF6IiXDYUaFx4Zn9ZuIH7MrzEZ3sD5RlqGXNRpHtvUHJyOnCEFxOlNDtGo7wg==}
+    engines: {node: 20 || >=22}
+
   java-properties@1.0.2:
     resolution: {integrity: sha512-qjdpeo2yKlYTH7nFdK0vbZWuTCesk4o63v5iVOlhMQPfuIZQfW/HI35SjfhA+4qpg36rnFSvUK5b1m+ckIblQQ==}
     engines: {node: '>= 0.6.0'}
@@ -3058,6 +3074,10 @@ packages:
 
   minimatch@10.1.2:
     resolution: {integrity: sha512-fu656aJ0n2kcXwsnwnv9g24tkU5uSmOlTjd6WyyaKm2Z+h1qmY6bAjrcaIxF/BslFqbZ8UBtbJi7KgQOZD2PTw==}
+    engines: {node: 20 || >=22}
+
+  minimatch@10.2.0:
+    resolution: {integrity: sha512-ugkC31VaVg9cF0DFVoADH12k6061zNZkZON+aX8AWsR9GhPcErkcMBceb6znR8wLERM2AkkOxy2nWRLpT9Jq5w==}
     engines: {node: 20 || >=22}
 
   minimatch@3.1.2:
@@ -3882,8 +3902,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-codemod-lib@2.0.4:
-    resolution: {integrity: sha512-KAi/PBUOuoXpcKp7Y5T7nqxVFIJT6FGuGpxW5do0vxDy3qfS/B24irDGsAKLXjmLwhSH/V8vzoJ8R70b9MbbEw==}
+  ts-codemod-lib@2.0.5:
+    resolution: {integrity: sha512-ybaz9KMPYrn92Xt2txfB6AGkr4j5QJegySQkAuHiRGBLhMghWuVJcVZmwxNMaBrA8TduQ2LNdYwma6dT/p6ncA==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
@@ -3900,6 +3920,12 @@ packages:
 
   ts-data-forge@6.4.0:
     resolution: {integrity: sha512-aOroHGSY4BtfxHa29hKKDn82Pu1HFcqZwHMcA8/nRdztXEwXz2NfYN2xBKvRaE6RJzRgNiitAdZGrXpyTOSp/Q==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
+    peerDependencies:
+      typescript: '>=4.8'
+
+  ts-data-forge@6.5.0:
+    resolution: {integrity: sha512-UPwFgkyLMyXTwySaJlBFpYlJjmay29I1kXfgWDDQqcAg6wSmH6ViqW56OEf6xBD5C4gdZycA8kXkVGsMfiBmJQ==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     peerDependencies:
       typescript: '>=4.8'
@@ -4780,6 +4806,8 @@ snapshots:
     dependencies:
       '@isaacs/balanced-match': 4.0.1
 
+  '@isaacs/cliui@9.0.0': {}
+
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -5165,7 +5193,7 @@ snapshots:
 
   '@ts-morph/common@0.28.1':
     dependencies:
-      minimatch: 10.1.2
+      minimatch: 10.2.0
       path-browserify: 1.0.1
       tinyglobby: 0.2.15
 
@@ -5591,6 +5619,10 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
+  balanced-match@4.0.2:
+    dependencies:
+      jackspeak: 4.2.3
+
   baseline-browser-mapping@2.9.19: {}
 
   before-after-hook@4.0.0: {}
@@ -5605,6 +5637,10 @@ snapshots:
   brace-expansion@2.0.2:
     dependencies:
       balanced-match: 1.0.2
+
+  brace-expansion@5.0.2:
+    dependencies:
+      balanced-match: 4.0.2
 
   braces@3.0.3:
     dependencies:
@@ -7138,6 +7174,10 @@ snapshots:
       has-symbols: 1.1.0
       set-function-name: 2.0.2
 
+  jackspeak@4.2.3:
+    dependencies:
+      '@isaacs/cliui': 9.0.0
+
   java-properties@1.0.2: {}
 
   jiti@2.6.1: {}
@@ -7527,6 +7567,10 @@ snapshots:
   minimatch@10.1.2:
     dependencies:
       '@isaacs/brace-expansion': 5.0.1
+
+  minimatch@10.2.0:
+    dependencies:
+      brace-expansion: 5.0.2
 
   minimatch@3.1.2:
     dependencies:
@@ -8359,9 +8403,9 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-codemod-lib@2.0.4(cmd-ts@0.14.3)(dedent@1.7.1)(ts-repo-utils@8.1.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
+  ts-codemod-lib@2.0.5(cmd-ts@0.14.3)(dedent@1.7.1)(ts-repo-utils@8.1.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
-      ts-data-forge: 6.4.0(typescript@5.9.3)
+      ts-data-forge: 6.5.0(typescript@5.9.3)
       ts-morph: 27.0.2
     optionalDependencies:
       cmd-ts: 0.14.3
@@ -8371,6 +8415,12 @@ snapshots:
       - typescript
 
   ts-data-forge@6.4.0(typescript@5.9.3):
+    dependencies:
+      '@sindresorhus/is': 7.2.0
+      ts-type-forge: 2.3.1
+      typescript: 5.9.3
+
+  ts-data-forge@6.5.0(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
       ts-type-forge: 2.3.1
