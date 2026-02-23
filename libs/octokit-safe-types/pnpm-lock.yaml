@@ -112,8 +112,8 @@ importers:
         specifier: 25.0.3
         version: 25.0.3(typescript@5.9.3)
       ts-repo-utils:
-        specifier: 8.1.0
-        version: 8.1.0(prettier@3.8.1)(typescript@5.9.3)
+        specifier: 8.2.0
+        version: 8.2.0(prettier@3.8.1)(typescript@5.9.3)
       ts-type-forge:
         specifier: 2.3.1
         version: 2.3.1
@@ -3933,8 +3933,8 @@ packages:
     resolution: {integrity: sha512-JD/LWwkr5NZRwnTW5nI/h/lSE1zB09tDx7RLmoVBsgvRf4hVS55dUgTPb7S7lS1B4ijYnM99RtqtRvqso4WAow==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
-  ts-repo-utils@8.1.0:
-    resolution: {integrity: sha512-xe75D4Zjw/x9RtxKf6ctCqAiBGjjBD9Dtc5UyVmnI/HhwzYI3UuLDpqd0Xo0O7KnZvnbGbRnrAJp39Em1N+nbw==}
+  ts-repo-utils@8.2.0:
+    resolution: {integrity: sha512-4ryCqIiR4tXxT51nDoeF7QGonVw86HBSfB/BpQujTzRCg+NldquTHkEOJlv0TlM6IP4xYeMFYUxVg8yyF129Ig==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
@@ -8473,7 +8473,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  ts-repo-utils@8.1.0(prettier@3.8.1)(typescript@5.9.3):
+  ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 7.2.0
