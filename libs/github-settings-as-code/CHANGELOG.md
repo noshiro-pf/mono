@@ -1,3 +1,9 @@
+## [1.1.9](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.8...v1.1.9) (2026-02-23)
+
+### Bug Fixes
+
+- bump dotenv from 17.2.3 to 17.3.1 ([#74](https://github.com/noshiro-pf/github-settings-as-code/issues/74)) ([a0961e8](https://github.com/noshiro-pf/github-settings-as-code/commit/a0961e809b58a20fda19b9d3b384f917ddc5f1c7))
+
 ## [1.1.8](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.7...v1.1.8) (2026-02-23)
 
 ### Bug Fixes
