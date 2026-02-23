@@ -84,7 +84,7 @@
     "@semantic-release/github": "12.0.5",
     "@semantic-release/npm": "13.1.4",
     "@semantic-release/release-notes-generator": "14.1.0",
-    "@types/node": "25.2.0",
+    "@types/node": "25.2.3",
     "@vitest/browser-playwright": "4.0.17",
     "@vitest/coverage-v8": "4.0.17",
     "@vitest/ui": "4.0.17",
