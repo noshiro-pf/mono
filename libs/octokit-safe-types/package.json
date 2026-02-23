@@ -1,6 +1,6 @@
 {
   "name": "octokit-safe-types",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "private": false,
   "description": "A library of readonly versions of Octokit types and their corresponding validators",
   "keywords": [
