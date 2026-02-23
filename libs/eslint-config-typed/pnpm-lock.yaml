@@ -244,8 +244,8 @@ importers:
         specifier: ^2.0.3
         version: 2.0.3
       ts-fortress:
-        specifier: 6.2.5
-        version: 6.2.5(typescript@5.9.3)
+        specifier: 6.4.0
+        version: 6.4.0(typescript@5.9.3)
       ts-morph:
         specifier: 27.0.2
         version: 27.0.2
@@ -4114,8 +4114,8 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@6.2.5:
-    resolution: {integrity: sha512-JD/LWwkr5NZRwnTW5nI/h/lSE1zB09tDx7RLmoVBsgvRf4hVS55dUgTPb7S7lS1B4ijYnM99RtqtRvqso4WAow==}
+  ts-fortress@6.4.0:
+    resolution: {integrity: sha512-GbV2LEkzjmzCDd7mSu9oQXIZdG3lBXU4q8y1qztf09nwoUEP6FgF12C1UYxqoCj8KriRqtwgIMCWie7uV/E+Hg==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   ts-morph@27.0.2:
@@ -7032,7 +7032,7 @@ snapshots:
       dotenv: 17.2.3
       octokit-safe-types: 1.2.8(typescript@5.9.3)
       ts-data-forge: 6.4.0(typescript@5.9.3)
-      ts-fortress: 6.2.5(typescript@5.9.3)
+      ts-fortress: 6.4.0(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -7952,7 +7952,7 @@ snapshots:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
       ts-data-forge: 6.4.0(typescript@5.9.3)
-      ts-fortress: 6.2.5(typescript@5.9.3)
+      ts-fortress: 6.4.0(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8681,7 +8681,7 @@ snapshots:
       picomatch: 4.0.3
       typescript: 5.9.3
 
-  ts-fortress@6.2.5(typescript@5.9.3):
+  ts-fortress@6.4.0(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
       ts-data-forge: 6.4.0(typescript@5.9.3)
