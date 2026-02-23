@@ -93,7 +93,7 @@
     "eslint": "9.39.2",
     "eslint-config-typed": "4.6.2",
     "fast-glob": "3.3.3",
-    "github-settings-as-code": "1.1.0",
+    "github-settings-as-code": "1.1.4",
     "jiti": "2.6.1",
     "markdownlint": "0.40.0",
     "markdownlint-cli2": "0.20.0",
