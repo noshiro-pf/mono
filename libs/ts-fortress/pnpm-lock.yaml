@@ -118,8 +118,8 @@ importers:
         specifier: ^2.0.3
         version: 2.0.3
       ts-repo-utils:
-        specifier: 8.1.0
-        version: 8.1.0(prettier@3.8.1)(typescript@5.9.3)
+        specifier: 8.2.0
+        version: 8.2.0(prettier@3.8.1)(typescript@5.9.3)
       tslib:
         specifier: 2.8.1
         version: 2.8.1
@@ -3947,8 +3947,8 @@ packages:
   ts-morph@27.0.2:
     resolution: {integrity: sha512-fhUhgeljcrdZ+9DZND1De1029PrE+cMkIP7ooqkLRTrRLTqcki2AstsyJm0vRNbTbVCNJ0idGlbBrfqc7/nA8w==}
 
-  ts-repo-utils@8.1.0:
-    resolution: {integrity: sha512-xe75D4Zjw/x9RtxKf6ctCqAiBGjjBD9Dtc5UyVmnI/HhwzYI3UuLDpqd0Xo0O7KnZvnbGbRnrAJp39Em1N+nbw==}
+  ts-repo-utils@8.2.0:
+    resolution: {integrity: sha512-4ryCqIiR4tXxT51nDoeF7QGonVw86HBSfB/BpQujTzRCg+NldquTHkEOJlv0TlM6IP4xYeMFYUxVg8yyF129Ig==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
@@ -8490,7 +8490,7 @@ snapshots:
       '@ts-morph/common': 0.28.1
       code-block-writer: 13.0.3
 
-  ts-repo-utils@8.1.0(prettier@3.8.1)(typescript@5.9.3):
+  ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 7.2.0
