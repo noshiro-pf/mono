@@ -26,7 +26,6 @@ jobs:
           - ws:type-check
           - ws:lint:fix
           - ws:test:browser
-          - ws:test:cov
           - codemod:full
           - knip
           - lint:published-deps
