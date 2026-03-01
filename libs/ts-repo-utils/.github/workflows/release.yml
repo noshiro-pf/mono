@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main # Trigger a push to the main branch
+      - alpha # Trigger a push to the alpha branch
+      - beta # Trigger a push to the beta branch
 
 permissions:
   id-token: write # Required for OIDC
