@@ -123,7 +123,7 @@
     "prettier": "3.8.1",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.0",
-    "rollup": "4.57.1",
+    "rollup": "4.59.0",
     "semantic-release": "25.0.3",
     "ts-codemod-lib": "^2.0.5",
     "ts-repo-utils": "^8.1.0",
