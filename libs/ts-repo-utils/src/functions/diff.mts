@@ -1,6 +1,24 @@
 import { type ExecException } from 'node:child_process';
 import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
+import { $ } from './exec-async.mjs';
+
+/**
+ * Get the git repository root directory
+ */
+export const getGitRoot = async (
+  options?: Readonly<{ silent?: boolean }>,
+): Promise<Result<string, ExecException | Readonly<{ message: string }>>> => {
+  const result = await $('git rev-parse --show-toplevel', {
+    silent: options?.silent ?? false,
+  });
+
+  if (Result.isErr(result)) {
+    return result;
+  }
+
+  return Result.ok(result.value.stdout.trim());
+};
 
 /**
  * Get untracked files from the working tree (files not added to git). Runs `git
@@ -105,6 +123,15 @@ const cmdResultToFiles = async ({
 }>): Promise<
   Result<readonly string[], ExecException | Readonly<{ message: string }>>
 > => {
+  // Get git root directory
+  const gitRootResult = await getGitRoot({ silent: options?.silent ?? false });
+
+  if (Result.isErr(gitRootResult)) {
+    return gitRootResult;
+  }
+
+  const gitRoot = gitRootResult.value;
+
   const result = await $(
     [
       cmd,
@@ -123,11 +150,12 @@ const cmdResultToFiles = async ({
 
   const { stdout } = result.value;
 
-  // Parse git output
+  // Parse git output and convert to absolute paths
   const files = stdout
     .split('\n')
     .map((line) => line.trim())
-    .filter((line) => line !== '');
+    .filter((line) => line !== '')
+    .map((relativePath) => path.join(gitRoot, relativePath));
 
   return Result.ok(files);
 };

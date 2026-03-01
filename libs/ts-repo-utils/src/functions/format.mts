@@ -5,6 +5,7 @@ import '../node-global.mjs';
 import { pathExists } from './assert-path-exists.mjs';
 import {
   getDiffFrom,
+  getGitRoot,
   getModifiedFiles,
   getStagedFiles,
   getUntrackedFiles,
@@ -37,6 +38,22 @@ export const formatFiles = async (
 
   conditionalEcho(`Formatting ${files.length} files...`);
 
+  // Get git root for display purposes
+  const gitRootResult = await getGitRoot({ silent: true });
+
+  const gitRoot = Result.isOk(gitRootResult) ? gitRootResult.value : undefined;
+
+  // Helper function to get display path (relative to git root if available)
+  const getDisplayPath = (filePath: string): string => {
+    if (gitRoot === undefined) {
+      return filePath;
+    }
+
+    const relativePath = path.relative(gitRoot, filePath);
+
+    return relativePath.startsWith('..') ? filePath : relativePath;
+  };
+
   // Format each file
   const results: readonly PromiseSettledResult<Result<undefined, unknown>>[] =
     // NOTE: Using Promise.allSettled to ensure all files are processed even if some fail
@@ -45,13 +62,17 @@ export const formatFiles = async (
         try {
           // Check if file exists first
           if (!(await pathExists(filePath))) {
-            conditionalEcho(`Skipping non-existent file: ${filePath}`);
+            conditionalEcho(
+              `Skipping non-existent file: ${getDisplayPath(filePath)}`,
+            );
 
             return Result.ok(undefined);
           }
 
           if (!noIgnore && (options?.ignore ?? defaultIgnoreFn)(filePath)) {
-            conditionalEcho(`Skipping ignored file: ${filePath}`);
+            conditionalEcho(
+              `Skipping ignored file: ${getDisplayPath(filePath)}`,
+            );
 
             return Result.ok(undefined);
           }
@@ -62,7 +83,9 @@ export const formatFiles = async (
           });
 
           if (!noIgnore && fileInfo.ignored) {
-            conditionalEcho(`Skipping ignored file: ${filePath}`);
+            conditionalEcho(
+              `Skipping ignored file: ${getDisplayPath(filePath)}`,
+            );
 
             return Result.ok(undefined);
           }
@@ -73,7 +96,9 @@ export const formatFiles = async (
             fileInfo.inferredParser === null
           ) {
             // Silently skip files with no parser
-            conditionalEcho(`Skipping file (no parser): ${filePath}`);
+            conditionalEcho(
+              `Skipping file (no parser): ${getDisplayPath(filePath)}`,
+            );
 
             return Result.ok(undefined);
           }
@@ -92,17 +117,20 @@ export const formatFiles = async (
 
           // Only write if content changed
           if (formatted === content) {
-            conditionalEcho(`Unchanged: ${filePath}`);
+            conditionalEcho(`Unchanged: ${getDisplayPath(filePath)}`);
           } else {
             await fs.writeFile(filePath, formatted, 'utf8');
 
-            conditionalEcho(`Formatted: ${filePath}`);
+            conditionalEcho(`Formatted: ${getDisplayPath(filePath)}`);
           }
 
           return Result.ok(undefined);
         } catch (error) {
           if (!silent) {
-            console.error(`Error formatting ${filePath}:`, error);
+            console.error(
+              `Error formatting ${getDisplayPath(filePath)}:`,
+              error,
+            );
           }
 
           return Result.err(error);

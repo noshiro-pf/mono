@@ -134,7 +134,7 @@ describe('diff', () => {
         if (Result.isOk(result)) {
           const files = result.value;
 
-          expect(files).toContain(testFileName);
+          expect(files).toContain(testFilePath);
         }
       } finally {
         await cleanup();
@@ -168,7 +168,7 @@ describe('diff', () => {
         if (Result.isOk(result)) {
           const files = result.value;
 
-          expect(files).not.toContain(testFileName);
+          expect(files).not.toContain(testFilePath);
         }
       } finally {
         await cleanup();
@@ -210,9 +210,9 @@ describe('diff', () => {
         if (Result.isOk(result)) {
           const files = result.value;
 
-          expect(files).toContain(newFile);
+          expect(files).toContain(newFilePath);
 
-          expect(files).not.toContain(modifyFile);
+          expect(files).not.toContain(modifyFilePath);
         }
       } finally {
         await cleanup();
@@ -348,7 +348,7 @@ describe('diff', () => {
         if (Result.isOk(result)) {
           const files = result.value;
 
-          expect(files).toContain(testFileName);
+          expect(files).toContain(testFilePath);
         }
       } finally {
         await cleanup();
@@ -386,9 +386,9 @@ describe('diff', () => {
         if (Result.isOk(result)) {
           const files = result.value;
 
-          expect(files).toContain(file1);
+          expect(files).toContain(filePath1);
 
-          expect(files).toContain(file2);
+          expect(files).toContain(filePath2);
         }
       } finally {
         await cleanup();
@@ -433,7 +433,7 @@ describe('diff', () => {
         if (Result.isOk(resultExclude)) {
           const files = resultExclude.value;
 
-          expect(files).not.toContain(testFileName);
+          expect(files).not.toContain(testFilePath);
         }
 
         // Test with excludeDeleted = false
@@ -457,7 +457,7 @@ describe('diff', () => {
           if (Result.isOk(resultInclude)) {
             const files = resultInclude.value;
 
-            expect(files).toContain(testFileName);
+            expect(files).toContain(testFilePath);
           }
         } else {
           // If the file is not properly staged for deletion, just log and skip the assertion
@@ -579,7 +579,7 @@ describe('diff', () => {
         if (Result.isOk(result)) {
           const files = result.value;
 
-          expect(files).toContain(testFileName);
+          expect(files).toContain(testFilePath);
         }
       } finally {
         await cleanup();
@@ -626,9 +626,9 @@ describe('diff', () => {
         if (Result.isOk(result)) {
           const files = result.value;
 
-          expect(files).toContain(file1);
+          expect(files).toContain(filePath1);
 
-          expect(files).toContain(file2);
+          expect(files).toContain(filePath2);
         }
       } finally {
         await cleanup();
@@ -669,7 +669,7 @@ describe('diff', () => {
         if (Result.isOk(resultExclude)) {
           const files = resultExclude.value;
 
-          expect(files).not.toContain(testFileName);
+          expect(files).not.toContain(testFilePath);
         }
 
         // Test with excludeDeleted = false
@@ -683,7 +683,7 @@ describe('diff', () => {
         if (Result.isOk(resultInclude)) {
           const files = resultInclude.value;
 
-          expect(files).toContain(testFileName);
+          expect(files).toContain(testFilePath);
         }
       } finally {
         await cleanup();

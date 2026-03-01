@@ -3,6 +3,7 @@ import { Result } from 'ts-data-forge';
 import '../node-global.mjs';
 import {
   getDiffFrom,
+  getGitRoot,
   getModifiedFiles,
   getStagedFiles,
   getUntrackedFiles,
@@ -16,6 +17,7 @@ import {
 
 vi.mock(import('./diff.mjs'), () => ({
   getDiffFrom: vi.fn(),
+  getGitRoot: vi.fn(),
   getModifiedFiles: vi.fn(),
   getStagedFiles: vi.fn(),
   getUntrackedFiles: vi.fn(),
@@ -45,6 +47,8 @@ describe(formatFilesGlob, () => {
 
   test('should format files matching glob pattern', async () => {
     vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
 
     // Setup test directory
     await fs.mkdir(testDir, { recursive: true });
@@ -119,6 +123,8 @@ describe(formatFilesGlob, () => {
   test('should handle nested directories with glob pattern', async () => {
     vi.clearAllMocks();
 
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
     // Setup test directory with nested structure
     await fs.mkdir(path.join(testDir, 'src', 'utils'), { recursive: true });
 
@@ -179,6 +185,8 @@ describe(formatFiles, () => {
 
   test('should format a list of files', async () => {
     vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
 
     await fs.mkdir(testDir, { recursive: true });
 
@@ -262,6 +270,9 @@ describe(formatUncommittedFiles, () => {
 
   const setupTest = async (): Promise<void> => {
     vi.clearAllMocks();
+
+    // Mock getGitRoot to return testDir as git root for relative path display
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
 
     await fs.mkdir(testDir, { recursive: true });
   };
