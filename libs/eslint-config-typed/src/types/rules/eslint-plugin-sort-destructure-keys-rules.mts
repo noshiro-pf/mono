@@ -8,15 +8,15 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Require object destructure keys to be sorted
+ * @description require object destructure keys to be sorted
  *
- * ```md
- * | key         | value |
- * | :---------- | :---- |
- * | deprecated  | false |
- * | fixable     | code  |
- * | recommended | false |
- * ```
+ *  ```md
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | fixable     | code  |
+ *  | recommended | false |
+ *  ```
  */
 namespace SortDestructureKeys {
   /**

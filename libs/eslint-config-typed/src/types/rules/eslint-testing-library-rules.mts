@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforce promises from async event methods are handled
- *
+ * @description Enforce promises from async event methods are handled
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-events.md
  *
  *  ```md
@@ -59,7 +58,9 @@ namespace AwaitAsyncEvents {
    * ```
    */
   export type Options = Readonly<{
-    /** @default 'userEvent' */
+    /**
+     * @default "userEvent"
+     */
     eventModule?:
       | ('fireEvent' | 'userEvent')
       | readonly ('fireEvent' | 'userEvent')[];
@@ -72,8 +73,7 @@ namespace AwaitAsyncEvents {
 }
 
 /**
- * Enforce promises from async queries to be handled
- *
+ * @description Enforce promises from async queries to be handled
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-queries.md
  *
  *  ```md
@@ -89,8 +89,7 @@ namespace AwaitAsyncQueries {
 }
 
 /**
- * Enforce promises from async utils to be awaited properly
- *
+ * @description Enforce promises from async utils to be awaited properly
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-utils.md
  *
  *  ```md
@@ -106,8 +105,7 @@ namespace AwaitAsyncUtils {
 }
 
 /**
- * Ensures consistent usage of `data-testid`
- *
+ * @description Ensures consistent usage of `data-testid`
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/consistent-data-testid.md
  *
  *  ```md
@@ -158,7 +156,9 @@ namespace ConsistentDataTestid {
    */
   export type Options = Readonly<{
     testIdPattern: string;
-    /** @default 'data-testid' */
+    /**
+     * @default "data-testid"
+     */
     testIdAttribute?: string | readonly string[];
     customMessage?: string;
   }>;
@@ -170,8 +170,7 @@ namespace ConsistentDataTestid {
 }
 
 /**
- * Disallow unnecessary `await` for sync events
- *
+ * @description Disallow unnecessary `await` for sync events
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-await-sync-events.md
  *
  *  ```md
@@ -212,7 +211,8 @@ namespace NoAwaitSyncEvents {
    */
   export type Options = Readonly<{
     /**
-     * @default ['fire-event']
+     * @default ["fire-event"]
+     *
      * @minItems 1
      */
     eventModules?: readonly [
@@ -228,8 +228,7 @@ namespace NoAwaitSyncEvents {
 }
 
 /**
- * Disallow unnecessary `await` for sync queries
- *
+ * @description Disallow unnecessary `await` for sync queries
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-await-sync-queries.md
  *
  *  ```md
@@ -245,8 +244,7 @@ namespace NoAwaitSyncQueries {
 }
 
 /**
- * Disallow the use of `container` methods
- *
+ * @description Disallow the use of `container` methods
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-container.md
  *
  *  ```md
@@ -261,8 +259,7 @@ namespace NoContainer {
 }
 
 /**
- * Disallow the use of debugging utilities like `debug`
- *
+ * @description Disallow the use of debugging utilities like `debug`
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-debugging-utils.md
  *
  *  ```md
@@ -329,8 +326,7 @@ namespace NoDebuggingUtils {
 }
 
 /**
- * Disallow importing from DOM Testing Library
- *
+ * @description Disallow importing from DOM Testing Library
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-dom-import.md
  *
  *  ```md
@@ -362,8 +358,7 @@ namespace NoDomImport {
 }
 
 /**
- * Disallow the use of the global RegExp flag (/g) in queries
- *
+ * @description Disallow the use of the global RegExp flag (/g) in queries
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-global-regexp-flag-in-query.md
  *
  *  ```md
@@ -379,8 +374,7 @@ namespace NoGlobalRegexpFlagInQuery {
 }
 
 /**
- * Disallow the use of `cleanup`
- *
+ * @description Disallow the use of `cleanup`
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-manual-cleanup.md
  *
  *  ```md
@@ -395,8 +389,7 @@ namespace NoManualCleanup {
 }
 
 /**
- * Disallow direct Node access
- *
+ * @description Disallow direct Node access
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-node-access.md
  *
  *  ```md
@@ -435,8 +428,7 @@ namespace NoNodeAccess {
 }
 
 /**
- * Disallow the use of promises passed to a `fireEvent` method
- *
+ * @description Disallow the use of promises passed to a `fireEvent` method
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-promise-in-fire-event.md
  *
  *  ```md
@@ -451,8 +443,7 @@ namespace NoPromiseInFireEvent {
 }
 
 /**
- * Disallow the use of `render` in testing frameworks setup functions
- *
+ * @description Disallow the use of `render` in testing frameworks setup functions
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-render-in-lifecycle.md
  *
  *  ```md
@@ -495,8 +486,7 @@ namespace NoRenderInLifecycle {
 }
 
 /**
- * Ensure no `data-testid` queries are used
- *
+ * @description Ensure no `data-testid` queries are used
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-test-id-queries.md
  *
  *  ```md
@@ -511,8 +501,7 @@ namespace NoTestIdQueries {
 }
 
 /**
- * Disallow wrapping Testing Library utils or empty callbacks in `act`
- *
+ * @description Disallow wrapping Testing Library utils or empty callbacks in `act`
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-unnecessary-act.md
  *
  *  ```md
@@ -551,8 +540,7 @@ namespace NoUnnecessaryAct {
 }
 
 /**
- * Disallow the use of multiple `expect` calls inside `waitFor`
- *
+ * @description Disallow the use of multiple `expect` calls inside `waitFor`
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-multiple-assertions.md
  *
  *  ```md
@@ -568,8 +556,7 @@ namespace NoWaitForMultipleAssertions {
 }
 
 /**
- * Disallow the use of side effects in `waitFor`
- *
+ * @description Disallow the use of side effects in `waitFor`
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-side-effects.md
  *
  *  ```md
@@ -585,8 +572,7 @@ namespace NoWaitForSideEffects {
 }
 
 /**
- * Ensures no snapshot is generated inside of a `waitFor` call
- *
+ * @description Ensures no snapshot is generated inside of a `waitFor` call
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-snapshot.md
  *
  *  ```md
@@ -601,8 +587,7 @@ namespace NoWaitForSnapshot {
 }
 
 /**
- * Suggest using explicit assertions rather than standalone queries
- *
+ * @description Suggest using explicit assertions rather than standalone queries
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-explicit-assert.md
  *
  *  ```md
@@ -655,9 +640,7 @@ namespace PreferExplicitAssert {
 }
 
 /**
- * Suggest using `find(All)By*` query instead of `waitFor` + `get(All)By*` to
- * wait for elements
- *
+ * @description Suggest using `find(All)By*` query instead of `waitFor` + `get(All)By*` to wait for elements
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-find-by.md
  *
  *  ```md
@@ -673,8 +656,7 @@ namespace PreferFindBy {
 }
 
 /**
- * Suggest using implicit assertions for getBy* & findBy* queries
- *
+ * @description Suggest using implicit assertions for getBy* & findBy* queries
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-implicit-assert.md
  *
  *  ```md
@@ -689,9 +671,7 @@ namespace PreferImplicitAssert {
 }
 
 /**
- * Ensure appropriate `get*`/`query*` queries are used with their respective
- * matchers
- *
+ * @description Ensure appropriate `get*`/`query*` queries are used with their respective matchers
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-presence-queries.md
  *
  *  ```md
@@ -735,8 +715,7 @@ namespace PreferPresenceQueries {
 }
 
 /**
- * Suggest using `queryBy*` queries when waiting for disappearance
- *
+ * @description Suggest using `queryBy*` queries when waiting for disappearance
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-query-by-disappearance.md
  *
  *  ```md
@@ -751,9 +730,7 @@ namespace PreferQueryByDisappearance {
 }
 
 /**
- * Ensure the configured `get*`/`query*` query is used with the corresponding
- * matchers
- *
+ * @description Ensure the configured `get*`/`query*` query is used with the corresponding matchers
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-query-matchers.md
  *
  *  ```md
@@ -811,8 +788,7 @@ namespace PreferQueryMatchers {
 }
 
 /**
- * Suggest using `screen` while querying
- *
+ * @description Suggest using `screen` while querying
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-screen-queries.md
  *
  *  ```md
@@ -827,8 +803,7 @@ namespace PreferScreenQueries {
 }
 
 /**
- * Suggest using `userEvent` over `fireEvent` for simulating user interactions
- *
+ * @description Suggest using `userEvent` over `fireEvent` for simulating user interactions
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-user-event.md
  *
  *  ```md
@@ -867,8 +842,7 @@ namespace PreferUserEvent {
 }
 
 /**
- * Suggest using userEvent with setup() instead of direct methods
- *
+ * @description Suggest using userEvent with setup() instead of direct methods
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-user-event-setup.md
  *
  *  ```md
@@ -883,8 +857,7 @@ namespace PreferUserEventSetup {
 }
 
 /**
- * Enforce a valid naming for return value from `render`
- *
+ * @description Enforce a valid naming for return value from `render`
  * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/render-result-naming-convention.md
  *
  *  ```md

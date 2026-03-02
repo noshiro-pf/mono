@@ -8,15 +8,14 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Ensure all properties are destructured from an object when explicitly
- * requested
+ * @description Ensure all properties are destructured from an object when explicitly requested
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace CheckDestructuringCompleteness {
   /**
@@ -43,13 +42,11 @@ namespace CheckDestructuringCompleteness {
    */
   export type Options = Readonly<{
     /**
-     * Always check React component props destructuring without directive
-     * keyword
+     * Always check React component props destructuring without directive keyword
      */
     alwaysCheckReactComponentProps?: boolean;
     /**
-     * Custom directive keyword to enable checking (default:
-     * "@check-destructuring-completeness")
+     * Custom directive keyword to enable checking (default: "@check-destructuring-completeness")
      */
     directiveKeyword?: string;
   }>;
@@ -61,15 +58,15 @@ namespace CheckDestructuringCompleteness {
 }
 
 /**
- * Disallow type assertions with specified type names
+ * @description Disallow type assertions with specified type names
  *
- * ```md
- * | key        | value   |
- * | :--------- | :------ |
- * | type       | problem |
- * | deprecated | false   |
- * | fixable    | code    |
- * ```
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
  */
 namespace NoRestrictedCastName {
   /**
@@ -147,7 +144,9 @@ namespace NoRestrictedCastName {
    * ]
    * ```
    */
-  /** @minItems 0 */
+  /**
+   * @minItems 0
+   */
   export type Options = readonly (
     | string
     | Readonly<{
@@ -172,8 +171,7 @@ namespace NoRestrictedCastName {
 }
 
 /**
- * Disallow specified syntax
- *
+ * @description Disallow specified syntax
  * @link https://eslint.org/docs/latest/rules/no-restricted-syntax
  *
  *  ```md
@@ -220,7 +218,9 @@ namespace NoRestrictedSyntax {
    * ]
    * ```
    */
-  /** @minItems 0 */
+  /**
+   * @minItems 0
+   */
   export type Options = readonly (
     | string
     | Readonly<{

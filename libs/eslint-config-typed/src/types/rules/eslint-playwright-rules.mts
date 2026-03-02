@@ -8,9 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforces a blank line between Playwright test blocks (e.g., test, test.step,
- * test.beforeEach, etc.).
- *
+ * @description Enforces a blank line between Playwright test blocks (e.g., test, test.step, test.beforeEach, etc.).
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/consistent-spacing-between-blocks.md
  *
  *  ```md
@@ -27,8 +25,7 @@ namespace ConsistentSpacingBetweenBlocks {
 }
 
 /**
- * Enforce assertion to be made in a test body
- *
+ * @description Enforce assertion to be made in a test body
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/expect-expect.md
  *
  *  ```md
@@ -78,8 +75,7 @@ namespace ExpectExpect {
 }
 
 /**
- * Enforces a maximum number assertion calls in a test body
- *
+ * @description Enforces a maximum number assertion calls in a test body
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/max-expects.md
  *
  *  ```md
@@ -120,8 +116,7 @@ namespace MaxExpects {
 }
 
 /**
- * Enforces a maximum depth to nested describe calls
- *
+ * @description Enforces a maximum depth to nested describe calls
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/max-nested-describe.md
  *
  *  ```md
@@ -162,8 +157,7 @@ namespace MaxNestedDescribe {
 }
 
 /**
- * Identify false positives when async Playwright APIs are not properly awaited.
- *
+ * @description Identify false positives when async Playwright APIs are not properly awaited.
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/missing-playwright-await.md
  *
  *  ```md
@@ -207,8 +201,7 @@ namespace MissingPlaywrightAwait {
 }
 
 /**
- * Disallow commented out tests
- *
+ * @description Disallow commented out tests
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-commented-out-tests.md
  *
  *  ```md
@@ -224,8 +217,7 @@ namespace NoCommentedOutTests {
 }
 
 /**
- * Disallow calling `expect` conditionally
- *
+ * @description Disallow calling `expect` conditionally
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-conditional-expect.md
  *
  *  ```md
@@ -241,8 +233,7 @@ namespace NoConditionalExpect {
 }
 
 /**
- * Disallow conditional logic in tests
- *
+ * @description Disallow conditional logic in tests
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-conditional-in-test.md
  *
  *  ```md
@@ -258,8 +249,7 @@ namespace NoConditionalInTest {
 }
 
 /**
- * Disallow duplicate setup and teardown hooks
- *
+ * @description Disallow duplicate setup and teardown hooks
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-duplicate-hooks.md
  *
  *  ```md
@@ -275,8 +265,23 @@ namespace NoDuplicateHooks {
 }
 
 /**
- * The use of ElementHandle is discouraged, use Locator instead
+ * @description Disallow multiple `test.slow()` calls in the same test
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-duplicate-slow.md
  *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoDuplicateSlow {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description The use of ElementHandle is discouraged, use Locator instead
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-element-handle.md
  *
  *  ```md
@@ -293,9 +298,7 @@ namespace NoElementHandle {
 }
 
 /**
- * The use of `page.$eval` and `page.$$eval` are discouraged, use
- * `locator.evaluate` or `locator.evaluateAll` instead
- *
+ * @description The use of `page.$eval` and `page.$$eval` are discouraged, use `locator.evaluate` or `locator.evaluateAll` instead
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-eval.md
  *
  *  ```md
@@ -311,8 +314,7 @@ namespace NoEval {
 }
 
 /**
- * Prevent usage of `.only()` focus test annotation
- *
+ * @description Prevent usage of `.only()` focus test annotation
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-focused-test.md
  *
  *  ```md
@@ -329,8 +331,7 @@ namespace NoFocusedTest {
 }
 
 /**
- * Prevent usage of `{ force: true }` option.
- *
+ * @description Prevent usage of `{ force: true }` option.
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-force-option.md
  *
  *  ```md
@@ -346,8 +347,7 @@ namespace NoForceOption {
 }
 
 /**
- * Disallows the usage of getByTitle()
- *
+ * @description Disallows the usage of getByTitle()
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-get-by-title.md
  *
  *  ```md
@@ -363,8 +363,7 @@ namespace NoGetByTitle {
 }
 
 /**
- * Disallow setup and teardown hooks
- *
+ * @description Disallow setup and teardown hooks
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-hooks.md
  *
  *  ```md
@@ -410,8 +409,7 @@ namespace NoHooks {
 }
 
 /**
- * Disallow nested `test.step()` methods
- *
+ * @description Disallow nested `test.step()` methods
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-nested-step.md
  *
  *  ```md
@@ -427,8 +425,7 @@ namespace NoNestedStep {
 }
 
 /**
- * Prevent usage of the networkidle option
- *
+ * @description Prevent usage of the networkidle option
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-networkidle.md
  *
  *  ```md
@@ -444,8 +441,7 @@ namespace NoNetworkidle {
 }
 
 /**
- * Disallow usage of nth methods
- *
+ * @description Disallow usage of nth methods
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-nth-methods.md
  *
  *  ```md
@@ -461,8 +457,7 @@ namespace NoNthMethods {
 }
 
 /**
- * Prevent usage of page.pause()
- *
+ * @description Prevent usage of page.pause()
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-page-pause.md
  *
  *  ```md
@@ -478,8 +473,7 @@ namespace NoPagePause {
 }
 
 /**
- * Disallows the usage of raw locators
- *
+ * @description Disallows the usage of raw locators
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-raw-locators.md
  *
  *  ```md
@@ -522,8 +516,7 @@ namespace NoRawLocators {
 }
 
 /**
- * Disallows the usage of specific locator methods
- *
+ * @description Disallows the usage of specific locator methods
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-restricted-locators.md
  *
  *  ```md
@@ -583,8 +576,7 @@ namespace NoRestrictedLocators {
 }
 
 /**
- * Disallow specific matchers & modifiers
- *
+ * @description Disallow specific matchers & modifiers
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-restricted-matchers.md
  *
  *  ```md
@@ -622,8 +614,67 @@ namespace NoRestrictedMatchers {
 }
 
 /**
- * Prevent usage of the `.skip()` skip test annotation.
+ * @description Disallows the usage of specific roles in getByRole()
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-restricted-roles.md
  *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoRestrictedRoles {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "items": {
+   *       "oneOf": [
+   *         {
+   *           "type": "string"
+   *         },
+   *         {
+   *           "additionalProperties": false,
+   *           "properties": {
+   *             "message": {
+   *               "type": "string"
+   *             },
+   *             "role": {
+   *               "type": "string"
+   *             }
+   *           },
+   *           "required": [
+   *             "role"
+   *           ],
+   *           "type": "object"
+   *         }
+   *       ]
+   *     },
+   *     "type": "array"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = readonly (
+    | string
+    | Readonly<{
+        message?: string;
+        role: string;
+      }>
+  )[];
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Prevent usage of the `.skip()` skip test annotation.
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-skipped-test.md
  *
  *  ```md
@@ -655,7 +706,9 @@ namespace NoSkippedTest {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     allowConditional?: boolean;
   }>;
 
@@ -666,8 +719,7 @@ namespace NoSkippedTest {
 }
 
 /**
- * Prevent usage of the `.slow()` slow test annotation.
- *
+ * @description Prevent usage of the `.slow()` slow test annotation.
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-slowed-test.md
  *
  *  ```md
@@ -699,7 +751,9 @@ namespace NoSlowedTest {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     allowConditional?: boolean;
   }>;
 
@@ -710,8 +764,7 @@ namespace NoSlowedTest {
 }
 
 /**
- * Disallow using `expect` outside of `test` blocks
- *
+ * @description Disallow using `expect` outside of `test` blocks
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-standalone-expect.md
  *
  *  ```md
@@ -728,9 +781,7 @@ namespace NoStandaloneExpect {
 }
 
 /**
- * Prevent unsafe variable references in page.evaluate() and
- * page.addInitScript()
- *
+ * @description Prevent unsafe variable references in page.evaluate() and page.addInitScript()
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-unsafe-references.md
  *
  *  ```md
@@ -747,8 +798,7 @@ namespace NoUnsafeReferences {
 }
 
 /**
- * Disallow usage of page locators that are not used
- *
+ * @description Disallow usage of page locators that are not used
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-unused-locators.md
  *
  *  ```md
@@ -764,8 +814,7 @@ namespace NoUnusedLocators {
 }
 
 /**
- * Disallow unnecessary awaits for Playwright methods
- *
+ * @description Disallow unnecessary awaits for Playwright methods
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-useless-await.md
  *
  *  ```md
@@ -782,8 +831,7 @@ namespace NoUselessAwait {
 }
 
 /**
- * Disallow usage of 'not' matchers when a more specific matcher exists
- *
+ * @description Disallow usage of 'not' matchers when a more specific matcher exists
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-useless-not.md
  *
  *  ```md
@@ -800,8 +848,7 @@ namespace NoUselessNot {
 }
 
 /**
- * Prevent usage of page.waitForNavigation()
- *
+ * @description Prevent usage of page.waitForNavigation()
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-wait-for-navigation.md
  *
  *  ```md
@@ -818,8 +865,7 @@ namespace NoWaitForNavigation {
 }
 
 /**
- * Prevent usage of page.waitForSelector()
- *
+ * @description Prevent usage of page.waitForSelector()
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-wait-for-selector.md
  *
  *  ```md
@@ -836,8 +882,7 @@ namespace NoWaitForSelector {
 }
 
 /**
- * Prevent usage of page.waitForTimeout()
- *
+ * @description Prevent usage of page.waitForTimeout()
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-wait-for-timeout.md
  *
  *  ```md
@@ -854,8 +899,7 @@ namespace NoWaitForTimeout {
 }
 
 /**
- * Suggest using the built-in comparison matchers
- *
+ * @description Suggest using the built-in comparison matchers
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-comparison-matcher.md
  *
  *  ```md
@@ -872,8 +916,7 @@ namespace PreferComparisonMatcher {
 }
 
 /**
- * Suggest using the built-in equality matchers
- *
+ * @description Suggest using the built-in equality matchers
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-equality-matcher.md
  *
  *  ```md
@@ -890,8 +933,7 @@ namespace PreferEqualityMatcher {
 }
 
 /**
- * Prefer having hooks in a consistent order
- *
+ * @description Prefer having hooks in a consistent order
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-hooks-in-order.md
  *
  *  ```md
@@ -907,8 +949,7 @@ namespace PreferHooksInOrder {
 }
 
 /**
- * Suggest having hooks before any test cases
- *
+ * @description Suggest having hooks before any test cases
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-hooks-on-top.md
  *
  *  ```md
@@ -924,8 +965,7 @@ namespace PreferHooksOnTop {
 }
 
 /**
- * Suggest locators over page methods
- *
+ * @description Suggest locators over page methods
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-locator.md
  *
  *  ```md
@@ -941,8 +981,7 @@ namespace PreferLocator {
 }
 
 /**
- * Enforce lowercase test names
- *
+ * @description Enforce lowercase test names
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-lowercase-title.md
  *
  *  ```md
@@ -993,7 +1032,9 @@ namespace PreferLowercaseTitle {
   export type Options = Readonly<{
     allowedPrefixes?: readonly string[];
     ignore?: readonly ('test.describe' | 'test')[];
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreTopLevelDescribe?: boolean;
   }>;
 
@@ -1004,8 +1045,7 @@ namespace PreferLowercaseTitle {
 }
 
 /**
- * Prefer native locator functions
- *
+ * @description Prefer native locator functions
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-native-locators.md
  *
  *  ```md
@@ -1037,7 +1077,9 @@ namespace PreferNativeLocators {
    * ```
    */
   export type Options = Readonly<{
-    /** @default 'data-testid' */
+    /**
+     * @default "data-testid"
+     */
     testIdAttribute?: string;
   }>;
 
@@ -1048,8 +1090,7 @@ namespace PreferNativeLocators {
 }
 
 /**
- * Suggest using `toStrictEqual()`
- *
+ * @description Suggest using `toStrictEqual()`
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-strict-equal.md
  *
  *  ```md
@@ -1067,8 +1108,7 @@ namespace PreferStrictEqual {
 }
 
 /**
- * Suggest using `toBe()` for primitive literals
- *
+ * @description Suggest using `toBe()` for primitive literals
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-be.md
  *
  *  ```md
@@ -1085,8 +1125,7 @@ namespace PreferToBe {
 }
 
 /**
- * Suggest using toContain()
- *
+ * @description Suggest using toContain()
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-contain.md
  *
  *  ```md
@@ -1103,8 +1142,7 @@ namespace PreferToContain {
 }
 
 /**
- * Suggest using `toHaveCount()`
- *
+ * @description Suggest using `toHaveCount()`
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-have-count.md
  *
  *  ```md
@@ -1121,8 +1159,7 @@ namespace PreferToHaveCount {
 }
 
 /**
- * Suggest using `toHaveLength()`
- *
+ * @description Suggest using `toHaveLength()`
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-to-have-length.md
  *
  *  ```md
@@ -1139,8 +1176,7 @@ namespace PreferToHaveLength {
 }
 
 /**
- * Prefer web first assertions
- *
+ * @description Prefer web first assertions
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/prefer-web-first-assertions.md
  *
  *  ```md
@@ -1157,8 +1193,7 @@ namespace PreferWebFirstAssertions {
 }
 
 /**
- * Require setup and teardown code to be within a hook
- *
+ * @description Require setup and teardown code to be within a hook
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/require-hook.md
  *
  *  ```md
@@ -1201,8 +1236,7 @@ namespace RequireHook {
 }
 
 /**
- * Require all assertions to use `expect.soft`
- *
+ * @description Require all assertions to use `expect.soft`
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/require-soft-assertions.md
  *
  *  ```md
@@ -1219,8 +1253,39 @@ namespace RequireSoftAssertions {
 }
 
 /**
- * Require a message for `toThrow()`
+ * @description Require test blocks to have tags
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/require-tags.md
  *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTags {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Require a timeout option for `toPass()`
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/require-to-pass-timeout.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireToPassTimeout {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Require a message for `toThrow()`
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/require-to-throw-message.md
  *
  *  ```md
@@ -1236,8 +1301,7 @@ namespace RequireToThrowMessage {
 }
 
 /**
- * Require test cases and hooks to be inside a `test.describe` block
- *
+ * @description Require test cases and hooks to be inside a `test.describe` block
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/require-top-level-describe.md
  *
  *  ```md
@@ -1278,8 +1342,7 @@ namespace RequireTopLevelDescribe {
 }
 
 /**
- * Enforce valid `describe()` callback
- *
+ * @description Enforce valid `describe()` callback
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/valid-describe-callback.md
  *
  *  ```md
@@ -1295,8 +1358,7 @@ namespace ValidDescribeCallback {
 }
 
 /**
- * Enforce valid `expect()` usage
- *
+ * @description Enforce valid `expect()` usage
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/valid-expect.md
  *
  *  ```md
@@ -1342,8 +1404,7 @@ namespace ValidExpect {
 }
 
 /**
- * Require promises that have expectations in their chain to be valid
- *
+ * @description Require promises that have expectations in their chain to be valid
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/valid-expect-in-promise.md
  *
  *  ```md
@@ -1359,8 +1420,7 @@ namespace ValidExpectInPromise {
 }
 
 /**
- * Enforce valid tag format in Playwright test blocks and titles
- *
+ * @description Enforce valid tag format in Playwright test blocks and titles
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/valid-test-tags.md
  *
  *  ```md
@@ -1446,8 +1506,7 @@ namespace ValidTestTags {
 }
 
 /**
- * Enforce valid titles
- *
+ * @description Enforce valid titles
  * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/valid-title.md
  *
  *  ```md
@@ -1557,13 +1616,21 @@ namespace ValidTitle {
 
   export type Options = Readonly<{
     disallowedWords?: readonly string[];
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreSpaces?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreTypeOfDescribeName?: boolean;
-    /** @default true */
+    /**
+     * @default true
+     */
     ignoreTypeOfStepName?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreTypeOfTestName?: boolean;
     mustMatch?: MustMatchType;
     mustNotMatch?: MustMatchType;
@@ -1585,6 +1652,7 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/no-conditional-expect': NoConditionalExpect.RuleEntry;
   'playwright/no-conditional-in-test': NoConditionalInTest.RuleEntry;
   'playwright/no-duplicate-hooks': NoDuplicateHooks.RuleEntry;
+  'playwright/no-duplicate-slow': NoDuplicateSlow.RuleEntry;
   'playwright/no-element-handle': NoElementHandle.RuleEntry;
   'playwright/no-eval': NoEval.RuleEntry;
   'playwright/no-focused-test': NoFocusedTest.RuleEntry;
@@ -1598,6 +1666,7 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/no-raw-locators': NoRawLocators.RuleEntry;
   'playwright/no-restricted-locators': NoRestrictedLocators.RuleEntry;
   'playwright/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
+  'playwright/no-restricted-roles': NoRestrictedRoles.RuleEntry;
   'playwright/no-skipped-test': NoSkippedTest.RuleEntry;
   'playwright/no-slowed-test': NoSlowedTest.RuleEntry;
   'playwright/no-standalone-expect': NoStandaloneExpect.RuleEntry;
@@ -1623,6 +1692,8 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/prefer-web-first-assertions': PreferWebFirstAssertions.RuleEntry;
   'playwright/require-hook': RequireHook.RuleEntry;
   'playwright/require-soft-assertions': RequireSoftAssertions.RuleEntry;
+  'playwright/require-tags': RequireTags.RuleEntry;
+  'playwright/require-to-pass-timeout': RequireToPassTimeout.RuleEntry;
   'playwright/require-to-throw-message': RequireToThrowMessage.RuleEntry;
   'playwright/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
   'playwright/valid-describe-callback': ValidDescribeCallback.RuleEntry;
@@ -1641,6 +1712,7 @@ export type EslintPlaywrightRulesOption = Readonly<{
   'playwright/no-raw-locators': NoRawLocators.Options;
   'playwright/no-restricted-locators': NoRestrictedLocators.Options;
   'playwright/no-restricted-matchers': NoRestrictedMatchers.Options;
+  'playwright/no-restricted-roles': NoRestrictedRoles.Options;
   'playwright/no-skipped-test': NoSkippedTest.Options;
   'playwright/no-slowed-test': NoSlowedTest.Options;
   'playwright/prefer-lowercase-title': PreferLowercaseTitle.Options;

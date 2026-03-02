@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Ensure imports point to a file/module that can be resolved.
- *
+ * @description Ensure imports point to a file/module that can be resolved.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-unresolved.md
  *
  *  ```md
@@ -62,9 +61,13 @@ namespace NoUnresolved {
     commonjs?: boolean;
     amd?: boolean;
     esmodule?: boolean;
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     */
     ignore?: readonly [string, ...string[]];
-    /** @default true */
+    /**
+     * @default true
+     */
     caseSensitive?: boolean;
     caseSensitiveStrict?: boolean;
   }>;
@@ -76,8 +79,7 @@ namespace NoUnresolved {
 }
 
 /**
- * Ensure named imports correspond to a named export in the remote file.
- *
+ * @description Ensure named imports correspond to a named export in the remote file.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/named.md
  *
  *  ```md
@@ -116,8 +118,7 @@ namespace Named {
 }
 
 /**
- * Ensure a default export is present, given a default import.
- *
+ * @description Ensure a default export is present, given a default import.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/default.md
  *
  *  ```md
@@ -132,9 +133,7 @@ namespace Default {
 }
 
 /**
- * Ensure imported namespaces contain dereferenced properties as they are
- * dereferenced.
- *
+ * @description Ensure imported namespaces contain dereferenced properties as they are dereferenced.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/namespace.md
  *
  *  ```md
@@ -166,8 +165,7 @@ namespace Namespace {
    */
   export type Options = Readonly<{
     /**
-     * If `false`, will report computed (and thus, un-lintable) references to
-     * namespace members.
+     * If `false`, will report computed (and thus, un-lintable) references to namespace members.
      *
      * @default false
      */
@@ -181,8 +179,7 @@ namespace Namespace {
 }
 
 /**
- * Forbid namespace (a.k.a. "wildcard" `*`) imports.
- *
+ * @description Forbid namespace (a.k.a. "wildcard" `*`) imports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-namespace.md
  *
  *  ```md
@@ -226,8 +223,7 @@ namespace NoNamespace {
 }
 
 /**
- * Forbid any invalid exports, i.e. re-export of the same name.
- *
+ * @description Forbid any invalid exports, i.e. re-export of the same name.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/export.md
  *
  *  ```md
@@ -242,8 +238,7 @@ namespace Export {
 }
 
 /**
- * Forbid the use of mutable exports with `var` or `let`.
- *
+ * @description Forbid the use of mutable exports with `var` or `let`.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-mutable-exports.md
  *
  *  ```md
@@ -258,8 +253,7 @@ namespace NoMutableExports {
 }
 
 /**
- * Ensure consistent use of file extension within the import path.
- *
+ * @description Ensure consistent use of file extension within the import path.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/extensions.md
  *
  *  ```md
@@ -521,8 +515,7 @@ namespace Extensions {
 }
 
 /**
- * Enforce which files can be imported in a given folder.
- *
+ * @description Enforce which files can be imported in a given folder.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-restricted-paths.md
  *
  *  ```md
@@ -601,7 +594,9 @@ namespace NoRestrictedPaths {
    * ```
    */
   export type Options = Readonly<{
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     */
     zones?: readonly [
       Readonly<{
         target?: string | readonly [string, ...string[]];
@@ -626,8 +621,7 @@ namespace NoRestrictedPaths {
 }
 
 /**
- * Forbid importing the submodules of other modules.
- *
+ * @description Forbid importing the submodules of other modules.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-internal-modules.md
  *
  *  ```md
@@ -690,8 +684,7 @@ namespace NoInternalModules {
 }
 
 /**
- * Prefer named exports to be grouped together in a single export declaration.
- *
+ * @description Prefer named exports to be grouped together in a single export declaration.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/group-exports.md
  *
  *  ```md
@@ -706,8 +699,7 @@ namespace GroupExports {
 }
 
 /**
- * Forbid importing packages through relative paths.
- *
+ * @description Forbid importing packages through relative paths.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-relative-packages.md
  *
  *  ```md
@@ -754,7 +746,9 @@ namespace NoRelativePackages {
     commonjs?: boolean;
     amd?: boolean;
     esmodule?: boolean;
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     */
     ignore?: readonly [string, ...string[]];
   }>;
 
@@ -765,8 +759,7 @@ namespace NoRelativePackages {
 }
 
 /**
- * Forbid importing modules from parent directories.
- *
+ * @description Forbid importing modules from parent directories.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-relative-parent-imports.md
  *
  *  ```md
@@ -812,7 +805,9 @@ namespace NoRelativeParentImports {
     commonjs?: boolean;
     amd?: boolean;
     esmodule?: boolean;
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     */
     ignore?: readonly [string, ...string[]];
   }>;
 
@@ -823,8 +818,7 @@ namespace NoRelativeParentImports {
 }
 
 /**
- * Enforce or ban the use of inline type-only markers for named imports.
- *
+ * @description Enforce or ban the use of inline type-only markers for named imports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/consistent-type-specifier-style.md
  *
  *  ```md
@@ -861,8 +855,7 @@ namespace ConsistentTypeSpecifierStyle {
 }
 
 /**
- * Forbid a module from importing itself.
- *
+ * @description Forbid a module from importing itself.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-self-import.md
  *
  *  ```md
@@ -878,9 +871,7 @@ namespace NoSelfImport {
 }
 
 /**
- * Forbid a module from importing a module with a dependency path back to
- * itself.
- *
+ * @description Forbid a module from importing a module with a dependency path back to itself.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-cycle.md
  *
  *  ```md
@@ -951,18 +942,19 @@ namespace NoCycle {
     commonjs?: boolean;
     amd?: boolean;
     esmodule?: boolean;
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     */
     ignore?: readonly [string, ...string[]];
     maxDepth?: number | '∞';
     /**
-     * Ignore external modules
+     * ignore external modules
      *
      * @default false
      */
     ignoreExternal?: boolean;
     /**
-     * Allow cyclic dependency if there is at least one dynamic import in the
-     * chain
+     * Allow cyclic dependency if there is at least one dynamic import in the chain
      *
      * @default false
      */
@@ -976,8 +968,7 @@ namespace NoCycle {
 }
 
 /**
- * Forbid named default exports.
- *
+ * @description Forbid named default exports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-named-default.md
  *
  *  ```md
@@ -992,8 +983,7 @@ namespace NoNamedDefault {
 }
 
 /**
- * Forbid use of exported name as identifier of default export.
- *
+ * @description Forbid use of exported name as identifier of default export.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-named-as-default.md
  *
  *  ```md
@@ -1008,8 +998,7 @@ namespace NoNamedAsDefault {
 }
 
 /**
- * Forbid use of exported name as property of default export.
- *
+ * @description Forbid use of exported name as property of default export.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-named-as-default-member.md
  *
  *  ```md
@@ -1024,8 +1013,7 @@ namespace NoNamedAsDefaultMember {
 }
 
 /**
- * Forbid anonymous values as default exports.
- *
+ * @description Forbid anonymous values as default exports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-anonymous-default-export.md
  *
  *  ```md
@@ -1083,21 +1071,37 @@ namespace NoAnonymousDefaultExport {
    * ```
    */
   export type Options = Readonly<{
-    /** If `false`, will report default export of an array */
+    /**
+     * If `false`, will report default export of an array
+     */
     allowArray?: boolean;
-    /** If `false`, will report default export of an arrow function */
+    /**
+     * If `false`, will report default export of an arrow function
+     */
     allowArrowFunction?: boolean;
-    /** If `false`, will report default export of a function call */
+    /**
+     * If `false`, will report default export of a function call
+     */
     allowCallExpression?: boolean;
-    /** If `false`, will report default export of an anonymous class */
+    /**
+     * If `false`, will report default export of an anonymous class
+     */
     allowAnonymousClass?: boolean;
-    /** If `false`, will report default export of an anonymous function */
+    /**
+     * If `false`, will report default export of an anonymous function
+     */
     allowAnonymousFunction?: boolean;
-    /** If `false`, will report default export of a literal */
+    /**
+     * If `false`, will report default export of a literal
+     */
     allowLiteral?: boolean;
-    /** If `false`, will report default export of an object expression */
+    /**
+     * If `false`, will report default export of an object expression
+     */
     allowObject?: boolean;
-    /** If `false`, will report default export of a class instantiation */
+    /**
+     * If `false`, will report default export of a class instantiation
+     */
     allowNew?: boolean;
   }>;
 
@@ -1108,8 +1112,7 @@ namespace NoAnonymousDefaultExport {
 }
 
 /**
- * Forbid importing a default export by a different name.
- *
+ * @description Forbid importing a default export by a different name.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-rename-default.md
  *
  *  ```md
@@ -1143,9 +1146,13 @@ namespace NoRenameDefault {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     commonjs?: boolean;
-    /** @default true */
+    /**
+     * @default true
+     */
     preventRenamingBindings?: boolean;
   }>;
 
@@ -1156,9 +1163,7 @@ namespace NoRenameDefault {
 }
 
 /**
- * Forbid modules without exports, or exports without matching import in another
- * module.
- *
+ * @description Forbid modules without exports, or exports without matching import in another module.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-unused-modules.md
  *
  *  ```md
@@ -1250,7 +1255,9 @@ namespace NoUnusedModules {
     (
       | {
           unusedExports: true;
-          /** @minItems 1 */
+          /**
+           * @minItems 1
+           */
           src?: readonly [unknown, ...unknown[]];
           [k: string]: unknown;
         }
@@ -1259,18 +1266,25 @@ namespace NoUnusedModules {
           [k: string]: unknown;
         }
     ) & {
-      /** Files/paths to be analyzed (only for unused exports) */
+      /**
+       * files/paths to be analyzed (only for unused exports)
+       */
       src?: readonly string[];
       /**
-       * Files/paths for which unused exports will not be reported (e.g module
-       * entry points)
+       * files/paths for which unused exports will not be reported (e.g module entry points)
        */
       ignoreExports?: readonly string[];
-      /** Report modules without any exports */
+      /**
+       * report modules without any exports
+       */
       missingExports?: boolean;
-      /** Report exports without any usage */
+      /**
+       * report exports without any usage
+       */
       unusedExports?: boolean;
-      /** Ignore type exports without any usage */
+      /**
+       * ignore type exports without any usage
+       */
       ignoreUnusedTypeExports?: boolean;
       [k: string]: unknown;
     }
@@ -1283,8 +1297,7 @@ namespace NoUnusedModules {
 }
 
 /**
- * Forbid CommonJS `require` calls and `module.exports` or `exports.*`.
- *
+ * @description Forbid CommonJS `require` calls and `module.exports` or `exports.*`.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-commonjs.md
  *
  *  ```md
@@ -1358,8 +1371,7 @@ namespace NoCommonjs {
 }
 
 /**
- * Forbid AMD `require` and `define` calls.
- *
+ * @description Forbid AMD `require` and `define` calls.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-amd.md
  *
  *  ```md
@@ -1374,8 +1386,7 @@ namespace NoAmd {
 }
 
 /**
- * Forbid repeated import of the same module in multiple places.
- *
+ * @description Forbid repeated import of the same module in multiple places.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-duplicates.md
  *
  *  ```md
@@ -1419,8 +1430,7 @@ namespace NoDuplicates {
 }
 
 /**
- * Ensure all imports appear before other statements.
- *
+ * @description Ensure all imports appear before other statements.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/first.md
  *
  *  ```md
@@ -1456,8 +1466,7 @@ namespace First {
 }
 
 /**
- * Enforce the maximum number of dependencies a module can have.
- *
+ * @description Enforce the maximum number of dependencies a module can have.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/max-dependencies.md
  *
  *  ```md
@@ -1500,8 +1509,7 @@ namespace MaxDependencies {
 }
 
 /**
- * Forbid the use of extraneous packages.
- *
+ * @description Forbid the use of extraneous packages.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-extraneous-dependencies.md
  *
  *  ```md
@@ -1589,8 +1597,7 @@ namespace NoExtraneousDependencies {
 }
 
 /**
- * Forbid import of modules using absolute paths.
- *
+ * @description Forbid import of modules using absolute paths.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-absolute-path.md
  *
  *  ```md
@@ -1637,7 +1644,9 @@ namespace NoAbsolutePath {
     commonjs?: boolean;
     amd?: boolean;
     esmodule?: boolean;
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     */
     ignore?: readonly [string, ...string[]];
   }>;
 
@@ -1648,8 +1657,7 @@ namespace NoAbsolutePath {
 }
 
 /**
- * Forbid Node.js builtin modules.
- *
+ * @description Forbid Node.js builtin modules.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-nodejs-modules.md
  *
  *  ```md
@@ -1692,8 +1700,7 @@ namespace NoNodejsModules {
 }
 
 /**
- * Forbid webpack loader syntax in imports.
- *
+ * @description Forbid webpack loader syntax in imports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-webpack-loader-syntax.md
  *
  *  ```md
@@ -1708,8 +1715,7 @@ namespace NoWebpackLoaderSyntax {
 }
 
 /**
- * Enforce a convention in module import order.
- *
+ * @description Enforce a convention in module import order.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/order.md
  *
  *  ```md
@@ -1934,7 +1940,9 @@ namespace Order {
   export type Options = Readonly<{
     groups?: readonly unknown[];
     pathGroupsExcludedImportTypes?: readonly unknown[];
-    /** @default true */
+    /**
+     * @default true
+     */
     distinctGroup?: boolean;
     pathGroups?: readonly Readonly<{
       pattern: string;
@@ -1962,9 +1970,13 @@ namespace Order {
       | 'always-and-inside-groups'
       | 'never';
     consolidateIslands?: 'inside-groups' | 'never';
-    /** @default false */
+    /**
+     * @default false
+     */
     sortTypesGroup?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     named?:
       | boolean
       | Readonly<{
@@ -1980,7 +1992,9 @@ namespace Order {
       order?: 'ignore' | 'asc' | 'desc';
       orderImportKind?: 'ignore' | 'asc' | 'desc';
     }>;
-    /** @default false */
+    /**
+     * @default false
+     */
     warnOnUnassignedImports?: boolean;
   }>;
 
@@ -1991,8 +2005,7 @@ namespace Order {
 }
 
 /**
- * Enforce a newline after import statements.
- *
+ * @description Enforce a newline after import statements.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/newline-after-import.md
  *
  *  ```md
@@ -2041,8 +2054,7 @@ namespace NewlineAfterImport {
 }
 
 /**
- * Prefer a default export if module exports a single name or multiple names.
- *
+ * @description Prefer a default export if module exports a single name or multiple names.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/prefer-default-export.md
  *
  *  ```md
@@ -2076,7 +2088,9 @@ namespace PreferDefaultExport {
    * ```
    */
   export type Options = Readonly<{
-    /** @default 'single' */
+    /**
+     * @default "single"
+     */
     target?: 'single' | 'any';
   }>;
 
@@ -2087,9 +2101,7 @@ namespace PreferDefaultExport {
 }
 
 /**
- * Enforce using namespace imports for specific modules, like
- * `react`/`react-dom`, etc.
- *
+ * @description Enforce using namespace imports for specific modules, like `react`/`react-dom`, etc.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/prefer-namespace-import.md
  *
  *  ```md
@@ -2133,8 +2145,7 @@ namespace PreferNamespaceImport {
 }
 
 /**
- * Forbid default exports.
- *
+ * @description Forbid default exports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-default-export.md
  *
  *  ```md
@@ -2149,8 +2160,7 @@ namespace NoDefaultExport {
 }
 
 /**
- * Forbid named exports.
- *
+ * @description Forbid named exports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-named-export.md
  *
  *  ```md
@@ -2165,8 +2175,7 @@ namespace NoNamedExport {
 }
 
 /**
- * Forbid `require()` calls with expressions.
- *
+ * @description Forbid `require()` calls with expressions.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-dynamic-require.md
  *
  *  ```md
@@ -2205,8 +2214,7 @@ namespace NoDynamicRequire {
 }
 
 /**
- * Forbid potentially ambiguous parse goal (`script` vs. `module`).
- *
+ * @description Forbid potentially ambiguous parse goal (`script` vs. `module`).
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/unambiguous.md
  *
  *  ```md
@@ -2221,8 +2229,7 @@ namespace Unambiguous {
 }
 
 /**
- * Forbid unassigned imports.
- *
+ * @description Forbid unassigned imports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-unassigned-import.md
  *
  *  ```md
@@ -2285,8 +2292,7 @@ namespace NoUnassignedImport {
 }
 
 /**
- * Forbid unnecessary path segments in import and require statements.
- *
+ * @description Forbid unnecessary path segments in import and require statements.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-useless-path-segments.md
  *
  *  ```md
@@ -2330,8 +2336,7 @@ namespace NoUselessPathSegments {
 }
 
 /**
- * Enforce a leading comment with the webpackChunkName for dynamic imports.
- *
+ * @description Enforce a leading comment with the webpackChunkName for dynamic imports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/dynamic-import-chunkname.md
  *
  *  ```md
@@ -2383,8 +2388,7 @@ namespace DynamicImportChunkname {
 }
 
 /**
- * Forbid import statements with CommonJS module.exports.
- *
+ * @description Forbid import statements with CommonJS module.exports.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-import-module-exports.md
  *
  *  ```md
@@ -2425,8 +2429,7 @@ namespace NoImportModuleExports {
 }
 
 /**
- * Forbid empty named import blocks.
- *
+ * @description Forbid empty named import blocks.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-empty-named-blocks.md
  *
  *  ```md
@@ -2443,8 +2446,7 @@ namespace NoEmptyNamedBlocks {
 }
 
 /**
- * Ensure all exports appear after other statements.
- *
+ * @description Ensure all exports appear after other statements.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/exports-last.md
  *
  *  ```md
@@ -2459,8 +2461,7 @@ namespace ExportsLast {
 }
 
 /**
- * Forbid imported names marked with `@deprecated` documentation tag.
- *
+ * @description Forbid imported names marked with `@deprecated` documentation tag.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/no-deprecated.md
  *
  *  ```md
@@ -2475,8 +2476,7 @@ namespace NoDeprecated {
 }
 
 /**
- * Replaced by `import-x/first`.
- *
+ * @description Replaced by `import-x/first`.
  * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.16.1/docs/rules/imports-first.md
  *
  *  ```md

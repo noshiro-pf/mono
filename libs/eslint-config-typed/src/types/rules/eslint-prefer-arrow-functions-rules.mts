@@ -8,9 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Auto-fix plain Functions into Arrow Functions, in all cases where conversion
- * would result in the same behaviour
- *
+ * @description Auto-fix plain Functions into Arrow Functions, in all cases where conversion would result in the same behaviour
  * @link https://github.com/JamieMason/prefer-arrow-functions
  *
  *  ```md
@@ -83,19 +81,33 @@ namespace PreferArrowFunctions {
    * ```
    */
   export type Options = Readonly<{
-    /** @default [ ] */
+    /**
+     * @default []
+     */
     allowedNames?: readonly string[];
-    /** @default false */
+    /**
+     * @default false
+     */
     allowNamedFunctions?: boolean | 'only-expressions';
-    /** @default false */
+    /**
+     * @default false
+     */
     allowObjectProperties?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     classPropertiesAllowed?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     disallowPrototype?: boolean;
-    /** @default 'unchanged' */
+    /**
+     * @default "unchanged"
+     */
     returnStyle?: 'explicit' | 'implicit' | 'unchanged';
-    /** @default false */
+    /**
+     * @default false
+     */
     singleReturnOnly?: boolean;
   }>;
 

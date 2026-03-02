@@ -2,7 +2,7 @@ name: Lint and Build
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push events (excluding develop branches) and manual runs
   push:
     branches-ignore:
       - 'develop'
@@ -59,8 +59,9 @@ jobs:
         if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run lint:fix
 
-      - name: Run format
-        run: pnpm run fmt
+      - name: Run codemod
+        if: steps.check_diff_type.outputs.should_run == 'true'
+        run: pnpm codemod:full
 
       - name: Check if there is no file diff
         run: pnpm exec assert-repo-is-clean

@@ -68,4 +68,8 @@ export const eslintPlaywrightRules = {
   'playwright/no-unused-locators': 'error',
   'playwright/consistent-spacing-between-blocks': 'error',
   'playwright/no-restricted-locators': withDefaultOption('error'),
+  'playwright/no-duplicate-slow': 'error',
+  'playwright/no-restricted-roles': withDefaultOption('error'),
+  'playwright/require-tags': 'error',
+  'playwright/require-to-pass-timeout': 'error',
 } as const satisfies EslintPlaywrightRules;

@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforce consistent use of `output` assertions in rule tests
- *
+ * @description enforce consistent use of `output` assertions in rule tests
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/consistent-output.md
  *
  *  ```md
@@ -39,8 +38,7 @@ namespace ConsistentOutput {
    * ```
    */
   /**
-   * Whether to enforce having output assertions 'always' or to be 'consistent'
-   * when some cases have them.
+   * Whether to enforce having output assertions 'always' or to be 'consistent' when some cases have them.
    */
   export type Options = 'always' | 'consistent';
 
@@ -51,8 +49,7 @@ namespace ConsistentOutput {
 }
 
 /**
- * Require fixer functions to return a fix
- *
+ * @description require fixer functions to return a fix
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/fixer-return.md
  *
  *  ```md
@@ -68,8 +65,7 @@ namespace FixerReturn {
 }
 
 /**
- * Enforce the order of meta properties
- *
+ * @description enforce the order of meta properties
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/meta-property-ordering.md
  *
  *  ```md
@@ -97,7 +93,9 @@ namespace MetaPropertyOrdering {
    * ]
    * ```
    */
-  /** What order to enforce for meta properties. */
+  /**
+   * What order to enforce for meta properties.
+   */
   export type Options = readonly unknown[];
 
   export type RuleEntry =
@@ -107,8 +105,7 @@ namespace MetaPropertyOrdering {
 }
 
 /**
- * Disallow usage of deprecated methods on rule context objects
- *
+ * @description disallow usage of deprecated methods on rule context objects
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-deprecated-context-methods.md
  *
  *  ```md
@@ -125,8 +122,7 @@ namespace NoDeprecatedContextMethods {
 }
 
 /**
- * Disallow the version of `context.report()` with multiple arguments
- *
+ * @description disallow the version of `context.report()` with multiple arguments
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-deprecated-report-api.md
  *
  *  ```md
@@ -143,8 +139,7 @@ namespace NoDeprecatedReportApi {
 }
 
 /**
- * Disallow identical tests
- *
+ * @description disallow identical tests
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-identical-tests.md
  *
  *  ```md
@@ -161,8 +156,7 @@ namespace NoIdenticalTests {
 }
 
 /**
- * Require suggestions to have different `messageId` than their parent report
- *
+ * @description require suggestions to have different `messageId` than their parent report
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-matching-violation-suggest-message-ids.md
  *
  *  ```md
@@ -178,8 +172,7 @@ namespace NoMatchingViolationSuggestMessageIds {
 }
 
 /**
- * Disallow using the `meta.replacedBy` rule property
- *
+ * @description disallow using the `meta.replacedBy` rule property
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-meta-replaced-by.md
  *
  *  ```md
@@ -195,8 +188,7 @@ namespace NoMetaReplacedBy {
 }
 
 /**
- * Disallow rules `meta.schema` properties to include defaults
- *
+ * @description disallow rules `meta.schema` properties to include defaults
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-meta-schema-default.md
  *
  *  ```md
@@ -212,8 +204,7 @@ namespace NoMetaSchemaDefault {
 }
 
 /**
- * Disallow `messageId`s that are missing from `meta.messages`
- *
+ * @description disallow `messageId`s that are missing from `meta.messages`
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-missing-message-ids.md
  *
  *  ```md
@@ -229,8 +220,7 @@ namespace NoMissingMessageIds {
 }
 
 /**
- * Disallow missing placeholders in rule report messages
- *
+ * @description disallow missing placeholders in rule report messages
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-missing-placeholders.md
  *
  *  ```md
@@ -246,8 +236,7 @@ namespace NoMissingPlaceholders {
 }
 
 /**
- * Disallow the test case property `only`
- *
+ * @description disallow the test case property `only`
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-only-tests.md
  *
  *  ```md
@@ -264,8 +253,7 @@ namespace NoOnlyTests {
 }
 
 /**
- * Disallow using `in` to narrow node types instead of looking at properties
- *
+ * @description disallow using `in` to narrow node types instead of looking at properties
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-property-in-node.md
  *
  *  ```md
@@ -301,8 +289,7 @@ namespace NoPropertyInNode {
    */
   export type Options = Readonly<{
     /**
-     * Any additional regular expressions to consider source files defining AST
-     * Node types.
+     * Any additional regular expressions to consider source files defining AST Node types.
      */
     additionalNodeTypeFiles?: readonly unknown[];
   }>;
@@ -314,8 +301,7 @@ namespace NoPropertyInNode {
 }
 
 /**
- * Disallow unused `messageId`s in `meta.messages`
- *
+ * @description disallow unused `messageId`s in `meta.messages`
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-unused-message-ids.md
  *
  *  ```md
@@ -331,8 +317,7 @@ namespace NoUnusedMessageIds {
 }
 
 /**
- * Disallow unused placeholders in rule report messages
- *
+ * @description disallow unused placeholders in rule report messages
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-unused-placeholders.md
  *
  *  ```md
@@ -348,9 +333,7 @@ namespace NoUnusedPlaceholders {
 }
 
 /**
- * Disallow unnecessary calls to `sourceCode.getFirstToken()` and
- * `sourceCode.getLastToken()`
- *
+ * @description disallow unnecessary calls to `sourceCode.getFirstToken()` and `sourceCode.getLastToken()`
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-useless-token-range.md
  *
  *  ```md
@@ -367,9 +350,7 @@ namespace NoUselessTokenRange {
 }
 
 /**
- * Require using `messageId` instead of `message` or `desc` to report rule
- * violations
- *
+ * @description require using `messageId` instead of `message` or `desc` to report rule violations
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-message-ids.md
  *
  *  ```md
@@ -385,8 +366,7 @@ namespace PreferMessageIds {
 }
 
 /**
- * Disallow function-style rules
- *
+ * @description disallow function-style rules
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-object-rule.md
  *
  *  ```md
@@ -403,8 +383,7 @@ namespace PreferObjectRule {
 }
 
 /**
- * Disallow invalid RuleTester test cases where the `output` matches the `code`
- *
+ * @description disallow invalid RuleTester test cases where the `output` matches the `code`
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-output-null.md
  *
  *  ```md
@@ -421,8 +400,7 @@ namespace PreferOutputNull {
 }
 
 /**
- * Require using placeholders for dynamic report messages
- *
+ * @description require using placeholders for dynamic report messages
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-placeholders.md
  *
  *  ```md
@@ -438,8 +416,7 @@ namespace PreferPlaceholders {
 }
 
 /**
- * Require using `replaceText()` instead of `replaceTextRange()`
- *
+ * @description require using `replaceText()` instead of `replaceTextRange()`
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-replace-text.md
  *
  *  ```md
@@ -455,8 +432,7 @@ namespace PreferReplaceText {
 }
 
 /**
- * Enforce a consistent format for rule report messages
- *
+ * @description enforce a consistent format for rule report messages
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/report-message-format.md
  *
  *  ```md
@@ -480,7 +456,9 @@ namespace ReportMessageFormat {
    * ]
    * ```
    */
-  /** Format that all report messages must match. */
+  /**
+   * Format that all report messages must match.
+   */
   export type Options = string;
 
   export type RuleEntry =
@@ -490,8 +468,7 @@ namespace ReportMessageFormat {
 }
 
 /**
- * Require only rules with options to implement a `meta.defaultOptions` property
- *
+ * @description require only rules with options to implement a `meta.defaultOptions` property
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-default-options.md
  *
  *  ```md
@@ -508,9 +485,7 @@ namespace RequireMetaDefaultOptions {
 }
 
 /**
- * Require rules to implement a `meta.docs.description` property with the
- * correct format
- *
+ * @description require rules to implement a `meta.docs.description` property with the correct format
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-docs-description.md
  *
  *  ```md
@@ -543,10 +518,9 @@ namespace RequireMetaDocsDescription {
    */
   export type Options = Readonly<{
     /**
-     * A regular expression that the description must match. Use `'.+'` to allow
-     * anything.
+     * A regular expression that the description must match. Use `'.+'` to allow anything.
      *
-     * @default '^(enforce|require|disallow)'
+     * @default "^(enforce|require|disallow)"
      */
     pattern?: string;
   }>;
@@ -558,8 +532,7 @@ namespace RequireMetaDocsDescription {
 }
 
 /**
- * Require rules to implement a `meta.docs.recommended` property
- *
+ * @description require rules to implement a `meta.docs.recommended` property
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-docs-recommended.md
  *
  *  ```md
@@ -607,8 +580,7 @@ namespace RequireMetaDocsRecommended {
 }
 
 /**
- * Require rules to implement a `meta.docs.url` property
- *
+ * @description require rules to implement a `meta.docs.url` property
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-docs-url.md
  *
  *  ```md
@@ -641,9 +613,7 @@ namespace RequireMetaDocsUrl {
    */
   export type Options = Readonly<{
     /**
-     * A pattern to enforce rule's document URL. It replaces `{{name}}`
-     * placeholder by each rule name. The rule name is the basename of each rule
-     * file. Omitting this allows any URL.
+     * A pattern to enforce rule's document URL. It replaces `{{name}}` placeholder by each rule name. The rule name is the basename of each rule file. Omitting this allows any URL.
      */
     pattern?: string;
   }>;
@@ -655,8 +625,7 @@ namespace RequireMetaDocsUrl {
 }
 
 /**
- * Require rules to implement a `meta.fixable` property
- *
+ * @description require rules to implement a `meta.fixable` property
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-fixable.md
  *
  *  ```md
@@ -689,10 +658,7 @@ namespace RequireMetaFixable {
    */
   export type Options = Readonly<{
     /**
-     * Whether the rule should attempt to detect rules that do not have a fixer
-     * but enable the `meta.fixable` property. This option is off by default
-     * because it increases the chance of false positives since fixers can't
-     * always be detected when helper functions are used.
+     * Whether the rule should attempt to detect rules that do not have a fixer but enable the `meta.fixable` property. This option is off by default because it increases the chance of false positives since fixers can't always be detected when helper functions are used.
      *
      * @default false
      */
@@ -706,8 +672,7 @@ namespace RequireMetaFixable {
 }
 
 /**
- * Require suggestable rules to implement a `meta.hasSuggestions` property
- *
+ * @description require suggestable rules to implement a `meta.hasSuggestions` property
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-has-suggestions.md
  *
  *  ```md
@@ -724,8 +689,7 @@ namespace RequireMetaHasSuggestions {
 }
 
 /**
- * Require rules `meta.schema` properties to include descriptions
- *
+ * @description require rules `meta.schema` properties to include descriptions
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-schema-description.md
  *
  *  ```md
@@ -741,8 +705,7 @@ namespace RequireMetaSchemaDescription {
 }
 
 /**
- * Require rules to implement a `meta.schema` property
- *
+ * @description require rules to implement a `meta.schema` property
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-schema.md
  *
  *  ```md
@@ -776,8 +739,7 @@ namespace RequireMetaSchema {
    */
   export type Options = Readonly<{
     /**
-     * Whether the rule should require the `meta.schema` property to be
-     * specified (with `schema: []`) for rules that have no options.
+     * Whether the rule should require the `meta.schema` property to be specified (with `schema: []`) for rules that have no options.
      *
      * @default true
      */
@@ -791,8 +753,7 @@ namespace RequireMetaSchema {
 }
 
 /**
- * Require rules to implement a `meta.type` property
- *
+ * @description require rules to implement a `meta.type` property
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-type.md
  *
  *  ```md
@@ -808,8 +769,7 @@ namespace RequireMetaType {
 }
 
 /**
- * Require test cases to have a `name` property under certain conditions
- *
+ * @description require test cases to have a `name` property under certain conditions
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-test-case-name.md
  *
  *  ```md
@@ -844,7 +804,9 @@ namespace RequireTestCaseName {
    * ```
    */
   export type Options = Readonly<{
-    /** When should the name property be required on a test case object. */
+    /**
+     * When should the name property be required on a test case object.
+     */
     require?: 'always' | 'objects' | 'objects-with-config';
   }>;
 
@@ -855,8 +817,7 @@ namespace RequireTestCaseName {
 }
 
 /**
- * Require the properties of a test case to be placed in a consistent order
- *
+ * @description require the properties of a test case to be placed in a consistent order
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/test-case-property-ordering.md
  *
  *  ```md
@@ -884,7 +845,9 @@ namespace TestCasePropertyOrdering {
    * ]
    * ```
    */
-  /** What order to enforce for test case properties. */
+  /**
+   * What order to enforce for test case properties.
+   */
   export type Options = readonly unknown[];
 
   export type RuleEntry =
@@ -894,8 +857,7 @@ namespace TestCasePropertyOrdering {
 }
 
 /**
- * Enforce consistent usage of shorthand strings for test cases with no options
- *
+ * @description enforce consistent usage of shorthand strings for test cases with no options
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/test-case-shorthand-strings.md
  *
  *  ```md
@@ -926,8 +888,7 @@ namespace TestCaseShorthandStrings {
    * ```
    */
   /**
-   * What behavior to enforce of when shorthand strings should be banned or
-   * required.
+   * What behavior to enforce of when shorthand strings should be banned or required.
    */
   export type Options =
     | 'as-needed'
@@ -942,8 +903,7 @@ namespace TestCaseShorthandStrings {
 }
 
 /**
- * Enforce that all test cases with names have unique names
- *
+ * @description enforce that all test cases with names have unique names
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/unique-test-case-names.md
  *
  *  ```md

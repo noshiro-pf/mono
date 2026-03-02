@@ -489,7 +489,8 @@ export const typescriptEslintRules = {
   '@typescript-eslint/no-unnecessary-type-conversion': 'error',
 
   '@typescript-eslint/no-unused-private-class-members': 'error',
-  '@typescript-eslint/no-useless-default-assignment': 'error',
+  '@typescript-eslint/no-useless-default-assignment':
+    withDefaultOption('error'),
   '@typescript-eslint/strict-void-return': ['error', { allowReturnAny: false }],
 
   // For browser environment only

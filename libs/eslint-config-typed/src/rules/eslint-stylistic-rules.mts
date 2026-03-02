@@ -102,6 +102,7 @@ export const eslintStylisticRules = {
   '@stylistic/lines-between-class-members': 'off',
   '@stylistic/multiline-comment-style': 'off',
   '@stylistic/spaced-comment': 'off',
+  '@stylistic/exp-jsx-props-style': 'off',
 
   '@stylistic/padding-line-between-statements': [
     'error',

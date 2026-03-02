@@ -211,6 +211,7 @@ export const eslintUnicornRules = {
   'unicorn/no-immediate-mutation': 'error',
   'unicorn/no-useless-collection-argument': 'error',
   'unicorn/prefer-response-static-json': 'error',
+  'unicorn/isolated-functions': 'off',
 
   // For Node.js environment only
   'unicorn/no-new-buffer': 'error',

@@ -2,98 +2,96 @@
 import { type Linter } from 'eslint';
 
 /**
- * Prefer using the mapFn callback of Array.from over an immediate .map() call.
+ * @description Prefer using the mapFn callback of Array.from over an immediate .map() call.
  *
- * ```md
- * | key         | value      |
- * | :---------- | :--------- |
- * | type        | suggestion |
- * | deprecated  | false      |
- * | fixable     | code       |
- * | recommended | true       |
- * ```
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
  */
 namespace FromMap {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Avoid the this parameter when providing arrow function as callback in array
- * functions.
+ * @description Avoid the this parameter when providing arrow function as callback in array functions.
  *
- * ```md
- * | key         | value      |
- * | :---------- | :--------- |
- * | type        | suggestion |
- * | deprecated  | false      |
- * | fixable     | code       |
- * | recommended | true       |
- * ```
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
  */
 namespace NoUnnecessaryThisArg {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer using Array.from over spreading an iterable in an array literal. Using
- * Array.from also preserves the original type of TypedArrays while mapping.
+ * @description Prefer using Array.from over spreading an iterable in an array literal. Using Array.from also preserves the original type of TypedArrays while mapping.
  *
- * ```md
- * | key         | value   |
- * | :---------- | :------ |
- * | type        | problem |
- * | deprecated  | false   |
- * | fixable     | code    |
- * | recommended | true    |
- * ```
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
+ *  ```
  */
 namespace PreferArrayFrom {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer methods operating from the right over reversing the array
+ * @description Prefer methods operating from the right over reversing the array
  *
- * ```md
- * | key         | value      |
- * | :---------- | :--------- |
- * | type        | suggestion |
- * | deprecated  | false      |
- * | fixable     | code       |
- * | recommended | true       |
- * ```
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
  */
 namespace AvoidReverse {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer using the flatMap over an immediate .flat() call after a .map().
+ * @description Prefer using the flatMap over an immediate .flat() call after a .map().
  *
- * ```md
- * | key         | value      |
- * | :---------- | :--------- |
- * | type        | suggestion |
- * | deprecated  | false      |
- * | fixable     | code       |
- * | recommended | true       |
- * ```
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
  */
 namespace PreferFlatMap {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer using .flat() over concatenating to flatten an array.
+ * @description Prefer using .flat() over concatenating to flatten an array.
  *
- * ```md
- * | key         | value      |
- * | :---------- | :--------- |
- * | type        | suggestion |
- * | deprecated  | false      |
- * | fixable     | code       |
- * | recommended | true       |
- * ```
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
  */
 namespace PreferFlat {
   export type RuleEntry = Linter.StringSeverity;

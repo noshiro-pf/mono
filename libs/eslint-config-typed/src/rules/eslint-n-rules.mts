@@ -36,10 +36,12 @@ export const eslintNRules = {
   'n/prefer-global/text-encoder': 'off',
   'n/prefer-global/url-search-params': 'off',
   'n/prefer-global/url': 'off',
-  'n/prefer-node-protocol': withDefaultOption('error'),
+  'n/prefer-node-protocol': ['error', { version: '>=18.0.0' }],
   'n/prefer-promises/dns': 'off',
   'n/prefer-promises/fs': 'off',
   'n/process-exit-as-throw': 'off',
+  'n/prefer-global/crypto': ['error', 'always'],
+  'n/prefer-global/timers': ['error', 'always'],
 
   // deprecated
   'n/no-hide-core-modules': 0,

@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforce using `.each` or `.for` consistently
- *
+ * @description enforce using `.each` or `.for` consistently
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-each-for.md
  *
  *  ```md
@@ -77,8 +76,7 @@ namespace ConsistentEachFor {
 }
 
 /**
- * Require test file pattern
- *
+ * @description require test file pattern
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-test-filename.md
  *
  *  ```md
@@ -102,13 +100,11 @@ namespace ConsistentTestFilename {
    *     "properties": {
    *       "pattern": {
    *         "type": "string",
-   *         "format": "regex",
-   *         "default": ".*\\.test\\.[tj]sx?$"
+   *         "format": "regex"
    *       },
    *       "allTestPattern": {
    *         "type": "string",
-   *         "format": "regex",
-   *         "default": ".*\\.(test|spec)\\.[tj]sx?$"
+   *         "format": "regex"
    *       }
    *     }
    *   }
@@ -116,9 +112,7 @@ namespace ConsistentTestFilename {
    * ```
    */
   export type Options = Readonly<{
-    /** @default '.*\.test\.[tj]sx?$' */
     pattern?: string;
-    /** @default '.*\.(test|spec)\.[tj]sx?$' */
     allTestPattern?: string;
   }>;
 
@@ -129,8 +123,7 @@ namespace ConsistentTestFilename {
 }
 
 /**
- * Enforce using test or it but not both
- *
+ * @description enforce using test or it but not both
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-test-it.md
  *
  *  ```md
@@ -183,8 +176,7 @@ namespace ConsistentTestIt {
 }
 
 /**
- * Enforce using vitest or vi but not both
- *
+ * @description enforce using vitest or vi but not both
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-vitest-vi.md
  *
  *  ```md
@@ -210,8 +202,7 @@ namespace ConsistentVitestVi {
    *         "enum": [
    *           "vi",
    *           "vitest"
-   *         ],
-   *         "default": "vi"
+   *         ]
    *       }
    *     },
    *     "additionalProperties": false
@@ -220,7 +211,6 @@ namespace ConsistentVitestVi {
    * ```
    */
   export type Options = Readonly<{
-    /** @default 'vi' */
     fn?: 'vi' | 'vitest';
   }>;
 
@@ -231,8 +221,7 @@ namespace ConsistentVitestVi {
 }
 
 /**
- * Enforce having expectation in test body
- *
+ * @description enforce having expectation in test body
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/expect-expect.md
  *
  *  ```md
@@ -282,8 +271,7 @@ namespace ExpectExpect {
 }
 
 /**
- * Enforce hoisted APIs to be on top of the file
- *
+ * @description enforce hoisted APIs to be on top of the file
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/hoisted-apis-on-top.md
  *
  *  ```md
@@ -299,8 +287,7 @@ namespace HoistedApisOnTop {
 }
 
 /**
- * Enforce a maximum number of expect per test
- *
+ * @description enforce a maximum number of expect per test
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/max-expects.md
  *
  *  ```md
@@ -341,8 +328,7 @@ namespace MaxExpects {
 }
 
 /**
- * Require describe block to be less than set max value or default value
- *
+ * @description require describe block to be less than set max value or default value
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/max-nested-describe.md
  *
  *  ```md
@@ -382,8 +368,7 @@ namespace MaxNestedDescribe {
 }
 
 /**
- * Disallow alias methods
- *
+ * @description disallow alias methods
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-alias-methods.md
  *
  *  ```md
@@ -401,8 +386,7 @@ namespace NoAliasMethods {
 }
 
 /**
- * Disallow commented out tests
- *
+ * @description disallow commented out tests
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-commented-out-tests.md
  *
  *  ```md
@@ -419,8 +403,7 @@ namespace NoCommentedOutTests {
 }
 
 /**
- * Disallow conditional expects
- *
+ * @description disallow conditional expects
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-conditional-expect.md
  *
  *  ```md
@@ -452,7 +435,9 @@ namespace NoConditionalExpect {
    * ```
    */
   export type Options = Readonly<{
-    /** Enable/disable whether expect.assertions() is taken into account */
+    /**
+     * Enable/disable whether expect.assertions() is taken into account
+     */
     expectAssertions?: boolean;
   }>;
 
@@ -463,8 +448,7 @@ namespace NoConditionalExpect {
 }
 
 /**
- * Disallow conditional tests
- *
+ * @description disallow conditional tests
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-conditional-in-test.md
  *
  *  ```md
@@ -481,8 +465,7 @@ namespace NoConditionalInTest {
 }
 
 /**
- * Disallow conditional tests
- *
+ * @description disallow conditional tests
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-conditional-tests.md
  *
  *  ```md
@@ -498,8 +481,7 @@ namespace NoConditionalTests {
 }
 
 /**
- * Disallow disabled tests
- *
+ * @description disallow disabled tests
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-disabled-tests.md
  *
  *  ```md
@@ -515,8 +497,7 @@ namespace NoDisabledTests {
 }
 
 /**
- * Disallow using a callback in asynchronous tests and hooks
- *
+ * @description disallow using a callback in asynchronous tests and hooks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-done-callback.md
  *
  *  ```md
@@ -533,8 +514,7 @@ namespace NoDoneCallback {
 }
 
 /**
- * Disallow duplicate hooks and teardown hooks
- *
+ * @description disallow duplicate hooks and teardown hooks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-duplicate-hooks.md
  *
  *  ```md
@@ -551,8 +531,7 @@ namespace NoDuplicateHooks {
 }
 
 /**
- * Disallow focused tests
- *
+ * @description disallow focused tests
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-focused-tests.md
  *
  *  ```md
@@ -574,8 +553,7 @@ namespace NoFocusedTests {
    *     "type": "object",
    *     "properties": {
    *       "fixable": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -584,7 +562,6 @@ namespace NoFocusedTests {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
     fixable?: boolean;
   }>;
 
@@ -595,8 +572,7 @@ namespace NoFocusedTests {
 }
 
 /**
- * Disallow setup and teardown hooks
- *
+ * @description disallow setup and teardown hooks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-hooks.md
  *
  *  ```md
@@ -638,7 +614,9 @@ namespace NoHooks {
    * ```
    */
   export type Options = Readonly<{
-    /** This array option controls which Vitest hooks are checked by this rule. */
+    /**
+     * This array option controls which Vitest hooks are checked by this rule.
+     */
     allow?: readonly ('beforeAll' | 'beforeEach' | 'afterAll' | 'afterEach')[];
   }>;
 
@@ -649,8 +627,7 @@ namespace NoHooks {
 }
 
 /**
- * Disallow identical titles
- *
+ * @description disallow identical titles
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-identical-title.md
  *
  *  ```md
@@ -667,8 +644,7 @@ namespace NoIdenticalTitle {
 }
 
 /**
- * Disallow importing `node:test`
- *
+ * @description disallow importing `node:test`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-import-node-test.md
  *
  *  ```md
@@ -685,8 +661,7 @@ namespace NoImportNodeTest {
 }
 
 /**
- * Disallow importing Vitest globals
- *
+ * @description disallow importing Vitest globals
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-importing-vitest-globals.md
  *
  *  ```md
@@ -703,8 +678,7 @@ namespace NoImportingVitestGlobals {
 }
 
 /**
- * Disallow string interpolation in snapshots
- *
+ * @description disallow string interpolation in snapshots
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-interpolation-in-snapshots.md
  *
  *  ```md
@@ -721,8 +695,7 @@ namespace NoInterpolationInSnapshots {
 }
 
 /**
- * Disallow large snapshots
- *
+ * @description disallow large snapshots
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-large-snapshots.md
  *
  *  ```md
@@ -773,8 +746,7 @@ namespace NoLargeSnapshots {
 }
 
 /**
- * Disallow importing from **mocks** directory
- *
+ * @description disallow importing from __mocks__ directory
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-mocks-import.md
  *
  *  ```md
@@ -790,8 +762,7 @@ namespace NoMocksImport {
 }
 
 /**
- * Disallow the use of certain matchers
- *
+ * @description disallow the use of certain matchers
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-restricted-matchers.md
  *
  *  ```md
@@ -829,8 +800,7 @@ namespace NoRestrictedMatchers {
 }
 
 /**
- * Disallow specific `vi.` methods
- *
+ * @description disallow specific `vi.` methods
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-restricted-vi-methods.md
  *
  *  ```md
@@ -868,8 +838,7 @@ namespace NoRestrictedViMethods {
 }
 
 /**
- * Disallow using `expect` outside of `it` or `test` blocks
- *
+ * @description disallow using `expect` outside of `it` or `test` blocks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-standalone-expect.md
  *
  *  ```md
@@ -912,8 +881,7 @@ namespace NoStandaloneExpect {
 }
 
 /**
- * Disallow using the `f` and `x` prefixes in favour of `.only` and `.skip`
- *
+ * @description disallow using the `f` and `x` prefixes in favour of `.only` and `.skip`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-test-prefixes.md
  *
  *  ```md
@@ -930,8 +898,7 @@ namespace NoTestPrefixes {
 }
 
 /**
- * Disallow return statements in tests
- *
+ * @description disallow return statements in tests
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-test-return-statement.md
  *
  *  ```md
@@ -947,8 +914,7 @@ namespace NoTestReturnStatement {
 }
 
 /**
- * Disallow unnecessary async function wrapper for expected promises
- *
+ * @description Disallow unnecessary async function wrapper for expected promises
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-unneeded-async-expect-function.md
  *
  *  ```md
@@ -964,8 +930,7 @@ namespace NoUnneededAsyncExpectFunction {
 }
 
 /**
- * Enforce padding around `afterAll` blocks
- *
+ * @description Enforce padding around `afterAll` blocks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-after-all-blocks.md
  *
  *  ```md
@@ -981,8 +946,7 @@ namespace PaddingAroundAfterAllBlocks {
 }
 
 /**
- * Enforce padding around `afterEach` blocks
- *
+ * @description Enforce padding around `afterEach` blocks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-after-each-blocks.md
  *
  *  ```md
@@ -998,8 +962,7 @@ namespace PaddingAroundAfterEachBlocks {
 }
 
 /**
- * Enforce padding around vitest functions
- *
+ * @description Enforce padding around vitest functions
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-all.md
  *
  *  ```md
@@ -1015,8 +978,7 @@ namespace PaddingAroundAll {
 }
 
 /**
- * Enforce padding around `beforeAll` blocks
- *
+ * @description Enforce padding around `beforeAll` blocks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-before-all-blocks.md
  *
  *  ```md
@@ -1032,8 +994,7 @@ namespace PaddingAroundBeforeAllBlocks {
 }
 
 /**
- * Enforce padding around `beforeEach` blocks
- *
+ * @description Enforce padding around `beforeEach` blocks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-before-each-blocks.md
  *
  *  ```md
@@ -1049,8 +1010,7 @@ namespace PaddingAroundBeforeEachBlocks {
 }
 
 /**
- * Enforce padding around `describe` blocks
- *
+ * @description Enforce padding around `describe` blocks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-describe-blocks.md
  *
  *  ```md
@@ -1066,8 +1026,7 @@ namespace PaddingAroundDescribeBlocks {
 }
 
 /**
- * Enforce padding around `expect` groups
- *
+ * @description Enforce padding around `expect` groups
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-expect-groups.md
  *
  *  ```md
@@ -1083,8 +1042,7 @@ namespace PaddingAroundExpectGroups {
 }
 
 /**
- * Enforce padding around `test` blocks
- *
+ * @description Enforce padding around `test` blocks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-test-blocks.md
  *
  *  ```md
@@ -1100,9 +1058,7 @@ namespace PaddingAroundTestBlocks {
 }
 
 /**
- * Prefer `toHaveBeenCalledExactlyOnceWith` over `toHaveBeenCalledOnce` and
- * `toHaveBeenCalledWith`
- *
+ * @description Prefer `toHaveBeenCalledExactlyOnceWith` over `toHaveBeenCalledOnce` and `toHaveBeenCalledWith`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-called-exactly-once-with.md
  *
  *  ```md
@@ -1118,8 +1074,7 @@ namespace PreferCalledExactlyOnceWith {
 }
 
 /**
- * Enforce using `toBeCalledOnce()` or `toHaveBeenCalledOnce()`
- *
+ * @description enforce using `toBeCalledOnce()` or `toHaveBeenCalledOnce()`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-called-once.md
  *
  *  ```md
@@ -1136,8 +1091,7 @@ namespace PreferCalledOnce {
 }
 
 /**
- * Enforce using `toBeCalledTimes(1)` or `toHaveBeenCalledTimes(1)`
- *
+ * @description enforce using `toBeCalledTimes(1)` or `toHaveBeenCalledTimes(1)`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-called-times.md
  *
  *  ```md
@@ -1154,8 +1108,7 @@ namespace PreferCalledTimes {
 }
 
 /**
- * Enforce using `toBeCalledWith()` or `toHaveBeenCalledWith()`
- *
+ * @description enforce using `toBeCalledWith()` or `toHaveBeenCalledWith()`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-called-with.md
  *
  *  ```md
@@ -1172,8 +1125,7 @@ namespace PreferCalledWith {
 }
 
 /**
- * Enforce using the built-in comparison matchers
- *
+ * @description enforce using the built-in comparison matchers
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-comparison-matcher.md
  *
  *  ```md
@@ -1190,8 +1142,7 @@ namespace PreferComparisonMatcher {
 }
 
 /**
- * Enforce using a function as a describe title over an equivalent string
- *
+ * @description enforce using a function as a describe title over an equivalent string
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-describe-function-title.md
  *
  *  ```md
@@ -1208,8 +1159,7 @@ namespace PreferDescribeFunctionTitle {
 }
 
 /**
- * Enforce using `each` rather than manual loops
- *
+ * @description enforce using `each` rather than manual loops
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-each.md
  *
  *  ```md
@@ -1225,8 +1175,7 @@ namespace PreferEach {
 }
 
 /**
- * Enforce using the built-in equality matchers
- *
+ * @description enforce using the built-in equality matchers
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-equality-matcher.md
  *
  *  ```md
@@ -1243,8 +1192,7 @@ namespace PreferEqualityMatcher {
 }
 
 /**
- * Enforce using expect assertions instead of callbacks
- *
+ * @description enforce using expect assertions instead of callbacks
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-expect-assertions.md
  *
  *  ```md
@@ -1293,8 +1241,7 @@ namespace PreferExpectAssertions {
 }
 
 /**
- * Enforce using `expect().resolves` over `expect(await ...)` syntax
- *
+ * @description enforce using `expect().resolves` over `expect(await ...)` syntax
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-expect-resolves.md
  *
  *  ```md
@@ -1311,8 +1258,7 @@ namespace PreferExpectResolves {
 }
 
 /**
- * Enforce using `expectTypeOf` instead of `expect(typeof ...)`
- *
+ * @description enforce using `expectTypeOf` instead of `expect(typeof ...)`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-expect-type-of.md
  *
  *  ```md
@@ -1329,8 +1275,7 @@ namespace PreferExpectTypeOf {
 }
 
 /**
- * Enforce having hooks in consistent order
- *
+ * @description enforce having hooks in consistent order
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-hooks-in-order.md
  *
  *  ```md
@@ -1346,8 +1291,7 @@ namespace PreferHooksInOrder {
 }
 
 /**
- * Enforce having hooks before any test cases
- *
+ * @description enforce having hooks before any test cases
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-hooks-on-top.md
  *
  *  ```md
@@ -1363,8 +1307,7 @@ namespace PreferHooksOnTop {
 }
 
 /**
- * Prefer dynamic import in mock
- *
+ * @description prefer dynamic import in mock
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-import-in-mock.md
  *
  *  ```md
@@ -1385,8 +1328,7 @@ namespace PreferImportInMock {
    *     "type": "object",
    *     "properties": {
    *       "fixable": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -1395,7 +1337,6 @@ namespace PreferImportInMock {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
     fixable?: boolean;
   }>;
 
@@ -1406,8 +1347,7 @@ namespace PreferImportInMock {
 }
 
 /**
- * Enforce importing Vitest globals
- *
+ * @description enforce importing Vitest globals
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-importing-vitest-globals.md
  *
  *  ```md
@@ -1424,8 +1364,7 @@ namespace PreferImportingVitestGlobals {
 }
 
 /**
- * Enforce lowercase titles
- *
+ * @description enforce lowercase titles
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-lowercase-title.md
  *
  *  ```md
@@ -1465,12 +1404,10 @@ namespace PreferLowercaseTitle {
    *         "additionalItems": false
    *       },
    *       "ignoreTopLevelDescribe": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "lowercaseFirstCharacterOnly": {
-   *         "type": "boolean",
-   *         "default": true
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -1481,9 +1418,7 @@ namespace PreferLowercaseTitle {
   export type Options = Readonly<{
     ignore?: readonly ('describe' | 'test' | 'it')[];
     allowedPrefixes?: readonly string[];
-    /** @default false */
     ignoreTopLevelDescribe?: boolean;
-    /** @default true */
     lowercaseFirstCharacterOnly?: boolean;
   }>;
 
@@ -1494,8 +1429,7 @@ namespace PreferLowercaseTitle {
 }
 
 /**
- * Enforce mock resolved/rejected shorthands for promises
- *
+ * @description enforce mock resolved/rejected shorthands for promises
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-mock-promise-shorthand.md
  *
  *  ```md
@@ -1512,8 +1446,7 @@ namespace PreferMockPromiseShorthand {
 }
 
 /**
- * Prefer mock return shorthands
- *
+ * @description Prefer mock return shorthands
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-mock-return-shorthand.md
  *
  *  ```md
@@ -1530,8 +1463,7 @@ namespace PreferMockReturnShorthand {
 }
 
 /**
- * Enforce including a hint with external snapshots
- *
+ * @description enforce including a hint with external snapshots
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-snapshot-hint.md
  *
  *  ```md
@@ -1567,8 +1499,7 @@ namespace PreferSnapshotHint {
 }
 
 /**
- * Enforce using `vi.spyOn`
- *
+ * @description enforce using `vi.spyOn`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-spy-on.md
  *
  *  ```md
@@ -1585,9 +1516,7 @@ namespace PreferSpyOn {
 }
 
 /**
- * Enforce using `toBe(true)` and `toBe(false)` over matchers that coerce types
- * to boolean
- *
+ * @description enforce using `toBe(true)` and `toBe(false)` over matchers that coerce types to boolean
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-strict-boolean-matchers.md
  *
  *  ```md
@@ -1604,8 +1533,7 @@ namespace PreferStrictBooleanMatchers {
 }
 
 /**
- * Enforce strict equal over equal
- *
+ * @description enforce strict equal over equal
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-strict-equal.md
  *
  *  ```md
@@ -1622,8 +1550,7 @@ namespace PreferStrictEqual {
 }
 
 /**
- * Enforce using toBeFalsy()
- *
+ * @description enforce using toBeFalsy()
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-be-falsy.md
  *
  *  ```md
@@ -1640,8 +1567,7 @@ namespace PreferToBeFalsy {
 }
 
 /**
- * Enforce using toBeObject()
- *
+ * @description enforce using toBeObject()
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-be-object.md
  *
  *  ```md
@@ -1658,8 +1584,7 @@ namespace PreferToBeObject {
 }
 
 /**
- * Enforce using `toBeTruthy`
- *
+ * @description enforce using `toBeTruthy`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-be-truthy.md
  *
  *  ```md
@@ -1676,8 +1601,7 @@ namespace PreferToBeTruthy {
 }
 
 /**
- * Enforce using toBe()
- *
+ * @description enforce using toBe()
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-be.md
  *
  *  ```md
@@ -1694,8 +1618,7 @@ namespace PreferToBe {
 }
 
 /**
- * Enforce using toContain()
- *
+ * @description enforce using toContain()
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-contain.md
  *
  *  ```md
@@ -1712,8 +1635,7 @@ namespace PreferToContain {
 }
 
 /**
- * Suggest using `toHaveBeenCalledTimes()`
- *
+ * @description Suggest using `toHaveBeenCalledTimes()`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-have-been-called-times.md
  *
  *  ```md
@@ -1729,8 +1651,7 @@ namespace PreferToHaveBeenCalledTimes {
 }
 
 /**
- * Enforce using toHaveLength()
- *
+ * @description enforce using toHaveLength()
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-have-length.md
  *
  *  ```md
@@ -1747,8 +1668,7 @@ namespace PreferToHaveLength {
 }
 
 /**
- * Enforce using `test.todo`
- *
+ * @description enforce using `test.todo`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-todo.md
  *
  *  ```md
@@ -1765,8 +1685,7 @@ namespace PreferTodo {
 }
 
 /**
- * Require `vi.mocked()` over `fn as Mock`
- *
+ * @description require `vi.mocked()` over `fn as Mock`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-vi-mocked.md
  *
  *  ```md
@@ -1784,8 +1703,7 @@ namespace PreferViMocked {
 }
 
 /**
- * Ensure that every `expect.poll` call is awaited
- *
+ * @description ensure that every `expect.poll` call is awaited
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-awaited-expect-poll.md
  *
  *  ```md
@@ -1802,8 +1720,7 @@ namespace RequireAwaitedExpectPoll {
 }
 
 /**
- * Require setup and teardown to be within a hook
- *
+ * @description require setup and teardown to be within a hook
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-hook.md
  *
  *  ```md
@@ -1846,8 +1763,7 @@ namespace RequireHook {
 }
 
 /**
- * Require tests to declare a timeout
- *
+ * @description require tests to declare a timeout
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-test-timeout.md
  *
  *  ```md
@@ -1863,8 +1779,7 @@ namespace RequireTestTimeout {
 }
 
 /**
- * Require local Test Context for concurrent snapshot tests
- *
+ * @description require local Test Context for concurrent snapshot tests
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-local-test-context-for-concurrent-snapshots.md
  *
  *  ```md
@@ -1880,8 +1795,7 @@ namespace RequireLocalTestContextForConcurrentSnapshots {
 }
 
 /**
- * Enforce using type parameters with vitest mock functions
- *
+ * @description enforce using type parameters with vitest mock functions
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-mock-type-parameters.md
  *
  *  ```md
@@ -1922,8 +1836,7 @@ namespace RequireMockTypeParameters {
 }
 
 /**
- * Require toThrow() to be called with an error message
- *
+ * @description require toThrow() to be called with an error message
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-to-throw-message.md
  *
  *  ```md
@@ -1939,8 +1852,7 @@ namespace RequireToThrowMessage {
 }
 
 /**
- * Enforce that all tests are in a top-level describe
- *
+ * @description enforce that all tests are in a top-level describe
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-top-level-describe.md
  *
  *  ```md
@@ -1962,8 +1874,7 @@ namespace RequireTopLevelDescribe {
    *     "properties": {
    *       "maxNumberOfTopLevelDescribes": {
    *         "type": "number",
-   *         "minimum": 1,
-   *         "default": null
+   *         "minimum": 1
    *       }
    *     },
    *     "additionalProperties": false
@@ -1972,7 +1883,6 @@ namespace RequireTopLevelDescribe {
    * ```
    */
   export type Options = Readonly<{
-    /** @default null */
     maxNumberOfTopLevelDescribes?: number;
   }>;
 
@@ -1983,8 +1893,7 @@ namespace RequireTopLevelDescribe {
 }
 
 /**
- * Enforce valid describe callback
- *
+ * @description enforce valid describe callback
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/valid-describe-callback.md
  *
  *  ```md
@@ -2000,8 +1909,7 @@ namespace ValidDescribeCallback {
 }
 
 /**
- * Require promises that have expectations in their chain to be valid
- *
+ * @description require promises that have expectations in their chain to be valid
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/valid-expect-in-promise.md
  *
  *  ```md
@@ -2016,8 +1924,7 @@ namespace ValidExpectInPromise {
 }
 
 /**
- * Enforce valid `expect()` usage
- *
+ * @description enforce valid `expect()` usage
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/valid-expect.md
  *
  *  ```md
@@ -2039,8 +1946,7 @@ namespace ValidExpect {
    *     "type": "object",
    *     "properties": {
    *       "alwaysAwait": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "asyncMatchers": {
    *         "type": "array",
@@ -2063,7 +1969,6 @@ namespace ValidExpect {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
     alwaysAwait?: boolean;
     asyncMatchers?: readonly string[];
     minArgs?: number;
@@ -2077,8 +1982,7 @@ namespace ValidExpect {
 }
 
 /**
- * Enforce valid titles
- *
+ * @description enforce valid titles
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/valid-title.md
  *
  *  ```md
@@ -2141,12 +2045,10 @@ namespace ValidTitle {
    *     },
    *     "properties": {
    *       "ignoreTypeOfDescribeName": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "allowArguments": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "disallowedWords": {
    *         "type": "array",
@@ -2179,9 +2081,7 @@ namespace ValidTitle {
     | readonly [string, string];
 
   export type Options = Readonly<{
-    /** @default false */
     ignoreTypeOfDescribeName?: boolean;
-    /** @default false */
     allowArguments?: boolean;
     disallowedWords?: readonly string[];
     mustMatch?: MustMatchType;
@@ -2195,8 +2095,7 @@ namespace ValidTitle {
 }
 
 /**
- * Disallow `.todo` usage
- *
+ * @description disallow `.todo` usage
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/warn-todo.md
  *
  *  ```md

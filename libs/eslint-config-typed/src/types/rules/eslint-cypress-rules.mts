@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Require screenshots to be preceded by an assertion
- *
+ * @description require screenshots to be preceded by an assertion
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/assertion-before-screenshot.md
  *
  *  ```md
@@ -25,8 +24,7 @@ namespace AssertionBeforeScreenshot {
 }
 
 /**
- * Disallow assigning return values of `cy` calls
- *
+ * @description disallow assigning return values of `cy` calls
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-assigning-return-values.md
  *
  *  ```md
@@ -42,8 +40,7 @@ namespace NoAssigningReturnValues {
 }
 
 /**
- * Disallow using `async`/`await` in Cypress `before` methods
- *
+ * @description disallow using `async`/`await` in Cypress `before` methods
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-async-before.md
  *
  *  ```md
@@ -59,8 +56,7 @@ namespace NoAsyncBefore {
 }
 
 /**
- * Disallow using `async`/`await` in Cypress test cases
- *
+ * @description disallow using `async`/`await` in Cypress test cases
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-async-tests.md
  *
  *  ```md
@@ -76,8 +72,7 @@ namespace NoAsyncTests {
 }
 
 /**
- * Disallow chain of `cy.get()` calls
- *
+ * @description disallow chain of `cy.get()` calls
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-chained-get.md
  *
  *  ```md
@@ -93,8 +88,7 @@ namespace NoChainedGet {
 }
 
 /**
- * Disallow using `cy.debug()` calls
- *
+ * @description disallow using `cy.debug()` calls
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-debug.md
  *
  *  ```md
@@ -110,8 +104,7 @@ namespace NoDebug {
 }
 
 /**
- * Disallow using `force: true` with action commands
- *
+ * @description disallow using `force: true` with action commands
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-force.md
  *
  *  ```md
@@ -127,8 +120,7 @@ namespace NoForce {
 }
 
 /**
- * Disallow using `cy.pause()` calls
- *
+ * @description disallow using `cy.pause()` calls
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-pause.md
  *
  *  ```md
@@ -144,8 +136,7 @@ namespace NoPause {
 }
 
 /**
- * Disallow waiting for arbitrary time periods
- *
+ * @description disallow waiting for arbitrary time periods
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-unnecessary-waiting.md
  *
  *  ```md
@@ -161,16 +152,15 @@ namespace NoUnnecessaryWaiting {
 }
 
 /**
- * Disallow using `cy.xpath()` calls
- *
+ * @description disallow using `cy.xpath()` calls
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-xpath.md
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | false      |
- *  | recommended | false      |
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
  *  ```
  */
 namespace NoXpath {
@@ -178,8 +168,7 @@ namespace NoXpath {
 }
 
 /**
- * Require `data-*` attribute selectors
- *
+ * @description require `data-*` attribute selectors
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/require-data-selectors.md
  *
  *  ```md
@@ -195,8 +184,7 @@ namespace RequireDataSelectors {
 }
 
 /**
- * Disallow actions within chains
- *
+ * @description disallow actions within chains
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/unsafe-to-chain-command.md
  *
  *  ```md
@@ -229,12 +217,14 @@ namespace UnsafeToChainCommand {
    * ]
    * ```
    */
-  /** Disallow actions within chains */
+  /**
+   * disallow actions within chains
+   */
   export type Options = Readonly<{
     /**
      * An additional list of methods to check for unsafe chaining.
      *
-     * @default [ ]
+     * @default []
      */
     methods?: readonly unknown[];
   }>;

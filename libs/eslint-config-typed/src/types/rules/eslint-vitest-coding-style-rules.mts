@@ -2,121 +2,120 @@
 import { type Linter } from 'eslint';
 
 /**
- * Disallow `expect(X).toStrictEqual(Y)` in favor of `assert.deepStrictEqual(X,
- * Y)`, as the former also checks type equality between X and Y.
+ * @description Disallow `expect(X).toStrictEqual(Y)` in favor of `assert.deepStrictEqual(X, Y)`, as the former also checks type equality between X and Y.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace NoExpectToStrictEqual {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.deepStrictEqual(X) over assert.deepEqual(X).
+ * @description Prefer assert.deepStrictEqual(X) over assert.deepEqual(X).
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace PreferAssertDeepStrictEqualOverDeepEqual {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.isTrue(X) over assert(X), assert.isOk(X), assert.ok(X).
+ * @description Prefer assert.isTrue(X) over assert(X), assert.isOk(X), assert.ok(X).
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace PreferAssertIsTrueOverAssert {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.isFalse(X) over assert.isNotOk(X), assert.notOk(X).
+ * @description Prefer assert.isFalse(X) over assert.isNotOk(X), assert.notOk(X).
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace PreferAssertIsFalseOverAssertNotOk {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.isTrue(X) over expect(X).toBe(true) (only if X is boolean)
+ * @description Prefer assert.isTrue(X) over expect(X).toBe(true) (only if X is boolean)
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace PreferAssertIsTrueOverExpectTrue {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.isFalse(X) over expect(X).toBe(false) (only if X is boolean)
+ * @description Prefer assert.isFalse(X) over expect(X).toBe(false) (only if X is boolean)
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace PreferAssertIsFalseOverExpectFalse {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.isFalse(X) over assert.isTrue(!X).
+ * @description Prefer assert.isFalse(X) over assert.isTrue(!X).
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace PreferAssertIsFalseOverNegatedAssertIsTrue {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Prefer assert.isTrue(X) over assert.isFalse(!X).
+ * @description Prefer assert.isTrue(X) over assert.isFalse(!X).
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace PreferAssertIsTrueOverNegatedAssertIsFalse {
   export type RuleEntry = Linter.StringSeverity;

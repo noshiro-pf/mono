@@ -2,9 +2,7 @@
 import { type Linter } from 'eslint';
 
 /**
- * Detects potentially unsafe regular expressions, which may take a very long
- * time to run, blocking the event loop.
- *
+ * @description Detects potentially unsafe regular expressions, which may take a very long time to run, blocking the event loop.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-unsafe-regex.md
  *
  *  ```md
@@ -20,9 +18,7 @@ namespace DetectUnsafeRegex {
 }
 
 /**
- * Detects "RegExp(variable)", which might allow an attacker to DOS your server
- * with a long-running regular expression.
- *
+ * @description Detects "RegExp(variable)", which might allow an attacker to DOS your server with a long-running regular expression.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-regexp.md
  *
  *  ```md
@@ -38,9 +34,7 @@ namespace DetectNonLiteralRegexp {
 }
 
 /**
- * Detects "require(variable)", which might allow an attacker to load and run
- * arbitrary code, or access arbitrary files on disk.
- *
+ * @description Detects "require(variable)", which might allow an attacker to load and run arbitrary code, or access arbitrary files on disk.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-require.md
  *
  *  ```md
@@ -56,9 +50,7 @@ namespace DetectNonLiteralRequire {
 }
 
 /**
- * Detects variable in filename argument of "fs" calls, which might allow an
- * attacker to access anything on your system.
- *
+ * @description Detects variable in filename argument of "fs" calls, which might allow an attacker to access anything on your system.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-non-literal-fs-filename.md
  *
  *  ```md
@@ -74,9 +66,7 @@ namespace DetectNonLiteralFsFilename {
 }
 
 /**
- * Detects "eval(variable)" which can allow an attacker to run arbitrary code
- * inside your process.
- *
+ * @description Detects "eval(variable)" which can allow an attacker to run arbitrary code inside your process.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-eval-with-expression.md
  *
  *  ```md
@@ -92,9 +82,7 @@ namespace DetectEvalWithExpression {
 }
 
 /**
- * Detects if "pseudoRandomBytes()" is in use, which might not give you the
- * randomness you need and expect.
- *
+ * @description Detects if "pseudoRandomBytes()" is in use, which might not give you the randomness you need and expect.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-pseudoRandomBytes.md
  *
  *  ```md
@@ -110,9 +98,7 @@ namespace DetectPseudoRandomBytes {
 }
 
 /**
- * Detects insecure comparisons (`==`, `!=`, `!==` and `===`), which check input
- * sequentially.
- *
+ * @description Detects insecure comparisons (`==`, `!=`, `!==` and `===`), which check input sequentially.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-possible-timing-attacks.md
  *
  *  ```md
@@ -128,8 +114,7 @@ namespace DetectPossibleTimingAttacks {
 }
 
 /**
- * Detects Express "csrf" middleware setup before "method-override" middleware.
- *
+ * @description Detects Express "csrf" middleware setup before "method-override" middleware.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-no-csrf-before-method-override.md
  *
  *  ```md
@@ -145,8 +130,7 @@ namespace DetectNoCsrfBeforeMethodOverride {
 }
 
 /**
- * Detects calls to "buffer" with "noAssert" flag set.
- *
+ * @description Detects calls to "buffer" with "noAssert" flag set.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-buffer-noassert.md
  *
  *  ```md
@@ -162,8 +146,7 @@ namespace DetectBufferNoassert {
 }
 
 /**
- * Detects instances of "child_process" & non-literal "exec()" calls.
- *
+ * @description Detects instances of "child_process" & non-literal "exec()" calls.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-child-process.md
  *
  *  ```md
@@ -179,9 +162,7 @@ namespace DetectChildProcess {
 }
 
 /**
- * Detects "object.escapeMarkup = false", which can be used with some template
- * engines to disable escaping of HTML entities.
- *
+ * @description Detects "object.escapeMarkup = false", which can be used with some template engines to disable escaping of HTML entities.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-disable-mustache-escape.md
  *
  *  ```md
@@ -197,8 +178,7 @@ namespace DetectDisableMustacheEscape {
 }
 
 /**
- * Detects "variable[key]" as a left- or right-hand assignment operand.
- *
+ * @description Detects "variable[key]" as a left- or right-hand assignment operand.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-object-injection.md
  *
  *  ```md
@@ -214,9 +194,7 @@ namespace DetectObjectInjection {
 }
 
 /**
- * Detects instances of new Buffer(argument) where argument is any non-literal
- * value.
- *
+ * @description Detects instances of new Buffer(argument) where argument is any non-literal value.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-new-buffer.md
  *
  *  ```md
@@ -232,9 +210,7 @@ namespace DetectNewBuffer {
 }
 
 /**
- * Detects trojan source attacks that employ unicode bidi attacks to inject
- * malicious code.
- *
+ * @description Detects trojan source attacks that employ unicode bidi attacks to inject malicious code.
  * @link https://github.com/eslint-community/eslint-plugin-security/blob/main/docs/rules/detect-bidi-characters.md
  *
  *  ```md

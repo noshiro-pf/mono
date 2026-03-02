@@ -2,14 +2,14 @@
 import { type Linter } from 'eslint';
 
 /**
- * Forbits non-tree-shakable access to module name space objects.
+ * @description Forbits non-tree-shakable access to module name space objects.
  *
- * ```md
- * | key        | value   |
- * | :--------- | :------ |
- * | type       | problem |
- * | deprecated | false   |
- * ```
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
  */
 namespace ImportStar {
   export type RuleEntry = Linter.StringSeverity;

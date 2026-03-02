@@ -8,15 +8,14 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforces naming conventions for variables assigned to React.memo(...)
- * components.
+ * @description Enforces naming conventions for variables assigned to React.memo(...) components.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace ComponentName {
   /**
@@ -52,28 +51,28 @@ namespace ComponentName {
 }
 
 /**
- * Disallows using React.FC / React.FunctionComponent type annotations.
+ * @description Disallows using React.FC / React.FunctionComponent type annotations.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace ComponentVarTypeAnnotation {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Enforces importing React with a specific style (namespace or named imports).
+ * @description Enforces importing React with a specific style (namespace or named imports).
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace ImportStyle {
   /**
@@ -100,8 +99,7 @@ namespace ImportStyle {
    */
   export type Options = Readonly<{
     /**
-     * Import style to enforce: "namespace" for `import * as React` or "named"
-     * for `import { ... }`
+     * Import style to enforce: "namespace" for `import * as React` or "named" for `import { ... }`
      */
     importStyle?: 'namespace' | 'named';
   }>;
@@ -113,86 +111,84 @@ namespace ImportStyle {
 }
 
 /**
- * Forbids annotating props directly in the arrow function passed to React.memo.
+ * @description Forbids annotating props directly in the arrow function passed to React.memo.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace PropsTypeAnnotationStyle {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Enforces the arrow function passed to React.memo to use a single argument
- * named 'props'.
+ * @description Enforces the arrow function passed to React.memo to use a single argument named 'props'.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace ReactMemoPropsArgumentName {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Requires React.memo calls to have the type parameter 'Props'.
+ * @description Requires React.memo calls to have the type parameter 'Props'.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace ReactMemoTypeParameter {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Restricts React.useMemo hook usage patterns for consistent styles.
+ * @description Restricts React.useMemo hook usage patterns for consistent styles.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace UseMemoHookStyle {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Restricts specific React hook usage patterns for consistent component styles.
+ * @description Restricts specific React hook usage patterns for consistent component styles.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace BanUseImperativeHandleHook {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * Require React.memo components to define displayName matching the component
- * name
+ * @description Require React.memo components to define displayName matching the component name
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
  */
 namespace DisplayName {
   /**
@@ -226,8 +222,7 @@ namespace DisplayName {
    */
   export type Options = Readonly<{
     /**
-     * Component names allowed to have displayName different from the variable
-     * name.
+     * Component names allowed to have displayName different from the variable name.
      */
     ignoreName?: string | readonly string[];
   }>;

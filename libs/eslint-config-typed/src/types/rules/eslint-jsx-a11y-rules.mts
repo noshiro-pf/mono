@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforce emojis are wrapped in `<span>` and provide screen reader access.
- *
+ * @description Enforce emojis are wrapped in `<span>` and provide screen reader access.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/accessible-emoji.md
  *
  *  ```md
@@ -35,9 +34,7 @@ namespace AccessibleEmoji {
 }
 
 /**
- * Enforce all elements that require alternative text have meaningful
- * information to relay back to end user.
- *
+ * @description Enforce all elements that require alternative text have meaningful information to relay back to end user.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/alt-text.md
  *
  *  ```md
@@ -116,9 +113,7 @@ namespace AltText {
 }
 
 /**
- * Enforce `<a>` text to not exactly match "click here", "here", "link", or "a
- * link".
- *
+ * @description Enforce `<a>` text to not exactly match "click here", "here", "link", or "a link".
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-ambiguous-text.md
  *
  *  ```md
@@ -161,8 +156,7 @@ namespace AnchorAmbiguousText {
 }
 
 /**
- * Enforce all anchors to contain accessible content.
- *
+ * @description Enforce all anchors to contain accessible content.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-has-content.md
  *
  *  ```md
@@ -205,8 +199,7 @@ namespace AnchorHasContent {
 }
 
 /**
- * Enforce all anchors are valid, navigable elements.
- *
+ * @description Enforce all anchors are valid, navigable elements.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/anchor-is-valid.md
  *
  *  ```md
@@ -262,7 +255,9 @@ namespace AnchorIsValid {
   export type Options = Readonly<{
     components?: readonly string[];
     specialLink?: readonly string[];
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     */
     aspects?: readonly [
       'noHref' | 'invalidHref' | 'preferButton',
       ...('noHref' | 'invalidHref' | 'preferButton')[],
@@ -277,8 +272,7 @@ namespace AnchorIsValid {
 }
 
 /**
- * Enforce elements with aria-activedescendant are tabbable.
- *
+ * @description Enforce elements with aria-activedescendant are tabbable.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-activedescendant-has-tabindex.md
  *
  *  ```md
@@ -309,8 +303,7 @@ namespace AriaActivedescendantHasTabindex {
 }
 
 /**
- * Enforce all `aria-*` props are valid.
- *
+ * @description Enforce all `aria-*` props are valid.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-props.md
  *
  *  ```md
@@ -341,8 +334,7 @@ namespace AriaProps {
 }
 
 /**
- * Enforce ARIA state and property values are valid.
- *
+ * @description Enforce ARIA state and property values are valid.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-proptypes.md
  *
  *  ```md
@@ -373,9 +365,7 @@ namespace AriaProptypes {
 }
 
 /**
- * Enforce that elements with ARIA roles must use a valid, non-abstract ARIA
- * role.
- *
+ * @description Enforce that elements with ARIA roles must use a valid, non-abstract ARIA role.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-role.md
  *
  *  ```md
@@ -411,7 +401,9 @@ namespace AriaRole {
    */
   export type Options = Readonly<{
     allowedInvalidRoles?: readonly string[];
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreNonDOM?: boolean;
     [k: string]: unknown;
   }>;
@@ -423,9 +415,7 @@ namespace AriaRole {
 }
 
 /**
- * Enforce that elements that do not support ARIA roles, states, and properties
- * do not have those attributes.
- *
+ * @description Enforce that elements that do not support ARIA roles, states, and properties do not have those attributes.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/aria-unsupported-elements.md
  *
  *  ```md
@@ -456,8 +446,7 @@ namespace AriaUnsupportedElements {
 }
 
 /**
- * Enforce that autocomplete attributes are used correctly.
- *
+ * @description Enforce that autocomplete attributes are used correctly.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/autocomplete-valid.md
  *
  *  ```md
@@ -500,9 +489,7 @@ namespace AutocompleteValid {
 }
 
 /**
- * Enforce a clickable non-interactive element has at least one keyboard event
- * listener.
- *
+ * @description Enforce a clickable non-interactive element has at least one keyboard event listener.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/click-events-have-key-events.md
  *
  *  ```md
@@ -533,8 +520,7 @@ namespace ClickEventsHaveKeyEvents {
 }
 
 /**
- * Enforce that a control (an interactive element) has a text label.
- *
+ * @description Enforce that a control (an interactive element) has a text label.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/control-has-associated-label.md
  *
  *  ```md
@@ -599,7 +585,9 @@ namespace ControlHasAssociatedLabel {
     controlComponents?: readonly string[];
     ignoreElements?: readonly string[];
     ignoreRoles?: readonly string[];
-    /** JSX tree depth limit to check for accessible label */
+    /**
+     * JSX tree depth limit to check for accessible label
+     */
     depth?: number;
     [k: string]: unknown;
   }>;
@@ -611,8 +599,7 @@ namespace ControlHasAssociatedLabel {
 }
 
 /**
- * Enforce heading (`h1`, `h2`, etc) elements contain accessible content.
- *
+ * @description Enforce heading (`h1`, `h2`, etc) elements contain accessible content.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/heading-has-content.md
  *
  *  ```md
@@ -655,8 +642,7 @@ namespace HeadingHasContent {
 }
 
 /**
- * Enforce `<html>` element has `lang` prop.
- *
+ * @description Enforce `<html>` element has `lang` prop.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/html-has-lang.md
  *
  *  ```md
@@ -687,8 +673,7 @@ namespace HtmlHasLang {
 }
 
 /**
- * Enforce iframe elements have a title attribute.
- *
+ * @description Enforce iframe elements have a title attribute.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/iframe-has-title.md
  *
  *  ```md
@@ -719,9 +704,7 @@ namespace IframeHasTitle {
 }
 
 /**
- * Enforce `<img>` alt prop does not contain the word "image", "picture", or
- * "photo".
- *
+ * @description Enforce `<img>` alt prop does not contain the word "image", "picture", or "photo".
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/img-redundant-alt.md
  *
  *  ```md
@@ -773,9 +756,7 @@ namespace ImgRedundantAlt {
 }
 
 /**
- * Enforce that elements with interactive handlers like `onClick` must be
- * focusable.
- *
+ * @description Enforce that elements with interactive handlers like `onClick` must be focusable.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/interactive-supports-focus.md
  *
  *  ```md
@@ -844,7 +825,9 @@ namespace InteractiveSupportsFocus {
    * ```
    */
   export type Options = Readonly<{
-    /** @minItems 0 */
+    /**
+     * @minItems 0
+     */
     tabbable?: readonly (
       | 'button'
       | 'checkbox'
@@ -891,8 +874,7 @@ namespace InteractiveSupportsFocus {
 }
 
 /**
- * Enforce that a `label` tag has a text label and an associated control.
- *
+ * @description Enforce that a `label` tag has a text label and an associated control.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/docs/rules/label-has-associated-control.md
  *
  *  ```md
@@ -958,9 +940,13 @@ namespace LabelHasAssociatedControl {
     labelComponents?: readonly string[];
     labelAttributes?: readonly string[];
     controlComponents?: readonly string[];
-    /** Assert that the label has htmlFor, a nested label, both or either */
+    /**
+     * Assert that the label has htmlFor, a nested label, both or either
+     */
     assert?: 'htmlFor' | 'nesting' | 'both' | 'either';
-    /** JSX tree depth limit to check for accessible label */
+    /**
+     * JSX tree depth limit to check for accessible label
+     */
     depth?: number;
     [k: string]: unknown;
   }>;
@@ -972,8 +958,7 @@ namespace LabelHasAssociatedControl {
 }
 
 /**
- * Enforce that `<label>` elements have the `htmlFor` prop.
- *
+ * @description Enforce that `<label>` elements have the `htmlFor` prop.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/label-has-for.md
  *
  *  ```md
@@ -1064,8 +1049,7 @@ namespace LabelHasFor {
 }
 
 /**
- * Enforce lang attribute has a valid value.
- *
+ * @description Enforce lang attribute has a valid value.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/lang.md
  *
  *  ```md
@@ -1096,9 +1080,7 @@ namespace Lang {
 }
 
 /**
- * Enforces that `<audio>` and `<video>` elements must have a `<track>` for
- * captions.
- *
+ * @description Enforces that `<audio>` and `<video>` elements must have a `<track>` for captions.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/media-has-caption.md
  *
  *  ```md
@@ -1159,9 +1141,7 @@ namespace MediaHasCaption {
 }
 
 /**
- * Enforce that `onMouseOver`/`onMouseOut` are accompanied by `onFocus`/`onBlur`
- * for keyboard-only users.
- *
+ * @description Enforce that `onMouseOver`/`onMouseOut` are accompanied by `onFocus`/`onBlur` for keyboard-only users.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/mouse-events-have-key-events.md
  *
  *  ```md
@@ -1203,9 +1183,13 @@ namespace MouseEventsHaveKeyEvents {
    * ```
    */
   export type Options = Readonly<{
-    /** An array of events that need to be accompanied by `onFocus` */
+    /**
+     * An array of events that need to be accompanied by `onFocus`
+     */
     hoverInHandlers?: readonly string[];
-    /** An array of events that need to be accompanied by `onBlur` */
+    /**
+     * An array of events that need to be accompanied by `onBlur`
+     */
     hoverOutHandlers?: readonly string[];
     [k: string]: unknown;
   }>;
@@ -1217,9 +1201,7 @@ namespace MouseEventsHaveKeyEvents {
 }
 
 /**
- * Enforce that the `accessKey` prop is not used on any element to avoid
- * complications with keyboard commands used by a screen reader.
- *
+ * @description Enforce that the `accessKey` prop is not used on any element to avoid complications with keyboard commands used by a screen reader.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-access-key.md
  *
  *  ```md
@@ -1250,8 +1232,7 @@ namespace NoAccessKey {
 }
 
 /**
- * Disallow `aria-hidden="true"` from being set on focusable elements.
- *
+ * @description Disallow `aria-hidden="true"` from being set on focusable elements.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-aria-hidden-on-focusable.md
  *
  *  ```md
@@ -1282,8 +1263,7 @@ namespace NoAriaHiddenOnFocusable {
 }
 
 /**
- * Enforce autoFocus prop is not used.
- *
+ * @description Enforce autoFocus prop is not used.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-autofocus.md
  *
  *  ```md
@@ -1311,7 +1291,9 @@ namespace NoAutofocus {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreNonDOM?: boolean;
     [k: string]: unknown;
   }>;
@@ -1323,8 +1305,7 @@ namespace NoAutofocus {
 }
 
 /**
- * Enforce distracting elements are not used.
- *
+ * @description Enforce distracting elements are not used.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-distracting-elements.md
  *
  *  ```md
@@ -1361,7 +1342,9 @@ namespace NoDistractingElements {
    * ```
    */
   export type Options = Readonly<{
-    /** @minItems 0 */
+    /**
+     * @minItems 0
+     */
     elements?: readonly ('marquee' | 'blink')[];
     [k: string]: unknown;
   }>;
@@ -1373,8 +1356,7 @@ namespace NoDistractingElements {
 }
 
 /**
- * Interactive elements should not be assigned non-interactive roles.
- *
+ * @description Interactive elements should not be assigned non-interactive roles.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-interactive-element-to-noninteractive-role.md
  *
  *  ```md
@@ -1411,9 +1393,7 @@ namespace NoInteractiveElementToNoninteractiveRole {
 }
 
 /**
- * Non-interactive elements should not be assigned mouse or keyboard event
- * listeners.
- *
+ * @description Non-interactive elements should not be assigned mouse or keyboard event listeners.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-element-interactions.md
  *
  *  ```md
@@ -1456,8 +1436,7 @@ namespace NoNoninteractiveElementInteractions {
 }
 
 /**
- * Non-interactive elements should not be assigned interactive roles.
- *
+ * @description Non-interactive elements should not be assigned interactive roles.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-element-to-interactive-role.md
  *
  *  ```md
@@ -1494,8 +1473,7 @@ namespace NoNoninteractiveElementToInteractiveRole {
 }
 
 /**
- * `tabIndex` should only be declared on interactive elements.
- *
+ * @description `tabIndex` should only be declared on interactive elements.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-noninteractive-tabindex.md
  *
  *  ```md
@@ -1537,9 +1515,13 @@ namespace NoNoninteractiveTabindex {
    * ```
    */
   export type Options = Readonly<{
-    /** An array of ARIA roles */
+    /**
+     * An array of ARIA roles
+     */
     roles?: readonly string[];
-    /** An array of HTML tag names */
+    /**
+     * An array of HTML tag names
+     */
     tags?: readonly string[];
     [k: string]: unknown;
   }>;
@@ -1551,8 +1533,7 @@ namespace NoNoninteractiveTabindex {
 }
 
 /**
- * Enforce usage of `onBlur` over `onChange` on select menus for accessibility.
- *
+ * @description Enforce usage of `onBlur` over `onChange` on select menus for accessibility.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-onchange.md
  *
  *  ```md
@@ -1578,9 +1559,7 @@ namespace NoOnchange {
 }
 
 /**
- * Enforce explicit role property is not the same as implicit/default role
- * property on element.
- *
+ * @description Enforce explicit role property is not the same as implicit/default role property on element.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-redundant-roles.md
  *
  *  ```md
@@ -1617,9 +1596,7 @@ namespace NoRedundantRoles {
 }
 
 /**
- * Enforce that non-interactive, visible elements (such as `<div>`) that have
- * click handlers use the role attribute.
- *
+ * @description Enforce that non-interactive, visible elements (such as `<div>`) that have click handlers use the role attribute.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/no-static-element-interactions.md
  *
  *  ```md
@@ -1662,8 +1639,7 @@ namespace NoStaticElementInteractions {
 }
 
 /**
- * Enforces using semantic DOM elements over the ARIA `role` property.
- *
+ * @description Enforces using semantic DOM elements over the ARIA `role` property.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/prefer-tag-over-role.md
  *
  *  ```md
@@ -1694,9 +1670,7 @@ namespace PreferTagOverRole {
 }
 
 /**
- * Enforce that elements with ARIA roles must have all required attributes for
- * that role.
- *
+ * @description Enforce that elements with ARIA roles must have all required attributes for that role.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/role-has-required-aria-props.md
  *
  *  ```md
@@ -1727,9 +1701,7 @@ namespace RoleHasRequiredAriaProps {
 }
 
 /**
- * Enforce that elements with explicit or implicit roles defined contain only
- * `aria-*` properties supported by that `role`.
- *
+ * @description Enforce that elements with explicit or implicit roles defined contain only `aria-*` properties supported by that `role`.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/role-supports-aria-props.md
  *
  *  ```md
@@ -1760,8 +1732,7 @@ namespace RoleSupportsAriaProps {
 }
 
 /**
- * Enforce `scope` prop is only used on `<th>` elements.
- *
+ * @description Enforce `scope` prop is only used on `<th>` elements.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/scope.md
  *
  *  ```md
@@ -1792,8 +1763,7 @@ namespace Scope {
 }
 
 /**
- * Enforce `tabIndex` value is not greater than zero.
- *
+ * @description Enforce `tabIndex` value is not greater than zero.
  * @link https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/tree/HEAD/docs/rules/tabindex-no-positive.md
  *
  *  ```md

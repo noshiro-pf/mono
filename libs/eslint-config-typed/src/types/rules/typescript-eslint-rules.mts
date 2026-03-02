@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Require that function overload signatures be consecutive
- *
+ * @description Require that function overload signatures be consecutive
  * @link https://typescript-eslint.io/rules/adjacent-overload-signatures
  *
  *  ```md
@@ -25,8 +24,7 @@ namespace AdjacentOverloadSignatures {
 }
 
 /**
- * Require consistently using either `T[]` or `Array<T>` for arrays
- *
+ * @description Require consistently using either `T[]` or `Array<T>` for arrays
  * @link https://typescript-eslint.io/rules/array-type
  *
  *  ```md
@@ -72,11 +70,12 @@ namespace ArrayType {
    * ```
    */
   export type Options = Readonly<{
-    /** The array type expected for mutable cases. */
+    /**
+     * The array type expected for mutable cases.
+     */
     default?: 'array' | 'generic' | 'array-simple';
     /**
-     * The array type expected for readonly cases. If omitted, the value for
-     * `default` will be used.
+     * The array type expected for readonly cases. If omitted, the value for `default` will be used.
      */
     readonly?: 'array' | 'generic' | 'array-simple';
   }>;
@@ -88,8 +87,7 @@ namespace ArrayType {
 }
 
 /**
- * Disallow awaiting a value that is not a Thenable
- *
+ * @description Disallow awaiting a value that is not a Thenable
  * @link https://typescript-eslint.io/rules/await-thenable
  *
  *  ```md
@@ -107,8 +105,7 @@ namespace AwaitThenable {
 }
 
 /**
- * Disallow `@ts-<directive>` comments or require descriptions after directives
- *
+ * @description Disallow `@ts-<directive>` comments or require descriptions after directives
  * @link https://typescript-eslint.io/rules/ban-ts-comment
  *
  *  ```md
@@ -181,32 +178,39 @@ namespace BanTsComment {
    */
   export type Options = Readonly<{
     /**
-     * A minimum character length for descriptions when `allow-with-description`
-     * is enabled.
+     * A minimum character length for descriptions when `allow-with-description` is enabled.
      */
     minimumDescriptionLength?: number;
-    /** Whether allow ts-check directives, and with which restrictions. */
+    /**
+     * Whether allow ts-check directives, and with which restrictions.
+     */
     'ts-check'?:
       | boolean
       | 'allow-with-description'
       | Readonly<{
           descriptionFormat?: string;
         }>;
-    /** Whether and when expect-error directives, and with which restrictions. */
+    /**
+     * Whether and when expect-error directives, and with which restrictions.
+     */
     'ts-expect-error'?:
       | boolean
       | 'allow-with-description'
       | Readonly<{
           descriptionFormat?: string;
         }>;
-    /** Whether allow ts-ignore directives, and with which restrictions. */
+    /**
+     * Whether allow ts-ignore directives, and with which restrictions.
+     */
     'ts-ignore'?:
       | boolean
       | 'allow-with-description'
       | Readonly<{
           descriptionFormat?: string;
         }>;
-    /** Whether allow ts-nocheck directives, and with which restrictions. */
+    /**
+     * Whether allow ts-nocheck directives, and with which restrictions.
+     */
     'ts-nocheck'?:
       | boolean
       | 'allow-with-description'
@@ -222,8 +226,7 @@ namespace BanTsComment {
 }
 
 /**
- * Disallow `// tslint:<rule-flag>` comments
- *
+ * @description Disallow `// tslint:<rule-flag>` comments
  * @link https://typescript-eslint.io/rules/ban-tslint-comment
  *
  *  ```md
@@ -240,8 +243,7 @@ namespace BanTslintComment {
 }
 
 /**
- * Enforce that literals on classes are exposed in a consistent style
- *
+ * @description Enforce that literals on classes are exposed in a consistent style
  * @link https://typescript-eslint.io/rules/class-literal-property-style
  *
  *  ```md
@@ -270,7 +272,9 @@ namespace ClassLiteralPropertyStyle {
    * ]
    * ```
    */
-  /** Which literal class member syntax to prefer. */
+  /**
+   * Which literal class member syntax to prefer.
+   */
   export type Options = 'fields' | 'getters';
 
   export type RuleEntry =
@@ -280,8 +284,7 @@ namespace ClassLiteralPropertyStyle {
 }
 
 /**
- * Enforce that class methods utilize `this`
- *
+ * @description Enforce that class methods utilize `this`
  * @link https://typescript-eslint.io/rules/class-methods-use-this
  *
  *  ```md
@@ -340,18 +343,20 @@ namespace ClassMethodsUseThis {
    */
   export type Options = Readonly<{
     /**
-     * Enforces that functions used as instance field initializers utilize
-     * `this`.
+     * Enforces that functions used as instance field initializers utilize `this`.
      */
     enforceForClassFields?: boolean;
-    /** Allows specified method names to be ignored with this rule. */
+    /**
+     * Allows specified method names to be ignored with this rule.
+     */
     exceptMethods?: readonly string[];
     /**
-     * Whether to ignore class members that are defined within a class that
-     * `implements` a type.
+     * Whether to ignore class members that are defined within a class that `implements` a type.
      */
     ignoreClassesThatImplementAnInterface?: boolean | 'public-fields';
-    /** Whether to ignore members marked with the `override` modifier. */
+    /**
+     * Whether to ignore members marked with the `override` modifier.
+     */
     ignoreOverrideMethods?: boolean;
   }>;
 
@@ -362,9 +367,7 @@ namespace ClassMethodsUseThis {
 }
 
 /**
- * Enforce specifying generic type arguments on type annotation or constructor
- * name of a constructor call
- *
+ * @description Enforce specifying generic type arguments on type annotation or constructor name of a constructor call
  * @link https://typescript-eslint.io/rules/consistent-generic-constructors
  *
  *  ```md
@@ -393,7 +396,9 @@ namespace ConsistentGenericConstructors {
    * ]
    * ```
    */
-  /** Which constructor call syntax to prefer. */
+  /**
+   * Which constructor call syntax to prefer.
+   */
   export type Options = 'type-annotation' | 'constructor';
 
   export type RuleEntry =
@@ -403,8 +408,7 @@ namespace ConsistentGenericConstructors {
 }
 
 /**
- * Require or disallow the `Record` type
- *
+ * @description Require or disallow the `Record` type
  * @link https://typescript-eslint.io/rules/consistent-indexed-object-style
  *
  *  ```md
@@ -434,7 +438,9 @@ namespace ConsistentIndexedObjectStyle {
    * ]
    * ```
    */
-  /** Which indexed object syntax to prefer. */
+  /**
+   * Which indexed object syntax to prefer.
+   */
   export type Options = 'record' | 'index-signature';
 
   export type RuleEntry =
@@ -444,8 +450,7 @@ namespace ConsistentIndexedObjectStyle {
 }
 
 /**
- * Require `return` statements to either always or never specify values
- *
+ * @description Require `return` statements to either always or never specify values
  * @link https://typescript-eslint.io/rules/consistent-return
  *
  *  ```md
@@ -485,8 +490,7 @@ namespace ConsistentReturn {
 }
 
 /**
- * Enforce consistent usage of type assertions
- *
+ * @description Enforce consistent usage of type assertions
  * @link https://typescript-eslint.io/rules/consistent-type-assertions
  *
  *  ```md
@@ -562,20 +566,22 @@ namespace ConsistentTypeAssertions {
    */
   export type Options = Readonly<
     | {
-        /** The expected assertion style to enforce. */
+        /**
+         * The expected assertion style to enforce.
+         */
         assertionStyle: 'never';
       }
     | {
         /**
-         * Whether to always prefer type declarations for array literals used as
-         * variable initializers, rather than type assertions.
+         * Whether to always prefer type declarations for array literals used as variable initializers, rather than type assertions.
          */
         arrayLiteralTypeAssertions?: 'allow' | 'allow-as-parameter' | 'never';
-        /** The expected assertion style to enforce. */
+        /**
+         * The expected assertion style to enforce.
+         */
         assertionStyle?: 'as' | 'angle-bracket';
         /**
-         * Whether to always prefer type declarations for object literals used
-         * as variable initializers, rather than type assertions.
+         * Whether to always prefer type declarations for object literals used as variable initializers, rather than type assertions.
          */
         objectLiteralTypeAssertions?: 'allow' | 'allow-as-parameter' | 'never';
       }
@@ -588,8 +594,7 @@ namespace ConsistentTypeAssertions {
 }
 
 /**
- * Enforce type definitions to consistently use either `interface` or `type`
- *
+ * @description Enforce type definitions to consistently use either `interface` or `type`
  * @link https://typescript-eslint.io/rules/consistent-type-definitions
  *
  *  ```md
@@ -618,7 +623,9 @@ namespace ConsistentTypeDefinitions {
    * ]
    * ```
    */
-  /** Which type definition syntax to prefer. */
+  /**
+   * Which type definition syntax to prefer.
+   */
   export type Options = 'interface' | 'type';
 
   export type RuleEntry =
@@ -628,8 +635,7 @@ namespace ConsistentTypeDefinitions {
 }
 
 /**
- * Enforce consistent usage of type exports
- *
+ * @description Enforce consistent usage of type exports
  * @link https://typescript-eslint.io/rules/consistent-type-exports
  *
  *  ```md
@@ -662,8 +668,7 @@ namespace ConsistentTypeExports {
    */
   export type Options = Readonly<{
     /**
-     * Whether the rule will autofix "mixed" export cases using TS inline type
-     * specifiers.
+     * Whether the rule will autofix "mixed" export cases using TS inline type specifiers.
      */
     fixMixedExportsWithInlineTypeSpecifier?: boolean;
   }>;
@@ -675,8 +680,7 @@ namespace ConsistentTypeExports {
 }
 
 /**
- * Enforce consistent usage of type imports
- *
+ * @description Enforce consistent usage of type imports
  * @link https://typescript-eslint.io/rules/consistent-type-imports
  *
  *  ```md
@@ -723,14 +727,17 @@ namespace ConsistentTypeImports {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to disallow type imports in type annotations (`import()`). */
+    /**
+     * Whether to disallow type imports in type annotations (`import()`).
+     */
     disallowTypeAnnotations?: boolean;
     /**
-     * The expected type modifier to be added when an import is detected as used
-     * only in the type position.
+     * The expected type modifier to be added when an import is detected as used only in the type position.
      */
     fixStyle?: 'separate-type-imports' | 'inline-type-imports';
-    /** The expected import kind for type-only imports. */
+    /**
+     * The expected import kind for type-only imports.
+     */
     prefer?: 'type-imports' | 'no-type-imports';
   }>;
 
@@ -741,8 +748,7 @@ namespace ConsistentTypeImports {
 }
 
 /**
- * Enforce default parameters to be last
- *
+ * @description Enforce default parameters to be last
  * @link https://typescript-eslint.io/rules/default-param-last
  *
  *  ```md
@@ -757,8 +763,7 @@ namespace DefaultParamLast {
 }
 
 /**
- * Enforce dot notation whenever possible
- *
+ * @description Enforce dot notation whenever possible
  * @link https://typescript-eslint.io/rules/dot-notation
  *
  *  ```md
@@ -808,22 +813,23 @@ namespace DotNotation {
    */
   export type Options = Readonly<{
     /**
-     * Whether to allow accessing properties matching an index signature with
-     * array notation.
+     * Whether to allow accessing properties matching an index signature with array notation.
      */
     allowIndexSignaturePropertyAccess?: boolean;
-    /** Whether to allow keywords such as ["class"]`. */
+    /**
+     * Whether to allow keywords such as ["class"]`.
+     */
     allowKeywords?: boolean;
-    /** Regular expression of names to allow. */
+    /**
+     * Regular expression of names to allow.
+     */
     allowPattern?: string;
     /**
-     * Whether to allow accessing class members marked as `private` with array
-     * notation.
+     * Whether to allow accessing class members marked as `private` with array notation.
      */
     allowPrivateClassPropertyAccess?: boolean;
     /**
-     * Whether to allow accessing class members marked as `protected` with array
-     * notation.
+     * Whether to allow accessing class members marked as `protected` with array notation.
      */
     allowProtectedClassPropertyAccess?: boolean;
   }>;
@@ -835,8 +841,7 @@ namespace DotNotation {
 }
 
 /**
- * Require explicit return types on functions and class methods
- *
+ * @description Require explicit return types on functions and class methods
  * @link https://typescript-eslint.io/rules/explicit-function-return-type
  *
  *  ```md
@@ -897,35 +902,36 @@ namespace ExplicitFunctionReturnType {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow arrow functions that start with the `void` keyword. */
+    /**
+     * Whether to allow arrow functions that start with the `void` keyword.
+     */
     allowConciseArrowFunctionExpressionsStartingWithVoid?: boolean;
     /**
-     * Whether to ignore arrow functions immediately returning a `as const`
-     * value.
+     * Whether to ignore arrow functions immediately returning a `as const` value.
      */
     allowDirectConstAssertionInArrowFunctions?: boolean;
     /**
-     * An array of function/method names that will not have their arguments or
-     * return values checked.
+     * An array of function/method names that will not have their arguments or return values checked.
      */
     allowedNames?: readonly string[];
     /**
-     * Whether to ignore function expressions (functions which are not part of a
-     * declaration).
+     * Whether to ignore function expressions (functions which are not part of a declaration).
      */
     allowExpressions?: boolean;
-    /** Whether to ignore functions that don't have generic type parameters. */
+    /**
+     * Whether to ignore functions that don't have generic type parameters.
+     */
     allowFunctionsWithoutTypeParameters?: boolean;
     /**
-     * Whether to ignore functions immediately returning another function
-     * expression.
+     * Whether to ignore functions immediately returning another function expression.
      */
     allowHigherOrderFunctions?: boolean;
-    /** Whether to ignore immediately invoked function expressions (IIFEs). */
+    /**
+     * Whether to ignore immediately invoked function expressions (IIFEs).
+     */
     allowIIFEs?: boolean;
     /**
-     * Whether to ignore type annotations on the variable of function
-     * expressions.
+     * Whether to ignore type annotations on the variable of function expressions.
      */
     allowTypedFunctionExpressions?: boolean;
   }>;
@@ -937,8 +943,7 @@ namespace ExplicitFunctionReturnType {
 }
 
 /**
- * Require explicit accessibility modifiers on class properties and methods
- *
+ * @description Require explicit accessibility modifiers on class properties and methods
  * @link https://typescript-eslint.io/rules/explicit-member-accessibility
  *
  *  ```md
@@ -1031,35 +1036,36 @@ namespace ExplicitMemberAccessibility {
    * ```
    */
   export type Options = Readonly<{
-    /** Which accessibility modifier is required to exist or not exist. */
+    /**
+     * Which accessibility modifier is required to exist or not exist.
+     */
     accessibility?: 'explicit' | 'no-public' | 'off';
-    /** Specific method names that may be ignored. */
+    /**
+     * Specific method names that may be ignored.
+     */
     ignoredMethodNames?: readonly string[];
     /**
-     * Changes to required accessibility modifiers for specific kinds of class
-     * members.
+     * Changes to required accessibility modifiers for specific kinds of class members.
      */
     overrides?: Readonly<{
       /**
-       * Which member accessibility modifier requirements to apply for
-       * accessors.
+       * Which member accessibility modifier requirements to apply for accessors.
        */
       accessors?: 'explicit' | 'no-public' | 'off';
       /**
-       * Which member accessibility modifier requirements to apply for
-       * constructors.
+       * Which member accessibility modifier requirements to apply for constructors.
        */
       constructors?: 'explicit' | 'no-public' | 'off';
-      /** Which member accessibility modifier requirements to apply for methods. */
+      /**
+       * Which member accessibility modifier requirements to apply for methods.
+       */
       methods?: 'explicit' | 'no-public' | 'off';
       /**
-       * Which member accessibility modifier requirements to apply for
-       * parameterProperties.
+       * Which member accessibility modifier requirements to apply for parameterProperties.
        */
       parameterProperties?: 'explicit' | 'no-public' | 'off';
       /**
-       * Which member accessibility modifier requirements to apply for
-       * properties.
+       * Which member accessibility modifier requirements to apply for properties.
        */
       properties?: 'explicit' | 'no-public' | 'off';
     }>;
@@ -1072,9 +1078,7 @@ namespace ExplicitMemberAccessibility {
 }
 
 /**
- * Require explicit return and argument types on exported functions' and
- * classes' public class methods
- *
+ * @description Require explicit return and argument types on exported functions' and classes' public class methods
  * @link https://typescript-eslint.io/rules/explicit-module-boundary-types
  *
  *  ```md
@@ -1127,33 +1131,30 @@ namespace ExplicitModuleBoundaryTypes {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to ignore arguments that are explicitly typed as `any`. */
+    /**
+     * Whether to ignore arguments that are explicitly typed as `any`.
+     */
     allowArgumentsExplicitlyTypedAsAny?: boolean;
     /**
-     * Whether to ignore return type annotations on body-less arrow functions
-     * that return an `as const` type assertion. You must still type the
-     * parameters of the function.
+     * Whether to ignore return type annotations on body-less arrow functions that return an `as const` type assertion.
+     * You must still type the parameters of the function.
      */
     allowDirectConstAssertionInArrowFunctions?: boolean;
     /**
-     * An array of function/method names that will not have their arguments or
-     * return values checked.
+     * An array of function/method names that will not have their arguments or return values checked.
      */
     allowedNames?: readonly string[];
     /**
-     * Whether to ignore return type annotations on functions immediately
-     * returning another function expression. You must still type the parameters
-     * of the function.
+     * Whether to ignore return type annotations on functions immediately returning another function expression.
+     * You must still type the parameters of the function.
      */
     allowHigherOrderFunctions?: boolean;
     /**
-     * Whether to ignore return type annotations on functions with overload
-     * signatures.
+     * Whether to ignore return type annotations on functions with overload signatures.
      */
     allowOverloadFunctions?: boolean;
     /**
-     * Whether to ignore type annotations on the variable of a function
-     * expression.
+     * Whether to ignore type annotations on the variable of a function expression.
      */
     allowTypedFunctionExpressions?: boolean;
   }>;
@@ -1165,8 +1166,7 @@ namespace ExplicitModuleBoundaryTypes {
 }
 
 /**
- * Require or disallow initialization in variable declarations
- *
+ * @description Require or disallow initialization in variable declarations
  * @link https://typescript-eslint.io/rules/init-declarations
  *
  *  ```md
@@ -1240,8 +1240,7 @@ namespace InitDeclarations {
 }
 
 /**
- * Enforce a maximum number of parameters in function definitions
- *
+ * @description Enforce a maximum number of parameters in function definitions
  * @link https://typescript-eslint.io/rules/max-params
  *
  *  ```md
@@ -1281,11 +1280,17 @@ namespace MaxParams {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to count a `this` declaration when the type is `void`. */
+    /**
+     * Whether to count a `this` declaration when the type is `void`.
+     */
     countVoidThis?: boolean;
-    /** A maximum number of parameters in function definitions. */
+    /**
+     * A maximum number of parameters in function definitions.
+     */
     max?: number;
-    /** (deprecated) A maximum number of parameters in function definitions. */
+    /**
+     * (deprecated) A maximum number of parameters in function definitions.
+     */
     maximum?: number;
   }>;
 
@@ -1296,8 +1301,7 @@ namespace MaxParams {
 }
 
 /**
- * Require a consistent member declaration order
- *
+ * @description Require a consistent member declaration order
  * @link https://typescript-eslint.io/rules/member-ordering
  *
  *  ```md
@@ -1831,7 +1835,9 @@ namespace MemberOrdering {
     | 'constructor';
 
   export type Options = Readonly<{
-    /** Which ordering to enforce for classes. */
+    /**
+     * Which ordering to enforce for classes.
+     */
     classes?:
       | 'never'
       | readonly (AllItems | readonly AllItems[])[]
@@ -1840,7 +1846,9 @@ namespace MemberOrdering {
           optionalityOrder?: OptionalityOrderOptions;
           order?: OrderOptions;
         }>;
-    /** Which ordering to enforce for classExpressions. */
+    /**
+     * Which ordering to enforce for classExpressions.
+     */
     classExpressions?:
       | 'never'
       | readonly (AllItems | readonly AllItems[])[]
@@ -1849,7 +1857,9 @@ namespace MemberOrdering {
           optionalityOrder?: OptionalityOrderOptions;
           order?: OrderOptions;
         }>;
-    /** Which ordering to enforce for default. */
+    /**
+     * Which ordering to enforce for default.
+     */
     default?:
       | 'never'
       | readonly (AllItems | readonly AllItems[])[]
@@ -1858,7 +1868,9 @@ namespace MemberOrdering {
           optionalityOrder?: OptionalityOrderOptions;
           order?: OrderOptions;
         }>;
-    /** Which ordering to enforce for interfaces. */
+    /**
+     * Which ordering to enforce for interfaces.
+     */
     interfaces?:
       | 'never'
       | readonly (TypeItems | readonly TypeItems[])[]
@@ -1867,7 +1879,9 @@ namespace MemberOrdering {
           optionalityOrder?: OptionalityOrderOptions;
           order?: OrderOptions;
         }>;
-    /** Which ordering to enforce for typeLiterals. */
+    /**
+     * Which ordering to enforce for typeLiterals.
+     */
     typeLiterals?:
       | 'never'
       | readonly (TypeItems | readonly TypeItems[])[]
@@ -1885,8 +1899,7 @@ namespace MemberOrdering {
 }
 
 /**
- * Enforce using a particular method signature syntax
- *
+ * @description Enforce using a particular method signature syntax
  * @link https://typescript-eslint.io/rules/method-signature-style
  *
  *  ```md
@@ -1914,7 +1927,9 @@ namespace MethodSignatureStyle {
    * ]
    * ```
    */
-  /** The method signature style to enforce using. */
+  /**
+   * The method signature style to enforce using.
+   */
   export type Options = 'property' | 'method';
 
   export type RuleEntry =
@@ -1924,8 +1939,7 @@ namespace MethodSignatureStyle {
 }
 
 /**
- * Enforce naming conventions for everything across a codebase
- *
+ * @description Enforce naming conventions for everything across a codebase
  * @link https://typescript-eslint.io/rules/naming-convention
  *
  *  ```md
@@ -4371,8 +4385,7 @@ namespace NamingConvention {
 }
 
 /**
- * Disallow generic `Array` constructors
- *
+ * @description Disallow generic `Array` constructors
  * @link https://typescript-eslint.io/rules/no-array-constructor
  *
  *  ```md
@@ -4389,8 +4402,7 @@ namespace NoArrayConstructor {
 }
 
 /**
- * Disallow using the `delete` operator on array values
- *
+ * @description Disallow using the `delete` operator on array values
  * @link https://typescript-eslint.io/rules/no-array-delete
  *
  *  ```md
@@ -4408,9 +4420,7 @@ namespace NoArrayDelete {
 }
 
 /**
- * Require `.toString()` and `.toLocaleString()` to only be called on objects
- * which provide useful information when stringified
- *
+ * @description Require `.toString()` and `.toLocaleString()` to only be called on objects which provide useful information when stringified
  * @link https://typescript-eslint.io/rules/no-base-to-string
  *
  *  ```md
@@ -4449,9 +4459,13 @@ namespace NoBaseToString {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to also check values of type `unknown` */
+    /**
+     * Whether to also check values of type `unknown`
+     */
     checkUnknown?: boolean;
-    /** Stringified type names to ignore. */
+    /**
+     * Stringified type names to ignore.
+     */
     ignoredTypeNames?: readonly string[];
   }>;
 
@@ -4462,8 +4476,7 @@ namespace NoBaseToString {
 }
 
 /**
- * Disallow non-null assertion in locations that may be confusing
- *
+ * @description Disallow non-null assertion in locations that may be confusing
  * @link https://typescript-eslint.io/rules/no-confusing-non-null-assertion
  *
  *  ```md
@@ -4480,8 +4493,7 @@ namespace NoConfusingNonNullAssertion {
 }
 
 /**
- * Require expressions of type void to appear in statement position
- *
+ * @description Require expressions of type void to appear in statement position
  * @link https://typescript-eslint.io/rules/no-confusing-void-expression
  *
  *  ```md
@@ -4524,15 +4536,15 @@ namespace NoConfusingVoidExpression {
    */
   export type Options = Readonly<{
     /**
-     * Whether to ignore "shorthand" `() =>` arrow functions: those without `{
-     * ... }` braces.
+     * Whether to ignore "shorthand" `() =>` arrow functions: those without `{ ... }` braces.
      */
     ignoreArrowShorthand?: boolean;
-    /** Whether to ignore returns that start with the `void` operator. */
+    /**
+     * Whether to ignore returns that start with the `void` operator.
+     */
     ignoreVoidOperator?: boolean;
     /**
-     * Whether to ignore returns from functions with explicit `void` return
-     * types and functions with contextual `void` return types.
+     * Whether to ignore returns from functions with explicit `void` return types and functions with contextual `void` return types.
      */
     ignoreVoidReturningFunctions?: boolean;
   }>;
@@ -4544,8 +4556,7 @@ namespace NoConfusingVoidExpression {
 }
 
 /**
- * Disallow using code marked as `@deprecated`
- *
+ * @description Disallow using code marked as `@deprecated`
  * @link https://typescript-eslint.io/rules/no-deprecated
  *
  *  ```md
@@ -4684,7 +4695,9 @@ namespace NoDeprecated {
    * ```
    */
   export type Options = Readonly<{
-    /** Type specifiers that can be allowed. */
+    /**
+     * Type specifiers that can be allowed.
+     */
     allow?: readonly (
       | string
       | Readonly<
@@ -4713,8 +4726,7 @@ namespace NoDeprecated {
 }
 
 /**
- * Disallow duplicate class members
- *
+ * @description Disallow duplicate class members
  * @link https://typescript-eslint.io/rules/no-dupe-class-members
  *
  *  ```md
@@ -4729,8 +4741,7 @@ namespace NoDupeClassMembers {
 }
 
 /**
- * Disallow duplicate enum member values
- *
+ * @description Disallow duplicate enum member values
  * @link https://typescript-eslint.io/rules/no-duplicate-enum-values
  *
  *  ```md
@@ -4747,8 +4758,7 @@ namespace NoDuplicateEnumValues {
 }
 
 /**
- * Disallow duplicate constituents of union or intersection types
- *
+ * @description Disallow duplicate constituents of union or intersection types
  * @link https://typescript-eslint.io/rules/no-duplicate-type-constituents
  *
  *  ```md
@@ -4785,9 +4795,13 @@ namespace NoDuplicateTypeConstituents {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to ignore `&` intersections. */
+    /**
+     * Whether to ignore `&` intersections.
+     */
     ignoreIntersections?: boolean;
-    /** Whether to ignore `|` unions. */
+    /**
+     * Whether to ignore `|` unions.
+     */
     ignoreUnions?: boolean;
   }>;
 
@@ -4798,8 +4812,7 @@ namespace NoDuplicateTypeConstituents {
 }
 
 /**
- * Disallow using the `delete` operator on computed key expressions
- *
+ * @description Disallow using the `delete` operator on computed key expressions
  * @link https://typescript-eslint.io/rules/no-dynamic-delete
  *
  *  ```md
@@ -4815,8 +4828,7 @@ namespace NoDynamicDelete {
 }
 
 /**
- * Disallow empty functions
- *
+ * @description Disallow empty functions
  * @link https://typescript-eslint.io/rules/no-empty-function
  *
  *  ```md
@@ -4868,7 +4880,9 @@ namespace NoEmptyFunction {
    * ```
    */
   export type Options = Readonly<{
-    /** Locations and kinds of functions that are allowed to be empty. */
+    /**
+     * Locations and kinds of functions that are allowed to be empty.
+     */
     allow?: readonly (
       | 'functions'
       | 'arrowFunctions'
@@ -4894,8 +4908,7 @@ namespace NoEmptyFunction {
 }
 
 /**
- * Disallow the declaration of empty interfaces
- *
+ * @description Disallow the declaration of empty interfaces
  * @link https://typescript-eslint.io/rules/no-empty-interface
  *
  *  ```md
@@ -4930,8 +4943,7 @@ namespace NoEmptyInterface {
 }
 
 /**
- * Disallow accidentally using the "empty object" type
- *
+ * @description Disallow accidentally using the "empty object" type
  * @link https://typescript-eslint.io/rules/no-empty-object-type
  *
  *  ```md
@@ -4980,13 +4992,16 @@ namespace NoEmptyObjectType {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow empty interfaces. */
+    /**
+     * Whether to allow empty interfaces.
+     */
     allowInterfaces?: 'always' | 'never' | 'with-single-extends';
-    /** Whether to allow empty object type literals. */
+    /**
+     * Whether to allow empty object type literals.
+     */
     allowObjectTypes?: 'always' | 'never';
     /**
-     * A stringified regular expression to allow interfaces and object type
-     * aliases with the configured name.
+     * A stringified regular expression to allow interfaces and object type aliases with the configured name.
      */
     allowWithName?: string;
   }>;
@@ -4998,8 +5013,7 @@ namespace NoEmptyObjectType {
 }
 
 /**
- * Disallow the `any` type
- *
+ * @description Disallow the `any` type
  * @link https://typescript-eslint.io/rules/no-explicit-any
  *
  *  ```md
@@ -5037,11 +5051,12 @@ namespace NoExplicitAny {
    */
   export type Options = Readonly<{
     /**
-     * Whether to enable auto-fixing in which the `any` type is converted to the
-     * `unknown` type.
+     * Whether to enable auto-fixing in which the `any` type is converted to the `unknown` type.
      */
     fixToUnknown?: boolean;
-    /** Whether to ignore rest parameter arrays. */
+    /**
+     * Whether to ignore rest parameter arrays.
+     */
     ignoreRestArgs?: boolean;
   }>;
 
@@ -5052,8 +5067,7 @@ namespace NoExplicitAny {
 }
 
 /**
- * Disallow extra non-null assertions
- *
+ * @description Disallow extra non-null assertions
  * @link https://typescript-eslint.io/rules/no-extra-non-null-assertion
  *
  *  ```md
@@ -5070,8 +5084,7 @@ namespace NoExtraNonNullAssertion {
 }
 
 /**
- * Disallow classes used as namespaces
- *
+ * @description Disallow classes used as namespaces
  * @link https://typescript-eslint.io/rules/no-extraneous-class
  *
  *  ```md
@@ -5114,13 +5127,21 @@ namespace NoExtraneousClass {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow extraneous classes that contain only a constructor. */
+    /**
+     * Whether to allow extraneous classes that contain only a constructor.
+     */
     allowConstructorOnly?: boolean;
-    /** Whether to allow extraneous classes that have no body (i.e. are empty). */
+    /**
+     * Whether to allow extraneous classes that have no body (i.e. are empty).
+     */
     allowEmpty?: boolean;
-    /** Whether to allow extraneous classes that only contain static members. */
+    /**
+     * Whether to allow extraneous classes that only contain static members.
+     */
     allowStaticOnly?: boolean;
-    /** Whether to allow extraneous classes that include a decorator. */
+    /**
+     * Whether to allow extraneous classes that include a decorator.
+     */
     allowWithDecorator?: boolean;
   }>;
 
@@ -5131,8 +5152,7 @@ namespace NoExtraneousClass {
 }
 
 /**
- * Require Promise-like statements to be handled appropriately
- *
+ * @description Require Promise-like statements to be handled appropriately
  * @link https://typescript-eslint.io/rules/no-floating-promises
  *
  *  ```md
@@ -5395,7 +5415,9 @@ namespace NoFloatingPromises {
    * ```
    */
   export type Options = Readonly<{
-    /** Type specifiers of functions whose calls are safe to float. */
+    /**
+     * Type specifiers of functions whose calls are safe to float.
+     */
     allowForKnownSafeCalls?: readonly (
       | string
       | Readonly<
@@ -5415,7 +5437,9 @@ namespace NoFloatingPromises {
             }
         >
     )[];
-    /** Type specifiers that are known to be safe to float. */
+    /**
+     * Type specifiers that are known to be safe to float.
+     */
     allowForKnownSafePromises?: readonly (
       | string
       | Readonly<
@@ -5435,11 +5459,17 @@ namespace NoFloatingPromises {
             }
         >
     )[];
-    /** Whether to check all "Thenable"s, not just the built-in Promise type. */
+    /**
+     * Whether to check all "Thenable"s, not just the built-in Promise type.
+     */
     checkThenables?: boolean;
-    /** Whether to ignore async IIFEs (Immediately Invoked Function Expressions). */
+    /**
+     * Whether to ignore async IIFEs (Immediately Invoked Function Expressions).
+     */
     ignoreIIFE?: boolean;
-    /** Whether to ignore `void` expressions. */
+    /**
+     * Whether to ignore `void` expressions.
+     */
     ignoreVoid?: boolean;
   }>;
 
@@ -5450,8 +5480,7 @@ namespace NoFloatingPromises {
 }
 
 /**
- * Disallow iterating over an array with a for-in loop
- *
+ * @description Disallow iterating over an array with a for-in loop
  * @link https://typescript-eslint.io/rules/no-for-in-array
  *
  *  ```md
@@ -5468,8 +5497,7 @@ namespace NoForInArray {
 }
 
 /**
- * Disallow the use of `eval()`-like functions
- *
+ * @description Disallow the use of `eval()`-like functions
  * @link https://typescript-eslint.io/rules/no-implied-eval
  *
  *  ```md
@@ -5486,9 +5514,7 @@ namespace NoImpliedEval {
 }
 
 /**
- * Enforce the use of top-level import type qualifier when an import only has
- * specifiers with inline type qualifiers
- *
+ * @description Enforce the use of top-level import type qualifier when an import only has specifiers with inline type qualifiers
  * @link https://typescript-eslint.io/rules/no-import-type-side-effects
  *
  *  ```md
@@ -5504,9 +5530,7 @@ namespace NoImportTypeSideEffects {
 }
 
 /**
- * Disallow explicit type declarations for variables or parameters initialized
- * to a number, string, or boolean
- *
+ * @description Disallow explicit type declarations for variables or parameters initialized to a number, string, or boolean
  * @link https://typescript-eslint.io/rules/no-inferrable-types
  *
  *  ```md
@@ -5542,9 +5566,13 @@ namespace NoInferrableTypes {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to ignore function parameters. */
+    /**
+     * Whether to ignore function parameters.
+     */
     ignoreParameters?: boolean;
-    /** Whether to ignore class properties. */
+    /**
+     * Whether to ignore class properties.
+     */
     ignoreProperties?: boolean;
   }>;
 
@@ -5555,8 +5583,7 @@ namespace NoInferrableTypes {
 }
 
 /**
- * Disallow `this` keywords outside of classes or class-like objects
- *
+ * @description Disallow `this` keywords outside of classes or class-like objects
  * @link https://typescript-eslint.io/rules/no-invalid-this
  *
  *  ```md
@@ -5595,8 +5622,7 @@ namespace NoInvalidThis {
 }
 
 /**
- * Disallow `void` type outside of generic or return types
- *
+ * @description Disallow `void` type outside of generic or return types
  * @link https://typescript-eslint.io/rules/no-invalid-void-type
  *
  *  ```md
@@ -5644,9 +5670,13 @@ namespace NoInvalidVoidType {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether a `this` parameter of a function may be `void`. */
+    /**
+     * Whether a `this` parameter of a function may be `void`.
+     */
     allowAsThisParameter?: boolean;
-    /** Whether `void` can be used as a valid value for generic type parameters. */
+    /**
+     * Whether `void` can be used as a valid value for generic type parameters.
+     */
     allowInGenericTypeArguments?: boolean | readonly [string, ...string[]];
   }>;
 
@@ -5657,9 +5687,7 @@ namespace NoInvalidVoidType {
 }
 
 /**
- * Disallow function declarations that contain unsafe references inside loop
- * statements
- *
+ * @description Disallow function declarations that contain unsafe references inside loop statements
  * @link https://typescript-eslint.io/rules/no-loop-func
  *
  *  ```md
@@ -5674,8 +5702,7 @@ namespace NoLoopFunc {
 }
 
 /**
- * Disallow literal numbers that lose precision
- *
+ * @description Disallow literal numbers that lose precision
  * @link https://typescript-eslint.io/rules/no-loss-of-precision
  *
  *  ```md
@@ -5690,8 +5717,7 @@ namespace NoLossOfPrecision {
 }
 
 /**
- * Disallow magic numbers
- *
+ * @description Disallow magic numbers
  * @link https://typescript-eslint.io/rules/no-magic-numbers
  *
  *  ```md
@@ -5772,16 +5798,26 @@ namespace NoMagicNumbers {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     detectObjects?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     enforceConst?: boolean;
     ignore?: readonly (number | string)[];
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreArrayIndexes?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreDefaultValues?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreClassFieldInitialValues?: boolean;
     /**
      * Whether enums used in TypeScript are considered okay.
@@ -5790,8 +5826,7 @@ namespace NoMagicNumbers {
      */
     ignoreEnums?: boolean;
     /**
-     * Whether numbers used in TypeScript numeric literal types are considered
-     * okay.
+     * Whether numbers used in TypeScript numeric literal types are considered okay.
      *
      * @default false
      */
@@ -5817,8 +5852,7 @@ namespace NoMagicNumbers {
 }
 
 /**
- * Disallow the `void` operator except when used to discard a value
- *
+ * @description Disallow the `void` operator except when used to discard a value
  * @link https://typescript-eslint.io/rules/no-meaningless-void-operator
  *
  *  ```md
@@ -5852,7 +5886,9 @@ namespace NoMeaninglessVoidOperator {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to suggest removing `void` when the argument has type `never`. */
+    /**
+     * Whether to suggest removing `void` when the argument has type `never`.
+     */
     checkNever?: boolean;
   }>;
 
@@ -5863,8 +5899,7 @@ namespace NoMeaninglessVoidOperator {
 }
 
 /**
- * Enforce valid definition of `new` and `constructor`
- *
+ * @description Enforce valid definition of `new` and `constructor`
  * @link https://typescript-eslint.io/rules/no-misused-new
  *
  *  ```md
@@ -5880,8 +5915,7 @@ namespace NoMisusedNew {
 }
 
 /**
- * Disallow Promises in places not designed to handle them
- *
+ * @description Disallow Promises in places not designed to handle them
  * @link https://typescript-eslint.io/rules/no-misused-promises
  *
  *  ```md
@@ -5957,45 +5991,42 @@ namespace NoMisusedPromises {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to warn when a Promise is provided to conditional statements. */
+    /**
+     * Whether to warn when a Promise is provided to conditional statements.
+     */
     checksConditionals?: boolean;
-    /** Whether to warn when `...` spreading a `Promise`. */
+    /**
+     * Whether to warn when `...` spreading a `Promise`.
+     */
     checksSpreads?: boolean;
     /**
-     * Whether to warn when a Promise is returned from a function typed as
-     * returning `void`.
+     * Whether to warn when a Promise is returned from a function typed as returning `void`.
      */
     checksVoidReturn?:
       | boolean
       | Readonly<{
           /**
-           * Disables checking an asynchronous function passed as argument where
-           * the parameter type expects a function that returns `void`.
+           * Disables checking an asynchronous function passed as argument where the parameter type expects a function that returns `void`.
            */
           arguments?: boolean;
           /**
-           * Disables checking an asynchronous function passed as a JSX
-           * attribute expected to be a function that returns `void`.
+           * Disables checking an asynchronous function passed as a JSX attribute expected to be a function that returns `void`.
            */
           attributes?: boolean;
           /**
-           * Disables checking an asynchronous method in a type that extends or
-           * implements another type expecting that method to return `void`.
+           * Disables checking an asynchronous method in a type that extends or implements another type expecting that method to return `void`.
            */
           inheritedMethods?: boolean;
           /**
-           * Disables checking an asynchronous function passed as an object
-           * property expected to be a function that returns `void`.
+           * Disables checking an asynchronous function passed as an object property expected to be a function that returns `void`.
            */
           properties?: boolean;
           /**
-           * Disables checking an asynchronous function returned in a function
-           * whose return type is a function that returns `void`.
+           * Disables checking an asynchronous function returned in a function whose return type is a function that returns `void`.
            */
           returns?: boolean;
           /**
-           * Disables checking an asynchronous function used as a variable whose
-           * return type is a function that returns `void`.
+           * Disables checking an asynchronous function used as a variable whose return type is a function that returns `void`.
            */
           variables?: boolean;
         }>;
@@ -6008,8 +6039,7 @@ namespace NoMisusedPromises {
 }
 
 /**
- * Disallow using the spread operator when it might cause unexpected behavior
- *
+ * @description Disallow using the spread operator when it might cause unexpected behavior
  * @link https://typescript-eslint.io/rules/no-misused-spread
  *
  *  ```md
@@ -6149,7 +6179,9 @@ namespace NoMisusedSpread {
    * ```
    */
   export type Options = Readonly<{
-    /** An array of type specifiers that are known to be safe to spread. */
+    /**
+     * An array of type specifiers that are known to be safe to spread.
+     */
     allow?: readonly (
       | string
       | Readonly<
@@ -6178,8 +6210,7 @@ namespace NoMisusedSpread {
 }
 
 /**
- * Disallow enums from having both number and string members
- *
+ * @description Disallow enums from having both number and string members
  * @link https://typescript-eslint.io/rules/no-mixed-enums
  *
  *  ```md
@@ -6196,8 +6227,7 @@ namespace NoMixedEnums {
 }
 
 /**
- * Disallow TypeScript namespaces
- *
+ * @description Disallow TypeScript namespaces
  * @link https://typescript-eslint.io/rules/no-namespace
  *
  *  ```md
@@ -6232,11 +6262,12 @@ namespace NoNamespace {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow `declare` with custom TypeScript namespaces. */
+    /**
+     * Whether to allow `declare` with custom TypeScript namespaces.
+     */
     allowDeclarations?: boolean;
     /**
-     * Whether to allow `declare` with custom TypeScript namespaces inside
-     * definition files.
+     * Whether to allow `declare` with custom TypeScript namespaces inside definition files.
      */
     allowDefinitionFiles?: boolean;
   }>;
@@ -6248,9 +6279,7 @@ namespace NoNamespace {
 }
 
 /**
- * Disallow non-null assertions in the left operand of a nullish coalescing
- * operator
- *
+ * @description Disallow non-null assertions in the left operand of a nullish coalescing operator
  * @link https://typescript-eslint.io/rules/no-non-null-asserted-nullish-coalescing
  *
  *  ```md
@@ -6267,8 +6296,7 @@ namespace NoNonNullAssertedNullishCoalescing {
 }
 
 /**
- * Disallow non-null assertions after an optional chain expression
- *
+ * @description Disallow non-null assertions after an optional chain expression
  * @link https://typescript-eslint.io/rules/no-non-null-asserted-optional-chain
  *
  *  ```md
@@ -6285,8 +6313,7 @@ namespace NoNonNullAssertedOptionalChain {
 }
 
 /**
- * Disallow non-null assertions using the `!` postfix operator
- *
+ * @description Disallow non-null assertions using the `!` postfix operator
  * @link https://typescript-eslint.io/rules/no-non-null-assertion
  *
  *  ```md
@@ -6303,8 +6330,7 @@ namespace NoNonNullAssertion {
 }
 
 /**
- * Disallow variable redeclaration
- *
+ * @description Disallow variable redeclaration
  * @link https://typescript-eslint.io/rules/no-redeclare
  *
  *  ```md
@@ -6338,11 +6364,12 @@ namespace NoRedeclare {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to report shadowing of built-in global variables. */
+    /**
+     * Whether to report shadowing of built-in global variables.
+     */
     builtinGlobals?: boolean;
     /**
-     * Whether to ignore declaration merges between certain TypeScript
-     * declaration types.
+     * Whether to ignore declaration merges between certain TypeScript declaration types.
      */
     ignoreDeclarationMerge?: boolean;
   }>;
@@ -6354,9 +6381,7 @@ namespace NoRedeclare {
 }
 
 /**
- * Disallow members of unions and intersections that do nothing or override type
- * information
- *
+ * @description Disallow members of unions and intersections that do nothing or override type information
  * @link https://typescript-eslint.io/rules/no-redundant-type-constituents
  *
  *  ```md
@@ -6373,8 +6398,7 @@ namespace NoRedundantTypeConstituents {
 }
 
 /**
- * Disallow invocation of `require()`
- *
+ * @description Disallow invocation of `require()`
  * @link https://typescript-eslint.io/rules/no-require-imports
  *
  *  ```md
@@ -6412,9 +6436,13 @@ namespace NoRequireImports {
    * ```
    */
   export type Options = Readonly<{
-    /** Patterns of import paths to allow requiring from. */
+    /**
+     * Patterns of import paths to allow requiring from.
+     */
     allow?: readonly string[];
-    /** Allows `require` statements in import declarations. */
+    /**
+     * Allows `require` statements in import declarations.
+     */
     allowAsImport?: boolean;
   }>;
 
@@ -6425,8 +6453,7 @@ namespace NoRequireImports {
 }
 
 /**
- * Disallow specified modules when loaded by `import`
- *
+ * @description Disallow specified modules when loaded by `import`
  * @link https://typescript-eslint.io/rules/no-restricted-imports
  *
  *  ```md
@@ -6621,7 +6648,9 @@ namespace NoRestrictedImports {
             message?: string;
             importNames?: readonly string[];
             allowImportNames?: readonly string[];
-            /** Whether to allow type-only imports for a path. */
+            /**
+             * Whether to allow type-only imports for a path.
+             */
             allowTypeImports?: boolean;
           }>
       )[]
@@ -6634,25 +6663,35 @@ namespace NoRestrictedImports {
                 message?: string;
                 importNames?: readonly string[];
                 allowImportNames?: readonly string[];
-                /** Whether to allow type-only imports for a path. */
+                /**
+                 * Whether to allow type-only imports for a path.
+                 */
                 allowTypeImports?: boolean;
               }>
           )[];
           patterns?:
             | readonly string[]
             | readonly Readonly<{
-                /** @minItems 1 */
+                /**
+                 * @minItems 1
+                 */
                 importNames?: readonly [string, ...string[]];
-                /** @minItems 1 */
+                /**
+                 * @minItems 1
+                 */
                 allowImportNames?: readonly [string, ...string[]];
-                /** @minItems 1 */
+                /**
+                 * @minItems 1
+                 */
                 group?: readonly [string, ...string[]];
                 regex?: string;
                 importNamePattern?: string;
                 allowImportNamePattern?: string;
                 message?: string;
                 caseSensitive?: boolean;
-                /** Whether to allow type-only imports for a path. */
+                /**
+                 * Whether to allow type-only imports for a path.
+                 */
                 allowTypeImports?: boolean;
               }>[];
         }>,
@@ -6665,8 +6704,7 @@ namespace NoRestrictedImports {
 }
 
 /**
- * Disallow certain types
- *
+ * @description Disallow certain types
  * @link https://typescript-eslint.io/rules/no-restricted-types
  *
  *  ```md
@@ -6744,20 +6782,22 @@ namespace NoRestrictedTypes {
     | string
     | Readonly<{
         /**
-         * Type to autofix replace with. Note that autofixers can be applied
-         * automatically - so you need to be careful with this option.
+         * Type to autofix replace with. Note that autofixers can be applied automatically - so you need to be careful with this option.
          */
         fixWith?: string;
-        /** Custom error message. */
+        /**
+         * Custom error message.
+         */
         message?: string;
-        /** Types to suggest replacing with. */
+        /**
+         * Types to suggest replacing with.
+         */
         suggest?: readonly string[];
       }>;
 
   export type Options = Readonly<{
     /**
-     * An object whose keys are the types you want to ban, and the values are
-     * error messages.
+     * An object whose keys are the types you want to ban, and the values are error messages.
      */
     types?: Readonly<Record<string, BanConfig>>;
   }>;
@@ -6769,9 +6809,7 @@ namespace NoRestrictedTypes {
 }
 
 /**
- * Disallow variable declarations from shadowing variables declared in the outer
- * scope
- *
+ * @description Disallow variable declarations from shadowing variables declared in the outer scope
  * @link https://typescript-eslint.io/rules/no-shadow
  *
  *  ```md
@@ -6831,23 +6869,29 @@ namespace NoShadow {
    * ```
    */
   export type Options = Readonly<{
-    /** Identifier names for which shadowing is allowed. */
+    /**
+     * Identifier names for which shadowing is allowed.
+     */
     allow?: readonly string[];
-    /** Whether to report shadowing of built-in global variables. */
+    /**
+     * Whether to report shadowing of built-in global variables.
+     */
     builtinGlobals?: boolean;
     /**
-     * Whether to report shadowing before outer functions or variables are
-     * defined.
+     * Whether to report shadowing before outer functions or variables are defined.
      */
     hoist?: 'all' | 'functions' | 'functions-and-types' | 'never' | 'types';
-    /** Whether to ignore function parameters named the same as a variable. */
+    /**
+     * Whether to ignore function parameters named the same as a variable.
+     */
     ignoreFunctionTypeParameterNameValueShadow?: boolean;
     /**
-     * Whether to ignore the variable initializers when the shadowed variable is
-     * presumably still unitialized.
+     * Whether to ignore the variable initializers when the shadowed variable is presumably still unitialized.
      */
     ignoreOnInitialization?: boolean;
-    /** Whether to ignore types named the same as a variable. */
+    /**
+     * Whether to ignore types named the same as a variable.
+     */
     ignoreTypeValueShadow?: boolean;
   }>;
 
@@ -6858,8 +6902,7 @@ namespace NoShadow {
 }
 
 /**
- * Disallow aliasing `this`
- *
+ * @description Disallow aliasing `this`
  * @link https://typescript-eslint.io/rules/no-this-alias
  *
  *  ```md
@@ -6898,11 +6941,12 @@ namespace NoThisAlias {
    */
   export type Options = Readonly<{
     /**
-     * Whether to ignore destructurings, such as `const { props, state } =
-     * this`.
+     * Whether to ignore destructurings, such as `const { props, state } = this`.
      */
     allowDestructuring?: boolean;
-    /** Names to ignore, such as ["self"] for `const self = this;`. */
+    /**
+     * Names to ignore, such as ["self"] for `const self = this;`.
+     */
     allowedNames?: readonly string[];
   }>;
 
@@ -6913,8 +6957,7 @@ namespace NoThisAlias {
 }
 
 /**
- * Disallow type aliases
- *
+ * @description Disallow type aliases
  * @link https://typescript-eslint.io/rules/no-type-alias
  *
  *  ```md
@@ -6994,8 +7037,7 @@ namespace NoTypeAlias {
 }
 
 /**
- * Disallow unnecessary equality comparisons against boolean literals
- *
+ * @description Disallow unnecessary equality comparisons against boolean literals
  * @link https://typescript-eslint.io/rules/no-unnecessary-boolean-literal-compare
  *
  *  ```md
@@ -7037,19 +7079,15 @@ namespace NoUnnecessaryBooleanLiteralCompare {
    */
   export type Options = Readonly<{
     /**
-     * Whether to allow comparisons between nullable boolean variables and
-     * `false`.
+     * Whether to allow comparisons between nullable boolean variables and `false`.
      */
     allowComparingNullableBooleansToFalse?: boolean;
     /**
-     * Whether to allow comparisons between nullable boolean variables and
-     * `true`.
+     * Whether to allow comparisons between nullable boolean variables and `true`.
      */
     allowComparingNullableBooleansToTrue?: boolean;
     /**
-     * Unless this is set to `true`, the rule will error on every file whose
-     * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
-     * (or `strict`) set to `true`.
+     * Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`.
      */
     allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
   }>;
@@ -7061,8 +7099,7 @@ namespace NoUnnecessaryBooleanLiteralCompare {
 }
 
 /**
- * Disallow conditionals where the type is always truthy or always falsy
- *
+ * @description Disallow conditionals where the type is always truthy or always falsy
  * @link https://typescript-eslint.io/rules/no-unnecessary-condition
  *
  *  ```md
@@ -7117,18 +7154,18 @@ namespace NoUnnecessaryCondition {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to ignore constant loop conditions, such as `while (true)`. */
+    /**
+     * Whether to ignore constant loop conditions, such as `while (true)`.
+     */
     allowConstantLoopConditions?:
       | boolean
       | ('always' | 'never' | 'only-allowed-literals');
     /**
-     * Whether to not error when running with a tsconfig that has
-     * strictNullChecks turned.
+     * Whether to not error when running with a tsconfig that has strictNullChecks turned.
      */
     allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
     /**
-     * Whether to check the asserted argument of a type predicate function for
-     * unnecessary conditions
+     * Whether to check the asserted argument of a type predicate function for unnecessary conditions
      */
     checkTypePredicates?: boolean;
   }>;
@@ -7140,8 +7177,7 @@ namespace NoUnnecessaryCondition {
 }
 
 /**
- * Disallow unnecessary assignment of constructor property parameter
- *
+ * @description Disallow unnecessary assignment of constructor property parameter
  * @link https://typescript-eslint.io/rules/no-unnecessary-parameter-property-assignment
  *
  *  ```md
@@ -7156,8 +7192,7 @@ namespace NoUnnecessaryParameterPropertyAssignment {
 }
 
 /**
- * Disallow unnecessary namespace qualifiers
- *
+ * @description Disallow unnecessary namespace qualifiers
  * @link https://typescript-eslint.io/rules/no-unnecessary-qualifier
  *
  *  ```md
@@ -7174,8 +7209,7 @@ namespace NoUnnecessaryQualifier {
 }
 
 /**
- * Disallow unnecessary template expressions
- *
+ * @description Disallow unnecessary template expressions
  * @link https://typescript-eslint.io/rules/no-unnecessary-template-expression
  *
  *  ```md
@@ -7193,8 +7227,7 @@ namespace NoUnnecessaryTemplateExpression {
 }
 
 /**
- * Disallow type arguments that are equal to the default
- *
+ * @description Disallow type arguments that are equal to the default
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-arguments
  *
  *  ```md
@@ -7212,8 +7245,7 @@ namespace NoUnnecessaryTypeArguments {
 }
 
 /**
- * Disallow type assertions that do not change the type of an expression
- *
+ * @description Disallow type assertions that do not change the type of an expression
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-assertion
  *
  *  ```md
@@ -7253,9 +7285,13 @@ namespace NoUnnecessaryTypeAssertion {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to check literal const assertions. */
+    /**
+     * Whether to check literal const assertions.
+     */
     checkLiteralConstAssertions?: boolean;
-    /** A list of type names to ignore. */
+    /**
+     * A list of type names to ignore.
+     */
     typesToIgnore?: readonly string[];
   }>;
 
@@ -7266,8 +7302,7 @@ namespace NoUnnecessaryTypeAssertion {
 }
 
 /**
- * Disallow unnecessary constraints on generic types
- *
+ * @description Disallow unnecessary constraints on generic types
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-constraint
  *
  *  ```md
@@ -7284,9 +7319,7 @@ namespace NoUnnecessaryTypeConstraint {
 }
 
 /**
- * Disallow conversion idioms when they do not change the type or value of the
- * expression
- *
+ * @description Disallow conversion idioms when they do not change the type or value of the expression
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-conversion
  *
  *  ```md
@@ -7304,8 +7337,7 @@ namespace NoUnnecessaryTypeConversion {
 }
 
 /**
- * Disallow type parameters that aren't used multiple times
- *
+ * @description Disallow type parameters that aren't used multiple times
  * @link https://typescript-eslint.io/rules/no-unnecessary-type-parameters
  *
  *  ```md
@@ -7323,8 +7355,7 @@ namespace NoUnnecessaryTypeParameters {
 }
 
 /**
- * Disallow calling a function with a value with type `any`
- *
+ * @description Disallow calling a function with a value with type `any`
  * @link https://typescript-eslint.io/rules/no-unsafe-argument
  *
  *  ```md
@@ -7341,8 +7372,7 @@ namespace NoUnsafeArgument {
 }
 
 /**
- * Disallow assigning a value with type `any` to variables and properties
- *
+ * @description Disallow assigning a value with type `any` to variables and properties
  * @link https://typescript-eslint.io/rules/no-unsafe-assignment
  *
  *  ```md
@@ -7359,8 +7389,7 @@ namespace NoUnsafeAssignment {
 }
 
 /**
- * Disallow calling a value with type `any`
- *
+ * @description Disallow calling a value with type `any`
  * @link https://typescript-eslint.io/rules/no-unsafe-call
  *
  *  ```md
@@ -7377,8 +7406,7 @@ namespace NoUnsafeCall {
 }
 
 /**
- * Disallow unsafe declaration merging
- *
+ * @description Disallow unsafe declaration merging
  * @link https://typescript-eslint.io/rules/no-unsafe-declaration-merging
  *
  *  ```md
@@ -7395,8 +7423,7 @@ namespace NoUnsafeDeclarationMerging {
 }
 
 /**
- * Disallow comparing an enum value with a non-enum value
- *
+ * @description Disallow comparing an enum value with a non-enum value
  * @link https://typescript-eslint.io/rules/no-unsafe-enum-comparison
  *
  *  ```md
@@ -7414,8 +7441,7 @@ namespace NoUnsafeEnumComparison {
 }
 
 /**
- * Disallow using the unsafe built-in Function type
- *
+ * @description Disallow using the unsafe built-in Function type
  * @link https://typescript-eslint.io/rules/no-unsafe-function-type
  *
  *  ```md
@@ -7431,8 +7457,7 @@ namespace NoUnsafeFunctionType {
 }
 
 /**
- * Disallow member access on a value with type `any`
- *
+ * @description Disallow member access on a value with type `any`
  * @link https://typescript-eslint.io/rules/no-unsafe-member-access
  *
  *  ```md
@@ -7464,7 +7489,9 @@ namespace NoUnsafeMemberAccess {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow `?.` optional chains on `any` values. */
+    /**
+     * Whether to allow `?.` optional chains on `any` values.
+     */
     allowOptionalChaining?: boolean;
   }>;
 
@@ -7475,8 +7502,7 @@ namespace NoUnsafeMemberAccess {
 }
 
 /**
- * Disallow returning a value with type `any` from a function
- *
+ * @description Disallow returning a value with type `any` from a function
  * @link https://typescript-eslint.io/rules/no-unsafe-return
  *
  *  ```md
@@ -7493,8 +7519,7 @@ namespace NoUnsafeReturn {
 }
 
 /**
- * Disallow type assertions that narrow a type
- *
+ * @description Disallow type assertions that narrow a type
  * @link https://typescript-eslint.io/rules/no-unsafe-type-assertion
  *
  *  ```md
@@ -7510,8 +7535,7 @@ namespace NoUnsafeTypeAssertion {
 }
 
 /**
- * Require unary negation to take a number
- *
+ * @description Require unary negation to take a number
  * @link https://typescript-eslint.io/rules/no-unsafe-unary-minus
  *
  *  ```md
@@ -7528,8 +7552,7 @@ namespace NoUnsafeUnaryMinus {
 }
 
 /**
- * Disallow unused expressions
- *
+ * @description Disallow unused expressions
  * @link https://typescript-eslint.io/rules/no-unused-expressions
  *
  *  ```md
@@ -7585,8 +7608,7 @@ namespace NoUnusedExpressions {
 }
 
 /**
- * Disallow unused private class members
- *
+ * @description Disallow unused private class members
  * @link https://typescript-eslint.io/rules/no-unused-private-class-members
  *
  *  ```md
@@ -7602,8 +7624,7 @@ namespace NoUnusedPrivateClassMembers {
 }
 
 /**
- * Disallow unused variables
- *
+ * @description Disallow unused variables
  * @link https://typescript-eslint.io/rules/no-unused-vars
  *
  *  ```md
@@ -7714,44 +7735,58 @@ namespace NoUnusedVars {
   export type Options =
     | ('all' | 'local')
     | Readonly<{
-        /** Whether to check all, some, or no arguments. */
+        /**
+         * Whether to check all, some, or no arguments.
+         */
         args?: 'all' | 'after-used' | 'none';
-        /** Regular expressions of argument names to not check for usage. */
+        /**
+         * Regular expressions of argument names to not check for usage.
+         */
         argsIgnorePattern?: string;
-        /** Whether to check catch block arguments. */
+        /**
+         * Whether to check catch block arguments.
+         */
         caughtErrors?: 'all' | 'none';
         /**
-         * Regular expressions of catch block argument names to not check for
-         * usage.
+         * Regular expressions of catch block argument names to not check for usage.
          */
         caughtErrorsIgnorePattern?: string;
         /**
-         * Regular expressions of destructured array variable names to not check
-         * for usage.
+         * Regular expressions of destructured array variable names to not check for usage.
          */
         destructuredArrayIgnorePattern?: string;
-        /** Configurable automatic fixes for different types of unused variables. */
+        /**
+         * Configurable automatic fixes for different types of unused variables.
+         */
         enableAutofixRemoval?: Readonly<{
-          /** Whether to enable automatic removal of unused imports. */
+          /**
+           * Whether to enable automatic removal of unused imports.
+           */
           imports?: boolean;
         }>;
         /**
-         * Whether to ignore classes with at least one static initialization
-         * block.
+         * Whether to ignore classes with at least one static initialization block.
          */
         ignoreClassWithStaticInitBlock?: boolean;
-        /** Whether to ignore sibling properties in `...` destructurings. */
+        /**
+         * Whether to ignore sibling properties in `...` destructurings.
+         */
         ignoreRestSiblings?: boolean;
-        /** Whether to ignore using or await using declarations. */
+        /**
+         * Whether to ignore using or await using declarations.
+         */
         ignoreUsingDeclarations?: boolean;
         /**
-         * Whether to report variables that match any of the valid ignore
-         * pattern options if they have been used.
+         * Whether to report variables that match any of the valid ignore pattern options if they have been used.
          */
         reportUsedIgnorePattern?: boolean;
-        /** Whether to check all variables or only locally-declared variables. */
+        /**
+         * Whether to check all variables or only locally-declared variables.
+         */
         vars?: 'all' | 'local';
-        /** Regular expressions of variable names to not check for usage. */
+        /**
+         * Regular expressions of variable names to not check for usage.
+         */
         varsIgnorePattern?: string;
       }>;
 
@@ -7762,8 +7797,7 @@ namespace NoUnusedVars {
 }
 
 /**
- * Disallow the use of variables before they are defined
- *
+ * @description Disallow the use of variables before they are defined
  * @link https://typescript-eslint.io/rules/no-use-before-define
  *
  *  ```md
@@ -7830,22 +7864,33 @@ namespace NoUseBeforeDefine {
   export type Options =
     | 'nofunc'
     | Readonly<{
-        /** Whether to ignore named exports. */
+        /**
+         * Whether to ignore named exports.
+         */
         allowNamedExports?: boolean;
-        /** Whether to ignore references to class declarations. */
+        /**
+         * Whether to ignore references to class declarations.
+         */
         classes?: boolean;
-        /** Whether to check references to enums. */
+        /**
+         * Whether to check references to enums.
+         */
         enums?: boolean;
-        /** Whether to ignore references to function declarations. */
+        /**
+         * Whether to ignore references to function declarations.
+         */
         functions?: boolean;
         /**
-         * Whether to ignore type references, such as in type annotations and
-         * assertions.
+         * Whether to ignore type references, such as in type annotations and assertions.
          */
         ignoreTypeReferences?: boolean;
-        /** Whether to check references to types. */
+        /**
+         * Whether to check references to types.
+         */
         typedefs?: boolean;
-        /** Whether to ignore references to variables. */
+        /**
+         * Whether to ignore references to variables.
+         */
         variables?: boolean;
       }>;
 
@@ -7856,8 +7901,7 @@ namespace NoUseBeforeDefine {
 }
 
 /**
- * Disallow unnecessary constructors
- *
+ * @description Disallow unnecessary constructors
  * @link https://typescript-eslint.io/rules/no-useless-constructor
  *
  *  ```md
@@ -7874,8 +7918,7 @@ namespace NoUselessConstructor {
 }
 
 /**
- * Disallow default values that will never be used
- *
+ * @description Disallow default values that will never be used
  * @link https://typescript-eslint.io/rules/no-useless-default-assignment
  *
  *  ```md
@@ -7889,12 +7932,39 @@ namespace NoUselessConstructor {
  *  ```
  */
 namespace NoUselessDefaultAssignment {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
+   *         "type": "boolean",
+   *         "description": "Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`."
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`.
+     */
+    allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
- * Disallow empty exports that don't change anything in a module file
- *
+ * @description Disallow empty exports that don't change anything in a module file
  * @link https://typescript-eslint.io/rules/no-useless-empty-export
  *
  *  ```md
@@ -7911,8 +7981,7 @@ namespace NoUselessEmptyExport {
 }
 
 /**
- * Disallow `require` statements except in import statements
- *
+ * @description Disallow `require` statements except in import statements
  * @link https://typescript-eslint.io/rules/no-var-requires
  *
  *  ```md
@@ -7948,8 +8017,7 @@ namespace NoVarRequires {
 }
 
 /**
- * Disallow using confusing built-in primitive class wrappers
- *
+ * @description Disallow using confusing built-in primitive class wrappers
  * @link https://typescript-eslint.io/rules/no-wrapper-object-types
  *
  *  ```md
@@ -7966,8 +8034,7 @@ namespace NoWrapperObjectTypes {
 }
 
 /**
- * Enforce non-null assertions over explicit type assertions
- *
+ * @description Enforce non-null assertions over explicit type assertions
  * @link https://typescript-eslint.io/rules/non-nullable-type-assertion-style
  *
  *  ```md
@@ -7985,8 +8052,7 @@ namespace NonNullableTypeAssertionStyle {
 }
 
 /**
- * Disallow throwing non-`Error` values as exceptions
- *
+ * @description Disallow throwing non-`Error` values as exceptions
  * @link https://typescript-eslint.io/rules/only-throw-error
  *
  *  ```md
@@ -8137,7 +8203,9 @@ namespace OnlyThrowError {
    * ```
    */
   export type Options = Readonly<{
-    /** Type specifiers that can be thrown. */
+    /**
+     * Type specifiers that can be thrown.
+     */
     allow?: readonly (
       | string
       | Readonly<
@@ -8157,11 +8225,17 @@ namespace OnlyThrowError {
             }
         >
     )[];
-    /** Whether to allow rethrowing caught values that are not `Error` objects. */
+    /**
+     * Whether to allow rethrowing caught values that are not `Error` objects.
+     */
     allowRethrowing?: boolean;
-    /** Whether to always allow throwing values typed as `any`. */
+    /**
+     * Whether to always allow throwing values typed as `any`.
+     */
     allowThrowingAny?: boolean;
-    /** Whether to always allow throwing values typed as `unknown`. */
+    /**
+     * Whether to always allow throwing values typed as `unknown`.
+     */
     allowThrowingUnknown?: boolean;
   }>;
 
@@ -8172,8 +8246,7 @@ namespace OnlyThrowError {
 }
 
 /**
- * Require or disallow parameter properties in class constructors
- *
+ * @description Require or disallow parameter properties in class constructors
  * @link https://typescript-eslint.io/rules/parameter-properties
  *
  *  ```md
@@ -8237,9 +8310,13 @@ namespace ParameterProperties {
     | 'public readonly';
 
   export type Options = Readonly<{
-    /** Whether to allow certain kinds of properties to be ignored. */
+    /**
+     * Whether to allow certain kinds of properties to be ignored.
+     */
     allow?: readonly Modifier[];
-    /** Whether to prefer class properties or parameter properties. */
+    /**
+     * Whether to prefer class properties or parameter properties.
+     */
     prefer?: 'class-property' | 'parameter-property';
   }>;
 
@@ -8250,8 +8327,7 @@ namespace ParameterProperties {
 }
 
 /**
- * Enforce the use of `as const` over literal type
- *
+ * @description Enforce the use of `as const` over literal type
  * @link https://typescript-eslint.io/rules/prefer-as-const
  *
  *  ```md
@@ -8269,8 +8345,7 @@ namespace PreferAsConst {
 }
 
 /**
- * Require destructuring from arrays and/or objects
- *
+ * @description Require destructuring from arrays and/or objects
  * @link https://typescript-eslint.io/rules/prefer-destructuring
  *
  *  ```md
@@ -8370,13 +8445,11 @@ namespace PreferDestructuring {
 
   export type Options1 = Readonly<{
     /**
-     * Whether to enforce destructuring on variable declarations with type
-     * annotations.
+     * Whether to enforce destructuring on variable declarations with type annotations.
      */
     enforceForDeclarationWithTypeAnnotation?: boolean;
     /**
-     * Whether to enforce destructuring that use a different variable name than
-     * the property name.
+     * Whether to enforce destructuring that use a different variable name than the property name.
      */
     enforceForRenamedProperties?: boolean;
   }>;
@@ -8389,8 +8462,7 @@ namespace PreferDestructuring {
 }
 
 /**
- * Require each enum member value to be explicitly initialized
- *
+ * @description Require each enum member value to be explicitly initialized
  * @link https://typescript-eslint.io/rules/prefer-enum-initializers
  *
  *  ```md
@@ -8406,9 +8478,7 @@ namespace PreferEnumInitializers {
 }
 
 /**
- * Enforce the use of Array.prototype.find() over Array.prototype.filter()
- * followed by [0] when looking for a single result
- *
+ * @description Enforce the use of Array.prototype.find() over Array.prototype.filter() followed by [0] when looking for a single result
  * @link https://typescript-eslint.io/rules/prefer-find
  *
  *  ```md
@@ -8426,8 +8496,7 @@ namespace PreferFind {
 }
 
 /**
- * Enforce the use of `for-of` loop over the standard `for` loop where possible
- *
+ * @description Enforce the use of `for-of` loop over the standard `for` loop where possible
  * @link https://typescript-eslint.io/rules/prefer-for-of
  *
  *  ```md
@@ -8443,8 +8512,7 @@ namespace PreferForOf {
 }
 
 /**
- * Enforce using function types instead of interfaces with call signatures
- *
+ * @description Enforce using function types instead of interfaces with call signatures
  * @link https://typescript-eslint.io/rules/prefer-function-type
  *
  *  ```md
@@ -8461,8 +8529,7 @@ namespace PreferFunctionType {
 }
 
 /**
- * Enforce `includes` method over `indexOf` method
- *
+ * @description Enforce `includes` method over `indexOf` method
  * @link https://typescript-eslint.io/rules/prefer-includes
  *
  *  ```md
@@ -8480,8 +8547,7 @@ namespace PreferIncludes {
 }
 
 /**
- * Require all enum members to be literal values
- *
+ * @description Require all enum members to be literal values
  * @link https://typescript-eslint.io/rules/prefer-literal-enum-member
  *
  *  ```md
@@ -8513,7 +8579,9 @@ namespace PreferLiteralEnumMember {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow using bitwise expressions in enum initializers. */
+    /**
+     * Whether to allow using bitwise expressions in enum initializers.
+     */
     allowBitwiseExpressions?: boolean;
   }>;
 
@@ -8524,9 +8592,7 @@ namespace PreferLiteralEnumMember {
 }
 
 /**
- * Require using `namespace` keyword over `module` keyword to declare custom
- * TypeScript modules
- *
+ * @description Require using `namespace` keyword over `module` keyword to declare custom TypeScript modules
  * @link https://typescript-eslint.io/rules/prefer-namespace-keyword
  *
  *  ```md
@@ -8543,9 +8609,7 @@ namespace PreferNamespaceKeyword {
 }
 
 /**
- * Enforce using the nullish coalescing operator instead of logical assignments
- * or chaining
- *
+ * @description Enforce using the nullish coalescing operator instead of logical assignments or chaining
  * @link https://typescript-eslint.io/rules/prefer-nullish-coalescing
  *
  *  ```md
@@ -8634,44 +8698,50 @@ namespace PreferNullishCoalescing {
    */
   export type Options = Readonly<{
     /**
-     * Unless this is set to `true`, the rule will error on every file whose
-     * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
-     * (or `strict`) set to `true`.
+     * Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`.
      */
     allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
-    /** Whether to ignore arguments to the `Boolean` constructor */
+    /**
+     * Whether to ignore arguments to the `Boolean` constructor
+     */
     ignoreBooleanCoercion?: boolean;
-    /** Whether to ignore cases that are located within a conditional test. */
+    /**
+     * Whether to ignore cases that are located within a conditional test.
+     */
     ignoreConditionalTests?: boolean;
     /**
-     * Whether to ignore any if statements that could be simplified by using the
-     * nullish coalescing operator.
+     * Whether to ignore any if statements that could be simplified by using the nullish coalescing operator.
      */
     ignoreIfStatements?: boolean;
     /**
-     * Whether to ignore any logical or expressions that are part of a mixed
-     * logical expression (with `&&`).
+     * Whether to ignore any logical or expressions that are part of a mixed logical expression (with `&&`).
      */
     ignoreMixedLogicalExpressions?: boolean;
     /**
-     * Whether to ignore all (`true`) or some (an object with properties)
-     * primitive types.
+     * Whether to ignore all (`true`) or some (an object with properties) primitive types.
      */
     ignorePrimitives?:
       | Readonly<{
-          /** Ignore bigint primitive types. */
+          /**
+           * Ignore bigint primitive types.
+           */
           bigint?: boolean;
-          /** Ignore boolean primitive types. */
+          /**
+           * Ignore boolean primitive types.
+           */
           boolean?: boolean;
-          /** Ignore number primitive types. */
+          /**
+           * Ignore number primitive types.
+           */
           number?: boolean;
-          /** Ignore string primitive types. */
+          /**
+           * Ignore string primitive types.
+           */
           string?: boolean;
         }>
       | true;
     /**
-     * Whether to ignore any ternary expressions that could be simplified by
-     * using the nullish coalescing operator.
+     * Whether to ignore any ternary expressions that could be simplified by using the nullish coalescing operator.
      */
     ignoreTernaryTests?: boolean;
   }>;
@@ -8683,9 +8753,7 @@ namespace PreferNullishCoalescing {
 }
 
 /**
- * Enforce using concise optional chain expressions instead of chained logical
- * ands, negated logical ors, or empty objects
- *
+ * @description Enforce using concise optional chain expressions instead of chained logical ands, negated logical ors, or empty objects
  * @link https://typescript-eslint.io/rules/prefer-optional-chain
  *
  *  ```md
@@ -8748,43 +8816,35 @@ namespace PreferOptionalChain {
    */
   export type Options = Readonly<{
     /**
-     * Allow autofixers that will change the return type of the expression. This
-     * option is considered unsafe as it may break the build.
+     * Allow autofixers that will change the return type of the expression. This option is considered unsafe as it may break the build.
      */
     allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing?: boolean;
     /**
-     * Check operands that are typed as `any` when inspecting "loose boolean"
-     * operands.
+     * Check operands that are typed as `any` when inspecting "loose boolean" operands.
      */
     checkAny?: boolean;
     /**
-     * Check operands that are typed as `bigint` when inspecting "loose boolean"
-     * operands.
+     * Check operands that are typed as `bigint` when inspecting "loose boolean" operands.
      */
     checkBigInt?: boolean;
     /**
-     * Check operands that are typed as `boolean` when inspecting "loose
-     * boolean" operands.
+     * Check operands that are typed as `boolean` when inspecting "loose boolean" operands.
      */
     checkBoolean?: boolean;
     /**
-     * Check operands that are typed as `number` when inspecting "loose boolean"
-     * operands.
+     * Check operands that are typed as `number` when inspecting "loose boolean" operands.
      */
     checkNumber?: boolean;
     /**
-     * Check operands that are typed as `string` when inspecting "loose boolean"
-     * operands.
+     * Check operands that are typed as `string` when inspecting "loose boolean" operands.
      */
     checkString?: boolean;
     /**
-     * Check operands that are typed as `unknown` when inspecting "loose
-     * boolean" operands.
+     * Check operands that are typed as `unknown` when inspecting "loose boolean" operands.
      */
     checkUnknown?: boolean;
     /**
-     * Skip operands that are not typed with `null` and/or `undefined` when
-     * inspecting "loose boolean" operands.
+     * Skip operands that are not typed with `null` and/or `undefined` when inspecting "loose boolean" operands.
      */
     requireNullish?: boolean;
   }>;
@@ -8796,8 +8856,7 @@ namespace PreferOptionalChain {
 }
 
 /**
- * Require using Error objects as Promise rejection reasons
- *
+ * @description Require using Error objects as Promise rejection reasons
  * @link https://typescript-eslint.io/rules/prefer-promise-reject-errors
  *
  *  ```md
@@ -8837,11 +8896,17 @@ namespace PreferPromiseRejectErrors {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow calls to `Promise.reject()` with no arguments. */
+    /**
+     * Whether to allow calls to `Promise.reject()` with no arguments.
+     */
     allowEmptyReject?: boolean;
-    /** Whether to always allow throwing values typed as `any`. */
+    /**
+     * Whether to always allow throwing values typed as `any`.
+     */
     allowThrowingAny?: boolean;
-    /** Whether to always allow throwing values typed as `unknown`. */
+    /**
+     * Whether to always allow throwing values typed as `unknown`.
+     */
     allowThrowingUnknown?: boolean;
   }>;
 
@@ -8852,9 +8917,7 @@ namespace PreferPromiseRejectErrors {
 }
 
 /**
- * Require private members to be marked as `readonly` if they're never modified
- * outside of the constructor
- *
+ * @description Require private members to be marked as `readonly` if they're never modified outside of the constructor
  * @link https://typescript-eslint.io/rules/prefer-readonly
  *
  *  ```md
@@ -8887,8 +8950,7 @@ namespace PreferReadonly {
    */
   export type Options = Readonly<{
     /**
-     * Whether to restrict checking only to members immediately assigned a
-     * lambda value.
+     * Whether to restrict checking only to members immediately assigned a lambda value.
      */
     onlyInlineLambdas?: boolean;
   }>;
@@ -8900,9 +8962,7 @@ namespace PreferReadonly {
 }
 
 /**
- * Require function parameters to be typed as `readonly` to prevent accidental
- * mutation of inputs
- *
+ * @description Require function parameters to be typed as `readonly` to prevent accidental mutation of inputs
  * @link https://typescript-eslint.io/rules/prefer-readonly-parameter-types
  *
  *  ```md
@@ -9052,7 +9112,9 @@ namespace PreferReadonlyParameterTypes {
    * ```
    */
   export type Options = Readonly<{
-    /** An array of type specifiers to ignore. */
+    /**
+     * An array of type specifiers to ignore.
+     */
     allow?: readonly (
       | string
       | Readonly<
@@ -9072,11 +9134,17 @@ namespace PreferReadonlyParameterTypes {
             }
         >
     )[];
-    /** Whether to check class parameter properties. */
+    /**
+     * Whether to check class parameter properties.
+     */
     checkParameterProperties?: boolean;
-    /** Whether to ignore parameters which don't explicitly specify a type. */
+    /**
+     * Whether to ignore parameters which don't explicitly specify a type.
+     */
     ignoreInferredTypes?: boolean;
-    /** Whether to treat all mutable methods as though they are readonly. */
+    /**
+     * Whether to treat all mutable methods as though they are readonly.
+     */
     treatMethodsAsReadonly?: boolean;
   }>;
 
@@ -9087,9 +9155,7 @@ namespace PreferReadonlyParameterTypes {
 }
 
 /**
- * Enforce using type parameter when calling `Array#reduce` instead of using a
- * type assertion
- *
+ * @description Enforce using type parameter when calling `Array#reduce` instead of using a type assertion
  * @link https://typescript-eslint.io/rules/prefer-reduce-type-parameter
  *
  *  ```md
@@ -9107,8 +9173,7 @@ namespace PreferReduceTypeParameter {
 }
 
 /**
- * Enforce `RegExp#exec` over `String#match` if no global flag is provided
- *
+ * @description Enforce `RegExp#exec` over `String#match` if no global flag is provided
  * @link https://typescript-eslint.io/rules/prefer-regexp-exec
  *
  *  ```md
@@ -9126,8 +9191,7 @@ namespace PreferRegexpExec {
 }
 
 /**
- * Enforce that `this` is used when only `this` type is returned
- *
+ * @description Enforce that `this` is used when only `this` type is returned
  * @link https://typescript-eslint.io/rules/prefer-return-this-type
  *
  *  ```md
@@ -9145,9 +9209,7 @@ namespace PreferReturnThisType {
 }
 
 /**
- * Enforce using `String#startsWith` and `String#endsWith` over other equivalent
- * methods of checking substrings
- *
+ * @description Enforce using `String#startsWith` and `String#endsWith` over other equivalent methods of checking substrings
  * @link https://typescript-eslint.io/rules/prefer-string-starts-ends-with
  *
  *  ```md
@@ -9185,8 +9247,7 @@ namespace PreferStringStartsEndsWith {
    */
   export type Options = Readonly<{
     /**
-     * Whether to allow equality checks against the first or last element of a
-     * string.
+     * Whether to allow equality checks against the first or last element of a string.
      */
     allowSingleElementEquality?: 'always' | 'never';
   }>;
@@ -9198,8 +9259,7 @@ namespace PreferStringStartsEndsWith {
 }
 
 /**
- * Enforce using `@ts-expect-error` over `@ts-ignore`
- *
+ * @description Enforce using `@ts-expect-error` over `@ts-ignore`
  * @link https://typescript-eslint.io/rules/prefer-ts-expect-error
  *
  *  ```md
@@ -9215,8 +9275,7 @@ namespace PreferTsExpectError {
 }
 
 /**
- * Require any function or method that returns a Promise to be marked async
- *
+ * @description Require any function or method that returns a Promise to be marked async
  * @link https://typescript-eslint.io/rules/promise-function-async
  *
  *  ```md
@@ -9271,17 +9330,29 @@ namespace PromiseFunctionAsync {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to consider `any` and `unknown` to be Promises. */
+    /**
+     * Whether to consider `any` and `unknown` to be Promises.
+     */
     allowAny?: boolean;
-    /** Any extra names of classes or interfaces to be considered Promises. */
+    /**
+     * Any extra names of classes or interfaces to be considered Promises.
+     */
     allowedPromiseNames?: readonly string[];
-    /** Whether to check arrow functions. */
+    /**
+     * Whether to check arrow functions.
+     */
     checkArrowFunctions?: boolean;
-    /** Whether to check standalone function declarations. */
+    /**
+     * Whether to check standalone function declarations.
+     */
     checkFunctionDeclarations?: boolean;
-    /** Whether to check inline function expressions */
+    /**
+     * Whether to check inline function expressions
+     */
     checkFunctionExpressions?: boolean;
-    /** Whether to check methods on classes and object literals. */
+    /**
+     * Whether to check methods on classes and object literals.
+     */
     checkMethodDeclarations?: boolean;
   }>;
 
@@ -9292,9 +9363,7 @@ namespace PromiseFunctionAsync {
 }
 
 /**
- * Enforce that `get()` types should be assignable to their equivalent `set()`
- * type
- *
+ * @description Enforce that `get()` types should be assignable to their equivalent `set()` type
  * @link https://typescript-eslint.io/rules/related-getter-setter-pairs
  *
  *  ```md
@@ -9311,9 +9380,7 @@ namespace RelatedGetterSetterPairs {
 }
 
 /**
- * Require `Array#sort` and `Array#toSorted` calls to always provide a
- * `compareFunction`
- *
+ * @description Require `Array#sort` and `Array#toSorted` calls to always provide a `compareFunction`
  * @link https://typescript-eslint.io/rules/require-array-sort-compare
  *
  *  ```md
@@ -9344,7 +9411,9 @@ namespace RequireArraySortCompare {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to ignore arrays in which all elements are strings. */
+    /**
+     * Whether to ignore arrays in which all elements are strings.
+     */
     ignoreStringArrays?: boolean;
   }>;
 
@@ -9355,9 +9424,7 @@ namespace RequireArraySortCompare {
 }
 
 /**
- * Disallow async functions which do not return promises and have no `await`
- * expression
- *
+ * @description Disallow async functions which do not return promises and have no `await` expression
  * @link https://typescript-eslint.io/rules/require-await
  *
  *  ```md
@@ -9375,9 +9442,7 @@ namespace RequireAwait {
 }
 
 /**
- * Require both operands of addition to be the same type and be `bigint`,
- * `number`, or `string`
- *
+ * @description Require both operands of addition to be the same type and be `bigint`, `number`, or `string`
  * @link https://typescript-eslint.io/rules/restrict-plus-operands
  *
  *  ```md
@@ -9428,20 +9493,29 @@ namespace RestrictPlusOperands {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow `any` typed values. */
+    /**
+     * Whether to allow `any` typed values.
+     */
     allowAny?: boolean;
-    /** Whether to allow `boolean` typed values. */
+    /**
+     * Whether to allow `boolean` typed values.
+     */
     allowBoolean?: boolean;
-    /** Whether to allow potentially `null` or `undefined` typed values. */
+    /**
+     * Whether to allow potentially `null` or `undefined` typed values.
+     */
     allowNullish?: boolean;
     /**
-     * Whether to allow `bigint`/`number` typed values and `string` typed values
-     * to be added together.
+     * Whether to allow `bigint`/`number` typed values and `string` typed values to be added together.
      */
     allowNumberAndString?: boolean;
-    /** Whether to allow `regexp` typed values. */
+    /**
+     * Whether to allow `regexp` typed values.
+     */
     allowRegExp?: boolean;
-    /** Whether to skip compound assignments such as `+=`. */
+    /**
+     * Whether to skip compound assignments such as `+=`.
+     */
     skipCompoundAssignments?: boolean;
   }>;
 
@@ -9452,8 +9526,7 @@ namespace RestrictPlusOperands {
 }
 
 /**
- * Enforce template literal expressions to be of `string` type
- *
+ * @description Enforce template literal expressions to be of `string` type
  * @link https://typescript-eslint.io/rules/restrict-template-expressions
  *
  *  ```md
@@ -9619,21 +9692,37 @@ namespace RestrictTemplateExpressions {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow `any` typed values in template expressions. */
+    /**
+     * Whether to allow `any` typed values in template expressions.
+     */
     allowAny?: boolean;
-    /** Whether to allow `array` typed values in template expressions. */
+    /**
+     * Whether to allow `array` typed values in template expressions.
+     */
     allowArray?: boolean;
-    /** Whether to allow `boolean` typed values in template expressions. */
+    /**
+     * Whether to allow `boolean` typed values in template expressions.
+     */
     allowBoolean?: boolean;
-    /** Whether to allow `nullish` typed values in template expressions. */
+    /**
+     * Whether to allow `nullish` typed values in template expressions.
+     */
     allowNullish?: boolean;
-    /** Whether to allow `number` typed values in template expressions. */
+    /**
+     * Whether to allow `number` typed values in template expressions.
+     */
     allowNumber?: boolean;
-    /** Whether to allow `regexp` typed values in template expressions. */
+    /**
+     * Whether to allow `regexp` typed values in template expressions.
+     */
     allowRegExp?: boolean;
-    /** Whether to allow `never` typed values in template expressions. */
+    /**
+     * Whether to allow `never` typed values in template expressions.
+     */
     allowNever?: boolean;
-    /** Types to allow in template expressions. */
+    /**
+     * Types to allow in template expressions.
+     */
     allow?: readonly (
       | string
       | Readonly<
@@ -9662,8 +9751,7 @@ namespace RestrictTemplateExpressions {
 }
 
 /**
- * Enforce consistent awaiting of returned promises
- *
+ * @description Enforce consistent awaiting of returned promises
  * @link https://typescript-eslint.io/rules/return-await
  *
  *  ```md
@@ -9730,8 +9818,7 @@ namespace ReturnAwait {
 }
 
 /**
- * Enforce constituents of a type union/intersection to be sorted alphabetically
- *
+ * @description Enforce constituents of a type union/intersection to be sorted alphabetically
  * @link https://typescript-eslint.io/rules/sort-type-constituents
  *
  *  ```md
@@ -9795,8 +9882,7 @@ namespace SortTypeConstituents {
 }
 
 /**
- * Disallow certain types in boolean expressions
- *
+ * @description Disallow certain types in boolean expressions
  * @link https://typescript-eslint.io/rules/strict-boolean-expressions
  *
  *  ```md
@@ -9860,30 +9946,41 @@ namespace StrictBooleanExpressions {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to allow `any`s in a boolean context. */
+    /**
+     * Whether to allow `any`s in a boolean context.
+     */
     allowAny?: boolean;
-    /** Whether to allow nullable `boolean`s in a boolean context. */
+    /**
+     * Whether to allow nullable `boolean`s in a boolean context.
+     */
     allowNullableBoolean?: boolean;
-    /** Whether to allow nullable `enum`s in a boolean context. */
+    /**
+     * Whether to allow nullable `enum`s in a boolean context.
+     */
     allowNullableEnum?: boolean;
-    /** Whether to allow nullable `number`s in a boolean context. */
+    /**
+     * Whether to allow nullable `number`s in a boolean context.
+     */
     allowNullableNumber?: boolean;
     /**
-     * Whether to allow nullable `object`s, `symbol`s, and functions in a
-     * boolean context.
+     * Whether to allow nullable `object`s, `symbol`s, and functions in a boolean context.
      */
     allowNullableObject?: boolean;
-    /** Whether to allow nullable `string`s in a boolean context. */
+    /**
+     * Whether to allow nullable `string`s in a boolean context.
+     */
     allowNullableString?: boolean;
-    /** Whether to allow `number`s in a boolean context. */
+    /**
+     * Whether to allow `number`s in a boolean context.
+     */
     allowNumber?: boolean;
     /**
-     * Unless this is set to `true`, the rule will error on every file whose
-     * `tsconfig.json` does _not_ have the `strictNullChecks` compiler option
-     * (or `strict`) set to `true`.
+     * Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`.
      */
     allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing?: boolean;
-    /** Whether to allow `string`s in a boolean context. */
+    /**
+     * Whether to allow `string`s in a boolean context.
+     */
     allowString?: boolean;
   }>;
 
@@ -9894,9 +9991,7 @@ namespace StrictBooleanExpressions {
 }
 
 /**
- * Disallow passing a value-returning function in a position accepting a void
- * function
- *
+ * @description Disallow passing a value-returning function in a position accepting a void function
  * @link https://typescript-eslint.io/rules/strict-void-return
  *
  *  ```md
@@ -9928,8 +10023,7 @@ namespace StrictVoidReturn {
    */
   export type Options = Readonly<{
     /**
-     * Whether to allow functions returning `any` to be used in place expecting
-     * a `void` function.
+     * Whether to allow functions returning `any` to be used in place expecting a `void` function.
      */
     allowReturnAny?: boolean;
   }>;
@@ -9941,8 +10035,7 @@ namespace StrictVoidReturn {
 }
 
 /**
- * Require switch-case statements to be exhaustive
- *
+ * @description Require switch-case statements to be exhaustive
  * @link https://typescript-eslint.io/rules/switch-exhaustiveness-check
  *
  *  ```md
@@ -9987,21 +10080,20 @@ namespace SwitchExhaustivenessCheck {
    */
   export type Options = Readonly<{
     /**
-     * If 'true', allow 'default' cases on switch statements with exhaustive
-     * cases.
+     * If 'true', allow 'default' cases on switch statements with exhaustive cases.
      */
     allowDefaultCaseForExhaustiveSwitch?: boolean;
     /**
-     * If 'true', the 'default' clause is used to determine whether the switch
-     * statement is exhaustive for union type
+     * If 'true', the 'default' clause is used to determine whether the switch statement is exhaustive for union type
      */
     considerDefaultExhaustiveForUnions?: boolean;
     /**
-     * Regular expression for a comment that can indicate an intentionally
-     * omitted default case.
+     * Regular expression for a comment that can indicate an intentionally omitted default case.
      */
     defaultCaseCommentPattern?: string;
-    /** If 'true', require a 'default' clause for switches on non-union types. */
+    /**
+     * If 'true', require a 'default' clause for switches on non-union types.
+     */
     requireDefaultForNonUnion?: boolean;
   }>;
 
@@ -10012,9 +10104,7 @@ namespace SwitchExhaustivenessCheck {
 }
 
 /**
- * Disallow certain triple slash directives in favor of ES6-style import
- * declarations
- *
+ * @description Disallow certain triple slash directives in favor of ES6-style import declarations
  * @link https://typescript-eslint.io/rules/triple-slash-reference
  *
  *  ```md
@@ -10066,11 +10156,17 @@ namespace TripleSlashReference {
    * ```
    */
   export type Options = Readonly<{
-    /** What to enforce for `/// <reference lib="..." />` references. */
+    /**
+     * What to enforce for `/// <reference lib="..." />` references.
+     */
     lib?: 'always' | 'never';
-    /** What to enforce for `/// <reference path="..." />` references. */
+    /**
+     * What to enforce for `/// <reference path="..." />` references.
+     */
     path?: 'always' | 'never';
-    /** What to enforce for `/// <reference types="..." />` references. */
+    /**
+     * What to enforce for `/// <reference types="..." />` references.
+     */
     types?: 'always' | 'never' | 'prefer-import';
   }>;
 
@@ -10081,8 +10177,7 @@ namespace TripleSlashReference {
 }
 
 /**
- * Require type annotations in certain places
- *
+ * @description Require type annotations in certain places
  * @link https://typescript-eslint.io/rules/typedef
  *
  *  ```md
@@ -10143,8 +10238,7 @@ namespace Typedef {
 }
 
 /**
- * Enforce unbound methods are called with their expected scope
- *
+ * @description Enforce unbound methods are called with their expected scope
  * @link https://typescript-eslint.io/rules/unbound-method
  *
  *  ```md
@@ -10176,7 +10270,9 @@ namespace UnboundMethod {
    * ```
    */
   export type Options = Readonly<{
-    /** Whether to skip checking whether `static` methods are correctly bound. */
+    /**
+     * Whether to skip checking whether `static` methods are correctly bound.
+     */
     ignoreStatic?: boolean;
   }>;
 
@@ -10187,9 +10283,7 @@ namespace UnboundMethod {
 }
 
 /**
- * Disallow two overloads that could be unified into one with a union or an
- * optional/rest parameter
- *
+ * @description Disallow two overloads that could be unified into one with a union or an optional/rest parameter
  * @link https://typescript-eslint.io/rules/unified-signatures
  *
  *  ```md
@@ -10225,13 +10319,11 @@ namespace UnifiedSignatures {
    */
   export type Options = Readonly<{
     /**
-     * Whether two parameters with different names at the same index should be
-     * considered different even if their types are the same.
+     * Whether two parameters with different names at the same index should be considered different even if their types are the same.
      */
     ignoreDifferentlyNamedParameters?: boolean;
     /**
-     * Whether two overloads with different JSDoc comments should be considered
-     * different even if their parameter and return types are the same.
+     * Whether two overloads with different JSDoc comments should be considered different even if their parameter and return types are the same.
      */
     ignoreOverloadsWithDifferentJSDoc?: boolean;
   }>;
@@ -10243,8 +10335,7 @@ namespace UnifiedSignatures {
 }
 
 /**
- * Enforce typing arguments in Promise rejection callbacks as `unknown`
- *
+ * @description Enforce typing arguments in Promise rejection callbacks as `unknown`
  * @link https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable
  *
  *  ```md
@@ -10451,6 +10542,7 @@ export type TypeScriptEslintRulesOption = Readonly<{
   '@typescript-eslint/no-unused-expressions': NoUnusedExpressions.Options;
   '@typescript-eslint/no-unused-vars': NoUnusedVars.Options;
   '@typescript-eslint/no-use-before-define': NoUseBeforeDefine.Options;
+  '@typescript-eslint/no-useless-default-assignment': NoUselessDefaultAssignment.Options;
   '@typescript-eslint/only-throw-error': OnlyThrowError.Options;
   '@typescript-eslint/parameter-properties': ParameterProperties.Options;
   '@typescript-eslint/prefer-destructuring': readonly [

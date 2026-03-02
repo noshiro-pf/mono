@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Verifies the list of dependencies for Hooks like useEffect and similar
- *
+ * @description verifies the list of dependencies for Hooks like useEffect and similar
  * @link https://github.com/facebook/react/issues/14920
  *
  *  ```md
@@ -67,8 +66,7 @@ namespace ExhaustiveDeps {
 }
 
 /**
- * Enforces the Rules of Hooks
- *
+ * @description enforces the Rules of Hooks
  * @link https://react.dev/reference/rules/rules-of-hooks
  *
  *  ```md
@@ -108,17 +106,17 @@ namespace RulesOfHooks {
 }
 
 /**
- * Validates the rules of hooks
+ * @description Validates the rules of hooks
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace Hooks {
   /**
@@ -142,17 +140,17 @@ namespace Hooks {
 }
 
 /**
- * Validates against calling capitalized functions/methods instead of using JSX
+ * @description Validates against calling capitalized functions/methods instead of using JSX
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace CapitalizedCalls {
   /**
@@ -176,19 +174,17 @@ namespace CapitalizedCalls {
 }
 
 /**
- * Validates that components are static, not recreated every render. Components
- * that are recreated dynamically can reset state and trigger excessive
- * re-rendering
+ * @description Validates that components are static, not recreated every render. Components that are recreated dynamically can reset state and trigger excessive re-rendering
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace StaticComponents {
   /**
@@ -212,19 +208,17 @@ namespace StaticComponents {
 }
 
 /**
- * Validates usage of the useMemo() hook against common mistakes. See
- * [`useMemo()` docs](https://react.dev/reference/react/useMemo) for more
- * information.
+ * @description Validates usage of the useMemo() hook against common mistakes. See [`useMemo()` docs](https://react.dev/reference/react/useMemo) for more information.
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace UseMemo {
   /**
@@ -248,19 +242,17 @@ namespace UseMemo {
 }
 
 /**
- * Validates that useMemos always return a value and that the result of the
- * useMemo is used by the component/hook. See [`useMemo()`
- * docs](https://react.dev/reference/react/useMemo) for more information.
+ * @description Validates that useMemos always return a value and that the result of the useMemo is used by the component/hook. See [`useMemo()` docs](https://react.dev/reference/react/useMemo) for more information.
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace VoidUseMemo {
   /**
@@ -284,18 +276,17 @@ namespace VoidUseMemo {
 }
 
 /**
- * Validates against higher order functions defining nested components or hooks.
- * Components and hooks should be defined at the module level
+ * @description Validates against higher order functions defining nested components or hooks. Components and hooks should be defined at the module level
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace ComponentHookFactories {
   /**
@@ -319,20 +310,17 @@ namespace ComponentHookFactories {
 }
 
 /**
- * Validates that existing manual memoized is preserved by the compiler. React
- * Compiler will only compile components and hooks if its inference [matches or
- * exceeds the existing manual
- * memoization](https://react.dev/learn/react-compiler/introduction#what-should-i-do-about-usememo-usecallback-and-reactmemo)
+ * @description Validates that existing manual memoized is preserved by the compiler. React Compiler will only compile components and hooks if its inference [matches or exceeds the existing manual memoization](https://react.dev/learn/react-compiler/introduction#what-should-i-do-about-usememo-usecallback-and-reactmemo)
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace PreserveManualMemoization {
   /**
@@ -356,18 +344,17 @@ namespace PreserveManualMemoization {
 }
 
 /**
- * Validates against usage of libraries which are incompatible with memoization
- * (manual or automatic)
+ * @description Validates against usage of libraries which are incompatible with memoization (manual or automatic)
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace IncompatibleLibrary {
   /**
@@ -391,18 +378,17 @@ namespace IncompatibleLibrary {
 }
 
 /**
- * Validates against mutating props, state, and other values that [are
- * immutable](https://react.dev/reference/rules/components-and-hooks-must-be-pure#props-and-state-are-immutable)
+ * @description Validates against mutating props, state, and other values that [are immutable](https://react.dev/reference/rules/components-and-hooks-must-be-pure#props-and-state-are-immutable)
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace Immutability {
   /**
@@ -426,19 +412,17 @@ namespace Immutability {
 }
 
 /**
- * Validates against assignment/mutation of globals during render, part of
- * ensuring that [side effects must render outside of
- * render](https://react.dev/reference/rules/components-and-hooks-must-be-pure#side-effects-must-run-outside-of-render)
+ * @description Validates against assignment/mutation of globals during render, part of ensuring that [side effects must render outside of render](https://react.dev/reference/rules/components-and-hooks-must-be-pure#side-effects-must-run-outside-of-render)
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace Globals {
   /**
@@ -462,19 +446,17 @@ namespace Globals {
 }
 
 /**
- * Validates correct usage of refs, not reading/writing during render. See the
- * "pitfalls" section in [`useRef()`
- * usage](https://react.dev/reference/react/useRef#usage)
+ * @description Validates correct usage of refs, not reading/writing during render. See the "pitfalls" section in [`useRef()` usage](https://react.dev/reference/react/useRef#usage)
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace Refs {
   /**
@@ -498,17 +480,17 @@ namespace Refs {
 }
 
 /**
- * Validates that effect dependencies are memoized
+ * @description Validates that effect dependencies are memoized
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace MemoizedEffectDependencies {
   /**
@@ -532,18 +514,17 @@ namespace MemoizedEffectDependencies {
 }
 
 /**
- * Validates against calling setState synchronously in an effect, which can lead
- * to re-renders that degrade performance
+ * @description Validates against calling setState synchronously in an effect, which can lead to re-renders that degrade performance
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace SetStateInEffect {
   /**
@@ -567,17 +548,17 @@ namespace SetStateInEffect {
 }
 
 /**
- * Validates against deriving values from state in an effect
+ * @description Validates against deriving values from state in an effect
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace NoDerivingStateInEffects {
   /**
@@ -601,18 +582,17 @@ namespace NoDerivingStateInEffects {
 }
 
 /**
- * Validates usage of error boundaries instead of try/catch for errors in child
- * components
+ * @description Validates usage of error boundaries instead of try/catch for errors in child components
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace ErrorBoundaries {
   /**
@@ -636,19 +616,17 @@ namespace ErrorBoundaries {
 }
 
 /**
- * Validates that [components/hooks are
- * pure](https://react.dev/reference/rules/components-and-hooks-must-be-pure) by
- * checking that they do not call known-impure functions
+ * @description Validates that [components/hooks are pure](https://react.dev/reference/rules/components-and-hooks-must-be-pure) by checking that they do not call known-impure functions
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace Purity {
   /**
@@ -672,18 +650,17 @@ namespace Purity {
 }
 
 /**
- * Validates against setting state during render, which can trigger additional
- * renders and potential infinite render loops
+ * @description Validates against setting state during render, which can trigger additional renders and potential infinite render loops
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace SetStateInRender {
   /**
@@ -707,17 +684,17 @@ namespace SetStateInRender {
 }
 
 /**
- * Internal invariants
+ * @description Internal invariants
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace Invariant {
   /**
@@ -741,17 +718,17 @@ namespace Invariant {
 }
 
 /**
- * Unimplemented features
+ * @description Unimplemented features
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace Todo {
   /**
@@ -775,17 +752,17 @@ namespace Todo {
 }
 
 /**
- * Validates against invalid syntax
+ * @description Validates against invalid syntax
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace Syntax {
   /**
@@ -809,17 +786,17 @@ namespace Syntax {
 }
 
 /**
- * Validates against syntax that we do not plan to support in React Compiler
+ * @description Validates against syntax that we do not plan to support in React Compiler
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace UnsupportedSyntax {
   /**
@@ -843,17 +820,17 @@ namespace UnsupportedSyntax {
 }
 
 /**
- * Validates the compiler configuration options
+ * @description Validates the compiler configuration options
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace Config {
   /**
@@ -877,18 +854,17 @@ namespace Config {
 }
 
 /**
- * Validates configuration of [gating
- * mode](https://react.dev/reference/react-compiler/gating)
+ * @description Validates configuration of [gating mode](https://react.dev/reference/react-compiler/gating)
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | true    |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
  */
 namespace Gating {
   /**
@@ -912,17 +888,17 @@ namespace Gating {
 }
 
 /**
- * Validates against suppression of other rules
+ * @description Validates against suppression of other rules
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace RuleSuppression {
   /**
@@ -946,17 +922,17 @@ namespace RuleSuppression {
 }
 
 /**
- * Verifies that automatic effect dependencies are compiled if opted-in
+ * @description Verifies that automatic effect dependencies are compiled if opted-in
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace AutomaticEffectDependencies {
   /**
@@ -980,17 +956,17 @@ namespace AutomaticEffectDependencies {
 }
 
 /**
- * Validates usage of `fire`
+ * @description Validates usage of `fire`
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace Fire {
   /**
@@ -1014,17 +990,17 @@ namespace Fire {
 }
 
 /**
- * Validates usage of fbt
+ * @description Validates usage of fbt
  *
- * ```md
- * | key            | value   |
- * | :------------- | :------ |
- * | type           | problem |
- * | deprecated     | false   |
- * | fixable        | code    |
- * | hasSuggestions | true    |
- * | recommended    | false   |
- * ```
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
  */
 namespace Fbt {
   /**

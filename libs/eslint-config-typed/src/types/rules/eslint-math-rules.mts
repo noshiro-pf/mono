@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforce the conversion to absolute values to be the method you prefer
- *
+ * @description enforce the conversion to absolute values to be the method you prefer
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/abs.html
  *
  *  ```md
@@ -58,8 +57,7 @@ namespace Abs {
 }
 
 /**
- * Disallow static calculations that result in infinity
- *
+ * @description disallow static calculations that result in infinity
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/no-static-infinity-calculations.html
  *
  *  ```md
@@ -75,8 +73,7 @@ namespace NoStaticInfinityCalculations {
 }
 
 /**
- * Disallow static calculations that result in NaN
- *
+ * @description disallow static calculations that result in NaN
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/no-static-nan-calculations.html
  *
  *  ```md
@@ -92,9 +89,7 @@ namespace NoStaticNanCalculations {
 }
 
 /**
- * Enforce the use of exponentiation (`**`) operator instead of other
- * calculations
- *
+ * @description enforce the use of exponentiation (`**`) operator instead of other calculations
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-exponentiation-operator.html
  *
  *  ```md
@@ -111,8 +106,7 @@ namespace PreferExponentiationOperator {
 }
 
 /**
- * Enforce the use of Math.cbrt() instead of other cube root calculations
- *
+ * @description enforce the use of Math.cbrt() instead of other cube root calculations
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-cbrt.html
  *
  *  ```md
@@ -129,8 +123,7 @@ namespace PreferMathCbrt {
 }
 
 /**
- * Enforce the use of Math.E instead of other ways
- *
+ * @description enforce the use of Math.E instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-e.html
  *
  *  ```md
@@ -147,8 +140,7 @@ namespace PreferMathE {
 }
 
 /**
- * Enforce the use of Math.hypot() instead of other hypotenuse calculations
- *
+ * @description enforce the use of Math.hypot() instead of other hypotenuse calculations
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-hypot.html
  *
  *  ```md
@@ -165,8 +157,7 @@ namespace PreferMathHypot {
 }
 
 /**
- * Enforce the use of Math.LN10 instead of other ways
- *
+ * @description enforce the use of Math.LN10 instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-ln10.html
  *
  *  ```md
@@ -183,8 +174,7 @@ namespace PreferMathLn10 {
 }
 
 /**
- * Enforce the use of Math.LN2 instead of other ways
- *
+ * @description enforce the use of Math.LN2 instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-ln2.html
  *
  *  ```md
@@ -201,8 +191,7 @@ namespace PreferMathLn2 {
 }
 
 /**
- * Enforce the use of Math.log10() instead of other calculation methods.
- *
+ * @description enforce the use of Math.log10() instead of other calculation methods.
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-log10.html
  *
  *  ```md
@@ -219,8 +208,7 @@ namespace PreferMathLog10 {
 }
 
 /**
- * Enforce the use of Math.LOG10E instead of other ways
- *
+ * @description enforce the use of Math.LOG10E instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-log10e.html
  *
  *  ```md
@@ -237,8 +225,7 @@ namespace PreferMathLog10e {
 }
 
 /**
- * Enforce the use of Math.log2() instead of other calculation methods.
- *
+ * @description enforce the use of Math.log2() instead of other calculation methods.
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-log2.html
  *
  *  ```md
@@ -255,8 +242,7 @@ namespace PreferMathLog2 {
 }
 
 /**
- * Enforce the use of Math.LOG2E instead of other ways
- *
+ * @description enforce the use of Math.LOG2E instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-log2e.html
  *
  *  ```md
@@ -273,8 +259,7 @@ namespace PreferMathLog2e {
 }
 
 /**
- * Enforce the use of Math.PI instead of literal number
- *
+ * @description enforce the use of Math.PI instead of literal number
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-pi.html
  *
  *  ```md
@@ -291,8 +276,7 @@ namespace PreferMathPi {
 }
 
 /**
- * Enforce the use of Math.sqrt() instead of other square root calculations
- *
+ * @description enforce the use of Math.sqrt() instead of other square root calculations
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-sqrt.html
  *
  *  ```md
@@ -309,8 +293,7 @@ namespace PreferMathSqrt {
 }
 
 /**
- * Enforce the use of Math.SQRT1_2 instead of other ways
- *
+ * @description enforce the use of Math.SQRT1_2 instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-sqrt1-2.html
  *
  *  ```md
@@ -327,8 +310,7 @@ namespace PreferMathSqrt12 {
 }
 
 /**
- * Enforce the use of Math.SQRT2 instead of other ways
- *
+ * @description enforce the use of Math.SQRT2 instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-sqrt2.html
  *
  *  ```md
@@ -345,8 +327,7 @@ namespace PreferMathSqrt2 {
 }
 
 /**
- * Enforce the use of Math.sumPrecise() instead of other summation methods
- *
+ * @description enforce the use of Math.sumPrecise() instead of other summation methods
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-sum-precise.html
  *
  *  ```md
@@ -387,8 +368,7 @@ namespace PreferMathSumPrecise {
 }
 
 /**
- * Enforce the use of Math.trunc() instead of other truncations
- *
+ * @description enforce the use of Math.trunc() instead of other truncations
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-math-trunc.html
  *
  *  ```md
@@ -420,7 +400,9 @@ namespace PreferMathTrunc {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
+    /**
+     * @default true
+     */
     reportBitwise?: boolean;
   }>;
 
@@ -431,8 +413,7 @@ namespace PreferMathTrunc {
 }
 
 /**
- * Enforce the use of Number.EPSILON instead of other ways
- *
+ * @description enforce the use of Number.EPSILON instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-epsilon.html
  *
  *  ```md
@@ -449,8 +430,7 @@ namespace PreferNumberEpsilon {
 }
 
 /**
- * Enforce the use of Number.isFinite() instead of other checking ways
- *
+ * @description enforce the use of Number.isFinite() instead of other checking ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-is-finite.html
  *
  *  ```md
@@ -467,8 +447,7 @@ namespace PreferNumberIsFinite {
 }
 
 /**
- * Enforce the use of Number.isInteger() instead of other checking ways
- *
+ * @description enforce the use of Number.isInteger() instead of other checking ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-is-integer.html
  *
  *  ```md
@@ -485,8 +464,7 @@ namespace PreferNumberIsInteger {
 }
 
 /**
- * Enforce the use of Number.isNaN() instead of other checking ways
- *
+ * @description enforce the use of Number.isNaN() instead of other checking ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-is-nan.html
  *
  *  ```md
@@ -503,8 +481,7 @@ namespace PreferNumberIsNan {
 }
 
 /**
- * Enforce the use of Number.isSafeInteger() instead of other checking ways
- *
+ * @description enforce the use of Number.isSafeInteger() instead of other checking ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-is-safe-integer.html
  *
  *  ```md
@@ -521,8 +498,7 @@ namespace PreferNumberIsSafeInteger {
 }
 
 /**
- * Enforce the use of Number.MAX_SAFE_INTEGER instead of other ways
- *
+ * @description enforce the use of Number.MAX_SAFE_INTEGER instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-max-safe-integer.html
  *
  *  ```md
@@ -539,8 +515,7 @@ namespace PreferNumberMaxSafeInteger {
 }
 
 /**
- * Enforce the use of Number.MAX_VALUE instead of literal number
- *
+ * @description enforce the use of Number.MAX_VALUE instead of literal number
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-max-value.html
  *
  *  ```md
@@ -557,8 +532,7 @@ namespace PreferNumberMaxValue {
 }
 
 /**
- * Enforce the use of Number.MIN_SAFE_INTEGER instead of other ways
- *
+ * @description enforce the use of Number.MIN_SAFE_INTEGER instead of other ways
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-min-safe-integer.html
  *
  *  ```md
@@ -575,8 +549,7 @@ namespace PreferNumberMinSafeInteger {
 }
 
 /**
- * Enforce the use of Number.MIN_VALUE instead of literal number
- *
+ * @description enforce the use of Number.MIN_VALUE instead of literal number
  * @link https://ota-meshi.github.io/eslint-plugin-math/rules/prefer-number-min-value.html
  *
  *  ```md

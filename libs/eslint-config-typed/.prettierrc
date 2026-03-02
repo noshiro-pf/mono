@@ -18,8 +18,7 @@
       "options": {
         "plugins": [
           "prettier-plugin-organize-imports",
-          "prettier-plugin-packagejson",
-          "prettier-plugin-jsdoc"
+          "prettier-plugin-packagejson"
         ]
       }
     }

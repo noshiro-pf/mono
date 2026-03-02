@@ -8,14 +8,14 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Prevent {...} as JSX prop value
+ * @description Prevent {...} as JSX prop value
  *
- * ```md
- * | key         | value |
- * | :---------- | :---- |
- * | deprecated  | false |
- * | recommended | true  |
- * ```
+ *  ```md
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
+ *  ```
  */
 namespace JsxNoNewObjectAsProp {
   /**
@@ -58,14 +58,14 @@ namespace JsxNoNewObjectAsProp {
 }
 
 /**
- * Prevent [...] as JSX prop value
+ * @description Prevent [...] as JSX prop value
  *
- * ```md
- * | key         | value |
- * | :---------- | :---- |
- * | deprecated  | false |
- * | recommended | true  |
- * ```
+ *  ```md
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
+ *  ```
  */
 namespace JsxNoNewArrayAsProp {
   /**
@@ -108,14 +108,14 @@ namespace JsxNoNewArrayAsProp {
 }
 
 /**
- * Prevent `function` as JSX prop value
+ * @description Prevent `function` as JSX prop value
  *
- * ```md
- * | key         | value |
- * | :---------- | :---- |
- * | deprecated  | false |
- * | recommended | true  |
- * ```
+ *  ```md
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
+ *  ```
  */
 namespace JsxNoNewFunctionAsProp {
   /**
@@ -158,14 +158,14 @@ namespace JsxNoNewFunctionAsProp {
 }
 
 /**
- * Prevent JSX as JSX prop value
+ * @description Prevent JSX as JSX prop value
  *
- * ```md
- * | key         | value |
- * | :---------- | :---- |
- * | deprecated  | false |
- * | recommended | true  |
- * ```
+ *  ```md
+ *  | key         | value |
+ *  | :---------- | :---- |
+ *  | deprecated  | false |
+ *  | recommended | true  |
+ *  ```
  */
 namespace JsxNoJsxAsProp {
   /**

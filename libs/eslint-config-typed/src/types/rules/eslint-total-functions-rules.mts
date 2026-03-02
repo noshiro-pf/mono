@@ -2,8 +2,7 @@
 import { type Linter } from 'eslint';
 
 /**
- * Bans enums.
- *
+ * @description Bans enums.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -18,8 +17,7 @@ namespace NoEnums {
 }
 
 /**
- * Bans hidden type assertions.
- *
+ * @description Bans hidden type assertions.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -34,8 +32,7 @@ namespace NoHiddenTypeAssertions {
 }
 
 /**
- * Bans problematic nested fp-ts effects.
- *
+ * @description Bans problematic nested fp-ts effects.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -50,8 +47,7 @@ namespace NoNestedFpTsEffects {
 }
 
 /**
- * Bans partial Array.prototype.reduce()
- *
+ * @description Bans partial Array.prototype.reduce()
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -66,8 +62,7 @@ namespace NoPartialArrayReduce {
 }
 
 /**
- * Bans partial division.
- *
+ * @description Bans partial division.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -82,8 +77,7 @@ namespace NoPartialDivision {
 }
 
 /**
- * Bans partial String.prototype.normalize()
- *
+ * @description Bans partial String.prototype.normalize()
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -98,8 +92,7 @@ namespace NoPartialStringNormalize {
 }
 
 /**
- * Bans the partial URL construction.
- *
+ * @description Bans the partial URL construction.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -114,8 +107,7 @@ namespace NoPartialUrlConstructor {
 }
 
 /**
- * Bans interpretation (execution) of fp-ts effects.
- *
+ * @description Bans interpretation (execution) of fp-ts effects.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -130,8 +122,7 @@ namespace NoPrematureFpTsEffects {
 }
 
 /**
- * Bans unsafe enum assignment.
- *
+ * @description Bans unsafe enum assignment.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -146,8 +137,7 @@ namespace NoUnsafeEnumAssignment {
 }
 
 /**
- * Bans unsafe assignment from mutable to readonly types.
- *
+ * @description Bans unsafe assignment from mutable to readonly types.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -162,8 +152,7 @@ namespace NoUnsafeMutableReadonlyAssignment {
 }
 
 /**
- * Bans unsafe assignment to optional properties.
- *
+ * @description Bans unsafe assignment to optional properties.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -178,8 +167,7 @@ namespace NoUnsafeOptionalPropertyAssignment {
 }
 
 /**
- * Bans unsafe assignment from readonly to mutable types.
- *
+ * @description Bans unsafe assignment from readonly to mutable types.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -194,8 +182,7 @@ namespace NoUnsafeReadonlyMutableAssignment {
 }
 
 /**
- * Bans unsafe type assertions.
- *
+ * @description Bans unsafe type assertions.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
@@ -210,8 +197,7 @@ namespace NoUnsafeTypeAssertion {
 }
 
 /**
- * Enforces the use of TypeScript's strict mode.
- *
+ * @description Enforces the use of TypeScript's strict mode.
  * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md

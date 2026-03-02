@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforce consistent param names and ordering when creating new promises.
- *
+ * @description Enforce consistent param names and ordering when creating new promises.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/param-names.md
  *
  *  ```md
@@ -52,9 +51,7 @@ namespace ParamNames {
 }
 
 /**
- * Disallow wrapping values in `Promise.resolve` or `Promise.reject` when not
- * needed.
- *
+ * @description Disallow wrapping values in `Promise.resolve` or `Promise.reject` when not needed.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-return-wrap.md
  *
  *  ```md
@@ -93,9 +90,7 @@ namespace NoReturnWrap {
 }
 
 /**
- * Require returning inside each `then()` to create readable and reusable
- * Promise chains.
- *
+ * @description Require returning inside each `then()` to create readable and reusable Promise chains.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/always-return.md
  *
  *  ```md
@@ -143,8 +138,7 @@ namespace AlwaysReturn {
 }
 
 /**
- * Enforce the use of `catch()` on un-returned promises.
- *
+ * @description Enforce the use of `catch()` on un-returned promises.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/catch-or-return.md
  *
  *  ```md
@@ -205,8 +199,7 @@ namespace CatchOrReturn {
 }
 
 /**
- * Prefer `async`/`await` to the callback pattern.
- *
+ * @description Prefer `async`/`await` to the callback pattern.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-await-to-callbacks.md
  *
  *  ```md
@@ -221,8 +214,7 @@ namespace PreferAwaitToCallbacks {
 }
 
 /**
- * Prefer `await` to `then()`/`catch()`/`finally()` for reading Promise values.
- *
+ * @description Prefer `await` to `then()`/`catch()`/`finally()` for reading Promise values.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-await-to-then.md
  *
  *  ```md
@@ -261,8 +253,7 @@ namespace PreferAwaitToThen {
 }
 
 /**
- * Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
- *
+ * @description Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
  *
  *  ```md
@@ -278,9 +269,7 @@ namespace PreferCatch {
 }
 
 /**
- * Require creating a `Promise` constructor before using it in an ES5
- * environment.
- *
+ * @description Require creating a `Promise` constructor before using it in an ES5 environment.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-native.md
  *
  *  ```md
@@ -295,9 +284,7 @@ namespace NoNative {
 }
 
 /**
- * Disallow calling `cb()` inside of a `then()` (use [util.callbackify][]
- * instead).
- *
+ * @description Disallow calling `cb()` inside of a `then()` (use [util.callbackify][] instead).
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-callback-in-promise.md
  *
  *  ```md
@@ -343,8 +330,7 @@ namespace NoCallbackInPromise {
 }
 
 /**
- * Disallow using promises inside of callbacks.
- *
+ * @description Disallow using promises inside of callbacks.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-promise-in-callback.md
  *
  *  ```md
@@ -359,8 +345,7 @@ namespace NoPromiseInCallback {
 }
 
 /**
- * Disallow nested `then()` or `catch()` statements.
- *
+ * @description Disallow nested `then()` or `catch()` statements.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-nesting.md
  *
  *  ```md
@@ -375,9 +360,7 @@ namespace NoNesting {
 }
 
 /**
- * Disallow creating `new` promises outside of utility libs (use
- * [util.promisify][] instead).
- *
+ * @description Disallow creating `new` promises outside of utility libs (use [util.promisify][] instead).
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/avoid-new.md
  *
  *  ```md
@@ -392,8 +375,7 @@ namespace AvoidNew {
 }
 
 /**
- * Disallow calling `new` on a Promise static method.
- *
+ * @description Disallow calling `new` on a Promise static method.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-new-statics.md
  *
  *  ```md
@@ -409,8 +391,7 @@ namespace NoNewStatics {
 }
 
 /**
- * Disallow return statements in `finally()`.
- *
+ * @description Disallow return statements in `finally()`.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-return-in-finally.md
  *
  *  ```md
@@ -425,8 +406,7 @@ namespace NoReturnInFinally {
 }
 
 /**
- * Enforces the proper number of arguments are passed to Promise functions.
- *
+ * @description Enforces the proper number of arguments are passed to Promise functions.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/valid-params.md
  *
  *  ```md
@@ -468,8 +448,7 @@ namespace ValidParams {
 }
 
 /**
- * Disallow creating new promises with paths that resolve multiple times.
- *
+ * @description Disallow creating new promises with paths that resolve multiple times.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/no-multiple-resolved.md
  *
  *  ```md
@@ -484,8 +463,7 @@ namespace NoMultipleResolved {
 }
 
 /**
- * Disallow use of non-standard Promise static methods.
- *
+ * @description Disallow use of non-standard Promise static methods.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/spec-only.md
  *
  *  ```md

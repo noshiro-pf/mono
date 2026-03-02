@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Enforces consistent naming for boolean props
- *
+ * @description Enforces consistent naming for boolean props
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/boolean-prop-naming.md
  *
  *  ```md
@@ -56,12 +55,18 @@ namespace BooleanPropNaming {
    * ```
    */
   export type Options = Readonly<{
-    /** @minItems 1 */
+    /**
+     * @minItems 1
+     */
     propTypeNames?: readonly [string, ...string[]];
-    /** @default '^(is|has)[A-Z]([A-Za-z0-9]?)+' */
+    /**
+     * @default "^(is|has)[A-Z]([A-Za-z0-9]?)+"
+     */
     rule?: string;
     message?: string;
-    /** @default false */
+    /**
+     * @default false
+     */
     validateNested?: boolean;
   }>;
 
@@ -72,8 +77,7 @@ namespace BooleanPropNaming {
 }
 
 /**
- * Disallow usage of `button` elements without an explicit `type` attribute
- *
+ * @description Disallow usage of `button` elements without an explicit `type` attribute
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/button-has-type.md
  *
  *  ```md
@@ -111,11 +115,17 @@ namespace ButtonHasType {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
+    /**
+     * @default true
+     */
     button?: boolean;
-    /** @default true */
+    /**
+     * @default true
+     */
     submit?: boolean;
-    /** @default true */
+    /**
+     * @default true
+     */
     reset?: boolean;
   }>;
 
@@ -126,8 +136,7 @@ namespace ButtonHasType {
 }
 
 /**
- * Enforce using `onChange` or `readonly` attribute when `checked` is used
- *
+ * @description Enforce using `onChange` or `readonly` attribute when `checked` is used
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/checked-requires-onchange-or-readonly.md
  *
  *  ```md
@@ -169,8 +178,7 @@ namespace CheckedRequiresOnchangeOrReadonly {
 }
 
 /**
- * Enforce all defaultProps have a corresponding non-required PropType
- *
+ * @description Enforce all defaultProps have a corresponding non-required PropType
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/default-props-match-prop-types.md
  *
  *  ```md
@@ -199,7 +207,9 @@ namespace DefaultPropsMatchPropTypes {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     allowRequiredDefaults?: boolean;
   }>;
 
@@ -210,9 +220,7 @@ namespace DefaultPropsMatchPropTypes {
 }
 
 /**
- * Enforce consistent usage of destructuring assignment of props, state, and
- * context
- *
+ * @description Enforce consistent usage of destructuring assignment of props, state, and context
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/destructuring-assignment.md
  *
  *  ```md
@@ -270,8 +278,7 @@ namespace DestructuringAssignment {
 }
 
 /**
- * Disallow missing displayName in a React component definition
- *
+ * @description Disallow missing displayName in a React component definition
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/display-name.md
  *
  *  ```md
@@ -314,8 +321,7 @@ namespace DisplayName {
 }
 
 /**
- * Disallow certain props on components
- *
+ * @description Disallow certain props on components
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-component-props.md
  *
  *  ```md
@@ -491,7 +497,6 @@ namespace ForbidComponentProps {
               allowedForPatterns?: readonly string[];
               message?: string;
             }
-          | Record<string, unknown>
           | {
               propNamePattern?: string;
               allowedFor?: readonly string[];
@@ -499,6 +504,7 @@ namespace ForbidComponentProps {
               message?: string;
             }
         >
+      | Record<string, unknown>
     )[];
     [k: string]: unknown;
   }>;
@@ -510,8 +516,7 @@ namespace ForbidComponentProps {
 }
 
 /**
- * Disallow certain props on DOM Nodes
- *
+ * @description Disallow certain props on DOM Nodes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-dom-props.md
  *
  *  ```md
@@ -585,8 +590,7 @@ namespace ForbidDomProps {
 }
 
 /**
- * Disallow certain elements
- *
+ * @description Disallow certain elements
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-elements.md
  *
  *  ```md
@@ -653,8 +657,7 @@ namespace ForbidElements {
 }
 
 /**
- * Disallow using another component's propTypes
- *
+ * @description Disallow using another component's propTypes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-foreign-prop-types.md
  *
  *  ```md
@@ -693,8 +696,7 @@ namespace ForbidForeignPropTypes {
 }
 
 /**
- * Disallow certain propTypes
- *
+ * @description Disallow certain propTypes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forbid-prop-types.md
  *
  *  ```md
@@ -745,8 +747,7 @@ namespace ForbidPropTypes {
 }
 
 /**
- * Require all forwardRef components include a ref parameter
- *
+ * @description Require all forwardRef components include a ref parameter
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/forward-ref-uses-ref.md
  *
  *  ```md
@@ -763,8 +764,7 @@ namespace ForwardRefUsesRef {
 }
 
 /**
- * Enforce a specific function type for function components
- *
+ * @description Enforce a specific function type for function components
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/function-component-definition.md
  *
  *  ```md
@@ -852,9 +852,7 @@ namespace FunctionComponentDefinition {
 }
 
 /**
- * Ensure destructuring and symmetric naming of useState hook value and setter
- * variables
- *
+ * @description Ensure destructuring and symmetric naming of useState hook value and setter variables
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/hook-use-state.md
  *
  *  ```md
@@ -886,7 +884,9 @@ namespace HookUseState {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     allowDestructuredState?: boolean;
   }>;
 
@@ -897,8 +897,7 @@ namespace HookUseState {
 }
 
 /**
- * Enforce sandbox attribute on iframe elements
- *
+ * @description Enforce sandbox attribute on iframe elements
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/iframe-missing-sandbox.md
  *
  *  ```md
@@ -913,8 +912,7 @@ namespace IframeMissingSandbox {
 }
 
 /**
- * Enforce boolean attributes notation in JSX
- *
+ * @description Enforce boolean attributes notation in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-boolean-value.md
  *
  *  ```md
@@ -1029,9 +1027,7 @@ namespace JsxBooleanValue {
 }
 
 /**
- * Enforce or disallow spaces inside of curly braces in JSX attributes and
- * expressions
- *
+ * @description Enforce or disallow spaces inside of curly braces in JSX attributes and expressions
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-child-element-spacing.md
  *
  *  ```md
@@ -1046,8 +1042,7 @@ namespace JsxChildElementSpacing {
 }
 
 /**
- * Enforce closing bracket location in JSX
- *
+ * @description Enforce closing bracket location in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-closing-bracket-location.md
  *
  *  ```md
@@ -1150,8 +1145,7 @@ namespace JsxClosingBracketLocation {
 }
 
 /**
- * Enforce closing tag location for multiline JSX
- *
+ * @description Enforce closing tag location for multiline JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-closing-tag-location.md
  *
  *  ```md
@@ -1206,9 +1200,7 @@ namespace JsxClosingTagLocation {
 }
 
 /**
- * Enforce or disallow spaces inside of curly braces in JSX attributes and
- * expressions
- *
+ * @description Enforce or disallow spaces inside of curly braces in JSX attributes and expressions
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-spacing.md
  *
  *  ```md
@@ -1367,9 +1359,7 @@ namespace JsxCurlySpacing {
 }
 
 /**
- * Enforce consistent linebreaks in curly braces in JSX attributes and
- * expressions
- *
+ * @description Enforce consistent linebreaks in curly braces in JSX attributes and expressions
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-newline.md
  *
  *  ```md
@@ -1434,8 +1424,7 @@ namespace JsxCurlyNewline {
 }
 
 /**
- * Enforce or disallow spaces around equal signs in JSX attributes
- *
+ * @description Enforce or disallow spaces around equal signs in JSX attributes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-equals-spacing.md
  *
  *  ```md
@@ -1470,8 +1459,7 @@ namespace JsxEqualsSpacing {
 }
 
 /**
- * Disallow file extensions that may contain JSX
- *
+ * @description Disallow file extensions that may contain JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-filename-extension.md
  *
  *  ```md
@@ -1524,8 +1512,7 @@ namespace JsxFilenameExtension {
 }
 
 /**
- * Enforce proper position of the first property in JSX
- *
+ * @description Enforce proper position of the first property in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-first-prop-new-line.md
  *
  *  ```md
@@ -1568,8 +1555,7 @@ namespace JsxFirstPropNewLine {
 }
 
 /**
- * Enforce event handler naming conventions in JSX
- *
+ * @description Enforce event handler naming conventions in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-handler-names.md
  *
  *  ```md
@@ -1744,8 +1730,7 @@ namespace JsxHandlerNames {
 }
 
 /**
- * Enforce JSX indentation
- *
+ * @description Enforce JSX indentation
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-indent.md
  *
  *  ```md
@@ -1804,8 +1789,7 @@ namespace JsxIndent {
 }
 
 /**
- * Enforce props indentation in JSX
- *
+ * @description Enforce props indentation in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-indent-props.md
  *
  *  ```md
@@ -1875,8 +1859,7 @@ namespace JsxIndentProps {
 }
 
 /**
- * Disallow missing `key` props in iterators/collection literals
- *
+ * @description Disallow missing `key` props in iterators/collection literals
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-key.md
  *
  *  ```md
@@ -1914,11 +1897,17 @@ namespace JsxKey {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     checkFragmentShorthand?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     checkKeyMustBeforeSpread?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     warnOnDuplicates?: boolean;
   }>;
 
@@ -1929,8 +1918,7 @@ namespace JsxKey {
 }
 
 /**
- * Enforce JSX maximum depth
- *
+ * @description Enforce JSX maximum depth
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-max-depth.md
  *
  *  ```md
@@ -1970,8 +1958,7 @@ namespace JsxMaxDepth {
 }
 
 /**
- * Enforce maximum of props on a single line in JSX
- *
+ * @description Enforce maximum of props on a single line in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-max-props-per-line.md
  *
  *  ```md
@@ -2052,8 +2039,7 @@ namespace JsxMaxPropsPerLine {
 }
 
 /**
- * Require or prevent a new line after jsx elements and expressions.
- *
+ * @description Require or prevent a new line after jsx elements and expressions.
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-newline.md
  *
  *  ```md
@@ -2105,9 +2091,13 @@ namespace JsxNewline {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     prevent?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     allowMultilines?: boolean;
   }>;
 
@@ -2118,8 +2108,7 @@ namespace JsxNewline {
 }
 
 /**
- * Disallow `.bind()` or arrow functions in JSX props
- *
+ * @description Disallow `.bind()` or arrow functions in JSX props
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-bind.md
  *
  *  ```md
@@ -2165,15 +2154,25 @@ namespace JsxNoBind {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     allowArrowFunctions?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     allowBind?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     allowFunctions?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreRefs?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreDOMComponents?: boolean;
   }>;
 
@@ -2184,8 +2183,7 @@ namespace JsxNoBind {
 }
 
 /**
- * Disallow comments from being inserted as text nodes
- *
+ * @description Disallow comments from being inserted as text nodes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-comment-textnodes.md
  *
  *  ```md
@@ -2200,9 +2198,7 @@ namespace JsxNoCommentTextnodes {
 }
 
 /**
- * Disallows JSX context provider values from taking values that will cause
- * needless rerenders
- *
+ * @description Disallows JSX context provider values from taking values that will cause needless rerenders
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-constructed-context-values.md
  *
  *  ```md
@@ -2217,8 +2213,7 @@ namespace JsxNoConstructedContextValues {
 }
 
 /**
- * Disallow duplicate properties in JSX
- *
+ * @description Disallow duplicate properties in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-duplicate-props.md
  *
  *  ```md
@@ -2257,8 +2252,7 @@ namespace JsxNoDuplicateProps {
 }
 
 /**
- * Disallow problematic leaked values from being rendered
- *
+ * @description Disallow problematic leaked values from being rendered
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-leaked-render.md
  *
  *  ```md
@@ -2299,7 +2293,9 @@ namespace JsxNoLeakedRender {
    * ```
    */
   export type Options = Readonly<{
-    /** @default ['ternary', 'coerce'] */
+    /**
+     * @default ["ternary","coerce"]
+     */
     validStrategies?: readonly ('ternary' | 'coerce')[];
   }>;
 
@@ -2310,8 +2306,7 @@ namespace JsxNoLeakedRender {
 }
 
 /**
- * Disallow usage of string literals in JSX
- *
+ * @description Disallow usage of string literals in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-literals.md
  *
  *  ```md
@@ -2408,8 +2403,7 @@ namespace JsxNoLiterals {
 }
 
 /**
- * Disallow usage of `javascript:` URLs
- *
+ * @description Disallow usage of `javascript:` URLs
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-script-url.md
  *
  *  ```md
@@ -2518,8 +2512,7 @@ namespace JsxNoScriptUrl {
 }
 
 /**
- * Disallow `target="_blank"` attribute without `rel="noreferrer"`
- *
+ * @description Disallow `target="_blank"` attribute without `rel="noreferrer"`
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-target-blank.md
  *
  *  ```md
@@ -2569,9 +2562,13 @@ namespace JsxNoTargetBlank {
     allowReferrer?: boolean;
     enforceDynamicLinks?: 'always' | 'never';
     warnOnSpreadAttributes?: boolean;
-    /** @default true */
+    /**
+     * @default true
+     */
     links?: boolean;
-    /** @default false */
+    /**
+     * @default false
+     */
     forms?: boolean;
   }>;
 
@@ -2582,8 +2579,7 @@ namespace JsxNoTargetBlank {
 }
 
 /**
- * Disallow unnecessary fragments
- *
+ * @description Disallow unnecessary fragments
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-useless-fragment.md
  *
  *  ```md
@@ -2624,8 +2620,7 @@ namespace JsxNoUselessFragment {
 }
 
 /**
- * Require one JSX element per line
- *
+ * @description Require one JSX element per line
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-one-expression-per-line.md
  *
  *  ```md
@@ -2673,8 +2668,7 @@ namespace JsxOneExpressionPerLine {
 }
 
 /**
- * Disallow undeclared variables in JSX
- *
+ * @description Disallow undeclared variables in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-no-undef.md
  *
  *  ```md
@@ -2713,9 +2707,7 @@ namespace JsxNoUndef {
 }
 
 /**
- * Disallow unnecessary JSX expressions when literals alone are sufficient or
- * enforce JSX expressions on literals in JSX children or attributes
- *
+ * @description Disallow unnecessary JSX expressions when literals alone are sufficient or enforce JSX expressions on literals in JSX children or attributes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-curly-brace-presence.md
  *
  *  ```md
@@ -2788,8 +2780,7 @@ namespace JsxCurlyBracePresence {
 }
 
 /**
- * Enforce PascalCase for user-defined JSX components
- *
+ * @description Enforce PascalCase for user-defined JSX components
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-pascal-case.md
  *
  *  ```md
@@ -2835,7 +2826,9 @@ namespace JsxPascalCase {
     allowAllCaps?: boolean;
     allowLeadingUnderscore?: boolean;
     allowNamespace?: boolean;
-    /** @minItems 0 */
+    /**
+     * @minItems 0
+     */
     ignore?: readonly string[];
   }>;
 
@@ -2846,8 +2839,7 @@ namespace JsxPascalCase {
 }
 
 /**
- * Enforce shorthand or standard form for React fragments
- *
+ * @description Enforce shorthand or standard form for React fragments
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-fragments.md
  *
  *  ```md
@@ -2882,8 +2874,7 @@ namespace JsxFragments {
 }
 
 /**
- * Disallow multiple spaces between inline JSX props
- *
+ * @description Disallow multiple spaces between inline JSX props
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-multi-spaces.md
  *
  *  ```md
@@ -2899,8 +2890,7 @@ namespace JsxPropsNoMultiSpaces {
 }
 
 /**
- * Disallow JSX prop spreading
- *
+ * @description Disallow JSX prop spreading
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-spreading.md
  *
  *  ```md
@@ -2979,15 +2969,14 @@ namespace JsxPropsNoSpreading {
    * ]
    * ```
    */
-  export type Options = Readonly<
-    {
-      html?: 'enforce' | 'ignore';
-      custom?: 'enforce' | 'ignore';
-      explicitSpread?: 'enforce' | 'ignore';
-      exceptions?: readonly string[];
-      [k: string]: unknown;
-    } & Record<string, unknown>
-  >;
+  export type Options = Readonly<{
+    html?: 'enforce' | 'ignore';
+    custom?: 'enforce' | 'ignore';
+    explicitSpread?: 'enforce' | 'ignore';
+    exceptions?: readonly string[];
+    [k: string]: unknown;
+  }> &
+    Record<string, unknown>;
 
   export type RuleEntry =
     | 'off'
@@ -2996,8 +2985,7 @@ namespace JsxPropsNoSpreading {
 }
 
 /**
- * Disallow JSX prop spreading the same identifier multiple times
- *
+ * @description Disallow JSX prop spreading the same identifier multiple times
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-props-no-spread-multi.md
  *
  *  ```md
@@ -3012,8 +3000,7 @@ namespace JsxPropsNoSpreadMulti {
 }
 
 /**
- * Enforce defaultProps declarations alphabetical sorting
- *
+ * @description Enforce defaultProps declarations alphabetical sorting
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-sort-default-props.md
  *
  *  ```md
@@ -3045,8 +3032,7 @@ namespace JsxSortDefaultProps {
 }
 
 /**
- * Enforce props alphabetical sorting
- *
+ * @description Enforce props alphabetical sorting
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-sort-props.md
  *
  *  ```md
@@ -3109,12 +3095,16 @@ namespace JsxSortProps {
     callbacksLast?: boolean;
     shorthandFirst?: boolean;
     shorthandLast?: boolean;
-    /** @default 'ignore' */
+    /**
+     * @default "ignore"
+     */
     multiline?: 'ignore' | 'first' | 'last';
     ignoreCase?: boolean;
     noSortAlphabetically?: boolean;
     reservedFirst?: readonly unknown[] | boolean;
-    /** @default 'auto' */
+    /**
+     * @default "auto"
+     */
     locale?: string;
   }>;
 
@@ -3125,8 +3115,7 @@ namespace JsxSortProps {
 }
 
 /**
- * Enforce spacing before closing bracket in JSX
- *
+ * @description Enforce spacing before closing bracket in JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-space-before-closing.md
  *
  *  ```md
@@ -3156,8 +3145,7 @@ namespace JsxSpaceBeforeClosing {
 }
 
 /**
- * Enforce whitespace in and around the JSX opening and closing brackets
- *
+ * @description Enforce whitespace in and around the JSX opening and closing brackets
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-tag-spacing.md
  *
  *  ```md
@@ -3234,8 +3222,7 @@ namespace JsxTagSpacing {
 }
 
 /**
- * Disallow React to be incorrectly marked as unused
- *
+ * @description Disallow React to be incorrectly marked as unused
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-uses-react.md
  *
  *  ```md
@@ -3250,8 +3237,7 @@ namespace JsxUsesReact {
 }
 
 /**
- * Disallow variables used in JSX to be incorrectly marked as unused
- *
+ * @description Disallow variables used in JSX to be incorrectly marked as unused
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-uses-vars.md
  *
  *  ```md
@@ -3266,8 +3252,7 @@ namespace JsxUsesVars {
 }
 
 /**
- * Disallow missing parentheses around multiline JSX
- *
+ * @description Disallow missing parentheses around multiline JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/jsx-wrap-multilines.md
  *
  *  ```md
@@ -3398,8 +3383,7 @@ namespace JsxWrapMultilines {
 }
 
 /**
- * Disallow usage of invalid attributes
- *
+ * @description Disallow usage of invalid attributes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-invalid-html-attribute.md
  *
  *  ```md
@@ -3437,8 +3421,7 @@ namespace NoInvalidHtmlAttribute {
 }
 
 /**
- * Disallow when this.state is accessed within setState
- *
+ * @description Disallow when this.state is accessed within setState
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-access-state-in-setstate.md
  *
  *  ```md
@@ -3453,8 +3436,7 @@ namespace NoAccessStateInSetstate {
 }
 
 /**
- * Disallow adjacent inline elements not separated by whitespace.
- *
+ * @description Disallow adjacent inline elements not separated by whitespace.
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-adjacent-inline-elements.md
  *
  *  ```md
@@ -3469,8 +3451,7 @@ namespace NoAdjacentInlineElements {
 }
 
 /**
- * Disallow usage of Array index in keys
- *
+ * @description Disallow usage of Array index in keys
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-array-index-key.md
  *
  *  ```md
@@ -3485,8 +3466,7 @@ namespace NoArrayIndexKey {
 }
 
 /**
- * Lifecycle methods should be methods on the prototype, not class fields
- *
+ * @description Lifecycle methods should be methods on the prototype, not class fields
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-arrow-function-lifecycle.md
  *
  *  ```md
@@ -3502,8 +3482,7 @@ namespace NoArrowFunctionLifecycle {
 }
 
 /**
- * Disallow passing of children as props
- *
+ * @description Disallow passing of children as props
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-children-prop.md
  *
  *  ```md
@@ -3533,7 +3512,9 @@ namespace NoChildrenProp {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     allowFunctions?: boolean;
   }>;
 
@@ -3544,8 +3525,7 @@ namespace NoChildrenProp {
 }
 
 /**
- * Disallow usage of dangerous JSX properties
- *
+ * @description Disallow usage of dangerous JSX properties
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-danger.md
  *
  *  ```md
@@ -3578,7 +3558,9 @@ namespace NoDanger {
    * ```
    */
   export type Options = Readonly<{
-    /** @minItems 0 */
+    /**
+     * @minItems 0
+     */
     customComponentNames?: readonly string[];
     [k: string]: unknown;
   }>;
@@ -3590,9 +3572,7 @@ namespace NoDanger {
 }
 
 /**
- * Disallow when a DOM element is using both children and
- * dangerouslySetInnerHTML
- *
+ * @description Disallow when a DOM element is using both children and dangerouslySetInnerHTML
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-danger-with-children.md
  *
  *  ```md
@@ -3607,8 +3587,7 @@ namespace NoDangerWithChildren {
 }
 
 /**
- * Disallow usage of deprecated methods
- *
+ * @description Disallow usage of deprecated methods
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-deprecated.md
  *
  *  ```md
@@ -3623,8 +3602,7 @@ namespace NoDeprecated {
 }
 
 /**
- * Disallow usage of setState in componentDidMount
- *
+ * @description Disallow usage of setState in componentDidMount
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-did-mount-set-state.md
  *
  *  ```md
@@ -3657,8 +3635,7 @@ namespace NoDidMountSetState {
 }
 
 /**
- * Disallow usage of setState in componentDidUpdate
- *
+ * @description Disallow usage of setState in componentDidUpdate
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-did-update-set-state.md
  *
  *  ```md
@@ -3691,8 +3668,7 @@ namespace NoDidUpdateSetState {
 }
 
 /**
- * Disallow direct mutation of this.state
- *
+ * @description Disallow direct mutation of this.state
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-direct-mutation-state.md
  *
  *  ```md
@@ -3707,8 +3683,7 @@ namespace NoDirectMutationState {
 }
 
 /**
- * Disallow usage of findDOMNode
- *
+ * @description Disallow usage of findDOMNode
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-find-dom-node.md
  *
  *  ```md
@@ -3723,8 +3698,7 @@ namespace NoFindDomNode {
 }
 
 /**
- * Disallow usage of isMounted
- *
+ * @description Disallow usage of isMounted
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-is-mounted.md
  *
  *  ```md
@@ -3739,8 +3713,7 @@ namespace NoIsMounted {
 }
 
 /**
- * Disallow multiple component definition per file
- *
+ * @description Disallow multiple component definition per file
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-multi-comp.md
  *
  *  ```md
@@ -3770,7 +3743,9 @@ namespace NoMultiComp {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreStateless?: boolean;
   }>;
 
@@ -3781,8 +3756,7 @@ namespace NoMultiComp {
 }
 
 /**
- * Enforce that namespaces are not used in React elements
- *
+ * @description Enforce that namespaces are not used in React elements
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-namespace.md
  *
  *  ```md
@@ -3797,8 +3771,7 @@ namespace NoNamespace {
 }
 
 /**
- * Disallow usage of setState
- *
+ * @description Disallow usage of setState
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-set-state.md
  *
  *  ```md
@@ -3813,8 +3786,7 @@ namespace NoSetState {
 }
 
 /**
- * Disallow using string references
- *
+ * @description Disallow using string references
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-string-refs.md
  *
  *  ```md
@@ -3853,8 +3825,7 @@ namespace NoStringRefs {
 }
 
 /**
- * Disallow usage of shouldComponentUpdate when extending React.PureComponent
- *
+ * @description Disallow usage of shouldComponentUpdate when extending React.PureComponent
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-redundant-should-component-update.md
  *
  *  ```md
@@ -3869,8 +3840,7 @@ namespace NoRedundantShouldComponentUpdate {
 }
 
 /**
- * Disallow usage of the return value of ReactDOM.render
- *
+ * @description Disallow usage of the return value of ReactDOM.render
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-render-return-value.md
  *
  *  ```md
@@ -3885,8 +3855,7 @@ namespace NoRenderReturnValue {
 }
 
 /**
- * Disallow `this` from being used in stateless functional components
- *
+ * @description Disallow `this` from being used in stateless functional components
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-this-in-sfc.md
  *
  *  ```md
@@ -3901,8 +3870,7 @@ namespace NoThisInSfc {
 }
 
 /**
- * Disallow common typos
- *
+ * @description Disallow common typos
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-typos.md
  *
  *  ```md
@@ -3917,8 +3885,7 @@ namespace NoTypos {
 }
 
 /**
- * Disallow unescaped HTML entities from appearing in markup
- *
+ * @description Disallow unescaped HTML entities from appearing in markup
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unescaped-entities.md
  *
  *  ```md
@@ -3987,8 +3954,7 @@ namespace NoUnescapedEntities {
 }
 
 /**
- * Disallow usage of unknown DOM property
- *
+ * @description Disallow usage of unknown DOM property
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unknown-property.md
  *
  *  ```md
@@ -4026,7 +3992,9 @@ namespace NoUnknownProperty {
    */
   export type Options = Readonly<{
     ignore?: readonly string[];
-    /** @default false */
+    /**
+     * @default false
+     */
     requireDataLowercase?: boolean;
   }>;
 
@@ -4037,8 +4005,7 @@ namespace NoUnknownProperty {
 }
 
 /**
- * Disallow usage of unsafe lifecycle methods
- *
+ * @description Disallow usage of unsafe lifecycle methods
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unsafe.md
  *
  *  ```md
@@ -4068,7 +4035,9 @@ namespace NoUnsafe {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     checkAliases?: boolean;
   }>;
 
@@ -4079,8 +4048,7 @@ namespace NoUnsafe {
 }
 
 /**
- * Disallow creating unstable components inside components
- *
+ * @description Disallow creating unstable components inside components
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unstable-nested-components.md
  *
  *  ```md
@@ -4130,8 +4098,7 @@ namespace NoUnstableNestedComponents {
 }
 
 /**
- * Disallow declaring unused methods of component class
- *
+ * @description Disallow declaring unused methods of component class
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-class-component-methods.md
  *
  *  ```md
@@ -4146,8 +4113,7 @@ namespace NoUnusedClassComponentMethods {
 }
 
 /**
- * Disallow definitions of unused propTypes
- *
+ * @description Disallow definitions of unused propTypes
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-prop-types.md
  *
  *  ```md
@@ -4201,8 +4167,7 @@ namespace NoUnusedPropTypes {
 }
 
 /**
- * Disallow definitions of unused state
- *
+ * @description Disallow definitions of unused state
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-unused-state.md
  *
  *  ```md
@@ -4217,9 +4182,7 @@ namespace NoUnusedState {
 }
 
 /**
- * Disallow usage of referential-type variables as default param in functional
- * component
- *
+ * @description Disallow usage of referential-type variables as default param in functional component
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-object-type-as-default-prop.md
  *
  *  ```md
@@ -4234,8 +4197,7 @@ namespace NoObjectTypeAsDefaultProp {
 }
 
 /**
- * Disallow usage of setState in componentWillUpdate
- *
+ * @description Disallow usage of setState in componentWillUpdate
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/no-will-update-set-state.md
  *
  *  ```md
@@ -4268,8 +4230,7 @@ namespace NoWillUpdateSetState {
 }
 
 /**
- * Enforce ES5 or ES6 class for React Components
- *
+ * @description Enforce ES5 or ES6 class for React Components
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-es6-class.md
  *
  *  ```md
@@ -4303,8 +4264,7 @@ namespace PreferEs6Class {
 }
 
 /**
- * Prefer exact proptype definitions
- *
+ * @description Prefer exact proptype definitions
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-exact-props.md
  *
  *  ```md
@@ -4319,8 +4279,7 @@ namespace PreferExactProps {
 }
 
 /**
- * Enforce that props are read-only
- *
+ * @description Enforce that props are read-only
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-read-only-props.md
  *
  *  ```md
@@ -4336,8 +4295,7 @@ namespace PreferReadOnlyProps {
 }
 
 /**
- * Enforce stateless components to be written as a pure function
- *
+ * @description Enforce stateless components to be written as a pure function
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prefer-stateless-function.md
  *
  *  ```md
@@ -4367,7 +4325,9 @@ namespace PreferStatelessFunction {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     ignorePureComponents?: boolean;
   }>;
 
@@ -4378,8 +4338,7 @@ namespace PreferStatelessFunction {
 }
 
 /**
- * Disallow missing props validation in a React component definition
- *
+ * @description Disallow missing props validation in a React component definition
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/prop-types.md
  *
  *  ```md
@@ -4432,8 +4391,7 @@ namespace PropTypes {
 }
 
 /**
- * Disallow missing React when using JSX
- *
+ * @description Disallow missing React when using JSX
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/react-in-jsx-scope.md
  *
  *  ```md
@@ -4448,8 +4406,7 @@ namespace ReactInJsxScope {
 }
 
 /**
- * Enforce a defaultProps definition for every prop that is not a required prop
- *
+ * @description Enforce a defaultProps definition for every prop that is not a required prop
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-default-props.md
  *
  *  ```md
@@ -4506,8 +4463,7 @@ namespace RequireDefaultProps {
 }
 
 /**
- * Enforce React components to have a shouldComponentUpdate method
- *
+ * @description Enforce React components to have a shouldComponentUpdate method
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-optimization.md
  *
  *  ```md
@@ -4549,8 +4505,7 @@ namespace RequireOptimization {
 }
 
 /**
- * Enforce ES5 or ES6 class for returning value in render function
- *
+ * @description Enforce ES5 or ES6 class for returning value in render function
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/require-render-return.md
  *
  *  ```md
@@ -4565,8 +4520,7 @@ namespace RequireRenderReturn {
 }
 
 /**
- * Disallow extra closing tags for components without children
- *
+ * @description Disallow extra closing tags for components without children
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/self-closing-comp.md
  *
  *  ```md
@@ -4601,9 +4555,13 @@ namespace SelfClosingComp {
    * ```
    */
   export type Options = Readonly<{
-    /** @default true */
+    /**
+     * @default true
+     */
     component?: boolean;
-    /** @default true */
+    /**
+     * @default true
+     */
     html?: boolean;
   }>;
 
@@ -4614,8 +4572,7 @@ namespace SelfClosingComp {
 }
 
 /**
- * Enforce component methods order
- *
+ * @description Enforce component methods order
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-comp.md
  *
  *  ```md
@@ -4669,8 +4626,7 @@ namespace SortComp {
 }
 
 /**
- * Enforce defaultProps declarations alphabetical sorting
- *
+ * @description Enforce defaultProps declarations alphabetical sorting
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-default-props.md
  *
  *  ```md
@@ -4709,8 +4665,7 @@ namespace SortDefaultProps {
 }
 
 /**
- * Enforce propTypes declarations alphabetical sorting
- *
+ * @description Enforce propTypes declarations alphabetical sorting
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/sort-prop-types.md
  *
  *  ```md
@@ -4770,8 +4725,7 @@ namespace SortPropTypes {
 }
 
 /**
- * Enforce class component state initialization style
- *
+ * @description Enforce class component state initialization style
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/state-in-constructor.md
  *
  *  ```md
@@ -4805,8 +4759,7 @@ namespace StateInConstructor {
 }
 
 /**
- * Enforces where React component static properties should be positioned.
- *
+ * @description Enforces where React component static properties should be positioned.
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/static-property-placement.md
  *
  *  ```md
@@ -4917,8 +4870,7 @@ namespace StaticPropertyPlacement {
 }
 
 /**
- * Enforce style prop value is an object
- *
+ * @description Enforce style prop value is an object
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/style-prop-object.md
  *
  *  ```md
@@ -4962,8 +4914,7 @@ namespace StylePropObject {
 }
 
 /**
- * Disallow void DOM elements (e.g. `<img />`, `<br />`) from receiving children
- *
+ * @description Disallow void DOM elements (e.g. `<img />`, `<br />`) from receiving children
  * @link https://github.com/jsx-eslint/eslint-plugin-react/tree/master/docs/rules/void-dom-elements-no-children.md
  *
  *  ```md

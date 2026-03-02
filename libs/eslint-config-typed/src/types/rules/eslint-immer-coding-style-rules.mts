@@ -2,15 +2,15 @@
 import { type Linter } from 'eslint';
 
 /**
- * Prefer the curried overload of immer produce for shorter updater definitions.
+ * @description Prefer the curried overload of immer produce for shorter updater definitions.
  *
- * ```md
- * | key        | value      |
- * | :--------- | :--------- |
- * | type       | suggestion |
- * | deprecated | false      |
- * | fixable    | code       |
- * ```
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
  */
 namespace PreferCurriedProduce {
   export type RuleEntry = Linter.StringSeverity;

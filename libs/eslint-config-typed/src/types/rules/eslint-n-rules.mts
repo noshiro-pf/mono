@@ -8,8 +8,7 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
- * Require `return` statements after callbacks
- *
+ * @description require `return` statements after callbacks
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/callback-return.md
  *
  *  ```md
@@ -44,8 +43,7 @@ namespace CallbackReturn {
 }
 
 /**
- * Enforce either `module.exports` or `exports`
- *
+ * @description enforce either `module.exports` or `exports`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/exports-style.md
  *
  *  ```md
@@ -95,8 +93,7 @@ namespace ExportsStyle {
 }
 
 /**
- * Enforce the style of file extensions in `import` declarations
- *
+ * @description enforce the style of file extensions in `import` declarations
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/file-extension-in-import.md
  *
  *  ```md
@@ -145,8 +142,7 @@ namespace FileExtensionInImport {
 }
 
 /**
- * Require `require()` calls to be placed at top-level module scope
- *
+ * @description require `require()` calls to be placed at top-level module scope
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/global-require.md
  *
  *  ```md
@@ -162,8 +158,7 @@ namespace GlobalRequire {
 }
 
 /**
- * Require error handling in callbacks
- *
+ * @description require error handling in callbacks
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/handle-callback-err.md
  *
  *  ```md
@@ -195,8 +190,7 @@ namespace HandleCallbackErr {
 }
 
 /**
- * Enforce Node.js-style error-first callback pattern is followed
- *
+ * @description enforce Node.js-style error-first callback pattern is followed
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-callback-literal.md
  *
  *  ```md
@@ -212,8 +206,7 @@ namespace NoCallbackLiteral {
 }
 
 /**
- * Disallow deprecated APIs
- *
+ * @description disallow deprecated APIs
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-deprecated-api.md
  *
  *  ```md
@@ -509,8 +502,7 @@ namespace NoDeprecatedApi {
 }
 
 /**
- * Disallow the assignment to `exports`
- *
+ * @description disallow the assignment to `exports`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-exports-assign.md
  *
  *  ```md
@@ -526,8 +518,7 @@ namespace NoExportsAssign {
 }
 
 /**
- * Disallow `import` declarations which import extraneous modules
- *
+ * @description disallow `import` declarations which import extraneous modules
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-extraneous-import.md
  *
  *  ```md
@@ -635,7 +626,9 @@ namespace NoExtraneousImport {
       | Readonly<Record<string, readonly [string, string]>>
       | readonly [
           Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -645,7 +638,9 @@ namespace NoExtraneousImport {
             replace: readonly [string, string];
           }>,
           ...Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -666,8 +661,7 @@ namespace NoExtraneousImport {
 }
 
 /**
- * Disallow `require()` expressions which import extraneous modules
- *
+ * @description disallow `require()` expressions which import extraneous modules
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-extraneous-require.md
  *
  *  ```md
@@ -783,7 +777,9 @@ namespace NoExtraneousRequire {
       | Readonly<Record<string, readonly [string, string]>>
       | readonly [
           Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -793,7 +789,9 @@ namespace NoExtraneousRequire {
             replace: readonly [string, string];
           }>,
           ...Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -815,8 +813,7 @@ namespace NoExtraneousRequire {
 }
 
 /**
- * Disallow `import` declarations which import missing modules
- *
+ * @description disallow `import` declarations which import missing modules
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-missing-import.md
  *
  *  ```md
@@ -914,7 +911,9 @@ namespace NoMissingImport {
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreTypeImport?: boolean;
     tsconfigPath?: string;
     typescriptExtensionMap?:
@@ -929,8 +928,7 @@ namespace NoMissingImport {
 }
 
 /**
- * Disallow `require()` expressions which import missing modules
- *
+ * @description disallow `require()` expressions which import missing modules
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-missing-require.md
  *
  *  ```md
@@ -1037,8 +1035,7 @@ namespace NoMissingRequire {
 }
 
 /**
- * Disallow `require` calls to be mixed with regular variable declarations
- *
+ * @description disallow `require` calls to be mixed with regular variable declarations
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-mixed-requires.md
  *
  *  ```md
@@ -1091,8 +1088,7 @@ namespace NoMixedRequires {
 }
 
 /**
- * Disallow `new` operators with calls to `require`
- *
+ * @description disallow `new` operators with calls to `require`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-new-require.md
  *
  *  ```md
@@ -1108,8 +1104,7 @@ namespace NoNewRequire {
 }
 
 /**
- * Disallow string concatenation with `__dirname` and `__filename`
- *
+ * @description disallow string concatenation with `__dirname` and `__filename`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-path-concat.md
  *
  *  ```md
@@ -1125,8 +1120,7 @@ namespace NoPathConcat {
 }
 
 /**
- * Disallow the use of `process.env`
- *
+ * @description disallow the use of `process.env`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-process-env.md
  *
  *  ```md
@@ -1169,8 +1163,7 @@ namespace NoProcessEnv {
 }
 
 /**
- * Disallow the use of `process.exit()`
- *
+ * @description disallow the use of `process.exit()`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-process-exit.md
  *
  *  ```md
@@ -1186,8 +1179,7 @@ namespace NoProcessExit {
 }
 
 /**
- * Disallow specified modules when loaded by `import` declarations
- *
+ * @description disallow specified modules when loaded by `import` declarations
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-restricted-import.md
  *
  *  ```md
@@ -1259,8 +1251,7 @@ namespace NoRestrictedImport {
 }
 
 /**
- * Disallow specified modules when loaded by `require`
- *
+ * @description disallow specified modules when loaded by `require`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-restricted-require.md
  *
  *  ```md
@@ -1332,8 +1323,7 @@ namespace NoRestrictedRequire {
 }
 
 /**
- * Disallow synchronous methods
- *
+ * @description disallow synchronous methods
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-sync.md
  *
  *  ```md
@@ -1426,9 +1416,13 @@ namespace NoSync {
    * ```
    */
   export type Options = Readonly<{
-    /** @default false */
+    /**
+     * @default false
+     */
     allowAtRootLevel?: boolean;
-    /** @default [ ] */
+    /**
+     * @default []
+     */
     ignores?: readonly (
       | string
       | Readonly<
@@ -1457,8 +1451,7 @@ namespace NoSync {
 }
 
 /**
- * Disallow top-level `await` in published modules
- *
+ * @description disallow top-level `await` in published modules
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-top-level-await.md
  *
  *  ```md
@@ -1549,7 +1542,9 @@ namespace NoTopLevelAwait {
       | Readonly<Record<string, readonly [string, string]>>
       | readonly [
           Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -1559,7 +1554,9 @@ namespace NoTopLevelAwait {
             replace: readonly [string, string];
           }>,
           ...Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -1578,8 +1575,7 @@ namespace NoTopLevelAwait {
 }
 
 /**
- * Disallow `bin` files that npm ignores
- *
+ * @description disallow `bin` files that npm ignores
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-unpublished-bin.md
  *
  *  ```md
@@ -1665,7 +1661,9 @@ namespace NoUnpublishedBin {
       | Readonly<Record<string, readonly [string, string]>>
       | readonly [
           Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -1675,7 +1673,9 @@ namespace NoUnpublishedBin {
             replace: readonly [string, string];
           }>,
           ...Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -1695,8 +1695,7 @@ namespace NoUnpublishedBin {
 }
 
 /**
- * Disallow `import` declarations which import private modules
- *
+ * @description disallow `import` declarations which import private modules
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-unpublished-import.md
  *
  *  ```md
@@ -1820,7 +1819,9 @@ namespace NoUnpublishedImport {
       | Readonly<Record<string, readonly [string, string]>>
       | readonly [
           Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -1830,7 +1831,9 @@ namespace NoUnpublishedImport {
             replace: readonly [string, string];
           }>,
           ...Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -1843,9 +1846,13 @@ namespace NoUnpublishedImport {
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
-    /** @default false */
+    /**
+     * @default false
+     */
     ignoreTypeImport?: boolean;
-    /** @default true */
+    /**
+     * @default true
+     */
     ignorePrivate?: boolean;
   }>;
 
@@ -1856,8 +1863,7 @@ namespace NoUnpublishedImport {
 }
 
 /**
- * Disallow `require()` expressions which import private modules
- *
+ * @description disallow `require()` expressions which import private modules
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-unpublished-require.md
  *
  *  ```md
@@ -1977,7 +1983,9 @@ namespace NoUnpublishedRequire {
       | Readonly<Record<string, readonly [string, string]>>
       | readonly [
           Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -1987,7 +1995,9 @@ namespace NoUnpublishedRequire {
             replace: readonly [string, string];
           }>,
           ...Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -2000,7 +2010,9 @@ namespace NoUnpublishedRequire {
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
-    /** @default true */
+    /**
+     * @default true
+     */
     ignorePrivate?: boolean;
   }>;
 
@@ -2011,8 +2023,7 @@ namespace NoUnpublishedRequire {
 }
 
 /**
- * Disallow unsupported ECMAScript built-ins on the specified version
- *
+ * @description disallow unsupported ECMAScript built-ins on the specified version
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-unsupported-features/es-builtins.md
  *
  *  ```md
@@ -2628,8 +2639,7 @@ namespace NoUnsupportedFeaturesEsBuiltins {
 }
 
 /**
- * Disallow unsupported ECMAScript syntax on the specified version
- *
+ * @description disallow unsupported ECMAScript syntax on the specified version
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-unsupported-features/es-syntax.md
  *
  *  ```md
@@ -3859,8 +3869,7 @@ namespace NoUnsupportedFeaturesEsSyntax {
 }
 
 /**
- * Disallow unsupported Node.js built-in APIs on the specified version
- *
+ * @description disallow unsupported Node.js built-in APIs on the specified version
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-unsupported-features/node-builtins.md
  *
  *  ```md
@@ -7146,8 +7155,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
 }
 
 /**
- * Enforce either `Buffer` or `require("buffer").Buffer`
- *
+ * @description enforce either `Buffer` or `require("buffer").Buffer`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/buffer.md
  *
  *  ```md
@@ -7182,8 +7190,7 @@ namespace PreferGlobalBuffer {
 }
 
 /**
- * Enforce either `console` or `require("console")`
- *
+ * @description enforce either `console` or `require("console")`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/console.md
  *
  *  ```md
@@ -7218,8 +7225,42 @@ namespace PreferGlobalConsole {
 }
 
 /**
- * Enforce either `process` or `require("process")`
+ * @description enforce either `crypto` or `require("crypto").webcrypto`
+ * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/crypto.md
  *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferGlobalCrypto {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "enum": [
+   *       "always",
+   *       "never"
+   *     ]
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = 'always' | 'never';
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce either `process` or `require("process")`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/process.md
  *
  *  ```md
@@ -7254,8 +7295,7 @@ namespace PreferGlobalProcess {
 }
 
 /**
- * Enforce either `TextDecoder` or `require("util").TextDecoder`
- *
+ * @description enforce either `TextDecoder` or `require("util").TextDecoder`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/text-decoder.md
  *
  *  ```md
@@ -7290,8 +7330,7 @@ namespace PreferGlobalTextDecoder {
 }
 
 /**
- * Enforce either `TextEncoder` or `require("util").TextEncoder`
- *
+ * @description enforce either `TextEncoder` or `require("util").TextEncoder`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/text-encoder.md
  *
  *  ```md
@@ -7326,8 +7365,7 @@ namespace PreferGlobalTextEncoder {
 }
 
 /**
- * Enforce either `URLSearchParams` or `require("url").URLSearchParams`
- *
+ * @description enforce either `URLSearchParams` or `require("url").URLSearchParams`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/url-search-params.md
  *
  *  ```md
@@ -7362,8 +7400,7 @@ namespace PreferGlobalUrlSearchParams {
 }
 
 /**
- * Enforce either `URL` or `require("url").URL`
- *
+ * @description enforce either `URL` or `require("url").URL`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/url.md
  *
  *  ```md
@@ -7398,8 +7435,42 @@ namespace PreferGlobalUrl {
 }
 
 /**
- * Enforce using the `node:` protocol when importing Node.js builtin modules.
+ * @description enforce either global timer functions or `require("timers")`
+ * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-global/timers.md
  *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferGlobalTimers {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "enum": [
+   *       "always",
+   *       "never"
+   *     ]
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = 'always' | 'never';
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce using the `node:` protocol when importing Node.js builtin modules.
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-node-protocol.md
  *
  *  ```md
@@ -7440,8 +7511,7 @@ namespace PreferNodeProtocol {
 }
 
 /**
- * Enforce `require("dns").promises`
- *
+ * @description enforce `require("dns").promises`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-promises/dns.md
  *
  *  ```md
@@ -7457,8 +7527,7 @@ namespace PreferPromisesDns {
 }
 
 /**
- * Enforce `require("fs").promises`
- *
+ * @description enforce `require("fs").promises`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/prefer-promises/fs.md
  *
  *  ```md
@@ -7474,8 +7543,7 @@ namespace PreferPromisesFs {
 }
 
 /**
- * Require that `process.exit()` expressions use the same code path as `throw`
- *
+ * @description require that `process.exit()` expressions use the same code path as `throw`
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/process-exit-as-throw.md
  *
  *  ```md
@@ -7491,8 +7559,7 @@ namespace ProcessExitAsThrow {
 }
 
 /**
- * Require correct usage of hashbang
- *
+ * @description require correct usage of hashbang
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/hashbang.md
  *
  *  ```md
@@ -7599,7 +7666,9 @@ namespace Hashbang {
       | Readonly<Record<string, readonly [string, string]>>
       | readonly [
           Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -7609,7 +7678,9 @@ namespace Hashbang {
             replace: readonly [string, string];
           }>,
           ...Readonly<{
-            /** @minItems 1 */
+            /**
+             * @minItems 1
+             */
             include: readonly [string, ...string[]];
             exclude?: readonly string[];
             /**
@@ -7631,8 +7702,7 @@ namespace Hashbang {
 }
 
 /**
- * Disallow third-party modules which are hiding core modules
- *
+ * @description disallow third-party modules which are hiding core modules
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-hide-core-modules.md
  *
  *  ```md
@@ -7706,8 +7776,7 @@ namespace NoHideCoreModules {
 }
 
 /**
- * Require correct usage of hashbang
- *
+ * @description require correct usage of hashbang
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/hashbang.md
  *
  *  ```md
@@ -7842,11 +7911,13 @@ export type EslintNRules = Readonly<{
   'n/no-unsupported-features/node-builtins': NoUnsupportedFeaturesNodeBuiltins.RuleEntry;
   'n/prefer-global/buffer': PreferGlobalBuffer.RuleEntry;
   'n/prefer-global/console': PreferGlobalConsole.RuleEntry;
+  'n/prefer-global/crypto': PreferGlobalCrypto.RuleEntry;
   'n/prefer-global/process': PreferGlobalProcess.RuleEntry;
   'n/prefer-global/text-decoder': PreferGlobalTextDecoder.RuleEntry;
   'n/prefer-global/text-encoder': PreferGlobalTextEncoder.RuleEntry;
   'n/prefer-global/url-search-params': PreferGlobalUrlSearchParams.RuleEntry;
   'n/prefer-global/url': PreferGlobalUrl.RuleEntry;
+  'n/prefer-global/timers': PreferGlobalTimers.RuleEntry;
   'n/prefer-node-protocol': PreferNodeProtocol.RuleEntry;
   'n/prefer-promises/dns': PreferPromisesDns.RuleEntry;
   'n/prefer-promises/fs': PreferPromisesFs.RuleEntry;
@@ -7885,11 +7956,13 @@ export type EslintNRulesOption = Readonly<{
   'n/no-unsupported-features/node-builtins': NoUnsupportedFeaturesNodeBuiltins.Options;
   'n/prefer-global/buffer': PreferGlobalBuffer.Options;
   'n/prefer-global/console': PreferGlobalConsole.Options;
+  'n/prefer-global/crypto': PreferGlobalCrypto.Options;
   'n/prefer-global/process': PreferGlobalProcess.Options;
   'n/prefer-global/text-decoder': PreferGlobalTextDecoder.Options;
   'n/prefer-global/text-encoder': PreferGlobalTextEncoder.Options;
   'n/prefer-global/url-search-params': PreferGlobalUrlSearchParams.Options;
   'n/prefer-global/url': PreferGlobalUrl.Options;
+  'n/prefer-global/timers': PreferGlobalTimers.Options;
   'n/prefer-node-protocol': PreferNodeProtocol.Options;
   'n/hashbang': Hashbang.Options;
 }>;
