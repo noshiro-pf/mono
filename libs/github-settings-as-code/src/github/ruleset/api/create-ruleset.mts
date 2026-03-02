@@ -15,6 +15,7 @@ export const createRuleset = async ({
   // https://docs.github.com/ja/rest/repos/rules?apiVersion=2022-11-28#create-a-repository-ruleset
   await octokit.request(
     'POST /repos/{owner}/{repo}/rulesets' satisfies EndpointKeys,
+    // transformer-ignore-next-line convert-to-readonly
     {
       owner: OWNER,
       repo: REPO,

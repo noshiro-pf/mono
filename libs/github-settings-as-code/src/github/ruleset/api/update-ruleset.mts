@@ -17,6 +17,7 @@ export const updateRuleset = async ({
   // https://docs.github.com/ja/rest/repos/rules?apiVersion=2022-11-28#update-a-repository-ruleset
   await octokit.request(
     'PUT /repos/{owner}/{repo}/rulesets/{ruleset_id}' satisfies EndpointKeys,
+    // transformer-ignore-next-line convert-to-readonly
     {
       owner: OWNER,
       repo: REPO,
