@@ -79,8 +79,8 @@ importers:
         specifier: 2.16.11
         version: 2.16.11
       github-settings-as-code:
-        specifier: 1.1.4
-        version: 1.1.4(typescript@5.9.3)
+        specifier: 1.1.6
+        version: 1.1.6(typescript@5.9.3)
       io-ts:
         specifier: 2.2.22
         version: 2.2.22(fp-ts@2.16.11)
@@ -2401,8 +2401,8 @@ packages:
   git-log-parser@1.2.1:
     resolution: {integrity: sha512-PI+sPDvHXNPl5WNOErAK05s3j0lgwUzMN6o8cyQrDaKfT3qd7TmNJKeXX+SknI5I0QhG5fVPAEwSY4tRGDtYoQ==}
 
-  github-settings-as-code@1.1.4:
-    resolution: {integrity: sha512-I4t/GXHwOuKzV8IzAJKd/47HzIY8s7kru1I85xF7daldunG9KXfzDwEqVIYnW53n09/2X2Ifjbsd4ulhoWW72A==}
+  github-settings-as-code@1.1.6:
+    resolution: {integrity: sha512-TX5EnNPVMZKn26oUmgndl0SQ7LYrduFB383XSnuY3fvdAuw2oa7TrFc5C+R6eIBni3UC6gdCdPSGGzb3gj6DdQ==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
 
@@ -6860,7 +6860,7 @@ snapshots:
       through2: 2.0.5
       traverse: 0.6.8
 
-  github-settings-as-code@1.1.4(typescript@5.9.3):
+  github-settings-as-code@1.1.6(typescript@5.9.3):
     dependencies:
       '@octokit/core': 7.0.6
       dotenv: 17.3.1
