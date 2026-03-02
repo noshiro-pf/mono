@@ -9,25 +9,37 @@ if (ownerNullable === undefined) {
 
 export const OWNER = ownerNullable;
 
-const packageJsonPath = path.resolve(process.cwd(), './package.json');
+const getRepoName = async (): Promise<string> => {
+  const repoNameEnv = process.env['REPO_NAME'];
 
-const packageJsonStr = await fs.readFile(packageJsonPath, { encoding: 'utf8' });
+  if (repoNameEnv !== undefined) {
+    return repoNameEnv;
+  }
 
-const packageJson = Json.parse(packageJsonStr);
+  const packageJsonPath = path.resolve(process.cwd(), './package.json');
 
-if (Result.isErr(packageJson)) {
-  throw new Error(packageJson.value);
-}
+  const packageJsonStr = await fs.readFile(packageJsonPath, {
+    encoding: 'utf8',
+  });
 
-if (
-  !isRecord(packageJson.value) ||
-  !hasKey(packageJson.value, 'name') ||
-  !isString(packageJson.value.name)
-) {
-  throw new Error('package.json not parsed correctly');
-}
+  const packageJson = Json.parse(packageJsonStr);
 
-export const REPO: string = packageJson.value.name;
+  if (Result.isErr(packageJson)) {
+    throw new Error(packageJson.value);
+  }
+
+  if (
+    !isRecord(packageJson.value) ||
+    !hasKey(packageJson.value, 'name') ||
+    !isString(packageJson.value.name)
+  ) {
+    throw new Error('package.json not parsed correctly');
+  }
+
+  return packageJson.value.name;
+};
+
+export const REPO: string = await getRepoName();
 
 const githubDir = path.resolve(process.cwd(), './github');
 
