@@ -553,7 +553,7 @@ const transformTypeReferenceNode = (
       T.isKind(tsm.SyntaxKind.ArrayType) ||
       T.isKind(tsm.SyntaxKind.TupleType)
     ) {
-      const readonlyText = `readonly ${T.getFullText()}`;
+      const readonlyText = `readonly ${T.getFullText()}` as const;
 
       options.replaceNode(
         node,
@@ -631,7 +631,7 @@ const transformTypeReferenceNode = (
       T.isKind(tsm.SyntaxKind.ArrayType) &&
       isAtomicTypeNode(T.getElementTypeNode())
     ) {
-      const readonlyText = `readonly ${T.getFullText()}`;
+      const readonlyText = `readonly ${T.getFullText()}` as const;
 
       options.replaceNode(
         node,
@@ -649,7 +649,7 @@ const transformTypeReferenceNode = (
       T.isKind(tsm.SyntaxKind.TupleType) &&
       T.getElements().every(isAtomicTypeNode)
     ) {
-      const readonlyText = `readonly ${T.getFullText()}`;
+      const readonlyText = `readonly ${T.getFullText()}` as const;
 
       options.replaceNode(
         node,
@@ -705,7 +705,7 @@ const transformArrayTypeNode = (
     case 'Readonly':
     case 'none':
       if (readonlyContext.indexedAccessDepth === 0) {
-        const readonlyText = `readonly ${node.getFullText()}`;
+        const readonlyText = `readonly ${node.getFullText()}` as const;
 
         options.replaceNode(
           node,
@@ -752,7 +752,7 @@ const transformTupleTypeNode = (
     case 'Readonly':
     case 'none':
       if (readonlyContext.indexedAccessDepth === 0) {
-        const readonlyText = `readonly ${node.getFullText()}`;
+        const readonlyText = `readonly ${node.getFullText()}` as const;
 
         options.replaceNode(
           node,
