@@ -1,3 +1,9 @@
+## [4.7.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.1...v4.7.2) (2026-03-02)
+
+### Bug Fixes
+
+- bump eslint from 9.39.2 to 9.39.3 ([#262](https://github.com/noshiro-pf/eslint-config-typed/issues/262)) ([2862935](https://github.com/noshiro-pf/eslint-config-typed/commit/28629359c2aea4b73c3b2bb5a837492ddeb9b605))
+
 ## [4.7.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.0...v4.7.1) (2026-03-02)
 
 ### Bug Fixes
