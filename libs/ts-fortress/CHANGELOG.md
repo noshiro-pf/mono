@@ -1,3 +1,9 @@
+## [6.4.1](https://github.com/noshiro-pf/ts-fortress/compare/v6.4.0...v6.4.1) (2026-03-02)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.4.0 to 6.5.0 ([#231](https://github.com/noshiro-pf/ts-fortress/issues/231)) ([019d0bb](https://github.com/noshiro-pf/ts-fortress/commit/019d0bbee380a337e9928780e5780d18fa9b5d40))
+
 # [6.4.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.3.0...v6.4.0) (2026-02-11)
 
 ### Features
