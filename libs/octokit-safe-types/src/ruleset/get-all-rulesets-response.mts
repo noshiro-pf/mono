@@ -14,6 +14,7 @@ expectType<
   >[number]
 >('=');
 
+// transformer-ignore-next-line convert-to-readonly
 expectType<
   components['schemas']['repository-ruleset'][],
   paths['/repos/{owner}/{repo}/rulesets']['get']['responses']['200']['content']['application/json']
