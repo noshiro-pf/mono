@@ -1,3 +1,9 @@
+# [4.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.4...v4.7.0) (2026-03-02)
+
+### Features
+
+- update eslint plugins and repo rulesets ([#259](https://github.com/noshiro-pf/eslint-config-typed/issues/259)) ([6955506](https://github.com/noshiro-pf/eslint-config-typed/commit/6955506b9db06bb5df522918fd191d90eac0c67f))
+
 ## [4.6.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.3...v4.6.4) (2026-02-23)
 
 ### Bug Fixes
