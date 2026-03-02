@@ -70,6 +70,10 @@
             "integration_id": 15368
           },
           {
+            "context": "codemod",
+            "integration_id": 15368
+          },
+          {
             "context": "test (test)",
             "integration_id": 15368
           },
