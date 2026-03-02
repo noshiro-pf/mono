@@ -49,11 +49,11 @@ jobs:
       # skip each step instead of skipping the entire workflow with paths-ignore.
       - name: Check diff
         id: check_diff_type
-        run: pnpm exec check-should-run-type-checks
+        run: pnpm run z:check-should-run-type-checks
 
-      - name: Run build
+      - name: Run codemod
         if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm codemod:full
 
       - name: Check if there is no file diff
-        run: pnpm exec assert-repo-is-clean
+        run: pnpm run z:assert-repo-is-clean
