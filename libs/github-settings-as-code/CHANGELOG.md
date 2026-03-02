@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.9...v1.2.0) (2026-03-02)
+
+### Features
+
+- support REPO_NAME env value ([#79](https://github.com/noshiro-pf/github-settings-as-code/issues/79)) ([fa22b34](https://github.com/noshiro-pf/github-settings-as-code/commit/fa22b34012e239e2b0a58eb8abfa15ba84cf3a1a))
+
 ## [1.1.9](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.1.8...v1.1.9) (2026-02-23)
 
 ### Bug Fixes
