@@ -2,7 +2,7 @@ name: Style Check
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push events (excluding develop branches) and manual runs
   push:
     branches-ignore:
       - 'develop'
