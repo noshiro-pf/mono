@@ -45,6 +45,12 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
+    startMessage: 'Running codemod',
+    action: () => runCmdStep('pnpm run codemod:full', 'Codemod failed'),
+    successMessage: 'Codemod applied',
+  });
+
+  await logStep({
     startMessage: 'Generating documentation',
     action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
     successMessage: 'Documentation generated',
