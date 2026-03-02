@@ -63,6 +63,45 @@ describe('Transformer-specific ignore comments (Integration)', () => {
       `,
     },
     {
+      name: 'ts-codemod-ignore-next-line pattern',
+      source: dedent`
+        // ts-codemod-ignore-next-line replace-any-with-unknown
+        type A = any; // Should remain any
+        const b = [1, 2, 3]; // Should have as const
+      `,
+      expected: dedent`
+        // ts-codemod-ignore-next-line replace-any-with-unknown
+        type A = any; // Should remain any
+        const b = [1, 2, 3] as const; // Should have as const
+      `,
+    },
+    {
+      name: 'codemod-ignore-next-line pattern',
+      source: dedent`
+        // codemod-ignore-next-line replace-any-with-unknown
+        type A = any; // Should remain any
+        type B = number[];
+      `,
+      expected: dedent`
+        // codemod-ignore-next-line replace-any-with-unknown
+        type A = any; // Should remain any
+        type B = readonly number[];
+      `,
+    },
+    {
+      name: 'transform-ignore-next-line pattern',
+      source: dedent`
+        // transform-ignore-next-line append-as-const
+        const b = [1, 2, 3]; // Should remain without as const
+        type A = any;
+      `,
+      expected: dedent`
+        // transform-ignore-next-line append-as-const
+        const b = [1, 2, 3]; // Should remain without as const
+        type A = unknown;
+      `,
+    },
+    {
       name: 'Ignore specific transformer for entire file',
       source: dedent`
         /* transformer-ignore replace-any-with-unknown */
@@ -77,6 +116,51 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         const b = [1, 2, 3] as const; // Should have as const
         type C = readonly number[]; // Should be readonly
         type D = any; // Should remain any
+      `,
+    },
+    {
+      name: 'ts-codemod-ignore for entire file',
+      source: dedent`
+        /* ts-codemod-ignore replace-any-with-unknown */
+        type A = any; // Should remain any
+        const b = [1, 2, 3]; // Should have as const
+        type D = any; // Should remain any
+      `,
+      expected: dedent`
+        /* ts-codemod-ignore replace-any-with-unknown */
+        type A = any; // Should remain any
+        const b = [1, 2, 3] as const; // Should have as const
+        type D = any; // Should remain any
+      `,
+    },
+    {
+      name: 'codemod-ignore for entire file',
+      source: dedent`
+        /* codemod-ignore convert-to-readonly */
+        type A = any;
+        const b = [1, 2, 3];
+        type C = number[]; // Should remain mutable
+      `,
+      expected: dedent`
+        /* codemod-ignore convert-to-readonly */
+        type A = unknown;
+        const b = [1, 2, 3] as const;
+        type C = number[]; // Should remain mutable
+      `,
+    },
+    {
+      name: 'transform-ignore for entire file',
+      source: dedent`
+        /* transform-ignore append-as-const */
+        type A = any;
+        const b = [1, 2, 3]; // Should remain without as const
+        type C = number[];
+      `,
+      expected: dedent`
+        /* transform-ignore append-as-const */
+        type A = unknown;
+        const b = [1, 2, 3]; // Should remain without as const
+        type C = readonly number[];
       `,
     },
     {
@@ -183,6 +267,51 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type A = any; // Should remain any
         const b = [1, 2, 3]; // Should remain without as const
         type C = number[]; // Should remain mutable
+      `,
+    },
+    {
+      name: 'ts-codemod-ignore for entire file',
+      source: dedent`
+        /* ts-codemod-ignore replace-any-with-unknown */
+        type A = any; // Should remain any
+        const b = [1, 2, 3]; // Should have as const
+        type D = any; // Should remain any
+      `,
+      expected: dedent`
+        /* ts-codemod-ignore replace-any-with-unknown */
+        type A = any; // Should remain any
+        const b = [1, 2, 3] as const; // Should have as const
+        type D = any; // Should remain any
+      `,
+    },
+    {
+      name: 'codemod-ignore for entire file',
+      source: dedent`
+        /* codemod-ignore convert-to-readonly */
+        type A = any;
+        const b = [1, 2, 3];
+        type C = number[]; // Should remain mutable
+      `,
+      expected: dedent`
+        /* codemod-ignore convert-to-readonly */
+        type A = unknown;
+        const b = [1, 2, 3] as const;
+        type C = number[]; // Should remain mutable
+      `,
+    },
+    {
+      name: 'transform-ignore for entire file',
+      source: dedent`
+        /* transform-ignore append-as-const */
+        type A = any;
+        const b = [1, 2, 3]; // Should remain without as const
+        type C = number[];
+      `,
+      expected: dedent`
+        /* transform-ignore append-as-const */
+        type A = unknown;
+        const b = [1, 2, 3]; // Should remain without as const
+        type C = readonly number[];
       `,
     },
   ])('$name', testFn);

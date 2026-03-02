@@ -1,9 +1,9 @@
 import * as tsm from 'ts-morph';
-import { IGNORE_LINE_COMMENT_PREFIX } from '../constants/index.mjs';
+import { IGNORE_LINE_COMMENT_PREFIXES } from '../constants/index.mjs';
 
 /**
- * Checks if a given ts-morph Node is immediately preceded by a
- * '// transformer-ignore-next-line' comment, optionally filtered by transformer name(s).
+ * Checks if a given ts-morph Node is immediately preceded by an ignore-next-line comment,
+ * optionally filtered by transformer name(s).
  *
  * @param node - The ts-morph Node to check.
  * @param transformerName - Optional transformer name to check for specific ignore directive.
@@ -12,6 +12,7 @@ import { IGNORE_LINE_COMMENT_PREFIX } from '../constants/index.mjs';
  *                          - `// transformer-ignore-next-line` (ignores all transformers)
  *                          - `// transformer-ignore-next-line append-as-const` (specific transformer)
  *                          - `// transformer-ignore-next-line append-as-const, replace-any-with-unknown` (multiple transformers)
+ *                          - Also accepts `ts-codemod-ignore-next-line`, `codemod-ignore-next-line`, `transform-ignore-next-line`
  * @returns True if the node is preceded by the ignore comment on the immediately previous line, false otherwise.
  */
 export const hasDisableNextLineComment = (
@@ -45,11 +46,16 @@ export const hasDisableNextLineComment = (
       if (commentRange.getKind() === tsm.SyntaxKind.SingleLineCommentTrivia) {
         const commentText = commentRange.getText().trim();
 
-        if (commentText.includes(IGNORE_LINE_COMMENT_PREFIX)) {
+        // Check if the comment contains any of the supported ignore prefixes
+        const matchedPrefix = IGNORE_LINE_COMMENT_PREFIXES.find((prefix) =>
+          commentText.includes(prefix),
+        );
+
+        if (matchedPrefix !== undefined) {
           // Extract the part after the prefix
           const afterPrefix = commentText
-            .slice(commentText.indexOf(IGNORE_LINE_COMMENT_PREFIX))
-            .replace(IGNORE_LINE_COMMENT_PREFIX, '')
+            .slice(commentText.indexOf(matchedPrefix))
+            .replace(matchedPrefix, '')
             .trim();
 
           // If no transformer name specified, check if comment applies to all transformers
