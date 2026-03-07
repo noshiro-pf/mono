@@ -968,20 +968,20 @@ describe(convertToReadonlyTransformer, () => {
           };
         `,
         expected: dedent`
-          let foo: Readonly<{
+          let foo: {
             a: number,
             b: readonly string[],
             c: () => string,
-            d: Readonly<{ [key: string]: readonly string[] }>,
-            [key: string]: readonly string[],
-            e: Readonly<{
+            d: { readonly [key: string]: string[] },
+            [key: string]: string[],
+            readonly e: {
               a: number,
               b: readonly string[],
               c: () => string,
-              d: Readonly<{ [key: string]: readonly string[] }>,
-              [key: string]: readonly string[],
-            }>
-          }>;
+              d: { readonly [key: string]: string[] },
+              [key: string]: string[],
+            }
+          };
         `,
       },
       {
@@ -1005,13 +1005,13 @@ describe(convertToReadonlyTransformer, () => {
           };
         `,
         expected: dedent`
-          let foo: Readonly<{
-            a: number,
-            b: readonly string[],
-            c: () => string,
-            d: Readonly<{ [key: string]: readonly string[] }>,
-            [key: string]: readonly string[]
-          }>;
+          let foo: {
+            readonly a: number,
+            readonly b: readonly string[],
+            readonly c: () => string,
+            readonly d: { readonly [key: string]: string[] },
+            readonly [key: string]: string[]
+          };
         `,
       },
       {
@@ -1148,7 +1148,7 @@ describe(convertToReadonlyTransformer, () => {
           let foo: { readonly [key: string]: number }
         `,
         expected: dedent`
-          let foo: Readonly<{ [key: string]: number }>
+          let foo: { readonly [key: string]: number }
         `,
       },
     ])('$name', testFn);
@@ -2088,20 +2088,20 @@ describe(convertToReadonlyTransformer, () => {
           `,
           expected: dedent`
             function foo() {
-              let foo: Readonly<{
+              let foo: {
                 a: number,
                 b: readonly string[],
                 c: () => string,
-                d: Readonly<{ [key: string]: readonly string[] }>,
-                e: Readonly<{ [key: string]: readonly string[] }>,
-                f: Readonly<{
+                d: { [key: string]: string[] },
+                e: { [key: string]: string[] },
+                readonly f: {
                   a: number,
                   b: readonly string[],
                   c: () => string,
-                  d: Readonly<{ [key: string]: readonly string[] }>,
-                  [key: string]: readonly string[],
-                }>
-              }>
+                  d: { [key: string]: string[] },
+                  [key: string]: string[],
+                }
+              }
             };
           `,
         },
@@ -2952,7 +2952,7 @@ describe(convertToReadonlyTransformer, () => {
           let fn: (map: Map<string, number>) => Set<string[]>
         `,
         expected: dedent`
-          let fn: (map: ReadonlyMap<string, number>) => ReadonlySet<readonly string[]>;
+          let fn: (map: Map<string, number>) => Set<string[]>
         `,
       },
       {
@@ -3236,7 +3236,7 @@ describe(convertToReadonlyTransformer, () => {
           let x = <Map<string, number[]>>{}
         `,
         expected: dedent`
-          let x = <ReadonlyMap<string, readonly number[]>>{}
+          let x = <Map<string, number[]>>{}
         `,
       },
       {
@@ -3247,7 +3247,7 @@ describe(convertToReadonlyTransformer, () => {
         `,
         expected: dedent`
           type List<T> = Readonly<{ value: T, next: List<T> | null }>;
-          let list: List<readonly number[]>;
+          let list: List<number[]>;
         `,
       },
       {
@@ -3256,7 +3256,7 @@ describe(convertToReadonlyTransformer, () => {
           type Tree<T> = { value: T; children: Tree<T>[] }; let tree: Tree<{ id: number[] }>;
         `,
         expected: dedent`
-          type Tree<T> = Readonly<{ value: T; children: readonly Tree<T>[] }>; let tree: Tree<Readonly<{ id: readonly number[] }>>;
+          type Tree<T> = Readonly<{ value: T; children: readonly Tree<T>[] }>; let tree: Tree<{ id: number[] }>;
         `,
       },
       {
@@ -3711,6 +3711,58 @@ describe(convertToReadonlyTransformer, () => {
         `,
         expected: dedent`
           const handler = (draft: Event[], event: readonly CustomEvent[]) => {};
+        `,
+      },
+    ])('$name', testFn);
+  });
+
+  describe('let declarations (should not apply readonly conversion)', () => {
+    test.each([
+      {
+        name: 'let with array type',
+        source: 'let foo: number[] = [1, 2, 3];',
+        expected: 'let foo: number[] = [1, 2, 3];',
+      },
+      {
+        name: 'let with object type',
+        source: 'let bar: { a: number; b: string } = { a: 1, b: "test" };',
+        expected: 'let bar: { a: number; b: string } = { a: 1, b: "test" };',
+      },
+      {
+        name: 'let with nested array type',
+        source: 'let nested: number[][] = [[1, 2], [3, 4]];',
+        expected: 'let nested: number[][] = [[1, 2], [3, 4]];',
+      },
+      {
+        name: 'let with ReadonlyArray (normalization only)',
+        source: 'let foo: ReadonlyArray<number> = [1, 2, 3];',
+        expected: 'let foo: readonly number[] = [1, 2, 3];',
+      },
+      {
+        name: 'let with already readonly modifier (preserve)',
+        source: 'let bar: { readonly a: number } = { a: 1 };',
+        expected: 'let bar: { readonly a: number } = { a: 1 };',
+      },
+      {
+        name: 'mixed const and let',
+        source: dedent`
+          const constArray: number[] = [1, 2, 3];
+          let letArray: string[] = ["a", "b", "c"];
+        `,
+        expected: dedent`
+          const constArray: readonly number[] = [1, 2, 3];
+          let letArray: string[] = ["a", "b", "c"];
+        `,
+      },
+      {
+        name: 'let with type alias',
+        source: dedent`
+          type MyArray = number[];
+          let foo: MyArray = [1, 2, 3];
+        `,
+        expected: dedent`
+          type MyArray = readonly number[];
+          let foo: MyArray = [1, 2, 3];
         `,
       },
     ])('$name', testFn);

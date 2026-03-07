@@ -713,6 +713,37 @@ describe(appendAsConstTransformer, () => {
     ])('$name', testFn);
   });
 
+  describe('let declarations (should not apply as const)', () => {
+    test.each([
+      {
+        name: 'let with array',
+        source: 'let foo = [1, 2, 3];',
+        expected: 'let foo = [1, 2, 3];',
+      },
+      {
+        name: 'let with object',
+        source: 'let bar = { a: 1, b: 2 };',
+        expected: 'let bar = { a: 1, b: 2 };',
+      },
+      {
+        name: 'let with nested array',
+        source: 'let nested = [[1, 2], [3, 4]];',
+        expected: 'let nested = [[1, 2], [3, 4]];',
+      },
+      {
+        name: 'mixed const and let',
+        source: dedent`
+          const constArray = [1, 2, 3];
+          let letArray = [4, 5, 6];
+        `,
+        expected: dedent`
+          const constArray = [1, 2, 3] as const;
+          let letArray = [4, 5, 6];
+        `,
+      },
+    ])('$name', testFn);
+  });
+
   describe('Additional edge cases', () => {
     test.each([
       {

@@ -161,6 +161,67 @@ const initialReadonlyContext: ReadonlyContext = {
   indexedAccessDepth: 0,
 } as const;
 
+/**
+ * Check if a TypeNode is part of a let variable declaration's type annotation
+ */
+const isTypeNodeInLetDeclaration = (node: tsm.Node): boolean => {
+  if (!tsm.Node.isTypeNode(node)) {
+    return false;
+  }
+
+  const variableDecl = node.getFirstAncestorByKind(
+    tsm.SyntaxKind.VariableDeclaration,
+  );
+
+  if (variableDecl === undefined) {
+    return false;
+  }
+
+  const declarationKindKeywords = variableDecl
+    .getVariableStatement()
+    ?.getDeclarationKindKeywords()
+    .map((k) => k.getText());
+
+  if (
+    declarationKindKeywords === undefined ||
+    !Arr.isArrayOfLength(declarationKindKeywords, 1) ||
+    declarationKindKeywords[0] !== 'let'
+  ) {
+    return false;
+  }
+
+  // Check if this is part of type annotation, not initializer
+  const typeNode = variableDecl.getTypeNode();
+
+  const initializer = variableDecl.getInitializer();
+
+  // Skip if it's in type annotation
+  if (
+    typeNode !== undefined &&
+    node.getPos() >= typeNode.getPos() &&
+    node.getEnd() <= typeNode.getEnd()
+  ) {
+    return true;
+  }
+
+  // Skip if it's in type assertion/assertion expressions in initializer
+  if (initializer !== undefined) {
+    const typeAssertion = node.getFirstAncestorByKind(
+      tsm.SyntaxKind.AsExpression,
+    );
+
+    const typeAssertionOld = node.getFirstAncestorByKind(
+      tsm.SyntaxKind.TypeAssertionExpression,
+    );
+
+    if (typeAssertion !== undefined || typeAssertionOld !== undefined) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 const transformNode = (
   node: tsm.Node,
   readonlyContext: ReadonlyContext,
@@ -433,6 +494,25 @@ const transformTypeReferenceNode = (
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const T = node.getTypeArguments()[0]!;
 
+    const isInLetDeclaration = isTypeNodeInLetDeclaration(node);
+
+    // For let declarations, only normalize ReadonlyArray -> readonly [], but don't convert Array -> readonly []
+    if (isInLetDeclaration) {
+      if (typeNameStr === 'ReadonlyArray') {
+        // Normalize ReadonlyArray to readonly [] even for let
+        options.replaceNode(
+          node,
+          wrapWithParentheses(
+            `readonly ${wrapWithParentheses(T.getFullText())}[]`,
+          ),
+        );
+      }
+
+      // For Array, skip conversion for let declarations
+      return;
+    }
+
+    // For non-let declarations, apply readonly conversion
     options.replaceNode(
       node,
       readonlyContext.type === 'DeepReadonly'
@@ -463,6 +543,13 @@ const transformTypeReferenceNode = (
       options,
     );
 
+    // Skip readonly conversion for let declarations
+    if (isTypeNodeInLetDeclaration(node)) {
+      options.debugPrint('skipped readonly conversion for let declaration');
+
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const T = node.getTypeArguments()[0]!;
 
@@ -491,6 +578,13 @@ const transformTypeReferenceNode = (
     }
 
     const [K, V] = node.getTypeArguments();
+
+    // Skip readonly conversion for let declarations
+    if (isTypeNodeInLetDeclaration(node)) {
+      options.debugPrint('skipped readonly conversion for let declaration');
+
+      return;
+    }
 
     options.replaceNode(
       node,
@@ -717,6 +811,13 @@ const transformArrayTypeNode = (
         readonlyContext.indexedAccessDepth === 0 &&
         !isConditionalTypeDistributionGuard(node)
       ) {
+        // Skip readonly conversion for let declarations
+        if (isTypeNodeInLetDeclaration(node)) {
+          options.debugPrint('skipped readonly conversion for let declaration');
+
+          return;
+        }
+
         const readonlyText = `readonly ${node.getFullText()}` as const;
 
         options.replaceNode(
@@ -769,6 +870,13 @@ const transformTupleTypeNode = (
         readonlyContext.indexedAccessDepth === 0 &&
         !isConditionalTypeDistributionGuard(node)
       ) {
+        // Skip readonly conversion for let declarations
+        if (isTypeNodeInLetDeclaration(node)) {
+          options.debugPrint('skipped readonly conversion for let declaration');
+
+          return;
+        }
+
         const readonlyText = `readonly ${node.getFullText()}` as const;
 
         options.replaceNode(
@@ -870,7 +978,7 @@ const transformTypeLiteralNode = (
   // Recursive processing
   transformMembers(
     node.getMembers(),
-    'remove',
+    isTypeNodeInLetDeclaration(node) ? 'keep' : 'remove',
     nextReadonlyContext({
       currentReadonlyContext: readonlyContext,
       nextReadonlyContextType: 'none',
@@ -887,6 +995,13 @@ const transformTypeLiteralNode = (
 
     case 'none': {
       if (readonlyContext.indexedAccessDepth === 0) {
+        // Skip readonly conversion for let declarations
+        if (isTypeNodeInLetDeclaration(node)) {
+          options.debugPrint('skipped readonly conversion for let declaration');
+
+          return;
+        }
+
         // `{ readonly x: X, readonly y: Y } |-> Readonly<{ x: X, y: Y }>`
         options.replaceNode(node, `Readonly<${node.getFullText()}>`);
       }
@@ -1350,7 +1465,7 @@ const transformParenthesizedTypeNode = (
 const transformMembers = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   members: readonly tsm.TypeElementTypes[],
-  readonlyModifier: 'add' | 'remove',
+  readonlyModifier: 'add' | 'keep' | 'remove',
   readonlyContext: StrictExtract<
     ReadonlyContext,
     Readonly<{
@@ -1398,7 +1513,7 @@ const transformMembers = (
 const transformPropertySignature = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.PropertySignature,
-  readonlyModifier: 'add' | 'remove',
+  readonlyModifier: 'add' | 'keep' | 'remove',
   readonlyContext: StrictExtract<
     ReadonlyContext,
     Readonly<{
@@ -1408,14 +1523,22 @@ const transformPropertySignature = (
   >,
   options: ReadonlyTransformerOptionsInternal,
 ): void => {
+  // Skip readonly modifier changes for let declarations or when 'keep' is specified
+  const isInLetDeclaration = isTypeNodeInLetDeclaration(node);
+
+  const shouldKeepReadonly = readonlyModifier === 'keep' || isInLetDeclaration;
+
   if (
     readonlyModifier === 'remove' ||
     readonlyContext.type === 'DeepReadonly'
   ) {
-    node.setIsReadonly(false);
-  } else {
+    if (!shouldKeepReadonly) {
+      node.setIsReadonly(false);
+    }
+  } else if (readonlyModifier === 'add' && !shouldKeepReadonly) {
     node.setIsReadonly(true);
   }
+  // If 'keep', don't modify readonly status
 
   {
     const type = node.getTypeNode();
@@ -1429,7 +1552,7 @@ const transformPropertySignature = (
 const transformIndexSignatureDeclaration = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.IndexSignatureDeclaration,
-  readonlyModifier: 'add' | 'remove',
+  readonlyModifier: 'add' | 'keep' | 'remove',
   readonlyContext: StrictExtract<
     ReadonlyContext,
     Readonly<{
@@ -1445,16 +1568,24 @@ const transformIndexSignatureDeclaration = (
     return;
   }
 
+  // Skip readonly modifier changes for let declarations or when 'keep' is specified
+  const isInLetDeclaration = isTypeNodeInLetDeclaration(node);
+
+  const shouldKeepReadonly = readonlyModifier === 'keep' || isInLetDeclaration;
+
   if (
     readonlyModifier === 'remove' ||
     readonlyContext.type === 'DeepReadonly'
   ) {
-    // node.setIsReadonly(false);
-    node.toggleModifier('readonly', false);
-  } else {
+    if (!shouldKeepReadonly) {
+      // node.setIsReadonly(false);
+      node.toggleModifier('readonly', false);
+    }
+  } else if (readonlyModifier === 'add' && !shouldKeepReadonly) {
     node.toggleModifier('readonly', true);
     // node.setIsReadonly(true);
   }
+  // If 'keep', don't modify readonly status
 
   {
     const key = node.getKeyTypeNode();
