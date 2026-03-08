@@ -1,3 +1,9 @@
+## [2.1.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.0...v2.1.1) (2026-03-08)
+
+### Bug Fixes
+
+- fix runTransformerCLI to handle uncommitted option correctly ([#58](https://github.com/noshiro-pf/ts-codemod-lib/issues/58)) ([c7cb237](https://github.com/noshiro-pf/ts-codemod-lib/commit/c7cb2378aef94a0db92db64264fbf9af0ab9ba05))
+
 # [2.1.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.0.5...v2.1.0) (2026-03-02)
 
 ### Features
