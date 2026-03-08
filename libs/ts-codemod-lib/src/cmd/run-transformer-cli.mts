@@ -6,6 +6,7 @@ import {
   getModifiedFiles,
   getStagedFiles,
   getUntrackedFiles,
+  glob,
 } from 'ts-repo-utils';
 import {
   transformSourceCode,
@@ -175,6 +176,7 @@ const getFilesFromGlob = async (
 > => {
   const globResult = await glob(baseDir, {
     ignore: exclude,
+    absolute: true,
   });
 
   if (Result.isErr(globResult)) {
