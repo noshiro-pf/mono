@@ -239,7 +239,7 @@ importers:
         version: 25.0.3(typescript@5.9.3)
       ts-codemod-lib:
         specifier: ^2.0.5
-        version: 2.0.5(cmd-ts@0.14.3)(dedent@1.7.1)(ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
+        version: 2.0.5(cmd-ts@0.14.3)(dedent@1.7.1)(ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
       ts-fortress:
         specifier: 6.4.0
         version: 6.4.0(typescript@5.9.3)
@@ -247,8 +247,8 @@ importers:
         specifier: 27.0.2
         version: 27.0.2
       ts-repo-utils:
-        specifier: 8.2.0
-        version: 8.2.0(prettier@3.8.1)(typescript@5.9.3)
+        specifier: 9.0.0
+        version: 9.0.0(prettier@3.8.1)(typescript@5.9.3)
       ts-type-forge:
         specifier: 2.3.1
         version: 2.3.1
@@ -1717,6 +1717,9 @@ packages:
 
   cmd-ts@0.14.3:
     resolution: {integrity: sha512-i9miaLBHGPn4T4vUFUdAdWoQ9HI8ato6usFrhubO21o/MQGqI6Nsqyd4ncZusT2chvPetNMmTt0JWkbaAOdWPg==}
+
+  cmd-ts@0.15.0:
+    resolution: {integrity: sha512-ASyAx+P6DNzNEZ6OYmvjjaLAQeI3L+4lm5rX2Jg8tondXdj06o9JTxi9mfC92KoVbrVFKhZ+j2TfBF8fcura6g==}
 
   code-block-writer@13.0.3:
     resolution: {integrity: sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg==}
@@ -3911,6 +3914,10 @@ packages:
     resolution: {integrity: sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==}
     engines: {node: '>=12'}
 
+  strip-ansi@7.2.0:
+    resolution: {integrity: sha512-yDPMNjp4WyfYBkHnjIRLfca1i6KMyGCtsVgoKe/z1+6vukgaENdgGBZt+ZmKPc4gavvEZ5OgHfHdrazhgNyG7w==}
+    engines: {node: '>=12'}
+
   strip-bom@3.0.0:
     resolution: {integrity: sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA==}
     engines: {node: '>=4'}
@@ -4056,8 +4063,8 @@ packages:
   ts-morph@27.0.2:
     resolution: {integrity: sha512-fhUhgeljcrdZ+9DZND1De1029PrE+cMkIP7ooqkLRTrRLTqcki2AstsyJm0vRNbTbVCNJ0idGlbBrfqc7/nA8w==}
 
-  ts-repo-utils@8.2.0:
-    resolution: {integrity: sha512-4ryCqIiR4tXxT51nDoeF7QGonVw86HBSfB/BpQujTzRCg+NldquTHkEOJlv0TlM6IP4xYeMFYUxVg8yyF129Ig==}
+  ts-repo-utils@9.0.0:
+    resolution: {integrity: sha512-uCmhkR5S1ntLmwXXYk3Mf/YYxdEKNOkMXqE5XuBFIkwnYNQz0jyyUnw8Xwrre6KFySx0+ntvd0M6YihJZNFsWQ==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
@@ -5831,7 +5838,7 @@ snapshots:
   cliui@9.0.1:
     dependencies:
       string-width: 7.2.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
       wrap-ansi: 9.0.2
 
   cmd-ts@0.14.3:
@@ -5839,7 +5846,17 @@ snapshots:
       chalk: 5.6.2
       debug: 4.4.3
       didyoumean: 1.2.2
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
+
+  cmd-ts@0.15.0:
+    dependencies:
+      chalk: 5.6.2
+      debug: 4.4.3
+      didyoumean: 1.2.2
+      strip-ansi: 7.2.0
     transitivePeerDependencies:
       - supports-color
 
@@ -8310,7 +8327,7 @@ snapshots:
     dependencies:
       emoji-regex: 10.6.0
       get-east-asian-width: 1.5.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   string-width@8.1.0:
     dependencies:
@@ -8376,6 +8393,10 @@ snapshots:
       ansi-regex: 5.0.1
 
   strip-ansi@7.1.2:
+    dependencies:
+      ansi-regex: 6.2.2
+
+  strip-ansi@7.2.0:
     dependencies:
       ansi-regex: 6.2.2
 
@@ -8467,14 +8488,14 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-codemod-lib@2.0.5(cmd-ts@0.14.3)(dedent@1.7.1)(ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
+  ts-codemod-lib@2.0.5(cmd-ts@0.14.3)(dedent@1.7.1)(ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
       ts-data-forge: 6.5.0(typescript@5.9.3)
       ts-morph: 27.0.2
     optionalDependencies:
       cmd-ts: 0.14.3
       dedent: 1.7.1
-      ts-repo-utils: 8.2.0(prettier@3.8.1)(typescript@5.9.3)
+      ts-repo-utils: 9.0.0(prettier@3.8.1)(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8502,12 +8523,12 @@ snapshots:
       '@ts-morph/common': 0.28.1
       code-block-writer: 13.0.3
 
-  ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3):
+  ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 7.2.0
       '@types/micromatch': 4.0.10
-      cmd-ts: 0.14.3
+      cmd-ts: 0.15.0
       fast-glob: 3.3.3
       micromatch: 4.0.8
       prettier: 3.8.1
@@ -8809,7 +8830,7 @@ snapshots:
     dependencies:
       ansi-styles: 6.2.3
       string-width: 7.2.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   xdg-basedir@5.1.0: {}
 
