@@ -108,7 +108,7 @@
     "eslint-plugin-sort-destructure-keys": "^3.0.0",
     "eslint-plugin-testing-library": "7.16.0",
     "eslint-plugin-unicorn": "63.0.0",
-    "globals": "17.3.0",
+    "globals": "17.4.0",
     "is-glob": "^4.0.3",
     "is-immutable-type": "5.0.1",
     "micromatch": "^4.0.8",
