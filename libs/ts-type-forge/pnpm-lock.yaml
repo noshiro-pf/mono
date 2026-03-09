@@ -78,8 +78,8 @@ importers:
         specifier: 6.4.0
         version: 6.4.0(typescript@5.9.3)
       ts-repo-utils:
-        specifier: 8.2.0
-        version: 8.2.0(prettier@3.8.1)(typescript@5.9.3)
+        specifier: 9.0.0
+        version: 9.0.0(prettier@3.8.1)(typescript@5.9.3)
       tslib:
         specifier: 2.8.1
         version: 2.8.1
@@ -1518,8 +1518,8 @@ packages:
     resolution: {integrity: sha512-k7ndgKhwoQveBL+/1tqGJYNz097I7WOvwbmmU2AR5+magtbjPWQTS1C5vzGkBC8Ym8UWRzfKUzUUqFLypY4Q+w==}
     engines: {node: '>=20'}
 
-  cmd-ts@0.14.3:
-    resolution: {integrity: sha512-i9miaLBHGPn4T4vUFUdAdWoQ9HI8ato6usFrhubO21o/MQGqI6Nsqyd4ncZusT2chvPetNMmTt0JWkbaAOdWPg==}
+  cmd-ts@0.15.0:
+    resolution: {integrity: sha512-ASyAx+P6DNzNEZ6OYmvjjaLAQeI3L+4lm5rX2Jg8tondXdj06o9JTxi9mfC92KoVbrVFKhZ+j2TfBF8fcura6g==}
 
   color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -3692,6 +3692,10 @@ packages:
     resolution: {integrity: sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==}
     engines: {node: '>=12'}
 
+  strip-ansi@7.2.0:
+    resolution: {integrity: sha512-yDPMNjp4WyfYBkHnjIRLfca1i6KMyGCtsVgoKe/z1+6vukgaENdgGBZt+ZmKPc4gavvEZ5OgHfHdrazhgNyG7w==}
+    engines: {node: '>=12'}
+
   strip-bom@3.0.0:
     resolution: {integrity: sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA==}
     engines: {node: '>=4'}
@@ -3817,8 +3821,8 @@ packages:
     resolution: {integrity: sha512-GbV2LEkzjmzCDd7mSu9oQXIZdG3lBXU4q8y1qztf09nwoUEP6FgF12C1UYxqoCj8KriRqtwgIMCWie7uV/E+Hg==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
-  ts-repo-utils@8.2.0:
-    resolution: {integrity: sha512-4ryCqIiR4tXxT51nDoeF7QGonVw86HBSfB/BpQujTzRCg+NldquTHkEOJlv0TlM6IP4xYeMFYUxVg8yyF129Ig==}
+  ts-repo-utils@9.0.0:
+    resolution: {integrity: sha512-uCmhkR5S1ntLmwXXYk3Mf/YYxdEKNOkMXqE5XuBFIkwnYNQz0jyyUnw8Xwrre6KFySx0+ntvd0M6YihJZNFsWQ==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
@@ -5629,15 +5633,15 @@ snapshots:
   cliui@9.0.1:
     dependencies:
       string-width: 7.2.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
       wrap-ansi: 9.0.2
 
-  cmd-ts@0.14.3:
+  cmd-ts@0.15.0:
     dependencies:
       chalk: 5.6.2
       debug: 4.4.3
       didyoumean: 1.2.2
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
     transitivePeerDependencies:
       - supports-color
 
@@ -8138,7 +8142,7 @@ snapshots:
     dependencies:
       emoji-regex: 10.6.0
       get-east-asian-width: 1.4.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   string-width@8.1.0:
     dependencies:
@@ -8204,6 +8208,10 @@ snapshots:
       ansi-regex: 5.0.1
 
   strip-ansi@7.1.2:
+    dependencies:
+      ansi-regex: 6.2.2
+
+  strip-ansi@7.2.0:
     dependencies:
       ansi-regex: 6.2.2
 
@@ -8318,12 +8326,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3):
+  ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 7.2.0
       '@types/micromatch': 4.0.10
-      cmd-ts: 0.14.3
+      cmd-ts: 0.15.0
       fast-glob: 3.3.3
       micromatch: 4.0.8
       prettier: 3.8.1
@@ -8645,7 +8653,7 @@ snapshots:
     dependencies:
       ansi-styles: 6.2.3
       string-width: 7.2.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   ws@8.19.0:
     optional: true
