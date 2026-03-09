@@ -112,7 +112,7 @@
     "@vitest/ui": "4.0.18",
     "conventional-changelog-conventionalcommits": "9.2.0",
     "cspell": "9.6.4",
-    "dedent": "1.7.1",
+    "dedent": "1.7.2",
     "eslint": "9.39.3",
     "eslint-config-typed": "4.6.4",
     "github-settings-as-code": "1.1.9",

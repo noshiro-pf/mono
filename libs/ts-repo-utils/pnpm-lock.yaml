@@ -79,8 +79,8 @@ importers:
         specifier: 9.6.4
         version: 9.6.4
       dedent:
-        specifier: 1.7.1
-        version: 1.7.1
+        specifier: 1.7.2
+        version: 1.7.2
       eslint:
         specifier: 9.39.3
         version: 9.39.3(jiti@2.6.1)
@@ -119,7 +119,7 @@ importers:
         version: 25.0.3(typescript@5.9.3)
       ts-codemod-lib:
         specifier: ^2.0.5
-        version: 2.0.5(cmd-ts@0.15.0)(dedent@1.7.1)(ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
+        version: 2.0.5(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
       ts-repo-utils:
         specifier: ^8.2.0
         version: 8.2.0(prettier@3.8.1)(typescript@5.9.3)
@@ -1868,8 +1868,8 @@ packages:
   decode-named-character-reference@1.3.0:
     resolution: {integrity: sha512-GtpQYB283KrPp6nRw50q3U9/VfOutZOe103qlN7BPP6Ad27xYnOIWv4lPzo8HCAL+mMZofJ9KEy30fq6MfaK6Q==}
 
-  dedent@1.7.1:
-    resolution: {integrity: sha512-9JmrhGZpOlEgOLdQgSm0zxFaYoQon408V1v49aqTWuXENVlnCuY9JBZcXZiCsZQWDjTm5Qf/nIvAy77mXDAjEg==}
+  dedent@1.7.2:
+    resolution: {integrity: sha512-WzMx3mW98SN+zn3hgemf4OzdmyNhhhKz5Ay0pUfQiMQ3e1g+xmTJWp/pKdwKVXhdSkAEGIIzqeuWrL3mV/AXbA==}
     peerDependencies:
       babel-plugin-macros: ^3.1.0
     peerDependenciesMeta:
@@ -6191,7 +6191,7 @@ snapshots:
     dependencies:
       character-entities: 2.0.2
 
-  dedent@1.7.1: {}
+  dedent@1.7.2: {}
 
   deep-extend@0.6.0: {}
 
@@ -8632,13 +8632,13 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-codemod-lib@2.0.5(cmd-ts@0.15.0)(dedent@1.7.1)(ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
+  ts-codemod-lib@2.0.5(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@8.2.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
       ts-data-forge: 6.5.0(typescript@5.9.3)
       ts-morph: 27.0.2
     optionalDependencies:
       cmd-ts: 0.15.0
-      dedent: 1.7.1
+      dedent: 1.7.2
       ts-repo-utils: 8.2.0(prettier@3.8.1)(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
