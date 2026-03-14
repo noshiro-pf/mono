@@ -1,3 +1,9 @@
+## [6.4.2](https://github.com/noshiro-pf/ts-fortress/compare/v6.4.1...v6.4.2) (2026-03-14)
+
+### Bug Fixes
+
+- Fixed the strictRecord to be usable with mergeRecord. ([#243](https://github.com/noshiro-pf/ts-fortress/issues/243)) ([41c44ec](https://github.com/noshiro-pf/ts-fortress/commit/41c44ece247be45b4df792d146e56f41ad586ac7))
+
 ## [6.4.1](https://github.com/noshiro-pf/ts-fortress/compare/v6.4.0...v6.4.1) (2026-03-02)
 
 ### Bug Fixes
