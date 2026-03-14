@@ -17,7 +17,7 @@ class MyMap<K, V> extends Map<K, V> {}
 
 class MySet<T> extends Set<T> {}
 
-const emptyObj = {};
+const emptyObj = {} as const;
 
 type TestCase = Readonly<{
   name: string;
@@ -367,8 +367,9 @@ describe(fastDeepEqual, () => {
   describe('Maps', () => {
     const createMap = <K, V>(
       obj: ReadonlyRecord<string, V>,
+      // transformer-ignore-next-line convert-to-readonly
       MapClass: new () => Map<K, V> = Map,
-    ): Map<K, V> => {
+    ): ReadonlyMap<K, V> => {
       const mut_m = new MapClass();
 
       for (const key in obj) {
@@ -498,8 +499,9 @@ describe(fastDeepEqual, () => {
   describe('Sets', () => {
     const createSet = <T,>(
       arr: readonly T[],
+      // transformer-ignore-next-line convert-to-readonly
       SetClass: new () => Set<T> = Set,
-    ): Set<T> => {
+    ): ReadonlySet<T> => {
       const mut_s = new SetClass();
 
       for (const value of arr) {
@@ -739,7 +741,7 @@ describe(fastDeepEqual, () => {
             React.createElement('h1', { key: 'h1' }, 'Title'),
             React.createElement('h2', { key: 'h2' }, 'Subtitle'),
           ],
-        };
+        } as const;
 
         if (child.shouldComponentUpdate(sameProps)) {
           child.render();
@@ -755,7 +757,7 @@ describe(fastDeepEqual, () => {
             React.createElement('h1', { key: 'h1' }, 'New Title'),
             React.createElement('h2', { key: 'h2' }, 'Subtitle'),
           ],
-        };
+        } as const;
 
         if (child.shouldComponentUpdate(differentProps)) {
           child.render();

@@ -93,7 +93,9 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
   // Reducing a value
 
   /**
-   * Checks if all elements in the map satisfy a predicate.
+   * Checks if all elements in the map satisfy a predicate. Also supports a
+   * type predicate overload that narrows the type of values in the map if the
+   * predicate returns true for all elements.
    *
    * @example
    *
@@ -112,19 +114,11 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * assert.isTrue(isNarrowed);
    * ```
    *
+   * @template W The narrowed type of the values.
    * @param predicate A function to test each key-value pair.
    * @returns `true` if all elements satisfy the predicate, `false` otherwise.
    */
   every: ((predicate: (value: V, key: K) => boolean) => boolean) &
-    /**
-     * Checks if all elements in the map satisfy a type predicate. Narrows the
-     * type of values in the map if the predicate returns true for all
-     * elements.
-     *
-     * @template W The narrowed type of the values.
-     * @param predicate A type predicate function.
-     * @returns `true` if all elements satisfy the predicate, `false` otherwise.
-     */
     (<W extends V>(
       predicate: (value: V, key: K) => value is W,
     ) => this is IMap<K, W>);

@@ -378,5 +378,50 @@ export namespace Obj {
 
     export type PartialIfKeyIsUnion<K, T> =
       IsUnion<K> extends true ? Partial<T> : T;
+
+    /** Merges two object types where keys in B override keys in A. */
+    type MergeTwo<A extends UnknownRecord, B extends UnknownRecord> = Readonly<{
+      [K in keyof A | keyof B]: K extends keyof B
+        ? B[K]
+        : K extends keyof A
+          ? A[K]
+          : never;
+    }>;
+
+    /** Sequentially merges a tuple of object types from left to right. */
+    export type MergeAll<
+      Records extends readonly UnknownRecord[],
+      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      Acc extends UnknownRecord = {},
+    > = Records extends readonly [
+      infer First extends UnknownRecord,
+      ...infer Rest extends readonly UnknownRecord[],
+    ]
+      ? MergeAll<Rest, MergeTwo<Acc, First>>
+      : Acc;
   }
+
+  /**
+   * Merges multiple records into a single record using `Object.assign`.
+   * Later records override properties from earlier records with the same key.
+   *
+   * @example
+   *
+   * ```ts
+   * const a = { a: 0, b: 0 } as const;
+   * const b = { b: 1, c: 0 } as const;
+   *
+   * const result = Obj.merge(a, b);
+   *
+   * assert.deepStrictEqual(result, { a: 0, b: 1, c: 0 });
+   * ```
+   *
+   * @param records - The records to merge
+   * @returns A new record with all properties merged
+   */
+  export const merge = <const Records extends readonly UnknownRecord[]>(
+    ...records: Records
+  ): TsDataForgeInternals.MergeAll<Records> =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    Object.fromEntries(records.flatMap((r) => Object.entries(r))) as never;
 }

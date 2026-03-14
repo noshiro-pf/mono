@@ -181,3 +181,61 @@ describe('fromEntries', () => {
     assert.deepStrictEqual(result, { name: 'Alice' });
   });
 });
+
+describe('merge', () => {
+  test('should merge two objects, later overriding earlier', () => {
+    const a = { a: 0, b: 0 } as const;
+
+    const b = { b: 1, c: 0 } as const;
+
+    const result = Obj.merge(a, b);
+
+    expectType<typeof result, Readonly<{ a: 0; b: 1; c: 0 }>>('=');
+
+    assert.deepStrictEqual(result, { a: 0, b: 1, c: 0 });
+  });
+
+  test('should merge three objects', () => {
+    const a = { x: 1, y: 2 } as const;
+
+    const b = { y: 3, z: 4 } as const;
+
+    const c = { z: 5, w: 6 } as const;
+
+    const result = Obj.merge(a, b, c);
+
+    expectType<typeof result, Readonly<{ x: 1; y: 3; z: 5; w: 6 }>>('=');
+
+    assert.deepStrictEqual(result, { x: 1, y: 3, z: 5, w: 6 });
+  });
+
+  test('should return empty object when called with no arguments', () => {
+    const result = Obj.merge();
+
+    expectType<typeof result, {}>('=');
+
+    assert.deepStrictEqual(result, {});
+  });
+
+  test('should return the same shape for a single argument', () => {
+    const a = { a: 1, b: 2 } as const;
+
+    const result = Obj.merge(a);
+
+    expectType<typeof result, Readonly<{ a: 1; b: 2 }>>('=');
+
+    assert.deepStrictEqual(result, { a: 1, b: 2 });
+  });
+
+  test('type: later key completely overrides earlier key type', () => {
+    const a = { key: 'hello' } as const;
+
+    const b = { key: 42 } as const;
+
+    const result = Obj.merge(a, b);
+
+    expectType<typeof result, Readonly<{ key: 42 }>>('=');
+
+    assert.deepStrictEqual(result, { key: 42 });
+  });
+});

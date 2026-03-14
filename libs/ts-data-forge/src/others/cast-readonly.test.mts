@@ -64,6 +64,7 @@ describe(castDeepReadonly, () => {
   });
 
   test('should preserve runtime value for complex structures', () => {
+    // transformer-ignore-next-line convert-to-readonly
     const complex = {
       users: [{ id: 1, profile: { name: 'Alice' } }],
       settings: { theme: 'dark', options: { debug: true } },
@@ -82,6 +83,7 @@ describe(castDeepReadonly, () => {
   });
 
   test('should work with arrays of objects', () => {
+    // transformer-ignore-next-line convert-to-readonly
     const data = [
       { id: 1, meta: { active: true } },
       { id: 2, meta: { active: false } },

@@ -83,7 +83,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
   // Reducing a value
 
   /**
-   * Checks if all elements in the set satisfy a predicate.
+   * Checks if all elements in the set satisfy a predicate. Also supports a
+   * type predicate overload that narrows the type of elements in the set if
+   * the predicate returns true for all elements.
    *
    * @example
    *
@@ -101,19 +103,11 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * assert.isTrue(narrowed);
    * ```
    *
+   * @template L The narrowed type of the elements.
    * @param predicate A function to test each element.
    * @returns `true` if all elements satisfy the predicate, `false` otherwise.
    */
   every: ((predicate: (key: K) => boolean) => boolean) &
-    /**
-     * Checks if all elements in the set satisfy a type predicate. Narrows the
-     * type of elements in the set if the predicate returns true for all
-     * elements.
-     *
-     * @template L The narrowed type of the elements.
-     * @param predicate A type predicate function.
-     * @returns `true` if all elements satisfy the predicate, `false` otherwise.
-     */
     (<L extends K>(predicate: (key: K) => key is L) => this is ISet<L>);
 
   /**
@@ -234,8 +228,8 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
   map: <K2 extends MapSetKeyType>(mapFn: (key: K) => K2) => ISet<K2>;
 
   /**
-   * Filters the elements of the set based on a type predicate. Narrows the type
-   * of elements in the resulting set.
+   * Filters the elements of the set based on a predicate. Also supports a type
+   * predicate overload that narrows the type of elements in the resulting set.
    *
    * @example
    *
@@ -254,16 +248,10 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    * ```
    *
    * @template K2 The narrowed type of the elements.
-   * @param predicate A type predicate function.
-   * @returns A new ISet instance with elements that satisfy the type predicate.
+   * @param predicate A function to test each element.
+   * @returns A new ISet instance with elements that satisfy the predicate.
    */
   filter: (<K2 extends K>(predicate: (key: K) => key is K2) => ISet<K2>) &
-    /**
-     * Filters the elements of the set based on a predicate.
-     *
-     * @param predicate A function to test each element.
-     * @returns A new ISet instance with elements that satisfy the predicate.
-     */
     ((predicate: (key: K) => boolean) => ISet<K>);
 
   /**

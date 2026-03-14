@@ -129,7 +129,10 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
   // Reducing a value
 
   /**
-   * Checks if all elements in the set satisfy a predicate.
+   * Checks if all elements in the set satisfy a type predicate. Narrows the
+   * type of elements in the set if the predicate returns true for all
+   * elements.
+   *
    *
    * @example
    *
@@ -162,19 +165,11 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * assert.isTrue(narrowed);
    * ```
    *
+   * @template L The narrowed type of the elements.
    * @param predicate A function to test each element.
    * @returns `true` if all elements satisfy the predicate, `false` otherwise.
    */
   every: ((predicate: (key: K) => boolean) => boolean) &
-    /**
-     * Checks if all elements in the set satisfy a type predicate. Narrows the
-     * type of elements in the set if the predicate returns true for all
-     * elements.
-     *
-     * @template L The narrowed type of the elements.
-     * @param predicate A type predicate function.
-     * @returns `true` if all elements satisfy the predicate, `false` otherwise.
-     */
     (<L extends K>(
       predicate: (key: K) => key is L,
     ) => this is ISetMapped<L, KM>);
