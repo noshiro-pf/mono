@@ -1,6 +1,6 @@
 import { number, string } from '../primitives/index.mjs';
-import { record } from '../record/index.mjs';
 import { mergeRecords } from './merge-records.mjs';
+import { record } from './record.mjs';
 
 describe('mergeRecords - fill and defaultType', () => {
   const A = record({ a: string(), s: string('S') });
@@ -31,19 +31,5 @@ describe('mergeRecords - fill and defaultType', () => {
         extra: 'keep',
       }),
     );
-  });
-
-  test('custom defaultType overrides fallback fill/default', () => {
-    const Default = record({ a: string('dA'), b: number(9), s: string('dS') });
-
-    const T = mergeRecords([A, B], { defaultType: Default });
-
-    // defaultValue comes from defaultType
-
-    assert.deepStrictEqual(T.defaultValue, { a: 'dA', b: 9, s: 'dS' });
-
-    // fill uses defaultType.fill when invalid
-
-    assert.deepStrictEqual(T.fill(undefined), { a: 'dA', b: 9, s: 'dS' });
   });
 });

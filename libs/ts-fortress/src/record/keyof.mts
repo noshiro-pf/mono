@@ -1,9 +1,9 @@
 import { Arr, expectType, pipe } from 'ts-data-forge';
 import { enumType } from '../enum/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
-import { type RecordType, type Type } from '../type.mjs';
+import { type RecordType, type Type, type UnknownShape } from '../type.mjs';
 
-export const keyof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
+export const keyof = <const R extends UnknownShape>(
   recordType: RecordType<R>,
   options?: Partial<
     Readonly<{
@@ -20,7 +20,7 @@ export const keyof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
       : (undefinedType satisfies Type<undefined>),
   ).value as KeyofType<R>;
 
-const getKeys = <const R extends ReadonlyRecord<string, Type<unknown>>>(
+const getKeys = <const R extends UnknownShape>(
   recordType: RecordType<R>,
 ): readonly ToString<keyof R>[] =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -30,11 +30,9 @@ const getKeys = <const R extends ReadonlyRecord<string, Type<unknown>>>(
     keyof R
   >[];
 
-type KeyofTypeSub<R extends ReadonlyRecord<string, Type<unknown>>> = Type<
-  ToString<keyof R>
->;
+type KeyofTypeSub<R extends UnknownShape> = Type<ToString<keyof R>>;
 
-type KeyofType<R extends ReadonlyRecord<string, Type<unknown>>> =
+type KeyofType<R extends UnknownShape> =
   IsNever<keyof R> extends true ? Type<undefined> : KeyofTypeSub<R>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

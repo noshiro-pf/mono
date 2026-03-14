@@ -12,6 +12,7 @@ import {
   type RecordType,
   type TsFortressInternal,
   type Type,
+  type UnknownShape,
 } from '../type.mjs';
 import {
   createAssertFn,
@@ -23,7 +24,7 @@ import {
 } from '../utils/index.mjs';
 
 export const record = <
-  const R extends ReadonlyRecord<string, Type<unknown>>,
+  const R extends UnknownShape,
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
   shape: R,
@@ -262,9 +263,7 @@ export const record = <
  * User.is({ name: "John", age: 30, extra: "not allowed" }); // false
  * ```
  */
-export const strictRecord = <
-  const R extends ReadonlyRecord<string, Type<unknown>>,
->(
+export const strictRecord = <const R extends UnknownShape>(
   source: R,
   options?: Partial<
     Readonly<{

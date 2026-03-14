@@ -3,13 +3,14 @@ import {
   type ExcessPropertyBehavior,
   type RecordType,
   type Type,
+  type UnknownShape,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
 /** Creates a record type with keys omitted. */
 export const omit = <
-  const R extends ReadonlyRecord<string, Type<unknown>>,
+  const R extends UnknownShape,
   const KeysToOmit extends readonly (keyof R & string)[],
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
@@ -34,7 +35,7 @@ export const omit = <
   });
 
 export type OmittedType<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   KeysToOmit extends readonly (keyof R)[],
   ExcessValidation extends ExcessPropertyBehavior = 'strip',
 > = RecordType<Omit<R, ArrayElement<KeysToOmit>>, ExcessValidation>;

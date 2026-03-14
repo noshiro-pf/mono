@@ -1,9 +1,9 @@
 import { Arr, expectType } from 'ts-data-forge';
 import { union } from '../compose/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
-import { type RecordType, type Type } from '../type.mjs';
+import { type RecordType, type Type, type UnknownShape } from '../type.mjs';
 
-export const valueof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
+export const valueof = <const R extends UnknownShape>(
   recordType: RecordType<R>,
   options?: Partial<
     Readonly<{
@@ -29,11 +29,9 @@ export const valueof = <const R extends ReadonlyRecord<string, Type<unknown>>>(
   return undefinedType satisfies ValueOfType<R>;
 };
 
-type ValueofTypeSub<R extends ReadonlyRecord<string, Type<unknown>>> = Type<
-  R[keyof R]['defaultValue']
->;
+type ValueofTypeSub<R extends UnknownShape> = Type<R[keyof R]['defaultValue']>;
 
-type ValueOfType<R extends ReadonlyRecord<string, Type<unknown>>> =
+type ValueOfType<R extends UnknownShape> =
   IsNever<keyof R> extends true ? Type<undefined> : ValueofTypeSub<R>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

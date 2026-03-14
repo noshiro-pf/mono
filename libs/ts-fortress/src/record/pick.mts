@@ -3,13 +3,14 @@ import {
   type ExcessPropertyBehavior,
   type RecordType,
   type Type,
+  type UnknownShape,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
 /** Creates a record type with keys picked. */
 export const pick = <
-  const R extends ReadonlyRecord<string, Type<unknown>>,
+  const R extends UnknownShape,
   const KeysToPick extends readonly (keyof R & string)[],
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
@@ -34,7 +35,7 @@ export const pick = <
   });
 
 export type PickedType<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   KeysToPick extends readonly (keyof R)[],
   ExcessValidation extends ExcessPropertyBehavior = 'strip',
 > = RecordType<Pick<R, ArrayElement<KeysToPick>>, ExcessValidation>;

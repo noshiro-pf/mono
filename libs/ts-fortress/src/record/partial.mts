@@ -3,6 +3,7 @@ import {
   type ExcessPropertyBehavior,
   type RecordType,
   type Type,
+  type UnknownShape,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { optional, type OptionalPropertyType } from './optional.mjs';
@@ -13,7 +14,7 @@ import { record } from './record.mjs';
  * optional, otherwise, all properties are optional.
  */
 export const partial = <
-  const R extends ReadonlyRecord<string, Type<unknown>>,
+  const R extends UnknownShape,
   const KeysToBeOptional extends NonEmptyArray<keyof R & string>,
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
@@ -43,10 +44,7 @@ export const partial = <
       Object.entries(recordType.shape).map(
         ([k, v]) => [k, keysToBeOptional.has(k) ? optional(v) : v] as const,
       ),
-    ) satisfies ReadonlyRecord<string, Type<unknown>> as PartialTypeShape<
-      R,
-      KeysToBeOptional
-    >;
+    ) satisfies UnknownShape as PartialTypeShape<R, KeysToBeOptional>;
 
   return record(partialShape, {
     typeName: typeNameFilled,
@@ -58,25 +56,26 @@ export const partial = <
 };
 
 type PartialTypeShape<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined,
 > =
   TypeEq<KeysToBeOptional, undefined> extends true
     ? FullyOptionalType<R>
     : PartiallyOptionalType<R, ArrayElement<KeysToBeOptional>>;
 
-type FullyOptionalType<R extends ReadonlyRecord<string, Type<unknown>>> =
-  Readonly<{ [P in keyof R]: OptionalPropertyType<R[P]> }>;
+type FullyOptionalType<R extends UnknownShape> = Readonly<{
+  [P in keyof R]: OptionalPropertyType<R[P]>;
+}>;
 
 type PartiallyOptionalType<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   K extends keyof R,
 > = Readonly<{
   [P in keyof R]: P extends K ? OptionalPropertyType<R[P]> : R[P];
 }>;
 
 export type PartialType<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined,
   ExcessValidation extends ExcessPropertyBehavior = 'strip',
 > = RecordType<PartialTypeShape<R, KeysToBeOptional>, ExcessValidation>;

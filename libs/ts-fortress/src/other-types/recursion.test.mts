@@ -1,11 +1,12 @@
 import { expectType } from 'ts-data-forge';
 import { array } from '../array/index.mjs';
 import { brandedString } from '../brand/index.mjs';
-import { mergeRecords, union } from '../compose/index.mjs';
+import { union } from '../compose/index.mjs';
 import { boolean, nullType, number, string } from '../primitives/index.mjs';
 import {
   keyof,
   keyValueRecord,
+  mergeRecords,
   omit,
   optional,
   partial,

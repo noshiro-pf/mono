@@ -3,6 +3,7 @@ import {
   type ExcessPropertyBehavior,
   type RecordType,
   type Type,
+  type UnknownShape,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import {
@@ -17,7 +18,7 @@ import { record } from './record.mjs';
  * made required, otherwise, all properties are made required.
  */
 export const required = <
-  const R extends ReadonlyRecord<string, Type<unknown>>,
+  const R extends UnknownShape,
   const KeysToBeRequired extends NonEmptyArray<keyof R & string>,
   const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
@@ -47,10 +48,7 @@ export const required = <
       Object.entries(recordType.shape).map(
         ([k, v]) => [k, keysToBeRequired.has(k) ? makeRequired(v) : v] as const,
       ),
-    ) satisfies ReadonlyRecord<string, Type<unknown>> as RequiredTypeShape<
-      R,
-      KeysToBeRequired
-    >;
+    ) satisfies UnknownShape as RequiredTypeShape<R, KeysToBeRequired>;
 
   return record(requiredShape, {
     typeName: typeNameFilled,
@@ -73,25 +71,26 @@ const makeRequired = <T extends Type<unknown>>(
     : t;
 
 type RequiredTypeShape<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
 > =
   TypeEq<KeysToBeRequired, undefined> extends true
     ? FullyRequiredType<R>
     : PartiallyRequiredType<R, ArrayElement<KeysToBeRequired>>;
 
-type FullyRequiredType<R extends ReadonlyRecord<string, Type<unknown>>> =
-  Readonly<{ [P in keyof R]: RequiredPropertyType<R[P]> }>;
+type FullyRequiredType<R extends UnknownShape> = Readonly<{
+  [P in keyof R]: RequiredPropertyType<R[P]>;
+}>;
 
 type PartiallyRequiredType<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   K extends keyof R,
 > = Readonly<{
   [P in keyof R]: P extends K ? RequiredPropertyType<R[P]> : R[P];
 }>;
 
 export type RequiredType<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
   ExcessValidation extends ExcessPropertyBehavior = 'strip',
 > = RecordType<RequiredTypeShape<R, KeysToBeRequired>, ExcessValidation>;

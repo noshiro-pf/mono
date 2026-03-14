@@ -1,5 +1,6 @@
 export * from './key-value-record.mjs';
 export * from './keyof.mjs';
+export * from './merge-records.mjs';
 export * from './omit.mjs';
 export * from './optional.mjs';
 export * from './partial.mjs';

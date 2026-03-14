@@ -41,8 +41,10 @@ export type ExcessPropertyFillBehavior = Extract<
   'allow' | 'strip'
 >;
 
+export type UnknownShape = ReadonlyRecord<string, Type<unknown>>;
+
 export type RecordType<
-  R extends ReadonlyRecord<string, Type<unknown>>,
+  R extends UnknownShape,
   ExcessPropertyValidation extends ExcessPropertyBehavior = 'strip',
 > = Type<
   ExcessPropertyValidation extends 'allow'
