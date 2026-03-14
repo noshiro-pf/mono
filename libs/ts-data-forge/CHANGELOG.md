@@ -1,3 +1,9 @@
+# [6.6.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.5.0...v6.6.0) (2026-03-14)
+
+### Features
+
+- add Obj.merge ([#320](https://github.com/noshiro-pf/ts-data-forge/issues/320)) ([3105dc1](https://github.com/noshiro-pf/ts-data-forge/commit/3105dc166b10b143637755b607115876426864ba))
+
 # [6.5.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.4.0...v6.5.0) (2026-02-13)
 
 ### Features
