@@ -1,3 +1,9 @@
+## [4.7.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.4...v4.7.5) (2026-03-16)
+
+### Bug Fixes
+
+- bump eslint-plugin-eslint-plugin from 7.3.1 to 7.3.2 ([#272](https://github.com/noshiro-pf/eslint-config-typed/issues/272)) ([90e1336](https://github.com/noshiro-pf/eslint-config-typed/commit/90e133612b2b2401364fb280f8e7fd2cc90620cc))
+
 ## [4.7.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.3...v4.7.4) (2026-03-09)
 
 ### Bug Fixes
