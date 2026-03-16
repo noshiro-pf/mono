@@ -21,8 +21,8 @@ importers:
         specifier: ^6.5.0
         version: 6.5.0(typescript@5.9.3)
       ts-fortress:
-        specifier: ^6.4.0
-        version: 6.4.0(typescript@5.9.3)
+        specifier: ^6.4.1
+        version: 6.4.1(typescript@5.9.3)
     devDependencies:
       '@semantic-release/changelog':
         specifier: 6.0.3
@@ -3892,8 +3892,8 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@6.4.0:
-    resolution: {integrity: sha512-GbV2LEkzjmzCDd7mSu9oQXIZdG3lBXU4q8y1qztf09nwoUEP6FgF12C1UYxqoCj8KriRqtwgIMCWie7uV/E+Hg==}
+  ts-fortress@6.4.1:
+    resolution: {integrity: sha512-d6BalDR+4jbZaFpLmjxZHAIljNy1EJ06hYzAhGwpPCX8ywSDnDqjdGd//48LsJdP1Xna9DrPyV8pFt7InZEyZw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   ts-morph@27.0.2:
@@ -7641,7 +7641,7 @@ snapshots:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
       ts-data-forge: 6.5.0(typescript@5.9.3)
-      ts-fortress: 6.4.0(typescript@5.9.3)
+      ts-fortress: 6.4.1(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8369,7 +8369,7 @@ snapshots:
       picomatch: 4.0.3
       typescript: 5.9.3
 
-  ts-fortress@6.4.0(typescript@5.9.3):
+  ts-fortress@6.4.1(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
       ts-data-forge: 6.5.0(typescript@5.9.3)
