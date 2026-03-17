@@ -82,7 +82,7 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
 
     // For union, merge all shapes to get all possible keys
 
-    const mergedShape = Obj.merge(...shapes) as UnknownShape;
+    const mergedShape = Obj.merge(...shapes);
 
     const excessProperty: ExcessPropertyOption = recordTypes.some(
       (t) => t.excessProperty === 'reject',

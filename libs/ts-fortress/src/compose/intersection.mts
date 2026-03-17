@@ -86,7 +86,7 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
       (t) => t.shape,
     ) satisfies readonly UnknownShape[];
 
-    const mergedShape = Obj.merge(...shapes) as UnknownShape;
+    const mergedShape = Obj.merge(...shapes);
 
     const excessProperty: ExcessPropertyOption = recordTypes.some(
       (t) => t.excessProperty === 'reject',
