@@ -1,3 +1,9 @@
+## [7.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.0...v7.0.1) (2026-03-17)
+
+### Bug Fixes
+
+- fix composition functions to return RecordTypeInternals ([#248](https://github.com/noshiro-pf/ts-fortress/issues/248)) ([c53b26e](https://github.com/noshiro-pf/ts-fortress/commit/c53b26e765c75df4fe6ba4767522aa36e5cc9160))
+
 # [7.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.4.2...v7.0.0) (2026-03-17)
 
 ### Features
