@@ -306,102 +306,6 @@ export namespace Obj {
     Object.fromEntries(entries) as never;
 
   /**
-   * @internal
-   * Internal type utilities for the Obj module.
-   */
-  declare namespace TsDataForgeInternals {
-    type RecursionLimit = 20;
-
-    /** - `[['x', 1], ['y', 3]]` -> `{ x: 1, y: 3 }` */
-    export type EntriesToObject<
-      Entries extends readonly (readonly [PropertyKey, unknown])[],
-      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    > = Readonly<EntriesToObjectImpl<{}, Entries>>;
-
-    /** @internal */
-    type EntriesToObjectImpl<
-      R,
-      Entries extends readonly (readonly [PropertyKey, unknown])[],
-    > =
-      TypeEq<Entries['length'], 0> extends true
-        ? R
-        : EntriesToObjectImpl<
-            R & Readonly<Record<Entries[0][0], Entries[0][1]>>,
-            List.Tail<Entries>
-          >;
-
-    /**
-     * - `['x' | 'y' | 'z', number][]]` -> `'x' | 'y' | 'z'`
-     * - `[['a' | 'b' | 'c', number], ...['x' | 'y' | 'z', number][]]` -> `'a' |
-     *   'b' | 'c' | 'x' | 'y' | 'z'`
-     *
-     * @note To handle the second example above, recursion needs to be performed on infinite-length Entries,
-     * but since the timing to stop cannot be determined, a recursion limit is set.
-     */
-    export type KeysOfEntries<
-      Entries extends readonly (readonly [PropertyKey, unknown])[],
-    > = KeysOfEntriesImpl<never, Entries, RecursionLimit>;
-
-    type KeysOfEntriesImpl<
-      K,
-      Entries extends readonly (readonly [PropertyKey, unknown])[],
-      RemainingNumRecursions extends number,
-    > =
-      TypeEq<RemainingNumRecursions, 0> extends true
-        ? K
-        : TypeEq<Entries['length'], 0> extends true
-          ? K
-          : KeysOfEntriesImpl<
-              K | Entries[0][0],
-              List.Tail<Entries>,
-              Decrement<RemainingNumRecursions>
-            >;
-
-    export type ValuesOfEntries<
-      Entries extends readonly (readonly [PropertyKey, unknown])[],
-    > = ValuesOfEntriesImpl<never, Entries, RecursionLimit>;
-
-    type ValuesOfEntriesImpl<
-      K,
-      Entries extends readonly (readonly [PropertyKey, unknown])[],
-      RemainingNumRecursions extends number,
-    > =
-      TypeEq<RemainingNumRecursions, 0> extends true
-        ? K
-        : TypeEq<Entries['length'], 0> extends true
-          ? K
-          : ValuesOfEntriesImpl<
-              K | Entries[0][1],
-              List.Tail<Entries>,
-              Decrement<RemainingNumRecursions>
-            >;
-
-    export type PartialIfKeyIsUnion<K, T> =
-      IsUnion<K> extends true ? Partial<T> : T;
-
-    /** Merges two object types where keys in B override keys in A. */
-    type MergeTwo<A extends UnknownRecord, B extends UnknownRecord> = Readonly<{
-      [K in keyof A | keyof B]: K extends keyof B
-        ? B[K]
-        : K extends keyof A
-          ? A[K]
-          : never;
-    }>;
-
-    /** Sequentially merges a tuple of object types from left to right. */
-    export type MergeAll<
-      Records extends readonly UnknownRecord[],
-      // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-      Acc extends UnknownRecord = {},
-    > = Records extends readonly [
-      infer First extends UnknownRecord,
-      ...infer Rest extends readonly UnknownRecord[],
-    ]
-      ? MergeAll<Rest, MergeTwo<Acc, First>>
-      : Acc;
-  }
-
-  /**
    * Merges multiple records into a single record using `Object.assign`.
    * Later records override properties from earlier records with the same key.
    *
@@ -424,4 +328,175 @@ export namespace Obj {
   ): TsDataForgeInternals.MergeAll<Records> =>
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Object.fromEntries(records.flatMap((r) => Object.entries(r))) as never;
+}
+
+/**
+ * @internal
+ * Internal type utilities for the Obj module.
+ */
+declare namespace TsDataForgeInternals {
+  type RecursionLimit = 20;
+
+  /** - `[['x', 1], ['y', 3]]` -> `{ x: 1, y: 3 }` */
+  export type EntriesToObject<
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  > = Readonly<EntriesToObjectImpl<{}, Entries>>;
+
+  /** @internal */
+  type EntriesToObjectImpl<
+    R,
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+  > =
+    TypeEq<Entries['length'], 0> extends true
+      ? R
+      : EntriesToObjectImpl<
+          R & Readonly<Record<Entries[0][0], Entries[0][1]>>,
+          List.Tail<Entries>
+        >;
+
+  /**
+   * - `['x' | 'y' | 'z', number][]]` -> `'x' | 'y' | 'z'`
+   * - `[['a' | 'b' | 'c', number], ...['x' | 'y' | 'z', number][]]` -> `'a' |
+   *   'b' | 'c' | 'x' | 'y' | 'z'`
+   *
+   * @note To handle the second example above, recursion needs to be performed on infinite-length Entries,
+   * but since the timing to stop cannot be determined, a recursion limit is set.
+   */
+  export type KeysOfEntries<
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+  > = KeysOfEntriesImpl<never, Entries, RecursionLimit>;
+
+  type KeysOfEntriesImpl<
+    K,
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+    RemainingNumRecursions extends number,
+  > =
+    TypeEq<RemainingNumRecursions, 0> extends true
+      ? K
+      : TypeEq<Entries['length'], 0> extends true
+        ? K
+        : KeysOfEntriesImpl<
+            K | Entries[0][0],
+            List.Tail<Entries>,
+            Decrement<RemainingNumRecursions>
+          >;
+
+  export type ValuesOfEntries<
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+  > = ValuesOfEntriesImpl<never, Entries, RecursionLimit>;
+
+  type ValuesOfEntriesImpl<
+    K,
+    Entries extends readonly (readonly [PropertyKey, unknown])[],
+    RemainingNumRecursions extends number,
+  > =
+    TypeEq<RemainingNumRecursions, 0> extends true
+      ? K
+      : TypeEq<Entries['length'], 0> extends true
+        ? K
+        : ValuesOfEntriesImpl<
+            K | Entries[0][1],
+            List.Tail<Entries>,
+            Decrement<RemainingNumRecursions>
+          >;
+
+  export type PartialIfKeyIsUnion<K, T> =
+    IsUnion<K> extends true ? Partial<T> : T;
+
+  /**
+   * Merges two object types where keys in B override keys in A, preserving optional modifiers.
+   *
+   * This implementation uses a sophisticated technique to preserve optional property modifiers (`?`)
+   * during the merge operation, which would otherwise be lost in a naive mapped type implementation.
+   *
+   * ## Core Technique: Optional Property Detection
+   *
+   * Uses `{} extends Pick<T, K>` to determine if a property is optional:
+   * - **Required property**: `Pick<T, 'x'>` = `{ x: number }` → `{}` does NOT extend it (false)
+   * - **Optional property**: `Pick<T, 'y'>` = `{ y?: string }` → `{}` DOES extend it (true)
+   *
+   * This works because `{}` (empty object) is assignable to objects with only optional properties
+   * but not to objects with required properties.
+   *
+   * ## Implementation Strategy
+   *
+   * The type is constructed as an intersection of five mapped types:
+   *
+   * 1. **Required properties from B** - Properties in B that are required (override A completely)
+   * 2. **Optional properties from B (not in A)** - New optional properties from B
+   * 3. **Optional properties from B (in A)** - Union of A[K] | B[K] to preserve both possibilities
+   * 4. **Required properties only in A** - Properties in A but not in B that are required
+   * 5. **Optional properties only in A** - Properties in A but not in B that are optional (with `?` modifier)
+   *
+   * Finally, the intersection is flattened using an optional-preserving identity mapping that
+   * re-applies the optional detection logic to maintain the `?` modifiers in the final type.
+   *
+   * @example
+   * ```ts
+   * type A = { x: number; y?: string };
+   * type B = { y?: number; z?: boolean };
+   * type Result = MergeTwo<A, B>;
+   * // Result: { x: number; y?: string | number; z?: boolean }
+   * ```
+   */
+  // transformer-ignore-next-line
+  type MergeTwo<A extends UnknownRecord, B extends UnknownRecord> = {
+    // 1. Required properties from B (override A completely)
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    readonly [K in keyof B as {} extends Pick<B, K> ? never : K]: B[K];
+  } & {
+    // 2. Optional properties from B that are NOT in A
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    readonly [K in keyof B as {} extends Pick<B, K>
+      ? K extends keyof A
+        ? never
+        : K
+      : never]?: B[K];
+  } & {
+    // 3. Optional properties from B that ARE in A (create union)
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    readonly [K in keyof B as {} extends Pick<B, K>
+      ? K extends keyof A
+        ? K
+        : never
+      : never]?: K extends keyof A ? A[K] | B[K] : never;
+  } & {
+    // 4. Required properties only in A (not overridden by B)
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    readonly [K in Exclude<keyof A, keyof B> as {} extends Pick<A, K>
+      ? never
+      : K]: A[K];
+  } & {
+    // 5. Optional properties only in A (not overridden by B)
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    readonly [K in Exclude<keyof A, keyof B> as {} extends Pick<A, K>
+      ? K
+      : never]?: A[K];
+  } extends infer O
+    ? Readonly<
+        {
+          // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+          [K in keyof O as {} extends Pick<O, K> ? never : K]: O[K];
+        } & {
+          // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+          [K in keyof O as {} extends Pick<O, K> ? K : never]?: O[K];
+        }
+      >
+    : never;
+
+  /** Sequentially merges a tuple of object types from left to right. */
+  export type MergeAll<
+    Records extends readonly UnknownRecord[],
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    Acc extends UnknownRecord = {},
+  > =
+    IsFixedLengthList<Records> extends false
+      ? ArrayElement<Records>
+      : Records extends readonly [
+            infer First extends UnknownRecord,
+            ...infer Rest extends readonly UnknownRecord[],
+          ]
+        ? MergeAll<Rest, MergeTwo<Acc, First>>
+        : Acc;
 }

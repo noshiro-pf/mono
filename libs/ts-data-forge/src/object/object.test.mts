@@ -238,4 +238,237 @@ describe('merge', () => {
 
     assert.deepStrictEqual(result, { key: 42 });
   });
+
+  test('type: MergeAll with four objects', () => {
+    const a = { a: 1, b: 2 } as const;
+
+    const b = { b: 3, c: 4 } as const;
+
+    const c = { c: 5, d: 6 } as const;
+
+    const d = { d: 7, e: 8 } as const;
+
+    const result = Obj.merge(a, b, c, d);
+
+    expectType<typeof result, Readonly<{ a: 1; b: 3; c: 5; d: 7; e: 8 }>>('=');
+
+    assert.deepStrictEqual(result, { a: 1, b: 3, c: 5, d: 7, e: 8 });
+  });
+
+  test('type: MergeAll with same key multiple times', () => {
+    const a = { x: 'first' } as const;
+
+    const b = { x: 'second' } as const;
+
+    const c = { x: 'third' } as const;
+
+    const result = Obj.merge(a, b, c);
+
+    expectType<typeof result, Readonly<{ x: 'third' }>>('=');
+
+    assert.deepStrictEqual(result, { x: 'third' });
+  });
+
+  test('type: MergeAll with disjoint keys', () => {
+    const a = { a: 1 } as const;
+
+    const b = { b: 2 } as const;
+
+    const c = { c: 3 } as const;
+
+    const result = Obj.merge(a, b, c);
+
+    expectType<typeof result, Readonly<{ a: 1; b: 2; c: 3 }>>('=');
+
+    assert.deepStrictEqual(result, { a: 1, b: 2, c: 3 });
+  });
+
+  test('type: MergeAll with complex nested types', () => {
+    const a = { value: { nested: 1 } } as const;
+
+    const b = { value: { nested: 2, extra: 'text' } } as const;
+
+    const result = Obj.merge(a, b);
+
+    expectType<
+      typeof result,
+      DeepReadonly<{ value: { nested: 2; extra: 'text' } }>
+    >('=');
+
+    assert.deepStrictEqual(result, { value: { nested: 2, extra: 'text' } });
+  });
+
+  test('type: MergeAll with mixed value types', () => {
+    const a = { x: 1, y: 'string' } as const;
+
+    const b = { y: 2, z: true } as const;
+
+    const c = { z: false, w: undefined } as const;
+
+    const result = Obj.merge(a, b, c);
+
+    expectType<typeof result, Readonly<{ x: 1; y: 2; z: false; w: undefined }>>(
+      '=',
+    );
+
+    assert.deepStrictEqual(result, { x: 1, y: 2, z: false, w: undefined });
+  });
+
+  test('type: MergeAll with mixed value types with optional properties', () => {
+    const a: Readonly<{ x: number; y?: string }> = {
+      x: 1,
+      y: 'string',
+    } as const;
+
+    const b: Readonly<{ y?: number; z?: boolean }> = { y: 2, z: true } as const;
+
+    const c: Readonly<{ z?: boolean; w?: undefined }> = {
+      z: false,
+      w: undefined,
+    } as const;
+
+    const result = Obj.merge(a, b, c);
+
+    expectType<
+      typeof result,
+      Readonly<{ x: number; y?: string | number; z?: boolean; w?: undefined }>
+    >('=');
+
+    assert.deepStrictEqual(result, { x: 1, y: 2, z: false, w: undefined });
+  });
+
+  test('type: MergeAll empty array produces empty object', () => {
+    const result = Obj.merge();
+
+    expectType<typeof result, {}>('=');
+
+    assert.deepStrictEqual(result, {});
+  });
+
+  test('type: MergeAll with arrays as values', () => {
+    const a = { items: [1, 2] } as const;
+
+    const b = { items: [3, 4, 5] } as const;
+
+    const result = Obj.merge(a, b);
+
+    expectType<typeof result, Readonly<{ items: readonly [3, 4, 5] }>>('=');
+
+    assert.deepStrictEqual(result, { items: [3, 4, 5] });
+  });
+
+  test('type: MergeAll preserves literal types', () => {
+    const a = { status: 'pending', count: 0 } as const;
+
+    const b = { status: 'completed' } as const;
+
+    const result = Obj.merge(a, b);
+
+    expectType<typeof result, Readonly<{ status: 'completed'; count: 0 }>>('=');
+
+    assert.deepStrictEqual(result, { status: 'completed', count: 0 });
+  });
+
+  test('type: MergeAll with UnknownRecord[] produces UnknownRecord', () => {
+    const records: readonly UnknownRecord[] = [
+      { a: 1, b: 2 },
+      { b: 3, c: 4 },
+      { c: 5, d: 6 },
+    ] as const;
+
+    const result = Obj.merge(...records);
+
+    expectType<typeof result, UnknownRecord>('=');
+
+    assert.deepStrictEqual(result, { a: 1, b: 3, c: 5, d: 6 });
+  });
+
+  test('type: MergeAll with specific typed array', () => {
+    type MyRecord = Readonly<{ x: number; y: string }>;
+
+    const records: readonly MyRecord[] = [
+      { x: 1, y: 'a' },
+      { x: 2, y: 'b' },
+      { x: 3, y: 'c' },
+    ] as const;
+
+    const result = Obj.merge(...records);
+
+    expectType<typeof result, MyRecord>('=');
+
+    assert.deepStrictEqual(result, { x: 3, y: 'c' });
+  });
+
+  test('type: MergeAll with fixed length typed array', () => {
+    type MyRecord = Readonly<{ x: number; y: string }>;
+
+    const records: ArrayOfLength<3, MyRecord> = [
+      { x: 1, y: 'a' },
+      { x: 2, y: 'b' },
+      { x: 3, y: 'c' },
+    ] as const;
+
+    const result = Obj.merge(...records);
+
+    expectType<typeof result, MyRecord>('=');
+
+    assert.deepStrictEqual(result, { x: 3, y: 'c' });
+  });
+
+  test('type: MergeAll with array and optional properties', () => {
+    type RecordWithOptional = Readonly<{ x: number; y?: string }>;
+
+    const records: readonly RecordWithOptional[] = [
+      { x: 1, y: 'a' },
+      { x: 2 },
+    ] as const;
+
+    const result = Obj.merge(...records);
+
+    expectType<typeof result, RecordWithOptional>('=');
+
+    assert.deepStrictEqual(result, { x: 2, y: 'a' });
+  });
+
+  test('type: MergeAll with fixed length typed array and optional properties', () => {
+    type RecordWithOptional = Readonly<{ x: number; y?: string }>;
+
+    const records: ArrayOfLength<2, RecordWithOptional> = [
+      { x: 1, y: 'a' },
+      { x: 2 },
+    ] as const;
+
+    const result = Obj.merge(...records);
+
+    expectType<typeof result, RecordWithOptional>('=');
+
+    assert.deepStrictEqual(result, { x: 2, y: 'a' });
+  });
+
+  test('type: MergeAll with empty dynamic array', () => {
+    const records: readonly UnknownRecord[] = [] as const;
+
+    const result = Obj.merge(...records);
+
+    expectType<typeof result, UnknownRecord>('=');
+
+    assert.deepStrictEqual(result, {});
+  });
+
+  test('type: MergeAll with union type array', () => {
+    type RecordA = Readonly<{ a: number; b: string }>;
+
+    type RecordB = Readonly<{ c: boolean; d: number }>;
+
+    const records: readonly (RecordA | RecordB)[] = [
+      { a: 1, b: 'text' },
+      { c: true, d: 42 },
+    ] as const;
+
+    const result = Obj.merge(...records);
+
+    expectType<typeof result, RecordA | RecordB>('=');
+
+    assert.deepStrictEqual(result, { a: 1, b: 'text', c: true, d: 42 });
+  });
 });
