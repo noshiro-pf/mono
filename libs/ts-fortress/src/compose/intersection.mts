@@ -1,5 +1,12 @@
-import { Arr, expectType, Result } from 'ts-data-forge';
-import { type Type, type TypeOf } from '../type.mjs';
+import { Arr, expectType, Obj, Result } from 'ts-data-forge';
+import {
+  type ExcessPropertyOption,
+  hasRecordInternals,
+  type RecordTypeInternals,
+  type Type,
+  type TypeOf,
+  type UnknownShape,
+} from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -57,7 +64,7 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : defaultType.fill(a));
 
-  return {
+  const baseType: Type<T> = {
     typeName: typeNameFilled,
     defaultValue: defaultType.defaultValue,
     fill,
@@ -65,7 +72,37 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-  };
+  } as const;
+
+  // If all types are records, add RecordTypeInternals
+  if (types.every(hasRecordInternals)) {
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    const recordTypes = types as unknown as NonEmptyArray<
+      Type<unknown> & RecordTypeInternals
+    >;
+
+    const shapes = Arr.map(
+      recordTypes,
+      (t) => t.shape,
+    ) satisfies readonly UnknownShape[];
+
+    const mergedShape = Obj.merge(...shapes) as UnknownShape;
+
+    const excessProperty: ExcessPropertyOption = recordTypes.some(
+      (t) => t.excessProperty === 'reject',
+    )
+      ? 'reject'
+      : 'allow';
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return {
+      ...baseType,
+      shape: mergedShape,
+      excessProperty,
+    } as IntersectionType<Types>;
+  }
+
+  return baseType as IntersectionType<Types>;
 };
 
 type IntersectionType<Types extends NonEmptyArray<Type<unknown>>> = Type<

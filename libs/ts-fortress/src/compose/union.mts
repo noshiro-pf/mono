@@ -1,5 +1,12 @@
-import { Result, expectType, memoizeFunction } from 'ts-data-forge';
-import { type Type, type TypeOf } from '../type.mjs';
+import { Arr, Obj, Result, expectType, memoizeFunction } from 'ts-data-forge';
+import {
+  hasRecordInternals,
+  type ExcessPropertyOption,
+  type RecordTypeInternals,
+  type Type,
+  type TypeOf,
+  type UnknownShape,
+} from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -49,7 +56,7 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultType().fill(a));
 
-  return {
+  const baseType: Type<T> = {
     typeName: typeNameFilled,
     get defaultValue() {
       return getDefaultType().defaultValue;
@@ -59,7 +66,39 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-  };
+  } as const;
+
+  // If all types are records, add RecordTypeInternals
+  if (types.every(hasRecordInternals)) {
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    const recordTypes = types as unknown as NonEmptyArray<
+      Type<unknown> & RecordTypeInternals
+    >;
+
+    const shapes = Arr.map(
+      recordTypes,
+      (t) => t.shape,
+    ) satisfies readonly UnknownShape[];
+
+    // For union, merge all shapes to get all possible keys
+
+    const mergedShape = Obj.merge(...shapes) as UnknownShape;
+
+    const excessProperty: ExcessPropertyOption = recordTypes.some(
+      (t) => t.excessProperty === 'reject',
+    )
+      ? 'reject'
+      : 'allow';
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return {
+      ...baseType,
+      shape: mergedShape,
+      excessProperty,
+    } as UnionType<Types>;
+  }
+
+  return baseType as UnionType<Types>;
 };
 
 type UnionType<Types extends NonEmptyArray<Type<unknown>>> = Type<

@@ -1,5 +1,5 @@
-import { memoizeFunction } from 'ts-data-forge';
-import { type Type } from '../type.mjs';
+import { hasKey, isRecord, memoizeFunction } from 'ts-data-forge';
+import { hasRecordInternals, type Type } from '../type.mjs';
 import { createAssertFn, createCastFn, createIsFn } from '../utils/index.mjs';
 
 /**
@@ -167,7 +167,7 @@ export const recursion = <A,>(
 
   const fill: Type<A>['fill'] = (a) => getInnerType().fill(a);
 
-  return {
+  const baseType: Type<A> = {
     typeName,
     get defaultValue(): A {
       return getDefaultValue();
@@ -177,5 +177,61 @@ export const recursion = <A,>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-  };
+  } as const;
+
+  // Proxy to propagate RecordTypeInternals if the inner type has them
+  return new Proxy(baseType, {
+    get: (target, prop) => {
+      if (prop === 'shape' || prop === 'excessProperty') {
+        const inner = getInnerType();
+
+        if (hasRecordInternals(inner)) {
+          return inner[prop];
+        }
+      }
+
+      if (
+        typeof prop === 'string' &&
+        isRecord(target) &&
+        hasKey(target, prop)
+      ) {
+        return target[prop as keyof typeof target];
+      }
+
+      return undefined;
+    },
+    has: (target, prop) => {
+      if (prop === 'shape' || prop === 'excessProperty') {
+        const inner = getInnerType();
+
+        return hasRecordInternals(inner);
+      }
+
+      return isRecord(target) && hasKey(target, prop);
+    },
+    ownKeys: (target) => {
+      const inner = getInnerType();
+
+      if (hasRecordInternals(inner)) {
+        return [...Object.keys(target), 'shape', 'excessProperty'];
+      }
+
+      return Object.keys(target);
+    },
+    getOwnPropertyDescriptor: (target, prop) => {
+      if (prop === 'shape' || prop === 'excessProperty') {
+        const inner = getInnerType();
+
+        if (hasRecordInternals(inner)) {
+          return {
+            enumerable: true,
+            configurable: true,
+            value: inner[prop],
+          };
+        }
+      }
+
+      return Object.getOwnPropertyDescriptor(target, prop);
+    },
+  });
 };
