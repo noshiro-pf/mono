@@ -1,3 +1,9 @@
+# [7.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v6.4.2...v7.0.0) (2026-03-17)
+
+### Features
+
+- **breaking:** Update excess property option ([#244](https://github.com/noshiro-pf/ts-fortress/issues/244)) ([8b517d1](https://github.com/noshiro-pf/ts-fortress/commit/8b517d12813325aa8d348af9f0546b6119addd82))
+
 ## [6.4.2](https://github.com/noshiro-pf/ts-fortress/compare/v6.4.1...v6.4.2) (2026-03-14)
 
 ### Bug Fixes
