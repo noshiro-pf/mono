@@ -1,3 +1,9 @@
+# [6.7.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.6.0...v6.7.0) (2026-03-17)
+
+### Features
+
+- improve Obj.merge typing ([#324](https://github.com/noshiro-pf/ts-data-forge/issues/324)) ([fdbbc55](https://github.com/noshiro-pf/ts-data-forge/commit/fdbbc5554cdf58b2c1c22fe6bc185322d8e22dcb))
+
 # [6.6.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.5.0...v6.6.0) (2026-03-14)
 
 ### Features
