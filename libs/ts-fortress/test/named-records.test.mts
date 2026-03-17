@@ -35,6 +35,24 @@ describe('nested record', () => {
 
   type Polygon = TypeOf<typeof Polygon>;
 
+  expectType<Point, Readonly<{ x: Int; y: Int; z?: Int }>>('=');
+
+  expectType<
+    Edge,
+    Readonly<{
+      from: Readonly<{ x: Int; y: Int; z?: Int }>;
+      to: Readonly<{ x: Int; y: Int; z?: Int }>;
+    }>
+  >('=');
+
+  expectType<
+    TypeOf<typeof Edges>,
+    readonly Readonly<{
+      from: Readonly<{ x: Int; y: Int; z?: Int }>;
+      to: Readonly<{ x: Int; y: Int; z?: Int }>;
+    }>[]
+  >('=');
+
   expectType<
     Polygon,
     Readonly<{

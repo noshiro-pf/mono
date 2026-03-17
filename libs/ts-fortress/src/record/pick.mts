@@ -1,81 +1,64 @@
 import { expectType, Obj } from 'ts-data-forge';
 import {
-  type ExcessPropertyBehavior,
-  type RecordType,
+  type ExcessPropertyOption,
+  hasRecordInternals,
   type Type,
-  type UnknownShape,
+  type TypeOf,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
 /** Creates a record type with keys picked. */
 export const pick = <
-  const R extends UnknownShape,
+  const R extends UnknownRecord,
   const KeysToPick extends readonly (keyof R & string)[],
-  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
-  recordType: RecordType<R, ExcessValidation>,
+  recordType: Type<R>,
   keysToPick: KeysToPick,
   options?: Partial<
     Readonly<{
       typeName: string;
-      excessPropertyValidation: ExcessValidation;
-      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+      excessProperty: ExcessPropertyOption;
     }>
   >,
-): PickedType<R, KeysToPick, ExcessValidation> =>
-  record(Obj.pick(recordType.shape, keysToPick), {
+): PickedType<R, KeysToPick> => {
+  if (!hasRecordInternals(recordType)) {
+    throw new Error(
+      `Expected a record type but received: ${recordType.typeName}`,
+    );
+  }
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return record(Obj.pick(recordType.shape, keysToPick), {
     typeName:
       options?.typeName ??
       `Pick<${recordType.typeName}, ${toUnionKeyString(keysToPick)}>`,
-    excessPropertyValidation:
-      options?.excessPropertyValidation ?? recordType.excessPropertyValidation,
-    excessPropertyFill:
-      options?.excessPropertyFill ?? recordType.excessPropertyFill,
-  });
 
-export type PickedType<
-  R extends UnknownShape,
-  KeysToPick extends readonly (keyof R)[],
-  ExcessValidation extends ExcessPropertyBehavior = 'strip',
-> = RecordType<Pick<R, ArrayElement<KeysToPick>>, ExcessValidation>;
+    excessProperty: options?.excessProperty ?? recordType.excessProperty,
+  }) as unknown as PickedType<R, KeysToPick>;
+};
 
-expectType<
-  Pick<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>,
-  Readonly<{
-    a: Type<0>;
-    b: Type<1>;
-  }>
->('=');
+type PickedType<
+  R extends UnknownRecord,
+  KeysToPick extends readonly (keyof R & string)[],
+> = Type<Readonly<Pick<R, ArrayElement<KeysToPick>>>>;
 
-expectType<
-  RecordType<Pick<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>>,
-  Type<Readonly<{ a: 0; b: 1 }>> &
-    Readonly<{
-      shape: Readonly<{ a: Type<0>; b: Type<1> }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
+// --- expectType assertions ---
 
-expectType<
-  PickedType<
-    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
-    readonly ['a', 'b']
-  >,
-  Type<Readonly<{ a: 0; b: 1 }>> &
-    Readonly<{
-      shape: Readonly<{ a: Type<0>; b: Type<1> }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
+{
+  type Base = ReturnType<
+    typeof record<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>
+  >;
 
-expectType<
-  PickedType<
-    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
-    // @ts-expect-error key "d" doesn't exist
-    readonly ['a', 'd']
-  >,
-  0
->('!=');
+  // pick narrows value type to picked keys
+  expectType<
+    TypeOf<ReturnType<typeof pick<TypeOf<Base>, readonly ['a', 'b']>>>,
+    Readonly<{ a: 0; b: 1 }>
+  >('=');
+
+  // pick with single key
+  expectType<
+    TypeOf<ReturnType<typeof pick<TypeOf<Base>, readonly ['c']>>>,
+    Readonly<{ c: 2 }>
+  >('=');
+}

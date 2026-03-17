@@ -7,10 +7,8 @@ import {
   keyof,
   keyValueRecord,
   mergeRecords,
-  omit,
   optional,
   partial,
-  pick,
   record,
   valueof,
 } from '../record/index.mjs';
@@ -339,9 +337,7 @@ describe('recursive', () => {
         children: array({} as Type<unknown>), // Placeholder for recursion
       } as const;
 
-      // Pick only id and children
-      const NodePickedShape = pick(record(NodeShape), ['id', 'children']).shape;
-
+      // Pick only id and children — use NodeShape directly for individual field types
       const NodePicked: Type<
         Readonly<{
           id: string;
@@ -352,7 +348,7 @@ describe('recursive', () => {
         }>
       > = recursion('NodePicked', () =>
         record({
-          id: NodePickedShape.id,
+          id: NodeShape.id,
           children: array(NodePicked),
         }),
       );
@@ -364,9 +360,7 @@ describe('recursive', () => {
 
       assert.isTrue(NodePicked.is(validNode));
 
-      // Omit metadata
-      const NodeOmittedShape = omit(record(NodeShape), ['metadata']).shape;
-
+      // Omit metadata — use NodeShape directly for individual field types
       const NodeOmitted: Type<
         Readonly<{
           id: string;
@@ -379,8 +373,8 @@ describe('recursive', () => {
         }>
       > = recursion('NodeOmitted', () =>
         record({
-          id: NodeOmittedShape.id,
-          value: NodeOmittedShape.value,
+          id: NodeShape.id,
+          value: NodeShape.value,
           children: array(NodeOmitted),
         }),
       );

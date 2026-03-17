@@ -1,5 +1,5 @@
 import { expectType, Result } from 'ts-data-forge';
-import { number, string } from '../primitives/index.mjs';
+import { number } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {
   type ValidationError,
@@ -13,7 +13,9 @@ describe(mergeRecords, () => {
     expect(() => {
       // @ts-expect-error should pass record type
       mergeRecords([record({ x: number(), y: number() }), number()]);
-    }).toThrowError('Cannot convert undefined or null to object');
+    }).toThrowError(
+      'Expected a record type but received a non-record type in mergeRecords',
+    );
   });
 
   const targetType = mergeRecords([
@@ -23,6 +25,7 @@ describe(mergeRecords, () => {
 
   type TargetType = TypeOf<typeof targetType>;
 
+  // Default (no explicit excessProperty) with record() inputs → DeriveStrictestEP = 'allow'
   expectType<
     TargetType,
     Readonly<{
@@ -33,7 +36,28 @@ describe(mergeRecords, () => {
     }>
   >('=');
 
-  expectType<typeof targetType.defaultValue, TargetType>('=');
+  expectType<typeof targetType.defaultValue, TypeOf<typeof targetType>>('=');
+
+  // excessProperty: 'allow' → type includes UnknownRecord
+  // (consistent with RecordType<R, 'allow'>)
+  const _allowType = mergeRecords(
+    [record({ x: number() }), record({ y: number() })],
+    { excessProperty: 'allow' },
+  );
+
+  type AllowType = TypeOf<typeof _allowType>;
+
+  expectType<AllowType, Readonly<{ x: number; y: number }>>('=');
+
+  // excessProperty: 'reject' → exact type (no UnknownRecord)
+  const _errorType = mergeRecords(
+    [record({ x: number() }), record({ y: number() })],
+    { excessProperty: 'reject' },
+  );
+
+  type ErrorType = TypeOf<typeof _errorType>;
+
+  expectType<ErrorType, Readonly<{ x: number; y: number }>>('=');
 
   describe('is', () => {
     test('truthy case', () => {
@@ -88,17 +112,17 @@ describe(mergeRecords, () => {
       assert.deepStrictEqual(resultValue, { x: 0, y: 1, z: 2, w: 3 });
     });
 
-    // test('validate returns input as-is for OK cases', () => {
-    //   const input = { x: 0, y: 1, z: 2, w: 3 } as const;
+    test('validate returns input as-is for OK cases', () => {
+      const input = { x: 0, y: 1, z: 2, w: 3 } as const;
 
-    //   const result = targetType.validate(input);
+      const result = targetType.validate(input);
 
-    //   assert.isTrue(Result.isOk(result));
+      assert.isTrue(Result.isOk(result));
 
-    //   const resultValue1 = Result.unwrapThrow(result);
+      const resultValue1 = Result.unwrapThrow(result);
 
-    //   expect(resultValue1).toBe(input); // ✅ same reference
-    // });
+      expect(resultValue1).toBe(input); // ✅ same reference
+    });
 
     test('falsy case', () => {
       const result = targetType.validate({ x: 0, y: 1 });
@@ -111,8 +135,8 @@ describe(mergeRecords, () => {
         {
           path: ['z'],
           actualValue: { x: 0, y: 1 },
-          expectedType: '({ x: number, y: number } & { z: number, w: number })',
           typeName: '({ x: number, y: number } & { z: number, w: number })',
+          expectedType: '({ x: number, y: number } & { z: number, w: number })',
           details: {
             kind: 'missing-key',
             key: 'z',
@@ -121,8 +145,8 @@ describe(mergeRecords, () => {
         {
           path: ['w'],
           actualValue: { x: 0, y: 1 },
-          expectedType: '({ x: number, y: number } & { z: number, w: number })',
           typeName: '({ x: number, y: number } & { z: number, w: number })',
+          expectedType: '({ x: number, y: number } & { z: number, w: number })',
           details: {
             kind: 'missing-key',
             key: 'w',
@@ -150,157 +174,119 @@ describe(mergeRecords, () => {
       assert.deepStrictEqual(targetType.fill(x), { x: 0, y: 1, z: 2, w: 0 });
     });
   });
-});
 
-describe('mergeRecords with strictRecord', () => {
-  const s1 = strictRecord({ id: string(), name: string() });
+  describe('with strictRecord', () => {
+    const strictTargetType = mergeRecords([
+      strictRecord({ x: number(), y: number() }),
+      strictRecord({ z: number(), w: number() }),
+    ]);
 
-  const s2 = strictRecord({ age: number() });
+    type StrictTargetType = TypeOf<typeof strictTargetType>;
 
-  const merged = mergeRecords([s1, s2]);
+    expectType<
+      StrictTargetType,
+      Readonly<{
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+      }>
+    >('=');
 
-  type Merged = TypeOf<typeof merged>;
+    describe('is', () => {
+      test('truthy case', () => {
+        assert.isTrue(strictTargetType.is({ x: 0, y: 1, z: 2, w: 3 }));
+      });
 
-  expectType<Merged, Readonly<{ id: string; name: string; age: number }>>('=');
+      test('rejects excess properties', () => {
+        assert.isFalse(strictTargetType.is({ x: 0, y: 1, z: 2, w: 3, a: 0 }));
+      });
 
-  describe('is', () => {
-    test('accepts valid data with all merged keys', () => {
-      assert.isTrue(merged.is({ id: '1', name: 'Alice', age: 30 }));
-    });
-
-    test('rejects data with missing keys', () => {
-      assert.isFalse(merged.is({ id: '1', name: 'Alice' }));
-    });
-
-    test('rejects non-record values', () => {
-      assert.isFalse(merged.is(null));
-
-      assert.isFalse(merged.is('string'));
-    });
-  });
-
-  describe('validate', () => {
-    test('succeeds for valid data', () => {
-      const result = merged.validate({ id: '1', name: 'Alice', age: 30 });
-
-      assert.isTrue(Result.isOk(result));
-
-      assert.deepStrictEqual(Result.unwrapThrow(result), {
-        id: '1',
-        name: 'Alice',
-        age: 30,
+      test('rejects missing properties', () => {
+        assert.isFalse(strictTargetType.is({ x: 0, y: 1 }));
       });
     });
 
-    test('reports missing key errors', () => {
-      const result = merged.validate({ id: '1' });
+    describe('validate', () => {
+      test('truthy case', () => {
+        const result = strictTargetType.validate({ x: 0, y: 1, z: 2, w: 3 });
 
-      assert.isTrue(Result.isErr(result));
+        assert.isTrue(Result.isOk(result));
 
-      const messages = validationErrorsToMessages(
-        Result.unwrapErrThrow(result),
-      );
+        const resultValue = Result.unwrapThrow(result);
 
-      assert.isTrue(
-        messages.some((m) => m.includes('missing required key "name"')),
-      );
-
-      assert.isTrue(
-        messages.some((m) => m.includes('missing required key "age"')),
-      );
-    });
-
-    test('reports property type errors', () => {
-      const result = merged.validate({ id: '1', name: 'Alice', age: 'thirty' });
-
-      assert.isTrue(Result.isErr(result));
-
-      const messages = validationErrorsToMessages(
-        Result.unwrapErrThrow(result),
-      );
-
-      assert.isTrue(messages.some((m) => m.includes('Error at age:')));
-    });
-  });
-
-  describe('fill', () => {
-    test('fills missing keys with defaults', () => {
-      const result = merged.fill({ id: 'x' });
-
-      assert.deepStrictEqual(result, { id: 'x', name: '', age: 0 });
-    });
-
-    test('fills from non-record input with all defaults', () => {
-      const result = merged.fill(null);
-
-      assert.deepStrictEqual(result, { id: '', name: '', age: 0 });
-    });
-  });
-
-  describe('with excessPropertyValidation: error', () => {
-    const mergedStrict = mergeRecords([s1, s2], {
-      excessPropertyValidation: 'error',
-    });
-
-    test('accepts valid data without excess', () => {
-      assert.isTrue(mergedStrict.is({ id: '1', name: 'Alice', age: 30 }));
-    });
-
-    test('rejects data with excess properties', () => {
-      assert.isFalse(
-        mergedStrict.is({ id: '1', name: 'Alice', age: 30, extra: true }),
-      );
-    });
-
-    test('validate reports excess key error', () => {
-      const result = mergedStrict.validate({
-        id: '1',
-        name: 'Alice',
-        age: 30,
-        extra: true,
+        assert.deepStrictEqual(resultValue, { x: 0, y: 1, z: 2, w: 3 });
       });
 
-      assert.isTrue(Result.isErr(result));
+      test('validate returns input as-is for OK cases', () => {
+        const input = { x: 0, y: 1, z: 2, w: 3 } as const;
 
-      const messages = validationErrorsToMessages(
-        Result.unwrapErrThrow(result),
-      );
+        const result = strictTargetType.validate(input);
 
-      assert.isTrue(
-        messages.some((m) => m.includes('excess property "extra"')),
-      );
-    });
-  });
+        assert.isTrue(Result.isOk(result));
 
-  describe('mixed strict and permissive', () => {
-    const permissive = record({ status: string() });
-
-    const mergedMixed = mergeRecords([s1, permissive]);
-
-    test('accepts valid data', () => {
-      assert.isTrue(mergedMixed.is({ id: '1', name: 'Alice', status: 'ok' }));
-    });
-
-    test('accepts data with excess (default strip mode)', () => {
-      assert.isTrue(
-        mergedMixed.is({ id: '1', name: 'Alice', status: 'ok', extra: 1 }),
-      );
-    });
-
-    test('validate strips excess properties in default mode', () => {
-      const result = mergedMixed.validate({
-        id: '1',
-        name: 'Alice',
-        status: 'ok',
-        extra: 1,
+        expect(Result.unwrapThrow(result)).toBe(input);
       });
 
-      assert.isTrue(Result.isOk(result));
+      test('rejects non-record input', () => {
+        const result = strictTargetType.validate('not a record');
 
-      assert.deepStrictEqual(Result.unwrapThrow(result), {
-        id: '1',
-        name: 'Alice',
-        status: 'ok',
+        assert.isTrue(Result.isErr(result));
+      });
+
+      test('rejects excess properties', () => {
+        const result = strictTargetType.validate({
+          x: 0,
+          y: 1,
+          z: 2,
+          w: 3,
+          extra: 99,
+        });
+
+        assert.isTrue(Result.isErr(result));
+
+        const errors = Result.unwrapErrThrow(result);
+
+        assert.deepStrictEqual(validationErrorsToMessages(errors), [
+          'Error at extra: excess property "extra" is not allowed.',
+        ]);
+      });
+
+      test('rejects missing properties', () => {
+        const result = strictTargetType.validate({ x: 0, y: 1 });
+
+        assert.isTrue(Result.isErr(result));
+
+        const errors = Result.unwrapErrThrow(result);
+
+        assert.deepStrictEqual(validationErrorsToMessages(errors), [
+          'Error at z: missing required key "z".',
+          'Error at w: missing required key "w".',
+        ]);
+      });
+    });
+
+    describe('fill', () => {
+      test('noop', () => {
+        const x: unknown = { x: 0, y: 1, z: 2, w: 3 } as const;
+
+        assert.deepStrictEqual(strictTargetType.fill(x), {
+          x: 0,
+          y: 1,
+          z: 2,
+          w: 3,
+        });
+      });
+
+      test('fill with the default value', () => {
+        const x = { x: 0, y: 1, z: 2 } as const;
+
+        assert.deepStrictEqual(strictTargetType.fill(x), {
+          x: 0,
+          y: 1,
+          z: 2,
+          w: 0,
+        });
       });
     });
   });

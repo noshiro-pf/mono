@@ -1,3 +1,4 @@
+import { isSet } from '@sindresorhus/is';
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
@@ -7,9 +8,6 @@ import {
   createPrimitiveValidationError,
   type ValidationError,
 } from '../utils/index.mjs';
-
-const isSet = (value: unknown): value is ReadonlySet<unknown> =>
-  Object.prototype.toString.call(value) === '[object Set]';
 
 type SetResultType<T extends Type<unknown>> = ReadonlySet<TypeOf<T>>;
 

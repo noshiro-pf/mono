@@ -1,13 +1,4 @@
-import { hasKey } from 'ts-data-forge';
 import { type Type } from '../type.mjs';
-
-export type OptionalPropertyType<T extends Type<unknown>> = T &
-  PartiallyRequired<T, 'optional'>;
-
-export type RequiredPropertyType<T extends Type<unknown>> = PartiallyOptional<
-  T,
-  'optional'
->;
 
 /**
  * Converts a Type to an optional property type.
@@ -21,33 +12,6 @@ export type RequiredPropertyType<T extends Type<unknown>> = PartiallyOptional<
  * @returns An OptionalPropertyType that can be used in record definitions
  *
  * @example
- * // Basic usage
- * ```ts
- * import * as t from 'ts-fortress';
- *
- * type EvenNumber = Readonly<{ type: 'even'; next?: OddNumber }>;
- *
- * type OddNumber = Readonly<{ type: 'odd'; next?: EvenNumber }>;
- *
- * // When using optional fields in mutually recursive types,
- * // use forceUndefinedDefault to avoid infinite loops when accessing defaultValue
- * const EvenNumber: t.Type<EvenNumber> = t.recursion('EvenNumber', () =>
- *   t.record({
- *     type: t.literal('even'),
- *     next: t.optional(OddNumber, { forceUndefinedDefault: true }),
- *   }),
- * );
- *
- * const OddNumber: t.Type<OddNumber> = t.recursion('OddNumber', () =>
- *   t.record({
- *     type: t.literal('odd'),
- *     next: t.optional(EvenNumber, { forceUndefinedDefault: true }),
- *   }),
- * );
- * ```
- *
- * @example
- * // With recursive types - use forceUndefinedDefault to avoid infinite loops
  * ```ts
  * import * as t from 'ts-fortress';
  *
@@ -104,6 +68,12 @@ export const optional = <T extends Type<unknown>>(
     optional: true,
   }) satisfies OptionalPropertyType<Type<unknown>> as OptionalPropertyType<T>;
 
+export type OptionalPropertyType<T extends Type<unknown>> = T &
+  Readonly<{ optional: true }>;
+
+export type RequiredPropertyType<T extends Type<unknown>> =
+  T extends OptionalPropertyType<T> ? StrictOmit<T, 'optional'> : T;
+
 export const isOptionalProperty = <T extends Type<unknown>>(
   t: T,
-): t is OptionalPropertyType<T> => hasKey(t, 'optional') && t.optional === true;
+): t is OptionalPropertyType<T> => t.optional === true;

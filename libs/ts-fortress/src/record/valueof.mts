@@ -1,55 +1,71 @@
 import { Arr, expectType } from 'ts-data-forge';
 import { union } from '../compose/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
-import { type RecordType, type Type, type UnknownShape } from '../type.mjs';
+import {
+  hasRecordInternals,
+  type Type,
+  type TypeOf,
+  type UnknownShape,
+} from '../type.mjs';
 
-export const valueof = <const R extends UnknownShape>(
-  recordType: RecordType<R>,
+export const valueof = <const R extends UnknownRecord>(
+  recordType: Type<R>,
   options?: Partial<
     Readonly<{
       typeName: string;
     }>
   >,
 ): ValueOfType<R> => {
-  const types = Object.values(recordType.shape);
+  if (!hasRecordInternals(recordType)) {
+    throw new Error(
+      `Expected a record type but received: ${recordType.typeName}`,
+    );
+  }
+
+  const types = Object.values(
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    (recordType as unknown as Readonly<{ shape: UnknownShape }>).shape,
+  );
 
   if (Arr.isArrayAtLeastLength(types, 2)) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return union(types, {
       typeName: options?.typeName ?? `ValueOf<${recordType.typeName}>`,
-    }) satisfies ValueofTypeSub<R> as ValueOfType<R>;
+    }) as ValueOfType<R>;
   }
 
   if (Arr.isNonEmpty(types)) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return types[0] satisfies ValueofTypeSub<R> as ValueOfType<R>;
+    return types[0] as ValueOfType<R>;
   }
 
   // types is empty
-  return undefinedType satisfies ValueOfType<R>;
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return undefinedType satisfies Type<undefined> as ValueOfType<R>;
 };
 
-type ValueofTypeSub<R extends UnknownShape> = Type<R[keyof R]['defaultValue']>;
+type ValueOfType<T extends UnknownRecord> =
+  IsNever<keyof T> extends true ? Type<undefined> : Type<ValueOf<T>>;
 
-type ValueOfType<R extends UnknownShape> =
-  IsNever<keyof R> extends true ? Type<undefined> : ValueofTypeSub<R>;
+// --- expectType assertions ---
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-expectType<ValueOfType<{}>, Type<undefined>>('=');
+{
+  // valueof extracts union of value types
+  type Base = Readonly<{ a: 0; b: 1; c: 2 }>;
 
-expectType<
-  ValueOfType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>,
-  Type<0 | 1 | 2>
->('=');
+  expectType<TypeOf<ReturnType<typeof valueof<Base>>>, 0 | 1 | 2>('=');
 
-expectType<
-  ValueOfType<Readonly<{ x: Type<string>; y: Type<number>; z: Type<boolean> }>>,
-  Type<string | number | boolean>
->('=');
+  // valueof of single-key record yields that value type
+  type Single = Readonly<{ x: 'hello' }>;
 
-expectType<
-  ValueOfType<Readonly<{ same: Type<string>; value: Type<string> }>>,
-  Type<string>
->('=');
+  expectType<TypeOf<ReturnType<typeof valueof<Single>>>, 'hello'>('=');
 
-expectType<ValueOfType<Readonly<{ never: Type<never> }>>, Type<never>>('=');
+  // valueof of empty record yields undefined
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  type EmptyRecord = Readonly<{}>;
+
+  expectType<ValueOfType<EmptyRecord>, Type<undefined>>('=');
+
+  expectType<TypeOf<ReturnType<typeof valueof<EmptyRecord>>>, undefined>('=');
+}

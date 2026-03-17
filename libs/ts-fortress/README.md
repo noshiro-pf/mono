@@ -73,13 +73,17 @@ const userData = {
     age: 30,
     email: 'john@example.com',
     isActive: true,
-} as const;
+} as const as unknown;
 
 assert.isTrue(User.is(userData));
 
 if (User.is(userData)) {
     // userData is now typed as User
     userData satisfies User;
+
+    expectType<typeof userData.age, number>('=');
+
+    expectType<typeof userData.email, string | undefined>('=');
 
     assert.strictEqual(
         `User: ${userData.name}, Age: ${userData.age}`,
@@ -621,8 +625,7 @@ const StrictUserType = t.record(
         name: t.string(),
     },
     {
-        excessPropertyValidation: 'error', // Reject any properties not defined in schema
-        excessPropertyFill: 'strip',
+        excessProperty: 'reject', // Reject any properties not defined in schema
     },
 );
 
@@ -632,15 +635,14 @@ const StrictUserTypeAlias = t.strictRecord({
     name: t.string(),
 });
 
-// Permissive validation (allow excess properties) - this is the default
+// Permissive validation (allow excess properties)
 const PermissiveUserType = t.record(
     {
         id: t.string(),
         name: t.string(),
     },
     {
-        excessPropertyValidation: 'allow', // Allow additional properties (default behavior)
-        excessPropertyFill: 'allow',
+        excessProperty: 'allow', // Allow additional properties and keep them in results
     },
 );
 
@@ -981,8 +983,7 @@ const StrictType = t.record(
         age: t.number(),
     },
     {
-        excessPropertyValidation: 'error',
-        excessPropertyFill: 'strip',
+        excessProperty: 'reject',
     },
 );
 

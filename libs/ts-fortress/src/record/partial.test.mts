@@ -5,8 +5,8 @@ import {
   type ValidationError,
   validationErrorsToMessages,
 } from '../utils/index.mjs';
-import { optional, type OptionalPropertyType } from './optional.mjs';
-import { partial, type PartialType } from './partial.mjs';
+import { optional } from './optional.mjs';
+import { partial } from './partial.mjs';
 import { record } from './record.mjs';
 
 describe(partial, () => {
@@ -21,34 +21,23 @@ describe(partial, () => {
 
     expectType<
       typeof ymd,
-      PartialType<
-        Readonly<{
-          year: Type<number>;
-          month: Type<number>;
-          date: Type<number>;
-        }>,
-        undefined
+      Type<
+        Readonly<
+          Partial<Readonly<{ year: number; month: number; date: number }>>
+        >
       >
     >('=');
 
     expectType<
-      typeof ymd,
-      Type<
-        Readonly<{
-          year?: number;
-          month?: number;
-          date?: number;
-        }>
-      > &
-        Readonly<{
-          shape: Readonly<{
-            year: OptionalPropertyType<Type<number>>;
-            month: OptionalPropertyType<Type<number>>;
-            date: OptionalPropertyType<Type<number>>;
-          }>;
-          excessPropertyValidation: 'strip';
-          excessPropertyFill: 'allow' | 'strip';
-        }>
+      keyof typeof ymd,
+      | 'typeName'
+      | 'defaultValue'
+      | 'is'
+      | 'assertIs'
+      | 'cast'
+      | 'fill'
+      | 'validate'
+      | 'optional'
     >('=');
 
     type Ymd = TypeOf<typeof ymd>;
@@ -58,7 +47,7 @@ describe(partial, () => {
       Partial<Readonly<{ year: number; month: number; date: number }>>
     >('=');
 
-    expectType<typeof ymd.defaultValue, Ymd>('=');
+    expectType<typeof ymd.defaultValue, TypeOf<typeof ymd>>('=');
 
     describe('is', () => {
       test('truthy case', () => {
@@ -132,21 +121,45 @@ describe(partial, () => {
 
         assert.deepStrictEqual(resultValue1, input); // Deep equality
 
-        // In strip mode (default), a new object is created even without excess properties
-        expect(resultValue1).not.toBe(input); // Different reference
+        // In allow mode (default), same reference is returned
+        expect(resultValue1).toBe(input); // Same reference
       });
 
-      test('validate returns input as-is for OK cases (allow mode)', () => {
-        const ymdBaseAllow = record(
+      test('validate rejects excess properties when excessProperty is "reject"', () => {
+        const ymdBaseReject = record(
           {
             year: number(1900),
             month: optional(number(1)),
             date: optional(number(1)),
           },
-          { excessPropertyValidation: 'allow' },
+          { excessProperty: 'reject' },
         );
 
-        const ymdAllow = partial(ymdBaseAllow);
+        const ymdReject = partial(ymdBaseReject);
+
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          date: 25,
+          extra: 'not allowed',
+        } as const;
+
+        const result = ymdReject.validate(input);
+
+        assert.isTrue(Result.isErr(result));
+      });
+
+      test('validate accepts valid data without excess when excessProperty is "reject"', () => {
+        const ymdBaseReject = record(
+          {
+            year: number(1900),
+            month: optional(number(1)),
+            date: optional(number(1)),
+          },
+          { excessProperty: 'reject' },
+        );
+
+        const ymdReject = partial(ymdBaseReject);
 
         const input: UnknownRecord = {
           year: 2000,
@@ -154,16 +167,11 @@ describe(partial, () => {
           date: 25,
         } as const;
 
-        const result = ymdAllow.validate(input);
+        const result = ymdReject.validate(input);
 
         assert.isTrue(Result.isOk(result));
 
-        const resultValue1 = Result.unwrapThrow(result);
-
-        assert.deepStrictEqual(resultValue1, input); // Deep equality
-
-        // In allow mode, the same reference is returned
-        expect(resultValue1).toBe(input); // Same reference
+        expect(Result.unwrapThrow(result)).toBe(input); // ✅ same reference
       });
 
       test('truthy case optional keys', () => {
@@ -191,25 +199,25 @@ describe(partial, () => {
 
         assert.deepStrictEqual(resultValue3, input); // Deep equality
 
-        // In strip mode (default), a new object is created even without excess properties
-        expect(resultValue3).not.toBe(input); // Different reference
+        // In allow mode (default), same reference is returned
+        expect(resultValue3).toBe(input); // Same reference
       });
 
-      test('validate returns input as-is for empty object (allow mode)', () => {
-        const ymdBaseAllow = record(
+      test('validate accepts empty object when excessProperty is "reject" (all fields optional, no excess)', () => {
+        const ymdBaseReject = record(
           {
             year: number(1900),
             month: optional(number(1)),
             date: optional(number(1)),
           },
-          { excessPropertyValidation: 'allow' },
+          { excessProperty: 'reject' },
         );
 
-        const ymdAllow = partial(ymdBaseAllow);
+        const ymdReject = partial(ymdBaseReject);
 
         const input: UnknownRecord = {} as const;
 
-        const result = ymdAllow.validate(input);
+        const result = ymdReject.validate(input);
 
         assert.isTrue(Result.isOk(result));
 
@@ -217,8 +225,7 @@ describe(partial, () => {
 
         assert.deepStrictEqual(resultValue3, input); // Deep equality
 
-        // In allow mode, the same reference is returned
-        expect(resultValue3).toBe(input); // Same reference
+        expect(resultValue3).toBe(input); // ✅ same reference
       });
 
       test('truthy case with additional keys', () => {
@@ -237,15 +244,12 @@ describe(partial, () => {
 
         const resultValue4 = Result.unwrapThrow(result);
 
-        assert.deepStrictEqual(
-          resultValue4,
-          ymd.cast({
-            year: 2000,
-            month: 12,
-            date: 25,
-            aaa: 999,
-          }),
-        );
+        assert.deepStrictEqual(resultValue4 as UnknownRecord, {
+          year: 2000,
+          month: 12,
+          date: 25,
+          aaa: 999,
+        });
       });
 
       test('validate returns input as-is for OK cases with additional keys', () => {
@@ -262,13 +266,15 @@ describe(partial, () => {
 
         const resultValue5 = Result.unwrapThrow(result);
 
-        assert.deepStrictEqual(resultValue5, {
+        assert.deepStrictEqual(resultValue5 as UnknownRecord, {
           year: 2000,
           month: 12,
           date: 25,
+          aaa: 999,
         });
 
-        expect(resultValue5).not.toBe(input); // Different reference
+        // In allow mode (default), excess properties are kept → same reference
+        expect(resultValue5).toBe(input);
       });
 
       test('falsy case 1', () => {
@@ -402,7 +408,7 @@ describe(partial, () => {
       '=',
     );
 
-    expectType<typeof ymd.defaultValue, Ymd>('=');
+    expectType<typeof ymd.defaultValue, TypeOf<typeof ymd>>('=');
 
     describe('is', () => {
       test('truthy case', () => {
@@ -486,21 +492,46 @@ describe(partial, () => {
 
         assert.deepStrictEqual(resultValue7, input); // Deep equality
 
-        // In strip mode (default), a new object is created even without excess properties
-        expect(resultValue7).not.toBe(input); // Different reference
+        // In allow mode (default), same reference is returned
+        expect(resultValue7).toBe(input); // Same reference
       });
 
-      test('partiallyPartialType validate returns input as-is for OK cases (allow mode)', () => {
-        const ymdBaseAllow = record(
+      test('partiallyPartialType validate rejects excess properties when excessProperty is "reject"', () => {
+        const ymdBaseReject = record(
           {
             year: number(1900),
             month: number(1),
             date: number(1),
           },
-          { excessPropertyValidation: 'allow' },
+          { excessProperty: 'reject' },
         );
 
-        const ymdAllow = partial(ymdBaseAllow, {
+        const ymdReject = partial(ymdBaseReject, {
+          keysToBeOptional: ['month', 'date'],
+        });
+
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          extra: 'not allowed',
+        } as const;
+
+        const result = ymdReject.validate(input);
+
+        assert.isTrue(Result.isErr(result));
+      });
+
+      test('partiallyPartialType validate accepts valid data without excess when excessProperty is "reject"', () => {
+        const ymdBaseReject = record(
+          {
+            year: number(1900),
+            month: number(1),
+            date: number(1),
+          },
+          { excessProperty: 'reject' },
+        );
+
+        const ymdReject = partial(ymdBaseReject, {
           keysToBeOptional: ['month', 'date'],
         });
 
@@ -509,16 +540,11 @@ describe(partial, () => {
           month: 12,
         } as const;
 
-        const result = ymdAllow.validate(input);
+        const result = ymdReject.validate(input);
 
         assert.isTrue(Result.isOk(result));
 
-        const resultValue7 = Result.unwrapThrow(result);
-
-        assert.deepStrictEqual(resultValue7, input); // Deep equality
-
-        // In allow mode, the same reference is returned
-        expect(resultValue7).toBe(input); // Same reference
+        expect(Result.unwrapThrow(result)).toBe(input); // ✅ same reference
       });
 
       test('falsy case', () => {

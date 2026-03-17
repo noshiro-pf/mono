@@ -5,9 +5,9 @@ import {
   type ValidationError,
   validationErrorsToMessages,
 } from '../utils/index.mjs';
-import { optional, type OptionalPropertyType } from './optional.mjs';
+import { optional } from './optional.mjs';
 import { record } from './record.mjs';
-import { required, type RequiredType } from './required.mjs';
+import { required } from './required.mjs';
 
 describe(required, () => {
   describe('fully required', () => {
@@ -21,34 +21,44 @@ describe(required, () => {
 
     expectType<
       typeof ymd,
-      RequiredType<
-        Readonly<{
-          year: OptionalPropertyType<Type<number>>;
-          month: OptionalPropertyType<Type<number>>;
-          date: OptionalPropertyType<Type<number>>;
-        }>,
-        undefined
+      Type<
+        Readonly<
+          Required<Readonly<{ year: number; month: number; date: number }>>
+        >
       >
     >('=');
 
     expectType<
-      typeof ymd,
-      Type<
+      (typeof ymd)['defaultValue'],
+      Readonly<{
+        year: number;
+        month: number;
+        date: number;
+      }>
+    >('=');
+
+    expectType<
+      (typeof ymd)['validate'],
+      (a: unknown) => Result<
         Readonly<{
           year: number;
           month: number;
           date: number;
-        }>
-      > &
-        Readonly<{
-          shape: Readonly<{
-            year: Type<number>;
-            month: Type<number>;
-            date: Type<number>;
-          }>;
-          excessPropertyValidation: 'strip';
-          excessPropertyFill: 'allow' | 'strip';
-        }>
+        }>,
+        readonly ValidationError[]
+      >
+    >('=');
+
+    expectType<
+      keyof typeof ymd,
+      | 'typeName'
+      | 'is'
+      | 'validate'
+      | 'assertIs'
+      | 'cast'
+      | 'defaultValue'
+      | 'fill'
+      | 'optional'
     >('=');
 
     type Ymd = TypeOf<typeof ymd>;
@@ -58,7 +68,7 @@ describe(required, () => {
       Required<Readonly<{ year: number; month: number; date: number }>>
     >('=');
 
-    expectType<typeof ymd.defaultValue, Ymd>('=');
+    expectType<typeof ymd.defaultValue, TypeOf<typeof ymd>>('=');
 
     describe('is', () => {
       test('truthy case', () => {
@@ -148,21 +158,45 @@ describe(required, () => {
 
         assert.deepStrictEqual(resultValue1, input); // Deep equality
 
-        // In strip mode (default), a new object is created even without excess properties
-        expect(resultValue1).not.toBe(input); // Different reference
+        // In allow mode (default), same reference is returned
+        expect(resultValue1).toBe(input); // Same reference
       });
 
-      test('validate returns input as-is for OK cases (allow mode)', () => {
-        const ymdBaseAllow = record(
+      test('validate rejects excess properties when excessProperty is "reject"', () => {
+        const ymdBaseReject = record(
           {
             year: optional(number(1900)),
             month: optional(number(1)),
             date: optional(number(1)),
           },
-          { excessPropertyValidation: 'allow' },
+          { excessProperty: 'reject' },
         );
 
-        const ymdAllow = required(ymdBaseAllow);
+        const ymdReject = required(ymdBaseReject);
+
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          date: 25,
+          extra: 'not allowed',
+        } as const;
+
+        const result = ymdReject.validate(input);
+
+        assert.isTrue(Result.isErr(result));
+      });
+
+      test('validate accepts valid data without excess when excessProperty is "reject"', () => {
+        const ymdBaseReject = record(
+          {
+            year: optional(number(1900)),
+            month: optional(number(1)),
+            date: optional(number(1)),
+          },
+          { excessProperty: 'reject' },
+        );
+
+        const ymdReject = required(ymdBaseReject);
 
         const input: UnknownRecord = {
           year: 2000,
@@ -170,16 +204,11 @@ describe(required, () => {
           date: 25,
         } as const;
 
-        const result = ymdAllow.validate(input);
+        const result = ymdReject.validate(input);
 
         assert.isTrue(Result.isOk(result));
 
-        const resultValue1 = Result.unwrapThrow(result);
-
-        assert.deepStrictEqual(resultValue1, input); // Deep equality
-
-        // In allow mode, the same reference is returned
-        expect(resultValue1).toBe(input); // Same reference
+        expect(Result.unwrapThrow(result)).toBe(input); // ✅ same reference
       });
 
       test('falsy case - missing required property', () => {
@@ -230,15 +259,12 @@ describe(required, () => {
 
         const resultValue2 = Result.unwrapThrow(result);
 
-        assert.deepStrictEqual(
-          resultValue2,
-          ymd.cast({
-            year: 2000,
-            month: 12,
-            date: 25,
-            aaa: 999,
-          }),
-        );
+        assert.deepStrictEqual(resultValue2 as UnknownRecord, {
+          year: 2000,
+          month: 12,
+          date: 25,
+          aaa: 999,
+        });
       });
 
       test('validate returns input as-is for OK cases with additional keys', () => {
@@ -255,13 +281,15 @@ describe(required, () => {
 
         const resultValue3 = Result.unwrapThrow(result);
 
-        assert.deepStrictEqual(resultValue3, {
+        assert.deepStrictEqual(resultValue3 as UnknownRecord, {
           year: 2000,
           month: 12,
           date: 25,
+          aaa: 999,
         });
 
-        expect(resultValue3).not.toBe(input); // Different reference
+        // In allow mode (default), excess properties are kept → same reference
+        expect(resultValue3).toBe(input);
       });
 
       test('falsy case - wrong type', () => {
@@ -396,7 +424,7 @@ describe(required, () => {
       '=',
     );
 
-    expectType<typeof ymd.defaultValue, Ymd>('=');
+    expectType<typeof ymd.defaultValue, TypeOf<typeof ymd>>('=');
 
     describe('is', () => {
       test('truthy case - required fields only', () => {
@@ -514,21 +542,46 @@ describe(required, () => {
 
         assert.deepStrictEqual(resultValue5, input); // Deep equality
 
-        // In strip mode (default), a new object is created even without excess properties
-        expect(resultValue5).not.toBe(input); // Different reference
+        // In allow mode (default), same reference is returned
+        expect(resultValue5).toBe(input); // Same reference
       });
 
-      test('partiallyRequiredType validate returns input as-is for OK cases (allow mode)', () => {
-        const ymdBaseAllow = record(
+      test('partiallyRequiredType validate rejects excess properties when excessProperty is "reject"', () => {
+        const ymdBaseReject = record(
           {
             year: optional(number(1900)),
             month: optional(number(1)),
             date: optional(number(1)),
           },
-          { excessPropertyValidation: 'allow' },
+          { excessProperty: 'reject' },
         );
 
-        const ymdAllow = required(ymdBaseAllow, {
+        const ymdReject = required(ymdBaseReject, {
+          keysToBeRequired: ['year', 'month'],
+        });
+
+        const input: UnknownRecord = {
+          year: 2000,
+          month: 12,
+          extra: 'not allowed',
+        } as const;
+
+        const result = ymdReject.validate(input);
+
+        assert.isTrue(Result.isErr(result));
+      });
+
+      test('partiallyRequiredType validate accepts valid data without excess when excessProperty is "reject"', () => {
+        const ymdBaseReject = record(
+          {
+            year: optional(number(1900)),
+            month: optional(number(1)),
+            date: optional(number(1)),
+          },
+          { excessProperty: 'reject' },
+        );
+
+        const ymdReject = required(ymdBaseReject, {
           keysToBeRequired: ['year', 'month'],
         });
 
@@ -537,16 +590,11 @@ describe(required, () => {
           month: 12,
         } as const;
 
-        const result = ymdAllow.validate(input);
+        const result = ymdReject.validate(input);
 
         assert.isTrue(Result.isOk(result));
 
-        const resultValue5 = Result.unwrapThrow(result);
-
-        assert.deepStrictEqual(resultValue5, input); // Deep equality
-
-        // In allow mode, the same reference is returned
-        expect(resultValue5).toBe(input); // Same reference
+        expect(Result.unwrapThrow(result)).toBe(input); // ✅ same reference
       });
 
       test('truthy case - with optional field', () => {

@@ -17,8 +17,7 @@ describe('record strict composition tests', () => {
       email: string(),
     },
     {
-      excessPropertyValidation: 'error',
-      excessPropertyFill: 'strip',
+      excessProperty: 'reject',
     },
   );
 
@@ -352,8 +351,7 @@ describe('record strict composition tests', () => {
         name: string(),
       },
       {
-        excessPropertyValidation: 'error',
-        excessPropertyFill: 'strip',
+        excessProperty: 'reject',
       },
     );
 
@@ -363,8 +361,7 @@ describe('record strict composition tests', () => {
         email: string(),
       },
       {
-        excessPropertyValidation: 'error',
-        excessPropertyFill: 'strip',
+        excessProperty: 'reject',
       },
     );
 
@@ -380,16 +377,37 @@ describe('record strict composition tests', () => {
 
       // mergeRecords merges shapes into {id, name, age, email} then delegates to record().
       // All keys are in the merged shape, so no excess property errors.
-      // Default excessPropertyValidation is 'strip' (not inherited from strict inputs).
+      // Strictest wins: 'reject' from strictRecord inputs.
 
       assert.isTrue(mergedType.is(validData));
 
       const result = mergedType.validate(validData);
 
       assert.isTrue(Result.isOk(result));
+
+      const resultValue = Result.unwrapThrow(result);
+
+      assert.deepStrictEqual(resultValue, validData);
     });
 
-    test('strips excess properties by default (merged shape does not include extra)', () => {
+    test('validate returns input as-is for OK cases', () => {
+      const input = {
+        id: '123',
+        name: 'John',
+        age: 25,
+        email: 'john@example.com',
+      } as const;
+
+      const result = mergedType.validate(input);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue = Result.unwrapThrow(result);
+
+      expect(resultValue).toBe(input); // same reference
+    });
+
+    test('rejects excess properties (strictest wins: reject from strictRecord inputs)', () => {
       const dataWithExcess = {
         id: '123',
         name: 'John',
@@ -398,20 +416,20 @@ describe('record strict composition tests', () => {
         extra: 'not allowed',
       } as const;
 
-      // Default excessPropertyValidation is 'strip': excess is stripped, not rejected.
-      assert.isTrue(mergedType.is(dataWithExcess));
+      // deriveStrictestExcessProperty picks 'reject' from strictRecord inputs
+      assert.isFalse(mergedType.is(dataWithExcess));
 
       const result = mergedType.validate(dataWithExcess);
 
-      assert.isTrue(Result.isOk(result));
+      assert.isTrue(Result.isErr(result));
 
-      // The stripped result should not contain 'extra'
-      assert.deepStrictEqual(Result.unwrapThrow(result), {
-        id: '123',
-        name: 'John',
-        age: 25,
-        email: 'john@example.com',
-      });
+      const messages = validationErrorsToMessages(
+        Result.unwrapErrThrow(result),
+      );
+
+      assert.isTrue(
+        messages.some((m) => m.includes('excess property "extra"')),
+      );
     });
 
     test('rejects missing required properties from any merged record', () => {
@@ -423,23 +441,30 @@ describe('record strict composition tests', () => {
 
       const resultError8 = Result.unwrapErrThrow(result);
 
-      const resultError8Messages = validationErrorsToMessages(resultError8);
-
-      assert.isTrue(
-        resultError8Messages.some((message) =>
-          message.includes('missing required key "email".'),
-        ),
-      );
+      assert.deepStrictEqual(validationErrorsToMessages(resultError8), [
+        'Error at email: missing required key "email".',
+      ]);
     });
 
-    test('mixed strict and permissive records', () => {
+    test('mixed strict and permissive records - strict wins for excess property check', () => {
       const permissiveRecord = record({
         status: string(),
         metadata: string(),
-      }); // default excessPropertyValidation is 'strip'
+      }); // default excessProperty is 'allow'
 
       const mixedMergedType = mergeRecords([strictRecord1, permissiveRecord]);
 
+      // Valid data with all merged properties should pass
+      const validData = {
+        id: '123',
+        name: 'John',
+        status: 'active',
+        metadata: 'some data',
+      } as const;
+
+      assert.isTrue(mixedMergedType.is(validData));
+
+      // Data with excess properties should be rejected (strictest wins: 'reject' from strictRecord1)
       const dataWithExcess = {
         id: '123',
         name: 'John',
@@ -448,20 +473,19 @@ describe('record strict composition tests', () => {
         extra: 'not in merged shape',
       } as const;
 
-      // mergeRecords merges shapes then delegates to record() with default 'strip'.
-      // 'extra' is not in the merged shape, so it is stripped (not rejected).
-      assert.isTrue(mixedMergedType.is(dataWithExcess));
+      assert.isFalse(mixedMergedType.is(dataWithExcess));
 
       const result = mixedMergedType.validate(dataWithExcess);
 
-      assert.isTrue(Result.isOk(result));
+      assert.isTrue(Result.isErr(result));
 
-      assert.deepStrictEqual(Result.unwrapThrow(result), {
-        id: '123',
-        name: 'John',
-        status: 'active',
-        metadata: 'some data',
-      });
+      const messages = validationErrorsToMessages(
+        Result.unwrapErrThrow(result),
+      );
+
+      assert.isTrue(
+        messages.some((m) => m.includes('excess property "extra"')),
+      );
     });
   });
 

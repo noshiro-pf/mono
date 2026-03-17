@@ -63,8 +63,7 @@ const StrictType = t.record(
     age: t.number(),
   },
   {
-    excessPropertyValidation: 'error',
-    excessPropertyFill: 'strip',
+    excessProperty: 'reject',
   },
 );
 

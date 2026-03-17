@@ -1,9 +1,9 @@
 import { Arr, expectType, Obj } from 'ts-data-forge';
 import { literal } from '../other-types/index.mjs';
 import {
-  type ExcessPropertyBehavior,
-  type ExcessPropertyFillBehavior,
-  type RecordType,
+  type ExcessPropertyOption,
+  hasRecordInternals,
+  type RecordTypeInternals,
   type Type,
   type TypeOf,
   type UnknownShape,
@@ -11,201 +11,88 @@ import {
 import { toIntersectionString } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
-type UnknownRecordType = RecordType<UnknownShape, ExcessPropertyBehavior>;
-
 export const mergeRecords = <
-  const RecordTypes extends NonEmptyArray<UnknownRecordType>,
-  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
+  const Types extends NonEmptyArray<Type<UnknownRecord>>,
 >(
-  recordTypes: RecordTypes,
+  recordTypes: Types,
   options?: Partial<
     Readonly<{
       typeName: string;
-      defaultValue: IntersectionTypeValue<RecordTypes>;
-
-      /**
-       * Behavior when validating objects with excess properties.
-       * - 'allow': Accept excess properties
-       * - 'strip': Remove excess properties from the result (default)
-       * - 'error': Reject objects with excess properties
-       * @default 'strip'
-       */
-      excessPropertyValidation: ExcessValidation;
-
-      /**
-       * Behavior when filling objects with excess properties.
-       * - 'allow': Keep excess properties in the result
-       * - 'strip': Remove excess properties from the result (default)
-       * @default 'strip'
-       */
-      excessPropertyFill: ExcessPropertyFillBehavior;
+      excessProperty: ExcessPropertyOption;
     }>
   >,
-): RecordType<
-  TsFortressInternal.CastToShape<IntersectionOfTypeShape<RecordTypes>>,
-  ExcessValidation
-> => {
-  type Ret = RecordType<
-    TsFortressInternal.CastToShape<IntersectionOfTypeShape<RecordTypes>>,
-    ExcessValidation
-  >;
+): MergeRecordsType<Types> => {
+  if (!recordTypes.every(hasRecordInternals)) {
+    throw new Error(
+      'Expected a record type but received a non-record type in mergeRecords',
+    );
+  }
 
   const typeNameFilled: string =
     options?.typeName ??
     `(${toIntersectionString(recordTypes.map((a) => a.typeName))})`;
 
-  const shapes = Arr.map(recordTypes, (t) => t.shape);
-
-  const mergedShape = Obj.merge(...shapes);
+  const shapes = Arr.map(
+    recordTypes,
+    (t) => t.shape,
+  ) satisfies readonly UnknownShape[];
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return record(mergedShape as UnknownShape, {
+  const mergedShape = Obj.merge(...shapes) as UnknownShape;
+
+  const excessProperty =
+    options?.excessProperty ?? deriveStrictestExcessProperty(recordTypes);
+
+  const internalRecord = record(mergedShape, {
     typeName: typeNameFilled,
-    excessPropertyValidation: options?.excessPropertyValidation,
-    excessPropertyFill: options?.excessPropertyFill,
-  }) as unknown as Ret;
+    excessProperty,
+  });
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return internalRecord as unknown as MergeRecordsType<Types>;
 };
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+type MergeRecordsType<Types extends readonly Type<UnknownRecord>[]> = Type<
+  MergedExactValue<Types>
+>;
 
-type IntersectionTypeValue<Types extends NonEmptyArray<UnknownRecordType>> =
-  Intersection<TsFortressInternal.TypeListToValueTypeList<Types>>;
+/** Compute the merged value type directly from input types' `defaultValue`. */
+type MergedExactValue<Types extends readonly Type<UnknownRecord>[]> =
+  FlattenIntersection<Intersection<ExactValueTuple<Types>>>;
 
-type IntersectionOfTypeShape<Types extends NonEmptyArray<UnknownRecordType>> =
-  Intersection<TsFortressInternal.TypeListToShapeList<Types>>;
+/** Flatten an intersection result into a single mapped type for better TypeScript compatibility. */
+type FlattenIntersection<T> = T extends UnknownRecord
+  ? Readonly<{ [K in keyof T]: T[K] }>
+  : T;
 
-namespace TsFortressInternal {
-  export type TypeListToValueTypeList<
-    Types extends readonly UnknownRecordType[],
-  > = TypeListToValueTypeListImpl<Types>;
+type ExactValueTuple<Types extends readonly unknown[]> =
+  Types extends readonly [infer Head, ...infer Tail]
+    ? readonly [ExactValueOf<Head>, ...ExactValueTuple<Tail>]
+    : readonly [];
 
-  type TypeListToValueTypeListImpl<Types extends readonly unknown[]> =
-    Types extends readonly []
-      ? readonly []
-      : Types extends readonly [infer Head, ...infer Tail]
-        ? readonly [TypeOf<Cast1<Head>>, ...TypeListToValueTypeListImpl<Tail>]
-        : never;
+type ExactValueOf<T> =
+  T extends Readonly<{ defaultValue: infer V }> ? V : never;
 
-  // transformer-ignore-next-line
-  type Cast1<T> = [T] extends [UnknownRecordType] ? T : never;
+const deriveStrictestExcessProperty = (
+  types: readonly RecordTypeInternals[],
+): ExcessPropertyOption =>
+  types.some((t) => t.excessProperty === 'reject') ? 'reject' : 'allow';
 
-  export type TypeListToShapeList<Types extends readonly UnknownRecordType[]> =
-    TypeListToShapeListImpl<Types>;
+// Verify MergedExactValue flattens correctly
+{
+  type R1 = ReturnType<
+    typeof record<Readonly<{ x: Type<number>; y: Type<number> }>>
+  >;
 
-  type TypeListToShapeListImpl<Types extends readonly unknown[]> =
-    Types extends readonly []
-      ? readonly []
-      : Types extends readonly [infer Head, ...infer Tail]
-        ? readonly [GetShape<Head>, ...TypeListToShapeListImpl<Tail>]
-        : never;
+  type R2 = ReturnType<
+    typeof record<Readonly<{ z: Type<number>; w: Type<number> }>>
+  >;
 
-  // transformer-ignore-next-line
-  type GetShape<T> = [T] extends [UnknownRecordType] ? T['shape'] : never;
-
-  // transformer-ignore-next-line
-  export type CastToShape<T> = [T] extends [UnknownShape] ? T : never;
+  expectType<
+    MergedExactValue<readonly [R1, R2]>,
+    Readonly<{ x: number; y: number; z: number; w: number }>
+  >('=');
 }
-
-expectType<
-  IntersectionTypeValue<
-    readonly [
-      RecordType<
-        Readonly<{
-          a: Type<0>;
-          b: Type<0>;
-        }>
-      >,
-      RecordType<
-        Readonly<{
-          b: Type<0>;
-          c: Type<0>;
-        }>
-      >,
-    ]
-  >,
-  Readonly<{
-    a: 0;
-    b: 0;
-    c: 0;
-  }>
->('=');
-
-expectType<
-  IntersectionOfTypeShape<
-    readonly [
-      RecordType<
-        Readonly<{
-          a: Type<0>;
-          b: Type<0>;
-        }>
-      >,
-      RecordType<
-        Readonly<{
-          b: Type<0>;
-          c: Type<0>;
-        }>
-      >,
-    ]
-  >,
-  Readonly<{
-    a: Type<0>;
-    b: Type<0>;
-    c: Type<0>;
-  }>
->('=');
-
-expectType<
-  IntersectionOfTypeShape<
-    readonly [
-      RecordType<
-        Readonly<{
-          a: Type<0>;
-          b: Type<0>;
-        }>
-      >,
-      RecordType<
-        Readonly<{
-          b: Type<0>;
-          c: Type<0>;
-        }>
-      >,
-    ]
-  >,
-  UnknownShape
->('<=');
-
-expectType<
-  RecordType<
-    IntersectionOfTypeShape<
-      [
-        RecordType<
-          Readonly<{
-            a: Type<0>;
-            b: Type<0>;
-          }>
-        >,
-        RecordType<
-          Readonly<{
-            b: Type<0>;
-            c: Type<0>;
-          }>
-        >,
-      ]
-    >
-  >['shape'],
-  Readonly<{
-    a: Type<0>;
-    b: Type<0>;
-    c: Type<0>;
-  }>
->('=');
-
-expectType<
-  IntersectionOfTypeShape<NonEmptyArray<UnknownRecordType>>,
-  UnknownShape
->('<=');
 
 expectType<
   TypeOf<
@@ -220,35 +107,6 @@ expectType<
     a: 0;
     b: 0;
   }>
->('=');
-
-expectType<
-  TsFortressInternal.TypeListToValueTypeList<
-    readonly [
-      RecordType<
-        Readonly<{
-          a: Type<0>;
-          b: Type<0>;
-        }>
-      >,
-      RecordType<
-        Readonly<{
-          b: Type<0>;
-          c: Type<0>;
-        }>
-      >,
-    ]
-  >,
-  readonly [
-    Readonly<{
-      a: 0;
-      b: 0;
-    }>,
-    Readonly<{
-      b: 0;
-      c: 0;
-    }>,
-  ]
 >('=');
 
 expectType<

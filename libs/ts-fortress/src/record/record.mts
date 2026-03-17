@@ -1,5 +1,6 @@
 import {
   Arr,
+  expectType,
   hasKey,
   isRecord,
   memoizeFunction,
@@ -7,11 +8,10 @@ import {
   tp,
 } from 'ts-data-forge';
 import {
-  type ExcessPropertyBehavior,
-  type ExcessPropertyFillBehavior,
-  type RecordType,
-  type TsFortressInternal,
+  type ExcessPropertyOption,
+  type RecordTypeInternals,
   type Type,
+  type TypeOf,
   type UnknownShape,
 } from '../type.mjs';
 import {
@@ -24,36 +24,25 @@ import {
 } from '../utils/index.mjs';
 
 export const record = <
-  const R extends UnknownShape,
-  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
+  const S extends UnknownShape,
+  const EP extends ExcessPropertyOption = 'allow',
 >(
-  shape: R,
+  shape: S,
   options?: Partial<
     Readonly<{
       typeName: string;
 
       /**
-       * Behavior when validating objects with excess properties.
-       * - 'allow': Accept excess properties
-       * - 'strip': Remove excess properties from the result (default)
-       * - 'error': Reject objects with excess properties
-       * @default 'strip'
+       * Controls how excess properties (keys not in shape) are handled.
+       *
+       * - `'allow'` (default) — accept excess properties
+       * - `'reject'` — reject objects with excess properties
        */
-      excessPropertyValidation: ExcessValidation;
-
-      /**
-       * Behavior when filling objects with excess properties.
-       * - 'allow': Keep excess properties in the result
-       * - 'strip': Remove excess properties from the result (default)
-       * @default 'strip'
-       */
-      excessPropertyFill: ExcessPropertyFillBehavior;
+      excessProperty: EP;
     }>
   >,
-): RecordType<R, ExcessValidation> => {
-  type T = ExcessValidation extends 'allow'
-    ? TsFortressInternal.RecordTypeValue<R> | UnknownRecord
-    : TsFortressInternal.RecordTypeValue<R>;
+): Type<RecordTypeFromShape<S>> => {
+  type V = RecordTypeFromShape<S>;
 
   const sourceKeys = new Set(Object.keys(shape));
 
@@ -63,27 +52,19 @@ export const record = <
       .map(([k, v]) => `${k}: ${v.typeName}`)
       .join(', ')} }`;
 
-  const excessPropertyValidation = options?.excessPropertyValidation ?? 'strip';
-
-  const excessPropertyFill = options?.excessPropertyFill ?? 'strip';
+  const ep: ExcessPropertyOption = options?.excessProperty ?? 'allow';
 
   const getDefaultValue = memoizeFunction(
-    (): T =>
+    (): V =>
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       Object.fromEntries(
         Object.entries(shape).map(([key, value]) =>
           tp(key, value.defaultValue),
         ),
-      ) as T,
+      ) as V,
   );
 
-  const stripExcessProperties = (obj: ReadonlyRecord<string, unknown>): T =>
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    Object.fromEntries(
-      Object.entries(obj).filter(([key]) => sourceKeys.has(key)),
-    ) as T;
-
-  const validate: Type<T>['validate'] = (a) => {
+  const validate: Type<V>['validate'] = (a) => {
     if (!isRecord(a)) {
       return Result.err([
         createPrimitiveValidationError({
@@ -130,101 +111,65 @@ export const record = <
       },
     );
 
-    switch (excessPropertyValidation) {
-      case 'allow':
-        return Arr.isNonEmpty(defaultErrors)
-          ? Result.err(defaultErrors)
-          : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            Result.ok(a as T);
+    if (ep === 'reject') {
+      const excessKeys = Object.keys(a).filter((key) => !sourceKeys.has(key));
 
-      case 'strip':
-        return Arr.isNonEmpty(defaultErrors)
-          ? Result.err(defaultErrors)
-          : Result.ok(stripExcessProperties(a));
+      const excessErrors: readonly ValidationError[] = excessKeys.map(
+        (key) =>
+          ({
+            path: [key],
+            actualValue: a[key],
+            typeName: typeNameFilled,
+            expectedType: typeNameFilled,
+            details: {
+              kind: 'excess-key',
+              key,
+            },
+          }) satisfies ValidationError,
+      );
 
-      case 'error': {
-        const excessKeys = Object.keys(a).filter((key) => !sourceKeys.has(key));
+      // Combine all errors
+      const allErrors = [...defaultErrors, ...excessErrors] as const;
 
-        const excessErrors: readonly ValidationError[] = excessKeys.map(
-          (key) =>
-            ({
-              path: [key],
-              actualValue: a[key],
-              typeName: typeNameFilled,
-              expectedType: typeNameFilled,
-              details: {
-                kind: 'excess-key',
-                key,
-              },
-            }) satisfies ValidationError,
-        );
-
-        // Combine all errors
-        const allErrors = [...defaultErrors, ...excessErrors] as const;
-
-        return Arr.isNonEmpty(allErrors)
-          ? Result.err(allErrors)
-          : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            Result.ok(a as T);
-      }
+      return Arr.isNonEmpty(allErrors)
+        ? Result.err(allErrors)
+        : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          Result.ok(a as V);
     }
+
+    // ep === 'allow'
+    return Arr.isNonEmpty(defaultErrors)
+      ? Result.err(defaultErrors)
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        Result.ok(a as V);
   };
 
-  const fill: Type<T>['fill'] = (a) => {
+  const fill = (a: unknown): V => {
     if (!isRecord(a)) {
       return getDefaultValue();
     }
 
-    // Handle excess properties based on fill option
-    switch (excessPropertyFill) {
-      case 'allow': {
-        const excessEntries = Object.entries(a).filter(
-          ([key]) => !sourceKeys.has(key),
-        );
+    // fill always produces shape-only values (strips excess)
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return Object.fromEntries(
+      Object.entries(shape).map(([k, v]) => {
+        if (hasKey(a, k)) {
+          const value = a[k];
 
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        return Object.fromEntries([
-          ...Object.entries(shape).map(([k, v]) => {
-            if (hasKey(a, k)) {
-              const value = a[k];
+          // For optional fields, if the value is undefined, keep it as undefined
+          if (v.optional === true && value === undefined) {
+            return tp(k, undefined);
+          }
 
-              // For optional fields, if the value is undefined, keep it as undefined
-              if (v.optional === true && value === undefined) {
-                return tp(k, undefined);
-              }
+          return tp(k, v.fill(value));
+        }
 
-              return tp(k, v.fill(value));
-            }
-
-            return tp(k, v.defaultValue);
-          }),
-          ...excessEntries,
-        ]) as T;
-      }
-
-      case 'strip': {
-        // For 'strip' or 'error' (treated as 'strip' for fill), return only defined keys
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        return Object.fromEntries(
-          Object.entries(shape).map(([k, v]) => {
-            if (hasKey(a, k)) {
-              const value = a[k];
-
-              // For optional fields, if the value is undefined, keep it as undefined
-              if (v.optional === true && value === undefined) {
-                return tp(k, undefined);
-              }
-
-              return tp(k, v.fill(value));
-            }
-
-            return tp(k, v.defaultValue);
-          }),
-        ) as T;
-      }
-    }
+        return tp(k, v.defaultValue);
+      }),
+    ) as V;
   };
 
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return {
     typeName: typeNameFilled,
     get defaultValue() {
@@ -236,40 +181,66 @@ export const record = <
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
     shape,
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    excessPropertyValidation: excessPropertyValidation as ExcessValidation,
-    excessPropertyFill,
-  };
+    excessProperty: ep,
+  } satisfies Type<V> & RecordTypeInternals as Type<V>;
 };
 
 /**
- * Creates a strict record type that does not allow excess properties.
- * This is an alias for `record(source, { excessPropertyValidation: 'error' })`.
- *
- * @param source - The record schema definition
- * @param options - Optional configuration
- * @returns A Type that validates records without allowing excess properties
- *
- * @example
- * ```typescript
- * import { strictRecord, string, number } from 'ts-fortress';
- *
- * const User = strictRecord({
- *   name: string(),
- *   age: number()
- * });
- *
- * User.is({ name: "John", age: 30 }); // true
- * User.is({ name: "John", age: 30, extra: "not allowed" }); // false
- * ```
+ * Creates a strict record type that rejects excess properties.
+ * This is an alias for `record(shape, { excessProperty: 'reject' })`.
  */
-export const strictRecord = <const R extends UnknownShape>(
-  source: R,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
-      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
-    }>
-  >,
-): RecordType<R, 'error'> =>
-  record(source, { ...options, excessPropertyValidation: 'error' });
+export const strictRecord = <const S extends UnknownShape>(
+  shape: S,
+  options?: Partial<Readonly<{ typeName: string }>>,
+): Type<RecordTypeFromShape<S>> =>
+  record(shape, {
+    typeName: options?.typeName,
+    excessProperty: 'reject',
+  });
+
+// ---------------------------------------------------------------------------
+// RecordTypeValue (internal — computes value type from shape)
+// ---------------------------------------------------------------------------
+
+/** @internal */
+type RecordTypeFromShape<S extends UnknownShape> =
+  TsFortressInternal.RecordTypeFromShapeImpl<S>;
+
+namespace TsFortressInternal {
+  export type RecordTypeFromShapeImpl<S extends UnknownShape> =
+    RecordTypeFromShapeImplSub<S, OptionalTypeKeys<S>>;
+
+  type RecordTypeFromShapeImplSub<
+    S extends UnknownShape,
+    OptionalKeys extends keyof S,
+  > =
+    TypeEq<OptionalKeys, never> extends true
+      ? Readonly<{ [key in Exclude<keyof S, OptionalKeys>]: TypeOf<S[key]> }>
+      : TypeEq<keyof S, OptionalKeys> extends true
+        ? MergeIntersection<
+            Readonly<{ [key in OptionalKeys]?: TypeOf<S[key]> }>
+          >
+        : MergeIntersection<
+            Readonly<
+              { [key in OptionalKeys]?: TypeOf<S[key]> } & {
+                [key in Exclude<keyof S, OptionalKeys>]: TypeOf<S[key]>;
+              }
+            >
+          >;
+
+  type OptionalTypeKeys<S extends UnknownShape> = {
+    [K in keyof S]: S[K] extends Readonly<{ optional: true }> ? K : never;
+  }[keyof S];
+}
+
+// --- expectType assertions ---
+
+expectType<
+  RecordTypeFromShape<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>,
+  Readonly<{ a: 0; b: 1; c: 2 }>
+>('=');
+
+expectType<
+  Type<RecordTypeFromShape<Readonly<{ a: Type<0> }>>>,
+  Type<Readonly<{ a: 0 }>>
+>('=');

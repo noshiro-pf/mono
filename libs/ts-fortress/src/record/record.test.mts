@@ -6,43 +6,43 @@ import { optional } from './optional.mjs';
 import { record } from './record.mjs';
 
 describe(record, () => {
-  const ymd = record(
-    {
-      year: number(1900),
-      month: number(1),
-      date: number(1),
-    },
-    { excessPropertyValidation: 'strip' },
-  );
+  const ymd = record({
+    year: number(1900),
+    month: number(1),
+    date: number(1),
+  });
 
-  const ymdEased = record(
+  const ymdStrict = record(
     {
       year: number(1900),
       month: optional(number(1)),
       date: optional(number(1)),
     },
-    { excessPropertyValidation: 'allow' },
+    { excessProperty: 'reject' },
   );
 
   expectType<
     typeof ymd,
-    Type<Readonly<{ year: number; month: number; date: number }>> &
-      Readonly<{
-        shape: Readonly<{
-          year: Type<number>;
-          month: Type<number>;
-          date: Type<number>;
-        }>;
-        excessPropertyValidation: 'strip';
-        excessPropertyFill: 'allow' | 'strip';
-      }>
+    Type<Readonly<{ year: number; month: number; date: number }>>
   >('=');
 
   type Ymd = TypeOf<typeof ymd>;
 
   expectType<Ymd, Readonly<{ year: number; month: number; date: number }>>('=');
 
-  expectType<typeof ymd.defaultValue, Ymd>('=');
+  expectType<typeof ymd.defaultValue, TypeOf<typeof ymd>>('=');
+
+  // record(shape) and record(shape, { excessProperty: 'allow' }) produce the same type
+  const _ymdExplicitAllow = record(
+    {
+      year: number(1900),
+      month: number(1),
+      date: number(1),
+    },
+    { excessProperty: 'allow' },
+  );
+
+  expectType<typeof ymd, typeof _ymdExplicitAllow>('=');
 
   describe('is', () => {
     test('truthy case', () => {
@@ -177,43 +177,53 @@ describe(record, () => {
       ]);
     });
 
-    test('validate returns the stripped content of input for OK cases if excessPropertyValidation is "strip"', () => {
+    test('validate returns input as-is (with excess) for OK cases since default excessProperty is "allow"', () => {
       const input = {
         year: 2023,
         month: 6,
         date: 15,
-        extra: 'should be stripped',
+        extra: 'should be kept',
       } as const;
 
-      const result = ymd.validate(input);
+      const result = ymd.validate(input as UnknownRecord);
 
       assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
-      assert.deepStrictEqual(resultValue1, {
+      assert.deepStrictEqual(resultValue1 as UnknownRecord, {
         year: 2023,
         month: 6,
         date: 15,
+        extra: 'should be kept',
       });
 
-      expect(resultValue1).not.toBe(input); // ✅ different reference
+      expect(resultValue1).toBe(input); // ✅ same reference
     });
 
-    test('validate returns input as-is for OK cases if excessPropertyValidation is "allow"', () => {
+    test('validate rejects excess properties if excessProperty is "reject"', () => {
       const input = {
         year: 2023,
         month: 6,
-        date: 15,
+        extra: 'not allowed',
       } as const;
 
-      const result = ymdEased.validate(input);
+      const result = ymdStrict.validate(input as UnknownRecord);
+
+      assert.isTrue(Result.isErr(result));
+    });
+
+    test('validate accepts valid data without excess when excessProperty is "reject"', () => {
+      const input = {
+        year: 2023,
+        month: 6,
+      } as const;
+
+      const result = ymdStrict.validate(input as UnknownRecord);
 
       assert.isTrue(Result.isOk(result));
 
-      const resultValue1 = Result.unwrapThrow(result);
-
-      expect(resultValue1).toBe(input); // ✅ same reference
+      expect(Result.unwrapThrow(result)).toBe(input); // ✅ same reference
     });
   });
 
@@ -270,22 +280,19 @@ describe(record, () => {
 });
 
 describe('partial record', () => {
-  const ymd = record(
-    {
-      year: number(1900),
-      month: optional(number(1)),
-      date: optional(number(1)),
-    },
-    { excessPropertyValidation: 'strip' },
-  );
+  const ymd = record({
+    year: number(1900),
+    month: optional(number(1)),
+    date: optional(number(1)),
+  });
 
-  const ymdEased = record(
+  const ymdStrict = record(
     {
       year: number(1900),
       month: optional(number(1)),
       date: optional(number(1)),
     },
-    { excessPropertyValidation: 'allow' },
+    { excessProperty: 'reject' },
   );
 
   type Ymd = TypeOf<typeof ymd>;
@@ -294,7 +301,7 @@ describe('partial record', () => {
     '=',
   );
 
-  expectType<typeof ymd.defaultValue, Ymd>('=');
+  expectType<typeof ymd.defaultValue, TypeOf<typeof ymd>>('=');
 
   describe('is', () => {
     test('truthy case', () => {
@@ -400,40 +407,51 @@ describe('partial record', () => {
       ]);
     });
 
-    test('validate returns the stripped content of input for OK cases if excessPropertyValidation is "strip"', () => {
+    test('validate returns input as-is (with excess) for OK cases since default excessProperty is "allow"', () => {
       const input = {
         year: 2024,
         month: 8,
-        extra: 'should be stripped',
+        extra: 'should be kept',
       } as const;
 
-      const result = ymd.validate(input);
+      const result = ymd.validate(input as UnknownRecord);
 
       assert.isTrue(Result.isOk(result));
 
       const resultValue3 = Result.unwrapThrow(result);
 
-      assert.deepStrictEqual(resultValue3, {
+      assert.deepStrictEqual(resultValue3 as UnknownRecord, {
         year: 2024,
         month: 8,
+        extra: 'should be kept',
       });
 
-      expect(resultValue3).not.toBe(input); // ✅ different reference
+      expect(resultValue3).toBe(input); // ✅ same reference
     });
 
-    test('validate returns input as-is for OK cases if excessPropertyValidation is "allow"', () => {
+    test('validate rejects excess properties if excessProperty is "reject"', () => {
+      const input = {
+        year: 2024,
+        month: 8,
+        extra: 'not allowed',
+      } as const;
+
+      const result = ymdStrict.validate(input as UnknownRecord);
+
+      assert.isTrue(Result.isErr(result));
+    });
+
+    test('validate accepts valid data without excess when excessProperty is "reject"', () => {
       const input = {
         year: 2024,
         month: 8,
       } as const;
 
-      const result = ymdEased.validate(input);
+      const result = ymdStrict.validate(input as UnknownRecord);
 
       assert.isTrue(Result.isOk(result));
 
-      const resultValue3 = Result.unwrapThrow(result);
-
-      expect(resultValue3).toBe(input); // ✅ same reference
+      expect(Result.unwrapThrow(result)).toBe(input); // ✅ same reference
     });
   });
 

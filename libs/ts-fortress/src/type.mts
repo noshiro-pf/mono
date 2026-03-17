@@ -1,11 +1,11 @@
-import { expectType } from 'ts-data-forge';
+import { hasKey, isRecord } from 'ts-data-forge';
 import { type ValidationError } from './utils/index.mjs';
 
 /**
  * - `typeName` : Name for this type
  * - `is` : Type guard function
  * - `assertIs` : Type assertion function
- * - `cast` : Cast function
+ * - `cast` : Cast function (returns the original value, no transformation)
  * - `fill` : Default value filling function
  * - `validate` : A base function to be used in `is` and `assertIs`. `validate`
  *   returns Result.Ok if the value is of Type A, otherwise returns Result.Err
@@ -26,74 +26,34 @@ export type Type<A> = Readonly<{
 
 export type TypeOf<A extends Type<unknown>> = A['defaultValue'];
 
-/** @deprecated */
-export type OptionalType<A> = MergeIntersection<
-  Type<A> &
-    Readonly<{
-      optional: true;
-    }>
->;
+/**
+ * Controls how excess properties (keys not in shape) are handled.
+ *
+ * - `'allow'` (default) — accept excess properties at runtime
+ * - `'reject'` — reject objects with excess properties at runtime
+ *
+ * This option only affects runtime validation behavior.
+ * The value type is always exact regardless of the setting.
+ */
+export type ExcessPropertyOption = 'allow' | 'reject';
 
-export type ExcessPropertyBehavior = 'allow' | 'strip' | 'error';
-
-export type ExcessPropertyFillBehavior = Extract<
-  ExcessPropertyBehavior,
-  'allow' | 'strip'
->;
-
+/** @internal */
 export type UnknownShape = ReadonlyRecord<string, Type<unknown>>;
 
-export type RecordType<
-  R extends UnknownShape,
-  ExcessPropertyValidation extends ExcessPropertyBehavior = 'strip',
-> = Type<
-  ExcessPropertyValidation extends 'allow'
-    ? TsFortressInternal.RecordTypeValue<R> | UnknownRecord
-    : TsFortressInternal.RecordTypeValue<R>
-> &
-  Readonly<{
-    shape: R;
-    excessPropertyValidation: ExcessPropertyValidation;
-    excessPropertyFill: ExcessPropertyFillBehavior;
-  }>;
+/** @internal Runtime type for accessing internal record properties via cast. */
+export type RecordTypeInternals = Readonly<{
+  shape: UnknownShape;
+  excessProperty: ExcessPropertyOption;
+}>;
 
-expectType<
-  RecordType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>,
-  Type<Readonly<{ a: 0; b: 1; c: 2 }>> &
-    Readonly<{
-      shape: Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: ExcessPropertyFillBehavior;
-    }>
->('=');
+/** @internal Runtime check for record type internals. */
+export const hasRecordInternals = <T extends Type<unknown>>(
+  t: T,
+): t is T & RecordTypeInternals => hasRecordInternalsImpl(t);
 
-export namespace TsFortressInternal {
-  export type RecordTypeValue<R extends ReadonlyRecord<string, Type<unknown>>> =
-    RecordTypeValueImpl<R>;
-
-  export type RecordTypeValueImpl<
-    R extends ReadonlyRecord<string, Type<unknown>>,
-  > = RecordTypeValueImplSub<R, OptionalTypeKeys<R>>;
-
-  type RecordTypeValueImplSub<
-    A extends ReadonlyRecord<string, Type<unknown>>,
-    OptionalKeys extends keyof A,
-  > =
-    TypeEq<OptionalKeys, never> extends true
-      ? Readonly<{ [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]> }>
-      : TypeEq<keyof A, OptionalKeys> extends true
-        ? MergeIntersection<
-            Readonly<{ [key in OptionalKeys]?: TypeOf<A[key]> }>
-          >
-        : MergeIntersection<
-            Readonly<
-              { [key in OptionalKeys]?: TypeOf<A[key]> } & {
-                [key in Exclude<keyof A, OptionalKeys>]: TypeOf<A[key]>;
-              }
-            >
-          >;
-
-  type OptionalTypeKeys<A extends ReadonlyRecord<string, Type<unknown>>> = {
-    [K in keyof A]: A[K] extends Readonly<{ optional: true }> ? K : never;
-  }[keyof A];
-}
+const hasRecordInternalsImpl = (t: unknown): t is RecordTypeInternals =>
+  isRecord(t) &&
+  hasKey(t, 'shape') &&
+  isRecord(t.shape) &&
+  hasKey(t, 'excessProperty') &&
+  (t.excessProperty === 'allow' || t.excessProperty === 'reject');

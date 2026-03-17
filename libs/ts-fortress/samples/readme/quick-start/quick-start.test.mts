@@ -31,13 +31,17 @@ const userData = {
   age: 30,
   email: 'john@example.com',
   isActive: true,
-} as const;
+} as const as unknown;
 
 assert.isTrue(User.is(userData));
 
 if (User.is(userData)) {
   // userData is now typed as User
   userData satisfies User;
+
+  expectType<typeof userData.age, number>('=');
+
+  expectType<typeof userData.email, string | undefined>('=');
 
   assert.strictEqual(
     `User: ${userData.name}, Age: ${userData.age}`,

@@ -6,8 +6,7 @@ describe('omit - allowExcessProperties propagation', () => {
   const base = record(
     { a: string(), b: number(), c: number() },
     {
-      excessPropertyValidation: 'error',
-      excessPropertyFill: 'strip',
+      excessProperty: 'reject',
     },
   );
 
@@ -21,8 +20,7 @@ describe('omit - allowExcessProperties propagation', () => {
 
   test('overrides allowExcessProperties when provided', () => {
     const t = omit(base, ['c'], {
-      excessPropertyValidation: 'allow',
-      excessPropertyFill: 'allow',
+      excessProperty: 'allow',
     });
 
     // Should allow excess properties now

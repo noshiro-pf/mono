@@ -1,16 +1,13 @@
-import { expectType, Obj } from 'ts-data-forge';
+import { expectType } from 'ts-data-forge';
 import {
-  type ExcessPropertyBehavior,
-  type RecordType,
+  type ExcessPropertyOption,
+  hasRecordInternals,
   type Type,
+  type TypeOf,
   type UnknownShape,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
-import {
-  isOptionalProperty,
-  type OptionalPropertyType,
-  type RequiredPropertyType,
-} from './optional.mjs';
+import { isOptionalProperty, type RequiredPropertyType } from './optional.mjs';
 import { record } from './record.mjs';
 
 /**
@@ -18,20 +15,24 @@ import { record } from './record.mjs';
  * made required, otherwise, all properties are made required.
  */
 export const required = <
-  const R extends UnknownShape,
+  const R extends UnknownRecord,
   const KeysToBeRequired extends NonEmptyArray<keyof R & string>,
-  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
-  recordType: RecordType<R, ExcessValidation>,
+  recordType: Type<R>,
   options?: Partial<
     Readonly<{
       keysToBeRequired: KeysToBeRequired;
       typeName: string;
-      excessPropertyValidation: ExcessValidation;
-      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+      excessProperty: ExcessPropertyOption;
     }>
   >,
-): RequiredType<R, KeysToBeRequired, ExcessValidation> => {
+): RequiredType<R, KeysToBeRequired> => {
+  if (!hasRecordInternals(recordType)) {
+    throw new Error(
+      `Expected a record type but received: ${recordType.typeName}`,
+    );
+  }
+
   const typeNameFilled: string =
     options?.typeName ??
     (options?.keysToBeRequired === undefined
@@ -42,217 +43,62 @@ export const required = <
     options?.keysToBeRequired ?? Object.keys(recordType.shape),
   );
 
-  const requiredShape =
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    Object.fromEntries(
-      Object.entries(recordType.shape).map(
-        ([k, v]) => [k, keysToBeRequired.has(k) ? makeRequired(v) : v] as const,
-      ),
-    ) satisfies UnknownShape as RequiredTypeShape<R, KeysToBeRequired>;
+  const requiredShape = Object.fromEntries(
+    Object.entries(recordType.shape).map(
+      ([k, v]) => [k, keysToBeRequired.has(k) ? makeRequired(v) : v] as const,
+    ),
+  ) satisfies UnknownShape as UnknownShape;
 
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return record(requiredShape, {
     typeName: typeNameFilled,
-    excessPropertyValidation:
-      options?.excessPropertyValidation ?? recordType.excessPropertyValidation,
-    excessPropertyFill:
-      options?.excessPropertyFill ?? recordType.excessPropertyFill,
-  });
+    excessProperty: options?.excessProperty ?? recordType.excessProperty,
+  }) as unknown as Type<RequiredValue<R, KeysToBeRequired>>;
 };
+
+type RequiredType<
+  R extends UnknownRecord,
+  KeysToBeRequired extends NonEmptyArray<keyof R & string>,
+> = Type<RequiredValue<R, KeysToBeRequired>>;
+
+/** Compute the required value type. */
+type RequiredValue<
+  R extends UnknownRecord,
+  KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
+> =
+  TypeEq<KeysToBeRequired, undefined> extends true
+    ? Readonly<Required<R>>
+    : PartiallyRequired<R, ArrayElement<KeysToBeRequired>>;
 
 /**
  * Makes an optional property required by removing the optional flag.
  */
 const makeRequired = <T extends Type<unknown>>(
   t: T,
-): RequiredPropertyType<T> =>
-  isOptionalProperty(t)
-    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      (Obj.omit(t, ['optional']) as RequiredPropertyType<T>)
-    : t;
+): RequiredPropertyType<T> => {
+  if (!isOptionalProperty(t)) {
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return t as RequiredPropertyType<T>;
+  }
 
-type RequiredTypeShape<
-  R extends UnknownShape,
-  KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
-> =
-  TypeEq<KeysToBeRequired, undefined> extends true
-    ? FullyRequiredType<R>
-    : PartiallyRequiredType<R, ArrayElement<KeysToBeRequired>>;
+  const { optional: _, ...rest } = t;
 
-type FullyRequiredType<R extends UnknownShape> = Readonly<{
-  [P in keyof R]: RequiredPropertyType<R[P]>;
-}>;
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return rest as RequiredPropertyType<T>;
+};
 
-type PartiallyRequiredType<
-  R extends UnknownShape,
-  K extends keyof R,
-> = Readonly<{
-  [P in keyof R]: P extends K ? RequiredPropertyType<R[P]> : R[P];
-}>;
+// --- expectType assertions ---
 
-export type RequiredType<
-  R extends UnknownShape,
-  KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
-  ExcessValidation extends ExcessPropertyBehavior = 'strip',
-> = RecordType<RequiredTypeShape<R, KeysToBeRequired>, ExcessValidation>;
+{
+  type Base = ReturnType<
+    typeof record<
+      Readonly<{ a: Type<0>; b: Type<1 | undefined>; c: Type<2 | undefined> }>
+    >
+  >;
 
-expectType<
-  RequiredTypeShape<
-    Readonly<{
-      a: OptionalPropertyType<Type<0>>;
-      b: Type<1>;
-      c: OptionalPropertyType<Type<2>>;
-    }>,
-    readonly ['a']
-  >,
-  Readonly<{
-    a: Type<0>;
-    b: Type<1>;
-    c: OptionalPropertyType<Type<2>>;
-  }>
->('=');
-
-expectType<
-  RecordType<
-    Readonly<{
-      a: Type<0>;
-      b: Type<1>;
-      c: Type<2>;
-    }>
-  >,
-  Type<
-    Readonly<{
-      a: 0;
-      b: 1;
-      c: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: Type<0>;
-        b: Type<1>;
-        c: Type<2>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  RecordType<
-    Readonly<{
-      a: Type<0>;
-      b: Type<1>;
-      c: OptionalPropertyType<Type<2>>;
-    }>
-  >,
-  Type<
-    Readonly<{
-      a: 0;
-      b: 1;
-      c?: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: Type<0>;
-        b: Type<1>;
-        c: OptionalPropertyType<Type<2>>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  RequiredType<
-    Readonly<{
-      a: OptionalPropertyType<Type<0>>;
-      b: Type<1>;
-      c: OptionalPropertyType<Type<2>>;
-    }>,
-    readonly ['a']
-  >,
-  Type<
-    Readonly<{
-      a: 0;
-      b: 1;
-      c?: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: Type<0>;
-        b: Type<1>;
-        c: OptionalPropertyType<Type<2>>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  RequiredType<
-    Readonly<{
-      a: OptionalPropertyType<Type<0>>;
-      b: OptionalPropertyType<Type<1>>;
-      c: Type<2>;
-    }>,
-    readonly ['a', 'b']
-  >,
-  Type<
-    Readonly<{
-      a: 0;
-      b: 1;
-      c: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: Type<0>;
-        b: Type<1>;
-        c: Type<2>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  RequiredType<
-    Readonly<{
-      a: OptionalPropertyType<Type<0>>;
-      b: OptionalPropertyType<Type<1>>;
-      c: OptionalPropertyType<Type<2>>;
-    }>,
-    undefined
-  >,
-  Type<
-    Readonly<{
-      a: 0;
-      b: 1;
-      c: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: Type<0>;
-        b: Type<1>;
-        c: Type<2>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  RequiredType<
-    Readonly<{
-      a: OptionalPropertyType<Type<0>>;
-      b: Type<1>;
-      c: OptionalPropertyType<Type<2>>;
-    }>,
-    // @ts-expect-error key "d" doesn't exist
-    readonly ['a', 'd']
-  >,
-  0
->('!=');
+  // required with no keys makes all properties required
+  expectType<
+    TypeOf<ReturnType<typeof required<TypeOf<Base>, readonly ['a', 'b', 'c']>>>,
+    Readonly<Required<Readonly<{ a: 0; b: 1 | undefined; c: 2 | undefined }>>>
+  >('=');
+}

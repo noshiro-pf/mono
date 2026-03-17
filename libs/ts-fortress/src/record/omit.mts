@@ -1,80 +1,80 @@
 import { expectType, Obj } from 'ts-data-forge';
 import {
-  type ExcessPropertyBehavior,
-  type RecordType,
+  type ExcessPropertyOption,
+  hasRecordInternals,
   type Type,
-  type UnknownShape,
+  type TypeOf,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { record } from './record.mjs';
 
 /** Creates a record type with keys omitted. */
 export const omit = <
-  const R extends UnknownShape,
+  const R extends UnknownRecord,
   const KeysToOmit extends readonly (keyof R & string)[],
-  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
-  recordType: RecordType<R, ExcessValidation>,
+  recordType: Type<R>,
   keysToOmit: KeysToOmit,
   options?: Partial<
     Readonly<{
       typeName: string;
-      excessPropertyValidation: ExcessValidation;
-      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+      excessProperty: ExcessPropertyOption;
     }>
   >,
-): OmittedType<R, KeysToOmit, ExcessValidation> =>
-  record(Obj.omit(recordType.shape, keysToOmit), {
+): OmittedType<R, KeysToOmit> => {
+  if (!hasRecordInternals(recordType)) {
+    throw new Error(
+      `Expected a record type but received: ${recordType.typeName}`,
+    );
+  }
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return record(Obj.omit(recordType.shape, keysToOmit), {
     typeName:
       options?.typeName ??
       `Omit<${recordType.typeName}, ${toUnionKeyString(keysToOmit)}>`,
-    excessPropertyValidation:
-      options?.excessPropertyValidation ?? recordType.excessPropertyValidation,
-    excessPropertyFill:
-      options?.excessPropertyFill ?? recordType.excessPropertyFill,
-  });
 
-export type OmittedType<
-  R extends UnknownShape,
-  KeysToOmit extends readonly (keyof R)[],
-  ExcessValidation extends ExcessPropertyBehavior = 'strip',
-> = RecordType<Omit<R, ArrayElement<KeysToOmit>>, ExcessValidation>;
+    excessProperty: options?.excessProperty ?? recordType.excessProperty,
+  }) as unknown as OmittedType<R, KeysToOmit>;
+};
 
-expectType<
-  Omit<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>,
-  Readonly<{
-    c: Type<2>;
-  }>
->('=');
+type OmittedType<
+  R extends UnknownRecord,
+  KeysToOmit extends readonly (keyof R & string)[],
+> = Type<Readonly<Omit<R, ArrayElement<KeysToOmit>>>>;
 
-expectType<
-  RecordType<Omit<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>>,
-  Type<Readonly<{ c: 2 }>> &
+// --- expectType assertions ---
+
+{
+  type Base = ReturnType<
+    typeof record<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>
+  >;
+
+  // omit removes specified keys from value type
+  expectType<
+    TypeOf<ReturnType<typeof omit<TypeOf<Base>, readonly ['a']>>>,
+    Readonly<{ b: 1; c: 2 }>
+  >('=');
+
+  // omit with multiple keys
+  expectType<
+    TypeOf<ReturnType<typeof omit<TypeOf<Base>, readonly ['a', 'b']>>>,
+    Readonly<{ c: 2 }>
+  >('=');
+
+  expectType<
+    Omit<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>,
     Readonly<{
-      shape: Readonly<{ c: Type<2> }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
+      c: Type<2>;
     }>
->('=');
+  >('=');
 
-expectType<
-  OmittedType<
-    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
-    readonly ['a', 'b']
-  >,
-  Type<Readonly<{ c: 2 }>> &
-    Readonly<{
-      shape: Readonly<{ c: Type<2> }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  OmittedType<
-    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
-    // @ts-expect-error key "d" doesn't exist
-    readonly ['a', 'd']
-  >,
-  0
->('!=');
+  expectType<
+    OmittedType<
+      Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
+      // @ts-expect-error key "d" doesn't exist
+      readonly ['a', 'd']
+    >,
+    0
+  >('!=');
+}

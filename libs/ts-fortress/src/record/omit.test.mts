@@ -14,21 +14,25 @@ describe(omit, () => {
 
   const ym = omit(ymd, ['date']);
 
+  expectType<typeof ym, Type<Readonly<{ year: number; month: number }>>>('=');
+
   expectType<
-    typeof ym,
-    Type<Readonly<{ year: number; month: number }>> &
-      Readonly<{
-        shape: Readonly<{ year: Type<number>; month: Type<number> }>;
-        excessPropertyValidation: 'strip';
-        excessPropertyFill: 'allow' | 'strip';
-      }>
+    keyof typeof ym,
+    | 'typeName'
+    | 'defaultValue'
+    | 'is'
+    | 'assertIs'
+    | 'cast'
+    | 'fill'
+    | 'validate'
+    | 'optional'
   >('=');
 
   type Ym = TypeOf<typeof ym>;
 
   expectType<Ym, Readonly<{ year: number; month: number }>>('=');
 
-  expectType<typeof ym.defaultValue, Ym>('=');
+  expectType<typeof ym.defaultValue, TypeOf<typeof ym>>('=');
 
   describe('is', () => {
     test('truthy case', () => {
@@ -97,19 +101,43 @@ describe(omit, () => {
 
       assert.deepStrictEqual(resultValue1, input); // Deep equality
 
-      // In strip mode (default), a new object is created even without excess properties
-      expect(resultValue1).not.toBe(input); // Different reference
+      // In allow mode (default), same reference is returned
+      expect(resultValue1).toBe(input); // Same reference
     });
 
-    test('validate returns input as-is for OK cases (allow mode)', () => {
-      const ymAllow = omit(
+    test('validate rejects excess properties when excessProperty is "reject"', () => {
+      const ymReject = omit(
         record(
           {
             year: number(1900),
             month: number(1),
             date: number(1),
           },
-          { excessPropertyValidation: 'allow' },
+          { excessProperty: 'reject' },
+        ),
+        ['date'],
+      );
+
+      const input: UnknownRecord = {
+        year: 2000,
+        month: 12,
+        extra: 'not allowed',
+      } as const;
+
+      const result = ymReject.validate(input);
+
+      assert.isTrue(Result.isErr(result));
+    });
+
+    test('validate accepts valid data without excess when excessProperty is "reject"', () => {
+      const ymReject = omit(
+        record(
+          {
+            year: number(1900),
+            month: number(1),
+            date: number(1),
+          },
+          { excessProperty: 'reject' },
         ),
         ['date'],
       );
@@ -119,16 +147,11 @@ describe(omit, () => {
         month: 12,
       } as const;
 
-      const result = ymAllow.validate(input);
+      const result = ymReject.validate(input);
 
       assert.isTrue(Result.isOk(result));
 
-      const resultValue1 = Result.unwrapThrow(result);
-
-      assert.deepStrictEqual(resultValue1, input); // Deep equality
-
-      // In allow mode, the same reference is returned
-      expect(resultValue1).toBe(input); // Same reference
+      expect(Result.unwrapThrow(result)).toBe(input); // ✅ same reference
     });
 
     test('truthy case with additional keys', () => {
@@ -146,14 +169,11 @@ describe(omit, () => {
 
       expectType<typeof resultValue2, Ym>('=');
 
-      assert.deepStrictEqual(
-        resultValue2,
-        ym.cast({
-          year: 2000,
-          month: 12,
-          aaa: 999,
-        }),
-      );
+      assert.deepStrictEqual(resultValue2 as UnknownRecord, {
+        year: 2000,
+        month: 12,
+        aaa: 999,
+      });
     });
 
     test('validate returns input as-is for OK cases with additional keys', () => {
@@ -169,13 +189,14 @@ describe(omit, () => {
 
       const resultValue3 = Result.unwrapThrow(result);
 
-      // In strip mode, excess properties are removed, so we get a new object
-      assert.deepStrictEqual(resultValue3, {
+      // In allow mode (default), excess properties are kept
+      assert.deepStrictEqual(resultValue3 as UnknownRecord, {
         year: 2000,
         month: 12,
+        aaa: 999,
       });
 
-      expect(resultValue3).not.toBe(input); // Different reference
+      expect(resultValue3).toBe(input); // ✅ same reference
     });
 
     test('falsy case', () => {

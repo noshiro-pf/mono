@@ -1,3 +1,4 @@
+import { isMap } from '@sindresorhus/is';
 import { Arr, memoizeFunction, Result, unknownToString } from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
@@ -8,9 +9,6 @@ import {
   prependPathToValidationErrors,
   type ValidationError,
 } from '../utils/index.mjs';
-
-const isMap = (value: unknown): value is ReadonlyMap<unknown, unknown> =>
-  Object.prototype.toString.call(value) === '[object Map]';
 
 type MapResultType<
   K extends Type<unknown>,

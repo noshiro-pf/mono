@@ -1,12 +1,13 @@
 import { expectType } from 'ts-data-forge';
 import {
-  type ExcessPropertyBehavior,
-  type RecordType,
+  type ExcessPropertyOption,
+  hasRecordInternals,
   type Type,
+  type TypeOf,
   type UnknownShape,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
-import { optional, type OptionalPropertyType } from './optional.mjs';
+import { optional } from './optional.mjs';
 import { record } from './record.mjs';
 
 /**
@@ -14,20 +15,24 @@ import { record } from './record.mjs';
  * optional, otherwise, all properties are optional.
  */
 export const partial = <
-  const R extends UnknownShape,
+  const R extends UnknownRecord,
   const KeysToBeOptional extends NonEmptyArray<keyof R & string>,
-  const ExcessValidation extends ExcessPropertyBehavior = 'strip',
 >(
-  recordType: RecordType<R, ExcessValidation>,
+  recordType: Type<R>,
   options?: Partial<
     Readonly<{
       keysToBeOptional: KeysToBeOptional;
       typeName: string;
-      excessPropertyValidation: ExcessValidation;
-      excessPropertyFill: Extract<ExcessPropertyBehavior, 'allow' | 'strip'>;
+      excessProperty: ExcessPropertyOption;
     }>
   >,
-): PartialType<R, KeysToBeOptional, ExcessValidation> => {
+): PartialType<R, KeysToBeOptional> => {
+  if (!hasRecordInternals(recordType)) {
+    throw new Error(
+      `Expected a record type but received: ${recordType.typeName}`,
+    );
+  }
+
   const typeNameFilled: string =
     options?.typeName ??
     (options?.keysToBeOptional === undefined
@@ -38,180 +43,67 @@ export const partial = <
     options?.keysToBeOptional ?? Object.keys(recordType.shape),
   );
 
-  const partialShape =
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    Object.fromEntries(
-      Object.entries(recordType.shape).map(
-        ([k, v]) => [k, keysToBeOptional.has(k) ? optional(v) : v] as const,
-      ),
-    ) satisfies UnknownShape as PartialTypeShape<R, KeysToBeOptional>;
+  const partialShape = Object.fromEntries(
+    Object.entries(recordType.shape).map(
+      ([k, v]) => [k, keysToBeOptional.has(k) ? optional(v) : v] as const,
+    ),
+  ) satisfies UnknownShape;
 
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return record(partialShape, {
     typeName: typeNameFilled,
-    excessPropertyValidation:
-      options?.excessPropertyValidation ?? recordType.excessPropertyValidation,
-    excessPropertyFill:
-      options?.excessPropertyFill ?? recordType.excessPropertyFill,
-  });
+    excessProperty: options?.excessProperty ?? recordType.excessProperty,
+  }) as unknown as PartialType<R, KeysToBeOptional>;
 };
 
-type PartialTypeShape<
-  R extends UnknownShape,
+type PartialType<
+  R extends UnknownRecord,
+  KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined =
+    undefined,
+> = Type<PartialValue<R, KeysToBeOptional>>;
+
+/** Compute the partial value type. */
+type PartialValue<
+  R extends UnknownRecord,
   KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined,
 > =
   TypeEq<KeysToBeOptional, undefined> extends true
-    ? FullyOptionalType<R>
-    : PartiallyOptionalType<R, ArrayElement<KeysToBeOptional>>;
+    ? Partial<R>
+    : PartiallyPartial<R, ArrayElement<KeysToBeOptional>>;
 
-type FullyOptionalType<R extends UnknownShape> = Readonly<{
-  [P in keyof R]: OptionalPropertyType<R[P]>;
-}>;
+// --- expectType assertions ---
 
-type PartiallyOptionalType<
-  R extends UnknownShape,
-  K extends keyof R,
-> = Readonly<{
-  [P in keyof R]: P extends K ? OptionalPropertyType<R[P]> : R[P];
-}>;
+{
+  type Base = ReturnType<
+    typeof record<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>
+  >;
 
-export type PartialType<
-  R extends UnknownShape,
-  KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined,
-  ExcessValidation extends ExcessPropertyBehavior = 'strip',
-> = RecordType<PartialTypeShape<R, KeysToBeOptional>, ExcessValidation>;
+  expectType<
+    PartialType<TypeOf<Base>, readonly ['a', 'b', 'c']>,
+    Type<Partial<Readonly<{ a: 0; b: 1; c: 2 }>>>
+  >('=');
 
-expectType<
-  PartialTypeShape<
-    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
-    readonly ['a']
-  >,
-  Readonly<{
-    a: OptionalPropertyType<Type<0>>;
-    b: Type<1>;
-    c: Type<2>;
-  }>
->('=');
+  expectType<
+    PartialType<TypeOf<Base>, readonly ['a', 'b']>,
+    Type<Readonly<{ a?: 0; b?: 1; c: 2 }>>
+  >('=');
 
-expectType<
-  RecordType<
-    Readonly<{
-      a: Type<0>;
-      b: Type<1>;
-      c: Type<2>;
-    }>
-  >,
-  Type<
-    Readonly<{
-      a: 0;
-      b: 1;
-      c: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: Type<0>;
-        b: Type<1>;
-        c: Type<2>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
+  expectType<
+    // @ts-expect-error NonEmptyArray is required if keysToBeOptional is provided
+    PartialType<TypeOf<Base>, readonly []>,
+    Type<Readonly<{ a?: 0; b?: 1; c: 2 }>>
+  >('!=');
 
-expectType<
-  RecordType<
-    Readonly<{
-      a: OptionalPropertyType<Type<0>>;
-      b: Type<1>;
-      c: Type<2>;
-    }>
-  >,
-  Type<
-    Readonly<{
-      a?: 0;
-      b: 1;
-      c: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: OptionalPropertyType<Type<0>>;
-        b: Type<1>;
-        c: Type<2>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
+  expectType<
+    PartialType<TypeOf<Base>>,
+    Type<Readonly<{ a?: 0; b?: 1; c?: 2 }>>
+  >('=');
 
-expectType<
-  PartialType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, readonly ['a']>,
-  Type<
-    Readonly<{
-      a?: 0;
-      b: 1;
-      c: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: OptionalPropertyType<Type<0>>;
-        b: Type<1>;
-        c: Type<2>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  PartialType<
-    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
-    readonly ['a', 'b']
-  >,
-  Type<
-    Readonly<{
-      a?: 0;
-      b?: 1;
-      c: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: OptionalPropertyType<Type<0>>;
-        b: OptionalPropertyType<Type<1>>;
-        c: Type<2>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  PartialType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, undefined>,
-  Type<
-    Readonly<{
-      a?: 0;
-      b?: 1;
-      c?: 2;
-    }>
-  > &
-    Readonly<{
-      shape: Readonly<{
-        a: OptionalPropertyType<Type<0>>;
-        b: OptionalPropertyType<Type<1>>;
-        c: OptionalPropertyType<Type<2>>;
-      }>;
-      excessPropertyValidation: 'strip';
-      excessPropertyFill: 'allow' | 'strip';
-    }>
->('=');
-
-expectType<
-  PartialType<
-    Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>,
-    // @ts-expect-error key "d" doesn't exist
-    readonly ['a', 'd']
-  >,
-  0
->('!=');
+  // partial with no keys makes all properties optional
+  expectType<
+    TypeOf<
+      ReturnType<typeof partial<TypeOf<Base>, NonEmptyArray<'a' | 'b' | 'c'>>>
+    >,
+    Partial<Readonly<{ a: 0; b: 1; c: 2 }>>
+  >('=');
+}

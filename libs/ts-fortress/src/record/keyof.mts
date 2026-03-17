@@ -1,63 +1,73 @@
 import { Arr, expectType, pipe } from 'ts-data-forge';
 import { enumType } from '../enum/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
-import { type RecordType, type Type, type UnknownShape } from '../type.mjs';
+import {
+  hasRecordInternals,
+  type RecordTypeInternals,
+  type Type,
+  type TypeOf,
+} from '../type.mjs';
 
-export const keyof = <const R extends UnknownShape>(
-  recordType: RecordType<R>,
+export const keyof = <const R extends UnknownRecord>(
+  recordType: Type<R>,
   options?: Partial<
     Readonly<{
       typeName: string;
     }>
   >,
-): KeyofType<R> =>
+): KeyofType<R> => {
+  if (!hasRecordInternals(recordType)) {
+    throw new Error(
+      `Expected a record type but received: ${recordType.typeName}`,
+    );
+  }
+
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  pipe(getKeys(recordType)).map((keys) =>
+  return pipe(getKeys(recordType)).map((keys) =>
     Arr.isNonEmpty(keys)
       ? (enumType(keys, {
           typeName: options?.typeName ?? `keyof ${recordType.typeName}`,
-        }) satisfies KeyofTypeSub<R>)
+        }) satisfies Type<string>)
       : (undefinedType satisfies Type<undefined>),
   ).value as KeyofType<R>;
+};
 
-const getKeys = <const R extends UnknownShape>(
-  recordType: RecordType<R>,
-): readonly ToString<keyof R>[] =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  Object.keys(
-    recordType.shape,
-  ) satisfies readonly string[] as readonly string[] as readonly ToString<
-    keyof R
-  >[];
+const getKeys = (
+  recordType: Type<unknown> & RecordTypeInternals,
+): readonly string[] => Object.keys(recordType.shape);
 
-type KeyofTypeSub<R extends UnknownShape> = Type<ToString<keyof R>>;
+type KeyofType<R extends UnknownRecord> =
+  IsNever<keyof R> extends true ? Type<undefined> : Type<ToString<keyof R>>;
 
-type KeyofType<R extends UnknownShape> =
-  IsNever<keyof R> extends true ? Type<undefined> : KeyofTypeSub<R>;
+// --- expectType assertions ---
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-expectType<keyof {}, never>('=');
+{
+  type Base = Readonly<{ a: 0; b: 1; c: 2 }>;
 
-expectType<ToString<keyof Readonly<{ 1: 1; 2: 2; 3: 3 }>>, '1' | '2' | '3'>(
-  '=',
-);
+  // keyof extracts string keys
+  expectType<TypeOf<ReturnType<typeof keyof<Base>>>, 'a' | 'b' | 'c'>('=');
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-expectType<KeyofType<{}>, Type<undefined>>('=');
+  // keyof of empty record yields undefined
+  type EmptyRecord = Readonly<Record<never, never>>;
 
-expectType<
-  KeyofType<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>>,
-  Type<'a' | 'b' | 'c'>
->('=');
+  expectType<TypeOf<ReturnType<typeof keyof<EmptyRecord>>>, undefined>('=');
 
-expectType<
-  KeyofType<Readonly<{ x: Type<string>; y: Type<number>; z: Type<boolean> }>>,
-  Type<'x' | 'y' | 'z'>
->('=');
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  expectType<KeyofType<{}>, Type<undefined>>('=');
 
-expectType<
-  KeyofType<Readonly<{ same: Type<string>; value: Type<string> }>>,
-  Type<'same' | 'value'>
->('=');
+  expectType<KeyofType<Readonly<{ a: 0; b: 1; c: 2 }>>, Type<'a' | 'b' | 'c'>>(
+    '=',
+  );
 
-expectType<KeyofType<Readonly<{ never: Type<never> }>>, Type<'never'>>('=');
+  expectType<
+    KeyofType<Readonly<{ x: string; y: number; z: boolean }>>,
+    Type<'x' | 'y' | 'z'>
+  >('=');
+
+  expectType<
+    KeyofType<Readonly<{ same: string; value: string }>>,
+    Type<'same' | 'value'>
+  >('=');
+
+  expectType<KeyofType<Readonly<{ never: never }>>, Type<'never'>>('=');
+}
