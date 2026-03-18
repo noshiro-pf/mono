@@ -1,3 +1,9 @@
+## [7.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.1...v7.0.2) (2026-03-18)
+
+### Bug Fixes
+
+- fix merge-records and union problems by using shapeStructure ([#250](https://github.com/noshiro-pf/ts-fortress/issues/250)) ([a80302c](https://github.com/noshiro-pf/ts-fortress/commit/a80302ceeb693483fe66d2b463d4212d976dc399))
+
 ## [7.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.0...v7.0.1) (2026-03-17)
 
 ### Bug Fixes
