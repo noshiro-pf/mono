@@ -49,4 +49,38 @@ describe(valueof, () => {
 
     assert.isFalse(V.is(false));
   });
+
+  describe('additional negative cases', () => {
+    test('rejects values not in union', () => {
+      const R = record({ a: number(), b: string() });
+
+      const V = valueof(R);
+
+      assert.isFalse(V.is(true));
+
+      assert.isFalse(V.is(null));
+
+      assert.isFalse(V.is(undefined));
+
+      assert.isFalse(V.is({}));
+
+      assert.isFalse(V.is([]));
+
+      assert.isFalse(V.is(Symbol('test')));
+    });
+
+    test('validate returns errors for invalid types', () => {
+      const R = record({ x: number(), y: string() });
+
+      const V = valueof(R);
+
+      const result = V.validate(true);
+
+      assert.isTrue(Result.isErr(result));
+
+      const resultError = Result.unwrapErrThrow(result);
+
+      assert.deepStrictEqual(resultError[0]?.actualValue, true);
+    });
+  });
 });

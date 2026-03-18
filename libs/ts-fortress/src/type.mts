@@ -1,4 +1,4 @@
-import { hasKey, isRecord } from 'ts-data-forge';
+import { Arr, Obj, hasKey, isRecord } from 'ts-data-forge';
 import { type ValidationError } from './utils/index.mjs';
 
 /**
@@ -40,11 +40,58 @@ export type ExcessPropertyOption = 'allow' | 'reject';
 /** @internal */
 export type UnknownShape = ReadonlyRecord<string, Type<unknown>>;
 
+/** @internal Shape structure that can represent union and intersection */
+export type ShapeStructure = Readonly<
+  | { kind: 'simple'; shape: UnknownShape }
+  | { kind: 'union'; variants: readonly ShapeStructure[] }
+  | { kind: 'intersection'; parts: readonly ShapeStructure[] }
+>;
+
 /** @internal Runtime type for accessing internal record properties via cast. */
 export type RecordTypeInternals = Readonly<{
-  shape: UnknownShape;
+  shapeStructure: ShapeStructure;
   excessProperty: ExcessPropertyOption;
 }>;
+
+/** @internal Helper to flatten ShapeStructure to a simple shape if possible */
+export const flattenShapeStructure = (
+  structure: ShapeStructure,
+): UnknownShape | undefined => {
+  switch (structure.kind) {
+    case 'simple': {
+      return structure.shape;
+    }
+    case 'intersection': {
+      // Intersection can be flattened by merging all parts
+      const parts = structure.parts.map(flattenShapeStructure);
+
+      if (parts.includes(undefined)) {
+        // Contains union - cannot flatten
+        return undefined;
+      }
+
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Obj.merge(...(parts as readonly UnknownShape[]));
+    }
+    case 'union': {
+      // Union cannot be flattened to a single shape
+      return undefined;
+    }
+  }
+};
+
+/** @internal Backward compatibility: simple shape accessor */
+export const getShape = (internals: RecordTypeInternals): UnknownShape => {
+  const flattened = flattenShapeStructure(internals.shapeStructure);
+
+  if (flattened === undefined) {
+    throw new Error(
+      `getShape() can only be called on simple or intersection record types, but received a union type. Use shapeStructure instead.`,
+    );
+  }
+
+  return flattened;
+};
 
 /** @internal Runtime check for record type internals. */
 export const hasRecordInternals = <T extends Type<unknown>>(
@@ -53,7 +100,33 @@ export const hasRecordInternals = <T extends Type<unknown>>(
 
 const hasRecordInternalsImpl = (t: unknown): t is RecordTypeInternals =>
   isRecord(t) &&
-  hasKey(t, 'shape') &&
-  isRecord(t.shape) &&
+  hasKey(t, 'shapeStructure') &&
+  isValidShapeStructure(t.shapeStructure) &&
   hasKey(t, 'excessProperty') &&
   (t.excessProperty === 'allow' || t.excessProperty === 'reject');
+
+const isValidShapeStructure = (s: unknown): s is ShapeStructure => {
+  if (!isRecord(s) || !hasKey(s, 'kind')) return false;
+
+  if (s.kind === 'simple') {
+    return hasKey(s, 'shape') && isRecord(s.shape);
+  }
+
+  if (s.kind === 'union') {
+    return (
+      hasKey(s, 'variants') &&
+      Arr.isArray(s.variants) &&
+      s.variants.every(isValidShapeStructure)
+    );
+  }
+
+  if (s.kind === 'intersection') {
+    return (
+      hasKey(s, 'parts') &&
+      Arr.isArray(s.parts) &&
+      s.parts.every(isValidShapeStructure)
+    );
+  }
+
+  return false;
+};

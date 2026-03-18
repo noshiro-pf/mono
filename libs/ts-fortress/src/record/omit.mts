@@ -1,6 +1,7 @@
 import { expectType, Obj } from 'ts-data-forge';
 import {
   type ExcessPropertyOption,
+  flattenShapeStructure,
   hasRecordInternals,
   type Type,
   type TypeOf,
@@ -28,8 +29,16 @@ export const omit = <
     );
   }
 
+  const shape = flattenShapeStructure(recordType.shapeStructure);
+
+  if (shape === undefined) {
+    throw new Error(
+      `omit() requires a simple or intersection record type, but received a union type`,
+    );
+  }
+
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return record(Obj.omit(recordType.shape, keysToOmit), {
+  return record(Obj.omit(shape, keysToOmit), {
     typeName:
       options?.typeName ??
       `Omit<${recordType.typeName}, ${toUnionKeyString(keysToOmit)}>`,
@@ -77,4 +86,15 @@ type OmittedType<
     >,
     0
   >('!=');
+}
+
+{
+  type A = Readonly<{ a: 0; b: 0; c: 0 } | { b: 0; c: 0; d: 0 }>;
+
+  // TypeScript Omit will not distribute over unions, so we don't support unions in omit() - it will produce an error if given a union type
+  expectType<Omit<A, 'b'>, Readonly<{ c: 0 }>>('=');
+
+  expectType<StrictOmit<A, 'b'>, Readonly<{ c: 0 }>>('=');
+
+  expectType<TypeOf<OmittedType<A, readonly ['b']>>, StrictOmit<A, 'b'>>('=');
 }

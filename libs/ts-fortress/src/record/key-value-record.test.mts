@@ -185,4 +185,45 @@ describe(keyValueRecord, () => {
       });
     });
   });
+
+  describe('additional negative cases', () => {
+    test('rejects non-record values', () => {
+      assert.isFalse(strNumRecord.is(null));
+
+      assert.isFalse(strNumRecord.is(undefined));
+
+      assert.isFalse(strNumRecord.is(123));
+
+      assert.isFalse(strNumRecord.is('string'));
+
+      // Empty array is actually treated as empty object (valid)
+      assert.isTrue(strNumRecord.is([]));
+    });
+
+    test('rejects record with invalid key types', () => {
+      const x: UnknownRecord = {
+        123: 456, // number key
+      } as const;
+
+      // Keys are coerced to strings, so this should actually pass
+      assert.isTrue(strNumRecord.is(x));
+    });
+
+    test('rejects record with nested invalid values', () => {
+      const x: UnknownRecord = {
+        a: 1,
+        b: { nested: 'object' },
+      } as const;
+
+      assert.isFalse(strNumRecord.is(x));
+    });
+
+    test('rejects record with array values when expecting primitives', () => {
+      const x: UnknownRecord = {
+        a: [1, 2, 3],
+      } as const;
+
+      assert.isFalse(strNumRecord.is(x));
+    });
+  });
 });

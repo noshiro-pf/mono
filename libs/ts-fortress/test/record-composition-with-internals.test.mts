@@ -122,4 +122,81 @@ describe('Record composition should preserve RecordTypeInternals', () => {
       }),
     );
   });
+
+  describe('negative cases for compositions', () => {
+    test('union of records rejects values not matching any variant', () => {
+      const record1 = record({ x: number() });
+
+      const record2 = record({ y: string() });
+
+      const unionRecord = union([record1, record2]);
+
+      // Missing both x and y
+      assert.isFalse(unionRecord.is({ z: 123 }));
+
+      // Wrong type for x
+      assert.isFalse(unionRecord.is({ x: 'not a number' }));
+
+      // Wrong type for y
+      assert.isFalse(unionRecord.is({ y: 456 }));
+    });
+
+    test('intersection of records rejects partial matches', () => {
+      const record1 = record({ a: number() });
+
+      const record2 = record({ b: string() });
+
+      const intersectionRecord = intersection(
+        [record1, record2],
+        record({ a: number(), b: string() }),
+      );
+
+      // Only has 'a', missing 'b'
+      assert.isFalse(intersectionRecord.is({ a: 1 }));
+
+      // Only has 'b', missing 'a'
+      assert.isFalse(intersectionRecord.is({ b: 'hello' }));
+
+      // Wrong type for 'a'
+      assert.isFalse(intersectionRecord.is({ a: 'wrong', b: 'hello' }));
+
+      // Wrong type for 'b'
+      assert.isFalse(intersectionRecord.is({ a: 1, b: 999 }));
+    });
+
+    test('recursion rejects invalid nested structures', () => {
+      type LinkedList = Readonly<{
+        value: number;
+        next: LinkedList | null;
+      }>;
+
+      const LinkedListNumber: Type<LinkedList> = recursion<LinkedList>(
+        'LinkedList',
+        () =>
+          record({
+            value: number(),
+            next: union([nullType, LinkedListNumber]),
+          }),
+      );
+
+      // Missing 'value'
+      assert.isFalse(LinkedListNumber.is({ next: null }));
+
+      // Wrong type for 'value'
+      assert.isFalse(
+        LinkedListNumber.is({ value: 'not a number', next: null }),
+      );
+
+      // Wrong type for 'next'
+      assert.isFalse(LinkedListNumber.is({ value: 1, next: 'invalid' }));
+
+      // Invalid nested value
+      assert.isFalse(
+        LinkedListNumber.is({
+          value: 1,
+          next: { value: 'invalid', next: null },
+        }),
+      );
+    });
+  });
 });

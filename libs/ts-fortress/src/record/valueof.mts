@@ -2,10 +2,10 @@ import { Arr, expectType } from 'ts-data-forge';
 import { union } from '../compose/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
 import {
+  flattenShapeStructure,
   hasRecordInternals,
   type Type,
   type TypeOf,
-  type UnknownShape,
 } from '../type.mjs';
 
 export const valueof = <const R extends UnknownRecord>(
@@ -22,10 +22,15 @@ export const valueof = <const R extends UnknownRecord>(
     );
   }
 
-  const types = Object.values(
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    (recordType as unknown as Readonly<{ shape: UnknownShape }>).shape,
-  );
+  const shape = flattenShapeStructure(recordType.shapeStructure);
+
+  if (shape === undefined) {
+    throw new Error(
+      `valueof() requires a simple or intersection record type, but received a union type`,
+    );
+  }
+
+  const types = Object.values(shape);
 
   if (Arr.isArrayAtLeastLength(types, 2)) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion

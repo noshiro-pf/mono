@@ -1,6 +1,7 @@
 import { expectType, Obj } from 'ts-data-forge';
 import {
   type ExcessPropertyOption,
+  flattenShapeStructure,
   hasRecordInternals,
   type Type,
   type TypeOf,
@@ -28,8 +29,16 @@ export const pick = <
     );
   }
 
+  const shape = flattenShapeStructure(recordType.shapeStructure);
+
+  if (shape === undefined) {
+    throw new Error(
+      `pick() requires a simple or intersection record type, but received a union type`,
+    );
+  }
+
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return record(Obj.pick(recordType.shape, keysToPick), {
+  return record(Obj.pick(shape, keysToPick), {
     typeName:
       options?.typeName ??
       `Pick<${recordType.typeName}, ${toUnionKeyString(keysToPick)}>`,

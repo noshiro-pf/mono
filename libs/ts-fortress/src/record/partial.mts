@@ -1,10 +1,11 @@
 import { expectType } from 'ts-data-forge';
 import {
   type ExcessPropertyOption,
-  hasRecordInternals,
   type Type,
   type TypeOf,
   type UnknownShape,
+  flattenShapeStructure,
+  hasRecordInternals,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
 import { optional } from './optional.mjs';
@@ -33,6 +34,14 @@ export const partial = <
     );
   }
 
+  const shape = flattenShapeStructure(recordType.shapeStructure);
+
+  if (shape === undefined) {
+    throw new Error(
+      `partial() requires a simple or intersection record type, but received a union type`,
+    );
+  }
+
   const typeNameFilled: string =
     options?.typeName ??
     (options?.keysToBeOptional === undefined
@@ -40,11 +49,11 @@ export const partial = <
       : `PartiallyPartial<${recordType.typeName}, ${toUnionKeyString(options.keysToBeOptional)}>`);
 
   const keysToBeOptional: ReadonlySet<string> = new Set(
-    options?.keysToBeOptional ?? Object.keys(recordType.shape),
+    options?.keysToBeOptional ?? Object.keys(shape),
   );
 
   const partialShape = Object.fromEntries(
-    Object.entries(recordType.shape).map(
+    Object.entries(shape).map(
       ([k, v]) => [k, keysToBeOptional.has(k) ? optional(v) : v] as const,
     ),
   ) satisfies UnknownShape;

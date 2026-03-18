@@ -1,11 +1,9 @@
-import { Arr, Obj, Result, expectType, memoizeFunction } from 'ts-data-forge';
+import { Arr, Result, expectType, memoizeFunction } from 'ts-data-forge';
 import {
   hasRecordInternals,
   type ExcessPropertyOption,
-  type RecordTypeInternals,
   type Type,
   type TypeOf,
-  type UnknownShape,
 } from '../type.mjs';
 import {
   createAssertFn,
@@ -68,23 +66,12 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
     cast: createCastFn(validate),
   } as const;
 
-  // If all types are records, add RecordTypeInternals
+  // If all types are records, add RecordTypeInternals with union structure
   if (types.every(hasRecordInternals)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    const recordTypes = types as unknown as NonEmptyArray<
-      Type<unknown> & RecordTypeInternals
-    >;
+    const shapeStructures = Arr.map(types, (t) => t.shapeStructure);
 
-    const shapes = Arr.map(
-      recordTypes,
-      (t) => t.shape,
-    ) satisfies readonly UnknownShape[];
-
-    // For union, merge all shapes to get all possible keys
-
-    const mergedShape = Obj.merge(...shapes);
-
-    const excessProperty: ExcessPropertyOption = recordTypes.some(
+    const excessProperty: ExcessPropertyOption = Arr.some(
+      types,
       (t) => t.excessProperty === 'reject',
     )
       ? 'reject'
@@ -93,7 +80,9 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return {
       ...baseType,
-      shape: mergedShape,
+      shapeStructure: Arr.isArrayOfLength(shapeStructures, 1)
+        ? shapeStructures[0]
+        : ({ kind: 'union', variants: shapeStructures } as const),
       excessProperty,
     } as UnionType<Types>;
   }

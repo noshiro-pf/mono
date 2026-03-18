@@ -116,4 +116,34 @@ describe(keyof, () => {
       expect(ymdKey.fill(x)).toBe('month');
     });
   });
+
+  describe('additional negative cases', () => {
+    test('rejects non-string values', () => {
+      assert.isFalse(ymdKey.is(123));
+
+      assert.isFalse(ymdKey.is(true));
+
+      assert.isFalse(ymdKey.is(null));
+
+      assert.isFalse(ymdKey.is(undefined));
+
+      assert.isFalse(ymdKey.is({}));
+
+      assert.isFalse(ymdKey.is([]));
+    });
+
+    test('rejects empty string', () => {
+      assert.isFalse(ymdKey.is(''));
+    });
+
+    test('rejects similar but incorrect keys', () => {
+      assert.isFalse(ymdKey.is('Year'));
+
+      assert.isFalse(ymdKey.is('YEAR'));
+
+      assert.isFalse(ymdKey.is('year '));
+
+      assert.isFalse(ymdKey.is(' year'));
+    });
+  });
 });

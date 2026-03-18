@@ -1,7 +1,8 @@
 import { expectType } from 'ts-data-forge';
 import {
-  type ExcessPropertyOption,
+  flattenShapeStructure,
   hasRecordInternals,
+  type ExcessPropertyOption,
   type Type,
   type TypeOf,
   type UnknownShape,
@@ -33,6 +34,14 @@ export const required = <
     );
   }
 
+  const shape = flattenShapeStructure(recordType.shapeStructure);
+
+  if (shape === undefined) {
+    throw new Error(
+      `required() requires a simple or intersection record type, but received a union type`,
+    );
+  }
+
   const typeNameFilled: string =
     options?.typeName ??
     (options?.keysToBeRequired === undefined
@@ -40,11 +49,11 @@ export const required = <
       : `PartiallyRequired<${recordType.typeName}, ${toUnionKeyString(options.keysToBeRequired)}>`);
 
   const keysToBeRequired: ReadonlySet<string> = new Set(
-    options?.keysToBeRequired ?? Object.keys(recordType.shape),
+    options?.keysToBeRequired ?? Object.keys(shape),
   );
 
   const requiredShape = Object.fromEntries(
-    Object.entries(recordType.shape).map(
+    Object.entries(shape).map(
       ([k, v]) => [k, keysToBeRequired.has(k) ? makeRequired(v) : v] as const,
     ),
   ) satisfies UnknownShape as UnknownShape;

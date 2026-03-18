@@ -182,7 +182,7 @@ export const recursion = <A,>(
   // Proxy to propagate RecordTypeInternals if the inner type has them
   return new Proxy(baseType, {
     get: (target, prop) => {
-      if (prop === 'shape' || prop === 'excessProperty') {
+      if (prop === 'shapeStructure' || prop === 'excessProperty') {
         const inner = getInnerType();
 
         if (hasRecordInternals(inner)) {
@@ -201,7 +201,7 @@ export const recursion = <A,>(
       return undefined;
     },
     has: (target, prop) => {
-      if (prop === 'shape' || prop === 'excessProperty') {
+      if (prop === 'shapeStructure' || prop === 'excessProperty') {
         const inner = getInnerType();
 
         return hasRecordInternals(inner);
@@ -213,13 +213,13 @@ export const recursion = <A,>(
       const inner = getInnerType();
 
       if (hasRecordInternals(inner)) {
-        return [...Object.keys(target), 'shape', 'excessProperty'];
+        return [...Object.keys(target), 'shapeStructure', 'excessProperty'];
       }
 
       return Object.keys(target);
     },
     getOwnPropertyDescriptor: (target, prop) => {
-      if (prop === 'shape' || prop === 'excessProperty') {
+      if (prop === 'shapeStructure' || prop === 'excessProperty') {
         const inner = getInnerType();
 
         if (hasRecordInternals(inner)) {

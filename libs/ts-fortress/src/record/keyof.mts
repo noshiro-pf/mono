@@ -2,10 +2,10 @@ import { Arr, expectType, pipe } from 'ts-data-forge';
 import { enumType } from '../enum/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
 import {
-  hasRecordInternals,
-  type RecordTypeInternals,
+  type ShapeStructure,
   type Type,
   type TypeOf,
+  hasRecordInternals,
 } from '../type.mjs';
 
 export const keyof = <const R extends UnknownRecord>(
@@ -23,7 +23,7 @@ export const keyof = <const R extends UnknownRecord>(
   }
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return pipe(getKeys(recordType)).map((keys) =>
+  return pipe(getKeysFromStructure(recordType.shapeStructure)).map((keys) =>
     Arr.isNonEmpty(keys)
       ? (enumType(keys, {
           typeName: options?.typeName ?? `keyof ${recordType.typeName}`,
@@ -32,9 +32,34 @@ export const keyof = <const R extends UnknownRecord>(
   ).value as KeyofType<R>;
 };
 
-const getKeys = (
-  recordType: Type<unknown> & RecordTypeInternals,
-): readonly string[] => Object.keys(recordType.shape);
+const getKeysFromStructure = (structure: ShapeStructure): readonly string[] => {
+  switch (structure.kind) {
+    case 'simple':
+      return Object.keys(structure.shape);
+
+    case 'union':
+      return getKeysHelper(structure.variants);
+
+    case 'intersection':
+      return getKeysHelper(structure.parts);
+  }
+};
+
+const getKeysHelper = (
+  structures: readonly ShapeStructure[],
+): readonly string[] => {
+  const mut_allKeys = new Set<string>();
+
+  for (const part of structures) {
+    const keys = getKeysFromStructure(part);
+
+    for (const key of keys) {
+      mut_allKeys.add(key);
+    }
+  }
+
+  return Array.from(mut_allKeys);
+};
 
 type KeyofType<R extends UnknownRecord> =
   IsNever<keyof R> extends true ? Type<undefined> : Type<ToString<keyof R>>;

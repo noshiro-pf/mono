@@ -1,11 +1,9 @@
-import { Arr, expectType, Obj, Result } from 'ts-data-forge';
+import { Arr, expectType, Result } from 'ts-data-forge';
 import {
   type ExcessPropertyOption,
   hasRecordInternals,
-  type RecordTypeInternals,
   type Type,
   type TypeOf,
-  type UnknownShape,
 } from '../type.mjs';
 import {
   createAssertFn,
@@ -76,19 +74,10 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
 
   // If all types are records, add RecordTypeInternals
   if (types.every(hasRecordInternals)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    const recordTypes = types as unknown as NonEmptyArray<
-      Type<unknown> & RecordTypeInternals
-    >;
+    const shapeStructures = Arr.map(types, (t) => t.shapeStructure);
 
-    const shapes = Arr.map(
-      recordTypes,
-      (t) => t.shape,
-    ) satisfies readonly UnknownShape[];
-
-    const mergedShape = Obj.merge(...shapes);
-
-    const excessProperty: ExcessPropertyOption = recordTypes.some(
+    const excessProperty: ExcessPropertyOption = Arr.some(
+      types,
       (t) => t.excessProperty === 'reject',
     )
       ? 'reject'
@@ -97,7 +86,9 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return {
       ...baseType,
-      shape: mergedShape,
+      shapeStructure: Arr.isArrayOfLength(shapeStructures, 1)
+        ? shapeStructures[0]
+        : ({ kind: 'intersection', parts: shapeStructures } as const),
       excessProperty,
     } as IntersectionType<Types>;
   }

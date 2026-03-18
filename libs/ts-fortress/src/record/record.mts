@@ -180,7 +180,7 @@ export const record = <
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    shape,
+    shapeStructure: { kind: 'simple', shape } as const,
     excessProperty: ep,
   } satisfies Type<V> & RecordTypeInternals as Type<V>;
 };

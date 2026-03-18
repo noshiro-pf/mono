@@ -444,4 +444,63 @@ describe('advanced type', () => {
       children: [],
     });
   });
+
+  describe('additional negative cases for complex types', () => {
+    test('rejects completely wrong structure', () => {
+      assert.isFalse(AdvancedNodeType.is(null));
+
+      assert.isFalse(AdvancedNodeType.is(undefined));
+
+      assert.isFalse(AdvancedNodeType.is(123));
+
+      assert.isFalse(AdvancedNodeType.is('string'));
+
+      assert.isFalse(AdvancedNodeType.is([]));
+    });
+
+    test('rejects partial valid structure', () => {
+      // Only id field
+      assert.isFalse(AdvancedNodeType.is({ id: 'id:test' }));
+
+      // Missing critical fields
+      assert.isFalse(
+        AdvancedNodeType.is({
+          id: 'id:test',
+          status: 'draft',
+        }),
+      );
+    });
+
+    test('rejects invalid nested types in recursion', () => {
+      const invalidChild: UnknownRecord = {
+        id: 'id:parent',
+        status: 'draft',
+        coordinates: [0, 0],
+        palette: [0, 2],
+        metrics: null,
+        tags: ['tag:1'],
+        children: [
+          {
+            // Invalid child: missing required fields
+            id: 'id:child',
+          },
+        ],
+      } as const;
+
+      assert.isFalse(AdvancedNodeType.is(invalidChild));
+    });
+
+    test('rejects invalid union variants', () => {
+      const invalidStatus: UnknownRecord = {
+        id: 'id:test',
+        status: 'invalid-status', // not in enum/null/undefined
+        coordinates: [0, 0],
+        palette: [0, 2],
+        metrics: null,
+        tags: ['tag:1'],
+      } as const;
+
+      assert.isFalse(AdvancedNodeType.is(invalidStatus));
+    });
+  });
 });

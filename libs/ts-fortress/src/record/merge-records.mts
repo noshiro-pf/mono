@@ -1,15 +1,19 @@
 import { Arr, expectType, Obj } from 'ts-data-forge';
+import { union } from '../compose/index.mjs';
 import { literal } from '../other-types/index.mjs';
 import {
   type ExcessPropertyOption,
-  hasRecordInternals,
   type RecordTypeInternals,
+  type ShapeStructure,
   type Type,
   type TypeOf,
   type UnknownShape,
+  hasRecordInternals,
 } from '../type.mjs';
 import { toIntersectionString } from '../utils/index.mjs';
 import { record } from './record.mjs';
+
+const MERGE_RECORDS_MAX_VARIANTS = 10_000;
 
 export const mergeRecords = <
   const Types extends NonEmptyArray<Type<UnknownRecord>>,
@@ -32,24 +36,83 @@ export const mergeRecords = <
     options?.typeName ??
     `(${toIntersectionString(recordTypes.map((a) => a.typeName))})`;
 
-  const shapes = Arr.map(
-    recordTypes,
-    (t) => t.shape,
-  ) satisfies readonly UnknownShape[];
+  // Expand all shape structures to get all possible shape combinations
+  const expandedShapesPerType = Arr.map(recordTypes, (t) =>
+    expandShapeStructure(t.shapeStructure),
+  );
 
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  const mergedShape = Obj.merge(...shapes) as UnknownShape;
+  // Estimate the total number of merged variants that would be produced.
+  // This is the product of the number of variants for each record type.
+  const estimatedVariantCount = expandedShapesPerType.reduce(
+    (acc, shapes) => acc * shapes.length,
+    1,
+  );
+
+  if (estimatedVariantCount > MERGE_RECORDS_MAX_VARIANTS) {
+    throw new Error(
+      `mergeRecords would create ${estimatedVariantCount} record variants, exceeding the limit of ${MERGE_RECORDS_MAX_VARIANTS}. ` +
+        'This could lead to excessive memory or CPU usage. Consider simplifying the record types or reducing union/intersection nesting.',
+    );
+  }
+
+  // For merging records (which is an intersection operation),
+  // we need to create the cartesian product of all variants
+  // For example: {a} & ({b} | {c}) = ({a} & {b}) | ({a} & {c})
+  const allCombinations = Arr.cartesianProduct(expandedShapesPerType);
+
+  // Merge each combination
+  const mergedShapes = Arr.map(allCombinations, (shapes) =>
+    Obj.merge(...shapes),
+  );
 
   const excessProperty =
     options?.excessProperty ?? deriveStrictestExcessProperty(recordTypes);
 
-  const internalRecord = record(mergedShape, {
-    typeName: typeNameFilled,
-    excessProperty,
-  });
+  // If there's only one merged shape, return it directly
+  if (Arr.isArrayOfLength(mergedShapes, 1)) {
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return record(mergedShapes[0], {
+      typeName: typeNameFilled,
+      excessProperty,
+    }) as MergeRecordsType<Types>;
+  }
+
+  // If there are multiple variants, we need to return a union
+  const variants = Arr.map(mergedShapes, (shape) =>
+    record(shape, { excessProperty }),
+  );
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return internalRecord as unknown as MergeRecordsType<Types>;
+  return union(variants as NonEmptyArray<Type<UnknownRecord>>, {
+    typeName: typeNameFilled,
+  }) as MergeRecordsType<Types>;
+};
+
+/**
+ * Expands a ShapeStructure into all possible simple shapes.
+ * For union structures, returns an array of all variant shapes.
+ * For intersection structures, computes cartesian product of all parts.
+ */
+const expandShapeStructure = (
+  structure: ShapeStructure,
+): readonly UnknownShape[] => {
+  switch (structure.kind) {
+    case 'simple': {
+      return [structure.shape];
+    }
+    case 'union': {
+      // Union: flatten all variants
+      return structure.variants.flatMap(expandShapeStructure);
+    }
+    case 'intersection': {
+      // Intersection: compute cartesian product of all parts
+      const expandedParts = structure.parts.map(expandShapeStructure);
+
+      const combinations = Arr.cartesianProduct(expandedParts);
+
+      return Arr.map(combinations, (shapes) => Obj.merge(...shapes));
+    }
+  }
 };
 
 type MergeRecordsType<Types extends readonly Type<UnknownRecord>[]> = Type<
