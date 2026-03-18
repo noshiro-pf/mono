@@ -121,7 +121,7 @@
     "conventional-changelog-conventionalcommits": "9.3.0",
     "cspell": "9.7.0",
     "dedent": "1.7.2",
-    "eslint": "9.39.3",
+    "eslint": "9.39.4",
     "eslint-config-typed": "4.7.2",
     "github-settings-as-code": "1.2.0",
     "jiti": "2.6.1",
