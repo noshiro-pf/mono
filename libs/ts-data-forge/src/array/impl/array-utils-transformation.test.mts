@@ -3,6 +3,7 @@ import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';
 import { SafeUint } from '../../number/index.mjs';
 import {
+  cartesianProduct,
   concat,
   filter,
   filterNot,
@@ -1091,6 +1092,59 @@ describe('Arr transformations', () => {
       const result = zip(arr1, arr2);
 
       assert.deepStrictEqual(result, []);
+    });
+  });
+
+  describe(cartesianProduct, () => {
+    test('Empty array', () => {
+      assert.deepStrictEqual(cartesianProduct([]), [[]]);
+    });
+
+    test('Single array', () => {
+      assert.deepStrictEqual(cartesianProduct([[1, 2, 3]]), [[1], [2], [3]]);
+    });
+
+    test('Two arrays', () => {
+      assert.deepStrictEqual(
+        cartesianProduct([
+          [1, 2],
+          [3, 4],
+        ]),
+        [
+          [1, 3],
+          [1, 4],
+          [2, 3],
+          [2, 4],
+        ],
+      );
+    });
+
+    test('Three arrays', () => {
+      assert.deepStrictEqual(
+        cartesianProduct<string | number | boolean>([
+          ['a', 'b'],
+          [1, 2],
+          [true, false],
+        ]),
+        [
+          ['a', 1, true],
+          ['a', 1, false],
+          ['a', 2, true],
+          ['a', 2, false],
+          ['b', 1, true],
+          ['b', 1, false],
+          ['b', 2, true],
+          ['b', 2, false],
+        ],
+      );
+    });
+
+    test('Array with empty array', () => {
+      assert.deepStrictEqual(cartesianProduct([[1, 2], [], [3, 4]]), []);
+    });
+
+    test('Single element arrays', () => {
+      assert.deepStrictEqual(cartesianProduct([[1], [2], [3]]), [[1, 2, 3]]);
     });
   });
 });

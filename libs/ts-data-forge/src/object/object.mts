@@ -311,6 +311,8 @@ export namespace Obj {
    *
    * @example
    *
+   * <!-- doc:embed:jsdoc:example:./samples/src/object/merge-example.mts -->
+   *
    * ```ts
    * const a = { a: 0, b: 0 } as const;
    * const b = { b: 1, c: 0 } as const;
@@ -319,6 +321,8 @@ export namespace Obj {
    *
    * assert.deepStrictEqual(result, { a: 0, b: 1, c: 0 });
    * ```
+   *
+   * <!-- /doc:embed:jsdoc:example:./samples/src/object/merge-example.mts -->
    *
    * @param records - The records to merge
    * @returns A new record with all properties merged

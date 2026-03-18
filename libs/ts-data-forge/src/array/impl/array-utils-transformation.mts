@@ -4,6 +4,7 @@ import { asPositiveUint32, asUint32, Uint32 } from '../../number/index.mjs';
 import { castMutable, tp } from '../../others/index.mjs';
 import { newArray, seq } from './array-utils-creation.mjs';
 import { size } from './array-utils-size.mjs';
+import { isNonEmpty } from './array-utils-validation.mjs';
 
 /**
  * Creates a new array by transforming each element with a mapping function.
@@ -809,3 +810,42 @@ export const zip = <
  * @see {@link partition}
  */
 export const chunk = partition;
+
+/**
+ * Computes the cartesian product of arrays.
+ * cartesianProduct([[1,2], [3,4]]) => [[1,3], [1,4], [2,3], [2,4]]
+ *
+ * @example
+ *
+ *
+ * ```ts
+ * const sizes = ['S', 'M'] as const;
+ *
+ * const colors = ['red', 'blue'] as const;
+ *
+ * const combinations = Arr.cartesianProduct([sizes, colors]);
+ *
+ * const expectedCombinations = [
+ *   ['S', 'red'],
+ *   ['S', 'blue'],
+ *   ['M', 'red'],
+ *   ['M', 'blue'],
+ * ] as const;
+ *
+ * assert.deepStrictEqual(combinations, expectedCombinations);
+ * ```
+ */
+export const cartesianProduct = <T,>(
+  arrays: readonly (readonly T[])[],
+): readonly (readonly T[])[] => {
+  if (!isNonEmpty(arrays)) return [[]];
+
+  const [first, ...rest] = arrays;
+
+  // If first array is empty, the result is empty
+  if (!isNonEmpty(first)) return [];
+
+  const restProduct = cartesianProduct(rest);
+
+  return first.flatMap((item) => restProduct.map((prod) => [item, ...prod]));
+};
