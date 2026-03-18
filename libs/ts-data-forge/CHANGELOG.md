@@ -1,3 +1,9 @@
+# [6.8.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.7.0...v6.8.0) (2026-03-18)
+
+### Features
+
+- add Arr.cartesianProduct ([#325](https://github.com/noshiro-pf/ts-data-forge/issues/325)) ([7c915ea](https://github.com/noshiro-pf/ts-data-forge/commit/7c915ea08df5ce31e2d60223df2fc39500a46b16))
+
 # [6.7.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.6.0...v6.7.0) (2026-03-17)
 
 ### Features
