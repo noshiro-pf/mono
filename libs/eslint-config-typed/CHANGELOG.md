@@ -1,3 +1,9 @@
+## [4.7.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.6...v4.7.7) (2026-03-25)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.5.0 to 6.6.0 ([#282](https://github.com/noshiro-pf/eslint-config-typed/issues/282)) ([8dc2ade](https://github.com/noshiro-pf/eslint-config-typed/commit/8dc2ade1f4fc444a46065b06d3465846976795b4))
+
 ## [4.7.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.5...v4.7.6) (2026-03-25)
 
 ### Bug Fixes
