@@ -119,7 +119,7 @@ importers:
         version: 25.0.3(typescript@5.9.3)
       ts-codemod-lib:
         specifier: ^2.0.5
-        version: 2.0.5(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
+        version: 2.1.1(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
       ts-repo-utils:
         specifier: 9.0.0
         version: 9.0.0(prettier@3.8.1)(typescript@5.9.3)
@@ -3906,8 +3906,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-codemod-lib@2.0.5:
-    resolution: {integrity: sha512-ybaz9KMPYrn92Xt2txfB6AGkr4j5QJegySQkAuHiRGBLhMghWuVJcVZmwxNMaBrA8TduQ2LNdYwma6dT/p6ncA==}
+  ts-codemod-lib@2.1.1:
+    resolution: {integrity: sha512-6i72N0abhKHYN/QuV/nuHofZLGqGL0p0MNV3cZv8Mugnd9ZsG8T2EqIN2uLUC4AVL9TXgl6mGXe0/WI8BCwFrw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
@@ -8416,7 +8416,7 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-codemod-lib@2.0.5(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
+  ts-codemod-lib@2.1.1(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
       ts-data-forge: 6.5.0(typescript@5.9.3)
       ts-morph: 27.0.2
