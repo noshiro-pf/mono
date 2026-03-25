@@ -112,7 +112,7 @@
     "is-glob": "^4.0.3",
     "is-immutable-type": "5.0.1",
     "micromatch": "^4.0.8",
-    "ts-data-forge": "^6.5.0",
+    "ts-data-forge": "^6.8.0",
     "tsutils": "3.21.0",
     "typescript-eslint": "8.57.1"
   },

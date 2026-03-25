@@ -114,8 +114,8 @@ importers:
         specifier: ^4.0.8
         version: 4.0.8
       ts-data-forge:
-        specifier: ^6.5.0
-        version: 6.5.0(typescript@5.9.3)
+        specifier: ^6.8.0
+        version: 6.8.0(typescript@5.9.3)
       tsutils:
         specifier: 3.21.0
         version: 3.21.0(typescript@5.9.3)
@@ -4107,6 +4107,12 @@ packages:
     peerDependencies:
       typescript: '>=4.8'
 
+  ts-data-forge@6.8.0:
+    resolution: {integrity: sha512-o+azDoqQfGOLY8LCtmeUZvGuv0z5XDKg5nYetAj7RQ/1/znJR1n/fNU1ZbqOMQbGhS3IocFs21gl4swCz7ZGmQ==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
+    peerDependencies:
+      typescript: '>=4.8'
+
   ts-declaration-location@1.0.7:
     resolution: {integrity: sha512-EDyGAwH1gO0Ausm9gV6T2nUvBgXT5kGoCMJPllOaooZ+4VvJiKBdZE7wK18N1deEowhcUptS+5GXZK8U/fvpwA==}
     peerDependencies:
@@ -7025,7 +7031,7 @@ snapshots:
       '@octokit/core': 7.0.6
       dotenv: 17.3.1
       octokit-safe-types: 1.2.10(typescript@5.9.3)
-      ts-data-forge: 6.5.0(typescript@5.9.3)
+      ts-data-forge: 6.8.0(typescript@5.9.3)
       ts-fortress: 6.4.0(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
@@ -7928,7 +7934,7 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
-      ts-data-forge: 6.5.0(typescript@5.9.3)
+      ts-data-forge: 6.8.0(typescript@5.9.3)
       ts-fortress: 6.4.0(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
@@ -8649,6 +8655,12 @@ snapshots:
       ts-type-forge: 2.3.1
       typescript: 5.9.3
 
+  ts-data-forge@6.8.0(typescript@5.9.3):
+    dependencies:
+      '@sindresorhus/is': 7.2.0
+      ts-type-forge: 2.3.1
+      typescript: 5.9.3
+
   ts-declaration-location@1.0.7(typescript@5.9.3):
     dependencies:
       picomatch: 4.0.3
@@ -8657,7 +8669,7 @@ snapshots:
   ts-fortress@6.4.0(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
-      ts-data-forge: 6.5.0(typescript@5.9.3)
+      ts-data-forge: 6.8.0(typescript@5.9.3)
       ts-type-forge: 2.3.1
     transitivePeerDependencies:
       - typescript
@@ -8676,7 +8688,7 @@ snapshots:
       fast-glob: 3.3.3
       micromatch: 4.0.8
       prettier: 3.8.1
-      ts-data-forge: 6.5.0(typescript@5.9.3)
+      ts-data-forge: 6.8.0(typescript@5.9.3)
       tsx: 4.21.0
     transitivePeerDependencies:
       - supports-color
