@@ -75,8 +75,8 @@ importers:
         specifier: 6.5.0
         version: 6.5.0(typescript@5.9.3)
       ts-fortress:
-        specifier: 6.4.1
-        version: 6.4.1(typescript@5.9.3)
+        specifier: 7.0.2
+        version: 7.0.2(typescript@5.9.3)
       ts-repo-utils:
         specifier: 9.0.0
         version: 9.0.0(prettier@3.8.1)(typescript@5.9.3)
@@ -3813,6 +3813,12 @@ packages:
     peerDependencies:
       typescript: '>=4.8'
 
+  ts-data-forge@6.8.0:
+    resolution: {integrity: sha512-o+azDoqQfGOLY8LCtmeUZvGuv0z5XDKg5nYetAj7RQ/1/znJR1n/fNU1ZbqOMQbGhS3IocFs21gl4swCz7ZGmQ==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
+    peerDependencies:
+      typescript: '>=4.8'
+
   ts-declaration-location@1.0.7:
     resolution: {integrity: sha512-EDyGAwH1gO0Ausm9gV6T2nUvBgXT5kGoCMJPllOaooZ+4VvJiKBdZE7wK18N1deEowhcUptS+5GXZK8U/fvpwA==}
     peerDependencies:
@@ -3820,6 +3826,10 @@ packages:
 
   ts-fortress@6.4.1:
     resolution: {integrity: sha512-d6BalDR+4jbZaFpLmjxZHAIljNy1EJ06hYzAhGwpPCX8ywSDnDqjdGd//48LsJdP1Xna9DrPyV8pFt7InZEyZw==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
+
+  ts-fortress@7.0.2:
+    resolution: {integrity: sha512-0Vqa3NdBOXIfphzjV1RFHAy76UUuwbknQottir8WaiCkqmUKwEhvCuR3iQ3KuFE8TEaGwBcf/sASyauHOsYhNw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   ts-repo-utils@9.0.0:
@@ -8312,6 +8322,12 @@ snapshots:
       ts-type-forge: 2.3.1
       typescript: 5.9.3
 
+  ts-data-forge@6.8.0(typescript@5.9.3):
+    dependencies:
+      '@sindresorhus/is': 7.2.0
+      ts-type-forge: 2.3.1
+      typescript: 5.9.3
+
   ts-declaration-location@1.0.7(typescript@5.9.3):
     dependencies:
       picomatch: 4.0.3
@@ -8321,6 +8337,14 @@ snapshots:
     dependencies:
       '@sindresorhus/is': 7.2.0
       ts-data-forge: 6.5.0(typescript@5.9.3)
+      ts-type-forge: 2.3.1
+    transitivePeerDependencies:
+      - typescript
+
+  ts-fortress@7.0.2(typescript@5.9.3):
+    dependencies:
+      '@sindresorhus/is': 7.2.0
+      ts-data-forge: 6.8.0(typescript@5.9.3)
       ts-type-forge: 2.3.1
     transitivePeerDependencies:
       - typescript
