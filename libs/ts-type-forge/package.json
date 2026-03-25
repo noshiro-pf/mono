@@ -78,7 +78,7 @@
     "npm-run-all2": "8.0.4",
     "prettier": "3.8.1",
     "prettier-plugin-organize-imports": "4.3.0",
-    "prettier-plugin-packagejson": "3.0.0",
+    "prettier-plugin-packagejson": "3.0.2",
     "semantic-release": "25.0.3",
     "ts-data-forge": "6.5.0",
     "ts-fortress": "7.0.2",
