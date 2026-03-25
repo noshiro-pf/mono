@@ -18,8 +18,8 @@ importers:
         specifier: ^6.5.0
         version: 6.8.0(typescript@5.9.3)
       ts-fortress:
-        specifier: ^6.4.0
-        version: 6.4.0(typescript@5.9.3)
+        specifier: ^7.0.2
+        version: 7.0.2(typescript@5.9.3)
     devDependencies:
       '@rollup/plugin-replace':
         specifier: 6.0.3
@@ -3947,8 +3947,12 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@6.4.0:
-    resolution: {integrity: sha512-GbV2LEkzjmzCDd7mSu9oQXIZdG3lBXU4q8y1qztf09nwoUEP6FgF12C1UYxqoCj8KriRqtwgIMCWie7uV/E+Hg==}
+  ts-fortress@6.4.2:
+    resolution: {integrity: sha512-fIv5m9gZJkdCPFRvepDkp3v3+AFe19epGPqVsh1tm++6p4nC0dVU4lVim98xkKxFFKnEHFxpcKtFB4/eWoNWzw==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
+
+  ts-fortress@7.0.2:
+    resolution: {integrity: sha512-0Vqa3NdBOXIfphzjV1RFHAy76UUuwbknQottir8WaiCkqmUKwEhvCuR3iQ3KuFE8TEaGwBcf/sASyauHOsYhNw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   ts-morph@27.0.2:
@@ -6840,7 +6844,7 @@ snapshots:
       dotenv: 17.3.1
       octokit-safe-types: 1.2.10(typescript@5.9.3)
       ts-data-forge: 6.8.0(typescript@5.9.3)
-      ts-fortress: 6.4.0(typescript@5.9.3)
+      ts-fortress: 6.4.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -7727,7 +7731,7 @@ snapshots:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
       ts-data-forge: 6.8.0(typescript@5.9.3)
-      ts-fortress: 6.4.0(typescript@5.9.3)
+      ts-fortress: 6.4.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8466,7 +8470,15 @@ snapshots:
       picomatch: 4.0.3
       typescript: 5.9.3
 
-  ts-fortress@6.4.0(typescript@5.9.3):
+  ts-fortress@6.4.2(typescript@5.9.3):
+    dependencies:
+      '@sindresorhus/is': 7.2.0
+      ts-data-forge: 6.8.0(typescript@5.9.3)
+      ts-type-forge: 2.3.1
+    transitivePeerDependencies:
+      - typescript
+
+  ts-fortress@7.0.2(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
       ts-data-forge: 6.8.0(typescript@5.9.3)
