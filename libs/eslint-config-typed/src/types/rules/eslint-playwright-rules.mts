@@ -183,6 +183,9 @@ namespace MissingPlaywrightAwait {
    *           "type": "string"
    *         },
    *         "type": "array"
+   *       },
+   *       "includePageLocatorMethods": {
+   *         "type": "boolean"
    *       }
    *     },
    *     "type": "object"
@@ -192,6 +195,7 @@ namespace MissingPlaywrightAwait {
    */
   export type Options = Readonly<{
     customMatchers?: readonly string[];
+    includePageLocatorMethods?: boolean;
   }>;
 
   export type RuleEntry =
@@ -698,6 +702,10 @@ namespace NoSkippedTest {
    *       "allowConditional": {
    *         "default": false,
    *         "type": "boolean"
+   *       },
+   *       "disallowFixme": {
+   *         "default": false,
+   *         "type": "boolean"
    *       }
    *     },
    *     "type": "object"
@@ -710,6 +718,10 @@ namespace NoSkippedTest {
      * @default false
      */
     allowConditional?: boolean;
+    /**
+     * @default false
+     */
+    disallowFixme?: boolean;
   }>;
 
   export type RuleEntry =

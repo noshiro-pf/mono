@@ -1,12 +1,13 @@
 import {
   eslintJsxA11yRules,
-  eslintReactCodingStyleRules,
-  eslintReactHooksRules,
   eslintReactPerfRules,
-  eslintReactRefreshRules,
   eslintReactRules,
 } from '../rules/index.mjs';
-import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
+import {
+  defineKnownRules,
+  type FlatConfig,
+  withDefaultOption,
+} from '../types/index.mjs';
 import { eslintConfigForBrowser } from './browser.mjs';
 
 export const eslintConfigForReactBase = (
@@ -25,11 +26,12 @@ export const eslintConfigForReactBase = (
       },
       rules: defineKnownRules({
         ...eslintReactRules,
-        ...eslintReactHooksRules,
-        ...eslintReactRefreshRules,
         ...eslintJsxA11yRules,
         ...eslintReactPerfRules,
-        ...eslintReactCodingStyleRules,
+
+        // Classic hooks rules shared by React and Preact
+        'react-hooks/rules-of-hooks': withDefaultOption('error'),
+        'react-hooks/exhaustive-deps': withDefaultOption('error'),
       }),
     },
   ] as const;

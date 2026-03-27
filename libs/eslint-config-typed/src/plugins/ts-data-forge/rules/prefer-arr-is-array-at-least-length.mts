@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { isIntegerLiteralOrConstant } from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -60,6 +61,9 @@ export const preferArrIsArrayAtLeastLength: TSESLint.RuleModule<
 
         // Check if lengthSide is accessing .length
         if (!isLengthAccess(lengthSide)) return;
+
+        // Only match integer literals or const variables initialized with integer literals
+        if (!isIntegerLiteralOrConstant(valueSide, sourceCode)) return;
 
         // lengthSide is MemberExpression accessing .length
         const arrayExpression = lengthSide.object;

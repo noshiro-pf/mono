@@ -12,5 +12,7 @@ export const eslintCypressRules = {
   'cypress/no-async-before': 'error',
   'cypress/no-debug': 'error',
   'cypress/no-chained-get': 'error',
-  'cypress/no-xpath': 'error',
+
+  // deprecated
+  'cypress/no-xpath': 0,
 } as const satisfies EslintCypressRules;

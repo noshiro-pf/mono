@@ -5860,6 +5860,19 @@ namespace ExpListStyle {
    *             "$ref": "#/$defs/multiLineConfig"
    *           }
    *         }
+   *       },
+   *       "overrideConfig": {
+   *         "oneOf": [
+   *           {
+   *             "$ref": "#/$defs/baseConfig"
+   *           },
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "off"
+   *             ]
+   *           }
+   *         ]
    *       }
    *     },
    *     "type": "object",
@@ -5876,85 +5889,85 @@ namespace ExpListStyle {
    *         "additionalProperties": false,
    *         "properties": {
    *           "()": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "[]": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "{}": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "<>": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "ArrayExpression": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "ArrayPattern": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "ArrowFunctionExpression": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "CallExpression": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "ExportNamedDeclaration": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "FunctionDeclaration": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "FunctionExpression": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "IfStatement": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "ImportAttributes": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "ImportDeclaration": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "JSONArrayExpression": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "JSONObjectExpression": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "NewExpression": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "ObjectExpression": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "ObjectPattern": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "TSDeclareFunction": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "TSEnumBody": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "TSFunctionType": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "TSInterfaceBody": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "TSTupleType": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "TSTypeLiteral": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "TSTypeParameterDeclaration": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           },
    *           "TSTypeParameterInstantiation": {
-   *             "$ref": "#/$defs/baseConfig"
+   *             "$ref": "#/$defs/overrideConfig"
    *           }
    *         }
    *       }
@@ -5963,37 +5976,39 @@ namespace ExpListStyle {
    * ]
    * ```
    */
+  export type OverrideConfig = BaseConfig | 'off';
+
   export type Options = Readonly<{
     singleLine?: SingleLineConfig;
     multiLine?: MultiLineConfig;
     overrides?: Readonly<{
-      '()'?: BaseConfig;
-      '[]'?: BaseConfig;
-      '{}'?: BaseConfig;
-      '<>'?: BaseConfig;
-      ArrayExpression?: BaseConfig;
-      ArrayPattern?: BaseConfig;
-      ArrowFunctionExpression?: BaseConfig;
-      CallExpression?: BaseConfig;
-      ExportNamedDeclaration?: BaseConfig;
-      FunctionDeclaration?: BaseConfig;
-      FunctionExpression?: BaseConfig;
-      IfStatement?: BaseConfig;
-      ImportAttributes?: BaseConfig;
-      ImportDeclaration?: BaseConfig;
-      JSONArrayExpression?: BaseConfig;
-      JSONObjectExpression?: BaseConfig;
-      NewExpression?: BaseConfig;
-      ObjectExpression?: BaseConfig;
-      ObjectPattern?: BaseConfig;
-      TSDeclareFunction?: BaseConfig;
-      TSEnumBody?: BaseConfig;
-      TSFunctionType?: BaseConfig;
-      TSInterfaceBody?: BaseConfig;
-      TSTupleType?: BaseConfig;
-      TSTypeLiteral?: BaseConfig;
-      TSTypeParameterDeclaration?: BaseConfig;
-      TSTypeParameterInstantiation?: BaseConfig;
+      '()'?: OverrideConfig;
+      '[]'?: OverrideConfig;
+      '{}'?: OverrideConfig;
+      '<>'?: OverrideConfig;
+      ArrayExpression?: OverrideConfig;
+      ArrayPattern?: OverrideConfig;
+      ArrowFunctionExpression?: OverrideConfig;
+      CallExpression?: OverrideConfig;
+      ExportNamedDeclaration?: OverrideConfig;
+      FunctionDeclaration?: OverrideConfig;
+      FunctionExpression?: OverrideConfig;
+      IfStatement?: OverrideConfig;
+      ImportAttributes?: OverrideConfig;
+      ImportDeclaration?: OverrideConfig;
+      JSONArrayExpression?: OverrideConfig;
+      JSONObjectExpression?: OverrideConfig;
+      NewExpression?: OverrideConfig;
+      ObjectExpression?: OverrideConfig;
+      ObjectPattern?: OverrideConfig;
+      TSDeclareFunction?: OverrideConfig;
+      TSEnumBody?: OverrideConfig;
+      TSFunctionType?: OverrideConfig;
+      TSInterfaceBody?: OverrideConfig;
+      TSTupleType?: OverrideConfig;
+      TSTypeLiteral?: OverrideConfig;
+      TSTypeParameterDeclaration?: OverrideConfig;
+      TSTypeParameterInstantiation?: OverrideConfig;
     }>;
   }>;
 
@@ -8237,6 +8252,14 @@ namespace PaddingLineBetweenStatements {
    *         "properties": {
    *           "selector": {
    *             "type": "string"
+   *           },
+   *           "lineMode": {
+   *             "type": "string",
+   *             "enum": [
+   *               "any",
+   *               "singleline",
+   *               "multiline"
+   *             ]
    *           }
    *         },
    *         "required": [
@@ -8371,6 +8394,7 @@ namespace PaddingLineBetweenStatements {
 
   export type SelectorOption = Readonly<{
     selector: string;
+    lineMode?: 'any' | 'singleline' | 'multiline';
   }>;
 
   export type RuleEntry =

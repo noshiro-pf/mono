@@ -29,6 +29,7 @@ namespace ConsistentEachFor {
    *     "type": "object",
    *     "properties": {
    *       "test": {
+   *         "description": "Preferred method for `test`.",
    *         "type": "string",
    *         "enum": [
    *           "each",
@@ -36,6 +37,7 @@ namespace ConsistentEachFor {
    *         ]
    *       },
    *       "it": {
+   *         "description": "Preferred method for `it`.",
    *         "type": "string",
    *         "enum": [
    *           "each",
@@ -43,6 +45,7 @@ namespace ConsistentEachFor {
    *         ]
    *       },
    *       "describe": {
+   *         "description": "Preferred method for `describe`.",
    *         "type": "string",
    *         "enum": [
    *           "each",
@@ -50,6 +53,7 @@ namespace ConsistentEachFor {
    *         ]
    *       },
    *       "suite": {
+   *         "description": "Preferred method for `suite`.",
    *         "type": "string",
    *         "enum": [
    *           "each",
@@ -63,9 +67,21 @@ namespace ConsistentEachFor {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Preferred method for `test`.
+     */
     test?: 'each' | 'for';
+    /**
+     * Preferred method for `it`.
+     */
     it?: 'each' | 'for';
+    /**
+     * Preferred method for `describe`.
+     */
     describe?: 'each' | 'for';
+    /**
+     * Preferred method for `suite`.
+     */
     suite?: 'each' | 'for';
   }>;
 
@@ -99,10 +115,12 @@ namespace ConsistentTestFilename {
    *     "additionalProperties": false,
    *     "properties": {
    *       "pattern": {
+   *         "description": "Regex pattern for files that should be treated as tests.",
    *         "type": "string",
    *         "format": "regex"
    *       },
    *       "allTestPattern": {
+   *         "description": "Regex pattern used to identify all possible test files.",
    *         "type": "string",
    *         "format": "regex"
    *       }
@@ -112,7 +130,13 @@ namespace ConsistentTestFilename {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Regex pattern for files that should be treated as tests.
+     */
     pattern?: string;
+    /**
+     * Regex pattern used to identify all possible test files.
+     */
     allTestPattern?: string;
   }>;
 
@@ -145,6 +169,7 @@ namespace ConsistentTestIt {
    *     "type": "object",
    *     "properties": {
    *       "fn": {
+   *         "description": "Preferred global test function keyword.",
    *         "type": "string",
    *         "enum": [
    *           "test",
@@ -152,6 +177,7 @@ namespace ConsistentTestIt {
    *         ]
    *       },
    *       "withinDescribe": {
+   *         "description": "Preferred test function keyword inside `describe`.",
    *         "type": "string",
    *         "enum": [
    *           "test",
@@ -165,7 +191,13 @@ namespace ConsistentTestIt {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Preferred global test function keyword.
+     */
     fn?: 'test' | 'it';
+    /**
+     * Preferred test function keyword inside `describe`.
+     */
     withinDescribe?: 'test' | 'it';
   }>;
 
@@ -198,6 +230,7 @@ namespace ConsistentVitestVi {
    *     "type": "object",
    *     "properties": {
    *       "fn": {
+   *         "description": "Preferred utility keyword to enforce.",
    *         "type": "string",
    *         "enum": [
    *           "vi",
@@ -211,6 +244,9 @@ namespace ConsistentVitestVi {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Preferred utility keyword to enforce.
+     */
     fn?: 'vi' | 'vitest';
   }>;
 
@@ -242,12 +278,14 @@ namespace ExpectExpect {
    *     "type": "object",
    *     "properties": {
    *       "assertFunctionNames": {
+   *         "description": "List of function names treated as assertions.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
    *         }
    *       },
    *       "additionalTestBlockFunctions": {
+   *         "description": "Additional functions that should be treated as test blocks.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
@@ -260,7 +298,13 @@ namespace ExpectExpect {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * List of function names treated as assertions.
+     */
     assertFunctionNames?: readonly string[];
+    /**
+     * Additional functions that should be treated as test blocks.
+     */
     additionalTestBlockFunctions?: readonly string[];
   }>;
 
@@ -309,6 +353,7 @@ namespace MaxExpects {
    *     "type": "object",
    *     "properties": {
    *       "max": {
+   *         "description": "Maximum number of `expect` calls allowed in a test.",
    *         "type": "number"
    *       }
    *     },
@@ -318,6 +363,9 @@ namespace MaxExpects {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Maximum number of `expect` calls allowed in a test.
+     */
     max?: number;
   }>;
 
@@ -349,6 +397,7 @@ namespace MaxNestedDescribe {
    *     "type": "object",
    *     "properties": {
    *       "max": {
+   *         "description": "Maximum allowed nesting depth for `describe` blocks.",
    *         "type": "number"
    *       }
    *     },
@@ -358,6 +407,9 @@ namespace MaxNestedDescribe {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Maximum allowed nesting depth for `describe` blocks.
+     */
     max?: number;
   }>;
 
@@ -553,6 +605,7 @@ namespace NoFocusedTests {
    *     "type": "object",
    *     "properties": {
    *       "fixable": {
+   *         "description": "Whether the rule should provide an autofix.",
    *         "type": "boolean"
    *       }
    *     },
@@ -562,6 +615,9 @@ namespace NoFocusedTests {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether the rule should provide an autofix.
+     */
     fixable?: boolean;
   }>;
 
@@ -716,12 +772,15 @@ namespace NoLargeSnapshots {
    *     "type": "object",
    *     "properties": {
    *       "maxSize": {
+   *         "description": "Maximum number of lines allowed in external snapshots.",
    *         "type": "number"
    *       },
    *       "inlineMaxSize": {
+   *         "description": "Maximum number of lines allowed in inline snapshots.",
    *         "type": "number"
    *       },
    *       "allowedSnapshots": {
+   *         "description": "Allowed snapshot names by absolute snapshot file path.",
    *         "type": "object",
    *         "additionalProperties": {
    *           "type": "array"
@@ -734,8 +793,17 @@ namespace NoLargeSnapshots {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Maximum number of lines allowed in external snapshots.
+     */
     maxSize?: number;
+    /**
+     * Maximum number of lines allowed in inline snapshots.
+     */
     inlineMaxSize?: number;
+    /**
+     * Allowed snapshot names by absolute snapshot file path.
+     */
     allowedSnapshots?: Readonly<Record<string, readonly unknown[]>>;
   }>;
 
@@ -780,6 +848,7 @@ namespace NoRestrictedMatchers {
    * ```json
    * [
    *   {
+   *     "description": "Restricted matcher chains mapped to optional custom messages.",
    *     "type": "object",
    *     "additionalProperties": {
    *       "type": [
@@ -790,6 +859,9 @@ namespace NoRestrictedMatchers {
    *   }
    * ]
    * ```
+   */
+  /**
+   * Restricted matcher chains mapped to optional custom messages.
    */
   export type Options = Readonly<Record<string, string | null>>;
 
@@ -818,6 +890,7 @@ namespace NoRestrictedViMethods {
    * ```json
    * [
    *   {
+   *     "description": "Restricted `vi` methods mapped to optional custom messages.",
    *     "type": "object",
    *     "additionalProperties": {
    *       "type": [
@@ -828,6 +901,9 @@ namespace NoRestrictedViMethods {
    *   }
    * ]
    * ```
+   */
+  /**
+   * Restricted `vi` methods mapped to optional custom messages.
    */
   export type Options = Readonly<Record<string, string | null>>;
 
@@ -859,6 +935,7 @@ namespace NoStandaloneExpect {
    *     "type": "object",
    *     "properties": {
    *       "additionalTestBlockFunctions": {
+   *         "description": "Additional functions that should be treated as test blocks.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
@@ -871,6 +948,9 @@ namespace NoStandaloneExpect {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Additional functions that should be treated as test blocks.
+     */
     additionalTestBlockFunctions?: readonly string[];
   }>;
 
@@ -1214,12 +1294,15 @@ namespace PreferExpectAssertions {
    *     "type": "object",
    *     "properties": {
    *       "onlyFunctionsWithAsyncKeyword": {
+   *         "description": "Only check test functions declared with the async keyword.",
    *         "type": "boolean"
    *       },
    *       "onlyFunctionsWithExpectInLoop": {
+   *         "description": "Only check test functions that contain `expect` inside loops.",
    *         "type": "boolean"
    *       },
    *       "onlyFunctionsWithExpectInCallback": {
+   *         "description": "Only check test functions that contain `expect` in callbacks.",
    *         "type": "boolean"
    *       }
    *     },
@@ -1229,8 +1312,17 @@ namespace PreferExpectAssertions {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Only check test functions declared with the async keyword.
+     */
     onlyFunctionsWithAsyncKeyword?: boolean;
+    /**
+     * Only check test functions that contain `expect` inside loops.
+     */
     onlyFunctionsWithExpectInLoop?: boolean;
+    /**
+     * Only check test functions that contain `expect` in callbacks.
+     */
     onlyFunctionsWithExpectInCallback?: boolean;
   }>;
 
@@ -1328,6 +1420,7 @@ namespace PreferImportInMock {
    *     "type": "object",
    *     "properties": {
    *       "fixable": {
+   *         "description": "Whether the rule should provide an autofix.",
    *         "type": "boolean"
    *       }
    *     },
@@ -1337,6 +1430,9 @@ namespace PreferImportInMock {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether the rule should provide an autofix.
+     */
     fixable?: boolean;
   }>;
 
@@ -1386,6 +1482,7 @@ namespace PreferLowercaseTitle {
    *     "type": "object",
    *     "properties": {
    *       "ignore": {
+   *         "description": "Functions whose titles should be ignored when checking case.",
    *         "type": "array",
    *         "items": {
    *           "type": "string",
@@ -1397,6 +1494,7 @@ namespace PreferLowercaseTitle {
    *         }
    *       },
    *       "allowedPrefixes": {
+   *         "description": "Title prefixes that are exempt from this rule.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
@@ -1404,9 +1502,11 @@ namespace PreferLowercaseTitle {
    *         "additionalItems": false
    *       },
    *       "ignoreTopLevelDescribe": {
+   *         "description": "Ignore the first top-level `describe` title.",
    *         "type": "boolean"
    *       },
    *       "lowercaseFirstCharacterOnly": {
+   *         "description": "Only require the first character to be lowercase.",
    *         "type": "boolean"
    *       }
    *     },
@@ -1416,9 +1516,21 @@ namespace PreferLowercaseTitle {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Functions whose titles should be ignored when checking case.
+     */
     ignore?: readonly ('describe' | 'test' | 'it')[];
+    /**
+     * Title prefixes that are exempt from this rule.
+     */
     allowedPrefixes?: readonly string[];
+    /**
+     * Ignore the first top-level `describe` title.
+     */
     ignoreTopLevelDescribe?: boolean;
+    /**
+     * Only require the first character to be lowercase.
+     */
     lowercaseFirstCharacterOnly?: boolean;
   }>;
 
@@ -1481,6 +1593,7 @@ namespace PreferSnapshotHint {
    * ```json
    * [
    *   {
+   *     "description": "When to require snapshot hints.",
    *     "type": "string",
    *     "enum": [
    *       "always",
@@ -1489,6 +1602,9 @@ namespace PreferSnapshotHint {
    *   }
    * ]
    * ```
+   */
+  /**
+   * When to require snapshot hints.
    */
   export type Options = 'always' | 'multi';
 
@@ -1741,6 +1857,7 @@ namespace RequireHook {
    *     "type": "object",
    *     "properties": {
    *       "allowedFunctionCalls": {
+   *         "description": "Function calls that are allowed outside of hooks.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
@@ -1753,6 +1870,9 @@ namespace RequireHook {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Function calls that are allowed outside of hooks.
+     */
     allowedFunctionCalls?: readonly string[];
   }>;
 
@@ -1817,6 +1937,7 @@ namespace RequireMockTypeParameters {
    *     "type": "object",
    *     "properties": {
    *       "checkImportFunctions": {
+   *         "description": "Also require type parameters for `importActual` and `importMock`.",
    *         "type": "boolean"
    *       }
    *     },
@@ -1826,6 +1947,9 @@ namespace RequireMockTypeParameters {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Also require type parameters for `importActual` and `importMock`.
+     */
     checkImportFunctions?: boolean;
   }>;
 
@@ -1873,6 +1997,7 @@ namespace RequireTopLevelDescribe {
    *     "type": "object",
    *     "properties": {
    *       "maxNumberOfTopLevelDescribes": {
+   *         "description": "Maximum number of `describe` blocks allowed at the top level.",
    *         "type": "number",
    *         "minimum": 1
    *       }
@@ -1883,6 +2008,9 @@ namespace RequireTopLevelDescribe {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Maximum number of `describe` blocks allowed at the top level.
+     */
     maxNumberOfTopLevelDescribes?: number;
   }>;
 
@@ -1946,19 +2074,23 @@ namespace ValidExpect {
    *     "type": "object",
    *     "properties": {
    *       "alwaysAwait": {
+   *         "description": "Require awaiting every async assertion.",
    *         "type": "boolean"
    *       },
    *       "asyncMatchers": {
+   *         "description": "Matchers that should be considered async assertions.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
    *         }
    *       },
    *       "minArgs": {
+   *         "description": "Minimum number of arguments allowed for `expect`.",
    *         "type": "number",
    *         "minimum": 1
    *       },
    *       "maxArgs": {
+   *         "description": "Maximum number of arguments allowed for `expect`.",
    *         "type": "number",
    *         "minimum": 1
    *       }
@@ -1969,9 +2101,21 @@ namespace ValidExpect {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Require awaiting every async assertion.
+     */
     alwaysAwait?: boolean;
+    /**
+     * Matchers that should be considered async assertions.
+     */
     asyncMatchers?: readonly string[];
+    /**
+     * Minimum number of arguments allowed for `expect`.
+     */
     minArgs?: number;
+    /**
+     * Maximum number of arguments allowed for `expect`.
+     */
     maxArgs?: number;
   }>;
 
@@ -2045,12 +2189,15 @@ namespace ValidTitle {
    *     },
    *     "properties": {
    *       "ignoreTypeOfDescribeName": {
+   *         "description": "Skip validating `describe` titles that come from `typeof`.",
    *         "type": "boolean"
    *       },
    *       "allowArguments": {
+   *         "description": "Allow dynamic arguments as titles.",
    *         "type": "boolean"
    *       },
    *       "disallowedWords": {
+   *         "description": "Words that are not allowed in test titles.",
    *         "type": "array",
    *         "items": {
    *           "type": "string"
@@ -2081,8 +2228,17 @@ namespace ValidTitle {
     | readonly [string, string];
 
   export type Options = Readonly<{
+    /**
+     * Skip validating `describe` titles that come from `typeof`.
+     */
     ignoreTypeOfDescribeName?: boolean;
+    /**
+     * Allow dynamic arguments as titles.
+     */
     allowArguments?: boolean;
+    /**
+     * Words that are not allowed in test titles.
+     */
     disallowedWords?: readonly string[];
     mustMatch?: MustMatchType;
     mustNotMatch?: MustMatchType;

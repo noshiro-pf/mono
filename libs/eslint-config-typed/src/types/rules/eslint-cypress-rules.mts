@@ -159,12 +159,12 @@ namespace NoUnnecessaryWaiting {
  *  | key         | value   |
  *  | :---------- | :------ |
  *  | type        | problem |
- *  | deprecated  | false   |
+ *  | deprecated  | true    |
  *  | recommended | false   |
  *  ```
  */
 namespace NoXpath {
-  export type RuleEntry = Linter.StringSeverity;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -245,9 +245,11 @@ export type EslintCypressRules = Readonly<{
   'cypress/no-force': NoForce.RuleEntry;
   'cypress/no-pause': NoPause.RuleEntry;
   'cypress/no-unnecessary-waiting': NoUnnecessaryWaiting.RuleEntry;
-  'cypress/no-xpath': NoXpath.RuleEntry;
   'cypress/require-data-selectors': RequireDataSelectors.RuleEntry;
   'cypress/unsafe-to-chain-command': UnsafeToChainCommand.RuleEntry;
+
+  // deprecated
+  'cypress/no-xpath': NoXpath.RuleEntry;
 }>;
 
 export type EslintCypressRulesOption = Readonly<{

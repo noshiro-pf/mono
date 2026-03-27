@@ -51,6 +51,37 @@ describe('prefer-arr-is-array-at-least-length', () => {
             const ok = xs.length === 3;
           `,
         },
+        {
+          name: 'ignores comparison with non-const variable',
+          code: dedent`
+            const xs = [1, 2, 3];
+            let n = 3;
+            const ok = xs.length >= n;
+          `,
+        },
+        {
+          name: 'ignores comparison with function return value',
+          code: dedent`
+            const xs = [1, 2, 3];
+            const ok = xs.length >= Math.floor(3.5);
+          `,
+        },
+        {
+          name: 'ignores comparison with const variable initialized by non-literal',
+          code: dedent`
+            const xs = [1, 2, 3];
+            const n = Math.floor(3.5);
+            const ok = xs.length >= n;
+          `,
+        },
+        {
+          name: 'ignores comparison with const variable of type number',
+          code: dedent`
+            const xs = [1, 2, 3];
+            const n: number = 3;
+            const ok = xs.length >= n;
+          `,
+        },
       ],
       invalid: [
         {
