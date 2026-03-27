@@ -1,3 +1,9 @@
+# [4.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.7...v4.8.0) (2026-03-27)
+
+### Features
+
+- Update rule configs ([#286](https://github.com/noshiro-pf/eslint-config-typed/issues/286)) ([7ad046a](https://github.com/noshiro-pf/eslint-config-typed/commit/7ad046ad63dcac07b42bd9360ecdf81318daaa11))
+
 ## [4.7.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.6...v4.7.7) (2026-03-25)
 
 ### Bug Fixes
