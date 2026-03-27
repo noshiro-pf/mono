@@ -1,3 +1,9 @@
+## [1.2.2](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.1...v1.2.2) (2026-03-27)
+
+### Bug Fixes
+
+- fix ts-fortress version ([#101](https://github.com/noshiro-pf/github-settings-as-code/issues/101)) ([b458a77](https://github.com/noshiro-pf/github-settings-as-code/commit/b458a77dcc526734004a55649d232de9339a6141))
+
 ## [1.2.1](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.0...v1.2.1) (2026-03-16)
 
 ### Bug Fixes
