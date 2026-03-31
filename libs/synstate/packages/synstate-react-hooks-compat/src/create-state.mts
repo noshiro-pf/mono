@@ -14,6 +14,7 @@ export const createState = <S,>(
     updateState: (updateFn: (prev: S) => S) => S;
     resetState: () => S;
     getSnapshot: () => S;
+    initialState: S;
   }>,
 ] => {
   const [state, setState, { updateState, resetState, getSnapshot }] =
@@ -29,6 +30,7 @@ export const createState = <S,>(
       updateState,
       resetState,
       getSnapshot,
+      initialState,
     },
   ] as const;
 };

@@ -45,14 +45,15 @@ export const createReducer = <S, A>(
   Readonly<{
     state: InitializedObservable<S>;
     getSnapshot: () => S;
+    initialState: S;
   }>,
 ] => {
-  const [state, dispatch, getSnapshot] = createReducerBase(
+  const [state, dispatch, { getSnapshot }] = createReducerBase(
     reducer,
     initialState,
   );
 
   const sig = toSignal(state);
 
-  return [sig, dispatch, { state, getSnapshot }];
+  return [sig, dispatch, { state, getSnapshot, initialState }];
 };

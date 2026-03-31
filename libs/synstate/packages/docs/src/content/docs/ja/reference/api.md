@@ -111,9 +111,9 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 
 コアの`createState` / `createReducer` / `createBooleanState`を再エクスポートしますが、タプルの最初の要素としてraw Observableの代わりに**フック**（`useCurrentValue`）を返します:
 
-- **`createState(initialValue)`**: `[useCurrentValue, setState, { state, updateState, resetState, getSnapshot }]`を返す。
-- **`createReducer(reducer, initialState)`**: `[useCurrentValue, dispatch, { state, getSnapshot }]`を返す。
-- **`createBooleanState(initialValue)`**: `[useCurrentValue, { state, setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot }]`を返す。
+- **`createState(initialValue)`**: `[useCurrentValue, setState, { state, updateState, resetState, getSnapshot, initialState }]`を返す。
+- **`createReducer(reducer, initialState)`**: `[useCurrentValue, dispatch, { state, getSnapshot, initialState }]`を返す。
+- **`createBooleanState(initialValue)`**: `[useCurrentValue, { state, setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot, initialState }]`を返す。
 
 ### Preact Signals (`synstate-preact-signals`)
 
@@ -129,6 +129,6 @@ synstateのObservableと[Preact Signals](https://preactjs.com/guide/v10/signals/
 
 hooksラッパーと同じですが、フックの代わりに**`ReadonlySignal`**を返します:
 
-- **`createState(initialValue)`**: `[signal, setState, { state, updateState, resetState, getSnapshot }]`を返す。
-- **`createReducer(reducer, initialState)`**: `[signal, dispatch, { state, getSnapshot }]`を返す。
-- **`createBooleanState(initialValue)`**: `[signal, { state, setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot }]`を返す。
+- **`createState(initialValue)`**: `[signal, setState, { state, updateState, resetState, getSnapshot, initialState }]`を返す。
+- **`createReducer(reducer, initialState)`**: `[signal, dispatch, { state, getSnapshot, initialState }]`を返す。
+- **`createBooleanState(initialValue)`**: `[signal, { state, setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot, initialState }]`を返す。

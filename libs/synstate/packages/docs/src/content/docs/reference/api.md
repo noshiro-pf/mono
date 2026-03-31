@@ -111,9 +111,9 @@ Both packages share the same API surface. Use `synstate-react-hooks` for React 1
 
 These re-export core `createState` / `createReducer` / `createBooleanState` but return a **hook** (`useCurrentValue`) as the first tuple element instead of the raw observable:
 
-- **`createState(initialValue)`**: Returns `[useCurrentValue, setState, { state, updateState, resetState, getSnapshot }]`.
-- **`createReducer(reducer, initialState)`**: Returns `[useCurrentValue, dispatch, { state, getSnapshot }]`.
-- **`createBooleanState(initialValue)`**: Returns `[useCurrentValue, { state, setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot }]`.
+- **`createState(initialValue)`**: Returns `[useCurrentValue, setState, { state, updateState, resetState, getSnapshot, initialState }]`.
+- **`createReducer(reducer, initialState)`**: Returns `[useCurrentValue, dispatch, { state, getSnapshot, initialState }]`.
+- **`createBooleanState(initialValue)`**: Returns `[useCurrentValue, { state, setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot, initialState }]`.
 
 ### Preact Signals (`synstate-preact-signals`)
 
@@ -129,6 +129,6 @@ Bridges synstate observables with [Preact Signals](https://preactjs.com/guide/v1
 
 Same as the hooks wrappers, but return a **`ReadonlySignal`** instead of a hook:
 
-- **`createState(initialValue)`**: Returns `[signal, setState, { state, updateState, resetState, getSnapshot }]`.
-- **`createReducer(reducer, initialState)`**: Returns `[signal, dispatch, { state, getSnapshot }]`.
-- **`createBooleanState(initialValue)`**: Returns `[signal, { state, setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot }]`.
+- **`createState(initialValue)`**: Returns `[signal, setState, { state, updateState, resetState, getSnapshot, initialState }]`.
+- **`createReducer(reducer, initialState)`**: Returns `[signal, dispatch, { state, getSnapshot, initialState }]`.
+- **`createBooleanState(initialValue)`**: Returns `[signal, { state, setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot, initialState }]`.

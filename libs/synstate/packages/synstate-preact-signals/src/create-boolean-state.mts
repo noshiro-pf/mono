@@ -43,6 +43,7 @@ export const createBooleanState = (
     updateState: (updateFn: (prev: boolean) => boolean) => boolean;
     resetState: () => boolean;
     getSnapshot: () => boolean;
+    initialState: boolean;
   }>,
 ] => {
   const [
@@ -71,6 +72,7 @@ export const createBooleanState = (
       updateState,
       resetState,
       getSnapshot,
+      initialState,
     },
   ] as const;
 };

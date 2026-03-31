@@ -5,13 +5,17 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
 
     // Create a reactive state
-    const [state, setState, { updateState, resetState, getSnapshot }] =
-      createState(0);
+    const [
+      state,
+      setState,
+      { updateState, resetState, getSnapshot, initialState },
+    ] = createState(0);
     // type of state: InitializedObservable<number>
     // type of setState: (v: number) => number
     // type of updateState: (updater: (prev: number) => number) => number
     // type of resetState: () => void
     // type of getSnapshot: () => number
+    // type of initialState: number
 
     // transformer-ignore-next-line convert-to-readonly, append-as-const
     const stateHistory: number[] = [];
@@ -41,6 +45,8 @@ if (import.meta.vitest !== undefined) {
     resetState();
 
     assert.strictEqual(getSnapshot(), 0);
+
+    assert.strictEqual(initialState, 0);
 
     assert.deepStrictEqual(stateHistory, [0, 1, 3, 0]);
 

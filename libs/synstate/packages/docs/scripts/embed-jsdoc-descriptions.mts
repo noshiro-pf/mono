@@ -20,7 +20,11 @@ const jsdocMappings: DeepReadonly<
   ['audit', 'src/core/operators/audit.mts', 'audit'],
   ['combine', 'src/core/combine/combine.mts', 'combine'],
   ['counter', 'src/core/create/counter.mts', 'counter'],
-  ['create-boolean-state', 'src/utils/create-state.mts', 'createBooleanState'],
+  [
+    'create-boolean-state',
+    'src/utils/create-boolean-state.mts',
+    'createBooleanState',
+  ],
   [
     'create-event-emitter',
     'src/utils/create-event-emitter.mts',

@@ -28,7 +28,7 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
  *
  * @template S - The type of the state
  * @param initialState - The initial value of the state
- * @returns An object containing the state observable and methods to manipulate it
+ * @returns A 3-element tuple: `[state, setState, { updateState, resetState, getSnapshot, initialState }]`
  *
  * @example
  * ```ts
@@ -64,9 +64,10 @@ export const createState = <S,>(
     updateState: (updateFn: (prev: S) => S) => S;
     resetState: () => S;
     getSnapshot: () => S;
+    initialState: S;
   }>,
 ] => {
-  const [state, dispatch, getSnapshot] = createReducer<S, Action<S>>(
+  const [state, dispatch, { getSnapshot }] = createReducer<S, Action<S>>(
     reducer,
     initialState,
   );
@@ -86,69 +87,7 @@ export const createState = <S,>(
       updateState,
       resetState,
       getSnapshot,
-    },
-  ] as const;
-};
-
-/**
- * Creates a reactive boolean state with convenient methods for boolean operations.
- * Extends `createState` with boolean-specific helpers like `toggle`, `setTrue`, and `setFalse`.
- *
- * @param initialState - The initial boolean value
- * @returns An object with the state observable and boolean-specific methods
- *
- * @example
- * ```ts
- * import type * as React from 'react';
- * import { createBooleanState } from 'synstate';
- * import { useObservableValue } from 'synstate-react-hooks';
- *
- *     // Menu drawer open/close state.
- *     // setTrue and setFalse can be passed directly as callbacks
- *     // — no need to create wrapper functions like `() => setState(true)`.
- *     const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
- *       createBooleanState(false);
- *
- *     const SampleComponent = (): React.JSX.Element => (
- *       <MenuDrawer
- *         open={useObservableValue(menuOpen$)}
- *         onClose={closeMenu}
- *         onOpen={openMenu}
- *       />
- *     );
- * ```
- */
-export const createBooleanState = (
-  initialState: boolean,
-): readonly [
-  state: InitializedObservable<boolean>,
-  Readonly<{
-    setTrue: () => void;
-    setFalse: () => void;
-    setState: (next: boolean) => boolean;
-    toggle: () => boolean;
-    updateState: (updateFn: (prev: boolean) => boolean) => boolean;
-    resetState: () => boolean;
-    getSnapshot: () => boolean;
-  }>,
-] => {
-  const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(initialState);
-
-  return [
-    state,
-    {
-      setTrue: () => {
-        setState(true);
-      },
-      setFalse: () => {
-        setState(false);
-      },
-      toggle: () => updateState((s) => !s),
-      setState,
-      updateState,
-      resetState,
-      getSnapshot,
+      initialState,
     },
   ] as const;
 };

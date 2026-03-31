@@ -34,10 +34,11 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   },
   {
     sourcePath: 'src/utils/create-state.mts',
-    sampleFiles: [
-      'samples/src/create-state-example.mts',
-      'samples/src/create-boolean-state-example.tsx',
-    ],
+    sampleFiles: ['samples/src/create-state-example.mts'],
+  },
+  {
+    sourcePath: 'src/utils/create-boolean-state.mts',
+    sampleFiles: ['samples/src/create-boolean-state-example.tsx'],
   },
   {
     sourcePath: 'src/utils/create-reducer.mts',

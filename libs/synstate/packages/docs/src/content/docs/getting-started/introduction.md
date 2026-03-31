@@ -45,12 +45,16 @@ setState(1);
 `createState` also returns a third element with additional utilities:
 
 ```ts
-const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(0);
+const [
+    state,
+    setState,
+    { updateState, resetState, getSnapshot, initialState },
+] = createState(0);
 
 updateState((prev) => prev + 1); // update using a function of the previous value
 resetState(); // reset to initial value (0)
 getSnapshot(); // read current value synchronously (0)
+initialState; // the initial value passed to createState (0)
 ```
 
 ## Deriving Values with `pipe`

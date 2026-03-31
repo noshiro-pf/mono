@@ -45,12 +45,16 @@ setState(1);
 `createState` は3番目の要素として追加のユーティリティも返します：
 
 ```ts
-const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(0);
+const [
+    state,
+    setState,
+    { updateState, resetState, getSnapshot, initialState },
+] = createState(0);
 
 updateState((prev) => prev + 1); // 前の値を使って更新
 resetState(); // 初期値（0）にリセット
 getSnapshot(); // 現在の値を同期的に読み取り（0）
+initialState; // createState に渡した初期値（0）
 ```
 
 ## `pipe` で値を派生する

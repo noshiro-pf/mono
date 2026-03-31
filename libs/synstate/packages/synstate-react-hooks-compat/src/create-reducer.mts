@@ -13,14 +13,15 @@ export const createReducer = <S, A>(
   Readonly<{
     state: InitializedObservable<S>;
     getSnapshot: () => S;
+    initialState: S;
   }>,
 ] => {
-  const [state, dispatch, getSnapshot] = createReducerBase(
+  const [state, dispatch, { getSnapshot }] = createReducerBase(
     reducer,
     initialState,
   );
 
   const useCurrentValue = (): S => useObservableValue(state);
 
-  return [useCurrentValue, dispatch, { state, getSnapshot }];
+  return [useCurrentValue, dispatch, { state, getSnapshot, initialState }];
 };

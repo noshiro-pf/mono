@@ -9,24 +9,31 @@ sidebar:
 ## 3番目の要素
 
 ```ts
-const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(0);
+const [
+    state,
+    setState,
+    { updateState, resetState, getSnapshot, initialState },
+] = createState(0);
 ```
 
-| 関数          | 型                                | 説明                                 |
-| :------------ | :-------------------------------- | :----------------------------------- |
-| `setState`    | `(v: S) => S`                     | 状態を新しい値に設定する             |
-| `updateState` | `(updateFn: (prev: S) => S) => S` | 前の値を受け取る関数で状態を更新する |
-| `resetState`  | `() => S`                         | 状態を初期値にリセットする           |
-| `getSnapshot` | `() => S`                         | 現在の値を同期的に読み取る           |
+| 関数           | 型                                | 説明                                 |
+| :------------- | :-------------------------------- | :----------------------------------- |
+| `setState`     | `(v: S) => S`                     | 状態を新しい値に設定する             |
+| `updateState`  | `(updateFn: (prev: S) => S) => S` | 前の値を受け取る関数で状態を更新する |
+| `resetState`   | `() => S`                         | 状態を初期値にリセットする           |
+| `getSnapshot`  | `() => S`                         | 現在の値を同期的に読み取る           |
+| `initialState` | `S`                               | `createState` に渡された初期値       |
 
 ## 同期的な状態更新
 
 React の `useState` の setter 関数は非同期的に再レンダリングをスケジュールしますが、SynState の `setState`、`updateState`、`resetState` は**同期的に**実行され、更新後の状態値を戻り値として返します。また、状態更新の直後に `getSnapshot()` を呼び出すことで、最新の値を即座に取得することもできます。
 
 ```ts
-const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(0);
+const [
+    state,
+    setState,
+    { updateState, resetState, getSnapshot, initialState },
+] = createState(0);
 
 // setState は更新後の状態値を同期的に返す
 const newValue = setState(42);

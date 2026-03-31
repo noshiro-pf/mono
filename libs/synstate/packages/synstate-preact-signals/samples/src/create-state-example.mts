@@ -4,10 +4,15 @@ if (import.meta.vitest !== undefined) {
   test('createState', () => {
     // embed-sample-code-ignore-above
 
-    const [countSignal, setCount, { updateState, resetState, getSnapshot }] =
-      createState(0);
+    const [
+      countSignal,
+      setCount,
+      { updateState, resetState, getSnapshot, initialState },
+    ] = createState(0);
 
     assert.strictEqual(countSignal.value, 0);
+
+    assert.strictEqual(initialState, 0);
 
     setCount(5);
 

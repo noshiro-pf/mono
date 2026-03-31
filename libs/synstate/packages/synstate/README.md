@@ -235,13 +235,17 @@ For a detailed explanation, see ["How SynState solved the glitch?"](./documents/
 
 ```tsx
 // Create a reactive state
-const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(0);
+const [
+    state,
+    setState,
+    { updateState, resetState, getSnapshot, initialState },
+] = createState(0);
 // type of state: InitializedObservable<number>
 // type of setState: (v: number) => number
 // type of updateState: (updater: (prev: number) => number) => number
 // type of resetState: () => void
 // type of getSnapshot: () => number
+// type of initialState: number
 
 const stateHistory: number[] = [];
 
@@ -270,6 +274,8 @@ assert.deepStrictEqual(stateHistory, [0, 1, 3]);
 resetState();
 
 assert.strictEqual(getSnapshot(), 0);
+
+assert.strictEqual(initialState, 0);
 
 assert.deepStrictEqual(stateHistory, [0, 1, 3, 0]);
 ```

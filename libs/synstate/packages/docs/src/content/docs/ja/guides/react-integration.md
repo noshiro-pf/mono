@@ -87,7 +87,7 @@ const UserProfile = (): React.JSX.Element => {
 
 ## 追加ユーティリティ：3番目の要素
 
-`synstate-react-hooks` の `createState` も、コアパッケージと同様に3要素のタプルを返します。3番目の要素には [createState 詳説](/synstate/ja/guides/core-state-management/) で説明されているものと同じユーティリティ（`updateState`、`resetState`、`getSnapshot`）に加え、コアライブラリの Observable である `state` が含まれています：
+`synstate-react-hooks` の `createState` も、コアパッケージと同様に3要素のタプルを返します。3番目の要素には [createState 詳説](/synstate/ja/guides/core-state-management/) で説明されているものと同じユーティリティ（`updateState`、`resetState`、`getSnapshot`、`initialState`）に加え、コアライブラリの Observable である `state` が含まれています：
 
 ```tsx
 import type * as React from 'react';
@@ -132,12 +132,13 @@ state.subscribe((value) => {
 console.log('current count:', getCountSnapshot());
 ```
 
-| プロパティ    | 型                                | 説明                                                                                                                                           |
-| :------------ | :-------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| `state`       | `InitializedObservable<S>`        | コアの `synstate` パッケージの `createState` が第1要素として返すのと同じ Observable。`pipe`、`combine`、`subscribe` などと組み合わせて使用可能 |
-| `updateState` | `(updateFn: (prev: S) => S) => S` | 前の値を受け取る関数で状態を更新（詳細は [createState 詳説](/synstate/ja/guides/core-state-management/) を参照）                               |
-| `resetState`  | `() => S`                         | 状態を初期値にリセット                                                                                                                         |
-| `getSnapshot` | `() => S`                         | 購読せずに現在の値を同期的に読み取る                                                                                                           |
+| プロパティ     | 型                                | 説明                                                                                                                                           |
+| :------------- | :-------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| `state`        | `InitializedObservable<S>`        | コアの `synstate` パッケージの `createState` が第1要素として返すのと同じ Observable。`pipe`、`combine`、`subscribe` などと組み合わせて使用可能 |
+| `updateState`  | `(updateFn: (prev: S) => S) => S` | 前の値を受け取る関数で状態を更新（詳細は [createState 詳説](/synstate/ja/guides/core-state-management/) を参照）                               |
+| `resetState`   | `() => S`                         | 状態を初期値にリセット                                                                                                                         |
+| `getSnapshot`  | `() => S`                         | 購読せずに現在の値を同期的に読み取る                                                                                                           |
+| `initialState` | `S`                               | `createState` に渡された初期値                                                                                                                 |
 
 ## 派生 Observable の購読: `useObservableValue`
 

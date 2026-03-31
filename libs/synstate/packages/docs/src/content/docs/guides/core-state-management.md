@@ -9,24 +9,31 @@ The [Quick Example](/synstate/getting-started/introduction/#quick-example) showe
 ## The Third Element
 
 ```ts
-const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(0);
+const [
+    state,
+    setState,
+    { updateState, resetState, getSnapshot, initialState },
+] = createState(0);
 ```
 
-| Function      | Type                              | Description                                         |
-| :------------ | :-------------------------------- | :-------------------------------------------------- |
-| `setState`    | `(v: S) => S`                     | Set the state to a new value                        |
-| `updateState` | `(updateFn: (prev: S) => S) => S` | Update the state using a function of previous value |
-| `resetState`  | `() => S`                         | Reset the state to its initial value                |
-| `getSnapshot` | `() => S`                         | Read the current value synchronously                |
+| Function       | Type                              | Description                                         |
+| :------------- | :-------------------------------- | :-------------------------------------------------- |
+| `setState`     | `(v: S) => S`                     | Set the state to a new value                        |
+| `updateState`  | `(updateFn: (prev: S) => S) => S` | Update the state using a function of previous value |
+| `resetState`   | `() => S`                         | Reset the state to its initial value                |
+| `getSnapshot`  | `() => S`                         | Read the current value synchronously                |
+| `initialState` | `S`                               | The initial value passed to `createState`           |
 
 ## Synchronous State Updates
 
 Unlike React's `useState` setter, which schedules asynchronous re-renders, `setState`, `updateState`, and `resetState` in SynState execute **synchronously** and return the updated state value. You can also call `getSnapshot()` immediately after a state update to retrieve the latest value.
 
 ```ts
-const [state, setState, { updateState, resetState, getSnapshot }] =
-    createState(0);
+const [
+    state,
+    setState,
+    { updateState, resetState, getSnapshot, initialState },
+] = createState(0);
 
 // setState returns the new state value synchronously
 const newValue = setState(42);

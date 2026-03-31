@@ -8,7 +8,7 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  * @template A - The type of actions
  * @param reducer - A pure function that takes current state and action, returns new state
  * @param initialState - The initial value of the state
- * @returns An object containing the state observable, dispatch function, and snapshot getter
+ * @returns A 3-element tuple: `[state, dispatch, { getSnapshot, initialState }]`
  *
  * @example
  * ```ts
@@ -49,7 +49,10 @@ export const createReducer = <S, A>(
 ): readonly [
   state: InitializedObservable<S>,
   dispatch: (action: A) => S,
-  getSnapshot: () => S,
+  Readonly<{
+    getSnapshot: () => S;
+    initialState: S;
+  }>,
 ] => {
   const state = source<S>(initialState);
 
@@ -63,5 +66,5 @@ export const createReducer = <S, A>(
 
   const getSnapshot = (): S => state.getSnapshot().value;
 
-  return [state, dispatch, getSnapshot] as const;
+  return [state, dispatch, { getSnapshot, initialState }] as const;
 };
