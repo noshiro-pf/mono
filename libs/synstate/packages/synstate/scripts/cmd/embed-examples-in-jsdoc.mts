@@ -24,6 +24,15 @@ export const embedExamplesInJsDoc = async (): Promise<
 
       const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
 
+      const codeBlockCount = sourceContent.split(codeBlockStart).length - 1;
+
+      // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
+      if (codeBlockCount !== sampleFiles.length) {
+        return Result.err(
+          `❌ Code block count mismatch in ${sourcePath}: found ${codeBlockCount} \`\`\`ts blocks but expected ${sampleFiles.length} sample files`,
+        );
+      }
+
       const mut_results: string[] = [];
 
       let mut_rest: string = sourceContent;

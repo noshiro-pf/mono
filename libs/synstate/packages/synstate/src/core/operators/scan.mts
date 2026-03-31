@@ -3,7 +3,7 @@ import { InitializedSyncChildObservableClass } from '../class/index.mjs';
 import {
   type Observable,
   type ScanOperatorObservable,
-  type UpdaterSymbol,
+  type UpdateToken,
   type WithInitialValueOperator,
 } from '../types/index.mjs';
 
@@ -35,25 +35,25 @@ import {
  *
  * const sum$ = num$.pipe(scan((acc, curr) => acc + curr, 0));
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * sum$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
- * assert.deepStrictEqual(mut_history, [0]);
+ * assert.deepStrictEqual(valueHistory, [0]);
  *
  * num$.next(1); // logs: 1
  *
- * assert.deepStrictEqual(mut_history, [0, 1]);
+ * assert.deepStrictEqual(valueHistory, [0, 1]);
  *
  * num$.next(2); // logs: 3
  *
- * assert.deepStrictEqual(mut_history, [0, 1, 3]);
+ * assert.deepStrictEqual(valueHistory, [0, 1, 3]);
  *
  * num$.next(3); // logs: 6
  *
- * assert.deepStrictEqual(mut_history, [0, 1, 3, 6]);
+ * assert.deepStrictEqual(valueHistory, [0, 1, 3, 6]);
  * ```
  */
 export const scan =
@@ -83,7 +83,7 @@ class ScanObservableClass<A, B>
     this.#reducer = reducer;
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const psn = par.getSnapshot();
@@ -91,13 +91,13 @@ class ScanObservableClass<A, B>
     const sn = this.getSnapshot();
 
     if (
-      par.updaterSymbol !== updaterSymbol ||
+      par.updateToken !== updateToken ||
       Optional.isNone(psn) ||
       Optional.isNone(sn)
     ) {
       return; // skip update
     }
 
-    this.setNext(this.#reducer(sn.value, psn.value), updaterSymbol);
+    this.setNext(this.#reducer(sn.value, psn.value), updateToken);
   }
 }

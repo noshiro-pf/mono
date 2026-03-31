@@ -1,0 +1,47 @@
+---
+title: SynState
+description: TypeScript 向けの軽量・高性能な状態管理ライブラリ。非同期オペレーター内蔵、React Compiler 完全互換。
+template: splash
+hero:
+    tagline: TypeScript/JavaScript 向けの軽量・高性能な状態管理ライブラリ。シンプルなグローバル状態から、debounce や switchMap を使った複雑な非同期パイプラインまで統一 API で記述。React Compiler と完全互換。
+    actions:
+        - text: はじめる
+          link: /synstate/ja/getting-started/introduction/
+          icon: right-arrow
+          variant: primary
+        - text: SynState の強み
+          link: /synstate/ja/guides/why-synstate/
+          variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 特徴
+
+<CardGrid>
+    <Card title="シンプルな状態管理" icon="pencil">
+        React の `useState` / `useReducer` に似た使いやすい `createState` と
+        `createReducer` でグローバル状態を管理。
+    </Card>
+    <Card title="高パフォーマンス" icon="rocket">
+        グリッチフリー O(n) 伝搬 — Jotai の**約30倍**、Redux
+        の**約16倍**高速。[ベンチマーク結果](/synstate/ja/guides/library-comparison/benchmark/)を参照。
+    </Card>
+    <Card title="軽量" icon="seti:favicon">
+        {/* bundle-size:synstate */}~4.4 kB min+gzip
+        {/* /bundle-size:synstate */}、外部ランタイム依存は1つのみ。
+    </Card>
+    <Card title="非同期オペレーター内蔵" icon="setting">
+        `debounce`、`throttle`、`switchMap` など —
+        複雑な非同期処理を外部ライブラリなしに統一的な宣言的 API で記述。
+    </Card>
+    <Card title="React 最適化" icon="seti:react">
+        React Compiler と完全互換。`synstate-react-hooks`
+        により数行でコンポーネントにグローバル状態を導入。
+    </Card>
+    <Card title="フレームワーク非依存" icon="random">
+        コアはバニラ JavaScript、Vue、Svelte
+        など任意のフレームワークでそのまま動作。React / Preact 向けには hooks
+        ラッパー、Preact 向けにはさらに Preact Signals 連携も用意。
+    </Card>
+</CardGrid>

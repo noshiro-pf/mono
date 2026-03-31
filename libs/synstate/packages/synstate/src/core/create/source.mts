@@ -25,38 +25,34 @@ import {
  *
  * const count$ = source<number>();
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * count$.subscribe((value) => {
- *   mut_history.push(value);
+ *   valueHistory.push(value);
  * });
  *
  * count$.next(1); // logs: 1
  *
- * assert.deepStrictEqual(mut_history, [1]);
+ * assert.deepStrictEqual(valueHistory, [1]);
  *
  * count$.next(2); // logs: 2
  *
- * assert.deepStrictEqual(mut_history, [1, 2]);
+ * assert.deepStrictEqual(valueHistory, [1, 2]);
  *
  * count$.next(3); // logs: 3
  *
- * assert.deepStrictEqual(mut_history, [1, 2, 3]);
+ * assert.deepStrictEqual(valueHistory, [1, 2, 3]);
  * ```
  */
-export function source<A>(initialValue: A): InitializedSourceObservable<A>;
+export function source<const A>(
+  initialValue: A,
+): InitializedSourceObservable<A>;
 
-export function source<A>(): SourceObservable<A>;
+export function source<const A>(): SourceObservable<A>;
 
-export function source<A>(...args: readonly A[]): SourceObservable<A> {
+export function source<const A>(...args: readonly A[]): SourceObservable<A> {
   return new SourceObservableClass<A>(...args);
 }
-
-/**
- * Alias for `source`. Creates a new Observable source.
- * @see source
- */
-export const subject = source;
 
 class SourceObservableClass<A>
   extends RootObservableClass<A>

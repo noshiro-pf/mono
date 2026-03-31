@@ -1,0 +1,73 @@
+---
+prev: false
+next: false
+title: withInitialValue
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+初期値を持たない Observable に初期値を提供します。
+結果の Observable はサブスクリプション時に即座に初期値を発行し、
+その後ソースからの後続の値をすべて発行します。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 35, label: '1', color: colors.yellow },
+                { t: 55, label: '2', color: colors.orange },
+                { t: 80, label: '3', color: colors.blue },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 5, label: '0', color: colors.gray },
+            { t: 35, label: '1', color: colors.yellow },
+            { t: 55, label: '2', color: colors.orange },
+            { t: 80, label: '3', color: colors.blue },
+        ],
+    }}
+    operator="withInitialValue(0)"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  num$             1    2    3
+//  withInitial$ 0   1    2    3
+//               ^
+//               initial value
+//
+//  Explanation:
+//  - withInitialValue provides an initial value before the source emits
+//  - Converts an uninitialized observable to an initialized one
+//  - Useful when you need a default value immediately
+
+const num$ = source<number>();
+
+const initialized$ = num$.pipe(withInitialValue(0));
+
+const valueHistory: number[] = [];
+
+initialized$.subscribe((x) => {
+    valueHistory.push(x);
+});
+
+assert.deepStrictEqual(valueHistory, [0]);
+
+num$.next(1); // logs: 1
+
+assert.deepStrictEqual(valueHistory, [0, 1]);
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [0, 1, 2]);
+```

@@ -1,6 +1,6 @@
 import { Arr, Optional, expectType } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
-import { fromArray, source } from '../create/index.mjs';
+import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
 import {
   type CombineObservable,
@@ -10,7 +10,7 @@ import {
   type NonEmptyUnknownList,
   type Observable,
   type SyncChildObservable,
-  type UpdaterSymbol,
+  type UpdateToken,
   type Wrap,
 } from '../types/index.mjs';
 
@@ -41,30 +41,30 @@ import {
  *
  * const user$ = combine([name$, age$]);
  *
- * const mut_history: (readonly [string, number])[] = [];
+ * const userHistory: (readonly [string, number])[] = [];
  *
  * user$.subscribe(([name_, age]) => {
- *   mut_history.push([name_, age]);
+ *   userHistory.push([name_, age]);
  * });
  *
  * name$.next('Alice'); // nothing logged (age$ hasn't emitted yet)
  *
- * assert.deepStrictEqual(mut_history, []);
+ * assert.deepStrictEqual(userHistory, []);
  *
  * age$.next(25); // logs: { name: 'Alice', age: 25 }
  *
- * assert.deepStrictEqual(mut_history, [['Alice', 25]]);
+ * assert.deepStrictEqual(userHistory, [['Alice', 25]]);
  *
  * name$.next('Bob'); // logs: { name: 'Bob', age: 25 }
  *
- * assert.deepStrictEqual(mut_history, [
+ * assert.deepStrictEqual(userHistory, [
  *   ['Alice', 25],
  *   ['Bob', 25],
  * ]);
  *
  * age$.next(30); // logs: { name: 'Bob', age: 30 }
  *
- * assert.deepStrictEqual(mut_history, [
+ * assert.deepStrictEqual(userHistory, [
  *   ['Alice', 25],
  *   ['Bob', 25],
  *   ['Bob', 30],
@@ -103,8 +103,8 @@ class CombineObservableClass<const A extends NonEmptyUnknownList>
     });
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
-    if (this.parents.every((o) => o.updaterSymbol !== updaterSymbol)) return; // all parents are skipped
+  override tryUpdate(updateToken: UpdateToken): void {
+    if (this.parents.every((o) => o.updateToken !== updateToken)) return; // all parents are skipped
 
     const parentValues = this.parents.map((a) => a.getSnapshot());
 
@@ -113,7 +113,7 @@ class CombineObservableClass<const A extends NonEmptyUnknownList>
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Arr.map(parentValues, (a) => a.value) as A;
 
-      this.setNext(nextValue, updaterSymbol);
+      this.setNext(nextValue, updateToken);
     }
   }
 }
@@ -154,9 +154,9 @@ class CombineObservableClass<const A extends NonEmptyUnknownList>
     expectType<typeof _d, InitializedObservable<readonly [1, 2]>>('<=');
   }
 
-  const r1 = fromArray([1, 2, 3]);
+  const r1 = source(1);
 
-  const r2 = fromArray(['a', 'b', 'c']);
+  const r2 = source('a');
 
   const _c = combine([r1, r2]);
 

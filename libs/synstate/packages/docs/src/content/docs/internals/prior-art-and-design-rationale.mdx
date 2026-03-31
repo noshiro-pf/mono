@@ -1,0 +1,225 @@
+---
+title: Prior Art and Design Rationale
+sidebar:
+    order: 4
+---
+
+The [previous page](/synstate/internals/how-synstate-solved-the-glitch/) explained how SynState achieves glitch-free propagation through a static dependency graph with a pre-computed propagation order. This page examines the historical context of this approach and explains why SynState chose a static graph while most modern state management libraries use dynamic graphs.
+
+## The Core Idea
+
+SynState's key insight is:
+
+> The dependency graph topology is static — it is determined when Observables are constructed and does not change between updates. This means the propagation order can be computed once at graph construction time, rather than re-derived on each emission.
+
+This is not a novel idea. Each of its components — static dependency graphs, topological ordering for glitch avoidance, and the observation that static graphs enable one-time scheduling — has been described in academic literature, with the earliest work dating back to 1987.
+
+## Prior Art in Academic Literature
+
+### Static Scheduling of Dataflow Graphs (1987)
+
+Lee & Messerschmitt's "Static Scheduling of Synchronous Data Flow Programs" (IEEE Transactions on Computers, 1987) is the most direct precedent. In Synchronous Dataflow (SDF), where each node's data production and consumption rates are specified a priori, "the scheduling of SDF nodes need not be done at runtime, but can be done at compile time (statically), so the run-time overhead evaporates." This is exactly SynState's insight, applied to signal processing nearly four decades ago.
+
+### Topological Sort for Glitch Avoidance (2006+)
+
+The use of topological ordering to prevent glitches in reactive systems is well-established:
+
+- **FrTime** (Cooper & Krishnamurthi, ESOP 2006) assigns each node a height greater than its dependencies and propagates via a priority queue in height order. Because FrTime supports dynamic graphs, it must "dynamically recompute the sort order when the structure of some portion of the graph changes" — the converse proof that static graphs do not need re-computation.
+- **Elm's original FRP model** (Czaplicki & Chong, PLDI 2013) used a static signal graph determined at program initialization, with the type system restricting reactive primitives to ensure a fixed graph structure.
+- **Scala.React** (Maier & Odersky, 2012) guarantees consistency through two-phase propagation cycles based on topological ordering.
+
+### Surveys and Overviews
+
+Bainomugisha et al.'s "A Survey on Reactive Programming" (ACM Computing Surveys, 2013) explicitly distinguishes static and dynamic dependency graphs and documents that "topologically sorting expressions and updating values in topological order" is the standard technique for glitch-free propagation.
+
+## Prior Art in Open-Source Libraries
+
+Several open-source projects have implemented static-graph approaches similar to SynState's:
+
+| Library                                                             | Approach                                                                                                                                  |
+| :------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| **[Topologica](https://github.com/datavis-tech/topologica)**        | Dependencies declared at construction time; propagation uses topological sort to guarantee each node is set exactly once per update cycle |
+| **[ReactiveModel](https://github.com/datavis-tech/reactive-model)** | Predecessor to Topologica; processes changes using an explicit topological sort algorithm on the dependency graph                         |
+| **[Storm.NET](https://github.com/StormDotNet/Storm.NET)**           | "Simple Topologically Ordered Reactive Model" with comparison-based update skipping                                                       |
+
+Meanwhile, most modern UI-focused reactive libraries — Angular Signals, Preact Signals, SolidJS, MobX, Vue, and Jotai — use **dynamic** dependency graphs where the set of dependencies is determined at runtime and can change between evaluations.
+
+## Why Most Modern Libraries Use Dynamic Graphs
+
+A common claim is that dynamic dependency graphs are more expressive than static ones — that certain patterns require the ability to change dependencies at runtime. Examining the concrete examples typically cited reveals that, at least for global state management use cases, static graphs can achieve equivalent results.
+
+### Conditional Dependencies
+
+In Jotai, a derived atom can conditionally read different atoms:
+
+```js
+const temperatureAtom = atom((get) => {
+    const mode = get(modeAtom);
+    if (mode === 'celsius') return get(celsiusAtom);
+    else return get(fahrenheitAtom);
+});
+```
+
+When `modeAtom` is `'celsius'`, changes to `fahrenheitAtom` do not trigger recalculation because the dynamic tracker knows `fahrenheitAtom` was not accessed.
+
+In SynState, the same logic is expressed with a static graph:
+
+```ts
+const temperature$ = combine([mode$, celsius$, fahrenheit$]).pipe(
+    map(([mode, c, f]) => (mode === 'celsius' ? c : f)),
+);
+```
+
+When `fahrenheit$` changes in celsius mode, `map` produces the same output value. SynState's equality comparison prevents further downstream propagation. The "oversubscription" cost is **one function call plus one equality comparison**. Meanwhile, dynamic tracking requires dependency set diffing, subscription removal, and re-subscription on every evaluation. SynState's benchmarks show that this dynamic tracking overhead exceeds the cost of the oversubscription in the scenarios tested.
+
+### Dynamic Collections
+
+Jotai's atoms-in-atom pattern gives each list item its own atom, so updating one item only re-renders that item's component:
+
+```tsx
+const todosAtom = atom([atom('Todo 1'), atom('Todo 2')]);
+
+const TodoItem = ({ todoAtom }: { todoAtom: PrimitiveAtom<string> }) => {
+    const [todo, setTodo] = useAtom(todoAtom);
+    return <input value={todo} onChange={(e) => setTodo(e.target.value)} />;
+};
+
+const TodoList = () => {
+    const [todos, setTodos] = useAtom(todosAtom);
+    const addTodo = () => setTodos((prev) => [...prev, atom('')]);
+    return (
+        <div>
+            {todos.map((todoAtom, i) => (
+                <TodoItem key={i} todoAtom={todoAtom} />
+            ))}
+            <button onClick={addTodo}>Add</button>
+        </div>
+    );
+};
+```
+
+In SynState, the collection is a single Observable, and per-item derived Observables achieve the same granularity:
+
+```tsx
+const [todos$, setTodos] = createState<readonly string[]>(['Todo 1', 'Todo 2']);
+
+const TodoItem = ({ index }: { index: number }) => {
+    const todo = useObservableValue(
+        useMemo(() => todos$.pipe(map((todos) => todos[index] ?? '')), [index]),
+    );
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTodos((prev) =>
+            prev.map((t, i) => (i === index ? e.target.value : t)),
+        );
+    };
+    return <input value={todo} onChange={handleChange} />;
+};
+
+const TodoList = () => {
+    const todosLength = useObservableValue(
+        useMemo(() => todos$.pipe(map((todos) => todos.length)), []),
+    );
+    const addTodo = () => setTodos((prev) => [...prev, '']);
+    return (
+        <div>
+            {Array.from({ length: todosLength }, (_, i) => (
+                <TodoItem key={i} index={i} />
+            ))}
+            <button onClick={addTodo}>Add</button>
+        </div>
+    );
+};
+```
+
+Each `TodoItem` subscribes to a derived Observable that extracts its item by index — an O(1) operation. Equality comparison ensures that editing one item does not re-render other items. `TodoList` subscribes only to `todosLength`, so editing existing items does not re-render the list itself. Adding and removing items simply updates the collection Observable; no dynamic graph reconstruction is needed.
+
+### Async Data Fetching
+
+In Jotai, an async atom only fetches when it is actually read:
+
+```js
+const userDataAtom = atom(async (get) => fetchUser(get(authAtom).id));
+```
+
+SynState handles conditional async operations within the static graph using `switchMap` and `fromAbortablePromise`:
+
+```ts
+const userData$ = auth$.pipe(
+    switchMap((auth) =>
+        auth
+            ? fromAbortablePromise((signal) => fetchUser(auth.id, signal))
+            : of(guestData),
+    ),
+);
+```
+
+When `auth$` becomes `null`, the in-flight fetch is automatically aborted and `guestData` is emitted. The graph structure is fixed at construction time. The abort control is built into `switchMap`'s semantics, so the resource lifecycle is explicitly expressed in the code.
+
+## The Cost of Oversubscription: Benchmark Verification
+
+Michel Weststrate, the creator of MobX, states: "An important principle behind the design of MobX is that a minimal, consistent set of subscriptions can only be achieved if subscriptions are determined at run-time."[^weststrate]
+
+What does this mean concretely? In MobX and Jotai, a `computed` or derived atom only subscribes to observables that were actually accessed via `.get()` during its execution. When a conditional branch changes the execution path, the subscription set itself changes dynamically. In contrast, SynState's `combine` subscribes to all sources at construction time, regardless of which branch is currently active.
+
+This difference is most pronounced for **updates to observables outside the subscription set**. With dynamic subscriptions, no observer is registered on the inactive observable, so update notifications never occur. With static subscriptions, `combine` fires and incurs the cost of `map` + equality comparison.
+
+To quantitatively verify this, we ran a [Conditional Fan-Out benchmark](/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out). The results confirm that the oversubscription cost **exists in theory**. In MobX, the inactive branch's observer list is empty, making updates zero-cost. SynState's `combine` includes all branches, so the cost scales linearly with B.
+
+However, the benchmark scenario — a fixed selector with a large volume of updates to an inactive branch — is unlikely to occur in real applications. If unused data is being frequently updated, that is an application-level design issue to be addressed regardless of the library's subscription model. Additionally, each selector switch in dynamic-subscription libraries requires rebuilding the subscription set (unsubscribing from old dependencies and subscribing to new ones), a cost that the benchmark does not include.
+
+## React Integration Does Not Require Dynamic Graphs
+
+It might appear that React's dynamic component tree necessitates a dynamic dependency graph. SynState's `synstate-react-hooks` demonstrates that this is not a requirement.
+
+`synstate-react-hooks` uses `useSyncExternalStore` to subscribe to Observables from React components:
+
+```
+[Static graph (SynState)] → Observable
+        ↓
+[useSyncExternalStore] → Component subscribes/unsubscribes
+        ↓
+[React component tree] → Mount/unmount managed by React
+```
+
+- The graph remains static — no constraints are imposed by the React integration.
+- Components subscribe and unsubscribe independently, absorbing the dynamic nature of the component tree entirely at the subscription layer.
+- No graph reconstruction occurs when components mount or unmount.
+
+In other words, the state computation graph and UI subscription management can be separated, and making the state graph itself dynamic is not necessary for React integration.
+
+## Mental Model Alignment with React
+
+React uses **explicit dependency declaration** — `useMemo(() => ..., [dep1, dep2])`. SynState's `pipe(map(...))` and `combine([a$, b$])` share a similar structure with this declarative model:
+
+| React                               | SynState                                         |
+| :---------------------------------- | :----------------------------------------------- |
+| `useMemo(() => count * 2, [count])` | `count.pipe(map((n) => n * 2))`                  |
+| `useMemo(() => a + b, [a, b])`      | `combine([a$, b$]).pipe(map(([a, b]) => a + b))` |
+| Explicit dependency arrays          | Explicit `combine` / `pipe` declarations         |
+
+SynState extends the mental model React developers already know — "declare dependencies explicitly, and the system propagates automatically" — from component scope to global state. The key differences are that SynState Observables are independent of the component lifecycle, push-based (only affected values recompute), and composable with async operators like `debounce`, `throttle`, and `switchMap`.
+
+## Why SynState Chose a Static Graph
+
+Based on the analysis above, SynState's design decision can be summarized as follows:
+
+- **Expressiveness**: Within the scope examined on this page, no global state management use case was found that requires a dynamic graph.
+- **Performance**: In [benchmarks](/synstate/guides/library-comparison/benchmark/) covering practical scenarios such as linear chains and diamond dependencies, SynState shows high throughput. We also tested a [Conditional Fan-Out](/synstate/guides/library-comparison/benchmark/#scenario-conditional-fan-out) scenario where dynamic subscriptions are theoretically advantageous, but this involves a large volume of updates to unsubscribed observables — an unrealistic condition that should be addressed through application-level design rather than library-level optimization.
+- **React integration**: The `useSyncExternalStore` subscription layer is sufficient; making the graph dynamic was not necessary.
+- **React mental model**: SynState's explicit dependency declarations share a similar structure with React's `useMemo` model.
+
+In libraries with dynamic graphs, dependencies are declared implicitly by calling `get()` inside a function. SynState's explicit dependency declarations via `combine` / `pipe`, on the other hand, make dependencies visually apparent in the code — much like React's `useMemo` dependency arrays. SynState builds on this explicit model to achieve zero-runtime-cost static graphs with glitch-free O(n) propagation.
+
+## References
+
+- Lee, E.A. & Messerschmitt, D.G. (1987). _Static Scheduling of Synchronous Data Flow Programs._ IEEE Transactions on Computers, C-36(1), 24–35.
+- Bainomugisha, E. et al. (2013). _A Survey on Reactive Programming._ ACM Computing Surveys, 45(4), Article 52.
+- Cooper, G.H. & Krishnamurthi, S. (2006). _Embedding Dynamic Dataflow in a Call-by-Value Language._ ESOP 2006.
+- Czaplicki, E. & Chong, S. (2013). _Asynchronous Functional Reactive Programming for GUIs._ PLDI 2013.
+- Maier, I. & Odersky, M. (2012). _Deprecating the Observer Pattern with Scala.React._ EPFL Technical Report.
+- Salvaneschi, G. et al. (2014). _REScala: Bridging Between Object-Oriented and Functional Style in Reactive Applications._ OOPSLA/SPLASH 2014.
+- Burchett, K., Cooper, G.H. & Krishnamurthi, S. (2007). _Lowering: A Static Optimization Technique for Transparent Functional Reactivity._ PEPM 2007.
+- Weststrate, M. (2016). _The Fundamental Principles Behind MobX._ https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8.
+- Weststrate, M. (2016). _Becoming Fully Reactive: an In-Depth Explanation of MobX._ https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254.
+
+[^weststrate]: Weststrate, M. (2016). [_The Fundamental Principles Behind MobX_](https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8). The same statement also appears in [_Becoming Fully Reactive: an In-Depth Explanation of MobX_](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254).

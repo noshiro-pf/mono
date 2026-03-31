@@ -1,0 +1,415 @@
+
+## Other Libraries
+
+### What Happens in MobX (Glitch-Free)
+
+MobX takes a fundamentally different approach from RxJS. While RxJS is push-based (values are eagerly propagated to subscribers as soon as they change), MobX's `computed` values are **pull-based and lazily evaluated** — they are only recomputed when accessed.
+
+When `counter` changes:
+
+1. `multipliedCounter` and `sum` are both marked as "possibly stale"
+2. MobX schedules the `reaction` (subscriber) to run after the current action completes
+3. When the reaction runs, it accesses `sum`, which accesses `multipliedCounter`
+4. `multipliedCounter` is recomputed from the already-updated `counter`
+5. `sum` is then computed with both up-to-date values
+
+Because `computed` values are lazily evaluated at the time of access, MobX never observes an inconsistent intermediate state in this scenario.
+
+You can verify this behavior by running the MobX following sample code:
+
+```tsx
+import { computed, observable, reaction, runInAction } from 'mobx';
+
+const state = observable({ counter: 0 });
+
+const multipliedBy10 = computed(() => state.counter * 10);
+// 0, 10, 20, 30, ...
+
+const multipliedBy1000 = computed(() => state.counter * 1000);
+// 0, 1000, 2000, 3000, ...
+
+const sum = computed(() => multipliedBy10.get() + multipliedBy1000.get());
+// Expected: 0, 1010, 2020, 3030, ...
+
+const valueHistory: number[] = [];
+
+const dispose = reaction(
+    () => sum.get(),
+    (value) => {
+        valueHistory.push(value);
+    },
+    { fireImmediately: true },
+);
+
+await new Promise<void>((resolve) => {
+    let mut_count = 0;
+
+    const interval = setInterval(() => {
+        mut_count += 1;
+
+        runInAction(() => {
+            state.counter = mut_count;
+        });
+
+        if (mut_count >= 4) {
+            clearInterval(interval);
+
+            dispose();
+
+            resolve();
+        }
+    }, 100);
+});
+
+// MobX computed values are lazily evaluated:
+// when `sum` is accessed, it first recomputes both dependencies,
+// so all values are consistent — no glitch.
+assert.deepStrictEqual(valueHistory, [0, 1010, 2020, 3030, 4040]);
+```
+
+### What Happens in Jotai (Glitch-Free)
+
+Jotai uses an **atom-based** model where derived atoms can form a dependency graph — including diamond dependencies. Like MobX, derived atoms are **lazily evaluated**: when a subscriber reads `sumAtom`, it triggers recomputation of `multipliedAtom` first, ensuring all values are consistent.
+
+You can verify this behavior by running the following Jotai sample code:
+
+```tsx
+import { atom, createStore } from 'jotai/vanilla';
+
+// Jotai supports diamond dependencies natively through derived atoms.
+// Derived atoms are lazily evaluated — when a subscriber reads `sumAtom`,
+// it triggers recomputation of both dependencies,
+// so all values are always consistent.
+
+const counterAtom = atom(0);
+
+const multipliedBy10Atom = atom((get) => get(counterAtom) * 10);
+// 0, 10, 20, 30, ...
+
+const multipliedBy1000Atom = atom((get) => get(counterAtom) * 1000);
+// 0, 1000, 2000, 3000, ...
+
+const sumAtom = atom(
+    (get) => get(multipliedBy10Atom) + get(multipliedBy1000Atom),
+);
+// Expected: 0, 1010, 2020, 3030, ...
+
+const store = createStore();
+
+// Record initial value
+const valueHistory: number[] = [store.get(sumAtom)];
+
+// Subscribe to future changes
+store.sub(sumAtom, () => {
+    valueHistory.push(store.get(sumAtom));
+});
+
+await new Promise<void>((resolve) => {
+    let mut_count = 0;
+
+    const interval = setInterval(() => {
+        mut_count += 1;
+
+        store.set(counterAtom, mut_count);
+
+        if (mut_count >= 4) {
+            clearInterval(interval);
+
+            resolve();
+        }
+    }, 100);
+});
+
+// Jotai derived atoms are lazily evaluated (like MobX computed),
+// so diamond dependencies are always consistent — no glitch.
+assert.deepStrictEqual(valueHistory, [0, 1010, 2020, 3030, 4040]);
+```
+
+#### How Jotai's Store Works Internally
+
+Understanding how Jotai avoids glitches requires looking at the internal data structures and the flow of `store.set()`.
+
+##### Data Structures
+
+Jotai's store maintains several `WeakMap`-based maps to manage atom state:
+
+- **`atomStateMap: WeakMap<Atom, AtomState>`** — stores each atom's current value, error, epoch number, and dependencies
+- **`mountedMap: WeakMap<Atom, Mounted>`** — tracks subscribed ("mounted") atoms with their listeners, dependencies, and dependents
+- **`invalidatedAtoms: WeakMap<Atom, EpochNumber>`** — marks which atoms need recomputation
+
+Each `AtomState` holds:
+
+```ts
+type AtomState = {
+    d: Map<Atom, EpochNumber>; // dependencies → epoch when last read
+    n: EpochNumber; // current epoch (incremented on value change)
+    v?: Value; // current value
+    e?: Error; // current error
+};
+```
+
+Each `Mounted` record holds:
+
+```ts
+type Mounted = {
+    l: Set<() => void>; // listener callbacks (from store.sub)
+    d: Set<Atom>; // mounted dependencies
+    t: Set<Atom>; // mounted dependenTs (reverse links)
+};
+```
+
+When `store.sub(sumAtom, listener)` is called, Jotai recursively mounts the entire dependency tree (`counterAtom`, `multipliedAtom`, `sumAtom`), establishing bidirectional dependency links in the `Mounted` records.
+
+##### What Happens on Each `store.set()` Call
+
+When `store.set(counterAtom, newValue)` is called, the following sequence occurs:
+
+```ts
+storeSet(store, atom, ...args) {
+  try {
+    writeAtomState(store, atom, ...args)
+  } finally {
+    recomputeInvalidatedAtoms(store)  // Phase 2
+    flushCallbacks(store)              // Phase 3
+  }
+}
+```
+
+**Phase 1 — Write + Invalidate**
+
+`writeAtomState` updates `counterAtom`'s value in the `atomStateMap`, increments its epoch number, and then calls `invalidateDependents`. This walks the mounted dependency graph (`counterAtom → multipliedAtom → sumAtom`) using the `Mounted.t` (dependents) links, marking each dependent in `invalidatedAtoms`.
+
+**Phase 2 — Recompute (Topological Sort + Pull)**
+
+`recomputeInvalidatedAtoms` builds a **topologically sorted list** of all invalidated atoms by performing a DFS traversal from `changedAtoms` through the mounted dependent graph. It then processes atoms in reverse topological order (leaves first).
+
+For each invalidated atom, it calls `readAtomState`, which is the core pull-based mechanism:
+
+```ts
+// Simplified readAtomState for a derived atom
+function readAtomState(store, atom) {
+    const atomState = atomStateMap.get(atom);
+
+    // Early return if mounted and not invalidated
+    if (mountedMap.has(atom) && invalidatedAtoms.get(atom) !== atomState.n) {
+        return atomState;
+    }
+
+    // Check if any dependency actually changed
+    for (const [dep, epochWhenRead] of atomState.d) {
+        if (readAtomState(store, dep).n !== epochWhenRead) {
+            // Dependency changed — must recompute
+            break;
+        }
+    }
+
+    // Create a getter that tracks dependencies
+    const getter = (a) => {
+        const aState = readAtomState(store, a);
+        nextDeps.set(a, aState.n); // record dependency + epoch
+        return aState.v;
+    };
+
+    // Execute the user's read function
+    const newValue = atom.read(getter); // e.g., (get) => get(multipliedAtom) + get(counterAtom)
+
+    // Update value and epoch if changed
+    if (!Object.is(atomState.v, newValue)) {
+        atomState.v = newValue;
+        atomState.n++;
+    }
+}
+```
+
+This is where glitches are avoided: when `sumAtom` is recomputed, its `read` function calls `getter(multipliedAtom)`, which recursively triggers `readAtomState(multipliedAtom)`. Since `multipliedAtom` was already recomputed earlier in the topological order (or is recomputed now on-demand), `sumAtom` always sees the up-to-date value. The dependency chain is resolved by pulling — not by pushing intermediate values.
+
+**Phase 3 — Flush Callbacks**
+
+`flushCallbacks` collects listener callbacks from all atoms in `changedAtoms` (by looking up `mountedMap.get(atom).l`) and invokes them. The listener then calls `store.get(sumAtom)`, which enters `readAtomState` again — but this time the atom is already up-to-date, so it returns immediately.
+
+##### Why This Approach Is Significantly Slower
+
+In the [performance benchmark](/synstate/guides/benchmark/), the Derived Chain scenario (100,000 synchronous `store.set()` calls through a 3-atom chain) shows Jotai at ~390ms, while RxJS achieves ~3ms and SynState ~13ms. The overhead comes from several compounding factors:
+
+**1. WeakMap Lookups Per Update (~30–40 times)**
+
+Almost every internal function begins by looking up the store's building blocks from a `WeakMap`, then looking up atom state from another `WeakMap`. A single `store.set()` call for a 3-atom chain involves approximately 30–40 `WeakMap` lookups: `atomStateMap.get()`, `mountedMap.get()`, `invalidatedAtoms.get()`, and `getInternalBuildingBlocks()` for each phase and each atom. Over 100,000 iterations, this totals **3–4 million WeakMap lookups**. In contrast, RxJS performs zero map lookups per update — the pipe chain is a direct function call chain established once at subscription time.
+
+**2. Object Allocations Per Update (~15–20 objects)**
+
+Each `store.set()` call creates: 2 closures in `writeAtomState` (getter/setter), 2 closures in each `readAtomState` call (getter + options), temporary `Map`/`Set` objects for dependency tracking (`prevDeps`, `nextDeps`), arrays and `WeakSet`s for the topological sort, and a `Set` for collecting callbacks. Over 100,000 iterations, this produces approximately **1.5–2 million short-lived object allocations**, putting significant pressure on the garbage collector. RxJS and SynState allocate zero objects per update in this scenario.
+
+**3. Topological Sort Per Update**
+
+Even for a simple 3-atom linear chain, `recomputeInvalidatedAtoms` performs a full DFS traversal to build a topologically sorted list. This involves creating temporary arrays and `WeakSet`s, iterating the dependency graph, and reversing the result. While the cost for 3 atoms is small in absolute terms, repeating this 100,000 times adds up. Push-based systems like RxJS and SynState establish the propagation order once at subscription time and reuse it for every update.
+
+**4. Dynamic Dependency Rebuilding**
+
+Every time `readAtomState` calls the user's `read` function, it rebuilds the dependency map from scratch. The `getter` closure records each accessed atom in `nextDeps`, and after the read completes, stale dependencies are pruned by diffing `prevDeps` and `nextDeps`. This is necessary because Jotai supports dynamic dependencies (the set of dependencies can change based on values), but in a static chain like the benchmark, it is pure overhead. Push-based systems wire up the dependency graph once.
+
+**5. Subscriber Double-Read**
+
+Jotai's `store.sub()` callback receives no arguments — it is only a notification that something changed. The subscriber must call `store.get(atom)` to retrieve the new value, which re-enters `readAtomState`. While this call is cheap (the atom is already up-to-date, so it returns early), it still involves WeakMap lookups and function calls. Push-based systems deliver the value directly to the subscriber as an argument.
+
+**Summary: Cost Comparison Per `store.set()` Call**
+
+| Cost Factor                |                   RxJS |               SynState |                         Jotai |
+| -------------------------- | ---------------------: | ---------------------: | ----------------------------: |
+| Map/WeakMap lookups        |                      0 |                   ~2–4 |                        ~30–40 |
+| Object allocations         |                      0 |                      0 |                        ~15–20 |
+| Function calls             |                   ~4–6 |                  ~6–10 |                        ~60–80 |
+| Dependency graph traversal |                   None |   Depth-based ordering |   Full DFS + topological sort |
+| Dependency tracking        |    Static (wired once) |    Static (wired once) |  Dynamic (rebuilt every read) |
+| Value delivery             | Push (direct argument) | Push (direct argument) | Pull (notification + re-read) |
+
+:::note
+Jotai's architecture is not "wrong" — it is optimized for React rendering, not raw synchronous throughput. Pull-based evaluation avoids recomputing atoms that no component is rendering. Dynamic dependency tracking enables powerful patterns like conditional `get()` calls. WeakMap-based storage provides automatic garbage collection. The 100,000 synchronous updates benchmark is an adversarial workload for this architecture; in a typical React application with a few dozen state updates per second, Jotai's overhead is negligible.
+:::
+
+### What Happens in Redux / Zustand (No Diamond Dependency)
+
+Redux and Zustand use a **single immutable state tree**. Derived values are not computed through a propagation graph but through **selector functions** — pure functions that take the current state snapshot and return a derived value.
+
+Since all selectors read from the same state snapshot, there is no ordering problem — `multiplied` and `counter` are always derived from the same version of the state. **Diamond dependencies are structurally impossible** in this model.
+
+However, this single-store model has a trade-off: it does not natively support reactive stream operations like `debounce`, `switchMap`, or `mergeMap`. For such use cases, you would need to add middleware or external libraries.
+
+#### Redux
+
+You can verify this behavior by running the following Redux sample code:
+
+```tsx
+import { configureStore, createSelector, createSlice } from '@reduxjs/toolkit';
+
+// Redux uses a single immutable state tree.
+// Derived values are computed via "selectors" — pure functions
+// that read from the state snapshot.
+// Since all selectors read from the same snapshot,
+// there is no propagation graph and thus no diamond dependency.
+
+const counterSlice = createSlice({
+    name: 'counter',
+    initialState: { value: 0 },
+    reducers: {
+        set: (state, action: Readonly<{ payload: number }>) => {
+            state.value = action.payload;
+        },
+    },
+});
+
+const store = configureStore({ reducer: counterSlice.reducer });
+
+const selectCounter = (state: Readonly<{ value: number }>): number =>
+    state.value;
+
+const selectMultipliedBy10 = createSelector(
+    selectCounter,
+    (counter) => counter * 10,
+);
+
+const selectMultipliedBy1000 = createSelector(
+    selectCounter,
+    (counter) => counter * 1000,
+);
+
+const selectSum = createSelector(
+    selectMultipliedBy10,
+    selectMultipliedBy1000,
+    (multipliedBy10, multipliedBy1000) => multipliedBy10 + multipliedBy1000,
+);
+
+// Record initial value
+const valueHistory: number[] = [selectSum(store.getState())];
+
+// Subscribe to future changes
+store.subscribe(() => {
+    valueHistory.push(selectSum(store.getState()));
+});
+
+await new Promise<void>((resolve) => {
+    let mut_count = 0;
+
+    const interval = setInterval(() => {
+        mut_count += 1;
+
+        store.dispatch(counterSlice.actions.set(mut_count));
+
+        if (mut_count >= 4) {
+            clearInterval(interval);
+
+            resolve();
+        }
+    }, 100);
+});
+
+// Redux selectors always read from a single consistent state snapshot,
+// so diamond dependencies are structurally impossible — no glitch.
+assert.deepStrictEqual(valueHistory, [0, 1010, 2020, 3030, 4040]);
+```
+
+#### Zustand
+
+You can verify this behavior by running the following Zustand sample code:
+
+```tsx
+import { createStore } from 'zustand/vanilla';
+
+// Zustand uses a single store object, similar to Redux.
+// Derived values are computed via selector functions
+// that read from the store's state snapshot.
+// Since all selectors read from the same snapshot,
+// there is no propagation graph and thus no diamond dependency.
+
+const store = createStore<Readonly<{ counter: number }>>()(() => ({
+    counter: 0,
+}));
+
+const selectSum = (state: Readonly<{ counter: number }>): number =>
+    state.counter * 10 + state.counter * 1000;
+
+// Record initial value
+const valueHistory: number[] = [selectSum(store.getState())];
+
+// Subscribe to future changes
+store.subscribe((state) => {
+    valueHistory.push(selectSum(state));
+});
+
+await new Promise<void>((resolve) => {
+    let mut_count = 0;
+
+    const interval = setInterval(() => {
+        mut_count += 1;
+
+        store.setState({ counter: mut_count });
+
+        if (mut_count >= 4) {
+            clearInterval(interval);
+
+            resolve();
+        }
+    }, 100);
+});
+
+// Zustand selectors always read from a single consistent state snapshot,
+// so diamond dependencies are structurally impossible — no glitch.
+assert.deepStrictEqual(valueHistory, [0, 1010, 2020, 3030, 4040]);
+```
+
+## Summary
+
+| Library  | Approach                        | Diamond Dependency | Glitch-Free? | Output                            |
+| :------- | :------------------------------ | :----------------: | :----------: | :-------------------------------- |
+| RxJS     | Push-based Observable (eager)   |    Yes (native)    |      No      | `0, 10, 1010, 20, 2020, 30, 3030` |
+| MobX     | Pull-based computed (lazy)      |    Yes (native)    |     Yes      | `0, 1010, 2020, 3030, 4040`       |
+| Jotai    | Pull-based derived atom (lazy)  |    Yes (native)    |     Yes      | `0, 1010, 2020, 3030, 4040`       |
+| Redux    | Single store + selectors        |      N/A [^1]      |     Yes      | `0, 1010, 2020, 3030, 4040`       |
+| Zustand  | Single store + selectors        |      N/A [^1]      |     Yes      | `0, 1010, 2020, 3030, 4040`       |
+| SynState | Push-based Observable (ordered) |    Yes (native)    |     Yes      | `0, 1010, 2020, 3030, 4040`       |
+
+[^1]: Redux and Zustand use a single immutable state tree with selector functions. Since all selectors read from the same state snapshot, diamond dependencies do not arise in the first place.
+
+- **RxJS** is the only library that exhibits glitches in this scenario. Its push-based, eager propagation model notifies `combineLatest` as soon as any input changes, without waiting for other inputs sharing the same source to update. The glitch values (`10`, `20`, `30`, ...) represent states where one derived observable has already updated but the other has not yet recalculated.
+- **MobX** and **Jotai** avoid glitches through lazy (pull-based) evaluation of derived values. When a subscriber reads a derived value, all upstream dependencies are recomputed on demand.
+- **Redux** and **Zustand** avoid glitches structurally — their single-store model means all selectors always read from a consistent state snapshot. However, they cannot natively express reactive stream operations like `debounce` or `switchMap`.
+- **SynState** is unique in being both push-based (like RxJS) and glitch-free. It achieves this by ordering the propagation so that all inputs to a combinator are updated before the combinator itself evaluates.

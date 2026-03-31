@@ -1,0 +1,79 @@
+---
+prev: false
+next: false
+title: takeUntil
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Emits values from the source until the notifier observable emits.
+When the notifier emits, this observable completes.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: '1', color: colors.yellow },
+                { t: 40, label: '2', color: colors.orange },
+                { t: 80, label: '3', color: colors.purple },
+            ],
+        },
+        {
+            marbles: [{ t: 60, label: '·', color: colors.red }],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 15, label: '1', color: colors.yellow },
+            { t: 40, label: '2', color: colors.orange },
+        ],
+        completion: 60,
+    }}
+    operator="takeUntil(stop$)"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  num$          1         2         stop      3 (ignored)
+//  stopNotifier                      X
+//  limited$      1         2         |------- (completed)
+//
+//  Explanation:
+//  - takeUntil completes the observable when the notifier emits
+//  - After stop() is called, no further values are emitted
+//  - Useful for cleanup and cancellation patterns
+
+const num$ = source<number>();
+
+const [stopNotifier, stop_] = createEventEmitter();
+
+const limited$ = num$.pipe(takeUntil(stopNotifier));
+
+const valueHistory: number[] = [];
+
+limited$.subscribe((x) => {
+    valueHistory.push(x);
+});
+
+num$.next(1); // logs: 1
+
+assert.deepStrictEqual(valueHistory, [1]);
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [1, 2]);
+
+stop_();
+
+num$.next(3); // nothing logged (completed)
+
+assert.deepStrictEqual(valueHistory, [1, 2]);
+```

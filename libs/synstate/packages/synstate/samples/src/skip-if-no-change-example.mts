@@ -6,8 +6,8 @@ if (import.meta.vitest !== undefined) {
 
     //  Timeline:
     //
-    //  num$      1     1     2     2     2     3
-    //  distinct$ 1           2                 3
+    //  num$      1     1     2     2     1     2     3     2
+    //  distinct$ 1           2           1     2     3     2
     //
     //  Explanation:
     //  - skipIfNoChange filters out consecutive duplicate values
@@ -18,29 +18,42 @@ if (import.meta.vitest !== undefined) {
 
     const distinct$ = num$.pipe(skipIfNoChange());
 
-    const mut_history: number[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: number[] = [];
 
     distinct$.subscribe((x) => {
-      mut_history.push(x);
+      valueHistory.push(x);
     });
 
     num$.next(1); // logs: 1
 
-    assert.deepStrictEqual(mut_history, [1]);
+    assert.deepStrictEqual(valueHistory, [1]);
 
     num$.next(1); // nothing logged
 
-    assert.deepStrictEqual(mut_history, [1]);
+    assert.deepStrictEqual(valueHistory, [1]);
 
     num$.next(2); // logs: 2
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2]);
 
     num$.next(2); // nothing logged
 
+    num$.next(1); // logs: 1
+
+    assert.deepStrictEqual(valueHistory, [1, 2, 1]);
+
+    num$.next(2); // logs: 2
+
+    assert.deepStrictEqual(valueHistory, [1, 2, 1, 2]);
+
     num$.next(3); // logs: 3
 
-    assert.deepStrictEqual(mut_history, [1, 2, 3]);
+    assert.deepStrictEqual(valueHistory, [1, 2, 1, 2, 3]);
+
+    num$.next(2); // logs: 2
+
+    assert.deepStrictEqual(valueHistory, [1, 2, 1, 2, 3, 2]);
 
     // embed-sample-code-ignore-below
   });

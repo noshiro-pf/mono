@@ -1,0 +1,79 @@
+---
+prev: false
+next: false
+title: filter
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+述語関数に基づいてソース Observable から発行される値をフィルタリングします。
+述語を満たす値のみが結果の Observable から発行されます。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 10, label: '1', color: colors.yellow },
+                { t: 25, label: '2', color: colors.orange },
+                { t: 40, label: '3', color: colors.blue },
+                { t: 55, label: '4', color: colors.purple },
+                { t: 70, label: '5', color: colors.green },
+                { t: 85, label: '6', color: colors.red },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 25, label: '2', color: colors.orange },
+            { t: 55, label: '4', color: colors.purple },
+            { t: 85, label: '6', color: colors.red },
+        ],
+    }}
+    operator="filter(x => x % 2 === 0)"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  num$          1     2     3     4     5     6
+//  even$               2           4           6
+//
+//  Explanation:
+//  - filter passes through only values that satisfy the predicate
+//  - Only even numbers (2, 4, 6) are emitted
+
+const num$ = source<number>();
+
+const even$ = num$.pipe(filter((x) => x % 2 === 0));
+
+const valueHistory: number[] = [];
+
+even$.subscribe((x) => {
+    valueHistory.push(x);
+});
+
+num$.next(1); // nothing logged
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [2]);
+
+num$.next(3); // nothing logged
+
+num$.next(4); // logs: 4
+
+assert.deepStrictEqual(valueHistory, [2, 4]);
+
+num$.next(5);
+
+num$.next(6);
+
+assert.deepStrictEqual(valueHistory, [2, 4, 6]);
+```

@@ -1,0 +1,83 @@
+---
+prev: false
+next: false
+title: pairwise
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Emits the previous and current values as a pair.
+Does not emit until the source has emitted at least twice.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 10, label: '1', color: colors.yellow },
+                { t: 30, label: '2', color: colors.orange },
+                { t: 55, label: '3', color: colors.blue },
+                { t: 80, label: '4', color: colors.purple },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 30, label: '1,2', color: colors.orange },
+            { t: 55, label: '2,3', color: colors.blue },
+            { t: 80, label: '3,4', color: colors.purple },
+        ],
+    }}
+    operator="pairwise()"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  num$      1     2     3     4
+//  pairs$          [1,2] [2,3] [3,4]
+//
+//  Explanation:
+//  - pairwise emits the current and previous values as a tuple
+//  - Nothing is emitted for the first value (no previous value yet)
+//  - Useful for tracking changes between consecutive values
+
+const num$ = source<number>();
+
+const pairs$ = num$.pipe(pairwise());
+
+const valueHistory: (readonly [number, number])[] = [];
+
+pairs$.subscribe(([prev, curr]) => {
+    valueHistory.push([prev, curr]);
+});
+
+num$.next(1); // nothing logged
+
+assert.deepStrictEqual(valueHistory, []);
+
+num$.next(2); // logs: 1, 2
+
+assert.deepStrictEqual(valueHistory, [[1, 2]]);
+
+num$.next(3); // logs: 2, 3
+
+assert.deepStrictEqual(valueHistory, [
+    [1, 2],
+    [2, 3],
+]);
+
+num$.next(4); // logs: 3, 4
+
+assert.deepStrictEqual(valueHistory, [
+    [1, 2],
+    [2, 3],
+    [3, 4],
+]);
+```

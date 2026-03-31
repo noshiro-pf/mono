@@ -1,0 +1,74 @@
+---
+prev: false
+next: false
+title: mapResultOk
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+ソースから発行される `Result` 型の成功値（`Ok`）を変換します。
+値が `Ok` の場合はマッピング関数が適用され、`Err` の場合はそのまま維持されます。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: '2', color: colors.green },
+                { t: 45, label: 'Err', color: colors.red },
+                { t: 75, label: '5', color: colors.blue },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 15, label: '4', color: colors.green },
+            { t: 45, label: 'Err', color: colors.red },
+            { t: 75, label: '10', color: colors.blue },
+        ],
+    }}
+    operator="mapResultOk(x => x * 2)"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  result$   Ok(2)      Err("e")   Ok(5)
+//  doubled$  Ok(4)      Err("e")   Ok(10)
+//
+//  Explanation:
+//  - mapResultOk transforms the Ok value of Result emissions
+//  - Err values pass through unchanged
+
+const result$ = source<Result<number, string>>();
+
+const doubled$ = result$.pipe(mapResultOk((x) => x * 2));
+
+const valueHistory: Result<number, string>[] = [];
+
+doubled$.subscribe((v) => {
+    valueHistory.push(v);
+});
+
+result$.next(Result.ok(2));
+
+assert.deepStrictEqual(valueHistory, [Result.ok(4)]);
+
+result$.next(Result.err('e'));
+
+assert.deepStrictEqual(valueHistory, [Result.ok(4), Result.err('e')]);
+
+result$.next(Result.ok(5));
+
+assert.deepStrictEqual(valueHistory, [
+    Result.ok(4),
+    Result.err('e'),
+    Result.ok(10),
+]);
+```

@@ -24,23 +24,23 @@ import { source, type InitializedObservable } from '../core/index.mjs';
  *   0,
  * );
  *
- * const mut_history: number[] = [];
+ * const stateHistory: number[] = [];
  *
  * state.subscribe((value: number) => {
- *   mut_history.push(value);
+ *   stateHistory.push(value);
  * });
  *
- * assert.deepStrictEqual(mut_history, [0]);
+ * assert.deepStrictEqual(stateHistory, [0]);
  *
  * dispatch({ type: 'increment' }); // logs: 1
  *
- * assert.deepStrictEqual(mut_history, [0, 1]);
+ * assert.deepStrictEqual(stateHistory, [0, 1]);
  *
  * dispatch({ type: 'increment' });
  *
  * dispatch({ type: 'decrement' });
  *
- * assert.deepStrictEqual(mut_history, [0, 1, 2, 1]);
+ * assert.deepStrictEqual(stateHistory, [0, 1, 2, 1]);
  * ```
  */
 export const createReducer = <S, A>(

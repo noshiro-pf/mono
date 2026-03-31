@@ -12,10 +12,7 @@ const UserProfile = (): React.JSX.Element => {
 
   return (
     <div>
-      <p>
-        {'Name: '}
-        {user.name}
-      </p>
+      <p>{`Name: ${user.name}`}</p>
       <button
         onClick={() => {
           setUserState({

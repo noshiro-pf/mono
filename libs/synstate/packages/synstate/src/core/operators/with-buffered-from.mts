@@ -3,7 +3,7 @@ import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type KeepInitialValueOperator,
   type Observable,
-  type UpdaterSymbol,
+  type UpdateToken,
   type WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
 import { maxDepth } from '../utils/index.mjs';
@@ -37,27 +37,27 @@ import { maxDepth } from '../utils/index.mjs';
  *
  * const result$ = trigger$.pipe(withBufferedFrom(data$));
  *
- * const mut_history: (readonly [number, readonly string[]])[] = [];
+ * const valueHistory: (readonly [number, readonly string[]])[] = [];
  *
  * result$.subscribe(([triggerValue, bufferedData]) => {
- *   mut_history.push([triggerValue, bufferedData]);
+ *   valueHistory.push([triggerValue, bufferedData]);
  * });
  *
- * data$.next('a');
+ * data$.next('A');
  *
- * data$.next('b');
+ * data$.next('B');
  *
  * trigger$.next(1);
  *
- * assert.deepStrictEqual(mut_history, [[1, ['a', 'b']]]);
+ * assert.deepStrictEqual(valueHistory, [[1, ['A', 'B']]]);
  *
- * data$.next('c');
+ * data$.next('C');
  *
  * trigger$.next(2);
  *
- * assert.deepStrictEqual(mut_history, [
- *   [1, ['a', 'b']],
- *   [2, ['c']],
+ * assert.deepStrictEqual(valueHistory, [
+ *   [1, ['A', 'B']],
+ *   [2, ['C']],
  * ]);
  * ```
  */
@@ -105,16 +105,16 @@ class WithBufferedFromObservableClass<A, B>
     });
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Optional.isNone(sn)) {
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
       return; // skip update
     }
 
-    this.setNext([sn.value, this.#mut_bufferedValues], updaterSymbol);
+    this.setNext([sn.value, this.#mut_bufferedValues], updateToken);
 
     this.#clearBuffer();
   }

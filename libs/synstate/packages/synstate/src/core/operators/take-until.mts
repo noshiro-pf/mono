@@ -4,7 +4,7 @@ import {
   type KeepInitialValueOperator,
   type Observable,
   type TakeUntilOperatorObservable,
-  type UpdaterSymbol,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -34,25 +34,25 @@ import {
  *
  * const limited$ = num$.pipe(takeUntil(stopNotifier));
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * limited$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
  * num$.next(1); // logs: 1
  *
- * assert.deepStrictEqual(mut_history, [1]);
+ * assert.deepStrictEqual(valueHistory, [1]);
  *
  * num$.next(2); // logs: 2
  *
- * assert.deepStrictEqual(mut_history, [1, 2]);
+ * assert.deepStrictEqual(valueHistory, [1, 2]);
  *
  * stop_();
  *
  * num$.next(3); // nothing logged (completed)
  *
- * assert.deepStrictEqual(mut_history, [1, 2]);
+ * assert.deepStrictEqual(valueHistory, [1, 2]);
  * ```
  */
 export const takeUntil = <A,>(
@@ -85,15 +85,15 @@ class TakeUntilObservableClass<A>
     );
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Optional.isNone(sn)) {
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
       return; // skip update
     }
 
-    this.setNext(sn.value, updaterSymbol);
+    this.setNext(sn.value, updateToken);
   }
 }

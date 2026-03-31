@@ -1,0 +1,94 @@
+---
+prev: false
+next: false
+title: skipWhile
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+述語が true を返す間、ソース Observable からの値をスキップします。
+述語が false を返すと、以降のすべての値が通過します。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 6, label: '1', color: colors.yellow },
+                { t: 17, label: '2', color: colors.yellow },
+                { t: 28, label: '3', color: colors.yellow },
+                { t: 39, label: '4', color: colors.yellow },
+                { t: 50, label: '5', color: colors.blue },
+                { t: 61, label: '6', color: colors.blue },
+                { t: 72, label: '7', color: colors.blue },
+                { t: 83, label: '1', color: colors.teal },
+                { t: 94, label: '2', color: colors.green },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 50, label: '5', color: colors.blue },
+            { t: 61, label: '6', color: colors.blue },
+            { t: 72, label: '7', color: colors.blue },
+            { t: 83, label: '1', color: colors.teal },
+            { t: 94, label: '2', color: colors.teal },
+        ],
+    }}
+    operator="skipWhile(x => x < 5)"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  num$        1     2     3     4     5     6     7     1     2
+//  skipped$                            5     6     7     1     2
+//              |-------- skip --------|
+//
+//  Explanation:
+//  - skipWhile skips values while the predicate returns true
+//  - Once the predicate returns false, all subsequent values pass through
+//  - Unlike filter, the predicate is never checked again after the first false
+
+const num$ = source<number>();
+
+const skipped$ = num$.pipe(skipWhile((x) => x < 5));
+
+const valueHistory: number[] = [];
+
+skipped$.subscribe((x) => {
+    valueHistory.push(x);
+});
+
+num$.next(1); // nothing logged
+
+num$.next(2); // nothing logged
+
+num$.next(3); // nothing logged
+
+num$.next(4); // nothing logged
+
+num$.next(5); // logs: 5
+
+assert.deepStrictEqual(valueHistory, [5]);
+
+num$.next(6); // logs: 6
+
+assert.deepStrictEqual(valueHistory, [5, 6]);
+
+num$.next(7); // logs: 7
+
+assert.deepStrictEqual(valueHistory, [5, 6, 7]);
+
+num$.next(1); // logs: 1
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [5, 6, 7, 1, 2]);
+```

@@ -9,7 +9,7 @@ if (import.meta.vitest !== undefined) {
     //  Timeline:
     //
     //  promise     [pending...]  -> resolved/rejected
-    //  data$                     Ok(value) or Err(error)
+    //  data$                        Ok(value) or Err(error)
     //
     //  Explanation:
     //  - fromPromise converts a Promise into an observable
@@ -17,17 +17,21 @@ if (import.meta.vitest !== undefined) {
     //  - Completes after emitting the result
     //  - Useful for integrating async operations into reactive flows
 
-    const fetchData = async (): Promise<{ value: number }> => ({ value: 42 });
+    const fetchData = async (): Promise<Readonly<{ value: number }>> =>
+      ({
+        value: 42,
+      }) as const;
 
     const data$ = fromPromise(fetchData());
 
-    const mut_history: { value: number }[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: Readonly<{ value: number }>[] = [];
 
     await new Promise<void>((resolve) => {
       data$.subscribe(
         (result) => {
           if (Result.isOk(result)) {
-            mut_history.push(result.value);
+            valueHistory.push(result.value);
           }
         },
         () => {
@@ -36,7 +40,7 @@ if (import.meta.vitest !== undefined) {
       );
     });
 
-    assert.deepStrictEqual(mut_history, [{ value: 42 }]);
+    assert.deepStrictEqual(valueHistory, [{ value: 42 }]);
 
     // embed-sample-code-ignore-below
   });

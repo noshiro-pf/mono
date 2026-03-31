@@ -1,0 +1,841 @@
+---
+title: パフォーマンスベンチマーク
+sidebar:
+    order: 6
+---
+
+import DerivedChainDepGraph from '../../../../../components/dep-graph/derived-chain-dep-graph-island.astro';
+import DiamondDepGraph from '../../../../../components/dep-graph/diamond-dep-graph-island.astro';
+import DeepChainDepGraph from '../../../../../components/dep-graph/deep-chain-dep-graph-island.astro';
+import CascadedDiamondDepGraph from '../../../../../components/dep-graph/cascaded-diamond-dep-graph-island.astro';
+import DeepChainChart from '../../../../../components/benchmark-chart/deep-chain-chart-island.astro';
+import CascadedDiamondChart from '../../../../../components/benchmark-chart/cascaded-diamond-chart-island.astro';
+import ConditionalFanOutDepGraph from '../../../../../components/dep-graph/conditional-fan-out-dep-graph-island.astro';
+import ConditionalFanOutChart from '../../../../../components/benchmark-chart/conditional-fan-out-chart-island.astro';
+
+## シナリオ： 派生チェーン
+
+各ライブラリのリアクティブプリミティブの純粋なオーバーヘッドを測定するシンプルな線形チェーンです：
+
+<DerivedChainDepGraph />
+
+- ループ： counter を $1$ から $N$ まで同期的に更新（$N = 10^5$）.
+- 検証： 最終値 $= N \times 4$.
+- ダイヤモンド依存関係なし — 純粋な伝搬オーバーヘッドの比較。
+
+### 結果
+
+{/* benchmark-result */}
+| Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec |
+| -------- | ----------: | -------: | -------: | -------: | ---------: |
+| SynState | 13.39 | 10.28 | 20.04 | 19.62 | 7,465,632 |
+| RxJS | 3.79 | 3.67 | 4.12 | 4.11 | 26,392,839 |
+| MobX | 89.36 | 88.48 | 90.74 | 90.14 | 1,119,054 |
+| Jotai | 392.07 | 374.80 | 426.35 | 420.00 | 255,059 |
+| Redux | 202.22 | 191.80 | 251.83 | 242.93 | 494,500 |
+| Zustand | 2.96 | 2.86 | 3.74 | 3.38 | 33,751,925 |
+| Valtio | 22.04 | 21.25 | 22.82 | 22.82 | 4,537,372 |
+{/* /benchmark-result */}
+
+:::note
+結果は https://github.com/noshiro-pf/synstate の `pnpm --filter synstate run benchmark` で自動生成され、`pnpm --filter @synstate/docs run doc` で埋め込まれています。
+実際の数値はマシンやランタイム環境によって異なります。
+:::
+
+:::caution[数値の読み方について]
+この単純なチェーンのシナリオでは、RxJS・Zustand・Valtio が SynState と同程度かより高速に見えます。しかし、線形チェーンでの生スループットだけでは全体像は分かりません。
+
+- **RxJS** がここで高速なのは、グラフにダイアモンド依存がないためです。ダイアモンドが存在すると `combineLatest` は冗長な中間値を発行し、ワイドダイアモンドで $O(N^2)$、**カスケードダイアモンドでは指数関数的**（一般に $O(D^N)$、$D$ = 1段あたりのファンアウト）に劣化します（[ダイアモンドシナリオ](#シナリオ：-ダイヤモンド依存関係)および[インタラクティブデモ](/synstate/ja/guides/library-comparison/interactive-demo/)を参照）。さらに RxJS は[グリッチ](/synstate/ja/internals/how-synstate-solved-the-glitch/)（不整合な中間状態）の問題を抱えており、SynState はこれを排除しています。
+- **Zustand** と **Valtio** の高速さは、派生値を**セレクターやコールバック内でインライン計算**（`counter * 2 * 2`）していることに由来します。独立した派生値を定義して結合する仕組みがないため、**ダイアモンド依存シナリオからは除外**されています。実際のアプリケーションで複数の派生ソースの結合が必要なケース（フォームバリデーション、算出スタイル、集約ダッシュボードなど）は、これらのライブラリのバニラ API だけでは手動の調整なしに表現できません。
+
+**グリッチフリーかつダイアモンド依存をサポートし、すべてのケースで $O(n)$ の伝播を維持**しているのは SynState だけです。
+:::
+
+### 実装の詳細
+
+各ライブラリは同じ派生チェーンパターンを実装しています。すべての実装は vitest テストとして実行可能です。
+
+#### SynState
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const [counter, setCounter] = createState(0);
+
+    const doubled = counter.pipe(map((x) => x * 2));
+
+    const quadrupled = doubled.pipe(map((x) => x * 2));
+
+    let mut_lastValue = 0;
+
+    const subscription = quadrupled.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        setCounter(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### RxJS
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counter = new BehaviorSubject(0);
+
+    const doubled = counter.pipe(map((x) => x * 2));
+
+    const quadrupled = doubled.pipe(map((x) => x * 2));
+
+    let mut_lastValue = 0;
+
+    const subscription = quadrupled.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        counter.next(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### MobX
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const state = observable({ counter: 0 });
+
+    const doubled = computed(() => state.counter * 2);
+
+    const quadrupled = computed(() => doubled.get() * 2);
+
+    let mut_lastValue = 0;
+
+    const dispose = reaction(
+        () => quadrupled.get(),
+        (value) => {
+            mut_lastValue = value;
+        },
+        { fireImmediately: true },
+    );
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        runInAction(() => {
+            state.counter = mut_i;
+        });
+    }
+
+    dispose();
+
+    return mut_lastValue;
+};
+```
+
+#### Jotai
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counterAtom = atom(0);
+
+    const doubledAtom = atom((get) => get(counterAtom) * 2);
+
+    const quadrupledAtom = atom((get) => get(doubledAtom) * 2);
+
+    const store = createStore();
+
+    let mut_lastValue = store.get(quadrupledAtom);
+
+    const unsub = store.sub(quadrupledAtom, () => {
+        mut_lastValue = store.get(quadrupledAtom);
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        store.set(counterAtom, mut_i);
+    }
+
+    unsub();
+
+    return mut_lastValue;
+};
+```
+
+#### Redux
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counterSlice = createSlice({
+        name: 'counter',
+        initialState: { value: 0 },
+        reducers: {
+            set: (state, action: Readonly<{ payload: number }>) => {
+                state.value = action.payload;
+            },
+        },
+    });
+
+    const store = configureStore({
+        reducer: counterSlice.reducer,
+        middleware: () => new Tuple(),
+    });
+
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const selectCounter = (state: Readonly<{ value: number }>): number =>
+        state.value;
+
+    const selectDoubled = createSelector(
+        selectCounter,
+        (counter) => counter * 2,
+    );
+
+    const selectQuadrupled = createSelector(
+        selectDoubled,
+        (doubled) => doubled * 2,
+    );
+
+    let mut_lastValue = selectQuadrupled(store.getState());
+
+    store.subscribe(() => {
+        mut_lastValue = selectQuadrupled(store.getState());
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        store.dispatch(counterSlice.actions.set(mut_i));
+    }
+
+    return mut_lastValue;
+};
+```
+
+#### Zustand
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const store = createStore<Readonly<{ counter: number }>>()(() => ({
+        counter: 0,
+    }));
+
+    const selectQuadrupled = (state: Readonly<{ counter: number }>): number =>
+        state.counter * 2 * 2;
+
+    let mut_lastValue = selectQuadrupled(store.getState());
+
+    store.subscribe((state) => {
+        mut_lastValue = selectQuadrupled(state);
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        store.setState({ counter: mut_i });
+    }
+
+    return mut_lastValue;
+};
+```
+
+#### Valtio
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const state = proxy({ counter: 0 });
+
+    let mut_lastValue = state.counter * 2 * 2;
+
+    const unsubscribe = subscribe(
+        state,
+        () => {
+            mut_lastValue = state.counter * 2 * 2;
+        },
+        true,
+    );
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        state.counter = mut_i;
+    }
+
+    unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+## シナリオ： ダイヤモンド依存関係
+
+複数の派生値が1つにマージされる場合に各ライブラリがどのように処理するかをテストする、ダイヤモンド型の依存関係グラフです：
+
+<DiamondDepGraph />
+
+- ループ： counter を $1$ から $N$ まで同期的に更新（$N = 10^5$）.
+- 検証： 最終値 $= N \times 5$.
+- Zustand は独立した派生値を組み合わせるメカニズムがないため除外。
+
+:::caution[RxJS グリッチ]
+RxJS の `combineLatest` はこのダイヤモンドグラフで**更新ごとに subscriber を2回**呼び出します（1回は古い値で、1回は正しい値で）。この2倍の作業はベンチマーク結果に反映されています。詳細は [SynState がグリッチを解決した方法](/synstate/ja/internals/how-synstate-solved-the-glitch/) を参照してください。
+:::
+
+### 結果
+
+{/* benchmark-result-diamond */}
+| Library | Median (ms) | Min (ms) | Max (ms) | p95 (ms) | Ops/sec |
+| -------- | ----------: | -------: | -------: | -------: | ---------: |
+| SynState | 19.54 | 17.93 | 25.79 | 22.63 | 5,118,062 |
+| RxJS | 9.31 | 8.86 | 9.68 | 9.57 | 10,737,673 |
+| MobX | 99.90 | 98.57 | 101.49 | 101.28 | 1,000,966 |
+| Jotai | 550.21 | 543.65 | 560.05 | 557.63 | 181,750 |
+| Redux | 317.42 | 289.68 | 362.50 | 339.75 | 315,041 |
+{/* /benchmark-result-diamond */}
+
+### 実装の詳細
+
+#### SynState
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const [counter, setCounter] = createState(0);
+
+    const doubled = counter.pipe(map((x) => x * 2));
+
+    const tripled = counter.pipe(map((x) => x * 3));
+
+    const sum = combine([doubled, tripled]).pipe(map(([d, t]) => d + t));
+
+    let mut_lastValue = 0;
+
+    const subscription = sum.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        setCounter(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### RxJS
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counter = new BehaviorSubject(0);
+
+    const doubled = counter.pipe(map((x) => x * 2));
+
+    const tripled = counter.pipe(map((x) => x * 3));
+
+    const sum = combineLatest([doubled, tripled]).pipe(map(([d, t]) => d + t));
+
+    let mut_lastValue = 0;
+
+    const subscription = sum.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        counter.next(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### MobX
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const state = observable({ counter: 0 });
+
+    const doubled = computed(() => state.counter * 2);
+
+    const tripled = computed(() => state.counter * 3);
+
+    const sum = computed(() => doubled.get() + tripled.get());
+
+    let mut_lastValue = 0;
+
+    const dispose = reaction(
+        () => sum.get(),
+        (value) => {
+            mut_lastValue = value;
+        },
+        { fireImmediately: true },
+    );
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        runInAction(() => {
+            state.counter = mut_i;
+        });
+    }
+
+    dispose();
+
+    return mut_lastValue;
+};
+```
+
+#### Jotai
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counterAtom = atom(0);
+
+    const doubledAtom = atom((get) => get(counterAtom) * 2);
+
+    const tripledAtom = atom((get) => get(counterAtom) * 3);
+
+    const sumAtom = atom((get) => get(doubledAtom) + get(tripledAtom));
+
+    const store = createStore();
+
+    let mut_lastValue = store.get(sumAtom);
+
+    const unsub = store.sub(sumAtom, () => {
+        mut_lastValue = store.get(sumAtom);
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        store.set(counterAtom, mut_i);
+    }
+
+    unsub();
+
+    return mut_lastValue;
+};
+```
+
+#### Redux
+
+```tsx
+export const runBenchmark = (n: number): number => {
+    const counterSlice = createSlice({
+        name: 'counter',
+        initialState: { value: 0 },
+        reducers: {
+            set: (state, action: Readonly<{ payload: number }>) => {
+                state.value = action.payload;
+            },
+        },
+    });
+
+    const store = configureStore({
+        reducer: counterSlice.reducer,
+        middleware: () => new Tuple(),
+    });
+
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const selectCounter = (state: Readonly<{ value: number }>): number =>
+        state.value;
+
+    const selectDoubled = createSelector(
+        selectCounter,
+        (counter) => counter * 2,
+    );
+
+    const selectTripled = createSelector(
+        selectCounter,
+        (counter) => counter * 3,
+    );
+
+    const selectSum = createSelector(
+        selectDoubled,
+        selectTripled,
+        (doubled, tripled) => doubled + tripled,
+    );
+
+    let mut_lastValue = selectSum(store.getState());
+
+    store.subscribe(() => {
+        mut_lastValue = selectSum(store.getState());
+    });
+
+    for (let mut_i = 1; mut_i <= n; mut_i++) {
+        store.dispatch(counterSlice.actions.set(mut_i));
+    }
+
+    return mut_lastValue;
+};
+```
+
+## シナリオ： ディープチェーンスループット
+
+最初の2つのシナリオは固定サイズのグラフを使用しています。このシナリオは[スループットのインタラクティブデモ](/synstate/ja/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load)と同じトポロジーを使用します： depth-$M$ の `scan` チェーンで、各ステージが前のステージに向かって lerp し、`combine` が**すべての $M+1$ 個の出力**を読み取ります。$K$ 回のソース更新を同期的に実行します（アニメーションフレームあたり $K$ 回の更新をシミュレート）。
+
+以下の図は $M = 3$ の場合のグラフ構造です。実際のベンチマークでは $M$ は $50$〜$200$ です：
+
+<DeepChainDepGraph />
+
+- $K$（計測あたりの更新回数）： $100$, $500$, $1000$.
+- $M$（チェーンの深さ）： $50$, $100$, $200$.
+- Zustand、Valtio、Redux は除外（独立した派生値による `scan` チェーンを表現する仕組みがないため）。
+- 5,000 ms を超える計測は打ち切り。
+
+:::caution[RxJS がソース更新1回あたり $O(M^2)$ になる理由]
+`combineLatest` は $M+1$ 個の入力（source + $M$ 個の scan ステージ）すべてを subscribe しています。source が新しい値を発行すると、RxJS の深さ優先伝播により以下のカスケードが発生します：
+
+1. **source** が発行 → `combineLatest` が実行（**1回目**の subscriber 呼び出し。scan₁〜scanₘ はまだ古い値）
+2. source の変更が **scan₁** に伝播 → scan₁ が発行 → `combineLatest` が実行（**2回目**。scan₂〜scanₘ はまだ古い値）
+3. scan₁ の変更が **scan₂** に伝播 → scan₂ が発行 → `combineLatest` が実行（**3回目**）
+4. …チェーン全体を通じてこれが繰り返される…
+5. **scanₘ** が発行 → `combineLatest` が実行（**$M+1$ 回目** — ここで初めてすべての値が最新）
+
+$M+1$ 回の `combineLatest` 発行のそれぞれが subscriber を呼び出し、subscriber は $M+1$ 個の値を処理します → **呼び出し1回あたり $O(M)$**。したがってソース1回の更新コストは $O(M) \times (M+1)$ = **$O(M^2)$** です。
+
+SynState の `combine` は伝播順序が完全に解決されてから発行するため、**ソース更新1回あたり subscriber 呼び出し1回、合計 $O(M)$** です。
+:::
+
+### 結果
+
+{/* benchmark-result-deep-chain */}
+| Library | K=100, M=50 | K=500, M=50 | K=1000, M=50 | K=100, M=100 | K=500, M=100 | K=1000, M=100 | K=500, M=200 | K=1000, M=200 |
+| ------------ | ----------: | ----------: | -----------: | -----------: | -----------: | ------------: | -----------: | ------------: |
+| **SynState** | 0.4 ms | 1.0 ms | 1.5 ms | 0.3 ms | 1.6 ms | 2.8 ms | 2.9 ms | 5.6 ms |
+| RxJS | 3.3 ms | 14.6 ms | 31.1 ms | 14.2 ms | 66.7 ms | 135.0 ms | 335.3 ms | 678.4 ms |
+| Jotai | 9.2 ms | 46.5 ms | 91.3 ms | 17.2 ms | 89.6 ms | 182.9 ms | 194.5 ms | 398.5 ms |
+| MobX | 18.9 ms | 79.4 ms | 156.2 ms | 30.0 ms | 150.1 ms | 289.9 ms | 289.8 ms | 575.2 ms |
+{/* /benchmark-result-deep-chain */}
+
+<DeepChainChart />
+
+### 主な観察結果
+
+- **SynState** は $K$ と $M$ の両方に対して線形に増加します。$K=1000$, $M=200$ でも **5.6 ms** で完了し、プッシュベースの直接関数呼び出しによるステージあたりのオーバーヘッドはごくわずかです。
+- **RxJS** は $K=1000$, $M=200$ で **678 ms** — SynState の**約121倍**です。上で説明した通り、これは定数倍の差ではなく `combineLatest` の冗長な発行による二次関数的 $O(M^2)$ な計算量の違いです。[インタラクティブデモ](/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)でも同じ増大が確認できます。
+- **Jotai** は $K=1000$, $M=200$ で **399 ms** — SynState の**約71倍**です。`selectAtom` の更新ごとのオーバーヘッド（エポックベースの再計算と動的依存関係追跡）に起因します。
+- **MobX** は $K=1000$, $M=200$ で **575 ms** — SynState の**約103倍**です。このシナリオは `scan`（ステートフルな累積：各ステージが自身の前回値と新しい入力を必要とする）を使用します。MobX の `computed` は純粋な派生であり、自身の前回出力にアクセスする手段を持たないため、ここでは使えません。`observable.box` + `reaction`（push-based）を使う必要があり、プロキシ追跡・依存通知・`autorun` の再読み取りによるステージごとのオーバーヘッドが発生します。対照的に、[カスケードダイアモンドシナリオ](#シナリオ：-カスケードダイアモンド)はステートレスな派生のため `computed` の遅延評価で高効率に処理できます。
+- $K=500$, $M=100$（60fps アニメーションで中程度のグラフ複雑度を想定）の場合、SynState（**1.6 ms**）は 16ms のフレーム時間内に余裕で収まりますが、RxJS（67 ms）、Jotai（90 ms）、MobX（150 ms）はいずれも大幅に超過します。
+
+## シナリオ： カスケードダイアモンド
+
+このシナリオは、RxJS の `combineLatest` でダイアモンドが直列に連なった場合の**指数関数的な増大**を実証します。各ステージは前の出力を2つのブランチ（ファンアウト $D = 2$）に分岐させ、再び結合します。$N$ 個の二分岐ダイアモンドがチェーンを形成します：
+
+<CascadedDiamondDepGraph />
+
+上図は $N = 3$ の場合です。ベンチマークでは $N$ は $2$〜$20$ です。
+
+- $K$（ソース更新回数）： $100$.
+- $N$（カスケード深さ）： $2, 4, 6, 8, 10, 12, 14, 16, 18, 20$.
+- 5,000 ms を超える計測は打ち切り。
+
+:::caution[このベンチマークで RxJS がソース更新1回あたり $O(2^N)$ になる理由]
+チェーン内の各 `combineLatest` は上流の発行ごとに2回実行されます（left ブランチで1回、right ブランチで1回）。この倍増がカスケードします：ステージ 1 は 2 回、ステージ 2 は 4 回、ステージ 3 は 8 回、…、ステージ $N$ は $2^N$ 回実行されます。$N=14$（$K=100$）で RxJS は約 2 秒かかり、$N=16$ では 5 秒のタイムアウトを超過します。より一般的には、ダイアモンド1段あたりのファンアウトが $D$ の場合、コストは $O(D^N)$ になります。
+:::
+
+### 結果
+
+{/* benchmark-result-cascaded-diamond */}
+| Library | N=2 | N=4 | N=6 | N=8 | N=10 | N=12 | N=14 | N=16 | N=18 | N=20 |
+| ------------ | -----: | -----: | -----: | ------: | ------: | -------: | --------: | --------: | --------: | --------: |
+| **SynState** | 0.5 ms | 0.6 ms | 0.5 ms | 0.5 ms | 0.8 ms | 1.9 ms | 6.2 ms | 23.1 ms | 90.8 ms | 359.2 ms |
+| RxJS | 0.2 ms | 0.5 ms | 2.1 ms | 11.1 ms | 60.2 ms | 373.9 ms | 2018.1 ms | > 5000 ms | > 5000 ms | > 5000 ms |
+| Jotai | 1.5 ms | 1.9 ms | 2.5 ms | 5.3 ms | 7.2 ms | 13.0 ms | 35.9 ms | 116.4 ms | 414.5 ms | 1666.5 ms |
+| MobX | 1.0 ms | 0.6 ms | 0.9 ms | 0.8 ms | 0.9 ms | 0.9 ms | 1.0 ms | 1.1 ms | 1.2 ms | 1.3 ms |
+{/* /benchmark-result-cascaded-diamond */}
+
+<CascadedDiamondChart />
+
+### 主な観察結果
+
+- **RxJS** は典型的な $O(2^N)$ の指数関数的増大（二分岐）を示します。$N=16$ でタイムアウト（ソース更新あたり $2^{16} = 65536$ 回の発行 $\times 100$ 回の更新）。$N=14$ では既に **2,018 ms** — SynState（6.2 ms）の**300倍以上**です。
+- **MobX** は遅延 `computed` 評価により $N=20$ でも 1.3 ms 以下です。MobX の `computed` 値は依存が変化しても即座に再計算されず、実際に読み取られたときに初めて再計算されます。`reaction` は最終段の `computed` のみを読み取り、それがチェーンを遡って各 `computed` を1回ずつ遅延評価するため、更新あたりの総作業量は $O(N)$ で、オーバーヘッドも最小限です。これは[ディープチェーンスループットシナリオ](#シナリオ：-ディープチェーンスループット)で MobX が SynState の**約103倍遅い**結果と対照的です。あちらのシナリオでは `computed` ではなく `reaction` チェーン（push-based）を使用しており、パフォーマンス特性は使用する MobX プリミティブに大きく依存します。
+- **SynState** は深さ順走査により $O(N)$ で伝播しますが、このベンチマークでは各 `runBenchmark` 呼び出しでグラフを再構築（$3N+1$ 個の Observable を二分探索挿入で `propagationOrder` に登録）しているため、その構築コストが $N$ の増加とともに支配的になります。$N=20$ で 359 ms。グラフを一度構築して繰り返し更新する実アプリケーションでは、更新あたりのコストはディープチェーンスループットシナリオで示した通り $O(N)$ です。
+- **Jotai** は派生 atom 数に伴う `store.set()` ごとの DFS オーバーヘッドの複合により、$O(N)$ より速く増加します。$N=20$ で 1,667 ms です。
+
+## シナリオ： 条件付きファンアウト
+
+これまでのシナリオは伝搬スループットをテストしていました — すべてのソース更新が subscriber に到達します。このシナリオは異なるパターンをテストします： **購読セットに含まれない observable への更新コスト** — 動的依存追跡が最も有利に働くケースです。
+
+グラフには B 個の分岐とセレクターがあります。セレクターはベンチマーク中ずっと $0$ に固定されており、`branch[0]` のみが「アクティブ」です。ベンチマークでは **`branch[1]`**（非アクティブな分岐）を $K = 10^5$ 回更新します。
+
+<ConditionalFanOutDepGraph />
+
+このシナリオの核心は、ライブラリによって **`branch[1]` の observer リスト（購読者の有無）が異なる** 点です：
+
+- **静的購読（SynState, RxJS）**： `combine` が構築時に全分岐を購読するため、`branch[1]` にも observer が登録されています。`branch[1]` が更新されるたびに `combine` が発火し、`map` が前回と同じ値を生成し、等値比較で下流への伝搬を防止します。結合配列のサイズが増えるため、コストは B に比例します。
+- **動的購読（Jotai, MobX）**： `computed` や派生 atom の関数が**実行時に** `.get()` で実際にアクセスした observable だけを購読します。`selector = 0` のとき `branch[0].get()` のみが呼ばれるため、`branch[1]` の observer リストは**空**です。`branch[1]` を更新しても、通知先が存在しないため何も起きません。
+
+### 結果
+
+{/* benchmark-result-conditional-fan-out */}
+| Library | B=2 | B=5 | B=10 | B=20 | B=50 | B=100 | B=200 | B=500 | B=1000 |
+| ------- | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: | ----------: |
+| **SynState** | 24.2 ms | 24.2 ms | 33.7 ms | 48.1 ms | 90.8 ms | 154.0 ms | 297.4 ms | 703.3 ms | 1466.0 ms |
+| RxJS | 5.6 ms | 5.3 ms | 5.1 ms | 5.4 ms | 6.1 ms | 9.2 ms | 22.3 ms | 37.2 ms | 61.4 ms |
+| Jotai | 69.6 ms | 69.8 ms | 73.7 ms | 68.8 ms | 72.1 ms | 69.0 ms | 70.5 ms | 72.5 ms | 69.9 ms |
+| MobX | 2.3 ms | 2.5 ms | 2.4 ms | 2.4 ms | 2.4 ms | 2.4 ms | 2.4 ms | 2.4 ms | 2.7 ms |
+{/* /benchmark-result-conditional-fan-out */}
+
+<ConditionalFanOutChart />
+
+### 主な観察結果
+
+- **MobX** はこのシナリオで最も高速です。`computed(() => branches[selector.get()].get())` は実行時に `selector` と `branches[0]` のみを購読するため、`branches[1]` の observer リストは空です。`branches[1]` を更新しても通知先が存在せず、B に関係なく約 2.4 ms で一定です。
+- **SynState** のコストは B に対して線形に増加します。`combine` が構築時に全分岐を購読するため、どの分岐が更新されても combine が発火します。グラフで線形な傾向が明確に見えます：B=2 で 24ms、B=1000 で 1,466ms（1更新あたり1分岐あたり約 1.5μs）。
+- **RxJS** は SynState と同じ静的な `combineLatest` アプローチです。コストは B に応じて増加しますが、SynState より緩やかです。`combineLatest` は等値比較による下流伝搬スキップを行わず常に発行するため、subscriber は毎回呼ばれますが処理は最小限（値の代入のみ）です。
+- **Jotai** は MobX と同じ動的購読を行います — `resultAtom` は非アクティブな分岐を購読していないため再計算はトリガーされません。しかし `store.set()` 自体が atom store 内で invalidation チェック等の管理処理を実行するため、B に関係なく約 70ms の一定オーバーヘッドが発生します。このため B≤50 では SynState より遅い結果です。
+
+    :::note[このベンチマークは動的購読に有利な恣意的シナリオです]
+    このベンチマークは静的購読と動的購読の理論的な特性の違いを示すために設計されたものであり、**動的購読側に最も有利な条件**を意図的に構成しています。
+
+    現実のアプリケーションにおいて、selector が固定されたまま非アクティブな分岐だけが大量に更新され続けることは考えにくいです。もし使われていないデータが頻繁に更新される状況が発生しているなら、それはライブラリの購読モデルの問題ではなく、アプリケーション側の設計の問題です。例えば、表示されていないチャンネルの WebSocket データを購読し続けている場合、ライブラリの選択に関係なく、不要な購読自体を停止すべきです。
+
+    また、このベンチマークでは selector の切り替えを行っていません。現実のアプリケーションでは selector が変わるたびに MobX/Jotai は購読セットの再構築（古い購読の解除 + 新しい購読の登録）が必要ですが、そのコストはここには含まれていません。
+    :::
+
+### 実装の詳細
+
+#### SynState
+
+```tsx
+export const runBenchmark = (k: number, branchCount: number): number => {
+    const [selector] = createState(0);
+
+    const branches: DeepReadonly<
+        {
+            source: Observable<number>;
+            set: (v: number) => void;
+        }[]
+    > = Arr.zeros(asUint32(branchCount)).map(() => {
+        const [source, setSource] = createState(0);
+
+        return { source, set: setSource };
+    });
+
+    const allSources = [
+        selector,
+        ...branches.map((b) => b.source),
+    ] as const satisfies NonEmptyArray<Observable<number>>;
+
+    const result = combine(allSources).pipe(
+        map(
+            ([selectorValue, ...branchesValue]) =>
+                branchesValue[selectorValue] ?? 0,
+        ),
+    );
+
+    let mut_lastValue = 0;
+
+    const subscription = result.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    // Update an INACTIVE branch (branch 1, while selector = 0)
+    const inactiveBranch = branches[1];
+
+    if (inactiveBranch === undefined) {
+        throw new Error('need at least 2 branches');
+    }
+
+    for (let mut_i = 1; mut_i <= k; mut_i++) {
+        inactiveBranch.set(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### RxJS
+
+```tsx
+export const runBenchmark = (k: number, branchCount: number): number => {
+    const selector = new BehaviorSubject(0);
+
+    const branches: readonly BehaviorSubject<number>[] = Arr.zeros(
+        asUint32(branchCount),
+    ).map(() => new BehaviorSubject(0));
+
+    const result = combineLatest([selector, ...branches]).pipe(
+        map((values) => {
+            const sel = values[0];
+
+            return values[sel + 1] ?? 0;
+        }),
+    );
+
+    let mut_lastValue = 0;
+
+    const subscription = result.subscribe((v) => {
+        mut_lastValue = v;
+    });
+
+    // Update an INACTIVE branch (branch 1, while selector = 0)
+    const inactiveBranch = branches[1];
+
+    if (inactiveBranch === undefined) {
+        throw new Error('need at least 2 branches');
+    }
+
+    for (let mut_i = 1; mut_i <= k; mut_i++) {
+        inactiveBranch.next(mut_i);
+    }
+
+    subscription.unsubscribe();
+
+    return mut_lastValue;
+};
+```
+
+#### MobX
+
+```tsx
+export const runBenchmark = (k: number, branchCount: number): number => {
+    const selector = observable.box(0);
+
+    const branches: readonly ReturnType<typeof observable.box<number>>[] =
+        Arr.zeros(asUint32(branchCount)).map(() => observable.box(0));
+
+    // Dynamic dependency: only tracks the branch selected by selector
+    const result = computed(() => {
+        const sel = selector.get();
+
+        const target = branches[sel];
+
+        if (target === undefined) {
+            return 0;
+        }
+
+        return target.get();
+    });
+
+    let mut_lastValue = 0;
+
+    const dispose = reaction(
+        () => result.get(),
+        (value) => {
+            mut_lastValue = value ?? 0;
+        },
+        { fireImmediately: true },
+    );
+
+    // Update an INACTIVE branch (branch 1, while selector = 0)
+    const inactiveBranch = branches[1];
+
+    if (inactiveBranch === undefined) {
+        throw new Error('need at least 2 branches');
+    }
+
+    for (let mut_i = 1; mut_i <= k; mut_i++) {
+        inactiveBranch.set(mut_i);
+    }
+
+    dispose();
+
+    return mut_lastValue;
+};
+```
+
+#### Jotai
+
+```tsx
+export const runBenchmark = (k: number, branchCount: number): number => {
+    const selectorAtom = atom(0);
+
+    const branchAtoms: readonly WritableAtom<
+        number,
+        Mutable<readonly [number]>,
+        void
+    >[] = Arr.zeros(asUint32(branchCount)).map(() => atom(0));
+
+    // Dynamic dependency: only reads the branch selected by selectorAtom
+    const resultAtom = atom((get) => {
+        const sel = get(selectorAtom);
+
+        const targetAtom = branchAtoms[sel];
+
+        if (targetAtom === undefined) {
+            return 0;
+        }
+
+        return get(targetAtom);
+    });
+
+    const store = createStore();
+
+    let mut_lastValue = store.get(resultAtom);
+
+    const unsub = store.sub(resultAtom, () => {
+        mut_lastValue = store.get(resultAtom);
+    });
+
+    // Update an INACTIVE branch (branch 1, while selector = 0)
+    const inactiveBranchAtom = branchAtoms[1];
+
+    if (inactiveBranchAtom === undefined) {
+        throw new Error('need at least 2 branches');
+    }
+
+    for (let mut_i = 1; mut_i <= k; mut_i++) {
+        store.set(inactiveBranchAtom, mut_i);
+    }
+
+    unsub();
+
+    return mut_lastValue;
+};
+```
+
+## 測定方法
+
+- **ウォームアップ**： 5ラウンド（破棄）。
+- **測定**： 20ラウンド。
+- $N$： 1ラウンドあたり $10^5$ 回の更新。
+- **タイミング**： `performance.now()`（サブミリ秒精度）。
+- **統計**： 中央値、最小、最大、p95、ops/sec（中央値に基づく）。
+
+### 公平性に関する注記
+
+- **Redux**： デフォルトのミドルウェア（thunk、シリアライザブルチェック、イミュータビリティチェック）は `middleware: () => new Tuple()` で無効化されています。これらは本番ビルドでは tree-shaking で除去される開発時チェックです。
+- **Zustand**（派生チェーンのみ）： Zustand には独立した派生値プリミティブがないため、派生値はセレクター内でインラインに計算されます（`counter * 2 * 2`）。同じ理由で、ダイヤモンド依存関係シナリオからも除外されています — 独立した派生値を定義して組み合わせるメカニズムがありません。
+- **Valtio**（派生チェーンのみ）： Zustand と同様に、Valtio のバニラ API には組み込みの派生値プリミティブがないため（`derive` は別パッケージ）、派生値は `subscribe` コールバック内でインラインに計算されます（`state.counter * 2 * 2`）。第3引数の `true` は同期通知を有効にし、subscriber がすべてのミューテーションで呼び出されるようにします（Valtio はデフォルトで非同期にバッチ処理します）。同じ理由でダイヤモンド依存関係シナリオからも除外されています。
+- **RxJS**（ダイヤモンド依存関係）： `combineLatest` は[グリッチ問題](/synstate/ja/internals/how-synstate-solved-the-glitch/)により、ソース更新ごとに subscriber を2回発火させます。ベンチマークはこの追加作業を含むウォールクロック時間を測定しており、RxJS におけるダイヤモンド依存関係の実際のコストを反映しています。
+- **MobX**： 他のライブラリの subscribe-and-record パターンに合わせるため、`autorun` ではなく `reaction` を使用しています。MobX の strict mode で要求されるとおり、`runInAction` で各ミューテーションをラップしています。
+- **Jotai**： `store.sub()` はコールバックに現在の値を渡さないため、リスナー内で追加の `store.get()` 呼び出しが必要です。初期値もsubscribe前に `store.get()` で読み取られます。
+- すべてのライブラリは、ベンチマーク関数内でステート、派生値、およびsubscriptionを作成します。セットアップコストは測定に含まれています。
+
+## 分析： Jotai が約29倍遅い理由
+
+Jotai はグリッチフリーのセマンティクスを持ちながら、両方のシナリオで最も遅いライブラリです。根本原因は**更新ごとのフレームワークオーバーヘッド**、つまりグラフのサイズに関係なく Jotai のストアが `store.set()` の呼び出しごとに実行する処理量です。
+
+### 更新ごとのコスト内訳
+
+`store.set(counterAtom, i)` が呼び出されると、Jotai のストアは以下のステップを実行します：
+
+1. **値の更新** — 新しい値を書き込み、`Object.is` で比較。$O(1)$。
+2. **無効化パス**（`invalidateDependents`）— マウントされたすべての依存先の DFS トラバーサル。`Map<Atom, EpochNumber>` でのエポック番号追跡により各ノードを「再計算が必要」とマーク。$O(N)$（$N$ = 影響を受ける atom の数）。
+3. **トポロジカルソート**（`recomputeInvalidatedAtoms`）— 訪問追跡に `WeakSet` を使用した2回目の DFS 後順トラバーサル。正しい順序の再計算リストを生成。$O(N)$。
+4. **再計算** — トポロジカル順序の各 atom に対して `read` 関数を実行。read 関数内で、各 `get(dep)` 呼び出しは： (a) 依存先の `AtomState` を検索、(b) エポック番号を比較して古さをチェック、(c) 将来の無効化のために `Map` に依存関係を記録。コストは $O(\sum D_i)$ — 再計算されるすべての atom の直接依存の合計であり、積ではない。各1つの依存を持つ N 個の atom のチェーンでは $O(N)$。
+5. **subscriber 通知** — リスナーコールバックを発火。Jotai の `store.sub()` は新しい値を渡さないため、コールバックは `store.get()` を再度呼び出す必要があり、追加のキャッシュ検索が発生する。リスナーあたり $O(1)$ だが、追加のトラバーサルが1回発生。
+
+### SynState との比較
+
+| ステップ                    | SynState                                                   | Jotai                                                           |
+| --------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------- |
+| **グラフの解決**            | 構築時に1回                                                | `store.set()` のたびに（ステップ2-3）                           |
+| **伝搬**                    | 事前構築されたsubscriptionチェーンを通じた直接関数呼び出し | getter spy + `Map`/`WeakSet` 操作を伴う `read` 関数実行         |
+| **依存関係の追跡**          | 静的（構築時に設定）                                       | 動的（getter spy を通じて評価のたびに再検出）                   |
+| **鮮度チェック**            | 不要（プッシュ型）                                         | `get()` 呼び出しごとのエポック番号比較                          |
+| **subscriber への値の配送** | 値がコールバックに直接渡される                             | コールバックが値を読むために `store.get()` を呼び出す必要がある |
+
+### 定数倍の差が見えるケース
+
+ベンチマークのループは更新ごとの差を測定可能にするために100,000回の更新を実行しています。しかし、この定数倍のコストは高頻度イベントを扱う実際のアプリケーションでも問題になります。
+
+例えば、`mousemove` や `pointermove` イベントは1秒間に数十回発火します。各イベントがリアクティブパイプラインを駆動する場合（ドラッグ&ドロップ、ツールチップの位置計算、キャンバスアニメーションなど）、更新ごとのオーバーヘッドがイベント発生頻度に比例して増大します。チェーンの深さが増すと差は劇的になります： [スループットデモ](/synstate/ja/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load)（depth-100 チェーン、フレームあたり500回更新）では、Jotai では ms/frame が 16ms を超えて目に見えるカクつきが生じる一方、SynState は16ms以内で安定して描画できます。
+
+更新ごとの差が生じる根本原因：
+
+- **SynState**： `setCounter(i)` → `doubled` の map 関数を呼び出し → `quadrupled` の map 関数を呼び出し → subscriber を呼び出し。フレームワークによる管理処理を伴わない、3回の直接関数呼び出しのみ。
+- **Jotai**： `store.set(counterAtom, i)` → DFS 無効化（WeakSet アロケーション + Map 書き込み）→ DFS トポロジカルソート（WeakSet アロケーション + 配列 push + reverse）→ `doubledAtom` の再計算（Map 検索 + エポックチェック + Map 書き込み）→ `quadrupledAtom` の再計算（同上）→ コールバックをフラッシュ → `store.get(quadrupledAtom)`（キャッシュ検索）。
+
+100,000回のイテレーションにわたって、SynState は3回の関数呼び出しが処理の大半を占める一方、Jotai では更新ごとの管理処理（Map/WeakSet アロケーション、エポック比較、2回の DFS トラバーサル）が蓄積され、観測される約29倍の差になります。

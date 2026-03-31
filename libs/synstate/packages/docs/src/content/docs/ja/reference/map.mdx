@@ -1,0 +1,67 @@
+---
+prev: false
+next: false
+title: map
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram.jsx';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+発行インデックスも受け取るマッピング関数を使用して、ソースから発行される各値を変換します。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 10, label: 'A', color: colors.yellow },
+                { t: 30, label: 'B', color: colors.orange },
+                { t: 60, label: 'C', color: colors.blue },
+            ],
+            completion: 85,
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 10, label: '0: A', color: colors.yellow },
+            { t: 30, label: '1: B', color: colors.orange },
+            { t: 60, label: '2: C', color: colors.blue },
+        ],
+        completion: 85,
+    }}
+    operator="map((x, i) => `${i}: ${x}`)"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  num$      "A"      "B"      "C"
+//  indexed$  "0: A"   "1: B"   "2: C"
+//
+//  Explanation:
+//  - mapWithIndex transforms each value along with its index
+//  - Index starts at 0 and increments with each emission
+
+const num$ = source<string>();
+
+const indexed$ = num$.pipe(map((x, i) => `${i}: ${x}`));
+
+const valueHistory: string[] = [];
+
+indexed$.subscribe((s) => {
+    valueHistory.push(s);
+});
+
+num$.next('A'); // 0: A
+
+num$.next('B'); // 1: B
+
+num$.next('C'); // 2: C
+
+assert.deepStrictEqual(valueHistory, ['0: A', '1: B', '2: C']);
+```

@@ -12,7 +12,7 @@ import {
   type InitializedObservable,
   type Observable,
   type TakeWhileOperatorObservable,
-  type UpdaterSymbol,
+  type UpdateToken,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 
@@ -28,7 +28,7 @@ import { withInitialValue } from './with-initial-value.mjs';
  * ```ts
  * //  Timeline:
  * //
- * //  num$      1     2     3     4     5     6 (ignored)
+ * //  num$      1     2     3     4     5     6     1     2 (ignored)
  * //  taken$    1     2     3     4     | (completes)
  * //
  * //  Explanation:
@@ -40,27 +40,35 @@ import { withInitialValue } from './with-initial-value.mjs';
  *
  * const taken$ = num$.pipe(takeWhile((x) => x < 5));
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * taken$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
  * num$.next(1); // logs: 1
  *
- * assert.deepStrictEqual(mut_history, [1]);
+ * assert.deepStrictEqual(valueHistory, [1]);
  *
  * num$.next(2); // logs: 2
  *
- * assert.deepStrictEqual(mut_history, [1, 2]);
+ * num$.next(3); // logs: 3
+ *
+ * num$.next(4); // logs: 4
+ *
+ * assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
  *
  * num$.next(5); // nothing logged (completes)
  *
- * assert.deepStrictEqual(mut_history, [1, 2]);
+ * assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
  *
  * num$.next(6); // nothing logged (already completed)
  *
- * assert.deepStrictEqual(mut_history, [1, 2]);
+ * assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
+ *
+ * num$.next(1); // logs: 1
+ *
+ * assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
  * ```
  */
 export const takeWhile =
@@ -99,12 +107,12 @@ class TakeWhileObservableClass<A>
     this.#predicate = predicate;
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Optional.isNone(sn)) {
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
       return; // skip update
     }
 
@@ -112,7 +120,7 @@ class TakeWhileObservableClass<A>
       this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
     if (this.#predicate(sn.value, this.#mut_index)) {
-      this.setNext(sn.value, updaterSymbol);
+      this.setNext(sn.value, updateToken);
     } else {
       this.complete();
     }

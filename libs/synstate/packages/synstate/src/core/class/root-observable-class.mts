@@ -5,20 +5,20 @@ import {
   type ObservableId,
   type RootObservable,
 } from '../types/index.mjs';
-import { binarySearch, issueUpdaterSymbol } from '../utils/index.mjs';
+import { binarySearch, issueUpdateToken } from '../utils/index.mjs';
 import { ObservableBaseClass } from './observable-base-class.mjs';
 
 export class RootObservableClass<A>
   extends ObservableBaseClass<A, 'root', 0>
   implements RootObservable<A>
 {
-  #mut_procedure: readonly ChildObservable<unknown>[];
+  #mut_propagationOrder: readonly ChildObservable<unknown>[];
   protected readonly _descendantsIdSet: MutableSet<ObservableId>;
 
   constructor({
     initialValue,
   }: Readonly<{
-    initialValue: ReturnType<RootObservable<A>['getSnapshot']>;
+    initialValue: Optional<A>;
   }>) {
     super({
       kind: 'root',
@@ -26,7 +26,7 @@ export class RootObservableClass<A>
       initialValue,
     });
 
-    this.#mut_procedure = [];
+    this.#mut_propagationOrder = [];
 
     this._descendantsIdSet = new Set<ObservableId>();
   }
@@ -37,20 +37,24 @@ export class RootObservableClass<A>
     this._descendantsIdSet.add(child.id);
 
     const insertPos = binarySearch(
-      this.#mut_procedure.map((a) => a.depth),
+      this.#mut_propagationOrder.map((a) => a.depth),
       child.depth,
     );
 
-    this.#mut_procedure = Arr.toInserted(this.#mut_procedure, insertPos, child);
+    this.#mut_propagationOrder = Arr.toInserted(
+      this.#mut_propagationOrder,
+      insertPos,
+      child,
+    );
   }
 
   startUpdate(nextValue: A): void {
-    const updaterSymbol = issueUpdaterSymbol();
+    const updateToken = issueUpdateToken();
 
-    this.setNext(nextValue, updaterSymbol);
+    this.setNext(nextValue, updateToken);
 
-    for (const p of this.#mut_procedure) {
-      p.tryUpdate(updaterSymbol);
+    for (const p of this.#mut_propagationOrder) {
+      p.tryUpdate(updateToken);
     }
   }
 }

@@ -23,7 +23,6 @@ jobs:
           - check:root
           - ws:type-check
           - ws:lint:fix
-          - ws:test:all
           - ws:test:browser
           - ws:test:cov
           - codemod:full

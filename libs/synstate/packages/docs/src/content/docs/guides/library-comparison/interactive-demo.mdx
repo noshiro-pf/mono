@@ -1,0 +1,159 @@
+---
+title: Interactive Demos
+sidebar:
+    order: 7
+---
+
+import GlitchDemo from '../../../../components/glitch-demo/glitch-demo-island.astro';
+import SpringDemo from '../../../../components/spring-demo/spring-demo-island.astro';
+import ThroughputDemo from '../../../../components/throughput-demo/throughput-demo-island.astro';
+import DeepChainDepGraph from '../../../../components/dep-graph/deep-chain-dep-graph-island.astro';
+
+## See the Diamond Dependency Glitch in Action
+
+When two derived values depend on the same source (a **diamond dependency**), some reactive libraries emit inconsistent intermediate states — known as **glitches**. This demo lets you see the difference with your own eyes.
+
+### How it works
+
+Click and drag on each canvas to draw a trail. Each dot is placed by the library's reactive pipeline using the same **diamond dependency graph**:
+
+```
+mousePos (source: {x, y})
+  ├── derivedX = map(pos => pos.x)
+  ├── derivedY = map(pos => pos.y)
+  └── combine([derivedX, derivedY])
+        └── draw dot at {x, y} + check consistency
+```
+
+Each emitted position is compared to the latest mouse position:
+
+- **Blue dot** — emitted `(x, y)` matches the actual mouse position (consistent).
+- **Red dot** — one axis updated but the other didn't yet (glitch — the dot appears off the drag path).
+
+<GlitchDemo />
+
+### What to look for
+
+| Library      | Glitches | Why                                                                                                                                |
+| ------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **SynState** | 0        | Depth-based topological update — all branches resolve atomically before notifying subscribers                                      |
+| **RxJS**     | Many     | `combineLatest` fires on each input change, so `derivedX` updates before `derivedY` causing intermediate emissions with stale data |
+| **Jotai**    | 0        | Pull-based derivation ensures consistency — derived atoms always read the latest values                                            |
+| **MobX**     | 0        | `computed` values are lazily evaluated inside a batched `reaction` — all inputs are up-to-date when read                           |
+
+With only 2 derived values, all four libraries are fast enough that the performance difference is negligible. But the extra emissions from RxJS become a serious performance problem as the graph grows — see the deep dependency chain demo below.
+
+### Why glitches matter
+
+In real applications, diamond dependencies appear everywhere — computed styles from shared state, derived UI values, form validations. Glitches cause:
+
+- **Visual flicker** — UI renders an impossible intermediate state.
+- **Wasted work** — each extra emission triggers unnecessary side effects. With $N$ inputs to `combineLatest`, a single source update causes $N+1$ emissions — this scales to an **$O(N^2)$ performance cliff** as shown in the demo below.
+- **Logic bugs** — side effects fire with inconsistent data.
+
+SynState eliminates these problems at the library level, with no manual workarounds needed.
+
+---
+
+## Deep Dependency Chain: Propagation Under Load
+
+This demo measures the **serial dependency chain propagation performance** of each reactive framework. All four libraries build an identical reactive graph topology: a **depth-$N$ chain** of stateful nodes where each depends on the previous, with a final combine/derive that reads all $N+1$ outputs.
+
+A snake tail follows the mouse — each segment is a stage in the chain that smoothly follows the previous stage via linear interpolation (lerp). To draw the full snake, all $N+1$ outputs (head + $N$ stages) are collected into a single `combine`:
+
+<DeepChainDepGraph />
+
+The diagram shows $N = 3$. In the demo, $N$ is adjustable via a slider. Increase the chain depth and watch for stutter and rising μs/update.
+
+<SpringDemo />
+
+### What to look for
+
+- At **low $N$** (10–50): all four libraries render smoothly.
+- At **high $N$**: RxJS starts stuttering first — check the **Total updates** counter to see why.
+- SynState, Jotai, and MobX stay smoother at higher $N$, but Jotai and MobX show higher μs/update due to per-update overhead in their reactive engines.
+
+### Why RxJS collapses at high N
+
+Check the **Total updates** counter: RxJS shows roughly **$N+1$ times** more updates than SynState for the same mouse movement. `combineLatest` fires every time **any** of its $N+1$ inputs emits. On a single mouse move, the scan chain propagates sequentially:
+
+1. `source` emits → `combineLatest` fires (only source updated, scans still hold old values)
+2. `scan₁` emits → `combineLatest` fires again
+3. `scan₂` emits → fires again
+4. ... for all $N$ stages
+
+Each of these $N+1$ firings triggers a full canvas redraw of $N+1$ points → **$O(N^2)$**. This is the glitch problem from the first demo manifesting as a performance cliff.
+
+### Summary: all four libraries compared
+
+| Library      | Graph depth | Propagation    | Subscriber calls per mouse event | Total work per event    |
+| ------------ | ----------- | -------------- | -------------------------------- | ----------------------- |
+| **SynState** | $N$         | push (atomic)  | **1** (atomic combine)           | $O(N)$                  |
+| **Jotai**    | $N$         | pull (lazy)    | **1** (derived read)             | $O(N)$, higher constant |
+| **MobX**     | $N$         | push (batched) | **1** (autorun)                  | $O(N)$, higher constant |
+| **RxJS**     | $N$         | push (eager)   | **$N+1$** (combineLatest glitch) | $O(N^2)$                |
+
+SynState, Jotai, and MobX all fire the subscriber **once** per mouse event, making them all $O(N)$. But the per-update constant factor differs significantly — SynState's direct function calls have much less overhead than Jotai's DFS recomputation or MobX's proxy-based tracking. The next demo isolates this difference.
+
+---
+
+## Throughput: Per-Update Overhead Under Load
+
+This demo removes RxJS (whose $O(N^2)$ blowup would dominate) and focuses on the three glitch-free libraries to make the constant-factor difference visible.
+
+### How it works
+
+A ball automatically orbits in a circle. Each canvas runs the **same depth-$M$ reactive chain** as the spring demo above. The difference: instead of 1 source update per mouse event, **$K$ source updates are pushed through the chain every animation frame** in a tight synchronous loop.
+
+```
+each animation frame:
+  for k in 0..K-1:
+    update source position (micro-step along orbit)
+    → propagate through depth-M scan chain
+    → subscriber records latest points
+  draw snake once
+```
+
+This amplifies the per-update overhead by a factor of $K$. When the overhead exceeds 16ms, the animation drops frames and stutters.
+
+<ThroughputDemo />
+
+### What to look for
+
+- At **low $K$** (1–100): all three libraries animate smoothly.
+- **Increase $K$** toward 500–1000: Jotai's and MobX's **ms/frame** climbs past 16ms and the animation visibly stutters, while SynState remains smooth.
+- The **ms/frame** indicator turns red when it exceeds the 16ms (60fps) threshold.
+
+### Why Jotai and MobX stutter
+
+Each of the $K$ source updates triggers the full update pipeline:
+
+**Jotai:**
+
+1. `store.set()` → DFS invalidation of $M$ dependents → $O(M)$
+2. DFS topological sort to determine recomputation order → $O(M)$
+3. Recompute each `selectAtom` with epoch checks and dynamic dependency tracking → $O(M)$
+
+**Total per frame: $K \times O(M)$ with high constant factor** (Map/WeakSet allocations, epoch comparisons, two DFS traversals per tick).
+
+**MobX:**
+
+1. `head.set()` → triggers `reaction` → `runInAction` propagates through $M$ stages → $O(M)$
+2. Each `stage.set()` notifies MobX's dependency tracking system
+3. After the action, `autorun` re-reads all $M$ stages → $O(M)$
+
+**Total per frame: $K \times O(M)$** with per-stage overhead from MobX's proxy-based tracking and reaction scheduling.
+
+SynState's push-based engine propagates through the same chain via **direct function calls** with the propagation order resolved once at construction time — no per-update graph traversal, no dynamic dependency tracking, no epoch bookkeeping.
+
+| Library      | Per-update work                                | $K=500$, $M=100$ |
+| ------------ | ---------------------------------------------- | ---------------- |
+| **SynState** | 100 direct function calls                      | ~2–5ms           |
+| **Jotai**    | 2× DFS(100) + 100 epoch-checked recomputations | ~50–100ms        |
+| **MobX**     | 100 observable.set + autorun re-read           | ~30–80ms         |
+
+## What's Next?
+
+- [Performance Benchmark](/synstate/guides/library-comparison/benchmark/) — quantitative measurements of the same scenarios shown here, plus additional graph topologies.
+- [How SynState Solved the Glitch](/synstate/internals/how-synstate-solved-the-glitch/) — deep dive into the depth-ordered propagation algorithm.
+- [Library Comparison](/synstate/guides/library-comparison/library-comparison/) — feature-by-feature comparison of SynState with RxJS, Jotai, MobX, and others.

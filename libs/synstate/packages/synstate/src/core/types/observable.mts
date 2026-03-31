@@ -1,5 +1,5 @@
 import { expectType, type Optional } from 'ts-data-forge';
-import { type ObservableId, type UpdaterSymbol } from './id.mjs';
+import { type ObservableId, type UpdateToken } from './id.mjs';
 import { type ObservableKind } from './observable-kind.mjs';
 import { type NonEmptyUnknownList, type Subscription } from './types.mjs';
 
@@ -28,12 +28,12 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   // state
   getSnapshot: () => Optional<A>;
   isCompleted: boolean;
-  updaterSymbol: UpdaterSymbol;
+  updateToken: UpdateToken;
   hasSubscriber: boolean;
   hasChild: boolean;
   hasActiveChild: () => boolean;
 
-  tryUpdate: (updaterSymbol: UpdaterSymbol) => void;
+  tryUpdate: (updateToken: UpdateToken) => void;
   tryComplete: () => void;
   complete: () => void;
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;

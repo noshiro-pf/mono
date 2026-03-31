@@ -1,0 +1,77 @@
+---
+prev: false
+next: false
+title: skip
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Skips the first `n` emissions from the source observable.
+After `n` values are skipped, all subsequent values pass through.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 10, label: '1', color: colors.yellow },
+                { t: 28, label: '2', color: colors.orange },
+                { t: 46, label: '3', color: colors.blue },
+                { t: 64, label: '4', color: colors.purple },
+                { t: 82, label: '5', color: colors.green },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 46, label: '3', color: colors.blue },
+            { t: 64, label: '4', color: colors.purple },
+            { t: 82, label: '5', color: colors.green },
+        ],
+    }}
+    operator="skip(2)"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  num$      1     2     3     4     5
+//  skipped$              3     4     5
+//            |skip 2|
+//
+//  Explanation:
+//  - skip ignores the first n emissions from the source
+//  - After n values are skipped, all subsequent values pass through
+
+const num$ = source<number>();
+
+const skipped$ = num$.pipe(skip(2));
+
+const valueHistory: number[] = [];
+
+skipped$.subscribe((x) => {
+    valueHistory.push(x);
+});
+
+num$.next(1); // skipped
+
+num$.next(2); // skipped
+
+assert.deepStrictEqual(valueHistory, []);
+
+num$.next(3); // logs: 3
+
+assert.deepStrictEqual(valueHistory, [3]);
+
+num$.next(4); // logs: 4
+
+num$.next(5); // logs: 5
+
+assert.deepStrictEqual(valueHistory, [3, 4, 5]);
+```

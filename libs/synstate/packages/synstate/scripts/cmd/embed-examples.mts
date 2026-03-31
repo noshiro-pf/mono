@@ -19,15 +19,16 @@ const documents: DeepReadonly<
     samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
     sampleCodeFiles: [
       '01-simple-state.mts',
-      '02-react-example.tsx',
+      '02-synstate-react-hooks-example.tsx',
       '03-react-18-example.tsx',
-      '04-synstate-react-hooks-example.tsx',
-      '05-global-counter.tsx',
-      '06-todo-reducer.tsx',
-      '07-dark-mode.tsx',
-      '08-cross-component.tsx',
-      '09-search-debounce.tsx',
-      '10-event-emitter-throttle.tsx',
+      '04-react-example.tsx',
+      '05-simple-state-with-additional-api.mts',
+      '06-global-counter.tsx',
+      '07-todo-reducer.tsx',
+      '08-dark-mode.tsx',
+      '09-cross-component.tsx',
+      '10-search-debounce.tsx',
+      '11-event-emitter-throttle.tsx',
     ],
   },
 ] as const;
@@ -37,6 +38,15 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
   try {
     for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
       const markdownContent = await fs.readFile(mdPath, 'utf8');
+
+      const codeBlockCount = markdownContent.split(codeBlockStart).length - 1;
+
+      // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
+      if (codeBlockCount !== sampleCodeFiles.length) {
+        return Result.err(
+          `❌ Code block count mismatch in ${mdPath}: found ${codeBlockCount} \`\`\`tsx blocks but expected ${sampleCodeFiles.length} sample files`,
+        );
+      }
 
       const mut_results: string[] = [];
 

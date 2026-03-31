@@ -4,7 +4,7 @@ import {
   type DropInitialValueOperator,
   type Observable,
   type PairwiseOperatorObservable,
-  type UpdaterSymbol,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -30,30 +30,30 @@ import {
  *
  * const pairs$ = num$.pipe(pairwise());
  *
- * const mut_history: (readonly [number, number])[] = [];
+ * const valueHistory: (readonly [number, number])[] = [];
  *
  * pairs$.subscribe(([prev, curr]) => {
- *   mut_history.push([prev, curr]);
+ *   valueHistory.push([prev, curr]);
  * });
  *
  * num$.next(1); // nothing logged
  *
- * assert.deepStrictEqual(mut_history, []);
+ * assert.deepStrictEqual(valueHistory, []);
  *
  * num$.next(2); // logs: 1, 2
  *
- * assert.deepStrictEqual(mut_history, [[1, 2]]);
+ * assert.deepStrictEqual(valueHistory, [[1, 2]]);
  *
  * num$.next(3); // logs: 2, 3
  *
- * assert.deepStrictEqual(mut_history, [
+ * assert.deepStrictEqual(valueHistory, [
  *   [1, 2],
  *   [2, 3],
  * ]);
  *
  * num$.next(4); // logs: 3, 4
  *
- * assert.deepStrictEqual(mut_history, [
+ * assert.deepStrictEqual(valueHistory, [
  *   [1, 2],
  *   [2, 3],
  *   [3, 4],
@@ -83,12 +83,12 @@ class PairwiseObservableClass<A>
     this.#mut_previousValue = parentObservable.getSnapshot();
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Optional.isNone(sn)) {
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
       return; // skip update
     }
 
@@ -100,7 +100,7 @@ class PairwiseObservableClass<A>
     this.#mut_previousValue = par.getSnapshot();
 
     if (cond) {
-      this.setNext([prev.value, sn.value], updaterSymbol);
+      this.setNext([prev.value, sn.value], updateToken);
     }
   }
 }

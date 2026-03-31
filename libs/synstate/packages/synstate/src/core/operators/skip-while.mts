@@ -4,7 +4,7 @@ import {
   type DropInitialValueOperator,
   type Observable,
   type SkipWhileOperatorObservable,
-  type UpdaterSymbol,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -19,9 +19,9 @@ import {
  * ```ts
  * //  Timeline:
  * //
- * //  num$        1     2     3     4     5     6     7
- * //  skipped$                      5     6     7
- * //              |---- skip -----|
+ * //  num$        1     2     3     4     5     6     7     1     2
+ * //  skipped$                            5     6     7     1     2
+ * //              |-------- skip --------|
  * //
  * //  Explanation:
  * //  - skipWhile skips values while the predicate returns true
@@ -32,27 +32,37 @@ import {
  *
  * const skipped$ = num$.pipe(skipWhile((x) => x < 5));
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * skipped$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
  * num$.next(1); // nothing logged
  *
  * num$.next(2); // nothing logged
  *
+ * num$.next(3); // nothing logged
+ *
+ * num$.next(4); // nothing logged
+ *
  * num$.next(5); // logs: 5
  *
- * assert.deepStrictEqual(mut_history, [5]);
+ * assert.deepStrictEqual(valueHistory, [5]);
  *
  * num$.next(6); // logs: 6
  *
- * assert.deepStrictEqual(mut_history, [5, 6]);
+ * assert.deepStrictEqual(valueHistory, [5, 6]);
  *
  * num$.next(7); // logs: 7
  *
- * assert.deepStrictEqual(mut_history, [5, 6, 7]);
+ * assert.deepStrictEqual(valueHistory, [5, 6, 7]);
+ *
+ * num$.next(1); // logs: 1
+ *
+ * num$.next(2); // logs: 2
+ *
+ * assert.deepStrictEqual(valueHistory, [5, 6, 7, 1, 2]);
  * ```
  */
 export const skipWhile =
@@ -70,6 +80,7 @@ class SkipWhileObservableClass<A>
 {
   readonly #predicate: (value: A, index: SafeUint | -1) => boolean;
   #mut_index: SafeUint | -1;
+  #mut_skipping: boolean;
 
   constructor(
     parentObservable: Observable<A>,
@@ -89,14 +100,16 @@ class SkipWhileObservableClass<A>
     this.#mut_index = -1;
 
     this.#predicate = predicate;
+
+    this.#mut_skipping = true;
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Optional.isNone(sn)) {
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
       return; // skip update
     }
 
@@ -104,7 +117,11 @@ class SkipWhileObservableClass<A>
       this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
     if (!this.#predicate(sn.value, this.#mut_index)) {
-      this.setNext(sn.value, updaterSymbol);
+      this.#mut_skipping = false;
+    }
+
+    if (!this.#mut_skipping) {
+      this.setNext(sn.value, updateToken);
     }
   }
 }

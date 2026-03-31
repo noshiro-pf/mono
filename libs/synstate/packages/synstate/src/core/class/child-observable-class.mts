@@ -1,5 +1,6 @@
 import { Arr } from 'ts-data-forge';
 import {
+  isChildObservable,
   isManagerObservable,
   type AsyncChildObservable,
   type ChildObservable,
@@ -14,13 +15,64 @@ import {
   type WithInitialValueOperator,
   type Wrap,
 } from '../types/index.mjs';
-import { binarySearch, issueUpdaterSymbol, maxDepth } from '../utils/index.mjs';
+import { binarySearch, issueUpdateToken, maxDepth } from '../utils/index.mjs';
 import { ObservableBaseClass } from './observable-base-class.mjs';
+
+/**
+ * Detects circular dependencies by walking the full ancestor chain of the
+ * given parents and checking whether `child` already appears among them.
+ *
+ * @throws {Error} if a circular dependency is detected
+ */
+const hasCircularDependencyFrom = (
+  node: Observable<unknown>,
+  mut_visited: MutableSet<ObservableId>,
+  mut_inPath: MutableSet<ObservableId>,
+): boolean => {
+  if (mut_inPath.has(node.id)) return true;
+
+  if (mut_visited.has(node.id)) return false;
+
+  mut_visited.add(node.id);
+
+  mut_inPath.add(node.id);
+
+  if (isChildObservable(node)) {
+    for (const parent of node.parents) {
+      if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
+        return true;
+      }
+    }
+  }
+
+  mut_inPath.delete(node.id);
+
+  return false;
+};
+
+const detectCircularDependency = (
+  child: ChildObservable<unknown>,
+  parents: readonly Observable<unknown>[],
+): void => {
+  const mut_visited = new Set<ObservableId>();
+
+  const mut_inPath = new Set<ObservableId>([child.id]);
+
+  for (const parent of parents) {
+    if (hasCircularDependencyFrom(parent, mut_visited, mut_inPath)) {
+      throw new Error(
+        'Circular dependency detected in observable graph: a child observable cannot be its own ancestor.',
+      );
+    }
+  }
+};
 
 const registerChild = <A,>(
   child: ChildObservable<A>,
   parents: ChildObservable<A>['parents'],
 ): void => {
+  detectCircularDependency(child, parents);
+
   for (const p of parents) {
     p.addChild(child);
   }
@@ -76,7 +128,7 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   implements AsyncChildObservable<A, P>
 {
   readonly parents;
-  #mut_procedure: readonly ChildObservable<unknown>[];
+  #mut_propagationOrder: readonly ChildObservable<unknown>[];
   protected readonly descendantsIdSet: MutableSet<ObservableId>;
 
   constructor({
@@ -96,7 +148,7 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
 
     this.parents = parents;
 
-    this.#mut_procedure = [];
+    this.#mut_propagationOrder = [];
 
     this.descendantsIdSet = new Set<ObservableId>();
 
@@ -110,20 +162,24 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
     this.descendantsIdSet.add(child.id);
 
     const insertPos = binarySearch(
-      this.#mut_procedure.map((a) => a.depth),
+      this.#mut_propagationOrder.map((a) => a.depth),
       child.depth,
     );
 
-    this.#mut_procedure = Arr.toInserted(this.#mut_procedure, insertPos, child);
+    this.#mut_propagationOrder = Arr.toInserted(
+      this.#mut_propagationOrder,
+      insertPos,
+      child,
+    );
   }
 
   startUpdate(nextValue: A): void {
-    const updaterSymbol = issueUpdaterSymbol();
+    const updateToken = issueUpdateToken();
 
-    this.setNext(nextValue, updaterSymbol);
+    this.setNext(nextValue, updateToken);
 
-    for (const p of this.#mut_procedure) {
-      p.tryUpdate(updaterSymbol);
+    for (const p of this.#mut_propagationOrder) {
+      p.tryUpdate(updateToken);
     }
   }
 

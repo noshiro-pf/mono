@@ -1,0 +1,32 @@
+---
+prev: false
+next: false
+title: createValueEmitter
+---
+
+<!-- jsdoc-description -->
+
+型付きペイロードを持つイベントエミッターを作成します。
+[observable, emitter 関数] のタプルを返します。
+
+<!-- /jsdoc-description -->
+
+## 使用例
+
+```tsx
+const [message$, emitMessage] = createValueEmitter<string>();
+
+const messageHistory: string[] = [];
+
+message$.subscribe((msg) => {
+    messageHistory.push(msg);
+});
+
+emitMessage('Hello'); // logs: Hello
+
+assert.deepStrictEqual(messageHistory, ['Hello']);
+
+emitMessage('World');
+
+assert.deepStrictEqual(messageHistory, ['Hello', 'World']);
+```

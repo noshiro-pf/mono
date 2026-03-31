@@ -1,0 +1,64 @@
+---
+prev: false
+next: false
+title: getKey (pluck)
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+発行される各オブジェクトからキーを指定してプロパティ値を抽出します。
+`map(value => value[key])` と同等です。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 30, label: '{·}', color: colors.yellow },
+                { t: 70, label: '{·}', color: colors.orange },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 30, label: 'Alice', color: colors.yellow },
+            { t: 70, label: 'Bob', color: colors.orange },
+        ],
+    }}
+    operator="getKey('name')"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  user$   { name: "Alice", age: 25 }   { name: "Bob", age: 30 }
+//  name$   "Alice"                       "Bob"
+//
+//  Explanation:
+//  - getKey extracts a property value from each emitted object
+//  - Equivalent to map(value => value[key])
+
+const user$ = source<Readonly<{ name: string; age: number }>>();
+
+const name$ = user$.pipe(getKey('name'));
+
+const valueHistory: string[] = [];
+
+name$.subscribe((n) => {
+    valueHistory.push(n);
+});
+
+user$.next({ name: 'Alice', age: 25 });
+
+assert.deepStrictEqual(valueHistory, ['Alice']);
+
+user$.next({ name: 'Bob', age: 30 });
+
+assert.deepStrictEqual(valueHistory, ['Alice', 'Bob']);
+```

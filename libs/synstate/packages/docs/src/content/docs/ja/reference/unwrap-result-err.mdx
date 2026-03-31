@@ -1,0 +1,69 @@
+---
+prev: false
+next: false
+title: unwrapResultErr
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+`Result` からエラー値をアンラップし、`Err(error)` を `error` に、`Ok` を `undefined` に変換します。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: '1', color: colors.green },
+                { t: 45, label: 'fail', color: colors.red },
+                { t: 75, label: '2', color: colors.green },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 15, label: '·', color: colors.gray },
+            { t: 45, label: 'fail', color: colors.red },
+            { t: 75, label: '·', color: colors.gray },
+        ],
+    }}
+    operator="unwrapResultErr()"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  result$     Ok(1)      Err("fail")   Ok(2)
+//  unwrapped$  undefined  "fail"        undefined
+//
+//  Explanation:
+//  - unwrapResultErr converts Err(error) to error, and Ok to undefined
+//  - Useful for extracting error values from Result streams
+
+const result$ = source<Result<number, string>>();
+
+const unwrapped$ = result$.pipe(unwrapResultErr());
+
+const valueHistory: (string | undefined)[] = [];
+
+unwrapped$.subscribe((v) => {
+    valueHistory.push(v);
+});
+
+result$.next(Result.ok(1));
+
+assert.deepStrictEqual(valueHistory, [undefined]);
+
+result$.next(Result.err('fail'));
+
+assert.deepStrictEqual(valueHistory, [undefined, 'fail']);
+
+result$.next(Result.ok(2));
+
+assert.deepStrictEqual(valueHistory, [undefined, 'fail', undefined]);
+```

@@ -1,0 +1,377 @@
+---
+title: SynState がグリッチを解決した方法
+sidebar:
+    order: 3
+---
+
+import DataTableDemo from '../../../../components/data-table-demo/data-table-demo-island.astro';
+import RxJSGlitchSlideshow from '../../../../components/svg-slideshow/rxjs-glitch-slides-island.astro';
+import SynStatePropagationOrderSlideshow from '../../../../components/svg-slideshow/synstate-propagation-order-island.astro';
+import PriorityQueueSlideshow from '../../../../components/svg-slideshow/priority-queue-slides-island.astro';
+import DataTableGraph from '../../../../components/dep-graph/data-table-graph-island.astro';
+import SimpleDiamondDepGraph from '../../../../components/dep-graph/simple-diamond-dep-graph-island.astro';
+import FilterDiamondDepGraph from '../../../../components/dep-graph/filter-diamond-dep-graph-island.astro';
+import SynStateUpdateTokenSlideshow from '../../../../components/svg-slideshow/synstate-update-token-island.astro';
+
+## グリッチとは?
+
+リアクティブプログラミングにおけるグリッチとは、伝搬中に派生値が一時的に**不整合な中間状態**になる現象です。単一のソース値が変化したとき、それに依存する Observable が一度にすべて更新されるのではなく、一つずつ更新される場合があります。下流の Observable が共通の祖先を持つ複数の上流の値に依存している場合、一部の入力はすでに更新されているが他はまだ古いままという状態を観測してしまい、論理的には存在し得ない値が生成されます。
+
+## シンプルな例
+
+以下の Observable グラフを考えてみましょう：
+
+<SimpleDiamondDepGraph />
+
+SynState のコードでは：
+
+```tsx
+import { collectToArray, combine, counter, map, take } from 'synstate';
+
+const counterObservable = counter(1000 /* ms */);
+// 0, 1, 2, 3, ...
+
+const multipliedBy10 = counterObservable.pipe(map((count) => count * 10));
+// 0, 10, 20, 30, ...
+
+const multipliedBy1000 = counterObservable.pipe(map((count) => count * 1000));
+// 0, 1000, 2000, 3000, ...
+
+const sum = combine([multipliedBy10, multipliedBy1000]).pipe(
+    map(([a, b]) => a + b),
+);
+// 0, 1010, 2020, 3030, ...
+
+const resultPromise = collectToArray(sum.pipe(take(5)));
+
+counterObservable.start();
+
+const result = await resultPromise;
+
+assert.deepStrictEqual(result, [0, 1010, 2020, 3030, 4040]);
+```
+
+`multipliedBy10` と `multipliedBy1000`（`combine` への2つの入力）はどちらも同じソース（`counterObservable`）から派生しています。`counterObservable` が新しい値を発行するたびに、`combine` への両方の入力は**同時に**更新されるべきであり、`sum` は常に `counter * 1010` に等しくなるはずです。
+
+## RxJS で起こること（グリッチ）
+
+RxJS では、`combineLatest` は**いずれか1つの入力が変化した時点で即座に**新しい値を伝搬します。`counterObservable` が新しい値を発行すると、更新は深さ優先でグラフを伝搬します。`combineLatest` は入力を順番にsubscribeするため、カウンターが `0` から `1` に変化するときの典型的なシーケンスは次の通りです：
+
+1. `counterObservable` が `1` を発行
+2. `combineLatest` の `multipliedBy10`（最初の入力）への subscription が実行される — `multipliedBy10` は `10` に再計算されるが、`multipliedBy1000`（2番目の入力）はまだ `0`（古い値）
+3. `combineLatest` が `[10, 0]` を発行 → `sum` が **`10`** を発行 — **グリッチ**
+4. `multipliedBy1000`（同じく `counterObservable` をsubscribeしている）が `1000` に再計算
+5. `combineLatest` が `multipliedBy1000` の `1000` への変化を検知
+6. `combineLatest` が `[10, 1000]` を発行 → `sum` が `1010` を発行 — 正しい値
+
+このパターンはカウンターがインクリメントされるたびに繰り返されます：
+
+```txt
+counter:     0     1           2              3
+             │     │           │              │
+sum (RxJS):  0     10, 1010    1020, 2020     2030, 3030   ...
+                   ↑           ↑              ↑
+                   glitch      glitch         glitch
+```
+
+RxJS における `sum` の完全な出力シーケンスは：
+
+```txt
+0, 10, 1010, 1020, 2020, 2030, 3030, ...
+```
+
+<RxJSGlitchSlideshow />
+
+`10`、`1020`、`2030` などの値は**グリッチ**です。これらは一方の派生 Observable はすでに更新されたが、もう一方はまだ再計算されていない状態を表しています。これらの値は論理的には存在し得ないはずですが（`sum` は常に `1010` の倍数であるべき）、subscriber に発行されてしまい、不正確な UI 描画、無効な API 呼び出し、あるいは見つけにくいバグの原因となる可能性があります。
+
+**注意:** グリッチが現れる順序は、`counterObservable` が subscriber に通知する順序に依存します。上の例では `combineLatest` が `multipliedBy10` → `multipliedBy1000` の順に subscribe するため、`counterObservable` の subscriber リストも同じ順序になり、`multipliedBy10` が先に更新されます。もし `multipliedBy1000` が `multipliedBy10` より先に `counterObservable` を subscribe していた場合、グリッチの値は `1000`、`2010`、`3020` などになります。いずれにしても、2つの派生 Observable がアトミックにではなく1つずつ更新されるためにグリッチが発生します。
+
+以下の RxJS サンプルコードを実行することでこの動作を確認できます：
+
+```tsx
+import {
+    combineLatest,
+    interval,
+    lastValueFrom,
+    map,
+    take,
+    toArray,
+} from 'rxjs';
+
+const counterObservable = interval(100);
+// 0, 1, 2, 3, ...
+
+const multipliedBy10 = counterObservable.pipe(map((count) => count * 10));
+// 0, 10, 20, 30, ...
+
+const multipliedBy1000 = counterObservable.pipe(map((count) => count * 1000));
+// 0, 1000, 2000, 3000, ...
+
+const sum = combineLatest([multipliedBy10, multipliedBy1000]).pipe(
+    map(([a, b]) => a + b),
+);
+// 0, 10, 1010, 20, 2020, 30, 3030, ...
+
+const result = await lastValueFrom(sum.pipe(take(7), toArray()));
+
+assert.deepStrictEqual(result, [0, 10, 1010, 1020, 2020, 2030, 3030]);
+```
+
+### タイムライン
+
+| ステップ | `counterObservable` | `multipliedBy10` | `multipliedBy1000` | `sum` (`multipliedBy10 + multipliedBy1000`) | 整合性?  |
+| -------: | ------------------: | ---------------: | -----------------: | ------------------------------------------: | :------: |
+|        1 |                   0 |                0 |                  0 |                                     **0** ✓ |   Yes    |
+|        2 |                   1 |               10 |                  0 |                                    **10** ✗ | グリッチ |
+|        3 |                   1 |               10 |               1000 |                                  **1010** ✓ |   Yes    |
+|        4 |                   2 |               20 |               1000 |                                  **1020** ✗ | グリッチ |
+|        5 |                   2 |               20 |               2000 |                                  **2020** ✓ |   Yes    |
+|        6 |                   3 |               30 |               2000 |                                  **2030** ✗ | グリッチ |
+|        7 |                   3 |               30 |               3000 |                                  **3030** ✓ |   Yes    |
+
+## これは作為的な例に過ぎないのか?
+
+上記の `counter × 1000 + counter × 10` という計算式は明らかに人工的ですが、その背後にあるパターン — **ダイヤモンド依存関係** — は日常的な UI コードで驚くほど一般的に発生します。2つ以上の派生ステートが共通の祖先を共有している場合、それはダイヤモンドです。
+
+### 実世界の例： フィルター付きデータテーブル
+
+以下のインタラクティブなテーブルは、典型的なデータ閲覧 UI です。レコードの一覧に**列ごとのテキストフィルター**（デバウンス付き）と**ページネーション**コントロールがあります。フィルター入力欄に文字を入力してみてください。キーストロークごとに派生状態の更新チェーンが発生します：
+
+<DataTableDemo />
+
+<DataTableGraph />
+
+`TableSliced` への3つの入力 — `ItemsPerPage`、`TableFiltered`、`CurrentPage` — は**複数の重なり合うダイヤモンド**を形成しています。例えば、`TableFiltered` は `TableSliced` への直接の入力であると同時に、`CurrentPage` の間接的な祖先でもあります（`PageLength` 経由）。同様に、`ItemsPerPage` は `PageLength`（`CurrentPage` に影響する）と `TableSliced` の両方に直接入力されます。フィルター入力または `ItemsPerPageInput` が変化するたびに、`TableSliced` の複数の入力が共通の祖先を共有しており、`TableSliced` を整合的に評価する前にすべてが解決される必要があります。
+
+RxJS のようなプッシュ型ライブラリでは、`combineLatest` が一部の入力はすでに更新されているが他はまだ古い値を保持している中間状態を発行してしまいます。これが目に見えるバグを引き起こすかどうかはアプリケーションによりますが、不整合は常に存在し、グラフの拡大に伴って悪化します。`combineLatest` への $N$ 個の入力がある場合、単一のソース更新で 1 回ではなく **$N+1$ 回の発行**が生じ、[ディープチェーンデモ](/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)で示されるように **$O(N^2)$ の急激な性能劣化**を引き起こします。
+
+## グリッチをどのように排除できるか?
+
+グリッチの根本原因は、子 Observable がすべての祖先の更新が完了する前に評価される可能性があることです。**すべての Observable がその祖先のすべてが更新された後にのみ更新される**ことを保証できれば、グリッチは不可能になります。
+
+### 優先度キューアプローチ
+
+よく知られた解決策は、各 Observable に**レベル**（または深さ）— ルートソースからその Observable までの最長パスの長さ — を割り当て、**優先度キュー**を使用してレベルの昇順で更新を処理することです。
+
+このアプローチは、例えば論文 [_Deprecating the Observer Pattern with Scala.React_](https://infoscience.epfl.ch/server/api/core/bitstreams/edac8552-b524-41c2-a4af-23abf42a0821/content)（Maier & Odersky, 2012）で詳しく解説されています。アルゴリズムは以下のように動作します：
+
+1. ソース Observable が変化しても、子にすぐには通知**しません**。代わりに、無効化されたすべてのノードがレベル順の**優先度キュー**に入れられます。
+2. 伝搬ループは**最低レベル**のノードをデキューし、検証（評価）して、その依存ノード（より高いレベルにある）をキューに追加します。
+3. キューが空になるまでこれを続けます。
+
+キューは常に低レベルのノードを先に処理するため、`combine`（または任意のマルチ親ノード）がデキューされるまでに、そのすべての親はこのサイクルで既に更新されていることが保証されます。一方の親は更新されたがもう一方はまだという中間状態は、下流のノードからは決して観測されません。
+
+ダイヤモンドの例を使って優先度キューアプローチをステップごとにトレースしてみましょう。各ノードにはグラフ内の位置に基づく**レベル**があります：
+
+```txt
+counter             → level 0
+multipliedBy10      → level 1
+multipliedBy1000    → level 1
+sum (combine + map) → level 2
+```
+
+`counter` が `0` から `1` に変化すると、伝搬は以下のように進みます：
+
+| ステップ | アクション                                                                                                        | 優先度キュー（実行後）                         |
+| -------: | :---------------------------------------------------------------------------------------------------------------- | :--------------------------------------------- |
+|        1 | `counter` が `1` に更新。依存先の `multipliedBy10` と `multipliedBy1000` がキューに追加される。                   | `[multipliedBy10 (L1), multipliedBy1000 (L1)]` |
+|        2 | `multipliedBy10`（レベル1）をデキュー。評価： `1 * 10 = 10`。依存先の `sum` がキューに追加される。                | `[multipliedBy1000 (L1), sum (L2)]`            |
+|        3 | `multipliedBy1000`（レベル1）をデキュー。評価： `1 * 1000 = 1000`。依存先の `sum` は既にキューにある — スキップ。 | `[sum (L2)]`                                   |
+|        4 | `sum`（レベル2）をデキュー。評価： `10 + 1000 = 1010`。両方の入力が最新。依存先はなし。                           | `[]`（空）                                     |
+
+キューが空になり、伝搬が完了します。`sum` は **`1010`** を発行します。これは正しい値です。`sum` は両方の親が更新された後にのみ評価されたため、グリッチは発生しませんでした。
+
+[reactivelib/reactive](https://github.com/reactivelib/reactive) は、Scala.React の論文に直接触発された、このトポロジカル順序の伝搬を実装する TypeScript ライブラリです。
+
+<PriorityQueueSlideshow />
+
+### 各アプローチのコスト
+
+優先度キューアプローチはグリッチを正しく排除しますが、**更新のたびに**オーバーヘッドが発生します。ソースが発行するたびに、すべての子孫を優先度キューに追加・取り出しする必要があり、各操作のコストは **$O(\log n)$**（$n$ はグラフ内の Observable の数）です。$n$ 個の子孫を持つグラフの場合、ソース発行あたりの合計伝搬コストは **$O(n \log n)$** になります。
+
+RxJS の深さ優先伝搬はこのオーバーヘッドを回避します — 各ノードは関数呼び出しだけで訪問されます。しかし、RxJS は依存関係グラフを DAG（有向非巡回グラフ）ではなく**ツリー**として扱います。ダイヤモンド依存関係が存在する場合、RxJS は両方のブランチを独立にトラバースします。共有された子孫（例： `combine`）は、それに到達する各ブランチごとに1回ずつ評価されます。
+
+コストはダイアモンドのトポロジーに依存します：
+
+- **ワイドダイアモンド** — $n$ 本のブランチが1つの `combineLatest` に合流する場合。ソース発行ごとに $n+1$ 回の `combineLatest` 評価が発生し、各評価が $n$ 個の入力を処理 → ソース発行あたり **$O(n^2)$**。
+- **カスケードダイアモンド** — $n$ 個のダイアモンドが直列に連なる場合。各ダイアモンドのファンアウト（分岐数）を $D$ とすると、各レベルで emission 数が $D$ 倍になります：レベル 1 は $D$ 回、レベル 2 は $D^2$ 回、…、レベル $n$ は $D^n$ 回 → ソース発行あたり **$O(D^n)$**。二分岐（$D = 2$）の場合は $O(2^n)$ です。
+
+| アプローチ                  | ダイヤモンドなし（ツリー） | ダイヤモンドあり（最悪ケース） |
+| :-------------------------- | :------------------------: | :----------------------------: |
+| RxJS（深さ優先）            |           $O(n)$           |          **$O(D^n)$**          |
+| 優先度キュー（Scala.React） |       $O(n \log n)$        |         $O(n \log n)$          |
+
+（$D$ = ダイアモンド1段あたりのファンアウト）
+
+ダイヤモンド依存関係のないグラフでは、RxJS は $\log n$ 倍高速です。しかしダイヤモンドが存在すると、RxJS の最悪ケースのコストは指数関数的に増大（カスケードダイアモンドの場合）しますが、優先度キューアプローチは $O(n \log n)$ のままです。どちらも **$O(n)$ でのグリッチフリー伝搬**という理想を達成していません。
+
+これは `mousemove` や `pointermove` イベント、アニメーションフレーム、または毎秒数十回から数百回更新が発生する高頻度ストリームなど、パフォーマンスに敏感なシナリオで重要になります。優先度キューアプローチの繰り返されるヒープ操作は蓄積され、ダイヤモンドグラフにおける RxJS の冗長な評価はさらに悪化します。
+
+SynState は両方の問題を解決します。**$O(n)$ でのグリッチフリー伝搬**を実現します。これは RxJS のツリートラバーサルと同じ漸近的コストですが、グリッチがなく、指数的な最悪ケースもありません（$D$ = ダイアモンド1段あたりのファンアウト）。この速度低下は[ディープ依存関係チェーンデモ](/synstate/ja/guides/library-comparison/interactive-demo/#deep-dependency-chain-propagation-under-load)で実際に観察できます。チェーンの深さが増加するにつれて RxJS のスループットが急激に低下する一方、SynState は安定したままです。
+
+## SynState で起こること（グリッチフリー、_O(n)_）
+
+SynState の重要な洞察は、依存関係グラフのトポロジーは**静的**であるということです。Observable が構築されるときに決定され、更新の間に変化しません。これは、伝搬順序を発行のたびに再導出するのではなく、グラフの構築時に**一度だけ**計算できることを意味します。
+
+### 事前ソートされた伝搬順序
+
+Observable が `.pipe()` またはコンビネータ（`combine`、`merge`、`zip`）を介して作成されると、SynState はその**深さ** — 任意のルートソースからの最長パスの長さ — を計算します：
+
+- **ルート Observable**： `depth = 0`.
+- **子 Observable**： `depth = 1 + max(parent depths)`.
+
+各ルート Observable は `propagationOrder` と呼ばれるフラット配列を保持します。これはすべての子孫のリストで、構築時の二分探索挿入により**深さの昇順**で保持されます。ソースが発行すると、伝搬はこの事前ソート済み配列に対するシンプルな線形走査です：
+
+```ts
+// Simplified from RootObservableClass
+startUpdate(nextValue) {
+    const updateToken = issueUpdateToken();
+    this.setNext(nextValue, updateToken);
+
+    // propagationOrder is pre-sorted by depth (ascending)
+    for (const child of this.propagationOrder) {
+        child.tryUpdate(updateToken);
+    }
+}
+```
+
+これは RxJS との重要なアーキテクチャの違いです。RxJS では、各 Observable が自身の値を更新し子に伝搬する責任を持ちます — 伝搬はグラフ全体に分散しています。SynState では、**マネージャー Observable** がすべての子孫の更新を単一のループで中央集権的に管理します。この集中管理方式が、優先度キューなしでの深さ順伝搬を可能にしています。
+
+SynState の Observable 型は `RootObservable`、`SyncChildObservable`、`AsyncChildObservable` です。このうち、`RootObservable` と `AsyncChildObservable` がマネージャーとして機能します。`RootObservable` はグラフのエントリーポイントであり、`AsyncChildObservable` は [`debounce`](/synstate/ja/reference/debounce/) のような時間シフト演算子によって作成されます。その発行は非同期であり上流のルートによって調整できないため、自身の下流サブグラフのマネージャーとして引き継ぎます。
+
+配列は深さでソートされているため、すべての親がその子のいずれよりも先に更新されることが保証されます。これは優先度キューアプローチと同じ正確性の保証ですが、**$O(n)$ の伝搬コスト**で**ランタイムアロケーションがゼロ**です。かかるコストは構築時の $O(\log n)$ 二分探索挿入のみで、これは一回限りの操作です。
+
+<SynStatePropagationOrderSlideshow />
+
+これをダイヤモンドの例に適用すると：
+
+```txt
+depth 0:  counter            ← source emits
+depth 1:  multipliedBy10     ← updated first  (depth 1)
+depth 1:  multipliedBy1000   ← updated next   (depth 1)
+depth 2:  sum (combine)      ← updated last   (depth 2); both inputs are up-to-date
+```
+
+SynState における `sum` の出力は：
+
+```txt
+0, 1010, 2020, 3030, 4040, ...
+```
+
+中間状態はありません。グリッチはありません。subscriber に発行されるすべての値が整合的です。
+
+### タイムライン
+
+| ステップ | `counterObservable` | `multipliedBy10` | `multipliedBy1000` | `sum` (`multipliedBy10 + multipliedBy1000`) | 整合性? |
+| -------: | ------------------: | ---------------: | -----------------: | ------------------------------------------: | :-----: |
+|        1 |                   0 |                0 |                  0 |                                     **0** ✓ |   Yes   |
+|        2 |                   1 |               10 |               1000 |                                  **1010** ✓ |   Yes   |
+|        3 |                   2 |               20 |               2000 |                                  **2020** ✓ |   Yes   |
+|        4 |                   3 |               30 |               3000 |                                  **3030** ✓ |   Yes   |
+
+### スキップされた更新の処理： 更新トークン
+
+深さ順の線形スキャンは、すべてのノードが更新される場合にグリッチを排除します。しかし、すべてのノードが毎サイクル更新されるわけではありません — `filter` や `skipIfNoChange` のような演算子は発行を**スキップ**することができます。これにより微妙な問題が生じます： 下流のノードは、親が現在のサイクルで意図的にスキップされたのか、まだ到達していないだけなのかをどう判断すればよいのでしょうか？
+
+`D` が `filter` を適用する以下のグラフを考えてみましょう：
+
+<FilterDiamondDepGraph />
+
+```tsx
+const A = counter(1000);
+// 0, 1, 2, 3, 4, ...
+
+const B = A.pipe(map((n) => n * 10));
+// 0, 10, 20, 30, 40, ...
+
+const D = A.pipe(filter((n) => n % 2 === 0));
+// 0, 2, 4, ...  (odd values are skipped)
+
+const C = combine([B, D]).pipe(map(([b, d]) => b + d));
+// sum of B and D: 0, 10, 22, 32, 44, 54, 66, ...
+
+const E = D.pipe(map((n) => n * 10));
+// 0, 20, 40, ...
+
+const resultC = collectToArray(C.pipe(take(7)));
+
+const resultE = collectToArray(E.pipe(take(4)));
+```
+
+`A` が**偶数**の値（例： `2`）を発行すると、すべてのノードが更新されます： `B` は `20` に、`D` は `2` を通過し、`C` は `22` を発行、`E` は `20` になります。しかし `A` が**奇数**の値（例： `1`）を発行すると、`D` は述語を通過しません。そのため `D` とその子孫 `E` は更新されるべきではありませんが、`B` は `10` に更新され、`C` は `B` が変化したため再評価されるべきです。課題は、`propagationOrder` が**線形化された**リストであること — 元の親子関係は平坦化されています。マネージャーがこのリストを走査する際、各ノードはこのサイクルで自身の親が更新されたのかスキップされたのかを自力で判断する必要があります。
+
+SynState はこれを、各更新サイクルに一意のアイデンティティ — **更新トークン** — を与えることで解決します。トークンは各サイクルの開始時に `issueUpdateToken()` で作成される `Symbol` であり、以下のようにグラフを流れます：
+
+1. マネージャーが新しいトークンを作成し、`setNext(value, token)` で自身にスタンプを押します。
+2. 同じトークンが線形スキャン中にすべての子孫の `tryUpdate(token)` メソッドに渡されます。
+3. 子が正常に更新されると、`setNext(newValue, token)` を呼び出し、現在のサイクルのトークンで自身にスタンプを押します。
+4. 子が**スキップ**した場合（例： `filter` の述語が `false` を返す）、`setNext` を呼び出し**ません** — そのため `updateToken` は**前の**サイクルのトークンのままです。
+
+これによりシンプルな不変条件が成立します： **ノードの `updateToken` が現在のサイクルのトークンと等しいのは、そのノードがこのサイクルで更新された場合かつその場合に限ります。** 各ノードは $O(1)$ の単一の参照比較で親のこれをチェックし、更新するかスキップするかを決定します：
+
+- **単一親演算子**（例： `map`、`scan`）： `parent.updateToken === token` をチェック。親のトークンが一致しない場合、親はスキップされたので子もスキップします。
+- **複数親演算子**（例： `combine`）： **少なくとも1つ**の親のトークンが一致するかをチェック。すべての親がスキップされた場合、`combine` もスキップします。少なくとも1つが更新された場合、`combine` はすべての親（このサイクルで更新されたかどうかにかかわらず）の最新のスナップショットを使用して再評価します。
+
+```ts
+// Simplified from CombineObservableClass
+override tryUpdate(updateToken: UpdateToken): void {
+    // Skip only if ALL parents were skipped in this cycle
+    if (this.parents.every((o) => o.updateToken !== updateToken)) return;
+
+    const parentValues = this.parents.map((a) => a.getSnapshot());
+    // ... emit combined value ...
+}
+```
+
+```ts
+// Simplified from FilterObservableClass
+override tryUpdate(updateToken: UpdateToken): void {
+    const par = this.parents[0];
+
+    if (par.updateToken !== updateToken) {
+        return; // parent was skipped → skip this node too
+    }
+
+    const sn = par.getSnapshot();
+
+    if (this.predicate(sn.value)) {
+        this.setNext(sn.value, updateToken); // stamp with token → "I updated"
+    }
+    // If predicate fails: no setNext → updateToken stays stale → descendants know to skip
+}
+```
+
+各ノードのスキップ/更新の判断が定数時間のトークン比較で済むため、単一の更新サイクルの全体コストは **$O(n)$**（$n$ は子孫の数）のままです。各ノードのコストは**サイクルあたり償却 $O(1)$** です。
+
+<SynStateUpdateTokenSlideshow />
+
+## まとめ
+
+| アプローチ                  | ダイヤモンドなし（ツリー） | ダイヤモンドあり（最悪ケース） | グリッチフリー? |
+| :-------------------------- | :------------------------: | :----------------------------: | :-------------: |
+| RxJS（深さ優先）            |           $O(n)$           |          **$O(D^n)$**          |       No        |
+| 優先度キュー（Scala.React） |       $O(n \log n)$        |         $O(n \log n)$          |       Yes       |
+| **SynState**                |         **$O(n)$**         |           **$O(n)$**           |     **Yes**     |
+
+SynState は、依存関係グラフの2つの性質を活用して $O(n)$ でのグリッチフリー伝搬を実現しています：
+
+1. **静的トポロジー** — グラフ構造は構築時に固定されるため、伝搬順序（`propagationOrder`）を発行のたびに再導出するのではなく一度だけ事前計算できます。
+2. **更新トークン** — サイクルごとの一意のトークンにより、各ノードが $O(1)$ で自身の親が現在のサイクルに参加したかどうかを判断でき、`propagationOrder` がグラフ構造のないフラットリストであっても正しいスキップ/更新の判断が可能になります。
+
+### 循環依存の検出
+
+SynState の伝搬モデルは、依存関係グラフが **DAG**（有向非巡回グラフ）であることを前提としています。これをランタイムで保証するために、SynState は**構築時に循環チェック**を実行します。`.pipe()` またはコンビネータ（`combine`、`merge`、`zip`）を介して新しい Observable が作成されるたびに、祖先チェーンの深さ優先探索により、自分自身が祖先に含まれていないことを検証します。循環が検出された場合、即座にエラーがスローされます：
+
+```
+Circular dependency detected in observable graph:
+a child observable cannot be its own ancestor.
+```
+
+これにより、初期のグラフ構築が成功した後は、すべての後続の更新サイクルが DAG 上で動作することが保証されます — 無限ループも伝搬順序の破損もありません。
+
+他のライブラリは循環を異なる方法で処理します：
+
+- **RxJS** は循環検出を行いません。実際には、`pipe()` と `combineLatest()` は前方のみの構築パターンに従います — 既に存在する Observable のみを参照できるため、通常の使用では循環はほとんど発生しません。しかし、SynState の構築時 DFS チェックとは異なり、RxJS はセーフティネットとしての明示的な検証を提供しません。
+- **Jotai** は循環を検出しません。循環的な `atom` 定義（例： `atomA` が `atomB` を読み、`atomB` が `atomA` を読む）は定義時にエラーなく受け入れられます。循環は atom が読まれたときにのみ顕在化し、明確なエラーメッセージではなく `Maximum call stack size exceeded`（スタックオーバーフロー）でクラッシュします。
+
+これらの動作は[循環依存の比較テスト](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/class/circular-dependency-comparison.test.mts)で検証されています。

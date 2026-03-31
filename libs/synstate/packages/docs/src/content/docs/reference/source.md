@@ -1,0 +1,45 @@
+---
+prev: false
+next: false
+title: source
+---
+
+<!-- jsdoc-description -->
+
+Creates a new Observable source that can manually emit values.
+This is the primary way to create root observables that start reactive chains.
+
+<!-- /jsdoc-description -->
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  count$    1     2     3     ...
+//
+//  Explanation:
+//  - source creates a new observable that you can manually emit values to
+//  - Use .next() to emit values
+//  - Foundation for building custom observables
+
+const count$ = source<number>();
+
+const valueHistory: number[] = [];
+
+count$.subscribe((value) => {
+    valueHistory.push(value);
+});
+
+count$.next(1); // logs: 1
+
+assert.deepStrictEqual(valueHistory, [1]);
+
+count$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [1, 2]);
+
+count$.next(3); // logs: 3
+
+assert.deepStrictEqual(valueHistory, [1, 2, 3]);
+```

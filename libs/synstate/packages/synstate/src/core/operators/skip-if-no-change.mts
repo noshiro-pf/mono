@@ -4,7 +4,7 @@ import {
   type KeepInitialValueOperator,
   type Observable,
   type SkipIfNoChangeOperatorObservable,
-  type UpdaterSymbol,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -19,8 +19,8 @@ import {
  * ```ts
  * //  Timeline:
  * //
- * //  num$      1     1     2     2     2     3
- * //  distinct$ 1           2                 3
+ * //  num$      1     1     2     2     1     2     3     2
+ * //  distinct$ 1           2           1     2     3     2
  * //
  * //  Explanation:
  * //  - skipIfNoChange filters out consecutive duplicate values
@@ -31,29 +31,41 @@ import {
  *
  * const distinct$ = num$.pipe(skipIfNoChange());
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * distinct$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
  * num$.next(1); // logs: 1
  *
- * assert.deepStrictEqual(mut_history, [1]);
+ * assert.deepStrictEqual(valueHistory, [1]);
  *
  * num$.next(1); // nothing logged
  *
- * assert.deepStrictEqual(mut_history, [1]);
+ * assert.deepStrictEqual(valueHistory, [1]);
  *
  * num$.next(2); // logs: 2
  *
- * assert.deepStrictEqual(mut_history, [1, 2]);
+ * assert.deepStrictEqual(valueHistory, [1, 2]);
  *
  * num$.next(2); // nothing logged
  *
+ * num$.next(1); // logs: 1
+ *
+ * assert.deepStrictEqual(valueHistory, [1, 2, 1]);
+ *
+ * num$.next(2); // logs: 2
+ *
+ * assert.deepStrictEqual(valueHistory, [1, 2, 1, 2]);
+ *
  * num$.next(3); // logs: 3
  *
- * assert.deepStrictEqual(mut_history, [1, 2, 3]);
+ * assert.deepStrictEqual(valueHistory, [1, 2, 1, 2, 3]);
+ *
+ * num$.next(2); // logs: 2
+ *
+ * assert.deepStrictEqual(valueHistory, [1, 2, 1, 2, 3, 2]);
  * ```
  */
 export const skipIfNoChange = <A,>(
@@ -92,12 +104,12 @@ class SkipIfNoChangeObservableClass<A>
     this.#eq = eq;
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Optional.isNone(sn)) {
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
       return; // skip update
     }
 
@@ -109,7 +121,7 @@ class SkipIfNoChangeObservableClass<A>
     this.#mut_previousValue = sn;
 
     if (cond) {
-      this.setNext(sn.value, updaterSymbol);
+      this.setNext(sn.value, updateToken);
     }
   }
 }

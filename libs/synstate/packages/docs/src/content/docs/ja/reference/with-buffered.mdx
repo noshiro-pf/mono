@@ -1,0 +1,85 @@
+---
+prev: false
+next: false
+title: withBuffered (withBufferedFrom)
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+ソース Observable からの値をバッファリングし、親が発行する際に親の値と一緒に発行します。
+バッファは各発行後にクリアされます。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 8, label: 'A', color: colors.yellow },
+                { t: 18, label: 'B', color: colors.orange },
+                { t: 50, label: 'C', color: colors.blue },
+            ],
+        },
+        {
+            marbles: [
+                { t: 35, label: '1', color: colors.purple },
+                { t: 75, label: '2', color: colors.green },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 35, label: '1,AB', color: colors.purple },
+            { t: 75, label: '2,C', color: colors.green },
+        ],
+    }}
+    operator="withBufferedFrom(data$)"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  data$       d1    d2    d3    d4    d5    d6    d7    d8
+//  trigger$                T1                T2                T3
+//  result$                 [T1,[d1,d2,d3]]   [T2,[d4,d5,d6]]   [T3,[d7,d8]]
+//
+//  Explanation:
+//  - withBufferedFrom collects values from the source observable
+//  - When the trigger emits, it emits a tuple of [triggerValue, bufferedValues]
+//  - Buffer is cleared after each emission
+//  - Useful for batching data collection triggered by events
+
+const data$ = source<string>();
+
+const trigger$ = source<number>();
+
+const result$ = trigger$.pipe(withBufferedFrom(data$));
+
+const valueHistory: (readonly [number, readonly string[]])[] = [];
+
+result$.subscribe(([triggerValue, bufferedData]) => {
+    valueHistory.push([triggerValue, bufferedData]);
+});
+
+data$.next('A');
+
+data$.next('B');
+
+trigger$.next(1);
+
+assert.deepStrictEqual(valueHistory, [[1, ['A', 'B']]]);
+
+data$.next('C');
+
+trigger$.next(2);
+
+assert.deepStrictEqual(valueHistory, [
+    [1, ['A', 'B']],
+    [2, ['C']],
+]);
+```

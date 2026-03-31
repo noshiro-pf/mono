@@ -1,0 +1,21 @@
+--- en/04-synstate-debounce-fetch.mts
++++ ja/04-synstate-debounce-fetch.mts
+@@ -7,14 +7,14 @@
+ } from 'synstate';
+ 
+ // embed-sample-code-ignore-above
+-// SynState: declarative pipeline outside any component
++// SynState： コンポーネントの外での宣言的パイプライン
+ const [query, setQuery] = createState('');
+ 
+ const results = query
+-  .pipe(debounce(300)) // wait for typing to pause
+-  .pipe(skipIfNoChange()) // skip if the debounced value is the same
++  .pipe(debounce(300)) // 入力の一時停止を待つ
++  .pipe(skipIfNoChange()) // デバウンス後の値が同じならスキップ
+   .pipe(
+-    // cancel previous fetch if a new query arrives
++    // 新しいクエリが来たら前の fetch をキャンセル
+     switchMap((q) =>
+       fromAbortablePromise((signal) =>
+         fetch(`/api/search?q=${q}`, { signal }).then((r) => r.json()),

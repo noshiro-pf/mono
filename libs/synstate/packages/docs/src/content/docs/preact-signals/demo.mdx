@@ -1,0 +1,339 @@
+---
+title: Preact Signals Demo
+description: Interactive demos for synstate-preact-signals — bridging synstate observables with Preact Signals for fine-grained DOM updates.
+sidebar:
+    order: 1
+---
+
+import RenderCountDemo from '../../../components/preact-signals-demo/render-count-demo-island.astro';
+import CounterDemo from '../../../components/preact-signals-demo/counter-demo-island.astro';
+import SignalBridgeDemo from '../../../components/preact-signals-demo/signal-bridge-demo-island.astro';
+
+`synstate-preact-signals` provides a bridge between synstate's observable system and [Preact Signals](https://preactjs.com/guide/v10/signals/). This enables **fine-grained DOM updates** — only the affected text nodes are updated, without re-rendering the entire component.
+
+The demos below exercise the actual `synstate-preact-signals` API running in the browser. See the [API Reference](/synstate/reference/api/#preact-signals-synstate-preact-signals) for full documentation of each function.
+
+---
+
+## Demo 1: Render Count — Hooks vs Signals
+
+<RenderCountDemo />
+
+<details>
+<summary>Source code</summary>
+
+```tsx
+import * as Preact from 'preact/hooks';
+import { createState as createStateBase } from 'synstate';
+import { useObservableValue } from 'synstate-preact-hooks';
+import { toSignal } from 'synstate-preact-signals';
+
+// Shared observable state — both panels read from the same source
+const [
+    sharedCount$,
+    ,
+    { updateState: updateSharedCount, resetState: resetSharedCount },
+] = createStateBase(0);
+
+const decrement = (): void => {
+    updateSharedCount((n) => n - 1);
+};
+
+const increment = (): void => {
+    updateSharedCount((n) => n + 1);
+};
+
+// Signal version of the same state
+const countSignal = toSignal(sharedCount$);
+
+// ---------------------------------------------------------------------------
+// Combined Demo
+// ---------------------------------------------------------------------------
+
+export const RenderCountDemo = (): preact.JSX.Element => (
+    <div>
+        <div style={panelsRowStyle}>
+            <HooksPanel />
+            <SignalsPanel />
+        </div>
+        <div style={controlsStyle}>
+            <button style={buttonStyle} type={'button'} onClick={decrement}>
+                {'-1'}
+            </button>
+            <button style={buttonStyle} type={'button'} onClick={increment}>
+                {'+1'}
+            </button>
+            <button
+                style={buttonStyle}
+                type={'button'}
+                onClick={resetSharedCount as () => void}
+            >
+                {'Reset'}
+            </button>
+        </div>
+    </div>
+);
+
+// ---------------------------------------------------------------------------
+// Hooks Panel — re-renders the entire component on every change
+// ---------------------------------------------------------------------------
+
+const HooksPanel = (): preact.JSX.Element => {
+    const count = useObservableValue(sharedCount$);
+
+    // Count renders via a ref that increments on every function body execution
+    const renderCountRef = Preact.useRef(0);
+
+    renderCountRef.current += 1;
+
+    return (
+        <div style={panelStyle}>
+            <div style={panelTitleStyle}>{'synstate-preact-hooks'}</div>
+            <div style={valueStyle}>{count}</div>
+            <div style={renderCountStyle}>
+                {'Render count: '}
+                <strong>{renderCountRef.current}</strong>
+            </div>
+        </div>
+    );
+};
+
+// ---------------------------------------------------------------------------
+// Signals Panel — renders once, only the Signal text nodes update
+// ---------------------------------------------------------------------------
+
+const SignalsPanel = (): preact.JSX.Element => {
+    // Count renders — this should stay at 1
+    const renderCountRef = Preact.useRef(0);
+
+    renderCountRef.current += 1;
+
+    return (
+        <div style={panelStyle}>
+            <div style={panelTitleStyle}>{'synstate-preact-signals'}</div>
+            <div style={valueStyle}>{countSignal}</div>
+            <div style={renderCountStyle}>
+                {'Render count: '}
+                <strong>{renderCountRef.current}</strong>
+            </div>
+        </div>
+    );
+};
+```
+
+</details>
+
+Click the buttons and watch the render counts:
+
+- **Hooks panel** — the render count increases on every state change because `useObservableValue` triggers a component re-render.
+- **Signals panel** — the render count stays at **1** because `toSignal` returns a Preact Signal that updates only the DOM text node, bypassing the component re-render cycle.
+
+This is the primary advantage of Preact Signals integration: components with expensive render trees (many children, complex JSX) benefit from skipping unnecessary virtual DOM diffing.
+
+---
+
+## Demo 2: Counter — createState with Signals
+
+<CounterDemo />
+
+<details>
+<summary>Source code</summary>
+
+```tsx
+import { map } from 'synstate';
+import {
+    createBooleanState,
+    createState,
+    toSignal,
+} from 'synstate-preact-signals';
+
+// State: counter
+const [
+    countSignal,
+    _setCount,
+    { state: count$, updateState, resetState, getSnapshot },
+] = createState(0);
+
+const decrement = (): void => {
+    updateState((n) => n - 1);
+};
+
+const increment = (): void => {
+    updateState((n) => n + 1);
+};
+
+// Derived: doubled value via map + toSignal
+const doubledSignal = toSignal(count$.pipe(map((n) => n * 2)));
+
+// State: visibility toggle via createBooleanState
+const [isVisibleSignal, { toggle: toggleVisibility }] =
+    createBooleanState(true);
+
+export const CounterDemo = (): preact.JSX.Element => (
+    <div>
+        <div style={rowStyle}>
+            <span style={labelStyle}>{'Count:'}</span>
+            <span style={valueStyle}>{countSignal}</span>
+        </div>
+        <div style={rowStyle}>
+            <span style={labelStyle}>{'Doubled (map + toSignal):'}</span>
+            <span style={valueStyle}>{doubledSignal}</span>
+        </div>
+        <div style={rowStyle}>
+            <span style={labelStyle}>{'Visible (createBooleanState):'}</span>
+            <span style={valueStyle}>
+                {isVisibleSignal.value ? 'Yes' : 'No'}
+            </span>
+        </div>
+        {isVisibleSignal.value ? (
+            <div style={boxStyle}>
+                {'This box is controlled by createBooleanState.'}
+            </div>
+        ) : undefined}
+        <div style={controlsStyle}>
+            <button style={buttonStyle} type={'button'} onClick={decrement}>
+                {'-1'}
+            </button>
+            <button style={buttonStyle} type={'button'} onClick={increment}>
+                {'+1'}
+            </button>
+            <button style={buttonStyle} type={'button'} onClick={resetState}>
+                {'Reset'}
+            </button>
+            <button
+                style={buttonStyle}
+                type={'button'}
+                onClick={toggleVisibility}
+            >
+                {'Toggle Visibility'}
+            </button>
+            <button
+                style={buttonStyle}
+                type={'button'}
+                onClick={() => {
+                    // eslint-disable-next-line no-alert
+                    alert(`getSnapshot() = ${String(getSnapshot())}`);
+                }}
+            >
+                {'getSnapshot()'}
+            </button>
+        </div>
+    </div>
+);
+```
+
+</details>
+
+Exercises the signal-returning wrappers:
+
+- **`createState`** — returns a `ReadonlySignal` instead of a hook. The counter value updates in-place.
+- **`map` + `toSignal`** — derives a new signal from the underlying observable. The "Doubled" value is computed via `count$.pipe(map(n => n * 2))` then bridged to a signal.
+- **`createBooleanState`** — convenience wrapper for boolean toggles. The visibility box demonstrates `setTrue`, `setFalse`, and `toggle`.
+- **`getSnapshot()`** — reads the current value synchronously, useful for event handlers.
+
+---
+
+## Demo 3: Signal ↔ Observable Bridge
+
+<SignalBridgeDemo />
+
+<details>
+<summary>Source code</summary>
+
+```tsx
+import { signal } from '@preact/signals';
+import { debounce, map } from 'synstate';
+import { fromSignal, toSignal } from 'synstate-preact-signals';
+
+// Raw input signal (Preact Signal — updates immediately on every keystroke)
+const inputSignal = signal('');
+
+// Bridge: Signal → Observable (via fromSignal)
+const [input$, _dispose] = fromSignal(inputSignal);
+
+// Apply synstate operators on the observable side
+const debouncedInput$ = input$.pipe(debounce(500));
+
+// Bridge back: Observable → Signal (via toSignal)
+const debouncedSignal = toSignal(debouncedInput$, '');
+
+// Count how many times the debounced value has changed
+const updateCount$ = debouncedInput$.pipe(map((_, i) => i + 1));
+
+const updateCountSignal = toSignal(updateCount$);
+
+// Track input length as a derived observable
+const inputLength$ = input$.pipe(map((s) => s.length));
+
+const inputLengthSignal = toSignal(inputLength$);
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+export const SignalBridgeDemo = (): preact.JSX.Element => (
+    <div>
+        <div style={inputRowStyle}>
+            <label style={labelStyle}>
+                {'Input (Preact Signal): '}
+                <input
+                    style={inputStyle}
+                    type={'text'}
+                    placeholder={'Type something...'}
+                    value={inputSignal}
+                    onInput={(e) => {
+                        // eslint-disable-next-line functional/immutable-data, total-functions/no-unsafe-type-assertion
+                        inputSignal.value = (
+                            e.target as HTMLInputElement
+                        ).value;
+                    }}
+                />
+            </label>
+        </div>
+
+        <div style={gridStyle}>
+            <div style={cellStyle}>
+                <div style={cellLabelStyle}>{'Raw signal value'}</div>
+                <div style={cellValueStyle}>{inputSignal}</div>
+            </div>
+            <div style={cellStyle}>
+                <div style={cellLabelStyle}>{'Debounced (500ms)'}</div>
+                <div style={cellValueStyle}>{debouncedSignal}</div>
+            </div>
+            <div style={cellStyle}>
+                <div style={cellLabelStyle}>{'Input length (map)'}</div>
+                <div style={cellValueStyle}>{inputLengthSignal}</div>
+            </div>
+            <div style={cellStyle}>
+                <div style={cellLabelStyle}>
+                    {'Debounce update count (map)'}
+                </div>
+                <div style={cellValueStyle}>{updateCountSignal}</div>
+            </div>
+        </div>
+
+        <div style={pipelineStyle}>
+            <code style={codeStyle}>
+                {'Signal → fromSignal → debounce(500) → toSignal'}
+            </code>
+            <br />
+            <code style={codeStyle}>
+                {'Signal → fromSignal → map(s => s.length) → toSignal'}
+            </code>
+            <br />
+            <code style={codeStyle}>
+                {'Signal → fromSignal → debounce(500) → map(index) → toSignal'}
+            </code>
+        </div>
+    </div>
+);
+```
+
+</details>
+
+Demonstrates bidirectional conversion:
+
+- **`fromSignal`** — converts a Preact Signal into a synstate Observable, enabling the full operator chain (`debounce`, `map`, etc.).
+- **`toSignal`** — converts the processed Observable back into a Signal for rendering.
+- The input updates instantly (raw Signal), while the debounced value settles after 500ms of inactivity.
+- The update count and input length both use `map` — the count leverages the second argument (emission index) via `map((_, i) => i + 1)`.

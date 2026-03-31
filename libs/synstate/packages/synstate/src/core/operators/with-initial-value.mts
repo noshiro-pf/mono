@@ -4,7 +4,7 @@ import { source } from '../create/index.mjs';
 import {
   type InitializedObservable,
   type Observable,
-  type UpdaterSymbol,
+  type UpdateToken,
   type WithInitialValueOperator,
   type WithInitialValueOperatorObservable,
 } from '../types/index.mjs';
@@ -37,21 +37,21 @@ import {
  *
  * const initialized$ = num$.pipe(withInitialValue(0));
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * initialized$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
- * assert.deepStrictEqual(mut_history, [0]);
+ * assert.deepStrictEqual(valueHistory, [0]);
  *
  * num$.next(1); // logs: 1
  *
- * assert.deepStrictEqual(mut_history, [0, 1]);
+ * assert.deepStrictEqual(valueHistory, [0, 1]);
  *
  * num$.next(2); // logs: 2
  *
- * assert.deepStrictEqual(mut_history, [0, 1, 2]);
+ * assert.deepStrictEqual(valueHistory, [0, 1, 2]);
  * ```
  */
 export const withInitialValue =
@@ -70,16 +70,16 @@ class WithInitialValueObservableClass<A, I>
     });
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Optional.isNone(sn)) {
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
       return; // skip update
     }
 
-    this.setNext(sn.value, updaterSymbol);
+    this.setNext(sn.value, updateToken);
   }
 }
 

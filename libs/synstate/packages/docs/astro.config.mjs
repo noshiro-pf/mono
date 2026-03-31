@@ -1,0 +1,218 @@
+import preact from '@astrojs/preact';
+import react from '@astrojs/react';
+import starlight from '@astrojs/starlight';
+import { defineConfig } from 'astro/config';
+import rehypeKatex from 'rehype-katex';
+import remarkMath from 'remark-math';
+
+export default defineConfig({
+  site: 'https://noshiro-pf.github.io',
+  base: '/synstate/',
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
+  },
+  integrations: [
+    react({
+      include: ['**/components/**', '!**/components/preact-signals-demo/**'],
+    }),
+    preact({
+      include: ['**/components/preact-signals-demo/**'],
+    }),
+    starlight({
+      title: 'SynState',
+      customCss: ['./src/styles/custom.css'],
+      defaultLocale: 'root',
+      locales: {
+        root: { label: 'English', lang: 'en' },
+        ja: { label: '日本語', lang: 'ja' },
+      },
+      social: [
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/noshiro-pf/synstate',
+        },
+      ],
+      favicon: '/favicon/favicon.ico',
+      head: [
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'stylesheet',
+            href: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css',
+            integrity:
+              'sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+',
+            crossorigin: 'anonymous',
+          },
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'icon',
+            type: 'image/png',
+            sizes: '32x32',
+            href: '/synstate/favicon/favicon-32x32.png',
+          },
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'icon',
+            type: 'image/png',
+            sizes: '16x16',
+            href: '/synstate/favicon/favicon-16x16.png',
+          },
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'apple-touch-icon',
+            sizes: '180x180',
+            href: '/synstate/favicon/apple-icon-180x180.png',
+          },
+        },
+      ],
+      sidebar: [
+        {
+          label: 'Getting Started',
+          translations: { ja: 'はじめに' },
+          autogenerate: { directory: 'getting-started' },
+        },
+        {
+          label: 'Guides',
+          translations: { ja: 'ガイド' },
+          autogenerate: { directory: 'guides' },
+        },
+        {
+          label: 'Examples',
+          translations: { ja: 'サンプル' },
+          autogenerate: { directory: 'examples' },
+        },
+        {
+          label: 'Preact Signals',
+          translations: { ja: 'Preact Signals' },
+          items: [{ slug: 'preact-signals/demo' }],
+        },
+        {
+          label: 'Internals',
+          translations: { ja: '内部実装' },
+          collapsed: true,
+          autogenerate: { directory: 'internals' },
+        },
+        {
+          label: 'API Reference',
+          translations: { ja: 'API リファレンス' },
+          collapsed: true,
+          items: [
+            { slug: 'reference/api' },
+            {
+              label: 'State Management',
+              translations: { ja: '状態管理' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/create-state' },
+                { slug: 'reference/create-reducer' },
+                { slug: 'reference/create-boolean-state' },
+              ],
+            },
+            {
+              label: 'Event System',
+              translations: { ja: 'イベントシステム' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/create-value-emitter' },
+                { slug: 'reference/create-event-emitter' },
+              ],
+            },
+            {
+              label: 'Creation Functions',
+              translations: { ja: '作成関数' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/source' },
+                { slug: 'reference/from-promise' },
+                { slug: 'reference/from-subscribable' },
+                { slug: 'reference/counter' },
+                { slug: 'reference/timer' },
+              ],
+            },
+            {
+              label: 'Combination',
+              translations: { ja: 'コンビネーター' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/combine' },
+                { slug: 'reference/merge' },
+                { slug: 'reference/zip' },
+              ],
+            },
+            {
+              label: 'Operators — Map',
+              translations: { ja: 'オペレーター — Map' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/map' },
+                { slug: 'reference/map-to' },
+                { slug: 'reference/get-key' },
+                { slug: 'reference/attach-index' },
+                { slug: 'reference/map-optional' },
+                { slug: 'reference/map-result-ok' },
+                { slug: 'reference/map-result-err' },
+                { slug: 'reference/unwrap-optional' },
+                { slug: 'reference/unwrap-result-ok' },
+                { slug: 'reference/unwrap-result-err' },
+              ],
+            },
+            {
+              label: 'Operators — FlatMap',
+              translations: { ja: 'オペレーター — FlatMap' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/merge-map' },
+                { slug: 'reference/switch-map' },
+              ],
+            },
+            {
+              label: 'Operators — Filtering',
+              translations: { ja: 'オペレーター — フィルタリング' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/filter' },
+                { slug: 'reference/skip-if-no-change' },
+                { slug: 'reference/skip' },
+                { slug: 'reference/take' },
+                { slug: 'reference/skip-while' },
+                { slug: 'reference/take-while' },
+                { slug: 'reference/skip-until' },
+                { slug: 'reference/take-until' },
+              ],
+            },
+            {
+              label: 'Operators — Time',
+              translations: { ja: 'オペレーター — 時間' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/debounce' },
+                { slug: 'reference/throttle' },
+                { slug: 'reference/audit' },
+              ],
+            },
+            {
+              label: 'Operators — Others',
+              translations: { ja: 'オペレーター — その他' },
+              collapsed: true,
+              items: [
+                { slug: 'reference/scan' },
+                { slug: 'reference/pairwise' },
+                { slug: 'reference/with-initial-value' },
+                { slug: 'reference/with-current-value-from' },
+                { slug: 'reference/with-buffered' },
+              ],
+            },
+          ],
+        },
+      ],
+    }),
+  ],
+});

@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
 
     //  Timeline:
     //
-    //  num$      1     2     3     4     5     6 (ignored)
+    //  num$      1     2     3     4     5     6     1     2 (ignored)
     //  taken$    1     2     3     4     | (completes)
     //
     //  Explanation:
@@ -18,27 +18,36 @@ if (import.meta.vitest !== undefined) {
 
     const taken$ = num$.pipe(takeWhile((x) => x < 5));
 
-    const mut_history: number[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: number[] = [];
 
     taken$.subscribe((x) => {
-      mut_history.push(x);
+      valueHistory.push(x);
     });
 
     num$.next(1); // logs: 1
 
-    assert.deepStrictEqual(mut_history, [1]);
+    assert.deepStrictEqual(valueHistory, [1]);
 
     num$.next(2); // logs: 2
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    num$.next(3); // logs: 3
+
+    num$.next(4); // logs: 4
+
+    assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
 
     num$.next(5); // nothing logged (completes)
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
 
     num$.next(6); // nothing logged (already completed)
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
+
+    num$.next(1); // logs: 1
+
+    assert.deepStrictEqual(valueHistory, [1, 2, 3, 4]);
 
     // embed-sample-code-ignore-below
   });

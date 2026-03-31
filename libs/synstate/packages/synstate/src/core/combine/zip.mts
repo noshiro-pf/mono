@@ -1,6 +1,6 @@
 import { Arr, Optional, createQueue, expectType } from 'ts-data-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
-import { fromArray, source } from '../create/index.mjs';
+import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
 import {
   type InitializedObservable,
@@ -9,7 +9,7 @@ import {
   type Observable,
   type SyncChildObservable,
   type TupleToQueueTuple,
-  type UpdaterSymbol,
+  type UpdateToken,
   type Wrap,
   type ZipObservable,
   type ZipObservableRefined,
@@ -28,38 +28,39 @@ import {
  * ```ts
  * //  Timeline:
  * //
- * //  letters$  'a'       'b'       'c'
+ * //  letters$  'A'       'B'       'C'
  * //  numbers$  1         2         3
- * //  zipped$   ['a',1]   ['b',2]   ['c',3]
+ * //  zipped$   ['A',1]   ['B',2]   ['C',3]
  * //
  * //  Explanation:
  * //  - zip pairs values by their index from multiple sources
  * //  - Waits for all sources to emit at the same index
  * //  - Completes when any source completes
  *
- * const letters$ = fromArray(['a', 'b', 'c']);
+ * const [letters$, setLetter] = createState<string>('A');
  *
- * const numbers$ = fromArray([1, 2, 3]);
+ * const [numbers$, setNumber] = createState<number>(1);
  *
  * const zipped$ = zip([letters$, numbers$]);
  *
- * const mut_history: (readonly [string, number])[] = [];
+ * const valueHistory: (readonly [string, number])[] = [];
  *
- * await new Promise<void>((resolve) => {
- *   zipped$.subscribe(
- *     ([letter, num]) => {
- *       mut_history.push([letter, num]);
- *     },
- *     () => {
- *       resolve();
- *     },
- *   );
+ * zipped$.subscribe(([letter, num]) => {
+ *   valueHistory.push([letter, num]);
  * });
  *
- * assert.deepStrictEqual(mut_history, [
- *   ['a', 1],
- *   ['b', 2],
- *   ['c', 3],
+ * for (const letter of ['B', 'C']) {
+ *   setLetter(letter);
+ * }
+ *
+ * for (const num of [2, 3]) {
+ *   setNumber(num);
+ * }
+ *
+ * assert.deepStrictEqual(valueHistory, [
+ *   ['A', 1],
+ *   ['B', 2],
+ *   ['C', 3],
  * ]);
  * ```
  */
@@ -93,13 +94,13 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
     ) satisfies TupleToQueueTuple<A>;
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const queues = this.#queues;
 
     for (const [index, par] of this.parents.entries()) {
       const sn = par.getSnapshot();
 
-      if (par.updaterSymbol === updaterSymbol && Optional.isSome(sn)) {
+      if (par.updateToken === updateToken && Optional.isSome(sn)) {
         queues[index]?.enqueue(sn.value);
       }
     }
@@ -109,7 +110,7 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
 
-      this.setNext(nextValue, updaterSymbol);
+      this.setNext(nextValue, updateToken);
     }
   }
 }
@@ -154,9 +155,9 @@ if (import.meta.vitest !== undefined) {
     expectType<typeof _d, InitializedObservable<readonly [1, 2]>>('<=');
   }
 
-  const r1 = fromArray([1, 2, 3]);
+  const r1 = source(1);
 
-  const r2 = fromArray(['a', 'b', 'c']);
+  const r2 = source('a');
 
   const _z = zip([r1, r2] as const);
 

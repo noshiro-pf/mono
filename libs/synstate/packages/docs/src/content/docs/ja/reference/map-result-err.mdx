@@ -1,0 +1,74 @@
+---
+prev: false
+next: false
+title: mapResultErr
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+ソースから発行される `Result` 型のエラー値（`Err`）を変換します。
+値が `Err` の場合はマッピング関数が適用され、`Ok` の場合はそのまま維持されます。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: '1', color: colors.green },
+                { t: 45, label: 'bad', color: colors.red },
+                { t: 75, label: 'fail', color: colors.red },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 15, label: '1', color: colors.green },
+            { t: 45, label: 'BAD', color: colors.red },
+            { t: 75, label: 'FAIL', color: colors.red },
+        ],
+    }}
+    operator="mapResultErr(e => e.toUpperCase())"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  result$   Ok(1)    Err("bad")      Err("fail")
+//  mapped$   Ok(1)    Err("BAD")      Err("FAIL")
+//
+//  Explanation:
+//  - mapResultErr transforms the Err value of Result emissions
+//  - Ok values pass through unchanged
+
+const result$ = source<Result<number, string>>();
+
+const mapped$ = result$.pipe(mapResultErr((e) => e.toUpperCase()));
+
+const valueHistory: Result<number, string>[] = [];
+
+mapped$.subscribe((v) => {
+    valueHistory.push(v);
+});
+
+result$.next(Result.ok(1));
+
+assert.deepStrictEqual(valueHistory, [Result.ok(1)]);
+
+result$.next(Result.err('bad'));
+
+assert.deepStrictEqual(valueHistory, [Result.ok(1), Result.err('BAD')]);
+
+result$.next(Result.err('fail'));
+
+assert.deepStrictEqual(valueHistory, [
+    Result.ok(1),
+    Result.err('BAD'),
+    Result.err('FAIL'),
+]);
+```

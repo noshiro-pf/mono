@@ -1,0 +1,97 @@
+---
+prev: false
+next: false
+title: skipIfNoChange (distinctUntilChanged)
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+前回の発行から値が変わっていない場合、発行をスキップします。
+カスタム等価関数、またはデフォルトで Object.is を使用します。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 8, label: '1', color: colors.yellow },
+                { t: 20, label: '1', color: colors.yellow },
+                { t: 32, label: '2', color: colors.orange },
+                { t: 44, label: '2', color: colors.orange },
+                { t: 56, label: '1', color: colors.yellow },
+                { t: 68, label: '2', color: colors.orange },
+                { t: 80, label: '3', color: colors.blue },
+                { t: 92, label: '2', color: colors.orange },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 8, label: '1', color: colors.yellow },
+            { t: 32, label: '2', color: colors.orange },
+            { t: 56, label: '1', color: colors.yellow },
+            { t: 68, label: '2', color: colors.orange },
+            { t: 80, label: '3', color: colors.blue },
+            { t: 92, label: '2', color: colors.orange },
+        ],
+    }}
+    operator="skipIfNoChange()"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  num$      1     1     2     2     1     2     3     2
+//  distinct$ 1           2           1     2     3     2
+//
+//  Explanation:
+//  - skipIfNoChange filters out consecutive duplicate values
+//  - Uses strict equality (===) for comparison
+//  - Only emits when the value actually changes
+
+const num$ = source<number>();
+
+const distinct$ = num$.pipe(skipIfNoChange());
+
+const valueHistory: number[] = [];
+
+distinct$.subscribe((x) => {
+    valueHistory.push(x);
+});
+
+num$.next(1); // logs: 1
+
+assert.deepStrictEqual(valueHistory, [1]);
+
+num$.next(1); // nothing logged
+
+assert.deepStrictEqual(valueHistory, [1]);
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [1, 2]);
+
+num$.next(2); // nothing logged
+
+num$.next(1); // logs: 1
+
+assert.deepStrictEqual(valueHistory, [1, 2, 1]);
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [1, 2, 1, 2]);
+
+num$.next(3); // logs: 3
+
+assert.deepStrictEqual(valueHistory, [1, 2, 1, 2, 3]);
+
+num$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [1, 2, 1, 2, 3, 2]);
+```

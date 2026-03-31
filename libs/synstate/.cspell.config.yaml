@@ -4,15 +4,35 @@ allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
 words:
-  - nums
+  - Jotai
+  - Katex
+  - lerp
+  - lerps
+  - Maier
+  - mobx
   - nargs
   - noshiro
+  - nums
+  - recombinations
+  - recomputations
+  - reduxjs
+  - scanₘ
+  - seti
+  - stageₙ
   - synstate
   - testw
   - tscw
+  - unsub
+  - unsubs
+  - valtio
+  - Zustand
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
   - dist/**
-  - docs/**
   - agents/common/**
+  - packages/docs/public
+  - packages/docs/src/components/data-table-demo/sample-data.mts
+  - packages/docs/assets/sample.csv
+  - prior-art-research.md
+  - prior-art-and-design-rationale.mdx

@@ -1,7 +1,7 @@
 import {
   type ObservableId,
   type SubscriberId,
-  type UpdaterSymbol,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 function* idMaker<T extends symbol>(): Generator<T, T, T> {
@@ -19,7 +19,7 @@ const observableIdMaker = idMaker<ObservableId>();
 
 const subscriberIdMaker = idMaker<SubscriberId>();
 
-const updaterSymbolMaker = idMaker<UpdaterSymbol>();
+const updateTokenMaker = idMaker<UpdateToken>();
 
 export const issueObservableId = (): ObservableId =>
   observableIdMaker.next().value;
@@ -27,5 +27,5 @@ export const issueObservableId = (): ObservableId =>
 export const issueSubscriberId = (): SubscriberId =>
   subscriberIdMaker.next().value;
 
-export const issueUpdaterSymbol = (): UpdaterSymbol =>
-  updaterSymbolMaker.next().value;
+export const issueUpdateToken = (): UpdateToken =>
+  updateTokenMaker.next().value;

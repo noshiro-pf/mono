@@ -3,7 +3,6 @@ export * from './map-optional.mjs';
 export * from './map-result-err.mjs';
 export * from './map-result-ok.mjs';
 export * from './map-to.mjs';
-export * from './map.mjs';
 export * from './pluck.mjs';
 export * from './skip.mjs';
 export * from './take.mjs';

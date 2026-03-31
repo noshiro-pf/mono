@@ -21,25 +21,26 @@ if (import.meta.vitest !== undefined) {
 
     const limited$ = num$.pipe(takeUntil(stopNotifier));
 
-    const mut_history: number[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: number[] = [];
 
     limited$.subscribe((x) => {
-      mut_history.push(x);
+      valueHistory.push(x);
     });
 
     num$.next(1); // logs: 1
 
-    assert.deepStrictEqual(mut_history, [1]);
+    assert.deepStrictEqual(valueHistory, [1]);
 
     num$.next(2); // logs: 2
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2]);
 
     stop_();
 
     num$.next(3); // nothing logged (completed)
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2]);
 
     // embed-sample-code-ignore-below
   });

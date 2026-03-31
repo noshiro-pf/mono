@@ -1,0 +1,88 @@
+---
+prev: false
+next: false
+title: withCurrentValueFrom (withLatestFrom)
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+ソースが発行するたびに、別の Observable から現在の値をサンプリングします。
+[sourceValue, sampledValue] のタプルを発行します。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 10, label: 'A', color: colors.yellow },
+                { t: 45, label: 'B', color: colors.orange },
+                { t: 80, label: 'C', color: colors.blue },
+            ],
+        },
+        {
+            marbles: [
+                { t: 25, label: '1', color: colors.purple },
+                { t: 60, label: '2', color: colors.green },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 45, label: 'B,1', color: colors.orange },
+            { t: 80, label: 'C,2', color: colors.blue },
+        ],
+    }}
+    operator="withCurrentValueFrom(obs2$)"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  name$     "Alice"           "Bob"               "Charlie"
+//  age$                25              30
+//  result$   (skip)          ["Bob",25]           ["Charlie",30]
+//
+//  Explanation:
+//  - withCurrentValueFrom samples the current value from another observable
+//  - Emits a tuple [sourceValue, sampledValue] each time the SOURCE emits
+//  - Does NOT emit when the sampled observable (age$) emits
+//  - Does not emit until both observables have emitted at least once
+//  - "Alice" is skipped because age$ hasn't emitted yet
+
+const name$ = source<string>();
+
+const age$ = source<number>();
+
+const result$ = name$.pipe(withCurrentValueFrom(age$));
+
+const valueHistory: (readonly [string, number])[] = [];
+
+result$.subscribe(([name_, currentAge]) => {
+    valueHistory.push([name_, currentAge]);
+});
+
+name$.next('Alice'); // nothing logged (age$ hasn't emitted)
+
+assert.deepStrictEqual(valueHistory, []);
+
+age$.next(25);
+
+name$.next('Bob'); // logs: Bob is 25 years old
+
+assert.deepStrictEqual(valueHistory, [['Bob', 25]]);
+
+age$.next(30);
+
+name$.next('Charlie'); // logs: Charlie is 30 years old
+
+assert.deepStrictEqual(valueHistory, [
+    ['Bob', 25],
+    ['Charlie', 30],
+]);
+```

@@ -1,0 +1,41 @@
+---
+prev: false
+next: false
+title: timer
+---
+
+<!-- jsdoc-description -->
+
+Creates an observable that emits 0 after a specified delay and then completes.
+
+<!-- /jsdoc-description -->
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  Time(ms)  0     ...   1000
+//  delayed$                X (emits and completes)
+//
+//  Explanation:
+//  - timer emits once after the specified delay, then completes
+//  - Useful for delayed actions or timeouts
+
+const delayed$ = timer(100);
+
+const valueHistory: number[] = [];
+
+await new Promise<void>((resolve) => {
+    delayed$.subscribe(
+        () => {
+            valueHistory.push(1);
+        },
+        () => {
+            resolve();
+        },
+    );
+});
+
+assert.deepStrictEqual(valueHistory, [1]);
+```

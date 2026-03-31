@@ -1,0 +1,122 @@
+---
+prev: false
+next: false
+title: switchMap
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Projects each source value to an observable, subscribes to it, and emits its values.
+When a new value arrives from the source, the previous inner observable is unsubscribed.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 5, label: 'A', color: colors.yellow },
+                { t: 50, label: 'B', color: colors.orange },
+                { t: 65, label: 'C', color: colors.blue },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 5, label: 'A1', color: colors.yellow },
+            { t: 15, label: 'A2', color: colors.yellow },
+            { t: 25, label: 'A3', color: colors.yellow },
+            { t: 50, label: 'B1', color: colors.orange },
+            { t: 60, label: 'B2', color: colors.orange },
+            { t: 65, label: 'C1', color: colors.blue },
+            { t: 75, label: 'C2', color: colors.blue },
+            { t: 85, label: 'C3', color: colors.blue },
+        ],
+    }}
+    operator="switchMap(fn)"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  input$      A                          B              C
+//  inner A     A1    A2    A3
+//  inner B                                B1    B2      (switched!)
+//  inner C                                              C1    C2    C3
+//  result$     A1    A2    A3              B1    B2      C1    C2    C3
+//
+//  Explanation:
+//  - switchMap creates an inner observable for each source value
+//  - When a new source value arrives, the previous inner is unsubscribed
+//  - A's inner completes normally (all 3 values emitted)
+//  - B's inner is interrupted by C (only 2 values emitted)
+//  - C's inner completes normally (all 3 values emitted)
+
+const input$ = source<string>();
+
+const result$ = input$.pipe(
+    switchMap((letter) => {
+        const inner$ = source<string>();
+
+        setTimeout(() => {
+            inner$.next(`${letter}1`);
+        }, 10);
+
+        setTimeout(() => {
+            inner$.next(`${letter}2`);
+        }, 110);
+
+        setTimeout(() => {
+            inner$.next(`${letter}3`);
+        }, 210);
+
+        return inner$;
+    }),
+);
+
+const valueHistory: string[] = [];
+
+result$.subscribe((value) => {
+    valueHistory.push(value);
+});
+
+const sleep = (ms: number): Promise<void> =>
+    new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+
+// Emit A - inner emits A1, A2, A3 at 10ms, 110ms, 210ms
+input$.next('A');
+
+await sleep(250);
+
+assert.deepStrictEqual(valueHistory, ['A1', 'A2', 'A3']);
+
+// Emit B - inner starts emitting B1, B2 at 10ms, 110ms
+input$.next('B');
+
+await sleep(150);
+
+assert.deepStrictEqual(valueHistory, ['A1', 'A2', 'A3', 'B1', 'B2']);
+
+// Emit C - switches away from B (B3 cancelled), C's inner starts
+input$.next('C');
+
+await sleep(250);
+
+assert.deepStrictEqual(valueHistory, [
+    'A1',
+    'A2',
+    'A3',
+    'B1',
+    'B2',
+    'C1',
+    'C2',
+    'C3',
+]);
+```

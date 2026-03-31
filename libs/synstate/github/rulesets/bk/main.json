@@ -81,6 +81,10 @@
             "integration_id": 15368
           },
           {
+            "context": "type-check (codemod:full)",
+            "integration_id": 15368
+          },
+          {
             "context": "test-node-versions (20.20.0)",
             "integration_id": 15368
           },

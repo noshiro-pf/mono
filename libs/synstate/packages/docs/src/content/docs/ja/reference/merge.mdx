@@ -1,0 +1,86 @@
+---
+prev: false
+next: false
+title: merge
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+複数の Observable を、すべてのソースからのすべての値を発行する単一の Observable にマージします。
+いずれかのソース Observable が値を発行するたびに発行します。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 10, label: 'C1', color: colors.yellow },
+                { t: 45, label: 'C2', color: colors.orange },
+                { t: 75, label: 'C3', color: colors.purple },
+            ],
+        },
+        {
+            marbles: [
+                { t: 25, label: 'K1', color: colors.blue },
+                { t: 55, label: 'K2', color: colors.green },
+                { t: 90, label: 'K3', color: colors.teal },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 10, label: 'C1', color: colors.yellow },
+            { t: 25, label: 'K1', color: colors.blue },
+            { t: 45, label: 'C2', color: colors.orange },
+            { t: 55, label: 'K2', color: colors.green },
+            { t: 75, label: 'C3', color: colors.purple },
+            { t: 90, label: 'K3', color: colors.teal },
+        ],
+    }}
+    operator="merge"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  clicks$   c1              c2                c3
+//  keys$               k1          k2                    k3
+//  events$   c1        k1    c2    k2          c3        k3
+//
+//  Explanation:
+//  - merge combines multiple observables into one
+//  - Emits values from any source as they arrive
+//  - Order is preserved based on emission time
+
+const clicks$ = source<string>();
+
+const keys$ = source<string>();
+
+const events$ = merge([clicks$, keys$]);
+
+const valueHistory: string[] = [];
+
+events$.subscribe((event_) => {
+    valueHistory.push(event_);
+});
+
+clicks$.next('c1');
+
+assert.deepStrictEqual(valueHistory, ['c1']);
+
+keys$.next('k1');
+
+assert.deepStrictEqual(valueHistory, ['c1', 'k1']);
+
+clicks$.next('c2');
+
+keys$.next('k2');
+
+assert.deepStrictEqual(valueHistory, ['c1', 'k1', 'c2', 'k2']);
+```

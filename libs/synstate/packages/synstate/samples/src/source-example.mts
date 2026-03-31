@@ -15,23 +15,24 @@ if (import.meta.vitest !== undefined) {
 
     const count$ = source<number>();
 
-    const mut_history: number[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: number[] = [];
 
     count$.subscribe((value) => {
-      mut_history.push(value);
+      valueHistory.push(value);
     });
 
     count$.next(1); // logs: 1
 
-    assert.deepStrictEqual(mut_history, [1]);
+    assert.deepStrictEqual(valueHistory, [1]);
 
     count$.next(2); // logs: 2
 
-    assert.deepStrictEqual(mut_history, [1, 2]);
+    assert.deepStrictEqual(valueHistory, [1, 2]);
 
     count$.next(3); // logs: 3
 
-    assert.deepStrictEqual(mut_history, [1, 2, 3]);
+    assert.deepStrictEqual(valueHistory, [1, 2, 3]);
 
     // embed-sample-code-ignore-below
   });

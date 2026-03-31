@@ -1,16 +1,14 @@
 import { ArgumentParser } from 'argparse';
 import { Arr, Num, asUint32 } from 'ts-data-forge';
 import {
-  auditTimeTestCases,
+  auditTestCases,
   combineTestCases,
-  debounceTimeTestCases,
+  counterTestCases,
+  debounceTestCases,
   filterTestCases,
-  fromArrayTestCases,
   fromPromiseTestCases,
-  intervalTestCases,
   mapTestCases,
   mapToTestCases,
-  mapWithIndexTestCases,
   mergeMapTestCases,
   mergeTestCases,
   pairwiseTestCases,
@@ -24,7 +22,7 @@ import {
   takeTestCases,
   takeUntilTestCases,
   takeWhileTestCases,
-  throttleTimeTestCases,
+  throttleTestCases,
   timerTestCases,
   withBufferedFromTestCases,
   withCurrentValueFromTestCases,
@@ -39,16 +37,14 @@ const exampleList: readonly Readonly<{
   name: string;
   cases: readonly StreamTestCase<unknown>[];
 }>[] = [
-  { name: 'auditTime', cases: auditTimeTestCases },
+  { name: 'audit', cases: auditTestCases },
   { name: 'combine', cases: combineTestCases },
-  { name: 'debounceTime', cases: debounceTimeTestCases },
+  { name: 'debounce', cases: debounceTestCases },
   { name: 'filter', cases: filterTestCases },
-  { name: 'fromArray', cases: fromArrayTestCases },
   { name: 'fromPromise', cases: fromPromiseTestCases },
-  { name: 'interval', cases: intervalTestCases },
+  { name: 'counter', cases: counterTestCases },
   { name: 'map', cases: mapTestCases },
   { name: 'mapTo', cases: mapToTestCases },
-  { name: 'mapWithIndex', cases: mapWithIndexTestCases },
   { name: 'merge', cases: mergeTestCases },
   { name: 'mergeMap', cases: mergeMapTestCases },
   { name: 'pairwise', cases: pairwiseTestCases },
@@ -63,13 +59,13 @@ const exampleList: readonly Readonly<{
   { name: 'take', cases: takeTestCases },
   { name: 'takeUntil', cases: takeUntilTestCases },
   { name: 'takeWhile', cases: takeWhileTestCases },
-  { name: 'throttleTime', cases: throttleTimeTestCases },
+  { name: 'throttle', cases: throttleTestCases },
   { name: 'timer', cases: timerTestCases },
   { name: 'withBufferedFrom', cases: withBufferedFromTestCases },
   { name: 'withCurrentValueFrom', cases: withCurrentValueFromTestCases },
   { name: 'withIndex', cases: withIndexTestCases },
   { name: 'zip', cases: zipTestCases },
-];
+] as const;
 
 const printExamples = (exampleIdx: SafeUint): void => {
   console.log('examples:');
@@ -113,18 +109,19 @@ const printMode = (isPreviewMode: boolean): void => {
 const convertArgs = (
   args: DeepReadonly<{
     example_no: string[];
-    preview: string[] | null;
+    preview: string[] | undefined;
     case_no: string[];
   }>,
 ): Readonly<{
   exampleIdx: Uint32;
   isPreviewMode: boolean;
   testCaseIdx: Uint32;
-}> => ({
-  exampleIdx: asUint32(Num.from(args.example_no[0] ?? '0') - 1),
-  isPreviewMode: args.preview != null,
-  testCaseIdx: asUint32(Num.from(args.case_no[0] ?? '0') - 1),
-});
+}> =>
+  ({
+    exampleIdx: asUint32(Num.from(args.example_no[0] ?? '0') - 1),
+    isPreviewMode: args.preview !== undefined,
+    testCaseIdx: asUint32(Num.from(args.case_no[0] ?? '0') - 1),
+  }) as const;
 
 const getArgs = (): Readonly<{
   exampleIdx: Uint32;
@@ -159,9 +156,9 @@ const getArgs = (): Readonly<{
 
   return convertArgs(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    parser.parse_args() as DeepReadonly<{
+    (parser.parse_args() ?? undefined) as DeepReadonly<{
       example_no: string[];
-      preview: string[] | null;
+      preview: string[] | undefined;
       case_no: string[];
     }>,
   );

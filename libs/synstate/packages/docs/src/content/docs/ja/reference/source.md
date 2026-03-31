@@ -1,0 +1,45 @@
+---
+prev: false
+next: false
+title: source
+---
+
+<!-- jsdoc-description -->
+
+手動で値を発行できる新しい Observable ソースを作成します。
+リアクティブチェーンの起点となるルート Observable を作成する主要な方法です。
+
+<!-- /jsdoc-description -->
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  count$    1     2     3     ...
+//
+//  Explanation:
+//  - source creates a new observable that you can manually emit values to
+//  - Use .next() to emit values
+//  - Foundation for building custom observables
+
+const count$ = source<number>();
+
+const valueHistory: number[] = [];
+
+count$.subscribe((value) => {
+    valueHistory.push(value);
+});
+
+count$.next(1); // logs: 1
+
+assert.deepStrictEqual(valueHistory, [1]);
+
+count$.next(2); // logs: 2
+
+assert.deepStrictEqual(valueHistory, [1, 2]);
+
+count$.next(3); // logs: 3
+
+assert.deepStrictEqual(valueHistory, [1, 2, 3]);
+```

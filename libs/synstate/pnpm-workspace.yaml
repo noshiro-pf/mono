@@ -1,11 +1,8 @@
 packages:
   - packages/**
 
-onlyBuiltDependencies:
-  - esbuild
-  - unrs-resolver
+minimumReleaseAge: 10080
 
-minimumReleaseAge: 10080 # = 7 days
 minimumReleaseAgeExclude:
   - '@types/**'
   - ts-type-forge
@@ -18,3 +15,8 @@ minimumReleaseAgeExclude:
   - eslint-config-typed
   - octokit-safe-types
   - github-settings-as-code
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver

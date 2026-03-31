@@ -1,43 +1,45 @@
-import { fromArray, zip } from 'synstate';
+import { createState, zip } from 'synstate';
 
 if (import.meta.vitest !== undefined) {
-  test(zip, async () => {
+  test(zip, () => {
     // embed-sample-code-ignore-above
 
     //  Timeline:
     //
-    //  letters$  'a'       'b'       'c'
+    //  letters$  'A'       'B'       'C'
     //  numbers$  1         2         3
-    //  zipped$   ['a',1]   ['b',2]   ['c',3]
+    //  zipped$   ['A',1]   ['B',2]   ['C',3]
     //
     //  Explanation:
     //  - zip pairs values by their index from multiple sources
     //  - Waits for all sources to emit at the same index
     //  - Completes when any source completes
 
-    const letters$ = fromArray(['a', 'b', 'c']);
+    const [letters$, setLetter] = createState<string>('A');
 
-    const numbers$ = fromArray([1, 2, 3]);
+    const [numbers$, setNumber] = createState<number>(1);
 
     const zipped$ = zip([letters$, numbers$]);
 
-    const mut_history: (readonly [string, number])[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: (readonly [string, number])[] = [];
 
-    await new Promise<void>((resolve) => {
-      zipped$.subscribe(
-        ([letter, num]) => {
-          mut_history.push([letter, num]);
-        },
-        () => {
-          resolve();
-        },
-      );
+    zipped$.subscribe(([letter, num]) => {
+      valueHistory.push([letter, num]);
     });
 
-    assert.deepStrictEqual(mut_history, [
-      ['a', 1],
-      ['b', 2],
-      ['c', 3],
+    for (const letter of ['B', 'C']) {
+      setLetter(letter);
+    }
+
+    for (const num of [2, 3]) {
+      setNumber(num);
+    }
+
+    assert.deepStrictEqual(valueHistory, [
+      ['A', 1],
+      ['B', 2],
+      ['C', 3],
     ]);
 
     // embed-sample-code-ignore-below

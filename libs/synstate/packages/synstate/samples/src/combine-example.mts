@@ -21,30 +21,31 @@ if (import.meta.vitest !== undefined) {
 
     const user$ = combine([name$, age$]);
 
-    const mut_history: (readonly [string, number])[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const userHistory: (readonly [string, number])[] = [];
 
     user$.subscribe(([name_, age]) => {
-      mut_history.push([name_, age]);
+      userHistory.push([name_, age]);
     });
 
     name$.next('Alice'); // nothing logged (age$ hasn't emitted yet)
 
-    assert.deepStrictEqual(mut_history, []);
+    assert.deepStrictEqual(userHistory, []);
 
     age$.next(25); // logs: { name: 'Alice', age: 25 }
 
-    assert.deepStrictEqual(mut_history, [['Alice', 25]]);
+    assert.deepStrictEqual(userHistory, [['Alice', 25]]);
 
     name$.next('Bob'); // logs: { name: 'Bob', age: 25 }
 
-    assert.deepStrictEqual(mut_history, [
+    assert.deepStrictEqual(userHistory, [
       ['Alice', 25],
       ['Bob', 25],
     ]);
 
     age$.next(30); // logs: { name: 'Bob', age: 30 }
 
-    assert.deepStrictEqual(mut_history, [
+    assert.deepStrictEqual(userHistory, [
       ['Alice', 25],
       ['Bob', 25],
       ['Bob', 30],

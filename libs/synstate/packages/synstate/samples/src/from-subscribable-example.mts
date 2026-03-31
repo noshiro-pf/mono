@@ -30,17 +30,18 @@ if (import.meta.vitest !== undefined) {
 
         return { unsubscribe: () => {} };
       },
-    };
+    } as const;
 
     const observable$ = fromSubscribable<number>(customSubscribable);
 
-    const mut_history: number[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: number[] = [];
 
     await new Promise<void>((resolve) => {
       observable$.subscribe(
         (result) => {
           if (Result.isOk(result)) {
-            mut_history.push(result.value);
+            valueHistory.push(result.value);
           }
         },
         () => {
@@ -49,7 +50,7 @@ if (import.meta.vitest !== undefined) {
       );
     });
 
-    assert.deepStrictEqual(mut_history, [1, 2, 3]);
+    assert.deepStrictEqual(valueHistory, [1, 2, 3]);
 
     // embed-sample-code-ignore-below
   });

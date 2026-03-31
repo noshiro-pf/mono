@@ -4,7 +4,7 @@ import {
   type DropInitialValueOperator,
   type Observable,
   type SkipUntilOperatorObservable,
-  type UpdaterSymbol,
+  type UpdateToken,
 } from '../types/index.mjs';
 
 /**
@@ -34,27 +34,27 @@ import {
  *
  * const skipped$ = num$.pipe(skipUntil(startNotifier));
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * skipped$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
  * num$.next(1); // nothing logged
  *
  * num$.next(2); // nothing logged
  *
- * assert.deepStrictEqual(mut_history, []);
+ * assert.deepStrictEqual(valueHistory, []);
  *
  * start_();
  *
  * num$.next(4); // logs: 4
  *
- * assert.deepStrictEqual(mut_history, [4]);
+ * assert.deepStrictEqual(valueHistory, [4]);
  *
  * num$.next(5); // logs: 5
  *
- * assert.deepStrictEqual(mut_history, [4, 5]);
+ * assert.deepStrictEqual(valueHistory, [4, 5]);
  * ```
  */
 export const skipUntil =
@@ -86,19 +86,19 @@ class SkipUntilObservableClass<A>
     );
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
     if (
-      par.updaterSymbol !== updaterSymbol ||
+      par.updateToken !== updateToken ||
       Optional.isNone(sn) ||
       this.#mut_isSkipping
     ) {
       return; // skip update
     }
 
-    this.setNext(sn.value, updaterSymbol);
+    this.setNext(sn.value, updateToken);
   }
 }

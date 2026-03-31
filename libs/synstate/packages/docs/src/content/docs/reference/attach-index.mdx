@@ -1,0 +1,80 @@
+---
+prev: false
+next: false
+title: attachIndex (withIndex)
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Attaches a sequential index to each emitted value, producing `[index, value]` tuples.
+Index starts at 0 and increments with each emission.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: 'A', color: colors.yellow },
+                { t: 40, label: 'B', color: colors.orange },
+                { t: 70, label: 'C', color: colors.blue },
+            ],
+            completion: 90,
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 15, label: '0,A', color: colors.yellow },
+            { t: 40, label: '1,B', color: colors.orange },
+            { t: 70, label: '2,C', color: colors.blue },
+        ],
+        completion: 90,
+    }}
+    operator="attachIndex()"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  letter$    "A"      "B"      "C"
+//  indexed$   [0,"A"]  [1,"B"]  [2,"C"]
+//
+//  Explanation:
+//  - attachIndex attaches a sequential index to each emitted value
+//  - Produces [index, value] tuples
+//  - Index starts at 0 and increments with each emission
+
+const letter$ = source<string>();
+
+const indexed$ = letter$.pipe(attachIndex());
+
+const valueHistory: (readonly [number, string])[] = [];
+
+indexed$.subscribe(([i, letter]) => {
+    valueHistory.push([i, letter]);
+});
+
+letter$.next('A');
+
+assert.deepStrictEqual(valueHistory, [[0, 'A']]);
+
+letter$.next('B');
+
+assert.deepStrictEqual(valueHistory, [
+    [0, 'A'],
+    [1, 'B'],
+]);
+
+letter$.next('C');
+
+assert.deepStrictEqual(valueHistory, [
+    [0, 'A'],
+    [1, 'B'],
+    [2, 'C'],
+]);
+```

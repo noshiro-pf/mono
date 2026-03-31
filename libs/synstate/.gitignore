@@ -110,6 +110,9 @@ dist
 # vitepress cache directory
 **/.vitepress/cache
 
+# Astro generated files
+.astro
+
 # Docusaurus cache and generated files
 .docusaurus
 

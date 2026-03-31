@@ -1,0 +1,30 @@
+--- en/05-imperative-table.mts
++++ ja/05-imperative-table.mts
+@@ -17,12 +17,12 @@
+ let currentPageInput = 1;
+ let allRows: readonly Row[] = [];
+ 
+-// Derived state — must be manually kept in sync
++// 派生状態 — 手動で同期を維持する必要がある
+ let filteredRows: readonly Row[] = [];
+ let pageLength = 1;
+ let currentPage = 1;
+ 
+-// Fetch table data from server
++// サーバーからテーブルデータを取得
+ const fetchData = async (): Promise<void> => {
+   try {
+     allRows = await fetch('/api/rows').then((r) => {
+@@ -52,10 +52,10 @@
+   renderTable(filteredRows.slice(start, start + itemsPerPage));
+ };
+ 
+-// Filter change: reset page to 1, then update (but what about debounce?)
++// フィルタ変更時はページを1にリセットしてから更新（デバウンスは？）
+ const onFilterNameChange = (v: string): void => {
+   filterName = v;
+-  currentPageInput = 1; // Easy to forget!
++  currentPageInput = 1; // 忘れやすい！
+   updateTable();
+ };
+ 

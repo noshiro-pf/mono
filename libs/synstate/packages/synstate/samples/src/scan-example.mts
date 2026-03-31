@@ -20,25 +20,26 @@ if (import.meta.vitest !== undefined) {
 
     const sum$ = num$.pipe(scan((acc, curr) => acc + curr, 0));
 
-    const mut_history: number[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: number[] = [];
 
     sum$.subscribe((x) => {
-      mut_history.push(x);
+      valueHistory.push(x);
     });
 
-    assert.deepStrictEqual(mut_history, [0]);
+    assert.deepStrictEqual(valueHistory, [0]);
 
     num$.next(1); // logs: 1
 
-    assert.deepStrictEqual(mut_history, [0, 1]);
+    assert.deepStrictEqual(valueHistory, [0, 1]);
 
     num$.next(2); // logs: 3
 
-    assert.deepStrictEqual(mut_history, [0, 1, 3]);
+    assert.deepStrictEqual(valueHistory, [0, 1, 3]);
 
     num$.next(3); // logs: 6
 
-    assert.deepStrictEqual(mut_history, [0, 1, 3, 6]);
+    assert.deepStrictEqual(valueHistory, [0, 1, 3, 6]);
 
     // embed-sample-code-ignore-below
   });

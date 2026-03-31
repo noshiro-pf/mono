@@ -1,0 +1,342 @@
+---
+title: Declarative State Management
+sidebar:
+    order: 2
+---
+
+import DataTableDemo from '../../../components/data-table-demo/data-table-demo-island.astro';
+import DataTableGraph from '../../../components/dep-graph/data-table-graph-island.astro';
+
+SynState is a library for **reactive programming** — a paradigm where you declare relationships between values, and the system automatically keeps everything in sync. If this sounds unfamiliar, a simple analogy makes it concrete.
+
+## The Spreadsheet Analogy
+
+In a spreadsheet, when you change cell A1, every cell that references A1 updates automatically. You never manually recalculate B1, C1, or D1 — the spreadsheet knows the dependencies and handles propagation for you.
+
+**Reactive programming brings this same idea to application code.** Instead of manually tracking which variables need to update when something changes, you declare dependencies between values, and the system propagates changes automatically.
+
+## You Already Know This Pattern
+
+If you have used React, you are already familiar with reactive derivation — `useMemo`:
+
+```tsx
+const [count, setCount] = React.useState(0);
+const doubled = React.useMemo(() => count * 2, [count]);
+const quadrupled = React.useMemo(() => doubled * 2, [doubled]);
+```
+
+You declare that `doubled` depends on `count`, and `quadrupled` depends on `doubled`. When `count` changes, React automatically recalculates both — in the correct order, without you writing any update logic. This looks like reactive programming within a single component.
+
+### Re-rendering vs. reactive propagation
+
+Strictly speaking, React is not a reactive system — it is a **scheduling-based re-rendering system**. When `setState` is called, React schedules a re-render of the component and re-executes the entire function body from top to bottom. Every expression is re-evaluated, regardless of whether its inputs actually changed. `useMemo` is a **computation cache** that skips expensive recalculations when the dependency array has not changed — but it only helps during a re-render that was already triggered. Without `useMemo`, derived values are recomputed on every render even if their inputs are unchanged. This is why React applications often need `useMemo` and `useCallback` for performance optimization.
+
+SynState is a true **push-based reactive system**. When a source value changes, the system pushes updates only to the values that directly or indirectly depend on it. There is no "re-execute everything and cache what you can" — derived values are recomputed **only when their specific inputs change**, with no memoization needed. Performance optimization is the default behavior, not an opt-in.
+
+### From component-local to global
+
+`useMemo` only works **inside a component's render cycle**. It cannot span across components, persist outside the React tree, or compose with asynchronous operators like debounce or throttle. SynState's Observables bring the "declare dependencies, propagate automatically" model to **global state** — independent of any component lifecycle:
+
+```tsx
+const [count, setCount] = createState(0);
+const doubled = count.pipe(map((n) => n * 2));
+const quadrupled = doubled.pipe(map((n) => n * 2));
+```
+
+The mental model is similar: declare what depends on what. The key differences are:
+
+|                     | React `useMemo`                                     | SynState Observable                         |
+| :------------------ | :-------------------------------------------------- | :------------------------------------------ |
+| **Update model**    | Re-render entire component + memoization cache      | Push-based — only affected values recompute |
+| **Memoization**     | Required for performance (`useMemo`, `useCallback`) | Not needed — updates are surgical by design |
+| **Scope**           | Single component                                    | Entire application                          |
+| **Async operators** | Not supported                                       | `debounce`, `throttle`, `switchMap`, etc.   |
+
+### Precise control over async behavior
+
+Defining reactive logic outside of React components also makes asynchronous behavior much easier to express correctly. Consider a common pattern: debounce a search input and fetch results only when the value actually changes.
+
+Inside a React component, this requires careful coordination of `useEffect`, `useRef`, `AbortController`, timers, and cleanup functions — and it is easy to introduce race conditions or stale closures:
+
+```tsx
+import * as React from 'react';
+
+// React: manual debounce + fetch + abort inside a component
+const [query, setQuery] = React.useState('');
+const [results, setResults] = React.useState([]);
+const timerRef = React.useRef<number | undefined>(undefined);
+const abortRef = React.useRef<AbortController | undefined>(undefined);
+
+React.useEffect(() => {
+    clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+        // Cancel the previous in-flight request
+        abortRef.current?.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
+
+        fetch(`/api/search?q=${query}`, { signal: controller.signal })
+            .then((res) => res.json())
+            .then((data) => {
+                setResults(data);
+            })
+            .catch((error) => {
+                if (error.name !== 'AbortError') throw error;
+            });
+    }, 300);
+
+    return () => {
+        clearTimeout(timerRef.current);
+        abortRef.current?.abort(); // Also abort on unmount
+    };
+}, [query]);
+```
+
+Timer management, abort controller lifecycle, error filtering for `AbortError`, cleanup on unmount — all of this is manual plumbing that obscures the actual intent: "debounce, then fetch, cancelling any previous request."
+
+With SynState, the same logic is a declarative pipeline where each concern is a composable operator:
+
+```tsx
+// SynState: declarative pipeline outside any component
+const [query, setQuery] = createState('');
+
+const results = query
+    .pipe(debounce(300)) // wait for typing to pause
+    .pipe(skipIfNoChange()) // skip if the debounced value is the same
+    .pipe(
+        // cancel previous fetch if a new query arrives
+        switchMap((q) =>
+            fromAbortablePromise((signal) =>
+                fetch(`/api/search?q=${q}`, { signal }).then((r) => r.json()),
+            ),
+        ),
+    );
+```
+
+No timers to manage, no manual abort controller lifecycle, no stale closure risks. `fromAbortablePromise` receives an `AbortSignal` and passes it to `fetch` — when `switchMap` switches to a new inner Observable, it completes the previous one, which automatically aborts the in-flight request. The pipeline lives outside the component lifecycle, so it is unaffected by re-renders or unmounting, and works identically regardless of which component consumes the result.
+
+---
+
+The patterns above — declarative dependencies, automatic propagation, composable async operators — really shine when the number of interconnected state values grows. Let's see this in a real-world example.
+
+## A Motivating Example: Data Table with Filters
+
+Consider a common UI pattern: a data table with per-column text filters, an items-per-page selector, and pagination controls. Try interacting with the demo below — type in the filter inputs and change the page size:
+
+<DataTableDemo />
+
+When you type in a filter, a chain of updates happens behind the scenes:
+
+1. The filter input text changes
+2. A debounce timer waits for typing to pause (to avoid filtering on every keystroke)
+3. The filtered rows are recalculated based on all active filters
+4. The page count updates (total filtered rows / items per page)
+5. The current page is clamped to remain within valid range
+6. The visible table rows are sliced from the filtered results based on the current page number
+
+There are **12 interconnected pieces of state** driving this UI. The dependency structure looks like this:
+
+<DataTableGraph />
+
+The orange nodes are user inputs, the blue nodes are intermediate state (debounce, filter, clamp, and other derived computations), and the green node (`TableSliced`) is the final output that renders the visible table. How you manage these dependencies makes a significant difference in code quality.
+
+## The Imperative Approach
+
+A straightforward imperative implementation uses mutable variables and a manual update function. In a real application, the table data would come from a server (with error handling), and the current page should reset to 1 when filter conditions change:
+
+```tsx
+let filterName = '';
+let filterEmail = '';
+let filterGender = '';
+let itemsPerPage = 10;
+let currentPageInput = 1;
+let allRows: readonly Row[] = [];
+
+// Derived state — must be manually kept in sync
+let filteredRows: readonly Row[] = [];
+let pageLength = 1;
+let currentPage = 1;
+
+// Fetch table data from server
+const fetchData = async (): Promise<void> => {
+    try {
+        allRows = await fetch('/api/rows').then((r) => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        });
+        updateTable();
+    } catch (error) {
+        renderError(error);
+    }
+};
+
+const updateTable = (): void => {
+    filteredRows = allRows.filter(
+        (row) =>
+            row.name.includes(filterName) &&
+            row.email.includes(filterEmail) &&
+            row.gender.includes(filterGender),
+    );
+
+    pageLength = Math.ceil(filteredRows.length / itemsPerPage);
+
+    currentPage = Math.min(currentPageInput, pageLength);
+
+    const start = (currentPage - 1) * itemsPerPage;
+
+    renderTable(filteredRows.slice(start, start + itemsPerPage));
+};
+
+// Filter change: reset page to 1, then update (but what about debounce?)
+const onFilterNameChange = (v: string): void => {
+    filterName = v;
+    currentPageInput = 1; // Easy to forget!
+    updateTable();
+};
+
+const onFilterEmailChange = (v: string): void => {
+    filterEmail = v;
+    currentPageInput = 1;
+    updateTable();
+};
+
+const onFilterGenderChange = (v: string): void => {
+    filterGender = v;
+    currentPageInput = 1;
+    updateTable();
+};
+
+const onItemsPerPageChange = (v: number): void => {
+    itemsPerPage = v;
+    currentPageInput = 1;
+    updateTable();
+};
+
+const onPageChange = (v: number): void => {
+    currentPageInput = v;
+    updateTable();
+};
+```
+
+This works for the simple case, but it has several structural problems:
+
+1. **Manual ordering** — the lines inside `updateTable()` must execute in dependency order. Swapping `pageLength` and `filteredRows` calculations produces a bug, but nothing in the code prevents it.
+2. **Implicit dependencies** — nothing formally declares that `pageLength` depends on `filteredRows` and `itemsPerPage`. The dependency is buried in the procedural order.
+3. **Scattered side effects** — "reset to page 1 when filters change" must be duplicated in every filter event handler. Forget one, and you get a bug where the user sees an empty page. This kind of cross-cutting concern is easy to miss and hard to test.
+4. **Fragile to change** — adding a new derived value (e.g., a "total matching rows" counter) means finding the right place inside `updateTable()` and hoping you do not break the ordering.
+5. **No partial updates** — even if only `currentPageInput` changes, `updateTable()` recalculates everything from scratch.
+6. **Debounce is hard** — adding debounce to the filter inputs requires manually managing timers, and the page reset must now happen after the debounce fires, not immediately — further complicating the event handlers.
+7. **Data fetching is entangled** — `fetchData()` must call `updateTable()` after loading, handle errors separately with `try/catch`, manage an `fetchError` state variable, and if the user changes filters while a fetch is in progress, the result may arrive stale.
+
+## The Reactive Approach
+
+With reactive programming, you **declare what depends on what** instead of writing how to update:
+
+The code below uses the [`Result`](https://www.npmjs.com/package/ts-data-forge) type from **ts-data-forge**, a general-purpose TypeScript utility library that provides types such as `Result` and `Optional` alongside other common utilities. SynState's `fromPromise` returns a `Result` to represent success/failure in a type-safe way.
+
+```tsx
+import {
+    combine,
+    createState,
+    debounce,
+    fromPromise,
+    map,
+    mapTo,
+    merge,
+} from 'synstate';
+import { Result } from 'ts-data-forge';
+
+// Source state — each input is an independent Observable
+const [filterName, setFilterName] = createState('');
+const [filterEmail, setFilterEmail] = createState('');
+const [filterGender, setFilterGender] = createState('');
+const [itemsPerPage, setItemsPerPage] = createState(10);
+const [pageInput, setPageInput] = createState(1);
+
+// Fetch table data from server
+// fromPromise emits Result.Ok(rows) on success, Result.Err(error) on failure
+const tableDataResult = fromPromise(
+    fetch('/api/rows').then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<readonly Row[]>;
+    }),
+);
+
+// Derived: debounced filters → filtered rows (only when data loaded successfully)
+const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
+    debounce(300),
+);
+
+const filteredRows = combine([headerValues, tableDataResult]).pipe(
+    map(([filters, result]) =>
+        Result.isErr(result)
+            ? [] // show empty table on error
+            : result.value.filter(
+                  (row) =>
+                      row.name.includes(filters[0]) &&
+                      row.email.includes(filters[1]) &&
+                      row.gender.includes(filters[2]),
+              ),
+    ),
+);
+
+// Error state is also a derived value — no separate error variable needed
+const fetchError = tableDataResult.pipe(
+    map((result) => (Result.isErr(result) ? result.value : undefined)),
+);
+
+// Derived: page count
+const pageLength = combine([filteredRows, itemsPerPage]).pipe(
+    map(([rows, perPage]) => Math.ceil(rows.length / perPage)),
+);
+
+// Reset page to 1 whenever pageLength changes (filters or itemsPerPage changed)
+const pageReset = pageLength.pipe(mapTo(1));
+
+// Derived: current page — merge user input and auto-reset, then clamp
+const currentPage = merge([
+    pageReset,
+    combine([pageInput, pageLength]).pipe(
+        map(([page, maxPage]) => Math.max(1, Math.min(page, maxPage))),
+    ),
+]);
+
+// Output: visible table rows
+const tableSliced = combine([filteredRows, currentPage, itemsPerPage]).pipe(
+    map(([rows, page, perPage]) => {
+        const start = (page - 1) * perPage;
+        return rows.slice(start, start + perPage);
+    }),
+);
+
+// Subscribe to render — called automatically when any dependency changes
+tableSliced.subscribe(renderTable);
+
+// Subscribe to errors — renderError is called only when the error state changes
+fetchError.subscribe((err) => {
+    renderError(err);
+});
+```
+
+Every problem from the imperative version is resolved:
+
+1. **Explicit dependencies** — each derived value declares exactly what it depends on. `pageLength` depends on `filteredRows` and `itemsPerPage` — this is directly visible in the code.
+2. **Automatic propagation** — when `filterName` changes, the system automatically propagates through `headerValues` → `filteredRows` → `pageLength` → `currentPage` → `tableSliced`. No manual `updateTable()` needed.
+3. **Page reset is centralized** — `pageReset` reacts to `pageLength` changes in one place. No need to duplicate "reset to page 1" across every filter handler.
+4. **Data fetching and error handling are declarative** — `fromPromise(fetch(...))` integrates server data into the same dependency graph as a `Result` type. Success and error are both reactive values — `fetchError` is just another derived Observable, not a separate mutable variable managed with `try/catch`.
+5. **Correct by construction** — you cannot accidentally reorder updates. The dependency graph determines the execution order.
+6. **Debounce is just an operator** — `.pipe(debounce(300))` handles all the timer complexity in one line.
+7. **Composable** — adding a new derived value is one more `combine(...).pipe(map(...))`. No existing code needs to change.
+
+## What's Next?
+
+Now that you understand the declarative model, the next step is to use it in practice:
+
+- [createState in Depth](/synstate/guides/core-state-management/) — learn more about `createState`, `createReducer`, and `createBooleanState`.
+- [React Integration](/synstate/guides/react-integration/) — connect SynState Observables to React components.
+
+One challenge with dependency graphs like this is ensuring **consistency** — when a source changes, all derived values should update atomically, without emitting intermediate states where some values are stale. This is called the [**glitch problem**](/synstate/internals/how-synstate-solved-the-glitch/), and it is one of the key issues SynState solves. To learn more:
+
+- [How SynState Solved the Glitch](/synstate/internals/how-synstate-solved-the-glitch/) — deep dive into glitch-free propagation.
+- [Library Comparison](/synstate/guides/library-comparison/library-comparison/) — how SynState compares to RxJS, Jotai, MobX, and others.
+- [Performance Benchmark](/synstate/guides/library-comparison/benchmark/) — quantitative throughput comparisons.

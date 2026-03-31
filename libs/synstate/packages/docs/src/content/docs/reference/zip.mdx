@@ -1,0 +1,84 @@
+---
+prev: false
+next: false
+title: zip
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Combines multiple observables by pairing their emissions by index.
+Waits for all sources to emit their nth value before emitting the nth tuple.
+Completes when any source completes.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 10, label: 'A', color: colors.yellow },
+                { t: 70, label: 'B', color: colors.orange },
+                { t: 85, label: 'C', color: colors.blue },
+            ],
+        },
+        {
+            marbles: [
+                { t: 25, label: '1', color: colors.yellow },
+                { t: 40, label: '2', color: colors.orange },
+                { t: 55, label: '3', color: colors.blue },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 25, label: 'A,1', color: colors.yellow },
+            { t: 70, label: 'B,2', color: colors.orange },
+            { t: 85, label: 'C,3', color: colors.blue },
+        ],
+    }}
+    operator="zip"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  letters$  'A'       'B'       'C'
+//  numbers$  1         2         3
+//  zipped$   ['A',1]   ['B',2]   ['C',3]
+//
+//  Explanation:
+//  - zip pairs values by their index from multiple sources
+//  - Waits for all sources to emit at the same index
+//  - Completes when any source completes
+
+const [letters$, setLetter] = createState<string>('A');
+
+const [numbers$, setNumber] = createState<number>(1);
+
+const zipped$ = zip([letters$, numbers$]);
+
+const valueHistory: (readonly [string, number])[] = [];
+
+zipped$.subscribe(([letter, num]) => {
+    valueHistory.push([letter, num]);
+});
+
+for (const letter of ['B', 'C']) {
+    setLetter(letter);
+}
+
+for (const num of [2, 3]) {
+    setNumber(num);
+}
+
+assert.deepStrictEqual(valueHistory, [
+    ['A', 1],
+    ['B', 2],
+    ['C', 3],
+]);
+```

@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
 
     //  Timeline:
     //
-    //  clicks$   c1          c2                    c3
+    //  clicks$   c1              c2                c3
     //  keys$               k1          k2                    k3
     //  events$   c1        k1    c2    k2          c3        k3
     //
@@ -21,25 +21,26 @@ if (import.meta.vitest !== undefined) {
 
     const events$ = merge([clicks$, keys$]);
 
-    const mut_history: string[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: string[] = [];
 
     events$.subscribe((event_) => {
-      mut_history.push(event_);
+      valueHistory.push(event_);
     });
 
     clicks$.next('c1');
 
-    assert.deepStrictEqual(mut_history, ['c1']);
+    assert.deepStrictEqual(valueHistory, ['c1']);
 
     keys$.next('k1');
 
-    assert.deepStrictEqual(mut_history, ['c1', 'k1']);
+    assert.deepStrictEqual(valueHistory, ['c1', 'k1']);
 
     clicks$.next('c2');
 
     keys$.next('k2');
 
-    assert.deepStrictEqual(mut_history, ['c1', 'k1', 'c2', 'k2']);
+    assert.deepStrictEqual(valueHistory, ['c1', 'k1', 'c2', 'k2']);
 
     // embed-sample-code-ignore-below
   });

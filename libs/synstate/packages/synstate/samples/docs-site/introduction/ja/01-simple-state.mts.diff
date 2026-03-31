@@ -1,0 +1,20 @@
+--- en/01-simple-state.mts
++++ ja/01-simple-state.mts
+@@ -1,14 +1,14 @@
+ import { createState } from 'synstate';
+ 
+-// Create a reactive state
++// リアクティブな状態を作成
+ const [state, setState] = createState(0);
+ 
+-// Subscribe to changes
++// 変更を購読
+ state.subscribe((count) => {
+   console.log(count); // 0, 1
+ });
+ 
+-// Update state
++// 状態を更新
+ setState(1);
+ 
+ // embed-sample-code-ignore-below

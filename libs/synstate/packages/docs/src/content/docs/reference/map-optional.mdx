@@ -1,0 +1,74 @@
+---
+prev: false
+next: false
+title: mapOptional
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Transforms the inner value of an `Optional` type emitted by the source.
+If the value is `Some`, the mapping function is applied; if `None`, it remains `None`.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: '2', color: colors.green },
+                { t: 45, label: '-', color: colors.gray },
+                { t: 75, label: '5', color: colors.blue },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 15, label: '4', color: colors.green },
+            { t: 45, label: '-', color: colors.gray },
+            { t: 75, label: '10', color: colors.blue },
+        ],
+    }}
+    operator="mapOptional(x => x * 2)"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  value$    Some(2)    None       Some(5)
+//  doubled$  Some(4)    None       Some(10)
+//
+//  Explanation:
+//  - mapOptional transforms the inner value of Optional emissions
+//  - Some values are mapped; None values pass through unchanged
+
+const value$ = source<Optional<number>>();
+
+const doubled$ = value$.pipe(mapOptional((x) => x * 2));
+
+const valueHistory: Optional<number>[] = [];
+
+doubled$.subscribe((v) => {
+    valueHistory.push(v);
+});
+
+value$.next(Optional.some(2));
+
+assert.deepStrictEqual(valueHistory, [Optional.some(4)]);
+
+value$.next(Optional.none);
+
+assert.deepStrictEqual(valueHistory, [Optional.some(4), Optional.none]);
+
+value$.next(Optional.some(5));
+
+assert.deepStrictEqual(valueHistory, [
+    Optional.some(4),
+    Optional.none,
+    Optional.some(10),
+]);
+```

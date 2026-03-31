@@ -1,0 +1,71 @@
+---
+prev: false
+next: false
+title: take
+---
+
+import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+Takes only the first `n` emissions from the source observable, then completes.
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: '1', color: colors.yellow },
+                { t: 35, label: '2', color: colors.orange },
+                { t: 55, label: '3', color: colors.blue },
+                { t: 75, label: '4', color: colors.purple },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 15, label: '1', color: colors.yellow },
+            { t: 35, label: '2', color: colors.orange },
+            { t: 55, label: '3', color: colors.blue },
+        ],
+        completion: 58,
+    }}
+    operator="take(3)"
+/>
+
+## Example
+
+```tsx
+//  Timeline:
+//
+//  num$    1     2     3     4 (ignored)
+//  taken$  1     2     3     | (completes)
+//
+//  Explanation:
+//  - take emits only the first n values, then completes
+//  - Subsequent emissions from the source are ignored
+
+const num$ = source<number>();
+
+const taken$ = num$.pipe(take(3));
+
+const valueHistory: number[] = [];
+
+taken$.subscribe((x) => {
+    valueHistory.push(x);
+});
+
+num$.next(1);
+
+num$.next(2);
+
+num$.next(3);
+
+assert.deepStrictEqual(valueHistory, [1, 2, 3]);
+
+num$.next(4); // ignored (already completed)
+
+assert.deepStrictEqual(valueHistory, [1, 2, 3]);
+```

@@ -30,6 +30,15 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
     for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
+      const codeBlockCount = markdownContent.split(codeBlockStart).length - 1;
+
+      // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
+      if (codeBlockCount !== sampleCodeFiles.length) {
+        return Result.err(
+          `❌ Code block count mismatch in ${mdPath}: found ${codeBlockCount} \`\`\`tsx blocks but expected ${sampleCodeFiles.length} sample files`,
+        );
+      }
+
       const mut_results: string[] = [];
 
       let mut_rest: string = markdownContent;

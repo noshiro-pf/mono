@@ -4,4 +4,3 @@ export * from './create/index.mjs';
 export * from './operators/index.mjs';
 export * from './predefined/index.mjs';
 export * from './types/index.mjs';
-export * from './utils/index.mjs';

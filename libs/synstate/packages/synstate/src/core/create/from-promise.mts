@@ -16,7 +16,7 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  * //  Timeline:
  * //
  * //  promise     [pending...]  -> resolved/rejected
- * //  data$                     Ok(value) or Err(error)
+ * //  data$                        Ok(value) or Err(error)
  * //
  * //  Explanation:
  * //  - fromPromise converts a Promise into an observable
@@ -24,17 +24,20 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  * //  - Completes after emitting the result
  * //  - Useful for integrating async operations into reactive flows
  *
- * const fetchData = async (): Promise<{ value: number }> => ({ value: 42 });
+ * const fetchData = async (): Promise<Readonly<{ value: number }>> =>
+ *   ({
+ *     value: 42,
+ *   }) as const;
  *
  * const data$ = fromPromise(fetchData());
  *
- * const mut_history: { value: number }[] = [];
+ * const valueHistory: Readonly<{ value: number }>[] = [];
  *
  * await new Promise<void>((resolve) => {
  *   data$.subscribe(
  *     (result) => {
  *       if (Result.isOk(result)) {
- *         mut_history.push(result.value);
+ *         valueHistory.push(result.value);
  *       }
  *     },
  *     () => {
@@ -43,18 +46,18 @@ import { type FromPromiseObservable } from '../types/index.mjs';
  *   );
  * });
  *
- * assert.deepStrictEqual(mut_history, [{ value: 42 }]);
+ * assert.deepStrictEqual(valueHistory, [{ value: 42 }]);
  * ```
  */
 export const fromPromise = <A, E = unknown>(
-  promise: Readonly<Promise<A>>,
+  promise: Promise<A>,
 ): FromPromiseObservable<A, E> => new FromPromiseObservableClass(promise);
 
 class FromPromiseObservableClass<A, E = unknown>
   extends RootObservableClass<Result<A, E>>
   implements FromPromiseObservable<A, E>
 {
-  constructor(promise: Readonly<Promise<A>>) {
+  constructor(promise: Promise<A>) {
     super({ initialValue: Optional.none });
 
     promise

@@ -12,7 +12,7 @@ import {
   type FilterOperatorObservable,
   type InitializedObservable,
   type Observable,
-  type UpdaterSymbol,
+  type UpdateToken,
 } from '../types/index.mjs';
 import { withInitialValue } from './with-initial-value.mjs';
 
@@ -40,29 +40,29 @@ import { withInitialValue } from './with-initial-value.mjs';
  *
  * const even$ = num$.pipe(filter((x) => x % 2 === 0));
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * even$.subscribe((x) => {
- *   mut_history.push(x);
+ *   valueHistory.push(x);
  * });
  *
  * num$.next(1); // nothing logged
  *
  * num$.next(2); // logs: 2
  *
- * assert.deepStrictEqual(mut_history, [2]);
+ * assert.deepStrictEqual(valueHistory, [2]);
  *
  * num$.next(3); // nothing logged
  *
  * num$.next(4); // logs: 4
  *
- * assert.deepStrictEqual(mut_history, [2, 4]);
+ * assert.deepStrictEqual(valueHistory, [2, 4]);
  *
  * num$.next(5);
  *
  * num$.next(6);
  *
- * assert.deepStrictEqual(mut_history, [2, 4, 6]);
+ * assert.deepStrictEqual(valueHistory, [2, 4, 6]);
  * ```
  */
 export function filter<A, B extends A>(
@@ -107,12 +107,12 @@ class FilterObservableClass<A>
     this.#predicate = predicate;
   }
 
-  override tryUpdate(updaterSymbol: UpdaterSymbol): void {
+  override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
     const sn = par.getSnapshot();
 
-    if (par.updaterSymbol !== updaterSymbol || Optional.isNone(sn)) {
+    if (par.updateToken !== updateToken || Optional.isNone(sn)) {
       return; // skip update
     }
 
@@ -120,7 +120,7 @@ class FilterObservableClass<A>
       this.#mut_index === -1 ? asSafeUint(0) : SafeUint.add(1, this.#mut_index);
 
     if (this.#predicate(sn.value, this.#mut_index)) {
-      this.setNext(sn.value, updaterSymbol);
+      this.setNext(sn.value, updateToken);
     }
   }
 }

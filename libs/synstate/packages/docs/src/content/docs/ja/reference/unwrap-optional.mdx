@@ -1,0 +1,69 @@
+---
+prev: false
+next: false
+title: unwrapOptional
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+`Optional` 値をアンラップし、`Some(value)` を `value` に、`None` を `undefined` に変換します。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: '42', color: colors.green },
+                { t: 45, label: '-', color: colors.gray },
+                { t: 75, label: '7', color: colors.blue },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 15, label: '42', color: colors.green },
+            { t: 45, label: '·', color: colors.gray },
+            { t: 75, label: '7', color: colors.blue },
+        ],
+    }}
+    operator="unwrapOptional()"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  opt$        Some(42)    None        Some(7)
+//  unwrapped$  42          undefined   7
+//
+//  Explanation:
+//  - unwrapOptional converts Some(value) to value, and None to undefined
+//  - Useful for extracting raw values from Optional streams
+
+const opt$ = source<Optional<number>>();
+
+const unwrapped$ = opt$.pipe(unwrapOptional());
+
+const valueHistory: (number | undefined)[] = [];
+
+unwrapped$.subscribe((v) => {
+    valueHistory.push(v);
+});
+
+opt$.next(Optional.some(42));
+
+assert.deepStrictEqual(valueHistory, [42]);
+
+opt$.next(Optional.none);
+
+assert.deepStrictEqual(valueHistory, [42, undefined]);
+
+opt$.next(Optional.some(7));
+
+assert.deepStrictEqual(valueHistory, [42, undefined, 7]);
+```

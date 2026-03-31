@@ -4,7 +4,10 @@ const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
 
 const ignoreBelowKeyword = '// embed-sample-code-ignore-below';
 
-const ignoreLineKeyword = '/* embed-sample-code-ignore-this-line */';
+const ignoreLineKeywords = [
+  '/* embed-sample-code-ignore-this-line */',
+  '// transformer-ignore-next-line',
+] as const;
 
 /** Extracts the relevant sample code, removing ignore markers */
 export const extractSampleCode = (content: string): string => {
@@ -20,7 +23,12 @@ export const extractSampleCode = (content: string): string => {
     .map((s) =>
       s
         .split('\n')
-        .filter((line) => !line.trimStart().startsWith(ignoreLineKeyword))
+        .filter(
+          (line) =>
+            !ignoreLineKeywords.some((ignoreLineKeyword) =>
+              line.trimStart().startsWith(ignoreLineKeyword),
+            ),
+        )
         .join('\n'),
     )
     .map(normalizeIndent)

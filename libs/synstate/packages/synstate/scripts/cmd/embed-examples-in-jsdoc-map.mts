@@ -32,7 +32,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sourcePath: 'src/utils/create-state.mts',
     sampleFiles: [
       'samples/src/create-state-example.mts',
-      'samples/src/create-boolean-state-example.mts',
+      'samples/src/create-boolean-state-example.tsx',
     ],
   },
   {
@@ -56,16 +56,16 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/scan-example.mts'],
   },
   {
-    sourcePath: 'src/core/operators/debounce-time.mts',
-    sampleFiles: ['samples/src/debounce-time-example.mts'],
+    sourcePath: 'src/core/operators/debounce.mts',
+    sampleFiles: ['samples/src/debounce-example.mts'],
   },
   {
-    sourcePath: 'src/core/operators/throttle-time.mts',
-    sampleFiles: ['samples/src/throttle-time-example.mts'],
+    sourcePath: 'src/core/operators/throttle.mts',
+    sampleFiles: ['samples/src/throttle-example.mts'],
   },
   {
-    sourcePath: 'src/core/operators/audit-time.mts',
-    sampleFiles: ['samples/src/audit-time-example.mts'],
+    sourcePath: 'src/core/operators/audit.mts',
+    sampleFiles: ['samples/src/audit-example.mts'],
   },
   {
     sourcePath: 'src/core/operators/with-initial-value.mts',
@@ -96,16 +96,16 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/skip-while-example.mts'],
   },
   {
-    sourcePath: 'src/core/operators/throttle-time.mts',
-    sampleFiles: ['samples/src/throttle-time-example.mts'],
+    sourcePath: 'src/core/operators/throttle.mts',
+    sampleFiles: ['samples/src/throttle-example.mts'],
   },
   {
     sourcePath: 'src/core/operators/pairwise.mts',
     sampleFiles: ['samples/src/pairwise-example.mts'],
   },
   {
-    sourcePath: 'src/core/operators/map-with-index.mts',
-    sampleFiles: ['samples/src/map-with-index-example.mts'],
+    sourcePath: 'src/core/operators/map.mts',
+    sampleFiles: ['samples/src/map-example.mts'],
   },
   {
     sourcePath: 'src/core/operators/merge-map.mts',
@@ -138,16 +138,8 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/from-promise-example.mts'],
   },
   {
-    sourcePath: 'src/core/create/of.mts',
-    sampleFiles: ['samples/src/of-example.mts'],
-  },
-  {
-    sourcePath: 'src/core/create/from-array.mts',
-    sampleFiles: ['samples/src/from-array-example.mts'],
-  },
-  {
-    sourcePath: 'src/core/create/interval.mts',
-    sampleFiles: ['samples/src/interval-example.mts'],
+    sourcePath: 'src/core/create/counter.mts',
+    sampleFiles: ['samples/src/counter-example.mts'],
   },
   {
     sourcePath: 'src/core/create/timer.mts',

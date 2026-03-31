@@ -1,6 +1,6 @@
 import { Optional } from 'ts-data-forge';
 import { RootObservableClass } from '../class/index.mjs';
-import { type TimerObservable } from '../types/index.mjs';
+import { type TimerId, type TimerObservable } from '../types/index.mjs';
 
 /**
  * Creates an observable that emits 0 after a specified delay and then completes.
@@ -22,12 +22,12 @@ import { type TimerObservable } from '../types/index.mjs';
  *
  * const delayed$ = timer(100);
  *
- * const mut_history: number[] = [];
+ * const valueHistory: number[] = [];
  *
  * await new Promise<void>((resolve) => {
  *   delayed$.subscribe(
  *     () => {
- *       mut_history.push(1);
+ *       valueHistory.push(1);
  *     },
  *     () => {
  *       resolve();
@@ -35,13 +35,16 @@ import { type TimerObservable } from '../types/index.mjs';
  *   );
  * });
  *
- * assert.deepStrictEqual(mut_history, [1]);
+ * assert.deepStrictEqual(valueHistory, [1]);
  * ```
  */
 export const timer = (
   milliSeconds: number,
-  startManually: boolean = false,
-): TimerObservable => new TimerObservableClass(milliSeconds, startManually);
+  options?: Readonly<{
+    startManually?: boolean;
+  }>,
+): TimerObservable =>
+  new TimerObservableClass(milliSeconds, options?.startManually ?? false);
 
 class TimerObservableClass
   extends RootObservableClass<0>
@@ -65,11 +68,11 @@ class TimerObservableClass
     }
   }
 
-  start(): this {
+  start(): void {
     if (this.#mut_isStarted) {
       console.warn('cannot start twice');
 
-      return this;
+      return;
     }
 
     this.#mut_isStarted = true;
@@ -77,7 +80,7 @@ class TimerObservableClass
     if (this.isCompleted) {
       console.warn('cannot restart stopped TimerObservable');
 
-      return this;
+      return;
     }
 
     this.#mut_timerId = setTimeout(() => {
@@ -85,8 +88,6 @@ class TimerObservableClass
 
       this.complete();
     }, this.#milliSeconds);
-
-    return this;
   }
 
   #resetTimer(): void {

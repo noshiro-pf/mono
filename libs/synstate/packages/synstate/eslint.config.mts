@@ -5,6 +5,7 @@ import {
   eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
+  eslintImportsRules,
   typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -28,6 +29,17 @@ export default [
         {
           ...typescriptEslintRules['@typescript-eslint/no-shadow'][1],
           allow: ['Observable'],
+        },
+      ],
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            'zustand/vanilla',
+            'jotai/vanilla',
+            'valtio/vanilla',
+          ],
         },
       ],
     }),
@@ -85,6 +97,14 @@ export default [
       'react/jsx-no-bind': 'off',
       'react-perf/jsx-no-new-function-as-prop': 'off',
       'react/no-array-index-key': 'off',
+      'functional/immutable-data': 'off',
+      'functional/no-let': 'off',
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          whitelist: ['synstate-react-hooks', 'synstate-react-hooks-compat'],
+        },
+      ],
     }),
   },
 ] satisfies readonly FlatConfig[];

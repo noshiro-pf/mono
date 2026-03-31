@@ -1,0 +1,225 @@
+---
+title: 先行研究と設計根拠
+sidebar:
+    order: 4
+---
+
+[前のページ](/synstate/ja/internals/how-synstate-solved-the-glitch/)では、SynState が静的依存グラフと事前計算された伝搬順序によってグリッチフリーな伝搬を実現する仕組みを説明しました。このページでは、このアプローチの歴史的背景を調査し、多くの現代状態管理ライブラリが動的グラフを採用する中で SynState が静的グラフを選択した根拠を説明します。
+
+## 中核アイデア
+
+SynState の重要な洞察は：
+
+> 依存関係グラフのトポロジーは静的である — Observable が構築されるときに決定され、更新の間に変化しない。これは、伝搬順序を発行のたびに再導出するのではなく、グラフの構築時に一度だけ計算できることを意味する。
+
+これは新しいアイデアではありません。個々の構成要素 — 静的依存グラフ、グリッチ回避のためのトポロジカル順序付け、静的グラフなら一度だけスケジューリングできるという観察 — はすべて学術文献に記載されており、最も古いものは 1987 年に遡ります。
+
+## 学術文献における先行研究
+
+### データフローグラフの静的スケジューリング（1987）
+
+Lee & Messerschmitt の "Static Scheduling of Synchronous Data Flow Programs"（IEEE Transactions on Computers, 1987）が最も直接的な先行研究です。Synchronous Dataflow（SDF）において、各ノードのデータ生成・消費量が事前に指定される場合、「SDF ノードのスケジューリングは実行時ではなくコンパイル時（静的に）行える。したがって実行時オーバーヘッドは消滅する」と明言しています。これは SynState の洞察そのものであり、約40年前に信号処理の分野で適用されたものです。
+
+### トポロジカルソートによるグリッチ回避（2006+）
+
+リアクティブシステムにおけるグリッチ防止のためのトポロジカル順序付けは確立された手法です：
+
+- **FrTime**（Cooper & Krishnamurthi, ESOP 2006）は各ノードに依存関係より高い高さを割り当て、高さ順の優先度キューで伝搬します。FrTime は動的グラフをサポートするため、「グラフ構造の一部が変化したとき、動的にソート順序を再計算」する必要があります — これは静的グラフでは再計算が不要であることの裏返しの証明です。
+- **Elm の初期 FRP モデル**（Czaplicki & Chong, PLDI 2013）はプログラム初期化時に決定される静的シグナルグラフを使用し、型システムでリアクティブプリミティブを制限して固定グラフ構造での効率的実行を保証しました。
+- **Scala.React**（Maier & Odersky, 2012）はトポロジカル順序に基づく2フェーズの伝搬サイクルで一貫性を保証します。
+
+### サーベイ
+
+Bainomugisha et al. の "A Survey on Reactive Programming"（ACM Computing Surveys, 2013）は静的依存グラフと動的依存グラフを明確に区別し、「式をトポロジカルソートし、その順序で値を更新する」ことがグリッチフリー伝搬の標準手法であると記述しています。
+
+## オープンソースライブラリにおける先行実装
+
+SynState と同様の静的グラフアプローチを実装した OSS が複数存在します：
+
+| ライブラリ                                                          | アプローチ                                                                                                        |
+| :------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------- |
+| **[Topologica](https://github.com/datavis-tech/topologica)**        | 依存関係を構築時に宣言。伝搬はトポロジカルソートを使用し、各ノードが更新サイクルごとに1回だけ設定されることを保証 |
+| **[ReactiveModel](https://github.com/datavis-tech/reactive-model)** | Topologica の前身。依存データグラフ上の明示的なトポロジカルソートアルゴリズムで変更を処理                         |
+| **[Storm.NET](https://github.com/StormDotNet/Storm.NET)**           | "Simple Topologically Ordered Reactive Model" — 比較ベースの更新スキップを実装                                    |
+
+一方、現代の UI 向けリアクティブライブラリの多く — Angular Signals, Preact Signals, SolidJS, MobX, Vue, Jotai — は**動的**依存グラフを採用しており、依存セットは実行時に決定され、評価ごとに変化し得ます。
+
+## 多くの現代ライブラリが動的グラフを採用する理由
+
+動的依存グラフは静的グラフよりも表現力が高い — 特定のパターンでは実行時に依存を変更できる必要がある — という主張がよくなされます。しかし、典型的に引用される具体例を検証すると、少なくともグローバル状態管理のユースケースにおいては、静的グラフでも同等の結果を得られることがわかります。
+
+### 条件分岐による依存関係の変化
+
+Jotai では、派生 atom が条件に応じて異なる atom を読み取れます：
+
+```js
+const temperatureAtom = atom((get) => {
+    const mode = get(modeAtom);
+    if (mode === 'celsius') return get(celsiusAtom);
+    else return get(fahrenheitAtom);
+});
+```
+
+`modeAtom` が `'celsius'` のとき、`fahrenheitAtom` の変化では再計算がトリガーされません。動的追跡が `fahrenheitAtom` にアクセスしなかったことを認識しているためです。
+
+SynState では、同じロジックを静的グラフで表現できます：
+
+```ts
+const temperature$ = combine([mode$, celsius$, fahrenheit$]).pipe(
+    map(([mode, c, f]) => (mode === 'celsius' ? c : f)),
+);
+```
+
+celsius モードで `fahrenheit$` が変化しても、`map` は同じ出力値を生成します。SynState の等値比較により下流への伝搬は発生しません。「過剰購読」のコストは**関数呼び出し1回 + 等値比較**のみです。一方、動的追跡では毎回の評価時に依存セットの差分計算、購読の解除、再購読が必要です。SynState のベンチマーク結果からは、この動的追跡のオーバーヘッドが過剰購読のコストを上回っているケースが確認されています。
+
+### 動的コレクション
+
+Jotai の atoms-in-atom パターンでは、各リストアイテムが独立した atom を持ち、1つのアイテムの更新で他のアイテムのコンポーネントが再レンダリングされません：
+
+```tsx
+const todosAtom = atom([atom('Todo 1'), atom('Todo 2')]);
+
+const TodoItem = ({ todoAtom }: { todoAtom: PrimitiveAtom<string> }) => {
+    const [todo, setTodo] = useAtom(todoAtom);
+    return <input value={todo} onChange={(e) => setTodo(e.target.value)} />;
+};
+
+const TodoList = () => {
+    const [todos, setTodos] = useAtom(todosAtom);
+    const addTodo = () => setTodos((prev) => [...prev, atom('')]);
+    return (
+        <div>
+            {todos.map((todoAtom, i) => (
+                <TodoItem key={i} todoAtom={todoAtom} />
+            ))}
+            <button onClick={addTodo}>Add</button>
+        </div>
+    );
+};
+```
+
+SynState では、コレクション全体を1つの Observable とし、各アイテム用の derived Observable で同じ粒度を実現できます：
+
+```tsx
+const [todos$, setTodos] = createState<readonly string[]>(['Todo 1', 'Todo 2']);
+
+const TodoItem = ({ index }: { index: number }) => {
+    const todo = useObservableValue(
+        useMemo(() => todos$.pipe(map((todos) => todos[index] ?? '')), [index]),
+    );
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTodos((prev) =>
+            prev.map((t, i) => (i === index ? e.target.value : t)),
+        );
+    };
+    return <input value={todo} onChange={handleChange} />;
+};
+
+const TodoList = () => {
+    const todosLength = useObservableValue(
+        useMemo(() => todos$.pipe(map((todos) => todos.length)), []),
+    );
+    const addTodo = () => setTodos((prev) => [...prev, '']);
+    return (
+        <div>
+            {Array.from({ length: todosLength }, (_, i) => (
+                <TodoItem key={i} index={i} />
+            ))}
+            <button onClick={addTodo}>Add</button>
+        </div>
+    );
+};
+```
+
+各 `TodoItem` はインデックスでアイテムを抽出する derived Observable を購読します — O(1) のインデックスアクセスです。等値比較により、あるアイテムの編集で他のアイテムは再レンダリングされません。`TodoList` は `todosLength` のみを購読するため、既存アイテムの編集でリスト自体が再レンダリングされることもありません。アイテムの追加・削除はコレクション Observable の値を更新するだけであり、グラフの動的な再構築は不要です。
+
+### 非同期データフェッチ
+
+Jotai では、非同期 atom は実際に読まれたときだけ fetch を実行します：
+
+```js
+const userDataAtom = atom(async (get) => fetchUser(get(authAtom).id));
+```
+
+SynState では `switchMap` と `fromAbortablePromise` を使って、静的グラフ内で条件付き非同期処理を扱えます：
+
+```ts
+const userData$ = auth$.pipe(
+    switchMap((auth) =>
+        auth
+            ? fromAbortablePromise((signal) => fetchUser(auth.id, signal))
+            : of(guestData),
+    ),
+);
+```
+
+`auth$` が `null` になると、進行中の fetch は自動的に abort され `guestData` が発行されます。グラフ構造は構築時に確定しており、動的な依存の付け替えは不要です。abort 制御が `switchMap` のセマンティクスとして組み込まれているため、リソースのライフサイクルがコード上で明示的に表現されます。
+
+## 「過剰購読」のコスト：ベンチマーク検証
+
+MobX の作者 Michel Weststrate は「最小かつ一貫した購読セットは、購読が実行時に決定される場合にのみ達成できる」と述べています[^weststrate]。
+
+この主張は具体的に何を意味するのでしょうか。MobX や Jotai では、`computed` や派生 atom の関数が**実行される際に** `.get()` で実際にアクセスした observable だけが購読されます。条件分岐により実行パスが変わると、購読セット自体が動的に変化します。一方、SynState の `combine` は構築時に全ソースを購読するため、条件分岐の結果に関係なくすべての observable が購読セットに含まれます。
+
+この差が最も顕著に現れるのは、**購読セットに含まれない observable への更新コスト**です。動的購読では observer が登録されていないため更新通知自体が発生しませんが、静的購読では `combine` が発火し `map` + 等値比較のコストが生じます。
+
+この主張を定量的に検証するため、[条件付きファンアウトベンチマーク](/synstate/ja/guides/library-comparison/benchmark/#シナリオ：-条件付きファンアウト)を実施しました。結果として、過剰購読のコストは**理論的には存在する**ことが確認されました。MobX では非アクティブな分岐の observer リストが空であるため更新コストがゼロである一方、SynState の `combine` は全分岐を含むため、分岐数 B に比例してコストが増加します。
+
+ただし、このベンチマークのシナリオ — selector が固定されたまま非アクティブな分岐だけが大量に更新され続ける — は現実のアプリケーションでは考えにくいものです。もし使われていないデータが頻繁に更新される状況が発生しているなら、それはライブラリの購読モデルではなくアプリケーション側の設計で解決すべき問題です。また、selector が切り替わるたびに動的購読ライブラリでは購読セットの再構築コストが発生しますが、このベンチマークにはそのコストが含まれていません。
+
+## React 統合に動的グラフは不要
+
+React のコンポーネントツリーが動的であるため、状態管理のグラフも動的でなければならないように見えるかもしれません。しかし、SynState の `synstate-react-hooks` はこの前提が必須ではないことを示しています。
+
+`synstate-react-hooks` は `useSyncExternalStore` を使用して React コンポーネントから Observable を購読します：
+
+```
+[静的グラフ (SynState)] → Observable
+        ↓
+[useSyncExternalStore] → コンポーネントが subscribe/unsubscribe
+        ↓
+[React コンポーネントツリー] → マウント/アンマウントは React が管理
+```
+
+- グラフは静的なまま — React 統合による制約は一切発生しません。
+- コンポーネントは独立して subscribe/unsubscribe し、コンポーネントツリーの動的な性質は購読レイヤーで完全に吸収されます。
+- コンポーネントのマウント/アンマウント時にグラフの再構築は発生しません。
+
+つまり、状態の計算グラフと UI の購読管理は分離可能であり、React と統合するために状態グラフ自体を動的にする必要はありません。
+
+## React ユーザーとの mental model の親和性
+
+React は `useMemo(() => ..., [dep1, dep2])` のように**依存を明示的に宣言する**モデルです。SynState の `pipe(map(...))` / `combine([a$, b$])` はこの「依存を宣言的に記述する」モデルと類似した構造を持っています：
+
+| React                               | SynState                                         |
+| :---------------------------------- | :----------------------------------------------- |
+| `useMemo(() => count * 2, [count])` | `count.pipe(map((n) => n * 2))`                  |
+| `useMemo(() => a + b, [a, b])`      | `combine([a$, b$]).pipe(map(([a, b]) => a + b))` |
+| 依存配列で明示的に宣言              | `combine` / `pipe` で明示的に宣言                |
+
+SynState は React ユーザーが既に理解している「依存を明示的に宣言し、システムが自動で伝搬する」という mental model を、コンポーネントのスコープを超えてグローバル状態に拡張したものです。主な違いは、SynState の Observable がコンポーネントライフサイクルから独立していること、push ベースで影響のある値のみ再計算されること、`debounce`・`throttle`・`switchMap` などの非同期オペレーターと合成可能であることです。
+
+## SynState が静的グラフを選択した根拠
+
+以上の分析を踏まえると、SynState の設計判断は以下のように整理できます：
+
+- **計算能力**： このページで検証した範囲では、動的グラフでなければ表現できないグローバル状態管理のユースケースは見つかりませんでした。
+- **パフォーマンス**： [ベンチマーク](/synstate/ja/guides/library-comparison/benchmark/)では、線形チェーンやダイヤモンド依存などの実用的なシナリオで SynState は高いスループットを示しています。動的購読が理論上有利な[条件付きファンアウト](/synstate/ja/guides/library-comparison/benchmark/#シナリオ：-条件付きファンアウト)シナリオも検証しましたが、これは購読されていない observable が大量に更新され続けるという非現実的な条件であり、実際にはアプリケーション側の設計で回避すべき状況です。
+- **React 統合**： `useSyncExternalStore` による購読レイヤーで十分であり、グラフ側を動的にする必要はありませんでした。
+- **React との mental model**： SynState の明示的依存宣言は React の `useMemo` モデルと類似した構造を持っています。
+
+動的グラフを採用するライブラリでは、関数内で `get()` を呼ぶだけで依存が暗黙的に宣言されます。一方、SynState の `combine` / `pipe` による明示的な依存宣言は、React の `useMemo` の依存配列と同様に、依存関係をコード上で視覚的に把握できるという利点があります。SynState はこの明示的なモデルの上で、ランタイムコストゼロの静的グラフによるグリッチフリー O(n) 伝搬を実現しています。
+
+## 参考文献
+
+- Lee, E.A. & Messerschmitt, D.G. (1987). _Static Scheduling of Synchronous Data Flow Programs._ IEEE Transactions on Computers, C-36(1), 24–35.
+- Bainomugisha, E. et al. (2013). _A Survey on Reactive Programming._ ACM Computing Surveys, 45(4), Article 52.
+- Cooper, G.H. & Krishnamurthi, S. (2006). _Embedding Dynamic Dataflow in a Call-by-Value Language._ ESOP 2006.
+- Czaplicki, E. & Chong, S. (2013). _Asynchronous Functional Reactive Programming for GUIs._ PLDI 2013.
+- Maier, I. & Odersky, M. (2012). _Deprecating the Observer Pattern with Scala.React._ EPFL Technical Report.
+- Salvaneschi, G. et al. (2014). _REScala: Bridging Between Object-Oriented and Functional Style in Reactive Applications._ OOPSLA/SPLASH 2014.
+- Burchett, K., Cooper, G.H. & Krishnamurthi, S. (2007). _Lowering: A Static Optimization Technique for Transparent Functional Reactivity._ PEPM 2007.
+- Weststrate, M. (2016). _The Fundamental Principles Behind MobX._ https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8.
+- Weststrate, M. (2016). _Becoming Fully Reactive: an In-Depth Explanation of MobX._ https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254.
+
+[^weststrate]: Weststrate, M. (2016). [_The Fundamental Principles Behind MobX_](https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8). 同様の記述は [_Becoming Fully Reactive: an In-Depth Explanation of MobX_](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254) にも含まれています。

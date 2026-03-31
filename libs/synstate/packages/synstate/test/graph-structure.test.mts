@@ -1,4 +1,4 @@
-import { combine, map, of, withCurrentValueFrom } from '../src/index.mjs';
+import { combine, map, source, withCurrentValueFrom } from '../src/index.mjs';
 
 describe('graph-structure', () => {
   test('case 1', () => {
@@ -13,7 +13,7 @@ describe('graph-structure', () => {
      *     |    |
      *  [ combined ]
      */
-    const source$ = of(0);
+    const source$ = source(0);
 
     const double$ = source$.pipe(map((x) => x * 2));
 
@@ -31,7 +31,7 @@ describe('graph-structure', () => {
   });
 
   test('case 2', () => {
-    const source$ = of(0);
+    const source$ = source(0);
 
     const double$ = source$.pipe(map((x) => x * 2));
 
@@ -45,7 +45,7 @@ describe('graph-structure', () => {
   });
 
   test('case 3', () => {
-    const source$ = of(0);
+    const source$ = source(0);
 
     const double$ = source$.pipe(map((x) => x * 2));
 

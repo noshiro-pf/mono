@@ -1,0 +1,113 @@
+---
+prev: false
+next: false
+title: throttle
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+最初の値を発行した後、指定された期間は後続の値を無視します。
+期間が経過すると、次の発行が許可されます。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 5, label: '0', color: colors.orange },
+                { t: 17, label: '2', color: colors.yellow },
+                { t: 23, label: '3', color: colors.orange },
+                { t: 53, label: '9', color: colors.orange },
+                { t: 59, label: '10', color: colors.yellow },
+                { t: 65, label: '11', color: colors.yellow },
+                { t: 71, label: '12', color: colors.orange },
+                { t: 77, label: '13', color: colors.yellow },
+                { t: 83, label: '14', color: colors.yellow },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 5, label: '0', color: colors.purple },
+            { t: 23, label: '3', color: colors.purple },
+            { t: 53, label: '9', color: colors.purple },
+            { t: 71, label: '12', color: colors.purple },
+        ],
+    }}
+    operator="throttle(250)"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline (250ms throttle):
+//
+//  Time(x50ms)  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+//
+//  input$       0       2   3                   9   10  11  12  13  14
+//               |- 250ms -> |- 250ms ->         |- 250ms ->    |- 250ms ->
+//  throttled$   0           3                   9          12           (emitted at start of window)
+//
+//  Explanation:
+//  - throttle emits the FIRST value received, then ignores subsequent values
+//    for the specified duration (250ms)
+//  - Unlike audit (which emits the LAST value), throttle emits the FIRST
+//  - Useful for rate-limiting scroll/resize events
+
+const input$ = source<number>();
+
+const throttled$ = input$.pipe(throttle(250));
+
+const valueHistory: number[] = [];
+
+throttled$.subscribe((value) => {
+    valueHistory.push(value);
+});
+
+const sleep = (ms: number): Promise<void> =>
+    new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+
+input$.next(0);
+
+assert.deepStrictEqual(valueHistory, [0]);
+
+await sleep(200);
+
+input$.next(2);
+
+assert.deepStrictEqual(valueHistory, [0]);
+
+await sleep(100);
+
+input$.next(3);
+
+assert.deepStrictEqual(valueHistory, [0, 3]);
+
+await sleep(300);
+
+input$.next(9);
+
+assert.deepStrictEqual(valueHistory, [0, 3, 9]);
+
+await sleep(100);
+
+input$.next(10);
+
+await sleep(100);
+
+input$.next(11);
+
+assert.deepStrictEqual(valueHistory, [0, 3, 9]);
+
+await sleep(100);
+
+input$.next(12);
+
+assert.deepStrictEqual(valueHistory, [0, 3, 9, 12]);
+```

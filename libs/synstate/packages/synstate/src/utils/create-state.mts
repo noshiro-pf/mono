@@ -34,25 +34,25 @@ const reducer = <S,>(state: S, action: Action<S>): S => {
  * ```ts
  * const [state, setState, { updateState, resetState }] = createState(0);
  *
- * const mut_history: number[] = [];
+ * const stateHistory: number[] = [];
  *
  * state.subscribe((value: number) => {
- *   mut_history.push(value);
+ *   stateHistory.push(value);
  * });
  *
- * assert.deepStrictEqual(mut_history, [0]);
+ * assert.deepStrictEqual(stateHistory, [0]);
  *
  * setState(10); // logs: 10
  *
- * assert.deepStrictEqual(mut_history, [0, 10]);
+ * assert.deepStrictEqual(stateHistory, [0, 10]);
  *
  * updateState((prev: number) => prev + 1); // logs: 11
  *
- * assert.deepStrictEqual(mut_history, [0, 10, 11]);
+ * assert.deepStrictEqual(stateHistory, [0, 10, 11]);
  *
  * resetState(); // logs: 0
  *
- * assert.deepStrictEqual(mut_history, [0, 10, 11, 0]);
+ * assert.deepStrictEqual(stateHistory, [0, 10, 11, 0]);
  * ```
  */
 export const createState = <S,>(
@@ -99,27 +99,23 @@ export const createState = <S,>(
  *
  * @example
  * ```ts
- * const [state, { setTrue, toggle }] = createBooleanState(false);
+ * import type * as React from 'react';
+ * import { createBooleanState } from 'synstate';
+ * import { useObservableValue } from 'synstate-react-hooks';
  *
- * const mut_history: boolean[] = [];
+ *     // Menu drawer open/close state.
+ *     // setTrue and setFalse can be passed directly as callbacks
+ *     // — no need to create wrapper functions like `() => setState(true)`.
+ *     const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
+ *       createBooleanState(false);
  *
- * state.subscribe((value: boolean) => {
- *   mut_history.push(value);
- * });
- *
- * assert.deepStrictEqual(mut_history, [false]);
- *
- * setTrue(); // logs: true
- *
- * assert.deepStrictEqual(mut_history, [false, true]);
- *
- * toggle(); // logs: false
- *
- * assert.deepStrictEqual(mut_history, [false, true, false]);
- *
- * toggle(); // logs: true
- *
- * assert.deepStrictEqual(mut_history, [false, true, false, true]);
+ *     const SampleComponent = (): React.JSX.Element => (
+ *       <MenuDrawer
+ *         open={useObservableValue(menuOpen$)}
+ *         onClose={closeMenu}
+ *         onOpen={openMenu}
+ *       />
+ *     );
  * ```
  */
 export const createBooleanState = (

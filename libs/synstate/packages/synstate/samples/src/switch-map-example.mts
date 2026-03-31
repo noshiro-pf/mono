@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 import { source, switchMap } from 'synstate';
 
 if (import.meta.vitest !== undefined) {
@@ -8,50 +9,82 @@ if (import.meta.vitest !== undefined) {
 
       //  Timeline:
       //
-      //  searchQuery$  "a"       "ab"      "abc"
-      //  requests      fetch1    fetch2    fetch3
-      //  results$                cancel    cancel    result3
-      //                          fetch1    fetch2
+      //  input$      A                          B              C
+      //  inner A     A1    A2    A3
+      //  inner B                                B1    B2      (switched!)
+      //  inner C                                              C1    C2    C3
+      //  result$     A1    A2    A3              B1    B2      C1    C2    C3
       //
       //  Explanation:
-      //  - switchMap cancels previous inner observables when a new value arrives
-      //  - Only the result from the latest search query is emitted
-      //  - Previous ongoing requests are cancelled
-      //  - Ideal for search-as-you-type scenarios
+      //  - switchMap creates an inner observable for each source value
+      //  - When a new source value arrives, the previous inner is unsubscribed
+      //  - A's inner completes normally (all 3 values emitted)
+      //  - B's inner is interrupted by C (only 2 values emitted)
+      //  - C's inner completes normally (all 3 values emitted)
 
-      const searchQuery$ = source<string>();
+      const input$ = source<string>();
 
-      const results$ = searchQuery$.pipe(
-        switchMap((query) => {
-          const result$ = source<string[]>();
+      const result$ = input$.pipe(
+        switchMap((letter) => {
+          const inner$ = source<string>();
 
           setTimeout(() => {
-            result$.next([query]);
-
-            result$.complete();
+            inner$.next(`${letter}1`);
           }, 10);
 
-          return result$;
+          setTimeout(() => {
+            inner$.next(`${letter}2`);
+          }, 110);
+
+          setTimeout(() => {
+            inner$.next(`${letter}3`);
+          }, 210);
+
+          return inner$;
         }),
       );
 
-      const mut_history: string[][] = [];
+      // transformer-ignore-next-line convert-to-readonly, append-as-const
+      const valueHistory: string[] = [];
 
-      results$.subscribe((value) => {
-        mut_history.push(value);
+      result$.subscribe((value) => {
+        valueHistory.push(value);
       });
 
-      searchQuery$.next('a');
+      const sleep = (ms: number): Promise<void> =>
+        new Promise((resolve) => {
+          setTimeout(resolve, ms);
+        });
 
-      searchQuery$.next('ab');
+      // Emit A - inner emits A1, A2, A3 at 10ms, 110ms, 210ms
+      input$.next('A');
 
-      searchQuery$.next('abc');
+      await sleep(250);
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200);
-      });
+      assert.deepStrictEqual(valueHistory, ['A1', 'A2', 'A3']);
 
-      assert.deepStrictEqual(mut_history, [['abc']]);
+      // Emit B - inner starts emitting B1, B2 at 10ms, 110ms
+      input$.next('B');
+
+      await sleep(150);
+
+      assert.deepStrictEqual(valueHistory, ['A1', 'A2', 'A3', 'B1', 'B2']);
+
+      // Emit C - switches away from B (B3 cancelled), C's inner starts
+      input$.next('C');
+
+      await sleep(250);
+
+      assert.deepStrictEqual(valueHistory, [
+        'A1',
+        'A2',
+        'A3',
+        'B1',
+        'B2',
+        'C1',
+        'C2',
+        'C3',
+      ]);
 
       // embed-sample-code-ignore-below
     },

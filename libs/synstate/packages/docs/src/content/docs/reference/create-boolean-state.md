@@ -1,0 +1,34 @@
+---
+prev: false
+next: false
+title: createBooleanState
+---
+
+<!-- jsdoc-description -->
+
+Creates a reactive boolean state with convenient methods for boolean operations.
+Extends `createState` with boolean-specific helpers like `toggle`, `setTrue`, and `setFalse`.
+
+<!-- /jsdoc-description -->
+
+## Example
+
+```tsx
+import type * as React from 'react';
+import { createBooleanState } from 'synstate';
+import { useObservableValue } from 'synstate-react-hooks';
+
+// Menu drawer open/close state.
+// setTrue and setFalse can be passed directly as callbacks
+// — no need to create wrapper functions like `() => setState(true)`.
+const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
+    createBooleanState(false);
+
+const SampleComponent = (): React.JSX.Element => (
+    <MenuDrawer
+        open={useObservableValue(menuOpen$)}
+        onClose={closeMenu}
+        onOpen={openMenu}
+    />
+);
+```

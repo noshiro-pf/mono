@@ -1,0 +1,342 @@
+---
+title: 宣言的な状態管理
+sidebar:
+    order: 2
+---
+
+import DataTableDemo from '../../../../components/data-table-demo/data-table-demo-island.astro';
+import DataTableGraph from '../../../../components/dep-graph/data-table-graph-island.astro';
+
+SynState は**リアクティブプログラミング**を行うためのライブラリです。値の間の関係を宣言すれば、システムが自動的にすべてを同期してくれます。馴染みがなくても、シンプルなアナロジーで理解できます。
+
+## スプレッドシートのアナロジー
+
+スプレッドシートでセル A1 の値を変更すると、A1 を参照しているすべてのセルが自動的に更新されます。B1 や C1 や D1 を手動で再計算する必要はありません。スプレッドシートが依存関係を把握し、伝播を処理してくれるからです。
+
+**リアクティブプログラミングは、この仕組みをアプリケーションコードに持ち込みます。** 何かが変化したときにどの変数を更新すべきかを手動で追跡する代わりに、値の間の依存関係を宣言すれば、システムが変更を自動的に伝播します。
+
+## 実はすでに馴染みのあるパターン
+
+React を使ったことがあれば、リアクティブな派生値はすでに馴染みがあるはずです。`useMemo` がまさにそれです：
+
+```tsx
+const [count, setCount] = React.useState(0);
+const doubled = React.useMemo(() => count * 2, [count]);
+const quadrupled = React.useMemo(() => doubled * 2, [doubled]);
+```
+
+`doubled` が `count` に依存し、`quadrupled` が `doubled` に依存すると宣言しています。`count` が変化すると、React が両方を正しい順序で自動的に再計算します。更新ロジックを書く必要はありません。一見すると、単一コンポーネント内でのリアクティブプログラミングのように見えます。
+
+### 再レンダリングとリアクティブ伝播
+
+厳密に言えば、React はリアクティブシステムではなく**スケジューリングベースの再レンダリングシステム**です。`setState` が呼ばれると、React はコンポーネントの再レンダリングをスケジュールし、関数本体を先頭から末尾まで再実行します。入力が実際に変化したかどうかにかかわらず、すべての式が再評価されます。`useMemo` は、既にトリガーされた再レンダリングの中で依存配列が変化していないときに高コストな再計算をスキップする**計算キャッシュ**です。`useMemo` がなければ、入力が変化していなくても派生値はレンダリングのたびに再計算されます。React アプリケーションでパフォーマンス最適化のために `useMemo` や `useCallback` が頻繁に必要になるのはこのためです。
+
+SynState は真の **push-based リアクティブシステム**です。ソースの値が変化すると、直接的または間接的に依存する値にのみ更新がプッシュされます。「すべてを再実行してキャッシュできるものをキャッシュする」のではなく、**入力が変化した派生値だけが再計算されます**。メモ化は不要です。パフォーマンスの最適化がオプトインではなくデフォルトの動作です。
+
+### コンポーネントローカルからグローバルへ
+
+`useMemo` は**コンポーネントのレンダリングサイクル内**でしか動作しません。コンポーネントをまたいだ共有や、React ツリーの外での永続化、debounce や throttle のような非同期オペレーターとの合成はできません。SynState の Observable は、「依存関係を宣言し、自動的に伝播する」モデルを**グローバル状態**に持ち込みます。コンポーネントのライフサイクルに依存しません：
+
+```tsx
+const [count, setCount] = createState(0);
+const doubled = count.pipe(map((n) => n * 2));
+const quadrupled = doubled.pipe(map((n) => n * 2));
+```
+
+考え方は似ています。「何が何に依存するか」を宣言するだけ。主な違いは以下の通りです：
+
+|                        | React `useMemo`                                        | SynState Observable                     |
+| :--------------------- | :----------------------------------------------------- | :-------------------------------------- |
+| **更新モデル**         | コンポーネント全体を再実行 + メモ化キャッシュ          | Push-based — 影響を受ける値だけが再計算 |
+| **メモ化**             | パフォーマンスのために必要（`useMemo`、`useCallback`） | 不要 — 更新は設計上、必要最小限         |
+| **スコープ**           | 単一コンポーネント                                     | アプリケーション全体                    |
+| **非同期オペレーター** | 非対応                                                 | `debounce`、`throttle`、`switchMap` 等  |
+
+### 非同期処理の正確な制御
+
+リアクティブなロジックを React コンポーネントの外に定義することで、非同期処理の記述も格段に容易になります。よくあるパターンとして、検索入力をデバウンスし、値が実際に変わったときだけ fetch を実行するケースを考えてみましょう。
+
+React コンポーネント内でこれを書くと、`useEffect`、`useRef`、`AbortController`、タイマー、クリーンアップ関数を慎重に組み合わせる必要があり、レースコンディションやクロージャの古い参照を生みやすくなります：
+
+```tsx
+import * as React from 'react';
+
+// React： コンポーネント内での手動デバウンス + fetch + abort
+const [query, setQuery] = React.useState('');
+const [results, setResults] = React.useState([]);
+const timerRef = React.useRef<number | undefined>(undefined);
+const abortRef = React.useRef<AbortController | undefined>(undefined);
+
+React.useEffect(() => {
+    clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+        // 前回の実行中リクエストをキャンセル
+        abortRef.current?.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
+
+        fetch(`/api/search?q=${query}`, { signal: controller.signal })
+            .then((res) => res.json())
+            .then((data) => {
+                setResults(data);
+            })
+            .catch((error) => {
+                if (error.name !== 'AbortError') throw error;
+            });
+    }, 300);
+
+    return () => {
+        clearTimeout(timerRef.current);
+        abortRef.current?.abort(); // アンマウント時もキャンセル
+    };
+}, [query]);
+```
+
+タイマー管理、AbortController のライフサイクル、`AbortError` のフィルタリング、アンマウント時のクリーンアップ — すべてが本質的でない定型的な手作業であり、本来の意図「デバウンスして fetch し、前のリクエストはキャンセルする」を覆い隠してしまいます。
+
+SynState では、同じロジックが宣言的なパイプラインになります。各関心事が合成可能なオペレーターです：
+
+```tsx
+// SynState： コンポーネントの外での宣言的パイプライン
+const [query, setQuery] = createState('');
+
+const results = query
+    .pipe(debounce(300)) // 入力の一時停止を待つ
+    .pipe(skipIfNoChange()) // デバウンス後の値が同じならスキップ
+    .pipe(
+        // 新しいクエリが来たら前の fetch をキャンセル
+        switchMap((q) =>
+            fromAbortablePromise((signal) =>
+                fetch(`/api/search?q=${q}`, { signal }).then((r) => r.json()),
+            ),
+        ),
+    );
+```
+
+タイマーの管理も AbortController の手動管理も古いクロージャのリスクもありません。`fromAbortablePromise` は `AbortSignal` を受け取り `fetch` に渡します。`switchMap` が新しい内部 Observable に切り替えると、前の Observable が complete され、実行中のリクエストが自動的に abort されます。パイプラインはコンポーネントのライフサイクルの外に存在するため、再レンダリングやアンマウントの影響を受けず、どのコンポーネントが結果を利用しても同じように動作します。
+
+---
+
+ここまで見てきたパターン — 宣言的な依存関係、自動的な伝播、合成可能な非同期オペレーター — は、相互接続された状態の数が増えるほど真価を発揮します。実際の例で確認してみましょう。
+
+## 実例： フィルター付きデータテーブル
+
+よくある UI パターンを考えてみましょう。列ごとのテキストフィルター、1ページあたりの表示件数セレクター、ページネーションコントロールを備えたデータテーブルです。以下のデモを操作してみてください。フィルター入力に文字を入力したり、ページサイズを変更したりしてみてください：
+
+<DataTableDemo />
+
+フィルターに文字を入力すると、裏側で一連の更新が連鎖します：
+
+1. フィルター入力テキストが変化する
+2. デバウンスタイマーが入力の一時停止を待つ（キーストロークごとのフィルタリングを避けるため）
+3. すべてのアクティブなフィルターに基づいてフィルタ結果が再計算される
+4. ページ数が更新される（フィルタ後の総行数 / 1ページあたりの件数）
+5. 現在のページが有効範囲内に収まるようクランプされる
+6. 現在のページ番号を基に、表示するテーブル行がフィルタ結果からスライスされる
+
+この UI を駆動する **12 個の相互接続された状態**があります。依存構造は以下のようなグラフになります：
+
+<DataTableGraph />
+
+オレンジのノードはユーザー入力、青のノードは中間 state（デバウンス、フィルター、クランプなどの派生計算）、緑のノード（`TableSliced`）が最終的に表示されるテーブルです。これらの依存関係をどう管理するかが、コードの品質に大きく影響します。
+
+## 命令的アプローチ
+
+素直な命令的実装では、ミュータブルな変数と手動の更新関数を使います。実際のアプリケーションではテーブルデータをサーバーから取得（エラーハンドリング含む）する必要があり、フィルタ条件が変わったときは現在のページを1にリセットすべきです：
+
+```tsx
+let filterName = '';
+let filterEmail = '';
+let filterGender = '';
+let itemsPerPage = 10;
+let currentPageInput = 1;
+let allRows: readonly Row[] = [];
+
+// 派生状態 — 手動で同期を維持する必要がある
+let filteredRows: readonly Row[] = [];
+let pageLength = 1;
+let currentPage = 1;
+
+// サーバーからテーブルデータを取得
+const fetchData = async (): Promise<void> => {
+    try {
+        allRows = await fetch('/api/rows').then((r) => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        });
+        updateTable();
+    } catch (error) {
+        renderError(error);
+    }
+};
+
+const updateTable = (): void => {
+    filteredRows = allRows.filter(
+        (row) =>
+            row.name.includes(filterName) &&
+            row.email.includes(filterEmail) &&
+            row.gender.includes(filterGender),
+    );
+
+    pageLength = Math.ceil(filteredRows.length / itemsPerPage);
+
+    currentPage = Math.min(currentPageInput, pageLength);
+
+    const start = (currentPage - 1) * itemsPerPage;
+
+    renderTable(filteredRows.slice(start, start + itemsPerPage));
+};
+
+// フィルタ変更時はページを1にリセットしてから更新（デバウンスは？）
+const onFilterNameChange = (v: string): void => {
+    filterName = v;
+    currentPageInput = 1; // 忘れやすい！
+    updateTable();
+};
+
+const onFilterEmailChange = (v: string): void => {
+    filterEmail = v;
+    currentPageInput = 1;
+    updateTable();
+};
+
+const onFilterGenderChange = (v: string): void => {
+    filterGender = v;
+    currentPageInput = 1;
+    updateTable();
+};
+
+const onItemsPerPageChange = (v: number): void => {
+    itemsPerPage = v;
+    currentPageInput = 1;
+    updateTable();
+};
+
+const onPageChange = (v: number): void => {
+    currentPageInput = v;
+    updateTable();
+};
+```
+
+単純なケースでは動作しますが、構造的な問題がいくつかあります：
+
+1. **手動の実行順序** — `updateTable()` 内の行は依存関係の順序で実行される必要があります。`pageLength` と `filteredRows` の計算を入れ替えるとバグが発生しますが、コード上はそれを防止する仕組みがありません。
+2. **暗黙的な依存関係** — `pageLength` が `filteredRows` と `itemsPerPage` に依存していることを正式に宣言するものがありません。依存関係は手続き的な実行順序に暗黙的に埋め込まれています。
+3. **散在する副作用** — 「フィルタが変わったらページを1にリセット」をすべてのフィルタハンドラに重複して記述する必要があります。1つ忘れると、ユーザーが空のページを見るバグが発生します。このような横断的関心事は見落としやすく、テストも困難です。
+4. **変更に脆弱** — 新しい派生値（例：「一致する行の合計数」カウンター）を追加するには、`updateTable()` の正しい場所を見つけ、順序を壊さないことを祈る必要があります。
+5. **部分更新ができない** — `currentPageInput` だけが変更されても、`updateTable()` はすべてを最初から再計算します。
+6. **デバウンスが困難** — フィルター入力にデバウンスを追加するには、タイマーを手動で管理する必要があり、ページリセットもデバウンス後に行わなければならないため、イベントハンドラがさらに複雑になります。
+7. **データ取得の絡み合い** — `fetchData()` はデータ読み込み後に `updateTable()` を呼ぶ必要があり、`try/catch` でエラーを別途処理し、`fetchError` 状態変数を管理する必要もあります。fetch の実行中にフィルタが変更された場合、古い結果が到着する可能性もあります。
+
+## リアクティブアプローチ
+
+リアクティブプログラミングでは、**更新の方法ではなく、何が何に依存しているかを宣言します**：
+
+以下のコードでは、[**ts-data-forge**](https://www.npmjs.com/package/ts-data-forge) の `Result` 型を使用しています。ts-data-forge は `Result` や `Optional` などの型をはじめ、さまざまな汎用ユーティリティを提供する TypeScript ライブラリです。SynState の `fromPromise` は成功/失敗を型安全に表現するために `Result` を返します。
+
+```tsx
+import {
+    combine,
+    createState,
+    debounce,
+    fromPromise,
+    map,
+    mapTo,
+    merge,
+} from 'synstate';
+import { Result } from 'ts-data-forge';
+
+// ソース状態 — 各入力は独立した Observable
+const [filterName, setFilterName] = createState('');
+const [filterEmail, setFilterEmail] = createState('');
+const [filterGender, setFilterGender] = createState('');
+const [itemsPerPage, setItemsPerPage] = createState(10);
+const [pageInput, setPageInput] = createState(1);
+
+// サーバーからテーブルデータを取得
+// fromPromise は成功時に Result.Ok(rows)、失敗時に Result.Err(error) を発行
+const tableDataResult = fromPromise(
+    fetch('/api/rows').then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<readonly Row[]>;
+    }),
+);
+
+// 派生： デバウンスされたフィルター → フィルタ結果（データ取得成功時のみ）
+const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
+    debounce(300),
+);
+
+const filteredRows = combine([headerValues, tableDataResult]).pipe(
+    map(([filters, result]) =>
+        Result.isErr(result)
+            ? [] // エラー時は空テーブルを表示
+            : result.value.filter(
+                  (row) =>
+                      row.name.includes(filters[0]) &&
+                      row.email.includes(filters[1]) &&
+                      row.gender.includes(filters[2]),
+              ),
+    ),
+);
+
+// エラー状態も派生値 — 別のミュータブル変数は不要
+const fetchError = tableDataResult.pipe(
+    map((result) => (Result.isErr(result) ? result.value : undefined)),
+);
+
+// 派生： ページ数
+const pageLength = combine([filteredRows, itemsPerPage]).pipe(
+    map(([rows, perPage]) => Math.ceil(rows.length / perPage)),
+);
+
+// pageLength が変わったらページを1にリセット
+const pageReset = pageLength.pipe(mapTo(1));
+
+// 派生： 現在のページ — ユーザー入力と自動リセットを merge し、クランプ
+const currentPage = merge([
+    pageReset,
+    combine([pageInput, pageLength]).pipe(
+        map(([page, maxPage]) => Math.max(1, Math.min(page, maxPage))),
+    ),
+]);
+
+// 出力： 表示するテーブル行
+const tableSliced = combine([filteredRows, currentPage, itemsPerPage]).pipe(
+    map(([rows, page, perPage]) => {
+        const start = (page - 1) * perPage;
+        return rows.slice(start, start + perPage);
+    }),
+);
+
+// subscribe で描画 — 依存が変化すると自動的に呼ばれる
+tableSliced.subscribe(renderTable);
+
+// エラーを subscribe — エラー状態が変化したときのみ renderError が呼ばれる
+fetchError.subscribe((err) => {
+    renderError(err);
+});
+```
+
+命令的バージョンのすべての問題が解決されます：
+
+1. **明示的な依存関係** — 各派生値が何に依存しているかが正確に宣言されています。`pageLength` が `filteredRows` と `itemsPerPage` に依存していることが、コードから直接読み取れます。
+2. **自動的な伝播** — `filterName` が変化すると、`headerValues` → `filteredRows` → `pageLength` → `currentPage` → `tableSliced` と自動的に伝播します。手動の `updateTable()` は不要です。
+3. **ページリセットが一箇所に集約** — `pageReset` が `pageLength` の変化に反応して1か所でリセットを行います。各フィルタハンドラに「ページを1にリセット」を重複して書く必要がありません。
+4. **データ取得とエラーハンドリングが宣言的** — `fromPromise(fetch(...))` でサーバーデータを `Result` 型として同じ依存グラフに統合します。成功もエラーもリアクティブな値です。`fetchError` は `try/catch` で管理する別のミュータブル変数ではなく、もう1つの派生 Observable です。
+5. **構造的に正しい** — 更新順序を誤って入れ替えることは不可能です。依存グラフが実行順序を決定します。
+6. **デバウンスはオペレーター1つ** — `.pipe(debounce(300))` がタイマーの複雑さをすべて処理します。
+7. **合成可能** — 新しい派生値の追加は `combine(...).pipe(map(...))` を1つ書くだけ。既存のコードを変更する必要はありません。
+
+## 次のステップ
+
+宣言的なモデルを理解したところで、次は実際に使ってみましょう：
+
+- [createState 詳説](/synstate/ja/guides/core-state-management/) — `createState`、`createReducer`、`createBooleanState` についてさらに詳しく。
+- [React 連携](/synstate/ja/guides/react-integration/) — SynState の Observable を React コンポーネントに接続する。
+
+このような依存グラフで重要な課題の1つは**一貫性の確保**です。ソースが変化したとき、すべての派生値が原子的に更新され、一部が古い値のままの中間状態を発行してはなりません。これは[**グリッチ問題**](/synstate/ja/internals/how-synstate-solved-the-glitch/)と呼ばれ、SynState が解決する重要な課題の1つです。さらに詳しく知りたい場合：
+
+- [SynState はグリッチをどう解決したか](/synstate/ja/internals/how-synstate-solved-the-glitch/) — グリッチフリー伝播の詳細。
+- [ライブラリ比較](/synstate/ja/guides/library-comparison/library-comparison/) — SynState と RxJS、Jotai、MobX 等の比較。
+- [パフォーマンスベンチマーク](/synstate/ja/guides/library-comparison/benchmark/) — スループットの定量比較。

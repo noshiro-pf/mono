@@ -20,21 +20,22 @@ if (import.meta.vitest !== undefined) {
 
     const initialized$ = num$.pipe(withInitialValue(0));
 
-    const mut_history: number[] = [];
+    // transformer-ignore-next-line convert-to-readonly, append-as-const
+    const valueHistory: number[] = [];
 
     initialized$.subscribe((x) => {
-      mut_history.push(x);
+      valueHistory.push(x);
     });
 
-    assert.deepStrictEqual(mut_history, [0]);
+    assert.deepStrictEqual(valueHistory, [0]);
 
     num$.next(1); // logs: 1
 
-    assert.deepStrictEqual(mut_history, [0, 1]);
+    assert.deepStrictEqual(valueHistory, [0, 1]);
 
     num$.next(2); // logs: 2
 
-    assert.deepStrictEqual(mut_history, [0, 1, 2]);
+    assert.deepStrictEqual(valueHistory, [0, 1, 2]);
 
     // embed-sample-code-ignore-below
   });

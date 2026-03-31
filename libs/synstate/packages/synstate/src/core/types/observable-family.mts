@@ -23,16 +23,6 @@ export type SourceObservable<A> = Readonly<{
 }> &
   RootObservable<A>;
 
-export type OfObservable<A> = Readonly<{
-  emit: () => OfObservable<A>;
-}> &
-  RootObservable<A>;
-
-export type FromArrayObservable<A> = Readonly<{
-  emit: () => FromArrayObservable<A>;
-}> &
-  RootObservable<A>;
-
 export type FromPromiseObservable<A, E = unknown> = RootObservable<
   Result<A, E>
 >;
@@ -41,13 +31,13 @@ export type FromSubscribableObservable<A, E = unknown> = RootObservable<
   Result<A, E>
 >;
 
-export type IntervalObservable = Readonly<{
-  start: () => IntervalObservable;
+export type CounterObservable = Readonly<{
+  start: () => void;
 }> &
   RootObservable<SafeUint>;
 
 export type TimerObservable = Readonly<{
-  start: () => TimerObservable;
+  start: () => void;
 }> &
   RootObservable<0>;
 
@@ -77,7 +67,7 @@ namespace SynStateInternals {
     ? true
     : false;
 
-  /** Evaluates True | false as true instead of boolean */
+  /** Evaluates true | false as true instead of boolean */
   type LogicalValue<B extends boolean> = readonly [B] extends readonly [true]
     ? true
     : readonly [B] extends readonly [false]
@@ -184,10 +174,7 @@ export type MergeObservableRefined<
   OS extends NonEmptyArray<Observable<unknown>>,
 > = SynStateInternals.MergeObservableRefinedImpl<OS>;
 
-export type MapWithIndexOperatorObservable<A, B> = SyncChildObservable<
-  B,
-  readonly [A]
->;
+export type MapOperatorObservable<A, B> = SyncChildObservable<B, readonly [A]>;
 
 export type PairwiseOperatorObservable<A> = SyncChildObservable<
   readonly [A, A],
@@ -231,19 +218,16 @@ export type SkipIfNoChangeOperatorObservable<A> = SyncChildObservable<
   readonly [A]
 >;
 
-export type ThrottleTimeOperatorObservable<A> = SyncChildObservable<
+export type ThrottleOperatorObservable<A> = SyncChildObservable<
   A,
   readonly [A]
 >;
 
 // AsyncChildObservable
 
-export type AuditTimeOperatorObservable<A> = AsyncChildObservable<
-  A,
-  readonly [A]
->;
+export type AuditOperatorObservable<A> = AsyncChildObservable<A, readonly [A]>;
 
-export type DebounceTimeOperatorObservable<A> = AsyncChildObservable<
+export type DebounceOperatorObservable<A> = AsyncChildObservable<
   A,
   readonly [A]
 >;

@@ -1,0 +1,90 @@
+---
+prev: false
+next: false
+title: combine (combineLatest)
+---
+
+import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
+import { colors } from '../../../../components/constants.mjs';
+
+{/* jsdoc-description */}
+複数の Observable を、それぞれの最新値の配列を発行する単一の Observable に結合します。
+いずれかのソース Observable が発行するたびに発行しますが、すべてのソースが少なくとも1回発行した後に限ります。
+{/* /jsdoc-description */}
+
+## Marble Diagram
+
+<MarbleDiagram
+    inputs={[
+        {
+            marbles: [
+                { t: 15, label: 'A', color: colors.yellow },
+                { t: 55, label: 'B', color: colors.orange },
+            ],
+        },
+        {
+            marbles: [
+                { t: 30, label: '25', color: colors.blue },
+                { t: 80, label: '30', color: colors.purple },
+            ],
+        },
+    ]}
+    output={{
+        marbles: [
+            { t: 30, label: 'A,25', color: colors.blue },
+            { t: 55, label: 'B,25', color: colors.orange },
+            { t: 80, label: 'B,30', color: colors.purple },
+        ],
+    }}
+    operator="combine"
+/>
+
+## 使用例
+
+```tsx
+//  Timeline:
+//
+//  name$     "Alice"                 "Bob"
+//  age$                25                        30
+//  user$               ["Alice",25]  ["Bob",25]  ["Bob",30]
+//
+//  Explanation:
+//  - combine waits for all sources to emit at least once
+//  - Then emits the latest value from all sources whenever any source emits
+//  - Always emits an array with the latest values from each source
+
+const name$ = source<string>();
+
+const age$ = source<number>();
+
+const user$ = combine([name$, age$]);
+
+const userHistory: (readonly [string, number])[] = [];
+
+user$.subscribe(([name_, age]) => {
+    userHistory.push([name_, age]);
+});
+
+name$.next('Alice'); // nothing logged (age$ hasn't emitted yet)
+
+assert.deepStrictEqual(userHistory, []);
+
+age$.next(25); // logs: { name: 'Alice', age: 25 }
+
+assert.deepStrictEqual(userHistory, [['Alice', 25]]);
+
+name$.next('Bob'); // logs: { name: 'Bob', age: 25 }
+
+assert.deepStrictEqual(userHistory, [
+    ['Alice', 25],
+    ['Bob', 25],
+]);
+
+age$.next(30); // logs: { name: 'Bob', age: 30 }
+
+assert.deepStrictEqual(userHistory, [
+    ['Alice', 25],
+    ['Bob', 25],
+    ['Bob', 30],
+]);
+```
