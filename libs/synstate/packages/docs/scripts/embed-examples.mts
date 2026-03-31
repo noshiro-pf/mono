@@ -255,6 +255,42 @@ const documents: DeepReadonly<
   {
     mdPath: path.resolve(
       workspaceRootPath,
+      'src/content/docs/internals/prior-art-and-design-rationale.mdx',
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/prior-art-and-design-rationale',
+    ),
+    sampleCodeFiles: [
+      '01-conditional-dependencies.jotai.mts',
+      '01-conditional-dependencies.synstate.mts',
+      '02-dynamic-collections.jotai.tsx',
+      '02-dynamic-collections.synstate.tsx',
+      '03-async-data-fetching.jotai.mts',
+      '03-async-data-fetching.synstate.mts',
+    ],
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
+      `${jaDocsBase}/internals/prior-art-and-design-rationale.mdx`,
+    ),
+    samplesDir: path.resolve(
+      synstateSamplesRoot,
+      'docs-site/prior-art-and-design-rationale',
+    ),
+    sampleCodeFiles: [
+      '01-conditional-dependencies.jotai.mts',
+      '01-conditional-dependencies.synstate.mts',
+      '02-dynamic-collections.jotai.tsx',
+      '02-dynamic-collections.synstate.tsx',
+      '03-async-data-fetching.jotai.mts',
+      '03-async-data-fetching.synstate.mts',
+    ],
+  },
+  {
+    mdPath: path.resolve(
+      workspaceRootPath,
       'src/content/docs/internals/how-synstate-solved-the-glitch.mdx',
     ),
     samplesDir: path.resolve(
@@ -376,7 +412,6 @@ const embedExamples = async (): Promise<void> => {
 
     const codeBlockCount = markdownContent.split(codeBlockStart).length - 1;
 
-    // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
     if (codeBlockCount !== sampleCodeFiles.length) {
       throw new Error(
         `❌ Code block count mismatch in ${mdPath}: found ${codeBlockCount} \`\`\`tsx blocks but expected ${sampleCodeFiles.length} sample files`,

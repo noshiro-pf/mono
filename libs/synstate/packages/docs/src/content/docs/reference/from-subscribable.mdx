@@ -4,14 +4,12 @@ next: false
 title: fromSubscribable
 ---
 
-<!-- jsdoc-description -->
+{/* jsdoc-description */}
+Converts any subscribable object into a SynState Observable.
+Works with objects that have a subscribe(onNext, onError, onComplete) method.
+{/* /jsdoc-description */}
 
-任意の subscribable オブジェクトを SynState の Observable に変換します。
-subscribe(onNext, onError, onComplete) メソッドを持つオブジェクトに対応します。
-
-<!-- /jsdoc-description -->
-
-## 使用例
+## Example
 
 ```tsx
 //  Explanation:
@@ -60,3 +58,7 @@ await new Promise<void>((resolve) => {
 
 assert.deepStrictEqual(valueHistory, [1, 2, 3]);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/from-subscribable.mts)
+{/* /source-link */}

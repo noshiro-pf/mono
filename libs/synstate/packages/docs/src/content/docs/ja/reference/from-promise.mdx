@@ -4,12 +4,12 @@ next: false
 title: fromPromise
 ---
 
-<!-- jsdoc-description -->
+{/* jsdoc-description */}
 
 Promise から Observable を作成します。
 Promise が解決されると Result.ok を、拒否されると Result.err を発行します。
 
-<!-- /jsdoc-description -->
+{/* /jsdoc-description */}
 
 ## 使用例
 
@@ -49,3 +49,7 @@ await new Promise<void>((resolve) => {
 
 assert.deepStrictEqual(valueHistory, [{ value: 42 }]);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/from-promise.mts)
+{/* /source-link */}

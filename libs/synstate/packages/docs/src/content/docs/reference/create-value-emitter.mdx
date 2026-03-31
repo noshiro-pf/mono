@@ -4,12 +4,10 @@ next: false
 title: createValueEmitter
 ---
 
-<!-- jsdoc-description -->
-
+{/* jsdoc-description */}
 Creates an event emitter with typed payload.
 Returns a tuple of [observable, emitter function].
-
-<!-- /jsdoc-description -->
+{/* /jsdoc-description */}
 
 ## Example
 
@@ -30,3 +28,7 @@ emitMessage('World');
 
 assert.deepStrictEqual(messageHistory, ['Hello', 'World']);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-event-emitter.mts)
+{/* /source-link */}

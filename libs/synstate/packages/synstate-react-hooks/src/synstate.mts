@@ -23,6 +23,7 @@ export {
   isChildObservable,
   isManagerObservable,
   isRootObservable,
+  just,
   map,
   mapOptional,
   mapResultErr,

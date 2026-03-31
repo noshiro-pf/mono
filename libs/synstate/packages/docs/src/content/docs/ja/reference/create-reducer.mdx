@@ -4,12 +4,12 @@ next: false
 title: createReducer
 ---
 
-<!-- jsdoc-description -->
+{/* jsdoc-description */}
 
 Redux パターンに基づいた reducer ベースの状態管理コンテナを作成します。
 アクションをディスパッチして reducer 関数に従い状態を更新します。
 
-<!-- /jsdoc-description -->
+{/* /jsdoc-description */}
 
 ## 使用例
 
@@ -44,3 +44,7 @@ dispatch({ type: 'decrement' });
 
 assert.deepStrictEqual(stateHistory, [0, 1, 2, 1]);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-reducer.mts)
+{/* /source-link */}

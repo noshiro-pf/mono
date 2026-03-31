@@ -24,7 +24,7 @@
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React useState/useReducer for global state
 - ⚡ **High Performance**: Optimized for fast state updates and minimal re-renders
 - 🎨 **Type-Safe**: Full TypeScript support with precise type inference
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~4.4 kB min+gzip<!-- /bundle-size:synstate --> with only one external runtime dependency ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge))
+- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~4.5 kB min+gzip<!-- /bundle-size:synstate --> with only one external runtime dependency ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge))
 - 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
 - 🔄 **Reactive Updates**: Automatic propagation of state changes to all subscribers
 - 📡 **Event System**: Built-in `createValueEmitter`, `createEventEmitter` for event-driven architecture

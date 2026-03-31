@@ -28,6 +28,7 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 ### 生成関数
 
 - [`source<T>()`](../source/): 新しいObservableソースを作成（RxJSの`subject`とほぼ同等）。
+- [`just(value)`](../just/): 単一の静的な値を保持し即座に完了するObservableを作成。`switchMap` 内の同期フォールバックとして有用。
 - [`fromPromise(promise)`](../from-promise/): PromiseからObservableを作成。
 - [`fromSubscribable()`](../from-subscribable/): 任意のsubscribableオブジェクトからObservableを作成。
 - [`counter(ms)`](../counter/): 一定間隔で値を発行（RxJSの`interval`とほぼ同等）。

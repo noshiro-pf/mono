@@ -4,12 +4,10 @@ next: false
 title: createReducer
 ---
 
-<!-- jsdoc-description -->
-
+{/* jsdoc-description */}
 Creates a reducer-based state management container following the Redux pattern.
 Actions are dispatched to update the state according to the reducer function.
-
-<!-- /jsdoc-description -->
+{/* /jsdoc-description */}
 
 ## Example
 
@@ -44,3 +42,7 @@ dispatch({ type: 'decrement' });
 
 assert.deepStrictEqual(stateHistory, [0, 1, 2, 1]);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-reducer.mts)
+{/* /source-link */}

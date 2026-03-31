@@ -4,13 +4,11 @@ next: false
 title: timer
 ---
 
-<!-- jsdoc-description -->
+{/* jsdoc-description */}
+Creates an observable that emits 0 after a specified delay and then completes.
+{/* /jsdoc-description */}
 
-指定された遅延後に 0 を発行して完了する Observable を作成します。
-
-<!-- /jsdoc-description -->
-
-## 使用例
+## Example
 
 ```tsx
 //  Timeline:
@@ -39,3 +37,7 @@ await new Promise<void>((resolve) => {
 
 assert.deepStrictEqual(valueHistory, [1]);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/timer.mts)
+{/* /source-link */}

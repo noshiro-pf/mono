@@ -16,7 +16,7 @@ sidebar:
 
 - 🎯 **シンプルな状態管理**： React の `useState`/`useReducer` に似た使いやすい `createState` と `createReducer`（グローバル状態向け）。
 - ⚡ **高パフォーマンス**： グリッチフリー $O(n)$ 伝搬 — Jotai の約30倍、Redux の約16倍高速。[ベンチマーク結果](/synstate/ja/guides/library-comparison/benchmark/)を参照。
-- 🚀 **軽量**： <!-- bundle-size:synstate -->~4.4 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) のみ。
+- 🚀 **軽量**： <!-- bundle-size:synstate -->~4.5 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) のみ。
 - 🔧 **非同期オペレーター内蔵**： `debounce`、`throttle`、`switchMap` など — 複雑な非同期処理を外部ライブラリなしに統一的な宣言的 API で記述。
 - ⚛️ **React 最適化**： [React Compiler](https://react.dev/learn/react-compiler) と完全互換。`synstate-react-hooks` により数行でコンポーネントにグローバル状態を導入。
 - 🌐 **フレームワーク非依存**： コアはバニラ JavaScript、Vue、Svelte など任意のフレームワークでそのまま動作。React / Preact 向けには hooks ラッパー（`synstate-react-hooks` / `synstate-preact-hooks`）、Preact 向けにはさらに [Preact Signals 連携](/synstate/ja/preact-signals/demo/)（`synstate-preact-signals`）も用意。

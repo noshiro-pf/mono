@@ -41,7 +41,6 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
 
       const codeBlockCount = markdownContent.split(codeBlockStart).length - 1;
 
-      // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
       if (codeBlockCount !== sampleCodeFiles.length) {
         return Result.err(
           `❌ Code block count mismatch in ${mdPath}: found ${codeBlockCount} \`\`\`tsx blocks but expected ${sampleCodeFiles.length} sample files`,

@@ -4,14 +4,14 @@ next: false
 title: source
 ---
 
-<!-- jsdoc-description -->
+{/* jsdoc-description */}
 
-Creates a new Observable source that can manually emit values.
-This is the primary way to create root observables that start reactive chains.
+手動で値を発行できる新しい Observable ソースを作成します。
+リアクティブチェーンの起点となるルート Observable を作成する主要な方法です。
 
-<!-- /jsdoc-description -->
+{/* /jsdoc-description */}
 
-## Example
+## 使用例
 
 ```tsx
 //  Timeline:
@@ -43,3 +43,7 @@ count$.next(3); // logs: 3
 
 assert.deepStrictEqual(valueHistory, [1, 2, 3]);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/source.mts)
+{/* /source-link */}

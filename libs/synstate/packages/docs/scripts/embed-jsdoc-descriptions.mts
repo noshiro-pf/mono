@@ -36,6 +36,7 @@ const jsdocMappings: DeepReadonly<
   ['debounce', 'src/core/operators/debounce.mts', 'debounce'],
   ['filter', 'src/core/operators/filter.mts', 'filter'],
   ['from-promise', 'src/core/create/from-promise.mts', 'fromPromise'],
+  ['just', 'src/core/create/just.mts', 'just'],
   [
     'from-subscribable',
     'src/core/create/from-subscribable.mts',
@@ -111,13 +112,17 @@ const jsdocMappings: DeepReadonly<
   ['zip', 'src/core/combine/zip.mts', 'zip'],
 ] as const;
 
-const placeholderStartHtml = '<!-- jsdoc-description -->';
+const jaRefDir = path.resolve(
+  workspaceRootPath,
+  'src/content/docs/ja/reference',
+);
 
-const placeholderEndHtml = '<!-- /jsdoc-description -->';
+const githubBaseUrl =
+  'https://github.com/noshiro-pf/synstate/blob/main/packages/synstate';
 
-const placeholderStartMdx = '{/* jsdoc-description */}';
+const placeholderStart = '{/* jsdoc-description */}';
 
-const placeholderEndMdx = '{/* /jsdoc-description */}';
+const placeholderEnd = '{/* /jsdoc-description */}';
 
 /**
  * Extracts the JSDoc description (text before any @-tag) for a given export name.
@@ -168,22 +173,13 @@ const replacePlaceholder = (
   markdown: string,
   description: string,
 ): 'no-placeholder' | Readonly<{ result: string }> => {
-  // Support both HTML comments (md) and JSX comments (mdx)
-  const htmlStartIdx = markdown.indexOf(placeholderStartHtml);
-
-  const isMdx = htmlStartIdx === -1;
-
-  const pStart = isMdx ? placeholderStartMdx : placeholderStartHtml;
-
-  const pEnd = isMdx ? placeholderEndMdx : placeholderEndHtml;
-
-  const startIdx = isMdx ? markdown.indexOf(pStart) : htmlStartIdx;
+  const startIdx = markdown.indexOf(placeholderStart);
 
   if (startIdx === -1) {
     return 'no-placeholder';
   }
 
-  const endIdx = markdown.indexOf(pEnd, startIdx);
+  const endIdx = markdown.indexOf(placeholderEnd, startIdx);
 
   if (endIdx === -1) {
     return 'no-placeholder';
@@ -191,7 +187,7 @@ const replacePlaceholder = (
 
   return {
     result: [
-      markdown.slice(0, startIdx + pStart.length),
+      markdown.slice(0, startIdx + placeholderStart.length),
       '\n',
       description,
       '\n',
@@ -259,11 +255,90 @@ const processRefDir = async (
   }
 };
 
+const sourceLinkStart = '{/* source-link */}';
+
+const sourceLinkEnd = '{/* /source-link */}';
+
+const replaceSourceLink = (
+  markdown: string,
+  srcPath: string,
+): 'no-placeholder' | Readonly<{ result: string }> => {
+  const startIdx = markdown.indexOf(sourceLinkStart);
+
+  if (startIdx === -1) {
+    return 'no-placeholder';
+  }
+
+  const endIdx = markdown.indexOf(sourceLinkEnd, startIdx);
+
+  if (endIdx === -1) {
+    return 'no-placeholder';
+  }
+
+  const link = `[View source on GitHub](${githubBaseUrl}/${srcPath})` as const;
+
+  return {
+    result: [
+      markdown.slice(0, startIdx + sourceLinkStart.length),
+      '\n',
+      link,
+      '\n',
+      markdown.slice(endIdx),
+    ].join(''),
+  };
+};
+
+const embedSourceLinks = async (
+  targetRefDir: string,
+  label: string,
+): Promise<void> => {
+  for (const [slug, srcPath] of jsdocMappings) {
+    const mdxPath = path.resolve(targetRefDir, `${slug}.mdx`);
+
+    const mdxExists = await pathExists(mdxPath);
+
+    const mdPath = mdxExists
+      ? mdxPath
+      : path.resolve(targetRefDir, `${slug}.md`);
+
+    const mdExists = await pathExists(mdPath);
+
+    if (!mdExists) {
+      continue;
+    }
+
+    const markdown = await fs.readFile(mdPath, 'utf8');
+
+    const replaced = replaceSourceLink(markdown, srcPath);
+
+    const mdFileName = path.basename(mdPath);
+
+    if (replaced === 'no-placeholder') {
+      console.warn(
+        `⚠ [${label}] Source link placeholder not found in ${mdFileName}`,
+      );
+
+      continue;
+    }
+
+    if (replaced.result === markdown) {
+      continue;
+    }
+
+    await fs.writeFile(mdPath, replaced.result, 'utf8');
+
+    console.log(`✓ [${label}] Embedded source link → ${mdFileName}`);
+  }
+};
+
 const embedJsdocDescriptions = async (): Promise<void> => {
+  // JSDoc descriptions: English only (Japanese pages maintain manual translations)
   await processRefDir(refDir, 'en');
 
-  // Japanese reference pages maintain manually-written descriptions.
-  // Only English pages are auto-populated from source JSDoc.
+  // Source links: both languages (language-independent)
+  await embedSourceLinks(refDir, 'en');
+
+  await embedSourceLinks(jaRefDir, 'ja');
 };
 
 const result = await embedJsdocDescriptions().catch((error: unknown) => error);

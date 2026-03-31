@@ -4,14 +4,12 @@ next: false
 title: createState
 ---
 
-<!-- jsdoc-description -->
+{/* jsdoc-description */}
+Creates a reactive state container with getter and setter methods.
+Provides a simple state management solution with observable state.
+{/* /jsdoc-description */}
 
-getter および setter メソッドを備えたリアクティブな状態コンテナを作成します。
-Observable による状態管理のシンプルなソリューションを提供します。
-
-<!-- /jsdoc-description -->
-
-## 使用例
+## Example
 
 ```tsx
 const [state, setState, { updateState, resetState }] = createState(0);
@@ -36,3 +34,7 @@ resetState(); // logs: 0
 
 assert.deepStrictEqual(stateHistory, [0, 10, 11, 0]);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/utils/create-state.mts)
+{/* /source-link */}

@@ -4,12 +4,10 @@ next: false
 title: fromPromise
 ---
 
-<!-- jsdoc-description -->
-
+{/* jsdoc-description */}
 Creates an observable from a Promise.
 Emits Result.ok when the promise resolves, or Result.err when it rejects.
-
-<!-- /jsdoc-description -->
+{/* /jsdoc-description */}
 
 ## Example
 
@@ -49,3 +47,7 @@ await new Promise<void>((resolve) => {
 
 assert.deepStrictEqual(valueHistory, [{ value: 42 }]);
 ```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/from-promise.mts)
+{/* /source-link */}

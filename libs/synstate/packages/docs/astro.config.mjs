@@ -131,6 +131,7 @@ export default defineConfig({
               collapsed: true,
               items: [
                 { slug: 'reference/source' },
+                { slug: 'reference/just' },
                 { slug: 'reference/from-promise' },
                 { slug: 'reference/from-subscribable' },
                 { slug: 'reference/counter' },

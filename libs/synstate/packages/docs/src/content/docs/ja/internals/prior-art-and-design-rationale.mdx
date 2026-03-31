@@ -52,9 +52,10 @@ SynState と同様の静的グラフアプローチを実装した OSS が複数
 
 Jotai では、派生 atom が条件に応じて異なる atom を読み取れます：
 
-```js
+```tsx
 const temperatureAtom = atom((get) => {
     const mode = get(modeAtom);
+
     if (mode === 'celsius') return get(celsiusAtom);
     else return get(fahrenheitAtom);
 });
@@ -64,7 +65,7 @@ const temperatureAtom = atom((get) => {
 
 SynState では、同じロジックを静的グラフで表現できます：
 
-```ts
+```tsx
 const temperature$ = combine([mode$, celsius$, fahrenheit$]).pipe(
     map(([mode, c, f]) => (mode === 'celsius' ? c : f)),
 );
@@ -77,22 +78,41 @@ celsius モードで `fahrenheit$` が変化しても、`map` は同じ出力値
 Jotai の atoms-in-atom パターンでは、各リストアイテムが独立した atom を持ち、1つのアイテムの更新で他のアイテムのコンポーネントが再レンダリングされません：
 
 ```tsx
+import { atom, useAtom, type PrimitiveAtom } from 'jotai';
+import type * as React from 'react';
+
 const todosAtom = atom([atom('Todo 1'), atom('Todo 2')]);
 
-const TodoItem = ({ todoAtom }: { todoAtom: PrimitiveAtom<string> }) => {
+const TodoItem = ({
+    todoAtom,
+}: Readonly<{
+    todoAtom: PrimitiveAtom<string>;
+}>): React.JSX.Element => {
     const [todo, setTodo] = useAtom(todoAtom);
-    return <input value={todo} onChange={(e) => setTodo(e.target.value)} />;
+
+    return (
+        <input
+            value={todo}
+            onChange={(e) => {
+                setTodo(e.target.value);
+            }}
+        />
+    );
 };
 
-const TodoList = () => {
+const TodoList = (): React.JSX.Element => {
     const [todos, setTodos] = useAtom(todosAtom);
-    const addTodo = () => setTodos((prev) => [...prev, atom('')]);
+
+    const addTodo = (): void => {
+        setTodos((prev) => [...prev, atom('')]);
+    };
+
     return (
         <div>
             {todos.map((todoAtom, i) => (
                 <TodoItem key={i} todoAtom={todoAtom} />
             ))}
-            <button onClick={addTodo}>Add</button>
+            <button onClick={addTodo}>{'Add'}</button>
         </div>
     );
 };
@@ -101,31 +121,48 @@ const TodoList = () => {
 SynState では、コレクション全体を1つの Observable とし、各アイテム用の derived Observable で同じ粒度を実現できます：
 
 ```tsx
-const [todos$, setTodos] = createState<readonly string[]>(['Todo 1', 'Todo 2']);
+import * as React from 'react';
+import { createState, map } from 'synstate';
+import { useObservableValue } from 'synstate-react-hooks';
 
-const TodoItem = ({ index }: { index: number }) => {
+const [todos$, , { updateState: updateTodos }] = createState<readonly string[]>(
+    ['Todo 1', 'Todo 2'],
+);
+
+const TodoItem = ({
+    index,
+}: Readonly<{ index: number }>): React.JSX.Element => {
     const todo = useObservableValue(
-        useMemo(() => todos$.pipe(map((todos) => todos[index] ?? '')), [index]),
+        React.useMemo(
+            () => todos$.pipe(map((todos) => todos[index] ?? '')),
+            [index],
+        ),
     );
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTodos((prev) =>
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        updateTodos((prev) =>
             prev.map((t, i) => (i === index ? e.target.value : t)),
         );
     };
+
     return <input value={todo} onChange={handleChange} />;
 };
 
-const TodoList = () => {
+const TodoList = (): React.JSX.Element => {
     const todosLength = useObservableValue(
-        useMemo(() => todos$.pipe(map((todos) => todos.length)), []),
+        React.useMemo(() => todos$.pipe(map((todos) => todos.length)), []),
     );
-    const addTodo = () => setTodos((prev) => [...prev, '']);
+
+    const addTodo = (): void => {
+        updateTodos((prev) => [...prev, '']);
+    };
+
     return (
         <div>
             {Array.from({ length: todosLength }, (_, i) => (
                 <TodoItem key={i} index={i} />
             ))}
-            <button onClick={addTodo}>Add</button>
+            <button onClick={addTodo}>{'Add'}</button>
         </div>
     );
 };
@@ -137,18 +174,18 @@ const TodoList = () => {
 
 Jotai では、非同期 atom は実際に読まれたときだけ fetch を実行します：
 
-```js
+```tsx
 const userDataAtom = atom(async (get) => fetchUser(get(authAtom).id));
 ```
 
-SynState では `switchMap` と `fromAbortablePromise` を使って、静的グラフ内で条件付き非同期処理を扱えます：
+SynState では `switchMap`、`fromAbortablePromise`、`just` を使って、静的グラフ内で条件付き非同期処理を扱えます：
 
-```ts
+```tsx
 const userData$ = auth$.pipe(
     switchMap((auth) =>
         auth
             ? fromAbortablePromise((signal) => fetchUser(auth.id, signal))
-            : of(guestData),
+            : just(Result.ok(guestData)),
     ),
 );
 ```

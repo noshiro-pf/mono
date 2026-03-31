@@ -29,6 +29,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/source-example.mts'],
   },
   {
+    sourcePath: 'src/core/create/just.mts',
+    sampleFiles: ['samples/src/just-example.mts'],
+  },
+  {
     sourcePath: 'src/utils/create-state.mts',
     sampleFiles: [
       'samples/src/create-state-example.mts',

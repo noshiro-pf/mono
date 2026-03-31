@@ -52,9 +52,10 @@ A common claim is that dynamic dependency graphs are more expressive than static
 
 In Jotai, a derived atom can conditionally read different atoms:
 
-```js
+```tsx
 const temperatureAtom = atom((get) => {
     const mode = get(modeAtom);
+
     if (mode === 'celsius') return get(celsiusAtom);
     else return get(fahrenheitAtom);
 });
@@ -64,7 +65,7 @@ When `modeAtom` is `'celsius'`, changes to `fahrenheitAtom` do not trigger recal
 
 In SynState, the same logic is expressed with a static graph:
 
-```ts
+```tsx
 const temperature$ = combine([mode$, celsius$, fahrenheit$]).pipe(
     map(([mode, c, f]) => (mode === 'celsius' ? c : f)),
 );
@@ -77,22 +78,41 @@ When `fahrenheit$` changes in celsius mode, `map` produces the same output value
 Jotai's atoms-in-atom pattern gives each list item its own atom, so updating one item only re-renders that item's component:
 
 ```tsx
+import { atom, useAtom, type PrimitiveAtom } from 'jotai';
+import type * as React from 'react';
+
 const todosAtom = atom([atom('Todo 1'), atom('Todo 2')]);
 
-const TodoItem = ({ todoAtom }: { todoAtom: PrimitiveAtom<string> }) => {
+const TodoItem = ({
+    todoAtom,
+}: Readonly<{
+    todoAtom: PrimitiveAtom<string>;
+}>): React.JSX.Element => {
     const [todo, setTodo] = useAtom(todoAtom);
-    return <input value={todo} onChange={(e) => setTodo(e.target.value)} />;
+
+    return (
+        <input
+            value={todo}
+            onChange={(e) => {
+                setTodo(e.target.value);
+            }}
+        />
+    );
 };
 
-const TodoList = () => {
+const TodoList = (): React.JSX.Element => {
     const [todos, setTodos] = useAtom(todosAtom);
-    const addTodo = () => setTodos((prev) => [...prev, atom('')]);
+
+    const addTodo = (): void => {
+        setTodos((prev) => [...prev, atom('')]);
+    };
+
     return (
         <div>
             {todos.map((todoAtom, i) => (
                 <TodoItem key={i} todoAtom={todoAtom} />
             ))}
-            <button onClick={addTodo}>Add</button>
+            <button onClick={addTodo}>{'Add'}</button>
         </div>
     );
 };
@@ -101,31 +121,48 @@ const TodoList = () => {
 In SynState, the collection is a single Observable, and per-item derived Observables achieve the same granularity:
 
 ```tsx
-const [todos$, setTodos] = createState<readonly string[]>(['Todo 1', 'Todo 2']);
+import * as React from 'react';
+import { createState, map } from 'synstate';
+import { useObservableValue } from 'synstate-react-hooks';
 
-const TodoItem = ({ index }: { index: number }) => {
+const [todos$, , { updateState: updateTodos }] = createState<readonly string[]>(
+    ['Todo 1', 'Todo 2'],
+);
+
+const TodoItem = ({
+    index,
+}: Readonly<{ index: number }>): React.JSX.Element => {
     const todo = useObservableValue(
-        useMemo(() => todos$.pipe(map((todos) => todos[index] ?? '')), [index]),
+        React.useMemo(
+            () => todos$.pipe(map((todos) => todos[index] ?? '')),
+            [index],
+        ),
     );
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTodos((prev) =>
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        updateTodos((prev) =>
             prev.map((t, i) => (i === index ? e.target.value : t)),
         );
     };
+
     return <input value={todo} onChange={handleChange} />;
 };
 
-const TodoList = () => {
+const TodoList = (): React.JSX.Element => {
     const todosLength = useObservableValue(
-        useMemo(() => todos$.pipe(map((todos) => todos.length)), []),
+        React.useMemo(() => todos$.pipe(map((todos) => todos.length)), []),
     );
-    const addTodo = () => setTodos((prev) => [...prev, '']);
+
+    const addTodo = (): void => {
+        updateTodos((prev) => [...prev, '']);
+    };
+
     return (
         <div>
             {Array.from({ length: todosLength }, (_, i) => (
                 <TodoItem key={i} index={i} />
             ))}
-            <button onClick={addTodo}>Add</button>
+            <button onClick={addTodo}>{'Add'}</button>
         </div>
     );
 };
@@ -137,18 +174,18 @@ Each `TodoItem` subscribes to a derived Observable that extracts its item by ind
 
 In Jotai, an async atom only fetches when it is actually read:
 
-```js
+```tsx
 const userDataAtom = atom(async (get) => fetchUser(get(authAtom).id));
 ```
 
-SynState handles conditional async operations within the static graph using `switchMap` and `fromAbortablePromise`:
+SynState handles conditional async operations within the static graph using `switchMap`, `fromAbortablePromise`, and `just`:
 
-```ts
+```tsx
 const userData$ = auth$.pipe(
     switchMap((auth) =>
         auth
             ? fromAbortablePromise((signal) => fetchUser(auth.id, signal))
-            : of(guestData),
+            : just(Result.ok(guestData)),
     ),
 );
 ```
