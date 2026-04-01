@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "synstate-router": ["./src/index.mts"]
+    }
+  },
+  "include": ["./src", "./test", "./scripts", "./configs"]
+}

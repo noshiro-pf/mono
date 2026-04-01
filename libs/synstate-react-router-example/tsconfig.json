@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "lib": ["ESNext", "DOM"],
+    "paths": {
+      "synstate-react-router": ["../synstate-react-router/src/index.mts"],
+      "synstate-router": ["../synstate-router/src/index.mts"]
+    }
+  },
+  "include": ["./src", "./test", "./scripts", "./configs", "./vite.config.ts"]
+}

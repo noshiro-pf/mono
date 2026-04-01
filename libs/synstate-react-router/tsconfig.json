@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "paths": {
+      "synstate-react-router": ["./src/index.mts"],
+      "synstate-router": ["../synstate-router/src/index.mts"]
+    }
+  },
+  "include": ["./src", "./test", "./scripts", "./configs"]
+}

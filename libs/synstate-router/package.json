@@ -1,0 +1,61 @@
+{
+  "name": "synstate-router",
+  "version": "0.1.0",
+  "description": "Framework-agnostic type-safe Observable-based router, powered by SynState",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/synstate.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx ./scripts/cmd/build.mts",
+    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "fmt": "format-uncommitted",
+    "fmt:full": "pnpm run z:prettier .",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest:node run",
+    "test:browser": "pnpm run z:vitest --project='Browser' run",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "tsc --noEmit",
+    "tscw": "tsc --noEmit --watch",
+    "type-check": "tsc --noEmit",
+    "update-packages": "pnpm update --latest",
+    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "synstate": "workspace:*",
+    "ts-data-forge": "^6.8.0"
+  },
+  "devDependencies": {
+    "@types/argparse": "^2.0.17",
+    "argparse": "^2.0.1"
+  }
+}
