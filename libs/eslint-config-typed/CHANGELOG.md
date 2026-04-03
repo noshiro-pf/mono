@@ -1,3 +1,9 @@
+# [4.9.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.8.0...v4.9.0) (2026-04-03)
+
+### Features
+
+- turn off strict-void-return ([#291](https://github.com/noshiro-pf/eslint-config-typed/issues/291)) ([0d4216d](https://github.com/noshiro-pf/eslint-config-typed/commit/0d4216d53f0e1f1aaa816861bd8e760fd4ddab4c))
+
 # [4.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.7...v4.8.0) (2026-03-27)
 
 ### Features
