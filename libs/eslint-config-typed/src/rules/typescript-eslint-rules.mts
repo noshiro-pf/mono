@@ -491,7 +491,9 @@ export const typescriptEslintRules = {
   '@typescript-eslint/no-unused-private-class-members': 'error',
   '@typescript-eslint/no-useless-default-assignment':
     withDefaultOption('error'),
-  '@typescript-eslint/strict-void-return': ['error', { allowReturnAny: false }],
+
+  // Disabled because it reports common state updater patterns as unnecessary errors.
+  '@typescript-eslint/strict-void-return': 'off',
 
   // For browser environment only
 

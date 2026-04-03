@@ -1883,22 +1883,6 @@ namespace RequireHook {
 }
 
 /**
- * @description require tests to declare a timeout
- * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-test-timeout.md
- *
- *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | false      |
- *  | recommended | false      |
- *  ```
- */
-namespace RequireTestTimeout {
-  export type RuleEntry = Linter.StringSeverity;
-}
-
-/**
  * @description require local Test Context for concurrent snapshot tests
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-local-test-context-for-concurrent-snapshots.md
  *
@@ -1960,6 +1944,22 @@ namespace RequireMockTypeParameters {
 }
 
 /**
+ * @description require tests to declare a timeout
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-test-timeout.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTestTimeout {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description require toThrow() to be called with an error message
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-to-throw-message.md
  *
@@ -2012,6 +2012,51 @@ namespace RequireTopLevelDescribe {
      * Maximum number of `describe` blocks allowed at the top level.
      */
     maxNumberOfTopLevelDescribes?: number;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce unbound methods are called with their expected scope
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/unbound-method.md
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | false   |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace UnboundMethod {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "ignoreStatic": {
+   *         "type": "boolean",
+   *         "description": "Whether to skip checking whether `static` methods are correctly bound."
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether to skip checking whether `static` methods are correctly bound.
+     */
+    ignoreStatic?: boolean;
   }>;
 
   export type RuleEntry =
@@ -2337,11 +2382,12 @@ export type EslintVitestRules = Readonly<{
   'vitest/prefer-vi-mocked': PreferViMocked.RuleEntry;
   'vitest/require-awaited-expect-poll': RequireAwaitedExpectPoll.RuleEntry;
   'vitest/require-hook': RequireHook.RuleEntry;
-  'vitest/require-test-timeout': RequireTestTimeout.RuleEntry;
   'vitest/require-local-test-context-for-concurrent-snapshots': RequireLocalTestContextForConcurrentSnapshots.RuleEntry;
   'vitest/require-mock-type-parameters': RequireMockTypeParameters.RuleEntry;
+  'vitest/require-test-timeout': RequireTestTimeout.RuleEntry;
   'vitest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
   'vitest/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
+  'vitest/unbound-method': UnboundMethod.RuleEntry;
   'vitest/valid-describe-callback': ValidDescribeCallback.RuleEntry;
   'vitest/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
   'vitest/valid-expect': ValidExpect.RuleEntry;
@@ -2374,6 +2420,7 @@ export type EslintVitestRulesOption = Readonly<{
   'vitest/require-hook': RequireHook.Options;
   'vitest/require-mock-type-parameters': RequireMockTypeParameters.Options;
   'vitest/require-top-level-describe': RequireTopLevelDescribe.Options;
+  'vitest/unbound-method': UnboundMethod.Options;
   'vitest/valid-expect': ValidExpect.Options;
   'vitest/valid-title': ValidTitle.Options;
 }>;

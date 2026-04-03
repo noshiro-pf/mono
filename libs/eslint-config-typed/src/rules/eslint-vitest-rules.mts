@@ -119,6 +119,7 @@ export const eslintVitestRules = {
   ],
   'vitest/no-unneeded-async-expect-function': 'error',
   'vitest/prefer-to-have-been-called-times': 'error',
+  'vitest/unbound-method': ['error', { ignoreStatic: false }],
 
   // This rule is enabled on an as-needed basis on a per-project basis, not by default.
   'vitest/require-test-timeout': 'off',
