@@ -1,3 +1,6 @@
+import { Arr } from '../array/index.mjs';
+import { hasKey, isRecord } from '../guard/index.mjs';
+
 /**
  * A collection of type-safe object utility functions providing functional
  * programming patterns for object manipulation, including pick, omit, shallow
@@ -58,7 +61,6 @@ export namespace Obj {
 
     const bEntries = Object.entries(b);
 
-    // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
     if (aEntries.length !== bEntries.length) return false;
 
     return aEntries.every(([k, v]) => eq(b[k], v));
@@ -332,7 +334,174 @@ export namespace Obj {
   ): TsDataForgeInternals.MergeAll<Records> =>
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     Object.fromEntries(records.flatMap((r) => Object.entries(r))) as never;
+
+  /**
+   * Deeply picks a nested property from an object along the specified key path.
+   * Supports both direct and curried usage.
+   *
+   * @example
+   *
+   * ```ts
+   * const data = { a: { b: { c: 1, d: 2 }, e: 3 }, f: 4 } as const;
+   *
+   * // Direct usage
+   * const result = Obj.deepPick(data, ['a', 'b', 'c']);
+   * assert.deepStrictEqual(result, { a: { b: { c: 1 } } });
+   *
+   * // Curried usage with pipe
+   * const pickName = Obj.deepPick(['user', 'name']);
+   * const result2 = pipe(data).map(pickName).value;
+   * ```
+   *
+   * @template R - The type of the input record
+   * @template Path - The key path tuple
+   * @param record - The source record
+   * @param path - A readonly tuple of keys representing the nested path
+   * @returns A new record containing only the nested property at the path
+   */
+  export function deepPick<
+    const R extends UnknownRecord,
+    const Path extends readonly (string | number)[],
+  >(record: R, path: Path): DeepPick<R, Path>;
+
+  // Curried version
+  export function deepPick<const Path extends readonly (string | number)[]>(
+    path: Path,
+  ): <const R extends UnknownRecord>(record: R) => DeepPick<R, Path>;
+
+  export function deepPick<
+    const R extends UnknownRecord,
+    const Path extends readonly (string | number)[],
+  >(
+    ...args: readonly [record: R, path: Path] | readonly [path: Path]
+  ): DeepPick<R, Path> | ((record: R) => DeepPick<R, Path>) {
+    switch (args.length) {
+      case 2: {
+        const [record, path] = args;
+
+        return (
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          deepPickImpl(record, path) as never
+        );
+      }
+
+      case 1: {
+        const [path] = args;
+
+        return (record: R) => deepPick(record, path);
+      }
+    }
+  }
+
+  /**
+   * Deeply omits a nested property from an object along the specified key path.
+   * Supports both direct and curried usage.
+   *
+   * @example
+   *
+   * ```ts
+   * const data = { a: { b: { c: 1, d: 2 }, e: 3 }, f: 4 } as const;
+   *
+   * // Direct usage
+   * const result = Obj.deepOmit(data, ['a', 'b', 'c']);
+   * assert.deepStrictEqual(result, { a: { b: { d: 2 }, e: 3 }, f: 4 });
+   *
+   * // Curried usage with pipe
+   * const omitPassword = Obj.deepOmit(['user', 'password']);
+   * const result2 = pipe(data).map(omitPassword).value;
+   * ```
+   *
+   * @template R - The type of the input record
+   * @template Path - The key path tuple
+   * @param record - The source record
+   * @param path - A readonly tuple of keys representing the nested path to omit
+   * @returns A new record with the nested property at the path removed
+   */
+  export function deepOmit<
+    const R extends UnknownRecord,
+    const Path extends readonly (string | number)[],
+  >(record: R, path: Path): DeepOmit<R, Path>;
+
+  // Curried version
+  export function deepOmit<const Path extends readonly (string | number)[]>(
+    path: Path,
+  ): <const R extends UnknownRecord>(record: R) => DeepOmit<R, Path>;
+
+  export function deepOmit<
+    const R extends UnknownRecord,
+    const Path extends readonly (string | number)[],
+  >(
+    ...args: readonly [record: R, path: Path] | readonly [path: Path]
+  ): DeepOmit<R, Path> | ((record: R) => DeepOmit<R, Path>) {
+    switch (args.length) {
+      case 2: {
+        const [record, path] = args;
+
+        return (
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          deepOmitImpl(record, path) as never
+        );
+      }
+
+      case 1: {
+        const [path] = args;
+
+        return (record: R) => deepOmit(record, path);
+      }
+    }
+  }
 }
+
+const deepPickImpl = (
+  record: UnknownRecord,
+  path: readonly (string | number)[],
+): UnknownRecord => {
+  if (!Arr.isNonEmpty(path)) return record;
+
+  const head = path[0];
+
+  if (!hasKey(record, head)) return {};
+
+  const value = record[head];
+
+  const tail = path.slice(1);
+
+  if (!Arr.isNonEmpty(tail)) return { [head]: value };
+
+  if (!isRecord(value)) return { [head]: {} };
+
+  return {
+    [head]: deepPickImpl(value, tail),
+  };
+};
+
+const deepOmitImpl = (
+  record: UnknownRecord,
+  path: readonly (string | number)[],
+): UnknownRecord => {
+  if (!Arr.isNonEmpty(path)) return record;
+
+  const head = path[0];
+
+  const tail = path.slice(1);
+
+  if (!hasKey(record, head)) return record;
+
+  if (!Arr.isNonEmpty(tail)) {
+    return Object.fromEntries(
+      Object.entries(record).filter(([k]) => k !== head),
+    );
+  }
+
+  const value = record[head];
+
+  if (!isRecord(value)) return record;
+
+  return {
+    ...record,
+    [head]: deepOmitImpl(value, tail),
+  };
+};
 
 /**
  * @internal

@@ -472,3 +472,175 @@ describe('merge', () => {
     assert.deepStrictEqual(result, { a: 1, b: 'text', c: true, d: 42 });
   });
 });
+
+describe('deepPick', () => {
+  test('should deeply pick a nested property', () => {
+    const data = { a: { b: { c: 1, d: 2 }, e: 3 }, f: 4 } as const;
+
+    const result = Obj.deepPick(data, ['a', 'b', 'c']);
+
+    assert.deepStrictEqual(result, { a: { b: { c: 1 } } });
+
+    expectType<
+      typeof result,
+      Readonly<{ a: Readonly<{ b: Readonly<{ c: 1 }> }> }>
+    >('=');
+  });
+
+  test('should pick at depth 1', () => {
+    const data = { a: 1, b: 2, c: 3 } as const;
+
+    const result = Obj.deepPick(data, ['a']);
+
+    assert.deepStrictEqual(result, { a: 1 });
+
+    expectType<typeof result, Readonly<{ a: 1 }>>('=');
+  });
+
+  test('should pick at depth 2', () => {
+    const data = { a: { b: 10, c: 20 }, d: 30 } as const;
+
+    const result = Obj.deepPick(data, ['a', 'b']);
+
+    assert.deepStrictEqual(result, { a: { b: 10 } });
+
+    expectType<typeof result, Readonly<{ a: Readonly<{ b: 10 }> }>>('=');
+  });
+
+  test('should return empty object for non-existent key', () => {
+    const data = { a: 1 } as const;
+
+    const result = Obj.deepPick(data, ['x']);
+
+    assert.deepStrictEqual(result, {});
+  });
+
+  test('should return empty nested for non-existent nested key', () => {
+    const data = { a: { b: 1 } } as const;
+
+    const result = Obj.deepPick(data, ['a', 'x']);
+
+    assert.deepStrictEqual(result, { a: {} });
+  });
+
+  test('should support curried form with correct type inference', () => {
+    const pickABC = Obj.deepPick(['a', 'b', 'c']);
+
+    const data = { a: { b: { c: 42, d: 99 } } } as const;
+
+    const result = pickABC(data);
+
+    assert.deepStrictEqual(result, { a: { b: { c: 42 } } });
+
+    expectType<
+      typeof result,
+      Readonly<{ a: Readonly<{ b: Readonly<{ c: 42 }> }> }>
+    >('=');
+  });
+
+  test('should work with pipe when curried with correct type inference', () => {
+    const pickNested = Obj.deepPick(['a', 'b']);
+
+    const data = { a: { b: 1, c: 2 }, d: 3 } as const;
+
+    const result = pipe(data).map(pickNested).value;
+
+    assert.deepStrictEqual(result, { a: { b: 1 } });
+
+    expectType<typeof result, Readonly<{ a: Readonly<{ b: 1 }> }>>('=');
+  });
+
+  test('should return {} for path through primitive', () => {
+    const data = { a: 42 } as const;
+
+    const result = Obj.deepPick(data, ['a', 'b']);
+
+    assert.deepStrictEqual(result, { a: {} });
+  });
+});
+
+describe('deepOmit', () => {
+  test('should deeply omit a nested property', () => {
+    const data = { a: { b: { c: 1, d: 2 }, e: 3 }, f: 4 } as const;
+
+    const result = Obj.deepOmit(data, ['a', 'b', 'c']);
+
+    assert.deepStrictEqual(result, { a: { b: { d: 2 }, e: 3 }, f: 4 });
+
+    expectType<
+      typeof result,
+      Readonly<{ a: Readonly<{ b: Readonly<{ d: 2 }>; e: 3 }>; f: 4 }>
+    >('=');
+  });
+
+  test('should omit at depth 1', () => {
+    const data = { a: 1, b: 2, c: 3 } as const;
+
+    const result = Obj.deepOmit(data, ['a']);
+
+    assert.deepStrictEqual(result, { b: 2, c: 3 });
+
+    expectType<typeof result, Readonly<{ b: 2; c: 3 }>>('=');
+  });
+
+  test('should omit at depth 2', () => {
+    const data = { a: { b: 10, c: 20 }, d: 30 } as const;
+
+    const result = Obj.deepOmit(data, ['a', 'b']);
+
+    assert.deepStrictEqual(result, { a: { c: 20 }, d: 30 });
+
+    expectType<typeof result, Readonly<{ a: Readonly<{ c: 20 }>; d: 30 }>>('=');
+  });
+
+  test('should return unchanged for non-existent key', () => {
+    const data = { a: 1, b: 2 } as const;
+
+    const result = Obj.deepOmit(data, ['x']);
+
+    assert.deepStrictEqual(result, { a: 1, b: 2 });
+  });
+
+  test('should return unchanged for non-existent nested key', () => {
+    const data = { a: { b: 1 } } as const;
+
+    const result = Obj.deepOmit(data, ['a', 'x']);
+
+    assert.deepStrictEqual(result, { a: { b: 1 } });
+  });
+
+  test('should return unchanged for path through primitive', () => {
+    const data = { a: 42, b: 'hello' } as const;
+
+    const result = Obj.deepOmit(data, ['a', 'toString']);
+
+    assert.deepStrictEqual(result, { a: 42, b: 'hello' });
+  });
+
+  test('should support curried form with correct type inference', () => {
+    const omitABC = Obj.deepOmit(['a', 'b', 'c']);
+
+    const data = { a: { b: { c: 1, d: 2 } } } as const;
+
+    const result = omitABC(data);
+
+    assert.deepStrictEqual(result, { a: { b: { d: 2 } } });
+
+    expectType<
+      typeof result,
+      Readonly<{ a: Readonly<{ b: Readonly<{ d: 2 }> }> }>
+    >('=');
+  });
+
+  test('should work with pipe when curried with correct type inference', () => {
+    const omitNested = Obj.deepOmit(['a', 'b']);
+
+    const data = { a: { b: 1, c: 2 }, d: 3 } as const;
+
+    const result = pipe(data).map(omitNested).value;
+
+    assert.deepStrictEqual(result, { a: { c: 2 }, d: 3 });
+
+    expectType<typeof result, Readonly<{ a: Readonly<{ c: 2 }>; d: 3 }>>('=');
+  });
+});

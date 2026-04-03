@@ -171,15 +171,15 @@ describe('TernaryResult test', () => {
   test('throwing unwrap variants provide descriptive errors', () => {
     expect(() =>
       TernaryResult.unwrapThrow(TernaryResult.warn('notice', 'warned')),
-    ).toThrowError(/Warn/u);
+    ).toThrow(/Warn/u);
 
     expect(() =>
       TernaryResult.unwrapWarnThrow(TernaryResult.err('no warn')),
-    ).toThrowError(/Err/u);
+    ).toThrow(/Err/u);
 
     expect(() =>
       TernaryResult.unwrapErrThrow(TernaryResult.ok('no err')),
-    ).toThrowError(/Ok/u);
+    ).toThrow(/Ok/u);
   });
 
   test('expectToBe unwraps Ok values', () => {
@@ -187,7 +187,7 @@ describe('TernaryResult test', () => {
 
     expect(() =>
       TernaryResult.expectToBe(TernaryResult.err('x'), 'missing'),
-    ).toThrowError(/missing/u);
+    ).toThrow(/missing/u);
   });
 
   test('zip prefers Err over Warn or Ok.', () => {

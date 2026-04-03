@@ -6,31 +6,27 @@ import { asNonZeroFiniteNumber } from './non-zero-finite-number.mjs';
 describe('FiniteNumber test', () => {
   describe(asFiniteNumber, () => {
     test('accepts valid finite numbers', () => {
-      expect(() => asFiniteNumber(0)).not.toThrowError();
+      expect(() => asFiniteNumber(0)).not.toThrow();
 
-      expect(() => asFiniteNumber(1)).not.toThrowError();
+      expect(() => asFiniteNumber(1)).not.toThrow();
 
-      expect(() => asFiniteNumber(-1)).not.toThrowError();
+      expect(() => asFiniteNumber(-1)).not.toThrow();
 
-      expect(() => asFiniteNumber(3.14)).not.toThrowError();
+      expect(() => asFiniteNumber(3.14)).not.toThrow();
 
-      expect(() => asFiniteNumber(-2.5)).not.toThrowError();
+      expect(() => asFiniteNumber(-2.5)).not.toThrow();
 
-      expect(() => asFiniteNumber(Number.MAX_VALUE)).not.toThrowError();
+      expect(() => asFiniteNumber(Number.MAX_VALUE)).not.toThrow();
 
-      expect(() => asFiniteNumber(-Number.MAX_VALUE)).not.toThrowError();
+      expect(() => asFiniteNumber(-Number.MAX_VALUE)).not.toThrow();
     });
 
     test('rejects non-finite numbers', () => {
-      expect(() => asFiniteNumber(Number.NaN)).toThrowError(TypeError);
+      expect(() => asFiniteNumber(Number.NaN)).toThrow(TypeError);
 
-      expect(() => asFiniteNumber(Number.POSITIVE_INFINITY)).toThrowError(
-        TypeError,
-      );
+      expect(() => asFiniteNumber(Number.POSITIVE_INFINITY)).toThrow(TypeError);
 
-      expect(() => asFiniteNumber(Number.NEGATIVE_INFINITY)).toThrowError(
-        TypeError,
-      );
+      expect(() => asFiniteNumber(Number.NEGATIVE_INFINITY)).toThrow(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -48,7 +44,7 @@ describe('FiniteNumber test', () => {
     ] as const)(
       `asFiniteNumber($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asFiniteNumber(value)).toThrowError(
+        expect(() => asFiniteNumber(value)).toThrow(
           new TypeError(`Expected a finite number, got: ${value}`),
         );
       },

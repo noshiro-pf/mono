@@ -21,7 +21,7 @@ describe(unknownToString, () => {
 
     expect(unknownToString(value)).toBe('123n');
 
-    expect(() => JSON.stringify(value)).toThrowError(
+    expect(() => JSON.stringify(value)).toThrow(
       'Do not know how to serialize a BigInt',
     );
   });

@@ -9,57 +9,53 @@ import {
 describe('NonZeroSafeInt test', () => {
   describe(asNonZeroSafeInt, () => {
     test('accepts valid non-zero safe integers', () => {
-      expect(() => asNonZeroSafeInt(1)).not.toThrowError();
+      expect(() => asNonZeroSafeInt(1)).not.toThrow();
 
-      expect(() => asNonZeroSafeInt(-1)).not.toThrowError();
+      expect(() => asNonZeroSafeInt(-1)).not.toThrow();
 
-      expect(() => asNonZeroSafeInt(42)).not.toThrowError();
+      expect(() => asNonZeroSafeInt(42)).not.toThrow();
 
-      expect(() => asNonZeroSafeInt(-42)).not.toThrowError();
+      expect(() => asNonZeroSafeInt(-42)).not.toThrow();
 
-      expect(() =>
-        asNonZeroSafeInt(Number.MAX_SAFE_INTEGER),
-      ).not.toThrowError();
+      expect(() => asNonZeroSafeInt(Number.MAX_SAFE_INTEGER)).not.toThrow();
 
-      expect(() =>
-        asNonZeroSafeInt(Number.MIN_SAFE_INTEGER),
-      ).not.toThrowError();
+      expect(() => asNonZeroSafeInt(Number.MIN_SAFE_INTEGER)).not.toThrow();
     });
 
     test('rejects zero', () => {
-      expect(() => asNonZeroSafeInt(0)).toThrowError(TypeError);
+      expect(() => asNonZeroSafeInt(0)).toThrow(TypeError);
 
-      expect(() => asNonZeroSafeInt(-0)).toThrowError(TypeError);
+      expect(() => asNonZeroSafeInt(-0)).toThrow(TypeError);
     });
 
     test('rejects values outside safe integer range', () => {
-      expect(() => asNonZeroSafeInt(Number.MAX_SAFE_INTEGER + 1)).toThrowError(
+      expect(() => asNonZeroSafeInt(Number.MAX_SAFE_INTEGER + 1)).toThrow(
         TypeError,
       );
 
-      expect(() => asNonZeroSafeInt(Number.MIN_SAFE_INTEGER - 1)).toThrowError(
+      expect(() => asNonZeroSafeInt(Number.MIN_SAFE_INTEGER - 1)).toThrow(
         TypeError,
       );
 
-      expect(() => asNonZeroSafeInt(Number.MAX_VALUE)).toThrowError(TypeError);
+      expect(() => asNonZeroSafeInt(Number.MAX_VALUE)).toThrow(TypeError);
 
-      expect(() => asNonZeroSafeInt(-Number.MAX_VALUE)).toThrowError(TypeError);
+      expect(() => asNonZeroSafeInt(-Number.MAX_VALUE)).toThrow(TypeError);
     });
 
     test('rejects non-integers', () => {
-      expect(() => asNonZeroSafeInt(Number.NaN)).toThrowError(TypeError);
+      expect(() => asNonZeroSafeInt(Number.NaN)).toThrow(TypeError);
 
-      expect(() => asNonZeroSafeInt(Number.POSITIVE_INFINITY)).toThrowError(
+      expect(() => asNonZeroSafeInt(Number.POSITIVE_INFINITY)).toThrow(
         TypeError,
       );
 
-      expect(() => asNonZeroSafeInt(Number.NEGATIVE_INFINITY)).toThrowError(
+      expect(() => asNonZeroSafeInt(Number.NEGATIVE_INFINITY)).toThrow(
         TypeError,
       );
 
-      expect(() => asNonZeroSafeInt(1.2)).toThrowError(TypeError);
+      expect(() => asNonZeroSafeInt(1.2)).toThrow(TypeError);
 
-      expect(() => asNonZeroSafeInt(-3.4)).toThrowError(TypeError);
+      expect(() => asNonZeroSafeInt(-3.4)).toThrow(TypeError);
     });
 
     test('returns the same value for valid inputs', () => {
@@ -80,7 +76,7 @@ describe('NonZeroSafeInt test', () => {
     ] as const)(
       `asNonZeroSafeInt($name) should throw a TypeError`,
       ({ value }) => {
-        expect(() => asNonZeroSafeInt(value)).toThrowError(
+        expect(() => asNonZeroSafeInt(value)).toThrow(
           new TypeError(`Expected a non-zero safe integer, got: ${value}`),
         );
       },

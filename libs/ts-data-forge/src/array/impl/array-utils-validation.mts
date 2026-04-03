@@ -106,9 +106,7 @@ export const isNonEmpty = <E,>(
 export const isArrayOfLength = <E, N extends SizeType.ArgArr>(
   array: readonly E[],
   len: N,
-): array is ArrayOfLength<N, E> =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
-  array.length === len;
+): array is ArrayOfLength<N, E> => array.length === len;
 
 /**
  * Checks if an array has at least a specific length.
@@ -132,9 +130,7 @@ export const isArrayOfLength = <E, N extends SizeType.ArgArr>(
 export const isArrayAtLeastLength = <E, N extends SizeType.ArgArr>(
   array: readonly E[],
   len: N,
-): array is ArrayAtLeastLen<N, E> =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-at-least-length
-  array.length >= len;
+): array is ArrayAtLeastLen<N, E> => array.length >= len;
 
 /**
  * Tests whether all elements in an array pass a test implemented by a predicate.

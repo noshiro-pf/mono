@@ -218,7 +218,7 @@ describe('Optional test', () => {
     });
 
     test('should throw for None', () => {
-      expect(() => Optional.unwrapThrow(Optional.none)).toThrowError(
+      expect(() => Optional.unwrapThrow(Optional.none)).toThrow(
         '`unwrapThrow()` has failed because it is `None`',
       );
     });
@@ -300,9 +300,7 @@ describe('Optional test', () => {
     test('should throw with custom message for None', () => {
       const expectNumber = Optional.expectToBe<number>('Expected a number');
 
-      expect(() => expectNumber(Optional.none)).toThrowError(
-        'Expected a number',
-      );
+      expect(() => expectNumber(Optional.none)).toThrow('Expected a number');
     });
 
     test('should be curried', () => {
@@ -314,7 +312,7 @@ describe('Optional test', () => {
 
       expect(expectValidId(id1)).toBe('user-123');
 
-      expect(() => expectValidId(id2)).toThrowError('ID is required');
+      expect(() => expectValidId(id2)).toThrow('ID is required');
     });
 
     test('should support curried form', () => {
@@ -328,7 +326,7 @@ describe('Optional test', () => {
 
       const noneValue = Optional.none;
 
-      expect(() => getValue(noneValue)).toThrowError('Value must exist');
+      expect(() => getValue(noneValue)).toThrow('Value must exist');
     });
 
     test('should work with pipe when curried', () => {
@@ -340,7 +338,7 @@ describe('Optional test', () => {
 
       assert.deepStrictEqual(someResult, { name: 'Alice', age: 30 });
 
-      expect(() => pipe(Optional.none).map(expectUser).value).toThrowError(
+      expect(() => pipe(Optional.none).map(expectUser).value).toThrow(
         'User not found',
       );
     });
