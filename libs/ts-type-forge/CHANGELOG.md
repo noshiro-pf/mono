@@ -1,3 +1,9 @@
+# [2.4.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.3.1...v2.4.0) (2026-04-03)
+
+### Features
+
+- add DeepPick, DeepOmit ([#332](https://github.com/noshiro-pf/ts-type-forge/issues/332)) ([5749976](https://github.com/noshiro-pf/ts-type-forge/commit/57499765aadffa4ebf56840d55536d9ab68fcf0a))
+
 ## [2.3.1](https://github.com/noshiro-pf/ts-type-forge/compare/v2.3.0...v2.3.1) (2026-01-23)
 
 ### Bug Fixes
