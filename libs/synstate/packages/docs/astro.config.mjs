@@ -36,6 +36,111 @@ export default defineConfig({
       ],
       favicon: '/favicon/favicon.ico',
       head: [
+        // OGP meta tags (Facebook, Slack, LINE, Telegram, LinkedIn)
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:type',
+            content: 'website',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:site_name',
+            content: 'SynState',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:description',
+            content:
+              'A lightweight, type-safe state management library for TypeScript/JavaScript built on an Observable pattern.',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image',
+            content: 'https://noshiro-pf.github.io/synstate/synstate-icon.png',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image:width',
+            content: '847',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image:height',
+            content: '476',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image:type',
+            content: 'image/png',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image:alt',
+            content:
+              'SynState — a lightweight, type-safe state management library',
+          },
+        },
+        // Twitter/X Card meta tags
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'twitter:card',
+            content: 'summary_large_image',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'twitter:title',
+            content: 'SynState',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'twitter:image',
+            content: 'https://noshiro-pf.github.io/synstate/synstate-icon.png',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'twitter:description',
+            content:
+              'A lightweight, type-safe state management library for TypeScript/JavaScript built on an Observable pattern.',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'twitter:image:alt',
+            content:
+              'SynState — a lightweight, type-safe state management library',
+          },
+        },
+        // Discord embed color
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'theme-color',
+            content: '#3b82f6',
+          },
+        },
         {
           tag: 'link',
           attrs: {
