@@ -1,5 +1,6 @@
 ---
 title: はじめに
+description: SynState の概要 — Observable パターンに基づく、TypeScript/JavaScript 向けの軽量・型安全な状態管理ライブラリ。
 sidebar:
     order: 1
 ---

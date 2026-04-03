@@ -1,5 +1,6 @@
 ---
 title: Installation
+description: Install SynState and its framework integrations for React, Preact, and Preact Signals via npm, yarn, or pnpm.
 sidebar:
     order: 2
 ---

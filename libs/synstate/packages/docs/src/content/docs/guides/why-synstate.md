@@ -1,5 +1,6 @@
 ---
 title: Why SynState?
+description: Why choose SynState over other state management libraries — glitch-free, lightweight, type-safe, and React Compiler compatible.
 sidebar:
     order: 1
 ---

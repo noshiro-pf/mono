@@ -1,5 +1,6 @@
 ---
 title: 'createState in Depth'
+description: Deep dive into createState — SynState's core API for creating reactive state with getters, setters, and reset functionality.
 sidebar:
     order: 3
 ---

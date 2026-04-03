@@ -1,5 +1,6 @@
 ---
 title: Introduction
+description: Learn what SynState is — a lightweight, type-safe state management library for TypeScript/JavaScript built on an Observable pattern.
 sidebar:
     order: 1
 ---

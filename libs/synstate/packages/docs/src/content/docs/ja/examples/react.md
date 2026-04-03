@@ -1,5 +1,6 @@
 ---
 title: React の使用例
+description: SynState を使った React の実践例 — カウンター、フォーム、非同期データ取得など。
 sidebar:
     order: 1
 ---

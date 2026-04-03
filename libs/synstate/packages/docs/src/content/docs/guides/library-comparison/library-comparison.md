@@ -1,5 +1,6 @@
 ---
 title: Library Comparison
+description: Compare SynState with other state management libraries — Zustand, Jotai, Valtio, Redux Toolkit, and more.
 sidebar:
     order: 5
 ---

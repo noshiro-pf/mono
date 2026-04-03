@@ -1,5 +1,6 @@
 ---
 title: SynState の強み
+description: SynState を選ぶ理由 — グリッチフリー、軽量、型安全、React Compiler 互換の状態管理ライブラリ。
 sidebar:
     order: 1
 ---

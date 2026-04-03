@@ -1,5 +1,6 @@
 ---
 title: インストール
+description: SynState と React・Preact 向けフレームワーク連携パッケージを npm / yarn / pnpm でインストールする方法。
 sidebar:
     order: 2
 ---

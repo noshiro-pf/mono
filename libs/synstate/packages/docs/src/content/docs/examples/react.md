@@ -1,5 +1,6 @@
 ---
 title: React Examples
+description: Practical React examples using SynState — counter, form, async data fetching, and more.
 sidebar:
     order: 1
 ---

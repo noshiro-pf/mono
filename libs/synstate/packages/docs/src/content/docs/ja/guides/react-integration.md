@@ -1,5 +1,6 @@
 ---
 title: React 連携
+description: SynState を React と統合する方法 — useObservableValue、useObservableEffect などのフック API。
 sidebar:
     order: 4
 ---

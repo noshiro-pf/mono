@@ -1,5 +1,6 @@
 ---
 title: Advanced Examples
+description: Advanced SynState patterns — derived state, event emitters, reducers, and complex reactive pipelines.
 sidebar:
     order: 2
 ---

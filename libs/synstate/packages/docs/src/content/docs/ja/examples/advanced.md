@@ -1,5 +1,6 @@
 ---
 title: 応用例
+description: SynState の応用パターン — 派生状態、イベントエミッター、リデューサー、複雑なリアクティブパイプライン。
 sidebar:
     order: 2
 ---

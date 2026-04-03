@@ -1,5 +1,6 @@
 ---
 title: 'createState 詳説'
+description: createState の詳細解説 — SynState のコア API でリアクティブな状態を作成・管理する方法。
 sidebar:
     order: 3
 ---

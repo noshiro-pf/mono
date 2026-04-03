@@ -1,5 +1,6 @@
 ---
 title: React Integration
+description: Integrate SynState with React using hooks — useObservableValue, useObservableEffect, and more.
 sidebar:
     order: 4
 ---

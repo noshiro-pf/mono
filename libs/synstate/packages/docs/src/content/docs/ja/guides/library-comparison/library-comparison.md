@@ -1,5 +1,6 @@
 ---
 title: ライブラリ比較
+description: SynState と他の状態管理ライブラリの比較 — Zustand、Jotai、Valtio、Redux Toolkit など。
 sidebar:
     order: 5
 ---
