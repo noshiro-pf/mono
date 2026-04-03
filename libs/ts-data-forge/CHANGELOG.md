@@ -1,3 +1,9 @@
+# [6.9.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.8.0...v6.9.0) (2026-04-03)
+
+### Features
+
+- add Obj.deepPick/deepOmit ([#333](https://github.com/noshiro-pf/ts-data-forge/issues/333)) ([bdca824](https://github.com/noshiro-pf/ts-data-forge/commit/bdca824e69308a0c0d1860052412ccc0236a75d0))
+
 # [6.8.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.7.0...v6.8.0) (2026-03-18)
 
 ### Features
