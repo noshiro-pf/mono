@@ -27,6 +27,7 @@
 /// <reference path="./others/mutable.d.mts" />
 /// <reference path="./others/utils.d.mts" />
 /// <reference path="./others/widen-literal.d.mts" />
+/// <reference path="./record/deep-pick-omit.d.mts" />
 /// <reference path="./record/deep.d.mts" />
 /// <reference path="./record/partial.d.mts" />
 /// <reference path="./record/record-path.d.mts" />
