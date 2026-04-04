@@ -6,7 +6,7 @@ sidebar:
 ---
 
 <p align="center">
-  <img src="/synstate/synstate-icon.png" alt="SynState ロゴ" width="400" />
+  <img src="/synstate/synstate-logo.png" alt="SynState ロゴ" width="400" />
 </p>
 
 **SynState** は TypeScript/JavaScript 向けの軽量・高性能な状態管理ライブラリです。シンプルなグローバル状態から、`debounce` や `switchMap` を使った複雑な非同期パイプラインまで統一 API で記述できます。React Compiler と完全互換。

@@ -6,7 +6,7 @@ sidebar:
 ---
 
 <p align="center">
-  <img src="/synstate/synstate-icon.png" alt="SynState Logo" width="400" />
+  <img src="/synstate/synstate-logo.png" alt="SynState Logo" width="400" />
 </p>
 
 **SynState** is a lightweight, high-performance state management library for TypeScript/JavaScript. Simple global state that scales to complex async pipelines — with built-in `debounce`, `switchMap`, and more. Fully compatible with React Compiler.

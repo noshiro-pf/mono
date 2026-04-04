@@ -4,6 +4,7 @@ allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
 words:
+  - astrojs
   - Jotai
   - Katex
   - lerp
@@ -12,12 +13,15 @@ words:
   - mobx
   - nargs
   - noshiro
+  - noto
   - nums
   - recombinations
   - recomputations
   - reduxjs
+  - resvg
   - scanₘ
   - seti
+  - sfnt
   - stageₙ
   - synstate
   - testw
@@ -25,7 +29,7 @@ words:
   - unsub
   - unsubs
   - valtio
-  - Zustand
+  - zustand
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml

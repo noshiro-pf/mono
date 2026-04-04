@@ -1,7 +1,7 @@
 # SynState
 
 <p align="center">
-  <img src="./packages/synstate/assets/synstate-icon.png" alt="SynState Logo" width="400" />
+  <img src="./packages/synstate/assets/synstate-logo.png" alt="SynState Logo" width="400" />
 </p>
 
 <p align="center">
