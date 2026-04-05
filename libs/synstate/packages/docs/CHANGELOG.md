@@ -1,5 +1,11 @@
 # @synstate/docs
 
+## 0.0.4
+
+### Patch Changes
+
+- 6237866: Update logo image.
+
 ## 0.0.3
 
 ### Patch Changes
