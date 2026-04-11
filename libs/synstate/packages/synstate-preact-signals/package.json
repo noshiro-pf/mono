@@ -62,7 +62,7 @@
     "ts-data-forge": "^6.8.0"
   },
   "devDependencies": {
-    "@preact/signals": "^2.8.2",
+    "@preact/signals": "^2.9.0",
     "@types/argparse": "^2.0.17",
     "argparse": "^2.0.1",
     "preact": "^10.29.0"
