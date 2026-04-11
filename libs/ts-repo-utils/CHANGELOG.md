@@ -1,3 +1,9 @@
+## [9.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v9.0.0...v9.0.1) (2026-04-11)
+
+### Bug Fixes
+
+- fix docs and update dependencies ([#337](https://github.com/noshiro-pf/ts-repo-utils/issues/337)) ([6fe5fe9](https://github.com/noshiro-pf/ts-repo-utils/commit/6fe5fe9c811ce536c10388cc03bbacb0ab1966be))
+
 # [9.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v8.2.0...v9.0.0) (2026-03-01)
 
 ### Features
