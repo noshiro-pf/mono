@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@astrojs/preact": "^5.0.2",
-    "@astrojs/react": "^5.0.1",
+    "@astrojs/react": "^5.0.2",
     "@astrojs/starlight": "^0.38.2",
     "@fontsource/noto-sans-jp": "^5.2.9",
     "@preact/signals": "^2.9.0",
