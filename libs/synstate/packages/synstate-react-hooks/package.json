@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "synstate": "workspace:*",
-    "ts-data-forge": "^6.8.0"
+    "ts-data-forge": "^6.9.0"
   },
   "devDependencies": {
     "@types/argparse": "^2.0.17",
