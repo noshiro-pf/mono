@@ -71,12 +71,11 @@ export const routeMatch = <R,>(
 
 // --- Map-based API (exhaustive / partial) ---
 
-type AnyHandlerMap<R> = Readonly<
-  Record<
-    string,
-    ((params: Readonly<Record<string, string>>) => R) | undefined
-  > & { fallback: () => R }
->;
+type AnyHandlerMap<R> = Record<
+  string,
+  ((params: Readonly<Record<string, string>>) => R) | undefined
+> &
+  Readonly<{ fallback: () => R }>;
 
 const matchWithHandlerMap = <R,>(
   pathSegments: readonly string[],
