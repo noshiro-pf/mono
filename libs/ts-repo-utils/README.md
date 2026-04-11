@@ -130,6 +130,9 @@ npm exec -- gen-index-ts ./src --target-ext .mts --target-ext .tsx --index-ext .
 # With exclude patterns
 npm exec -- gen-index-ts ./src --target-ext .ts --index-ext .ts --export-ext .js --exclude '*.test.ts' --exclude '*.spec.ts'
 
+# Skip generating index files at the root level (depth 0), only generate from depth 1 onwards
+npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .mjs --min-depth 1
+
 # Example in npm scripts
 "gi": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --fmt 'npm run fmt'"
 ```
@@ -155,6 +158,7 @@ npm exec -- gen-index-ts ./src --target-ext .ts --index-ext .ts --export-ext .js
 - `--export-ext` - Extension of the export statements in the index file (required, or 'none')
 - `--exclude` - Glob patterns of files to exclude (optional, can be specified multiple times)
 - `--fmt` - Command to format after generating the index file (optional)
+- `--min-depth` - Minimum depth to start generating index files (default: 0)
 - `--silent` - Suppress output messages (optional)
 
 ### `check-should-run-type-checks`
