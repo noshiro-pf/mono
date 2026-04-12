@@ -212,6 +212,10 @@ export const eslintUnicornRules = {
   'unicorn/no-useless-collection-argument': 'error',
   'unicorn/prefer-response-static-json': 'error',
   'unicorn/isolated-functions': 'off',
+  'unicorn/consistent-template-literal-escape': 'error',
+  'unicorn/no-useless-iterator-to-array': 'error',
+  'unicorn/prefer-simple-condition-first': 'error',
+  'unicorn/switch-case-break-position': 'error',
 
   // For Node.js environment only
   'unicorn/no-new-buffer': 'error',

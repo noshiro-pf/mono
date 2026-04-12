@@ -9,7 +9,7 @@ type SpreadOptionsIfIsArray<
 
 /**
  * @description Improve regexes by making them shorter, consistent, and safer.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/better-regex.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/better-regex.md
  *
  *  ```md
  *  | key         | value      |
@@ -31,7 +31,8 @@ namespace BetterRegex {
    *     "additionalProperties": false,
    *     "properties": {
    *       "sortCharacterClasses": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to sort character classes."
    *       }
    *     }
    *   }
@@ -39,6 +40,9 @@ namespace BetterRegex {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to sort character classes.
+     */
     sortCharacterClasses?: boolean;
   }>;
 
@@ -50,7 +54,7 @@ namespace BetterRegex {
 
 /**
  * @description Enforce a specific parameter name in catch clauses.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/catch-error-name.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/catch-error-name.md
  *
  *  ```md
  *  | key         | value      |
@@ -72,11 +76,13 @@ namespace CatchErrorName {
    *     "additionalProperties": false,
    *     "properties": {
    *       "name": {
-   *         "type": "string"
+   *         "type": "string",
+   *         "description": "The expected name for the error variable."
    *       },
    *       "ignore": {
    *         "type": "array",
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Patterns to ignore."
    *       }
    *     }
    *   }
@@ -84,7 +90,13 @@ namespace CatchErrorName {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * The expected name for the error variable.
+     */
     name?: string;
+    /**
+     * Patterns to ignore.
+     */
     ignore?: readonly unknown[];
   }>;
 
@@ -96,7 +108,7 @@ namespace CatchErrorName {
 
 /**
  * @description Enforce consistent assertion style with `node:assert`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/consistent-assert.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/consistent-assert.md
  *
  *  ```md
  *  | key         | value   |
@@ -113,7 +125,7 @@ namespace ConsistentAssert {
 
 /**
  * @description Prefer passing `Date` directly to the constructor when cloning.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/consistent-date-clone.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/consistent-date-clone.md
  *
  *  ```md
  *  | key         | value         |
@@ -130,7 +142,7 @@ namespace ConsistentDateClone {
 
 /**
  * @description Use destructured variables over properties.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/consistent-destructuring.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/consistent-destructuring.md
  *
  *  ```md
  *  | key            | value      |
@@ -147,7 +159,7 @@ namespace ConsistentDestructuring {
 
 /**
  * @description Prefer consistent types when spreading a ternary in an array literal.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/consistent-empty-array-spread.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/consistent-empty-array-spread.md
  *
  *  ```md
  *  | key         | value      |
@@ -164,7 +176,7 @@ namespace ConsistentEmptyArraySpread {
 
 /**
  * @description Enforce consistent style for element existence checks with `indexOf()`, `lastIndexOf()`, `findIndex()`, and `findLastIndex()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/consistent-existence-index-check.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/consistent-existence-index-check.md
  *
  *  ```md
  *  | key         | value         |
@@ -181,7 +193,7 @@ namespace ConsistentExistenceIndexCheck {
 
 /**
  * @description Move function definitions to the highest possible scope.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/consistent-function-scoping.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/consistent-function-scoping.md
  *
  *  ```md
  *  | key         | value      |
@@ -202,7 +214,8 @@ namespace ConsistentFunctionScoping {
    *     "additionalProperties": false,
    *     "properties": {
    *       "checkArrowFunctions": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check arrow functions."
    *       }
    *     }
    *   }
@@ -210,6 +223,9 @@ namespace ConsistentFunctionScoping {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to check arrow functions.
+     */
     checkArrowFunctions?: boolean;
   }>;
 
@@ -220,8 +236,25 @@ namespace ConsistentFunctionScoping {
 }
 
 /**
+ * @description Enforce consistent style for escaping `${` in template literals.
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/consistent-template-literal-escape.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace ConsistentTemplateLiteralEscape {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Enforce correct `Error` subclassing.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/custom-error-definition.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/custom-error-definition.md
  *
  *  ```md
  *  | key         | value   |
@@ -238,7 +271,7 @@ namespace CustomErrorDefinition {
 
 /**
  * @description Enforce no spaces between braces.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/empty-brace-spaces.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/empty-brace-spaces.md
  *
  *  ```md
  *  | key         | value      |
@@ -255,7 +288,7 @@ namespace EmptyBraceSpaces {
 
 /**
  * @description Enforce passing a `message` value when creating a built-in error.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/error-message.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/error-message.md
  *
  *  ```md
  *  | key         | value         |
@@ -271,7 +304,7 @@ namespace ErrorMessage {
 
 /**
  * @description Require escape sequences to use uppercase or lowercase values.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/escape-case.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/escape-case.md
  *
  *  ```md
  *  | key         | value         |
@@ -292,10 +325,14 @@ namespace EscapeCase {
    *     "enum": [
    *       "uppercase",
    *       "lowercase"
-   *     ]
+   *     ],
+   *     "description": "The case style for escape sequences."
    *   }
    * ]
    * ```
+   */
+  /**
+   * The case style for escape sequences.
    */
   export type Options = 'uppercase' | 'lowercase';
 
@@ -307,7 +344,7 @@ namespace EscapeCase {
 
 /**
  * @description Add expiration conditions to TODO comments.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/expiring-todo-comments.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/expiring-todo-comments.md
  *
  *  ```md
  *  | key         | value         |
@@ -331,21 +368,30 @@ namespace ExpiringTodoComments {
    *         "type": "array",
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "description": "Comment terms to check."
    *       },
    *       "ignore": {
    *         "type": "array",
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Patterns to ignore."
+   *       },
+   *       "ignoreDates": {
+   *         "type": "boolean",
+   *         "description": "Whether to ignore expiration dates."
    *       },
    *       "ignoreDatesOnPullRequests": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore expiration dates on pull requests."
    *       },
    *       "allowWarningComments": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow warning comments."
    *       },
    *       "date": {
    *         "type": "string",
-   *         "format": "date"
+   *         "format": "date",
+   *         "description": "The reference date."
    *       }
    *     }
    *   }
@@ -353,10 +399,29 @@ namespace ExpiringTodoComments {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Comment terms to check.
+     */
     terms?: readonly string[];
+    /**
+     * Patterns to ignore.
+     */
     ignore?: readonly unknown[];
+    /**
+     * Whether to ignore expiration dates.
+     */
+    ignoreDates?: boolean;
+    /**
+     * Whether to ignore expiration dates on pull requests.
+     */
     ignoreDatesOnPullRequests?: boolean;
+    /**
+     * Whether to allow warning comments.
+     */
     allowWarningComments?: boolean;
+    /**
+     * The reference date.
+     */
     date?: string;
   }>;
 
@@ -368,7 +433,7 @@ namespace ExpiringTodoComments {
 
 /**
  * @description Enforce explicitly comparing the `length` or `size` property of a value.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/explicit-length-check.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/explicit-length-check.md
  *
  *  ```md
  *  | key            | value   |
@@ -417,7 +482,7 @@ namespace ExplicitLengthCheck {
 
 /**
  * @description Enforce a case style for filenames.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/filename-case.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/filename-case.md
  *
  *  ```md
  *  | key         | value      |
@@ -443,14 +508,17 @@ namespace FilenameCase {
    *               "snakeCase",
    *               "kebabCase",
    *               "pascalCase"
-   *             ]
+   *             ],
+   *             "description": "The filename case style."
    *           },
    *           "ignore": {
    *             "type": "array",
-   *             "uniqueItems": true
+   *             "uniqueItems": true,
+   *             "description": "Patterns to ignore."
    *           },
    *           "multipleFileExtensions": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to treat additional, dot-separated parts of a filename as file extensions."
    *           }
    *         },
    *         "additionalProperties": false
@@ -460,26 +528,33 @@ namespace FilenameCase {
    *           "cases": {
    *             "properties": {
    *               "camelCase": {
-   *                 "type": "boolean"
+   *                 "type": "boolean",
+   *                 "description": "Whether to allow camelCase filenames."
    *               },
    *               "snakeCase": {
-   *                 "type": "boolean"
+   *                 "type": "boolean",
+   *                 "description": "Whether to allow snake_case filenames."
    *               },
    *               "kebabCase": {
-   *                 "type": "boolean"
+   *                 "type": "boolean",
+   *                 "description": "Whether to allow kebab-case filenames."
    *               },
    *               "pascalCase": {
-   *                 "type": "boolean"
+   *                 "type": "boolean",
+   *                 "description": "Whether to allow PascalCase filenames."
    *               }
    *             },
-   *             "additionalProperties": false
+   *             "additionalProperties": false,
+   *             "description": "The allowed filename case styles."
    *           },
    *           "ignore": {
    *             "type": "array",
-   *             "uniqueItems": true
+   *             "uniqueItems": true,
+   *             "description": "Patterns to ignore."
    *           },
    *           "multipleFileExtensions": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to treat additional, dot-separated parts of a filename as file extensions."
    *           }
    *         },
    *         "additionalProperties": false
@@ -491,18 +566,48 @@ namespace FilenameCase {
    */
   export type Options = Readonly<
     | {
+        /**
+         * The filename case style.
+         */
         case?: 'camelCase' | 'snakeCase' | 'kebabCase' | 'pascalCase';
+        /**
+         * Patterns to ignore.
+         */
         ignore?: readonly unknown[];
+        /**
+         * Whether to treat additional, dot-separated parts of a filename as file extensions.
+         */
         multipleFileExtensions?: boolean;
       }
     | {
+        /**
+         * The allowed filename case styles.
+         */
         cases?: Readonly<{
+          /**
+           * Whether to allow camelCase filenames.
+           */
           camelCase?: boolean;
+          /**
+           * Whether to allow snake_case filenames.
+           */
           snakeCase?: boolean;
+          /**
+           * Whether to allow kebab-case filenames.
+           */
           kebabCase?: boolean;
+          /**
+           * Whether to allow PascalCase filenames.
+           */
           pascalCase?: boolean;
         }>;
+        /**
+         * Patterns to ignore.
+         */
         ignore?: readonly unknown[];
+        /**
+         * Whether to treat additional, dot-separated parts of a filename as file extensions.
+         */
         multipleFileExtensions?: boolean;
       }
   >;
@@ -515,7 +620,7 @@ namespace FilenameCase {
 
 /**
  * @description Enforce specific import styles per module.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/import-style.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/import-style.md
  *
  *  ```md
  *  | key         | value         |
@@ -540,22 +645,28 @@ namespace ImportStyle {
    *         "additionalProperties": false,
    *         "properties": {
    *           "checkImport": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check `import` statements."
    *           },
    *           "checkDynamicImport": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check dynamic `import()` expressions."
    *           },
    *           "checkExportFrom": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check `export … from` statements."
    *           },
    *           "checkRequire": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check `require()` calls."
    *           },
    *           "extendDefaultStyles": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to extend the default styles."
    *           },
    *           "styles": {
-   *             "$ref": "#/definitions/moduleStyles"
+   *             "$ref": "#/definitions/moduleStyles",
+   *             "description": "Module import styles."
    *           }
    *         }
    *       }
@@ -606,10 +717,25 @@ namespace ImportStyle {
     | readonly []
     | readonly [
         Readonly<{
+          /**
+           * Whether to check `import` statements.
+           */
           checkImport?: boolean;
+          /**
+           * Whether to check dynamic `import()` expressions.
+           */
           checkDynamicImport?: boolean;
+          /**
+           * Whether to check `export … from` statements.
+           */
           checkExportFrom?: boolean;
+          /**
+           * Whether to check `require()` calls.
+           */
           checkRequire?: boolean;
+          /**
+           * Whether to extend the default styles.
+           */
           extendDefaultStyles?: boolean;
           styles?: ModuleStyles;
         }>,
@@ -617,6 +743,9 @@ namespace ImportStyle {
 
   export type Styles = false | BooleanObject;
 
+  /**
+   * Module import styles.
+   */
   export type ModuleStyles = Readonly<Record<string, Styles>>;
 
   export type BooleanObject = Readonly<{
@@ -634,7 +763,7 @@ namespace ImportStyle {
 
 /**
  * @description Prevent usage of variables from outside the scope of isolated functions.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/isolated-functions.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/isolated-functions.md
  *
  *  ```md
  *  | key         | value   |
@@ -670,28 +799,32 @@ namespace IsolatedFunctions {
    *               ]
    *             }
    *           ]
-   *         }
+   *         },
+   *         "description": "Override which global variables are allowed inside isolated scopes."
    *       },
    *       "functions": {
    *         "type": "array",
    *         "uniqueItems": true,
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "description": "Function names that mark a scope as isolated."
    *       },
    *       "selectors": {
    *         "type": "array",
    *         "uniqueItems": true,
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "description": "AST selectors that mark a scope as isolated."
    *       },
    *       "comments": {
    *         "type": "array",
    *         "uniqueItems": true,
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "description": "Comment patterns that mark a scope as isolated."
    *       }
    *     }
    *   }
@@ -699,11 +832,23 @@ namespace IsolatedFunctions {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Override which global variables are allowed inside isolated scopes.
+     */
     overrideGlobals?: Readonly<
       Record<string, boolean | ('readonly' | 'writable' | 'writeable' | 'off')>
     >;
+    /**
+     * Function names that mark a scope as isolated.
+     */
     functions?: readonly string[];
+    /**
+     * AST selectors that mark a scope as isolated.
+     */
     selectors?: readonly string[];
+    /**
+     * Comment patterns that mark a scope as isolated.
+     */
     comments?: readonly string[];
   }>;
 
@@ -715,7 +860,7 @@ namespace IsolatedFunctions {
 
 /**
  * @description Enforce the use of `new` for all builtins, except `String`, `Number`, `Boolean`, `Symbol` and `BigInt`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/new-for-builtins.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/new-for-builtins.md
  *
  *  ```md
  *  | key            | value         |
@@ -733,7 +878,7 @@ namespace NewForBuiltins {
 
 /**
  * @description Enforce specifying rules to disable in `eslint-disable` comments.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-abusive-eslint-disable.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-abusive-eslint-disable.md
  *
  *  ```md
  *  | key         | value         |
@@ -749,7 +894,7 @@ namespace NoAbusiveEslintDisable {
 
 /**
  * @description Disallow recursive access to `this` within getters and setters.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-accessor-recursion.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-accessor-recursion.md
  *
  *  ```md
  *  | key         | value         |
@@ -765,7 +910,7 @@ namespace NoAccessorRecursion {
 
 /**
  * @description Disallow anonymous functions and classes as the default export.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-anonymous-default-export.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-anonymous-default-export.md
  *
  *  ```md
  *  | key            | value         |
@@ -782,7 +927,7 @@ namespace NoAnonymousDefaultExport {
 
 /**
  * @description Prevent passing a function reference directly to iterator methods.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-array-callback-reference.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-array-callback-reference.md
  *
  *  ```md
  *  | key            | value   |
@@ -799,7 +944,7 @@ namespace NoArrayCallbackReference {
 
 /**
  * @description Prefer `for…of` over the `forEach` method.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-array-for-each.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-array-for-each.md
  *
  *  ```md
  *  | key            | value         |
@@ -817,7 +962,7 @@ namespace NoArrayForEach {
 
 /**
  * @description Disallow using the `this` argument in array methods.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-array-method-this-argument.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-array-method-this-argument.md
  *
  *  ```md
  *  | key            | value         |
@@ -835,7 +980,7 @@ namespace NoArrayMethodThisArgument {
 
 /**
  * @description Disallow `Array#reduce()` and `Array#reduceRight()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-array-reduce.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-array-reduce.md
  *
  *  ```md
  *  | key         | value      |
@@ -856,7 +1001,8 @@ namespace NoArrayReduce {
    *     "additionalProperties": false,
    *     "properties": {
    *       "allowSimpleOperations": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to allow simple reduce operations whose callback body is a single binary expression."
    *       }
    *     }
    *   }
@@ -864,6 +1010,9 @@ namespace NoArrayReduce {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to allow simple reduce operations whose callback body is a single binary expression.
+     */
     allowSimpleOperations?: boolean;
   }>;
 
@@ -875,7 +1024,7 @@ namespace NoArrayReduce {
 
 /**
  * @description Prefer `Array#toReversed()` over `Array#reverse()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-array-reverse.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-array-reverse.md
  *
  *  ```md
  *  | key            | value         |
@@ -916,7 +1065,7 @@ namespace NoArrayReverse {
 
 /**
  * @description Prefer `Array#toSorted()` over `Array#sort()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-array-sort.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-array-sort.md
  *
  *  ```md
  *  | key            | value         |
@@ -957,7 +1106,7 @@ namespace NoArraySort {
 
 /**
  * @description Disallow member access from await expression.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-await-expression-member.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-await-expression-member.md
  *
  *  ```md
  *  | key         | value      |
@@ -974,7 +1123,7 @@ namespace NoAwaitExpressionMember {
 
 /**
  * @description Disallow using `await` in `Promise` method parameters.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-await-in-promise-methods.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-await-in-promise-methods.md
  *
  *  ```md
  *  | key            | value         |
@@ -991,7 +1140,7 @@ namespace NoAwaitInPromiseMethods {
 
 /**
  * @description Do not use leading/trailing space between `console.log` parameters.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-console-spaces.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-console-spaces.md
  *
  *  ```md
  *  | key         | value         |
@@ -1008,7 +1157,7 @@ namespace NoConsoleSpaces {
 
 /**
  * @description Do not use `document.cookie` directly.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-document-cookie.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-document-cookie.md
  *
  *  ```md
  *  | key         | value         |
@@ -1024,7 +1173,7 @@ namespace NoDocumentCookie {
 
 /**
  * @description Disallow empty files.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-empty-file.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-empty-file.md
  *
  *  ```md
  *  | key         | value         |
@@ -1040,7 +1189,7 @@ namespace NoEmptyFile {
 
 /**
  * @description Do not use a `for` loop that can be replaced with a `for-of` loop.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-for-loop.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-for-loop.md
  *
  *  ```md
  *  | key            | value      |
@@ -1058,7 +1207,7 @@ namespace NoForLoop {
 
 /**
  * @description Enforce the use of Unicode escapes instead of hexadecimal escapes.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-hex-escape.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-hex-escape.md
  *
  *  ```md
  *  | key         | value         |
@@ -1075,7 +1224,7 @@ namespace NoHexEscape {
 
 /**
  * @description Disallow immediate mutation after variable assignment.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-immediate-mutation.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-immediate-mutation.md
  *
  *  ```md
  *  | key            | value      |
@@ -1093,7 +1242,7 @@ namespace NoImmediateMutation {
 
 /**
  * @description Disallow `instanceof` with built-in objects
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-instanceof-builtins.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-instanceof-builtins.md
  *
  *  ```md
  *  | key            | value         |
@@ -1156,7 +1305,7 @@ namespace NoInstanceofBuiltins {
 
 /**
  * @description Disallow invalid options in `fetch()` and `new Request()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-invalid-fetch-options.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-invalid-fetch-options.md
  *
  *  ```md
  *  | key         | value         |
@@ -1172,7 +1321,7 @@ namespace NoInvalidFetchOptions {
 
 /**
  * @description Prevent calling `EventTarget#removeEventListener()` with the result of an expression.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-invalid-remove-event-listener.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-invalid-remove-event-listener.md
  *
  *  ```md
  *  | key         | value         |
@@ -1188,7 +1337,7 @@ namespace NoInvalidRemoveEventListener {
 
 /**
  * @description Disallow identifiers starting with `new` or `class`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-keyword-prefix.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-keyword-prefix.md
  *
  *  ```md
  *  | key         | value      |
@@ -1212,15 +1361,18 @@ namespace NoKeywordPrefix {
    *         "type": "array",
    *         "minItems": 0,
    *         "uniqueItems": true,
+   *         "description": "The prefixes to disallow.",
    *         "items": {
    *           "type": "string"
    *         }
    *       },
    *       "checkProperties": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check property names."
    *       },
    *       "onlyCamelCase": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to only check camelCase names."
    *       }
    *     }
    *   }
@@ -1229,10 +1381,18 @@ namespace NoKeywordPrefix {
    */
   export type Options = Readonly<{
     /**
+     * The prefixes to disallow.
+     *
      * @minItems 0
      */
     disallowedPrefixes?: readonly string[];
+    /**
+     * Whether to check property names.
+     */
     checkProperties?: boolean;
+    /**
+     * Whether to only check camelCase names.
+     */
     onlyCamelCase?: boolean;
   }>;
 
@@ -1244,7 +1404,7 @@ namespace NoKeywordPrefix {
 
 /**
  * @description Disallow `if` statements as the only statement in `if` blocks without `else`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-lonely-if.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-lonely-if.md
  *
  *  ```md
  *  | key         | value         |
@@ -1261,7 +1421,7 @@ namespace NoLonelyIf {
 
 /**
  * @description Disallow a magic number as the `depth` argument in `Array#flat(…).`
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-magic-array-flat-depth.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-magic-array-flat-depth.md
  *
  *  ```md
  *  | key         | value         |
@@ -1277,7 +1437,7 @@ namespace NoMagicArrayFlatDepth {
 
 /**
  * @description Disallow named usage of default import and export.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-named-default.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-named-default.md
  *
  *  ```md
  *  | key         | value         |
@@ -1294,7 +1454,7 @@ namespace NoNamedDefault {
 
 /**
  * @description Disallow negated conditions.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-negated-condition.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-negated-condition.md
  *
  *  ```md
  *  | key         | value         |
@@ -1311,7 +1471,7 @@ namespace NoNegatedCondition {
 
 /**
  * @description Disallow negated expression in equality check.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-negation-in-equality-check.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-negation-in-equality-check.md
  *
  *  ```md
  *  | key            | value         |
@@ -1328,7 +1488,7 @@ namespace NoNegationInEqualityCheck {
 
 /**
  * @description Disallow nested ternary expressions.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-nested-ternary.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-nested-ternary.md
  *
  *  ```md
  *  | key         | value      |
@@ -1345,7 +1505,7 @@ namespace NoNestedTernary {
 
 /**
  * @description Disallow `new Array()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-new-array.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-new-array.md
  *
  *  ```md
  *  | key            | value         |
@@ -1363,7 +1523,7 @@ namespace NoNewArray {
 
 /**
  * @description Enforce the use of `Buffer.from()` and `Buffer.alloc()` instead of the deprecated `new Buffer()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-new-buffer.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-new-buffer.md
  *
  *  ```md
  *  | key            | value         |
@@ -1381,7 +1541,7 @@ namespace NoNewBuffer {
 
 /**
  * @description Disallow the use of the `null` literal.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-null.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-null.md
  *
  *  ```md
  *  | key            | value      |
@@ -1404,7 +1564,8 @@ namespace NoNull {
    *     "additionalProperties": false,
    *     "properties": {
    *       "checkStrictEquality": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check strict equality comparisons against `null`."
    *       }
    *     }
    *   }
@@ -1412,6 +1573,9 @@ namespace NoNull {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to check strict equality comparisons against `null`.
+     */
     checkStrictEquality?: boolean;
   }>;
 
@@ -1423,7 +1587,7 @@ namespace NoNull {
 
 /**
  * @description Disallow the use of objects as default parameters.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-object-as-default-parameter.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-object-as-default-parameter.md
  *
  *  ```md
  *  | key         | value         |
@@ -1439,7 +1603,7 @@ namespace NoObjectAsDefaultParameter {
 
 /**
  * @description Disallow `process.exit()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-process-exit.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-process-exit.md
  *
  *  ```md
  *  | key         | value         |
@@ -1455,7 +1619,7 @@ namespace NoProcessExit {
 
 /**
  * @description Disallow passing single-element arrays to `Promise` methods.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-single-promise-in-promise-methods.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-single-promise-in-promise-methods.md
  *
  *  ```md
  *  | key            | value         |
@@ -1473,7 +1637,7 @@ namespace NoSinglePromiseInPromiseMethods {
 
 /**
  * @description Disallow classes that only have static members.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-static-only-class.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-static-only-class.md
  *
  *  ```md
  *  | key         | value         |
@@ -1490,7 +1654,7 @@ namespace NoStaticOnlyClass {
 
 /**
  * @description Disallow `then` property.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-thenable.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-thenable.md
  *
  *  ```md
  *  | key         | value         |
@@ -1506,7 +1670,7 @@ namespace NoThenable {
 
 /**
  * @description Disallow assigning `this` to a variable.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-this-assignment.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-this-assignment.md
  *
  *  ```md
  *  | key         | value         |
@@ -1522,7 +1686,7 @@ namespace NoThisAssignment {
 
 /**
  * @description Disallow comparing `undefined` using `typeof`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-typeof-undefined.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-typeof-undefined.md
  *
  *  ```md
  *  | key            | value         |
@@ -1545,7 +1709,8 @@ namespace NoTypeofUndefined {
    *     "additionalProperties": false,
    *     "properties": {
    *       "checkGlobalVariables": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to also check `typeof` comparisons against global variables."
    *       }
    *     }
    *   }
@@ -1553,6 +1718,9 @@ namespace NoTypeofUndefined {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to also check `typeof` comparisons against global variables.
+     */
     checkGlobalVariables?: boolean;
   }>;
 
@@ -1564,7 +1732,7 @@ namespace NoTypeofUndefined {
 
 /**
  * @description Disallow using `1` as the `depth` argument of `Array#flat()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-unnecessary-array-flat-depth.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-unnecessary-array-flat-depth.md
  *
  *  ```md
  *  | key         | value         |
@@ -1581,7 +1749,7 @@ namespace NoUnnecessaryArrayFlatDepth {
 
 /**
  * @description Disallow using `.length` or `Infinity` as the `deleteCount` or `skipCount` argument of `Array#{splice,toSpliced}()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-unnecessary-array-splice-count.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-unnecessary-array-splice-count.md
  *
  *  ```md
  *  | key         | value         |
@@ -1598,7 +1766,7 @@ namespace NoUnnecessaryArraySpliceCount {
 
 /**
  * @description Disallow awaiting non-promise values.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-unnecessary-await.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-unnecessary-await.md
  *
  *  ```md
  *  | key         | value         |
@@ -1615,7 +1783,7 @@ namespace NoUnnecessaryAwait {
 
 /**
  * @description Enforce the use of built-in methods instead of unnecessary polyfills.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-unnecessary-polyfills.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-unnecessary-polyfills.md
  *
  *  ```md
  *  | key         | value         |
@@ -1641,15 +1809,19 @@ namespace NoUnnecessaryPolyfills {
    *       "targets": {
    *         "oneOf": [
    *           {
-   *             "type": "string"
+   *             "type": "string",
+   *             "description": "A browserslist query string."
    *           },
    *           {
-   *             "type": "array"
+   *             "type": "array",
+   *             "description": "An array of browserslist query strings."
    *           },
    *           {
-   *             "type": "object"
+   *             "type": "object",
+   *             "description": "A browserslist targets object."
    *           }
-   *         ]
+   *         ],
+   *         "description": "The target environments."
    *       }
    *     }
    *   }
@@ -1657,6 +1829,9 @@ namespace NoUnnecessaryPolyfills {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * The target environments.
+     */
     targets: string | readonly unknown[] | Readonly<Record<string, unknown>>;
   }>;
 
@@ -1668,7 +1843,7 @@ namespace NoUnnecessaryPolyfills {
 
 /**
  * @description Disallow using `.length` or `Infinity` as the `end` argument of `{Array,String,TypedArray}#slice()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-unnecessary-slice-end.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-unnecessary-slice-end.md
  *
  *  ```md
  *  | key         | value         |
@@ -1685,7 +1860,7 @@ namespace NoUnnecessarySliceEnd {
 
 /**
  * @description Disallow unreadable array destructuring.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-unreadable-array-destructuring.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-unreadable-array-destructuring.md
  *
  *  ```md
  *  | key         | value         |
@@ -1702,7 +1877,7 @@ namespace NoUnreadableArrayDestructuring {
 
 /**
  * @description Disallow unreadable IIFEs.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-unreadable-iife.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-unreadable-iife.md
  *
  *  ```md
  *  | key            | value         |
@@ -1719,7 +1894,7 @@ namespace NoUnreadableIife {
 
 /**
  * @description Disallow unused object properties.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-unused-properties.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-unused-properties.md
  *
  *  ```md
  *  | key         | value      |
@@ -1735,7 +1910,7 @@ namespace NoUnusedProperties {
 
 /**
  * @description Disallow useless values or fallbacks in `Set`, `Map`, `WeakSet`, or `WeakMap`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-useless-collection-argument.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-collection-argument.md
  *
  *  ```md
  *  | key            | value         |
@@ -1753,7 +1928,7 @@ namespace NoUselessCollectionArgument {
 
 /**
  * @description Disallow unnecessary `Error.captureStackTrace(…)`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-useless-error-capture-stack-trace.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-error-capture-stack-trace.md
  *
  *  ```md
  *  | key         | value         |
@@ -1770,7 +1945,7 @@ namespace NoUselessErrorCaptureStackTrace {
 
 /**
  * @description Disallow useless fallback when spreading in object literals.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-useless-fallback-in-spread.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-fallback-in-spread.md
  *
  *  ```md
  *  | key         | value         |
@@ -1786,8 +1961,26 @@ namespace NoUselessFallbackInSpread {
 }
 
 /**
+ * @description Disallow unnecessary `.toArray()` on iterators.
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-iterator-to-array.md
+ *
+ *  ```md
+ *  | key            | value         |
+ *  | :------------- | :------------ |
+ *  | type           | suggestion    |
+ *  | deprecated     | false         |
+ *  | fixable        | code          |
+ *  | hasSuggestions | true          |
+ *  | recommended    | unopinionated |
+ *  ```
+ */
+namespace NoUselessIteratorToArray {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow useless array length check.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-useless-length-check.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-length-check.md
  *
  *  ```md
  *  | key         | value         |
@@ -1804,7 +1997,7 @@ namespace NoUselessLengthCheck {
 
 /**
  * @description Disallow returning/yielding `Promise.resolve/reject()` in async functions or promise callbacks
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-useless-promise-resolve-reject.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-promise-resolve-reject.md
  *
  *  ```md
  *  | key         | value         |
@@ -1821,7 +2014,7 @@ namespace NoUselessPromiseResolveReject {
 
 /**
  * @description Disallow unnecessary spread.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-useless-spread.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-spread.md
  *
  *  ```md
  *  | key         | value         |
@@ -1838,7 +2031,7 @@ namespace NoUselessSpread {
 
 /**
  * @description Disallow useless case in switch statements.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-useless-switch-case.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-switch-case.md
  *
  *  ```md
  *  | key            | value         |
@@ -1855,7 +2048,7 @@ namespace NoUselessSwitchCase {
 
 /**
  * @description Disallow useless `undefined`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-useless-undefined.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-useless-undefined.md
  *
  *  ```md
  *  | key         | value         |
@@ -1877,10 +2070,12 @@ namespace NoUselessUndefined {
    *     "additionalProperties": false,
    *     "properties": {
    *       "checkArguments": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check function arguments."
    *       },
    *       "checkArrowFunctionBody": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check arrow function bodies."
    *       }
    *     }
    *   }
@@ -1888,7 +2083,13 @@ namespace NoUselessUndefined {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to check function arguments.
+     */
     checkArguments?: boolean;
+    /**
+     * Whether to check arrow function bodies.
+     */
     checkArrowFunctionBody?: boolean;
   }>;
 
@@ -1900,7 +2101,7 @@ namespace NoUselessUndefined {
 
 /**
  * @description Disallow number literals with zero fractions or dangling dots.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/no-zero-fractions.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/no-zero-fractions.md
  *
  *  ```md
  *  | key         | value         |
@@ -1917,7 +2118,7 @@ namespace NoZeroFractions {
 
 /**
  * @description Enforce proper case for numeric literals.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/number-literal-case.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/number-literal-case.md
  *
  *  ```md
  *  | key         | value         |
@@ -1961,7 +2162,7 @@ namespace NumberLiteralCase {
 
 /**
  * @description Enforce the style of numeric separators by correctly grouping digits.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/numeric-separators-style.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/numeric-separators-style.md
  *
  *  ```md
  *  | key         | value         |
@@ -1987,15 +2188,18 @@ namespace NumericSeparatorsStyle {
    *         "additionalProperties": false,
    *         "properties": {
    *           "onlyIfContainsSeparator": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to only enforce the style if the number already contains a separator."
    *           },
    *           "minimumDigits": {
    *             "type": "integer",
-   *             "minimum": 0
+   *             "minimum": 0,
+   *             "description": "The minimum number of digits before separators are enforced."
    *           },
    *           "groupLength": {
    *             "type": "integer",
-   *             "minimum": 1
+   *             "minimum": 1,
+   *             "description": "The number of digits in each group."
    *           }
    *         }
    *       },
@@ -2004,15 +2208,18 @@ namespace NumericSeparatorsStyle {
    *         "additionalProperties": false,
    *         "properties": {
    *           "onlyIfContainsSeparator": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to only enforce the style if the number already contains a separator."
    *           },
    *           "minimumDigits": {
    *             "type": "integer",
-   *             "minimum": 0
+   *             "minimum": 0,
+   *             "description": "The minimum number of digits before separators are enforced."
    *           },
    *           "groupLength": {
    *             "type": "integer",
-   *             "minimum": 1
+   *             "minimum": 1,
+   *             "description": "The number of digits in each group."
    *           }
    *         }
    *       },
@@ -2021,15 +2228,18 @@ namespace NumericSeparatorsStyle {
    *         "additionalProperties": false,
    *         "properties": {
    *           "onlyIfContainsSeparator": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to only enforce the style if the number already contains a separator."
    *           },
    *           "minimumDigits": {
    *             "type": "integer",
-   *             "minimum": 0
+   *             "minimum": 0,
+   *             "description": "The minimum number of digits before separators are enforced."
    *           },
    *           "groupLength": {
    *             "type": "integer",
-   *             "minimum": 1
+   *             "minimum": 1,
+   *             "description": "The number of digits in each group."
    *           }
    *         }
    *       },
@@ -2038,20 +2248,24 @@ namespace NumericSeparatorsStyle {
    *         "additionalProperties": false,
    *         "properties": {
    *           "onlyIfContainsSeparator": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to only enforce the style if the number already contains a separator."
    *           },
    *           "minimumDigits": {
    *             "type": "integer",
-   *             "minimum": 0
+   *             "minimum": 0,
+   *             "description": "The minimum number of digits before separators are enforced."
    *           },
    *           "groupLength": {
    *             "type": "integer",
-   *             "minimum": 1
+   *             "minimum": 1,
+   *             "description": "The number of digits in each group."
    *           }
    *         }
    *       },
    *       "onlyIfContainsSeparator": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to only enforce the style if the number already contains a separator."
    *       }
    *     }
    *   }
@@ -2060,25 +2274,64 @@ namespace NumericSeparatorsStyle {
    */
   export type Options = Readonly<{
     binary?: Readonly<{
+      /**
+       * Whether to only enforce the style if the number already contains a separator.
+       */
       onlyIfContainsSeparator?: boolean;
+      /**
+       * The minimum number of digits before separators are enforced.
+       */
       minimumDigits?: number;
+      /**
+       * The number of digits in each group.
+       */
       groupLength?: number;
     }>;
     octal?: Readonly<{
+      /**
+       * Whether to only enforce the style if the number already contains a separator.
+       */
       onlyIfContainsSeparator?: boolean;
+      /**
+       * The minimum number of digits before separators are enforced.
+       */
       minimumDigits?: number;
+      /**
+       * The number of digits in each group.
+       */
       groupLength?: number;
     }>;
     hexadecimal?: Readonly<{
+      /**
+       * Whether to only enforce the style if the number already contains a separator.
+       */
       onlyIfContainsSeparator?: boolean;
+      /**
+       * The minimum number of digits before separators are enforced.
+       */
       minimumDigits?: number;
+      /**
+       * The number of digits in each group.
+       */
       groupLength?: number;
     }>;
     number?: Readonly<{
+      /**
+       * Whether to only enforce the style if the number already contains a separator.
+       */
       onlyIfContainsSeparator?: boolean;
+      /**
+       * The minimum number of digits before separators are enforced.
+       */
       minimumDigits?: number;
+      /**
+       * The number of digits in each group.
+       */
       groupLength?: number;
     }>;
+    /**
+     * Whether to only enforce the style if the number already contains a separator.
+     */
     onlyIfContainsSeparator?: boolean;
   }>;
 
@@ -2090,7 +2343,7 @@ namespace NumericSeparatorsStyle {
 
 /**
  * @description Prefer `.addEventListener()` and `.removeEventListener()` over `on`-functions.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-add-event-listener.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-add-event-listener.md
  *
  *  ```md
  *  | key         | value         |
@@ -2116,7 +2369,8 @@ namespace PreferAddEventListener {
    *         "items": {
    *           "type": "string"
    *         },
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Packages to exclude from checking."
    *       }
    *     }
    *   }
@@ -2124,6 +2378,9 @@ namespace PreferAddEventListener {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Packages to exclude from checking.
+     */
     excludedPackages?: readonly string[];
   }>;
 
@@ -2135,7 +2392,7 @@ namespace PreferAddEventListener {
 
 /**
  * @description Prefer `.find(…)` and `.findLast(…)` over the first or last element from `.filter(…)`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-array-find.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-array-find.md
  *
  *  ```md
  *  | key            | value         |
@@ -2158,7 +2415,8 @@ namespace PreferArrayFind {
    *     "additionalProperties": false,
    *     "properties": {
    *       "checkFromLast": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to also check for patterns that can be replaced with `findLast()`."
    *       }
    *     }
    *   }
@@ -2166,6 +2424,9 @@ namespace PreferArrayFind {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to also check for patterns that can be replaced with `findLast()`.
+     */
     checkFromLast?: boolean;
   }>;
 
@@ -2177,7 +2438,7 @@ namespace PreferArrayFind {
 
 /**
  * @description Prefer `Array#flat()` over legacy techniques to flatten arrays.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-array-flat.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-array-flat.md
  *
  *  ```md
  *  | key         | value         |
@@ -2200,7 +2461,8 @@ namespace PreferArrayFlat {
    *     "properties": {
    *       "functions": {
    *         "type": "array",
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Additional functions to check."
    *       }
    *     }
    *   }
@@ -2208,6 +2470,9 @@ namespace PreferArrayFlat {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Additional functions to check.
+     */
     functions?: readonly unknown[];
   }>;
 
@@ -2219,7 +2484,7 @@ namespace PreferArrayFlat {
 
 /**
  * @description Prefer `.flatMap(…)` over `.map(…).flat()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-array-flat-map.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-array-flat-map.md
  *
  *  ```md
  *  | key         | value         |
@@ -2236,7 +2501,7 @@ namespace PreferArrayFlatMap {
 
 /**
  * @description Prefer `Array#{indexOf,lastIndexOf}()` over `Array#{findIndex,findLastIndex}()` when looking for the index of an item.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-array-index-of.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-array-index-of.md
  *
  *  ```md
  *  | key            | value         |
@@ -2254,7 +2519,7 @@ namespace PreferArrayIndexOf {
 
 /**
  * @description Prefer `.some(…)` over `.filter(…).length` check and `.{find,findLast,findIndex,findLastIndex}(…)`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-array-some.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-array-some.md
  *
  *  ```md
  *  | key            | value         |
@@ -2272,7 +2537,7 @@ namespace PreferArraySome {
 
 /**
  * @description Prefer `.at()` method for index access and `String#charAt()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-at.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-at.md
  *
  *  ```md
  *  | key            | value         |
@@ -2296,10 +2561,12 @@ namespace PreferAt {
    *     "properties": {
    *       "getLastElementFunctions": {
    *         "type": "array",
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Additional functions that return the last element."
    *       },
    *       "checkAllIndexAccess": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to also check positive integer index access."
    *       }
    *     }
    *   }
@@ -2307,7 +2574,13 @@ namespace PreferAt {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Additional functions that return the last element.
+     */
     getLastElementFunctions?: readonly unknown[];
+    /**
+     * Whether to also check positive integer index access.
+     */
     checkAllIndexAccess?: boolean;
   }>;
 
@@ -2319,7 +2592,7 @@ namespace PreferAt {
 
 /**
  * @description Prefer `BigInt` literals over the constructor.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-bigint-literals.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-bigint-literals.md
  *
  *  ```md
  *  | key            | value         |
@@ -2337,7 +2610,7 @@ namespace PreferBigintLiterals {
 
 /**
  * @description Prefer `Blob#arrayBuffer()` over `FileReader#readAsArrayBuffer(…)` and `Blob#text()` over `FileReader#readAsText(…)`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-blob-reading-methods.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-blob-reading-methods.md
  *
  *  ```md
  *  | key         | value         |
@@ -2353,7 +2626,7 @@ namespace PreferBlobReadingMethods {
 
 /**
  * @description Prefer class field declarations over `this` assignments in constructors.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-class-fields.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-class-fields.md
  *
  *  ```md
  *  | key            | value         |
@@ -2371,7 +2644,7 @@ namespace PreferClassFields {
 
 /**
  * @description Prefer using `Element#classList.toggle()` to toggle class names.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-classlist-toggle.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-classlist-toggle.md
  *
  *  ```md
  *  | key            | value         |
@@ -2389,7 +2662,7 @@ namespace PreferClasslistToggle {
 
 /**
  * @description Prefer `String#codePointAt(…)` over `String#charCodeAt(…)` and `String.fromCodePoint(…)` over `String.fromCharCode(…)`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-code-point.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-code-point.md
  *
  *  ```md
  *  | key            | value         |
@@ -2406,7 +2679,7 @@ namespace PreferCodePoint {
 
 /**
  * @description Prefer `Date.now()` to get the number of milliseconds since the Unix Epoch.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-date-now.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-date-now.md
  *
  *  ```md
  *  | key         | value         |
@@ -2423,7 +2696,7 @@ namespace PreferDateNow {
 
 /**
  * @description Prefer default parameters over reassignment.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-default-parameters.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-default-parameters.md
  *
  *  ```md
  *  | key            | value         |
@@ -2440,7 +2713,7 @@ namespace PreferDefaultParameters {
 
 /**
  * @description Prefer `Node#append()` over `Node#appendChild()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-dom-node-append.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-dom-node-append.md
  *
  *  ```md
  *  | key         | value         |
@@ -2457,7 +2730,7 @@ namespace PreferDomNodeAppend {
 
 /**
  * @description Prefer using `.dataset` on DOM elements over calling attribute methods.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-dom-node-dataset.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-dom-node-dataset.md
  *
  *  ```md
  *  | key         | value         |
@@ -2474,7 +2747,7 @@ namespace PreferDomNodeDataset {
 
 /**
  * @description Prefer `childNode.remove()` over `parentNode.removeChild(childNode)`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-dom-node-remove.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-dom-node-remove.md
  *
  *  ```md
  *  | key            | value         |
@@ -2492,7 +2765,7 @@ namespace PreferDomNodeRemove {
 
 /**
  * @description Prefer `.textContent` over `.innerText`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-dom-node-text-content.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-dom-node-text-content.md
  *
  *  ```md
  *  | key            | value         |
@@ -2509,7 +2782,7 @@ namespace PreferDomNodeTextContent {
 
 /**
  * @description Prefer `EventTarget` over `EventEmitter`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-event-target.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-event-target.md
  *
  *  ```md
  *  | key         | value         |
@@ -2525,7 +2798,7 @@ namespace PreferEventTarget {
 
 /**
  * @description Prefer `export…from` when re-exporting.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-export-from.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-export-from.md
  *
  *  ```md
  *  | key            | value      |
@@ -2548,7 +2821,8 @@ namespace PreferExportFrom {
    *     "additionalProperties": false,
    *     "properties": {
    *       "ignoreUsedVariables": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to ignore variables that are used in the module."
    *       }
    *     }
    *   }
@@ -2556,6 +2830,9 @@ namespace PreferExportFrom {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to ignore variables that are used in the module.
+     */
     ignoreUsedVariables?: boolean;
   }>;
 
@@ -2567,7 +2844,7 @@ namespace PreferExportFrom {
 
 /**
  * @description Prefer `globalThis` over `window`, `self`, and `global`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-global-this.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-global-this.md
  *
  *  ```md
  *  | key            | value         |
@@ -2585,7 +2862,7 @@ namespace PreferGlobalThis {
 
 /**
  * @description Prefer `import.meta.{dirname,filename}` over legacy techniques for getting file paths.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-import-meta-properties.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-import-meta-properties.md
  *
  *  ```md
  *  | key         | value      |
@@ -2602,7 +2879,7 @@ namespace PreferImportMetaProperties {
 
 /**
  * @description Prefer `.includes()` over `.indexOf()`, `.lastIndexOf()`, and `Array#some()` when checking for existence or non-existence.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-includes.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-includes.md
  *
  *  ```md
  *  | key            | value         |
@@ -2620,7 +2897,7 @@ namespace PreferIncludes {
 
 /**
  * @description Prefer reading a JSON file as a buffer.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-json-parse-buffer.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-json-parse-buffer.md
  *
  *  ```md
  *  | key         | value      |
@@ -2637,7 +2914,7 @@ namespace PreferJsonParseBuffer {
 
 /**
  * @description Prefer `KeyboardEvent#key` over `KeyboardEvent#keyCode`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-keyboard-event-key.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-keyboard-event-key.md
  *
  *  ```md
  *  | key         | value         |
@@ -2654,7 +2931,7 @@ namespace PreferKeyboardEventKey {
 
 /**
  * @description Prefer using a logical operator over a ternary.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-logical-operator-over-ternary.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-logical-operator-over-ternary.md
  *
  *  ```md
  *  | key            | value         |
@@ -2671,7 +2948,7 @@ namespace PreferLogicalOperatorOverTernary {
 
 /**
  * @description Prefer `Math.min()` and `Math.max()` over ternaries for simple comparisons.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-math-min-max.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-math-min-max.md
  *
  *  ```md
  *  | key         | value         |
@@ -2688,7 +2965,7 @@ namespace PreferMathMinMax {
 
 /**
  * @description Enforce the use of `Math.trunc` instead of bitwise operators.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-math-trunc.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-math-trunc.md
  *
  *  ```md
  *  | key            | value         |
@@ -2706,7 +2983,7 @@ namespace PreferMathTrunc {
 
 /**
  * @description Prefer `.before()` over `.insertBefore()`, `.replaceWith()` over `.replaceChild()`, prefer one of `.before()`, `.after()`, `.append()` or `.prepend()` over `insertAdjacentText()` and `insertAdjacentElement()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-modern-dom-apis.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-modern-dom-apis.md
  *
  *  ```md
  *  | key         | value         |
@@ -2723,7 +3000,7 @@ namespace PreferModernDomApis {
 
 /**
  * @description Prefer modern `Math` APIs over legacy patterns.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-modern-math-apis.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-modern-math-apis.md
  *
  *  ```md
  *  | key         | value         |
@@ -2740,7 +3017,7 @@ namespace PreferModernMathApis {
 
 /**
  * @description Prefer JavaScript modules (ESM) over CommonJS.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-module.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-module.md
  *
  *  ```md
  *  | key            | value         |
@@ -2758,7 +3035,7 @@ namespace PreferModule {
 
 /**
  * @description Prefer using `String`, `Number`, `BigInt`, `Boolean`, and `Symbol` directly.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-native-coercion-functions.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-native-coercion-functions.md
  *
  *  ```md
  *  | key         | value         |
@@ -2775,7 +3052,7 @@ namespace PreferNativeCoercionFunctions {
 
 /**
  * @description Prefer negative index over `.length - index` when possible.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-negative-index.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-negative-index.md
  *
  *  ```md
  *  | key         | value         |
@@ -2792,7 +3069,7 @@ namespace PreferNegativeIndex {
 
 /**
  * @description Prefer using the `node:` protocol when importing Node.js builtin modules.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-node-protocol.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-node-protocol.md
  *
  *  ```md
  *  | key         | value         |
@@ -2809,7 +3086,7 @@ namespace PreferNodeProtocol {
 
 /**
  * @description Prefer `Number` static properties over global ones.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-number-properties.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-number-properties.md
  *
  *  ```md
  *  | key            | value         |
@@ -2832,10 +3109,12 @@ namespace PreferNumberProperties {
    *     "additionalProperties": false,
    *     "properties": {
    *       "checkInfinity": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check usage of the global `Infinity`."
    *       },
    *       "checkNaN": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to check usage of the global `NaN`."
    *       }
    *     }
    *   }
@@ -2843,7 +3122,13 @@ namespace PreferNumberProperties {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to check usage of the global `Infinity`.
+     */
     checkInfinity?: boolean;
+    /**
+     * Whether to check usage of the global `NaN`.
+     */
     checkNaN?: boolean;
   }>;
 
@@ -2855,7 +3140,7 @@ namespace PreferNumberProperties {
 
 /**
  * @description Prefer using `Object.fromEntries(…)` to transform a list of key-value pairs into an object.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-object-from-entries.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-object-from-entries.md
  *
  *  ```md
  *  | key         | value         |
@@ -2878,7 +3163,8 @@ namespace PreferObjectFromEntries {
    *     "properties": {
    *       "functions": {
    *         "type": "array",
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Additional functions to check."
    *       }
    *     }
    *   }
@@ -2886,6 +3172,9 @@ namespace PreferObjectFromEntries {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Additional functions to check.
+     */
     functions?: readonly unknown[];
   }>;
 
@@ -2897,7 +3186,7 @@ namespace PreferObjectFromEntries {
 
 /**
  * @description Prefer omitting the `catch` binding parameter.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-optional-catch-binding.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-optional-catch-binding.md
  *
  *  ```md
  *  | key         | value         |
@@ -2914,7 +3203,7 @@ namespace PreferOptionalCatchBinding {
 
 /**
  * @description Prefer borrowing methods from the prototype instead of the instance.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-prototype-methods.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-prototype-methods.md
  *
  *  ```md
  *  | key         | value         |
@@ -2931,7 +3220,7 @@ namespace PreferPrototypeMethods {
 
 /**
  * @description Prefer `.querySelector()` over `.getElementById()`, `.querySelectorAll()` over `.getElementsByClassName()` and `.getElementsByTagName()` and `.getElementsByName()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-query-selector.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-query-selector.md
  *
  *  ```md
  *  | key         | value      |
@@ -2948,7 +3237,7 @@ namespace PreferQuerySelector {
 
 /**
  * @description Prefer `Reflect.apply()` over `Function#apply()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-reflect-apply.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-reflect-apply.md
  *
  *  ```md
  *  | key         | value         |
@@ -2965,7 +3254,7 @@ namespace PreferReflectApply {
 
 /**
  * @description Prefer `RegExp#test()` over `String#match()` and `RegExp#exec()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-regexp-test.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-regexp-test.md
  *
  *  ```md
  *  | key            | value         |
@@ -2983,7 +3272,7 @@ namespace PreferRegexpTest {
 
 /**
  * @description Prefer `Response.json()` over `new Response(JSON.stringify())`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-response-static-json.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-response-static-json.md
  *
  *  ```md
  *  | key         | value         |
@@ -3000,7 +3289,7 @@ namespace PreferResponseStaticJson {
 
 /**
  * @description Prefer `Set#has()` over `Array#includes()` when checking for existence or non-existence.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-set-has.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-set-has.md
  *
  *  ```md
  *  | key            | value         |
@@ -3018,7 +3307,7 @@ namespace PreferSetHas {
 
 /**
  * @description Prefer using `Set#size` instead of `Array#length`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-set-size.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-set-size.md
  *
  *  ```md
  *  | key         | value         |
@@ -3034,8 +3323,26 @@ namespace PreferSetSize {
 }
 
 /**
+ * @description Prefer simple conditions first in logical expressions.
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-simple-condition-first.md
+ *
+ *  ```md
+ *  | key            | value         |
+ *  | :------------- | :------------ |
+ *  | type           | suggestion    |
+ *  | deprecated     | false         |
+ *  | fixable        | code          |
+ *  | hasSuggestions | true          |
+ *  | recommended    | unopinionated |
+ *  ```
+ */
+namespace PreferSimpleConditionFirst {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Enforce combining multiple `Array#push()`, `Element#classList.{add,remove}()`, and `importScripts()` into one call.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-single-call.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-single-call.md
  *
  *  ```md
  *  | key            | value         |
@@ -3059,7 +3366,8 @@ namespace PreferSingleCall {
    *     "properties": {
    *       "ignore": {
    *         "type": "array",
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Methods to ignore."
    *       }
    *     }
    *   }
@@ -3067,6 +3375,9 @@ namespace PreferSingleCall {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Methods to ignore.
+     */
     ignore?: readonly unknown[];
   }>;
 
@@ -3078,7 +3389,7 @@ namespace PreferSingleCall {
 
 /**
  * @description Prefer the spread operator over `Array.from(…)`, `Array#concat(…)`, `Array#{slice,toSpliced}()` and `String#split('')`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-spread.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-spread.md
  *
  *  ```md
  *  | key            | value      |
@@ -3096,7 +3407,7 @@ namespace PreferSpread {
 
 /**
  * @description Prefer using the `String.raw` tag to avoid escaping `\`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-string-raw.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-string-raw.md
  *
  *  ```md
  *  | key         | value         |
@@ -3113,7 +3424,7 @@ namespace PreferStringRaw {
 
 /**
  * @description Prefer `String#replaceAll()` over regex searches with the global flag.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-string-replace-all.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-string-replace-all.md
  *
  *  ```md
  *  | key         | value         |
@@ -3130,7 +3441,7 @@ namespace PreferStringReplaceAll {
 
 /**
  * @description Prefer `String#slice()` over `String#substr()` and `String#substring()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-string-slice.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-string-slice.md
  *
  *  ```md
  *  | key         | value         |
@@ -3147,7 +3458,7 @@ namespace PreferStringSlice {
 
 /**
  * @description Prefer `String#startsWith()` & `String#endsWith()` over `RegExp#test()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-string-starts-ends-with.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-string-starts-ends-with.md
  *
  *  ```md
  *  | key            | value         |
@@ -3165,7 +3476,7 @@ namespace PreferStringStartsEndsWith {
 
 /**
  * @description Prefer `String#trimStart()` / `String#trimEnd()` over `String#trimLeft()` / `String#trimRight()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-string-trim-start-end.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-string-trim-start-end.md
  *
  *  ```md
  *  | key         | value         |
@@ -3182,7 +3493,7 @@ namespace PreferStringTrimStartEnd {
 
 /**
  * @description Prefer using `structuredClone` to create a deep clone.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-structured-clone.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-structured-clone.md
  *
  *  ```md
  *  | key            | value         |
@@ -3205,7 +3516,8 @@ namespace PreferStructuredClone {
    *     "properties": {
    *       "functions": {
    *         "type": "array",
-   *         "uniqueItems": true
+   *         "uniqueItems": true,
+   *         "description": "Additional functions to check."
    *       }
    *     }
    *   }
@@ -3213,6 +3525,9 @@ namespace PreferStructuredClone {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Additional functions to check.
+     */
     functions?: readonly unknown[];
   }>;
 
@@ -3224,7 +3539,7 @@ namespace PreferStructuredClone {
 
 /**
  * @description Prefer `switch` over multiple `else-if`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-switch.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-switch.md
  *
  *  ```md
  *  | key         | value         |
@@ -3247,14 +3562,16 @@ namespace PreferSwitch {
    *     "properties": {
    *       "minimumCases": {
    *         "type": "integer",
-   *         "minimum": 2
+   *         "minimum": 2,
+   *         "description": "The minimum number of `if`/`else if` cases before suggesting a `switch` statement."
    *       },
    *       "emptyDefaultCase": {
    *         "enum": [
    *           "no-default-comment",
    *           "do-nothing-comment",
    *           "no-default-case"
-   *         ]
+   *         ],
+   *         "description": "How to handle an empty `default` case."
    *       }
    *     }
    *   }
@@ -3262,7 +3579,13 @@ namespace PreferSwitch {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * The minimum number of `if`/`else if` cases before suggesting a `switch` statement.
+     */
     minimumCases?: number;
+    /**
+     * How to handle an empty `default` case.
+     */
     emptyDefaultCase?:
       | 'no-default-comment'
       | 'do-nothing-comment'
@@ -3277,7 +3600,7 @@ namespace PreferSwitch {
 
 /**
  * @description Prefer ternary expressions over simple `if-else` statements.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-ternary.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-ternary.md
  *
  *  ```md
  *  | key         | value         |
@@ -3298,10 +3621,14 @@ namespace PreferTernary {
    *     "enum": [
    *       "always",
    *       "only-single-line"
-   *     ]
+   *     ],
+   *     "description": "Whether to always prefer ternary, or only for single-line expressions."
    *   }
    * ]
    * ```
+   */
+  /**
+   * Whether to always prefer ternary, or only for single-line expressions.
    */
   export type Options = 'always' | 'only-single-line';
 
@@ -3313,7 +3640,7 @@ namespace PreferTernary {
 
 /**
  * @description Prefer top-level await over top-level promises and async function calls.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-top-level-await.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-top-level-await.md
  *
  *  ```md
  *  | key            | value         |
@@ -3330,7 +3657,7 @@ namespace PreferTopLevelAwait {
 
 /**
  * @description Enforce throwing `TypeError` in type checking conditions.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prefer-type-error.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prefer-type-error.md
  *
  *  ```md
  *  | key         | value         |
@@ -3347,7 +3674,7 @@ namespace PreferTypeError {
 
 /**
  * @description Prevent abbreviations.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/prevent-abbreviations.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/prevent-abbreviations.md
  *
  *  ```md
  *  | key         | value      |
@@ -3373,46 +3700,57 @@ namespace PreventAbbreviations {
    *         "additionalProperties": false,
    *         "properties": {
    *           "checkProperties": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check property names."
    *           },
    *           "checkVariables": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check variable names."
    *           },
    *           "checkDefaultAndNamespaceImports": {
    *             "type": [
    *               "boolean",
    *               "string"
    *             ],
-   *             "pattern": "internal"
+   *             "pattern": "internal",
+   *             "description": "Whether to check default and namespace import names."
    *           },
    *           "checkShorthandImports": {
    *             "type": [
    *               "boolean",
    *               "string"
    *             ],
-   *             "pattern": "internal"
+   *             "pattern": "internal",
+   *             "description": "Whether to check shorthand import names."
    *           },
    *           "checkShorthandProperties": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check shorthand property names."
    *           },
    *           "checkFilenames": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to check filenames."
    *           },
    *           "extendDefaultReplacements": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to extend the default replacements."
    *           },
    *           "replacements": {
-   *             "$ref": "#/definitions/abbreviations"
+   *             "$ref": "#/definitions/abbreviations",
+   *             "description": "Custom abbreviation replacements."
    *           },
    *           "extendDefaultAllowList": {
-   *             "type": "boolean"
+   *             "type": "boolean",
+   *             "description": "Whether to extend the default allow list."
    *           },
    *           "allowList": {
-   *             "$ref": "#/definitions/booleanObject"
+   *             "$ref": "#/definitions/booleanObject",
+   *             "description": "Custom allow list of names."
    *           },
    *           "ignore": {
    *             "type": "array",
-   *             "uniqueItems": true
+   *             "uniqueItems": true,
+   *             "description": "Patterns to ignore."
    *           }
    *         }
    *       }
@@ -3451,25 +3789,60 @@ namespace PreventAbbreviations {
     | readonly []
     | readonly [
         Readonly<{
+          /**
+           * Whether to check property names.
+           */
           checkProperties?: boolean;
+          /**
+           * Whether to check variable names.
+           */
           checkVariables?: boolean;
+          /**
+           * Whether to check default and namespace import names.
+           */
           checkDefaultAndNamespaceImports?: boolean | string;
+          /**
+           * Whether to check shorthand import names.
+           */
           checkShorthandImports?: boolean | string;
+          /**
+           * Whether to check shorthand property names.
+           */
           checkShorthandProperties?: boolean;
+          /**
+           * Whether to check filenames.
+           */
           checkFilenames?: boolean;
+          /**
+           * Whether to extend the default replacements.
+           */
           extendDefaultReplacements?: boolean;
           replacements?: Abbreviations;
+          /**
+           * Whether to extend the default allow list.
+           */
           extendDefaultAllowList?: boolean;
-          allowList?: BooleanObject;
+          allowList?: BooleanObject1;
+          /**
+           * Patterns to ignore.
+           */
           ignore?: readonly unknown[];
         }>,
       ];
 
   export type Replacements = false | BooleanObject;
 
+  /**
+   * Custom abbreviation replacements.
+   */
   export type Abbreviations = Readonly<Record<string, Replacements>>;
 
   export type BooleanObject = Readonly<Record<string, boolean>>;
+
+  /**
+   * Custom allow list of names.
+   */
+  export type BooleanObject1 = Readonly<Record<string, boolean>>;
 
   export type RuleEntry =
     | 'off'
@@ -3479,7 +3852,7 @@ namespace PreventAbbreviations {
 
 /**
  * @description Enforce consistent relative URL style.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/relative-url-style.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/relative-url-style.md
  *
  *  ```md
  *  | key            | value         |
@@ -3501,10 +3874,14 @@ namespace RelativeUrlStyle {
    *     "enum": [
    *       "never",
    *       "always"
-   *     ]
+   *     ],
+   *     "description": "Whether to never or always use a leading `./` for relative URLs."
    *   }
    * ]
    * ```
+   */
+  /**
+   * Whether to never or always use a leading `./` for relative URLs.
    */
   export type Options = 'never' | 'always';
 
@@ -3516,7 +3893,7 @@ namespace RelativeUrlStyle {
 
 /**
  * @description Enforce using the separator argument with `Array#join()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/require-array-join-separator.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/require-array-join-separator.md
  *
  *  ```md
  *  | key         | value         |
@@ -3533,7 +3910,7 @@ namespace RequireArrayJoinSeparator {
 
 /**
  * @description Require non-empty module attributes for imports and exports
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/require-module-attributes.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/require-module-attributes.md
  *
  *  ```md
  *  | key         | value         |
@@ -3550,7 +3927,7 @@ namespace RequireModuleAttributes {
 
 /**
  * @description Require non-empty specifier list in import and export statements.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/require-module-specifiers.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/require-module-specifiers.md
  *
  *  ```md
  *  | key            | value         |
@@ -3568,7 +3945,7 @@ namespace RequireModuleSpecifiers {
 
 /**
  * @description Enforce using the digits argument with `Number#toFixed()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/require-number-to-fixed-digits-argument.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/require-number-to-fixed-digits-argument.md
  *
  *  ```md
  *  | key         | value         |
@@ -3585,7 +3962,7 @@ namespace RequireNumberToFixedDigitsArgument {
 
 /**
  * @description Enforce using the `targetOrigin` argument with `window.postMessage()`.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/require-post-message-target-origin.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/require-post-message-target-origin.md
  *
  *  ```md
  *  | key            | value   |
@@ -3602,7 +3979,7 @@ namespace RequirePostMessageTargetOrigin {
 
 /**
  * @description Enforce better string content.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/string-content.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/string-content.md
  *
  *  ```md
  *  | key            | value      |
@@ -3626,6 +4003,7 @@ namespace StringContent {
    *     "properties": {
    *       "patterns": {
    *         "type": "object",
+   *         "description": "Patterns to replace in string content.",
    *         "additionalProperties": {
    *           "anyOf": [
    *             {
@@ -3658,6 +4036,9 @@ namespace StringContent {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Patterns to replace in string content.
+     */
     patterns?: Readonly<
       Record<
         string,
@@ -3679,7 +4060,7 @@ namespace StringContent {
 
 /**
  * @description Enforce consistent brace style for `case` clauses.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/switch-case-braces.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/switch-case-braces.md
  *
  *  ```md
  *  | key         | value  |
@@ -3700,10 +4081,14 @@ namespace SwitchCaseBraces {
    *     "enum": [
    *       "always",
    *       "avoid"
-   *     ]
+   *     ],
+   *     "description": "Whether to always require braces or avoid them for empty cases."
    *   }
    * ]
    * ```
+   */
+  /**
+   * Whether to always require braces or avoid them for empty cases.
    */
   export type Options = 'always' | 'avoid';
 
@@ -3714,8 +4099,25 @@ namespace SwitchCaseBraces {
 }
 
 /**
+ * @description Enforce consistent `break`/`return`/`continue`/`throw` position in `case` clauses.
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/switch-case-break-position.md
+ *
+ *  ```md
+ *  | key         | value  |
+ *  | :---------- | :----- |
+ *  | type        | layout |
+ *  | deprecated  | false  |
+ *  | fixable     | code   |
+ *  | recommended | true   |
+ *  ```
+ */
+namespace SwitchCaseBreakPosition {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Fix whitespace-insensitive template indentation.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/template-indent.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/template-indent.md
  *
  *  ```md
  *  | key         | value      |
@@ -3740,41 +4142,48 @@ namespace TemplateIndent {
    *         "oneOf": [
    *           {
    *             "type": "string",
-   *             "pattern": "^\\s+$"
+   *             "pattern": "^\\s+$",
+   *             "description": "Whitespace string to use as indentation."
    *           },
    *           {
    *             "type": "integer",
-   *             "minimum": 1
+   *             "minimum": 1,
+   *             "description": "Number of spaces to use as indentation."
    *           }
-   *         ]
+   *         ],
+   *         "description": "The indentation to use inside the template literal."
    *       },
    *       "tags": {
    *         "type": "array",
    *         "uniqueItems": true,
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "description": "Tagged template names to check."
    *       },
    *       "functions": {
    *         "type": "array",
    *         "uniqueItems": true,
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "description": "Function names whose template literal arguments to check."
    *       },
    *       "selectors": {
    *         "type": "array",
    *         "uniqueItems": true,
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "description": "AST selectors for template literals to check."
    *       },
    *       "comments": {
    *         "type": "array",
    *         "uniqueItems": true,
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "description": "Comment patterns to mark template literals for checking."
    *       }
    *     }
    *   }
@@ -3782,10 +4191,25 @@ namespace TemplateIndent {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * The indentation to use inside the template literal.
+     */
     indent?: string | number;
+    /**
+     * Tagged template names to check.
+     */
     tags?: readonly string[];
+    /**
+     * Function names whose template literal arguments to check.
+     */
     functions?: readonly string[];
+    /**
+     * AST selectors for template literals to check.
+     */
     selectors?: readonly string[];
+    /**
+     * Comment patterns to mark template literals for checking.
+     */
     comments?: readonly string[];
   }>;
 
@@ -3797,7 +4221,7 @@ namespace TemplateIndent {
 
 /**
  * @description Enforce consistent case for text encoding identifiers.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/text-encoding-identifier-case.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/text-encoding-identifier-case.md
  *
  *  ```md
  *  | key            | value         |
@@ -3820,7 +4244,8 @@ namespace TextEncodingIdentifierCase {
    *     "additionalProperties": false,
    *     "properties": {
    *       "withDash": {
-   *         "type": "boolean"
+   *         "type": "boolean",
+   *         "description": "Whether to prefer identifiers with a dash, like `utf-8` instead of `utf8`."
    *       }
    *     }
    *   }
@@ -3828,6 +4253,9 @@ namespace TextEncodingIdentifierCase {
    * ```
    */
   export type Options = Readonly<{
+    /**
+     * Whether to prefer identifiers with a dash, like `utf-8` instead of `utf8`.
+     */
     withDash?: boolean;
   }>;
 
@@ -3839,7 +4267,7 @@ namespace TextEncodingIdentifierCase {
 
 /**
  * @description Require `new` when creating an error.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/rules/throw-new-error.md
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/rules/throw-new-error.md
  *
  *  ```md
  *  | key         | value         |
@@ -3856,7 +4284,7 @@ namespace ThrowNewError {
 
 /**
  * @description Replaced by `unicorn/no-instanceof-builtins` which covers more cases.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/deleted-and-deprecated-rules.md#no-instanceof-array
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/deleted-and-deprecated-rules.md#no-instanceof-array
  *
  *  ```md
  *  | key        | value |
@@ -3870,7 +4298,7 @@ namespace NoInstanceofArray {
 
 /**
  * @description Replaced by `unicorn/no-unnecessary-slice-end` which covers more cases.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/deleted-and-deprecated-rules.md#no-length-as-slice-end
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/deleted-and-deprecated-rules.md#no-length-as-slice-end
  *
  *  ```md
  *  | key        | value |
@@ -3884,7 +4312,7 @@ namespace NoLengthAsSliceEnd {
 
 /**
  * @description Replaced by `unicorn/prefer-single-call` which covers more cases.
- * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v63.0.0/docs/deleted-and-deprecated-rules.md#no-array-push-push
+ * @link https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v64.0.0/docs/deleted-and-deprecated-rules.md#no-array-push-push
  *
  *  ```md
  *  | key        | value |
@@ -3905,6 +4333,7 @@ export type EslintUnicornRules = Readonly<{
   'unicorn/consistent-empty-array-spread': ConsistentEmptyArraySpread.RuleEntry;
   'unicorn/consistent-existence-index-check': ConsistentExistenceIndexCheck.RuleEntry;
   'unicorn/consistent-function-scoping': ConsistentFunctionScoping.RuleEntry;
+  'unicorn/consistent-template-literal-escape': ConsistentTemplateLiteralEscape.RuleEntry;
   'unicorn/custom-error-definition': CustomErrorDefinition.RuleEntry;
   'unicorn/empty-brace-spaces': EmptyBraceSpaces.RuleEntry;
   'unicorn/error-message': ErrorMessage.RuleEntry;
@@ -3963,6 +4392,7 @@ export type EslintUnicornRules = Readonly<{
   'unicorn/no-useless-collection-argument': NoUselessCollectionArgument.RuleEntry;
   'unicorn/no-useless-error-capture-stack-trace': NoUselessErrorCaptureStackTrace.RuleEntry;
   'unicorn/no-useless-fallback-in-spread': NoUselessFallbackInSpread.RuleEntry;
+  'unicorn/no-useless-iterator-to-array': NoUselessIteratorToArray.RuleEntry;
   'unicorn/no-useless-length-check': NoUselessLengthCheck.RuleEntry;
   'unicorn/no-useless-promise-resolve-reject': NoUselessPromiseResolveReject.RuleEntry;
   'unicorn/no-useless-spread': NoUselessSpread.RuleEntry;
@@ -4015,6 +4445,7 @@ export type EslintUnicornRules = Readonly<{
   'unicorn/prefer-response-static-json': PreferResponseStaticJson.RuleEntry;
   'unicorn/prefer-set-has': PreferSetHas.RuleEntry;
   'unicorn/prefer-set-size': PreferSetSize.RuleEntry;
+  'unicorn/prefer-simple-condition-first': PreferSimpleConditionFirst.RuleEntry;
   'unicorn/prefer-single-call': PreferSingleCall.RuleEntry;
   'unicorn/prefer-spread': PreferSpread.RuleEntry;
   'unicorn/prefer-string-raw': PreferStringRaw.RuleEntry;
@@ -4036,6 +4467,7 @@ export type EslintUnicornRules = Readonly<{
   'unicorn/require-post-message-target-origin': RequirePostMessageTargetOrigin.RuleEntry;
   'unicorn/string-content': StringContent.RuleEntry;
   'unicorn/switch-case-braces': SwitchCaseBraces.RuleEntry;
+  'unicorn/switch-case-break-position': SwitchCaseBreakPosition.RuleEntry;
   'unicorn/template-indent': TemplateIndent.RuleEntry;
   'unicorn/text-encoding-identifier-case': TextEncodingIdentifierCase.RuleEntry;
   'unicorn/throw-new-error': ThrowNewError.RuleEntry;

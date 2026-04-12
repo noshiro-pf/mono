@@ -121,6 +121,16 @@ export const eslintStylisticRules = {
       prev: 'case',
       next: 'case',
     },
+    {
+      blankLine: 'any',
+      prev: 'case',
+      next: 'default',
+    },
+    {
+      blankLine: 'any',
+      prev: 'default',
+      next: 'case',
+    },
   ],
 
   '@stylistic/jsx-sort-props': 0,

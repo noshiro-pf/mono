@@ -81,15 +81,15 @@
     "@sindresorhus/is": "^7.2.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/eslint": "9.6.1",
-    "@typescript-eslint/eslint-plugin": "8.57.2",
-    "@typescript-eslint/parser": "8.57.2",
-    "@typescript-eslint/type-utils": "8.57.2",
-    "@typescript-eslint/utils": "8.57.2",
-    "@vitest/eslint-plugin": "^1.6.13",
+    "@typescript-eslint/eslint-plugin": "8.58.0",
+    "@typescript-eslint/parser": "8.58.0",
+    "@typescript-eslint/type-utils": "8.58.0",
+    "@typescript-eslint/utils": "8.58.0",
+    "@vitest/eslint-plugin": "^1.6.14",
     "eslint": "9.39.4",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-array-func": "5.1.1",
-    "eslint-plugin-cypress": "6.2.1",
+    "eslint-plugin-cypress": "6.2.2",
     "eslint-plugin-eslint-plugin": "7.3.2",
     "eslint-plugin-functional": "9.0.4",
     "eslint-plugin-import-x": "^4.16.2",
@@ -107,17 +107,17 @@
     "eslint-plugin-security": "4.0.0",
     "eslint-plugin-sort-destructure-keys": "^3.0.0",
     "eslint-plugin-testing-library": "7.16.2",
-    "eslint-plugin-unicorn": "63.0.0",
+    "eslint-plugin-unicorn": "64.0.0",
     "globals": "17.4.0",
     "is-glob": "^4.0.3",
     "is-immutable-type": "5.0.1",
     "micromatch": "^4.0.8",
-    "ts-data-forge": "^6.8.0",
+    "ts-data-forge": "^6.9.0",
     "tsutils": "3.21.0",
-    "typescript-eslint": "8.57.2"
+    "typescript-eslint": "8.58.0"
   },
   "devDependencies": {
-    "@eslint/core": "1.1.1",
+    "@eslint/core": "1.2.0",
     "@rollup/plugin-replace": "6.0.3",
     "@rollup/plugin-strip": "3.0.4",
     "@rollup/plugin-typescript": "12.3.0",
@@ -132,9 +132,9 @@
     "@types/is-glob": "4.0.4",
     "@types/json-schema": "7.0.15",
     "@types/micromatch": "4.0.10",
-    "@types/node": "25.5.0",
+    "@types/node": "25.5.2",
     "@types/react": "19.2.14",
-    "@typescript-eslint/rule-tester": "8.57.2",
+    "@typescript-eslint/rule-tester": "8.58.0",
     "@vitest/coverage-v8": "4.1.2",
     "@vitest/ui": "4.1.2",
     "conventional-changelog-conventionalcommits": "9.3.1",
@@ -159,7 +159,7 @@
     "ts-fortress": "7.0.2",
     "ts-morph": "27.0.2",
     "ts-repo-utils": "9.0.0",
-    "ts-type-forge": "2.3.1",
+    "ts-type-forge": "2.4.0",
     "tslib": "2.8.1",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
@@ -169,11 +169,11 @@
     "eslint": ">=9.0.0 <10.0.0",
     "typescript": ">=5.0.0"
   },
-  "packageManager": "pnpm@10.28.1",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=20.11.0"
+    "node": ">=22.14.0"
   },
   "volta": {
-    "node": "25.2.1"
+    "node": "25.9.0"
   }
 }
