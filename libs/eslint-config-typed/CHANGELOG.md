@@ -1,3 +1,9 @@
+## [4.9.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.0...v4.9.1) (2026-04-12)
+
+### Bug Fixes
+
+- Make it irrelevant whether there are blank lines around the default case ([#299](https://github.com/noshiro-pf/eslint-config-typed/issues/299)) ([183c5be](https://github.com/noshiro-pf/eslint-config-typed/commit/183c5bebaf7667fc918900948f12256c07c365de))
+
 # [4.9.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.8.0...v4.9.0) (2026-04-03)
 
 ### Features
