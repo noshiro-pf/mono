@@ -106,8 +106,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.0(prettier@3.8.1)(typescript@5.9.3)
       ts-type-forge:
-        specifier: 2.3.1
-        version: 2.3.1
+        specifier: 2.4.0
+        version: 2.4.0
       tslib:
         specifier: 2.8.1
         version: 2.8.1
@@ -4067,10 +4067,6 @@ packages:
     hasBin: true
     peerDependencies:
       prettier: '>=3.0.0'
-
-  ts-type-forge@2.3.1:
-    resolution: {integrity: sha512-JBsmJ41/SMruhXKs9RNye2saw+RffR+qlxNp8HDW5qXMqXHFa5IiBAnJXXUbOev387xu018xNiHa0jvQoLZhtA==}
-    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   ts-type-forge@2.4.0:
     resolution: {integrity: sha512-YwDGgDzkqcsvF+YxmqRMnXEd9YfytLkBt6o1iRAmVx6+MJEhRCVD0bLTBu0WEn3iEzOByEkXdvaOi2XrDv9qgA==}
@@ -8614,7 +8610,7 @@ snapshots:
   ts-data-forge@6.5.0(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
-      ts-type-forge: 2.3.1
+      ts-type-forge: 2.4.0
       typescript: 5.9.3
 
   ts-data-forge@6.9.0(typescript@5.9.3):
@@ -8632,7 +8628,7 @@ snapshots:
     dependencies:
       '@sindresorhus/is': 7.2.0
       ts-data-forge: 6.9.0(typescript@5.9.3)
-      ts-type-forge: 2.3.1
+      ts-type-forge: 2.4.0
     transitivePeerDependencies:
       - typescript
 
@@ -8655,8 +8651,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - typescript
-
-  ts-type-forge@2.3.1: {}
 
   ts-type-forge@2.4.0: {}
 
