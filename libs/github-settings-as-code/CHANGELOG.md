@@ -1,3 +1,9 @@
+## [1.2.3](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.2...v1.2.3) (2026-04-13)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.8.0 to 6.9.0 ([#111](https://github.com/noshiro-pf/github-settings-as-code/issues/111)) ([d19c58c](https://github.com/noshiro-pf/github-settings-as-code/commit/d19c58c3d337a01aa7c99d38b6a5cd166609959d))
+
 ## [1.2.2](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.1...v1.2.2) (2026-03-27)
 
 ### Bug Fixes
