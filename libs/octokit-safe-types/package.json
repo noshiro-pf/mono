@@ -101,7 +101,7 @@
     "eslint": "9.39.4",
     "eslint-config-typed": "4.9.0",
     "fast-glob": "3.3.3",
-    "github-settings-as-code": "1.2.0",
+    "github-settings-as-code": "1.2.2",
     "jiti": "2.6.1",
     "markdownlint": "0.40.0",
     "markdownlint-cli2": "0.22.0",
