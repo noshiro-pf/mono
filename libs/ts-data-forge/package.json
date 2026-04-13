@@ -104,7 +104,7 @@
     "@vitest/browser-playwright": "4.1.2",
     "@vitest/coverage-v8": "4.1.2",
     "@vitest/ui": "4.1.2",
-    "conventional-changelog-conventionalcommits": "9.3.0",
+    "conventional-changelog-conventionalcommits": "9.3.1",
     "cspell": "10.0.0",
     "dedent": "^1.7.2",
     "eslint": "9.39.4",
