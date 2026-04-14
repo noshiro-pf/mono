@@ -1,3 +1,9 @@
+## [4.9.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.1...v4.9.2) (2026-04-14)
+
+### Bug Fixes
+
+- Modified to also recognize destructuring using string/number literal keys ([#303](https://github.com/noshiro-pf/eslint-config-typed/issues/303)) ([9b26c2f](https://github.com/noshiro-pf/eslint-config-typed/commit/9b26c2fcf62ad2d3b5bff55399797a538d528dfc))
+
 ## [4.9.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.0...v4.9.1) (2026-04-12)
 
 ### Bug Fixes
