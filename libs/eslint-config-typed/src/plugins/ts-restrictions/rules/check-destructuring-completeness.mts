@@ -148,28 +148,18 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
       return false;
     };
 
-    const checkNode = (
-      node: DeepReadonly<TSESTree.VariableDeclarator>,
+    const checkObjectPatternCompleteness = (
+      objectPattern: DeepReadonly<TSESTree.ObjectPattern>,
+      tsSourceNode: DeepReadonly<TSESTree.Node>,
     ): void => {
-      if (node.id.type !== AST_NODE_TYPES.ObjectPattern) return;
-
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (node.init === undefined || node.init === null) return;
-
-      const shouldCheck =
-        hasDirectiveComment(node) || isReactComponentPropsDestructuring(node);
-
-      if (!shouldCheck) return;
-
-      // If rest element is used, skip completeness check
-      const hasRestElement = node.id.properties.some(
+      const hasRestElement = objectPattern.properties.some(
         (prop) => prop.type === AST_NODE_TYPES.RestElement,
       );
 
       if (hasRestElement) return;
 
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      const tsNode = esTreeNodeToTSNodeMap.get(node.init as never);
+      const tsNode = esTreeNodeToTSNodeMap.get(tsSourceNode as never);
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (tsNode === undefined) return;
@@ -178,25 +168,20 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
 
       const objectProps = getObjectTypeProperties(type);
 
-      const mut_destructuredProps = new Set<string>();
+      const collected = collectDestructuredPropNames(objectPattern.properties);
 
-      for (const prop of node.id.properties) {
-        if (
-          prop.type === AST_NODE_TYPES.Property &&
-          prop.key.type === AST_NODE_TYPES.Identifier
-        ) {
-          mut_destructuredProps.add(prop.key.name);
-        }
-      }
+      // Dynamic computed properties cannot be resolved statically,
+      // so skip completeness check when they are present.
+      if (collected.hasDynamicComputedKey) return;
 
       const missingProps = objectProps.filter(
-        (prop) => !mut_destructuredProps.has(prop),
+        (prop) => !collected.names.has(prop),
       );
 
       if (missingProps.length > 0) {
         context.report({
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          node: node.id as never,
+          node: objectPattern as never,
           messageId: 'incompleteDestructuring',
           data: {
             missingProps: missingProps.join(', '),
@@ -206,7 +191,19 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
     };
 
     return {
-      VariableDeclarator: checkNode,
+      VariableDeclarator: (node) => {
+        if (node.id.type !== AST_NODE_TYPES.ObjectPattern) return;
+
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (node.init === undefined || node.init === null) return;
+
+        const shouldCheck =
+          hasDirectiveComment(node) || isReactComponentPropsDestructuring(node);
+
+        if (!shouldCheck) return;
+
+        checkObjectPatternCompleteness(node.id, node.init);
+      },
       ArrowFunctionExpression: (node) => {
         if (!alwaysCheckReactComponentProps) return;
 
@@ -214,47 +211,7 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
 
         for (const param of node.params) {
           if (param.type === AST_NODE_TYPES.ObjectPattern) {
-            // If rest element is used, skip completeness check
-            const hasRestElement = param.properties.some(
-              (prop) => prop.type === AST_NODE_TYPES.RestElement,
-            );
-
-            if (hasRestElement) continue;
-
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            const tsNode = esTreeNodeToTSNodeMap.get(param as never);
-
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            if (tsNode === undefined) continue;
-
-            const type = typeChecker.getTypeAtLocation(tsNode);
-
-            const objectProps = getObjectTypeProperties(type);
-
-            const mut_destructuredProps = new Set<string>();
-
-            for (const prop of param.properties) {
-              if (
-                prop.type === AST_NODE_TYPES.Property &&
-                prop.key.type === AST_NODE_TYPES.Identifier
-              ) {
-                mut_destructuredProps.add(prop.key.name);
-              }
-            }
-
-            const missingProps = objectProps.filter(
-              (prop) => !mut_destructuredProps.has(prop),
-            );
-
-            if (missingProps.length > 0) {
-              context.report({
-                node: param,
-                messageId: 'incompleteDestructuring',
-                data: {
-                  missingProps: missingProps.join(', '),
-                },
-              });
-            }
+            checkObjectPatternCompleteness(param, param);
           }
         }
       },
@@ -287,6 +244,56 @@ const getObjectTypeProperties = (type: ts.Type): readonly string[] => {
     // If there's any error getting properties, return empty array
     return [];
   }
+};
+
+const collectDestructuredPropNames = (
+  properties: DeepReadonly<TSESTree.ObjectPattern['properties']>,
+): Readonly<{
+  names: ReadonlySet<string>;
+  hasDynamicComputedKey: boolean;
+}> => {
+  const mut_names = new Set<string>();
+
+  let mut_hasDynamicComputedKey = false;
+
+  for (const prop of properties) {
+    if (prop.type !== AST_NODE_TYPES.Property) continue;
+
+    if (!prop.computed) {
+      switch (prop.key.type) {
+        case AST_NODE_TYPES.Identifier: {
+          mut_names.add(prop.key.name);
+
+          break;
+        }
+
+        case AST_NODE_TYPES.Literal: {
+          if (typeof prop.key.value === 'string') {
+            mut_names.add(prop.key.value);
+          } else if (typeof prop.key.value === 'number') {
+            mut_names.add(String(prop.key.value));
+          }
+
+          break;
+        }
+      }
+    } else if (
+      prop.key.type === AST_NODE_TYPES.Literal &&
+      (typeof prop.key.value === 'string' || typeof prop.key.value === 'number')
+    ) {
+      // Computed key with a static literal value, e.g. { ['data-id']: val }
+      mut_names.add(
+        typeof prop.key.value === 'string'
+          ? prop.key.value
+          : String(prop.key.value),
+      );
+    } else {
+      // Dynamic computed key — cannot resolve statically
+      mut_hasDynamicComputedKey = true;
+    }
+  }
+
+  return { names: mut_names, hasDynamicComputedKey: mut_hasDynamicComputedKey };
 };
 
 const isReactComponentFunction = (
