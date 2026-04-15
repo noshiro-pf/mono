@@ -76,8 +76,8 @@ importers:
         specifier: 4.7.4
         version: 4.7.4(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.56.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18)
       github-settings-as-code:
-        specifier: 1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: 1.2.2
+        version: 1.2.2(typescript@5.9.3)
       jiti:
         specifier: 2.6.1
         version: 2.6.1
@@ -2009,8 +2009,8 @@ packages:
     resolution: {integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==}
     engines: {node: '>=8'}
 
-  dotenv@17.3.1:
-    resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
+  dotenv@17.4.1:
+    resolution: {integrity: sha512-k8DaKGP6r1G30Lx8V4+pCsLzKr8vLmV2paqEj1Y55GdAgJuIqpRp5FfajGF8KtwMxCz9qJc6wUIJnm053d/WCw==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -2591,8 +2591,8 @@ packages:
   git-log-parser@1.2.1:
     resolution: {integrity: sha512-PI+sPDvHXNPl5WNOErAK05s3j0lgwUzMN6o8cyQrDaKfT3qd7TmNJKeXX+SknI5I0QhG5fVPAEwSY4tRGDtYoQ==}
 
-  github-settings-as-code@1.2.0:
-    resolution: {integrity: sha512-A06TzvIpYh/ksCJzknqLe9jYh5JF/YH+tNY664soxp2obhALUZ8hTVS+mXI2L+gRq/fGjnrq5wVvXKtxeTOAIA==}
+  github-settings-as-code@1.2.2:
+    resolution: {integrity: sha512-W3jKw+9dWGoWUcx215abp3yBstSURXAaFA5HQyyGk4cxIVy4FvWjZVSjXEveVz5eefvhM4emggUYOueEnpvwnw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
 
@@ -3021,8 +3021,8 @@ packages:
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
 
-  json-with-bigint@3.5.7:
-    resolution: {integrity: sha512-7ei3MdAI5+fJPVnKlW77TKNKwQ5ppSzWvhPuSuINT/GYW9ZOC1eRKOuhV9yHG5aEsUPj9BBx5JIekkmoLHxZOw==}
+  json-with-bigint@3.5.8:
+    resolution: {integrity: sha512-eq/4KP6K34kwa7TcFdtvnftvHCD9KvHOGGICWwMFc4dOOKF5t4iYqnfLK8otCRCRv06FXOzGGyqE8h8ElMvvdw==}
 
   json5@1.0.2:
     resolution: {integrity: sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==}
@@ -3477,8 +3477,8 @@ packages:
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
 
-  octokit-safe-types@1.2.10:
-    resolution: {integrity: sha512-2EcPUjkrjabIOe5IWzAq+COY19uBhk42AfGlT/vJrUeLZnVH174f94d4i7SyBe+QKcmi/VrOjB8q8BJTAOXa4w==}
+  octokit-safe-types@1.2.14:
+    resolution: {integrity: sha512-dQ95BM5oR9vR9h+8TzSZUfGih8u+kF/eP6OarmXwDpPuZYE1QtmxVOk4C6Yc5iU/mpYeMz7hgUMMDVEZb7OZdg==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   onetime@5.1.2:
@@ -4134,8 +4134,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8'
 
-  ts-data-forge@6.8.0:
-    resolution: {integrity: sha512-o+azDoqQfGOLY8LCtmeUZvGuv0z5XDKg5nYetAj7RQ/1/znJR1n/fNU1ZbqOMQbGhS3IocFs21gl4swCz7ZGmQ==}
+  ts-data-forge@6.9.0:
+    resolution: {integrity: sha512-/J13CeSsWetXroAGsesvQRJxjS11NEe3Qje4bxCb7MTzVMYZfrN4GeQe6jvz/PpD+XmZasG393i6virl4B4cCw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     peerDependencies:
       typescript: '>=4.8'
@@ -4145,10 +4145,9 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@6.4.2:
-    resolution: {integrity: sha512-fIv5m9gZJkdCPFRvepDkp3v3+AFe19epGPqVsh1tm++6p4nC0dVU4lVim98xkKxFFKnEHFxpcKtFB4/eWoNWzw==}
+  ts-fortress@7.0.2:
+    resolution: {integrity: sha512-0Vqa3NdBOXIfphzjV1RFHAy76UUuwbknQottir8WaiCkqmUKwEhvCuR3iQ3KuFE8TEaGwBcf/sASyauHOsYhNw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
-    deprecated: There is a bug in ts-data-forge that prevents mergeRecords from working correctly. Please use v7.
 
   ts-morph@27.0.2:
     resolution: {integrity: sha512-fhUhgeljcrdZ+9DZND1De1029PrE+cMkIP7ooqkLRTrRLTqcki2AstsyJm0vRNbTbVCNJ0idGlbBrfqc7/nA8w==}
@@ -4162,6 +4161,10 @@ packages:
 
   ts-type-forge@2.3.1:
     resolution: {integrity: sha512-JBsmJ41/SMruhXKs9RNye2saw+RffR+qlxNp8HDW5qXMqXHFa5IiBAnJXXUbOev387xu018xNiHa0jvQoLZhtA==}
+    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
+
+  ts-type-forge@2.4.0:
+    resolution: {integrity: sha512-YwDGgDzkqcsvF+YxmqRMnXEd9YfytLkBt6o1iRAmVx6+MJEhRCVD0bLTBu0WEn3iEzOByEkXdvaOi2XrDv9qgA==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
 
   tsconfig-paths@3.15.0:
@@ -5209,7 +5212,7 @@ snapshots:
       '@octokit/request-error': 7.1.0
       '@octokit/types': 16.0.0
       fast-content-type-parse: 3.0.0
-      json-with-bigint: 3.5.7
+      json-with-bigint: 3.5.8
       universal-user-agent: 7.0.3
 
   '@octokit/types@16.0.0':
@@ -6368,7 +6371,7 @@ snapshots:
     dependencies:
       is-obj: 2.0.0
 
-  dotenv@17.3.1: {}
+  dotenv@17.4.1: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -7264,13 +7267,13 @@ snapshots:
       through2: 2.0.5
       traverse: 0.6.8
 
-  github-settings-as-code@1.2.0(typescript@5.9.3):
+  github-settings-as-code@1.2.2(typescript@5.9.3):
     dependencies:
       '@octokit/core': 7.0.6
-      dotenv: 17.3.1
-      octokit-safe-types: 1.2.10(typescript@5.9.3)
-      ts-data-forge: 6.5.0(typescript@5.9.3)
-      ts-fortress: 6.4.2(typescript@5.9.3)
+      dotenv: 17.4.1
+      octokit-safe-types: 1.2.14(typescript@5.9.3)
+      ts-data-forge: 6.9.0(typescript@5.9.3)
+      ts-fortress: 7.0.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -7660,7 +7663,7 @@ snapshots:
 
   json-stable-stringify-without-jsonify@1.0.1: {}
 
-  json-with-bigint@3.5.7: {}
+  json-with-bigint@3.5.8: {}
 
   json5@1.0.2:
     dependencies:
@@ -8165,12 +8168,12 @@ snapshots:
 
   obug@2.1.1: {}
 
-  octokit-safe-types@1.2.10(typescript@5.9.3):
+  octokit-safe-types@1.2.14(typescript@5.9.3):
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
       ts-data-forge: 6.5.0(typescript@5.9.3)
-      ts-fortress: 6.4.2(typescript@5.9.3)
+      ts-fortress: 7.0.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8894,10 +8897,10 @@ snapshots:
       ts-type-forge: 2.3.1
       typescript: 5.9.3
 
-  ts-data-forge@6.8.0(typescript@5.9.3):
+  ts-data-forge@6.9.0(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
-      ts-type-forge: 2.3.1
+      ts-type-forge: 2.4.0
       typescript: 5.9.3
 
   ts-declaration-location@1.0.7(typescript@5.9.3):
@@ -8905,10 +8908,10 @@ snapshots:
       picomatch: 4.0.4
       typescript: 5.9.3
 
-  ts-fortress@6.4.2(typescript@5.9.3):
+  ts-fortress@7.0.2(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
-      ts-data-forge: 6.8.0(typescript@5.9.3)
+      ts-data-forge: 6.9.0(typescript@5.9.3)
       ts-type-forge: 2.3.1
     transitivePeerDependencies:
       - typescript
@@ -8934,6 +8937,8 @@ snapshots:
       - typescript
 
   ts-type-forge@2.3.1: {}
+
+  ts-type-forge@2.4.0: {}
 
   tsconfig-paths@3.15.0:
     dependencies:
