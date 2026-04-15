@@ -99,7 +99,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "ts-data-forge": "6.5.0",
+    "ts-data-forge": "6.9.0",
     "ts-morph": "27.0.2"
   },
   "devDependencies": {

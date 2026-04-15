@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       ts-data-forge:
-        specifier: 6.5.0
-        version: 6.5.0(typescript@5.9.3)
+        specifier: 6.9.0
+        version: 6.9.0(typescript@5.9.3)
       ts-morph:
         specifier: 27.0.2
         version: 27.0.2
@@ -4128,12 +4128,6 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-data-forge@6.5.0:
-    resolution: {integrity: sha512-UPwFgkyLMyXTwySaJlBFpYlJjmay29I1kXfgWDDQqcAg6wSmH6ViqW56OEf6xBD5C4gdZycA8kXkVGsMfiBmJQ==}
-    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
-    peerDependencies:
-      typescript: '>=4.8'
-
   ts-data-forge@6.9.0:
     resolution: {integrity: sha512-/J13CeSsWetXroAGsesvQRJxjS11NEe3Qje4bxCb7MTzVMYZfrN4GeQe6jvz/PpD+XmZasG393i6virl4B4cCw==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
@@ -6686,7 +6680,7 @@ snapshots:
       is-glob: 4.0.3
       is-immutable-type: 5.0.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       micromatch: 4.0.8
-      ts-data-forge: 6.5.0(typescript@5.9.3)
+      ts-data-forge: 6.9.0(typescript@5.9.3)
       tsutils: 3.21.0(typescript@5.9.3)
       typescript: 5.9.3
       typescript-eslint: 8.56.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
@@ -8172,7 +8166,7 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
-      ts-data-forge: 6.5.0(typescript@5.9.3)
+      ts-data-forge: 6.9.0(typescript@5.9.3)
       ts-fortress: 7.0.2(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
@@ -8891,12 +8885,6 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-data-forge@6.5.0(typescript@5.9.3):
-    dependencies:
-      '@sindresorhus/is': 7.2.0
-      ts-type-forge: 2.3.1
-      typescript: 5.9.3
-
   ts-data-forge@6.9.0(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 7.2.0
@@ -8930,7 +8918,7 @@ snapshots:
       fast-glob: 3.3.3
       micromatch: 4.0.8
       prettier: 3.8.1
-      ts-data-forge: 6.5.0(typescript@5.9.3)
+      ts-data-forge: 6.9.0(typescript@5.9.3)
       tsx: 4.21.0
     transitivePeerDependencies:
       - supports-color
