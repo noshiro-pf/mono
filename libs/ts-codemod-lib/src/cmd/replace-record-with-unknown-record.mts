@@ -9,7 +9,7 @@ const transformer = replaceRecordWithUnknownRecordTransformer();
 
 const cmdDef = cmd.command({
   name: transformer.name,
-  version: '2.1.1',
+  version: '2.1.2',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

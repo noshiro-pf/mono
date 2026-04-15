@@ -1,3 +1,9 @@
+## [2.1.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.1...v2.1.2) (2026-04-15)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.5.0 to 6.8.0 ([#75](https://github.com/noshiro-pf/ts-codemod-lib/issues/75)) ([f527f77](https://github.com/noshiro-pf/ts-codemod-lib/commit/f527f777e2e35fab9f09e7b68b99ba18b6fd9b41))
+
 ## [2.1.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.0...v2.1.1) (2026-03-08)
 
 ### Bug Fixes
