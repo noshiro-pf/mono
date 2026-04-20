@@ -99,7 +99,7 @@
     "cspell": "9.7.0",
     "dedent": "^1.7.1",
     "eslint": "9.39.4",
-    "eslint-config-typed": "4.9.0",
+    "eslint-config-typed": "4.9.1",
     "fast-glob": "3.3.3",
     "github-settings-as-code": "1.2.2",
     "jiti": "2.6.1",
