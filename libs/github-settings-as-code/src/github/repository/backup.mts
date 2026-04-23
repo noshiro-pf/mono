@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 import 'dotenv/config';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { Obj } from 'ts-data-forge';
-import { formatUncommittedFiles, makeEmptyDir } from 'ts-repo-utils';
+import {
+  formatUncommittedFiles,
+  isDirectlyExecuted,
+  makeEmptyDir,
+} from 'ts-repo-utils';
 import {
   repositorySettingsDir,
   repositorySettingsJsonName,
@@ -18,6 +24,7 @@ export const backupRepositorySettings = async (
 
   const repositorySettings = await getRepositorySettings();
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(
     path.resolve(backupDir, repositorySettingsJsonName),
     JSON.stringify(

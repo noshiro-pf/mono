@@ -1,5 +1,7 @@
-import { hasKey, isRecord, isString, Json, Result } from 'ts-data-forge';
-import 'ts-repo-utils';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { hasKey, isRecord, isString, Json } from 'ts-data-forge';
+import { Result } from 'ts-repo-utils';
 
 const ownerNullable = process.env['OWNER'];
 
@@ -18,6 +20,7 @@ const getRepoName = async (): Promise<string> => {
 
   const packageJsonPath = path.resolve(process.cwd(), './package.json');
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const packageJsonStr = await fs.readFile(packageJsonPath, {
     encoding: 'utf8',
   });

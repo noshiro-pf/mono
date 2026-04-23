@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import 'dotenv/config';
-import 'ts-repo-utils';
+import { isDirectlyExecuted } from 'ts-repo-utils';
 import {
   createRepoVariable,
   listRepoVariables,

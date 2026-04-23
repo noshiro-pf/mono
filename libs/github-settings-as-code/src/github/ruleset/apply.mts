@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import 'dotenv/config';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { Obj } from 'ts-data-forge';
-import { formatUncommittedFiles } from 'ts-repo-utils';
+import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
 import {
   createRuleset,
@@ -69,8 +71,10 @@ export const applyRulesets = async (): Promise<void> => {
         2,
       );
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(path.resolve(rulesetsDir, `${rule.name}.json`), str);
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(
         path.resolve(rulesetsDir, `./bk/${rule.name}.json`),
         str,

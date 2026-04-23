@@ -1,9 +1,15 @@
 #!/usr/bin/env node
 import 'dotenv/config';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { type UpdateRepositoryRequest } from 'octokit-safe-types';
 import { Obj } from 'ts-data-forge';
 import { validationErrorsToMessages } from 'ts-fortress';
-import { formatUncommittedFiles } from 'ts-repo-utils';
+import {
+  formatUncommittedFiles,
+  isDirectlyExecuted,
+  Result,
+} from 'ts-repo-utils';
 import {
   repositorySettingsDir,
   repositorySettingsJsonName,
@@ -62,11 +68,13 @@ export const applyRepositorySettings = async (): Promise<void> => {
       2,
     );
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
       path.resolve(repositorySettingsDir, repositorySettingsJsonName),
       str,
     );
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
       path.resolve(repositorySettingsDir, 'bk', repositorySettingsJsonName),
       str,
@@ -77,6 +85,7 @@ export const applyRepositorySettings = async (): Promise<void> => {
 };
 
 const readSettings = async (): Promise<RepositoryPicked> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const settingsText = await fs.readFile(
     path.resolve(repositorySettingsDir, repositorySettingsJsonName),
     {

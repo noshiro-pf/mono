@@ -1,6 +1,8 @@
 import { type Dirent } from 'node:fs';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import * as t from 'ts-fortress';
-import 'ts-repo-utils';
+import { isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
 import { RulesetPicked } from './constants.mjs';
 
@@ -12,6 +14,7 @@ export const readRulesetBackupFiles = async (): Promise<
 > => readFilesIn(path.resolve(rulesetsDir, './bk'));
 
 const readFilesIn = async (dir: string): Promise<readonly RulesetPicked[]> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const files: readonly Dirent<string>[] = await fs.readdir(dir, {
     withFileTypes: true,
   });
@@ -20,6 +23,7 @@ const readFilesIn = async (dir: string): Promise<readonly RulesetPicked[]> => {
     files
       .filter((d) => d.isFile())
       .map((d) =>
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.readFile(path.resolve(dir, d.name), {
           encoding: 'utf8',
         }),

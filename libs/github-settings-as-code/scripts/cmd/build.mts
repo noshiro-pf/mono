@@ -1,5 +1,7 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
-import 'ts-repo-utils';
+import { $, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');
@@ -13,7 +15,7 @@ const tsconfigPath = path.resolve(
  * Builds the entire project.
  */
 const build = async (skipChecks: boolean): Promise<void> => {
-  echo('Starting build process...\n');
+  console.log('Starting build process...\n');
 
   if (!skipChecks) {
     await logStep({
@@ -61,7 +63,7 @@ const build = async (skipChecks: boolean): Promise<void> => {
     successMessage: 'Build completed',
   });
 
-  echo('✅ Build completed successfully!\n');
+  console.log('✅ Build completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -75,11 +77,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  echo(`${mut_step.current}. ${startMessage}...`);
+  console.log(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  echo(`✓ ${successMessage}.\n`);
+  console.log(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };
