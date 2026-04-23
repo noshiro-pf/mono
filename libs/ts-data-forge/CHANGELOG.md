@@ -1,3 +1,9 @@
+## [6.9.1](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.0...v6.9.1) (2026-04-23)
+
+### Bug Fixes
+
+- bump @sindresorhus/is from 7.2.0 to 8.0.0 ([#348](https://github.com/noshiro-pf/ts-data-forge/issues/348)) ([4bc770c](https://github.com/noshiro-pf/ts-data-forge/commit/4bc770cbc7b56fa1e01996ebe6caf7b3f5caeed7))
+
 # [6.9.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.8.0...v6.9.0) (2026-04-03)
 
 ### Features
