@@ -101,10 +101,10 @@ importers:
         version: 25.0.3(typescript@5.9.3)
       ts-codemod-lib:
         specifier: ^2.1.1
-        version: 2.1.1(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
+        version: 2.1.1(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@9.0.1(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3)
       ts-repo-utils:
-        specifier: ^9.0.0
-        version: 9.0.0(prettier@3.8.1)(typescript@5.9.3)
+        specifier: ^9.0.1
+        version: 9.0.1(prettier@3.8.1)(typescript@5.9.3)
       ts-type-forge:
         specifier: 2.4.0
         version: 2.4.0
@@ -4105,8 +4105,8 @@ packages:
   ts-morph@27.0.2:
     resolution: {integrity: sha512-fhUhgeljcrdZ+9DZND1De1029PrE+cMkIP7ooqkLRTrRLTqcki2AstsyJm0vRNbTbVCNJ0idGlbBrfqc7/nA8w==}
 
-  ts-repo-utils@9.0.0:
-    resolution: {integrity: sha512-uCmhkR5S1ntLmwXXYk3Mf/YYxdEKNOkMXqE5XuBFIkwnYNQz0jyyUnw8Xwrre6KFySx0+ntvd0M6YihJZNFsWQ==}
+  ts-repo-utils@9.0.1:
+    resolution: {integrity: sha512-xD/MZ9GQr4pFxRqaV4N22KdJ1r9Lf0zxSZAAwuwSNRVMK+N1U93NfQmfzrJWqNjIxwhioi0oEXbazfHtyJMMVg==}
     engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
@@ -8756,14 +8756,14 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-codemod-lib@2.1.1(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
+  ts-codemod-lib@2.1.1(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@9.0.1(prettier@3.8.1)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
       ts-data-forge: 6.5.0(typescript@5.9.3)
       ts-morph: 27.0.2
     optionalDependencies:
       cmd-ts: 0.15.0
       dedent: 1.7.2
-      ts-repo-utils: 9.0.0(prettier@3.8.1)(typescript@5.9.3)
+      ts-repo-utils: 9.0.1(prettier@3.8.1)(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8797,7 +8797,7 @@ snapshots:
       '@ts-morph/common': 0.28.1
       code-block-writer: 13.0.3
 
-  ts-repo-utils@9.0.0(prettier@3.8.1)(typescript@5.9.3):
+  ts-repo-utils@9.0.1(prettier@3.8.1)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 7.2.0
