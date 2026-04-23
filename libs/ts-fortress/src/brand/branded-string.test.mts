@@ -100,7 +100,7 @@ describe('simpleBrandedString', () => {
       });
 
       test('throws for invalid values', () => {
-        expect(() => userNameType.cast(123)).toThrowError('Error');
+        expect(() => userNameType.cast(123)).toThrow('Error');
       });
     });
 

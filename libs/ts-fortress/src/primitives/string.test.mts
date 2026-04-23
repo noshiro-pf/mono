@@ -79,7 +79,7 @@ describe(string, () => {
 
       expect(() => {
         assertIs(value);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
 
     test('invalid value throws', () => {
@@ -87,7 +87,7 @@ describe(string, () => {
 
       expect(() => {
         assertIs(value);
-      }).toThrowError(/Error: expected <string> type/u);
+      }).toThrow(/Error: expected <string> type/u);
     });
   });
 
@@ -103,7 +103,7 @@ describe(string, () => {
     test('invalid value throws error', () => {
       const value: unknown = 42;
 
-      expect(() => str.cast(value)).toThrowError(
+      expect(() => str.cast(value)).toThrow(
         'Error: expected <string> type but <number> type value `42` was passed.',
       );
     });
@@ -113,7 +113,7 @@ describe(string, () => {
 
       const value: unknown = 42;
 
-      expect(() => strWithDefault.cast(value)).toThrowError(
+      expect(() => strWithDefault.cast(value)).toThrow(
         'Error: expected <string> type but <number> type value `42` was passed.',
       );
     });
@@ -248,7 +248,7 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "cab" does not start with "ab"
         string('cab', { startsWith: 'ab' }),
-      ).toThrowError('startsWith = ab');
+      ).toThrow('startsWith = ab');
     });
 
     test('empty startsWith', () => {
@@ -273,7 +273,7 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "abc" does not end with "ba"
         string('abc', { endsWith: 'ba' }),
-      ).toThrowError('endsWith = ba');
+      ).toThrow('endsWith = ba');
     });
 
     test('empty endsWith', () => {
@@ -298,7 +298,7 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "abc" does not include "def"
         string('abc', { includes: 'def' }),
-      ).toThrowError('includes = def');
+      ).toThrow('includes = def');
     });
 
     test('empty includes', () => {
@@ -321,7 +321,7 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "ABCDEFGHI" is not assignable if lowercase is true
         string('ABCDEFGHI', { lowercase: true }),
-      ).toThrowError('lowercase = true');
+      ).toThrow('lowercase = true');
     });
   });
 
@@ -340,7 +340,7 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "abcdefghi" is not assignable if uppercase is true
         string('abcdefghi', { uppercase: true }),
-      ).toThrowError('uppercase = true');
+      ).toThrow('uppercase = true');
     });
   });
 
@@ -359,7 +359,7 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "" is not assignable if nonempty is true
         string('', { nonempty: true }),
-      ).toThrowError('nonempty = true');
+      ).toThrow('nonempty = true');
     });
   });
 
@@ -378,7 +378,7 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "hi" is not assignable if minLength is 3
         string('hi', { minLength: 3 }),
-      ).toThrowError('minLength = 3');
+      ).toThrow('minLength = 3');
     });
 
     test('negative minLength', () => {
@@ -407,7 +407,7 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "too-long" is not assignable if maxLength is 5
         string('too-long', { maxLength: 5 }),
-      ).toThrowError('maxLength = 5');
+      ).toThrow('maxLength = 5');
     });
   });
 
@@ -427,7 +427,7 @@ describe('string with constraints', () => {
     test('rejects invalid default value', () => {
       const numeric = /^\d+$/u;
 
-      expect(() => string('abc', { regex: numeric })).toThrowError(
+      expect(() => string('abc', { regex: numeric })).toThrow(
         String.raw`regex = ^\d+$`,
       );
     });
@@ -453,7 +453,7 @@ describe('string with constraints', () => {
         expect(() =>
           // @ts-expect-error "abba" does not end with "zz"
           string('abba', { startsWith: 'ab', endsWith: 'zz' }),
-        ).toThrowError('endsWith = zz');
+        ).toThrow('endsWith = zz');
       });
     });
 
@@ -489,7 +489,7 @@ describe('string with constraints', () => {
             includes: 'cd',
             endsWith: 'hi',
           }),
-        ).toThrowError('endsWith = hi');
+        ).toThrow('endsWith = hi');
 
         expect(() =>
           // @ts-expect-error "abcdhi" does not includes "cd"
@@ -498,7 +498,7 @@ describe('string with constraints', () => {
             includes: 'cd',
             endsWith: 'hi',
           }),
-        ).toThrowError('includes = cd');
+        ).toThrow('includes = cd');
       });
     });
 
@@ -519,7 +519,7 @@ describe('string with constraints', () => {
         expect(() =>
           // @ts-expect-error "Ab" is neither strictly uppercase nor lowercase
           string('Ab', { uppercase: true, lowercase: true }),
-        ).toThrowError('uppercase = true');
+        ).toThrow('uppercase = true');
       });
     });
 
@@ -550,7 +550,7 @@ describe('string with constraints', () => {
             minLength: 3,
             maxLength: 8,
           }),
-        ).toThrowError(
+        ).toThrow(
           'defaultValue "extra-long-token" for string does not satisfy the constraint maxLength = 8',
         );
       });
@@ -563,7 +563,7 @@ describe('string with constraints', () => {
             minLength: 8,
             maxLength: 3,
           }),
-        ).toThrowError(
+        ).toThrow(
           'defaultValue "1234" for string does not satisfy the constraint minLength = 8',
         );
       });
@@ -594,7 +594,7 @@ describe('string with constraints', () => {
 
         expect(() =>
           string('featureFLAG', { includes: 'feature', regex: slug }),
-        ).toThrowError('regex = ^[a-z-]+$');
+        ).toThrow('regex = ^[a-z-]+$');
       });
     });
 
@@ -629,7 +629,7 @@ describe('string with constraints', () => {
             maxLength: 6,
             regex: digits,
           }),
-        ).toThrowError('maxLength = 6');
+        ).toThrow('maxLength = 6');
       });
     });
   });

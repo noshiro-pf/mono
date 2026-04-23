@@ -161,7 +161,7 @@ describe(literal, () => {
       test('invalid value throws error', () => {
         const value: unknown = 'world';
 
-        expect(() => hello.cast(value)).toThrowError(
+        expect(() => hello.cast(value)).toThrow(
           'Error: expected <"hello"> type but <string> type value "world" was passed.',
         );
       });
@@ -451,7 +451,7 @@ describe(literal, () => {
       test('falsy case', () => {
         const x: unknown = 123n;
 
-        expect(() => targetType.cast(x)).toThrowError('Error');
+        expect(() => targetType.cast(x)).toThrow('Error');
       });
     });
 
@@ -594,7 +594,7 @@ describe(literal, () => {
         test('falsy case', () => {
           const x: unknown = false;
 
-          expect(() => targetType.cast(x)).toThrowError('Error');
+          expect(() => targetType.cast(x)).toThrow('Error');
         });
       });
 

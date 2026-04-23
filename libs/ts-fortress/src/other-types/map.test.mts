@@ -153,7 +153,7 @@ test('MapType cast() method', () => {
 
   // Invalid input - should throw
 
-  expect(() => StringNumberMap.cast('not a map')).toThrowError(
+  expect(() => StringNumberMap.cast('not a map')).toThrow(
     'Error: expected <Map> type but <string> type value',
   );
 });
@@ -170,13 +170,13 @@ test('MapType assertIs() method', () => {
 
   expect(() => {
     assertIsStringNumberMap(validMap);
-  }).not.toThrowError();
+  }).not.toThrow();
 
   // Invalid input - should throw
 
   expect(() => {
     assertIsStringNumberMap('not a map');
-  }).toThrowError('Error: expected <Map> type but <string> type value');
+  }).toThrow('Error: expected <Map> type but <string> type value');
 });
 
 test('MapType with custom typeName', () => {

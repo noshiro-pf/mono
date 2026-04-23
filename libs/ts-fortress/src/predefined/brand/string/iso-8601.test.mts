@@ -166,7 +166,7 @@ describe(iso8601, () => {
 
     expect(baseType.fill(value)).toBe(value);
 
-    expect(() => baseType.cast(value)).not.toThrowError();
+    expect(() => baseType.cast(value)).not.toThrow();
   });
 
   test('fill falls back to default for invalid values', () => {

@@ -135,7 +135,7 @@ describe(finiteNumber, () => {
 
       expect(() => {
         assertIs(x);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
 
     test('falsy case', () => {
@@ -146,7 +146,7 @@ describe(finiteNumber, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrowError('Error: expected <FiniteNumber> type');
+      }).toThrow('Error: expected <FiniteNumber> type');
     });
   });
 
@@ -160,7 +160,7 @@ describe(finiteNumber, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrowError('Error');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

@@ -58,7 +58,7 @@ describe('undefined type', () => {
 
       expect(() => {
         undefinedType.assertIs(value);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
 
     test('non-undefined throws', () => {
@@ -66,7 +66,7 @@ describe('undefined type', () => {
 
       expect(() => {
         undefinedType.assertIs(value);
-      }).toThrowError(
+      }).toThrow(
         'Error: expected <undefined> type but <object> type value `null` was passed.',
       );
     });
@@ -86,7 +86,7 @@ describe('undefined type', () => {
 
       expect(() => {
         undefinedType.cast(value);
-      }).toThrowError(
+      }).toThrow(
         'Error: expected <undefined> type but <object> type value `null` was passed.',
       );
     });
@@ -96,7 +96,7 @@ describe('undefined type', () => {
       (v) => {
         expect(() => {
           undefinedType.cast(v);
-        }).toThrowError(
+        }).toThrow(
           /^Error: expected <undefined> type but <.*> type value .+\.$/u,
         );
       },

@@ -127,7 +127,7 @@ describe(int, () => {
 
       expect(() => {
         assertIs(x);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
 
     test('falsy case', () => {
@@ -138,7 +138,7 @@ describe(int, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrowError('Error: expected <Int> type');
+      }).toThrow('Error: expected <Int> type');
     });
   });
 
@@ -152,7 +152,7 @@ describe(int, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrowError('Error');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

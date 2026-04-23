@@ -74,7 +74,7 @@ describe(number, () => {
 
       expect(() => {
         assertIs(value);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
 
     test('invalid value throws', () => {
@@ -82,7 +82,7 @@ describe(number, () => {
 
       expect(() => {
         assertIs(value);
-      }).toThrowError(/Error: expected <number> type/u);
+      }).toThrow(/Error: expected <number> type/u);
     });
   });
 
@@ -98,7 +98,7 @@ describe(number, () => {
     test('invalid value throws error', () => {
       const value: unknown = 'not a number';
 
-      expect(() => num.cast(value)).toThrowError(
+      expect(() => num.cast(value)).toThrow(
         'Error: expected <number> type but <string> type value "not a number" was passed.',
       );
     });
@@ -108,7 +108,7 @@ describe(number, () => {
 
       const value: unknown = 'not a number';
 
-      expect(() => numWithDefault.cast(value)).toThrowError(
+      expect(() => numWithDefault.cast(value)).toThrow(
         'Error: expected <number> type but <string> type value "not a number" was passed.',
       );
     });
@@ -220,7 +220,7 @@ describe('number with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => number(5, { gt: 5 })).toThrowError('gt = 5');
+      expect(() => number(5, { gt: 5 })).toThrow('gt = 5');
     });
   });
 
@@ -238,7 +238,7 @@ describe('number with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => number(4, { gte: 5 })).toThrowError('gte = 5');
+      expect(() => number(4, { gte: 5 })).toThrow('gte = 5');
     });
   });
 
@@ -254,7 +254,7 @@ describe('number with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => number(4, { min: 5 })).toThrowError('min = 5');
+      expect(() => number(4, { min: 5 })).toThrow('min = 5');
     });
   });
 
@@ -272,7 +272,7 @@ describe('number with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => number(5, { lt: 5 })).toThrowError('lt = 5');
+      expect(() => number(5, { lt: 5 })).toThrow('lt = 5');
     });
   });
 
@@ -290,7 +290,7 @@ describe('number with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => number(6, { lte: 5 })).toThrowError('lte = 5');
+      expect(() => number(6, { lte: 5 })).toThrow('lte = 5');
     });
   });
 
@@ -308,7 +308,7 @@ describe('number with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => number(6, { max: 5 })).toThrowError('max = 5');
+      expect(() => number(6, { max: 5 })).toThrow('max = 5');
     });
   });
 
@@ -329,7 +329,7 @@ describe('number with constraints', () => {
       expect(() =>
         // @ts-expect-error 0 is not > 0 when positive is true
         number(0, { positive: true }),
-      ).toThrowError('positive = true');
+      ).toThrow('positive = true');
     });
   });
 
@@ -350,7 +350,7 @@ describe('number with constraints', () => {
       expect(() =>
         // @ts-expect-error -1 is not >= 0 when nonNegative is true
         number(-1, { nonNegative: true }),
-      ).toThrowError('nonNegative = true');
+      ).toThrow('nonNegative = true');
     });
   });
 
@@ -371,7 +371,7 @@ describe('number with constraints', () => {
       expect(() =>
         // @ts-expect-error 0 is not < 0 when negative is true
         number(0, { negative: true }),
-      ).toThrowError('negative = true');
+      ).toThrow('negative = true');
     });
   });
 
@@ -392,7 +392,7 @@ describe('number with constraints', () => {
       expect(() =>
         // @ts-expect-error 1 is not <= 0 when nonPositive is true
         number(1, { nonPositive: true }),
-      ).toThrowError('nonPositive = true');
+      ).toThrow('nonPositive = true');
     });
   });
 
@@ -408,7 +408,7 @@ describe('number with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => number(7, { multipleOf: 3 })).toThrowError('multipleOf = 3');
+      expect(() => number(7, { multipleOf: 3 })).toThrow('multipleOf = 3');
     });
   });
 
@@ -424,7 +424,7 @@ describe('number with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => number(9, { step: 2 })).toThrowError('step = 2');
+      expect(() => number(9, { step: 2 })).toThrow('step = 2');
     });
   });
 
@@ -443,7 +443,7 @@ describe('number with constraints', () => {
       });
 
       test('rejects invalid default value', () => {
-        expect(() => number(1, { gt: 1, lt: 10 })).toThrowError('gt = 1');
+        expect(() => number(1, { gt: 1, lt: 10 })).toThrow('gt = 1');
       });
     });
 
@@ -463,7 +463,7 @@ describe('number with constraints', () => {
       });
 
       test('rejects invalid default value', () => {
-        expect(() => number(4, { gte: 5, lte: 10 })).toThrowError('gte = 5');
+        expect(() => number(4, { gte: 5, lte: 10 })).toThrow('gte = 5');
       });
     });
 
@@ -483,7 +483,7 @@ describe('number with constraints', () => {
       });
 
       test('rejects invalid default value', () => {
-        expect(() => number(4, { positive: true, multipleOf: 3 })).toThrowError(
+        expect(() => number(4, { positive: true, multipleOf: 3 })).toThrow(
           'multipleOf = 3',
         );
       });
@@ -513,7 +513,7 @@ describe('number with constraints', () => {
       test('rejects invalid default value', () => {
         expect(() =>
           number(12, { nonNegative: true, max: 10, step: 2 }),
-        ).toThrowError('max = 10');
+        ).toThrow('max = 10');
       });
     });
   });

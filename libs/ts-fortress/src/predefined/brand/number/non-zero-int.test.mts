@@ -110,7 +110,7 @@ describe(nonZeroInt, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrowError('Error');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

@@ -141,11 +141,11 @@ test('SetType cast() method', () => {
 
   // Invalid input - should throw
 
-  expect(() => StringSet.cast('not a set')).toThrowError(
+  expect(() => StringSet.cast('not a set')).toThrow(
     'Error: expected <Set> type but <string> type value',
   );
 
-  expect(() => StringSet.cast([])).toThrowError(
+  expect(() => StringSet.cast([])).toThrow(
     'Error: expected <Set> type but <object> type value',
   );
 });
@@ -161,17 +161,17 @@ test('SetType assertIs() method', () => {
 
   expect(() => {
     assertIsNumberSet(validSet);
-  }).not.toThrowError();
+  }).not.toThrow();
 
   // Invalid input - should throw
 
   expect(() => {
     assertIsNumberSet('not a set');
-  }).toThrowError('Error: expected <Set> type but <string> type value');
+  }).toThrow('Error: expected <Set> type but <string> type value');
 
   expect(() => {
     assertIsNumberSet([1, 2, 3]);
-  }).toThrowError('Error: expected <Set> type but <object> type value');
+  }).toThrow('Error: expected <Set> type but <object> type value');
 });
 
 test('SetType with custom typeName', () => {

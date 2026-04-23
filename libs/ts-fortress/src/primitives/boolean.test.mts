@@ -93,7 +93,7 @@ describe(boolean, () => {
 
       expect(() => {
         assertIs(x);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
 
     test('falsy case', () => {
@@ -104,7 +104,7 @@ describe(boolean, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrowError('Error');
+      }).toThrow('Error');
     });
   });
 
@@ -118,7 +118,7 @@ describe(boolean, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrowError('Error');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

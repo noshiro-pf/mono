@@ -40,9 +40,7 @@ test('WrongSchema', () => {
 
   expect(
     () => WrongSchema.safeParse({ key1: 1, key2: 'string' }).success,
-  ).toThrowError(
-    new Error('Invalid element at key "key1": expected a Zod schema'),
-  );
+  ).toThrow(new Error('Invalid element at key "key1": expected a Zod schema'));
 });
 
 describe('api check', () => {

@@ -65,6 +65,6 @@ describe(jsonString, () => {
   test('cast returns parsed string when valid, throws otherwise', () => {
     expect(baseType.cast('{"foo":1}')).toBe('{"foo":1}');
 
-    expect(() => baseType.cast('invalid')).toThrowError('Error');
+    expect(() => baseType.cast('invalid')).toThrow('Error');
   });
 });

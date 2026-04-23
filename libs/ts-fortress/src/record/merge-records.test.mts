@@ -24,7 +24,7 @@ describe(mergeRecords, () => {
       expect(() => {
         // @ts-expect-error should pass record type
         mergeRecords([record({ x: number(), y: number() }), number()]);
-      }).toThrowError(
+      }).toThrow(
         'Expected a record type but received a non-record type in mergeRecords',
       );
     });

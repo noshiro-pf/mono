@@ -1,3 +1,4 @@
+import * as path from 'node:path';
 import { assertExt } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 

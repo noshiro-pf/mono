@@ -1,5 +1,7 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
-import { formatFiles } from 'ts-repo-utils';
+import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
 import { extractSampleCode } from './embed-examples-utils.mjs';
@@ -22,6 +24,7 @@ export const embedExamplesInJsDoc = async (): Promise<
     for (const { sampleFiles, sourcePath } of sourceFileMappings) {
       const sourceFilePath = path.resolve(projectRootPath, sourcePath);
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
 
       const mut_results: string[] = [];
@@ -32,6 +35,7 @@ export const embedExamplesInJsDoc = async (): Promise<
         const samplePath = path.resolve(projectRootPath, sampleFile);
 
         // Read sample content
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const sampleContent = await fs.readFile(samplePath, 'utf8');
 
         const sampleContentSliced = extractSampleCode(sampleContent);
@@ -84,6 +88,7 @@ export const embedExamplesInJsDoc = async (): Promise<
       // Write updated source file
       const updatedContent = mut_results.join('');
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(sourceFilePath, updatedContent, 'utf8');
 
       mut_modifiedFiles.push(sourceFilePath);

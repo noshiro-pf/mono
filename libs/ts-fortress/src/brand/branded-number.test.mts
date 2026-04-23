@@ -98,7 +98,7 @@ describe('simpleBrandedNumber', () => {
       });
 
       test('throws for invalid values', () => {
-        expect(() => userIdType.cast('invalid')).toThrowError('Error');
+        expect(() => userIdType.cast('invalid')).toThrow('Error');
       });
     });
 

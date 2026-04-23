@@ -96,7 +96,7 @@ describe(symbol, () => {
 
       expect(() => {
         assertIs(x);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
 
     test('falsy case', () => {
@@ -106,7 +106,7 @@ describe(symbol, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrowError('Error');
+      }).toThrow('Error');
     });
   });
 
@@ -122,7 +122,7 @@ describe(symbol, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrowError('Error');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 

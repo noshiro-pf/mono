@@ -92,7 +92,7 @@ describe(bigint, () => {
 
       expect(() => {
         assertIs(x);
-      }).not.toThrowError();
+      }).not.toThrow();
     });
 
     test('falsy case', () => {
@@ -102,7 +102,7 @@ describe(bigint, () => {
 
       expect(() => {
         assertIs(x);
-      }).toThrowError('Error');
+      }).toThrow('Error');
     });
   });
 
@@ -116,7 +116,7 @@ describe(bigint, () => {
     test('falsy case', () => {
       const x: unknown = 'invalid';
 
-      expect(() => targetType.cast(x)).toThrowError('Error');
+      expect(() => targetType.cast(x)).toThrow('Error');
     });
   });
 
@@ -150,7 +150,7 @@ describe('bigint with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => bigint(5n, { gt: 5n })).toThrowError('gt = 5');
+      expect(() => bigint(5n, { gt: 5n })).toThrow('gt = 5');
     });
   });
 
@@ -168,7 +168,7 @@ describe('bigint with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => bigint(4n, { gte: 5n })).toThrowError('gte = 5');
+      expect(() => bigint(4n, { gte: 5n })).toThrow('gte = 5');
     });
   });
 
@@ -184,7 +184,7 @@ describe('bigint with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => bigint(4n, { min: 5n })).toThrowError('min = 5');
+      expect(() => bigint(4n, { min: 5n })).toThrow('min = 5');
     });
   });
 
@@ -202,7 +202,7 @@ describe('bigint with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => bigint(5n, { lt: 5n })).toThrowError('lt = 5');
+      expect(() => bigint(5n, { lt: 5n })).toThrow('lt = 5');
     });
   });
 
@@ -220,7 +220,7 @@ describe('bigint with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => bigint(6n, { lte: 5n })).toThrowError('lte = 5');
+      expect(() => bigint(6n, { lte: 5n })).toThrow('lte = 5');
     });
   });
 
@@ -238,7 +238,7 @@ describe('bigint with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => bigint(6n, { max: 5n })).toThrowError('max = 5');
+      expect(() => bigint(6n, { max: 5n })).toThrow('max = 5');
     });
   });
 
@@ -259,7 +259,7 @@ describe('bigint with constraints', () => {
       expect(() =>
         // @ts-expect-error 0n is not > 0n when positive is true
         bigint(0n, { positive: true }),
-      ).toThrowError('positive = true');
+      ).toThrow('positive = true');
     });
   });
 
@@ -280,7 +280,7 @@ describe('bigint with constraints', () => {
       expect(() =>
         // @ts-expect-error -1n is not >= 0n when nonNegative is true
         bigint(-1n, { nonNegative: true }),
-      ).toThrowError('nonNegative = true');
+      ).toThrow('nonNegative = true');
     });
   });
 
@@ -301,7 +301,7 @@ describe('bigint with constraints', () => {
       expect(() =>
         // @ts-expect-error 0n is not < 0n when negative is true
         bigint(0n, { negative: true }),
-      ).toThrowError('negative = true');
+      ).toThrow('negative = true');
     });
   });
 
@@ -322,7 +322,7 @@ describe('bigint with constraints', () => {
       expect(() =>
         // @ts-expect-error 1n is not <= 0n when nonPositive is true
         bigint(1n, { nonPositive: true }),
-      ).toThrowError('nonPositive = true');
+      ).toThrow('nonPositive = true');
     });
   });
 
@@ -340,9 +340,7 @@ describe('bigint with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => bigint(7n, { multipleOf: 3n })).toThrowError(
-        'multipleOf = 3',
-      );
+      expect(() => bigint(7n, { multipleOf: 3n })).toThrow('multipleOf = 3');
     });
   });
 
@@ -360,7 +358,7 @@ describe('bigint with constraints', () => {
     });
 
     test('rejects invalid default value', () => {
-      expect(() => bigint(9n, { step: 2n })).toThrowError('step = 2');
+      expect(() => bigint(9n, { step: 2n })).toThrow('step = 2');
     });
   });
 
@@ -379,7 +377,7 @@ describe('bigint with constraints', () => {
       });
 
       test('rejects invalid default value', () => {
-        expect(() => bigint(1n, { gt: 1n, lt: 10n })).toThrowError('gt = 1');
+        expect(() => bigint(1n, { gt: 1n, lt: 10n })).toThrow('gt = 1');
       });
     });
 
@@ -399,7 +397,7 @@ describe('bigint with constraints', () => {
       });
 
       test('rejects invalid default value', () => {
-        expect(() => bigint(4n, { gte: 5n, lte: 10n })).toThrowError('gte = 5');
+        expect(() => bigint(4n, { gte: 5n, lte: 10n })).toThrow('gte = 5');
       });
     });
 
@@ -419,9 +417,9 @@ describe('bigint with constraints', () => {
       });
 
       test('rejects invalid default value', () => {
-        expect(() =>
-          bigint(4n, { positive: true, multipleOf: 3n }),
-        ).toThrowError('multipleOf = 3');
+        expect(() => bigint(4n, { positive: true, multipleOf: 3n })).toThrow(
+          'multipleOf = 3',
+        );
       });
     });
 
@@ -449,7 +447,7 @@ describe('bigint with constraints', () => {
       test('rejects invalid default value', () => {
         expect(() =>
           bigint(12n, { nonNegative: true, max: 10n, step: 2n }),
-        ).toThrowError('max = 10');
+        ).toThrow('max = 10');
       });
     });
   });

@@ -62,9 +62,7 @@ describe(templateLiteral, () => {
     });
 
     test('cast invalid value throws', () => {
-      expect(() => PathString.cast('users')).toThrowError(
-        'expected <PathString>',
-      );
+      expect(() => PathString.cast('users')).toThrow('expected <PathString>');
     });
   });
 
