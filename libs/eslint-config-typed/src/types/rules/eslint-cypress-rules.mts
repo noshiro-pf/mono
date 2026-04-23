@@ -24,6 +24,23 @@ namespace AssertionBeforeScreenshot {
 }
 
 /**
+ * @description enforce .should() over .and() for starting assertion chains
+ * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-and.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoAnd {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description disallow assigning return values of `cy` calls
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-assigning-return-values.md
  *
@@ -237,6 +254,7 @@ namespace UnsafeToChainCommand {
 
 export type EslintCypressRules = Readonly<{
   'cypress/assertion-before-screenshot': AssertionBeforeScreenshot.RuleEntry;
+  'cypress/no-and': NoAnd.RuleEntry;
   'cypress/no-assigning-return-values': NoAssigningReturnValues.RuleEntry;
   'cypress/no-async-before': NoAsyncBefore.RuleEntry;
   'cypress/no-async-tests': NoAsyncTests.RuleEntry;

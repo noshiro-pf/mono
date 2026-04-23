@@ -894,6 +894,7 @@ import {
     eslintConfigForTypeScript,
     type FlatConfig,
 } from 'eslint-config-typed';
+import * as path from 'node:path';
 
 const thisDir = import.meta.dirname;
 

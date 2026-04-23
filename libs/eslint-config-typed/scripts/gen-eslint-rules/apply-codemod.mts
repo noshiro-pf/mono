@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import {
   convertInterfaceToTypeTransformer,
   convertToReadonlyTransformer,
@@ -7,7 +9,7 @@ import {
   transformSourceCode,
 } from 'ts-codemod-lib';
 import { Arr } from 'ts-data-forge';
-import 'ts-repo-utils';
+import { isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const TYPES_RULES_DIR = path.resolve(projectRootPath, 'src/types/rules');
@@ -16,6 +18,7 @@ export const applyTypeTransformations = async (): Promise<void> => {
   console.log('🔄 Applying type transformations to src/types/rules files...\n');
 
   // Get all .mts files in src/types/rules
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const fileNames = await fs.readdir(TYPES_RULES_DIR);
 
   const files = fileNames
@@ -91,6 +94,7 @@ export const applyTransformationsToFile = async (
   const fileName = path.basename(filePath);
 
   try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const originalCode = await fs.readFile(filePath, 'utf8');
 
     // Transform the code with all transformers
@@ -107,6 +111,7 @@ export const applyTransformationsToFile = async (
       return Result.ok('unchanged' as const);
     } else {
       // Write back the transformed code
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(filePath, transformedCode, 'utf8');
 
       console.log(`✅ ${fileName} - transformed`);

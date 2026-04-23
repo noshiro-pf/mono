@@ -1,7 +1,9 @@
 #!/usr/bin/env tsx
 
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
-import 'ts-repo-utils';
+import { $, glob, isDirectlyExecuted } from 'ts-repo-utils';
 import {
   applyTransformationsToFile,
   applyTypeTransformations,
@@ -92,6 +94,7 @@ const generate = async (
 
       const targetFilePath = path.resolve(outDir, plugin.outputFileName);
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(targetFilePath, result);
     } catch (error) {
       return { type: 'error', error };

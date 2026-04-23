@@ -1,9 +1,10 @@
 import * as rollupPluginReplace from '@rollup/plugin-replace';
 import * as rollupPluginStrip from '@rollup/plugin-strip';
 import * as rollupPluginTypescript from '@rollup/plugin-typescript';
+import * as path from 'node:path';
 import { defineConfig } from 'rollup';
 import { castMutable, unknownToString } from 'ts-data-forge';
-import 'ts-repo-utils';
+import { glob, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
 
