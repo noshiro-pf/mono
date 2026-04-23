@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "@octokit/core": "7.0.6",
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.2",
     "octokit-safe-types": "^1.2.14",
     "ts-data-forge": "^6.9.0",
     "ts-fortress": "^7.0.2"
