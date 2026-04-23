@@ -1,3 +1,9 @@
+## [4.9.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.3...v4.9.4) (2026-04-23)
+
+### Bug Fixes
+
+- update deps ([#309](https://github.com/noshiro-pf/eslint-config-typed/issues/309)) ([a378c0e](https://github.com/noshiro-pf/eslint-config-typed/commit/a378c0e94e9f1837a090e9c296441c1c7ccf0d9f))
+
 ## [4.9.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.2...v4.9.3) (2026-04-23)
 
 ### Bug Fixes
