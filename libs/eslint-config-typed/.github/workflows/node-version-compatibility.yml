@@ -45,5 +45,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --engine-strict
 
+      - name: Verify installation
+        run: pnpm list
+
       - name: Build
         run: pnpm run build
+
+      - name: Test
+        run: pnpm run test
