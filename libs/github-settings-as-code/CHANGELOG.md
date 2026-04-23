@@ -1,3 +1,9 @@
+## [1.2.6](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.5...v1.2.6) (2026-04-23)
+
+### Bug Fixes
+
+- update deps ([#122](https://github.com/noshiro-pf/github-settings-as-code/issues/122)) ([64e8966](https://github.com/noshiro-pf/github-settings-as-code/commit/64e8966c0a634cde558eff80872272045bb91c28))
+
 ## [1.2.5](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.4...v1.2.5) (2026-04-23)
 
 ### Bug Fixes
