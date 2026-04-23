@@ -1,6 +1,7 @@
 import dedent from 'dedent';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
-import '../node-global.mjs';
 import {
   getDiffFrom,
   getGitRoot,
@@ -36,6 +37,7 @@ describe(formatFilesGlob, () => {
   ): Promise<string> => {
     const filePath = path.join(testDir, filename);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(filePath, content, 'utf8');
 
     return filePath;
@@ -43,6 +45,7 @@ describe(formatFilesGlob, () => {
 
   // Helper to read file content
   const readTestFile = async (filePath: string): Promise<string> =>
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFile(filePath, 'utf8');
 
   test('should format files matching glob pattern', async () => {
@@ -51,6 +54,7 @@ describe(formatFilesGlob, () => {
     vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
 
     // Setup test directory
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -126,6 +130,7 @@ describe(formatFilesGlob, () => {
     vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
 
     // Setup test directory with nested structure
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(path.join(testDir, 'src', 'utils'), { recursive: true });
 
     try {
@@ -174,6 +179,7 @@ describe(formatFiles, () => {
   ): Promise<string> => {
     const filePath = path.join(testDir, filename);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(filePath, content, 'utf8');
 
     return filePath;
@@ -181,6 +187,7 @@ describe(formatFiles, () => {
 
   // Helper to read file content
   const readTestFile = async (filePath: string): Promise<string> =>
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFile(filePath, 'utf8');
 
   test('should format a list of files', async () => {
@@ -188,6 +195,7 @@ describe(formatFiles, () => {
 
     vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -261,8 +269,10 @@ describe(formatUncommittedFiles, () => {
 
     const dir = path.dirname(filePath);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(dir, { recursive: true });
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(filePath, content, 'utf8');
 
     return filePath;
@@ -274,6 +284,7 @@ describe(formatUncommittedFiles, () => {
     // Mock getGitRoot to return testDir as git root for relative path display
     vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
   };
 
@@ -330,6 +341,7 @@ describe(formatUncommittedFiles, () => {
 
       // Verify files were formatted
       const verifyPromises = allFiles.map(async (file) => {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const content = await fs.readFile(path.join(testDir, file), 'utf8');
 
         expect(content).toBe('const x = 1;\n');
@@ -499,6 +511,7 @@ describe(formatUncommittedFiles, () => {
       assert.isTrue(Result.isOk(result));
 
       // Verify file was formatted (only once despite appearing in all categories)
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const content = await fs.readFile(duplicateFile, 'utf8');
 
       expect(content).toBe('const x = 1;\n');
@@ -660,6 +673,7 @@ describe(formatUncommittedFiles, () => {
 
       assert.isTrue(Result.isOk(result));
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const content = await fs.readFile(path.join(testDir, testFile), 'utf8');
 
       expect(content).toBe(
@@ -716,17 +730,20 @@ describe(formatDiffFrom, () => {
   ): Promise<string> => {
     const filePath = path.join(testDir, filename);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(filePath, content, 'utf8');
 
     return filePath;
   };
 
   const readTestFile = async (filePath: string): Promise<string> =>
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFile(filePath, 'utf8');
 
   test('should format files from diff', async () => {
     vi.clearAllMocks();
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -769,6 +786,7 @@ describe(formatDiffFrom, () => {
   test('should include untracked files when option is set', async () => {
     vi.clearAllMocks();
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -832,6 +850,7 @@ describe(formatDiffFrom, () => {
   test('should deduplicate files when including untracked', async () => {
     vi.clearAllMocks();
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -879,6 +898,7 @@ describe(formatDiffFrom, () => {
   test('should include both staged and untracked files by default', async () => {
     vi.clearAllMocks();
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -958,6 +978,7 @@ describe(formatDiffFrom, () => {
   test('should include staged files when option is set', async () => {
     vi.clearAllMocks();
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -1023,6 +1044,7 @@ describe(formatDiffFrom, () => {
   test('should deduplicate files when including both staged and untracked', async () => {
     vi.clearAllMocks();
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {
@@ -1073,6 +1095,7 @@ describe(formatDiffFrom, () => {
   test('should exclude staged files when option is set to false', async () => {
     vi.clearAllMocks();
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(testDir, { recursive: true });
 
     try {

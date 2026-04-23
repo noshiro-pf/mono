@@ -1,8 +1,5 @@
 import { isDirectlyExecuted } from 'ts-repo-utils';
 
-// or
-// import "ts-repo-utils"; // isDirectlyExecuted is globally defined in ts-repo-utils
-
 // calculator.mjs
 export const add = (a: number, b: number): number => a + b;
 

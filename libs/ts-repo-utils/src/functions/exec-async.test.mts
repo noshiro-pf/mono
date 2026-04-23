@@ -2,25 +2,20 @@
 /* eslint-disable vitest/no-conditional-expect */
 import { exec, type ExecException } from 'node:child_process';
 import { expectType, Result } from 'ts-data-forge';
-import '../node-global.mjs';
 import { $ } from './exec-async.mjs';
 
 describe('exec-async', () => {
-  // Helper to suppress echo output during tests
+  // Helper to suppress console.log output during tests
   const withSilentEcho = async <T,>(fn: () => Promise<T>): Promise<T> => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const originalEcho = (globalThis as any).echo;
-
-    // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-unsafe-member-access
-    (globalThis as any).echo = () => {
-      // Silent implementation - no output
-    };
+    const spy = vi
+      // eslint-disable-next-line vitest/no-restricted-vi-methods
+      .spyOn(console, 'log')
+      .mockImplementation(() => {});
 
     try {
       return await fn();
     } finally {
-      // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      (globalThis as any).echo = originalEcho;
+      spy.mockRestore();
     }
   };
 

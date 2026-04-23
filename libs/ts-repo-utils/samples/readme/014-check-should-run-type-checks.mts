@@ -1,4 +1,4 @@
-import { checkShouldRunTypeChecks } from 'ts-repo-utils';
+import { $, checkShouldRunTypeChecks } from 'ts-repo-utils';
 
 // Use default settings (compare against origin/main)
 const shouldRun = await checkShouldRunTypeChecks();

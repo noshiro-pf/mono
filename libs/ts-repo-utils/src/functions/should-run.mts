@@ -1,5 +1,6 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
-import '../node-global.mjs';
 import { getDiffFrom } from './diff.mjs';
 
 /**
@@ -113,6 +114,7 @@ export const checkShouldRunTypeChecks = async (
   );
 
   if (GITHUB_OUTPUT !== undefined) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.appendFile(GITHUB_OUTPUT, `should_run=${shouldRunTsChecks}\n`);
   }
 

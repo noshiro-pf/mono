@@ -1,14 +1,15 @@
 /* eslint-disable vitest/no-conditional-expect */
+import * as fs from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
-import '../node-global.mjs';
 import {
   getDiffFrom,
   getModifiedFiles,
   getStagedFiles,
   getUntrackedFiles,
 } from './diff.mjs';
-import { type ExecResult } from './exec-async.mjs';
+import { $, type ExecResult } from './exec-async.mjs';
 
 describe('diff', () => {
   // Helper function to create a temporary git repository
@@ -125,6 +126,7 @@ describe('diff', () => {
 
         const testFilePath = path.join(repoPath, testFileName);
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'test content');
 
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
@@ -153,12 +155,14 @@ describe('diff', () => {
 
         const testFilePath = path.join(repoPath, testFileName);
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'initial content');
 
         // Add to git to track it
         await execInRepo(`git add ${testFileName}`, { silent: true });
 
         // Modify the file
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'modified content');
 
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
@@ -193,14 +197,17 @@ describe('diff', () => {
         const modifyFilePath = path.join(repoPath, modifyFile);
 
         // Create new file
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(newFilePath, 'new file content');
 
         // Create and track another file
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(modifyFilePath, 'initial content');
 
         await execInRepo(`git add ${modifyFile}`, { silent: true });
 
         // Modify the tracked file
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(modifyFilePath, 'modified content');
 
         const result = await repoFunctions.getUntrackedFiles({ silent: true });
@@ -336,6 +343,7 @@ describe('diff', () => {
 
         const testFilePath = path.join(repoPath, testFileName);
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'staged file content');
 
         // Stage the file
@@ -372,8 +380,10 @@ describe('diff', () => {
 
         const filePath2 = path.join(repoPath, file2);
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(filePath1, 'staged file 1 content');
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(filePath2, 'staged file 2 content');
 
         // Stage both files
@@ -407,6 +417,7 @@ describe('diff', () => {
         const testFilePath = path.join(repoPath, testFileName);
 
         // Create a file and commit it
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'file to be deleted');
 
         await execInRepo(`git add ${testFileName}`, { silent: true });
@@ -560,6 +571,7 @@ describe('diff', () => {
 
         const testFilePath = path.join(repoPath, testFileName);
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'initial content');
 
         await execInRepo(`git add ${testFileName}`, { silent: true });
@@ -570,6 +582,7 @@ describe('diff', () => {
         );
 
         // Now modify the file (without staging)
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'modified content');
 
         const result = await repoFunctions.getModifiedFiles({ silent: true });
@@ -603,8 +616,10 @@ describe('diff', () => {
         const filePath2 = path.join(repoPath, file2);
 
         // Create and commit both files
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(filePath1, 'initial content 1');
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(filePath2, 'initial content 2');
 
         await execInRepo(`git add ${file1} ${file2}`, { silent: true });
@@ -615,8 +630,10 @@ describe('diff', () => {
         );
 
         // Modify both files
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(filePath1, 'modified content 1');
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(filePath2, 'modified content 2');
 
         const result = await repoFunctions.getModifiedFiles({ silent: true });
@@ -647,6 +664,7 @@ describe('diff', () => {
         const testFilePath = path.join(repoPath, testFileName);
 
         // Create a file and commit it
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'file to be deleted');
 
         await execInRepo(`git add ${testFileName}`, { silent: true });
@@ -762,6 +780,7 @@ describe('diff', () => {
 
         const testFilePath = path.join(repoPath, testFileName);
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         await fs.writeFile(testFilePath, 'initial content');
 
         await execInRepo(`git add ${testFileName}`, { silent: true });

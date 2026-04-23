@@ -1,5 +1,7 @@
 #!/usr/bin/env tsx
 
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import {
   hasKey,
   isNotUndefined,
@@ -8,7 +10,7 @@ import {
   Json,
   Result,
 } from 'ts-data-forge';
-import '../../node-global.mjs';
+import { glob } from '../glob.mjs';
 import { type Package } from './types.mjs';
 
 /**
@@ -26,6 +28,7 @@ export const getWorkspacePackages = async (
   // Read root package.json
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const rootPackageJson: JsonValue = JSON.parse(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.readFile(path.join(rootPackageJsonDir, 'package.json'), 'utf8'),
   );
 
@@ -56,6 +59,7 @@ export const getWorkspacePackages = async (
         const maybePackagePath = path.join(match, 'package.json');
 
         const result = await Result.fromPromise(
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
           fs.readFile(maybePackagePath, 'utf8'),
         );
 

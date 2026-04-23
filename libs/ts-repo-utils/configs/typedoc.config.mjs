@@ -8,12 +8,9 @@ const outDir = path.resolve(import.meta.dirname, '../docs');
 const config = {
   plugin: ['typedoc-github-theme'],
   entryPoints: [`${srcDir}/**/*.mts`],
-  exclude: [
-    './**/index.mts',
-    './**/*.test.mts',
-    './entry-point.mts',
-    './globals.d.mts',
-  ].map((p) => path.resolve(srcDir, p)),
+  exclude: ['./**/index.mts', './**/*.test.mts', './entry-point.mts'].map((p) =>
+    path.resolve(srcDir, p),
+  ),
   out: outDir,
   gitRevision: 'main',
   headings: {

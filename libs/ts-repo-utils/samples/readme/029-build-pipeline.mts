@@ -1,4 +1,4 @@
-import { formatFilesGlob, genIndex } from 'ts-repo-utils';
+import { $, formatFilesGlob, genIndex } from 'ts-repo-utils';
 
 // Generate barrel exports
 await genIndex({ targetDirectory: './src' });

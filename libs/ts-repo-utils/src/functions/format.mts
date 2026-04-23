@@ -1,7 +1,8 @@
 import { type ExecException } from 'node:child_process';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import * as prettier from 'prettier';
 import { Arr, isNotUndefined, pipe, Result } from 'ts-data-forge';
-import '../node-global.mjs';
 import { pathExists } from './assert-path-exists.mjs';
 import {
   getDiffFrom,
@@ -10,6 +11,7 @@ import {
   getStagedFiles,
   getUntrackedFiles,
 } from './diff.mjs';
+import { glob } from './glob.mjs';
 
 /**
  * Format a list of files using Prettier
@@ -28,7 +30,7 @@ export const formatFiles = async (
 
   const noIgnore = options?.ignore === false;
 
-  const conditionalEcho = silent ? () => {} : echo;
+  const conditionalEcho = silent ? () => {} : console.log;
 
   if (files.length === 0) {
     conditionalEcho('No files to format');
@@ -104,6 +106,7 @@ export const formatFiles = async (
           }
 
           // Read file content
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
           const content = await fs.readFile(filePath, 'utf8');
 
           // Resolve prettier config for this file
@@ -119,6 +122,7 @@ export const formatFiles = async (
           if (formatted === content) {
             conditionalEcho(`Unchanged: ${getDisplayPath(filePath)}`);
           } else {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename
             await fs.writeFile(filePath, formatted, 'utf8');
 
             conditionalEcho(`Formatted: ${getDisplayPath(filePath)}`);
@@ -239,7 +243,7 @@ export const formatFilesGlob = async (
 
   const ignore = options?.ignore;
 
-  const conditionalEcho = silent ? () => {} : echo;
+  const conditionalEcho = silent ? () => {} : console.log;
 
   // Find all files matching the glob
   const globResult = await glob(pathGlob, {
@@ -395,7 +399,7 @@ export const formatDiffFrom = async (
     ignore,
   } = options ?? {};
 
-  const conditionalEcho = silent ? () => {} : echo;
+  const conditionalEcho = silent ? () => {} : console.log;
 
   // Get files that differ from base branch/commit (excluding deleted files)
   const diffFromBaseResult = await getDiffFrom(base, {

@@ -9,7 +9,6 @@ import {
   pipe,
   Result,
 } from 'ts-data-forge';
-import '../../node-global.mjs';
 import { type Package } from './types.mjs';
 
 const DEBUG = false as boolean;

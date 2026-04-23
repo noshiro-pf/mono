@@ -1,6 +1,5 @@
 /* eslint-disable vitest/no-restricted-vi-methods */
 import { type MockInstance } from 'vitest';
-import '../../node-global.mjs';
 import { executeStages } from './execute-parallel.mjs';
 import { getWorkspacePackages } from './get-workspace-packages.mjs';
 import { runCmdInStagesAcrossWorkspaces } from './run-cmd-in-stages.mjs';

@@ -63,7 +63,7 @@ export function $(
   const normalizedOptions: NormalizedExecOptions = restOptions;
 
   if (!silent) {
-    echo(`$ ${command}`);
+    console.log(`$ ${command}`);
   }
 
   return new Promise((resolve) => {
@@ -75,7 +75,7 @@ export function $(
     ): void => {
       if (!silent) {
         if (!isEmpty(stdout)) {
-          echo(stdout);
+          console.log(stdout);
         }
 
         if (!isEmpty(stderr)) {

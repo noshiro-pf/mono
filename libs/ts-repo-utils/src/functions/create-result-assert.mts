@@ -1,5 +1,4 @@
 import { hasKey, isRecord, isString, Result } from 'ts-data-forge';
-import '../node-global.mjs';
 
 type ResultProducer<TConfig, TOk, TErr> = (
   config: TConfig,
@@ -32,7 +31,7 @@ export const createResultAssert = <Config, Ok, Err>({
       hasKey(error, 'message') &&
       isString(error.message)
     ) {
-      echo(error.message);
+      console.log(error.message);
     } else {
       console.error(error);
     }

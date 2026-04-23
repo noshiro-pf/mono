@@ -1,5 +1,5 @@
 import { Result } from 'ts-data-forge';
-import '../node-global.mjs';
+import { $ } from './exec-async.mjs';
 
 /**
  * Checks if the repository has uncommitted changes.
@@ -28,7 +28,7 @@ export const assertRepoIsClean = async (
 ): Promise<void> => {
   const silent = options?.silent ?? false;
 
-  const conditionalEcho = silent ? () => {} : echo;
+  const conditionalEcho = silent ? () => {} : console.log;
 
   const gitStatusResult = await getGitStatus({ silent });
 

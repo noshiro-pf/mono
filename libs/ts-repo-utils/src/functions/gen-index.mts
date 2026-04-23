@@ -1,7 +1,9 @@
 import micromatch from 'micromatch';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { Arr, ISet, isString, pipe, Result } from 'ts-data-forge';
-import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
+import { $ } from './exec-async.mjs';
 
 /** Configuration for index file generation. */
 export type GenIndexConfig = DeepReadonly<{
@@ -82,7 +84,7 @@ export const genIndex = async (
   // Merge config with defaults
   const filledConfig: GenIndexConfigInternal = fillConfig(config);
 
-  const conditionalEcho = filledConfig.silent ? () => {} : echo;
+  const conditionalEcho = filledConfig.silent ? () => {} : console.log;
 
   conditionalEcho('Starting index file generation...\n');
 
@@ -214,9 +216,12 @@ const generateIndexFileForDir = async (
   baseDir?: string,
   currentDepth: number = 0,
 ): Promise<void> => {
+  const conditionalEcho = config.silent ? () => {} : console.log;
+
   try {
     const actualBaseDir = baseDir ?? dirPath;
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const entries = await fs.readdir(dirPath, { withFileTypes: true });
 
     const mut_subDirectories: string[] = [];
@@ -272,9 +277,10 @@ const generateIndexFileForDir = async (
 
       const indexPath = path.join(dirPath, `index${config.indexFileExtension}`);
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(indexPath, indexContent);
 
-      echo(`Generated: ${path.relative(process.cwd(), indexPath)}`);
+      conditionalEcho(`Generated: ${path.relative(process.cwd(), indexPath)}`);
     }
   } catch (error) {
     throw new Error(

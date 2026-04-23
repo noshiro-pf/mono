@@ -1,6 +1,6 @@
 import { type ExecException } from 'node:child_process';
+import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
-import '../node-global.mjs';
 import { $ } from './exec-async.mjs';
 
 /**

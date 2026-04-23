@@ -1,7 +1,8 @@
+import * as path from 'node:path';
 import { Arr, type IMap, isString, Result } from 'ts-data-forge';
-import '../node-global.mjs';
 import { assertPathExists } from './assert-path-exists.mjs';
 import { createResultAssert } from './create-result-assert.mjs';
+import { glob } from './glob.mjs';
 
 /** Configuration for directory extension checking. */
 export type CheckExtConfig = DeepReadonly<{
@@ -17,8 +18,7 @@ export type CheckExtConfig = DeepReadonly<{
     extension: `.${string}` | `.${string}`[];
 
     /**
-     * Optional glob patterns to ignore (defaults to ['tsconfig.json',
-     * 'globals.d.*'])
+     * Optional glob patterns to ignore (defaults to ['tsconfig.json'])
      */
     ignorePatterns?: string[];
   }[];
@@ -89,10 +89,10 @@ export const assertExt = createResultAssert<
 >({
   run: checkExt,
   onError: (error) => {
-    echo(error.message);
+    console.log(error.message);
   },
   onSuccess: () => {
-    echo('✓ All files have correct extensions');
+    console.log('✓ All files have correct extensions');
   },
 });
 
@@ -111,7 +111,7 @@ const getFilesWithIncorrectExtension = async (
 ): Promise<readonly string[]> => {
   await assertPathExists(dir, 'Directory');
 
-  const defaultIgnorePatterns = ['tsconfig.json', 'globals.d.*'] as const;
+  const defaultIgnorePatterns = ['tsconfig.json'] as const;
 
   const finalIgnorePatterns = ignorePatterns ?? defaultIgnorePatterns;
 

@@ -1,4 +1,4 @@
-import '../node-global.mjs';
+import * as fs from 'node:fs/promises';
 
 /**
  * Checks if a file or directory exists.
@@ -27,7 +27,7 @@ export const assertPathExists = async (
   description = 'Path',
 ): Promise<void> => {
   if (!(await pathExists(filePath))) {
-    echo(`${description} does not exist: ${filePath}`);
+    console.log(`${description} does not exist: ${filePath}`);
 
     process.exit(1);
   }
