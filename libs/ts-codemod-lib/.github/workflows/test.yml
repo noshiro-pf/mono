@@ -7,17 +7,6 @@ on:
     branches-ignore:
       - 'develop'
       - 'develop*'
-    paths-ignore:
-      - '**.md'
-      - '**.txt'
-      - 'agents/**'
-      - 'docs/**'
-      - 'documents/**'
-      - '.gitignore'
-      - '.cspell.config.yaml'
-      - '.editorconfig'
-      - '.markdownlint-cli2.mjs'
-      - 'LICENSE'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -27,7 +16,7 @@ jobs:
   test:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     # Allow Codecov OIDC upload and minimal read access
     permissions:
@@ -47,6 +36,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Fetch main
+        run: git fetch origin main # To allow check-should-run-type-checks to get the diff from main
+
       - name: Install pnpm
         uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
 
@@ -60,6 +52,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # NOTE: To include this workflow in the branch protection rule status check,
+      # skip each step instead of skipping the entire workflow with paths-ignore.
+      - name: Check diff
+        id: check_diff_type
+        run: pnpm exec check-should-run-type-checks
+
+      - name: Exit if no relevant changes
+        if: steps.check_diff_type.outputs.should_run != 'true'
+        run: exit 1
+
       - name: Build src
         run: pnpm run build:min
 
@@ -72,14 +74,12 @@ jobs:
         run: pnpm run ${{ matrix.command }}
 
       # Source - https://stackoverflow.com/a/71583518
-      # Posted by VonC, modified by community. See post 'Timeline' for change history
-      # Retrieved 2026-02-10, License - CC BY-SA 4.0
       - name: Run 'test:browser' with retry
         if: matrix.command == 'test:browser'
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
           timeout_minutes: 10
-          max_attempts: 3
+          max_attempts: 2
           command: pnpm run ${{ matrix.command }}
 
       - name: Upload coverage reports to Codecov
