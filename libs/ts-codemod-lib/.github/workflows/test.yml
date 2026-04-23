@@ -60,7 +60,7 @@ jobs:
 
       - name: Exit if no relevant changes
         if: steps.check_diff_type.outputs.should_run != 'true'
-        run: exit 1
+        run: exit 0
 
       - name: Build src
         run: pnpm run build:min
