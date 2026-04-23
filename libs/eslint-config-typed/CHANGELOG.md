@@ -1,3 +1,9 @@
+## [4.9.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.2...v4.9.3) (2026-04-23)
+
+### Bug Fixes
+
+- bump @vitest/eslint-plugin from 1.6.14 to 1.6.15 ([#306](https://github.com/noshiro-pf/eslint-config-typed/issues/306)) ([7cde944](https://github.com/noshiro-pf/eslint-config-typed/commit/7cde9441be9c910402028d06f000c5e832879381))
+
 ## [4.9.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.1...v4.9.2) (2026-04-14)
 
 ### Bug Fixes
