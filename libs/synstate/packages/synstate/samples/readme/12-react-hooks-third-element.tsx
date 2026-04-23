@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/strict-void-return */
 // embed-sample-code-ignore-above
 
 import type * as React from 'react';

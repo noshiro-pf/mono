@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/strict-void-return */
 /** @jsxImportSource preact */
 // embed-sample-code-ignore-above
 import { map } from 'synstate';

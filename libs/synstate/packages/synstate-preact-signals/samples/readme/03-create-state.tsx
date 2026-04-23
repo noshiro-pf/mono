@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/strict-void-return */
 // embed-sample-code-ignore-above
 import type * as Preact from 'preact';
 import { createState } from 'synstate-preact-signals';
