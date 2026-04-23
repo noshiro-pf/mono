@@ -1,6 +1,8 @@
 /* eslint-disable no-await-in-loop */
 
 import dedent from 'dedent';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import {
   getModifiedFiles,
@@ -26,7 +28,7 @@ export const runTransformerCLI = async (
   options: TransformerCLIOptions,
   transformers: readonly TsMorphTransformer[],
 ): Promise<Result<undefined, undefined>> => {
-  const echoIfNotSilent = options.silent ? () => {} : echo;
+  const echoIfNotSilent = options.silent ? () => {} : console.log;
 
   const errorIfNotSilent = options.silent ? () => {} : console.error;
 
@@ -239,7 +241,7 @@ const transformOneFile = async (
   transformers: readonly TsMorphTransformer[],
   silent: boolean,
 ): Promise<Result<'unchanged' | 'transformed', string>> => {
-  const echoIfNotSilent = silent ? () => {} : echo;
+  const echoIfNotSilent = silent ? () => {} : console.log;
 
   const errorIfNotSilent = silent ? () => {} : console.error;
 
@@ -248,6 +250,7 @@ const transformOneFile = async (
   const isTsx = fileName.endsWith('.tsx') || fileName.endsWith('.jsx');
 
   try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const originalCode = await fs.readFile(filePath, 'utf8');
 
     const transformedCode = transformSourceCode(
@@ -261,6 +264,7 @@ const transformOneFile = async (
 
       return Result.ok('unchanged');
     } else {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(filePath, transformedCode, 'utf8');
 
       echoIfNotSilent(`✅ ${fileName} - transformed`);

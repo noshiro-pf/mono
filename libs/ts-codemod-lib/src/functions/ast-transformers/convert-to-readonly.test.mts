@@ -3915,7 +3915,7 @@ describe(convertToReadonlyTransformer, () => {
             },
           }),
         ]);
-      }).toThrowError(
+      }).toThrow(
         'Invalid DeepReadonly typeName "Readonly" passed to convertToReadonlyType',
       );
     });
@@ -3933,7 +3933,7 @@ describe(convertToReadonlyTransformer, () => {
         `; // Invalid Array usage
 
         transformSourceCode(source, false, [convertToReadonlyTransformer()]);
-      }).toThrowError('Unexpected number of type arguments');
+      }).toThrow('Unexpected number of type arguments');
     });
   });
 });
