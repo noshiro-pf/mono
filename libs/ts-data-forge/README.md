@@ -568,21 +568,9 @@ import { castMutable } from 'ts-data-forge';
 const SomeComponent: React.FC = () => (
     <Autocomplete
         options={castMutable(readonlyOptions)}
-        renderInput={({
-            InputLabelProps,
-            InputProps,
-            disabled,
-            fullWidth,
-            id,
-            inputProps,
-            size,
-        }) => (
+        renderInput={({ disabled, fullWidth, id, size, slotProps }) => (
             <TextField
-                slotProps={{
-                    inputLabel: InputLabelProps,
-                    input: InputProps,
-                    htmlInput: inputProps,
-                }}
+                slotProps={slotProps}
                 disabled={disabled}
                 fullWidth={fullWidth}
                 id={id}

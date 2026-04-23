@@ -1,5 +1,7 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
-import { formatFiles } from 'ts-repo-utils';
+import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 
@@ -36,6 +38,7 @@ const documents: DeepReadonly<
 export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
   try {
     for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
       const mut_results: string[] = [];
@@ -46,6 +49,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
         const samplePath = path.resolve(samplesDir, sampleCodeFile);
 
         // Read sample content
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         const sampleContent = await fs.readFile(samplePath, 'utf8');
 
         const sampleContentSliced = extractSampleCode(sampleContent);
@@ -86,6 +90,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
       mut_results.push(mut_rest);
 
       // Write updated README
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(mdPath, mut_results.join('\n'), 'utf8');
 
       await formatFiles([mdPath]);
