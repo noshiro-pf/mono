@@ -82,7 +82,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "@sindresorhus/is": "^7.2.0",
+    "@sindresorhus/is": "^8.0.0",
     "ts-type-forge": "^2.4.0"
   },
   "devDependencies": {
