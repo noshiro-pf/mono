@@ -1,5 +1,6 @@
+import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
-import 'ts-repo-utils';
+import { $, Result } from 'ts-repo-utils';
 import { genRootIndex } from '../functions/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -11,7 +12,7 @@ const indexFilePath = path.resolve(srcDir, 'index.d.mts');
  * Builds the entire project.
  */
 const build = async (): Promise<void> => {
-  echo('Starting build process...\n');
+  console.log('Starting build process...\n');
 
   await logStep({
     startMessage: 'Generating root index.d.mts',
@@ -36,7 +37,7 @@ const build = async (): Promise<void> => {
     successMessage: 'Type checking passed',
   });
 
-  echo('✅ Build completed successfully!\n');
+  console.log('✅ Build completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -50,11 +51,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  echo(`${mut_step.current}. ${startMessage}...`);
+  console.log(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  echo(`✓ ${successMessage}.\n`);
+  console.log(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };

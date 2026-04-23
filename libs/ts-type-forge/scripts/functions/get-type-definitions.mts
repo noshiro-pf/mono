@@ -1,3 +1,6 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { glob, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const srcDir = path.resolve(projectRootPath, './src');
@@ -34,6 +37,7 @@ const processFile = async (
   const relativePath = path.relative(projectRootPath, filePath);
 
   try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const content = await fs.readFile(filePath, 'utf8');
 
     const lines = content.split('\n');
@@ -111,6 +115,7 @@ export const genTypeDefinitions = async (): Promise<void> => {
     ])
     .join('\n');
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const content = await fs.readFile(readmePath, 'utf8');
 
   const newContent = content.replaceAll(
@@ -120,5 +125,6 @@ export const genTypeDefinitions = async (): Promise<void> => {
   );
 
   // Write the updated content back to the README file
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(readmePath, newContent, 'utf8');
 };

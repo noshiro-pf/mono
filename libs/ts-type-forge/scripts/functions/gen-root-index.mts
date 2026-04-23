@@ -1,3 +1,7 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { glob, Result } from 'ts-repo-utils';
+
 export const genRootIndex = async (
   srcDir: string,
   indexFilePath: string,
@@ -36,6 +40,7 @@ export const genRootIndex = async (
   const fileContent = `${referenceLines.join('\n')}\n`; // Add trailing newline
 
   try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(indexFilePath, fileContent, 'utf8');
 
     console.log(

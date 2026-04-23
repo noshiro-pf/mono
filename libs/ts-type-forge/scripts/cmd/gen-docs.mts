@@ -1,5 +1,6 @@
+import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
-import { assertPathExists } from 'ts-repo-utils';
+import { $, assertPathExists, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { embedSamples } from './embed-samples.mjs';
 
@@ -12,7 +13,7 @@ const TYPEDOC_CONFIG = path.resolve(
  * Generates documentation using TypeDoc and formats the output.
  */
 export const genDocs = async (): Promise<void> => {
-  echo('Starting documentation generation...\n');
+  console.log('Starting documentation generation...\n');
 
   // Verify TypeDoc config exists
   await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
@@ -45,7 +46,7 @@ export const genDocs = async (): Promise<void> => {
     successMessage: 'Formatting completed',
   });
 
-  echo('✅ Documentation generation completed successfully!\n');
+  console.log('✅ Documentation generation completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -59,11 +60,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  echo(`${mut_step.current}. ${startMessage}...`);
+  console.log(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  echo(`✓ ${successMessage}.\n`);
+  console.log(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };
