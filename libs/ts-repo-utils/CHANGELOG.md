@@ -1,3 +1,64 @@
+# [10.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v9.0.1...v10.0.0) (2026-04-23)
+
+### Bug Fixes
+
+- **breaking:** remove runtime global injection (enforce explicit imports) ([#348](https://github.com/noshiro-pf/ts-repo-utils/issues/348)) ([9812e70](https://github.com/noshiro-pf/ts-repo-utils/commit/9812e7084b350a475b4c87e1aad634b29b197987))
+
+### BREAKING CHANGES
+
+- **breaking:** `ts-repo-utils` no longer installs any runtime
+  globals when imported. Code that relied on `import 'ts-repo-utils';`
+  as a side-effect import, or on the implicitly-defined globals, must
+  be updated.
+
+Migration guide
+
+1. Remove any bare side-effect import:
+    - import 'ts-repo-utils';
+    * // delete the line
+
+2. Add explicit imports for every utility you were using as a
+   global. Mapping from the old global to its new import source:
+
+    | global               | replacement                                           |
+    | -------------------- | ----------------------------------------------------- |
+    | `$`                  | `import { $ } from 'ts-repo-utils';`                  |
+    | `Result`             | `import { Result } from 'ts-data-forge';`             |
+    | `glob`               | `import { glob } from 'ts-repo-utils';`               |
+    | `isDirectlyExecuted` | `import { isDirectlyExecuted } from 'ts-repo-utils';` |
+    | `path`               | `import * as path from 'node:path';`                  |
+    | `fs`                 | `import * as fs from 'node:fs/promises';`             |
+    | `os`                 | `import * as os from 'node:os';`                      |
+    | `echo(...)`          | `console.log(...)` (echo is gone)                     |
+    | `cd(...)`            | `process.chdir(...)` (cd is gone)                     |
+
+    Example:
+    - import 'ts-repo-utils';
+    -
+    - const result = await $('npm test');
+    - if (Result.isErr(result)) echo(result.value.message);
+    * import { Result } from 'ts-data-forge';
+    * import { $ } from 'ts-repo-utils';
+    *
+    * const result = await $('npm test');
+    * if (Result.isErr(result)) console.log(result.value.message);
+
+3. If your project relied on `ts-type-forge` ambient types
+   (`DeepReadonly`, `StrictOmit`, `JsonValue`, `UnknownResult`,
+   `ReadonlyRecord`, ...) being provided transitively by
+   `ts-repo-utils`, add `ts-type-forge` to your own dev
+   dependencies and reference it from your project's `tsconfig.json`
+   (`"types": ["ts-type-forge", ...]`) or a local `globals.d.ts`
+   file. Projects that already depend on `ts-data-forge` continue to
+   receive the ambient types for free because `ts-data-forge` still
+   references `ts-type-forge` itself.
+
+4. TypeScript will surface every remaining global reference as a
+   "Cannot find name" error, which makes a mechanical find-and-fix
+   pass straightforward.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
 ## [9.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v9.0.0...v9.0.1) (2026-04-11)
 
 ### Bug Fixes
