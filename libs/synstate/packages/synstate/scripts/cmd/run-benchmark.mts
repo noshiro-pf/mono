@@ -1,3 +1,5 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
 import { range } from 'ts-data-forge';
@@ -158,6 +160,7 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
   // Write to file for docs embedding
   const resultsPath = path.resolve(benchmarkDir, scenario.resultsFile);
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
 
   console.log(`\n✓ Results written to ${resultsPath}`);

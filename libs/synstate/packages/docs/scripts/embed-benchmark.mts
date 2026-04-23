@@ -1,3 +1,5 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { pathExists } from 'ts-repo-utils';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -61,6 +63,7 @@ const embedBenchmark = async (): Promise<void> => {
       continue;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     let mut_markdown = await fs.readFile(targetMarkdownFile, 'utf8');
 
     for (const { resultsFile, startMarker, endMarker } of targets) {
@@ -76,6 +79,7 @@ const embedBenchmark = async (): Promise<void> => {
         continue;
       }
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const results = await fs.readFile(resultsPath, 'utf8');
 
       const startIndex = mut_markdown.indexOf(startMarker);
@@ -104,6 +108,7 @@ const embedBenchmark = async (): Promise<void> => {
       );
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(targetMarkdownFile, mut_markdown, 'utf8');
   }
 };

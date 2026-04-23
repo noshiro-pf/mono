@@ -12,6 +12,8 @@
  * Each combineLatest doubles the emission count, producing 2^N
  * subscriber calls per source update in RxJS.
  */
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
@@ -155,6 +157,7 @@ console.log(`\n${tableContent}`);
 
 const resultsPath = path.resolve(benchmarkDir, 'results-cascaded-diamond.md');
 
+// eslint-disable-next-line security/detect-non-literal-fs-filename
 await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
 
 console.log(`\n✓ Results written to ${resultsPath}`);

@@ -1,10 +1,11 @@
-import 'ts-repo-utils';
+import { Result } from 'ts-data-forge';
+import { $ } from 'ts-repo-utils';
 
 /**
  * Runs all validation and build steps for the project.
  */
 const checkAll = async (): Promise<void> => {
-  echo('Starting full project validation and build...\n');
+  console.log('Starting full project validation and build...\n');
 
   await logStep({
     startMessage: 'Running tests',
@@ -30,7 +31,7 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Documentation generated',
   });
 
-  echo('✅ All checks completed successfully!\n');
+  console.log('✅ All checks completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -44,11 +45,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  echo(`${mut_step.current}. ${startMessage}...`);
+  console.log(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  echo(`✓ ${successMessage}.\n`);
+  console.log(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };

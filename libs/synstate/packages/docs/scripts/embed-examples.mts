@@ -1,3 +1,5 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { pathExists } from 'ts-repo-utils';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
@@ -408,6 +410,7 @@ const documents: DeepReadonly<
 
 const embedExamples = async (): Promise<void> => {
   for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const markdownContent = await fs.readFile(mdPath, 'utf8');
 
     const codeBlockCount = markdownContent.split(codeBlockStart).length - 1;
@@ -425,6 +428,7 @@ const embedExamples = async (): Promise<void> => {
     for (const sampleCodeFile of sampleCodeFiles) {
       const samplePath = path.resolve(samplesDir, sampleCodeFile);
 
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const sampleContent = await fs.readFile(samplePath, 'utf8');
 
       const sampleContentSliced = extractSampleCode(sampleContent);
@@ -464,6 +468,7 @@ const embedExamples = async (): Promise<void> => {
 
     mut_results.push(mut_rest);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(mdPath, mut_results.join('\n'), 'utf8');
   }
 };

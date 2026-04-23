@@ -6,6 +6,8 @@
  * Usage: tsx ./scripts/cmd/generate-ja-sample-diffs.mts
  */
 import { execFileSync } from 'node:child_process';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 const sampleDirs: readonly string[] = [
@@ -22,9 +24,11 @@ for (const dir of sampleDirs) {
 
   const jaDir = path.resolve(enDir, 'ja');
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const jaDirExists = await fs
+
     .stat(jaDir)
-    .then((s) => s.isDirectory())
+    .then((s: Readonly<{ isDirectory: () => boolean }>) => s.isDirectory())
     .catch(() => false);
 
   if (!jaDirExists) {
@@ -33,6 +37,7 @@ for (const dir of sampleDirs) {
     continue;
   }
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const jaFiles = await fs.readdir(jaDir);
 
   for (const fileName of jaFiles) {
@@ -40,15 +45,18 @@ for (const dir of sampleDirs) {
 
     const jaFilePath = path.resolve(jaDir, fileName);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const jaStat = await fs.stat(jaFilePath);
 
     if (!jaStat.isFile()) continue;
 
     const enFilePath = path.resolve(enDir, fileName);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const enExists = await fs
+
       .stat(enFilePath)
-      .then((s) => s.isFile())
+      .then((s: Readonly<{ isFile: () => boolean }>) => s.isFile())
       .catch(() => false);
 
     if (!enExists) {
@@ -57,8 +65,10 @@ for (const dir of sampleDirs) {
       continue;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const enContent = await fs.readFile(enFilePath, 'utf8');
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const jaContent = await fs.readFile(jaFilePath, 'utf8');
 
     if (enContent === jaContent) {
@@ -102,6 +112,7 @@ for (const dir of sampleDirs) {
 
     const diffPath = path.resolve(jaDir, `${fileName}.diff`);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(diffPath, mut_diffContent, 'utf8');
 
     console.log(`✓ ${dir}/ja/${fileName}.diff`);

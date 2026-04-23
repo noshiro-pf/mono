@@ -1,11 +1,11 @@
 import { Result } from 'ts-data-forge';
-import 'ts-repo-utils';
+import { $ } from 'ts-repo-utils';
 
 /**
  * Runs all validation and build steps for the project.
  */
 const checkAll = async (): Promise<void> => {
-  echo('Starting full project validation and build...\n');
+  console.log('Starting full project validation and build...\n');
 
   await logStep({
     startMessage: 'Installing dependencies',
@@ -76,7 +76,7 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Code formatted',
   });
 
-  echo('✅ All checks completed successfully!\n');
+  console.log('✅ All checks completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -90,11 +90,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  echo(`${mut_step.current}. ${startMessage}...`);
+  console.log(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  echo(`✓ ${successMessage}.\n`);
+  console.log(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };
@@ -103,9 +103,9 @@ const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
 
   if (Result.isErr(result)) {
-    echo(`${errorMsg}: ${result.value.message}`);
+    console.log(`${errorMsg}: ${result.value.message}`);
 
-    echo('❌ Check failed');
+    console.log('❌ Check failed');
 
     process.exit(1);
   }

@@ -21,6 +21,8 @@
  * - Dynamic graphs (Jotai, MobX): the inactive branch is not in the
  *   dependency set, so updates do not trigger recomputation at all.
  */
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
@@ -168,6 +170,7 @@ const resultsPath = path.resolve(
   'results-conditional-fan-out.md',
 );
 
+// eslint-disable-next-line security/detect-non-literal-fs-filename
 await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
 
 console.log(`\n✓ Results written to ${resultsPath}`);

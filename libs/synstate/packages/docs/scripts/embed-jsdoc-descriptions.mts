@@ -1,3 +1,5 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { pathExists } from 'ts-repo-utils';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -221,6 +223,7 @@ const processRefDir = async (
       continue;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
 
     const description = extractJsdocDescription(sourceContent, funcName);
@@ -233,6 +236,7 @@ const processRefDir = async (
       continue;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const markdown = await fs.readFile(mdPath, 'utf8');
 
     const replaced = replacePlaceholder(markdown, description);
@@ -251,6 +255,7 @@ const processRefDir = async (
       continue;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(mdPath, replaced.result, 'utf8');
 
     console.log(
@@ -311,6 +316,7 @@ const embedSourceLinks = async (
       continue;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const markdown = await fs.readFile(mdPath, 'utf8');
 
     const replaced = replaceSourceLink(markdown, srcPath);
@@ -329,6 +335,7 @@ const embedSourceLinks = async (
       continue;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(mdPath, replaced.result, 'utf8');
 
     console.log(`✓ [${label}] Embedded source link → ${mdFileName}`);

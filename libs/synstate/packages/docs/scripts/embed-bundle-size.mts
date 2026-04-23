@@ -1,6 +1,7 @@
 import { build } from 'esbuild';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { gzipSync } from 'node:zlib';
-import 'ts-repo-utils';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const synstateDistPath = path.resolve(
@@ -112,6 +113,7 @@ const embedBundleSize = async (): Promise<void> => {
 
   // Replace placeholders in markdown files
   for (const mdPath of targetMarkdownFiles) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     let mut_content = await fs.readFile(mdPath, 'utf8');
 
     mut_content = replacePlaceholder(
@@ -126,6 +128,7 @@ const embedBundleSize = async (): Promise<void> => {
       `~${formatKB(reactHooks.gzippedBytes)} kB min+gzip`,
     );
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(mdPath, mut_content, 'utf8');
 
     console.log(`✓ Updated bundle size in ${path.basename(mdPath)}`);

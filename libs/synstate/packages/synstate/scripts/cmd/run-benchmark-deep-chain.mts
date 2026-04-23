@@ -5,6 +5,8 @@
  * (packages/docs/src/components/throughput-demo/adapters/) to ensure
  * the benchmark measures the same reactive chain topology.
  */
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
 import { asSafeUint, range } from 'ts-data-forge';
@@ -210,6 +212,7 @@ const benchmarkDir = path.resolve(
 
 const resultsPath = path.resolve(benchmarkDir, 'results-deep-chain.md');
 
+// eslint-disable-next-line security/detect-non-literal-fs-filename
 await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
 
 console.log(`\n✓ Results written to ${resultsPath}`);

@@ -1,4 +1,5 @@
-import 'ts-repo-utils';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -200,6 +201,7 @@ const embedJsdocExamples = async (): Promise<void> => {
 
     const samplePath = path.resolve(synstateSamplesDir, sampleFile);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const sampleContent = await fs.readFile(samplePath, 'utf8');
 
     const extracted = extractSampleCode(sampleContent);
@@ -207,6 +209,7 @@ const embedJsdocExamples = async (): Promise<void> => {
     const formatted = formatForJsdoc(extracted);
 
     // Re-read the source file each time (handles multiple functions in the same file)
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
 
     const updated = replaceJsdocExample(sourceContent, funcName, formatted);
@@ -225,6 +228,7 @@ const embedJsdocExamples = async (): Promise<void> => {
       continue;
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(sourceFilePath, updated, 'utf8');
 
     console.log(`✓ Embedded example for ${funcName} → ${srcPath}`);

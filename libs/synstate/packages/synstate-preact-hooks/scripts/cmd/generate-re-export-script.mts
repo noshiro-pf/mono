@@ -1,7 +1,7 @@
 /* eslint-disable tree-shakable/import-star */
+import * as fs from 'node:fs/promises';
 import * as synstate from 'synstate';
 import { ISet } from 'ts-data-forge';
-import 'ts-repo-utils';
 
 const outFile = 'src/synstate.mts';
 

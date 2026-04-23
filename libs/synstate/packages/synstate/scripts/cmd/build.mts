@@ -1,5 +1,7 @@
-import { unknownToString } from 'ts-data-forge';
-import { assertPathExists } from 'ts-repo-utils';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { Result, unknownToString } from 'ts-data-forge';
+import { $, assertPathExists } from 'ts-repo-utils';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 const distDir = path.resolve(workspaceRootPath, './dist');
@@ -8,7 +10,7 @@ const distDir = path.resolve(workspaceRootPath, './dist');
  * Builds the entire project.
  */
 const build = async (skipCheck: boolean): Promise<void> => {
-  echo('Starting build process...\n');
+  console.log('Starting build process...\n');
 
   await logStep({
     startMessage: 'Generating index files',
@@ -96,6 +98,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
       const typesFile = path.resolve(distDir, 'types.d.mts');
 
       await runStep(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         Result.fromPromise(fs.writeFile(typesFile, content)),
         'Failed to generate dist/types.d.mts',
       );
@@ -111,6 +114,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
       const configFile = path.resolve(distDir, 'tsconfig.json');
 
       await runStep(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         Result.fromPromise(fs.writeFile(configFile, configContent)),
         'Failed to generate tsconfig',
       );
@@ -133,7 +137,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     });
   }
 
-  echo('✅ Build completed successfully!\n');
+  console.log('✅ Build completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -147,11 +151,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  echo(`${mut_step.current}. ${startMessage}...`);
+  console.log(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  echo(`✓ ${successMessage}.\n`);
+  console.log(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };
