@@ -81,7 +81,7 @@
     "z:eslint": "NODE_OPTIONS='--max-old-space-size=6144' TIMING=1 eslint"
   },
   "devDependencies": {
-    "@changesets/cli": "2.30.0",
+    "@changesets/cli": "2.31.0",
     "@rollup/plugin-json": "6.1.0",
     "@rollup/plugin-replace": "6.0.3",
     "@rollup/plugin-strip": "3.0.4",
