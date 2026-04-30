@@ -9,8 +9,9 @@ minimumReleaseAgeExclude:
   - ts-data-forge
   - ts-fortress
   - ts-repo-utils
-  # - ts-codemod-lib
-  - syncflow
+  - ts-codemod-lib
+  - synstate
+  - synstate-*
   - eslint-config-typed
   - octokit-safe-types
   - github-settings-as-code
