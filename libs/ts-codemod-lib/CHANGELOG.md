@@ -1,3 +1,9 @@
+## [2.1.4](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.3...v2.1.4) (2026-04-30)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#107](https://github.com/noshiro-pf/ts-codemod-lib/issues/107)) ([1253c88](https://github.com/noshiro-pf/ts-codemod-lib/commit/1253c888357261dd397023ff0cc2055eaf96edcd))
+
 ## [2.1.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.2...v2.1.3) (2026-04-23)
 
 ### Bug Fixes
