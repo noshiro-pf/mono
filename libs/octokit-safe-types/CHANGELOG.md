@@ -1,3 +1,9 @@
+## [1.2.16](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.15...v1.2.16) (2026-04-30)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#204](https://github.com/noshiro-pf/octokit-safe-types/issues/204)) ([bbfbd37](https://github.com/noshiro-pf/octokit-safe-types/commit/bbfbd37c56cbbe92d9671b1ed94744d0c5437efb))
+
 ## [1.2.15](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.14...v1.2.15) (2026-04-23)
 
 ### Bug Fixes
