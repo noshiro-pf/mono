@@ -115,7 +115,7 @@
     "dedent": "1.7.2",
     "eslint": "9.39.4",
     "eslint-config-typed": "4.9.2",
-    "github-settings-as-code": "1.2.3",
+    "github-settings-as-code": "1.2.7",
     "jiti": "2.6.1",
     "markdownlint": "0.40.0",
     "markdownlint-cli2": "0.22.0",
