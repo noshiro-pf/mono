@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "synstate": "workspace:*",
-    "ts-data-forge": "^6.9.0"
+    "ts-data-forge": "^6.9.1"
   },
   "devDependencies": {
     "@preact/signals": "^2.9.0",

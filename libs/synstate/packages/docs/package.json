@@ -25,16 +25,16 @@
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"
   },
   "dependencies": {
-    "@astrojs/preact": "^5.0.2",
+    "@astrojs/preact": "^5.1.1",
     "@astrojs/react": "^5.0.3",
-    "@astrojs/starlight": "^0.38.2",
+    "@astrojs/starlight": "^0.38.3",
     "@fontsource/noto-sans-jp": "^5.2.9",
     "@preact/signals": "^2.9.0",
     "@resvg/resvg-js": "^2.6.2",
-    "astro": "^6.1.6",
+    "astro": "^6.1.8",
     "preact": "^10.29.1",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "satori": "^0.26.0"

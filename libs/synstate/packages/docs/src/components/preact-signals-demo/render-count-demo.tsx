@@ -40,11 +40,7 @@ export const RenderCountDemo = (): preact.JSX.Element => (
       <button style={buttonStyle} type={'button'} onClick={increment}>
         {'+1'}
       </button>
-      <button
-        style={buttonStyle}
-        type={'button'}
-        onClick={resetSharedCount as () => void}
-      >
+      <button style={buttonStyle} type={'button'} onClick={resetSharedCount}>
         {'Reset'}
       </button>
     </div>

@@ -280,9 +280,6 @@ export class InitializedSyncChildObservableClass<
 
   override pipe<B>(operator: Operator<A, B>): Observable<B>;
   override pipe<B>(operator: Operator<A, B>): Observable<B> {
-    return operator(
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      this as unknown as InitializedObservable<A>,
-    );
+    return operator(this);
   }
 }
