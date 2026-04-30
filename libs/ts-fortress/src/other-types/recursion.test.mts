@@ -524,8 +524,8 @@ describe('recursive', () => {
 
       const NodeIdType = brandedString<'NodeId'>({
         typeName: 'NodeId',
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        defaultValue: 'node-default' as Brand<string, 'NodeId'>,
+
+        defaultValue: 'node-default',
       });
 
       const BrandedNodeType: Type<BrandedNode> = recursion('BrandedNode', () =>
@@ -740,8 +740,8 @@ describe('recursive', () => {
 
       const NodeIdType = brandedString<'NodeId'>({
         typeName: 'NodeId',
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        defaultValue: 'node-default' as Brand<string, 'NodeId'>,
+
+        defaultValue: 'node-default',
       });
 
       const BaseNodeType = record({

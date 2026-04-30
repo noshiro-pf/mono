@@ -56,7 +56,7 @@ export const required = <
     Object.entries(shape).map(
       ([k, v]) => [k, keysToBeRequired.has(k) ? makeRequired(v) : v] as const,
     ),
-  ) satisfies UnknownShape as UnknownShape;
+  ) satisfies UnknownShape;
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return record(requiredShape, {

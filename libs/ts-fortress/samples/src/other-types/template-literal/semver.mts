@@ -6,7 +6,7 @@ const SemVer = t.templateLiteral<SemVer>({
   is: (value: unknown): value is SemVer =>
     typeof value === 'string' && /^\d+\.\d+\.\d+$/u.test(value),
   typeName: 'SemVer',
-  defaultValue: '0.0.0' as SemVer,
+  defaultValue: '0.0.0',
 });
 
 assert.isTrue(SemVer.is('1.2.3'));

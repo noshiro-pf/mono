@@ -93,7 +93,7 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
     } as IntersectionType<Types>;
   }
 
-  return baseType as IntersectionType<Types>;
+  return baseType;
 };
 
 type IntersectionType<Types extends NonEmptyArray<Type<unknown>>> = Type<

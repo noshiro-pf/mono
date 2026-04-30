@@ -90,17 +90,17 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
       return Result.err(errors);
     }
 
-    return Result.ok(a as M);
+    return Result.ok(a);
   };
 
   const fill: Type<M>['fill'] = (a) =>
     !isMap(a)
       ? getDefaultValue()
-      : (new Map(
+      : new Map(
           Array.from(a.entries()).filter(
             ([k, v]) => keyType.is(k) && valueType.is(v),
           ),
-        ) as M);
+        );
 
   return {
     typeName,

@@ -73,8 +73,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
       return Result.err(errors);
     }
 
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return Result.ok(a as unknown as T);
+    return Result.ok(a);
   };
 
   const fill: Type<T>['fill'] = (a) =>

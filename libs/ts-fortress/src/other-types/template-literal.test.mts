@@ -7,7 +7,7 @@ describe(templateLiteral, () => {
     type PathString = `/${string}`;
 
     const PathString = templateLiteral<PathString>({
-      defaultValue: '/' as PathString,
+      defaultValue: '/',
       is: (value): value is PathString =>
         typeof value === 'string' && value.startsWith('/'),
       typeName: 'PathString',
@@ -75,7 +75,7 @@ describe(templateLiteral, () => {
         (value.startsWith('http://') || value.startsWith('https://')) &&
         value.length > 8,
       typeName: 'HttpUrl',
-      defaultValue: 'https://example.com' as HttpUrl,
+      defaultValue: 'https://example.com',
     });
 
     expectType<TypeOf<typeof HttpUrl>, HttpUrl>('=');
@@ -114,7 +114,7 @@ describe(templateLiteral, () => {
       typeName: 'Semver',
       is: (value): value is Semver =>
         typeof value === 'string' && /^\d+\.\d+\.\d+$/u.test(value),
-      defaultValue: '0.0.0' as Semver,
+      defaultValue: '0.0.0',
     });
 
     expectType<TypeOf<typeof Semver>, Semver>('=');
@@ -153,7 +153,7 @@ describe(templateLiteral, () => {
       is: (value): value is HexColor =>
         typeof value === 'string' && /^#[\da-f]{6}$/iu.test(value),
       typeName: 'HexColor',
-      defaultValue: '#000000' as HexColor,
+      defaultValue: '#000000',
     });
 
     expectType<TypeOf<typeof HexColor>, HexColor>('=');
@@ -201,7 +201,7 @@ describe(templateLiteral, () => {
         value.length > 1 &&
         !value.includes('@@'),
       typeName: 'EmailPrefix',
-      defaultValue: 'user@' as EmailPrefix,
+      defaultValue: 'user@',
     });
 
     expectType<TypeOf<typeof EmailPrefix>, EmailPrefix>('=');
@@ -259,7 +259,7 @@ describe(templateLiteral, () => {
       is: (value): value is CustomString =>
         typeof value === 'string' && value.startsWith('prefix-'),
       typeName: 'CustomString',
-      defaultValue: 'prefix-default' as CustomString,
+      defaultValue: 'prefix-default',
     });
 
     test('uses pattern in error message', () => {
@@ -288,7 +288,7 @@ describe(templateLiteral, () => {
         value.startsWith('start') &&
         value.endsWith('end'),
       typeName: 'EdgeCase',
-      defaultValue: 'startend' as EdgeCase,
+      defaultValue: 'startend',
     });
 
     test('validates minimum matching string', () => {

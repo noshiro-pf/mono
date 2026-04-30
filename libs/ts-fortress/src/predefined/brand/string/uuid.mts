@@ -1,6 +1,23 @@
+/// <reference types="ts-type-forge" />
+
 import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
+
+export type UuidVersion = UintRangeInclusive<1, 8>;
+
+export type UuidBaseString<V extends UuidVersion = UuidVersion> =
+  | `${string}-${string}-${V}${string}-${string}-${string}`
+  | '00000000-0000-0000-0000-000000000000'
+  | 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+
+export type Uuid = Brand<UuidBaseString, 'Uuid'>;
+
+export type Uuid4 = Brand<UuidBaseString<4>, 'Uuid'>;
+
+export type Uuid6 = Brand<UuidBaseString<6>, 'Uuid'>;
+
+export type Uuid7 = Brand<UuidBaseString<7>, 'Uuid'>;
 
 /**
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators

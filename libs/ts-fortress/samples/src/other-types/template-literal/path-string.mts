@@ -6,7 +6,7 @@ const PathString = t.templateLiteral<PathString>({
   is: (value: unknown): value is PathString =>
     typeof value === 'string' && value.startsWith('/'),
   typeName: 'PathString',
-  defaultValue: '/' as PathString,
+  defaultValue: '/',
 });
 
 assert.isTrue(PathString.is('/users'));

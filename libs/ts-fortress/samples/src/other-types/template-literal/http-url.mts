@@ -8,7 +8,7 @@ const HttpUrl = t.templateLiteral<HttpUrl>({
     (value.startsWith('http://') || value.startsWith('https://')) &&
     value.length > 7,
   typeName: 'HttpUrl',
-  defaultValue: 'https://example.com' as HttpUrl,
+  defaultValue: 'https://example.com',
 });
 
 assert.isTrue(HttpUrl.is('https://example.com'));

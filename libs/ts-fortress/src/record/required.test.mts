@@ -259,6 +259,7 @@ describe(required, () => {
 
         const resultValue2 = Result.unwrapThrow(result);
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         assert.deepStrictEqual(resultValue2 as UnknownRecord, {
           year: 2000,
           month: 12,
@@ -281,6 +282,7 @@ describe(required, () => {
 
         const resultValue3 = Result.unwrapThrow(result);
 
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         assert.deepStrictEqual(resultValue3 as UnknownRecord, {
           year: 2000,
           month: 12,

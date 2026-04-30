@@ -1,7 +1,11 @@
+/// <reference types="ts-type-forge" />
+
 import { brandedString } from '../../../brand/index.mjs';
 import { boolean, string } from '../../../primitives/index.mjs';
 import { record } from '../../../record/index.mjs';
 import { type Type, type TypeOf } from '../../../type.mjs';
+
+export type Iso8601 = Brand<string, 'Iso8601'>;
 
 /**
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators

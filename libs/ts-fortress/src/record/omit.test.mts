@@ -169,6 +169,7 @@ describe(omit, () => {
 
       expectType<typeof resultValue2, Ym>('=');
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue2 as UnknownRecord, {
         year: 2000,
         month: 12,
@@ -190,6 +191,7 @@ describe(omit, () => {
       const resultValue3 = Result.unwrapThrow(result);
 
       // In allow mode (default), excess properties are kept
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue3 as UnknownRecord, {
         year: 2000,
         month: 12,

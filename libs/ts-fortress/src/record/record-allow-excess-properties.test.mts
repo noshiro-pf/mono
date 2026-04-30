@@ -127,6 +127,7 @@ describe('record allowExcessProperties option', () => {
     const resultValue2 = Result.unwrapThrow(result);
 
     // In allow mode, excess properties are kept
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     assert.deepStrictEqual(resultValue2 as UnknownRecord, {
       name: 42,
       age: 25,
@@ -166,6 +167,7 @@ describe('record allowExcessProperties option', () => {
     const resultValue4 = Result.unwrapThrow(result);
 
     // Default mode is allow, so excess properties are kept
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     assert.deepStrictEqual(resultValue4 as UnknownRecord, {
       name: 42,
       age: 25,
@@ -183,6 +185,7 @@ describe('record allowExcessProperties option', () => {
     const resultValue5 = Result.unwrapThrow(result);
 
     // Default mode is allow, so excess property is kept
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     assert.deepStrictEqual(resultValue5 as UnknownRecord, {
       name: 42,
       age: 25,
@@ -209,6 +212,7 @@ describe('record allowExcessProperties option', () => {
 
     const resultValue = Result.unwrapThrow(result);
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     assert.deepStrictEqual(resultValue as UnknownRecord, {
       name: 42,
       age: 25,

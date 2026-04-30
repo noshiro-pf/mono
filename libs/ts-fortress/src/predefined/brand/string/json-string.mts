@@ -1,6 +1,10 @@
+/// <reference types="ts-type-forge" />
+
 import { isNonNullObject } from 'ts-data-forge';
 import { brandedString } from '../../../brand/index.mjs';
 import { type Type } from '../../../type.mjs';
+
+export type JsonString = Brand<string, 'JsonString'>;
 
 /**
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators

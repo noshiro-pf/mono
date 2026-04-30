@@ -185,12 +185,13 @@ describe(record, () => {
         extra: 'should be kept',
       } as const;
 
-      const result = ymd.validate(input as UnknownRecord);
+      const result = ymd.validate(input);
 
       assert.isTrue(Result.isOk(result));
 
       const resultValue1 = Result.unwrapThrow(result);
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue1 as UnknownRecord, {
         year: 2023,
         month: 6,
@@ -208,7 +209,7 @@ describe(record, () => {
         extra: 'not allowed',
       } as const;
 
-      const result = ymdStrict.validate(input as UnknownRecord);
+      const result = ymdStrict.validate(input);
 
       assert.isTrue(Result.isErr(result));
     });
@@ -219,7 +220,7 @@ describe(record, () => {
         month: 6,
       } as const;
 
-      const result = ymdStrict.validate(input as UnknownRecord);
+      const result = ymdStrict.validate(input);
 
       assert.isTrue(Result.isOk(result));
 
@@ -414,12 +415,13 @@ describe('partial record', () => {
         extra: 'should be kept',
       } as const;
 
-      const result = ymd.validate(input as UnknownRecord);
+      const result = ymd.validate(input);
 
       assert.isTrue(Result.isOk(result));
 
       const resultValue3 = Result.unwrapThrow(result);
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue3 as UnknownRecord, {
         year: 2024,
         month: 8,
@@ -436,7 +438,7 @@ describe('partial record', () => {
         extra: 'not allowed',
       } as const;
 
-      const result = ymdStrict.validate(input as UnknownRecord);
+      const result = ymdStrict.validate(input);
 
       assert.isTrue(Result.isErr(result));
     });
@@ -447,7 +449,7 @@ describe('partial record', () => {
         month: 8,
       } as const;
 
-      const result = ymdStrict.validate(input as UnknownRecord);
+      const result = ymdStrict.validate(input);
 
       assert.isTrue(Result.isOk(result));
 

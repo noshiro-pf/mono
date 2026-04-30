@@ -1,5 +1,9 @@
+/// <reference types="ts-type-forge" />
+
 import { brandedString } from '../../../brand/index.mjs';
 import { type Type } from '../../../type.mjs';
+
+export type Email = Brand<string, 'Email'>;
 
 /**
  * @link https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address

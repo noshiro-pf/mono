@@ -29,7 +29,7 @@ import {
  *   is: (value: unknown): value is PathString =>
  *     typeof value === 'string' && value.startsWith('/'),
  *   typeName: 'PathString',
- *   defaultValue: '/' as PathString,
+ *   defaultValue: '/',
  * });
  *
  * assert.isTrue(PathString.is('/users'));
@@ -52,7 +52,7 @@ import {
  *     (value.startsWith('http://') || value.startsWith('https://')) &&
  *     value.length > 7,
  *   typeName: 'HttpUrl',
- *   defaultValue: 'https://example.com' as HttpUrl,
+ *   defaultValue: 'https://example.com',
  * });
  *
  * assert.isTrue(HttpUrl.is('https://example.com'));
@@ -73,7 +73,7 @@ import {
  *   is: (value: unknown): value is SemVer =>
  *     typeof value === 'string' && /^\d+\.\d+\.\d+$/u.test(value),
  *   typeName: 'SemVer',
- *   defaultValue: '0.0.0' as SemVer,
+ *   defaultValue: '0.0.0',
  * });
  *
  * assert.isTrue(SemVer.is('1.2.3'));

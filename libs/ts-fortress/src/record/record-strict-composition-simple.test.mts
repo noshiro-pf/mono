@@ -182,6 +182,7 @@ describe('record strict composition - simple tests', () => {
       const resultValue = Result.unwrapThrow(result);
 
       // In allow mode (default), excess properties are kept
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue as UnknownRecord, {
         id: '123',
         name: 'John',
@@ -198,13 +199,14 @@ describe('record strict composition - simple tests', () => {
         extra: 'kept',
       } as const;
 
-      const result = permissiveRecord.validate(input as UnknownRecord);
+      const result = permissiveRecord.validate(input);
 
       assert.isTrue(Result.isOk(result));
 
       const resultValue3 = Result.unwrapThrow(result);
 
       // In allow mode (default), excess properties are kept
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue3 as UnknownRecord, {
         id: '123',
         name: 'John',
@@ -237,6 +239,7 @@ describe('record strict composition - simple tests', () => {
       const resultValue = Result.unwrapThrow(result);
 
       // In allow mode (inherited from parent), excess properties are kept
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue as UnknownRecord, {
         id: '123',
         name: 'John',
@@ -249,13 +252,14 @@ describe('record strict composition - simple tests', () => {
 
       const input = { id: '123', name: 'John', extra: 'kept' } as const;
 
-      const result = permissivePicked.validate(input as UnknownRecord);
+      const result = permissivePicked.validate(input);
 
       assert.isTrue(Result.isOk(result));
 
       const resultValue4 = Result.unwrapThrow(result);
 
       // In allow mode (default), excess properties are kept
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue4 as UnknownRecord, {
         id: '123',
         name: 'John',

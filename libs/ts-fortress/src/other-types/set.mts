@@ -62,13 +62,13 @@ export const SetType = <T extends Type<unknown>>(
       return Result.err(errors);
     }
 
-    return Result.ok(a as S);
+    return Result.ok(a);
   };
 
   const fill: Type<S>['fill'] = (a) =>
     !isSet(a)
       ? getDefaultValue()
-      : (new Set(Array.from(a.values()).filter((v) => elementType.is(v))) as S);
+      : new Set(Array.from(a.values()).filter((v) => elementType.is(v)));
 
   return {
     typeName,

@@ -111,6 +111,7 @@ describe(pick, () => {
 
       const resultValue1 = Result.unwrapThrow(result);
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue1 as UnknownRecord, {
         year: 2000,
         month: 12,
@@ -160,6 +161,7 @@ describe(pick, () => {
 
       expectType<typeof resultValue2, Ym>('=');
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue2 as UnknownRecord, {
         year: 2000,
         month: 12,
@@ -174,12 +176,13 @@ describe(pick, () => {
         aaa: 999,
       } as const;
 
-      const result = ym.validate(input as UnknownRecord);
+      const result = ym.validate(input);
 
       assert.isTrue(Result.isOk(result));
 
       const resultValue3 = Result.unwrapThrow(result);
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       assert.deepStrictEqual(resultValue3 as UnknownRecord, {
         year: 2000,
         month: 12,

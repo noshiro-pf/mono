@@ -87,7 +87,7 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
     } as UnionType<Types>;
   }
 
-  return baseType as UnionType<Types>;
+  return baseType;
 };
 
 type UnionType<Types extends NonEmptyArray<Type<unknown>>> = Type<

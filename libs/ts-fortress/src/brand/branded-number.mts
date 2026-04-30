@@ -14,8 +14,7 @@ export const brandedNumber = <K extends string>({
   brand({
     baseType: number(defaultValue),
 
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    defaultValue: defaultValue as Brand<number, K>,
+    defaultValue,
 
     is,
     brandKeys: [typeName],
