@@ -12,5 +12,5 @@ minimumReleaseAgeExclude:
   - ts-codemod-lib
   - syncflow
   - eslint-config-typed
-  # - octokit-safe-types
+  - octokit-safe-types
   - github-settings-as-code
