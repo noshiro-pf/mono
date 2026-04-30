@@ -1,3 +1,9 @@
+## [1.2.7](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.6...v1.2.7) (2026-04-30)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#132](https://github.com/noshiro-pf/github-settings-as-code/issues/132)) ([ef2f6ef](https://github.com/noshiro-pf/github-settings-as-code/commit/ef2f6ef9d05d1535c5e335d094ccf60f96dac0eb))
+
 ## [1.2.6](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.5...v1.2.6) (2026-04-23)
 
 ### Bug Fixes
