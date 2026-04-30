@@ -1,3 +1,9 @@
+## [4.9.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.5...v4.9.6) (2026-04-30)
+
+### Bug Fixes
+
+- fix dependencies ([#321](https://github.com/noshiro-pf/eslint-config-typed/issues/321)) ([2ef258a](https://github.com/noshiro-pf/eslint-config-typed/commit/2ef258a6d6b3ce1c39bce0b341eeb3d386ccfbde))
+
 ## [4.9.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.4...v4.9.5) (2026-04-30)
 
 ### Bug Fixes
