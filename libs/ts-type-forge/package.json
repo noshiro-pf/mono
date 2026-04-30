@@ -72,7 +72,7 @@
     "cspell": "10.0.0",
     "eslint": "9.39.4",
     "eslint-config-typed": "4.9.6",
-    "github-settings-as-code": "1.2.6",
+    "github-settings-as-code": "1.2.7",
     "jiti": "2.6.1",
     "markdownlint": "0.40.0",
     "markdownlint-cli2": "0.22.1",
