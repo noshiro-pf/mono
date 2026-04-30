@@ -1,3 +1,9 @@
+## [7.0.4](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.3...v7.0.4) (2026-04-30)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#286](https://github.com/noshiro-pf/ts-fortress/issues/286)) ([7215022](https://github.com/noshiro-pf/ts-fortress/commit/72150220ee3abe5e5a128edd49ce37385ee5e96e))
+
 ## [7.0.3](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.2...v7.0.3) (2026-04-23)
 
 ### Bug Fixes
