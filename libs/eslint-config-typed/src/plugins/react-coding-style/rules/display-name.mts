@@ -155,7 +155,7 @@ const getDisplayNameAssignment = (
       mut_current.type === AST_NODE_TYPES.VariableDeclaration ||
       mut_current.type === AST_NODE_TYPES.ExportNamedDeclaration
     ) {
-      mut_statement = mut_current as DeepReadonly<TSESTree.Statement>;
+      mut_statement = mut_current;
     }
 
     if (mut_current.type === AST_NODE_TYPES.Program) {
@@ -171,10 +171,7 @@ const getDisplayNameAssignment = (
 
   const program = mut_current;
 
-  const componentIndex = program.body.indexOf(
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    mut_statement as TSESTree.Statement,
-  );
+  const componentIndex = program.body.indexOf(mut_statement);
 
   if (componentIndex === -1) {
     return undefined;

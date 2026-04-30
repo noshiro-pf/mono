@@ -74,7 +74,7 @@ export const expandMustMatchPatternProperties = (
           if (typeof propName === 'string') {
             mut_properties[propName] = {
               $ref: '#/definitions/PatternOrPatternArray',
-            } as JSONSchema4;
+            };
           }
         }
 
@@ -104,8 +104,7 @@ export const expandMustMatchPatternProperties = (
       mut_newDefinitions['PatternOrPatternArray'] = mut_patternTypeSchema;
     }
 
-    mut_newDefinitions['MustMatchType'] =
-      mut_expandedMustMatchSchema as JSONSchema4;
+    mut_newDefinitions['MustMatchType'] = mut_expandedMustMatchSchema;
 
     return {
       ...rest,
@@ -119,7 +118,7 @@ export const expandMustMatchPatternProperties = (
           $ref: '#/definitions/MustMatchType',
         },
       },
-    } as JSONSchema4;
+    };
   }
 
   return schema;

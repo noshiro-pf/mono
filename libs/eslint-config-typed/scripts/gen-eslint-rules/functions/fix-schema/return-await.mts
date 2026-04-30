@@ -10,7 +10,7 @@ export const removeStringTypeFromSchema = (
   if (schema.type === 'string') {
     const { type, ...rest } = schema;
 
-    return rest as JSONSchema4;
+    return rest;
   }
 
   return schema;

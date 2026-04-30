@@ -107,6 +107,7 @@ namespace RulesOfHooks {
 
 /**
  * @description Validates the rules of hooks
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/hooks
  *
  *  ```md
  *  | key            | value   |
@@ -141,6 +142,7 @@ namespace Hooks {
 
 /**
  * @description Validates against calling capitalized functions/methods instead of using JSX
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/capitalized-calls
  *
  *  ```md
  *  | key            | value   |
@@ -175,6 +177,7 @@ namespace CapitalizedCalls {
 
 /**
  * @description Validates that components are static, not recreated every render. Components that are recreated dynamically can reset state and trigger excessive re-rendering
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/static-components
  *
  *  ```md
  *  | key            | value   |
@@ -209,6 +212,7 @@ namespace StaticComponents {
 
 /**
  * @description Validates usage of the useMemo() hook against common mistakes. See [`useMemo()` docs](https://react.dev/reference/react/useMemo) for more information.
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/use-memo
  *
  *  ```md
  *  | key            | value   |
@@ -243,6 +247,7 @@ namespace UseMemo {
 
 /**
  * @description Validates that useMemos always return a value and that the result of the useMemo is used by the component/hook. See [`useMemo()` docs](https://react.dev/reference/react/useMemo) for more information.
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/void-use-memo
  *
  *  ```md
  *  | key            | value   |
@@ -276,41 +281,8 @@ namespace VoidUseMemo {
 }
 
 /**
- * @description Validates against higher order functions defining nested components or hooks. Components and hooks should be defined at the module level
- *
- *  ```md
- *  | key            | value   |
- *  | :------------- | :------ |
- *  | type           | problem |
- *  | deprecated     | false   |
- *  | fixable        | code    |
- *  | hasSuggestions | true    |
- *  | recommended    | true    |
- *  ```
- */
-namespace ComponentHookFactories {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "additionalProperties": true
-   *   }
-   * ]
-   * ```
-   */
-  export type Options = UnknownRecord;
-
-  export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
-}
-
-/**
  * @description Validates that existing manual memoized is preserved by the compiler. React Compiler will only compile components and hooks if its inference [matches or exceeds the existing manual memoization](https://react.dev/learn/react-compiler/introduction#what-should-i-do-about-usememo-usecallback-and-reactmemo)
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/preserve-manual-memoization
  *
  *  ```md
  *  | key            | value   |
@@ -344,7 +316,43 @@ namespace PreserveManualMemoization {
 }
 
 /**
+ * @description Validates that useMemo() and useCallback() specify comprehensive dependencies without extraneous values. See [`useMemo()` docs](https://react.dev/reference/react/useMemo) for more information.
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/memo-dependencies
+ *
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
+ */
+namespace MemoDependencies {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": true
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = UnknownRecord;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
  * @description Validates against usage of libraries which are incompatible with memoization (manual or automatic)
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/incompatible-library
  *
  *  ```md
  *  | key            | value   |
@@ -379,6 +387,7 @@ namespace IncompatibleLibrary {
 
 /**
  * @description Validates against mutating props, state, and other values that [are immutable](https://react.dev/reference/rules/components-and-hooks-must-be-pure#props-and-state-are-immutable)
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/immutability
  *
  *  ```md
  *  | key            | value   |
@@ -413,6 +422,7 @@ namespace Immutability {
 
 /**
  * @description Validates against assignment/mutation of globals during render, part of ensuring that [side effects must render outside of render](https://react.dev/reference/rules/components-and-hooks-must-be-pure#side-effects-must-run-outside-of-render)
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/globals
  *
  *  ```md
  *  | key            | value   |
@@ -447,6 +457,7 @@ namespace Globals {
 
 /**
  * @description Validates correct usage of refs, not reading/writing during render. See the "pitfalls" section in [`useRef()` usage](https://react.dev/reference/react/useRef#usage)
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/refs
  *
  *  ```md
  *  | key            | value   |
@@ -481,6 +492,7 @@ namespace Refs {
 
 /**
  * @description Validates that effect dependencies are memoized
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/memoized-effect-dependencies
  *
  *  ```md
  *  | key            | value   |
@@ -514,7 +526,43 @@ namespace MemoizedEffectDependencies {
 }
 
 /**
- * @description Validates against calling setState synchronously in an effect, which can lead to re-renders that degrade performance
+ * @description Validates that effect dependencies are exhaustive and without extraneous values
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/exhaustive-effect-dependencies
+ *
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | code    |
+ *  | hasSuggestions | true    |
+ *  | recommended    | false   |
+ *  ```
+ */
+namespace ExhaustiveEffectDependencies {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": true
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = UnknownRecord;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Validates against calling setState synchronously in an effect. This can indicate non-local derived data, a derived event pattern, or improper external data synchronization.
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/set-state-in-effect
  *
  *  ```md
  *  | key            | value   |
@@ -549,6 +597,7 @@ namespace SetStateInEffect {
 
 /**
  * @description Validates against deriving values from state in an effect
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/no-deriving-state-in-effects
  *
  *  ```md
  *  | key            | value   |
@@ -583,6 +632,7 @@ namespace NoDerivingStateInEffects {
 
 /**
  * @description Validates usage of error boundaries instead of try/catch for errors in child components
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/error-boundaries
  *
  *  ```md
  *  | key            | value   |
@@ -617,6 +667,7 @@ namespace ErrorBoundaries {
 
 /**
  * @description Validates that [components/hooks are pure](https://react.dev/reference/rules/components-and-hooks-must-be-pure) by checking that they do not call known-impure functions
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/purity
  *
  *  ```md
  *  | key            | value   |
@@ -651,6 +702,7 @@ namespace Purity {
 
 /**
  * @description Validates against setting state during render, which can trigger additional renders and potential infinite render loops
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/set-state-in-render
  *
  *  ```md
  *  | key            | value   |
@@ -685,6 +737,7 @@ namespace SetStateInRender {
 
 /**
  * @description Internal invariants
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/invariant
  *
  *  ```md
  *  | key            | value   |
@@ -719,6 +772,7 @@ namespace Invariant {
 
 /**
  * @description Unimplemented features
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/todo
  *
  *  ```md
  *  | key            | value   |
@@ -753,6 +807,7 @@ namespace Todo {
 
 /**
  * @description Validates against invalid syntax
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/syntax
  *
  *  ```md
  *  | key            | value   |
@@ -787,6 +842,7 @@ namespace Syntax {
 
 /**
  * @description Validates against syntax that we do not plan to support in React Compiler
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/unsupported-syntax
  *
  *  ```md
  *  | key            | value   |
@@ -821,6 +877,7 @@ namespace UnsupportedSyntax {
 
 /**
  * @description Validates the compiler configuration options
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/config
  *
  *  ```md
  *  | key            | value   |
@@ -855,6 +912,7 @@ namespace Config {
 
 /**
  * @description Validates configuration of [gating mode](https://react.dev/reference/react-compiler/gating)
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/gating
  *
  *  ```md
  *  | key            | value   |
@@ -889,6 +947,7 @@ namespace Gating {
 
 /**
  * @description Validates against suppression of other rules
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/rule-suppression
  *
  *  ```md
  *  | key            | value   |
@@ -922,75 +981,8 @@ namespace RuleSuppression {
 }
 
 /**
- * @description Verifies that automatic effect dependencies are compiled if opted-in
- *
- *  ```md
- *  | key            | value   |
- *  | :------------- | :------ |
- *  | type           | problem |
- *  | deprecated     | false   |
- *  | fixable        | code    |
- *  | hasSuggestions | true    |
- *  | recommended    | false   |
- *  ```
- */
-namespace AutomaticEffectDependencies {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "additionalProperties": true
-   *   }
-   * ]
-   * ```
-   */
-  export type Options = UnknownRecord;
-
-  export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
-}
-
-/**
- * @description Validates usage of `fire`
- *
- *  ```md
- *  | key            | value   |
- *  | :------------- | :------ |
- *  | type           | problem |
- *  | deprecated     | false   |
- *  | fixable        | code    |
- *  | hasSuggestions | true    |
- *  | recommended    | false   |
- *  ```
- */
-namespace Fire {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "additionalProperties": true
-   *   }
-   * ]
-   * ```
-   */
-  export type Options = UnknownRecord;
-
-  export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
-}
-
-/**
  * @description Validates usage of fbt
+ * @link https://react.dev/reference/eslint-plugin-react-hooks/lints/fbt
  *
  *  ```md
  *  | key            | value   |
@@ -1023,6 +1015,20 @@ namespace Fbt {
     | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
+/**
+ * @description Deprecated: this rule has been removed in 7.1.0.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | true       |
+ *  ```
+ */
+namespace ComponentHookFactories {
+  export type RuleEntry = 0;
+}
+
 export type EslintReactHooksRules = Readonly<{
   'react-hooks/exhaustive-deps': ExhaustiveDeps.RuleEntry;
   'react-hooks/rules-of-hooks': RulesOfHooks.RuleEntry;
@@ -1031,13 +1037,14 @@ export type EslintReactHooksRules = Readonly<{
   'react-hooks/static-components': StaticComponents.RuleEntry;
   'react-hooks/use-memo': UseMemo.RuleEntry;
   'react-hooks/void-use-memo': VoidUseMemo.RuleEntry;
-  'react-hooks/component-hook-factories': ComponentHookFactories.RuleEntry;
   'react-hooks/preserve-manual-memoization': PreserveManualMemoization.RuleEntry;
+  'react-hooks/memo-dependencies': MemoDependencies.RuleEntry;
   'react-hooks/incompatible-library': IncompatibleLibrary.RuleEntry;
   'react-hooks/immutability': Immutability.RuleEntry;
   'react-hooks/globals': Globals.RuleEntry;
   'react-hooks/refs': Refs.RuleEntry;
   'react-hooks/memoized-effect-dependencies': MemoizedEffectDependencies.RuleEntry;
+  'react-hooks/exhaustive-effect-dependencies': ExhaustiveEffectDependencies.RuleEntry;
   'react-hooks/set-state-in-effect': SetStateInEffect.RuleEntry;
   'react-hooks/no-deriving-state-in-effects': NoDerivingStateInEffects.RuleEntry;
   'react-hooks/error-boundaries': ErrorBoundaries.RuleEntry;
@@ -1050,9 +1057,10 @@ export type EslintReactHooksRules = Readonly<{
   'react-hooks/config': Config.RuleEntry;
   'react-hooks/gating': Gating.RuleEntry;
   'react-hooks/rule-suppression': RuleSuppression.RuleEntry;
-  'react-hooks/automatic-effect-dependencies': AutomaticEffectDependencies.RuleEntry;
-  'react-hooks/fire': Fire.RuleEntry;
   'react-hooks/fbt': Fbt.RuleEntry;
+
+  // deprecated
+  'react-hooks/component-hook-factories': ComponentHookFactories.RuleEntry;
 }>;
 
 export type EslintReactHooksRulesOption = Readonly<{
@@ -1063,13 +1071,14 @@ export type EslintReactHooksRulesOption = Readonly<{
   'react-hooks/static-components': StaticComponents.Options;
   'react-hooks/use-memo': UseMemo.Options;
   'react-hooks/void-use-memo': VoidUseMemo.Options;
-  'react-hooks/component-hook-factories': ComponentHookFactories.Options;
   'react-hooks/preserve-manual-memoization': PreserveManualMemoization.Options;
+  'react-hooks/memo-dependencies': MemoDependencies.Options;
   'react-hooks/incompatible-library': IncompatibleLibrary.Options;
   'react-hooks/immutability': Immutability.Options;
   'react-hooks/globals': Globals.Options;
   'react-hooks/refs': Refs.Options;
   'react-hooks/memoized-effect-dependencies': MemoizedEffectDependencies.Options;
+  'react-hooks/exhaustive-effect-dependencies': ExhaustiveEffectDependencies.Options;
   'react-hooks/set-state-in-effect': SetStateInEffect.Options;
   'react-hooks/no-deriving-state-in-effects': NoDerivingStateInEffects.Options;
   'react-hooks/error-boundaries': ErrorBoundaries.Options;
@@ -1082,7 +1091,5 @@ export type EslintReactHooksRulesOption = Readonly<{
   'react-hooks/config': Config.Options;
   'react-hooks/gating': Gating.Options;
   'react-hooks/rule-suppression': RuleSuppression.Options;
-  'react-hooks/automatic-effect-dependencies': AutomaticEffectDependencies.Options;
-  'react-hooks/fire': Fire.Options;
   'react-hooks/fbt': Fbt.Options;
 }>;

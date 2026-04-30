@@ -161,13 +161,13 @@ ruleTester.run(
 describe('chai API', () => {
   test('assert truthy', () => {
     // @ts-expect-error truthy value is ok
-    // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-assert, total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-call
-    assert.isOk(1 as unknown as boolean);
+    // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-assert, @typescript-eslint/no-unsafe-call
+    assert.isOk(1);
 
     assert.isTrue(true);
 
     // @ts-expect-error truthy value is ok
-    // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-assert, total-functions/no-unsafe-type-assertion
-    assert(1 as unknown as boolean);
+    // eslint-disable-next-line vitest-coding-style/prefer-assert-is-true-over-assert
+    assert(1);
   });
 });

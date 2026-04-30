@@ -34,7 +34,7 @@ export const normalizeArrayItemsProperties = (
         mut_properties[key] = {
           ...restProperty,
           items: firstItem,
-        } as JSONSchema4;
+        };
 
         continue;
       }
@@ -50,5 +50,5 @@ export const normalizeArrayItemsProperties = (
   return {
     ...schema,
     properties: mut_properties,
-  } as JSONSchema4;
+  };
 };

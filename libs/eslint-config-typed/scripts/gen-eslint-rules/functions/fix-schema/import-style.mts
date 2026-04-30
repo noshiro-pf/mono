@@ -46,7 +46,7 @@ export const expandBooleanObjectProperties = (
       return {
         ...schema,
         definitions: mut_newDefinitions,
-      } as JSONSchema4;
+      };
     }
   }
 

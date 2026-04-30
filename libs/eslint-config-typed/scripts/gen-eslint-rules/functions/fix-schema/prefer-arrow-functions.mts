@@ -22,7 +22,7 @@ export const convertPatternToEnum = (schema: JSONSchema4): JSONSchema4 => {
           mut_newProperties[key] = {
             ...rest,
             enum: enumValues,
-          } as JSONSchema4;
+          };
         } else {
           mut_newProperties[key] = value;
         }
@@ -34,7 +34,7 @@ export const convertPatternToEnum = (schema: JSONSchema4): JSONSchema4 => {
     return {
       ...schema,
       properties: mut_newProperties,
-    } as JSONSchema4;
+    };
   }
 
   return schema;

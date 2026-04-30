@@ -11,7 +11,7 @@ export const renameTitleToOptions = (schema: JSONSchema4): JSONSchema4 => {
     return {
       ...rest,
       title: 'Options',
-    } as JSONSchema4;
+    };
   }
 
   return schema;

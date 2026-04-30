@@ -199,8 +199,7 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
 
     return {
       TSAsExpression: (node) => {
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        const typeName = getTypeName(node.typeAnnotation as never);
+        const typeName = getTypeName(node.typeAnnotation);
 
         if (typeName === undefined) return;
 
@@ -225,8 +224,7 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
       },
 
       TSTypeAssertion: (node) => {
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        const typeName = getTypeName(node.typeAnnotation as never);
+        const typeName = getTypeName(node.typeAnnotation);
 
         if (typeName === undefined) return;
 

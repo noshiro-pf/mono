@@ -38,7 +38,7 @@ export const addDefaultValuesToDescription = (
       mut_newProperties[key] = {
         ...prop,
         description: `${existingDescription}@default ${defaultValue}`,
-      } as JSONSchema4;
+      };
     } else {
       mut_newProperties[key] = prop;
     }
@@ -47,5 +47,5 @@ export const addDefaultValuesToDescription = (
   return {
     ...schema,
     properties: mut_newProperties,
-  } as JSONSchema4;
+  };
 };

@@ -15,7 +15,6 @@ await genIndex({
   exclude: ({ absolutePath, fileName }) =>
     fileName.endsWith('.test.mts') ||
     fileName === 'react-base.mts' ||
-    fileName === 'globals.d.mts' ||
     fileName === 'eslint.config.gen.mts' ||
     absolutePath === path.resolve(srcDir, './entry-point.mts') ||
     mm.isMatch(absolutePath, path.resolve(srcDir, './constants/**')) ||

@@ -8,7 +8,7 @@ export const removeArrayTypeFromSchema = (schema: JSONSchema4): JSONSchema4 => {
   if (schema.type === 'array') {
     const { type, ...rest } = schema;
 
-    return rest as JSONSchema4;
+    return rest;
   }
 
   return schema;

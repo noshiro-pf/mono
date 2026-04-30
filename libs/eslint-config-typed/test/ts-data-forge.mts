@@ -1,5 +1,4 @@
 /* eslint-disable functional/no-let */
-/* eslint-disable total-functions/no-unsafe-type-assertion */
 
 import { noop } from './noop.mjs';
 
@@ -20,11 +19,9 @@ import { noop } from './noop.mjs';
 {
   const n = 1 as number;
 
-  // eslint-disable-next-line ts-data-forge/prefer-as-int
-  noop(n as Int);
+  noop(n);
 
-  // eslint-disable-next-line ts-data-forge/prefer-as-int
-  noop((n + 1) as Int);
+  noop(n + 1);
 }
 
 {
