@@ -1,3 +1,9 @@
+## [4.9.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.4...v4.9.5) (2026-04-30)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#320](https://github.com/noshiro-pf/eslint-config-typed/issues/320)) ([e563695](https://github.com/noshiro-pf/eslint-config-typed/commit/e563695be3273933326d31757894f45ddb94715d))
+
 ## [4.9.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.3...v4.9.4) (2026-04-23)
 
 ### Bug Fixes
