@@ -1,3 +1,17 @@
+# [3.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.4.2...v3.0.0) (2026-05-06)
+
+- feat!: ship as side-effect-free named-export library ([#365](https://github.com/noshiro-pf/ts-type-forge/issues/365)) ([f831899](https://github.com/noshiro-pf/ts-type-forge/commit/f8318991603348d016514c950606ce509214b6bb)), closes [#364](https://github.com/noshiro-pf/ts-type-forge/issues/364)
+
+### BREAKING CHANGES
+
+- ts-type-forge no longer exposes its types as ambient
+  globals by default. Consumers that relied on
+  `/// <reference types="ts-type-forge" />` to get every type globally
+  must switch to `/// <reference types="ts-type-forge/global" />`, or
+  move to explicit named imports. The `TSTypeForgeInternals` namespace
+  has been flattened into `TSTypeForgeInternals_*` named exports. The
+  package now ships `dist/` instead of `src/`.
+
 ## [2.4.2](https://github.com/noshiro-pf/ts-type-forge/compare/v2.4.1...v2.4.2) (2026-05-06)
 
 ### Bug Fixes
