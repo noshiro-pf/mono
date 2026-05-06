@@ -1,3 +1,9 @@
+import {
+  type Brand,
+  type UintRange,
+  type UintRangeInclusive,
+} from 'ts-type-forge';
+
 const IGNORE_EMBEDDING = (..._args: readonly unknown[]): void => {};
 
 type User = { id: UserId };

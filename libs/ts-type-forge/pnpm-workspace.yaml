@@ -1,7 +1,3 @@
-onlyBuiltDependencies:
-  - esbuild
-  - unrs-resolver
-
 minimumReleaseAge: 10080 # = 7 days
 minimumReleaseAgeExclude:
   - '@types/**'
@@ -15,3 +11,18 @@ minimumReleaseAgeExclude:
   - eslint-config-typed
   - octokit-safe-types
   - github-settings-as-code
+onlyBuiltDependencies:
+  - esbuild
+  - unrs-resolver
+# `patches/ts-data-forge.patch` strips the
+# `/// <reference types="ts-type-forge" />` line from ts-data-forge's
+# `dist/globals.d.mts`. While developing this branch we do not want that
+# directive resolving to the *old* ts-type-forge package in node_modules
+# and pulling its ambient globals into the program — doing so would cause
+# `test/imports/named-import-side-effect-free.mts` to spuriously pass
+# (the `@ts-expect-error` directives become unused). After a new
+# ts-type-forge release with this branch's flat-export shape, the
+# directive resolves to a globals-free entry, ts-data-forge can update,
+# and this patch can be removed.
+patchedDependencies:
+  ts-data-forge: patches/ts-data-forge.patch

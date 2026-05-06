@@ -20,13 +20,18 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./src/index.d.mts"
+        "types": "./dist/index.d.mts"
+      }
+    },
+    "./global": {
+      "import": {
+        "types": "./dist/global.d.mts"
       }
     }
   },
-  "types": "./src/index.d.mts",
+  "types": "./dist/index.d.mts",
   "files": [
-    "src",
+    "dist",
     "README.md",
     "LICENSE"
   ],
@@ -35,6 +40,12 @@
     "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
     "check:ext": "tsx ./scripts/cmd/check-ext.mts",
     "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "codemod": "run-s codemod:uncommitted:as-const fmt codemod:uncommitted:readonly fmt",
+    "codemod:full": "run-s codemod:full:as-const fmt codemod:full:readonly fmt",
+    "codemod:full:as-const": "append-as-const '{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:full:readonly": "convert-to-readonly '{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:as-const": "append-as-const --uncommitted '{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:readonly": "convert-to-readonly --uncommitted '{scripts,test}/**/*.{mts,tsx}'",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx ./scripts/cmd/embed-samples.mts",
@@ -50,14 +61,18 @@
     "gh:backup-all": "gh-backup-all",
     "gh:backup-repository-settings": "gh-backup-repository-settings",
     "gh:backup-rulesets": "gh-backup-rulesets",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude '*.test.mts' --exclude global.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
-    "test": "tsc --noEmit",
-    "tsc": "tsc --noEmit",
+    "test": "run-p test:*",
+    "test:ambient": "tsc --noEmit -p ./test/imports/tsconfig.ambient.json",
+    "test:named": "tsc --noEmit -p ./test/imports/tsconfig.named.json",
+    "test:src": "tsc --noEmit -p ./tsconfig.json",
+    "tsc": "run-p test:*",
     "tscw": "tsc --noEmit --watch -p ./tsconfig.json",
-    "type-check": "tsc --noEmit",
-    "update-packages": "pnpm update --latest"
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
@@ -68,8 +83,10 @@
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.0",
     "@types/node": "25.6.0",
+    "cmd-ts": "^0.15.0",
     "conventional-changelog-conventionalcommits": "9.3.1",
     "cspell": "10.0.0",
+    "dedent": "^1.7.2",
     "eslint": "9.39.4",
     "eslint-config-typed": "4.9.6",
     "github-settings-as-code": "1.2.7",
@@ -81,8 +98,9 @@
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.2",
     "semantic-release": "25.0.3",
+    "ts-codemod-lib": "^2.1.4",
     "ts-data-forge": "6.9.2",
-    "ts-fortress": "7.0.3",
+    "ts-fortress": "7.0.4",
     "ts-repo-utils": "10.0.0",
     "tslib": "2.8.1",
     "tsx": "4.21.0",

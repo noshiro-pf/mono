@@ -10,7 +10,21 @@ const thisDir = import.meta.dirname;
 
 export default [
   {
-    ignores: ['.eslintrc.cjs', 'docs/**', 'agents/**'],
+    ignores: [
+      '.eslintrc.cjs',
+      'docs/**',
+      'agents/**',
+      // test/imports/ has its own tsconfig (tsconfig.named.json /
+      // tsconfig.ambient.json) and is excluded from the root tsconfig
+      // because the named-import side-effect-free assertions only hold
+      // when src/global.mts is NOT in the program.
+      'test/imports/**',
+      // src/global.mts is excluded from the root tsconfig (so ambient
+      // globals don't leak into the named-import program), so the
+      // typed-linter cannot parse it. The file is auto-generated and
+      // not worth linting.
+      'src/global.mts',
+    ],
   },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
@@ -21,7 +35,7 @@ export default [
   eslintConfigForVitest(),
 
   {
-    files: ['test/**/*.mts', '**/*.test.mts'],
+    files: ['**/*.test.mts'],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-duplicate-type-constituents': 'off',
@@ -56,13 +70,9 @@ export default [
   {
     files: ['src/**'],
     rules: defineKnownRules({
-      'import-x/no-unused-modules': [
-        'error',
-        { unusedExports: true, ignoreExports: ['src/index.d.mts'] },
-      ],
+      'import-x/no-unused-modules': ['error', { unusedExports: true }],
     }),
   },
-
   {
     files: ['samples/**'],
     rules: defineKnownRules({

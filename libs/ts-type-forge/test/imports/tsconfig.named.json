@@ -1,0 +1,11 @@
+{
+  "extends": ["../../configs/tsconfig/tsconfig.type-check.json"],
+  "compilerOptions": {
+    "typeRoots": [],
+    "paths": {
+      "ts-type-forge": ["../../src/index.mts"],
+      "ts-type-forge/global": ["../../src/global.mts"]
+    }
+  },
+  "include": ["./named-import-side-effect-free.mts"]
+}

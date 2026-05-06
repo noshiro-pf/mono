@@ -1,8 +1,13 @@
 {
   "extends": ["./configs/tsconfig/tsconfig.type-check.json"],
+  "compilerOptions": {
+    "paths": {
+      "ts-type-forge": ["./src/index.mts"],
+      "ts-type-forge/global": ["./src/global.mts"]
+    }
+  },
   "include": [
     "./src",
-    "./test",
     "./samples",
     "./scripts",
     "./configs",
@@ -10,5 +15,6 @@
     "./eslint.config.mts",
     "./release.config.js",
     "./.markdownlint-cli2.mjs"
-  ]
+  ],
+  "exclude": ["src/global.mts"]
 }

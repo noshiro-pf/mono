@@ -1,4 +1,5 @@
 import { expectType } from 'ts-data-forge';
+import { type StrictOmit } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 

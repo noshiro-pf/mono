@@ -1,40 +1,76 @@
+import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
-import { genRootIndex } from '../functions/index.mjs';
+import { genGlobal } from '../functions/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const srcDir = path.resolve(projectRootPath, 'src');
 
-const indexFilePath = path.resolve(srcDir, 'index.d.mts');
+const distDir = path.resolve(projectRootPath, './dist');
+
+const globalFilePath = path.resolve(srcDir, 'global.mts');
 
 /**
  * Builds the entire project.
  */
-const build = async (): Promise<void> => {
+const build = async (skipCheck: boolean): Promise<void> => {
   console.log('Starting build process...\n');
 
   await logStep({
-    startMessage: 'Generating root index.d.mts',
+    startMessage: 'Generating per-directory index.mts files',
+    action: () => runCmdStep('pnpm run gi', 'Index generation failed'),
+    successMessage: 'Generated src/**/index.mts',
+  });
+
+  await logStep({
+    startMessage: 'Generating root global.mts',
     action: () =>
       runStep(
-        Result.fromPromise(genRootIndex(srcDir, indexFilePath)),
-        'Failed to generate tsconfig',
+        Result.fromPromise(genGlobal(srcDir, globalFilePath)),
+        'Failed to generate global.mts',
       ),
-    successMessage: 'Generated src/index.d.mts',
+    successMessage: 'Generated src/global.mts',
   });
 
+  if (!skipCheck) {
+    await logStep({
+      startMessage: 'Checking file extensions',
+      action: () =>
+        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+      successMessage: 'File extensions validated',
+    });
+
+    await logStep({
+      startMessage: 'Running type checking',
+      action: () => runCmdStep('tsc --noEmit', 'Type checking failed'),
+      successMessage: 'Type checking passed',
+    });
+  }
+
   await logStep({
-    startMessage: 'Checking file extensions',
+    startMessage: 'Cleaning dist directory',
     action: () =>
-      runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
-    successMessage: 'File extensions validated',
+      runStep(
+        Result.fromPromise(
+          fs.rm(distDir, {
+            recursive: true,
+            force: true,
+          }),
+        ),
+        'Failed to clean dist directory',
+      ),
+    successMessage: 'Cleaned dist directory',
   });
 
   await logStep({
-    startMessage: 'Running type checking',
-    action: () => runCmdStep('tsc --noEmit', 'Type checking failed'),
-    successMessage: 'Type checking passed',
+    startMessage: 'Emitting declarations with tsc',
+    action: () =>
+      runCmdStep(
+        'tsc -p ./configs/tsconfig.build.json',
+        'Declaration emit failed',
+      ),
+    successMessage: 'Declaration emit completed',
   });
 
   console.log('✅ Build completed successfully!\n');
@@ -87,4 +123,4 @@ const runStep = async (
   }
 };
 
-await build();
+await build(process.argv.includes('--skip-check'));

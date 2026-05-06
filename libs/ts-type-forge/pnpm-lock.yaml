@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  ts-data-forge:
+    hash: ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de
+    path: patches/ts-data-forge.patch
+
 importers:
 
   .:
@@ -32,12 +37,18 @@ importers:
       '@types/node':
         specifier: 25.6.0
         version: 25.6.0
+      cmd-ts:
+        specifier: ^0.15.0
+        version: 0.15.0
       conventional-changelog-conventionalcommits:
         specifier: 9.3.1
         version: 9.3.1
       cspell:
         specifier: 10.0.0
         version: 10.0.0
+      dedent:
+        specifier: ^1.7.2
+        version: 1.7.2
       eslint:
         specifier: 9.39.4
         version: 9.39.4(jiti@2.6.1)
@@ -71,12 +82,15 @@ importers:
       semantic-release:
         specifier: 25.0.3
         version: 25.0.3(typescript@5.9.3)
+      ts-codemod-lib:
+        specifier: ^2.1.4
+        version: 2.1.4(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3)
       ts-data-forge:
         specifier: 6.9.2
-        version: 6.9.2(typescript@5.9.3)
+        version: 6.9.2(patch_hash=ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de)(typescript@5.9.3)
       ts-fortress:
-        specifier: 7.0.3
-        version: 7.0.3(typescript@5.9.3)
+        specifier: 7.0.4
+        version: 7.0.4(typescript@5.9.3)
       ts-repo-utils:
         specifier: 10.0.0
         version: 10.0.0(prettier@3.8.3)(typescript@5.9.3)
@@ -1094,6 +1108,9 @@ packages:
     peerDependencies:
       eslint: ^9.0.0 || ^10.0.0
 
+  '@ts-morph/common@0.29.0':
+    resolution: {integrity: sha512-35oUmphHbJvQ/+UTwFNme/t2p3FoKiGJ5auTjjpNTop2dyREspirjMy82PLSC1pnDJ8ah1GU98hwpVt64YXQsg==}
+
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
 
@@ -1619,6 +1636,9 @@ packages:
   cmd-ts@0.15.0:
     resolution: {integrity: sha512-ASyAx+P6DNzNEZ6OYmvjjaLAQeI3L+4lm5rX2Jg8tondXdj06o9JTxi9mfC92KoVbrVFKhZ+j2TfBF8fcura6g==}
 
+  code-block-writer@13.0.3:
+    resolution: {integrity: sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg==}
+
   color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
 
@@ -1785,6 +1805,14 @@ packages:
   decode-named-character-reference@1.3.0:
     resolution: {integrity: sha512-GtpQYB283KrPp6nRw50q3U9/VfOutZOe103qlN7BPP6Ad27xYnOIWv4lPzo8HCAL+mMZofJ9KEy30fq6MfaK6Q==}
 
+  dedent@1.7.2:
+    resolution: {integrity: sha512-WzMx3mW98SN+zn3hgemf4OzdmyNhhhKz5Ay0pUfQiMQ3e1g+xmTJWp/pKdwKVXhdSkAEGIIzqeuWrL3mV/AXbA==}
+    peerDependencies:
+      babel-plugin-macros: ^3.1.0
+    peerDependenciesMeta:
+      babel-plugin-macros:
+        optional: true
+
   deep-extend@0.6.0:
     resolution: {integrity: sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA==}
     engines: {node: '>=4.0.0'}
@@ -1864,8 +1892,8 @@ packages:
   emojilib@2.4.0:
     resolution: {integrity: sha512-5U0rVMU5Y2n2+ykNLQqMoqklN9ICBT/KsvC1Gz6vqHbz2AXXGkG+Pm5rMWk/8Vjrr/mY9985Hi8DYzn1F09Nyw==}
 
-  enhanced-resolve@5.20.1:
-    resolution: {integrity: sha512-Qohcme7V1inbAfvjItgw0EaxVX5q2rdVEZHRBrEQdRZTssLDGsL8Lwrznl8oQ/6kuTJONLaDcGjkNP247XEhcA==}
+  enhanced-resolve@5.21.0:
+    resolution: {integrity: sha512-otxSQPw4lkOZWkHpB3zaEQs6gWYEsmX4xQF68ElXC/TWvGxGMSGOvoNbaLXm6/cS/fSfHtsEdw90y20PCd+sCA==}
     engines: {node: '>=10.13.0'}
 
   entities@4.5.0:
@@ -3432,6 +3460,9 @@ packages:
   parse5@6.0.1:
     resolution: {integrity: sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==}
 
+  path-browserify@1.0.1:
+    resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
+
   path-exists@3.0.0:
     resolution: {integrity: sha512-bpC7GYwiDYQ4wYLe+FA8lhRjhQCMcQGuSgGGqDkg/QerRWw9CmGRT0iSOVRSZJ29NMLZgIzqaljJ63oaL4NIJQ==}
     engines: {node: '>=4'}
@@ -3968,6 +3999,22 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
+  ts-codemod-lib@2.1.4:
+    resolution: {integrity: sha512-6ruJQUu4+fpM572nGsO9Qt8RzCKnS/1MGP+LLXxtQgu9SUR/ezgaMUrWwR/QVR2WY6pJFdbg/IwfvmX36f2TYA==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
+    hasBin: true
+    peerDependencies:
+      cmd-ts: 0.14.3
+      dedent: 1.7.2
+      ts-repo-utils: 8.1.0
+    peerDependenciesMeta:
+      cmd-ts:
+        optional: true
+      dedent:
+        optional: true
+      ts-repo-utils:
+        optional: true
+
   ts-data-forge@6.9.2:
     resolution: {integrity: sha512-mA26aJYgGUoCcjn079d2ZJO7FO8HhSEE0dDbJcv/Xz3vtBoF2WGOGpWzahNO4k6FnmwUAVBRvniCIiqt6cdf/A==}
     engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
@@ -3979,9 +4026,12 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@7.0.3:
-    resolution: {integrity: sha512-wJ4OIPzXOnFsbCxY5Hl0Sr0XexMBbS1ucxGuIRMxcimdOzKSNbR2fJElSrwiW3QZc68RAKs5mkVjpJelzoaU3A==}
-    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
+  ts-fortress@7.0.4:
+    resolution: {integrity: sha512-ZhPEOpwOmtHGeTnV3ABsl5QI2og5vv6Os/vUtqMIz8Vw4ekMQ0YhVDyQ4U4bpiYBMrhCCJr1yFLu3Ap2OXaFbg==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
+
+  ts-morph@28.0.0:
+    resolution: {integrity: sha512-Wp3tnZ2bzwxyTZMtgWVzXDfm7lB1Drz+y9DmmYH/L702PQhPyVrp3pkou3yIz4qjS14GY9kcpmLiOOMvl8oG1g==}
 
   ts-repo-utils@10.0.0:
     resolution: {integrity: sha512-DtyaywPZ1Rvk/A6D2GwJDxsv2Vraxgr0uB4P7B1WCzvQfNltfjXClEFar31Z88VWv7r2i/XPXpD4cb1cCWC7Zw==}
@@ -3990,9 +4040,9 @@ packages:
     peerDependencies:
       prettier: '>=3.0.0'
 
-  ts-type-forge@2.4.0:
-    resolution: {integrity: sha512-YwDGgDzkqcsvF+YxmqRMnXEd9YfytLkBt6o1iRAmVx6+MJEhRCVD0bLTBu0WEn3iEzOByEkXdvaOi2XrDv9qgA==}
-    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
+  ts-type-forge@2.4.1:
+    resolution: {integrity: sha512-T//uRe5vHUn+R/DYzPxT2iyDNW3BV1ZWVRNB5358/fsbx2828b/QNzM22CA3lJD/MdTJK0skoZHpNRf1qGiF3w==}
+    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
 
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
@@ -5313,6 +5363,12 @@ snapshots:
       estraverse: 5.3.0
       picomatch: 4.0.4
 
+  '@ts-morph/common@0.29.0':
+    dependencies:
+      minimatch: 10.2.5
+      path-browserify: 1.0.1
+      tinyglobby: 0.2.16
+
   '@tybys/wasm-util@0.10.1':
     dependencies:
       tslib: 2.8.1
@@ -5898,6 +5954,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  code-block-writer@13.0.3: {}
+
   color-convert@1.9.3:
     dependencies:
       color-name: 1.1.3
@@ -6108,6 +6166,8 @@ snapshots:
     dependencies:
       character-entities: 2.0.2
 
+  dedent@1.7.2: {}
+
   deep-extend@0.6.0: {}
 
   deep-is@0.1.4: {}
@@ -6174,7 +6234,7 @@ snapshots:
 
   emojilib@2.4.0: {}
 
-  enhanced-resolve@5.20.1:
+  enhanced-resolve@5.21.0:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
@@ -6380,7 +6440,7 @@ snapshots:
       is-glob: 4.0.3
       is-immutable-type: 5.0.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       micromatch: 4.0.8
-      ts-data-forge: 6.9.2(typescript@5.9.3)
+      ts-data-forge: 6.9.2(patch_hash=ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de)(typescript@5.9.3)
       tsutils: 3.21.0(typescript@5.9.3)
       typescript: 5.9.3
       typescript-eslint: 8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
@@ -6557,7 +6617,7 @@ snapshots:
   eslint-plugin-n@17.24.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@2.6.1))
-      enhanced-resolve: 5.20.1
+      enhanced-resolve: 5.21.0
       eslint: 9.39.4(jiti@2.6.1)
       eslint-plugin-es-x: 7.8.0(eslint@9.39.4(jiti@2.6.1))
       get-tsconfig: 4.14.0
@@ -6960,8 +7020,8 @@ snapshots:
       '@octokit/core': 7.0.6
       dotenv: 17.4.2
       octokit-safe-types: 1.2.16(typescript@5.9.3)
-      ts-data-forge: 6.9.2(typescript@5.9.3)
-      ts-fortress: 7.0.3(typescript@5.9.3)
+      ts-data-forge: 6.9.2(patch_hash=ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de)(typescript@5.9.3)
+      ts-fortress: 7.0.4(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -7874,8 +7934,8 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
-      ts-data-forge: 6.9.2(typescript@5.9.3)
-      ts-fortress: 7.0.3(typescript@5.9.3)
+      ts-data-forge: 6.9.2(patch_hash=ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de)(typescript@5.9.3)
+      ts-fortress: 7.0.4(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -7981,6 +8041,8 @@ snapshots:
   parse5@5.1.1: {}
 
   parse5@6.0.1: {}
+
+  path-browserify@1.0.1: {}
 
   path-exists@3.0.0: {}
 
@@ -8617,10 +8679,21 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-data-forge@6.9.2(typescript@5.9.3):
+  ts-codemod-lib@2.1.4(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3):
+    dependencies:
+      ts-data-forge: 6.9.2(patch_hash=ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de)(typescript@5.9.3)
+      ts-morph: 28.0.0
+    optionalDependencies:
+      cmd-ts: 0.15.0
+      dedent: 1.7.2
+      ts-repo-utils: 10.0.0(prettier@3.8.3)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - typescript
+
+  ts-data-forge@6.9.2(patch_hash=ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de)(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 8.0.0
-      ts-type-forge: 2.4.0
+      ts-type-forge: 2.4.1
       typescript: 5.9.3
 
   ts-declaration-location@1.0.7(typescript@5.9.3):
@@ -8628,13 +8701,18 @@ snapshots:
       picomatch: 4.0.4
       typescript: 5.9.3
 
-  ts-fortress@7.0.3(typescript@5.9.3):
+  ts-fortress@7.0.4(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 8.0.0
-      ts-data-forge: 6.9.2(typescript@5.9.3)
-      ts-type-forge: 2.4.0
+      ts-data-forge: 6.9.2(patch_hash=ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de)(typescript@5.9.3)
+      ts-type-forge: 2.4.1
     transitivePeerDependencies:
       - typescript
+
+  ts-morph@28.0.0:
+    dependencies:
+      '@ts-morph/common': 0.29.0
+      code-block-writer: 13.0.3
 
   ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3):
     dependencies:
@@ -8645,13 +8723,13 @@ snapshots:
       fast-glob: 3.3.3
       micromatch: 4.0.8
       prettier: 3.8.3
-      ts-data-forge: 6.9.2(typescript@5.9.3)
+      ts-data-forge: 6.9.2(patch_hash=ab87d2c56a27d72da09b23fae67a335ad033612baa86061888b2b7260a3792de)(typescript@5.9.3)
       tsx: 4.21.0
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  ts-type-forge@2.4.0: {}
+  ts-type-forge@2.4.1: {}
 
   tsconfig-paths@3.15.0:
     dependencies:

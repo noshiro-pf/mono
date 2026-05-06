@@ -11,8 +11,9 @@ const config = {
   exclude: [
     './**/index.mts',
     './**/*.test.mts',
+    './**/_internals.mts',
     './entry-point.mts',
-    './globals.d.mts',
+    './global.mts',
   ].map((p) => path.resolve(srcDir, p)),
   out: outDir,
   gitRevision: 'main',

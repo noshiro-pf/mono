@@ -1,4 +1,5 @@
 /* eslint-disable total-functions/no-unsafe-type-assertion */
+import { type JsonObject, type JsonValue } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 const jsonString =

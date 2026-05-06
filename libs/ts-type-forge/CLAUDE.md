@@ -47,7 +47,7 @@ The `expectType` utility provides a DSL for type assertions:
 
 ### Type-Level Only Library
 
-This is a pure TypeScript type utility library with **no runtime code**. All files in `src/` are `.d.mts` declaration files that provide type-level operations.
+This is a pure TypeScript type utility library with **no runtime code**. All files in `src/` are `.mts` modules that contain only type declarations (`export type`, `declare global`).
 
 ### Module Organization
 
@@ -63,7 +63,7 @@ Types are organized into logical categories:
 
 ### Key Patterns
 
-1. **Triple-Slash References**: The main `index.d.mts` uses triple-slash directives to include all types globally
+1. **Dual API**: The main `index.mts` exports each named type for `import { X } from 'ts-type-forge'`. A separate `global.mts` (loaded via `/// <reference types="ts-type-forge/global" />` or the `ts-type-forge/global` subpath) re-declares the same types as ambient globals.
 2. **Namespace Pattern**: Complex utilities like `List` use namespaces to group related operations
 3. **Recursive Types**: Many operations use recursive conditional types for tuple/object manipulation
 4. **Delegation**: List operations often delegate to Tuple operations for fixed-length arrays
@@ -71,8 +71,7 @@ Types are organized into logical categories:
 
 ### File Naming Convention
 
-- All type definition files use `.d.mts` extension
-- Test files use `.mts` extension
+- All source and test files use the `.mts` extension
 - Documentation is auto-generated in the `docs/` directory
 
 ## Configuration Notes

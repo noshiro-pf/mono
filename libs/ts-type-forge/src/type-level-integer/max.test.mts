@@ -1,0 +1,18 @@
+import { expectType } from 'ts-data-forge';
+import { type Index } from './index-type.mjs';
+import { type Max } from './max.mjs';
+
+expectType<Max<0 | 1 | 2>, 2>('=');
+
+expectType<Max<0>, 0>('=');
+
+expectType<Max<0 | 1 | 3 | 5 | 6>, 6>('=');
+
+expectType<Max<0 | 1 | 3 | 5 | 6 | 6>, 6>('=');
+
+expectType<Max<6 | 6>, 6>('=');
+
+expectType<Max<Index<64>>, 63>('=');
+
+// invalid input
+expectType<Max<never>, never>('=');

@@ -114,6 +114,6 @@ The test suite covers the following categories:
 
 ## Files
 
-- `src/record/deep-pick-omit.d.mts` -- Type definitions
-- `test/record/deep-pick-omit.mts` -- Type-level tests
-- `src/index.d.mts` -- Triple-slash reference (entry point)
+- `src/record/deep-pick-omit.mts` -- Type definitions
+- `src/record/deep-pick-omit.test.mts` -- Type-level tests
+- `src/index.mts` -- Re-exports each named type for `import { X } from 'ts-type-forge'`

@@ -1,0 +1,617 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ts-type-forge</title><meta name="description" content="Documentation for ts-type-forge"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script><link rel="stylesheet" href="assets/typedoc-github-style.css"/></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">ts-type-forge</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"></div><div class="tsd-panel tsd-typography"><h1 id="ts-type-forge" class="tsd-anchor-link">ts-type-forge<a href="#ts-type-forge" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<p><a href="https://www.npmjs.com/package/ts-type-forge"><img src="https://img.shields.io/npm/v/ts-type-forge.svg" alt="npm version"></a></p>
+<h2 id="documentation" class="tsd-anchor-link">Documentation<a href="#documentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li>API reference: <a href="https://noshiro-pf.github.io/ts-type-forge/">https://noshiro-pf.github.io/ts-type-forge/</a></li>
+</ul>
+<p><a href="https://www.npmjs.com/package/ts-type-forge"><img src="https://img.shields.io/npm/dm/ts-type-forge.svg" alt="npm downloads"></a>
+<a href="./LICENSE"><img src="https://img.shields.io/npm/l/ts-type-forge.svg" alt="License"></a></p>
+<p><strong>ts-type-forge</strong> is a comprehensive TypeScript type utility library that provides powerful type-level operations with zero runtime cost. It enhances TypeScript development by offering advanced type manipulations, strict type checking utilities, and comprehensive type safety features.</p>
+<h2 id="features" class="tsd-anchor-link">Features<a href="#features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>This library offers a comprehensive suite of type-level utilities, including:</p>
+<ul>
+<li><strong>Advanced Type Utilities</strong>: Enhanced versions of built-in types like <a href="modules/record_std.html#L86"><code>StrictExclude</code></a>, <a href="modules/record_std.html#L120"><code>StrictOmit</code></a>, <a href="modules/record_std.html#L155"><code>ReadonlyRecord</code></a>, and many more.</li>
+<li><strong>Compile-Time Type Checking</strong>: Assert type relationships at compile time with comprehensive condition types.</li>
+<li><strong>Branded Types</strong>: Extensive collection of branded number types (<code>Int</code>, <code>Uint</code>, <code>SafeInt</code>, <code>FiniteNumber</code>, etc.) for enhanced type safety.</li>
+<li><strong>Array and Tuple Utilities</strong>: Type-safe operations with <code>List</code> and <code>Tuple</code> namespaces for complex array manipulations.</li>
+<li><strong>Record Manipulation</strong>: Deep operations like <code>DeepReadonly</code>, <code>DeepPartial</code>, and advanced path-based record updates.</li>
+<li><strong>Type-Level Arithmetic</strong>: Integer operations, ranges (<code>UintRange</code>), and mathematical type computations.</li>
+<li><strong>Global Type Availability</strong>: <strong>No need for import statements</strong> when using Triple-Slash Directives.</li>
+<li><strong>Zero Runtime Cost</strong>: Pure type-level operations with no runtime dependencies.</li>
+<li><strong>Comprehensive Testing</strong>: Thoroughly tested for type correctness with custom type-testing utilities.</li>
+</ul>
+<h2 id="installation" class="tsd-anchor-link">Installation<a href="#installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-3">--save-dev</span><span class="hl-1"> </span><span class="hl-2">ts-type-forge</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Or with other package managers:</p>
+<pre><code class="bash"><span class="hl-4"># Yarn</span><br/><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-3">--dev</span><span class="hl-1"> </span><span class="hl-2">ts-type-forge</span><br/><br/><span class="hl-4"># pnpm</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-3">--save-dev</span><span class="hl-1"> </span><span class="hl-2">ts-type-forge</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="typescript-configuration" class="tsd-anchor-link">TypeScript Configuration<a href="#typescript-configuration" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>ts-type-forge works best with strict TypeScript settings:</p>
+<pre><code class="json"><span class="hl-1">{</span><br/><span class="hl-1">    </span><span class="hl-5">&quot;compilerOptions&quot;</span><span class="hl-1">: {</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;strict&quot;</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">, </span><span class="hl-4">// important</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;noUncheckedIndexedAccess&quot;</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">, </span><span class="hl-4">// important</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;noPropertyAccessFromIndexSignature&quot;</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">, </span><span class="hl-4">// important</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;noFallthroughCasesInSwitch&quot;</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;noImplicitOverride&quot;</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;noImplicitReturns&quot;</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;noUnusedLocals&quot;</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;noUnusedParameters&quot;</span><span class="hl-1">: </span><span class="hl-3">true</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;allowUnreachableCode&quot;</span><span class="hl-1">: </span><span class="hl-3">false</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;allowUnusedLabels&quot;</span><span class="hl-1">: </span><span class="hl-3">false</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-5">&quot;exactOptionalPropertyTypes&quot;</span><span class="hl-1">: </span><span class="hl-3">false</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="how-to-use" class="tsd-anchor-link">How to use<a href="#how-to-use" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>There are two ways to use the types provided by <code>ts-type-forge</code>:</p>
+<ol>
+<li>
+<p><strong>Explicit Imports (Recommended — side-effect free):</strong>
+Import the types you need by name. Only the imported types come into scope; nothing else from <code>ts-type-forge</code> is added to the global namespace, so the package can be loaded without affecting the rest of your project.</p>
+<pre><code class="ts"><span class="hl-4">// src/types/dice.ts</span><br/><span class="hl-6">import</span><span class="hl-1"> { </span><span class="hl-6">type</span><span class="hl-1"> </span><span class="hl-7">UintRange</span><span class="hl-1"> } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;ts-type-forge&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">DiceValue</span><span class="hl-1"> = </span><span class="hl-8">UintRange</span><span class="hl-1">&lt;</span><span class="hl-9">1</span><span class="hl-1">, </span><span class="hl-9">7</span><span class="hl-1">&gt;; </span><span class="hl-4">// 1 | 2 | 3 | 4 | 5 | 6</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>
+<p><strong>Triple-Slash Directive (opt-in to ambient access):</strong>
+When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-forge/global&quot; /&gt;</code> to any <code>.ts</code> file in your project (e.g., <code>globals.d.ts</code> or at the top of a frequently used file included in the tsconfig.json). This makes every type provided by <code>ts-type-forge</code> globally available throughout your project — useful for prototyping or for projects that already rely on ambient typings.</p>
+<pre><code class="ts"><span class="hl-4">// src/globals.d.ts or any other .ts file</span><br/><span class="hl-4">/// </span><span class="hl-10">&lt;</span><span class="hl-11">reference</span><span class="hl-4"> </span><span class="hl-12">types</span><span class="hl-1">=</span><span class="hl-2">&quot;ts-type-forge/global&quot;</span><span class="hl-4"> </span><span class="hl-10">/&gt;</span><br/><br/><span class="hl-4">// src/types/dice.ts</span><br/><span class="hl-4">// No import needed</span><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">DiceValue</span><span class="hl-1"> = </span><span class="hl-8">UintRange</span><span class="hl-1">&lt;</span><span class="hl-9">1</span><span class="hl-1">, </span><span class="hl-9">7</span><span class="hl-1">&gt;; </span><span class="hl-4">// 1 | 2 | 3 | 4 | 5 | 6</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+</ol>
+<h2 id="core-modules" class="tsd-anchor-link">Core Modules<a href="#core-modules" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="🎯-type-conditions-and-predicates" class="tsd-anchor-link">🎯 Type Conditions and Predicates<a href="#🎯-type-conditions-and-predicates" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Essential type-level conditional logic for advanced type operations.</p>
+<ul>
+<li><strong>Type Equality</strong> - <code>TypeEq</code> for exact type matching</li>
+<li><strong>Type Extensions</strong> - <code>TypeExtends</code> for subtype relationships</li>
+<li><strong>Union Detection</strong> - <code>IsUnion</code> for union type identification</li>
+<li><strong>Never Detection</strong> - <code>IsNever</code> for never type checking</li>
+</ul>
+<h3 id="🔧-record-and-object-types" class="tsd-anchor-link">🔧 Record and Object Types<a href="#🔧-record-and-object-types" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Advanced object type manipulations with strict type safety.</p>
+<ul>
+<li><strong>Strict Operations</strong> - <code>StrictOmit</code>, <code>StrictPick</code>, <code>StrictExclude</code> with key validation</li>
+<li><strong>Deep Operations</strong> - <code>DeepReadonly</code>, <code>DeepPartial</code>, <code>DeepRequired</code></li>
+<li><strong>Partial Utilities</strong> - <code>PartiallyPartial</code>, <code>PartiallyOptional</code>, <code>PartiallyRequired</code></li>
+<li><strong>Record Paths</strong> - <code>RecordPaths</code>, <code>RecordValueAtPath</code> for type-safe property access</li>
+</ul>
+<h3 id="🔢-branded-number-types" class="tsd-anchor-link">🔢 Branded Number Types<a href="#🔢-branded-number-types" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Comprehensive branded types for enhanced numeric type safety.</p>
+<ul>
+<li><strong>Basic Types</strong> - <code>Int</code>, <code>Uint</code>, <code>SafeInt</code>, <code>FiniteNumber</code></li>
+<li><strong>Range Types</strong> - <code>Int16</code>, <code>Int32</code>, <code>Uint16</code>, <code>Uint32</code></li>
+<li><strong>Constraint Types</strong> - <code>PositiveInt</code>, <code>NonZeroInt</code>, <code>NonNegativeInt</code></li>
+<li><strong>Floating Point</strong> - <code>Float32</code>, <code>Float64</code> with proper constraints</li>
+</ul>
+<h3 id="📋-array-and-tuple-operations" class="tsd-anchor-link">📋 Array and Tuple Operations<a href="#📋-array-and-tuple-operations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Type-safe array and tuple utilities with functional programming patterns.</p>
+<ul>
+<li><strong>Array Types</strong> - <code>NonEmptyArray</code>, <code>ArrayOfLength</code>, <code>ArrayAtLeastLen</code></li>
+<li><strong>List Namespace</strong> - Comprehensive list operations (Head, Tail, Take, Skip, etc.)</li>
+<li><strong>Tuple Namespace</strong> - Type-safe tuple manipulations with compile-time guarantees</li>
+</ul>
+<h3 id="🧮-type-level-arithmetic" class="tsd-anchor-link">🧮 Type-Level Arithmetic<a href="#🧮-type-level-arithmetic" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Mathematical operations performed entirely at the type level.</p>
+<ul>
+<li><strong>Integer Operations</strong> - <code>Increment</code>, <code>Decrement</code>, <code>AbsoluteValue</code></li>
+<li><strong>Ranges</strong> - <code>UintRange</code>, <code>UintRangeInclusive</code> for precise numeric constraints</li>
+<li><strong>Comparisons</strong> - <code>Max</code>, <code>Min</code> for type-level comparisons</li>
+</ul>
+<h3 id="🌐-constants-and-primitives" class="tsd-anchor-link">🌐 Constants and Primitives<a href="#🌐-constants-and-primitives" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Pre-defined type constants for common use cases.</p>
+<ul>
+<li><strong>Basic Constants</strong> - <code>Primitive</code>, <code>FalsyValue</code>, <code>UnknownRecord</code></li>
+<li><strong>Web Types</strong> - <code>HTTPRequestMethod</code> for web development</li>
+<li><strong>Numeric Enums</strong> - <code>MonthEnum</code>, <code>DateEnum</code>, <code>HoursEnum</code>, etc.</li>
+</ul>
+<h2 id="usage-examples" class="tsd-anchor-link">Usage Examples<a href="#usage-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Here are detailed examples showcasing the power of ts-type-forge's type utilities.</p>
+<p>For a comprehensive list of all available types and their detailed documentation, please refer to the <a href="#api-reference">API Reference</a> section.</p>
+<h3 id="1-type-level-conditional-logic-with-and" class="tsd-anchor-link">1. Type-Level Conditional Logic with <code>TypeEq</code> and <code>TypeExtends</code><a href="#1-type-level-conditional-logic-with-and" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>The type utilities allow you to perform complex type checking and assertions at compile time.</p>
+<pre><code class="tsx"><span class="hl-4">// No import needed if using triple-slash directive</span><br/><span class="hl-4">// import type { TypeEq, TypeExtends } from &#39;ts-type-forge&#39;; // if importing explicitly</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">User</span><span class="hl-1"> = { </span><span class="hl-7">id</span><span class="hl-1">: </span><span class="hl-8">number</span><span class="hl-1">; </span><span class="hl-7">name</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1"> };</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">Admin</span><span class="hl-1"> = { </span><span class="hl-7">id</span><span class="hl-1">: </span><span class="hl-8">number</span><span class="hl-1">; </span><span class="hl-7">name</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">; </span><span class="hl-7">role</span><span class="hl-1">: </span><span class="hl-2">&#39;admin&#39;</span><span class="hl-1"> };</span><br/><br/><span class="hl-4">// Check exact type equality</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">IsExactMatch</span><span class="hl-1"> = </span><span class="hl-8">TypeEq</span><span class="hl-1">&lt;</span><span class="hl-8">User</span><span class="hl-1">, </span><span class="hl-8">Admin</span><span class="hl-1">&gt;; </span><span class="hl-4">// false</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">IsSameType</span><span class="hl-1"> = </span><span class="hl-8">TypeEq</span><span class="hl-1">&lt;</span><span class="hl-8">User</span><span class="hl-1">, </span><span class="hl-8">User</span><span class="hl-1">&gt;; </span><span class="hl-4">// true</span><br/><br/><span class="hl-4">// Check type extension relationships</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">AdminExtendsUser</span><span class="hl-1"> = </span><span class="hl-8">TypeExtends</span><span class="hl-1">&lt;</span><span class="hl-8">Admin</span><span class="hl-1">, </span><span class="hl-8">User</span><span class="hl-1">&gt;; </span><span class="hl-4">// true</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">UserExtendsAdmin</span><span class="hl-1"> = </span><span class="hl-8">TypeExtends</span><span class="hl-1">&lt;</span><span class="hl-8">User</span><span class="hl-1">, </span><span class="hl-8">Admin</span><span class="hl-1">&gt;; </span><span class="hl-4">// false</span><br/><br/><span class="hl-4">// Use in conditional types</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">GetUserType</span><span class="hl-1">&lt;</span><span class="hl-8">T</span><span class="hl-1">&gt; =</span><br/><span class="hl-1">    </span><span class="hl-8">TypeExtends</span><span class="hl-1">&lt;</span><span class="hl-8">T</span><span class="hl-1">, </span><span class="hl-8">Admin</span><span class="hl-1">&gt; </span><span class="hl-3">extends</span><span class="hl-1"> </span><span class="hl-8">true</span><br/><span class="hl-1">        ? </span><span class="hl-2">&#39;admin&#39;</span><br/><span class="hl-1">        : </span><span class="hl-8">TypeExtends</span><span class="hl-1">&lt;</span><span class="hl-8">T</span><span class="hl-1">, </span><span class="hl-8">User</span><span class="hl-1">&gt; </span><span class="hl-3">extends</span><span class="hl-1"> </span><span class="hl-8">true</span><br/><span class="hl-1">          ? </span><span class="hl-2">&#39;user&#39;</span><br/><span class="hl-1">          : </span><span class="hl-2">&#39;unknown&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">AdminType</span><span class="hl-1"> = </span><span class="hl-8">GetUserType</span><span class="hl-1">&lt;</span><span class="hl-8">Admin</span><span class="hl-1">&gt;; </span><span class="hl-4">// &#39;admin&#39;</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">UserType</span><span class="hl-1"> = </span><span class="hl-8">GetUserType</span><span class="hl-1">&lt;</span><span class="hl-8">User</span><span class="hl-1">&gt;; </span><span class="hl-4">// &#39;user&#39;</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="2-deep-object-manipulation-with-and" class="tsd-anchor-link">2. Deep Object Manipulation with <code>DeepReadonly</code> and <code>DeepPartial</code><a href="#2-deep-object-manipulation-with-and" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Transform nested object types with precise control over mutability and optionality.</p>
+<pre><code class="tsx"><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">Config</span><span class="hl-1"> = {</span><br/><span class="hl-1">    </span><span class="hl-7">port</span><span class="hl-1">: </span><span class="hl-8">number</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-7">database</span><span class="hl-1">: {</span><br/><span class="hl-1">        </span><span class="hl-7">host</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">        </span><span class="hl-7">port</span><span class="hl-1">: </span><span class="hl-8">number</span><span class="hl-1">;</span><br/><span class="hl-1">        </span><span class="hl-7">credentials</span><span class="hl-1">?: {</span><br/><span class="hl-1">            </span><span class="hl-7">user</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">            </span><span class="hl-7">pass</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">        };</span><br/><span class="hl-1">    };</span><br/><span class="hl-1">    </span><span class="hl-7">features</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">[];</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-4">// Create a type where all properties, nested or not, are readonly</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">ReadonlyConfig</span><span class="hl-1"> = </span><span class="hl-8">DeepReadonly</span><span class="hl-1">&lt;</span><span class="hl-8">Config</span><span class="hl-1">&gt;;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">config</span><span class="hl-1">: </span><span class="hl-8">ReadonlyConfig</span><span class="hl-1"> = {</span><br/><span class="hl-1">    </span><span class="hl-7">port:</span><span class="hl-1"> </span><span class="hl-9">8080</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">database:</span><span class="hl-1"> {</span><br/><span class="hl-1">        </span><span class="hl-7">host:</span><span class="hl-1"> </span><span class="hl-2">&#39;localhost&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-7">port:</span><span class="hl-1"> </span><span class="hl-9">5432</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-7">credentials:</span><span class="hl-1"> {</span><br/><span class="hl-1">            </span><span class="hl-7">user:</span><span class="hl-1"> </span><span class="hl-2">&#39;admin&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">            </span><span class="hl-7">pass:</span><span class="hl-1"> </span><span class="hl-2">&#39;secret&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">        },</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">    </span><span class="hl-7">features:</span><span class="hl-1"> [</span><span class="hl-2">&#39;featureA&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;featureB&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-4">// @ts-expect-error Cannot assign to &#39;port&#39; because it is a read-only property</span><br/><span class="hl-7">config</span><span class="hl-1">.</span><span class="hl-7">port</span><span class="hl-1"> = </span><span class="hl-9">8081</span><span class="hl-1">;</span><br/><br/><span class="hl-4">// @ts-expect-error Cannot assign to &#39;host&#39; because it is a read-only property</span><br/><span class="hl-7">config</span><span class="hl-1">.</span><span class="hl-7">database</span><span class="hl-1">.</span><span class="hl-7">host</span><span class="hl-1"> = </span><span class="hl-2">&#39;remote&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">// @ts-expect-error Property &#39;push&#39; does not exist on type &#39;readonly string[]&#39;</span><br/><span class="hl-7">config</span><span class="hl-1">.</span><span class="hl-7">features</span><span class="hl-1">.</span><span class="hl-0">push</span><span class="hl-1">(</span><span class="hl-2">&#39;featureC&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-4">// Create a type where all properties are optional (useful for partial updates)</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">PartialConfig</span><span class="hl-1"> = </span><span class="hl-8">DeepPartial</span><span class="hl-1">&lt;</span><span class="hl-8">Config</span><span class="hl-1">&gt;;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">partialUpdate</span><span class="hl-1">: </span><span class="hl-8">PartialConfig</span><span class="hl-1"> = {</span><br/><span class="hl-1">    </span><span class="hl-7">database:</span><span class="hl-1"> {</span><br/><span class="hl-1">        </span><span class="hl-7">host:</span><span class="hl-1"> </span><span class="hl-2">&#39;new-host&#39;</span><span class="hl-1">, </span><span class="hl-4">// Only update specific fields</span><br/><span class="hl-1">        </span><span class="hl-4">// port and credentials are optional</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">    </span><span class="hl-4">// port and features are optional</span><br/><span class="hl-1">};</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="3-strict-type-operations-with" class="tsd-anchor-link">3. Strict Type Operations with <code>StrictOmit</code><a href="#3-strict-type-operations-with" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Enhanced versions of built-in <code>Omit</code> utility that provide compile-time key validation.</p>
+<pre><code class="tsx"><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">UserProfile</span><span class="hl-1"> = </span><span class="hl-8">Readonly</span><span class="hl-1">&lt;{</span><br/><span class="hl-1">    </span><span class="hl-7">id</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-7">username</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-7">email</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-7">lastLogin</span><span class="hl-1">: </span><span class="hl-8">Date</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-7">bio</span><span class="hl-1">?: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">}&gt;;</span><br/><br/><span class="hl-4">// StrictOmit ensures keys actually exist in the source type</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">UserCreationData</span><span class="hl-1"> = </span><span class="hl-8">StrictOmit</span><span class="hl-1">&lt;</span><span class="hl-8">UserProfile</span><span class="hl-1">, </span><span class="hl-2">&#39;id&#39;</span><span class="hl-1"> | </span><span class="hl-2">&#39;lastLogin&#39;</span><span class="hl-1">&gt;;</span><br/><br/><span class="hl-7">expectType</span><span class="hl-1">&lt;</span><br/><span class="hl-1">    </span><span class="hl-7">UserCreationData</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">// Result:</span><br/><span class="hl-1">    </span><span class="hl-0">Readonly</span><span class="hl-1">&lt;{</span><br/><span class="hl-1">        </span><span class="hl-7">username</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">        </span><span class="hl-7">email</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">        </span><span class="hl-7">bio</span><span class="hl-1">?: </span><span class="hl-8">string</span><span class="hl-1"> | </span><span class="hl-8">undefined</span><span class="hl-1">;</span><br/><span class="hl-1">    }&gt;</span><br/><span class="hl-1">&gt;(</span><span class="hl-2">&#39;=&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">newUser</span><span class="hl-1">: </span><span class="hl-8">UserCreationData</span><span class="hl-1"> = {</span><br/><span class="hl-1">    </span><span class="hl-7">username:</span><span class="hl-1"> </span><span class="hl-2">&#39;jane_doe&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">email:</span><span class="hl-1"> </span><span class="hl-2">&#39;jane@example.com&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">bio:</span><span class="hl-1"> </span><span class="hl-2">&#39;Software Developer&#39;</span><span class="hl-1">, </span><span class="hl-4">// Optional</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-4">// @ts-expect-error &#39;nonExistentKey&#39; doesn&#39;t exist:</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">InvalidOmit</span><span class="hl-1"> = </span><span class="hl-8">StrictOmit</span><span class="hl-1">&lt;</span><span class="hl-8">UserProfile</span><span class="hl-1">, </span><span class="hl-2">&#39;id&#39;</span><span class="hl-1"> | </span><span class="hl-2">&#39;nonExistentKey&#39;</span><span class="hl-1">&gt;;</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="4-array-type-safety-with-and--operations" class="tsd-anchor-link">4. Array Type Safety with <code>NonEmptyArray</code> and <code>List</code> Operations<a href="#4-array-type-safety-with-and--operations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Guarantee array constraints and perform type-safe operations on collections.</p>
+<pre><code class="tsx"><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">Post</span><span class="hl-1"> = </span><span class="hl-8">Readonly</span><span class="hl-1">&lt;{</span><br/><span class="hl-1">    </span><span class="hl-7">title</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-7">content</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">}&gt;;</span><br/><br/><span class="hl-4">// A blog must have at least one post</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">Blog</span><span class="hl-1"> = </span><span class="hl-8">Readonly</span><span class="hl-1">&lt;{</span><br/><span class="hl-1">    </span><span class="hl-7">name</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-7">posts</span><span class="hl-1">: </span><span class="hl-8">NonEmptyArray</span><span class="hl-1">&lt;</span><span class="hl-8">Post</span><span class="hl-1">&gt;; </span><span class="hl-4">// Ensures posts array is never empty</span><br/><span class="hl-1">}&gt;;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">myBlog</span><span class="hl-1">: </span><span class="hl-8">Blog</span><span class="hl-1"> = {</span><br/><span class="hl-1">    </span><span class="hl-7">name:</span><span class="hl-1"> </span><span class="hl-2">&#39;My Tech Journey&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">posts:</span><span class="hl-1"> [</span><br/><span class="hl-1">        </span><span class="hl-4">// This array must have at least one element</span><br/><span class="hl-1">        { </span><span class="hl-7">title:</span><span class="hl-1"> </span><span class="hl-2">&#39;First Post&#39;</span><span class="hl-1">, </span><span class="hl-7">content:</span><span class="hl-1"> </span><span class="hl-2">&#39;Hello world!&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">        { </span><span class="hl-7">title:</span><span class="hl-1"> </span><span class="hl-2">&#39;Understanding TypeScript&#39;</span><span class="hl-1">, </span><span class="hl-7">content:</span><span class="hl-1"> </span><span class="hl-2">&#39;...&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">    ],</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-4">// This would cause a type error:</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">emptyBlog</span><span class="hl-1">: </span><span class="hl-8">Blog</span><span class="hl-1"> = {</span><br/><span class="hl-1">    </span><span class="hl-7">name:</span><span class="hl-1"> </span><span class="hl-2">&#39;Empty Thoughts&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">// @ts-expect-error Source has 0 element(s) but target requires 1</span><br/><span class="hl-1">    </span><span class="hl-7">posts:</span><span class="hl-1"> [],</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-0">getFirstPostTitle</span><span class="hl-1"> = (</span><span class="hl-7">posts</span><span class="hl-1">: </span><span class="hl-8">NonEmptyArray</span><span class="hl-1">&lt;</span><span class="hl-8">Post</span><span class="hl-1">&gt;): </span><span class="hl-8">string</span><span class="hl-1"> </span><span class="hl-3">=&gt;</span><br/><span class="hl-1">    </span><span class="hl-7">posts</span><span class="hl-1">[</span><span class="hl-9">0</span><span class="hl-1">].</span><span class="hl-7">title</span><span class="hl-1">; </span><span class="hl-4">// Safe to access posts[0] - guaranteed to exist</span><br/><br/><span class="hl-4">// Advanced List operations at the type level</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">NumberList</span><span class="hl-1"> = </span><span class="hl-3">readonly</span><span class="hl-1"> [</span><span class="hl-9">1</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">3</span><span class="hl-1">, </span><span class="hl-9">4</span><span class="hl-1">, </span><span class="hl-9">5</span><span class="hl-1">];</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">FirstElement</span><span class="hl-1"> = </span><span class="hl-8">List</span><span class="hl-1">.</span><span class="hl-8">Head</span><span class="hl-1">&lt;</span><span class="hl-8">NumberList</span><span class="hl-1">&gt;; </span><span class="hl-4">// 1</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">LastElement</span><span class="hl-1"> = </span><span class="hl-8">List</span><span class="hl-1">.</span><span class="hl-8">Last</span><span class="hl-1">&lt;</span><span class="hl-8">NumberList</span><span class="hl-1">&gt;; </span><span class="hl-4">// 5</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">WithoutFirst</span><span class="hl-1"> = </span><span class="hl-8">List</span><span class="hl-1">.</span><span class="hl-8">Tail</span><span class="hl-1">&lt;</span><span class="hl-8">NumberList</span><span class="hl-1">&gt;; </span><span class="hl-4">// readonly [2, 3, 4, 5]</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">FirstThree</span><span class="hl-1"> = </span><span class="hl-8">List</span><span class="hl-1">.</span><span class="hl-8">Take</span><span class="hl-1">&lt;</span><span class="hl-9">3</span><span class="hl-1">, </span><span class="hl-8">NumberList</span><span class="hl-1">&gt;; </span><span class="hl-4">// readonly [1, 2, 3]</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">Reversed</span><span class="hl-1"> = </span><span class="hl-8">List</span><span class="hl-1">.</span><span class="hl-8">Reverse</span><span class="hl-1">&lt;</span><span class="hl-8">NumberList</span><span class="hl-1">&gt;; </span><span class="hl-4">// readonly [5, 4, 3, 2, 1]</span><br/><br/><span class="hl-4">// Combine operations</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">LastThreeReversed</span><span class="hl-1"> = </span><span class="hl-8">List</span><span class="hl-1">.</span><span class="hl-8">Reverse</span><span class="hl-1">&lt;</span><span class="hl-8">List</span><span class="hl-1">.</span><span class="hl-8">TakeLast</span><span class="hl-1">&lt;</span><span class="hl-9">3</span><span class="hl-1">, </span><span class="hl-8">NumberList</span><span class="hl-1">&gt;&gt;; </span><span class="hl-4">// readonly [5, 4, 3]</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="5-type-safe-json-handling-with" class="tsd-anchor-link">5. Type-Safe JSON Handling with <code>JsonValue</code><a href="#5-type-safe-json-handling-with" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Safely represent and work with JSON data structures.</p>
+<pre><code class="tsx"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">jsonString</span><span class="hl-1"> =</span><br/><span class="hl-1">    </span><span class="hl-2">&#39;{&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 30, &quot;isAdmin&quot;: false, &quot;tags&quot;: [&quot;user&quot;, &quot;active&quot;], &quot;metadata&quot;: null}&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-6">try</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-4">// Cast the result of JSON.parse to JsonValue for type safety</span><br/><span class="hl-1">    </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">parsedData</span><span class="hl-1"> = </span><span class="hl-13">JSON</span><span class="hl-1">.</span><span class="hl-0">parse</span><span class="hl-1">(</span><span class="hl-7">jsonString</span><span class="hl-1">) </span><span class="hl-6">as</span><span class="hl-1"> </span><span class="hl-8">JsonValue</span><span class="hl-1">;</span><br/><br/><span class="hl-1">    </span><span class="hl-4">// Use type guards to safely work with parsed data</span><br/><span class="hl-1">    </span><span class="hl-6">if</span><span class="hl-1"> (</span><br/><span class="hl-1">        </span><span class="hl-3">typeof</span><span class="hl-1"> </span><span class="hl-7">parsedData</span><span class="hl-1"> === </span><span class="hl-2">&#39;object&#39;</span><span class="hl-1"> &amp;&amp;</span><br/><span class="hl-1">        </span><span class="hl-7">parsedData</span><span class="hl-1"> !== </span><span class="hl-3">null</span><span class="hl-1"> &amp;&amp;</span><br/><span class="hl-1">        !</span><span class="hl-7">Array</span><span class="hl-1">.</span><span class="hl-0">isArray</span><span class="hl-1">(</span><span class="hl-7">parsedData</span><span class="hl-1">)</span><br/><span class="hl-1">    ) {</span><br/><span class="hl-1">        </span><span class="hl-4">// parsedData is now known to be JsonObject</span><br/><span class="hl-1">        </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">jsonObj</span><span class="hl-1"> = </span><span class="hl-7">parsedData</span><span class="hl-1"> </span><span class="hl-6">as</span><span class="hl-1"> </span><span class="hl-8">JsonObject</span><span class="hl-1">;</span><br/><br/><span class="hl-1">        </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-7">jsonObj</span><span class="hl-1">[</span><span class="hl-2">&#39;name&#39;</span><span class="hl-1">]); </span><span class="hl-4">// Access properties safely</span><br/><br/><span class="hl-1">        </span><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-3">typeof</span><span class="hl-1"> </span><span class="hl-7">jsonObj</span><span class="hl-1">[</span><span class="hl-2">&#39;age&#39;</span><span class="hl-1">] === </span><span class="hl-2">&#39;number&#39;</span><span class="hl-1">) {</span><br/><span class="hl-1">            </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">`Age: </span><span class="hl-3">${</span><span class="hl-7">jsonObj</span><span class="hl-14">[</span><span class="hl-2">&#39;age&#39;</span><span class="hl-14">]</span><span class="hl-3">}</span><span class="hl-2">`</span><span class="hl-1">);</span><br/><span class="hl-1">        }</span><br/><br/><span class="hl-1">        </span><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-7">Array</span><span class="hl-1">.</span><span class="hl-0">isArray</span><span class="hl-1">(</span><span class="hl-7">jsonObj</span><span class="hl-1">[</span><span class="hl-2">&#39;tags&#39;</span><span class="hl-1">])) {</span><br/><span class="hl-1">            </span><span class="hl-6">for</span><span class="hl-1"> (</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">tag</span><span class="hl-1"> </span><span class="hl-3">of</span><span class="hl-1"> </span><span class="hl-7">jsonObj</span><span class="hl-1">[</span><span class="hl-2">&#39;tags&#39;</span><span class="hl-1">]) {</span><br/><span class="hl-1">                </span><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-3">typeof</span><span class="hl-1"> </span><span class="hl-7">tag</span><span class="hl-1"> === </span><span class="hl-2">&#39;string&#39;</span><span class="hl-1">) {</span><br/><span class="hl-1">                    </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">`Tag: </span><span class="hl-3">${</span><span class="hl-7">tag</span><span class="hl-3">}</span><span class="hl-2">`</span><span class="hl-1">);</span><br/><span class="hl-1">                }</span><br/><span class="hl-1">            }</span><br/><span class="hl-1">        }</span><br/><span class="hl-1">    } </span><span class="hl-6">else</span><span class="hl-1"> </span><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-7">Array</span><span class="hl-1">.</span><span class="hl-0">isArray</span><span class="hl-1">(</span><span class="hl-7">parsedData</span><span class="hl-1">)) {</span><br/><span class="hl-1">        </span><span class="hl-4">// parsedData is a JSON array</span><br/><span class="hl-1">        </span><span class="hl-6">for</span><span class="hl-1"> (</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">item</span><span class="hl-1"> </span><span class="hl-3">of</span><span class="hl-1"> </span><span class="hl-7">parsedData</span><span class="hl-1">) {</span><br/><span class="hl-1">            </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-7">item</span><span class="hl-1">);</span><br/><span class="hl-1">        }</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">} </span><span class="hl-6">catch</span><span class="hl-1"> (</span><span class="hl-7">error</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">error</span><span class="hl-1">(</span><span class="hl-2">&#39;Failed to parse JSON:&#39;</span><span class="hl-1">, </span><span class="hl-7">error</span><span class="hl-1">);</span><br/><span class="hl-1">}</span><br/><br/><span class="hl-4">// Define API response types using JsonValue</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">ApiResponse</span><span class="hl-1"> = </span><span class="hl-8">JsonObject</span><span class="hl-1"> &amp;</span><br/><span class="hl-1">    </span><span class="hl-8">Readonly</span><span class="hl-1">&lt;{</span><br/><span class="hl-1">        </span><span class="hl-7">status</span><span class="hl-1">: </span><span class="hl-2">&#39;success&#39;</span><span class="hl-1"> | </span><span class="hl-2">&#39;error&#39;</span><span class="hl-1">;</span><br/><span class="hl-1">        </span><span class="hl-7">data</span><span class="hl-1">?: </span><span class="hl-8">JsonValue</span><span class="hl-1">;</span><br/><span class="hl-1">        </span><span class="hl-7">message</span><span class="hl-1">?: </span><span class="hl-8">string</span><span class="hl-1">;</span><br/><span class="hl-1">    }&gt;;</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="6-precise-numeric-ranges-with-and-branded-types" class="tsd-anchor-link">6. Precise Numeric Ranges with <code>UintRange</code> and Branded Types<a href="#6-precise-numeric-ranges-with-and-branded-types" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Define exact numeric constraints and enhance type safety with branded number types.</p>
+<pre><code class="tsx"><span class="hl-4">/**</span><br/><span class="hl-4"> * Parse integer with constrained radix parameter</span><br/><span class="hl-4"> * </span><span class="hl-3">@param</span><span class="hl-4"> </span><span class="hl-7">str</span><span class="hl-4"> A string to convert into a number</span><br/><span class="hl-4"> * </span><span class="hl-3">@param</span><span class="hl-4"> </span><span class="hl-7">radix</span><span class="hl-4"> A value between 2 and 36 that specifies the base</span><br/><span class="hl-4"> */</span><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-0">parseInteger</span><span class="hl-1"> = (</span><span class="hl-7">str</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-7">radix</span><span class="hl-1">?: </span><span class="hl-8">UintRange</span><span class="hl-1">&lt;</span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">37</span><span class="hl-1">&gt;): </span><span class="hl-8">number</span><span class="hl-1"> </span><span class="hl-3">=&gt;</span><br/><span class="hl-1">    </span><span class="hl-7">Number</span><span class="hl-1">.</span><span class="hl-0">parseInt</span><span class="hl-1">(</span><span class="hl-7">str</span><span class="hl-1">, </span><span class="hl-7">radix</span><span class="hl-1">);</span><br/><br/><span class="hl-4">// Alternative using inclusive range</span><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-0">parseIntegerInclusive</span><span class="hl-1"> = (</span><br/><span class="hl-1">    </span><span class="hl-7">str</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">radix</span><span class="hl-1">?: </span><span class="hl-8">UintRangeInclusive</span><span class="hl-1">&lt;</span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">36</span><span class="hl-1">&gt;,</span><br/><span class="hl-1">): </span><span class="hl-8">number</span><span class="hl-1"> </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-7">Number</span><span class="hl-1">.</span><span class="hl-0">parseInt</span><span class="hl-1">(</span><span class="hl-7">str</span><span class="hl-1">, </span><span class="hl-7">radix</span><span class="hl-1">);</span><br/><br/><span class="hl-4">// Valid usages:</span><br/><span class="hl-0">parseInteger</span><span class="hl-1">(</span><span class="hl-2">&#39;10&#39;</span><span class="hl-1">); </span><span class="hl-4">// radix defaults to 10</span><br/><br/><span class="hl-0">parseInteger</span><span class="hl-1">(</span><span class="hl-2">&#39;10&#39;</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">); </span><span class="hl-4">// Binary</span><br/><br/><span class="hl-0">parseInteger</span><span class="hl-1">(</span><span class="hl-2">&#39;255&#39;</span><span class="hl-1">, </span><span class="hl-9">16</span><span class="hl-1">); </span><span class="hl-4">// Hexadecimal</span><br/><br/><span class="hl-0">parseInteger</span><span class="hl-1">(</span><span class="hl-2">&#39;123&#39;</span><span class="hl-1">, </span><span class="hl-9">36</span><span class="hl-1">); </span><span class="hl-4">// Maximum base</span><br/><br/><span class="hl-4">// Invalid usages (TypeScript will error):</span><br/><span class="hl-4">// @ts-expect-error Argument of type &#39;1&#39; is not assignable to parameter of type &#39;UintRange&lt;2, 37&gt; | undefined&#39;</span><br/><span class="hl-0">parseInteger</span><span class="hl-1">(</span><span class="hl-2">&#39;10&#39;</span><span class="hl-1">, </span><span class="hl-9">1</span><span class="hl-1">);</span><br/><br/><span class="hl-4">// @ts-expect-error Argument of type &#39;37&#39; is not assignable to parameter of type &#39;UintRange&lt;2, 37&gt; | undefined&#39;</span><br/><span class="hl-0">parseInteger</span><span class="hl-1">(</span><span class="hl-2">&#39;10&#39;</span><span class="hl-1">, </span><span class="hl-9">37</span><span class="hl-1">);</span><br/><br/><span class="hl-4">// Branded types for additional safety</span><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">UserId</span><span class="hl-1"> = </span><span class="hl-8">Brand</span><span class="hl-1">&lt;</span><span class="hl-8">number</span><span class="hl-1">, </span><span class="hl-2">&#39;UserId&#39;</span><span class="hl-1">&gt;;</span><br/><br/><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">ProductId</span><span class="hl-1"> = </span><span class="hl-8">Brand</span><span class="hl-1">&lt;</span><span class="hl-8">number</span><span class="hl-1">, </span><span class="hl-2">&#39;ProductId&#39;</span><span class="hl-1">&gt;;</span><br/><br/><span class="hl-4">// Create branded values (you would typically have constructor functions)</span><br/><span class="hl-3">declare</span><span class="hl-1"> </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">userId</span><span class="hl-1">: </span><span class="hl-8">UserId</span><span class="hl-1">;</span><br/><br/><span class="hl-3">declare</span><span class="hl-1"> </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">productId</span><span class="hl-1">: </span><span class="hl-8">ProductId</span><span class="hl-1">;</span><br/><br/><span class="hl-4">// Type-safe functions that can&#39;t mix up IDs</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-0">getUserById</span><span class="hl-1"> = (</span><span class="hl-7">id</span><span class="hl-1">: </span><span class="hl-8">UserId</span><span class="hl-1">): </span><span class="hl-8">User</span><span class="hl-1"> | </span><span class="hl-8">undefined</span><span class="hl-1"> </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-4">/* ... */</span><br/><br/><span class="hl-1">    </span><span class="hl-6">return</span><span class="hl-1"> </span><span class="hl-3">undefined</span><span class="hl-1">;</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-0">getProductById</span><span class="hl-1"> = (</span><span class="hl-7">id</span><span class="hl-1">: </span><span class="hl-8">ProductId</span><span class="hl-1">): </span><span class="hl-8">Product</span><span class="hl-1"> | </span><span class="hl-8">undefined</span><span class="hl-1"> </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-4">/* ... */</span><br/><br/><span class="hl-1">    </span><span class="hl-6">return</span><span class="hl-1"> </span><span class="hl-3">undefined</span><span class="hl-1">;</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-4">// @ts-expect-error Argument of type &#39;ProductId&#39; is not assignable to parameter of type &#39;UserId&#39;</span><br/><span class="hl-0">getUserById</span><span class="hl-1">(</span><span class="hl-7">productId</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="modules-overview" class="tsd-anchor-link">Modules Overview<a href="#modules-overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The library is organized into logical modules for easy navigation and understanding:</p>
+<ul>
+<li><strong><code>condition/</code></strong>: Type predicates like <code>TypeEq</code>, <code>TypeExtends</code>, <code>IsUnion</code>, <code>IsNever</code> for conditional type logic.</li>
+<li><strong><code>record/</code></strong>: Object type utilities including <code>StrictOmit</code>, <code>DeepReadonly</code>, <code>RecordPaths</code>, and partial operations.</li>
+<li><strong><code>branded-types/</code></strong>: Comprehensive branded number types (<code>Int</code>, <code>Uint</code>, <code>SafeInt</code>, <code>FiniteNumber</code>, etc.) with range constraints.</li>
+<li><strong><code>tuple-and-list/</code></strong>: Array and tuple operations with <code>List</code> and <code>Tuple</code> namespaces for type-safe manipulations.</li>
+<li><strong><code>type-level-integer/</code></strong>: Mathematical operations like <code>Increment</code>, <code>UintRange</code>, <code>AbsoluteValue</code> performed at the type level.</li>
+<li><strong><code>constants/</code></strong>: Pre-defined constants like <code>Primitive</code>, <code>FalsyValue</code>, <code>HTTPRequestMethod</code>, and enum types.</li>
+<li><strong><code>others/</code></strong>: Utility types like <code>JsonValue</code>, <code>Mutable</code>, <code>WidenLiteral</code>, and helper functions.</li>
+</ul>
+<h2 id="key-benefits" class="tsd-anchor-link">Key Benefits<a href="#key-benefits" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><strong>Type Safety</strong>: All utilities are designed with TypeScript's advanced type system, providing compile-time guarantees.</li>
+<li><strong>Zero Runtime Cost</strong>: Pure type-level operations with no runtime dependencies or overhead.</li>
+<li><strong>Comprehensive Coverage</strong>: From basic utilities to advanced type manipulations for complex scenarios.</li>
+<li><strong>Global Availability</strong>: Use triple-slash directives to make types available without explicit imports.</li>
+<li><strong>Extensive Testing</strong>: All utilities are thoroughly tested with custom type-testing framework.</li>
+<li><strong>Strict Validation</strong>: Enhanced versions of built-in types with compile-time key validation.</li>
+</ul>
+<h2 id="api-reference" class="tsd-anchor-link">API Reference<a href="#api-reference" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>For detailed information on all types, see the <a href="./docs/README.md">Full API Reference</a>.</p>
+<h3 id="overview-of-all-types-with-source-code-links" class="tsd-anchor-link">Overview of All Types (with source code links)<a href="#overview-of-all-types-with-source-code-links" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<!-- AUTO-GENERATED TYPES START -->
+<ul>
+<li>src/branded-types/bigint.mts
+<ul>
+<li><a href="modules/branded-types_bigint.html#L18">BigInt64</a></li>
+<li><a href="modules/branded-types_bigint.html#L33">BigUint64</a></li>
+</ul>
+</li>
+<li>src/branded-types/brand.mts
+<ul>
+<li><a href="modules/branded-types_brand.html#L12">UnknownBrand</a></li>
+<li><a href="modules/branded-types_brand.html#L61">Brand</a></li>
+<li><a href="modules/branded-types_brand.html#L82">UnwrapBrandTrueKeys</a></li>
+<li><a href="modules/branded-types_brand.html#L96">UnwrapBrandFalseKeys</a></li>
+<li><a href="modules/branded-types_brand.html#L113">UnwrapBrandBooleanKeys</a></li>
+<li><a href="modules/branded-types_brand.html#L128">UnwrapBrandKeys</a></li>
+<li><a href="modules/branded-types_brand.html#L145">GetBrandKeysPart</a></li>
+<li><a href="modules/branded-types_brand.html#L165">GetBrandValuePart</a></li>
+<li><a href="modules/branded-types_brand.html#L196">ExtendBrand</a></li>
+<li><a href="modules/branded-types_brand.html#L227">ChangeBaseBrand</a></li>
+<li><a href="modules/branded-types_brand.html#L254">IntersectBrand</a></li>
+<li><a href="modules/branded-types_brand.html#L279">NormalizeBrandUnion</a></li>
+</ul>
+</li>
+<li>src/branded-types/core.mts
+<ul>
+<li><a href="modules/branded-types_core.html#L58">NaNType</a></li>
+<li><a href="modules/branded-types_core.html#L78">ValidNumber</a></li>
+<li><a href="modules/branded-types_core.html#L98">NonZeroNumber</a></li>
+<li><a href="modules/branded-types_core.html#L117">NonNegativeNumber</a></li>
+<li><a href="modules/branded-types_core.html#L136">PositiveNumber</a></li>
+<li><a href="modules/branded-types_core.html#L152">NegativeNumber</a></li>
+</ul>
+</li>
+<li>src/branded-types/finite-number.mts
+<ul>
+<li><a href="modules/branded-types_finite-number.html#L26">FiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L46">InfiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L66">POSITIVE_INFINITY</a></li>
+<li><a href="modules/branded-types_finite-number.html#L86">NEGATIVE_INFINITY</a></li>
+<li><a href="modules/branded-types_finite-number.html#L105">NonNegativeFiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L123">PositiveFiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L138">NegativeFiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L153">NonZeroFiniteNumber</a></li>
+</ul>
+</li>
+<li>src/branded-types/float.mts
+<ul>
+<li><a href="modules/branded-types_float.html#L22">Float32</a></li>
+<li><a href="modules/branded-types_float.html#L40">Float64</a></li>
+</ul>
+</li>
+<li>src/branded-types/int.mts
+<ul>
+<li><a href="modules/branded-types_int.html#L27">Int</a></li>
+<li><a href="modules/branded-types_int.html#L45">NonZeroInt</a></li>
+<li><a href="modules/branded-types_int.html#L60">NonNegativeInt</a></li>
+<li><a href="modules/branded-types_int.html#L78">Uint</a></li>
+<li><a href="modules/branded-types_int.html#L95">PositiveInt</a></li>
+<li><a href="modules/branded-types_int.html#L110">NegativeInt</a></li>
+<li><a href="modules/branded-types_int.html#L116">IntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L122">NonZeroIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L128">NonNegativeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L135">UintWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L141">PositiveIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L147">NegativeIntWithSmallInt</a></li>
+</ul>
+</li>
+<li>src/branded-types/int16.mts
+<ul>
+<li><a href="modules/branded-types_int16.html#L25">Int16</a></li>
+<li><a href="modules/branded-types_int16.html#L42">NonZeroInt16</a></li>
+<li><a href="modules/branded-types_int16.html#L56">NonNegativeInt16</a></li>
+<li><a href="modules/branded-types_int16.html#L70">PositiveInt16</a></li>
+<li><a href="modules/branded-types_int16.html#L84">NegativeInt16</a></li>
+<li><a href="modules/branded-types_int16.html#L90">Int16WithSmallInt</a></li>
+<li><a href="modules/branded-types_int16.html#L96">NonZeroInt16WithSmallInt</a></li>
+<li><a href="modules/branded-types_int16.html#L102">NonNegativeInt16WithSmallInt</a></li>
+<li><a href="modules/branded-types_int16.html#L108">PositiveInt16WithSmallInt</a></li>
+<li><a href="modules/branded-types_int16.html#L114">NegativeInt16WithSmallInt</a></li>
+</ul>
+</li>
+<li>src/branded-types/int32.mts
+<ul>
+<li><a href="modules/branded-types_int32.html#L29">Int32</a></li>
+<li><a href="modules/branded-types_int32.html#L46">NonZeroInt32</a></li>
+<li><a href="modules/branded-types_int32.html#L60">NonNegativeInt32</a></li>
+<li><a href="modules/branded-types_int32.html#L74">PositiveInt32</a></li>
+<li><a href="modules/branded-types_int32.html#L88">NegativeInt32</a></li>
+<li><a href="modules/branded-types_int32.html#L94">Int32WithSmallInt</a></li>
+<li><a href="modules/branded-types_int32.html#L100">NonZeroInt32WithSmallInt</a></li>
+<li><a href="modules/branded-types_int32.html#L106">NonNegativeInt32WithSmallInt</a></li>
+<li><a href="modules/branded-types_int32.html#L112">PositiveInt32WithSmallInt</a></li>
+<li><a href="modules/branded-types_int32.html#L118">NegativeInt32WithSmallInt</a></li>
+</ul>
+</li>
+<li>src/branded-types/safe-int.mts
+<ul>
+<li><a href="modules/branded-types_safe-int.html#L28">SafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L43">NonZeroSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L58">SafeUint</a></li>
+<li><a href="modules/branded-types_safe-int.html#L73">PositiveSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L87">NegativeSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L94">NonNegativeSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L100">SafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L106">NonZeroSafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L112">NonNegativeSafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L119">SafeUintWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L125">PositiveSafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L131">NegativeSafeIntWithSmallInt</a></li>
+</ul>
+</li>
+<li>src/branded-types/small-int.mts
+<ul>
+<li><a href="modules/branded-types_small-int.html#L45">SmallInt</a></li>
+<li><a href="modules/branded-types_small-int.html#L73">SmallUint</a></li>
+<li><a href="modules/branded-types_small-int.html#L102">WithSmallInt</a></li>
+<li><a href="modules/branded-types_small-int.html#L140">ExcludeSmallInt</a></li>
+</ul>
+</li>
+<li>src/branded-types/uint16.mts
+<ul>
+<li><a href="modules/branded-types_uint16.html#L20">Uint16</a></li>
+<li><a href="modules/branded-types_uint16.html#L37">PositiveUint16</a></li>
+<li><a href="modules/branded-types_uint16.html#L52">NonZeroUint16</a></li>
+<li><a href="modules/branded-types_uint16.html#L58">Uint16WithSmallInt</a></li>
+<li><a href="modules/branded-types_uint16.html#L64">PositiveUint16WithSmallInt</a></li>
+<li><a href="modules/branded-types_uint16.html#L71">NonZeroUint16WithSmallInt</a></li>
+</ul>
+</li>
+<li>src/branded-types/uint32.mts
+<ul>
+<li><a href="modules/branded-types_uint32.html#L23">Uint32</a></li>
+<li><a href="modules/branded-types_uint32.html#L37">PositiveUint32</a></li>
+<li><a href="modules/branded-types_uint32.html#L52">NonZeroUint32</a></li>
+<li><a href="modules/branded-types_uint32.html#L58">Uint32WithSmallInt</a></li>
+<li><a href="modules/branded-types_uint32.html#L64">PositiveUint32WithSmallInt</a></li>
+<li><a href="modules/branded-types_uint32.html#L71">NonZeroUint32WithSmallInt</a></li>
+</ul>
+</li>
+<li>src/condition/eq.mts
+<ul>
+<li><a href="modules/condition_eq.html#L23">TypeEq</a></li>
+</ul>
+</li>
+<li>src/condition/extends.mts
+<ul>
+<li><a href="modules/condition_extends.html#L45">TypeExtends</a></li>
+</ul>
+</li>
+<li>src/condition/is-fixed-length-list.mts
+<ul>
+<li><a href="modules/condition_is-fixed-length-list.html#L19">IsFixedLengthList</a></li>
+<li><a href="modules/condition_is-fixed-length-list.html#L37">IsNotFixedLengthList</a></li>
+</ul>
+</li>
+<li>src/condition/is-never.mts
+<ul>
+<li><a href="modules/condition_is-never.html#L18">IsNever</a></li>
+</ul>
+</li>
+<li>src/condition/is-union.mts
+<ul>
+<li><a href="modules/condition_is-union.html#L30">IsUnion</a></li>
+</ul>
+</li>
+<li>src/constants/alphabet.mts
+<ul>
+<li><a href="modules/constants_alphabet.html#L22">LowerAlphabet</a></li>
+<li><a href="modules/constants_alphabet.html#L50">UpperAlphabet</a></li>
+<li><a href="modules/constants_alphabet.html#L77">Alphabet</a></li>
+</ul>
+</li>
+<li>src/constants/falsy-value.mts
+<ul>
+<li><a href="modules/constants_falsy-value.html#L45">FalsyValue</a></li>
+</ul>
+</li>
+<li>src/constants/int-enum.mts
+<ul>
+<li><a href="modules/constants_int-enum.html#L23">Uint8</a></li>
+<li><a href="modules/constants_int-enum.html#L41">Uint9</a></li>
+<li><a href="modules/constants_int-enum.html#L60">Uint10</a></li>
+<li><a href="modules/constants_int-enum.html#L66">Int8</a></li>
+<li><a href="modules/constants_int-enum.html#L72">Int9</a></li>
+<li><a href="modules/constants_int-enum.html#L78">Int10</a></li>
+<li><a href="modules/constants_int-enum.html#L100">MonthEnum</a></li>
+<li><a href="modules/constants_int-enum.html#L122">MonthIndexEnum</a></li>
+<li><a href="modules/constants_int-enum.html#L128">DateEnum</a></li>
+<li><a href="modules/constants_int-enum.html#L134">DayOfWeekIndex</a></li>
+<li><a href="modules/constants_int-enum.html#L140">DayOfWeekName</a></li>
+<li><a href="modules/constants_int-enum.html#L176">HoursEnum</a></li>
+<li><a href="modules/constants_int-enum.html#L182">MinutesEnum</a></li>
+<li><a href="modules/constants_int-enum.html#L188">SecondsEnum</a></li>
+<li><a href="modules/constants_int-enum.html#L194">MillisecondsEnum</a></li>
+<li><a href="modules/constants_int-enum.html#L200">Sexagesimal</a></li>
+<li><a href="modules/constants_int-enum.html#L229">Percent</a></li>
+</ul>
+</li>
+<li>src/constants/primitive.mts
+<ul>
+<li><a href="modules/constants_primitive.html#L24">Primitive</a></li>
+</ul>
+</li>
+<li>src/constants/record.mts
+<ul>
+<li><a href="modules/constants_record.html#L36">UnknownRecord</a></li>
+</ul>
+</li>
+<li>src/constants/web.mts
+<ul>
+<li><a href="modules/constants_web.html#L45">HTTPRequestMethod</a></li>
+</ul>
+</li>
+<li>src/others/bivariant-hack.mts
+<ul>
+<li><a href="modules/others_bivariant-hack.html#L26">BivariantHack</a></li>
+</ul>
+</li>
+<li>src/others/boolean.mts
+<ul>
+<li><a href="modules/others_boolean.html#L26">BoolNot</a></li>
+<li><a href="modules/others_boolean.html#L59">BoolAnd</a></li>
+<li><a href="modules/others_boolean.html#L102">BoolOr</a></li>
+<li><a href="modules/others_boolean.html#L128">BoolEq</a></li>
+<li><a href="modules/others_boolean.html#L153">BoolNand</a></li>
+<li><a href="modules/others_boolean.html#L167">BoolNor</a></li>
+<li><a href="modules/others_boolean.html#L182">BoolNeq</a></li>
+</ul>
+</li>
+<li>src/others/json.mts
+<ul>
+<li><a href="modules/others_json.html#L17">JsonPrimitive</a></li>
+<li><a href="modules/others_json.html#L46">MutableJsonValue</a></li>
+<li><a href="modules/others_json.html#L83">JsonValue</a></li>
+<li><a href="modules/others_json.html#L109">JsonObject</a></li>
+<li><a href="modules/others_json.html#L127">MutableJsonObject</a></li>
+</ul>
+</li>
+<li>src/others/mutable.mts
+<ul>
+<li><a href="modules/others_mutable.html#L30">Mutable</a></li>
+<li><a href="modules/others_mutable.html#L51">ToMutableMap</a></li>
+<li><a href="modules/others_mutable.html#L73">ToMutableSet</a></li>
+<li><a href="modules/others_mutable.html#L90">MutableSet</a></li>
+<li><a href="modules/others_mutable.html#L107">MutableMap</a></li>
+</ul>
+</li>
+<li>src/others/utils.mts
+<ul>
+<li><a href="modules/others_utils.html#L13">ToString</a></li>
+<li><a href="modules/others_utils.html#L24">ToNumber</a></li>
+<li><a href="modules/others_utils.html#L33">ValueOf</a></li>
+<li><a href="modules/others_utils.html#L45">Length</a></li>
+<li><a href="modules/others_utils.html#L53">FunctionType</a></li>
+<li><a href="modules/others_utils.html#L61">Fn</a></li>
+<li><a href="modules/others_utils.html#L67">MonoTypeFunction</a></li>
+<li><a href="modules/others_utils.html#L75">Reducer</a></li>
+<li><a href="modules/others_utils.html#L78">AnyFn</a></li>
+<li><a href="modules/others_utils.html#L86">UnionToIntersection</a></li>
+<li><a href="modules/others_utils.html#L99">MergeIntersection</a></li>
+<li><a href="modules/others_utils.html#L108">ExcludeFalsyValue</a></li>
+<li><a href="modules/others_utils.html#L116">Intersection</a></li>
+</ul>
+</li>
+<li>src/others/widen-literal.mts
+<ul>
+<li><a href="modules/others_widen-literal.html#L47">WidenLiteral</a></li>
+</ul>
+</li>
+<li>src/record/deep-pick-omit.mts
+<ul>
+<li><a href="modules/record_deep-pick-omit.html#L21">DeepPick</a></li>
+<li><a href="modules/record_deep-pick-omit.html#L48">DeepOmit</a></li>
+</ul>
+</li>
+<li>src/record/deep.mts
+<ul>
+<li><a href="modules/record_deep.html#L24">DeepReadonly</a></li>
+<li><a href="modules/record_deep.html#L53">DeepMutable</a></li>
+<li><a href="modules/record_deep.html#L89">DeepPartial</a></li>
+<li><a href="modules/record_deep.html#L119">DeepRequired</a></li>
+</ul>
+</li>
+<li>src/record/partial.mts
+<ul>
+<li><a href="modules/record_partial.html#L15">PartiallyPartial</a></li>
+<li><a href="modules/record_partial.html#L29">PartiallyOptional</a></li>
+<li><a href="modules/record_partial.html#L42">PartiallyNullable</a></li>
+<li><a href="modules/record_partial.html#L57">PartiallyRequired</a></li>
+<li><a href="modules/record_partial.html#L69">PickUndefined</a></li>
+<li><a href="modules/record_partial.html#L80">MapToNever</a></li>
+<li><a href="modules/record_partial.html#L101">OptionalKeys</a></li>
+<li><a href="modules/record_partial.html#L121">RequiredKeys</a></li>
+</ul>
+</li>
+<li>src/record/record-path.mts
+<ul>
+<li><a href="modules/record_record-path.html#L32">RecordPathsWithIndex</a></li>
+<li><a href="modules/record_record-path.html#L46">RecordPaths</a></li>
+<li><a href="modules/record_record-path.html#L61">RecordPathAndValueTypeTuple</a></li>
+<li><a href="modules/record_record-path.html#L76">RecordLeafPaths</a></li>
+<li><a href="modules/record_record-path.html#L92">RecordLeafPathsWithIndex</a></li>
+<li><a href="modules/record_record-path.html#L111">RecordUpdated</a></li>
+<li><a href="modules/record_record-path.html#L135">RecordValueAtPath</a></li>
+<li><a href="modules/record_record-path.html#L159">RecordValueAtPathWithIndex</a></li>
+</ul>
+</li>
+<li>src/record/std.mts
+<ul>
+<li><a href="modules/record_std.html#L16">StrictExtract</a></li>
+<li><a href="modules/record_std.html#L33">RelaxedExtract</a></li>
+<li><a href="modules/record_std.html#L50">StrictPick</a></li>
+<li><a href="modules/record_std.html#L69">RelaxedPick</a></li>
+<li><a href="modules/record_std.html#L86">StrictExclude</a></li>
+<li><a href="modules/record_std.html#L103">RelaxedExclude</a></li>
+<li><a href="modules/record_std.html#L120">StrictOmit</a></li>
+<li><a href="modules/record_std.html#L137">RelaxedOmit</a></li>
+<li><a href="modules/record_std.html#L155">ReadonlyRecord</a></li>
+<li><a href="modules/record_std.html#L176">MutableRecord</a></li>
+</ul>
+</li>
+<li>src/tuple-and-list/array.mts
+<ul>
+<li><a href="modules/tuple-and-list_array.html#L15">MutableNonEmptyArray</a></li>
+<li><a href="modules/tuple-and-list_array.html#L27">NonEmptyArray</a></li>
+<li><a href="modules/tuple-and-list_array.html#L40">ArrayElement</a></li>
+<li><a href="modules/tuple-and-list_array.html#L54">ArrayOfLength</a></li>
+<li><a href="modules/tuple-and-list_array.html#L64">MutableArrayOfLength</a></li>
+<li><a href="modules/tuple-and-list_array.html#L83">MutableArrayAtLeastLen</a></li>
+<li><a href="modules/tuple-and-list_array.html#L98">ArrayAtLeastLen</a></li>
+</ul>
+</li>
+<li>src/tuple-and-list/index-of-tuple.mts
+<ul>
+<li><a href="modules/tuple-and-list_index-of-tuple.html#L18">IndexOfTuple</a></li>
+<li><a href="modules/tuple-and-list_index-of-tuple.html#L53">NegativeIndexOfTuple</a></li>
+</ul>
+</li>
+<li>src/tuple-and-list/list.mts
+<ul>
+<li><a href="modules/tuple-and-list_list.html#L19">List.Head</a></li>
+<li><a href="modules/tuple-and-list_list.html#L32">List.Last</a></li>
+<li><a href="modules/tuple-and-list_list.html#L45">List.ButLast</a></li>
+<li><a href="modules/tuple-and-list_list.html#L58">List.Tail</a></li>
+<li><a href="modules/tuple-and-list_list.html#L71">List.Reverse</a></li>
+<li><a href="modules/tuple-and-list_list.html#L91">List.Take</a></li>
+<li><a href="modules/tuple-and-list_list.html#L106">List.Skip</a></li>
+<li><a href="modules/tuple-and-list_list.html#L121">List.TakeLast</a></li>
+<li><a href="modules/tuple-and-list_list.html#L136">List.SkipLast</a></li>
+<li><a href="modules/tuple-and-list_list.html#L152">List.SetAt</a></li>
+<li><a href="modules/tuple-and-list_list.html#L167">List.Flatten</a></li>
+<li><a href="modules/tuple-and-list_list.html#L181">List.Concat</a></li>
+<li><a href="modules/tuple-and-list_list.html#L200">List.Zip</a></li>
+<li><a href="modules/tuple-and-list_list.html#L226">List.Partition</a></li>
+</ul>
+</li>
+<li>src/tuple-and-list/make-tuple.mts
+<ul>
+<li><a href="modules/tuple-and-list_make-tuple.html#L13">MakeTuple</a></li>
+</ul>
+</li>
+<li>src/tuple-and-list/tuple.mts
+<ul>
+<li><a href="modules/tuple-and-list_tuple.html#L15">Tuple.Head</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L30">Tuple.Last</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L48">Tuple.ButLast</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L66">Tuple.Tail</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L80">Tuple.Reverse</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L107">Tuple.Take</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L123">Tuple.Skip</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L139">Tuple.TakeLast</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L154">Tuple.SkipLast</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L169">Tuple.SetAt</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L184">Tuple.Flatten</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L200">Tuple.Concat</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L217">Tuple.Zip</a></li>
+<li><a href="modules/tuple-and-list_tuple.html#L236">Tuple.Partition</a></li>
+</ul>
+</li>
+<li>src/type-level-integer/abs.mts
+<ul>
+<li><a href="modules/type-level-integer_abs.html#L17">AbsoluteValue</a></li>
+<li><a href="modules/type-level-integer_abs.html#L34">Abs</a></li>
+</ul>
+</li>
+<li>src/type-level-integer/increment.mts
+<ul>
+<li><a href="modules/type-level-integer_increment.html#L37">Increment</a></li>
+<li><a href="modules/type-level-integer_increment.html#L74">Decrement</a></li>
+</ul>
+</li>
+<li>src/type-level-integer/index-type.mts
+<ul>
+<li><a href="modules/type-level-integer_index-type.html#L16">Index</a></li>
+<li><a href="modules/type-level-integer_index-type.html#L29">IndexInclusive</a></li>
+<li><a href="modules/type-level-integer_index-type.html#L45">NegativeIndex</a></li>
+</ul>
+</li>
+<li>src/type-level-integer/max.mts
+<ul>
+<li><a href="modules/type-level-integer_max.html#L16">Max</a></li>
+</ul>
+</li>
+<li>src/type-level-integer/min.mts
+<ul>
+<li><a href="modules/type-level-integer_min.html#L15">Min</a></li>
+</ul>
+</li>
+<li>src/type-level-integer/seq.mts
+<ul>
+<li><a href="modules/type-level-integer_seq.html#L15">Seq</a></li>
+</ul>
+</li>
+<li>src/type-level-integer/uint-range.mts
+<ul>
+<li><a href="modules/type-level-integer_uint-range.html#L16">UintRange</a></li>
+<li><a href="modules/type-level-integer_uint-range.html#L33">UintRangeInclusive</a></li>
+</ul>
+</li>
+</ul>
+<!-- AUTO-GENERATED TYPES END -->
+<h2 id="important-notes" class="tsd-anchor-link">Important Notes<a href="#important-notes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li>This library is <strong>type-level only</strong> with zero runtime dependencies and no runtime cost.</li>
+<li>All types are designed to work seamlessly with TypeScript's strict mode settings.</li>
+<li>The library supports both explicit imports and global type availability via triple-slash directives.</li>
+<li>Custom type-testing utilities ensure all operations work correctly at compile time.</li>
+</ul>
+<h2 id="runtime-type-guards-with-ts-data-forge" class="tsd-anchor-link">Runtime Type Guards with ts-data-forge<a href="#runtime-type-guards-with-ts-data-forge" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>While <strong>ts-type-forge</strong> provides powerful compile-time type utilities, combining it with <a href="https://www.npmjs.com/package/ts-data-forge"><strong>ts-data-forge</strong></a> unlocks runtime type validation capabilities that make your TypeScript applications even more robust.</p>
+<p><strong>ts-data-forge</strong> complements ts-type-forge by providing:</p>
+<ul>
+<li><strong>Type Guard Functions</strong>: Runtime validation for all the branded types defined in ts-type-forge</li>
+<li><strong>Type Assertions</strong>: Throw errors when values don't match expected types</li>
+<li><strong>Type Predicates</strong>: Safely narrow types at runtime with <code>is*</code> functions</li>
+<li><strong>JSON Validation</strong>: Runtime validation for <code>JsonValue</code> types</li>
+<li><strong>Array Guards</strong>: Validate <code>NonEmptyArray</code> and other array constraints at runtime</li>
+</ul>
+<h3 id="example-combining-type-level-and-runtime-safety" class="tsd-anchor-link">Example: Combining Type-Level and Runtime Safety<a href="#example-combining-type-level-and-runtime-safety" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="typescript"><span class="hl-4">/// </span><span class="hl-10">&lt;</span><span class="hl-11">reference</span><span class="hl-4"> </span><span class="hl-12">types</span><span class="hl-1">=</span><span class="hl-2">&quot;ts-type-forge/global&quot;</span><span class="hl-4"> </span><span class="hl-10">/&gt;</span><br/><br/><span class="hl-4">// Runtime validation with ts-data-forge</span><br/><span class="hl-6">import</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-7">isUint</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">expectType</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">assertNonEmptyArray</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">parseJsonValue</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">isRecord</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">hasKey</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;ts-data-forge&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">numbers</span><span class="hl-1">: </span><span class="hl-3">readonly</span><span class="hl-1"> </span><span class="hl-8">number</span><span class="hl-1">[] = [</span><span class="hl-9">1</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">3</span><span class="hl-1">, </span><span class="hl-9">4</span><span class="hl-1">, </span><span class="hl-9">5</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">3</span><span class="hl-1">];</span><br/><br/><span class="hl-4">// Type-safe length checking</span><br/><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-7">Arr</span><span class="hl-1">.</span><span class="hl-0">isArrayAtLeastLength</span><span class="hl-1">(</span><span class="hl-7">numbers</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">)) {</span><br/><span class="hl-1">    </span><span class="hl-4">// numbers is now guaranteed to have at least 3 elements</span><br/><span class="hl-1">    </span><span class="hl-7">expectType</span><span class="hl-1">&lt;</span><span class="hl-3">typeof</span><span class="hl-1"> </span><span class="hl-7">numbers</span><span class="hl-1">, </span><span class="hl-7">ArrayAtLeastLen</span><span class="hl-1">&lt;</span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-7">number</span><span class="hl-1">&gt;&gt;(</span><span class="hl-2">&#39;=&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-7">numbers</span><span class="hl-1">[</span><span class="hl-9">1</span><span class="hl-1">]); </span><span class="hl-4">// Array access to index 0, 1 is now safe even with noUncheckedIndexedAccess enabled</span><br/><span class="hl-1">}</span><br/><br/><span class="hl-4">// Safe JSON parsing with type validation</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">jsonString</span><span class="hl-1"> = </span><span class="hl-2">&#39;{&quot;count&quot;: 42, &quot;items&quot;: [1, 2, 3]}&#39;</span><span class="hl-1">;</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">data</span><span class="hl-1">: </span><span class="hl-8">JsonValue</span><span class="hl-1"> = </span><span class="hl-0">parseJsonValue</span><span class="hl-1">(</span><span class="hl-7">jsonString</span><span class="hl-1">); </span><span class="hl-4">// Validates at runtime</span><br/><br/><span class="hl-4">// Use the data with confidence</span><br/><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-0">isRecord</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">) &amp;&amp; </span><span class="hl-0">hasKey</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">, </span><span class="hl-2">&#39;count&#39;</span><span class="hl-1">)) {</span><br/><span class="hl-1">    </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">.</span><span class="hl-7">count</span><span class="hl-1">); </span><span class="hl-4">// Safe access</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="benefits-of-using-both-libraries-together" class="tsd-anchor-link">Benefits of Using Both Libraries Together<a href="#benefits-of-using-both-libraries-together" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ol>
+<li><strong>Complete Type Safety</strong>: Compile-time guarantees with ts-type-forge + runtime validation with ts-data-forge</li>
+<li><strong>API Boundary Protection</strong>: Validate external data (API responses, user input) at runtime</li>
+<li><strong>Developer Experience</strong>: Same type names and conventions across both libraries</li>
+<li><strong>Zero Runtime Cost Option</strong>: Use only ts-type-forge when runtime validation isn't needed</li>
+<li><strong>Progressive Enhancement</strong>: Start with type-level safety, add runtime checks where needed</li>
+</ol>
+<p>Install both libraries to get the full TypeScript type safety experience:</p>
+<pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-2">ts-data-forge</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-3">-D</span><span class="hl-1"> </span><span class="hl-2">ts-type-forge</span>
+</code><button type="button">Copy</button></pre>
+
+<h2 id="compatibility-notes" class="tsd-anchor-link">Compatibility Notes<a href="#compatibility-notes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>This library requires TypeScript version 4.8 or higher for full compatibility with advanced type features.</p>
+<h2 id="contributing" class="tsd-anchor-link">Contributing<a href="#contributing" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Contributions are welcome! Please see the repository's contribution guidelines for detailed information on how to contribute to this project.</p>
+<h2 id="license" class="tsd-anchor-link">License<a href="#license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Apache-2.0</p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#ts-type-forge"><span>ts-<wbr/>type-<wbr/>forge</span></a><ul><li><a href="#documentation"><span>Documentation</span></a></li><li><a href="#features"><span>Features</span></a></li><li><a href="#installation"><span>Installation</span></a></li><li><a href="#typescript-configuration"><span>Type<wbr/>Script <wbr/>Configuration</span></a></li><li><a href="#how-to-use"><span>How to use</span></a></li><li><a href="#core-modules"><span>Core <wbr/>Modules</span></a></li><li><ul><li><a href="#🎯-type-conditions-and-predicates"><span>🎯 <wbr/>Type <wbr/>Conditions and <wbr/>Predicates</span></a></li><li><a href="#🔧-record-and-object-types"><span>🔧 <wbr/>Record and <wbr/>Object <wbr/>Types</span></a></li><li><a href="#🔢-branded-number-types"><span>🔢 <wbr/>Branded <wbr/>Number <wbr/>Types</span></a></li><li><a href="#📋-array-and-tuple-operations"><span>📋 <wbr/>Array and <wbr/>Tuple <wbr/>Operations</span></a></li><li><a href="#🧮-type-level-arithmetic"><span>🧮 <wbr/>Type-<wbr/>Level <wbr/>Arithmetic</span></a></li><li><a href="#🌐-constants-and-primitives"><span>🌐 <wbr/>Constants and <wbr/>Primitives</span></a></li></ul></li><li><a href="#usage-examples"><span>Usage <wbr/>Examples</span></a></li><li><ul><li><a href="#1-type-level-conditional-logic-with-and"><span>1. <wbr/>Type-<wbr/>Level <wbr/>Conditional <wbr/>Logic with  and </span></a></li><li><a href="#2-deep-object-manipulation-with-and"><span>2. <wbr/>Deep <wbr/>Object <wbr/>Manipulation with  and </span></a></li><li><a href="#3-strict-type-operations-with"><span>3. <wbr/>Strict <wbr/>Type <wbr/>Operations with </span></a></li><li><a href="#4-array-type-safety-with-and--operations"><span>4. <wbr/>Array <wbr/>Type <wbr/>Safety with  and  <wbr/>Operations</span></a></li><li><a href="#5-type-safe-json-handling-with"><span>5. <wbr/>Type-<wbr/>Safe <wbr/>JSON <wbr/>Handling with </span></a></li><li><a href="#6-precise-numeric-ranges-with-and-branded-types"><span>6. <wbr/>Precise <wbr/>Numeric <wbr/>Ranges with  and <wbr/>Branded <wbr/>Types</span></a></li></ul></li><li><a href="#modules-overview"><span>Modules <wbr/>Overview</span></a></li><li><a href="#key-benefits"><span>Key <wbr/>Benefits</span></a></li><li><a href="#api-reference"><span>API <wbr/>Reference</span></a></li><li><ul><li><a href="#overview-of-all-types-with-source-code-links"><span>Overview of <wbr/>All <wbr/>Types (with source code links)</span></a></li></ul></li><li><a href="#important-notes"><span>Important <wbr/>Notes</span></a></li><li><a href="#runtime-type-guards-with-ts-data-forge"><span>Runtime <wbr/>Type <wbr/>Guards with ts-<wbr/>data-<wbr/>forge</span></a></li><li><ul><li><a href="#example-combining-type-level-and-runtime-safety"><span>Example: <wbr/>Combining <wbr/>Type-<wbr/>Level and <wbr/>Runtime <wbr/>Safety</span></a></li><li><a href="#benefits-of-using-both-libraries-together"><span>Benefits of <wbr/>Using <wbr/>Both <wbr/>Libraries <wbr/>Together</span></a></li></ul></li><li><a href="#compatibility-notes"><span>Compatibility <wbr/>Notes</span></a></li><li><a href="#contributing"><span>Contributing</span></a></li><li><a href="#license"><span>License</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">ts-type-forge</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a> with <a href="https://github.com/JulianWowra/typedoc-github-theme" target="_blank">typedoc-github-theme</a></p></footer><div class="overlay"></div></body></html>

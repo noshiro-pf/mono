@@ -2,111 +2,87 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { glob, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
+import { extractTypeExports } from './extract-type-exports.mjs';
 
 const srcDir = path.resolve(projectRootPath, './src');
 
 const readmePath = path.resolve(projectRootPath, './README.md');
-
-const typeRegex = /^type ([^< =]*)/u;
-
-const namespaceRegex = /^declare namespace ([^ {]*)/u;
 
 const markers = {
   start: '<!-- AUTO-GENERATED TYPES START -->',
   end: '<!-- AUTO-GENERATED TYPES END -->',
 } as const;
 
-const TSTypeForgeInternals = 'TSTypeForgeInternals';
+type TypeEntry = Readonly<{ typeName: string; line: number }>;
 
-/**
- * Processes a single file to find type definitions matching the regex.
- */
-const processFile = async (
-  filePath: string,
-): Promise<
-  DeepReadonly<{
-    relativePath: string;
-    types: { typeName: string; line: number }[];
-  }>
-> => {
-  const mut_results: Readonly<{
-    typeName: string;
-    line: number;
-  }>[] = [];
+type FileEntry = Readonly<{
+  relativePath: string;
+  types: readonly TypeEntry[];
+}>;
 
+const collectExports = async (filePath: string): Promise<FileEntry> => {
   const relativePath = path.relative(projectRootPath, filePath);
 
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const content = await fs.readFile(filePath, 'utf8');
 
-    const lines = content.split('\n');
+    const { types, namespaces } = extractTypeExports(content);
 
-    for (const [index, line] of lines.entries()) {
-      {
-        const match = typeRegex.exec(line);
+    // Skip `TSTypeForgeInternals_`-prefixed exports (e.g.
+    // `TSTypeForgeInternals_SmallIntIndexMax`) that may live alongside
+    // public types in a regular module file — they're internal opt-in
+    // helpers, not part of the user-facing surface.
+    const isInternal = (name: string): boolean =>
+      name.startsWith('TSTypeForgeInternals_');
 
-        if (match?.[1] !== undefined) {
-          // Exclude internal namespace helper types if needed (adjust regex if necessary)
-          // For now, just matching the pattern
-          mut_results.push({
-            typeName: match[1],
-            line: index + 1,
-          });
-        }
-      }
+    const flat: readonly TypeEntry[] = [
+      ...types
+        .filter(({ name }) => !isInternal(name))
+        .map(({ name, line }) => ({ typeName: name, line })),
+      ...namespaces.flatMap((ns) =>
+        ns.types
+          .filter(({ name }) => !isInternal(name))
+          .map(({ name, line }) => ({
+            typeName: `${ns.name}.${name}`,
+            line,
+          })),
+      ),
+    ].toSorted((a, b) => a.line - b.line);
 
-      {
-        const namespaceMatch = namespaceRegex.exec(line);
-
-        if (
-          namespaceMatch?.[1] !== undefined &&
-          namespaceMatch[1] !== TSTypeForgeInternals // Exclude TSTypeForgeInternals namespace
-        ) {
-          for (const [idx, l] of lines.entries()) {
-            const typeMatch = typeRegex.exec(l.trimStart());
-
-            if (typeMatch?.[1] !== undefined) {
-              // Exclude internal namespace helper types if needed (adjust regex if necessary)
-              // For now, just matching the pattern
-              mut_results.push({
-                typeName: `${namespaceMatch[1]}.${typeMatch[1]}`,
-                line: idx + 1,
-              });
-            }
-          }
-        }
-      }
-    }
+    return { relativePath, types: flat };
   } catch (error) {
     console.error(`Error processing file ${filePath}:`, error);
-  }
 
-  return {
-    relativePath,
-    types: mut_results,
-  };
+    return { relativePath, types: [] };
+  }
 };
 
 export const genTypeDefinitions = async (): Promise<void> => {
-  const getDesFilesResult = await glob(`${srcDir}/**/*.d.mts`);
+  const filesResult = await glob(`${srcDir}/**/*.mts`);
 
-  if (Result.isErr(getDesFilesResult)) {
-    console.error(getDesFilesResult.value);
+  if (Result.isErr(filesResult)) {
+    console.error(filesResult.value);
 
     return;
   }
 
-  const dtsFiles = getDesFilesResult.value;
+  const filesToList = filesResult.value.filter((p) => {
+    const base = path.basename(p);
 
-  const allTypes: DeepReadonly<
-    {
-      relativePath: string;
-      types: { typeName: string; line: number }[];
-    }[]
-  > = await Promise.all(dtsFiles.toSorted().map(processFile));
+    return (
+      base !== 'index.mts' &&
+      base !== 'global.mts' &&
+      base !== '_internals.mts' &&
+      !base.endsWith('.test.mts')
+    );
+  });
 
-  const result = allTypes
+  const fileEntries = await Promise.all(
+    filesToList.toSorted().map(collectExports),
+  );
+
+  const result = fileEntries
     .flatMap(({ relativePath, types }) => [
       `- ${relativePath}`,
       ...types.map(
@@ -124,7 +100,6 @@ export const genTypeDefinitions = async (): Promise<void> => {
     `${markers.start}\n${result}\n\n${markers.end}`,
   );
 
-  // Write the updated content back to the README file
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(readmePath, newContent, 'utf8');
 };

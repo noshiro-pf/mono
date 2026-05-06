@@ -1,3 +1,6 @@
+import { type DeepPartial, type DeepReadonly } from 'ts-type-forge';
+// embed-sample-code-ignore-above
+
 type Config = {
   port: number;
   database: {

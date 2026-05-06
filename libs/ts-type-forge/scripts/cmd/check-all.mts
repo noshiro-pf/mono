@@ -39,6 +39,27 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
+    startMessage:
+      'Running import-pattern tests (named imports stay side-effect free)',
+    action: () =>
+      runCmdStep(
+        'tsc -p test/imports/tsconfig.named.json',
+        'Named-import isolation test failed',
+      ),
+    successMessage: 'Named-import isolation test passed',
+  });
+
+  await logStep({
+    startMessage: 'Running import-pattern tests (/// reference loads ambients)',
+    action: () =>
+      runCmdStep(
+        'tsc -p test/imports/tsconfig.ambient.json',
+        'Ambient subpath test failed',
+      ),
+    successMessage: 'Ambient subpath test passed',
+  });
+
+  await logStep({
     startMessage: 'Generating documentation',
     action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
     successMessage: 'Documentation generated',
