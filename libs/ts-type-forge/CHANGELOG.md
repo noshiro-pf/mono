@@ -1,3 +1,9 @@
+## [2.4.2](https://github.com/noshiro-pf/ts-type-forge/compare/v2.4.1...v2.4.2) (2026-05-06)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#364](https://github.com/noshiro-pf/ts-type-forge/issues/364)) ([11f2310](https://github.com/noshiro-pf/ts-type-forge/commit/11f2310bc6fda2d7fe3129cd43a688863bfce6f6))
+
 ## [2.4.1](https://github.com/noshiro-pf/ts-type-forge/compare/v2.4.0...v2.4.1) (2026-04-23)
 
 ### Bug Fixes
