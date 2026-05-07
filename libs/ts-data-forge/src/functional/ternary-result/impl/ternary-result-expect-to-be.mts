@@ -1,3 +1,7 @@
+import {
+  type TernaryResult,
+  type UnknownTernaryResult,
+} from '../ternary-result.mjs';
 import { isOk } from './ternary-result-is-ok.mjs';
 import { unwrapOk } from './ternary-result-unwrap-ok.mjs';
 import { type UnwrapOk } from './types.mjs';

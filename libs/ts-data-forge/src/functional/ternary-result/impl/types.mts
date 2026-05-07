@@ -1,3 +1,10 @@
+import {
+  type TernaryErr,
+  type TernaryOk,
+  type TernaryWarn,
+  type UnknownTernaryResult,
+} from '../ternary-result.mjs';
+
 /**
  * Extracts the success value type `S` from a `TernaryResult.Ok<S>`.
  */

@@ -1,3 +1,4 @@
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { WarnTypeTagName } from './tag.mjs';
 import { type NarrowToWarn } from './types.mjs';
 

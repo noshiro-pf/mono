@@ -1,5 +1,8 @@
+import { type NonZeroInt32 as TtfImported_NonZeroInt32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type NonZeroInt32 = TtfImported_NonZeroInt32;
 
 type ElementType = NonZeroInt32;
 

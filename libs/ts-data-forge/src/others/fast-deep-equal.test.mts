@@ -3,8 +3,8 @@
 /* eslint-disable require-unicode-regexp */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable functional/no-class-inheritance */
-
 import * as React from 'react';
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { fastDeepEqual } from './fast-deep-equal.mjs';
 
 const fastDeepEqualUntyped = (a: any, b: any): boolean => fastDeepEqual(a, b);

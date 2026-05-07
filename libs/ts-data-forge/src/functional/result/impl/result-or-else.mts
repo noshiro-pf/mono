@@ -1,3 +1,4 @@
+import { type Result, type UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { type NarrowToOk } from './types.mjs';
 

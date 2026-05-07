@@ -1,4 +1,5 @@
 import { unknownToString } from '../../../others/index.mjs';
+import { type UnknownResult } from '../result.mjs';
 import { isErr } from './result-is-err.mjs';
 import { type UnwrapErr, type UnwrapOk } from './types.mjs';
 

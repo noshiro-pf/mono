@@ -15,7 +15,7 @@ const configDir = path.resolve(projectRootPath, './configs');
 const srcDir = path.resolve(projectRootPath, './src');
 
 const globResult = await glob(path.resolve(srcDir, './**/*.mts'), {
-  ignore: ['**/*.test.mts', './**/*.d.mts'],
+  ignore: ['**/*.test.mts', '**/*.d.mts'],
 });
 
 if (Result.isErr(globResult)) {

@@ -1,3 +1,16 @@
+import {
+  type ArrayElement,
+  type Decrement,
+  type DeepOmit,
+  type DeepPick,
+  type IsFixedLengthList,
+  type IsUnion,
+  type List,
+  type ReadonlyRecord,
+  type RelaxedPick,
+  type TypeEq,
+  type UnknownRecord,
+} from 'ts-type-forge';
 import { Arr } from '../array/index.mjs';
 import { hasKey, isRecord } from '../guard/index.mjs';
 

@@ -1,3 +1,4 @@
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { ErrTypeTagName, OkTypeTagName, WarnTypeTagName } from './tag.mjs';
 
 /** @internal Returns the human readable variant label for the given tag. */

@@ -1,5 +1,8 @@
+import { type Uint8 as TtfImported_Uint8, type Uint16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type Uint8 = TtfImported_Uint8;
 
 const typeNameInMessage = 'an non-negative integer less than 256';
 

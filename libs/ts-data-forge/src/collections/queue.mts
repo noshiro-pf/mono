@@ -1,6 +1,7 @@
 import { Optional } from '../functional/index.mjs';
 import { range } from '../iterator/index.mjs';
 import { asSafeUint, asUint32 } from '../number/index.mjs';
+import { type SizeType } from '../types.mjs';
 
 /**
  * Interface for a high-performance queue with FIFO (First-In, First-Out)

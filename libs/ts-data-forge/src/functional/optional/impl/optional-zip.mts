@@ -1,3 +1,4 @@
+import { type Optional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { none } from './optional-none.mjs';
 import { some } from './optional-some.mjs';
@@ -21,6 +22,7 @@ import { some } from './optional-some.mjs';
  *
  * const missing = Optional.zip(
  *   Optional.some('value'),
+ *   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
  *   Optional.none as Optional<number>,
  * );
  *

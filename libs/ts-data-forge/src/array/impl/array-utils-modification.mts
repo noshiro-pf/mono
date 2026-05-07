@@ -1,5 +1,16 @@
+import {
+  type ArrayOfLength,
+  type Increment,
+  type IsFixedLengthList,
+  type NonEmptyArray,
+} from 'ts-type-forge';
 import { asPositiveUint32 } from '../../number/index.mjs';
 import { castMutable } from '../../others/index.mjs';
+import {
+  type ArgArrayIndex,
+  type ArgArrayIndexWithNegative,
+  type SizeType,
+} from '../../types.mjs';
 import { copy, create } from './array-utils-creation.mjs';
 
 /**

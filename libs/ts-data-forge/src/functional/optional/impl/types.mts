@@ -1,3 +1,6 @@
+import { type None, type Some } from '../../../types.mjs';
+import { type UnknownOptional } from '../optional.mjs';
+
 /**
  * Extracts the value type `S` from an {@link Some}<S>. If the
  * {@link Optional} is {@link None}, resolves to `never`.

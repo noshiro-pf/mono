@@ -2,6 +2,7 @@ import { expectType } from '../expect-type.mjs';
 import { Optional } from '../functional/index.mjs';
 import { range } from '../iterator/index.mjs';
 import { asPositiveSafeInt, asSafeInt } from '../number/index.mjs';
+import { type SizeType } from '../types.mjs';
 import { createStack, type Stack } from './stack.mjs';
 
 describe('Stack test', () => {

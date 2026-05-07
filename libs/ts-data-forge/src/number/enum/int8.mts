@@ -1,5 +1,12 @@
+import {
+  type AbsoluteValue,
+  type Int16,
+  type Int8 as TtfImported_Int8,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type Int8 = TtfImported_Int8;
 
 const typeNameInMessage = 'an integer in [-128, 127]';
 

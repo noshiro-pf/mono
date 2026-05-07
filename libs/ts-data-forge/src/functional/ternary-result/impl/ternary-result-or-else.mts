@@ -1,3 +1,7 @@
+import {
+  type TernaryResult,
+  type UnknownTernaryResult,
+} from '../ternary-result.mjs';
 import { isOk } from './ternary-result-is-ok.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
 import { type NarrowToOk, type NarrowToWarn } from './types.mjs';

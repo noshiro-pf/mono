@@ -16,7 +16,6 @@ describe(debounce, () => {
   test('should delay the execution of the function', () => {
     const func = vi.fn();
 
-    // eslint-disable-next-line @typescript-eslint/strict-void-return
     const debouncedFunc = debounce(func, 100);
 
     debouncedFunc();
@@ -35,7 +34,6 @@ describe(debounce, () => {
   test('should only execute the function once after multiple rapid calls', () => {
     const func = vi.fn();
 
-    // eslint-disable-next-line @typescript-eslint/strict-void-return
     const debouncedFunc = debounce(func, 100);
 
     debouncedFunc();

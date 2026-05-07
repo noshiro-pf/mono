@@ -1,3 +1,4 @@
+import { type None } from '../../../types.mjs';
 import { NoneTypeTagName } from './tag.mjs';
 
 /**

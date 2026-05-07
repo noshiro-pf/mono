@@ -1,3 +1,4 @@
+import { type UnknownResult } from '../result.mjs';
 import { OkTypeTagName } from './tag.mjs';
 import { type NarrowToOk } from './types.mjs';
 

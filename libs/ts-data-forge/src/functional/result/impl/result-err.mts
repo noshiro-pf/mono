@@ -1,3 +1,4 @@
+import { type Err } from '../../../types.mjs';
 import { ErrTypeTagName } from './tag.mjs';
 
 /**

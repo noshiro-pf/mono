@@ -1,4 +1,5 @@
 import { hasKey, isRecord } from '../../../guard/index.mjs';
+import { type UnknownResult } from '../result.mjs';
 import { ErrTypeTagName, OkTypeTagName } from './tag.mjs';
 
 /**

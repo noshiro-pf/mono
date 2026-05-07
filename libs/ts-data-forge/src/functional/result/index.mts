@@ -1,1 +1,1 @@
-export * as Result from './impl/index.mjs';
+export * from './result.mjs';

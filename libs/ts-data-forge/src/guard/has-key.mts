@@ -1,3 +1,5 @@
+import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
+
 /**
  * Type guard function that checks if an object has a specific key as its own
  * property.

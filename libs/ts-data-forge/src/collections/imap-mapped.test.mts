@@ -1,3 +1,4 @@
+import { type DeepReadonly } from 'ts-type-forge';
 import { Optional } from '../functional/index.mjs';
 import { IMapMapped } from './imap-mapped.mjs';
 

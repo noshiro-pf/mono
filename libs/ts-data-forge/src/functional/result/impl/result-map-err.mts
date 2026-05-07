@@ -1,3 +1,5 @@
+import { type Ok } from '../../../types.mjs';
+import { type Result, type UnknownResult } from '../result.mjs';
 import { err } from './result-err.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { type UnwrapErr, type UnwrapOk } from './types.mjs';

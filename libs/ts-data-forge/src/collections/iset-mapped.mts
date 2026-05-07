@@ -1,4 +1,6 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { asUint32 } from '../number/index.mjs';
+import { type MapSetKeyType, type SizeType } from '../types.mjs';
 
 /**
  * Interface for an immutable set with custom element mapping and membership

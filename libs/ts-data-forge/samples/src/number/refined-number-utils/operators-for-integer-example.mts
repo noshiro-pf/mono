@@ -1,5 +1,6 @@
 // Example: src/number/refined-number-utils.mts (operatorsForInteger)
 import { TsDataForgeInternals } from 'ts-data-forge';
+import { type SafeInt } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {

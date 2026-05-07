@@ -1,4 +1,5 @@
 import { expectType } from '../expect-type.mjs';
+import { type Err, type Ok } from '../types.mjs';
 import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
 import { Result } from './result/index.mjs';

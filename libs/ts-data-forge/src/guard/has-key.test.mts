@@ -1,3 +1,4 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 
@@ -52,6 +53,7 @@ test('hasKey type inferences', () => {
   {
     type R = Readonly<{ a: 0 } | { b: 1 }>;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const obj: R = { a: 0 } as R;
 
     if (hasKey(obj, 'a')) {
@@ -68,6 +70,7 @@ test('hasKey type inferences', () => {
   {
     type R = Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 } | { c: 3 }>;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const obj: R = { a: 0 } as R;
 
     if (hasKey(obj, 'a') && hasKey(obj, 'b')) {
@@ -84,6 +87,7 @@ test('hasKey type inferences', () => {
       | ReadonlyRecord<string, number>
       | Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 }>;
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const obj: R = { a: 0 } as R;
 
     expectType<

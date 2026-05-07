@@ -1,3 +1,4 @@
+import { type Result, type UnknownResult } from '../result.mjs';
 import { err } from './result-err.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { ok } from './result-ok.mjs';

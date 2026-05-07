@@ -1,5 +1,8 @@
+import { type PositiveInt32 as TtfImported_PositiveInt32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type PositiveInt32 = TtfImported_PositiveInt32;
 
 type ElementType = PositiveInt32;
 

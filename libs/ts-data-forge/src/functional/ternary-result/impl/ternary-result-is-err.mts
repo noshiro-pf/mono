@@ -1,3 +1,4 @@
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { ErrTypeTagName } from './tag.mjs';
 import { type NarrowToErr } from './types.mjs';
 

@@ -1,4 +1,6 @@
+import { type List, type NonEmptyArray, type SmallUint } from 'ts-type-forge';
 import { Uint32 } from '../../number/index.mjs';
+import { type SizeType } from '../../types.mjs';
 import { size } from './array-utils-size.mjs';
 import { sliceClamped } from './array-utils-slice-clamped.mjs';
 import { isEmpty } from './array-utils-validation.mjs';

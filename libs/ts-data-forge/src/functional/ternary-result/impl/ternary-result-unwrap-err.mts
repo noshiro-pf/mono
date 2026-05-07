@@ -1,3 +1,4 @@
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { isErr } from './ternary-result-is-err.mjs';
 import { type UnwrapErr } from './types.mjs';
 

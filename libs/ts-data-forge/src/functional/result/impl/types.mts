@@ -1,3 +1,6 @@
+import { type Err, type Ok } from '../../../types.mjs';
+import { type UnknownResult } from '../result.mjs';
+
 /**
  * Extracts the success value type `S` from a `Result.Ok<S>`. If the `Result`
  * is `Result.Err<E>`, resolves to `never`.

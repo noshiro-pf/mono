@@ -16,6 +16,7 @@ if (import.meta.vitest !== undefined) {
 
     const missing = Optional.zip(
       Optional.some('value'),
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       Optional.none as Optional<number>,
     );
 

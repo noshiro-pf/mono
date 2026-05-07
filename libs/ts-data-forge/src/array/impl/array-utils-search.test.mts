@@ -1,5 +1,6 @@
 import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';
+import { type SizeType } from '../../types.mjs';
 import {
   find,
   findIndex,

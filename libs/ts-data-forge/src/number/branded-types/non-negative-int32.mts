@@ -1,5 +1,8 @@
+import { type NonNegativeInt32 as TtfImported_NonNegativeInt32 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type NonNegativeInt32 = TtfImported_NonNegativeInt32;
 
 type ElementType = NonNegativeInt32;
 

@@ -4,6 +4,7 @@ import { match } from './match.mjs';
 describe(match, () => {
   type Direction = 'E' | 'N' | 'S' | 'W';
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   const direction: Direction = 'N' as Direction;
 
   test('literal union', () => {

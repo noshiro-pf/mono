@@ -1,3 +1,5 @@
+import { type Primitive } from 'ts-type-forge';
+
 /**
  * Creates a memoized version of a function that caches results based on input
  * arguments.

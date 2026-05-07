@@ -1,3 +1,8 @@
+import {
+  type ArrayOfLength,
+  type DeepReadonly,
+  type UnknownRecord,
+} from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { pipe } from '../functional/index.mjs';
 import { Obj } from './object.mjs';

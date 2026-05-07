@@ -1,3 +1,4 @@
+import { type Some } from '../../../types.mjs';
 import { SomeTypeTagName } from './tag.mjs';
 
 /**

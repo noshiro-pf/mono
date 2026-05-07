@@ -1,4 +1,22 @@
+import {
+  type Decrement,
+  type Increment,
+  type Index,
+  type Int,
+  type Min,
+  type NaNType,
+  type NegativeIndex,
+  type NonNegativeNumber,
+  type NonZeroNumber,
+  type PositiveNumber,
+  type PositiveSafeIntWithSmallInt,
+  type RelaxedExclude,
+  type SmallInt,
+  type SmallUint,
+  type UnknownBrand,
+} from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
+import { type SmallPositiveInt } from '../types.mjs';
 
 /**
  * Namespace providing utility functions for number manipulation and validation.

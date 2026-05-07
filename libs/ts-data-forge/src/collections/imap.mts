@@ -1,6 +1,8 @@
+import { type WidenLiteral } from 'ts-type-forge';
 import { Optional, pipe } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
 import { tp, unknownToString } from '../others/index.mjs';
+import { type MapSetKeyType, type SizeType } from '../types.mjs';
 
 /**
  * Interface for an immutable map with lookup operations and functional

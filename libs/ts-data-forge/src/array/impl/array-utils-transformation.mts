@@ -1,7 +1,24 @@
+import {
+  type ArrayOfLength,
+  type IsFixedLengthList,
+  type List,
+  type MutableNonEmptyArray,
+  type NonEmptyArray,
+  type PositiveInt,
+  type PositiveUint32,
+  type Primitive,
+  type SafeUintWithSmallInt,
+  type WithSmallInt,
+} from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
 import { asPositiveUint32, asUint32, Uint32 } from '../../number/index.mjs';
 import { castMutable, tp } from '../../others/index.mjs';
+import {
+  type ArrayIndex,
+  type MapSetKeyType,
+  type SizeType,
+} from '../../types.mjs';
 import { newArray, seq } from './array-utils-creation.mjs';
 import { size } from './array-utils-size.mjs';
 import { isNonEmpty } from './array-utils-validation.mjs';

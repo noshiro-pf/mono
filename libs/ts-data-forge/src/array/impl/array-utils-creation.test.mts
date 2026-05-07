@@ -1,3 +1,4 @@
+import { type SafeInt, type SafeUint, type SmallUint } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range as rangeIterator } from '../../iterator/index.mjs';
 import {
@@ -6,6 +7,7 @@ import {
   asSafeUint,
   asUint32,
 } from '../../number/index.mjs';
+import { type SizeType } from '../../types.mjs';
 import {
   copy,
   create,

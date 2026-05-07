@@ -1,6 +1,11 @@
 import { expectType } from '../../expect-type.mjs';
 import { Optional, pipe } from '../../functional/index.mjs';
 import { asUint32 } from '../../number/index.mjs';
+import {
+  type ArgArrayIndexWithNegative,
+  type ArrayIndex,
+  type SizeType,
+} from '../../types.mjs';
 
 /**
  * Finds the first element that satisfies a predicate.

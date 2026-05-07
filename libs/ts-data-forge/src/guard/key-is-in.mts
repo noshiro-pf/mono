@@ -1,3 +1,5 @@
+import { type UnknownRecord } from 'ts-type-forge';
+
 /**
  * Type guard that checks if a key exists as an own property in an object.
  *

@@ -1,3 +1,5 @@
+import { type RelaxedExclude } from 'ts-type-forge';
+
 /**
  * Type guard that checks if a value is `undefined`.
  *

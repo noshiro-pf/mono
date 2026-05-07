@@ -1,3 +1,4 @@
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
 import { type UnwrapWarn } from './types.mjs';
 

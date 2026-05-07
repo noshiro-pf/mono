@@ -6,6 +6,7 @@ import {
   eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
+import { restrictedImports } from './configs/eslint/rules/eslint-no-restricted-imports-option.mjs';
 
 const thisDir = import.meta.dirname;
 
@@ -22,6 +23,15 @@ export default [
   eslintConfigForTsDataForge(),
 
   eslintConfigForVitest(),
+
+  {
+    rules: defineKnownRules({
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        ...restrictedImports,
+      ],
+    }),
+  },
 
   {
     files: ['test/**/*.mts', '**/*.test.mts'],
@@ -49,6 +59,12 @@ export default [
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
       'import-x/no-extraneous-dependencies': 'off',
+      // ts-repo-utils' API surface still references `Result` as an ambient
+      // type. Until that is migrated to named imports, type narrowing of
+      // its return values reports as `any` here.
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
     }),
   },
   {
@@ -64,7 +80,10 @@ export default [
     rules: defineKnownRules({
       'import-x/no-unused-modules': [
         'error',
-        { unusedExports: true, ignoreExports: ['src/entry-point.mts'] },
+        {
+          unusedExports: true,
+          ignoreExports: ['src/entry-point.mts', 'src/types.mts'],
+        },
       ],
     }),
   },
@@ -76,7 +95,6 @@ export default [
       '@stylistic/padding-line-between-statements': 'off',
     }),
   },
-
   {
     files: ['samples/**'],
     rules: defineKnownRules({

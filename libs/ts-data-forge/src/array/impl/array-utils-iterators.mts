@@ -1,4 +1,5 @@
 import { asUint32 } from '../../number/index.mjs';
+import { type SizeType } from '../../types.mjs';
 
 /**
  * Returns an iterator of `[index, value]` pairs for an array.

@@ -1,4 +1,5 @@
-import { Optional } from './optional/index.mjs';
+import { type MergeIntersection } from 'ts-type-forge';
+import { Optional, type UnknownOptional } from './optional/index.mjs';
 
 /**
  * Creates a new pipe object that allows for chaining operations on a value.

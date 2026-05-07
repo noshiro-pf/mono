@@ -1,5 +1,12 @@
+import {
+  type SafeInt,
+  type SafeUint,
+  type NonZeroSafeInt as TtfImported_NonZeroSafeInt,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type NonZeroSafeInt = TtfImported_NonZeroSafeInt;
 
 type ElementType = NonZeroSafeInt;
 

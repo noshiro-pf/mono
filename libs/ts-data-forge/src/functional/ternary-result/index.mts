@@ -1,1 +1,1 @@
-export * as TernaryResult from './impl/index.mjs';
+export * from './ternary-result.mjs';

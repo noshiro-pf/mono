@@ -1,3 +1,4 @@
+import { type UnknownResult } from '../result.mjs';
 import { ErrTypeTagName } from './tag.mjs';
 import { type NarrowToErr } from './types.mjs';
 

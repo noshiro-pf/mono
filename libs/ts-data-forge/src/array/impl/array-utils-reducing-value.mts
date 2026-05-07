@@ -1,9 +1,16 @@
 import { isError } from '@sindresorhus/is';
+import { type Int, type NonEmptyArray, type Uint } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { Optional, Result } from '../../functional/index.mjs';
 import { isString, isUndefined } from '../../guard/index.mjs';
 import { asUint32, Num, Uint32 } from '../../number/index.mjs';
 import { unknownToString } from '../../others/index.mjs';
+import {
+  type ArrayIndex,
+  type MapSetKeyType,
+  type SizeType,
+  type Some,
+} from '../../types.mjs';
 import { isNonEmpty } from './array-utils-validation.mjs';
 
 /**

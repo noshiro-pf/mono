@@ -1,3 +1,4 @@
+import { type UnknownRecord } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { isRecord } from './is-record.mjs';
 

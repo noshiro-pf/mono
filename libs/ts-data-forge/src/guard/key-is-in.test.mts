@@ -1,3 +1,4 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { keyIsIn } from './key-is-in.mjs';
 
 const f = <Key extends string, V, KeySub extends Key>(
@@ -6,6 +7,7 @@ const f = <Key extends string, V, KeySub extends Key>(
 ): V | undefined => (keyIsIn(key, obj) ? obj[key] : undefined);
 
 describe(keyIsIn, () => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   f('a' as 'a' | 'b' | 'c', { a: 0, b: 1 });
 
   test('', () => {

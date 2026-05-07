@@ -1,6 +1,8 @@
+import { type Uint32 } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
 import { Optional, Result } from '../../functional/index.mjs';
+import { type Some } from '../../types.mjs';
 import {
   count,
   countBy,

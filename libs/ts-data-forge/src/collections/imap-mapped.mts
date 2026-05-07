@@ -1,6 +1,7 @@
 import { Optional, pipe } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
 import { tp } from '../others/index.mjs';
+import { type MapSetKeyType, type SizeType } from '../types.mjs';
 
 /**
  * Interface for an immutable map with custom key mapping and lookup operations.

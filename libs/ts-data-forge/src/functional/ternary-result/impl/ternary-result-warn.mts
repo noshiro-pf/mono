@@ -1,3 +1,4 @@
+import { type TernaryWarn } from '../ternary-result.mjs';
 import { WarnTypeTagName } from './tag.mjs';
 
 /**

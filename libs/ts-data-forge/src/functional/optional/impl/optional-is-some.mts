@@ -1,3 +1,4 @@
+import { type UnknownOptional } from '../optional.mjs';
 import { SomeTypeTagName } from './tag.mjs';
 import { type NarrowToSome } from './types.mjs';
 

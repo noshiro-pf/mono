@@ -1,3 +1,4 @@
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { OkTypeTagName } from './tag.mjs';
 import { type NarrowToOk } from './types.mjs';
 

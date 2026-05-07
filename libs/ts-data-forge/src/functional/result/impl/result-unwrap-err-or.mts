@@ -1,3 +1,4 @@
+import { type Result, type UnknownResult } from '../result.mjs';
 import { unwrapErr } from './result-unwrap-err.mjs';
 import { type UnwrapErr } from './types.mjs';
 

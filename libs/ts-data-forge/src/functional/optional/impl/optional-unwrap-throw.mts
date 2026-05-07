@@ -1,3 +1,4 @@
+import { type UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { type Unwrap } from './types.mjs';
 

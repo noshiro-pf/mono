@@ -1,4 +1,12 @@
+import {
+  type ArrayAtLeastLen,
+  type ArrayOfLength,
+  type BoolOr,
+  type NonEmptyArray,
+  type TypeEq,
+} from 'ts-type-forge';
 import { asUint32, Num } from '../../number/index.mjs';
+import { type ArrayIndex, type SizeType } from '../../types.mjs';
 
 /**
  * Type guard that checks if a value is an array.

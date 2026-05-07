@@ -1,5 +1,11 @@
+import {
+  type NonNegativeFiniteNumber as TtfImported_NonNegativeFiniteNumber,
+  type Uint,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type NonNegativeFiniteNumber = TtfImported_NonNegativeFiniteNumber;
 
 type ElementType = NonNegativeFiniteNumber;
 

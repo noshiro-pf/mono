@@ -1,3 +1,8 @@
+import {
+  type JsonValue,
+  type UintRangeInclusive,
+  type UnknownRecord,
+} from 'ts-type-forge';
 import { Arr } from '../array/index.mjs';
 import { pipe, Result } from '../functional/index.mjs';
 import { isRecord } from '../guard/index.mjs';

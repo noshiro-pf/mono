@@ -1,3 +1,4 @@
+import { type DeepReadonly } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { pipe } from '../functional/index.mjs';
 import { mapNullable } from './map-nullable.mjs';

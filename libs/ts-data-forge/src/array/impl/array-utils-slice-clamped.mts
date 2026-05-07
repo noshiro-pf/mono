@@ -1,4 +1,5 @@
 import { Num } from '../../number/index.mjs';
+import { type ArgArrayIndexWithNegative, type SizeType } from '../../types.mjs';
 
 /**
  * Slices an array with automatically clamped start and end indices.

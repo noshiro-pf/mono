@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import { $, assertPathExists, Result } from 'ts-repo-utils';
+import { type UnknownResult } from '../../src/functional/result/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const distDir = path.resolve(projectRootPath, './dist');
@@ -72,32 +73,9 @@ const build = async (skipCheck: boolean): Promise<void> => {
   });
 
   await logStep({
-    startMessage: 'Copying global type definitions',
-    action: async () => {
-      const srcGlobalsFile = path.resolve(
-        projectRootPath,
-        './src/globals.d.mts',
-      );
-
-      await assertPathExists(srcGlobalsFile, 'Global types file');
-
-      const destFile = path.resolve(distDir, 'globals.d.mts');
-
-      await runCmdStep(
-        `cp "${srcGlobalsFile}" "${destFile}"`,
-        'Failed to copy globals',
-      );
-    },
-    successMessage: 'Copied globals.d.mts to dist',
-  });
-
-  await logStep({
     startMessage: 'Generating dist/types.d.mts',
     action: async () => {
-      const content = [
-        "import './globals.d.mts';",
-        "export * from './entry-point.mjs';",
-      ].join('\n');
+      const content = "export * from './entry-point.mjs';\n";
 
       const typesFile = path.resolve(distDir, 'types.d.mts');
 

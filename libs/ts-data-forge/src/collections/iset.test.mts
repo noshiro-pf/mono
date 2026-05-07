@@ -1,5 +1,7 @@
+import { type Primitive } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { isString } from '../guard/index.mjs';
+import { type MapSetKeyType } from '../types.mjs';
 import { ISet } from './iset.mjs';
 
 describe('ISet.create', () => {
@@ -1000,7 +1002,7 @@ describe('ISet.toArray', () => {
     expectType<typeof s0.toArray, () => readonly (1 | 2 | 3)[]>('<=');
 
     assert.deepStrictEqual(
-      Array.from(s0.toArray()).toSorted((a, b) => a - b),
+      s0.toArray().toSorted((a, b) => a - b),
       [1, 2, 3],
     );
   });
@@ -1019,7 +1021,7 @@ describe('ISet.toArray', () => {
     expect(array).toHaveLength(3);
 
     assert.deepStrictEqual(
-      Array.from(array).toSorted((a, b) => a - b),
+      array.toSorted((a, b) => a - b),
       [1, 2, 3],
     );
   });

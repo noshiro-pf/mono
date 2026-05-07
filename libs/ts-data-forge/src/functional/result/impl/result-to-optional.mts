@@ -1,4 +1,5 @@
 import { Optional } from '../../optional/index.mjs';
+import { type UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { unwrapOk } from './result-unwrap-ok.mjs';
 import { type UnwrapOk } from './types.mjs';

@@ -1,5 +1,6 @@
 import { isError } from '@sindresorhus/is';
 import { unknownToString } from '../../../others/index.mjs';
+import { type TernaryResult } from '../ternary-result.mjs';
 import { err } from './ternary-result-err.mjs';
 import { ok } from './ternary-result-ok.mjs';
 

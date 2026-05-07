@@ -1,3 +1,4 @@
+import { type Ok } from '../../../types.mjs';
 import { OkTypeTagName } from './tag.mjs';
 
 /**

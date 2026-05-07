@@ -1,5 +1,8 @@
+import { type Uint16 as TtfImported_Uint16 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type Uint16 = TtfImported_Uint16;
 
 type ElementType = Uint16;
 

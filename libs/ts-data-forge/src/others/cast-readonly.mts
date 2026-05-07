@@ -1,3 +1,5 @@
+import { type DeepReadonly } from 'ts-type-forge';
+
 /**
  * Casts a mutable type `T` to its `Readonly<T>` equivalent.
  *
@@ -13,6 +15,7 @@
  * @see castMutable - For the opposite operation (use with caution)
  */
 export const castReadonly = <T,>(mutable: T): Readonly<T> =>
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   mutable as Readonly<T>;
 
 /**

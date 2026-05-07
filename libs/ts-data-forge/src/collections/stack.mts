@@ -1,6 +1,7 @@
 import { Optional } from '../functional/index.mjs';
 import { range } from '../iterator/index.mjs';
 import { asUint32, Uint32 } from '../number/index.mjs';
+import { type SizeType } from '../types.mjs';
 
 /**
  * Interface for a high-performance stack with LIFO (Last-In, First-Out)

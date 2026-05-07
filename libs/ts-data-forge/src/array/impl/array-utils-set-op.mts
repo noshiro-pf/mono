@@ -1,3 +1,5 @@
+import { type Primitive } from 'ts-type-forge';
+
 /**
  * Checks if two arrays are equal by comparing their elements.
  *

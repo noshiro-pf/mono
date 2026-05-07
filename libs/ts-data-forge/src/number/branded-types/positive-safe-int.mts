@@ -1,5 +1,11 @@
+import {
+  type SafeUint,
+  type PositiveSafeInt as TtfImported_PositiveSafeInt,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
+
+export type PositiveSafeInt = TtfImported_PositiveSafeInt;
 
 type ElementType = PositiveSafeInt;
 

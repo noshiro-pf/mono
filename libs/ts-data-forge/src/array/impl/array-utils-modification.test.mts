@@ -1,3 +1,4 @@
+import { type ArrayOfLength, type NonEmptyArray } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { asUint32 } from '../../number/index.mjs';
 import {

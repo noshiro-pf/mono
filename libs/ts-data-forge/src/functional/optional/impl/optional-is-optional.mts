@@ -1,4 +1,5 @@
 import { hasKey, isRecord } from '../../../guard/index.mjs';
+import { type Optional } from '../optional.mjs';
 import { NoneTypeTagName, SomeTypeTagName } from './tag.mjs';
 
 /**

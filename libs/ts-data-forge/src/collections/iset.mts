@@ -1,6 +1,7 @@
-// No imports from functional needed anymore
+import { type ReadonlyRecord, type WidenLiteral } from 'ts-type-forge';
 import { asUint32 } from '../number/index.mjs';
 import { unknownToString } from '../others/index.mjs';
+import { type MapSetKeyType, type SizeType } from '../types.mjs';
 
 /**
  * Interface for an immutable set with membership testing and set operation

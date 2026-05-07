@@ -1,3 +1,4 @@
+import { type Result, type UnknownResult } from '../result.mjs';
 import { unwrapOk } from './result-unwrap-ok.mjs';
 import { type UnwrapOk } from './types.mjs';
 

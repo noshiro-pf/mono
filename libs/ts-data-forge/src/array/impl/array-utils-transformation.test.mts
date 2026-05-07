@@ -1,3 +1,4 @@
+import { type ArrayOfLength } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';

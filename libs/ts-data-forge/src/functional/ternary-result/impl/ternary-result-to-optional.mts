@@ -1,4 +1,5 @@
 import { Optional } from '../../optional/index.mjs';
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { isOk } from './ternary-result-is-ok.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
 import { type UnwrapOk } from './types.mjs';

@@ -1,3 +1,4 @@
+import { type Primitive } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 
 /**

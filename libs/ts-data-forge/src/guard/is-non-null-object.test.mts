@@ -1,3 +1,4 @@
+import { type UnknownRecord } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { isNonNullObject } from './is-non-null-object.mjs';
 

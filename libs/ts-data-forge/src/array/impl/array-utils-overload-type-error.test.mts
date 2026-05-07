@@ -1,5 +1,6 @@
 import { expectType } from '../../expect-type.mjs';
 import { pipe } from '../../functional/index.mjs';
+import { type SizeType } from '../../types.mjs';
 import { range } from './array-utils-creation.mjs';
 import { findIndex } from './array-utils-search.mjs';
 import { filterNot, partition } from './array-utils-transformation.mjs';

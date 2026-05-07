@@ -1,4 +1,11 @@
+import { type NonEmptyArray } from 'ts-type-forge';
 import { Optional, pipe } from '../../functional/index.mjs';
+import {
+  type ArgArrayIndexWithNegative,
+  type None,
+  type SizeType,
+  type Some,
+} from '../../types.mjs';
 
 /**
  * Safely retrieves an element at a given index from an array, returning an Optional.

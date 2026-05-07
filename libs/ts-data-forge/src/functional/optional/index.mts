@@ -1,1 +1,1 @@
-export * as Optional from './impl/index.mjs';
+export * from './optional.mjs';
