@@ -1,3 +1,9 @@
+## [6.9.3](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.2...v6.9.3) (2026-05-07)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#364](https://github.com/noshiro-pf/ts-data-forge/issues/364)) ([04784f0](https://github.com/noshiro-pf/ts-data-forge/commit/04784f0ee0ff49a1d4b8ef8b142b7c2a042fdb43))
+
 ## [6.9.2](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.1...v6.9.2) (2026-04-23)
 
 ### Bug Fixes
