@@ -2,6 +2,7 @@ import micromatch from 'micromatch';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, ISet, isString, pipe, Result } from 'ts-data-forge';
+import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
 import { assertPathExists } from './assert-path-exists.mjs';
 import { $ } from './exec-async.mjs';
 

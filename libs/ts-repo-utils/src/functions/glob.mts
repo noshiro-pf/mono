@@ -1,6 +1,7 @@
 import type * as fsWalk from '@nodelib/fs.walk';
 import fastGlob from 'fast-glob';
 import { castDeepMutable, castMutable, Result } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 
 type EntryInternal = DeepReadonly<fsWalk.Entry>;
 

@@ -233,6 +233,7 @@ if (Result.isOk(result)) {
 
 ```tsx
 import { type ExecException } from 'node:child_process';
+import { type Result } from 'ts-data-forge';
 
 type Ret = Promise<
     Result<
@@ -487,6 +488,7 @@ Runs `git diff --name-only <base> [--diff-filter=d]`
 
 ```tsx
 import { type ExecException } from 'node:child_process';
+import { type Result } from 'ts-data-forge';
 
 type Ret = Result<
     readonly string[],
@@ -586,6 +588,7 @@ await formatUncommittedFiles({
 
 ```tsx
 import { type ExecException } from 'node:child_process';
+import { type Result } from 'ts-data-forge';
 
 type Ret = Promise<
     Result<
@@ -630,6 +633,7 @@ await formatDiffFrom('main', {
 
 ```tsx
 import { type ExecException } from 'node:child_process';
+import { type Result } from 'ts-data-forge';
 
 type Ret = Promise<
     Result<
@@ -774,6 +778,8 @@ console.log(packages.map((pkg) => pkg.name));
 **Return Type:**
 
 ```tsx
+import { type JsonValue } from 'ts-type-forge';
+
 type Package = Readonly<{
     name: string;
     path: string;

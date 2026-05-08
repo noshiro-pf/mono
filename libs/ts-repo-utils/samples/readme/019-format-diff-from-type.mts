@@ -1,4 +1,5 @@
 import { type ExecException } from 'node:child_process';
+import { type Result } from 'ts-data-forge';
 
 type Ret = Promise<
   Result<

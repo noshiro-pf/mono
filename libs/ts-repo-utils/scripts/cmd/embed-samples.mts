@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { pipe, Result, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
+import { type DeepReadonly } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
 const codeBlockStart = '```tsx';

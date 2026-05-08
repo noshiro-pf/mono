@@ -6,6 +6,7 @@ import * as cmd from 'cmd-ts';
 // eslint-disable-next-line import-x/no-internal-modules
 import { type InputOf, type OutputOf } from 'cmd-ts/dist/esm/from.js';
 import { expectType } from 'ts-data-forge';
+import { type NonEmptyArray } from 'ts-type-forge';
 import { genIndex } from '../functions/index.mjs';
 
 type Ext = `.${string}`;

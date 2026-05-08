@@ -10,6 +10,7 @@ import {
   Json,
   Result,
 } from 'ts-data-forge';
+import { type JsonValue, type ReadonlyRecord } from 'ts-type-forge';
 import { glob } from '../glob.mjs';
 import { type Package } from './types.mjs';
 

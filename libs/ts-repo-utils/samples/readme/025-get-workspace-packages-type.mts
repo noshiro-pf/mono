@@ -1,3 +1,5 @@
+import { type JsonValue } from 'ts-type-forge';
+
 type Package = Readonly<{
   name: string;
   path: string;
