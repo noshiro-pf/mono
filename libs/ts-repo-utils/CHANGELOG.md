@@ -1,3 +1,9 @@
+## [10.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.0.0...v10.0.1) (2026-05-08)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#365](https://github.com/noshiro-pf/ts-repo-utils/issues/365)) ([3f8b61e](https://github.com/noshiro-pf/ts-repo-utils/commit/3f8b61e8d199131f3460723b416460cac7833112))
+
 # [10.0.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v9.0.1...v10.0.0) (2026-04-23)
 
 ### Bug Fixes
