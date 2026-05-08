@@ -1,3 +1,9 @@
+## [6.9.4](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.3...v6.9.4) (2026-05-08)
+
+### Bug Fixes
+
+- fix entry point ([#369](https://github.com/noshiro-pf/ts-data-forge/issues/369)) ([49e60b7](https://github.com/noshiro-pf/ts-data-forge/commit/49e60b71f00b80585f6c528005d11f92de04d13b))
+
 ## [6.9.3](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.2...v6.9.3) (2026-05-07)
 
 ### Bug Fixes
