@@ -15,7 +15,6 @@ await genIndex({
   }: Readonly<{ absolutePath: string; fileName: string }>) =>
     fileName.endsWith('.test.mts') ||
     fileName.endsWith('.d.mts') ||
-    fileName === 'types.mts' ||
     absolutePath === path.resolve(srcDir, './entry-point.mts') ||
     absolutePath.startsWith(path.resolve(srcDir, './array')) ||
     absolutePath.startsWith(path.resolve(srcDir, './functional')),

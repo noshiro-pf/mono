@@ -72,38 +72,6 @@ const build = async (skipCheck: boolean): Promise<void> => {
     successMessage: 'Rollup build completed',
   });
 
-  await logStep({
-    startMessage: 'Generating dist/types.d.mts',
-    action: async () => {
-      const content = "export * from './entry-point.mjs';\n";
-
-      const typesFile = path.resolve(distDir, 'types.d.mts');
-
-      await runStep(
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        Result.fromPromise(fs.writeFile(typesFile, content)),
-        'Failed to generate dist/types.d.mts',
-      );
-    },
-    successMessage: 'Generated dist/types.d.mts',
-  });
-
-  await logStep({
-    startMessage: 'Generating dist TypeScript config',
-    action: async () => {
-      const configContent = JSON.stringify({ include: ['.'] });
-
-      const configFile = path.resolve(distDir, 'tsconfig.json');
-
-      await runStep(
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        Result.fromPromise(fs.writeFile(configFile, configContent)),
-        'Failed to generate tsconfig',
-      );
-    },
-    successMessage: 'Generated dist/tsconfig.json',
-  });
-
   console.log('✅ Build completed successfully!\n');
 };
 
