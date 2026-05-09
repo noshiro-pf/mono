@@ -1,3 +1,9 @@
+## [7.0.5](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.4...v7.0.5) (2026-05-09)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#288](https://github.com/noshiro-pf/ts-fortress/issues/288)) ([a07d619](https://github.com/noshiro-pf/ts-fortress/commit/a07d6193ac237fbd172973eb4afe6129daba21db))
+
 ## [7.0.4](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.3...v7.0.4) (2026-04-30)
 
 ### Bug Fixes
