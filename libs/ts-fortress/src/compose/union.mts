@@ -1,4 +1,5 @@
 import { Arr, Result, expectType, memoizeFunction } from 'ts-data-forge';
+import { type ArrayElement, type NonEmptyArray } from 'ts-type-forge';
 import {
   hasRecordInternals,
   type ExcessPropertyOption,

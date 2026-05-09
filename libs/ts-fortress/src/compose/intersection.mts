@@ -1,4 +1,5 @@
 import { Arr, expectType, Result } from 'ts-data-forge';
+import { type Intersection, type NonEmptyArray } from 'ts-type-forge';
 import {
   type ExcessPropertyOption,
   hasRecordInternals,

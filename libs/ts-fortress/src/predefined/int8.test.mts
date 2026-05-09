@@ -1,4 +1,5 @@
 import { expectType, Result } from 'ts-data-forge';
+import { type Int8 } from 'ts-type-forge';
 import { type TypeOf } from '../type.mjs';
 import { int8 } from './int8.mjs';
 

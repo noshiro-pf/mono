@@ -5,6 +5,15 @@ import {
   Num,
   Result,
 } from 'ts-data-forge';
+import {
+  type BoolAnd,
+  type Index,
+  type IndexInclusive,
+  type Int8,
+  type NegativeIndex,
+  type TypeExtends,
+  type UintRange,
+} from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -74,7 +83,7 @@ type NegativeRange = NegativeIndex<128>;
 
 type PositiveRange = IndexInclusive<128>;
 
-type IntRange<Start extends Int8, End extends Int8 | 128> =
+export type IntRange<Start extends Int8, End extends Int8 | 128> =
   BoolAnd<
     TypeExtends<Start, PositiveRange>,
     TypeExtends<End, PositiveRange>

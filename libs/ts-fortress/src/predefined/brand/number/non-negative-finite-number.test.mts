@@ -1,4 +1,5 @@
 import { expectType, Result } from 'ts-data-forge';
+import { type NonNegativeFiniteNumber } from 'ts-type-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { nonNegativeFiniteNumber } from './non-negative-finite-number.mjs';

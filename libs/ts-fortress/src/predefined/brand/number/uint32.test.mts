@@ -1,4 +1,5 @@
 import { asUint32, expectType, Result } from 'ts-data-forge';
+import { type Uint32 } from 'ts-type-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { uint32 } from './uint32.mjs';

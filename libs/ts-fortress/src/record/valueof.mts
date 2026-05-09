@@ -1,4 +1,5 @@
 import { Arr, expectType } from 'ts-data-forge';
+import { type IsNever, type UnknownRecord, type ValueOf } from 'ts-type-forge';
 import { union } from '../compose/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
 import {
@@ -7,6 +8,8 @@ import {
   type Type,
   type TypeOf,
 } from '../type.mjs';
+
+export type { ValueOf } from 'ts-type-forge';
 
 export const valueof = <const R extends UnknownRecord>(
   recordType: Type<R>,

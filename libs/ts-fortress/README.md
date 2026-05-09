@@ -383,6 +383,8 @@ Key differences:
 Every validator in ts-fortress implements the `Type<A>` interface:
 
 ```tsx
+import { type StrictOmit } from 'ts-type-forge';
+
 type Type<A> = Readonly<{
     typeName: string; // Human-readable type name
     defaultValue: A; // Default value for this type

@@ -1,5 +1,10 @@
 import { expectType, Obj } from 'ts-data-forge';
 import {
+  type ArrayElement,
+  type StrictOmit,
+  type UnknownRecord,
+} from 'ts-type-forge';
+import {
   type ExcessPropertyOption,
   flattenShapeStructure,
   hasRecordInternals,

@@ -1,4 +1,5 @@
 import { Arr, isRecord, Result } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,

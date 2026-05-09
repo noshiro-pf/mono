@@ -1,4 +1,5 @@
 import { asInt16, expectType, Result } from 'ts-data-forge';
+import { type Int16 } from 'ts-type-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { int16 } from './int16.mjs';

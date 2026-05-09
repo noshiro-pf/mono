@@ -1,4 +1,9 @@
 import { ISet, memoizeFunction, Result } from 'ts-data-forge';
+import {
+  type ArrayElement,
+  type NonEmptyArray,
+  type Primitive,
+} from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,

@@ -1,4 +1,5 @@
 import { Arr, isString } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 import { refine } from '../other-types/index.mjs';
 import { type Type } from '../type.mjs';
 import { createPrimitiveType } from '../utils/index.mjs';

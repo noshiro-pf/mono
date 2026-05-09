@@ -1,4 +1,9 @@
 import { Arr, expectType, Obj } from 'ts-data-forge';
+import {
+  type Intersection,
+  type NonEmptyArray,
+  type UnknownRecord,
+} from 'ts-type-forge';
 import { union } from '../compose/index.mjs';
 import { literal } from '../other-types/index.mjs';
 import {

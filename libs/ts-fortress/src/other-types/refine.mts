@@ -1,4 +1,5 @@
 import { pipe, Result } from 'ts-data-forge';
+import { type Primitive } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createPrimitiveValidationError,

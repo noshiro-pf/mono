@@ -1,4 +1,5 @@
 import { Result } from 'ts-data-forge';
+import { type UnknownRecord } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { record } from './record.mjs';

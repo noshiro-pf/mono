@@ -1,6 +1,5 @@
-/// <reference types="ts-type-forge" />
-
 import { isNonNullObject } from 'ts-data-forge';
+import { type Brand } from 'ts-type-forge';
 import { brandedString } from '../../../brand/index.mjs';
 import { type Type } from '../../../type.mjs';
 

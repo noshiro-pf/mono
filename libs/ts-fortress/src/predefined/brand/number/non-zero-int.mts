@@ -1,4 +1,5 @@
 import { isNonZeroInt } from 'ts-data-forge';
+import { type NonZeroInt } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { number } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';

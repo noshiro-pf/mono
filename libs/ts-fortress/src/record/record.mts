@@ -7,6 +7,7 @@ import {
   Result,
   tp,
 } from 'ts-data-forge';
+import { type MergeIntersection, type TypeEq } from 'ts-type-forge';
 import {
   type ExcessPropertyOption,
   type RecordTypeInternals,

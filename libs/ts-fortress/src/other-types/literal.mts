@@ -1,4 +1,5 @@
 import { isBigint, isString } from 'ts-data-forge';
+import { type Primitive } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import { createPrimitiveType } from '../utils/index.mjs';
 

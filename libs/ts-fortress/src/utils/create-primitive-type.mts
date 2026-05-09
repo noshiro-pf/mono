@@ -1,4 +1,5 @@
 import { Result } from 'ts-data-forge';
+import { type Primitive } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import { createAssertFn } from './create-assert-fn.mjs';
 import { createCastFn } from './create-cast-fn.mjs';

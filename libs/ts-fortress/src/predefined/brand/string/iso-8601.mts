@@ -1,5 +1,4 @@
-/// <reference types="ts-type-forge" />
-
+import { type Brand, type StrictOmit } from 'ts-type-forge';
 import { brandedString } from '../../../brand/index.mjs';
 import { boolean, string } from '../../../primitives/index.mjs';
 import { record } from '../../../record/index.mjs';

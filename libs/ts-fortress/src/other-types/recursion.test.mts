@@ -1,4 +1,5 @@
 import { expectType } from 'ts-data-forge';
+import { type Brand, type ReadonlyRecord } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
 import { brandedString } from '../brand/index.mjs';
 import { union } from '../compose/index.mjs';

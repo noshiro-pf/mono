@@ -1,3 +1,4 @@
+import { type Uint8 } from 'ts-type-forge';
 import { uintRange } from '../enum/index.mjs';
 import { type Type } from '../type.mjs';
 

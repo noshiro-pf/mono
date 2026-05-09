@@ -1,3 +1,5 @@
+import { type StrictOmit } from 'ts-type-forge';
+
 type Type<A> = Readonly<{
   typeName: string; // Human-readable type name
   defaultValue: A; // Default value for this type
@@ -10,7 +12,7 @@ type Type<A> = Readonly<{
 
 // embed-sample-code-ignore-below
 /* eslint-disable import-x/first */
-import { expectType } from 'ts-data-forge';
+import { expectType, type Result } from 'ts-data-forge';
 import {
   type Type as Type_,
   type ValidationError,

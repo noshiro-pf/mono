@@ -1,5 +1,9 @@
-/// <reference types="ts-type-forge" />
-
+import {
+  type Brand,
+  type ReadonlyRecord,
+  type TypeEq,
+  type UintRangeInclusive,
+} from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';

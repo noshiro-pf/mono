@@ -1,3 +1,4 @@
+import { type StrictOmit } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 
 /**

@@ -1,4 +1,5 @@
 import { expectType, Result } from 'ts-data-forge';
+import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
 import { number, string } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {

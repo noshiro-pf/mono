@@ -1,3 +1,4 @@
+import { type Brand } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
 import { type Type } from '../type.mjs';
 import { brand } from './brand.mjs';

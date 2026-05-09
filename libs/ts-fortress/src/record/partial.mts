@@ -1,5 +1,12 @@
 import { expectType } from 'ts-data-forge';
 import {
+  type ArrayElement,
+  type NonEmptyArray,
+  type PartiallyPartial,
+  type TypeEq,
+  type UnknownRecord,
+} from 'ts-type-forge';
+import {
   type ExcessPropertyOption,
   type Type,
   type TypeOf,

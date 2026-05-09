@@ -1,4 +1,5 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
+import { type NonEmptyArray } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -8,6 +9,8 @@ import {
   prependIndexToValidationErrors,
   type ValidationError,
 } from '../utils/index.mjs';
+
+export type { NonEmptyArray } from 'ts-type-forge';
 
 export const nonEmptyArray = <A,>(
   elementType: Type<A>,

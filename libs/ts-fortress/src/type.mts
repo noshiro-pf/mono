@@ -1,4 +1,5 @@
-import { Arr, Obj, hasKey, isRecord } from 'ts-data-forge';
+import { Arr, Obj, hasKey, isRecord, type Result } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { type ValidationError } from './utils/index.mjs';
 
 /**
