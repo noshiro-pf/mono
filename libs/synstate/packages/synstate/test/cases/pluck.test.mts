@@ -1,3 +1,4 @@
+import { type SafeUint } from 'ts-type-forge';
 import {
   counter,
   map,

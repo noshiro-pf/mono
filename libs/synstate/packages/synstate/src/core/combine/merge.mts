@@ -1,4 +1,5 @@
 import { Optional, expectType } from 'ts-data-forge';
+import { type ArrayElement, type NonEmptyArray } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import {

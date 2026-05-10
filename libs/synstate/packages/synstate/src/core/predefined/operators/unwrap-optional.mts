@@ -1,4 +1,5 @@
-import { Optional } from 'ts-data-forge';
+import { Optional, type UnknownOptional } from 'ts-data-forge';
+import { type Fn } from 'ts-type-forge';
 import { map } from '../../operators/index.mjs';
 import { type KeepInitialValueOperator } from '../../types/index.mjs';
 

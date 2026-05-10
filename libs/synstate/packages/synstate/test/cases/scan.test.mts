@@ -1,3 +1,4 @@
+import { type SafeUint } from 'ts-type-forge';
 import { counter, scan, take, type Observable } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';

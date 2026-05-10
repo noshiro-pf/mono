@@ -1,5 +1,6 @@
 import { combine, createState, map, type Observable } from 'synstate';
 import { Arr, asUint32 } from 'ts-data-forge';
+import { type DeepReadonly, type NonEmptyArray } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 export const runBenchmark = (k: number, branchCount: number): number => {

@@ -1,4 +1,5 @@
 import { expectType } from 'ts-data-forge';
+import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
 import {
   combine,
   counter,

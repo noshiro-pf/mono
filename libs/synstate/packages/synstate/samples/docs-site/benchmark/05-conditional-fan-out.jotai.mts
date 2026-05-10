@@ -1,5 +1,6 @@
 import { type WritableAtom, atom, createStore } from 'jotai/vanilla';
 import { Arr, asUint32 } from 'ts-data-forge';
+import { type Mutable } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 export const runBenchmark = (k: number, branchCount: number): number => {

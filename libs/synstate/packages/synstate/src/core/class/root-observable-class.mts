@@ -1,4 +1,5 @@
 import { Arr, Optional } from 'ts-data-forge';
+import { type MutableSet } from 'ts-type-forge';
 import {
   isRootObservable,
   type ChildObservable,

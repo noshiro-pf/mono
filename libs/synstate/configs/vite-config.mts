@@ -1,6 +1,7 @@
 import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
 import { castMutable } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 import { type ViteUserConfig } from 'vitest/config';
 import {
   type CoverageOptions,

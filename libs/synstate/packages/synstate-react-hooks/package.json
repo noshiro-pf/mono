@@ -59,13 +59,14 @@
   },
   "dependencies": {
     "synstate": "workspace:*",
-    "ts-data-forge": "^6.9.1"
+    "ts-data-forge": "6.9.4",
+    "ts-type-forge": "3.0.0"
   },
   "devDependencies": {
-    "@types/argparse": "^2.0.17",
-    "@types/react": "^19.2.14",
-    "argparse": "^2.0.1",
-    "react": "^19.2.5"
+    "@types/argparse": "2.0.17",
+    "@types/react": "19.2.14",
+    "argparse": "2.0.1",
+    "react": "19.2.5"
   },
   "peerDependencies": {
     "react": ">=18.0.0"

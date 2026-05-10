@@ -1,3 +1,4 @@
+import { type SafeUint } from 'ts-type-forge';
 import { map } from '../../operators/index.mjs';
 import { type KeepInitialValueOperator } from '../../types/index.mjs';
 

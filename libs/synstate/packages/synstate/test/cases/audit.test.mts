@@ -1,4 +1,5 @@
 import { ISet } from 'ts-data-forge';
+import { type SafeUint } from 'ts-type-forge';
 import {
   audit,
   counter,

@@ -1,3 +1,5 @@
+import { type DeepReadonly } from 'ts-type-forge';
+
 export type StreamTestCase<T> = StreamTestCaseImpl<T>;
 
 type StreamTestCaseImpl<T, O = DeepReadonly<T[]>> = Readonly<{

@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { pathExists } from 'ts-repo-utils';
+import { type DeepReadonly } from 'ts-type-forge';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const synstateRoot = path.resolve(workspaceRootPath, '../synstate');

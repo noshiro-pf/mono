@@ -1,4 +1,5 @@
 import { Arr, Optional, createQueue, expectType } from 'ts-data-forge';
+import { type NonEmptyArray } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { asSafeUint, range } from 'ts-data-forge';
+import { type SmallUint } from 'ts-type-forge';
 
 type Props = Readonly<{
   nodes: readonly NodeDef[];

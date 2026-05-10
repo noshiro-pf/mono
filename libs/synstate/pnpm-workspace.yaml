@@ -1,6 +1,11 @@
 packages:
   - packages/**
 
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+
 minimumReleaseAge: 10080
 
 minimumReleaseAgeExclude:

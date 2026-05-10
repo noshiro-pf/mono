@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { asSafeUint } from 'ts-data-forge';
+import { type SafeUint } from 'ts-type-forge';
 import {
   createJotaiThroughputAdapter,
   createMobXThroughputAdapter,

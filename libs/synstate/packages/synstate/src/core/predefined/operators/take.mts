@@ -1,3 +1,4 @@
+import { type PositiveSafeIntWithSmallInt } from 'ts-type-forge';
 import { takeWhile } from '../../operators/index.mjs';
 import { type DropInitialValueOperator } from '../../types/index.mjs';
 

@@ -1,4 +1,5 @@
-import { expectType, type Optional } from 'ts-data-forge';
+import { expectType, type Optional, type Some } from 'ts-data-forge';
+import { type StrictOmit } from 'ts-type-forge';
 import { type ObservableId, type UpdateToken } from './id.mjs';
 import { type ObservableKind } from './observable-kind.mjs';
 import { type NonEmptyUnknownList, type Subscription } from './types.mjs';

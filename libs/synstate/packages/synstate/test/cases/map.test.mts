@@ -1,4 +1,5 @@
 import { tp } from 'ts-data-forge';
+import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
 import { counter, map, take, type Observable } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';

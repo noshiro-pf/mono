@@ -1,4 +1,5 @@
 import { expectType, isNumber } from 'ts-data-forge';
+import { type SafeUint } from 'ts-type-forge';
 import {
   counter,
   filter,

@@ -1,5 +1,10 @@
 import { expectType, type Result } from 'ts-data-forge';
 import {
+  type ArrayElement,
+  type NonEmptyArray,
+  type SafeUint,
+} from 'ts-type-forge';
+import {
   type AsyncChildObservable,
   type InitializedObservable,
   type InitializedRootObservable,

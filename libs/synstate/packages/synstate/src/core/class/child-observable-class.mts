@@ -1,4 +1,5 @@
-import { Arr } from 'ts-data-forge';
+import { Arr, type Some } from 'ts-data-forge';
+import { type MutableSet } from 'ts-type-forge';
 import {
   isChildObservable,
   isManagerObservable,

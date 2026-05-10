@@ -1,4 +1,5 @@
 import { Arr, Optional } from 'ts-data-forge';
+import { type MutableMap } from 'ts-type-forge';
 import {
   type ChildObservable,
   type InitializedObservable,

@@ -1,4 +1,5 @@
 import { Arr, asSafeInt, asUint32, SafeInt } from 'ts-data-forge';
+import { type NegativeInt32, type Uint32 } from 'ts-type-forge';
 
 export const halfInt = (x: SafeInt): SafeInt =>
   x % 2 === 0

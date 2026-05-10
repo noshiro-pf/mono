@@ -59,13 +59,14 @@
   },
   "dependencies": {
     "synstate": "workspace:*",
-    "ts-data-forge": "^6.9.1"
+    "ts-data-forge": "6.9.4",
+    "ts-type-forge": "3.0.0"
   },
   "devDependencies": {
-    "@preact/signals": "^2.9.0",
-    "@types/argparse": "^2.0.17",
-    "argparse": "^2.0.1",
-    "preact": "^10.29.1"
+    "@preact/signals": "2.9.0",
+    "@types/argparse": "2.0.17",
+    "argparse": "2.0.1",
+    "preact": "10.29.1"
   },
   "peerDependencies": {
     "@preact/signals": ">=1.0.0",

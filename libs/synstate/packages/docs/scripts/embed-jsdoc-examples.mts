@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { type DeepReadonly } from 'ts-type-forge';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 

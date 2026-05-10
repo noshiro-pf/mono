@@ -66,7 +66,7 @@ importers:
         specifier: 8.0.4
         version: 8.0.4
       playwright:
-        specifier: ^1.59.1
+        specifier: 1.59.1
         version: 1.59.1
       prettier:
         specifier: 3.8.3
@@ -81,17 +81,17 @@ importers:
         specifier: 4.60.2
         version: 4.60.2
       ts-codemod-lib:
-        specifier: ^2.1.3
-        version: 2.1.3(cmd-ts@0.14.3)(dedent@1.7.2)(ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3)
+        specifier: 2.1.4
+        version: 2.1.4(dedent@1.7.2)(ts-repo-utils@10.0.1(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3)
       ts-data-forge:
-        specifier: 6.9.2
-        version: 6.9.2(typescript@5.9.3)
+        specifier: 6.9.4
+        version: 6.9.4(typescript@5.9.3)
       ts-repo-utils:
-        specifier: 10.0.0
-        version: 10.0.0(prettier@3.8.3)(typescript@5.9.3)
+        specifier: 10.0.1
+        version: 10.0.1(prettier@3.8.3)(typescript@5.9.3)
       ts-type-forge:
-        specifier: 2.4.1
-        version: 2.4.1
+        specifier: 3.0.0
+        version: 3.0.0
       tslib:
         specifier: 2.8.1
         version: 2.8.1
@@ -102,10 +102,10 @@ importers:
         specifier: 0.28.19
         version: 0.28.19(typescript@5.9.3)
       typedoc-github-theme:
-        specifier: ^0.4.0
+        specifier: 0.4.0
         version: 0.4.0(typedoc@0.28.19(typescript@5.9.3))
       typedoc-plugin-markdown:
-        specifier: ^4.11.0
+        specifier: 4.11.0
         version: 4.11.0(typedoc@0.28.19(typescript@5.9.3))
       typescript:
         specifier: 5.9.3
@@ -203,44 +203,47 @@ importers:
         version: 2.3.1(@types/react@19.2.14)(react@19.2.5)
       zustand:
         specifier: ^5.0.12
-        version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
+        version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)
 
   packages/synstate:
     dependencies:
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: 6.9.4
+        version: 6.9.4(typescript@5.9.3)
+      ts-type-forge:
+        specifier: 3.0.0
+        version: 3.0.0
     devDependencies:
       '@reduxjs/toolkit':
-        specifier: ^2.11.2
+        specifier: 2.11.2
         version: 2.11.2(react@19.2.5)
       '@types/argparse':
-        specifier: ^2.0.17
+        specifier: 2.0.17
         version: 2.0.17
       '@types/react':
-        specifier: ^19.2.14
+        specifier: 19.2.14
         version: 19.2.14
       argparse:
-        specifier: ^2.0.1
+        specifier: 2.0.1
         version: 2.0.1
       jotai:
-        specifier: ^2.19.1
+        specifier: 2.19.1
         version: 2.19.1(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.5)
       mobx:
-        specifier: ^6.15.0
+        specifier: 6.15.0
         version: 6.15.0
       react:
-        specifier: ^19.2.5
+        specifier: 19.2.5
         version: 19.2.5
       rxjs:
-        specifier: ^7.8.2
+        specifier: 7.8.2
         version: 7.8.2
       valtio:
-        specifier: ^2.3.1
+        specifier: 2.3.1
         version: 2.3.1(@types/react@19.2.14)(react@19.2.5)
       zustand:
-        specifier: ^5.0.12
-        version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
+        specifier: 5.0.12
+        version: 5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)
 
   packages/synstate-preact-hooks:
     dependencies:
@@ -248,17 +251,20 @@ importers:
         specifier: workspace:*
         version: link:../synstate
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: 6.9.4
+        version: 6.9.4(typescript@5.9.3)
+      ts-type-forge:
+        specifier: 3.0.0
+        version: 3.0.0
     devDependencies:
       '@types/argparse':
-        specifier: ^2.0.17
+        specifier: 2.0.17
         version: 2.0.17
       argparse:
-        specifier: ^2.0.1
+        specifier: 2.0.1
         version: 2.0.1
       preact:
-        specifier: ^10.29.1
+        specifier: 10.29.1
         version: 10.29.1
 
   packages/synstate-preact-signals:
@@ -267,20 +273,23 @@ importers:
         specifier: workspace:*
         version: link:../synstate
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: 6.9.4
+        version: 6.9.4(typescript@5.9.3)
+      ts-type-forge:
+        specifier: 3.0.0
+        version: 3.0.0
     devDependencies:
       '@preact/signals':
-        specifier: ^2.9.0
+        specifier: 2.9.0
         version: 2.9.0(preact@10.29.1)
       '@types/argparse':
-        specifier: ^2.0.17
+        specifier: 2.0.17
         version: 2.0.17
       argparse:
-        specifier: ^2.0.1
+        specifier: 2.0.1
         version: 2.0.1
       preact:
-        specifier: ^10.29.1
+        specifier: 10.29.1
         version: 10.29.1
 
   packages/synstate-react-hooks:
@@ -289,20 +298,23 @@ importers:
         specifier: workspace:*
         version: link:../synstate
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: 6.9.4
+        version: 6.9.4(typescript@5.9.3)
+      ts-type-forge:
+        specifier: 3.0.0
+        version: 3.0.0
     devDependencies:
       '@types/argparse':
-        specifier: ^2.0.17
+        specifier: 2.0.17
         version: 2.0.17
       '@types/react':
-        specifier: ^19.2.14
+        specifier: 19.2.14
         version: 19.2.14
       argparse:
-        specifier: ^2.0.1
+        specifier: 2.0.1
         version: 2.0.1
       react:
-        specifier: ^19.2.5
+        specifier: 19.2.5
         version: 19.2.5
 
   packages/synstate-react-hooks-compat:
@@ -311,20 +323,23 @@ importers:
         specifier: workspace:*
         version: link:../synstate
       ts-data-forge:
-        specifier: ^6.9.1
-        version: 6.9.1(typescript@5.9.3)
+        specifier: 6.9.4
+        version: 6.9.4(typescript@5.9.3)
+      ts-type-forge:
+        specifier: 3.0.0
+        version: 3.0.0
     devDependencies:
       '@types/argparse':
-        specifier: ^2.0.17
+        specifier: 2.0.17
         version: 2.0.17
       '@types/react':
-        specifier: ^19.2.14
+        specifier: 19.2.14
         version: 19.2.14
       argparse:
-        specifier: ^2.0.1
+        specifier: 2.0.1
         version: 2.0.1
       react:
-        specifier: ^19.2.5
+        specifier: 19.2.5
         version: 19.2.5
 
 packages:
@@ -1955,10 +1970,6 @@ packages:
     engines: {node: '>= 8.0.0'}
     hasBin: true
 
-  '@sindresorhus/is@7.2.0':
-    resolution: {integrity: sha512-P1Cz1dWaFfR4IR+U13mqqiGsLFf1KbayybWwdd2vfctdV6hDpUkgCY0nKOLLTMSoRd/jJNjtbqzf13K8DCCXQw==}
-    engines: {node: '>=18'}
-
   '@sindresorhus/is@8.0.0':
     resolution: {integrity: sha512-YvOsokBE5NsyHuXMnwEVB7lgFk6lX8F4OXCruYVgFII0hUHof0RGUvhMoabVt9hRqbg+qVzayzEG24RCcxcYeA==}
     engines: {node: '>=22'}
@@ -2135,6 +2146,7 @@ packages:
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
+    deprecated: Potential CWE-502 - Update to 1.3.1 or higher
 
   '@unrs/resolver-binding-android-arm-eabi@1.11.1':
     resolution: {integrity: sha512-ppLRUgHVaGRWUx0R0Ut06Mjo9gBaBkg3v/8AxusGLhsIotbBLuRk51rAzqLC8gq6NyyAojEXglNjzf6R948DNw==}
@@ -2581,9 +2593,6 @@ packages:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
 
-  cmd-ts@0.14.3:
-    resolution: {integrity: sha512-i9miaLBHGPn4T4vUFUdAdWoQ9HI8ato6usFrhubO21o/MQGqI6Nsqyd4ncZusT2chvPetNMmTt0JWkbaAOdWPg==}
-
   cmd-ts@0.15.0:
     resolution: {integrity: sha512-ASyAx+P6DNzNEZ6OYmvjjaLAQeI3L+4lm5rX2Jg8tondXdj06o9JTxi9mfC92KoVbrVFKhZ+j2TfBF8fcura6g==}
 
@@ -2888,8 +2897,8 @@ packages:
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
 
-  enhanced-resolve@5.20.1:
-    resolution: {integrity: sha512-Qohcme7V1inbAfvjItgw0EaxVX5q2rdVEZHRBrEQdRZTssLDGsL8Lwrznl8oQ/6kuTJONLaDcGjkNP247XEhcA==}
+  enhanced-resolve@5.21.0:
+    resolution: {integrity: sha512-otxSQPw4lkOZWkHpB3zaEQs6gWYEsmX4xQF68ElXC/TWvGxGMSGOvoNbaLXm6/cS/fSfHtsEdw90y20PCd+sCA==}
     engines: {node: '>=10.13.0'}
 
   enquirer@2.4.1:
@@ -5102,9 +5111,9 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-codemod-lib@2.1.3:
-    resolution: {integrity: sha512-mEOjlEtdzTyBe8ef9EeesB9iCH8vKrSSOCZXSnuReeETXj26oQPNZv8dVAOYFrVkmngdvlYfypijWCSO0iYRwQ==}
-    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
+  ts-codemod-lib@2.1.4:
+    resolution: {integrity: sha512-6ruJQUu4+fpM572nGsO9Qt8RzCKnS/1MGP+LLXxtQgu9SUR/ezgaMUrWwR/QVR2WY6pJFdbg/IwfvmX36f2TYA==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
     hasBin: true
     peerDependencies:
       cmd-ts: 0.14.3
@@ -5118,21 +5127,15 @@ packages:
       ts-repo-utils:
         optional: true
 
-  ts-data-forge@6.9.0:
-    resolution: {integrity: sha512-/J13CeSsWetXroAGsesvQRJxjS11NEe3Qje4bxCb7MTzVMYZfrN4GeQe6jvz/PpD+XmZasG393i6virl4B4cCw==}
-    engines: {node: '>=20.11.0', pnpm: '>=8.0.0'}
-    peerDependencies:
-      typescript: '>=4.8'
-
-  ts-data-forge@6.9.1:
-    resolution: {integrity: sha512-oMXO6nsrabKUKsIeP6aOlKYwkmHMukUuwZn+EQklEqtHoY6HiFsac9Fo/gzr2q2RXZ7O1lje/yKfeXDCsGVWLA==}
-    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
-    peerDependencies:
-      typescript: '>=4.8'
-
   ts-data-forge@6.9.2:
     resolution: {integrity: sha512-mA26aJYgGUoCcjn079d2ZJO7FO8HhSEE0dDbJcv/Xz3vtBoF2WGOGpWzahNO4k6FnmwUAVBRvniCIiqt6cdf/A==}
     engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
+    peerDependencies:
+      typescript: '>=4.8'
+
+  ts-data-forge@6.9.4:
+    resolution: {integrity: sha512-18jGsOuEUnjfCWndXNpaaeTtU7wnL87tw+xaRjrn3MduTXtrCtC35EGxqTSNL+uY/Uahv60wBClg2ctBDAARPA==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
     peerDependencies:
       typescript: '>=4.8'
 
@@ -5141,23 +5144,28 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@7.0.3:
-    resolution: {integrity: sha512-wJ4OIPzXOnFsbCxY5Hl0Sr0XexMBbS1ucxGuIRMxcimdOzKSNbR2fJElSrwiW3QZc68RAKs5mkVjpJelzoaU3A==}
-    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
+  ts-fortress@7.0.4:
+    resolution: {integrity: sha512-ZhPEOpwOmtHGeTnV3ABsl5QI2og5vv6Os/vUtqMIz8Vw4ekMQ0YhVDyQ4U4bpiYBMrhCCJr1yFLu3Ap2OXaFbg==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
 
   ts-morph@28.0.0:
     resolution: {integrity: sha512-Wp3tnZ2bzwxyTZMtgWVzXDfm7lB1Drz+y9DmmYH/L702PQhPyVrp3pkou3yIz4qjS14GY9kcpmLiOOMvl8oG1g==}
 
-  ts-repo-utils@10.0.0:
-    resolution: {integrity: sha512-DtyaywPZ1Rvk/A6D2GwJDxsv2Vraxgr0uB4P7B1WCzvQfNltfjXClEFar31Z88VWv7r2i/XPXpD4cb1cCWC7Zw==}
-    engines: {node: '>=22.0.0', pnpm: '>=8.0.0'}
+  ts-repo-utils@10.0.1:
+    resolution: {integrity: sha512-c5VJniQBRsTI2xjVnSjIhHsjK4dQPmAJ94CY+bD0os1kPXokd6/Kp/4DfS3SN11Hm4EHnTfy3SrS5T4l32k2vw==}
+    engines: {node: '>=22.18.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
       prettier: '>=3.0.0'
 
-  ts-type-forge@2.4.1:
-    resolution: {integrity: sha512-T//uRe5vHUn+R/DYzPxT2iyDNW3BV1ZWVRNB5358/fsbx2828b/QNzM22CA3lJD/MdTJK0skoZHpNRf1qGiF3w==}
-    engines: {node: '>=22.12.0', pnpm: '>=9.0.0'}
+  ts-type-forge@2.4.2:
+    resolution: {integrity: sha512-sIAlPLGLzN7S3xVvtLx0FoPxQFT54001ZFchX50iN2xGCMcwhjk2oWSi/TPNZ40HDsSq8413WFnG6kQDP+XuIw==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
+    deprecated: v2.4.2 has breaking changes from v2.4.1. Use v2.4.1 or v3.0.0 instead.
+
+  ts-type-forge@3.0.0:
+    resolution: {integrity: sha512-IKPxTv7Ng4GHTOYkCP2XHL0REZ+OWQ4ArNsDfwY9/KGp3hPwuUW+Vp4d5pRQ4NXsbe6MKU/Rv4Tgmy8xyVMyQA==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
 
   tsconfck@3.1.6:
     resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
@@ -5382,11 +5390,6 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
-
-  use-sync-external-store@1.6.0:
-    resolution: {integrity: sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
@@ -7255,8 +7258,6 @@ snapshots:
       fflate: 0.7.4
       string.prototype.codepointat: 0.2.1
 
-  '@sindresorhus/is@7.2.0': {}
-
   '@sindresorhus/is@8.0.0': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
@@ -7999,16 +8000,6 @@ snapshots:
 
   clsx@2.1.1: {}
 
-  cmd-ts@0.14.3:
-    dependencies:
-      chalk: 5.6.2
-      debug: 4.4.3
-      didyoumean: 1.2.2
-      strip-ansi: 7.2.0
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
   cmd-ts@0.15.0:
     dependencies:
       chalk: 5.6.2
@@ -8330,7 +8321,7 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  enhanced-resolve@5.20.1:
+  enhanced-resolve@5.21.0:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
@@ -8574,7 +8565,7 @@ snapshots:
       is-glob: 4.0.3
       is-immutable-type: 5.0.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       micromatch: 4.0.8
-      ts-data-forge: 6.9.2(typescript@5.9.3)
+      ts-data-forge: 6.9.4(typescript@5.9.3)
       tsutils: 3.21.0(typescript@5.9.3)
       typescript: 5.9.3
       typescript-eslint: 8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
@@ -8699,7 +8690,7 @@ snapshots:
   eslint-plugin-n@17.24.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.4(jiti@2.6.1))
-      enhanced-resolve: 5.20.1
+      enhanced-resolve: 5.21.0
       eslint: 9.39.4(jiti@2.6.1)
       eslint-plugin-es-x: 7.8.0(eslint@9.39.4(jiti@2.6.1))
       get-tsconfig: 4.14.0
@@ -9091,8 +9082,8 @@ snapshots:
       '@octokit/core': 7.0.6
       dotenv: 17.4.2
       octokit-safe-types: 1.2.16(typescript@5.9.3)
-      ts-data-forge: 6.9.2(typescript@5.9.3)
-      ts-fortress: 7.0.3(typescript@5.9.3)
+      ts-data-forge: 6.9.4(typescript@5.9.3)
+      ts-fortress: 7.0.4(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -10465,8 +10456,8 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
-      ts-data-forge: 6.9.2(typescript@5.9.3)
-      ts-fortress: 7.0.3(typescript@5.9.3)
+      ts-data-forge: 6.9.4(typescript@5.9.3)
+      ts-fortress: 7.0.4(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -11375,33 +11366,26 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-codemod-lib@2.1.3(cmd-ts@0.14.3)(dedent@1.7.2)(ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3):
+  ts-codemod-lib@2.1.4(dedent@1.7.2)(ts-repo-utils@10.0.1(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
-      ts-data-forge: 6.9.0(typescript@5.9.3)
+      ts-data-forge: 6.9.2(typescript@5.9.3)
       ts-morph: 28.0.0
     optionalDependencies:
-      cmd-ts: 0.14.3
       dedent: 1.7.2
-      ts-repo-utils: 10.0.0(prettier@3.8.3)(typescript@5.9.3)
+      ts-repo-utils: 10.0.1(prettier@3.8.3)(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
-
-  ts-data-forge@6.9.0(typescript@5.9.3):
-    dependencies:
-      '@sindresorhus/is': 7.2.0
-      ts-type-forge: 2.4.1
-      typescript: 5.9.3
-
-  ts-data-forge@6.9.1(typescript@5.9.3):
-    dependencies:
-      '@sindresorhus/is': 8.0.0
-      ts-type-forge: 2.4.1
-      typescript: 5.9.3
 
   ts-data-forge@6.9.2(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 8.0.0
-      ts-type-forge: 2.4.1
+      ts-type-forge: 2.4.2
+      typescript: 5.9.3
+
+  ts-data-forge@6.9.4(typescript@5.9.3):
+    dependencies:
+      '@sindresorhus/is': 8.0.0
+      ts-type-forge: 3.0.0
       typescript: 5.9.3
 
   ts-declaration-location@1.0.7(typescript@5.9.3):
@@ -11409,11 +11393,11 @@ snapshots:
       picomatch: 4.0.4
       typescript: 5.9.3
 
-  ts-fortress@7.0.3(typescript@5.9.3):
+  ts-fortress@7.0.4(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 8.0.0
-      ts-data-forge: 6.9.2(typescript@5.9.3)
-      ts-type-forge: 2.4.1
+      ts-data-forge: 6.9.4(typescript@5.9.3)
+      ts-type-forge: 2.4.2
     transitivePeerDependencies:
       - typescript
 
@@ -11422,7 +11406,7 @@ snapshots:
       '@ts-morph/common': 0.29.0
       code-block-writer: 13.0.3
 
-  ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3):
+  ts-repo-utils@10.0.1(prettier@3.8.3)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 8.0.0
@@ -11431,13 +11415,15 @@ snapshots:
       fast-glob: 3.3.3
       micromatch: 4.0.8
       prettier: 3.8.3
-      ts-data-forge: 6.9.2(typescript@5.9.3)
+      ts-data-forge: 6.9.4(typescript@5.9.3)
       tsx: 4.21.0
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  ts-type-forge@2.4.1: {}
+  ts-type-forge@2.4.2: {}
+
+  ts-type-forge@3.0.0: {}
 
   tsconfck@3.1.6(typescript@5.9.3):
     optionalDependencies:
@@ -11663,11 +11649,6 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  use-sync-external-store@1.6.0(react@19.2.5):
-    dependencies:
-      react: 19.2.5
-    optional: true
-
   util-deprecate@1.0.2: {}
 
   valtio@2.3.1(@types/react@19.2.14)(react@19.2.5):
@@ -11857,11 +11838,10 @@ snapshots:
 
   zod@4.3.6: {}
 
-  zustand@5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5)):
+  zustand@5.0.12(@types/react@19.2.14)(immer@11.1.4)(react@19.2.5):
     optionalDependencies:
       '@types/react': 19.2.14
       immer: 11.1.4
       react: 19.2.5
-      use-sync-external-store: 1.6.0(react@19.2.5)
 
   zwitch@2.0.4: {}
