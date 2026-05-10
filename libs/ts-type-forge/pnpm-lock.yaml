@@ -33,7 +33,7 @@ importers:
         specifier: 25.6.0
         version: 25.6.0
       cmd-ts:
-        specifier: ^0.15.0
+        specifier: 0.15.0
         version: 0.15.0
       conventional-changelog-conventionalcommits:
         specifier: 9.3.1
@@ -42,7 +42,7 @@ importers:
         specifier: 10.0.0
         version: 10.0.0
       dedent:
-        specifier: ^1.7.2
+        specifier: 1.7.2
         version: 1.7.2
       eslint:
         specifier: 9.39.4
@@ -84,8 +84,8 @@ importers:
         specifier: 6.9.4
         version: 6.9.4(typescript@5.9.3)
       ts-fortress:
-        specifier: 7.0.4
-        version: 7.0.4(typescript@5.9.3)
+        specifier: 7.0.5
+        version: 7.0.5(typescript@5.9.3)
       ts-repo-utils:
         specifier: 10.0.1
         version: 10.0.1(prettier@3.8.3)(typescript@5.9.3)
@@ -1126,6 +1126,9 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/estree@1.0.9':
+    resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
@@ -3184,6 +3187,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@3.3.12:
+    resolution: {integrity: sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
   napi-postinstall@0.3.4:
     resolution: {integrity: sha512-PHI5f1O0EP5xJ9gQmFGMS6IZcrVvTjpXjz7Na41gTE7eE2hK11lg04CECCYEEjdc17EV4DO+fkGEtt7TpTaTiQ==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
@@ -3536,6 +3544,10 @@ packages:
 
   postcss@8.5.10:
     resolution: {integrity: sha512-pMMHxBOZKFU6HgAZ4eyGnwXF/EvPGGqUr0MnZ5+99485wwW41kW91A4LOGxSHhgugZmSChL5AlElNdwlNgcnLQ==}
+    engines: {node: ^10 || ^12 || >=14}
+
+  postcss@8.5.13:
+    resolution: {integrity: sha512-qif0+jGGZoLWdHey3UFHHWP0H7Gbmsk8T5VEqyYFbWqPr1XqvLGBbk/sl8V5exGmcYJklJOhOQq1pV9IcsiFag==}
     engines: {node: ^10 || ^12 || >=14}
 
   prelude-ls@1.2.1:
@@ -4027,8 +4039,8 @@ packages:
     peerDependencies:
       typescript: '>=4.0.0'
 
-  ts-fortress@7.0.4:
-    resolution: {integrity: sha512-ZhPEOpwOmtHGeTnV3ABsl5QI2og5vv6Os/vUtqMIz8Vw4ekMQ0YhVDyQ4U4bpiYBMrhCCJr1yFLu3Ap2OXaFbg==}
+  ts-fortress@7.0.5:
+    resolution: {integrity: sha512-LuPLmaPJNLOvZMD6xGcD//rCsFqBNJC5h3FB285u4SbhXxrsInfSKpWBf3bcBlz10Hp3XZfXO5yPEx8ymeLBgA==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
 
   ts-morph@28.0.0:
@@ -5400,6 +5412,9 @@ snapshots:
       '@types/json-schema': 7.0.15
 
   '@types/estree@1.0.8': {}
+
+  '@types/estree@1.0.9':
+    optional: true
 
   '@types/hast@3.0.4':
     dependencies:
@@ -6809,7 +6824,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
     optional: true
 
   esutils@2.0.3: {}
@@ -7026,7 +7041,7 @@ snapshots:
       dotenv: 17.4.2
       octokit-safe-types: 1.2.16(typescript@5.9.3)
       ts-data-forge: 6.9.4(typescript@5.9.3)
-      ts-fortress: 7.0.4(typescript@5.9.3)
+      ts-fortress: 7.0.5(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -7821,6 +7836,9 @@ snapshots:
 
   nanoid@3.3.11: {}
 
+  nanoid@3.3.12:
+    optional: true
+
   napi-postinstall@0.3.4: {}
 
   natural-compare-lite@1.4.0: {}
@@ -7940,7 +7958,7 @@ snapshots:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
       ts-data-forge: 6.9.4(typescript@5.9.3)
-      ts-fortress: 7.0.4(typescript@5.9.3)
+      ts-fortress: 7.0.5(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8106,6 +8124,13 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  postcss@8.5.13:
+    dependencies:
+      nanoid: 3.3.12
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+    optional: true
 
   prelude-ls@1.2.1: {}
 
@@ -8712,11 +8737,11 @@ snapshots:
       picomatch: 4.0.4
       typescript: 5.9.3
 
-  ts-fortress@7.0.4(typescript@5.9.3):
+  ts-fortress@7.0.5(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 8.0.0
       ts-data-forge: 6.9.4(typescript@5.9.3)
-      ts-type-forge: 2.4.1
+      ts-type-forge: 3.0.0
     transitivePeerDependencies:
       - typescript
 
@@ -8925,7 +8950,7 @@ snapshots:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
-      postcss: 8.5.10
+      postcss: 8.5.13
       rollup: 4.60.2
       tinyglobby: 0.2.16
     optionalDependencies:
