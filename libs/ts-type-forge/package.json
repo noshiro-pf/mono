@@ -98,7 +98,7 @@
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.2",
     "semantic-release": "25.0.3",
-    "ts-codemod-lib": "^2.1.4",
+    "ts-codemod-lib": "2.1.4",
     "ts-data-forge": "6.9.4",
     "ts-fortress": "7.0.4",
     "ts-repo-utils": "10.0.1",
