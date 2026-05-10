@@ -1,3 +1,9 @@
+## [2.1.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.4...v2.1.5) (2026-05-10)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#108](https://github.com/noshiro-pf/ts-codemod-lib/issues/108)) ([e437f14](https://github.com/noshiro-pf/ts-codemod-lib/commit/e437f147f33139a98413a9e7a7f174d1cb919c6a))
+
 ## [2.1.4](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.3...v2.1.4) (2026-04-30)
 
 ### Bug Fixes
