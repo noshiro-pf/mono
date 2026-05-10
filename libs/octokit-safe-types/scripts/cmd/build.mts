@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { unknownToString } from 'ts-data-forge';
+import { unknownToString, type UnknownResult } from 'ts-data-forge';
 import { $, assertPathExists, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 

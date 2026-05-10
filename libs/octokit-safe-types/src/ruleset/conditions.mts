@@ -1,6 +1,7 @@
 import { type components } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import { type DeepReadonly } from 'ts-type-forge';
 
 export const RepositoryRulesetConditions = t.record({
   ref_name: t.optional(

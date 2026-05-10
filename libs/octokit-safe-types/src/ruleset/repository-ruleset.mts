@@ -1,6 +1,7 @@
 import { type components } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import { type DeepReadonly } from 'ts-type-forge';
 import { RepositoryRulesetBypassActor } from './bypass-actor.mjs';
 import { RepositoryRulesetConditions } from './conditions.mjs';
 import { RepositoryRule } from './repository-rule.mjs';
@@ -59,7 +60,7 @@ const OrgRulesetConditions = t.union([
 expectType<
   t.TypeOf<typeof OrgRulesetConditions>,
   DeepReadonly<components['schemas']['org-ruleset-conditions']>
->('=');
+>('~=');
 
 export const RepositoryRuleset = t.record({
   id: t.number(),

@@ -1,6 +1,7 @@
 import { type components, type paths } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import type * as t from 'ts-fortress';
+import { type DeepReadonly } from 'ts-type-forge';
 import { FullRepository } from './full-repository.mjs';
 
 export const GetRepositoryResponse = FullRepository;
