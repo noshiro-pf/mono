@@ -1,5 +1,13 @@
 # synstate-react-hooks
 
+## 1.0.1
+
+### Patch Changes
+
+- 759b7d5: The implementation has been modified to explicitly import ts-type-forge internally.
+- Updated dependencies [759b7d5]
+    - synstate@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

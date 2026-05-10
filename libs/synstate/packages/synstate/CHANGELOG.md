@@ -1,5 +1,11 @@
 # synstate
 
+## 1.0.1
+
+### Patch Changes
+
+- 759b7d5: The implementation has been modified to explicitly import ts-type-forge internally.
+
 ## 1.0.0
 
 ### Major Changes
