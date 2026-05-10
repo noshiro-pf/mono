@@ -1,4 +1,5 @@
 import { type EndpointKeys } from 'octokit-safe-types';
+import { type DeepReadonly } from 'ts-type-forge';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 

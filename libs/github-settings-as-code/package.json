@@ -71,10 +71,11 @@
   },
   "dependencies": {
     "@octokit/core": "7.0.6",
-    "dotenv": "^17.4.2",
-    "octokit-safe-types": "^1.2.16",
-    "ts-data-forge": "^6.9.2",
-    "ts-fortress": "^7.0.3"
+    "dotenv": "17.4.2",
+    "octokit-safe-types": "1.2.17",
+    "ts-data-forge": "6.9.4",
+    "ts-fortress": "7.0.6",
+    "ts-type-forge": "3.0.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
@@ -102,9 +103,8 @@
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.2",
     "semantic-release": "25.0.3",
-    "ts-codemod-lib": "2.1.3",
-    "ts-repo-utils": "10.0.0",
-    "ts-type-forge": "2.4.1",
+    "ts-codemod-lib": "2.1.4",
+    "ts-repo-utils": "10.0.1",
     "tslib": "2.8.1",
     "tsx": "4.21.0",
     "typedoc": "0.28.19",
@@ -112,7 +112,7 @@
     "typescript": "5.9.3",
     "vitest": "4.1.5"
   },
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.0.9",
   "engines": {
     "node": ">=22.18.0",
     "pnpm": ">=9.0.0"

@@ -34,14 +34,17 @@ const readFilesIn = async (dir: string): Promise<readonly RulesetPicked[]> => {
     RulesetPicked.validate(JSON.parse(rule)),
   );
 
-  if (validationResults.every(Result.isOk)) {
-    return validationResults.map((r) => r.value);
+  const mut_values: RulesetPicked[] = [];
+
+  for (const r of validationResults) {
+    if (Result.isErr(r)) {
+      throw new Error(t.validationErrorsToMessages(r.value).join('\n'));
+    }
+
+    mut_values.push(r.value);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const error = validationResults.find(Result.isErr)!;
-
-  throw new Error(t.validationErrorsToMessages(error.value).join('\n'));
+  return mut_values;
 };
 
 if (isDirectlyExecuted(import.meta.url)) {

@@ -4,6 +4,7 @@ import {
 } from 'octokit-safe-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import { type StrictExclude } from 'ts-type-forge';
 
 const keysToPickBase = [
   'allow_auto_merge',
