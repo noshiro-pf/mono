@@ -9,28 +9,31 @@ importers:
   .:
     dependencies:
       '@nodelib/fs.walk':
-        specifier: ^3.0.1
+        specifier: 3.0.1
         version: 3.0.1
       '@sindresorhus/is':
-        specifier: ^8.0.0
+        specifier: 8.0.0
         version: 8.0.0
       '@types/micromatch':
-        specifier: ^4.0.10
+        specifier: 4.0.10
         version: 4.0.10
       cmd-ts:
-        specifier: ^0.15.0
+        specifier: 0.15.0
         version: 0.15.0
       fast-glob:
-        specifier: ^3.3.3
+        specifier: 3.3.3
         version: 3.3.3
       micromatch:
-        specifier: ^4.0.8
+        specifier: 4.0.8
         version: 4.0.8
       ts-data-forge:
-        specifier: ^6.9.4
+        specifier: 6.9.4
         version: 6.9.4(typescript@5.9.3)
+      ts-type-forge:
+        specifier: 3.0.0
+        version: 3.0.0
       tsx:
-        specifier: ^4.21.0
+        specifier: 4.21.0
         version: 4.21.0
     devDependencies:
       '@rollup/plugin-replace':
@@ -119,13 +122,10 @@ importers:
         version: 25.0.3(typescript@5.9.3)
       ts-codemod-lib:
         specifier: 2.1.4
-        version: 2.1.4(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3)
+        version: 2.1.4(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.0.1(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3)
       ts-repo-utils:
-        specifier: ^10.0.0
-        version: 10.0.0(prettier@3.8.3)(typescript@5.9.3)
-      ts-type-forge:
-        specifier: ^3.0.0
-        version: 3.0.0
+        specifier: 10.0.1
+        version: 10.0.1(prettier@3.8.3)(typescript@5.9.3)
       tslib:
         specifier: 2.8.1
         version: 2.8.1
@@ -4073,9 +4073,9 @@ packages:
   ts-morph@28.0.0:
     resolution: {integrity: sha512-Wp3tnZ2bzwxyTZMtgWVzXDfm7lB1Drz+y9DmmYH/L702PQhPyVrp3pkou3yIz4qjS14GY9kcpmLiOOMvl8oG1g==}
 
-  ts-repo-utils@10.0.0:
-    resolution: {integrity: sha512-DtyaywPZ1Rvk/A6D2GwJDxsv2Vraxgr0uB4P7B1WCzvQfNltfjXClEFar31Z88VWv7r2i/XPXpD4cb1cCWC7Zw==}
-    engines: {node: '>=22.0.0', pnpm: '>=8.0.0'}
+  ts-repo-utils@10.0.1:
+    resolution: {integrity: sha512-c5VJniQBRsTI2xjVnSjIhHsjK4dQPmAJ94CY+bD0os1kPXokd6/Kp/4DfS3SN11Hm4EHnTfy3SrS5T4l32k2vw==}
+    engines: {node: '>=22.18.0', pnpm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
       prettier: '>=3.0.0'
@@ -8589,14 +8589,14 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-codemod-lib@2.1.4(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3):
+  ts-codemod-lib@2.1.4(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.0.1(prettier@3.8.3)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
       ts-data-forge: 6.9.2(typescript@5.9.3)
       ts-morph: 28.0.0
     optionalDependencies:
       cmd-ts: 0.15.0
       dedent: 1.7.2
-      ts-repo-utils: 10.0.0(prettier@3.8.3)(typescript@5.9.3)
+      ts-repo-utils: 10.0.1(prettier@3.8.3)(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
 
@@ -8630,7 +8630,7 @@ snapshots:
       '@ts-morph/common': 0.29.0
       code-block-writer: 13.0.3
 
-  ts-repo-utils@10.0.0(prettier@3.8.3)(typescript@5.9.3):
+  ts-repo-utils@10.0.1(prettier@3.8.3)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 8.0.0
