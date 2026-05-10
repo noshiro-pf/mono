@@ -1,3 +1,9 @@
+## [10.0.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.0.1...v10.0.2) (2026-05-10)
+
+### Bug Fixes
+
+- fix dependencies ([#366](https://github.com/noshiro-pf/ts-repo-utils/issues/366)) ([828d2a5](https://github.com/noshiro-pf/ts-repo-utils/commit/828d2a548ddcd63f7d12d6ef348eddd9daec0576))
+
 ## [10.0.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.0.0...v10.0.1) (2026-05-08)
 
 ### Bug Fixes
