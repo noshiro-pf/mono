@@ -1,3 +1,9 @@
+## [1.2.8](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.7...v1.2.8) (2026-05-10)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#134](https://github.com/noshiro-pf/github-settings-as-code/issues/134)) ([c7c5c0b](https://github.com/noshiro-pf/github-settings-as-code/commit/c7c5c0b13de094cf99e196ec884b94d524fcbe00))
+
 ## [1.2.7](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.6...v1.2.7) (2026-04-30)
 
 ### Bug Fixes
