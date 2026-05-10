@@ -8,6 +8,7 @@ import {
   pipe,
 } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
+import { type DeepReadonly, type SafeUintWithSmallInt } from 'ts-type-forge';
 import {
   hasDisableNextLineComment,
   isAtomicTypeNode,

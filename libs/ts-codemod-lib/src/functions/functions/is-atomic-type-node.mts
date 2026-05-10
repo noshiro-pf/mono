@@ -1,5 +1,6 @@
 import { ISet } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
+import { type DeepReadonly } from 'ts-type-forge';
 
 // Define the set of SyntaxKinds that represent primitive type keywords
 const atomicTypeKeywordKinds = ISet.create<tsm.SyntaxKind>([

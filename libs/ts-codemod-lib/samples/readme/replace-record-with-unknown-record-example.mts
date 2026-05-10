@@ -1,5 +1,6 @@
 /* eslint-disable vitest/expect-expect */
 import { expectType } from 'ts-data-forge';
+import { type UnknownRecord } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 // Before

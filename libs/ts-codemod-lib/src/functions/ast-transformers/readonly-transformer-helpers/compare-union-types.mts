@@ -1,4 +1,5 @@
 import * as tsm from 'ts-morph';
+import { type DeepReadonly } from 'ts-type-forge';
 import {
   isAtomicTypeNode,
   isReadonlyTupleOrArrayTypeNode,

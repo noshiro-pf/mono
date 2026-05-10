@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
+import { type DeepReadonly } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 import { extractSampleCode } from './embed-samples-utils.mjs';
 
