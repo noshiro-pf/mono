@@ -75,9 +75,9 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "@sindresorhus/is": "^8.0.0",
-    "ts-data-forge": "^6.9.4",
-    "ts-type-forge": "^3.0.0"
+    "@sindresorhus/is": "8.0.0",
+    "ts-data-forge": "6.9.4",
+    "ts-type-forge": "3.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",
