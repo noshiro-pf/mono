@@ -1,3 +1,9 @@
+## [1.2.17](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.16...v1.2.17) (2026-05-10)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#208](https://github.com/noshiro-pf/octokit-safe-types/issues/208)) ([11fe016](https://github.com/noshiro-pf/octokit-safe-types/commit/11fe016131438722381215c34ce0f95dc15148d1))
+
 ## [1.2.16](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.15...v1.2.16) (2026-04-30)
 
 ### Bug Fixes
