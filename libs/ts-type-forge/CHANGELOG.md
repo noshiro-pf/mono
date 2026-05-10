@@ -1,3 +1,9 @@
+## [3.0.1](https://github.com/noshiro-pf/ts-type-forge/compare/v3.0.0...v3.0.1) (2026-05-10)
+
+### Bug Fixes
+
+- fix dependencies ([#367](https://github.com/noshiro-pf/ts-type-forge/issues/367)) ([3375b5f](https://github.com/noshiro-pf/ts-type-forge/commit/3375b5f045aae2eac9f0339ab326971199bf28d2))
+
 # [3.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v2.4.2...v3.0.0) (2026-05-06)
 
 - feat!: ship as side-effect-free named-export library ([#365](https://github.com/noshiro-pf/ts-type-forge/issues/365)) ([f831899](https://github.com/noshiro-pf/ts-type-forge/commit/f8318991603348d016514c950606ce509214b6bb)), closes [#364](https://github.com/noshiro-pf/ts-type-forge/issues/364)
