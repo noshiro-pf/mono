@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { castDeepMutable, hasKey, isRecord } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 
 type MessageIds = 'useCurriedProduce';
 

@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type UnknownRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -477,7 +478,7 @@ namespace Extensions {
           checkTypeImports?: boolean;
           pathGroupOverrides?: readonly Readonly<{
             pattern: string;
-            patternOptions?: Readonly<Record<string, unknown>>;
+            patternOptions?: UnknownRecord;
             action: 'enforce' | 'ignore';
           }>[];
           fix?: boolean;
@@ -493,7 +494,7 @@ namespace Extensions {
           checkTypeImports?: boolean;
           pathGroupOverrides?: readonly Readonly<{
             pattern: string;
-            patternOptions?: Readonly<Record<string, unknown>>;
+            patternOptions?: UnknownRecord;
             action: 'enforce' | 'ignore';
           }>[];
           fix?: boolean;
@@ -1954,7 +1955,7 @@ namespace Order {
     distinctGroup?: boolean;
     pathGroups?: readonly Readonly<{
       pattern: string;
-      patternOptions?: Readonly<Record<string, unknown>>;
+      patternOptions?: UnknownRecord;
       group:
         | 'builtin'
         | 'external'

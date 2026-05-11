@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import { Arr, isNonEmptyString, mapNullable } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 
 // Forked from https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/v1.3.27/strict-dependencies/resolveImportPath.js

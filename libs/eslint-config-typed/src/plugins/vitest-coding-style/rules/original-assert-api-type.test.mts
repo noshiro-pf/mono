@@ -1,4 +1,5 @@
 import { expectType } from 'ts-data-forge';
+import { type StrictExclude } from 'ts-type-forge';
 // eslint-disable-next-line vitest/no-importing-vitest-globals
 import { type assert as originalAssert } from 'vitest';
 

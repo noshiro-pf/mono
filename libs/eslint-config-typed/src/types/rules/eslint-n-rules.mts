@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type UnknownRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],

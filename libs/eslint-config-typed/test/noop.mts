@@ -1,2 +1,1 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const noop = (..._args: readonly any[]): void => {};
+export const noop = (..._args: readonly unknown[]): void => {};

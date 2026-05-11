@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { type DeepReadonly } from 'ts-type-forge';
 
 const isIntegerLiteral = (node: DeepReadonly<TSESTree.Expression>): boolean =>
   node.type === AST_NODE_TYPES.Literal &&

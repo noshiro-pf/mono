@@ -1,4 +1,5 @@
 import { type TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { type DeepReadonly } from 'ts-type-forge';
 
 type MessageIds = 'non-tree-shakable-access';
 

@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { castDeepMutable, hasKey } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 import { isReactApiCall } from './shared.mjs';
 
 type MessageIds = 'disallowUseMemoTypeAnnotation';

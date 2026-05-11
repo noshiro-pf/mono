@@ -1,6 +1,6 @@
-onlyBuiltDependencies:
-  - esbuild
-  - unrs-resolver
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
 
 minimumReleaseAge: 10080 # = 7 days
 minimumReleaseAgeExclude:

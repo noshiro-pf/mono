@@ -1,5 +1,6 @@
 import { type RuleDefinition } from '@eslint/core';
 import { type FlatConfig as FlatConfig_ } from '@typescript-eslint/utils/ts-eslint';
+import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
 
 export type FlatConfig = DeepReadonly<FlatConfig_.Config>;
 

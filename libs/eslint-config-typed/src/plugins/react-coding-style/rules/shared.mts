@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { type DeepReadonly } from 'ts-type-forge';
 
 const isReactMemberExpression = (
   node: DeepReadonly<TSESTree.MemberExpression>,

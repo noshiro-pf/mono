@@ -1,3 +1,5 @@
+import { type RelaxedExclude } from 'ts-type-forge';
+
 export const toCapitalCase = (str: string): string =>
   str
     .replaceAll(/[-/]./gu, (x) => x[1]?.toUpperCase() ?? str) // "aaa-bbb" ->

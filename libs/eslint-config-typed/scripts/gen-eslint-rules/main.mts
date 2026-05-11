@@ -4,6 +4,8 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
 import { $, glob, isDirectlyExecuted } from 'ts-repo-utils';
+import { type NonEmptyArray } from 'ts-type-forge';
+import { projectRootPath } from '../project-root-path.mjs';
 import {
   applyTransformationsToFile,
   applyTypeTransformations,
@@ -13,7 +15,7 @@ import { generateRulesTypeCore } from './functions/generate-rules-type-core.mjs'
 
 const thisDir = import.meta.dirname;
 
-export const outDir = path.resolve(thisDir, '../../src/types/rules');
+const TYPES_RULES_DIR = path.resolve(projectRootPath, 'src/types/rules');
 
 const eslintConfigPath = path.resolve(thisDir, './eslint.config.gen.mts');
 
@@ -28,8 +30,6 @@ export const generateRulesType = async (
 
       return;
     }
-
-    await fmt(targetFileNames);
   }
 
   {
@@ -92,7 +92,10 @@ const generate = async (
         plugin.rulePrefix,
       );
 
-      const targetFilePath = path.resolve(outDir, plugin.outputFileName);
+      const targetFilePath = path.resolve(
+        TYPES_RULES_DIR,
+        plugin.outputFileName,
+      );
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.writeFile(targetFilePath, result);
@@ -107,7 +110,7 @@ const generate = async (
 const lintFix = async (
   targetFileNames?: NonEmptyArray<string>,
 ): Promise<Readonly<{ type: 'error'; error: unknown } | { type: 'ok' }>> => {
-  const globResult = await glob(`${outDir}/*.mts`);
+  const globResult = await glob(`${TYPES_RULES_DIR}/*.mts`);
 
   if (Result.isErr(globResult)) {
     return { type: 'error', error: globResult.value };
@@ -151,7 +154,7 @@ const applyTypeTransformationsForTargets = async (
     await applyTypeTransformations();
   } else {
     for (const fileName of targetFileNames) {
-      const filePath = path.resolve(outDir, fileName);
+      const filePath = path.resolve(TYPES_RULES_DIR, fileName);
 
       await applyTransformationsToFile(filePath);
     }

@@ -2,6 +2,7 @@ import { type DeprecatedInfo } from '@eslint/core';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { compile, type Options } from 'json-schema-to-typescript';
 import { castDeepMutable } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 import { type Rule, type Rules } from '../../../src/index.mjs';
 import { immerCodingStyleRules } from '../../../src/plugins/immer-coding-style/rules/rules.mjs';
 import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/rules/rules.mjs';
@@ -52,7 +53,7 @@ const RuleSeverityForNoOption = generatorOption.explicitRuleDefaultOption
 
 const compilerConfig = {
   bannerComment: '',
-  format: false,
+  format: true,
   unknownAny: true,
 } as const satisfies Partial<Options>;
 
@@ -214,6 +215,10 @@ const createResult = async (
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
     "import { type Linter } from 'eslint';",
+    // Types that the codemods (convertToReadonly, replaceRecordWithUnknownRecord)
+    // may introduce into rule type bodies. Unused ones are pruned by
+    // prettier-plugin-organize-imports during the final format step.
+    "import { type DeepReadonly, type UnknownRecord } from 'ts-type-forge';",
     ...(schemaList.some(({ schema }) => schema.length === 1)
       ? [
           '',

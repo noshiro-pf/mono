@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type UnknownRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -1832,7 +1833,7 @@ namespace NoUnnecessaryPolyfills {
     /**
      * The target environments.
      */
-    targets: string | readonly unknown[] | Readonly<Record<string, unknown>>;
+    targets: string | readonly unknown[] | UnknownRecord;
   }>;
 
   export type RuleEntry =

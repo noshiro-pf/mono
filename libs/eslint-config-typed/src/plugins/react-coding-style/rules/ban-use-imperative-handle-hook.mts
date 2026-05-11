@@ -1,5 +1,6 @@
 import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import { castDeepMutable } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 import { isReactApiCall } from './shared.mjs';
 
 type MessageIds = 'disallowUseImperativeHandle';

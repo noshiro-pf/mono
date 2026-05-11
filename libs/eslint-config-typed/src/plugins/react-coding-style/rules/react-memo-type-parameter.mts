@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { castDeepMutable } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 import { getReactMemoArrowFunction, isReactApiCall } from './shared.mjs';
 
 type MessageIds =

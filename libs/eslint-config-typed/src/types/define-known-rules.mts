@@ -1,3 +1,4 @@
+import { type DeepReadonly } from 'ts-type-forge';
 import {
   type EslintArrayFuncRules,
   type EslintCypressRules,

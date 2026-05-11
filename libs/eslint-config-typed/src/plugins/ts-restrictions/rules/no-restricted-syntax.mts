@@ -1,5 +1,6 @@
 import { type Rule } from 'eslint';
 import type * as ESTree from 'estree';
+import { type DeepReadonly, type UnknownRecord } from 'ts-type-forge';
 
 export const noRestrictedSyntax: Rule.RuleModule = {
   meta: {

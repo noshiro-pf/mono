@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type UnknownRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -504,7 +505,7 @@ namespace ForbidComponentProps {
               message?: string;
             }
         >
-      | Record<string, unknown>
+      | UnknownRecord
     )[];
     [k: string]: unknown;
   }>;
@@ -2976,7 +2977,7 @@ namespace JsxPropsNoSpreading {
     exceptions?: readonly string[];
     [k: string]: unknown;
   }> &
-    Record<string, unknown>;
+    UnknownRecord;
 
   export type RuleEntry =
     | 'off'

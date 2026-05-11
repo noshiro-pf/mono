@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { type DeepReadonly } from 'ts-type-forge';
 import { TS_DATA_FORGE_MODULE } from './constants.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */

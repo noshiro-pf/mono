@@ -100,8 +100,8 @@ export const applyTransformationsToFile = async (
     // Transform the code with all transformers
     const transformedCode = transformSourceCode(originalCode, false, [
       convertInterfaceToTypeTransformer(),
-      convertToReadonlyTransformer(),
       replaceRecordWithUnknownRecordTransformer(),
+      convertToReadonlyTransformer(),
     ]);
 
     // Check if the code was actually changed

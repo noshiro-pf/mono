@@ -1,4 +1,5 @@
 import { isBoolean, isString } from 'ts-data-forge';
+import { type DeepReadonly } from 'ts-type-forge';
 import { type Rule } from '../../../../src/index.mjs';
 import { toStr } from '../../utils/index.mjs';
 import { isDeprecated } from '../is-deprecated.mjs';
