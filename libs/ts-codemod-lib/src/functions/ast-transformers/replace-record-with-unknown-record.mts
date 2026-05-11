@@ -6,95 +6,113 @@ import { type TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'replace-record-with-unknown-record';
 
+const UNKNOWN_RECORD_MODULE = 'ts-type-forge';
+
+const UNKNOWN_RECORD_NAME = 'UnknownRecord';
+
 /**
  * Replaces `Readonly<Record<string, unknown>>`, `Record<string, unknown>`,
- * and index signatures `[k: string]: unknown` with `UnknownRecord`
+ * and index signatures `[k: string]: unknown` with `UnknownRecord`.
+ *
+ * When a replacement occurs, also inserts
+ * `import { type UnknownRecord } from 'ts-type-forge';` at the top of the
+ * source file (or merges into an existing import from `'ts-type-forge'`).
  */
 export const replaceRecordWithUnknownRecordTransformer =
   (): TsMorphTransformer =>
     ({
       name: TRANSFORMER_NAME,
       transform: (sourceAst) => {
-        // Process top-level declarations
-        processDeclarations(sourceAst);
+        const containerModifications = [
+          processDeclarations(sourceAst),
+          ...sourceAst
+            .getModules()
+            .map((namespace) => processDeclarations(namespace)),
+        ];
 
-        // Process declarations inside namespaces/modules
-        const namespaces = sourceAst.getModules();
-
-        for (const namespace of namespaces) {
-          processDeclarations(namespace);
+        if (containerModifications.includes(true)) {
+          ensureUnknownRecordImport(sourceAst);
         }
       },
     }) as const;
 
 const processDeclarations = (
   container: tsm.SourceFile | tsm.ModuleDeclaration,
-): void => {
-  const typeAliases = container.getTypeAliases();
-
-  for (const typeAlias of typeAliases) {
+): boolean => {
+  const typeAliasModifications = container.getTypeAliases().map((typeAlias) => {
     if (hasDisableNextLineComment(typeAlias, TRANSFORMER_NAME)) {
-      continue;
+      return false;
     }
 
     const typeNode = typeAlias.getTypeNode();
 
-    if (typeNode === undefined) continue;
+    if (typeNode === undefined) return false;
 
-    visitTypeNode(typeNode);
-  }
+    return visitTypeNode(typeNode);
+  });
 
-  const interfaces = container.getInterfaces();
+  const interfaceModifications = container
+    .getInterfaces()
+    .map((interfaceDecl) => processInterfaceDeclaration(interfaceDecl));
 
-  for (const interfaceDecl of interfaces) {
-    if (hasDisableNextLineComment(interfaceDecl, TRANSFORMER_NAME)) {
-      continue;
-    }
-
-    // Check if interface has index signature [k: string]: unknown
-    const indexSignatures = interfaceDecl.getIndexSignatures();
-
-    const hasStringUnknownSignature = indexSignatures.some((sig) => {
-      const keyType = sig.getKeyType();
-
-      const returnType = sig.getReturnType();
-
-      return (
-        keyType.getText() === 'string' && returnType.getText() === 'unknown'
-      );
-    });
-
-    // If it has the signature and no other members, replace entire interface with type alias
-    if (hasStringUnknownSignature) {
-      const properties = interfaceDecl.getProperties();
-
-      if (
-        Arr.isArrayOfLength(properties, 0) &&
-        Arr.isArrayOfLength(indexSignatures, 1)
-      ) {
-        // Replace interface with type alias
-        const interfaceName = interfaceDecl.getName();
-
-        interfaceDecl.replaceWithText(
-          `export type ${interfaceName} = UnknownRecord;`,
-        );
-
-        continue;
-      }
-    }
-
-    // Otherwise, check properties for Record types
-    for (const property of interfaceDecl.getProperties()) {
-      const typeNode = property.getTypeNode();
-
-      if (typeNode === undefined) continue;
-
-      visitTypeNode(typeNode);
-    }
-  }
+  return [...typeAliasModifications, ...interfaceModifications].includes(true);
 };
 
-const visitTypeNode = (node: tsm.TypeNode): void => {
+const processInterfaceDeclaration = (
+  interfaceDecl: tsm.InterfaceDeclaration,
+): boolean => {
+  if (hasDisableNextLineComment(interfaceDecl, TRANSFORMER_NAME)) {
+    return false;
+  }
+
+  // Check if interface has index signature [k: string]: unknown
+  const indexSignatures = interfaceDecl.getIndexSignatures();
+
+  const hasStringUnknownSignature = indexSignatures.some((sig) => {
+    const keyType = sig.getKeyType();
+
+    const returnType = sig.getReturnType();
+
+    return keyType.getText() === 'string' && returnType.getText() === 'unknown';
+  });
+
+  // If it has the signature and no other members, replace entire interface with type alias.
+  // Skip when the interface carries semantics that a plain type alias would lose
+  // (type parameters, extends clauses, declare modifier, default export).
+  if (
+    hasStringUnknownSignature &&
+    Arr.isArrayOfLength(interfaceDecl.getProperties(), 0) &&
+    Arr.isArrayOfLength(indexSignatures, 1) &&
+    Arr.isArrayOfLength(interfaceDecl.getTypeParameters(), 0) &&
+    Arr.isArrayOfLength(interfaceDecl.getExtends(), 0) &&
+    !interfaceDecl.hasDeclareKeyword() &&
+    !interfaceDecl.hasDefaultKeyword()
+  ) {
+    const exportPrefix = interfaceDecl.hasExportKeyword() ? 'export ' : '';
+
+    const interfaceName = interfaceDecl.getName();
+
+    interfaceDecl.replaceWithText(
+      `${exportPrefix}type ${interfaceName} = UnknownRecord;`,
+    );
+
+    return true;
+  }
+
+  // Otherwise, check properties for Record types
+  return interfaceDecl
+    .getProperties()
+    .map((property) => {
+      const typeNode = property.getTypeNode();
+
+      if (typeNode === undefined) return false;
+
+      return visitTypeNode(typeNode);
+    })
+    .includes(true);
+};
+
+const visitTypeNode = (node: tsm.TypeNode): boolean => {
   if (tsm.Node.isTypeReference(node)) {
     // Check if it's Readonly<{ [k: string]: unknown }>
     if (node.getTypeName().getText() === 'Readonly') {
@@ -118,18 +136,16 @@ const visitTypeNode = (node: tsm.TypeNode): void => {
           ) {
             node.replaceWithText('UnknownRecord');
 
-            return;
+            return true;
           }
 
           // Otherwise, recurse into the type literal to visit its properties
-          visitTypeNode(typeArg);
-
-          return;
+          return visitTypeNode(typeArg);
         }
       }
     }
 
-    replaceIfRecordUnknown(node);
+    return replaceIfRecordUnknown(node);
   }
 
   // Check for type literal { [k: string]: unknown }
@@ -148,44 +164,65 @@ const visitTypeNode = (node: tsm.TypeNode): void => {
     ) {
       node.replaceWithText('UnknownRecord');
 
-      return;
+      return true;
     }
+
+    return members
+      .map((member) => {
+        if (tsm.Node.isPropertySignature(member)) {
+          const typeNode = member.getTypeNode();
+
+          return typeNode === undefined ? false : visitTypeNode(typeNode);
+        }
+
+        if (tsm.Node.isIndexSignatureDeclaration(member)) {
+          const typeNode = member.getReturnTypeNode();
+
+          return typeNode === undefined ? false : visitTypeNode(typeNode);
+        }
+
+        return false;
+      })
+      .includes(true);
   }
 
   // Recursively visit child type nodes
-  if (tsm.Node.isUnionTypeNode(node)) {
-    for (const typeNode of node.getTypeNodes()) {
-      visitTypeNode(typeNode);
-    }
-  } else if (tsm.Node.isIntersectionTypeNode(node)) {
-    for (const typeNode of node.getTypeNodes()) {
-      visitTypeNode(typeNode);
-    }
-  } else if (tsm.Node.isArrayTypeNode(node)) {
-    visitTypeNode(node.getElementTypeNode());
-  } else if (tsm.Node.isTupleTypeNode(node)) {
-    for (const element of node.getElements()) {
-      visitTypeNode(element);
-    }
-  } else if (tsm.Node.isParenthesizedTypeNode(node)) {
-    visitTypeNode(node.getTypeNode());
-  } else if (tsm.Node.isTypeLiteral(node)) {
-    for (const member of node.getMembers()) {
-      if (tsm.Node.isPropertySignature(member)) {
-        const typeNode = member.getTypeNode();
-
-        if (typeNode !== undefined) {
-          visitTypeNode(typeNode);
-        }
-      } else if (tsm.Node.isIndexSignatureDeclaration(member)) {
-        const typeNode = member.getReturnTypeNode();
-
-        if (typeNode !== undefined) {
-          visitTypeNode(typeNode);
-        }
-      }
-    }
+  if (tsm.Node.isUnionTypeNode(node) || tsm.Node.isIntersectionTypeNode(node)) {
+    return node
+      .getTypeNodes()
+      .map((typeNode) => visitTypeNode(typeNode))
+      .includes(true);
   }
+
+  if (tsm.Node.isArrayTypeNode(node)) {
+    return visitTypeNode(node.getElementTypeNode());
+  }
+
+  if (tsm.Node.isTupleTypeNode(node)) {
+    return node
+      .getElements()
+      .map((element) => visitTypeNode(element))
+      .includes(true);
+  }
+
+  if (tsm.Node.isParenthesizedTypeNode(node)) {
+    return visitTypeNode(node.getTypeNode());
+  }
+
+  // Handles `readonly T[]`, `readonly [...]`, `keyof T`
+  if (tsm.Node.isTypeOperatorTypeNode(node)) {
+    return visitTypeNode(node.getTypeNode());
+  }
+
+  if (tsm.Node.isRestTypeNode(node)) {
+    return visitTypeNode(node.getTypeNode());
+  }
+
+  if (tsm.Node.isNamedTupleMember(node)) {
+    return visitTypeNode(node.getTypeNode());
+  }
+
+  return false;
 };
 
 const isStringUnknownIndexSignature = (
@@ -198,7 +235,7 @@ const isStringUnknownIndexSignature = (
   return keyType.getText() === 'string' && returnType?.getText() === 'unknown';
 };
 
-const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): void => {
+const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {
   const typeName = node.getTypeName().getText();
 
   switch (typeName) {
@@ -212,9 +249,12 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): void => {
         typeArgs[1].getText() === 'unknown'
       ) {
         node.replaceWithText('UnknownRecord');
+
+        return true;
       }
 
-      break;
+      // Recurse into type arguments (e.g. Record<string, Record<string, unknown>>)
+      return typeArgs.map((typeArg) => visitTypeNode(typeArg)).includes(true);
     }
     case 'Readonly': {
       // Check if it's Readonly<Record<string, unknown>>
@@ -235,16 +275,51 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): void => {
               innerTypeArgs[1].getText() === 'unknown'
             ) {
               node.replaceWithText('UnknownRecord');
+
+              return true;
             }
           }
         }
+
+        // Otherwise, recurse into the type argument
+        return visitTypeNode(innerType);
       }
 
-      break;
+      return false;
     }
 
     default: {
-      break;
+      // Recurse into type arguments for any other generic type
+      return node
+        .getTypeArguments()
+        .map((typeArg) => visitTypeNode(typeArg))
+        .includes(true);
     }
   }
+};
+
+const ensureUnknownRecordImport = (sourceFile: tsm.SourceFile): void => {
+  const existingImport = sourceFile
+    .getImportDeclarations()
+    .find((decl) => decl.getModuleSpecifierValue() === UNKNOWN_RECORD_MODULE);
+
+  if (existingImport === undefined) {
+    sourceFile.insertImportDeclaration(0, {
+      moduleSpecifier: UNKNOWN_RECORD_MODULE,
+      namedImports: [{ name: UNKNOWN_RECORD_NAME, isTypeOnly: true }],
+    });
+
+    return;
+  }
+
+  const alreadyImported = existingImport
+    .getNamedImports()
+    .some((ni) => ni.getName() === UNKNOWN_RECORD_NAME);
+
+  if (alreadyImported) return;
+
+  existingImport.addNamedImport({
+    name: UNKNOWN_RECORD_NAME,
+    isTypeOnly: true,
+  });
 };

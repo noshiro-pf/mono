@@ -46,6 +46,8 @@ const transformedCode = transformSourceCode(originalCode, isTsx, [
 ]);
 
 const expected = dedent`
+  import { type UnknownRecord } from "ts-type-forge";
+
   export type A = Readonly< {
     name?: string;
     point: (readonly  [x: number, y: number, z?: number]);
@@ -73,6 +75,6 @@ const expected = dedent`
 
 if (import.meta.vitest !== undefined) {
   test('transformSourceCode', () => {
-    assert.isTrue(transformedCode === expected);
+    assert.strictEqual(transformedCode, expected);
   });
 }
