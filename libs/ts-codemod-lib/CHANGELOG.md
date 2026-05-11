@@ -1,3 +1,9 @@
+## [2.1.6](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.5...v2.1.6) (2026-05-11)
+
+### Bug Fixes
+
+- fix replaceRecordWithUnknownRecordTransformer to handle TypeOperatorTypeNode ([#109](https://github.com/noshiro-pf/ts-codemod-lib/issues/109)) ([72966c1](https://github.com/noshiro-pf/ts-codemod-lib/commit/72966c11b0eceee604ee1a941cdb367d8cc9259f))
+
 ## [2.1.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.4...v2.1.5) (2026-05-10)
 
 ### Bug Fixes
