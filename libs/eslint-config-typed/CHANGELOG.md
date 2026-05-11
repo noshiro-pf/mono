@@ -1,3 +1,9 @@
+## [4.9.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.6...v4.9.7) (2026-05-11)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#325](https://github.com/noshiro-pf/eslint-config-typed/issues/325)) ([7390bbd](https://github.com/noshiro-pf/eslint-config-typed/commit/7390bbd570af3c90a4b7edcc8d2d0c58b9198849))
+
 ## [4.9.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.5...v4.9.6) (2026-04-30)
 
 ### Bug Fixes
