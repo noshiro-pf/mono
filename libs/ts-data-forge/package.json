@@ -110,7 +110,7 @@
     "eslint": "9.39.4",
     "eslint-config-typed": "4.9.7",
     "github-settings-as-code": "1.2.8",
-    "immer": "11.1.4",
+    "immer": "11.1.6",
     "jiti": "2.6.1",
     "markdownlint": "0.40.0",
     "markdownlint-cli2": "0.22.1",
