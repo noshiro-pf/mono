@@ -11,6 +11,6 @@ minimumReleaseAgeExclude:
   - eslint-config-typed
   - octokit-safe-types
   - github-settings-as-code
-onlyBuiltDependencies:
-  - esbuild
-  - unrs-resolver
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
