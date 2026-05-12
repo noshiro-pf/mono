@@ -1,4 +1,9 @@
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+
 minimumReleaseAge: 10080 # = 7 days
+
 minimumReleaseAgeExclude:
   - '@types/**'
   - ts-type-forge
@@ -11,6 +16,3 @@ minimumReleaseAgeExclude:
   - eslint-config-typed
   - octokit-safe-types
   - github-settings-as-code
-allowBuilds:
-  esbuild: true
-  unrs-resolver: true
