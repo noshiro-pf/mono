@@ -1,3 +1,9 @@
+## [2.1.7](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.6...v2.1.7) (2026-05-12)
+
+### Bug Fixes
+
+- fix dependencies ([#110](https://github.com/noshiro-pf/ts-codemod-lib/issues/110)) ([3458cab](https://github.com/noshiro-pf/ts-codemod-lib/commit/3458cab78f16ef1e3f51434fca1d7313366cf365))
+
 ## [2.1.6](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.5...v2.1.6) (2026-05-11)
 
 ### Bug Fixes
