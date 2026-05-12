@@ -1,3 +1,9 @@
+## [7.0.7](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.6...v7.0.7) (2026-05-12)
+
+### Bug Fixes
+
+- fix dependencies ([#292](https://github.com/noshiro-pf/ts-fortress/issues/292)) ([a856770](https://github.com/noshiro-pf/ts-fortress/commit/a85677065bbf1c8a76f91b738ba3051bf87abdad))
+
 ## [7.0.6](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.5...v7.0.6) (2026-05-10)
 
 ### Bug Fixes
