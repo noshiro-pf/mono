@@ -1,6 +1,3 @@
-packages:
-  - packages/**
-
 allowBuilds:
   esbuild: true
   sharp: true
@@ -21,7 +18,5 @@ minimumReleaseAgeExclude:
   - octokit-safe-types
   - github-settings-as-code
 
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
-  - unrs-resolver
+packages:
+  - packages/**

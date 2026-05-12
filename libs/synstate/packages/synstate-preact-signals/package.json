@@ -59,8 +59,8 @@
   },
   "dependencies": {
     "synstate": "workspace:*",
-    "ts-data-forge": "6.9.4",
-    "ts-type-forge": "3.0.0"
+    "ts-data-forge": "^6.9.6",
+    "ts-type-forge": "^3.0.1"
   },
   "devDependencies": {
     "@preact/signals": "2.9.0",

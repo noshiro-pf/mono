@@ -61,8 +61,8 @@
     "z:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
   },
   "dependencies": {
-    "ts-data-forge": "6.9.4",
-    "ts-type-forge": "3.0.0"
+    "ts-data-forge": "^6.9.6",
+    "ts-type-forge": "^3.0.1"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "2.11.2",
