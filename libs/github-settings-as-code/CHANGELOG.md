@@ -1,3 +1,9 @@
+## [1.2.9](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.8...v1.2.9) (2026-05-13)
+
+### Bug Fixes
+
+- fix dependencies ([#136](https://github.com/noshiro-pf/github-settings-as-code/issues/136)) ([4e39f6e](https://github.com/noshiro-pf/github-settings-as-code/commit/4e39f6e7bcbbc6c05429b86cd53fcd7621adc3d0))
+
 ## [1.2.8](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.7...v1.2.8) (2026-05-10)
 
 ### Bug Fixes
