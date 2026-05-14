@@ -35,7 +35,7 @@
     "doc": "run-s doc:embed doc:embed:jsdoc",
     "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
     "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
-    "fmt": "format-uncommitted",
+    "fmt": "format-uncommitted --cwd .",
     "fmt:full": "pnpm run z:prettier .",
     "gen:re-export": "run-s gen:re-export:script fmt",
     "gen:re-export:script": "tsx ./scripts/cmd/generate-re-export-script.mts",

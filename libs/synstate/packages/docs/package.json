@@ -13,7 +13,7 @@
     "doc:embed:bundle-size": "tsx ./scripts/embed-bundle-size.mts",
     "doc:embed:jsdoc": "tsx ./scripts/embed-jsdoc-descriptions.mts",
     "doc:embed:jsdoc-examples": "tsx ./scripts/embed-jsdoc-examples.mts",
-    "fmt": "format-uncommitted",
+    "fmt": "format-uncommitted --cwd .",
     "fmt:full": "pnpm run z:prettier .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

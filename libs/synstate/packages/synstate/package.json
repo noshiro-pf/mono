@@ -39,7 +39,7 @@
     "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
     "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "doc:gen-sample-diffs": "tsx ./scripts/cmd/generate-sample-diffs.mts",
-    "fmt": "format-uncommitted",
+    "fmt": "format-uncommitted --cwd .",
     "fmt:full": "pnpm run z:prettier .",
     "gi": "run-s gi:src fmt",
     "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude \"core/utils/**\"",
