@@ -1,3 +1,9 @@
+## [10.1.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.0...v10.1.1) (2026-05-14)
+
+### Bug Fixes
+
+- resolve untracked-file paths correctly when format-uncommitted is run from a subdirectory ([#371](https://github.com/noshiro-pf/ts-repo-utils/issues/371)) ([96f59ca](https://github.com/noshiro-pf/ts-repo-utils/commit/96f59ca9c248f23f9b66ad64de72b724a8f97184))
+
 # [10.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.0.3...v10.1.0) (2026-05-14)
 
 ### Features
