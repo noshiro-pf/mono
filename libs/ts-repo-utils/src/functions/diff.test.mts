@@ -143,6 +143,48 @@ describe('diff', () => {
       }
     });
 
+    test('should resolve paths correctly when invoked from a subdirectory', async () => {
+      const { repoPath, cleanup } = await createTempRepo();
+
+      try {
+        // Create a subdirectory and an untracked file inside it
+        const subDir = path.join(repoPath, 'sub');
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.mkdir(subDir);
+
+        const testFileName =
+          `test-untracked-${crypto.randomUUID()}.tmp` as const;
+
+        const testFilePath = path.join(subDir, testFileName);
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await fs.writeFile(testFilePath, 'test content');
+
+        // Invoke getUntrackedFiles from the subdirectory (not from repo root).
+        // Without the cwd fix, git ls-files would return paths relative to
+        // the subdirectory, which would then be incorrectly joined with
+        // gitRoot.
+        const originalCwd = process.cwd();
+
+        process.chdir(subDir);
+
+        try {
+          const result = await getUntrackedFiles({ silent: true });
+
+          assert.isTrue(Result.isOk(result));
+
+          if (Result.isOk(result)) {
+            expect(result.value).toContain(testFilePath);
+          }
+        } finally {
+          process.chdir(originalCwd);
+        }
+      } finally {
+        await cleanup();
+      }
+    });
+
     test('should detect modified existing files', async () => {
       const { repoPath, cleanup, execInRepo } = await createTempRepo();
 
