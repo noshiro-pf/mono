@@ -41,6 +41,12 @@ const cmdDef = cmd.command({
       type: cmd.optional(cmd.boolean),
       description: 'If true, suppresses output messages (default: false)',
     }),
+    cwd: cmd.option({
+      long: 'cwd',
+      type: cmd.optional(cmd.string),
+      description:
+        'If provided, only files within this directory are formatted. Relative paths are resolved against the current working directory (process.cwd()), not the git repository root.',
+    }),
   },
   handler: (args) => {
     main({
@@ -50,6 +56,7 @@ const cmdDef = cmd.command({
       excludeStaged: args.excludeStaged ?? false,
       ignoreUnknown: args.ignoreUnknown ?? true,
       silent: args.silent ?? false,
+      cwd: args.cwd,
     }).catch((error: unknown) => {
       console.error('An error occurred:', error);
 
@@ -66,6 +73,7 @@ const main = async (
     excludeStaged: boolean;
     ignoreUnknown: boolean;
     silent: boolean;
+    cwd: string | undefined;
   }>,
 ): Promise<void> => {
   const result = await formatDiffFrom(args.base, {
@@ -74,6 +82,7 @@ const main = async (
     includeStaged: !args.excludeStaged,
     ignoreUnknown: args.ignoreUnknown,
     silent: args.silent,
+    cwd: args.cwd,
   });
 
   if (Result.isErr(result)) {

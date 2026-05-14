@@ -277,6 +277,10 @@ export const formatFilesGlob = async (
  * Format only files that have been changed (git status)
  *
  * @param options - Options for formatting
+ * @param options.cwd - If provided, only files within this directory will be
+ *   formatted. Relative paths are resolved against `process.cwd()`. Defaults to
+ *   undefined (no filtering; all changed files in the repository are
+ *   formatted).
  */
 export const formatUncommittedFiles = async (
   options?: Readonly<{
@@ -286,6 +290,7 @@ export const formatUncommittedFiles = async (
     silent?: boolean;
     ignoreUnknown?: boolean;
     ignore?: false | ((filePath: string) => boolean);
+    cwd?: string;
   }>,
 ): Promise<
   Result<
@@ -300,6 +305,7 @@ export const formatUncommittedFiles = async (
     silent = false,
     ignoreUnknown = true,
     ignore,
+    cwd,
   } = options ?? {};
 
   const mut_files: string[] = [];
@@ -349,10 +355,36 @@ export const formatUncommittedFiles = async (
     mut_files.push(...stagedFilesResult.value);
   }
 
-  return formatFiles(Arr.uniq(mut_files), {
+  return formatFiles(filterFilesByCwd(Arr.uniq(mut_files), cwd), {
     silent,
     ignoreUnknown,
     ignore,
+  });
+};
+
+/**
+ * Filter a list of file paths to those inside `cwd`. If `cwd` is undefined,
+ * returns the original list unchanged. Relative `cwd` is resolved against
+ * `process.cwd()`.
+ */
+const filterFilesByCwd = (
+  files: readonly string[],
+  cwd: string | undefined,
+): readonly string[] => {
+  if (cwd === undefined) {
+    return files;
+  }
+
+  const resolvedCwd = path.resolve(cwd);
+
+  const cwdWithSep = resolvedCwd.endsWith(path.sep)
+    ? resolvedCwd
+    : (`${resolvedCwd}${path.sep}` as const);
+
+  return files.filter((file) => {
+    const absFile = path.isAbsolute(file) ? file : path.resolve(file);
+
+    return absFile === resolvedCwd || absFile.startsWith(cwdWithSep);
   });
 };
 
@@ -378,6 +410,13 @@ export const formatDiffFrom = async (
     silent?: boolean;
     ignoreUnknown?: boolean;
     ignore?: false | ((filePath: string) => boolean);
+    /**
+     * If provided, only files within this directory will be formatted.
+     * Relative paths are resolved against `process.cwd()`. Defaults to
+     * undefined (no filtering; all changed files in the repository are
+     * formatted).
+     */
+    cwd?: string;
   }>,
 ): Promise<
   Result<
@@ -397,6 +436,7 @@ export const formatDiffFrom = async (
     includeStaged = true,
     ignoreUnknown = true,
     ignore,
+    cwd,
   } = options ?? {};
 
   const conditionalEcho = silent ? () => {} : console.log;
@@ -443,7 +483,7 @@ export const formatDiffFrom = async (
     }
   }
 
-  const allFiles = Arr.uniq(mut_allFiles);
+  const allFiles = filterFilesByCwd(Arr.uniq(mut_allFiles), cwd);
 
   if (!silent) {
     const includedFileTypes = [

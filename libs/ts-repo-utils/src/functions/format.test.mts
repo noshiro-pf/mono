@@ -538,6 +538,116 @@ describe(formatUncommittedFiles, () => {
     }
   });
 
+  test('should filter files by cwd when option is provided', async () => {
+    await setupTest();
+
+    try {
+      // Create files inside and outside the target subdirectory
+      const inside1 = path.join(testDir, 'sub', 'inside1.ts');
+
+      const inside2 = path.join(testDir, 'sub', 'nested', 'inside2.ts');
+
+      const outside1 = path.join(testDir, 'outside1.ts');
+
+      const outside2 = path.join(testDir, 'other', 'outside2.ts');
+
+      await createTestFile(path.join('sub', 'inside1.ts'), 'const a=1');
+
+      await createTestFile(
+        path.join('sub', 'nested', 'inside2.ts'),
+        'const b=2',
+      );
+
+      await createTestFile('outside1.ts', 'const c=3');
+
+      await createTestFile(path.join('other', 'outside2.ts'), 'const d=4');
+
+      vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([inside1]));
+
+      vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([outside1]));
+
+      vi.mocked(getStagedFiles).mockResolvedValue(
+        Result.ok([inside2, outside2]),
+      );
+
+      const result = await formatUncommittedFiles({
+        silent: true,
+        cwd: path.join(testDir, 'sub'),
+      });
+
+      assert.isTrue(Result.isOk(result));
+
+      // Files inside cwd should be formatted
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await expect(fs.readFile(inside1, 'utf8')).resolves.toBe(
+        'const a = 1;\n',
+      );
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await expect(fs.readFile(inside2, 'utf8')).resolves.toBe(
+        'const b = 2;\n',
+      );
+
+      // Files outside cwd should be untouched
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await expect(fs.readFile(outside1, 'utf8')).resolves.toBe('const c=3');
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await expect(fs.readFile(outside2, 'utf8')).resolves.toBe('const d=4');
+    } finally {
+      await cleanupTest();
+    }
+  });
+
+  test('should resolve relative cwd against process.cwd()', async () => {
+    await setupTest();
+
+    try {
+      const inside = path.join(testDir, 'sub', 'inside.ts');
+
+      const outside = path.join(testDir, 'outside.ts');
+
+      await createTestFile(path.join('sub', 'inside.ts'), 'const a=1');
+
+      await createTestFile('outside.ts', 'const b=2');
+
+      vi.mocked(getUntrackedFiles).mockResolvedValue(
+        Result.ok([inside, outside]),
+      );
+
+      vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
+      vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
+
+      // Run with relative cwd value, but chdir to testDir first so that
+      // process.cwd() based resolution lands inside testDir/sub
+      const originalCwd = process.cwd();
+
+      process.chdir(testDir);
+
+      try {
+        const result = await formatUncommittedFiles({
+          silent: true,
+          cwd: './sub',
+        });
+
+        assert.isTrue(Result.isOk(result));
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await expect(fs.readFile(inside, 'utf8')).resolves.toBe(
+          'const a = 1;\n',
+        );
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        await expect(fs.readFile(outside, 'utf8')).resolves.toBe('const b=2');
+      } finally {
+        process.chdir(originalCwd);
+      }
+    } finally {
+      await cleanupTest();
+    }
+  });
+
   test('should return error when getUntrackedFiles fails', async () => {
     await setupTest();
 
@@ -1140,6 +1250,55 @@ describe(formatDiffFrom, () => {
       expect(getUntrackedFiles).not.toHaveBeenCalled();
 
       expect(getModifiedFiles).not.toHaveBeenCalled();
+    } finally {
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  test('should filter files by cwd when option is provided', async () => {
+    vi.clearAllMocks();
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(path.join(testDir, 'sub'), { recursive: true });
+
+    try {
+      const inside = await createTestFile(
+        path.join('sub', 'inside.ts'),
+        dedent`
+          const a=1
+        `,
+      );
+
+      const outside = await createTestFile(
+        'outside.ts',
+        dedent`
+          const b=2
+        `,
+      );
+
+      vi.mocked(getDiffFrom).mockResolvedValue(Result.ok([inside, outside]));
+
+      vi.mocked(getUntrackedFiles).mockResolvedValue(Result.ok([]));
+
+      vi.mocked(getModifiedFiles).mockResolvedValue(Result.ok([]));
+
+      vi.mocked(getStagedFiles).mockResolvedValue(Result.ok([]));
+
+      const result = await formatDiffFrom('main', {
+        silent: true,
+        cwd: path.join(testDir, 'sub'),
+      });
+
+      assert.isTrue(Result.isOk(result));
+
+      // Inside cwd should be formatted, outside should be left untouched
+      await expect(readTestFile(inside)).resolves.toBe(
+        `${dedent`
+          const a = 1;
+        `}\n`,
+      );
+
+      await expect(readTestFile(outside)).resolves.toBe('const b=2');
     } finally {
       await fs.rm(testDir, { recursive: true, force: true });
     }
