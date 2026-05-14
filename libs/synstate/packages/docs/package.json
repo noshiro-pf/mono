@@ -14,6 +14,7 @@
     "doc:embed:jsdoc": "tsx ./scripts/embed-jsdoc-descriptions.mts",
     "doc:embed:jsdoc-examples": "tsx ./scripts/embed-jsdoc-examples.mts",
     "fmt": "format-uncommitted --cwd .",
+    "fmt:diff": "format-diff-from origin/main --cwd .",
     "fmt:full": "pnpm run z:prettier .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
