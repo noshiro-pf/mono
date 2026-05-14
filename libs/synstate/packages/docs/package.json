@@ -31,7 +31,7 @@
     "@fontsource/noto-sans-jp": "^5.2.9",
     "@preact/signals": "^2.9.0",
     "@resvg/resvg-js": "^2.6.2",
-    "astro": "^6.1.9",
+    "astro": "^6.1.10",
     "preact": "^10.29.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
