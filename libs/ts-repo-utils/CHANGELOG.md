@@ -1,3 +1,9 @@
+# [10.1.0](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.0.3...v10.1.0) (2026-05-14)
+
+### Features
+
+- add --cwd option to format-uncommitted and format-diff-from ([#370](https://github.com/noshiro-pf/ts-repo-utils/issues/370)) ([a66a394](https://github.com/noshiro-pf/ts-repo-utils/commit/a66a3947565bbfff4062dcdc05747e1e4d1fa33f))
+
 ## [10.0.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.0.2...v10.0.3) (2026-05-12)
 
 ### Bug Fixes
