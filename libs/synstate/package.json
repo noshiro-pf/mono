@@ -17,22 +17,6 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": false,
   "type": "module",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      }
-    }
-  },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "src",
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
   "workspaces": [
     "packages/**"
   ],
@@ -41,7 +25,7 @@
     "check:root:lint": "pnpm run z:eslint ./{scripts,configs}/**/*.mts --fix",
     "check:root:type": "tsc -p ./tsconfig.json --noEmit",
     "check-all": "tsx ./scripts/cmd/check-all.mts",
-    "ci:publish": "pnpm run ws:build && pnpm publish -r",
+    "ci:publish": "pnpm run ws:build && pnpm changeset publish",
     "ci:version-packages": "pnpm changeset version && pnpm install --no-frozen-lockfile",
     "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "codemod": "run-s codemod:uncommitted:as-const fmt codemod:uncommitted:readonly fmt",
@@ -96,7 +80,7 @@
     "eslint": "9.39.4",
     "eslint-config-typed": "4.9.8",
     "github-settings-as-code": "1.2.9",
-    "jiti": "2.6.1",
+    "jiti": "2.7.0",
     "markdownlint": "0.40.0",
     "markdownlint-cli2": "0.22.1",
     "npm-run-all2": "8.0.4",
@@ -104,7 +88,7 @@
     "prettier": "3.8.3",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.2",
-    "rollup": "4.60.2",
+    "rollup": "4.60.3",
     "ts-codemod-lib": "2.1.7",
     "ts-data-forge": "6.9.6",
     "ts-repo-utils": "10.1.0",
