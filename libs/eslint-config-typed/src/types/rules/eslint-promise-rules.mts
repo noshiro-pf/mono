@@ -341,7 +341,31 @@ namespace NoCallbackInPromise {
  *  ```
  */
 namespace NoPromiseInCallback {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "exemptDeclarations": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    exemptDeclarations?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -531,6 +555,7 @@ export type EslintPromiseRulesOption = Readonly<{
   'promise/catch-or-return': CatchOrReturn.Options;
   'promise/prefer-await-to-then': PreferAwaitToThen.Options;
   'promise/no-callback-in-promise': NoCallbackInPromise.Options;
+  'promise/no-promise-in-callback': NoPromiseInCallback.Options;
   'promise/valid-params': ValidParams.Options;
   'promise/spec-only': SpecOnly.Options;
 }>;
