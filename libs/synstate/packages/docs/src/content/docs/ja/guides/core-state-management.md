@@ -97,7 +97,7 @@ dispatch({ type: 'increment' }); // state は 1 になる
 
 ## `createBooleanState` — トグル状態
 
-真偽値フラグ（モーダル、ドロワーの開閉状態、ダークモードなど）には、`createBooleanState` が便利な名前付きメソッドを提供します。`() => setState(true)` のようなラッパーを書く必要がありません：
+真偽値フラグ（モーダル、 drawer の開閉状態、ダークモードなど）には、`createBooleanState` が便利な名前付きメソッドを提供します。`() => setState(true)` のようなラッパーを毎回書く必要がありません：
 
 ```ts
 const [isOpen$, { setTrue: open, setFalse: close, toggle }] =

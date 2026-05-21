@@ -41,7 +41,7 @@ state.subscribe((count) => {
 setState(1);
 ```
 
-`createState` creates a reactive state and a setter function. Subscribers are called immediately with the initial value, and again whenever the state is updated.
+`createState` creates a reactive state (InitializedObservable) and a setter function. Subscribers are called immediately with the initial value, and again whenever the state is updated.
 
 `createState` also returns a third element with additional utilities:
 
@@ -52,10 +52,12 @@ const [
     { updateState, resetState, getSnapshot, initialState },
 ] = createState(0);
 
-updateState((prev) => prev + 1); // update using a function of the previous value
+updateState((prev) => prev + 2); // update using a function of the previous value
+getSnapshot(); // read current value synchronously (2)
+initialState; // the initial value passed to createState (0)
+
 resetState(); // reset to initial value (0)
 getSnapshot(); // read current value synchronously (0)
-initialState; // the initial value passed to createState (0)
 ```
 
 ## Deriving Values with `pipe`

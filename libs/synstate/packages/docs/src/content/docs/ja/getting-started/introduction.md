@@ -41,7 +41,7 @@ state.subscribe((count) => {
 setState(1);
 ```
 
-`createState` はリアクティブな状態とセッター関数を作成します。サブスクライバーは初期値で即座に呼び出され、状態が更新されるたびに再び呼び出されます。
+`createState` はリアクティブな状態（InitializedObservable）とセッター関数を作成します。サブスクライバーは初期値で即座に呼び出され、状態が更新されるたびに再び呼び出されます。
 
 `createState` は3番目の要素として追加のユーティリティも返します：
 
@@ -52,10 +52,12 @@ const [
     { updateState, resetState, getSnapshot, initialState },
 ] = createState(0);
 
-updateState((prev) => prev + 1); // 前の値を使って更新
+updateState((prev) => prev + 2); // 前の値を使って更新
+getSnapshot(); // 現在の値を同期的に読み取り（2）
+initialState; // createState に渡した初期値（0）
+
 resetState(); // 初期値（0）にリセット
 getSnapshot(); // 現在の値を同期的に読み取り（0）
-initialState; // createState に渡した初期値（0）
 ```
 
 ## `pipe` で値を派生する

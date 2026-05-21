@@ -23,6 +23,7 @@ const documents: DeepReadonly<
     sampleCodeFiles: [
       '01-simple-state.tsx',
       '02-simple-state-with-additional-api.tsx',
+      '03-use-observable-value.tsx',
     ],
   },
 ] as const;

@@ -110,3 +110,45 @@ const UserProfile = (): React.JSX.Element => {
     );
 };
 ```
+
+## Subscribing to Observables: `useObservableValue`
+
+Use `useObservableValue` to read any `Observable` — including derived ones produced by `pipe` / `combine` — from a React component. It is implemented on top of `useSyncExternalStore`, so the component re-renders whenever the source emits.
+
+### Overloads
+
+| Signature                                                           | Return type      | When to use                                                                                                                   |
+| ------------------------------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `useObservableValue<A>(obs: InitializedObservable<A>)`              | `A`              | The observable always has a current value (e.g. came from `createState`, or a `pipe` chain that preserves the initial value). |
+| `useObservableValue<A>(obs: Observable<A>)`                         | `A \| undefined` | The observable may not have emitted yet (no initial value).                                                                   |
+| `useObservableValue<A, B = A>(obs: Observable<A>, initialValue: B)` | `A \| B`         | Provide a fallback used while the observable has no value. Implemented via `Optional.unwrapOr`.                               |
+
+### Example
+
+```tsx
+import type * as React from 'react';
+import { map, type Observable } from 'synstate';
+import { createState, useObservableValue } from 'synstate-react-hooks';
+
+const [useCount, setCount, { state: count$ }] = createState(0);
+
+// Derived InitializedObservable — no fallback needed.
+const doubled$ = count$.pipe(map((n) => n * 2));
+
+// Imagine an Observable<string> that has no initial value
+// (e.g. one waiting on an async source).
+declare const userName$: Observable<string>;
+
+const Profile = (): React.JSX.Element => {
+    const doubled = useObservableValue(doubled$); // number
+
+    const userName = useObservableValue(userName$, 'Guest'); // string
+
+    return (
+        <div>
+            <p>{`Doubled count: ${doubled}`}</p>
+            <p>{`Hello, ${userName}`}</p>
+        </div>
+    );
+};
+```

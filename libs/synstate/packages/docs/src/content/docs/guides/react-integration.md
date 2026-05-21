@@ -176,7 +176,36 @@ const CountDisplay = (): React.JSX.Element => {
 };
 ```
 
-`useObservableValue` works with any `InitializedObservable` — whether it comes from `createState`, `pipe`, `combine`, or any other SynState operator. It subscribes to the Observable and returns the current value as React state, re-rendering the component when the value changes.
+`useObservableValue` works with any `Observable` — whether it comes from `createState`, `pipe`, `combine`, or any other SynState operator. It subscribes to the Observable and returns the current value as React state, re-rendering the component when the value changes.
+
+### Fallback for Observables Without an Initial Value
+
+`useObservableValue` is overloaded so the return type tracks whether the source has an initial value:
+
+| Signature                                                           | Return type      |
+| ------------------------------------------------------------------- | ---------------- |
+| `useObservableValue<A>(obs: InitializedObservable<A>)`              | `A`              |
+| `useObservableValue<A>(obs: Observable<A>)`                         | `A \| undefined` |
+| `useObservableValue<A, B = A>(obs: Observable<A>, initialValue: B)` | `A \| B`         |
+
+The second argument is a fallback used while the source has not produced a value yet (it is applied via `Optional.unwrapOr`):
+
+```tsx
+import type * as React from 'react';
+import { type Observable } from 'synstate';
+import { useObservableValue } from 'synstate-react-hooks';
+
+// Observable<string> that may not have emitted yet.
+declare const userName$: Observable<string>;
+
+const Greeting = (): React.JSX.Element => {
+    const userName = useObservableValue(userName$, 'Guest'); // string
+
+    return <p>{`Hello, ${userName}`}</p>;
+};
+```
+
+Observables created from `createState` (or any `pipe` chain that preserves the initial value) are `InitializedObservable<T>` and never need a fallback.
 
 ## React v17 or Earlier
 

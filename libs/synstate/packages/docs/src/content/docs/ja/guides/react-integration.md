@@ -176,7 +176,36 @@ const CountDisplay = (): React.JSX.Element => {
 };
 ```
 
-`useObservableValue` は `createState`、`pipe`、`combine` など、SynState のあらゆるオペレーターから得られる `InitializedObservable` に対して動作します。Observable を購読し、現在の値を React state として返します。値が変化するとコンポーネントが再レンダリングされます。
+`useObservableValue` は `createState`、`pipe`、`combine` など、SynState のあらゆるオペレーターから得られる `Observable` に対して動作します。Observable を購読し、現在の値を React state として返します。値が変化するとコンポーネントが再レンダリングされます。
+
+### 初期値を持たない Observable のためのフォールバック
+
+`useObservableValue` はオーバーロードされており、ソースに初期値があるかどうかに応じて戻り値の型が変わります：
+
+| シグネチャ                                                          | 戻り値の型       |
+| ------------------------------------------------------------------- | ---------------- |
+| `useObservableValue<A>(obs: InitializedObservable<A>)`              | `A`              |
+| `useObservableValue<A>(obs: Observable<A>)`                         | `A \| undefined` |
+| `useObservableValue<A, B = A>(obs: Observable<A>, initialValue: B)` | `A \| B`         |
+
+第二引数はソースがまだ値を発行していない場合に使われるフォールバック値です（内部的に `Optional.unwrapOr` で適用されます）：
+
+```tsx
+import type * as React from 'react';
+import { type Observable } from 'synstate';
+import { useObservableValue } from 'synstate-react-hooks';
+
+// Observable<string> that may not have emitted yet.
+declare const userName$: Observable<string>;
+
+const Greeting = (): React.JSX.Element => {
+    const userName = useObservableValue(userName$, 'Guest'); // string
+
+    return <p>{`Hello, ${userName}`}</p>;
+};
+```
+
+`createState` から得られる Observable や、初期値を保持する `pipe` チェーンから得られる Observable は `InitializedObservable<T>` であるため、フォールバックは不要です。
 
 ## React v17 以前
 

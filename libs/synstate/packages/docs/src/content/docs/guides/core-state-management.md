@@ -97,7 +97,7 @@ See the [API reference for `createReducer`](/synstate/reference/create-reducer/)
 
 ## `createBooleanState` — Toggle State
 
-For boolean flags (modals, drawers, dark mode, etc.), `createBooleanState` provides convenient named methods so you don't need to write `() => setState(true)` wrappers:
+For boolean flags (modals, drawers, dark mode, etc.), `createBooleanState` provides convenient named methods so you don't need to write `() => setState(true)` wrappers every time:
 
 ```ts
 const [isOpen$, { setTrue: open, setFalse: close, toggle }] =
