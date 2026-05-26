@@ -1,6 +1,6 @@
 import { unknownToString, type UnknownResult } from 'ts-data-forge';
 import { $, isDirectlyExecuted, Result } from 'ts-repo-utils';
-import { embedSamples } from './embed-samples.mjs';
+import { embedExamples } from './embed-examples.mjs';
 
 /**
  * Generates documentation using TypeDoc and formats the output.
@@ -10,7 +10,7 @@ export const genDocs = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Embedding sample code into README',
-    action: () => runStep(embedSamples(), 'Sample embedding failed'),
+    action: () => runStep(embedExamples(), 'Sample embedding failed'),
     successMessage: 'Sample code embedded into README',
   });
 

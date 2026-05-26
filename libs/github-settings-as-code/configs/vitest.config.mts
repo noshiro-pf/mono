@@ -3,18 +3,18 @@ import { type ViteUserConfig } from 'vitest/config';
 import { type CoverageOptions, type ProjectConfig } from 'vitest/node';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 
+const aliasMap = {
+  'github-settings-as-code': path.resolve(
+    projectRootPath,
+    './src/entry-point.mts',
+  ),
+};
+
 // https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
 const config = () =>
   ({
     test: {
       coverage: coverageSettings(),
-
-      alias: {
-        'github-settings-as-code': path.resolve(
-          projectRootPath,
-          './src/entry-point.mts',
-        ),
-      },
 
       passWithNoTests: true,
       projects: [
@@ -22,6 +22,7 @@ const config = () =>
           test: {
             name: 'Node.js',
             environment: 'node',
+            alias: aliasMap,
             ...projectConfig(),
             typecheck: {
               tsconfig: path.resolve(
