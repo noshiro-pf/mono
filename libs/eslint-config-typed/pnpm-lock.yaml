@@ -42,8 +42,8 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1(eslint@9.39.4(jiti@2.6.1))
       eslint-plugin-cypress:
-        specifier: ^6.3.1
-        version: 6.3.1(eslint@9.39.4(jiti@2.6.1))
+        specifier: ^6.4.1
+        version: 6.4.1(@typescript-eslint/parser@8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))
       eslint-plugin-eslint-plugin:
         specifier: ^7.3.2
         version: 7.3.2(eslint@9.39.4(jiti@2.6.1))
@@ -2123,10 +2123,14 @@ packages:
     peerDependencies:
       eslint: '>=8.51.0'
 
-  eslint-plugin-cypress@6.3.1:
-    resolution: {integrity: sha512-iTJtdIZbyCUlagEI4YlVcwgPFV7X379Qi/upujaD4kvOaQkMvzmpt90vfSnaqgqprp/HPIvhnzv3fdI7mYV4QQ==}
+  eslint-plugin-cypress@6.4.1:
+    resolution: {integrity: sha512-8mnfR3q0Lr41Fu9SYZGeZ5nbSBgtS44+bbtSs7k0KvfoQ2pPmK43IvaTP6FGTfwBTN6S7w027CpqjrLAd65AYA==}
     peerDependencies:
+      '@typescript-eslint/parser': '>=8'
       eslint: '>=9'
+    peerDependenciesMeta:
+      '@typescript-eslint/parser':
+        optional: true
 
   eslint-plugin-es-x@7.8.0:
     resolution: {integrity: sha512-7Ds8+wAAoV3T+LAKeu39Y5BzXCrGKrcISfgKEqTS4BDN8SFEDQd0S43jiQ8vIa3wUKD07qitZdfzlenSi8/0qQ==}
@@ -2527,6 +2531,10 @@ packages:
 
   globals@17.5.0:
     resolution: {integrity: sha512-qoV+HK2yFl/366t2/Cb3+xxPUo5BuMynomoDmiaZBIdbs+0pYbjfZU+twLhGKp4uCZ/+NbtpVepH5bGCxRyy2g==}
+    engines: {node: '>=18'}
+
+  globals@17.6.0:
+    resolution: {integrity: sha512-sepffkT8stwnIYbsMBpoCHJuJM5l98FUF2AnE07hfvE0m/qp3R586hw4jF4uadbhvg1ooIdzuu7CsfD2jzCaNA==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -6356,10 +6364,12 @@ snapshots:
     dependencies:
       eslint: 9.39.4(jiti@2.6.1)
 
-  eslint-plugin-cypress@6.3.1(eslint@9.39.4(jiti@2.6.1)):
+  eslint-plugin-cypress@6.4.1(@typescript-eslint/parser@8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1)):
     dependencies:
       eslint: 9.39.4(jiti@2.6.1)
-      globals: 17.5.0
+      globals: 17.6.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
 
   eslint-plugin-es-x@7.8.0(eslint@9.39.4(jiti@2.6.1)):
     dependencies:
@@ -6866,6 +6876,8 @@ snapshots:
   globals@15.15.0: {}
 
   globals@17.5.0: {}
+
+  globals@17.6.0: {}
 
   globalthis@1.0.4:
     dependencies:
