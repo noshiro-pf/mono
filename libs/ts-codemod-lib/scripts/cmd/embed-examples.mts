@@ -4,9 +4,7 @@ import { unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { type DeepReadonly } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
-import { extractSampleCode } from './embed-samples-utils.mjs';
-
-const codeBlockPatterns = ['```tsx', '```ts', '```js'] as const;
+import { extractSampleCode } from './embed-examples-utils.mjs';
 
 const codeBlockEnd = '```';
 
@@ -35,11 +33,21 @@ const documents: DeepReadonly<
 ] as const;
 
 /** Embeds sample code from ./samples/readme directory into README.md */
-export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
+export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
   try {
     for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
+
+      const codeBlockCount = (
+        markdownContent.match(/^```(?:tsx|ts|js)(?!\w)/gmu) ?? []
+      ).length;
+
+      if (codeBlockCount !== sampleCodeFiles.length) {
+        return Result.err(
+          `❌ Code block count mismatch in ${mdPath}: found ${codeBlockCount} code blocks but expected ${sampleCodeFiles.length} sample files`,
+        );
+      }
 
       const mut_results: string[] = [];
 
@@ -53,33 +61,22 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 
         const sampleContentSliced = extractSampleCode(sampleContent);
 
-        // Find the next code block that matches one of our patterns
-        let mut_codeBlockStartIndex = -1;
+        // Find the next code block (line-start anchor avoids nested fences)
+        const match = /^```(?:tsx|ts|js)(?!\w)/mu.exec(mut_rest);
 
-        let mut_codeBlockStart = '';
-
-        for (const pattern of codeBlockPatterns) {
-          const index = mut_rest.indexOf(pattern);
-
-          if (
-            index !== -1 &&
-            (mut_codeBlockStartIndex === -1 || index < mut_codeBlockStartIndex)
-          ) {
-            mut_codeBlockStartIndex = index;
-
-            mut_codeBlockStart = pattern;
-          }
-        }
-
-        if (mut_codeBlockStartIndex === -1) {
+        if (match === null) {
           return Result.err(
             `❌ codeBlockStart not found for ${sampleCodeFile}`,
           );
         }
 
+        const codeBlockStartIndex = match.index;
+
+        const codeBlockStart = match[0];
+
         const codeBlockEndIndex = mut_rest.indexOf(
           codeBlockEnd,
-          mut_codeBlockStartIndex + mut_codeBlockStart.length,
+          codeBlockStartIndex + codeBlockStart.length,
         );
 
         if (codeBlockEndIndex === -1) {
@@ -89,7 +86,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
         // Replace the code block content
         const beforeBlock = mut_rest.slice(
           0,
-          Math.max(0, mut_codeBlockStartIndex + mut_codeBlockStart.length),
+          Math.max(0, codeBlockStartIndex + codeBlockStart.length),
         );
 
         const afterBlock = mut_rest.slice(Math.max(0, codeBlockEndIndex));
@@ -117,7 +114,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const result = await embedSamples();
+  const result = await embedExamples();
 
   if (Result.isErr(result)) {
     console.error(result.value);
