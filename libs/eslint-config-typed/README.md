@@ -932,7 +932,7 @@ module.exports = {
 
 The flat config then enables the rule for our source tree and marks the public federation module as an allowed unused export:
 
-```ts
+```typescript
 // eslint.config.mts (excerpt)
 {
   files: ['src/**'],

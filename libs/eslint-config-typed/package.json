@@ -53,7 +53,7 @@
     "codemod:uncommitted:interface-to-type": "convert-interface-to-type --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
-    "doc:embed": "tsx ./scripts/cmd/embed-samples.mts",
+    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
     "fmt:full": "prettier --write .",
