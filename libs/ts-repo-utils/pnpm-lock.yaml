@@ -12,8 +12,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1
       '@sindresorhus/is':
-        specifier: ^8.0.0
-        version: 8.0.0
+        specifier: ^8.1.0
+        version: 8.1.0
       '@types/micromatch':
         specifier: ^4.0.10
         version: 4.0.10
@@ -1160,8 +1160,8 @@ packages:
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
 
-  '@sindresorhus/is@8.0.0':
-    resolution: {integrity: sha512-YvOsokBE5NsyHuXMnwEVB7lgFk6lX8F4OXCruYVgFII0hUHof0RGUvhMoabVt9hRqbg+qVzayzEG24RCcxcYeA==}
+  '@sindresorhus/is@8.1.0':
+    resolution: {integrity: sha512-2SX/1jW6CIMAiebvVv5ZInoCEuWQmMyBoJXXGC6Vjakjp/fpxP5eHs7/V6WKuPEIbuK06+VpjH+vjLQhr98rDQ==}
     engines: {node: '>=22'}
 
   '@sindresorhus/merge-streams@4.0.0':
@@ -5356,7 +5356,7 @@ snapshots:
 
   '@sindresorhus/is@4.6.0': {}
 
-  '@sindresorhus/is@8.0.0': {}
+  '@sindresorhus/is@8.1.0': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
@@ -6371,7 +6371,7 @@ snapshots:
 
   eslint-config-typed@4.9.8(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.1.5):
     dependencies:
-      '@sindresorhus/is': 8.0.0
+      '@sindresorhus/is': 8.1.0
       '@stylistic/eslint-plugin': 5.10.0(eslint@9.39.4(jiti@2.6.1))
       '@types/eslint': 9.6.1
       '@typescript-eslint/eslint-plugin': 8.59.2(@typescript-eslint/parser@8.59.2(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
@@ -8594,7 +8594,7 @@ snapshots:
 
   ts-data-forge@6.9.6(typescript@5.9.3):
     dependencies:
-      '@sindresorhus/is': 8.0.0
+      '@sindresorhus/is': 8.1.0
       ts-type-forge: 3.0.1
       typescript: 5.9.3
 
@@ -8605,7 +8605,7 @@ snapshots:
 
   ts-fortress@7.0.7(typescript@5.9.3):
     dependencies:
-      '@sindresorhus/is': 8.0.0
+      '@sindresorhus/is': 8.1.0
       ts-data-forge: 6.9.6(typescript@5.9.3)
       ts-type-forge: 3.0.1
     transitivePeerDependencies:
@@ -8619,7 +8619,7 @@ snapshots:
   ts-repo-utils@10.0.3(prettier@3.8.3)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
-      '@sindresorhus/is': 8.0.0
+      '@sindresorhus/is': 8.1.0
       '@types/micromatch': 4.0.10
       cmd-ts: 0.15.0
       fast-glob: 3.3.3
