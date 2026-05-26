@@ -56,6 +56,7 @@ export const defineViteConfig = ({
               include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
               testTimeout,
             }),
+            alias,
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,

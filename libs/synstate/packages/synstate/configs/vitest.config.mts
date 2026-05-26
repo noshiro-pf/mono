@@ -7,6 +7,7 @@ export default defineViteConfig({
   workspaceRootPath,
   testTimeout: 30_000,
   alias: {
+    synstate: path.resolve(workspaceRootPath, './src/index.mts'),
     'synstate-react-hooks': path.resolve(
       workspaceRootPath,
       '../synstate-react-hooks/src/index.mts',
