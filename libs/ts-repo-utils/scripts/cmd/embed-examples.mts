@@ -1,22 +1,17 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { pipe, Result, unknownToString } from 'ts-data-forge';
+import { Result, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { type DeepReadonly } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
-
-const codeBlockStart = '```tsx';
+import { extractSampleCode } from './embed-examples-utils.mjs';
 
 const codeBlockEnd = '```';
 
-const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
-
-const ignoreBelowKeyword = '// embed-sample-code-ignore-below';
-
 /**
- * Each entry maps to a ```tsx code block in the target markdown, in document
- * order. The list length must equal the number of ```tsx blocks in the
- * markdown.
+ * Each entry maps to a code block (```tsx / ```ts / ```js) in the target
+ * markdown, in document order. The list length must equal the number of such
+ * blocks in the markdown.
  */
 const documents: DeepReadonly<
   {
@@ -64,11 +59,21 @@ const documents: DeepReadonly<
 ] as const;
 
 /** Embeds sample code from ./samples/readme directory into README.md */
-export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
+export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
   try {
     for (const { mdPath, sampleCodeFiles, samplesDir } of documents) {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
+
+      const codeBlockCount = (
+        markdownContent.match(/^```(?:tsx|ts|js)(?!\w)/gmu) ?? []
+      ).length;
+
+      if (codeBlockCount !== sampleCodeFiles.length) {
+        return Result.err(
+          `❌ Code block count mismatch in ${mdPath}: found ${codeBlockCount} code blocks but expected ${sampleCodeFiles.length} sample files`,
+        );
+      }
 
       const mut_results: string[] = [];
 
@@ -77,26 +82,24 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
       for (const sampleCodeFile of sampleCodeFiles) {
         const samplePath = path.resolve(samplesDir, sampleCodeFile);
 
+        // Read sample content
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         const sampleContent = await fs.readFile(samplePath, 'utf8');
 
-        const sampleContentSliced = sampleContent
-          .slice(
-            pipe(sampleContent.indexOf(ignoreAboveKeyword)).map((i) =>
-              i === -1 ? 0 : i + ignoreAboveKeyword.length,
-            ).value,
-            sampleContent.indexOf(ignoreBelowKeyword),
-          )
-          .replaceAll(/IGNORE_EMBEDDING\(.*\);\n/gu, '')
-          .trim();
+        const sampleContentSliced = extractSampleCode(sampleContent);
 
-        const codeBlockStartIndex = mut_rest.indexOf(codeBlockStart);
+        // Find the next code block (line-start anchor avoids nested fences)
+        const match = /^```(?:tsx|ts|js)(?!\w)/mu.exec(mut_rest);
 
-        if (codeBlockStartIndex === -1) {
+        if (match === null) {
           return Result.err(
             `❌ codeBlockStart not found for ${sampleCodeFile}`,
           );
         }
+
+        const codeBlockStartIndex = match.index;
+
+        const codeBlockStart = match[0];
 
         const codeBlockEndIndex = mut_rest.indexOf(
           codeBlockEnd,
@@ -138,7 +141,7 @@ export const embedSamples = async (): Promise<Result<undefined, unknown>> => {
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const result = await embedSamples();
+  const result = await embedExamples();
 
   if (Result.isErr(result)) {
     console.error(result.value);
