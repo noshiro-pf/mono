@@ -1,3 +1,9 @@
+## [10.1.2](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.1...v10.1.2) (2026-05-26)
+
+### Bug Fixes
+
+- bump @sindresorhus/is from 8.0.0 to 8.1.0 ([#374](https://github.com/noshiro-pf/ts-repo-utils/issues/374)) ([23e36d0](https://github.com/noshiro-pf/ts-repo-utils/commit/23e36d0cc98520240b41741fd1666e2e310126c3))
+
 ## [10.1.1](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.0...v10.1.1) (2026-05-14)
 
 ### Bug Fixes
