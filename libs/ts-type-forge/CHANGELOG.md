@@ -1,3 +1,9 @@
+# [3.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v3.0.1...v3.1.0) (2026-06-01)
+
+### Features
+
+- add ArrayBoundedLen and ArrayAtMostLen type ([#379](https://github.com/noshiro-pf/ts-type-forge/issues/379)) ([ac5bebc](https://github.com/noshiro-pf/ts-type-forge/commit/ac5bebc5f3c3b6230eae0e5cce371a0f48694040))
+
 ## [3.0.1](https://github.com/noshiro-pf/ts-type-forge/compare/v3.0.0...v3.0.1) (2026-05-10)
 
 ### Bug Fixes
