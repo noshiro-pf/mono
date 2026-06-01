@@ -48,7 +48,7 @@
     "codemod:uncommitted:readonly": "convert-to-readonly --uncommitted '{scripts,test}/**/*.{mts,tsx}'",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
-    "doc:embed": "tsx ./scripts/cmd/embed-samples.mts",
+    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
     "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",
     "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "format-uncommitted",

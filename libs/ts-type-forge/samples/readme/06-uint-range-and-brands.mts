@@ -54,14 +54,14 @@ declare const productId: ProductId;
 // Type-safe functions that can't mix up IDs
 const getUserById = (id: UserId): User | undefined => {
   /* ... */
-  IGNORE_EMBEDDING(id);
+  /* embed-sample-code-ignore-this-line */ IGNORE_EMBEDDING(id);
 
   return undefined;
 };
 
 const getProductById = (id: ProductId): Product | undefined => {
   /* ... */
-  IGNORE_EMBEDDING(id);
+  /* embed-sample-code-ignore-this-line */ IGNORE_EMBEDDING(id);
 
   return undefined;
 };

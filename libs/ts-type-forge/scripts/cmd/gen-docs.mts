@@ -3,7 +3,7 @@ import { type UnknownResult, unknownToString } from 'ts-data-forge';
 import { $, assertPathExists, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { genTypeDefinitions } from '../functions/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
-import { embedSamples } from './embed-samples.mjs';
+import { embedExamples } from './embed-examples.mjs';
 
 const TYPEDOC_CONFIG = path.resolve(
   projectRootPath,
@@ -20,9 +20,9 @@ export const genDocs = async (): Promise<void> => {
   await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
 
   await logStep({
-    startMessage: 'Embedding sample code into README',
-    action: () => runStep(embedSamples(), 'Sample embedding failed'),
-    successMessage: 'Sample code embedded into README',
+    startMessage: 'Embedding example code into README',
+    action: () => runStep(embedExamples(), 'Example embedding failed'),
+    successMessage: 'Example code embedded into README',
   });
 
   await logStep({
