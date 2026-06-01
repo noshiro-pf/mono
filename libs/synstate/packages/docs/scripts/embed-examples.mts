@@ -440,7 +440,7 @@ const embedExamples = async (): Promise<void> => {
 
       if (codeBlockStartIndex === -1) {
         throw new Error(
-          `❌ codeBlockStart not found for ${sampleCodeFile} in ${mdPath}`,
+          `❌ Opening code fence (${codeBlockStart}) not found for ${sampleCodeFile} in ${mdPath}`,
         );
       }
 
