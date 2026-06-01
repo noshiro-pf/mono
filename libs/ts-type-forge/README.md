@@ -696,6 +696,10 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [MutableArrayOfLength](./src/tuple-and-list/array.mts#L64)
     - [MutableArrayAtLeastLen](./src/tuple-and-list/array.mts#L83)
     - [ArrayAtLeastLen](./src/tuple-and-list/array.mts#L98)
+    - [ArrayBoundedLen](./src/tuple-and-list/array.mts#L145)
+    - [MutableArrayBoundedLen](./src/tuple-and-list/array.mts#L161)
+    - [ArrayAtMostLen](./src/tuple-and-list/array.mts#L185)
+    - [MutableArrayAtMostLen](./src/tuple-and-list/array.mts#L196)
 - src/tuple-and-list/index-of-tuple.mts
     - [IndexOfTuple](./src/tuple-and-list/index-of-tuple.mts#L18)
     - [NegativeIndexOfTuple](./src/tuple-and-list/index-of-tuple.mts#L53)

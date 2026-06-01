@@ -301,6 +301,24 @@ declare global {
     N,
     Elm
   >;
+  type ArrayBoundedLen<
+    Min extends number,
+    Max extends number,
+    Elm,
+  > = _TSTypeForge.ArrayBoundedLen<Min, Max, Elm>;
+  type MutableArrayBoundedLen<
+    Min extends number,
+    Max extends number,
+    Elm,
+  > = _TSTypeForge.MutableArrayBoundedLen<Min, Max, Elm>;
+  type ArrayAtMostLen<N extends number, Elm> = _TSTypeForge.ArrayAtMostLen<
+    N,
+    Elm
+  >;
+  type MutableArrayAtMostLen<
+    N extends number,
+    Elm,
+  > = _TSTypeForge.MutableArrayAtMostLen<N, Elm>;
   type IndexOfTuple<T extends readonly unknown[]> =
     _TSTypeForge.IndexOfTuple<T>;
   type NegativeIndexOfTuple<T extends readonly unknown[]> =
