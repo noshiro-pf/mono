@@ -111,7 +111,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
 
         if (match === null) {
           return Result.err(
-            `❌ codeBlockStart not found for ${sampleCodeFile}`,
+            `❌ Opening code fence (\`\`\`ts, \`\`\`tsx, or \`\`\`js) not found for ${sampleCodeFile}`,
           );
         }
 

@@ -27,6 +27,14 @@ export const embedExamplesInJsDoc = async (): Promise<
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
 
+      const codeBlockCount = sourceContent.split(codeBlockStart).length - 1;
+
+      if (codeBlockCount !== sampleFiles.length) {
+        return Result.err(
+          `❌ Code block count mismatch in ${sourcePath}: found ${codeBlockCount} \`\`\`ts blocks but expected ${sampleFiles.length} sample files`,
+        );
+      }
+
       const mut_results: string[] = [];
 
       let mut_rest: string = sourceContent;
