@@ -1,4 +1,4 @@
-import { pipe } from 'ts-data-forge';
+import { Arr, pipe } from 'ts-data-forge';
 
 const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
 
@@ -32,14 +32,14 @@ const normalizeIndent = (source: string): string => {
 
   // Get the indentation of a line excluding blank lines
   const indents = lines
-    .filter((line) => line.length > 0)
+    .filter((line) => line.trim().length > 0)
     .map((line) => {
       const match = /^ */u.exec(line);
 
       return match !== null ? match[0].length : 0;
     });
 
-  if (indents.length === 0) {
+  if (Arr.isArrayOfLength(indents, 0)) {
     return source;
   }
 
