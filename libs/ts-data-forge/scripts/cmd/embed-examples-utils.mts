@@ -32,7 +32,7 @@ const normalizeIndent = (source: string): string => {
 
   // Get the indentation of a line excluding blank lines
   const indents = lines
-    .filter((line) => line.length > 0)
+    .filter((line) => line.trim().length > 0)
     .map((line) => {
       const match = /^ */u.exec(line);
 

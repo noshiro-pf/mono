@@ -20,9 +20,7 @@ const globResult = await glob(path.resolve(srcDir, './**/*.mts'), {
 
 if (Result.isErr(globResult)) {
   throw new Error(
-    `Error occurred while globbing for input files: ${unknownToString(
-      globResult.value,
-    )}`,
+    `Failed to glob source files: ${unknownToString(globResult.value)}`,
   );
 }
 

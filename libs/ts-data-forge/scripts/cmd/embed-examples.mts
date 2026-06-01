@@ -6,8 +6,6 @@ import { type DeepReadonly } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 
-const codeBlockStart = '```tsx';
-
 const codeBlockEnd = '```';
 
 const documents: DeepReadonly<
@@ -42,6 +40,16 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
+      const codeBlockCount = (
+        markdownContent.match(/^```(?:tsx|ts|js)(?!\w)/gmu) ?? []
+      ).length;
+
+      if (codeBlockCount !== sampleCodeFiles.length) {
+        return Result.err(
+          `❌ Code block count mismatch in ${mdPath}: found ${codeBlockCount} code blocks but expected ${sampleCodeFiles.length} sample files`,
+        );
+      }
+
       const mut_results: string[] = [];
 
       let mut_rest: string = markdownContent;
@@ -55,14 +63,18 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
 
         const sampleContentSliced = extractSampleCode(sampleContent);
 
-        // Find next code block
-        const codeBlockStartIndex = mut_rest.indexOf(codeBlockStart);
+        // Find the next code block (line-start anchor avoids nested fences)
+        const match = /^```(?:tsx|ts|js)(?!\w)/mu.exec(mut_rest);
 
-        if (codeBlockStartIndex === -1) {
+        if (match === null) {
           return Result.err(
-            `❌ codeBlockStart not found for ${sampleCodeFile}`,
+            `❌ Opening code fence (\`\`\`ts, \`\`\`tsx, or \`\`\`js) not found for ${sampleCodeFile}`,
           );
         }
+
+        const codeBlockStartIndex = match.index;
+
+        const codeBlockStart = match[0];
 
         const codeBlockEndIndex = mut_rest.indexOf(
           codeBlockEnd,

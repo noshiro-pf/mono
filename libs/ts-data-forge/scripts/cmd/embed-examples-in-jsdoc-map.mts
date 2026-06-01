@@ -143,6 +143,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/array/concat-example.mts',
       'samples/src/array/group-by-example.mts',
       'samples/src/array/zip-example.mts',
+      'samples/src/array/cartesian-product-example.mts',
     ],
   },
   {
@@ -766,6 +767,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/object/pick-example.mts',
       'samples/src/object/omit-example.mts',
       'samples/src/object/from-entries-example.mts',
+      'samples/src/object/merge-example.mts',
+      'samples/src/object/deep-pick-example.mts',
+      'samples/src/object/deep-omit-example.mts',
+      'samples/src/object/merge-two-example.mts',
     ],
   },
   {

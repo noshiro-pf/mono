@@ -19,16 +19,16 @@ export const genDocs = async (): Promise<void> => {
   await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
 
   await logStep({
-    startMessage: 'Embedding sample code into README',
-    action: () => runStep(embedExamples(), 'Sample embedding failed'),
-    successMessage: 'Sample code embedded into README',
+    startMessage: 'Embedding example code into README',
+    action: () => runStep(embedExamples(), 'Example embedding failed'),
+    successMessage: 'Example code embedded into README',
   });
 
   await logStep({
-    startMessage: 'Embedding sample code into JSDoc',
+    startMessage: 'Embedding example code into JSDoc',
     action: () =>
-      runStep(embedExamplesInJsDoc(), 'Sample embedding into JSDoc failed'),
-    successMessage: 'Sample code embedded into JSDoc',
+      runStep(embedExamplesInJsDoc(), 'Example embedding into JSDoc failed'),
+    successMessage: 'Example code embedded into JSDoc',
   });
 
   await logStep({

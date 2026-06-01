@@ -4,21 +4,22 @@ import { type ViteUserConfig } from 'vitest/config';
 import { type CoverageOptions, type ProjectConfig } from 'vitest/node';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 
+const aliasMap = {
+  'ts-data-forge': path.resolve(projectRootPath, './src/entry-point.mts'),
+};
+
 // https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
 const config = () =>
   ({
     test: {
       coverage: coverageSettings(),
 
-      alias: {
-        'ts-data-forge': path.resolve(projectRootPath, './src/entry-point.mts'),
-      },
-
       projects: [
         {
           test: {
             name: 'Node.js',
             environment: 'node',
+            alias: aliasMap,
             ...projectConfig(),
             typecheck: {
               tsconfig: path.resolve(
@@ -31,6 +32,7 @@ const config = () =>
         {
           test: {
             name: 'Browser',
+            alias: aliasMap,
             ...projectConfig({ additionalExcludes: ['samples/**/*'] }),
             // https://vitest.dev/config/browser/playwright
             browser: {
@@ -73,7 +75,7 @@ const coverageSettings = () =>
   ({
     provider: 'v8',
     reporter: ['html', 'lcov', 'text'],
-    include: ['src/**/*.mts'],
+    include: ['src/**/*.{mts,tsx}'],
     exclude: ['**/index.mts', 'src/entry-point.mts'],
   }) as const satisfies CoverageOptions;
 

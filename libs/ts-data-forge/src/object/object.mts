@@ -330,6 +330,7 @@ export namespace Obj {
    *
    * ```ts
    * const a = { a: 0, b: 0 } as const;
+   *
    * const b = { b: 1, c: 0 } as const;
    *
    * const result = Obj.merge(a, b);
@@ -359,11 +360,15 @@ export namespace Obj {
    *
    * // Direct usage
    * const result = Obj.deepPick(data, ['a', 'b', 'c']);
+   *
    * assert.deepStrictEqual(result, { a: { b: { c: 1 } } });
    *
    * // Curried usage with pipe
-   * const pickName = Obj.deepPick(['user', 'name']);
-   * const result2 = pipe(data).map(pickName).value;
+   * const pickAB = Obj.deepPick(['a', 'b']);
+   *
+   * const result2 = pipe(data).map(pickAB).value;
+   *
+   * assert.deepStrictEqual(result2, { a: { b: { c: 1, d: 2 } } });
    * ```
    *
    * @template R - The type of the input record
@@ -417,11 +422,15 @@ export namespace Obj {
    *
    * // Direct usage
    * const result = Obj.deepOmit(data, ['a', 'b', 'c']);
+   *
    * assert.deepStrictEqual(result, { a: { b: { d: 2 }, e: 3 }, f: 4 });
    *
    * // Curried usage with pipe
-   * const omitPassword = Obj.deepOmit(['user', 'password']);
-   * const result2 = pipe(data).map(omitPassword).value;
+   * const omitAB = Obj.deepOmit(['a', 'b']);
+   *
+   * const result2 = pipe(data).map(omitAB).value;
+   *
+   * assert.deepStrictEqual(result2, { a: { e: 3 }, f: 4 });
    * ```
    *
    * @template R - The type of the input record
@@ -620,10 +629,12 @@ declare namespace TsDataForgeInternals {
    *
    * @example
    * ```ts
-   * type A = { x: number; y?: string };
-   * type B = { y?: number; z?: boolean };
+   * type A = Readonly<{ x: number; y?: string }>;
+   *
+   * type B = Readonly<{ y?: number; z?: boolean }>;
+   *
    * type Result = MergeTwo<A, B>;
-   * // Result: { x: number; y?: string | number; z?: boolean }
+   * // Result: Readonly<{ x: number; y?: string | number; z?: boolean }>
    * ```
    */
   // transformer-ignore-next-line
