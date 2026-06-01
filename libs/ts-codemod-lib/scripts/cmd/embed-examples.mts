@@ -56,6 +56,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
       for (const sampleCodeFile of sampleCodeFiles) {
         const samplePath = path.resolve(samplesDir, sampleCodeFile);
 
+        // Read sample content
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         const sampleContent = await fs.readFile(samplePath, 'utf8');
 
@@ -66,7 +67,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
 
         if (match === null) {
           return Result.err(
-            `❌ codeBlockStart not found for ${sampleCodeFile}`,
+            `❌ Opening code fence (\`\`\`ts, \`\`\`tsx, or \`\`\`js) not found for ${sampleCodeFile}`,
           );
         }
 
