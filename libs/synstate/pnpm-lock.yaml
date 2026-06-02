@@ -90,8 +90,8 @@ importers:
         specifier: 10.1.0
         version: 10.1.0(prettier@3.8.3)(typescript@5.9.3)
       ts-type-forge:
-        specifier: 3.0.1
-        version: 3.0.1
+        specifier: 3.1.0
+        version: 3.1.0
       tslib:
         specifier: 2.8.1
         version: 2.8.1
@@ -211,8 +211,8 @@ importers:
         specifier: ^6.9.6
         version: 6.9.6(typescript@5.9.3)
       ts-type-forge:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@reduxjs/toolkit':
         specifier: 2.11.2
@@ -254,8 +254,8 @@ importers:
         specifier: ^6.9.6
         version: 6.9.6(typescript@5.9.3)
       ts-type-forge:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
@@ -276,8 +276,8 @@ importers:
         specifier: ^6.9.6
         version: 6.9.6(typescript@5.9.3)
       ts-type-forge:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@preact/signals':
         specifier: 2.9.0
@@ -301,8 +301,8 @@ importers:
         specifier: ^6.9.6
         version: 6.9.6(typescript@5.9.3)
       ts-type-forge:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
@@ -326,8 +326,8 @@ importers:
         specifier: ^6.9.6
         version: 6.9.6(typescript@5.9.3)
       ts-type-forge:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
@@ -5183,8 +5183,8 @@ packages:
     peerDependencies:
       prettier: '>=3.0.0'
 
-  ts-type-forge@3.0.1:
-    resolution: {integrity: sha512-nld+c93luAnZI5HYydZZl2eWWOe19Pv7NiniXdyDoemGviplah1HUN4pFNoa0PJw3SBDIfewExuZU9Eqsv7oSQ==}
+  ts-type-forge@3.1.0:
+    resolution: {integrity: sha512-TYY+m+TfdoHVnzHXWnwKnxzVKb5iiRacWLW9pxkPMMR1ypxf/1BzUkRvmiCoSxm9hEYscPoUnuRmv7Wb1ddZfQ==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
 
   tslib@1.14.1:
@@ -8623,7 +8623,7 @@ snapshots:
       is-immutable-type: 5.0.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
       micromatch: 4.0.8
       ts-data-forge: 6.9.6(typescript@5.9.3)
-      ts-type-forge: 3.0.1
+      ts-type-forge: 3.1.0
       tsutils: 3.21.0(typescript@5.9.3)
       typescript: 5.9.3
       typescript-eslint: 8.59.2(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
@@ -9148,7 +9148,7 @@ snapshots:
       octokit-safe-types: 1.2.18(typescript@5.9.3)
       ts-data-forge: 6.9.6(typescript@5.9.3)
       ts-fortress: 7.0.7(typescript@5.9.3)
-      ts-type-forge: 3.0.1
+      ts-type-forge: 3.1.0
     transitivePeerDependencies:
       - typescript
 
@@ -10527,7 +10527,7 @@ snapshots:
       '@octokit/types': 16.0.0
       ts-data-forge: 6.9.6(typescript@5.9.3)
       ts-fortress: 7.0.7(typescript@5.9.3)
-      ts-type-forge: 3.0.1
+      ts-type-forge: 3.1.0
     transitivePeerDependencies:
       - typescript
 
@@ -11444,7 +11444,7 @@ snapshots:
     dependencies:
       ts-data-forge: 6.9.6(typescript@5.9.3)
       ts-morph: 28.0.0
-      ts-type-forge: 3.0.1
+      ts-type-forge: 3.1.0
     optionalDependencies:
       dedent: 1.7.2
       ts-repo-utils: 10.1.0(prettier@3.8.3)(typescript@5.9.3)
@@ -11454,7 +11454,7 @@ snapshots:
   ts-data-forge@6.9.6(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 8.0.0
-      ts-type-forge: 3.0.1
+      ts-type-forge: 3.1.0
       typescript: 5.9.3
 
   ts-declaration-location@1.0.7(typescript@5.9.3):
@@ -11466,7 +11466,7 @@ snapshots:
     dependencies:
       '@sindresorhus/is': 8.0.0
       ts-data-forge: 6.9.6(typescript@5.9.3)
-      ts-type-forge: 3.0.1
+      ts-type-forge: 3.1.0
     transitivePeerDependencies:
       - typescript
 
@@ -11485,13 +11485,13 @@ snapshots:
       micromatch: 4.0.8
       prettier: 3.8.3
       ts-data-forge: 6.9.6(typescript@5.9.3)
-      ts-type-forge: 3.0.1
+      ts-type-forge: 3.1.0
       tsx: 4.21.0
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  ts-type-forge@3.0.1: {}
+  ts-type-forge@3.1.0: {}
 
   tslib@1.14.1: {}
 
