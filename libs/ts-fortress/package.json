@@ -103,7 +103,7 @@
     "fp-ts": "2.16.11",
     "github-settings-as-code": "1.2.9",
     "io-ts": "2.2.22",
-    "jiti": "2.6.1",
+    "jiti": "2.7.0",
     "markdownlint": "0.40.0",
     "markdownlint-cli2": "0.22.1",
     "npm-run-all2": "8.0.4",
