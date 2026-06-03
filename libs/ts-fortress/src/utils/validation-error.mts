@@ -33,6 +33,17 @@ export type ValidationErrorDetails = Readonly<
       actualLength: number;
     }
   | {
+      kind: 'array-max-length';
+      maxLength: number;
+      actualLength: number;
+    }
+  | {
+      kind: 'array-range-length';
+      minLength: number;
+      maxLength: number;
+      actualLength: number;
+    }
+  | {
       kind: 'non-empty-array';
     }
   | {
@@ -155,6 +166,12 @@ const createDetailsMessage = (
 
     case 'array-min-length':
       return `expected array of length ${error.details.minLength} or more but length ${error.details.actualLength} was passed.`;
+
+    case 'array-max-length':
+      return `expected array of length ${error.details.maxLength} or less but length ${error.details.actualLength} was passed.`;
+
+    case 'array-range-length':
+      return `expected array of length between ${error.details.minLength} and ${error.details.maxLength} but length ${error.details.actualLength} was passed.`;
 
     case 'non-empty-array':
       return 'expected non-empty array but empty array was passed.';
