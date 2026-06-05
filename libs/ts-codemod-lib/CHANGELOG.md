@@ -1,3 +1,9 @@
+# [2.2.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.7...v2.2.0) (2026-06-05)
+
+### Features
+
+- add --diff-from option to codemod commands ([#135](https://github.com/noshiro-pf/ts-codemod-lib/issues/135)) ([9cf64c4](https://github.com/noshiro-pf/ts-codemod-lib/commit/9cf64c4cad66f89cbc7d79c1c109939206903472))
+
 ## [2.1.7](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.6...v2.1.7) (2026-05-12)
 
 ### Bug Fixes
