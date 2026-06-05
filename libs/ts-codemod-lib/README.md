@@ -218,7 +218,7 @@ This package provides command-line tools for common TypeScript transformations:
 Appends `as const` to array literals and object literals to make them readonly constants.
 
 ```bash
-npx append-as-const <baseDir> [--exclude <pattern>] [--silent]
+npx append-as-const <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
 ```
 
 ### convert-interface-to-type
@@ -226,7 +226,7 @@ npx append-as-const <baseDir> [--exclude <pattern>] [--silent]
 Converts TypeScript interface declarations to type aliases.
 
 ```bash
-npx convert-interface-to-type <baseDir> [--exclude <pattern>] [--silent]
+npx convert-interface-to-type <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
 ```
 
 ### convert-to-readonly
@@ -234,7 +234,7 @@ npx convert-interface-to-type <baseDir> [--exclude <pattern>] [--silent]
 Adds `readonly` modifiers to type definitions throughout your codebase.
 
 ```bash
-npx convert-to-readonly <baseDir> [--exclude <pattern>] [--silent]
+npx convert-to-readonly <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
 ```
 
 ### replace-any-with-unknown
@@ -242,7 +242,7 @@ npx convert-to-readonly <baseDir> [--exclude <pattern>] [--silent]
 Replaces `any` type annotations with `unknown` for improved type safety.
 
 ```bash
-npx replace-any-with-unknown <baseDir> [--exclude <pattern>] [--silent]
+npx replace-any-with-unknown <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
 ```
 
 ### replace-record-with-unknown-record
@@ -250,13 +250,15 @@ npx replace-any-with-unknown <baseDir> [--exclude <pattern>] [--silent]
 Replaces `Record<string, unknown>` with `UnknownRecord` for better type safety.
 
 ```bash
-npx replace-record-with-unknown-record <baseDir> [--exclude <pattern>] [--silent]
+npx replace-record-with-unknown-record <baseDir> [--exclude <pattern>] [--uncommitted] [--diff-from <base>] [--silent]
 ```
 
 **Common Options:**
 
 - `baseDir`: Base directory to scan for TypeScript files
 - `--exclude`: Glob patterns to exclude (e.g., `"src/generated/**/*.mts"`)
+- `--uncommitted`: Transform only uncommitted files (untracked, modified, and staged), intersected with `baseDir`
+- `--diff-from <base>`: Transform only files that differ from the given base branch or commit hash (e.g., `origin/main`), intersected with `baseDir`
 - `--silent`: Suppress output messages
 
 ## Programmatic Usage

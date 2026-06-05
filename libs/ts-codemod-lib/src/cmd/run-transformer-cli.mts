@@ -5,6 +5,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import {
+  getDiffFrom,
   getModifiedFiles,
   getStagedFiles,
   getUntrackedFiles,
@@ -19,6 +20,7 @@ type GetFilesOptions = Readonly<{
   baseDir: string;
   exclude: readonly string[];
   uncommitted: boolean;
+  diffFrom: string | undefined;
   silent: boolean;
 }>;
 
@@ -36,9 +38,11 @@ export const runTransformerCLI = async (
 
   if (Result.isErr(filesResult)) {
     errorIfNotSilent(
-      options.uncommitted
-        ? 'Error getting uncommitted files:'
-        : 'Error finding files matching pattern:',
+      options.diffFrom !== undefined
+        ? `Error getting diff files from "${options.diffFrom}":`
+        : options.uncommitted
+          ? 'Error getting uncommitted files:'
+          : 'Error finding files matching pattern:',
       filesResult.value,
     );
 
@@ -49,9 +53,11 @@ export const runTransformerCLI = async (
 
   if (Arr.isArrayOfLength(files, 0)) {
     echoIfNotSilent(
-      options.uncommitted
-        ? 'No uncommitted files found'
-        : `No files found matching pattern: ${options.baseDir}`,
+      options.diffFrom !== undefined
+        ? `No files found in diff from "${options.diffFrom}" matching pattern: ${options.baseDir}`
+        : options.uncommitted
+          ? 'No uncommitted files found'
+          : `No files found matching pattern: ${options.baseDir}`,
     );
 
     return Result.ok(undefined);
@@ -108,6 +114,12 @@ const getFilesForTransformation = async (
     options.silent,
   );
 
+  if (Result.isErr(filesFromGlob)) {
+    return filesFromGlob;
+  }
+
+  let mut_files = filesFromGlob.value;
+
   if (options.uncommitted) {
     const uncommittedFiles = await getUncommittedFiles(options.silent);
 
@@ -115,12 +127,22 @@ const getFilesForTransformation = async (
       return uncommittedFiles;
     }
 
-    return Result.map(filesFromGlob, (files) =>
-      Arr.setIntersection(files, uncommittedFiles.value),
-    );
+    mut_files = Arr.setIntersection(mut_files, uncommittedFiles.value);
   }
 
-  return filesFromGlob;
+  if (options.diffFrom !== undefined) {
+    const diffFiles = await getDiffFrom(options.diffFrom, {
+      silent: options.silent,
+    });
+
+    if (Result.isErr(diffFiles)) {
+      return diffFiles;
+    }
+
+    mut_files = Arr.setIntersection(mut_files, diffFiles.value);
+  }
+
+  return Result.ok(mut_files);
 };
 
 const getUncommittedFiles = async (

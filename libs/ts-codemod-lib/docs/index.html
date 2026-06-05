@@ -95,33 +95,35 @@
 <p>This package provides command-line tools for common TypeScript transformations:</p>
 <h3 id="append-as-const" class="tsd-anchor-link">append-as-const<a href="#append-as-const" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>Appends <code>as const</code> to array literals and object literals to make them readonly constants.</p>
-<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">append-as-const</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--silent]</span>
+<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">append-as-const</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--uncommitted] [--diff-from &lt;base&gt;] [--silent]</span>
 </code><button type="button">Copy</button></pre>
 
 <h3 id="convert-interface-to-type" class="tsd-anchor-link">convert-interface-to-type<a href="#convert-interface-to-type" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>Converts TypeScript interface declarations to type aliases.</p>
-<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">convert-interface-to-type</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--silent]</span>
+<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">convert-interface-to-type</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--uncommitted] [--diff-from &lt;base&gt;] [--silent]</span>
 </code><button type="button">Copy</button></pre>
 
 <h3 id="convert-to-readonly" class="tsd-anchor-link">convert-to-readonly<a href="#convert-to-readonly" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>Adds <code>readonly</code> modifiers to type definitions throughout your codebase.</p>
-<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">convert-to-readonly</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--silent]</span>
+<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">convert-to-readonly</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--uncommitted] [--diff-from &lt;base&gt;] [--silent]</span>
 </code><button type="button">Copy</button></pre>
 
 <h3 id="replace-any-with-unknown" class="tsd-anchor-link">replace-any-with-unknown<a href="#replace-any-with-unknown" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>Replaces <code>any</code> type annotations with <code>unknown</code> for improved type safety.</p>
-<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">replace-any-with-unknown</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--silent]</span>
+<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">replace-any-with-unknown</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--uncommitted] [--diff-from &lt;base&gt;] [--silent]</span>
 </code><button type="button">Copy</button></pre>
 
 <h3 id="replace-record-with-unknown-record" class="tsd-anchor-link">replace-record-with-unknown-record<a href="#replace-record-with-unknown-record" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>Replaces <code>Record&lt;string, unknown&gt;</code> with <code>UnknownRecord</code> for better type safety.</p>
-<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">replace-record-with-unknown-record</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--silent]</span>
+<pre><code class="bash"><span class="hl-1">npx</span><span class="hl-2"> </span><span class="hl-3">replace-record-with-unknown-record</span><span class="hl-2"> &lt;</span><span class="hl-3">baseDi</span><span class="hl-2">r&gt; [--exclude &lt;</span><span class="hl-3">patter</span><span class="hl-2">n&gt;</span><span class="hl-3">]</span><span class="hl-2"> [--uncommitted] [--diff-from &lt;base&gt;] [--silent]</span>
 </code><button type="button">Copy</button></pre>
 
 <p><strong>Common Options:</strong></p>
 <ul>
 <li><code>baseDir</code>: Base directory to scan for TypeScript files</li>
 <li><code>--exclude</code>: Glob patterns to exclude (e.g., <code>&quot;src/generated/**/*.mts&quot;</code>)</li>
+<li><code>--uncommitted</code>: Transform only uncommitted files (untracked, modified, and staged), intersected with <code>baseDir</code></li>
+<li><code>--diff-from &lt;base&gt;</code>: Transform only files that differ from the given base branch or commit hash (e.g., <code>origin/main</code>), intersected with <code>baseDir</code></li>
 <li><code>--silent</code>: Suppress output messages</li>
 </ul>
 <h2 id="programmatic-usage" class="tsd-anchor-link">Programmatic Usage<a href="#programmatic-usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>

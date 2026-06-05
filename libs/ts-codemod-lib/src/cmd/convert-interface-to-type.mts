@@ -28,6 +28,12 @@ const cmdDef = cmd.command({
       description:
         'If true, transforms only uncommitted files (untracked, modified, and staged files)',
     }),
+    diffFrom: cmd.option({
+      long: 'diff-from',
+      type: cmd.optional(cmd.string),
+      description:
+        'If provided, transforms only files that differ from the given base branch or commit hash',
+    }),
     silent: cmd.flag({
       long: 'silent',
       type: cmd.optional(cmd.boolean),
@@ -41,6 +47,7 @@ const cmdDef = cmd.command({
           baseDir: args.baseDir,
           exclude: args.exclude ?? [],
           uncommitted: args.uncommitted ?? false,
+          diffFrom: args.diffFrom,
           silent: args.silent ?? false,
         },
         [transformer],
