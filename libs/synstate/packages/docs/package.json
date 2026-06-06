@@ -30,7 +30,7 @@
     "@astrojs/react": "^5.0.4",
     "@astrojs/starlight": "^0.38.4",
     "@fontsource/noto-sans-jp": "^5.2.9",
-    "@preact/signals": "^2.9.0",
+    "@preact/signals": "^2.9.1",
     "@resvg/resvg-js": "^2.6.2",
     "astro": "^6.4.2",
     "preact": "^10.29.1",
