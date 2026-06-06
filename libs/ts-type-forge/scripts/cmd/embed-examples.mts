@@ -8,6 +8,17 @@ import { extractSampleCode } from './embed-examples-utils.mjs';
 
 const codeBlockEnd = '```';
 
+/**
+ * Matches the opening line of a fenced code block whose language tag is exactly
+ * `ts`, `tsx`, or `js` (optionally followed by an info string). The `(?=\s|$)`
+ * lookahead requires the tag to end at whitespace or end-of-line, so fences such
+ * as ```jsx, ```typescript, or ```ts-ignore are not matched.
+ */
+const codeBlockStartRegex = /^```(?:tsx|ts|js)(?=\s|$)/mu;
+
+/** Global counterpart of {@link codeBlockStartRegex} for counting all fences. */
+const codeBlockStartRegexGlobal = new RegExp(codeBlockStartRegex, 'gmu');
+
 const documents: DeepReadonly<
   {
     mdPath: string;
@@ -37,7 +48,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
       const codeBlockCount = (
-        markdownContent.match(/^```(?:tsx|ts|js)(?!\w)/gmu) ?? []
+        markdownContent.match(codeBlockStartRegexGlobal) ?? []
       ).length;
 
       if (codeBlockCount !== sampleCodeFiles.length) {
@@ -60,7 +71,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
         const sampleContentSliced = extractSampleCode(sampleContent);
 
         // Find the next code block (line-start anchor avoids nested fences)
-        const match = /^```(?:tsx|ts|js)(?!\w)/mu.exec(mut_rest);
+        const match = codeBlockStartRegex.exec(mut_rest);
 
         if (match === null) {
           return Result.err(
