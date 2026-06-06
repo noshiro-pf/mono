@@ -9,11 +9,22 @@ import { extractSampleCode } from './embed-examples-utils.mjs';
 const codeBlockEnd = '```';
 
 /**
- * Matches the opening line of a fenced code block whose language tag is exactly
- * `ts`, `tsx`, or `js`. The trailing `(?!\w)` negative lookahead prevents the
- * pattern from also prefix-matching languages such as `jsx` or `typescript`.
+ * Matches the start of an opening code fence whose language tag is exactly
+ * `ts`, `tsx`, or `js`. The `(?=\s|$)` lookahead requires the tag to be followed
+ * by whitespace or end-of-line, so tags like `jsx`, `typescript`, or
+ * `ts-ignore` are not matched. Only the fence prefix (backticks + tag) is
+ * matched; any trailing info string is not part of the match.
  */
-const codeBlockStartRegex = /^```(?:tsx|ts|js)(?!\w)/mu;
+const codeBlockStartRegex = /^```(?:tsx|ts|js)(?=\s|$)/mu;
+
+/**
+ * Global counterpart of {@link codeBlockStartRegex} for counting all fences. The
+ * flags are derived from `codeBlockStartRegex` (plus `g`) so the two cannot drift.
+ */
+const codeBlockStartRegexGlobal = new RegExp(
+  codeBlockStartRegex,
+  `${codeBlockStartRegex.flags.replace('g', '')}g`,
+);
 
 const documents: DeepReadonly<
   {
@@ -36,8 +47,9 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
-      const codeBlockCount =
-        markdownContent.split(codeBlockStartRegex).length - 1;
+      const codeBlockCount = (
+        markdownContent.match(codeBlockStartRegexGlobal) ?? []
+      ).length;
 
       if (codeBlockCount !== sampleCodeFiles.length) {
         return Result.err(
