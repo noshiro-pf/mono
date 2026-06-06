@@ -9,15 +9,22 @@ import { extractSampleCode } from './embed-examples-utils.mjs';
 const codeBlockEnd = '```';
 
 /**
- * Matches the opening line of a fenced code block whose language tag is exactly
- * `ts`, `tsx`, or `js` (optionally followed by an info string). The `(?=\s|$)`
- * lookahead requires the tag to end at whitespace or end-of-line, so fences such
- * as ```jsx, ```typescript, or ```ts-ignore are not matched.
+ * Matches the start of an opening code fence whose language tag is exactly
+ * `ts`, `tsx`, or `js`. The `(?=\s|$)` lookahead requires the tag to be followed
+ * by whitespace or end-of-line, so tags like `jsx`, `typescript`, or
+ * `ts-ignore` are not matched. Only the fence prefix (backticks + tag) is
+ * matched; any trailing info string is not part of the match.
  */
 const codeBlockStartRegex = /^```(?:tsx|ts|js)(?=\s|$)/mu;
 
-/** Global counterpart of {@link codeBlockStartRegex} for counting all fences. */
-const codeBlockStartRegexGlobal = new RegExp(codeBlockStartRegex, 'gmu');
+/**
+ * Global counterpart of {@link codeBlockStartRegex} for counting all fences. The
+ * flags are derived from `codeBlockStartRegex` (plus `g`) so the two cannot drift.
+ */
+const codeBlockStartRegexGlobal = new RegExp(
+  codeBlockStartRegex,
+  `${codeBlockStartRegex.flags.replace('g', '')}g`,
+);
 
 const documents: DeepReadonly<
   {
