@@ -10,10 +10,14 @@ const codeBlockEnd = '```';
 
 /**
  * Matches the opening line of a fenced code block whose language tag is exactly
- * `ts`, `tsx`, or `js`. The trailing `(?!\w)` negative lookahead prevents the
- * pattern from also prefix-matching languages such as `jsx` or `typescript`.
+ * `ts`, `tsx`, or `js` (optionally followed by an info string). The `(?=\s|$)`
+ * lookahead requires the tag to end at whitespace or end-of-line, so fences such
+ * as ```jsx, ```typescript, or ```ts-ignore are not matched.
  */
-const codeBlockStartRegex = /^```(?:tsx|ts|js)(?!\w)/mu;
+const codeBlockStartRegex = /^```(?:tsx|ts|js)(?=\s|$)/mu;
+
+/** Global counterpart of {@link codeBlockStartRegex} for counting all fences. */
+const codeBlockStartRegexGlobal = new RegExp(codeBlockStartRegex, 'gmu');
 
 const documents: DeepReadonly<
   {
@@ -36,8 +40,9 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
-      const codeBlockCount =
-        markdownContent.split(codeBlockStartRegex).length - 1;
+      const codeBlockCount = (
+        markdownContent.match(codeBlockStartRegexGlobal) ?? []
+      ).length;
 
       if (codeBlockCount !== sampleCodeFiles.length) {
         return Result.err(
