@@ -8,6 +8,13 @@ import { extractSampleCode } from './embed-examples-utils.mjs';
 
 const codeBlockEnd = '```';
 
+/**
+ * Matches the opening line of a fenced code block whose language tag is exactly
+ * `ts`, `tsx`, or `js`. The trailing `(?!\w)` negative lookahead prevents the
+ * pattern from also prefix-matching languages such as `jsx` or `typescript`.
+ */
+const codeBlockStartRegex = /^```(?:tsx|ts|js)(?!\w)/mu;
+
 const documents: DeepReadonly<
   {
     mdPath: string;
@@ -29,9 +36,8 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const markdownContent = await fs.readFile(mdPath, 'utf8');
 
-      const codeBlockCount = (
-        markdownContent.match(/^```(?:tsx|ts|js)(?!\w)/gmu) ?? []
-      ).length;
+      const codeBlockCount =
+        markdownContent.split(codeBlockStartRegex).length - 1;
 
       if (codeBlockCount !== sampleCodeFiles.length) {
         return Result.err(
@@ -53,7 +59,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
         const sampleContentSliced = extractSampleCode(sampleContent);
 
         // Find the next code block (line-start anchor avoids nested fences)
-        const match = /^```(?:tsx|ts|js)(?!\w)/mu.exec(mut_rest);
+        const match = codeBlockStartRegex.exec(mut_rest);
 
         if (match === null) {
           return Result.err(
