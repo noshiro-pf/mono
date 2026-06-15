@@ -61,10 +61,6 @@
             "integration_id": 15368
           },
           {
-            "context": "type-check (ws:test:cov)",
-            "integration_id": 15368
-          },
-          {
             "context": "style-check (fmt:full)",
             "integration_id": 15368
           },
