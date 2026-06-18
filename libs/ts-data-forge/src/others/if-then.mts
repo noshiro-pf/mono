@@ -19,3 +19,15 @@
  */
 export const ifThen = (antecedent: boolean, consequent: boolean): boolean =>
   !antecedent || consequent;
+
+/**
+ * Alias for {@link ifThen}.
+ *
+ * Implements the logical implication (if-then) operator.
+ *
+ * @param antecedent - The condition (if part)
+ * @param consequent - The result that should hold if the condition is true
+ *   (then part)
+ * @returns `true` if the implication holds, `false` otherwise
+ */
+export const implies = ifThen;
