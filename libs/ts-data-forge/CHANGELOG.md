@@ -1,3 +1,9 @@
+# [6.10.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.6...v6.10.0) (2026-06-18)
+
+### Features
+
+- add `implies` as an alias for `ifThen` ([#392](https://github.com/noshiro-pf/ts-data-forge/issues/392)) ([09a908c](https://github.com/noshiro-pf/ts-data-forge/commit/09a908c38ea6dd22e33860c86e1355cdace707b8))
+
 ## [6.9.6](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.5...v6.9.6) (2026-05-12)
 
 ### Bug Fixes
