@@ -1,3 +1,4 @@
+import { unified } from '@astrojs/markdown-remark';
 import preact from '@astrojs/preact';
 import react from '@astrojs/react';
 import starlight from '@astrojs/starlight';
@@ -9,8 +10,11 @@ export default defineConfig({
   site: 'https://noshiro-pf.github.io',
   base: '/synstate/',
   markdown: {
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeKatex],
+    processor: unified({
+      gfm: true,
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [rehypeKatex],
+    }),
   },
   integrations: [
     react({
@@ -93,17 +97,17 @@ export default defineConfig({
         {
           label: 'Getting Started',
           translations: { ja: 'はじめに' },
-          autogenerate: { directory: 'getting-started' },
+          items: [{ autogenerate: { directory: 'getting-started' } }],
         },
         {
           label: 'Guides',
           translations: { ja: 'ガイド' },
-          autogenerate: { directory: 'guides' },
+          items: [{ autogenerate: { directory: 'guides' } }],
         },
         {
           label: 'Examples',
           translations: { ja: 'サンプル' },
-          autogenerate: { directory: 'examples' },
+          items: [{ autogenerate: { directory: 'examples' } }],
         },
         {
           label: 'Preact Signals',
@@ -114,7 +118,7 @@ export default defineConfig({
           label: 'Internals',
           translations: { ja: '内部実装' },
           collapsed: true,
-          autogenerate: { directory: 'internals' },
+          items: [{ autogenerate: { directory: 'internals' } }],
         },
         {
           label: 'API Reference',

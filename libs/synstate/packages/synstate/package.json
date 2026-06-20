@@ -62,19 +62,19 @@
     "z:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
   },
   "dependencies": {
-    "ts-data-forge": "^6.9.6",
+    "ts-data-forge": "^6.10.0",
     "ts-type-forge": "^3.1.0"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "2.12.0",
     "@types/argparse": "2.0.17",
-    "@types/react": "19.2.14",
+    "@types/react": "19.2.17",
     "argparse": "2.0.1",
-    "jotai": "2.19.1",
-    "mobx": "6.15.0",
-    "react": "19.2.5",
+    "jotai": "2.20.1",
+    "mobx": "6.16.1",
+    "react": "19.2.7",
     "rxjs": "7.8.2",
-    "valtio": "2.3.1",
-    "zustand": "5.0.12"
+    "valtio": "2.3.2",
+    "zustand": "5.0.14"
   }
 }

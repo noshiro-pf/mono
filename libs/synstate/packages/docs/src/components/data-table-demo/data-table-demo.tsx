@@ -85,6 +85,12 @@ export const DataTableDemo = React.memo(() => {
 
       <div style={tableWrapperStyle}>
         <table style={tableStyle}>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '30%' }} />
+            <col style={{ width: '42%' }} />
+            <col style={{ width: '20%' }} />
+          </colgroup>
           <thead>
             <tr>
               <th style={thStyle}>{'No.'}</th>
@@ -322,10 +328,13 @@ const rangeStyle: React.CSSProperties = {
 
 const tableWrapperStyle: React.CSSProperties = {
   overflowX: 'auto',
+  overflowY: 'auto',
+  maxHeight: '65vh',
 } as const;
 
 const tableStyle: React.CSSProperties = {
   width: '100%',
+  tableLayout: 'fixed',
   borderCollapse: 'collapse',
   border: '1px solid var(--sl-color-gray-5, #c9c9c9)',
 } as const;
@@ -338,6 +347,8 @@ const thStyle: React.CSSProperties = {
   fontWeight: 600,
   fontSize: '13px',
   verticalAlign: 'top',
+  wordWrap: 'break-word',
+  overflowWrap: 'break-word',
 } as const;
 
 const filterInputStyle: React.CSSProperties = {
@@ -356,6 +367,8 @@ const tdStyle: React.CSSProperties = {
   padding: '6px 10px',
   borderBottom: '1px solid var(--sl-color-gray-6, #e5e5e5)',
   fontSize: '13px',
+  wordWrap: 'break-word',
+  overflowWrap: 'break-word',
 } as const;
 
 const evenRowStyle: React.CSSProperties = {
