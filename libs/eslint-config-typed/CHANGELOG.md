@@ -1,3 +1,9 @@
+# [5.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.10.0...v5.0.0) (2026-06-22)
+
+### Features
+
+- **breaking:** update dependencies, enabling many rules ([#350](https://github.com/noshiro-pf/eslint-config-typed/issues/350)) ([4d93f28](https://github.com/noshiro-pf/eslint-config-typed/commit/4d93f28e18ca1e37af695396afa67ac754d47f19))
+
 # [4.10.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.11...v4.10.0) (2026-06-22)
 
 ### Features
