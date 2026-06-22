@@ -1,3 +1,9 @@
+# [3.2.0](https://github.com/noshiro-pf/ts-type-forge/compare/v3.1.0...v3.2.0) (2026-06-22)
+
+### Features
+
+- add NonEmptyString ([#396](https://github.com/noshiro-pf/ts-type-forge/issues/396)) ([bf4f73b](https://github.com/noshiro-pf/ts-type-forge/commit/bf4f73bda255048e36fcd8dfd954fe9b1be7db9c))
+
 # [3.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v3.0.1...v3.1.0) (2026-06-01)
 
 ### Features
