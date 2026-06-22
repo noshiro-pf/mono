@@ -1,3 +1,9 @@
+# [7.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v7.1.0...v7.2.0) (2026-06-22)
+
+### Features
+
+- add nonEmptyString type ([#315](https://github.com/noshiro-pf/ts-fortress/issues/315)) ([2e49c35](https://github.com/noshiro-pf/ts-fortress/commit/2e49c359c3f71bb87f5549bff3b0baf363244334))
+
 # [7.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v7.0.7...v7.1.0) (2026-06-03)
 
 ### Features
