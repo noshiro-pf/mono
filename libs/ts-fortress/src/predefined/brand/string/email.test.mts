@@ -1,6 +1,7 @@
 /* cSpell:disable */
 
 import { expectType } from 'ts-data-forge';
+import { type NonEmptyString } from 'ts-type-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { email } from './email.mjs';
 
@@ -76,6 +77,8 @@ describe(email, () => {
   type EmailType = TypeOf<typeof baseType>;
 
   expectType<EmailType, string>('<=');
+
+  expectType<EmailType, NonEmptyString>('<=');
 
   expectType<typeof baseType.defaultValue, EmailType>('=');
 

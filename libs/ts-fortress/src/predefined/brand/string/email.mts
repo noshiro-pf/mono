@@ -1,8 +1,10 @@
 import { type Brand } from 'ts-type-forge';
-import { brandedString } from '../../../brand/index.mjs';
+import { brand } from '../../../brand/index.mjs';
+import { string } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-export type Email = Brand<string, 'Email'>;
+// A valid e-mail address is always non-empty, so it also satisfies `NonEmptyString`.
+export type Email = Brand<string, 'Email' | 'NonEmptyString'>;
 
 /**
  * @link https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
@@ -14,9 +16,11 @@ export const email = (
     }>
   >,
 ): Type<Email> =>
-  brandedString({
+  brand({
+    baseType: string(options?.defaultValue ?? defaultEmail),
     is: (s): s is Email => regexpEmailAddress.test(s),
     defaultValue: options?.defaultValue ?? defaultEmail,
+    brandKeys: ['Email', 'NonEmptyString'],
     typeName: 'Email',
   });
 

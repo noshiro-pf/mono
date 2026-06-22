@@ -1,10 +1,12 @@
 import { type Brand, type StrictOmit } from 'ts-type-forge';
-import { brandedString } from '../../../brand/index.mjs';
+import { brand } from '../../../brand/index.mjs';
 import { boolean, string } from '../../../primitives/index.mjs';
 import { record } from '../../../record/index.mjs';
 import { type Type, type TypeOf } from '../../../type.mjs';
 
-export type Iso8601 = Brand<string, 'Iso8601'>;
+// A valid ISO 8601 string always begins with a 4-digit year, so it is always
+// non-empty and also satisfies `NonEmptyString`.
+export type Iso8601 = Brand<string, 'Iso8601' | 'NonEmptyString'>;
 
 /**
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators
@@ -16,9 +18,11 @@ export const iso8601 = (options?: ISO8601ValidatorOption): Type<Iso8601> => {
 
   const is = isISO8601(filledOptions);
 
-  return brandedString({
+  return brand({
+    baseType: string(filledOptions.defaultValue),
     is,
     defaultValue: filledOptions.defaultValue,
+    brandKeys: ['Iso8601', 'NonEmptyString'],
     typeName: 'Iso8601',
   });
 };

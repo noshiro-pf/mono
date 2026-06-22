@@ -1,4 +1,5 @@
 import { expectType, Result } from 'ts-data-forge';
+import { type NonEmptyString } from 'ts-type-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
 import { iso8601 } from './iso-8601.mjs';
@@ -95,6 +96,8 @@ describe(iso8601, () => {
   type Iso8601Type = TypeOf<typeof baseType>;
 
   expectType<Iso8601Type, string>('<=');
+
+  expectType<Iso8601Type, NonEmptyString>('<=');
 
   expectType<typeof baseType.defaultValue, Iso8601Type>('=');
 

@@ -15,13 +15,15 @@ export type UuidBaseString<V extends UuidVersion = UuidVersion> =
   | '00000000-0000-0000-0000-000000000000'
   | 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 
-export type Uuid = Brand<UuidBaseString, 'Uuid'>;
+// A UUID always has the dash-separated hexadecimal form, so it is never an
+// empty string and also satisfies `NonEmptyString`.
+export type Uuid = Brand<UuidBaseString, 'Uuid' | 'NonEmptyString'>;
 
-export type Uuid4 = Brand<UuidBaseString<4>, 'Uuid'>;
+export type Uuid4 = Brand<UuidBaseString<4>, 'Uuid' | 'NonEmptyString'>;
 
-export type Uuid6 = Brand<UuidBaseString<6>, 'Uuid'>;
+export type Uuid6 = Brand<UuidBaseString<6>, 'Uuid' | 'NonEmptyString'>;
 
-export type Uuid7 = Brand<UuidBaseString<7>, 'Uuid'>;
+export type Uuid7 = Brand<UuidBaseString<7>, 'Uuid' | 'NonEmptyString'>;
 
 /**
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators
@@ -29,20 +31,20 @@ export type Uuid7 = Brand<UuidBaseString<7>, 'Uuid'>;
 export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
   options?: UuidValidatorOption<V>,
 ): Type<UuidOf<V>> => {
-  type T = Brand<UuidBaseString, 'Uuid'>;
+  type T = Brand<UuidBaseString, 'Uuid' | 'NonEmptyString'>;
 
   const defaultValue = options?.defaultValue ?? nilUuid;
 
   const version = options?.version ?? 'all';
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return brand<UuidBaseString, readonly ['Uuid']>({
+  return brand<UuidBaseString, readonly ['Uuid', 'NonEmptyString']>({
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     baseType: string(defaultValue) as Type<UuidBaseString>,
     is: (s): s is T => uuidDef[version](s),
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     defaultValue: defaultValue as UuidBaseString,
-    brandKeys: ['Uuid'],
+    brandKeys: ['Uuid', 'NonEmptyString'],
     typeName:
       options?.typeName ??
       (version === 4
