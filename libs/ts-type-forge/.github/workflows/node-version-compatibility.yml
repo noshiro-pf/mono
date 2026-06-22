@@ -22,12 +22,12 @@ on:
 jobs:
   test-node-versions:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     strategy:
       fail-fast: false
       matrix:
-        node-version: ['22.18.0', '22.22.2', '24.14.1', '25.9.0']
+        node-version: ['22.22.2', '24.17.0', '26.3.1']
 
     steps:
       - name: Checkout
