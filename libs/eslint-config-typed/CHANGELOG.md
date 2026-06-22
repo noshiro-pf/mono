@@ -1,3 +1,9 @@
+# [4.10.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.11...v4.10.0) (2026-06-22)
+
+### Features
+
+- add ts-restrictions/no-unnecessary-coalesce-undefined rule ([#349](https://github.com/noshiro-pf/eslint-config-typed/issues/349)) ([3264eb9](https://github.com/noshiro-pf/eslint-config-typed/commit/3264eb98d6d662d842b1654da957aae0e3f1410a))
+
 ## [4.9.11](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.10...v4.9.11) (2026-05-26)
 
 ### Bug Fixes
