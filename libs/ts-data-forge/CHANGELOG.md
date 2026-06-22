@@ -1,3 +1,9 @@
+# [6.11.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.10.0...v6.11.0) (2026-06-22)
+
+### Features
+
+- Use the NonEmptyString type as the return type of isNonEmptyString ([#395](https://github.com/noshiro-pf/ts-data-forge/issues/395)) ([d2788ea](https://github.com/noshiro-pf/ts-data-forge/commit/d2788ea0bc0bbb37f0b58fa9979e624c7544629a))
+
 # [6.10.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.6...v6.10.0) (2026-06-18)
 
 ### Features
