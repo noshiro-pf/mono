@@ -235,10 +235,26 @@ namespace NoRestrictedSyntax {
     | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
+/**
+ * @description Require the left-hand side of `?? undefined` to include `null` in its type, and remove the redundant `?? undefined` otherwise
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoUnnecessaryCoalesceUndefined {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
+  'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{
