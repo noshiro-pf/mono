@@ -94,6 +94,7 @@ declare global {
   type NonNegativeInt32WithSmallInt = _TSTypeForge.NonNegativeInt32WithSmallInt;
   type PositiveInt32WithSmallInt = _TSTypeForge.PositiveInt32WithSmallInt;
   type NegativeInt32WithSmallInt = _TSTypeForge.NegativeInt32WithSmallInt;
+  type NonEmptyString = _TSTypeForge.NonEmptyString;
   type SafeInt = _TSTypeForge.SafeInt;
   type NonZeroSafeInt = _TSTypeForge.NonZeroSafeInt;
   type SafeUint = _TSTypeForge.SafeUint;

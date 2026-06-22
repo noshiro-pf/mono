@@ -3,11 +3,6 @@ import { type TSTypeForgeInternals_BrandEncapsulated } from './_internals.mjs';
 
 /**
  * Base type for all branded types. Represents a brand with unknown value type and no keys.
- *
- * @example
- * ```ts
- * type MyBrand = Brand<string, 'validated', never>;
- * ```
  */
 export type UnknownBrand = Brand<unknown, never, never>;
 
