@@ -9,12 +9,12 @@ describe(memoizeFunction, () => {
     // First call
     expect(memoized(5)).toBe(10);
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(5);
 
     // Second call with same argument - should use cache
     expect(memoized(5)).toBe(10);
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(5);
 
     // Call with different argument
     expect(memoized(3)).toBe(6);
@@ -29,11 +29,11 @@ describe(memoizeFunction, () => {
 
     expect(memoized(2, 3)).toBe(5);
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(2, 3);
 
     expect(memoized(2, 3)).toBe(5);
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(2, 3);
 
     expect(memoized(3, 2)).toBe(5);
 
@@ -48,14 +48,14 @@ describe(memoizeFunction, () => {
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(memoized(5)).toBeUndefined();
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(5);
 
     // Should use cache even for undefined
 
     // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
     expect(memoized(5)).toBeUndefined();
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(5);
   });
 
   test('should work with object arguments using primitive cache keys', () => {
@@ -73,12 +73,12 @@ describe(memoizeFunction, () => {
 
     expect(memoized(user1)).toBe('Hello Alice');
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(user1);
 
     // Same id, should use cache (even though name is different)
     expect(memoized(user2)).toBe('Hello Alice');
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(user1);
 
     // Different id, should call function
     expect(memoized(user3)).toBe('Hello Charlie');
@@ -133,11 +133,11 @@ describe(memoizeFunction, () => {
 
     expect(memoized(null)).toBe('default');
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(null);
 
     expect(memoized(null)).toBe('default');
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(null);
 
     expect(memoized(undefined)).toBe('default');
 
@@ -156,19 +156,19 @@ describe(memoizeFunction, () => {
     // First call
     const result1 = memoized();
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith();
 
     // Second call - should use cache and return the same random value
     const result2 = memoized();
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith();
 
     expect(result2).toBe(result1);
 
     // Third call - still using cache
     const result3 = memoized();
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith();
 
     expect(result3).toBe(result1);
   });
@@ -186,18 +186,18 @@ describe(memoizeFunction, () => {
 
     expect(memoized2(5)).toBe(15);
 
-    expect(fn1).toHaveBeenCalledOnce();
+    expect(fn1).toHaveBeenCalledExactlyOnceWith(5);
 
-    expect(fn2).toHaveBeenCalledOnce();
+    expect(fn2).toHaveBeenCalledExactlyOnceWith(5);
 
     // Each has its own cache
     expect(memoized1(5)).toBe(10);
 
     expect(memoized2(5)).toBe(15);
 
-    expect(fn1).toHaveBeenCalledOnce();
+    expect(fn1).toHaveBeenCalledExactlyOnceWith(5);
 
-    expect(fn2).toHaveBeenCalledOnce();
+    expect(fn2).toHaveBeenCalledExactlyOnceWith(5);
   });
 
   test('should work with complex cache key generation', () => {
@@ -236,12 +236,12 @@ describe(memoizeFunction, () => {
 
     expect(memoized(args1)).toBe('books/fiction/123');
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(args1);
 
     // Same cache key, should use cache
     expect(memoized(args2)).toBe('books/fiction/123');
 
-    expect(mockFn).toHaveBeenCalledOnce();
+    expect(mockFn).toHaveBeenCalledExactlyOnceWith(args1);
 
     // Different id, different cache key
     expect(memoized(args3)).toBe('books/fiction/124');

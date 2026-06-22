@@ -28,7 +28,7 @@ describe(debounce, () => {
 
     vi.advanceTimersByTime(50);
 
-    expect(func).toHaveBeenCalledOnce();
+    expect(func).toHaveBeenCalledExactlyOnceWith();
   });
 
   test('should only execute the function once after multiple rapid calls', () => {
@@ -46,7 +46,7 @@ describe(debounce, () => {
 
     vi.advanceTimersByTime(100);
 
-    expect(func).toHaveBeenCalledOnce();
+    expect(func).toHaveBeenCalledExactlyOnceWith();
   });
 
   test('should pass the arguments to the original function', () => {
