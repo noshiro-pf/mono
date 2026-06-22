@@ -1,3 +1,4 @@
+import { type NonEmptyString } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { isNonEmptyString } from './is-non-empty-string.mjs';
 
@@ -55,7 +56,7 @@ describe(isNonEmptyString, () => {
 
     // @ts-expect-error Testing non-string types
     if (isNonEmptyString(value)) {
-      expectType<typeof value, string>('=');
+      expectType<typeof value, NonEmptyString>('=');
 
       // TypeScript knows it's a string
       expect(value.length).toBeGreaterThan(0);
@@ -68,7 +69,7 @@ describe(isNonEmptyString, () => {
     const maybeString: string | undefined | null = 'hello';
 
     if (isNonEmptyString(maybeString)) {
-      expectType<typeof maybeString, string>('=');
+      expectType<typeof maybeString, NonEmptyString>('=');
 
       expect(maybeString.toUpperCase()).toBe('HELLO');
     }

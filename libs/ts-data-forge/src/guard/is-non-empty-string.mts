@@ -1,4 +1,4 @@
-import { type RelaxedExclude } from 'ts-type-forge';
+import { type NonEmptyString, type RelaxedExclude } from 'ts-type-forge';
 
 /**
  * Type guard that checks if a value is a non-empty string.
@@ -39,5 +39,5 @@ import { type RelaxedExclude } from 'ts-type-forge';
  */
 export const isNonEmptyString = <S extends string | null | undefined>(
   s: S,
-): s is RelaxedExclude<NonNullable<S>, ''> =>
+): s is NonEmptyString & RelaxedExclude<NonNullable<S>, ''> =>
   typeof s === 'string' && s.length > 0;
