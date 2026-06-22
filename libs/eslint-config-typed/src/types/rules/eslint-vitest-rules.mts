@@ -780,7 +780,7 @@ namespace NoLargeSnapshots {
    *         "type": "number"
    *       },
    *       "allowedSnapshots": {
-   *         "description": "Allowed snapshot names by absolute snapshot file path.",
+   *         "description": "A map of snapshot absolute file paths to arrays of snapshot names that are allowed to exceed the size limit. Snapshot names can be specified as regular expressions.",
    *         "type": "object",
    *         "additionalProperties": {
    *           "type": "array"
@@ -802,7 +802,7 @@ namespace NoLargeSnapshots {
      */
     inlineMaxSize?: number;
     /**
-     * Allowed snapshot names by absolute snapshot file path.
+     * A map of snapshot absolute file paths to arrays of snapshot names that are allowed to exceed the size limit. Snapshot names can be specified as regular expressions.
      */
     allowedSnapshots?: Readonly<Record<string, readonly unknown[]>>;
   }>;
@@ -1350,7 +1350,7 @@ namespace PreferExpectResolves {
 }
 
 /**
- * @description enforce using `expectTypeOf` instead of `expect(typeof ...)`
+ * @description enforce using `expect(...).toBeTypeOf(...)` instead of `expect(typeof ...).toBe(...)`
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-expect-type-of.md
  *
  *  ```md
@@ -1805,13 +1805,12 @@ namespace PreferTodo {
  * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-vi-mocked.md
  *
  *  ```md
- *  | key                  | value      |
- *  | :------------------- | :--------- |
- *  | type                 | suggestion |
- *  | deprecated           | false      |
- *  | fixable              | code       |
- *  | recommended          | false      |
- *  | requiresTypeChecking | true       |
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
  *  ```
  */
 namespace PreferViMocked {

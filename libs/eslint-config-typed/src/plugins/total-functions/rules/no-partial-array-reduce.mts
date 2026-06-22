@@ -55,11 +55,13 @@ export const noPartialArrayReduce = createRule({
         // We only care if this call is on an array or tuple (or a type that is a union that includes one or more arrays or tuples)
 
         if (
-          !typeParts.some(
+          typeParts.every(
             (t) =>
-              checker.isArrayType(t) ||
-              isTupleType(t) ||
-              isTupleTypeReference(t),
+              !(
+                checker.isArrayType(t) ||
+                isTupleType(t) ||
+                isTupleTypeReference(t)
+              ),
           )
         ) {
           return;

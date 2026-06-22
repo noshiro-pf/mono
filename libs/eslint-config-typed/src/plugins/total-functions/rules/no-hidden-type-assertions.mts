@@ -77,11 +77,9 @@ export const noHiddenTypeAssertions = createRule({
                       ? ([type.elementType] as const)
                       : isTypeOperatorNode(type)
                         ? ([type.type] as const)
-                        : isUnionTypeNode(type)
+                        : isUnionTypeNode(type) || isIntersectionTypeNode(type)
                           ? type.types
-                          : isIntersectionTypeNode(type)
-                            ? type.types
-                            : ([] as const);
+                          : ([] as const);
 
       return [type, ...next.flatMap(explodeTypeNode)] as const;
     };

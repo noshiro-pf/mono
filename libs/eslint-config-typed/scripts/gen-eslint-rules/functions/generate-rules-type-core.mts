@@ -57,6 +57,15 @@ const compilerConfig = {
   unknownAny: true,
 } as const satisfies Partial<Options>;
 
+// Plugins whose `valid-title` rule schema needs `mustMatch`/`mustNotMatch`
+// pattern expansion. Hoisted to module scope as a Set so it is allocated once
+// and looked up in O(1) rather than re-allocating/scanning on every iteration.
+const validTitlePlugins: ReadonlySet<string> = new Set([
+  'eslint-plugin-playwright',
+  'eslint-plugin-jest',
+  '@vitest/eslint-plugin',
+]);
+
 /**
  * ESLint プラグインのルール定義から TypeScript 型定義を生成するメイン関数
  */
@@ -114,12 +123,7 @@ export const generateRulesTypeCore = async (
         return enforceMinItemsForRestrictedTuple(s);
       }
 
-      if (
-        (pluginName === 'eslint-plugin-playwright' ||
-          pluginName === 'eslint-plugin-jest' ||
-          pluginName === '@vitest/eslint-plugin') &&
-        ruleName === 'valid-title'
-      ) {
+      if (validTitlePlugins.has(pluginName) && ruleName === 'valid-title') {
         return expandMustMatchPatternProperties(s);
       }
 
@@ -419,9 +423,7 @@ const getRules = async (
     case 'eslint':
       return (
         // eslint-disable-next-line @typescript-eslint/no-deprecated, total-functions/no-unsafe-type-assertion
-        Array.from(builtinRules.entries()) as unknown as DeepReadonly<
-          [string, Rule][]
-        >
+        Array.from(builtinRules) as unknown as DeepReadonly<[string, Rule][]>
       );
 
     case eslintPlugins.EslintTsRestrictionsRules.pluginName:

@@ -9,7 +9,7 @@ import { resolveImportPath } from './resolve-import-path.mjs';
 // Forked from https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/v1.3.27/strict-dependencies/index.js
 
 // Fork 時の変更点メモ
-// - normalize は path.normalize に変更（厳密には挙動が異なるが、この eslint ルールの用途的には問題ないはず）
+// - normalize は path.normalize に変更（厳密には挙動が異なるが、この ESLint ルールの用途的には問題ないはず）
 // - MessageId を使ってレポートするように変更（context.report に 2引数渡していた形式を object を渡すように変更）
 
 type RuleOptions = readonly [Dependencies] | readonly [Dependencies, Options];

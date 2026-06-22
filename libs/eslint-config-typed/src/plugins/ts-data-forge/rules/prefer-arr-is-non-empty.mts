@@ -49,9 +49,9 @@ export const preferArrIsNonEmpty: TSESLint.RuleModule<MessageIds, Options> = {
 
         const isLengthOnLeft = node.operator === '>';
 
-        const lengthSide = isLengthOnLeft ? node.left : node.right;
+        const lengthSide = node[isLengthOnLeft ? 'left' : 'right'];
 
-        const numberSide = isLengthOnLeft ? node.right : node.left;
+        const numberSide = node[isLengthOnLeft ? 'right' : 'left'];
 
         // Check if one side is `.length` and the other is 0
         if (

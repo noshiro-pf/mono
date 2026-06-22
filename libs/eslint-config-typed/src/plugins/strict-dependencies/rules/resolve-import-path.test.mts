@@ -98,15 +98,19 @@ type FixtureName = keyof typeof compilerOptionsByFixture;
 
 const restoreActual = (): void => {
   if (
-    mut_actualFunctions.findConfigFile !== undefined &&
-    mut_actualFunctions.getParsedCommandLineOfConfigFile !== undefined
+    !(
+      mut_actualFunctions.findConfigFile !== undefined &&
+      mut_actualFunctions.getParsedCommandLineOfConfigFile !== undefined
+    )
   ) {
-    mockFindConfigFile.mockImplementation(mut_actualFunctions.findConfigFile);
-
-    mockGetParsedCommandLine.mockImplementation(
-      mut_actualFunctions.getParsedCommandLineOfConfigFile,
-    );
+    return;
   }
+
+  mockFindConfigFile.mockImplementation(mut_actualFunctions.findConfigFile);
+
+  mockGetParsedCommandLine.mockImplementation(
+    mut_actualFunctions.getParsedCommandLineOfConfigFile,
+  );
 };
 
 const useFixture = (fixtureName: FixtureName | undefined): void => {

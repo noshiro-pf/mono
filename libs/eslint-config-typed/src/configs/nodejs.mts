@@ -22,7 +22,7 @@ export const eslintConfigForNodeJs = (files?: readonly string[]): FlatConfig =>
       'unicorn/prefer-blob-reading-methods': 'off',
       'unicorn/prefer-classlist-toggle': 'off',
       'unicorn/prefer-dom-node-append': 'off',
-      'unicorn/prefer-dom-node-dataset': 'off',
+      'unicorn/prefer-dom-node-dataset': 0, // renamed to unicorn/dom-node-dataset in v66
       'unicorn/prefer-dom-node-remove': 'off',
       'unicorn/prefer-dom-node-text-content': 'off',
       'unicorn/prefer-event-target': 'off',

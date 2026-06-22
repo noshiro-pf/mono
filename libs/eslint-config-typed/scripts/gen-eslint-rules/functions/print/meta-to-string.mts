@@ -29,8 +29,7 @@ export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
       'requiresTypeChecking',
       // eslint-disable-next-line no-restricted-syntax
       'requiresTypeChecking' in docs
-        ? // eslint-disable-next-line unicorn/consistent-destructuring
-          Boolean(docs.requiresTypeChecking)
+        ? Boolean(docs.requiresTypeChecking)
         : undefined,
     ],
   ] as const;

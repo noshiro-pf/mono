@@ -34,7 +34,7 @@ export const noNestedFpTsEffects = createRule({
           return;
         }
 
-        // TODO report other types of problematic nesting besides Tasks within IOs.
+        // TODO: report other types of problematic nesting besides Tasks within I/Os.
 
         if (
           effectType.effectName === 'IO' &&

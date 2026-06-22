@@ -56,9 +56,9 @@ export const preferArrIsArrayAtLeastLength: TSESLint.RuleModule<
         // xs.length >= n  or  n <= xs.length
         const isLengthOnLeft = node.operator === '>=';
 
-        const lengthSide = isLengthOnLeft ? node.left : node.right;
+        const lengthSide = node[isLengthOnLeft ? 'left' : 'right'];
 
-        const valueSide = isLengthOnLeft ? node.right : node.left;
+        const valueSide = node[isLengthOnLeft ? 'right' : 'left'];
 
         // Check if lengthSide is accessing .length
         if (!isLengthAccess(lengthSide)) return;

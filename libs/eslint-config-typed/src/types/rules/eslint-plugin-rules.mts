@@ -31,8 +31,7 @@ namespace ConsistentOutput {
    *     "enum": [
    *       "always",
    *       "consistent"
-   *     ],
-   *     "default": "consistent"
+   *     ]
    *   }
    * ]
    * ```
@@ -507,8 +506,7 @@ namespace RequireMetaDocsDescription {
    *     "properties": {
    *       "pattern": {
    *         "type": "string",
-   *         "description": "A regular expression that the description must match. Use `'.+'` to allow anything.",
-   *         "default": "^(enforce|require|disallow)"
+   *         "description": "A regular expression that the description must match. Use `'.+'` to allow anything."
    *       }
    *     },
    *     "additionalProperties": false
@@ -519,8 +517,6 @@ namespace RequireMetaDocsDescription {
   export type Options = Readonly<{
     /**
      * A regular expression that the description must match. Use `'.+'` to allow anything.
-     *
-     * @default "^(enforce|require|disallow)"
      */
     pattern?: string;
   }>;
@@ -554,7 +550,6 @@ namespace RequireMetaDocsRecommended {
    *     "type": "object",
    *     "properties": {
    *       "allowNonBoolean": {
-   *         "default": false,
    *         "description": "Whether to allow values of types other than boolean.",
    *         "type": "boolean"
    *       }
@@ -567,8 +562,6 @@ namespace RequireMetaDocsRecommended {
   export type Options = Readonly<{
     /**
      * Whether to allow values of types other than boolean.
-     *
-     * @default false
      */
     allowNonBoolean?: boolean;
   }>;
@@ -647,7 +640,6 @@ namespace RequireMetaFixable {
    *     "properties": {
    *       "catchNoFixerButFixableProperty": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether the rule should attempt to detect rules that do not have a fixer but enable the `meta.fixable` property. This option is off by default because it increases the chance of false positives since fixers can't always be detected when helper functions are used."
    *       }
    *     },
@@ -659,8 +651,6 @@ namespace RequireMetaFixable {
   export type Options = Readonly<{
     /**
      * Whether the rule should attempt to detect rules that do not have a fixer but enable the `meta.fixable` property. This option is off by default because it increases the chance of false positives since fixers can't always be detected when helper functions are used.
-     *
-     * @default false
      */
     catchNoFixerButFixableProperty?: boolean;
   }>;
@@ -728,7 +718,6 @@ namespace RequireMetaSchema {
    *     "properties": {
    *       "requireSchemaPropertyWhenOptionless": {
    *         "type": "boolean",
-   *         "default": true,
    *         "description": "Whether the rule should require the `meta.schema` property to be specified (with `schema: []`) for rules that have no options."
    *       }
    *     },
@@ -740,8 +729,6 @@ namespace RequireMetaSchema {
   export type Options = Readonly<{
     /**
      * Whether the rule should require the `meta.schema` property to be specified (with `schema: []`) for rules that have no options.
-     *
-     * @default true
      */
     requireSchemaPropertyWhenOptionless?: boolean;
   }>;
@@ -814,6 +801,22 @@ namespace RequireTestCaseName {
     | 'off'
     | Linter.Severity
     | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description requires the position of errors to be explicitly stated for all expected errors
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-test-error-positions.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTestErrorPositions {
+  export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
@@ -951,6 +954,7 @@ export type EslintPluginRules = Readonly<{
   'eslint-plugin/require-meta-schema': RequireMetaSchema.RuleEntry;
   'eslint-plugin/require-meta-type': RequireMetaType.RuleEntry;
   'eslint-plugin/require-test-case-name': RequireTestCaseName.RuleEntry;
+  'eslint-plugin/require-test-error-positions': RequireTestErrorPositions.RuleEntry;
   'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.RuleEntry;
   'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.RuleEntry;
   'eslint-plugin/unique-test-case-names': UniqueTestCaseNames.RuleEntry;

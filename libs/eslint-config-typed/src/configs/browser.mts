@@ -17,7 +17,7 @@ export const eslintConfigForBrowser = (files?: readonly string[]): FlatConfig =>
       '@typescript-eslint/no-require-imports': 'off',
       'unicorn/no-new-buffer': 'off',
       'unicorn/no-process-exit': 'off',
-      'unicorn/prefer-json-parse-buffer': 'off',
+      'unicorn/prefer-json-parse-buffer': 0, // removed in v66
       'unicorn/prefer-module': 'off',
       'unicorn/prefer-node-protocol': 'off',
     }),

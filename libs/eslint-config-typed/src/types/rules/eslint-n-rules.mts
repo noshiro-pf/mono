@@ -624,7 +624,16 @@ namespace NoExtraneousImport {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<Record<string, readonly [string, string]>>
+      | Readonly<{
+          /**
+           * @minItems 2
+           * @maxItems 2
+           *
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` "^.+$".
+           */
+          [k: string]: readonly [string, string];
+        }>
       | readonly [
           Readonly<{
             /**
@@ -775,7 +784,16 @@ namespace NoExtraneousRequire {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<Record<string, readonly [string, string]>>
+      | Readonly<{
+          /**
+           * @minItems 2
+           * @maxItems 2
+           *
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` "^.+$".
+           */
+          [k: string]: readonly [string, string];
+        }>
       | readonly [
           Readonly<{
             /**
@@ -1540,7 +1558,16 @@ namespace NoTopLevelAwait {
   export type Options = Readonly<{
     ignoreBin?: boolean;
     convertPath?:
-      | Readonly<Record<string, readonly [string, string]>>
+      | Readonly<{
+          /**
+           * @minItems 2
+           * @maxItems 2
+           *
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` "^.+$".
+           */
+          [k: string]: readonly [string, string];
+        }>
       | readonly [
           Readonly<{
             /**
@@ -1580,11 +1607,10 @@ namespace NoTopLevelAwait {
  * @link https://github.com/eslint-community/eslint-plugin-n/blob/HEAD/docs/rules/no-unpublished-bin.md
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | true    |
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
  *  ```
  */
 namespace NoUnpublishedBin {
@@ -1652,14 +1678,24 @@ namespace NoUnpublishedBin {
    *           }
    *         ]
    *       }
-   *     }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
    */
   export type Options = Readonly<{
     convertPath?:
-      | Readonly<Record<string, readonly [string, string]>>
+      | Readonly<{
+          /**
+           * @minItems 2
+           * @maxItems 2
+           *
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` "^.+$".
+           */
+          [k: string]: readonly [string, string];
+        }>
       | readonly [
           Readonly<{
             /**
@@ -1686,7 +1722,6 @@ namespace NoUnpublishedBin {
             replace: readonly [string, string];
           }>[],
         ];
-    [k: string]: unknown;
   }>;
 
   export type RuleEntry =
@@ -1817,7 +1852,16 @@ namespace NoUnpublishedImport {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<Record<string, readonly [string, string]>>
+      | Readonly<{
+          /**
+           * @minItems 2
+           * @maxItems 2
+           *
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` "^.+$".
+           */
+          [k: string]: readonly [string, string];
+        }>
       | readonly [
           Readonly<{
             /**
@@ -1981,7 +2025,16 @@ namespace NoUnpublishedRequire {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<Record<string, readonly [string, string]>>
+      | Readonly<{
+          /**
+           * @minItems 2
+           * @maxItems 2
+           *
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` "^.+$".
+           */
+          [k: string]: readonly [string, string];
+        }>
       | readonly [
           Readonly<{
             /**
@@ -3941,6 +3994,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "navigator.hardwareConcurrency",
    *             "navigator.language",
    *             "navigator.languages",
+   *             "navigator.locks",
+   *             "navigator.locks.request",
+   *             "navigator.locks.query",
    *             "navigator.platform",
    *             "navigator.userAgent",
    *             "structuredClone",
@@ -3989,13 +4045,18 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "console.warn",
    *             "crypto",
    *             "crypto.subtle",
+   *             "crypto.subtle.decapsulateBits",
+   *             "crypto.subtle.decapsulateKey",
    *             "crypto.subtle.decrypt",
    *             "crypto.subtle.deriveBits",
    *             "crypto.subtle.deriveKey",
    *             "crypto.subtle.digest",
+   *             "crypto.subtle.encapsulateBits",
+   *             "crypto.subtle.encapsulateKey",
    *             "crypto.subtle.encrypt",
    *             "crypto.subtle.exportKey",
    *             "crypto.subtle.generateKey",
+   *             "crypto.subtle.getPublicKey",
    *             "crypto.subtle.importKey",
    *             "crypto.subtle.sign",
    *             "crypto.subtle.unwrapKey",
@@ -4006,6 +4067,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "Crypto",
    *             "CryptoKey",
    *             "SubtleCrypto",
+   *             "SubtleCrypto.supports",
    *             "CloseEvent",
    *             "CustomEvent",
    *             "Event",
@@ -4314,13 +4376,18 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "crypto.fips",
    *             "crypto.webcrypto",
    *             "crypto.webcrypto.subtle",
+   *             "crypto.webcrypto.subtle.decapsulateBits",
+   *             "crypto.webcrypto.subtle.decapsulateKey",
    *             "crypto.webcrypto.subtle.decrypt",
    *             "crypto.webcrypto.subtle.deriveBits",
    *             "crypto.webcrypto.subtle.deriveKey",
    *             "crypto.webcrypto.subtle.digest",
+   *             "crypto.webcrypto.subtle.encapsulateBits",
+   *             "crypto.webcrypto.subtle.encapsulateKey",
    *             "crypto.webcrypto.subtle.encrypt",
    *             "crypto.webcrypto.subtle.exportKey",
    *             "crypto.webcrypto.subtle.generateKey",
+   *             "crypto.webcrypto.subtle.getPublicKey",
    *             "crypto.webcrypto.subtle.importKey",
    *             "crypto.webcrypto.subtle.sign",
    *             "crypto.webcrypto.subtle.unwrapKey",
@@ -4328,6 +4395,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "crypto.webcrypto.subtle.wrapKey",
    *             "crypto.webcrypto.getRandomValues",
    *             "crypto.webcrypto.randomUUID",
+   *             "crypto.argon2",
+   *             "crypto.argon2Sync",
    *             "crypto.checkPrime",
    *             "crypto.checkPrimeSync",
    *             "crypto.createCipher",
@@ -4344,7 +4413,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "crypto.createSecretKey",
    *             "crypto.createSign",
    *             "crypto.createVerify",
+   *             "crypto.decapsulate",
    *             "crypto.diffieHellman",
+   *             "crypto.encapsulate",
    *             "crypto.generateKey",
    *             "crypto.generateKeyPair",
    *             "crypto.generateKeyPairSync",
@@ -4542,6 +4613,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "fs.promises.lutimes",
    *             "fs.promises.mkdir",
    *             "fs.promises.mkdtemp",
+   *             "fs.promises.mkdtempDisposable",
    *             "fs.promises.open",
    *             "fs.promises.opendir",
    *             "fs.promises.readFile",
@@ -4633,6 +4705,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "fs.lutimesSync",
    *             "fs.mkdirSync",
    *             "fs.mkdtempSync",
+   *             "fs.mkdtempDisposableSync",
    *             "fs.opendirSync",
    *             "fs.openSync",
    *             "fs.readdirSync",
@@ -4665,6 +4738,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "fs.Stats",
    *             "fs.StatFs",
    *             "fs.WriteStream",
+   *             "fs.Utf8Stream",
    *             "fs.common_objects",
    *             "fs/promises",
    *             "fs/promises.FileHandle",
@@ -4683,6 +4757,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "fs/promises.lutimes",
    *             "fs/promises.mkdir",
    *             "fs/promises.mkdtemp",
+   *             "fs/promises.mkdtempDisposable",
    *             "fs/promises.open",
    *             "fs/promises.opendir",
    *             "fs/promises.readFile",
@@ -4731,12 +4806,19 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "http.validateHeaderName",
    *             "http.validateHeaderValue",
    *             "http.setMaxIdleHTTPParsers",
+   *             "http.Agent()",
    *             "http.Agent",
+   *             "http.ClientRequest()",
    *             "http.ClientRequest",
+   *             "http.Server()",
    *             "http.Server",
+   *             "http.ServerResponse()",
    *             "http.ServerResponse",
+   *             "http.IncomingMessage()",
    *             "http.IncomingMessage",
+   *             "http.OutgoingMessage()",
    *             "http.OutgoingMessage",
+   *             "http.WebSocket()",
    *             "http.WebSocket",
    *             "_http_agent",
    *             "_http_client",
@@ -4759,6 +4841,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "inspector.Network.loadingFinished",
    *             "inspector.Network.requestWillBeSent",
    *             "inspector.Network.responseReceived",
+   *             "inspector.Network.webSocketCreated",
+   *             "inspector.Network.webSocketHandshakeResponseReceived",
+   *             "inspector.Network.webSocketClosed",
    *             "inspector.NetworkResources.put",
    *             "inspector.console",
    *             "inspector.close",
@@ -4773,6 +4858,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "inspector/promises.Network.loadingFinished",
    *             "inspector/promises.Network.requestWillBeSent",
    *             "inspector/promises.Network.responseReceived",
+   *             "inspector/promises.Network.webSocketCreated",
+   *             "inspector/promises.Network.webSocketHandshakeResponseReceived",
+   *             "inspector/promises.Network.webSocketClosed",
    *             "inspector/promises.NetworkResources.put",
    *             "inspector/promises.console",
    *             "inspector/promises.close",
@@ -4957,6 +5045,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "perf_hooks.performance.timerify",
    *             "perf_hooks.performance.toJSON",
    *             "perf_hooks.createHistogram",
+   *             "perf_hooks.eventLoopUtilization",
+   *             "perf_hooks.timerify",
    *             "perf_hooks.monitorEventLoopDelay",
    *             "perf_hooks.PerformanceEntry",
    *             "perf_hooks.PerformanceMark",
@@ -5015,10 +5105,12 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "sea.isSea",
    *             "sea.getAsset",
    *             "sea.getAssetAsBlob",
+   *             "sea.getAssetKeys",
    *             "sea.getRawAsset",
    *             "sea.sea.isSea",
    *             "sea.sea.getAsset",
    *             "sea.sea.getAssetAsBlob",
+   *             "sea.sea.getAssetKeys",
    *             "sea.sea.getRawAsset",
    *             "stream",
    *             "stream.promises",
@@ -5073,6 +5165,12 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "stream/consumers.buffer",
    *             "stream/consumers.json",
    *             "stream/consumers.text",
+   *             "_stream_duplex",
+   *             "_stream_passthrough",
+   *             "_stream_readable",
+   *             "_stream_transform",
+   *             "_stream_wrap",
+   *             "_stream_writable",
    *             "string_decoder",
    *             "string_decoder.StringDecoder",
    *             "sqlite",
@@ -5082,6 +5180,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "sqlite.constants.SQLITE_CHANGESET_ABORT",
    *             "sqlite.backup",
    *             "sqlite.DatabaseSync",
+   *             "sqlite.Session",
    *             "sqlite.StatementSync",
    *             "sqlite.SQLITE_CHANGESET_OMIT",
    *             "sqlite.SQLITE_CHANGESET_REPLACE",
@@ -5106,6 +5205,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "test.mock.getter",
    *             "test.mock.method",
    *             "test.mock.module",
+   *             "test.mock.property",
    *             "test.mock.reset",
    *             "test.mock.restoreAll",
    *             "test.mock.setter",
@@ -5165,6 +5265,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "tls.Server",
    *             "tls.setDefaultCACertificates",
    *             "tls.TLSSocket",
+   *             "_tls_common",
+   *             "_tls_wrap",
    *             "trace_events",
    *             "trace_events.createTracing",
    *             "trace_events.getEnabledCategories",
@@ -5358,6 +5460,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "v8.writeHeapSnapshot",
    *             "v8.setHeapSnapshotNearHeapLimit",
    *             "v8.GCProfiler",
+   *             "v8.startCpuProfile",
    *             "vm.constants",
    *             "vm.compileFunction",
    *             "vm.createContext",
@@ -5378,6 +5481,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "worker_threads.resourceLimits",
    *             "worker_threads.SHARE_ENV",
    *             "worker_threads.threadId",
+   *             "worker_threads.threadName",
    *             "worker_threads.workerData",
    *             "worker_threads.getEnvironmentData",
    *             "worker_threads.getHeapStatistics",
@@ -5386,6 +5490,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
    *             "worker_threads.isInternalThread",
    *             "worker_threads.isMainThread",
    *             "worker_threads.isMarkedAsUntransferable",
+   *             "worker_threads.locks",
+   *             "worker_threads.locks.request",
+   *             "worker_threads.locks.query",
    *             "worker_threads.moveMessagePortToContext",
    *             "worker_threads.postMessageToThread",
    *             "worker_threads.receiveMessageOnPort",
@@ -5571,6 +5678,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'navigator.hardwareConcurrency'
       | 'navigator.language'
       | 'navigator.languages'
+      | 'navigator.locks'
+      | 'navigator.locks.request'
+      | 'navigator.locks.query'
       | 'navigator.platform'
       | 'navigator.userAgent'
       | 'structuredClone'
@@ -5619,13 +5729,18 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'console.warn'
       | 'crypto'
       | 'crypto.subtle'
+      | 'crypto.subtle.decapsulateBits'
+      | 'crypto.subtle.decapsulateKey'
       | 'crypto.subtle.decrypt'
       | 'crypto.subtle.deriveBits'
       | 'crypto.subtle.deriveKey'
       | 'crypto.subtle.digest'
+      | 'crypto.subtle.encapsulateBits'
+      | 'crypto.subtle.encapsulateKey'
       | 'crypto.subtle.encrypt'
       | 'crypto.subtle.exportKey'
       | 'crypto.subtle.generateKey'
+      | 'crypto.subtle.getPublicKey'
       | 'crypto.subtle.importKey'
       | 'crypto.subtle.sign'
       | 'crypto.subtle.unwrapKey'
@@ -5636,6 +5751,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'Crypto'
       | 'CryptoKey'
       | 'SubtleCrypto'
+      | 'SubtleCrypto.supports'
       | 'CloseEvent'
       | 'CustomEvent'
       | 'Event'
@@ -5944,13 +6060,18 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.fips'
       | 'crypto.webcrypto'
       | 'crypto.webcrypto.subtle'
+      | 'crypto.webcrypto.subtle.decapsulateBits'
+      | 'crypto.webcrypto.subtle.decapsulateKey'
       | 'crypto.webcrypto.subtle.decrypt'
       | 'crypto.webcrypto.subtle.deriveBits'
       | 'crypto.webcrypto.subtle.deriveKey'
       | 'crypto.webcrypto.subtle.digest'
+      | 'crypto.webcrypto.subtle.encapsulateBits'
+      | 'crypto.webcrypto.subtle.encapsulateKey'
       | 'crypto.webcrypto.subtle.encrypt'
       | 'crypto.webcrypto.subtle.exportKey'
       | 'crypto.webcrypto.subtle.generateKey'
+      | 'crypto.webcrypto.subtle.getPublicKey'
       | 'crypto.webcrypto.subtle.importKey'
       | 'crypto.webcrypto.subtle.sign'
       | 'crypto.webcrypto.subtle.unwrapKey'
@@ -5958,6 +6079,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.webcrypto.subtle.wrapKey'
       | 'crypto.webcrypto.getRandomValues'
       | 'crypto.webcrypto.randomUUID'
+      | 'crypto.argon2'
+      | 'crypto.argon2Sync'
       | 'crypto.checkPrime'
       | 'crypto.checkPrimeSync'
       | 'crypto.createCipher'
@@ -5974,7 +6097,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'crypto.createSecretKey'
       | 'crypto.createSign'
       | 'crypto.createVerify'
+      | 'crypto.decapsulate'
       | 'crypto.diffieHellman'
+      | 'crypto.encapsulate'
       | 'crypto.generateKey'
       | 'crypto.generateKeyPair'
       | 'crypto.generateKeyPairSync'
@@ -6172,6 +6297,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs.promises.lutimes'
       | 'fs.promises.mkdir'
       | 'fs.promises.mkdtemp'
+      | 'fs.promises.mkdtempDisposable'
       | 'fs.promises.open'
       | 'fs.promises.opendir'
       | 'fs.promises.readFile'
@@ -6263,6 +6389,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs.lutimesSync'
       | 'fs.mkdirSync'
       | 'fs.mkdtempSync'
+      | 'fs.mkdtempDisposableSync'
       | 'fs.opendirSync'
       | 'fs.openSync'
       | 'fs.readdirSync'
@@ -6295,6 +6422,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs.Stats'
       | 'fs.StatFs'
       | 'fs.WriteStream'
+      | 'fs.Utf8Stream'
       | 'fs.common_objects'
       | 'fs/promises'
       | 'fs/promises.FileHandle'
@@ -6313,6 +6441,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'fs/promises.lutimes'
       | 'fs/promises.mkdir'
       | 'fs/promises.mkdtemp'
+      | 'fs/promises.mkdtempDisposable'
       | 'fs/promises.open'
       | 'fs/promises.opendir'
       | 'fs/promises.readFile'
@@ -6361,12 +6490,19 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'http.validateHeaderName'
       | 'http.validateHeaderValue'
       | 'http.setMaxIdleHTTPParsers'
+      | 'http.Agent()'
       | 'http.Agent'
+      | 'http.ClientRequest()'
       | 'http.ClientRequest'
+      | 'http.Server()'
       | 'http.Server'
+      | 'http.ServerResponse()'
       | 'http.ServerResponse'
+      | 'http.IncomingMessage()'
       | 'http.IncomingMessage'
+      | 'http.OutgoingMessage()'
       | 'http.OutgoingMessage'
+      | 'http.WebSocket()'
       | 'http.WebSocket'
       | '_http_agent'
       | '_http_client'
@@ -6389,6 +6525,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'inspector.Network.loadingFinished'
       | 'inspector.Network.requestWillBeSent'
       | 'inspector.Network.responseReceived'
+      | 'inspector.Network.webSocketCreated'
+      | 'inspector.Network.webSocketHandshakeResponseReceived'
+      | 'inspector.Network.webSocketClosed'
       | 'inspector.NetworkResources.put'
       | 'inspector.console'
       | 'inspector.close'
@@ -6403,6 +6542,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'inspector/promises.Network.loadingFinished'
       | 'inspector/promises.Network.requestWillBeSent'
       | 'inspector/promises.Network.responseReceived'
+      | 'inspector/promises.Network.webSocketCreated'
+      | 'inspector/promises.Network.webSocketHandshakeResponseReceived'
+      | 'inspector/promises.Network.webSocketClosed'
       | 'inspector/promises.NetworkResources.put'
       | 'inspector/promises.console'
       | 'inspector/promises.close'
@@ -6587,6 +6729,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'perf_hooks.performance.timerify'
       | 'perf_hooks.performance.toJSON'
       | 'perf_hooks.createHistogram'
+      | 'perf_hooks.eventLoopUtilization'
+      | 'perf_hooks.timerify'
       | 'perf_hooks.monitorEventLoopDelay'
       | 'perf_hooks.PerformanceEntry'
       | 'perf_hooks.PerformanceMark'
@@ -6645,10 +6789,12 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'sea.isSea'
       | 'sea.getAsset'
       | 'sea.getAssetAsBlob'
+      | 'sea.getAssetKeys'
       | 'sea.getRawAsset'
       | 'sea.sea.isSea'
       | 'sea.sea.getAsset'
       | 'sea.sea.getAssetAsBlob'
+      | 'sea.sea.getAssetKeys'
       | 'sea.sea.getRawAsset'
       | 'stream'
       | 'stream.promises'
@@ -6703,6 +6849,12 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'stream/consumers.buffer'
       | 'stream/consumers.json'
       | 'stream/consumers.text'
+      | '_stream_duplex'
+      | '_stream_passthrough'
+      | '_stream_readable'
+      | '_stream_transform'
+      | '_stream_wrap'
+      | '_stream_writable'
       | 'string_decoder'
       | 'string_decoder.StringDecoder'
       | 'sqlite'
@@ -6712,6 +6864,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'sqlite.constants.SQLITE_CHANGESET_ABORT'
       | 'sqlite.backup'
       | 'sqlite.DatabaseSync'
+      | 'sqlite.Session'
       | 'sqlite.StatementSync'
       | 'sqlite.SQLITE_CHANGESET_OMIT'
       | 'sqlite.SQLITE_CHANGESET_REPLACE'
@@ -6736,6 +6889,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'test.mock.getter'
       | 'test.mock.method'
       | 'test.mock.module'
+      | 'test.mock.property'
       | 'test.mock.reset'
       | 'test.mock.restoreAll'
       | 'test.mock.setter'
@@ -6795,6 +6949,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'tls.Server'
       | 'tls.setDefaultCACertificates'
       | 'tls.TLSSocket'
+      | '_tls_common'
+      | '_tls_wrap'
       | 'trace_events'
       | 'trace_events.createTracing'
       | 'trace_events.getEnabledCategories'
@@ -6988,6 +7144,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'v8.writeHeapSnapshot'
       | 'v8.setHeapSnapshotNearHeapLimit'
       | 'v8.GCProfiler'
+      | 'v8.startCpuProfile'
       | 'vm.constants'
       | 'vm.compileFunction'
       | 'vm.createContext'
@@ -7008,6 +7165,7 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'worker_threads.resourceLimits'
       | 'worker_threads.SHARE_ENV'
       | 'worker_threads.threadId'
+      | 'worker_threads.threadName'
       | 'worker_threads.workerData'
       | 'worker_threads.getEnvironmentData'
       | 'worker_threads.getHeapStatistics'
@@ -7016,6 +7174,9 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
       | 'worker_threads.isInternalThread'
       | 'worker_threads.isMainThread'
       | 'worker_threads.isMarkedAsUntransferable'
+      | 'worker_threads.locks'
+      | 'worker_threads.locks.request'
+      | 'worker_threads.locks.query'
       | 'worker_threads.moveMessagePortToContext'
       | 'worker_threads.postMessageToThread'
       | 'worker_threads.receiveMessageOnPort'
@@ -7664,7 +7825,16 @@ namespace Hashbang {
    */
   export type Options = Readonly<{
     convertPath?:
-      | Readonly<Record<string, readonly [string, string]>>
+      | Readonly<{
+          /**
+           * @minItems 2
+           * @maxItems 2
+           *
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` "^.+$".
+           */
+          [k: string]: readonly [string, string];
+        }>
       | readonly [
           Readonly<{
             /**
@@ -7693,7 +7863,13 @@ namespace Hashbang {
         ];
     ignoreUnpublished?: boolean;
     additionalExecutables?: readonly string[];
-    executableMap?: Readonly<Record<string, string>>;
+    executableMap?: Readonly<{
+      /**
+       * This interface was referenced by `undefined`'s JSON-Schema definition
+       * via the `patternProperty` "^\.\w+$".
+       */
+      [k: string]: string;
+    }>;
   }>;
 
   export type RuleEntry =

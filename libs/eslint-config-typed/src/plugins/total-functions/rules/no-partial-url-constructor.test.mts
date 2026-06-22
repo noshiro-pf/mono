@@ -26,20 +26,20 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     {
       filename: 'file.ts',
       code: dedent`
-        new URL("http://example.com");
+        new URL("https://example.com");
       `,
     },
     {
       filename: 'file.ts',
       code: dedent`
-        new URL("/hello", "http://example.com");
+        new URL("/hello", "https://example.com");
       `,
     },
     // TODO support this form
     // {
     //   filename: "file.ts",
     //   code: `
-    //     new URL("/hello", new URL("http://example.com"));
+    //     new URL("/hello", new URL("https://example.com"));
     //   `,
     // },
     {
@@ -90,7 +90,7 @@ ruleTester.run('no-partial-url-constructor', noPartialUrlConstructor, {
     {
       filename: 'file.ts',
       code: dedent`
-        new URL("http://example.com", "bar")
+        new URL("https://example.com", "bar")
       `,
       errors: [
         {

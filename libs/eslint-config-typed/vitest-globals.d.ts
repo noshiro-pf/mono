@@ -40,7 +40,6 @@ declare global {
   const onTestFinished: (typeof import('vitest'))['onTestFinished'];
 }
 
-// eslint-disable-next-line unicorn/require-module-specifiers
 export {};
 
 type Constructor<T> = Chai.Constructor<T>;

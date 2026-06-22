@@ -227,7 +227,7 @@ export const eslintRules = {
   'guard-for-in': 'error',
   'id-denylist': withDefaultOption('error'),
   'id-length': 'off', // disabled
-  'id-match': withDefaultOption('error'),
+  'id-match': 'off', // in favor of unicorn/id-match
   'logical-assignment-operators': [
     'error',
     'always',

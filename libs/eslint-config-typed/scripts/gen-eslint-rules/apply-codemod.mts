@@ -109,15 +109,15 @@ export const applyTransformationsToFile = async (
       console.log(`⏭️ ${fileName} - no changes needed`);
 
       return Result.ok('unchanged' as const);
-    } else {
-      // Write back the transformed code
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(filePath, transformedCode, 'utf8');
-
-      console.log(`✅ ${fileName} - transformed`);
-
-      return Result.ok('transformed' as const);
     }
+
+    // Write back the transformed code
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.writeFile(filePath, transformedCode, 'utf8');
+
+    console.log(`✅ ${fileName} - transformed`);
+
+    return Result.ok('transformed' as const);
   } catch (error) {
     console.log(typeof error);
 

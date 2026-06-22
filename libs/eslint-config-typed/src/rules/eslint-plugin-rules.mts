@@ -36,4 +36,5 @@ export const eslintPluginRules = {
   'eslint-plugin/require-test-case-name': withDefaultOption('error'),
   'eslint-plugin/unique-test-case-names': 'error',
   'eslint-plugin/no-matching-violation-suggest-message-ids': 'error',
+  'eslint-plugin/require-test-error-positions': 'error',
 } as const satisfies EslintPluginRules;

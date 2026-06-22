@@ -58,9 +58,9 @@ export const preferArrIsArrayOfLength: TSESLint.RuleModule<
 
         const isLengthOnLeft = isLengthAccess(node.left);
 
-        const lengthSide = isLengthOnLeft ? node.left : node.right;
+        const lengthSide = node[isLengthOnLeft ? 'left' : 'right'];
 
-        const valueSide = isLengthOnLeft ? node.right : node.left;
+        const valueSide = node[isLengthOnLeft ? 'right' : 'left'];
 
         if (!isLengthAccess(lengthSide)) return;
 

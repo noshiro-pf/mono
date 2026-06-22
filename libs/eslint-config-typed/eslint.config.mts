@@ -108,6 +108,37 @@ export default [
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
       'import-x/no-extraneous-dependencies': 'off',
+      // Code-generation scripts legitimately export helpers, await inside
+      // codegen flows, break out of nested loops, and build dynamic strings.
+      'unicorn/no-exports-in-scripts': 'off',
+      'unicorn/no-break-in-nested-loop': 'off',
+      'unicorn/no-unsafe-string-replacement': 'off',
+      'unicorn/prefer-await': 'off',
+      'unicorn/prefer-top-level-await': 'off',
+    }),
+  },
+
+  {
+    // Generated rule-type definitions: comment/format style is produced by the
+    // generator and is not worth (and cannot stay) hand-aligned to these rules.
+    files: ['src/types/rules/**'],
+    rules: defineKnownRules({
+      'unicorn/comment-content': 'off',
+      '@typescript-eslint/consistent-indexed-object-style': 'off',
+    }),
+  },
+
+  {
+    // ESLint rule implementations are AST-heavy; these opinionated rules conflict
+    // with idiomatic visitor/traversal code.
+    files: ['src/plugins/**'],
+    rules: defineKnownRules({
+      'unicorn/no-unsafe-property-key': 'off',
+      'unicorn/no-break-in-nested-loop': 'off',
+      'unicorn/no-declarations-before-early-exit': 'off',
+      'unicorn/no-unsafe-string-replacement': 'off',
+      'unicorn/prefer-number-is-safe-integer': 'off',
+      'unicorn/prefer-early-return': 'off',
     }),
   },
 
@@ -150,6 +181,8 @@ export default [
   {
     files: ['test/**'],
     rules: defineKnownRules({
+      // Test fixtures intentionally contain top-level rendering side effects.
+      'unicorn/no-top-level-side-effects': 'off',
       'ts-restrictions/no-restricted-cast-name': [
         'error',
         {

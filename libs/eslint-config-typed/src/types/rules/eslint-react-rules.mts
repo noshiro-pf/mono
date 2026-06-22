@@ -2378,19 +2378,20 @@ namespace JsxNoLiterals {
    * ```
    */
   export type Options = Readonly<{
-    elementOverrides?: Readonly<
-      Record<
-        string,
-        Readonly<{
-          applyToNestedElements?: boolean;
-          noStrings?: boolean;
-          allowedStrings?: readonly string[];
-          ignoreProps?: boolean;
-          noAttributeStrings?: boolean;
-          [k: string]: unknown;
-        }>
-      >
-    >;
+    elementOverrides?: Readonly<{
+      /**
+       * This interface was referenced by `undefined`'s JSON-Schema definition
+       * via the `patternProperty` "^[A-Z][\w.]*$".
+       */
+      [k: string]: Readonly<{
+        applyToNestedElements?: boolean;
+        noStrings?: boolean;
+        allowedStrings?: readonly string[];
+        ignoreProps?: boolean;
+        noAttributeStrings?: boolean;
+        [k: string]: unknown;
+      }>;
+    }>;
     noStrings?: boolean;
     allowedStrings?: readonly string[];
     ignoreProps?: boolean;
@@ -4617,7 +4618,13 @@ namespace SortComp {
    */
   export type Options = Readonly<{
     order?: readonly string[];
-    groups?: Readonly<Record<string, readonly string[]>>;
+    groups?: Readonly<{
+      /**
+       * This interface was referenced by `undefined`'s JSON-Schema definition
+       * via the `patternProperty` "^.*$".
+       */
+      [k: string]: readonly string[];
+    }>;
   }>;
 
   export type RuleEntry =

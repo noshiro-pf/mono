@@ -10,7 +10,6 @@ import { noop } from './noop.mjs';
 
   noop(a, b);
 
-  // eslint-disable-next-line unicorn/consistent-destructuring
   noop(obj.c);
 }
 
@@ -27,7 +26,6 @@ import { noop } from './noop.mjs';
 
   noop(a, b);
 
-  // eslint-disable-next-line unicorn/consistent-destructuring
   noop(obj.c);
 }
 

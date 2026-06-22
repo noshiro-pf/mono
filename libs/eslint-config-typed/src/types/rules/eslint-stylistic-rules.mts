@@ -7178,7 +7178,13 @@ namespace NoMultiSpaces {
    * ```
    */
   export type Options = Readonly<{
-    exceptions?: Readonly<Record<string, boolean>>;
+    exceptions?: Readonly<{
+      /**
+       * This interface was referenced by `undefined`'s JSON-Schema definition
+       * via the `patternProperty` "^([A-Z][a-z]*)+$".
+       */
+      [k: string]: boolean;
+    }>;
     ignoreEOLComments?: boolean;
     includeTabs?: boolean;
   }>;

@@ -119,7 +119,7 @@ export const eslintReactRules = {
   'react/no-typos': 'error',
   'react/no-unescaped-entities': withDefaultOption('error'),
 
-  // Allow css prop for @emotion/react
+  // Allow CSS prop for @emotion/react
   'react/no-unknown-property': ['error', { ignore: ['css'] }],
 
   'react/no-unsafe': withDefaultOption('error'),

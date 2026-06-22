@@ -471,9 +471,13 @@ namespace Extensions {
     | readonly [
         'always' | 'ignorePackages' | 'never',
         Readonly<{
-          pattern?: Readonly<
-            Record<string, 'always' | 'ignorePackages' | 'never'>
-          >;
+          pattern?: Readonly<{
+            /**
+             * This interface was referenced by `undefined`'s JSON-Schema definition
+             * via the `patternProperty` ".*".
+             */
+            [k: string]: 'always' | 'ignorePackages' | 'never';
+          }>;
           ignorePackages?: boolean;
           checkTypeImports?: boolean;
           pathGroupOverrides?: readonly Readonly<{
@@ -487,9 +491,13 @@ namespace Extensions {
       ]
     | readonly [
         Readonly<{
-          pattern?: Readonly<
-            Record<string, 'always' | 'ignorePackages' | 'never'>
-          >;
+          pattern?: Readonly<{
+            /**
+             * This interface was referenced by `undefined`'s JSON-Schema definition
+             * via the `patternProperty` ".*".
+             */
+            [k: string]: 'always' | 'ignorePackages' | 'never';
+          }>;
           ignorePackages?: boolean;
           checkTypeImports?: boolean;
           pathGroupOverrides?: readonly Readonly<{
@@ -503,10 +511,22 @@ namespace Extensions {
       ]
     | readonly [
         'always' | 'ignorePackages' | 'never',
-        Readonly<Record<string, 'always' | 'ignorePackages' | 'never'>>,
+        Readonly<{
+          /**
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` ".*".
+           */
+          [k: string]: 'always' | 'ignorePackages' | 'never';
+        }>,
       ]
     | readonly [
-        Readonly<Record<string, 'always' | 'ignorePackages' | 'never'>>,
+        Readonly<{
+          /**
+           * This interface was referenced by `undefined`'s JSON-Schema definition
+           * via the `patternProperty` ".*".
+           */
+          [k: string]: 'always' | 'ignorePackages' | 'never';
+        }>,
       ];
 
   export type RuleEntry =

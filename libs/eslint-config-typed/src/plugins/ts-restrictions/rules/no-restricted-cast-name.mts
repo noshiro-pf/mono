@@ -187,15 +187,15 @@ export const noRestrictedCastName: TSESLint.RuleModule<MessageIds, Options> = {
             node as TSESTree.Node,
             `${expressionText} as ${fixWith.name}`,
           );
-      } else {
-        // kind === 'function'
-        return (fixer) =>
-          fixer.replaceText(
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            node as TSESTree.Node,
-            `${fixWith.name}(${expressionText})`,
-          );
       }
+
+      // kind === 'function'
+      return (fixer) =>
+        fixer.replaceText(
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+          node as TSESTree.Node,
+          `${fixWith.name}(${expressionText})`,
+        );
     };
 
     return {

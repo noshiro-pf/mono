@@ -332,7 +332,7 @@ ruleTester.run(
         `,
       },
       // multiple call signatures, recursive
-      // TODO fix stack overflow properly instead of just terminating iteration arbitrarily
+      // TODO fix Stack Overflow properly instead of just terminating iteration arbitrarily
       {
         filename: 'file.ts',
         code: dedent`
