@@ -1,3 +1,9 @@
+# [5.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.0.0...v5.1.0) (2026-06-23)
+
+### Features
+
+- create ts-data-forge/no-unnecessary-type-guard, prefer-comparison-over-nullish-guard rule ([#351](https://github.com/noshiro-pf/eslint-config-typed/issues/351)) ([7f79af8](https://github.com/noshiro-pf/eslint-config-typed/commit/7f79af8704efcd79fdeb2b0f69a67b8175788af9))
+
 # [5.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.10.0...v5.0.0) (2026-06-22)
 
 ### Features
