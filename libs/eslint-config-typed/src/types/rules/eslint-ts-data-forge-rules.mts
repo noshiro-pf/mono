@@ -1,6 +1,12 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
 
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
+
 /**
  * @description Replace `xs.length >= n` with `Arr.isArrayAtLeastLength(xs, n)` from ts-data-forge.
  *
@@ -136,6 +142,67 @@ namespace PreferIsRecordAndHasKey {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Detect ts-data-forge type guard calls that perform no narrowing (the argument type already satisfies, or can never satisfy, the guard).
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoUnnecessaryTypeGuard {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignore": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "description": "Names of ts-data-forge guard functions to skip checking."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Names of ts-data-forge guard functions to skip checking.
+     */
+    ignore?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Prefer a direct `=== null` / `!== undefined` comparison over calling `isNull`, `isNotNull`, `isUndefined`, or `isNotUndefined` with an explicit argument (those guards are intended for point-free use such as `xs.filter(isNotUndefined)`).
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferComparisonOverNullishGuard {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-arr-is-array-at-least-length': PreferArrIsArrayAtLeastLength.RuleEntry;
   'ts-data-forge/prefer-arr-is-array-of-length': PreferArrIsArrayOfLength.RuleEntry;
@@ -146,4 +213,10 @@ export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-is-non-null-object': PreferIsNonNullObject.RuleEntry;
   'ts-data-forge/prefer-range-for-loop': PreferRangeForLoop.RuleEntry;
   'ts-data-forge/prefer-is-record-and-has-key': PreferIsRecordAndHasKey.RuleEntry;
+  'ts-data-forge/no-unnecessary-type-guard': NoUnnecessaryTypeGuard.RuleEntry;
+  'ts-data-forge/prefer-comparison-over-nullish-guard': PreferComparisonOverNullishGuard.RuleEntry;
+}>;
+
+export type EslintTsDataForgeRulesOption = Readonly<{
+  'ts-data-forge/no-unnecessary-type-guard': NoUnnecessaryTypeGuard.Options;
 }>;
