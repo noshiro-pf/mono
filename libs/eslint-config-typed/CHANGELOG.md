@@ -1,3 +1,9 @@
+## [5.1.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.0...v5.1.1) (2026-06-23)
+
+### Bug Fixes
+
+- fix new eslint-unicorn-rules ([#352](https://github.com/noshiro-pf/eslint-config-typed/issues/352)) ([72ed6ca](https://github.com/noshiro-pf/eslint-config-typed/commit/72ed6ca9e4971d40c2d5dbb6c3fee2841a4a33d0))
+
 # [5.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.0.0...v5.1.0) (2026-06-23)
 
 ### Features
