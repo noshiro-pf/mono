@@ -1,3 +1,9 @@
+## [5.1.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.1...v5.1.2) (2026-06-24)
+
+### Bug Fixes
+
+- disable unicorn/no-unsafe-property-key ([#353](https://github.com/noshiro-pf/eslint-config-typed/issues/353)) ([b635e85](https://github.com/noshiro-pf/eslint-config-typed/commit/b635e85515adb66f08daeddc9720632a73fb7d1f))
+
 ## [5.1.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.0...v5.1.1) (2026-06-23)
 
 ### Bug Fixes
