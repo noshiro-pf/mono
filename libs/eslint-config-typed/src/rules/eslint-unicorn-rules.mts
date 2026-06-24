@@ -260,7 +260,10 @@ export const eslintUnicornRules = {
   'unicorn/no-unnecessary-splice': 'error',
   'unicorn/no-unreadable-new-expression': 'error',
   'unicorn/no-unreadable-object-destructuring': 'error',
-  'unicorn/no-unsafe-property-key': 'error',
+
+  // This rule is turned off because it doesn't work with branded types.
+  'unicorn/no-unsafe-property-key': 'off',
+
   'unicorn/no-unsafe-string-replacement': 'error',
   'unicorn/no-unused-array-method-return': 'error',
   'unicorn/no-useless-boolean-cast': 'error',
