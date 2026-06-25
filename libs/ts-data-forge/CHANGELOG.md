@@ -1,3 +1,9 @@
+# [6.13.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.12.0...v6.13.0) (2026-06-25)
+
+### Features
+
+- add Num.safeParseFloat for strict number parsing ([#397](https://github.com/noshiro-pf/ts-data-forge/issues/397)) ([71cd2e4](https://github.com/noshiro-pf/ts-data-forge/commit/71cd2e41c65f419e732c1341b7fe2e71f3099c61))
+
 # [6.12.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.11.0...v6.12.0) (2026-06-25)
 
 ### Features
