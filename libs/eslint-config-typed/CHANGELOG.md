@@ -1,3 +1,9 @@
+## [5.1.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.2...v5.1.3) (2026-06-25)
+
+### Bug Fixes
+
+- disable unicorn/no-top-level-side-effects ([#354](https://github.com/noshiro-pf/eslint-config-typed/issues/354)) ([f00a180](https://github.com/noshiro-pf/eslint-config-typed/commit/f00a1809cdf213ebbdb6354aa2f0d5e9be0ea1c8))
+
 ## [5.1.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.1...v5.1.2) (2026-06-24)
 
 ### Bug Fixes
