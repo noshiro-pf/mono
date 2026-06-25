@@ -16,6 +16,7 @@ import {
   type UnknownBrand,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
+import { Result } from '../functional/index.mjs';
 import { type SmallPositiveInt } from '../types.mjs';
 
 /**
@@ -51,6 +52,83 @@ export namespace Num {
    * @returns The numeric representation of `n`.
    */
   export const from: (n: unknown) => number = Number;
+
+  /**
+   * Safely parses a base-10 integer from a string, returning a {@link Result}
+   * that is `Ok<Int>` for valid input and `Err<Error>` otherwise.
+   *
+   * This is a stricter alternative to both `parseInt` and `Number`:
+   *
+   * - Unlike `parseInt('12abc', 10)` (which returns `12`), trailing
+   *   non-numeric characters make the whole input invalid and yield `Err`.
+   * - Unlike `Number('')` / `Number('   ')` (which return `0`), empty or
+   *   whitespace-only input yields `Err`.
+   *
+   * The empty-string case is rejected by delegating to `parseInt` (which
+   * returns `NaN` there) rather than hard-coding a check, while the trailing-
+   * garbage case is rejected via `Number`. Valid input is truncated toward
+   * zero, so `'12.9'` becomes `12` and `'-3.5'` becomes `-3`.
+   *
+   * Only base 10 is supported. Use `Result.unwrapOk` (optionally with a
+   * `?? Number.NaN` fallback) or `Result.unwrapOkOr` to get a plain number
+   * back.
+   *
+   * @example
+   *
+   * ```ts
+   * assert.strictEqual(
+   *   Result.unwrapOkOr(Num.safeParseInt('123'), Number.NaN),
+   *   123,
+   * );
+   *
+   * assert.strictEqual(
+   *   Result.unwrapOkOr(Num.safeParseInt('12.9'), Number.NaN),
+   *   12,
+   * );
+   *
+   * assert.strictEqual(
+   *   Result.unwrapOkOr(Num.safeParseInt('-12.9'), Number.NaN),
+   *   -12,
+   * );
+   *
+   * assert.strictEqual(Number.parseInt('-12.9', 10), -12);
+   *
+   * // Native `parseInt` ignores trailing non-numeric characters
+   *
+   * assert.strictEqual(Number.parseInt('123abc', 10), 123);
+   *
+   * assert.isTrue(Number.isNaN(Number('123abc')));
+   *
+   * assert.isTrue(Result.isErr(Num.safeParseInt('123abc')));
+   *
+   * // Whitespace is not a valid integer, so we return an error instead of coercing to 0.
+   *
+   * assert.isTrue(Number.isNaN(Number.parseInt('  ', 10)));
+   *
+   * assert.strictEqual(Number('  '), 0); // Native `Number` coerces whitespace to 0
+   *
+   * assert.isTrue(Result.isErr(Num.safeParseInt('')));
+   *
+   * assert.strictEqual(Result.unwrapOk(Num.safeParseInt('  ')), undefined);
+   * ```
+   *
+   * @param s The string to parse.
+   * @returns `Result.ok(parsedInt)` for valid input, otherwise `Result.err`
+   *   wrapping an `Error` describing the invalid input.
+   */
+  export const safeParseInt = (s: string): Result<Int, Error> => {
+    const viaNumber = Number(s);
+
+    // `Number('')` / `Number('   ')` は 0 を返すが、`parseInt` は NaN を返す。
+    // 末尾不正文字 ('12abc' 等) は `Number` 側が NaN にするので、両者が共に
+    // 有効な場合のみ採用することで空文字・空白のみ・末尾不正をまとめて弾く。
+    return Number.isNaN(viaNumber) || Number.isNaN(Number.parseInt(s, 10))
+      ? Result.err(
+          new Error(`safeParseInt: "${s}" is not a valid base-10 integer`),
+        )
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion, ts-data-forge/prefer-as-int
+        Result.ok(Math.trunc(viaNumber) as Int);
+  };
 
   /**
    * Type guard that checks if a number is non-zero.

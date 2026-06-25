@@ -1,6 +1,6 @@
 import { type NonZeroNumber } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
-import { pipe } from '../functional/index.mjs';
+import { pipe, Result } from '../functional/index.mjs';
 import { asNonZeroFiniteNumber } from './branded-types/index.mjs';
 import { Num } from './num.mjs';
 
@@ -129,6 +129,64 @@ describe('Num test', () => {
       expect(Num.from(true)).toBe(1);
 
       expect(Num.from(false)).toBe(0);
+    });
+  });
+
+  describe('safeParseInt', () => {
+    test('parses valid integer strings into Ok', () => {
+      expect(Result.unwrapOk(Num.safeParseInt('123'))).toBe(123);
+
+      expect(Result.unwrapOk(Num.safeParseInt('-42'))).toBe(-42);
+
+      expect(Result.unwrapOk(Num.safeParseInt('+7'))).toBe(7);
+
+      expect(Result.unwrapOk(Num.safeParseInt('0'))).toBe(0);
+
+      expect(Result.unwrapOk(Num.safeParseInt('  12  '))).toBe(12);
+    });
+
+    test('truncates non-integer numeric strings toward zero', () => {
+      expect(Result.unwrapOk(Num.safeParseInt('12.9'))).toBe(12);
+
+      expect(Result.unwrapOk(Num.safeParseInt('-3.5'))).toBe(-3);
+
+      expect(Result.unwrapOk(Num.safeParseInt('1e3'))).toBe(1000);
+    });
+
+    test('rejects trailing non-numeric characters (unlike parseInt)', () => {
+      assert.isTrue(Result.isErr(Num.safeParseInt('123abc')));
+
+      assert.isTrue(Result.isErr(Num.safeParseInt('12px')));
+
+      assert.isTrue(Result.isErr(Num.safeParseInt('abc')));
+    });
+
+    test('rejects empty / whitespace-only input (unlike Number)', () => {
+      assert.isTrue(Result.isErr(Num.safeParseInt('')));
+
+      assert.isTrue(Result.isErr(Num.safeParseInt('   ')));
+    });
+
+    test('rejects non-finite words', () => {
+      assert.isTrue(Result.isErr(Num.safeParseInt('Infinity')));
+
+      assert.isTrue(Result.isErr(Num.safeParseInt('NaN')));
+    });
+
+    test('the Err carries a descriptive Error', () => {
+      const result = Num.safeParseInt('nope');
+
+      assert.isTrue(Result.isErr(result));
+
+      if (Result.isErr(result)) {
+        expect(Result.unwrapErr(result)).toBeInstanceOf(Error);
+      }
+    });
+
+    test('composes with Result.unwrapOk + nullish fallback', () => {
+      expect(Result.unwrapOk(Num.safeParseInt('42')) ?? Number.NaN).toBe(42);
+
+      expect(Result.unwrapOk(Num.safeParseInt('')) ?? Number.NaN).toBeNaN();
     });
   });
 
