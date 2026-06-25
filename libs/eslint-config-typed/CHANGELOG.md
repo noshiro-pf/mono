@@ -1,3 +1,9 @@
+# [5.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.2.0...v5.3.0) (2026-06-25)
+
+### Features
+
+- create ts-data-forge/prefer-num-safe-parse-float rule ([#356](https://github.com/noshiro-pf/eslint-config-typed/issues/356)) ([32bac9f](https://github.com/noshiro-pf/eslint-config-typed/commit/32bac9fc5c8f4360f435057e892c5a5161d529da))
+
 # [5.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.3...v5.2.0) (2026-06-25)
 
 ### Features
