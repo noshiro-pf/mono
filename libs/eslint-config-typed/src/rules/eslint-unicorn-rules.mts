@@ -253,7 +253,10 @@ export const eslintUnicornRules = {
   'unicorn/no-return-array-push': 'error',
   'unicorn/no-subtraction-comparison': 'error',
   'unicorn/no-this-outside-of-class': 'error',
-  'unicorn/no-top-level-side-effects': 'error',
+
+  // Disabled to allow expectType type checking
+  'unicorn/no-top-level-side-effects': 'off',
+
   'unicorn/no-undeclared-class-members': 'error',
   'unicorn/no-unnecessary-global-this': 'error',
   'unicorn/no-unnecessary-nested-ternary': 'error',

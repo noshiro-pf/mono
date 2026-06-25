@@ -182,20 +182,15 @@ describe('no-unnecessary-type-guard', () => {
       },
       {
         name: 'isNonEmptyString on a NonEmptyString value (always true)',
-        // Structurally identical to ts-type-forge's `Brand<string, 'NonEmptyString'>`.
         code: dedent`
+          import { type NonEmptyString } from 'ts-type-forge';
           import { isNonEmptyString } from 'ts-data-forge';
-          type NonEmptyString = string & { readonly NonEmptyString: true } & {
-            readonly 'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-          };
           declare const x: NonEmptyString;
           const y = isNonEmptyString(x);
         `,
         output: dedent`
+          import { type NonEmptyString } from 'ts-type-forge';
           import { isNonEmptyString } from 'ts-data-forge';
-          type NonEmptyString = string & { readonly NonEmptyString: true } & {
-            readonly 'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-          };
           declare const x: NonEmptyString;
           const y = true;
         `,
@@ -341,18 +336,14 @@ describe('no-unnecessary-type-guard', () => {
       {
         name: 'isNonEmptyString that only removes nullish -> isNonNullish',
         code: dedent`
+          import { type NonEmptyString } from 'ts-type-forge';
           import { isNonEmptyString, isNonNullish } from 'ts-data-forge';
-          type NonEmptyString = string & { readonly NonEmptyString: true } & {
-            readonly 'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-          };
           declare const x: NonEmptyString | null | undefined;
           const y = isNonEmptyString(x);
         `,
         output: dedent`
+          import { type NonEmptyString } from 'ts-type-forge';
           import { isNonEmptyString, isNonNullish } from 'ts-data-forge';
-          type NonEmptyString = string & { readonly NonEmptyString: true } & {
-            readonly 'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-          };
           declare const x: NonEmptyString | null | undefined;
           const y = isNonNullish(x);
         `,
