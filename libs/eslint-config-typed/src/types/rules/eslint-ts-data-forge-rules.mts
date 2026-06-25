@@ -143,6 +143,21 @@ namespace PreferIsRecordAndHasKey {
 }
 
 /**
+ * @description Replace `parseInt(x, 10)` with `Result.unwrapOkOr(Num.safeParseInt(x), Number.NaN)` from ts-data-forge.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferNumSafeParseInt {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Detect ts-data-forge type guard calls that perform no narrowing (the argument type already satisfies, or can never satisfy, the guard).
  *
  *  ```md
@@ -213,6 +228,7 @@ export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-is-non-null-object': PreferIsNonNullObject.RuleEntry;
   'ts-data-forge/prefer-range-for-loop': PreferRangeForLoop.RuleEntry;
   'ts-data-forge/prefer-is-record-and-has-key': PreferIsRecordAndHasKey.RuleEntry;
+  'ts-data-forge/prefer-num-safe-parse-int': PreferNumSafeParseInt.RuleEntry;
   'ts-data-forge/no-unnecessary-type-guard': NoUnnecessaryTypeGuard.RuleEntry;
   'ts-data-forge/prefer-comparison-over-nullish-guard': PreferComparisonOverNullishGuard.RuleEntry;
 }>;

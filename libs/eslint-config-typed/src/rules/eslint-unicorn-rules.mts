@@ -306,7 +306,13 @@ export const eslintUnicornRules = {
   // This rule is disabled because it would require the container to be directly included in the React hooks dependencies.
   'unicorn/prefer-minimal-ternary': 'off',
 
-  'unicorn/prefer-number-coercion': 'error',
+  // Disabled in favor of `ts-data-forge/prefer-num-safe-parse-int`, which
+  // rewrites `parseInt(x, 10)` to `Num.safeParseInt(x)` instead of
+  // `Math.trunc(Number(x))`. The latter is hard to read and silently changes
+  // parsing semantics (e.g. `Number('')` is `0` whereas `parseInt('', 10)` is
+  // `NaN`).
+  'unicorn/prefer-number-coercion': 'off',
+
   'unicorn/prefer-number-is-safe-integer': 'error',
   'unicorn/prefer-object-define-properties': 'error',
   'unicorn/prefer-object-destructuring-defaults': 'error',
