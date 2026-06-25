@@ -1,3 +1,9 @@
+# [5.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.3...v5.2.0) (2026-06-25)
+
+### Features
+
+- create ts-data-forge/prefer-num-safe-parse-int rule ([#355](https://github.com/noshiro-pf/eslint-config-typed/issues/355)) ([3de79b2](https://github.com/noshiro-pf/eslint-config-typed/commit/3de79b29762e5ed75cc4df3502b9924a0e87a531))
+
 ## [5.1.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.2...v5.1.3) (2026-06-25)
 
 ### Bug Fixes
