@@ -1,3 +1,9 @@
+# [6.12.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.11.0...v6.12.0) (2026-06-25)
+
+### Features
+
+- add Num.safeParseInt for strict base-10 integer parsing ([#396](https://github.com/noshiro-pf/ts-data-forge/issues/396)) ([af543ec](https://github.com/noshiro-pf/ts-data-forge/commit/af543eca5c2b23a15267aa68e82686d49584bf6f))
+
 # [6.11.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.10.0...v6.11.0) (2026-06-22)
 
 ### Features
