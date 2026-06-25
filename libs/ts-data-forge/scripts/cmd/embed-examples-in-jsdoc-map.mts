@@ -735,6 +735,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: [
       'samples/src/number/num-from-example.mts',
       'samples/src/number/num-safe-parse-int.mts',
+      'samples/src/number/num-safe-parse-float.mts',
       'samples/src/number/num-is-non-zero-example.mts',
       'samples/src/number/num-is-non-negative-example.mts',
       'samples/src/number/num-is-positive-example.mts',

@@ -190,6 +190,68 @@ describe('Num test', () => {
     });
   });
 
+  describe('safeParseFloat', () => {
+    test('parses valid numeric strings into Ok', () => {
+      expect(Result.unwrapOk(Num.safeParseFloat('123'))).toBe(123);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('-42'))).toBe(-42);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('+7'))).toBe(7);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('0'))).toBe(0);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('  12  '))).toBe(12);
+    });
+
+    test('preserves decimal values', () => {
+      expect(Result.unwrapOk(Num.safeParseFloat('12.9'))).toBe(12.9);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('-3.5'))).toBe(-3.5);
+
+      expect(Result.unwrapOk(Num.safeParseFloat('1e3'))).toBe(1000);
+    });
+
+    test('rejects trailing non-numeric characters (unlike parseFloat)', () => {
+      assert.isTrue(Result.isErr(Num.safeParseFloat('123abc')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('12px')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('abc')));
+    });
+
+    test('rejects empty / whitespace-only input (unlike Number)', () => {
+      assert.isTrue(Result.isErr(Num.safeParseFloat('')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('   ')));
+    });
+
+    test('rejects non-finite values', () => {
+      assert.isTrue(Result.isErr(Num.safeParseFloat('Infinity')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('-Infinity')));
+
+      assert.isTrue(Result.isErr(Num.safeParseFloat('NaN')));
+    });
+
+    test('the Err carries a descriptive Error', () => {
+      const result = Num.safeParseFloat('nope');
+
+      assert.isTrue(Result.isErr(result));
+
+      if (Result.isErr(result)) {
+        expect(Result.unwrapErr(result)).toBeInstanceOf(Error);
+      }
+    });
+
+    test('composes with Result.unwrapOk + nullish fallback', () => {
+      expect(Result.unwrapOk(Num.safeParseFloat('3.14')) ?? Number.NaN).toBe(
+        3.14,
+      );
+
+      expect(Result.unwrapOk(Num.safeParseFloat('')) ?? Number.NaN).toBeNaN();
+    });
+  });
+
   describe('isInRange', () => {
     test('checks range (lower inclusive, upper exclusive)', () => {
       const inRange = Num.isInRange(0, 10);

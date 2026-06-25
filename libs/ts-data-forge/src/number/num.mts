@@ -1,5 +1,6 @@
 import {
   type Decrement,
+  type FiniteNumber,
   type Increment,
   type Index,
   type Int,
@@ -128,6 +129,86 @@ export namespace Num {
         )
       : // eslint-disable-next-line total-functions/no-unsafe-type-assertion, ts-data-forge/prefer-as-int
         Result.ok(Math.trunc(viaNumber) as Int);
+  };
+
+  /**
+   * Safely parses a finite floating-point number from a string, returning a
+   * {@link Result} that is `Ok<FiniteNumber>` for valid input and `Err<Error>`
+   * otherwise.
+   *
+   * This is a stricter alternative to both `parseFloat` and `Number`:
+   *
+   * - Unlike `parseFloat('12abc')` (which returns `12`), trailing non-numeric
+   *   characters make the whole input invalid and yield `Err`.
+   * - Unlike `Number('')` / `Number('   ')` (which return `0`), empty or
+   *   whitespace-only input yields `Err`.
+   * - Unlike `Number('Infinity')` (which returns `Infinity`), non-finite values
+   *   yield `Err`.
+   *
+   * The empty-string case is rejected by delegating to `parseFloat` (which
+   * returns `NaN` there) rather than hard-coding a check, while the trailing-
+   * garbage case is rejected via `Number`. Decimal values are preserved as-is,
+   * so `'12.9'` stays `12.9`.
+   *
+   * Use `Result.unwrapOk` (optionally with a `?? Number.NaN` fallback) or
+   * `Result.unwrapOkOr` to get a plain number back.
+   *
+   * @example
+   *
+   * ```ts
+   * assert.strictEqual(
+   *   Result.unwrapOkOr(Num.safeParseFloat('12.9'), Number.NaN),
+   *   12.9,
+   * );
+   *
+   * assert.strictEqual(
+   *   Result.unwrapOkOr(Num.safeParseFloat('-3.5'), Number.NaN),
+   *   -3.5,
+   * );
+   *
+   * assert.strictEqual(
+   *   Result.unwrapOkOr(Num.safeParseFloat('1e3'), Number.NaN),
+   *   1000,
+   * );
+   *
+   * // Native `parseFloat` ignores trailing non-numeric characters
+   *
+   * assert.strictEqual(Number.parseFloat('12px'), 12);
+   *
+   * assert.isTrue(Result.isErr(Num.safeParseFloat('12px')));
+   *
+   * // Whitespace is not a valid number, so we return an error instead of coercing to 0.
+   *
+   * assert.isTrue(Result.isErr(Num.safeParseFloat('')));
+   *
+   * assert.isTrue(Result.isErr(Num.safeParseFloat('   ')));
+   *
+   * // Infinity and NaN are not finite, so they are rejected.
+   *
+   * assert.isTrue(Result.isErr(Num.safeParseFloat('Infinity')));
+   *
+   * assert.isTrue(Result.isErr(Num.safeParseFloat('NaN')));
+   * ```
+   *
+   * @param s The string to parse.
+   * @returns `Result.ok(parsedFloat)` for valid finite input, otherwise
+   *   `Result.err` wrapping an `Error` describing the invalid input.
+   */
+  export const safeParseFloat = (s: string): Result<FiniteNumber, Error> => {
+    const viaNumber = Number(s);
+
+    // `Number('')` / `Number('   ')` は 0 を返すが、`parseFloat` は NaN を返す。
+    // 末尾不正文字 ('12abc' 等) は `Number` 側が NaN にするので、両者が共に
+    // 非 NaN かつ有限の場合のみ採用することで空文字・空白のみ・末尾不正・
+    // Infinity をまとめて弾く。
+    return Number.isNaN(viaNumber) ||
+      !Number.isFinite(viaNumber) ||
+      Number.isNaN(Number.parseFloat(s))
+      ? Result.err(
+          new Error(`safeParseFloat: "${s}" is not a valid finite number`),
+        )
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion, ts-data-forge/prefer-as-int
+        Result.ok(viaNumber as FiniteNumber);
   };
 
   /**
