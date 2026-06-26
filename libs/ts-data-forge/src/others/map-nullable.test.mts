@@ -143,10 +143,9 @@ describe(mapNullable, () => {
 
       const toUpperCase = mapNullable((s: string) => s.toUpperCase());
 
-      const result = pipe(42 as number | null)
-        .map(toStr)
-        .map(addPrefix)
-        .map(toUpperCase).value;
+      const x = 42 as number | null;
+
+      const result = pipe(x).map(toStr).map(addPrefix).map(toUpperCase).value;
 
       expect(result).toBe('NUMBER: 42');
     });

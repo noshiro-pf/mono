@@ -1,4 +1,4 @@
-import { type MergeIntersection } from 'ts-type-forge';
+import { expectType } from '../expect-type.mjs';
 import { Optional, type UnknownOptional } from './optional/index.mjs';
 
 /**
@@ -19,36 +19,71 @@ import { Optional, type UnknownOptional } from './optional/index.mjs';
  * @param a The initial value to wrap in a pipe.
  * @returns A pipe object with chaining methods appropriate for the value type.
  */
-export function pipe<const A extends UnknownOptional>(
-  a: A,
-): PipeWithMapOptional<A>;
+export const pipe = <const A,>(a: A): Pipe<A> =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  ({
+    value: a,
+    map: (fn) => pipe(fn(a)),
+    mapNullable: (fn) => pipe(a == null ? undefined : fn(a)),
 
-export function pipe<const A>(a: A): PipeBase<A>;
+    ...(Optional.isOptional(a)
+      ? {
+          mapOptional: (fn) => pipe(Optional.map(a, fn)),
+        }
+      : {}),
+  }) satisfies PipeImpl<A> as unknown as Pipe<A>;
 
-export function pipe<const A>(a: A): PipeImpl<A> {
-  if (Optional.isOptional(a)) {
-    return {
-      value: a,
-      map: (fn) => pipe(fn(a)),
-      mapOptional: (fn) => pipe(Optional.map(a, fn)),
-    };
-  } else {
-    return {
-      value: a,
-      map: (fn) => pipe(fn(a)),
-      mapNullable: (fn) => pipe(a == null ? undefined : fn(a)),
-    };
-  }
-}
+// `PipeBase<A>` is always present; the conditional only *adds* `mapOptional`
+// for Optional values. Two subtleties motivate this shape:
+//
+//   1. The check is `[A] extends [UnknownOptional]` (a 1-tuple), not the bare
+//      `A extends UnknownOptional`. A bare check distributes over unions, so a
+//      piped union value such as `Result<D, E> | undefined` would expand into
+//      `Pipe<Ok<D>> | Pipe<Err<E>> | Pipe<undefined>`. Calling a chained method
+//      on that union of pipe objects forces TypeScript to synthesize a merged
+//      call signature, during which a branded member like `Ok<D>` is widened to
+//      its constraint (`Ok<number>`) — losing the brand `D`.
+//
+//   2. `value: A` lives on `PipeBase<A>`, *outside* the conditional. If `value`
+//      flowed through the conditional, then for a not-yet-resolved generic `A`
+//      the deferred true branch narrows `A` to `A & UnknownOptional`, so
+//      `.value` would surface as the noisy `(A & UnknownOptional) | A`. Keeping
+//      it on the unconditional base yields a clean `A`.
+// transformer-ignore-next-line convert-to-readonly
+export type Pipe<A> = PipeBase<A> &
+  PipeMapNullable<A> &
+  ([A] extends [UnknownOptional] ? PipeMapOptional<A> : unknown);
 
-type Pipe<A> = A extends UnknownOptional ? PipeWithMapOptional<A> : PipeBase<A>;
+// NOTE: 以下では 'typing when used with generics' test で型エラーが出る。
+// 詳細は documents/reports/pipe-typing.md の 「mapNullable を条件付きで含めるのがうまくいかない理由」を参照。
+// export type Pipe<A> = PipeBase<A> &
+//   ([A] extends [UnknownOptional] ? PipeMapOptional<A> : unknown) &
+//   ([undefined] extends [A] ? PipeMapNullable<A> : unknown) &
+//   ([null] extends [A] ? PipeMapNullable<A> : unknown);
 
-/**
- * @template A The type of the current value in the pipe.
- * @internal
- * Base pipe interface providing core functionality.
- * All pipe types extend this interface.
- */
+expectType<Optional<number>, UnknownOptional>('<=');
+
+expectType<number | undefined, undefined>('>=');
+
+expectType<keyof Pipe<number | undefined>, 'value' | 'map' | 'mapNullable'>(
+  '=',
+);
+
+expectType<
+  keyof Pipe<Optional<number>>,
+  'value' | 'map' | 'mapNullable' | 'mapOptional'
+>('=');
+
+expectType<
+  keyof Pipe<Optional<number | undefined>>,
+  'value' | 'map' | 'mapNullable' | 'mapOptional'
+>('=');
+
+expectType<
+  keyof Pipe<Optional<number> | undefined>,
+  'value' | 'map' | 'mapNullable'
+>('=');
+
 type PipeBase<A> = Readonly<{
   /** The current value being piped. */
   value: A;
@@ -71,7 +106,9 @@ type PipeBase<A> = Readonly<{
    * @returns A new pipe containing the transformed value.
    */
   map: <B>(fn: (a: A) => B) => Pipe<B>;
+}>;
 
+type PipeMapNullable<A> = Readonly<{
   /**
    * Maps the current value only if it's not null or undefined. If the current
    * value is null/undefined, the transformation is skipped and undefined is
@@ -100,56 +137,45 @@ type PipeBase<A> = Readonly<{
   mapNullable: <B>(fn: (a: NonNullable<A>) => B) => Pipe<B | undefined>;
 }>;
 
-/**
- * @template A The Optional type currently in the pipe.
- * @internal
- * Pipe interface for Optional values, providing Optional-aware mapping.
- * Extends PipeBase with mapOptional functionality for monadic operations.
- */
-type PipeWithMapOptional<A extends UnknownOptional> = MergeIntersection<
-  PipeBase<A> &
-    Readonly<{
-      /**
-       * Maps the value inside an Optional using Optional.map semantics. If the
-       * Optional is None, the transformation is skipped and None is propagated.
-       * If the Optional is Some, the transformation is applied to the inner
-       * value.
-       *
-       * @example
-       *
-       * ```ts
-       * const result = pipe(Optional.some(10))
-       *   .mapOptional((value) => value * 2)
-       *   .mapOptional((value) => value + 5);
-       *
-       * assert.deepStrictEqual(result.value, Optional.some(25));
-       *
-       * const empty = pipe(Optional.none as Optional<number>).mapOptional(
-       *   (value) => value * 2,
-       * );
-       *
-       * assert.isTrue(Optional.isNone(empty.value));
-       * ```
-       *
-       * @template B The type of the transformed inner value.
-       * @param fn Function to transform the inner value of the Optional.
-       * @returns A new pipe containing an Optional with the transformed value.
-       */
-      mapOptional: <B>(fn: (a: Optional.Unwrap<A>) => B) => Pipe<Optional<B>>;
-    }>
->;
+type PipeMapOptional<A extends UnknownOptional> = Readonly<{
+  /**
+   * Maps the value inside an Optional using Optional.map semantics. If the
+   * Optional is None, the transformation is skipped and None is propagated.
+   * If the Optional is Some, the transformation is applied to the inner
+   * value.
+   *
+   * @example
+   *
+   * ```ts
+   * const result = pipe(Optional.some(10))
+   *   .mapOptional((value) => value * 2)
+   *   .mapOptional((value) => value + 5);
+   *
+   * assert.deepStrictEqual(result.value, Optional.some(25));
+   *
+   * const empty = pipe(Optional.none as Optional<number>).mapOptional(
+   *   (value) => value * 2,
+   * );
+   *
+   * assert.isTrue(Optional.isNone(empty.value));
+   * ```
+   *
+   * @template B The type of the transformed inner value.
+   * @param fn Function to transform the inner value of the Optional.
+   * @returns A new pipe containing an Optional with the transformed value.
+   */
+  mapOptional: <B>(fn: (a: Optional.Unwrap<A>) => B) => Pipe<Optional<B>>;
+}>;
 
 /** @internal */
 type Cast<T, U> = T & U;
 
 /** @internal */
-type PipeImpl<A> = Partial<
-  Readonly<{
-    value: A;
-    map: <B>(fn: (a: A) => B) => PipeBase<B>;
-    mapNullable: <B>(fn: (a: NonNullable<A>) => B) => PipeBase<B | undefined>;
-    mapOptional: <B>(
-      fn: (a: Optional.Unwrap<Cast<A, UnknownOptional>>) => B,
-    ) => PipeBase<Optional<B>>;
-  }>
->;
+type PipeImpl<A> = Readonly<{
+  value: A;
+  map: <B>(fn: (a: A) => B) => PipeImpl<B>;
+  mapNullable?: <B>(fn: (a: NonNullable<A>) => B) => PipeImpl<B | undefined>;
+  mapOptional?: <B>(
+    fn: (a: Optional.Unwrap<Cast<A, UnknownOptional>>) => B,
+  ) => PipeImpl<Optional<B>>;
+}>;

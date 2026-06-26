@@ -2,6 +2,7 @@ import { expectType } from '../expect-type.mjs';
 import { type None, type Some } from '../types.mjs';
 import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
+import { Result } from './result/index.mjs';
 
 describe(pipe, () => {
   test('basic pipe operations', () => {
@@ -35,7 +36,9 @@ describe(pipe, () => {
   });
 
   test('mapNullable with non-null value', () => {
-    const result = pipe(5 as number | null).mapNullable((x) => x * 2).value;
+    const s = 5 as number | null;
+
+    const result = pipe(s).mapNullable((x) => x * 2).value;
 
     expect(result).toBe(10);
 
@@ -94,5 +97,58 @@ describe(pipe, () => {
     expect(result).toBe('15 items');
 
     expectType<typeof result, string>('=');
+  });
+
+  test('typing when used with Result', () => {
+    const validate = <D,>(_u: unknown): Result<D, unknown> =>
+      Result.err(undefined);
+
+    const decodeBranded = (
+      input: string,
+      parse: (s: string) => number | undefined,
+    ): number | undefined => {
+      const v = pipe(input)
+        .map(parse)
+        .mapNullable(validate<number>)
+        .mapNullable((res) => Result.unwrapOk(res)).value;
+
+      expectType<typeof v, number | undefined>('=');
+
+      return v;
+    };
+
+    expect(decodeBranded('', () => undefined)).toBeUndefined();
+  });
+
+  test('typing when used with generics', () => {
+    const validate = <D,>(_u: unknown): Result<D, unknown> =>
+      Result.err(undefined);
+
+    // Regression: a generic brand `D` must survive the whole chain.
+    //
+    // The trigger is a `.map` whose result is a branded *union* such as
+    // `D | undefined`. If `Pipe<A>` distributes over unions, that step expands
+    // into `Pipe<D> | Pipe<undefined>`; calling the next method on the union of
+    // pipe objects then widens `D` to its constraint `number`, so `.value`
+    // collapses to `number | undefined` instead of `D | undefined`.
+    //
+    // The explicit `D | undefined` return annotation is itself the assertion:
+    // were the brand lost, `.value` would be `number | undefined` and the
+    // body would fail to compile.
+    const decodeBranded = <D extends number>(
+      input: string,
+      parse: (s: string) => D | undefined,
+    ): D | undefined => {
+      const v = pipe(input)
+        .map(parse)
+        .mapNullable((n) => validate<D>(n))
+        .mapNullable((res) => Result.unwrapOk(res)).value;
+
+      expectType<typeof v, D | undefined>('=');
+
+      return v;
+    };
+
+    expect(decodeBranded('', () => undefined)).toBeUndefined();
   });
 });
