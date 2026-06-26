@@ -1,6 +1,7 @@
 /* cSpell:disable */
 
 import { expectType, Result } from 'ts-data-forge';
+import { type NonEmptyString } from 'ts-type-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import { string } from './string.mjs';
 
@@ -104,7 +105,7 @@ describe(string, () => {
       const value: unknown = 42;
 
       expect(() => str.cast(value)).toThrow(
-        'Error: expected <string> type but <number> type value `42` was passed.',
+        /^Error: expected <string> type but <number> type value `42` was passed\.$/u,
       );
     });
 
@@ -114,7 +115,7 @@ describe(string, () => {
       const value: unknown = 42;
 
       expect(() => strWithDefault.cast(value)).toThrow(
-        'Error: expected <string> type but <number> type value `42` was passed.',
+        /^Error: expected <string> type but <number> type value `42` was passed\.$/u,
       );
     });
   });
@@ -248,7 +249,9 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "cab" does not start with "ab"
         string('cab', { startsWith: 'ab' }),
-      ).toThrow('startsWith = ab');
+      ).toThrow(
+        /^defaultValue "cab" for string does not satisfy the constraint startsWith = ab$/u,
+      );
     });
 
     test('empty startsWith', () => {
@@ -273,7 +276,9 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "abc" does not end with "ba"
         string('abc', { endsWith: 'ba' }),
-      ).toThrow('endsWith = ba');
+      ).toThrow(
+        /^defaultValue "abc" for string does not satisfy the constraint endsWith = ba$/u,
+      );
     });
 
     test('empty endsWith', () => {
@@ -298,7 +303,9 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "abc" does not include "def"
         string('abc', { includes: 'def' }),
-      ).toThrow('includes = def');
+      ).toThrow(
+        /^defaultValue "abc" for string does not satisfy the constraint includes = def$/u,
+      );
     });
 
     test('empty includes', () => {
@@ -321,7 +328,9 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "ABCDEFGHI" is not assignable if lowercase is true
         string('ABCDEFGHI', { lowercase: true }),
-      ).toThrow('lowercase = true');
+      ).toThrow(
+        /^defaultValue "ABCDEFGHI" for string does not satisfy the constraint lowercase = true$/u,
+      );
     });
   });
 
@@ -340,7 +349,9 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "abcdefghi" is not assignable if uppercase is true
         string('abcdefghi', { uppercase: true }),
-      ).toThrow('uppercase = true');
+      ).toThrow(
+        /^defaultValue "abcdefghi" for string does not satisfy the constraint uppercase = true$/u,
+      );
     });
   });
 
@@ -348,7 +359,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('nonempty', { nonempty: true });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<typeof type, Type<NonEmptyString>>('=');
 
       assert.isTrue(type.is('value'));
 
@@ -359,7 +370,9 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "" is not assignable if nonempty is true
         string('', { nonempty: true }),
-      ).toThrow('nonempty = true');
+      ).toThrow(
+        /^defaultValue "" for string does not satisfy the constraint nonempty = true$/u,
+      );
     });
   });
 
@@ -378,7 +391,9 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "hi" is not assignable if minLength is 3
         string('hi', { minLength: 3 }),
-      ).toThrow('minLength = 3');
+      ).toThrow(
+        /^defaultValue "hi" for string does not satisfy the constraint minLength = 3$/u,
+      );
     });
 
     test('negative minLength', () => {
@@ -407,7 +422,9 @@ describe('string with constraints', () => {
       expect(() =>
         // @ts-expect-error "too-long" is not assignable if maxLength is 5
         string('too-long', { maxLength: 5 }),
-      ).toThrow('maxLength = 5');
+      ).toThrow(
+        /^defaultValue "too-long" for string does not satisfy the constraint maxLength = 5$/u,
+      );
     });
   });
 
@@ -428,7 +445,7 @@ describe('string with constraints', () => {
       const numeric = /^\d+$/u;
 
       expect(() => string('abc', { regex: numeric })).toThrow(
-        String.raw`regex = ^\d+$`,
+        /^defaultValue "abc" for string does not satisfy the constraint regex = \^\\d\+\$$/u,
       );
     });
   });
@@ -453,7 +470,9 @@ describe('string with constraints', () => {
         expect(() =>
           // @ts-expect-error "abba" does not end with "zz"
           string('abba', { startsWith: 'ab', endsWith: 'zz' }),
-        ).toThrow('endsWith = zz');
+        ).toThrow(
+          /^defaultValue "abba" for string does not satisfy the constraint endsWith = zz$/u,
+        );
       });
     });
 
@@ -489,7 +508,9 @@ describe('string with constraints', () => {
             includes: 'cd',
             endsWith: 'hi',
           }),
-        ).toThrow('endsWith = hi');
+        ).toThrow(
+          /^defaultValue "abcdbye" for string does not satisfy the constraint endsWith = hi$/u,
+        );
 
         expect(() =>
           // @ts-expect-error "abcdhi" does not includes "cd"
@@ -498,7 +519,9 @@ describe('string with constraints', () => {
             includes: 'cd',
             endsWith: 'hi',
           }),
-        ).toThrow('includes = cd');
+        ).toThrow(
+          /^defaultValue "abxxhi" for string does not satisfy the constraint includes = cd$/u,
+        );
       });
     });
 
@@ -519,7 +542,9 @@ describe('string with constraints', () => {
         expect(() =>
           // @ts-expect-error "Ab" is neither strictly uppercase nor lowercase
           string('Ab', { uppercase: true, lowercase: true }),
-        ).toThrow('uppercase = true');
+        ).toThrow(
+          /^defaultValue "Ab" for string does not satisfy the constraint uppercase = true$/u,
+        );
       });
     });
 
@@ -531,7 +556,7 @@ describe('string with constraints', () => {
           maxLength: 8,
         });
 
-        expectType<typeof type, Type<string>>('=');
+        expectType<typeof type, Type<NonEmptyString>>('=');
 
         assert.isTrue(type.is('value'));
 
@@ -551,7 +576,7 @@ describe('string with constraints', () => {
             maxLength: 8,
           }),
         ).toThrow(
-          'defaultValue "extra-long-token" for string does not satisfy the constraint maxLength = 8',
+          /^defaultValue "extra-long-token" for string does not satisfy the constraint maxLength = 8$/u,
         );
       });
 
@@ -564,7 +589,7 @@ describe('string with constraints', () => {
             maxLength: 3,
           }),
         ).toThrow(
-          'defaultValue "1234" for string does not satisfy the constraint minLength = 8',
+          /^defaultValue "1234" for string does not satisfy the constraint minLength = 8$/u,
         );
       });
     });
@@ -594,7 +619,9 @@ describe('string with constraints', () => {
 
         expect(() =>
           string('featureFLAG', { includes: 'feature', regex: slug }),
-        ).toThrow('regex = ^[a-z-]+$');
+        ).toThrow(
+          /^defaultValue "featureFLAG" for string does not satisfy the constraint regex = \^\[a-z-\]\+\$$/u,
+        );
       });
     });
 
@@ -629,7 +656,9 @@ describe('string with constraints', () => {
             maxLength: 6,
             regex: digits,
           }),
-        ).toThrow('maxLength = 6');
+        ).toThrow(
+          /^defaultValue "1234567" for string does not satisfy the constraint maxLength = 6$/u,
+        );
       });
     });
   });

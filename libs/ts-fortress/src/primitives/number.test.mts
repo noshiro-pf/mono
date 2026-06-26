@@ -1,4 +1,10 @@
 import { expectType, Result } from 'ts-data-forge';
+import {
+  type NegativeInt,
+  type NegativeNumber,
+  type NonNegativeNumber,
+  type PositiveNumber,
+} from 'ts-type-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import { number } from './number.mjs';
 
@@ -316,7 +322,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(1, { positive: true });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<typeof type, Type<PositiveNumber>>('=');
 
       assert.isTrue(type.is(10));
 
@@ -337,7 +343,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(0, { nonNegative: true });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<typeof type, Type<NonNegativeNumber>>('=');
 
       assert.isTrue(type.is(5));
 
@@ -358,7 +364,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(-1, { negative: true });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<typeof type, Type<NegativeNumber>>('=');
 
       assert.isTrue(type.is(-5));
 
@@ -379,7 +385,7 @@ describe('number with constraints', () => {
     test('accepts valid default value', () => {
       const type = number(0, { nonPositive: true });
 
-      expectType<typeof type, Type<number>>('=');
+      expectType<typeof type, Type<NegativeInt>>('>=');
 
       assert.isTrue(type.is(-5));
 
@@ -471,7 +477,7 @@ describe('number with constraints', () => {
       test('accepts valid default value', () => {
         const type = number(6, { positive: true, multipleOf: 3 });
 
-        expectType<typeof type, Type<number>>('=');
+        expectType<typeof type, Type<PositiveNumber>>('=');
 
         assert.isTrue(type.is(9));
 
@@ -497,7 +503,7 @@ describe('number with constraints', () => {
           step: 2,
         });
 
-        expectType<typeof type, Type<number>>('=');
+        expectType<typeof type, Type<NonNegativeNumber>>('=');
 
         assert.isTrue(type.is(10));
 

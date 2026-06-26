@@ -1,5 +1,6 @@
-import { Arr, isString } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import { isRegExp } from '@sindresorhus/is';
+import { Arr, expectType, isString, Result } from 'ts-data-forge';
+import { type NonEmptyString } from 'ts-type-forge';
 import { refine } from '../other-types/index.mjs';
 import { type Type } from '../type.mjs';
 import { createPrimitiveType } from '../utils/index.mjs';
@@ -28,90 +29,18 @@ export function string<C extends Constraints>(
     return baseType;
   }
 
-  if (
-    constraints.startsWith !== undefined &&
-    !defaultValue.startsWith(constraints.startsWith)
-  ) {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint startsWith = ${constraints.startsWith}`,
-    );
-  }
+  const constraintsPredicate = createConstraintsPredicate(constraints);
 
-  if (
-    constraints.endsWith !== undefined &&
-    !defaultValue.endsWith(constraints.endsWith)
-  ) {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint endsWith = ${constraints.endsWith}`,
-    );
-  }
+  const defaultValueConstraintsCheck = constraintsPredicate(defaultValue);
 
-  if (
-    constraints.includes !== undefined &&
-    !defaultValue.includes(constraints.includes)
-  ) {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint includes = ${constraints.includes}`,
-    );
+  if (Result.isErr(defaultValueConstraintsCheck)) {
+    throw new Error(defaultValueConstraintsCheck.value);
   }
-
-  if (
-    constraints.uppercase === true &&
-    defaultValue !== defaultValue.toUpperCase()
-  ) {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint uppercase = true`,
-    );
-  }
-
-  if (
-    constraints.lowercase === true &&
-    defaultValue !== defaultValue.toLowerCase()
-  ) {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint lowercase = true`,
-    );
-  }
-
-  if (constraints.nonempty === true && defaultValue === '') {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint nonempty = true`,
-    );
-  }
-
-  if (
-    constraints.minLength !== undefined &&
-    defaultValue.length < constraints.minLength
-  ) {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint minLength = ${constraints.minLength}`,
-    );
-  }
-
-  if (
-    constraints.maxLength !== undefined &&
-    defaultValue.length > constraints.maxLength
-  ) {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint maxLength = ${constraints.maxLength}`,
-    );
-  }
-
-  if (
-    constraints.regex !== undefined &&
-    !constraints.regex.test(defaultValue)
-  ) {
-    throw new Error(
-      `defaultValue "${defaultValue}" for string does not satisfy the constraint regex = ${constraints.regex.source}`,
-    );
-  }
-
-  const satisfiesConstraints = createConstraintsPredicate(constraints);
 
   return refine({
     baseType,
     defaultValue,
-    is: (value): value is string => satisfiesConstraints(value),
+    is: (value): value is string => Result.isOk(constraintsPredicate(value)),
     typeName: 'string',
   });
 }
@@ -121,81 +50,81 @@ type Constraints = Partial<
     startsWith: string;
     endsWith: string;
     includes: string;
-    uppercase: boolean;
-    lowercase: boolean;
-    nonempty: boolean;
+    uppercase: true;
+    lowercase: true;
+    nonempty: true;
     minLength: number;
     maxLength: number;
-    regex: DeepReadonly<RegExp>;
+    regex: RegExp;
   }>
 >;
 
 type DefaultValueType<
   S extends string,
-  R extends Constraints,
-> = DefaultValueWhenStartsWithIsOn<R> &
-  DefaultValueWhenEndsWithIsOn<R> &
-  DefaultValueWhenIncludesIsOn<R> &
-  DefaultValueWhenUppercaseIsOn<S, R> &
-  DefaultValueWhenLowercaseIsOn<S, R> &
-  DefaultValueWhenNonemptyIsOn<S, R> &
-  DefaultValueWhenMinLengthIsOn<S, R> &
-  DefaultValueWhenMaxLengthIsOn<S, R>;
+  C extends Constraints,
+> = DefaultValueWhenStartsWithIsOn<C> &
+  DefaultValueWhenEndsWithIsOn<C> &
+  DefaultValueWhenIncludesIsOn<C> &
+  DefaultValueWhenUppercaseIsOn<S, C> &
+  DefaultValueWhenLowercaseIsOn<S, C> &
+  DefaultValueWhenNonemptyIsOn<S, C> &
+  DefaultValueWhenMinLengthIsOn<S, C> &
+  DefaultValueWhenMaxLengthIsOn<S, C>;
 
-type ConstraintsResultType<R extends Constraints> =
-  DefaultValueWhenStartsWithIsOn<R> &
-    DefaultValueWhenEndsWithIsOn<R> &
-    DefaultValueWhenIncludesIsOn<R>;
+type ConstraintsResultType<C extends Constraints> =
+  DefaultValueWhenStartsWithIsOn<C> &
+    DefaultValueWhenEndsWithIsOn<C> &
+    DefaultValueWhenIncludesIsOn<C> &
+    ConstraintsResultTypeWhenNonemptyIsOn<C>;
 
-type DefaultValueWhenStartsWithIsOn<R extends Constraints> =
-  R extends Readonly<{
+type DefaultValueWhenStartsWithIsOn<C extends Constraints> =
+  C extends Readonly<{
     startsWith: infer S extends string;
   }>
     ? `${S}${string}`
     : string;
 
-type DefaultValueWhenEndsWithIsOn<R extends Constraints> =
-  R extends Readonly<{
+type DefaultValueWhenEndsWithIsOn<C extends Constraints> =
+  C extends Readonly<{
     endsWith: infer E extends string;
   }>
     ? `${string}${E}`
     : string;
 
-type DefaultValueWhenIncludesIsOn<R extends Constraints> =
-  R extends Readonly<{
+type DefaultValueWhenIncludesIsOn<C extends Constraints> =
+  C extends Readonly<{
     includes: infer M extends string;
   }>
     ? `${string}${M}${string}`
     : string;
 
-type DefaultValueWhenUppercaseIsOn<S extends string, R extends Constraints> =
-  R extends Readonly<{ uppercase: true }> ? CastUppercase<S> : string;
+type DefaultValueWhenUppercaseIsOn<S extends string, C extends Constraints> =
+  C extends Readonly<{ uppercase: true }> ? CastUppercase<S> : string;
 
-type DefaultValueWhenLowercaseIsOn<S extends string, R extends Constraints> =
-  R extends Readonly<{ lowercase: true }> ? CastLowercase<S> : string;
+type DefaultValueWhenLowercaseIsOn<S extends string, C extends Constraints> =
+  C extends Readonly<{ lowercase: true }> ? CastLowercase<S> : string;
 
 type CastLowercase<S extends string> = S extends Lowercase<S> ? S : never;
 
 type CastUppercase<S extends string> = S extends Uppercase<S> ? S : never;
 
-type DefaultValueWhenNonemptyIsOn<S extends string, R extends Constraints> =
-  R extends Readonly<{ nonempty: true }> ? NonEmptyString<S> : string;
+type DefaultValueWhenNonemptyIsOn<S extends string, C extends Constraints> =
+  C extends Readonly<{ nonempty: true }> ? RejectEmptyString<S> : string;
 
-type DefaultValueWhenMinLengthIsOn<S extends string, R extends Constraints> =
-  R extends Readonly<{ minLength: infer M extends number }>
+type RejectEmptyString<S extends string> = S extends '' ? never : S;
+
+type ConstraintsResultTypeWhenNonemptyIsOn<C extends Constraints> =
+  C extends Readonly<{ nonempty: true }> ? NonEmptyString : string;
+
+type DefaultValueWhenMinLengthIsOn<S extends string, C extends Constraints> =
+  C extends Readonly<{ minLength: infer M extends number }>
     ? StringWithMinLength<S, M>
     : string;
 
-type DefaultValueWhenMaxLengthIsOn<S extends string, R extends Constraints> =
-  R extends Readonly<{ maxLength: infer M extends number }>
+type DefaultValueWhenMaxLengthIsOn<S extends string, C extends Constraints> =
+  C extends Readonly<{ maxLength: infer M extends number }>
     ? StringWithMaxLength<S, M>
     : string;
-
-type NonEmptyString<S extends string> = string extends S
-  ? string
-  : S extends ''
-    ? never
-    : S;
 
 type StringWithMinLength<S extends string, N extends number> =
   HasLengthAtLeast<S, N> extends true ? S : never;
@@ -239,57 +168,64 @@ type IsNegative<N extends number> = `${N}` extends `-${string}` ? true : false;
 
 const createConstraintsPredicate =
   (constraints: Constraints) =>
-  (value: string): boolean => {
-    if (
-      constraints.startsWith !== undefined &&
-      !value.startsWith(constraints.startsWith)
-    ) {
-      return false;
+  (value: string): Result<true, string> => {
+    const {
+      includes,
+      startsWith,
+      endsWith,
+      uppercase,
+      lowercase,
+      nonempty,
+      minLength,
+      maxLength,
+      regex,
+      ..._rest
+    } = constraints;
+
+    expectType<keyof typeof _rest, never>('=');
+
+    if (startsWith !== undefined && !value.startsWith(startsWith)) {
+      return Result.err(errorMessage(value, 'startsWith', startsWith));
     }
 
-    if (
-      constraints.endsWith !== undefined &&
-      !value.endsWith(constraints.endsWith)
-    ) {
-      return false;
+    if (endsWith !== undefined && !value.endsWith(endsWith)) {
+      return Result.err(errorMessage(value, 'endsWith', endsWith));
     }
 
-    if (
-      constraints.includes !== undefined &&
-      !value.includes(constraints.includes)
-    ) {
-      return false;
+    if (includes !== undefined && !value.includes(includes)) {
+      return Result.err(errorMessage(value, 'includes', includes));
     }
 
-    if (constraints.uppercase === true && value !== value.toUpperCase()) {
-      return false;
+    if (uppercase === true && value !== value.toUpperCase()) {
+      return Result.err(errorMessage(value, 'uppercase', true));
     }
 
-    if (constraints.lowercase === true && value !== value.toLowerCase()) {
-      return false;
+    if (lowercase === true && value !== value.toLowerCase()) {
+      return Result.err(errorMessage(value, 'lowercase', true));
     }
 
-    if (constraints.nonempty === true && value.length === 0) {
-      return false;
+    if (nonempty === true && value.length === 0) {
+      return Result.err(errorMessage(value, 'nonempty', true));
     }
 
-    if (
-      constraints.minLength !== undefined &&
-      value.length < constraints.minLength
-    ) {
-      return false;
+    if (minLength !== undefined && value.length < minLength) {
+      return Result.err(errorMessage(value, 'minLength', minLength));
     }
 
-    if (
-      constraints.maxLength !== undefined &&
-      value.length > constraints.maxLength
-    ) {
-      return false;
+    if (maxLength !== undefined && value.length > maxLength) {
+      return Result.err(errorMessage(value, 'maxLength', maxLength));
     }
 
-    if (constraints.regex !== undefined && !constraints.regex.test(value)) {
-      return false;
+    if (regex !== undefined && !regex.test(value)) {
+      return Result.err(errorMessage(value, 'regex', regex));
     }
 
-    return true;
+    return Result.ok(true);
   };
+
+const errorMessage = (
+  value: string,
+  constraintName: string,
+  constraintValue: string | number | boolean | RegExp,
+): string =>
+  `defaultValue "${value}" for string does not satisfy the constraint ${constraintName} = ${isRegExp(constraintValue) ? constraintValue.source : constraintValue}` as const;

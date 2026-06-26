@@ -1,4 +1,14 @@
-import { Arr, isNumber } from 'ts-data-forge';
+import { Arr, expectType, Int, isNumber, Result } from 'ts-data-forge';
+import {
+  type Brand,
+  type FiniteNumber,
+  type IsNever,
+  type NegativeInt,
+  type NonZeroFiniteNumber,
+  type NonZeroInt,
+  type PositiveInt,
+  type Uint,
+} from 'ts-type-forge';
 import { refine } from '../other-types/index.mjs';
 import { type Type } from '../type.mjs';
 import { createPrimitiveType } from '../utils/index.mjs';
@@ -8,7 +18,7 @@ export function number(defaultValue?: number): Type<number>;
 export function number<N extends number, const C extends Constraints>(
   defaultValue: N & DefaultValueType<N, C>,
   constraints: C,
-): Type<number>;
+): Type<ConstraintsToResultType<C>>;
 
 export function number<C extends Constraints>(
   defaultValue: number = 0,
@@ -27,87 +37,18 @@ export function number<C extends Constraints>(
     return baseType;
   }
 
-  if (constraints.gt !== undefined && !(defaultValue > constraints.gt)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint gt = ${constraints.gt}`,
-    );
-  }
+  const constraintsPredicate = createConstraintsPredicate(constraints);
 
-  if (constraints.gte !== undefined && !(defaultValue >= constraints.gte)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint gte = ${constraints.gte}`,
-    );
-  }
+  const defaultValueConstraintsCheck = constraintsPredicate(defaultValue);
 
-  if (constraints.min !== undefined && !(defaultValue >= constraints.min)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint min = ${constraints.min}`,
-    );
+  if (Result.isErr(defaultValueConstraintsCheck)) {
+    throw new Error(defaultValueConstraintsCheck.value);
   }
-
-  if (constraints.lt !== undefined && !(defaultValue < constraints.lt)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint lt = ${constraints.lt}`,
-    );
-  }
-
-  if (constraints.lte !== undefined && !(defaultValue <= constraints.lte)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint lte = ${constraints.lte}`,
-    );
-  }
-
-  if (constraints.max !== undefined && !(defaultValue <= constraints.max)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint max = ${constraints.max}`,
-    );
-  }
-
-  if (constraints.positive === true && !(defaultValue > 0)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint positive = true`,
-    );
-  }
-
-  if (constraints.nonNegative === true && !(defaultValue >= 0)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint nonNegative = true`,
-    );
-  }
-
-  if (constraints.negative === true && !(defaultValue < 0)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint negative = true`,
-    );
-  }
-
-  if (constraints.nonPositive === true && !(defaultValue <= 0)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint nonPositive = true`,
-    );
-  }
-
-  if (
-    constraints.multipleOf !== undefined &&
-    defaultValue % constraints.multipleOf !== 0
-  ) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint multipleOf = ${constraints.multipleOf}`,
-    );
-  }
-
-  if (constraints.step !== undefined && defaultValue % constraints.step !== 0) {
-    throw new Error(
-      `defaultValue ${defaultValue} for number does not satisfy the constraint step = ${constraints.step}`,
-    );
-  }
-
-  const satisfiesConstraints = createConstraintsPredicate(constraints);
 
   return refine({
     baseType,
     defaultValue,
-    is: (value): value is number => satisfiesConstraints(value),
+    is: (value): value is number => Result.isOk(constraintsPredicate(value)),
     typeName: 'number',
   });
 }
@@ -120,34 +61,152 @@ type Constraints = Partial<
     lt: number;
     lte: number;
     max: number;
-    negative: boolean;
-    nonNegative: boolean;
-    positive: boolean;
-    nonPositive: boolean;
     multipleOf: number;
     step: number;
+
+    finite: true;
+    int: true;
+    nonzero: true;
+    negative: true;
+    nonNegative: true;
+    positive: true;
+    nonPositive: true;
   }>
 >;
 
 type DefaultValueType<
   N extends number,
-  R extends Constraints,
-> = DefaultValueWhenNegativeIsOn<N, R> &
-  DefaultValueWhenNonNegativeIsOn<N, R> &
-  DefaultValueWhenPositiveIsOn<N, R> &
-  DefaultValueWhenNonPositiveIsOn<N, R>;
+  C extends Constraints,
+> = DefaultValueWhenNonZeroIsOn<N, C> &
+  DefaultValueWhenNegativeIsOn<N, C> &
+  DefaultValueWhenNonNegativeIsOn<N, C> &
+  DefaultValueWhenPositiveIsOn<N, C> &
+  DefaultValueWhenNonPositiveIsOn<N, C>;
 
-type DefaultValueWhenNegativeIsOn<N extends number, R extends Constraints> =
-  R extends Readonly<{ negative: true }> ? NegativeNumber<N> : number;
+type ConstraintsToResultType<C extends Constraints> =
+  ConstraintsToResultHelperType<ConstraintsToResultBrandKeys<C>>;
 
-type DefaultValueWhenNonNegativeIsOn<N extends number, R extends Constraints> =
-  R extends Readonly<{ nonNegative: true }> ? NonNegativeNumber<N> : number;
+type ConstraintsToResultHelperType<
+  R extends Readonly<{ brandKeys: string; brandFalseKeys: string }>,
+> =
+  IsNever<R> extends true
+    ? number
+    : Brand<number, R['brandKeys'], R['brandFalseKeys']>;
 
-type DefaultValueWhenPositiveIsOn<N extends number, R extends Constraints> =
-  R extends Readonly<{ positive: true }> ? PositiveNumber<N> : number;
+type ConstraintsToResultBrandKeys<C extends Constraints> =
+  | (C extends Readonly<{ int: true }>
+      ? Readonly<{ brandKeys: 'Int' | 'Finite'; brandFalseKeys: 'NaNValue' }>
+      : never)
+  | (C extends Readonly<{ finite: true }>
+      ? Readonly<{ brandKeys: 'Finite'; brandFalseKeys: 'NaNValue' }>
+      : never)
+  | (C extends Readonly<{ nonzero: true }>
+      ? Readonly<{ brandKeys: '!=0'; brandFalseKeys: 'NaNValue' }>
+      : never)
+  | (C extends Readonly<{ negative: true }>
+      ? Readonly<{
+          brandKeys: '!=0' | '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32';
+          brandFalseKeys: '>=0' | 'NaNValue';
+        }>
+      : never)
+  | (C extends Readonly<{ positive: true }>
+      ? Readonly<{
+          brandKeys:
+            | '>=0'
+            | '!=0'
+            | '> -2^16'
+            | '> -2^32'
+            | '>= -2^15'
+            | '>= -2^31';
+          brandFalseKeys: 'NaNValue';
+        }>
+      : never)
+  | (C extends Readonly<{ nonNegative: true }>
+      ? Readonly<{
+          brandKeys: '>=0' | '> -2^16' | '> -2^32' | '>= -2^15' | '>= -2^31';
+          brandFalseKeys: 'NaNValue';
+        }>
+      : never)
+  | (C extends Readonly<{ nonPositive: true }>
+      ? Readonly<{
+          brandKeys: '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32';
+          brandFalseKeys: '>=0' | 'NaNValue';
+        }>
+      : never);
 
-type DefaultValueWhenNonPositiveIsOn<N extends number, R extends Constraints> =
-  R extends Readonly<{ nonPositive: true }> ? NonPositiveNumber<N> : number;
+type BrandKeysInt = ConstraintsToResultBrandKeys<Readonly<{ int: true }>>;
+
+expectType<BrandKeysInt['brandKeys'], 'Finite' | 'Int'>('=');
+
+expectType<BrandKeysInt['brandFalseKeys'], 'NaNValue'>('=');
+
+type BrandKeysPositiveInt = ConstraintsToResultBrandKeys<
+  Readonly<{ int: true; positive: true }>
+>;
+
+expectType<
+  BrandKeysPositiveInt['brandKeys'],
+  | 'Int'
+  | 'Finite'
+  | '!=0'
+  | '>=0'
+  | '> -2^16'
+  | '> -2^32'
+  | '>= -2^15'
+  | '>= -2^31'
+>('=');
+
+expectType<BrandKeysPositiveInt['brandFalseKeys'], 'NaNValue'>('=');
+
+expectType<ConstraintsToResultType<Readonly<{ finite: true }>>, FiniteNumber>(
+  '=',
+);
+
+expectType<
+  ConstraintsToResultType<Readonly<{ finite: true; nonzero: true }>>,
+  NonZeroFiniteNumber
+>('=');
+
+expectType<
+  ConstraintsToResultType<Readonly<{ int: true; nonzero: true }>>,
+  NonZeroInt
+>('=');
+
+expectType<
+  ConstraintsToResultType<Readonly<{ int: true; positive: true }>>,
+  PositiveInt
+>('=');
+
+expectType<
+  ConstraintsToResultType<Readonly<{ int: true; negative: true }>>,
+  NegativeInt
+>('=');
+
+expectType<
+  ConstraintsToResultType<Readonly<{ int: true; nonNegative: true }>>,
+  Uint
+>('=');
+
+type DefaultValueWhenNonZeroIsOn<N extends number, C extends Constraints> =
+  C extends Readonly<{ nonzero: true }> ? NonZeroNumber<N> : number;
+
+type DefaultValueWhenNegativeIsOn<N extends number, C extends Constraints> =
+  C extends Readonly<{ negative: true }> ? NegativeNumber<N> : number;
+
+type DefaultValueWhenNonNegativeIsOn<N extends number, C extends Constraints> =
+  C extends Readonly<{ nonNegative: true }> ? NonNegativeNumber<N> : number;
+
+type DefaultValueWhenPositiveIsOn<N extends number, C extends Constraints> =
+  C extends Readonly<{ positive: true }> ? PositiveNumber<N> : number;
+
+type DefaultValueWhenNonPositiveIsOn<N extends number, C extends Constraints> =
+  C extends Readonly<{ nonPositive: true }> ? NonPositiveNumber<N> : number;
+
+type NonZeroNumber<N extends number> = number extends N
+  ? number
+  : IsNonZero<N> extends true
+    ? N
+    : never;
 
 type NegativeNumber<N extends number> = number extends N
   ? number
@@ -173,6 +232,8 @@ type NonPositiveNumber<N extends number> = number extends N
     ? N
     : never;
 
+type IsNonZero<N extends number> = N extends 0 ? false : true;
+
 type IsNegative<N extends number> = `${N}` extends `-${string}` ? true : false;
 
 type IsNonNegative<N extends number> =
@@ -185,57 +246,94 @@ type IsNonPositive<N extends number> =
 
 const createConstraintsPredicate =
   (constraints: Constraints) =>
-  (value: number): boolean => {
-    if (constraints.gt !== undefined && !(value > constraints.gt)) {
-      return false;
+  (value: number): Result<true, string> => {
+    const {
+      gt,
+      gte,
+      lt,
+      lte,
+      min,
+      max,
+      multipleOf,
+      step,
+      finite,
+      int,
+      nonzero,
+      positive,
+      nonNegative,
+      negative,
+      nonPositive,
+      ..._rest
+    } = constraints;
+
+    expectType<keyof typeof _rest, never>('=');
+
+    if (gt !== undefined && !(value > gt)) {
+      return Result.err(errorMessage(value, 'gt', gt));
     }
 
-    if (constraints.gte !== undefined && !(value >= constraints.gte)) {
-      return false;
+    if (gte !== undefined && !(value >= gte)) {
+      return Result.err(errorMessage(value, 'gte', gte));
     }
 
-    if (constraints.min !== undefined && !(value >= constraints.min)) {
-      return false;
+    if (min !== undefined && !(value >= min)) {
+      return Result.err(errorMessage(value, 'min', min));
     }
 
-    if (constraints.lt !== undefined && !(value < constraints.lt)) {
-      return false;
+    if (lt !== undefined && !(value < lt)) {
+      return Result.err(errorMessage(value, 'lt', lt));
     }
 
-    if (constraints.lte !== undefined && !(value <= constraints.lte)) {
-      return false;
+    if (lte !== undefined && !(value <= lte)) {
+      return Result.err(errorMessage(value, 'lte', lte));
     }
 
-    if (constraints.max !== undefined && !(value <= constraints.max)) {
-      return false;
+    if (max !== undefined && !(value <= max)) {
+      return Result.err(errorMessage(value, 'max', max));
     }
 
-    if (constraints.positive === true && !(value > 0)) {
-      return false;
+    if (multipleOf !== undefined && value % multipleOf !== 0) {
+      return Result.err(errorMessage(value, 'multipleOf', multipleOf));
     }
 
-    if (constraints.nonNegative === true && !(value >= 0)) {
-      return false;
+    if (step !== undefined && value % step !== 0) {
+      return Result.err(errorMessage(value, 'step', step));
     }
 
-    if (constraints.negative === true && !(value < 0)) {
-      return false;
+    if (nonzero === true && !(value !== 0)) {
+      return Result.err(errorMessage(value, 'nonzero', true));
     }
 
-    if (constraints.nonPositive === true && !(value <= 0)) {
-      return false;
+    if (positive === true && !(value > 0)) {
+      return Result.err(errorMessage(value, 'positive', true));
     }
 
-    if (
-      constraints.multipleOf !== undefined &&
-      value % constraints.multipleOf !== 0
-    ) {
-      return false;
+    if (nonNegative === true && !(value >= 0)) {
+      return Result.err(errorMessage(value, 'nonNegative', true));
     }
 
-    if (constraints.step !== undefined && value % constraints.step !== 0) {
-      return false;
+    if (negative === true && !(value < 0)) {
+      return Result.err(errorMessage(value, 'negative', true));
     }
 
-    return true;
+    if (nonPositive === true && !(value <= 0)) {
+      return Result.err(errorMessage(value, 'nonPositive', true));
+    }
+
+    if (int === true && !Int.is(value)) {
+      return Result.err(errorMessage(value, 'int', true));
+    }
+
+    if (finite === true && !Number.isFinite(value)) {
+      return Result.err(errorMessage(value, 'finite', true));
+    }
+
+    return Result.ok(true);
   };
+
+const errorMessage = (
+  value: number,
+  constraintName: string,
+  constraintValue: number | boolean,
+): string =>
+  `defaultValue [${value}] for number does not satisfy the constraint ${constraintName} = ${constraintValue}` as const;
