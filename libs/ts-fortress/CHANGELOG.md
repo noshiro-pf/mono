@@ -1,3 +1,9 @@
+# [7.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v7.2.0...v7.3.0) (2026-06-26)
+
+### Features
+
+- improve the typing of number/string with constraints ([#317](https://github.com/noshiro-pf/ts-fortress/issues/317)) ([f3293e6](https://github.com/noshiro-pf/ts-fortress/commit/f3293e69db626635c16c3fec860b1411f44f3e4b))
+
 # [7.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v7.1.0...v7.2.0) (2026-06-22)
 
 ### Features
