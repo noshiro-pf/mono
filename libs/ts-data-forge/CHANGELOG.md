@@ -1,3 +1,9 @@
+## [6.13.1](https://github.com/noshiro-pf/ts-data-forge/compare/v6.13.0...v6.13.1) (2026-06-26)
+
+### Bug Fixes
+
+- fix the typing of pipe function ([#398](https://github.com/noshiro-pf/ts-data-forge/issues/398)) ([657271a](https://github.com/noshiro-pf/ts-data-forge/commit/657271a8a6b4771505342c0678a799d2a904216c))
+
 # [6.13.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.12.0...v6.13.0) (2026-06-25)
 
 ### Features
