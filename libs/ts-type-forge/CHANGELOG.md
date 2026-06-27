@@ -1,3 +1,9 @@
+# [4.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v3.2.0...v4.0.0) (2026-06-27)
+
+### Features
+
+- **breaking:** add NonPositiveNumber ([#398](https://github.com/noshiro-pf/ts-type-forge/issues/398)) ([973217d](https://github.com/noshiro-pf/ts-type-forge/commit/973217da2f50d944132ed8a0bbdc9bacefeeb3cd))
+
 # [3.2.0](https://github.com/noshiro-pf/ts-type-forge/compare/v3.1.0...v3.2.0) (2026-06-22)
 
 ### Features
