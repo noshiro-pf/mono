@@ -10,7 +10,7 @@
 <h2 id="features" class="tsd-anchor-link">Features<a href="#features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
 <p>This library offers a comprehensive suite of type-level utilities, including:</p>
 <ul>
-<li><strong>Advanced Type Utilities</strong>: Enhanced versions of built-in types like <a href="modules/record_std.html#L86"><code>StrictExclude</code></a>, <a href="modules/record_std.html#L120"><code>StrictOmit</code></a>, <a href="modules/record_std.html#L155"><code>ReadonlyRecord</code></a>, and many more.</li>
+<li><strong>Advanced Type Utilities</strong>: Enhanced versions of built-in types like <a href="./src/record/std.mts#L86"><code>StrictExclude</code></a>, <a href="./src/record/std.mts#L120"><code>StrictOmit</code></a>, <a href="./src/record/std.mts#L155"><code>ReadonlyRecord</code></a>, and many more.</li>
 <li><strong>Compile-Time Type Checking</strong>: Assert type relationships at compile time with comprehensive condition types.</li>
 <li><strong>Branded Types</strong>: Extensive collection of branded number types (<code>Int</code>, <code>Uint</code>, <code>SafeInt</code>, <code>FiniteNumber</code>, etc.) for enhanced type safety.</li>
 <li><strong>Array and Tuple Utilities</strong>: Type-safe operations with <code>List</code> and <code>Tuple</code> namespaces for complex array manipulations.</li>
@@ -184,19 +184,21 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 <li><a href="modules/branded-types_core.html#L98">NonZeroNumber</a></li>
 <li><a href="modules/branded-types_core.html#L117">NonNegativeNumber</a></li>
 <li><a href="modules/branded-types_core.html#L136">PositiveNumber</a></li>
-<li><a href="modules/branded-types_core.html#L152">NegativeNumber</a></li>
+<li><a href="modules/branded-types_core.html#L156">NonPositiveNumber</a></li>
+<li><a href="modules/branded-types_core.html#L175">NegativeNumber</a></li>
 </ul>
 </li>
 <li>src/branded-types/finite-number.mts
 <ul>
-<li><a href="modules/branded-types_finite-number.html#L26">FiniteNumber</a></li>
-<li><a href="modules/branded-types_finite-number.html#L46">InfiniteNumber</a></li>
-<li><a href="modules/branded-types_finite-number.html#L66">POSITIVE_INFINITY</a></li>
-<li><a href="modules/branded-types_finite-number.html#L86">NEGATIVE_INFINITY</a></li>
-<li><a href="modules/branded-types_finite-number.html#L105">NonNegativeFiniteNumber</a></li>
-<li><a href="modules/branded-types_finite-number.html#L123">PositiveFiniteNumber</a></li>
-<li><a href="modules/branded-types_finite-number.html#L138">NegativeFiniteNumber</a></li>
-<li><a href="modules/branded-types_finite-number.html#L153">NonZeroFiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L27">FiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L47">InfiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L67">POSITIVE_INFINITY</a></li>
+<li><a href="modules/branded-types_finite-number.html#L87">NEGATIVE_INFINITY</a></li>
+<li><a href="modules/branded-types_finite-number.html#L106">NonNegativeFiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L124">PositiveFiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L139">NegativeFiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L154">NonZeroFiniteNumber</a></li>
+<li><a href="modules/branded-types_finite-number.html#L168">NonPositiveFiniteNumber</a></li>
 </ul>
 </li>
 <li>src/branded-types/float.mts
@@ -207,18 +209,20 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 </li>
 <li>src/branded-types/int.mts
 <ul>
-<li><a href="modules/branded-types_int.html#L27">Int</a></li>
-<li><a href="modules/branded-types_int.html#L45">NonZeroInt</a></li>
-<li><a href="modules/branded-types_int.html#L60">NonNegativeInt</a></li>
-<li><a href="modules/branded-types_int.html#L78">Uint</a></li>
-<li><a href="modules/branded-types_int.html#L95">PositiveInt</a></li>
-<li><a href="modules/branded-types_int.html#L110">NegativeInt</a></li>
-<li><a href="modules/branded-types_int.html#L116">IntWithSmallInt</a></li>
-<li><a href="modules/branded-types_int.html#L122">NonZeroIntWithSmallInt</a></li>
-<li><a href="modules/branded-types_int.html#L128">NonNegativeIntWithSmallInt</a></li>
-<li><a href="modules/branded-types_int.html#L135">UintWithSmallInt</a></li>
-<li><a href="modules/branded-types_int.html#L141">PositiveIntWithSmallInt</a></li>
-<li><a href="modules/branded-types_int.html#L147">NegativeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L28">Int</a></li>
+<li><a href="modules/branded-types_int.html#L46">NonZeroInt</a></li>
+<li><a href="modules/branded-types_int.html#L61">NonNegativeInt</a></li>
+<li><a href="modules/branded-types_int.html#L79">Uint</a></li>
+<li><a href="modules/branded-types_int.html#L96">PositiveInt</a></li>
+<li><a href="modules/branded-types_int.html#L111">NegativeInt</a></li>
+<li><a href="modules/branded-types_int.html#L117">IntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L123">NonZeroIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L129">NonNegativeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L136">UintWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L142">PositiveIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L148">NegativeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_int.html#L163">NonPositiveInt</a></li>
+<li><a href="modules/branded-types_int.html#L169">NonPositiveIntWithSmallInt</a></li>
 </ul>
 </li>
 <li>src/branded-types/int16.mts
@@ -256,18 +260,20 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 </li>
 <li>src/branded-types/safe-int.mts
 <ul>
-<li><a href="modules/branded-types_safe-int.html#L28">SafeInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L43">NonZeroSafeInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L58">SafeUint</a></li>
-<li><a href="modules/branded-types_safe-int.html#L73">PositiveSafeInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L87">NegativeSafeInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L94">NonNegativeSafeInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L100">SafeIntWithSmallInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L106">NonZeroSafeIntWithSmallInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L112">NonNegativeSafeIntWithSmallInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L119">SafeUintWithSmallInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L125">PositiveSafeIntWithSmallInt</a></li>
-<li><a href="modules/branded-types_safe-int.html#L131">NegativeSafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L29">SafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L44">NonZeroSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L59">SafeUint</a></li>
+<li><a href="modules/branded-types_safe-int.html#L74">PositiveSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L88">NegativeSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L95">NonNegativeSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L101">SafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L107">NonZeroSafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L113">NonNegativeSafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L120">SafeUintWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L126">PositiveSafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L132">NegativeSafeIntWithSmallInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L146">NonPositiveSafeInt</a></li>
+<li><a href="modules/branded-types_safe-int.html#L152">NonPositiveSafeIntWithSmallInt</a></li>
 </ul>
 </li>
 <li>src/branded-types/small-int.mts
@@ -406,6 +412,20 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 <li><a href="modules/others_mutable.html#L107">MutableMap</a></li>
 </ul>
 </li>
+<li>src/others/std.mts
+<ul>
+<li><a href="modules/others_std.html#L16">StrictExtract</a></li>
+<li><a href="modules/others_std.html#L33">RelaxedExtract</a></li>
+<li><a href="modules/others_std.html#L50">StrictPick</a></li>
+<li><a href="modules/others_std.html#L69">RelaxedPick</a></li>
+<li><a href="modules/others_std.html#L86">StrictExclude</a></li>
+<li><a href="modules/others_std.html#L103">RelaxedExclude</a></li>
+<li><a href="modules/others_std.html#L120">StrictOmit</a></li>
+<li><a href="modules/others_std.html#L137">RelaxedOmit</a></li>
+<li><a href="modules/others_std.html#L155">ReadonlyRecord</a></li>
+<li><a href="modules/others_std.html#L176">MutableRecord</a></li>
+</ul>
+</li>
 <li>src/others/utils.mts
 <ul>
 <li><a href="modules/others_utils.html#L13">ToString</a></li>
@@ -466,20 +486,6 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 <li><a href="modules/record_record-path.html#L159">RecordValueAtPathWithIndex</a></li>
 </ul>
 </li>
-<li>src/record/std.mts
-<ul>
-<li><a href="modules/record_std.html#L16">StrictExtract</a></li>
-<li><a href="modules/record_std.html#L33">RelaxedExtract</a></li>
-<li><a href="modules/record_std.html#L50">StrictPick</a></li>
-<li><a href="modules/record_std.html#L69">RelaxedPick</a></li>
-<li><a href="modules/record_std.html#L86">StrictExclude</a></li>
-<li><a href="modules/record_std.html#L103">RelaxedExclude</a></li>
-<li><a href="modules/record_std.html#L120">StrictOmit</a></li>
-<li><a href="modules/record_std.html#L137">RelaxedOmit</a></li>
-<li><a href="modules/record_std.html#L155">ReadonlyRecord</a></li>
-<li><a href="modules/record_std.html#L176">MutableRecord</a></li>
-</ul>
-</li>
 <li>src/tuple-and-list/array.mts
 <ul>
 <li><a href="modules/tuple-and-list_array.html#L15">MutableNonEmptyArray</a></li>
@@ -497,8 +503,8 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 </li>
 <li>src/tuple-and-list/index-of-tuple.mts
 <ul>
-<li><a href="modules/tuple-and-list_index-of-tuple.html#L18">IndexOfTuple</a></li>
-<li><a href="modules/tuple-and-list_index-of-tuple.html#L53">NegativeIndexOfTuple</a></li>
+<li><a href="modules/tuple-and-list_index-of-tuple.html#L17">IndexOfTuple</a></li>
+<li><a href="modules/tuple-and-list_index-of-tuple.html#L52">NegativeIndexOfTuple</a></li>
 </ul>
 </li>
 <li>src/tuple-and-list/list.mts

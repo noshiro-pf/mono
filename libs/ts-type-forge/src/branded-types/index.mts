@@ -1,4 +1,5 @@
 export * from './_internals.mjs';
+export * from './_number-brand-internals.mjs';
 export * from './bigint.mjs';
 export * from './brand.mjs';
 export * from './core.mjs';

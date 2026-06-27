@@ -62,17 +62,40 @@ import { type Uint32 } from './uint32.mjs';
       number
   >('=');
 
+  expectType<UnwrapBrandKeys<A>, 'B' | 'F' | 'T'>('=');
+
+  expectType<UnwrapBrandKeys<B>, 'B' | 'F' | 'T'>('=');
+
+  expectType<UnwrapBrandTrueKeys<AB>, 'T'>('=');
+
+  expectType<UnwrapBrandFalseKeys<AB>, 'F'>('=');
+
+  expectType<UnwrapBrandBooleanKeys<AB>, 'B'>('=');
+
+  expectType<GetBrandKeysPart<AB>, Readonly<{ B: boolean; T: true; F: false }>>(
+    '=',
+  );
+
+  expectType<
+    NormalizeBrandUnion<AB>,
+    TSTypeForgeInternals_BrandEncapsulated<Readonly<{ T: true; F: false }>> &
+      number
+  >('=');
+}
+
+{
   expectType<
     IntersectBrand<PositiveNumber, Uint32>,
     TSTypeForgeInternals_BrandEncapsulated<
       Readonly<{
         NaNValue: false;
         '!=0': true;
+        '>=0': true;
+        '<=0': false;
         '> -2^16': true;
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
         '< 2^32': true;
         Finite: true;
         Int: true;
@@ -88,11 +111,12 @@ import { type Uint32 } from './uint32.mjs';
       Readonly<{
         NaNValue: false;
         '!=0': true;
+        '>=0': true;
+        '<=0': false;
         '> -2^16': true;
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
         '< 2^32': true;
         Finite: true;
         Int: true;
@@ -121,24 +145,4 @@ import { type Uint32 } from './uint32.mjs';
     > &
       number
   >('!=');
-
-  expectType<UnwrapBrandKeys<A>, 'B' | 'F' | 'T'>('=');
-
-  expectType<UnwrapBrandKeys<B>, 'B' | 'F' | 'T'>('=');
-
-  expectType<UnwrapBrandTrueKeys<AB>, 'T'>('=');
-
-  expectType<UnwrapBrandFalseKeys<AB>, 'F'>('=');
-
-  expectType<UnwrapBrandBooleanKeys<AB>, 'B'>('=');
-
-  expectType<GetBrandKeysPart<AB>, Readonly<{ B: boolean; T: true; F: false }>>(
-    '=',
-  );
-
-  expectType<
-    NormalizeBrandUnion<AB>,
-    TSTypeForgeInternals_BrandEncapsulated<Readonly<{ T: true; F: false }>> &
-      number
-  >('=');
 }

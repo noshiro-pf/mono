@@ -1,8 +1,9 @@
-import { type TSTypeForgeInternals_ExtendNumberBrand } from './_internals.mjs';
+import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import { type IntersectBrand } from './brand.mjs';
 import {
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonPositiveNumber,
   type NonZeroNumber,
   type PositiveNumber,
 } from './core.mjs';
@@ -116,7 +117,7 @@ export type NonNegativeSafeIntWithSmallInt = WithSmallInt<NonNegativeSafeInt>;
  * Safe unsigned integer type with small literal values included.
  * Type: `0 | 1 | ... | 39 | SafeUint`
  */
-export type SafeUintWithSmallInt = WithSmallInt<SafeUint>;
+export type SafeUintWithSmallInt = NonNegativeSafeIntWithSmallInt;
 
 /**
  * Positive safe integer type with small literal values included.
@@ -129,3 +130,23 @@ export type PositiveSafeIntWithSmallInt = WithSmallInt<PositiveSafeInt>;
  * Type: `-40 | -39 | ... | -1 | NegativeSafeInt`
  */
 export type NegativeSafeIntWithSmallInt = WithSmallInt<NegativeSafeInt>;
+
+/**
+ * Branded numeric type for non-positive safe integers.
+ * Represents safe integers less than or equal to zero.
+ *
+ * @example
+ * ```ts
+ * const isNonPositiveSafeInt = (x: number): x is NonPositiveSafeInt =>
+ *   Number.isSafeInteger(x) && x <= 0;
+ *
+ * const debt = (amount: NonPositiveSafeInt) => ({ debt: amount });
+ * ```
+ */
+export type NonPositiveSafeInt = IntersectBrand<SafeInt, NonPositiveNumber>;
+
+/**
+ * Non-positive safe integer type with small literal values included.
+ * Type: `-40 | -39 | ... | 0 | NonPositiveSafeInt`
+ */
+export type NonPositiveSafeIntWithSmallInt = WithSmallInt<NonPositiveSafeInt>;

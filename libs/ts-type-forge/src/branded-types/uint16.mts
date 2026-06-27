@@ -1,4 +1,4 @@
-import { type TSTypeForgeInternals_ExtendNumberBrand } from './_internals.mjs';
+import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import { type IntersectBrand } from './brand.mjs';
 import { type PositiveNumber } from './core.mjs';
 import { type WithSmallInt } from './small-int.mjs';

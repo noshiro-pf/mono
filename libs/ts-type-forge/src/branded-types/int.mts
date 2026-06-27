@@ -1,8 +1,9 @@
-import { type TSTypeForgeInternals_ExtendNumberBrand } from './_internals.mjs';
+import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import { type IntersectBrand } from './brand.mjs';
 import {
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonPositiveNumber,
   type NonZeroNumber,
   type PositiveNumber,
 } from './core.mjs';
@@ -145,3 +146,24 @@ export type PositiveIntWithSmallInt = WithSmallInt<PositiveInt>;
  * Type: `-40 | -39 | ... | -1 | NegativeInt`
  */
 export type NegativeIntWithSmallInt = WithSmallInt<NegativeInt>;
+
+/**
+ * Branded numeric type for non-positive integers.
+ * Represents integers less than or equal to zero.
+ *
+ * @example
+ * ```ts
+ * const isNonPositiveInt = (x: number): x is NonPositiveInt =>
+ *   Number.isInteger(x) && x <= 0;
+ *
+ * const countdown = (remaining: NonPositiveInt) => ({ remaining });
+ * const penalty = (points: NonPositiveInt) => ({ penalty: points });
+ * ```
+ */
+export type NonPositiveInt = IntersectBrand<Int, NonPositiveNumber>;
+
+/**
+ * Non-positive integer type with small literal values included.
+ * Type: `-40 | -39 | ... | 0 | NonPositiveInt`
+ */
+export type NonPositiveIntWithSmallInt = WithSmallInt<NonPositiveInt>;

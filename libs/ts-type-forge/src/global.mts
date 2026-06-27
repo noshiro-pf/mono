@@ -51,6 +51,7 @@ declare global {
   type NonZeroNumber = _TSTypeForge.NonZeroNumber;
   type NonNegativeNumber = _TSTypeForge.NonNegativeNumber;
   type PositiveNumber = _TSTypeForge.PositiveNumber;
+  type NonPositiveNumber = _TSTypeForge.NonPositiveNumber;
   type NegativeNumber = _TSTypeForge.NegativeNumber;
   type FiniteNumber = _TSTypeForge.FiniteNumber;
   type InfiniteNumber = _TSTypeForge.InfiniteNumber;
@@ -60,6 +61,7 @@ declare global {
   type PositiveFiniteNumber = _TSTypeForge.PositiveFiniteNumber;
   type NegativeFiniteNumber = _TSTypeForge.NegativeFiniteNumber;
   type NonZeroFiniteNumber = _TSTypeForge.NonZeroFiniteNumber;
+  type NonPositiveFiniteNumber = _TSTypeForge.NonPositiveFiniteNumber;
   type Float32 = _TSTypeForge.Float32;
   type Float64 = _TSTypeForge.Float64;
   type Int = _TSTypeForge.Int;
@@ -74,6 +76,8 @@ declare global {
   type UintWithSmallInt = _TSTypeForge.UintWithSmallInt;
   type PositiveIntWithSmallInt = _TSTypeForge.PositiveIntWithSmallInt;
   type NegativeIntWithSmallInt = _TSTypeForge.NegativeIntWithSmallInt;
+  type NonPositiveInt = _TSTypeForge.NonPositiveInt;
+  type NonPositiveIntWithSmallInt = _TSTypeForge.NonPositiveIntWithSmallInt;
   type Int16 = _TSTypeForge.Int16;
   type NonZeroInt16 = _TSTypeForge.NonZeroInt16;
   type NonNegativeInt16 = _TSTypeForge.NonNegativeInt16;
@@ -108,6 +112,9 @@ declare global {
   type SafeUintWithSmallInt = _TSTypeForge.SafeUintWithSmallInt;
   type PositiveSafeIntWithSmallInt = _TSTypeForge.PositiveSafeIntWithSmallInt;
   type NegativeSafeIntWithSmallInt = _TSTypeForge.NegativeSafeIntWithSmallInt;
+  type NonPositiveSafeInt = _TSTypeForge.NonPositiveSafeInt;
+  type NonPositiveSafeIntWithSmallInt =
+    _TSTypeForge.NonPositiveSafeIntWithSmallInt;
   type SmallInt<
     T extends '!=0' | '' | '<=0' | '<0' | '>=0' | '>0' = '',
     MaxIndex extends number =
@@ -200,6 +207,22 @@ declare global {
   type ToMutableSet<T extends ReadonlySet<any>> = _TSTypeForge.ToMutableSet<T>;
   type MutableSet<K> = _TSTypeForge.MutableSet<K>;
   type MutableMap<K, V> = _TSTypeForge.MutableMap<K, V>;
+  type StrictExtract<T, U extends T> = _TSTypeForge.StrictExtract<T, U>;
+  type RelaxedExtract<T, U> = _TSTypeForge.RelaxedExtract<T, U>;
+  type StrictPick<T, K extends keyof T> = _TSTypeForge.StrictPick<T, K>;
+  type RelaxedPick<T, K> = _TSTypeForge.RelaxedPick<T, K>;
+  type StrictExclude<T, U extends T> = _TSTypeForge.StrictExclude<T, U>;
+  type RelaxedExclude<T, U> = _TSTypeForge.RelaxedExclude<T, U>;
+  type StrictOmit<T, K extends keyof T> = _TSTypeForge.StrictOmit<T, K>;
+  type RelaxedOmit<T, K> = _TSTypeForge.RelaxedOmit<T, K>;
+  type ReadonlyRecord<K extends PropertyKey, T> = _TSTypeForge.ReadonlyRecord<
+    K,
+    T
+  >;
+  type MutableRecord<K extends PropertyKey, T> = _TSTypeForge.MutableRecord<
+    K,
+    T
+  >;
   type ToString<A> = _TSTypeForge.ToString<A>;
   type ToNumber<S extends `${number}`> = _TSTypeForge.ToNumber<S>;
   type ValueOf<T> = _TSTypeForge.ValueOf<T>;
@@ -267,22 +290,6 @@ declare global {
     R,
     Path extends RecordPathsWithIndex<R>,
   > = _TSTypeForge.RecordValueAtPathWithIndex<R, Path>;
-  type StrictExtract<T, U extends T> = _TSTypeForge.StrictExtract<T, U>;
-  type RelaxedExtract<T, U> = _TSTypeForge.RelaxedExtract<T, U>;
-  type StrictPick<T, K extends keyof T> = _TSTypeForge.StrictPick<T, K>;
-  type RelaxedPick<T, K> = _TSTypeForge.RelaxedPick<T, K>;
-  type StrictExclude<T, U extends T> = _TSTypeForge.StrictExclude<T, U>;
-  type RelaxedExclude<T, U> = _TSTypeForge.RelaxedExclude<T, U>;
-  type StrictOmit<T, K extends keyof T> = _TSTypeForge.StrictOmit<T, K>;
-  type RelaxedOmit<T, K> = _TSTypeForge.RelaxedOmit<T, K>;
-  type ReadonlyRecord<K extends PropertyKey, T> = _TSTypeForge.ReadonlyRecord<
-    K,
-    T
-  >;
-  type MutableRecord<K extends PropertyKey, T> = _TSTypeForge.MutableRecord<
-    K,
-    T
-  >;
   type MutableNonEmptyArray<A> = _TSTypeForge.MutableNonEmptyArray<A>;
   type NonEmptyArray<A> = _TSTypeForge.NonEmptyArray<A>;
   type ArrayElement<S> = _TSTypeForge.ArrayElement<S>;

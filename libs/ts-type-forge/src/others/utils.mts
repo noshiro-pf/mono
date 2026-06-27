@@ -1,5 +1,5 @@
 import { type FalsyValue, type UnknownRecord } from '../constants/index.mjs';
-import { type RelaxedExclude } from '../record/index.mjs';
+import { type RelaxedExclude } from './std.mjs';
 
 /* Other Utilities */
 

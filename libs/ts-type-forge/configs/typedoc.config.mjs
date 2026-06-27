@@ -12,6 +12,7 @@ const config = {
     './**/index.mts',
     './**/*.test.mts',
     './**/_internals.mts',
+    './**/_number-brand-internals.mts',
     './entry-point.mts',
     './global.mts',
   ].map((p) => path.resolve(srcDir, p)),

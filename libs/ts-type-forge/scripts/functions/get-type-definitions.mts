@@ -74,6 +74,7 @@ export const genTypeDefinitions = async (): Promise<void> => {
       base !== 'index.mts' &&
       base !== 'global.mts' &&
       base !== '_internals.mts' &&
+      base !== '_number-brand-internals.mts' &&
       !base.endsWith('.test.mts')
     );
   });

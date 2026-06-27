@@ -1,4 +1,4 @@
-import { type RelaxedExclude } from '../record/index.mjs';
+import { type RelaxedExclude } from '../others/index.mjs';
 import { type Index, type IndexInclusive } from './index-type.mjs';
 
 /**

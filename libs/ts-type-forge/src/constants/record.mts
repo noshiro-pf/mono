@@ -1,4 +1,4 @@
-import { type ReadonlyRecord } from '../record/index.mjs';
+import { type ReadonlyRecord } from '../others/index.mjs';
 
 /**
  * Represents a generic readonly record (object) type where keys are strings

@@ -1,6 +1,5 @@
 import { type IsFixedLengthList } from '../condition/index.mjs';
-import { type ToNumber } from '../others/index.mjs';
-import { type RelaxedExclude } from '../record/index.mjs';
+import { type RelaxedExclude, type ToNumber } from '../others/index.mjs';
 
 /**
  * Extracts the numeric index type from a readonly array or tuple type `T`.

@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
 import { type TypeEq } from '../condition/index.mjs';
-import { type RelaxedExclude } from '../record/index.mjs';
+import { type RelaxedExclude } from '../others/index.mjs';
 import {
   type Index,
   type NegativeIndex,

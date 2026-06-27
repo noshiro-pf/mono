@@ -1,7 +1,7 @@
 import {
   type TSTypeForgeInternals_BrandedNumberBaseType,
   type TSTypeForgeInternals_ExtendNumberBrand,
-} from './_internals.mjs';
+} from './_number-brand-internals.mjs';
 import { type IntersectBrand } from './brand.mjs';
 
 /*
@@ -9,15 +9,14 @@ This file serves as the main entry point for all branded number types.
 All type definitions have been moved to separate files organized by base type:
 
 Core types and utilities:
-├── core.mts - Base infrastructure, NaN, ValidNumber, basic ranges
-├── finite-number.mts - FiniteNumber, InfiniteNumber, POSITIVE/NEGATIVE_INFINITY
-├── int.mts - Int, NonZeroInt, NonNegativeInt, PositiveInt, NegativeInt
-├── uint.mts - Uint (unsigned integers)
-├── safe-int.mts - SafeInt and all its variants
+├── core.mts - Base infrastructure, NaN, ValidNumber, basic ranges, NonPositiveNumber
+├── finite-number.mts - FiniteNumber, NonPositiveFiniteNumber, InfiniteNumber, POSITIVE/NEGATIVE_INFINITY
+├── int.mts - Int, NonZeroInt, NonNegativeInt, PositiveInt, NegativeInt, NonPositiveInt
+├── safe-int.mts - SafeInt, NonPositiveSafeInt and all variants
 
 Sized integer types:
-├── int32.mts - Int32, NonNegativeInt32, PositiveInt32, NegativeInt32, NonZeroInt32
-├── int16.mts - Int16, NonNegativeInt16, PositiveInt16, NegativeInt16, NonZeroInt16
+├── int32.mts - Int32, NonNegativeInt32, PositiveInt32, NegativeInt32, NonZeroInt32, NonPositiveInt32
+├── int16.mts - Int16, NonNegativeInt16, PositiveInt16, NegativeInt16, NonZeroInt16, NonPositiveInt16
 ├── uint32.mts - Uint32, PositiveUint32, NonZeroUint32
 ├── uint16.mts - Uint16, PositiveUint16, NonZeroUint16
 
@@ -38,7 +37,8 @@ type IntRangeKeys =
   | '> -2^32'
   | '>= -2^15'
   | '>= -2^31'
-  | '>=0';
+  | '>=0'
+  | '<=0';
 
 /**
  * Branded numeric type representing the `NaN` value.
@@ -133,7 +133,30 @@ export type NonNegativeNumber = TSTypeForgeInternals_ExtendNumberBrand<
  * const scale = (value: number, factor: PositiveNumber) => value * factor;
  * ```
  */
-export type PositiveNumber = IntersectBrand<NonZeroNumber, NonNegativeNumber>;
+export type PositiveNumber = TSTypeForgeInternals_ExtendNumberBrand<
+  IntersectBrand<NonNegativeNumber, NonZeroNumber>,
+  never,
+  '<=0'
+>;
+
+/**
+ * Branded numeric type for non-positive numbers (x <= 0).
+ * Includes zero and all negative numbers.
+ *
+ * @example
+ * ```ts
+ * const isNonPositive = (x: number): x is NonPositiveNumber => x <= 0;
+ *
+ * const clampToNonPositive = (x: number): NonPositiveNumber =>
+ *   Math.min(x, 0) as NonPositiveNumber;
+ *
+ * const debt = (amount: NonPositiveNumber) => ({ debtOrZero: amount });
+ * ```
+ */
+export type NonPositiveNumber = TSTypeForgeInternals_ExtendNumberBrand<
+  ValidNumber,
+  '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32' | '<=0'
+>;
 
 /**
  * Branded numeric type for negative numbers (x < 0).
@@ -150,7 +173,7 @@ export type PositiveNumber = IntersectBrand<NonZeroNumber, NonNegativeNumber>;
  * ```
  */
 export type NegativeNumber = TSTypeForgeInternals_ExtendNumberBrand<
-  NonZeroNumber,
-  '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32',
+  IntersectBrand<NonPositiveNumber, NonZeroNumber>,
+  never,
   '>=0'
 >;

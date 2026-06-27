@@ -1,4 +1,4 @@
-import { type RelaxedExclude } from '../record/index.mjs';
+import { type RelaxedExclude } from '../others/index.mjs';
 import { type IndexOfTuple, type MakeTuple } from '../tuple-and-list/index.mjs';
 
 /**

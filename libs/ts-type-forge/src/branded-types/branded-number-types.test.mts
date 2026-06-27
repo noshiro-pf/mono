@@ -6,6 +6,7 @@ import {
   type NaNType,
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonPositiveNumber,
   type NonZeroNumber,
   type PositiveNumber,
   type ValidNumber,
@@ -53,6 +54,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: false;
         SafeInt: false;
         '!=0': true;
+        '>=0': false;
+        '<=0': false;
         '< 2^15': false;
         '< 2^16': false;
         '< 2^31': false;
@@ -61,7 +64,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': false;
         '>= -2^15': false;
         '>= -2^31': false;
-        '>=0': false;
       }>
     > &
       number
@@ -73,9 +75,9 @@ import { type Uint32 } from './uint32.mjs';
       Readonly<{
         NaNValue: false;
         Finite: false;
-        '!=0': true;
         Int: false;
         SafeInt: false;
+        '!=0': true;
       }>
     > &
       number
@@ -87,10 +89,11 @@ import { type Uint32 } from './uint32.mjs';
       Readonly<{
         NaNValue: false;
         Finite: false;
-        '!=0': true;
         Int: false;
         SafeInt: false;
+        '!=0': true;
         '>=0': true;
+        '<=0': false;
         '>= -2^15': true;
         '> -2^16': true;
         '>= -2^31': true;
@@ -110,10 +113,11 @@ import { type Uint32 } from './uint32.mjs';
       Readonly<{
         NaNValue: false;
         Finite: false;
-        '!=0': true;
         Int: false;
         SafeInt: false;
+        '!=0': true;
         '>=0': false;
+        '<=0': true;
         '>= -2^15': false;
         '> -2^16': false;
         '>= -2^31': false;
@@ -163,6 +167,8 @@ import { type Uint32 } from './uint32.mjs';
       Readonly<{
         NaNValue: false;
         '!=0': true;
+        '>=0': true;
+        '<=0': false;
         // '< 2^15': true;
         // '< 2^16': true;
         // '< 2^31': true;
@@ -171,7 +177,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
       }>
     > &
       number
@@ -187,6 +192,8 @@ import { type Uint32 } from './uint32.mjs';
       Readonly<{
         NaNValue: false;
         '!=0': true;
+        '>=0': false;
+        '<=0': true;
         '< 2^15': true;
         '< 2^16': true;
         '< 2^31': true;
@@ -195,7 +202,6 @@ import { type Uint32 } from './uint32.mjs';
         // '> -2^32': true;
         // '>= -2^15': true;
         // '>= -2^31': true;
-        '>=0': false;
       }>
     > &
       number
@@ -234,6 +240,8 @@ import { type Uint32 } from './uint32.mjs';
         Finite: true;
         Int: true;
         // '!=0': true;
+        '>=0': true;
+        // '<=0': false;
         // '< 2^15': true;
         // '< 2^16': true;
         // '< 2^31': true;
@@ -242,7 +250,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
       }>
     > &
       number
@@ -256,6 +263,8 @@ import { type Uint32 } from './uint32.mjs';
         Finite: true;
         Int: true;
         '!=0': true;
+        '>=0': true;
+        '<=0': false;
         // '< 2^15': true;
         // '< 2^16': true;
         // '< 2^31': true;
@@ -264,7 +273,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
       }>
     > &
       number
@@ -278,6 +286,8 @@ import { type Uint32 } from './uint32.mjs';
         Finite: true;
         Int: true;
         '!=0': true;
+        '>=0': false;
+        '<=0': true;
         '< 2^15': true;
         '< 2^16': true;
         '< 2^31': true;
@@ -286,7 +296,6 @@ import { type Uint32 } from './uint32.mjs';
         // '> -2^32': true;
         // '>= -2^15': true;
         // '>= -2^31': true;
-        '>=0': false;
       }>
     > &
       number
@@ -327,6 +336,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: true;
         SafeInt: true;
         // '!=0': true;
+        '>=0': true;
+        // '<=0': false;
         // '< 2^15': true;
         // '< 2^16': true;
         // '< 2^31': true;
@@ -335,7 +346,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
       }>
     > &
       number
@@ -350,6 +360,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: true;
         SafeInt: true;
         '!=0': true;
+        '>=0': true;
+        '<=0': false;
         // '< 2^15': true;
         // '< 2^16': true;
         // '< 2^31': true;
@@ -358,7 +370,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
       }>
     > &
       number
@@ -371,8 +382,10 @@ import { type Uint32 } from './uint32.mjs';
         NaNValue: false;
         Finite: true;
         Int: true;
-        '!=0': true;
         SafeInt: true;
+        '!=0': true;
+        '>=0': false;
+        '<=0': true;
         '< 2^15': true;
         '< 2^16': true;
         '< 2^31': true;
@@ -381,7 +394,6 @@ import { type Uint32 } from './uint32.mjs';
         // '> -2^32': true;
         // '>= -2^15': true;
         // '>= -2^31': true;
-        '>=0': false;
       }>
     > &
       number
@@ -410,6 +422,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: true;
         SafeInt: true;
         // '!=0': true;
+        // '>=0': true;
+        // '<=0': false;
         // '< 2^15': true;
         // '< 2^16': true;
         '< 2^31': true;
@@ -418,7 +432,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         // '>= -2^15': true;
         '>= -2^31': true;
-        // '>=0': true;
       }>
     > &
       number
@@ -433,6 +446,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: true;
         SafeInt: true;
         // '!=0': true;
+        // '>=0': true;
+        // '<=0': false;
         '< 2^15': true;
         '< 2^16': true;
         '< 2^31': true;
@@ -441,7 +456,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        // '>=0': true;
       }>
     > &
       number
@@ -456,6 +470,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: true;
         SafeInt: true;
         // '!=0': true;
+        '>=0': true;
+        // '<=0': false;
         // '< 2^15': true;
         // '< 2^16': true;
         // '< 2^31': true;
@@ -464,7 +480,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
       }>
     > &
       number
@@ -479,6 +494,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: true;
         SafeInt: true;
         // '!=0': true;
+        '>=0': true;
+        // '<=0': false;
         // '< 2^15': true;
         '< 2^16': true;
         '< 2^31': true;
@@ -487,7 +504,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': true;
       }>
     > &
       number
@@ -504,6 +520,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: true;
         SafeInt: true;
         '!=0': true;
+        '>=0': false;
+        // '<=0': false;
         '< 2^15': true;
         '< 2^16': true;
         '< 2^31': true;
@@ -512,7 +530,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         // '>= -2^15': true;
         // '>= -2^31': true;
-        '>=0': false;
       }>
     > &
       number
@@ -529,6 +546,8 @@ import { type Uint32 } from './uint32.mjs';
         Int: true;
         SafeInt: true;
         '!=0': true;
+        '>=0': false;
+        // '<=0': false;
         '< 2^15': true;
         '< 2^16': true;
         '< 2^31': true;
@@ -537,7 +556,6 @@ import { type Uint32 } from './uint32.mjs';
         '> -2^32': true;
         // '>= -2^15': true;
         '>= -2^31': true;
-        '>=0': false;
       }>
     > &
       number
@@ -764,7 +782,7 @@ import { type Uint32 } from './uint32.mjs';
 
 {
   {
-    // types that extend Int
+    // types that extend NonNegativeNumber
     const op = '<=';
 
     expectType<Uint, NonNegativeNumber>(op);
@@ -783,7 +801,7 @@ import { type Uint32 } from './uint32.mjs';
   }
 
   {
-    // types that don't extend Int
+    // types that don't extend NonNegativeNumber
     const op = '!<=';
 
     expectType<InfiniteNumber, NonNegativeNumber>(op);
@@ -819,6 +837,66 @@ import { type Uint32 } from './uint32.mjs';
     expectType<BigInt64, NonNegativeNumber>(op);
 
     expectType<BigUint64, NonNegativeNumber>(op);
+  }
+}
+
+{
+  {
+    // types that extend NonPositiveNumber
+    const op = '<=';
+
+    expectType<NonPositiveNumber, NonPositiveNumber>(op);
+
+    expectType<NEGATIVE_INFINITY, NonPositiveNumber>(op);
+
+    expectType<NegativeNumber, NonPositiveNumber>(op);
+
+    expectType<NegativeInt32, NonPositiveNumber>(op);
+
+    expectType<NegativeInt16, NonPositiveNumber>(op);
+  }
+
+  {
+    // types that don't extend NonPositiveNumber
+    const op = '!<=';
+
+    expectType<PositiveNumber, NonPositiveNumber>(op);
+
+    expectType<Uint, NonPositiveNumber>(op);
+
+    expectType<SafeUint, NonPositiveNumber>(op);
+
+    expectType<Uint32, NonPositiveNumber>(op);
+
+    expectType<Uint16, NonPositiveNumber>(op);
+
+    expectType<POSITIVE_INFINITY, NonPositiveNumber>(op);
+
+    expectType<InfiniteNumber, NonPositiveNumber>(op);
+
+    expectType<NonZeroNumber, NonPositiveNumber>(op);
+
+    expectType<FiniteNumber, NonPositiveNumber>(op);
+
+    expectType<Int, NonPositiveNumber>(op);
+
+    expectType<NonZeroInt, NonPositiveNumber>(op);
+
+    expectType<SafeInt, NonPositiveNumber>(op);
+
+    expectType<NonZeroSafeInt, NonPositiveNumber>(op);
+
+    expectType<Int32, NonPositiveNumber>(op);
+
+    expectType<Int16, NonPositiveNumber>(op);
+
+    expectType<Float32, NonPositiveNumber>(op);
+
+    expectType<Float64, NonPositiveNumber>(op);
+
+    expectType<BigInt64, NonPositiveNumber>(op);
+
+    expectType<BigUint64, NonPositiveNumber>(op);
   }
 }
 
@@ -940,9 +1018,17 @@ import { type Uint32 } from './uint32.mjs';
 
   expectType<NaNType & ValidNumber, never>('=');
 
+  expectType<NaNType & Int, never>('=');
+
+  expectType<NaNType & Int32, never>('=');
+
   expectType<NegativeNumber & NonNegativeNumber, never>('=');
 
   expectType<NegativeNumber & PositiveNumber, never>('=');
+
+  expectType<PositiveNumber & NonPositiveNumber, never>('=');
+
+  expectType<PositiveNumber & NegativeNumber, never>('=');
 
   expectType<NegativeInt & PositiveInt, never>('=');
 
