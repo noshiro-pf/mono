@@ -738,6 +738,56 @@ describe(convertToReadonlyTransformer, () => {
       },
     ])('$name', testFn);
 
+    describe('Conditional type union-distribution-guard idiom', () => {
+      test.each([
+        {
+          name: 'Single-element tuples in check and extends positions are left as-is',
+          source: dedent`
+            type TypeExtends<A, B> = [A] extends [B] ? true : false;
+          `,
+          expected: dedent`
+            type TypeExtends<A, B> = [A] extends [B] ? true : false;
+          `,
+        },
+        {
+          name: 'Multi-element guard tuples are left as-is',
+          source: dedent`
+            type Eq<A, B> = [A, B] extends [B, A] ? true : false;
+          `,
+          expected: dedent`
+            type Eq<A, B> = [A, B] extends [B, A] ? true : false;
+          `,
+        },
+        {
+          name: 'Tuples in true/false branches are still converted',
+          source: dedent`
+            type T<A> = [A] extends [string] ? [A, A] : [number];
+          `,
+          expected: dedent`
+            type T<A> = [A] extends [string] ? readonly [A, A] : readonly [number];
+          `,
+        },
+        {
+          name: 'Arrays in check and extends positions are left as-is',
+          source: dedent`
+            type ArrayExtends<A, B> = A[] extends B[] ? true : false;
+          `,
+          expected: dedent`
+            type ArrayExtends<A, B> = A[] extends B[] ? true : false;
+          `,
+        },
+        {
+          name: 'Arrays in true/false branches are still converted',
+          source: dedent`
+            type T<A> = A[] extends string[] ? A[] : number[];
+          `,
+          expected: dedent`
+            type T<A> = A[] extends string[] ? readonly A[] : readonly number[];
+          `,
+        },
+      ])('$name', testFn);
+    });
+
     describe('Rest types', () => {
       test.each([
         {

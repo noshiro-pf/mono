@@ -12,6 +12,7 @@ import { type DeepReadonly, type SafeUintWithSmallInt } from 'ts-type-forge';
 import {
   hasDisableNextLineComment,
   isAtomicTypeNode,
+  isConditionalTypeDistributionGuard,
   isReadonlyArrayTypeNode,
   isReadonlyTupleOrArrayTypeNode,
   isReadonlyTupleTypeNode,
@@ -705,7 +706,12 @@ const transformArrayTypeNode = (
     // Unnecessary `Readonly` wrapper will be remove in transformTypeReferenceNode
     case 'Readonly':
     case 'none':
-      if (readonlyContext.indexedAccessDepth === 0) {
+      // Skip the `A[] extends B[] ? ...` union-distribution-guard idiom: adding
+      // `readonly` there does not improve immutability and breaks the idiom.
+      if (
+        readonlyContext.indexedAccessDepth === 0 &&
+        !isConditionalTypeDistributionGuard(node)
+      ) {
         const readonlyText = `readonly ${node.getFullText()}` as const;
 
         options.replaceNode(
@@ -752,7 +758,12 @@ const transformTupleTypeNode = (
     // Unnecessary `Readonly` wrapper will be remove in transformTypeReferenceNode
     case 'Readonly':
     case 'none':
-      if (readonlyContext.indexedAccessDepth === 0) {
+      // Skip the `[A] extends [B] ? ...` union-distribution-guard idiom: adding
+      // `readonly` there does not improve immutability and breaks the idiom.
+      if (
+        readonlyContext.indexedAccessDepth === 0 &&
+        !isConditionalTypeDistributionGuard(node)
+      ) {
         const readonlyText = `readonly ${node.getFullText()}` as const;
 
         options.replaceNode(
