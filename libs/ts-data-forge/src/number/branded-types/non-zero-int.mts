@@ -10,16 +10,13 @@ const typeNameInMessage = 'a non-zero integer';
 
 const {
   abs,
-  add,
   castType,
-  div,
   is,
   max: max_,
   min: min_,
   mul,
   pow,
   randomNonZero: random,
-  sub,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   number,
@@ -108,48 +105,29 @@ export const NonZeroInt = {
   pow,
 
   /**
-   * Adds two non-zero integers.
-   *
-   * @param a The first non-zero integer.
-   * @param b The second non-zero integer.
-   * @returns `a + b` as a NonZeroInt.
-   */
-  add,
-
-  /**
-   * Subtracts one non-zero integer from another.
-   *
-   * @param a The minuend non-zero integer.
-   * @param b The subtrahend non-zero integer.
-   * @returns `a - b` as a NonZeroInt.
-   */
-  sub,
-
-  /**
    * Multiplies two non-zero integers.
+   *
+   * The product of two non-zero integers is always non-zero, so this stays
+   * closed; for the non-closed operations (`add`/`sub`/`div`, whose result may
+   * be `0`) use {@link Num.add}/{@link Num.sub}/{@link Num.divInt}.
    *
    * @param a The first non-zero integer.
    * @param b The second non-zero integer.
    * @returns `a * b` as a NonZeroInt.
    */
   mul,
-
-  /**
-   * Divides one non-zero integer by another using floor division.
-   *
-   * @param a The dividend non-zero integer.
-   * @param b The divisor non-zero integer.
-   * @returns `⌊a / b⌋` as a NonZeroInt.
-   */
-  div,
 } as const;
 
 expectType<
   keyof typeof NonZeroInt,
-  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<ElementType, 'int'>
+  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
+    ElementType,
+    'int',
+    'mul'
+  >
 >('=');
 
 expectType<
   typeof NonZeroInt,
-  TsDataForgeInternals.RefinedNumberUtils.NumberClass<ElementType, 'int'>
+  TsDataForgeInternals.RefinedNumberUtils.NumberClass<ElementType, 'int', 'mul'>
 >('<=');

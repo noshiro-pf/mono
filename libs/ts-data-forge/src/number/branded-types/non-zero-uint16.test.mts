@@ -159,12 +159,6 @@ describe('NonZeroUint16 test', () => {
       expect(NonZeroUint16.add(a, b)).toBe(150);
     });
 
-    test('sub (never goes below 1)', () => {
-      expect(NonZeroUint16.sub(a, b)).toBe(50);
-
-      expect(NonZeroUint16.sub(b, a)).toBe(1); // clamped to 1
-    });
-
     test('mul (with clamping to non-zero uint16 range)', () => {
       const result = NonZeroUint16.mul(
         asNonZeroUint16(1000),
@@ -176,16 +170,6 @@ describe('NonZeroUint16 test', () => {
       expect(NonZeroUint16.mul(asNonZeroUint16(10), asNonZeroUint16(5))).toBe(
         50,
       );
-    });
-
-    test('div (floor division, never goes below 1)', () => {
-      expect(NonZeroUint16.div(a, asNonZeroUint16(50))).toBe(2);
-
-      expect(NonZeroUint16.div(asNonZeroUint16(7), asNonZeroUint16(3))).toBe(2);
-
-      expect(NonZeroUint16.div(asNonZeroUint16(50), asNonZeroUint16(100))).toBe(
-        1,
-      ); // floor(50/100) = 0, clamped to 1
     });
 
     test('pow (with clamping to non-zero uint16 range)', () => {

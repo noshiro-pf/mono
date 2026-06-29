@@ -12,17 +12,14 @@ const {
   MAX_VALUE,
   MIN_VALUE,
   abs,
-  add,
   castType,
   clamp,
-  div,
   is,
   max: max_,
   min: min_,
   mul,
   pow,
   randomNonZero: random,
-  sub,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   number,
@@ -139,47 +136,25 @@ export const NonZeroInt32 = {
   pow,
 
   /**
-   * Adds two NonZeroInt32 values.
-   *
-   * @param a The first NonZeroInt32.
-   * @param b The second NonZeroInt32.
-   * @returns `a + b` clamped to [-2147483648, 2147483647] as a NonZeroInt32.
-   */
-  add,
-
-  /**
-   * Subtracts one NonZeroInt32 from another.
-   *
-   * @param a The minuend NonZeroInt32.
-   * @param b The subtrahend NonZeroInt32.
-   * @returns `a - b` clamped to [-2147483648, 2147483647] as a NonZeroInt32.
-   */
-  sub,
-
-  /**
    * Multiplies two NonZeroInt32 values.
+   *
+   * The product of two non-zero integers is always non-zero, so this stays
+   * closed; for the non-closed operations (`add`/`sub`/`div`, whose result may
+   * be `0`) use {@link Num.add}/{@link Num.sub}/{@link Num.divInt}.
    *
    * @param a The first NonZeroInt32.
    * @param b The second NonZeroInt32.
    * @returns `a * b` clamped to [-2147483648, 2147483647] as a NonZeroInt32.
    */
   mul,
-
-  /**
-   * Divides one NonZeroInt32 by another using floor division.
-   *
-   * @param a The dividend NonZeroInt32.
-   * @param b The divisor NonZeroInt32.
-   * @returns `⌊a / b⌋` clamped to [-2147483648, 2147483647] as a NonZeroInt32.
-   */
-  div,
 } as const;
 
 expectType<
   keyof typeof NonZeroInt32,
   keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
-    'int' | 'range'
+    'int' | 'range',
+    'mul'
   >
 >('=');
 
@@ -187,6 +162,7 @@ expectType<
   typeof NonZeroInt32,
   TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
-    'int' | 'range'
+    'int' | 'range',
+    'mul'
   >
 >('<=');

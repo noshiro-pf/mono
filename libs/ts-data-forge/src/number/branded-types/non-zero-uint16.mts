@@ -14,14 +14,12 @@ const {
   add,
   castType,
   clamp,
-  div,
   is,
   max: max_,
   min: min_,
   mul,
   pow,
   randomNonZero: random,
-  sub,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   1,
@@ -137,38 +135,25 @@ export const NonZeroUint16 = {
   add,
 
   /**
-   * Subtracts one NonZeroUint16 from another.
-   *
-   * @param a The minuend NonZeroUint16.
-   * @param b The subtrahend NonZeroUint16.
-   * @returns `a - b` clamped to [1, 65535] as a NonZeroUint16 (minimum 1).
-   */
-  sub,
-
-  /**
    * Multiplies two NonZeroUint16 values.
+   *
+   * Both `add` and `mul` stay within `[1, 65535]`. For the non-closed
+   * operations (`sub`/`div`, whose result may be `0`) use {@link Num.sub} /
+   * {@link Num.divInt}.
    *
    * @param a The first NonZeroUint16.
    * @param b The second NonZeroUint16.
    * @returns `a * b` clamped to [1, 65535] as a NonZeroUint16.
    */
   mul,
-
-  /**
-   * Divides one NonZeroUint16 by another using floor division.
-   *
-   * @param a The dividend NonZeroUint16.
-   * @param b The divisor NonZeroUint16.
-   * @returns `⌊a / b⌋` clamped to [1, 65535] as a NonZeroUint16.
-   */
-  div,
 } as const;
 
 expectType<
   keyof typeof NonZeroUint16,
   keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
-    'int' | 'positive' | 'range'
+    'int' | 'positive' | 'range',
+    'add' | 'mul'
   >
 >('=');
 
@@ -176,6 +161,7 @@ expectType<
   typeof NonZeroUint16,
   TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
-    'int' | 'positive' | 'range'
+    'int' | 'positive' | 'range',
+    'add' | 'mul'
   >
 >('<=');

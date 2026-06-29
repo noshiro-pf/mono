@@ -16,17 +16,14 @@ const {
   MAX_VALUE,
   MIN_VALUE,
   abs,
-  add,
   castType,
   clamp,
-  div,
   is,
   max: max_,
   min: min_,
   mul,
   pow,
   randomNonZero: random,
-  sub,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   SafeInt,
@@ -145,27 +142,11 @@ export const NonZeroSafeInt = {
   pow,
 
   /**
-   * Adds two NonZeroSafeInt values.
-   *
-   * @param a The first NonZeroSafeInt.
-   * @param b The second NonZeroSafeInt.
-   * @returns `a + b` clamped to non-zero safe integer range as a
-   *   NonZeroSafeInt.
-   */
-  add,
-
-  /**
-   * Subtracts one NonZeroSafeInt from another.
-   *
-   * @param a The minuend NonZeroSafeInt.
-   * @param b The subtrahend NonZeroSafeInt.
-   * @returns `a - b` clamped to non-zero safe integer range as a
-   *   NonZeroSafeInt.
-   */
-  sub,
-
-  /**
    * Multiplies two NonZeroSafeInt values.
+   *
+   * The product of two non-zero safe integers is always non-zero, so this stays
+   * closed; for the non-closed operations (`add`/`sub`/`div`, whose result may
+   * be `0`) use {@link Num.add}/{@link Num.sub}/{@link Num.divInt}.
    *
    * @param a The first NonZeroSafeInt.
    * @param b The second NonZeroSafeInt.
@@ -173,23 +154,14 @@ export const NonZeroSafeInt = {
    *   NonZeroSafeInt.
    */
   mul,
-
-  /**
-   * Divides one NonZeroSafeInt by another using floor division.
-   *
-   * @param a The dividend NonZeroSafeInt.
-   * @param b The divisor NonZeroSafeInt.
-   * @returns `⌊a / b⌋` clamped to non-zero safe integer range as a
-   *   NonZeroSafeInt.
-   */
-  div,
 } as const;
 
 expectType<
   keyof typeof NonZeroSafeInt,
   keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
-    'int' | 'range'
+    'int' | 'range',
+    'mul'
   >
 >('=');
 
@@ -197,6 +169,7 @@ expectType<
   typeof NonZeroSafeInt,
   TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
-    'int' | 'range'
+    'int' | 'range',
+    'mul'
   >
 >('<=');

@@ -159,12 +159,6 @@ describe('NonZeroUint32 test', () => {
       expect(NonZeroUint32.add(a, b)).toBe(1_500_000);
     });
 
-    test('sub (never goes below 1)', () => {
-      expect(NonZeroUint32.sub(a, b)).toBe(500_000);
-
-      expect(NonZeroUint32.sub(b, a)).toBe(1); // clamped to 1
-    });
-
     test('mul (with clamping to non-zero uint32 range)', () => {
       const result = NonZeroUint32.mul(
         asNonZeroUint32(100_000),
@@ -176,16 +170,6 @@ describe('NonZeroUint32 test', () => {
       expect(NonZeroUint32.mul(asNonZeroUint32(1000), asNonZeroUint32(5))).toBe(
         5000,
       );
-    });
-
-    test('div (floor division, never goes below 1)', () => {
-      expect(NonZeroUint32.div(a, asNonZeroUint32(500_000))).toBe(2);
-
-      expect(NonZeroUint32.div(asNonZeroUint32(7), asNonZeroUint32(3))).toBe(2);
-
-      expect(
-        NonZeroUint32.div(asNonZeroUint32(500_000), asNonZeroUint32(1_000_000)),
-      ).toBe(1); // floor(500000/1000000) = 0, clamped to 1
     });
 
     test('pow (with clamping to non-zero uint32 range)', () => {

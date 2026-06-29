@@ -8,7 +8,7 @@ import {
   asUint,
   asUint32,
   Int16,
-  NonZeroInt,
+  Num,
 } from 'ts-data-forge';
 
 /* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
@@ -63,7 +63,7 @@ import {
     assert.isTrue(clamped === 32_767);
 
     // Safe division with non-zero types
-    const ratio = NonZeroInt.div(asNonZeroInt(10), nonZeroInt); // No division by zero risk
+    const ratio = Num.divInt(asNonZeroInt(10), nonZeroInt); // No division by zero risk
 
     assert.isTrue(ratio === 2);
 

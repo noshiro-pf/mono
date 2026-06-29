@@ -170,26 +170,6 @@ describe('NonZeroSafeInt test', () => {
       expect(NonZeroSafeInt.max(a, c)).toBe(5);
     });
 
-    test('add (with clamping to safe integer range)', () => {
-      const largeValue = asNonZeroSafeInt(Number.MAX_SAFE_INTEGER - 1);
-
-      const result = NonZeroSafeInt.add(largeValue, asNonZeroSafeInt(10));
-
-      expect(result).toBe(Number.MAX_SAFE_INTEGER); // clamped to max
-
-      expect(NonZeroSafeInt.add(a, b)).toBe(7);
-    });
-
-    test('sub (with clamping to safe integer range)', () => {
-      const smallValue = asNonZeroSafeInt(Number.MIN_SAFE_INTEGER + 1);
-
-      const result = NonZeroSafeInt.sub(smallValue, asNonZeroSafeInt(10));
-
-      expect(result).toBe(Number.MIN_SAFE_INTEGER); // clamped to min
-
-      expect(NonZeroSafeInt.sub(a, b)).toBe(3);
-    });
-
     test('mul (with clamping to safe integer range)', () => {
       const largeValue = asNonZeroSafeInt(
         Math.floor(Math.sqrt(Number.MAX_SAFE_INTEGER)),
@@ -202,18 +182,6 @@ describe('NonZeroSafeInt test', () => {
       expect(
         NonZeroSafeInt.mul(asNonZeroSafeInt(10), asNonZeroSafeInt(5)),
       ).toBe(50);
-    });
-
-    test('div (floor division with clamping)', () => {
-      expect(NonZeroSafeInt.div(a, b)).toBe(2);
-
-      expect(NonZeroSafeInt.div(asNonZeroSafeInt(7), asNonZeroSafeInt(3))).toBe(
-        2,
-      );
-
-      expect(
-        NonZeroSafeInt.div(asNonZeroSafeInt(-7), asNonZeroSafeInt(3)),
-      ).toBe(-3);
     });
 
     test('pow (with clamping to safe integer range)', () => {

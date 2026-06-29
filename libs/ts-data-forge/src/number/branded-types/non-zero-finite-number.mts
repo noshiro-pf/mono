@@ -15,7 +15,6 @@ const typeNameInMessage = 'a non-zero finite number';
 
 const {
   abs,
-  add,
   castType,
   div,
   is,
@@ -24,7 +23,6 @@ const {
   mul,
   pow,
   randomNonZero: random,
-  sub,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForFloat<
   ElementType,
   number,
@@ -170,24 +168,6 @@ export const NonZeroFiniteNumber = {
   pow,
 
   /**
-   * Adds two NonZeroFiniteNumber values.
-   *
-   * @param a The first NonZeroFiniteNumber.
-   * @param b The second NonZeroFiniteNumber.
-   * @returns `a + b` as a NonZeroFiniteNumber.
-   */
-  add,
-
-  /**
-   * Subtracts one NonZeroFiniteNumber from another.
-   *
-   * @param a The minuend NonZeroFiniteNumber.
-   * @param b The subtrahend NonZeroFiniteNumber.
-   * @returns `a - b` as a NonZeroFiniteNumber.
-   */
-  sub,
-
-  /**
    * Multiplies two NonZeroFiniteNumber values.
    *
    * @param a The first NonZeroFiniteNumber.
@@ -198,6 +178,10 @@ export const NonZeroFiniteNumber = {
 
   /**
    * Divides one NonZeroFiniteNumber by another.
+   *
+   * Exact (non-flooring) division of two non-zero finite numbers is always
+   * non-zero, so this stays closed. For the non-closed operations (`add`/`sub`,
+   * whose result may be `0`) use {@link Num.add}/{@link Num.sub}.
    *
    * @param a The dividend NonZeroFiniteNumber.
    * @param b The divisor NonZeroFiniteNumber.
@@ -213,10 +197,18 @@ expectType<
 
 expectType<
   keyof typeof NonZeroFiniteNumber,
-  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<ElementType, never>
+  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
+    ElementType,
+    never,
+    'div' | 'mul'
+  >
 >('=');
 
 expectType<
   typeof NonZeroFiniteNumber,
-  TsDataForgeInternals.RefinedNumberUtils.NumberClass<ElementType, never>
+  TsDataForgeInternals.RefinedNumberUtils.NumberClass<
+    ElementType,
+    never,
+    'div' | 'mul'
+  >
 >('<=');

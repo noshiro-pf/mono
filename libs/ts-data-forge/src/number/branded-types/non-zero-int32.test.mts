@@ -154,28 +154,6 @@ describe('NonZeroInt32 test', () => {
       expect(NonZeroInt32.max(a, c)).toBe(1_000_000);
     });
 
-    test('add (with clamping)', () => {
-      const result = NonZeroInt32.add(
-        asNonZeroInt32(2_147_483_000),
-        asNonZeroInt32(1000),
-      );
-
-      expect(result).toBe(2_147_483_647); // clamped to max
-
-      expect(NonZeroInt32.add(a, b)).toBe(1_500_000);
-    });
-
-    test('sub (with clamping)', () => {
-      const result = NonZeroInt32.sub(
-        asNonZeroInt32(-2_147_483_000),
-        asNonZeroInt32(1000),
-      );
-
-      expect(result).toBe(-2_147_483_648); // clamped to min
-
-      expect(NonZeroInt32.sub(a, b)).toBe(500_000);
-    });
-
     test('mul (with clamping)', () => {
       const result = NonZeroInt32.mul(
         asNonZeroInt32(100_000),
@@ -187,14 +165,6 @@ describe('NonZeroInt32 test', () => {
       expect(NonZeroInt32.mul(asNonZeroInt32(1000), asNonZeroInt32(5))).toBe(
         5000,
       );
-    });
-
-    test('div (floor division with clamping)', () => {
-      expect(NonZeroInt32.div(a, asNonZeroInt32(500_000))).toBe(2);
-
-      expect(NonZeroInt32.div(asNonZeroInt32(7), asNonZeroInt32(3))).toBe(2);
-
-      expect(NonZeroInt32.div(asNonZeroInt32(-7), asNonZeroInt32(3))).toBe(-3);
     });
 
     test('pow (with clamping)', () => {

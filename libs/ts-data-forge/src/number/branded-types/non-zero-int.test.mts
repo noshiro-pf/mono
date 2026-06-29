@@ -127,30 +127,10 @@ describe('NonZeroInt test', () => {
       expect(NonZeroInt.max(a, c)).toBe(5);
     });
 
-    test('add', () => {
-      expect(NonZeroInt.add(a, b)).toBe(7);
-
-      expect(NonZeroInt.add(a, c)).toBe(2);
-    });
-
-    test('sub', () => {
-      expect(NonZeroInt.sub(a, b)).toBe(3);
-
-      expect(NonZeroInt.sub(a, c)).toBe(8);
-    });
-
     test('mul', () => {
       expect(NonZeroInt.mul(a, b)).toBe(10);
 
       expect(NonZeroInt.mul(a, c)).toBe(-15);
-    });
-
-    test('div (floor division)', () => {
-      expect(NonZeroInt.div(a, b)).toBe(2);
-
-      expect(NonZeroInt.div(asNonZeroInt(7), asNonZeroInt(3))).toBe(2);
-
-      expect(NonZeroInt.div(asNonZeroInt(-7), asNonZeroInt(3))).toBe(-3);
     });
 
     test('pow', () => {

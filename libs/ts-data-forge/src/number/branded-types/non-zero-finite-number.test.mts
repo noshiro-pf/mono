@@ -146,18 +146,6 @@ describe('NonZeroFiniteNumber test', () => {
       expect(NonZeroFiniteNumber.round(c)).toBe(-3);
     });
 
-    test('add', () => {
-      expect(NonZeroFiniteNumber.add(a, b)).toBe(8);
-
-      expect(NonZeroFiniteNumber.add(a, c)).toBe(2);
-    });
-
-    test('sub', () => {
-      expect(NonZeroFiniteNumber.sub(a, b)).toBe(3);
-
-      expect(NonZeroFiniteNumber.sub(a, c)).toBe(9);
-    });
-
     test('mul', () => {
       expect(NonZeroFiniteNumber.mul(a, b)).toBe(13.75);
 

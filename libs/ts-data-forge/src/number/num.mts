@@ -19,6 +19,13 @@ import {
 import { expectType } from '../expect-type.mjs';
 import { Result } from '../functional/index.mjs';
 import { type SmallPositiveInt } from '../types.mjs';
+import {
+  type AddResult,
+  type DivIntResult,
+  type DivResult,
+  type MulResult,
+  type SubResult,
+} from './num-arithmetic-types.mjs';
 
 /**
  * Namespace providing utility functions for number manipulation and validation.
@@ -504,19 +511,86 @@ export namespace Num {
   }
 
   /**
-   * Performs type-safe division with compile-time zero-check.
+   * Adds two numbers, returning the tightest sound branded result type.
    *
-   * This function leverages TypeScript's type system to prevent division by
-   * zero at compile time. The divisor must be typed as NonZeroNumber or a
-   * non-zero numeric literal.
+   * The sign of the result is computed exactly (e.g. a non-negative plus a
+   * non-negative is non-negative); the integer/finite level is preserved, with
+   * `SafeInt` operands widening to `Int` because the sum may exceed the safe
+   * range. No clamping is performed — for a result that stays inside a bounded
+   * type, use that type's branded `add` instead.
    *
-   * @param a - The dividend
-   * @param b - The divisor (must be non-zero, enforced by types)
-   * @returns The quotient of a / b
+   * @param a - The first addend.
+   * @param b - The second addend.
+   * @returns `a + b`, typed as the tightest branded type guaranteed to contain
+   *   it.
    */
-  export const div = (a: number, b: NonZeroNumber | SmallInt<'!=0'>): number =>
-    // eslint-disable-next-line total-functions/no-partial-division
-    a / b;
+  export const add = <A extends number, B extends number>(
+    a: A,
+    b: B,
+  ): AddResult<A, B> =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    (a + b) as AddResult<A, B>;
+
+  /**
+   * Subtracts `b` from `a`, returning the tightest sound branded result type.
+   *
+   * The sign is computed exactly; the level is preserved (with `SafeInt`
+   * widening to `Int`). No clamping — for saturating subtraction that stays in a
+   * bounded type (e.g. `Uint.sub` clamping at `0`), use that type's branded
+   * `sub`.
+   *
+   * @param a - The minuend.
+   * @param b - The subtrahend.
+   * @returns `a - b`, typed as the tightest branded type guaranteed to contain
+   *   it.
+   */
+  export const sub = <A extends number, B extends number>(
+    a: A,
+    b: B,
+  ): SubResult<A, B> =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    (a - b) as SubResult<A, B>;
+
+  /**
+   * Multiplies two numbers, returning the tightest sound branded result type.
+   *
+   * The sign follows the usual product rule (e.g. negative times negative is
+   * positive); the level is preserved (with `SafeInt` widening to `Int`). No
+   * clamping.
+   *
+   * @param a - The first factor.
+   * @param b - The second factor.
+   * @returns `a * b`, typed as the tightest branded type guaranteed to contain
+   *   it.
+   */
+  export const mul = <A extends number, B extends number>(
+    a: A,
+    b: B,
+  ): MulResult<A, B> =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    (a * b) as MulResult<A, B>;
+
+  /**
+   * Performs type-safe exact division with a compile-time zero-check.
+   *
+   * The divisor must be typed as `NonZeroNumber` or a non-zero numeric literal.
+   * The result sign follows the quotient rule; because exact division can be
+   * fractional, the level is `finite` (or `number`).
+   *
+   * @param a - The dividend.
+   * @param b - The divisor (must be non-zero, enforced by types).
+   * @returns `a / b`, typed as the tightest branded type guaranteed to contain
+   *   it.
+   */
+  export const div = <
+    A extends number,
+    B extends NonZeroNumber | SmallInt<'!=0'>,
+  >(
+    a: A,
+    b: B,
+  ): DivResult<A, B> =>
+    // eslint-disable-next-line total-functions/no-partial-division, total-functions/no-unsafe-type-assertion
+    (a / b) as DivResult<A, B>;
 
   /**
    * Performs integer division using floor division.
@@ -531,12 +605,19 @@ export namespace Num {
    * @param b - The divisor
    * @returns The integer quotient, or `NaN` if b is zero
    */
-  export const divInt = (
-    a: number,
-    b: NonZeroNumber | SmallInt<'!=0'>,
-  ): number =>
+  export const divInt = <
+    A extends number,
+    B extends NonZeroNumber | SmallInt<'!=0'>,
+  >(
+    a: A,
+    b: B,
+  ): DivIntResult<A, B> => {
     // eslint-disable-next-line total-functions/no-partial-division
-    Math.floor(Math.floor(a) / Math.floor(b));
+    const quotient = Math.floor(Math.floor(a) / Math.floor(b));
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return quotient as DivIntResult<A, B>;
+  };
 
   /**
    * Rounds a number to a specified number of decimal places.

@@ -154,28 +154,6 @@ describe('NonZeroInt16 test', () => {
       expect(NonZeroInt16.max(a, c)).toBe(100);
     });
 
-    test('add (with clamping)', () => {
-      const result = NonZeroInt16.add(
-        asNonZeroInt16(32_000),
-        asNonZeroInt16(1000),
-      );
-
-      expect(result).toBe(32_767); // clamped to max
-
-      expect(NonZeroInt16.add(a, b)).toBe(150);
-    });
-
-    test('sub (with clamping)', () => {
-      const result = NonZeroInt16.sub(
-        asNonZeroInt16(-32_000),
-        asNonZeroInt16(1000),
-      );
-
-      expect(result).toBe(-32_768); // clamped to min
-
-      expect(NonZeroInt16.sub(a, b)).toBe(50);
-    });
-
     test('mul (with clamping)', () => {
       const result = NonZeroInt16.mul(
         asNonZeroInt16(1000),
@@ -185,14 +163,6 @@ describe('NonZeroInt16 test', () => {
       expect(result).toBe(32_767); // clamped to max
 
       expect(NonZeroInt16.mul(asNonZeroInt16(10), asNonZeroInt16(5))).toBe(50);
-    });
-
-    test('div (floor division with clamping)', () => {
-      expect(NonZeroInt16.div(a, asNonZeroInt16(50))).toBe(2);
-
-      expect(NonZeroInt16.div(asNonZeroInt16(7), asNonZeroInt16(3))).toBe(2);
-
-      expect(NonZeroInt16.div(asNonZeroInt16(-7), asNonZeroInt16(3))).toBe(-3);
     });
 
     test('pow (with clamping)', () => {

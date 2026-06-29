@@ -14,14 +14,12 @@ const {
   add,
   castType,
   clamp,
-  div,
   is,
   max: max_,
   min: min_,
   mul,
   pow,
   randomNonZero: random,
-  sub,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
   ElementType,
   1,
@@ -137,38 +135,25 @@ export const NonZeroUint32 = {
   add,
 
   /**
-   * Subtracts one NonZeroUint32 from another.
-   *
-   * @param a The minuend NonZeroUint32.
-   * @param b The subtrahend NonZeroUint32.
-   * @returns `a - b` clamped to [1, 4294967295] as a NonZeroUint32 (minimum 1).
-   */
-  sub,
-
-  /**
    * Multiplies two NonZeroUint32 values.
+   *
+   * Both `add` and `mul` stay within `[1, 4294967295]`. For the non-closed
+   * operations (`sub`/`div`, whose result may be `0`) use {@link Num.sub} /
+   * {@link Num.divInt}.
    *
    * @param a The first NonZeroUint32.
    * @param b The second NonZeroUint32.
    * @returns `a * b` clamped to [1, 4294967295] as a NonZeroUint32.
    */
   mul,
-
-  /**
-   * Divides one NonZeroUint32 by another using floor division.
-   *
-   * @param a The dividend NonZeroUint32.
-   * @param b The divisor NonZeroUint32.
-   * @returns `⌊a / b⌋` clamped to [1, 4294967295] as a NonZeroUint32.
-   */
-  div,
 } as const;
 
 expectType<
   keyof typeof NonZeroUint32,
   keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
-    'int' | 'positive' | 'range'
+    'int' | 'positive' | 'range',
+    'add' | 'mul'
   >
 >('=');
 
@@ -176,6 +161,7 @@ expectType<
   typeof NonZeroUint32,
   TsDataForgeInternals.RefinedNumberUtils.NumberClass<
     ElementType,
-    'int' | 'positive' | 'range'
+    'int' | 'positive' | 'range',
+    'add' | 'mul'
   >
 >('<=');
