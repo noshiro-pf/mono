@@ -3,6 +3,7 @@ import {
   type NaNType,
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonPositiveNumber,
   type NonZeroNumber,
   type PositiveNumber,
   type ValidNumber,
@@ -64,12 +65,35 @@ expectType<PositiveNumber, NegativeNumber>('!=');
 
 expectType<NegativeNumber, PositiveNumber>('!=');
 
+// Test NonPositiveNumber
+expectType<NonPositiveNumber, number>('<=');
+
+expectType<number, NonPositiveNumber>('!<=');
+
+// NegativeNumber is a subset of NonPositiveNumber
+expectType<NegativeNumber, NonPositiveNumber>('<=');
+
+// NonPositiveNumber includes zero, so it is NOT a subset of NegativeNumber
+expectType<NonPositiveNumber, NegativeNumber>('!<=');
+
+// NonPositiveNumber and NonNegativeNumber overlap at 0, so neither is a subset
+expectType<NonPositiveNumber, NonNegativeNumber>('!<=');
+
+expectType<NonNegativeNumber, NonPositiveNumber>('!<=');
+
+// PositiveNumber and NonPositiveNumber are disjoint
+expectType<PositiveNumber, NonPositiveNumber>('!=');
+
+expectType<NonPositiveNumber, PositiveNumber>('!=');
+
 // Test that all these are distinct branded types
 expectType<ValidNumber, NonZeroNumber>('!=');
 
 expectType<NonZeroNumber, NonNegativeNumber>('!=');
 
 expectType<NonNegativeNumber, PositiveNumber>('!=');
+
+expectType<NonPositiveNumber, NegativeNumber>('!=');
 
 // Test brand structure (all types are branded)
 type ValidNumberIsBranded = number extends ValidNumber ? false : true;
@@ -84,6 +108,10 @@ type PositiveNumberIsBranded = number extends PositiveNumber ? false : true;
 
 type NegativeNumberIsBranded = number extends NegativeNumber ? false : true;
 
+type NonPositiveNumberIsBranded = number extends NonPositiveNumber
+  ? false
+  : true;
+
 expectType<ValidNumberIsBranded, true>('=');
 
 expectType<NonZeroNumberIsBranded, true>('=');
@@ -93,3 +121,5 @@ expectType<NonNegativeNumberIsBranded, true>('=');
 expectType<PositiveNumberIsBranded, true>('=');
 
 expectType<NegativeNumberIsBranded, true>('=');
+
+expectType<NonPositiveNumberIsBranded, true>('=');

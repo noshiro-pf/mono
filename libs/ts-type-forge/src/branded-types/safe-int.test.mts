@@ -2,6 +2,7 @@ import { expectType } from 'ts-data-forge';
 import {
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonPositiveNumber,
   type NonZeroNumber,
   type PositiveNumber,
 } from './core.mjs';
@@ -9,6 +10,7 @@ import { type Int } from './int.mjs';
 import {
   type NegativeSafeInt,
   type NonNegativeSafeInt,
+  type NonPositiveSafeInt,
   type NonZeroSafeInt,
   type PositiveSafeInt,
   type SafeInt,
@@ -79,6 +81,26 @@ expectType<SafeInt, NegativeSafeInt>('!<=');
 expectType<PositiveSafeInt, NegativeSafeInt>('!=');
 
 expectType<NegativeSafeInt, PositiveSafeInt>('!=');
+
+// Test NonPositiveSafeInt
+expectType<NonPositiveSafeInt, SafeInt>('<=');
+
+expectType<NonPositiveSafeInt, NonPositiveNumber>('<=');
+
+// NegativeSafeInt is a subset of NonPositiveSafeInt
+expectType<NegativeSafeInt, NonPositiveSafeInt>('<=');
+
+// NonPositiveSafeInt includes zero so it is NOT a subset of NegativeSafeInt
+expectType<NonPositiveSafeInt, NegativeSafeInt>('!<=');
+
+expectType<NonPositiveSafeInt, SafeUint>('!<=');
+
+expectType<SafeInt, NonPositiveSafeInt>('!<=');
+
+// PositiveSafeInt and NonPositiveSafeInt are disjoint
+expectType<PositiveSafeInt, NonPositiveSafeInt>('!=');
+
+expectType<NonPositiveSafeInt, PositiveSafeInt>('!=');
 
 // Test WithSmallInt variants (commented out complex tests)
 // WithSmallInt tests are complex due to literal/branded type interactions
