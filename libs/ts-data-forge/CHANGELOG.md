@@ -1,3 +1,9 @@
+## [7.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v7.0.0...v7.0.1) (2026-06-29)
+
+### Bug Fixes
+
+- fix ISet/IMap(Mapped) type definitions to be consistent ([#402](https://github.com/noshiro-pf/ts-data-forge/issues/402)) ([095526a](https://github.com/noshiro-pf/ts-data-forge/commit/095526a32b6e29bf65f097364d53fd3db79ad992))
+
 # [7.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.13.1...v7.0.0) (2026-06-29)
 
 ### Features
