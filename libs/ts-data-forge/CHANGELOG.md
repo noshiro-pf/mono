@@ -1,3 +1,9 @@
+# [7.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.13.1...v7.0.0) (2026-06-29)
+
+### Features
+
+- **breaking:** Re-organize arithmetic operations to Num namespace, update ts-type-forge to v4.0.0 ([#399](https://github.com/noshiro-pf/ts-data-forge/issues/399)) ([f68a729](https://github.com/noshiro-pf/ts-data-forge/commit/f68a729211d81e23f61539008a42127fc30f5e48))
+
 ## [6.13.1](https://github.com/noshiro-pf/ts-data-forge/compare/v6.13.0...v6.13.1) (2026-06-26)
 
 ### Bug Fixes
