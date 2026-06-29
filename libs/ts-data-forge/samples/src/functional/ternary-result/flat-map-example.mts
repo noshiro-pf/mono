@@ -1,13 +1,15 @@
 // Example: src/functional/ternary-result/impl/ternary-result-flat-map.mts
-import { TernaryResult } from 'ts-data-forge';
+import { Num, pipe, Result, TernaryResult } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
     const parse = (value: string): TernaryResult<number, string, string> =>
-      Number.isNaN(Number(value))
-        ? TernaryResult.err('NaN')
-        : TernaryResult.ok(Number(value));
+      pipe(Num.safeParseFloat(value)).map((result) =>
+        Result.isErr(result)
+          ? TernaryResult.err('NaN')
+          : TernaryResult.ok(result.value),
+      ).value;
 
     const doubled = TernaryResult.flatMap(TernaryResult.ok('3'), (text) =>
       TernaryResult.map(parse(text), (num) => num * 2),

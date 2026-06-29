@@ -205,6 +205,9 @@ export type Queue<T> = Readonly<{
  * @implements Queue
  */
 class QueueClass<T> implements Queue<T> {
+  /** @internal Initial capacity for new queues. */
+  static readonly #INITIAL_CAPACITY = 8;
+
   /** @internal Circular buffer to store queue elements. */
   #mut_buffer: (T | undefined)[];
 
@@ -219,9 +222,6 @@ class QueueClass<T> implements Queue<T> {
 
   /** @internal Current capacity of the buffer. */
   #mut_capacity: number;
-
-  /** @internal Initial capacity for new queues. */
-  static readonly #INITIAL_CAPACITY = 8;
 
   /**
    * Constructs a new QueueClass instance.
@@ -250,6 +250,35 @@ class QueueClass<T> implements Queue<T> {
     for (const value of initialValues) {
       this.enqueue(value);
     }
+  }
+
+  /**
+   * @internal
+   * Resizes the circular buffer when it becomes full.
+   * Doubles the capacity and reorganizes elements to maintain queue order.
+   */
+  #resize(): void {
+    const newCapacity = asUint32(this.#mut_capacity * 2);
+
+    const newBuffer = Array.from<unknown, T | undefined>(
+      { length: newCapacity },
+      () => undefined,
+    );
+
+    // Copy elements in order from head to tail
+    for (const i of range(asSafeUint(this.#mut_size))) {
+      const sourceIndex = (this.#mut_head + i) % this.#mut_capacity;
+
+      newBuffer[i] = this.#mut_buffer[sourceIndex];
+    }
+
+    this.#mut_buffer = newBuffer;
+
+    this.#mut_head = 0;
+
+    this.#mut_tail = this.#mut_size;
+
+    this.#mut_capacity = newCapacity;
   }
 
   /** @inheritdoc */
@@ -321,35 +350,6 @@ class QueueClass<T> implements Queue<T> {
     this.#mut_tail = (this.#mut_tail + 1) % this.#mut_capacity;
 
     this.#mut_size += 1;
-  }
-
-  /**
-   * @internal
-   * Resizes the circular buffer when it becomes full.
-   * Doubles the capacity and reorganizes elements to maintain queue order.
-   */
-  #resize(): void {
-    const newCapacity = asUint32(this.#mut_capacity * 2);
-
-    const newBuffer = Array.from<unknown, T | undefined>(
-      { length: newCapacity },
-      () => undefined,
-    );
-
-    // Copy elements in order from head to tail
-    for (const i of range(asSafeUint(this.#mut_size))) {
-      const sourceIndex = (this.#mut_head + i) % this.#mut_capacity;
-
-      newBuffer[i] = this.#mut_buffer[sourceIndex];
-    }
-
-    this.#mut_buffer = newBuffer;
-
-    this.#mut_head = 0;
-
-    this.#mut_tail = this.#mut_size;
-
-    this.#mut_capacity = newCapacity;
   }
 }
 

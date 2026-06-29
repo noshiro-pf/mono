@@ -350,18 +350,15 @@ const keysDeepImpl = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   mut_keys: string[],
 ): void => {
-  for (const k of Object.keys(obj)) {
+  for (const [k, v] of Object.entries(obj)) {
     mut_keys.push(k);
 
-    const o = obj[k];
-
-    if (isRecord(o)) {
-      keysDeepImpl(o, mut_keys);
+    if (isRecord(v)) {
+      keysDeepImpl(v, mut_keys);
     }
 
-    // eslint-disable-next-line ts-data-forge/prefer-arr-is-array
-    if (Array.isArray(o)) {
-      for (const li of o) {
+    if (Array.isArray(v)) {
+      for (const li of v) {
         if (isRecord(li)) {
           keysDeepImpl(li, mut_keys);
         }

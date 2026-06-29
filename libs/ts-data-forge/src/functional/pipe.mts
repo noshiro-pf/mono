@@ -49,7 +49,6 @@ export const pipe = <const A,>(a: A): Pipe<A> =>
 //      the deferred true branch narrows `A` to `A & UnknownOptional`, so
 //      `.value` would surface as the noisy `(A & UnknownOptional) | A`. Keeping
 //      it on the unconditional base yields a clean `A`.
-// transformer-ignore-next-line convert-to-readonly
 export type Pipe<A> = PipeBase<A> &
   PipeMapNullable<A> &
   ([A] extends [UnknownOptional] ? PipeMapOptional<A> : unknown);

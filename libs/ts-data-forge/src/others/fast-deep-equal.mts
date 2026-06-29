@@ -1,5 +1,3 @@
-/* eslint-disable ts-data-forge/prefer-arr-is-array */
-
 import { isMap, isRegExp, isSet, isTypedArray } from '@sindresorhus/is';
 import { hasKey, isRecord } from '../guard/index.mjs';
 

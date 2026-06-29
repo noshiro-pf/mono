@@ -78,7 +78,7 @@ export const unknownToString = (
 
         // Special handling for Map
         if (isMap(value)) {
-          const entries = Array.from(value.entries());
+          const entries = Array.from(value);
 
           const entriesStr = prettyPrintObject
             ? JSON.stringify(entries, undefined, 2)
@@ -89,7 +89,7 @@ export const unknownToString = (
 
         // Special handling for Set
         if (isSet(value)) {
-          const values = Array.from(value.values());
+          const values = Array.from(value);
 
           const valuesStr = prettyPrintObject
             ? JSON.stringify(values, undefined, 2)

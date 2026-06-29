@@ -265,7 +265,7 @@ export function count<E>(
  * ```ts
  * const words = ['Ada', 'Grace', 'Alan', 'Barbara'] as const;
  *
- * const counts = Arr.countBy(words, (word) => word[0]);
+ * const counts = Arr.countBy(words, (word) => word.at(0));
  *
  * assert.deepStrictEqual(counts.get('A'), Optional.some(2));
  *
@@ -503,7 +503,6 @@ export function sum(array: readonly Int[]): Int;
 export function sum(array: readonly number[]): number;
 
 export function sum(array: readonly number[]): number {
-  // eslint-disable-next-line ts-data-forge/prefer-arr-sum
   return array.reduce((prev, curr) => prev + curr, 0);
 }
 

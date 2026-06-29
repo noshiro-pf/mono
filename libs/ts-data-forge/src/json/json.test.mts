@@ -1,6 +1,7 @@
 import { Arr } from '../array/index.mjs';
 import { Result } from '../functional/index.mjs';
 import { hasKey, isRecord, isString } from '../guard/index.mjs';
+import { Num } from '../number/index.mjs';
 import { Json } from './json.mjs';
 
 describe('parse', () => {
@@ -154,7 +155,7 @@ describe('parse', () => {
   test('should handle reviver returning different types', () => {
     const transformReviver = (key: string, value: unknown): unknown => {
       if (key === 'number' && typeof value === 'string') {
-        return Number.parseInt(value, 10);
+        return Result.unwrapOkOr(Num.safeParseInt(value), Number.NaN);
       }
 
       return value;
@@ -465,7 +466,6 @@ describe('stringifySelected', () => {
 
     // Note: stringifySelected works with JSON.stringify's replacer parameter
     // which may not work as expected with arrays
-    // eslint-disable-next-line ts-data-forge/prefer-arr-is-array
     assert.isTrue(Array.isArray(parsed));
 
     expect(parsed).toHaveLength(3);

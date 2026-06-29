@@ -46,7 +46,7 @@ export const entries = function* <E>(
  * ```
  */
 export const values = function* <E>(array: readonly E[]): ArrayIterator<E> {
-  for (const value of array.values()) {
+  for (const value of array) {
     yield value;
   }
 };

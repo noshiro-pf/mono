@@ -32,7 +32,7 @@ const {
 >({
   integerOrSafeInteger: 'SafeInteger',
   MIN_VALUE: 1,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer, ts-data-forge/prefer-as-int
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
   MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
   typeNameInMessage,
 } as const);

@@ -1,4 +1,5 @@
 import { expectType } from '../expect-type.mjs';
+import { Num } from '../number/index.mjs';
 import { type Err, type Ok } from '../types.mjs';
 import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
@@ -467,7 +468,7 @@ describe('Result test', () => {
 
     test('should support chaining multiple flatMaps', () => {
       const parseNumber = (s: string): Result<number, string> => {
-        const n = Number(s);
+        const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
 
         return Number.isNaN(n) ? Result.err('Not a number') : Result.ok(n);
       };
@@ -518,7 +519,7 @@ describe('Result test', () => {
 
     test('should work with pipe when curried', () => {
       const parseNumber = (s: string): Result<number, string> => {
-        const n = Number(s);
+        const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
 
         return Number.isNaN(n) ? Result.err('Not a number') : Result.ok(n);
       };

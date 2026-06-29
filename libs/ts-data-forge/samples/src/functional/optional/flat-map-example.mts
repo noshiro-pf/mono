@@ -1,13 +1,13 @@
 // Example: src/functional/optional.mts (Optional.flatMap)
-import { Optional } from 'ts-data-forge';
+import { Num, Optional, Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
     const parseNumber = (input: string): Optional<number> => {
-      const num = Number.parseInt(input, 10);
+      const num = Num.safeParseInt(input);
 
-      return Number.isNaN(num) ? Optional.none : Optional.some(num);
+      return Result.isErr(num) ? Optional.none : Optional.some(num.value);
     };
 
     const parsed = Optional.flatMap(Optional.some('10'), parseNumber);

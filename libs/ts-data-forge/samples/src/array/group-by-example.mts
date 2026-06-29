@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
 
     const groupedByLength = Arr.groupBy(animals, (animal) => animal.length);
 
-    const groupedByFirstLetter = Arr.groupBy((animal: string) => animal[0])(
+    const groupedByFirstLetter = Arr.groupBy((animal: string) => animal.at(0))(
       animals,
     );
 

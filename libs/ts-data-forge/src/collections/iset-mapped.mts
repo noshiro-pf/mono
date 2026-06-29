@@ -1,4 +1,5 @@
-import { type ReadonlyRecord } from 'ts-type-forge';
+/* eslint-disable unicorn/prefer-iterator-to-array-at-end */
+import { type ReadonlyRecord, type WidenLiteral } from 'ts-type-forge';
 import { asUint32 } from '../number/index.mjs';
 import { type MapSetKeyType, type SizeType } from '../types.mjs';
 
@@ -126,7 +127,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    * @param key The element to check.
    * @returns `true` if the element exists, `false` otherwise.
    */
-  has: (key: K) => boolean;
+  has: (key: K | (WidenLiteral<K> & {})) => boolean;
 
   // Reducing a value
 
@@ -471,9 +472,9 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *
    * const mut_collected: Point[] = [];
    *
-   * for (const point of set) {
+   * set.forEach((point) => {
    *   mut_collected.push(point);
-   * }
+   * });
    *
    * assert.deepStrictEqual(mut_collected, [
    *   { x: 1, tag: 'a' },
@@ -1218,8 +1219,9 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
   }
 
   /** @inheritdoc */
-  has(key: K): boolean {
-    return this.#set.has(this.#toKey(key));
+  has(key: K | (WidenLiteral<K> & {})): boolean {
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return this.#set.has(this.#toKey(key as K));
   }
 
   /** @inheritdoc */
@@ -1290,7 +1292,9 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
   ): ISetMapped<K, KM> {
     const mut_result = new Set<KM>(this.#set);
 
-    for (const action of actions) {
+    const updateFn = (
+      action: Readonly<{ type: 'add'; key: K } | { type: 'delete'; key: K }>,
+    ): void => {
       const key = this.#toKey(action.key);
 
       switch (action.type) {
@@ -1304,6 +1308,10 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
 
           break;
       }
+    };
+
+    for (const action of actions) {
+      updateFn(action);
     }
 
     return ISetMapped.create<K, KM>(
@@ -1422,14 +1430,14 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
 
   /** @inheritdoc */
   *keys(): IterableIterator<K> {
-    for (const km of this.#set.keys()) {
+    for (const km of this.#set) {
       yield this.#fromKey(km);
     }
   }
 
   /** @inheritdoc */
   *values(): IterableIterator<K> {
-    for (const km of this.#set.keys()) {
+    for (const km of this.#set) {
       // JavaScript Set's values() is an alias for keys()
       yield this.#fromKey(km);
     }
@@ -1437,7 +1445,7 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
 
   /** @inheritdoc */
   *entries(): IterableIterator<readonly [K, K]> {
-    for (const km of this.#set.keys()) {
+    for (const km of this.#set) {
       // JavaScript Set's entries() yields [value, value]
       const a = this.#fromKey(km);
 

@@ -22,9 +22,9 @@ if (import.meta.vitest !== undefined) {
 
     const mut_collected: Point[] = [];
 
-    for (const point of set) {
+    set.forEach((point) => {
       mut_collected.push(point);
-    }
+    });
 
     assert.deepStrictEqual(mut_collected, [
       { x: 1, tag: 'a' },

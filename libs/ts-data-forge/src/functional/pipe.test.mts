@@ -1,4 +1,5 @@
 import { expectType } from '../expect-type.mjs';
+import { Num } from '../number/index.mjs';
 import { type None, type Some } from '../types.mjs';
 import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
@@ -89,7 +90,7 @@ describe(pipe, () => {
 
   test('chaining multiple operations', () => {
     const result = pipe('5')
-      .map((s) => Number.parseInt(s, 10))
+      .map((s) => Result.unwrapOkOr(Num.safeParseInt(s), Number.NaN))
       .map((n) => n * 3)
       .map((n) => n.toString())
       .map((s) => `${s} items`).value;

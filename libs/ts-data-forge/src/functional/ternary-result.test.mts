@@ -1,5 +1,8 @@
 import { expectType } from '../expect-type.mjs';
+import { Num } from '../number/index.mjs';
 import { Optional } from './optional/index.mjs';
+import { pipe } from './pipe.mjs';
+import { Result } from './result/index.mjs';
 import { TernaryResult } from './ternary-result/index.mjs';
 
 describe('TernaryResult test', () => {
@@ -69,9 +72,11 @@ describe('TernaryResult test', () => {
 
   test('flatMap propagates Warn and Err while keeping warnings', () => {
     const parse = (value: string): TernaryResult<number, string, never> =>
-      Number.isNaN(Number(value))
-        ? TernaryResult.err('NaN')
-        : TernaryResult.ok(Number(value));
+      pipe(Num.safeParseFloat(value)).map((result) =>
+        Result.isErr(result)
+          ? TernaryResult.err('NaN')
+          : TernaryResult.ok(result.value),
+      ).value;
 
     const warn = TernaryResult.warn('3', 'slow');
 

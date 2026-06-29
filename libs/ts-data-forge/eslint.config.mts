@@ -20,7 +20,7 @@ export default [
     packageDirs: [thisDir],
   }),
 
-  eslintConfigForTsDataForge(),
+  eslintConfigForTsDataForge(['samples/**', 'scripts/**', 'configs/**']),
 
   eslintConfigForVitest(),
 
@@ -30,6 +30,8 @@ export default [
         'error',
         ...restrictedImports,
       ],
+
+      'unicorn/prefer-temporal': ['warn', {}], // todo
     }),
   },
 
@@ -78,6 +80,8 @@ export default [
   {
     files: ['src/**'],
     rules: defineKnownRules({
+      'unicorn/prefer-number-is-safe-integer': 'off',
+
       'import-x/no-unused-modules': [
         'error',
         {
@@ -95,6 +99,7 @@ export default [
       '@stylistic/padding-line-between-statements': 'off',
     }),
   },
+
   {
     files: ['samples/**'],
     rules: defineKnownRules({

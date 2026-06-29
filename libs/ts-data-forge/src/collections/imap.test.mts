@@ -1,5 +1,6 @@
-import { Optional } from '../functional/index.mjs';
+import { Optional, Result } from '../functional/index.mjs';
 import { isString } from '../guard/index.mjs';
+import { Num } from '../number/index.mjs';
 import { IMap } from './imap.mjs';
 
 describe('IMap[Symbol.iterator]', () => {
@@ -829,7 +830,9 @@ describe('IMap.mapKeys', () => {
       ['2', 'two'],
     ]);
 
-    const mapped = map.mapKeys((key) => Number.parseInt(key, 10));
+    const mapped = map.mapKeys((key) =>
+      Result.unwrapOkOr(Num.safeParseInt(key), Number.NaN),
+    );
 
     expect(Optional.unwrap(mapped.get(1))).toBe('one');
 
@@ -896,11 +899,10 @@ describe('IMap.forEach', () => {
       ['c', 3],
     ]);
 
-    const mut_collected: [string, number][] = [];
-
-    for (const [key, value] of map.entries()) {
-      mut_collected.push([key, value]);
-    }
+    const mut_collected: [string, number][] = Array.from(
+      map.entries(),
+      ([key, value]) => [key, value],
+    );
 
     expect(mut_collected).toHaveLength(3);
 
@@ -916,7 +918,6 @@ describe('IMap.forEach', () => {
 
     let mut_called = false;
 
-    // eslint-disable-next-line unicorn/no-array-for-each
     map.forEach(() => {
       mut_called = true;
     });

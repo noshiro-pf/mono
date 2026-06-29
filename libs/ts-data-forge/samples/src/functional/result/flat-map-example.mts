@@ -1,13 +1,13 @@
 // Example: src/functional/result.mts (Result.flatMap)
-import { Result } from 'ts-data-forge';
+import { Num, Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
     const parseNumber = (input: string): Result<number, string> => {
-      const num = Number.parseInt(input, 10);
+      const num = Num.safeParseInt(input);
 
-      return Number.isNaN(num) ? Result.err('not a number') : Result.ok(num);
+      return Result.mapErr(num, () => 'not a number');
     };
 
     const parsed = Result.flatMap(Result.ok('42'), parseNumber);

@@ -1,3 +1,5 @@
+/* eslint-disable ts-data-forge/prefer-num-safe-parse-float */
+/* eslint-disable ts-data-forge/prefer-num-safe-parse-int */
 /* eslint-disable math/no-static-nan-calculations */
 // Example: src/number/num.mts (Num.safeParseInt)
 import { Num, Result } from 'ts-data-forge';

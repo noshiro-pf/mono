@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-iterator-to-array-at-end */
 import { type ReadonlyRecord, type WidenLiteral } from 'ts-type-forge';
 import { asUint32 } from '../number/index.mjs';
 import { unknownToString } from '../others/index.mjs';
@@ -394,9 +395,9 @@ type ISetInterface<K extends MapSetKeyType> = Readonly<{
    *
    * const mut_collected: string[] = [];
    *
-   * for (const value of set) {
+   * set.forEach((value) => {
    *   mut_collected.push(value);
-   * }
+   * });
    *
    * assert.deepStrictEqual(mut_collected, ['alpha', 'beta']);
    * ```
@@ -806,7 +807,9 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
   ): ISet<K> {
     const mut_result = new Set<K>(this.#set);
 
-    for (const action of actions) {
+    const updateFn = (
+      action: Readonly<{ type: 'add'; key: K } | { type: 'delete'; key: K }>,
+    ): void => {
       switch (action.type) {
         case 'delete':
           mut_result.delete(action.key);
@@ -818,6 +821,10 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
 
           break;
       }
+    };
+
+    for (const action of actions) {
+      updateFn(action);
     }
 
     return ISet.create(mut_result);
@@ -846,7 +853,7 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
 
   /** @inheritdoc */
   forEach(callbackfn: (key: K) => void): void {
-    for (const v of this.#set.values()) {
+    for (const v of this.#set) {
       callbackfn(v);
     }
   }

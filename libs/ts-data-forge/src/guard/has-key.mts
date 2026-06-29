@@ -47,9 +47,7 @@ export const hasKey = <
 >(
   obj: R,
   key: K,
-): obj is HasKeyReturnType<R, K> =>
-  // eslint-disable-next-line ts-data-forge/prefer-is-record-and-has-key
-  Object.hasOwn(obj, key);
+): obj is HasKeyReturnType<R, K> => Object.hasOwn(obj, key);
 
 /**
  * @internal

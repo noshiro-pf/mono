@@ -1,6 +1,7 @@
 import { type DeepReadonly } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
-import { pipe } from '../functional/index.mjs';
+import { pipe, Result } from '../functional/index.mjs';
+import { Num } from '../number/index.mjs';
 import { mapNullable } from './map-nullable.mjs';
 
 describe(mapNullable, () => {
@@ -306,7 +307,7 @@ describe(mapNullable, () => {
       const extractAge = mapNullable((data: FormDataType) => data.age);
 
       const parseAge = mapNullable((ageStr: string) =>
-        Number.parseInt(ageStr, 10),
+        Result.unwrapOkOr(Num.safeParseInt(ageStr), Number.NaN),
       );
 
       const validateAge = mapNullable((age: number) =>
@@ -336,7 +337,7 @@ describe(mapNullable, () => {
       const extractAge = mapNullable((data: FormDataType) => data.age);
 
       const parseAge = mapNullable((ageStr: string) =>
-        Number.parseInt(ageStr, 10),
+        Result.unwrapOkOr(Num.safeParseInt(ageStr), Number.NaN),
       );
 
       const extractedAge = extractAge(incompleteFormData);

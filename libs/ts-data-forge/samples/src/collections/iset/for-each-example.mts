@@ -8,9 +8,9 @@ if (import.meta.vitest !== undefined) {
 
     const mut_collected: string[] = [];
 
-    for (const value of set) {
+    set.forEach((value) => {
       mut_collected.push(value);
-    }
+    });
 
     assert.deepStrictEqual(mut_collected, ['alpha', 'beta']);
 

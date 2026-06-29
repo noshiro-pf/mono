@@ -1,3 +1,5 @@
+import { Result } from '../functional/index.mjs';
+import { Num } from '../number/index.mjs';
 import { ISetMapped } from './iset-mapped.mjs';
 
 const toKey = (a: Readonly<{ v: number }>): number => a.v;
@@ -13,7 +15,10 @@ const testElementToString = (el: Readonly<TestElement>): string =>
 const stringToTestElement = (str: string): TestElement => {
   const [type, idStr] = str.split('_');
 
-  return { type: type ?? '', id: Number(idStr ?? '0') };
+  return {
+    type: type ?? '',
+    id: Result.unwrapOkOr(Num.safeParseFloat(idStr ?? '0'), Number.NaN),
+  };
 };
 
 describe('ISetMapped[Symbol.iterator]', () => {

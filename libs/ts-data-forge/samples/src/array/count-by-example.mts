@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const words = ['Ada', 'Grace', 'Alan', 'Barbara'] as const;
 
-    const counts = Arr.countBy(words, (word) => word[0]);
+    const counts = Arr.countBy(words, (word) => word.at(0));
 
     assert.deepStrictEqual(counts.get('A'), Optional.some(2));
 

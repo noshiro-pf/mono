@@ -200,6 +200,9 @@ export type Stack<T> = Readonly<{
  * @implements Stack
  */
 class StackClass<T> implements Stack<T> {
+  /** @internal Initial capacity for new stacks. */
+  static readonly #INITIAL_CAPACITY = 8;
+
   /** @internal Dynamic array to store stack elements. */
   #mut_buffer: (T | undefined)[];
 
@@ -208,9 +211,6 @@ class StackClass<T> implements Stack<T> {
 
   /** @internal Current capacity of the buffer. */
   #mut_capacity: Uint32;
-
-  /** @internal Initial capacity for new stacks. */
-  static readonly #INITIAL_CAPACITY = 8;
 
   /**
    * Constructs a new StackClass instance.
@@ -235,6 +235,29 @@ class StackClass<T> implements Stack<T> {
     for (const value of initialValues) {
       this.push(value);
     }
+  }
+
+  /**
+   * @internal
+   * Resizes the buffer when it becomes full.
+   * Doubles the capacity while preserving all elements.
+   */
+  #resize(): void {
+    const newCapacity = asUint32(this.#mut_capacity * 2);
+
+    const newBuffer = Array.from<unknown, T | undefined>(
+      { length: newCapacity },
+      () => undefined,
+    );
+
+    // Copy existing elements
+    for (const i of range(this.#mut_size)) {
+      newBuffer[i] = this.#mut_buffer[i];
+    }
+
+    this.#mut_buffer = newBuffer;
+
+    this.#mut_capacity = newCapacity;
   }
 
   /** @inheritdoc */
@@ -302,29 +325,6 @@ class StackClass<T> implements Stack<T> {
     this.#mut_buffer[this.#mut_size] = value;
 
     this.#mut_size = Uint32.add(this.#mut_size, 1);
-  }
-
-  /**
-   * @internal
-   * Resizes the buffer when it becomes full.
-   * Doubles the capacity while preserving all elements.
-   */
-  #resize(): void {
-    const newCapacity = asUint32(this.#mut_capacity * 2);
-
-    const newBuffer = Array.from<unknown, T | undefined>(
-      { length: newCapacity },
-      () => undefined,
-    );
-
-    // Copy existing elements
-    for (const i of range(this.#mut_size)) {
-      newBuffer[i] = this.#mut_buffer[i];
-    }
-
-    this.#mut_buffer = newBuffer;
-
-    this.#mut_capacity = newCapacity;
   }
 }
 

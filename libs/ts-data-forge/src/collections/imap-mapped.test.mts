@@ -1,5 +1,6 @@
 import { type DeepReadonly } from 'ts-type-forge';
-import { Optional } from '../functional/index.mjs';
+import { Optional, Result } from '../functional/index.mjs';
+import { Num } from '../number/index.mjs';
 import { IMapMapped } from './imap-mapped.mjs';
 
 const toKey = (a: Readonly<{ v: number }>): number => a.v;
@@ -14,7 +15,10 @@ const testKeyToString = (key: Readonly<TestKey>): string =>
 const stringToTestKey = (str: string): TestKey => {
   const [type, idStr] = str.split('_');
 
-  return { type: type ?? '', id: Number(idStr ?? '0') };
+  return {
+    type: type ?? '',
+    id: Result.unwrapOkOr(Num.safeParseFloat(idStr ?? '0'), Number.NaN),
+  };
 };
 
 describe('IMapMapped[Symbol.iterator]', () => {
@@ -112,7 +116,9 @@ describe('IMapMapped.create', () => {
       const [idStr, arrStr] = str.split('_');
 
       return {
-        nested: { id: Number(idStr ?? '0') },
+        nested: {
+          id: Result.unwrapOkOr(Num.safeParseFloat(idStr ?? '0'), Number.NaN),
+        },
         arr: (arrStr ?? '').split(',').map(Number),
       };
     };
@@ -216,6 +222,31 @@ describe('IMapMapped.equal', () => {
 
     const map2 = IMapMapped.create<TestKey, string, string>(
       [],
+      testKeyToString,
+      stringToTestKey,
+    );
+
+    assert.isTrue(IMapMapped.equal(map1, map2));
+  });
+
+  test('should return true for non-empty maps with identical entries', () => {
+    // Regression: the old implementation compared `b.get(k) === v` where
+    // `b.get(k)` returns `Optional<V>` and `v` is `V`, so the comparison was
+    // always false and `equal` never returned true for non-empty maps.
+    const map1 = IMapMapped.create(
+      [
+        [{ id: 1, type: 'user' }, 'Alice'],
+        [{ id: 2, type: 'admin' }, 'Bob'],
+      ],
+      testKeyToString,
+      stringToTestKey,
+    );
+
+    const map2 = IMapMapped.create(
+      [
+        [{ id: 2, type: 'admin' }, 'Bob'],
+        [{ id: 1, type: 'user' }, 'Alice'],
+      ],
       testKeyToString,
       stringToTestKey,
     );
@@ -396,6 +427,26 @@ describe('IMapMapped.set', () => {
         fromKey,
       ),
     );
+  });
+
+  test('should return same instance when setting an existing key with the same value', () => {
+    // Regression: the old implementation compared `value === this.get(key)`
+    // where `this.get(key)` returns `Optional<V>` and `value` is `V`, so the
+    // comparison was always false and the early return never fired — a new
+    // instance was always created even when the value was unchanged.
+    const s0 = IMapMapped.create(
+      [
+        [{ v: 1 }, '1'],
+        [{ v: 2 }, '2'],
+        [{ v: 3 }, '3'],
+      ],
+      toKey,
+      fromKey,
+    );
+
+    const result = s0.set({ v: 3 }, '3');
+
+    assert.isTrue(result === s0);
   });
 
   test('case 3', () => {
@@ -602,7 +653,6 @@ describe('IMapMapped.some', () => {
       stringToTestKey,
     );
 
-    // eslint-disable-next-line unicorn/prefer-includes
     assert.isTrue(map.some((value) => value === 'Alice'));
   });
 
@@ -616,7 +666,6 @@ describe('IMapMapped.some', () => {
       stringToTestKey,
     );
 
-    // eslint-disable-next-line unicorn/prefer-includes
     assert.isFalse(map.some((value) => value === 'Charlie'));
   });
 
@@ -799,17 +848,16 @@ describe('IMapMapped.forEach', () => {
       stringToTestKey,
     );
 
-    const mut_collected: [TestKey, string][] = [];
+    const collected: DeepReadonly<[TestKey, string][]> = Array.from(
+      map.entries(),
+      ([key, value]) => [key, value],
+    );
 
-    for (const [key, value] of map.entries()) {
-      mut_collected.push([key, value]);
-    }
+    expect(collected).toHaveLength(2);
 
-    expect(mut_collected).toHaveLength(2);
+    expect(collected).toContainEqual([{ id: 1, type: 'user' }, 'Alice']);
 
-    expect(mut_collected).toContainEqual([{ id: 1, type: 'user' }, 'Alice']);
-
-    expect(mut_collected).toContainEqual([{ id: 2, type: 'admin' }, 'Bob']);
+    expect(collected).toContainEqual([{ id: 2, type: 'admin' }, 'Bob']);
   });
 });
 

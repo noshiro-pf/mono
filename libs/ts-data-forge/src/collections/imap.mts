@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-iterator-to-array-at-end */
 import { type WidenLiteral } from 'ts-type-forge';
 import { Optional, pipe } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
@@ -87,7 +88,7 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    * ```
    *
    * @param key The key to retrieve.
-   * @returns The value associated with the key wrapped with Optional.some, or
+   * @returns The value associated with the key wrapped with `Optional.some`, or
    *   `Optional.none` if the key does not exist.
    */
   get: (key: K | (WidenLiteral<K> & {})) => Optional<V>;
@@ -390,9 +391,9 @@ type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
    *
    * const mut_entries: (readonly [string, number])[] = [];
    *
-   * for (const [key, value] of map.entries()) {
+   * map.forEach((value, key) => {
    *   mut_entries.push([key, value]);
-   * }
+   * });
    *
    * assert.deepStrictEqual(mut_entries, [
    *   ['a', 1],
@@ -815,11 +816,11 @@ class IMapClass<K extends MapSetKeyType, V>
 
     if (!this.has(key)) {
       return IMap.create([...this.#map, tp(key, value)]);
-    } else {
-      return IMap.create(
-        Array.from(this.#map, ([k, v]) => tp(k, Object.is(k, key) ? value : v)),
-      );
     }
+
+    return IMap.create(
+      Array.from(this.#map, ([k, v]) => tp(k, Object.is(k, key) ? value : v)),
+    );
   }
 
   /** @inheritdoc */
@@ -853,7 +854,13 @@ class IMapClass<K extends MapSetKeyType, V>
   ): IMap<K, V> {
     const mut_result = new Map<K, V>(this.#map);
 
-    for (const action of actions) {
+    const updateFn = (
+      action: Readonly<
+        | { type: 'delete'; key: K }
+        | { type: 'set'; key: K; value: V }
+        | { type: 'update'; key: K; updater: (value: V) => V }
+      >,
+    ): void => {
       switch (action.type) {
         case 'delete':
           mut_result.delete(action.key);
@@ -885,6 +892,10 @@ class IMapClass<K extends MapSetKeyType, V>
           break;
         }
       }
+    };
+
+    for (const action of actions) {
+      updateFn(action);
     }
 
     return IMap.create(mut_result);
@@ -909,7 +920,7 @@ class IMapClass<K extends MapSetKeyType, V>
 
   /** @inheritdoc */
   forEach(callbackfn: (value: V, key: K) => void): void {
-    for (const [key, value] of this.#map.entries()) {
+    for (const [key, value] of this.#map) {
       callbackfn(value, key);
     }
   }

@@ -15,9 +15,11 @@ import { type UnwrapErr, type UnwrapOk, type UnwrapWarn } from './types.mjs';
  *
  * ```ts
  * const parse = (value: string): TernaryResult<number, string, string> =>
- *   Number.isNaN(Number(value))
- *     ? TernaryResult.err('NaN')
- *     : TernaryResult.ok(Number(value));
+ *   pipe(Num.safeParseFloat(value)).map((result) =>
+ *     Result.isErr(result)
+ *       ? TernaryResult.err('NaN')
+ *       : TernaryResult.ok(result.value),
+ *   ).value;
  *
  * const doubled = TernaryResult.flatMap(TernaryResult.ok('3'), (text) =>
  *   TernaryResult.map(parse(text), (num) => num * 2),

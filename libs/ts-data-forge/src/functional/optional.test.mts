@@ -1,7 +1,9 @@
 import { expectType } from '../expect-type.mjs';
+import { Num } from '../number/index.mjs';
 import { type None, type Some } from '../types.mjs';
 import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
+import { Result } from './result/index.mjs';
 
 describe('Optional test', () => {
   describe('isOptional', () => {
@@ -374,7 +376,7 @@ describe('Optional test', () => {
   describe('flatMap', () => {
     test('should chain operations that return Optional', () => {
       const parseNumber = (s: string): Optional<number> => {
-        const n = Number(s);
+        const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
 
         return Number.isNaN(n) ? Optional.none : Optional.some(n);
       };
@@ -400,7 +402,7 @@ describe('Optional test', () => {
 
     test('should support chaining multiple flatMaps', () => {
       const parseNumber = (s: string): Optional<number> => {
-        const n = Number(s);
+        const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
 
         return Number.isNaN(n) ? Optional.none : Optional.some(n);
       };
@@ -424,7 +426,7 @@ describe('Optional test', () => {
 
     test('should support curried form', () => {
       const parseNumber = (s: string): Optional<number> => {
-        const n = Number(s);
+        const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
 
         return Number.isNaN(n) ? Optional.none : Optional.some(n);
       };
@@ -450,7 +452,7 @@ describe('Optional test', () => {
 
     test('should work with pipe when curried', () => {
       const parseNumber = (s: string): Optional<number> => {
-        const n = Number(s);
+        const n = Result.unwrapOkOr(Num.safeParseFloat(s), Number.NaN);
 
         return Number.isNaN(n) ? Optional.none : Optional.some(n);
       };

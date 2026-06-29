@@ -505,9 +505,9 @@ const deepOmitImpl = (
 
   const head = path[0];
 
-  const tail = path.slice(1);
-
   if (!hasKey(record, head)) return record;
+
+  const tail = path.slice(1);
 
   if (!Arr.isNonEmpty(tail)) {
     return Object.fromEntries(

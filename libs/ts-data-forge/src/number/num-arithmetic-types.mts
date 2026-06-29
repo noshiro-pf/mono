@@ -52,7 +52,6 @@ type Sign = 'any' | 'neg' | 'nonneg' | 'nonpos' | 'nonzero' | 'pos';
 type Level = 'finite' | 'int' | 'number' | 'safeint';
 
 /** Classifies a numeric type's sign. */
-// transformer-ignore-next-line convert-to-readonly
 export type SignOf<N> = [N] extends [PositiveNumber]
   ? 'pos'
   : [N] extends [NegativeNumber]
@@ -66,7 +65,6 @@ export type SignOf<N> = [N] extends [PositiveNumber]
           : 'any';
 
 /** Classifies a numeric type's level. */
-// transformer-ignore-next-line convert-to-readonly
 export type LevelOf<N> = [N] extends [SafeInt]
   ? 'safeint'
   : [N] extends [Int]
@@ -77,7 +75,6 @@ export type LevelOf<N> = [N] extends [SafeInt]
 
 // --- boolean fact algebra over a sign ----------------------------------------
 
-// transformer-ignore-next-line convert-to-readonly
 type And<A extends boolean, B extends boolean> = [A, B] extends [true, true]
   ? true
   : false;
@@ -171,7 +168,6 @@ type DivLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
   : 'finite';
 
 /** Floor division yields an integer; the safe range is preserved. */
-// transformer-ignore-next-line convert-to-readonly
 type DivIntLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
   ? 'number'
   : [LA, LB] extends ['safeint', 'safeint']

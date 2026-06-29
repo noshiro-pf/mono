@@ -540,13 +540,15 @@ export function flat<E, D extends SafeUintWithSmallInt = 1>(
         const depth = arrayOrDepth as SafeUintWithSmallInt | undefined;
 
         return (array) => flat(array, depth);
-      } else if (arrayOrDepth === undefined) {
-        return (array) => flat(array, 1);
-      } else {
-        expectType<typeof arrayOrDepth, readonly E[]>('=');
-
-        return arrayOrDepth.flat();
       }
+
+      if (arrayOrDepth === undefined) {
+        return (array) => flat(array, 1);
+      }
+
+      expectType<typeof arrayOrDepth, readonly E[]>('=');
+
+      return arrayOrDepth.flat();
     }
 
     case 0:
@@ -709,7 +711,7 @@ export const concat = <
  *
  * const groupedByLength = Arr.groupBy(animals, (animal) => animal.length);
  *
- * const groupedByFirstLetter = Arr.groupBy((animal: string) => animal[0])(
+ * const groupedByFirstLetter = Arr.groupBy((animal: string) => animal.at(0))(
  *   animals,
  * );
  *

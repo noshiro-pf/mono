@@ -28,7 +28,6 @@ import { type ArrayIndex, type SizeType } from '../../types.mjs';
  * ```
  */
 export const isArray = <E,>(value: E): value is FilterArray<E> =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array
   Array.isArray(value);
 
 type FilterArray<T> = T extends T
@@ -64,7 +63,6 @@ type Cast<A, B> = A extends B ? A : never;
  * ```
  */
 export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
   array.length === 0;
 
 /**
@@ -88,9 +86,7 @@ export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
  */
 export const isNonEmpty = <E,>(
   array: readonly E[],
-): array is NonEmptyArray<E> =>
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-non-empty
-  array.length > 0;
+): array is NonEmptyArray<E> => array.length > 0;
 
 /**
  * Checks if an array has a specific length.

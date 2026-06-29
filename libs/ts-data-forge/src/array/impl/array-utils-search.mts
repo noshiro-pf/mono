@@ -196,7 +196,6 @@ export function findLast<E>(
  *
  * const indexOfB = Arr.findIndex(letters, (letter) => letter === 'b');
  *
- * // eslint-disable-next-line unicorn/prefer-array-index-of
  * const indexOfMissing = Arr.findIndex<string>((letter) => letter === 'z')(
  *   letters,
  * );
@@ -263,7 +262,6 @@ export function findIndex<E>(
  *
  * const lastIndexOfB = Arr.findLastIndex(letters, (letter) => letter === 'b');
  *
- * // eslint-disable-next-line unicorn/prefer-array-index-of
  * const notFound = Arr.findLastIndex<string>((letter) => letter === 'z')(
  *   letters,
  * );

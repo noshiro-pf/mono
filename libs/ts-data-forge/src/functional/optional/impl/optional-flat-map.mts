@@ -13,9 +13,9 @@ import { type Unwrap } from './types.mjs';
  *
  * ```ts
  * const parseNumber = (input: string): Optional<number> => {
- *   const num = Number.parseInt(input, 10);
+ *   const num = Num.safeParseInt(input);
  *
- *   return Number.isNaN(num) ? Optional.none : Optional.some(num);
+ *   return Result.isErr(num) ? Optional.none : Optional.some(num.value);
  * };
  *
  * const parsed = Optional.flatMap(Optional.some('10'), parseNumber);

@@ -11,9 +11,9 @@ if (import.meta.vitest !== undefined) {
 
     const mut_entries: (readonly [string, number])[] = [];
 
-    for (const [key, value] of map.entries()) {
+    map.forEach((value, key) => {
       mut_entries.push([key, value]);
-    }
+    });
 
     assert.deepStrictEqual(mut_entries, [
       ['a', 1],

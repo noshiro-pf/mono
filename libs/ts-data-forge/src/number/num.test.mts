@@ -164,7 +164,7 @@ describe('Num test', () => {
     test('rejects empty / whitespace-only input (unlike Number)', () => {
       assert.isTrue(Result.isErr(Num.safeParseInt('')));
 
-      assert.isTrue(Result.isErr(Num.safeParseInt('   ')));
+      assert.isTrue(Result.isErr(Num.safeParseInt(' '.repeat(3))));
     });
 
     test('rejects non-finite words', () => {
@@ -222,7 +222,7 @@ describe('Num test', () => {
     test('rejects empty / whitespace-only input (unlike Number)', () => {
       assert.isTrue(Result.isErr(Num.safeParseFloat('')));
 
-      assert.isTrue(Result.isErr(Num.safeParseFloat('   ')));
+      assert.isTrue(Result.isErr(Num.safeParseFloat(' '.repeat(3))));
     });
 
     test('rejects non-finite values', () => {

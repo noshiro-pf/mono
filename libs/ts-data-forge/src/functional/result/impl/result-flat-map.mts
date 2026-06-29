@@ -12,9 +12,9 @@ import { type UnwrapErr, type UnwrapOk } from './types.mjs';
  *
  * ```ts
  * const parseNumber = (input: string): Result<number, string> => {
- *   const num = Number.parseInt(input, 10);
+ *   const num = Num.safeParseInt(input);
  *
- *   return Number.isNaN(num) ? Result.err('not a number') : Result.ok(num);
+ *   return Result.mapErr(num, () => 'not a number');
  * };
  *
  * const parsed = Result.flatMap(Result.ok('42'), parseNumber);

@@ -134,7 +134,7 @@ export namespace Num {
       ? Result.err(
           new Error(`safeParseInt: "${s}" is not a valid base-10 integer`),
         )
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion, ts-data-forge/prefer-as-int
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(Math.trunc(viaNumber) as Int);
   };
 
@@ -214,7 +214,7 @@ export namespace Num {
       ? Result.err(
           new Error(`safeParseFloat: "${s}" is not a valid finite number`),
         )
-      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion, ts-data-forge/prefer-as-int
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Result.ok(viaNumber as FiniteNumber);
   };
 
@@ -649,7 +649,7 @@ export namespace Num {
    * @param num - The number to round
    * @returns The rounded integer as an Int branded type
    */
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, ts-data-forge/prefer-as-int
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   export const roundToInt = (num: number): Int => Math.trunc(num + 0.5) as Int;
 
   /**

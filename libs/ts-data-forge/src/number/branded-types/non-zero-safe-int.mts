@@ -31,9 +31,9 @@ const {
 >({
   integerOrSafeInteger: 'SafeInteger',
   nonZero: true,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-min-safe-integer, ts-data-forge/prefer-as-int
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-min-safe-integer
   MIN_VALUE: Number.MIN_SAFE_INTEGER as SafeInt,
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer, ts-data-forge/prefer-as-int
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, math/prefer-number-max-safe-integer
   MAX_VALUE: Number.MAX_SAFE_INTEGER as SafeUint,
   typeNameInMessage,
 } as const);

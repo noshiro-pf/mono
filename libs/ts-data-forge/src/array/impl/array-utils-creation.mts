@@ -43,7 +43,7 @@ export const zeros = <N extends SizeType.ArgArr>(
     ? NonEmptyArray<0>
     : readonly 0[] =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  Array.from<0>({ length: len }).fill(0) as never;
+  Array.from({ length: len }, () => 0) as never;
 
 /**
  * Creates a sequence of consecutive integers from 0 to `len-1`.

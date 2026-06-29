@@ -1,4 +1,4 @@
-import { type Primitive } from 'ts-type-forge';
+import { type DeepReadonly, type Primitive } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { isString } from '../guard/index.mjs';
 import { type MapSetKeyType } from '../types.mjs';
@@ -922,7 +922,6 @@ describe('ISet.forEach', () => {
 
     let mut_callCount = 0;
 
-    // eslint-disable-next-line unicorn/no-array-for-each
     set.forEach(() => {
       mut_callCount += 1;
     });
@@ -978,14 +977,13 @@ describe('ISet.entries', () => {
       () => IterableIterator<readonly [1 | 2 | 3, 1 | 2 | 3]>
     >('<=');
 
-    const mut_result: [1 | 2 | 3, 1 | 2 | 3][] = [];
-
-    for (const x of s0.entries()) {
-      mut_result.push([x[0], x[1]]);
-    }
+    const result: DeepReadonly<[1 | 2 | 3, 1 | 2 | 3][]> = Array.from(
+      s0.entries(),
+      (x) => [x[0], x[1]],
+    );
 
     assert.deepStrictEqual(
-      mut_result.toSorted((a, b) => a[0] - b[0]),
+      result.toSorted((a, b) => a[0] - b[0]),
       [
         [1, 1],
         [2, 2],
