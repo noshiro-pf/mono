@@ -1,3 +1,9 @@
+# [8.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.1.0...v8.2.0) (2026-06-30)
+
+### Features
+
+- add allowAnyString option to enumType ([#322](https://github.com/noshiro-pf/ts-fortress/issues/322)) ([b5f5206](https://github.com/noshiro-pf/ts-fortress/commit/b5f5206360577d2108f5d7c1e4abedb0766e2376))
+
 # [8.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.0.0...v8.1.0) (2026-06-30)
 
 ### Features
