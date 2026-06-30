@@ -108,3 +108,73 @@ describe(enumType, () => {
     });
   });
 });
+
+describe('enumType with allowAnyString', () => {
+  const color = enumType(['red', 'green', 'blue'], {
+    allowAnyString: true,
+    defaultValue: '',
+  });
+
+  type Color = TypeOf<typeof color>;
+
+  // Autocomplete is preserved for the listed members via the open-union idiom,
+  // while any other string is still part of the type.
+  expectType<Color, 'red' | 'green' | 'blue' | (string & {})>('=');
+
+  expectType<typeof color.defaultValue, Color>('=');
+
+  describe('is', () => {
+    test('accepts a listed member', () => {
+      assert.isTrue(color.is('red'));
+    });
+
+    test('accepts any other string at runtime (behaves like string())', () => {
+      assert.isTrue(color.is('purple'));
+    });
+
+    test('rejects non-string values', () => {
+      assert.isFalse(color.is(42));
+    });
+  });
+
+  describe('validate', () => {
+    test('returns an unlisted string as-is', () => {
+      const result = color.validate('purple');
+
+      assert.isTrue(Result.isOk(result));
+
+      expect(Result.unwrapThrow(result)).toBe('purple');
+    });
+
+    test('rejects non-string values with a string-type error', () => {
+      const result = color.validate(42);
+
+      assert.isTrue(Result.isErr(result));
+
+      assert.deepStrictEqual(
+        validationErrorsToMessages(Result.unwrapErrThrow(result)),
+        [
+          'Error: expected <string> type but <number> type value `42` was passed.',
+        ],
+      );
+    });
+  });
+
+  describe('default value and fill', () => {
+    test('uses the configured default value', () => {
+      expect(color.defaultValue).toBe('');
+    });
+
+    test('keeps any string', () => {
+      const x: unknown = 'anything';
+
+      expect(color.fill(x)).toBe('anything');
+    });
+
+    test('non-string falls back to the default value', () => {
+      const x: unknown = 123;
+
+      expect(color.fill(x)).toBe('');
+    });
+  });
+});

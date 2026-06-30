@@ -1,9 +1,10 @@
-import { ISet, memoizeFunction, Result } from 'ts-data-forge';
+import { ISet, isString, memoizeFunction, Result } from 'ts-data-forge';
 import {
   type ArrayElement,
   type NonEmptyArray,
   type Primitive,
 } from 'ts-type-forge';
+import { string } from '../primitives/index.mjs';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -12,16 +13,49 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export const enumType = <const Values extends NonEmptyArray<Primitive>>(
+export function enumType<const Values extends NonEmptyArray<Primitive>>(
   values: Values,
   options?: Partial<
     Readonly<{
       typeName: string;
       defaultValue: ArrayElement<Values>;
+      allowAnyString: false;
     }>
   >,
-): Type<ArrayElement<Values>> => {
-  type T = ArrayElement<Values>;
+): Type<ArrayElement<Values>>;
+
+// When `allowAnyString` is on, the result type keeps autocomplete for the
+// listed members via the `T | (string & {})` idiom while still accepting any
+// other string, and at runtime the value is validated as a plain string
+// (i.e. it behaves like `string()`).
+export function enumType<const Values extends NonEmptyArray<string>>(
+  values: Values,
+  options: Readonly<{
+    allowAnyString: true;
+    typeName?: string;
+    defaultValue?: ArrayElement<Values> | (string & {});
+  }>,
+): Type<ArrayElement<Values> | (string & {})>;
+
+export function enumType<const Values extends NonEmptyArray<Primitive>>(
+  values: Values,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: ArrayElement<Values> | (string & {});
+      allowAnyString: boolean;
+    }>
+  >,
+): Type<ArrayElement<Values> | (string & {})> {
+  if (
+    options?.allowAnyString === true &&
+    values.every(isString) &&
+    isString(options.defaultValue)
+  ) {
+    return string(options.defaultValue);
+  }
+
+  type T = ArrayElement<Values> | (string & {});
 
   const valueSet = ISet.create(values);
 
@@ -55,7 +89,7 @@ export const enumType = <const Values extends NonEmptyArray<Primitive>>(
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultValue());
 
   return {
-    typeName: options?.typeName ?? 'enum',
+    typeName,
     get defaultValue() {
       return getDefaultValue();
     },
@@ -65,4 +99,4 @@ export const enumType = <const Values extends NonEmptyArray<Primitive>>(
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
   };
-};
+}
