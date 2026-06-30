@@ -1,5 +1,9 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type ArrayBoundedLen } from 'ts-type-forge';
+import {
+  type ArrayAtLeastLen,
+  type ArrayAtMostLen,
+  type ArrayBoundedLen,
+} from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {
@@ -247,6 +251,42 @@ describe(arrayBoundedLength, () => {
       const ys: unknown = null;
 
       assert.deepStrictEqual(xs.fill(ys), [1, 2, 3]);
+    });
+  });
+
+  describe('bounds outside SmallUint', () => {
+    // A plain `number` is outside `SmallUint`, so it drops the corresponding
+    // bound from the result type.
+    const dynamic: number = 3;
+
+    // min ∈ SmallUint & max ∉ SmallUint -> ArrayAtLeastLen<min, A>
+    const atLeast = arrayBoundedLength(2, dynamic, number());
+
+    expectType<TypeOf<typeof atLeast>, ArrayAtLeastLen<2, number>>('=');
+
+    // min ∉ SmallUint & max ∈ SmallUint -> ArrayAtMostLen<max, A>
+    const atMost = arrayBoundedLength(dynamic, 5, number());
+
+    expectType<TypeOf<typeof atMost>, ArrayAtMostLen<5, number>>('=');
+
+    // min ∉ SmallUint & max ∉ SmallUint -> readonly A[]
+    const unbounded = arrayBoundedLength(dynamic, dynamic, number());
+
+    expectType<TypeOf<typeof unbounded>, readonly number[]>('=');
+
+    test('still validates the range at runtime', () => {
+      // `atLeast` has range [2, 3], `atMost` has range [3, 5], `unbounded` [3, 3].
+      assert.isTrue(atLeast.is([0, 0]));
+
+      assert.isFalse(atLeast.is([0]));
+
+      assert.isTrue(atMost.is([0, 0, 0]));
+
+      assert.isFalse(atMost.is([0, 0]));
+
+      assert.isTrue(unbounded.is([0, 0, 0]));
+
+      assert.isFalse(unbounded.is([0, 0]));
     });
   });
 });

@@ -1,5 +1,10 @@
-import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import { type ArrayBoundedLen, type SmallUint } from 'ts-type-forge';
+import { Arr, asUint32, memoizeFunction, Result } from 'ts-data-forge';
+import {
+  type ArrayAtLeastLen,
+  type ArrayAtMostLen,
+  type ArrayBoundedLen,
+  type SmallUint,
+} from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -12,7 +17,7 @@ import {
 
 export type { ArrayBoundedLen } from 'ts-type-forge';
 
-export const arrayBoundedLength = <
+export function arrayBoundedLength<
   A,
   Min extends SmallUint,
   Max extends SmallUint,
@@ -26,8 +31,61 @@ export const arrayBoundedLength = <
       defaultValue: ArrayBoundedLen<Min, Max, A>;
     }>
   >,
-): Type<ArrayBoundedLen<Min, Max, A>> => {
-  type T = ArrayBoundedLen<Min, Max, A>;
+): Type<ArrayBoundedLen<Min, Max, A>>;
+
+// Only the lower bound is in `SmallUint`, so the upper bound is dropped from the
+// result type and only the "at least `min`" guarantee is kept.
+export function arrayBoundedLength<A, Min extends SmallUint>(
+  min: Min,
+  max: number,
+  elementType: Type<A>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: ArrayAtLeastLen<Min, A>;
+    }>
+  >,
+): Type<ArrayAtLeastLen<Min, A>>;
+
+// Only the upper bound is in `SmallUint`, so the lower bound is dropped from the
+// result type and only the "at most `max`" guarantee is kept.
+export function arrayBoundedLength<A, Max extends SmallUint>(
+  min: number,
+  max: Max,
+  elementType: Type<A>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: ArrayAtMostLen<Max, A>;
+    }>
+  >,
+): Type<ArrayAtMostLen<Max, A>>;
+
+// Neither bound is in `SmallUint`, so the result length is left unconstrained.
+export function arrayBoundedLength<A>(
+  min: number,
+  max: number,
+  elementType: Type<A>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: readonly A[];
+    }>
+  >,
+): Type<readonly A[]>;
+
+export function arrayBoundedLength<A>(
+  min: number,
+  max: number,
+  elementType: Type<A>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: readonly A[];
+    }>
+  >,
+): Type<readonly A[]> {
+  type T = readonly A[];
 
   const typeName =
     options?.typeName ??
@@ -37,8 +95,7 @@ export const arrayBoundedLength = <
     (): T =>
       options?.defaultValue ??
       // An array of the minimum length is the shortest value within the range.
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      (Arr.create(min, elementType.defaultValue) as T),
+      Arr.create(asUint32(min), elementType.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {
@@ -94,14 +151,14 @@ export const arrayBoundedLength = <
     }
 
     // Trim down to at most `max`, then pad up to at least `min`.
-    const capped = Arr.take(a, max);
+    const capped = Arr.take(a, asUint32(max));
 
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return (
-      capped.length >= min
-        ? Arr.map(capped, (el) => elementType.fill(el) satisfies A)
-        : Arr.map(Arr.seq(min), (i) => elementType.fill(capped[i]) satisfies A)
-    ) as T;
+    return capped.length >= min
+      ? Arr.map(capped, (el) => elementType.fill(el) satisfies A)
+      : Arr.map(
+          Arr.seq(asUint32(min)),
+          (i) => elementType.fill(capped[i]) satisfies A,
+        );
   };
 
   return {
@@ -115,4 +172,4 @@ export const arrayBoundedLength = <
     cast: createCastFn(validate),
     assertIs: createAssertFn(validate),
   };
-};
+}

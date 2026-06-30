@@ -1,4 +1,4 @@
-import { Arr, memoizeFunction, Result } from 'ts-data-forge';
+import { Arr, asUint32, memoizeFunction, Result } from 'ts-data-forge';
 import { type ArrayAtMostLen, type SmallUint } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
@@ -12,7 +12,7 @@ import {
 
 export type { ArrayAtMostLen } from 'ts-type-forge';
 
-export const arrayAtMostLength = <A, N extends SmallUint>(
+export function arrayAtMostLength<A, N extends SmallUint>(
   size: N,
   elementType: Type<A>,
   options?: Partial<
@@ -21,8 +21,32 @@ export const arrayAtMostLength = <A, N extends SmallUint>(
       defaultValue: ArrayAtMostLen<N, A>;
     }>
   >,
-): Type<ArrayAtMostLen<N, A>> => {
-  type T = ArrayAtMostLen<N, A>;
+): Type<ArrayAtMostLen<N, A>>;
+
+// For sizes outside `SmallUint` the exact length cannot be encoded in the type,
+// so the result length is left unconstrained (`readonly A[]`).
+export function arrayAtMostLength<A>(
+  size: number,
+  elementType: Type<A>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: readonly A[];
+    }>
+  >,
+): Type<readonly A[]>;
+
+export function arrayAtMostLength<A>(
+  size: number,
+  elementType: Type<A>,
+  options?: Partial<
+    Readonly<{
+      typeName: string;
+      defaultValue: readonly A[];
+    }>
+  >,
+): Type<readonly A[]> {
+  type T = readonly A[];
 
   const typeName =
     options?.typeName ?? `ArrayAtMostLen<${size}, ${elementType.typeName}>`;
@@ -31,8 +55,7 @@ export const arrayAtMostLength = <A, N extends SmallUint>(
     (): T =>
       options?.defaultValue ??
       // The empty array is the shortest value satisfying `length <= size`.
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      (Arr.create(0, elementType.defaultValue) as T),
+      Arr.create(0, elementType.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {
@@ -84,12 +107,10 @@ export const arrayAtMostLength = <A, N extends SmallUint>(
   const fill: Type<T>['fill'] = (a) =>
     Arr.isArray(a)
       ? // Keep the input but trim down to at most `size` elements.
-        // TODO: remove as
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        (Arr.map(
-          Arr.take(a, size),
+        Arr.map(
+          Arr.take(a, asUint32(size)),
           (el) => elementType.fill(el) satisfies A,
-        ) as T)
+        )
       : getDefaultValue();
 
   return {
@@ -103,4 +124,4 @@ export const arrayAtMostLength = <A, N extends SmallUint>(
     cast: createCastFn(validate),
     assertIs: createAssertFn(validate),
   };
-};
+}

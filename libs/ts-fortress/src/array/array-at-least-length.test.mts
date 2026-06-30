@@ -219,4 +219,31 @@ describe(arrayAtLeastLength, () => {
       assert.deepStrictEqual(xs.fill(ys), [1, 2, 3]);
     });
   });
+
+  describe('size outside SmallUint', () => {
+    // A literal beyond `SmallUint`'s range selects the fallback overload, whose
+    // result length is unconstrained.
+    const big = arrayAtLeastLength(100, number());
+
+    expectType<TypeOf<typeof big>, readonly number[]>('=');
+
+    expectType<typeof big.defaultValue, readonly number[]>('=');
+
+    // A plain `number` (not a literal) also selects the fallback overload.
+    const dynamicSize: number = 5;
+
+    const dyn = arrayAtLeastLength(dynamicSize, number());
+
+    expectType<TypeOf<typeof dyn>, readonly number[]>('=');
+
+    test('default value has the requested length', () => {
+      expect(big.defaultValue).toHaveLength(100);
+    });
+
+    test('validates the minimum length at runtime', () => {
+      assert.isTrue(dyn.is([0, 0, 0, 0, 0]));
+
+      assert.isFalse(dyn.is([0, 0, 0, 0]));
+    });
+  });
 });
