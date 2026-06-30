@@ -1,3 +1,9 @@
+# [8.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.0.0...v8.1.0) (2026-06-30)
+
+### Features
+
+- make arrayBoundedLength accept an arbitrary size argument ([#321](https://github.com/noshiro-pf/ts-fortress/issues/321)) ([33d3a6a](https://github.com/noshiro-pf/ts-fortress/commit/33d3a6a17237aa818d43b7ca5aaea8a501b14c6c))
+
 # [8.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v7.3.0...v8.0.0) (2026-06-30)
 
 ### Features
