@@ -333,8 +333,9 @@ describe('recursive', () => {
       const NodeShape = {
         id: string(),
         value: number(0),
+        // eslint-disable-next-line unicorn/no-unused-properties
         metadata: string(''),
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion, unicorn/no-unused-properties
         children: array({} as Type<unknown>), // Placeholder for recursion
       } as const;
 

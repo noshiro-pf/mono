@@ -1,19 +1,23 @@
-import { Arr, isBigint } from 'ts-data-forge';
+/* eslint-disable unicorn/no-negated-comparison */
+import { Arr, expectType, isBigint, Result } from 'ts-data-forge';
+import { type BoolAnd, type BoolNot } from 'ts-type-forge';
 import { refine } from '../other-types/index.mjs';
 import { type Type } from '../type.mjs';
 import { createPrimitiveType } from '../utils/index.mjs';
 
-export function bigint(defaultValue?: bigint): Type<bigint>;
+type NumberType = bigint;
 
-export function bigint<B extends bigint, const C extends Constraints>(
-  defaultValue: B & DefaultValueType<B, C>,
+export function bigint(defaultValue?: NumberType): Type<NumberType>;
+
+export function bigint<N extends NumberType, const C extends Constraints>(
+  defaultValue: N & DefaultValueType<N, C>,
   constraints: C,
-): Type<bigint>;
+): Type<NumberType>;
 
 export function bigint<C extends Constraints>(
-  defaultValue: bigint = 0n,
+  defaultValue: NumberType = 0n,
   constraints?: C,
-): Type<bigint> {
+): Type<NumberType> {
   const baseType = createPrimitiveType({
     typeName: 'bigint',
     defaultValue,
@@ -27,250 +31,211 @@ export function bigint<C extends Constraints>(
     return baseType;
   }
 
-  if (constraints.gt !== undefined && !(defaultValue > constraints.gt)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint gt = ${constraints.gt}`,
-    );
+  const constraintsPredicate = createConstraintsPredicate(constraints);
+
+  const defaultValueConstraintsCheck = constraintsPredicate(defaultValue);
+
+  if (Result.isErr(defaultValueConstraintsCheck)) {
+    throw new Error(defaultValueConstraintsCheck.value);
   }
-
-  if (constraints.gte !== undefined && !(defaultValue >= constraints.gte)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint gte = ${constraints.gte}`,
-    );
-  }
-
-  if (constraints.min !== undefined && !(defaultValue >= constraints.min)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint min = ${constraints.min}`,
-    );
-  }
-
-  if (constraints.lt !== undefined && !(defaultValue < constraints.lt)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint lt = ${constraints.lt}`,
-    );
-  }
-
-  if (constraints.lte !== undefined && !(defaultValue <= constraints.lte)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint lte = ${constraints.lte}`,
-    );
-  }
-
-  if (constraints.max !== undefined && !(defaultValue <= constraints.max)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint max = ${constraints.max}`,
-    );
-  }
-
-  if (constraints.positive === true && !(defaultValue > 0n)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint positive = true`,
-    );
-  }
-
-  if (constraints.nonNegative === true && !(defaultValue >= 0n)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint nonNegative = true`,
-    );
-  }
-
-  if (constraints.negative === true && !(defaultValue < 0n)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint negative = true`,
-    );
-  }
-
-  if (constraints.nonPositive === true && !(defaultValue <= 0n)) {
-    throw new Error(
-      `defaultValue ${defaultValue} for bigint does not satisfy the constraint nonPositive = true`,
-    );
-  }
-
-  if (constraints.multipleOf !== undefined) {
-    const divisor = constraints.multipleOf;
-
-    if (divisor === 0n) {
-      if (defaultValue !== 0n) {
-        throw new Error(
-          `defaultValue ${defaultValue} for bigint does not satisfy the constraint multipleOf = ${constraints.multipleOf}`,
-        );
-      }
-    } else if (defaultValue % divisor !== 0n) {
-      throw new Error(
-        `defaultValue ${defaultValue} for bigint does not satisfy the constraint multipleOf = ${constraints.multipleOf}`,
-      );
-    }
-  }
-
-  if (constraints.step !== undefined) {
-    const stepValue = constraints.step;
-
-    if (stepValue === 0n) {
-      if (defaultValue !== 0n) {
-        throw new Error(
-          `defaultValue ${defaultValue} for bigint does not satisfy the constraint step = ${constraints.step}`,
-        );
-      }
-    } else if (defaultValue % stepValue !== 0n) {
-      throw new Error(
-        `defaultValue ${defaultValue} for bigint does not satisfy the constraint step = ${constraints.step}`,
-      );
-    }
-  }
-
-  const satisfiesConstraints = createConstraintsPredicate(constraints);
 
   return refine({
     baseType,
     defaultValue,
-    is: (value): value is bigint => satisfiesConstraints(value),
+    is: (value): value is NumberType =>
+      Result.isOk(constraintsPredicate(value)),
     typeName: 'bigint',
   });
 }
 
 type Constraints = Partial<
   Readonly<{
-    gt: bigint;
-    gte: bigint;
-    min: bigint;
-    lt: bigint;
-    lte: bigint;
-    max: bigint;
-    negative: boolean;
-    nonNegative: boolean;
-    positive: boolean;
-    nonPositive: boolean;
-    multipleOf: bigint;
-    step: bigint;
+    nonZero: true;
+    negative: true;
+    nonNegative: true;
+    positive: true;
+    nonPositive: true;
+
+    gt: NumberType;
+    gte: NumberType;
+    min: NumberType;
+    lt: NumberType;
+    lte: NumberType;
+    max: NumberType;
+    multipleOf: NumberType;
+    step: NumberType;
   }>
 >;
 
 type DefaultValueType<
-  B extends bigint,
-  R extends Constraints,
-> = DefaultValueWhenNegativeIsOn<B, R> &
-  DefaultValueWhenNonNegativeIsOn<B, R> &
-  DefaultValueWhenPositiveIsOn<B, R> &
-  DefaultValueWhenNonPositiveIsOn<B, R>;
+  N extends NumberType,
+  C extends Constraints,
+> = DefaultValueWhenNonZeroIsOn<N, C> &
+  DefaultValueWhenNegativeIsOn<N, C> &
+  DefaultValueWhenNonNegativeIsOn<N, C> &
+  DefaultValueWhenPositiveIsOn<N, C> &
+  DefaultValueWhenNonPositiveIsOn<N, C>;
 
-type DefaultValueWhenNegativeIsOn<B extends bigint, R extends Constraints> =
-  R extends Readonly<{ negative: true }> ? NegativeBigint<B> : bigint;
+type DefaultValueWhenNonZeroIsOn<N extends NumberType, C extends Constraints> =
+  C extends Readonly<{ nonZero: true }> ? NonZeroNumber<N> : NumberType;
 
-type DefaultValueWhenNonNegativeIsOn<B extends bigint, R extends Constraints> =
-  R extends Readonly<{ nonNegative: true }> ? NonNegativeBigint<B> : bigint;
+type DefaultValueWhenNegativeIsOn<N extends NumberType, C extends Constraints> =
+  C extends Readonly<{ negative: true }> ? NegativeNumber<N> : NumberType;
 
-type DefaultValueWhenPositiveIsOn<B extends bigint, R extends Constraints> =
-  R extends Readonly<{ positive: true }> ? PositiveBigint<B> : bigint;
+type DefaultValueWhenNonNegativeIsOn<
+  N extends NumberType,
+  C extends Constraints,
+> =
+  C extends Readonly<{ nonNegative: true }> ? NonNegativeNumber<N> : NumberType;
 
-type DefaultValueWhenNonPositiveIsOn<B extends bigint, R extends Constraints> =
-  R extends Readonly<{ nonPositive: true }> ? NonPositiveBigint<B> : bigint;
+type DefaultValueWhenPositiveIsOn<N extends NumberType, C extends Constraints> =
+  C extends Readonly<{ positive: true }> ? PositiveNumber<N> : NumberType;
 
-type NegativeBigint<B extends bigint> = bigint extends B
-  ? bigint
-  : IsNegativeBigint<B> extends true
-    ? B
+type DefaultValueWhenNonPositiveIsOn<
+  N extends NumberType,
+  C extends Constraints,
+> =
+  C extends Readonly<{ nonPositive: true }> ? NonPositiveNumber<N> : NumberType;
+
+type NonZeroNumber<N extends NumberType> = NumberType extends N
+  ? NumberType
+  : IsZero<N> extends true
+    ? never
+    : N;
+
+type NegativeNumber<N extends NumberType> = NumberType extends N
+  ? NumberType
+  : IsNegative<N> extends true
+    ? N
     : never;
 
-type NonNegativeBigint<B extends bigint> = bigint extends B
-  ? bigint
-  : IsNonNegativeBigint<B> extends true
-    ? B
+type NonNegativeNumber<N extends NumberType> = NumberType extends N
+  ? NumberType
+  : IsNonNegative<N> extends true
+    ? N
     : never;
 
-type PositiveBigint<B extends bigint> = bigint extends B
-  ? bigint
-  : IsPositiveBigint<B> extends true
-    ? B
+type PositiveNumber<N extends NumberType> = NumberType extends N
+  ? NumberType
+  : IsPositive<N> extends true
+    ? N
     : never;
 
-type NonPositiveBigint<B extends bigint> = bigint extends B
-  ? bigint
-  : IsNonPositiveBigint<B> extends true
-    ? B
+type NonPositiveNumber<N extends NumberType> = NumberType extends N
+  ? NumberType
+  : IsNonPositive<N> extends true
+    ? N
     : never;
 
-type IsNegativeBigint<B extends bigint> = `${B}` extends `-${string}`
+type IsZero<N extends NumberType> = `${N}` extends '0' ? true : false;
+
+type IsNonZero<N extends NumberType> = IsZero<N> extends true ? false : true;
+
+type IsNegative<N extends NumberType> = `${N}` extends `-${string}`
   ? true
   : false;
 
-type IsNonNegativeBigint<B extends bigint> =
-  IsNegativeBigint<B> extends true ? false : true;
+type IsNonNegative<N extends NumberType> =
+  IsNegative<N> extends true ? false : true;
 
-type IsZeroBigint<B extends bigint> = `${B}` extends '0' ? true : false;
+type IsPositive<N extends NumberType> = BoolAnd<IsNonZero<N>, IsNonNegative<N>>;
 
-type IsPositiveBigint<B extends bigint> =
-  IsZeroBigint<B> extends true ? false : IsNonNegativeBigint<B>;
-
-type IsNonPositiveBigint<B extends bigint> =
-  IsPositiveBigint<B> extends true ? false : true;
+type IsNonPositive<N extends NumberType> = BoolNot<IsPositive<N>>;
 
 const createConstraintsPredicate =
   (constraints: Constraints) =>
-  (value: bigint): boolean => {
-    if (constraints.gt !== undefined && !(value > constraints.gt)) {
-      return false;
+  (value: NumberType): Result<true, string> => {
+    const {
+      nonZero,
+      negative,
+      nonNegative,
+      positive,
+      nonPositive,
+      gt,
+      gte,
+      min,
+      lt,
+      lte,
+      max,
+      multipleOf,
+      step,
+      ..._rest
+    } = constraints;
+
+    expectType<keyof typeof _rest, never>('=');
+
+    if (nonZero === true && !(value !== 0n)) {
+      return Result.err(errorMessage(value, 'nonZero', true));
     }
 
-    if (constraints.gte !== undefined && !(value >= constraints.gte)) {
-      return false;
+    if (negative === true && !(value < 0n)) {
+      return Result.err(errorMessage(value, 'negative', true));
     }
 
-    if (constraints.min !== undefined && !(value >= constraints.min)) {
-      return false;
+    if (nonNegative === true && !(value >= 0n)) {
+      return Result.err(errorMessage(value, 'nonNegative', true));
     }
 
-    if (constraints.lt !== undefined && !(value < constraints.lt)) {
-      return false;
+    if (positive === true && !(value > 0n)) {
+      return Result.err(errorMessage(value, 'positive', true));
     }
 
-    if (constraints.lte !== undefined && !(value <= constraints.lte)) {
-      return false;
+    if (nonPositive === true && !(value <= 0n)) {
+      return Result.err(errorMessage(value, 'nonPositive', true));
     }
 
-    if (constraints.max !== undefined && !(value <= constraints.max)) {
-      return false;
+    if (gt !== undefined && !(value > gt)) {
+      return Result.err(errorMessage(value, 'gt', gt));
     }
 
-    if (constraints.positive === true && !(value > 0n)) {
-      return false;
+    if (gte !== undefined && !(value >= gte)) {
+      return Result.err(errorMessage(value, 'gte', gte));
     }
 
-    if (constraints.nonNegative === true && !(value >= 0n)) {
-      return false;
+    if (min !== undefined && !(value >= min)) {
+      return Result.err(errorMessage(value, 'min', min));
     }
 
-    if (constraints.negative === true && !(value < 0n)) {
-      return false;
+    if (lt !== undefined && !(value < lt)) {
+      return Result.err(errorMessage(value, 'lt', lt));
     }
 
-    if (constraints.nonPositive === true && !(value <= 0n)) {
-      return false;
+    if (lte !== undefined && !(value <= lte)) {
+      return Result.err(errorMessage(value, 'lte', lte));
     }
 
-    if (constraints.multipleOf !== undefined) {
-      const divisor = constraints.multipleOf;
+    if (max !== undefined && !(value <= max)) {
+      return Result.err(errorMessage(value, 'max', max));
+    }
 
-      if (divisor === 0n) {
+    // `value % 0n` throws a RangeError, so the zero divisor is handled
+    // separately: it only admits zero.
+    if (multipleOf !== undefined) {
+      if (multipleOf === 0n) {
         if (value !== 0n) {
-          return false;
+          return Result.err(errorMessage(value, 'multipleOf', multipleOf));
         }
-      } else if (value % divisor !== 0n) {
-        return false;
+      } else if (value % multipleOf !== 0n) {
+        return Result.err(errorMessage(value, 'multipleOf', multipleOf));
       }
     }
 
-    if (constraints.step !== undefined) {
-      const stepValue = constraints.step;
-
-      if (stepValue === 0n) {
+    if (step !== undefined) {
+      if (step === 0n) {
         if (value !== 0n) {
-          return false;
+          return Result.err(errorMessage(value, 'step', step));
         }
-      } else if (value % stepValue !== 0n) {
-        return false;
+      } else if (value % step !== 0n) {
+        return Result.err(errorMessage(value, 'step', step));
       }
     }
 
-    return true;
+    return Result.ok(true);
   };
+
+const errorMessage = (
+  value: NumberType,
+  constraintName: string,
+  constraintValue: NumberType | boolean,
+): string =>
+  `defaultValue [${value}] for bigint does not satisfy the constraint ${constraintName} = ${constraintValue}` as const;

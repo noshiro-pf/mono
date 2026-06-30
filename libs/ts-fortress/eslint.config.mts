@@ -24,6 +24,12 @@ export default [
   eslintConfigForVitest(),
 
   {
+    rules: defineKnownRules({
+      'unicorn/prefer-temporal': 'off',
+    }),
+  },
+
+  {
     files: ['test/**/*.mts', '**/*.test.mts'],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',
@@ -33,6 +39,7 @@ export default [
       '@typescript-eslint/no-restricted-types': 'off',
       '@typescript-eslint/no-redundant-type-constituents': 'off',
       'unicorn/consistent-function-scoping': 'off',
+      'unicorn/no-array-fill-with-reference-type': 'off',
     }),
   },
 

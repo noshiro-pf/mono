@@ -20,7 +20,7 @@ describe('undefined type', () => {
       if (undefinedType.is(value)) {
         expectType<typeof value, undefined>('=');
       } else {
-        expectType<typeof value, {} | null>('=');
+        expectType<typeof value, null | {}>('=');
       }
 
       assert.isTrue(undefinedType.is(value));
@@ -32,7 +32,7 @@ describe('undefined type', () => {
       if (undefinedType.is(value)) {
         expectType<typeof value, undefined>('=');
       } else {
-        expectType<typeof value, {} | null>('=');
+        expectType<typeof value, null | {}>('=');
       }
 
       assert.isFalse(undefinedType.is(value));
@@ -44,7 +44,7 @@ describe('undefined type', () => {
         if (undefinedType.is(u)) {
           expectType<typeof u, undefined>('=');
         } else {
-          expectType<typeof u, {} | null>('=');
+          expectType<typeof u, null | {}>('=');
         }
 
         assert.isFalse(undefinedType.is(u));

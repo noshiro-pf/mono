@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-number-is-safe-integer */
 /* eslint-disable security/detect-unsafe-regex */
 // embed-sample-code-ignore-above
 import * as t from 'ts-fortress';

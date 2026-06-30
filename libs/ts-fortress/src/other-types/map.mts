@@ -43,7 +43,7 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
     }
 
     const errors: readonly ValidationError[] = Arr.generate(function* () {
-      for (const [k, v] of a.entries()) {
+      for (const [k, v] of a) {
         {
           const res = keyType.validate(k);
 
@@ -97,9 +97,7 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
     !isMap(a)
       ? getDefaultValue()
       : new Map(
-          Array.from(a.entries()).filter(
-            ([k, v]) => keyType.is(k) && valueType.is(v),
-          ),
+          Array.from(a).filter(([k, v]) => keyType.is(k) && valueType.is(v)),
         );
 
   return {

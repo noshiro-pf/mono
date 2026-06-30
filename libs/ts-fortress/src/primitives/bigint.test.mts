@@ -8,6 +8,20 @@ describe(bigint, () => {
 
   type TargetType = TypeOf<typeof targetType>;
 
+  describe('default value', () => {
+    test('without explicit default value', () => {
+      const bigintDefault = bigint();
+
+      expect(bigintDefault.defaultValue).toBe(0n);
+    });
+
+    test('with explicit default value', () => {
+      const bigintCustom = bigint(42n);
+
+      expect(bigintCustom.defaultValue).toBe(42n);
+    });
+  });
+
   expectType<TargetType, bigint>('=');
 
   expectType<typeof targetType.defaultValue, TargetType>('=');
@@ -35,52 +49,6 @@ describe(bigint, () => {
       }
 
       assert.isFalse(targetType.is(x));
-    });
-  });
-
-  describe('validate', () => {
-    test('truthy case', () => {
-      const result = targetType.validate(456n);
-
-      assert.isTrue(Result.isOk(result));
-
-      const resultValue = Result.unwrapThrow(result);
-
-      expect(resultValue).toBe(456n);
-    });
-
-    test('falsy case', () => {
-      const result = targetType.validate(123);
-
-      assert.isTrue(Result.isErr(result));
-
-      const resultError = Result.unwrapErrThrow(result);
-
-      assert.deepStrictEqual(resultError, [
-        {
-          path: [],
-          actualValue: 123,
-          expectedType: 'bigint',
-          typeName: 'bigint',
-          details: undefined,
-        },
-      ]);
-
-      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected <bigint> type but <number> type value `123` was passed.',
-      ]);
-    });
-
-    test('validate returns input as-is for OK cases', () => {
-      const input = 999n;
-
-      const result = targetType.validate(input);
-
-      assert.isTrue(Result.isOk(result));
-
-      const resultValue1 = Result.unwrapThrow(result);
-
-      expect(resultValue1).toBe(input); // ✅ same reference
     });
   });
 
@@ -133,9 +101,160 @@ describe(bigint, () => {
       expect(targetType.fill(x)).toBe(0n);
     });
   });
+
+  describe('validate', () => {
+    test('truthy case', () => {
+      const result = targetType.validate(456n);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue = Result.unwrapThrow(result);
+
+      expect(resultValue).toBe(456n);
+    });
+
+    test('falsy case', () => {
+      const result = targetType.validate(123);
+
+      assert.isTrue(Result.isErr(result));
+
+      const resultError = Result.unwrapErrThrow(result);
+
+      assert.deepStrictEqual(resultError, [
+        {
+          path: [],
+          actualValue: 123,
+          expectedType: 'bigint',
+          typeName: 'bigint',
+          details: undefined,
+        },
+      ]);
+
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
+        'Error: expected <bigint> type but <number> type value `123` was passed.',
+      ]);
+    });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 999n;
+
+      const result = targetType.validate(input);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue1 = Result.unwrapThrow(result);
+
+      expect(resultValue1).toBe(input); // ✅ same reference
+    });
+  });
 });
 
 describe('bigint with constraints', () => {
+  describe('bigint constrained by nonZero', () => {
+    test('accepts valid default value', () => {
+      const type = bigint(1n, { nonZero: true });
+
+      expectType<typeof type, Type<bigint>>('=');
+
+      assert.isTrue(type.is(-5n));
+
+      assert.isTrue(type.is(5n));
+
+      assert.isFalse(type.is(0n));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 0n is not allowed when nonZero is true
+        bigint(0n, { nonZero: true }),
+      ).toThrow('nonZero = true');
+    });
+  });
+
+  describe('bigint constrained by negative', () => {
+    test('accepts valid default value', () => {
+      const type = bigint(-1n, { negative: true });
+
+      expectType<typeof type, Type<bigint>>('=');
+
+      assert.isTrue(type.is(-5n));
+
+      assert.isFalse(type.is(0n));
+
+      assert.isFalse(type.is(1n));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 0n is not < 0n when negative is true
+        bigint(0n, { negative: true }),
+      ).toThrow('negative = true');
+    });
+  });
+
+  describe('bigint constrained by nonNegative', () => {
+    test('accepts valid default value', () => {
+      const type = bigint(0n, { nonNegative: true });
+
+      expectType<typeof type, Type<bigint>>('=');
+
+      assert.isTrue(type.is(5n));
+
+      assert.isTrue(type.is(0n));
+
+      assert.isFalse(type.is(-1n));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error -1n is not >= 0n when nonNegative is true
+        bigint(-1n, { nonNegative: true }),
+      ).toThrow('nonNegative = true');
+    });
+  });
+
+  describe('bigint constrained by positive', () => {
+    test('accepts valid default value', () => {
+      const type = bigint(1n, { positive: true });
+
+      expectType<typeof type, Type<bigint>>('=');
+
+      assert.isTrue(type.is(10n));
+
+      assert.isFalse(type.is(0n));
+
+      assert.isFalse(type.is(-1n));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 0n is not > 0n when positive is true
+        bigint(0n, { positive: true }),
+      ).toThrow('positive = true');
+    });
+  });
+
+  describe('bigint constrained by nonPositive', () => {
+    test('accepts valid default value', () => {
+      const type = bigint(0n, { nonPositive: true });
+
+      expectType<typeof type, Type<bigint>>('=');
+
+      assert.isTrue(type.is(-5n));
+
+      assert.isTrue(type.is(0n));
+
+      assert.isFalse(type.is(1n));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 1n is not <= 0n when nonPositive is true
+        bigint(1n, { nonPositive: true }),
+      ).toThrow('nonPositive = true');
+    });
+  });
+
   describe('bigint constrained by gt', () => {
     test('accepts valid default value', () => {
       const type = bigint(10n, { gt: 5n });
@@ -242,90 +361,6 @@ describe('bigint with constraints', () => {
     });
   });
 
-  describe('bigint constrained by positive', () => {
-    test('accepts valid default value', () => {
-      const type = bigint(1n, { positive: true });
-
-      expectType<typeof type, Type<bigint>>('=');
-
-      assert.isTrue(type.is(10n));
-
-      assert.isFalse(type.is(0n));
-
-      assert.isFalse(type.is(-1n));
-    });
-
-    test('rejects invalid default value', () => {
-      expect(() =>
-        // @ts-expect-error 0n is not > 0n when positive is true
-        bigint(0n, { positive: true }),
-      ).toThrow('positive = true');
-    });
-  });
-
-  describe('bigint constrained by nonNegative', () => {
-    test('accepts valid default value', () => {
-      const type = bigint(0n, { nonNegative: true });
-
-      expectType<typeof type, Type<bigint>>('=');
-
-      assert.isTrue(type.is(5n));
-
-      assert.isTrue(type.is(0n));
-
-      assert.isFalse(type.is(-1n));
-    });
-
-    test('rejects invalid default value', () => {
-      expect(() =>
-        // @ts-expect-error -1n is not >= 0n when nonNegative is true
-        bigint(-1n, { nonNegative: true }),
-      ).toThrow('nonNegative = true');
-    });
-  });
-
-  describe('bigint constrained by negative', () => {
-    test('accepts valid default value', () => {
-      const type = bigint(-1n, { negative: true });
-
-      expectType<typeof type, Type<bigint>>('=');
-
-      assert.isTrue(type.is(-5n));
-
-      assert.isFalse(type.is(0n));
-
-      assert.isFalse(type.is(1n));
-    });
-
-    test('rejects invalid default value', () => {
-      expect(() =>
-        // @ts-expect-error 0n is not < 0n when negative is true
-        bigint(0n, { negative: true }),
-      ).toThrow('negative = true');
-    });
-  });
-
-  describe('bigint constrained by nonPositive', () => {
-    test('accepts valid default value', () => {
-      const type = bigint(0n, { nonPositive: true });
-
-      expectType<typeof type, Type<bigint>>('=');
-
-      assert.isTrue(type.is(-5n));
-
-      assert.isTrue(type.is(0n));
-
-      assert.isFalse(type.is(1n));
-    });
-
-    test('rejects invalid default value', () => {
-      expect(() =>
-        // @ts-expect-error 1n is not <= 0n when nonPositive is true
-        bigint(1n, { nonPositive: true }),
-      ).toThrow('nonPositive = true');
-    });
-  });
-
   describe('bigint constrained by multipleOf', () => {
     test('accepts valid default value', () => {
       const type = bigint(6n, { multipleOf: 3n });
@@ -341,6 +376,18 @@ describe('bigint with constraints', () => {
 
     test('rejects invalid default value', () => {
       expect(() => bigint(7n, { multipleOf: 3n })).toThrow('multipleOf = 3');
+    });
+
+    test('treats a zero divisor as accepting only zero', () => {
+      const type = bigint(0n, { multipleOf: 0n });
+
+      expectType<typeof type, Type<bigint>>('=');
+
+      assert.isTrue(type.is(0n));
+
+      assert.isFalse(type.is(3n));
+
+      expect(() => bigint(5n, { multipleOf: 0n })).toThrow('multipleOf = 0');
     });
   });
 
@@ -359,6 +406,18 @@ describe('bigint with constraints', () => {
 
     test('rejects invalid default value', () => {
       expect(() => bigint(9n, { step: 2n })).toThrow('step = 2');
+    });
+
+    test('treats a zero divisor as accepting only zero', () => {
+      const type = bigint(0n, { step: 0n });
+
+      expectType<typeof type, Type<bigint>>('=');
+
+      assert.isTrue(type.is(0n));
+
+      assert.isFalse(type.is(2n));
+
+      expect(() => bigint(5n, { step: 0n })).toThrow('step = 0');
     });
   });
 

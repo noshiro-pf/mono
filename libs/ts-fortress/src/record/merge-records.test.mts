@@ -310,7 +310,7 @@ describe(mergeRecords, () => {
 
       expectType<
         TypeOf<typeof Merged>,
-        Readonly<{ name: string } & ({ a: number } | { b: number })>
+        Readonly<({ a: number } | { b: number }) & { name: string }>
       >('=');
 
       expectType<

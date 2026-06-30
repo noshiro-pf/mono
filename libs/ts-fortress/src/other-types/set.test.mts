@@ -241,6 +241,7 @@ test('SetType ensures uniqueness', () => {
   const NumberSet = SetType(number());
 
   // Set with duplicate values (Set automatically handles uniqueness)
+  // eslint-disable-next-line unicorn/no-duplicate-set-values
   const setWithDuplicates = new Set([1, 2, 2, 3, 3, 3]);
 
   expect(setWithDuplicates.size).toBe(3); // Only unique values

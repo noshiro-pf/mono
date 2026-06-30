@@ -36,7 +36,7 @@ describe(string, () => {
       '123',
       'true',
       'false',
-      '   ',
+      ' '.repeat(3),
       '\n',
       '\t',
       '🎉',

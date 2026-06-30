@@ -3,12 +3,17 @@ import {
   type NegativeInt,
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonZeroNumber,
   type PositiveNumber,
 } from 'ts-type-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import { number } from './number.mjs';
 
 describe(number, () => {
+  const targetType = number();
+
+  type TargetType = TypeOf<typeof targetType>;
+
   describe('default value', () => {
     test('without explicit default value', () => {
       const numDefault = number();
@@ -23,13 +28,9 @@ describe(number, () => {
     });
   });
 
-  const num = number();
+  expectType<TargetType, number>('=');
 
-  type Num = TypeOf<typeof num>;
-
-  expectType<Num, number>('=');
-
-  expectType<typeof num.defaultValue, Num>('=');
+  expectType<typeof targetType.defaultValue, TargetType>('=');
 
   describe('is', () => {
     test.each([
@@ -42,13 +43,13 @@ describe(number, () => {
       Number.NEGATIVE_INFINITY,
       Number.NaN,
     ])('num.is($0) should be true', (v: unknown) => {
-      if (num.is(v)) {
-        expectType<typeof v, Num>('=');
+      if (targetType.is(v)) {
+        expectType<typeof v, TargetType>('=');
       } else {
         expectType<typeof v, unknown>('=');
       }
 
-      assert.isTrue(num.is(v));
+      assert.isTrue(targetType.is(v));
     });
 
     test.each([
@@ -62,18 +63,18 @@ describe(number, () => {
       [],
       Symbol('test'),
     ])('num.is($0) should be false', (v: unknown) => {
-      if (num.is(v)) {
-        expectType<typeof v, Num>('=');
+      if (targetType.is(v)) {
+        expectType<typeof v, TargetType>('=');
       } else {
         expectType<typeof v, unknown>('=');
       }
 
-      assert.isFalse(num.is(v));
+      assert.isFalse(targetType.is(v));
     });
   });
 
   describe('assertIs', () => {
-    const assertIs: (a: unknown) => asserts a is number = num.assertIs;
+    const assertIs: (a: unknown) => asserts a is number = targetType.assertIs;
 
     test('valid number', () => {
       const value: unknown = 42;
@@ -96,7 +97,7 @@ describe(number, () => {
     test('valid number returns as is', () => {
       const value: unknown = 42;
 
-      const result = num.cast(value);
+      const result = targetType.cast(value);
 
       expect(result).toBe(42);
     });
@@ -104,7 +105,7 @@ describe(number, () => {
     test('invalid value throws error', () => {
       const value: unknown = 'not a number';
 
-      expect(() => num.cast(value)).toThrow(
+      expect(() => targetType.cast(value)).toThrow(
         'Error: expected <number> type but <string> type value "not a number" was passed.',
       );
     });
@@ -124,7 +125,7 @@ describe(number, () => {
     test('valid number returns as is', () => {
       const value: unknown = 42;
 
-      const result = num.fill(value);
+      const result = targetType.fill(value);
 
       expect(result).toBe(42);
     });
@@ -132,25 +133,19 @@ describe(number, () => {
     test('undefined returns default', () => {
       const value: unknown = undefined;
 
-      const result = num.fill(value);
-
-      expect(result).toBe(0);
+      expect(targetType.fill(value)).toBe(0);
     });
 
     test('null returns default', () => {
       const value: unknown = null;
 
-      const result = num.fill(value);
-
-      expect(result).toBe(0);
+      expect(targetType.fill(value)).toBe(0);
     });
 
     test('invalid value returns default', () => {
       const value: unknown = 'not a number';
 
-      const result = num.fill(value);
-
-      expect(result).toBe(0);
+      expect(targetType.fill(value)).toBe(0);
     });
 
     test('uses custom default value for invalid', () => {
@@ -158,9 +153,7 @@ describe(number, () => {
 
       const value: unknown = 'not a number';
 
-      const result = numWithDefault.fill(value);
-
-      expect(result).toBe(100);
+      expect(numWithDefault.fill(value)).toBe(100);
     });
   });
 
@@ -168,7 +161,7 @@ describe(number, () => {
     test('valid number', () => {
       const value: unknown = 42;
 
-      const result = num.validate(value);
+      const result = targetType.validate(value);
 
       assert.isTrue(Result.isOk(result));
 
@@ -180,7 +173,7 @@ describe(number, () => {
     test('invalid value', () => {
       const value: unknown = 'not a number';
 
-      const result = num.validate(value);
+      const result = targetType.validate(value);
 
       assert.isTrue(Result.isErr(result));
 
@@ -200,7 +193,7 @@ describe(number, () => {
     test('validate returns input as-is for OK cases', () => {
       const input = 123.456;
 
-      const result = num.validate(input);
+      const result = targetType.validate(input);
 
       assert.isTrue(Result.isOk(result));
 
@@ -212,6 +205,111 @@ describe(number, () => {
 });
 
 describe('number with constraints', () => {
+  describe('number constrained by nonZero', () => {
+    test('accepts valid default value', () => {
+      const type = number(1, { nonZero: true });
+
+      expectType<typeof type, Type<NonZeroNumber>>('=');
+
+      assert.isTrue(type.is(-5));
+
+      assert.isTrue(type.is(5));
+
+      assert.isFalse(type.is(0));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 0 is not allowed when nonZero is true
+        number(0, { nonZero: true }),
+      ).toThrow('nonZero = true');
+    });
+  });
+
+  describe('number constrained by negative', () => {
+    test('accepts valid default value', () => {
+      const type = number(-1, { negative: true });
+
+      expectType<typeof type, Type<NegativeNumber>>('=');
+
+      assert.isTrue(type.is(-5));
+
+      assert.isFalse(type.is(0));
+
+      assert.isFalse(type.is(1));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 0 is not < 0 when negative is true
+        number(0, { negative: true }),
+      ).toThrow('negative = true');
+    });
+  });
+
+  describe('number constrained by nonNegative', () => {
+    test('accepts valid default value', () => {
+      const type = number(0, { nonNegative: true });
+
+      expectType<typeof type, Type<NonNegativeNumber>>('=');
+
+      assert.isTrue(type.is(5));
+
+      assert.isTrue(type.is(0));
+
+      assert.isFalse(type.is(-1));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error -1 is not >= 0 when nonNegative is true
+        number(-1, { nonNegative: true }),
+      ).toThrow('nonNegative = true');
+    });
+  });
+
+  describe('number constrained by positive', () => {
+    test('accepts valid default value', () => {
+      const type = number(1, { positive: true });
+
+      expectType<typeof type, Type<PositiveNumber>>('=');
+
+      assert.isTrue(type.is(10));
+
+      assert.isFalse(type.is(0));
+
+      assert.isFalse(type.is(-1));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 0 is not > 0 when positive is true
+        number(0, { positive: true }),
+      ).toThrow('positive = true');
+    });
+  });
+
+  describe('number constrained by nonPositive', () => {
+    test('accepts valid default value', () => {
+      const type = number(0, { nonPositive: true });
+
+      expectType<typeof type, Type<NegativeInt>>('>=');
+
+      assert.isTrue(type.is(-5));
+
+      assert.isTrue(type.is(0));
+
+      assert.isFalse(type.is(1));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error 1 is not <= 0 when nonPositive is true
+        number(1, { nonPositive: true }),
+      ).toThrow('nonPositive = true');
+    });
+  });
+
   describe('number constrained by gt', () => {
     test('accepts valid default value', () => {
       const type = number(10, { gt: 5 });
@@ -318,90 +416,6 @@ describe('number with constraints', () => {
     });
   });
 
-  describe('number constrained by positive', () => {
-    test('accepts valid default value', () => {
-      const type = number(1, { positive: true });
-
-      expectType<typeof type, Type<PositiveNumber>>('=');
-
-      assert.isTrue(type.is(10));
-
-      assert.isFalse(type.is(0));
-
-      assert.isFalse(type.is(-1));
-    });
-
-    test('rejects invalid default value', () => {
-      expect(() =>
-        // @ts-expect-error 0 is not > 0 when positive is true
-        number(0, { positive: true }),
-      ).toThrow('positive = true');
-    });
-  });
-
-  describe('number constrained by nonNegative', () => {
-    test('accepts valid default value', () => {
-      const type = number(0, { nonNegative: true });
-
-      expectType<typeof type, Type<NonNegativeNumber>>('=');
-
-      assert.isTrue(type.is(5));
-
-      assert.isTrue(type.is(0));
-
-      assert.isFalse(type.is(-1));
-    });
-
-    test('rejects invalid default value', () => {
-      expect(() =>
-        // @ts-expect-error -1 is not >= 0 when nonNegative is true
-        number(-1, { nonNegative: true }),
-      ).toThrow('nonNegative = true');
-    });
-  });
-
-  describe('number constrained by negative', () => {
-    test('accepts valid default value', () => {
-      const type = number(-1, { negative: true });
-
-      expectType<typeof type, Type<NegativeNumber>>('=');
-
-      assert.isTrue(type.is(-5));
-
-      assert.isFalse(type.is(0));
-
-      assert.isFalse(type.is(1));
-    });
-
-    test('rejects invalid default value', () => {
-      expect(() =>
-        // @ts-expect-error 0 is not < 0 when negative is true
-        number(0, { negative: true }),
-      ).toThrow('negative = true');
-    });
-  });
-
-  describe('number constrained by nonPositive', () => {
-    test('accepts valid default value', () => {
-      const type = number(0, { nonPositive: true });
-
-      expectType<typeof type, Type<NegativeInt>>('>=');
-
-      assert.isTrue(type.is(-5));
-
-      assert.isTrue(type.is(0));
-
-      assert.isFalse(type.is(1));
-    });
-
-    test('rejects invalid default value', () => {
-      expect(() =>
-        // @ts-expect-error 1 is not <= 0 when nonPositive is true
-        number(1, { nonPositive: true }),
-      ).toThrow('nonPositive = true');
-    });
-  });
-
   describe('number constrained by multipleOf', () => {
     test('accepts valid default value', () => {
       const type = number(6, { multipleOf: 3 });
@@ -415,6 +429,18 @@ describe('number with constraints', () => {
 
     test('rejects invalid default value', () => {
       expect(() => number(7, { multipleOf: 3 })).toThrow('multipleOf = 3');
+    });
+
+    test('treats a zero divisor as accepting only zero', () => {
+      const type = number(0, { multipleOf: 0 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      assert.isTrue(type.is(0));
+
+      assert.isFalse(type.is(3));
+
+      expect(() => number(5, { multipleOf: 0 })).toThrow('multipleOf = 0');
     });
   });
 
@@ -431,6 +457,18 @@ describe('number with constraints', () => {
 
     test('rejects invalid default value', () => {
       expect(() => number(9, { step: 2 })).toThrow('step = 2');
+    });
+
+    test('treats a zero divisor as accepting only zero', () => {
+      const type = number(0, { step: 0 });
+
+      expectType<typeof type, Type<number>>('=');
+
+      assert.isTrue(type.is(0));
+
+      assert.isFalse(type.is(2));
+
+      expect(() => number(5, { step: 0 })).toThrow('step = 0');
     });
   });
 

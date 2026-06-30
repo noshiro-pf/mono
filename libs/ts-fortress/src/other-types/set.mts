@@ -38,7 +38,7 @@ export const SetType = <T extends Type<unknown>>(
     }
 
     const errors: readonly ValidationError[] = Arr.generate(function* () {
-      for (const element of a.values()) {
+      for (const element of a) {
         const res = elementType.validate(element);
 
         if (Result.isErr(res)) {
@@ -68,7 +68,7 @@ export const SetType = <T extends Type<unknown>>(
   const fill: Type<S>['fill'] = (a) =>
     !isSet(a)
       ? getDefaultValue()
-      : new Set(Array.from(a.values()).filter((v) => elementType.is(v)));
+      : new Set(Array.from(a).filter((v) => elementType.is(v)));
 
   return {
     typeName,

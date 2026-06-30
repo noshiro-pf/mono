@@ -22,7 +22,7 @@ describe('null type', () => {
       if (nullType.is(value)) {
         expectType<typeof value, Null>('=');
       } else {
-        expectType<typeof value, {} | undefined>('=');
+        expectType<typeof value, undefined | {}>('=');
       }
 
       assert.isTrue(nullType.is(value));
@@ -34,7 +34,7 @@ describe('null type', () => {
       if (nullType.is(value)) {
         expectType<typeof value, Null>('=');
       } else {
-        expectType<typeof value, {} | undefined>('=');
+        expectType<typeof value, undefined | {}>('=');
       }
 
       assert.isFalse(nullType.is(value));
@@ -46,7 +46,7 @@ describe('null type', () => {
         if (nullType.is(v)) {
           expectType<typeof v, Null>('=');
         } else {
-          expectType<typeof v, {} | undefined>('=');
+          expectType<typeof v, undefined | {}>('=');
         }
 
         assert.isFalse(nullType.is(v));

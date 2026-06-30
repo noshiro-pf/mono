@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-string-repeat */
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';

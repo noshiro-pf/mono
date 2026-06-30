@@ -41,6 +41,7 @@ const ISO8601ValidatorOption = record({
   /**
    * @default new Date().toISOString()
    */
+  // eslint-disable-next-line unicorn/no-unreadable-new-expression
   defaultValue: string(new Date().toISOString()),
 });
 

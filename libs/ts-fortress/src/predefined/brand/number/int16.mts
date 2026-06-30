@@ -1,12 +1,18 @@
 import { isInt16 } from 'ts-data-forge';
 import { type Int16 } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
-import { number } from '../../../primitives/index.mjs';
+import {
+  number,
+  type NumberRangeConstraints,
+} from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-export const int16 = (defaultValue: number = 0): Type<Int16> =>
+export const int16 = (
+  defaultValue: number = 0,
+  constraints?: NumberRangeConstraints,
+): Type<Int16> =>
   brand({
-    baseType: number(defaultValue),
+    baseType: number(defaultValue, constraints ?? {}),
     is: isInt16,
     defaultValue,
     brandKeys: [

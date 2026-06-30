@@ -47,14 +47,14 @@ export function string<C extends Constraints>(
 
 type Constraints = Partial<
   Readonly<{
+    nonempty: true;
+    minLength: number;
+    maxLength: number;
     startsWith: string;
     endsWith: string;
     includes: string;
     uppercase: true;
     lowercase: true;
-    nonempty: true;
-    minLength: number;
-    maxLength: number;
     regex: RegExp;
   }>
 >;
@@ -62,20 +62,20 @@ type Constraints = Partial<
 type DefaultValueType<
   S extends string,
   C extends Constraints,
-> = DefaultValueWhenStartsWithIsOn<C> &
+> = DefaultValueWhenNonemptyIsOn<S, C> &
+  DefaultValueWhenMinLengthIsOn<S, C> &
+  DefaultValueWhenMaxLengthIsOn<S, C> &
+  DefaultValueWhenStartsWithIsOn<C> &
   DefaultValueWhenEndsWithIsOn<C> &
   DefaultValueWhenIncludesIsOn<C> &
   DefaultValueWhenUppercaseIsOn<S, C> &
-  DefaultValueWhenLowercaseIsOn<S, C> &
-  DefaultValueWhenNonemptyIsOn<S, C> &
-  DefaultValueWhenMinLengthIsOn<S, C> &
-  DefaultValueWhenMaxLengthIsOn<S, C>;
+  DefaultValueWhenLowercaseIsOn<S, C>;
 
 type ConstraintsResultType<C extends Constraints> =
-  DefaultValueWhenStartsWithIsOn<C> &
+  ConstraintsResultTypeWhenNonemptyIsOn<C> &
+    DefaultValueWhenStartsWithIsOn<C> &
     DefaultValueWhenEndsWithIsOn<C> &
-    DefaultValueWhenIncludesIsOn<C> &
-    ConstraintsResultTypeWhenNonemptyIsOn<C>;
+    DefaultValueWhenIncludesIsOn<C>;
 
 type DefaultValueWhenStartsWithIsOn<C extends Constraints> =
   C extends Readonly<{
@@ -170,19 +170,31 @@ const createConstraintsPredicate =
   (constraints: Constraints) =>
   (value: string): Result<true, string> => {
     const {
-      includes,
-      startsWith,
-      endsWith,
-      uppercase,
-      lowercase,
       nonempty,
       minLength,
       maxLength,
+      startsWith,
+      endsWith,
+      includes,
+      uppercase,
+      lowercase,
       regex,
       ..._rest
     } = constraints;
 
     expectType<keyof typeof _rest, never>('=');
+
+    if (nonempty === true && value.length === 0) {
+      return Result.err(errorMessage(value, 'nonempty', true));
+    }
+
+    if (minLength !== undefined && value.length < minLength) {
+      return Result.err(errorMessage(value, 'minLength', minLength));
+    }
+
+    if (maxLength !== undefined && value.length > maxLength) {
+      return Result.err(errorMessage(value, 'maxLength', maxLength));
+    }
 
     if (startsWith !== undefined && !value.startsWith(startsWith)) {
       return Result.err(errorMessage(value, 'startsWith', startsWith));
@@ -202,18 +214,6 @@ const createConstraintsPredicate =
 
     if (lowercase === true && value !== value.toLowerCase()) {
       return Result.err(errorMessage(value, 'lowercase', true));
-    }
-
-    if (nonempty === true && value.length === 0) {
-      return Result.err(errorMessage(value, 'nonempty', true));
-    }
-
-    if (minLength !== undefined && value.length < minLength) {
-      return Result.err(errorMessage(value, 'minLength', minLength));
-    }
-
-    if (maxLength !== undefined && value.length > maxLength) {
-      return Result.err(errorMessage(value, 'maxLength', maxLength));
     }
 
     if (regex !== undefined && !regex.test(value)) {

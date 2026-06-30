@@ -1,14 +1,18 @@
 import { isPositiveSafeInt } from 'ts-data-forge';
 import { type PositiveSafeInt } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
-import { number } from '../../../primitives/index.mjs';
+import {
+  number,
+  type NumberRangeConstraints,
+} from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
 export const positiveSafeInt = (
   defaultValue: number = 1,
+  constraints?: NumberRangeConstraints,
 ): Type<PositiveSafeInt> =>
   brand({
-    baseType: number(defaultValue),
+    baseType: number(defaultValue, constraints ?? {}),
     is: isPositiveSafeInt,
     defaultValue,
     brandKeys: [
@@ -22,6 +26,6 @@ export const positiveSafeInt = (
       '>=0',
       '!=0',
     ],
-    brandFalseKeys: ['NaNValue'],
+    brandFalseKeys: ['NaNValue', '<=0'],
     typeName: 'PositiveSafeInt',
   });

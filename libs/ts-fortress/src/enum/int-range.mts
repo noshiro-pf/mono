@@ -42,7 +42,9 @@ export const intRange = <Start extends Int8, End extends Int8 | 128>({
   );
 
   const validate: Type<T>['validate'] = (a) => {
-    if (!(isNumber(a) && Number.isInteger(a) && Num.isInRange(start, end)(a))) {
+    if (
+      !(isNumber(a) && Number.isSafeInteger(a) && Num.isInRange(start, end)(a))
+    ) {
       return Result.err([
         {
           path: [],

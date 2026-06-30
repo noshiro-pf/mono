@@ -1,14 +1,18 @@
 import { isPositiveFiniteNumber } from 'ts-data-forge';
 import { type PositiveFiniteNumber } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
-import { number } from '../../../primitives/index.mjs';
+import {
+  number,
+  type NumberRangeConstraints,
+} from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
 export const positiveFiniteNumber = (
   defaultValue: number,
+  constraints?: NumberRangeConstraints,
 ): Type<PositiveFiniteNumber> =>
   brand({
-    baseType: number(defaultValue),
+    baseType: number(defaultValue, constraints ?? {}),
     is: isPositiveFiniteNumber,
     defaultValue,
     brandKeys: [
@@ -20,6 +24,6 @@ export const positiveFiniteNumber = (
       'Finite',
       '!=0',
     ],
-    brandFalseKeys: ['NaNValue'],
+    brandFalseKeys: ['NaNValue', '<=0'],
     typeName: 'PositiveFiniteNumber',
   });
