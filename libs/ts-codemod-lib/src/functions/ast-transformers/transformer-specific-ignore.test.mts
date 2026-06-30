@@ -70,7 +70,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         const b = [1, 2, 3]; // Should have as const
       `,
       expected: dedent`
-        // ts-codemod-ignore-next-line replace-any-with-unknown
+        // transformer-ignore-next-line replace-any-with-unknown
         type A = any; // Should remain any
         const b = [1, 2, 3] as const; // Should have as const
       `,
@@ -83,7 +83,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type B = number[];
       `,
       expected: dedent`
-        // codemod-ignore-next-line replace-any-with-unknown
+        // transformer-ignore-next-line replace-any-with-unknown
         type A = any; // Should remain any
         type B = readonly number[];
       `,
@@ -96,7 +96,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type A = any;
       `,
       expected: dedent`
-        // transform-ignore-next-line append-as-const
+        // transformer-ignore-next-line append-as-const
         const b = [1, 2, 3]; // Should remain without as const
         type A = unknown;
       `,
@@ -127,7 +127,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type D = any; // Should remain any
       `,
       expected: dedent`
-        /* ts-codemod-ignore replace-any-with-unknown */
+        /* transformer-ignore replace-any-with-unknown */
         type A = any; // Should remain any
         const b = [1, 2, 3] as const; // Should have as const
         type D = any; // Should remain any
@@ -142,7 +142,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type C = number[]; // Should remain mutable
       `,
       expected: dedent`
-        /* codemod-ignore convert-to-readonly */
+        /* transformer-ignore convert-to-readonly */
         type A = unknown;
         const b = [1, 2, 3] as const;
         type C = number[]; // Should remain mutable
@@ -157,7 +157,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type C = number[];
       `,
       expected: dedent`
-        /* transform-ignore append-as-const */
+        /* transformer-ignore append-as-const */
         type A = unknown;
         const b = [1, 2, 3]; // Should remain without as const
         type C = readonly number[];
@@ -174,7 +174,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
       `,
       expected: dedent`
         type A = unknown;
-        // transformer-ignore-next-line replace-any-with-unknown, append-as-const
+        // transformer-ignore-next-line replace-any-with-unknown
         type B = any;
         const c = [1, 2, 3] as const;
         type D = readonly number[];
@@ -278,7 +278,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type D = any; // Should remain any
       `,
       expected: dedent`
-        /* ts-codemod-ignore replace-any-with-unknown */
+        /* transformer-ignore replace-any-with-unknown */
         type A = any; // Should remain any
         const b = [1, 2, 3] as const; // Should have as const
         type D = any; // Should remain any
@@ -293,7 +293,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type C = number[]; // Should remain mutable
       `,
       expected: dedent`
-        /* codemod-ignore convert-to-readonly */
+        /* transformer-ignore convert-to-readonly */
         type A = unknown;
         const b = [1, 2, 3] as const;
         type C = number[]; // Should remain mutable
@@ -308,7 +308,7 @@ describe('Transformer-specific ignore comments (Integration)', () => {
         type C = number[];
       `,
       expected: dedent`
-        /* transform-ignore append-as-const */
+        /* transformer-ignore append-as-const */
         type A = unknown;
         const b = [1, 2, 3]; // Should remain without as const
         type C = readonly number[];

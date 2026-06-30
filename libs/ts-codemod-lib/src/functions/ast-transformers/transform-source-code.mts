@@ -1,5 +1,6 @@
 import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
+import { pruneIgnoreComments } from './prune-ignore-comments.mjs';
 import { type TsMorphTransformer } from './types.mjs';
 
 const extractFileIgnoreTransformers = (code: string): readonly string[] => {
@@ -76,11 +77,11 @@ const shouldSkipFile = (
   return ignoredTransformers.includes(transformerName);
 };
 
-export const transformSourceCode = (
+const runTransformers = (
   code: string,
   isTsx: boolean,
   transformers: readonly TsMorphTransformer[],
-  debug: boolean = false,
+  debug: boolean,
 ): string => {
   const project = new tsm.Project({
     useInMemoryFileSystem: true,
@@ -113,4 +114,23 @@ export const transformSourceCode = (
   }
 
   return sourceAst.getFullText();
+};
+
+export const transformSourceCode = (
+  code: string,
+  isTsx: boolean,
+  transformers: readonly TsMorphTransformer[],
+  debug: boolean = false,
+): string => {
+  // Strip ignore comments that no longer suppress anything and normalize the rest
+  // before transforming.
+  const cleanedCode = pruneIgnoreComments(
+    code,
+    isTsx,
+    transformers,
+    (innerCode, innerTransformers) =>
+      runTransformers(innerCode, isTsx, innerTransformers, false),
+  );
+
+  return runTransformers(cleanedCode, isTsx, transformers, debug);
 };
