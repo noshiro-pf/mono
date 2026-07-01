@@ -52,3 +52,37 @@ describe(nonEmptyString, () => {
     expect(t.defaultValue).toBe('default');
   });
 });
+
+describe('nonEmptyString with extra constraints', () => {
+  test('forwards constraints to string and still enforces non-emptiness', () => {
+    const t = nonEmptyString('abcd', { minLength: 3 });
+
+    // Non-refining constraints (e.g. `minLength`) keep a plain `NonEmptyString`.
+    expectType<TypeOf<typeof t>, NonEmptyString>('=');
+
+    assert.isTrue(t.is('abcd'));
+
+    assert.isTrue(t.is('abc'));
+
+    assert.isFalse(t.is('ab')); // shorter than minLength
+
+    assert.isFalse(t.is('')); // empty string is still rejected
+  });
+
+  test('throws when the default value violates a forwarded constraint', () => {
+    expect(() => nonEmptyString('ab', { minLength: 3 })).toThrow(
+      'minLength = 3',
+    );
+  });
+
+  test('refines the result type for startsWith', () => {
+    const t = nonEmptyString('a-thing', { startsWith: 'a' });
+
+    // `startsWith` refines the result type, just like `string` does.
+    expectType<TypeOf<typeof t>, NonEmptyString & `a${string}`>('=');
+
+    assert.isTrue(t.is('a-thing'));
+
+    assert.isFalse(t.is('b-thing'));
+  });
+});

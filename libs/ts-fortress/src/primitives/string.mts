@@ -59,6 +59,19 @@ type Constraints = Partial<
   }>
 >;
 
+/**
+ * The set of constraints accepted by {@link string}.
+ */
+export type StringTypeConstraints = Constraints;
+
+/**
+ * The result type produced by {@link string} for a given set of constraints
+ * `C` (e.g. `nonempty` yields {@link NonEmptyString}, `startsWith` narrows to a
+ * template literal type, etc.).
+ */
+export type StringConstraintsResultType<C extends StringTypeConstraints> =
+  ConstraintsResultType<C>;
+
 type DefaultValueType<
   S extends string,
   C extends Constraints,
