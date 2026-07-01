@@ -1,3 +1,9 @@
+# [8.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.2.0...v8.3.0) (2026-07-01)
+
+### Features
+
+- add constraints option to nonEmptyString ([#323](https://github.com/noshiro-pf/ts-fortress/issues/323)) ([6d679ca](https://github.com/noshiro-pf/ts-fortress/commit/6d679ca5b82d1e388c703b00586f199a3983def3))
+
 # [8.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.1.0...v8.2.0) (2026-06-30)
 
 ### Features
