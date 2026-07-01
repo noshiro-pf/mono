@@ -69,9 +69,15 @@ describe('nonEmptyString with extra constraints', () => {
     assert.isFalse(t.is('')); // empty string is still rejected
   });
 
+  test('throws when the default value violates a nonEmpty constraint', () => {
+    expect(() => nonEmptyString('')).toThrow(
+      /^defaultValue "" for string does not satisfy the constraint nonempty = true$/u,
+    );
+  });
+
   test('throws when the default value violates a forwarded constraint', () => {
     expect(() => nonEmptyString('ab', { minLength: 3 })).toThrow(
-      'minLength = 3',
+      /^defaultValue "ab" for string does not satisfy the constraint minLength = 3$/u,
     );
   });
 
