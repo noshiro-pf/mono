@@ -1,3 +1,9 @@
+# [8.4.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.3.0...v8.4.0) (2026-07-02)
+
+### Features
+
+- add branded string type uri ([#324](https://github.com/noshiro-pf/ts-fortress/issues/324)) ([c36d48b](https://github.com/noshiro-pf/ts-fortress/commit/c36d48b666533342db15dc615f4ff52d0250894d))
+
 # [8.3.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.2.0...v8.3.0) (2026-07-01)
 
 ### Features
