@@ -10,6 +10,7 @@ words:
   - testw
   - tscw
   - valueof
+  - whatwg
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml

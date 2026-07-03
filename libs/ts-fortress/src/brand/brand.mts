@@ -22,7 +22,7 @@ export const brand = <
   typeName,
 }: Readonly<{
   baseType: Type<A>;
-  is: (
+  is?: (
     a: A,
   ) => a is Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
   defaultValue: A;
@@ -34,7 +34,9 @@ export const brand = <
 > => {
   type T = Brand<A, ArrayToUnion<BrandTrueKeys>, ArrayToUnion<BrandFalseKeys>>;
 
-  if (!is(defaultValue)) {
+  const isFilled: (a: A) => a is T = is ?? ((_a): _a is T => true);
+
+  if (!isFilled(defaultValue)) {
     throw new Error(
       `defaultValue ${defaultValue} doesn't pass \`is\` function`,
     );
@@ -54,7 +56,7 @@ export const brand = <
         (res): Result<T, readonly ValidationError[]> =>
           Result.isErr(res)
             ? res
-            : is(res.value)
+            : isFilled(res.value)
               ? Result.ok(res.value satisfies T)
               : Result.err([
                   {

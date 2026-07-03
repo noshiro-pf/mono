@@ -3,7 +3,7 @@ import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-// A valid URI always has a non-empty scheme, so it also satisfies `NonEmptyString`.
+// An absolute URI/URL always has a non-empty scheme, so it also satisfies `NonEmptyString`.
 export type Uri = Brand<string, 'Uri' | 'NonEmptyString'>;
 
 /**
@@ -26,7 +26,9 @@ export const uri = (
 
 const defaultUri = 'https://example.com';
 
-const isUri = (s: string): s is Uri => URL.canParse(s);
+// `URL.canParse` trims leading/trailing ASCII whitespace per the WHATWG URL parser, so
+// surrounding whitespace must be rejected explicitly to avoid accepting e.g. " https://example.com ".
+const isUri = (s: string): s is Uri => s === s.trim() && URL.canParse(s);
 
 if (import.meta.vitest !== undefined) {
   test('defaultUri', () => {

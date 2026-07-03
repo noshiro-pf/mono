@@ -22,6 +22,9 @@ const invalidSamples = [
   'relative/path',
   '/absolute/path',
   '1http://example.com',
+  ' https://example.com',
+  'https://example.com ',
+  ' https://example.com ',
 ] as const satisfies readonly string[];
 
 describe(uri, () => {
