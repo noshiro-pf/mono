@@ -1,3 +1,9 @@
+# [8.5.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.4.0...v8.5.0) (2026-07-03)
+
+### Features
+
+- Change the `is` argument of `brand` to `Optional`. ([#325](https://github.com/noshiro-pf/ts-fortress/issues/325)) ([4fd0c79](https://github.com/noshiro-pf/ts-fortress/commit/4fd0c799680732fa19745fae42b98127e3198a01))
+
 # [8.4.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.3.0...v8.4.0) (2026-07-02)
 
 ### Features
