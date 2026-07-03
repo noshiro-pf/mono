@@ -1,3 +1,9 @@
+## [8.5.1](https://github.com/noshiro-pf/ts-fortress/compare/v8.5.0...v8.5.1) (2026-07-03)
+
+### Bug Fixes
+
+- Change the `defaultValue` argument of `brand` to `Optional` ([#326](https://github.com/noshiro-pf/ts-fortress/issues/326)) ([8dd3f78](https://github.com/noshiro-pf/ts-fortress/commit/8dd3f788a9adc014047f0ea99e6291d3df5d6f83))
+
 # [8.5.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.4.0...v8.5.0) (2026-07-03)
 
 ### Features
