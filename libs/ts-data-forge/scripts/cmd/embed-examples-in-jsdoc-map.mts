@@ -55,6 +55,8 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/array/is-non-empty-example.mts',
       'samples/src/array/is-array-of-length-example.mts',
       'samples/src/array/is-array-at-least-length-example.mts',
+      'samples/src/array/is-array-at-most-length-example.mts',
+      'samples/src/array/is-array-bounded-length-example.mts',
       'samples/src/array/every-example.mts',
       'samples/src/array/some-example.mts',
       'samples/src/array/index-is-in-range-example.mts',

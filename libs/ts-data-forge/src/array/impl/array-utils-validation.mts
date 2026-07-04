@@ -1,5 +1,7 @@
 import {
   type ArrayAtLeastLen,
+  type ArrayAtMostLen,
+  type ArrayBoundedLen,
   type ArrayOfLength,
   type BoolOr,
   type NonEmptyArray,
@@ -135,6 +137,60 @@ export const isArrayAtLeastLength = <E, N extends SizeType.ArgArr>(
   array: readonly E[],
   len: N,
 ): array is ArrayAtLeastLen<N, E> => array.length >= len;
+
+/**
+ * Checks if an array has at most a specific length.
+ *
+ * @example
+ *
+ * ```ts
+ * const pair: readonly number[] = [1, 2] as const;
+ *
+ * const triple: readonly number[] = [1, 2, 3] as const;
+ *
+ * assert.isTrue(Arr.isArrayAtMostLength(pair, 2));
+ *
+ * assert.isFalse(Arr.isArrayAtMostLength(triple, 2));
+ *
+ * if (Arr.isArrayAtMostLength(pair, 2)) {
+ *   assert.isTrue(pair.length <= 2);
+ * }
+ * ```
+ */
+export const isArrayAtMostLength = <E, N extends SizeType.ArgArr>(
+  array: readonly E[],
+  len: N,
+): array is ArrayAtMostLen<N, E> => array.length <= len;
+
+/**
+ * Checks if an array's length is within a specific inclusive range.
+ *
+ * @example
+ *
+ * ```ts
+ * const pair: readonly number[] = [1, 2] as const;
+ *
+ * const quad: readonly number[] = [1, 2, 3, 4] as const;
+ *
+ * assert.isTrue(Arr.isArrayBoundedLength(pair, 1, 3));
+ *
+ * assert.isFalse(Arr.isArrayBoundedLength(quad, 1, 3));
+ *
+ * if (Arr.isArrayBoundedLength(pair, 1, 3)) {
+ *   assert.isTrue(pair.length >= 1 && pair.length <= 3);
+ * }
+ * ```
+ */
+export const isArrayBoundedLength = <
+  E,
+  Min extends SizeType.ArgArr,
+  Max extends SizeType.ArgArr,
+>(
+  array: readonly E[],
+  min: Min,
+  max: Max,
+): array is ArrayBoundedLen<Min, Max, E> =>
+  array.length >= min && array.length <= max;
 
 /**
  * Tests whether all elements in an array pass a test implemented by a predicate.
