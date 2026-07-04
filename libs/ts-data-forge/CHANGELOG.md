@@ -1,3 +1,9 @@
+# [7.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.0.1...v7.1.0) (2026-07-04)
+
+### Features
+
+- add Arr.isArrayAtMostLength and Arr.isArrayBoundedLength ([#403](https://github.com/noshiro-pf/ts-data-forge/issues/403)) ([e237320](https://github.com/noshiro-pf/ts-data-forge/commit/e2373205017da129a8d718dde931c66ade9f57a5))
+
 ## [7.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v7.0.0...v7.0.1) (2026-06-29)
 
 ### Bug Fixes
