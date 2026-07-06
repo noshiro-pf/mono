@@ -1,3 +1,9 @@
+# [5.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.3.3...v5.4.0) (2026-07-06)
+
+### Features
+
+- create canonical array methods rules ([#365](https://github.com/noshiro-pf/eslint-config-typed/issues/365)) ([a8f864b](https://github.com/noshiro-pf/eslint-config-typed/commit/a8f864ba1f32910c8e5990cd3c0406b642a985da))
+
 ## [5.3.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.3.2...v5.3.3) (2026-07-06)
 
 ### Bug Fixes
