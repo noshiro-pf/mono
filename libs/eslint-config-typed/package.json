@@ -93,7 +93,7 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/eslint": "^9.6.1",
     "@typescript-eslint/eslint-plugin": "^8.61.1",
-    "@typescript-eslint/parser": "^8.61.1",
+    "@typescript-eslint/parser": "^8.62.0",
     "@typescript-eslint/type-utils": "^8.61.1",
     "@typescript-eslint/utils": "^8.61.1",
     "@vitest/eslint-plugin": "^1.6.20",
