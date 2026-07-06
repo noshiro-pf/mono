@@ -1,3 +1,9 @@
+## [7.1.1](https://github.com/noshiro-pf/ts-data-forge/compare/v7.1.0...v7.1.1) (2026-07-06)
+
+### Bug Fixes
+
+- correct type annotations for generics in some curried functions ([#404](https://github.com/noshiro-pf/ts-data-forge/issues/404)) ([cb8a79f](https://github.com/noshiro-pf/ts-data-forge/commit/cb8a79fd0b29580a25fd058ed8b9d514634d4b4f))
+
 # [7.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.0.1...v7.1.0) (2026-07-04)
 
 ### Features
