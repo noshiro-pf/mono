@@ -1,3 +1,9 @@
+## [5.3.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.3.1...v5.3.2) (2026-07-06)
+
+### Bug Fixes
+
+- bump eslint-plugin-n from 18.1.0 to 18.2.1 ([#362](https://github.com/noshiro-pf/eslint-config-typed/issues/362)) ([d8a6c76](https://github.com/noshiro-pf/eslint-config-typed/commit/d8a6c76bf635fb050409167dd2e462d12e970d11))
+
 ## [5.3.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.3.0...v5.3.1) (2026-07-06)
 
 ### Bug Fixes
