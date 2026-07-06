@@ -236,6 +236,21 @@ namespace NoRestrictedSyntax {
 }
 
 /**
+ * @description Disallow wrapping an array in `Array.from()` before a non-mutating array method (e.g. `Array.from(x).toSorted()`), since the method already returns a new array
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoUnnecessaryArrayFrom {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Require the left-hand side of `?? undefined` to include `null` in its type, and remove the redundant `?? undefined` otherwise
  *
  *  ```md
@@ -250,11 +265,28 @@ namespace NoUnnecessaryCoalesceUndefined {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Disallow calling a mutating array method on a defensive `Array.from()` copy of an array (e.g. `Array.from(x).sort()`); use the non-mutating counterpart on the original array instead (e.g. `x.toSorted()`)
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferNonMutatingArrayMethod {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
+  'ts-restrictions/no-unnecessary-array-from': NoUnnecessaryArrayFrom.RuleEntry;
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
+  'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{

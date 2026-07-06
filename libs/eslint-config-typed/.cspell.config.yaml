@@ -6,14 +6,15 @@ ignoreRandomStrings: true
 words:
   - bivariant
   - blueprintjs
-  - Klass
+  - klass
   - noshiro
   - pikachu
   - sindresorhus
   - testw
   - tscw
-  - TSES
+  - tses
   - tsutils
+  - unshifted
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml

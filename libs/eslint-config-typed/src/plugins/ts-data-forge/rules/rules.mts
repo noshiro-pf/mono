@@ -6,6 +6,7 @@ import { preferArrIsArray } from './prefer-arr-is-array.mjs';
 import { preferArrIsNonEmpty } from './prefer-arr-is-non-empty.mjs';
 import { preferArrSum } from './prefer-arr-sum.mjs';
 import { preferAsInt } from './prefer-as-int.mjs';
+import { preferCanonicalArraySlicing } from './prefer-canonical-array-slicing.mjs';
 import { preferComparisonOverNullishGuard } from './prefer-comparison-over-nullish-guard.mjs';
 import { preferIsNonNullObject } from './prefer-is-non-null-object.mjs';
 import { preferIsRecordAndHasKey } from './prefer-is-record-and-has-key.mjs';
@@ -14,6 +15,7 @@ import { preferNumSafeParseInt } from './prefer-num-safe-parse-int.mjs';
 import { preferRangeForLoop } from './prefer-range-for-loop.mjs';
 
 export const tsDataForgeRules = {
+  'prefer-canonical-array-slicing': preferCanonicalArraySlicing,
   'prefer-arr-is-array-at-least-length': preferArrIsArrayAtLeastLength,
   'prefer-arr-is-array-of-length': preferArrIsArrayOfLength,
   'prefer-arr-is-array': preferArrIsArray,

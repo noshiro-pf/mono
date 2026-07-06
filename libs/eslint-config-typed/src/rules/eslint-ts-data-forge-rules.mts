@@ -4,6 +4,7 @@ import {
 } from '../types/index.mjs';
 
 export const eslintTsDataForgeRules = {
+  'ts-data-forge/prefer-canonical-array-slicing': 'error',
   'ts-data-forge/prefer-as-int': 'error',
   'ts-data-forge/prefer-is-non-null-object': 'error',
   'ts-data-forge/prefer-arr-is-array': 'error',

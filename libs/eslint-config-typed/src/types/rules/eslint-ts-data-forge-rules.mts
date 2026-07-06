@@ -8,6 +8,21 @@ type SpreadOptionsIfIsArray<
   : T;
 
 /**
+ * @description Unify non-mutating array element addition/removal patterns (`slice` / `toSpliced` / `filter` / `concat` / spread) into the corresponding ts-data-forge functions: `Arr.tail`, `Arr.skip`, `Arr.take`, `Arr.butLast`, `Arr.skipLast`, `Arr.takeLast`, `Arr.toUnshifted`, `Arr.toPushed`.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferCanonicalArraySlicing {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace `xs.length >= n` with `Arr.isArrayAtLeastLength(xs, n)` from ts-data-forge.
  *
  *  ```md
@@ -234,6 +249,7 @@ namespace PreferComparisonOverNullishGuard {
 }
 
 export type EslintTsDataForgeRules = Readonly<{
+  'ts-data-forge/prefer-canonical-array-slicing': PreferCanonicalArraySlicing.RuleEntry;
   'ts-data-forge/prefer-arr-is-array-at-least-length': PreferArrIsArrayAtLeastLength.RuleEntry;
   'ts-data-forge/prefer-arr-is-array-of-length': PreferArrIsArrayOfLength.RuleEntry;
   'ts-data-forge/prefer-arr-is-array': PreferArrIsArray.RuleEntry;
