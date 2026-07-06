@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(TernaryResult.expectToBe(okValue, 'missing'), 'ready');
 
-    const expectResult = TernaryResult.expectToBe<string>('needs value');
+    const expectResult = TernaryResult.expectToBe('needs value');
 
     const throwTest = (): void => {
       expectResult(TernaryResult.err('oops'));

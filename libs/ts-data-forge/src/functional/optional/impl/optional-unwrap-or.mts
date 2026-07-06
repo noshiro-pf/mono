@@ -40,9 +40,9 @@ export function unwrapOr<O extends UnknownOptional, D>(
 ): D | Unwrap<O>;
 
 // Curried version
-export function unwrapOr<S, D>(
+export function unwrapOr<D>(
   defaultValue: D,
-): (optional: Optional<S>) => D | S;
+): <O>(optional: Optional<O>) => D | O;
 
 export function unwrapOr<O extends UnknownOptional, D>(
   ...args: readonly [optional: O, defaultValue: D] | readonly [defaultValue: D]

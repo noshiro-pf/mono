@@ -16,7 +16,7 @@ import { type Unwrap } from './types.mjs';
  *   Optional.expectToBe(optionalValue, 'value expected') === 'data',
  * );
  *
- * const expectValue = Optional.expectToBe<string>('missing optional');
+ * const expectValue = Optional.expectToBe('missing optional');
  *
  * const throwTest = (): void => {
  *   expectValue(Optional.none);
@@ -41,7 +41,7 @@ export function expectToBe<O extends UnknownOptional>(
 ): Unwrap<O>;
 
 // Curried version
-export function expectToBe<S>(message: string): (optional: Optional<S>) => S;
+export function expectToBe(message: string): <O>(optional: Optional<O>) => O;
 
 export function expectToBe<O extends UnknownOptional>(
   ...args: readonly [optional: O, message: string] | readonly [message: string]

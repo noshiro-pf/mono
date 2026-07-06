@@ -1,4 +1,4 @@
-import { type Result, type UnknownResult } from '../result.mjs';
+import { type UnknownResult } from '../result.mjs';
 import { unwrapOk } from './result-unwrap-ok.mjs';
 import { type UnwrapOk } from './types.mjs';
 
@@ -36,9 +36,9 @@ export function unwrapOkOr<R extends UnknownResult, D>(
 ): D | UnwrapOk<R>;
 
 // Curried version
-export function unwrapOkOr<S, D>(
+export function unwrapOkOr<D>(
   defaultValue: D,
-): <E>(result: Result<S, E>) => D | S;
+): <R extends UnknownResult>(result: R) => D | UnwrapOk<R>;
 
 export function unwrapOkOr<R extends UnknownResult, D>(
   ...args: readonly [result: R, defaultValue: D] | readonly [defaultValue: D]

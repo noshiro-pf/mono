@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
       Optional.expectToBe(optionalValue, 'value expected') === 'data',
     );
 
-    const expectValue = Optional.expectToBe<string>('missing optional');
+    const expectValue = Optional.expectToBe('missing optional');
 
     const throwTest = (): void => {
       expectValue(Optional.none);

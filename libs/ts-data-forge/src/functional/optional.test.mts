@@ -295,19 +295,19 @@ describe('Optional test', () => {
 
   describe('expectToBe', () => {
     test('should return the value for Some', () => {
-      const expectNumber = Optional.expectToBe<number>('Expected a number');
+      const expectNumber = Optional.expectToBe('Expected a number');
 
       expect(expectNumber(Optional.some(42))).toBe(42);
     });
 
     test('should throw with custom message for None', () => {
-      const expectNumber = Optional.expectToBe<number>('Expected a number');
+      const expectNumber = Optional.expectToBe('Expected a number');
 
       expect(() => expectNumber(Optional.none)).toThrow('Expected a number');
     });
 
     test('should be curried', () => {
-      const expectValidId = Optional.expectToBe<string>('ID is required');
+      const expectValidId = Optional.expectToBe('ID is required');
 
       const id1 = Optional.some('user-123');
 

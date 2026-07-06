@@ -1,4 +1,4 @@
-import { type Result, type UnknownResult } from '../result.mjs';
+import { type UnknownResult } from '../result.mjs';
 import { unwrapErr } from './result-unwrap-err.mjs';
 import { type UnwrapErr } from './types.mjs';
 
@@ -38,7 +38,7 @@ export function unwrapErrOr<R extends UnknownResult, D>(
 // Curried version
 export function unwrapErrOr<D>(
   defaultValue: D,
-): <S, E>(result: Result<S, E>) => D | E;
+): <R extends UnknownResult>(result: R) => D | UnwrapErr<R>;
 
 export function unwrapErrOr<R extends UnknownResult, D>(
   ...args: readonly [result: R, defaultValue: D] | readonly [defaultValue: D]

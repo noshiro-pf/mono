@@ -1,7 +1,4 @@
-import {
-  type TernaryResult,
-  type UnknownTernaryResult,
-} from '../ternary-result.mjs';
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { unwrapOk } from './ternary-result-unwrap-ok.mjs';
 import { type UnwrapOk } from './types.mjs';
 
@@ -31,9 +28,9 @@ export function unwrapOkOr<R extends UnknownTernaryResult, D>(
 ): D | UnwrapOk<R>;
 
 // Curried version
-export function unwrapOkOr<S, D>(
+export function unwrapOkOr<D>(
   defaultValue: D,
-): <W, E>(result: TernaryResult<S, E, W>) => D | S;
+): <R extends UnknownTernaryResult>(result: R) => D | UnwrapOk<R>;
 
 export function unwrapOkOr<R extends UnknownTernaryResult, D>(
   ...args: readonly [result: R, defaultValue: D] | readonly [defaultValue: D]

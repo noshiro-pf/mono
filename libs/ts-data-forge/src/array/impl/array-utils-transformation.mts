@@ -143,7 +143,7 @@ export function scan<E, S>(
       const [array, reducer, init] = args;
 
       const mut_result: MutableNonEmptyArray<S> = castMutable(
-        newArray<S, PositiveUint32>(asPositiveUint32(array.length + 1), init),
+        newArray<PositiveUint32, S>(asPositiveUint32(array.length + 1), init),
       );
 
       let mut_acc = init;

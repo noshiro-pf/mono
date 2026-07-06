@@ -85,7 +85,7 @@ export const seq = <N extends SizeType.ArgArr>(
  * assert.deepStrictEqual(emptyStrings, []);
  * ```
  */
-export const create = <const V, N extends SizeType.ArgArr>(
+export const create = <N extends SizeType.ArgArr, const V>(
   len: N,
   init: V,
 ): N extends SmallUint

@@ -1,7 +1,4 @@
-import {
-  type TernaryResult,
-  type UnknownTernaryResult,
-} from '../ternary-result.mjs';
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { isOk } from './ternary-result-is-ok.mjs';
 import { isWarn } from './ternary-result-is-warn.mjs';
 import { type NarrowToOk, type NarrowToWarn } from './types.mjs';
@@ -36,11 +33,11 @@ export function orElse<
 >(result: R, alternative: R2): NarrowToOk<R> | NarrowToWarn<R> | R2;
 
 // Curried version
-export function orElse<S, W, E, S2, W2, E2>(
-  alternative: TernaryResult<S2, E2, W2>,
-): (
-  result: TernaryResult<S, E, W>,
-) => TernaryResult<S, E, W> | TernaryResult<S2, E2, W2>;
+export function orElse<R2 extends UnknownTernaryResult>(
+  alternative: R2,
+): <R extends UnknownTernaryResult>(
+  result: R,
+) => NarrowToOk<R> | NarrowToWarn<R> | R2;
 
 export function orElse<
   R extends UnknownTernaryResult,

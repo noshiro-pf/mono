@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(Result.expectToBe(okValue, 'should have value') === 'data');
 
-    const expectResult = Result.expectToBe<string>('missing result');
+    const expectResult = Result.expectToBe('missing result');
 
     const throwTest = (): void => {
       expectResult(Result.err('boom'));

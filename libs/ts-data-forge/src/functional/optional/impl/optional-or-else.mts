@@ -47,9 +47,9 @@ export function orElse<
 >(optional: O, alternative: O2): O | O2;
 
 // Curried version
-export function orElse<S, S2>(
-  alternative: Optional<S2>,
-): (optional: Optional<S>) => Optional<S> | Optional<S2>;
+export function orElse<O2>(
+  alternative: Optional<O2>,
+): <O>(optional: Optional<O>) => Optional<O> | Optional<O2>;
 
 export function orElse<
   O extends UnknownOptional,

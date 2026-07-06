@@ -1,4 +1,4 @@
-import { type Result, type UnknownResult } from '../result.mjs';
+import { type UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { type NarrowToOk } from './types.mjs';
 
@@ -43,9 +43,9 @@ export function orElse<R extends UnknownResult, R2 extends UnknownResult>(
 ): NarrowToOk<R> | R2;
 
 // Curried version
-export function orElse<S, E, S2, E2>(
-  alternative: Result<S2, E2>,
-): (result: Result<S, E>) => Result<S, E> | Result<S2, E2>;
+export function orElse<R2 extends UnknownResult>(
+  alternative: R2,
+): <R extends UnknownResult>(result: R) => NarrowToOk<R> | R2;
 
 export function orElse<R extends UnknownResult, R2 extends UnknownResult>(
   ...args: readonly [result: R, alternative: R2] | readonly [alternative: R2]

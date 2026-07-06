@@ -1,4 +1,4 @@
-import { type Result, type UnknownResult } from '../result.mjs';
+import { type UnknownResult } from '../result.mjs';
 import { isOk } from './result-is-ok.mjs';
 import { unwrapOk } from './result-unwrap-ok.mjs';
 import { type UnwrapOk } from './types.mjs';
@@ -14,7 +14,7 @@ import { type UnwrapOk } from './types.mjs';
  *
  * assert.isTrue(Result.expectToBe(okValue, 'should have value') === 'data');
  *
- * const expectResult = Result.expectToBe<string>('missing result');
+ * const expectResult = Result.expectToBe('missing result');
  *
  * const throwTest = (): void => {
  *   expectResult(Result.err('boom'));
@@ -37,7 +37,9 @@ export function expectToBe<R extends UnknownResult>(
 ): UnwrapOk<R>;
 
 // Curried version
-export function expectToBe<S>(message: string): <E>(result: Result<S, E>) => S;
+export function expectToBe(
+  message: string,
+): <R extends UnknownResult>(result: R) => UnwrapOk<R>;
 
 export function expectToBe<R extends UnknownResult>(
   ...args: readonly [result: R, message: string] | readonly [message: string]

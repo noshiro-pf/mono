@@ -1,7 +1,4 @@
-import {
-  type TernaryResult,
-  type UnknownTernaryResult,
-} from '../ternary-result.mjs';
+import { type UnknownTernaryResult } from '../ternary-result.mjs';
 import { unwrapWarn } from './ternary-result-unwrap-warn.mjs';
 import { type UnwrapWarn } from './types.mjs';
 
@@ -28,9 +25,9 @@ export function unwrapWarnOr<R extends UnknownTernaryResult, D>(
 ): D | UnwrapWarn<R>;
 
 // Curried version
-export function unwrapWarnOr<W, D>(
+export function unwrapWarnOr<D>(
   defaultValue: D,
-): <S, E>(result: TernaryResult<S, E, W>) => D | W;
+): <R extends UnknownTernaryResult>(result: R) => D | UnwrapWarn<R>;
 
 export function unwrapWarnOr<R extends UnknownTernaryResult, D>(
   ...args: readonly [result: R, defaultValue: D] | readonly [defaultValue: D]

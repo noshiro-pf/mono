@@ -16,7 +16,7 @@ import { type UnwrapOk } from './types.mjs';
  *
  * assert.strictEqual(TernaryResult.expectToBe(okValue, 'missing'), 'ready');
  *
- * const expectResult = TernaryResult.expectToBe<string>('needs value');
+ * const expectResult = TernaryResult.expectToBe('needs value');
  *
  * const throwTest = (): void => {
  *   expectResult(TernaryResult.err('oops'));
@@ -31,9 +31,9 @@ export function expectToBe<R extends UnknownTernaryResult>(
 ): UnwrapOk<R>;
 
 // Curried version
-export function expectToBe<S>(
+export function expectToBe(
   message: string,
-): <W, E>(result: TernaryResult<S, E, W>) => S;
+): <S, W, E>(result: TernaryResult<S, E, W>) => S;
 
 export function expectToBe<R extends UnknownTernaryResult>(
   ...args: readonly [result: R, message: string] | readonly [message: string]
