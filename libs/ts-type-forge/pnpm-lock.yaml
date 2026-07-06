@@ -78,8 +78,8 @@ importers:
         specifier: 25.0.5
         version: 25.0.5(typescript@5.9.3)
       ts-codemod-lib:
-        specifier: 2.2.0
-        version: 2.2.0(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.1.2(prettier@3.8.4)(typescript@5.9.3))(typescript@5.9.3)
+        specifier: 2.2.1
+        version: 2.2.1(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.1.2(prettier@3.8.4)(typescript@5.9.3))(typescript@5.9.3)
       ts-data-forge:
         specifier: 7.0.0
         version: 7.0.0(typescript@5.9.3)
@@ -4042,8 +4042,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-codemod-lib@2.2.0:
-    resolution: {integrity: sha512-v4Y5EQ04+qGVQiCWPDeBSWO2bWQ3R6ANNskqK1zXyEmjuTJ5rZ7ye3fWOEkaVXP+NkQ8n6Af5eMvzV2nVBsiTQ==}
+  ts-codemod-lib@2.2.1:
+    resolution: {integrity: sha512-HXDiOm8tkPFgr4ujOY209NnvFj6B1vzTjFhsoOianKLrLCv2qf1cDLAtt5b10GFuE30u3JZ4gFktacri1lVKhw==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
     hasBin: true
     peerDependencies:
@@ -4061,6 +4061,12 @@ packages:
   ts-data-forge@6.10.0:
     resolution: {integrity: sha512-4s5bLadmRbnkBuxBq7NL/Jr++dhW6G8itqc73jl4dGSCOnXARafN20O53DedTYa1rSSPtWoOW6oSYAQACXAxAA==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
+    peerDependencies:
+      typescript: '>=4.8'
+
+  ts-data-forge@6.13.1:
+    resolution: {integrity: sha512-/M0BQvYkD0j1XQ/+5sZ8bXoVHNf8k5XfTg/OZ1EqxekUQCa2jk6z+uCrTaSHZi5Vwt9LQyJCRvLVi/50PFI/Qg==}
+    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
     peerDependencies:
       typescript: '>=4.8'
 
@@ -4091,6 +4097,10 @@ packages:
 
   ts-type-forge@3.1.0:
     resolution: {integrity: sha512-TYY+m+TfdoHVnzHXWnwKnxzVKb5iiRacWLW9pxkPMMR1ypxf/1BzUkRvmiCoSxm9hEYscPoUnuRmv7Wb1ddZfQ==}
+    engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
+
+  ts-type-forge@3.2.0:
+    resolution: {integrity: sha512-QoHXXnTyW00e1CLgWvX3U+Ko2NpMJYji6K/muFHh+2VdBKpuM+vXWam3BUDC+3I5yarXmLwXloudr2tfVHcZiA==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
 
   ts-type-forge@4.0.0:
@@ -8025,9 +8035,9 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 27.0.0
       '@octokit/types': 16.0.0
-      ts-data-forge: 6.10.0(typescript@5.9.3)
+      ts-data-forge: 6.13.1(typescript@5.9.3)
       ts-fortress: 7.1.0(typescript@5.9.3)
-      ts-type-forge: 3.1.0
+      ts-type-forge: 3.2.0
     transitivePeerDependencies:
       - typescript
 
@@ -8785,11 +8795,11 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-codemod-lib@2.2.0(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.1.2(prettier@3.8.4)(typescript@5.9.3))(typescript@5.9.3):
+  ts-codemod-lib@2.2.1(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.1.2(prettier@3.8.4)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
-      ts-data-forge: 6.10.0(typescript@5.9.3)
+      ts-data-forge: 6.13.1(typescript@5.9.3)
       ts-morph: 28.0.0
-      ts-type-forge: 3.1.0
+      ts-type-forge: 3.2.0
     optionalDependencies:
       cmd-ts: 0.15.0
       dedent: 1.7.2
@@ -8800,7 +8810,13 @@ snapshots:
   ts-data-forge@6.10.0(typescript@5.9.3):
     dependencies:
       '@sindresorhus/is': 8.1.0
-      ts-type-forge: 3.1.0
+      ts-type-forge: 3.2.0
+      typescript: 5.9.3
+
+  ts-data-forge@6.13.1(typescript@5.9.3):
+    dependencies:
+      '@sindresorhus/is': 8.1.0
+      ts-type-forge: 3.2.0
       typescript: 5.9.3
 
   ts-data-forge@7.0.0(typescript@5.9.3):
@@ -8844,6 +8860,8 @@ snapshots:
       - typescript
 
   ts-type-forge@3.1.0: {}
+
+  ts-type-forge@3.2.0: {}
 
   ts-type-forge@4.0.0: {}
 
