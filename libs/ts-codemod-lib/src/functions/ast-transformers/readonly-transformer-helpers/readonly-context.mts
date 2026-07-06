@@ -15,12 +15,12 @@ import { type SafeUintWithSmallInt } from 'ts-type-forge';
  * - `"none"`: All other cases
  */
 export type ReadonlyContext = Readonly<
-  { indexedAccessDepth: SafeUintWithSmallInt } & (
+  (
     | { type: 'DeepReadonly' }
     | { type: 'Readonly' }
     | { type: 'readonly' }
     | { type: 'none' }
-  )
+  ) & { indexedAccessDepth: SafeUintWithSmallInt }
 >;
 
 export const nextReadonlyContext = <
@@ -31,9 +31,7 @@ export const nextReadonlyContext = <
   nextReadonlyContextType: next,
   indexedAccessDepthChange = 'infinity',
 }: Readonly<
-  {
-    currentReadonlyContext: Curr;
-  } & (
+  (
     | {
         nextReadonlyContextType: Next;
         indexedAccessDepthChange: 'decr' | 'incr' | 'keep' | 'infinity';
@@ -45,7 +43,9 @@ export const nextReadonlyContext = <
         >;
         indexedAccessDepthChange?: 'infinity';
       }
-  )
+  ) & {
+    currentReadonlyContext: Curr;
+  }
 >): Readonly<{
   type: Extract<ReadonlyContext['type'], 'DeepReadonly'> | Next;
   indexedAccessDepth: SafeUintWithSmallInt;

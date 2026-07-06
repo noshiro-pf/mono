@@ -8,6 +8,7 @@ words:
   - noshiro
   - testw
   - tscw
+  - unshifted
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml

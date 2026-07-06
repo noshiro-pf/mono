@@ -100,14 +100,14 @@
     "tsc": "tsc --noEmit",
     "tscw": "tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "tsc --noEmit",
-    "update-packages": "pnpm update --latest",
+    "update-packages": "pnpm update --latest '!typescript'",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "ts-data-forge": "^6.9.6",
+    "ts-data-forge": "^7.1.1",
     "ts-morph": "^28.0.0",
-    "ts-type-forge": "^3.0.1"
+    "ts-type-forge": "^4.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",
@@ -120,35 +120,35 @@
     "@semantic-release/github": "12.0.8",
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.1",
-    "@types/node": "25.9.2",
-    "@vitest/browser-playwright": "4.1.5",
-    "@vitest/coverage-v8": "4.1.5",
-    "@vitest/ui": "4.1.5",
+    "@types/node": "26.1.0",
+    "@vitest/browser-playwright": "4.1.9",
+    "@vitest/coverage-v8": "4.1.9",
+    "@vitest/ui": "4.1.9",
     "cmd-ts": "0.15.0",
-    "conventional-changelog-conventionalcommits": "9.3.1",
+    "conventional-changelog-conventionalcommits": "10.2.0",
     "cspell": "10.0.1",
     "dedent": "1.7.2",
-    "eslint": "9.39.4",
-    "eslint-config-typed": "4.9.11",
+    "eslint": "10.6.0",
+    "eslint-config-typed": "5.4.0",
     "github-settings-as-code": "1.2.9",
     "jiti": "2.7.0",
-    "markdownlint": "0.40.0",
+    "markdownlint": "0.41.0",
     "markdownlint-cli2": "0.22.1",
-    "npm-run-all2": "8.0.4",
-    "playwright": "1.60.0",
-    "prettier": "3.8.3",
+    "npm-run-all2": "9.0.2",
+    "playwright": "1.61.1",
+    "prettier": "3.9.3",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.2",
-    "rollup": "4.61.1",
+    "rollup": "4.62.2",
     "semantic-release": "25.0.5",
     "ts-repo-utils": "10.1.2",
     "tslib": "2.8.1",
-    "tsx": "4.22.3",
+    "tsx": "4.22.4",
     "typedoc": "0.28.19",
     "typedoc-github-theme": "0.4.0",
     "typescript": "5.9.3",
-    "vite": "8.0.16",
-    "vitest": "4.1.5"
+    "vite": "8.1.0",
+    "vitest": "4.1.9"
   },
   "peerDependencies": {
     "cmd-ts": "0.14.3",
@@ -166,12 +166,12 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@11.9.0",
   "engines": {
-    "node": ">=22.18.0",
+    "node": ">=22.22.2",
     "pnpm": ">=9.0.0"
   },
   "volta": {
-    "node": "25.9.0"
+    "node": "26.3.1"
   }
 }

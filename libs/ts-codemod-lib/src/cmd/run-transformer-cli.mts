@@ -3,7 +3,7 @@
 import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { Arr, expectType, Result, unknownToString } from 'ts-data-forge';
 import {
   getDiffFrom,
   getModifiedFiles,
@@ -235,16 +235,12 @@ const transformFiles = async (
     const result = await transformOneFile(filePath, transformers, silent);
 
     if (Result.isOk(result)) {
-      switch (result.value) {
-        case 'transformed':
-          mut_transformedCount += 1;
+      expectType<typeof result.value, 'unchanged' | 'transformed'>('=');
 
-          break;
-
-        case 'unchanged':
-          mut_unchangedCount += 1;
-
-          break;
+      if (result.value === 'transformed') {
+        mut_transformedCount += 1;
+      } else {
+        mut_unchangedCount += 1;
       }
     } else {
       mut_errorFiles.push(path.basename(filePath));
@@ -285,14 +281,14 @@ const transformOneFile = async (
       echoIfNotSilent(`⏭️ ${fileName} - no changes needed`);
 
       return Result.ok('unchanged');
-    } else {
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(filePath, transformedCode, 'utf8');
-
-      echoIfNotSilent(`✅ ${fileName} - transformed`);
-
-      return Result.ok('transformed');
     }
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.writeFile(filePath, transformedCode, 'utf8');
+
+    echoIfNotSilent(`✅ ${fileName} - transformed`);
+
+    return Result.ok('transformed');
   } catch (error) {
     const errStr = unknownToString(error);
 

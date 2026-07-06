@@ -70,7 +70,7 @@ export const convertInterfaceToTypeTransformer = (): TsMorphTransformer =>
 
           const ownType = buildTypeLiteral(members);
 
-          return [...extendedTypesWithMembers, ownType].join(' & ');
+          return Arr.toPushed(extendedTypesWithMembers, ownType).join(' & ');
         })();
 
         // Get export keyword

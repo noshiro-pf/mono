@@ -1054,41 +1054,7 @@ const transformClassDeclarationNode = (
 
   for (const ctor of node.getConstructors()) {
     for (const param of ctor.getParameters()) {
-      if (hasDisableNextLineComment(param)) {
-        options.debugPrint(
-          'skipped class constructor parameter by disable-next-line comment',
-        );
-
-        continue;
-      }
-
-      {
-        const name = (param satisfies tsm.ParameterDeclaration).getName();
-
-        if (options.ignoredPrefixes.some((p) => name.startsWith(p))) {
-          continue;
-        }
-      }
-
-      // Check if parameter is a property declaration (public/protected/private)
-      const scope = param.getScope();
-
-      // public -> public readonly
-      // protected -> protected readonly
-      // private -> private readonly
-      if (
-        scope === tsm.Scope.Public ||
-        scope === tsm.Scope.Protected ||
-        scope === tsm.Scope.Private
-      ) {
-        param.setIsReadonly(true);
-      }
-
-      const type = param.getTypeNode();
-
-      if (type !== undefined) {
-        transformNode(type, initialReadonlyContext, options);
-      }
+      transformConstructorParameter(param, options);
     }
 
     const body = ctor.getBody();
@@ -1096,8 +1062,46 @@ const transformClassDeclarationNode = (
     if (body !== undefined) {
       transformNode(body, initialReadonlyContext, options);
     }
+  }
+};
 
-    continue;
+const transformConstructorParameter = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  param: tsm.ParameterDeclaration,
+  options: ReadonlyTransformerOptionsInternal,
+): void => {
+  if (hasDisableNextLineComment(param)) {
+    options.debugPrint(
+      'skipped class constructor parameter by disable-next-line comment',
+    );
+
+    return;
+  }
+
+  const name = param.getName();
+
+  if (options.ignoredPrefixes.some((p) => name.startsWith(p))) {
+    return;
+  }
+
+  // Check if parameter is a property declaration (public/protected/private)
+  const scope = param.getScope();
+
+  // public -> public readonly
+  // protected -> protected readonly
+  // private -> private readonly
+  if (
+    scope === tsm.Scope.Public ||
+    scope === tsm.Scope.Protected ||
+    scope === tsm.Scope.Private
+  ) {
+    param.setIsReadonly(true);
+  }
+
+  const type = param.getTypeNode();
+
+  if (type !== undefined) {
+    transformNode(type, initialReadonlyContext, options);
   }
 };
 

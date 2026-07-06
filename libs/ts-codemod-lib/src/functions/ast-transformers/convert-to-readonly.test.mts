@@ -59,7 +59,10 @@ const normalizeWhitespaceForComparison = (code: string): string => {
   const placeholder = '___LINE_COMMENT_NEWLINE_PLACEHOLDER___';
 
   // 1. Protect newlines immediately following line comments
-  const protectedCode = code.replaceAll(/(\/\/.*?)\r?\n/gu, `$1${placeholder}`);
+  const protectedCode = code.replaceAll(
+    /(\/\/.*?)\r?\n/gu,
+    (_match, comment: string) => `${comment}${placeholder}`,
+  );
 
   // 2. Collapse multiple whitespace characters (including unprotected newlines) into a single space
   const collapsedCode = protectedCode.replaceAll(/\s+/gu, ' ');

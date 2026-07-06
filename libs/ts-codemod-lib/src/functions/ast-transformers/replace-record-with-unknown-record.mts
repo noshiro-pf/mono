@@ -23,12 +23,12 @@ export const replaceRecordWithUnknownRecordTransformer =
     ({
       name: TRANSFORMER_NAME,
       transform: (sourceAst) => {
-        const containerModifications = [
-          processDeclarations(sourceAst),
-          ...sourceAst
+        const containerModifications = Arr.toUnshifted(
+          sourceAst
             .getModules()
             .map((namespace) => processDeclarations(namespace)),
-        ];
+          processDeclarations(sourceAst),
+        );
 
         if (containerModifications.includes(true)) {
           ensureUnknownRecordImport(sourceAst);

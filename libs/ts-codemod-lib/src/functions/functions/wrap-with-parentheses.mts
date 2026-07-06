@@ -10,6 +10,19 @@
  */
 import { asUint32, range } from 'ts-data-forge';
 
+const parenDepthDelta = (char: string): number => {
+  switch (char) {
+    case '(':
+      return 1;
+
+    case ')':
+      return -1;
+
+    default:
+      return 0;
+  }
+};
+
 const isWrappedWithParentheses = (str: string): boolean => {
   const trimmed = str.trim();
 
@@ -22,30 +35,11 @@ const isWrappedWithParentheses = (str: string): boolean => {
   let mut_depth = 0;
 
   for (const mut_i of range(0, asUint32(trimmed.length))) {
-    const char: string = trimmed.charAt(mut_i);
+    mut_depth += parenDepthDelta(trimmed.charAt(mut_i));
 
-    switch (char) {
-      case '(': {
-        mut_depth += 1;
-
-        break;
-      }
-
-      case ')': {
-        mut_depth -= 1;
-
-        // If we reach depth 0 before the end, the outer parentheses don't wrap everything
-        if (mut_depth === 0 && mut_i < trimmed.length - 1) {
-          return false;
-        }
-
-        break;
-      }
-
-      default: {
-        // Other characters - no action needed
-        break;
-      }
+    // If we reach depth 0 before the end, the outer parentheses don't wrap everything
+    if (mut_depth === 0 && mut_i < trimmed.length - 1) {
+      return false;
     }
   }
 

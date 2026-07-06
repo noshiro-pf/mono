@@ -52,16 +52,16 @@ export const hasDisableNextLineComment = (
         );
 
         if (matchedPrefix !== undefined) {
+          // If no transformer name specified, check if comment applies to all transformers
+          if (transformerName === undefined) {
+            return true;
+          }
+
           // Extract the part after the prefix
           const afterPrefix = commentText
             .slice(commentText.indexOf(matchedPrefix))
             .replace(matchedPrefix, '')
             .trim();
-
-          // If no transformer name specified, check if comment applies to all transformers
-          if (transformerName === undefined) {
-            return true;
-          }
 
           // If no specific transformers listed in comment, it applies to all
           if (afterPrefix === '') {

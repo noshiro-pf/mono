@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as cmd from 'cmd-ts';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import { convertToReadonlyTransformer } from '../functions/index.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
 
@@ -64,4 +64,4 @@ const cmdDef = cmd.command({
   },
 });
 
-await cmd.run(cmdDef, process.argv.slice(2));
+await cmd.run(cmdDef, Arr.skip(process.argv, 2));

@@ -3,9 +3,7 @@ import { noop } from './noop.mjs';
 const flag = true as boolean;
 
 type Elem =
-  | Readonly<{ a: 'str0' }>
-  | Readonly<{ b: 'str1' }>
-  | Readonly<{ c: 'str2' }>;
+  Readonly<{ a: 'str0' }> | Readonly<{ b: 'str1' }> | Readonly<{ c: 'str2' }>;
 
 const a = [
   { a: 'str0' },
