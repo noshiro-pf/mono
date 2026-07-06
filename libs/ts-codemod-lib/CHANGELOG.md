@@ -2,7 +2,7 @@
 
 ### Bug Fixes
 
-- skip adding readonly to union-distrubution-guard idioms ([#149](https://github.com/noshiro-pf/ts-codemod-lib/issues/149)) ([49a41a9](https://github.com/noshiro-pf/ts-codemod-lib/commit/49a41a92b78004acc81f0a52d020dcb04c435ebf))
+- skip adding readonly to union-distribution-guard idioms ([#149](https://github.com/noshiro-pf/ts-codemod-lib/issues/149)) ([49a41a9](https://github.com/noshiro-pf/ts-codemod-lib/commit/49a41a92b78004acc81f0a52d020dcb04c435ebf))
 
 # [2.2.0](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.1.7...v2.2.0) (2026-06-05)
 
