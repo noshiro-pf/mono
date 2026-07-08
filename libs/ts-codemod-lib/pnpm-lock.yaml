@@ -97,14 +97,14 @@ importers:
         specifier: 1.61.1
         version: 1.61.1
       prettier:
-        specifier: 3.9.3
-        version: 3.9.3
+        specifier: 3.9.4
+        version: 3.9.4
       prettier-plugin-organize-imports:
         specifier: 4.3.0
-        version: 4.3.0(prettier@3.9.3)(typescript@5.9.3)
+        version: 4.3.0(prettier@3.9.4)(typescript@5.9.3)
       prettier-plugin-packagejson:
         specifier: 3.0.2
-        version: 3.0.2(prettier@3.9.3)
+        version: 3.0.2(prettier@3.9.4)
       rollup:
         specifier: 4.62.2
         version: 4.62.2
@@ -113,7 +113,7 @@ importers:
         version: 25.0.5(typescript@5.9.3)
       ts-repo-utils:
         specifier: 10.1.2
-        version: 10.1.2(prettier@3.9.3)(typescript@5.9.3)
+        version: 10.1.2(prettier@3.9.4)(typescript@5.9.3)
       tslib:
         specifier: 2.8.1
         version: 2.8.1
@@ -3634,8 +3634,8 @@ packages:
       prettier:
         optional: true
 
-  prettier@3.9.3:
-    resolution: {integrity: sha512-HWmu+K+zvHNpaMfSnYeqdqrDbR16cuIXaPx8WoHaviQkDJh1/0BNtOZmHVQI5jc3wXv0H1yXc9wjvFdXh+n3hQ==}
+  prettier@3.9.4:
+    resolution: {integrity: sha512-yWG/o/4oJfo036EKAfK6ACAoDOfHeRHx4tuxkfBZiauURiaSmYwlpOr5LQqKtIkRD2z1PLteme2WoxEnj4tHTg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -8123,18 +8123,18 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-organize-imports@4.3.0(prettier@3.9.3)(typescript@5.9.3):
+  prettier-plugin-organize-imports@4.3.0(prettier@3.9.4)(typescript@5.9.3):
     dependencies:
-      prettier: 3.9.3
+      prettier: 3.9.4
       typescript: 5.9.3
 
-  prettier-plugin-packagejson@3.0.2(prettier@3.9.3):
+  prettier-plugin-packagejson@3.0.2(prettier@3.9.4):
     dependencies:
       sort-package-json: 3.7.1
     optionalDependencies:
-      prettier: 3.9.3
+      prettier: 3.9.4
 
-  prettier@3.9.3: {}
+  prettier@3.9.4: {}
 
   pretty-ms@9.3.0:
     dependencies:
@@ -8720,7 +8720,7 @@ snapshots:
       '@ts-morph/common': 0.29.0
       code-block-writer: 13.0.3
 
-  ts-repo-utils@10.1.2(prettier@3.9.3)(typescript@5.9.3):
+  ts-repo-utils@10.1.2(prettier@3.9.4)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 3.0.1
       '@sindresorhus/is': 8.1.0
@@ -8728,7 +8728,7 @@ snapshots:
       cmd-ts: 0.15.0
       fast-glob: 3.3.3
       micromatch: 4.0.8
-      prettier: 3.9.3
+      prettier: 3.9.4
       ts-data-forge: 6.13.1(typescript@5.9.3)
       ts-type-forge: 3.2.0
       tsx: 4.22.4
