@@ -133,7 +133,7 @@
     "github-settings-as-code": "1.2.9",
     "jiti": "2.7.0",
     "markdownlint": "0.41.0",
-    "markdownlint-cli2": "0.22.1",
+    "markdownlint-cli2": "0.23.0",
     "npm-run-all2": "9.0.2",
     "playwright": "1.61.1",
     "prettier": "3.9.3",
