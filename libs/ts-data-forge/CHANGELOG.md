@@ -1,3 +1,13 @@
+# [8.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.1.1...v8.0.0) (2026-07-09)
+
+- fix!: changed isRecord to reject arrays ([#409](https://github.com/noshiro-pf/ts-data-forge/issues/409)) ([ff73b7d](https://github.com/noshiro-pf/ts-data-forge/commit/ff73b7d2c9b5077a7a3b1e44e36430d5d5131b22))
+
+### BREAKING CHANGES
+
+-   - isRecord([]) now returns false (it used to return true)
+
+isRecord was changed to allow arrays in https://github.com/noshiro-pf/ts-data-forge/pull/222, but the change is reverted in this commit.
+
 ## [7.1.1](https://github.com/noshiro-pf/ts-data-forge/compare/v7.1.0...v7.1.1) (2026-07-06)
 
 ### Bug Fixes
