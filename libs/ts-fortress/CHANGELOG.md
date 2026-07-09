@@ -1,3 +1,9 @@
+## [8.5.2](https://github.com/noshiro-pf/ts-fortress/compare/v8.5.1...v8.5.2) (2026-07-09)
+
+### Bug Fixes
+
+- update dependencies ([#331](https://github.com/noshiro-pf/ts-fortress/issues/331)) ([4478d3b](https://github.com/noshiro-pf/ts-fortress/commit/4478d3bb830a1590854f9359804a8d7622bf765b))
+
 ## [8.5.1](https://github.com/noshiro-pf/ts-fortress/compare/v8.5.0...v8.5.1) (2026-07-03)
 
 ### Bug Fixes
