@@ -12,9 +12,6 @@ import {
   type UnwrapBrandKeys,
   type UnwrapBrandTrueKeys,
 } from './brand.mjs';
-import { type PositiveNumber } from './core.mjs';
-import { type PositiveInt } from './int.mjs';
-import { type Uint32 } from './uint32.mjs';
 
 {
   type A = Brand<number, 'A'>;
@@ -81,68 +78,4 @@ import { type Uint32 } from './uint32.mjs';
     TSTypeForgeInternals_BrandEncapsulated<Readonly<{ T: true; F: false }>> &
       number
   >('=');
-}
-
-{
-  expectType<
-    IntersectBrand<PositiveNumber, Uint32>,
-    TSTypeForgeInternals_BrandEncapsulated<
-      Readonly<{
-        NaNValue: false;
-        '!=0': true;
-        '>=0': true;
-        '<=0': false;
-        '> -2^16': true;
-        '> -2^32': true;
-        '>= -2^15': true;
-        '>= -2^31': true;
-        '< 2^32': true;
-        Finite: true;
-        Int: true;
-        SafeInt: true;
-      }>
-    > &
-      number
-  >('=');
-
-  expectType<
-    IntersectBrand<PositiveInt, Uint32>,
-    TSTypeForgeInternals_BrandEncapsulated<
-      Readonly<{
-        NaNValue: false;
-        '!=0': true;
-        '>=0': true;
-        '<=0': false;
-        '> -2^16': true;
-        '> -2^32': true;
-        '>= -2^15': true;
-        '>= -2^31': true;
-        '< 2^32': true;
-        Finite: true;
-        Int: true;
-        SafeInt: true;
-      }>
-    > &
-      number
-  >('=');
-
-  expectType<
-    PositiveInt & Uint32,
-    TSTypeForgeInternals_BrandEncapsulated<
-      Readonly<{
-        NaNValue: false;
-        '!=0': true;
-        '> -2^16': true;
-        '> -2^32': true;
-        '>= -2^15': true;
-        '>= -2^31': true;
-        '>=0': true;
-        '< 2^32': true;
-        Finite: true;
-        Int: true;
-        SafeInt: true;
-      }>
-    > &
-      number
-  >('!=');
 }

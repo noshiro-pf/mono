@@ -11,8 +11,6 @@
 import type * as _TSTypeForge from './index.mjs';
 
 declare global {
-  type BigInt64 = _TSTypeForge.BigInt64;
-  type BigUint64 = _TSTypeForge.BigUint64;
   type UnknownBrand = _TSTypeForge.UnknownBrand;
   type Brand<
     T,
@@ -46,6 +44,8 @@ declare global {
   > = _TSTypeForge.IntersectBrand<B1, B2>;
   type NormalizeBrandUnion<B extends UnknownBrand> =
     _TSTypeForge.NormalizeBrandUnion<B>;
+  type BigInt64 = _TSTypeForge.BigInt64;
+  type BigUint64 = _TSTypeForge.BigUint64;
   type NaNType = _TSTypeForge.NaNType;
   type ValidNumber = _TSTypeForge.ValidNumber;
   type NonZeroNumber = _TSTypeForge.NonZeroNumber;
@@ -98,7 +98,6 @@ declare global {
   type NonNegativeInt32WithSmallInt = _TSTypeForge.NonNegativeInt32WithSmallInt;
   type PositiveInt32WithSmallInt = _TSTypeForge.PositiveInt32WithSmallInt;
   type NegativeInt32WithSmallInt = _TSTypeForge.NegativeInt32WithSmallInt;
-  type NonEmptyString = _TSTypeForge.NonEmptyString;
   type SafeInt = _TSTypeForge.SafeInt;
   type NonZeroSafeInt = _TSTypeForge.NonZeroSafeInt;
   type SafeUint = _TSTypeForge.SafeUint;
@@ -143,6 +142,17 @@ declare global {
   type Uint32WithSmallInt = _TSTypeForge.Uint32WithSmallInt;
   type PositiveUint32WithSmallInt = _TSTypeForge.PositiveUint32WithSmallInt;
   type NonZeroUint32WithSmallInt = _TSTypeForge.NonZeroUint32WithSmallInt;
+  type MaxLengthString<MaxLength extends number> =
+    _TSTypeForge.MaxLengthString<MaxLength>;
+  type MinLengthString<MinLength extends number> =
+    _TSTypeForge.MinLengthString<MinLength>;
+  type BoundedLengthString<
+    MinLength extends number,
+    MaxLength extends number,
+  > = _TSTypeForge.BoundedLengthString<MinLength, MaxLength>;
+  type FixedLengthString<Length extends number> =
+    _TSTypeForge.FixedLengthString<Length>;
+  type NonEmptyString = _TSTypeForge.NonEmptyString;
   type TypeEq<A, B> = _TSTypeForge.TypeEq<A, B>;
   type TypeExtends<A, B> = _TSTypeForge.TypeExtends<A, B>;
   type IsFixedLengthList<T extends readonly unknown[]> =
