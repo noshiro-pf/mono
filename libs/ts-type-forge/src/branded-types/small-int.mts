@@ -67,7 +67,7 @@ export type SmallInt<
  * @example
  * ```ts
  * type Index = SmallUint; // 0 | 1 | 2 | ... | 39
- * const getItem = <T>(arr: readonly T[], i: Index) => arr[i];
+ * const getItem = <T,>(arr: readonly T[], i: Index) => arr[i];
  * ```
  */
 export type SmallUint = SmallInt<'>=0'>;
@@ -90,12 +90,12 @@ export type SmallUint = SmallInt<'>=0'>;
  *   if (typeof n === 'number' && n < 39) {
  *     return (n + 1) as Count; // Type narrowing works with literals
  *   }
- *   return (n as number + 1) as Count;
+ *   return ((n as number) + 1) as Count;
  * };
  *
  * // Common patterns:
- * type SmallInt = WithSmallInt<Int>;              // -40 to 39 | Int
- * type SmallUint = WithSmallInt<Uint>;            // 0 to 39 | Uint
+ * type SmallInt = WithSmallInt<Int>; // -40 to 39 | Int
+ * type SmallUint = WithSmallInt<Uint>; // 0 to 39 | Uint
  * type SmallPositiveInt = WithSmallInt<PositiveInt>; // 1 to 39 | PositiveInt
  * ```
  */
@@ -127,9 +127,9 @@ type CastToInt<T> = T extends Int ? T : never;
  * @example
  * ```ts
  * type Count = WithSmallInt<Uint>; // 0 | 1 | ... | 39 | Uint
- * type PureCount = RemoveSmallInt<Count>; // Uint
+ * type PureCount = ExcludeSmallInt<Count>; // Uint
  *
- * const toLargeCount = (n: Count): RemoveSmallInt<Count> => {
+ * const toLargeCount = (n: Count): ExcludeSmallInt<Count> => {
  *   if (typeof n === 'number') {
  *     return (n + 1000) as Uint; // Convert small to large
  *   }

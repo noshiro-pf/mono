@@ -21,7 +21,7 @@
  * type T4 = TypeExtends<string, 'hello'>; // false (primitive doesn't extend literal)
  *
  * // Object assignability
- * type T5 = TypeExtends<{ a: number }, object>; // true (specific object extends general object)
+ * type T5 = TypeExtends<{ a: number }, UnknownRecord>; // true (specific object extends general object)
  * type T6 = TypeExtends<{ a: number; b: string }, { a: number }>; // true (extra properties allowed)
  *
  * // Special types
@@ -33,7 +33,7 @@
  *
  * // Practical usage in conditional types
  * type IsOptional<T, K extends keyof T> = TypeExtends<T[K], undefined>;
- * type IsFunction<T> = TypeExtends<T, (...args: any[]) => any>;
+ * type IsFunction<T> = TypeExtends<T, (...args: readonly any[]) => any>;
  * type IsArray<T> = TypeExtends<T, readonly unknown[]>;
  *
  * // Type compatibility checking

@@ -45,8 +45,8 @@ type ExtractBooleanKeysImpl<
  * type PostId = Brand<string, 'PostId'>;
  *
  * // These are incompatible even though both are strings
- * const userId: UserId = "user123" as UserId;
- * const postId: PostId = "post456" as PostId;
+ * const userId: UserId = 'user123' as UserId;
+ * const postId: PostId = 'post456' as PostId;
  * // const wrongAssignment: UserId = postId; // Error!
  *
  * // Create validated types
@@ -214,7 +214,7 @@ export type ExtendBrand<
  *
  * // Useful for type conversions
  * type SerializedData = Brand<string, 'json' | 'validated'>;
- * type ParsedData = ChangeBaseBrand<SerializedData, object>;
+ * type ParsedData = ChangeBaseBrand<SerializedData, UnknownRecord>;
  * ```
  */
 export type ChangeBaseBrand<B extends UnknownBrand, T> = Brand<

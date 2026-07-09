@@ -17,8 +17,8 @@ import { type ReadonlyRecord } from '../others/index.mjs';
  * // Safe handling of unknown objects
  * const processData = (data: UnknownRecord) => {
  *   // Must use type guards to access properties safely
- *   if ('name' in data && typeof data.name === 'string') {
- *     console.log(data.name);
+ *   if (Object.hasOwn(data, 'name') && typeof data['name'] === 'string') {
+ *     console.log(data['name']);
  *   }
  * };
  *
@@ -26,7 +26,7 @@ import { type ReadonlyRecord } from '../others/index.mjs';
  * const config: UnknownRecord = {
  *   apiUrl: 'https://api.example.com',
  *   timeout: 5000,
- *   retries: 3
+ *   retries: 3,
  * };
  *
  * // Unlike `any`, this requires type checking

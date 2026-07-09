@@ -22,7 +22,7 @@ import { type WithSmallInt } from './small-int.mjs';
  *   add: (a: SafeInt, b: SafeInt): SafeInt | undefined => {
  *     const result = a + b;
  *     return isSafeInt(result) ? result : undefined;
- *   }
+ *   },
  * };
  * ```
  */
@@ -82,7 +82,7 @@ export type PositiveSafeInt = IntersectBrand<SafeInt, PositiveNumber>;
  * const isNegativeSafeInt = (x: number): x is NegativeSafeInt =>
  *   Number.isSafeInteger(x) && x < 0;
  *
- * const priority = (level: NegativeSafeInt) => ({ priority: -level });
+ * const priority = (level: NegativeSafeInt) => ({ priority: Math.abs(level) });
  * ```
  */
 export type NegativeSafeInt = IntersectBrand<SafeInt, NegativeNumber>;

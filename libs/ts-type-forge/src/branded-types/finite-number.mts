@@ -16,11 +16,14 @@ import {
  *
  * @example
  * ```ts
- * const isFinite = (x: number): x is FiniteNumber => Number.isFinite(x);
+ * const isFiniteNumber = (x: number): x is FiniteNumber => Number.isFinite(x);
  *
- * const safeDivide = (a: FiniteNumber, b: FiniteNumber): FiniteNumber | InfiniteNumber => {
+ * const safeDivide = (
+ *   a: FiniteNumber,
+ *   b: FiniteNumber,
+ * ): FiniteNumber | InfiniteNumber => {
  *   const result = a / b;
- *   return isFinite(result) ? result : result as InfiniteNumber;
+ *   return isFiniteNumber(result) ? result : (result as InfiniteNumber);
  * };
  * ```
  */
@@ -59,7 +62,8 @@ export type InfiniteNumber = TSTypeForgeInternals_ExtendNumberBrand<
  *   x === Number.POSITIVE_INFINITY;
  *
  * const handleLimit = (x: number): FiniteNumber | POSITIVE_INFINITY => {
- *   if (x > Number.MAX_VALUE) return Number.POSITIVE_INFINITY as POSITIVE_INFINITY;
+ *   if (x > Number.MAX_VALUE)
+ *     return Number.POSITIVE_INFINITY as POSITIVE_INFINITY;
  *   return x as FiniteNumber;
  * };
  * ```
@@ -79,7 +83,8 @@ export type POSITIVE_INFINITY = TSTypeForgeInternals_ExtendNumberBrand<
  *   x === Number.NEGATIVE_INFINITY;
  *
  * const handleUnderflow = (x: number): FiniteNumber | NEGATIVE_INFINITY => {
- *   if (x < -Number.MAX_VALUE) return Number.NEGATIVE_INFINITY as NEGATIVE_INFINITY;
+ *   if (x < -Number.MAX_VALUE)
+ *     return Number.NEGATIVE_INFINITY as NEGATIVE_INFINITY;
  *   return x as FiniteNumber;
  * };
  * ```
@@ -132,8 +137,10 @@ export type PositiveFiniteNumber = IntersectBrand<PositiveNumber, FiniteNumber>;
  * const isNegativeFinite = (x: number): x is NegativeFiniteNumber =>
  *   Number.isFinite(x) && x < 0;
  *
- * const temperature = (celsius: NegativeFiniteNumber) =>
- *   ({ celsius, freezing: true });
+ * const temperature = (celsius: NegativeFiniteNumber) => ({
+ *   celsius,
+ *   freezing: true,
+ * });
  * ```
  */
 export type NegativeFiniteNumber = IntersectBrand<NegativeNumber, FiniteNumber>;

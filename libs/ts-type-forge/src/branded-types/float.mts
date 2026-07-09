@@ -14,7 +14,7 @@ import {
  *   return arr[0] as Float32;
  * };
  *
- * const shader = (vertices: Float32[]) => {
+ * const shader = (_vertices: readonly Float32[]): void => {
  *   // WebGL shader processing
  * };
  * ```
@@ -32,7 +32,7 @@ export type Float32 = TSTypeForgeInternals_ExtendNumberBrand<
  * ```ts
  * const toFloat64 = (x: number): Float64 => x as Float64;
  *
- * const scientificData = (measurements: Float64[]) => {
+ * const scientificData = (_measurements: readonly Float64[]): void => {
  *   // High-precision calculations
  * };
  * ```

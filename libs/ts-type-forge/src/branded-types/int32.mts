@@ -16,12 +16,9 @@ import { type WithSmallInt } from './small-int.mjs';
  * @example
  * ```ts
  * const isInt32 = (x: number): x is Int32 =>
- *   Number.isSafeInteger(x) && x >= -(2**31) && x <= 2**31 - 1;
+ *   Number.isSafeInteger(x) && x >= -(2 ** 31) && x <= 2 ** 31 - 1;
  *
- * const toInt32 = (x: number): Int32 => {
- *   // Simulate 32-bit integer overflow
- *   return (x | 0) as Int32;
- * };
+ * const toInt32 = (x: number): Int32 => (x | 0) as Int32;
  *
  * const bitwiseOr = (a: Int32, b: Int32): Int32 => (a | b) as Int32;
  * ```
@@ -38,7 +35,7 @@ export type Int32 = TSTypeForgeInternals_ExtendNumberBrand<
  * @example
  * ```ts
  * const isNonZeroInt32 = (x: number): x is NonZeroInt32 =>
- *   Number.isSafeInteger(x) && x !== 0 && x >= -(2**31) && x <= 2**31 - 1;
+ *   Number.isSafeInteger(x) && x !== 0 && x >= -(2 ** 31) && x <= 2 ** 31 - 1;
  *
  * const delta = (change: NonZeroInt32) => ({ delta: change });
  * ```
@@ -52,7 +49,7 @@ export type NonZeroInt32 = IntersectBrand<Int32, NonZeroNumber>;
  * @example
  * ```ts
  * const isNonNegativeInt32 = (x: number): x is NonNegativeInt32 =>
- *   Number.isSafeInteger(x) && x >= 0 && x <= 2**31 - 1;
+ *   Number.isSafeInteger(x) && x >= 0 && x <= 2 ** 31 - 1;
  *
  * const score = (points: NonNegativeInt32) => ({ score: points });
  * ```
@@ -66,7 +63,7 @@ export type NonNegativeInt32 = IntersectBrand<Int32, NonNegativeNumber>;
  * @example
  * ```ts
  * const isPositiveInt32 = (x: number): x is PositiveInt32 =>
- *   Number.isSafeInteger(x) && x > 0 && x <= 2**31 - 1;
+ *   Number.isSafeInteger(x) && x > 0 && x <= 2 ** 31 - 1;
  *
  * const userId = (id: PositiveInt32) => ({ userId: id });
  * ```
@@ -80,7 +77,7 @@ export type PositiveInt32 = IntersectBrand<Int32, PositiveNumber>;
  * @example
  * ```ts
  * const isNegativeInt32 = (x: number): x is NegativeInt32 =>
- *   Number.isSafeInteger(x) && x < 0 && x >= -(2**31);
+ *   Number.isSafeInteger(x) && x < 0 && x >= -(2 ** 31);
  *
  * const offset = (value: NegativeInt32) => ({ offset: value });
  * ```

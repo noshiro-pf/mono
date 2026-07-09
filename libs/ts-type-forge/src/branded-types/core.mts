@@ -48,10 +48,10 @@ type IntRangeKeys =
  * ```ts
  * const checkNaN = (x: number): x is NaNType => Number.isNaN(x);
  *
- * const value: number = parseFloat("invalid");
+ * const value: number = parseFloat('invalid');
  * if (checkNaN(value)) {
  *   const nan: NaNType = value;
- *   // Handle NaN case specifically
+ *   console.log(nan); // Handle NaN case specifically
  * }
  * ```
  */
@@ -69,10 +69,7 @@ export type NaNType = TSTypeForgeInternals_ExtendNumberBrand<
  * ```ts
  * const isValidNumber = (x: number): x is ValidNumber => !Number.isNaN(x);
  *
- * const process = (n: ValidNumber) => {
- *   // Can safely perform arithmetic without NaN checks
- *   return n * 2 + 1;
- * };
+ * const process = (n: ValidNumber) => n * 2 + 1;
  * ```
  */
 export type ValidNumber = TSTypeForgeInternals_ExtendNumberBrand<
@@ -111,7 +108,8 @@ export type NonZeroNumber = TSTypeForgeInternals_ExtendNumberBrand<
  * const sqrt = (x: NonNegativeNumber) => Math.sqrt(x);
  * // Safe square root without negative input
  *
- * const arrayIndex = (arr: readonly unknown[], i: NonNegativeNumber & Int) => arr[i];
+ * const arrayIndex = (arr: readonly unknown[], i: NonNegativeNumber & Int) =>
+ *   arr[i];
  * ```
  */
 export type NonNegativeNumber = TSTypeForgeInternals_ExtendNumberBrand<

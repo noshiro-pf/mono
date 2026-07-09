@@ -168,8 +168,8 @@ export type ReadonlyRecord<K extends PropertyKey, T> = {
  * ```ts
  * type Config = MutableRecord<string, string | number>;
  * const settings: Config = { host: 'localhost', port: 3000 };
- * settings.host = 'new-host'; // OK
- * settings.timeout = 5000; // OK
+ * settings['host'] = 'new-host'; // OK
+ * settings['timeout'] = 5000; // OK
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style

@@ -18,27 +18,25 @@
  *
  * @example
  * ```ts
- * const checkFalsy = (value: unknown): value is FalsyValue => {
- *   return !value;
- * };
+ * const checkFalsy = (value: unknown): value is FalsyValue => !value;
  *
- * checkFalsy(false);    // true
- * checkFalsy(0);        // true
- * checkFalsy('');       // true
- * checkFalsy(null);     // true
+ * checkFalsy(false); // true
+ * checkFalsy(0); // true
+ * checkFalsy(''); // true
+ * checkFalsy(null); // true
  * checkFalsy(undefined); // true
- * checkFalsy('hello');  // false
- * checkFalsy(1);        // false
+ * checkFalsy('hello'); // false
+ * checkFalsy(1); // false
  *
  * // Type guard for filtering out falsy values
  * const truthyValues = [0, 1, '', 'hello', false, true, null].filter(
- *   (value): value is Exclude<typeof value, FalsyValue> => Boolean(value)
+ *   (value): value is Exclude<typeof value, FalsyValue> => Boolean(value),
  * ); // [1, 'hello', true]
  *
  * // Conditional logic based on falsy values
  * type IsFalsy<T> = T extends FalsyValue ? true : false;
- * type Test1 = IsFalsy<0>;     // true
- * type Test2 = IsFalsy<'hi'>;  // false
+ * type Test1 = IsFalsy<0>; // true
+ * type Test2 = IsFalsy<'hi'>; // false
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents

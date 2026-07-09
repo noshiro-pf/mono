@@ -10,17 +10,17 @@
  *
  * @example
  * ```ts
- * type ReadonlyUser = {
- *   readonly id: number;
- *   readonly name: string;
- *   readonly email: string;
- * };
+ * type ReadonlyUser = Readonly<{
+ *   id: number;
+ *   name: string;
+ *   email: string;
+ * }>;
  *
  * type MutableUser = Mutable<ReadonlyUser>;
  * // Result: { id: number; name: string; email: string }
  *
- * const user: MutableUser = { id: 1, name: "Alice", email: "alice@example.com" };
- * user.name = "Alice Smith"; // ✓ allowed - property is mutable
+ * const user: MutableUser = { id: 1, name: 'Alice', email: 'alice@example.com' };
+ * user.name = 'Alice Smith'; // ✓ allowed - property is mutable
  *
  * // Useful for creating editable versions of readonly data
  * type Config = Readonly<{ host: string; port: number; ssl: boolean }>;
@@ -42,9 +42,9 @@ export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
  * type MutableUserMap = ToMutableMap<ReadOnlyUserMap>; // Map<string, User>
  *
  * // Useful when you need to convert readonly collections to mutable ones
- * const convertToMutable = (readonlyMap: ReadonlyMap<string, number>): Map<string, number> => {
- *   return new Map(readonlyMap);
- * };
+ * const convertToMutable = (
+ *   readonlyMap: ReadonlyMap<string, number>,
+ * ): Map<string, number> => new Map(readonlyMap);
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,9 +64,8 @@ export type ToMutableMap<T extends ReadonlyMap<any, any>> =
  * type MutableStringSet = ToMutableSet<ReadOnlyStringSet>; // Set<string>
  *
  * // Converting readonly collections to mutable ones
- * const convertToMutable = (readonlySet: ReadonlySet<string>): Set<string> => {
- *   return new Set(readonlySet);
- * };
+ * const convertToMutable = (readonlySet: ReadonlySet<string>): Set<string> =>
+ *   new Set(readonlySet);
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

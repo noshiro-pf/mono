@@ -11,13 +11,11 @@ import { type WithSmallInt } from './small-int.mjs';
  * @example
  * ```ts
  * const isUint32 = (x: number): x is Uint32 =>
- *   Number.isSafeInteger(x) && x >= 0 && x <= 2**32 - 1;
+ *   Number.isSafeInteger(x) && x >= 0 && x <= 2 ** 32 - 1;
  *
  * const color = (rgba: Uint32) => ({ rgba });
- * const ipAddress = (ip: Uint32) => {
- *   // Convert to dotted decimal notation
- *   return `${ip >>> 24}.${(ip >>> 16) & 0xff}.${(ip >>> 8) & 0xff}.${ip & 0xff}`;
- * };
+ * const ipAddress = (ip: Uint32) =>
+ *   `${ip >>> 24}.${(ip >>> 16) & 0xff}.${(ip >>> 8) & 0xff}.${ip & 0xff}`;
  * ```
  */
 export type Uint32 = TSTypeForgeInternals_ExtendNumberBrand<SafeUint, '< 2^32'>;
@@ -29,7 +27,7 @@ export type Uint32 = TSTypeForgeInternals_ExtendNumberBrand<SafeUint, '< 2^32'>;
  * @example
  * ```ts
  * const isPositiveUint32 = (x: number): x is PositiveUint32 =>
- *   Number.isSafeInteger(x) && x > 0 && x <= 2**32 - 1;
+ *   Number.isSafeInteger(x) && x > 0 && x <= 2 ** 32 - 1;
  *
  * const id = (value: PositiveUint32) => ({ id: value });
  * ```
@@ -44,7 +42,7 @@ export type PositiveUint32 = IntersectBrand<Uint32, PositiveNumber>;
  * @example
  * ```ts
  * const isNonZeroUint32 = (x: number): x is NonZeroUint32 =>
- *   Number.isSafeInteger(x) && x > 0 && x <= 2**32 - 1;
+ *   Number.isSafeInteger(x) && x > 0 && x <= 2 ** 32 - 1;
  *
  * const divisor = (value: NonZeroUint32) => 1000000 / value;
  * ```

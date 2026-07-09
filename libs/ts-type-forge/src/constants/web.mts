@@ -20,13 +20,13 @@
  * @example
  * ```ts
  * // Type-safe HTTP client
- * interface RequestConfig {
+ * type RequestConfig = Readonly<{
  *   method: HTTPRequestMethod;
  *   url: string;
  *   data?: unknown;
- * }
+ * }>;
  *
- * const makeRequest = (config: RequestConfig) => {
+ * const makeRequest = (_config: RequestConfig): void => {
  *   // Implementation here
  * };
  *

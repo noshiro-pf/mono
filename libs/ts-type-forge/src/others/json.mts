@@ -7,10 +7,10 @@ import { type MutableRecord, type ReadonlyRecord } from './std.mjs';
  *
  * @example
  * ```ts
- * const jsonString: JsonPrimitive = "hello";     // ✓ valid
- * const jsonNumber: JsonPrimitive = 42;          // ✓ valid
- * const jsonBoolean: JsonPrimitive = true;       // ✓ valid
- * const jsonNull: JsonPrimitive = null;          // ✓ valid
+ * const jsonString: JsonPrimitive = 'hello'; // ✓ valid
+ * const jsonNumber: JsonPrimitive = 42; // ✓ valid
+ * const jsonBoolean: JsonPrimitive = true; // ✓ valid
+ * const jsonNull: JsonPrimitive = null; // ✓ valid
  * // const invalid: JsonPrimitive = undefined;   // ✗ error
  * ```
  */
@@ -28,19 +28,28 @@ export type JsonPrimitive = boolean | number | string | null;
  * ```ts
  * const apiPayload: MutableJsonValue = {
  *   user: {
- *     name: "John Doe",
+ *     name: 'John Doe',
  *     age: 30,
- *     preferences: ["dark-mode", "notifications"]
- *   }
+ *     preferences: ['dark-mode', 'notifications'],
+ *   },
  * };
  *
  * // Can modify the structure
- * if (typeof apiPayload === 'object' && apiPayload !== null && 'user' in apiPayload) {
- *   const user = apiPayload.user as MutableJsonValue;
- *   if (typeof user === 'object' && user !== null && 'age' in user) {
- *     (user as any).age = 31; // Update age
+ * const updateAge = (payload: MutableJsonValue): void => {
+ *   if (
+ *     typeof payload !== 'object' ||
+ *     payload === null ||
+ *     Array.isArray(payload)
+ *   ) {
+ *     return;
  *   }
- * }
+ *   const user = payload['user'];
+ *   if (typeof user === 'object' && user !== null && !Array.isArray(user)) {
+ *     user['age'] = 31; // Update age
+ *   }
+ * };
+ *
+ * updateAge(apiPayload);
  * ```
  */
 export type MutableJsonValue =
@@ -65,17 +74,16 @@ export type MutableJsonValue =
  * const apiResponse: JsonValue = {
  *   data: {
  *     users: [
- *       { id: 1, name: "Alice" },
- *       { id: 2, name: "Bob" }
- *     ]
+ *       { id: 1, name: 'Alice' },
+ *       { id: 2, name: 'Bob' },
+ *     ],
  *   },
- *   meta: { total: 2, page: 1 }
+ *   meta: { total: 2, page: 1 },
  * };
  *
  * // Type-safe JSON parsing
- * const parseConfig = (jsonString: string): JsonValue => {
- *   return JSON.parse(jsonString) as JsonValue;
- * };
+ * const parseConfig = (jsonString: string): JsonValue =>
+ *   JSON.parse(jsonString) as JsonValue;
  *
  * // apiResponse.data.users.push({...}); // ✗ Error: readonly array
  * ```
@@ -96,11 +104,11 @@ export type JsonValue =
  * ```ts
  * const config: JsonObject = {
  *   database: {
- *     host: "localhost",
+ *     host: 'localhost',
  *     port: 5432,
- *     ssl: true
+ *     ssl: true,
  *   },
- *   features: ["auth", "logging"]
+ *   features: ['auth', 'logging'],
  * };
  *
  * // config.database.port = 3306; // ✗ Error: readonly property
@@ -116,12 +124,12 @@ export type JsonObject = ReadonlyRecord<string, JsonValue>;
  * @example
  * ```ts
  * const builder: MutableJsonObject = {};
- * builder.timestamp = Date.now();
- * builder.data = { message: "Hello" };
- * builder.tags = ["info", "user-action"];
+ * builder['timestamp'] = Date.now();
+ * builder['data'] = { message: 'Hello' };
+ * builder['tags'] = ['info', 'user-action'];
  *
  * // All modifications are allowed
- * builder.data = { message: "Updated" }; // ✓ valid
+ * builder['data'] = { message: 'Updated' }; // ✓ valid
  * ```
  */
 export type MutableJsonObject = MutableRecord<string, MutableJsonValue>;

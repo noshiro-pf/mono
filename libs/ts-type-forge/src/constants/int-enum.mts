@@ -12,12 +12,11 @@ import {
  *
  * @example
  * ```ts
- * type RedChannel = Uint8;   // 0-255 for RGB red component
- * type ByteValue = Uint8;    // Single byte representation
+ * type RedChannel = Uint8; // 0-255 for RGB red component
+ * type ByteValue = Uint8; // Single byte representation
  *
- * const isValidUint8 = (value: number): value is Uint8 => {
- *   return Number.isInteger(value) && value >= 0 && value <= 255;
- * };
+ * const isValidUint8 = (value: number): value is Uint8 =>
+ *   Number.isInteger(value) && value >= 0 && value <= 255;
  * ```
  */
 export type Uint8 = Index<256>;
@@ -33,9 +32,8 @@ export type Uint8 = Index<256>;
  * ```ts
  * type NineBitValue = Uint9;
  *
- * const validate9Bit = (value: number): value is Uint9 => {
- *   return Number.isInteger(value) && value >= 0 && value <= 511;
- * };
+ * const validate9Bit = (value: number): value is Uint9 =>
+ *   Number.isInteger(value) && value >= 0 && value <= 511;
  * ```
  */
 export type Uint9 = Index<512>;
@@ -49,12 +47,11 @@ export type Uint9 = Index<512>;
  *
  * @example
  * ```ts
- * type TenBitColor = Uint10;  // 10-bit color depth
- * type PortNumber = Uint10;   // Some port ranges
+ * type TenBitColor = Uint10; // 10-bit color depth
+ * type PortNumber = Uint10; // Some port ranges
  *
- * const isValid10Bit = (value: number): value is Uint10 => {
- *   return Number.isInteger(value) && value >= 0 && value <= 1023;
- * };
+ * const isValid10Bit = (value: number): value is Uint10 =>
+ *   Number.isInteger(value) && value >= 0 && value <= 1023;
  * ```
  */
 export type Uint10 = Index<1024>;
@@ -87,14 +84,26 @@ export type Int10 = Readonly<Index<512> | NegativeIndex<512>>;
  * @example
  * ```ts
  * const getMonthName = (month: MonthEnum): string => {
- *   const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
- *                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
- *   return names[month - 1]; // Convert to 0-based for array access
+ *   const names = [
+ *     'Jan',
+ *     'Feb',
+ *     'Mar',
+ *     'Apr',
+ *     'May',
+ *     'Jun',
+ *     'Jul',
+ *     'Aug',
+ *     'Sep',
+ *     'Oct',
+ *     'Nov',
+ *     'Dec',
+ *   ];
+ *   return names[month - 1] ?? ''; // Convert to 0-based for array access
  * };
  *
- * type January = 1 satisfies MonthEnum;
- * type December = 12 satisfies MonthEnum;
- * // type Invalid = 13; // Error: not assignable to MonthEnum
+ * const january = 1 satisfies MonthEnum;
+ * const december = 12 satisfies MonthEnum;
+ * // const invalid = 13 satisfies MonthEnum; // Error: not assignable to MonthEnum
  * ```
  */
 export type MonthEnum = Exclude<Index<13>, 0>;
@@ -108,15 +117,15 @@ export type MonthEnum = Exclude<Index<13>, 0>;
  *
  * @example
  * ```ts
- * const createDate = (year: number, month: MonthIndexEnum, day: number) => {
- *   return new Date(year, month, day); // month is 0-based in Date constructor
- * };
+ * const createDate = (year: number, month: MonthIndexEnum, day: number) =>
+ *   new Date(year, month, day);
  *
- * const januaryDate = createDate(2024, 0, 1);  // January 1, 2024
+ * const januaryDate = createDate(2024, 0, 1); // January 1, 2024
  * const decemberDate = createDate(2024, 11, 31); // December 31, 2024
  *
  * // Convert from 1-based to 0-based
- * const toMonthIndex = (month: MonthEnum): MonthIndexEnum => (month - 1) as MonthIndexEnum;
+ * const toMonthIndex = (month: MonthEnum): MonthIndexEnum =>
+ *   (month - 1) as MonthIndexEnum;
  * ```
  */
 export type MonthIndexEnum = Index<12>;
@@ -151,9 +160,8 @@ export type DayOfWeekName =
  *
  * @example
  * ```ts
- * const formatHour = (hour: HoursEnum): string => {
- *   return hour.toString().padStart(2, '0');
- * };
+ * const formatHour = (hour: HoursEnum): string =>
+ *   hour.toString().padStart(2, '0');
  *
  * const is12HourFormat = (hour: HoursEnum): string => {
  *   if (hour === 0) return '12 AM';
@@ -162,9 +170,9 @@ export type DayOfWeekName =
  *   return `${hour - 12} PM`;
  * };
  *
- * type Midnight = 0 satisfies HoursEnum;
- * type Noon = 12 satisfies HoursEnum;
- * type ElevenPM = 23 satisfies HoursEnum;
+ * const midnight = 0 satisfies HoursEnum;
+ * const noon = 12 satisfies HoursEnum;
+ * const elevenPM = 23 satisfies HoursEnum;
  * ```
  */
 export type HoursEnum = Index<24>;
@@ -209,15 +217,15 @@ export type Sexagesimal = Index<60>;
  *
  * const formatPercent = (value: Percent): string => `${value}%`;
  *
- * type FullProgress = 100 satisfies Percent;
- * type HalfProgress = 50 satisfies Percent;
- * type NoProgress = 0 satisfies Percent;
+ * const fullProgress = 100 satisfies Percent;
+ * const halfProgress = 50 satisfies Percent;
+ * const noProgress = 0 satisfies Percent;
  *
  * // Usage in progress bars, loading indicators, etc.
- * interface ProgressBarProps {
+ * type ProgressBarProps = {
  *   progress: Percent;
  *   showLabel?: boolean;
- * }
+ * };
  * ```
  */
 export type Percent = Index<101>;

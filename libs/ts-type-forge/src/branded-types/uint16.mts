@@ -11,7 +11,7 @@ import { type Uint32 } from './uint32.mjs';
  * @example
  * ```ts
  * const isUint16 = (x: number): x is Uint16 =>
- *   Number.isSafeInteger(x) && x >= 0 && x <= 2**16 - 1;
+ *   Number.isSafeInteger(x) && x >= 0 && x <= 2 ** 16 - 1;
  *
  * const port = (num: Uint16) => ({ port: num });
  * const characterCode = (code: Uint16) => String.fromCharCode(code);
@@ -29,7 +29,7 @@ export type Uint16 = TSTypeForgeInternals_ExtendNumberBrand<
  * @example
  * ```ts
  * const isPositiveUint16 = (x: number): x is PositiveUint16 =>
- *   Number.isSafeInteger(x) && x > 0 && x <= 2**16 - 1;
+ *   Number.isSafeInteger(x) && x > 0 && x <= 2 ** 16 - 1;
  *
  * const tcpPort = (port: PositiveUint16) => ({ port });
  * ```
@@ -44,7 +44,7 @@ export type PositiveUint16 = IntersectBrand<Uint16, PositiveNumber>;
  * @example
  * ```ts
  * const isNonZeroUint16 = (x: number): x is NonZeroUint16 =>
- *   Number.isSafeInteger(x) && x > 0 && x <= 2**16 - 1;
+ *   Number.isSafeInteger(x) && x > 0 && x <= 2 ** 16 - 1;
  *
  * const networkId = (id: NonZeroUint16) => ({ networkId: id });
  * ```

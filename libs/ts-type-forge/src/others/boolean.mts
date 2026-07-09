@@ -9,7 +9,7 @@ import { type TypeEq } from '../condition/index.mjs';
  *
  * @example
  * ```ts
- * type Result1 = BoolNot<true>;  // false
+ * type Result1 = BoolNot<true>; // false
  * type Result2 = BoolNot<false>; // true
  *
  * // Useful in conditional types
@@ -19,7 +19,7 @@ import { type TypeEq } from '../condition/index.mjs';
  *     : never
  *   : true;
  *
- * type Test1 = IsDisabled<{ enabled: true }>;  // false
+ * type Test1 = IsDisabled<{ enabled: true }>; // false
  * type Test2 = IsDisabled<{ enabled: false }>; // true
  * ```
  */
@@ -41,13 +41,13 @@ export type BoolNot<A extends boolean> =
  *
  * @example
  * ```ts
- * type T_T = BoolAnd<true, true>;   // true
- * type T_F = BoolAnd<true, false>;  // false
- * type F_T = BoolAnd<false, true>;  // false
+ * type T_T = BoolAnd<true, true>; // true
+ * type T_F = BoolAnd<true, false>; // false
+ * type F_T = BoolAnd<false, true>; // false
  * type F_F = BoolAnd<false, false>; // false
  *
  * // Useful for combining conditions
- * type HasBothFlags<T> = T extends { flagA: infer A, flagB: infer B }
+ * type HasBothFlags<T> = T extends { flagA: infer A; flagB: infer B }
  *   ? A extends boolean
  *     ? B extends boolean
  *       ? BoolAnd<A, B>
@@ -82,13 +82,13 @@ export type BoolAnd<A extends boolean, B extends boolean> =
  *
  * @example
  * ```ts
- * type T_T = BoolOr<true, true>;   // true
- * type T_F = BoolOr<true, false>;  // true
- * type F_T = BoolOr<false, true>;  // true
+ * type T_T = BoolOr<true, true>; // true
+ * type T_F = BoolOr<true, false>; // true
+ * type F_T = BoolOr<false, true>; // true
  * type F_F = BoolOr<false, false>; // false
  *
  * // Useful for fallback conditions
- * type HasAnyFlag<T> = T extends { flagA: infer A, flagB: infer B }
+ * type HasAnyFlag<T> = T extends { flagA: infer A; flagB: infer B }
  *   ? A extends boolean
  *     ? B extends boolean
  *       ? BoolOr<A, B>

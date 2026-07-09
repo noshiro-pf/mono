@@ -15,21 +15,21 @@ import { type List, type MakeTuple } from '../tuple-and-list/index.mjs';
  *
  * @example
  * ```ts
- * type Five = Increment<4>;  // 5
- * type One = Increment<0>;   // 1
- * type Ten = Increment<9>;   // 10
+ * type Five = Increment<4>; // 5
+ * type One = Increment<0>; // 1
+ * type Ten = Increment<9>; // 10
  *
  * // Useful in recursive type computations
- * type CountToN<N extends number, Count extends number = 0> =
- *   Count extends N ? Count : CountToN<N, Increment<Count>>;
+ * type CountToN<N extends number, Count extends number = 0> = Count extends N
+ *   ? Count
+ *   : CountToN<N, Increment<Count> & number>;
  *
  * type UpTo5 = CountToN<5>; // 5
  *
  * // Building sequences
- * type Range<From extends number, To extends number> =
- *   From extends To
- *     ? From
- *     : From | Range<Increment<From>, To>;
+ * type Range<From extends number, To extends number> = From extends To
+ *   ? From
+ *   : From | Range<Increment<From> & number, To>;
  *
  * type OneToFive = Range<1, 5>; // 1 | 2 | 3 | 4 | 5
  * ```
@@ -55,20 +55,24 @@ export type Increment<N extends number> = (readonly [
  * @example
  * ```ts
  * type Three = Decrement<4>; // 3
- * type Zero = Decrement<1>;  // 0
- * type Four = Decrement<5>;  // 4
+ * type Zero = Decrement<1>; // 0
+ * type Four = Decrement<5>; // 4
  *
  * // type Error = Decrement<0>; // ⚠️ Error: will fail or return unexpected result
  *
  * // Useful in countdown scenarios
- * type Countdown<N extends number> =
- *   N extends 0 ? 0 : N | Countdown<Decrement<N>>;
+ * type Countdown<N extends number> = N extends 0
+ *   ? 0
+ *   : N | Countdown<Decrement<N>>;
  *
  * type CountdownFrom3 = Countdown<3>; // 3 | 2 | 1 | 0
  *
  * // Bounds checking
- * type IsPositive<N extends number> =
- *   N extends 0 ? false : N extends Decrement<Increment<N>> ? true : false;
+ * type IsPositive<N extends number> = N extends 0
+ *   ? false
+ *   : N extends Decrement<Increment<N> & number>
+ *     ? true
+ *     : false;
  * ```
  */
 export type Decrement<N extends number> = List.Tail<MakeTuple<0, N>>['length'];

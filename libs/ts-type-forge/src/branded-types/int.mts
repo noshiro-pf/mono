@@ -18,11 +18,15 @@ import { type WithSmallInt } from './small-int.mjs';
  * ```ts
  * const isInt = (x: number): x is Int => Number.isInteger(x);
  *
- * const getArrayElement = <T>(arr: readonly T[], index: Int & NonNegativeNumber) =>
- *   arr[index];
+ * const getArrayElement = <T,>(
+ *   arr: readonly T[],
+ *   index: Int & NonNegativeNumber,
+ * ) => arr[index];
  *
  * const factorial = (n: Int & NonNegativeNumber): Int =>
- *   n === 0 ? 1 as Int : (n * factorial((n - 1) as Int & NonNegativeNumber)) as Int;
+ *   n === 0
+ *     ? (1 as Int)
+ *     : ((n * factorial((n - 1) as Int & NonNegativeNumber)) as Int);
  * ```
  */
 export type Int = TSTypeForgeInternals_ExtendNumberBrand<FiniteNumber, 'Int'>;
@@ -37,10 +41,8 @@ export type Int = TSTypeForgeInternals_ExtendNumberBrand<FiniteNumber, 'Int'>;
  *   Number.isInteger(x) && x !== 0;
  *
  * const modulo = (a: Int, b: NonZeroInt) => a % b;
- * const gcd = (a: NonZeroInt, b: NonZeroInt): NonZeroInt => {
- *   // Euclidean algorithm implementation
- *   return (b === 0 ? a : gcd(b, (a % b) as NonZeroInt)) as NonZeroInt;
- * };
+ * const gcd = (a: NonZeroInt, b: NonZeroInt): NonZeroInt =>
+ *   b === 0 ? a : gcd(b, (a % b) as NonZeroInt);
  * ```
  */
 export type NonZeroInt = IntersectBrand<Int, NonZeroNumber>;
@@ -67,11 +69,9 @@ export type NonNegativeInt = IntersectBrand<Int, NonNegativeNumber>;
  *
  * @example
  * ```ts
- * const isUint = (x: number): x is Uint =>
- *   Number.isInteger(x) && x >= 0;
+ * const isUint = (x: number): x is Uint => Number.isInteger(x) && x >= 0;
  *
- * const arrayLength = (arr: readonly unknown[]): Uint =>
- *   arr.length as Uint;
+ * const arrayLength = (arr: readonly unknown[]): Uint => arr.length as Uint;
  *
  * const repeat = (str: string, count: Uint) => str.repeat(count);
  * ```
@@ -87,8 +87,7 @@ export type Uint = NonNegativeInt;
  * const isPositiveInt = (x: number): x is PositiveInt =>
  *   Number.isInteger(x) && x > 0;
  *
- * const take = <T>(arr: readonly T[], n: PositiveInt): T[] =>
- *   arr.slice(0, n);
+ * const take = <T,>(arr: readonly T[], n: PositiveInt): T[] => arr.slice(0, n);
  *
  * const id = (value: PositiveInt) => ({ id: value });
  * ```
@@ -105,7 +104,7 @@ export type PositiveInt = IntersectBrand<Int, PositiveNumber>;
  *   Number.isInteger(x) && x < 0;
  *
  * const offset = (value: NegativeInt) => ({ offset: value });
- * const depth = (level: NegativeInt) => ({ belowGround: -level });
+ * const depth = (level: NegativeInt) => ({ belowGround: Math.abs(level) });
  * ```
  */
 export type NegativeInt = IntersectBrand<Int, NegativeNumber>;

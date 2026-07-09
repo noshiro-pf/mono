@@ -18,6 +18,13 @@ const config = {
   ].map((p) => path.resolve(srcDir, p)),
   out: outDir,
   gitRevision: 'main',
+  // Pin the source link template instead of relying on git-remote
+  // auto-detection, so `pnpm doc` produces identical output regardless of the
+  // local git remote configuration (e.g. proxied clones that rewrite the
+  // GitHub remote URL). This matches the URL TypeDoc derives from the GitHub
+  // origin in CI.
+  sourceLinkTemplate:
+    'https://github.com/noshiro-pf/ts-type-forge/blob/{gitRevision}/{path}#L{line}',
   headings: {
     document: true,
     readme: false,
