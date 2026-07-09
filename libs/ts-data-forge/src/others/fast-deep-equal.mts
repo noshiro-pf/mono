@@ -16,6 +16,16 @@ export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
     return false;
   }
 
+  // Arrays are handled before `isRecord`, which excludes them.
+  if (Array.isArray(a)) {
+    return (
+      Array.isArray(b) &&
+      a.constructor === b.constructor &&
+      a.length === b.length &&
+      a.every((ai, index) => fastDeepEqual(ai, b[index]))
+    );
+  }
+
   if (isRecord(a)) {
     if (!isRecord(b)) {
       return false;
@@ -23,14 +33,6 @@ export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
 
     if (a.constructor !== b.constructor) {
       return false;
-    }
-
-    if (Array.isArray(a)) {
-      return (
-        Array.isArray(b) &&
-        a.length === b.length &&
-        a.every((ai, index) => fastDeepEqual(ai, b[index]))
-      );
     }
 
     if (isMap(a)) {

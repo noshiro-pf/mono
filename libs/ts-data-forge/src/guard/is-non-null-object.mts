@@ -13,8 +13,8 @@
  * - Excludes functions (they have `typeof` === `"function"`, not `"object"`)
  * - Includes arrays, dates, regex, and other object instances
  *
- * **Note:** This function returns `true` for arrays. If you need to check for
- * plain objects specifically (excluding arrays), use `isRecord()` instead.
+ * **Note:** This function returns `true` for arrays. If you need
+ * record-oriented narrowing that excludes arrays, use `isRecord()` instead.
  *
  * @example
  *
@@ -29,7 +29,7 @@
  * @param u - The value to check
  * @returns `true` if `u` is an object and not `null`, `false` otherwise. When
  *   `true`, TypeScript narrows the type to `object`.
- * @see {@link isRecord} - For checking plain objects specifically (excludes arrays)
+ * @see {@link isRecord} - For record-oriented type narrowing (excludes arrays)
  */
 // eslint-disable-next-line @typescript-eslint/no-restricted-types
 export const isNonNullObject = (u: unknown): u is object =>
