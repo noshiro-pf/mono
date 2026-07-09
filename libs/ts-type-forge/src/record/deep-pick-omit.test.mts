@@ -153,7 +153,7 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
   // Union input: members with disjoint keys
   expectType<
     DeepPick<{ a: number } | { b: string }, ['a']>,
-    { a: number } | NonNullable<unknown>
+    NonNullable<unknown> | { a: number }
   >('=');
 
   // Reference: picking a non-existent key produces an empty object type

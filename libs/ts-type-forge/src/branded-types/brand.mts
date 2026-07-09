@@ -121,9 +121,7 @@ export type UnwrapBrandBooleanKeys<B extends UnknownBrand> =
  * ```
  */
 export type UnwrapBrandKeys<B extends UnknownBrand> =
-  | UnwrapBrandBooleanKeys<B>
-  | UnwrapBrandFalseKeys<B>
-  | UnwrapBrandTrueKeys<B>;
+  UnwrapBrandBooleanKeys<B> | UnwrapBrandFalseKeys<B> | UnwrapBrandTrueKeys<B>;
 
 /**
  * Extracts only the brand keys part of a branded type (without the underlying value).
@@ -273,8 +271,7 @@ export type IntersectBrand<
  */
 export type NormalizeBrandUnion<B extends UnknownBrand> = GetBrandValuePart<B> &
   TSTypeForgeInternals_BrandEncapsulated<{
-    readonly [key in Exclude<
-      UnwrapBrandKeys<B>,
-      UnwrapBrandBooleanKeys<B>
-    >]: B[key];
+    readonly [
+      key in Exclude<UnwrapBrandKeys<B>, UnwrapBrandBooleanKeys<B>>
+    ]: B[key];
   }>;

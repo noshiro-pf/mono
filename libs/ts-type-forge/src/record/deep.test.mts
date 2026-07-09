@@ -43,14 +43,14 @@ type PartialBase = {
   a?: number;
   b?: string | undefined;
   c?:
+    | undefined
     | {
         d?: boolean;
         e?: (number | undefined)[];
         f?: string;
         g?: Map<string, number>;
         h?: Set<boolean>;
-      }
-    | undefined;
+      };
   i?: [number?, string?, { j?: bigint }?];
   k?: (x: number) => string;
   l?: null;

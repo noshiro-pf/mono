@@ -98,7 +98,7 @@ export const genTypeDefinitions = async (): Promise<void> => {
   const newContent = content.replaceAll(
     // eslint-disable-next-line security/detect-non-literal-regexp
     new RegExp(String.raw`${markers.start}[.\s\S]*${markers.end}`, 'gu'),
-    `${markers.start}\n${result}\n\n${markers.end}`,
+    () => `${markers.start}\n${result}\n\n${markers.end}`,
   );
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename

@@ -138,13 +138,7 @@ export type DayOfWeekIndex = Index<7>;
  * A union of string literals: `'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat'`.
  */
 export type DayOfWeekName =
-  | 'Sun'
-  | 'Mon'
-  | 'Tue'
-  | 'Wed'
-  | 'Thr'
-  | 'Fri'
-  | 'Sat';
+  'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thr' | 'Fri' | 'Sat';
 
 /**
  * Represents the hours in a day using 24-hour format.

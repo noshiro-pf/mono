@@ -33,8 +33,8 @@ export const extractTypeExports = (content: string): FileExports => {
   // may contain apostrophes (e.g. "shouldn't") that the string-skip logic
   // below would otherwise misread as a string opener.
   const cleaned = content
-    .replaceAll(/\/\*[\s\S]*?\*\//gu, blankNonNewlines)
-    .replaceAll(/\/\/[^\n]*/gu, blankNonNewlines);
+    .replaceAll(/\/\*[\s\S]*?\*\//gu, (m) => blankNonNewlines(m))
+    .replaceAll(/\/\/[^\n]*/gu, (m) => blankNonNewlines(m));
 
   const lineOf = (idx: number): number =>
     countOccurrences(cleaned.slice(0, idx), '\n') + 1;
@@ -344,25 +344,12 @@ const findMatchingGt = (content: string, startIdx: number): number => {
       continue;
     }
 
-    switch (ch) {
-      case '<': {
-        mut_depth += 1;
+    if (ch === '<') mut_depth += 1;
 
-        break;
-      }
-      case '>': {
-        mut_depth -= 1;
+    if (ch === '>') {
+      mut_depth -= 1;
 
-        if (mut_depth === 0) return mut_i + 1;
-
-        break;
-      }
-
-      case undefined:
-        break;
-
-      default:
-        break;
+      if (mut_depth === 0) return mut_i + 1;
     }
 
     mut_i += 1;
@@ -396,7 +383,7 @@ const extractParamNames = (generic: string): readonly string[] => {
 
   if (mut_curr.trim() !== '') mut_params.push(mut_curr.trim());
 
-  return mut_params.map((p) => (p.split(/[\s=]/u)[0] ?? '').trim());
+  return mut_params.map((p) => (p.split(/[\s=]/u, 1)[0] ?? '').trim());
 };
 
 const countOccurrences = (haystack: string, needle: string): number => {

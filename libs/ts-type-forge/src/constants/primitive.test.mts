@@ -84,7 +84,7 @@ type OnlyPrimitives<T> = T extends Primitive ? T : never;
 
 expectType<OnlyPrimitives<string | object>, string>('=');
 
-expectType<OnlyPrimitives<number | {} | boolean>, number | boolean>('=');
+expectType<OnlyPrimitives<number | boolean | {}>, number | boolean>('=');
 
 expectType<OnlyPrimitives<Date | string | (() => void) | null>, string | null>(
   '=',
@@ -95,7 +95,7 @@ type OnlyObjects<T> = T extends Primitive ? never : T;
 
 expectType<OnlyObjects<string | object>, object>('=');
 
-expectType<OnlyObjects<number | {} | boolean>, {}>('=');
+expectType<OnlyObjects<number | boolean | {}>, {}>('=');
 
 expectType<
   OnlyObjects<Date | string | (() => void) | null>,
