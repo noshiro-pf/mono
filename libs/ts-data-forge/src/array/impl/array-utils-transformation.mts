@@ -651,8 +651,7 @@ export function partition<
   E,
 >(
   ...args:
-    | readonly [array: readonly E[], chunkSize: N]
-    | readonly [chunkSize: N]
+    readonly [array: readonly E[], chunkSize: N] | readonly [chunkSize: N]
 ):
   | readonly (readonly E[])[]
   | ((array: readonly E[]) => readonly (readonly E[])[]) {

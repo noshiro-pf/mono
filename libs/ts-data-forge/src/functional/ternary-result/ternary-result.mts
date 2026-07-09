@@ -39,16 +39,12 @@ export type TernaryErr<E> = Readonly<{
  * Represents a value that can be `Ok`, `Warn`, or `Err`.
  */
 export type TernaryResult<S, E, W = E> =
-  | TernaryOk<S>
-  | TernaryWarn<S, W>
-  | TernaryErr<E>;
+  TernaryOk<S> | TernaryWarn<S, W> | TernaryErr<E>;
 
 /**
  * Base type for any `TernaryResult`, used for generic constraints.
  */
 export type UnknownTernaryResult =
-  | TernaryOk<unknown>
-  | TernaryWarn<unknown, unknown>
-  | TernaryErr<unknown>;
+  TernaryOk<unknown> | TernaryWarn<unknown, unknown> | TernaryErr<unknown>;
 
 export * as TernaryResult from './impl/index.mjs';

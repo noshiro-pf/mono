@@ -71,9 +71,8 @@ import { type TypeEq, type TypeExtends } from 'ts-type-forge';
 export const expectType = <A, B>(
   _relation: TypeEq<A, B> extends true
     ? '<=' | '=' | '>=' | '~='
-    :
-        | '!='
-        | (TypeExtends<A, B> extends true
-            ? '<=' | (TypeExtends<B, A> extends true ? '>=' | '~=' : '!>=')
-            : '!<=' | (TypeExtends<B, A> extends true ? '>=' : '!>=')),
+    : | '!='
+      | (TypeExtends<A, B> extends true
+          ? '<=' | (TypeExtends<B, A> extends true ? '>=' | '~=' : '!>=')
+          : '!<=' | (TypeExtends<B, A> extends true ? '>=' : '!>=')),
 ): void => undefined;

@@ -15,32 +15,36 @@ type MergeTwo<A extends UnknownRecord, B extends UnknownRecord> = {
   readonly [K in keyof B as {} extends Pick<B, K> ? never : K]: B[K];
 } & {
   // 2. Optional properties from B that are NOT in A
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  readonly [K in keyof B as {} extends Pick<B, K>
-    ? K extends keyof A
-      ? never
-      : K
-    : never]?: B[K];
+  readonly [
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    K in keyof B as {} extends Pick<B, K>
+      ? K extends keyof A
+        ? never
+        : K
+      : never
+  ]?: B[K];
 } & {
   // 3. Optional properties from B that ARE in A (create union)
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  readonly [K in keyof B as {} extends Pick<B, K>
-    ? K extends keyof A
-      ? K
+  readonly [
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    K in keyof B as {} extends Pick<B, K>
+      ? K extends keyof A
+        ? K
+        : never
       : never
-    : never]?: K extends keyof A ? A[K] | B[K] : never;
+  ]?: K extends keyof A ? A[K] | B[K] : never;
 } & {
   // 4. Required properties only in A (not overridden by B)
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  readonly [K in Exclude<keyof A, keyof B> as {} extends Pick<A, K>
-    ? never
-    : K]: A[K];
+  readonly [
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    K in Exclude<keyof A, keyof B> as {} extends Pick<A, K> ? never : K
+  ]: A[K];
 } & {
   // 5. Optional properties only in A (not overridden by B)
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  readonly [K in Exclude<keyof A, keyof B> as {} extends Pick<A, K>
-    ? K
-    : never]?: A[K];
+  readonly [
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    K in Exclude<keyof A, keyof B> as {} extends Pick<A, K> ? K : never
+  ]?: A[K];
 } extends infer O
   ? Readonly<
       {

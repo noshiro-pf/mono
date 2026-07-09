@@ -185,15 +185,7 @@ export namespace TsDataForgeInternals {
       }>;
 
     type BaseKeys =
-      | 'add'
-      | 'div'
-      | 'is'
-      | 'max'
-      | 'min'
-      | 'mul'
-      | 'pow'
-      | 'random'
-      | 'sub';
+      'add' | 'div' | 'is' | 'max' | 'min' | 'mul' | 'pow' | 'random' | 'sub';
 
     type FloatMethods = 'ceil' | 'floor' | 'round';
 

@@ -228,9 +228,7 @@ describe('Arr validations', () => {
 
       test('should handle union of array types', () => {
         type MixedArrayUnion =
-          | readonly string[]
-          | readonly number[]
-          | readonly boolean[];
+          readonly string[] | readonly number[] | readonly boolean[];
 
         const mixedArray: MixedArrayUnion = [1, 2, 3] as const;
 
