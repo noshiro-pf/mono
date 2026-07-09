@@ -25,8 +25,8 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
 
   const typeName = options?.typeName ?? 'tuple';
 
-  const getDefaultValue = memoizeFunction(
-    (): MapTuple<A> => Arr.map(types, (t) => t.defaultValue),
+  const getDefaultValue = memoizeFunction((): MapTuple<A> =>
+    Arr.map(types, (t) => t.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {

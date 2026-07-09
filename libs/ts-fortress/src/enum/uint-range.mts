@@ -33,9 +33,11 @@ export const uintRange = <
   );
 
   const validate: Type<T>['validate'] = (a) => {
-    if (
-      !(isNumber(a) && Number.isSafeInteger(a) && Num.isInRange(start, end)(a))
-    ) {
+    if (!(
+      isNumber(a) &&
+      Number.isSafeInteger(a) &&
+      Num.isInRange(start, end)(a)
+    )) {
       return Result.err([
         {
           path: [],

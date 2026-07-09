@@ -54,28 +54,27 @@ export const brand = <
   const validate: Type<T>['validate'] = (a) =>
     pipe(a)
       .map(baseType.validate)
-      .map(
-        (res): Result<T, readonly ValidationError[]> =>
-          Result.isErr(res)
-            ? res
-            : is(res.value)
-              ? Result.ok(res.value satisfies T)
-              : Result.err([
-                  {
-                    path: [],
-                    actualValue: res.value,
-                    expectedType: typeNameFilled,
-                    typeName: typeNameFilled,
-                    details:
-                      // If typeName is specified, it will be used in the error message, so no further information is required.
-                      typeName === undefined
-                        ? {
-                            kind: 'brand' as const,
-                            description: brandKeysStr,
-                          }
-                        : undefined,
-                  } satisfies ValidationError,
-                ]),
+      .map((res): Result<T, readonly ValidationError[]> =>
+        Result.isErr(res)
+          ? res
+          : is(res.value)
+            ? Result.ok(res.value satisfies T)
+            : Result.err([
+                {
+                  path: [],
+                  actualValue: res.value,
+                  expectedType: typeNameFilled,
+                  typeName: typeNameFilled,
+                  details:
+                    // If typeName is specified, it will be used in the error message, so no further information is required.
+                    typeName === undefined
+                      ? {
+                          kind: 'brand' as const,
+                          description: brandKeysStr,
+                        }
+                      : undefined,
+                } satisfies ValidationError,
+              ]),
       ).value;
 
   return createType({

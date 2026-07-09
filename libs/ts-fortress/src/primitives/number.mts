@@ -152,12 +152,7 @@ type ConstraintsToResultBrandKeys<C extends Constraints> =
   | (C extends Readonly<{ positive: true }>
       ? Readonly<{
           brandKeys:
-            | '>=0'
-            | '!=0'
-            | '> -2^16'
-            | '> -2^32'
-            | '>= -2^15'
-            | '>= -2^31';
+            '>=0' | '!=0' | '> -2^16' | '> -2^32' | '>= -2^15' | '>= -2^31';
           brandFalseKeys: '<=0' | 'NaNValue';
         }>
       : never)

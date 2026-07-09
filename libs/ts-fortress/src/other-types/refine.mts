@@ -24,20 +24,19 @@ export const refine = <
   const validate: Type<R>['validate'] = (a) =>
     pipe(a)
       .map(baseType.validate)
-      .map(
-        (res): Result<R, readonly ValidationError[]> =>
-          Result.isErr(res)
-            ? res
-            : is(res.value)
-              ? Result.ok(res.value)
-              : Result.err([
-                  createPrimitiveValidationError({
-                    actualValue: a,
-                    expectedType: typeName,
-                    typeName,
-                    details: undefined,
-                  }),
-                ]),
+      .map((res): Result<R, readonly ValidationError[]> =>
+        Result.isErr(res)
+          ? res
+          : is(res.value)
+            ? Result.ok(res.value)
+            : Result.err([
+                createPrimitiveValidationError({
+                  actualValue: a,
+                  expectedType: typeName,
+                  typeName,
+                  details: undefined,
+                }),
+              ]),
       ).value;
 
   return createType({
