@@ -1,3 +1,20 @@
+# [5.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v4.0.0...v5.0.0) (2026-07-09)
+
+- feat!: add length-constrained branded string types and redefine NonEmptyString ([#406](https://github.com/noshiro-pf/ts-type-forge/issues/406)) ([0cbec25](https://github.com/noshiro-pf/ts-type-forge/commit/0cbec25b25dda25162db26046b73d304eb3dd418))
+
+### BREAKING CHANGES
+
+- `NonEmptyString` no longer carries the `'NonEmptyString'`
+  brand key. It is now `Brand`-compatible with `MinLengthString<1>` instead
+  of a standalone `Brand<string, 'NonEmptyString'>`. Values that were cast to
+  `NonEmptyString` via the old brand key, or code that inspected the brand
+  keys (e.g. `UnwrapBrandTrueKeys`), will observe a different brand shape.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01VfbfUoEnhGNsnmmbb8w9TB
+
+- refactor: re-organize src files
+
 # [4.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v3.2.0...v4.0.0) (2026-06-27)
 
 ### Features
