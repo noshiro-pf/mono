@@ -1,3 +1,9 @@
+# [9.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v9.0.0...v9.1.0) (2026-07-10)
+
+### Features
+
+- add prune method to Type ([#333](https://github.com/noshiro-pf/ts-fortress/issues/333)) ([508b01f](https://github.com/noshiro-pf/ts-fortress/commit/508b01fa0a48b72511ce9c1167d9392d44dc45d2))
+
 # [9.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.5.2...v9.0.0) (2026-07-10)
 
 ## [8.5.2](https://github.com/noshiro-pf/ts-fortress/compare/v8.5.1...v8.5.2) (2026-07-09)
