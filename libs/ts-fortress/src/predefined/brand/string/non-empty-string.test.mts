@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type NonEmptyString } from 'ts-type-forge';
+import { type MinLengthString, type NonEmptyString } from 'ts-type-forge';
 import { type TypeOf } from '../../../type.mjs';
 import { type Email } from './email.mjs';
 import { type Iso8601 } from './iso-8601.mjs';
@@ -57,8 +57,9 @@ describe('nonEmptyString with extra constraints', () => {
   test('forwards constraints to string and still enforces non-emptiness', () => {
     const t = nonEmptyString('abcd', { minLength: 3 });
 
-    // Non-refining constraints (e.g. `minLength`) keep a plain `NonEmptyString`.
-    expectType<TypeOf<typeof t>, NonEmptyString>('=');
+    // Length constraints (e.g. `minLength`) refine the result type with the
+    // corresponding length-constrained brand.
+    expectType<TypeOf<typeof t>, NonEmptyString & MinLengthString<3>>('=');
 
     assert.isTrue(t.is('abcd'));
 

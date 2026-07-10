@@ -14,7 +14,9 @@ Slug.is('feature-beta'); // true
 
 Slug.is('Feature-Flag'); // false (fails regex)
 
-type SlugType = t.TypeOf<typeof Slug>; // inferred as `feature${string}`
+type SlugType = t.TypeOf<typeof Slug>;
+// inferred as a `feature${string}` template literal branded with
+// `NonEmptyString`, `MinLengthString<6>` and `MaxLengthString<32>`
 
 // embed-sample-code-ignore-below
 export { type SlugType };

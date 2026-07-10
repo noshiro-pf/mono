@@ -76,8 +76,8 @@
   },
   "dependencies": {
     "@sindresorhus/is": "^8.1.0",
-    "ts-data-forge": "^7.1.1",
-    "ts-type-forge": "^4.0.0"
+    "ts-data-forge": "^9.0.0",
+    "ts-type-forge": "^5.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",

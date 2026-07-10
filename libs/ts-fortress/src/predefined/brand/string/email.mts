@@ -1,10 +1,11 @@
-import { type Brand } from 'ts-type-forge';
+import { type Brand, type NonEmptyString } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-// A valid e-mail address is always non-empty, so it also satisfies `NonEmptyString`.
-export type Email = Brand<string, 'Email' | 'NonEmptyString'>;
+// A valid e-mail address is always non-empty, so `Email` is branded on top of
+// `NonEmptyString` and is assignable to it.
+export type Email = Brand<NonEmptyString, 'Email'>;
 
 /**
  * @link https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
@@ -16,11 +17,12 @@ export const email = (
     }>
   >,
 ): Type<Email> =>
-  brand({
-    baseType: string(options?.defaultValue ?? defaultEmail),
+  brand<NonEmptyString, readonly ['Email']>({
+    baseType: string(options?.defaultValue ?? defaultEmail, {
+      nonempty: true,
+    }),
     is: (s): s is Email => regexpEmailAddress.test(s),
-    defaultValue: options?.defaultValue ?? defaultEmail,
-    brandKeys: ['Email', 'NonEmptyString'],
+    brandKeys: ['Email'],
     typeName: 'Email',
   });
 

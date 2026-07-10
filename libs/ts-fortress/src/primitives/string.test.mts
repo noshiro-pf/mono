@@ -1,7 +1,12 @@
 /* cSpell:disable */
 
 import { expectType, Result } from 'ts-data-forge';
-import { type NonEmptyString } from 'ts-type-forge';
+import {
+  type BoundedLengthString,
+  type MaxLengthString,
+  type MinLengthString,
+  type NonEmptyString,
+} from 'ts-type-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import { string } from './string.mjs';
 
@@ -380,7 +385,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('minimum', { minLength: 3 });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<typeof type, Type<MinLengthString<3>>>('=');
 
       assert.isTrue(type.is('hello'));
 
@@ -396,14 +401,20 @@ describe('string with constraints', () => {
       );
     });
 
-    test('negative minLength', () => {
-      const type = string('minimum', { minLength: -1 });
+    test('throws for a minLength less than 1', () => {
+      expect(() => string('minimum', { minLength: -1 })).toThrow(
+        /^minLength constraint for string must be a positive integer, but -1 was passed\.$/u,
+      );
 
-      expectType<typeof type, Type<string>>('=');
+      expect(() => string('minimum', { minLength: 0 })).toThrow(
+        /^minLength constraint for string must be a positive integer, but 0 was passed\.$/u,
+      );
+    });
 
-      assert.isTrue(type.is('hello'));
-
-      assert.isTrue(type.is('hi'));
+    test('throws for a non-integer minLength', () => {
+      expect(() => string('minimum', { minLength: 1.5 })).toThrow(
+        /^minLength constraint for string must be a positive integer, but 1\.5 was passed\.$/u,
+      );
     });
   });
 
@@ -411,7 +422,7 @@ describe('string with constraints', () => {
     test('accepts valid default value', () => {
       const type = string('short', { maxLength: 5 });
 
-      expectType<typeof type, Type<string>>('=');
+      expectType<typeof type, Type<MaxLengthString<5>>>('=');
 
       assert.isTrue(type.is('tiny'));
 
@@ -424,6 +435,76 @@ describe('string with constraints', () => {
         string('too-long', { maxLength: 5 }),
       ).toThrow(
         /^defaultValue "too-long" for string does not satisfy the constraint maxLength = 5$/u,
+      );
+    });
+  });
+
+  describe('minLength/maxLength outside the supported literal range', () => {
+    // Only the number literals `1..39` (`SmallInt<'>0'>`) are encoded in the
+    // result brand. A larger literal or a non-literal `number` collapses the
+    // result type to plain `string` to keep the type-level computation
+    // cheap, while the runtime constraint applies regardless. Non-integer
+    // bounds and bounds less than 1 throw at construction time.
+
+    test('the largest supported literal (39) is encoded in the brand', () => {
+      const type = string('x'.repeat(39), { minLength: 39 });
+
+      expectType<typeof type, Type<MinLengthString<39>>>('=');
+
+      assert.isTrue(type.is('x'.repeat(39)));
+
+      assert.isFalse(type.is('x'.repeat(38)));
+    });
+
+    test('a minLength literal outside the range (>= 40) falls back to plain string', () => {
+      const type = string('x'.repeat(40), { minLength: 40 });
+
+      expectType<typeof type, Type<string>>('=');
+
+      // The runtime constraint still applies.
+      assert.isTrue(type.is('x'.repeat(40)));
+
+      assert.isFalse(type.is('x'.repeat(39)));
+    });
+
+    test('a maxLength literal outside the range (>= 40) falls back to plain string', () => {
+      const type = string('', { maxLength: 100 });
+
+      expectType<typeof type, Type<string>>('=');
+
+      assert.isTrue(type.is('x'.repeat(100)));
+
+      assert.isFalse(type.is('x'.repeat(101)));
+    });
+
+    test('throws for a maxLength less than 1 or a non-integer maxLength', () => {
+      expect(() => string('', { maxLength: 0 })).toThrow(
+        /^maxLength constraint for string must be a positive integer, but 0 was passed\.$/u,
+      );
+
+      expect(() => string('', { maxLength: 2.5 })).toThrow(
+        /^maxLength constraint for string must be a positive integer, but 2\.5 was passed\.$/u,
+      );
+    });
+
+    test('a non-literal bound falls back to plain string', () => {
+      const getBound = (): number => 5;
+
+      const type = string('', { maxLength: getBound() });
+
+      expectType<typeof type, Type<string>>('=');
+
+      assert.isTrue(type.is('12345'));
+
+      assert.isFalse(type.is('123456'));
+    });
+
+    test('the default value is only length-checked at runtime for an out-of-range bound', () => {
+      // With an in-range literal bound, a too-short default is already a
+      // compile error; with an out-of-range bound it compiles and the check
+      // is deferred to runtime.
+      expect(() => string('hi', { minLength: 100 })).toThrow(
+        /^defaultValue "hi" for string does not satisfy the constraint minLength = 100$/u,
       );
     });
   });
@@ -556,7 +637,10 @@ describe('string with constraints', () => {
           maxLength: 8,
         });
 
-        expectType<typeof type, Type<NonEmptyString>>('=');
+        expectType<
+          typeof type,
+          Type<NonEmptyString & BoundedLengthString<3, 8>>
+        >('=');
 
         assert.isTrue(type.is('value'));
 
@@ -635,7 +719,7 @@ describe('string with constraints', () => {
           regex: digits,
         });
 
-        expectType<typeof type, Type<string>>('=');
+        expectType<typeof type, Type<BoundedLengthString<4, 6>>>('=');
 
         assert.isTrue(type.is('6789'));
 

@@ -277,17 +277,20 @@ Slug.is('feature-beta'); // true
 
 Slug.is('Feature-Flag'); // false (fails regex)
 
-type SlugType = t.TypeOf<typeof Slug>; // inferred as `feature${string}`
+type SlugType = t.TypeOf<typeof Slug>;
+// inferred as a `feature${string}` template literal branded with
+// `NonEmptyString`, `MinLengthString<6>` and `MaxLengthString<32>`
 ```
 
 String constraints:
 
-- `startsWith`, `endsWith`, `includes`
-- `lowercase`, `uppercase`, `nonempty`
-- `minLength`, `maxLength`
+- `startsWith`, `endsWith`, `includes` — narrow the result to the corresponding template literal type
+- `lowercase`, `uppercase`
+- `nonempty` — brands the result as `NonEmptyString` (from [ts-type-forge](https://github.com/noshiro-pf/ts-type-forge))
+- `minLength`, `maxLength` — brand the result as `MinLengthString<N>` / `MaxLengthString<N>` (from ts-type-forge), which preserve the natural subtyping between length bounds
 - `regex`
 
-A negative `minLength` is ignored so you can enable or disable the bound dynamically without branching.
+`minLength` / `maxLength` accept plain `number`s, which must be positive integers (`>= 1`) — passing a non-integer or a value less than `1` throws a `TypeError` when the type is constructed. Number literals in the range `1..39` are encoded in the result brand (`MinLengthString<N>` / `MaxLengthString<N>`); larger literals and dynamically computed `number`s are still enforced at runtime, but the result type falls back to plain `string` to keep the type-level computation cheap.
 
 ### Number constraints
 

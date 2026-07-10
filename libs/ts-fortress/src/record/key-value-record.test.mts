@@ -197,8 +197,7 @@ describe(keyValueRecord, () => {
 
       assert.isFalse(strNumRecord.is('string'));
 
-      // Empty array is actually treated as empty object (valid)
-      assert.isTrue(strNumRecord.is([]));
+      assert.isFalse(strNumRecord.is([]));
     });
 
     test('rejects record with invalid key types', () => {

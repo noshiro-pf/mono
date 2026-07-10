@@ -1,12 +1,12 @@
 import { isNonNullObject } from 'ts-data-forge';
-import { type Brand } from 'ts-type-forge';
+import { type Brand, type NonEmptyString } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { string } from '../../../primitives/index.mjs';
 import { type Type } from '../../../type.mjs';
 
-// A valid JSON string (an object or array literal) is always non-empty, so it
-// also satisfies `NonEmptyString`.
-export type JsonString = Brand<string, 'JsonString' | 'NonEmptyString'>;
+// A valid JSON string (an object or array literal) is always non-empty, so
+// `JsonString` is branded on top of `NonEmptyString` and is assignable to it.
+export type JsonString = Brand<NonEmptyString, 'JsonString'>;
 
 /**
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators
@@ -18,11 +18,12 @@ export const jsonString = (
     }>
   >,
 ): Type<JsonString> =>
-  brand({
-    baseType: string(options?.defaultValue ?? defaultJsonString),
+  brand<NonEmptyString, readonly ['JsonString']>({
+    baseType: string(options?.defaultValue ?? defaultJsonString, {
+      nonempty: true,
+    }),
     is: isJsonString,
-    defaultValue: options?.defaultValue ?? defaultJsonString,
-    brandKeys: ['JsonString', 'NonEmptyString'],
+    brandKeys: ['JsonString'],
     typeName: 'JsonString',
   });
 

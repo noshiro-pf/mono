@@ -1,5 +1,6 @@
 import {
   type Brand,
+  type NonEmptyString,
   type ReadonlyRecord,
   type TypeEq,
   type UintRangeInclusive,
@@ -16,14 +17,15 @@ export type UuidBaseString<V extends UuidVersion = UuidVersion> =
   | 'ffffffff-ffff-ffff-ffff-ffffffffffff';
 
 // A UUID always has the dash-separated hexadecimal form, so it is never an
-// empty string and also satisfies `NonEmptyString`.
-export type Uuid = Brand<UuidBaseString, 'Uuid' | 'NonEmptyString'>;
+// empty string; `Uuid` is branded on top of `NonEmptyString` and is
+// assignable to it.
+export type Uuid = Brand<UuidBaseString & NonEmptyString, 'Uuid'>;
 
-export type Uuid4 = Brand<UuidBaseString<4>, 'Uuid' | 'NonEmptyString'>;
+export type Uuid4 = Brand<UuidBaseString<4> & NonEmptyString, 'Uuid'>;
 
-export type Uuid6 = Brand<UuidBaseString<6>, 'Uuid' | 'NonEmptyString'>;
+export type Uuid6 = Brand<UuidBaseString<6> & NonEmptyString, 'Uuid'>;
 
-export type Uuid7 = Brand<UuidBaseString<7>, 'Uuid' | 'NonEmptyString'>;
+export type Uuid7 = Brand<UuidBaseString<7> & NonEmptyString, 'Uuid'>;
 
 /**
  * @link https://github.com/validatorjs/validator.js/tree/v13.1.17?tab=readme-ov-file#validators
@@ -31,20 +33,22 @@ export type Uuid7 = Brand<UuidBaseString<7>, 'Uuid' | 'NonEmptyString'>;
 export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
   options?: UuidValidatorOption<V>,
 ): Type<UuidOf<V>> => {
-  type T = Brand<UuidBaseString, 'Uuid' | 'NonEmptyString'>;
+  type T = Brand<UuidBaseString & NonEmptyString, 'Uuid'>;
 
   const defaultValue = options?.defaultValue ?? nilUuid;
 
   const version = options?.version ?? 'all';
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return brand<UuidBaseString, readonly ['Uuid', 'NonEmptyString']>({
+  return brand<UuidBaseString & NonEmptyString, readonly ['Uuid']>({
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    baseType: string(defaultValue) as Type<UuidBaseString>,
+    baseType: string(defaultValue, { nonempty: true }) as Type<
+      UuidBaseString & NonEmptyString
+    >,
     is: (s): s is T => uuidDef[version](s),
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    defaultValue: defaultValue as UuidBaseString,
-    brandKeys: ['Uuid', 'NonEmptyString'],
+    defaultValue: defaultValue as UuidBaseString & NonEmptyString,
+    brandKeys: ['Uuid'],
     typeName:
       options?.typeName ??
       (version === 4
