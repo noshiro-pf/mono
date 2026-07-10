@@ -123,6 +123,7 @@ export const templateLiteral = <T extends string>({
     typeName,
     defaultValue,
     fill,
+    prune: (a) => a,
     validate,
     is: createIsFn<T>(validate),
     assertIs: createAssertFn(validate),

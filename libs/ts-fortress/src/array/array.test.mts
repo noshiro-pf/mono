@@ -1,5 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { number } from '../primitives/index.mjs';
+import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {
   type ValidationError,
@@ -138,6 +139,23 @@ describe(array, () => {
       const ys: unknown = ['1', '', 3] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [0, 0, 3]);
+    });
+  });
+
+  describe('prune', () => {
+    test('prunes each element recursively', () => {
+      const points = array(record({ x: number(0), y: number(0) }));
+
+      assert.deepStrictEqual(
+        points.prune([
+          { x: 1, y: 2, z: 3 },
+          { x: 4, y: 5 },
+        ]),
+        [
+          { x: 1, y: 2 },
+          { x: 4, y: 5 },
+        ],
+      );
     });
   });
 });

@@ -81,12 +81,15 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
       : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 
+  const prune = (a: T): T => Arr.map(types, (t, i) => t.prune(a[i]));
+
   return {
     typeName,
     get defaultValue() {
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),

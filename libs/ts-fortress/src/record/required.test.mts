@@ -59,6 +59,7 @@ describe(required, () => {
       | 'cast'
       | 'defaultValue'
       | 'fill'
+      | 'prune'
       | 'optional'
     >('=');
 

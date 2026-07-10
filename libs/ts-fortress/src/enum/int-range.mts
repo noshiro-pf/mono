@@ -76,6 +76,7 @@ export const intRange = <Start extends Int8, End extends Int8 | 128>({
       return getDefaultValue();
     },
     fill,
+    prune: (a) => a,
     validate,
     is,
     assertIs: createAssertFn(validate),

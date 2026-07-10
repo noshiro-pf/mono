@@ -167,12 +167,15 @@ export const recursion = <A,>(
 
   const fill: Type<A>['fill'] = (a) => getInnerType().fill(a);
 
+  const prune = (a: A): A => getInnerType().prune(a);
+
   const baseType: Type<A> = {
     typeName,
     get defaultValue(): A {
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is,
     assertIs: createAssertFn(validate),

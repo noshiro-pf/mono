@@ -5,6 +5,7 @@ caseSensitive: false
 ignoreRandomStrings: true
 words:
   - brandable
+  - bivariance
   - noshiro
   - sindresorhus
   - testw

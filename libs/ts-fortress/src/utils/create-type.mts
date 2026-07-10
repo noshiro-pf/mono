@@ -6,6 +6,7 @@ import { createIsFn } from './create-is-fn.mjs';
 export const createType = <A,>({
   defaultValue,
   fill,
+  prune,
   typeName,
   validate,
 }: Readonly<{
@@ -13,6 +14,7 @@ export const createType = <A,>({
   defaultValue: A;
   validate: Type<A>['validate'];
   fill?: Type<A>['fill'];
+  prune?: Type<A>['prune'];
 }>): Type<A> => {
   const is = createIsFn<A>(validate);
 
@@ -23,6 +25,7 @@ export const createType = <A,>({
     is,
     assertIs: createAssertFn(validate),
     fill: fill ?? ((a) => (is(a) ? a : defaultValue)),
+    prune: prune ?? ((a) => a),
     cast: createCastFn(validate),
   };
 };

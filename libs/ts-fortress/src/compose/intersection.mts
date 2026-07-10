@@ -1,4 +1,4 @@
-import { Arr, expectType, Result } from 'ts-data-forge';
+import { Arr, expectType, hasKey, isRecord, Result, tp } from 'ts-data-forge';
 import { type Intersection, type NonEmptyArray } from 'ts-type-forge';
 import {
   type ExcessPropertyOption,
@@ -67,6 +67,9 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
     typeName: typeNameFilled,
     defaultValue: defaultType.defaultValue,
     fill,
+    // Non-record intersections (e.g. branded primitives) have no excess paths
+    // to remove. Record intersections override this below.
+    prune: (a) => a,
     validate,
     is,
     assertIs: createAssertFn(validate),
@@ -87,6 +90,13 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return {
       ...baseType,
+      // A value path is represented by a record intersection if it is
+      // represented by any member, so the pruned members are merged (deeply;
+      // see `mergePruned`). All members are record types here
+      // (`hasRecordInternals`), so each pruned result is a record.
+      prune: (a: T): T =>
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T,
       shapeStructure: Arr.isArrayOfLength(shapeStructures, 1)
         ? shapeStructures[0]
         : ({ kind: 'intersection', parts: shapeStructures } as const),
@@ -95,6 +105,39 @@ export const intersection = <const Types extends NonEmptyArray<Type<unknown>>>(
   }
 
   return baseType;
+};
+
+/**
+ * Deep-merges the pruned results of intersection members. Each pruned result
+ * contains only the value paths represented by its own member type, so the
+ * results have to be merged recursively to keep the union of all represented
+ * paths — a shallow spread would drop nested paths kept by an earlier member
+ * whenever a later member shares the same key (e.g. two members both having a
+ * `pos` sub-record with different fields).
+ */
+const mergePruned = (x: unknown, y: unknown): unknown => {
+  if (isRecord(x) && isRecord(y)) {
+    const xMergedWithY = Object.fromEntries(
+      Object.entries(x).map(([k, xv]) =>
+        tp(k, hasKey(y, k) ? mergePruned(xv, y[k]) : xv),
+      ),
+    );
+
+    const yOnly = Object.fromEntries(
+      Object.entries(y).filter(([k]) => !hasKey(x, k)),
+    );
+
+    return { ...xMergedWithY, ...yOnly };
+  }
+
+  // Both members pruned the same input array, so the lengths always match;
+  // merge element-wise to keep every represented element path.
+  if (Arr.isArray(x) && Arr.isArray(y) && x.length === y.length) {
+    return x.map((xi, i) => mergePruned(xi, y[i]));
+  }
+
+  // Not structurally mergeable — the later member wins.
+  return y;
 };
 
 type IntersectionType<Types extends NonEmptyArray<Type<unknown>>> = Type<

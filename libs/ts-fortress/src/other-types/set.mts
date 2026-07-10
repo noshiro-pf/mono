@@ -70,12 +70,16 @@ export const SetType = <T extends Type<unknown>>(
       ? getDefaultValue()
       : new Set(Array.from(a).filter((v) => elementType.is(v)));
 
+  const prune = (a: S): S =>
+    new Set(Array.from(a, (e) => elementType.prune(e)));
+
   return {
     typeName,
     get defaultValue() {
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),

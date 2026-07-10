@@ -795,3 +795,114 @@ describe('recursive', () => {
     });
   });
 });
+
+describe('recursive prune', () => {
+  describe('self-recursive tree', () => {
+    type TreeNode = Readonly<{ value: number; children: readonly TreeNode[] }>;
+
+    const TreeNode: Type<TreeNode> = recursion('TreeNode', () =>
+      record({ value: number(0), children: array(TreeNode) }),
+    );
+
+    test('prunes excess properties at every depth', () => {
+      assert.deepStrictEqual(
+        TreeNode.prune({
+          value: 1,
+          excess: 'root',
+          children: [
+            {
+              value: 2,
+              excess: 'child',
+              children: [{ value: 3, children: [], excess: 'leaf' }],
+            },
+          ],
+        }),
+        {
+          value: 1,
+          children: [{ value: 2, children: [{ value: 3, children: [] }] }],
+        },
+      );
+    });
+
+    test('keeps represented values as-is (never fills defaults)', () => {
+      const x = { value: 1, children: [{ value: 2, children: [] }] } as const;
+
+      assert.deepStrictEqual(TreeNode.prune(x), {
+        value: 1,
+        children: [{ value: 2, children: [] }],
+      });
+    });
+  });
+
+  describe('mutually recursive types with optional links', () => {
+    type EvenNumber = Readonly<{ type: 'even'; next?: OddNumber }>;
+
+    type OddNumber = Readonly<{ type: 'odd'; next?: EvenNumber }>;
+
+    const EvenNumber: Type<EvenNumber> = recursion('EvenNumber', () =>
+      record({
+        type: literal('even'),
+        next: optional(OddNumber, { forceUndefinedDefault: true }),
+      }),
+    );
+
+    const OddNumber: Type<OddNumber> = recursion('OddNumber', () =>
+      record({
+        type: literal('odd'),
+        next: optional(EvenNumber, { forceUndefinedDefault: true }),
+      }),
+    );
+
+    test('prunes through the optional recursive links', () => {
+      assert.deepStrictEqual(
+        EvenNumber.prune({
+          type: 'even',
+          excess: 0,
+          next: { type: 'odd', excess: 1, next: { type: 'even' } },
+        } as const),
+        { type: 'even', next: { type: 'odd', next: { type: 'even' } } },
+      );
+    });
+
+    test('missing optional links stay missing (never filled)', () => {
+      assert.deepStrictEqual(EvenNumber.prune({ type: 'even' } as const), {
+        type: 'even',
+      });
+    });
+  });
+
+  describe('recursive union (JsonValue-like)', () => {
+    const JsonPrimitive = union([nullType, number(), string(), boolean()]);
+
+    type JsonValue =
+      | TypeOf<typeof JsonPrimitive>
+      | Readonly<{ [k: string]: JsonValue }>
+      | readonly JsonValue[];
+
+    const JsonValue: Type<JsonValue> = recursion('JsonValue', () =>
+      union([
+        JsonPrimitive,
+        keyValueRecord(string(), JsonValue),
+        array(JsonValue),
+      ]),
+    );
+
+    test('keeps every value of a mixed structure', () => {
+      // Every path of a JsonValue is represented by the type, so nothing is
+      // removed; the structure must survive the recursive rebuild
+      // (records via keyValueRecord, arrays via array, primitives as-is).
+      const x = { a: [1, 'two', { b: null }], c: true } as const;
+
+      assert.deepStrictEqual(JsonValue.prune(x), {
+        a: [1, 'two', { b: null }],
+        c: true,
+      });
+    });
+
+    test('is identity for primitive values', () => {
+      expect(JsonValue.prune(42)).toBe(42);
+
+      expect(JsonValue.prune(null)).toBeNull();
+    });
+  });
+});

@@ -10,6 +10,7 @@ export const unknown = (defaultValue?: unknown): Type<unknown> =>
     },
     is,
     fill: (a) => a,
+    prune: (a) => a,
     validate,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),

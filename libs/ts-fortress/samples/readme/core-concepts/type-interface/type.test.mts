@@ -7,6 +7,7 @@ type Type<A> = Readonly<{
   assertIs: (a: unknown) => asserts a is A; // Type assertion
   cast: (a: unknown) => A; // Cast with fallback to default
   fill: (a: unknown) => A; // Fill missing values with defaults
+  prune: <B extends A>(a: B) => A; // Recursively remove excess properties
   validate: (a: unknown) => Result<A, readonly ValidationError[]>; // Detailed validation
 }>;
 

@@ -1,5 +1,8 @@
 import { expectType, Result } from 'ts-data-forge';
+import { type UnknownRecord } from 'ts-type-forge';
+import { array } from '../array/index.mjs';
 import { uintRange } from '../enum/index.mjs';
+import { literal } from '../other-types/index.mjs';
 import { number } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
@@ -8,6 +11,7 @@ import {
   validationErrorsToMessages,
 } from '../utils/index.mjs';
 import { intersection } from './intersection.mjs';
+import { union } from './union.mjs';
 
 describe(intersection, () => {
   describe('merge records', () => {
@@ -169,6 +173,24 @@ describe(intersection, () => {
         assert.deepStrictEqual(targetType.fill(x), { x: 0, y: 1, z: 2, w: 0 });
       });
     });
+
+    describe('prune', () => {
+      test('removes properties not represented by any member', () => {
+        assert.deepStrictEqual(
+          targetType.prune({ x: 0, y: 1, z: 2, w: 3, excess: 9 }),
+          { x: 0, y: 1, z: 2, w: 3 },
+        );
+      });
+
+      test('keeps represented values as-is (never fills defaults)', () => {
+        assert.deepStrictEqual(targetType.prune({ x: 0, y: 1, z: 2, w: 3 }), {
+          x: 0,
+          y: 1,
+          z: 2,
+          w: 3,
+        });
+      });
+    });
   });
 
   describe('merge primitives', () => {
@@ -298,6 +320,12 @@ describe(intersection, () => {
         const x = { x: 0, y: 1, z: 2 } as const;
 
         expect(targetType.fill(x)).toBe(0);
+      });
+    });
+
+    describe('prune', () => {
+      test('is identity for non-record intersections', () => {
+        expect(targetType.prune(2)).toBe(2);
       });
     });
   });
@@ -452,6 +480,108 @@ describe(intersection, () => {
         const x = 9;
 
         expect(targetType.fill(x)).toBe(1);
+      });
+    });
+
+    describe('prune', () => {
+      test('is identity for enum-like intersections', () => {
+        expect(targetType.prune(3)).toBe(3);
+      });
+    });
+  });
+
+  describe('prune with overlapping keys', () => {
+    describe('members sharing a nested record key', () => {
+      const targetType = intersection(
+        [
+          record({ pos: record({ x: number() }), a: number() }),
+          record({ pos: record({ y: number() }), b: number() }),
+        ],
+        record({
+          pos: record({ x: number(), y: number() }),
+          a: number(),
+          b: number(),
+        }),
+      );
+
+      test('keeps nested paths of every member (deep merge)', () => {
+        // A shallow merge of the pruned member results would drop `pos.x`
+        // here, because the later member also prunes the shared `pos` key.
+        assert.deepStrictEqual(
+          targetType.prune({ pos: { x: 1, y: 2, z: 9 }, a: 1, b: 2, c: 9 }),
+          { pos: { x: 1, y: 2 }, a: 1, b: 2 },
+        );
+      });
+    });
+
+    describe('members sharing an array-of-records key', () => {
+      const targetType = intersection(
+        [
+          record({ items: array(record({ x: number() })) }),
+          record({ items: array(record({ y: number() })) }),
+        ],
+        record({ items: array(record({ x: number(), y: number() })) }),
+      );
+
+      test('merges array elements element-wise', () => {
+        const pruned: UnknownRecord = targetType.prune({
+          items: [
+            { x: 1, y: 2, z: 9 },
+            { x: 3, y: 4 },
+          ],
+          excess: 9,
+        });
+
+        assert.deepStrictEqual(pruned, {
+          items: [
+            { x: 1, y: 2 },
+            { x: 3, y: 4 },
+          ],
+        });
+      });
+    });
+
+    describe('members sharing a flat primitive key', () => {
+      const targetType = intersection(
+        [
+          record({ a: number(), b: number() }),
+          record({ b: number(), c: number() }),
+        ],
+        record({ a: number(), b: number(), c: number() }),
+      );
+
+      test('keeps the shared key and removes excess properties', () => {
+        assert.deepStrictEqual(targetType.prune({ a: 1, b: 2, c: 3, d: 9 }), {
+          a: 1,
+          b: 2,
+          c: 3,
+        });
+      });
+    });
+
+    describe('a union member combined with a record member', () => {
+      const tagged = union([
+        record({ tag: literal('a'), a: number() }),
+        record({ tag: literal('b'), b: number() }),
+      ]);
+
+      const targetType = intersection(
+        [tagged, record({ common: number() })],
+        record({ tag: literal('a'), a: number(), common: number() }),
+      );
+
+      test('prunes the matched union variant and merges the record member', () => {
+        assert.deepStrictEqual(
+          targetType.prune({ tag: 'a', a: 1, common: 2, excess: 9 } as const),
+          { tag: 'a', a: 1, common: 2 },
+        );
+      });
+
+      test('the other union variant is selected by its tag', () => {
+        assert.deepStrictEqual(
+          targetType.prune({ tag: 'b', b: 1, common: 2, excess: 9 } as const),
+          { tag: 'b', b: 1, common: 2 },
+        );
       });
     });
   });

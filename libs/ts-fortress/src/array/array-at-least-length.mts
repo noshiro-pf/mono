@@ -112,12 +112,15 @@ export function arrayAtLeastLength<A>(
         )
       : getDefaultValue();
 
+  const prune = (a: T): T => a.map((el) => elementType.prune(el));
+
   return {
     typeName,
     get defaultValue() {
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is: createIsFn(validate),
     cast: createCastFn(validate),

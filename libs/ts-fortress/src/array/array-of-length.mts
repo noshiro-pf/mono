@@ -89,12 +89,17 @@ export const arrayOfLength = <A, N extends SmallUint>(
           (i) => elementType.fill(a[i]) satisfies A,
         ) as T);
 
+  const prune = (a: T): T =>
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    Arr.map(a, (el) => elementType.prune(el)) as T;
+
   return {
     typeName,
     get defaultValue() {
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is: createIsFn(validate),
     cast: createCastFn(validate),

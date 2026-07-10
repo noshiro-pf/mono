@@ -1,6 +1,7 @@
 import { expectType, Result } from 'ts-data-forge';
+import { type UnknownRecord } from 'ts-type-forge';
 import { number, string } from '../primitives/index.mjs';
-import { record } from '../record/index.mjs';
+import { record, strictRecord } from '../record/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {
   type ValidationError,
@@ -159,5 +160,91 @@ describe('union - records only', () => {
 
       assert.deepStrictEqual(targetType.fill(x), { kind: '', value: 0 });
     });
+  });
+
+  describe('prune', () => {
+    test('prunes with the first member that matches', () => {
+      assert.deepStrictEqual(
+        targetType.prune({ kind: 'A', value: 10, excess: 9 }),
+        { kind: 'A', value: 10 },
+      );
+    });
+
+    test('prunes with the second member when the first does not match', () => {
+      assert.deepStrictEqual(
+        targetType.prune({ type: 'B', data: 'x', excess: 9 }),
+        { type: 'B', data: 'x' },
+      );
+    });
+
+    test('member order decides the result when multiple members match', () => {
+      // The value matches both members; the first one wins, so the second
+      // member's paths (`type`, `data`) are removed.
+      assert.deepStrictEqual(
+        targetType.prune({ kind: 'A', value: 10, type: 'B', data: 'x' }),
+        { kind: 'A', value: 10 },
+      );
+    });
+  });
+});
+
+describe('union - prune member selection traps', () => {
+  const point2d = record({ x: number(), y: number() });
+
+  const point2dStrict = strictRecord({ x: number(), y: number() });
+
+  const point3d = record({ x: number(), y: number(), z: number() });
+
+  test('an earlier member that also matches removes later member paths', () => {
+    // point2d.is({ x, y, z }) is true because excess properties are allowed
+    // by default, so the value is pruned as a 2D point and `z` is removed.
+    assert.deepStrictEqual(
+      union([point2d, point3d]).prune({ x: 1, y: 2, z: 3 }),
+      { x: 1, y: 2 },
+    );
+  });
+
+  test('putting the more specific member first keeps its paths', () => {
+    assert.deepStrictEqual(
+      union([point3d, point2d]).prune({ x: 1, y: 2, z: 3 }),
+      { x: 1, y: 2, z: 3 },
+    );
+  });
+
+  test('a member that rejects the value falls through to later members', () => {
+    // strictRecord rejects excess properties, so `is` fails for the first
+    // member and the 3D member prunes the value instead.
+    assert.deepStrictEqual(
+      union([point2dStrict, point3d]).prune({
+        x: 1,
+        y: 2,
+        z: 3,
+      }),
+      { x: 1, y: 2, z: 3 },
+    );
+  });
+
+  test('returns the value as-is when no member matches', () => {
+    // Contract-violating input (excess property on a strict record): prune
+    // removes nothing rather than guessing a member.
+    const pruned: UnknownRecord = union([point2dStrict]).prune({
+      x: 1,
+      y: 2,
+      z: 3,
+    });
+
+    assert.deepStrictEqual(pruned, { x: 1, y: 2, z: 3 });
+  });
+
+  test('prunes recursively inside the matched member', () => {
+    const withNested = union([
+      record({ pos: point2d }),
+      record({ other: number() }),
+    ]);
+
+    assert.deepStrictEqual(
+      withNested.prune({ pos: { x: 1, y: 2, z: 9 }, excess: 9 }),
+      { pos: { x: 1, y: 2 } },
+    );
   });
 });

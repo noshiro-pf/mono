@@ -67,6 +67,7 @@ export const uintRange = <
       return getDefaultValue();
     },
     fill,
+    prune: (a) => a,
     validate,
     is,
     assertIs: createAssertFn(validate),

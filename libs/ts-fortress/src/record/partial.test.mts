@@ -37,6 +37,7 @@ describe(partial, () => {
       | 'assertIs'
       | 'cast'
       | 'fill'
+      | 'prune'
       | 'validate'
       | 'optional'
     >('=');

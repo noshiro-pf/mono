@@ -1,5 +1,6 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type UnknownRecord } from 'ts-type-forge';
+import { array } from '../array/index.mjs';
 import { number } from '../primitives/index.mjs';
 import { type Type, type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
@@ -279,6 +280,82 @@ describe(record, () => {
       });
     });
   });
+
+  describe('prune', () => {
+    test('removes excess properties', () => {
+      assert.deepStrictEqual(
+        ymd.prune({ year: 2000, month: 12, date: 31, aaaaa: 9999 }),
+        {
+          year: 2000,
+          month: 12,
+          date: 31,
+        },
+      );
+    });
+
+    test('keeps all represented paths as-is (never fills defaults)', () => {
+      assert.deepStrictEqual(ymd.prune({ year: 2000, month: 999, date: 999 }), {
+        year: 2000,
+        month: 999,
+        date: 999,
+      });
+    });
+
+    test('rejects a value with missing keys at type level', () => {
+      const pruned: UnknownRecord =
+        // @ts-expect-error missing key: "date"
+        ymd.prune({ year: 2000, month: 12 });
+
+      // runtime: prune assumes type-conforming input, so a missing required
+      // key just yields undefined (never a default value)
+      assert.deepStrictEqual(pruned, {
+        year: 2000,
+        month: 12,
+        date: undefined,
+      });
+    });
+
+    test('prunes nested records recursively', () => {
+      const nested = record({
+        id: number(0),
+        pos: record({ x: number(0), y: number(0) }),
+      });
+
+      assert.deepStrictEqual(
+        nested.prune({
+          id: 1,
+          pos: { x: 2, y: 3, z: 4 },
+          excess: 'excess',
+        }),
+        {
+          id: 1,
+          pos: { x: 2, y: 3 },
+        },
+      );
+    });
+
+    test('prunes records inside arrays recursively', () => {
+      const nested = record({
+        points: array(record({ x: number(0), y: number(0) })),
+      });
+
+      assert.deepStrictEqual(
+        nested.prune({
+          points: [
+            { x: 1, y: 2, z: 3 },
+            { x: 4, y: 5 },
+          ],
+          excess: 'excess',
+        }),
+        {
+          points: [
+            { x: 1, y: 2 },
+            { x: 4, y: 5 },
+          ],
+        },
+      );
+    });
+  });
 });
 
 describe('partial record', () => {
@@ -506,6 +583,19 @@ describe('partial record', () => {
         month: 1,
         date: 1,
       });
+    });
+  });
+
+  describe('prune', () => {
+    test('removes excess properties and keeps present optional keys', () => {
+      assert.deepStrictEqual(ymd.prune({ year: 2000, month: 6, aaaaa: 9999 }), {
+        year: 2000,
+        month: 6,
+      });
+    });
+
+    test('does not fill in missing optional keys', () => {
+      assert.deepStrictEqual(ymd.prune({ year: 2000 }), { year: 2000 });
     });
   });
 });

@@ -8,6 +8,9 @@ import { type ValidationError } from './utils/index.mjs';
  * - `assertIs` : Type assertion function
  * - `cast` : Cast function (returns the original value, no transformation)
  * - `fill` : Default value filling function
+ * - `prune` : Excess property pruning function (recursively removes value
+ *   paths that are not represented by the type; unlike `fill`, it never fills
+ *   in default values)
  * - `validate` : A base function to be used in `is` and `assertIs`. `validate`
  *   returns Result.Ok if the value is of Type A, otherwise returns Result.Err
  *   with structured validation error information.
@@ -19,6 +22,30 @@ export type Type<A> = Readonly<{
   assertIs: (a: unknown) => asserts a is A;
   cast: (a: unknown) => A;
   fill: (a: unknown) => A;
+
+  /**
+   * Recursively removes value paths that are not represented by the type
+   * (e.g. excess record properties). Unlike `fill`, it never fills in default
+   * values, so the input must already be of type `A`.
+   *
+   * NOTE: The parameter is intentionally a naked type parameter
+   * (`<B extends A>(a: B) => A`) rather than `(a: A) => A`:
+   *
+   * 1. `(a: A) => A` would put `A` in a contravariant position, so `Type<X>`
+   *    would no longer be assignable to `Type<unknown>` under
+   *    `strictFunctionTypes`, breaking `UnknownShape` (the shape constraint
+   *    of `record`), `TypeOf`, and every `readonly Type<unknown>[]` argument
+   *    (`tuple`, `union`, `intersection`, ...).
+   * 2. `(a: A) => A` would reject fresh object literals with excess
+   *    properties (e.g. `Point2D.prune({ x: 1, y: 2, z: 3 })`) via excess
+   *    property checking (TS2353), which is the main use case of `prune`.
+   *    Inference onto the naked type parameter `B` skips that check, while
+   *    `B extends A` still rejects inputs with missing keys.
+   *
+   * (A bivariance hack such as `{ m(a: A): A }['m']` would solve 1 but not
+   * 2.)
+   */
+  prune: <B extends A>(a: B) => A;
   validate: (a: unknown) => Result<A, readonly ValidationError[]>;
 
   /** @internal Used to mark properties as optional in record type validation */

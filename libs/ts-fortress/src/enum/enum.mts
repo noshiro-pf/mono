@@ -94,6 +94,7 @@ export function enumType<const Values extends NonEmptyArray<Primitive>>(
       return getDefaultValue();
     },
     fill,
+    prune: (a) => a,
     validate,
     is,
     assertIs: createAssertFn(validate),

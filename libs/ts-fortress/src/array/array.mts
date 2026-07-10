@@ -57,12 +57,15 @@ export const array = <A,>(
   const fill: Type<T>['fill'] = (a) =>
     !Arr.isArray(a) ? getDefaultValue() : a.map((e) => elementType.fill(e));
 
+  const prune = (a: T): T => a.map((e) => elementType.prune(e));
+
   return {
     typeName,
     get defaultValue() {
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),

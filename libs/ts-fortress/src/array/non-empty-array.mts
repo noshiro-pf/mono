@@ -79,12 +79,15 @@ export const nonEmptyArray = <A,>(
       ? Arr.map(a, (e) => elementType.fill(e))
       : getDefaultValue();
 
+  const prune = (a: T): T => Arr.map(a, (e) => elementType.prune(e));
+
   return {
     typeName,
     get defaultValue() {
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),

@@ -25,6 +25,7 @@ describe(omit, () => {
     | 'assertIs'
     | 'cast'
     | 'fill'
+    | 'prune'
     | 'validate'
     | 'optional'
   >('=');

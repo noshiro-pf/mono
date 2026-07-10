@@ -31,6 +31,7 @@ export const createPrimitiveType = <A extends Primitive>({
     defaultValue,
     is,
     fill: (a) => (is(a) ? a : defaultValue),
+    prune: (a) => a,
     validate,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),

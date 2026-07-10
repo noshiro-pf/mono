@@ -7,7 +7,11 @@ import {
   Result,
   tp,
 } from 'ts-data-forge';
-import { type MergeIntersection, type TypeEq } from 'ts-type-forge';
+import {
+  type MergeIntersection,
+  type TypeEq,
+  type UnknownRecord,
+} from 'ts-type-forge';
 import {
   type ExcessPropertyOption,
   type RecordTypeInternals,
@@ -170,6 +174,33 @@ export const record = <
     ) as V;
   };
 
+  const prune = (a: V): V => {
+    // The input is statically guaranteed to be a record.
+    const rec: UnknownRecord = a;
+
+    // prune keeps only the value paths represented by the shape;
+    // unlike fill, it never fills in missing keys with default values
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    return Object.fromEntries(
+      Object.entries(shape).flatMap(([k, v]) => {
+        // Only optional keys can be absent in the input; required keys are
+        // statically guaranteed to be present.
+        if (v.optional === true) {
+          if (!hasKey(rec, k)) {
+            return [];
+          }
+
+          // For optional fields, if the value is undefined, keep it as undefined
+          if (rec[k] === undefined) {
+            return [tp(k, undefined)];
+          }
+        }
+
+        return [tp(k, v.prune(rec[k]))];
+      }),
+    ) as V;
+  };
+
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return {
     typeName: typeNameFilled,
@@ -177,6 +208,7 @@ export const record = <
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),

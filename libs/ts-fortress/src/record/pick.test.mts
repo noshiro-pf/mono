@@ -36,6 +36,7 @@ describe(pick, () => {
     | 'assertIs'
     | 'cast'
     | 'fill'
+    | 'prune'
     | 'validate'
     | 'optional'
   >('=');

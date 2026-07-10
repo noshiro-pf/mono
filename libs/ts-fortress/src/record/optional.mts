@@ -56,6 +56,7 @@ export const optional = <T extends Type<unknown>>(
     is: t.is,
     cast: t.cast,
     fill: t.fill,
+    prune: t.prune,
     validate: t.validate,
     typeName: t.typeName,
 

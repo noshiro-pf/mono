@@ -1,5 +1,11 @@
 import { isMap } from '@sindresorhus/is';
-import { Arr, memoizeFunction, Result, unknownToString } from 'ts-data-forge';
+import {
+  Arr,
+  memoizeFunction,
+  Result,
+  tp,
+  unknownToString,
+} from 'ts-data-forge';
 import { type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
@@ -100,12 +106,18 @@ export const MapType = <K extends Type<unknown>, V extends Type<unknown>>(
           Array.from(a).filter(([k, v]) => keyType.is(k) && valueType.is(v)),
         );
 
+  const prune = (a: M): M =>
+    new Map(
+      Array.from(a, ([k, v]) => tp(keyType.prune(k), valueType.prune(v))),
+    );
+
   return {
     typeName,
     get defaultValue() {
       return getDefaultValue();
     },
     fill,
+    prune,
     validate,
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),

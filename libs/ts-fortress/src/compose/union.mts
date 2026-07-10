@@ -55,12 +55,23 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
 
   const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultType().fill(a));
 
+  // Prunes with the first member type that matches the value.
+  const prune = (a: T): T => {
+    const matched = types.find((t) => t.is(a));
+
+    return matched === undefined
+      ? a
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        (matched.prune(a) as T);
+  };
+
   const baseType: Type<T> = {
     typeName: typeNameFilled,
     get defaultValue() {
       return getDefaultType().defaultValue;
     },
     fill,
+    prune,
     validate,
     is,
     assertIs: createAssertFn(validate),
