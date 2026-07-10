@@ -1,3 +1,5 @@
+# [9.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v8.5.2...v9.0.0) (2026-07-10)
+
 ## [8.5.2](https://github.com/noshiro-pf/ts-fortress/compare/v8.5.1...v8.5.2) (2026-07-09)
 
 ### Bug Fixes
