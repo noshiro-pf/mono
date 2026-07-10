@@ -1,3 +1,5 @@
+# [9.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v8.0.0...v9.0.0) (2026-07-10)
+
 # [8.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.1.1...v8.0.0) (2026-07-09)
 
 - fix!: changed isRecord to reject arrays ([#409](https://github.com/noshiro-pf/ts-data-forge/issues/409)) ([ff73b7d](https://github.com/noshiro-pf/ts-data-forge/commit/ff73b7d2c9b5077a7a3b1e44e36430d5d5131b22))
