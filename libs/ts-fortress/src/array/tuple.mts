@@ -1,5 +1,5 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import { type Type, type TypeOf } from '../type.mjs';
+import { type TupleTypeInternals, type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -83,6 +83,7 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
 
   const prune = (a: T): T => Arr.map(types, (t, i) => t.prune(a[i]));
 
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   return {
     typeName,
     get defaultValue() {
@@ -94,5 +95,8 @@ export const tuple = <const A extends readonly Type<unknown>[]>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-  };
+    // Retain the element types so that `at(tupleType, index)` can recover the
+    // Type at a given position.
+    elementTypes: types,
+  } satisfies Type<T> & TupleTypeInternals as Type<T>;
 };

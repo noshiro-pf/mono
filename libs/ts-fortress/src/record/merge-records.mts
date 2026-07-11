@@ -9,10 +9,9 @@ import { literal } from '../other-types/index.mjs';
 import {
   type ExcessPropertyOption,
   type RecordTypeInternals,
-  type ShapeStructure,
   type Type,
   type TypeOf,
-  type UnknownShape,
+  expandShapeStructure,
   hasRecordInternals,
 } from '../type.mjs';
 import { toIntersectionString } from '../utils/index.mjs';
@@ -91,33 +90,6 @@ export const mergeRecords = <
   return union(variants as NonEmptyArray<Type<UnknownRecord>>, {
     typeName: typeNameFilled,
   }) as MergeRecordsType<Types>;
-};
-
-/**
- * Expands a ShapeStructure into all possible simple shapes.
- * For union structures, returns an array of all variant shapes.
- * For intersection structures, computes cartesian product of all parts.
- */
-const expandShapeStructure = (
-  structure: ShapeStructure,
-): readonly UnknownShape[] => {
-  switch (structure.kind) {
-    case 'simple': {
-      return [structure.shape];
-    }
-    case 'union': {
-      // Union: flatten all variants
-      return structure.variants.flatMap(expandShapeStructure);
-    }
-    case 'intersection': {
-      // Intersection: compute cartesian product of all parts
-      const expandedParts = structure.parts.map(expandShapeStructure);
-
-      const combinations = Arr.cartesianProduct(expandedParts);
-
-      return Arr.map(combinations, (shapes) => Obj.merge(...shapes));
-    }
-  }
 };
 
 type MergeRecordsType<Types extends readonly Type<UnknownRecord>[]> = Type<
