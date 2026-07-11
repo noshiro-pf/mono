@@ -26,7 +26,7 @@
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write"
   },
   "dependencies": {
-    "@astrojs/preact": "^5.1.5",
+    "@astrojs/preact": "^6.0.1",
     "@astrojs/react": "^5.0.7",
     "@astrojs/starlight": "^0.40.0",
     "@fontsource/noto-sans-jp": "^5.2.9",
