@@ -1,3 +1,9 @@
+# [9.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v9.1.0...v9.2.0) (2026-07-11)
+
+### Features
+
+- add `at` utility ([#334](https://github.com/noshiro-pf/ts-fortress/issues/334)) ([b3bdfa2](https://github.com/noshiro-pf/ts-fortress/commit/b3bdfa20c988ac62e72912d893f6010695467ddf))
+
 # [9.1.0](https://github.com/noshiro-pf/ts-fortress/compare/v9.0.0...v9.1.0) (2026-07-10)
 
 ### Features
