@@ -37,7 +37,9 @@
     "checkJs": true,
 
     // Interop Constraints
-    "allowSyntheticDefaultImports": false,
+    // Note: "allowSyntheticDefaultImports": false was removed because
+    // disabling it is deprecated in TypeScript 6.0 (TS5107) and will stop
+    // functioning in 7.0 ("esModuleInterop": true implies it anyway).
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
