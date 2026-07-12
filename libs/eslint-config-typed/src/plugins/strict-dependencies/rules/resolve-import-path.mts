@@ -37,10 +37,14 @@ export const resolveImportPath = (
           const pathValue: string =
             mapNullable(pathIndex, (i) => value[i]) ?? value[0];
 
+          // `baseUrl` is deprecated in TypeScript 6.0, but this rule still
+          // needs to read it (if present) to resolve legacy `baseUrl`-relative
+          // `paths` entries the same way `tsc` does.
+          // eslint-disable-next-line @typescript-eslint/no-deprecated
+          const { baseUrl } = tsconfigOptions;
+
           mut_importAliasMap[key] =
-            tsconfigOptions.baseUrl !== undefined
-              ? path.join(tsconfigOptions.baseUrl, pathValue)
-              : pathValue;
+            baseUrl !== undefined ? path.join(baseUrl, pathValue) : pathValue;
         }
       }
     }

@@ -69,7 +69,12 @@ const build = async (skipCheck: boolean): Promise<void> => {
         [
           'rollup',
           `--config ${rollupConfig}`,
-          '--configPlugin typescript',
+          // Rollup bundles the config file as ESM, so compile it with
+          // bundler-style module settings. Without this override, the root
+          // tsconfig's "moduleResolution": "NodeNext" conflicts with the
+          // "module" override Rollup applies when loading the config
+          // (TS5110).
+          `--configPlugin 'typescript={compilerOptions:{module:"esnext",moduleResolution:"bundler"}}'`,
           '--configImportAttributesKey with',
         ].join(' '),
         'Rollup build failed',
