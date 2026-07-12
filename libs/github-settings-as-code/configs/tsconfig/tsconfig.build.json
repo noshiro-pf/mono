@@ -1,10 +1,18 @@
 {
   "extends": "./tsconfig.type-check.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
+    // Note: "downlevelIteration" and "importsNotUsedAsValues" were removed
+    // because they are deprecated in TypeScript 6.0 (TS5101) and will stop
+    // functioning in 7.0. "downlevelIteration" is a no-op with
+    // "target": "ESNext", and "importsNotUsedAsValues": "remove" was the
+    // default behavior.
+    //
+    // Note: the explicit "allowSyntheticDefaultImports": true override
+    // (previously needed to counteract tsconfig.type-check.json's
+    // "allowSyntheticDefaultImports": false) was also removed: now that the
+    // base no longer sets "false", this option is redundant with
+    // "esModuleInterop": true, which already implies "true".
     "importHelpers": true,
-    "importsNotUsedAsValues": "remove",
     "newLine": "lf",
     "noEmit": false,
     "noEmitOnError": true,
