@@ -1,3 +1,9 @@
+## [9.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v9.0.0...v9.0.1) (2026-07-12)
+
+### Bug Fixes
+
+- quote absolute paths in build.mts shell command strings ([#414](https://github.com/noshiro-pf/ts-data-forge/issues/414)) ([7cabddb](https://github.com/noshiro-pf/ts-data-forge/commit/7cabddbf52674d5c4bc289fd01cd70a4bea48468))
+
 # [9.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v8.0.0...v9.0.0) (2026-07-10)
 
 # [8.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.1.1...v8.0.0) (2026-07-09)
