@@ -1,3 +1,9 @@
+## [5.4.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.4.1...v5.4.2) (2026-07-13)
+
+### Bug Fixes
+
+- bump eslint-plugin-cypress from 6.4.1 to 6.4.2 ([#372](https://github.com/noshiro-pf/eslint-config-typed/issues/372)) ([052e837](https://github.com/noshiro-pf/eslint-config-typed/commit/052e83708fffcb6da459ac9e5565cc9b31e6485d))
+
 ## [5.4.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.4.0...v5.4.1) (2026-07-13)
 
 ### Bug Fixes
