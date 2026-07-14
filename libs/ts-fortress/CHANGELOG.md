@@ -1,3 +1,9 @@
+## [9.2.1](https://github.com/noshiro-pf/ts-fortress/compare/v9.2.0...v9.2.1) (2026-07-14)
+
+### Bug Fixes
+
+- keep Type<X> usable at Type<unknown> bounds under TypeScript 7 (native) ([#342](https://github.com/noshiro-pf/ts-fortress/issues/342)) ([928ad21](https://github.com/noshiro-pf/ts-fortress/commit/928ad214afba9f11e8aa3fd1725d128a84d397ea))
+
 # [9.2.0](https://github.com/noshiro-pf/ts-fortress/compare/v9.1.0...v9.2.0) (2026-07-11)
 
 ### Features
