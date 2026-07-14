@@ -2,6 +2,7 @@ import { Arr, Result, expectType, memoizeFunction } from 'ts-data-forge';
 import { type ArrayElement, type NonEmptyArray } from 'ts-type-forge';
 import {
   hasRecordInternals,
+  type AnyType,
   type ExcessPropertyOption,
   type Type,
   type TypeOf,
@@ -14,7 +15,7 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
+export const union = <const Types extends NonEmptyArray<AnyType>>(
   types: Types,
   options?: Partial<
     Readonly<{
@@ -27,7 +28,6 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
 
   const getDefaultType = memoizeFunction(
     (): UnionType<Types> =>
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       options?.defaultType ?? (types[0] as UnionType<Types>),
   );
 
@@ -102,18 +102,18 @@ export const union = <const Types extends NonEmptyArray<Type<unknown>>>(
   return baseType;
 };
 
-type UnionType<Types extends NonEmptyArray<Type<unknown>>> = Type<
+type UnionType<Types extends NonEmptyArray<AnyType>> = Type<
   UnionTypeValue<Types>
 >;
 
-type UnionTypeValue<Types extends NonEmptyArray<Type<unknown>>> =
+type UnionTypeValue<Types extends NonEmptyArray<AnyType>> =
   TsFortressInternal.UnionTypeValueImpl<Types>;
 
 namespace TsFortressInternal {
-  export type UnionTypeValueImpl<Types extends NonEmptyArray<Type<unknown>>> =
+  export type UnionTypeValueImpl<Types extends NonEmptyArray<AnyType>> =
     UnwrapUnion<ArrayElement<Types>>;
 
-  type UnwrapUnion<T extends Type<unknown>> = T extends T ? TypeOf<T> : never;
+  type UnwrapUnion<T extends AnyType> = T extends T ? TypeOf<T> : never;
 }
 
 expectType<

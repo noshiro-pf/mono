@@ -52,7 +52,33 @@ export type Type<A> = Readonly<{
   optional?: true;
 }>;
 
-export type TypeOf<A extends Type<unknown>> = A['defaultValue'];
+/**
+ * A maximally-permissive `Type` for use in **constraint positions only** —
+ * e.g. `<T extends AnyType>`, `UnknownShape`, and the element bounds of
+ * `union` / `tuple` / `intersection`.
+ *
+ * `Type<A>` is **not** covariant in `A`: `prune` accepts `<B extends A>`, which
+ * puts `A` in a constraint position. TypeScript 5.x tolerated this, but the
+ * native (Go) compiler / TypeScript 7 enforces the variance, so a concrete
+ * `Type<SomeUnion>` is no longer assignable to `Type<unknown>` across a
+ * declaration-file boundary. That broke every `Type<unknown>` bound
+ * (`record`/`strictRecord`, `TypeOf`, `union`, `tuple`, `intersection`, ...)
+ * for codecs imported from a built dependency.
+ *
+ * Making `Type<A>` covariant is impossible without dropping `prune`'s
+ * missing-key rejection (that check inherently needs `A` in a non-covariant
+ * position). Instead we loosen only the **bound** to `Type<any>`: `any` makes
+ * every concrete `Type<X>` assignable to it, so a codec from a built dependency
+ * once again satisfies the shape / element / `TypeOf` constraints. The `any` is
+ * confined to this constraint-only alias — it never appears in inferred or
+ * public output types (those go through the concrete `Type<X>` / `TypeOf<X>`),
+ * so consumer-facing types stay precise. `AnyType` still requires a real codec:
+ * every `Type` member must be present.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- confined to this constraint-only bound; see above
+export type AnyType = Type<any>;
+
+export type TypeOf<A extends AnyType> = A['defaultValue'];
 
 /**
  * Controls how excess properties (keys not in shape) are handled.
@@ -66,7 +92,7 @@ export type TypeOf<A extends Type<unknown>> = A['defaultValue'];
 export type ExcessPropertyOption = 'allow' | 'reject';
 
 /** @internal */
-export type UnknownShape = ReadonlyRecord<string, Type<unknown>>;
+export type UnknownShape = ReadonlyRecord<string, AnyType>;
 
 /** @internal Shape structure that can represent union and intersection */
 export type ShapeStructure = Readonly<
@@ -186,7 +212,7 @@ export const getShape = (internals: RecordTypeInternals): UnknownShape => {
 };
 
 /** @internal Runtime check for record type internals. */
-export const hasRecordInternals = <T extends Type<unknown>>(
+export const hasRecordInternals = <T extends AnyType>(
   t: T,
 ): t is T & RecordTypeInternals => hasRecordInternalsImpl(t);
 
@@ -198,7 +224,7 @@ const hasRecordInternalsImpl = (t: unknown): t is RecordTypeInternals =>
   (t.excessProperty === 'allow' || t.excessProperty === 'reject');
 
 /** @internal Runtime check for tuple type internals. */
-export const hasTupleInternals = <T extends Type<unknown>>(
+export const hasTupleInternals = <T extends AnyType>(
   t: T,
 ): t is T & TupleTypeInternals => hasTupleInternalsImpl(t);
 

@@ -36,15 +36,13 @@ export const valueof = <const R extends UnknownRecord>(
   const types = Object.values(shape);
 
   if (Arr.isArrayAtLeastLength(types, 2)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return union(types, {
       typeName: options?.typeName ?? `ValueOf<${recordType.typeName}>`,
-    }) as ValueOfType<R>;
+    });
   }
 
   if (Arr.isNonEmpty(types)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return types[0] as ValueOfType<R>;
+    return types[0];
   }
 
   // types is empty

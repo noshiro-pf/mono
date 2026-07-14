@@ -1,6 +1,6 @@
 import { isSet } from '@sindresorhus/is';
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import { type Type, type TypeOf } from '../type.mjs';
+import { type AnyType, type Type, type TypeOf } from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -9,9 +9,9 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-type SetResultType<T extends Type<unknown>> = ReadonlySet<TypeOf<T>>;
+type SetResultType<T extends AnyType> = ReadonlySet<TypeOf<T>>;
 
-export const SetType = <T extends Type<unknown>>(
+export const SetType = <T extends AnyType>(
   elementType: T,
   options?: Partial<
     Readonly<{
@@ -71,6 +71,7 @@ export const SetType = <T extends Type<unknown>>(
       : new Set(Array.from(a).filter((v) => elementType.is(v)));
 
   const prune = (a: S): S =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     new Set(Array.from(a, (e) => elementType.prune(e)));
 
   return {

@@ -1,5 +1,5 @@
 import { type StrictOmit } from 'ts-type-forge';
-import { type Type } from '../type.mjs';
+import { type AnyType, type Type } from '../type.mjs';
 
 /**
  * Converts a Type to an optional property type.
@@ -37,7 +37,7 @@ import { type Type } from '../type.mjs';
  * );
  * ```
  */
-export const optional = <T extends Type<unknown>>(
+export const optional = <T extends AnyType>(
   t: T,
   options?: Partial<
     Readonly<{
@@ -70,12 +70,12 @@ export const optional = <T extends Type<unknown>>(
     optional: true,
   }) satisfies OptionalPropertyType<Type<unknown>> as OptionalPropertyType<T>;
 
-export type OptionalPropertyType<T extends Type<unknown>> = T &
+export type OptionalPropertyType<T extends AnyType> = T &
   Readonly<{ optional: true }>;
 
-export type RequiredPropertyType<T extends Type<unknown>> =
+export type RequiredPropertyType<T extends AnyType> =
   T extends OptionalPropertyType<T> ? StrictOmit<T, 'optional'> : T;
 
-export const isOptionalProperty = <T extends Type<unknown>>(
+export const isOptionalProperty = <T extends AnyType>(
   t: T,
 ): t is OptionalPropertyType<T> => t.optional === true;

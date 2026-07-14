@@ -9,6 +9,7 @@ import {
 import {
   flattenShapeStructure,
   hasRecordInternals,
+  type AnyType,
   type ExcessPropertyOption,
   type Type,
   type TypeOf,
@@ -89,9 +90,7 @@ type RequiredValue<
 /**
  * Makes an optional property required by removing the optional flag.
  */
-const makeRequired = <T extends Type<unknown>>(
-  t: T,
-): RequiredPropertyType<T> => {
+const makeRequired = <T extends AnyType>(t: T): RequiredPropertyType<T> => {
   if (!isOptionalProperty(t)) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return t as RequiredPropertyType<T>;
