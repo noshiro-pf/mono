@@ -124,7 +124,7 @@
     "@vitest/coverage-v8": "4.1.10",
     "@vitest/ui": "4.1.9",
     "cmd-ts": "0.15.0",
-    "conventional-changelog-conventionalcommits": "10.2.0",
+    "conventional-changelog-conventionalcommits": "10.2.1",
     "cspell": "10.0.1",
     "dedent": "1.7.2",
     "esbuild": "0.28.1",
