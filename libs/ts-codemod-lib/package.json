@@ -120,7 +120,7 @@
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.1",
     "@types/node": "26.1.0",
-    "@vitest/browser-playwright": "4.1.9",
+    "@vitest/browser-playwright": "4.1.10",
     "@vitest/coverage-v8": "4.1.9",
     "@vitest/ui": "4.1.9",
     "cmd-ts": "0.15.0",
