@@ -199,8 +199,16 @@ const getFilesFromGlob = async (
   >
 > => {
   const globResult = await glob(baseDir, {
-    ignore: exclude,
+    // Never transform files inside dependencies. With pnpm,
+    // `packages/*/node_modules/<dep>` are symlinks whose `src/` directory would
+    // otherwise be matched by patterns such as
+    // `packages/**/{src,scripts,samples,test}/**`, so the codemod would rewrite
+    // dependency source files (and could hit pathological types there).
+    ignore: Arr.toPushed(exclude, '**/node_modules/**'),
     absolute: true,
+    // Do not escape the project tree by following symlinks (e.g. the pnpm
+    // `node_modules` symlinks above, or workspace-package links).
+    followSymbolicLinks: false,
   });
 
   if (Result.isErr(globResult)) {

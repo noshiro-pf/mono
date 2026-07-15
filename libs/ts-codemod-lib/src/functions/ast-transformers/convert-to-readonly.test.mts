@@ -2627,6 +2627,69 @@ describe(convertToReadonlyTransformer, () => {
           type ParenReadonly = Readonly<{ a: number }>
         `,
       },
+      {
+        // Regression: redundant nested parentheses around a union used to make
+        // the transformer re-wrap the union on every pass, growing parentheses
+        // without bound until ts-morph's parser overflowed its stack (hang).
+        name: 'Doubled parentheses around a union (no infinite paren growth)',
+        source: dedent`
+          type DoubleParenUnion = (('a' | 'b'));
+        `,
+        expected: dedent`
+          type DoubleParenUnion = 'a' | 'b';
+        `,
+      },
+      {
+        name: 'Doubled parentheses around an object union (no infinite paren growth)',
+        source: dedent`
+          type DoubleParenObjUnion = (({ a: number[] } | { b: string[] }));
+        `,
+        expected: dedent`
+          type DoubleParenObjUnion = Readonly<
+            { a: readonly number[] } | { b: readonly string[] }
+          >;
+        `,
+      },
+      {
+        name: 'Doubled parentheses around a union in a conditional type (no infinite paren growth)',
+        source: dedent`
+          type DoubleParenCond = true extends true ? (('a' | 'b')) : 'c';
+        `,
+        expected: dedent`
+          type DoubleParenCond = true extends true ? 'a' | 'b' : 'c';
+        `,
+      },
+      {
+        // Precedence guard: the defensive parentheses around a union/intersection
+        // must NOT be dropped. A function type used as a union member is invalid
+        // TypeScript unless parenthesized (`string | () => number` is a syntax
+        // error), so the wrapping has to survive the transform.
+        name: 'Function type in a union stays parenthesized (precedence)',
+        source: dedent`
+          type FnUnion = string | (() => number);
+        `,
+        expected: dedent`
+          type FnUnion = string | (() => number);
+        `,
+      },
+      {
+        name: 'Bare function type in a union is parenthesized (precedence)',
+        source: dedent`
+          type FnUnionBare = string | () => number;
+        `,
+        expected: dedent`
+          type FnUnionBare = string | (() => number);
+        `,
+      },
+      {
+        name: 'Mixed & and | keeps precedence parentheses',
+        source: dedent`
+          type Mixed = number & { a: string } | { b: number };
+        `,
+        expected: dedent`
+          type Mixed = (number & Readonly<{ a: string }>) | Readonly<{ b: number }>;
+        `,
+      },
     ])('$name', testFn);
   });
 

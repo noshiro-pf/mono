@@ -1253,6 +1253,20 @@ const transformUnionOrIntersectionTypeNodeImpl = (
 
   // Readonly<number | { x: X } | { y: Y } | readonly E[]>
   // -> number | readonly E[] | Readonly<{ x: X } | { y: Y }>
+  // Readonly<number & { x: X } & { y: Y } & readonly E[]>
+  // -> number & readonly E[] & Readonly<{ x: X } & { y: Y }>
+
+  // Readonly<number | { x: X } | { y: Y } | readonly E[]>
+  // -> number | readonly E[] | Readonly<{ x: X } | { y: Y }>
+  //
+  // NOTE: The result is wrapped in parentheses (via `unionToString`). This is
+  // intentional and required for precedence safety: without it, a member such
+  // as a function type (`() => T`), or a mix of `&` and `|`, or a `readonly`
+  // operator would produce invalid syntax when this node is spliced back in.
+  // Idempotency is guaranteed by `transformParenthesizedTypeNode`, which
+  // collapses the redundant nesting (`((X))` -> `(X)`) this wrapping can create
+  // — see the note there. That prevents the parentheses from growing without
+  // bound when a union/intersection sits inside a `ParenthesizedType`.
   options.replaceNode(
     node,
     unionToString({ types: sorted, op: operator, wrapWithReadonly: false }),
@@ -1311,7 +1325,18 @@ const transformParenthesizedTypeNode = (
     isAtomicTypeNode(T) ||
     // remove () if T is TypeLiteralNode
     // e.g. `({ member: V }) |-> { member: V }`
-    T.isKind(tsm.SyntaxKind.TypeLiteral)
+    T.isKind(tsm.SyntaxKind.TypeLiteral) ||
+    // collapse redundant nested parentheses if T is itself a ParenthesizedType
+    // e.g. `((X)) |-> (X)`
+    //
+    // This is what makes the transform terminate on nested parentheses. The
+    // union/intersection handler defensively wraps its result in parentheses
+    // for precedence safety, which turns `(A | B)` into `((A | B))` when the
+    // union already sits inside a `ParenthesizedType`. Collapsing the redundant
+    // outer layer here means each pass removes exactly the layer the wrapping
+    // added, so the parentheses no longer grow without bound (which previously
+    // overflowed the parser stack on inputs like `type T = (('a' | 'b'))`).
+    T.isKind(tsm.SyntaxKind.ParenthesizedType)
   ) {
     options.replaceNode(node, T.getFullText());
   }
