@@ -1,3 +1,9 @@
+## [2.2.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.1...v2.2.2) (2026-07-15)
+
+### Bug Fixes
+
+- ignore node_modules and fix infinite loop ([#166](https://github.com/noshiro-pf/ts-codemod-lib/issues/166)) ([56cccb9](https://github.com/noshiro-pf/ts-codemod-lib/commit/56cccb96c21a9abb6096b2c9fc1a95a3c3047b71))
+
 ## [2.2.1](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.0...v2.2.1) (2026-06-29)
 
 ### Bug Fixes
