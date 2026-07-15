@@ -149,7 +149,7 @@
     "typescript": "6.0.3",
     "typescript-native": "npm:typescript@7.0.1-rc",
     "vite": "8.1.2",
-    "vitest": "4.1.9"
+    "vitest": "4.1.10"
   },
   "peerDependencies": {
     "cmd-ts": "0.14.3",
