@@ -1,3 +1,115 @@
+# [10.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v9.2.1...v10.0.0) (2026-07-17)
+
+- feat!: adopt ts-type-forge v6 / ts-data-forge v10 length-constrained types ([#343](https://github.com/noshiro-pf/ts-fortress/issues/343)) ([d306927](https://github.com/noshiro-pf/ts-fortress/commit/d306927572f7b7437d8d3285fbb5d4a5cb40e4cb))
+
+### BREAKING CHANGES
+
+- re-exported type names and default typeName strings
+  follow the renamed ts-type-forge tuple family; requires ts-type-forge
+  and ts-data-forge releases that include the renamed family.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
+- feat!: rename tuple-based length validators to match the type names
+
+Rename the structural tuple-based length validators so that function
+names match the types they produce, completing the
+{Fixed,Min,Max,Bounded}Length naming scheme:
+
+- arrayOfLength -> fixedLengthTuple
+- arrayAtLeastLength -> minLengthTuple
+- arrayAtMostLength -> maxLengthTuple
+- arrayBoundedLength -> boundedLengthTuple
+
+Source files are renamed accordingly (array-of-length.mts ->
+fixed-length-tuple.mts etc.), and internal calls to the renamed
+ts-data-forge guards (Arr.isArrayOfLength -> Arr.isFixedLengthTuple
+etc.) are updated.
+
+- the validators arrayOfLength, arrayAtLeastLength,
+  arrayAtMostLength, and arrayBoundedLength have been renamed to
+  fixedLengthTuple, minLengthTuple, maxLengthTuple, and
+  boundedLengthTuple. Requires a ts-data-forge release that includes the
+  renamed guards.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
+- docs: regenerate docs and README for the renamed validators
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
+- feat!: widen branded length bounds to the shared 2048 cap
+
+Use the shared SupportedLength (0..2048) boundary from ts-type-forge
+instead of repo-local caps:
+
+- The branded array validators (fixedLengthArray / minLengthArray /
+  maxLengthArray / boundedLengthArray) now accept bounds up to 2048
+  (previously SmallUint, i.e. up to 39) before falling back to
+  readonly A[]. The structural tuple validators keep the SmallUint
+  bound, which reflects the real cost of structural tuple expansion.
+- string() now encodes minLength/maxLength literals up to 2048 in the
+  result brand (previously 1..39). The range check is folded into the
+  infer constraint (`infer M extends SupportedLengthLiteral`), which
+  also keeps the TypeScript 7 (native) checker within its relation
+  complexity limits.
+
+* string() with minLength/maxLength literals in 40..2048
+  now returns branded MinLengthString/MaxLengthString types instead of
+  plain string; branded array validators accept bounds beyond SmallUint.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
+- feat!: bound tuple validators by the shared StructuralPrefixLength
+
+Replace the repo-local SmallUint (0..39) bound of the structural tuple
+validators (fixedLengthTuple / minLengthTuple / maxLengthTuple /
+boundedLengthTuple) with StructuralPrefixLength (0..10) exported from
+ts-type-forge, unifying the "expand N into a structural tuple vs fall
+back to readonly A[]" boundary across the repositories. It also matches
+the exact-tuple range of the branded FixedLengthArray.
+
+- tuple validators fall back to the untyped
+  readonly A[] overload for bounds above 10 (previously above 39); use
+  the branded validators (fixedLengthArray etc.) for larger bounds.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
+- chore: bump ts-type-forge from 5.0.0 to 6.0.0
+
+Adopt the released ts-type-forge v6.0.0. Note that this branch still
+requires an unreleased ts-data-forge (renamed tuple guards and the
+SupportedLength-constrained branded guards); until its next major is
+published, ts-data-forge remains at ^9.0.0 and CI type-checking will
+fail on the guard names. Verified locally against the built
+ts-data-forge dist from the sibling branch.
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
+- chore: bump ts-data-forge to 10.0.0 and finalize published deps
+
+Adopt the released ts-data-forge v10.0.0 (and ts-type-forge v6.0.0),
+so the branch no longer depends on any unpublished sibling build.
+
+- Bump the ts-data-forge dependency from ^9.0.0 to ^10.0.0.
+- Rework the internal validate/build helpers in
+  length-constrained-array.mts to avoid `Type<readonly A[]>['validate']`
+  indexed-access annotations, which the repo's convert-to-readonly
+  codemod rewrites to a non-readonly form; explicit function-type
+  annotations keep the file codemod-idempotent while still
+  type-checking.
+- Regenerate docs with GitHub source links (they had been generated in
+  an environment whose git remote does not resolve to github.com).
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
 ## [9.2.1](https://github.com/noshiro-pf/ts-fortress/compare/v9.2.0...v9.2.1) (2026-07-14)
 
 ### Bug Fixes
