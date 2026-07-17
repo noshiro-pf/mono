@@ -10,7 +10,7 @@ import { Arr, expectType, Optional } from 'ts-data-forge';
     assert.isTrue(sum === 20);
 
     // Type-safe length checking
-    if (Arr.isArrayAtLeastLength(numbers, 2)) {
+    if (Arr.isMinLengthTuple(numbers, 2)) {
       // numbers is now guaranteed to have at least 2 elements
       expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
 

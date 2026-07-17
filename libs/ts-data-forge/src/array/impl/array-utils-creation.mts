@@ -1,6 +1,6 @@
 import {
-  type ArrayOfLength,
   type BoolOr,
+  type FixedLengthTuple,
   type Index,
   type IsUnion,
   type List,
@@ -38,7 +38,7 @@ import { type SizeType } from '../../types.mjs';
 export const zeros = <N extends SizeType.ArgArr>(
   len: N,
 ): N extends SmallUint
-  ? ArrayOfLength<N, 0>
+  ? FixedLengthTuple<N, 0>
   : N extends SizeType.ArgArrPositive
     ? NonEmptyArray<0>
     : readonly 0[] =>
@@ -89,7 +89,7 @@ export const create = <N extends SizeType.ArgArr, const V>(
   len: N,
   init: V,
 ): N extends SmallUint
-  ? ArrayOfLength<N, V>
+  ? FixedLengthTuple<N, V>
   : N extends SizeType.ArgArrPositive
     ? NonEmptyArray<V>
     : readonly V[] =>

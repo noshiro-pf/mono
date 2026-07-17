@@ -1,4 +1,4 @@
-import { type ArrayOfLength } from 'ts-type-forge';
+import { type FixedLengthTuple } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';
@@ -26,7 +26,7 @@ describe('Arr transformations', () => {
   describe(map, () => {
     const mapped = map([1, 2, 3], (x, i): number => x ** 2 * i);
 
-    expectType<typeof mapped, ArrayOfLength<3, number>>('=');
+    expectType<typeof mapped, FixedLengthTuple<3, number>>('=');
 
     test('case 1', () => {
       assert.deepStrictEqual(mapped, [0, 4, 18]);
@@ -215,7 +215,7 @@ describe('Arr transformations', () => {
 
       const result = toSorted(xs);
 
-      expectType<typeof result, ArrayOfLength<3, 1 | 2 | 3>>('=');
+      expectType<typeof result, FixedLengthTuple<3, 1 | 2 | 3>>('=');
 
       test('case 1', () => {
         assert.deepStrictEqual(result, [1, 2, 3]);
@@ -227,7 +227,7 @@ describe('Arr transformations', () => {
 
       const result = toSorted(xs, (a, b) => a - b);
 
-      expectType<typeof result, ArrayOfLength<3, 1 | 2 | 3>>('=');
+      expectType<typeof result, FixedLengthTuple<3, 1 | 2 | 3>>('=');
 
       test('case 2', () => {
         assert.deepStrictEqual(result, [1, 2, 3]);
@@ -239,7 +239,7 @@ describe('Arr transformations', () => {
 
       const result = toSorted(xs, (a, b) => b - a);
 
-      expectType<typeof result, ArrayOfLength<3, 1 | 2 | 3>>('=');
+      expectType<typeof result, FixedLengthTuple<3, 1 | 2 | 3>>('=');
 
       test('case 3', () => {
         assert.deepStrictEqual(result, [3, 2, 1]);
@@ -255,7 +255,7 @@ describe('Arr transformations', () => {
 
       expectType<
         typeof sorted,
-        ArrayOfLength<3, Readonly<{ v: 1 } | { v: 2 } | { v: 3 }>>
+        FixedLengthTuple<3, Readonly<{ v: 1 } | { v: 2 } | { v: 3 }>>
       >('=');
 
       test('case 1', () => {
@@ -274,7 +274,7 @@ describe('Arr transformations', () => {
 
       expectType<
         typeof sorted,
-        ArrayOfLength<3, Readonly<{ v: 1 } | { v: 2 } | { v: 3 }>>
+        FixedLengthTuple<3, Readonly<{ v: 1 } | { v: 2 } | { v: 3 }>>
       >('=');
 
       test('case 2', () => {

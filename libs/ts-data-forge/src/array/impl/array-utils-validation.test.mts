@@ -1,19 +1,19 @@
 import {
-  type ArrayAtLeastLen,
-  type ArrayAtMostLen,
-  type ArrayBoundedLen,
-  type ArrayOfLength,
+  type BoundedLengthTuple,
+  type FixedLengthTuple,
+  type MaxLengthTuple,
+  type MinLengthTuple,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {
   every,
   indexIsInRange,
   isArray,
-  isArrayAtLeastLength,
-  isArrayAtMostLength,
-  isArrayBoundedLength,
-  isArrayOfLength,
+  isBoundedLengthTuple,
   isEmpty,
+  isFixedLengthTuple,
+  isMaxLengthTuple,
+  isMinLengthTuple,
   isNonEmpty,
   some,
 } from './array-utils-validation.mjs';
@@ -416,13 +416,13 @@ describe('Arr validations', () => {
     });
   });
 
-  describe(isArrayOfLength, () => {
+  describe(isFixedLengthTuple, () => {
     test('should return true if array has specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isTrue(isArrayOfLength(arr, 3));
+      assert.isTrue(isFixedLengthTuple(arr, 3));
 
-      if (isArrayOfLength(arr, 3)) {
+      if (isFixedLengthTuple(arr, 3)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
     });
@@ -430,15 +430,15 @@ describe('Arr validations', () => {
     test('should return false if array does not have specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isFalse(isArrayOfLength(arr, 2));
+      assert.isFalse(isFixedLengthTuple(arr, 2));
     });
 
     test('should return true for empty array and length 0', () => {
       const arr = [] as const;
 
-      assert.isTrue(isArrayOfLength(arr, 0));
+      assert.isTrue(isFixedLengthTuple(arr, 0));
 
-      if (isArrayOfLength(arr, 0)) {
+      if (isFixedLengthTuple(arr, 0)) {
         expectType<typeof arr, readonly []>('=');
       }
     });
@@ -446,74 +446,74 @@ describe('Arr validations', () => {
     test('should return false for non-empty array and length 0', () => {
       const arr = [1] as const;
 
-      assert.isFalse(isArrayOfLength(arr, 0));
+      assert.isFalse(isFixedLengthTuple(arr, 0));
     });
 
     test('should work with unknown array type', () => {
       const mut_arr: number[] = [1, 2];
 
-      assert.isTrue(isArrayOfLength(mut_arr, 2));
+      assert.isTrue(isFixedLengthTuple(mut_arr, 2));
 
-      if (isArrayOfLength(mut_arr, 2)) {
+      if (isFixedLengthTuple(mut_arr, 2)) {
         // transformer-ignore-next-line
-        expectType<typeof mut_arr, number[] & ArrayOfLength<2, number>>('=');
+        expectType<typeof mut_arr, number[] & FixedLengthTuple<2, number>>('=');
       }
 
-      assert.isFalse(isArrayOfLength(mut_arr, 3));
+      assert.isFalse(isFixedLengthTuple(mut_arr, 3));
     });
 
     test('should work with unknown readonly array type', () => {
       const arr: readonly number[] = [1, 2] as const;
 
-      assert.isTrue(isArrayOfLength(arr, 2));
+      assert.isTrue(isFixedLengthTuple(arr, 2));
 
-      if (isArrayOfLength(arr, 2)) {
-        expectType<typeof arr, ArrayOfLength<2, number>>('=');
+      if (isFixedLengthTuple(arr, 2)) {
+        expectType<typeof arr, FixedLengthTuple<2, number>>('=');
       }
 
-      assert.isFalse(isArrayOfLength(arr, 3));
+      assert.isFalse(isFixedLengthTuple(arr, 3));
     });
 
     test('should return true for arrays of exact length (additional)', () => {
-      assert.isTrue(isArrayOfLength([1, 2, 3], 3));
+      assert.isTrue(isFixedLengthTuple([1, 2, 3], 3));
 
-      assert.isTrue(isArrayOfLength([], 0));
+      assert.isTrue(isFixedLengthTuple([], 0));
 
-      assert.isTrue(isArrayOfLength(['a'], 1));
+      assert.isTrue(isFixedLengthTuple(['a'], 1));
     });
 
     test('should return false for arrays of different length (additional)', () => {
-      assert.isFalse(isArrayOfLength([1, 2, 3], 2));
+      assert.isFalse(isFixedLengthTuple([1, 2, 3], 2));
 
-      assert.isFalse(isArrayOfLength([1, 2, 3], 4));
+      assert.isFalse(isFixedLengthTuple([1, 2, 3], 4));
 
-      assert.isFalse(isArrayOfLength([], 1));
+      assert.isFalse(isFixedLengthTuple([], 1));
     });
 
     test('should work as type guard with exact length (additional)', () => {
       const array: readonly number[] = [1, 2, 3] as const;
 
-      if (isArrayOfLength(array, 3)) {
-        expectType<typeof array, ArrayOfLength<3, number>>('=');
+      if (isFixedLengthTuple(array, 3)) {
+        expectType<typeof array, FixedLengthTuple<3, number>>('=');
 
         expect(array).toHaveLength(3);
       }
     });
   });
 
-  describe(isArrayAtLeastLength, () => {
+  describe(isMinLengthTuple, () => {
     test('should return true if array length is greater than or equal to specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isTrue(isArrayAtLeastLength(arr, 3));
+      assert.isTrue(isMinLengthTuple(arr, 3));
 
-      if (isArrayAtLeastLength(arr, 3)) {
+      if (isMinLengthTuple(arr, 3)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
 
-      assert.isTrue(isArrayAtLeastLength(arr, 2));
+      assert.isTrue(isMinLengthTuple(arr, 2));
 
-      if (isArrayAtLeastLength(arr, 2)) {
+      if (isMinLengthTuple(arr, 2)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
     });
@@ -521,15 +521,15 @@ describe('Arr validations', () => {
     test('should return false if array length is less than specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isFalse(isArrayAtLeastLength(arr, 4));
+      assert.isFalse(isMinLengthTuple(arr, 4));
     });
 
     test('should return true for empty array and length 0', () => {
       const arr = [] as const;
 
-      assert.isTrue(isArrayAtLeastLength(arr, 0));
+      assert.isTrue(isMinLengthTuple(arr, 0));
 
-      if (isArrayAtLeastLength(arr, 0)) {
+      if (isMinLengthTuple(arr, 0)) {
         expectType<typeof arr, readonly []>('=');
       }
     });
@@ -537,71 +537,71 @@ describe('Arr validations', () => {
     test('should return false for empty array and positive length', () => {
       const arr = [] as const;
 
-      assert.isFalse(isArrayAtLeastLength(arr, 1));
+      assert.isFalse(isMinLengthTuple(arr, 1));
     });
 
     test('should work with unknown array type', () => {
       const mut_arr: number[] = [1, 2];
 
-      assert.isTrue(isArrayAtLeastLength(mut_arr, 2));
+      assert.isTrue(isMinLengthTuple(mut_arr, 2));
 
       // transformer-ignore-next-line
-      expectType<typeof mut_arr, number[] & ArrayAtLeastLen<2, number>>('=');
+      expectType<typeof mut_arr, number[] & MinLengthTuple<2, number>>('=');
 
-      assert.isFalse(isArrayAtLeastLength(mut_arr, 3));
+      assert.isFalse(isMinLengthTuple(mut_arr, 3));
     });
 
     test('should work with unknown array type 2', () => {
       const mut_arr: number[] = [1, 2];
 
-      assert.isTrue(isArrayAtLeastLength(mut_arr, 1));
+      assert.isTrue(isMinLengthTuple(mut_arr, 1));
 
       // transformer-ignore-next-line
-      expectType<typeof mut_arr, number[] & ArrayAtLeastLen<1, number>>('=');
+      expectType<typeof mut_arr, number[] & MinLengthTuple<1, number>>('=');
 
-      assert.isFalse(isArrayAtLeastLength(mut_arr, 3));
+      assert.isFalse(isMinLengthTuple(mut_arr, 3));
     });
 
     test('should return true for arrays of at least specified length (additional)', () => {
-      assert.isTrue(isArrayAtLeastLength([1, 2, 3], 3));
+      assert.isTrue(isMinLengthTuple([1, 2, 3], 3));
 
-      assert.isTrue(isArrayAtLeastLength([1, 2, 3], 2));
+      assert.isTrue(isMinLengthTuple([1, 2, 3], 2));
 
-      assert.isTrue(isArrayAtLeastLength([1, 2, 3], 1));
+      assert.isTrue(isMinLengthTuple([1, 2, 3], 1));
 
-      assert.isTrue(isArrayAtLeastLength([1, 2, 3], 0));
+      assert.isTrue(isMinLengthTuple([1, 2, 3], 0));
     });
 
     test('should return false for arrays shorter than specified length (additional)', () => {
-      assert.isFalse(isArrayAtLeastLength([1, 2, 3], 4));
+      assert.isFalse(isMinLengthTuple([1, 2, 3], 4));
 
-      assert.isFalse(isArrayAtLeastLength([], 1));
+      assert.isFalse(isMinLengthTuple([], 1));
     });
 
     test('should work as type guard for at least length (additional)', () => {
       const array: readonly number[] = [1, 2, 3] as const;
 
-      if (isArrayAtLeastLength(array, 2)) {
-        expectType<typeof array, ArrayAtLeastLen<2, number>>('=');
+      if (isMinLengthTuple(array, 2)) {
+        expectType<typeof array, MinLengthTuple<2, number>>('=');
 
         expect(array.length).toBeGreaterThanOrEqual(2);
       }
     });
   });
 
-  describe(isArrayAtMostLength, () => {
+  describe(isMaxLengthTuple, () => {
     test('should return true if array length is less than or equal to specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isTrue(isArrayAtMostLength(arr, 3));
+      assert.isTrue(isMaxLengthTuple(arr, 3));
 
-      if (isArrayAtMostLength(arr, 3)) {
+      if (isMaxLengthTuple(arr, 3)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
 
-      assert.isTrue(isArrayAtMostLength(arr, 4));
+      assert.isTrue(isMaxLengthTuple(arr, 4));
 
-      if (isArrayAtMostLength(arr, 4)) {
+      if (isMaxLengthTuple(arr, 4)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
     });
@@ -609,15 +609,15 @@ describe('Arr validations', () => {
     test('should return false if array length is greater than specified length', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isFalse(isArrayAtMostLength(arr, 2));
+      assert.isFalse(isMaxLengthTuple(arr, 2));
     });
 
     test('should return true for empty array and length 0', () => {
       const arr = [] as const;
 
-      assert.isTrue(isArrayAtMostLength(arr, 0));
+      assert.isTrue(isMaxLengthTuple(arr, 0));
 
-      if (isArrayAtMostLength(arr, 0)) {
+      if (isMaxLengthTuple(arr, 0)) {
         expectType<typeof arr, readonly []>('=');
       }
     });
@@ -625,58 +625,58 @@ describe('Arr validations', () => {
     test('should return false for non-empty array and length 0', () => {
       const arr = [1] as const;
 
-      assert.isFalse(isArrayAtMostLength(arr, 0));
+      assert.isFalse(isMaxLengthTuple(arr, 0));
     });
 
     test('should work with unknown array type', () => {
       const mut_arr: number[] = [1, 2];
 
-      assert.isTrue(isArrayAtMostLength(mut_arr, 2));
+      assert.isTrue(isMaxLengthTuple(mut_arr, 2));
 
       // transformer-ignore-next-line
-      expectType<typeof mut_arr, number[] & ArrayAtMostLen<2, number>>('=');
+      expectType<typeof mut_arr, number[] & MaxLengthTuple<2, number>>('=');
 
-      assert.isFalse(isArrayAtMostLength(mut_arr, 1));
+      assert.isFalse(isMaxLengthTuple(mut_arr, 1));
     });
 
     test('should return true for arrays of at most specified length (additional)', () => {
-      assert.isTrue(isArrayAtMostLength([1, 2, 3], 3));
+      assert.isTrue(isMaxLengthTuple([1, 2, 3], 3));
 
-      assert.isTrue(isArrayAtMostLength([1, 2, 3], 4));
+      assert.isTrue(isMaxLengthTuple([1, 2, 3], 4));
 
-      assert.isTrue(isArrayAtMostLength([], 0));
+      assert.isTrue(isMaxLengthTuple([], 0));
     });
 
     test('should return false for arrays longer than specified length (additional)', () => {
-      assert.isFalse(isArrayAtMostLength([1, 2, 3], 2));
+      assert.isFalse(isMaxLengthTuple([1, 2, 3], 2));
 
-      assert.isFalse(isArrayAtMostLength([1, 2, 3], 0));
+      assert.isFalse(isMaxLengthTuple([1, 2, 3], 0));
     });
 
     test('should work as type guard for at most length (additional)', () => {
       const array: readonly number[] = [1, 2] as const;
 
-      if (isArrayAtMostLength(array, 3)) {
-        expectType<typeof array, ArrayAtMostLen<3, number>>('=');
+      if (isMaxLengthTuple(array, 3)) {
+        expectType<typeof array, MaxLengthTuple<3, number>>('=');
 
         expect(array.length).toBeLessThanOrEqual(3);
       }
     });
   });
 
-  describe(isArrayBoundedLength, () => {
+  describe(isBoundedLengthTuple, () => {
     test('should return true if array length is within the specified range', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isTrue(isArrayBoundedLength(arr, 1, 3));
+      assert.isTrue(isBoundedLengthTuple(arr, 1, 3));
 
-      if (isArrayBoundedLength(arr, 1, 3)) {
+      if (isBoundedLengthTuple(arr, 1, 3)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
 
-      assert.isTrue(isArrayBoundedLength(arr, 3, 5));
+      assert.isTrue(isBoundedLengthTuple(arr, 3, 5));
 
-      if (isArrayBoundedLength(arr, 3, 5)) {
+      if (isBoundedLengthTuple(arr, 3, 5)) {
         expectType<typeof arr, readonly [1, 2, 3]>('=');
       }
     });
@@ -684,21 +684,21 @@ describe('Arr validations', () => {
     test('should return false if array length is below the specified range', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isFalse(isArrayBoundedLength(arr, 4, 5));
+      assert.isFalse(isBoundedLengthTuple(arr, 4, 5));
     });
 
     test('should return false if array length is above the specified range', () => {
       const arr = [1, 2, 3] as const;
 
-      assert.isFalse(isArrayBoundedLength(arr, 0, 2));
+      assert.isFalse(isBoundedLengthTuple(arr, 0, 2));
     });
 
     test('should return true for empty array and range including 0', () => {
       const arr = [] as const;
 
-      assert.isTrue(isArrayBoundedLength(arr, 0, 2));
+      assert.isTrue(isBoundedLengthTuple(arr, 0, 2));
 
-      if (isArrayBoundedLength(arr, 0, 2)) {
+      if (isBoundedLengthTuple(arr, 0, 2)) {
         expectType<typeof arr, readonly []>('=');
       }
     });
@@ -706,33 +706,35 @@ describe('Arr validations', () => {
     test('should work with unknown array type', () => {
       const mut_arr: number[] = [1, 2];
 
-      assert.isTrue(isArrayBoundedLength(mut_arr, 1, 3));
+      assert.isTrue(isBoundedLengthTuple(mut_arr, 1, 3));
 
       // transformer-ignore-next-line
-      expectType<typeof mut_arr, number[] & ArrayBoundedLen<1, 3, number>>('=');
+      expectType<typeof mut_arr, number[] & BoundedLengthTuple<1, 3, number>>(
+        '=',
+      );
 
-      assert.isFalse(isArrayBoundedLength(mut_arr, 3, 5));
+      assert.isFalse(isBoundedLengthTuple(mut_arr, 3, 5));
     });
 
     test('should return true for arrays within specified range (additional)', () => {
-      assert.isTrue(isArrayBoundedLength([1, 2, 3], 1, 3));
+      assert.isTrue(isBoundedLengthTuple([1, 2, 3], 1, 3));
 
-      assert.isTrue(isArrayBoundedLength([1, 2, 3], 3, 3));
+      assert.isTrue(isBoundedLengthTuple([1, 2, 3], 3, 3));
 
-      assert.isTrue(isArrayBoundedLength([], 0, 0));
+      assert.isTrue(isBoundedLengthTuple([], 0, 0));
     });
 
     test('should return false for arrays outside specified range (additional)', () => {
-      assert.isFalse(isArrayBoundedLength([1, 2, 3], 4, 5));
+      assert.isFalse(isBoundedLengthTuple([1, 2, 3], 4, 5));
 
-      assert.isFalse(isArrayBoundedLength([1, 2, 3], 0, 2));
+      assert.isFalse(isBoundedLengthTuple([1, 2, 3], 0, 2));
     });
 
     test('should work as type guard for bounded length (additional)', () => {
       const array: readonly number[] = [1, 2] as const;
 
-      if (isArrayBoundedLength(array, 1, 3)) {
-        expectType<typeof array, ArrayBoundedLen<1, 3, number>>('=');
+      if (isBoundedLengthTuple(array, 1, 3)) {
+        expectType<typeof array, BoundedLengthTuple<1, 3, number>>('=');
 
         expect(array.length).toBeGreaterThanOrEqual(1);
 

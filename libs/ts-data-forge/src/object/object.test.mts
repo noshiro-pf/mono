@@ -1,6 +1,6 @@
 import {
-  type ArrayOfLength,
   type DeepReadonly,
+  type FixedLengthTuple,
   type UnknownRecord,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
@@ -407,7 +407,7 @@ describe('merge', () => {
   test('type: MergeAll with fixed length typed array', () => {
     type MyRecord = Readonly<{ x: number; y: string }>;
 
-    const records: ArrayOfLength<3, MyRecord> = [
+    const records: FixedLengthTuple<3, MyRecord> = [
       { x: 1, y: 'a' },
       { x: 2, y: 'b' },
       { x: 3, y: 'c' },
@@ -438,7 +438,7 @@ describe('merge', () => {
   test('type: MergeAll with fixed length typed array and optional properties', () => {
     type RecordWithOptional = Readonly<{ x: number; y?: string }>;
 
-    const records: ArrayOfLength<2, RecordWithOptional> = [
+    const records: FixedLengthTuple<2, RecordWithOptional> = [
       { x: 1, y: 'a' },
       { x: 2 },
     ] as const;

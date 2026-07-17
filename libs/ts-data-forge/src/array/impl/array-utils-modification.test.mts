@@ -1,4 +1,4 @@
-import { type ArrayOfLength, type NonEmptyArray } from 'ts-type-forge';
+import { type FixedLengthTuple, type NonEmptyArray } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { asUint32 } from '../../number/index.mjs';
 import {
@@ -18,7 +18,7 @@ describe('Arr modifications', () => {
 
     const result = toUpdated(xs, 1, (x) => x + 2);
 
-    expectType<typeof result, ArrayOfLength<3, number>>('=');
+    expectType<typeof result, FixedLengthTuple<3, number>>('=');
 
     test('case 1', () => {
       assert.deepStrictEqual(result, [1, 4, 3]);
@@ -39,7 +39,7 @@ describe('Arr modifications', () => {
     test('case 1', () => {
       const result = toInserted(xs, 1, 5);
 
-      expectType<typeof result, ArrayOfLength<4, 1 | 2 | 3 | 5>>('=');
+      expectType<typeof result, FixedLengthTuple<4, 1 | 2 | 3 | 5>>('=');
 
       assert.deepStrictEqual(result, [1, 5, 2, 3]);
     });
@@ -47,7 +47,7 @@ describe('Arr modifications', () => {
     test('case 2 (insert head)', () => {
       const result = toInserted(xs, 0, 5);
 
-      expectType<typeof result, ArrayOfLength<4, 1 | 2 | 3 | 5>>('=');
+      expectType<typeof result, FixedLengthTuple<4, 1 | 2 | 3 | 5>>('=');
 
       assert.deepStrictEqual(result, [5, 1, 2, 3]);
     });

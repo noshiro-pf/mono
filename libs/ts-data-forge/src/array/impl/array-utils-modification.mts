@@ -1,5 +1,5 @@
 import {
-  type ArrayOfLength,
+  type FixedLengthTuple,
   type Increment,
   type IsFixedLengthList,
   type NonEmptyArray,
@@ -163,7 +163,7 @@ export function toInserted<
   index: ArgArrayIndexWithNegative<Ar>,
   newValue: V,
 ): IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
+  ? FixedLengthTuple<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
   : NonEmptyArray<Ar[number] | V>;
 
 // curried version
@@ -173,7 +173,7 @@ export function toInserted<const V>(
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
 ) => IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
+  ? FixedLengthTuple<CastToNumber<Increment<Ar['length']>>, Ar[number] | V>
   : NonEmptyArray<Ar[number] | V>;
 
 export function toInserted<E, const V = E>(
@@ -367,7 +367,7 @@ export function toFilled<const Ar extends readonly unknown[], const V>(
   array: Ar,
   value: V,
 ): IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<Ar['length'], V>
+  ? FixedLengthTuple<Ar['length'], V>
   : Ar extends NonEmptyArray<unknown>
     ? NonEmptyArray<V>
     : readonly V[];
@@ -378,7 +378,7 @@ export function toFilled<const V>(
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
 ) => IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<Ar['length'], V>
+  ? FixedLengthTuple<Ar['length'], V>
   : Ar extends NonEmptyArray<unknown>
     ? NonEmptyArray<V>
     : readonly V[];
@@ -426,7 +426,7 @@ export function toRangeFilled<const Ar extends readonly unknown[], const V>(
     end: ArgArrayIndexWithNegative<Ar>,
   ],
 ): IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<Ar['length'], V | Ar[number]>
+  ? FixedLengthTuple<Ar['length'], V | Ar[number]>
   : Ar extends NonEmptyArray<unknown>
     ? NonEmptyArray<V | Ar[number]>
     : readonly (V | Ar[number])[];
@@ -441,7 +441,7 @@ export function toRangeFilled<const V>(
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
 ) => IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<Ar['length'], V | Ar[number]>
+  ? FixedLengthTuple<Ar['length'], V | Ar[number]>
   : Ar extends NonEmptyArray<unknown>
     ? NonEmptyArray<V | Ar[number]>
     : readonly (V | Ar[number])[];

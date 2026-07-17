@@ -1,4 +1,4 @@
-// Example: src/array/array-utils.mts (isArrayAtLeastLength)
+// Example: src/array/array-utils.mts (isMinLengthTuple)
 import { Arr } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
@@ -8,11 +8,11 @@ if (import.meta.vitest !== undefined) {
 
     const emptyQueue: readonly string[] = [] as const;
 
-    assert.isTrue(Arr.isArrayAtLeastLength(queue, 1));
+    assert.isTrue(Arr.isMinLengthTuple(queue, 1));
 
-    assert.isFalse(Arr.isArrayAtLeastLength(emptyQueue, 1));
+    assert.isFalse(Arr.isMinLengthTuple(emptyQueue, 1));
 
-    if (Arr.isArrayAtLeastLength(queue, 1)) {
+    if (Arr.isMinLengthTuple(queue, 1)) {
       assert.isTrue(queue[0] === 'task-1');
     }
 

@@ -3,8 +3,8 @@ import {
   type FixedLengthString,
   type MaxLengthString,
   type MinLengthString,
+  type SupportedLength,
 } from 'ts-type-forge';
-import { type SizeType } from '../types.mjs';
 
 /**
  * Type guard that checks if a string has at least `minLength` characters.
@@ -46,7 +46,7 @@ import { type SizeType } from '../types.mjs';
  */
 export const isMinLengthString = <
   S extends string,
-  MinLength extends SizeType.ArgStr,
+  MinLength extends SupportedLength,
 >(
   s: S,
   minLength: MinLength,
@@ -92,7 +92,7 @@ export const isMinLengthString = <
  */
 export const isMaxLengthString = <
   S extends string,
-  MaxLength extends SizeType.ArgStr,
+  MaxLength extends SupportedLength,
 >(
   s: S,
   maxLength: MaxLength,
@@ -142,8 +142,8 @@ export const isMaxLengthString = <
  */
 export const isBoundedLengthString = <
   S extends string,
-  MinLength extends SizeType.ArgStr,
-  MaxLength extends SizeType.ArgStr,
+  MinLength extends SupportedLength,
+  MaxLength extends SupportedLength,
 >(
   s: S,
   minLength: MinLength,
@@ -192,7 +192,7 @@ export const isBoundedLengthString = <
  */
 export const isFixedLengthString = <
   S extends string,
-  Length extends SizeType.ArgStr,
+  Length extends SupportedLength,
 >(
   s: S,
   length: Length,

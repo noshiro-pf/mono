@@ -1,5 +1,5 @@
 import {
-  type ArrayOfLength,
+  type FixedLengthTuple,
   type IsFixedLengthList,
   type List,
   type MutableNonEmptyArray,
@@ -220,7 +220,7 @@ export const toSorted = <const Ar extends readonly unknown[]>(
       ]
     : readonly [array: Ar, comparator: (x: Ar[number], y: Ar[number]) => number]
 ): IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<Ar['length'], Ar[number]>
+  ? FixedLengthTuple<Ar['length'], Ar[number]>
   : Ar extends NonEmptyArray<unknown>
     ? NonEmptyArray<Ar[number]>
     : readonly Ar[number][] =>
@@ -278,7 +278,7 @@ export function toSortedBy<const Ar extends readonly unknown[]>(
   // If the array elements are mapped to numbers, comparator is optional.
   comparator?: (x: number, y: number) => number,
 ): IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<Ar['length'], Ar[number]>
+  ? FixedLengthTuple<Ar['length'], Ar[number]>
   : Ar extends NonEmptyArray<unknown>
     ? NonEmptyArray<Ar[number]>
     : readonly Ar[number][];
@@ -288,7 +288,7 @@ export function toSortedBy<const Ar extends readonly unknown[], const V>(
   comparatorValueMapper: (value: Ar[number]) => V,
   comparator: (x: V, y: V) => number,
 ): IsFixedLengthList<Ar> extends true
-  ? ArrayOfLength<Ar['length'], Ar[number]>
+  ? FixedLengthTuple<Ar['length'], Ar[number]>
   : Ar extends NonEmptyArray<unknown>
     ? NonEmptyArray<Ar[number]>
     : readonly Ar[number][];
