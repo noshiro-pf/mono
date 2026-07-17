@@ -4,7 +4,8 @@ import {
   type MaxLengthString,
   type MinLengthString,
   type NonEmptyString,
-  type SmallInt,
+  type RelaxedExclude,
+  type SupportedLength,
 } from 'ts-type-forge';
 import { refine } from '../other-types/index.mjs';
 import { type Type } from '../type.mjs';
@@ -29,7 +30,7 @@ export function string<C extends RawConstraints>(
 
   if (
     constraints === undefined ||
-    Arr.isArrayOfLength(Object.keys(constraints), 0)
+    Arr.isFixedLengthTuple(Object.keys(constraints), 0)
   ) {
     return baseType;
   }
@@ -160,42 +161,36 @@ type ConstraintsResultTypeWhenNonemptyIsOn<C extends RawConstraints> =
   C extends Readonly<{ nonempty: true }> ? NonEmptyString : string;
 
 /**
- * The length-bound literals supported at the type level: `SmallInt<'>0'>`
- * (i.e. `1 | 2 | ... | 39`). Only bounds within this range are encoded in
- * the result brand; larger literals and non-literal `number`s collapse to
- * plain `string` to keep the type-level computation cheap (the runtime
- * constraint applies regardless). Non-integer bounds and bounds less than 1
- * throw a `TypeError` when the type is constructed.
+ * The length-bound literals supported at the type level:
+ * `RelaxedExclude<SupportedLength, 0>` (i.e. `1 | 2 | ... | 2048`, the shared
+ * cap of the branded length-constrained types in ts-type-forge). Only bounds
+ * within this range are encoded in the result brand; larger literals and
+ * non-literal `number`s collapse to plain `string` to keep the type-level
+ * computation cheap (the runtime constraint applies regardless). Non-integer
+ * bounds and bounds less than 1 throw a `TypeError` when the type is
+ * constructed.
  */
-type SupportedLengthLiteral = SmallInt<'>0'>;
+type SupportedLengthLiteral = RelaxedExclude<SupportedLength, 0>;
 
 type ConstraintsResultTypeWhenMinLengthIsOn<C extends RawConstraints> =
-  C extends Readonly<{ minLength: infer M extends number }>
-    ? [M] extends [SupportedLengthLiteral]
-      ? MinLengthString<M>
-      : string // minLength outside the supported literal range is not encoded in the brand
-    : string;
+  C extends Readonly<{ minLength: infer M extends SupportedLengthLiteral }>
+    ? MinLengthString<M>
+    : string; // minLength outside the supported literal range is not encoded in the brand
 
 type ConstraintsResultTypeWhenMaxLengthIsOn<C extends RawConstraints> =
-  C extends Readonly<{ maxLength: infer M extends number }>
-    ? [M] extends [SupportedLengthLiteral]
-      ? MaxLengthString<M>
-      : string // maxLength outside the supported literal range is not encoded in the brand
-    : string;
+  C extends Readonly<{ maxLength: infer M extends SupportedLengthLiteral }>
+    ? MaxLengthString<M>
+    : string; // maxLength outside the supported literal range is not encoded in the brand
 
 type DefaultValueWhenMinLengthIsOn<S extends string, C extends RawConstraints> =
-  C extends Readonly<{ minLength: infer M extends number }>
-    ? [M] extends [SupportedLengthLiteral]
-      ? StringWithMinLength<S, M>
-      : string // the default's length is only checked at runtime for such bounds
-    : string;
+  C extends Readonly<{ minLength: infer M extends SupportedLengthLiteral }>
+    ? StringWithMinLength<S, M>
+    : string; // the default's length is only checked at runtime for such bounds
 
 type DefaultValueWhenMaxLengthIsOn<S extends string, C extends RawConstraints> =
-  C extends Readonly<{ maxLength: infer M extends number }>
-    ? [M] extends [SupportedLengthLiteral]
-      ? StringWithMaxLength<S, M>
-      : string // the default's length is only checked at runtime for such bounds
-    : string;
+  C extends Readonly<{ maxLength: infer M extends SupportedLengthLiteral }>
+    ? StringWithMaxLength<S, M>
+    : string; // the default's length is only checked at runtime for such bounds
 
 type StringWithMinLength<S extends string, N extends number> =
   HasLengthAtLeast<S, N> extends true ? S : never;

@@ -1042,10 +1042,10 @@ type ValidationError = Readonly<{
 - `t.array(elementType)` - Array validation
 - `t.nonEmptyArray(elementType)` - Non-empty array validation
 - `t.tuple([t1, t2, ..., tN])` - Fixed-length tuple validation
-- `t.arrayOfLength(size, elementType)` - Fixed-length array validation
-- `t.arrayAtLeastLength(size, elementType)` - Array validation with a minimum length
-- `t.arrayAtMostLength(size, elementType)` - Array validation with a maximum length
-- `t.arrayBoundedLength(min, max, elementType)` - Array validation with a length between `min` and `max` (inclusive)
+- `t.fixedLengthTuple(size, elementType)` - Fixed-length array validation
+- `t.minLengthTuple(size, elementType)` - Array validation with a minimum length
+- `t.maxLengthTuple(size, elementType)` - Array validation with a maximum length
+- `t.boundedLengthTuple(min, max, elementType)` - Array validation with a length between `min` and `max` (inclusive)
 
 ### Objects
 

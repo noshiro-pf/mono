@@ -92,7 +92,7 @@ export const union = <const Types extends NonEmptyArray<AnyType>>(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return {
       ...baseType,
-      shapeStructure: Arr.isArrayOfLength(shapeStructures, 1)
+      shapeStructure: Arr.isFixedLengthTuple(shapeStructures, 1)
         ? shapeStructures[0]
         : ({ kind: 'union', variants: shapeStructures } as const),
       excessProperty,

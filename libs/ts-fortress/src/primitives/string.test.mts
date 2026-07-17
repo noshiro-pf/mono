@@ -440,41 +440,46 @@ describe('string with constraints', () => {
   });
 
   describe('minLength/maxLength outside the supported literal range', () => {
-    // Only the number literals `1..39` (`SmallInt<'>0'>`) are encoded in the
-    // result brand. A larger literal or a non-literal `number` collapses the
-    // result type to plain `string` to keep the type-level computation
-    // cheap, while the runtime constraint applies regardless. Non-integer
-    // bounds and bounds less than 1 throw at construction time.
+    // Only the number literals `1..2048` (the shared `SupportedLength` cap of
+    // the branded length-constrained types) are encoded in the result brand.
+    // A larger literal or a non-literal `number` collapses the result type to
+    // plain `string` to keep the type-level computation cheap, while the
+    // runtime constraint applies regardless. Non-integer bounds and bounds
+    // less than 1 throw at construction time.
 
-    test('the largest supported literal (39) is encoded in the brand', () => {
-      const type = string('x'.repeat(39), { minLength: 39 });
+    test('the largest supported literal (2048) is encoded in the brand', () => {
+      const longDefault: string = 'x'.repeat(2048);
 
-      expectType<typeof type, Type<MinLengthString<39>>>('=');
+      const type = string(longDefault, { minLength: 2048 });
 
-      assert.isTrue(type.is('x'.repeat(39)));
+      expectType<typeof type, Type<MinLengthString<2048>>>('=');
 
-      assert.isFalse(type.is('x'.repeat(38)));
+      assert.isTrue(type.is('x'.repeat(2048)));
+
+      assert.isFalse(type.is('x'.repeat(2047)));
     });
 
-    test('a minLength literal outside the range (>= 40) falls back to plain string', () => {
-      const type = string('x'.repeat(40), { minLength: 40 });
+    test('a minLength literal outside the range (>= 2049) falls back to plain string', () => {
+      const longDefault: string = 'x'.repeat(2049);
+
+      const type = string(longDefault, { minLength: 2049 });
 
       expectType<typeof type, Type<string>>('=');
 
       // The runtime constraint still applies.
-      assert.isTrue(type.is('x'.repeat(40)));
+      assert.isTrue(type.is('x'.repeat(2049)));
 
-      assert.isFalse(type.is('x'.repeat(39)));
+      assert.isFalse(type.is('x'.repeat(2048)));
     });
 
-    test('a maxLength literal outside the range (>= 40) falls back to plain string', () => {
-      const type = string('', { maxLength: 100 });
+    test('a maxLength literal outside the range (>= 2049) falls back to plain string', () => {
+      const type = string('', { maxLength: 2049 });
 
       expectType<typeof type, Type<string>>('=');
 
-      assert.isTrue(type.is('x'.repeat(100)));
+      assert.isTrue(type.is('x'.repeat(2049)));
 
-      assert.isFalse(type.is('x'.repeat(101)));
+      assert.isFalse(type.is('x'.repeat(2050)));
     });
 
     test('throws for a maxLength less than 1 or a non-integer maxLength', () => {
@@ -503,8 +508,10 @@ describe('string with constraints', () => {
       // With an in-range literal bound, a too-short default is already a
       // compile error; with an out-of-range bound it compiles and the check
       // is deferred to runtime.
-      expect(() => string('hi', { minLength: 100 })).toThrow(
-        /^defaultValue "hi" for string does not satisfy the constraint minLength = 100$/u,
+      const shortDefault: string = 'hi';
+
+      expect(() => string(shortDefault, { minLength: 2049 })).toThrow(
+        /^defaultValue "hi" for string does not satisfy the constraint minLength = 2049$/u,
       );
     });
   });

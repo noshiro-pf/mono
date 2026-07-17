@@ -73,7 +73,7 @@ export const mergeRecords = <
     options?.excessProperty ?? deriveStrictestExcessProperty(recordTypes);
 
   // If there's only one merged shape, return it directly
-  if (Arr.isArrayOfLength(mergedShapes, 1)) {
+  if (Arr.isFixedLengthTuple(mergedShapes, 1)) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return record(mergedShapes[0], {
       typeName: typeNameFilled,

@@ -26,7 +26,7 @@ export function bigint<C extends Constraints>(
 
   if (
     constraints === undefined ||
-    Arr.isArrayOfLength(Object.keys(constraints), 0)
+    Arr.isFixedLengthTuple(Object.keys(constraints), 0)
   ) {
     return baseType;
   }

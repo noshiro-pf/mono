@@ -1,9 +1,7 @@
 import { Arr, asUint32, memoizeFunction, Result } from 'ts-data-forge';
 import {
-  type ArrayAtLeastLen,
-  type ArrayAtMostLen,
-  type ArrayBoundedLen,
-  type SmallUint,
+  type MaxLengthTuple,
+  type StructuralPrefixLength,
 } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
@@ -15,56 +13,23 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export type { ArrayBoundedLen } from 'ts-type-forge';
+export type { MaxLengthTuple } from 'ts-type-forge';
 
-export function arrayBoundedLength<
-  A,
-  Min extends SmallUint,
-  Max extends SmallUint,
->(
-  min: Min,
-  max: Max,
+export function maxLengthTuple<A, N extends StructuralPrefixLength>(
+  size: N,
   elementType: Type<A>,
   options?: Partial<
     Readonly<{
       typeName: string;
-      defaultValue: ArrayBoundedLen<Min, Max, A>;
+      defaultValue: MaxLengthTuple<N, A>;
     }>
   >,
-): Type<ArrayBoundedLen<Min, Max, A>>;
+): Type<MaxLengthTuple<N, A>>;
 
-// Only the lower bound is in `SmallUint`, so the upper bound is dropped from the
-// result type and only the "at least `min`" guarantee is kept.
-export function arrayBoundedLength<A, Min extends SmallUint>(
-  min: Min,
-  max: number,
-  elementType: Type<A>,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
-      defaultValue: ArrayAtLeastLen<Min, A>;
-    }>
-  >,
-): Type<ArrayAtLeastLen<Min, A>>;
-
-// Only the upper bound is in `SmallUint`, so the lower bound is dropped from the
-// result type and only the "at most `max`" guarantee is kept.
-export function arrayBoundedLength<A, Max extends SmallUint>(
-  min: number,
-  max: Max,
-  elementType: Type<A>,
-  options?: Partial<
-    Readonly<{
-      typeName: string;
-      defaultValue: ArrayAtMostLen<Max, A>;
-    }>
-  >,
-): Type<ArrayAtMostLen<Max, A>>;
-
-// Neither bound is in `SmallUint`, so the result length is left unconstrained.
-export function arrayBoundedLength<A>(
-  min: number,
-  max: number,
+// For sizes outside `StructuralPrefixLength` (`0..10`) the exact length cannot be encoded in the type,
+// so the result length is left unconstrained (`readonly A[]`).
+export function maxLengthTuple<A>(
+  size: number,
   elementType: Type<A>,
   options?: Partial<
     Readonly<{
@@ -74,9 +39,8 @@ export function arrayBoundedLength<A>(
   >,
 ): Type<readonly A[]>;
 
-export function arrayBoundedLength<A>(
-  min: number,
-  max: number,
+export function maxLengthTuple<A>(
+  size: number,
   elementType: Type<A>,
   options?: Partial<
     Readonly<{
@@ -88,14 +52,13 @@ export function arrayBoundedLength<A>(
   type T = readonly A[];
 
   const typeName =
-    options?.typeName ??
-    `ArrayBoundedLen<${min}, ${max}, ${elementType.typeName}>`;
+    options?.typeName ?? `MaxLengthTuple<${size}, ${elementType.typeName}>`;
 
   const getDefaultValue = memoizeFunction(
     (): T =>
       options?.defaultValue ??
-      // An array of the minimum length is the shortest value within the range.
-      Arr.create(asUint32(min), elementType.defaultValue),
+      // The empty array is the shortest value satisfying `length <= size`.
+      Arr.create(0, elementType.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {
@@ -110,7 +73,7 @@ export function arrayBoundedLength<A>(
       ]);
     }
 
-    if (a.length < min || max < a.length) {
+    if (a.length > size) {
       return Result.err([
         {
           path: [],
@@ -118,9 +81,8 @@ export function arrayBoundedLength<A>(
           expectedType: typeName,
           typeName,
           details: {
-            kind: 'array-range-length',
-            minLength: min,
-            maxLength: max,
+            kind: 'array-max-length',
+            maxLength: size,
             actualLength: a.length,
           },
         } satisfies ValidationError,
@@ -145,21 +107,14 @@ export function arrayBoundedLength<A>(
     return Result.ok(a as unknown as T);
   };
 
-  const fill: Type<T>['fill'] = (a) => {
-    if (!Arr.isArray(a)) {
-      return getDefaultValue();
-    }
-
-    // Trim down to at most `max`, then pad up to at least `min`.
-    const capped = Arr.take(a, asUint32(max));
-
-    return capped.length >= min
-      ? Arr.map(capped, (el) => elementType.fill(el) satisfies A)
-      : Arr.map(
-          Arr.seq(asUint32(min)),
-          (i) => elementType.fill(capped[i]) satisfies A,
-        );
-  };
+  const fill: Type<T>['fill'] = (a) =>
+    Arr.isArray(a)
+      ? // Keep the input but trim down to at most `size` elements.
+        Arr.map(
+          Arr.take(a, asUint32(size)),
+          (el) => elementType.fill(el) satisfies A,
+        )
+      : getDefaultValue();
 
   const prune = (a: T): T => a.map((el) => elementType.prune(el));
 

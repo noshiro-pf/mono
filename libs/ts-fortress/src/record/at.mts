@@ -104,7 +104,7 @@ export function at(
     ? ([...memberTypes, undefinedType] as const)
     : memberTypes;
 
-  if (Arr.isArrayAtLeastLength(collected, 2)) {
+  if (Arr.isMinLengthTuple(collected, 2)) {
     return union(collected, {
       typeName: `${type.typeName}[${JSON.stringify(keyOrIndex)}]`,
     });

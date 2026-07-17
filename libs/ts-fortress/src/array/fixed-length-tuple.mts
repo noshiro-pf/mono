@@ -1,5 +1,8 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import { type ArrayOfLength, type SmallUint } from 'ts-type-forge';
+import {
+  type FixedLengthTuple,
+  type StructuralPrefixLength,
+} from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -10,22 +13,22 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export type { ArrayOfLength } from 'ts-type-forge';
+export type { FixedLengthTuple } from 'ts-type-forge';
 
-export const arrayOfLength = <A, N extends SmallUint>(
+export const fixedLengthTuple = <A, N extends StructuralPrefixLength>(
   size: N,
   elementType: Type<A>,
   options?: Partial<
     Readonly<{
       typeName: string;
-      defaultValue: ArrayOfLength<N, A>;
+      defaultValue: FixedLengthTuple<N, A>;
     }>
   >,
-): Type<ArrayOfLength<N, A>> => {
-  type T = ArrayOfLength<N, A>;
+): Type<FixedLengthTuple<N, A>> => {
+  type T = FixedLengthTuple<N, A>;
 
   const typeName =
-    options?.typeName ?? `ArrayOfLength<${size}, ${elementType.typeName}>`;
+    options?.typeName ?? `FixedLengthTuple<${size}, ${elementType.typeName}>`;
 
   const getDefaultValue = memoizeFunction(
     (): T =>
@@ -46,7 +49,7 @@ export const arrayOfLength = <A, N extends SmallUint>(
       ]);
     }
 
-    if (!Arr.isArrayOfLength(a, size)) {
+    if (!Arr.isFixedLengthTuple(a, size)) {
       return Result.err([
         {
           path: [],

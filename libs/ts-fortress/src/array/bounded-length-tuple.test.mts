@@ -1,8 +1,8 @@
 import { expectType, Result } from 'ts-data-forge';
 import {
-  type ArrayAtLeastLen,
-  type ArrayAtMostLen,
-  type ArrayBoundedLen,
+  type BoundedLengthTuple,
+  type MaxLengthTuple,
+  type MinLengthTuple,
 } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
@@ -10,27 +10,27 @@ import {
   type ValidationError,
   validationErrorsToMessages,
 } from '../utils/index.mjs';
-import { arrayBoundedLength } from './array-bounded-length.mjs';
+import { boundedLengthTuple } from './bounded-length-tuple.mjs';
 
-describe(arrayBoundedLength, () => {
+describe(boundedLengthTuple, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
       assert.deepStrictEqual(
-        arrayBoundedLength(2, 4, number()).defaultValue,
+        boundedLengthTuple(2, 4, number()).defaultValue,
         [0, 0],
       );
     });
 
     test('with explicit element default value', () => {
       assert.deepStrictEqual(
-        arrayBoundedLength(2, 4, number(5)).defaultValue,
+        boundedLengthTuple(2, 4, number(5)).defaultValue,
         [5, 5],
       );
     });
 
     test('with explicit default value override', () => {
       assert.deepStrictEqual(
-        arrayBoundedLength(2, 4, number(), {
+        boundedLengthTuple(2, 4, number(), {
           typeName: 'ys',
           defaultValue: [1, 2, 3],
         }).defaultValue,
@@ -39,14 +39,14 @@ describe(arrayBoundedLength, () => {
     });
   });
 
-  const xs = arrayBoundedLength(2, 4, number(), {
+  const xs = boundedLengthTuple(2, 4, number(), {
     typeName: 'xs',
     defaultValue: [1, 2, 3],
   });
 
   type Xs = TypeOf<typeof xs>;
 
-  expectType<Xs, ArrayBoundedLen<2, 4, number>>('=');
+  expectType<Xs, BoundedLengthTuple<2, 4, number>>('=');
 
   expectType<typeof xs.defaultValue, Xs>('=');
 
@@ -254,23 +254,23 @@ describe(arrayBoundedLength, () => {
     });
   });
 
-  describe('bounds outside SmallUint', () => {
-    // A plain `number` is outside `SmallUint`, so it drops the corresponding
+  describe('bounds outside StructuralPrefixLength', () => {
+    // A plain `number` is outside `StructuralPrefixLength`, so it drops the corresponding
     // bound from the result type.
     const dynamic: number = 3;
 
-    // min ∈ SmallUint & max ∉ SmallUint -> ArrayAtLeastLen<min, A>
-    const atLeast = arrayBoundedLength(2, dynamic, number());
+    // min ∈ StructuralPrefixLength & max ∉ StructuralPrefixLength -> MinLengthTuple<min, A>
+    const atLeast = boundedLengthTuple(2, dynamic, number());
 
-    expectType<TypeOf<typeof atLeast>, ArrayAtLeastLen<2, number>>('=');
+    expectType<TypeOf<typeof atLeast>, MinLengthTuple<2, number>>('=');
 
-    // min ∉ SmallUint & max ∈ SmallUint -> ArrayAtMostLen<max, A>
-    const atMost = arrayBoundedLength(dynamic, 5, number());
+    // min ∉ StructuralPrefixLength & max ∈ StructuralPrefixLength -> MaxLengthTuple<max, A>
+    const atMost = boundedLengthTuple(dynamic, 5, number());
 
-    expectType<TypeOf<typeof atMost>, ArrayAtMostLen<5, number>>('=');
+    expectType<TypeOf<typeof atMost>, MaxLengthTuple<5, number>>('=');
 
-    // min ∉ SmallUint & max ∉ SmallUint -> readonly A[]
-    const unbounded = arrayBoundedLength(dynamic, dynamic, number());
+    // min ∉ StructuralPrefixLength & max ∉ StructuralPrefixLength -> readonly A[]
+    const unbounded = boundedLengthTuple(dynamic, dynamic, number());
 
     expectType<TypeOf<typeof unbounded>, readonly number[]>('=');
 

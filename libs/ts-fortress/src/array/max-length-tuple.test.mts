@@ -1,54 +1,44 @@
 import { expectType, Result } from 'ts-data-forge';
-import { type ArrayAtLeastLen } from 'ts-type-forge';
+import { type MaxLengthTuple } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
 import { type TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,
 } from '../utils/index.mjs';
-import { arrayAtLeastLength } from './array-at-least-length.mjs';
+import { maxLengthTuple } from './max-length-tuple.mjs';
 
-describe(arrayAtLeastLength, () => {
+describe(maxLengthTuple, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
-      assert.deepStrictEqual(
-        arrayAtLeastLength(3, number()).defaultValue,
-        [0, 0, 0],
-      );
-    });
-
-    test('with explicit element default value', () => {
-      assert.deepStrictEqual(
-        arrayAtLeastLength(2, number(5)).defaultValue,
-        [5, 5],
-      );
+      assert.deepStrictEqual(maxLengthTuple(3, number()).defaultValue, []);
     });
 
     test('with explicit default value override', () => {
       assert.deepStrictEqual(
-        arrayAtLeastLength(3, number(), {
+        maxLengthTuple(3, number(), {
           typeName: 'ys',
-          defaultValue: [1, 2, 3, 4],
+          defaultValue: [1, 2, 3],
         }).defaultValue,
-        [1, 2, 3, 4],
+        [1, 2, 3],
       );
     });
   });
 
-  const xs = arrayAtLeastLength(3, number(), {
+  const xs = maxLengthTuple(3, number(), {
     typeName: 'xs',
     defaultValue: [1, 2, 3],
   });
 
   type Xs = TypeOf<typeof xs>;
 
-  expectType<Xs, ArrayAtLeastLen<3, number>>('=');
+  expectType<Xs, MaxLengthTuple<3, number>>('=');
 
   expectType<typeof xs.defaultValue, Xs>('=');
 
   describe('is', () => {
-    test('truthy case', () => {
-      const ys: unknown = [4, 5, 6, 7] as const;
+    test('truthy case (max length)', () => {
+      const ys: unknown = [4, 5, 6] as const;
 
       if (xs.is(ys)) {
         expectType<typeof ys, Xs>('=');
@@ -59,38 +49,26 @@ describe(arrayAtLeastLength, () => {
       assert.isTrue(xs.is(ys));
     });
 
-    test('falsy case 1', () => {
-      const ys: unknown = [1, 2] as const;
+    test('truthy case (empty)', () => {
+      const ys: unknown = [] as const;
 
-      if (xs.is(ys)) {
-        expectType<typeof ys, Xs>('=');
-      } else {
-        expectType<typeof ys, unknown>('=');
-      }
+      assert.isTrue(xs.is(ys));
+    });
+
+    test('falsy case 1 (too long)', () => {
+      const ys: unknown = [1, 2, 3, 4] as const;
 
       assert.isFalse(xs.is(ys));
     });
 
-    test('falsy case 2', () => {
+    test('falsy case 2 (wrong element type)', () => {
       const ys: unknown = [1, '2', 3] as const;
 
-      if (xs.is(ys)) {
-        expectType<typeof ys, Xs>('=');
-      } else {
-        expectType<typeof ys, unknown>('=');
-      }
-
       assert.isFalse(xs.is(ys));
     });
 
-    test('falsy case 3', () => {
+    test('falsy case 3 (not an array)', () => {
       const ys: unknown = 'foo';
-
-      if (xs.is(ys)) {
-        expectType<typeof ys, Xs>('=');
-      } else {
-        expectType<typeof ys, unknown>('=');
-      }
 
       assert.isFalse(xs.is(ys));
     });
@@ -98,7 +76,7 @@ describe(arrayAtLeastLength, () => {
 
   describe('validate', () => {
     test('truthy case', () => {
-      const ys: unknown = [4, 5, 6, 7] as const;
+      const ys: unknown = [4, 5] as const;
 
       const result = xs.validate(ys);
 
@@ -108,7 +86,7 @@ describe(arrayAtLeastLength, () => {
 
       const resultValue = Result.unwrapThrow(result);
 
-      assert.deepStrictEqual(resultValue, [4, 5, 6, 7]);
+      assert.deepStrictEqual(resultValue, [4, 5]);
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -123,7 +101,7 @@ describe(arrayAtLeastLength, () => {
       expect(resultValue1).toBe(input); // ✅ same reference
     });
 
-    test('falsy case 1', () => {
+    test('falsy case 1 (not an array)', () => {
       const ys: unknown = 'foo';
 
       const result = xs.validate(ys);
@@ -147,8 +125,8 @@ describe(arrayAtLeastLength, () => {
       ]);
     });
 
-    test('falsy case 2', () => {
-      const ys: unknown = [1, 2] as const;
+    test('falsy case 2 (too long)', () => {
+      const ys: unknown = [1, 2, 3, 4] as const;
 
       const result = xs.validate(ys);
 
@@ -163,19 +141,19 @@ describe(arrayAtLeastLength, () => {
           expectedType: 'xs',
           typeName: 'xs',
           details: {
-            kind: 'array-min-length',
-            minLength: 3,
-            actualLength: 2,
+            kind: 'array-max-length',
+            maxLength: 3,
+            actualLength: 4,
           },
         },
       ]);
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected array of length 3 or more but length 2 was passed.',
+        'Error: expected array of length 3 or less but length 4 was passed.',
       ]);
     });
 
-    test('falsy case 3', () => {
+    test('falsy case 3 (wrong element type)', () => {
       const ys: unknown = [1, '2', 3] as const;
 
       const result = xs.validate(ys);
@@ -201,16 +179,22 @@ describe(arrayAtLeastLength, () => {
   });
 
   describe('fill', () => {
-    test('keeps numeric entries and trims extras', () => {
+    test('keeps numeric entries and trims extras to max', () => {
       const ys: unknown = [4, 5, 6, 7] as const;
 
       assert.deepStrictEqual(xs.fill(ys), [4, 5, 6]);
     });
 
-    test('fills missing or invalid entries', () => {
+    test('keeps shorter arrays as-is and fills invalid entries', () => {
       const ys: unknown = [4, '5'] as const;
 
-      assert.deepStrictEqual(xs.fill(ys), [4, 0, 0]);
+      assert.deepStrictEqual(xs.fill(ys), [4, 0]);
+    });
+
+    test('keeps the empty array', () => {
+      const ys: unknown = [] as const;
+
+      assert.deepStrictEqual(xs.fill(ys), []);
     });
 
     test('fill with the default value for non-array input', () => {
@@ -220,30 +204,30 @@ describe(arrayAtLeastLength, () => {
     });
   });
 
-  describe('size outside SmallUint', () => {
-    // A literal beyond `SmallUint`'s range selects the fallback overload, whose
+  describe('size outside StructuralPrefixLength', () => {
+    // A literal beyond `StructuralPrefixLength`'s range selects the fallback overload, whose
     // result length is unconstrained.
-    const big = arrayAtLeastLength(100, number());
+    const big = maxLengthTuple(100, number());
 
     expectType<TypeOf<typeof big>, readonly number[]>('=');
 
     expectType<typeof big.defaultValue, readonly number[]>('=');
 
     // A plain `number` (not a literal) also selects the fallback overload.
-    const dynamicSize: number = 5;
+    const dynamicSize: number = 2;
 
-    const dyn = arrayAtLeastLength(dynamicSize, number());
+    const dyn = maxLengthTuple(dynamicSize, number());
 
     expectType<TypeOf<typeof dyn>, readonly number[]>('=');
 
-    test('default value has the requested length', () => {
-      expect(big.defaultValue).toHaveLength(100);
+    test('default value is the empty array', () => {
+      assert.deepStrictEqual(big.defaultValue, []);
     });
 
-    test('validates the minimum length at runtime', () => {
-      assert.isTrue(dyn.is([0, 0, 0, 0, 0]));
+    test('validates the maximum length at runtime', () => {
+      assert.isTrue(dyn.is([0, 0]));
 
-      assert.isFalse(dyn.is([0, 0, 0, 0]));
+      assert.isFalse(dyn.is([0, 0, 0]));
     });
   });
 });
