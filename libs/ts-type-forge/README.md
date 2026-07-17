@@ -122,7 +122,7 @@ Comprehensive branded types for enhanced numeric type safety.
 
 Type-safe array and tuple utilities with functional programming patterns.
 
-- **Array Types** - `NonEmptyArray`, `ArrayOfLength`, `ArrayAtLeastLen`
+- **Array Types** - `NonEmptyArray`, `FixedLengthTuple`, `MinLengthTuple`
 - **List Namespace** - Comprehensive list operations (Head, Tail, Take, Skip, etc.)
 - **Tuple Namespace** - Type-safe tuple manipulations with compile-time guarantees
 
@@ -483,6 +483,13 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [ChangeBaseBrand](./src/branded-types/brand.mts#L220)
     - [IntersectBrand](./src/branded-types/brand.mts#L247)
     - [NormalizeBrandUnion](./src/branded-types/brand.mts#L272)
+- src/branded-types/predefined-arrays/length-constrained-array.mts
+    - [StructuralPrefixCap](./src/branded-types/predefined-arrays/length-constrained-array.mts#L22)
+    - [StructuralPrefixLength](./src/branded-types/predefined-arrays/length-constrained-array.mts#L32)
+    - [MaxLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L80)
+    - [MinLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L132)
+    - [BoundedLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L170)
+    - [FixedLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L207)
 - src/branded-types/predefined-numbers/bigint.mts
     - [BigInt64](./src/branded-types/predefined-numbers/bigint.mts#L18)
     - [BigUint64](./src/branded-types/predefined-numbers/bigint.mts#L33)
@@ -579,12 +586,15 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [PositiveUint32WithSmallInt](./src/branded-types/predefined-numbers/uint32.mts#L62)
     - [NonZeroUint32WithSmallInt](./src/branded-types/predefined-numbers/uint32.mts#L69)
 - src/branded-types/predefined-strings/length-constrained-string.mts
-    - [MaxLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L31)
-    - [MinLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L64)
-    - [BoundedLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L94)
-    - [FixedLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L115)
+    - [MaxLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L32)
+    - [MinLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L65)
+    - [BoundedLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L95)
+    - [FixedLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L116)
 - src/branded-types/predefined-strings/non-empty-string.mts
     - [NonEmptyString](./src/branded-types/predefined-strings/non-empty-string.mts#L20)
+- src/branded-types/supported-length.mts
+    - [SupportedLengthCap](./src/branded-types/supported-length.mts#L18)
+    - [SupportedLength](./src/branded-types/supported-length.mts#L31)
 - src/condition/eq.mts
     - [TypeEq](./src/condition/eq.mts#L23)
 - src/condition/extends.mts
@@ -702,20 +712,21 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [RecordValueAtPath](./src/record/record-path.mts#L135)
     - [RecordValueAtPathWithIndex](./src/record/record-path.mts#L159)
 - src/tuple-and-list/array.mts
-    - [MutableNonEmptyArray](./src/tuple-and-list/array.mts#L15)
-    - [NonEmptyArray](./src/tuple-and-list/array.mts#L27)
-    - [ArrayElement](./src/tuple-and-list/array.mts#L40)
-    - [ArrayOfLength](./src/tuple-and-list/array.mts#L54)
-    - [MutableArrayOfLength](./src/tuple-and-list/array.mts#L64)
-    - [MutableArrayAtLeastLen](./src/tuple-and-list/array.mts#L83)
-    - [ArrayAtLeastLen](./src/tuple-and-list/array.mts#L98)
-    - [ArrayBoundedLen](./src/tuple-and-list/array.mts#L145)
-    - [MutableArrayBoundedLen](./src/tuple-and-list/array.mts#L161)
-    - [ArrayAtMostLen](./src/tuple-and-list/array.mts#L185)
-    - [MutableArrayAtMostLen](./src/tuple-and-list/array.mts#L196)
+    - [MutableNonEmptyArray](./src/tuple-and-list/array.mts#L12)
+    - [NonEmptyArray](./src/tuple-and-list/array.mts#L24)
+    - [ArrayElement](./src/tuple-and-list/array.mts#L37)
 - src/tuple-and-list/index-of-tuple.mts
     - [IndexOfTuple](./src/tuple-and-list/index-of-tuple.mts#L17)
     - [NegativeIndexOfTuple](./src/tuple-and-list/index-of-tuple.mts#L52)
+- src/tuple-and-list/length-constrained-tuple.mts
+    - [FixedLengthTuple](./src/tuple-and-list/length-constrained-tuple.mts#L18)
+    - [MutableFixedLengthTuple](./src/tuple-and-list/length-constrained-tuple.mts#L28)
+    - [MutableMinLengthTuple](./src/tuple-and-list/length-constrained-tuple.mts#L47)
+    - [MinLengthTuple](./src/tuple-and-list/length-constrained-tuple.mts#L62)
+    - [BoundedLengthTuple](./src/tuple-and-list/length-constrained-tuple.mts#L109)
+    - [MutableBoundedLengthTuple](./src/tuple-and-list/length-constrained-tuple.mts#L125)
+    - [MaxLengthTuple](./src/tuple-and-list/length-constrained-tuple.mts#L149)
+    - [MutableMaxLengthTuple](./src/tuple-and-list/length-constrained-tuple.mts#L164)
 - src/tuple-and-list/list.mts
     - [List.Head](./src/tuple-and-list/list.mts#L19)
     - [List.Last](./src/tuple-and-list/list.mts#L32)
@@ -809,7 +820,7 @@ const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
 // Type-safe length checking
 if (Arr.isArrayAtLeastLength(numbers, 2)) {
     // numbers is now guaranteed to have at least 3 elements
-    expectType<typeof numbers, ArrayAtLeastLen<2, number>>('=');
+    expectType<typeof numbers, MinLengthTuple<2, number>>('=');
     console.log(numbers[1]); // Array access to index 0, 1 is now safe even with noUncheckedIndexedAccess enabled
 }
 

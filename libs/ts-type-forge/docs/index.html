@@ -79,7 +79,7 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 <h3 id="📋-array-and-tuple-operations" class="tsd-anchor-link">📋 Array and Tuple Operations<a href="#📋-array-and-tuple-operations" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <p>Type-safe array and tuple utilities with functional programming patterns.</p>
 <ul>
-<li><strong>Array Types</strong> - <code>NonEmptyArray</code>, <code>ArrayOfLength</code>, <code>ArrayAtLeastLen</code></li>
+<li><strong>Array Types</strong> - <code>NonEmptyArray</code>, <code>FixedLengthTuple</code>, <code>MinLengthTuple</code></li>
 <li><strong>List Namespace</strong> - Comprehensive list operations (Head, Tail, Take, Skip, etc.)</li>
 <li><strong>Tuple Namespace</strong> - Type-safe tuple manipulations with compile-time guarantees</li>
 </ul>
@@ -169,6 +169,16 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 <li><a href="modules/branded-types_brand.html#L220">ChangeBaseBrand</a></li>
 <li><a href="modules/branded-types_brand.html#L247">IntersectBrand</a></li>
 <li><a href="modules/branded-types_brand.html#L272">NormalizeBrandUnion</a></li>
+</ul>
+</li>
+<li>src/branded-types/predefined-arrays/length-constrained-array.mts
+<ul>
+<li><a href="modules/branded-types_predefined-arrays_length-constrained-array.html#L22">StructuralPrefixCap</a></li>
+<li><a href="modules/branded-types_predefined-arrays_length-constrained-array.html#L32">StructuralPrefixLength</a></li>
+<li><a href="modules/branded-types_predefined-arrays_length-constrained-array.html#L80">MaxLengthArray</a></li>
+<li><a href="modules/branded-types_predefined-arrays_length-constrained-array.html#L132">MinLengthArray</a></li>
+<li><a href="modules/branded-types_predefined-arrays_length-constrained-array.html#L170">BoundedLengthArray</a></li>
+<li><a href="modules/branded-types_predefined-arrays_length-constrained-array.html#L207">FixedLengthArray</a></li>
 </ul>
 </li>
 <li>src/branded-types/predefined-numbers/bigint.mts
@@ -301,15 +311,21 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 </li>
 <li>src/branded-types/predefined-strings/length-constrained-string.mts
 <ul>
-<li><a href="modules/branded-types_predefined-strings_length-constrained-string.html#L31">MaxLengthString</a></li>
-<li><a href="modules/branded-types_predefined-strings_length-constrained-string.html#L64">MinLengthString</a></li>
-<li><a href="modules/branded-types_predefined-strings_length-constrained-string.html#L94">BoundedLengthString</a></li>
-<li><a href="modules/branded-types_predefined-strings_length-constrained-string.html#L115">FixedLengthString</a></li>
+<li><a href="modules/branded-types_predefined-strings_length-constrained-string.html#L32">MaxLengthString</a></li>
+<li><a href="modules/branded-types_predefined-strings_length-constrained-string.html#L65">MinLengthString</a></li>
+<li><a href="modules/branded-types_predefined-strings_length-constrained-string.html#L95">BoundedLengthString</a></li>
+<li><a href="modules/branded-types_predefined-strings_length-constrained-string.html#L116">FixedLengthString</a></li>
 </ul>
 </li>
 <li>src/branded-types/predefined-strings/non-empty-string.mts
 <ul>
 <li><a href="modules/branded-types_predefined-strings_non-empty-string.html#L20">NonEmptyString</a></li>
+</ul>
+</li>
+<li>src/branded-types/supported-length.mts
+<ul>
+<li><a href="modules/branded-types_supported-length.html#L18">SupportedLengthCap</a></li>
+<li><a href="modules/branded-types_supported-length.html#L31">SupportedLength</a></li>
 </ul>
 </li>
 <li>src/condition/eq.mts
@@ -496,23 +512,27 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 </li>
 <li>src/tuple-and-list/array.mts
 <ul>
-<li><a href="modules/tuple-and-list_array.html#L15">MutableNonEmptyArray</a></li>
-<li><a href="modules/tuple-and-list_array.html#L27">NonEmptyArray</a></li>
-<li><a href="modules/tuple-and-list_array.html#L40">ArrayElement</a></li>
-<li><a href="modules/tuple-and-list_array.html#L54">ArrayOfLength</a></li>
-<li><a href="modules/tuple-and-list_array.html#L64">MutableArrayOfLength</a></li>
-<li><a href="modules/tuple-and-list_array.html#L83">MutableArrayAtLeastLen</a></li>
-<li><a href="modules/tuple-and-list_array.html#L98">ArrayAtLeastLen</a></li>
-<li><a href="modules/tuple-and-list_array.html#L145">ArrayBoundedLen</a></li>
-<li><a href="modules/tuple-and-list_array.html#L161">MutableArrayBoundedLen</a></li>
-<li><a href="modules/tuple-and-list_array.html#L185">ArrayAtMostLen</a></li>
-<li><a href="modules/tuple-and-list_array.html#L196">MutableArrayAtMostLen</a></li>
+<li><a href="modules/tuple-and-list_array.html#L12">MutableNonEmptyArray</a></li>
+<li><a href="modules/tuple-and-list_array.html#L24">NonEmptyArray</a></li>
+<li><a href="modules/tuple-and-list_array.html#L37">ArrayElement</a></li>
 </ul>
 </li>
 <li>src/tuple-and-list/index-of-tuple.mts
 <ul>
 <li><a href="modules/tuple-and-list_index-of-tuple.html#L17">IndexOfTuple</a></li>
 <li><a href="modules/tuple-and-list_index-of-tuple.html#L52">NegativeIndexOfTuple</a></li>
+</ul>
+</li>
+<li>src/tuple-and-list/length-constrained-tuple.mts
+<ul>
+<li><a href="modules/tuple-and-list_length-constrained-tuple.html#L18">FixedLengthTuple</a></li>
+<li><a href="modules/tuple-and-list_length-constrained-tuple.html#L28">MutableFixedLengthTuple</a></li>
+<li><a href="modules/tuple-and-list_length-constrained-tuple.html#L47">MutableMinLengthTuple</a></li>
+<li><a href="modules/tuple-and-list_length-constrained-tuple.html#L62">MinLengthTuple</a></li>
+<li><a href="modules/tuple-and-list_length-constrained-tuple.html#L109">BoundedLengthTuple</a></li>
+<li><a href="modules/tuple-and-list_length-constrained-tuple.html#L125">MutableBoundedLengthTuple</a></li>
+<li><a href="modules/tuple-and-list_length-constrained-tuple.html#L149">MaxLengthTuple</a></li>
+<li><a href="modules/tuple-and-list_length-constrained-tuple.html#L164">MutableMaxLengthTuple</a></li>
 </ul>
 </li>
 <li>src/tuple-and-list/list.mts
@@ -616,7 +636,7 @@ When you prefer ambient access, add <code>/// &lt;reference types=&quot;ts-type-
 <li><strong>Array Guards</strong>: Validate <code>NonEmptyArray</code> and other array constraints at runtime</li>
 </ul>
 <h3 id="example-combining-type-level-and-runtime-safety" class="tsd-anchor-link">Example: Combining Type-Level and Runtime Safety<a href="#example-combining-type-level-and-runtime-safety" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<pre><code class="typescript"><span class="hl-4">/// </span><span class="hl-10">&lt;</span><span class="hl-11">reference</span><span class="hl-4"> </span><span class="hl-12">types</span><span class="hl-1">=</span><span class="hl-2">&quot;ts-type-forge/global&quot;</span><span class="hl-4"> </span><span class="hl-10">/&gt;</span><br/><br/><span class="hl-4">// Runtime validation with ts-data-forge</span><br/><span class="hl-6">import</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-7">isUint</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">expectType</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">assertNonEmptyArray</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">parseJsonValue</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">isRecord</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">hasKey</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;ts-data-forge&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">numbers</span><span class="hl-1">: </span><span class="hl-3">readonly</span><span class="hl-1"> </span><span class="hl-8">number</span><span class="hl-1">[] = [</span><span class="hl-9">1</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">3</span><span class="hl-1">, </span><span class="hl-9">4</span><span class="hl-1">, </span><span class="hl-9">5</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">3</span><span class="hl-1">];</span><br/><br/><span class="hl-4">// Type-safe length checking</span><br/><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-7">Arr</span><span class="hl-1">.</span><span class="hl-0">isArrayAtLeastLength</span><span class="hl-1">(</span><span class="hl-7">numbers</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">)) {</span><br/><span class="hl-1">    </span><span class="hl-4">// numbers is now guaranteed to have at least 3 elements</span><br/><span class="hl-1">    </span><span class="hl-7">expectType</span><span class="hl-1">&lt;</span><span class="hl-3">typeof</span><span class="hl-1"> </span><span class="hl-7">numbers</span><span class="hl-1">, </span><span class="hl-7">ArrayAtLeastLen</span><span class="hl-1">&lt;</span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-7">number</span><span class="hl-1">&gt;&gt;(</span><span class="hl-2">&#39;=&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-7">numbers</span><span class="hl-1">[</span><span class="hl-9">1</span><span class="hl-1">]); </span><span class="hl-4">// Array access to index 0, 1 is now safe even with noUncheckedIndexedAccess enabled</span><br/><span class="hl-1">}</span><br/><br/><span class="hl-4">// Safe JSON parsing with type validation</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">jsonString</span><span class="hl-1"> = </span><span class="hl-2">&#39;{&quot;count&quot;: 42, &quot;items&quot;: [1, 2, 3]}&#39;</span><span class="hl-1">;</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">data</span><span class="hl-1">: </span><span class="hl-8">JsonValue</span><span class="hl-1"> = </span><span class="hl-0">parseJsonValue</span><span class="hl-1">(</span><span class="hl-7">jsonString</span><span class="hl-1">); </span><span class="hl-4">// Validates at runtime</span><br/><br/><span class="hl-4">// Use the data with confidence</span><br/><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-0">isRecord</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">) &amp;&amp; </span><span class="hl-0">hasKey</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">, </span><span class="hl-2">&#39;count&#39;</span><span class="hl-1">)) {</span><br/><span class="hl-1">    </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">.</span><span class="hl-7">count</span><span class="hl-1">); </span><span class="hl-4">// Safe access</span><br/><span class="hl-1">}</span>
+<pre><code class="typescript"><span class="hl-4">/// </span><span class="hl-10">&lt;</span><span class="hl-11">reference</span><span class="hl-4"> </span><span class="hl-12">types</span><span class="hl-1">=</span><span class="hl-2">&quot;ts-type-forge/global&quot;</span><span class="hl-4"> </span><span class="hl-10">/&gt;</span><br/><br/><span class="hl-4">// Runtime validation with ts-data-forge</span><br/><span class="hl-6">import</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-7">isUint</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">expectType</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">assertNonEmptyArray</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">parseJsonValue</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">isRecord</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-7">hasKey</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;ts-data-forge&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">numbers</span><span class="hl-1">: </span><span class="hl-3">readonly</span><span class="hl-1"> </span><span class="hl-8">number</span><span class="hl-1">[] = [</span><span class="hl-9">1</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">3</span><span class="hl-1">, </span><span class="hl-9">4</span><span class="hl-1">, </span><span class="hl-9">5</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-9">3</span><span class="hl-1">];</span><br/><br/><span class="hl-4">// Type-safe length checking</span><br/><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-7">Arr</span><span class="hl-1">.</span><span class="hl-0">isArrayAtLeastLength</span><span class="hl-1">(</span><span class="hl-7">numbers</span><span class="hl-1">, </span><span class="hl-9">2</span><span class="hl-1">)) {</span><br/><span class="hl-1">    </span><span class="hl-4">// numbers is now guaranteed to have at least 3 elements</span><br/><span class="hl-1">    </span><span class="hl-7">expectType</span><span class="hl-1">&lt;</span><span class="hl-3">typeof</span><span class="hl-1"> </span><span class="hl-7">numbers</span><span class="hl-1">, </span><span class="hl-7">MinLengthTuple</span><span class="hl-1">&lt;</span><span class="hl-9">2</span><span class="hl-1">, </span><span class="hl-7">number</span><span class="hl-1">&gt;&gt;(</span><span class="hl-2">&#39;=&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">    </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-7">numbers</span><span class="hl-1">[</span><span class="hl-9">1</span><span class="hl-1">]); </span><span class="hl-4">// Array access to index 0, 1 is now safe even with noUncheckedIndexedAccess enabled</span><br/><span class="hl-1">}</span><br/><br/><span class="hl-4">// Safe JSON parsing with type validation</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">jsonString</span><span class="hl-1"> = </span><span class="hl-2">&#39;{&quot;count&quot;: 42, &quot;items&quot;: [1, 2, 3]}&#39;</span><span class="hl-1">;</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">data</span><span class="hl-1">: </span><span class="hl-8">JsonValue</span><span class="hl-1"> = </span><span class="hl-0">parseJsonValue</span><span class="hl-1">(</span><span class="hl-7">jsonString</span><span class="hl-1">); </span><span class="hl-4">// Validates at runtime</span><br/><br/><span class="hl-4">// Use the data with confidence</span><br/><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-0">isRecord</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">) &amp;&amp; </span><span class="hl-0">hasKey</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">, </span><span class="hl-2">&#39;count&#39;</span><span class="hl-1">)) {</span><br/><span class="hl-1">    </span><span class="hl-7">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-7">data</span><span class="hl-1">.</span><span class="hl-7">count</span><span class="hl-1">); </span><span class="hl-4">// Safe access</span><br/><span class="hl-1">}</span>
 </code><button type="button">Copy</button></pre>
 
 <h3 id="benefits-of-using-both-libraries-together" class="tsd-anchor-link">Benefits of Using Both Libraries Together<a href="#benefits-of-using-both-libraries-together" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>

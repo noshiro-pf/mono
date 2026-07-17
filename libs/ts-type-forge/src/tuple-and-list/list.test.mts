@@ -1,6 +1,6 @@
 import { expectType } from 'ts-data-forge';
 import { type DeepReadonly } from '../record/index.mjs';
-import { type ArrayOfLength } from './array.mjs';
+import { type FixedLengthTuple } from './length-constrained-tuple.mjs';
 import { type List } from './list.mjs';
 
 // ── butlast ─────────────────────────
@@ -242,13 +242,13 @@ import { type List } from './list.mjs';
 
   // <= かつ >= だが "=" だとエラーになってしまう
   expectType<
-    List.Zip<ArrayOfLength<32, 1>, ArrayOfLength<32, 2>>,
-    ArrayOfLength<32, readonly [1, 2]>
+    List.Zip<FixedLengthTuple<32, 1>, FixedLengthTuple<32, 2>>,
+    FixedLengthTuple<32, readonly [1, 2]>
   >('<=');
 
   expectType<
-    ArrayOfLength<32, readonly [1, 2]>,
-    List.Zip<ArrayOfLength<32, 1>, ArrayOfLength<32, 2>>
+    FixedLengthTuple<32, readonly [1, 2]>,
+    List.Zip<FixedLengthTuple<32, 1>, FixedLengthTuple<32, 2>>
   >('<=');
 
   expectType<

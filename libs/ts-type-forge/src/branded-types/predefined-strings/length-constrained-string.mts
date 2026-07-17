@@ -1,6 +1,7 @@
-import { type ArrayAtLeastLen } from '../../tuple-and-list/index.mjs';
+import { type MinLengthTuple } from '../../tuple-and-list/index.mjs';
 import { type UintRangeInclusive } from '../../type-level-integer/index.mjs';
 import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
+import { type SupportedLength } from '../supported-length.mjs';
 
 /**
  * Branded string type for strings with at most `MaxLength` characters.
@@ -28,7 +29,7 @@ import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
  * // const tooLong: MaxLengthString<16> = userName; // Error! (32 > 16)
  * ```
  */
-export type MaxLengthString<MaxLength extends number> = string &
+export type MaxLengthString<MaxLength extends SupportedLength> = string &
   TSTypeForgeInternals_BrandEncapsulated<
     Readonly<{
       MaxLength: UintRangeInclusive<0, MaxLength>;
@@ -61,10 +62,10 @@ export type MaxLengthString<MaxLength extends number> = string &
  * // const longer: MinLengthString<16> = password; // Error! (12 < 16)
  * ```
  */
-export type MinLengthString<MinLength extends number> = string &
+export type MinLengthString<MinLength extends SupportedLength> = string &
   TSTypeForgeInternals_BrandEncapsulated<
     Readonly<{
-      MinLength: ArrayAtLeastLen<MinLength, 0>;
+      MinLength: MinLengthTuple<MinLength, 0>;
     }>
   >;
 
@@ -92,8 +93,8 @@ export type MinLengthString<MinLength extends number> = string &
  * ```
  */
 export type BoundedLengthString<
-  MinLength extends number,
-  MaxLength extends number,
+  MinLength extends SupportedLength,
+  MaxLength extends SupportedLength,
 > = MaxLengthString<MaxLength> & MinLengthString<MinLength>;
 
 /**
@@ -112,7 +113,5 @@ export type BoundedLengthString<
  * // const threeChars: FixedLengthString<3> = countryCode; // Error!
  * ```
  */
-export type FixedLengthString<Length extends number> = BoundedLengthString<
-  Length,
-  Length
->;
+export type FixedLengthString<Length extends SupportedLength> =
+  BoundedLengthString<Length, Length>;

@@ -26,6 +26,16 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
+    sourcePath:
+      'src/branded-types/predefined-arrays/length-constrained-array.mts',
+    sampleFiles: [
+      'samples/src/branded-types/predefined-arrays/max-length-array-example.mts',
+      'samples/src/branded-types/predefined-arrays/min-length-array-example.mts',
+      'samples/src/branded-types/predefined-arrays/bounded-length-array-example.mts',
+      'samples/src/branded-types/predefined-arrays/fixed-length-array-example.mts',
+    ],
+  },
+  {
     sourcePath: 'src/branded-types/predefined-numbers/bigint.mts',
     sampleFiles: [
       'samples/src/branded-types/predefined-numbers/big-int64-example.mts',

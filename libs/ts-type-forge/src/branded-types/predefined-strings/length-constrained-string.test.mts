@@ -166,3 +166,27 @@ import {
 
   expectType<BoundedLengthString<3, 3>, FixedLengthString<4>>('!<=');
 }
+
+// Length parameters are capped at 2048 (SupportedLength); larger literals and
+// non-literal `number` are rejected with a constraint error
+
+{
+  expectType<MaxLengthString<2048>, MaxLengthString<2048>>('=');
+
+  expectType<MinLengthString<2048>, MinLengthString<2047>>('<=');
+
+  // @ts-expect-error 2049 exceeds the supported length cap
+  type _TooLargeMax = MaxLengthString<2049>;
+
+  // @ts-expect-error 2049 exceeds the supported length cap
+  type _TooLargeMin = MinLengthString<2049>;
+
+  // @ts-expect-error 2049 exceeds the supported length cap
+  type _TooLargeBounded = BoundedLengthString<0, 2049>;
+
+  // @ts-expect-error 2049 exceeds the supported length cap
+  type _TooLargeFixed = FixedLengthString<2049>;
+
+  // @ts-expect-error non-literal number is rejected
+  type _NonLiteral = FixedLengthString<number>;
+}
