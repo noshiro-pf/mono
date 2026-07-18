@@ -1,6 +1,9 @@
+import { type Mutable } from '../../others/index.mjs';
 import {
   type FixedLengthTuple,
   type MinLengthTuple,
+  type MutableFixedLengthTuple,
+  type MutableMinLengthTuple,
 } from '../../tuple-and-list/index.mjs';
 import { type UintRangeInclusive } from '../../type-level-integer/index.mjs';
 import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
@@ -88,6 +91,42 @@ export type MaxLengthArray<
   >;
 
 /**
+ * Mutable counterpart of {@link MaxLengthArray}: a branded *mutable* array type
+ * for arrays with at most `MaxLength` elements.
+ *
+ * Identical to {@link MaxLengthArray} except that the structural part is a
+ * mutable `Elm[]` instead of `readonly Elm[]`, so elements can be reassigned.
+ * The brand is the same, so a `MutableMaxLengthArray<M, Elm>` is assignable to
+ * `MaxLengthArray<M, Elm>`.
+ *
+ * Note that the `MaxLength` constraint is not enforced under mutation: pushing
+ * additional elements past the bound is not a type error (as with any mutable
+ * array whose length is tracked only in the brand).
+ *
+ * @template MaxLength - The maximum number of elements (inclusive). Must be a
+ *   non-negative integer literal.
+ * @template Elm - The type of elements in the array (defaults to `unknown`).
+ *
+ * @example
+ * ```ts
+ * const tags = ['a', 'b', 'c'] as unknown as MutableMaxLengthArray<8, string>;
+ *
+ * tags[0] = 'z'; // OK — elements are mutable
+ * const relaxed: MaxLengthArray<16, string> = tags; // OK (8 <= 16)
+ * // const strict: MutableMaxLengthArray<2, string> = tags; // Error! (8 > 2)
+ * ```
+ */
+export type MutableMaxLengthArray<
+  MaxLength extends SupportedLength,
+  Elm = unknown,
+> = Mutable<readonly Elm[]> &
+  TSTypeForgeInternals_BrandEncapsulated<
+    Readonly<{
+      MaxLength: UintRangeInclusive<0, MaxLength>;
+    }>
+  >;
+
+/**
  * Branded readonly array type for arrays with at least `MinLength` elements.
  *
  * Unlike the structural tuple-based {@link MinLengthTuple}, the exact length
@@ -140,6 +179,43 @@ export type MinLengthArray<
   >;
 
 /**
+ * Mutable counterpart of {@link MinLengthArray}: a branded *mutable* array type
+ * for arrays with at least `MinLength` elements.
+ *
+ * Identical to {@link MinLengthArray} except that the clamped structural prefix
+ * is mutable ({@link MutableMinLengthTuple} instead of {@link MinLengthTuple}),
+ * so elements can be reassigned. The brand is the same, so a
+ * `MutableMinLengthArray<M, Elm>` is assignable to `MinLengthArray<M, Elm>`.
+ *
+ * This is the mutable, brand-based counterpart of the structural tuple-based
+ * `MutableMinLengthTuple`; type-checking cost stays essentially independent of
+ * the size of `Elm` and of the bound.
+ *
+ * @template MinLength - The minimum number of elements (inclusive). Must be a
+ *   non-negative integer literal.
+ * @template Elm - The type of elements in the array (defaults to `unknown`).
+ *
+ * @example
+ * ```ts
+ * const history = [0, 1, 2, 3] as unknown as MutableMinLengthArray<3, number>;
+ *
+ * history[0] = 10; // OK — elements are mutable
+ * const first: number = history[0]; // OK — no `undefined` below min(N, 10)
+ * const readonlyView: MinLengthArray<3, number> = history; // OK
+ * // const longer: MutableMinLengthArray<5, number> = history; // Error! (3 < 5)
+ * ```
+ */
+export type MutableMinLengthArray<
+  MinLength extends SupportedLength,
+  Elm = unknown,
+> = MutableMinLengthTuple<ClampToPrefixCap<MinLength>, Elm> &
+  TSTypeForgeInternals_BrandEncapsulated<
+    Readonly<{
+      MinLength: MinLengthTuple<MinLength, 0>;
+    }>
+  >;
+
+/**
  * Branded readonly array type for arrays whose length is between `MinLength`
  * and `MaxLength` elements (both inclusive).
  * Defined as the intersection of {@link MinLengthArray} and
@@ -172,6 +248,42 @@ export type BoundedLengthArray<
   MaxLength extends SupportedLength,
   Elm = unknown,
 > = MaxLengthArray<MaxLength, Elm> & MinLengthArray<MinLength, Elm>;
+
+/**
+ * Mutable counterpart of {@link BoundedLengthArray}: a branded *mutable* array
+ * type for arrays whose length is between `MinLength` and `MaxLength` elements
+ * (both inclusive). Defined as the intersection of
+ * {@link MutableMinLengthArray} and {@link MutableMaxLengthArray}, so the
+ * clamped structural prefix stays mutable and both bounds can be weakened
+ * independently. The brand is the same as {@link BoundedLengthArray}, so a
+ * `MutableBoundedLengthArray<M1, M2, Elm>` is assignable to
+ * `BoundedLengthArray<M1, M2, Elm>`.
+ *
+ * @template MinLength - The minimum number of elements (inclusive). Must be a
+ *   non-negative integer literal.
+ * @template MaxLength - The maximum number of elements (inclusive). Must be a
+ *   non-negative integer literal.
+ * @template Elm - The type of elements in the array (defaults to `unknown`).
+ *
+ * @example
+ * ```ts
+ * const selection = [1, 2, 3] as unknown as MutableBoundedLengthArray<
+ *   1,
+ *   5,
+ *   number
+ * >;
+ *
+ * selection[0] = 10; // OK — elements are mutable
+ * const relaxed: BoundedLengthArray<0, 100, number> = selection; // OK ([1, 5] ⊆ [0, 100])
+ * // const strict: MutableBoundedLengthArray<2, 5, number> = selection; // Error! (1 < 2)
+ * ```
+ */
+export type MutableBoundedLengthArray<
+  MinLength extends SupportedLength,
+  MaxLength extends SupportedLength,
+  Elm = unknown,
+> = MutableMaxLengthArray<MaxLength, Elm> &
+  MutableMinLengthArray<MinLength, Elm>;
 
 /**
  * Branded readonly array type for arrays with exactly `Length` elements.
@@ -210,4 +322,41 @@ export type FixedLengthArray<
 > = BoundedLengthArray<Length, Length, Elm> &
   (Length extends UintRangeInclusive<0, StructuralPrefixCap>
     ? FixedLengthTuple<Length, Elm>
+    : unknown);
+
+/**
+ * Mutable counterpart of {@link FixedLengthArray}: a branded *mutable* array
+ * type for arrays with exactly `Length` elements.
+ * Alias for `MutableBoundedLengthArray<Length, Length, Elm>`.
+ *
+ * Identical to {@link FixedLengthArray} except that the structural part is
+ * mutable: for `Length <= 10` it is intersected with the exact mutable tuple
+ * {@link MutableFixedLengthTuple} (so `length` is the literal `Length`,
+ * in-range indexed access does not include `undefined` under
+ * `noUncheckedIndexedAccess`, and elements can be reassigned); for larger
+ * lengths only the clamped mutable structural prefix inherited from
+ * {@link MutableMinLengthArray} remains. The brand is the same as
+ * {@link FixedLengthArray}, so a `MutableFixedLengthArray<Length, Elm>` is
+ * assignable to `FixedLengthArray<Length, Elm>`.
+ *
+ * @template Length - The exact number of elements. Must be a non-negative
+ *   integer literal.
+ * @template Elm - The type of elements in the array (defaults to `unknown`).
+ *
+ * @example
+ * ```ts
+ * const rgb = [255, 128, 0] as unknown as MutableFixedLengthArray<3, number>;
+ *
+ * rgb[0] = 200; // OK — elements are mutable
+ * const len: 3 = rgb.length; // `length` is the literal N (N <= 10)
+ * const readonlyView: FixedLengthArray<3, number> = rgb; // OK
+ * // const rgba: MutableFixedLengthArray<4, number> = rgb; // Error!
+ * ```
+ */
+export type MutableFixedLengthArray<
+  Length extends SupportedLength,
+  Elm = unknown,
+> = MutableBoundedLengthArray<Length, Length, Elm> &
+  (Length extends UintRangeInclusive<0, StructuralPrefixCap>
+    ? MutableFixedLengthTuple<Length, Elm>
     : unknown);

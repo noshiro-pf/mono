@@ -12,19 +12,22 @@ type Blog = Readonly<{
   posts: NonEmptyArray<Post>; // Ensures posts array is never empty
 }>;
 
+// `NonEmptyArray<A>` is brand-based (an alias of `MinLengthArray<1, A>`), so a
+// value is obtained via a runtime guard or an explicit cast rather than a plain
+// array literal.
 const myBlog: Blog = {
   name: 'My Tech Journey',
   posts: [
     // This array must have at least one element
     { title: 'First Post', content: 'Hello world!' },
     { title: 'Understanding TypeScript', content: '...' },
-  ],
+  ] as unknown as NonEmptyArray<Post>,
 };
 
 // This would cause a type error:
 const emptyBlog: Blog = {
   name: 'Empty Thoughts',
-  // @ts-expect-error Source has 0 element(s) but target requires 1
+  // @ts-expect-error `[]` lacks the `MinLength` brand required by NonEmptyArray
   posts: [],
 };
 

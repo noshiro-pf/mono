@@ -50,19 +50,36 @@ declare global {
     MaxLength extends SupportedLength,
     Elm = unknown,
   > = _TSTypeForge.MaxLengthArray<MaxLength, Elm>;
+  type MutableMaxLengthArray<
+    MaxLength extends SupportedLength,
+    Elm = unknown,
+  > = _TSTypeForge.MutableMaxLengthArray<MaxLength, Elm>;
   type MinLengthArray<
     MinLength extends SupportedLength,
     Elm = unknown,
   > = _TSTypeForge.MinLengthArray<MinLength, Elm>;
+  type MutableMinLengthArray<
+    MinLength extends SupportedLength,
+    Elm = unknown,
+  > = _TSTypeForge.MutableMinLengthArray<MinLength, Elm>;
   type BoundedLengthArray<
     MinLength extends SupportedLength,
     MaxLength extends SupportedLength,
     Elm = unknown,
   > = _TSTypeForge.BoundedLengthArray<MinLength, MaxLength, Elm>;
+  type MutableBoundedLengthArray<
+    MinLength extends SupportedLength,
+    MaxLength extends SupportedLength,
+    Elm = unknown,
+  > = _TSTypeForge.MutableBoundedLengthArray<MinLength, MaxLength, Elm>;
   type FixedLengthArray<
     Length extends SupportedLength,
     Elm = unknown,
   > = _TSTypeForge.FixedLengthArray<Length, Elm>;
+  type MutableFixedLengthArray<
+    Length extends SupportedLength,
+    Elm = unknown,
+  > = _TSTypeForge.MutableFixedLengthArray<Length, Elm>;
   type BigInt64 = _TSTypeForge.BigInt64;
   type BigUint64 = _TSTypeForge.BigUint64;
   type NaNType = _TSTypeForge.NaNType;
@@ -322,8 +339,10 @@ declare global {
     R,
     Path extends RecordPathsWithIndex<R>,
   > = _TSTypeForge.RecordValueAtPathWithIndex<R, Path>;
-  type MutableNonEmptyArray<A> = _TSTypeForge.MutableNonEmptyArray<A>;
+  type MutableNonEmptyTuple<A> = _TSTypeForge.MutableNonEmptyTuple<A>;
+  type NonEmptyTuple<A> = _TSTypeForge.NonEmptyTuple<A>;
   type NonEmptyArray<A> = _TSTypeForge.NonEmptyArray<A>;
+  type MutableNonEmptyArray<A> = _TSTypeForge.MutableNonEmptyArray<A>;
   type ArrayElement<S> = _TSTypeForge.ArrayElement<S>;
   type IndexOfTuple<T extends readonly unknown[]> =
     _TSTypeForge.IndexOfTuple<T>;

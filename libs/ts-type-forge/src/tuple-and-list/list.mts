@@ -1,5 +1,5 @@
 import { type IsFixedLengthList } from '../condition/index.mjs';
-import { type NonEmptyArray } from './array.mjs';
+import { type NonEmptyTuple } from './array.mjs';
 import { type Tuple } from './tuple.mjs';
 
 export namespace List {
@@ -204,11 +204,11 @@ export namespace List {
     ? readonly []
     : B extends readonly []
       ? readonly []
-      : A extends NonEmptyArray<unknown>
-        ? B extends NonEmptyArray<unknown>
+      : A extends NonEmptyTuple<unknown>
+        ? B extends NonEmptyTuple<unknown>
           ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B has at least 1 element
           : readonly [readonly [Head<A>, B[number]], ...Zip<Tail<A>, Tail<B>>] // A has at least 1 element but B has at least 0 element
-        : B extends NonEmptyArray<unknown>
+        : B extends NonEmptyTuple<unknown>
           ? readonly [readonly [A[number], Head<B>], ...Zip<Tail<A>, Tail<B>>] // B has at least 1 element but A has at least 0 element
           : readonly (readonly [A[number], B[number]])[];
 

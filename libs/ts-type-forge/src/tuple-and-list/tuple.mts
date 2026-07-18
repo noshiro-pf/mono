@@ -1,4 +1,4 @@
-import { type NonEmptyArray } from './array.mjs';
+import { type NonEmptyTuple } from './array.mjs';
 
 export namespace Tuple {
   /**
@@ -215,8 +215,8 @@ export namespace Tuple {
    * type Z4 = Tuple.Zip<[], ['a']>; // readonly []
    */
   export type Zip<A extends readonly unknown[], B extends readonly unknown[]> =
-    A extends NonEmptyArray<unknown>
-      ? B extends NonEmptyArray<unknown>
+    A extends NonEmptyTuple<unknown>
+      ? B extends NonEmptyTuple<unknown>
         ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>]
         : readonly []
       : readonly [];

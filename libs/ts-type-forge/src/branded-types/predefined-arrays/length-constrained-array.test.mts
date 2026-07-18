@@ -1,5 +1,8 @@
 import { expectType } from 'ts-data-forge';
-import { type FixedLengthTuple } from '../../tuple-and-list/index.mjs';
+import {
+  type FixedLengthTuple,
+  type MutableFixedLengthTuple,
+} from '../../tuple-and-list/index.mjs';
 import { type MaxLengthString } from '../predefined-strings/index.mjs';
 import { type SupportedLength } from '../supported-length.mjs';
 import {
@@ -7,6 +10,10 @@ import {
   type FixedLengthArray,
   type MaxLengthArray,
   type MinLengthArray,
+  type MutableBoundedLengthArray,
+  type MutableFixedLengthArray,
+  type MutableMaxLengthArray,
+  type MutableMinLengthArray,
 } from './length-constrained-array.mjs';
 
 // MaxLengthArray
@@ -50,6 +57,41 @@ import {
   expectType<MaxLengthArray<3, number>, readonly number[]>('<=');
 
   expectType<readonly number[], MaxLengthArray<3, number>>('!<=');
+}
+
+// MutableMaxLengthArray
+
+{
+  expectType<
+    MutableMaxLengthArray<3, number>,
+    number[] &
+      Readonly<{
+        MaxLength: 0 | 1 | 2 | 3;
+      }> &
+      Readonly<{
+        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+      }>
+  >('=');
+
+  // Reflexivity
+  expectType<
+    MutableMaxLengthArray<3, number>,
+    MutableMaxLengthArray<3, number>
+  >('=');
+
+  // Same length-bound subtyping as the readonly variant
+  expectType<
+    MutableMaxLengthArray<3, number>,
+    MutableMaxLengthArray<5, number>
+  >('<=');
+
+  // Assignable to the readonly MaxLengthArray of the same bound
+  expectType<MutableMaxLengthArray<3, number>, MaxLengthArray<3, number>>('<=');
+
+  // ... but the readonly variant is not assignable to the mutable one
+  expectType<MaxLengthArray<3, number>, MutableMaxLengthArray<3, number>>(
+    '!<=',
+  );
 }
 
 // MinLengthArray
@@ -106,6 +148,41 @@ import {
     MinLengthArray<3, number>,
     readonly [number, number, number, ...(readonly number[])]
   >('<=');
+}
+
+// MutableMinLengthArray
+
+{
+  expectType<
+    MutableMinLengthArray<3, number>,
+    [number, number, number, ...number[]] &
+      Readonly<{
+        MinLength: readonly [0, 0, 0, ...(readonly 0[])];
+      }> &
+      Readonly<{
+        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+      }>
+  >('=');
+
+  // Reflexivity
+  expectType<
+    MutableMinLengthArray<3, number>,
+    MutableMinLengthArray<3, number>
+  >('=');
+
+  // Same length-bound subtyping as the readonly variant
+  expectType<
+    MutableMinLengthArray<5, number>,
+    MutableMinLengthArray<3, number>
+  >('<=');
+
+  // Assignable to the readonly MinLengthArray of the same bound
+  expectType<MutableMinLengthArray<3, number>, MinLengthArray<3, number>>('<=');
+
+  // ... but the readonly variant is not assignable to the mutable one
+  expectType<MinLengthArray<3, number>, MutableMinLengthArray<3, number>>(
+    '!<=',
+  );
 }
 
 // Indexed access below the (clamped) minimum length does not include
@@ -208,6 +285,33 @@ declare const bounded25: BoundedLengthArray<2, 5, number>;
   expectType<typeof _bounded25At2, number | undefined>('=');
 }
 
+// MutableBoundedLengthArray
+
+{
+  expectType<
+    MutableBoundedLengthArray<2, 5, number>,
+    MutableMaxLengthArray<5, number> & MutableMinLengthArray<2, number>
+  >('=');
+
+  // Assignable to the readonly BoundedLengthArray of the same bounds
+  expectType<
+    MutableBoundedLengthArray<2, 5, number>,
+    BoundedLengthArray<2, 5, number>
+  >('<=');
+
+  // ... but the readonly variant is not assignable to the mutable one
+  expectType<
+    BoundedLengthArray<2, 5, number>,
+    MutableBoundedLengthArray<2, 5, number>
+  >('!<=');
+
+  // Weakening either bound is still allowed
+  expectType<
+    MutableBoundedLengthArray<2, 5, number>,
+    MutableBoundedLengthArray<1, 10, number>
+  >('<=');
+}
+
 // FixedLengthArray
 
 declare const fixed3: FixedLengthArray<3, number>;
@@ -256,6 +360,44 @@ declare const fixed3: FixedLengthArray<3, number>;
   expectType<BoundedLengthArray<3, 3, number>, FixedLengthArray<4, number>>(
     '!<=',
   );
+}
+
+// MutableFixedLengthArray
+
+declare const mutableFixed3: MutableFixedLengthArray<3, number>;
+
+{
+  // Up to the prefix cap, the structural part is the exact mutable tuple, so
+  // `length` is the literal `N` and in-range indexed access does not include
+  // `undefined`
+  expectType<
+    MutableFixedLengthArray<3, number>,
+    MutableBoundedLengthArray<3, 3, number> & MutableFixedLengthTuple<3, number>
+  >('=');
+
+  expectType<MutableFixedLengthArray<3, number>['length'], 3>('=');
+
+  const _mutableFixed3At0 = mutableFixed3[0];
+
+  expectType<typeof _mutableFixed3At0, number>('=');
+
+  // Assignable to the readonly FixedLengthArray of the same length
+  expectType<MutableFixedLengthArray<3, number>, FixedLengthArray<3, number>>(
+    '<=',
+  );
+
+  // ... but the readonly variant is not assignable to the mutable one
+  expectType<FixedLengthArray<3, number>, MutableFixedLengthArray<3, number>>(
+    '!<=',
+  );
+
+  // Beyond the prefix cap, only the clamped mutable structural prefix remains
+  expectType<
+    MutableFixedLengthArray<12, number>,
+    MutableBoundedLengthArray<12, 12, number>
+  >('=');
+
+  expectType<MutableFixedLengthArray<12, number>['length'], number>('=');
 }
 
 // Relation to the structural tuple family (FixedLengthTuple etc.)

@@ -290,19 +290,22 @@ type Blog = Readonly<{
     posts: NonEmptyArray<Post>; // Ensures posts array is never empty
 }>;
 
+// `NonEmptyArray<A>` is brand-based (an alias of `MinLengthArray<1, A>`), so a
+// value is obtained via a runtime guard or an explicit cast rather than a plain
+// array literal.
 const myBlog: Blog = {
     name: 'My Tech Journey',
     posts: [
         // This array must have at least one element
         { title: 'First Post', content: 'Hello world!' },
         { title: 'Understanding TypeScript', content: '...' },
-    ],
+    ] as unknown as NonEmptyArray<Post>,
 };
 
 // This would cause a type error:
 const emptyBlog: Blog = {
     name: 'Empty Thoughts',
-    // @ts-expect-error Source has 0 element(s) but target requires 1
+    // @ts-expect-error `[]` lacks the `MinLength` brand required by NonEmptyArray
     posts: [],
 };
 
@@ -484,12 +487,16 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [IntersectBrand](./src/branded-types/brand.mts#L247)
     - [NormalizeBrandUnion](./src/branded-types/brand.mts#L272)
 - src/branded-types/predefined-arrays/length-constrained-array.mts
-    - [StructuralPrefixCap](./src/branded-types/predefined-arrays/length-constrained-array.mts#L22)
-    - [StructuralPrefixLength](./src/branded-types/predefined-arrays/length-constrained-array.mts#L32)
-    - [MaxLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L80)
-    - [MinLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L132)
-    - [BoundedLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L170)
-    - [FixedLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L207)
+    - [StructuralPrefixCap](./src/branded-types/predefined-arrays/length-constrained-array.mts#L25)
+    - [StructuralPrefixLength](./src/branded-types/predefined-arrays/length-constrained-array.mts#L35)
+    - [MaxLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L83)
+    - [MutableMaxLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L119)
+    - [MinLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L171)
+    - [MutableMinLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L208)
+    - [BoundedLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L246)
+    - [MutableBoundedLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L281)
+    - [FixedLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L319)
+    - [MutableFixedLengthArray](./src/branded-types/predefined-arrays/length-constrained-array.mts#L356)
 - src/branded-types/predefined-numbers/bigint.mts
     - [BigInt64](./src/branded-types/predefined-numbers/bigint.mts#L18)
     - [BigUint64](./src/branded-types/predefined-numbers/bigint.mts#L33)
@@ -713,9 +720,11 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [RecordValueAtPath](./src/record/record-path.mts#L135)
     - [RecordValueAtPathWithIndex](./src/record/record-path.mts#L159)
 - src/tuple-and-list/array.mts
-    - [MutableNonEmptyArray](./src/tuple-and-list/array.mts#L12)
-    - [NonEmptyArray](./src/tuple-and-list/array.mts#L24)
-    - [ArrayElement](./src/tuple-and-list/array.mts#L37)
+    - [MutableNonEmptyTuple](./src/tuple-and-list/array.mts#L18)
+    - [NonEmptyTuple](./src/tuple-and-list/array.mts#L31)
+    - [NonEmptyArray](./src/tuple-and-list/array.mts#L46)
+    - [MutableNonEmptyArray](./src/tuple-and-list/array.mts#L56)
+    - [ArrayElement](./src/tuple-and-list/array.mts#L69)
 - src/tuple-and-list/index-of-tuple.mts
     - [IndexOfTuple](./src/tuple-and-list/index-of-tuple.mts#L17)
     - [NegativeIndexOfTuple](./src/tuple-and-list/index-of-tuple.mts#L52)

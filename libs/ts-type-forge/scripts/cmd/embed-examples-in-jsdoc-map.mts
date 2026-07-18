@@ -30,9 +30,13 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'src/branded-types/predefined-arrays/length-constrained-array.mts',
     sampleFiles: [
       'samples/src/branded-types/predefined-arrays/max-length-array-example.mts',
+      'samples/src/branded-types/predefined-arrays/mutable-max-length-array-example.mts',
       'samples/src/branded-types/predefined-arrays/min-length-array-example.mts',
+      'samples/src/branded-types/predefined-arrays/mutable-min-length-array-example.mts',
       'samples/src/branded-types/predefined-arrays/bounded-length-array-example.mts',
+      'samples/src/branded-types/predefined-arrays/mutable-bounded-length-array-example.mts',
       'samples/src/branded-types/predefined-arrays/fixed-length-array-example.mts',
+      'samples/src/branded-types/predefined-arrays/mutable-fixed-length-array-example.mts',
     ],
   },
   {

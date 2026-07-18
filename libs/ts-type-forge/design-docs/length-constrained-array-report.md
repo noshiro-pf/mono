@@ -138,9 +138,13 @@ brand 単独では `xs[0]` が `T | undefined` になる(`noUncheckedIndexedAcce
       正式に tuple type(先頭固定要素 + rest 要素)なので、`MinLengthTuple` は用語として正確。
 - 解消した不統一: `Len` 略記(`ArrayAtLeastLen`)と `Length`(`MaxLengthString`)の混在、
   `Of` / `AtLeast` / `AtMost` / `Bounded` と `Fixed` / `Min` / `Max` / `Bounded` の混在。
-- 残した不統一(意図的): `NonEmptyArray` は構造的(≡ `MinLengthTuple<1, A>`)、`NonEmptyString` は
-  brand。`NonEmptyArray` は利用箇所が非常に多く、brand 化はさらに大きな破壊的変更になるため今回は
-  見送り。brand 版が必要な場合は `MinLengthArray<1, A>` を使う。
+- 解消した不統一(`NonEmptyArray` の brand 化): 以前は `NonEmptyArray` のみ構造的
+  (≡ `MinLengthTuple<1, A>`)で `NonEmptyString` が brand という不統一が残っていたが、これを解消した。
+    - 構造的だった旧 `NonEmptyArray` / `MutableNonEmptyArray` は `NonEmptyTuple` /
+      `MutableNonEmptyTuple` にリネーム。
+    - `NonEmptyArray<A>` は `MinLengthArray<1, A>`、`MutableNonEmptyArray<A>` は
+      `MutableMinLengthArray<1, A>`(新設した mutable brand 版)への別名として brand 化。
+    - 純粋に構造的な判定(`T extends NonEmptyTuple<unknown>` 等)が必要な箇所では `NonEmptyTuple` を使う。
 
 ## 5. ベンチマーク結果
 

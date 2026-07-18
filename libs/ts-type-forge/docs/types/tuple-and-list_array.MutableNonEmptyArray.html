@@ -11,23 +11,20 @@
 <li><a href="../modules/tuple-and-list_array.html">tuple-and-list/array</a></li>
 <li><a href="" aria-current="page">MutableNonEmptyArray</a></li></ul>
 <h1>Type Alias MutableNonEmptyArray&lt;A&gt;</h1></div>
-<div class="tsd-signature"><span class="tsd-kind-type-alias">MutableNonEmptyArray</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#a">A</a><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-symbol">...</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#a">A</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">]</span></div>
+<div class="tsd-signature"><span class="tsd-kind-type-alias">MutableNonEmptyArray</span><span class="tsd-signature-symbol">:</span> <a href="branded-types_predefined-arrays_length-constrained-array.MutableMinLengthArray.html" class="tsd-signature-type tsd-kind-type-alias">MutableMinLengthArray</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">1</span><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#a">A</a><span class="tsd-signature-symbol">&gt;</span></div>
 <div class="tsd-comment tsd-typography"><p>Represents a mutable array that is guaranteed to have at least one element.</p>
+<p>Brand-based alias of <code>MutableMinLengthArray&lt;1, A&gt;</code> — the mutable counterpart
+of <a href="tuple-and-list_array.NonEmptyArray.html" class="tsd-kind-type-alias">NonEmptyArray</a>. Use <a href="tuple-and-list_array.MutableNonEmptyTuple.html" class="tsd-kind-type-alias">MutableNonEmptyTuple</a> instead when a
+purely structural mutable tuple is needed.</p>
 </div>
 <section class="tsd-panel">
 <h4>Type Parameters</h4>
 <ul class="tsd-type-parameter-list">
 <li><span id="a"><span class="tsd-kind-type-parameter">A</span></span>
 <div class="tsd-comment tsd-typography"><p>The type of elements in the array.</p>
-</div></li></ul></section>
-<div class="tsd-comment tsd-typography">
-<div class="tsd-tag-example">
-<h4 class="tsd-anchor-link" id="example">Example<a href="#example" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">type</span><span class="hl-1"> </span><span class="hl-8">NA</span><span class="hl-1"> = </span><span class="hl-8">MutableNonEmptyArray</span><span class="hl-1">&lt;</span><span class="hl-8">string</span><span class="hl-1">&gt;; </span><span class="hl-4">// [string, ...string[]]</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">valid</span><span class="hl-1">: </span><span class="hl-8">NA</span><span class="hl-1"> = [</span><span class="hl-2">&quot;hello&quot;</span><span class="hl-1">];</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-13">alsoValid</span><span class="hl-1">: </span><span class="hl-8">NA</span><span class="hl-1"> = [</span><span class="hl-2">&quot;hello&quot;</span><span class="hl-1">, </span><span class="hl-2">&quot;world&quot;</span><span class="hl-1">];</span><br/><span class="hl-4">// const invalid: NA = []; // Error</span>
-</code><button type="button">Copy</button></pre>
-
-</div></div><aside class="tsd-sources">
+</div></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.mts#L12">tuple-and-list/array.mts:12</a></li></ul></aside></div>
+<li>Defined in <a href="https://github.com/noshiro-pf/ts-type-forge/blob/main/src/tuple-and-list/array.mts#L56">tuple-and-list/array.mts:56</a></li></ul></aside></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
