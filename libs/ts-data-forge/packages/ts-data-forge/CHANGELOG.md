@@ -1,132 +1,30 @@
-# [10.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v9.0.1...v10.0.0) (2026-07-17)
+# ts-data-forge
 
 ## 11.0.0
 
 ### Major Changes
 
-- 22e5322: Adopt ts-type-forge v7's brand-based `NonEmptyArray` and reorganize the
-  length-constrained helpers so each type's helpers live in that type's
-  namespace.
+- 22e5322: Adopt ts-type-forge v7's brand-based `NonEmptyArray` and reorganize the length-constrained helpers so each type's helpers live in that type's namespace.
 
     **Breaking changes:**
 
-    - The branded array length **guards and casts** move from top-level into the
-      **`Arr`** namespace: `isFixedLengthArray` / `isMinLengthArray` /
-      `isMaxLengthArray` / `isBoundedLengthArray` (and the matching `as*` casts)
-      are now `Arr.isFixedLengthArray` / `Arr.asFixedLengthArray` / … . The
-      structural short-`N` guards (`Arr.is*LengthTuple`) are unchanged.
-    - The length-constrained **string guards** move into a new **`Str`** namespace
-      (mirroring `Num`): `isFixedLengthString` / … are now
-      `Str.isFixedLengthString` / … , and new `Str.as*LengthString` casts are
-      added.
-    - Array producers now return the brand-based `NonEmptyArray` (an alias of
-      `MinLengthArray<1>`) instead of the structural non-empty tuple. Input
-      dispatch stays structural (`NonEmptyTuple`), so plain non-empty tuples are
-      still accepted.
+    - The branded array length **guards and casts** move from top-level into the **`Arr`** namespace: `isFixedLengthArray` / `isMinLengthArray` / `isMaxLengthArray` / `isBoundedLengthArray` (and the matching `as*` casts) are now `Arr.isFixedLengthArray` / `Arr.asFixedLengthArray` / … . The structural short-`N` guards (`Arr.is*LengthTuple`) are unchanged.
+    - The length-constrained **string guards** move into a new **`Str`** namespace (mirroring `Num`): `isFixedLengthString` / … are now `Str.isFixedLengthString` / … , and new `Str.as*LengthString` casts are added.
+    - Array producers now return the brand-based `NonEmptyArray` (an alias of `MinLengthArray<1>`) instead of the structural non-empty tuple. Input dispatch stays structural (`NonEmptyTuple`), so plain non-empty tuples are still accepted.
 
     Requires `ts-type-forge@^7.0.0`.
 
-- feat!: add type guards for brand-based length-constrained arrays ([#421](https://github.com/noshiro-pf/ts-data-forge/issues/421)) ([981d464](https://github.com/noshiro-pf/ts-data-forge/commit/981d464f2fa34224d31fba6faa04dab6deca3305))
+## [10.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v9.0.1...v10.0.0) (2026-07-17)
+
+### Features
+
+- Add brand-based length-constrained array guards and runtime-checked casts: `Arr.is{Fixed,Min,Max,Bounded}LengthArray` and the matching `Arr.as{Fixed,Min,Max,Bounded}LengthArray` ([#421](https://github.com/noshiro-pf/ts-data-forge/issues/421)).
+- Constrain the length arguments of the branded array/string guards to the shared `SupportedLength` cap (integer literals in `0..2048`); non-literal numbers and out-of-range literals are rejected at the type level.
 
 ### BREAKING CHANGES
 
-- public signatures now reference the renamed
-  ts-type-forge tuple types (FixedLengthTuple etc.); requires a
-  ts-type-forge release that includes the renamed family and the hybrid
-  branded array types.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: <https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t>
-
-- feat!: rename tuple-based length guards to match the type names
-
-Rename the structural tuple-based length guards so that function names
-match the types they narrow to, completing the
-{Fixed,Min,Max,Bounded}Length naming scheme:
-
-- isArrayOfLength -> isFixedLengthTuple
-- isArrayAtLeastLength -> isMinLengthTuple
-- isArrayAtMostLength -> isMaxLengthTuple
-- isArrayBoundedLength -> isBoundedLengthTuple
-
-JSDoc examples, sample files (samples/src/array/*), and internal
-usages are updated accordingly.
-
-- the guards isArrayOfLength, isArrayAtLeastLength,
-  isArrayAtMostLength, and isArrayBoundedLength have been renamed to
-  isFixedLengthTuple, isMinLengthTuple, isMaxLengthTuple, and
-  isBoundedLengthTuple.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: <https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t>
-
-- feat: add runtime-checked casts for branded length-constrained arrays
-
-Add asFixedLengthArray / asMinLengthArray / asMaxLengthArray /
-asBoundedLengthArray so that branded array values can be constructed
-without writing `xs as unknown as FixedLengthArray<N, E>` by hand. The
-length is verified at runtime (TypeError on violation, mirroring the
-asUint32-style cast contract), and the original array type is preserved
-via intersection.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: <https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t>
-
-- docs: regenerate docs and README for the renamed guards and new casts
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: <https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t>
-
-- feat: constrain branded array guard/cast length params to the 2048 cap
-
-Follow the new SupportedArrayLength constraint from ts-type-forge in
-is{Min,Max,Bounded,Fixed}LengthArray and
-as{Min,Max,Bounded,Fixed}LengthArray: length arguments must now be
-integer literals in 0..2048. Non-literal numbers (for which the brand
-would be meaningless) and lengths beyond the cap are rejected at the
-type level. Docs regenerated.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: <https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t>
-
-- feat!: constrain string/array length guards with the shared cap
-
-Follow the shared SupportedLength (0..2048) constraint from
-ts-type-forge in both guard families:
-
-- is{Min,Max,Bounded,Fixed}LengthArray and as* casts: renamed
-  constraint (SupportedArrayLength -> SupportedLength).
-- is{Min,Max,Bounded,Fixed}LengthString: length arguments are now
-  constrained to SupportedLength instead of SizeType.ArgStr, so
-  literals above 2048 and non-literal numbers are rejected at the type
-  level (the brand encoding cannot represent them).
-
-- the length parameters of the branded string guards
-  now require integer literals in 0..2048.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: <https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t>
-
-- chore: bump ts-type-forge from 5.0.0 to 6.0.0
-
-Adopt the released ts-type-forge v6.0.0, which this branch's changes
-(renamed tuple family, branded length-constrained arrays with the
-shared SupportedLength cap) depend on.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: <https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t>
-
-- chore: apply codemod as-const and regenerate docs with source links
-
-- Apply `codemod:full` (adds `as const` to array literals in the new
-  guard test files), fixing the codemod:full CI check.
-- Regenerate TypeDoc output so every page carries GitHub source links,
-  fixing the style-check (doc) check. The links were missing because
-  they had been generated in an environment whose git remote does not
-  resolve to github.com; they now match the CI-generated output.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: <https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t>
+- Rename the structural tuple guards to match the types they narrow to: `isArrayOfLength` → `isFixedLengthTuple`, `isArrayAtLeastLength` → `isMinLengthTuple`, `isArrayAtMostLength` → `isMaxLengthTuple`, `isArrayBoundedLength` → `isBoundedLengthTuple`.
+- Public signatures now reference the renamed ts-type-forge tuple types (`FixedLengthTuple` etc.); requires `ts-type-forge@^6.0.0`.
 
 ## [9.0.1](https://github.com/noshiro-pf/ts-data-forge/compare/v9.0.0...v9.0.1) (2026-07-12)
 
