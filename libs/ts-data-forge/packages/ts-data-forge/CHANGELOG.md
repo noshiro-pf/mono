@@ -1,5 +1,31 @@
 # [10.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v9.0.1...v10.0.0) (2026-07-17)
 
+## 11.0.0
+
+### Major Changes
+
+- 22e5322: Adopt ts-type-forge v7's brand-based `NonEmptyArray` and reorganize the
+  length-constrained helpers so each type's helpers live in that type's
+  namespace.
+
+    **Breaking changes:**
+
+    - The branded array length **guards and casts** move from top-level into the
+      **`Arr`** namespace: `isFixedLengthArray` / `isMinLengthArray` /
+      `isMaxLengthArray` / `isBoundedLengthArray` (and the matching `as*` casts)
+      are now `Arr.isFixedLengthArray` / `Arr.asFixedLengthArray` / … . The
+      structural short-`N` guards (`Arr.is*LengthTuple`) are unchanged.
+    - The length-constrained **string guards** move into a new **`Str`** namespace
+      (mirroring `Num`): `isFixedLengthString` / … are now
+      `Str.isFixedLengthString` / … , and new `Str.as*LengthString` casts are
+      added.
+    - Array producers now return the brand-based `NonEmptyArray` (an alias of
+      `MinLengthArray<1>`) instead of the structural non-empty tuple. Input
+      dispatch stays structural (`NonEmptyTuple`), so plain non-empty tuples are
+      still accepted.
+
+    Requires `ts-type-forge@^7.0.0`.
+
 - feat!: add type guards for brand-based length-constrained arrays ([#421](https://github.com/noshiro-pf/ts-data-forge/issues/421)) ([981d464](https://github.com/noshiro-pf/ts-data-forge/commit/981d464f2fa34224d31fba6faa04dab6deca3305))
 
 ### BREAKING CHANGES
