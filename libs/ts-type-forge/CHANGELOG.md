@@ -1,3 +1,9 @@
+# [6.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v6.0.0...v6.1.0) (2026-07-18)
+
+### Features
+
+- add Float16 type ([#416](https://github.com/noshiro-pf/ts-type-forge/issues/416)) ([d7c4634](https://github.com/noshiro-pf/ts-type-forge/commit/d7c4634bbb1f2ea0658e34369c91ec284bb41e49))
+
 # [6.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v5.0.0...v6.0.0) (2026-07-17)
 
 - feat!: add brand-based length-constrained array types ([#415](https://github.com/noshiro-pf/ts-type-forge/issues/415)) ([6bd2f13](https://github.com/noshiro-pf/ts-type-forge/commit/6bd2f131515e8324917ca43954b890c12442feb9))
