@@ -41,6 +41,7 @@ jobs:
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           OWNER: noshiro-pf
+          REPO_NAME: ts-data-forge
 
       - name: Check if there is no file diff
         run: pnpm exec assert-repo-is-clean

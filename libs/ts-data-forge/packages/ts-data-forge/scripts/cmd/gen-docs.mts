@@ -1,0 +1,102 @@
+import * as path from 'node:path';
+import { unknownToString } from 'ts-data-forge';
+import { $, assertPathExists, isDirectlyExecuted, Result } from 'ts-repo-utils';
+import { type UnknownResult } from '../../src/functional/result/index.mjs';
+import { projectRootPath } from '../project-root-path.mjs';
+import { embedExamplesInJsDoc } from './embed-examples-in-jsdoc.mjs';
+import { embedExamples } from './embed-examples.mjs';
+
+const TYPEDOC_CONFIG = path.resolve(
+  projectRootPath,
+  './configs/typedoc.config.mjs',
+);
+
+/** Generates documentation using TypeDoc and formats the output. */
+export const genDocs = async (): Promise<void> => {
+  console.log('Starting documentation generation...\n');
+
+  // Verify TypeDoc config exists
+  await assertPathExists(TYPEDOC_CONFIG, 'TypeDoc config');
+
+  await logStep({
+    startMessage: 'Embedding example code into README',
+    action: () => runStep(embedExamples(), 'Example embedding failed'),
+    successMessage: 'Example code embedded into README',
+  });
+
+  await logStep({
+    startMessage: 'Embedding example code into JSDoc',
+    action: () =>
+      runStep(embedExamplesInJsDoc(), 'Example embedding into JSDoc failed'),
+    successMessage: 'Example code embedded into JSDoc',
+  });
+
+  await logStep({
+    startMessage: 'Generating documentation with TypeDoc',
+    action: () =>
+      runCmdStep(
+        `typedoc --options "${TYPEDOC_CONFIG}"`,
+        'TypeDoc generation failed',
+      ),
+    successMessage: 'TypeDoc generation completed',
+  });
+
+  await logStep({
+    startMessage: 'Formatting files',
+    action: () => runCmdStep('pnpm run fmt', 'File formatting failed'),
+    successMessage: 'Formatting completed',
+  });
+
+  console.log('✅ Documentation generation completed successfully!\n');
+};
+
+const mut_step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  console.log(`${mut_step.current}. ${startMessage}...`);
+
+  await action();
+
+  console.log(`✓ ${successMessage}.\n`);
+
+  mut_step.current += 1;
+};
+
+const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
+  const result = await $(cmd);
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${result.value.message}`);
+
+    console.error('❌ Documentation generation failed');
+
+    process.exit(1);
+  }
+};
+
+const runStep = async (
+  promise: Promise<UnknownResult>,
+  errorMsg: string,
+): Promise<void> => {
+  const result = await promise;
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
+
+    console.error('❌ Documentation generation failed');
+
+    process.exit(1);
+  }
+};
+
+if (isDirectlyExecuted(import.meta.url)) {
+  await genDocs();
+}

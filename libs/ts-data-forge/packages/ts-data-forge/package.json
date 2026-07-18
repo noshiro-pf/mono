@@ -1,0 +1,88 @@
+{
+  "name": "ts-data-forge",
+  "version": "10.0.0",
+  "private": false,
+  "keywords": [
+    "typescript",
+    "utility",
+    "types",
+    "static-typing",
+    "functional-programming",
+    "type-guard"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/ts-data-forge.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/entry-point.d.mts",
+        "default": "./dist/entry-point.mjs"
+      }
+    }
+  },
+  "module": "./dist/entry-point.mjs",
+  "types": "./dist/entry-point.d.mts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx ./scripts/cmd/build.mts",
+    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "doc": "tsx ./scripts/cmd/gen-docs.mts",
+    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
+    "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
+    "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",
+    "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
+    "fmt": "format-uncommitted --cwd .",
+    "fmt:diff": "format-diff-from origin/main --cwd .",
+    "fmt:full": "pnpm run z:prettier .",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "tsx scripts/cmd/gen-index.mts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest:node run",
+    "test:browser": "pnpm run z:vitest --project='Browser' run",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "test:cov:ui": "vite preview --outDir ./coverage",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "update-packages": "pnpm update --latest",
+    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "@sindresorhus/is": "^8.1.0",
+    "ts-type-forge": "^6.0.0"
+  },
+  "devDependencies": {
+    "@emotion/react": "11.14.0",
+    "@emotion/styled": "11.14.1",
+    "@mui/material": "9.2.0",
+    "@types/react": "19.2.17",
+    "immer": "11.1.11",
+    "react": "19.2.7",
+    "typedoc": "0.28.19",
+    "typedoc-github-theme": "0.4.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.8"
+  },
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  }
+}

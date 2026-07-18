@@ -3,53 +3,21 @@ import {
   eslintConfigForNodeJs,
   eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
-  eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
-import { restrictedImports } from './configs/eslint/rules/eslint-no-restricted-imports-option.mjs';
-
-const thisDir = import.meta.dirname;
+import { projectRootPath } from './scripts/project-root-path.mjs';
 
 export default [
   {
-    ignores: ['.eslintrc.cjs', 'docs/**', 'agents/**'],
+    ignores: ['packages/**', 'agents/**'],
   },
   ...eslintConfigForTypeScript({
-    tsconfigRootDir: thisDir,
-    tsconfigFileName: './tsconfig.json',
-    packageDirs: [thisDir],
+    tsconfigRootDir: projectRootPath,
+    tsconfigFileName: 'tsconfig.json',
+    packageDirs: [projectRootPath],
   }),
 
-  eslintConfigForTsDataForge(['samples/**', 'scripts/**', 'configs/**']),
-
-  eslintConfigForVitest(),
-
-  {
-    rules: defineKnownRules({
-      '@typescript-eslint/no-restricted-imports': [
-        'error',
-        ...restrictedImports,
-      ],
-
-      'unicorn/prefer-temporal': ['warn', {}], // todo
-    }),
-  },
-
-  {
-    files: ['test/**/*.mts', '**/*.test.mts'],
-    rules: defineKnownRules({
-      '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/no-duplicate-type-constituents': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/consistent-indexed-object-style': 'off',
-      '@typescript-eslint/no-restricted-types': 'off',
-      '@typescript-eslint/no-redundant-type-constituents': 'off',
-      // Tests often assert conditionally and may omit explicit expectations in helper-driven flows
-      'vitest/no-conditional-expect': 'off',
-      'vitest/expect-expect': 'off',
-      'unicorn/consistent-function-scoping': 'off',
-    }),
-  },
+  eslintConfigForTsDataForge(),
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
@@ -67,48 +35,6 @@ export default [
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
-    }),
-  },
-  {
-    files: ['configs/**/*', '.markdownlint-cli2.mjs'],
-    rules: defineKnownRules({
-      'import-x/no-default-export': 'off',
-      'import-x/no-anonymous-default-export': 'off',
-    }),
-  },
-
-  {
-    files: ['src/**'],
-    rules: defineKnownRules({
-      'unicorn/prefer-number-is-safe-integer': 'off',
-
-      'import-x/no-unused-modules': [
-        'error',
-        {
-          unusedExports: true,
-          ignoreExports: ['src/entry-point.mts', 'src/types.mts'],
-        },
-      ],
-    }),
-  },
-  {
-    files: ['src/entry-point.mts'],
-    rules: defineKnownRules({
-      '@typescript-eslint/no-restricted-imports': 'off',
-      'import-x/export': 'off',
-      '@stylistic/padding-line-between-statements': 'off',
-    }),
-  },
-
-  {
-    files: ['samples/**'],
-    rules: defineKnownRules({
-      'import-x/no-extraneous-dependencies': 'off',
-      'import-x/no-internal-modules': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      'functional/immutable-data': 'off',
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-unnecessary-condition': 'off',
     }),
   },
 ] satisfies readonly FlatConfig[];

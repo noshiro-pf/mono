@@ -1,32 +1,30 @@
-name: Publish to npm (Semantic Release)
+name: Release
 
 on:
   push:
     branches:
-      - main # Trigger a push to the main branch
+      - main
 
-permissions:
-  id-token: write # Required for OIDC
-  contents: write # To allow semantic-release to update package.json, create tags, and create releases
-  issues: write # To allow semantic-release to comment release notes on related issues/PRs
-  pull-requests: write # To allow semantic-release to comment release notes into the associated PR
+env:
+  CI: true
 
 jobs:
-  publish:
+  release:
+    name: Release
+    timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write # to create release
+      issues: write # to post issue comments
+      pull-requests: write # to create pull request
+      id-token: write
     steps:
-      - name: Generate Token
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          app-id: ${{ vars.SEMANTIC_RELEASE_GIT_PERMISSION_BOT_APP_ID }}
-          private-key: ${{ secrets.SEMANTIC_RELEASE_GIT_PERMISSION_BOT_PRIVATE_KEY }}
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          fetch-depth: 0 # To allow semantic-release to parse the entire commit history
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -40,9 +38,25 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run semantic-release
-        run: pnpm exec semantic-release
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.CHANGESETS_BOT_APP_ID }}
+          private-key: ${{ secrets.CHANGESETS_BOT_PRIVATE_KEY }}
+
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        with:
+          publish: pnpm run ci:publish
+          version: pnpm run ci:version-packages
+          title: 'chore: version packages'
+          commit: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Used for npm publish
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.CHANGESET_PAT }}

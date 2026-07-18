@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "paths": {
+      "ts-data-forge": ["./src/entry-point.mts"]
+    }
+  },
+  "include": [
+    "./src",
+    "./test",
+    "./samples",
+    "./scripts",
+    "./configs",
+    "./.eslintrc.cjs",
+    "./eslint.config.mts"
+  ]
+}
