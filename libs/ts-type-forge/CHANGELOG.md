@@ -1,3 +1,33 @@
+# [7.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v6.1.0...v7.0.0) (2026-07-18)
+
+- feat!: make NonEmptyArray brand-based; add MutableMinLengthArray ([#417](https://github.com/noshiro-pf/ts-type-forge/issues/417)) ([080a6f9](https://github.com/noshiro-pf/ts-type-forge/commit/080a6f92edec46364f6f323782b6574d1912fc28))
+
+### BREAKING CHANGES
+
+- NonEmptyArray / MutableNonEmptyArray are now brand-based
+  (MinLengthArray<1> / MutableMinLengthArray<1>); a plain array literal is no
+  longer directly assignable to them. Use NonEmptyTuple / MutableNonEmptyTuple
+  for the previous structural types.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
+- feat: add Mutable{Max,Bounded,Fixed}LengthArray for family symmetry
+
+Add the mutable branded counterparts of the readonly length-constrained
+array family so every readonly variant has a matching mutable one:
+
+- MutableMaxLengthArray (structural part: mutable `Elm[]`)
+- MutableBoundedLengthArray (= MutableMaxLengthArray & MutableMinLengthArray)
+- MutableFixedLengthArray (mutable structural tuple for Length <= 10)
+
+Each shares the same brand as its readonly counterpart, so the mutable
+variant is assignable to the readonly one. Adds type-level tests, JSDoc
+examples with matching sample files, and regenerates global.mts/index/docs.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
 # [6.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v6.0.0...v6.1.0) (2026-07-18)
 
 ### Features
