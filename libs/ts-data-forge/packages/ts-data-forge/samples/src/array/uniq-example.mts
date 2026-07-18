@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
 
     const expected = ['a', 'b', 'c'] as const;
 
-    assert.deepStrictEqual(uniqueLetters, expected);
+    assert.deepStrictEqual<readonly string[]>(uniqueLetters, expected);
 
     // embed-sample-code-ignore-below
   });

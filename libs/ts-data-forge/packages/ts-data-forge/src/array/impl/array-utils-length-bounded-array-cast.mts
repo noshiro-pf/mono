@@ -10,7 +10,7 @@ import {
   isFixedLengthArray,
   isMaxLengthArray,
   isMinLengthArray,
-} from './is-length-bounded-array.mjs';
+} from './array-utils-length-bounded-array-guard.mjs';
 
 /**
  * Casts an array to `FixedLengthArray<Length, E>` after checking that it has
@@ -25,12 +25,12 @@ import {
  * @example
  *
  * ```ts
- * const rgb = asFixedLengthArray([255, 128, 0], 3);
+ * const rgb = Arr.asFixedLengthArray([255, 128, 0], 3);
  *
  * const atMost5: MaxLengthArray<5, number> = rgb; // OK (3 <= 5)
  * const red: number = rgb[0]; // OK — no `undefined`
  *
- * // asFixedLengthArray([255, 128], 3); // throws TypeError
+ * // Arr.asFixedLengthArray([255, 128], 3); // throws TypeError
  * ```
  *
  * @template Xs - The input array type (tuple types are preserved).
@@ -69,12 +69,12 @@ export const asFixedLengthArray = <
  * @example
  *
  * ```ts
- * const history = asMinLengthArray([0, 1, 2, 3], 3);
+ * const history = Arr.asMinLengthArray([0, 1, 2, 3], 3);
  *
  * const nonEmpty: MinLengthArray<1, number> = history; // OK (3 >= 1)
  * const first: number = history[0]; // OK — no `undefined`
  *
- * // asMinLengthArray([0], 3); // throws TypeError
+ * // Arr.asMinLengthArray([0], 3); // throws TypeError
  * ```
  *
  * @template Xs - The input array type (tuple types are preserved).
@@ -111,11 +111,11 @@ export const asMinLengthArray = <
  * @example
  *
  * ```ts
- * const tags = asMaxLengthArray(['a', 'b', 'c'], 8);
+ * const tags = Arr.asMaxLengthArray(['a', 'b', 'c'], 8);
  *
  * const relaxed: MaxLengthArray<16, string> = tags; // OK (8 <= 16)
  *
- * // asMaxLengthArray(['a', 'b', 'c'], 2); // throws TypeError
+ * // Arr.asMaxLengthArray(['a', 'b', 'c'], 2); // throws TypeError
  * ```
  *
  * @template Xs - The input array type (tuple types are preserved).
@@ -154,11 +154,11 @@ export const asMaxLengthArray = <
  * @example
  *
  * ```ts
- * const selection = asBoundedLengthArray([1, 2, 3], 1, 5);
+ * const selection = Arr.asBoundedLengthArray([1, 2, 3], 1, 5);
  *
  * const relaxed: BoundedLengthArray<0, 100, number> = selection; // OK
  *
- * // asBoundedLengthArray([], 1, 5); // throws TypeError
+ * // Arr.asBoundedLengthArray([], 1, 5); // throws TypeError
  * ```
  *
  * @template Xs - The input array type (tuple types are preserved).

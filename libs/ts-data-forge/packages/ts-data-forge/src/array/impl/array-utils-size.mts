@@ -1,6 +1,6 @@
 import {
   type IntersectBrand,
-  type NonEmptyArray,
+  type NonEmptyTuple,
   type PositiveNumber,
 } from 'ts-type-forge';
 /**
@@ -26,7 +26,7 @@ import { type SizeType } from '../../types.mjs';
 
 export const size = <const Ar extends readonly unknown[]>(
   array: Ar,
-): Ar extends NonEmptyArray<unknown>
+): Ar extends NonEmptyTuple<unknown>
   ? IntersectBrand<PositiveNumber, SizeType.Arr>
   : SizeType.Arr =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

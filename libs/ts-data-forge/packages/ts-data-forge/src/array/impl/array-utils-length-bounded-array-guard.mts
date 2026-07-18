@@ -25,11 +25,11 @@ import {
  * ```ts
  * const input: readonly number[] = [0, 1, 2, 3];
  *
- * assert.isTrue(isMinLengthArray(input, 3));
+ * assert.isTrue(Arr.isMinLengthArray(input, 3));
  *
- * assert.isFalse(isMinLengthArray([0], 3));
+ * assert.isFalse(Arr.isMinLengthArray([0], 3));
  *
- * if (isMinLengthArray(input, 3)) {
+ * if (Arr.isMinLengthArray(input, 3)) {
  *   const history: MinLengthArray<3, number> = input;
  *
  *   const nonEmpty: MinLengthArray<1, number> = input; // OK (3 >= 1)
@@ -70,11 +70,11 @@ export const isMinLengthArray = <
  * ```ts
  * const input: readonly string[] = ['a', 'b', 'c'];
  *
- * assert.isTrue(isMaxLengthArray(input, 8));
+ * assert.isTrue(Arr.isMaxLengthArray(input, 8));
  *
- * assert.isFalse(isMaxLengthArray(input, 2));
+ * assert.isFalse(Arr.isMaxLengthArray(input, 2));
  *
- * if (isMaxLengthArray(input, 8)) {
+ * if (Arr.isMaxLengthArray(input, 8)) {
  *   const tags: MaxLengthArray<8, string> = input;
  *
  *   const relaxed: MaxLengthArray<16, string> = input; // OK (8 <= 16)
@@ -116,11 +116,11 @@ export const isMaxLengthArray = <
  * ```ts
  * const input: readonly number[] = [1, 2, 3];
  *
- * assert.isTrue(isBoundedLengthArray(input, 1, 5));
+ * assert.isTrue(Arr.isBoundedLengthArray(input, 1, 5));
  *
- * assert.isFalse(isBoundedLengthArray([], 1, 5));
+ * assert.isFalse(Arr.isBoundedLengthArray([], 1, 5));
  *
- * if (isBoundedLengthArray(input, 1, 5)) {
+ * if (Arr.isBoundedLengthArray(input, 1, 5)) {
  *   const selection: BoundedLengthArray<1, 5, number> = input;
  *
  *   const relaxed: BoundedLengthArray<0, 100, number> = input; // OK ([1, 5] ⊆ [0, 100])
@@ -168,11 +168,11 @@ export const isBoundedLengthArray = <
  * ```ts
  * const input: readonly number[] = [255, 128, 0];
  *
- * assert.isTrue(isFixedLengthArray(input, 3));
+ * assert.isTrue(Arr.isFixedLengthArray(input, 3));
  *
- * assert.isFalse(isFixedLengthArray(input, 4));
+ * assert.isFalse(Arr.isFixedLengthArray(input, 4));
  *
- * if (isFixedLengthArray(input, 3)) {
+ * if (Arr.isFixedLengthArray(input, 3)) {
  *   const rgb: FixedLengthArray<3, number> = input;
  *
  *   const atMost5: MaxLengthArray<5, number> = input; // OK (3 <= 5)

@@ -1,4 +1,9 @@
-import { type List, type NonEmptyArray, type SmallUint } from 'ts-type-forge';
+import {
+  type List,
+  type NonEmptyArray,
+  type NonEmptyTuple,
+  type StructuralPrefixLength,
+} from 'ts-type-forge';
 import { Uint32 } from '../../number/index.mjs';
 import { type SizeType } from '../../types.mjs';
 import { size } from './array-utils-size.mjs';
@@ -84,10 +89,10 @@ export function take<
 >(
   array: Ar,
   num: N,
-): N extends SmallUint
+): N extends StructuralPrefixLength
   ? List.Take<N, Ar>
   : N extends SizeType.ArgArrPositive
-    ? Ar extends NonEmptyArray<unknown>
+    ? Ar extends NonEmptyTuple<unknown>
       ? NonEmptyArray<Ar[number]>
       : readonly Ar[number][]
     : readonly Ar[number][];
@@ -96,10 +101,10 @@ export function take<N extends SizeType.ArgArr>(
   num: N,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => N extends SmallUint
+) => N extends StructuralPrefixLength
   ? List.Take<N, Ar>
   : N extends SizeType.ArgArrPositive
-    ? Ar extends NonEmptyArray<unknown>
+    ? Ar extends NonEmptyTuple<unknown>
       ? NonEmptyArray<Ar[number]>
       : readonly Ar[number][]
     : readonly Ar[number][];
@@ -147,10 +152,10 @@ export function takeLast<
 >(
   array: Ar,
   num: N,
-): N extends SmallUint
+): N extends StructuralPrefixLength
   ? List.TakeLast<N, Ar>
   : N extends SizeType.ArgArrPositive
-    ? Ar extends NonEmptyArray<unknown>
+    ? Ar extends NonEmptyTuple<unknown>
       ? NonEmptyArray<Ar[number]>
       : readonly Ar[number][]
     : readonly Ar[number][];
@@ -159,10 +164,10 @@ export function takeLast<N extends SizeType.ArgArr>(
   num: N,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => N extends SmallUint
+) => N extends StructuralPrefixLength
   ? List.TakeLast<N, Ar>
   : N extends SizeType.ArgArrPositive
-    ? Ar extends NonEmptyArray<unknown>
+    ? Ar extends NonEmptyTuple<unknown>
       ? NonEmptyArray<Ar[number]>
       : readonly Ar[number][]
     : readonly Ar[number][];
@@ -210,14 +215,16 @@ export function skip<
 >(
   array: Ar,
   num: N,
-): N extends SmallUint ? List.Skip<N, Ar> : readonly Ar[number][];
+): N extends StructuralPrefixLength ? List.Skip<N, Ar> : readonly Ar[number][];
 
 // curried version
 export function skip<N extends SizeType.ArgArr>(
   num: N,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => N extends SmallUint ? List.Skip<N, Ar> : readonly Ar[number][];
+) => N extends StructuralPrefixLength
+  ? List.Skip<N, Ar>
+  : readonly Ar[number][];
 
 export function skip<E>(
   ...args: readonly [readonly E[], SizeType.ArgArr] | readonly [SizeType.ArgArr]
@@ -260,14 +267,18 @@ export function skipLast<
 >(
   array: Ar,
   num: N,
-): N extends SmallUint ? List.SkipLast<N, Ar> : readonly Ar[number][];
+): N extends StructuralPrefixLength
+  ? List.SkipLast<N, Ar>
+  : readonly Ar[number][];
 
 // curried version
 export function skipLast<N extends SizeType.ArgArr>(
   num: N,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => N extends SmallUint ? List.SkipLast<N, Ar> : readonly Ar[number][];
+) => N extends StructuralPrefixLength
+  ? List.SkipLast<N, Ar>
+  : readonly Ar[number][];
 
 export function skipLast<E>(
   ...args:

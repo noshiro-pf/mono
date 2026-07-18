@@ -105,8 +105,8 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0
       ts-type-forge:
-        specifier: ^6.0.0
-        version: 6.0.0
+        specifier: ^7.0.0
+        version: 7.0.0
       typescript:
         specifier: '>=4.8'
         version: 6.0.3
@@ -3817,8 +3817,8 @@ packages:
     resolution: {integrity: sha512-QoHXXnTyW00e1CLgWvX3U+Ko2NpMJYji6K/muFHh+2VdBKpuM+vXWam3BUDC+3I5yarXmLwXloudr2tfVHcZiA==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
 
-  ts-type-forge@6.0.0:
-    resolution: {integrity: sha512-JaKup0HC8vBjnKPfDXao2NYzX1/5cB6LR5S4fCHRqqNLSNoZtH08jR/IuvjLDVg3paxyQWXm6BG1/bqgN9XEYg==}
+  ts-type-forge@7.0.0:
+    resolution: {integrity: sha512-7XX9AjeMTRgDTDIfR/oGd+NeRbOUzch6b5YRxdf1gIjhZQAJpzRRjZuPpUL/yjbxB+ZXcjjjQWigNgqbpzifWA==}
     engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   tslib@1.14.1:
@@ -8102,7 +8102,7 @@ snapshots:
 
   ts-type-forge@3.2.0: {}
 
-  ts-type-forge@6.0.0: {}
+  ts-type-forge@7.0.0: {}
 
   tslib@1.14.1: {}
 

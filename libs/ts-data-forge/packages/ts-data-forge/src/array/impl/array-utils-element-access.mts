@@ -1,4 +1,4 @@
-import { type NonEmptyArray } from 'ts-type-forge';
+import { type NonEmptyTuple } from 'ts-type-forge';
 import { Optional, pipe } from '../../functional/index.mjs';
 import {
   type ArgArrayIndexWithNegative,
@@ -90,7 +90,7 @@ export const head = <const Ar extends readonly unknown[]>(
   ? None
   : Ar extends readonly [infer E, ...unknown[]]
     ? Some<E>
-    : Ar extends NonEmptyArray<infer E>
+    : Ar extends NonEmptyTuple<infer E>
       ? Some<E>
       : Optional<Ar[number]> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -121,7 +121,7 @@ export const last = <const Ar extends readonly unknown[]>(
   ? None
   : Ar extends readonly [...unknown[], infer E]
     ? Some<E>
-    : Ar extends NonEmptyArray<infer E>
+    : Ar extends NonEmptyTuple<infer E>
       ? Some<E>
       : Optional<Ar[number]> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion

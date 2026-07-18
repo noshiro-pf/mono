@@ -814,4 +814,17 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sourcePath: 'src/others/tuple.mts',
     sampleFiles: ['samples/src/others/tp-example.mts'],
   },
+  {
+    sourcePath: 'src/string/str.mts',
+    sampleFiles: [
+      'samples/src/string/is-min-length-string-example.mts',
+      'samples/src/string/is-max-length-string-example.mts',
+      'samples/src/string/is-bounded-length-string-example.mts',
+      'samples/src/string/is-fixed-length-string-example.mts',
+      'samples/src/string/as-min-length-string-example.mts',
+      'samples/src/string/as-max-length-string-example.mts',
+      'samples/src/string/as-bounded-length-string-example.mts',
+      'samples/src/string/as-fixed-length-string-example.mts',
+    ],
+  },
 ] as const;

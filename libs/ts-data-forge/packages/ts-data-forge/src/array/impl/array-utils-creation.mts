@@ -15,6 +15,7 @@ import {
   type SafeUintWithSmallInt,
   type Seq,
   type SmallUint,
+  type StructuralPrefixLength,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range as rangeIterator } from '../../iterator/index.mjs';
@@ -88,7 +89,7 @@ export const seq = <N extends SizeType.ArgArr>(
 export const create = <N extends SizeType.ArgArr, const V>(
   len: N,
   init: V,
-): N extends SmallUint
+): N extends StructuralPrefixLength
   ? FixedLengthTuple<N, V>
   : N extends SizeType.ArgArrPositive
     ? NonEmptyArray<V>

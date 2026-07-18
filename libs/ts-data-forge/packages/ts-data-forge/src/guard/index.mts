@@ -1,7 +1,4 @@
-export * from './as-length-bounded-array.mjs';
 export * from './has-key.mjs';
-export * from './is-length-bounded-array.mjs';
-export * from './is-length-bounded-string.mjs';
 export * from './is-non-empty-string.mjs';
 export * from './is-non-null-object.mjs';
 export * from './is-primitive.mjs';

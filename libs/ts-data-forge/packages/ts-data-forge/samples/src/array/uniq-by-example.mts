@@ -19,7 +19,10 @@ if (import.meta.vitest !== undefined) {
       { id: 3, name: 'Grace' },
     ] as const;
 
-    assert.deepStrictEqual(uniqueById, expected);
+    assert.deepStrictEqual<readonly Readonly<{ id: number; name: string }>[]>(
+      uniqueById,
+      expected,
+    );
 
     // embed-sample-code-ignore-below
   });

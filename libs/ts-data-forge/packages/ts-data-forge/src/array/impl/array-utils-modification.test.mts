@@ -61,7 +61,12 @@ describe('Arr modifications', () => {
 
       expectType<typeof result, NonEmptyArray<string | 5>>('=');
 
-      assert.deepStrictEqual(result, ['a', 'b', 'c', 5]);
+      assert.deepStrictEqual<readonly (5 | string)[]>(result, [
+        'a',
+        'b',
+        'c',
+        5,
+      ]);
     });
 
     test('should work with curried version', () => {

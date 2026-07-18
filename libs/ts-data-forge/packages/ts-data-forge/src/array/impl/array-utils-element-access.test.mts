@@ -1,4 +1,4 @@
-import { type MutableNonEmptyArray } from 'ts-type-forge';
+import { type NonEmptyTuple } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';
 import { asInt32, asUint32 } from '../../number/index.mjs';
@@ -64,7 +64,7 @@ describe('Arr element access', () => {
     });
 
     test('case 2', () => {
-      const xs: MutableNonEmptyArray<number> = [1, 2, 3] as const;
+      const xs: NonEmptyTuple<number> = [1, 2, 3] as const;
 
       const h = head(xs);
 
@@ -134,7 +134,7 @@ describe('Arr element access', () => {
     });
 
     test('case 2', () => {
-      const xs: MutableNonEmptyArray<number> = [1, 2, 3] as const;
+      const xs: NonEmptyTuple<number> = [1, 2, 3] as const;
 
       const l = last(xs);
 

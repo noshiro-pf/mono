@@ -73,7 +73,7 @@ describe('Arr transformations', () => {
 
       expectType<typeof runningSum, readonly [number, ...number[]]>('<=');
 
-      assert.deepStrictEqual(runningSum, [0, 1, 3, 6, 10]);
+      assert.deepStrictEqual<readonly number[]>(runningSum, [0, 1, 3, 6, 10]);
     });
 
     test('should include initial value as first element', () => {
@@ -81,7 +81,7 @@ describe('Arr transformations', () => {
 
       const result = scan(numbers, (acc, curr) => acc + curr, 100);
 
-      assert.deepStrictEqual(result, [100, 110, 130, 160]);
+      assert.deepStrictEqual<readonly number[]>(result, [100, 110, 130, 160]);
 
       expect(result).toHaveLength(4); // original length + 1
     });
@@ -93,9 +93,9 @@ describe('Arr transformations', () => {
 
       const result2 = scanSum([5, 10]);
 
-      assert.deepStrictEqual(result1, [0, 1, 3, 6]);
+      assert.deepStrictEqual<readonly number[]>(result1, [0, 1, 3, 6]);
 
-      assert.deepStrictEqual(result2, [0, 5, 15]);
+      assert.deepStrictEqual<readonly number[]>(result2, [0, 5, 15]);
     });
 
     test('should provide index to reducer', () => {
@@ -121,7 +121,7 @@ describe('Arr transformations', () => {
 
       const result = scan(empty, (acc, curr) => acc + curr, 42);
 
-      assert.deepStrictEqual(result, [42]);
+      assert.deepStrictEqual<readonly number[]>(result, [42]);
     });
 
     test('should work with different accumulator and element types', () => {
@@ -131,7 +131,7 @@ describe('Arr transformations', () => {
 
       expectType<typeof result, readonly [number, ...number[]]>('<=');
 
-      assert.deepStrictEqual(result, [0, 1, 2, 3]);
+      assert.deepStrictEqual<readonly number[]>(result, [0, 1, 2, 3]);
     });
 
     test('should compute running product', () => {
@@ -139,7 +139,7 @@ describe('Arr transformations', () => {
 
       const runningProduct = scan(numbers, (acc, curr) => acc * curr, 1);
 
-      assert.deepStrictEqual(runningProduct, [1, 2, 6, 24]);
+      assert.deepStrictEqual<readonly number[]>(runningProduct, [1, 2, 6, 24]);
     });
 
     test('should work with objects', () => {
@@ -147,7 +147,7 @@ describe('Arr transformations', () => {
 
       const result = scan(items, (acc, curr) => acc + curr.value, 0);
 
-      assert.deepStrictEqual(result, [0, 10, 30, 60]);
+      assert.deepStrictEqual<readonly number[]>(result, [0, 10, 30, 60]);
     });
 
     test('should preserve all intermediate values', () => {
@@ -156,7 +156,7 @@ describe('Arr transformations', () => {
       const result = scan(numbers, (acc, curr) => acc - curr, 10);
 
       // 10 -> 10-1=9 -> 9-2=7 -> 7-3=4
-      assert.deepStrictEqual(result, [10, 9, 7, 4]);
+      assert.deepStrictEqual<readonly number[]>(result, [10, 9, 7, 4]);
     });
   });
 
@@ -429,7 +429,7 @@ describe('Arr transformations', () => {
 
       const result = uniq(array);
 
-      assert.deepStrictEqual(result, [1, 2, 3, 4]);
+      assert.deepStrictEqual<readonly number[]>(result, [1, 2, 3, 4]);
     });
 
     test('should work with strings', () => {
@@ -437,7 +437,7 @@ describe('Arr transformations', () => {
 
       const result = uniq(array);
 
-      assert.deepStrictEqual(result, ['a', 'b', 'c']);
+      assert.deepStrictEqual<readonly string[]>(result, ['a', 'b', 'c']);
     });
 
     test('should work with empty array', () => {
@@ -453,7 +453,7 @@ describe('Arr transformations', () => {
 
       const result = uniq(array);
 
-      assert.deepStrictEqual(result, [3, 1, 2]);
+      assert.deepStrictEqual<readonly number[]>(result, [3, 1, 2]);
     });
   });
 

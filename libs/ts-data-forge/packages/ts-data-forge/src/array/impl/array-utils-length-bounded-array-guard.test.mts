@@ -4,13 +4,13 @@ import {
   type MaxLengthArray,
   type MinLengthArray,
 } from 'ts-type-forge';
-import { expectType } from '../expect-type.mjs';
+import { expectType } from '../../expect-type.mjs';
 import {
   isBoundedLengthArray,
   isFixedLengthArray,
   isMaxLengthArray,
   isMinLengthArray,
-} from './is-length-bounded-array.mjs';
+} from './array-utils-length-bounded-array-guard.mjs';
 
 describe(isMinLengthArray, () => {
   test('should return true when the array is long enough', () => {

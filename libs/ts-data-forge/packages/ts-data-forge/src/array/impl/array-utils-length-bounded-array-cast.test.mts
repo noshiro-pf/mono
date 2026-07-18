@@ -4,13 +4,13 @@ import {
   type MaxLengthArray,
   type MinLengthArray,
 } from 'ts-type-forge';
-import { expectType } from '../expect-type.mjs';
+import { expectType } from '../../expect-type.mjs';
 import {
   asBoundedLengthArray,
   asFixedLengthArray,
   asMaxLengthArray,
   asMinLengthArray,
-} from './as-length-bounded-array.mjs';
+} from './array-utils-length-bounded-array-cast.mjs';
 
 describe(asFixedLengthArray, () => {
   test('should return the input when the length matches exactly', () => {

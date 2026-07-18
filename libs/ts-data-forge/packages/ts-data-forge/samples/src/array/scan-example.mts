@@ -21,9 +21,12 @@ if (import.meta.vitest !== undefined) {
 
     const expectedCurriedTotals = [10, 5, 20] as const;
 
-    assert.deepStrictEqual(runningTotals, expectedTotals);
+    assert.deepStrictEqual<readonly number[]>(runningTotals, expectedTotals);
 
-    assert.deepStrictEqual(runningTotalsFromCurried, expectedCurriedTotals);
+    assert.deepStrictEqual<readonly number[]>(
+      runningTotalsFromCurried,
+      expectedCurriedTotals,
+    );
 
     // embed-sample-code-ignore-below
   });
