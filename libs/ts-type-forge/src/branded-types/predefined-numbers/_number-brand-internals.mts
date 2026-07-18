@@ -20,6 +20,7 @@ type NumberBrandKey =
   | '>=0'
   | '<=0'
   | 'Finite'
+  | 'Float16'
   | 'Float32'
   | 'Float64'
   | 'Int'

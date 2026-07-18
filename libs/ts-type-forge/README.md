@@ -495,12 +495,12 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [BigUint64](./src/branded-types/predefined-numbers/bigint.mts#L33)
 - src/branded-types/predefined-numbers/core.mts
     - [NaNType](./src/branded-types/predefined-numbers/core.mts#L58)
-    - [ValidNumber](./src/branded-types/predefined-numbers/core.mts#L75)
-    - [NonZeroNumber](./src/branded-types/predefined-numbers/core.mts#L95)
-    - [NonNegativeNumber](./src/branded-types/predefined-numbers/core.mts#L115)
-    - [PositiveNumber](./src/branded-types/predefined-numbers/core.mts#L134)
-    - [NonPositiveNumber](./src/branded-types/predefined-numbers/core.mts#L154)
-    - [NegativeNumber](./src/branded-types/predefined-numbers/core.mts#L173)
+    - [ValidNumber](./src/branded-types/predefined-numbers/core.mts#L81)
+    - [NonZeroNumber](./src/branded-types/predefined-numbers/core.mts#L101)
+    - [NonNegativeNumber](./src/branded-types/predefined-numbers/core.mts#L121)
+    - [PositiveNumber](./src/branded-types/predefined-numbers/core.mts#L140)
+    - [NonPositiveNumber](./src/branded-types/predefined-numbers/core.mts#L160)
+    - [NegativeNumber](./src/branded-types/predefined-numbers/core.mts#L179)
 - src/branded-types/predefined-numbers/finite-number.mts
     - [FiniteNumber](./src/branded-types/predefined-numbers/finite-number.mts#L30)
     - [InfiniteNumber](./src/branded-types/predefined-numbers/finite-number.mts#L50)
@@ -512,8 +512,9 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [NonZeroFiniteNumber](./src/branded-types/predefined-numbers/finite-number.mts#L161)
     - [NonPositiveFiniteNumber](./src/branded-types/predefined-numbers/finite-number.mts#L175)
 - src/branded-types/predefined-numbers/float.mts
-    - [Float32](./src/branded-types/predefined-numbers/float.mts#L22)
-    - [Float64](./src/branded-types/predefined-numbers/float.mts#L40)
+    - [Float16](./src/branded-types/predefined-numbers/float.mts#L22)
+    - [Float32](./src/branded-types/predefined-numbers/float.mts#L43)
+    - [Float64](./src/branded-types/predefined-numbers/float.mts#L61)
 - src/branded-types/predefined-numbers/int.mts
     - [Int](./src/branded-types/predefined-numbers/int.mts#L32)
     - [NonZeroInt](./src/branded-types/predefined-numbers/int.mts#L48)

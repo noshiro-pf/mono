@@ -71,6 +71,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
     sourcePath: 'src/branded-types/predefined-numbers/float.mts',
     sampleFiles: [
+      'samples/src/branded-types/predefined-numbers/float16-example.mts',
       'samples/src/branded-types/predefined-numbers/float32-example.mts',
       'samples/src/branded-types/predefined-numbers/float64-example.mts',
     ],

@@ -81,6 +81,7 @@ declare global {
   type NegativeFiniteNumber = _TSTypeForge.NegativeFiniteNumber;
   type NonZeroFiniteNumber = _TSTypeForge.NonZeroFiniteNumber;
   type NonPositiveFiniteNumber = _TSTypeForge.NonPositiveFiniteNumber;
+  type Float16 = _TSTypeForge.Float16;
   type Float32 = _TSTypeForge.Float32;
   type Float64 = _TSTypeForge.Float64;
   type Int = _TSTypeForge.Int;

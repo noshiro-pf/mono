@@ -21,7 +21,7 @@ import {
   type POSITIVE_INFINITY,
   type PositiveFiniteNumber,
 } from './finite-number.mjs';
-import { type Float32, type Float64 } from './float.mjs';
+import { type Float16, type Float32, type Float64 } from './float.mjs';
 import {
   type Int,
   type NegativeInt,
@@ -51,6 +51,7 @@ import { type Uint32 } from './uint32.mjs';
         Finite: false;
         Float64: false;
         Float32: false;
+        Float16: false;
         Int: false;
         SafeInt: false;
         '!=0': true;
@@ -517,6 +518,7 @@ import { type Uint32 } from './uint32.mjs';
         Finite: true;
         Float64: false;
         Float32: false;
+        Float16: false;
         Int: true;
         SafeInt: true;
         '!=0': true;
@@ -543,6 +545,7 @@ import { type Uint32 } from './uint32.mjs';
         Finite: true;
         Float64: false;
         Float32: false;
+        Float16: false;
         Int: true;
         SafeInt: true;
         '!=0': true;
@@ -560,6 +563,16 @@ import { type Uint32 } from './uint32.mjs';
     > &
       number
   >('!=');
+
+  expectType<
+    Float16,
+    TSTypeForgeInternals_BrandEncapsulated<
+      Readonly<{
+        Float16: true;
+      }>
+    > &
+      number
+  >('=');
 
   expectType<
     Float32,
@@ -651,6 +664,8 @@ import { type Uint32 } from './uint32.mjs';
 
   expectType<NegativeInt16, NaNType>(op);
 
+  expectType<Float16, NaNType>(op);
+
   expectType<Float32, NaNType>(op);
 
   expectType<Float64, NaNType>(op);
@@ -709,6 +724,8 @@ import { type Uint32 } from './uint32.mjs';
     expectType<PositiveNumber, FiniteNumber>(op);
 
     expectType<NegativeNumber, FiniteNumber>(op);
+
+    expectType<Float16, FiniteNumber>(op);
 
     expectType<Float32, FiniteNumber>(op);
 
@@ -770,6 +787,8 @@ import { type Uint32 } from './uint32.mjs';
 
     expectType<FiniteNumber, Int>(op);
 
+    expectType<Float16, Int>(op);
+
     expectType<Float32, Int>(op);
 
     expectType<Float64, Int>(op);
@@ -829,6 +848,8 @@ import { type Uint32 } from './uint32.mjs';
     expectType<NegativeInt32, NonNegativeNumber>(op);
 
     expectType<NegativeInt16, NonNegativeNumber>(op);
+
+    expectType<Float16, NonNegativeNumber>(op);
 
     expectType<Float32, NonNegativeNumber>(op);
 
@@ -890,6 +911,8 @@ import { type Uint32 } from './uint32.mjs';
 
     expectType<Int16, NonPositiveNumber>(op);
 
+    expectType<Float16, NonPositiveNumber>(op);
+
     expectType<Float32, NonPositiveNumber>(op);
 
     expectType<Float64, NonPositiveNumber>(op);
@@ -926,6 +949,8 @@ import { type Uint32 } from './uint32.mjs';
   expectType<Int32, Uint>('!<=');
 
   expectType<Int16, Uint>('!<=');
+
+  expectType<Float16, Uint>('!<=');
 
   expectType<Float32, Uint>('!<=');
 
@@ -968,6 +993,8 @@ import { type Uint32 } from './uint32.mjs';
   expectType<Uint16, NonZeroNumber>('!<=');
 
   expectType<Int16, NonZeroNumber>('!<=');
+
+  expectType<Float16, NonZeroNumber>('!<=');
 
   expectType<Float32, NonZeroNumber>('!<=');
 
@@ -1323,6 +1350,8 @@ import { type Uint32 } from './uint32.mjs';
   expectType<PositiveSafeInt & NegativeNumber, never>('=');
 
   // Non-integer intersections - these should be impossible combinations
+  expectType<Float16 & Int, never>('!=');
+
   expectType<Float32 & Int, never>('!=');
 
   expectType<Float64 & Int, never>('!=');

@@ -21,7 +21,7 @@ Sized integer types:
 ├── uint16.mts - Uint16, PositiveUint16, NonZeroUint16
 
 Floating point and other types:
-├── float.mts - Float32, Float64
+├── float.mts - Float16, Float32, Float64
 ├── bigint.mts - BigInt64, BigUint64
 
 Utility types:
@@ -58,7 +58,13 @@ type IntRangeKeys =
 export type NaNType = TSTypeForgeInternals_ExtendNumberBrand<
   TSTypeForgeInternals_BrandedNumberBaseType,
   '!=0' | 'NaNValue',
-  IntRangeKeys | 'Finite' | 'Int' | 'SafeInt' | 'Float32' | 'Float64'
+  | IntRangeKeys
+  | 'Finite'
+  | 'Int'
+  | 'SafeInt'
+  | 'Float16'
+  | 'Float32'
+  | 'Float64'
 >;
 
 /**

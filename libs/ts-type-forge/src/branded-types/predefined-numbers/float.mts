@@ -4,6 +4,27 @@ import {
 } from './_number-brand-internals.mjs';
 
 /**
+ * Branded numeric type for 16-bit (half-precision) floating point numbers.
+ * Represents values that can be stored in a Float16Array.
+ *
+ * @example
+ * ```ts
+ * const toFloat16 = (x: number): Float16 => {
+ *   const arr = new Float16Array([x]);
+ *   return arr[0] as Float16;
+ * };
+ *
+ * const halfPrecisionData = (_values: readonly Float16[]): void => {
+ *   // Half-precision computations
+ * };
+ * ```
+ */
+export type Float16 = TSTypeForgeInternals_ExtendNumberBrand<
+  TSTypeForgeInternals_BrandedNumberBaseType,
+  'Float16'
+>;
+
+/**
  * Branded numeric type for 32-bit floating point numbers.
  * Represents values that can be stored in a Float32Array.
  *
