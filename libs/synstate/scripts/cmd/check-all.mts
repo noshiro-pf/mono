@@ -103,9 +103,9 @@ const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
   const result = await $(cmd);
 
   if (Result.isErr(result)) {
-    console.log(`${errorMsg}: ${result.value.message}`);
+    console.error(`${errorMsg}: ${result.value.message}`);
 
-    console.log('❌ Check failed');
+    console.error('❌ Check failed');
 
     process.exit(1);
   }
