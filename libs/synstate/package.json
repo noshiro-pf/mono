@@ -73,7 +73,7 @@
     "@rollup/plugin-replace": "6.0.3",
     "@rollup/plugin-strip": "3.0.4",
     "@types/node": "26.0.1",
-    "@vitest/browser-playwright": "4.1.8",
+    "@vitest/browser-playwright": "4.1.10",
     "@vitest/coverage-v8": "4.1.8",
     "@vitest/ui": "4.1.8",
     "conventional-changelog-conventionalcommits": "10.2.0",
