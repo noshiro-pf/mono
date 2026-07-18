@@ -1,32 +1,12 @@
 # [7.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v6.1.0...v7.0.0) (2026-07-18)
 
-- feat!: make NonEmptyArray brand-based; add MutableMinLengthArray ([#417](https://github.com/noshiro-pf/ts-type-forge/issues/417)) ([080a6f9](https://github.com/noshiro-pf/ts-type-forge/commit/080a6f92edec46364f6f323782b6574d1912fc28))
+### Features
+
+- Add `Mutable{Max,Bounded,Fixed}LengthArray`, completing the mutable branded counterparts of the readonly length-constrained array family so every readonly variant has a matching mutable one ([#417](https://github.com/noshiro-pf/ts-type-forge/issues/417)).
 
 ### BREAKING CHANGES
 
-- NonEmptyArray / MutableNonEmptyArray are now brand-based
-  (MinLengthArray<1> / MutableMinLengthArray<1>); a plain array literal is no
-  longer directly assignable to them. Use NonEmptyTuple / MutableNonEmptyTuple
-  for the previous structural types.
-
-Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- feat: add Mutable{Max,Bounded,Fixed}LengthArray for family symmetry
-
-Add the mutable branded counterparts of the readonly length-constrained
-array family so every readonly variant has a matching mutable one:
-
-- MutableMaxLengthArray (structural part: mutable `Elm[]`)
-- MutableBoundedLengthArray (= MutableMaxLengthArray & MutableMinLengthArray)
-- MutableFixedLengthArray (mutable structural tuple for Length <= 10)
-
-Each shares the same brand as its readonly counterpart, so the mutable
-variant is assignable to the readonly one. Adds type-level tests, JSDoc
-examples with matching sample files, and regenerates global.mts/index/docs.
-
-Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+- `NonEmptyArray` / `MutableNonEmptyArray` are now brand-based (`MinLengthArray<1>` / `MutableMinLengthArray<1>`); a plain array literal is no longer directly assignable to them. Use `NonEmptyTuple` / `MutableNonEmptyTuple` for the previous structural types.
 
 # [6.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v6.0.0...v6.1.0) (2026-07-18)
 
@@ -36,130 +16,15 @@ Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
 
 # [6.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v5.0.0...v6.0.0) (2026-07-17)
 
-- feat!: add brand-based length-constrained array types ([#415](https://github.com/noshiro-pf/ts-type-forge/issues/415)) ([6bd2f13](https://github.com/noshiro-pf/ts-type-forge/commit/6bd2f131515e8324917ca43954b890c12442feb9))
+### Features
+
+- Add brand-based length-constrained array types (`MaxLengthArray` / `MinLengthArray` / `BoundedLengthArray` / `FixedLengthArray`), with a structural tuple prefix for small lengths ([#415](https://github.com/noshiro-pf/ts-type-forge/issues/415)).
+- Cap the length parameters of the branded array/string families at a shared `SupportedLength` (`0..2048`), and export the shared boundaries `SupportedLengthCap`, `SupportedLength`, `StructuralPrefixCap`, and `StructuralPrefixLength` for downstream reuse.
 
 ### BREAKING CHANGES
 
-- ArrayOfLength, ArrayAtLeastLen, ArrayAtMostLen,
-  ArrayBoundedLen and their Mutable* variants have been renamed to
-  FixedLengthTuple, MinLengthTuple, MaxLengthTuple, BoundedLengthTuple
-  and Mutable* counterparts; the old names are no longer exported. The
-  branded array types now include a structural tuple prefix.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- docs: reflect tuple-family function renames in the design report
-
-The tuple-based guards/validators in ts-data-forge and ts-fortress are
-now renamed to match the type names (isFixedLengthTuple /
-fixedLengthTuple etc.), so the report no longer lists this as deferred
-work.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- refactor: move length-constrained tuple family into its own file
-
-Split the {Fixed,Min,Max,Bounded}LengthTuple family (and their Mutable*
-variants) out of src/tuple-and-list/array.mts into
-src/tuple-and-list/length-constrained-tuple.mts, mirroring
-length-constrained-string.mts and length-constrained-array.mts.
-array.mts now only contains the general array utilities
-(NonEmptyArray, MutableNonEmptyArray, ArrayElement).
-
-No public API change: all exports still go through the generated index
-files. The README type listing is regenerated accordingly.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- docs: embed branded-array JSDoc examples from samples and regenerate docs
-
-Add sample files for the length-constrained array family under
-samples/src/branded-types/predefined-arrays/ and register them in the
-embed-examples-in-jsdoc map so their JSDoc @example blocks are embedded
-by the doc pipeline like the other branded types. The Min/Fixed
-examples now also demonstrate the hybrid structural prefix (in-range
-indexed access without `undefined`, literal `length`).
-
-Regenerate the committed TypeDoc output (docs/) and README, which had
-gone stale after the tuple-family renames and file split, fixing the
-style-check (doc) CI job.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- docs: mention runtime-checked as* casts in the design report
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- feat: cap length parameters of branded array types at 2048
-
-Constrain the length type parameters of MaxLengthArray /
-MinLengthArray / BoundedLengthArray / FixedLengthArray to the new
-exported SupportedArrayLength union (0 | 1 | ... | 2048). The brand
-encoding relies on MakeTuple, which breaks down near TypeScript's
-10,000-element tuple limit; the cap rejects excessive literals (and
-non-literal `number`, for which the brand would be meaningless) with a
-readable constraint error instead of a deep-instantiation error.
-
-The constraint is effectively free for the type checker: the union is
-built once per program and cached, and each instantiation only adds a
-single union-membership check (measured: no per-use cost, one-time
-fixed cost of ~7k types).
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- feat!: share the length cap across string/array brands; export boundaries
-
-Generalize the 2048 length cap introduced for the branded array types
-to the whole branded length-constrained family:
-
-- New src/branded-types/supported-length.mts exports SupportedLengthCap
-  (2048) and SupportedLength (0 | 1 | ... | 2048), replacing the
-  array-local SupportedArrayLength.
-- MaxLengthString / MinLengthString / BoundedLengthString /
-  FixedLengthString now constrain their length parameters with
-  SupportedLength as well (they share the same MakeTuple-based brand
-  encoding and hence the same compiler limits).
-- StructuralPrefixCap (10) — the boundary between expanding the minimum
-  length into structural tuple positions and falling back to
-  `readonly Elm[]` — is now exported so downstream libraries can share
-  the same boundary instead of hard-coding their own.
-
-* the length parameters of the branded string types
-  (MaxLengthString etc.) are now constrained to SupportedLength
-  (0..2048); larger literals and non-literal `number` are rejected.
-  SupportedArrayLength has been renamed to SupportedLength.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- docs: regenerate docs with source links for supported-length.mts
-
-TypeDoc omits GitHub source links for files that are not yet committed
-at generation time; regenerate now that the file is committed, fixing
-the style-check (doc) CI job.
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
-
-- feat: export StructuralPrefixLength and pin down the MakeTuple limit
-
-* Export StructuralPrefixLength (0 | 1 | ... | 10, the union at or
-  below StructuralPrefixCap) so that downstream libraries can use the
-  "expand into a structural tuple vs fall back to readonly Elm[]"
-  boundary as a type-parameter constraint.
-* Add a boundary type test documenting the actual compiler limit that
-  SupportedLengthCap (2048) stays below: MakeTuple works up to
-  N = 9999 and fails with TS2799 from N = 10000 (identical on
-  TypeScript 6 and TypeScript 7 native).
-
-Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+- Rename the structural tuple family `ArrayOfLength` / `ArrayAtLeastLen` / `ArrayAtMostLen` / `ArrayBoundedLen` (and their `Mutable*` variants) to `FixedLengthTuple` / `MinLengthTuple` / `MaxLengthTuple` / `BoundedLengthTuple` (and `Mutable*`); the old names are no longer exported.
+- The length parameters of the branded string types (`MaxLengthString` etc.) are now constrained to `SupportedLength` (`0..2048`); larger literals and non-literal `number` are rejected. `SupportedArrayLength` is renamed to `SupportedLength`.
 
 # [5.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v4.0.0...v5.0.0) (2026-07-09)
 
