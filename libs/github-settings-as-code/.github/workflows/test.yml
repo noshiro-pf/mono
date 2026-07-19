@@ -57,15 +57,12 @@ jobs:
         id: check_diff_type
         run: pnpm exec check-should-run-type-checks
 
-      - name: Exit if no relevant changes
-        if: steps.check_diff_type.outputs.should_run != 'true'
-        run: exit 0
-
       - name: Run "${{ matrix.command }}"
+        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run ${{ matrix.command }}
 
       - name: Upload coverage reports to Codecov
-        if: matrix.command == 'test:cov'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           fail_ci_if_error: true

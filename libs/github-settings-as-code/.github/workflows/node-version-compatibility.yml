@@ -6,16 +6,7 @@ on:
       - 'develop'
       - 'develop*'
     paths-ignore:
-      - '**.md'
-      - '**.txt'
-      - 'agents/**'
-      - 'docs/**'
-      - 'documents/**'
       - '.gitignore'
-      - '.cspell.config.yaml'
-      - '.editorconfig'
-      - '.markdownlint-cli2.mjs'
-      - 'LICENSE'
 
   workflow_dispatch:
 
@@ -33,6 +24,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
+      - name: Fetch main
+        run: git fetch origin main # To allow check-should-run-type-checks to get the diff from main
+
       - name: Install pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
 
@@ -45,11 +39,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --engine-strict
 
+      # NOTE: To include this workflow in the branch protection rule status check,
+      # skip each step instead of skipping the entire workflow with paths-ignore.
+      - name: Check diff
+        id: check_diff_type
+        run: pnpm exec check-should-run-type-checks
+
       - name: Verify installation
+        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm list
 
       - name: Build
+        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run build
 
       - name: Test
+        if: steps.check_diff_type.outputs.should_run == 'true'
         run: pnpm run test
