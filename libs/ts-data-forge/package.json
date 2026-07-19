@@ -78,7 +78,7 @@
     "@changesets/cli": "2.31.0",
     "@rollup/plugin-replace": "6.0.3",
     "@rollup/plugin-strip": "3.0.4",
-    "@types/node": "26.1.0",
+    "@types/node": "26.1.1",
     "@vitest/browser-playwright": "4.1.10",
     "@vitest/coverage-v8": "4.1.10",
     "@vitest/ui": "4.1.10",
