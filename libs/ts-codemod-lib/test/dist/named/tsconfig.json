@@ -1,0 +1,28 @@
+{
+  // Type-checks the built `dist/` output through the real package.json
+  // `exports` map, via named imports
+  // (`import { X } from 'ts-codemod-lib'`): `scripts/cmd/build.mts`
+  // materializes a minimal `test/dist/node_modules/ts-codemod-lib`
+  // package (package.json + dist), so module resolution here behaves exactly
+  // like an external consumer's.
+  //
+  // Deliberately self-contained (no `extends`, no test-library dependencies)
+  // and conservative, so that older TypeScript versions can run it in the
+  // compatibility matrix
+  // (.github/workflows/typescript-version-compatibility.yml).
+  // `types: []` prevents auto-inclusion of node_modules/@types: the
+  // repository's @types/node requires a recent TypeScript and would produce
+  // unrelated lib-conflict errors on the older compilers in the matrix.
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "types": [],
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": false
+  },
+  "include": ["./*.mts"]
+}

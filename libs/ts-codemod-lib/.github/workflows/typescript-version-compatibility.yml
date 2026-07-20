@@ -1,0 +1,63 @@
+name: TypeScript Version Compatibility
+
+# Verifies that the built `dist/` declarations (resolved through the real
+# package.json `exports` map, see test/dist/) type-check on the range of
+# TypeScript versions consumers may be using — not just the repository's own
+# compiler.
+
+on:
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'develop*'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - 'agents/**'
+      - 'docs/**'
+      - 'documents/**'
+      - '.gitignore'
+      - '.cspell.config.yaml'
+      - '.editorconfig'
+      - '.markdownlint-cli2.mjs'
+      - 'LICENSE'
+
+  workflow_dispatch:
+
+jobs:
+  test-typescript-versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Floor is 5.6: transitive dependency declarations (@ts-morph/common,
+        # ts-data-forge) use MapIterator / ArrayIterator (TS 5.6 lib types),
+        # so consumers on older TypeScript cannot use this package's types.
+        ts-version: ['5.6', '5.7', '5.9', 'latest']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # build:min emits dist/ and links the package into
+      # test/dist/node_modules without running the repository's own checks
+      # (those are covered by the lint workflow).
+      - name: Build
+        run: pnpm run build:min
+
+      - name: Type-check dist output (named imports) with TypeScript ${{ matrix.ts-version }}
+        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./test/dist/named/tsconfig.json

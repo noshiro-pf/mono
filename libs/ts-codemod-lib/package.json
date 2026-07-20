@@ -24,6 +24,10 @@
       "import": {
         "types": "./dist/types.d.mts",
         "default": "./dist/entry-point.mjs"
+      },
+      "default": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/entry-point.mjs"
       }
     }
   },
@@ -43,6 +47,8 @@
     "LICENSE"
   ],
   "scripts": {
+    "agents:gen": "tsx ./scripts/cmd/gen-agents-md.mts",
+    "agents:sync": "tsx ./scripts/cmd/sync-agent-config.mts",
     "build": "tsx ./scripts/cmd/build.mts",
     "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
     "check:ext": "tsx ./scripts/cmd/check-ext.mts",
@@ -174,5 +180,9 @@
   },
   "volta": {
     "node": "26.3.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
