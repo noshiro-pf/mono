@@ -1,7 +1,7 @@
 name: TypeScript Version Compatibility
 
 # Verifies that the built `dist/` declarations (resolved through the real
-# package.json `exports` map, see test/dist/) type-check on the range of
+# package.json `exports` map, see test/dist_/) type-check on the range of
 # TypeScript versions consumers may be using — not just the repository's own
 # compiler.
 
@@ -54,10 +54,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # build:min emits dist/ and links the package into
-      # test/dist/node_modules without running the repository's own checks
+      # test/dist_/node_modules without running the repository's own checks
       # (those are covered by the lint workflow).
       - name: Build
         run: pnpm run build:min
 
       - name: Type-check dist output (named imports) with TypeScript ${{ matrix.ts-version }}
-        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./test/dist/named/tsconfig.json
+        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./test/dist_/named/tsconfig.json

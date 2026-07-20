@@ -150,13 +150,13 @@ const build = async (skipCheck: boolean): Promise<void> => {
 
   await logStep({
     startMessage:
-      'Linking the package into test/dist/node_modules (for exports-map resolution)',
+      'Linking the package into test/dist_/node_modules (for exports-map resolution)',
     action: () =>
       runStep(
         Result.fromPromise(ensureDistTestPackageLink()),
-        'Failed to link the package into test/dist/node_modules',
+        'Failed to link the package into test/dist_/node_modules',
       ),
-    successMessage: 'Linked test/dist/node_modules/ts-codemod-lib',
+    successMessage: 'Linked test/dist_/node_modules/ts-codemod-lib',
   });
 
   if (!skipCheck) {
@@ -165,7 +165,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
         'Type-checking the dist output through the package exports map (named imports)',
       action: () =>
         runCmdStep(
-          `node "${nativeTsc}" -p ./test/dist/named/tsconfig.json`,
+          `node "${nativeTsc}" -p ./test/dist_/named/tsconfig.json`,
           'dist output type check (named imports) failed',
         ),
       successMessage: 'dist output type check (named imports) passed',
@@ -223,14 +223,14 @@ const runStep = async (
 };
 
 /**
- * Materializes a minimal `test/dist/node_modules/ts-codemod-lib` package (a
+ * Materializes a minimal `test/dist_/node_modules/ts-codemod-lib` package (a
  * directory containing symlinks to the repository's `package.json` and
  * `dist/` only — the same surface a published tarball has) so that the dist
- * smoke tests (`test/dist/**`) resolve the package through the real
+ * smoke tests (`test/dist_/**`) resolve the package through the real
  * `package.json` `exports` map, exactly like an external consumer.
  *
  * Deliberately NOT a symlink to the repository root: that would expose the
- * whole repository (including `node_modules/`) under `test/dist/`, which
+ * whole repository (including `node_modules/`) under `test/dist_/`, which
  * derails tools that walk the tree.
  *
  * (`node_modules` is gitignored, so the links are re-created on every build.)
@@ -238,7 +238,7 @@ const runStep = async (
 const ensureDistTestPackageLink = async (): Promise<void> => {
   const packageDir = path.resolve(
     projectRootPath,
-    'test/dist/node_modules/ts-codemod-lib',
+    'test/dist_/node_modules/ts-codemod-lib',
   );
 
   // Remove leftovers from a previous build so the links never go stale.

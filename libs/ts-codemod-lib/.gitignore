@@ -90,9 +90,9 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
-# test/dist/ contains committed dist smoke tests, not build output
+# test/dist_/ contains committed dist smoke tests, not build output
 # (its node_modules/ stays ignored via the node_modules/ pattern above)
-!/test/dist/
+!/test/dist_/
 
 # Gatsby files
 .cache/
