@@ -93,8 +93,8 @@ importers:
         specifier: 10.1.2
         version: 10.1.2(prettier@3.8.4)(typescript@6.0.3)
       ts-type-forge:
-        specifier: 3.1.0
-        version: 3.1.0
+        specifier: 5.0.0
+        version: 5.0.0
       tsx:
         specifier: 4.22.4
         version: 4.22.4
@@ -217,8 +217,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@reduxjs/toolkit':
         specifier: 2.12.0
@@ -260,8 +260,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
@@ -282,8 +282,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@preact/signals':
         specifier: 2.9.1
@@ -307,8 +307,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
@@ -332,8 +332,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@types/argparse':
         specifier: 2.0.17
