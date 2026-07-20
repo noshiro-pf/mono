@@ -5,29 +5,13 @@
   "keywords": [
     "typescript"
   ],
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
     "directory": "libs/ts-repo-utils"
   },
-  "license": "Apache-2.0",
-  "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "sideEffects": false,
-  "type": "module",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/types.d.mts",
-        "default": "./dist/entry-point.mjs"
-      },
-      "default": {
-        "types": "./dist/types.d.mts",
-        "default": "./dist/entry-point.mjs"
-      }
-    }
-  },
-  "module": "./dist/entry-point.mjs",
-  "types": "./dist/types.d.mts",
   "bin": {
     "assert-repo-is-clean": "./dist/cmd/assert-repo-is-clean.mjs",
     "check-should-run-type-checks": "./dist/cmd/check-should-run-type-checks.mjs",
@@ -41,6 +25,22 @@
     "README.md",
     "LICENSE"
   ],
+  "type": "module",
+  "sideEffects": false,
+  "module": "./dist/entry-point.mjs",
+  "types": "./dist/types.d.mts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/entry-point.mjs"
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsx ./scripts/cmd/build.mts",
     "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
@@ -62,7 +62,7 @@
     "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "pnpm run z:format-uncommitted",
     "fmt:diff": "pnpm run z:format-diff-from origin/main",
-    "fmt:full": "prettier --write .",
+    "fmt:full": "oxfmt --write .",
     "gi": "run-s gi:src fmt",
     "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude cmd",
     "lint": "eslint .",
@@ -110,9 +110,7 @@
     "markdownlint": "0.41.1",
     "markdownlint-cli2": "0.23.2",
     "npm-run-all2": "9.0.3",
-    "prettier": "3.9.6",
-    "prettier-plugin-organize-imports": "4.3.0",
-    "prettier-plugin-packagejson": "3.0.2",
+    "oxfmt": "0.58.0",
     "rollup": "4.62.4",
     "rollup-plugin-esbuild": "6.2.1",
     "typedoc": "0.28.20",
@@ -123,9 +121,8 @@
     "vitest": "4.1.10"
   },
   "peerDependencies": {
-    "prettier": ">=3.0.0"
+    "oxfmt": ">=0.58.0"
   },
-  "packageManager": "pnpm@11.20.0",
   "engines": {
     "node": ">=22.22.2",
     "pnpm": ">=8.0.0"
@@ -133,8 +130,5 @@
   "volta": {
     "node": "26.3.1"
   },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  }
+  "packageManager": "pnpm@11.20.0"
 }

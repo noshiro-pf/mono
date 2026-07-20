@@ -58,7 +58,7 @@ npm exec -- assert-repo-is-clean --silent
 
 ### `format-uncommitted`
 
-Formats only untracked/modified files using Prettier.
+Formats only untracked/modified files using [Oxfmt](https://oxc.rs/docs/guide/usage/formatter). Files ignored by `.gitignore`/`.prettierignore`, and files with an extension Oxfmt doesn't support, are skipped automatically.
 
 ```bash
 # Basic usage
@@ -74,11 +74,10 @@ npm exec -- format-uncommitted --silent
 - `--exclude-modified` - Exclude modified files (default: false)
 - `--exclude-staged` - Exclude staged files (default: false)
 - `--silent` - Suppress output messages (default: false)
-- `--ignore-unknown` - Skip files without a Prettier parser instead of erroring (default: true)
 
 ### `format-diff-from`
 
-Formats only files that differ from the specified base branch or commit.
+Formats only files that differ from the specified base branch or commit, using [Oxfmt](https://oxc.rs/docs/guide/usage/formatter).
 
 ```bash
 # Format files different from main branch
@@ -111,7 +110,6 @@ Example in npm scripts:
 - `--exclude-modified` - Exclude modified files (default: false)
 - `--exclude-staged` - Exclude staged files (default: false)
 - `--silent` - Suppress output messages (default: false)
-- `--ignore-unknown` - Skip files without a Prettier parser instead of erroring (default: true)
 
 ### `gen-index-ts`
 
@@ -141,7 +139,7 @@ npm exec -- gen-index-ts ./src --target-ext .mts --index-ext .mts --export-ext .
 
 - Creates barrel exports for all subdirectories
 - Supports complex glob exclusion patterns (using micromatch)
-- Automatically formats generated files using the project's Prettier config
+- Automatically formats generated files using the project's Oxfmt config
 - Works with both single directories and directory arrays
 - Respects source and export extension configuration
 
@@ -197,7 +195,7 @@ npm exec -- check-should-run-type-checks \
     - Supports exact file matches: `.cspell.config.yaml`
     - Directory prefixes: `docs/` (matches any file in docs directory)
     - File extensions: `**.md` (matches any markdown file)
-    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.oxfmtrc.json', 'docs/', '**.md', '**.txt']`
 - `--base-branch` - Base branch to compare against for determining changed files (default: `origin/main`)
 
 **GitHub Actions Integration:**
@@ -526,14 +524,24 @@ const shouldRun2 = await checkShouldRunTypeChecks({
     - Exact file matches: `.cspell.config.yaml`
     - Directory prefixes: `docs/` (matches any file in docs directory)
     - File extensions: `**.md` (matches any markdown file)
-    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.prettierrc', 'docs/', '**.md', '**.txt']`
+    - Default: `['LICENSE', '.editorconfig', '.gitignore', '.cspell.config.yaml', '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore', '.oxfmtrc.json', 'docs/', '**.md', '**.txt']`
 - `baseBranch?` - Base branch to compare against (default: `origin/main`)
 
 ### Code Formatting Utilities
 
+All formatting utilities format files using [Oxfmt](https://oxc.rs/docs/guide/usage/formatter). Files ignored by `.gitignore`/`.prettierignore`, and files with an extension Oxfmt doesn't support, are skipped automatically, so there is no separate ignore option.
+
+#### `formatFiles(files: readonly string[], options?): Promise<Result<undefined, ExecException>>`
+
+Formats an explicit list of files, e.g. `formatFiles(['src/index.ts', 'src/utils.ts'])`.
+
+**Options:**
+
+- `silent?` - Suppress output messages (default: false)
+
 #### `formatFilesGlob(pathGlob: string, options?): Promise<Result<undefined, unknown>>`
 
-Formats files matching a glob pattern using Prettier.
+Formats files matching a glob pattern.
 
 ```tsx
 import { formatFilesGlob } from 'ts-repo-utils';
@@ -543,19 +551,11 @@ await formatFilesGlob('src/**/*.ts');
 
 // Format specific files
 await formatFilesGlob('src/{index,utils}.ts');
-
-// With custom ignore function
-await formatFilesGlob('src/**/*.ts', {
-    ignore: (filePath) => filePath.includes('generated'),
-    ignoreUnknown: false, // Error on files without parser
-});
 ```
 
 **Options:**
 
 - `silent?` - Suppress output messages (default: false)
-- `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
-- `ignore?` - Custom function to ignore files (default: built-in ignore list)
 
 #### `formatUncommittedFiles(options?): Promise<Result>`
 
@@ -571,7 +571,6 @@ await formatUncommittedFiles();
 // With custom options
 await formatUncommittedFiles({
     untracked: false, // Skip untracked files
-    ignore: (filePath) => filePath.includes('test'),
 });
 ```
 
@@ -581,8 +580,6 @@ await formatUncommittedFiles({
 - `modified?` - Format modified files (default: true)
 - `staged?` - Format staged files (default: true)
 - `silent?` - Suppress output messages (default: false)
-- `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
-- `ignore?` - Custom function to ignore files (default: built-in ignore list)
 
 **Return Type:**
 
@@ -615,8 +612,6 @@ await formatDiffFrom('abc123');
 // With custom options
 await formatDiffFrom('main', {
     includeUntracked: false,
-    ignore: (filePath) => filePath.includes('vendor'),
-    ignoreUnknown: false, // Error on files without parser
 });
 ```
 
@@ -626,8 +621,6 @@ await formatDiffFrom('main', {
 - `includeModified?` - Include modified files in addition to diff files (default: true)
 - `includeStaged?` - Include staged files in addition to diff files (default: true)
 - `silent?` - Suppress output messages (default: false)
-- `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
-- `ignore?` - Custom function to ignore files (default: built-in ignore list)
 
 **Return Type:**
 
@@ -705,7 +698,7 @@ type GenIndexConfig = Readonly<{
 
 - Creates barrel exports for all subdirectories
 - Supports complex glob exclusion patterns (using micromatch)
-- Automatically formats generated files using the project's Prettier config
+- Automatically formats generated files using the project's Oxfmt config
 - Works with both single directories and directory arrays
 - Respects source and export extension configuration
 

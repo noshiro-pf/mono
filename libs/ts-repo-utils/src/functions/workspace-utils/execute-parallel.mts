@@ -1,6 +1,6 @@
+import { spawn } from 'node:child_process';
 /* eslint-disable require-atomic-updates */
 import { isError } from '@sindresorhus/is';
-import { spawn } from 'node:child_process';
 import {
   Arr,
   createPromise,

@@ -1,6 +1,6 @@
-import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
   getDiffFrom,

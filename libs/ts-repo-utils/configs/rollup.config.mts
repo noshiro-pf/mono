@@ -1,7 +1,7 @@
-import * as rollupPluginReplaceNs from '@rollup/plugin-replace';
-import * as rollupPluginStripNs from '@rollup/plugin-strip';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as rollupPluginReplaceNs from '@rollup/plugin-replace';
+import * as rollupPluginStripNs from '@rollup/plugin-strip';
 import { defineConfig, type Plugin as RollupPlugin } from 'rollup';
 import * as rollupPluginEsbuildNs from 'rollup-plugin-esbuild';
 import { castMutable, Result, unknownToString } from 'ts-data-forge';

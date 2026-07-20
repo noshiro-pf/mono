@@ -1,34 +1,45 @@
 import { type ExecException } from 'node:child_process';
-import * as fs from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import * as path from 'node:path';
-import * as prettier from 'prettier';
-import { Arr, isNotUndefined, pipe, Result } from 'ts-data-forge';
+import { Arr, isNotUndefined, Result } from 'ts-data-forge';
 import { pathExists } from './assert-path-exists.mjs';
 import {
   getDiffFrom,
-  getGitRoot,
   getModifiedFiles,
   getStagedFiles,
   getUntrackedFiles,
 } from './diff.mjs';
+import { $ } from './exec-async.mjs';
 import { glob } from './glob.mjs';
 
 /**
- * Format a list of files using Prettier
+ * Resolves the path to the `oxfmt` binary. `oxfmt` is a peer dependency (like
+ * `typescript` or `eslint`), so it must be resolved relative to the
+ * consuming package rather than bundled with this package.
+ */
+const resolveOxfmtBin = (): string => {
+  const oxfmtPackageJsonPath = createRequire(import.meta.url).resolve(
+    'oxfmt/package.json',
+  );
+
+  return path.join(path.dirname(oxfmtPackageJsonPath), 'bin', 'oxfmt');
+};
+
+/**
+ * Format a list of files using Oxfmt.
+ *
+ * Files that don't exist are silently skipped (this can happen with files
+ * reported by `git diff` that were deleted). Oxfmt itself silently skips
+ * files it doesn't recognize and files excluded by `.gitignore` /
+ * `.prettierignore`, so no separate ignore handling is needed here.
  *
  * @param files - Array of file paths to format
  */
 export const formatFiles = async (
   files: readonly string[],
-  options?: Readonly<{
-    silent?: boolean;
-    ignore?: false | ((filePath: string) => boolean);
-    ignoreUnknown?: boolean;
-  }>,
-): Promise<Result<undefined, readonly unknown[]>> => {
+  options?: Readonly<{ silent?: boolean }>,
+): Promise<Result<undefined, ExecException>> => {
   const silent = options?.silent ?? false;
-
-  const noIgnore = options?.ignore === false;
 
   const conditionalEcho = silent ? () => {} : console.info;
 
@@ -38,213 +49,65 @@ export const formatFiles = async (
     return Result.ok(undefined);
   }
 
-  conditionalEcho(`Formatting ${files.length} files...`);
+  const existenceChecks = await Promise.all(
+    files.map(async (filePath) => ({
+      filePath,
+      exists: await pathExists(filePath),
+    })),
+  );
 
-  // Get git root for display purposes
-  const gitRootResult = await getGitRoot({ silent: true });
+  const existingFiles = existenceChecks
+    .filter(({ exists }) => exists)
+    .map(({ filePath }) => filePath);
 
-  const gitRoot = Result.isOk(gitRootResult) ? gitRootResult.value : undefined;
-
-  // Helper function to get display path (relative to git root if available)
-  const getDisplayPath = (filePath: string): string => {
-    if (gitRoot === undefined) {
-      return filePath;
+  for (const { filePath, exists } of existenceChecks) {
+    if (!exists) {
+      conditionalEcho(`Skipping non-existent file: ${filePath}`);
     }
-
-    const relativePath = path.relative(gitRoot, filePath);
-
-    return relativePath.startsWith('..') ? filePath : relativePath;
-  };
-
-  // Format each file
-  const results: readonly PromiseSettledResult<Result<undefined, unknown>>[] =
-    // NOTE: Using Promise.allSettled to ensure all files are processed even if some fail
-    await Promise.allSettled(
-      files.map(async (filePath) => {
-        try {
-          // Check if file exists first
-          if (!(await pathExists(filePath))) {
-            conditionalEcho(
-              `Skipping non-existent file: ${getDisplayPath(filePath)}`,
-            );
-
-            return Result.ok(undefined);
-          }
-
-          if (!noIgnore && (options?.ignore ?? defaultIgnoreFn)(filePath)) {
-            conditionalEcho(
-              `Skipping ignored file: ${getDisplayPath(filePath)}`,
-            );
-
-            return Result.ok(undefined);
-          }
-
-          // Check if file is ignored by prettier
-          const fileInfo = await prettier.getFileInfo(filePath, {
-            ignorePath: '.prettierignore',
-          });
-
-          if (!noIgnore && fileInfo.ignored) {
-            conditionalEcho(
-              `Skipping ignored file: ${getDisplayPath(filePath)}`,
-            );
-
-            return Result.ok(undefined);
-          }
-
-          if (
-            !noIgnore &&
-            (options?.ignoreUnknown ?? true) &&
-            fileInfo.inferredParser === null
-          ) {
-            // Silently skip files with no parser
-            conditionalEcho(
-              `Skipping file (no parser): ${getDisplayPath(filePath)}`,
-            );
-
-            return Result.ok(undefined);
-          }
-
-          // Read file content
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          const content = await fs.readFile(filePath, 'utf8');
-
-          // Resolve prettier config for this file
-          const prettierOptions = await prettier.resolveConfig(filePath);
-
-          // Format the content
-          const formatted = await prettier.format(content, {
-            ...prettierOptions,
-            filepath: filePath,
-          });
-
-          // Only write if content changed
-          if (formatted === content) {
-            conditionalEcho(`Unchanged: ${getDisplayPath(filePath)}`);
-          } else {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename
-            await fs.writeFile(filePath, formatted, 'utf8');
-
-            conditionalEcho(`Formatted: ${getDisplayPath(filePath)}`);
-          }
-
-          return Result.ok(undefined);
-        } catch (error) {
-          if (!silent) {
-            console.error(
-              `Error formatting ${getDisplayPath(filePath)}:`,
-              error,
-            );
-          }
-
-          return Result.err(error);
-        }
-      }),
-    );
-
-  if (results.every((r) => r.status === 'fulfilled')) {
-    const fulfilled = results.map((r) => r.value);
-
-    if (fulfilled.every(Result.isOk)) {
-      return Result.ok(undefined);
-    }
-
-    return Result.err(fulfilled.filter(Result.isErr).map((r) => r.value));
   }
 
-  return Result.err(
-    results
-      .filter((r) => r.status === 'rejected')
-      .map((r): unknown => r.reason),
+  if (Arr.isEmpty(existingFiles)) {
+    conditionalEcho('No files to format');
+
+    return Result.ok(undefined);
+  }
+
+  conditionalEcho(`Formatting ${existingFiles.length} files...`);
+
+  const oxfmtBin = resolveOxfmtBin();
+
+  const result = await $(
+    `node "${oxfmtBin}" --write ${existingFiles.map((f) => `"${f}"`).join(' ')}`,
+    { silent },
   );
+
+  if (Result.isErr(result)) {
+    if (!silent) {
+      console.error('Error formatting files:', result.value.message);
+    }
+
+    return Result.err(result.value);
+  }
+
+  return Result.ok(undefined);
 };
-
-const defaultIgnoreFn = (filePath: string): boolean => {
-  const filename = path.basename(filePath);
-
-  return (
-    ignoreFiles.has(filename) ||
-    filename.startsWith('.env') ||
-    ignoreExtensions.some((ext) => filePath.endsWith(ext)) ||
-    pipe(filePath.split(path.sep)).map((pathSegments) =>
-      pathSegments.some((segment) => ignoreDirs.includes(segment)),
-    ).value
-  );
-};
-
-const ignoreFiles: ReadonlySet<string> = new Set([
-  '.DS_Store',
-  'package-lock.json',
-  'yarn.lock',
-  'pnpm-lock.yaml',
-  'LICENSE',
-  '.prettierignore',
-  '.editorconfig',
-  '.gitignore',
-  '.npmignore',
-  '.envrc',
-  '.nvmrc',
-  '.npmrc',
-]);
-
-const ignoreExtensions: readonly `.${string}`[] = [
-  '.svg',
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.gif',
-  '.bmp',
-  '.tiff',
-  '.bak',
-  '.log',
-  '.zip',
-  '.tar',
-  '.gz',
-  '.7z',
-  '.mp3',
-  '.mp4',
-  '.avi',
-  '.mkv',
-  '.tsbuildinfo',
-] as const;
-
-const ignoreDirs: readonly string[] = [
-  'node_modules',
-  '.git',
-  'dist',
-  'build',
-  'out',
-  '.cache',
-  '.vscode',
-  '.yarn',
-  '.wireit',
-] as const;
 
 /**
- * Format files matching the given glob pattern using Prettier
+ * Format files matching the given glob pattern using Oxfmt.
  *
  * @param pathGlob - Glob pattern to match files
  */
 export const formatFilesGlob = async (
   pathGlob: string,
-  options?: Readonly<{
-    silent?: boolean;
-    ignoreUnknown?: boolean;
-    ignore?: false | ((filePath: string) => boolean);
-  }>,
+  options?: Readonly<{ silent?: boolean }>,
 ): Promise<Result<undefined, unknown>> => {
   const silent = options?.silent ?? false;
 
-  const ignoreUnknown = options?.ignoreUnknown ?? true;
-
-  const ignore = options?.ignore;
-
   const conditionalEcho = silent ? () => {} : console.info;
 
-  // Find all files matching the glob
   const globResult = await glob(pathGlob, {
     absolute: true,
-    ignore: ignore === false ? [] : ['**/node_modules/**', '**/.git/**'],
+    ignore: ['**/node_modules/**', '**/.git/**'],
     dot: true,
   });
 
@@ -252,7 +115,7 @@ export const formatFilesGlob = async (
     const error = globResult.value;
 
     if (!silent) {
-      console.error('Error in formatFiles:', error);
+      console.error('Error in formatFilesGlob:', error);
     }
 
     return Result.err(error);
@@ -266,7 +129,7 @@ export const formatFilesGlob = async (
     return Result.ok(undefined);
   }
 
-  return formatFiles(files, { silent, ignoreUnknown, ignore });
+  return formatFiles(files, { silent });
 };
 
 /**
@@ -274,8 +137,8 @@ export const formatFilesGlob = async (
  *
  * @param options - Options for formatting
  * @param options.cwd - If provided, only files within this directory will be
- *   formatted. Relative paths are resolved against `process.cwd()`. Defaults to
- *   undefined (no filtering; all changed files in the repository are
+ *   formatted. Relative paths are resolved against `process.cwd()`. Defaults
+ *   to undefined (no filtering; all changed files in the repository are
  *   formatted).
  */
 export const formatUncommittedFiles = async (
@@ -284,23 +147,16 @@ export const formatUncommittedFiles = async (
     modified?: boolean;
     staged?: boolean;
     silent?: boolean;
-    ignoreUnknown?: boolean;
-    ignore?: false | ((filePath: string) => boolean);
     cwd?: string;
   }>,
 ): Promise<
-  Result<
-    undefined,
-    ExecException | Readonly<{ message: string }> | readonly unknown[]
-  >
+  Result<undefined, ExecException | Readonly<{ message: string }>>
 > => {
   const {
     untracked = true,
     modified = true,
     staged = true,
     silent = false,
-    ignoreUnknown = true,
-    ignore,
     cwd,
   } = options ?? {};
 
@@ -351,11 +207,7 @@ export const formatUncommittedFiles = async (
     mut_files.push(...stagedFilesResult.value);
   }
 
-  return formatFiles(filterFilesByCwd(Arr.uniq(mut_files), cwd), {
-    silent,
-    ignoreUnknown,
-    ignore,
-  });
+  return formatFiles(filterFilesByCwd(Arr.uniq(mut_files), cwd), { silent });
 };
 
 /**
@@ -387,13 +239,13 @@ const filterFilesByCwd = (
 /**
  * Format only files that differ from the specified base branch or commit
  *
- * @param base - Base branch name or commit hash to compare against (defaults to
- *   'main')
+ * @param base - Base branch name or commit hash to compare against (defaults
+ *   to 'main')
  * @param options - Options for formatting
- * @param options.includeUntracked - Include untracked files in addition to diff
+ * @param options.includeUntracked - Include untracked files in addition to
+ *   diff files (default is true)
+ * @param options.includeStaged - Include staged files in addition to diff
  *   files (default is true)
- * @param options.includeStaged - Include staged files in addition to diff files
- *   (default is true)
  * @param options.silent - Silent mode to suppress command output (default is
  *   false)
  */
@@ -404,34 +256,16 @@ export const formatDiffFrom = async (
     includeModified?: boolean;
     includeStaged?: boolean;
     silent?: boolean;
-    ignoreUnknown?: boolean;
-    ignore?: false | ((filePath: string) => boolean);
-    /**
-     * If provided, only files within this directory will be formatted.
-     * Relative paths are resolved against `process.cwd()`. Defaults to
-     * undefined (no filtering; all changed files in the repository are
-     * formatted).
-     */
     cwd?: string;
   }>,
 ): Promise<
-  Result<
-    undefined,
-    | ExecException
-    | Readonly<{
-        message: string;
-      }>
-    | readonly unknown[]
-  >
+  Result<undefined, ExecException | Readonly<{ message: string }>>
 > => {
-  // const silent = options?.silent ?? false;
   const {
     silent = false,
     includeUntracked = true,
     includeModified = true,
     includeStaged = true,
-    ignoreUnknown = true,
-    ignore,
     cwd,
   } = options ?? {};
 
@@ -508,9 +342,5 @@ export const formatDiffFrom = async (
     return Result.ok(undefined);
   }
 
-  return formatFiles(allFiles, {
-    silent,
-    ignoreUnknown,
-    ignore,
-  });
+  return formatFiles(allFiles, { silent });
 };

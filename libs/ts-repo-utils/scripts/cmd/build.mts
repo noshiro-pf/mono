@@ -16,10 +16,9 @@ const distDir = path.resolve(projectRootPath, './dist');
  * The native TypeScript compiler (TypeScript >= 7). It is installed under the
  * alias "typescript-native" because the "typescript" package must stay on 6.x
  * for tools that require the JS compiler API (typescript-eslint, typedoc,
- * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
- * provides. Invoked via an explicit path because both packages declare a
- * `tsc` bin and the winner of the `node_modules/.bin/tsc` conflict is not
- * guaranteed.
+ * ...), which TypeScript 7 no longer provides. Invoked via an explicit path
+ * because both packages declare a `tsc` bin and the winner of the
+ * `node_modules/.bin/tsc` conflict is not guaranteed.
  */
 const nativeTsc = path.resolve(
   projectRootPath,

@@ -9,6 +9,4 @@ await formatDiffFrom('abc123');
 // With custom options
 await formatDiffFrom('main', {
   includeUntracked: false,
-  ignore: (filePath) => filePath.includes('vendor'),
-  ignoreUnknown: false, // Error on files without parser
 });
