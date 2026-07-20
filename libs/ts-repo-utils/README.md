@@ -58,7 +58,7 @@ npm exec -- assert-repo-is-clean --silent
 
 ### `format-uncommitted`
 
-Formats only untracked/modified files using [Oxfmt](https://oxc.rs/docs/guide/usage/formatter). Files ignored by `.gitignore`/`.prettierignore`, and files with an extension Oxfmt doesn't support, are skipped automatically.
+Formats only untracked/modified files using [`organize-imports-cli`](https://github.com/thorn0/organize-imports-cli) (sorts imports and removes unused ones) followed by [Oxfmt](https://oxc.rs/docs/guide/usage/formatter). Files ignored by `.gitignore`/`.prettierignore`, and files with an extension neither tool supports, are skipped automatically.
 
 ```bash
 # Basic usage
@@ -77,7 +77,7 @@ npm exec -- format-uncommitted --silent
 
 ### `format-diff-from`
 
-Formats only files that differ from the specified base branch or commit, using [Oxfmt](https://oxc.rs/docs/guide/usage/formatter).
+Formats only files that differ from the specified base branch or commit, using [`organize-imports-cli`](https://github.com/thorn0/organize-imports-cli) followed by [Oxfmt](https://oxc.rs/docs/guide/usage/formatter).
 
 ```bash
 # Format files different from main branch
@@ -529,7 +529,7 @@ const shouldRun2 = await checkShouldRunTypeChecks({
 
 ### Code Formatting Utilities
 
-All formatting utilities format files using [Oxfmt](https://oxc.rs/docs/guide/usage/formatter). Files ignored by `.gitignore`/`.prettierignore`, and files with an extension Oxfmt doesn't support, are skipped automatically, so there is no separate ignore option.
+All formatting utilities run [`organize-imports-cli`](https://github.com/thorn0/organize-imports-cli) (sorts imports and removes unused ones, via the same TypeScript language-service call `prettier-plugin-organize-imports` used to wrap) followed by [Oxfmt](https://oxc.rs/docs/guide/usage/formatter) (`sortImports` is intentionally left disabled in `.oxfmtrc.json` so import sorting stays organize-imports-cli's job alone). Files ignored by `.gitignore`/`.prettierignore`, and files with an extension neither tool supports, are skipped automatically, so there is no separate ignore option.
 
 #### `formatFiles(files: readonly string[], options?): Promise<Result<undefined, ExecException>>`
 

@@ -13,25 +13,40 @@ import { $ } from './exec-async.mjs';
 import { glob } from './glob.mjs';
 
 /**
- * Resolves the path to the `oxfmt` binary. `oxfmt` is a peer dependency (like
- * `typescript` or `eslint`), so it must be resolved relative to the
- * consuming package rather than bundled with this package.
+ * Resolves the path to a peer-dependency CLI's executable, given the
+ * package's name and the path to its bin script relative to the package
+ * root. Peer dependencies (like `typescript`, `eslint`, `oxfmt`, or
+ * `organize-imports-cli`) must be resolved relative to the consuming
+ * package rather than bundled with this package.
  */
-const resolveOxfmtBin = (): string => {
-  const oxfmtPackageJsonPath = createRequire(import.meta.url).resolve(
-    'oxfmt/package.json',
+const resolvePeerBin = (
+  packageName: string,
+  binPathInPackage: string,
+): string => {
+  const packageJsonPath = createRequire(import.meta.url).resolve(
+    `${packageName}/package.json`,
   );
 
-  return path.join(path.dirname(oxfmtPackageJsonPath), 'bin', 'oxfmt');
+  return path.join(path.dirname(packageJsonPath), binPathInPackage);
 };
 
+const resolveOxfmtBin = (): string => resolvePeerBin('oxfmt', 'bin/oxfmt');
+
+const resolveOrganizeImportsCliBin = (): string =>
+  resolvePeerBin('organize-imports-cli', 'cli.js');
+
 /**
- * Format a list of files using Oxfmt.
+ * Format a list of files: first `organize-imports-cli` (sorts imports and
+ * removes unused ones, via the same TypeScript language-service
+ * `organizeImports` call that `prettier-plugin-organize-imports` used to
+ * wrap), then Oxfmt (`sortImports` is intentionally left disabled in
+ * `.oxfmtrc.json` so import sorting stays organize-imports-cli's job
+ * alone).
  *
  * Files that don't exist are silently skipped (this can happen with files
- * reported by `git diff` that were deleted). Oxfmt itself silently skips
- * files it doesn't recognize and files excluded by `.gitignore` /
- * `.prettierignore`, so no separate ignore handling is needed here.
+ * reported by `git diff` that were deleted). Both tools silently skip files
+ * they don't recognize; Oxfmt additionally respects `.gitignore` /
+ * `.prettierignore`. So no separate ignore handling is needed here.
  *
  * @param files - Array of file paths to format
  */
@@ -74,12 +89,31 @@ export const formatFiles = async (
 
   conditionalEcho(`Formatting ${existingFiles.length} files...`);
 
-  const oxfmtBin = resolveOxfmtBin();
+  const quotedFiles = existingFiles.map((f) => `"${f}"`).join(' ');
 
-  const result = await $(
-    `node "${oxfmtBin}" --write ${existingFiles.map((f) => `"${f}"`).join(' ')}`,
+  const organizeImportsBin = resolveOrganizeImportsCliBin();
+
+  const organizeImportsResult = await $(
+    `node "${organizeImportsBin}" ${quotedFiles}`,
     { silent },
   );
+
+  if (Result.isErr(organizeImportsResult)) {
+    if (!silent) {
+      console.error(
+        'Error organizing imports:',
+        organizeImportsResult.value.message,
+      );
+    }
+
+    return Result.err(organizeImportsResult.value);
+  }
+
+  const oxfmtBin = resolveOxfmtBin();
+
+  const result = await $(`node "${oxfmtBin}" --write ${quotedFiles}`, {
+    silent,
+  });
 
   if (Result.isErr(result)) {
     if (!silent) {

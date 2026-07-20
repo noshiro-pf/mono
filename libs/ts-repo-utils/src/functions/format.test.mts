@@ -1,6 +1,6 @@
+import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
   getDiffFrom,
@@ -252,6 +252,45 @@ describe(formatFiles, () => {
     });
 
     assert.isTrue(Result.isOk(result));
+  });
+
+  test('should remove unused imports and sort the remaining ones', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(testDir, { recursive: true });
+
+    try {
+      const file = await createTestFile(
+        'unused-imports.ts',
+        dedent`
+          import * as path from 'node:path';
+          import * as fs from 'node:fs';
+          import * as os from 'node:os';
+
+          export const x = path.join(os.tmpdir(), 'a');
+        `,
+      );
+
+      const result = await formatFiles([file], { silent: true });
+
+      assert.isTrue(Result.isOk(result));
+
+      const content = await readTestFile(file);
+
+      expect(content).toBe(
+        `${dedent`
+          import * as os from 'node:os';
+          import * as path from 'node:path';
+
+          export const x = path.join(os.tmpdir(), 'a');
+        `}\n`,
+      );
+    } finally {
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
   });
 });
 
