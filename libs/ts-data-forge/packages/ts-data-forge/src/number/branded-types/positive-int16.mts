@@ -34,131 +34,135 @@ const {
 } as const);
 
 /**
- * Checks if a number is a PositiveInt16 (16-bit positive signed integer in the
- * range [1, 2^15)).
+ * Type guard that checks if a value is a positive integer in [1, 2^15).
  *
- * @param value The value to check.
- * @returns `true` if the value is a PositiveInt16, `false` otherwise.
+ * Returns `true` for a positive integer in [1, 2^15) — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a positive integer in [1, 2^15), `false` otherwise
  */
 export const isPositiveInt16 = is;
 
 /**
- * Casts a number to a PositiveInt16 type.
+ * Casts a `number` to the `PositiveInt16` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a PositiveInt16 type.
- * @throws {TypeError} If the value is not a positive integer in [1, 2^15).
+ * Validates that the value is a positive integer in [1, 2^15) and returns it
+ * with the `PositiveInt16` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `PositiveInt16`
+ * @throws {TypeError} If the value is not a positive integer in [1, 2^15)
  */
 export const asPositiveInt16 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 16-bit positive
- * integers.
+ * Namespace providing type-safe operations for the `PositiveInt16` branded
+ * type.
  *
- * All operations automatically clamp results to the valid PositiveInt16 range
- * [1, 32767]. This ensures that all arithmetic maintains the 16-bit positive
- * integer constraint, with results below 1 clamped to MIN_VALUE and overflow
- * results clamped to MAX_VALUE.
+ * The `PositiveInt16` type represents a positive integer in [1, 2^15). Division
+ * (`div`) uses floor division.
  */
 export const PositiveInt16 = {
   /**
-   * Type guard to check if a value is a PositiveInt16.
+   * Type guard that checks if a value is a positive integer in [1, 2^15).
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a 16-bit positive integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a positive integer in [1, 2^15), `false` otherwise
+   * @see {@link isPositiveInt16} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a 16-bit positive integer.
-   *
-   * @readonly
+   * The smallest value representable as `PositiveInt16`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a 16-bit positive integer.
-   *
-   * @readonly
+   * The largest value representable as `PositiveInt16`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two PositiveInt16 values.
+   * Returns the smallest of the given positive integers.
    *
-   * @param a The first PositiveInt16.
-   * @param b The second PositiveInt16.
-   * @returns The minimum value as a PositiveInt16.
+   * @param values - The positive integers to compare (at least one required)
+   * @returns The smallest value as a `PositiveInt16`
    */
   min: min_,
 
   /**
-   * Returns the larger of two PositiveInt16 values.
+   * Returns the largest of the given positive integers.
    *
-   * @param a The first PositiveInt16.
-   * @param b The second PositiveInt16.
-   * @returns The maximum value as a PositiveInt16.
+   * @param values - The positive integers to compare (at least one required)
+   * @returns The largest value as a `PositiveInt16`
    */
   max: max_,
 
   /**
-   * Clamps a number to the PositiveInt16 range.
+   * Clamps a `number` into the `PositiveInt16` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [1, 32767] as a PositiveInt16.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `PositiveInt16`
    */
   clamp,
 
   /**
-   * Generates a random PositiveInt16 value within the valid range.
+   * Generates a random `PositiveInt16` within the given range.
    *
-   * @returns A random PositiveInt16 between 1 and 32767.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `PositiveInt16` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a PositiveInt16 to the power of another PositiveInt16.
+   * Raises `a` to the power `b`, returning `a ** b` as a `PositiveInt16`
+   * (floored to an integer).
    *
-   * @param a The base PositiveInt16.
-   * @param b The exponent PositiveInt16.
-   * @returns `a ** b` clamped to [1, 32767] as a PositiveInt16.
+   * @param a - The base positive integer
+   * @param b - The exponent positive integer
+   * @returns `a ** b` as a `PositiveInt16`
    */
   pow,
 
   /**
-   * Adds two PositiveInt16 values.
+   * Adds two positive integers, returning `a + b` as a `PositiveInt16`.
    *
-   * @param a The first PositiveInt16.
-   * @param b The second PositiveInt16.
-   * @returns `a + b` clamped to [1, 32767] as a PositiveInt16.
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The sum of `a` and `b` as a `PositiveInt16`
    */
   add,
 
   /**
-   * Subtracts one PositiveInt16 from another.
+   * Subtracts two positive integers, returning `a - b` as a `PositiveInt16`.
    *
-   * @param a The minuend PositiveInt16.
-   * @param b The subtrahend PositiveInt16.
-   * @returns `a - b` clamped to [1, 32767] as a PositiveInt16 (minimum 1).
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The difference of `a` and `b` as a `PositiveInt16`
    */
   sub,
 
   /**
-   * Multiplies two PositiveInt16 values.
+   * Multiplies two positive integers, returning `a * b` as a `PositiveInt16`.
    *
-   * @param a The first PositiveInt16.
-   * @param b The second PositiveInt16.
-   * @returns `a * b` clamped to [1, 32767] as a PositiveInt16.
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The product of `a` and `b` as a `PositiveInt16`
    */
   mul,
 
   /**
-   * Divides one PositiveInt16 by another using floor division.
+   * Divides two positive integers using floor division (`⌊a / b⌋`): the result
+   * is `a / b` rounded toward negative infinity, as a `PositiveInt16`.
    *
-   * @param a The dividend PositiveInt16.
-   * @param b The divisor PositiveInt16.
-   * @returns `⌊a / b⌋` clamped to [1, 32767] as a PositiveInt16.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as a `PositiveInt16`
    */
   div,
 } as const;

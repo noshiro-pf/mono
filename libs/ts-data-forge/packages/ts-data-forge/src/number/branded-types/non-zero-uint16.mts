@@ -33,117 +33,116 @@ const {
 } as const);
 
 /**
- * Checks if a number is a NonZeroUint16 (16-bit non-zero unsigned integer in
- * the range [1, 2^16)).
+ * Type guard that checks if a value is a non-zero integer in [1, 2^16).
  *
- * @param value The value to check.
- * @returns `true` if the value is a NonZeroUint16, `false` otherwise.
+ * Returns `true` for a non-zero integer in [1, 2^16) — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-zero integer in [1, 2^16), `false` otherwise
  */
 export const isNonZeroUint16 = is;
 
 /**
- * Casts a number to a NonZeroUint16 type.
+ * Casts a `number` to the `NonZeroUint16` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NonZeroUint16 type.
- * @throws {TypeError} If the value is not a non-zero integer in [1, 2^16).
+ * Validates that the value is a non-zero integer in [1, 2^16) and returns it
+ * with the `NonZeroUint16` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NonZeroUint16`
+ * @throws {TypeError} If the value is not a non-zero integer in [1, 2^16)
  */
 export const asNonZeroUint16 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 16-bit non-zero
- * unsigned integers.
+ * Namespace providing type-safe operations for the `NonZeroUint16` branded
+ * type.
  *
- * All operations automatically clamp results to the valid NonZeroUint16 range
- * [1, 65535]. This ensures that all arithmetic maintains the 16-bit non-zero
- * unsigned integer constraint, with results below 1 clamped to MIN_VALUE and
- * overflow results clamped to MAX_VALUE.
+ * The `NonZeroUint16` type represents a non-zero integer in [1, 2^16). Division
+ * (`div`) uses floor division.
  */
 export const NonZeroUint16 = {
   /**
-   * Type guard to check if a value is a NonZeroUint16.
+   * Type guard that checks if a value is a non-zero integer in [1, 2^16).
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a 16-bit non-zero unsigned integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-zero integer in [1, 2^16), `false` otherwise
+   * @see {@link isNonZeroUint16} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a 16-bit non-zero unsigned integer.
-   *
-   * @readonly
+   * The smallest value representable as `NonZeroUint16`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a 16-bit non-zero unsigned integer.
-   *
-   * @readonly
+   * The largest value representable as `NonZeroUint16`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two NonZeroUint16 values.
+   * Returns the smallest of the given non-zero integers.
    *
-   * @param a The first NonZeroUint16.
-   * @param b The second NonZeroUint16.
-   * @returns The minimum value as a NonZeroUint16.
+   * @param values - The non-zero integers to compare (at least one required)
+   * @returns The smallest value as a `NonZeroUint16`
    */
   min: min_,
 
   /**
-   * Returns the larger of two NonZeroUint16 values.
+   * Returns the largest of the given non-zero integers.
    *
-   * @param a The first NonZeroUint16.
-   * @param b The second NonZeroUint16.
-   * @returns The maximum value as a NonZeroUint16.
+   * @param values - The non-zero integers to compare (at least one required)
+   * @returns The largest value as a `NonZeroUint16`
    */
   max: max_,
 
   /**
-   * Clamps a number to the NonZeroUint16 range.
+   * Clamps a `number` into the `NonZeroUint16` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [1, 65535] as a NonZeroUint16.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `NonZeroUint16`
    */
   clamp,
 
   /**
-   * Generates a random NonZeroUint16 value within the valid range.
+   * Generates a random `NonZeroUint16` within the given range.
    *
-   * @returns A random NonZeroUint16 between 1 and 65535.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NonZeroUint16` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a NonZeroUint16 to the power of another NonZeroUint16.
+   * Raises `a` to the power `b`, returning `a ** b` as a `NonZeroUint16`
+   * (floored to an integer).
    *
-   * @param a The base NonZeroUint16.
-   * @param b The exponent NonZeroUint16.
-   * @returns `a ** b` clamped to [1, 65535] as a NonZeroUint16.
+   * @param a - The base non-zero integer
+   * @param b - The exponent non-zero integer
+   * @returns `a ** b` as a `NonZeroUint16`
    */
   pow,
 
   /**
-   * Adds two NonZeroUint16 values.
+   * Adds two non-zero integers, returning `a + b` as a `NonZeroUint16`.
    *
-   * @param a The first NonZeroUint16.
-   * @param b The second NonZeroUint16.
-   * @returns `a + b` clamped to [1, 65535] as a NonZeroUint16.
+   * @param a - The first non-zero integer
+   * @param b - The second non-zero integer
+   * @returns The sum of `a` and `b` as a `NonZeroUint16`
    */
   add,
 
   /**
-   * Multiplies two NonZeroUint16 values.
+   * Multiplies two non-zero integers, returning `a * b` as a `NonZeroUint16`.
    *
-   * Both `add` and `mul` stay within `[1, 65535]`. For the non-closed
-   * operations (`sub`/`div`, whose result may be `0`) use {@link Num.sub} /
-   * {@link Num.divInt}.
-   *
-   * @param a The first NonZeroUint16.
-   * @param b The second NonZeroUint16.
-   * @returns `a * b` clamped to [1, 65535] as a NonZeroUint16.
+   * @param a - The first non-zero integer
+   * @param b - The second non-zero integer
+   * @returns The product of `a` and `b` as a `NonZeroUint16`
    */
   mul,
 } as const;

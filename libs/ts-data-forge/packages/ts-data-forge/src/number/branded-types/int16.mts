@@ -35,137 +35,144 @@ const {
 } as const);
 
 /**
- * Checks if a number is an Int16 (16-bit signed integer in the range [-2^15,
- * 2^15)).
+ * Type guard that checks if a value is an integer in [-2^15, 2^15).
  *
- * @param value The value to check.
- * @returns `true` if the value is an Int16, `false` otherwise.
+ * Returns `true` for an integer in [-2^15, 2^15) — a value with no fractional
+ * component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is an integer in [-2^15, 2^15), `false` otherwise
  */
 export const isInt16 = is;
 
 /**
- * Casts a number to an Int16 type.
+ * Casts a `number` to the `Int16` branded type.
  *
- * @param value The value to cast.
- * @returns The value as an Int16 type.
- * @throws {TypeError} If the value is not an integer in [-2^15, 2^15).
+ * Validates that the value is an integer in [-2^15, 2^15) and returns it with
+ * the `Int16` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as an `Int16`
+ * @throws {TypeError} If the value is not an integer in [-2^15, 2^15)
  */
 export const asInt16 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 16-bit signed
- * integers.
+ * Namespace providing type-safe operations for the `Int16` branded type.
  *
- * All operations automatically clamp results to the valid Int16 range [-32768,
- * 32767]. This ensures that all arithmetic maintains the 16-bit signed integer
- * constraint.
+ * The `Int16` type represents an integer in [-2^15, 2^15). Division (`div`)
+ * uses floor division.
  */
 export const Int16 = {
   /**
-   * Type guard to check if a value is an Int16.
+   * Type guard that checks if a value is an integer in [-2^15, 2^15).
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a 16-bit signed integer, `false` otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is an integer in [-2^15, 2^15), `false` otherwise
+   * @see {@link isInt16} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a 16-bit signed integer.
-   *
-   * @readonly
+   * The smallest value representable as `Int16`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a 16-bit signed integer.
-   *
-   * @readonly
+   * The largest value representable as `Int16`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the absolute value of a 16-bit signed integer.
+   * Returns the absolute value of an integer in [-2^15, 2^15).
    *
-   * @param a The Int16 value.
-   * @returns The absolute value as an Int16, clamped to valid range.
+   * The result is non-negative and keeps the `Int16` brand.
+   *
+   * @param a - The integer value
+   * @returns The absolute value as a non-negative `Int16`
    */
   abs,
 
   /**
-   * Returns the smaller of two Int16 values.
+   * Returns the smallest of the given integers.
    *
-   * @param a The first Int16.
-   * @param b The second Int16.
-   * @returns The minimum value as an Int16.
+   * @param values - The integers to compare (at least one required)
+   * @returns The smallest value as an `Int16`
    */
   min: min_,
 
   /**
-   * Returns the larger of two Int16 values.
+   * Returns the largest of the given integers.
    *
-   * @param a The first Int16.
-   * @param b The second Int16.
-   * @returns The maximum value as an Int16.
+   * @param values - The integers to compare (at least one required)
+   * @returns The largest value as an `Int16`
    */
   max: max_,
 
   /**
-   * Clamps a number to the Int16 range.
+   * Clamps a `number` into the `Int16` range, rounding to the nearest integer
+   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [-32768, 32767] as an Int16.
+   * @param value - The value to clamp
+   * @returns The clamped value as an `Int16`
    */
   clamp,
 
   /**
-   * Generates a random Int16 value within the valid range.
+   * Generates a random `Int16` within the given range.
    *
-   * @returns A random Int16 between MIN_VALUE and MAX_VALUE.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `Int16` in `[min, max]`
    */
   random,
 
   /**
-   * Raises an Int16 to the power of another Int16.
+   * Raises `a` to the power `b`, returning `a ** b` as an `Int16` (floored to
+   * an integer).
    *
-   * @param a The base Int16.
-   * @param b The exponent Int16.
-   * @returns `a ** b` clamped to [-32768, 32767] as an Int16.
+   * @param a - The base integer
+   * @param b - The exponent integer
+   * @returns `a ** b` as an `Int16`
    */
   pow,
 
   /**
-   * Adds two Int16 values.
+   * Adds two integers, returning `a + b` as an `Int16`.
    *
-   * @param a The first Int16.
-   * @param b The second Int16.
-   * @returns `a + b` clamped to [-32768, 32767] as an Int16.
+   * @param a - The first integer
+   * @param b - The second integer
+   * @returns The sum of `a` and `b` as an `Int16`
    */
   add,
 
   /**
-   * Subtracts one Int16 from another.
+   * Subtracts two integers, returning `a - b` as an `Int16`.
    *
-   * @param a The minuend Int16.
-   * @param b The subtrahend Int16.
-   * @returns `a - b` clamped to [-32768, 32767] as an Int16.
+   * @param a - The first integer
+   * @param b - The second integer
+   * @returns The difference of `a` and `b` as an `Int16`
    */
   sub,
 
   /**
-   * Multiplies two Int16 values.
+   * Multiplies two integers, returning `a * b` as an `Int16`.
    *
-   * @param a The first Int16.
-   * @param b The second Int16.
-   * @returns `a * b` clamped to [-32768, 32767] as an Int16.
+   * @param a - The first integer
+   * @param b - The second integer
+   * @returns The product of `a` and `b` as an `Int16`
    */
   mul,
 
   /**
-   * Divides one Int16 by another using floor division.
+   * Divides two integers using floor division (`⌊a / b⌋`): the result is `a /
+   * b` rounded toward negative infinity, as an `Int16`.
    *
-   * @param a The dividend Int16.
-   * @param b The divisor Int16.
-   * @returns `⌊a / b⌋` clamped to [-32768, 32767] as an Int16.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as an `Int16`
    */
   div,
 } as const;

@@ -34,127 +34,130 @@ const {
   typeNameInMessage,
 } as const);
 
-/**
- * Returns the absolute value of a negative integer.
- *
- * The absolute value of a negative integer is always a positive integer
- * (`>= 1`), so the result is typed as a {@link PositiveInt}.
- *
- * @param x - The negative integer.
- * @returns `|x|` as a PositiveInt.
- */
 const abs = (x: WithSmallInt<ElementType>): PositiveInt =>
   PositiveInt.clamp(Math.abs(x));
 
 /**
- * Checks if a number is a NegativeInt (a negative integer `<= -1`).
+ * Type guard that checks if a value is a negative integer.
  *
- * @param value The value to check.
- * @returns `true` if the value is a NegativeInt, `false` otherwise.
+ * Returns `true` for a negative integer — a value with no fractional component,
+ * including values outside the safe integer range (unlike `SafeInt`).
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a negative integer, `false` otherwise
  */
 export const isNegativeInt = is;
 
 /**
- * Casts a number to a NegativeInt type.
+ * Casts a `number` to the `NegativeInt` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NegativeInt type.
- * @throws {TypeError} If the value is not a negative integer.
+ * Validates that the value is a negative integer and returns it with the
+ * `NegativeInt` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NegativeInt`
+ * @throws {TypeError} If the value is not a negative integer
  */
 export const asNegativeInt = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for negative integers.
+ * Namespace providing type-safe operations for the `NegativeInt` branded type.
  *
- * NegativeInt represents integers that are strictly less than zero (`<= -1`).
- * Operations that stay within the negative integers (such as `add`) clamp their
- * results to the valid range, while operations whose result leaves the set
- * (`mul`, `div`, `abs`) are typed to reflect the actual sign of the result.
+ * The `NegativeInt` type represents a negative integer. Division (`div`) uses
+ * floor division.
+ *
+ * Unlike `SafeInt`, `NegativeInt` allows values outside the safe integer range
+ * (±2^53 − 1), so very large magnitudes may lose precision in JavaScript's
+ * `number` type.
  */
 export const NegativeInt = {
   /**
-   * Type guard to check if a value is a NegativeInt.
+   * Type guard that checks if a value is a negative integer.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a negative integer, `false` otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a negative integer, `false` otherwise
+   * @see {@link isNegativeInt} for usage examples
    */
   is,
 
   /**
-   * The maximum value for a negative integer.
-   *
-   * @readonly
+   * The largest value representable as `NegativeInt`.
    */
   MAX_VALUE,
 
   /**
    * Returns the absolute value of a negative integer.
    *
-   * @param a The negative integer.
-   * @returns The absolute value as a PositiveInt.
+   * The result is non-negative and keeps the `NegativeInt` brand. Note that
+   * `Math.abs(Number.MIN_SAFE_INTEGER)` exceeds `Number.MAX_SAFE_INTEGER`, so
+   * use `SafeInt` for guaranteed precision.
+   *
+   * @param a - The negative integer value
+   * @returns The absolute value as a non-negative `NegativeInt`
    */
   abs,
 
   /**
-   * Returns the smaller of two negative integers.
+   * Returns the smallest of the given negative integers.
    *
-   * @param a The first negative integer.
-   * @param b The second negative integer.
-   * @returns The minimum value as a NegativeInt.
+   * @param values - The negative integers to compare (at least one required)
+   * @returns The smallest value as a `NegativeInt`
    */
   min: min_,
 
   /**
-   * Returns the larger of two negative integers.
+   * Returns the largest of the given negative integers.
    *
-   * @param a The first negative integer.
-   * @param b The second negative integer.
-   * @returns The maximum value as a NegativeInt.
+   * @param values - The negative integers to compare (at least one required)
+   * @returns The largest value as a `NegativeInt`
    */
   max: max_,
 
   /**
-   * Clamps a number to the negative integer range.
+   * Clamps a `number` into the `NegativeInt` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to `[-∞, -1]` as a NegativeInt.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `NegativeInt`
    */
   clamp,
 
   /**
-   * Generates a random NegativeInt value within the valid range.
+   * Generates a random `NegativeInt` within the given range.
    *
-   * @returns A random negative integer.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NegativeInt` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a negative integer to the power of another negative integer.
+   * Raises `a` to the power `b`, returning `a ** b` as a `NegativeInt` (floored
+   * to an integer).
    *
-   * @param a The base negative integer.
-   * @param b The exponent negative integer.
-   * @returns `a ** b` clamped to the negative integer range.
+   * @param a - The base negative integer
+   * @param b - The exponent negative integer
+   * @returns `a ** b` as a `NegativeInt`
    */
   pow,
 
   /**
-   * Adds two negative integers.
+   * Adds two negative integers, returning `a + b` as a `NegativeInt`.
    *
-   * @param a The first negative integer.
-   * @param b The second negative integer.
-   * @returns `a + b` as a NegativeInt.
+   * @param a - The first negative integer
+   * @param b - The second negative integer
+   * @returns The sum of `a` and `b` as a `NegativeInt`
    */
   add,
 
   /**
-   * Subtracts one negative integer from another.
+   * Subtracts two negative integers, returning `a - b` as a `NegativeInt`.
    *
-   * The mathematical result can be positive, so it is clamped to the negative
-   * integer range (maximum `-1`).
-   *
-   * @param a The minuend negative integer.
-   * @param b The subtrahend negative integer.
-   * @returns `a - b` clamped to the negative integer range.
+   * @param a - The first negative integer
+   * @param b - The second negative integer
+   * @returns The difference of `a` and `b` as a `NegativeInt`
    */
   sub,
 } as const;

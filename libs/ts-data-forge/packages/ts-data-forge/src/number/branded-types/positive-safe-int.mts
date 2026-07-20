@@ -38,8 +38,10 @@ const {
 } as const);
 
 /**
- * Checks if a number is a PositiveSafeInt (a positive safe integer in the range
- * [1, MAX_SAFE_INTEGER]).
+ * Type guard that checks if a value is a positive safe integer.
+ *
+ * Returns `true` for a positive safe integer — a value with no fractional
+ * component.
  *
  * @example
  *
@@ -53,13 +55,16 @@ const {
  * assert.isTrue(PositiveSafeInt.is(42));
  * ```
  *
- * @param value The value to check.
- * @returns `true` if the value is a PositiveSafeInt, `false` otherwise.
+ * @param value - The value to check
+ * @returns `true` if the value is a positive safe integer, `false` otherwise
  */
 export const isPositiveSafeInt = is;
 
 /**
- * Casts a number to a PositiveSafeInt type.
+ * Casts a `number` to the `PositiveSafeInt` branded type.
+ *
+ * Validates that the value is a positive safe integer and returns it with the
+ * `PositiveSafeInt` brand. Throws a `TypeError` otherwise.
  *
  * @example
  *
@@ -71,24 +76,22 @@ export const isPositiveSafeInt = is;
  * assert.isTrue(PositiveSafeInt.is(branded));
  * ```
  *
- * @param value The value to cast.
- * @returns The value as a PositiveSafeInt type.
- * @throws {TypeError} If the value is not a positive safe integer.
+ * @param value - The value to cast
+ * @returns The value as a `PositiveSafeInt`
+ * @throws {TypeError} If the value is not a positive safe integer
  */
 export const asPositiveSafeInt = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for positive safe
- * integers.
+ * Namespace providing type-safe operations for the `PositiveSafeInt` branded
+ * type.
  *
- * All operations automatically clamp results to the positive safe integer range
- * [1, MAX_SAFE_INTEGER]. This ensures that all arithmetic maintains both the
- * positive constraint and IEEE 754 precision guarantees, preventing precision
- * loss and ensuring results are always positive.
+ * The `PositiveSafeInt` type represents a positive safe integer. Division
+ * (`div`) uses floor division.
  */
 export const PositiveSafeInt = {
   /**
-   * Type guard to check if a value is a PositiveSafeInt.
+   * Type guard that checks if a value is a positive safe integer.
    *
    * @example
    *
@@ -102,28 +105,24 @@ export const PositiveSafeInt = {
    * assert.isTrue(PositiveSafeInt.is(42));
    * ```
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a positive safe integer, `false` otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a positive safe integer, `false` otherwise
    * @see {@link isPositiveSafeInt} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a positive safe integer.
-   *
-   * @readonly
+   * The smallest value representable as `PositiveSafeInt`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum safe integer value (2^53 - 1).
-   *
-   * @readonly
+   * The largest value representable as `PositiveSafeInt`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two PositiveSafeInt values.
+   * Returns the smallest of the given positive safe integers.
    *
    * @example
    *
@@ -136,14 +135,13 @@ export const PositiveSafeInt = {
    * assert.isTrue(smallest === 5);
    * ```
    *
-   * @param a The first PositiveSafeInt.
-   * @param b The second PositiveSafeInt.
-   * @returns The minimum value as a PositiveSafeInt.
+   * @param values - The positive safe integers to compare (at least one required)
+   * @returns The smallest value as a `PositiveSafeInt`
    */
   min: min_,
 
   /**
-   * Returns the larger of two PositiveSafeInt values.
+   * Returns the largest of the given positive safe integers.
    *
    * @example
    *
@@ -156,14 +154,14 @@ export const PositiveSafeInt = {
    * assert.isTrue(largest === 10);
    * ```
    *
-   * @param a The first PositiveSafeInt.
-   * @param b The second PositiveSafeInt.
-   * @returns The maximum value as a PositiveSafeInt.
+   * @param values - The positive safe integers to compare (at least one required)
+   * @returns The largest value as a `PositiveSafeInt`
    */
   max: max_,
 
   /**
-   * Clamps a number to the positive safe integer range.
+   * Clamps a `number` into the `PositiveSafeInt` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
    * @example
    *
@@ -181,13 +179,15 @@ export const PositiveSafeInt = {
    * assert.isTrue(aboveRange === Number.MAX_SAFE_INTEGER);
    * ```
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [1, MAX_SAFE_INTEGER] as a PositiveSafeInt.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `PositiveSafeInt`
    */
   clamp,
 
   /**
-   * Generates a random PositiveSafeInt value within the valid range.
+   * Generates a random `PositiveSafeInt` within the given range.
+   *
+   * The range is inclusive on both ends.
    *
    * @example
    *
@@ -203,12 +203,15 @@ export const PositiveSafeInt = {
    * assert.isTrue(randomValue >= 1 && randomValue <= 6);
    * ```
    *
-   * @returns A random PositiveSafeInt between 1 and MAX_SAFE_INTEGER.
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `PositiveSafeInt` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a PositiveSafeInt to the power of another PositiveSafeInt.
+   * Raises `a` to the power `b`, returning `a ** b` as a `PositiveSafeInt`
+   * (floored to an integer).
    *
    * @example
    *
@@ -222,14 +225,14 @@ export const PositiveSafeInt = {
    * assert.isTrue(power === 27);
    * ```
    *
-   * @param a The base PositiveSafeInt.
-   * @param b The exponent PositiveSafeInt.
-   * @returns `a ** b` clamped to [1, MAX_SAFE_INTEGER] as a PositiveSafeInt.
+   * @param a - The base positive safe integer
+   * @param b - The exponent positive safe integer
+   * @returns `a ** b` as a `PositiveSafeInt`
    */
   pow,
 
   /**
-   * Adds two PositiveSafeInt values.
+   * Adds two positive safe integers, returning `a + b` as a `PositiveSafeInt`.
    *
    * @example
    *
@@ -244,14 +247,15 @@ export const PositiveSafeInt = {
    * assert.isTrue(PositiveSafeInt.is(sum));
    * ```
    *
-   * @param a The first PositiveSafeInt.
-   * @param b The second PositiveSafeInt.
-   * @returns `a + b` clamped to [1, MAX_SAFE_INTEGER] as a PositiveSafeInt.
+   * @param a - The first positive safe integer
+   * @param b - The second positive safe integer
+   * @returns The sum of `a` and `b` as a `PositiveSafeInt`
    */
   add,
 
   /**
-   * Subtracts one PositiveSafeInt from another.
+   * Subtracts two positive safe integers, returning `a - b` as a
+   * `PositiveSafeInt`.
    *
    * @example
    *
@@ -266,15 +270,15 @@ export const PositiveSafeInt = {
    * assert.isTrue(PositiveSafeInt.is(difference));
    * ```
    *
-   * @param a The minuend PositiveSafeInt.
-   * @param b The subtrahend PositiveSafeInt.
-   * @returns `a - b` clamped to [1, MAX_SAFE_INTEGER] as a PositiveSafeInt
-   *   (minimum 1).
+   * @param a - The first positive safe integer
+   * @param b - The second positive safe integer
+   * @returns The difference of `a` and `b` as a `PositiveSafeInt`
    */
   sub,
 
   /**
-   * Multiplies two PositiveSafeInt values.
+   * Multiplies two positive safe integers, returning `a * b` as a
+   * `PositiveSafeInt`.
    *
    * @example
    *
@@ -289,14 +293,15 @@ export const PositiveSafeInt = {
    * assert.isTrue(PositiveSafeInt.is(product));
    * ```
    *
-   * @param a The first PositiveSafeInt.
-   * @param b The second PositiveSafeInt.
-   * @returns `a * b` clamped to [1, MAX_SAFE_INTEGER] as a PositiveSafeInt.
+   * @param a - The first positive safe integer
+   * @param b - The second positive safe integer
+   * @returns The product of `a` and `b` as a `PositiveSafeInt`
    */
   mul,
 
   /**
-   * Divides one PositiveSafeInt by another using floor division.
+   * Divides two positive safe integers using floor division (`⌊a / b⌋`): the
+   * result is `a / b` rounded toward negative infinity, as a `PositiveSafeInt`.
    *
    * @example
    *
@@ -316,9 +321,9 @@ export const PositiveSafeInt = {
    * assert.isTrue(clamped === 1);
    * ```
    *
-   * @param a The dividend PositiveSafeInt.
-   * @param b The divisor PositiveSafeInt.
-   * @returns `⌊a / b⌋` clamped to [1, MAX_SAFE_INTEGER] as a PositiveSafeInt.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as a `PositiveSafeInt`
    */
   div,
 } as const;

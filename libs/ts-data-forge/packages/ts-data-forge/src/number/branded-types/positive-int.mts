@@ -35,8 +35,8 @@ const {
 /**
  * Type guard that checks if a value is a positive integer.
  *
- * A positive integer is any integer greater than zero (>= 1). This excludes
- * zero, negative numbers, and non-integers.
+ * Returns `true` for a positive integer — a value with no fractional component,
+ * including values outside the safe integer range (unlike `SafeInt`).
  *
  * @example
  *
@@ -54,11 +54,10 @@ const {
 export const isPositiveInt = is;
 
 /**
- * Casts a number to a PositiveInt branded type.
+ * Casts a `number` to the `PositiveInt` branded type.
  *
- * This function validates that the input is a positive integer (>= 1) and
- * returns it with the PositiveInt brand. This ensures type safety for
- * operations that require strictly positive integer values.
+ * Validates that the value is a positive integer and returns it with the
+ * `PositiveInt` brand. Throws a `TypeError` otherwise.
  *
  * @example
  *
@@ -71,26 +70,20 @@ export const isPositiveInt = is;
  * ```
  *
  * @param value - The value to cast
- * @returns The value as a PositiveInt branded type
+ * @returns The value as a `PositiveInt`
  * @throws {TypeError} If the value is not a positive integer
  */
 export const asPositiveInt = castType;
 
 /**
- * Namespace providing type-safe operations for PositiveInt branded types.
+ * Namespace providing type-safe operations for the `PositiveInt` branded type.
  *
- * PositiveInt represents integers that are strictly greater than zero (>= 1).
- * All operations automatically clamp results to maintain the positive
- * constraint, ensuring that arithmetic operations never produce zero or
- * negative values.
+ * The `PositiveInt` type represents a positive integer. Division (`div`) uses
+ * floor division.
  *
- * This type is essential for:
- *
- * - Array lengths and sizes (length >= 1)
- * - Counts and quantities that must be positive
- * - Denominators in division operations
- * - Loop counters and iteration counts
- * - Database primary keys and IDs
+ * Unlike `SafeInt`, `PositiveInt` allows values outside the safe integer range
+ * (±2^53 − 1), so very large magnitudes may lose precision in JavaScript's
+ * `number` type.
  */
 export const PositiveInt = {
   /**
@@ -113,17 +106,12 @@ export const PositiveInt = {
   is,
 
   /**
-   * The minimum value for a PositiveInt.
-   *
-   * @readonly
+   * The smallest value representable as `PositiveInt`.
    */
   MIN_VALUE,
 
   /**
-   * Returns the minimum value from a list of positive integers.
-   *
-   * Since all inputs are guaranteed to be >= 1, the result is also guaranteed
-   * to be a positive integer.
+   * Returns the smallest of the given positive integers.
    *
    * @example
    *
@@ -138,12 +126,12 @@ export const PositiveInt = {
    * ```
    *
    * @param values - The positive integers to compare (at least one required)
-   * @returns The smallest value as a PositiveInt
+   * @returns The smallest value as a `PositiveInt`
    */
   min: min_,
 
   /**
-   * Returns the maximum value from a list of positive integers.
+   * Returns the largest of the given positive integers.
    *
    * @example
    *
@@ -158,15 +146,13 @@ export const PositiveInt = {
    * ```
    *
    * @param values - The positive integers to compare (at least one required)
-   * @returns The largest value as a PositiveInt
+   * @returns The largest value as a `PositiveInt`
    */
   max: max_,
 
   /**
-   * Clamps a number to the positive integer range.
-   *
-   * Since PositiveInt has a minimum value of 1, this function ensures that any
-   * input less than 1 is clamped to 1.
+   * Clamps a `number` into the `PositiveInt` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
    * @example
    *
@@ -180,16 +166,15 @@ export const PositiveInt = {
    * assert.isTrue(withinRange === 10);
    * ```
    *
-   * @param value - The number to clamp
-   * @returns The value clamped to >= 1 as a PositiveInt
+   * @param value - The value to clamp
+   * @returns The clamped value as a `PositiveInt`
    */
   clamp,
 
   /**
-   * Generates a random positive integer within the specified range (inclusive).
+   * Generates a random `PositiveInt` within the given range.
    *
-   * Both bounds are inclusive, and both min and max must be positive integers.
-   * If min > max, they are automatically swapped.
+   * The range is inclusive on both ends.
    *
    * @example
    *
@@ -205,15 +190,15 @@ export const PositiveInt = {
    * assert.isTrue(randomValue >= 3 && randomValue <= 6);
    * ```
    *
-   * @param min - The minimum value (inclusive, must be >= 1)
-   * @param max - The maximum value (inclusive, must be >= min)
-   * @returns A random PositiveInt in the range [min, max]
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `PositiveInt` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a positive integer to a power, ensuring the result is never less
-   * than 1.
+   * Raises `a` to the power `b`, returning `a ** b` as a `PositiveInt` (floored
+   * to an integer).
    *
    * @example
    *
@@ -229,12 +214,12 @@ export const PositiveInt = {
    *
    * @param a - The base positive integer
    * @param b - The exponent positive integer
-   * @returns `a ** b` as a PositiveInt, but never less than 1
+   * @returns `a ** b` as a `PositiveInt`
    */
   pow,
 
   /**
-   * Adds two positive integers, ensuring the result is never less than 1.
+   * Adds two positive integers, returning `a + b` as a `PositiveInt`.
    *
    * @example
    *
@@ -244,17 +229,14 @@ export const PositiveInt = {
    * assert.isTrue(sum === 9);
    * ```
    *
-   * @param a - First positive integer
-   * @param b - Second positive integer
-   * @returns `a + b` as a PositiveInt, but never less than 1
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The sum of `a` and `b` as a `PositiveInt`
    */
   add,
 
   /**
-   * Subtracts two positive integers, clamping the result to remain positive.
-   *
-   * If the mathematical result would be <= 0, it is clamped to 1 to maintain
-   * the positive integer constraint.
+   * Subtracts two positive integers, returning `a - b` as a `PositiveInt`.
    *
    * @example
    *
@@ -264,14 +246,14 @@ export const PositiveInt = {
    * assert.isTrue(difference === 1);
    * ```
    *
-   * @param a - The minuend (positive integer)
-   * @param b - The subtrahend (positive integer)
-   * @returns `max(1, a - b)` as a PositiveInt
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The difference of `a` and `b` as a `PositiveInt`
    */
   sub,
 
   /**
-   * Multiplies two positive integers, ensuring the result is never less than 1.
+   * Multiplies two positive integers, returning `a * b` as a `PositiveInt`.
    *
    * @example
    *
@@ -281,19 +263,15 @@ export const PositiveInt = {
    * assert.isTrue(product === 21);
    * ```
    *
-   * @param a - First positive integer
-   * @param b - Second positive integer
-   * @returns `a * b` as a PositiveInt, but never less than 1
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The product of `a` and `b` as a `PositiveInt`
    */
   mul,
 
   /**
-   * Divides two positive integers using floor division, clamping to remain
-   * positive.
-   *
-   * Performs mathematical floor division: `⌊a / b⌋`. If the result would be 0
-   * (when a < b), it is clamped to 1 to maintain the positive integer
-   * constraint.
+   * Divides two positive integers using floor division (`⌊a / b⌋`): the result
+   * is `a / b` rounded toward negative infinity, as a `PositiveInt`.
    *
    * @example
    *
@@ -307,9 +285,9 @@ export const PositiveInt = {
    * assert.isTrue(clamped === 1);
    * ```
    *
-   * @param a - The dividend (positive integer)
-   * @param b - The divisor (positive integer, guaranteed non-zero)
-   * @returns `max(1, ⌊a / b⌋)` as a PositiveInt
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as a `PositiveInt`
    */
   div,
 } as const;

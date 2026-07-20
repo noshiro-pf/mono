@@ -34,131 +34,138 @@ const {
 } as const);
 
 /**
- * Checks if a number is a NonNegativeInt16 (16-bit non-negative signed integer
- * in the range [0, 2^15)).
+ * Type guard that checks if a value is a non-negative integer in [0, 2^15).
  *
- * @param value The value to check.
- * @returns `true` if the value is a NonNegativeInt16, `false` otherwise.
+ * Returns `true` for a non-negative integer in [0, 2^15) — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-negative integer in [0, 2^15), `false` otherwise
  */
 export const isNonNegativeInt16 = is;
 
 /**
- * Casts a number to a NonNegativeInt16 type.
+ * Casts a `number` to the `NonNegativeInt16` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NonNegativeInt16 type.
- * @throws {TypeError} If the value is not a non-negative integer in [0, 2^15).
+ * Validates that the value is a non-negative integer in [0, 2^15) and returns
+ * it with the `NonNegativeInt16` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NonNegativeInt16`
+ * @throws {TypeError} If the value is not a non-negative integer in [0, 2^15)
  */
 export const asNonNegativeInt16 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 16-bit non-negative
- * integers.
+ * Namespace providing type-safe operations for the `NonNegativeInt16` branded
+ * type.
  *
- * All operations automatically clamp results to the valid NonNegativeInt16
- * range [0, 32767]. This ensures that all arithmetic maintains the 16-bit
- * non-negative integer constraint, with negative results clamped to 0 and
- * overflow results clamped to MAX_VALUE.
+ * The `NonNegativeInt16` type represents a non-negative integer in [0, 2^15).
+ * Division (`div`) uses floor division.
  */
 export const NonNegativeInt16 = {
   /**
-   * Type guard to check if a value is a NonNegativeInt16.
+   * Type guard that checks if a value is a non-negative integer in [0, 2^15).
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a 16-bit non-negative integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-negative integer in [0, 2^15), `false` otherwise
+   * @see {@link isNonNegativeInt16} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a 16-bit non-negative integer.
-   *
-   * @readonly
+   * The smallest value representable as `NonNegativeInt16`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a 16-bit non-negative integer.
-   *
-   * @readonly
+   * The largest value representable as `NonNegativeInt16`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two NonNegativeInt16 values.
+   * Returns the smallest of the given non-negative integers.
    *
-   * @param a The first NonNegativeInt16.
-   * @param b The second NonNegativeInt16.
-   * @returns The minimum value as a NonNegativeInt16.
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The smallest value as a `NonNegativeInt16`
    */
   min: min_,
 
   /**
-   * Returns the larger of two NonNegativeInt16 values.
+   * Returns the largest of the given non-negative integers.
    *
-   * @param a The first NonNegativeInt16.
-   * @param b The second NonNegativeInt16.
-   * @returns The maximum value as a NonNegativeInt16.
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The largest value as a `NonNegativeInt16`
    */
   max: max_,
 
   /**
-   * Clamps a number to the NonNegativeInt16 range.
+   * Clamps a `number` into the `NonNegativeInt16` range, rounding to the
+   * nearest integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [0, 32767] as a NonNegativeInt16.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `NonNegativeInt16`
    */
   clamp,
 
   /**
-   * Generates a random NonNegativeInt16 value within the valid range.
+   * Generates a random `NonNegativeInt16` within the given range.
    *
-   * @returns A random NonNegativeInt16 between 0 and 32767.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NonNegativeInt16` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a NonNegativeInt16 to the power of another NonNegativeInt16.
+   * Raises `a` to the power `b`, returning `a ** b` as a `NonNegativeInt16`
+   * (floored to an integer).
    *
-   * @param a The base NonNegativeInt16.
-   * @param b The exponent NonNegativeInt16.
-   * @returns `a ** b` clamped to [0, 32767] as a NonNegativeInt16.
+   * @param a - The base non-negative integer
+   * @param b - The exponent non-negative integer
+   * @returns `a ** b` as a `NonNegativeInt16`
    */
   pow,
 
   /**
-   * Adds two NonNegativeInt16 values.
+   * Adds two non-negative integers, returning `a + b` as a `NonNegativeInt16`.
    *
-   * @param a The first NonNegativeInt16.
-   * @param b The second NonNegativeInt16.
-   * @returns `a + b` clamped to [0, 32767] as a NonNegativeInt16.
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The sum of `a` and `b` as a `NonNegativeInt16`
    */
   add,
 
   /**
-   * Subtracts one NonNegativeInt16 from another.
+   * Subtracts two non-negative integers, returning `a - b` as a
+   * `NonNegativeInt16`.
    *
-   * @param a The minuend NonNegativeInt16.
-   * @param b The subtrahend NonNegativeInt16.
-   * @returns `a - b` clamped to [0, 32767] as a NonNegativeInt16 (minimum 0).
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The difference of `a` and `b` as a `NonNegativeInt16`
    */
   sub,
 
   /**
-   * Multiplies two NonNegativeInt16 values.
+   * Multiplies two non-negative integers, returning `a * b` as a
+   * `NonNegativeInt16`.
    *
-   * @param a The first NonNegativeInt16.
-   * @param b The second NonNegativeInt16.
-   * @returns `a * b` clamped to [0, 32767] as a NonNegativeInt16.
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The product of `a` and `b` as a `NonNegativeInt16`
    */
   mul,
 
   /**
-   * Divides one NonNegativeInt16 by another using floor division.
+   * Divides two non-negative integers using floor division (`⌊a / b⌋`): the
+   * result is `a / b` rounded toward negative infinity, as a
+   * `NonNegativeInt16`.
    *
-   * @param a The dividend NonNegativeInt16.
-   * @param b The divisor NonNegativeInt16.
-   * @returns `⌊a / b⌋` clamped to [0, 32767] as a NonNegativeInt16.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as a `NonNegativeInt16`
    */
   div,
 } as const;

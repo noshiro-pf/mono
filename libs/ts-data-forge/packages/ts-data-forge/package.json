@@ -47,6 +47,7 @@
     "fmt": "format-uncommitted --cwd .",
     "fmt:diff": "format-diff-from origin/main --cwd .",
     "fmt:full": "pnpm run z:prettier .",
+    "gen:branded-number": "tsx ./scripts/gen-branded-number/generate.mts && pnpm run doc:embed:jsdoc && pnpm run z:prettier 'src/number/branded-types/*.mts'",
     "gi": "run-s gi:src fmt",
     "gi:src": "tsx scripts/cmd/gen-index.mts",
     "lint": "eslint .",

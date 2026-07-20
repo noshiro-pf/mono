@@ -34,132 +34,134 @@ const {
 } as const);
 
 /**
- * Checks if a number is a Uint16 (16-bit unsigned integer in the range [0,
- * 2^16)).
+ * Type guard that checks if a value is a non-negative integer less than 2^16.
  *
- * @param value The value to check.
- * @returns `true` if the value is a Uint16, `false` otherwise.
+ * Returns `true` for a non-negative integer less than 2^16 — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-negative integer less than 2^16, `false` otherwise
  */
 export const isUint16 = is;
 
 /**
- * Casts a number to a Uint16 type.
+ * Casts a `number` to the `Uint16` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a Uint16 type.
- * @throws {TypeError} If the value is not a non-negative integer less than
- *   2^16.
+ * Validates that the value is a non-negative integer less than 2^16 and returns
+ * it with the `Uint16` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as an `Uint16`
+ * @throws {TypeError} If the value is not a non-negative integer less than 2^16
  */
 export const asUint16 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 16-bit unsigned
- * integers.
+ * Namespace providing type-safe operations for the `Uint16` branded type.
  *
- * All operations automatically clamp results to the valid Uint16 range [0,
- * 65535]. This ensures that all arithmetic maintains the 16-bit unsigned
- * integer constraint, with negative results clamped to 0 and overflow results
- * clamped to MAX_VALUE.
+ * The `Uint16` type represents a non-negative integer less than 2^16. Division
+ * (`div`) uses floor division.
  */
 export const Uint16 = {
   /**
-   * Type guard to check if a value is a Uint16.
+   * Type guard that checks if a value is a non-negative integer less than 2^16.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a 16-bit unsigned integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-negative integer less than 2^16, `false` otherwise
+   * @see {@link isUint16} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a 16-bit unsigned integer.
-   *
-   * @readonly
+   * The smallest value representable as `Uint16`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a 16-bit unsigned integer.
-   *
-   * @readonly
+   * The largest value representable as `Uint16`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two Uint16 values.
+   * Returns the smallest of the given non-negative integers.
    *
-   * @param a The first Uint16.
-   * @param b The second Uint16.
-   * @returns The minimum value as a Uint16.
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The smallest value as an `Uint16`
    */
   min: min_,
 
   /**
-   * Returns the larger of two Uint16 values.
+   * Returns the largest of the given non-negative integers.
    *
-   * @param a The first Uint16.
-   * @param b The second Uint16.
-   * @returns The maximum value as a Uint16.
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The largest value as an `Uint16`
    */
   max: max_,
 
   /**
-   * Clamps a number to the Uint16 range.
+   * Clamps a `number` into the `Uint16` range, rounding to the nearest integer
+   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [0, 65535] as a Uint16.
+   * @param value - The value to clamp
+   * @returns The clamped value as an `Uint16`
    */
   clamp,
 
   /**
-   * Generates a random Uint16 value within the valid range.
+   * Generates a random `Uint16` within the given range.
    *
-   * @returns A random Uint16 between 0 and 65535.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `Uint16` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a Uint16 to the power of another Uint16.
+   * Raises `a` to the power `b`, returning `a ** b` as an `Uint16` (floored to
+   * an integer).
    *
-   * @param a The base Uint16.
-   * @param b The exponent Uint16.
-   * @returns `a ** b` clamped to [0, 65535] as a Uint16.
+   * @param a - The base non-negative integer
+   * @param b - The exponent non-negative integer
+   * @returns `a ** b` as an `Uint16`
    */
   pow,
 
   /**
-   * Adds two Uint16 values.
+   * Adds two non-negative integers, returning `a + b` as an `Uint16`.
    *
-   * @param a The first Uint16.
-   * @param b The second Uint16.
-   * @returns `a + b` clamped to [0, 65535] as a Uint16.
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The sum of `a` and `b` as an `Uint16`
    */
   add,
 
   /**
-   * Subtracts one Uint16 from another.
+   * Subtracts two non-negative integers, returning `a - b` as an `Uint16`.
    *
-   * @param a The minuend Uint16.
-   * @param b The subtrahend Uint16.
-   * @returns `a - b` clamped to [0, 65535] as a Uint16 (minimum 0).
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The difference of `a` and `b` as an `Uint16`
    */
   sub,
 
   /**
-   * Multiplies two Uint16 values.
+   * Multiplies two non-negative integers, returning `a * b` as an `Uint16`.
    *
-   * @param a The first Uint16.
-   * @param b The second Uint16.
-   * @returns `a * b` clamped to [0, 65535] as a Uint16.
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The product of `a` and `b` as an `Uint16`
    */
   mul,
 
   /**
-   * Divides one Uint16 by another using floor division.
+   * Divides two non-negative integers using floor division (`⌊a / b⌋`): the
+   * result is `a / b` rounded toward negative infinity, as an `Uint16`.
    *
-   * @param a The dividend Uint16.
-   * @param b The divisor Uint16.
-   * @returns `⌊a / b⌋` clamped to [0, 65535] as a Uint16.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as an `Uint16`
    */
   div,
 } as const;

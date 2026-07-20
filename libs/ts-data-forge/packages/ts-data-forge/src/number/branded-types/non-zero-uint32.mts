@@ -33,117 +33,116 @@ const {
 } as const);
 
 /**
- * Checks if a number is a NonZeroUint32 (32-bit non-zero unsigned integer in
- * the range [1, 2^32)).
+ * Type guard that checks if a value is a non-zero integer in [1, 2^32).
  *
- * @param value The value to check.
- * @returns `true` if the value is a NonZeroUint32, `false` otherwise.
+ * Returns `true` for a non-zero integer in [1, 2^32) — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-zero integer in [1, 2^32), `false` otherwise
  */
 export const isNonZeroUint32 = is;
 
 /**
- * Casts a number to a NonZeroUint32 type.
+ * Casts a `number` to the `NonZeroUint32` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NonZeroUint32 type.
- * @throws {TypeError} If the value is not a non-zero integer in [1, 2^32).
+ * Validates that the value is a non-zero integer in [1, 2^32) and returns it
+ * with the `NonZeroUint32` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NonZeroUint32`
+ * @throws {TypeError} If the value is not a non-zero integer in [1, 2^32)
  */
 export const asNonZeroUint32 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 32-bit non-zero
- * unsigned integers.
+ * Namespace providing type-safe operations for the `NonZeroUint32` branded
+ * type.
  *
- * All operations automatically clamp results to the valid NonZeroUint32 range
- * [1, 4294967295]. This ensures that all arithmetic maintains the 32-bit
- * non-zero unsigned integer constraint, with results below 1 clamped to
- * MIN_VALUE and overflow results clamped to MAX_VALUE.
+ * The `NonZeroUint32` type represents a non-zero integer in [1, 2^32). Division
+ * (`div`) uses floor division.
  */
 export const NonZeroUint32 = {
   /**
-   * Type guard to check if a value is a NonZeroUint32.
+   * Type guard that checks if a value is a non-zero integer in [1, 2^32).
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a 32-bit non-zero unsigned integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-zero integer in [1, 2^32), `false` otherwise
+   * @see {@link isNonZeroUint32} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a 32-bit non-zero unsigned integer.
-   *
-   * @readonly
+   * The smallest value representable as `NonZeroUint32`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a 32-bit non-zero unsigned integer.
-   *
-   * @readonly
+   * The largest value representable as `NonZeroUint32`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two NonZeroUint32 values.
+   * Returns the smallest of the given non-zero integers.
    *
-   * @param a The first NonZeroUint32.
-   * @param b The second NonZeroUint32.
-   * @returns The minimum value as a NonZeroUint32.
+   * @param values - The non-zero integers to compare (at least one required)
+   * @returns The smallest value as a `NonZeroUint32`
    */
   min: min_,
 
   /**
-   * Returns the larger of two NonZeroUint32 values.
+   * Returns the largest of the given non-zero integers.
    *
-   * @param a The first NonZeroUint32.
-   * @param b The second NonZeroUint32.
-   * @returns The maximum value as a NonZeroUint32.
+   * @param values - The non-zero integers to compare (at least one required)
+   * @returns The largest value as a `NonZeroUint32`
    */
   max: max_,
 
   /**
-   * Clamps a number to the NonZeroUint32 range.
+   * Clamps a `number` into the `NonZeroUint32` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [1, 4294967295] as a NonZeroUint32.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `NonZeroUint32`
    */
   clamp,
 
   /**
-   * Generates a random NonZeroUint32 value within the valid range.
+   * Generates a random `NonZeroUint32` within the given range.
    *
-   * @returns A random NonZeroUint32 between 1 and 4294967295.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NonZeroUint32` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a NonZeroUint32 to the power of another NonZeroUint32.
+   * Raises `a` to the power `b`, returning `a ** b` as a `NonZeroUint32`
+   * (floored to an integer).
    *
-   * @param a The base NonZeroUint32.
-   * @param b The exponent NonZeroUint32.
-   * @returns `a ** b` clamped to [1, 4294967295] as a NonZeroUint32.
+   * @param a - The base non-zero integer
+   * @param b - The exponent non-zero integer
+   * @returns `a ** b` as a `NonZeroUint32`
    */
   pow,
 
   /**
-   * Adds two NonZeroUint32 values.
+   * Adds two non-zero integers, returning `a + b` as a `NonZeroUint32`.
    *
-   * @param a The first NonZeroUint32.
-   * @param b The second NonZeroUint32.
-   * @returns `a + b` clamped to [1, 4294967295] as a NonZeroUint32.
+   * @param a - The first non-zero integer
+   * @param b - The second non-zero integer
+   * @returns The sum of `a` and `b` as a `NonZeroUint32`
    */
   add,
 
   /**
-   * Multiplies two NonZeroUint32 values.
+   * Multiplies two non-zero integers, returning `a * b` as a `NonZeroUint32`.
    *
-   * Both `add` and `mul` stay within `[1, 4294967295]`. For the non-closed
-   * operations (`sub`/`div`, whose result may be `0`) use {@link Num.sub} /
-   * {@link Num.divInt}.
-   *
-   * @param a The first NonZeroUint32.
-   * @param b The second NonZeroUint32.
-   * @returns `a * b` clamped to [1, 4294967295] as a NonZeroUint32.
+   * @param a - The first non-zero integer
+   * @param b - The second non-zero integer
+   * @returns The product of `a` and `b` as a `NonZeroUint32`
    */
   mul,
 } as const;

@@ -34,130 +34,134 @@ const {
 } as const);
 
 /**
- * Checks if a number is a Uint32 (32-bit unsigned integer in the range [0,
- * 2^32)).
+ * Type guard that checks if a value is a non-negative integer less than 2^32.
  *
- * @param value The value to check.
- * @returns `true` if the value is a Uint32, `false` otherwise.
+ * Returns `true` for a non-negative integer less than 2^32 — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-negative integer less than 2^32, `false` otherwise
  */
 export const isUint32 = is;
 
 /**
- * Casts a number to a Uint32 type.
+ * Casts a `number` to the `Uint32` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a Uint32 type.
- * @throws {TypeError} If the value is not a non-negative integer less than
- *   2^32.
+ * Validates that the value is a non-negative integer less than 2^32 and returns
+ * it with the `Uint32` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as an `Uint32`
+ * @throws {TypeError} If the value is not a non-negative integer less than 2^32
  */
 export const asUint32 = castType;
 
 /**
- * Utility functions for working with Uint32 (32-bit unsigned integer) branded
- * types. Provides type-safe operations that ensure results remain within the
- * valid range [0, 2^32). All arithmetic operations are clamped to maintain the
- * Uint32 constraint.
+ * Namespace providing type-safe operations for the `Uint32` branded type.
+ *
+ * The `Uint32` type represents a non-negative integer less than 2^32. Division
+ * (`div`) uses floor division.
  */
 export const Uint32 = {
   /**
-   * Type guard that checks if a value is a 32-bit unsigned integer.
+   * Type guard that checks if a value is a non-negative integer less than 2^32.
    *
    * @param value - The value to check
-   * @returns `true` if the value is within the range [0, 2^32), `false`
-   *   otherwise
+   * @returns `true` if the value is a non-negative integer less than 2^32, `false` otherwise
+   * @see {@link isUint32} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a Uint32.
-   *
-   * @readonly
+   * The smallest value representable as `Uint32`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a Uint32.
-   *
-   * @readonly
+   * The largest value representable as `Uint32`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the minimum of multiple Uint32 values.
+   * Returns the smallest of the given non-negative integers.
    *
-   * @param values - The Uint32 values to compare
-   * @returns The smallest value as a Uint32
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The smallest value as an `Uint32`
    */
   min: min_,
 
   /**
-   * Returns the maximum of multiple Uint32 values.
+   * Returns the largest of the given non-negative integers.
    *
-   * @param values - The Uint32 values to compare
-   * @returns The largest value as a Uint32
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The largest value as an `Uint32`
    */
   max: max_,
 
   /**
-   * Clamps a Uint32 to be within the specified range.
+   * Clamps a `number` into the `Uint32` range, rounding to the nearest integer
+   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
    * @param value - The value to clamp
-   * @param min - The minimum value
-   * @param max - The maximum value
-   * @returns The clamped value as a Uint32
+   * @returns The clamped value as an `Uint32`
    */
   clamp,
 
   /**
-   * Generates a random Uint32 value.
+   * Generates a random `Uint32` within the given range.
    *
-   * @returns A random Uint32 value within [0, 2^32)
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `Uint32` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a Uint32 to a power, with result clamped to [0, 2^32).
+   * Raises `a` to the power `b`, returning `a ** b` as an `Uint32` (floored to
+   * an integer).
    *
-   * @param a - The base Uint32
-   * @param b - The exponent Uint32
-   * @returns `a ** b` as a Uint32, clamped to valid range
+   * @param a - The base non-negative integer
+   * @param b - The exponent non-negative integer
+   * @returns `a ** b` as an `Uint32`
    */
   pow,
 
   /**
-   * Adds two Uint32 values, with result clamped to [0, 2^32).
+   * Adds two non-negative integers, returning `a + b` as an `Uint32`.
    *
-   * @param a - First Uint32
-   * @param b - Second Uint32
-   * @returns `a + b` as a Uint32, clamped to valid range
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The sum of `a` and `b` as an `Uint32`
    */
   add,
 
   /**
-   * Subtracts two Uint32 values, with result clamped to [0, 2^32).
+   * Subtracts two non-negative integers, returning `a - b` as an `Uint32`.
    *
-   * @param a - First Uint32
-   * @param b - Second Uint32
-   * @returns `a - b` as a Uint32, clamped to valid range (minimum 0)
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The difference of `a` and `b` as an `Uint32`
    */
   sub,
 
   /**
-   * Multiplies two Uint32 values, with result clamped to [0, 2^32).
+   * Multiplies two non-negative integers, returning `a * b` as an `Uint32`.
    *
-   * @param a - First Uint32
-   * @param b - Second Uint32
-   * @returns `a * b` as a Uint32, clamped to valid range
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The product of `a` and `b` as an `Uint32`
    */
   mul,
 
   /**
-   * Divides two Uint32 values using floor division, with result clamped to [0,
-   * 2^32).
+   * Divides two non-negative integers using floor division (`⌊a / b⌋`): the
+   * result is `a / b` rounded toward negative infinity, as an `Uint32`.
    *
-   * @param a - The dividend Uint32
-   * @param b - The divisor Uint32
-   * @returns `⌊a / b⌋` as a Uint32, clamped to valid range
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as an `Uint32`
    */
   div,
 } as const;

@@ -34,131 +34,135 @@ const {
 } as const);
 
 /**
- * Checks if a number is a PositiveInt32 (32-bit positive signed integer in the
- * range [1, 2^31)).
+ * Type guard that checks if a value is a positive integer in [1, 2^31).
  *
- * @param value The value to check.
- * @returns `true` if the value is a PositiveInt32, `false` otherwise.
+ * Returns `true` for a positive integer in [1, 2^31) — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a positive integer in [1, 2^31), `false` otherwise
  */
 export const isPositiveInt32 = is;
 
 /**
- * Casts a number to a PositiveInt32 type.
+ * Casts a `number` to the `PositiveInt32` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a PositiveInt32 type.
- * @throws {TypeError} If the value is not a positive integer in [1, 2^31).
+ * Validates that the value is a positive integer in [1, 2^31) and returns it
+ * with the `PositiveInt32` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `PositiveInt32`
+ * @throws {TypeError} If the value is not a positive integer in [1, 2^31)
  */
 export const asPositiveInt32 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 32-bit positive
- * integers.
+ * Namespace providing type-safe operations for the `PositiveInt32` branded
+ * type.
  *
- * All operations automatically clamp results to the valid PositiveInt32 range
- * [1, 2147483647]. This ensures that all arithmetic maintains the 32-bit
- * positive integer constraint, with results below 1 clamped to MIN_VALUE and
- * overflow results clamped to MAX_VALUE.
+ * The `PositiveInt32` type represents a positive integer in [1, 2^31). Division
+ * (`div`) uses floor division.
  */
 export const PositiveInt32 = {
   /**
-   * Type guard to check if a value is a PositiveInt32.
+   * Type guard that checks if a value is a positive integer in [1, 2^31).
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a 32-bit positive integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a positive integer in [1, 2^31), `false` otherwise
+   * @see {@link isPositiveInt32} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a 32-bit positive integer.
-   *
-   * @readonly
+   * The smallest value representable as `PositiveInt32`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a 32-bit positive integer.
-   *
-   * @readonly
+   * The largest value representable as `PositiveInt32`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two PositiveInt32 values.
+   * Returns the smallest of the given positive integers.
    *
-   * @param a The first PositiveInt32.
-   * @param b The second PositiveInt32.
-   * @returns The minimum value as a PositiveInt32.
+   * @param values - The positive integers to compare (at least one required)
+   * @returns The smallest value as a `PositiveInt32`
    */
   min: min_,
 
   /**
-   * Returns the larger of two PositiveInt32 values.
+   * Returns the largest of the given positive integers.
    *
-   * @param a The first PositiveInt32.
-   * @param b The second PositiveInt32.
-   * @returns The maximum value as a PositiveInt32.
+   * @param values - The positive integers to compare (at least one required)
+   * @returns The largest value as a `PositiveInt32`
    */
   max: max_,
 
   /**
-   * Clamps a number to the PositiveInt32 range.
+   * Clamps a `number` into the `PositiveInt32` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [1, 2147483647] as a PositiveInt32.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `PositiveInt32`
    */
   clamp,
 
   /**
-   * Generates a random PositiveInt32 value within the valid range.
+   * Generates a random `PositiveInt32` within the given range.
    *
-   * @returns A random PositiveInt32 between 1 and 2147483647.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `PositiveInt32` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a PositiveInt32 to the power of another PositiveInt32.
+   * Raises `a` to the power `b`, returning `a ** b` as a `PositiveInt32`
+   * (floored to an integer).
    *
-   * @param a The base PositiveInt32.
-   * @param b The exponent PositiveInt32.
-   * @returns `a ** b` clamped to [1, 2147483647] as a PositiveInt32.
+   * @param a - The base positive integer
+   * @param b - The exponent positive integer
+   * @returns `a ** b` as a `PositiveInt32`
    */
   pow,
 
   /**
-   * Adds two PositiveInt32 values.
+   * Adds two positive integers, returning `a + b` as a `PositiveInt32`.
    *
-   * @param a The first PositiveInt32.
-   * @param b The second PositiveInt32.
-   * @returns `a + b` clamped to [1, 2147483647] as a PositiveInt32.
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The sum of `a` and `b` as a `PositiveInt32`
    */
   add,
 
   /**
-   * Subtracts one PositiveInt32 from another.
+   * Subtracts two positive integers, returning `a - b` as a `PositiveInt32`.
    *
-   * @param a The minuend PositiveInt32.
-   * @param b The subtrahend PositiveInt32.
-   * @returns `a - b` clamped to [1, 2147483647] as a PositiveInt32 (minimum 1).
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The difference of `a` and `b` as a `PositiveInt32`
    */
   sub,
 
   /**
-   * Multiplies two PositiveInt32 values.
+   * Multiplies two positive integers, returning `a * b` as a `PositiveInt32`.
    *
-   * @param a The first PositiveInt32.
-   * @param b The second PositiveInt32.
-   * @returns `a * b` clamped to [1, 2147483647] as a PositiveInt32.
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The product of `a` and `b` as a `PositiveInt32`
    */
   mul,
 
   /**
-   * Divides one PositiveInt32 by another using floor division.
+   * Divides two positive integers using floor division (`⌊a / b⌋`): the result
+   * is `a / b` rounded toward negative infinity, as a `PositiveInt32`.
    *
-   * @param a The dividend PositiveInt32.
-   * @param b The divisor PositiveInt32.
-   * @returns `⌊a / b⌋` clamped to [1, 2147483647] as a PositiveInt32.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as a `PositiveInt32`
    */
   div,
 } as const;

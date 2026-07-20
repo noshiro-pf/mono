@@ -39,119 +39,118 @@ const {
 } as const);
 
 /**
- * Checks if a number is a NonZeroSafeInt (a non-zero safe integer in the range
- * [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] excluding 0).
+ * Type guard that checks if a value is a non-zero safe integer.
  *
- * @param value The value to check.
- * @returns `true` if the value is a NonZeroSafeInt, `false` otherwise.
+ * Returns `true` for a non-zero safe integer — a value with no fractional
+ * component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-zero safe integer, `false` otherwise
  */
 export const isNonZeroSafeInt = is;
 
 /**
- * Casts a number to a NonZeroSafeInt type.
+ * Casts a `number` to the `NonZeroSafeInt` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NonZeroSafeInt type.
- * @throws {TypeError} If the value is not a non-zero safe integer.
+ * Validates that the value is a non-zero safe integer and returns it with the
+ * `NonZeroSafeInt` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NonZeroSafeInt`
+ * @throws {TypeError} If the value is not a non-zero safe integer
  */
 export const asNonZeroSafeInt = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for non-zero safe
- * integers.
+ * Namespace providing type-safe operations for the `NonZeroSafeInt` branded
+ * type.
  *
- * All operations automatically clamp results to the non-zero safe integer
- * range, excluding zero. This ensures that all arithmetic maintains both the
- * non-zero constraint and IEEE 754 precision guarantees, preventing precision
- * loss while ensuring results are never zero.
+ * The `NonZeroSafeInt` type represents a non-zero safe integer. Division
+ * (`div`) uses floor division.
  */
 export const NonZeroSafeInt = {
   /**
-   * Type guard to check if a value is a NonZeroSafeInt.
+   * Type guard that checks if a value is a non-zero safe integer.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a non-zero safe integer, `false` otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-zero safe integer, `false` otherwise
+   * @see {@link isNonZeroSafeInt} for usage examples
    */
   is,
 
   /**
-   * The minimum safe integer value (-(2^53 - 1)).
-   *
-   * @readonly
+   * The smallest value representable as `NonZeroSafeInt`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum safe integer value (2^53 - 1).
-   *
-   * @readonly
+   * The largest value representable as `NonZeroSafeInt`.
    */
   MAX_VALUE,
 
   /**
    * Returns the absolute value of a non-zero safe integer.
    *
-   * @param a The NonZeroSafeInt value.
-   * @returns The absolute value as a NonZeroSafeInt, clamped to safe range.
+   * The result is non-negative and keeps the `NonZeroSafeInt` brand.
+   *
+   * @param a - The non-zero safe integer value
+   * @returns The absolute value as a non-negative `NonZeroSafeInt`
    */
   abs,
 
   /**
-   * Returns the smaller of two NonZeroSafeInt values.
+   * Returns the smallest of the given non-zero safe integers.
    *
-   * @param a The first NonZeroSafeInt.
-   * @param b The second NonZeroSafeInt.
-   * @returns The minimum value as a NonZeroSafeInt.
+   * @param values - The non-zero safe integers to compare (at least one required)
+   * @returns The smallest value as a `NonZeroSafeInt`
    */
   min: min_,
 
   /**
-   * Returns the larger of two NonZeroSafeInt values.
+   * Returns the largest of the given non-zero safe integers.
    *
-   * @param a The first NonZeroSafeInt.
-   * @param b The second NonZeroSafeInt.
-   * @returns The maximum value as a NonZeroSafeInt.
+   * @param values - The non-zero safe integers to compare (at least one required)
+   * @returns The largest value as a `NonZeroSafeInt`
    */
   max: max_,
 
   /**
-   * Clamps a number to the non-zero safe integer range.
+   * Clamps a `number` into the `NonZeroSafeInt` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] \ {0} as
-   *   a NonZeroSafeInt.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `NonZeroSafeInt`
    */
   clamp,
 
   /**
-   * Generates a random NonZeroSafeInt value within the valid range.
+   * Generates a random `NonZeroSafeInt` within the given range.
    *
-   * @returns A random non-zero safe integer between MIN_SAFE_INTEGER and
-   *   MAX_SAFE_INTEGER.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NonZeroSafeInt` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a NonZeroSafeInt to the power of another NonZeroSafeInt.
+   * Raises `a` to the power `b`, returning `a ** b` as a `NonZeroSafeInt`
+   * (floored to an integer).
    *
-   * @param a The base NonZeroSafeInt.
-   * @param b The exponent NonZeroSafeInt.
-   * @returns `a ** b` clamped to non-zero safe integer range as a
-   *   NonZeroSafeInt.
+   * @param a - The base non-zero safe integer
+   * @param b - The exponent non-zero safe integer
+   * @returns `a ** b` as a `NonZeroSafeInt`
    */
   pow,
 
   /**
-   * Multiplies two NonZeroSafeInt values.
+   * Multiplies two non-zero safe integers, returning `a * b` as a
+   * `NonZeroSafeInt`.
    *
-   * The product of two non-zero safe integers is always non-zero, so this stays
-   * closed; for the non-closed operations (`add`/`sub`/`div`, whose result may
-   * be `0`) use {@link Num.add}/{@link Num.sub}/{@link Num.divInt}.
-   *
-   * @param a The first NonZeroSafeInt.
-   * @param b The second NonZeroSafeInt.
-   * @returns `a * b` clamped to non-zero safe integer range as a
-   *   NonZeroSafeInt.
+   * @param a - The first non-zero safe integer
+   * @param b - The second non-zero safe integer
+   * @returns The product of `a` and `b` as a `NonZeroSafeInt`
    */
   mul,
 } as const;

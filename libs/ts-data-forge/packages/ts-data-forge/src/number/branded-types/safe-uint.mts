@@ -35,131 +35,136 @@ const {
 } as const);
 
 /**
- * Checks if a number is a SafeUint.
+ * Type guard that checks if a value is a non-negative safe integer.
  *
- * @param value The value to check.
- * @returns `true` if the value is a SafeUint, `false` otherwise.
+ * Returns `true` for a non-negative safe integer — a value with no fractional
+ * component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-negative safe integer, `false` otherwise
  */
 export const isSafeUint = is;
 
 /**
- * Casts a number to a SafeUint type.
+ * Casts a `number` to the `SafeUint` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a SafeUint type.
- * @throws {TypeError} If the value is not a non-negative safe integer.
+ * Validates that the value is a non-negative safe integer and returns it with
+ * the `SafeUint` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `SafeUint`
+ * @throws {TypeError} If the value is not a non-negative safe integer
  */
 export const asSafeUint = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for safe unsigned
- * integers.
+ * Namespace providing type-safe operations for the `SafeUint` branded type.
  *
- * All operations automatically clamp results to the safe unsigned integer range
- * [0, MAX_SAFE_INTEGER]. This ensures that all arithmetic maintains both the
- * non-negative constraint and IEEE 754 precision guarantees, preventing
- * precision loss while ensuring results are never negative.
+ * The `SafeUint` type represents a non-negative safe integer. Division (`div`)
+ * uses floor division.
  */
 export const SafeUint = {
   /**
-   * Type guard to check if a value is a SafeUint.
+   * Type guard that checks if a value is a non-negative safe integer.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a non-negative safe integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-negative safe integer, `false` otherwise
+   * @see {@link isSafeUint} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a safe unsigned integer.
-   *
-   * @readonly
+   * The smallest value representable as `SafeUint`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum safe integer value (2^53 - 1).
-   *
-   * @readonly
+   * The largest value representable as `SafeUint`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two SafeUint values.
+   * Returns the smallest of the given non-negative safe integers.
    *
-   * @param a The first SafeUint.
-   * @param b The second SafeUint.
-   * @returns The minimum value as a SafeUint.
+   * @param values - The non-negative safe integers to compare (at least one required)
+   * @returns The smallest value as a `SafeUint`
    */
   min: min_,
 
   /**
-   * Returns the larger of two SafeUint values.
+   * Returns the largest of the given non-negative safe integers.
    *
-   * @param a The first SafeUint.
-   * @param b The second SafeUint.
-   * @returns The maximum value as a SafeUint.
+   * @param values - The non-negative safe integers to compare (at least one required)
+   * @returns The largest value as a `SafeUint`
    */
   max: max_,
 
   /**
-   * Clamps a number to the safe unsigned integer range.
+   * Clamps a `number` into the `SafeUint` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [0, MAX_SAFE_INTEGER] as a SafeUint.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `SafeUint`
    */
   clamp,
 
   /**
-   * Generates a random SafeUint value within the valid range.
+   * Generates a random `SafeUint` within the given range.
    *
-   * @returns A random SafeUint between 0 and MAX_SAFE_INTEGER.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `SafeUint` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a SafeUint to the power of another SafeUint.
+   * Raises `a` to the power `b`, returning `a ** b` as a `SafeUint` (floored to
+   * an integer).
    *
-   * @param a The base SafeUint.
-   * @param b The exponent SafeUint.
-   * @returns `a ** b` clamped to [0, MAX_SAFE_INTEGER] as a SafeUint.
+   * @param a - The base non-negative safe integer
+   * @param b - The exponent non-negative safe integer
+   * @returns `a ** b` as a `SafeUint`
    */
   pow,
 
   /**
-   * Adds two SafeUint values.
+   * Adds two non-negative safe integers, returning `a + b` as a `SafeUint`.
    *
-   * @param a The first SafeUint.
-   * @param b The second SafeUint.
-   * @returns `a + b` clamped to [0, MAX_SAFE_INTEGER] as a SafeUint.
+   * @param a - The first non-negative safe integer
+   * @param b - The second non-negative safe integer
+   * @returns The sum of `a` and `b` as a `SafeUint`
    */
   add,
 
   /**
-   * Subtracts one SafeUint from another.
+   * Subtracts two non-negative safe integers, returning `a - b` as a
+   * `SafeUint`.
    *
-   * @param a The minuend SafeUint.
-   * @param b The subtrahend SafeUint.
-   * @returns `a - b` clamped to [0, MAX_SAFE_INTEGER] as a SafeUint (minimum
-   *   0).
+   * @param a - The first non-negative safe integer
+   * @param b - The second non-negative safe integer
+   * @returns The difference of `a` and `b` as a `SafeUint`
    */
   sub,
 
   /**
-   * Multiplies two SafeUint values.
+   * Multiplies two non-negative safe integers, returning `a * b` as a
+   * `SafeUint`.
    *
-   * @param a The first SafeUint.
-   * @param b The second SafeUint.
-   * @returns `a * b` clamped to [0, MAX_SAFE_INTEGER] as a SafeUint.
+   * @param a - The first non-negative safe integer
+   * @param b - The second non-negative safe integer
+   * @returns The product of `a` and `b` as a `SafeUint`
    */
   mul,
 
   /**
-   * Divides one SafeUint by another using floor division.
+   * Divides two non-negative safe integers using floor division (`⌊a / b⌋`):
+   * the result is `a / b` rounded toward negative infinity, as a `SafeUint`.
    *
-   * @param a The dividend SafeUint.
-   * @param b The divisor SafeUint.
-   * @returns `⌊a / b⌋` clamped to [0, MAX_SAFE_INTEGER] as a SafeUint.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as a `SafeUint`
    */
   div,
 } as const;

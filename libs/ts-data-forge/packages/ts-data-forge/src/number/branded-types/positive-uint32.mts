@@ -34,132 +34,135 @@ const {
 } as const);
 
 /**
- * Checks if a number is a PositiveUint32 (32-bit positive unsigned integer in
- * the range [1, 2^32)).
+ * Type guard that checks if a value is a positive integer in [1, 2^32).
  *
- * @param value The value to check.
- * @returns `true` if the value is a PositiveUint32, `false` otherwise.
+ * Returns `true` for a positive integer in [1, 2^32) — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a positive integer in [1, 2^32), `false` otherwise
  */
 export const isPositiveUint32 = is;
 
 /**
- * Casts a number to a PositiveUint32 type.
+ * Casts a `number` to the `PositiveUint32` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a PositiveUint32 type.
- * @throws {TypeError} If the value is not a positive integer in [1, 2^32).
+ * Validates that the value is a positive integer in [1, 2^32) and returns it
+ * with the `PositiveUint32` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `PositiveUint32`
+ * @throws {TypeError} If the value is not a positive integer in [1, 2^32)
  */
 export const asPositiveUint32 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 32-bit positive
- * unsigned integers.
+ * Namespace providing type-safe operations for the `PositiveUint32` branded
+ * type.
  *
- * All operations automatically clamp results to the valid PositiveUint32 range
- * [1, 4294967295]. This ensures that all arithmetic maintains the 32-bit
- * positive unsigned integer constraint, with results below 1 clamped to
- * MIN_VALUE and overflow results clamped to MAX_VALUE.
+ * The `PositiveUint32` type represents a positive integer in [1, 2^32).
+ * Division (`div`) uses floor division.
  */
 export const PositiveUint32 = {
   /**
-   * Type guard to check if a value is a PositiveUint32.
+   * Type guard that checks if a value is a positive integer in [1, 2^32).
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a 32-bit positive unsigned integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a positive integer in [1, 2^32), `false` otherwise
+   * @see {@link isPositiveUint32} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a 32-bit positive unsigned integer.
-   *
-   * @readonly
+   * The smallest value representable as `PositiveUint32`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for a 32-bit positive unsigned integer.
-   *
-   * @readonly
+   * The largest value representable as `PositiveUint32`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two PositiveUint32 values.
+   * Returns the smallest of the given positive integers.
    *
-   * @param a The first PositiveUint32.
-   * @param b The second PositiveUint32.
-   * @returns The minimum value as a PositiveUint32.
+   * @param values - The positive integers to compare (at least one required)
+   * @returns The smallest value as a `PositiveUint32`
    */
   min: min_,
 
   /**
-   * Returns the larger of two PositiveUint32 values.
+   * Returns the largest of the given positive integers.
    *
-   * @param a The first PositiveUint32.
-   * @param b The second PositiveUint32.
-   * @returns The maximum value as a PositiveUint32.
+   * @param values - The positive integers to compare (at least one required)
+   * @returns The largest value as a `PositiveUint32`
    */
   max: max_,
 
   /**
-   * Clamps a number to the PositiveUint32 range.
+   * Clamps a `number` into the `PositiveUint32` range, rounding to the nearest
+   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [1, 4294967295] as a PositiveUint32.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `PositiveUint32`
    */
   clamp,
 
   /**
-   * Generates a random PositiveUint32 value within the valid range.
+   * Generates a random `PositiveUint32` within the given range.
    *
-   * @returns A random PositiveUint32 between 1 and 4294967295.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `PositiveUint32` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a PositiveUint32 to the power of another PositiveUint32.
+   * Raises `a` to the power `b`, returning `a ** b` as a `PositiveUint32`
+   * (floored to an integer).
    *
-   * @param a The base PositiveUint32.
-   * @param b The exponent PositiveUint32.
-   * @returns `a ** b` clamped to [1, 4294967295] as a PositiveUint32.
+   * @param a - The base positive integer
+   * @param b - The exponent positive integer
+   * @returns `a ** b` as a `PositiveUint32`
    */
   pow,
 
   /**
-   * Adds two PositiveUint32 values.
+   * Adds two positive integers, returning `a + b` as a `PositiveUint32`.
    *
-   * @param a The first PositiveUint32.
-   * @param b The second PositiveUint32.
-   * @returns `a + b` clamped to [1, 4294967295] as a PositiveUint32.
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The sum of `a` and `b` as a `PositiveUint32`
    */
   add,
 
   /**
-   * Subtracts one PositiveUint32 from another.
+   * Subtracts two positive integers, returning `a - b` as a `PositiveUint32`.
    *
-   * @param a The minuend PositiveUint32.
-   * @param b The subtrahend PositiveUint32.
-   * @returns `a - b` clamped to [1, 4294967295] as a PositiveUint32 (minimum
-   *   1).
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The difference of `a` and `b` as a `PositiveUint32`
    */
   sub,
 
   /**
-   * Multiplies two PositiveUint32 values.
+   * Multiplies two positive integers, returning `a * b` as a `PositiveUint32`.
    *
-   * @param a The first PositiveUint32.
-   * @param b The second PositiveUint32.
-   * @returns `a * b` clamped to [1, 4294967295] as a PositiveUint32.
+   * @param a - The first positive integer
+   * @param b - The second positive integer
+   * @returns The product of `a` and `b` as a `PositiveUint32`
    */
   mul,
 
   /**
-   * Divides one PositiveUint32 by another using floor division.
+   * Divides two positive integers using floor division (`⌊a / b⌋`): the result
+   * is `a / b` rounded toward negative infinity, as a `PositiveUint32`.
    *
-   * @param a The dividend PositiveUint32.
-   * @param b The divisor PositiveUint32.
-   * @returns `⌊a / b⌋` clamped to [1, 4294967295] as a PositiveUint32.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as a `PositiveUint32`
    */
   div,
 } as const;

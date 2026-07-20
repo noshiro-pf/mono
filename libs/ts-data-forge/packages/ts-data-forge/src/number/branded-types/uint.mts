@@ -33,7 +33,11 @@ const {
 } as const);
 
 /**
- * Checks if a number is a Uint.
+ * Type guard that checks if a value is a non-negative integer.
+ *
+ * Returns `true` for a non-negative integer — a value with no fractional
+ * component, including values outside the safe integer range (unlike
+ * `SafeInt`).
  *
  * @example
  *
@@ -45,13 +49,16 @@ const {
  * assert.isTrue(Uint.is(0));
  * ```
  *
- * @param value The value to check.
- * @returns `true` if the value is a Uint, `false` otherwise.
+ * @param value - The value to check
+ * @returns `true` if the value is a non-negative integer, `false` otherwise
  */
 export const isUint = is;
 
 /**
- * Casts a number to a Uint type.
+ * Casts a `number` to the `Uint` branded type.
+ *
+ * Validates that the value is a non-negative integer and returns it with the
+ * `Uint` brand. Throws a `TypeError` otherwise.
  *
  * @example
  *
@@ -63,22 +70,25 @@ export const isUint = is;
  * assert.isTrue(Uint.is(branded));
  * ```
  *
- * @param value The value to cast.
- * @returns The value as a Uint type.
- * @throws {TypeError} If the value is not a non-negative integer.
+ * @param value - The value to cast
+ * @returns The value as an `Uint`
+ * @throws {TypeError} If the value is not a non-negative integer
  */
 export const asUint = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for unsigned integers.
+ * Namespace providing type-safe operations for the `Uint` branded type.
  *
- * All operations maintain the non-negative constraint by clamping negative
- * results to 0. This ensures that all arithmetic preserves the unsigned integer
- * property.
+ * The `Uint` type represents a non-negative integer. Division (`div`) uses
+ * floor division.
+ *
+ * Unlike `SafeInt`, `Uint` allows values outside the safe integer range (±2^53
+ * − 1), so very large magnitudes may lose precision in JavaScript's `number`
+ * type.
  */
 export const Uint = {
   /**
-   * Type guard to check if a value is a Uint.
+   * Type guard that checks if a value is a non-negative integer.
    *
    * @example
    *
@@ -90,21 +100,19 @@ export const Uint = {
    * assert.isTrue(Uint.is(0));
    * ```
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a non-negative integer, `false` otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-negative integer, `false` otherwise
    * @see {@link isUint} for usage examples
    */
   is,
 
   /**
-   * The minimum value for an unsigned integer.
-   *
-   * @readonly
+   * The smallest value representable as `Uint`.
    */
   MIN_VALUE,
 
   /**
-   * Returns the smaller of two Uint values.
+   * Returns the smallest of the given non-negative integers.
    *
    * @example
    *
@@ -114,14 +122,13 @@ export const Uint = {
    * assert.isTrue(smallest === 3);
    * ```
    *
-   * @param a The first Uint.
-   * @param b The second Uint.
-   * @returns The minimum value as a Uint.
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The smallest value as an `Uint`
    */
   min: min_,
 
   /**
-   * Returns the larger of two Uint values.
+   * Returns the largest of the given non-negative integers.
    *
    * @example
    *
@@ -131,14 +138,14 @@ export const Uint = {
    * assert.isTrue(largest === 7);
    * ```
    *
-   * @param a The first Uint.
-   * @param b The second Uint.
-   * @returns The maximum value as a Uint.
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The largest value as an `Uint`
    */
   max: max_,
 
   /**
-   * Clamps a number to the Uint range (non-negative).
+   * Clamps a `number` into the `Uint` range, rounding to the nearest integer
+   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
    * @example
    *
@@ -152,13 +159,15 @@ export const Uint = {
    * assert.isTrue(clampedPositive === 42);
    * ```
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [0, +∞) as a Uint.
+   * @param value - The value to clamp
+   * @returns The clamped value as an `Uint`
    */
   clamp,
 
   /**
-   * Generates a random Uint value.
+   * Generates a random `Uint` within the given range.
+   *
+   * The range is inclusive on both ends.
    *
    * @example
    *
@@ -174,12 +183,15 @@ export const Uint = {
    * assert.isTrue(randomValue >= 0 && randomValue <= 3);
    * ```
    *
-   * @returns A random non-negative integer as a Uint.
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `Uint` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a Uint to the power of another Uint.
+   * Raises `a` to the power `b`, returning `a ** b` as an `Uint` (floored to an
+   * integer).
    *
    * @example
    *
@@ -193,14 +205,14 @@ export const Uint = {
    * assert.isTrue(power === 32);
    * ```
    *
-   * @param a The base Uint.
-   * @param b The exponent Uint.
-   * @returns `a ** b` clamped to [0, +∞) as a Uint.
+   * @param a - The base non-negative integer
+   * @param b - The exponent non-negative integer
+   * @returns `a ** b` as an `Uint`
    */
   pow,
 
   /**
-   * Adds two Uint values.
+   * Adds two non-negative integers, returning `a + b` as an `Uint`.
    *
    * @example
    *
@@ -210,14 +222,14 @@ export const Uint = {
    * assert.isTrue(sum === 13);
    * ```
    *
-   * @param a The first Uint.
-   * @param b The second Uint.
-   * @returns `a + b` clamped to [0, +∞) as a Uint.
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The sum of `a` and `b` as an `Uint`
    */
   add,
 
   /**
-   * Subtracts one Uint from another.
+   * Subtracts two non-negative integers, returning `a - b` as an `Uint`.
    *
    * @example
    *
@@ -227,14 +239,14 @@ export const Uint = {
    * assert.isTrue(difference === 0);
    * ```
    *
-   * @param a The minuend Uint.
-   * @param b The subtrahend Uint.
-   * @returns `a - b` clamped to [0, +∞) as a Uint (minimum 0).
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The difference of `a` and `b` as an `Uint`
    */
   sub,
 
   /**
-   * Multiplies two Uint values.
+   * Multiplies two non-negative integers, returning `a * b` as an `Uint`.
    *
    * @example
    *
@@ -244,14 +256,15 @@ export const Uint = {
    * assert.isTrue(product === 42);
    * ```
    *
-   * @param a The first Uint.
-   * @param b The second Uint.
-   * @returns `a * b` clamped to [0, +∞) as a Uint.
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The product of `a` and `b` as an `Uint`
    */
   mul,
 
   /**
-   * Divides one Uint by another using floor division.
+   * Divides two non-negative integers using floor division (`⌊a / b⌋`): the
+   * result is `a / b` rounded toward negative infinity, as an `Uint`.
    *
    * @example
    *
@@ -261,9 +274,9 @@ export const Uint = {
    * assert.isTrue(quotient === 2);
    * ```
    *
-   * @param a The dividend Uint.
-   * @param b The divisor Uint.
-   * @returns `⌊a / b⌋` clamped to [0, +∞) as a Uint.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as an `Uint`
    */
   div,
 } as const;

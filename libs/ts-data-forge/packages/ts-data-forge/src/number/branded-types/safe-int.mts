@@ -42,8 +42,7 @@ const {
 /**
  * Type guard that checks if a value is a safe integer.
  *
- * A safe integer is an integer that can be exactly represented in JavaScript
- * without precision loss. The range is [±(2^53 - 1)].
+ * Returns `true` for a safe integer — a value with no fractional component.
  *
  * @example
  *
@@ -61,11 +60,10 @@ const {
 export const isSafeInt = is;
 
 /**
- * Casts a number to a SafeInt branded type.
+ * Casts a `number` to the `SafeInt` branded type.
  *
- * This function validates that the input is a safe integer (within ±(2^53 - 1))
- * and returns it with the SafeInt brand. This ensures type safety for
- * operations that require precise integer arithmetic.
+ * Validates that the value is a safe integer and returns it with the `SafeInt`
+ * brand. Throws a `TypeError` otherwise.
  *
  * @example
  *
@@ -78,26 +76,16 @@ export const isSafeInt = is;
  * ```
  *
  * @param value - The value to cast
- * @returns The value as a SafeInt branded type
+ * @returns The value as a `SafeInt`
  * @throws {TypeError} If the value is not a safe integer
  */
 export const asSafeInt = castType;
 
 /**
- * Namespace providing type-safe operations for SafeInt branded types.
+ * Namespace providing type-safe operations for the `SafeInt` branded type.
  *
- * SafeInt represents integers that can be exactly represented in JavaScript's
- * number type without precision loss. The range is [±(2^53 - 1)], which covers
- * approximately ±9 quadrillion.
- *
- * All operations automatically clamp results to stay within the safe range,
- * preventing precision loss that occurs with larger integers. This makes
- * SafeInt ideal for:
- *
- * - Financial calculations requiring exact cents
- * - Database IDs and counters
- * - Array indices and sizes
- * - Any integer arithmetic requiring precision guarantees
+ * The `SafeInt` type represents a safe integer. Division (`div`) uses floor
+ * division.
  */
 export const SafeInt = {
   /**
@@ -120,24 +108,19 @@ export const SafeInt = {
   is,
 
   /**
-   * The minimum safe integer value (-(2^53 - 1)).
-   *
-   * @readonly
+   * The smallest value representable as `SafeInt`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum safe integer value (2^53 - 1).
-   *
-   * @readonly
+   * The largest value representable as `SafeInt`.
    */
   MAX_VALUE,
 
   /**
    * Returns the absolute value of a safe integer.
    *
-   * Note: `Math.abs(MIN_SAFE_INTEGER)` would exceed `MAX_SAFE_INTEGER`, so this
-   * function clamps the result to maintain the safe integer guarantee.
+   * The result is non-negative and keeps the `SafeInt` brand.
    *
    * @example
    *
@@ -152,12 +135,12 @@ export const SafeInt = {
    * ```
    *
    * @param a - The safe integer value
-   * @returns The absolute value as a SafeInt, clamped if necessary
+   * @returns The absolute value as a non-negative `SafeInt`
    */
   abs,
 
   /**
-   * Returns the minimum value from a list of safe integers.
+   * Returns the smallest of the given safe integers.
    *
    * @example
    *
@@ -168,12 +151,12 @@ export const SafeInt = {
    * ```
    *
    * @param values - The safe integers to compare (at least one required)
-   * @returns The smallest value as a SafeInt
+   * @returns The smallest value as a `SafeInt`
    */
   min: min_,
 
   /**
-   * Returns the maximum value from a list of safe integers.
+   * Returns the largest of the given safe integers.
    *
    * @example
    *
@@ -184,12 +167,13 @@ export const SafeInt = {
    * ```
    *
    * @param values - The safe integers to compare (at least one required)
-   * @returns The largest value as a SafeInt
+   * @returns The largest value as a `SafeInt`
    */
   max: max_,
 
   /**
-   * Clamps a number to the safe integer range.
+   * Clamps a `number` into the `SafeInt` range, rounding to the nearest integer
+   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
    * @example
    *
@@ -207,17 +191,15 @@ export const SafeInt = {
    * assert.isTrue(belowRange === Number.MIN_SAFE_INTEGER);
    * ```
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [MIN_SAFE_INTEGER, MAX_SAFE_INTEGER] as a
-   *   SafeInt.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `SafeInt`
    */
   clamp,
 
   /**
-   * Generates a random safe integer within the specified range (inclusive).
+   * Generates a random `SafeInt` within the given range.
    *
-   * The range is inclusive on both ends. If min > max, they are automatically
-   * swapped.
+   * The range is inclusive on both ends.
    *
    * @example
    *
@@ -235,12 +217,13 @@ export const SafeInt = {
    *
    * @param min - The minimum value (inclusive)
    * @param max - The maximum value (inclusive)
-   * @returns A random SafeInt in the range [min, max]
+   * @returns A random `SafeInt` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a SafeInt to the power of another SafeInt.
+   * Raises `a` to the power `b`, returning `a ** b` as a `SafeInt` (floored to
+   * an integer).
    *
    * @example
    *
@@ -256,14 +239,14 @@ export const SafeInt = {
    * assert.isTrue(SafeInt.is(power));
    * ```
    *
-   * @param a The base SafeInt.
-   * @param b The exponent SafeInt.
-   * @returns `a ** b` clamped to safe integer range as a SafeInt.
+   * @param a - The base safe integer
+   * @param b - The exponent safe integer
+   * @returns `a ** b` as a `SafeInt`
    */
   pow,
 
   /**
-   * Adds two SafeInt values.
+   * Adds two safe integers, returning `a + b` as a `SafeInt`.
    *
    * @example
    *
@@ -275,14 +258,14 @@ export const SafeInt = {
    * assert.isTrue(SafeInt.is(sum));
    * ```
    *
-   * @param a The first SafeInt.
-   * @param b The second SafeInt.
-   * @returns `a + b` clamped to safe integer range as a SafeInt.
+   * @param a - The first safe integer
+   * @param b - The second safe integer
+   * @returns The sum of `a` and `b` as a `SafeInt`
    */
   add,
 
   /**
-   * Subtracts one SafeInt from another.
+   * Subtracts two safe integers, returning `a - b` as a `SafeInt`.
    *
    * @example
    *
@@ -294,14 +277,14 @@ export const SafeInt = {
    * assert.isTrue(SafeInt.is(difference));
    * ```
    *
-   * @param a The minuend SafeInt.
-   * @param b The subtrahend SafeInt.
-   * @returns `a - b` clamped to safe integer range as a SafeInt.
+   * @param a - The first safe integer
+   * @param b - The second safe integer
+   * @returns The difference of `a` and `b` as a `SafeInt`
    */
   sub,
 
   /**
-   * Multiplies two SafeInt values.
+   * Multiplies two safe integers, returning `a * b` as a `SafeInt`.
    *
    * @example
    *
@@ -313,17 +296,15 @@ export const SafeInt = {
    * assert.isTrue(SafeInt.is(product));
    * ```
    *
-   * @param a The first SafeInt.
-   * @param b The second SafeInt.
-   * @returns `a * b` clamped to safe integer range as a SafeInt.
+   * @param a - The first safe integer
+   * @param b - The second safe integer
+   * @returns The product of `a` and `b` as a `SafeInt`
    */
   mul,
 
   /**
-   * Divides one SafeInt by another using floor division.
-   *
-   * Performs mathematical floor division: `⌊a / b⌋`. The divisor must be
-   * non-zero (enforced by type constraints).
+   * Divides two safe integers using floor division (`⌊a / b⌋`): the result is
+   * `a / b` rounded toward negative infinity, as a `SafeInt`.
    *
    * @example
    *
@@ -337,7 +318,7 @@ export const SafeInt = {
    *
    * @param a - The dividend
    * @param b - The divisor (must be non-zero)
-   * @returns The integer quotient as a SafeInt
+   * @returns The floored quotient as a `SafeInt`
    */
   div,
 } as const;

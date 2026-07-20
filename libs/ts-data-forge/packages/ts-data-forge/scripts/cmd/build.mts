@@ -67,6 +67,16 @@ const build = async (skipCheck: boolean): Promise<void> => {
     });
 
     await logStep({
+      startMessage: 'Generating branded-number modules',
+      action: () =>
+        runCmdStep(
+          'pnpm run gen:branded-number',
+          'Generating branded-number modules failed',
+        ),
+      successMessage: 'Branded-number modules generated',
+    });
+
+    await logStep({
       startMessage: 'Generating index files',
       action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
       successMessage: 'Index files generated',
