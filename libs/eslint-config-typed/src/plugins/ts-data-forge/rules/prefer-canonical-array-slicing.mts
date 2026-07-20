@@ -24,6 +24,8 @@ type MessageIds = 'preferCanonicalArraySlicing';
  * - `skip N` / `take N` — drop / keep the first `N` elements
  * - `skipLast N` / `takeLast N` — drop / keep the last `N` elements
  * - `toUnshifted item` / `toPushed item` — prepend / append one element
+ *   (`toUnshifted` is emitted in its curried form `toUnshifted(item)(xs)` so
+ *   the new element keeps the leading position it had in `[item, ...xs]`)
  */
 type CopyOp = Readonly<
   | { fn: 'butLast' | 'tail' }
@@ -286,9 +288,14 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         case 'takeLast':
           return `${arrRef}.${op.fn}(${xsText}, ${op.count})`;
 
+        // Emit the curried form for `toUnshifted` so the new element stays in
+        // the same textual position as in the `[item, ...xs]` source, keeping
+        // the rewrite easy to read.
         case 'toUnshifted':
+          return `${arrRef}.toUnshifted(${op.itemText})(${xsText})`;
+
         case 'toPushed':
-          return `${arrRef}.${op.fn}(${xsText}, ${op.itemText})`;
+          return `${arrRef}.toPushed(${xsText}, ${op.itemText})`;
       }
     };
 

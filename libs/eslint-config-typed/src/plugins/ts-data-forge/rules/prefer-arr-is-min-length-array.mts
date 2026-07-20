@@ -1,10 +1,9 @@
+import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import {
-  AST_NODE_TYPES,
-  type TSESLint,
-  type TSESTree,
-} from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
-import { isIntegerLiteralOrConstant } from './ast-utils.mjs';
+  isIntegerLiteralOrConstant,
+  isLengthAccess,
+  isPartOfBoundedLengthCheck,
+} from './ast-utils.mjs';
 import {
   buildImportFixes,
   getNamedImports,
@@ -13,9 +12,9 @@ import {
 
 type Options = readonly [];
 
-type MessageIds = 'useIsArrayOfLength';
+type MessageIds = 'useIsMinLengthArray';
 
-export const preferArrIsArrayOfLength: TSESLint.RuleModule<
+export const preferArrIsMinLengthArray: TSESLint.RuleModule<
   MessageIds,
   Options
 > = {
@@ -23,13 +22,13 @@ export const preferArrIsArrayOfLength: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Replace `xs.length === n` with `Arr.isArrayOfLength(xs, n)` from ts-data-forge.',
+        'Replace `xs.length >= n` with `Arr.isMinLengthArray(xs, n)` from ts-data-forge.',
     },
     fixable: 'code',
     schema: [],
     messages: {
-      useIsArrayOfLength:
-        'Replace `{{original}}` with `Arr.isArrayOfLength({{arrayName}}, {{length}})` from ts-data-forge.',
+      useIsMinLengthArray:
+        'Replace `{{original}}` with `Arr.isMinLengthArray({{arrayName}}, {{length}})` from ts-data-forge.',
     },
   },
 
@@ -46,22 +45,25 @@ export const preferArrIsArrayOfLength: TSESLint.RuleModule<
       node: TSESTree.BinaryExpression;
       arrayExpression: TSESTree.Expression;
       lengthExpression: TSESTree.Expression;
-      isNegated: boolean;
     }[] = [];
 
     return {
       BinaryExpression: (node) => {
-        // Check for `xs.length === n` or `n === xs.length` or `xs.length !== n`
-        if (node.operator !== '===' && node.operator !== '!==') return;
+        // Check for `xs.length >= n` or `n <= xs.length`
+        if (node.operator !== '>=' && node.operator !== '<=') return;
 
-        const isNegated = node.operator === '!==';
+        // Defer to `prefer-arr-is-bounded-length-array` when this comparison is
+        // the lower bound of a `min && max` pair on the same array.
+        if (isPartOfBoundedLengthCheck(node, sourceCode)) return;
 
-        const isLengthOnLeft = isLengthAccess(node.left);
+        // xs.length >= n  or  n <= xs.length
+        const isLengthOnLeft = node.operator === '>=';
 
         const lengthSide = node[isLengthOnLeft ? 'left' : 'right'];
 
         const valueSide = node[isLengthOnLeft ? 'right' : 'left'];
 
+        // Check if lengthSide is accessing .length
         if (!isLengthAccess(lengthSide)) return;
 
         // Only match integer literals or const variables initialized with integer literals
@@ -95,7 +97,6 @@ export const preferArrIsArrayOfLength: TSESLint.RuleModule<
           node,
           arrayExpression,
           lengthExpression: valueSide,
-          isNegated,
         });
       },
       'Program:exit': () => {
@@ -105,7 +106,7 @@ export const preferArrIsArrayOfLength: TSESLint.RuleModule<
 
         for (const [
           index,
-          { node, arrayExpression, lengthExpression, isNegated },
+          { node, arrayExpression, lengthExpression },
         ] of mut_nodesToFix.entries()) {
           const arrayText = sourceCode.getText(arrayExpression);
 
@@ -115,16 +116,14 @@ export const preferArrIsArrayOfLength: TSESLint.RuleModule<
 
           context.report({
             node,
-            messageId: 'useIsArrayOfLength',
+            messageId: 'useIsMinLengthArray',
             data: {
               original: originalText,
               arrayName: arrayText,
               length: lengthText,
             },
             fix: (fixer) => {
-              const baseCall = `Arr.isArrayOfLength(${arrayText}, ${lengthText})`;
-
-              const replacement = isNegated ? `!${baseCall}` : baseCall;
+              const replacement = `Arr.isMinLengthArray(${arrayText}, ${lengthText})`;
 
               const importFixes =
                 index === 0 && !hasArrImport
@@ -140,10 +139,3 @@ export const preferArrIsArrayOfLength: TSESLint.RuleModule<
   },
   defaultOptions: [],
 } as const;
-
-const isLengthAccess = (
-  node: DeepReadonly<TSESTree.Expression>,
-): node is TSESTree.MemberExpression =>
-  node.type === AST_NODE_TYPES.MemberExpression &&
-  node.property.type === AST_NODE_TYPES.Identifier &&
-  node.property.name === 'length';

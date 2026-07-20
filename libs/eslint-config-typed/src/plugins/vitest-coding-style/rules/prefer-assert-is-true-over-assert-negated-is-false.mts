@@ -30,7 +30,7 @@ export const preferAssertIsTrueOverNegatedAssertIsFalseRule: TSESLint.RuleModule
         node.callee.object.name === 'assert' &&
         node.callee.property.type === AST_NODE_TYPES.Identifier &&
         node.callee.property.name === 'isFalse' &&
-        Arr.isArrayOfLength(node.arguments, 1)
+        Arr.isFixedLengthTuple(node.arguments, 1)
       ) {
         const [arg] = node.arguments;
 

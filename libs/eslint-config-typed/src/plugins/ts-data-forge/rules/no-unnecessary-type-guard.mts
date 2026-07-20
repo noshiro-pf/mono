@@ -53,13 +53,19 @@ type GuardSpec = DeepReadonly<
 
 /**
  * Internal marker property attached to every `ts-type-forge` branded type. Its
- * presence (together with the brand key) lets us recognize a `NonEmptyString`
- * without holding a reference to the type itself.
+ * presence (together with the `MinLength` brand key) lets us recognize a
+ * `NonEmptyString` without holding a reference to the type itself.
  */
 const BRAND_MARKER_PROPERTY =
   'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3';
 
-const NON_EMPTY_STRING_BRAND_KEY = 'NonEmptyString';
+/**
+ * Brand key carried by `MinLengthString<N>` — and therefore by
+ * `NonEmptyString = MinLengthString<1>`. Its value is `MinLengthTuple<N, 0>`, a
+ * tuple of `0`s with at least `N` elements, so a required first element means
+ * `N >= 1` (the string cannot be empty).
+ */
+const MIN_LENGTH_BRAND_KEY = 'MinLength';
 
 const NULLISH_REPLACEMENTS_EXCLUDE: Readonly<Record<string, string>> = {
   undefined: 'isNotUndefined',
@@ -357,7 +363,11 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
                 break;
               }
 
-              if (!nonNullishParts.every(isGuaranteedNonEmptyString)) {
+              if (
+                nonNullishParts.some(
+                  (p) => !isGuaranteedNonEmptyString(p, checker),
+                )
+              ) {
                 break; // still does real string/empty work
               }
 
@@ -446,15 +456,28 @@ const joinAtoms = (atoms: readonly AtomKey[]): string =>
 
 /**
  * Returns `true` when the type is guaranteed to be a non-empty string: either a
- * non-empty string literal or a value branded as `NonEmptyString`.
+ * non-empty string literal or a value branded as `NonEmptyString`
+ * (`MinLengthString<N>` with `N >= 1`).
  */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const isGuaranteedNonEmptyString = (type: ts.Type): boolean => {
+const isGuaranteedNonEmptyString = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean => {
   if (type.isStringLiteral()) return type.value !== '';
 
+  if (type.getProperty(BRAND_MARKER_PROPERTY) === undefined) return false;
+
+  const minLengthSymbol = type.getProperty(MIN_LENGTH_BRAND_KEY);
+
+  if (minLengthSymbol === undefined) return false;
+
+  // The `MinLength` brand value is `MinLengthTuple<N, 0>`; it has a required
+  // first element (`'0'`) exactly when `N >= 1`, i.e. the string is non-empty.
+  // `MinLengthString<0>` brands with a plain array and has no such element.
   return (
-    type.getProperty(NON_EMPTY_STRING_BRAND_KEY) !== undefined &&
-    type.getProperty(BRAND_MARKER_PROPERTY) !== undefined
+    checker.getTypeOfSymbol(minLengthSymbol).getProperty('0') !== undefined
   );
 };
 

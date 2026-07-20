@@ -50,7 +50,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
         if (
           node.init?.type !== AST_NODE_TYPES.VariableDeclaration ||
           node.init.kind !== 'let' ||
-          !Arr.isArrayOfLength(node.init.declarations, 1)
+          !Arr.isFixedLengthTuple(node.init.declarations, 1)
         ) {
           return;
         }

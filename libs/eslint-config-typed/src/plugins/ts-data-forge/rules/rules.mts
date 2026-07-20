@@ -1,8 +1,10 @@
 import { type ESLintPlugin } from '../../../types/index.mjs';
 import { noUnnecessaryTypeGuard } from './no-unnecessary-type-guard.mjs';
-import { preferArrIsArrayAtLeastLength } from './prefer-arr-is-array-at-least-length.mjs';
-import { preferArrIsArrayOfLength } from './prefer-arr-is-array-of-length.mjs';
 import { preferArrIsArray } from './prefer-arr-is-array.mjs';
+import { preferArrIsBoundedLengthArray } from './prefer-arr-is-bounded-length-array.mjs';
+import { preferArrIsFixedLengthArray } from './prefer-arr-is-fixed-length-array.mjs';
+import { preferArrIsMaxLengthArray } from './prefer-arr-is-max-length-array.mjs';
+import { preferArrIsMinLengthArray } from './prefer-arr-is-min-length-array.mjs';
 import { preferArrIsNonEmpty } from './prefer-arr-is-non-empty.mjs';
 import { preferArrSum } from './prefer-arr-sum.mjs';
 import { preferAsInt } from './prefer-as-int.mjs';
@@ -16,8 +18,10 @@ import { preferRangeForLoop } from './prefer-range-for-loop.mjs';
 
 export const tsDataForgeRules = {
   'prefer-canonical-array-slicing': preferCanonicalArraySlicing,
-  'prefer-arr-is-array-at-least-length': preferArrIsArrayAtLeastLength,
-  'prefer-arr-is-array-of-length': preferArrIsArrayOfLength,
+  'prefer-arr-is-min-length-array': preferArrIsMinLengthArray,
+  'prefer-arr-is-max-length-array': preferArrIsMaxLengthArray,
+  'prefer-arr-is-bounded-length-array': preferArrIsBoundedLengthArray,
+  'prefer-arr-is-fixed-length-array': preferArrIsFixedLengthArray,
   'prefer-arr-is-array': preferArrIsArray,
   'prefer-arr-is-non-empty': preferArrIsNonEmpty,
   'prefer-arr-sum': preferArrSum,

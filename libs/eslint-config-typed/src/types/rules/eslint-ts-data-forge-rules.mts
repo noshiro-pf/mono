@@ -23,7 +23,7 @@ namespace PreferCanonicalArraySlicing {
 }
 
 /**
- * @description Replace `xs.length >= n` with `Arr.isArrayAtLeastLength(xs, n)` from ts-data-forge.
+ * @description Replace `xs.length >= n` with `Arr.isMinLengthArray(xs, n)` from ts-data-forge.
  *
  *  ```md
  *  | key        | value      |
@@ -33,12 +33,12 @@ namespace PreferCanonicalArraySlicing {
  *  | fixable    | code       |
  *  ```
  */
-namespace PreferArrIsArrayAtLeastLength {
+namespace PreferArrIsMinLengthArray {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 /**
- * @description Replace `xs.length === n` with `Arr.isArrayOfLength(xs, n)` from ts-data-forge.
+ * @description Replace `xs.length <= n` with `Arr.isMaxLengthArray(xs, n)` from ts-data-forge.
  *
  *  ```md
  *  | key        | value      |
@@ -48,7 +48,37 @@ namespace PreferArrIsArrayAtLeastLength {
  *  | fixable    | code       |
  *  ```
  */
-namespace PreferArrIsArrayOfLength {
+namespace PreferArrIsMaxLengthArray {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Replace `xs.length >= min && xs.length <= max` with `Arr.isBoundedLengthArray(xs, min, max)` from ts-data-forge.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferArrIsBoundedLengthArray {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Replace `xs.length === n` with `Arr.isFixedLengthArray(xs, n)` from ts-data-forge.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferArrIsFixedLengthArray {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -250,8 +280,10 @@ namespace PreferComparisonOverNullishGuard {
 
 export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-canonical-array-slicing': PreferCanonicalArraySlicing.RuleEntry;
-  'ts-data-forge/prefer-arr-is-array-at-least-length': PreferArrIsArrayAtLeastLength.RuleEntry;
-  'ts-data-forge/prefer-arr-is-array-of-length': PreferArrIsArrayOfLength.RuleEntry;
+  'ts-data-forge/prefer-arr-is-min-length-array': PreferArrIsMinLengthArray.RuleEntry;
+  'ts-data-forge/prefer-arr-is-max-length-array': PreferArrIsMaxLengthArray.RuleEntry;
+  'ts-data-forge/prefer-arr-is-bounded-length-array': PreferArrIsBoundedLengthArray.RuleEntry;
+  'ts-data-forge/prefer-arr-is-fixed-length-array': PreferArrIsFixedLengthArray.RuleEntry;
   'ts-data-forge/prefer-arr-is-array': PreferArrIsArray.RuleEntry;
   'ts-data-forge/prefer-arr-is-non-empty': PreferArrIsNonEmpty.RuleEntry;
   'ts-data-forge/prefer-arr-sum': PreferArrSum.RuleEntry;

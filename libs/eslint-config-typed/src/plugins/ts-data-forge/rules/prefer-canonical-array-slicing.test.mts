@@ -446,7 +446,7 @@ describe('prefer-canonical-array-slicing', () => {
       },
       // ---- toUnshifted ----
       {
-        name: '[v, ...xs] → Arr.toUnshifted(xs, v)',
+        name: '[v, ...xs] → Arr.toUnshifted(v)(xs)',
         code: dedent`
           declare const xs: readonly number[];
           declare const v: number;
@@ -456,12 +456,12 @@ describe('prefer-canonical-array-slicing', () => {
           import { Arr } from 'ts-data-forge';
           declare const xs: readonly number[];
           declare const v: number;
-          const ys = Arr.toUnshifted(xs, v);
+          const ys = Arr.toUnshifted(v)(xs);
         `,
         errors: [{ messageId: 'preferCanonicalArraySlicing' }],
       },
       {
-        name: '[v].concat(xs) → Arr.toUnshifted(xs, v)',
+        name: '[v].concat(xs) → Arr.toUnshifted(v)(xs)',
         code: dedent`
           declare const xs: readonly number[];
           declare const v: number;
@@ -471,12 +471,12 @@ describe('prefer-canonical-array-slicing', () => {
           import { Arr } from 'ts-data-forge';
           declare const xs: readonly number[];
           declare const v: number;
-          const ys = Arr.toUnshifted(xs, v);
+          const ys = Arr.toUnshifted(v)(xs);
         `,
         errors: [{ messageId: 'preferCanonicalArraySlicing' }],
       },
       {
-        name: 'xs.toSpliced(0, 0, v) → Arr.toUnshifted(xs, v)',
+        name: 'xs.toSpliced(0, 0, v) → Arr.toUnshifted(v)(xs)',
         code: dedent`
           declare const xs: readonly number[];
           declare const v: number;
@@ -486,7 +486,7 @@ describe('prefer-canonical-array-slicing', () => {
           import { Arr } from 'ts-data-forge';
           declare const xs: readonly number[];
           declare const v: number;
-          const ys = Arr.toUnshifted(xs, v);
+          const ys = Arr.toUnshifted(v)(xs);
         `,
         errors: [{ messageId: 'preferCanonicalArraySlicing' }],
       },

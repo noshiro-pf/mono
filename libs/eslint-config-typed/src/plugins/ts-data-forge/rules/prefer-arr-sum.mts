@@ -61,7 +61,7 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
         const arrayExpression = node.callee.object;
 
         // Check if we have 2 arguments: reducer function and initial value 0
-        if (!Arr.isArrayOfLength(node.arguments, 2)) return;
+        if (!Arr.isFixedLengthTuple(node.arguments, 2)) return;
 
         const reducer = node.arguments[0];
 
@@ -78,7 +78,7 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
         // Check if reducer is an arrow function with 2 parameters
         if (
           reducer.type !== AST_NODE_TYPES.ArrowFunctionExpression ||
-          !Arr.isArrayOfLength(reducer.params, 2)
+          !Arr.isFixedLengthTuple(reducer.params, 2)
         ) {
           return;
         }

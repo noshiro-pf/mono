@@ -96,7 +96,7 @@ export const strictDependenciesRule: TSESLint.RuleModule<
 
     const dependencies: Dependencies = ruleOptions[0];
 
-    const options: Options = Arr.isArrayAtLeastLength(ruleOptions, 2)
+    const options: Options = Arr.isMinLengthTuple(ruleOptions, 2)
       ? ruleOptions[1]
       : {};
 

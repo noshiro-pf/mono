@@ -59,7 +59,7 @@ import { noop } from './noop.mjs';
 {
   const xs = [0, 0, 0] as readonly number[];
 
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-of-length
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-fixed-length-array
   if (xs.length === 3) {
     noop(xs);
   }
@@ -68,7 +68,7 @@ import { noop } from './noop.mjs';
 {
   const xs = [0, 0, 0] as readonly number[];
 
-  // eslint-disable-next-line ts-data-forge/prefer-arr-is-array-at-least-length
+  // eslint-disable-next-line ts-data-forge/prefer-arr-is-min-length-array
   if (xs.length >= 3) {
     noop(xs);
   }

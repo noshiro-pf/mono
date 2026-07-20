@@ -48,6 +48,100 @@ export const isIntegerLiteralOrConstant = (
   return isIntegerLiteral(def.node.init);
 };
 
+export const isLengthAccess = (
+  node: DeepReadonly<TSESTree.Expression>,
+): node is TSESTree.MemberExpression =>
+  node.type === AST_NODE_TYPES.MemberExpression &&
+  node.property.type === AST_NODE_TYPES.Identifier &&
+  node.property.name === 'length';
+
+type LengthComparison = Readonly<{
+  array: TSESTree.Expression;
+  bound: TSESTree.Expression;
+  kind: 'max' | 'min';
+}>;
+
+/**
+ * Parses a `<array>.length <op> <bound>` comparison (in either operand order)
+ * into its array expression, integer-literal/`const` `bound`, and whether it is
+ * a lower (`min`) or upper (`max`) length bound. Returns `undefined` for
+ * anything else.
+ *
+ * - `xs.length >= n` / `n <= xs.length` → `min`
+ * - `xs.length <= n` / `n >= xs.length` → `max`
+ */
+export const parseLengthComparison = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Expression,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+): LengthComparison | undefined => {
+  if (
+    node.type !== AST_NODE_TYPES.BinaryExpression ||
+    (node.operator !== '>=' && node.operator !== '<=')
+  ) {
+    return undefined;
+  }
+
+  const { left, right, operator } = node;
+
+  const lengthOnLeft = isLengthAccess(left);
+
+  const lengthSide = lengthOnLeft ? left : right;
+
+  const boundSide = lengthOnLeft ? right : left;
+
+  if (!isLengthAccess(lengthSide)) return undefined;
+
+  if (!isIntegerLiteralOrConstant(boundSide, sourceCode)) return undefined;
+
+  const kind: LengthComparison['kind'] = (
+    lengthOnLeft ? operator === '>=' : operator === '<='
+  )
+    ? 'min'
+    : 'max';
+
+  return { array: lengthSide.object, bound: boundSide, kind };
+};
+
+/**
+ * `true` when `node` is one operand of an `a && b` whose other operand is the
+ * complementary length bound (`min` vs `max`) on the same array — i.e. the two
+ * together form the `Arr.isBoundedLengthArray` pattern handled by
+ * `prefer-arr-is-bounded-length-array`. The single-bound rules skip such
+ * operands so the bounded rule rewrites the whole `&&` instead of the parts.
+ */
+export const isPartOfBoundedLengthCheck = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.BinaryExpression,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+): boolean => {
+  const { parent } = node;
+
+  if (
+    parent.type !== AST_NODE_TYPES.LogicalExpression ||
+    parent.operator !== '&&'
+  ) {
+    return false;
+  }
+
+  const self = parseLengthComparison(node, sourceCode);
+
+  if (self === undefined) return false;
+
+  const sibling = parent.left === node ? parent.right : parent.left;
+
+  const other = parseLengthComparison(sibling, sourceCode);
+
+  if (other === undefined) return false;
+
+  return (
+    self.kind !== other.kind &&
+    sourceCode.getText(self.array) === sourceCode.getText(other.array)
+  );
+};
+
 type VariableDefinition = Readonly<{
   type: string;
   parent: TSESTree.VariableDeclaration;
