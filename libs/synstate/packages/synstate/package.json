@@ -62,7 +62,7 @@
     "z:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
   },
   "dependencies": {
-    "ts-data-forge": "^6.10.0",
+    "ts-data-forge": "^9.0.1",
     "ts-type-forge": "^3.1.0"
   },
   "devDependencies": {
