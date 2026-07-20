@@ -1,3 +1,17 @@
+# [11.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v10.0.0...v11.0.0) (2026-07-20)
+
+- feat!: adopt brand-based NonEmptyArray from ts-type-forge / ts-data-forge ([#345](https://github.com/noshiro-pf/ts-fortress/issues/345)) ([950b5eb](https://github.com/noshiro-pf/ts-fortress/commit/950b5eb88f27a6f9c2f513f6dec94dd1c552eb64))
+
+### BREAKING CHANGES
+
+- `nonEmptyArray(elementType)` now yields the brand-based
+  `NonEmptyArray` value type (like the other branded array validators); a branded
+  non-empty array is obtained through validation / cast rather than a plain array
+  literal. Requires `ts-type-forge@^7.0.0` and `ts-data-forge@^11.0.0`.
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_017TbKfKmkWsYMtbb1Ef6e1t
+
 # [10.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v9.2.1...v10.0.0) (2026-07-17)
 
 ### Features
