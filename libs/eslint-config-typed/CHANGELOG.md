@@ -1,3 +1,9 @@
+## [5.6.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.0...v5.6.1) (2026-07-20)
+
+### Bug Fixes
+
+- remove deprecated eslintConfigForTsDataForge from plugins defini… ([#383](https://github.com/noshiro-pf/eslint-config-typed/issues/383)) ([5de9552](https://github.com/noshiro-pf/eslint-config-typed/commit/5de9552cf61370bbb68d7634285d5a9154b42a86))
+
 # [5.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.5.1...v5.6.0) (2026-07-20)
 
 ### Features
