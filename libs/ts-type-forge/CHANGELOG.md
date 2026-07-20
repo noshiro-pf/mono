@@ -1,3 +1,9 @@
+# [7.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v7.0.0...v7.1.0) (2026-07-20)
+
+### Features
+
+- add IsAny/IsUnknown, fix general-array tuple ops, hide internal… ([#425](https://github.com/noshiro-pf/ts-type-forge/issues/425)) ([5d91fe2](https://github.com/noshiro-pf/ts-type-forge/commit/5d91fe2c7faf2784caacb9e93628bcdc540fb90b))
+
 # [7.0.0](https://github.com/noshiro-pf/ts-type-forge/compare/v6.1.0...v7.0.0) (2026-07-18)
 
 ### Features
