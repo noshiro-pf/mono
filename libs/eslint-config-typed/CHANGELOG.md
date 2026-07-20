@@ -1,3 +1,9 @@
+# [5.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.4.2...v5.5.0) (2026-07-20)
+
+### Features
+
+- **ts-data-forge:** update custom plugin for ts-data-forge v10 ([#373](https://github.com/noshiro-pf/eslint-config-typed/issues/373)) ([3689d25](https://github.com/noshiro-pf/eslint-config-typed/commit/3689d2517dfec3910658144ccbd0a505e120e485))
+
 ## [5.4.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.4.1...v5.4.2) (2026-07-13)
 
 ### Bug Fixes
