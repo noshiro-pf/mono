@@ -7,7 +7,6 @@
     // functioning in 7.0. "downlevelIteration" is a no-op with
     // "target": "ESNext", and "importsNotUsedAsValues": "remove" was the
     // default behavior.
-    "importHelpers": true,
     "newLine": "lf",
     "noEmit": false,
     "noEmitOnError": true,

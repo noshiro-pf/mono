@@ -13,6 +13,13 @@ updates:
     commit-message:
       prefix: 'fix'
       prefix-development: 'chore'
+    ignore:
+      # "typescript" must stay on 6.x: TypeScript 7 (installed separately
+      # under the "typescript-native" alias) no longer ships the JS compiler
+      # API required by typescript-eslint, typedoc, and
+      # prettier-plugin-organize-imports. See scripts/cmd/build.mts.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'github-actions'
     directory: '/'

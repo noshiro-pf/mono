@@ -39,7 +39,7 @@
   keys (e.g. `UnwrapBrandTrueKeys`), will observe a different brand shape.
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_01VfbfUoEnhGNsnmmbb8w9TB
+Claude-Session: <https://claude.ai/code/session_01VfbfUoEnhGNsnmmbb8w9TB>
 
 - refactor: re-organize src files
 

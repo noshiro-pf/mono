@@ -36,6 +36,8 @@
     "LICENSE"
   ],
   "scripts": {
+    "agents:gen": "tsx ./scripts/cmd/gen-agents-md.mts",
+    "agents:sync": "tsx ./scripts/cmd/sync-agent-config.mts",
     "build": "tsx ./scripts/cmd/build.mts",
     "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
     "check:ext": "tsx ./scripts/cmd/check-ext.mts",
@@ -84,10 +86,8 @@
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.1",
     "@types/node": "26.1.1",
-    "cmd-ts": "0.15.0",
     "conventional-changelog-conventionalcommits": "10.2.1",
     "cspell": "10.0.1",
-    "dedent": "1.7.2",
     "eslint": "10.7.0",
     "eslint-config-typed": "5.4.2",
     "github-settings-as-code": "1.2.9",
@@ -103,7 +103,6 @@
     "ts-data-forge": "10.0.0",
     "ts-fortress": "10.0.0",
     "ts-repo-utils": "10.1.2",
-    "tslib": "2.8.1",
     "tsx": "4.23.0",
     "typedoc": "0.28.20",
     "typedoc-github-theme": "0.4.0",
@@ -118,5 +117,9 @@
   },
   "volta": {
     "node": "26.3.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
