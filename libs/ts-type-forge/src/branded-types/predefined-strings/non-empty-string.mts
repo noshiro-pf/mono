@@ -14,6 +14,7 @@ import { type MinLengthString } from './length-constrained-string.mjs';
  * const isNonEmptyString = (s: string): s is NonEmptyString => s.length > 0;
  *
  * const greeting = 'hello' as NonEmptyString;
+ *
  * const atLeastOne: MinLengthString<0> = greeting; // OK
  * ```
  */

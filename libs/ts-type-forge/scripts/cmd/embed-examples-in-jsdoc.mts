@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
-import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
+import { formatFiles, glob, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
 import { extractSampleCode } from './embed-examples-utils.mjs';
@@ -15,11 +15,21 @@ const codeBlockEnd = '```';
  * src files. Replaces code blocks sequentially in the order defined in
  * sourceFileMappings, so sample files must be listed in the order their
  * `@example` blocks appear in the source file.
+ *
+ * Fails if a src file contains a ```ts code block but is not listed in
+ * sourceFileMappings, so that every example is backed by a type-checked
+ * sample file in samples/src.
  */
 export const embedExamplesInJsDoc = async (): Promise<
   Result<undefined, unknown>
 > => {
   try {
+    const coverageResult = await assertAllCodeBlocksAreMapped();
+
+    if (Result.isErr(coverageResult)) {
+      return coverageResult;
+    }
+
     const mut_modifiedFiles: string[] = [];
 
     for (const { sampleFiles, sourcePath } of sourceFileMappings) {
@@ -127,6 +137,63 @@ export const embedExamplesInJsDoc = async (): Promise<
       `❌ Failed to embed JSDoc examples: ${unknownToString(error)}`,
     );
   }
+};
+
+/**
+ * Verifies that every src module containing a ```ts code block is listed in
+ * sourceFileMappings (i.e. its `@example` blocks are sourced from
+ * type-checked sample files under samples/src). Generated files
+ * (index.mts / global.mts / entry-point.mts) and tests are exempt.
+ */
+const assertAllCodeBlocksAreMapped = async (): Promise<
+  Result<undefined, string>
+> => {
+  const filesResult = await glob(path.resolve(projectRootPath, 'src/**/*.mts'));
+
+  if (Result.isErr(filesResult)) {
+    return Result.err(unknownToString(filesResult.value));
+  }
+
+  const mappedSourcePaths = new Set<string>(
+    sourceFileMappings.map(({ sourcePath }) =>
+      path.resolve(projectRootPath, sourcePath),
+    ),
+  );
+
+  const mut_unmappedFiles: string[] = [];
+
+  for (const filePath of filesResult.value) {
+    if (
+      filePath.endsWith('.test.mts') ||
+      path.basename(filePath) === 'index.mts' ||
+      path.basename(filePath) === 'global.mts' ||
+      path.basename(filePath) === 'entry-point.mts' ||
+      mappedSourcePaths.has(filePath)
+    ) {
+      continue;
+    }
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const content = await fs.readFile(filePath, 'utf8');
+
+    if (content.includes(codeBlockStart)) {
+      mut_unmappedFiles.push(path.relative(projectRootPath, filePath));
+    }
+  }
+
+  if (mut_unmappedFiles.length > 0) {
+    return Result.err(
+      [
+        `❌ Found ${mut_unmappedFiles.length} src file(s) containing \`\`\`ts code blocks`,
+        'that are not sourced from samples/src (missing from sourceFileMappings in',
+        'scripts/cmd/embed-examples-in-jsdoc-map.mts):',
+        ...mut_unmappedFiles.toSorted().map((p) => `  - ${p}`),
+        'Create sample files under samples/src and add mapping entries for them.',
+      ].join('\n'),
+    );
+  }
+
+  return Result.ok(undefined);
 };
 
 if (isDirectlyExecuted(import.meta.url)) {

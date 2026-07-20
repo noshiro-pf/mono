@@ -20,16 +20,22 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts"
+        "types": "./dist/entry-point.d.mts"
+      },
+      "default": {
+        "types": "./dist/entry-point.d.mts"
       }
     },
     "./global": {
       "import": {
         "types": "./dist/global.d.mts"
+      },
+      "default": {
+        "types": "./dist/global.d.mts"
       }
     }
   },
-  "types": "./dist/index.d.mts",
+  "types": "./dist/entry-point.d.mts",
   "files": [
     "dist",
     "README.md",
@@ -43,6 +49,9 @@
     "check:ext": "tsx ./scripts/cmd/check-ext.mts",
     "check-all": "tsx ./scripts/cmd/check-all.mts",
     "codemod": "run-s codemod:uncommitted:as-const fmt codemod:uncommitted:readonly fmt",
+    "codemod:diff": "run-s codemod:diff:as-const fmt codemod:diff:readonly fmt",
+    "codemod:diff:as-const": "append-as-const --diff-from origin/main '{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:diff:readonly": "convert-to-readonly --diff-from origin/main '{scripts,test}/**/*.{mts,tsx}'",
     "codemod:full": "run-s codemod:full:as-const fmt codemod:full:readonly fmt",
     "codemod:full:as-const": "append-as-const '{scripts,test}/**/*.{mts,tsx}'",
     "codemod:full:readonly": "convert-to-readonly '{scripts,test}/**/*.{mts,tsx}'",
@@ -65,13 +74,11 @@
     "gh:backup-repository-settings": "gh-backup-repository-settings",
     "gh:backup-rulesets": "gh-backup-rulesets",
     "gi": "run-s gi:src fmt",
-    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude '*.test.mts' --exclude global.mts",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude '*.test.mts' --exclude global.mts --exclude entry-point.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
     "test": "run-p test:*",
-    "test:ambient": "node ./node_modules/typescript-native/bin/tsc --noEmit -p ./test/imports/tsconfig.ambient.json",
-    "test:named": "node ./node_modules/typescript-native/bin/tsc --noEmit -p ./test/imports/tsconfig.named.json",
     "test:src": "node ./node_modules/typescript-native/bin/tsc --noEmit -p ./tsconfig.json",
     "tsc": "run-p test:*",
     "tscw": "node ./node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
@@ -110,7 +117,7 @@
     "typescript-native": "npm:typescript@7.0.2",
     "vite": "8.1.4"
   },
-  "packageManager": "pnpm@11.14.0",
+  "packageManager": "pnpm@11.15.1",
   "engines": {
     "node": ">=22.22.2",
     "pnpm": ">=9.0.0"

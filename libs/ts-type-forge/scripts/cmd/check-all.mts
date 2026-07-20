@@ -38,41 +38,13 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Build succeeded',
   });
 
-  await logStep({
-    startMessage:
-      'Running import-pattern tests (named imports stay side-effect free)',
-    action: () =>
-      runCmdStep(
-        'tsc -p test/imports/tsconfig.named.json',
-        'Named-import isolation test failed',
-      ),
-    successMessage: 'Named-import isolation test passed',
-  });
-
-  await logStep({
-    startMessage: 'Running import-pattern tests (/// reference loads ambients)',
-    action: () =>
-      runCmdStep(
-        'tsc -p test/imports/tsconfig.ambient.json',
-        'Ambient subpath test failed',
-      ),
-    successMessage: 'Ambient subpath test passed',
-  });
-
+  // Note: the named-import / ambient-global import-pattern tests
+  // (test/dist_/named, test/dist_/ambient) run as part of `pnpm run build`
+  // above, against the built dist output.
   await logStep({
     startMessage: 'Generating documentation',
     action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
     successMessage: 'Documentation generated',
-  });
-
-  await logStep({
-    startMessage: 'Backing up repository settings',
-    action: () =>
-      runCmdStep(
-        'pnpm run gh:backup-all',
-        'Backing up repository settings failed',
-      ),
-    successMessage: 'Repository settings backed up',
   });
 
   console.log('✅ All checks completed successfully!\n');

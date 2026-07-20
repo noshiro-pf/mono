@@ -18,7 +18,7 @@ import { type SupportedLength } from '../supported-length.mjs';
  *
  * @example
  * ```ts
- * const isMaxLengthString = <N extends number>(
+ * const isMaxLengthString = <N extends SupportedLength>(
  *   s: string,
  *   maxLength: N,
  * ): s is MaxLengthString<N> => s.length <= maxLength;
@@ -51,7 +51,7 @@ export type MaxLengthString<MaxLength extends SupportedLength> = string &
  *
  * @example
  * ```ts
- * const isMinLengthString = <N extends number>(
+ * const isMinLengthString = <N extends SupportedLength>(
  *   s: string,
  *   minLength: N,
  * ): s is MinLengthString<N> => s.length >= minLength;

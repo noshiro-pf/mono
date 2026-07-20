@@ -4,6 +4,7 @@ export namespace Tuple {
   /**
    * Gets the type of the first element of a readonly tuple `T`.
    * If the tuple is empty, it returns the default type `D` (defaults to `never`).
+   * For a general (non-tuple) array, it returns the element type.
    * @template T - The readonly tuple type.
    * @template D - The default type to return if `T` is empty. Defaults to `never`.
    * @returns The type of the first element, or `D` if `T` is empty.
@@ -11,27 +12,38 @@ export namespace Tuple {
    * type H1 = Tuple.Head<[1, 2, 3]>; // 1
    * type H2 = Tuple.Head<[]>; // never
    * type H3 = Tuple.Head<[], 'default'>; // 'default'
+   * type H4 = Tuple.Head<readonly string[]>; // string
    */
   export type Head<
     T extends readonly unknown[],
     D = never,
-  > = T extends readonly [infer X, ...(readonly unknown[])] ? X : D;
+  > = T extends readonly []
+    ? D
+    : T extends readonly [infer X, ...(readonly unknown[])]
+      ? X
+      : T[number];
 
   /**
    * Gets the type of the last element of a readonly tuple `T`.
    * If the tuple is empty, it returns `never`.
+   * For a general (non-tuple) array, it returns the element type. For a tuple
+   * with a rest element (e.g. `[1, ...string[]]`), the exact last element is
+   * not statically known, so the union of all element types is returned.
    * @template T - The readonly tuple type.
    * @returns The type of the last element, or `never` if `T` is empty.
    * @example
    * type L1 = Tuple.Last<[1, 2, 3]>; // 3
    * type L2 = Tuple.Last<[]>; // never
    * type L3 = Tuple.Last<[1]>; // 1
+   * type L4 = Tuple.Last<readonly string[]>; // string
+   * type L5 = Tuple.Last<[...string[], 1]>; // 1
+   * type L6 = Tuple.Last<[1, ...string[]]>; // 1 | string
    */
   export type Last<T extends readonly unknown[]> = T extends readonly []
     ? never
-    : T extends readonly [unknown]
-      ? Head<T>
-      : Last<Tail<T>>;
+    : T extends readonly [...(readonly unknown[]), infer L]
+      ? L
+      : T[number];
 
   /**
    * Gets a new readonly tuple type containing all elements of `A` except the last one.
@@ -81,18 +93,6 @@ export namespace Tuple {
     L,
     readonly []
   >;
-
-  // /**
-  //  * Gets a tuple containing all elements except the first. Alias for Tail.
-  //  * @template T - The tuple type.
-  //  * @returns A tuple type with the first element removed.
-  //  */
-  // type Rest<T extends unknown[]> = ((...x: T) => void) extends (
-  //   x: T[0],
-  //   ...xs: infer XS
-  // ) => void
-  //   ? XS
-  //   : never;
 
   /**
    * Takes the first `N` elements from a readonly tuple `T`.
@@ -174,21 +174,32 @@ export namespace Tuple {
 
   /**
    * Flattens a nested readonly tuple `T` by one level.
+   * General (non-tuple) arrays are supported both as the outer type and as
+   * elements; where the exact layout is not statically known, the result
+   * degrades to a general readonly array of the combined element types.
    * @template T - A readonly tuple where elements are themselves readonly arrays/tuples.
    * @returns A new readonly tuple type flattened by one level.
    * @example
    * type F1 = Tuple.Flatten<[[1, 2], [3, 4]]>; // readonly [1, 2, 3, 4]
    * type F2 = Tuple.Flatten<[[1], readonly [2, 3]]>; // readonly [1, 2, 3]
    * type F3 = Tuple.Flatten<[[1], [2, [3]]]>; // readonly [1, 2, [3]] (only flattens one level)
+   * type F4 = Tuple.Flatten<[readonly number[], readonly string[]]>; // readonly (number | string)[]
+   * type F5 = Tuple.Flatten<readonly (readonly number[])[]>; // readonly number[]
    */
-  export type Flatten<T extends readonly (readonly unknown[])[]> = FlattenImpl<
-    T,
-    readonly [],
-    readonly []
-  >;
+  export type Flatten<T extends readonly (readonly unknown[])[]> =
+    T extends readonly []
+      ? readonly []
+      : T extends readonly [
+            infer H extends readonly unknown[],
+            ...infer R extends readonly (readonly unknown[])[],
+          ]
+        ? Readonly<[...H, ...Flatten<R>]>
+        : readonly T[number][number][];
 
   /**
    * Concatenates two readonly tuples `A` and `B`.
+   * General (non-tuple) arrays are also supported; concatenating two general
+   * arrays yields a general readonly array of the union of the element types.
    * @template A - The first readonly tuple.
    * @template B - The second readonly tuple.
    * @returns A new readonly tuple type representing the concatenation of `A` and `B`.
@@ -196,11 +207,13 @@ export namespace Tuple {
    * type C1 = Tuple.Concat<[1, 2], [3, 4]>; // readonly [1, 2, 3, 4]
    * type C2 = Tuple.Concat<[], [1]>; // readonly [1]
    * type C3 = Tuple.Concat<[1], []>; // readonly [1]
+   * type C4 = Tuple.Concat<readonly number[], readonly string[]>; // readonly (number | string)[]
+   * type C5 = Tuple.Concat<[1], readonly number[]>; // readonly [1, ...number[]]
    */
   export type Concat<
     A extends readonly unknown[],
     B extends readonly unknown[],
-  > = ConcatImpl<A, B, readonly []>;
+  > = Readonly<[...A, ...B]>;
 
   /**
    * Creates pairs of elements from two readonly tuples `A` and `B`.
@@ -283,36 +296,44 @@ type SkipImpl<
     : SkipImpl<N, Tuple.Tail<T>, readonly [Tuple.Head<T>, ...R]>; // Recursive step: skip Head<T>, increment R['length']
 
 /**
- * @internal Recursive implementation for `Tuple.TakeLast`. Uses `ButLast` and `Last`.
- * @template N - The number of elements remaining to take.
- * @template T - The remaining part of the input tuple (processed from the end).
- * @template R - The accumulator tuple (reversed taken elements from the end).
+ * @internal Implementation for `Tuple.TakeLast`. Builds a counter tuple `R` of
+ * length `N`, then splits `T` at the counted position with a single
+ * rest-element inference instead of peeling one element per step (which would
+ * cost O(N * |T|) instantiations via `ButLast`/`Last`).
+ * @template N - The number of elements to take from the end.
+ * @template T - The input tuple.
+ * @template R - Counter tuple; grows until its length reaches `N`.
  */
 type TakeLastImpl<
   N extends number,
   T extends readonly unknown[],
   R extends readonly unknown[],
-> = T extends readonly []
-  ? R // Base case: T is empty, return accumulator
-  : R['length'] extends N
-    ? R // Base case: N elements taken, return accumulator
-    : TakeLastImpl<N, Tuple.ButLast<T>, readonly [Tuple.Last<T>, ...R]>; // Recursive step: take Last<T>, process ButLast<T>
+> = R['length'] extends N
+  ? T extends readonly [...infer Init, ...{ [K in keyof R]: unknown }]
+    ? T extends readonly [...Init, ...infer LastN]
+      ? Readonly<LastN> // Split succeeded: return the trailing N elements
+      : never // Unreachable: the split above always re-matches
+    : Readonly<T> // N >= T['length']: return the whole tuple
+  : TakeLastImpl<N, T, readonly [unknown, ...R]>;
 
 /**
- * @internal Recursive implementation for `Tuple.SkipLast`. Uses `ButLast` and `Last`.
- * @template N - The number of elements remaining to skip from the end.
- * @template T - The remaining part of the input tuple (processed from the end).
- * @template R - Accumulator tracking skipped elements from the end (used for length check).
+ * @internal Implementation for `Tuple.SkipLast`. Builds a counter tuple `R` of
+ * length `N`, then splits `T` at the counted position with a single
+ * rest-element inference instead of peeling one element per step (which would
+ * cost O(N * |T|) instantiations via `ButLast`/`Last`).
+ * @template N - The number of elements to skip from the end.
+ * @template T - The input tuple.
+ * @template R - Counter tuple; grows until its length reaches `N`.
  */
 type SkipLastImpl<
   N extends number,
   T extends readonly unknown[],
   R extends readonly unknown[],
-> = T extends readonly []
-  ? T // Base case: T is empty, return empty
-  : R['length'] extends N
-    ? T // Base case: N elements skipped from end, return remaining T
-    : SkipLastImpl<N, Tuple.ButLast<T>, readonly [Tuple.Last<T>, ...R]>; // Recursive step: skip Last<T>, process ButLast<T>
+> = R['length'] extends N
+  ? T extends readonly [...infer Init, ...{ [K in keyof R]: unknown }]
+    ? Readonly<Init> // Split succeeded: return everything before the last N
+    : readonly [] // N >= T['length']: everything is skipped
+  : SkipLastImpl<N, T, readonly [unknown, ...R]>;
 
 /**
  * @internal Recursive implementation for `Tuple.SetAt`.
@@ -335,40 +356,6 @@ type SetAtImpl<
   : ACC['length'] extends I
     ? 'setValue'
     : 'next'];
-
-/**
- * @internal Recursive implementation for `Tuple.Flatten`.
- * @template T - The remaining tuple of tuples.
- * @template R1 - The current inner tuple being processed (reversed).
- * @template R2 - The accumulator for the final flattened tuple (reversed).
- */
-type FlattenImpl<
-  T extends readonly (readonly unknown[])[],
-  R1 extends readonly unknown[],
-  R2 extends readonly unknown[],
-> = T extends readonly [] // Is the outer tuple processed?
-  ? R1 extends readonly [] // Is the current inner tuple processed?
-    ? Tuple.Reverse<R2> // Yes to both: return final reversed accumulator
-    : FlattenImpl<T, Tuple.Tail<R1>, readonly [Tuple.Head<R1>, ...R2]> // No: process current inner tuple
-  : R1 extends readonly [] // Current inner tuple processed?
-    ? FlattenImpl<Tuple.Tail<T>, Tuple.Head<T, []>, R2> // Yes: move to the next inner tuple from T
-    : FlattenImpl<T, Tuple.Tail<R1>, readonly [Tuple.Head<R1>, ...R2]>; // No: process current inner tuple
-
-/**
- * @internal Recursive implementation for `Tuple.Concat`.
- * @template A - The remaining part of the first tuple.
- * @template B - The remaining part of the second tuple.
- * @template R - The accumulator tuple (reversed concatenated elements).
- */
-type ConcatImpl<
-  A extends readonly unknown[],
-  B extends readonly unknown[],
-  R extends readonly unknown[],
-> = A extends readonly [] // Is A processed?
-  ? B extends readonly [] // Is B processed?
-    ? Tuple.Reverse<R> // Yes to both: return final reversed accumulator
-    : ConcatImpl<A, Tuple.Tail<B>, readonly [Tuple.Head<B>, ...R]> // No: process B
-  : ConcatImpl<Tuple.Tail<A>, B, readonly [Tuple.Head<A>, ...R]>; // No: process A
 
 /**
  * @internal Recursive implementation for `Tuple.Partition`.

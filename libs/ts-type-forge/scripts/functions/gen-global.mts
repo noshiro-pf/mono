@@ -36,6 +36,7 @@ export const genGlobal = async (
   const moduleFiles = files
     .filter((p) => p !== globalFilePath)
     .filter((p) => path.basename(p) !== 'index.mts')
+    .filter((p) => path.basename(p) !== 'entry-point.mts')
     .filter((p) => !p.endsWith('.test.mts'))
     .toSorted();
 

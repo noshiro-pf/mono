@@ -1,13 +1,13 @@
 import { expectType } from 'ts-data-forge';
 import {
-  type MapToNever,
   type OptionalKeys,
   type PartiallyNullable,
   type PartiallyOptional,
   type PartiallyPartial,
   type PartiallyRequired,
-  type PickUndefined,
   type RequiredKeys,
+  type TSTypeForgeInternals_MapToNever,
+  type TSTypeForgeInternals_PickUndefined,
 } from './partial.mjs';
 
 // Base type for testing
@@ -244,14 +244,20 @@ type Base = {
     h: null | undefined; // yes
   };
 
-  expectType<PickUndefined<R>, 'a' | 'b' | 'c' | 'e' | 'f' | 'h'>('=');
+  expectType<
+    TSTypeForgeInternals_PickUndefined<R>,
+    'a' | 'b' | 'c' | 'e' | 'f' | 'h'
+  >('=');
 }
 
 // --- MapToNever ---
 {
-  expectType<MapToNever<{ a: 1; b: 'x' }>, { a: never; b: never }>('=');
+  expectType<
+    TSTypeForgeInternals_MapToNever<{ a: 1; b: 'x' }>,
+    { a: never; b: never }
+  >('=');
 
-  expectType<MapToNever<{}>, {}>('=');
+  expectType<TSTypeForgeInternals_MapToNever<{}>, {}>('=');
 }
 
 // --- OptionalKeys ---

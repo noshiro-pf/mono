@@ -63,10 +63,11 @@ export type PartiallyRequired<T, K extends keyof T> = MergeIntersection<
  * Helper type to extract keys from a record `R` whose property types include `undefined`.
  * It checks if `undefined` is assignable to the property type `R[K]`.
  * The `-?` removes optionality before checking.
+ * Named with the internals prefix so it is excluded from the public API surface.
  * @template R - The record type.
  * @returns A union of keys whose types include `undefined`.
  */
-export type PickUndefined<R extends UnknownRecord> = {
+export type TSTypeForgeInternals_PickUndefined<R extends UnknownRecord> = {
   [K in keyof R]-?: undefined extends R[K] ? K : never;
 }[keyof R];
 
@@ -74,16 +75,17 @@ export type PickUndefined<R extends UnknownRecord> = {
  * @internal
  * Helper type that maps all property values of a record `R` to `never`.
  * Used in `OptionalKeys` to isolate the check for the `?` modifier.
+ * Named with the internals prefix so it is excluded from the public API surface.
  * @template R - The record type.
  * @returns A new record type with the same keys as `R` but all values as `never`.
  */
-export type MapToNever<R extends UnknownRecord> = {
+export type TSTypeForgeInternals_MapToNever<R extends UnknownRecord> = {
   [K in keyof R]: never;
 };
 
 /**
  * Extracts keys from a record `R` that are explicitly marked as optional using the `?` modifier.
- * It works by creating a mapped type where all values are `never` and then using `PickUndefined`
+ * It works by creating a mapped type where all values are `never` and then using `TSTypeForgeInternals_PickUndefined`
  * to find keys where `undefined` is assignable (which is true only for optional properties in this context).
  *
  * @template R - The record type.
@@ -98,9 +100,8 @@ export type MapToNever<R extends UnknownRecord> = {
  *   f: 0 | undefined; // required, value includes undefined
  * }>; // 'a' | 'b' | 'c'
  */
-export type OptionalKeys<R extends UnknownRecord> = PickUndefined<
-  MapToNever<R>
->;
+export type OptionalKeys<R extends UnknownRecord> =
+  TSTypeForgeInternals_PickUndefined<TSTypeForgeInternals_MapToNever<R>>;
 
 /**
  * Extracts keys from a record `R` that are *not* explicitly marked as optional using the `?` modifier.

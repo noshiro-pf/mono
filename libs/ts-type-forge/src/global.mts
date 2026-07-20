@@ -194,12 +194,16 @@ declare global {
   type SupportedLength = _TSTypeForge.SupportedLength;
   type TypeEq<A, B> = _TSTypeForge.TypeEq<A, B>;
   type TypeExtends<A, B> = _TSTypeForge.TypeExtends<A, B>;
+  type IsAny<T> = _TSTypeForge.IsAny<T>;
+  type IsNotAny<T> = _TSTypeForge.IsNotAny<T>;
   type IsFixedLengthList<T extends readonly unknown[]> =
     _TSTypeForge.IsFixedLengthList<T>;
   type IsNotFixedLengthList<T extends readonly unknown[]> =
     _TSTypeForge.IsNotFixedLengthList<T>;
   type IsNever<T> = _TSTypeForge.IsNever<T>;
   type IsUnion<U> = _TSTypeForge.IsUnion<U>;
+  type IsUnknown<T> = _TSTypeForge.IsUnknown<T>;
+  type IsNotUnknown<T> = _TSTypeForge.IsNotUnknown<T>;
   type LowerAlphabet = _TSTypeForge.LowerAlphabet;
   type UpperAlphabet = _TSTypeForge.UpperAlphabet;
   type Alphabet = _TSTypeForge.Alphabet;
@@ -316,8 +320,6 @@ declare global {
     T,
     K
   >;
-  type PickUndefined<R extends UnknownRecord> = _TSTypeForge.PickUndefined<R>;
-  type MapToNever<R extends UnknownRecord> = _TSTypeForge.MapToNever<R>;
   type OptionalKeys<R extends UnknownRecord> = _TSTypeForge.OptionalKeys<R>;
   type RequiredKeys<R extends UnknownRecord> = _TSTypeForge.RequiredKeys<R>;
   type RecordPathsWithIndex<R> = _TSTypeForge.RecordPathsWithIndex<R>;

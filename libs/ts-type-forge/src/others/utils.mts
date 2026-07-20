@@ -38,9 +38,14 @@ export type ValueOf<T> = T[keyof T];
  * @template T - A type with a `length: number` property (e.g., `readonly unknown[]`).
  * @returns The type of the `length` property (e.g., `number` for arrays, a number literal for tuples).
  * @example
+ * ```ts
  * type TupleLen = Length<[1, 2, 3]>; // 3
  * type ArrayLen = Length<string[]>; // number
- * type StringLen = Length<"abc">; // 3
+ *
+ * // Note: a string literal's `length` property is typed as `number`,
+ * // not as the literal length of the string.
+ * type StringLen = Length<'abc'>; // number
+ * ```
  */
 export type Length<T extends Readonly<{ length: number }>> = T['length'];
 
@@ -74,6 +79,13 @@ export type MonoTypeFunction<X> = Fn<X, X>;
  */
 export type Reducer<S, A> = (state: S, action: A) => S;
 
+/**
+ * Represents any function type. Useful as a constraint for generic type
+ * parameters that accept arbitrary functions.
+ *
+ * Uses `any` (rather than `unknown`) for the argument and return types so
+ * that every concrete function type is assignable to it.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFn = (...args: readonly any[]) => any;
 

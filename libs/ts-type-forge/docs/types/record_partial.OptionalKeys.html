@@ -11,9 +11,9 @@
 <li><a href="../modules/record_partial.html">record/partial</a></li>
 <li><a href="" aria-current="page">OptionalKeys</a></li></ul>
 <h1>Type Alias OptionalKeys&lt;R&gt;</h1></div>
-<div class="tsd-signature"><span class="tsd-kind-type-alias">OptionalKeys</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">PickUndefined</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">MapToNever</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#r">R</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
+<div class="tsd-signature"><span class="tsd-kind-type-alias">OptionalKeys</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">TSTypeForgeInternals_PickUndefined</span><span class="tsd-signature-symbol">&lt;</span><br/>    <span class="tsd-signature-type">TSTypeForgeInternals_MapToNever</span><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#r">R</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">&gt;</span></div>
 <div class="tsd-comment tsd-typography"><p>Extracts keys from a record <code>R</code> that are explicitly marked as optional using the <code>?</code> modifier.
-It works by creating a mapped type where all values are <code>never</code> and then using <code>PickUndefined</code>
+It works by creating a mapped type where all values are <code>never</code> and then using <code>TSTypeForgeInternals_PickUndefined</code>
 to find keys where <code>undefined</code> is assignable (which is true only for optional properties in this context).</p>
 </div>
 <section class="tsd-panel">
@@ -32,7 +32,7 @@ to find keys where <code>undefined</code> is assignable (which is true only for 
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.mts#L101">record/partial.mts:101</a></li></ul></aside></div>
+<li>Defined in <a href="https://github.com/noshiro-pf/ts-type-forge/blob/main/src/record/partial.mts#L103">record/partial.mts:103</a></li></ul></aside></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

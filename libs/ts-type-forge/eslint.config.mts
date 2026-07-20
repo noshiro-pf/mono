@@ -2,7 +2,6 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
-  eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
 
@@ -14,16 +13,20 @@ export default [
       '.eslintrc.cjs',
       'docs/**',
       'agents/**',
-      // test/imports/ has its own tsconfig (tsconfig.named.json /
-      // tsconfig.ambient.json) and is excluded from the root tsconfig
-      // because the named-import side-effect-free assertions only hold
-      // when src/global.mts is NOT in the program.
-      'test/imports/**',
+      // test/dist_/ has its own tsconfigs (named/ and ambient/) and
+      // type-checks the built dist/ output (see scripts/cmd/build.mts); it
+      // is excluded from the root tsconfig, so the typed-linter cannot
+      // parse it.
+      'test/dist_/**',
       // src/global.mts is excluded from the root tsconfig (so ambient
       // globals don't leak into the named-import program), so the
       // typed-linter cannot parse it. The file is auto-generated and
       // not worth linting.
       'src/global.mts',
+      // src/entry-point.mts is auto-generated (scripts/functions/
+      // gen-entry-point.mts) and must re-export from './index.mjs' by
+      // design, which conflicts with the no-restricted-imports rule.
+      'src/entry-point.mts',
     ],
   },
   ...eslintConfigForTypeScript({
@@ -31,8 +34,6 @@ export default [
     tsconfigFileName: './tsconfig.json',
     packageDirs: [thisDir],
   }),
-
-  eslintConfigForVitest(),
 
   {
     files: ['**/*.test.mts'],

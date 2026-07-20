@@ -25,6 +25,22 @@ import { type List } from './list.mjs';
 
   expectType<List.Concat<readonly [], readonly [1, 2]>, readonly [1, 2]>('=');
 
+  // General (non-tuple) array operands (locks the documented behavior)
+  expectType<
+    List.Concat<readonly number[], readonly string[]>,
+    readonly (number | string)[]
+  >('=');
+
+  expectType<
+    List.Concat<readonly [1], readonly number[]>,
+    readonly [1, ...number[]]
+  >('=');
+
+  expectType<
+    List.Concat<readonly number[], readonly [1]>,
+    readonly [...number[], 1]
+  >('=');
+
   expectType<
     List.Concat<readonly [1, 2], readonly [3, 4, 5]>,
     readonly [1, 2, 3, 4, 5]
@@ -49,6 +65,21 @@ import { type List } from './list.mjs';
     '=',
   );
 
+  // General (non-tuple) array operands (locks the documented behavior)
+  expectType<
+    List.Flatten<readonly [readonly number[], readonly string[]]>,
+    readonly (number | string)[]
+  >('=');
+
+  expectType<List.Flatten<readonly (readonly number[])[]>, readonly number[]>(
+    '=',
+  );
+
+  expectType<
+    List.Flatten<readonly [readonly [1], readonly number[]]>,
+    readonly [1, ...number[]]
+  >('=');
+
   expectType<List.Flatten<DeepReadonly<[[], [1, 2], [3]]>>, readonly [1, 2, 3]>(
     '=',
   );
@@ -58,21 +89,23 @@ import { type List } from './list.mjs';
 {
   expectType<List.Head<[]>, never>('=');
 
-  expectType<List.Head<number[]>, never>('=');
+  // For a general (non-tuple) array, the element type is returned.
+  expectType<List.Head<number[]>, number>('=');
 
   expectType<List.Head<[number, ...number[]], 0>, number>('=');
 
-  expectType<List.Head<number[], 1>, 1>('=');
+  // The default type `D` only applies to empty tuples, not general arrays.
+  expectType<List.Head<number[], 1>, number>('=');
 
   expectType<List.Head<readonly []>, never>('=');
 
-  expectType<List.Head<readonly number[]>, never>('=');
+  expectType<List.Head<readonly number[]>, number>('=');
 
   expectType<List.Head<readonly [number, ...(readonly number[])], 0>, number>(
     '=',
   );
 
-  expectType<List.Head<readonly number[], 1>, 1>('=');
+  expectType<List.Head<readonly number[], 1>, number>('=');
 
   // Additional tests
   expectType<List.Head<[1, 2, 3]>, 1>('=');
@@ -81,7 +114,7 @@ import { type List } from './list.mjs';
 
   expectType<List.Head<[boolean, string, number]>, boolean>('=');
 
-  expectType<List.Head<readonly string[]>, string>('<=');
+  expectType<List.Head<readonly string[]>, string>('=');
 
   expectType<List.Head<[42]>, 42>('=');
 }
@@ -104,7 +137,15 @@ import { type List } from './list.mjs';
   expectType<List.Last<[boolean, string, number]>, number>('=');
 
   expectType<List.Last<[42]>, 42>('=');
-  // expectType<List.Last<readonly string[]>, string>('<='); // Skip due to complexity
+
+  // For a general (non-tuple) array, the element type is returned.
+  expectType<List.Last<readonly string[]>, string>('=');
+
+  // For a tuple with a trailing rest element, the exact last element is not
+  // statically known, so the union of all element types is returned.
+  expectType<List.Last<[1, 2, ...string[]]>, 1 | 2 | string>('=');
+
+  expectType<List.Last<readonly [...string[], 1]>, 1>('=');
 }
 
 // ── partition ─────────────────────────

@@ -1,4 +1,3 @@
-import { expectType } from 'ts-data-forge';
 import { type TypeEq } from '../../condition/index.mjs';
 import { type RelaxedExclude } from '../../others/index.mjs';
 import {
@@ -161,7 +160,9 @@ type WithSmallIntImpl<N extends Int, MaxIndex extends number> =
     >
   | N;
 
-// `CastToInt` keeps integer brands and zeroes out non-integer brands.
-expectType<CastToInt<Int>, Int>('=');
-
-expectType<CastToInt<never>, never>('=');
+/**
+ * @internal Exported (with the internals prefix, so it is excluded from the
+ * public API surface) only so that `small-int.test.mts` can assert the
+ * behavior of the module-local `CastToInt` helper.
+ */
+export type TSTypeForgeInternals_CastToInt<T> = CastToInt<T>;

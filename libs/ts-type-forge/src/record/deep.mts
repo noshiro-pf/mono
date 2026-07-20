@@ -8,6 +8,8 @@ import {
 /**
  * Recursively applies the `readonly` modifier to all properties of an object, array, Map, or Set.
  * Primitives and functions are returned as is.
+ * Note: passing `any` yields a union of both conditional branches
+ * (standard TypeScript behavior for `any` in conditional types).
  * @template T - The type to make deeply readonly.
  * @returns A new type with all nested properties marked as readonly.
  * @example
@@ -43,6 +45,8 @@ export type DeepReadonly<T> = T extends Primitive
 /**
  * Recursively removes the `readonly` modifier from all properties of an object, array, Map, or Set.
  * Primitives and functions are returned as is.
+ * Note: passing `any` yields a union of both conditional branches
+ * (standard TypeScript behavior for `any` in conditional types).
  * @template T - The type to make deeply mutable.
  * @returns A new type with all nested `readonly` modifiers removed.
  * @example
@@ -73,6 +77,8 @@ export type DeepMutable<T> = T extends Primitive
  * Recursively applies the `?` optional modifier to all properties of an UnknownRecord or array.
  * Handles Map and Set types by applying `DeepPartial` to their keys/values.
  * Primitives and functions are returned as is.
+ * Note: passing `any` yields a union of both conditional branches
+ * (standard TypeScript behavior for `any` in conditional types).
  * @template T - The type to make deeply partial.
  * @returns A new type with all nested properties marked as optional.
  * @example
@@ -109,6 +115,8 @@ export type DeepPartial<T> = T extends Primitive
  * Recursively removes the `?` optional modifier from all properties of an object or array.
  * Handles Map and Set types by applying `DeepRequired` to their keys/values.
  * Primitives and functions are returned as is.
+ * Note: passing `any` yields a union of both conditional branches
+ * (standard TypeScript behavior for `any` in conditional types).
  * @template T - The type to make deeply required.
  * @returns A new type with all nested properties marked as required.
  * @example

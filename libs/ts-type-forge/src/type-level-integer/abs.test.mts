@@ -25,3 +25,8 @@ expectType<Abs<'-0'>, 0>('=');
 const _x = -1;
 
 expectType<Abs<typeof _x>, 1>('=');
+
+// Edge cases: never and non-literal number
+expectType<Abs<never>, never>('=');
+
+expectType<Abs<number>, number>('=');

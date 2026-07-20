@@ -11,7 +11,9 @@ await assertExt({
     {
       path: path.resolve(projectRootPath, './test'),
       extension: '.mts',
-      ignorePatterns: ['**/tsconfig*.json'],
+      // node_modules: build.mts links the built package into
+      // test/dist_/node_modules for the dist smoke tests.
+      ignorePatterns: ['**/tsconfig*.json', '**/node_modules/**'],
     },
     {
       path: path.resolve(projectRootPath, './scripts'),

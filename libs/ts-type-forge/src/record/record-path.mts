@@ -1,4 +1,3 @@
-import { expectType } from 'ts-data-forge';
 import { type IsNotFixedLengthList } from '../condition/index.mjs';
 import { type UnknownRecord } from '../constants/index.mjs';
 import { type ToNumber } from '../others/index.mjs';
@@ -312,9 +311,11 @@ type RecordValueAtPathWithIndexImpl<
       ? R | undefined // Yes, the value might be undefined
       : R; // No, it was a specific key/index, return the value type R
 
-expectType<
-  RecordPathPrefixes<readonly [1, 2, 3]>,
-  readonly [] | readonly [1, 2, 3] | readonly [1, 2] | readonly [1]
->('=');
-
-expectType<RecordPathPrefixes<[]>, readonly []>('=');
+/**
+ * @internal Exported (with the internals prefix, so it is excluded from the
+ * public API surface) only so that `record-path.test.mts` can assert the
+ * behavior of the module-local `RecordPathPrefixes` helper.
+ */
+export type TSTypeForgeInternals_RecordPathPrefixes<
+  L extends readonly unknown[],
+> = RecordPathPrefixes<L>;

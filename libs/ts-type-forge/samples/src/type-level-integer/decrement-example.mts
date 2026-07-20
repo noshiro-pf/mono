@@ -6,7 +6,9 @@ type Three = Decrement<4>; // 3
 type Zero = Decrement<1>; // 0
 type Four = Decrement<5>; // 4
 
-// type Error = Decrement<0>; // ⚠️ Error: will fail or return unexpected result
+// Note: `Decrement<0>` does not error; it clamps to 0
+// (`List.Tail` of an empty tuple is an empty tuple, whose length is 0).
+type ClampedAtZero = Decrement<0>; // 0
 
 // Useful in countdown scenarios
 type Countdown<N extends number> = N extends 0
@@ -23,4 +25,12 @@ type IsPositive<N extends number> = N extends 0
     : false;
 
 // embed-sample-code-ignore-below
-export type { Countdown, CountdownFrom3, Four, IsPositive, Three, Zero };
+export type {
+  ClampedAtZero,
+  Countdown,
+  CountdownFrom3,
+  Four,
+  IsPositive,
+  Three,
+  Zero,
+};

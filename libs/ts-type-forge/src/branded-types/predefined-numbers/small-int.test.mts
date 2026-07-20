@@ -9,8 +9,14 @@ import {
   type ExcludeSmallInt,
   type SmallInt,
   type SmallUint,
+  type TSTypeForgeInternals_CastToInt,
   type WithSmallInt,
 } from './small-int.mjs';
+
+// `CastToInt` keeps integer brands and zeroes out non-integer brands.
+expectType<TSTypeForgeInternals_CastToInt<Int>, Int>('=');
+
+expectType<TSTypeForgeInternals_CastToInt<never>, never>('=');
 
 // Test SmallInt with different constraints
 expectType<SmallInt<''>, number>('<=');

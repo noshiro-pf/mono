@@ -8,7 +8,16 @@ import {
   type RecordPathsWithIndex,
   type RecordUpdated,
   type RecordValueAtPath,
+  type TSTypeForgeInternals_RecordPathPrefixes,
 } from './record-path.mjs';
+
+// `RecordPathPrefixes` generates all prefixes of a tuple, including `[]`.
+expectType<
+  TSTypeForgeInternals_RecordPathPrefixes<readonly [1, 2, 3]>,
+  readonly [] | readonly [1, 2, 3] | readonly [1, 2] | readonly [1]
+>('=');
+
+expectType<TSTypeForgeInternals_RecordPathPrefixes<[]>, readonly []>('=');
 
 // ── key-path-and-value-pair ─────────────────────────
 {

@@ -29,7 +29,7 @@ use npm or yarn.
 - `pnpm run build` - Full build pipeline: regenerates `src/**/index.mts`,
   `src/entry-point.mts`, `src/global.mts`, and `AGENTS.md`; type-checks;
   emits declarations to `dist/`; then type-checks the dist output through
-  the real package `exports` map (`test/dist/named` + `test/dist/ambient`)
+  the real package `exports` map (`test/dist_/named` + `test/dist_/ambient`)
 - `pnpm run test` (alias: `pnpm run tsc`) - Runs the type tests
   (`tsc --noEmit` over `src/**/*.test.mts`)
 - `pnpm run check-all` - Comprehensive validation (spellcheck, lint, build,
@@ -79,7 +79,7 @@ from the committed state.
 
 - Tests are **type-level only**, co-located with the source as
   `src/**/*.test.mts`, using `expectType` imported from `ts-data-forge`
-- `test/dist/named/` and `test/dist/ambient/` type-check the **built**
+- `test/dist_/named/` and `test/dist_/ambient/` type-check the **built**
   `dist/` output through the real package.json `exports` map (run as part
   of `pnpm run build`; also run against multiple TypeScript versions in
   CI). They intentionally use separate tsconfigs: the named-import program

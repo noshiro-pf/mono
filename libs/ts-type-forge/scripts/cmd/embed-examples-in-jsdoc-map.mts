@@ -150,6 +150,22 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
+    sourcePath:
+      'src/branded-types/predefined-strings/length-constrained-string.mts',
+    sampleFiles: [
+      'samples/src/branded-types/predefined-strings/max-length-string-example.mts',
+      'samples/src/branded-types/predefined-strings/min-length-string-example.mts',
+      'samples/src/branded-types/predefined-strings/bounded-length-string-example.mts',
+      'samples/src/branded-types/predefined-strings/fixed-length-string-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/branded-types/predefined-strings/non-empty-string.mts',
+    sampleFiles: [
+      'samples/src/branded-types/predefined-strings/non-empty-string-example.mts',
+    ],
+  },
+  {
     sourcePath: 'src/condition/extends.mts',
     sampleFiles: ['samples/src/condition/type-extends-example.mts'],
   },
@@ -231,6 +247,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/others/readonly-record-example.mts',
       'samples/src/others/mutable-record-example.mts',
     ],
+  },
+  {
+    sourcePath: 'src/others/utils.mts',
+    sampleFiles: ['samples/src/others/length-example.mts'],
   },
   {
     sourcePath: 'src/others/widen-literal.mts',

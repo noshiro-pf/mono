@@ -575,10 +575,10 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [NonPositiveSafeInt](./src/branded-types/predefined-numbers/safe-int.mts#L146)
     - [NonPositiveSafeIntWithSmallInt](./src/branded-types/predefined-numbers/safe-int.mts#L152)
 - src/branded-types/predefined-numbers/small-int.mts
-    - [SmallInt](./src/branded-types/predefined-numbers/small-int.mts#L45)
-    - [SmallUint](./src/branded-types/predefined-numbers/small-int.mts#L73)
-    - [WithSmallInt](./src/branded-types/predefined-numbers/small-int.mts#L102)
-    - [ExcludeSmallInt](./src/branded-types/predefined-numbers/small-int.mts#L140)
+    - [SmallInt](./src/branded-types/predefined-numbers/small-int.mts#L44)
+    - [SmallUint](./src/branded-types/predefined-numbers/small-int.mts#L72)
+    - [WithSmallInt](./src/branded-types/predefined-numbers/small-int.mts#L101)
+    - [ExcludeSmallInt](./src/branded-types/predefined-numbers/small-int.mts#L139)
 - src/branded-types/predefined-numbers/uint16.mts
     - [Uint16](./src/branded-types/predefined-numbers/uint16.mts#L20)
     - [PositiveUint16](./src/branded-types/predefined-numbers/uint16.mts#L37)
@@ -599,7 +599,7 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [BoundedLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L95)
     - [FixedLengthString](./src/branded-types/predefined-strings/length-constrained-string.mts#L116)
 - src/branded-types/predefined-strings/non-empty-string.mts
-    - [NonEmptyString](./src/branded-types/predefined-strings/non-empty-string.mts#L20)
+    - [NonEmptyString](./src/branded-types/predefined-strings/non-empty-string.mts#L21)
 - src/branded-types/supported-length.mts
     - [SupportedLengthCap](./src/branded-types/supported-length.mts#L18)
     - [SupportedLength](./src/branded-types/supported-length.mts#L31)
@@ -607,6 +607,9 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [TypeEq](./src/condition/eq.mts#L23)
 - src/condition/extends.mts
     - [TypeExtends](./src/condition/extends.mts#L45)
+- src/condition/is-any.mts
+    - [IsAny](./src/condition/is-any.mts#L19)
+    - [IsNotAny](./src/condition/is-any.mts#L33)
 - src/condition/is-fixed-length-list.mts
     - [IsFixedLengthList](./src/condition/is-fixed-length-list.mts#L19)
     - [IsNotFixedLengthList](./src/condition/is-fixed-length-list.mts#L37)
@@ -614,6 +617,9 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [IsNever](./src/condition/is-never.mts#L18)
 - src/condition/is-union.mts
     - [IsUnion](./src/condition/is-union.mts#L30)
+- src/condition/is-unknown.mts
+    - [IsUnknown](./src/condition/is-unknown.mts#L20)
+    - [IsNotUnknown](./src/condition/is-unknown.mts#L35)
 - src/constants/alphabet.mts
     - [LowerAlphabet](./src/constants/alphabet.mts#L21)
     - [UpperAlphabet](./src/constants/alphabet.mts#L48)
@@ -644,6 +650,7 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [UnknownRecord](./src/constants/record.mts#L36)
 - src/constants/web.mts
     - [HTTPRequestMethod](./src/constants/web.mts#L45)
+- src/entry-point.mts
 - src/others/bivariant-hack.mts
     - [BivariantHack](./src/others/bivariant-hack.mts#L26)
 - src/others/boolean.mts
@@ -681,44 +688,42 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [ToString](./src/others/utils.mts#L13)
     - [ToNumber](./src/others/utils.mts#L24)
     - [ValueOf](./src/others/utils.mts#L33)
-    - [Length](./src/others/utils.mts#L45)
-    - [FunctionType](./src/others/utils.mts#L53)
-    - [Fn](./src/others/utils.mts#L61)
-    - [MonoTypeFunction](./src/others/utils.mts#L67)
-    - [Reducer](./src/others/utils.mts#L75)
-    - [AnyFn](./src/others/utils.mts#L78)
-    - [UnionToIntersection](./src/others/utils.mts#L86)
-    - [MergeIntersection](./src/others/utils.mts#L99)
-    - [ExcludeFalsyValue](./src/others/utils.mts#L108)
-    - [Intersection](./src/others/utils.mts#L116)
+    - [Length](./src/others/utils.mts#L50)
+    - [FunctionType](./src/others/utils.mts#L58)
+    - [Fn](./src/others/utils.mts#L66)
+    - [MonoTypeFunction](./src/others/utils.mts#L72)
+    - [Reducer](./src/others/utils.mts#L80)
+    - [AnyFn](./src/others/utils.mts#L90)
+    - [UnionToIntersection](./src/others/utils.mts#L98)
+    - [MergeIntersection](./src/others/utils.mts#L111)
+    - [ExcludeFalsyValue](./src/others/utils.mts#L120)
+    - [Intersection](./src/others/utils.mts#L128)
 - src/others/widen-literal.mts
     - [WidenLiteral](./src/others/widen-literal.mts#L47)
 - src/record/deep-pick-omit.mts
     - [DeepPick](./src/record/deep-pick-omit.mts#L21)
     - [DeepOmit](./src/record/deep-pick-omit.mts#L48)
 - src/record/deep.mts
-    - [DeepReadonly](./src/record/deep.mts#L24)
-    - [DeepMutable](./src/record/deep.mts#L53)
-    - [DeepPartial](./src/record/deep.mts#L89)
-    - [DeepRequired](./src/record/deep.mts#L119)
+    - [DeepReadonly](./src/record/deep.mts#L26)
+    - [DeepMutable](./src/record/deep.mts#L57)
+    - [DeepPartial](./src/record/deep.mts#L95)
+    - [DeepRequired](./src/record/deep.mts#L127)
 - src/record/partial.mts
     - [PartiallyPartial](./src/record/partial.mts#L15)
     - [PartiallyOptional](./src/record/partial.mts#L29)
     - [PartiallyNullable](./src/record/partial.mts#L42)
     - [PartiallyRequired](./src/record/partial.mts#L57)
-    - [PickUndefined](./src/record/partial.mts#L69)
-    - [MapToNever](./src/record/partial.mts#L80)
-    - [OptionalKeys](./src/record/partial.mts#L101)
-    - [RequiredKeys](./src/record/partial.mts#L121)
+    - [OptionalKeys](./src/record/partial.mts#L103)
+    - [RequiredKeys](./src/record/partial.mts#L122)
 - src/record/record-path.mts
-    - [RecordPathsWithIndex](./src/record/record-path.mts#L32)
-    - [RecordPaths](./src/record/record-path.mts#L46)
-    - [RecordPathAndValueTypeTuple](./src/record/record-path.mts#L61)
-    - [RecordLeafPaths](./src/record/record-path.mts#L76)
-    - [RecordLeafPathsWithIndex](./src/record/record-path.mts#L92)
-    - [RecordUpdated](./src/record/record-path.mts#L111)
-    - [RecordValueAtPath](./src/record/record-path.mts#L135)
-    - [RecordValueAtPathWithIndex](./src/record/record-path.mts#L159)
+    - [RecordPathsWithIndex](./src/record/record-path.mts#L31)
+    - [RecordPaths](./src/record/record-path.mts#L45)
+    - [RecordPathAndValueTypeTuple](./src/record/record-path.mts#L60)
+    - [RecordLeafPaths](./src/record/record-path.mts#L75)
+    - [RecordLeafPathsWithIndex](./src/record/record-path.mts#L91)
+    - [RecordUpdated](./src/record/record-path.mts#L110)
+    - [RecordValueAtPath](./src/record/record-path.mts#L134)
+    - [RecordValueAtPathWithIndex](./src/record/record-path.mts#L158)
 - src/tuple-and-list/array.mts
     - [MutableNonEmptyTuple](./src/tuple-and-list/array.mts#L18)
     - [NonEmptyTuple](./src/tuple-and-list/array.mts#L31)
@@ -755,26 +760,26 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
 - src/tuple-and-list/make-tuple.mts
     - [MakeTuple](./src/tuple-and-list/make-tuple.mts#L13)
 - src/tuple-and-list/tuple.mts
-    - [Tuple.Head](./src/tuple-and-list/tuple.mts#L15)
-    - [Tuple.Last](./src/tuple-and-list/tuple.mts#L30)
-    - [Tuple.ButLast](./src/tuple-and-list/tuple.mts#L48)
-    - [Tuple.Tail](./src/tuple-and-list/tuple.mts#L66)
-    - [Tuple.Reverse](./src/tuple-and-list/tuple.mts#L80)
+    - [Tuple.Head](./src/tuple-and-list/tuple.mts#L17)
+    - [Tuple.Last](./src/tuple-and-list/tuple.mts#L42)
+    - [Tuple.ButLast](./src/tuple-and-list/tuple.mts#L60)
+    - [Tuple.Tail](./src/tuple-and-list/tuple.mts#L78)
+    - [Tuple.Reverse](./src/tuple-and-list/tuple.mts#L92)
     - [Tuple.Take](./src/tuple-and-list/tuple.mts#L107)
     - [Tuple.Skip](./src/tuple-and-list/tuple.mts#L123)
     - [Tuple.TakeLast](./src/tuple-and-list/tuple.mts#L139)
     - [Tuple.SkipLast](./src/tuple-and-list/tuple.mts#L154)
     - [Tuple.SetAt](./src/tuple-and-list/tuple.mts#L169)
-    - [Tuple.Flatten](./src/tuple-and-list/tuple.mts#L184)
-    - [Tuple.Concat](./src/tuple-and-list/tuple.mts#L200)
-    - [Tuple.Zip](./src/tuple-and-list/tuple.mts#L217)
-    - [Tuple.Partition](./src/tuple-and-list/tuple.mts#L236)
+    - [Tuple.Flatten](./src/tuple-and-list/tuple.mts#L189)
+    - [Tuple.Concat](./src/tuple-and-list/tuple.mts#L213)
+    - [Tuple.Zip](./src/tuple-and-list/tuple.mts#L230)
+    - [Tuple.Partition](./src/tuple-and-list/tuple.mts#L249)
 - src/type-level-integer/abs.mts
     - [AbsoluteValue](./src/type-level-integer/abs.mts#L17)
     - [Abs](./src/type-level-integer/abs.mts#L34)
 - src/type-level-integer/increment.mts
     - [Increment](./src/type-level-integer/increment.mts#L37)
-    - [Decrement](./src/type-level-integer/increment.mts#L78)
+    - [Decrement](./src/type-level-integer/increment.mts#L80)
 - src/type-level-integer/index-type.mts
     - [Index](./src/type-level-integer/index-type.mts#L16)
     - [IndexInclusive](./src/type-level-integer/index-type.mts#L29)

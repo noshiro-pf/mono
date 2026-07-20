@@ -49,12 +49,17 @@ export type NegativeIndex<N extends number> = MapIdx<
 /**
  * @internal Maps a union of positive integer literals `I` to a union of
  * their corresponding negative integer literals `-I`.
+ *
+ * Deliberately duplicated in `src/tuple-and-list/index-of-tuple.mts`: keeping
+ * the helper module-local (instead of extracting a shared module) keeps it
+ * out of the package's export surface.
  */
 type MapIdx<I extends number> = I extends I ? NegativeToNumber<`-${I}`> : never;
 
 /**
  * @internal Converts a negative number string literal (e.g. `"-5"`) to its
  * corresponding negative number literal (`-5`).
+ * (Deliberately duplicated; see `MapIdx` above.)
  */
 type NegativeToNumber<S extends `-${number}`> =
   S extends `${infer N extends number}` ? N : never;

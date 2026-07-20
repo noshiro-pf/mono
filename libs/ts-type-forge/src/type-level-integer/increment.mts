@@ -46,11 +46,11 @@ export type Increment<N extends number> = (readonly [
  * It creates a tuple of length `N`, removes the first element using `List.Tail`,
  * and returns the new length type. This effectively computes `N - 1` at the type level.
  *
- * Warning: This requires `N` to be positive (>= 1). Attempting to decrement 0 will likely
- * result in compilation errors or unexpected behavior.
+ * Note: `Decrement<0>` does not error; it clamps to `0`, because `List.Tail`
+ * of an empty tuple is an empty tuple (whose length is `0`).
  *
- * @template N - A positive integer literal type (must be >= 1) to decrement.
- * @returns The number literal type representing `N - 1`.
+ * @template N - A non-negative integer literal type to decrement.
+ * @returns The number literal type representing `N - 1` (or `0` for `N = 0`).
  *
  * @example
  * ```ts
@@ -58,7 +58,9 @@ export type Increment<N extends number> = (readonly [
  * type Zero = Decrement<1>; // 0
  * type Four = Decrement<5>; // 4
  *
- * // type Error = Decrement<0>; // ⚠️ Error: will fail or return unexpected result
+ * // Note: `Decrement<0>` does not error; it clamps to 0
+ * // (`List.Tail` of an empty tuple is an empty tuple, whose length is 0).
+ * type ClampedAtZero = Decrement<0>; // 0
  *
  * // Useful in countdown scenarios
  * type Countdown<N extends number> = N extends 0

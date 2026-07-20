@@ -20,9 +20,6 @@ import {
       }>
   >('=');
 
-  // Reflexivity
-  expectType<MaxLengthString<3>, MaxLengthString<3>>('=');
-
   // Covariance: M <= N implies MaxLengthString<M> <= MaxLengthString<N>
   expectType<MaxLengthString<3>, MaxLengthString<5>>('<=');
 
@@ -56,9 +53,6 @@ import {
         'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
       }>
   >('=');
-
-  // Reflexivity
-  expectType<MinLengthString<3>, MinLengthString<3>>('=');
 
   // M >= N implies MinLengthString<M> <= MinLengthString<N>
   expectType<MinLengthString<5>, MinLengthString<3>>('<=');
@@ -171,7 +165,8 @@ import {
 // non-literal `number` are rejected with a constraint error
 
 {
-  expectType<MaxLengthString<2048>, MaxLengthString<2048>>('=');
+  // The cap itself is usable (smoke test against instantiation-depth limits)
+  expectType<MaxLengthString<2048>, string>('<=');
 
   expectType<MinLengthString<2048>, MinLengthString<2047>>('<=');
 

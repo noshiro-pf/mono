@@ -30,9 +30,6 @@ import {
       }>
   >('=');
 
-  // Reflexivity
-  expectType<MaxLengthArray<3, number>, MaxLengthArray<3, number>>('=');
-
   // Covariance in the bound: M <= N implies MaxLengthArray<M> <= MaxLengthArray<N>
   expectType<MaxLengthArray<3, number>, MaxLengthArray<5, number>>('<=');
 
@@ -107,9 +104,6 @@ import {
         'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
       }>
   >('=');
-
-  // Reflexivity
-  expectType<MinLengthArray<3, number>, MinLengthArray<3, number>>('=');
 
   // M >= N implies MinLengthArray<M> <= MinLengthArray<N>
   expectType<MinLengthArray<5, number>, MinLengthArray<3, number>>('<=');
@@ -432,8 +426,8 @@ declare const mutableFixed3: MutableFixedLengthArray<3, number>;
 
   expectType<2049, SupportedLength>('!<=');
 
-  // The cap itself is usable
-  expectType<MaxLengthArray<2048, number>, MaxLengthArray<2048, number>>('=');
+  // The cap itself is usable (smoke test against instantiation-depth limits)
+  expectType<MaxLengthArray<2048, number>, readonly number[]>('<=');
 
   expectType<MinLengthArray<2048, number>, MinLengthArray<2047, number>>('<=');
 

@@ -13,8 +13,12 @@ expectType<UintRange<0, 5>, 0 | 1 | 2 | 3 | 4>('=');
 
 expectType<UintRange<2, 5>, 2 | 3 | 4>('=');
 
-// large union type
-expectType<UintRange<0, 100>, UintRange<0, 100>>('=');
+// large union type (boundary checks double as an instantiation-depth smoke test)
+expectType<0, UintRange<0, 100>>('<=');
+
+expectType<99, UintRange<0, 100>>('<=');
+
+expectType<100, UintRange<0, 100>>('!<=');
 
 expectType<UintRangeInclusive<0, 3>, 0 | 1 | 2 | 3>('=');
 
@@ -32,5 +36,9 @@ expectType<UintRangeInclusive<0, 5>, 0 | 1 | 2 | 3 | 4 | 5>('=');
 
 expectType<UintRangeInclusive<2, 5>, 2 | 3 | 4 | 5>('=');
 
-// large union type
-expectType<UintRangeInclusive<0, 100>, UintRangeInclusive<0, 100>>('=');
+// large union type (boundary checks double as an instantiation-depth smoke test)
+expectType<0, UintRangeInclusive<0, 100>>('<=');
+
+expectType<100, UintRangeInclusive<0, 100>>('<=');
+
+expectType<101, UintRangeInclusive<0, 100>>('!<=');
