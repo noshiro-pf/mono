@@ -158,6 +158,7 @@
     "conventional-changelog-conventionalcommits": "9.3.1",
     "cspell": "10.0.1",
     "dedent": "1.7.2",
+    "eslint-plugin-ts-data-forge": "^0.1.1",
     "fast-glob": "3.3.3",
     "github-settings-as-code": "1.2.9",
     "immer": "11.1.8",
@@ -186,7 +187,7 @@
     "eslint": ">=9.0.0 <10.0.0",
     "typescript": ">=5.0.0"
   },
-  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8",
+  "packageManager": "pnpm@11.15.1",
   "engines": {
     "node": ">=22.22.2",
     "pnpm": ">=9.0.0"

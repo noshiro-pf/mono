@@ -2,12 +2,15 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForReact,
-  eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
   type FlatConfig,
 } from 'eslint-config-typed';
+import {
+  eslintPluginTsDataForge,
+  EslintTsDataForgeRules,
+} from 'eslint-plugin-ts-data-forge';
 
 const thisDir = import.meta.dirname;
 
@@ -22,6 +25,29 @@ export default [
   }),
 
   eslintConfigForVitest(),
+
+  {
+    files: ['test/**/*.{mts,tsx}'],
+    plugins: { 'ts-data-forge': eslintPluginTsDataForge },
+    rules: {
+      'ts-data-forge/prefer-canonical-array-slicing': 'error',
+      'ts-data-forge/prefer-arr-is-min-length-array': 'error',
+      'ts-data-forge/prefer-arr-is-max-length-array': 'error',
+      'ts-data-forge/prefer-arr-is-bounded-length-array': 'error',
+      'ts-data-forge/prefer-arr-is-fixed-length-array': 'error',
+      'ts-data-forge/prefer-arr-is-array': 'error',
+      'ts-data-forge/prefer-arr-is-non-empty': 'error',
+      'ts-data-forge/prefer-arr-sum': 'error',
+      'ts-data-forge/prefer-as-int': 'error',
+      'ts-data-forge/prefer-is-non-null-object': 'error',
+      'ts-data-forge/prefer-range-for-loop': 'error',
+      'ts-data-forge/prefer-is-record-and-has-key': 'error',
+      'ts-data-forge/prefer-num-safe-parse-int': 'error',
+      'ts-data-forge/prefer-num-safe-parse-float': 'error',
+      'ts-data-forge/no-unnecessary-type-guard': ['error', { ignore: [] }],
+      'ts-data-forge/prefer-comparison-over-nullish-guard': 'error',
+    } satisfies Partial<EslintTsDataForgeRules>,
+  },
 
   {
     rules: defineKnownRules({
@@ -175,11 +201,6 @@ export default [
   },
 
   ...eslintConfigForReact(['test/**/*.{mts,tsx}']),
-
-  // Kept until eslint-config-typed's next major; the rules now live in the
-  // standalone `eslint-plugin-ts-data-forge` package.
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  eslintConfigForTsDataForge(['test/**/*.{mts,tsx}']),
 
   {
     files: ['test/**'],

@@ -14,5 +14,6 @@ minimumReleaseAgeExclude:
   - synstate
   - 'synstate-*'
   - eslint-config-typed
+  - eslint-plugin-ts-data-forge
   - octokit-safe-types
   - github-settings-as-code
