@@ -115,7 +115,7 @@ export const embedExamples = async (): Promise<Result<undefined, unknown>> => {
 
         mut_rest = afterBlock;
 
-        console.log(`✓ Updated code block for ${sampleCodeFile}`);
+        console.info(`✓ Updated code block for ${sampleCodeFile}`);
       }
 
       mut_results.push(mut_rest);

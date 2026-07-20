@@ -37,6 +37,7 @@
   "scripts": {
     "build": "tsx ./scripts/cmd/build.mts",
     "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
+    "check:branded-number-casts": "tsx ./scripts/cmd/check-branded-number-casts.mts",
     "check:ext": "tsx ./scripts/cmd/check-ext.mts",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",

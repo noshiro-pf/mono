@@ -86,7 +86,7 @@ export const embedExamplesInJsDoc = async (): Promise<
 
         mut_rest = afterBlock;
 
-        console.log(
+        console.info(
           `✓ Updated code block for ${sampleFile} in ${path.relative(projectRootPath, sourceFilePath)}`,
         );
       }
@@ -103,11 +103,13 @@ export const embedExamplesInJsDoc = async (): Promise<
     }
 
     if (Arr.isNonEmpty(mut_modifiedFiles)) {
-      console.log(`\nFormatting ${mut_modifiedFiles.length} modified files...`);
+      console.info(
+        `\nFormatting ${mut_modifiedFiles.length} modified files...`,
+      );
 
       await formatFiles(mut_modifiedFiles);
 
-      console.log('✓ Formatting completed');
+      console.info('✓ Formatting completed');
     }
 
     return Result.ok(undefined);

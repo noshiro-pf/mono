@@ -1,0 +1,74 @@
+{
+  "name": "eslint-plugin-ts-data-forge",
+  "version": "0.0.0",
+  "private": false,
+  "description": "ESLint rules that steer code toward ts-data-forge idioms.",
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "ts-data-forge",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/ts-data-forge.git",
+    "directory": "packages/eslint-plugin-ts-data-forge"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx ./scripts/cmd/build.mts",
+    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
+    "check:branded-number-types": "tsx ./scripts/cmd/check-branded-number-types.mts",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "fmt": "format-uncommitted --cwd .",
+    "fmt:diff": "format-diff-from origin/main --cwd .",
+    "fmt:full": "pnpm run z:prettier .",
+    "gen:rule-types": "tsx ./scripts/cmd/gen-rule-types.mts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest run",
+    "test:cov": "pnpm run z:vitest run --coverage",
+    "testw": "pnpm run z:vitest",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts"
+  },
+  "dependencies": {
+    "@typescript-eslint/utils": "8.63.0",
+    "ts-data-forge": "workspace:*",
+    "ts-type-forge": "^7.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "8.63.0",
+    "@typescript-eslint/rule-tester": "8.63.0",
+    "dedent": "1.7.2"
+  },
+  "peerDependencies": {
+    "eslint": ">=9.0.0",
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=22.22.2",
+    "pnpm": ">=9.0.0"
+  }
+}

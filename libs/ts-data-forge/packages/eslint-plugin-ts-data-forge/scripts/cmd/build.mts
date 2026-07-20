@@ -1,26 +1,22 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { rollup } from 'rollup';
-import { Arr, unknownToString } from 'ts-data-forge';
+import { type UnknownResult } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
-import { type UnknownResult } from '../../src/functional/result/index.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 
-const distDir = path.resolve(projectRootPath, './dist');
+const distDir = path.resolve(workspaceRootPath, './dist');
 
 /**
  * The monorepo root, where the hoisted `node_modules` lives.
  */
-const monorepoRootPath = path.resolve(projectRootPath, '../..');
+const monorepoRootPath = path.resolve(workspaceRootPath, '../..');
 
 /**
- * The native TypeScript compiler (TypeScript >= 7). It is installed under the
- * alias "typescript-native" because the "typescript" package must stay on 6.x
- * for tools that require the JS compiler API (typescript-eslint, typedoc,
- * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
- * provides. Invoked via an explicit path because both packages declare a
- * `tsc` bin and the winner of the `node_modules/.bin/tsc` conflict is not
- * guaranteed. It is hoisted to the monorepo root's `node_modules`.
+ * The native TypeScript compiler (TypeScript >= 7), installed under the alias
+ * "typescript-native" and hoisted to the monorepo root's `node_modules`. It is
+ * used for type checking and declaration emit; JS transpilation is done by
+ * esbuild via Rollup.
  */
 const nativeTsc = path.resolve(
   monorepoRootPath,
@@ -28,48 +24,34 @@ const nativeTsc = path.resolve(
 );
 
 /**
- * Builds the entire project.
+ * Builds the ESLint plugin package.
  */
 const build = async (skipCheck: boolean): Promise<void> => {
   console.info('Starting build process...\n');
 
+  await logStep({
+    startMessage: 'Generating rule type definitions',
+    action: () =>
+      runCmdStep('pnpm run gen:rule-types', 'Rule type generation failed'),
+    successMessage: 'Rule type definitions generated',
+  });
+
   if (!skipCheck) {
+    await logStep({
+      startMessage: 'Verifying branded number type coverage',
+      action: () =>
+        runCmdStep(
+          'pnpm run check:branded-number-types',
+          'Branded number type coverage check failed',
+        ),
+      successMessage: 'Branded number type coverage verified',
+    });
+
     await logStep({
       startMessage: 'Checking file extensions',
       action: () =>
         runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
       successMessage: 'File extensions validated',
-    });
-
-    await logStep({
-      startMessage: 'Verifying branded number cast coverage',
-      action: () =>
-        runCmdStep(
-          'pnpm run check:branded-number-casts',
-          'Branded number cast coverage check failed',
-        ),
-      successMessage: 'Branded number cast coverage verified',
-    });
-
-    await logStep({
-      startMessage: 'Cleaning dist directory',
-      action: () =>
-        runStep(
-          Result.fromPromise(
-            fs.rm(distDir, {
-              recursive: true,
-              force: true,
-            }),
-          ),
-          'Failed to clean dist directory',
-        ),
-      successMessage: 'Cleaned dist directory',
-    });
-
-    await logStep({
-      startMessage: 'Generating index files',
-      action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
-      successMessage: 'Index files generated',
     });
 
     await logStep({
@@ -81,26 +63,30 @@ const build = async (skipCheck: boolean): Promise<void> => {
   }
 
   await logStep({
+    startMessage: 'Cleaning dist directory',
+    action: () =>
+      runStep(
+        Result.fromPromise(fs.rm(distDir, { recursive: true, force: true })),
+        'Failed to clean dist directory',
+      ),
+    successMessage: 'Cleaned dist directory',
+  });
+
+  await logStep({
     startMessage: 'Building with Rollup',
     action: async () => {
-      // The config is imported directly (tsx transpiles it) instead of going
-      // through `rollup --config --configPlugin typescript`, because
-      // `@rollup/plugin-typescript` requires the TypeScript JS compiler API
-      // that TypeScript 7 no longer provides.
       const { default: rollupConfig } =
         await import('../../configs/rollup.config.mjs');
 
       await runStep(
         Result.fromPromise(
           (async () => {
-            // `await using` disposes (closes) the bundle when this scope
-            // exits, even if `bundle.write(...)` throws.
             await using bundle = await rollup(rollupConfig);
 
             const outputs =
               rollupConfig.output === undefined
                 ? ([] as const)
-                : Arr.isArray(rollupConfig.output)
+                : Array.isArray(rollupConfig.output)
                   ? rollupConfig.output
                   : ([rollupConfig.output] as const);
 
@@ -119,7 +105,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     startMessage: 'Generating type declarations',
     action: () =>
       runCmdStep(
-        `node "${nativeTsc}" -p "${path.resolve(projectRootPath, './configs/tsconfig.build.json')}" --emitDeclarationOnly`,
+        `node "${nativeTsc}" -p "${path.resolve(workspaceRootPath, './configs/tsconfig.build.json')}" --emitDeclarationOnly`,
         'Type declaration generation failed',
       ),
     successMessage: 'Type declarations generated',
@@ -167,7 +153,7 @@ const runStep = async (
   const result = await promise;
 
   if (Result.isErr(result)) {
-    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
+    console.error(`${errorMsg}: ${String(result.value)}`);
 
     console.error('❌ Build failed');
 
