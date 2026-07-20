@@ -1,7 +1,7 @@
 import { ISet, isString, memoizeFunction, Result } from 'ts-data-forge';
 import {
   type ArrayElement,
-  type NonEmptyArray,
+  type NonEmptyTuple,
   type Primitive,
 } from 'ts-type-forge';
 import { string } from '../primitives/index.mjs';
@@ -13,7 +13,7 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export function enumType<const Values extends NonEmptyArray<Primitive>>(
+export function enumType<const Values extends NonEmptyTuple<Primitive>>(
   values: Values,
   options?: Partial<
     Readonly<{
@@ -28,7 +28,7 @@ export function enumType<const Values extends NonEmptyArray<Primitive>>(
 // listed members via the `T | (string & {})` idiom while still accepting any
 // other string, and at runtime the value is validated as a plain string
 // (i.e. it behaves like `string()`).
-export function enumType<const Values extends NonEmptyArray<string>>(
+export function enumType<const Values extends NonEmptyTuple<string>>(
   values: Values,
   options: Readonly<{
     allowAnyString: true;
@@ -37,7 +37,7 @@ export function enumType<const Values extends NonEmptyArray<string>>(
   }>,
 ): Type<ArrayElement<Values> | (string & {})>;
 
-export function enumType<const Values extends NonEmptyArray<Primitive>>(
+export function enumType<const Values extends NonEmptyTuple<Primitive>>(
   values: Values,
   options?: Partial<
     Readonly<{

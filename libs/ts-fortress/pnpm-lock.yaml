@@ -12,11 +12,11 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0
       ts-data-forge:
-        specifier: ^10.0.0
-        version: 10.0.0(typescript@6.0.3)
+        specifier: ^11.0.0
+        version: 11.0.0(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^6.0.0
-        version: 6.0.0
+        specifier: ^7.0.0
+        version: 7.0.0
     devDependencies:
       '@rollup/plugin-replace':
         specifier: 6.0.3
@@ -4313,8 +4313,8 @@ packages:
       ts-repo-utils:
         optional: true
 
-  ts-data-forge@10.0.0:
-    resolution: {integrity: sha512-JbhsTcNhnAD7F/fDUPs1pMpj2phvEmRI/B/uXJpy47/nFN8Mhttj1mAH0qY9xPHIYcsQ7khh90uO64IPNNcFxg==}
+  ts-data-forge@11.0.0:
+    resolution: {integrity: sha512-dJRBXLBMPG4gBYnPq/AsY5zISOV9OauzoAb/2y119G2H8DPH2LjrZmEhIkTjy4YZoQfOMvsVzYzDYSt/OJkk6A==}
     engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
     peerDependencies:
       typescript: '>=4.8'
@@ -4348,8 +4348,8 @@ packages:
     resolution: {integrity: sha512-QoHXXnTyW00e1CLgWvX3U+Ko2NpMJYji6K/muFHh+2VdBKpuM+vXWam3BUDC+3I5yarXmLwXloudr2tfVHcZiA==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
 
-  ts-type-forge@6.0.0:
-    resolution: {integrity: sha512-JaKup0HC8vBjnKPfDXao2NYzX1/5cB6LR5S4fCHRqqNLSNoZtH08jR/IuvjLDVg3paxyQWXm6BG1/bqgN9XEYg==}
+  ts-type-forge@7.0.0:
+    resolution: {integrity: sha512-7XX9AjeMTRgDTDIfR/oGd+NeRbOUzch6b5YRxdf1gIjhZQAJpzRRjZuPpUL/yjbxB+ZXcjjjQWigNgqbpzifWA==}
     engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   tsconfig-paths@3.15.0:
@@ -9147,10 +9147,10 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  ts-data-forge@10.0.0(typescript@6.0.3):
+  ts-data-forge@11.0.0(typescript@6.0.3):
     dependencies:
       '@sindresorhus/is': 8.1.0
-      ts-type-forge: 6.0.0
+      ts-type-forge: 7.0.0
       typescript: 6.0.3
 
   ts-data-forge@6.13.1(typescript@6.0.3):
@@ -9195,7 +9195,7 @@ snapshots:
 
   ts-type-forge@3.2.0: {}
 
-  ts-type-forge@6.0.0: {}
+  ts-type-forge@7.0.0: {}
 
   tsconfig-paths@3.15.0:
     dependencies:

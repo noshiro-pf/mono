@@ -1,7 +1,7 @@
 import { Arr, expectType, Obj } from 'ts-data-forge';
 import {
   type Intersection,
-  type NonEmptyArray,
+  type NonEmptyTuple,
   type UnknownRecord,
 } from 'ts-type-forge';
 import { union } from '../compose/index.mjs';
@@ -20,7 +20,7 @@ import { record } from './record.mjs';
 const MERGE_RECORDS_MAX_VARIANTS = 10_000;
 
 export const mergeRecords = <
-  const Types extends NonEmptyArray<Type<UnknownRecord>>,
+  const Types extends NonEmptyTuple<Type<UnknownRecord>>,
 >(
   recordTypes: Types,
   options?: Partial<
@@ -87,7 +87,7 @@ export const mergeRecords = <
   );
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  return union(variants as NonEmptyArray<Type<UnknownRecord>>, {
+  return union(variants as NonEmptyTuple<Type<UnknownRecord>>, {
     typeName: typeNameFilled,
   }) as MergeRecordsType<Types>;
 };

@@ -11,15 +11,21 @@ import { nonEmptyArray } from './non-empty-array.mjs';
 describe(nonEmptyArray, () => {
   describe('arg patterns', () => {
     test('without explicit default value', () => {
-      assert.deepStrictEqual(nonEmptyArray(number()).defaultValue, [0]);
+      assert.deepStrictEqual<readonly number[]>(
+        nonEmptyArray(number()).defaultValue,
+        [0],
+      );
     });
 
     test('with explicit default value, case 1', () => {
-      assert.deepStrictEqual(nonEmptyArray(number(1)).defaultValue, [1]);
+      assert.deepStrictEqual<readonly number[]>(
+        nonEmptyArray(number(1)).defaultValue,
+        [1],
+      );
     });
 
     test('with explicit default value, case 2', () => {
-      assert.deepStrictEqual(
+      assert.deepStrictEqual<readonly number[]>(
         nonEmptyArray(number(), {
           typeName: 'xs',
           defaultValue: [2],
@@ -90,7 +96,7 @@ describe(nonEmptyArray, () => {
 
       const resultValue = Result.unwrapThrow(result);
 
-      assert.deepStrictEqual(resultValue, [1, 2, 3]);
+      assert.deepStrictEqual<readonly number[]>(resultValue, [1, 2, 3]);
     });
 
     test('validate returns input as-is for OK cases', () => {
@@ -168,19 +174,19 @@ describe(nonEmptyArray, () => {
     test('noop', () => {
       const ys: unknown = [1, 2, 3] as const;
 
-      assert.deepStrictEqual(xs.fill(ys), [1, 2, 3]);
+      assert.deepStrictEqual<readonly number[]>(xs.fill(ys), [1, 2, 3]);
     });
 
     test('fill with the default value', () => {
       const ys: unknown = ['1', '', 3] as const;
 
-      assert.deepStrictEqual(xs.fill(ys), [0, 0, 3]);
+      assert.deepStrictEqual<readonly number[]>(xs.fill(ys), [0, 0, 3]);
     });
 
     test('fill empty array', () => {
       const ys: unknown = [] as const;
 
-      assert.deepStrictEqual(xs.fill(ys), [1]);
+      assert.deepStrictEqual<readonly number[]>(xs.fill(ys), [1]);
     });
   });
 });

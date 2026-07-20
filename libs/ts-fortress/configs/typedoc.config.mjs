@@ -16,6 +16,8 @@ const config = {
   ].map((p) => path.resolve(srcDir, p)),
   out: outDir,
   gitRevision: 'main',
+  sourceLinkTemplate:
+    'https://github.com/noshiro-pf/ts-fortress/blob/{gitRevision}/{path}#L{line}',
   headings: {
     document: true,
     readme: false,

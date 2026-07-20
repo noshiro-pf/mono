@@ -1,7 +1,7 @@
 import { expectType } from 'ts-data-forge';
 import {
   type ArrayElement,
-  type NonEmptyArray,
+  type NonEmptyTuple,
   type PartiallyRequired,
   type TypeEq,
   type UnknownRecord,
@@ -25,7 +25,7 @@ import { record } from './record.mjs';
  */
 export const required = <
   const R extends UnknownRecord,
-  const KeysToBeRequired extends NonEmptyArray<keyof R & string>,
+  const KeysToBeRequired extends NonEmptyTuple<keyof R & string>,
 >(
   recordType: Type<R>,
   options?: Partial<
@@ -75,13 +75,13 @@ export const required = <
 
 type RequiredType<
   R extends UnknownRecord,
-  KeysToBeRequired extends NonEmptyArray<keyof R & string>,
+  KeysToBeRequired extends NonEmptyTuple<keyof R & string>,
 > = Type<RequiredValue<R, KeysToBeRequired>>;
 
 /** Compute the required value type. */
 type RequiredValue<
   R extends UnknownRecord,
-  KeysToBeRequired extends NonEmptyArray<keyof R & string> | undefined,
+  KeysToBeRequired extends NonEmptyTuple<keyof R & string> | undefined,
 > =
   TypeEq<KeysToBeRequired, undefined> extends true
     ? Readonly<Required<R>>

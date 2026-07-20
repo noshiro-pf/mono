@@ -60,7 +60,7 @@
     "gh:backup-repository-settings": "gh-backup-repository-settings",
     "gh:backup-rulesets": "gh-backup-rulesets",
     "gi": "run-s gi:src fmt",
-    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude build-type.mts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
@@ -79,8 +79,8 @@
   },
   "dependencies": {
     "@sindresorhus/is": "^8.1.0",
-    "ts-data-forge": "^10.0.0",
-    "ts-type-forge": "^6.0.0"
+    "ts-data-forge": "^11.0.0",
+    "ts-type-forge": "^7.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",

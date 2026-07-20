@@ -1,14 +1,12 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import { type NonEmptyArray } from 'ts-type-forge';
+import { type NonEmptyArray, type NonEmptyTuple } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
-  createAssertFn,
-  createCastFn,
-  createIsFn,
   createPrimitiveValidationError,
   prependIndexToValidationErrors,
   type ValidationError,
 } from '../utils/index.mjs';
+import { buildType } from './build-type.mjs';
 
 export type { NonEmptyArray } from 'ts-type-forge';
 
@@ -17,20 +15,21 @@ export const nonEmptyArray = <A,>(
   options?: Partial<
     Readonly<{
       typeName: string;
-      defaultValue: NonEmptyArray<A>;
+      defaultValue: NonEmptyTuple<A>;
     }>
   >,
 ): Type<NonEmptyArray<A>> => {
-  type T = NonEmptyArray<A>;
-
   const typeName =
     options?.typeName ?? `NonEmptyArray<${elementType.typeName}>`;
 
   const getDefaultValue = memoizeFunction(
-    (): T => options?.defaultValue ?? Arr.newArray(1, elementType.defaultValue),
+    (): readonly A[] =>
+      options?.defaultValue ?? Arr.newArray(1, elementType.defaultValue),
   );
 
-  const validate: Type<T>['validate'] = (a) => {
+  const validate = (
+    a: unknown,
+  ): Result<readonly A[], readonly ValidationError[]> => {
     if (!Arr.isArray(a)) {
       return Result.err([
         createPrimitiveValidationError({
@@ -71,26 +70,19 @@ export const nonEmptyArray = <A,>(
     }
 
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return Result.ok(a as unknown as T);
+    return Result.ok(a as readonly A[]);
   };
 
-  const fill: Type<T>['fill'] = (a) =>
-    Arr.isArray(a) && Arr.isNonEmpty(a)
-      ? Arr.map(a, (e) => elementType.fill(e))
+  const fill = (a: unknown): readonly A[] =>
+    Arr.isArray(a) && Arr.isMinLengthTuple(a, 1)
+      ? Arr.map(a, (e) => elementType.fill(e) satisfies A)
       : getDefaultValue();
 
-  const prune = (a: T): T => Arr.map(a, (e) => elementType.prune(e));
-
-  return {
+  return buildType<A, NonEmptyArray<A>>({
     typeName,
-    get defaultValue() {
-      return getDefaultValue();
-    },
-    fill,
-    prune,
+    getDefaultValue,
     validate,
-    is: createIsFn(validate),
-    assertIs: createAssertFn(validate),
-    cast: createCastFn(validate),
-  };
+    fill,
+    elementType,
+  });
 };

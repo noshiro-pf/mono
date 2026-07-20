@@ -1,5 +1,5 @@
 import { Arr, Result, expectType, memoizeFunction } from 'ts-data-forge';
-import { type ArrayElement, type NonEmptyArray } from 'ts-type-forge';
+import { type ArrayElement, type NonEmptyTuple } from 'ts-type-forge';
 import {
   hasRecordInternals,
   type AnyType,
@@ -15,7 +15,7 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export const union = <const Types extends NonEmptyArray<AnyType>>(
+export const union = <const Types extends NonEmptyTuple<AnyType>>(
   types: Types,
   options?: Partial<
     Readonly<{
@@ -102,15 +102,15 @@ export const union = <const Types extends NonEmptyArray<AnyType>>(
   return baseType;
 };
 
-type UnionType<Types extends NonEmptyArray<AnyType>> = Type<
+type UnionType<Types extends NonEmptyTuple<AnyType>> = Type<
   UnionTypeValue<Types>
 >;
 
-type UnionTypeValue<Types extends NonEmptyArray<AnyType>> =
+type UnionTypeValue<Types extends NonEmptyTuple<AnyType>> =
   TsFortressInternal.UnionTypeValueImpl<Types>;
 
 namespace TsFortressInternal {
-  export type UnionTypeValueImpl<Types extends NonEmptyArray<AnyType>> =
+  export type UnionTypeValueImpl<Types extends NonEmptyTuple<AnyType>> =
     UnwrapUnion<ArrayElement<Types>>;
 
   type UnwrapUnion<T extends AnyType> = T extends T ? TypeOf<T> : never;

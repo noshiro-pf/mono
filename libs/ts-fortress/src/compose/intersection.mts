@@ -1,5 +1,5 @@
 import { Arr, expectType, hasKey, isRecord, Result, tp } from 'ts-data-forge';
-import { type Intersection, type NonEmptyArray } from 'ts-type-forge';
+import { type Intersection, type NonEmptyTuple } from 'ts-type-forge';
 import {
   hasRecordInternals,
   type AnyType,
@@ -15,7 +15,7 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export const intersection = <const Types extends NonEmptyArray<AnyType>>(
+export const intersection = <const Types extends NonEmptyTuple<AnyType>>(
   types: Types,
   defaultType: IntersectionType<Types>,
   options?: Partial<
@@ -141,18 +141,18 @@ const mergePruned = (x: unknown, y: unknown): unknown => {
   return y;
 };
 
-type IntersectionType<Types extends NonEmptyArray<AnyType>> = Type<
+type IntersectionType<Types extends NonEmptyTuple<AnyType>> = Type<
   IntersectionTypeValue<Types>
 >;
 
-type IntersectionTypeValue<Types extends NonEmptyArray<AnyType>> =
+type IntersectionTypeValue<Types extends NonEmptyTuple<AnyType>> =
   TsFortressInternal.IntersectionTypeValueImpl<Types>;
 
 namespace TsFortressInternal {
-  export type IntersectionTypeValueImpl<Types extends NonEmptyArray<AnyType>> =
+  export type IntersectionTypeValueImpl<Types extends NonEmptyTuple<AnyType>> =
     Intersection<Cast0<UnwrapTypeList<Types>>>;
 
-  type Cast0<T> = readonly [T] extends readonly [NonEmptyArray<unknown>]
+  type Cast0<T> = readonly [T] extends readonly [NonEmptyTuple<unknown>]
     ? T
     : never;
 }

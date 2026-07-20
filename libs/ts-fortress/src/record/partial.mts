@@ -1,7 +1,7 @@
 import { expectType } from 'ts-data-forge';
 import {
   type ArrayElement,
-  type NonEmptyArray,
+  type NonEmptyTuple,
   type PartiallyPartial,
   type TypeEq,
   type UnknownRecord,
@@ -24,7 +24,7 @@ import { record } from './record.mjs';
  */
 export const partial = <
   const R extends UnknownRecord,
-  const KeysToBeOptional extends NonEmptyArray<keyof R & string>,
+  const KeysToBeOptional extends NonEmptyTuple<keyof R & string>,
 >(
   recordType: Type<R>,
   options?: Partial<
@@ -74,14 +74,14 @@ export const partial = <
 
 type PartialType<
   R extends UnknownRecord,
-  KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined =
+  KeysToBeOptional extends NonEmptyTuple<keyof R & string> | undefined =
     undefined,
 > = Type<PartialValue<R, KeysToBeOptional>>;
 
 /** Compute the partial value type. */
 type PartialValue<
   R extends UnknownRecord,
-  KeysToBeOptional extends NonEmptyArray<keyof R & string> | undefined,
+  KeysToBeOptional extends NonEmptyTuple<keyof R & string> | undefined,
 > =
   TypeEq<KeysToBeOptional, undefined> extends true
     ? Partial<R>
@@ -105,7 +105,7 @@ type PartialValue<
   >('=');
 
   expectType<
-    // @ts-expect-error NonEmptyArray is required if keysToBeOptional is provided
+    // @ts-expect-error NonEmptyTuple is required if keysToBeOptional is provided
     PartialType<TypeOf<Base>, readonly []>,
     Type<Readonly<{ a?: 0; b?: 1; c: 2 }>>
   >('!=');
@@ -118,7 +118,7 @@ type PartialValue<
   // partial with no keys makes all properties optional
   expectType<
     TypeOf<
-      ReturnType<typeof partial<TypeOf<Base>, NonEmptyArray<'a' | 'b' | 'c'>>>
+      ReturnType<typeof partial<TypeOf<Base>, NonEmptyTuple<'a' | 'b' | 'c'>>>
     >,
     Partial<Readonly<{ a: 0; b: 1; c: 2 }>>
   >('=');
