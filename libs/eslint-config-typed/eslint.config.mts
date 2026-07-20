@@ -176,6 +176,9 @@ export default [
 
   ...eslintConfigForReact(['test/**/*.{mts,tsx}']),
 
+  // Kept until eslint-config-typed's next major; the rules now live in the
+  // standalone `eslint-plugin-ts-data-forge` package.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   eslintConfigForTsDataForge(['test/**/*.{mts,tsx}']),
 
   {
