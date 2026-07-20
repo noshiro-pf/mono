@@ -1,9 +1,0 @@
-.github
-agents
-scripts
-test
-
-tsconfig.json
-.cspell.config.yaml
-.prettierrc
-pnpm-lock.yaml

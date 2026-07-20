@@ -18,6 +18,10 @@
       "import": {
         "types": "./dist/types.d.mts",
         "default": "./dist/entry-point.mjs"
+      },
+      "default": {
+        "types": "./dist/types.d.mts",
+        "default": "./dist/entry-point.mjs"
       }
     },
     "./vitest-globals": {
@@ -34,6 +38,8 @@
     "vitest-globals.d.ts"
   ],
   "scripts": {
+    "agents:gen": "tsx ./scripts/cmd/gen-agents-md.mts",
+    "agents:sync": "tsx ./scripts/cmd/sync-agent-config.mts",
     "apply-type-transformations": "tsx ./scripts/gen-eslint-rules/codemod/apply-type-transformations.mts",
     "build": "tsx ./scripts/cmd/build.mts",
     "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
@@ -187,5 +193,9 @@
   },
   "volta": {
     "node": "26.3.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
