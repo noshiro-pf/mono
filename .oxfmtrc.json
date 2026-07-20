@@ -1,11 +1,9 @@
 {
-  "plugins": [
-    "prettier-plugin-organize-imports",
-    "prettier-plugin-packagejson"
-  ],
   "semi": true,
   "endOfLine": "lf",
   "singleQuote": true,
+  "printWidth": 80,
+  "sortPackageJson": true,
   "overrides": [
     {
       "files": ["**/*.md", "**/*.mdx"],

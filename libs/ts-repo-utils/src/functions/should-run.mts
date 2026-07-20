@@ -49,7 +49,7 @@ import { getDiffFrom } from './diff.mjs';
  *   - **File extensions**: e.g., `**.md` matches any markdown file Defaults to:
  *       `['LICENSE', '.editorconfig', '.gitignore', '.cspell.json', '.cspell.config.yaml',
  *       '.markdownlint-cli2.mjs', '.npmignore', '.prettierignore',
- *       '.prettierrc', 'docs/', '**.md', '**.txt']`
+ *       '.oxfmtrc.json', 'docs/', '**.md', '**.txt']`
  *
  * @param options.baseBranch - Base branch to compare against for determining
  *   changed files. Defaults to `'origin/main'`
@@ -72,7 +72,7 @@ export const checkShouldRunTypeChecks = async (
     '.markdownlint-cli2.mjs',
     '.npmignore',
     '.prettierignore',
-    '.prettierrc',
+    '.oxfmtrc.json',
     'docs/',
     '**.md',
     '**.txt',
