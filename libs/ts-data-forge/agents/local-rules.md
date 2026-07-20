@@ -1,5 +1,9 @@
 # ts-data-forge Local Rules & Guidelines
 
+In addition to the common instructions above (vendored into
+`agents/common-rules.md` from the common-agent-config repository), the
+project-specific rules below apply.
+
 ## Project Structure
 
 - `src/`: ESM TypeScript modules (`.mts`), organized by domain (e.g., `array/`, `functional/`, `guard/`). Place tests as `*.test.mts` beside sources.

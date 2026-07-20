@@ -22,6 +22,8 @@
     "packages/**"
   ],
   "scripts": {
+    "agents:gen": "tsx ./scripts/cmd/gen-agents-md.mts",
+    "agents:sync": "tsx ./scripts/cmd/sync-agent-config.mts",
     "build": "pnpm run ws:build",
     "build:min": "pnpm run ws:build",
     "check:ext": "pnpm run ws:check:ext",
