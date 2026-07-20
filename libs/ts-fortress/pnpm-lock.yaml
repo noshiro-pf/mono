@@ -63,9 +63,6 @@ importers:
       cspell:
         specifier: 10.0.1
         version: 10.0.1
-      dedent:
-        specifier: 1.7.2
-        version: 1.7.2
       esbuild:
         specifier: 0.28.1
         version: 0.28.1
@@ -6570,7 +6567,8 @@ snapshots:
     dependencies:
       character-entities: 2.0.2
 
-  dedent@1.7.2: {}
+  dedent@1.7.2:
+    optional: true
 
   deep-extend@0.6.0: {}
 

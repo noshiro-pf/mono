@@ -56,16 +56,6 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Documentation generated',
   });
 
-  await logStep({
-    startMessage: 'Backing up repository settings',
-    action: () =>
-      runCmdStep(
-        'pnpm run gh:backup-all',
-        'Backing up repository settings failed',
-      ),
-    successMessage: 'Repository settings backed up',
-  });
-
   console.log('✅ All checks completed successfully!\n');
 };
 

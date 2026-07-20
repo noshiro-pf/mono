@@ -1,6 +1,9 @@
-# Local Project-Specific Agent Instructions
+# ts-fortress Local Rules
 
-This file contains project-specific coding guidelines and conventions that supplement the shared instructions in `common/agents/AGENTS.md`.
+Repository-specific rules for `ts-fortress` (a runtime type-validation /
+branded-type library). These supplement the shared instructions above
+(vendored into `agents/common-rules.md` from the common-agent-config
+repository).
 
 ## Validation Error Handling
 
@@ -8,13 +11,13 @@ This file contains project-specific coding guidelines and conventions that suppl
 
 All validation error messages must be centralized in `src/utils/validation-error.mts` to ensure consistency and maintainability.
 
-#### Guidelines:
+#### Guidelines
 
 1. **Define Error Details Types**: Add new error detail types to `ValidationErrorDetails` in `src/utils/validation-error.mts`
 2. **Implement Message Logic**: Add corresponding message generation logic in the `createDetailsMessage` function
 3. **Use Structured Details**: Always use the `details` field in `ValidationError` rather than custom error messages
 
-#### Example:
+#### Example
 
 **❌ Don't do this:**
 ```typescript
@@ -75,7 +78,7 @@ const validate = (a: unknown) => {
 };
 ```
 
-#### Benefits:
+#### Benefits
 
 - **Consistency**: All error messages follow the same format
 - **Maintainability**: Update error messages in one place
@@ -83,7 +86,7 @@ const validate = (a: unknown) => {
 - **Type Safety**: TypeScript ensures all error kinds are handled
 - **i18n Ready**: Centralized messages make internationalization easier
 
-#### When to Use `kind: 'custom'`:
+#### When to Use `kind: 'custom'`
 
 The `custom` kind should only be used when:
 - The error is truly one-off and doesn't fit any existing pattern
