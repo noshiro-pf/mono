@@ -100,6 +100,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/branded-types/predefined-numbers/non-negative-int16-example.mts',
       'samples/src/branded-types/predefined-numbers/positive-int16-example.mts',
       'samples/src/branded-types/predefined-numbers/negative-int16-example.mts',
+      'samples/src/branded-types/predefined-numbers/non-positive-int16-example.mts',
     ],
   },
   {
@@ -110,6 +111,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/branded-types/predefined-numbers/non-negative-int32-example.mts',
       'samples/src/branded-types/predefined-numbers/positive-int32-example.mts',
       'samples/src/branded-types/predefined-numbers/negative-int32-example.mts',
+      'samples/src/branded-types/predefined-numbers/non-positive-int32-example.mts',
     ],
   },
   {

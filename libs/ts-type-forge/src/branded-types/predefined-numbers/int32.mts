@@ -1,8 +1,11 @@
+/* AUTO-GENERATED. DO NOT EDIT. Regenerate with `pnpm run build`. */
+
 import { type IntersectBrand } from '../brand.mjs';
 import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import {
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonPositiveNumber,
   type NonZeroNumber,
   type PositiveNumber,
 } from './core.mjs';
@@ -30,6 +33,7 @@ export type Int32 = TSTypeForgeInternals_ExtendNumberBrand<
 
 /**
  * Branded numeric type for non-zero 32-bit signed integers.
+ * Represents a 32-bit signed integer that is not equal to zero.
  * Range: [-2^31, -1] ∪ [1, 2^31 - 1]
  *
  * @example
@@ -44,6 +48,7 @@ export type NonZeroInt32 = IntersectBrand<Int32, NonZeroNumber>;
 
 /**
  * Branded numeric type for non-negative 32-bit signed integers.
+ * Represents a 32-bit signed integer that is greater than or equal to zero.
  * Range: [0, 2^31 - 1] or [0, 2,147,483,647]
  *
  * @example
@@ -58,6 +63,7 @@ export type NonNegativeInt32 = IntersectBrand<Int32, NonNegativeNumber>;
 
 /**
  * Branded numeric type for positive 32-bit signed integers.
+ * Represents a 32-bit signed integer that is strictly greater than zero.
  * Range: [1, 2^31 - 1] or [1, 2,147,483,647]
  *
  * @example
@@ -71,7 +77,8 @@ export type NonNegativeInt32 = IntersectBrand<Int32, NonNegativeNumber>;
 export type PositiveInt32 = IntersectBrand<Int32, PositiveNumber>;
 
 /**
- * Branded numeric type for negative 32-bit integers.
+ * Branded numeric type for negative 32-bit signed integers.
+ * Represents a 32-bit signed integer that is strictly less than zero.
  * Range: [-2^31, -1] or [-2,147,483,648, -1]
  *
  * @example
@@ -83,6 +90,21 @@ export type PositiveInt32 = IntersectBrand<Int32, PositiveNumber>;
  * ```
  */
 export type NegativeInt32 = IntersectBrand<Int32, NegativeNumber>;
+
+/**
+ * Branded numeric type for non-positive 32-bit signed integers.
+ * Represents a 32-bit signed integer that is less than or equal to zero.
+ * Range: [-2^31, 0] or [-2,147,483,648, 0]
+ *
+ * @example
+ * ```ts
+ * const isNonPositiveInt32 = (x: number): x is NonPositiveInt32 =>
+ *   Number.isSafeInteger(x) && x <= 0 && x >= -(2 ** 31);
+ *
+ * const temperatureDelta = (drop: NonPositiveInt32) => ({ drop });
+ * ```
+ */
+export type NonPositiveInt32 = IntersectBrand<Int32, NonPositiveNumber>;
 
 /**
  * 32-bit integer type with small literal values included.
@@ -113,3 +135,9 @@ export type PositiveInt32WithSmallInt = WithSmallInt<PositiveInt32>;
  * Type: `-40 | -39 | ... | -1 | NegativeInt32`
  */
 export type NegativeInt32WithSmallInt = WithSmallInt<NegativeInt32>;
+
+/**
+ * Non-positive 32-bit integer type with small literal values included.
+ * Type: `-40 | -39 | ... | 0 | NonPositiveInt32`
+ */
+export type NonPositiveInt32WithSmallInt = WithSmallInt<NonPositiveInt32>;

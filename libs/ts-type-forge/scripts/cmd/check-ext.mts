@@ -7,6 +7,8 @@ await assertExt({
     {
       path: path.resolve(projectRootPath, './src'),
       extension: '.mts',
+      // Markdown docs (e.g. predefined-numbers/README.md) live alongside source.
+      ignorePatterns: ['**/*.md'],
     },
     {
       path: path.resolve(projectRootPath, './test'),

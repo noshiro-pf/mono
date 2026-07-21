@@ -1,3 +1,5 @@
+/* AUTO-GENERATED. DO NOT EDIT. Regenerate with `pnpm run build`. */
+
 import { type IntersectBrand } from '../brand.mjs';
 import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import { type PositiveNumber } from './core.mjs';
@@ -24,6 +26,7 @@ export type Uint16 = TSTypeForgeInternals_ExtendNumberBrand<
 
 /**
  * Branded numeric type for positive 16-bit unsigned integers.
+ * Represents a 16-bit unsigned integer that is strictly greater than zero.
  * Range: [1, 2^16 - 1] or [1, 65,535]
  *
  * @example
@@ -38,7 +41,7 @@ export type PositiveUint16 = IntersectBrand<Uint16, PositiveNumber>;
 
 /**
  * Alias for `PositiveUint16`.
- * Branded numeric type for non-zero 16-bit unsigned integers.
+ * Branded numeric type for positive 16-bit unsigned integers (strictly greater than zero).
  * Range: [1, 2^16 - 1] or [1, 65,535]
  *
  * @example
@@ -65,7 +68,7 @@ export type PositiveUint16WithSmallInt = WithSmallInt<PositiveUint16>;
 
 /**
  * Alias for `PositiveUint16WithSmallInt`.
- * Non-zero 16-bit unsigned integer type with small literal values included.
+ * Positive 16-bit unsigned integer type with small literal values included.
  * Type: `1 | 2 | ... | 39 | NonZeroUint16`
  */
 export type NonZeroUint16WithSmallInt = PositiveUint16WithSmallInt;

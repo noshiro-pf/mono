@@ -2,7 +2,11 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { type UnknownResult, unknownToString } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
-import { genEntryPoint, genGlobal } from '../functions/index.mjs';
+import {
+  genEntryPoint,
+  genGlobal,
+  genNumberBrandTypes,
+} from '../functions/index.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { genAgentsMd } from './gen-agents-md.mjs';
 
@@ -33,6 +37,16 @@ const nativeTsc = path.resolve(
  */
 const build = async (skipCheck: boolean): Promise<void> => {
   console.log('Starting build process...\n');
+
+  await logStep({
+    startMessage: 'Generating branded integer number types',
+    action: () =>
+      runStep(
+        genNumberBrandTypes(srcDir),
+        'Failed to generate branded integer number types',
+      ),
+    successMessage: 'Generated src/branded-types/predefined-numbers/*.mts',
+  });
 
   await logStep({
     startMessage: 'Generating per-directory index.mts files',

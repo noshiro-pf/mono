@@ -1,3 +1,5 @@
+/* AUTO-GENERATED. DO NOT EDIT. Regenerate with `pnpm run build`. */
+
 import { type IntersectBrand } from '../brand.mjs';
 import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import {
@@ -30,7 +32,7 @@ export type SafeInt = TSTypeForgeInternals_ExtendNumberBrand<Int, 'SafeInt'>;
 
 /**
  * Branded numeric type for non-zero safe integers.
- * Represents safe integers that are not equal to zero.
+ * Represents a safe integer that is not equal to zero.
  *
  * @example
  * ```ts
@@ -44,8 +46,8 @@ export type SafeInt = TSTypeForgeInternals_ExtendNumberBrand<Int, 'SafeInt'>;
 export type NonZeroSafeInt = IntersectBrand<SafeInt, NonZeroNumber>;
 
 /**
- * Branded numeric type for safe unsigned integers.
- * Represents non-negative integers within the safe integer range.
+ * Branded numeric type for non-negative safe integers.
+ * Represents a safe integer that is greater than or equal to zero.
  *
  * @example
  * ```ts
@@ -59,8 +61,14 @@ export type NonZeroSafeInt = IntersectBrand<SafeInt, NonZeroNumber>;
 export type SafeUint = IntersectBrand<SafeInt, NonNegativeNumber>;
 
 /**
+ * Alias for `SafeUint`.
+ * Branded numeric type for non-negative safe integers (greater than or equal to zero).
+ */
+export type NonNegativeSafeInt = SafeUint;
+
+/**
  * Branded numeric type for positive safe integers.
- * Represents positive integers within the safe integer range.
+ * Represents a safe integer that is strictly greater than zero.
  *
  * @example
  * ```ts
@@ -75,7 +83,7 @@ export type PositiveSafeInt = IntersectBrand<SafeInt, PositiveNumber>;
 
 /**
  * Branded numeric type for negative safe integers.
- * Represents negative integers within the safe integer range.
+ * Represents a safe integer that is strictly less than zero.
  *
  * @example
  * ```ts
@@ -88,11 +96,18 @@ export type PositiveSafeInt = IntersectBrand<SafeInt, PositiveNumber>;
 export type NegativeSafeInt = IntersectBrand<SafeInt, NegativeNumber>;
 
 /**
- * Alias for `SafeUint`.
- * Branded numeric type for non-negative safe integers.
- * Represents non-negative integers within the safe integer range.
+ * Branded numeric type for non-positive safe integers.
+ * Represents a safe integer that is less than or equal to zero.
+ *
+ * @example
+ * ```ts
+ * const isNonPositiveSafeInt = (x: number): x is NonPositiveSafeInt =>
+ *   Number.isSafeInteger(x) && x <= 0;
+ *
+ * const debt = (amount: NonPositiveSafeInt) => ({ debt: amount });
+ * ```
  */
-export type NonNegativeSafeInt = SafeUint;
+export type NonPositiveSafeInt = IntersectBrand<SafeInt, NonPositiveNumber>;
 
 /**
  * Safe integer type with small literal values included.
@@ -108,16 +123,16 @@ export type NonZeroSafeIntWithSmallInt = WithSmallInt<NonZeroSafeInt>;
 
 /**
  * Non-negative safe integer type with small literal values included.
- * Type: `0 | 1 | ... | 39 | NonNegativeSafeInt`
- */
-export type NonNegativeSafeIntWithSmallInt = WithSmallInt<NonNegativeSafeInt>;
-
-/**
- * Alias for `NonNegativeSafeIntWithSmallInt`.
- * Safe unsigned integer type with small literal values included.
  * Type: `0 | 1 | ... | 39 | SafeUint`
  */
-export type SafeUintWithSmallInt = NonNegativeSafeIntWithSmallInt;
+export type SafeUintWithSmallInt = WithSmallInt<SafeUint>;
+
+/**
+ * Alias for `SafeUintWithSmallInt`.
+ * Non-negative safe integer type with small literal values included.
+ * Type: `0 | 1 | ... | 39 | NonNegativeSafeInt`
+ */
+export type NonNegativeSafeIntWithSmallInt = SafeUintWithSmallInt;
 
 /**
  * Positive safe integer type with small literal values included.
@@ -130,20 +145,6 @@ export type PositiveSafeIntWithSmallInt = WithSmallInt<PositiveSafeInt>;
  * Type: `-40 | -39 | ... | -1 | NegativeSafeInt`
  */
 export type NegativeSafeIntWithSmallInt = WithSmallInt<NegativeSafeInt>;
-
-/**
- * Branded numeric type for non-positive safe integers.
- * Represents safe integers less than or equal to zero.
- *
- * @example
- * ```ts
- * const isNonPositiveSafeInt = (x: number): x is NonPositiveSafeInt =>
- *   Number.isSafeInteger(x) && x <= 0;
- *
- * const debt = (amount: NonPositiveSafeInt) => ({ debt: amount });
- * ```
- */
-export type NonPositiveSafeInt = IntersectBrand<SafeInt, NonPositiveNumber>;
 
 /**
  * Non-positive safe integer type with small literal values included.

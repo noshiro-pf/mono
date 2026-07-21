@@ -1,8 +1,11 @@
+/* AUTO-GENERATED. DO NOT EDIT. Regenerate with `pnpm run build`. */
+
 import { type IntersectBrand } from '../brand.mjs';
 import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import {
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonPositiveNumber,
   type NonZeroNumber,
   type PositiveNumber,
 } from './core.mjs';
@@ -29,6 +32,7 @@ export type Int16 = TSTypeForgeInternals_ExtendNumberBrand<
 
 /**
  * Branded numeric type for non-zero 16-bit signed integers.
+ * Represents a 16-bit signed integer that is not equal to zero.
  * Range: [-2^15, -1] ∪ [1, 2^15 - 1]
  *
  * @example
@@ -43,6 +47,7 @@ export type NonZeroInt16 = IntersectBrand<Int16, NonZeroNumber>;
 
 /**
  * Branded numeric type for non-negative 16-bit signed integers.
+ * Represents a 16-bit signed integer that is greater than or equal to zero.
  * Range: [0, 2^15 - 1] or [0, 32,767]
  *
  * @example
@@ -57,6 +62,7 @@ export type NonNegativeInt16 = IntersectBrand<Int16, NonNegativeNumber>;
 
 /**
  * Branded numeric type for positive 16-bit signed integers.
+ * Represents a 16-bit signed integer that is strictly greater than zero.
  * Range: [1, 2^15 - 1] or [1, 32,767]
  *
  * @example
@@ -70,7 +76,8 @@ export type NonNegativeInt16 = IntersectBrand<Int16, NonNegativeNumber>;
 export type PositiveInt16 = IntersectBrand<Int16, PositiveNumber>;
 
 /**
- * Branded numeric type for negative 16-bit integers.
+ * Branded numeric type for negative 16-bit signed integers.
+ * Represents a 16-bit signed integer that is strictly less than zero.
  * Range: [-2^15, -1] or [-32,768, -1]
  *
  * @example
@@ -82,6 +89,21 @@ export type PositiveInt16 = IntersectBrand<Int16, PositiveNumber>;
  * ```
  */
 export type NegativeInt16 = IntersectBrand<Int16, NegativeNumber>;
+
+/**
+ * Branded numeric type for non-positive 16-bit signed integers.
+ * Represents a 16-bit signed integer that is less than or equal to zero.
+ * Range: [-2^15, 0] or [-32,768, 0]
+ *
+ * @example
+ * ```ts
+ * const isNonPositiveInt16 = (x: number): x is NonPositiveInt16 =>
+ *   Number.isSafeInteger(x) && x <= 0 && x >= -(2 ** 15);
+ *
+ * const relativeFloor = (level: NonPositiveInt16) => ({ level });
+ * ```
+ */
+export type NonPositiveInt16 = IntersectBrand<Int16, NonPositiveNumber>;
 
 /**
  * 16-bit integer type with small literal values included.
@@ -112,3 +134,9 @@ export type PositiveInt16WithSmallInt = WithSmallInt<PositiveInt16>;
  * Type: `-40 | -39 | ... | -1 | NegativeInt16`
  */
 export type NegativeInt16WithSmallInt = WithSmallInt<NegativeInt16>;
+
+/**
+ * Non-positive 16-bit integer type with small literal values included.
+ * Type: `-40 | -39 | ... | 0 | NonPositiveInt16`
+ */
+export type NonPositiveInt16WithSmallInt = WithSmallInt<NonPositiveInt16>;

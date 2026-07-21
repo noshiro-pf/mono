@@ -1,3 +1,5 @@
+/* AUTO-GENERATED. DO NOT EDIT. Regenerate with `pnpm run build`. */
+
 import { type IntersectBrand } from '../brand.mjs';
 import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import { type PositiveNumber } from './core.mjs';
@@ -22,6 +24,7 @@ export type Uint32 = TSTypeForgeInternals_ExtendNumberBrand<SafeUint, '< 2^32'>;
 
 /**
  * Branded numeric type for positive 32-bit unsigned integers.
+ * Represents a 32-bit unsigned integer that is strictly greater than zero.
  * Range: [1, 2^32 - 1] or [1, 4,294,967,295]
  *
  * @example
@@ -36,7 +39,7 @@ export type PositiveUint32 = IntersectBrand<Uint32, PositiveNumber>;
 
 /**
  * Alias for `PositiveUint32`.
- * Branded numeric type for non-zero 32-bit unsigned integers.
+ * Branded numeric type for positive 32-bit unsigned integers (strictly greater than zero).
  * Range: [1, 2^32 - 1] or [1, 4,294,967,295]
  *
  * @example
@@ -63,7 +66,7 @@ export type PositiveUint32WithSmallInt = WithSmallInt<PositiveUint32>;
 
 /**
  * Alias for `PositiveUint32WithSmallInt`.
- * Non-zero 32-bit unsigned integer type with small literal values included.
+ * Positive 32-bit unsigned integer type with small literal values included.
  * Type: `1 | 2 | ... | 39 | NonZeroUint32`
  */
 export type NonZeroUint32WithSmallInt = PositiveUint32WithSmallInt;

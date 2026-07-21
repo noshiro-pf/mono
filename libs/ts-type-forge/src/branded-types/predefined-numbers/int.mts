@@ -1,3 +1,5 @@
+/* AUTO-GENERATED. DO NOT EDIT. Regenerate with `pnpm run build`. */
+
 import { type IntersectBrand } from '../brand.mjs';
 import { type TSTypeForgeInternals_ExtendNumberBrand } from './_number-brand-internals.mjs';
 import {
@@ -33,7 +35,7 @@ export type Int = TSTypeForgeInternals_ExtendNumberBrand<FiniteNumber, 'Int'>;
 
 /**
  * Branded numeric type for non-zero integers.
- * Represents integers that are not equal to zero.
+ * Represents an integer that is not equal to zero.
  *
  * @example
  * ```ts
@@ -49,7 +51,7 @@ export type NonZeroInt = IntersectBrand<Int, NonZeroNumber>;
 
 /**
  * Branded numeric type for non-negative integers.
- * Represents integers greater than or equal to zero.
+ * Represents an integer that is greater than or equal to zero.
  *
  * @example
  * ```ts
@@ -64,8 +66,7 @@ export type NonNegativeInt = IntersectBrand<Int, NonNegativeNumber>;
 
 /**
  * Alias for `NonNegativeInt`.
- * Branded numeric type for unsigned integers (non-negative integers).
- * Represents integers greater than or equal to zero.
+ * Branded numeric type for non-negative integers (greater than or equal to zero).
  *
  * @example
  * ```ts
@@ -80,7 +81,7 @@ export type Uint = NonNegativeInt;
 
 /**
  * Branded numeric type for positive integers.
- * Represents integers strictly greater than zero.
+ * Represents an integer that is strictly greater than zero.
  *
  * @example
  * ```ts
@@ -96,7 +97,7 @@ export type PositiveInt = IntersectBrand<Int, PositiveNumber>;
 
 /**
  * Branded numeric type for negative integers.
- * Represents integers strictly less than zero.
+ * Represents an integer that is strictly less than zero.
  *
  * @example
  * ```ts
@@ -108,6 +109,21 @@ export type PositiveInt = IntersectBrand<Int, PositiveNumber>;
  * ```
  */
 export type NegativeInt = IntersectBrand<Int, NegativeNumber>;
+
+/**
+ * Branded numeric type for non-positive integers.
+ * Represents an integer that is less than or equal to zero.
+ *
+ * @example
+ * ```ts
+ * const isNonPositiveInt = (x: number): x is NonPositiveInt =>
+ *   Number.isInteger(x) && x <= 0;
+ *
+ * const countdown = (remaining: NonPositiveInt) => ({ remaining });
+ * const penalty = (points: NonPositiveInt) => ({ penalty: points });
+ * ```
+ */
+export type NonPositiveInt = IntersectBrand<Int, NonPositiveNumber>;
 
 /**
  * Integer type with small literal values included.
@@ -129,7 +145,7 @@ export type NonNegativeIntWithSmallInt = WithSmallInt<NonNegativeInt>;
 
 /**
  * Alias for `NonNegativeIntWithSmallInt`.
- * Unsigned integer type with small literal values included.
+ * Non-negative integer type with small literal values included.
  * Type: `0 | 1 | ... | 39 | Uint`
  */
 export type UintWithSmallInt = NonNegativeIntWithSmallInt;
@@ -145,21 +161,6 @@ export type PositiveIntWithSmallInt = WithSmallInt<PositiveInt>;
  * Type: `-40 | -39 | ... | -1 | NegativeInt`
  */
 export type NegativeIntWithSmallInt = WithSmallInt<NegativeInt>;
-
-/**
- * Branded numeric type for non-positive integers.
- * Represents integers less than or equal to zero.
- *
- * @example
- * ```ts
- * const isNonPositiveInt = (x: number): x is NonPositiveInt =>
- *   Number.isInteger(x) && x <= 0;
- *
- * const countdown = (remaining: NonPositiveInt) => ({ remaining });
- * const penalty = (points: NonPositiveInt) => ({ penalty: points });
- * ```
- */
-export type NonPositiveInt = IntersectBrand<Int, NonPositiveNumber>;
 
 /**
  * Non-positive integer type with small literal values included.

@@ -2,6 +2,7 @@ import { expectType } from 'ts-data-forge';
 import {
   type NegativeNumber,
   type NonNegativeNumber,
+  type NonPositiveNumber,
   type NonZeroNumber,
   type PositiveNumber,
 } from './core.mjs';
@@ -9,6 +10,7 @@ import {
   type Int16,
   type NegativeInt16,
   type NonNegativeInt16,
+  type NonPositiveInt16,
   type NonZeroInt16,
   type PositiveInt16,
 } from './int16.mjs';
@@ -73,6 +75,26 @@ expectType<Int16, NegativeInt16>('!<=');
 expectType<PositiveInt16, NegativeInt16>('!=');
 
 expectType<NegativeInt16, PositiveInt16>('!=');
+
+// Test NonPositiveInt16
+expectType<NonPositiveInt16, Int16>('<=');
+
+expectType<NonPositiveInt16, NonPositiveNumber>('<=');
+
+// NegativeInt16 is a subset of NonPositiveInt16
+expectType<NegativeInt16, NonPositiveInt16>('<=');
+
+// NonPositiveInt16 includes zero so it is NOT a subset of NegativeInt16
+expectType<NonPositiveInt16, NegativeInt16>('!<=');
+
+expectType<NonPositiveInt16, NonNegativeInt16>('!<=');
+
+expectType<Int16, NonPositiveInt16>('!<=');
+
+// PositiveInt16 and NonPositiveInt16 are disjoint
+expectType<PositiveInt16, NonPositiveInt16>('!=');
+
+expectType<NonPositiveInt16, PositiveInt16>('!=');
 
 // Test WithSmallInt variants (commented out complex tests)
 // WithSmallInt tests are complex due to literal/branded type interactions
