@@ -44,6 +44,10 @@ jobs:
           node-version-file: 'package.json'
           cache: 'pnpm'
 
+      # Intentionally NOT --frozen-lockfile: together with the
+      # assert-repo-is-clean step below, this verifies that a fresh install
+      # does not modify pnpm-lock.yaml (i.e. the committed lockfile is in
+      # sync with package.json).
       - name: Install dependencies
         run: pnpm install
 
