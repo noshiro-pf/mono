@@ -1,5 +1,36 @@
 # ts-data-forge
 
+## 11.0.1
+
+### Patch Changes
+
+- aec5752: Generate the remaining branded-number modules — the 6 `operatorsForFloat`
+  families (`FiniteNumber`, `NonNegative`/`NonPositive`/`NonZero`/`Positive`/
+  `Negative` finite numbers) and the 2 `enum` modules (`Int8`, `Uint8`) — from the
+  same declarative generator that already produces the integer modules, so all 34
+  branded-number modules are now generated. The generated code is structurally
+  identical to the previous hand-written modules (verified by a comment-stripped
+  diff), so the runtime and type surface are unchanged; only the JSDoc prose is
+  templated (with per-member overrides preserving design-intent notes such as why
+  `add`/`sub` are absent from `NonZeroFiniteNumber`). Worked `@example` blocks are
+  still embedded from `samples/`.
+
+    With every branded-number type now generated, the `check:branded-number-casts`
+    guard is removed — consistency is enforced by generation.
+
+- bf3466d: Generate the branded-number **integer** modules (`Int`, `Uint`, `SafeInt`, the
+  `Int16/32`, `Uint16/32`, `NonNegative*`, `Positive*`, `NonZero*`, `NonPositive*`
+  and `Negative*` families — 26 modules) from a declarative config
+  (`scripts/gen-branded-number`) instead of maintaining them by hand. The
+  generated code is structurally identical to the previous hand-written modules
+  (same factory calls, `is`/`as`, namespace objects and `expectType` assertions),
+  so the runtime and type surface are unchanged; only the JSDoc prose is now
+  produced from flag-driven templates for consistency, with worked `@example`
+  blocks still embedded from `samples/`. Generation runs as part of the build.
+
+    The `operatorsForFloat` families and the two `enum` modules remain hand-written
+    for now and continue to be covered by `check:branded-number-casts`.
+
 ## 11.0.0
 
 ### Major Changes
