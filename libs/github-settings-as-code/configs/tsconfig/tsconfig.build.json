@@ -12,7 +12,6 @@
     // "allowSyntheticDefaultImports": false) was also removed: now that the
     // base no longer sets "false", this option is redundant with
     // "esModuleInterop": true, which already implies "true".
-    "importHelpers": true,
     "newLine": "lf",
     "noEmit": false,
     "noEmitOnError": true,
