@@ -1,14 +1,14 @@
-// Example: src/number/branded-types/positive-safe-int.mts (PositiveSafeInt.clamp)
+// Example: src/number/branded-types/positive-safe-int.mts (PositiveSafeInt.fromNumber)
 import { PositiveSafeInt } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const belowRange = PositiveSafeInt.clamp(0);
+    const belowRange = PositiveSafeInt.fromNumber(0);
 
-    const withinRange = PositiveSafeInt.clamp(123);
+    const withinRange = PositiveSafeInt.fromNumber(123);
 
-    const aboveRange = PositiveSafeInt.clamp(Number.MAX_SAFE_INTEGER + 10);
+    const aboveRange = PositiveSafeInt.fromNumber(Number.MAX_SAFE_INTEGER + 10);
 
     assert.isTrue(belowRange === 1);
 

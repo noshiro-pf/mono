@@ -13,8 +13,8 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -73,12 +73,14 @@ export const Uint32 = {
   is,
 
   /**
-   * The smallest value representable as `Uint32`.
+   * The smallest value representable as `Uint32` (the lower saturation target
+   * of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `Uint32`.
+   * The largest value representable as `Uint32` (the upper saturation target of
+   * `fromNumber`).
    */
   MAX_VALUE,
 
@@ -99,13 +101,16 @@ export const Uint32 = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `Uint32` range, rounding to the nearest integer
-   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into an `Uint32`, rounding to the nearest
+   * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as an `Uint32`
+   * Unlike `asUint32`, this is total: out-of-range inputs are clamped to the
+   * nearest representable `Uint32` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as an `Uint32`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `Uint32` within the given range.

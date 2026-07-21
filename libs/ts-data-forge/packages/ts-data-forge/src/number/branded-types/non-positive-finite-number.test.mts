@@ -139,23 +139,23 @@ describe('NonPositiveFiniteNumber test', () => {
     });
   });
 
-  describe('NonPositiveFiniteNumber.clamp', () => {
+  describe('NonPositiveFiniteNumber.fromNumber', () => {
     test('returns the same value if within range', () => {
-      expect(NonPositiveFiniteNumber.clamp(-5.5)).toBe(-5.5);
+      expect(NonPositiveFiniteNumber.fromNumber(-5.5)).toBe(-5.5);
 
-      expect(NonPositiveFiniteNumber.clamp(0)).toBe(0);
+      expect(NonPositiveFiniteNumber.fromNumber(0)).toBe(0);
 
-      expect(NonPositiveFiniteNumber.clamp(-1000.5)).toBe(-1000.5);
+      expect(NonPositiveFiniteNumber.fromNumber(-1000.5)).toBe(-1000.5);
     });
 
     test('clamps positive values to MAX_VALUE (0)', () => {
-      expect(NonPositiveFiniteNumber.clamp(5.5)).toBe(0);
+      expect(NonPositiveFiniteNumber.fromNumber(5.5)).toBe(0);
 
-      expect(NonPositiveFiniteNumber.clamp(1000)).toBe(0);
+      expect(NonPositiveFiniteNumber.fromNumber(1000)).toBe(0);
     });
 
     test('clamps -Infinity to the lower bound', () => {
-      expect(NonPositiveFiniteNumber.clamp(Number.NEGATIVE_INFINITY)).toBe(
+      expect(NonPositiveFiniteNumber.fromNumber(Number.NEGATIVE_INFINITY)).toBe(
         -Number.MAX_VALUE,
       );
     });

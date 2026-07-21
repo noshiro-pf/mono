@@ -17,8 +17,8 @@ const {
   abs,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -108,12 +108,14 @@ export const SafeInt = {
   is,
 
   /**
-   * The smallest value representable as `SafeInt`.
+   * The smallest value representable as `SafeInt` (the lower saturation target
+   * of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `SafeInt`.
+   * The largest value representable as `SafeInt` (the upper saturation target
+   * of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -172,17 +174,20 @@ export const SafeInt = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `SafeInt` range, rounding to the nearest integer
-   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `SafeInt`, rounding to the nearest
+   * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
+   *
+   * Unlike `asSafeInt`, this is total: out-of-range inputs are clamped to the
+   * nearest representable `SafeInt` instead of throwing.
    *
    * @example
    *
    * ```ts
-   * const aboveRange = SafeInt.clamp(1e20);
+   * const aboveRange = SafeInt.fromNumber(1e20);
    *
-   * const withinRange = SafeInt.clamp(123);
+   * const withinRange = SafeInt.fromNumber(123);
    *
-   * const belowRange = SafeInt.clamp(-1e20);
+   * const belowRange = SafeInt.fromNumber(-1e20);
    *
    * assert.isTrue(aboveRange === Number.MAX_SAFE_INTEGER);
    *
@@ -191,10 +196,10 @@ export const SafeInt = {
    * assert.isTrue(belowRange === Number.MIN_SAFE_INTEGER);
    * ```
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `SafeInt`
+   * @param value - The value to convert
+   * @returns The value as a `SafeInt`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `SafeInt` within the given range.

@@ -13,8 +13,8 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -74,12 +74,14 @@ export const SafeUint = {
   is,
 
   /**
-   * The smallest value representable as `SafeUint`.
+   * The smallest value representable as `SafeUint` (the lower saturation target
+   * of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `SafeUint`.
+   * The largest value representable as `SafeUint` (the upper saturation target
+   * of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -100,13 +102,16 @@ export const SafeUint = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `SafeUint` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `SafeUint`, rounding to the nearest
+   * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `SafeUint`
+   * Unlike `asSafeUint`, this is total: out-of-range inputs are clamped to the
+   * nearest representable `SafeUint` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `SafeUint`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `SafeUint` within the given range.

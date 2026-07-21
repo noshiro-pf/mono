@@ -10,7 +10,7 @@ const {
   MAX_VALUE,
   MIN_VALUE,
   castType: castTypeImpl,
-  clamp: clampImpl,
+  fromNumber: fromNumberImpl,
   is: isImpl,
   random: randomImpl,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<Uint16, 0, 255>(
@@ -28,7 +28,7 @@ const castType = (x: number): Uint8 =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   castTypeImpl(x) as Uint8;
 
-const clamp = (a: number): Uint8 => castType(clampImpl(a));
+const fromNumber = (a: number): Uint8 => castType(fromNumberImpl(a));
 
 const min_ = (...values: readonly Uint8[]): Uint8 =>
   castType(Math.min(...values));
@@ -36,15 +36,16 @@ const min_ = (...values: readonly Uint8[]): Uint8 =>
 const max_ = (...values: readonly Uint8[]): Uint8 =>
   castType(Math.max(...values));
 
-const pow = (x: Uint8, y: Uint8): Uint8 => clamp(x ** y);
+const pow = (x: Uint8, y: Uint8): Uint8 => fromNumber(x ** y);
 
-const add = (x: Uint8, y: Uint8): Uint8 => clamp(x + y);
+const add = (x: Uint8, y: Uint8): Uint8 => fromNumber(x + y);
 
-const sub = (x: Uint8, y: Uint8): Uint8 => clamp(x - y);
+const sub = (x: Uint8, y: Uint8): Uint8 => fromNumber(x - y);
 
-const mul = (x: Uint8, y: Uint8): Uint8 => clamp(x * y);
+const mul = (x: Uint8, y: Uint8): Uint8 => fromNumber(x * y);
 
-const div = (x: Uint8, y: Exclude<Uint8, 0>): Uint8 => clamp(Math.floor(x / y));
+const div = (x: Uint8, y: Exclude<Uint8, 0>): Uint8 =>
+  fromNumber(Math.floor(x / y));
 
 const random = (min: Uint8, max: Uint8): Uint8 =>
   castType(randomImpl(castTypeImpl(min), castTypeImpl(max)));
@@ -89,12 +90,14 @@ export const Uint8 = {
   is,
 
   /**
-   * The smallest value representable as `Uint8`.
+   * The smallest value representable as `Uint8` (the lower saturation target of
+   * `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `Uint8`.
+   * The largest value representable as `Uint8` (the upper saturation target of
+   * `fromNumber`).
    */
   MAX_VALUE,
 
@@ -115,13 +118,16 @@ export const Uint8 = {
   min: min_,
 
   /**
-   * Clamps a `number` into the `Uint8` range, rounding to the nearest integer
-   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into an `Uint8`, rounding to the nearest
+   * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as an `Uint8`
+   * Unlike `asUint8`, this is total: out-of-range inputs are clamped to the
+   * nearest representable `Uint8` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as an `Uint8`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `Uint8` within the given range.

@@ -12,7 +12,7 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -71,12 +71,14 @@ export const NonPositiveSafeInt = {
   is,
 
   /**
-   * The smallest value representable as `NonPositiveSafeInt`.
+   * The smallest value representable as `NonPositiveSafeInt` (the lower
+   * saturation target of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `NonPositiveSafeInt`.
+   * The largest value representable as `NonPositiveSafeInt` (the upper
+   * saturation target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -97,13 +99,18 @@ export const NonPositiveSafeInt = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `NonPositiveSafeInt` range, rounding to the
-   * nearest integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `NonPositiveSafeInt`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `NonPositiveSafeInt`
+   * Unlike `asNonPositiveSafeInt`, this is total: out-of-range inputs are
+   * clamped to the nearest representable `NonPositiveSafeInt` instead of
+   * throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NonPositiveSafeInt`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `NonPositiveSafeInt` within the given range.

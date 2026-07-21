@@ -61,7 +61,7 @@ describe('Uint8 test', () => {
     });
   });
 
-  describe('Uint8.clamp', () => {
+  describe('Uint8.fromNumber', () => {
     test.each([
       { value: -100, expected: 0 },
       { value: 0, expected: 0 },
@@ -69,9 +69,12 @@ describe('Uint8 test', () => {
       { value: 255, expected: 255 },
       { value: 300, expected: 255 },
       { value: 1.5, expected: 2 },
-    ])('Uint8.clamp($value) should return $expected', ({ expected, value }) => {
-      expect(Uint8.clamp(value)).toBe(expected);
-    });
+    ])(
+      'Uint8.fromNumber($value) should return $expected',
+      ({ expected, value }) => {
+        expect(Uint8.fromNumber(value)).toBe(expected);
+      },
+    );
   });
 
   describe('Uint8.min', () => {

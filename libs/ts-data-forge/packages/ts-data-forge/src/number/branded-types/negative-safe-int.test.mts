@@ -86,13 +86,13 @@ describe('NegativeSafeInt test', () => {
     });
   });
 
-  describe('NegativeSafeInt.clamp', () => {
+  describe('NegativeSafeInt.fromNumber', () => {
     test('clamps to the valid range', () => {
-      expect(NegativeSafeInt.clamp(-5)).toBe(-5);
+      expect(NegativeSafeInt.fromNumber(-5)).toBe(-5);
 
-      expect(NegativeSafeInt.clamp(0)).toBe(-1);
+      expect(NegativeSafeInt.fromNumber(0)).toBe(-1);
 
-      expect(NegativeSafeInt.clamp(Number.MIN_SAFE_INTEGER - 100)).toBe(
+      expect(NegativeSafeInt.fromNumber(Number.MIN_SAFE_INTEGER - 100)).toBe(
         Number.MIN_SAFE_INTEGER,
       );
     });

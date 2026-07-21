@@ -12,7 +12,7 @@ const {
   MAX_VALUE,
   add,
   castType,
-  clamp,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -31,7 +31,7 @@ const {
 } as const);
 
 const abs = (x: ElementType): PositiveFiniteNumber =>
-  PositiveFiniteNumber.clamp(Math.abs(x));
+  PositiveFiniteNumber.fromNumber(Math.abs(x));
 
 const floor = (
   x: ElementType,
@@ -101,7 +101,10 @@ export const NegativeFiniteNumber = {
   is,
 
   /**
-   * The largest value representable as `NegativeFiniteNumber`.
+   * The largest value representable as `NegativeFiniteNumber` (the upper
+   * saturation target of `fromNumber`). The domain is open at `0` (excluded),
+   * so this is `-Number.MIN_VALUE` — the negative double closest to `0` —
+   * rather than `0`.
    */
   MAX_VALUE,
 
@@ -132,13 +135,17 @@ export const NegativeFiniteNumber = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `NegativeFiniteNumber` range `[MIN_VALUE,
-   * MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `NegativeFiniteNumber`, saturating it
+   * into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `NegativeFiniteNumber`
+   * Unlike `asNegativeFiniteNumber`, this is total: out-of-range inputs are
+   * clamped to the nearest representable `NegativeFiniteNumber` instead of
+   * throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NegativeFiniteNumber`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Returns the greatest integer less than or equal to a negative finite

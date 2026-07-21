@@ -12,8 +12,8 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -107,7 +107,8 @@ export const Uint = {
   is,
 
   /**
-   * The smallest value representable as `Uint`.
+   * The smallest value representable as `Uint` (the lower saturation target of
+   * `fromNumber`).
    */
   MIN_VALUE,
 
@@ -144,25 +145,28 @@ export const Uint = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `Uint` range, rounding to the nearest integer
-   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into an `Uint`, rounding to the nearest
+   * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
+   *
+   * Unlike `asUint`, this is total: out-of-range inputs are clamped to the
+   * nearest representable `Uint` instead of throwing.
    *
    * @example
    *
    * ```ts
-   * const clampedNegative = Uint.clamp(-5);
+   * const fromNegative = Uint.fromNumber(-5);
    *
-   * const clampedPositive = Uint.clamp(42);
+   * const fromPositive = Uint.fromNumber(42);
    *
-   * assert.isTrue(clampedNegative === 0);
+   * assert.isTrue(fromNegative === 0);
    *
-   * assert.isTrue(clampedPositive === 42);
+   * assert.isTrue(fromPositive === 42);
    * ```
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as an `Uint`
+   * @param value - The value to convert
+   * @returns The value as an `Uint`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `Uint` within the given range.

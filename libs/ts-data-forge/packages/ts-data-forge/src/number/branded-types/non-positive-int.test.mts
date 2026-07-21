@@ -131,23 +131,23 @@ describe('NonPositiveInt test', () => {
     });
   });
 
-  describe('NonPositiveInt.clamp', () => {
+  describe('NonPositiveInt.fromNumber', () => {
     test('returns the same value if within range', () => {
-      expect(NonPositiveInt.clamp(-5)).toBe(-5);
+      expect(NonPositiveInt.fromNumber(-5)).toBe(-5);
 
-      expect(NonPositiveInt.clamp(0)).toBe(0);
+      expect(NonPositiveInt.fromNumber(0)).toBe(0);
 
-      expect(NonPositiveInt.clamp(-1000)).toBe(-1000);
+      expect(NonPositiveInt.fromNumber(-1000)).toBe(-1000);
     });
 
     test('clamps positive values to MAX_VALUE (0)', () => {
-      expect(NonPositiveInt.clamp(5)).toBe(0);
+      expect(NonPositiveInt.fromNumber(5)).toBe(0);
 
-      expect(NonPositiveInt.clamp(1000)).toBe(0);
+      expect(NonPositiveInt.fromNumber(1000)).toBe(0);
     });
 
     test('clamps -Infinity to the lower bound', () => {
-      expect(NonPositiveInt.clamp(Number.NEGATIVE_INFINITY)).toBe(
+      expect(NonPositiveInt.fromNumber(Number.NEGATIVE_INFINITY)).toBe(
         -Number.MAX_VALUE,
       );
     });

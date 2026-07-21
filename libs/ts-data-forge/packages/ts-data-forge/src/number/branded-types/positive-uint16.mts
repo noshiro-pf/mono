@@ -13,8 +13,8 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -74,12 +74,14 @@ export const PositiveUint16 = {
   is,
 
   /**
-   * The smallest value representable as `PositiveUint16`.
+   * The smallest value representable as `PositiveUint16` (the lower saturation
+   * target of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `PositiveUint16`.
+   * The largest value representable as `PositiveUint16` (the upper saturation
+   * target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -100,13 +102,17 @@ export const PositiveUint16 = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `PositiveUint16` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `PositiveUint16`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `PositiveUint16`
+   * Unlike `asPositiveUint16`, this is total: out-of-range inputs are clamped
+   * to the nearest representable `PositiveUint16` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `PositiveUint16`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `PositiveUint16` within the given range.

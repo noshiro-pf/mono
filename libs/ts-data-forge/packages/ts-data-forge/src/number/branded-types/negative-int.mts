@@ -15,7 +15,7 @@ const {
   MAX_VALUE,
   add,
   castType,
-  clamp,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -35,7 +35,7 @@ const {
 } as const);
 
 const abs = (x: WithSmallInt<ElementType>): PositiveInt =>
-  PositiveInt.clamp(Math.abs(x));
+  PositiveInt.fromNumber(Math.abs(x));
 
 /**
  * Type guard that checks if a value is a negative integer.
@@ -81,7 +81,8 @@ export const NegativeInt = {
   is,
 
   /**
-   * The largest value representable as `NegativeInt`.
+   * The largest value representable as `NegativeInt` (the upper saturation
+   * target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -114,13 +115,17 @@ export const NegativeInt = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `NegativeInt` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `NegativeInt`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `NegativeInt`
+   * Unlike `asNegativeInt`, this is total: out-of-range inputs are clamped to
+   * the nearest representable `NegativeInt` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NegativeInt`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `NegativeInt` within the given range.

@@ -16,8 +16,8 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -112,12 +112,14 @@ export const PositiveSafeInt = {
   is,
 
   /**
-   * The smallest value representable as `PositiveSafeInt`.
+   * The smallest value representable as `PositiveSafeInt` (the lower saturation
+   * target of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `PositiveSafeInt`.
+   * The largest value representable as `PositiveSafeInt` (the upper saturation
+   * target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -160,17 +162,21 @@ export const PositiveSafeInt = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `PositiveSafeInt` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `PositiveSafeInt`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
+   *
+   * Unlike `asPositiveSafeInt`, this is total: out-of-range inputs are clamped
+   * to the nearest representable `PositiveSafeInt` instead of throwing.
    *
    * @example
    *
    * ```ts
-   * const belowRange = PositiveSafeInt.clamp(0);
+   * const belowRange = PositiveSafeInt.fromNumber(0);
    *
-   * const withinRange = PositiveSafeInt.clamp(123);
+   * const withinRange = PositiveSafeInt.fromNumber(123);
    *
-   * const aboveRange = PositiveSafeInt.clamp(Number.MAX_SAFE_INTEGER + 10);
+   * const aboveRange = PositiveSafeInt.fromNumber(Number.MAX_SAFE_INTEGER + 10);
    *
    * assert.isTrue(belowRange === 1);
    *
@@ -179,10 +185,10 @@ export const PositiveSafeInt = {
    * assert.isTrue(aboveRange === Number.MAX_SAFE_INTEGER);
    * ```
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `PositiveSafeInt`
+   * @param value - The value to convert
+   * @returns The value as a `PositiveSafeInt`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `PositiveSafeInt` within the given range.

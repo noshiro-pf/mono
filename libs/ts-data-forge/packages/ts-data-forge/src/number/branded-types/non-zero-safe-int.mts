@@ -17,7 +17,7 @@ const {
   MIN_VALUE,
   abs,
   castType,
-  clamp,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -79,12 +79,14 @@ export const NonZeroSafeInt = {
   is,
 
   /**
-   * The smallest value representable as `NonZeroSafeInt`.
+   * The smallest value representable as `NonZeroSafeInt` (the lower saturation
+   * target of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `NonZeroSafeInt`.
+   * The largest value representable as `NonZeroSafeInt` (the upper saturation
+   * target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -115,13 +117,17 @@ export const NonZeroSafeInt = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `NonZeroSafeInt` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `NonZeroSafeInt`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `NonZeroSafeInt`
+   * Unlike `asNonZeroSafeInt`, this is total: out-of-range inputs are clamped
+   * to the nearest representable `NonZeroSafeInt` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NonZeroSafeInt`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `NonZeroSafeInt` within the given range.

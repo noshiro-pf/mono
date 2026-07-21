@@ -14,8 +14,8 @@ const {
   abs,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -74,12 +74,14 @@ export const Int16 = {
   is,
 
   /**
-   * The smallest value representable as `Int16`.
+   * The smallest value representable as `Int16` (the lower saturation target of
+   * `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `Int16`.
+   * The largest value representable as `Int16` (the upper saturation target of
+   * `fromNumber`).
    */
   MAX_VALUE,
 
@@ -110,13 +112,16 @@ export const Int16 = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `Int16` range, rounding to the nearest integer
-   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into an `Int16`, rounding to the nearest
+   * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as an `Int16`
+   * Unlike `asInt16`, this is total: out-of-range inputs are clamped to the
+   * nearest representable `Int16` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as an `Int16`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `Int16` within the given range.

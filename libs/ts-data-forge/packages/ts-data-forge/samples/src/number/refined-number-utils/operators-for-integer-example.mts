@@ -28,7 +28,7 @@ if (import.meta.vitest !== undefined) {
 
     const quotient = intOps.div(six, intOps.castType(2));
 
-    const roundedClamp = intOps.clamp(1.5);
+    const coerced = intOps.fromNumber(1.5);
 
     const randomValue = intOps.random();
 
@@ -40,7 +40,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(quotient === 3);
 
-    assert.isTrue(roundedClamp === 2);
+    assert.isTrue(coerced === 2);
 
     assert.isTrue(Number.isSafeInteger(randomValue));
 

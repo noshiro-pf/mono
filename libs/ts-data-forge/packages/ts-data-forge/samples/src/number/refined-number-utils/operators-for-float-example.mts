@@ -24,7 +24,7 @@ if (import.meta.vitest !== undefined) {
 
     const ratio = floatOps.div(sum, floatOps.castType(10));
 
-    const clamped = floatOps.clamp(0);
+    const coerced = floatOps.fromNumber(0);
 
     const boundedRandom = floatOps.random(
       floatOps.castType(10),
@@ -37,7 +37,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(ratio === 5);
 
-    assert.isTrue(clamped >= Number.MIN_VALUE);
+    assert.isTrue(coerced >= Number.MIN_VALUE);
 
     assert.isTrue(boundedRandom >= 10 && boundedRandom <= 20);
 

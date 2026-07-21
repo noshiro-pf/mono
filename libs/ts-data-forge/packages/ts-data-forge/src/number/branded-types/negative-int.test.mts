@@ -96,17 +96,17 @@ describe('NegativeInt test', () => {
     });
   });
 
-  describe('NegativeInt.clamp', () => {
+  describe('NegativeInt.fromNumber', () => {
     test('returns the same value if within range', () => {
-      expect(NegativeInt.clamp(-5)).toBe(-5);
+      expect(NegativeInt.fromNumber(-5)).toBe(-5);
 
-      expect(NegativeInt.clamp(-1000)).toBe(-1000);
+      expect(NegativeInt.fromNumber(-1000)).toBe(-1000);
     });
 
     test('clamps non-negative values to MAX_VALUE (-1)', () => {
-      expect(NegativeInt.clamp(0)).toBe(-1);
+      expect(NegativeInt.fromNumber(0)).toBe(-1);
 
-      expect(NegativeInt.clamp(5)).toBe(-1);
+      expect(NegativeInt.fromNumber(5)).toBe(-1);
     });
   });
 

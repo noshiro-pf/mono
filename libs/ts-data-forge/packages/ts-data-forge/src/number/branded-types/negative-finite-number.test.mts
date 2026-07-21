@@ -93,13 +93,13 @@ describe('NegativeFiniteNumber test', () => {
     });
   });
 
-  describe('NegativeFiniteNumber.clamp', () => {
+  describe('NegativeFiniteNumber.fromNumber', () => {
     test('clamps non-negative values into range', () => {
-      expect(NegativeFiniteNumber.clamp(-5.5)).toBeCloseTo(-5.5, 5);
+      expect(NegativeFiniteNumber.fromNumber(-5.5)).toBeCloseTo(-5.5, 5);
 
-      expect(NegativeFiniteNumber.clamp(0)).toBeLessThan(0);
+      expect(NegativeFiniteNumber.fromNumber(0)).toBeLessThan(0);
 
-      expect(NegativeFiniteNumber.clamp(5)).toBeLessThan(0);
+      expect(NegativeFiniteNumber.fromNumber(5)).toBeLessThan(0);
     });
   });
 

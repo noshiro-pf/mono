@@ -11,7 +11,7 @@ const {
   MAX_VALUE,
   add,
   castType,
-  clamp,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -102,7 +102,8 @@ export const NonPositiveFiniteNumber = {
   is,
 
   /**
-   * The largest value representable as `NonPositiveFiniteNumber`.
+   * The largest value representable as `NonPositiveFiniteNumber` (the upper
+   * saturation target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -123,13 +124,17 @@ export const NonPositiveFiniteNumber = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `NonPositiveFiniteNumber` range `[MIN_VALUE,
-   * MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `NonPositiveFiniteNumber`, saturating
+   * it into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `NonPositiveFiniteNumber`
+   * Unlike `asNonPositiveFiniteNumber`, this is total: out-of-range inputs are
+   * clamped to the nearest representable `NonPositiveFiniteNumber` instead of
+   * throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NonPositiveFiniteNumber`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Returns the greatest integer less than or equal to a non-positive finite

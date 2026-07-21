@@ -350,11 +350,11 @@ assert.isTrue(positiveInt === 10);
 // Type-safe arithmetic with automatic clamping
 const sum = Int16.add(int16, asInt16(2000)); // Int16 (3000)
 
-const clamped = Int16.clamp(100_000); // Int16 (32767 - clamped to MAX_VALUE)
+const coerced = Int16.fromNumber(100_000); // Int16 (32767 - saturated to MAX_VALUE)
 
 assert.isTrue(sum === 3000);
 
-assert.isTrue(clamped === 32_767);
+assert.isTrue(coerced === 32_767);
 
 // Safe division with non-zero types
 const ratio = Num.divInt(asNonZeroInt(10), nonZeroInt); // No division by zero risk

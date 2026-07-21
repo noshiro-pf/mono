@@ -16,7 +16,7 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -36,7 +36,7 @@ const {
 } as const);
 
 const abs = (x: WithSmallInt<ElementType>): PositiveSafeInt =>
-  PositiveSafeInt.clamp(Math.abs(x));
+  PositiveSafeInt.fromNumber(Math.abs(x));
 
 /**
  * Type guard that checks if a value is a negative safe integer.
@@ -79,12 +79,14 @@ export const NegativeSafeInt = {
   is,
 
   /**
-   * The smallest value representable as `NegativeSafeInt`.
+   * The smallest value representable as `NegativeSafeInt` (the lower saturation
+   * target of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `NegativeSafeInt`.
+   * The largest value representable as `NegativeSafeInt` (the upper saturation
+   * target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -115,13 +117,17 @@ export const NegativeSafeInt = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `NegativeSafeInt` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `NegativeSafeInt`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `NegativeSafeInt`
+   * Unlike `asNegativeSafeInt`, this is total: out-of-range inputs are clamped
+   * to the nearest representable `NegativeSafeInt` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NegativeSafeInt`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `NegativeSafeInt` within the given range.

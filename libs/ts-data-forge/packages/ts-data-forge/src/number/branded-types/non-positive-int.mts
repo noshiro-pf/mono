@@ -11,7 +11,7 @@ const {
   MAX_VALUE,
   add,
   castType,
-  clamp,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -75,7 +75,8 @@ export const NonPositiveInt = {
   is,
 
   /**
-   * The largest value representable as `NonPositiveInt`.
+   * The largest value representable as `NonPositiveInt` (the upper saturation
+   * target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -96,13 +97,17 @@ export const NonPositiveInt = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `NonPositiveInt` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `NonPositiveInt`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `NonPositiveInt`
+   * Unlike `asNonPositiveInt`, this is total: out-of-range inputs are clamped
+   * to the nearest representable `NonPositiveInt` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NonPositiveInt`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `NonPositiveInt` within the given range.

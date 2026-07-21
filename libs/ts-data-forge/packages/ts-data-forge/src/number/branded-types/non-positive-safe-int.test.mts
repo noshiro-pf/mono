@@ -163,23 +163,23 @@ describe('NonPositiveSafeInt test', () => {
     });
   });
 
-  describe('NonPositiveSafeInt.clamp', () => {
+  describe('NonPositiveSafeInt.fromNumber', () => {
     test('returns the same value if within range', () => {
-      expect(NonPositiveSafeInt.clamp(-5)).toBe(-5);
+      expect(NonPositiveSafeInt.fromNumber(-5)).toBe(-5);
 
-      expect(NonPositiveSafeInt.clamp(0)).toBe(0);
+      expect(NonPositiveSafeInt.fromNumber(0)).toBe(0);
 
-      expect(NonPositiveSafeInt.clamp(-1000)).toBe(-1000);
+      expect(NonPositiveSafeInt.fromNumber(-1000)).toBe(-1000);
     });
 
     test('clamps positive values to MAX_VALUE (0)', () => {
-      expect(NonPositiveSafeInt.clamp(5)).toBe(0);
+      expect(NonPositiveSafeInt.fromNumber(5)).toBe(0);
 
-      expect(NonPositiveSafeInt.clamp(1000)).toBe(0);
+      expect(NonPositiveSafeInt.fromNumber(1000)).toBe(0);
     });
 
     test('clamps out-of-range negative values to MIN_VALUE', () => {
-      expect(NonPositiveSafeInt.clamp(Number.MIN_SAFE_INTEGER - 1)).toBe(
+      expect(NonPositiveSafeInt.fromNumber(Number.MIN_SAFE_INTEGER - 1)).toBe(
         Number.MIN_SAFE_INTEGER,
       );
     });

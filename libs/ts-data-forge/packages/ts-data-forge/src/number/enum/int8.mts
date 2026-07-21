@@ -14,7 +14,7 @@ const {
   MAX_VALUE,
   MIN_VALUE,
   castType: castTypeImpl,
-  clamp: clampImpl,
+  fromNumber: fromNumberImpl,
   is: isImpl,
   random: randomImpl,
 } = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<
@@ -34,7 +34,7 @@ const castType = (x: number): Int8 =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   castTypeImpl(x) as Int8;
 
-const clamp = (a: number): Int8 => castType(clampImpl(a));
+const fromNumber = (a: number): Int8 => castType(fromNumberImpl(a));
 
 const abs = <N extends Int8>(x: N): AbsoluteValue<N> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -46,15 +46,16 @@ const min_ = (...values: readonly Int8[]): Int8 =>
 const max_ = (...values: readonly Int8[]): Int8 =>
   castType(Math.max(...values));
 
-const pow = (x: Int8, y: Int8): Int8 => clamp(x ** y);
+const pow = (x: Int8, y: Int8): Int8 => fromNumber(x ** y);
 
-const add = (x: Int8, y: Int8): Int8 => clamp(x + y);
+const add = (x: Int8, y: Int8): Int8 => fromNumber(x + y);
 
-const sub = (x: Int8, y: Int8): Int8 => clamp(x - y);
+const sub = (x: Int8, y: Int8): Int8 => fromNumber(x - y);
 
-const mul = (x: Int8, y: Int8): Int8 => clamp(x * y);
+const mul = (x: Int8, y: Int8): Int8 => fromNumber(x * y);
 
-const div = (x: Int8, y: Exclude<Int8, 0>): Int8 => clamp(Math.floor(x / y));
+const div = (x: Int8, y: Exclude<Int8, 0>): Int8 =>
+  fromNumber(Math.floor(x / y));
 
 const random = (min: Int8, max: Int8): Int8 =>
   castType(randomImpl(castTypeImpl(min), castTypeImpl(max)));
@@ -99,12 +100,14 @@ export const Int8 = {
   is,
 
   /**
-   * The smallest value representable as `Int8`.
+   * The smallest value representable as `Int8` (the lower saturation target of
+   * `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `Int8`.
+   * The largest value representable as `Int8` (the upper saturation target of
+   * `fromNumber`).
    */
   MAX_VALUE,
 
@@ -125,13 +128,16 @@ export const Int8 = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `Int8` range, rounding to the nearest integer
-   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into an `Int8`, rounding to the nearest
+   * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as an `Int8`
+   * Unlike `asInt8`, this is total: out-of-range inputs are clamped to the
+   * nearest representable `Int8` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as an `Int8`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Returns the absolute value of an integer in [-128, 127].

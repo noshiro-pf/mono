@@ -64,10 +64,20 @@ export const methodProse = (
       };
 
     case 'MIN_VALUE':
-      return constProse(`The smallest value representable as \`${t}\`.`);
+      return constProse(
+        appendNote(
+          `The smallest value representable as \`${t}\` (the lower saturation target of \`fromNumber\`).`,
+          config.minValueNote,
+        ),
+      );
 
     case 'MAX_VALUE':
-      return constProse(`The largest value representable as \`${t}\`.`);
+      return constProse(
+        appendNote(
+          `The largest value representable as \`${t}\` (the upper saturation target of \`fromNumber\`).`,
+          config.maxValueNote,
+        ),
+      );
 
     case 'abs':
       return {
@@ -103,14 +113,14 @@ export const methodProse = (
         returns: `The largest value as ${aT}`,
       };
 
-    case 'clamp':
+    case 'fromNumber':
       return {
         description: isFloor
-          ? `Clamps a \`number\` into the \`${t}\` range, rounding to the nearest integer and constraining the result to \`[MIN_VALUE, MAX_VALUE]\`.`
-          : `Clamps a \`number\` into the \`${t}\` range \`[MIN_VALUE, MAX_VALUE]\`.`,
+          ? `Converts an arbitrary \`number\` into ${aT}, rounding to the nearest integer and saturating the result into the range \`[MIN_VALUE, MAX_VALUE]\`.\n\nUnlike \`as${t}\`, this is total: out-of-range inputs are clamped to the nearest representable \`${t}\` instead of throwing.`
+          : `Converts an arbitrary \`number\` into ${aT}, saturating it into the range \`[MIN_VALUE, MAX_VALUE]\`.\n\nUnlike \`as${t}\`, this is total: out-of-range inputs are clamped to the nearest representable \`${t}\` instead of throwing.`,
         hasExample: true,
-        params: [{ name: 'value', desc: 'The value to clamp' }],
-        returns: `The clamped value as ${aT}`,
+        params: [{ name: 'value', desc: 'The value to convert' }],
+        returns: `The value as ${aT}`,
       };
 
     case 'random':
@@ -225,6 +235,10 @@ const constProse = (description: string): MethodProse =>
     params: [],
     returns: undefined,
   }) as const;
+
+/** Appends an optional clarifying sentence to a const's base description. */
+const appendNote = (base: string, note: string | undefined): string =>
+  note === undefined ? base : (`${base} ${note}` as const);
 
 const guardSentence = (tn: string): string =>
   `Type guard that checks if a value is ${tn}.` as const;

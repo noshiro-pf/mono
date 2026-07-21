@@ -12,8 +12,8 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -106,7 +106,8 @@ export const PositiveInt = {
   is,
 
   /**
-   * The smallest value representable as `PositiveInt`.
+   * The smallest value representable as `PositiveInt` (the lower saturation
+   * target of `fromNumber`).
    */
   MIN_VALUE,
 
@@ -151,25 +152,29 @@ export const PositiveInt = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `PositiveInt` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `PositiveInt`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
+   *
+   * Unlike `asPositiveInt`, this is total: out-of-range inputs are clamped to
+   * the nearest representable `PositiveInt` instead of throwing.
    *
    * @example
    *
    * ```ts
-   * const belowRange = PositiveInt.clamp(0);
+   * const belowRange = PositiveInt.fromNumber(0);
    *
-   * const withinRange = PositiveInt.clamp(10);
+   * const withinRange = PositiveInt.fromNumber(10);
    *
    * assert.isTrue(belowRange === 1);
    *
    * assert.isTrue(withinRange === 10);
    * ```
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `PositiveInt`
+   * @param value - The value to convert
+   * @returns The value as a `PositiveInt`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `PositiveInt` within the given range.

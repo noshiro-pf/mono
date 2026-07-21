@@ -14,8 +14,8 @@ const {
   abs,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -74,12 +74,14 @@ export const Int32 = {
   is,
 
   /**
-   * The smallest value representable as `Int32`.
+   * The smallest value representable as `Int32` (the lower saturation target of
+   * `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `Int32`.
+   * The largest value representable as `Int32` (the upper saturation target of
+   * `fromNumber`).
    */
   MAX_VALUE,
 
@@ -110,13 +112,16 @@ export const Int32 = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `Int32` range, rounding to the nearest integer
-   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into an `Int32`, rounding to the nearest
+   * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as an `Int32`
+   * Unlike `asInt32`, this is total: out-of-range inputs are clamped to the
+   * nearest representable `Int32` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as an `Int32`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `Int32` within the given range.

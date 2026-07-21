@@ -144,7 +144,7 @@ export namespace TsDataForgeInternals {
       ('non-negative' extends classes
         ? Readonly<{
             MIN_VALUE: number;
-            clamp: (a: number) => N;
+            fromNumber: (a: number) => N;
           }>
         : unknown) &
       ('non-negative' extends classes
@@ -157,14 +157,14 @@ export namespace TsDataForgeInternals {
       ('positive' extends classes
         ? Readonly<{
             MIN_VALUE: number;
-            clamp: (a: number) => N;
+            fromNumber: (a: number) => N;
           }>
         : unknown) &
       ('range' extends classes
         ? Readonly<{
             MIN_VALUE: number;
             MAX_VALUE: number;
-            clamp: (a: number) => N;
+            fromNumber: (a: number) => N;
           }>
         : unknown) &
       Pick<
@@ -200,17 +200,17 @@ export namespace TsDataForgeInternals {
 
     expectType<
       keyof NumberClass<UnknownNumberBrand, 'non-negative'>,
-      BaseKeys | FloatMethods | 'clamp' | 'MIN_VALUE'
+      BaseKeys | FloatMethods | 'fromNumber' | 'MIN_VALUE'
     >('=');
 
     expectType<
       keyof NumberClass<UnknownNumberBrand, 'positive'>,
-      BaseKeys | FloatMethods | 'clamp' | 'MIN_VALUE'
+      BaseKeys | FloatMethods | 'fromNumber' | 'MIN_VALUE'
     >('=');
 
     expectType<
       keyof NumberClass<UnknownNumberBrand, 'int' | 'range'>,
-      BaseKeys | 'abs' | 'clamp' | 'MAX_VALUE' | 'MIN_VALUE'
+      BaseKeys | 'abs' | 'fromNumber' | 'MAX_VALUE' | 'MIN_VALUE'
     >('=');
 
     const isFnOrUndefined = (
@@ -292,7 +292,7 @@ export namespace TsDataForgeInternals {
 
       castType: <N extends number>(x: N) => ElementType & N;
 
-      clamp: TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
+      fromNumber: TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
         ? undefined
         : (x: number) => ElementType;
     }>;
@@ -337,7 +337,7 @@ export namespace TsDataForgeInternals {
      *
      * const quotient = intOps.div(six, intOps.castType(2));
      *
-     * const roundedClamp = intOps.clamp(1.5);
+     * const coerced = intOps.fromNumber(1.5);
      *
      * const randomValue = intOps.random();
      *
@@ -349,7 +349,7 @@ export namespace TsDataForgeInternals {
      *
      * assert.isTrue(quotient === 3);
      *
-     * assert.isTrue(roundedClamp === 2);
+     * assert.isTrue(coerced === 2);
      *
      * assert.isTrue(Number.isSafeInteger(randomValue));
      * ```
@@ -396,7 +396,7 @@ export namespace TsDataForgeInternals {
 
       const castType = castTypeImpl<ElementType>(is, typeNameInMessage);
 
-      const clamp: ((a: number) => ElementType) | undefined = pipe(
+      const fromNumber: ((a: number) => ElementType) | undefined = pipe(
         clampFnOrUndefined(MIN_VALUE, MAX_VALUE),
       ).mapNullable(
         (cl) =>
@@ -404,7 +404,7 @@ export namespace TsDataForgeInternals {
             castType(Math.round(cl(x))),
       ).value;
 
-      const clampOrCastFn: (a: number) => ElementType = clamp ?? castType;
+      const clampOrCastFn: (a: number) => ElementType = fromNumber ?? castType;
 
       const abs = (x: ElementTypeWithSmallInt): ToNonNegative<ElementType> =>
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -488,9 +488,9 @@ export namespace TsDataForgeInternals {
         randomNonZero,
         castType,
 
-        clamp:
+        fromNumber:
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-          clamp as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
+          fromNumber as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
             ? undefined
             : (x: number) => ElementType,
       } as const;
@@ -519,7 +519,7 @@ export namespace TsDataForgeInternals {
 
       castType: <N extends number>(x: N) => ElementType & N;
 
-      clamp: TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
+      fromNumber: TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
         ? undefined
         : (x: number) => ElementType;
     }>;
@@ -560,7 +560,7 @@ export namespace TsDataForgeInternals {
      *
      * const ratio = floatOps.div(sum, floatOps.castType(10));
      *
-     * const clamped = floatOps.clamp(0);
+     * const coerced = floatOps.fromNumber(0);
      *
      * const boundedRandom = floatOps.random(
      *   floatOps.castType(10),
@@ -573,7 +573,7 @@ export namespace TsDataForgeInternals {
      *
      * assert.isTrue(ratio === 5);
      *
-     * assert.isTrue(clamped >= Number.MIN_VALUE);
+     * assert.isTrue(coerced >= Number.MIN_VALUE);
      *
      * assert.isTrue(boundedRandom >= 10 && boundedRandom <= 20);
      *
@@ -615,7 +615,7 @@ export namespace TsDataForgeInternals {
 
       const castType = castTypeImpl<ElementType>(is, typeNameInMessage);
 
-      const clamp: ((a: number) => ElementType) | undefined = pipe(
+      const fromNumber: ((a: number) => ElementType) | undefined = pipe(
         clampFnOrUndefined(MIN_VALUE, MAX_VALUE),
       ).mapNullable(
         (cl) =>
@@ -623,7 +623,7 @@ export namespace TsDataForgeInternals {
             castType(cl(x)),
       ).value;
 
-      const clampOrCastFn: (a: number) => ElementType = clamp ?? castType;
+      const clampOrCastFn: (a: number) => ElementType = fromNumber ?? castType;
 
       const abs = (x: ElementType): ToNonNegative<ElementType> =>
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -687,7 +687,10 @@ export namespace TsDataForgeInternals {
         castType,
 
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        clamp: clamp as TypeEq<MAX_VALUE | MIN_VALUE, undefined> extends true
+        fromNumber: fromNumber as TypeEq<
+          MAX_VALUE | MIN_VALUE,
+          undefined
+        > extends true
           ? undefined
           : (x: number) => ElementType,
       } as const;

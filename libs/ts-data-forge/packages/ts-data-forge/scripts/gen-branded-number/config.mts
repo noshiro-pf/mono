@@ -46,6 +46,18 @@ export type BrandedNumberConfig = Readonly<{
   minValueComment?: string;
   /** Optional `// eslint-disable...` comment emitted directly above `MAX_VALUE`. */
   maxValueComment?: string;
+  /**
+   * Optional clarifying sentence appended to the `MIN_VALUE` const JSDoc — used
+   * by open-domain types whose exposed `MIN_VALUE` is the nearest representable
+   * value rather than the mathematical bound (e.g. `PositiveFiniteNumber`).
+   */
+  minValueNote?: string;
+  /**
+   * Optional clarifying sentence appended to the `MAX_VALUE` const JSDoc — used
+   * by open-domain types whose exposed `MAX_VALUE` is the nearest representable
+   * value rather than the mathematical bound (e.g. `NegativeFiniteNumber`).
+   */
+  maxValueNote?: string;
   typeNameInMessage: string;
 
   // --- locally-defined members (not from the factory) ---
@@ -115,7 +127,7 @@ const KEYS_BOUNDED = [
   'MAX_VALUE',
   'min',
   'max',
-  'clamp',
+  'fromNumber',
   'random',
   'pow',
   'add',
@@ -131,7 +143,7 @@ const KEYS_BOUNDED_ABS = [
   'abs',
   'min',
   'max',
-  'clamp',
+  'fromNumber',
   'random',
   'pow',
   'add',
@@ -147,7 +159,7 @@ const KEYS_NONZERO_BOUNDED_ABS = [
   'abs',
   'min',
   'max',
-  'clamp',
+  'fromNumber',
   'random',
   'pow',
   'mul',
@@ -159,7 +171,7 @@ const KEYS_NONZERO_UINT = [
   'MAX_VALUE',
   'min',
   'max',
-  'clamp',
+  'fromNumber',
   'random',
   'pow',
   'add',
@@ -213,7 +225,7 @@ const FLOAT_KEYS_LOWER_BOUNDED = [
   'MIN_VALUE',
   'min',
   'max',
-  'clamp',
+  'fromNumber',
   'floor',
   'ceil',
   'round',
@@ -331,7 +343,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'MIN_VALUE',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'random',
       'pow',
       'add',
@@ -453,7 +465,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'MIN_VALUE',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'random',
       'pow',
       'add',
@@ -694,7 +706,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'MAX_VALUE',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'random',
       'pow',
       'add',
@@ -723,7 +735,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'MAX_VALUE',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'random',
       'pow',
       'add',
@@ -748,7 +760,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     maxValueExpr: '-1',
     typeNameInMessage: 'a negative integer',
     customConsts:
-      'const abs = (x: WithSmallInt<ElementType>): PositiveInt =>\n  PositiveInt.clamp(Math.abs(x));',
+      'const abs = (x: WithSmallInt<ElementType>): PositiveInt =>\n  PositiveInt.fromNumber(Math.abs(x));',
     customKeys: ['abs'],
     namespaceKeys: [
       'is',
@@ -756,7 +768,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'abs',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'random',
       'pow',
       'add',
@@ -784,7 +796,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     maxValueExpr: '-1',
     typeNameInMessage: 'a negative safe integer',
     customConsts:
-      'const abs = (x: WithSmallInt<ElementType>): PositiveSafeInt =>\n  PositiveSafeInt.clamp(Math.abs(x));',
+      'const abs = (x: WithSmallInt<ElementType>): PositiveSafeInt =>\n  PositiveSafeInt.fromNumber(Math.abs(x));',
     customKeys: ['abs'],
     namespaceKeys: [
       'is',
@@ -793,7 +805,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'abs',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'random',
       'pow',
       'add',
@@ -910,7 +922,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'MAX_VALUE',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'floor',
       'ceil',
       'round',
@@ -934,6 +946,8 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     nonZero: false,
     minValueExpr: 'Number.MIN_VALUE',
     maxValueExpr: 'Number.MAX_VALUE',
+    minValueNote:
+      'The domain is open at `0` (excluded), so this is `Number.MIN_VALUE` — the smallest positive double — rather than `0`.',
     typeNameInMessage: 'a positive finite number',
     customConsts: floatRounding(REMOVE_NZ_RET, TO_INT_RET, REMOVE_NZ_RET),
     customKeys: ['floor', 'ceil', 'round'],
@@ -960,9 +974,11 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     nonZero: true,
     minValueExpr: '-Number.MAX_VALUE',
     maxValueExpr: '-Number.MIN_VALUE',
+    maxValueNote:
+      'The domain is open at `0` (excluded), so this is `-Number.MIN_VALUE` — the negative double closest to `0` — rather than `0`.',
     typeNameInMessage: 'a negative finite number',
     customConsts: [
-      'const abs = (x: ElementType): PositiveFiniteNumber =>\n  PositiveFiniteNumber.clamp(Math.abs(x));',
+      'const abs = (x: ElementType): PositiveFiniteNumber =>\n  PositiveFiniteNumber.fromNumber(Math.abs(x));',
       floatRounding(TO_INT_RET, REMOVE_NZ_RET, REMOVE_NZ_RET),
     ].join('\n\n'),
     customKeys: ['abs', 'floor', 'ceil', 'round'],
@@ -972,7 +988,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'abs',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'floor',
       'ceil',
       'round',
@@ -1005,7 +1021,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'MAX_VALUE',
       'min',
       'max',
-      'clamp',
+      'fromNumber',
       'abs',
       'random',
       'pow',
@@ -1039,7 +1055,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'MAX_VALUE',
       'max',
       'min',
-      'clamp',
+      'fromNumber',
       'random',
       'pow',
       'add',

@@ -16,8 +16,8 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
   div,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -117,7 +117,10 @@ export const PositiveFiniteNumber = {
   is,
 
   /**
-   * The smallest value representable as `PositiveFiniteNumber`.
+   * The smallest value representable as `PositiveFiniteNumber` (the lower
+   * saturation target of `fromNumber`). The domain is open at `0` (excluded),
+   * so this is `Number.MIN_VALUE` — the smallest positive double — rather than
+   * `0`.
    */
   MIN_VALUE,
 
@@ -138,13 +141,17 @@ export const PositiveFiniteNumber = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `PositiveFiniteNumber` range `[MIN_VALUE,
-   * MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `PositiveFiniteNumber`, saturating it
+   * into the range `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `PositiveFiniteNumber`
+   * Unlike `asPositiveFiniteNumber`, this is total: out-of-range inputs are
+   * clamped to the nearest representable `PositiveFiniteNumber` instead of
+   * throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `PositiveFiniteNumber`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Returns the greatest integer less than or equal to a positive finite

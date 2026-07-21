@@ -13,7 +13,7 @@ const {
   MIN_VALUE,
   add,
   castType,
-  clamp,
+  fromNumber,
   is,
   max: max_,
   min: min_,
@@ -73,12 +73,14 @@ export const NonZeroUint16 = {
   is,
 
   /**
-   * The smallest value representable as `NonZeroUint16`.
+   * The smallest value representable as `NonZeroUint16` (the lower saturation
+   * target of `fromNumber`).
    */
   MIN_VALUE,
 
   /**
-   * The largest value representable as `NonZeroUint16`.
+   * The largest value representable as `NonZeroUint16` (the upper saturation
+   * target of `fromNumber`).
    */
   MAX_VALUE,
 
@@ -99,13 +101,17 @@ export const NonZeroUint16 = {
   max: max_,
 
   /**
-   * Clamps a `number` into the `NonZeroUint16` range, rounding to the nearest
-   * integer and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
+   * Converts an arbitrary `number` into a `NonZeroUint16`, rounding to the
+   * nearest integer and saturating the result into the range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value - The value to clamp
-   * @returns The clamped value as a `NonZeroUint16`
+   * Unlike `asNonZeroUint16`, this is total: out-of-range inputs are clamped to
+   * the nearest representable `NonZeroUint16` instead of throwing.
+   *
+   * @param value - The value to convert
+   * @returns The value as a `NonZeroUint16`
    */
-  clamp,
+  fromNumber,
 
   /**
    * Generates a random `NonZeroUint16` within the given range.
