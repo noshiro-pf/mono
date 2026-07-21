@@ -11,6 +11,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(relaxed.length <= 32);
 
+    // curried version
+    const asUserName = Str.asMaxLengthString(32);
+
+    assert.strictEqual(asUserName('another-user'), 'another-user');
+
     assert.throws(() => Str.asMaxLengthString('noshiro', 3)); // length 7 > 3
 
     // embed-sample-code-ignore-below

@@ -11,6 +11,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(atMost5.length === 2);
 
+    // curried version
+    const asCountryCode = Str.asFixedLengthString(2);
+
+    assert.strictEqual(asCountryCode('US'), 'US');
+
     assert.throws(() => Str.asFixedLengthString('JP', 3)); // length 2 !== 3
 
     // embed-sample-code-ignore-below

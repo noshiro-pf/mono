@@ -825,6 +825,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/string/as-max-length-string-example.mts',
       'samples/src/string/as-bounded-length-string-example.mts',
       'samples/src/string/as-fixed-length-string-example.mts',
+      'samples/src/string/as-non-empty-string-example.mts',
     ],
   },
 ] as const;

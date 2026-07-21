@@ -3,6 +3,7 @@ import {
   type FixedLengthString,
   type MaxLengthString,
   type MinLengthString,
+  type NonEmptyString,
   type SupportedLength,
 } from 'ts-type-forge';
 
@@ -200,6 +201,9 @@ export namespace Str {
    * length is verified at runtime, and the original string type (e.g. literal
    * types) is preserved via intersection.
    *
+   * Supports a curried overload: calling it with only `minLength` returns a
+   * function that casts a string, which is convenient for `pipe`/`map`.
+   *
    * @example
    *
    * ```ts
@@ -208,6 +212,11 @@ export namespace Str {
    * const nonEmpty: NonEmptyString = password; // OK (>= 1)
    *
    * assert.isTrue(nonEmpty.length >= 12);
+   *
+   * // curried version
+   * const asPassword = Str.asMinLengthString(12);
+   *
+   * assert.strictEqual(asPassword('another-secret'), 'another-secret');
    *
    * assert.throws(() => Str.asMinLengthString('short', 12)); // length 5 < 12
    * ```
@@ -219,21 +228,41 @@ export namespace Str {
    * @returns `s` typed as `MinLengthString<MinLength> & S`.
    * @throws {TypeError} If `s.length < minLength`.
    */
-  export const asMinLengthString = <
+  export function asMinLengthString<
     S extends string,
     MinLength extends SupportedLength,
-  >(
-    s: S,
-    minLength: MinLength,
-  ): MinLengthString<MinLength> & S => {
-    if (!isMinLengthString(s, minLength)) {
-      throw new TypeError(
-        `Expected a string of length >= ${minLength}, got a string of length ${s.length}`,
-      );
-    }
+  >(s: S, minLength: MinLength): MinLengthString<MinLength> & S;
 
-    return s;
-  };
+  // Curried version
+  export function asMinLengthString<MinLength extends SupportedLength>(
+    minLength: MinLength,
+  ): <S extends string>(s: S) => MinLengthString<MinLength> & S;
+
+  export function asMinLengthString(
+    ...args:
+      | readonly [s: string, minLength: SupportedLength]
+      | readonly [minLength: SupportedLength]
+  ): string | ((s: string) => string) {
+    switch (args.length) {
+      case 2: {
+        const [s, minLength] = args;
+
+        if (!isMinLengthString(s, minLength)) {
+          throw new TypeError(
+            `Expected a string of length >= ${minLength}, got a string of length ${s.length}`,
+          );
+        }
+
+        return s;
+      }
+
+      case 1: {
+        const [minLength] = args;
+
+        return (s) => asMinLengthString(s, minLength);
+      }
+    }
+  }
 
   /**
    * Casts a string to `MaxLengthString<MaxLength>` after checking that it has
@@ -243,6 +272,9 @@ export namespace Str {
    * length is verified at runtime, and the original string type (e.g. literal
    * types) is preserved via intersection.
    *
+   * Supports a curried overload: calling it with only `maxLength` returns a
+   * function that casts a string, which is convenient for `pipe`/`map`.
+   *
    * @example
    *
    * ```ts
@@ -251,6 +283,11 @@ export namespace Str {
    * const relaxed: MaxLengthString<64> = userName; // OK (32 <= 64)
    *
    * assert.isTrue(relaxed.length <= 32);
+   *
+   * // curried version
+   * const asUserName = Str.asMaxLengthString(32);
+   *
+   * assert.strictEqual(asUserName('another-user'), 'another-user');
    *
    * assert.throws(() => Str.asMaxLengthString('noshiro', 3)); // length 7 > 3
    * ```
@@ -262,21 +299,41 @@ export namespace Str {
    * @returns `s` typed as `MaxLengthString<MaxLength> & S`.
    * @throws {TypeError} If `s.length > maxLength`.
    */
-  export const asMaxLengthString = <
+  export function asMaxLengthString<
     S extends string,
     MaxLength extends SupportedLength,
-  >(
-    s: S,
-    maxLength: MaxLength,
-  ): MaxLengthString<MaxLength> & S => {
-    if (!isMaxLengthString(s, maxLength)) {
-      throw new TypeError(
-        `Expected a string of length <= ${maxLength}, got a string of length ${s.length}`,
-      );
-    }
+  >(s: S, maxLength: MaxLength): MaxLengthString<MaxLength> & S;
 
-    return s;
-  };
+  // Curried version
+  export function asMaxLengthString<MaxLength extends SupportedLength>(
+    maxLength: MaxLength,
+  ): <S extends string>(s: S) => MaxLengthString<MaxLength> & S;
+
+  export function asMaxLengthString(
+    ...args:
+      | readonly [s: string, maxLength: SupportedLength]
+      | readonly [maxLength: SupportedLength]
+  ): string | ((s: string) => string) {
+    switch (args.length) {
+      case 2: {
+        const [s, maxLength] = args;
+
+        if (!isMaxLengthString(s, maxLength)) {
+          throw new TypeError(
+            `Expected a string of length <= ${maxLength}, got a string of length ${s.length}`,
+          );
+        }
+
+        return s;
+      }
+
+      case 1: {
+        const [maxLength] = args;
+
+        return (s) => asMaxLengthString(s, maxLength);
+      }
+    }
+  }
 
   /**
    * Casts a string to `BoundedLengthString<MinLength, MaxLength>` after
@@ -287,6 +344,10 @@ export namespace Str {
    * the length is verified at runtime, and the original string type (e.g.
    * literal types) is preserved via intersection.
    *
+   * Supports a curried overload: calling it with only `minLength` and
+   * `maxLength` returns a function that casts a string, which is convenient for
+   * `pipe`/`map`.
+   *
    * @example
    *
    * ```ts
@@ -295,6 +356,11 @@ export namespace Str {
    * const relaxed: BoundedLengthString<1, 255> = userId; // OK ([8, 16] ⊆ [1, 255])
    *
    * assert.isTrue(relaxed.length >= 8 && relaxed.length <= 16);
+   *
+   * // curried version
+   * const asUserId = Str.asBoundedLengthString(8, 16);
+   *
+   * assert.strictEqual(asUserId('user-87654321'), 'user-87654321');
    *
    * assert.throws(() => Str.asBoundedLengthString('user', 8, 16)); // length 4 < 8
    * ```
@@ -308,7 +374,7 @@ export namespace Str {
    * @returns `s` typed as `BoundedLengthString<MinLength, MaxLength> & S`.
    * @throws {TypeError} If `s.length < minLength` or `s.length > maxLength`.
    */
-  export const asBoundedLengthString = <
+  export function asBoundedLengthString<
     S extends string,
     MinLength extends SupportedLength,
     MaxLength extends SupportedLength,
@@ -316,15 +382,46 @@ export namespace Str {
     s: S,
     minLength: MinLength,
     maxLength: MaxLength,
-  ): BoundedLengthString<MinLength, MaxLength> & S => {
-    if (!isBoundedLengthString(s, minLength, maxLength)) {
-      throw new TypeError(
-        `Expected a string of length in [${minLength}, ${maxLength}], got a string of length ${s.length}`,
-      );
-    }
+  ): BoundedLengthString<MinLength, MaxLength> & S;
 
-    return s;
-  };
+  // Curried version
+  export function asBoundedLengthString<
+    MinLength extends SupportedLength,
+    MaxLength extends SupportedLength,
+  >(
+    minLength: MinLength,
+    maxLength: MaxLength,
+  ): <S extends string>(s: S) => BoundedLengthString<MinLength, MaxLength> & S;
+
+  export function asBoundedLengthString(
+    ...args:
+      | readonly [
+          s: string,
+          minLength: SupportedLength,
+          maxLength: SupportedLength,
+        ]
+      | readonly [minLength: SupportedLength, maxLength: SupportedLength]
+  ): string | ((s: string) => string) {
+    switch (args.length) {
+      case 3: {
+        const [s, minLength, maxLength] = args;
+
+        if (!isBoundedLengthString(s, minLength, maxLength)) {
+          throw new TypeError(
+            `Expected a string of length in [${minLength}, ${maxLength}], got a string of length ${s.length}`,
+          );
+        }
+
+        return s;
+      }
+
+      case 2: {
+        const [minLength, maxLength] = args;
+
+        return (s) => asBoundedLengthString(s, minLength, maxLength);
+      }
+    }
+  }
 
   /**
    * Casts a string to `FixedLengthString<Length>` after checking that it has
@@ -334,6 +431,9 @@ export namespace Str {
    * length is verified at runtime, and the original string type (e.g. literal
    * types) is preserved via intersection.
    *
+   * Supports a curried overload: calling it with only `length` returns a
+   * function that casts a string, which is convenient for `pipe`/`map`.
+   *
    * @example
    *
    * ```ts
@@ -342,6 +442,11 @@ export namespace Str {
    * const atMost5: MaxLengthString<5> = countryCode; // OK (2 <= 5)
    *
    * assert.isTrue(atMost5.length === 2);
+   *
+   * // curried version
+   * const asCountryCode = Str.asFixedLengthString(2);
+   *
+   * assert.strictEqual(asCountryCode('US'), 'US');
    *
    * assert.throws(() => Str.asFixedLengthString('JP', 3)); // length 2 !== 3
    * ```
@@ -353,17 +458,74 @@ export namespace Str {
    * @returns `s` typed as `FixedLengthString<Length> & S`.
    * @throws {TypeError} If `s.length !== length`.
    */
-  export const asFixedLengthString = <
+  export function asFixedLengthString<
     S extends string,
     Length extends SupportedLength,
-  >(
-    s: S,
+  >(s: S, length: Length): FixedLengthString<Length> & S;
+
+  // Curried version
+  export function asFixedLengthString<Length extends SupportedLength>(
     length: Length,
-  ): FixedLengthString<Length> & S => {
-    if (!isFixedLengthString(s, length)) {
-      throw new TypeError(
-        `Expected a string of length ${length}, got a string of length ${s.length}`,
-      );
+  ): <S extends string>(s: S) => FixedLengthString<Length> & S;
+
+  export function asFixedLengthString(
+    ...args:
+      | readonly [s: string, length: SupportedLength]
+      | readonly [length: SupportedLength]
+  ): string | ((s: string) => string) {
+    switch (args.length) {
+      case 2: {
+        const [s, length] = args;
+
+        if (!isFixedLengthString(s, length)) {
+          throw new TypeError(
+            `Expected a string of length ${length}, got a string of length ${s.length}`,
+          );
+        }
+
+        return s;
+      }
+
+      case 1: {
+        const [length] = args;
+
+        return (s) => asFixedLengthString(s, length);
+      }
+    }
+  }
+
+  /**
+   * Casts a string to `NonEmptyString` after checking that it has at least one
+   * character.
+   *
+   * `NonEmptyString` is an alias of `MinLengthString<1>`, so this is the
+   * length-1 specialization of {@link asMinLengthString}. Use this instead of
+   * writing `s as unknown as NonEmptyString`: the length is verified at
+   * runtime, and the original string type (e.g. literal types) is preserved
+   * via intersection.
+   *
+   * @example
+   *
+   * ```ts
+   * const name = Str.asNonEmptyString('noshiro');
+   *
+   * const nonEmpty: NonEmptyString = name; // OK
+   *
+   * assert.isTrue(nonEmpty.length >= 1);
+   *
+   * assert.throws(() => Str.asNonEmptyString('')); // length 0 < 1
+   * ```
+   *
+   * @template S - The input string type (literal types are preserved).
+   * @param s - The string to cast.
+   * @returns `s` typed as `NonEmptyString & S`.
+   * @throws {TypeError} If `s` is empty.
+   */
+  export const asNonEmptyString = <S extends string>(
+    s: S,
+  ): NonEmptyString & S => {
+    if (!isMinLengthString(s, 1)) {
+      throw new TypeError('Expected a non-empty string, got an empty string');
     }
 
     return s;

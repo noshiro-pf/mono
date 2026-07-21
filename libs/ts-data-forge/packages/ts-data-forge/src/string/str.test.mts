@@ -213,3 +213,79 @@ describe('Str length-bounded casts', () => {
     assert.throws(() => Str.asFixedLengthString('JP', 3), TypeError);
   });
 });
+
+describe('Str length-bounded casts (curried)', () => {
+  test('asMinLengthString returns the value and narrows its type', () => {
+    const result = Str.asMinLengthString(3)('very-secret');
+
+    expectType<typeof result, MinLengthString<3>>('<=');
+
+    assert.strictEqual(result, 'very-secret');
+  });
+
+  test('asMinLengthString throws when too short', () => {
+    assert.throws(() => Str.asMinLengthString(3)('hi'), TypeError);
+  });
+
+  test('asMaxLengthString returns the value and narrows its type', () => {
+    const result = Str.asMaxLengthString(32)('noshiro');
+
+    expectType<typeof result, MaxLengthString<32>>('<=');
+
+    assert.strictEqual(result, 'noshiro');
+  });
+
+  test('asMaxLengthString throws when too long', () => {
+    assert.throws(() => Str.asMaxLengthString(3)('noshiro'), TypeError);
+  });
+
+  test('asBoundedLengthString returns the value and narrows its type', () => {
+    const result = Str.asBoundedLengthString(8, 16)('user-12345678');
+
+    expectType<typeof result, BoundedLengthString<8, 16>>('<=');
+
+    assert.strictEqual(result, 'user-12345678');
+  });
+
+  test('asBoundedLengthString throws when out of range', () => {
+    assert.throws(() => Str.asBoundedLengthString(8, 16)('user'), TypeError);
+  });
+
+  test('asFixedLengthString returns the value and narrows its type', () => {
+    const result = Str.asFixedLengthString(2)('JP');
+
+    expectType<typeof result, FixedLengthString<2>>('<=');
+
+    assert.strictEqual(result, 'JP');
+  });
+
+  test('asFixedLengthString throws when the length differs', () => {
+    assert.throws(() => Str.asFixedLengthString(3)('JP'), TypeError);
+  });
+});
+
+describe(Str.asNonEmptyString, () => {
+  test('returns the value and narrows its type', () => {
+    const result = Str.asNonEmptyString('noshiro');
+
+    expectType<typeof result, NonEmptyString>('<=');
+
+    expectType<typeof result, MinLengthString<1>>('<=');
+
+    assert.strictEqual(result, 'noshiro');
+  });
+
+  test('throws when the string is empty', () => {
+    assert.throws(() => Str.asNonEmptyString(''), TypeError);
+  });
+
+  test('preserves literal string types', () => {
+    const result = Str.asNonEmptyString('hello');
+
+    expectType<typeof result, 'hello'>('<=');
+
+    expectType<typeof result, NonEmptyString>('<=');
+
+    assert.strictEqual(result, 'hello');
+  });
+});

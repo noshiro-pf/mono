@@ -11,6 +11,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(relaxed.length >= 8 && relaxed.length <= 16);
 
+    // curried version
+    const asUserId = Str.asBoundedLengthString(8, 16);
+
+    assert.strictEqual(asUserId('user-87654321'), 'user-87654321');
+
     assert.throws(() => Str.asBoundedLengthString('user', 8, 16)); // length 4 < 8
 
     // embed-sample-code-ignore-below

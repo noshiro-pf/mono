@@ -11,6 +11,11 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(nonEmpty.length >= 12);
 
+    // curried version
+    const asPassword = Str.asMinLengthString(12);
+
+    assert.strictEqual(asPassword('another-secret'), 'another-secret');
+
     assert.throws(() => Str.asMinLengthString('short', 12)); // length 5 < 12
 
     // embed-sample-code-ignore-below
