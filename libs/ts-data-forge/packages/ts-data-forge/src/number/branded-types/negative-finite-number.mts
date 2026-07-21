@@ -30,15 +30,6 @@ const {
   typeNameInMessage,
 } as const);
 
-/**
- * Returns the absolute value of a negative finite number.
- *
- * The absolute value of a negative finite number is always a positive finite
- * number, so the result is typed as a {@link PositiveFiniteNumber}.
- *
- * @param x - The negative finite number.
- * @returns `|x|` as a PositiveFiniteNumber.
- */
 const abs = (x: ElementType): PositiveFiniteNumber =>
   PositiveFiniteNumber.clamp(Math.abs(x));
 
@@ -71,140 +62,149 @@ const round = (
   >;
 
 /**
- * Checks if a number is a NegativeFiniteNumber (a finite number `< 0`).
+ * Type guard that checks if a value is a negative finite number.
  *
- * @param value The value to check.
- * @returns `true` if the value is a NegativeFiniteNumber, `false` otherwise.
+ * Returns `true` only for a finite value — never `NaN`, `Infinity`, or
+ * `-Infinity`.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a negative finite number, `false` otherwise
  */
 export const isNegativeFiniteNumber = is;
 
 /**
- * Casts a number to a NegativeFiniteNumber type.
+ * Casts a `number` to the `NegativeFiniteNumber` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NegativeFiniteNumber type.
- * @throws {TypeError} If the value is not a negative finite number.
+ * Validates that the value is a negative finite number and returns it with the
+ * `NegativeFiniteNumber` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NegativeFiniteNumber`
+ * @throws {TypeError} If the value is not a negative finite number
  */
 export const asNegativeFiniteNumber = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for negative finite
- * numbers.
+ * Namespace providing type-safe operations for the `NegativeFiniteNumber`
+ * branded type.
  *
- * All operations keep results finite (excluding NaN and Infinity). Operations
- * that stay within the negative finite numbers clamp their results to the valid
- * range, while operations whose result leaves the set (`mul`, `div`, `abs`) are
- * typed to reflect the actual sign of the result.
+ * The `NegativeFiniteNumber` type represents a negative finite number.
  */
 export const NegativeFiniteNumber = {
   /**
-   * Type guard to check if a value is a NegativeFiniteNumber.
+   * Type guard that checks if a value is a negative finite number.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a negative finite number, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a negative finite number, `false` otherwise
+   * @see {@link isNegativeFiniteNumber} for usage examples
    */
   is,
 
   /**
-   * The maximum value for a negative finite number.
-   *
-   * @readonly
+   * The largest value representable as `NegativeFiniteNumber`.
    */
   MAX_VALUE,
 
   /**
    * Returns the absolute value of a negative finite number.
    *
-   * @param a The negative finite number.
-   * @returns The absolute value as a PositiveFiniteNumber.
+   * The result is non-negative and keeps the `NegativeFiniteNumber` brand.
+   *
+   * @param a - The negative finite number value
+   * @returns The absolute value as a non-negative `NegativeFiniteNumber`
    */
   abs,
 
   /**
-   * Returns the smaller of two NegativeFiniteNumber values.
+   * Returns the smallest of the given negative finite numbers.
    *
-   * @param a The first NegativeFiniteNumber.
-   * @param b The second NegativeFiniteNumber.
-   * @returns The minimum value as a NegativeFiniteNumber.
+   * @param values - The negative finite numbers to compare (at least one required)
+   * @returns The smallest value as a `NegativeFiniteNumber`
    */
   min: min_,
 
   /**
-   * Returns the larger of two NegativeFiniteNumber values.
+   * Returns the largest of the given negative finite numbers.
    *
-   * @param a The first NegativeFiniteNumber.
-   * @param b The second NegativeFiniteNumber.
-   * @returns The maximum value as a NegativeFiniteNumber.
+   * @param values - The negative finite numbers to compare (at least one required)
+   * @returns The largest value as a `NegativeFiniteNumber`
    */
   max: max_,
 
   /**
-   * Clamps a number to the negative finite range.
+   * Clamps a `number` into the `NegativeFiniteNumber` range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to `(-∞, 0)` as a NegativeFiniteNumber.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `NegativeFiniteNumber`
    */
   clamp,
 
   /**
-   * Rounds down a NegativeFiniteNumber to the nearest integer.
+   * Returns the greatest integer less than or equal to a negative finite
+   * number.
    *
-   * @param x The NegativeFiniteNumber to round down.
-   * @returns The floor value as a NegativeInt (always `<= -1`).
+   * @param a - The negative finite number value
+   * @returns The floored value as an integer
    */
   floor,
 
   /**
-   * Rounds up a NegativeFiniteNumber to the nearest integer.
+   * Returns the smallest integer greater than or equal to a negative finite
+   * number.
    *
-   * @param x The NegativeFiniteNumber to round up.
-   * @returns The ceiling value as a NonPositiveInt (can be 0).
+   * @param a - The negative finite number value
+   * @returns The ceiled value as an integer
    */
   ceil,
 
   /**
-   * Rounds a NegativeFiniteNumber to the nearest integer.
+   * Returns the value of a negative finite number rounded to the nearest
+   * integer.
    *
-   * @param x The NegativeFiniteNumber to round.
-   * @returns The rounded value as a NonPositiveInt (can be 0 if x > -0.5).
+   * @param a - The negative finite number value
+   * @returns The rounded value as an integer
    */
   round,
 
   /**
-   * Generates a random NegativeFiniteNumber value.
+   * Generates a random `NegativeFiniteNumber` within the given range.
    *
-   * @returns A random negative finite number.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NegativeFiniteNumber` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a NegativeFiniteNumber to the power of another NegativeFiniteNumber.
+   * Raises `a` to the power `b`, returning `a ** b` as a
+   * `NegativeFiniteNumber`.
    *
-   * @param a The base NegativeFiniteNumber.
-   * @param b The exponent NegativeFiniteNumber.
-   * @returns `a ** b` clamped to `(-∞, 0)` as a NegativeFiniteNumber.
+   * @param a - The base negative finite number
+   * @param b - The exponent negative finite number
+   * @returns `a ** b` as a `NegativeFiniteNumber`
    */
   pow,
 
   /**
-   * Adds two NegativeFiniteNumber values.
+   * Adds two negative finite numbers, returning `a + b` as a
+   * `NegativeFiniteNumber`.
    *
-   * @param a The first NegativeFiniteNumber.
-   * @param b The second NegativeFiniteNumber.
-   * @returns `a + b` as a NegativeFiniteNumber.
+   * @param a - The first negative finite number
+   * @param b - The second negative finite number
+   * @returns The sum of `a` and `b` as a `NegativeFiniteNumber`
    */
   add,
 
   /**
-   * Subtracts one NegativeFiniteNumber from another.
+   * Subtracts two negative finite numbers, returning `a - b` as a
+   * `NegativeFiniteNumber`.
    *
-   * The mathematical result can be positive, so it is clamped to the negative
-   * finite range (maximum `-Number.MIN_VALUE`).
-   *
-   * @param a The minuend NegativeFiniteNumber.
-   * @param b The subtrahend NegativeFiniteNumber.
-   * @returns `a - b` clamped to `(-∞, 0)` as a NegativeFiniteNumber.
+   * @param a - The first negative finite number
+   * @param b - The second negative finite number
+   * @returns The difference of `a` and `b` as a `NegativeFiniteNumber`
    */
   sub,
 } as const;

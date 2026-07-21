@@ -57,149 +57,159 @@ expectType<TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>, Uint>(
 );
 
 /**
- * Checks if a number is a NonNegativeFiniteNumber (a finite number >= 0).
+ * Type guard that checks if a value is a non-negative finite number.
  *
- * @param value The value to check.
- * @returns `true` if the value is a NonNegativeFiniteNumber, `false` otherwise.
+ * Returns `true` only for a finite value — never `NaN`, `Infinity`, or
+ * `-Infinity`.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-negative finite number, `false` otherwise
  */
 export const isNonNegativeFiniteNumber = is;
 
 /**
- * Casts a number to a NonNegativeFiniteNumber type.
+ * Casts a `number` to the `NonNegativeFiniteNumber` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NonNegativeFiniteNumber type.
- * @throws {TypeError} If the value is not a non-negative finite number.
+ * Validates that the value is a non-negative finite number and returns it with
+ * the `NonNegativeFiniteNumber` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NonNegativeFiniteNumber`
+ * @throws {TypeError} If the value is not a non-negative finite number
  */
 export const asNonNegativeFiniteNumber = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for non-negative finite
- * numbers.
+ * Namespace providing type-safe operations for the `NonNegativeFiniteNumber`
+ * branded type.
  *
- * All operations maintain the non-negative constraint by clamping negative
- * results to 0, while ensuring results remain finite (excluding NaN and
- * Infinity). This type is useful for representing measurements, distances,
- * weights, and other inherently non-negative values.
+ * The `NonNegativeFiniteNumber` type represents a non-negative finite number.
  */
 export const NonNegativeFiniteNumber = {
   /**
-   * Type guard to check if a value is a NonNegativeFiniteNumber.
+   * Type guard that checks if a value is a non-negative finite number.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a non-negative finite number, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-negative finite number, `false` otherwise
+   * @see {@link isNonNegativeFiniteNumber} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a non-negative finite number.
-   *
-   * @readonly
+   * The smallest value representable as `NonNegativeFiniteNumber`.
    */
   MIN_VALUE,
 
   /**
-   * Returns the smaller of two NonNegativeFiniteNumber values.
+   * Returns the smallest of the given non-negative finite numbers.
    *
-   * @param a The first NonNegativeFiniteNumber.
-   * @param b The second NonNegativeFiniteNumber.
-   * @returns The minimum value as a NonNegativeFiniteNumber.
+   * @param values - The non-negative finite numbers to compare (at least one required)
+   * @returns The smallest value as a `NonNegativeFiniteNumber`
    */
   min: min_,
 
   /**
-   * Returns the larger of two NonNegativeFiniteNumber values.
+   * Returns the largest of the given non-negative finite numbers.
    *
-   * @param a The first NonNegativeFiniteNumber.
-   * @param b The second NonNegativeFiniteNumber.
-   * @returns The maximum value as a NonNegativeFiniteNumber.
+   * @param values - The non-negative finite numbers to compare (at least one required)
+   * @returns The largest value as a `NonNegativeFiniteNumber`
    */
   max: max_,
 
   /**
-   * Clamps a number to the non-negative finite range.
+   * Clamps a `number` into the `NonNegativeFiniteNumber` range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [0, +∞) as a NonNegativeFiniteNumber.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `NonNegativeFiniteNumber`
    */
   clamp,
 
   /**
-   * Rounds down a NonNegativeFiniteNumber to the nearest integer.
+   * Returns the greatest integer less than or equal to a non-negative finite
+   * number.
    *
-   * @param x The NonNegativeFiniteNumber to round down.
-   * @returns The floor value as a Uint.
+   * @param a - The non-negative finite number value
+   * @returns The floored value as an integer
    */
   floor,
 
   /**
-   * Rounds up a NonNegativeFiniteNumber to the nearest integer.
+   * Returns the smallest integer greater than or equal to a non-negative finite
+   * number.
    *
-   * @param x The NonNegativeFiniteNumber to round up.
-   * @returns The ceiling value as a Uint.
+   * @param a - The non-negative finite number value
+   * @returns The ceiled value as an integer
    */
   ceil,
 
   /**
-   * Rounds a NonNegativeFiniteNumber to the nearest integer.
+   * Returns the value of a non-negative finite number rounded to the nearest
+   * integer.
    *
-   * @param x The NonNegativeFiniteNumber to round.
-   * @returns The rounded value as a Uint.
+   * @param a - The non-negative finite number value
+   * @returns The rounded value as an integer
    */
   round,
 
   /**
-   * Generates a random NonNegativeFiniteNumber value.
+   * Generates a random `NonNegativeFiniteNumber` within the given range.
    *
-   * @returns A random non-negative finite number.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NonNegativeFiniteNumber` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a NonNegativeFiniteNumber to the power of another
-   * NonNegativeFiniteNumber.
+   * Raises `a` to the power `b`, returning `a ** b` as a
+   * `NonNegativeFiniteNumber`.
    *
-   * @param a The base NonNegativeFiniteNumber.
-   * @param b The exponent NonNegativeFiniteNumber.
-   * @returns `a ** b` clamped to [0, +∞) as a NonNegativeFiniteNumber.
+   * @param a - The base non-negative finite number
+   * @param b - The exponent non-negative finite number
+   * @returns `a ** b` as a `NonNegativeFiniteNumber`
    */
   pow,
 
   /**
-   * Adds two NonNegativeFiniteNumber values.
+   * Adds two non-negative finite numbers, returning `a + b` as a
+   * `NonNegativeFiniteNumber`.
    *
-   * @param a The first NonNegativeFiniteNumber.
-   * @param b The second NonNegativeFiniteNumber.
-   * @returns `a + b` clamped to [0, +∞) as a NonNegativeFiniteNumber.
+   * @param a - The first non-negative finite number
+   * @param b - The second non-negative finite number
+   * @returns The sum of `a` and `b` as a `NonNegativeFiniteNumber`
    */
   add,
 
   /**
-   * Subtracts one NonNegativeFiniteNumber from another.
+   * Subtracts two non-negative finite numbers, returning `a - b` as a
+   * `NonNegativeFiniteNumber`.
    *
-   * @param a The minuend NonNegativeFiniteNumber.
-   * @param b The subtrahend NonNegativeFiniteNumber.
-   * @returns `a - b` clamped to [0, +∞) as a NonNegativeFiniteNumber (minimum
-   *   0).
+   * @param a - The first non-negative finite number
+   * @param b - The second non-negative finite number
+   * @returns The difference of `a` and `b` as a `NonNegativeFiniteNumber`
    */
   sub,
 
   /**
-   * Multiplies two NonNegativeFiniteNumber values.
+   * Multiplies two non-negative finite numbers, returning `a * b` as a
+   * `NonNegativeFiniteNumber`.
    *
-   * @param a The first NonNegativeFiniteNumber.
-   * @param b The second NonNegativeFiniteNumber.
-   * @returns `a * b` clamped to [0, +∞) as a NonNegativeFiniteNumber.
+   * @param a - The first non-negative finite number
+   * @param b - The second non-negative finite number
+   * @returns The product of `a` and `b` as a `NonNegativeFiniteNumber`
    */
   mul,
 
   /**
-   * Divides one NonNegativeFiniteNumber by another.
+   * Divides two non-negative finite numbers, returning `a / b` as a
+   * `NonNegativeFiniteNumber`.
    *
-   * @param a The dividend NonNegativeFiniteNumber.
-   * @param b The divisor NonNegativeFiniteNumber.
-   * @returns `a / b` clamped to [0, +∞) as a NonNegativeFiniteNumber.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns `a / b` as a `NonNegativeFiniteNumber`
    */
   div,
 } as const;

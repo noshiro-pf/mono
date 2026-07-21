@@ -235,7 +235,7 @@ const guardReturns = (tn: string): string =>
 const guardDetail = (config: BrandedNumberConfig): string =>
   config.division === 'floor'
     ? (`Returns \`true\` for ${config.typeNameInMessage} — a value with no fractional component${config.precision === 'may-lose' ? ', including values outside the safe integer range (unlike `SafeInt`)' : ''}.` as const)
-    : (`Returns \`true\` only for a finite value (never \`NaN\` or \`±Infinity\`) that is ${config.typeNameInMessage}.` as const);
+    : 'Returns `true` only for a finite value — never `NaN`, `Infinity`, or `-Infinity`.';
 
 const namespaceDescription = (config: BrandedNumberConfig): string => {
   const divisionNote =

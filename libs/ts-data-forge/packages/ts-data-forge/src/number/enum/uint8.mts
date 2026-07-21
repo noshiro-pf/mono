@@ -50,132 +50,134 @@ const random = (min: Uint8, max: Uint8): Uint8 =>
   castType(randomImpl(castTypeImpl(min), castTypeImpl(max)));
 
 /**
- * Checks if a number is a Uint8 (8-bit unsigned integer in the range [0, 255]).
+ * Type guard that checks if a value is an non-negative integer less than 256.
  *
- * @param value The value to check.
- * @returns `true` if the value is a Uint8, `false` otherwise.
+ * Returns `true` for an non-negative integer less than 256 — a value with no
+ * fractional component.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is an non-negative integer less than 256, `false` otherwise
  */
 export const isUint8 = is;
 
 /**
- * Casts a number to a Uint8 type. This function validates that the input is
- * within the Uint8 range [0, 255] and is an integer, then returns it with the
- * Uint8 brand.
+ * Casts a `number` to the `Uint8` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a Uint8 type.
- * @throws {TypeError} If the value is not a valid 8-bit unsigned integer.
+ * Validates that the value is an non-negative integer less than 256 and returns
+ * it with the `Uint8` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as an `Uint8`
+ * @throws {TypeError} If the value is not an non-negative integer less than 256
  */
 export const asUint8 = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for 8-bit unsigned
- * integers.
+ * Namespace providing type-safe operations for the `Uint8` branded type.
  *
- * All operations automatically clamp results to the valid Uint8 range [0, 255].
- * This ensures that all arithmetic maintains the 8-bit unsigned integer
- * constraint, with negative results clamped to 0 and overflow results clamped
- * to MAX_VALUE.
+ * The `Uint8` type represents an non-negative integer less than 256. Division
+ * (`div`) uses floor division.
  */
 export const Uint8 = {
   /**
-   * Type guard that checks if a value is an 8-bit unsigned integer.
+   * Type guard that checks if a value is an non-negative integer less than 256.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is an 8-bit unsigned integer, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is an non-negative integer less than 256, `false` otherwise
+   * @see {@link isUint8} for usage examples
    */
   is,
 
   /**
-   * The minimum value for an 8-bit unsigned integer.
-   *
-   * @readonly
+   * The smallest value representable as `Uint8`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for an 8-bit unsigned integer.
-   *
-   * @readonly
+   * The largest value representable as `Uint8`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the larger of the given Uint8 values.
+   * Returns the largest of the given non-negative integers.
    *
-   * @param values The Uint8 values to compare.
-   * @returns The maximum value as a Uint8.
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The largest value as an `Uint8`
    */
   max: max_,
 
   /**
-   * Returns the smaller of the given Uint8 values.
+   * Returns the smallest of the given non-negative integers.
    *
-   * @param values The Uint8 values to compare.
-   * @returns The minimum value as a Uint8.
+   * @param values - The non-negative integers to compare (at least one required)
+   * @returns The smallest value as an `Uint8`
    */
   min: min_,
 
   /**
-   * Clamps a number to the Uint8 range.
+   * Clamps a `number` into the `Uint8` range, rounding to the nearest integer
+   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [0, 255] as a Uint8.
+   * @param value - The value to clamp
+   * @returns The clamped value as an `Uint8`
    */
   clamp,
 
   /**
-   * Generates a random Uint8 value within the specified range.
+   * Generates a random `Uint8` within the given range.
    *
-   * @param min The minimum value (inclusive).
-   * @param max The maximum value (inclusive).
-   * @returns A random Uint8 between min and max.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `Uint8` in `[min, max]`
    */
   random,
 
   /**
-   * Raises x to the power of y, clamped to Uint8 range.
+   * Raises `a` to the power `b`, returning `a ** b` as an `Uint8` (floored to
+   * an integer).
    *
-   * @param x - The base
-   * @param y - The exponent
-   * @returns `x ** y` clamped to [0, 255]
+   * @param a - The base non-negative integer
+   * @param b - The exponent non-negative integer
+   * @returns `a ** b` as an `Uint8`
    */
   pow,
 
   /**
-   * Adds two Uint8 values, clamped to Uint8 range.
+   * Adds two non-negative integers, returning `a + b` as an `Uint8`.
    *
-   * @param x - First operand
-   * @param y - Second operand
-   * @returns `x + y` clamped to [0, 255]
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The sum of `a` and `b` as an `Uint8`
    */
   add,
 
   /**
-   * Subtracts two Uint8 values, clamped to Uint8 range.
+   * Subtracts two non-negative integers, returning `a - b` as an `Uint8`.
    *
-   * @param x - First operand
-   * @param y - Second operand
-   * @returns `x - y` clamped to [0, 255]
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The difference of `a` and `b` as an `Uint8`
    */
   sub,
 
   /**
-   * Multiplies two Uint8 values, clamped to Uint8 range.
+   * Multiplies two non-negative integers, returning `a * b` as an `Uint8`.
    *
-   * @param x - First operand
-   * @param y - Second operand
-   * @returns `x * y` clamped to [0, 255]
+   * @param a - The first non-negative integer
+   * @param b - The second non-negative integer
+   * @returns The product of `a` and `b` as an `Uint8`
    */
   mul,
 
   /**
-   * Divides two Uint8 values, clamped to Uint8 range.
+   * Divides two non-negative integers using floor division (`⌊a / b⌋`): the
+   * result is `a / b` rounded toward negative infinity, as an `Uint8`.
    *
-   * @param x - The dividend
-   * @param y - The divisor (cannot be 0)
-   * @returns `⌊x / y⌋` clamped to [0, 255]
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as an `Uint8`
    */
   div,
 } as const;

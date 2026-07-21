@@ -60,153 +60,144 @@ const random = (min: Int8, max: Int8): Int8 =>
   castType(randomImpl(castTypeImpl(min), castTypeImpl(max)));
 
 /**
- * Type guard that checks if a value is an 8-bit signed integer.
+ * Type guard that checks if a value is an integer in [-128, 127].
  *
- * An Int8 is a signed integer in the range [-128, 127], representing values
- * that fit in exactly 8 bits of memory.
+ * Returns `true` for an integer in [-128, 127] — a value with no fractional
+ * component.
  *
  * @param value - The value to check
- * @returns `true` if the value is an Int8, `false` otherwise
+ * @returns `true` if the value is an integer in [-128, 127], `false` otherwise
  */
 export const isInt8 = is;
 
 /**
- * Casts a number to an Int8 branded type.
+ * Casts a `number` to the `Int8` branded type.
  *
- * This function validates that the input is within the Int8 range [-128, 127]
- * and is an integer, then returns it with the Int8 brand.
+ * Validates that the value is an integer in [-128, 127] and returns it with the
+ * `Int8` brand. Throws a `TypeError` otherwise.
  *
  * @param value - The value to cast
- * @returns The value as an Int8 branded type
- * @throws {TypeError} If the value is not a valid 8-bit signed integer
+ * @returns The value as an `Int8`
+ * @throws {TypeError} If the value is not an integer in [-128, 127]
  */
 export const asInt8 = castType;
 
 /**
- * Namespace providing type-safe operations for Int8 (8-bit signed integer)
- * branded types.
+ * Namespace providing type-safe operations for the `Int8` branded type.
  *
- * Int8 represents signed integers in the range [-128, 127], equivalent to a
- * signed byte in many programming languages. All operations automatically clamp
- * results to stay within this range, preventing overflow/underflow issues.
- *
- * This type is useful for:
- *
- * - Binary data processing (signed bytes)
- * - Small integer values with known bounds
- * - Embedded systems programming
- * - Memory-efficient integer storage
- * - Image processing (signed pixel offsets)
+ * The `Int8` type represents an integer in [-128, 127]. Division (`div`) uses
+ * floor division.
  */
 export const Int8 = {
   /**
-   * Type guard that checks if a value is an 8-bit signed integer.
+   * Type guard that checks if a value is an integer in [-128, 127].
    *
    * @param value - The value to check
-   * @returns `true` if the value is in range [-128, 127] and is an integer
+   * @returns `true` if the value is an integer in [-128, 127], `false` otherwise
    * @see {@link isInt8} for usage examples
    */
   is,
 
   /**
-   * The minimum value for an 8-bit signed integer.
-   *
-   * @readonly
+   * The smallest value representable as `Int8`.
    */
   MIN_VALUE,
 
   /**
-   * The maximum value for an 8-bit signed integer.
-   *
-   * @readonly
+   * The largest value representable as `Int8`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the minimum value from a list of Int8 values.
+   * Returns the smallest of the given integers.
    *
-   * @param values - The Int8 values to compare (at least one required)
-   * @returns The smallest value as an Int8
+   * @param values - The integers to compare (at least one required)
+   * @returns The smallest value as an `Int8`
    */
   min: min_,
 
   /**
-   * Returns the maximum value from a list of Int8 values.
+   * Returns the largest of the given integers.
    *
-   * @param values - The Int8 values to compare (at least one required)
-   * @returns The largest value as an Int8
+   * @param values - The integers to compare (at least one required)
+   * @returns The largest value as an `Int8`
    */
   max: max_,
 
   /**
-   * Clamps a number to the Int8 range.
+   * Clamps a `number` into the `Int8` range, rounding to the nearest integer
+   * and constraining the result to `[MIN_VALUE, MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to [-128, 127] as an Int8.
+   * @param value - The value to clamp
+   * @returns The clamped value as an `Int8`
    */
   clamp,
 
   /**
-   * Returns the absolute value of an Int8.
+   * Returns the absolute value of an integer in [-128, 127].
    *
-   * @param value The Int8 value.
-   * @returns The absolute value as an Int8, clamped to valid range.
+   * The result is non-negative and keeps the `Int8` brand.
+   *
+   * @param a - The integer value
+   * @returns The absolute value as a non-negative `Int8`
    */
   abs,
 
   /**
-   * Generates a random Int8 value within the specified range (inclusive).
+   * Generates a random `Int8` within the given range.
    *
-   * Both bounds are inclusive. If min > max, they are automatically swapped.
+   * The range is inclusive on both ends.
    *
    * @param min - The minimum value (inclusive)
    * @param max - The maximum value (inclusive)
-   * @returns A random Int8 in the range [min, max]
+   * @returns A random `Int8` in `[min, max]`
    */
   random,
 
   /**
-   * Raises x to the power of y, clamped to Int8 range.
+   * Raises `a` to the power `b`, returning `a ** b` as an `Int8` (floored to an
+   * integer).
    *
-   * @param x - The base
-   * @param y - The exponent
-   * @returns `x ** y` clamped to [-128, 127]
+   * @param a - The base integer
+   * @param b - The exponent integer
+   * @returns `a ** b` as an `Int8`
    */
   pow,
 
   /**
-   * Adds two Int8 values, clamped to Int8 range.
+   * Adds two integers, returning `a + b` as an `Int8`.
    *
-   * @param x - First operand
-   * @param y - Second operand
-   * @returns `x + y` clamped to [-128, 127]
+   * @param a - The first integer
+   * @param b - The second integer
+   * @returns The sum of `a` and `b` as an `Int8`
    */
   add,
 
   /**
-   * Subtracts two Int8 values, clamped to Int8 range.
+   * Subtracts two integers, returning `a - b` as an `Int8`.
    *
-   * @param x - First operand
-   * @param y - Second operand
-   * @returns `x - y` clamped to [-128, 127]
+   * @param a - The first integer
+   * @param b - The second integer
+   * @returns The difference of `a` and `b` as an `Int8`
    */
   sub,
 
   /**
-   * Multiplies two Int8 values, clamped to Int8 range.
+   * Multiplies two integers, returning `a * b` as an `Int8`.
    *
-   * @param x - First operand
-   * @param y - Second operand
-   * @returns `x * y` clamped to [-128, 127]
+   * @param a - The first integer
+   * @param b - The second integer
+   * @returns The product of `a` and `b` as an `Int8`
    */
   mul,
 
   /**
-   * Divides two Int8 values, clamped to Int8 range.
+   * Divides two integers using floor division (`⌊a / b⌋`): the result is `a /
+   * b` rounded toward negative infinity, as an `Int8`.
    *
-   * @param x - The dividend
-   * @param y - The divisor (cannot be 0)
-   * @returns `⌊x / y⌋` clamped to [-128, 127]
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns The floored quotient as an `Int8`
    */
   div,
 } as const;

@@ -34,8 +34,6 @@ const {
   typeNameInMessage,
 } as const);
 
-// Not provided because reasonable rounding operations that avoid becoming 0 cannot be defined
-
 const floor = (
   x: ElementType,
 ): TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType> =>
@@ -67,125 +65,138 @@ expectType<
 >('=');
 
 /**
- * Checks if a number is a NonZeroFiniteNumber (a finite number that is not 0).
+ * Type guard that checks if a value is a non-zero finite number.
  *
- * @param value The value to check.
- * @returns `true` if the value is a NonZeroFiniteNumber, `false` otherwise.
+ * Returns `true` only for a finite value — never `NaN`, `Infinity`, or
+ * `-Infinity`.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-zero finite number, `false` otherwise
  */
 export const isNonZeroFiniteNumber = is;
 
 /**
- * Casts a number to a NonZeroFiniteNumber type.
+ * Casts a `number` to the `NonZeroFiniteNumber` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NonZeroFiniteNumber type.
- * @throws {TypeError} If the value is not a non-zero finite number.
+ * Validates that the value is a non-zero finite number and returns it with the
+ * `NonZeroFiniteNumber` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NonZeroFiniteNumber`
+ * @throws {TypeError} If the value is not a non-zero finite number
  */
 export const asNonZeroFiniteNumber = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for non-zero finite
- * numbers.
+ * Namespace providing type-safe operations for the `NonZeroFiniteNumber`
+ * branded type.
  *
- * All operations maintain the non-zero constraint while ensuring results remain
- * finite (excluding NaN and Infinity). This type is useful for values that must
- * never be zero, such as denominators, scaling factors, and ratios.
+ * The `NonZeroFiniteNumber` type represents a non-zero finite number.
  */
 export const NonZeroFiniteNumber = {
   /**
-   * Type guard to check if a value is a NonZeroFiniteNumber.
+   * Type guard that checks if a value is a non-zero finite number.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a non-zero finite number, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-zero finite number, `false` otherwise
+   * @see {@link isNonZeroFiniteNumber} for usage examples
    */
   is,
 
   /**
    * Returns the absolute value of a non-zero finite number.
    *
-   * @param a The NonZeroFiniteNumber.
-   * @returns The absolute value as a NonZeroFiniteNumber.
+   * The result is non-negative and keeps the `NonZeroFiniteNumber` brand.
+   *
+   * @param a - The non-zero finite number value
+   * @returns The absolute value as a non-negative `NonZeroFiniteNumber`
    */
   abs,
 
   /**
-   * Returns the smaller of two NonZeroFiniteNumber values.
+   * Returns the smallest of the given non-zero finite numbers.
    *
-   * @param a The first NonZeroFiniteNumber.
-   * @param b The second NonZeroFiniteNumber.
-   * @returns The minimum value as a NonZeroFiniteNumber.
+   * @param values - The non-zero finite numbers to compare (at least one required)
+   * @returns The smallest value as a `NonZeroFiniteNumber`
    */
   min: min_,
 
   /**
-   * Returns the larger of two NonZeroFiniteNumber values.
+   * Returns the largest of the given non-zero finite numbers.
    *
-   * @param a The first NonZeroFiniteNumber.
-   * @param b The second NonZeroFiniteNumber.
-   * @returns The maximum value as a NonZeroFiniteNumber.
+   * @param values - The non-zero finite numbers to compare (at least one required)
+   * @returns The largest value as a `NonZeroFiniteNumber`
    */
   max: max_,
 
   /**
-   * Rounds down a NonZeroFiniteNumber to the nearest integer.
+   * Returns the greatest integer less than or equal to a non-zero finite
+   * number.
    *
-   * @param x The NonZeroFiniteNumber to round down.
-   * @returns The floor value as a NonZeroInt.
+   * @param a - The non-zero finite number value
+   * @returns The floored value as an integer
    */
   floor,
 
   /**
-   * Rounds up a NonZeroFiniteNumber to the nearest integer.
+   * Returns the smallest integer greater than or equal to a non-zero finite
+   * number.
    *
-   * @param x The NonZeroFiniteNumber to round up.
-   * @returns The ceiling value as a NonZeroInt.
+   * @param a - The non-zero finite number value
+   * @returns The ceiled value as an integer
    */
   ceil,
 
   /**
-   * Rounds a NonZeroFiniteNumber to the nearest integer.
+   * Returns the value of a non-zero finite number rounded to the nearest
+   * integer.
    *
-   * @param x The NonZeroFiniteNumber to round.
-   * @returns The rounded value as a NonZeroInt.
+   * @param a - The non-zero finite number value
+   * @returns The rounded value as an integer
    */
   round,
 
   /**
-   * Generates a random NonZeroFiniteNumber value.
+   * Generates a random `NonZeroFiniteNumber` within the given range.
    *
-   * @returns A random non-zero finite number.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NonZeroFiniteNumber` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a NonZeroFiniteNumber to the power of another NonZeroFiniteNumber.
+   * Raises `a` to the power `b`, returning `a ** b` as a `NonZeroFiniteNumber`.
    *
-   * @param a The base NonZeroFiniteNumber.
-   * @param b The exponent NonZeroFiniteNumber.
-   * @returns `a ** b` as a NonZeroFiniteNumber.
+   * @param a - The base non-zero finite number
+   * @param b - The exponent non-zero finite number
+   * @returns `a ** b` as a `NonZeroFiniteNumber`
    */
   pow,
 
   /**
-   * Multiplies two NonZeroFiniteNumber values.
+   * Multiplies two non-zero finite numbers, returning `a * b` as a
+   * `NonZeroFiniteNumber`.
    *
-   * @param a The first NonZeroFiniteNumber.
-   * @param b The second NonZeroFiniteNumber.
-   * @returns `a * b` as a NonZeroFiniteNumber.
+   * @param a - The first non-zero finite number
+   * @param b - The second non-zero finite number
+   * @returns The product of `a` and `b` as a `NonZeroFiniteNumber`
    */
   mul,
 
   /**
-   * Divides one NonZeroFiniteNumber by another.
+   * Divides two non-zero finite numbers, returning `a / b` as a
+   * `NonZeroFiniteNumber`.
    *
    * Exact (non-flooring) division of two non-zero finite numbers is always
    * non-zero, so this stays closed. For the non-closed operations (`add`/`sub`,
    * whose result may be `0`) use {@link Num.add}/{@link Num.sub}.
    *
-   * @param a The dividend NonZeroFiniteNumber.
-   * @param b The divisor NonZeroFiniteNumber.
-   * @returns `a / b` as a NonZeroFiniteNumber.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns `a / b` as a `NonZeroFiniteNumber`
    */
   div,
 } as const;

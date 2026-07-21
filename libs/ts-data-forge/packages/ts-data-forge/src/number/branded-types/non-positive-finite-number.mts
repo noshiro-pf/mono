@@ -63,129 +63,139 @@ const round = (
   >;
 
 /**
- * Checks if a number is a NonPositiveFiniteNumber (a finite number <= 0).
+ * Type guard that checks if a value is a non-positive finite number.
  *
- * @param value The value to check.
- * @returns `true` if the value is a NonPositiveFiniteNumber, `false` otherwise.
+ * Returns `true` only for a finite value — never `NaN`, `Infinity`, or
+ * `-Infinity`.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a non-positive finite number, `false` otherwise
  */
 export const isNonPositiveFiniteNumber = is;
 
 /**
- * Casts a number to a NonPositiveFiniteNumber type.
+ * Casts a `number` to the `NonPositiveFiniteNumber` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a NonPositiveFiniteNumber type.
- * @throws {TypeError} If the value is not a non-positive finite number.
+ * Validates that the value is a non-positive finite number and returns it with
+ * the `NonPositiveFiniteNumber` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `NonPositiveFiniteNumber`
+ * @throws {TypeError} If the value is not a non-positive finite number
  */
 export const asNonPositiveFiniteNumber = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for non-positive finite
- * numbers.
+ * Namespace providing type-safe operations for the `NonPositiveFiniteNumber`
+ * branded type.
  *
- * All operations maintain the non-positive constraint by clamping positive
- * results to MAX_VALUE (0), while ensuring results remain finite (excluding NaN
- * and Infinity). This type is useful for representing quantities that must
- * always be non-positive, such as debts, penalties, and negative offsets.
+ * The `NonPositiveFiniteNumber` type represents a non-positive finite number.
  */
 export const NonPositiveFiniteNumber = {
   /**
-   * Type guard to check if a value is a NonPositiveFiniteNumber.
+   * Type guard that checks if a value is a non-positive finite number.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a non-positive finite number, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a non-positive finite number, `false` otherwise
+   * @see {@link isNonPositiveFiniteNumber} for usage examples
    */
   is,
 
   /**
-   * The maximum value for a non-positive finite number.
-   *
-   * @readonly
+   * The largest value representable as `NonPositiveFiniteNumber`.
    */
   MAX_VALUE,
 
   /**
-   * Returns the smaller of two NonPositiveFiniteNumber values.
+   * Returns the smallest of the given non-positive finite numbers.
    *
-   * @param a The first NonPositiveFiniteNumber.
-   * @param b The second NonPositiveFiniteNumber.
-   * @returns The minimum value as a NonPositiveFiniteNumber.
+   * @param values - The non-positive finite numbers to compare (at least one required)
+   * @returns The smallest value as a `NonPositiveFiniteNumber`
    */
   min: min_,
 
   /**
-   * Returns the larger of two NonPositiveFiniteNumber values.
+   * Returns the largest of the given non-positive finite numbers.
    *
-   * @param a The first NonPositiveFiniteNumber.
-   * @param b The second NonPositiveFiniteNumber.
-   * @returns The maximum value as a NonPositiveFiniteNumber.
+   * @param values - The non-positive finite numbers to compare (at least one required)
+   * @returns The largest value as a `NonPositiveFiniteNumber`
    */
   max: max_,
 
   /**
-   * Clamps a number to the non-positive finite range.
+   * Clamps a `number` into the `NonPositiveFiniteNumber` range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to (-∞, 0] as a NonPositiveFiniteNumber.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `NonPositiveFiniteNumber`
    */
   clamp,
 
   /**
-   * Rounds down a NonPositiveFiniteNumber to the nearest integer.
+   * Returns the greatest integer less than or equal to a non-positive finite
+   * number.
    *
-   * @param x The NonPositiveFiniteNumber to round down.
-   * @returns The floor value as a NonPositiveInt (can be 0).
+   * @param a - The non-positive finite number value
+   * @returns The floored value as an integer
    */
   floor,
 
   /**
-   * Rounds up a NonPositiveFiniteNumber to the nearest integer.
+   * Returns the smallest integer greater than or equal to a non-positive finite
+   * number.
    *
-   * @param x The NonPositiveFiniteNumber to round up.
-   * @returns The ceiling value as a NegativeInt (always <= -1) or 0.
+   * @param a - The non-positive finite number value
+   * @returns The ceiled value as an integer
    */
   ceil,
 
   /**
-   * Rounds a NonPositiveFiniteNumber to the nearest integer.
+   * Returns the value of a non-positive finite number rounded to the nearest
+   * integer.
    *
-   * @param x The NonPositiveFiniteNumber to round.
-   * @returns The rounded value as a NonPositiveInt (can be 0 if x > -0.5).
+   * @param a - The non-positive finite number value
+   * @returns The rounded value as an integer
    */
   round,
 
   /**
-   * Generates a random NonPositiveFiniteNumber value.
+   * Generates a random `NonPositiveFiniteNumber` within the given range.
    *
-   * @returns A random non-positive finite number.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `NonPositiveFiniteNumber` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a NonPositiveFiniteNumber to the power of another NonPositiveFiniteNumber.
+   * Raises `a` to the power `b`, returning `a ** b` as a
+   * `NonPositiveFiniteNumber`.
    *
-   * @param a The base NonPositiveFiniteNumber.
-   * @param b The exponent NonPositiveFiniteNumber.
-   * @returns `a ** b` clamped to (-∞, 0] as a NonPositiveFiniteNumber.
+   * @param a - The base non-positive finite number
+   * @param b - The exponent non-positive finite number
+   * @returns `a ** b` as a `NonPositiveFiniteNumber`
    */
   pow,
 
   /**
-   * Adds two NonPositiveFiniteNumber values.
+   * Adds two non-positive finite numbers, returning `a + b` as a
+   * `NonPositiveFiniteNumber`.
    *
-   * @param a The first NonPositiveFiniteNumber.
-   * @param b The second NonPositiveFiniteNumber.
-   * @returns `a + b` clamped to (-∞, 0] as a NonPositiveFiniteNumber.
+   * @param a - The first non-positive finite number
+   * @param b - The second non-positive finite number
+   * @returns The sum of `a` and `b` as a `NonPositiveFiniteNumber`
    */
   add,
 
   /**
-   * Subtracts one NonPositiveFiniteNumber from another.
+   * Subtracts two non-positive finite numbers, returning `a - b` as a
+   * `NonPositiveFiniteNumber`.
    *
-   * @param a The minuend NonPositiveFiniteNumber.
-   * @param b The subtrahend NonPositiveFiniteNumber.
-   * @returns `a - b` clamped to (-∞, 0] as a NonPositiveFiniteNumber (maximum 0).
+   * @param a - The first non-positive finite number
+   * @param b - The second non-positive finite number
+   * @returns The difference of `a` and `b` as a `NonPositiveFiniteNumber`
    */
   sub,
 } as const;

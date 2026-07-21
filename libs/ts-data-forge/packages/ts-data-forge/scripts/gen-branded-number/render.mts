@@ -4,26 +4,43 @@ import { methodProse, type MethodProse } from './prose.mjs';
 
 /** Renders a complete branded-number module from its config. */
 export const renderModule = (config: BrandedNumberConfig): string =>
-  [
-    renderImports(config),
-    '',
-    `export type ${config.pascalName} = TtfImported_${config.ttfType};`,
-    '',
-    `type ElementType = ${config.elementTypeRhs};`,
-    '',
-    `const typeNameInMessage = '${config.typeNameInMessage}';`,
-    '',
-    renderFactoryCall(config),
-    ...(config.customConsts !== undefined ? ['', config.customConsts] : []),
-    '',
-    renderTopLevel(config, 'guard'),
-    '',
-    renderTopLevel(config, 'cast'),
-    '',
-    renderNamespace(config),
-    ...renderExpectType(config),
-    '',
-  ].join('\n');
+  config.enumSpec !== undefined
+    ? renderEnumModule(config, config.enumSpec)
+    : [
+        renderImports(config),
+        '',
+        `export type ${config.pascalName} = TtfImported_${config.ttfType};`,
+        '',
+        `type ElementType = ${config.elementTypeRhs};`,
+        '',
+        `const typeNameInMessage = '${config.typeNameInMessage}';`,
+        '',
+        renderFactoryCall(config),
+        ...(config.customConsts !== undefined ? ['', config.customConsts] : []),
+        ...(config.leadingExpectType !== undefined
+          ? ['', config.leadingExpectType]
+          : []),
+        '',
+        renderTopLevel(config, 'guard'),
+        '',
+        renderTopLevel(config, 'cast'),
+        '',
+        renderNamespace(config),
+        ...renderExpectType(config),
+        '',
+      ].join('\n');
+
+/** Computes a member's prose, applying any per-member override from config. */
+const resolveProse = (
+  key: string,
+  config: BrandedNumberConfig,
+): MethodProse => {
+  const base = methodProse(key, config);
+
+  const override = config.proseOverrides?.[key];
+
+  return override === undefined ? base : { ...base, ...override };
+};
 
 const renderImports = (config: BrandedNumberConfig): string =>
   [
@@ -80,7 +97,10 @@ const renderTopLevel = (
   config: BrandedNumberConfig,
   which: 'guard' | 'cast',
 ): string => {
-  const prose = methodProse(which === 'guard' ? 'topGuard' : 'topCast', config);
+  const prose = resolveProse(
+    which === 'guard' ? 'topGuard' : 'topCast',
+    config,
+  );
 
   const decl =
     which === 'guard'
@@ -96,7 +116,7 @@ const renderTopLevel = (
 const renderNamespace = (config: BrandedNumberConfig): string => {
   const members = config.namespaceKeys
     .map((key: string) => {
-      const prose = methodProse(key, config);
+      const prose = resolveProse(key, config);
 
       const localName = namespaceLocalName(key);
 
@@ -113,7 +133,7 @@ const renderNamespace = (config: BrandedNumberConfig): string => {
     .join('\n\n');
 
   return [
-    renderJsDoc(methodProse('namespace', config), 0, false),
+    renderJsDoc(resolveProse('namespace', config), 0, false),
     `export const ${config.pascalName} = {`,
     members,
     '} as const;',
@@ -131,12 +151,130 @@ const renderExpectType = (config: BrandedNumberConfig): readonly string[] => {
   ].join('\n');
 
   return [
+    ...(config.trailingExpectTypeExtra !== undefined
+      ? ['', config.trailingExpectTypeExtra]
+      : []),
     '',
     `expectType<keyof typeof ${config.pascalName}, keyof ${numberClass}>('=');`,
     '',
     `expectType<typeof ${config.pascalName}, ${numberClass}>('<=');`,
   ];
 };
+
+// ---------------------------------------------------------------------------
+// Enum modules (int8 / uint8): hand-wrapped around a wider base type
+// ---------------------------------------------------------------------------
+
+type EnumSpec = Readonly<{ wideBase: string; hasAbs: boolean }>;
+
+const renderEnumModule = (
+  config: BrandedNumberConfig,
+  enumSpec: EnumSpec,
+): string =>
+  [
+    renderEnumImports(config, enumSpec),
+    '',
+    `export type ${config.pascalName} = TtfImported_${config.ttfType};`,
+    '',
+    `const typeNameInMessage = '${config.typeNameInMessage}';`,
+    '',
+    renderEnumFactory(config, enumSpec),
+    '',
+    renderEnumWrappers(config, enumSpec),
+    '',
+    renderTopLevel(config, 'guard'),
+    '',
+    renderTopLevel(config, 'cast'),
+    '',
+    renderNamespace(config),
+    '',
+    renderEnumExpectType(config, enumSpec),
+    '',
+  ].join('\n');
+
+const renderEnumImports = (
+  config: BrandedNumberConfig,
+  enumSpec: EnumSpec,
+): string =>
+  [
+    `import { type ${config.ttfType} as TtfImported_${config.ttfType} } from 'ts-type-forge';`,
+    `import { type ${enumSpec.wideBase} } from 'ts-type-forge';`,
+    ...(enumSpec.hasAbs
+      ? [`import { type AbsoluteValue } from 'ts-type-forge';`]
+      : []),
+    `import { expectType } from '../../expect-type.mjs';`,
+    `import { TsDataForgeInternals } from '../refined-number-utils.mjs';`,
+  ].join('\n');
+
+const renderEnumFactory = (
+  config: BrandedNumberConfig,
+  enumSpec: EnumSpec,
+): string =>
+  [
+    'const {',
+    '  MAX_VALUE,',
+    '  MIN_VALUE,',
+    '  castType: castTypeImpl,',
+    '  clamp: clampImpl,',
+    '  is: isImpl,',
+    '  random: randomImpl,',
+    '} = TsDataForgeInternals.RefinedNumberUtils.operatorsForInteger<',
+    `  ${enumSpec.wideBase},`,
+    `  ${config.minValueExpr},`,
+    `  ${config.maxValueExpr}`,
+    '>({',
+    "  integerOrSafeInteger: 'SafeInteger',",
+    `  MIN_VALUE: ${config.minValueExpr},`,
+    `  MAX_VALUE: ${config.maxValueExpr},`,
+    '  typeNameInMessage,',
+    '} as const);',
+  ].join('\n');
+
+const renderEnumWrappers = (
+  config: BrandedNumberConfig,
+  enumSpec: EnumSpec,
+): string => {
+  const t = config.pascalName;
+
+  const absConst = [
+    `const abs = <N extends ${t}>(x: N): AbsoluteValue<N> =>`,
+    '  // eslint-disable-next-line total-functions/no-unsafe-type-assertion',
+    '  Math.abs(x) as unknown as AbsoluteValue<N>;',
+  ].join('\n');
+
+  return [
+    `const is = (x: number): x is ${t} => isImpl(x);`,
+    [
+      `const castType = (x: number): ${t} =>`,
+      '  // eslint-disable-next-line total-functions/no-unsafe-type-assertion',
+      `  castTypeImpl(x) as ${t};`,
+    ].join('\n'),
+    `const clamp = (a: number): ${t} => castType(clampImpl(a));`,
+    ...(enumSpec.hasAbs ? [absConst] : []),
+    `const min_ = (...values: readonly ${t}[]): ${t} =>\n  castType(Math.min(...values));`,
+    `const max_ = (...values: readonly ${t}[]): ${t} =>\n  castType(Math.max(...values));`,
+    `const pow = (x: ${t}, y: ${t}): ${t} => clamp(x ** y);`,
+    `const add = (x: ${t}, y: ${t}): ${t} => clamp(x + y);`,
+    `const sub = (x: ${t}, y: ${t}): ${t} => clamp(x - y);`,
+    `const mul = (x: ${t}, y: ${t}): ${t} => clamp(x * y);`,
+    `const div = (x: ${t}, y: Exclude<${t}, 0>): ${t} => clamp(Math.floor(x / y));`,
+    `const random = (min: ${t}, max: ${t}): ${t} =>\n  castType(randomImpl(castTypeImpl(min), castTypeImpl(max)));`,
+  ].join('\n\n');
+};
+
+const renderEnumExpectType = (
+  config: BrandedNumberConfig,
+  enumSpec: EnumSpec,
+): string =>
+  [
+    'expectType<',
+    `  keyof typeof ${config.pascalName},`,
+    '  keyof TsDataForgeInternals.RefinedNumberUtils.NumberClass<',
+    `    ${enumSpec.wideBase},`,
+    `    ${config.numberClassParams}`,
+    '  >',
+    ">('=');",
+  ].join('\n');
 
 // ---------------------------------------------------------------------------
 // JSDoc rendering with prose wrapping

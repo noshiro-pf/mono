@@ -6,8 +6,9 @@
  * flag-driven JSDoc prose. Worked `@example` blocks are left as placeholders and
  * filled by `embed-examples-in-jsdoc`.
  *
- * Phase 1 covers the `operatorsForInteger` families. The `operatorsForFloat`
- * families and the two `enum` modules are handled in a later phase.
+ * Covers every branded-number module: the `operatorsForInteger` and
+ * `operatorsForFloat` families under `branded-types/`, plus the hand-wrapped
+ * `enum` modules (`Int8`/`Uint8`) via `enumSpec`.
  */
 export type BrandedNumberConfig = Readonly<{
   // --- identity ---
@@ -64,6 +65,33 @@ export type BrandedNumberConfig = Readonly<{
    * negative / non-positive families).
    */
   numberClassParams?: string;
+  /**
+   * Verbatim `expectType<...>(...)` assertion(s) emitted right after the custom
+   * consts and before `is<T>` (the float families' `ToInt` aux assertions).
+   */
+  leadingExpectType?: string;
+  /**
+   * Verbatim `expectType<...>(...)` assertion(s) emitted after the namespace and
+   * before the standard `keyof`/`typeof` assertions (float `ToNonNegative` aux).
+   */
+  trailingExpectTypeExtra?: string;
+  /**
+   * Per-member JSDoc overrides, keyed by member key (`'topGuard'`, `'topCast'`,
+   * `'namespace'`, or a namespace key). Used to preserve hand-written prose that
+   * carries design intent the templates cannot express (e.g. why `add`/`sub` are
+   * absent from `NonZeroFiniteNumber`).
+   */
+  proseOverrides?: Readonly<
+    Record<string, Readonly<{ description?: string; returns?: string }>>
+  >;
+
+  // --- enum modules (int8 / uint8) ---
+  /**
+   * When set, the module is rendered by the dedicated enum renderer: the factory
+   * is parametrized by the wider `wideBase` type and every operator is
+   * hand-wrapped to narrow back to the branded type.
+   */
+  enumSpec?: Readonly<{ wideBase: string; hasAbs: boolean }>;
 
   // --- prose flags ---
   /** `'floor'` for integer division, `'exact'` for float division. */
@@ -136,6 +164,65 @@ const KEYS_NONZERO_UINT = [
   'pow',
   'add',
   'mul',
+] as const;
+
+// Return types of the locally-defined float rounding operators.
+const TO_INT_RET = 'TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>';
+
+const REMOVE_NZ_RET =
+  `TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<${TO_INT_RET}>` as const;
+
+/** A locally-defined `floor`/`ceil`/`round` const for a float module. */
+const roundingConst = (name: string, ret: string): string =>
+  [
+    `const ${name} = (x: ElementType): ${ret} =>`,
+    '  // eslint-disable-next-line total-functions/no-unsafe-type-assertion',
+    `  Math.${name}(x) as ${ret};`,
+  ].join('\n');
+
+/** The `floor`/`ceil`/`round` block for a float module (per-method return type). */
+const floatRounding = (
+  floorRet: string,
+  ceilRet: string,
+  roundRet: string,
+): string =>
+  [
+    roundingConst('floor', floorRet),
+    roundingConst('ceil', ceilRet),
+    roundingConst('round', roundRet),
+  ].join('\n\n');
+
+const FLOAT_KEYS_UNBOUNDED_ABS = [
+  'is',
+  'abs',
+  'min',
+  'max',
+  'floor',
+  'ceil',
+  'round',
+  'random',
+  'pow',
+  'add',
+  'sub',
+  'mul',
+  'div',
+] as const;
+
+const FLOAT_KEYS_LOWER_BOUNDED = [
+  'is',
+  'MIN_VALUE',
+  'min',
+  'max',
+  'clamp',
+  'floor',
+  'ceil',
+  'round',
+  'random',
+  'pow',
+  'add',
+  'sub',
+  'mul',
+  'div',
 ] as const;
 
 export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
@@ -712,6 +799,256 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       'add',
       'sub',
     ],
+    division: 'floor',
+    hasExamples: false,
+  },
+
+  // --- operatorsForFloat families ---
+  {
+    pascalName: 'FiniteNumber',
+    kebabName: 'finite-number',
+    dir: 'branded-types',
+    ttfType: 'FiniteNumber',
+    elementTypeRhs: 'FiniteNumber',
+    extraTtfTypes: ['Int', 'NonNegativeFiniteNumber'],
+    factory: 'operatorsForFloat',
+    generics: ['ElementType', 'number', 'number'],
+    nonZero: false,
+    minValueExpr: '-Number.MAX_VALUE',
+    maxValueExpr: 'Number.MAX_VALUE',
+    typeNameInMessage: 'a finite number',
+    customConsts: floatRounding(TO_INT_RET, TO_INT_RET, TO_INT_RET),
+    customKeys: ['floor', 'ceil', 'round'],
+    leadingExpectType: `expectType<${TO_INT_RET}, Int>('=');`,
+    trailingExpectTypeExtra: `expectType<TsDataForgeInternals.RefinedNumberUtils.ToNonNegative<ElementType>, NonNegativeFiniteNumber>('=');`,
+    namespaceKeys: FLOAT_KEYS_UNBOUNDED_ABS,
+    numberClassParams: 'never',
+    division: 'exact',
+    hasExamples: false,
+  },
+  {
+    pascalName: 'NonNegativeFiniteNumber',
+    kebabName: 'non-negative-finite-number',
+    dir: 'branded-types',
+    ttfType: 'NonNegativeFiniteNumber',
+    elementTypeRhs: 'NonNegativeFiniteNumber',
+    extraTtfTypes: ['Uint'],
+    factory: 'operatorsForFloat',
+    generics: ['ElementType', '0', 'number'],
+    nonZero: false,
+    minValueExpr: '0',
+    maxValueExpr: 'Number.MAX_VALUE',
+    typeNameInMessage: 'a non-negative finite number',
+    customConsts: floatRounding(TO_INT_RET, TO_INT_RET, TO_INT_RET),
+    customKeys: ['floor', 'ceil', 'round'],
+    leadingExpectType: `expectType<${TO_INT_RET}, Uint>('=');`,
+    namespaceKeys: FLOAT_KEYS_LOWER_BOUNDED,
+    numberClassParams: "'non-negative'",
+    division: 'exact',
+    hasExamples: false,
+  },
+  {
+    pascalName: 'NonZeroFiniteNumber',
+    kebabName: 'non-zero-finite-number',
+    dir: 'branded-types',
+    ttfType: 'NonZeroFiniteNumber',
+    elementTypeRhs: 'NonZeroFiniteNumber',
+    extraTtfTypes: ['Int', 'NonZeroInt', 'PositiveFiniteNumber'],
+    factory: 'operatorsForFloat',
+    generics: ['ElementType', 'number', 'number'],
+    nonZero: true,
+    randomNonZero: true,
+    minValueExpr: '-Number.MAX_VALUE',
+    maxValueExpr: 'Number.MAX_VALUE',
+    typeNameInMessage: 'a non-zero finite number',
+    customConsts: floatRounding(TO_INT_RET, TO_INT_RET, TO_INT_RET),
+    customKeys: ['floor', 'ceil', 'round'],
+    leadingExpectType: [
+      `expectType<${TO_INT_RET}, NonZeroInt>('=');`,
+      `expectType<${REMOVE_NZ_RET}, Int>('=');`,
+    ].join('\n\n'),
+    trailingExpectTypeExtra: `expectType<TsDataForgeInternals.RefinedNumberUtils.ToNonNegative<ElementType>, PositiveFiniteNumber>('=');`,
+    namespaceKeys: [
+      'is',
+      'abs',
+      'min',
+      'max',
+      'floor',
+      'ceil',
+      'round',
+      'random',
+      'pow',
+      'mul',
+      'div',
+    ],
+    numberClassParams: "never, 'div' | 'mul'",
+    division: 'exact',
+    hasExamples: false,
+    proseOverrides: {
+      div: {
+        description:
+          'Divides two non-zero finite numbers, returning `a / b` as a `NonZeroFiniteNumber`.\n\nExact (non-flooring) division of two non-zero finite numbers is always non-zero, so this stays closed. For the non-closed operations (`add`/`sub`, whose result may be `0`) use {@link Num.add}/{@link Num.sub}.',
+      },
+    },
+  },
+  {
+    pascalName: 'NonPositiveFiniteNumber',
+    kebabName: 'non-positive-finite-number',
+    dir: 'branded-types',
+    ttfType: 'NonPositiveFiniteNumber',
+    elementTypeRhs: 'NonPositiveFiniteNumber',
+    factory: 'operatorsForFloat',
+    generics: ['ElementType', 'number', '0'],
+    nonZero: false,
+    minValueExpr: 'Number.MAX_VALUE * -1',
+    maxValueExpr: '0',
+    typeNameInMessage: 'a non-positive finite number',
+    customConsts: floatRounding(REMOVE_NZ_RET, REMOVE_NZ_RET, REMOVE_NZ_RET),
+    customKeys: ['floor', 'ceil', 'round'],
+    namespaceKeys: [
+      'is',
+      'MAX_VALUE',
+      'min',
+      'max',
+      'clamp',
+      'floor',
+      'ceil',
+      'round',
+      'random',
+      'pow',
+      'add',
+      'sub',
+    ],
+    division: 'exact',
+    hasExamples: false,
+  },
+  {
+    pascalName: 'PositiveFiniteNumber',
+    kebabName: 'positive-finite-number',
+    dir: 'branded-types',
+    ttfType: 'PositiveFiniteNumber',
+    elementTypeRhs: 'PositiveFiniteNumber',
+    extraTtfTypes: ['PositiveInt', 'Uint'],
+    factory: 'operatorsForFloat',
+    generics: ['ElementType', 'number', 'number'],
+    nonZero: false,
+    minValueExpr: 'Number.MIN_VALUE',
+    maxValueExpr: 'Number.MAX_VALUE',
+    typeNameInMessage: 'a positive finite number',
+    customConsts: floatRounding(REMOVE_NZ_RET, TO_INT_RET, REMOVE_NZ_RET),
+    customKeys: ['floor', 'ceil', 'round'],
+    leadingExpectType: [
+      `expectType<${TO_INT_RET}, PositiveInt>('=');`,
+      `expectType<${REMOVE_NZ_RET}, Uint>('=');`,
+    ].join('\n\n'),
+    namespaceKeys: FLOAT_KEYS_LOWER_BOUNDED,
+    numberClassParams: "'positive'",
+    division: 'exact',
+    hasExamples: false,
+  },
+  {
+    pascalName: 'NegativeFiniteNumber',
+    kebabName: 'negative-finite-number',
+    dir: 'branded-types',
+    ttfType: 'NegativeFiniteNumber',
+    elementTypeRhs: 'NegativeFiniteNumber',
+    extraImports: [
+      "import { PositiveFiniteNumber } from './positive-finite-number.mjs';",
+    ],
+    factory: 'operatorsForFloat',
+    generics: ['ElementType', 'number', 'number'],
+    nonZero: true,
+    minValueExpr: '-Number.MAX_VALUE',
+    maxValueExpr: '-Number.MIN_VALUE',
+    typeNameInMessage: 'a negative finite number',
+    customConsts: [
+      'const abs = (x: ElementType): PositiveFiniteNumber =>\n  PositiveFiniteNumber.clamp(Math.abs(x));',
+      floatRounding(TO_INT_RET, REMOVE_NZ_RET, REMOVE_NZ_RET),
+    ].join('\n\n'),
+    customKeys: ['abs', 'floor', 'ceil', 'round'],
+    namespaceKeys: [
+      'is',
+      'MAX_VALUE',
+      'abs',
+      'min',
+      'max',
+      'clamp',
+      'floor',
+      'ceil',
+      'round',
+      'random',
+      'pow',
+      'add',
+      'sub',
+    ],
+    division: 'exact',
+    hasExamples: false,
+  },
+
+  // --- enum modules ---
+  {
+    pascalName: 'Int8',
+    kebabName: 'int8',
+    dir: 'enum',
+    ttfType: 'Int8',
+    elementTypeRhs: 'Int8',
+    factory: 'operatorsForInteger',
+    generics: [],
+    integerOrSafeInteger: 'SafeInteger',
+    nonZero: false,
+    minValueExpr: '-128',
+    maxValueExpr: '127',
+    typeNameInMessage: 'an integer in [-128, 127]',
+    namespaceKeys: [
+      'is',
+      'MIN_VALUE',
+      'MAX_VALUE',
+      'min',
+      'max',
+      'clamp',
+      'abs',
+      'random',
+      'pow',
+      'add',
+      'sub',
+      'mul',
+      'div',
+    ],
+    numberClassParams: "'int' | 'range'",
+    enumSpec: { wideBase: 'Int16', hasAbs: true },
+    division: 'floor',
+    hasExamples: false,
+  },
+  {
+    pascalName: 'Uint8',
+    kebabName: 'uint8',
+    dir: 'enum',
+    ttfType: 'Uint8',
+    elementTypeRhs: 'Uint8',
+    factory: 'operatorsForInteger',
+    generics: [],
+    integerOrSafeInteger: 'SafeInteger',
+    nonZero: false,
+    minValueExpr: '0',
+    maxValueExpr: '255',
+    // Grammatical typo ("an non-negative") preserved verbatim from the source.
+    typeNameInMessage: 'an non-negative integer less than 256',
+    namespaceKeys: [
+      'is',
+      'MIN_VALUE',
+      'MAX_VALUE',
+      'max',
+      'min',
+      'clamp',
+      'random',
+      'pow',
+      'add',
+      'sub',
+      'mul',
+      'div',
+    ],
+    numberClassParams: "'int' | 'non-negative' | 'range'",
+    enumSpec: { wideBase: 'Uint16', hasAbs: false },
     division: 'floor',
     hasExamples: false,
   },

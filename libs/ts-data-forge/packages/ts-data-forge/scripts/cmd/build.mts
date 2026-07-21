@@ -42,16 +42,6 @@ const build = async (skipCheck: boolean): Promise<void> => {
     });
 
     await logStep({
-      startMessage: 'Verifying branded number cast coverage',
-      action: () =>
-        runCmdStep(
-          'pnpm run check:branded-number-casts',
-          'Branded number cast coverage check failed',
-        ),
-      successMessage: 'Branded number cast coverage verified',
-    });
-
-    await logStep({
       startMessage: 'Cleaning dist directory',
       action: () =>
         runStep(

@@ -78,148 +78,159 @@ expectType<
 >('=');
 
 /**
- * Checks if a number is a PositiveFiniteNumber (a finite number > 0).
+ * Type guard that checks if a value is a positive finite number.
  *
- * @param value The value to check.
- * @returns `true` if the value is a PositiveFiniteNumber, `false` otherwise.
+ * Returns `true` only for a finite value — never `NaN`, `Infinity`, or
+ * `-Infinity`.
+ *
+ * @param value - The value to check
+ * @returns `true` if the value is a positive finite number, `false` otherwise
  */
 export const isPositiveFiniteNumber = is;
 
 /**
- * Casts a number to a PositiveFiniteNumber type.
+ * Casts a `number` to the `PositiveFiniteNumber` branded type.
  *
- * @param value The value to cast.
- * @returns The value as a PositiveFiniteNumber type.
- * @throws {TypeError} If the value is not a positive finite number.
+ * Validates that the value is a positive finite number and returns it with the
+ * `PositiveFiniteNumber` brand. Throws a `TypeError` otherwise.
+ *
+ * @param value - The value to cast
+ * @returns The value as a `PositiveFiniteNumber`
+ * @throws {TypeError} If the value is not a positive finite number
  */
 export const asPositiveFiniteNumber = castType;
 
 /**
- * Namespace providing type-safe arithmetic operations for positive finite
- * numbers.
+ * Namespace providing type-safe operations for the `PositiveFiniteNumber`
+ * branded type.
  *
- * All operations maintain the positive constraint by clamping non-positive
- * results to MIN_VALUE, while ensuring results remain finite (excluding NaN and
- * Infinity). This type is useful for representing quantities that must always
- * be positive, such as probabilities, magnitudes, and physical measurements.
+ * The `PositiveFiniteNumber` type represents a positive finite number.
  */
 export const PositiveFiniteNumber = {
   /**
-   * Type guard to check if a value is a PositiveFiniteNumber.
+   * Type guard that checks if a value is a positive finite number.
    *
-   * @param value The value to check.
-   * @returns `true` if the value is a positive finite number, `false`
-   *   otherwise.
+   * @param value - The value to check
+   * @returns `true` if the value is a positive finite number, `false` otherwise
+   * @see {@link isPositiveFiniteNumber} for usage examples
    */
   is,
 
   /**
-   * The minimum value for a positive finite number.
-   *
-   * @readonly
+   * The smallest value representable as `PositiveFiniteNumber`.
    */
   MIN_VALUE,
 
   /**
-   * Returns the smaller of two PositiveFiniteNumber values.
+   * Returns the smallest of the given positive finite numbers.
    *
-   * @param a The first PositiveFiniteNumber.
-   * @param b The second PositiveFiniteNumber.
-   * @returns The minimum value as a PositiveFiniteNumber.
+   * @param values - The positive finite numbers to compare (at least one required)
+   * @returns The smallest value as a `PositiveFiniteNumber`
    */
   min: min_,
 
   /**
-   * Returns the larger of two PositiveFiniteNumber values.
+   * Returns the largest of the given positive finite numbers.
    *
-   * @param a The first PositiveFiniteNumber.
-   * @param b The second PositiveFiniteNumber.
-   * @returns The maximum value as a PositiveFiniteNumber.
+   * @param values - The positive finite numbers to compare (at least one required)
+   * @returns The largest value as a `PositiveFiniteNumber`
    */
   max: max_,
 
   /**
-   * Clamps a number to the positive finite range.
+   * Clamps a `number` into the `PositiveFiniteNumber` range `[MIN_VALUE,
+   * MAX_VALUE]`.
    *
-   * @param value The number to clamp.
-   * @returns The value clamped to (0, +∞) as a PositiveFiniteNumber.
+   * @param value - The value to clamp
+   * @returns The clamped value as a `PositiveFiniteNumber`
    */
   clamp,
 
   /**
-   * Rounds down a PositiveFiniteNumber to the nearest integer.
+   * Returns the greatest integer less than or equal to a positive finite
+   * number.
    *
-   * @param x The PositiveFiniteNumber to round down.
-   * @returns The floor value as a Uint (can be 0).
+   * @param a - The positive finite number value
+   * @returns The floored value as an integer
    */
   floor,
 
   /**
-   * Rounds up a PositiveFiniteNumber to the nearest integer.
+   * Returns the smallest integer greater than or equal to a positive finite
+   * number.
    *
-   * @param x The PositiveFiniteNumber to round up.
-   * @returns The ceiling value as a PositiveInt (always >= 1).
+   * @param a - The positive finite number value
+   * @returns The ceiled value as an integer
    */
   ceil,
 
   /**
-   * Rounds a PositiveFiniteNumber to the nearest integer.
+   * Returns the value of a positive finite number rounded to the nearest
+   * integer.
    *
-   * @param x The PositiveFiniteNumber to round.
-   * @returns The rounded value as a Uint (can be 0 if x < 0.5).
+   * @param a - The positive finite number value
+   * @returns The rounded value as an integer
    */
   round,
 
   /**
-   * Generates a random PositiveFiniteNumber value.
+   * Generates a random `PositiveFiniteNumber` within the given range.
    *
-   * @returns A random positive finite number.
+   * The range is inclusive on both ends.
+   *
+   * @param min - The minimum value (inclusive)
+   * @param max - The maximum value (inclusive)
+   * @returns A random `PositiveFiniteNumber` in `[min, max]`
    */
   random,
 
   /**
-   * Raises a PositiveFiniteNumber to the power of another PositiveFiniteNumber.
+   * Raises `a` to the power `b`, returning `a ** b` as a
+   * `PositiveFiniteNumber`.
    *
-   * @param a The base PositiveFiniteNumber.
-   * @param b The exponent PositiveFiniteNumber.
-   * @returns `a ** b` clamped to (0, +∞) as a PositiveFiniteNumber.
+   * @param a - The base positive finite number
+   * @param b - The exponent positive finite number
+   * @returns `a ** b` as a `PositiveFiniteNumber`
    */
   pow,
 
   /**
-   * Adds two PositiveFiniteNumber values.
+   * Adds two positive finite numbers, returning `a + b` as a
+   * `PositiveFiniteNumber`.
    *
-   * @param a The first PositiveFiniteNumber.
-   * @param b The second PositiveFiniteNumber.
-   * @returns `a + b` clamped to (0, +∞) as a PositiveFiniteNumber.
+   * @param a - The first positive finite number
+   * @param b - The second positive finite number
+   * @returns The sum of `a` and `b` as a `PositiveFiniteNumber`
    */
   add,
 
   /**
-   * Subtracts one PositiveFiniteNumber from another.
+   * Subtracts two positive finite numbers, returning `a - b` as a
+   * `PositiveFiniteNumber`.
    *
-   * @param a The minuend PositiveFiniteNumber.
-   * @param b The subtrahend PositiveFiniteNumber.
-   * @returns `a - b` clamped to (0, +∞) as a PositiveFiniteNumber (minimum
-   *   MIN_VALUE).
+   * @param a - The first positive finite number
+   * @param b - The second positive finite number
+   * @returns The difference of `a` and `b` as a `PositiveFiniteNumber`
    */
   sub,
 
   /**
-   * Multiplies two PositiveFiniteNumber values.
+   * Multiplies two positive finite numbers, returning `a * b` as a
+   * `PositiveFiniteNumber`.
    *
-   * @param a The first PositiveFiniteNumber.
-   * @param b The second PositiveFiniteNumber.
-   * @returns `a * b` clamped to (0, +∞) as a PositiveFiniteNumber.
+   * @param a - The first positive finite number
+   * @param b - The second positive finite number
+   * @returns The product of `a` and `b` as a `PositiveFiniteNumber`
    */
   mul,
 
   /**
-   * Divides one PositiveFiniteNumber by another.
+   * Divides two positive finite numbers, returning `a / b` as a
+   * `PositiveFiniteNumber`.
    *
-   * @param a The dividend PositiveFiniteNumber.
-   * @param b The divisor PositiveFiniteNumber.
-   * @returns `a / b` clamped to (0, +∞) as a PositiveFiniteNumber.
+   * @param a - The dividend
+   * @param b - The divisor (must be non-zero)
+   * @returns `a / b` as a `PositiveFiniteNumber`
    */
   div,
 } as const;
