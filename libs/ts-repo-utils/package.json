@@ -99,7 +99,7 @@
     "cmd-ts": "^0.15.0",
     "fast-glob": "^3.3.3",
     "micromatch": "^4.0.8",
-    "ts-data-forge": "^6.9.6",
+    "ts-data-forge": "^9.0.1",
     "ts-type-forge": "^3.0.1",
     "tsx": "^4.21.0"
   },
