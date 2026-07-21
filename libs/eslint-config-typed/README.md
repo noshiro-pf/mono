@@ -22,6 +22,7 @@ A comprehensive ESLint configuration package with strongly-typed rule definition
     - [Node.js TypeScript Project](#nodejs-typescript-project)
     - [React + Testing Libraries](#react--testing-libraries)
 - [VS Code Integration](#vs-code-integration)
+- [Using with oxlint](#using-with-oxlint)
 - [Included plugins](#included-plugins)
 - [API Reference](#api-reference)
     - [Configuration Functions](#configuration-functions)
@@ -433,6 +434,113 @@ Add the following to `.vscode/settings.json` for proper ESLint integration:
     // }
 }
 ```
+
+## Using with oxlint
+
+[oxlint](https://oxc.rs/docs/guide/usage/linter) is an extremely fast Rust-based linter that natively reimplements a subset of ESLint rules — including many rules from `typescript-eslint`, `eslint-plugin-unicorn`, `eslint-plugin-import`, `eslint-plugin-react`, `eslint-plugin-react-perf`, `eslint-plugin-jsx-a11y`, `eslint-plugin-promise`, `eslint-plugin-n`, `eslint-plugin-jest`, and `eslint-plugin-vitest`, all of which `eslint-config-typed` turns on by default.
+
+A common setup is to run **oxlint first** for the rules it supports, then run **ESLint** (with `eslint-config-typed`) only for the type-aware and more advanced rules that oxlint does not yet implement. Because `eslint-config-typed` enables those overlapping rules by default, you should turn them **off** on the ESLint side so the two linters don't report the same problem twice (and so ESLint stays fast). The [`eslint-plugin-oxlint`](https://github.com/oxc-project/eslint-plugin-oxlint) plugin does exactly that.
+
+### 1. Install
+
+```sh
+pnpm add -D oxlint eslint-plugin-oxlint
+```
+
+### 2. Turn off the overlapping rules in ESLint
+
+Append `eslint-plugin-oxlint` **as the last entry** of your flat config array. It emits a config that sets every rule oxlint already handles to `"off"`, so it must come **after** `eslintConfigForTypeScript(...)` (and every other preset / override) in order to win.
+
+```tsx
+import {
+    eslintConfigForTypeScript,
+    eslintConfigForVitest,
+    type FlatConfig,
+} from 'eslint-config-typed';
+import oxlint from 'eslint-plugin-oxlint';
+
+const thisDir = import.meta.dirname;
+
+export default [
+    ...eslintConfigForTypeScript({
+        tsconfigRootDir: thisDir,
+        tsconfigFileName: './tsconfig.json',
+        packageDirs: [thisDir],
+    }),
+    eslintConfigForVitest(),
+
+    // Must be LAST: disables every ESLint rule that oxlint already covers,
+    // reading exactly the rules enabled in ./.oxlintrc.json so the two stay in sync.
+    ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json'),
+] satisfies readonly FlatConfig[];
+```
+
+`buildFromOxlintConfigFile` reads your `.oxlintrc.json` and disables exactly the rules oxlint is configured to run, so the ESLint and oxlint sides never drift apart. If you'd rather use a fixed set instead of reading the file, the plugin also ships ready-made flat configs:
+
+- `oxlint.configs['flat/recommended']` — turns off only the `correctness` category rules
+- `oxlint.configs['flat/all']` — turns off every rule oxlint supports
+- per-category: `flat/correctness`, `flat/suspicious`, `flat/pedantic`, `flat/style`, `flat/restriction`
+- per-plugin: `flat/typescript`, `flat/unicorn`, `flat/import`, `flat/react`, `flat/react-perf`, `flat/jsx-a11y`, `flat/jest`, `flat/vitest`, …
+
+> [!NOTE]
+> If you deliberately want ESLint to keep checking a rule that oxlint also implements, re-enable it in a `defineKnownRules({ ... })` block placed **after** the oxlint config.
+
+### 3. Enable the matching rules on the oxlint side
+
+The step above only _turns off_ rules in ESLint — for them to still be checked, oxlint has to actually run them. Create an `.oxlintrc.json` that enables the plugins matching the presets you use, plus the rule categories you want oxlint to enforce:
+
+```json
+{
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "plugins": [
+        "eslint",
+        "typescript",
+        "unicorn",
+        "import",
+        "promise",
+        "node",
+        "react",
+        "react-perf",
+        "jsx-a11y",
+        "vitest"
+    ],
+    "categories": {
+        "correctness": "error",
+        "suspicious": "warn"
+    }
+}
+```
+
+Set `plugins` to the oxlint plugins that correspond to the `eslint-config-typed` presets you actually use — the table below maps them. Listing `plugins` explicitly **overwrites** oxlint's defaults (`eslint`, `typescript`, `unicorn`, `oxc`), so include every plugin you want.
+
+| `eslint-config-typed` preset / plugin            | oxlint `plugins` entry            |
+| :----------------------------------------------- | :-------------------------------- |
+| core ESLint rules                                | `eslint`                          |
+| `@typescript-eslint`                             | `typescript`                      |
+| `eslint-plugin-unicorn`                          | `unicorn`                         |
+| `eslint-plugin-import-x`                         | `import`                          |
+| `eslint-plugin-promise`                          | `promise`                         |
+| `eslint-plugin-n` (`eslintConfigForNodeJs`)      | `node`                            |
+| `eslintConfigForReact` / `eslintConfigForPreact` | `react`, `react-perf`, `jsx-a11y` |
+| `eslintConfigForJest`                            | `jest`                            |
+| `eslintConfigForVitest`                          | `vitest`                          |
+
+Plugins that have no oxlint counterpart (`functional`, `total-functions`, `security`, `math`, `array-func`, `strict-dependencies`, `tree-shakable`, and the custom `ts-restrictions` / `*-coding-style` plugins) stay ESLint-only — that's the work ESLint keeps doing after oxlint runs.
+
+For `categories`, note that `eslint-config-typed` is intentionally strict, so enabling only oxlint's default `correctness` category leaves many overlapping rules unchecked by _either_ linter. Turning on `suspicious` (and, to widen coverage further, `pedantic`) brings oxlint's coverage closer to this config's defaults. Individual rules can still be fine-tuned in the `rules` field.
+
+### 4. Run oxlint before ESLint
+
+```json
+{
+    "scripts": {
+        "lint": "oxlint && eslint .",
+        "lint:fix": "oxlint --fix && eslint . --fix"
+    }
+}
+```
+
+oxlint gives near-instant feedback on the rules it supports, while ESLint (with `eslint-config-typed`) focuses on the type-aware and more advanced rules oxlint doesn't implement yet. If you are migrating an existing ESLint setup, the [`@oxlint/migrate`](https://github.com/oxc-project/oxc/tree/main/npm/oxlint-migrate) tool can generate a starting `.oxlintrc.json` for you.
 
 ## Included plugins
 
