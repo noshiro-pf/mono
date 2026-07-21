@@ -1,3 +1,4 @@
+import { type IsUnion } from '../../condition/index.mjs';
 import { type MinLengthTuple } from '../../tuple-and-list/index.mjs';
 import { type UintRangeInclusive } from '../../type-level-integer/index.mjs';
 import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
@@ -29,12 +30,25 @@ import { type SupportedLength } from '../supported-length.mjs';
  * // const tooLong: MaxLengthString<16> = userName; // Error! (32 > 16)
  * ```
  */
-export type MaxLengthString<MaxLength extends SupportedLength> = string &
-  TSTypeForgeInternals_BrandEncapsulated<
-    Readonly<{
-      MaxLength: UintRangeInclusive<0, MaxLength>;
-    }>
-  >;
+// The `IsUnion<MaxLength>` guard is a type-checker performance safeguard. The
+// brand value `UintRangeInclusive<0, MaxLength>` distributes over a union
+// `MaxLength`, materializing `0 | 1 | ... | k` once per member. In real usage
+// `MaxLength` is a single literal, so this never happens — except when a
+// consumer's deferred conditional forces this type's *constraint*, where
+// `MaxLength` widens to its bound `SupportedLength` (the whole `0 | ... | 2048`
+// union). That single instantiation expands the brand across all 2049 lengths
+// and generates millions of types. Collapsing the union case to plain `string`
+// (a sound supertype of the branded type) keeps that constraint cheap while
+// leaving every concrete single-literal result identical.
+export type MaxLengthString<MaxLength extends SupportedLength> =
+  IsUnion<MaxLength> extends true
+    ? string
+    : string &
+        TSTypeForgeInternals_BrandEncapsulated<
+          Readonly<{
+            MaxLength: UintRangeInclusive<0, MaxLength>;
+          }>
+        >;
 
 /**
  * Branded string type for strings with at least `MinLength` characters.
@@ -62,12 +76,20 @@ export type MaxLengthString<MaxLength extends SupportedLength> = string &
  * // const longer: MinLengthString<16> = password; // Error! (12 < 16)
  * ```
  */
-export type MinLengthString<MinLength extends SupportedLength> = string &
-  TSTypeForgeInternals_BrandEncapsulated<
-    Readonly<{
-      MinLength: MinLengthTuple<MinLength, 0>;
-    }>
-  >;
+// See the note on {@link MaxLengthString}: the `IsUnion<MinLength>` guard keeps
+// the brand value `MinLengthTuple<MinLength, 0>` (a tuple whose size follows
+// `MinLength`) from being built once per member when `MinLength` widens to the
+// `SupportedLength` union during constraint computation. `readonly string`
+// (i.e. plain `string`) is a sound supertype for that collapsed case.
+export type MinLengthString<MinLength extends SupportedLength> =
+  IsUnion<MinLength> extends true
+    ? string
+    : string &
+        TSTypeForgeInternals_BrandEncapsulated<
+          Readonly<{
+            MinLength: MinLengthTuple<MinLength, 0>;
+          }>
+        >;
 
 /**
  * Branded string type for strings whose length is between `MinLength` and

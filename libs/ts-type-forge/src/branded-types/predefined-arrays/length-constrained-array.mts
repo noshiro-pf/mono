@@ -1,3 +1,4 @@
+import { type IsUnion } from '../../condition/index.mjs';
 import { type Mutable } from '../../others/index.mjs';
 import {
   type FixedLengthTuple,
@@ -80,15 +81,25 @@ type ClampToPrefixCap<N extends number> =
  * // const strict: MaxLengthArray<2, string> = tags; // Error! (8 > 2)
  * ```
  */
-export type MaxLengthArray<
-  MaxLength extends SupportedLength,
-  Elm = unknown,
-> = readonly Elm[] &
-  TSTypeForgeInternals_BrandEncapsulated<
-    Readonly<{
-      MaxLength: UintRangeInclusive<0, MaxLength>;
-    }>
-  >;
+// The `IsUnion<MaxLength>` guard is a type-checker performance safeguard. The
+// brand value `UintRangeInclusive<0, MaxLength>` distributes over a union
+// `MaxLength`, materializing `0 | 1 | ... | k` once per member. In real usage
+// `MaxLength` is a single literal, so this never happens — except when a
+// consumer's deferred conditional forces this type's *constraint*, where
+// `MaxLength` widens to its bound `SupportedLength` (the whole `0 | ... | 2048`
+// union), expanding the brand across all 2049 lengths and generating millions
+// of types. Collapsing the union case to the unbranded `readonly Elm[]` (a
+// sound supertype) keeps that constraint cheap while leaving every concrete
+// single-literal result identical.
+export type MaxLengthArray<MaxLength extends SupportedLength, Elm = unknown> =
+  IsUnion<MaxLength> extends true
+    ? readonly Elm[]
+    : readonly Elm[] &
+        TSTypeForgeInternals_BrandEncapsulated<
+          Readonly<{
+            MaxLength: UintRangeInclusive<0, MaxLength>;
+          }>
+        >;
 
 /**
  * Mutable counterpart of {@link MaxLengthArray}: a branded *mutable* array type
@@ -116,15 +127,21 @@ export type MaxLengthArray<
  * // const strict: MutableMaxLengthArray<2, string> = tags; // Error! (8 > 2)
  * ```
  */
+// See {@link MaxLengthArray}: the `IsUnion<MaxLength>` guard collapses the
+// union case (which only arises during constraint computation) to the unbranded
+// `Mutable<readonly Elm[]>`, a sound supertype.
 export type MutableMaxLengthArray<
   MaxLength extends SupportedLength,
   Elm = unknown,
-> = Mutable<readonly Elm[]> &
-  TSTypeForgeInternals_BrandEncapsulated<
-    Readonly<{
-      MaxLength: UintRangeInclusive<0, MaxLength>;
-    }>
-  >;
+> =
+  IsUnion<MaxLength> extends true
+    ? Mutable<readonly Elm[]>
+    : Mutable<readonly Elm[]> &
+        TSTypeForgeInternals_BrandEncapsulated<
+          Readonly<{
+            MaxLength: UintRangeInclusive<0, MaxLength>;
+          }>
+        >;
 
 /**
  * Branded readonly array type for arrays with at least `MinLength` elements.
@@ -168,15 +185,24 @@ export type MutableMaxLengthArray<
  * // const longer: MinLengthArray<5, number> = history; // Error! (3 < 5)
  * ```
  */
-export type MinLengthArray<
-  MinLength extends SupportedLength,
-  Elm = unknown,
-> = MinLengthTuple<ClampToPrefixCap<MinLength>, Elm> &
-  TSTypeForgeInternals_BrandEncapsulated<
-    Readonly<{
-      MinLength: MinLengthTuple<MinLength, 0>;
-    }>
-  >;
+// The `IsUnion<MinLength>` guard is a type-checker performance safeguard. The
+// brand value `MinLengthTuple<MinLength, 0>` builds a tuple whose size follows
+// `MinLength` and distributes over a union `MinLength`. In real usage
+// `MinLength` is a single literal; the union case only arises when a consumer's
+// deferred conditional forces this type's *constraint*, widening `MinLength` to
+// its bound `SupportedLength` (`0 | ... | 2048`) and materializing a tuple per
+// member. Collapsing that case to the unbranded `readonly Elm[]` (a sound
+// supertype) keeps the constraint cheap; concrete single-literal results are
+// unchanged.
+export type MinLengthArray<MinLength extends SupportedLength, Elm = unknown> =
+  IsUnion<MinLength> extends true
+    ? readonly Elm[]
+    : MinLengthTuple<ClampToPrefixCap<MinLength>, Elm> &
+        TSTypeForgeInternals_BrandEncapsulated<
+          Readonly<{
+            MinLength: MinLengthTuple<MinLength, 0>;
+          }>
+        >;
 
 /**
  * Mutable counterpart of {@link MinLengthArray}: a branded *mutable* array type
@@ -205,15 +231,21 @@ export type MinLengthArray<
  * // const longer: MutableMinLengthArray<5, number> = history; // Error! (3 < 5)
  * ```
  */
+// See {@link MinLengthArray}: the `IsUnion<MinLength>` guard collapses the
+// union case (which only arises during constraint computation) to the unbranded
+// `Mutable<readonly Elm[]>`, a sound supertype.
 export type MutableMinLengthArray<
   MinLength extends SupportedLength,
   Elm = unknown,
-> = MutableMinLengthTuple<ClampToPrefixCap<MinLength>, Elm> &
-  TSTypeForgeInternals_BrandEncapsulated<
-    Readonly<{
-      MinLength: MinLengthTuple<MinLength, 0>;
-    }>
-  >;
+> =
+  IsUnion<MinLength> extends true
+    ? Mutable<readonly Elm[]>
+    : MutableMinLengthTuple<ClampToPrefixCap<MinLength>, Elm> &
+        TSTypeForgeInternals_BrandEncapsulated<
+          Readonly<{
+            MinLength: MinLengthTuple<MinLength, 0>;
+          }>
+        >;
 
 /**
  * Branded readonly array type for arrays whose length is between `MinLength`
