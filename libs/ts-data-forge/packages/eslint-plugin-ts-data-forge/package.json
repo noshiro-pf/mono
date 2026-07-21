@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-ts-data-forge",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": false,
   "description": "ESLint rules that steer code toward ts-data-forge idioms.",
   "keywords": [

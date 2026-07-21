@@ -1,5 +1,11 @@
 # ts-data-forge
 
+## 12.1.0
+
+### Minor Changes
+
+- 1bf4200: Add curried overloads and NonEmpty specializations to length validators
+
 ## 12.0.0
 
 ### Major Changes
