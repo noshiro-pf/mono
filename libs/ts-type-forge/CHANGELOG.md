@@ -1,3 +1,9 @@
+## [7.2.1](https://github.com/noshiro-pf/ts-type-forge/compare/v7.2.0...v7.2.1) (2026-07-21)
+
+### Performance Improvements
+
+- collapse length-constrained brands to base type on union length parameter ([#428](https://github.com/noshiro-pf/ts-type-forge/issues/428)) ([f34256e](https://github.com/noshiro-pf/ts-type-forge/commit/f34256ed3d74edaedb1dc662e1f69e7388d5de60))
+
 # [7.2.0](https://github.com/noshiro-pf/ts-type-forge/compare/v7.1.0...v7.2.0) (2026-07-21)
 
 ### Features
