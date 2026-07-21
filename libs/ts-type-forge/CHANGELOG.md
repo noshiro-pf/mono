@@ -1,3 +1,9 @@
+# [7.2.0](https://github.com/noshiro-pf/ts-type-forge/compare/v7.1.0...v7.2.0) (2026-07-21)
+
+### Features
+
+- Add NonPositiveInt16, NonPositiveInt32 and WithSmallInt variants; ([#427](https://github.com/noshiro-pf/ts-type-forge/issues/427)) ([6a3024b](https://github.com/noshiro-pf/ts-type-forge/commit/6a3024bfc5a1b6ec1ca09fb2e7878e0d8ae36321))
+
 # [7.1.0](https://github.com/noshiro-pf/ts-type-forge/compare/v7.0.0...v7.1.0) (2026-07-20)
 
 ### Features
