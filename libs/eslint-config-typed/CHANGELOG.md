@@ -1,3 +1,9 @@
+## [5.6.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.1...v5.6.2) (2026-07-21)
+
+### Performance Improvements
+
+- disable import-x resolution rules that are redundant with TypeScript ([#384](https://github.com/noshiro-pf/eslint-config-typed/issues/384)) ([d78e4ae](https://github.com/noshiro-pf/eslint-config-typed/commit/d78e4ae0f1b5957e9bb0472bac63f7a4fcb70205))
+
 ## [5.6.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.0...v5.6.1) (2026-07-20)
 
 ### Bug Fixes
