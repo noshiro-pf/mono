@@ -1,3 +1,0 @@
-[submodule "agents/common"]
-	path = agents/common
-	url = https://github.com/noshiro-pf/common-agent-config.git

@@ -63,18 +63,12 @@ importers:
       '@vitest/ui':
         specifier: 4.1.5
         version: 4.1.5(vitest@4.1.5)
-      cmd-ts:
-        specifier: 0.15.0
-        version: 0.15.0
       conventional-changelog-conventionalcommits:
         specifier: 9.3.1
         version: 9.3.1
       cspell:
         specifier: 10.0.0
         version: 10.0.0
-      dedent:
-        specifier: 1.7.2
-        version: 1.7.2
       esbuild:
         specifier: 0.28.1
         version: 0.28.1
@@ -125,7 +119,7 @@ importers:
         version: 25.0.3(typescript@6.0.3)
       ts-codemod-lib:
         specifier: 2.1.7
-        version: 2.1.7(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.0.3(prettier@3.8.3)(typescript@6.0.3))(typescript@6.0.3)
+        version: 2.1.7(dedent@1.7.2)(ts-repo-utils@10.0.3(prettier@3.8.3)(typescript@6.0.3))(typescript@6.0.3)
       ts-repo-utils:
         specifier: 10.0.3
         version: 10.0.3(prettier@3.8.3)(typescript@6.0.3)
@@ -6289,7 +6283,8 @@ snapshots:
     dependencies:
       character-entities: 2.0.2
 
-  dedent@1.7.2: {}
+  dedent@1.7.2:
+    optional: true
 
   deep-extend@0.6.0: {}
 
@@ -8707,13 +8702,12 @@ snapshots:
     dependencies:
       typescript: 6.0.3
 
-  ts-codemod-lib@2.1.7(cmd-ts@0.15.0)(dedent@1.7.2)(ts-repo-utils@10.0.3(prettier@3.8.3)(typescript@6.0.3))(typescript@6.0.3):
+  ts-codemod-lib@2.1.7(dedent@1.7.2)(ts-repo-utils@10.0.3(prettier@3.8.3)(typescript@6.0.3))(typescript@6.0.3):
     dependencies:
       ts-data-forge: 6.9.6(typescript@6.0.3)
       ts-morph: 28.0.0
       ts-type-forge: 3.0.1
     optionalDependencies:
-      cmd-ts: 0.15.0
       dedent: 1.7.2
       ts-repo-utils: 10.0.3(prettier@3.8.3)(typescript@6.0.3)
     transitivePeerDependencies:

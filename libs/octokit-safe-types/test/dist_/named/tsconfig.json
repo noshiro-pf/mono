@@ -1,0 +1,34 @@
+{
+  // Type-checks the built `dist/` output through the real package.json
+  // `exports` map, via named imports
+  // (`import { X } from 'octokit-safe-types'`): `scripts/cmd/build.mts`
+  // materializes a minimal `test/dist/node_modules/octokit-safe-types`
+  // package (package.json + dist), so module resolution here behaves exactly
+  // like an external consumer's.
+  //
+  // Deliberately self-contained (no `extends`, no test-library dependencies)
+  // and conservative, so that older TypeScript versions can run it in the
+  // compatibility matrix
+  // (.github/workflows/typescript-version-compatibility.yml).
+  // `types: []` prevents auto-inclusion of node_modules/@types: the
+  // repository's @types/node requires a recent TypeScript and would produce
+  // unrelated lib-conflict errors on the older compilers in the matrix.
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "types": [],
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": false,
+    // Transitive typed dependencies (e.g. ts-data-forge) ship `.d.mts` that
+    // uses newer lib types (ArrayIterator, etc.); real consumers resolve them
+    // with skipLibCheck (often the default). Skipping lib checks here keeps
+    // this a cross-version *resolution/usage* test of our public API rather
+    // than a re-check of every dependency's declarations on older compilers.
+    "skipLibCheck": true
+  },
+  "include": ["./*.mts"]
+}
