@@ -5,11 +5,14 @@ export const eslintImportsRules = {
   // Not needed when using TypeScript.
   'import-x/no-unresolved': 'off',
 
-  // TypeScript compilation already ensures that named imports exist in the referenced module
+  // The following import-x resolution rules are redundant when using TypeScript:
+  // the type-checker already reports missing named / default imports and invalid
+  // namespace member access (TS2339). They also build large ExportMaps that are
+  // slow and memory-heavy (a known cause of ESLint OOM on large codebases), so
+  // keep them off for TypeScript.
   'import-x/named': 'off',
-
-  'import-x/default': 'error',
-  'import-x/namespace': withDefaultOption('error'),
+  'import-x/default': 'off',
+  'import-x/namespace': 'off',
   'import-x/no-restricted-paths': 'off', // TODO
   'import-x/no-absolute-path': withDefaultOption('error'),
   'import-x/no-dynamic-require': withDefaultOption('error'),
@@ -49,9 +52,13 @@ export const eslintImportsRules = {
   'import-x/no-relative-packages': withDefaultOption('error'),
 
   // helpfulWarnings
-  'import-x/export': 'error',
+  // Redundant with TypeScript: duplicate / conflicting exports are reported as
+  // TS2323 / TS2528.
+  'import-x/export': 'off',
   'import-x/no-named-as-default': 'error',
-  'import-x/no-named-as-default-member': 'error',
+  // Redundant with TypeScript: accessing a named export through the default
+  // import is already a type error.
+  'import-x/no-named-as-default-member': 'off',
 
   // prefer @typescript-eslint/no-deprecated (raised in import-js/eslint-plugin-import#1532)
   'import-x/no-deprecated': 'off',
