@@ -1,3 +1,9 @@
+# [5.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.2...v5.7.0) (2026-07-22)
+
+### Features
+
+- add ts-restrictions/no-string-spread rule ([#386](https://github.com/noshiro-pf/eslint-config-typed/issues/386)) ([2f86ad9](https://github.com/noshiro-pf/eslint-config-typed/commit/2f86ad9d5a7c092f5530de1cb703d357dea3aa9d))
+
 ## [5.6.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.1...v5.6.2) (2026-07-21)
 
 ### Performance Improvements
