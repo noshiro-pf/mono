@@ -95,9 +95,9 @@
 
 - quote absolute paths in build.mts shell command strings ([#414](https://github.com/noshiro-pf/ts-data-forge/issues/414)) ([7cabddb](https://github.com/noshiro-pf/ts-data-forge/commit/7cabddbf52674d5c4bc289fd01cd70a4bea48468))
 
-# [9.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v8.0.0...v9.0.0) (2026-07-10)
+## [9.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v8.0.0...v9.0.0) (2026-07-10)
 
-# [8.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.1.1...v8.0.0) (2026-07-09)
+## [8.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.1.1...v8.0.0) (2026-07-09)
 
 - fix!: changed isRecord to reject arrays ([#409](https://github.com/noshiro-pf/ts-data-forge/issues/409)) ([ff73b7d](https://github.com/noshiro-pf/ts-data-forge/commit/ff73b7d2c9b5077a7a3b1e44e36430d5d5131b22))
 
@@ -113,7 +113,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - correct type annotations for generics in some curried functions ([#404](https://github.com/noshiro-pf/ts-data-forge/issues/404)) ([cb8a79f](https://github.com/noshiro-pf/ts-data-forge/commit/cb8a79fd0b29580a25fd058ed8b9d514634d4b4f))
 
-# [7.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.0.1...v7.1.0) (2026-07-04)
+## [7.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v7.0.1...v7.1.0) (2026-07-04)
 
 ### Features
 
@@ -125,7 +125,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - fix ISet/IMap(Mapped) type definitions to be consistent ([#402](https://github.com/noshiro-pf/ts-data-forge/issues/402)) ([095526a](https://github.com/noshiro-pf/ts-data-forge/commit/095526a32b6e29bf65f097364d53fd3db79ad992))
 
-# [7.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.13.1...v7.0.0) (2026-06-29)
+## [7.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.13.1...v7.0.0) (2026-06-29)
 
 ### Features
 
@@ -137,25 +137,25 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - fix the typing of pipe function ([#398](https://github.com/noshiro-pf/ts-data-forge/issues/398)) ([657271a](https://github.com/noshiro-pf/ts-data-forge/commit/657271a8a6b4771505342c0678a799d2a904216c))
 
-# [6.13.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.12.0...v6.13.0) (2026-06-25)
+## [6.13.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.12.0...v6.13.0) (2026-06-25)
 
 ### Features
 
 - add Num.safeParseFloat for strict number parsing ([#397](https://github.com/noshiro-pf/ts-data-forge/issues/397)) ([71cd2e4](https://github.com/noshiro-pf/ts-data-forge/commit/71cd2e41c65f419e732c1341b7fe2e71f3099c61))
 
-# [6.12.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.11.0...v6.12.0) (2026-06-25)
+## [6.12.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.11.0...v6.12.0) (2026-06-25)
 
 ### Features
 
 - add Num.safeParseInt for strict base-10 integer parsing ([#396](https://github.com/noshiro-pf/ts-data-forge/issues/396)) ([af543ec](https://github.com/noshiro-pf/ts-data-forge/commit/af543eca5c2b23a15267aa68e82686d49584bf6f))
 
-# [6.11.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.10.0...v6.11.0) (2026-06-22)
+## [6.11.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.10.0...v6.11.0) (2026-06-22)
 
 ### Features
 
 - Use the NonEmptyString type as the return type of isNonEmptyString ([#395](https://github.com/noshiro-pf/ts-data-forge/issues/395)) ([d2788ea](https://github.com/noshiro-pf/ts-data-forge/commit/d2788ea0bc0bbb37f0b58fa9979e624c7544629a))
 
-# [6.10.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.6...v6.10.0) (2026-06-18)
+## [6.10.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.9.6...v6.10.0) (2026-06-18)
 
 ### Features
 
@@ -197,37 +197,37 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - bump @sindresorhus/is from 7.2.0 to 8.0.0 ([#348](https://github.com/noshiro-pf/ts-data-forge/issues/348)) ([4bc770c](https://github.com/noshiro-pf/ts-data-forge/commit/4bc770cbc7b56fa1e01996ebe6caf7b3f5caeed7))
 
-# [6.9.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.8.0...v6.9.0) (2026-04-03)
+## [6.9.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.8.0...v6.9.0) (2026-04-03)
 
 ### Features
 
 - add Obj.deepPick/deepOmit ([#333](https://github.com/noshiro-pf/ts-data-forge/issues/333)) ([bdca824](https://github.com/noshiro-pf/ts-data-forge/commit/bdca824e69308a0c0d1860052412ccc0236a75d0))
 
-# [6.8.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.7.0...v6.8.0) (2026-03-18)
+## [6.8.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.7.0...v6.8.0) (2026-03-18)
 
 ### Features
 
 - add Arr.cartesianProduct ([#325](https://github.com/noshiro-pf/ts-data-forge/issues/325)) ([7c915ea](https://github.com/noshiro-pf/ts-data-forge/commit/7c915ea08df5ce31e2d60223df2fc39500a46b16))
 
-# [6.7.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.6.0...v6.7.0) (2026-03-17)
+## [6.7.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.6.0...v6.7.0) (2026-03-17)
 
 ### Features
 
 - improve Obj.merge typing ([#324](https://github.com/noshiro-pf/ts-data-forge/issues/324)) ([fdbbc55](https://github.com/noshiro-pf/ts-data-forge/commit/fdbbc5554cdf58b2c1c22fe6bc185322d8e22dcb))
 
-# [6.6.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.5.0...v6.6.0) (2026-03-14)
+## [6.6.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.5.0...v6.6.0) (2026-03-14)
 
 ### Features
 
 - add Obj.merge ([#320](https://github.com/noshiro-pf/ts-data-forge/issues/320)) ([3105dc1](https://github.com/noshiro-pf/ts-data-forge/commit/3105dc166b10b143637755b607115876426864ba))
 
-# [6.5.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.4.0...v6.5.0) (2026-02-13)
+## [6.5.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.4.0...v6.5.0) (2026-02-13)
 
 ### Features
 
 - add fastDeepEqual ([#297](https://github.com/noshiro-pf/ts-data-forge/issues/297)) ([3c1a83a](https://github.com/noshiro-pf/ts-data-forge/commit/3c1a83a139e36c79d048f3ec85f86fe45ff7c8b5))
 
-# [6.4.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.3.1...v6.4.0) (2026-02-05)
+## [6.4.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.3.1...v6.4.0) (2026-02-05)
 
 ### Features
 
@@ -239,7 +239,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - bump ts-type-forge from 2.3.0 to 2.3.1 ([#286](https://github.com/noshiro-pf/ts-data-forge/issues/286)) ([ab35432](https://github.com/noshiro-pf/ts-data-forge/commit/ab35432c67d315e29b164c27710c288ad8686606))
 
-# [6.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.2.2...v6.3.0) (2026-01-23)
+## [6.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.2.2...v6.3.0) (2026-01-23)
 
 ### Features
 
@@ -257,7 +257,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - bump @sindresorhus/is from 7.1.1 to 7.2.0 ([#256](https://github.com/noshiro-pf/ts-data-forge/issues/256)) ([9c5b905](https://github.com/noshiro-pf/ts-data-forge/commit/9c5b9057be9b0b3b0e474fa0219899a98a7b96c1))
 
-# [6.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.1.1...v6.2.0) (2026-01-02)
+## [6.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.1.1...v6.2.0) (2026-01-02)
 
 ### Features
 
@@ -269,13 +269,13 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - fix Arr.sumBy document ([#251](https://github.com/noshiro-pf/ts-data-forge/issues/251)) ([47dc15f](https://github.com/noshiro-pf/ts-data-forge/commit/47dc15f2cdea301ffab52e05a921ce7e9f1f800b))
 
-# [6.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.0.0...v6.1.0) (2025-12-27)
+## [6.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v6.0.0...v6.1.0) (2025-12-27)
 
 ### Features
 
 - add Arr.sumBy ([#250](https://github.com/noshiro-pf/ts-data-forge/issues/250)) ([b7b6af9](https://github.com/noshiro-pf/ts-data-forge/commit/b7b6af9aafb508bc546a5f09a31f1f80251b77e5))
 
-# [6.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v5.1.1...v6.0.0) (2025-11-28)
+## [6.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v5.1.1...v6.0.0) (2025-11-28)
 
 ### Features
 
@@ -292,7 +292,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - fix runtime dependency ([#221](https://github.com/noshiro-pf/ts-data-forge/issues/221)) ([12eda3b](https://github.com/noshiro-pf/ts-data-forge/commit/12eda3bdcba2d3605b98ab0d89b2db4713c23ffa))
 
-# [5.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v5.0.1...v5.1.0) (2025-11-21)
+## [5.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v5.0.1...v5.1.0) (2025-11-21)
 
 ### Features
 
@@ -304,19 +304,19 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - avoid using Error.isError ([#202](https://github.com/noshiro-pf/ts-data-forge/issues/202)) ([023e222](https://github.com/noshiro-pf/ts-data-forge/commit/023e2222f42fda7d2e3f398e24ef172bd07bc8ef))
 
-# [5.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v4.1.0...v5.0.0) (2025-11-10)
+## [5.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v4.1.0...v5.0.0) (2025-11-10)
 
 ### Features
 
 - **breaking:** fix return type of Json.stringify ([#201](https://github.com/noshiro-pf/ts-data-forge/issues/201)) ([4a92303](https://github.com/noshiro-pf/ts-data-forge/commit/4a92303ac697c9d7cf2005e80b2a57c6161f0480))
 
-# [4.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v4.0.0...v4.1.0) (2025-11-10)
+## [4.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v4.0.0...v4.1.0) (2025-11-10)
 
 ### Features
 
 - add TernaryResult ([#200](https://github.com/noshiro-pf/ts-data-forge/issues/200)) ([eeac8fd](https://github.com/noshiro-pf/ts-data-forge/commit/eeac8fdf84082b299d29ae20e052229f6be2e36e))
 
-# [4.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.3.1...v4.0.0) (2025-11-10)
+## [4.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.3.1...v4.0.0) (2025-11-10)
 
 ### Features
 
@@ -328,19 +328,19 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - add type checking and testing to JSDoc sample code ([#176](https://github.com/noshiro-pf/ts-data-forge/issues/176)) ([a41f6e0](https://github.com/noshiro-pf/ts-data-forge/commit/a41f6e0f344cae6c8ddefae3bab0683c6a2359ca))
 
-# [3.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.2.0...v3.3.0) (2025-09-16)
+## [3.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.2.0...v3.3.0) (2025-09-16)
 
 ### Features
 
 - unknownToString now outputs BigInt values ​​as "123n" instead of "123" ([#149](https://github.com/noshiro-pf/ts-data-forge/issues/149)) ([1da1397](https://github.com/noshiro-pf/ts-data-forge/commit/1da139769e75fc68544531af3befa5b509688d2b))
 
-# [3.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.1.0...v3.2.0) (2025-08-28)
+## [3.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.1.0...v3.2.0) (2025-08-28)
 
 ### Features
 
 - add Arr.generateAsync ([#128](https://github.com/noshiro-pf/ts-data-forge/issues/128)) ([cb6b2d1](https://github.com/noshiro-pf/ts-data-forge/commit/cb6b2d1babf1958456bc1a3f9cf7a8ddae1b0e27))
 
-# [3.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.5...v3.1.0) (2025-08-12)
+## [3.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v3.0.5...v3.1.0) (2025-08-12)
 
 ### Features
 
@@ -376,7 +376,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - fix entry point ([#77](https://github.com/noshiro-pf/ts-data-forge/issues/77)) ([9cf49b9](https://github.com/noshiro-pf/ts-data-forge/commit/9cf49b9cf86c537d7abd107cf179d8d0f96929e9))
 
-# [3.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.3...v3.0.0) (2025-07-15)
+## [3.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v2.1.3...v3.0.0) (2025-07-15)
 
 ### Bug Fixes
 
@@ -400,7 +400,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - fix package.json ([#74](https://github.com/noshiro-pf/ts-data-forge/issues/74)) ([dfb261d](https://github.com/noshiro-pf/ts-data-forge/commit/dfb261dafa35449000b5af2192dbed1231044e55))
 
-# [2.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.3...v2.1.0) (2025-07-15)
+## [2.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v2.0.3...v2.1.0) (2025-07-15)
 
 ### Features
 
@@ -424,7 +424,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - fix type annotation of pipe ([#63](https://github.com/noshiro-pf/ts-data-forge/issues/63)) ([1babcff](https://github.com/noshiro-pf/ts-data-forge/commit/1babcffc5820aab5df8523fb29306b9702038978))
 
-# [2.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.5.2...v2.0.0) (2025-07-07)
+## [2.0.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.5.2...v2.0.0) (2025-07-07)
 
 ### Features
 
@@ -464,31 +464,31 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 
 - reduce JSDoc examples ([#48](https://github.com/noshiro-pf/ts-data-forge/issues/48)) ([9a8b301](https://github.com/noshiro-pf/ts-data-forge/commit/9a8b3017525ee75760eb9f0e86b488688451eb57))
 
-# [1.5.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.4.0...v1.5.0) (2025-07-04)
+## [1.5.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.4.0...v1.5.0) (2025-07-04)
 
 ### Features
 
 - use NonZeroNumber in divInt divisor ([#47](https://github.com/noshiro-pf/ts-data-forge/issues/47)) ([b1fc2db](https://github.com/noshiro-pf/ts-data-forge/commit/b1fc2db061b911d6ec94565c2af59a66a327a9ef))
 
-# [1.4.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.3.0...v1.4.0) (2025-07-04)
+## [1.4.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.3.0...v1.4.0) (2025-07-04)
 
 ### Features
 
 - add Arr.generate ([#46](https://github.com/noshiro-pf/ts-data-forge/issues/46)) ([49b5db0](https://github.com/noshiro-pf/ts-data-forge/commit/49b5db0d22d5b295293021a3373f98fd4b4cee6f))
 
-# [1.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.2.0...v1.3.0) (2025-07-04)
+## [1.3.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.2.0...v1.3.0) (2025-07-04)
 
 ### Features
 
 - add createPromise function ([#44](https://github.com/noshiro-pf/ts-data-forge/issues/44)) ([ff5bf16](https://github.com/noshiro-pf/ts-data-forge/commit/ff5bf167dbf2eba36c7bd6261b039bca5a5f4ce3))
 
-# [1.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.1.0...v1.2.0) (2025-06-25)
+## [1.2.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.1.0...v1.2.0) (2025-06-25)
 
 ### Features
 
 - make range argument optional for branded numeric random function ([#33](https://github.com/noshiro-pf/ts-data-forge/issues/33)) ([7d6ce59](https://github.com/noshiro-pf/ts-data-forge/commit/7d6ce596a062916ba4ddd65d299ea2299b264dda))
 
-# [1.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.0.2...v1.1.0) (2025-06-23)
+## [1.1.0](https://github.com/noshiro-pf/ts-data-forge/compare/v1.0.2...v1.1.0) (2025-06-23)
 
 ### Features
 
@@ -511,7 +511,7 @@ isRecord was changed to allow arrays in <https://github.com/noshiro-pf/ts-data-f
 - fix devDependencies ([#12](https://github.com/noshiro-pf/ts-data-forge/issues/12)) ([cc14518](https://github.com/noshiro-pf/ts-data-forge/commit/cc1451840317becbdfd11bb14c457383a1bbe3f9))
 - fix release workflow ([#11](https://github.com/noshiro-pf/ts-data-forge/issues/11)) ([33fc277](https://github.com/noshiro-pf/ts-data-forge/commit/33fc277707b35cdf488386448c3060f68f8a2726))
 
-# 1.0.0 (2025-06-15)
+## 1.0.0 (2025-06-15)
 
 ### Features
 
