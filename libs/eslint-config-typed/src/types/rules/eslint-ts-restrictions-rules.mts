@@ -236,6 +236,20 @@ namespace NoRestrictedSyntax {
 }
 
 /**
+ * @description Disallow spreading a `string` (e.g. `[...str]`), which silently splits it into characters and yields a `string[]` indistinguishable from spreading an array
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoStringSpread {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow wrapping an array in `Array.from()` before a non-mutating array method (e.g. `Array.from(x).toSorted()`), since the method already returns a new array
  *
  *  ```md
@@ -284,6 +298,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;
+  'ts-restrictions/no-string-spread': NoStringSpread.RuleEntry;
   'ts-restrictions/no-unnecessary-array-from': NoUnnecessaryArrayFrom.RuleEntry;
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
