@@ -1,3 +1,9 @@
+# [5.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.7.0...v5.8.0) (2026-07-23)
+
+### Features
+
+- **ts-restrictions:** add prefer-curried-call rule ([#387](https://github.com/noshiro-pf/eslint-config-typed/issues/387)) ([263212b](https://github.com/noshiro-pf/eslint-config-typed/commit/263212b9faf54796d7251675876c874894ee5e89))
+
 # [5.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.2...v5.7.0) (2026-07-22)
 
 ### Features
