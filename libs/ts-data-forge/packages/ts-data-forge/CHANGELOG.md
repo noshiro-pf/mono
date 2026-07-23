@@ -1,5 +1,11 @@
 # ts-data-forge
 
+## 12.2.0
+
+### Minor Changes
+
+- 36b9be2: Make toPushed/toUnshifted return types assignable to NonEmptyArray
+
 ## 12.1.0
 
 ### Minor Changes
