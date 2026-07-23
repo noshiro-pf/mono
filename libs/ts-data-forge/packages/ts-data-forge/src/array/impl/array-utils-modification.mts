@@ -266,19 +266,26 @@ export function toRemoved<E>(
  *
  * const appendedCurried = Arr.toPushed(4)(base);
  *
- * assert.deepStrictEqual(appended, [1, 2, 3]);
+ * // The result is guaranteed non-empty, so it is assignable to NonEmptyArray.
+ * const nonEmpty: NonEmptyArray<number> = appended;
  *
- * assert.deepStrictEqual(appendedCurried, [1, 2, 4]);
+ * assert.deepStrictEqual<readonly number[]>(appended, [1, 2, 3]);
+ *
+ * assert.deepStrictEqual<readonly number[]>(appendedCurried, [1, 2, 4]);
+ *
+ * assert.isTrue(nonEmpty.length >= 1);
  * ```
  */
 export function toPushed<const Ar extends readonly unknown[], const V>(
   array: Ar,
   newValue: V,
-): readonly [...Ar, V];
+): readonly [...Ar, V] & NonEmptyArray<Ar[number] | V>;
 
 export function toPushed<const V>(
   newValue: V,
-): <const Ar extends readonly unknown[]>(array: Ar) => readonly [...Ar, V];
+): <const Ar extends readonly unknown[]>(
+  array: Ar,
+) => readonly [...Ar, V] & NonEmptyArray<Ar[number] | V>;
 
 export function toPushed<const Ar extends readonly unknown[], const V>(
   ...args: readonly [array: Ar, newValue: V] | readonly [newValue: V]
@@ -314,19 +321,26 @@ export function toPushed<const Ar extends readonly unknown[], const V>(
  *
  * const prefixedCurried = Arr.toUnshifted(0)(base);
  *
- * assert.deepStrictEqual(prefixed, [1, 2, 3]);
+ * // The result is guaranteed non-empty, so it is assignable to NonEmptyArray.
+ * const nonEmpty: NonEmptyArray<number> = prefixed;
  *
- * assert.deepStrictEqual(prefixedCurried, [0, 2, 3]);
+ * assert.deepStrictEqual<readonly number[]>(prefixed, [1, 2, 3]);
+ *
+ * assert.deepStrictEqual<readonly number[]>(prefixedCurried, [0, 2, 3]);
+ *
+ * assert.isTrue(nonEmpty.length >= 1);
  * ```
  */
 export function toUnshifted<const Ar extends readonly unknown[], const V>(
   array: Ar,
   newValue: V,
-): readonly [V, ...Ar];
+): readonly [V, ...Ar] & NonEmptyArray<V | Ar[number]>;
 
 export function toUnshifted<const V>(
   newValue: V,
-): <const Ar extends readonly unknown[]>(array: Ar) => readonly [V, ...Ar];
+): <const Ar extends readonly unknown[]>(
+  array: Ar,
+) => readonly [V, ...Ar] & NonEmptyArray<V | Ar[number]>;
 
 export function toUnshifted<Ar extends readonly unknown[], const V>(
   ...args: readonly [array: Ar, newValue: V] | readonly [newValue: V]

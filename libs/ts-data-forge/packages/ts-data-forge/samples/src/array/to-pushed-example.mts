@@ -1,5 +1,6 @@
 // Example: src/array/array-utils.mts (toPushed)
 import { Arr } from 'ts-data-forge';
+import { type NonEmptyArray } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test('main', () => {
@@ -10,9 +11,14 @@ if (import.meta.vitest !== undefined) {
 
     const appendedCurried = Arr.toPushed(4)(base);
 
-    assert.deepStrictEqual(appended, [1, 2, 3]);
+    // The result is guaranteed non-empty, so it is assignable to NonEmptyArray.
+    const nonEmpty: NonEmptyArray<number> = appended;
 
-    assert.deepStrictEqual(appendedCurried, [1, 2, 4]);
+    assert.deepStrictEqual<readonly number[]>(appended, [1, 2, 3]);
+
+    assert.deepStrictEqual<readonly number[]>(appendedCurried, [1, 2, 4]);
+
+    assert.isTrue(nonEmpty.length >= 1);
 
     // embed-sample-code-ignore-below
   });

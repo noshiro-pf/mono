@@ -134,9 +134,18 @@ describe('Arr modifications', () => {
 
       const result = toPushed(xs, 4 as const);
 
-      expectType<typeof result, readonly [1, 2, 3, 4]>('=');
+      // The structural tuple is preserved, and the result is additionally
+      // branded as non-empty so it is assignable to `NonEmptyArray`.
+      expectType<
+        typeof result,
+        readonly [1, 2, 3, 4] & NonEmptyArray<1 | 2 | 3 | 4>
+      >('=');
 
-      assert.deepStrictEqual(result, [1, 2, 3, 4]);
+      expectType<typeof result, readonly [1, 2, 3, 4]>('<=');
+
+      expectType<typeof result, NonEmptyArray<number>>('<=');
+
+      assert.deepStrictEqual<readonly number[]>(result, [1, 2, 3, 4]);
     });
 
     test('case 2', () => {
@@ -144,9 +153,14 @@ describe('Arr modifications', () => {
 
       const result = toPushed(xs, 4 as const);
 
-      expectType<typeof result, readonly [...number[], 4]>('=');
+      expectType<
+        typeof result,
+        readonly [...number[], 4] & NonEmptyArray<number>
+      >('=');
 
-      assert.deepStrictEqual(result, [1, 2, 3, 4]);
+      expectType<typeof result, NonEmptyArray<number>>('<=');
+
+      assert.deepStrictEqual<readonly number[]>(result, [1, 2, 3, 4]);
     });
 
     test('should work with curried version', () => {
@@ -154,7 +168,9 @@ describe('Arr modifications', () => {
 
       const result = pushFive([1, 2, 3]);
 
-      assert.deepStrictEqual(result, [1, 2, 3, 5]);
+      expectType<typeof result, NonEmptyArray<number>>('<=');
+
+      assert.deepStrictEqual<readonly number[]>(result, [1, 2, 3, 5]);
     });
   });
 
@@ -164,9 +180,16 @@ describe('Arr modifications', () => {
 
       const result = toUnshifted(xs, 4 as const);
 
-      expectType<typeof result, readonly [4, 1, 2, 3]>('=');
+      expectType<
+        typeof result,
+        readonly [4, 1, 2, 3] & NonEmptyArray<1 | 2 | 3 | 4>
+      >('=');
 
-      assert.deepStrictEqual(result, [4, 1, 2, 3]);
+      expectType<typeof result, readonly [4, 1, 2, 3]>('<=');
+
+      expectType<typeof result, NonEmptyArray<number>>('<=');
+
+      assert.deepStrictEqual<readonly number[]>(result, [4, 1, 2, 3]);
     });
 
     test('case 2', () => {
@@ -174,9 +197,14 @@ describe('Arr modifications', () => {
 
       const result = toUnshifted(xs, 4 as const);
 
-      expectType<typeof result, readonly [4, ...number[]]>('=');
+      expectType<
+        typeof result,
+        readonly [4, ...number[]] & NonEmptyArray<number>
+      >('=');
 
-      assert.deepStrictEqual(result, [4, 1, 2, 3]);
+      expectType<typeof result, NonEmptyArray<number>>('<=');
+
+      assert.deepStrictEqual<readonly number[]>(result, [4, 1, 2, 3]);
     });
 
     test('should work with curried version', () => {
@@ -184,7 +212,9 @@ describe('Arr modifications', () => {
 
       const result = unshiftZero([1, 2, 3]);
 
-      assert.deepStrictEqual(result, [0, 1, 2, 3]);
+      expectType<typeof result, NonEmptyArray<number>>('<=');
+
+      assert.deepStrictEqual<readonly number[]>(result, [0, 1, 2, 3]);
     });
   });
 

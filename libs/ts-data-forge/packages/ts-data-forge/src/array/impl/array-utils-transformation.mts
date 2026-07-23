@@ -684,6 +684,10 @@ export function partition<
 /**
  * Concatenates two arrays.
  *
+ * The exact tuple shape is preserved. Additionally, when either input is known
+ * to be non-empty (a non-empty tuple or a branded `NonEmptyArray`), the result
+ * is branded as non-empty so it is assignable to `NonEmptyArray`.
+ *
  * @example
  *
  * ```ts
@@ -693,9 +697,18 @@ export function partition<
  *
  * const combined = Arr.concat(numbers, words);
  *
+ * // Because at least one input is non-empty, the result is assignable to
+ * // NonEmptyArray.
+ * const nonEmpty: NonEmptyArray<number | string> = combined;
+ *
  * const expectedCombined = [1, 2, 'three', 'four'] as const;
  *
- * assert.deepStrictEqual(combined, expectedCombined);
+ * assert.deepStrictEqual<readonly (number | string)[]>(
+ *   combined,
+ *   expectedCombined,
+ * );
+ *
+ * assert.isTrue(nonEmpty.length >= 1);
  * ```
  */
 export const concat = <
@@ -704,7 +717,25 @@ export const concat = <
 >(
   array1: Ar1,
   array2: Ar2,
-): readonly [...Ar1, ...Ar2] => [...array1, ...array2] as const;
+): ConcatResult<Ar1, Ar2> =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  [...array1, ...array2] as never;
+
+/**
+ * Return type of {@link concat}: the concatenated tuple `readonly [...Ar1,
+ * ...Ar2]`, additionally branded as {@link NonEmptyArray} when either input is
+ * a non-empty tuple (a plain non-empty tuple or a branded `NonEmptyArray`,
+ * both of which extend `NonEmptyTuple<unknown>`).
+ */
+type ConcatResult<
+  Ar1 extends readonly unknown[],
+  Ar2 extends readonly unknown[],
+> =
+  Ar1 extends NonEmptyTuple<unknown>
+    ? readonly [...Ar1, ...Ar2] & NonEmptyArray<Ar1[number] | Ar2[number]>
+    : Ar2 extends NonEmptyTuple<unknown>
+      ? readonly [...Ar1, ...Ar2] & NonEmptyArray<Ar1[number] | Ar2[number]>
+      : readonly [...Ar1, ...Ar2];
 
 /**
  * Groups elements by a key derived from each element.

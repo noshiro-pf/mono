@@ -1,4 +1,4 @@
-import { type FixedLengthTuple } from 'ts-type-forge';
+import { type FixedLengthTuple, type NonEmptyArray } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';
@@ -750,10 +750,56 @@ describe('Arr transformations', () => {
 
     const result = concat(xs, ys);
 
-    expectType<typeof result, readonly [1, 2, 3, 4, 5]>('=');
+    // The exact tuple shape is preserved, and because both inputs are
+    // non-empty tuples the result is additionally branded as non-empty so it
+    // is assignable to `NonEmptyArray`.
+    expectType<
+      typeof result,
+      readonly [1, 2, 3, 4, 5] & NonEmptyArray<1 | 2 | 3 | 4 | 5>
+    >('=');
+
+    expectType<typeof result, readonly [1, 2, 3, 4, 5]>('<=');
+
+    expectType<typeof result, NonEmptyArray<number>>('<=');
 
     test('case 1', () => {
-      assert.deepStrictEqual(result, [1, 2, 3, 4, 5]);
+      assert.deepStrictEqual<readonly number[]>(result, [1, 2, 3, 4, 5]);
+    });
+
+    test('is non-empty when only the left side is non-empty', () => {
+      const left = [1] as const;
+
+      const right: readonly number[] = [2, 3] as const;
+
+      const merged = concat(left, right);
+
+      expectType<typeof merged, NonEmptyArray<number>>('<=');
+
+      assert.deepStrictEqual<readonly number[]>(merged, [1, 2, 3]);
+    });
+
+    test('is non-empty when only the right side is non-empty', () => {
+      const left: readonly number[] = [1, 2] as const;
+
+      const right = [3] as const;
+
+      const merged = concat(left, right);
+
+      expectType<typeof merged, NonEmptyArray<number>>('<=');
+
+      assert.deepStrictEqual<readonly number[]>(merged, [1, 2, 3]);
+    });
+
+    test('is not branded non-empty when both sides may be empty', () => {
+      const left: readonly number[] = [1] as const;
+
+      const right: readonly number[] = [2] as const;
+
+      const merged = concat(left, right);
+
+      expectType<typeof merged, readonly number[]>('=');
+
+      assert.deepStrictEqual<readonly number[]>(merged, [1, 2]);
     });
 
     // testArrayEquality({
