@@ -35,12 +35,12 @@ export const noPartialDivision = createRule({
 
         return (
           numberLiteralParts.length > 0 &&
-          numberLiteralParts.every((t) => isSafeDenominator(t))
+          numberLiteralParts.every(isSafeDenominator)
         );
       }
 
       if (type.isUnion()) {
-        return unionTypeParts(type).every((t) => isSafeDenominator(t));
+        return unionTypeParts(type).every(isSafeDenominator);
       }
 
       return (

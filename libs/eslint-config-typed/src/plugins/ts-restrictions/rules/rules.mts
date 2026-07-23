@@ -5,6 +5,7 @@ import { noRestrictedSyntax } from './no-restricted-syntax.mjs';
 import { noStringSpread } from './no-string-spread.mjs';
 import { noUnnecessaryArrayFrom } from './no-unnecessary-array-from.mjs';
 import { noUnnecessaryCoalesceUndefined } from './no-unnecessary-coalesce-undefined.mjs';
+import { preferCurriedCall } from './prefer-curried-call.mjs';
 import { preferNonMutatingArrayMethod } from './prefer-non-mutating-array-method.mjs';
 
 export const tsRestrictionsRules = {
@@ -14,5 +15,6 @@ export const tsRestrictionsRules = {
   'no-string-spread': noStringSpread,
   'no-unnecessary-array-from': noUnnecessaryArrayFrom,
   'no-unnecessary-coalesce-undefined': noUnnecessaryCoalesceUndefined,
+  'prefer-curried-call': preferCurriedCall,
   'prefer-non-mutating-array-method': preferNonMutatingArrayMethod,
 } as const satisfies ESLintPlugin['rules'];

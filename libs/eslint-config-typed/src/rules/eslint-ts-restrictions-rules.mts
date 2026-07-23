@@ -9,6 +9,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-string-spread': 'error',
   'ts-restrictions/no-unnecessary-array-from': 'error',
   'ts-restrictions/no-unnecessary-coalesce-undefined': 'error',
+  'ts-restrictions/prefer-curried-call': 'error',
   'ts-restrictions/prefer-non-mutating-array-method': 'error',
   'ts-restrictions/check-destructuring-completeness':
     withDefaultOption('error'),

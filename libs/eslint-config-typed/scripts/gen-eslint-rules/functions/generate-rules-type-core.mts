@@ -296,9 +296,7 @@ const createResult = async (
         default: {
           mut_resultToWrite.push(...rawSchemaToString(schemaToPrint));
 
-          const schemasWithDefaults = schema.map((s) =>
-            addDefaultValuesToDescription(s),
-          );
+          const schemasWithDefaults = schema.map(addDefaultValuesToDescription);
 
           /* e.g. "export type Options = { ... };" */
           const optionsTypeList: readonly string[] = await Promise.all(

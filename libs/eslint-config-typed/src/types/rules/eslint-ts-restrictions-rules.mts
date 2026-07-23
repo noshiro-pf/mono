@@ -280,6 +280,21 @@ namespace NoUnnecessaryCoalesceUndefined {
 }
 
 /**
+ * @description Replace a redundant arrow wrapper with the function itself (`(a) => f(a)` → `f`) or, when the callee has a curried version, its curried form (`(a) => f(a, ...rest)` → `f(...rest)`).
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferCurriedCall {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow calling a mutating array method on a defensive `Array.from()` copy of an array (e.g. `Array.from(x).sort()`); use the non-mutating counterpart on the original array instead (e.g. `x.toSorted()`)
  *
  *  ```md
@@ -301,6 +316,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-string-spread': NoStringSpread.RuleEntry;
   'ts-restrictions/no-unnecessary-array-from': NoUnnecessaryArrayFrom.RuleEntry;
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
+  'ts-restrictions/prefer-curried-call': PreferCurriedCall.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
 }>;
 
