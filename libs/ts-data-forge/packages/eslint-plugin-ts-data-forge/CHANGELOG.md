@@ -1,5 +1,13 @@
 # eslint-plugin-ts-data-forge
 
+## 0.1.6
+
+### Patch Changes
+
+- 59bfcbe: Fix how dependencies are specified.
+- Updated dependencies [59bfcbe]
+    - ts-data-forge@12.2.1
+
 ## 0.1.5
 
 ### Patch Changes

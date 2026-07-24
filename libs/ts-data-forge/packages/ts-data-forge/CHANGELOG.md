@@ -1,5 +1,11 @@
 # ts-data-forge
 
+## 12.2.1
+
+### Patch Changes
+
+- 59bfcbe: Fix how dependencies are specified.
+
 ## 12.2.0
 
 ### Minor Changes
