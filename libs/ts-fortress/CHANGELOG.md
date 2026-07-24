@@ -1,3 +1,9 @@
+## [11.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.0...v11.0.1) (2026-07-24)
+
+### Bug Fixes
+
+- report violated constraint in string/number/bigint validation errors ([#353](https://github.com/noshiro-pf/ts-fortress/issues/353)) ([d43d1a9](https://github.com/noshiro-pf/ts-fortress/commit/d43d1a9fc61e919b49bdee98fca83eca04efafa2))
+
 # [11.0.0](https://github.com/noshiro-pf/ts-fortress/compare/v10.0.0...v11.0.0) (2026-07-20)
 
 - feat!: adopt brand-based NonEmptyArray from ts-type-forge / ts-data-forge ([#345](https://github.com/noshiro-pf/ts-fortress/issues/345)) ([950b5eb](https://github.com/noshiro-pf/ts-fortress/commit/950b5eb88f27a6f9c2f513f6dec94dd1c552eb64))
