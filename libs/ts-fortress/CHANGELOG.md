@@ -1,3 +1,9 @@
+## [11.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.1...v11.0.2) (2026-07-24)
+
+### Bug Fixes
+
+- update dependencies ([#354](https://github.com/noshiro-pf/ts-fortress/issues/354)) ([451ce68](https://github.com/noshiro-pf/ts-fortress/commit/451ce689dc4eb2e49dbc279e75c64b5cb948cce8))
+
 ## [11.0.1](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.0...v11.0.1) (2026-07-24)
 
 ### Bug Fixes
