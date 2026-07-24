@@ -249,7 +249,7 @@ const createDetailsMessage = (
 
     case 'enum':
       return `expected one of { ${error.details.values
-        .map((value) => String(value))
+        .map(String)
         .join(', ')} } but${actualValueStr} was passed.`;
 
     case 'union':
@@ -395,7 +395,7 @@ export const prependPathToValidationErrors = (
 ): readonly ValidationError[] =>
   errors.map((error) => ({
     ...error,
-    path: [pathSegment, ...error.path],
+    path: Arr.toUnshifted(pathSegment)(error.path),
   }));
 
 /**

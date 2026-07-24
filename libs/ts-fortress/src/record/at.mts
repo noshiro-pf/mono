@@ -101,7 +101,7 @@ export function at(
   const hasOptionalMember = memberTypes.some(isOptionalProperty);
 
   const collected: readonly Type<unknown>[] = hasOptionalMember
-    ? ([...memberTypes, undefinedType] as const)
+    ? Arr.toPushed(memberTypes, undefinedType)
     : memberTypes;
 
   if (Arr.isMinLengthTuple(collected, 2)) {

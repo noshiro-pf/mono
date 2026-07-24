@@ -1,18 +1,20 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
-  eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
+import {
+  eslintPluginTsDataForge,
+  type EslintTsDataForgeRules,
+} from 'eslint-plugin-ts-data-forge';
 
 const thisDir = import.meta.dirname;
 
 export default [
   {
     ignores: [
-      '.eslintrc.cjs',
       'docs/**',
       'agents/**',
       // test/dist_/ has its own tsconfig and type-checks the built dist/
@@ -27,12 +29,33 @@ export default [
     packageDirs: [thisDir],
   }),
 
-  eslintConfigForTsDataForge(),
+  {
+    plugins: { 'ts-data-forge': eslintPluginTsDataForge },
+    rules: {
+      'ts-data-forge/prefer-canonical-array-slicing': 'error',
+      'ts-data-forge/prefer-arr-is-min-length-array': 'error',
+      'ts-data-forge/prefer-arr-is-max-length-array': 'error',
+      'ts-data-forge/prefer-arr-is-bounded-length-array': 'error',
+      'ts-data-forge/prefer-arr-is-fixed-length-array': 'error',
+      'ts-data-forge/prefer-arr-is-array': 'error',
+      'ts-data-forge/prefer-arr-is-non-empty': 'error',
+      'ts-data-forge/prefer-arr-sum': 'error',
+      'ts-data-forge/prefer-as-int': 'error',
+      'ts-data-forge/prefer-is-non-null-object': 'error',
+      'ts-data-forge/prefer-range-for-loop': 'error',
+      'ts-data-forge/prefer-is-record-and-has-key': 'error',
+      'ts-data-forge/prefer-num-safe-parse-int': 'error',
+      'ts-data-forge/prefer-num-safe-parse-float': 'error',
+      'ts-data-forge/no-unnecessary-type-guard': ['error', { ignore: [] }],
+      'ts-data-forge/prefer-comparison-over-nullish-guard': 'error',
+    } satisfies EslintTsDataForgeRules,
+  },
 
   eslintConfigForVitest(),
 
   {
     rules: defineKnownRules({
+      'import-x/no-unused-modules': 'off',
       'unicorn/prefer-temporal': 'off',
     }),
   },
@@ -71,15 +94,6 @@ export default [
     }),
   },
 
-  {
-    files: ['src/**'],
-    rules: defineKnownRules({
-      'import-x/no-unused-modules': [
-        'error',
-        { unusedExports: true, ignoreExports: ['src/entry-point.mts'] },
-      ],
-    }),
-  },
   {
     files: ['src/entry-point.mts'],
     rules: defineKnownRules({
