@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@sindresorhus/is": "^8.1.0",
-    "ts-type-forge": "^7.0.0"
+    "ts-type-forge": "7.x"
   },
   "devDependencies": {
     "@emotion/react": "11.14.0",

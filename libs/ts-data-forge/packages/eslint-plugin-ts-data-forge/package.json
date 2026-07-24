@@ -56,7 +56,7 @@
   "dependencies": {
     "@typescript-eslint/utils": "8.63.0",
     "ts-data-forge": "workspace:*",
-    "ts-type-forge": "^7.0.0"
+    "ts-type-forge": "7.x"
   },
   "devDependencies": {
     "@typescript-eslint/parser": "8.63.0",
