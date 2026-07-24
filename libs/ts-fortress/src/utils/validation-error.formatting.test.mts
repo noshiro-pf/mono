@@ -56,4 +56,68 @@ describe('validation-error formatting details', () => {
       'Error at p: expected <number> type but <number> type value was passed.',
     );
   });
+
+  test('string-constraint detail renders a constraint-specific message', () => {
+    const msg = validationErrorToMessage(
+      {
+        path: ['name'],
+        actualValue: '',
+        expectedType: 'string',
+        typeName: 'string',
+        details: {
+          kind: 'string-constraint',
+          violation: { constraint: 'nonempty', value: true },
+        },
+      },
+      20,
+    );
+
+    expect(msg).toBe(
+      'Error at name: expected a non-empty string but an empty string was passed.',
+    );
+  });
+
+  test('string-constraint minLength reports the actual length even for a long value', () => {
+    const long = 'x'.repeat(50);
+
+    const msg = validationErrorToMessage(
+      {
+        path: [],
+        actualValue: long,
+        expectedType: 'string',
+        typeName: 'string',
+        details: {
+          kind: 'string-constraint',
+          violation: { constraint: 'minLength', value: 100 },
+        },
+      },
+      10,
+    );
+
+    // The value itself is omitted (too long), but the length is still shown.
+    expect(msg).toBe(
+      'Error: expected a string of length 100 or more but a string of length 50 was passed.',
+    );
+  });
+
+  test('numeric-constraint detail renders the numeric-type noun', () => {
+    const msg = validationErrorToMessage(
+      {
+        path: ['count'],
+        actualValue: -1n,
+        expectedType: 'bigint',
+        typeName: 'bigint',
+        details: {
+          kind: 'numeric-constraint',
+          numericType: 'bigint',
+          violation: { constraint: 'positive', value: true },
+        },
+      },
+      20,
+    );
+
+    expect(msg).toBe(
+      'Error at count: expected a positive bigint but `-1n` was passed.',
+    );
+  });
 });

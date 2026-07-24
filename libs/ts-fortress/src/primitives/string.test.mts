@@ -8,7 +8,16 @@ import {
   type NonEmptyString,
 } from 'ts-type-forge';
 import { type Type, type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { string } from './string.mjs';
+
+const messageOf = (type: Type<string>, value: unknown): string => {
+  const result = type.validate(value);
+
+  assert.isTrue(Result.isErr(result));
+
+  return validationErrorsToMessages(Result.unwrapErrThrow(result)).join('\n');
+};
 
 describe(string, () => {
   describe('default value', () => {
@@ -752,5 +761,90 @@ describe('string with constraints', () => {
         );
       });
     });
+  });
+});
+
+describe('string constraint validation messages', () => {
+  test('nonempty reports the violated constraint', () => {
+    expect(messageOf(string('x', { nonempty: true }), '')).toBe(
+      'Error: expected a non-empty string but an empty string was passed.',
+    );
+  });
+
+  test('minLength reports the expected and actual length', () => {
+    expect(messageOf(string('xxx', { minLength: 3 }), 'ab')).toBe(
+      'Error: expected a string of length 3 or more but a string of length 2 "ab" was passed.',
+    );
+  });
+
+  test('maxLength reports the expected and actual length', () => {
+    expect(messageOf(string('x', { maxLength: 5 }), 'excessive')).toBe(
+      'Error: expected a string of length 5 or less but a string of length 9 "excessive" was passed.',
+    );
+  });
+
+  test('startsWith reports the required prefix', () => {
+    expect(messageOf(string('ab', { startsWith: 'ab' }), 'cab')).toBe(
+      'Error: expected a string starting with "ab" but "cab" was passed.',
+    );
+  });
+
+  test('endsWith reports the required suffix', () => {
+    expect(messageOf(string('xba', { endsWith: 'ba' }), 'abc')).toBe(
+      'Error: expected a string ending with "ba" but "abc" was passed.',
+    );
+  });
+
+  test('includes reports the required substring', () => {
+    expect(messageOf(string('def', { includes: 'def' }), 'xyz')).toBe(
+      'Error: expected a string containing "def" but "xyz" was passed.',
+    );
+  });
+
+  test('uppercase reports the casing constraint', () => {
+    expect(messageOf(string('ABC', { uppercase: true }), 'abc')).toBe(
+      'Error: expected an uppercase string but "abc" was passed.',
+    );
+  });
+
+  test('lowercase reports the casing constraint', () => {
+    expect(messageOf(string('abc', { lowercase: true }), 'ABC')).toBe(
+      'Error: expected a lowercase string but "ABC" was passed.',
+    );
+  });
+
+  test('regex reports the pattern source', () => {
+    expect(messageOf(string('12', { regex: /^\d+$/u }), 'abc')).toBe(
+      String.raw`Error: expected a string matching /^\d+$/ but "abc" was passed.`,
+    );
+  });
+
+  test('reports the first failing constraint when several are set', () => {
+    const type = string('token', {
+      nonempty: true,
+      minLength: 3,
+      maxLength: 8,
+    });
+
+    expect(messageOf(type, 'hi')).toBe(
+      'Error: expected a string of length 3 or more but a string of length 2 "hi" was passed.',
+    );
+  });
+
+  test('keeps the field path prefix for nested constraint failures', () => {
+    const type = string('token', { minLength: 3 });
+
+    const result = type.validate('ab');
+
+    assert.isTrue(Result.isErr(result));
+
+    const errors = Result.unwrapErrThrow(result).map((e) => ({
+      ...e,
+      path: ['field'] as const,
+    }));
+
+    assert.deepStrictEqual(validationErrorsToMessages(errors), [
+      'Error at field: expected a string of length 3 or more but a string of length 2 "ab" was passed.',
+    ]);
   });
 });

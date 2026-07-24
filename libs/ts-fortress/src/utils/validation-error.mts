@@ -80,6 +80,68 @@ export type ValidationErrorDetails = Readonly<
       kind: 'brand';
       description: string;
     }
+  | {
+      kind: 'string-constraint';
+      violation: StringConstraintViolation;
+    }
+  | {
+      kind: 'numeric-constraint';
+      numericType: 'bigint' | 'number';
+      violation: NumericConstraintViolation;
+    }
+>;
+
+/**
+ * Describes which `string` constraint (see the `string` codec) a value failed,
+ * together with the constraint's configured value. `value` doubles as the
+ * value shown in the constructor-time "defaultValue ... does not satisfy the
+ * constraint ..." message, so it mirrors the raw constraint input (the flag
+ * constraints carry `true`, `regex` carries its `source`).
+ */
+export type StringConstraintViolation = Readonly<
+  | {
+      constraint: 'nonempty' | 'lowercase' | 'uppercase';
+      value: true;
+    }
+  | {
+      constraint: 'minLength' | 'maxLength';
+      value: number;
+    }
+  | {
+      constraint: 'startsWith' | 'endsWith' | 'includes';
+      value: string;
+    }
+  | {
+      constraint: 'regex';
+      value: string;
+    }
+>;
+
+/**
+ * Describes which numeric constraint (see the `number` / `bigint` codecs) a
+ * value failed. Range bounds are stringified so a single type can describe both
+ * `number` and `bigint` violations; `value` doubles as the value shown in the
+ * constructor-time "defaultValue ... does not satisfy the constraint ..."
+ * message.
+ */
+export type NumericConstraintViolation = Readonly<
+  | {
+      constraint:
+        | 'finite'
+        | 'int'
+        | 'safeInteger'
+        | 'nonZero'
+        | 'negative'
+        | 'nonNegative'
+        | 'positive'
+        | 'nonPositive';
+      value: true;
+    }
+  | {
+      constraint:
+        'gt' | 'gte' | 'min' | 'lt' | 'lte' | 'max' | 'multipleOf' | 'step';
+      value: string;
+    }
 >;
 
 /**
@@ -210,6 +272,107 @@ const createDetailsMessage = (
 
     case 'brand':
       return `expected value to satisfy constraint: ${error.details.description}.`;
+
+    case 'string-constraint':
+      return stringConstraintToMessage(
+        error.details.violation,
+        error.actualValue,
+        actualValueStr,
+      );
+
+    case 'numeric-constraint':
+      return numericConstraintToMessage(
+        error.details.numericType,
+        error.details.violation,
+        actualValueStr,
+      );
+  }
+};
+
+const stringConstraintToMessage = (
+  violation: StringConstraintViolation,
+  actualValue: unknown,
+  actualValueStr: string,
+): string => {
+  const actualLength = isString(actualValue) ? actualValue.length : 0;
+
+  switch (violation.constraint) {
+    case 'nonempty':
+      return 'expected a non-empty string but an empty string was passed.';
+
+    case 'minLength':
+      return `expected a string of length ${violation.value} or more but a string of length ${actualLength}${actualValueStr} was passed.`;
+
+    case 'maxLength':
+      return `expected a string of length ${violation.value} or less but a string of length ${actualLength}${actualValueStr} was passed.`;
+
+    case 'startsWith':
+      return `expected a string starting with "${violation.value}" but${actualValueStr} was passed.`;
+
+    case 'endsWith':
+      return `expected a string ending with "${violation.value}" but${actualValueStr} was passed.`;
+
+    case 'includes':
+      return `expected a string containing "${violation.value}" but${actualValueStr} was passed.`;
+
+    case 'uppercase':
+      return `expected an uppercase string but${actualValueStr} was passed.`;
+
+    case 'lowercase':
+      return `expected a lowercase string but${actualValueStr} was passed.`;
+
+    case 'regex':
+      return `expected a string matching /${violation.value}/ but${actualValueStr} was passed.`;
+  }
+};
+
+const numericConstraintToMessage = (
+  numericType: 'bigint' | 'number',
+  violation: NumericConstraintViolation,
+  actualValueStr: string,
+): string => {
+  switch (violation.constraint) {
+    case 'finite':
+      return `expected a finite number but${actualValueStr} was passed.`;
+
+    case 'int':
+      return `expected an integer but${actualValueStr} was passed.`;
+
+    case 'safeInteger':
+      return `expected a safe integer but${actualValueStr} was passed.`;
+
+    case 'nonZero':
+      return `expected a non-zero ${numericType} but${actualValueStr} was passed.`;
+
+    case 'negative':
+      return `expected a negative ${numericType} but${actualValueStr} was passed.`;
+
+    case 'nonNegative':
+      return `expected a non-negative ${numericType} but${actualValueStr} was passed.`;
+
+    case 'positive':
+      return `expected a positive ${numericType} but${actualValueStr} was passed.`;
+
+    case 'nonPositive':
+      return `expected a non-positive ${numericType} but${actualValueStr} was passed.`;
+
+    case 'gt':
+      return `expected a ${numericType} greater than ${violation.value} but${actualValueStr} was passed.`;
+
+    case 'gte':
+    case 'min':
+      return `expected a ${numericType} greater than or equal to ${violation.value} but${actualValueStr} was passed.`;
+
+    case 'lt':
+      return `expected a ${numericType} less than ${violation.value} but${actualValueStr} was passed.`;
+
+    case 'lte':
+    case 'max':
+      return `expected a ${numericType} less than or equal to ${violation.value} but${actualValueStr} was passed.`;
+
+    case 'multipleOf':
+    case 'step':
+      return `expected a ${numericType} to be a multiple of ${violation.value} but${actualValueStr} was passed.`;
   }
 };
 

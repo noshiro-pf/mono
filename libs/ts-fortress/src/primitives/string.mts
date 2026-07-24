@@ -1,4 +1,3 @@
-import { isRegExp } from '@sindresorhus/is';
 import { Arr, expectType, isString, PositiveInt, Result } from 'ts-data-forge';
 import {
   type MaxLengthString,
@@ -9,7 +8,10 @@ import {
 } from 'ts-type-forge';
 import { refine } from '../other-types/index.mjs';
 import { type Type } from '../type.mjs';
-import { createPrimitiveType } from '../utils/index.mjs';
+import {
+  createPrimitiveType,
+  type StringConstraintViolation,
+} from '../utils/index.mjs';
 
 export function string(defaultValue?: string): Type<string>;
 
@@ -48,7 +50,12 @@ export function string<C extends RawConstraints>(
   const defaultValueConstraintsCheck = constraintsPredicate(defaultValue);
 
   if (Result.isErr(defaultValueConstraintsCheck)) {
-    throw new Error(defaultValueConstraintsCheck.value);
+    throw new Error(
+      defaultValueErrorMessage(
+        defaultValue,
+        defaultValueConstraintsCheck.value,
+      ),
+    );
   }
 
   return refine({
@@ -56,6 +63,13 @@ export function string<C extends RawConstraints>(
     defaultValue,
     is: (value): value is string => Result.isOk(constraintsPredicate(value)),
     typeName: 'string',
+    getConstraintDetails: (value) => {
+      const result = constraintsPredicate(value);
+
+      return Result.isErr(result)
+        ? { kind: 'string-constraint', violation: result.value }
+        : undefined;
+    },
   });
 }
 
@@ -260,7 +274,7 @@ const validateLengthConstraint = (
 
 const createConstraintsPredicate =
   (constraints: Constraints) =>
-  (value: string): Result<true, string> => {
+  (value: string): Result<true, StringConstraintViolation> => {
     const {
       nonempty,
       minLength,
@@ -277,47 +291,49 @@ const createConstraintsPredicate =
     expectType<keyof typeof _rest, never>('=');
 
     if (nonempty === true && value.length === 0) {
-      return Result.err(errorMessage(value, 'nonempty', true));
+      return Result.err({ constraint: 'nonempty', value: true } as const);
     }
 
     if (minLength !== undefined && value.length < minLength) {
-      return Result.err(errorMessage(value, 'minLength', minLength));
+      return Result.err({ constraint: 'minLength', value: minLength } as const);
     }
 
     if (maxLength !== undefined && value.length > maxLength) {
-      return Result.err(errorMessage(value, 'maxLength', maxLength));
+      return Result.err({ constraint: 'maxLength', value: maxLength } as const);
     }
 
     if (startsWith !== undefined && !value.startsWith(startsWith)) {
-      return Result.err(errorMessage(value, 'startsWith', startsWith));
+      return Result.err({
+        constraint: 'startsWith',
+        value: startsWith,
+      } as const);
     }
 
     if (endsWith !== undefined && !value.endsWith(endsWith)) {
-      return Result.err(errorMessage(value, 'endsWith', endsWith));
+      return Result.err({ constraint: 'endsWith', value: endsWith } as const);
     }
 
     if (includes !== undefined && !value.includes(includes)) {
-      return Result.err(errorMessage(value, 'includes', includes));
+      return Result.err({ constraint: 'includes', value: includes } as const);
     }
 
     if (uppercase === true && value !== value.toUpperCase()) {
-      return Result.err(errorMessage(value, 'uppercase', true));
+      return Result.err({ constraint: 'uppercase', value: true } as const);
     }
 
     if (lowercase === true && value !== value.toLowerCase()) {
-      return Result.err(errorMessage(value, 'lowercase', true));
+      return Result.err({ constraint: 'lowercase', value: true } as const);
     }
 
     if (regex !== undefined && !regex.test(value)) {
-      return Result.err(errorMessage(value, 'regex', regex));
+      return Result.err({ constraint: 'regex', value: regex.source } as const);
     }
 
     return Result.ok(true);
   };
 
-const errorMessage = (
+const defaultValueErrorMessage = (
   value: string,
-  constraintName: string,
-  constraintValue: string | number | boolean | RegExp,
+  violation: StringConstraintViolation,
 ): string =>
-  `defaultValue "${value}" for string does not satisfy the constraint ${constraintName} = ${isRegExp(constraintValue) ? constraintValue.source : constraintValue}` as const;
+  `defaultValue "${value}" for string does not satisfy the constraint ${violation.constraint} = ${violation.value}` as const;

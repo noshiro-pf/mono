@@ -3,6 +3,14 @@ import { type Type, type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { bigint } from './bigint.mjs';
 
+const messageOf = (type: Type<bigint>, value: unknown): string => {
+  const result = type.validate(value);
+
+  assert.isTrue(Result.isErr(result));
+
+  return validationErrorsToMessages(Result.unwrapErrThrow(result)).join('\n');
+};
+
 describe(bigint, () => {
   const targetType = bigint(0n);
 
@@ -509,5 +517,79 @@ describe('bigint with constraints', () => {
         ).toThrow('max = 10');
       });
     });
+  });
+});
+
+describe('bigint constraint validation messages', () => {
+  test('nonZero reports the violated constraint', () => {
+    expect(messageOf(bigint(1n, { nonZero: true }), 0n)).toBe(
+      'Error: expected a non-zero bigint but `0n` was passed.',
+    );
+  });
+
+  test('negative reports the violated constraint', () => {
+    expect(messageOf(bigint(-1n, { negative: true }), 3n)).toBe(
+      'Error: expected a negative bigint but `3n` was passed.',
+    );
+  });
+
+  test('nonNegative reports the violated constraint', () => {
+    expect(messageOf(bigint(0n, { nonNegative: true }), -3n)).toBe(
+      'Error: expected a non-negative bigint but `-3n` was passed.',
+    );
+  });
+
+  test('positive reports the violated constraint', () => {
+    expect(messageOf(bigint(1n, { positive: true }), -1n)).toBe(
+      'Error: expected a positive bigint but `-1n` was passed.',
+    );
+  });
+
+  test('nonPositive reports the violated constraint', () => {
+    expect(messageOf(bigint(0n, { nonPositive: true }), 5n)).toBe(
+      'Error: expected a non-positive bigint but `5n` was passed.',
+    );
+  });
+
+  test('gt reports the bound', () => {
+    expect(messageOf(bigint(1n, { gt: 0n }), -3n)).toBe(
+      'Error: expected a bigint greater than 0 but `-3n` was passed.',
+    );
+  });
+
+  test('gte and min report the bound', () => {
+    expect(messageOf(bigint(10n, { gte: 10n }), 5n)).toBe(
+      'Error: expected a bigint greater than or equal to 10 but `5n` was passed.',
+    );
+
+    expect(messageOf(bigint(10n, { min: 10n }), 5n)).toBe(
+      'Error: expected a bigint greater than or equal to 10 but `5n` was passed.',
+    );
+  });
+
+  test('lt reports the bound', () => {
+    expect(messageOf(bigint(1n, { lt: 5n }), 5n)).toBe(
+      'Error: expected a bigint less than 5 but `5n` was passed.',
+    );
+  });
+
+  test('lte and max report the bound', () => {
+    expect(messageOf(bigint(1n, { lte: 5n }), 7n)).toBe(
+      'Error: expected a bigint less than or equal to 5 but `7n` was passed.',
+    );
+
+    expect(messageOf(bigint(1n, { max: 5n }), 7n)).toBe(
+      'Error: expected a bigint less than or equal to 5 but `7n` was passed.',
+    );
+  });
+
+  test('multipleOf and step report the divisor', () => {
+    expect(messageOf(bigint(3n, { multipleOf: 3n }), 7n)).toBe(
+      'Error: expected a bigint to be a multiple of 3 but `7n` was passed.',
+    );
+
+    expect(messageOf(bigint(4n, { step: 2n }), 7n)).toBe(
+      'Error: expected a bigint to be a multiple of 2 but `7n` was passed.',
+    );
   });
 });

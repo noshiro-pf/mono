@@ -7,7 +7,16 @@ import {
   type PositiveNumber,
 } from 'ts-type-forge';
 import { type Type, type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
 import { number } from './number.mjs';
+
+const messageOf = (type: Type<number>, value: unknown): string => {
+  const result = type.validate(value);
+
+  assert.isTrue(Result.isErr(result));
+
+  return validationErrorsToMessages(Result.unwrapErrThrow(result)).join('\n');
+};
 
 describe(number, () => {
   const targetType = number();
@@ -560,5 +569,97 @@ describe('number with constraints', () => {
         ).toThrow('max = 10');
       });
     });
+  });
+});
+
+describe('number constraint validation messages', () => {
+  test('finite reports the violated constraint', () => {
+    expect(
+      messageOf(number(0, { finite: true }), Number.POSITIVE_INFINITY),
+    ).toBe('Error: expected a finite number but `Infinity` was passed.');
+  });
+
+  test('int reports the violated constraint', () => {
+    expect(messageOf(number(2, { int: true }), 1.5)).toBe(
+      'Error: expected an integer but `1.5` was passed.',
+    );
+  });
+
+  test('safeInteger reports the violated constraint', () => {
+    expect(messageOf(number(2, { safeInteger: true }), 2 ** 53)).toBe(
+      'Error: expected a safe integer but `9007199254740992` was passed.',
+    );
+  });
+
+  test('nonZero reports the violated constraint', () => {
+    expect(messageOf(number(1, { nonZero: true }), 0)).toBe(
+      'Error: expected a non-zero number but `0` was passed.',
+    );
+  });
+
+  test('negative reports the violated constraint', () => {
+    expect(messageOf(number(-1, { negative: true }), 3)).toBe(
+      'Error: expected a negative number but `3` was passed.',
+    );
+  });
+
+  test('nonNegative reports the violated constraint', () => {
+    expect(messageOf(number(0, { nonNegative: true }), -3)).toBe(
+      'Error: expected a non-negative number but `-3` was passed.',
+    );
+  });
+
+  test('positive reports the violated constraint', () => {
+    expect(messageOf(number(1, { positive: true }), -1)).toBe(
+      'Error: expected a positive number but `-1` was passed.',
+    );
+  });
+
+  test('nonPositive reports the violated constraint', () => {
+    expect(messageOf(number(0, { nonPositive: true }), 5)).toBe(
+      'Error: expected a non-positive number but `5` was passed.',
+    );
+  });
+
+  test('gt reports the bound', () => {
+    expect(messageOf(number(1, { gt: 0 }), -3)).toBe(
+      'Error: expected a number greater than 0 but `-3` was passed.',
+    );
+  });
+
+  test('gte and min report the bound', () => {
+    expect(messageOf(number(10, { gte: 10 }), 5)).toBe(
+      'Error: expected a number greater than or equal to 10 but `5` was passed.',
+    );
+
+    expect(messageOf(number(10, { min: 10 }), 5)).toBe(
+      'Error: expected a number greater than or equal to 10 but `5` was passed.',
+    );
+  });
+
+  test('lt reports the bound', () => {
+    expect(messageOf(number(1, { lt: 5 }), 5)).toBe(
+      'Error: expected a number less than 5 but `5` was passed.',
+    );
+  });
+
+  test('lte and max report the bound', () => {
+    expect(messageOf(number(1, { lte: 5 }), 7)).toBe(
+      'Error: expected a number less than or equal to 5 but `7` was passed.',
+    );
+
+    expect(messageOf(number(1, { max: 5 }), 7)).toBe(
+      'Error: expected a number less than or equal to 5 but `7` was passed.',
+    );
+  });
+
+  test('multipleOf and step report the divisor', () => {
+    expect(messageOf(number(3, { multipleOf: 3 }), 7)).toBe(
+      'Error: expected a number to be a multiple of 3 but `7` was passed.',
+    );
+
+    expect(messageOf(number(4, { step: 2 }), 7)).toBe(
+      'Error: expected a number to be a multiple of 2 but `7` was passed.',
+    );
   });
 });

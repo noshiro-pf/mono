@@ -3,7 +3,10 @@ import { Arr, expectType, isBigint, Result } from 'ts-data-forge';
 import { type BoolAnd, type BoolNot } from 'ts-type-forge';
 import { refine } from '../other-types/index.mjs';
 import { type Type } from '../type.mjs';
-import { createPrimitiveType } from '../utils/index.mjs';
+import {
+  createPrimitiveType,
+  type NumericConstraintViolation,
+} from '../utils/index.mjs';
 
 type NumberType = bigint;
 
@@ -36,7 +39,12 @@ export function bigint<C extends Constraints>(
   const defaultValueConstraintsCheck = constraintsPredicate(defaultValue);
 
   if (Result.isErr(defaultValueConstraintsCheck)) {
-    throw new Error(defaultValueConstraintsCheck.value);
+    throw new Error(
+      defaultValueErrorMessage(
+        defaultValue,
+        defaultValueConstraintsCheck.value,
+      ),
+    );
   }
 
   return refine({
@@ -45,6 +53,17 @@ export function bigint<C extends Constraints>(
     is: (value): value is NumberType =>
       Result.isOk(constraintsPredicate(value)),
     typeName: 'bigint',
+    getConstraintDetails: (value) => {
+      const result = constraintsPredicate(value);
+
+      return Result.isErr(result)
+        ? {
+            kind: 'numeric-constraint',
+            numericType: 'bigint',
+            violation: result.value,
+          }
+        : undefined;
+    },
   });
 }
 
@@ -144,7 +163,7 @@ type IsNonPositive<N extends NumberType> = BoolNot<IsPositive<N>>;
 
 const createConstraintsPredicate =
   (constraints: Constraints) =>
-  (value: NumberType): Result<true, string> => {
+  (value: NumberType): Result<true, NumericConstraintViolation> => {
     const {
       nonZero,
       negative,
@@ -165,47 +184,47 @@ const createConstraintsPredicate =
     expectType<keyof typeof _rest, never>('=');
 
     if (nonZero === true && !(value !== 0n)) {
-      return Result.err(errorMessage(value, 'nonZero', true));
+      return Result.err({ constraint: 'nonZero', value: true } as const);
     }
 
     if (negative === true && !(value < 0n)) {
-      return Result.err(errorMessage(value, 'negative', true));
+      return Result.err({ constraint: 'negative', value: true } as const);
     }
 
     if (nonNegative === true && !(value >= 0n)) {
-      return Result.err(errorMessage(value, 'nonNegative', true));
+      return Result.err({ constraint: 'nonNegative', value: true } as const);
     }
 
     if (positive === true && !(value > 0n)) {
-      return Result.err(errorMessage(value, 'positive', true));
+      return Result.err({ constraint: 'positive', value: true } as const);
     }
 
     if (nonPositive === true && !(value <= 0n)) {
-      return Result.err(errorMessage(value, 'nonPositive', true));
+      return Result.err({ constraint: 'nonPositive', value: true } as const);
     }
 
     if (gt !== undefined && !(value > gt)) {
-      return Result.err(errorMessage(value, 'gt', gt));
+      return Result.err({ constraint: 'gt', value: String(gt) } as const);
     }
 
     if (gte !== undefined && !(value >= gte)) {
-      return Result.err(errorMessage(value, 'gte', gte));
+      return Result.err({ constraint: 'gte', value: String(gte) } as const);
     }
 
     if (min !== undefined && !(value >= min)) {
-      return Result.err(errorMessage(value, 'min', min));
+      return Result.err({ constraint: 'min', value: String(min) } as const);
     }
 
     if (lt !== undefined && !(value < lt)) {
-      return Result.err(errorMessage(value, 'lt', lt));
+      return Result.err({ constraint: 'lt', value: String(lt) } as const);
     }
 
     if (lte !== undefined && !(value <= lte)) {
-      return Result.err(errorMessage(value, 'lte', lte));
+      return Result.err({ constraint: 'lte', value: String(lte) } as const);
     }
 
     if (max !== undefined && !(value <= max)) {
-      return Result.err(errorMessage(value, 'max', max));
+      return Result.err({ constraint: 'max', value: String(max) } as const);
     }
 
     // `value % 0n` throws a RangeError, so the zero divisor is handled
@@ -213,29 +232,37 @@ const createConstraintsPredicate =
     if (multipleOf !== undefined) {
       if (multipleOf === 0n) {
         if (value !== 0n) {
-          return Result.err(errorMessage(value, 'multipleOf', multipleOf));
+          return Result.err({
+            constraint: 'multipleOf',
+            value: String(multipleOf),
+          } as const);
         }
       } else if (value % multipleOf !== 0n) {
-        return Result.err(errorMessage(value, 'multipleOf', multipleOf));
+        return Result.err({
+          constraint: 'multipleOf',
+          value: String(multipleOf),
+        } as const);
       }
     }
 
     if (step !== undefined) {
       if (step === 0n) {
         if (value !== 0n) {
-          return Result.err(errorMessage(value, 'step', step));
+          return Result.err({
+            constraint: 'step',
+            value: String(step),
+          } as const);
         }
       } else if (value % step !== 0n) {
-        return Result.err(errorMessage(value, 'step', step));
+        return Result.err({ constraint: 'step', value: String(step) } as const);
       }
     }
 
     return Result.ok(true);
   };
 
-const errorMessage = (
+const defaultValueErrorMessage = (
   value: NumberType,
-  constraintName: string,
-  constraintValue: NumberType | boolean,
+  violation: NumericConstraintViolation,
 ): string =>
-  `defaultValue [${value}] for bigint does not satisfy the constraint ${constraintName} = ${constraintValue}` as const;
+  `defaultValue [${value}] for bigint does not satisfy the constraint ${violation.constraint} = ${violation.value}` as const;

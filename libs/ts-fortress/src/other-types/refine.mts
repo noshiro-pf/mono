@@ -5,6 +5,7 @@ import {
   createPrimitiveValidationError,
   createType,
   type ValidationError,
+  type ValidationErrorDetails,
 } from '../utils/index.mjs';
 
 export const refine = <
@@ -15,11 +16,19 @@ export const refine = <
   is,
   defaultValue,
   typeName = `${baseType.typeName} refined`,
+  getConstraintDetails,
 }: Readonly<{
   baseType: Type<Base>;
   is: (a: Base) => a is R;
   defaultValue: R;
   typeName?: string;
+  /**
+   * Optional producer of structured error details for a value that passes the
+   * base type but fails `is`. Used by the built-in constrained primitives
+   * (`string` / `number` / `bigint`) to explain which constraint was violated;
+   * user-defined refinements can omit it and fall back to a generic message.
+   */
+  getConstraintDetails?: (a: Base) => ValidationErrorDetails | undefined;
 }>): Type<R> => {
   const validate: Type<R>['validate'] = (a) =>
     pipe(a)
@@ -34,7 +43,7 @@ export const refine = <
                   actualValue: a,
                   expectedType: typeName,
                   typeName,
-                  details: undefined,
+                  details: getConstraintDetails?.(res.value),
                 }),
               ]),
       ).value;
