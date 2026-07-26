@@ -111,9 +111,14 @@ export const formatFiles = async (
 
   const oxfmtBin = resolveOxfmtBin();
 
-  const result = await $(`node "${oxfmtBin}" --write ${quotedFiles}`, {
-    silent,
-  });
+  // `--no-error-on-unmatched-pattern` keeps Oxfmt from exiting non-zero when
+  // every file passed to it is excluded by an ignore rule. That is a normal
+  // situation here (e.g. formatting only files under a `.prettierignore`d
+  // `docs/` directory), not a failure.
+  const result = await $(
+    `node "${oxfmtBin}" --write --no-error-on-unmatched-pattern ${quotedFiles}`,
+    { silent },
+  );
 
   if (Result.isErr(result)) {
     if (!silent) {

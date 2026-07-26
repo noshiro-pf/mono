@@ -62,7 +62,7 @@
     "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "pnpm run z:format-uncommitted",
     "fmt:diff": "pnpm run z:format-diff-from origin/main",
-    "fmt:full": "organize-imports-cli tsconfig.json && oxfmt --write .",
+    "fmt:full": "organize-imports-cli tsconfig.json && oxfmt --write --no-error-on-unmatched-pattern .",
     "gi": "run-s gi:src fmt",
     "gi:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude cmd",
     "lint": "eslint .",
