@@ -27,9 +27,9 @@ jobs:
       fail-fast: true
       matrix:
         command:
-          - test
-          - test:cov
-          - test:browser
+          - ws:test
+          - ws:test:cov
+          - ws:test:browser
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -60,19 +60,19 @@ jobs:
 
       - name: Build src
         if: steps.check_diff_type.outputs.should_run == 'true'
-        run: pnpm run build:min
+        run: pnpm run ws:build:min
 
       - name: Install Playwright Browsers
-        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:browser'
         run: pnpm exec playwright install chromium
 
       - name: Run "${{ matrix.command }}"
-        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command != 'test:browser'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command != 'ws:test:browser'
         run: pnpm run ${{ matrix.command }}
 
       # Source - https://stackoverflow.com/a/71583518
-      - name: Run 'test:browser' with retry
-        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'test:browser'
+      - name: Run 'ws:test:browser' with retry
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:browser'
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
           timeout_minutes: 10
@@ -80,7 +80,7 @@ jobs:
           command: pnpm run ${{ matrix.command }}
 
       - name: Upload coverage reports to Codecov
-        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'test:cov'
+        if: steps.check_diff_type.outputs.should_run == 'true' && matrix.command == 'ws:test:cov'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           fail_ci_if_error: true
