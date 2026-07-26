@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate docs
+      - name: Build synstate
         run: pnpm --filter synstate run build
 
       - name: Generate docs
