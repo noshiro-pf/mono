@@ -1,5 +1,13 @@
 # ts-data-forge
 
+## 12.2.2
+
+### Patch Changes
+
+- 8ef64f1: chore(deps): bump actions/checkout from 7.0.0 to 7.0.1
+- 37cedcb: chore(deps): bump actions/setup-node from 6.4.0 to 7.0.0
+- 6cb1c29: chore(deps): bump anthropics/claude-code-action from 1.0.177 to 1.0.178
+
 ## 12.2.1
 
 ### Patch Changes
