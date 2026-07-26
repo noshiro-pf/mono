@@ -1,5 +1,4 @@
 /* eslint-disable unicorn/prefer-string-repeat */
-/* eslint-disable ts-data-forge/prefer-num-safe-parse-float */
 // Example: src/number/num.mts (Num.safeParseInt)
 import { Num, Result } from 'ts-data-forge';
 

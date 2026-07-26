@@ -39,21 +39,23 @@ export function sliceClamped<E>(
     | readonly [SizeType.ArgArrWithNegative, SizeType.ArgArrWithNegative]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 3: {
-      const [array, start, end] = args;
+    case 3:
+      return sliceClampedImpl(...args);
 
-      const startClamped = Num.clamp(0, array.length)(start);
-
-      // Ensure endClamped is not less than startClamped.
-      const endClamped = Num.clamp(startClamped, array.length)(end);
-
-      return array.slice(startClamped, endClamped);
-    }
-
-    case 2: {
-      const [start, end] = args;
-
-      return (array) => sliceClamped(array, start, end);
-    }
+    case 2:
+      return (array) => sliceClampedImpl(array, ...args);
   }
 }
+
+const sliceClampedImpl = <E,>(
+  array: readonly E[],
+  start: SizeType.ArgArrWithNegative,
+  end: SizeType.ArgArrWithNegative,
+): readonly E[] => {
+  const startClamped = Num.clamp(0, array.length)(start);
+
+  // Ensure endClamped is not less than startClamped.
+  const endClamped = Num.clamp(startClamped, array.length)(end);
+
+  return array.slice(startClamped, endClamped);
+};

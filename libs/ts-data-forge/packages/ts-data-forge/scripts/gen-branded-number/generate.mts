@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { brandedNumberConfigs } from './config.mjs';
 import { renderModule } from './render.mjs';
 
@@ -13,14 +13,14 @@ import { renderModule } from './render.mjs';
 const main = async (): Promise<void> => {
   for (const config of brandedNumberConfigs) {
     const filePath = path.resolve(
-      projectRootPath,
+      workspaceRootPath,
       `./src/number/${config.dir}/${config.kebabName}.mts`,
     );
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(filePath, renderModule(config));
 
-    console.info(`Generated ${path.relative(projectRootPath, filePath)}`);
+    console.info(`Generated ${path.relative(workspaceRootPath, filePath)}`);
   }
 };
 

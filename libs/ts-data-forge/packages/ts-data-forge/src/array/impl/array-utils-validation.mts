@@ -240,19 +240,18 @@ export function every<E>(
     | readonly [predicate: (a: E, index: SizeType.Arr) => boolean]
 ): boolean | ((array: readonly E[]) => boolean) {
   switch (args.length) {
-    case 2: {
-      const [array, predicate] = args;
+    case 2:
+      return everyImpl(...args);
 
-      return array.every((a, i) => predicate(a, asUint32(i)));
-    }
-
-    case 1: {
-      const [predicate] = args;
-
-      return (array) => every(array, predicate);
-    }
+    case 1:
+      return (array) => everyImpl(array, ...args);
   }
 }
+
+const everyImpl = <E,>(
+  array: readonly E[],
+  predicate: (a: E, index: SizeType.Arr) => boolean,
+): boolean => array.every((a, i) => predicate(a, asUint32(i)));
 
 /**
  * Tests whether at least one element in an array passes a test implemented by a predicate.
@@ -291,19 +290,18 @@ export function some<E>(
     | readonly [predicate: (a: E, index: SizeType.Arr) => boolean]
 ): boolean | ((array: readonly E[]) => boolean) {
   switch (args.length) {
-    case 2: {
-      const [array, predicate] = args;
+    case 2:
+      return someImpl(...args);
 
-      return array.some((a, i) => predicate(a, asUint32(i)));
-    }
-
-    case 1: {
-      const [predicate] = args;
-
-      return (array) => some(array, predicate);
-    }
+    case 1:
+      return (array) => someImpl(array, ...args);
   }
 }
+
+const someImpl = <E,>(
+  array: readonly E[],
+  predicate: (a: E, index: SizeType.Arr) => boolean,
+): boolean => array.some((a, i) => predicate(a, asUint32(i)));
 
 /**
  * Checks if an index is within the valid range of an array.

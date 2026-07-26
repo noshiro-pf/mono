@@ -67,16 +67,16 @@
   },
   "dependencies": {
     "@sindresorhus/is": "^8.1.0",
-    "ts-type-forge": "7.x"
+    "ts-type-forge": "~7.2.1"
   },
   "devDependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@mui/material": "9.2.0",
     "@types/react": "19.2.17",
-    "immer": "11.1.11",
+    "immer": "11.1.15",
     "react": "19.2.7",
-    "typedoc": "0.28.19",
+    "typedoc": "0.28.20",
     "typedoc-github-theme": "0.4.0"
   },
   "peerDependencies": {

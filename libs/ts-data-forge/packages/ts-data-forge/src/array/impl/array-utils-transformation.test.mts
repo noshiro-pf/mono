@@ -35,7 +35,7 @@ describe('Arr transformations', () => {
     test('should work with empty tuple', () => {
       const empty = [] as const;
 
-      const mappedEmpty = map(empty, (x) => String(x));
+      const mappedEmpty = map(empty, String);
 
       expectType<typeof mappedEmpty, readonly []>('=');
 

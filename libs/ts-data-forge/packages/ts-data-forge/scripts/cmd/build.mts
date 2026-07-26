@@ -4,14 +4,14 @@ import { rollup } from 'rollup';
 import { Arr, unknownToString } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
 import { type UnknownResult } from '../../src/functional/result/index.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 
-const distDir = path.resolve(projectRootPath, './dist');
+const distDir = path.resolve(workspaceRootPath, './dist');
 
 /**
  * The monorepo root, where the hoisted `node_modules` lives.
  */
-const monorepoRootPath = path.resolve(projectRootPath, '../..');
+const monorepoRootPath = path.resolve(workspaceRootPath, '../..');
 
 /**
  * The native TypeScript compiler (TypeScript >= 7). It is installed under the
@@ -119,7 +119,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     startMessage: 'Generating type declarations',
     action: () =>
       runCmdStep(
-        `node "${nativeTsc}" -p "${path.resolve(projectRootPath, './configs/tsconfig.build.json')}" --emitDeclarationOnly`,
+        `node "${nativeTsc}" -p "${path.resolve(workspaceRootPath, './configs/tsconfig.build.json')}" --emitDeclarationOnly`,
         'Type declaration generation failed',
       ),
     successMessage: 'Type declarations generated',

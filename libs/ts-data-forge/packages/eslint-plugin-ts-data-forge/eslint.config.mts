@@ -5,22 +5,26 @@ import {
   eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
-import { projectRootPath } from '../../scripts/project-root-path.mjs';
-
-const thisDir = import.meta.dirname;
+import { repositoryRootPath } from '../../scripts/repository-root-path.mjs';
+import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 export default [
   {
     ignores: ['dist/**'],
   },
   ...eslintConfigForTypeScript({
-    tsconfigRootDir: thisDir,
+    tsconfigRootDir: workspaceRootPath,
     tsconfigFileName: './tsconfig.json',
-    packageDirs: [thisDir, projectRootPath],
+    packageDirs: [workspaceRootPath, repositoryRootPath],
   }),
 
   eslintConfigForVitest(),
 
+  {
+    rules: defineKnownRules({
+      'import-x/no-unused-modules': 'off',
+    }),
+  },
   {
     // ESLint rule implementations are AST-heavy; these opinionated rules
     // conflict with idiomatic visitor/traversal code.

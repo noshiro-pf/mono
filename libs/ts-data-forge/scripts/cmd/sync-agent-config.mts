@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { repositoryRootPath } from '../repository-root-path.mjs';
 import { genAgentsMd } from './gen-agents-md.mjs';
 
 /**
@@ -12,7 +12,10 @@ import { genAgentsMd } from './gen-agents-md.mjs';
 const commonRulesUrl =
   'https://raw.githubusercontent.com/noshiro-pf/common-agent-config/main/agents/AGENTS.md';
 
-const commonRulesPath = path.resolve(projectRootPath, 'agents/common-rules.md');
+const commonRulesPath = path.resolve(
+  repositoryRootPath,
+  'agents/common-rules.md',
+);
 
 /**
  * Fetches the latest shared agent instructions from the common-agent-config
@@ -48,7 +51,9 @@ export const syncAgentConfig = async (): Promise<Result<undefined, string>> => {
     // `fmt:full`-stable even if the ignore rules ever change.
     await formatFiles([commonRulesPath]);
 
-    console.log(`Vendored ${path.relative(projectRootPath, commonRulesPath)}.`);
+    console.log(
+      `Vendored ${path.relative(repositoryRootPath, commonRulesPath)}.`,
+    );
 
     return await genAgentsMd();
   } catch (error) {

@@ -39,11 +39,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build packages
-        run: pnpm run ws:build
+      - name: Build ts-data-forge
+        run: pnpm --filter ts-data-forge run build
 
       - name: Generate docs
-        run: pnpm run ws:doc
+        run: pnpm  --filter ts-data-forge run doc
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

@@ -327,7 +327,7 @@ export namespace Json {
     space?: UintRangeInclusive<1, 10> | string,
   ): Result<string | undefined, string> => {
     const allKeys = pipe(keysDeep(value))
-      .map((keys) => Arr.uniq(keys))
+      .map(Arr.uniq)
       .map((ks) => ks.toSorted()).value;
 
     return stringifySelected(value, allKeys, space);

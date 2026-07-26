@@ -2,12 +2,12 @@ import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import { $, assertPathExists, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { type UnknownResult } from '../../src/functional/result/index.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { embedExamplesInJsDoc } from './embed-examples-in-jsdoc.mjs';
 import { embedExamples } from './embed-examples.mjs';
 
 const TYPEDOC_CONFIG = path.resolve(
-  projectRootPath,
+  workspaceRootPath,
   './configs/typedoc.config.mjs',
 );
 

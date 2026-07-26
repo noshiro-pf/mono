@@ -142,31 +142,33 @@ export function scan<E, S>(
       ]
 ): NonEmptyTuple<S> | ((array: readonly E[]) => NonEmptyTuple<S>) {
   switch (args.length) {
-    case 3: {
-      const [array, reducer, init] = args;
+    case 3:
+      return scanImpl(...args);
 
-      const mut_result = castMutable<NonEmptyTuple<S>>(
-        newArray<PositiveUint32, S>(asPositiveUint32(array.length + 1), init),
-      );
-
-      let mut_acc = init;
-
-      for (const [index, value] of array.entries()) {
-        mut_acc = reducer(mut_acc, value, asUint32(index));
-
-        mut_result[index + 1] = mut_acc;
-      }
-
-      return mut_result;
-    }
-
-    case 2: {
-      const [reducer, init] = args;
-
-      return (array) => scan(array, reducer, init);
-    }
+    case 2:
+      return (array) => scanImpl(array, ...args);
   }
 }
+
+const scanImpl = <E, S>(
+  array: readonly E[],
+  reducer: (accumulator: S, currentValue: E, currentIndex: SizeType.Arr) => S,
+  init: S,
+): NonEmptyTuple<S> => {
+  const mut_result = castMutable<NonEmptyTuple<S>>(
+    newArray<PositiveUint32, S>(asPositiveUint32(array.length + 1), init),
+  );
+
+  let mut_acc = init;
+
+  for (const [index, value] of array.entries()) {
+    mut_acc = reducer(mut_acc, value, asUint32(index));
+
+    mut_result[index + 1] = mut_acc;
+  }
+
+  return mut_result;
+};
 
 /**
  * Reverses an array.
@@ -362,19 +364,18 @@ export function filter<E>(
     | readonly [predicate: (a: E, index: SizeType.Arr) => boolean]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [array, predicate] = args;
+    case 2:
+      return filterImpl(...args);
 
-      return array.filter((a, i) => predicate(a, asUint32(i)));
-    }
-
-    case 1: {
-      const [predicate] = args;
-
-      return (array) => filter(array, predicate);
-    }
+    case 1:
+      return (array) => filterImpl(array, ...args);
   }
 }
+
+const filterImpl = <E,>(
+  array: readonly E[],
+  predicate: (a: E, index: SizeType.Arr) => boolean,
+): readonly E[] => array.filter((a, i) => predicate(a, asUint32(i)));
 
 /**
  * Filters an array by excluding elements for which the predicate returns true.
@@ -411,19 +412,18 @@ export function filterNot<E>(
     | readonly [predicate: (a: E, index: SizeType.Arr) => boolean]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [array, predicate] = args;
+    case 2:
+      return filterNotImpl(...args);
 
-      return array.filter((a, i) => !predicate(a, asUint32(i)));
-    }
-
-    case 1: {
-      const [predicate] = args;
-
-      return (array) => filterNot(array, predicate);
-    }
+    case 1:
+      return (array) => filterNotImpl(array, ...args);
   }
 }
+
+const filterNotImpl = <E,>(
+  array: readonly E[],
+  predicate: (a: E, index: SizeType.Arr) => boolean,
+): readonly E[] => array.filter((a, i) => !predicate(a, asUint32(i)));
 
 /**
  * Creates a new array with unique elements.
@@ -533,11 +533,8 @@ export function flat<E, D extends SafeUintWithSmallInt = 1>(
   ...args: readonly [array: readonly E[], depth?: D] | readonly [depth?: D]
 ): readonly unknown[] | ((array: readonly unknown[]) => readonly unknown[]) {
   switch (args.length) {
-    case 2: {
-      const [array, depth] = args;
-
-      return array.flat(depth);
-    }
+    case 2:
+      return flatImpl(...args);
 
     case 1: {
       const [arrayOrDepth] = args;
@@ -545,11 +542,11 @@ export function flat<E, D extends SafeUintWithSmallInt = 1>(
       if (typeof arrayOrDepth === 'number') {
         const depth = arrayOrDepth as SafeUintWithSmallInt | undefined;
 
-        return (array) => flat(array, depth);
+        return (array) => flatImpl(array, depth);
       }
 
       if (arrayOrDepth === undefined) {
-        return (array) => flat(array, 1);
+        return (array) => flatImpl(array, 1);
       }
 
       expectType<typeof arrayOrDepth, readonly E[]>('=');
@@ -558,9 +555,14 @@ export function flat<E, D extends SafeUintWithSmallInt = 1>(
     }
 
     case 0:
-      return (array) => flat(array, 1);
+      return (array) => flatImpl(array, 1);
   }
 }
+
+const flatImpl = (
+  array: readonly unknown[],
+  depth?: SafeUintWithSmallInt,
+): readonly unknown[] => array.flat(depth);
 
 /**
  * Maps each element and flattens the result.
@@ -662,24 +664,24 @@ export function partition<
   | readonly (readonly E[])[]
   | ((array: readonly E[]) => readonly (readonly E[])[]) {
   switch (args.length) {
-    case 2: {
-      const [array, chunkSize] = args;
+    case 2:
+      return partitionImpl(...args);
 
-      return chunkSize < 2
-        ? []
-        : // eslint-disable-next-line total-functions/no-partial-division
-          seq(asUint32(Math.ceil(array.length / chunkSize))).map((i: Uint32) =>
-            array.slice(chunkSize * i, chunkSize * (i + 1)),
-          );
-    }
-
-    case 1: {
-      const [chunkSize] = args;
-
-      return (array) => partition(array, chunkSize);
-    }
+    case 1:
+      return (array) => partitionImpl(array, ...args);
   }
 }
+
+const partitionImpl = <N extends WithSmallInt<PositiveInt & SizeType.Arr>, E>(
+  array: readonly E[],
+  chunkSize: N,
+): readonly (readonly E[])[] =>
+  chunkSize < 2
+    ? ([] as const)
+    : // eslint-disable-next-line total-functions/no-partial-division
+      seq(asUint32(Math.ceil(array.length / chunkSize))).map((i: Uint32) =>
+        array.slice(chunkSize * i, chunkSize * (i + 1)),
+      );
 
 /**
  * Concatenates two arrays.

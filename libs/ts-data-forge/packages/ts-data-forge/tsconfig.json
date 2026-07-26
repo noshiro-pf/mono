@@ -15,7 +15,6 @@
     "./samples",
     "./scripts",
     "./configs",
-    "./.eslintrc.cjs",
     "./eslint.config.mts"
   ]
 }

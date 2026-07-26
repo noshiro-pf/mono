@@ -1,32 +1,29 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
-  eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
-import { projectRootPath } from '../../scripts/project-root-path.mjs';
+import { repositoryRootPath } from '../../scripts/repository-root-path.mjs';
 import { restrictedImports } from './configs/eslint/rules/eslint-no-restricted-imports-option.mjs';
-
-const thisDir = import.meta.dirname;
+import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
 export default [
   {
-    ignores: ['.eslintrc.cjs', 'docs/**', 'agents/**'],
+    ignores: ['docs/**'],
   },
   ...eslintConfigForTypeScript({
-    tsconfigRootDir: thisDir,
+    tsconfigRootDir: workspaceRootPath,
     tsconfigFileName: './tsconfig.json',
-    packageDirs: [thisDir, projectRootPath],
+    packageDirs: [workspaceRootPath, repositoryRootPath],
   }),
-
-  eslintConfigForTsDataForge(['samples/**', 'scripts/**', 'configs/**']),
 
   eslintConfigForVitest(),
 
   {
     rules: defineKnownRules({
+      'import-x/no-unused-modules': 'off',
       '@typescript-eslint/no-restricted-imports': [
         'error',
         ...restrictedImports,
@@ -82,14 +79,6 @@ export default [
     files: ['src/**'],
     rules: defineKnownRules({
       'unicorn/prefer-number-is-safe-integer': 'off',
-
-      'import-x/no-unused-modules': [
-        'error',
-        {
-          unusedExports: true,
-          ignoreExports: ['src/entry-point.mts', 'src/types.mts'],
-        },
-      ],
     }),
   },
   {

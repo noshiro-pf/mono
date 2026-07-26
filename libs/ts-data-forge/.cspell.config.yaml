@@ -11,21 +11,21 @@ words:
   - foldr
   - funcs
   - iset
-  - LEQC
-  - NAND
+  - leqc
+  - nand
   - noshiro
   - nums
   - sindresorhus
   - strs
   - testw
   - tscw
-  - TSES
+  - tses
   - unmemoized
   - unshift
   - unshifted
-  - Unstringifiable
+  - unstringifiable
   - uppercased
-  - XNOR
+  - xnor
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml

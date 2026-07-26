@@ -239,23 +239,23 @@ export function count<E>(
     | readonly [predicate: (value: E, index: SizeType.Arr) => boolean]
 ): SizeType.Arr | ((array: readonly E[]) => SizeType.Arr) {
   switch (args.length) {
-    case 2: {
-      const [array, predicate] = args;
+    case 2:
+      return countImpl(...args);
 
-      return array.reduce<Uint32>(
-        (acc, curr, index) =>
-          predicate(curr, asUint32(index)) ? Uint32.add(acc, 1) : acc,
-        asUint32(0),
-      );
-    }
-
-    case 1: {
-      const [predicate] = args;
-
-      return (array) => count(array, predicate);
-    }
+    case 1:
+      return (array) => countImpl(array, ...args);
   }
 }
+
+const countImpl = <E,>(
+  array: readonly E[],
+  predicate: (value: E, index: SizeType.Arr) => boolean,
+): SizeType.Arr =>
+  array.reduce<Uint32>(
+    (acc, curr, index) =>
+      predicate(curr, asUint32(index)) ? Uint32.add(acc, 1) : acc,
+    asUint32(0),
+  );
 
 /**
  * Groups elements by a key and counts the elements in each group.
@@ -295,29 +295,30 @@ export function countBy<E, G extends MapSetKeyType>(
     | readonly [grouper: (value: E, index: SizeType.Arr) => G]
 ): IMap<G, SizeType.Arr> | ((array: readonly E[]) => IMap<G, SizeType.Arr>) {
   switch (args.length) {
-    case 2: {
-      const [array, grouper] = args;
+    case 2:
+      return countByImpl(...args);
 
-      const mut_groups = new Map<G, SizeType.Arr>();
-
-      for (const [index, e] of array.entries()) {
-        const key = grouper(e, asUint32(index));
-
-        const curr = mut_groups.get(key) ?? 0;
-
-        mut_groups.set(key, asUint32(curr + 1));
-      }
-
-      return IMap.create(mut_groups);
-    }
-
-    case 1: {
-      const [grouper] = args;
-
-      return (array) => countBy(array, grouper);
-    }
+    case 1:
+      return (array) => countByImpl(array, ...args);
   }
 }
+
+const countByImpl = <E, G extends MapSetKeyType>(
+  array: readonly E[],
+  grouper: (value: E, index: SizeType.Arr) => G,
+): IMap<G, SizeType.Arr> => {
+  const mut_groups = new Map<G, SizeType.Arr>();
+
+  for (const [index, e] of array.entries()) {
+    const key = grouper(e, asUint32(index));
+
+    const curr = mut_groups.get(key) ?? 0;
+
+    mut_groups.set(key, asUint32(curr + 1));
+  }
+
+  return IMap.create(mut_groups);
+};
 
 /**
  * Reduces an array to a single value from left to right.
@@ -379,22 +380,27 @@ export function foldl<E, P>(
       ]
 ): P | ((array: readonly E[]) => P) {
   switch (args.length) {
-    case 3: {
-      const [array, callbackfn, initialValue] = args;
+    case 3:
+      return foldlImpl(...args);
 
-      return array.reduce(
-        (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
-        initialValue,
-      );
-    }
-
-    case 2: {
-      const [callbackfn, initialValue] = args;
-
-      return (array) => foldl(array, callbackfn, initialValue);
-    }
+    case 2:
+      return (array) => foldlImpl(array, ...args);
   }
 }
+
+const foldlImpl = <E, P>(
+  array: readonly E[],
+  callbackfn: (
+    previousValue: P,
+    currentValue: E,
+    currentIndex: SizeType.Arr,
+  ) => P,
+  initialValue: P,
+): P =>
+  array.reduce(
+    (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
+    initialValue,
+  );
 
 /**
  * Reduces an array to a single value from right to left.
@@ -456,22 +462,27 @@ export function foldr<E, P>(
       ]
 ): P | ((array: readonly E[]) => P) {
   switch (args.length) {
-    case 3: {
-      const [array, callbackfn, initialValue] = args;
+    case 3:
+      return foldrImpl(...args);
 
-      return array.reduceRight(
-        (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
-        initialValue,
-      );
-    }
-
-    case 2: {
-      const [callbackfn, initialValue] = args;
-
-      return (array) => foldr(array, callbackfn, initialValue);
-    }
+    case 2:
+      return (array) => foldrImpl(array, ...args);
   }
 }
+
+const foldrImpl = <E, P>(
+  array: readonly E[],
+  callbackfn: (
+    previousValue: P,
+    currentValue: E,
+    currentIndex: SizeType.Arr,
+  ) => P,
+  initialValue: P,
+): P =>
+  array.reduceRight(
+    (prev, curr, index) => callbackfn(prev, curr, asUint32(index)),
+    initialValue,
+  );
 
 /**
  * Calculates the sum of numbers in an array.

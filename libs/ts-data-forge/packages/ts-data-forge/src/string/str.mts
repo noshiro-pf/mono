@@ -244,25 +244,28 @@ export namespace Str {
       | readonly [minLength: SupportedLength]
   ): string | ((s: string) => string) {
     switch (args.length) {
-      case 2: {
-        const [s, minLength] = args;
+      case 2:
+        return asMinLengthStringImpl(...args);
 
-        if (!isMinLengthString(s, minLength)) {
-          throw new TypeError(
-            `Expected a string of length >= ${minLength}, got a string of length ${s.length}`,
-          );
-        }
-
-        return s;
-      }
-
-      case 1: {
-        const [minLength] = args;
-
-        return (s) => asMinLengthString(s, minLength);
-      }
+      case 1:
+        return (s) => asMinLengthStringImpl(s, ...args);
     }
   }
+
+  const asMinLengthStringImpl = (
+    s: string,
+    minLength: SupportedLength,
+  ): string => {
+    const actualLength = s.length;
+
+    if (!isMinLengthString(s, minLength)) {
+      throw new TypeError(
+        `Expected a string of length >= ${minLength}, got a string of length ${actualLength}`,
+      );
+    }
+
+    return s;
+  };
 
   /**
    * Casts a string to `MaxLengthString<MaxLength>` after checking that it has
@@ -315,25 +318,28 @@ export namespace Str {
       | readonly [maxLength: SupportedLength]
   ): string | ((s: string) => string) {
     switch (args.length) {
-      case 2: {
-        const [s, maxLength] = args;
+      case 2:
+        return asMaxLengthStringImpl(...args);
 
-        if (!isMaxLengthString(s, maxLength)) {
-          throw new TypeError(
-            `Expected a string of length <= ${maxLength}, got a string of length ${s.length}`,
-          );
-        }
-
-        return s;
-      }
-
-      case 1: {
-        const [maxLength] = args;
-
-        return (s) => asMaxLengthString(s, maxLength);
-      }
+      case 1:
+        return (s) => asMaxLengthStringImpl(s, ...args);
     }
   }
+
+  const asMaxLengthStringImpl = (
+    s: string,
+    maxLength: SupportedLength,
+  ): string => {
+    const actualLength = s.length;
+
+    if (!isMaxLengthString(s, maxLength)) {
+      throw new TypeError(
+        `Expected a string of length <= ${maxLength}, got a string of length ${actualLength}`,
+      );
+    }
+
+    return s;
+  };
 
   /**
    * Casts a string to `BoundedLengthString<MinLength, MaxLength>` after
@@ -403,25 +409,29 @@ export namespace Str {
       | readonly [minLength: SupportedLength, maxLength: SupportedLength]
   ): string | ((s: string) => string) {
     switch (args.length) {
-      case 3: {
-        const [s, minLength, maxLength] = args;
+      case 3:
+        return asBoundedLengthStringImpl(...args);
 
-        if (!isBoundedLengthString(s, minLength, maxLength)) {
-          throw new TypeError(
-            `Expected a string of length in [${minLength}, ${maxLength}], got a string of length ${s.length}`,
-          );
-        }
-
-        return s;
-      }
-
-      case 2: {
-        const [minLength, maxLength] = args;
-
-        return (s) => asBoundedLengthString(s, minLength, maxLength);
-      }
+      case 2:
+        return (s) => asBoundedLengthStringImpl(s, ...args);
     }
   }
+
+  const asBoundedLengthStringImpl = (
+    s: string,
+    minLength: SupportedLength,
+    maxLength: SupportedLength,
+  ): string => {
+    const actualLength = s.length;
+
+    if (!isBoundedLengthString(s, minLength, maxLength)) {
+      throw new TypeError(
+        `Expected a string of length in [${minLength}, ${maxLength}], got a string of length ${actualLength}`,
+      );
+    }
+
+    return s;
+  };
 
   /**
    * Casts a string to `FixedLengthString<Length>` after checking that it has
@@ -474,25 +484,28 @@ export namespace Str {
       | readonly [length: SupportedLength]
   ): string | ((s: string) => string) {
     switch (args.length) {
-      case 2: {
-        const [s, length] = args;
+      case 2:
+        return asFixedLengthStringImpl(...args);
 
-        if (!isFixedLengthString(s, length)) {
-          throw new TypeError(
-            `Expected a string of length ${length}, got a string of length ${s.length}`,
-          );
-        }
-
-        return s;
-      }
-
-      case 1: {
-        const [length] = args;
-
-        return (s) => asFixedLengthString(s, length);
-      }
+      case 1:
+        return (s) => asFixedLengthStringImpl(s, ...args);
     }
   }
+
+  const asFixedLengthStringImpl = (
+    s: string,
+    length: SupportedLength,
+  ): string => {
+    const actualLength = s.length;
+
+    if (!isFixedLengthString(s, length)) {
+      throw new TypeError(
+        `Expected a string of length ${length}, got a string of length ${actualLength}`,
+      );
+    }
+
+    return s;
+  };
 
   /**
    * Casts a string to `NonEmptyString` after checking that it has at least one

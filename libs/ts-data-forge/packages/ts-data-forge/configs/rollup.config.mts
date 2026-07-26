@@ -5,7 +5,7 @@ import * as path from 'node:path';
 import { defineConfig, type Plugin as RollupPlugin } from 'rollup';
 import * as rollupPluginEsbuildNs from 'rollup-plugin-esbuild';
 import { glob, Result } from 'ts-repo-utils';
-import { projectRootPath } from '../scripts/project-root-path.mjs';
+import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 import { castMutable, unknownToString } from '../src/index.mjs';
 import tsconfig from './tsconfig.build.json' with { type: 'json' };
 
@@ -94,9 +94,9 @@ const rollupPluginResolveMtsFromMjs: RollupPlugin = {
 
 const outDirRelative = tsconfig.compilerOptions.outDir;
 
-const configDir = path.resolve(projectRootPath, './configs');
+const configDir = path.resolve(workspaceRootPath, './configs');
 
-const srcDir = path.resolve(projectRootPath, './src');
+const srcDir = path.resolve(workspaceRootPath, './src');
 
 const globResult = await glob(path.resolve(srcDir, './**/*.mts'), {
   ignore: ['**/*.test.mts', '**/*.d.mts'],

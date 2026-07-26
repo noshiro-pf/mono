@@ -66,25 +66,28 @@ export function asFixedLengthArray<E>(
     | readonly [length: SupportedLength]
 ): readonly E[] | ((xs: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [xs, length] = args;
+    case 2:
+      return asFixedLengthArrayImpl(...args);
 
-      if (!isFixedLengthArray(xs, length)) {
-        throw new TypeError(
-          `Expected an array of length ${length}, got an array of length ${xs.length}`,
-        );
-      }
-
-      return xs;
-    }
-
-    case 1: {
-      const [length] = args;
-
-      return (xs) => asFixedLengthArray(xs, length);
-    }
+    case 1:
+      return (xs) => asFixedLengthArrayImpl(xs, ...args);
   }
 }
+
+const asFixedLengthArrayImpl = <E,>(
+  xs: readonly E[],
+  length: SupportedLength,
+): readonly E[] => {
+  const actualLength = xs.length;
+
+  if (!isFixedLengthArray(xs, length)) {
+    throw new TypeError(
+      `Expected an array of length ${length}, got an array of length ${actualLength}`,
+    );
+  }
+
+  return xs;
+};
 
 /**
  * Casts an array to `MinLengthArray<MinLength, E>` after checking that it has
@@ -139,25 +142,28 @@ export function asMinLengthArray<E>(
     | readonly [minLength: SupportedLength]
 ): readonly E[] | ((xs: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [xs, minLength] = args;
+    case 2:
+      return asMinLengthArrayImpl(...args);
 
-      if (!isMinLengthArray(xs, minLength)) {
-        throw new TypeError(
-          `Expected an array of length >= ${minLength}, got an array of length ${xs.length}`,
-        );
-      }
-
-      return xs;
-    }
-
-    case 1: {
-      const [minLength] = args;
-
-      return (xs) => asMinLengthArray(xs, minLength);
-    }
+    case 1:
+      return (xs) => asMinLengthArrayImpl(xs, ...args);
   }
 }
+
+const asMinLengthArrayImpl = <E,>(
+  xs: readonly E[],
+  minLength: SupportedLength,
+): readonly E[] => {
+  const actualLength = xs.length;
+
+  if (!isMinLengthArray(xs, minLength)) {
+    throw new TypeError(
+      `Expected an array of length >= ${minLength}, got an array of length ${actualLength}`,
+    );
+  }
+
+  return xs;
+};
 
 /**
  * Casts an array to `MaxLengthArray<MaxLength, E>` after checking that it has
@@ -209,25 +215,28 @@ export function asMaxLengthArray<E>(
     | readonly [maxLength: SupportedLength]
 ): readonly E[] | ((xs: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [xs, maxLength] = args;
+    case 2:
+      return asMaxLengthArrayImpl(...args);
 
-      if (!isMaxLengthArray(xs, maxLength)) {
-        throw new TypeError(
-          `Expected an array of length <= ${maxLength}, got an array of length ${xs.length}`,
-        );
-      }
-
-      return xs;
-    }
-
-    case 1: {
-      const [maxLength] = args;
-
-      return (xs) => asMaxLengthArray(xs, maxLength);
-    }
+    case 1:
+      return (xs) => asMaxLengthArrayImpl(xs, ...args);
   }
 }
+
+const asMaxLengthArrayImpl = <E,>(
+  xs: readonly E[],
+  maxLength: SupportedLength,
+): readonly E[] => {
+  const actualLength = xs.length;
+
+  if (!isMaxLengthArray(xs, maxLength)) {
+    throw new TypeError(
+      `Expected an array of length <= ${maxLength}, got an array of length ${actualLength}`,
+    );
+  }
+
+  return xs;
+};
 
 /**
  * Casts an array to `BoundedLengthArray<MinLength, MaxLength, E>` after
@@ -298,25 +307,29 @@ export function asBoundedLengthArray<E>(
     | readonly [minLength: SupportedLength, maxLength: SupportedLength]
 ): readonly E[] | ((xs: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 3: {
-      const [xs, minLength, maxLength] = args;
+    case 3:
+      return asBoundedLengthArrayImpl(...args);
 
-      if (!isBoundedLengthArray(xs, minLength, maxLength)) {
-        throw new TypeError(
-          `Expected an array of length in [${minLength}, ${maxLength}], got an array of length ${xs.length}`,
-        );
-      }
-
-      return xs;
-    }
-
-    case 2: {
-      const [minLength, maxLength] = args;
-
-      return (xs) => asBoundedLengthArray(xs, minLength, maxLength);
-    }
+    case 2:
+      return (xs) => asBoundedLengthArrayImpl(xs, ...args);
   }
 }
+
+const asBoundedLengthArrayImpl = <E,>(
+  xs: readonly E[],
+  minLength: SupportedLength,
+  maxLength: SupportedLength,
+): readonly E[] => {
+  const actualLength = xs.length;
+
+  if (!isBoundedLengthArray(xs, minLength, maxLength)) {
+    throw new TypeError(
+      `Expected an array of length in [${minLength}, ${maxLength}], got an array of length ${actualLength}`,
+    );
+  }
+
+  return xs;
+};
 
 /**
  * Casts an array to `NonEmptyArray<E>` after checking that it has at least one

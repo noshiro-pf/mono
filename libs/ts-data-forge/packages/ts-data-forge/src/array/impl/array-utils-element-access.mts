@@ -45,25 +45,24 @@ export function at<E>(
     | readonly [index: SizeType.ArgArrWithNegative]
 ): Optional<E> | ((array: readonly E[]) => Optional<E>) {
   switch (args.length) {
-    case 2: {
-      const [array, index] = args;
+    case 2:
+      return atImpl(...args);
 
-      return pipe(index < 0 ? array.length + index : index).map(
-        (normalizedIndex) =>
-          normalizedIndex < 0 || normalizedIndex >= array.length
-            ? Optional.none
-            : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              Optional.some(array[normalizedIndex]!),
-      ).value;
-    }
-
-    case 1: {
-      const [index] = args;
-
-      return (array) => at(array, index);
-    }
+    case 1:
+      return (array) => atImpl(array, ...args);
   }
 }
+
+const atImpl = <E,>(
+  array: readonly E[],
+  index: SizeType.ArgArrWithNegative,
+): Optional<E> =>
+  pipe(index < 0 ? array.length + index : index).map((normalizedIndex) =>
+    normalizedIndex < 0 || normalizedIndex >= array.length
+      ? Optional.none
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        Optional.some(array[normalizedIndex]!),
+  ).value;
 
 /**
  * Returns the first element of an array as an Optional.

@@ -1,23 +1,26 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
-  eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
-import { projectRootPath } from './scripts/project-root-path.mjs';
+import { repositoryRootPath } from './scripts/repository-root-path.mjs';
 
 export default [
   {
     ignores: ['packages/**', 'agents/**'],
   },
   ...eslintConfigForTypeScript({
-    tsconfigRootDir: projectRootPath,
+    tsconfigRootDir: repositoryRootPath,
     tsconfigFileName: 'tsconfig.json',
-    packageDirs: [projectRootPath],
+    packageDirs: [repositoryRootPath],
   }),
 
-  eslintConfigForTsDataForge(),
+  {
+    rules: defineKnownRules({
+      'import-x/no-unused-modules': 'off',
+    }),
+  },
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {

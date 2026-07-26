@@ -55,19 +55,19 @@ export function set<E, const V = E>(
     | readonly [index: SizeType.ArgArr, newValue: V]
 ): readonly (E | V)[] | ((array: readonly E[]) => readonly (E | V)[]) {
   switch (args.length) {
-    case 3: {
-      const [array, index, newValue] = args;
+    case 3:
+      return setImpl(...args);
 
-      return (array as readonly (E | V)[]).with(index, newValue);
-    }
-
-    case 2: {
-      const [index, newValue] = args;
-
-      return (array) => set(array, index, newValue);
-    }
+    case 2:
+      return (array) => setImpl(array, ...args);
   }
 }
+
+const setImpl = <E, const V = E>(
+  array: readonly E[],
+  index: SizeType.ArgArr,
+  newValue: V,
+): readonly (E | V)[] => (array as readonly (E | V)[]).with(index, newValue);
 
 /**
  * Returns a new array with an element at the specified index updated by applying a function.
@@ -124,20 +124,21 @@ export function toUpdated<E, V = E>(
     | readonly [index: SizeType.ArgArr, updater: (prev: E) => V]
 ): readonly (E | V)[] | ((array: readonly E[]) => readonly (E | V)[]) {
   switch (args.length) {
-    case 3: {
-      const [array, index, updater] = args;
+    case 3:
+      return toUpdatedImpl(...args);
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return (array as readonly (E | V)[]).with(index, updater(array[index]!));
-    }
-
-    case 2: {
-      const [index, updater] = args;
-
-      return (array) => toUpdated(array, index, updater);
-    }
+    case 2:
+      return (array) => toUpdatedImpl(array, ...args);
   }
 }
+
+const toUpdatedImpl = <E, V = E>(
+  array: readonly E[],
+  index: SizeType.ArgArr,
+  updater: (prev: E) => V,
+): readonly (E | V)[] =>
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  (array as readonly (E | V)[]).with(index, updater(array[index]!));
 
 /**
  * Returns a new array with a value inserted at the specified index.
@@ -187,24 +188,25 @@ export function toInserted<E, const V = E>(
     | readonly [index: SizeType.ArgArrWithNegative, newValue: V]
 ): NonEmptyArray<E | V> | ((array: readonly E[]) => NonEmptyArray<E | V>) {
   switch (args.length) {
-    case 3: {
-      const [array, index, newValue] = args;
+    case 3:
+      return toInsertedImpl(...args);
 
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      return (array as readonly (E | V)[]).toSpliced(
-        index,
-        0,
-        newValue,
-      ) as unknown as NonEmptyArray<E | V>;
-    }
-
-    case 2: {
-      const [index, newValue] = args;
-
-      return (array) => toInserted(array, index, newValue);
-    }
+    case 2:
+      return (array) => toInsertedImpl(array, ...args);
   }
 }
+
+const toInsertedImpl = <E, const V = E>(
+  array: readonly E[],
+  index: SizeType.ArgArrWithNegative,
+  newValue: V,
+): NonEmptyArray<E | V> =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  (array as readonly (E | V)[]).toSpliced(
+    index,
+    0,
+    newValue,
+  ) as unknown as NonEmptyArray<E | V>;
 
 type CastToNumber<T> = T extends number ? T : never;
 
@@ -240,19 +242,18 @@ export function toRemoved<E>(
     | readonly [index: SizeType.ArgArrWithNegative]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [array, index] = args;
+    case 2:
+      return toRemovedImpl(...args);
 
-      return array.toSpliced(index, 1);
-    }
-
-    case 1: {
-      const [index] = args;
-
-      return (array) => toRemoved(array, index);
-    }
+    case 1:
+      return (array) => toRemovedImpl(array, ...args);
   }
 }
+
+const toRemovedImpl = <E,>(
+  array: readonly E[],
+  index: SizeType.ArgArrWithNegative,
+): readonly E[] => array.toSpliced(index, 1);
 
 /**
  * Returns a new array with a value appended to the end.
@@ -291,23 +292,20 @@ export function toPushed<const Ar extends readonly unknown[], const V>(
   ...args: readonly [array: Ar, newValue: V] | readonly [newValue: V]
 ): readonly [...Ar, V] | ((array: Ar) => readonly [...Ar, V]) {
   switch (args.length) {
-    case 2: {
-      const [array, newValue] = args;
+    case 2:
+      return toPushedImpl(...args);
 
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      return array.toSpliced(array.length, 0, newValue) as unknown as readonly [
-        ...Ar,
-        V,
-      ];
-    }
-
-    case 1: {
-      const [newValue] = args;
-
-      return (array) => toPushed(array, newValue);
-    }
+    case 1:
+      return (array) => toPushedImpl(array, ...args);
   }
 }
+
+const toPushedImpl = <const Ar extends readonly unknown[], const V>(
+  array: Ar,
+  newValue: V,
+): readonly [...Ar, V] =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  array.toSpliced(array.length, 0, newValue) as unknown as readonly [...Ar, V];
 
 /**
  * Returns a new array with a value prepended to the beginning.
@@ -346,20 +344,20 @@ export function toUnshifted<Ar extends readonly unknown[], const V>(
   ...args: readonly [array: Ar, newValue: V] | readonly [newValue: V]
 ): readonly [V, ...Ar] | ((array: Ar) => readonly [V, ...Ar]) {
   switch (args.length) {
-    case 2: {
-      const [array, newValue] = args;
+    case 2:
+      return toUnshiftedImpl(...args);
 
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      return array.toSpliced(0, 0, newValue) as unknown as readonly [V, ...Ar];
-    }
-
-    case 1: {
-      const [newValue] = args;
-
-      return (array) => toUnshifted(array, newValue);
-    }
+    case 1:
+      return (array) => toUnshiftedImpl(array, ...args);
   }
 }
+
+const toUnshiftedImpl = <Ar extends readonly unknown[], const V>(
+  array: Ar,
+  newValue: V,
+): readonly [V, ...Ar] =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  array.toSpliced(0, 0, newValue) as unknown as readonly [V, ...Ar];
 
 /**
  * Returns a new array with all elements replaced by the specified value.
@@ -402,19 +400,16 @@ export function toFilled<E>(
   ...args: readonly [array: readonly E[], value: E] | readonly [value: E]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [array, value] = args;
+    case 2:
+      return toFilledImpl(...args);
 
-      return create(asPositiveUint32(array.length), value);
-    }
-
-    case 1: {
-      const [value] = args;
-
-      return (array) => toFilled(array, value);
-    }
+    case 1:
+      return (array) => toFilledImpl(array, ...args);
   }
 }
+
+const toFilledImpl = <E,>(array: readonly E[], value: E): readonly E[] =>
+  create(asPositiveUint32(array.length), value);
 
 /**
  * Returns a new array with elements in the specified range replaced by the specified value.
@@ -480,20 +475,27 @@ export function toRangeFilled<E, const V>(
       ]
 ): readonly (E | V)[] | ((array: readonly E[]) => readonly (E | V)[]) {
   switch (args.length) {
-    case 3: {
-      const [array, value, [start, end]] = args;
+    case 3:
+      return toRangeFilledImpl(...args);
 
-      const mut_cp: (E | V)[] = castMutable(copy(array));
-
-      mut_cp.fill(value, start, end);
-
-      return mut_cp;
-    }
-
-    case 2: {
-      const [value, fillRange] = args;
-
-      return (array) => toRangeFilled(array, value, fillRange);
-    }
+    case 2:
+      return (array) => toRangeFilledImpl(array, ...args);
   }
 }
+
+const toRangeFilledImpl = <E, const V>(
+  array: readonly E[],
+  value: V,
+  fillRange: readonly [
+    start: SizeType.ArgArrWithNegative,
+    end: SizeType.ArgArrWithNegative,
+  ],
+): readonly (E | V)[] => {
+  const [start, end] = fillRange;
+
+  const mut_cp: (E | V)[] = castMutable(copy(array));
+
+  mut_cp.fill(value, start, end);
+
+  return mut_cp;
+};

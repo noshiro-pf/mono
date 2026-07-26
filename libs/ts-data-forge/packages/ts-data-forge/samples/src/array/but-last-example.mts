@@ -1,4 +1,3 @@
-/* eslint-disable ts-data-forge/prefer-arr-is-array-of-length */
 // Example: src/array/array-utils.mts (butLast)
 import { Arr } from 'ts-data-forge';
 

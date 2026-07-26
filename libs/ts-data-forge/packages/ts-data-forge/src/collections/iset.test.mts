@@ -1229,7 +1229,7 @@ describe('iterable functionality', () => {
     const array = Array.from(set);
 
     assert.deepStrictEqual(
-      Array.from(array).toSorted((a, b) => a - b),
+      array.toSorted((a, b) => a - b),
       [1, 2, 3],
     );
   });
@@ -1240,7 +1240,7 @@ describe('iterable functionality', () => {
     const array = Array.from(set);
 
     assert.deepStrictEqual(
-      Array.from(array).toSorted((a, b) => a - b),
+      array.toSorted((a, b) => a - b),
       [1, 2, 3],
     );
   });

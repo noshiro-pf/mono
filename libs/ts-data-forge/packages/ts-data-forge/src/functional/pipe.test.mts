@@ -142,7 +142,7 @@ describe(pipe, () => {
     ): D | undefined => {
       const v = pipe(input)
         .map(parse)
-        .mapNullable((n) => validate<D>(n))
+        .mapNullable(validate<D>)
         .mapNullable((res) => Result.unwrapOk(res)).value;
 
       expectType<typeof v, D | undefined>('=');

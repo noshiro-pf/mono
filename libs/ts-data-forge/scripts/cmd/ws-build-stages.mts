@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 
 import { runCmdInStagesAcrossWorkspaces } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { repositoryRootPath } from '../repository-root-path.mjs';
 
 await runCmdInStagesAcrossWorkspaces({
   cmd: 'build',
-  rootPackageJsonDir: projectRootPath,
+  rootPackageJsonDir: repositoryRootPath,
 });

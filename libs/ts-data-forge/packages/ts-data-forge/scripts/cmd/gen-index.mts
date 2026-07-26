@@ -1,8 +1,8 @@
 import * as path from 'node:path';
 import { genIndex } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 
-const srcDir = path.resolve(projectRootPath, './src');
+const srcDir = path.resolve(workspaceRootPath, './src');
 
 await genIndex({
   targetDirectory: srcDir,

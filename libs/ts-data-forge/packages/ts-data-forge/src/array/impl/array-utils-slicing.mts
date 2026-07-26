@@ -115,19 +115,18 @@ export function take<E>(
     | readonly [num: SizeType.ArgArr]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [array, num] = args;
+    case 2:
+      return takeImpl(...args);
 
-      return sliceClamped(array, 0, num);
-    }
-
-    case 1: {
-      const [num] = args;
-
-      return (array) => take(array, num);
-    }
+    case 1:
+      return (array) => takeImpl(array, ...args);
   }
 }
+
+const takeImpl = <E,>(
+  array: readonly E[],
+  num: SizeType.ArgArr,
+): readonly E[] => sliceClamped(array, 0, num);
 
 /**
  * Takes the last N elements from an array.
@@ -178,19 +177,19 @@ export function takeLast<E>(
     | readonly [num: SizeType.ArgArr]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [array, num] = args;
+    case 2:
+      return takeLastImpl(...args);
 
-      return sliceClamped(array, Uint32.sub(size(array), num), size(array));
-    }
-
-    case 1: {
-      const [num] = args;
-
-      return (array) => takeLast(array, num);
-    }
+    case 1:
+      return (array) => takeLastImpl(array, ...args);
   }
 }
+
+const takeLastImpl = <E,>(
+  array: readonly E[],
+  num: SizeType.ArgArr,
+): readonly E[] =>
+  sliceClamped(array, Uint32.sub(size(array), num), size(array));
 
 /**
  * Skips the first N elements of an array.
@@ -230,19 +229,18 @@ export function skip<E>(
   ...args: readonly [readonly E[], SizeType.ArgArr] | readonly [SizeType.ArgArr]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [array, num] = args;
+    case 2:
+      return skipImpl(...args);
 
-      return sliceClamped(array, num, size(array));
-    }
-
-    case 1: {
-      const [num] = args;
-
-      return (array) => skip(array, num);
-    }
+    case 1:
+      return (array) => skipImpl(array, ...args);
   }
 }
+
+const skipImpl = <E,>(
+  array: readonly E[],
+  num: SizeType.ArgArr,
+): readonly E[] => sliceClamped(array, num, size(array));
 
 /**
  * Skips the last N elements of an array.
@@ -286,19 +284,18 @@ export function skipLast<E>(
     | readonly [num: SizeType.ArgArr]
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
-    case 2: {
-      const [array, num] = args;
+    case 2:
+      return skipLastImpl(...args);
 
-      return sliceClamped(array, 0, Uint32.sub(size(array), num));
-    }
-
-    case 1: {
-      const [num] = args;
-
-      return (array) => skipLast(array, num);
-    }
+    case 1:
+      return (array) => skipLastImpl(array, ...args);
   }
 }
+
+const skipLastImpl = <E,>(
+  array: readonly E[],
+  num: SizeType.ArgArr,
+): readonly E[] => sliceClamped(array, 0, Uint32.sub(size(array), num));
 
 /**
  * Alias for `tail`.

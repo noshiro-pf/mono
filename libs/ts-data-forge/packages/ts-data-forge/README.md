@@ -200,12 +200,9 @@ const divideAndFormat = (
 ): Result<string, string> =>
     pipe(denominator)
         .map((d) => (d !== 0 ? Result.ok(d) : Result.err('Division by zero')))
-        .map((result) => Result.map(result, (d) => numerator / d))
-        .map((result) =>
-            Result.map(result, (value) => `Result: ${value.toFixed(2)}`),
-        )
-        .map((result) => Result.mapErr(result, (error) => `Error: ${error}`))
-        .value;
+        .map(Result.map((d: number) => numerator / d))
+        .map(Result.map((value: number) => `Result: ${value.toFixed(2)}`))
+        .map(Result.mapErr((error: string) => `Error: ${error}`)).value;
 
 assert.deepStrictEqual(divideAndFormat(10, 2), Result.ok('Result: 5.00'));
 
