@@ -1,3 +1,9 @@
+## [1.2.19](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.18...v1.2.19) (2026-07-27)
+
+### Bug Fixes
+
+- remove trailing space from CODEOWNERS filename ([#236](https://github.com/noshiro-pf/octokit-safe-types/issues/236)) ([8269642](https://github.com/noshiro-pf/octokit-safe-types/commit/8269642e3ffa2910dd747e977a14622dd012663f))
+
 ## [1.2.18](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.17...v1.2.18) (2026-05-13)
 
 ### Bug Fixes
