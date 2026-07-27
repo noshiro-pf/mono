@@ -1,3 +1,9 @@
+## [10.1.4](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.3...v10.1.4) (2026-07-27)
+
+### Bug Fixes
+
+- remove trailing space from CODEOWNERS filename ([#415](https://github.com/noshiro-pf/ts-repo-utils/issues/415)) ([0a2ca1f](https://github.com/noshiro-pf/ts-repo-utils/commit/0a2ca1f43ab886fd3bd45f59a69370f0a23980af))
+
 ## [10.1.3](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.2...v10.1.3) (2026-07-21)
 
 ### Bug Fixes
