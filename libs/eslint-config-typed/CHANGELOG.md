@@ -1,3 +1,9 @@
+## [5.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.0...v5.8.1) (2026-07-27)
+
+### Bug Fixes
+
+- remove trailing space from CODEOWNERS filename ([#389](https://github.com/noshiro-pf/eslint-config-typed/issues/389)) ([c5cf5e6](https://github.com/noshiro-pf/eslint-config-typed/commit/c5cf5e621f26a25a64a8c2114e94a4e003f0e22d))
+
 # [5.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.7.0...v5.8.0) (2026-07-23)
 
 ### Features
