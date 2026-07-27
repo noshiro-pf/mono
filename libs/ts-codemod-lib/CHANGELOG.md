@@ -1,3 +1,9 @@
+## [2.2.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.2...v2.2.3) (2026-07-27)
+
+### Bug Fixes
+
+- remove trailing space from CODEOWNERS filename ([#178](https://github.com/noshiro-pf/ts-codemod-lib/issues/178)) ([7729cb2](https://github.com/noshiro-pf/ts-codemod-lib/commit/7729cb2425ec426d12cdbb46adee412a194922dd))
+
 ## [2.2.2](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.1...v2.2.2) (2026-07-15)
 
 ### Bug Fixes
