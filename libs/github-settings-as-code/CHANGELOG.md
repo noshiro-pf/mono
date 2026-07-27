@@ -1,3 +1,9 @@
+## [1.2.10](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.9...v1.2.10) (2026-07-27)
+
+### Bug Fixes
+
+- remove trailing space from CODEOWNERS filename ([#159](https://github.com/noshiro-pf/github-settings-as-code/issues/159)) ([ed4b163](https://github.com/noshiro-pf/github-settings-as-code/commit/ed4b163d96b010eaa6c11da68348656a1d727cdb))
+
 ## [1.2.9](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.8...v1.2.9) (2026-05-13)
 
 ### Bug Fixes
