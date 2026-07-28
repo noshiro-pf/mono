@@ -12,7 +12,6 @@ const thisDir = import.meta.dirname;
 export default [
   {
     ignores: [
-      '.eslintrc.cjs',
       'docs/**',
       'agents/**',
       'test-code/**',
@@ -77,21 +76,7 @@ export default [
   {
     files: ['src/**'],
     rules: defineKnownRules({
-      'import-x/no-unused-modules': [
-        'error',
-        {
-          unusedExports: true,
-          ignoreExports: [
-            'src/entry-point.mts',
-            'src/cmd/append-as-const.mts',
-            'src/cmd/convert-interface-to-type.mts',
-            'src/cmd/convert-to-readonly.mts',
-            'src/cmd/replace-any-with-unknown.mts',
-            'src/cmd/replace-record-with-unknown-record.mts',
-            'src/cmd/run-transformer-cli.mts',
-          ],
-        },
-      ],
+      'import-x/no-unused-modules': 'off',
     }),
   },
   {

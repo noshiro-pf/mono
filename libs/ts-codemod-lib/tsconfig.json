@@ -15,7 +15,6 @@
     "./test-code",
     "./scripts",
     "./configs",
-    "./.eslintrc.cjs",
     "./eslint.config.mts",
     "./release.config.js",
     "./.markdownlint-cli2.mjs"
