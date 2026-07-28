@@ -50,14 +50,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # build:min emits dist_/ and links the package into
-      # test/dist_/node_modules without running the repository's own checks
-      # (those are covered by the lint workflow).
+      # build:min emits dist/ and links the package into
+      # packages/ts-type-forge/test/dist_/node_modules without running the
+      # repository's own checks (those are covered by the lint workflow).
       - name: Build
-        run: pnpm run build:min
+        run: pnpm --filter ts-type-forge run build:min
 
       - name: Type-check dist output (named imports) with TypeScript ${{ matrix.ts-version }}
-        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./test/dist_/named/tsconfig.json
+        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./packages/ts-type-forge/test/dist_/named/tsconfig.json
 
       - name: Type-check dist output (ambient global) with TypeScript ${{ matrix.ts-version }}
-        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./test/dist_/ambient/tsconfig.json
+        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./packages/ts-type-forge/test/dist_/ambient/tsconfig.json

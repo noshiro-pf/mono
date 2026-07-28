@@ -1,12 +1,12 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { glob, Result } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { extractTypeExports } from './extract-type-exports.mjs';
 
-const srcDir = path.resolve(projectRootPath, './src');
+const srcDir = path.resolve(workspaceRootPath, './src');
 
-const readmePath = path.resolve(projectRootPath, './README.md');
+const readmePath = path.resolve(workspaceRootPath, './README.md');
 
 const markers = {
   start: '<!-- AUTO-GENERATED TYPES START -->',
@@ -21,7 +21,7 @@ type FileEntry = Readonly<{
 }>;
 
 const collectExports = async (filePath: string): Promise<FileEntry> => {
-  const relativePath = path.relative(projectRootPath, filePath);
+  const relativePath = path.relative(workspaceRootPath, filePath);
 
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename

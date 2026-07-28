@@ -7,16 +7,20 @@ import {
   genGlobal,
   genNumberBrandTypes,
 } from '../functions/index.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
-import { genAgentsMd } from './gen-agents-md.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 
-const srcDir = path.resolve(projectRootPath, 'src');
+const srcDir = path.resolve(workspaceRootPath, 'src');
 
-const distDir = path.resolve(projectRootPath, './dist');
+const distDir = path.resolve(workspaceRootPath, './dist');
 
 const globalFilePath = path.resolve(srcDir, 'global.mts');
 
 const entryPointFilePath = path.resolve(srcDir, 'entry-point.mts');
+
+/**
+ * The monorepo root, where the hoisted `node_modules` lives.
+ */
+const monorepoRootPath = path.resolve(workspaceRootPath, '../..');
 
 /**
  * The native TypeScript compiler (TypeScript >= 7). It is installed under the
@@ -28,7 +32,7 @@ const entryPointFilePath = path.resolve(srcDir, 'entry-point.mts');
  * guaranteed.
  */
 const nativeTsc = path.resolve(
-  projectRootPath,
+  monorepoRootPath,
   './node_modules/typescript-native/bin/tsc',
 );
 
@@ -72,12 +76,6 @@ const build = async (skipCheck: boolean): Promise<void> => {
         'Failed to generate entry-point.mts',
       ),
     successMessage: 'Generated src/entry-point.mts',
-  });
-
-  await logStep({
-    startMessage: 'Generating AGENTS.md',
-    action: () => runStep(genAgentsMd(), 'Failed to generate AGENTS.md'),
-    successMessage: 'Generated AGENTS.md',
   });
 
   if (!skipCheck) {
@@ -222,7 +220,7 @@ const runStep = async (
  */
 const ensureDistTestPackageLink = async (): Promise<void> => {
   const packageDir = path.resolve(
-    projectRootPath,
+    workspaceRootPath,
     'test/dist_/node_modules/ts-type-forge',
   );
 
@@ -235,7 +233,7 @@ const ensureDistTestPackageLink = async (): Promise<void> => {
   for (const entry of ['package.json', 'dist'] as const) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.symlink(
-      path.relative(packageDir, path.resolve(projectRootPath, entry)),
+      path.relative(packageDir, path.resolve(workspaceRootPath, entry)),
       path.resolve(packageDir, entry),
     );
   }

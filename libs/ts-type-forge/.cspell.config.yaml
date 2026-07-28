@@ -12,10 +12,12 @@ words:
   - rgba
   - testw
   - tscw
+  - tses
   - XNOR
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
-  - dist/**
-  - docs/**
+  - '**/node_modules/**'
+  - '**/dist/**'
+  - '**/docs/**'
   - agents/common/**

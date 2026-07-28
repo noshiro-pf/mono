@@ -33,8 +33,8 @@ export const extractTypeExports = (content: string): FileExports => {
   // may contain apostrophes (e.g. "shouldn't") that the string-skip logic
   // below would otherwise misread as a string opener.
   const cleaned = content
-    .replaceAll(/\/\*[\s\S]*?\*\//gu, (m) => blankNonNewlines(m))
-    .replaceAll(/\/\/[^\n]*/gu, (m) => blankNonNewlines(m));
+    .replaceAll(/\/\*[\s\S]*?\*\//gu, (m) => m.replaceAll(/[^\n]/gu, ' '))
+    .replaceAll(/\/\/[^\n]*/gu, (m) => m.replaceAll(/[^\n]/gu, ' '));
 
   const lineOf = (idx: number): number =>
     countOccurrences(cleaned.slice(0, idx), '\n') + 1;
@@ -199,8 +199,6 @@ const extractNamespaceTypes = (
 
   return mut_types;
 };
-
-const blankNonNewlines = (m: string): string => m.replaceAll(/[^\n]/gu, ' ');
 
 const isWordBoundary = (content: string, i: number): boolean =>
   i === 0 || /\W/u.test(content[i - 1] ?? ' ');

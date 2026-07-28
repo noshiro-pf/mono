@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { extractSampleCode } from '../cmd/embed-examples-utils.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 // =============================================================================
 // main
@@ -49,7 +49,7 @@ export const genNumberBrandTypes = async (
 
       mut_writtenPaths.push(filePath);
 
-      console.log(`Generated ${path.relative(projectRootPath, filePath)}`);
+      console.log(`Generated ${path.relative(workspaceRootPath, filePath)}`);
     }
 
     await formatFiles(mut_writtenPaths);
@@ -575,7 +575,11 @@ const renderMember = async (member: Member): Promise<string> => {
   }
 
   if (member.example !== undefined) {
-    const samplePath = path.resolve(projectRootPath, sampleDir, member.example);
+    const samplePath = path.resolve(
+      workspaceRootPath,
+      sampleDir,
+      member.example,
+    );
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const raw = await fs.readFile(samplePath, 'utf8');
@@ -664,7 +668,7 @@ const buildImports = (members: readonly Member[]): string => {
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await genNumberBrandTypes(
-    path.resolve(projectRootPath, 'src'),
+    path.resolve(workspaceRootPath, 'src'),
   );
 
   if (Result.isErr(result)) {

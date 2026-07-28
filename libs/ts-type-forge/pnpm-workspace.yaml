@@ -16,3 +16,6 @@ minimumReleaseAgeExclude:
   - eslint-config-typed
   - octokit-safe-types
   - github-settings-as-code
+
+packages:
+  - packages/**

@@ -1,7 +1,7 @@
 {
-  "name": "ts-type-forge",
-  "version": "7.2.1",
-  "private": false,
+  "name": "ts-type-forge-monorepo",
+  "version": "0.0.0",
+  "private": true,
   "keywords": [
     "typescript",
     "utility",
@@ -17,55 +17,33 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": false,
   "type": "module",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/entry-point.d.mts"
-      },
-      "default": {
-        "types": "./dist/entry-point.d.mts"
-      }
-    },
-    "./global": {
-      "import": {
-        "types": "./dist/global.d.mts"
-      },
-      "default": {
-        "types": "./dist/global.d.mts"
-      }
-    }
-  },
-  "types": "./dist/entry-point.d.mts",
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+  "workspaces": [
+    "packages/**"
   ],
   "scripts": {
     "agents:gen": "tsx ./scripts/cmd/gen-agents-md.mts",
     "agents:sync": "tsx ./scripts/cmd/sync-agent-config.mts",
-    "build": "tsx ./scripts/cmd/build.mts",
-    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
-    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "check:ext": "pnpm run ws:check:ext",
+    "check:root": "pnpm run '/check:root:.*/'",
+    "check:root:lint": "pnpm run z:eslint ./{scripts,configs}/**/*.mts --fix",
+    "check:root:type": "node ./node_modules/typescript-native/bin/tsc -p ./tsconfig.json --noEmit",
     "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "ci:publish": "pnpm run ws:build && pnpm changeset publish",
+    "ci:version-packages": "pnpm changeset version && pnpm install --no-frozen-lockfile",
+    "clean:node_modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "codemod": "run-s codemod:uncommitted:as-const fmt codemod:uncommitted:readonly fmt",
     "codemod:diff": "run-s codemod:diff:as-const fmt codemod:diff:readonly fmt",
-    "codemod:diff:as-const": "append-as-const --diff-from origin/main '{scripts,test}/**/*.{mts,tsx}'",
-    "codemod:diff:readonly": "convert-to-readonly --diff-from origin/main '{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:diff:as-const": "append-as-const --diff-from origin/main 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:diff:readonly": "convert-to-readonly --diff-from origin/main 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
     "codemod:full": "run-s codemod:full:as-const fmt codemod:full:readonly fmt",
-    "codemod:full:as-const": "append-as-const '{scripts,test}/**/*.{mts,tsx}'",
-    "codemod:full:readonly": "convert-to-readonly '{scripts,test}/**/*.{mts,tsx}'",
-    "codemod:uncommitted:as-const": "append-as-const --uncommitted '{scripts,test}/**/*.{mts,tsx}'",
-    "codemod:uncommitted:readonly": "convert-to-readonly --uncommitted '{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:full:as-const": "append-as-const 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:full:readonly": "convert-to-readonly 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:as-const": "append-as-const --uncommitted 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
+    "codemod:uncommitted:readonly": "convert-to-readonly --uncommitted 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
     "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
-    "doc": "tsx ./scripts/cmd/gen-docs.mts",
-    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
-    "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
-    "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",
-    "doc:watch": "typedoc --options ./configs/typedoc.config.mjs --watch",
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
-    "fmt:full": "prettier --write .",
+    "fmt:full": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write .",
     "gh:apply-all": "gh-apply-all",
     "gh:apply-repository-settings": "gh-apply-repository-settings",
     "gh:apply-rulesets": "gh-apply-rulesets",
@@ -73,60 +51,56 @@
     "gh:backup-all": "gh-backup-all",
     "gh:backup-repository-settings": "gh-backup-repository-settings",
     "gh:backup-rulesets": "gh-backup-rulesets",
-    "gi": "run-s gi:src fmt",
-    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude '*.test.mts' --exclude global.mts --exclude entry-point.mts",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "md": "markdownlint-cli2",
-    "test": "run-p test:*",
-    "test:src": "node ./node_modules/typescript-native/bin/tsc --noEmit -p ./tsconfig.json",
-    "tsc": "run-p test:*",
-    "tscw": "node ./node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
-    "type-check": "node ./node_modules/typescript-native/bin/tsc --noEmit"
+    "update-dependencies": "pnpm update --latest -r '!eslint' '!typescript'",
+    "ws:build": "tsx ./scripts/cmd/ws-build-stages.mts",
+    "ws:build:min": "tsx ./scripts/cmd/ws-build-min-stages.mts",
+    "ws:check:ext": "pnpm run --recursive --if-present check:ext",
+    "ws:doc": "pnpm run --recursive --if-present doc",
+    "ws:doc:embed": "pnpm run --recursive --if-present doc:embed",
+    "ws:doc:embed:jsdoc": "pnpm run --recursive --if-present doc:embed:jsdoc",
+    "ws:gi": "pnpm run --recursive --if-present gi",
+    "ws:lint": "pnpm run --recursive --if-present lint",
+    "ws:lint:fix": "pnpm run --recursive --if-present lint:fix",
+    "ws:test": "pnpm run --recursive --if-present test",
+    "ws:test:cov": "pnpm run --recursive --if-present test:cov",
+    "ws:tsc": "pnpm run --recursive --if-present tsc",
+    "ws:type-check": "pnpm run --recursive --if-present type-check",
+    "z:eslint": "NODE_OPTIONS='--max-old-space-size=6144' TIMING=1 eslint"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "6.0.3",
-    "@semantic-release/commit-analyzer": "13.0.1",
-    "@semantic-release/exec": "7.1.0",
-    "@semantic-release/git": "10.0.1",
-    "@semantic-release/github": "12.0.9",
-    "@semantic-release/npm": "13.1.5",
-    "@semantic-release/release-notes-generator": "14.1.1",
-    "@types/node": "26.1.1",
-    "conventional-changelog-conventionalcommits": "10.2.1",
+    "@changesets/cli": "2.31.1",
+    "@types/node": "26.1.2",
+    "@vitest/coverage-v8": "4.1.10",
     "cspell": "10.0.1",
+    "esbuild": "0.28.1",
     "eslint": "10.7.0",
-    "eslint-config-typed": "5.4.2",
-    "github-settings-as-code": "1.2.9",
+    "eslint-config-typed": "5.8.1",
+    "github-settings-as-code": "1.2.10",
     "jiti": "2.7.0",
-    "markdownlint": "0.41.0",
-    "markdownlint-cli2": "0.23.0",
+    "markdownlint": "0.41.1",
+    "markdownlint-cli2": "0.23.1",
     "npm-run-all2": "9.0.2",
-    "prettier": "3.9.5",
+    "prettier": "3.9.6",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.2",
-    "semantic-release": "25.0.6",
-    "ts-codemod-lib": "2.2.2",
-    "ts-data-forge": "10.0.0",
-    "ts-fortress": "10.0.0",
-    "ts-repo-utils": "10.1.2",
-    "tsx": "4.23.0",
-    "typedoc": "0.28.20",
-    "typedoc-github-theme": "0.4.0",
+    "rollup": "4.62.2",
+    "rollup-plugin-esbuild": "6.2.1",
+    "ts-codemod-lib": "2.2.3",
+    "ts-fortress": "11.0.2",
+    "ts-repo-utils": "10.1.4",
+    "tsx": "4.23.1",
     "typescript": "6.0.3",
     "typescript-native": "npm:typescript@7.0.2",
-    "vite": "8.1.4"
+    "vite": "8.1.5",
+    "vitest": "4.1.10"
   },
-  "packageManager": "pnpm@11.15.1",
+  "packageManager": "pnpm@11.17.0",
   "engines": {
     "node": ">=22.22.2",
     "pnpm": ">=9.0.0"
   },
   "volta": {
     "node": "26.3.1"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
   }
 }

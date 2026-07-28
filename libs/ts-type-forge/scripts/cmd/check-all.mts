@@ -1,7 +1,7 @@
 import { $, Result } from 'ts-repo-utils';
 
 /**
- * Runs all validation and build steps for the project.
+ * Runs all validation and build steps for the monorepo.
  */
 const checkAll = async (): Promise<void> => {
   console.info('Starting full project validation and build...\n');
@@ -10,6 +10,13 @@ const checkAll = async (): Promise<void> => {
     startMessage: 'Installing dependencies',
     action: () => runCmdStep('pnpm i', 'Failed to install dependencies'),
     successMessage: 'Dependencies installed',
+  });
+
+  await logStep({
+    startMessage: 'Regenerating AGENTS.md',
+    action: () =>
+      runCmdStep('pnpm run agents:gen', 'AGENTS.md generation failed'),
+    successMessage: 'AGENTS.md regenerated',
   });
 
   await logStep({
@@ -28,20 +35,36 @@ const checkAll = async (): Promise<void> => {
   await logStep({
     startMessage: 'Checking file extensions',
     action: () =>
-      runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+      runCmdStep('pnpm run ws:check:ext', 'Checking file extensions failed'),
     successMessage: 'File extensions validated',
   });
 
   await logStep({
-    startMessage: 'Running lint fixes',
-    action: () => runCmdStep('pnpm run lint:fix', 'Linting failed'),
-    successMessage: 'Lint fixes applied',
+    startMessage: 'Checking scripts and configs',
+    action: () =>
+      runCmdStep('pnpm run check:root', 'Checking scripts and configs failed'),
+    successMessage: 'Scripts and configs validated',
   });
 
   await logStep({
-    startMessage: 'Building project',
-    action: () => runCmdStep('pnpm run build', 'Build failed'),
+    startMessage: 'Running lint fixes',
+    action: () => runCmdStep('pnpm run ws:lint:fix', 'Linting failed'),
+    successMessage: 'Lint fixes applied',
+  });
+
+  // Note: the named-import / ambient-global dist smoke tests of
+  // `ts-type-forge` (packages/ts-type-forge/test/dist_) run as part of the
+  // build below, against the built dist output.
+  await logStep({
+    startMessage: 'Building all packages',
+    action: () => runCmdStep('pnpm run ws:build', 'Build failed'),
     successMessage: 'Build succeeded',
+  });
+
+  await logStep({
+    startMessage: 'Running tests',
+    action: () => runCmdStep('pnpm run ws:test', 'Tests failed'),
+    successMessage: 'Tests passed',
   });
 
   await logStep({
@@ -50,13 +73,10 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Codemod applied',
   });
 
-  // Note: the named-import / ambient-global import-pattern tests
-  // (test/dist_/named, test/dist_/ambient) run as part of `pnpm run build`
-  // above, against the built dist output.
   await logStep({
-    startMessage: 'Generating documentation',
-    action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
-    successMessage: 'Documentation generated',
+    startMessage: 'Formatting code',
+    action: () => runCmdStep('pnpm run fmt:full', 'File formatting failed'),
+    successMessage: 'Code formatted',
   });
 
   console.info('✅ All checks completed successfully!\n');
