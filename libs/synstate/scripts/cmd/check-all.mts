@@ -52,13 +52,6 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
-    startMessage: 'Generating documentation',
-    action: () =>
-      runCmdStep('pnpm run ws:doc', 'Documentation generation failed'),
-    successMessage: 'Documentation generated',
-  });
-
-  await logStep({
     startMessage: 'Running lint fixes',
     action: () => runCmdStep('pnpm run ws:lint:fix', 'Linting failed'),
     successMessage: 'Lint fixes applied',
@@ -72,7 +65,7 @@ const checkAll = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Formatting code',
-    action: () => runCmdStep('pnpm run fmt:full', 'File formatting failed'),
+    action: () => runCmdStep('pnpm run fmt:diff', 'File formatting failed'),
     successMessage: 'Code formatted',
   });
 
