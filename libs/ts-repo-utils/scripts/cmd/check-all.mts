@@ -57,9 +57,9 @@ const checkAll = async (): Promise<void> => {
   });
 
   await logStep({
-    startMessage: 'Generating documentation',
-    action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
-    successMessage: 'Documentation generated',
+    startMessage: 'Formatting code',
+    action: () => runCmdStep('pnpm run fmt:diff', 'File formatting failed'),
+    successMessage: 'Code formatted',
   });
 
   console.log('✅ All checks completed successfully!\n');
