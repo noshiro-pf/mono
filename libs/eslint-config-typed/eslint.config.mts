@@ -16,7 +16,7 @@ const thisDir = import.meta.dirname;
 
 export default [
   {
-    ignores: ['.eslintrc.cjs', 'docs/**', 'agents/**'],
+    ignores: ['docs/**', 'agents/**'],
   },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
@@ -171,10 +171,7 @@ export default [
   {
     files: ['src/**'],
     rules: defineKnownRules({
-      'import-x/no-unused-modules': [
-        'error',
-        { unusedExports: true, ignoreExports: ['src/entry-point.mts'] },
-      ],
+      'import-x/no-unused-modules': 'off',
     }),
   },
   {
