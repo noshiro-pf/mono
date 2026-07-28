@@ -11,7 +11,7 @@ const thisDir = import.meta.dirname;
 
 export default [
   {
-    ignores: ['.eslintrc.cjs', 'agents/**'],
+    ignores: ['agents/**'],
   },
   ...eslintConfigForTypeScript({
     tsconfigRootDir: thisDir,
