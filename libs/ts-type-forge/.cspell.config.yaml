@@ -4,16 +4,17 @@ allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
 words:
+  - anthropics
   - bivariant
   - contravariance
   - gcanti
-  - NAND
+  - nand
   - noshiro
   - rgba
   - testw
   - tscw
   - tses
-  - XNOR
+  - xnor
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
