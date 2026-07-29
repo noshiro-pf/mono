@@ -1,6 +1,7 @@
 import { type ESLintPlugin } from '../types.mjs';
-import { preferNonEmptyArray } from './prefer-non-empty-array.mjs';
+import { preferCanonicalLengthConstrainedTuple } from './prefer-canonical-length-constrained-tuple.mjs';
 
 export const tsTypeForgeRules = {
-  'prefer-non-empty-array': preferNonEmptyArray,
+  'prefer-canonical-length-constrained-tuple':
+    preferCanonicalLengthConstrainedTuple,
 } as const satisfies ESLintPlugin['rules'];

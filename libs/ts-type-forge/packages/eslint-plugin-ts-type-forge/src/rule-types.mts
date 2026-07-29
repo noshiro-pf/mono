@@ -28,7 +28,7 @@ type RuleOptionsOf<Name extends keyof typeof tsTypeForgeRules> =
     : never;
 
 /**
- * @description Replace the `readonly [V, ...V[]]` tuple spelling with `NonEmptyArray<V>` from ts-type-forge.
+ * @description Replace uniform tuple spellings such as `[V, ...V[]]` / `[V, V, ...V[]]` / `[V, V, V]` with the canonical ts-type-forge tuple type.
  *
  *  ```md
  *  | key        | value      |
@@ -38,7 +38,7 @@ type RuleOptionsOf<Name extends keyof typeof tsTypeForgeRules> =
  *  | fixable    | code       |
  *  ```
  */
-namespace PreferNonEmptyArray {
+namespace PreferCanonicalLengthConstrainedTuple {
   /**
    * ### schema
    *
@@ -53,7 +53,12 @@ namespace PreferNonEmptyArray {
    *           "global",
    *           "named"
    *         ],
-   *         "description": "How `NonEmptyArray` is brought into scope. 'global' (default) assumes the ambient globals of `ts-type-forge/global` and never touches imports; 'named' makes the autofix add `import { type NonEmptyArray } from 'ts-type-forge';` when the name is not imported yet."
+   *         "description": "How the ts-type-forge type is brought into scope. 'global' (default) assumes the ambient globals of `ts-type-forge/global` and never touches imports; 'named' makes the autofix add the corresponding `import { type … } from 'ts-type-forge';` when the name is not imported yet."
+   *       },
+   *       "maxLength": {
+   *         "type": "integer",
+   *         "minimum": 2,
+   *         "description": "Longest tuple the rule rewrites (default 10). Longer tuples are usually spelled out on purpose, and the named form stops being more readable."
    *       }
    *     },
    *     "additionalProperties": false
@@ -61,7 +66,9 @@ namespace PreferNonEmptyArray {
    * ]
    * ```
    */
-  export type Options = NonNullable<RuleOptionsOf<'prefer-non-empty-array'>[0]>;
+  export type Options = NonNullable<
+    RuleOptionsOf<'prefer-canonical-length-constrained-tuple'>[0]
+  >;
 
   export type RuleEntry =
     | 'off'
@@ -70,11 +77,11 @@ namespace PreferNonEmptyArray {
 }
 
 export type EslintTsTypeForgeRules = Readonly<{
-  'ts-type-forge/prefer-non-empty-array': PreferNonEmptyArray.RuleEntry;
+  'ts-type-forge/prefer-canonical-length-constrained-tuple': PreferCanonicalLengthConstrainedTuple.RuleEntry;
 }>;
 
 export type EslintTsTypeForgeRulesOption = Readonly<{
-  'ts-type-forge/prefer-non-empty-array': PreferNonEmptyArray.Options;
+  'ts-type-forge/prefer-canonical-length-constrained-tuple': PreferCanonicalLengthConstrainedTuple.Options;
 }>;
 
 // If this assertion fails to type-check, this generated file has drifted from

@@ -6,54 +6,96 @@ import {
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
+export type UniformTupleShape = Readonly<{
+  /** The node an autofix must replace: the tuple, or the `readonly` operator. */
+  node: TSESTree.Node;
+  isReadonly: boolean;
+  /** Source text of the (single, shared) element type. */
+  elementText: string;
+  /** Number of leading fixed-position elements. */
+  fixedCount: number;
+  /** Whether a trailing `...V[]` rest element is present. */
+  hasRest: boolean;
+}>;
+
 /**
- * Matches the "non-empty array" tuple spelling — `readonly [V, ...V[]]` (and
- * its equivalent `readonly [V, ...(readonly V[])]`) — and returns the source
- * text of `V`, or `undefined` when `node` is not that shape.
+ * Recognizes a tuple whose every position has the *same* element type — the
+ * hand-rolled spelling of ts-type-forge's length-constrained tuple family:
  *
- * Deliberately narrow:
+ * | shape                | meaning                    |
+ * | :------------------- | :------------------------- |
+ * | `[V, ..., V]`        | `FixedLengthTuple<N, V>`   |
+ * | `[V, ..., V, ...V[]]`| `MinLengthTuple<N, V>`     |
  *
- * - Only the `readonly` operator is matched. A mutable `[V, ...V[]]` is a
- *   different type (`MutableNonEmptyArray<V>`) and is left alone.
- * - Exactly two elements, the second being a rest element whose element type is
- *   textually identical to the first.
- * - Labelled members (`readonly [head: V, ...tail: V[]]`) are skipped, since
- *   rewriting them would silently drop the labels.
+ * Returns `undefined` for anything else. Deliberately narrow:
+ *
+ * - Element types are compared by normalized source text, so heterogeneous
+ *   tuples are never matched.
+ * - Optional (`[V?]`) and labelled (`[head: V]`) members are skipped, since
+ *   rewriting them would drop information.
+ * - A tuple that is only a rest element (`[...V[]]`) is not a length
+ *   constraint at all.
  */
-export const getNonEmptyArrayElementText = (
-  node: TSESTree.TSTypeOperator,
+export const analyzeUniformTuple = (
+  tuple: TSESTree.TSTupleType,
   sourceCode: TSESLint.SourceCode,
-): string | undefined => {
-  if (node.operator !== 'readonly') return undefined;
+): UniformTupleShape | undefined => {
+  const { parent } = tuple;
 
-  const tuple = node.typeAnnotation;
+  const isReadonly =
+    parent.type === AST_NODE_TYPES.TSTypeOperator &&
+    parent.operator === 'readonly';
 
-  if (tuple?.type !== AST_NODE_TYPES.TSTupleType) return undefined;
+  const elements = tuple.elementTypes;
 
-  const [head, tail, ...rest] = tuple.elementTypes;
+  const last = elements.at(-1);
 
-  if (head === undefined || tail === undefined || rest.length > 0) {
-    return undefined;
-  }
+  const hasRest = last?.type === AST_NODE_TYPES.TSRestType;
+
+  const leading = hasRest ? elements.slice(0, -1) : elements;
 
   if (
-    head.type === AST_NODE_TYPES.TSRestType ||
-    head.type === AST_NODE_TYPES.TSOptionalType ||
-    head.type === AST_NODE_TYPES.TSNamedTupleMember ||
-    tail.type !== AST_NODE_TYPES.TSRestType
+    leading.length === 0 ||
+    leading.some(
+      (element) =>
+        element.type === AST_NODE_TYPES.TSRestType ||
+        element.type === AST_NODE_TYPES.TSOptionalType ||
+        element.type === AST_NODE_TYPES.TSNamedTupleMember,
+    )
   ) {
     return undefined;
   }
 
-  const restElementType = getArrayElementType(tail.typeAnnotation);
+  const restElementType =
+    last !== undefined && hasRest
+      ? getArrayElementType(last.typeAnnotation)
+      : undefined;
 
-  if (restElementType === undefined) return undefined;
+  if (hasRest && restElementType === undefined) return undefined;
 
-  const headText = sourceCode.getText(head);
+  const [head] = leading;
 
-  return normalizeWhitespace(headText) ===
-    normalizeWhitespace(sourceCode.getText(restElementType))
-    ? headText
+  if (head === undefined) return undefined;
+
+  const elementText = sourceCode.getText(head);
+
+  const expected = normalizeWhitespace(elementText);
+
+  const others = [
+    ...leading.slice(1),
+    ...(restElementType === undefined ? [] : [restElementType]),
+  ];
+
+  return others.every(
+    (element) => normalizeWhitespace(sourceCode.getText(element)) === expected,
+  )
+    ? {
+        node: isReadonly ? parent : tuple,
+        isReadonly,
+        elementText,
+        fixedCount: leading.length,
+        hasRest,
+      }
     : undefined;
 };
 
