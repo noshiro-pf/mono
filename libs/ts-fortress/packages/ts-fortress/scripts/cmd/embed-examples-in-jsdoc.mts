@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 
@@ -22,7 +22,7 @@ export const embedExamplesInJsDoc = async (): Promise<
     const mut_modifiedFiles: string[] = [];
 
     for (const { sampleFiles, sourcePath } of sourceFileMappings) {
-      const sourceFilePath = path.resolve(projectRootPath, sourcePath);
+      const sourceFilePath = path.resolve(workspaceRootPath, sourcePath);
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const sourceContent = await fs.readFile(sourceFilePath, 'utf8');
@@ -40,7 +40,7 @@ export const embedExamplesInJsDoc = async (): Promise<
       let mut_rest: string = sourceContent;
 
       for (const sampleFile of sampleFiles) {
-        const samplePath = path.resolve(projectRootPath, sampleFile);
+        const samplePath = path.resolve(workspaceRootPath, sampleFile);
 
         // Read sample content
         // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -87,7 +87,7 @@ export const embedExamplesInJsDoc = async (): Promise<
         mut_rest = afterBlock;
 
         console.log(
-          `✓ Updated code block for ${sampleFile} in ${path.relative(projectRootPath, sourceFilePath)}`,
+          `✓ Updated code block for ${sampleFile} in ${path.relative(workspaceRootPath, sourceFilePath)}`,
         );
       }
 

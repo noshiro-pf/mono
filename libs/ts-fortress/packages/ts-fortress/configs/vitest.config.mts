@@ -2,10 +2,10 @@ import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
 import { type ViteUserConfig } from 'vitest/config';
 import { type CoverageOptions, type ProjectConfig } from 'vitest/node';
-import { projectRootPath } from '../scripts/project-root-path.mjs';
+import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 
 const aliasMap = {
-  'ts-fortress': path.resolve(projectRootPath, './src/entry-point.mts'),
+  'ts-fortress': path.resolve(workspaceRootPath, './src/entry-point.mts'),
 };
 
 // https://github.com/vitest-dev/vitest/blob/v1.5.0/test/import-meta/vite.config.ts
@@ -23,7 +23,7 @@ const config = () =>
             ...projectConfig(),
             typecheck: {
               tsconfig: path.resolve(
-                projectRootPath,
+                workspaceRootPath,
                 './configs/tsconfig.test.json',
               ),
             },
@@ -57,7 +57,7 @@ const projectConfig = (
   }>,
 ) =>
   ({
-    dir: projectRootPath,
+    dir: workspaceRootPath,
     globals: true,
     restoreMocks: true,
     hideSkippedTests: true,

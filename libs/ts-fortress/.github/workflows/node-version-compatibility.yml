@@ -51,8 +51,8 @@ jobs:
 
       - name: Build
         if: steps.check_diff_type.outputs.should_run == 'true'
-        run: pnpm run build
+        run: pnpm run ws:build
 
       - name: Test
         if: steps.check_diff_type.outputs.should_run == 'true'
-        run: pnpm run test
+        run: pnpm run ws:test

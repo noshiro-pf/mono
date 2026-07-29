@@ -57,7 +57,7 @@ jobs:
       # test/dist_/node_modules without running the repository's own checks
       # (those are covered by the lint workflow).
       - name: Build
-        run: pnpm run build:min
+        run: pnpm --filter ts-fortress run build:min
 
       - name: Type-check dist output (named imports) with TypeScript ${{ matrix.ts-version }}
-        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./test/dist_/named/tsconfig.json
+        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./packages/ts-fortress/test/dist_/named/tsconfig.json

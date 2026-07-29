@@ -17,3 +17,6 @@ minimumReleaseAgeExclude:
   - octokit-safe-types
   - github-settings-as-code
   - eslint-plugin-ts-data-forge
+
+packages:
+  - packages/**

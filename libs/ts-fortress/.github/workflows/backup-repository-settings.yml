@@ -41,6 +41,10 @@ jobs:
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           OWNER: noshiro-pf
+          # github-settings-as-code falls back to the root package.json `name`,
+          # which is the private workspace root (`ts-fortress-monorepo`), so the
+          # repository has to be named explicitly.
+          REPO_NAME: ts-fortress
 
       - name: Check if there is no file diff
         run: pnpm exec assert-repo-is-clean

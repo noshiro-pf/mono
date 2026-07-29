@@ -58,7 +58,7 @@
             "integration_id": 15368
           },
           {
-            "context": "style-check (doc)",
+            "context": "style-check (ws:doc)",
             "integration_id": 15368
           },
           {
@@ -66,11 +66,11 @@
             "integration_id": 15368
           },
           {
-            "context": "lint-and-build (build)",
+            "context": "lint-and-build (ws:build)",
             "integration_id": 15368
           },
           {
-            "context": "lint-and-build (lint:fix)",
+            "context": "lint-and-build (ws:lint:fix)",
             "integration_id": 15368
           },
           {
@@ -78,11 +78,15 @@
             "integration_id": 15368
           },
           {
-            "context": "test (test)",
+            "context": "lint-and-build (check:root)",
             "integration_id": 15368
           },
           {
-            "context": "test (test:browser)",
+            "context": "test (ws:test)",
+            "integration_id": 15368
+          },
+          {
+            "context": "test (ws:test:browser)",
             "integration_id": 15368
           },
           {

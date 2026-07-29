@@ -2,33 +2,31 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
-  eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
 import {
   eslintPluginTsDataForge,
   type EslintTsDataForgeRules,
 } from 'eslint-plugin-ts-data-forge';
-
-const thisDir = import.meta.dirname;
+import { repositoryRootPath } from './scripts/repository-root-path.mjs';
 
 export default [
   {
-    ignores: [
-      'docs/**',
-      'agents/**',
-      // test/dist_/ has its own tsconfig and type-checks the built dist/
-      // output (see scripts/cmd/build.mts); it is excluded from the root
-      // tsconfig, so the typed-linter cannot parse it.
-      'test/dist_/**',
-    ],
+    // Each workspace package under packages/ has its own flat config
+    // (and its own tsconfig, which the typed linter needs).
+    ignores: ['packages/**', 'agents/**'],
   },
   ...eslintConfigForTypeScript({
-    tsconfigRootDir: thisDir,
-    tsconfigFileName: './tsconfig.json',
-    packageDirs: [thisDir],
+    tsconfigRootDir: repositoryRootPath,
+    tsconfigFileName: 'tsconfig.json',
+    packageDirs: [repositoryRootPath],
   }),
 
+  {
+    rules: defineKnownRules({
+      'import-x/no-unused-modules': 'off',
+    }),
+  },
   {
     plugins: { 'ts-data-forge': eslintPluginTsDataForge },
     rules: {
@@ -51,29 +49,6 @@ export default [
     } satisfies EslintTsDataForgeRules,
   },
 
-  eslintConfigForVitest(),
-
-  {
-    rules: defineKnownRules({
-      'import-x/no-unused-modules': 'off',
-      'unicorn/prefer-temporal': 'off',
-    }),
-  },
-
-  {
-    files: ['test/**/*.mts', '**/*.test.mts'],
-    rules: defineKnownRules({
-      '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/no-duplicate-type-constituents': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/consistent-indexed-object-style': 'off',
-      '@typescript-eslint/no-restricted-types': 'off',
-      '@typescript-eslint/no-redundant-type-constituents': 'off',
-      'unicorn/consistent-function-scoping': 'off',
-      'unicorn/no-array-fill-with-reference-type': 'off',
-    }),
-  },
-
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
     files: ['scripts/**', 'configs/**'],
@@ -84,6 +59,12 @@ export default [
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
       'import-x/no-extraneous-dependencies': 'off',
+      // ts-repo-utils' API surface still references `Result` as an ambient
+      // type. Until that is migrated to named imports, type narrowing of
+      // its return values reports as `any` here.
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
     }),
   },
   {
@@ -91,23 +72,6 @@ export default [
     rules: defineKnownRules({
       'import-x/no-default-export': 'off',
       'import-x/no-anonymous-default-export': 'off',
-    }),
-  },
-
-  {
-    files: ['src/entry-point.mts'],
-    rules: defineKnownRules({
-      '@typescript-eslint/no-restricted-imports': 'off',
-    }),
-  },
-
-  {
-    files: ['samples/**'],
-    rules: defineKnownRules({
-      'import-x/no-extraneous-dependencies': 'off',
-      'import-x/no-internal-modules': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      'functional/immutable-data': 'off',
     }),
   },
 ] satisfies readonly FlatConfig[];

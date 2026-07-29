@@ -1,7 +1,7 @@
 {
   "extends": [
-    "./tsconfig/tsconfig.build.json",
-    "./tsconfig/tsconfig.vite.json"
+    "../../../configs/tsconfig/tsconfig.build.json",
+    "../../../configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
     "sourceMap": true,

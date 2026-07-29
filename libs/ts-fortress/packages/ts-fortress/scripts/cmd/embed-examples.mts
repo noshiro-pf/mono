@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { type DeepReadonly } from 'ts-type-forge';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { extractSampleCode } from './embed-examples-utils.mjs';
 
 const codeBlockEnd = '```';
@@ -34,8 +34,8 @@ const documents: DeepReadonly<
   }[]
 > = [
   {
-    mdPath: path.resolve(projectRootPath, 'README.md'),
-    samplesDir: path.resolve(projectRootPath, 'samples/readme'),
+    mdPath: path.resolve(workspaceRootPath, 'README.md'),
+    samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
     sampleCodeFiles: [
       'quick-start/quick-start.test.mts',
       'default-values-and-data-filling/intro.test.mts',
@@ -65,11 +65,11 @@ const documents: DeepReadonly<
   },
   {
     mdPath: path.resolve(
-      projectRootPath,
+      workspaceRootPath,
       'documents/why-ts-fortress-over-zod-and-io-ts.md',
     ),
     samplesDir: path.resolve(
-      projectRootPath,
+      workspaceRootPath,
       'samples/why-ts-fortress-over-zod-and-io-ts',
     ),
     sampleCodeFiles: [

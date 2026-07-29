@@ -1,12 +1,12 @@
 import * as path from 'node:path';
 import { unknownToString, type UnknownResult } from 'ts-data-forge';
 import { $, assertPathExists, isDirectlyExecuted, Result } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { embedExamplesInJsDoc } from './embed-examples-in-jsdoc.mjs';
 import { embedExamples } from './embed-examples.mjs';
 
 const TYPEDOC_CONFIG = path.resolve(
-  projectRootPath,
+  workspaceRootPath,
   './configs/typedoc.config.mjs',
 );
 
@@ -44,7 +44,10 @@ export const genDocs = async (): Promise<void> => {
 
   await logStep({
     startMessage: 'Linting markdown files',
-    action: () => runCmdStep('pnpm run md', 'Markdown linting failed'),
+    // `md` is a repository-wide script (the markdownlint config lives at the
+    // monorepo root), so it has to be invoked from there.
+    action: () =>
+      runCmdStep('pnpm --workspace-root run md', 'Markdown linting failed'),
     successMessage: 'Markdown linting completed',
   });
 

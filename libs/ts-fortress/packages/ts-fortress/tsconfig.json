@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "ts-fortress": ["./src/entry-point.mts"]
+    }
+  },
+  "include": [
+    "./src",
+    "./test",
+    "./samples",
+    "./scripts",
+    "./configs",
+    "./eslint.config.mts"
+  ]
+}

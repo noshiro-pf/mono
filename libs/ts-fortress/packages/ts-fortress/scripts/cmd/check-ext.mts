@@ -1,15 +1,15 @@
 import * as path from 'node:path';
 import { assertExt } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 await assertExt({
   directories: [
     {
-      path: path.resolve(projectRootPath, './src'),
+      path: path.resolve(workspaceRootPath, './src'),
       extension: '.mts',
     },
     {
-      path: path.resolve(projectRootPath, './scripts'),
+      path: path.resolve(workspaceRootPath, './scripts'),
       extension: ['.mts', '.md'],
     },
   ],

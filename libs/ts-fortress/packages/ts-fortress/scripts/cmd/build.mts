@@ -3,10 +3,14 @@ import * as path from 'node:path';
 import { rollup } from 'rollup';
 import { Arr, unknownToString, type UnknownResult } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
-import { genAgentsMd } from './gen-agents-md.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 
-const distDir = path.resolve(projectRootPath, './dist');
+const distDir = path.resolve(workspaceRootPath, './dist');
+
+/**
+ * The monorepo root, where the hoisted `node_modules` lives.
+ */
+const monorepoRootPath = path.resolve(workspaceRootPath, '../..');
 
 /**
  * The native TypeScript compiler (TypeScript >= 7). It is installed under the
@@ -18,7 +22,7 @@ const distDir = path.resolve(projectRootPath, './dist');
  * guaranteed.
  */
 const nativeTsc = path.resolve(
-  projectRootPath,
+  monorepoRootPath,
   './node_modules/typescript-native/bin/tsc',
 );
 
@@ -55,12 +59,6 @@ const build = async (skipCheck: boolean): Promise<void> => {
       startMessage: 'Generating index files',
       action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
       successMessage: 'Index files generated',
-    });
-
-    await logStep({
-      startMessage: 'Generating AGENTS.md',
-      action: () => runStep(genAgentsMd(), 'Failed to generate AGENTS.md'),
-      successMessage: 'Generated AGENTS.md',
     });
 
     await logStep({
@@ -110,7 +108,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     startMessage: 'Generating type declarations',
     action: () =>
       runCmdStep(
-        `node "${nativeTsc}" -p "${path.resolve(projectRootPath, './configs/tsconfig.build.json')}" --emitDeclarationOnly`,
+        `node "${nativeTsc}" -p "${path.resolve(workspaceRootPath, './configs/tsconfig.build.json')}" --emitDeclarationOnly`,
         'Type declaration generation failed',
       ),
     successMessage: 'Type declarations generated',
@@ -237,7 +235,7 @@ const runStep = async (
  */
 const ensureDistTestPackageLink = async (): Promise<void> => {
   const packageDir = path.resolve(
-    projectRootPath,
+    workspaceRootPath,
     'test/dist_/node_modules/ts-fortress',
   );
 
@@ -250,7 +248,7 @@ const ensureDistTestPackageLink = async (): Promise<void> => {
   for (const entry of ['package.json', 'dist'] as const) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.symlink(
-      path.relative(packageDir, path.resolve(projectRootPath, entry)),
+      path.relative(packageDir, path.resolve(workspaceRootPath, entry)),
       path.resolve(packageDir, entry),
     );
   }

@@ -492,10 +492,71 @@ Types such as `DeepReadonly`, `StrictOmit`, `ReadonlyRecord` etc. are installed 
 
 ## ts-fortress Local Rules
 
-Repository-specific rules for `ts-fortress` (a runtime type-validation /
-branded-type library). These supplement the shared instructions above
-(vendored into `agents/common-rules.md` from the common-agent-config
-repository).
+Repository-specific rules for the `ts-fortress` monorepo (a runtime
+type-validation / branded-type library and its ESLint plugin). These supplement
+the shared instructions above (vendored into `agents/common-rules.md` from the
+common-agent-config repository).
+
+### Repository Layout (monorepo)
+
+This repository is a **pnpm workspace** (`pnpm-workspace.yaml`,
+`packages: packages/**`). The root `package.json` is private
+(`ts-fortress-monorepo`) and only holds repository-wide tooling; every
+publishable artifact lives under `packages/`:
+
+| Package                              | Description                                                           |
+| :----------------------------------- | :-------------------------------------------------------------------- |
+| `packages/ts-fortress`               | The schema validation library published as `ts-fortress`.             |
+| `packages/eslint-plugin-ts-fortress` | ESLint rules that steer schema definitions toward ts-fortress idioms. |
+
+Repository-wide files at the root: `configs/tsconfig/*` (shared tsconfig bases
+every package extends), `scripts/` (workspace orchestration:
+`ws-build-stages.mts`, `check-all.mts`, the `AGENTS.md` generators),
+`.changeset/`, `agents/`, `github/`, and the linter / formatter / spellcheck
+configs.
+
+Use **pnpm** (see `packageManager` in package.json); do not use npm or yarn.
+
+### Essential Development Commands
+
+Run from the repository root:
+
+- `pnpm run ws:build` - Build every package in dependency order
+  (`ws:build:min` skips the per-package checks).
+- `pnpm run ws:test` / `ws:test:cov` / `ws:test:browser` / `ws:lint:fix` /
+  `ws:doc` / `ws:check:ext` / `ws:gi` - Run the corresponding script in every
+  package that defines it.
+- `pnpm run check:root` - Type-check and lint the root `scripts/` + `configs/`
+  (these are outside every package's tsconfig).
+- `pnpm run check-all` - Comprehensive validation (spellcheck, markdown,
+  extensions, root checks, lint, build, tests, codemod, format).
+- `pnpm run agents:gen` - Regenerate `AGENTS.md` from `agents/*.md`.
+- `pnpm changeset` - Record a release note for the packages you changed
+  (releases are driven by Changesets, not semantic-release).
+
+Per package, use `pnpm --filter <name> run <script>` or run from its directory.
+
+#### `packages/eslint-plugin-ts-fortress`
+
+- `src/rules/<rule-name>.mts` - one rule per file, exported as a plain
+  `TSESLint.RuleModule` object (not `RuleCreator`), so read options from
+  `context.options[0]` and apply defaults manually.
+- `src/rules/rules.mts` - the rule registry; add new rules here.
+- `src/rules/import-utils.mts` - shared import/callee helpers. ts-fortress is
+  idiomatically consumed as `import * as t from 'ts-fortress'`, so every rule
+  must handle both the namespace and the named-import (incl. aliased) form.
+- `src/rule-types.mts` - **generated** (`pnpm run gen:rule-types`); contains a
+  `TypeEq` assertion that fails to compile when it drifts from `rules.mts`.
+- Every rule needs a co-located `*.test.mts` covering the `valid` and `invalid`
+  (with `output`) sides, plus the cases the rule deliberately skips.
+
+#### Generated Files (never edit manually)
+
+`packages/ts-fortress/src/**/index.mts`,
+`packages/eslint-plugin-ts-fortress/src/rule-types.mts`, and the root
+`AGENTS.md` are auto-generated. Regenerate with `pnpm run ws:build` (or
+`pnpm run ws:gi` / `pnpm run agents:gen` individually). CI fails if they drift
+from the committed state.
 
 ### Validation Error Handling
 

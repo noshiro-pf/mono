@@ -4,7 +4,9 @@
 version: 2
 updates:
   - package-ecosystem: 'npm' # See documentation for possible values
-    directory: '/'
+    directories:
+      - '/'
+      - '/packages/*'
     schedule:
       interval: 'weekly'
     cooldown:

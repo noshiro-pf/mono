@@ -1,14 +1,19 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
-import { projectRootPath } from '../project-root-path.mjs';
+import { repositoryRootPath } from '../repository-root-path.mjs';
 
-const commonRulesPath = path.resolve(projectRootPath, 'agents/common-rules.md');
+const commonRulesPath = path.resolve(
+  repositoryRootPath,
+  'agents/common-rules.md',
+);
 
-const localRulesPath = path.resolve(projectRootPath, 'agents/local-rules.md');
+const localRulesPath = path.resolve(
+  repositoryRootPath,
+  'agents/local-rules.md',
+);
 
-const outputPath = path.resolve(projectRootPath, 'AGENTS.md');
+const outputPath = path.resolve(repositoryRootPath, 'AGENTS.md');
 
 const header = [
   '<!-- AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. -->',
@@ -47,7 +52,7 @@ export const genAgentsMd = async (): Promise<Result<undefined, string>> => {
     if (commonContent === undefined) {
       return Result.err(
         [
-          `❌ ${path.relative(projectRootPath, commonRulesPath)} not found.`,
+          `❌ ${path.relative(repositoryRootPath, commonRulesPath)} not found.`,
           'Vendor the shared agent instructions first by running:',
           '  pnpm run agents:sync',
         ].join('\n'),
@@ -74,14 +79,12 @@ export const genAgentsMd = async (): Promise<Result<undefined, string>> => {
     await formatFiles([outputPath]);
 
     console.log(
-      `Successfully generated ${path.relative(projectRootPath, outputPath)}.`,
+      `Successfully generated ${path.relative(repositoryRootPath, outputPath)}.`,
     );
 
     return Result.ok(undefined);
   } catch (error) {
-    return Result.err(
-      `❌ Failed to generate AGENTS.md: ${unknownToString(error)}`,
-    );
+    return Result.err(`❌ Failed to generate AGENTS.md: ${String(error)}`);
   }
 };
 

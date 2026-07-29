@@ -1,21 +1,9 @@
 {
-  "extends": [
-    "./configs/tsconfig/tsconfig.type-check.json",
-    "./configs/tsconfig/tsconfig.vite.json"
-  ],
-  "compilerOptions": {
-    "paths": {
-      "ts-fortress": ["./src/entry-point.mts"]
-    }
-  },
+  "extends": ["./configs/tsconfig/tsconfig.type-check.json"],
   "include": [
-    "./src",
-    "./test",
-    "./samples",
-    "./scripts",
-    "./configs",
+    "./scripts/**/*",
+    "./configs/**/*",
     "./eslint.config.mts",
-    "./release.config.js",
     "./.markdownlint-cli2.mjs"
   ]
 }

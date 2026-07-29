@@ -9,6 +9,7 @@ words:
   - noshiro
   - sindresorhus
   - testw
+  - tses
   - tscw
   - unshifted
   - valueof
@@ -16,6 +17,7 @@ words:
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
-  - dist/**
-  - docs/**
+  - '**/node_modules/**'
+  - '**/dist/**'
+  - '**/docs/**'
   - agents/common/**

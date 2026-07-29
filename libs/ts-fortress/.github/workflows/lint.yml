@@ -28,8 +28,9 @@ jobs:
       fail-fast: true
       matrix:
         command:
-          - lint:fix
-          - build
+          - ws:lint:fix
+          - ws:build
+          - check:root
           - codemod:full
 
     # Steps represent a sequence of tasks that will be executed as part of the job
