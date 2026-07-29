@@ -116,12 +116,22 @@ const generateFileContent = (rules: readonly RuleInfo[]): string => {
     ),
     '}>;',
     '',
-    'export type EslintTsTypeForgeRulesOption = Readonly<{',
-    ...optionRules.map(
-      (rule) =>
-        `  '${pluginPrefix}/${rule.name}': ${rule.namespaceName}.Options;`,
-    ),
-    '}>;',
+    // `Readonly<{}>` would be an "empty object" type (any non-nullish value),
+    // so the no-option case gets an explicitly empty record instead.
+    ...(optionRules.length === 0
+      ? [
+          'export type EslintTsTypeForgeRulesOption = Readonly<',
+          '  Record<never, never>',
+          '>;',
+        ]
+      : [
+          'export type EslintTsTypeForgeRulesOption = Readonly<{',
+          ...optionRules.map(
+            (rule) =>
+              `  '${pluginPrefix}/${rule.name}': ${rule.namespaceName}.Options;`,
+          ),
+          '}>;',
+        ]),
     '',
     '// If this assertion fails to type-check, this generated file has drifted from',
     '// the actual plugin rules — re-run `pnpm run gen:rule-types`.',
