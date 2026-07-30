@@ -37,9 +37,9 @@ describe('nested record', () => {
     xs: array(int(2)),
     rec: pick(
       record({
-        a: uintRange({ start: 0, end: 11, defaultValue: 0 }),
-        b: uintRange({ start: 0, end: 11, defaultValue: 0 }),
-        c: optional(uintRange({ start: 3, end: 6, defaultValue: 3 })),
+        a: uintRange(0, 11, { defaultValue: 0 }),
+        b: uintRange(0, 11, { defaultValue: 0 }),
+        c: optional(uintRange(3, 6, { defaultValue: 3 })),
         d: unknown(),
       }),
       ['a', 'b', 'c'],
@@ -269,15 +269,15 @@ describe('advanced type', () => {
   });
 
   const EvenRange = refine({
-    baseType: intRange({ start: 0, end: 11, defaultValue: 0 }),
+    baseType: intRange(0, 11, { defaultValue: 0 }),
     is: (value): value is 0 | 2 | 4 | 6 | 8 | 10 => value % 2 === 0,
     defaultValue: 0,
     typeName: 'EvenRange',
   });
 
   const Coordinates = tuple([
-    intRange({ start: -90, end: 91, defaultValue: 0 }),
-    intRange({ start: -128, end: 128, defaultValue: 0 }),
+    intRange(-90, 91, { defaultValue: 0 }),
+    intRange(-128, 128, { defaultValue: 0 }),
   ]);
 
   // A fixed-length-2 branded array is already non-empty, so

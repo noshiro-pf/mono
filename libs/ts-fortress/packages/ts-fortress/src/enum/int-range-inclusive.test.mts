@@ -1,10 +1,10 @@
 import { expectType, Result } from 'ts-data-forge';
 import { type TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
-import { intRange } from './int-range.mjs';
+import { intRangeInclusive } from './int-range-inclusive.mjs';
 
-describe(intRange, () => {
-  const rng = intRange(-2, 3, {
+describe(intRangeInclusive, () => {
+  const rng = intRangeInclusive(-2, 2, {
     defaultValue: -2,
     typeName: 'rng',
   });
@@ -15,19 +15,36 @@ describe(intRange, () => {
 
   expectType<typeof rng.defaultValue, Rng>('=');
 
+  describe('object argument form', () => {
+    test('accepts start and end as options', () => {
+      const rngByObject = intRangeInclusive({
+        start: -2,
+        end: 2,
+        defaultValue: -2,
+        typeName: 'rng',
+      });
+
+      expectType<TypeOf<typeof rngByObject>, Rng>('=');
+
+      assert.isTrue(rngByObject.is(2));
+
+      assert.isFalse(rngByObject.is(3));
+    });
+  });
+
   describe('is', () => {
     test('valid cases', () => {
       assert.isTrue(rng.is(-2));
 
       assert.isTrue(rng.is(0));
 
-      assert.isTrue(rng.is(2));
+      assert.isTrue(rng.is(2)); // end is inclusive
     });
 
     test('invalid cases', () => {
       assert.isFalse(rng.is(-3));
 
-      assert.isFalse(rng.is(3)); // end is exclusive
+      assert.isFalse(rng.is(3));
 
       assert.isFalse(rng.is(1.5)); // not integer
     });
@@ -57,15 +74,23 @@ describe(intRange, () => {
         expectedType: 'rng',
         typeName: 'rng',
         details: {
-          kind: 'integer-range',
+          kind: 'integer-range-inclusive',
           start: -2,
-          endExclusive: 3,
+          endInclusive: 2,
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Error: expected an integer between -2 and 2 but `3` was passed.',
       ]);
+    });
+  });
+
+  describe('typeName', () => {
+    test('default type name', () => {
+      const rng2 = intRangeInclusive(-3, 3);
+
+      expect(rng2.typeName).toBe('intRangeInclusive(-3, 3)');
     });
   });
 
@@ -76,6 +101,12 @@ describe(intRange, () => {
 
     test('returns input for valid input', () => {
       expect(rng.fill(0)).toBe(0);
+    });
+
+    test('fill with start when defaultValue is omitted', () => {
+      const rng2 = intRangeInclusive(-3, 3);
+
+      expect(rng2.fill(99)).toBe(-3);
     });
   });
 });

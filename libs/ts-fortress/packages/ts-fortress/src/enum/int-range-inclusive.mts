@@ -1,5 +1,5 @@
 import { isNumber, memoizeFunction, Num, Result } from 'ts-data-forge';
-import { type Int11, type IntRange } from 'ts-type-forge';
+import { type Int11, type IntRangeInclusive } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -8,16 +8,16 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
-export type { IntRange } from 'ts-type-forge';
+export type { IntRangeInclusive } from 'ts-type-forge';
 
-export const intRange = <Start extends Int11, End extends Int11 | 1024>(
+export const intRangeInclusive = <Start extends Int11, End extends Int11>(
   ...args:
     | readonly [
         start: Start,
         end: End,
         options?: Readonly<{
           typeName?: string;
-          defaultValue?: IntRange<Start, End>;
+          defaultValue?: IntRangeInclusive<Start, End>;
         }>,
       ]
     | readonly [
@@ -25,36 +25,37 @@ export const intRange = <Start extends Int11, End extends Int11 | 1024>(
           start: Start;
           end: End;
           typeName?: string;
-          defaultValue?: IntRange<Start, End>;
+          defaultValue?: IntRangeInclusive<Start, End>;
         }>,
       ]
-): Type<IntRange<Start, End>> => {
+): Type<IntRangeInclusive<Start, End>> => {
   switch (args.length) {
     case 1:
-      return intRangeImpl(args[0].start, args[0].end, {
+      return intRangeInclusiveImpl(args[0].start, args[0].end, {
         defaultValue: args[0].defaultValue,
         typeName: args[0].typeName,
       });
 
     case 2:
-      return intRangeImpl(args[0], args[1]);
+      return intRangeInclusiveImpl(args[0], args[1]);
 
     case 3:
-      return intRangeImpl(args[0], args[1], args[2]);
+      return intRangeInclusiveImpl(args[0], args[1], args[2]);
   }
 };
 
-const intRangeImpl = <Start extends Int11, End extends Int11 | 1024>(
+const intRangeInclusiveImpl = <Start extends Int11, End extends Int11>(
   start: Start,
   end: End,
   options?: Readonly<{
     typeName?: string;
-    defaultValue?: IntRange<Start, End>;
+    defaultValue?: IntRangeInclusive<Start, End>;
   }>,
-): Type<IntRange<Start, End>> => {
-  type T = IntRange<Start, End>;
+): Type<IntRangeInclusive<Start, End>> => {
+  type T = IntRangeInclusive<Start, End>;
 
-  const typeNameFilled = options?.typeName ?? `intRange(${start}, ${end})`;
+  const typeNameFilled =
+    options?.typeName ?? `intRangeInclusive(${start}, ${end})`;
 
   const getDefaultValue = memoizeFunction(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -65,7 +66,7 @@ const intRangeImpl = <Start extends Int11, End extends Int11 | 1024>(
     if (!(
       isNumber(a) &&
       Number.isSafeInteger(a) &&
-      Num.isInRange(start, end)(a)
+      Num.isInRangeInclusive(start, end)(a)
     )) {
       return Result.err([
         {
@@ -74,9 +75,9 @@ const intRangeImpl = <Start extends Int11, End extends Int11 | 1024>(
           expectedType: typeNameFilled,
           typeName: typeNameFilled,
           details: {
-            kind: 'integer-range',
+            kind: 'integer-range-inclusive',
             start,
-            endExclusive: end,
+            endInclusive: end,
           },
         } satisfies ValidationError,
       ]);

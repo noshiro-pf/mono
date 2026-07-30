@@ -20,6 +20,11 @@ export type ValidationErrorDetails = Readonly<
       endExclusive: number;
     }
   | {
+      kind: 'integer-range-inclusive';
+      start: number;
+      endInclusive: number;
+    }
+  | {
       kind: 'tuple-length';
       expectedLength: number;
       actualLength: number;
@@ -355,6 +360,9 @@ const createDetailsMessage = (
 
     case 'integer-range':
       return `expected an integer between ${error.details.start} and ${error.details.endExclusive - 1} but ${bareValueClause(actualValue)} was passed.`;
+
+    case 'integer-range-inclusive':
+      return `expected an integer between ${error.details.start} and ${error.details.endInclusive} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'tuple-length':
       return `expected tuple of length ${error.details.expectedLength} but length ${error.details.actualLength} was passed.`;

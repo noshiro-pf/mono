@@ -909,14 +909,15 @@ const ColorEnum = t.enumType(['red', 'green', 'blue']);
 
 type Color = t.TypeOf<typeof ColorEnum>; // 'red' | 'green' | 'blue'
 
-// Numeric ranges
-const DiceRoll = t.uintRange({
-    start: 1,
-    end: 7,
-    defaultValue: 1,
-}); // integers from 1 to 6
+// Numeric ranges (end is exclusive)
+const DiceRoll = t.uintRange(1, 7, { defaultValue: 1 }); // integers from 1 to 6
 
 type DiceRoll = t.TypeOf<typeof DiceRoll>; // 1 | 2 | 3 | 4 | 5 | 6
+
+// Numeric ranges (end is inclusive)
+const DiceRoll2 = t.uintRangeInclusive(1, 6, { defaultValue: 1 }); // integers from 1 to 6
+
+type DiceRoll2 = t.TypeOf<typeof DiceRoll2>; // 1 | 2 | 3 | 4 | 5 | 6
 ```
 
 Tips: It is often better to use `uintRange` instead of `enumType` when possible, because `enumType` stores a Set of the sizes of its members as data, while `uintRange` only stores the range, resulting in smaller memory usage.
@@ -1077,8 +1078,10 @@ type ValidationError = Readonly<{
 
 - `t.TypeOf<T>` - Extract TypeScript type from validator
 - `t.enumType(values)` - Enum validation
-- `t.uintRange({ start, end, defaultValue? })` - Non-negative integer range validation
-- `t.intRange({ start, end, defaultValue? })` - Integer range validation
+- `t.uintRange(start, end, { defaultValue? })` - Non-negative integer range validation (`end` is exclusive)
+- `t.intRange(start, end, { defaultValue? })` - Integer range validation (`end` is exclusive)
+- `t.uintRangeInclusive(start, end, { defaultValue? })` - Non-negative integer range validation (`end` is inclusive)
+- `t.intRangeInclusive(start, end, { defaultValue? })` - Integer range validation (`end` is inclusive)
 - `t.unknown` - Unknown Type
 - `t.recursion(typeName, definition)` - Define recursive type
 

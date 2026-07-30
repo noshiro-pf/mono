@@ -156,6 +156,16 @@ describe(validationErrorToMessage, () => {
           'Error: expected an integer between 0 and 9 but a value of type <number> was passed.',
       },
       {
+        name: 'integer-range-inclusive',
+        actualValue: 42,
+        expectedType: 'Digit',
+        details: { kind: 'integer-range-inclusive', start: 0, endInclusive: 9 },
+        printed:
+          'Error: expected an integer between 0 and 9 but `42` was passed.',
+        omitted:
+          'Error: expected an integer between 0 and 9 but a value of type <number> was passed.',
+      },
+      {
         name: 'union',
         actualValue: 'purple',
         expectedType: '("red" | "green")',

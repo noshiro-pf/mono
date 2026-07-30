@@ -4,10 +4,10 @@ import {
   type ValidationError,
   validationErrorsToMessages,
 } from '../utils/index.mjs';
-import { uintRange } from './uint-range.mjs';
+import { uintRangeInclusive } from './uint-range-inclusive.mjs';
 
-describe(uintRange, () => {
-  const month = uintRange(1, 13, {
+describe(uintRangeInclusive, () => {
+  const month = uintRangeInclusive(1, 12, {
     defaultValue: 1,
     typeName: 'month',
   });
@@ -18,9 +18,26 @@ describe(uintRange, () => {
 
   expectType<typeof month.defaultValue, Month>('=');
 
+  describe('object argument form', () => {
+    test('accepts start and end as options', () => {
+      const monthByObject = uintRangeInclusive({
+        start: 1,
+        end: 12,
+        defaultValue: 1,
+        typeName: 'month',
+      });
+
+      expectType<TypeOf<typeof monthByObject>, Month>('=');
+
+      assert.isTrue(monthByObject.is(12));
+
+      assert.isFalse(monthByObject.is(13));
+    });
+  });
+
   describe('is', () => {
     test('truthy case', () => {
-      const x: number = Math.random() >= 0 ? 1 : 0; // the value is always 1
+      const x: number = Math.random() >= 0 ? 12 : 0; // the value is always 12
 
       if (month.is(x)) {
         expectType<typeof x, Month>('=');
@@ -28,7 +45,7 @@ describe(uintRange, () => {
         expectType<typeof x, number>('=');
       }
 
-      assert.isTrue(month.is(x));
+      assert.isTrue(month.is(x)); // end is inclusive
     });
 
     test('falsy case', () => {
@@ -41,6 +58,24 @@ describe(uintRange, () => {
       }
 
       assert.isFalse(month.is(x));
+    });
+
+    test('not an integer', () => {
+      assert.isFalse(month.is(1.5));
+    });
+  });
+
+  describe('single value range', () => {
+    test('start equal to end', () => {
+      const one = uintRangeInclusive(1, 1);
+
+      expectType<TypeOf<typeof one>, 1>('=');
+
+      assert.isTrue(one.is(1));
+
+      assert.isFalse(one.is(0));
+
+      assert.isFalse(one.is(2));
     });
   });
 
@@ -82,15 +117,23 @@ describe(uintRange, () => {
         expectedType: 'month',
         typeName: 'month',
         details: {
-          kind: 'integer-range',
+          kind: 'integer-range-inclusive',
           start: 1,
-          endExclusive: 13,
+          endInclusive: 12,
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
         'Error: expected an integer between 1 and 12 but `13` was passed.',
       ]);
+    });
+  });
+
+  describe('typeName', () => {
+    test('default type name', () => {
+      const rng = uintRangeInclusive(3, 7);
+
+      expect(rng.typeName).toBe('uintRangeInclusive(3, 7)');
     });
   });
 
@@ -105,6 +148,12 @@ describe(uintRange, () => {
       const x: number = (() => 123)();
 
       expect(month.fill(x)).toBe(1);
+    });
+
+    test('fill with start when defaultValue is omitted', () => {
+      const rng = uintRangeInclusive(3, 7);
+
+      expect(rng.fill(99)).toBe(3);
     });
   });
 });

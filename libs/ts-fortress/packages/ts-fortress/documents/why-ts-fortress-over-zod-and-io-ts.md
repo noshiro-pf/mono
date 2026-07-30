@@ -315,7 +315,7 @@ assert.isTrue(t.Result.isOk(T.validate('0'))); // ✅ Success - string "0" is ac
 
 // For this use case, if you want to define a union type of numeric literals, you can use `uintRange` from ts-fortress:
 
-const U = t.uintRange({ start: 0, end: 5 });
+const U = t.uintRange(0, 5);
 
 type U = t.TypeOf<typeof U>;
 // ↑ TypeScript correctly infers: 0 | 1 | 2 | 3 | 4 (number literals)

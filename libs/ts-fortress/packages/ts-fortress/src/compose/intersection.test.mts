@@ -332,8 +332,8 @@ describe(intersection, () => {
 
   describe('merge unions', () => {
     const targetType = intersection(
-      [uintRange({ start: 0, end: 5 }), uintRange({ start: 1, end: 7 })],
-      uintRange({ start: 1, end: 4 }),
+      [uintRange(0, 5), uintRange(1, 7)],
+      uintRange(1, 4),
     );
 
     type TargetType = TypeOf<typeof targetType>;
