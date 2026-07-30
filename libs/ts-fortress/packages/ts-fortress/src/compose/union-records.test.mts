@@ -116,16 +116,17 @@ describe('union - records only', () => {
         typeName:
           '({ kind: string, value: number } | { type: string, data: string })',
         details: {
-          kind: 'union',
-          typeNames: [
-            '{ kind: string, value: number }',
-            '{ type: string, data: string }',
-          ],
+          kind: 'union-closest-member',
+          memberCount: 2,
+          closestMemberTypeName: '{ kind: string, value: number }',
+          equallyCloseMemberTypeNames: ['{ type: string, data: string }'],
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of <{ kind: string, value: number }>, <{ type: string, data: string }> but <object> type value was passed.',
+        'Error: the value did not match any of the 2 members of the union; the closest member types are <{ kind: string, value: number }>, <{ type: string, data: string }>; the first of them failed as follows:',
+        'Error at kind: missing required key "kind".',
+        'Error at value: missing required key "value".',
       ]);
     });
 

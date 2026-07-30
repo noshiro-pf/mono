@@ -123,7 +123,7 @@ describe('union - primitive and literal', () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of <string>, <42>, <number> but <object> type value `null` was passed.',
+        'Error: expected one of <string>, <42>, <number> but <null> type value `null` was passed.',
       ]);
     });
 

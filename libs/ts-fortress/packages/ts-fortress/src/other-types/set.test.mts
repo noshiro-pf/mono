@@ -146,7 +146,7 @@ test('SetType cast() method', () => {
   );
 
   expect(() => StringSet.cast([])).toThrow(
-    'Error: expected <Set> type but <object> type value',
+    'Error: expected <Set> type but <array> type value',
   );
 });
 
@@ -171,7 +171,7 @@ test('SetType assertIs() method', () => {
 
   expect(() => {
     assertIsNumberSet([1, 2, 3]);
-  }).toThrow('Error: expected <Set> type but <object> type value');
+  }).toThrow('Error: expected <Set> type but <array> type value');
 });
 
 test('SetType with custom typeName', () => {

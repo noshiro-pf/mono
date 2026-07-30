@@ -419,16 +419,16 @@ describe('advanced type', () => {
     assert.deepStrictEqual(messages, [
       'Error at status: expected one of <enum>, <null>, <undefined> but <string> type value "unknown" was passed.',
       'Error at coordinates.1: expected an integer between -128 and 127 but `190` was passed.',
-      'Error at palette: expected value to match all types of <NonEmptyArray<EvenRange>>, <FixedLengthArray<2, EvenRange>> but <object> type value `[1,3,5]` was passed.',
+      'Error at palette: expected value to match all types of <NonEmptyArray<EvenRange>>, <FixedLengthArray<2, EvenRange>> but <array> type value `[1,3,5]` was passed.',
       'Error at palette.0: expected <EvenRange> type but <number> type value `1` was passed.',
       'Error at palette.1: expected <EvenRange> type but <number> type value `3` was passed.',
       'Error at palette.2: expected <EvenRange> type but <number> type value `5` was passed.',
-      'Error at palette: expected value to match all types of <NonEmptyArray<EvenRange>>, <FixedLengthArray<2, EvenRange>> but <object> type value `[1,3,5]` was passed.',
+      'Error at palette: expected value to match all types of <NonEmptyArray<EvenRange>>, <FixedLengthArray<2, EvenRange>> but <array> type value `[1,3,5]` was passed.',
       'Error at palette: expected array of length 2 but length 3 was passed.',
       'Error at metrics: expected one of <key-value-record>, <undefined> but <object> type value `{"alpha":1}` was passed.',
-      'Error at tags: expected one of <NonEmptyArray<Tag>>, <undefined> but <object> type value `[]` was passed.',
-      'Error at extras: expected one of <key-value-record>, <undefined> but <object> type value was passed.',
-      'Error at children: expected one of <AdvancedNode[]>, <undefined> but <object> type value `[{}]` was passed.',
+      'Error at tags: expected one of <NonEmptyArray<Tag>>, <undefined> but <array> type value `[]` was passed.',
+      'Error at extras: expected one of <key-value-record>, <undefined> but a value of type <object> matching none of them was passed.',
+      'Error at children: expected one of <AdvancedNode[]>, <undefined> but <array> type value `[{}]` was passed.',
     ]);
   });
 

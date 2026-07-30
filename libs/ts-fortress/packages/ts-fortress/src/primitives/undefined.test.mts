@@ -67,7 +67,7 @@ describe('undefined type', () => {
       expect(() => {
         undefinedType.assertIs(value);
       }).toThrow(
-        'Error: expected <undefined> type but <object> type value `null` was passed.',
+        'Error: expected <undefined> type but <null> type value `null` was passed.',
       );
     });
   });
@@ -87,7 +87,7 @@ describe('undefined type', () => {
       expect(() => {
         undefinedType.cast(value);
       }).toThrow(
-        'Error: expected <undefined> type but <object> type value `null` was passed.',
+        'Error: expected <undefined> type but <null> type value `null` was passed.',
       );
     });
 

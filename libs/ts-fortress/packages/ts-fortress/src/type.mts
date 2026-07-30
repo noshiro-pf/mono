@@ -115,6 +115,16 @@ export type TupleTypeInternals = Readonly<{
   elementTypes: readonly Type<unknown>[];
 }>;
 
+/**
+ * @internal Internal properties attached to union types so that a union
+ * nested directly inside another union can contribute its own members to the
+ * parent (see {@link hasUnionInternals}).
+ */
+export type UnionTypeInternals = Readonly<{
+  /** The member types, with directly nested unions already flattened in. */
+  memberTypes: readonly AnyType[];
+}>;
+
 /** @internal Helper to flatten ShapeStructure to a simple shape if possible */
 export const flattenShapeStructure = (
   structure: ShapeStructure,
@@ -230,6 +240,20 @@ export const hasTupleInternals = <T extends AnyType>(
 
 const hasTupleInternalsImpl = (t: unknown): t is TupleTypeInternals =>
   isRecord(t) && hasKey(t, 'elementTypes') && Arr.isArray(t.elementTypes);
+
+/**
+ * @internal Runtime check for union type internals.
+ *
+ * A `recursion` type answers this without resolving its definition (its proxy
+ * only forwards the keys the base type already has), so a recursive member is
+ * treated as an opaque type rather than being flattened.
+ */
+export const hasUnionInternals = <T extends AnyType>(
+  t: T,
+): t is T & UnionTypeInternals => hasUnionInternalsImpl(t);
+
+const hasUnionInternalsImpl = (t: unknown): t is UnionTypeInternals =>
+  isRecord(t) && hasKey(t, 'memberTypes') && Arr.isArray(t.memberTypes);
 
 const isValidShapeStructure = (s: unknown): s is ShapeStructure => {
   if (!isRecord(s) || !hasKey(s, 'kind')) return false;

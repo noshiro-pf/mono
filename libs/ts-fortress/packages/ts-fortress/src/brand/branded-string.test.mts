@@ -173,7 +173,7 @@ describe('simpleBrandedString', () => {
         ]);
 
         assert.deepStrictEqual(validationErrorsToMessages(resultError1), [
-          'Error: expected <string> type but <object> type value `null` was passed.',
+          'Error: expected <string> type but <null> type value `null` was passed.',
         ]);
       });
     });

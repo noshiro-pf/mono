@@ -1,4 +1,6 @@
+import { isMap, isSet } from '@sindresorhus/is';
 import { Arr, isString, match, pipe, unknownToString } from 'ts-data-forge';
+import { toUnionString } from './to-union-string.mjs';
 
 export type ValidationErrorDetails = Readonly<
   | {
@@ -61,6 +63,23 @@ export type ValidationErrorDetails = Readonly<
   | {
       kind: 'union';
       typeNames: readonly string[];
+    }
+  | {
+      kind: 'union-category-mismatch';
+      memberCount: number;
+      memberCategories: readonly string[];
+    }
+  | {
+      kind: 'union-closest-member';
+      memberCount: number;
+      /** The member whose errors follow the message. */
+      closestMemberTypeName: string;
+      /**
+       * Members that produced the same number of errors as
+       * {@link ValidationErrorDetails.closestMemberTypeName} and are therefore
+       * just as plausible. Empty when the closest member is unambiguous.
+       */
+      equallyCloseMemberTypeNames: readonly string[];
     }
   | {
       kind: 'record-entry';
@@ -171,42 +190,159 @@ export const validationErrorToMessage = (
     ? (`Error at ${error.path.join('.')}: ` as const)
     : 'Error: ';
 
-  const detailsMessage = createDetailsMessage(
-    error,
+  const actualValue = describeActualValue(
+    error.actualValue,
     maxLengthToPrintActualValue,
   );
 
-  if (detailsMessage !== undefined) {
-    return `${pathPrefix}${detailsMessage}`;
+  const detailsMessage = createDetailsMessage(error, actualValue);
+
+  return `${pathPrefix}${
+    detailsMessage ??
+    `expected <${error.expectedType}> type but ${typedValueClause(actualValue)} was passed.`
+  }`;
+};
+
+/**
+ * Human-readable name for the runtime type of a value.
+ *
+ * `typeof` reports a bare `"object"` for `null` and for every non-primitive,
+ * which makes an error message unable to distinguish a plain object from
+ * `null` or from the basic containers, so those are named individually.
+ */
+export const runtimeTypeNameOf = (value: unknown): string =>
+  value === null
+    ? 'null'
+    : Arr.isArray(value)
+      ? 'array'
+      : isMap(value)
+        ? 'Map'
+        : isSet(value)
+          ? 'Set'
+          : typeof value;
+
+/** A value as it is rendered inside an error message. */
+type ActualValueView = Readonly<{
+  /** See {@link runtimeTypeNameOf}. */
+  typeName: string;
+
+  /**
+   * The value itself (`"purple"`, `` `5` ``), or `''` when it is longer than
+   * the configured maximum print length.
+   */
+  literal: string;
+
+  /**
+   * Replaces {@link literal} when the value is too long to print. Keeps the
+   * message informative by describing the value's size instead of dropping it
+   * entirely (e.g. `a string of length 50`).
+   */
+  summary: string;
+}>;
+
+const describeActualValue = (
+  actualValue: unknown,
+  maxLengthToPrintActualValue: number,
+): ActualValueView =>
+  ({
+    typeName: runtimeTypeNameOf(actualValue),
+    literal: isString(actualValue)
+      ? actualValue.length <= maxLengthToPrintActualValue
+        ? (`"${actualValue}"` as const)
+        : ('' as const)
+      : pipe(unknownToString(actualValue)).map((s) =>
+          s.length <= maxLengthToPrintActualValue ? (`\`${s}\`` as const) : '',
+        ).value,
+    summary: summarizeActualValue(actualValue),
+  }) as const;
+
+const summarizeActualValue = (actualValue: unknown): string =>
+  isString(actualValue)
+    ? (`a string of length ${actualValue.length}` as const)
+    : Arr.isArray(actualValue)
+      ? (`an array of length ${actualValue.length}` as const)
+      : isMap(actualValue)
+        ? (`a Map of size ${actualValue.size}` as const)
+        : isSet(actualValue)
+          ? (`a Set of size ${actualValue.size}` as const)
+          : (`a value of type <${runtimeTypeNameOf(actualValue)}>` as const);
+
+/**
+ * Renders the subject of the trailing `"... was passed."` clause, prefixed
+ * with the value's runtime type (`<string> type value "purple"`).
+ *
+ * `unmatchedReason` is used only when the value is too long to print: for a
+ * type that accepts several shapes (a union, an enum, an intersection),
+ * naming the runtime type alone reads as if that type were acceptable, so the
+ * reason why the value was rejected has to be spelled out instead.
+ */
+const typedValueClause = (
+  actualValue: ActualValueView,
+  unmatchedReason?: string,
+): string =>
+  actualValue.literal === ''
+    ? withUnmatchedReason(actualValue.summary, unmatchedReason)
+    : (`<${actualValue.typeName}> type value ${actualValue.literal}` as const);
+
+/** Same as {@link typedValueClause}, but without the leading type name. */
+const bareValueClause = (
+  actualValue: ActualValueView,
+  unmatchedReason?: string,
+): string =>
+  actualValue.literal === ''
+    ? withUnmatchedReason(actualValue.summary, unmatchedReason)
+    : actualValue.literal;
+
+const withUnmatchedReason = (
+  summary: string,
+  unmatchedReason: string | undefined,
+): string =>
+  unmatchedReason === undefined
+    ? summary
+    : (`${summary} ${unmatchedReason}` as const);
+
+/**
+ * Maximum length of the ` | `-joined listing of union member type names that a
+ * message may spell out. Beyond it a listing is more noise than help, so both
+ * users of this bound summarize instead: `union` switches from listing every
+ * member to reporting the closest one, and the closest-member message stops
+ * naming the members that tie with it.
+ */
+export const UNION_MEMBER_LISTING_MAX_LENGTH = 60;
+
+/**
+ * Names the closest union member, plus the members that are just as close.
+ *
+ * The tie is a subset of members that were already too many to list, so the
+ * bound is applied to the names this clause *adds* — the closest member is
+ * named either way.
+ */
+const closestMemberClause = (
+  closestMemberTypeName: string,
+  equallyCloseMemberTypeNames: readonly string[],
+): string => {
+  if (!Arr.isNonEmpty(equallyCloseMemberTypeNames)) {
+    return `the closest member type is <${closestMemberTypeName}>, which failed as follows:`;
   }
 
-  const actualTypeStr = typeof error.actualValue;
+  if (
+    toUnionString(equallyCloseMemberTypeNames).length >
+    UNION_MEMBER_LISTING_MAX_LENGTH
+  ) {
+    return `${equallyCloseMemberTypeNames.length + 1} members are equally close; <${closestMemberTypeName}> failed as follows:`;
+  }
 
-  const actualValueStr: string = isString(error.actualValue)
-    ? error.actualValue.length <= maxLengthToPrintActualValue
-      ? (` "${error.actualValue}"` as const)
-      : ''
-    : pipe(unknownToString(error.actualValue)).map((s) =>
-        s.length <= maxLengthToPrintActualValue ? ` \`${s}\`` : '',
-      ).value;
+  const allTypeNames = Arr.toUnshifted(closestMemberTypeName)(
+    equallyCloseMemberTypeNames,
+  );
 
-  return `${pathPrefix}expected <${error.expectedType}> type but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+  return `the closest member types are <${allTypeNames.join('>, <')}>; the first of them failed as follows:`;
 };
 
 const createDetailsMessage = (
   error: ValidationError,
-  maxLengthToPrintActualValue: number,
+  actualValue: ActualValueView,
 ): string | undefined => {
-  const actualTypeStr = typeof error.actualValue;
-
-  const actualValueStr: string = isString(error.actualValue)
-    ? error.actualValue.length <= maxLengthToPrintActualValue
-      ? (` "${error.actualValue}"` as const)
-      : ''
-    : pipe(unknownToString(error.actualValue)).map((s) =>
-        s.length <= maxLengthToPrintActualValue ? ` \`${s}\`` : '',
-      ).value;
-
   switch (error.details?.kind) {
     case undefined:
       return undefined;
@@ -215,10 +351,10 @@ const createDetailsMessage = (
       return error.details.message;
 
     case 'template-literal':
-      return `expected <${error.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+      return `expected <${error.expectedType}> but ${typedValueClause(actualValue)} was passed.`;
 
     case 'integer-range':
-      return `expected an integer between ${error.details.start} and ${error.details.endExclusive - 1} but${actualValueStr} was passed.`;
+      return `expected an integer between ${error.details.start} and ${error.details.endExclusive - 1} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'tuple-length':
       return `expected tuple of length ${error.details.expectedLength} but length ${error.details.actualLength} was passed.`;
@@ -245,30 +381,41 @@ const createDetailsMessage = (
       return `excess property "${error.details.key}" is not allowed.`;
 
     case 'intersection':
-      return `expected value to match all types of <${error.details.typeNames.join('>, <')}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+      return `expected value to match all types of <${error.details.typeNames.join('>, <')}> but ${typedValueClause(actualValue, 'not matching all of them')} was passed.`;
 
     case 'enum':
       return `expected one of { ${error.details.values
         .map(String)
-        .join(', ')} } but${actualValueStr} was passed.`;
+        .join(
+          ', ',
+        )} } but ${bareValueClause(actualValue, 'matching none of them')} was passed.`;
 
     case 'union':
-      return `expected one of <${error.details.typeNames.join('>, <')}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+      return `expected one of <${error.details.typeNames.join('>, <')}> but ${typedValueClause(actualValue, 'matching none of them')} was passed.`;
+
+    case 'union-category-mismatch':
+      return `the value did not match any of the ${error.details.memberCount} members of the union; expected a value of type <${error.details.memberCategories.join('> | <')}> but ${typedValueClause(actualValue)} was passed.`;
+
+    case 'union-closest-member':
+      return `the value did not match any of the ${error.details.memberCount} members of the union; ${closestMemberClause(
+        error.details.closestMemberTypeName,
+        error.details.equallyCloseMemberTypeNames,
+      )}`;
 
     case 'record-entry':
       return match(error.details.entry, {
-        key: `expected record key type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`,
-        value: `expected record value type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`,
+        key: `expected record key type to be <${error.details.expectedType}> but ${typedValueClause(actualValue)} was passed.`,
+        value: `expected record value type to be <${error.details.expectedType}> but ${typedValueClause(actualValue)} was passed.`,
       });
 
     case 'map-entry':
       return match(error.details.entry, {
-        key: `expected Map key type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`,
-        value: `expected Map value type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`,
+        key: `expected Map key type to be <${error.details.expectedType}> but ${typedValueClause(actualValue)} was passed.`,
+        value: `expected Map value type to be <${error.details.expectedType}> but ${typedValueClause(actualValue)} was passed.`,
       });
 
     case 'set-element':
-      return `expected Set element type to be <${error.details.expectedType}> but <${actualTypeStr}> type value${actualValueStr} was passed.`;
+      return `expected Set element type to be <${error.details.expectedType}> but ${typedValueClause(actualValue)} was passed.`;
 
     case 'brand':
       return `expected value to satisfy constraint: ${error.details.description}.`;
@@ -277,102 +424,109 @@ const createDetailsMessage = (
       return stringConstraintToMessage(
         error.details.violation,
         error.actualValue,
-        actualValueStr,
+        actualValue,
       );
 
     case 'numeric-constraint':
       return numericConstraintToMessage(
         error.details.numericType,
         error.details.violation,
-        actualValueStr,
+        actualValue,
       );
   }
 };
 
 const stringConstraintToMessage = (
   violation: StringConstraintViolation,
-  actualValue: unknown,
-  actualValueStr: string,
+  rawActualValue: unknown,
+  actualValue: ActualValueView,
 ): string => {
-  const actualLength = isString(actualValue) ? actualValue.length : 0;
+  const actualLength = isString(rawActualValue) ? rawActualValue.length : 0;
+
+  // The length carries the constraint violation, so the value itself is only
+  // appended when it is short enough to print.
+  const lengthClause =
+    actualValue.literal === ''
+      ? (`a string of length ${actualLength}` as const)
+      : (`a string of length ${actualLength} ${actualValue.literal}` as const);
 
   switch (violation.constraint) {
     case 'nonempty':
       return 'expected a non-empty string but an empty string was passed.';
 
     case 'minLength':
-      return `expected a string of length ${violation.value} or more but a string of length ${actualLength}${actualValueStr} was passed.`;
+      return `expected a string of length ${violation.value} or more but ${lengthClause} was passed.`;
 
     case 'maxLength':
-      return `expected a string of length ${violation.value} or less but a string of length ${actualLength}${actualValueStr} was passed.`;
+      return `expected a string of length ${violation.value} or less but ${lengthClause} was passed.`;
 
     case 'startsWith':
-      return `expected a string starting with "${violation.value}" but${actualValueStr} was passed.`;
+      return `expected a string starting with "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
 
     case 'endsWith':
-      return `expected a string ending with "${violation.value}" but${actualValueStr} was passed.`;
+      return `expected a string ending with "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
 
     case 'includes':
-      return `expected a string containing "${violation.value}" but${actualValueStr} was passed.`;
+      return `expected a string containing "${violation.value}" but ${bareValueClause(actualValue)} was passed.`;
 
     case 'uppercase':
-      return `expected an uppercase string but${actualValueStr} was passed.`;
+      return `expected an uppercase string but ${bareValueClause(actualValue)} was passed.`;
 
     case 'lowercase':
-      return `expected a lowercase string but${actualValueStr} was passed.`;
+      return `expected a lowercase string but ${bareValueClause(actualValue)} was passed.`;
 
     case 'regex':
-      return `expected a string matching /${violation.value}/ but${actualValueStr} was passed.`;
+      return `expected a string matching /${violation.value}/ but ${bareValueClause(actualValue)} was passed.`;
   }
 };
 
 const numericConstraintToMessage = (
   numericType: 'bigint' | 'number',
   violation: NumericConstraintViolation,
-  actualValueStr: string,
+  actualValue: ActualValueView,
 ): string => {
   switch (violation.constraint) {
     case 'finite':
-      return `expected a finite number but${actualValueStr} was passed.`;
+      return `expected a finite number but ${bareValueClause(actualValue)} was passed.`;
 
     case 'int':
-      return `expected an integer but${actualValueStr} was passed.`;
+      return `expected an integer but ${bareValueClause(actualValue)} was passed.`;
 
     case 'safeInteger':
-      return `expected a safe integer but${actualValueStr} was passed.`;
+      return `expected a safe integer but ${bareValueClause(actualValue)} was passed.`;
 
     case 'nonZero':
-      return `expected a non-zero ${numericType} but${actualValueStr} was passed.`;
+      return `expected a non-zero ${numericType} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'negative':
-      return `expected a negative ${numericType} but${actualValueStr} was passed.`;
+      return `expected a negative ${numericType} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'nonNegative':
-      return `expected a non-negative ${numericType} but${actualValueStr} was passed.`;
+      return `expected a non-negative ${numericType} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'positive':
-      return `expected a positive ${numericType} but${actualValueStr} was passed.`;
+      return `expected a positive ${numericType} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'nonPositive':
-      return `expected a non-positive ${numericType} but${actualValueStr} was passed.`;
+      return `expected a non-positive ${numericType} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'gt':
-      return `expected a ${numericType} greater than ${violation.value} but${actualValueStr} was passed.`;
+      return `expected a ${numericType} greater than ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'gte':
     case 'min':
-      return `expected a ${numericType} greater than or equal to ${violation.value} but${actualValueStr} was passed.`;
+      return `expected a ${numericType} greater than or equal to ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'lt':
-      return `expected a ${numericType} less than ${violation.value} but${actualValueStr} was passed.`;
+      return `expected a ${numericType} less than ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'lte':
     case 'max':
-      return `expected a ${numericType} less than or equal to ${violation.value} but${actualValueStr} was passed.`;
+      return `expected a ${numericType} less than or equal to ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
 
     case 'multipleOf':
     case 'step':
-      return `expected a ${numericType} to be a multiple of ${violation.value} but${actualValueStr} was passed.`;
+      return `expected a ${numericType} to be a multiple of ${violation.value} but ${bareValueClause(actualValue)} was passed.`;
   }
 };
 

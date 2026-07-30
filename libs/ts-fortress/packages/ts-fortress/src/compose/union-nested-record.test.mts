@@ -133,16 +133,19 @@ describe('union - nested records', () => {
         typeName:
           '({ type: string, data: { value: number } } | { kind: string, config: { enabled: string } })',
         details: {
-          kind: 'union',
-          typeNames: [
-            '{ type: string, data: { value: number } }',
+          kind: 'union-closest-member',
+          memberCount: 2,
+          closestMemberTypeName: '{ type: string, data: { value: number } }',
+          equallyCloseMemberTypeNames: [
             '{ kind: string, config: { enabled: string } }',
           ],
         },
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of <{ type: string, data: { value: number } }>, <{ kind: string, config: { enabled: string } }> but <object> type value `{"invalid":"data"}` was passed.',
+        'Error: the value did not match any of the 2 members of the union; the closest member types are <{ type: string, data: { value: number } }>, <{ kind: string, config: { enabled: string } }>; the first of them failed as follows:',
+        'Error at type: missing required key "type".',
+        'Error at data: missing required key "data".',
       ]);
     });
 

@@ -150,7 +150,7 @@ describe('validation-error', () => {
       assert.deepStrictEqual(validationErrorsToMessages(errors), [
         'Error at user.name: expected <string> type but <number> type value `123` was passed.',
         'Error at items.0: expected <number> type but <string> type value "invalid" was passed.',
-        'Error: expected <boolean> type but <object> type value `null` was passed.',
+        'Error: expected <boolean> type but <null> type value `null` was passed.',
       ]);
     });
 

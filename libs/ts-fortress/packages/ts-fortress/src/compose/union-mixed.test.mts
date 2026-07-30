@@ -158,7 +158,7 @@ describe('union - mixed types', () => {
       });
 
       assert.deepStrictEqual(validationErrorsToMessages(resultError), [
-        'Error: expected one of <"empty">, <number>, <{ status: string }>, <number[]> but <object> type value `null` was passed.',
+        'Error: expected one of <"empty">, <number>, <{ status: string }>, <number[]> but <null> type value `null` was passed.',
       ]);
     });
 
