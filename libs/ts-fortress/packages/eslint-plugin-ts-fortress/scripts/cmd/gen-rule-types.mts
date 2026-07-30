@@ -9,9 +9,9 @@ const ruleTypesPath = path.resolve(workspaceRootPath, './src/rule-types.mts');
 const pluginPrefix = 'ts-fortress';
 
 type RuleInfo = Readonly<{
-  /** Rule name without the plugin prefix (e.g. `'prefer-non-empty-array'`). */
+  /** Rule name without the plugin prefix (e.g. `'prefer-canonical-type'`). */
   name: string;
-  /** PascalCase namespace name (e.g. `'PreferNonEmptyArray'`). */
+  /** PascalCase namespace name (e.g. `'PreferCanonicalType'`). */
   namespaceName: string;
   description: string;
   type: string;

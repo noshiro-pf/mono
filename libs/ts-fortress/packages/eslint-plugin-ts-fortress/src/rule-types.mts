@@ -8,7 +8,7 @@ import { type TypeEq } from 'ts-type-forge';
 import { type tsFortressRules } from './rules/index.mjs';
 
 /**
- * @description Replace `minLengthArray(1, ...)` with `nonEmptyArray(...)` from ts-fortress.
+ * @description Normalize a length-constrained ts-fortress array combinator whose bounds are degenerate (e.g. `minLengthArray(1, x)`, `boundedLengthTuple(n, n, x)`) to the combinator that names that constraint directly.
  *
  *  ```md
  *  | key        | value      |
@@ -18,12 +18,12 @@ import { type tsFortressRules } from './rules/index.mjs';
  *  | fixable    | code       |
  *  ```
  */
-namespace PreferNonEmptyArray {
+namespace PreferCanonicalLengthConstrainedType {
   export type RuleEntry = Linter.StringSeverity;
 }
 
 export type EslintTsFortressRules = Readonly<{
-  'ts-fortress/prefer-non-empty-array': PreferNonEmptyArray.RuleEntry;
+  'ts-fortress/prefer-canonical-length-constrained-type': PreferCanonicalLengthConstrainedType.RuleEntry;
 }>;
 
 export type EslintTsFortressRulesOption = Readonly<Record<never, never>>;

@@ -2,7 +2,7 @@
 
 ESLint rules that steer schema definitions toward
 [`ts-fortress`](https://www.npmjs.com/package/ts-fortress) idioms. Every rule is
-auto-fixable.
+auto-fixable, and every rewrite is **type-preserving**.
 
 ## Installation
 
@@ -26,7 +26,7 @@ export default [
     {
         plugins: { 'ts-fortress': eslintPluginTsFortress },
         rules: {
-            'ts-fortress/prefer-non-empty-array': 'error',
+            'ts-fortress/prefer-canonical-length-constrained-type': 'error',
         } satisfies Partial<EslintTsFortressRules>,
     },
 ];
@@ -34,43 +34,87 @@ export default [
 
 ## Rules
 
-| Rule                     | Description                                             |
-| ------------------------ | ------------------------------------------------------- |
-| `prefer-non-empty-array` | Replace `minLengthArray(1, …)` with `nonEmptyArray(…)`. |
+| Rule                                       | Description                                                                                   |
+| :----------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| `prefer-canonical-length-constrained-type` | Normalize a length-constrained array combinator with degenerate bounds to its canonical form. |
 
-### `prefer-non-empty-array`
+### `prefer-canonical-length-constrained-type`
 
-`t.minLengthArray(1, x)` and `t.nonEmptyArray(x)` build the **same type** —
-`NonEmptyArray<A>` is defined as `MinLengthArray<1, A>` — so the rewrite is
-type-preserving. `nonEmptyArray` states the intent directly and, when no
-explicit `typeName` is given, reports the clearer `NonEmptyArray<…>` instead of
-`MinLengthArray<1, …>` in validation errors.
+Several of ts-fortress's array combinators build the very same type once their
+length arguments hit a degenerate value. The rule rewrites each of those to the
+combinator that names the constraint directly:
+
+| ❌ written as                 | ✅ canonical form        | why they are the same type                                         |
+| :---------------------------- | :----------------------- | :----------------------------------------------------------------- |
+| `minLengthArray(1, x)`        | `nonEmptyArray(x)`       | `NonEmptyArray<A>` is defined as `MinLengthArray<1, A>`            |
+| `minLengthTuple(0, x)`        | `array(x)`               | `MinLengthTuple<0, A>` is `readonly A[]` — no constraint at all    |
+| `maxLengthTuple(0, x)`        | `fixedLengthTuple(0, x)` | both are `readonly []`                                             |
+| `boundedLengthTuple(n, n, x)` | `fixedLengthTuple(n, x)` | the length union collapses to its single member                    |
+| `boundedLengthTuple(0, n, x)` | `maxLengthTuple(n, x)`   | `MaxLengthTuple<N, A>` is defined as `BoundedLengthTuple<0, N, A>` |
 
 ```ts
 import * as t from 'ts-fortress';
 
 // ❌
 const Tags = t.minLengthArray(1, t.string());
+const Rgb = t.boundedLengthTuple(3, 3, t.number());
+const Page = t.boundedLengthTuple(0, 20, t.string());
 
 // ✅
 const Tags = t.nonEmptyArray(t.string());
+const Rgb = t.fixedLengthTuple(3, t.number());
+const Page = t.maxLengthTuple(20, t.string());
 ```
+
+Each rewrite keeps the accepted values, the `defaultValue`, and the options
+object exactly as they were. The only observable change is the default
+`typeName` — and the `details.kind` of the length error derived from it — which
+becomes the one that names the constraint actually being checked.
+
+#### Why the branded `*Array` family is left alone
+
+`boundedLengthArray(0, n, x)` and `boundedLengthArray(n, n, x)` look like the
+same degenerate cases, but their types are branded rather than structural, and
+the analogous rewrites would silently change them:
+
+- `BoundedLengthArray<Min, Max, A>` is
+  `MaxLengthArray<Max, A> & MinLengthArray<Min, A>`, so rewriting
+  `boundedLengthArray(0, n, x)` to `maxLengthArray(n, x)` **drops** the
+  `MinLengthArray<0, A>` brand — a widening.
+- `FixedLengthArray<N, A>` additionally intersects the exact tuple
+  `FixedLengthTuple<N, A>` for `N <= 10`, so rewriting
+  `boundedLengthArray(n, n, x)` to `fixedLengthArray(n, x)` **adds** a
+  constraint — a narrowing.
+
+Neither is a pure rename, so the rule does not report them.
+
+#### Bounds above the structural cap
+
+The `*Tuple` combinators only encode lengths up to `10` (ts-type-forge's
+`StructuralPrefixLength`); past that they fall back to an overload that drops
+the constraint from the result type. The rule therefore only fires when the
+bound it carries over to the other combinator is a literal within `0..10`.
+
+#### Imports
 
 Both the namespace style (`import * as t from 'ts-fortress'`) and named imports
 — including aliases — are recognized, and the autofix reuses whatever binding
-the file already has, adding `import { nonEmptyArray } from 'ts-fortress';`
-only when a named call needs it.
+the file already has, adding `import { … } from 'ts-fortress';` only when a
+named call needs one.
 
-The rule deliberately leaves alone:
+#### The rule deliberately leaves alone
 
-- other minimum lengths (`minLengthArray(2, …)` is `MinLengthArray<2, …>`);
-- `minLengthTuple(1, …)`, which produces the structural
-  `readonly [A, ...A[]]` tuple rather than the branded `NonEmptyArray`;
-- calls passing a `defaultValue` option, because `nonEmptyArray` types it as
-  `NonEmptyTuple<A>` while `minLengthArray` types it as the branded
-  `MinLengthArray<1, A>` — a blind rewrite could stop type-checking. A
-  `typeName`-only options object is safe and is rewritten;
-- files that already bind the name `nonEmptyArray` to something else.
+- non-degenerate bounds (`minLengthArray(2, …)`, `boundedLengthTuple(1, 3, …)`);
+- computed bounds and calls with explicit type arguments, since the literal is
+  what makes the two forms equivalent;
+- `minLengthArray(1, …)` calls passing a `defaultValue`, because
+  `nonEmptyArray` types that option as `NonEmptyTuple<A>` while
+  `minLengthArray` types it as the branded `MinLengthArray<1, A>` — a blind
+  rewrite could stop type-checking. A `typeName`-only options object is safe
+  and is rewritten. (The other rewrites type `defaultValue` identically, so
+  they keep it.)
+- calls where the target name is already bound to something else at the call
+  site.
 
 ## License
 
