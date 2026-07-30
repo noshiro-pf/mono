@@ -15,6 +15,39 @@ configured TypeScript project is not required.
 
 ## Usage (flat config)
 
+The plugin ships a `recommended` config preset that registers the plugin and
+turns on **every** rule at `error`:
+
+```ts
+// eslint.config.mts
+import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
+
+export default [eslintPluginTsFortress.configs.recommended];
+```
+
+Since the preset is a plain flat-config object, individual rules can be
+adjusted by a later config entry:
+
+```ts
+// eslint.config.mts
+import {
+    eslintPluginTsFortress,
+    type EslintTsFortressRules,
+} from 'eslint-plugin-ts-fortress';
+
+export default [
+    eslintPluginTsFortress.configs.recommended,
+    {
+        files: ['src/legacy/**'],
+        rules: {
+            'ts-fortress/prefer-canonical-length-constrained-type': 'off',
+        } satisfies Partial<EslintTsFortressRules>,
+    },
+];
+```
+
+Or register the plugin yourself and pick the rules one by one:
+
 ```ts
 // eslint.config.mts
 import {
