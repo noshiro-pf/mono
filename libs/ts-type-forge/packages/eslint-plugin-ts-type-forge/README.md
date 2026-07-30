@@ -16,6 +16,41 @@ configured TypeScript project is not required.
 
 ## Usage (flat config)
 
+The plugin ships a `recommended` config preset that registers the plugin and
+turns on **every** rule at `error`:
+
+```ts
+// eslint.config.mts
+import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+
+export default [eslintPluginTsTypeForge.configs.recommended];
+```
+
+Since the preset is a plain flat-config object, individual rules can be
+adjusted by a later config entry — for instance to pass [options](#options):
+
+```ts
+// eslint.config.mts
+import {
+    eslintPluginTsTypeForge,
+    type EslintTsTypeForgeRules,
+} from 'eslint-plugin-ts-type-forge';
+
+export default [
+    eslintPluginTsTypeForge.configs.recommended,
+    {
+        rules: {
+            'ts-type-forge/prefer-canonical-length-constrained-tuple': [
+                'error',
+                { importStyle: 'named' },
+            ],
+        } satisfies Partial<EslintTsTypeForgeRules>,
+    },
+];
+```
+
+Or register the plugin yourself and pick the rules one by one:
+
 ```ts
 // eslint.config.mts
 import {
