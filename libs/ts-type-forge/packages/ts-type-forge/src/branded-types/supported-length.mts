@@ -1,4 +1,4 @@
-import { type UintRangeInclusive } from '../type-level-integer/index.mjs';
+import { type IndexInclusive } from '../type-level-integer/index.mjs';
 
 /**
  * The inclusive upper bound (`2048`) of the length parameters accepted by the
@@ -21,6 +21,10 @@ export type SupportedLengthCap = 2048;
  * Union of the length values (`0 | 1 | ... | 2048`) accepted by the length
  * parameters of the branded length-constrained string and array types.
  *
+ * Spelled with `IndexInclusive` rather than `UintRangeInclusive<0, ...>` (the
+ * same type) because {@link SupportedLengthCap} is above the `Uint10` bound
+ * that `UintRangeInclusive` constrains its arguments to.
+ *
  * The constraint costs almost nothing for the type checker: the union is
  * constructed once per program and cached, and each instantiation only adds a
  * single union-membership check. Its purpose is to reject length literals for
@@ -28,4 +32,4 @@ export type SupportedLengthCap = 2048;
  * with a readable constraint error, and to reject non-literal `number`, for
  * which the brand would be meaningless.
  */
-export type SupportedLength = UintRangeInclusive<0, SupportedLengthCap>;
+export type SupportedLength = IndexInclusive<SupportedLengthCap>;

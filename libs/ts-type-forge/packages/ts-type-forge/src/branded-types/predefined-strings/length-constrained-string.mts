@@ -1,6 +1,6 @@
 import { type IsUnion } from '../../condition/index.mjs';
 import { type MinLengthTuple } from '../../tuple-and-list/index.mjs';
-import { type UintRangeInclusive } from '../../type-level-integer/index.mjs';
+import { type IndexInclusive } from '../../type-level-integer/index.mjs';
 import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
 import { type SupportedLength } from '../supported-length.mjs';
 
@@ -31,7 +31,7 @@ import { type SupportedLength } from '../supported-length.mjs';
  * ```
  */
 // The `IsUnion<MaxLength>` guard is a type-checker performance safeguard. The
-// brand value `UintRangeInclusive<0, MaxLength>` distributes over a union
+// brand value `IndexInclusive<MaxLength>` distributes over a union
 // `MaxLength`, materializing `0 | 1 | ... | k` once per member. In real usage
 // `MaxLength` is a single literal, so this never happens — except when a
 // consumer's deferred conditional forces this type's *constraint*, where
@@ -46,7 +46,7 @@ export type MaxLengthString<MaxLength extends SupportedLength> =
     : string &
         TSTypeForgeInternals_BrandEncapsulated<
           Readonly<{
-            MaxLength: UintRangeInclusive<0, MaxLength>;
+            MaxLength: IndexInclusive<MaxLength>;
           }>
         >;
 

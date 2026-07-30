@@ -6,7 +6,10 @@ import {
   type MutableFixedLengthTuple,
   type MutableMinLengthTuple,
 } from '../../tuple-and-list/index.mjs';
-import { type UintRangeInclusive } from '../../type-level-integer/index.mjs';
+import {
+  type IndexInclusive,
+  type UintRangeInclusive,
+} from '../../type-level-integer/index.mjs';
 import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
 import { type SupportedLength } from '../supported-length.mjs';
 
@@ -82,7 +85,7 @@ type ClampToPrefixCap<N extends number> =
  * ```
  */
 // The `IsUnion<MaxLength>` guard is a type-checker performance safeguard. The
-// brand value `UintRangeInclusive<0, MaxLength>` distributes over a union
+// brand value `IndexInclusive<MaxLength>` distributes over a union
 // `MaxLength`, materializing `0 | 1 | ... | k` once per member. In real usage
 // `MaxLength` is a single literal, so this never happens — except when a
 // consumer's deferred conditional forces this type's *constraint*, where
@@ -97,7 +100,7 @@ export type MaxLengthArray<MaxLength extends SupportedLength, Elm = unknown> =
     : readonly Elm[] &
         TSTypeForgeInternals_BrandEncapsulated<
           Readonly<{
-            MaxLength: UintRangeInclusive<0, MaxLength>;
+            MaxLength: IndexInclusive<MaxLength>;
           }>
         >;
 
@@ -139,7 +142,7 @@ export type MutableMaxLengthArray<
     : Mutable<readonly Elm[]> &
         TSTypeForgeInternals_BrandEncapsulated<
           Readonly<{
-            MaxLength: UintRangeInclusive<0, MaxLength>;
+            MaxLength: IndexInclusive<MaxLength>;
           }>
         >;
 
