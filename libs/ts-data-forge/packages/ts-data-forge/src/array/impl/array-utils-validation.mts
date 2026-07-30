@@ -1,10 +1,11 @@
 import {
   type BoolOr,
   type BoundedLengthTuple,
+  type FixedLengthArray,
   type FixedLengthTuple,
   type MaxLengthTuple,
+  type MinLengthArray,
   type MinLengthTuple,
-  type NonEmptyArray,
   type TypeEq,
 } from 'ts-type-forge';
 import { asUint32, Num } from '../../number/index.mjs';
@@ -60,12 +61,15 @@ type Cast<A, B> = A extends B ? A : never;
  * assert.isFalse(Arr.isEmpty(words));
  *
  * if (Arr.isEmpty(emptyNumbers)) {
- *   assert.deepStrictEqual(emptyNumbers, []);
+ *   // `isEmpty` narrows to the branded `FixedLengthArray<0, number>`, so the
+ *   // expected value is annotated with the unbranded type.
+ *   assert.deepStrictEqual<readonly number[]>(emptyNumbers, []);
  * }
  * ```
  */
-export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
-  array.length === 0;
+export const isEmpty = <Xs extends readonly unknown[]>(
+  array: Xs,
+): array is FixedLengthArray<0, Xs[number]> & Xs => array.length === 0;
 
 /**
  * Type guard that checks if an array is non-empty.
@@ -86,9 +90,9 @@ export const isEmpty = <E,>(array: readonly E[]): array is readonly [] =>
  * }
  * ```
  */
-export const isNonEmpty = <E,>(
-  array: readonly E[],
-): array is NonEmptyArray<E> => array.length > 0;
+export const isNonEmpty = <Xs extends readonly unknown[]>(
+  array: Xs,
+): array is MinLengthArray<1, Xs[number]> & Xs => array.length > 0;
 
 /**
  * Checks if an array has a specific length.

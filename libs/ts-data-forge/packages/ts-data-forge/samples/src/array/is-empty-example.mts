@@ -13,7 +13,9 @@ if (import.meta.vitest !== undefined) {
     assert.isFalse(Arr.isEmpty(words));
 
     if (Arr.isEmpty(emptyNumbers)) {
-      assert.deepStrictEqual(emptyNumbers, []);
+      // `isEmpty` narrows to the branded `FixedLengthArray<0, number>`, so the
+      // expected value is annotated with the unbranded type.
+      assert.deepStrictEqual<readonly number[]>(emptyNumbers, []);
     }
 
     // embed-sample-code-ignore-below
