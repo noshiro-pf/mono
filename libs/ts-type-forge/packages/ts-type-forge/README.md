@@ -612,18 +612,18 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
 - src/condition/extends.mts
     - [TypeExtends](./src/condition/extends.mts#L45)
 - src/condition/is-any.mts
-    - [IsAny](./src/condition/is-any.mts#L19)
-    - [IsNotAny](./src/condition/is-any.mts#L33)
+    - [IsAny](./src/condition/is-any.mts#L21)
+    - [IsNotAny](./src/condition/is-any.mts#L35)
 - src/condition/is-fixed-length-list.mts
-    - [IsFixedLengthList](./src/condition/is-fixed-length-list.mts#L19)
-    - [IsNotFixedLengthList](./src/condition/is-fixed-length-list.mts#L37)
+    - [IsFixedLengthList](./src/condition/is-fixed-length-list.mts#L21)
+    - [IsNotFixedLengthList](./src/condition/is-fixed-length-list.mts#L39)
 - src/condition/is-never.mts
-    - [IsNever](./src/condition/is-never.mts#L18)
+    - [IsNever](./src/condition/is-never.mts#L20)
 - src/condition/is-union.mts
     - [IsUnion](./src/condition/is-union.mts#L30)
 - src/condition/is-unknown.mts
-    - [IsUnknown](./src/condition/is-unknown.mts#L20)
-    - [IsNotUnknown](./src/condition/is-unknown.mts#L35)
+    - [IsUnknown](./src/condition/is-unknown.mts#L21)
+    - [IsNotUnknown](./src/condition/is-unknown.mts#L36)
 - src/constants/alphabet.mts
     - [LowerAlphabet](./src/constants/alphabet.mts#L21)
     - [UpperAlphabet](./src/constants/alphabet.mts#L48)

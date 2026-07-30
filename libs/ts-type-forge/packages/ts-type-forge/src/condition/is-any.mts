@@ -1,3 +1,5 @@
+import { type BoolNot } from '../others/index.mjs';
+
 /**
  * Checks if a given type `T` is exactly the `any` type.
  *
@@ -30,4 +32,4 @@ export type IsAny<T> = 0 extends 1 & T ? true : false;
  * type T2 = IsNotAny<unknown>; // true
  * type T3 = IsNotAny<string>; // true
  */
-export type IsNotAny<T> = 0 extends 1 & T ? false : true;
+export type IsNotAny<T> = BoolNot<IsAny<T>>;

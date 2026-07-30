@@ -1,3 +1,4 @@
+import { type BoolNot } from '../others/index.mjs';
 import { type IsAny } from './is-any.mjs';
 
 /**
@@ -32,4 +33,4 @@ export type IsUnknown<T> =
  * type T2 = IsNotUnknown<any>; // true
  * type T3 = IsNotUnknown<string>; // true
  */
-export type IsNotUnknown<T> = IsUnknown<T> extends true ? false : true;
+export type IsNotUnknown<T> = BoolNot<IsUnknown<T>>;

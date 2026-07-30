@@ -1,3 +1,5 @@
+import { type TypeExtends } from './extends.mjs';
+
 /**
  * Checks if a given type `T` is exactly the `never` type.
  *
@@ -15,4 +17,4 @@
  * type T5 = IsNever<string | never>; // false (evaluates to string)
  * type T6 = IsNever<string & never>; // true (evaluates to never)
  */
-export type IsNever<T> = [T] extends [never] ? true : false;
+export type IsNever<T> = TypeExtends<T, never>;

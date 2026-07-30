@@ -1,3 +1,5 @@
+import { type BoolNot } from '../others/index.mjs';
+
 /**
  * Checks if a given readonly array type `T` has a fixed length (i.e., is a tuple).
  * Returns `true` if `T` is a tuple, `false` if it's a regular array (`Type[]`).
@@ -34,5 +36,6 @@ export type IsFixedLengthList<T extends readonly unknown[]> =
  * type IsNotEmptyTuple = IsNotFixedLengthList<[]>; // false
  * type IsNotTupleWithRest = IsNotFixedLengthList<[number, ...string[]]>; // true
  */
-export type IsNotFixedLengthList<T extends readonly unknown[]> =
-  number extends T['length'] ? true : false;
+export type IsNotFixedLengthList<T extends readonly unknown[]> = BoolNot<
+  IsFixedLengthList<T>
+>;
