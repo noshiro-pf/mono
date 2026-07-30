@@ -1,5 +1,41 @@
 ## [11.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.1...v11.0.2) (2026-07-24)
 
+## 11.2.0
+
+### Minor Changes
+
+- 48a4e49: Add `uintRangeInclusive()` and `intRangeInclusive()`, the inclusive-end
+  counterparts of `uintRange()` and `intRange()`. They accept the same two
+  argument forms as the exclusive versions — positional
+  (`uintRangeInclusive(1, 12, { defaultValue: 1 })`) and object
+  (`uintRangeInclusive({ start: 1, end: 12, defaultValue: 1 })`) — but treat
+  `end` as part of the range, so `start === end` yields a single-value type.
+
+    The corresponding `UintRangeInclusive` / `IntRangeInclusive` types are
+    re-exported from `ts-type-forge`, and validation failures report a new
+    `{ kind: 'integer-range-inclusive', start, endInclusive }` error detail.
+
+- 48a4e49: `uintRange()` and `intRange()` now accept their bounds as positional arguments -
+  `uintRange(1, 13, { defaultValue: 1 })` - in addition to the existing options
+  object form `uintRange({ start: 1, end: 13, defaultValue: 1 })`. The object form
+  keeps working unchanged, so this is backward compatible.
+
+    The bounds these functions accept are also widened from `Int8` / `Uint8` to
+    `Int11` / `Uint11`, the caps the whole integer-range family now uses:
+    `intRange()` covers `-1024` to `1024` and `uintRange()` covers `0` to `2048`
+    (the `end` bound is exclusive, hence one past the `Int11` / `Uint11` maximum).
+
+### Patch Changes
+
+- d1ae5a9: `IntRange<Start, End>` is now re-exported from `ts-type-forge` instead of being
+  declared locally, mirroring how `UintRange` is already handled. The exported
+  type name and its semantics are unchanged.
+
+    Requires `ts-type-forge` 8.0.0, the release that adds `IntRange`. That release
+    also constrains the bounds of the whole integer-range family (`Uint11`, `0` to
+    `2047`, for `UintRange` / `UintRangeInclusive`; `Int11`, `-1024` to `1023`, for
+    `IntRange` / `IntRangeInclusive`).
+
 ## 11.1.0
 
 ### Minor Changes
