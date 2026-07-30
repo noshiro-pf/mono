@@ -1,19 +1,5 @@
-import {
-  expectType,
-  isNumber,
-  memoizeFunction,
-  Num,
-  Result,
-} from 'ts-data-forge';
-import {
-  type BoolAnd,
-  type Index,
-  type IndexInclusive,
-  type Int8,
-  type NegativeIndex,
-  type TypeExtends,
-  type UintRange,
-} from 'ts-type-forge';
+import { isNumber, memoizeFunction, Num, Result } from 'ts-data-forge';
+import { type Int8, type IntRange } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -21,6 +7,8 @@ import {
   createIsFn,
   type ValidationError,
 } from '../utils/index.mjs';
+
+export type { IntRange } from 'ts-type-forge';
 
 export const intRange = <Start extends Int8, End extends Int8 | 128>({
   end,
@@ -83,46 +71,3 @@ export const intRange = <Start extends Int8, End extends Int8 | 128>({
     cast: createCastFn(validate),
   };
 };
-
-type NegativeRange = NegativeIndex<128>;
-
-type PositiveRange = IndexInclusive<128>;
-
-export type IntRange<Start extends Int8, End extends Int8 | 128> =
-  BoolAnd<
-    TypeExtends<Start, PositiveRange>,
-    TypeExtends<End, PositiveRange>
-  > extends true
-    ? UintRange<Start, End>
-    : BoolAnd<
-          TypeExtends<Start, NegativeRange>,
-          TypeExtends<End, PositiveRange>
-        > extends true
-      ? NegativeIndex<NegativeToPositive<Start>> | Index<End>
-      : BoolAnd<
-            TypeExtends<Start, PositiveRange>,
-            TypeExtends<End, NegativeRange>
-          > extends true
-        ? never
-        : BoolAnd<
-              TypeExtends<Start, NegativeRange>,
-              TypeExtends<End, NegativeRange>
-            > extends true
-          ? Exclude<
-              NegativeIndex<NegativeToPositive<Start>>,
-              NegativeIndex<NegativeToPositive<End>>
-            >
-          : never;
-
-type NegativeToPositive<N extends number> =
-  `${N}` extends `-${infer D extends number}` ? D : never;
-
-expectType<NegativeToPositive<-3>, 3>('=');
-
-expectType<IntRange<1, 5>, 1 | 2 | 3 | 4>('=');
-
-expectType<IntRange<-3, 3>, -3 | -2 | -1 | 0 | 1 | 2>('=');
-
-expectType<IntRange<3, -3>, never>('=');
-
-expectType<IntRange<-5, -1>, -5 | -4 | -3 | -2>('=');

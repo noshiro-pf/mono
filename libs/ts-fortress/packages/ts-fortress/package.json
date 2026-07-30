@@ -67,7 +67,7 @@
   "dependencies": {
     "@sindresorhus/is": "8.1.x",
     "ts-data-forge": "12.x",
-    "ts-type-forge": "7.x"
+    "ts-type-forge": "8.x"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",

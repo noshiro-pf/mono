@@ -121,8 +121,8 @@ importers:
         specifier: 12.x
         version: 12.2.2(typescript@6.0.3)
       ts-type-forge:
-        specifier: 7.x
-        version: 7.2.1
+        specifier: 8.x
+        version: 8.0.0
     devDependencies:
       '@rollup/plugin-replace':
         specifier: 6.0.3
@@ -3762,6 +3762,10 @@ packages:
 
   ts-type-forge@7.2.1:
     resolution: {integrity: sha512-XfF2CYB/2YoKNKfbTQNDAyXRNc7qpLZqNWL8FIZYlOPiODfn9B0oAIh4ogduRoXJAg5hunj473rZJ0IAolIslw==}
+    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
+
+  ts-type-forge@8.0.0:
+    resolution: {integrity: sha512-6wisIN+EFO+hxhcx5hBQ8fIBaSPBZirUSt0Pt5F3SJr0/C+9K3lwyDPY3DASeUMQi/YonE9mzO49+h0K/7RKGg==}
     engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   tsconfig-paths@3.15.0:
@@ -7997,6 +8001,8 @@ snapshots:
   ts-type-forge@5.0.0: {}
 
   ts-type-forge@7.2.1: {}
+
+  ts-type-forge@8.0.0: {}
 
   tsconfig-paths@3.15.0:
     dependencies:
