@@ -12,6 +12,38 @@ Requires ESLint 9+ (flat config) and TypeScript. Some rules are type-aware and n
 
 ## Usage (flat config)
 
+The plugin ships a `recommended` config preset that registers the plugin and
+turns on **every** rule at `error`:
+
+```ts
+// eslint.config.mts
+import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
+
+export default [eslintPluginTsDataForge.configs.recommended];
+```
+
+Since the preset is a plain flat-config object, individual rules can be
+adjusted by a later config entry:
+
+```ts
+// eslint.config.mts
+import {
+    eslintPluginTsDataForge,
+    type EslintTsDataForgeRules,
+} from 'eslint-plugin-ts-data-forge';
+
+export default [
+    eslintPluginTsDataForge.configs.recommended,
+    {
+        rules: {
+            'ts-data-forge/prefer-range-for-loop': 'off',
+        } satisfies Partial<EslintTsDataForgeRules>,
+    },
+];
+```
+
+Or register the plugin yourself and pick the rules one by one:
+
 ```ts
 // eslint.config.mts
 import {
