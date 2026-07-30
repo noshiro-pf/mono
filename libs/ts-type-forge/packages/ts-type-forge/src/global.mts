@@ -44,6 +44,18 @@ declare global {
   > = _TSTypeForge.IntersectBrand<B1, B2>;
   type NormalizeBrandUnion<B extends UnknownBrand> =
     _TSTypeForge.NormalizeBrandUnion<B>;
+  type HasLengthConstraint<Ar extends readonly unknown[]> =
+    _TSTypeForge.HasLengthConstraint<Ar>;
+  type LengthConstraintBrandOf<Ar extends readonly unknown[]> =
+    _TSTypeForge.LengthConstraintBrandOf<Ar>;
+  type MinLengthOf<Ar extends readonly unknown[]> =
+    _TSTypeForge.MinLengthOf<Ar>;
+  type MaxLengthOf<Ar extends readonly unknown[]> =
+    _TSTypeForge.MaxLengthOf<Ar>;
+  type ChangeArrayElement<
+    Ar extends readonly unknown[],
+    Elm,
+  > = _TSTypeForge.ChangeArrayElement<Ar, Elm>;
   type StructuralPrefixCap = _TSTypeForge.StructuralPrefixCap;
   type StructuralPrefixLength = _TSTypeForge.StructuralPrefixLength;
   type MaxLengthArray<

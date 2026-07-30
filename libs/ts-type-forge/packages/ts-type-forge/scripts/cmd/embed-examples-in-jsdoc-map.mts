@@ -40,6 +40,16 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
+    sourcePath:
+      'src/branded-types/predefined-arrays/length-constrained-array-bounds.mts',
+    sampleFiles: [
+      'samples/src/branded-types/predefined-arrays/has-length-constraint-example.mts',
+      'samples/src/branded-types/predefined-arrays/min-length-of-example.mts',
+      'samples/src/branded-types/predefined-arrays/max-length-of-example.mts',
+      'samples/src/branded-types/predefined-arrays/change-array-element-example.mts',
+    ],
+  },
+  {
     sourcePath: 'src/branded-types/predefined-numbers/bigint.mts',
     sampleFiles: [
       'samples/src/branded-types/predefined-numbers/big-int64-example.mts',
