@@ -1,0 +1,5 @@
+name = "synstate-formal"
+defaultTargets = ["SynstateFormal"]
+
+[[lean_lib]]
+name = "SynstateFormal"
