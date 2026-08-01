@@ -169,5 +169,3 @@ const isTsFortressImportDef = (node: TSESTree.Node): boolean =>
     node.type === AST_NODE_TYPES.ImportNamespaceSpecifier) &&
   node.parent.type === AST_NODE_TYPES.ImportDeclaration &&
   node.parent.source.value === TS_FORTRESS_MODULE;
-
-/* eslint-enable @typescript-eslint/prefer-readonly-parameter-types */

@@ -356,5 +356,3 @@ const passesDefaultValue = (node: TSESTree.Node | undefined): boolean =>
         property.key.type !== AST_NODE_TYPES.Identifier ||
         property.key.name === 'defaultValue',
     ));
-
-/* eslint-enable @typescript-eslint/prefer-readonly-parameter-types */
