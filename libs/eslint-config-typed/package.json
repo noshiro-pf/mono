@@ -132,7 +132,7 @@
     "ts-data-forge": "^11.0.0",
     "ts-type-forge": "^7.0.0",
     "tsutils": "^3.21.0",
-    "typescript-eslint": "^8.62.0"
+    "typescript-eslint": "^8.65.0"
   },
   "devDependencies": {
     "@eslint/core": "1.2.1",
