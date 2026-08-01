@@ -190,13 +190,13 @@ import { type List } from './list.mjs';
 
 // ── set-at ─────────────────────────
 {
-  expectType<List.SetAt<readonly [], 2, 999>, readonly []>('=');
+  expectType<List.SetAt<2, 999, readonly []>, readonly []>('=');
 
-  expectType<List.SetAt<readonly [1, 2], 2, 999>, readonly [1, 2]>('=');
+  expectType<List.SetAt<2, 999, readonly [1, 2]>, readonly [1, 2]>('=');
 
-  expectType<List.SetAt<readonly [1, 2, 3], 1, 999>, readonly [1, 999, 3]>('=');
+  expectType<List.SetAt<1, 999, readonly [1, 2, 3]>, readonly [1, 999, 3]>('=');
 
-  expectType<List.SetAt<readonly [1, 2, 3], 0, 999>, readonly [999, 2, 3]>('=');
+  expectType<List.SetAt<0, 999, readonly [1, 2, 3]>, readonly [999, 2, 3]>('=');
 }
 
 // ── skip-last ─────────────────────────

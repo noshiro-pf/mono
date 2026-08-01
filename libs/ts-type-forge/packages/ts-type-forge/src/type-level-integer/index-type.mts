@@ -13,7 +13,7 @@ import { type IndexOfTuple, type MakeTuple } from '../tuple-and-list/index.mjs';
  * type Idx0 = Index<0>; // never
  * type Idx1 = Index<1>; // 0
  */
-export type Index<N extends number> = IndexOfTuple<MakeTuple<0, N>>;
+export type Index<N extends number> = IndexOfTuple<MakeTuple<N, 0>>;
 
 /**
  * Creates a union of non-negative integer literals from 0 up to (and including) `N`.
@@ -27,7 +27,7 @@ export type Index<N extends number> = IndexOfTuple<MakeTuple<0, N>>;
  * type IdxInc0 = IndexInclusive<0>; // 0
  */
 export type IndexInclusive<N extends number> = IndexOfTuple<
-  [...MakeTuple<0, N>, 0]
+  [...MakeTuple<N, 0>, 0]
 >;
 
 /**

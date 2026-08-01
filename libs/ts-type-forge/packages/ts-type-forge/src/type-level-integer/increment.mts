@@ -36,7 +36,7 @@ import { type List, type MakeTuple } from '../tuple-and-list/index.mjs';
  */
 export type Increment<N extends number> = (readonly [
   0,
-  ...MakeTuple<0, N>,
+  ...MakeTuple<N, 0>,
 ])['length'];
 
 /**
@@ -77,4 +77,4 @@ export type Increment<N extends number> = (readonly [
  *     : false;
  * ```
  */
-export type Decrement<N extends number> = List.Tail<MakeTuple<0, N>>['length'];
+export type Decrement<N extends number> = List.Tail<MakeTuple<N, 0>>['length'];

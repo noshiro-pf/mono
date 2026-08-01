@@ -3,7 +3,7 @@ import { type MakeTuple } from '../tuple-and-list/index.mjs';
 
 /**
  * Creates a readonly tuple containing a sequence of number literals from 0 up to (but not including) `N`.
- * Requires `N` to be a non-negative integer literal for which `MakeTuple<unknown, N>` can be computed.
+ * Requires `N` to be a non-negative integer literal for which `MakeTuple<N, unknown>` can be computed.
  *
  * @template N - The upper bound (exclusive) of the sequence. Must be a non-negative integer literal.
  * @returns A readonly tuple type `readonly [0, 1, ..., N-1]`.
@@ -12,7 +12,7 @@ import { type MakeTuple } from '../tuple-and-list/index.mjs';
  * type S0 = Seq<0>; // readonly []
  * type S1 = Seq<1>; // readonly [0]
  */
-export type Seq<N extends number> = SeqImpl<MakeTuple<unknown, N>>;
+export type Seq<N extends number> = SeqImpl<MakeTuple<N, unknown>>;
 
 /**
  * @internal

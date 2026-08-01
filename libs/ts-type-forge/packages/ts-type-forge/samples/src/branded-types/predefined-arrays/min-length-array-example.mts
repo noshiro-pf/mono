@@ -3,8 +3,8 @@ import { type MinLengthArray, type SupportedLength } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
 const isMinLengthArray = <N extends SupportedLength, E>(
-  xs: readonly E[],
   minLength: N,
+  xs: readonly E[],
 ): xs is MinLengthArray<N, E> => xs.length >= minLength;
 
 const history = [0, 1, 2, 3] as unknown as MinLengthArray<3, number>;

@@ -260,12 +260,12 @@ expectType<
 /* SetAt */
 
 expectType<
-  ConstrainedList.SetAt<MinLengthArray<3, number>, 1, 'x'>,
+  ConstrainedList.SetAt<1, 'x', MinLengthArray<3, number>>,
   MinLengthArray<3, number | 'x'>
 >('~=');
 
 expectType<
-  ConstrainedList.SetAt<readonly [1, 2, 3], 1, 'x'>,
+  ConstrainedList.SetAt<1, 'x', readonly [1, 2, 3]>,
   readonly [1, 'x', 3]
 >('=');
 
@@ -466,7 +466,7 @@ expectType<
 >('~=');
 
 expectType<
-  ConstrainedList.SetAt<BrandedFiveTuple, 1, 'x'>,
+  ConstrainedList.SetAt<1, 'x', BrandedFiveTuple>,
   MinLengthArray<3, Elm5 | 'x'> & readonly [1, 'x', 3, 4, 5]
 >('~=');
 
@@ -580,7 +580,7 @@ expectType<List.Last<readonly [1, 2, 3, 4, 5]>, 5>('=');
 export type ListReverseOfBranded = List.Reverse<BrandedFiveTuple>;
 
 // @ts-expect-error TS2589: Type instantiation is excessively deep.
-export type ListSetAtOfBranded = List.SetAt<BrandedFiveTuple, 1, 'x'>;
+export type ListSetAtOfBranded = List.SetAt<1, 'x', BrandedFiveTuple>;
 
 // @ts-expect-error TS2589: Type instantiation is excessively deep.
 export type ListPartitionOfBranded = List.Partition<2, BrandedFiveTuple>;

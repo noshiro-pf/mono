@@ -40,7 +40,7 @@
     "codemod:full:readonly": "convert-to-readonly 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
     "codemod:uncommitted:as-const": "append-as-const --uncommitted 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
     "codemod:uncommitted:readonly": "convert-to-readonly --uncommitted 'packages/*/{scripts,test}/**/*.{mts,tsx}'",
-    "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
+    "cspell": "cspell \"{**/*,.changeset/**/*}\" --gitignore --gitignore-root ./ --no-progress",
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
     "fmt:full": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write .",

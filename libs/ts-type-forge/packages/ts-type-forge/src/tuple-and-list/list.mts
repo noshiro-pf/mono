@@ -140,18 +140,18 @@ export namespace List {
    * Creates a new array/tuple type where the element at index `I` in `T` is replaced with type `V`.
    * If `T` is a tuple, it returns a new tuple type with the element at `I` updated.
    * If `T` is a general array, it returns a general array type `readonly (T[number] | V)[]`.
-   * @template T - The readonly array or tuple type.
    * @template I - The index to update (must be a valid index for `T` if `T` is a tuple).
    * @template V - The new type for the element at index `I`.
+   * @template T - The readonly array or tuple type.
    * @returns A new array/tuple type with the element at index `I` updated.
    * @example
-   * type SA1 = List.SetAt<[1, 2, 3], 1, 'x'>; // readonly [1, 'x', 3]
-   * type SA2 = List.SetAt<readonly number[], 1, 'x'>; // readonly (string | number)[]
-   * // type SA3 = List.SetAt<[1, 2], 2, 'x'>; // Error if I is out of bounds for tuple
+   * type SA1 = List.SetAt<1, 'x', [1, 2, 3]>; // readonly [1, 'x', 3]
+   * type SA2 = List.SetAt<1, 'x', readonly number[]>; // readonly (string | number)[]
+   * // type SA3 = List.SetAt<2, 'x', [1, 2]>; // Error if I is out of bounds for tuple
    */
-  export type SetAt<T extends readonly unknown[], I extends number, V> =
+  export type SetAt<I extends number, V, T extends readonly unknown[]> =
     IsFixedLengthList<T> extends true
-      ? Tuple.SetAt<T, I, V>
+      ? Tuple.SetAt<I, V, T>
       : readonly (T[number] | V)[];
 
   /**

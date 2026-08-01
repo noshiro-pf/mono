@@ -158,18 +158,18 @@ export namespace Tuple {
 
   /**
    * Creates a new readonly tuple type where the element at index `I` in `T` is replaced with type `V`.
-   * @template T - The readonly tuple type.
    * @template I - The index to update (must be a valid index literal for `T`).
    * @template V - The new type for the element at index `I`.
+   * @template T - The readonly tuple type.
    * @returns A new readonly tuple type with the element at index `I` updated.
    * @example
-   * type SA1 = Tuple.SetAt<[1, 2, 3], 1, 'x'>; // readonly [1, 'x', 3]
-   * // type SA2 = Tuple.SetAt<[1, 2], 2, 'x'>; // Error: Index '2' is out of bounds.
+   * type SA1 = Tuple.SetAt<1, 'x', [1, 2, 3]>; // readonly [1, 'x', 3]
+   * // type SA2 = Tuple.SetAt<2, 'x', [1, 2]>; // Error: Index '2' is out of bounds.
    */
   export type SetAt<
-    T extends readonly unknown[],
     I extends number,
     V,
+    T extends readonly unknown[],
   > = SetAtImpl<T, I, V, readonly []>;
 
   /**

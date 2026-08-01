@@ -280,7 +280,7 @@ type RecordUpdatedImplTupleCase<
   ? Head extends IndexOfTuple<T> // Is the head a valid numeric index for the tuple?
     ? Rest extends RecordPaths<T[Head]> // Is the rest a valid path within the nested value?
       ? // Use Tuple.SetAt to update the element at the specific index
-        Tuple.SetAt<T, Head, RecordUpdated<T[Head], Rest, ValueAfter>>
+        Tuple.SetAt<Head, RecordUpdated<T[Head], Rest, ValueAfter>, T>
       : never // Invalid rest path
     : never // Invalid head index
   : never; // Path should not be empty here (handled in RecordUpdated)

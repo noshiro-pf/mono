@@ -128,15 +128,15 @@ import { type Tuple } from './tuple.mjs';
 
 // ── set-at ─────────────────────────
 {
-  expectType<Tuple.SetAt<readonly [], 2, 999>, readonly []>('=');
+  expectType<Tuple.SetAt<2, 999, readonly []>, readonly []>('=');
 
-  expectType<Tuple.SetAt<readonly [1, 2], 2, 999>, readonly [1, 2]>('=');
+  expectType<Tuple.SetAt<2, 999, readonly [1, 2]>, readonly [1, 2]>('=');
 
-  expectType<Tuple.SetAt<readonly [1, 2, 3], 1, 999>, readonly [1, 999, 3]>(
+  expectType<Tuple.SetAt<1, 999, readonly [1, 2, 3]>, readonly [1, 999, 3]>(
     '=',
   );
 
-  expectType<Tuple.SetAt<readonly [1, 2, 3], 0, 999>, readonly [999, 2, 3]>(
+  expectType<Tuple.SetAt<0, 999, readonly [1, 2, 3]>, readonly [999, 2, 3]>(
     '=',
   );
 }

@@ -108,14 +108,14 @@ export namespace ConstrainedList {
    * Replaces the element at index `I` of `Ar` with `V`, keeping its length
    * constraint. Like {@link Reverse}, this changes no length.
    *
-   * @template Ar - The array type to update.
    * @template I - The index to update.
    * @template V - The new type at that index.
+   * @template Ar - The array type to update.
    */
-  export type SetAt<Ar extends readonly unknown[], I extends number, V> =
+  export type SetAt<I extends number, V, Ar extends readonly unknown[]> =
     HasLengthConstraint<Ar> extends true
       ? ChangeArrayElement<Ar, Ar[number] | V> & SetAtStructure<Ar, I, V>
-      : List.SetAt<Ar, I, V>;
+      : List.SetAt<I, V, Ar>;
 
   /**
    * Drops the first element of `Ar`, lowering both bounds by one.
@@ -431,7 +431,7 @@ type ReverseStructure<Ar extends readonly unknown[]> =
 /** @internal {@link List.SetAt} of the exact tuple, when there is one. */
 type SetAtStructure<Ar extends readonly unknown[], I extends number, V> =
   PinsExactTuple<Ar> extends true
-    ? List.SetAt<MaterializeTuple<Ar>, I, V>
+    ? List.SetAt<I, V, MaterializeTuple<Ar>>
     : unknown;
 
 /** @internal {@link List.Tail} of the exact tuple, when there is one. */
@@ -589,4 +589,4 @@ type SmallerLength<A, B> =
  * constraint satisfied for a bound that is still deferred on a type parameter,
  * which is the normal case here.
  */
-type LengthTuple<N> = MakeTuple<0, N & number>;
+type LengthTuple<N> = MakeTuple<N & number, 0>;

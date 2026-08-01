@@ -73,8 +73,8 @@ type ClampToPrefixCap<N extends number> =
  * @example
  * ```ts
  * const isMaxLengthArray = <N extends SupportedLength, E>(
- *   xs: readonly E[],
  *   maxLength: N,
+ *   xs: readonly E[],
  * ): xs is MaxLengthArray<N, E> => xs.length <= maxLength;
  *
  * const tags = ['a', 'b', 'c'] as unknown as MaxLengthArray<8, string>;
@@ -177,8 +177,8 @@ export type MutableMaxLengthArray<
  * @example
  * ```ts
  * const isMinLengthArray = <N extends SupportedLength, E>(
- *   xs: readonly E[],
  *   minLength: N,
+ *   xs: readonly E[],
  * ): xs is MinLengthArray<N, E> => xs.length >= minLength;
  *
  * const history = [0, 1, 2, 3] as unknown as MinLengthArray<3, number>;

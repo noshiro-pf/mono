@@ -102,7 +102,7 @@ that makes `List.Tail` of such a type `readonly unknown[]`, and makes
 instantiation-depth limit outright. Indexed access _does_ reach through, so
 the tuple is rebuilt one index at a time, capped at 32 elements; past the cap
 the brand answer stands alone, which claims less rather than more. `List` and
-`Tuple` themselves are unchanged — the type tests now pin their behaviour on
+`Tuple` themselves are unchanged — the type tests now pin their behavior on
 such an input so the gap stays visible.
 
 Cost of the rebuild across this package's own suite: **+18.5k instantiations,

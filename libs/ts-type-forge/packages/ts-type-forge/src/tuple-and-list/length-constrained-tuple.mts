@@ -7,7 +7,7 @@ import { type MakeTuple } from './make-tuple.mjs';
 
 /**
  * Creates a readonly tuple type of a specific length `N` with elements of type `Elm`.
- * Alias for `MakeTuple<Elm, N>`.
+ * Alias for `MakeTuple<N, Elm>`.
  * @template N - The desired length of the tuple (must be a non-negative integer literal).
  * @template Elm - The type of elements in the tuple.
  * @returns A readonly tuple type `readonly [Elm, Elm, ..., Elm]` of length `N`.
@@ -15,7 +15,7 @@ import { type MakeTuple } from './make-tuple.mjs';
  * type TupleOf3Strings = FixedLengthTuple<3, string>; // readonly [string, string, string]
  * type TupleOf0Numbers = FixedLengthTuple<0, number>; // readonly []
  */
-export type FixedLengthTuple<N extends number, Elm> = MakeTuple<Elm, N>;
+export type FixedLengthTuple<N extends number, Elm> = MakeTuple<N, Elm>;
 
 /**
  * Creates a mutable tuple type of a specific length `N` with elements of type `Elm`.
@@ -60,7 +60,7 @@ export type MutableMinLengthTuple<N extends number, Elm> = Mutable<
  * // const invalid: AtLeast3Strings = ["a", "b"]; // Error
  */
 export type MinLengthTuple<N extends number, Elm> = readonly [
-  ...MakeTuple<Elm, N>,
+  ...MakeTuple<N, Elm>,
   ...Elm[],
 ];
 
@@ -91,7 +91,7 @@ type TuplePrefixesDownTo<
 /**
  * Creates a readonly tuple type whose length is between `Min` and `Max` (both inclusive).
  * The result is a union of fixed-length readonly tuples
- * `MakeTuple<Elm, Min> | ... | MakeTuple<Elm, Max>`.
+ * `MakeTuple<Min, Elm> | ... | MakeTuple<Max, Elm>`.
  * Requires `Min` and `Max` to be non-negative integer literals with `Min <= Max`.
  *
  * @template Min - The minimum length (inclusive). Must be a non-negative integer literal.
@@ -110,7 +110,7 @@ export type BoundedLengthTuple<
   Min extends number,
   Max extends number,
   Elm,
-> = TuplePrefixesDownTo<MakeTuple<Elm, Max>, Min>;
+> = TuplePrefixesDownTo<MakeTuple<Max, Elm>, Min>;
 
 /**
  * Mutable version of {@link BoundedLengthTuple}.
@@ -133,7 +133,7 @@ export type MutableBoundedLengthTuple<
 /**
  * Creates a readonly tuple type whose length is at most `N` (i.e. `0` to `N`, both inclusive).
  * Counterpart of {@link MinLengthTuple}, defined as `BoundedLengthTuple<0, N, Elm>`.
- * The result is a union `readonly [] | readonly [Elm] | ... | MakeTuple<Elm, N>`.
+ * The result is a union `readonly [] | readonly [Elm] | ... | MakeTuple<N, Elm>`.
  * Requires `N` to be a non-negative integer literal.
  *
  * @template N - The maximum length (inclusive). Must be a non-negative integer literal.

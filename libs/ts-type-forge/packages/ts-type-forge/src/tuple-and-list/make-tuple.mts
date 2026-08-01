@@ -1,16 +1,16 @@
 /**
  * Creates a readonly tuple type of a specific length `N` with elements of type `Elm`.
  *
- * @template Elm - The type of elements in the tuple.
  * @template N - The desired length of the tuple (must be a non-negative integer literal).
+ * @template Elm - The type of elements in the tuple.
  * @returns A readonly tuple type `readonly [Elm, Elm, ..., Elm]` of length `N`.
  * @example
- * type TupleOf3Strings = MakeTuple<string, 3>; // readonly [string, string, string]
- * type TupleOf0Numbers = MakeTuple<number, 0>; // readonly []
- * // type InvalidLength = MakeTuple<boolean, -1>; // Error or unexpected result
- * // type InvalidLength2 = MakeTuple<boolean, 1.5>; // Error or unexpected result
+ * type TupleOf3Strings = MakeTuple<3, string>; // readonly [string, string, string]
+ * type TupleOf0Numbers = MakeTuple<0, number>; // readonly []
+ * // type InvalidLength = MakeTuple<-1, boolean>; // Error or unexpected result
+ * // type InvalidLength2 = MakeTuple<1.5, boolean>; // Error or unexpected result
  */
-export type MakeTuple<Elm, N extends number> = MakeTupleImpl<Elm, `${N}`, []>;
+export type MakeTuple<N extends number, Elm> = MakeTupleImpl<Elm, `${N}`, []>;
 
 // https://techracho.bpsinc.jp/yoshi/2020_09_04/97108
 

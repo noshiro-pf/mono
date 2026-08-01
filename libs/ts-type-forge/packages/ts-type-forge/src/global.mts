@@ -405,7 +405,7 @@ declare global {
     N extends number,
     Elm,
   > = _TSTypeForge.MutableMaxLengthTuple<N, Elm>;
-  type MakeTuple<Elm, N extends number> = _TSTypeForge.MakeTuple<Elm, N>;
+  type MakeTuple<N extends number, Elm> = _TSTypeForge.MakeTuple<N, Elm>;
   type AbsoluteValue<N extends number> = _TSTypeForge.AbsoluteValue<N>;
   type Abs<N extends number> = _TSTypeForge.Abs<N>;
   type Increment<N extends number> = _TSTypeForge.Increment<N>;
@@ -436,10 +436,10 @@ declare global {
     export type Reverse<Ar extends readonly unknown[]> =
       _TSTypeForge.ConstrainedList.Reverse<Ar>;
     export type SetAt<
-      Ar extends readonly unknown[],
       I extends number,
       V,
-    > = _TSTypeForge.ConstrainedList.SetAt<Ar, I, V>;
+      Ar extends readonly unknown[],
+    > = _TSTypeForge.ConstrainedList.SetAt<I, V, Ar>;
     export type Tail<Ar extends readonly unknown[]> =
       _TSTypeForge.ConstrainedList.Tail<Ar>;
     export type ButLast<Ar extends readonly unknown[]> =
@@ -507,10 +507,10 @@ declare global {
       T extends readonly unknown[],
     > = _TSTypeForge.List.SkipLast<N, T>;
     export type SetAt<
-      T extends readonly unknown[],
       I extends number,
       V,
-    > = _TSTypeForge.List.SetAt<T, I, V>;
+      T extends readonly unknown[],
+    > = _TSTypeForge.List.SetAt<I, V, T>;
     export type Flatten<T extends readonly (readonly unknown[])[]> =
       _TSTypeForge.List.Flatten<T>;
     export type Concat<
@@ -554,10 +554,10 @@ declare global {
       T extends readonly unknown[],
     > = _TSTypeForge.Tuple.SkipLast<N, T>;
     export type SetAt<
-      T extends readonly unknown[],
       I extends number,
       V,
-    > = _TSTypeForge.Tuple.SetAt<T, I, V>;
+      T extends readonly unknown[],
+    > = _TSTypeForge.Tuple.SetAt<I, V, T>;
     export type Flatten<T extends readonly (readonly unknown[])[]> =
       _TSTypeForge.Tuple.Flatten<T>;
     export type Concat<
