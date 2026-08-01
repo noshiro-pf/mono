@@ -66,6 +66,68 @@ Per package, use `pnpm --filter <name> run <script>` or run from its directory.
 `pnpm run ws:gi` / `pnpm run agents:gen` individually). CI fails if they drift
 from the committed state.
 
+## Workflow
+
+- After completing a series of code changes, run in this order:
+    1. `pnpm run ws:tsc` and `pnpm run ws:test`
+    2. `pnpm run ws:lint:fix`
+    3. `pnpm run codemod:full` — **before** any doc step, see below
+    4. `pnpm run ws:doc:embed:jsdoc`, then `pnpm run ws:doc:embed`, then
+       `pnpm run ws:doc`
+    5. `pnpm run fmt:full`
+    6. `pnpm run check:root` if you touched the root `scripts/` or `configs/`
+    7. `pnpm run ws:build`
+- **The codemod must run before the doc embeds.** `codemod:full`
+  (`append-as-const` / `convert-to-readonly`) rewrites files under `samples/`,
+  so running it *after* an embed leaves the copy inside the JSDoc block stale
+  — which fails CI's build and doc checks while everything passes locally.
+  This bites whenever a task adds **new** sample files.
+- Run the sequence a second time and confirm `git status` does not grow. These
+  steps feed each other, so one pass is not proof of a fixed point.
+- The JSDoc sample mapping
+  (`packages/ts-fortress/scripts/cmd/embed-examples-in-jsdoc-map.mts`) is
+  **count-exact and order-sensitive per source file**, so splitting or merging
+  a source file breaks the embed even though no example changed.
+
+## The Length-Constrained Array Combinators
+
+`minLengthArray` / `maxLengthArray` / `boundedLengthArray` /
+`fixedLengthArray` in `packages/ts-fortress/src/array/` return the **branded**
+ts-type-forge types, while their `*Tuple` counterparts return the structural
+ones. Two properties are worth knowing before touching them or the ESLint
+rules that rewrite them:
+
+- **The result is a *pure* brand.** These combinators produce
+  `Type<MinLengthArray<N, A>>` and never intersect the brand with a tuple.
+  That is the opposite of ts-data-forge's `Arr.is*` guards, which narrow to
+  `Brand<…> & Xs` so as to keep the caller's own element types. If you are
+  reasoning about "brand intersected with tuple" types, this repository is not
+  a source of them.
+- **Each combinator is an overload pair keyed on the bound.** A bound inside
+  `SupportedLength` (`0..2048`) can be encoded in the brand; anything larger
+  selects the fallback overload and the length constraint is dropped
+  (`Type<readonly A[]>`). The structural `*Tuple` combinators have the tighter
+  `StructuralPrefixLength` (`0..10`) limit, mirrored as
+  `STRUCTURAL_PREFIX_CAP` in the plugin's `constants.mts`. A rewrite that
+  carries a bound from one combinator to another is only valid while the bound
+  is inside the target's range.
+
+### Why canonical-form rewrites must be type-identical here
+
+`prefer-canonical-length-constrained-type` only rewrites calls whose result is
+the **very same** `Type<T>`, never one that is merely narrower. That is
+stricter than the equivalent ts-data-forge rules, and the reason is variance:
+`Type<A>` is **not covariant in `A`** (`prune` takes `<B extends A>`, putting
+`A` in a constraint position — see the long note on `Type` in
+`src/type.mts`). So a `Type<Narrower>` is *not* substitutable for a
+`Type<Wider>`, and "strengthening" a combinator call can break assignability
+at every use site.
+
+A ts-data-forge `Arr.as*` cast has no such problem — it only ever *returns*
+the narrowed value, so a strengthened result stays assignable everywhere the
+old one was, and those rules do allow a few strengthening rewrites. Do not
+port that latitude back here.
+
 ## Validation Error Handling
 
 ### Centralized Error Message Logic
