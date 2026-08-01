@@ -796,5 +796,3 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
   },
   defaultOptions: [],
 } as const;
-
-/* eslint-enable @typescript-eslint/prefer-readonly-parameter-types */

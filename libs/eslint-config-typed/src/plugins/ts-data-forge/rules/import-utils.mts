@@ -149,4 +149,3 @@ export const buildImportFixes = (
   // (organize-imports will handle merging/deduplication)
   return [fixer.insertTextBefore(program, insertionText)];
 };
-/* eslint-enable @typescript-eslint/prefer-readonly-parameter-types */
