@@ -1,3 +1,9 @@
+## [5.8.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.1...v5.8.2) (2026-08-01)
+
+### Bug Fixes
+
+- bump typescript-eslint from 8.62.0 to 8.65.0 ([#393](https://github.com/noshiro-pf/eslint-config-typed/issues/393)) ([2829d4c](https://github.com/noshiro-pf/eslint-config-typed/commit/2829d4c4916825909212b3254e61be8daa1852e5))
+
 ## [5.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.0...v5.8.1) (2026-07-27)
 
 ### Bug Fixes
