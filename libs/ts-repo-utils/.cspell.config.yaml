@@ -4,6 +4,8 @@ allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
 words:
+  - amannn
+  - anthropics
   - chdir
   - envrc
   - myorg
@@ -12,6 +14,7 @@ words:
   - testw
   - tscw
   - unstub
+  - vitest
   - wireit
 ignorePaths:
   - pnpm-lock.yaml
