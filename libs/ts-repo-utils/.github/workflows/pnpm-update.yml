@@ -6,14 +6,14 @@ name: Weekly pnpm update
 # CI passes. This replaces Dependabot's npm updates; GitHub Actions updates
 # stay with Dependabot (see .github/dependabot.yml).
 #
-# The PR is created with the DEPENDABOT_AUTO_MERGE_BOT GitHub App token so
-# that (a) the push triggers the push-based CI workflows and (b) the App (an
-# `Integration` bypass actor on the branch ruleset) can auto-merge.
+# Authenticates with PERSONAL_ACCESS_TOKEN (the same Actions secret used by
+# sync-agent-config.yml) so that the push triggers the push-based CI workflows
+# and the repository owner (a ruleset bypass actor) can auto-merge.
 
 on:
   schedule:
-    # Weekly, Monday 04:17 JST (Sunday 19:17 UTC).
-    - cron: '17 19 * * 0'
+    # Weekly, Saturday 06:07 JST (Friday 21:07 UTC) — lands before the weekend.
+    - cron: '7 21 * * 5'
 
   workflow_dispatch:
 
@@ -27,17 +27,10 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: Generate token
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          client-id: ${{ vars.DEPENDABOT_AUTO_MERGE_BOT_APP_ID }}
-          private-key: ${{ secrets.DEPENDABOT_AUTO_MERGE_BOT_PRIVATE_KEY }}
-
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -58,18 +51,15 @@ jobs:
 
       - name: Open auto-merge PR if anything changed
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           if git diff --quiet; then
             echo "Dependencies already up to date; nothing to do."
             exit 0
           fi
 
-          # Commit as the GitHub App bot.
-          user_id="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
-          git config user.name "${APP_SLUG}[bot]"
-          git config user.email "${user_id}+${APP_SLUG}[bot]@users.noreply.github.com"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
           branch="chore/pnpm-update-$(date -u +%Y%m%d)"
           git switch -c "$branch"
