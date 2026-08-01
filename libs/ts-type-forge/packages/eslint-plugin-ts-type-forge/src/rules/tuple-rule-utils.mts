@@ -120,5 +120,3 @@ export const reportTupleRewrites = <MessageIds extends string>(
     });
   }
 };
-
-/* eslint-enable @typescript-eslint/prefer-readonly-parameter-types */

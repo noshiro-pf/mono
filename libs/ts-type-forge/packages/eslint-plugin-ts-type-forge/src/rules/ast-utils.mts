@@ -114,5 +114,3 @@ const getArrayElementType = (
 
 const normalizeWhitespace = (text: string): string =>
   text.replaceAll(/\s+/gu, ' ').trim();
-
-/* eslint-enable @typescript-eslint/prefer-readonly-parameter-types */

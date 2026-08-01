@@ -101,5 +101,3 @@ const declaresName = (
     node.type === AST_NODE_TYPES.ClassDeclaration && node.id?.name === name
   );
 };
-
-/* eslint-enable @typescript-eslint/prefer-readonly-parameter-types */
