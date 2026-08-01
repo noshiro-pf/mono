@@ -1,5 +1,13 @@
-import { type IsNever, type TypeExtends } from '../../condition/index.mjs';
-import { type BoolAnd, type BoolNot } from '../../others/index.mjs';
+import {
+  type IsFixedLengthList,
+  type IsNever,
+  type TypeExtends,
+} from '../../condition/index.mjs';
+import {
+  type BoolAnd,
+  type BoolNot,
+  type BoolOr,
+} from '../../others/index.mjs';
 import {
   type FixedLengthTuple,
   type MinLengthTuple,
@@ -102,6 +110,29 @@ export type MaxLengthOf<Ar extends readonly unknown[]> =
   Ar extends MaxLengthConstraintBrand<infer Allowed>
     ? CountContiguousUintUnion<Allowed>
     : never;
+
+/**
+ * @internal The minimum length the *type* `Ar` guarantees, which is not always
+ * what its brand alone says.
+ *
+ * A length-constrained array is often intersected with the tuple it was
+ * narrowed from — `Arr.isMinLengthArray(3, xs)` narrows a five-tuple to
+ * `MinLengthArray<3, E> & readonly [a, b, c, d, e]` — and then the structural
+ * part pins the length exactly while the brand only bounds it. The structural
+ * part is the stronger and more reliable statement of the two, so it wins.
+ */
+export type TSTypeForgeInternals_EffectiveMinLengthOf<
+  Ar extends readonly unknown[],
+> = IsFixedLengthList<Ar> extends true ? Ar['length'] : MinLengthOf<Ar>;
+
+/**
+ * @internal The maximum length the *type* `Ar` allows. The counterpart of
+ * {@link TSTypeForgeInternals_EffectiveMinLengthOf}; see it for why the
+ * structural part takes precedence over the brand.
+ */
+export type TSTypeForgeInternals_EffectiveMaxLengthOf<
+  Ar extends readonly unknown[],
+> = IsFixedLengthList<Ar> extends true ? Ar['length'] : MaxLengthOf<Ar>;
 
 /**
  * Replaces the element type of `Ar` with `Elm`, keeping its length exactly as
@@ -210,8 +241,11 @@ type PreviousLength<Counter extends readonly 0[]> = Counter extends readonly [
  */
 type ConstrainedStructureOf<Ar extends readonly unknown[], Elm> =
   IsExactLengthWithinCap<Ar> extends true
-    ? FixedLengthTuple<MinLengthOf<Ar>, Elm>
-    : MinLengthTuple<ClampToPrefixCap<MinLengthOf<Ar>>, Elm>;
+    ? FixedLengthTuple<TSTypeForgeInternals_EffectiveMinLengthOf<Ar>, Elm>
+    : MinLengthTuple<
+        ClampToPrefixCap<TSTypeForgeInternals_EffectiveMinLengthOf<Ar>>,
+        Elm
+      >;
 
 /**
  * @internal Whether `Ar`'s bounds pin one length at or below the cap.
@@ -226,8 +260,16 @@ type ConstrainedStructureOf<Ar extends readonly unknown[], Elm> =
  * types, never a naked type parameter, so nothing distributes either way.
  */
 type IsExactLengthWithinCap<Ar extends readonly unknown[]> = BoolAnd<
-  TypeExtends<MinLengthOf<Ar>, UintRangeInclusive<0, StructuralPrefixCap>>,
-  TypeExtends<Ar, MaxLengthArray<ClampToPrefixCap<MinLengthOf<Ar>>, unknown>>
+  TypeExtends<
+    TSTypeForgeInternals_EffectiveMinLengthOf<Ar>,
+    UintRangeInclusive<0, StructuralPrefixCap>
+  >,
+  BoolOr<
+    // A fixed-length structural part already pins one length, so the bounds
+    // trivially coincide and no brand comparison is needed.
+    IsFixedLengthList<Ar>,
+    TypeExtends<Ar, MaxLengthArray<ClampToPrefixCap<MinLengthOf<Ar>>, unknown>>
+  >
 >;
 
 /** @internal Clamps `N` to {@link StructuralPrefixCap}. */

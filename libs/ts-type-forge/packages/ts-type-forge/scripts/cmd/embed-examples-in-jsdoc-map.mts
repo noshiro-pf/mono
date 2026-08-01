@@ -50,6 +50,14 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
+    sourcePath:
+      'src/branded-types/predefined-arrays/length-constrained-array-ops.mts',
+    sampleFiles: [
+      'samples/src/branded-types/predefined-arrays/constrained-list-example.mts',
+      'samples/src/branded-types/predefined-arrays/normalize-length-constraint-example.mts',
+    ],
+  },
+  {
     sourcePath: 'src/branded-types/predefined-numbers/bigint.mts',
     sampleFiles: [
       'samples/src/branded-types/predefined-numbers/big-int64-example.mts',

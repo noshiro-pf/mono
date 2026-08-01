@@ -1,4 +1,6 @@
 import { expectType } from 'ts-data-forge';
+import { type MinLengthTuple } from '../../tuple-and-list/index.mjs';
+import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
 import {
   type ChangeArrayElement,
   type HasLengthConstraint,
@@ -150,8 +152,64 @@ expectType<
 >('~=');
 
 // The structural prefix survives, so in-range indexed access stays defined.
-declare const _mapped: ChangeArrayElement<MinLengthArray<3, number>, string>;
+type Mapped = ChangeArrayElement<MinLengthArray<3, number>, string>;
 
-expectType<(typeof _mapped)[0], string>('=');
+expectType<Mapped[0], string>('=');
 
-expectType<(typeof _mapped)[2], string>('=');
+expectType<Mapped[2], string>('=');
+
+/* A brand intersected with an exact tuple, as a ts-data-forge guard produces:
+   `Arr.isMinLengthArray(3, xs)` narrows a five-tuple to
+   `MinLengthArray<3, E> & readonly [a, b, c, d, e]`. The brand still reports
+   what it alone guarantees, but the element swap keeps the exact length the
+   tuple pins rather than falling back to the brand's weaker bound. */
+
+type BrandedFiveTuple = MinLengthArray<3, number> & readonly [1, 2, 3, 4, 5];
+
+expectType<HasLengthConstraint<BrandedFiveTuple>, true>('=');
+
+expectType<MinLengthOf<BrandedFiveTuple>, 3>('=');
+
+expectType<MaxLengthOf<BrandedFiveTuple>, never>('=');
+
+expectType<BrandedFiveTuple['length'], 5>('=');
+
+type MappedExact = ChangeArrayElement<BrandedFiveTuple, string>;
+
+expectType<
+  MappedExact,
+  readonly [string, string, string, string, string] &
+    LengthConstraintBrandOf<BrandedFiveTuple>
+>('=');
+
+expectType<MappedExact['length'], 5>('=');
+
+expectType<MappedExact[4], string>('=');
+
+// The brand comes along, so the result is still recognizably constrained.
+expectType<
+  HasLengthConstraint<ChangeArrayElement<BrandedFiveTuple, string>>,
+  true
+>('=');
+
+type BrandedThreeTuple = MaxLengthArray<9, number> & readonly [1, 2, 3];
+
+type MappedBounded = ChangeArrayElement<BrandedThreeTuple, string>;
+
+expectType<MappedBounded['length'], 3>('=');
+
+expectType<MappedBounded[2], string>('=');
+
+type ContradictoryLengthConstraints = MinLengthArray<6, number> &
+  readonly [1, 2, 3, 4, 5];
+
+expectType<
+  ContradictoryLengthConstraints,
+  MinLengthTuple<6, number> &
+    TSTypeForgeInternals_BrandEncapsulated<
+      Readonly<{
+        MinLength: MinLengthTuple<6, 0>;
+      }>
+    > &
+    readonly [1, 2, 3, 4, 5]
+>('=');

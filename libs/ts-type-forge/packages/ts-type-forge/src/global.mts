@@ -56,6 +56,9 @@ declare global {
     Ar extends readonly unknown[],
     Elm,
   > = _TSTypeForge.ChangeArrayElement<Ar, Elm>;
+  type FromBounds<Min, Max, Elm> = _TSTypeForge.FromBounds<Min, Max, Elm>;
+  type NormalizeLengthConstraint<Ar extends readonly unknown[]> =
+    _TSTypeForge.NormalizeLengthConstraint<Ar>;
   type StructuralPrefixCap = _TSTypeForge.StructuralPrefixCap;
   type StructuralPrefixLength = _TSTypeForge.StructuralPrefixLength;
   type MaxLengthArray<
@@ -429,6 +432,53 @@ declare global {
     MinValue extends Uint11,
     MaxValue extends Uint11,
   > = _TSTypeForge.UintRangeInclusive<MinValue, MaxValue>;
+  namespace ConstrainedList {
+    export type Reverse<Ar extends readonly unknown[]> =
+      _TSTypeForge.ConstrainedList.Reverse<Ar>;
+    export type SetAt<
+      Ar extends readonly unknown[],
+      I extends number,
+      V,
+    > = _TSTypeForge.ConstrainedList.SetAt<Ar, I, V>;
+    export type Tail<Ar extends readonly unknown[]> =
+      _TSTypeForge.ConstrainedList.Tail<Ar>;
+    export type ButLast<Ar extends readonly unknown[]> =
+      _TSTypeForge.ConstrainedList.ButLast<Ar>;
+    export type Take<
+      N extends SupportedLength,
+      Ar extends readonly unknown[],
+    > = _TSTypeForge.ConstrainedList.Take<N, Ar>;
+    export type TakeLast<
+      N extends SupportedLength,
+      Ar extends readonly unknown[],
+    > = _TSTypeForge.ConstrainedList.TakeLast<N, Ar>;
+    export type Skip<
+      N extends SupportedLength,
+      Ar extends readonly unknown[],
+    > = _TSTypeForge.ConstrainedList.Skip<N, Ar>;
+    export type SkipLast<
+      N extends SupportedLength,
+      Ar extends readonly unknown[],
+    > = _TSTypeForge.ConstrainedList.SkipLast<N, Ar>;
+    export type Concat<
+      Ar1 extends readonly unknown[],
+      Ar2 extends readonly unknown[],
+    > = _TSTypeForge.ConstrainedList.Concat<Ar1, Ar2>;
+    export type Zip<
+      Ar1 extends readonly unknown[],
+      Ar2 extends readonly unknown[],
+    > = _TSTypeForge.ConstrainedList.Zip<Ar1, Ar2>;
+    export type Head<
+      Ar extends readonly unknown[],
+      D = never,
+    > = _TSTypeForge.ConstrainedList.Head<Ar, D>;
+    export type Last<Ar extends readonly unknown[]> =
+      _TSTypeForge.ConstrainedList.Last<Ar>;
+    export type Partition<
+      N extends SupportedLength,
+      Ar extends readonly unknown[],
+    > = _TSTypeForge.ConstrainedList.Partition<N, Ar>;
+  }
   namespace List {
     export type Head<
       T extends readonly unknown[],
