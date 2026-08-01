@@ -39,7 +39,7 @@
     "codemod:full:readonly": "convert-to-readonly 'packages/*/{src,scripts,samples,test}/**/*.{ts,mts,tsx}'",
     "codemod:uncommitted:as-const": "append-as-const --uncommitted 'packages/*/{src,scripts,samples,test}/**/*.{ts,mts,tsx}'",
     "codemod:uncommitted:readonly": "convert-to-readonly --uncommitted 'packages/*/{src,scripts,samples,test}/**/*.{ts,mts,tsx}'",
-    "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
+    "cspell": "cspell \"{**,.changeset/**/*,.github/**/*}\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "pnpm --filter @synstate/docs run build",
     "doc:preview": "pnpm --filter @synstate/docs run preview",
     "fmt": "format-uncommitted",
