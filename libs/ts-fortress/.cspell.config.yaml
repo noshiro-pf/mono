@@ -4,15 +4,18 @@ allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
 words:
+  - amannn
+  - anthropics
   - bivariance
   - brandable
   - noshiro
   - sindresorhus
   - testw
-  - tses
   - tscw
+  - tses
   - unshifted
   - valueof
+  - vitest
   - whatwg
 ignorePaths:
   - pnpm-lock.yaml

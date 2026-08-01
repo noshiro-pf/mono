@@ -36,7 +36,7 @@
     "codemod:full:readonly": "convert-to-readonly 'packages/*/{src,scripts,samples,test}/**/*.{mts,tsx}'",
     "codemod:uncommitted:as-const": "append-as-const --uncommitted 'packages/*/{src,scripts,samples,test}/**/*.{mts,tsx}'",
     "codemod:uncommitted:readonly": "convert-to-readonly --uncommitted 'packages/*/{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
+    "cspell": "cspell \"{**,.changeset/**/*,.github/**/*}\" --gitignore --gitignore-root ./ --no-progress",
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
     "fmt:full": "prettier --ignore-unknown --no-error-on-unmatched-pattern --write .",
