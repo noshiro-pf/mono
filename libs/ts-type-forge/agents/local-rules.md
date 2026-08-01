@@ -149,6 +149,132 @@ individually). CI fails if they drift from the committed state.
   or a derived property (e.g. `['length']`) instead.
 - Cover `never` / `any` / `unknown` / union / empty-tuple / readonly /
   optional-key edge cases for new utilities.
+- A type built out of intersections (anything in the length-constraint
+  family) rarely satisfies `'='`, because the checker does not normalize
+  intersection member order. Use `'~='` for those and keep `'='` for
+  structural results.
+
+### Type-Level Pitfalls
+
+- **`never` absorbs everything.** `never extends number` is `true`, so a
+  bound check like `Max extends SupportedLength` silently succeeds for an
+  absent bound. Test `IsNever<Max>` first whenever `never` is a meaningful
+  value (this codebase uses it for "no upper bound"). A distributive
+  conditional over `never` yields `never` rather than taking a branch, which
+  hides the same mistake in a different shape.
+- **Naked type parameters distribute.** Use `TypeExtends<A, B>` instead of
+  `A extends B ? ... : ...` when either side may be a union and you want one
+  answer rather than a union of answers.
+- **When an `expectType` failure is opaque**, resolve the type with the
+  compiler API rather than guessing: build a scratch `*.test.mts` with
+  `declare const _x: TheType;`, then run a small `tsx` script that calls
+  `checker.typeToString(..., ts.TypeFormatFlags.NoTruncation)` on it. That
+  prints the fully expanded intersection, which is what actually explains a
+  `'~='` mismatch. Delete the scratch file before finishing.
+
+## The Length-Constrained Array Family
+
+`MinLengthArray` / `MaxLengthArray` / `BoundedLengthArray` /
+`FixedLengthArray` (in `src/branded-types/predefined-arrays/`) are each an
+**intersection of a tuple and a brand object**. Two consequences drive
+almost every bug in this area:
+
+- **TypeScript does not treat such an intersection as an array type.** A
+  homomorphic mapped type over it (`Readonly<{ [K in keyof Ar]: Elm }>`)
+  maps `length`, the array methods *and* the brand keys, producing a non-array
+  object. Never map over a possibly-branded array directly — go through
+  `ChangeArrayElement<Ar, Elm>`, which rebuilds the structural part from the
+  bounds and re-applies the brand, and falls back to the homomorphic mapping
+  for a plain array or tuple.
+- **`List.*` is wrong, not merely imprecise, for a branded input.** `List`
+  decides what it can say from whether the input is a fixed-length tuple; a
+  branded array's `length` is `number`, so `List` returns the input type
+  unchanged — `List.Take<2, MinLengthArray<5, E>>` claims the two-element
+  result still holds at least five. Use the `ConstrainedList` namespace
+  (`length-constrained-array-ops.mts`), which recovers the bounds, applies the
+  operation's effect on them and rebuilds the constraint.
+
+### Brand *and* tuple at once
+
+A value routinely carries **both** a brand and an exact tuple:
+`Arr.isMinLengthArray(3, xs)` in ts-data-forge narrows a five-tuple to
+`MinLengthArray<3, E> & readonly [a, b, c, d, e]`, because those guards
+intersect the brand onto the caller's own type on purpose. (ts-fortress does
+*not* produce this shape — its combinators return a pure
+`Type<MinLengthArray<N, A>>`.)
+
+When both are present the **structural part wins**: it pins the length exactly
+where the brand only bounds it. Read bounds through
+`TSTypeForgeInternals_EffectiveMinLengthOf` /
+`...EffectiveMaxLengthOf`, never through the public `MinLengthOf` /
+`MaxLengthOf` — those answer "what does the brand guarantee", which is the
+right question for them but the wrong one for computing a result type.
+Getting this wrong is not unsound (the brand claims less than the truth, never
+more), but it silently degrades `Tail` of a branded five-tuple from
+"exactly four" to "at least two".
+
+### Reading a brand
+
+Extract the brand structurally rather than naming the internal marker key:
+
+```ts
+type LengthConstraintKeysOf<Ar extends readonly unknown[]> = Exclude<
+  keyof Ar,
+  keyof (readonly unknown[]) | `${number}`
+>;
+```
+
+`LengthConstraintBrandOf<Ar>` is `Pick<Ar, LengthConstraintKeysOf<Ar>>`, which
+resolves to `{}` for a plain array or tuple, so intersecting it is a no-op and
+the same code path works for both.
+
+### Bounds beyond the structural cap
+
+`StructuralPrefixCap` (10) is where the family stops encoding an exact tuple;
+`SupportedLength` (`0..2048`) is where the brand stops being able to express a
+bound at all. Above the cap a `FixedLengthArray` is brand-only, so a
+reconstruction that also stops there matches it exactly — assert that in tests
+rather than assuming the tuple form.
+
+## Type-Level Performance
+
+- **Never count with recursion when a tuple splice will do.** `MakeTuple`
+  builds a tuple of length `N` by digit-wise tiling, so addition, saturating
+  subtraction and minimum are each a *single* variadic-tuple match against
+  it, independent of the size of the bound:
+
+    ```ts
+    type LengthTuple<N> = MakeTuple<0, N & number>;
+    type AddLength<A, B> = [...LengthTuple<A>, ...LengthTuple<B>]['length'];
+    type SubLength<A, B> =
+      LengthTuple<A> extends readonly [...LengthTuple<B>, ...infer Rest]
+        ? Rest['length']
+        : 0; // saturates
+    type SmallerLength<A, B> =
+      LengthTuple<A> extends readonly [...LengthTuple<B>, ...unknown[]] ? B : A;
+    ```
+
+    A per-unit `[...Counter, 0]` walk gives the same answers but costs one
+    instantiation per unit and hits the depth limit on realistic bounds. The
+    `& number` keeps `MakeTuple`'s constraint satisfied for a bound still
+    deferred on a type parameter, which is the normal case.
+
+- **Measure, do not guess.** `tsc --extendedDiagnostics` reports
+  `Instantiations` and `Check time`; compare against a baseline run on the
+  unmodified tree before claiming a type addition is cheap. A whole new
+  operation family can land inside measurement noise.
+
+- **TS2589 spills across files.** Pushing a signature over the
+  instantiation-depth limit surfaces the error in *unrelated* modules that
+  merely consume it, so a sudden failure far from the edit is a signal to
+  look at the type you just widened, not at the file that reported it.
+
+- **Know which bounds are worth carrying.** A *lower* bound or an *exact*
+  length unlocks indexed access without `undefined`, so it pays for itself. An
+  upper-only bound unlocks nothing for callers while still forcing an
+  annotation at every comparison site — and, in practice, was what blew the
+  instantiation budget. Propagate lower bounds and exact lengths; leave
+  upper-only bounds off.
 
 ## JSDoc `@example` Blocks and samples/
 
@@ -165,16 +291,34 @@ be sourced from a type-checked sample file:
 `doc:embed:jsdoc` FAILS if a src file contains a ` ```ts ` block that is not
 registered in the mapping. Do not hand-edit the embedded blocks in `src/`.
 
+The mapping is **count-exact and order-sensitive per source file**: the
+samples listed for a file must match its ` ```ts ` blocks one-for-one, in
+order. Splitting or merging a source file therefore breaks the embed even
+though no example changed — re-register both halves rather than dropping the
+orphaned samples, and note that examples which were previously inline become
+type-checked for the first time when you extract them (expect to fix latent
+errors in them).
+
 ## Workflow
 
 - After completing a series of code changes, run in this order:
     1. `pnpm run ws:tsc` (type checking + type tests) and `pnpm run ws:test`
     2. `pnpm run ws:lint:fix`
-    3. `pnpm run fmt`
-    4. `pnpm run ws:doc:embed` and `pnpm run ws:doc:embed:jsdoc` (embed
-       samples; also verifies that every JSDoc example is sourced from
-       `samples/`)
-    5. `pnpm run check:root` if you touched the root `scripts/` or `configs/`
+    3. `pnpm run codemod:full` — **before** any doc step, see below
+    4. `pnpm run ws:doc:embed:jsdoc`, then `pnpm run ws:doc:embed`, then
+       `pnpm run ws:doc` (embed samples; also verifies that every JSDoc
+       example is sourced from `samples/`)
+    5. `pnpm run fmt:full`
+    6. `pnpm run check:root` if you touched the root `scripts/` or `configs/`
+- **The codemod must run before the doc embeds.** `codemod:full`
+  (`append-as-const` / `convert-to-readonly`) rewrites files under
+  `samples/`, so running it *after* an embed leaves the copy inside the JSDoc
+  block stale — which fails CI's `lint-and-build (ws:build)` and
+  `style-check (ws:doc)` while everything passes locally. This bites whenever
+  a task adds **new** sample files.
+- After the sequence, run it a second time and confirm `git status` does not
+  grow. These steps feed each other, so a single pass is not proof of a fixed
+  point.
 - `pnpm run ws:build` additionally regenerates all generated files and
   validates the dist output; run it before finishing a task that touches any
   package's `src/`
