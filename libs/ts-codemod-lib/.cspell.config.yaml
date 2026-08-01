@@ -4,11 +4,14 @@ allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
 words:
+  - amannn
+  - anthropics
   - klass
   - noshiro
   - testw
   - tscw
   - unshifted
+  - vitest
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml
