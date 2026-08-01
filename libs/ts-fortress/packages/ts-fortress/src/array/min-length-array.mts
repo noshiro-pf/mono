@@ -18,7 +18,7 @@ export type { MinLengthArray } from 'ts-type-forge';
  * never expanded into tuple positions, which keeps type-checking cheap even
  * when `A` is a large type.
  */
-export function minLengthArray<A, N extends SupportedLength>(
+export function minLengthArray<N extends SupportedLength, A>(
   minLength: N,
   elementType: Type<A>,
   options?: Partial<

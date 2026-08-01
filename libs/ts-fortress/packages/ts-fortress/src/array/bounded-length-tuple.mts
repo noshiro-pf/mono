@@ -18,9 +18,9 @@ import {
 export type { BoundedLengthTuple } from 'ts-type-forge';
 
 export function boundedLengthTuple<
-  A,
   Min extends StructuralPrefixLength,
   Max extends StructuralPrefixLength,
+  A,
 >(
   min: Min,
   max: Max,
@@ -35,7 +35,7 @@ export function boundedLengthTuple<
 
 // Only the lower bound is in `StructuralPrefixLength` (`0..10`), so the upper bound is dropped from the
 // result type and only the "at least `min`" guarantee is kept.
-export function boundedLengthTuple<A, Min extends StructuralPrefixLength>(
+export function boundedLengthTuple<Min extends StructuralPrefixLength, A>(
   min: Min,
   max: number,
   elementType: Type<A>,
@@ -49,7 +49,7 @@ export function boundedLengthTuple<A, Min extends StructuralPrefixLength>(
 
 // Only the upper bound is in `StructuralPrefixLength` (`0..10`), so the lower bound is dropped from the
 // result type and only the "at most `max`" guarantee is kept.
-export function boundedLengthTuple<A, Max extends StructuralPrefixLength>(
+export function boundedLengthTuple<Max extends StructuralPrefixLength, A>(
   min: number,
   max: Max,
   elementType: Type<A>,

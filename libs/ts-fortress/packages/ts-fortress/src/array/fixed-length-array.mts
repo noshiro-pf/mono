@@ -20,7 +20,7 @@ export type { FixedLengthArray } from 'ts-type-forge';
  * large; prefer `fixedLengthTuple` when positional element types or a literal
  * `length` are needed.
  */
-export function fixedLengthArray<A, N extends SupportedLength>(
+export function fixedLengthArray<N extends SupportedLength, A>(
   size: N,
   elementType: Type<A>,
   options?: Partial<

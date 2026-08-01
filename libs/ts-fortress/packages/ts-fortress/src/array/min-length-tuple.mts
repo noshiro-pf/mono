@@ -15,7 +15,7 @@ import {
 
 export type { MinLengthTuple } from 'ts-type-forge';
 
-export function minLengthTuple<A, N extends StructuralPrefixLength>(
+export function minLengthTuple<N extends StructuralPrefixLength, A>(
   size: N,
   elementType: Type<A>,
   options?: Partial<

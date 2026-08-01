@@ -18,7 +18,7 @@ export type { MaxLengthArray } from 'ts-type-forge';
  * of the element type is ever constructed, which keeps type-checking cheap
  * even when `A` is a large type.
  */
-export function maxLengthArray<A, N extends SupportedLength>(
+export function maxLengthArray<N extends SupportedLength, A>(
   maxLength: N,
   elementType: Type<A>,
   options?: Partial<

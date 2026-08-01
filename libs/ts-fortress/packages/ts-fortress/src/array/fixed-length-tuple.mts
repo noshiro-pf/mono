@@ -15,7 +15,7 @@ import {
 
 export type { FixedLengthTuple } from 'ts-type-forge';
 
-export const fixedLengthTuple = <A, N extends StructuralPrefixLength>(
+export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
   size: N,
   elementType: Type<A>,
   options?: Partial<

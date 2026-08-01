@@ -15,7 +15,7 @@ import {
 
 export type { MaxLengthTuple } from 'ts-type-forge';
 
-export function maxLengthTuple<A, N extends StructuralPrefixLength>(
+export function maxLengthTuple<N extends StructuralPrefixLength, A>(
   size: N,
   elementType: Type<A>,
   options?: Partial<

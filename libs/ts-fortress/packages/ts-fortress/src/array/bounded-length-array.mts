@@ -24,9 +24,9 @@ export type { BoundedLengthArray } from 'ts-type-forge';
  * even when `A` is a large type.
  */
 export function boundedLengthArray<
-  A,
   Min extends SupportedLength,
   Max extends SupportedLength,
+  A,
 >(
   min: Min,
   max: Max,
@@ -41,7 +41,7 @@ export function boundedLengthArray<
 
 // Only the lower bound is in `SupportedLength`, so the upper bound is dropped from
 // the result type and only the "at least `min`" guarantee is kept.
-export function boundedLengthArray<A, Min extends SupportedLength>(
+export function boundedLengthArray<Min extends SupportedLength, A>(
   min: Min,
   max: number,
   elementType: Type<A>,
@@ -55,7 +55,7 @@ export function boundedLengthArray<A, Min extends SupportedLength>(
 
 // Only the upper bound is in `SupportedLength`, so the lower bound is dropped from
 // the result type and only the "at most `max`" guarantee is kept.
-export function boundedLengthArray<A, Max extends SupportedLength>(
+export function boundedLengthArray<Max extends SupportedLength, A>(
   min: number,
   max: Max,
   elementType: Type<A>,
