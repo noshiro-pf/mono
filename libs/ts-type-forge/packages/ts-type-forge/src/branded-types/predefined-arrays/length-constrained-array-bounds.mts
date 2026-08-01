@@ -176,10 +176,16 @@ export type ChangeArrayElement<Ar extends readonly unknown[], Elm> =
  * @internal The members of `Ar` that are neither array members nor tuple
  * indices — i.e. exactly the length-constraint brand, marker key included,
  * without naming the marker.
+ *
+ * Both `keyof unknown[]` and `keyof (readonly unknown[])` are subtracted, not
+ * just the readonly one: a mutable array carries `push` / `pop` / `splice` and
+ * the rest of the mutating methods, which the readonly key set does not
+ * mention, so subtracting only that set leaves them behind and reports every
+ * mutable array as brand-carrying.
  */
 type LengthConstraintKeysOf<Ar extends readonly unknown[]> = Exclude<
   keyof Ar,
-  keyof (readonly unknown[]) | `${number}`
+  keyof unknown[] | keyof (readonly unknown[]) | `${number}`
 >;
 
 /**

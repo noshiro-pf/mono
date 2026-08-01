@@ -1,5 +1,15 @@
 import { type ExecOptions } from 'node:child_process';
 import { expectType } from 'ts-data-forge';
+import {
+  type BoundedLengthArray,
+  type Brand,
+  type FixedLengthArray,
+  type HasLengthConstraint,
+  type MaxLengthArray,
+  type MaxLengthOf,
+  type MinLengthArray,
+  type MinLengthOf,
+} from '../branded-types/index.mjs';
 import { type MutableMap, type MutableSet } from '../others/index.mjs';
 import {
   type DeepMutable,
@@ -316,4 +326,121 @@ type RequiredBase = {
   expectType<DeepRequired<Omit<PartialBase, 'b'>>, Omit<RequiredBase, 'b'>>(
     '=',
   );
+}
+
+/* Length-constrained arrays.
+
+   These are an intersection of a tuple and a brand object, which TypeScript
+   does not treat as an array type, so the homomorphic mapped type the four
+   transforms use for records maps `length`, the `Array.prototype` methods and
+   the brand keys and yields a non-array object. Each transform now rebuilds an
+   array instead and carries the brand over. */
+{
+  // The result is an array again, with the element type transformed.
+  expectType<
+    DeepReadonly<MinLengthArray<3, { a: number[] }>>[number],
+    Readonly<{ a: readonly number[] }>
+  >('=');
+
+  expectType<
+    DeepReadonly<FixedLengthArray<3, { a: number[] }>>[number],
+    Readonly<{ a: readonly number[] }>
+  >('=');
+
+  expectType<
+    DeepReadonly<BoundedLengthArray<2, 5, { a: number[] }>>[number],
+    Readonly<{ a: readonly number[] }>
+  >('=');
+
+  expectType<
+    DeepReadonly<MaxLengthArray<5, { a: number[] }>>[number],
+    Readonly<{ a: readonly number[] }>
+  >('=');
+
+  // The brand is carried over, so the constraint is still readable.
+  expectType<
+    HasLengthConstraint<DeepReadonly<MinLengthArray<3, number>>>,
+    true
+  >('=');
+
+  expectType<MinLengthOf<DeepReadonly<MinLengthArray<3, number>>>, 3>('=');
+
+  expectType<MaxLengthOf<DeepReadonly<MaxLengthArray<5, number>>>, 5>('=');
+
+  /* The structural minimum-length prefix is *not* rebuilt, so the result is
+     strictly wider than the corresponding family member: recovering the bounds
+     costs one instantiation per unit of the bound, which is affordable for a
+     single array but not for every array a deep transform reaches. Use
+     `ChangeArrayElement` directly when one array needs the exact shape. */
+  expectType<
+    DeepReadonly<MinLengthArray<3, { a: number[] }>>,
+    MinLengthArray<3, Readonly<{ a: readonly number[] }>>
+  >('>=');
+
+  // Nested under a record, which is where the breakage used to spread.
+  expectType<
+    DeepReadonly<{ xs: MinLengthArray<2, { a: number[] }> }>['xs'][number],
+    Readonly<{ a: readonly number[] }>
+  >('=');
+
+  /* `DeepMutable` deep-mutates the element type but leaves the array itself
+     readonly: the family's structural part is a readonly tuple, so a mutable
+     array carrying a length-constraint brand is not expressible at all. */
+  expectType<
+    DeepMutable<MinLengthArray<3, { a: readonly number[] }>>[number],
+    { a: number[] }
+  >('=');
+
+  expectType<HasLengthConstraint<DeepMutable<MinLengthArray<3, number>>>, true>(
+    '=',
+  );
+
+  expectType<
+    DeepPartial<MinLengthArray<2, { a: number }>>[number],
+    { a?: number }
+  >('=');
+
+  expectType<
+    DeepRequired<MinLengthArray<2, { a?: number }>>[number],
+    { a: number }
+  >('=');
+
+  // An array intersected with a hand-written brand fails the same way, and is
+  // covered by the same path.
+  expectType<
+    DeepReadonly<readonly { a: number[] }[] & Brand<unknown, 'Tag'>>,
+    readonly Readonly<{ a: readonly number[] }>[] & Brand<unknown, 'Tag'>
+  >('~=');
+}
+
+/* Plain arrays and tuples keep mapping exactly as before: element positions
+   stay distinct, a plain array stays a plain array, and a mutable array is not
+   mistaken for a brand-carrying one. */
+{
+  expectType<
+    DeepReadonly<readonly [{ a: number[] }, { b: string[] }]>,
+    readonly [
+      Readonly<{ a: readonly number[] }>,
+      Readonly<{ b: readonly string[] }>,
+    ]
+  >('=');
+
+  expectType<
+    DeepReadonly<{ a: number[] }[]>,
+    readonly Readonly<{ a: readonly number[] }>[]
+  >('=');
+
+  expectType<
+    DeepReadonly<readonly { a: number[] }[]>,
+    readonly Readonly<{ a: readonly number[] }>[]
+  >('=');
+
+  expectType<DeepReadonly<readonly []>, readonly []>('=');
+
+  expectType<DeepReadonly<[]>, readonly []>('=');
+
+  expectType<
+    DeepMutable<readonly [{ a: readonly number[] }]>,
+    [{ a: number[] }]
+  >('=');
 }

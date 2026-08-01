@@ -33,6 +33,19 @@ expectType<HasLengthConstraint<readonly []>, false>('=');
 
 expectType<HasLengthConstraint<readonly [string, ...string[]]>, false>('=');
 
+/* A *mutable* array is not brand-carrying either. Its mutating methods
+   (`push`, `pop`, `splice`, ...) are absent from `keyof (readonly unknown[])`,
+   so a key-subtraction that only mentions the readonly key set leaves them
+   behind and reports every mutable array as branded. */
+
+expectType<HasLengthConstraint<string[]>, false>('=');
+
+expectType<HasLengthConstraint<[string, string]>, false>('=');
+
+expectType<HasLengthConstraint<[]>, false>('=');
+
+expectType<HasLengthConstraint<[string, ...string[]]>, false>('=');
+
 /* MinLengthOf */
 
 expectType<MinLengthOf<MinLengthArray<0, string>>, 0>('=');
@@ -107,6 +120,15 @@ expectType<ChangeArrayElement<readonly number[], string>, readonly string[]>(
 );
 
 expectType<ChangeArrayElement<readonly [], string>, readonly []>('=');
+
+// A mutable input maps homomorphically too, rather than picking up a brand
+// made out of its own mutating methods.
+expectType<ChangeArrayElement<number[], string>, readonly string[]>('=');
+
+expectType<
+  ChangeArrayElement<[number, number], string>,
+  readonly [string, string]
+>('=');
 
 expectType<
   ChangeArrayElement<readonly [number, ...number[]], string>,

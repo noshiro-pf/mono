@@ -732,10 +732,10 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [DeepPick](./src/record/deep-pick-omit.mts#L21)
     - [DeepOmit](./src/record/deep-pick-omit.mts#L48)
 - src/record/deep.mts
-    - [DeepReadonly](./src/record/deep.mts#L26)
-    - [DeepMutable](./src/record/deep.mts#L57)
-    - [DeepPartial](./src/record/deep.mts#L95)
-    - [DeepRequired](./src/record/deep.mts#L127)
+    - [DeepReadonly](./src/record/deep.mts#L28)
+    - [DeepMutable](./src/record/deep.mts#L63)
+    - [DeepPartial](./src/record/deep.mts#L105)
+    - [DeepRequired](./src/record/deep.mts#L141)
 - src/record/partial.mts
     - [PartiallyPartial](./src/record/partial.mts#L15)
     - [PartiallyOptional](./src/record/partial.mts#L29)
