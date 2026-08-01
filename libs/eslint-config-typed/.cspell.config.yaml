@@ -4,6 +4,8 @@ allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
 words:
+  - amannn
+  - anthropics
   - bivariant
   - blueprintjs
   - klass
@@ -15,6 +17,7 @@ words:
   - tses
   - tsutils
   - unshifted
+  - vitest
 ignorePaths:
   - pnpm-lock.yaml
   - pnpm-workspace.yaml

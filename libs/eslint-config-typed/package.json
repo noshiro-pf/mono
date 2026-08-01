@@ -63,7 +63,7 @@
     "codemod:uncommitted:any-to-unknown": "replace-any-with-unknown --uncommitted '{src,scripts,samples}/**/*.{mts,tsx}'",
     "codemod:uncommitted:unknown-record": "replace-record-with-unknown-record --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
     "codemod:uncommitted:interface-to-type": "convert-interface-to-type --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
-    "cspell": "cspell \"**\" --gitignore --gitignore-root ./ --no-progress",
+    "cspell": "cspell \"{**,.changeset/**/*,.github/**/*}\" --gitignore --gitignore-root ./ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
     "fmt": "format-uncommitted",
