@@ -1,0 +1,87 @@
+name: Weekly pnpm update
+
+# Runs this repository's own `update-packages` script (which encodes the
+# skip rules such as `!eslint` / `!typescript`) together with `pnpm
+# self-update`, and opens a single bundled pull request that auto-merges once
+# CI passes. This replaces Dependabot's npm updates; GitHub Actions updates
+# stay with Dependabot (see .github/dependabot.yml).
+#
+# The PR is created with the DEPENDABOT_AUTO_MERGE_BOT GitHub App token so
+# that (a) the push triggers the push-based CI workflows and (b) the App (an
+# `Integration` bypass actor on the branch ruleset) can auto-merge.
+
+on:
+  schedule:
+    # Weekly, Monday 04:17 JST (Sunday 19:17 UTC).
+    - cron: '17 19 * * 0'
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pnpm-update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.DEPENDABOT_AUTO_MERGE_BOT_APP_ID }}
+          private-key: ${{ secrets.DEPENDABOT_AUTO_MERGE_BOT_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Update pnpm itself
+        run: pnpm self-update
+
+      - name: Update dependencies
+        run: |
+          pnpm run update-packages
+          pnpm install --no-frozen-lockfile
+
+      - name: Open auto-merge PR if anything changed
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          if git diff --quiet; then
+            echo "Dependencies already up to date; nothing to do."
+            exit 0
+          fi
+
+          # Commit as the GitHub App bot.
+          user_id="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${user_id}+${APP_SLUG}[bot]@users.noreply.github.com"
+
+          branch="chore/pnpm-update-$(date -u +%Y%m%d)"
+          git switch -c "$branch"
+          git add -A
+          git commit -m "fix: update dependencies"
+          git push -u origin "$branch" --force-with-lease
+
+          if ! gh pr view "$branch" >/dev/null 2>&1; then
+            gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "fix: update dependencies" \
+              --body "Automated weekly dependency update via \`pnpm run update-packages\` + \`pnpm self-update\`. Auto-merges once CI passes."
+          fi
+          gh pr merge --auto --squash "$branch"
