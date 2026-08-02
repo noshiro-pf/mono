@@ -1,0 +1,130 @@
+name: Weekly pnpm update
+
+# Runs this repository's own `update-packages` script (which encodes the
+# skip rules such as `!eslint` / `!typescript`) together with `pnpm
+# self-update`, and opens a single bundled pull request that auto-merges once
+# CI passes. This replaces Dependabot's npm updates; GitHub Actions updates
+# stay with Dependabot (see .github/dependabot.yml).
+#
+# This is a Changesets monorepo, so the workflow also adds a patch changeset
+# for each publishable (non-private) workspace package whose runtime
+# (dependencies / peerDependencies / optionalDependencies) changed, mirroring
+# the classification that dependabot-changeset.yml used, so the Changesets
+# release flow publishes those packages once the PR merges.
+#
+# Authenticates with PERSONAL_ACCESS_TOKEN (the same Actions secret used by
+# sync-agent-config.yml) so that the push triggers the push-based CI workflows
+# and the repository owner (a ruleset bypass actor) can auto-merge.
+
+on:
+  schedule:
+    # Weekly, Saturday 06:07 JST (Friday 21:07 UTC) — lands before the weekend.
+    - cron: '7 21 * * 5'
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pnpm-update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Do not persist any token in the git config: `pnpm install` below runs
+          # dependency lifecycle scripts, and the PAT must not be exposed to them.
+          # It is supplied inline only for the final push.
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Update pnpm itself
+        run: pnpm self-update
+
+      - name: Update dependencies
+        run: |
+          pnpm run update-packages
+          pnpm install --no-frozen-lockfile
+
+      - name: Open auto-merge PR if anything changed
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          # `git status --porcelain` (not `git diff --quiet`) so untracked files
+          # created by the update are detected too.
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Dependencies already up to date; nothing to do."
+            exit 0
+          fi
+
+          # Add a patch changeset for each publishable package whose runtime deps
+          # changed, so the Changesets release flow publishes it. (HEAD is still
+          # the pre-update baseline here — nothing has been committed yet.)
+          export DATESTR="$(date -u +%Y%m%d)"
+          node <<'NODE'
+          const fs = require('node:fs');
+          const cp = require('node:child_process');
+          const path = require('node:path');
+          const RUNTIME = ['dependencies', 'peerDependencies', 'optionalDependencies'];
+          const baseline = (file) => {
+            try {
+              return JSON.parse(cp.execSync(`git show HEAD:${file}`, { encoding: 'utf8' }));
+            } catch {
+              return {};
+            }
+          };
+          const changed = [];
+          for (const dirent of fs.readdirSync('packages', { withFileTypes: true })) {
+            if (!dirent.isDirectory()) continue;
+            const file = path.join('packages', dirent.name, 'package.json');
+            if (!fs.existsSync(file)) continue;
+            const cur = JSON.parse(fs.readFileSync(file, 'utf8'));
+            if (typeof cur.name !== 'string' || cur.private === true) continue;
+            const base = baseline(file);
+            const runtimeChanged = RUNTIME.some(
+              (k) => JSON.stringify(cur[k] ?? {}) !== JSON.stringify(base[k] ?? {}),
+            );
+            if (runtimeChanged) changed.push(cur.name);
+          }
+          if (changed.length === 0) {
+            console.log('No publishable runtime-dependency changes; no changeset added.');
+          } else {
+            const lines = ['---', ...changed.map((n) => `'${n}': patch`), '---', '', 'Update dependencies', ''];
+            fs.writeFileSync(`.changeset/pnpm-update-${process.env.DATESTR}.md`, lines.join('\n'));
+            console.log(`Added patch changeset for: ${changed.join(', ')}`);
+          }
+          NODE
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          branch="chore/pnpm-update-${DATESTR}"
+          git switch -c "$branch"
+          git add -A
+          git commit -m "chore: update dependencies"
+
+          # Authenticate the push inline so the PAT is never written to git config.
+          git push --force-with-lease \
+            "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "HEAD:refs/heads/${branch}"
+
+          if ! gh pr view "$branch" >/dev/null 2>&1; then
+            gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "chore: update dependencies" \
+              --body "Automated weekly dependency update via \`pnpm run update-packages\` + \`pnpm self-update\`. A patch changeset is added for publishable packages whose runtime dependencies changed. Auto-merges once CI passes."
+          fi
+          gh pr merge --auto --squash "$branch"
