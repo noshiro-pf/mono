@@ -1,28 +1,12 @@
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 # https://docs.github.com/ja/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot
 
+# npm dependency updates are handled by the self-hosted `.github/workflows/pnpm-update.yml`
+# workflow (weekly `pnpm update` + `pnpm self-update`). Dependabot only keeps
+# GitHub Actions up to date here, since those cannot be updated by `pnpm update`.
+
 version: 2
 updates:
-  - package-ecosystem: 'npm' # See documentation for possible values
-    directories:
-      - '/'
-      - '/packages/*'
-    schedule:
-      interval: 'weekly'
-    cooldown:
-      default-days: 7
-    target-branch: 'main'
-    commit-message:
-      prefix: 'fix'
-      prefix-development: 'chore'
-    ignore:
-      # "typescript" must stay on 6.x: TypeScript 7 (installed separately
-      # under the "typescript-native" alias) no longer ships the JS compiler
-      # API required by typescript-eslint, typedoc, and
-      # prettier-plugin-organize-imports. See scripts/cmd/build.mts.
-      - dependency-name: 'typescript'
-        update-types: ['version-update:semver-major']
-
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
