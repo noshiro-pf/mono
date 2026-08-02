@@ -1,3 +1,9 @@
+## [10.1.5](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.4...v10.1.5) (2026-08-02)
+
+### Bug Fixes
+
+- trigger pnpm-update autofix via workflow_run (not check_suite) ([#433](https://github.com/noshiro-pf/ts-repo-utils/issues/433)) ([05e2a0c](https://github.com/noshiro-pf/ts-repo-utils/commit/05e2a0c02255bc010194f2dd52dd61df1594a57b))
+
 ## [10.1.4](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.3...v10.1.4) (2026-07-27)
 
 ### Bug Fixes
