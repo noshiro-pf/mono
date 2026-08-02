@@ -4,16 +4,25 @@ name: pnpm-update autofix
 # attempt a one-shot fix (typically adapting to breaking changes from a major
 # dependency bump), then leave the PR for manual review.
 #
-# Fires once, after the GitHub Actions check suite for the branch finishes, so
-# Claude sees the complete failure picture. A label caps it at one attempt per PR
-# so the fixer's own push cannot start an endless fix loop.
+# Reacts to a CI workflow completing with failure (via workflow_run — note a
+# `check_suite` trigger does NOT fire for GitHub Actions' own check suite). A
+# label caps it at one attempt per PR so the fixer's own push cannot start an
+# endless fix loop. workflow_run fires here because our CI is triggered by a PAT
+# push, not GITHUB_TOKEN.
 #
 # Auth: PERSONAL_ACCESS_TOKEN for both checkout and the action's github_token, so
 # Claude's push is attributed to a real user and re-triggers the push-based CI
 # (the default GITHUB_TOKEN cannot).
 
 on:
-  check_suite:
+  workflow_run:
+    workflows:
+      - 'Style Check'
+      - 'Lint and Build'
+      - 'Test and Upload Coverage to Codecov'
+      - 'Node.js Version Compatibility'
+      - 'TypeScript Version Compatibility'
+      - 'Codemod'
     types: [completed]
 
 permissions:
@@ -22,22 +31,21 @@ permissions:
 
 jobs:
   autofix:
-    # Only for a failed GitHub Actions check suite on a pnpm-update branch.
+    # Only for a failed CI run on a pnpm-update branch.
     if: >
-      github.event.check_suite.conclusion == 'failure' &&
-      github.event.check_suite.app.slug == 'github-actions' &&
-      startsWith(github.event.check_suite.head_branch, 'chore/pnpm-update-')
+      github.event.workflow_run.conclusion == 'failure' &&
+      startsWith(github.event.workflow_run.head_branch, 'chore/pnpm-update-')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
-      group: pnpm-update-autofix-${{ github.event.check_suite.head_branch }}
+      group: pnpm-update-autofix-${{ github.event.workflow_run.head_branch }}
       cancel-in-progress: false
     steps:
       - name: Resolve PR, guard one attempt, disable auto-merge
         id: pr
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          BRANCH: ${{ github.event.check_suite.head_branch }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
           LABEL: pnpm-update-autofix-attempted
         run: |
           num=$(gh pr list -R "$GITHUB_REPOSITORY" --head "$BRANCH" --state open \
@@ -65,7 +73,7 @@ jobs:
         if: steps.pr.outputs.skip == 'false'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.check_suite.head_branch }}
+          ref: ${{ github.event.workflow_run.head_branch }}
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0
 
@@ -97,7 +105,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           prompt: |
-            The pull request on branch `${{ github.event.check_suite.head_branch }}`
+            The pull request on branch `${{ github.event.workflow_run.head_branch }}`
             in `${{ github.repository }}` is an automated weekly dependency update, and
             its CI has failed. Make the CI pass by fixing the CODE — do NOT revert the
             dependency bumps in package.json / pnpm-lock.yaml (they are intentional).
