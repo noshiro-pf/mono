@@ -69,6 +69,7 @@ export default [
           ],
         },
       ],
+      'unicorn/no-exports-in-scripts': 'off',
     }),
   },
 

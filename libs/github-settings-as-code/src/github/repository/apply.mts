@@ -10,10 +10,7 @@ import {
   isDirectlyExecuted,
   Result,
 } from 'ts-repo-utils';
-import {
-  repositorySettingsDir,
-  repositorySettingsJsonName,
-} from '../constants.mjs';
+import { repositorySettingsDir, settingsJsonName } from '../constants.mjs';
 import { getRepositorySettings, updateRepository } from './api/index.mjs';
 import { backupRepositorySettings } from './backup.mjs';
 import {
@@ -70,13 +67,13 @@ export const applyRepositorySettings = async (): Promise<void> => {
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
-      path.resolve(repositorySettingsDir, repositorySettingsJsonName),
+      path.resolve(repositorySettingsDir, settingsJsonName),
       str,
     );
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
-      path.resolve(repositorySettingsDir, 'bk', repositorySettingsJsonName),
+      path.resolve(repositorySettingsDir, 'bk', settingsJsonName),
       str,
     );
 
@@ -87,7 +84,7 @@ export const applyRepositorySettings = async (): Promise<void> => {
 const readSettings = async (): Promise<RepositoryPicked> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const settingsText = await fs.readFile(
-    path.resolve(repositorySettingsDir, repositorySettingsJsonName),
+    path.resolve(repositorySettingsDir, settingsJsonName),
     {
       encoding: 'utf8',
     },

@@ -10,16 +10,24 @@ import {
 export const applyVariables = async (): Promise<void> => {
   const variables = [
     {
-      name: 'DEPENDABOT_AUTO_MERGE_BOT_APP_ID',
-      value: '1442916',
+      // noshiro-dependabot-auto-merge-bot (App ID: 1442916)
+      name: 'DEPENDABOT_AUTO_MERGE_BOT_CLIENT_ID',
+      value: 'Iv23liQSNiSTcy3Dt99I',
     },
     {
-      name: 'SEMANTIC_RELEASE_GIT_PERMISSION_BOT_APP_ID',
-      value: '1442563',
+      // noshiro-semantic-release-bot (App ID: 1442563)
+      name: 'SEMANTIC_RELEASE_GIT_PERMISSION_BOT_CLIENT_ID',
+      value: 'Iv23liAmv2bgTYTkv2pt',
     },
     {
-      name: 'CHANGESETS_BOT_APP_ID',
-      value: '1576218',
+      // noshiro-changesets-release-bot (App ID: 1576218)
+      name: 'CHANGESETS_BOT_CLIENT_ID',
+      value: 'Iv23limuZKrTEcXmN0lp',
+    },
+    {
+      // noshiro-repo-settings-bot (App ID: 4476573)
+      name: 'REPO_SETTINGS_BOT_CLIENT_ID',
+      value: 'Iv23ctr4Lq9H3wOYRQrD',
     },
   ] as const;
 

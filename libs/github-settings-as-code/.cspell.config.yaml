@@ -3,6 +3,9 @@ language: en
 allowCompoundWords: true
 caseSensitive: false
 ignoreRandomStrings: true
+ignoreRegExpList:
+  # GitHub App client IDs (e.g. "Iv23limuZKrTEcXmN0lp")
+  - /\bIv23[A-Za-z0-9]+/
 words:
   - amannn
   - anthropics

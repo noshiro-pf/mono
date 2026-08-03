@@ -1,57 +1,24 @@
-import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { hasKey, isRecord, isString, Json } from 'ts-data-forge';
-import { Result } from 'ts-repo-utils';
+import { resolveTargetRepo } from './resolve-target-repo.mjs';
 
-const ownerNullable = process.env['OWNER'];
+const targetRepo = await resolveTargetRepo();
 
-if (ownerNullable === undefined) {
-  throw new Error('OWNER env var is not set');
-}
+export const OWNER: string = targetRepo.owner;
 
-export const OWNER = ownerNullable;
-
-const getRepoName = async (): Promise<string> => {
-  const repoNameEnv = process.env['REPO_NAME'];
-
-  if (repoNameEnv !== undefined) {
-    return repoNameEnv;
-  }
-
-  const packageJsonPath = path.resolve(process.cwd(), './package.json');
-
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const packageJsonStr = await fs.readFile(packageJsonPath, {
-    encoding: 'utf8',
-  });
-
-  const packageJson = Json.parse(packageJsonStr);
-
-  if (Result.isErr(packageJson)) {
-    throw new Error(packageJson.value);
-  }
-
-  if (
-    !isRecord(packageJson.value) ||
-    !hasKey(packageJson.value, 'name') ||
-    !isString(packageJson.value.name)
-  ) {
-    throw new Error('package.json not parsed correctly');
-  }
-
-  return packageJson.value.name;
-};
-
-export const REPO: string = await getRepoName();
+export const REPO: string = targetRepo.repo;
 
 const githubDir = path.resolve(process.cwd(), './github');
+
+export const settingsJsonName = 'settings.json';
 
 export const repositorySettingsDir = path.resolve(
   githubDir,
   './repository-settings',
 );
 
-export const repositorySettingsJsonName = 'settings.json';
+export const actionsSettingsDir = path.resolve(githubDir, './actions-settings');
+
+export const pagesSettingsDir = path.resolve(githubDir, './pages');
 
 export const rulesetsDir = path.resolve(githubDir, './rulesets');
 
