@@ -29,4 +29,3 @@ update:
   githubActions: true
   ignoreDeps:
     - typescript
-    - eslint

@@ -10,18 +10,13 @@ import {
 export const applyVariables = async (): Promise<void> => {
   const variables = [
     {
-      // noshiro-dependabot-auto-merge-bot (App ID: 1442916)
-      name: 'DEPENDABOT_AUTO_MERGE_BOT_CLIENT_ID',
-      value: 'Iv23liQSNiSTcy3Dt99I',
-    },
-    {
       // noshiro-semantic-release-bot (App ID: 1442563)
-      name: 'SEMANTIC_RELEASE_GIT_PERMISSION_BOT_CLIENT_ID',
+      name: 'SEMANTIC_RELEASE_BOT_CLIENT_ID',
       value: 'Iv23liAmv2bgTYTkv2pt',
     },
     {
       // noshiro-changesets-release-bot (App ID: 1576218)
-      name: 'CHANGESETS_BOT_CLIENT_ID',
+      name: 'CHANGESETS_RELEASE_BOT_CLIENT_ID',
       value: 'Iv23limuZKrTEcXmN0lp',
     },
     {
