@@ -1,3 +1,9 @@
+## [2.0.1](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.0...v2.0.1) (2026-08-03)
+
+### Bug Fixes
+
+- add REPO_AUTOMATION_BOT_CLIENT_ID to variables ([#169](https://github.com/noshiro-pf/github-settings-as-code/issues/169)) ([05ddd51](https://github.com/noshiro-pf/github-settings-as-code/commit/05ddd51d3fc220a9484365e5ba8707eb3cc65a69))
+
 # [2.0.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.10...v2.0.0) (2026-08-03)
 
 - feat!: rework the CLI and manage Actions / Pages settings as code ([#167](https://github.com/noshiro-pf/github-settings-as-code/issues/167)) ([e6aa0ed](https://github.com/noshiro-pf/github-settings-as-code/commit/e6aa0ed11b42f7b21692e108290236352c49dd12)), closes [#apply-all](https://github.com/noshiro-pf/github-settings-as-code/issues/apply-all) [#backup-all](https://github.com/noshiro-pf/github-settings-as-code/issues/backup-all)
