@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.10...v2.0.0) (2026-08-03)
+
+- feat!: rework the CLI and manage Actions / Pages settings as code ([#167](https://github.com/noshiro-pf/github-settings-as-code/issues/167)) ([e6aa0ed](https://github.com/noshiro-pf/github-settings-as-code/commit/e6aa0ed11b42f7b21692e108290236352c49dd12)), closes [#apply-all](https://github.com/noshiro-pf/github-settings-as-code/issues/apply-all) [#backup-all](https://github.com/noshiro-pf/github-settings-as-code/issues/backup-all)
+
+### Bug Fixes
+
+- remove DEPENDABOT_AUTO_MERGE_BOT_CLIENT_ID from variables ([#168](https://github.com/noshiro-pf/github-settings-as-code/issues/168)) ([9ec1bdc](https://github.com/noshiro-pf/github-settings-as-code/commit/9ec1bdc6b61968bd0aa9159a3633231df30acca0))
+
+### BREAKING CHANGES
+
+- bin を 11 個から `repo-settings` 1 個に統合した。
+
 ## [1.2.10](https://github.com/noshiro-pf/github-settings-as-code/compare/v1.2.9...v1.2.10) (2026-07-27)
 
 ### Bug Fixes
