@@ -1,3 +1,9 @@
+## [10.1.6](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.5...v10.1.6) (2026-08-03)
+
+### Bug Fixes
+
+- use REST API for autofix label ops (PAT lacks read:org scope) ([#434](https://github.com/noshiro-pf/ts-repo-utils/issues/434)) ([358e90a](https://github.com/noshiro-pf/ts-repo-utils/commit/358e90a6d57384213fac9603a7d06ba6bbd31399))
+
 ## [10.1.5](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.4...v10.1.5) (2026-08-02)
 
 ### Bug Fixes
