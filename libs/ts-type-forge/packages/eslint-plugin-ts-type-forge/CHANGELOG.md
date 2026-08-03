@@ -1,5 +1,12 @@
 # eslint-plugin-ts-type-forge
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [e83818f]
+    - ts-type-forge@9.1.1
+
 ## 0.4.2
 
 ### Patch Changes
