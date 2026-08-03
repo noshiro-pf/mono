@@ -6,9 +6,10 @@ name: Weekly pnpm update
 # CI passes. This replaces Dependabot's npm updates; GitHub Actions updates
 # stay with Dependabot (see .github/dependabot.yml).
 #
-# Authenticates with PERSONAL_ACCESS_TOKEN (the same Actions secret used by
+# Authenticates with a GitHub App installation token (the same App used by
 # sync-agent-config.yml) so that the push triggers the push-based CI workflows
-# and the repository owner (a ruleset bypass actor) can auto-merge.
+# and auto-merge can be enabled. Unlike a PAT it expires in an hour and its
+# permissions are scoped to this job.
 
 on:
   schedule:
@@ -31,7 +32,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # Do not persist any token in the git config: `pnpm install` below runs
-          # dependency lifecycle scripts, and the PAT must not be exposed to them.
+          # dependency lifecycle scripts, and the token must not be exposed to them.
           # It is supplied inline only for the final push.
           persist-credentials: false
 
@@ -52,9 +53,20 @@ jobs:
           pnpm update
           pnpm install --no-frozen-lockfile
 
+      # 依存更新が終わってからトークンを発行する。 esbuild などの許可済み
+      # ビルドスクリプトが動く前に鍵を job へ持ち込まないため。
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.REPO_AUTOMATION_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
+          permission-contents: write # ブランチの push
+          permission-pull-requests: write # PR の作成と auto-merge の有効化
+
       - name: Open auto-merge PR if anything changed
         env:
-          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           # `git status --porcelain` (not `git diff --quiet`) so untracked files
           # created by the update are detected too.
@@ -71,7 +83,7 @@ jobs:
           git add -A
           git commit -m "fix: update dependencies"
 
-          # Authenticate the push inline so the PAT is never written to git config.
+          # Authenticate the push inline so the token is never written to git config.
           git push --force-with-lease \
             "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
             "HEAD:refs/heads/${branch}"

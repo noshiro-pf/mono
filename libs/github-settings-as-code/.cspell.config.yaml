@@ -9,6 +9,7 @@ ignoreRegExpList:
 words:
   - amannn
   - anthropics
+  - esbuild
   - noshiro
   - testw
   - tscw

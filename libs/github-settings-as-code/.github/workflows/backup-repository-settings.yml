@@ -25,18 +25,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # GITHUB_TOKEN の permissions に administration は存在せず、リポジトリ設定や
-      # ruleset を読むことができないため、GitHub App の installation token を使う。
-      # PAT と違い 1 時間で失効し、権限もこのステップの用途だけに絞れる。
       - name: Generate Token
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           client-id: ${{ vars.REPO_SETTINGS_BOT_CLIENT_ID }}
           private-key: ${{ secrets.REPO_SETTINGS_BOT_PRIVATE_KEY }}
-          # backup は読み取りのみ。apply する workflow を足す場合は write が要る。
-          permission-administration: read
-          permission-contents: read
+          # read では足りない。GitHub は以下を write 相当のときだけ返すため、
+          # backup であっても write が必要になる。
+          #   - merge 関連設定（ allow_auto_merge, merge_commit_title など ）
+          #     … "To view merge-related settings, you must have the
+          #        contents:read and contents:write permissions."
+          #   - ruleset の bypass_actors
+          #     … "the bypass_actors property is only returned if the user
+          #        making the API request has write access to the ruleset."
+          permission-administration: write
+          permission-contents: write
+          permission-pages: read
 
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
@@ -54,9 +59,7 @@ jobs:
       # owner / repo は actions/checkout が設定する origin から解決されるため、
       # OWNER の指定は不要。
       - name: Back up
-        run: |
-          pnpm exec tsx src/github/repository/backup.mts
-          pnpm exec tsx src/github/ruleset/backup.mts
+        run: pnpm exec tsx src/cmd/repo-settings.mts backup
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
 

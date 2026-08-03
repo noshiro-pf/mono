@@ -21,8 +21,16 @@ export const applyVariables = async (): Promise<void> => {
     },
     {
       // noshiro-repo-settings-bot (App ID: 4476573)
+      // Administration を含む強い権限を持つ。設定の backup / apply 専用。
       name: 'REPO_SETTINGS_BOT_CLIENT_ID',
       value: 'Iv23ctr4Lq9H3wOYRQrD',
+    },
+    {
+      // noshiro-repo-automation-bot (App ID: 4478721)
+      // Contents / Pull requests 権限のみ。PR を作る自動化（ pnpm-update /
+      // sync-agent-config ）用。
+      name: 'REPO_AUTOMATION_BOT_CLIENT_ID',
+      value: 'Iv23lilpiDh0twq2PErv',
     },
   ] as const;
 
