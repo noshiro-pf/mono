@@ -55,16 +55,20 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
 
-          labels=$(gh pr view "$num" -R "$GITHUB_REPOSITORY" --json labels --jq '[.labels[].name] | join(",")')
-          if printf '%s' "$labels" | grep -qw "$LABEL"; then
+          # Label ops go through the REST API: PERSONAL_ACCESS_TOKEN has only the
+          # `repo` scope, and gh's label commands use a GraphQL path that also
+          # requires `read:org`.
+          have=$(gh api "repos/$GITHUB_REPOSITORY/issues/$num/labels" --jq '[.[].name] | join(",")' 2>/dev/null || true)
+          if printf '%s' "$have" | grep -qw "$LABEL"; then
             echo "PR #$num already had an autofix attempt; leaving it for manual review."
             echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
 
           # Cap at one attempt and stop auto-merge so nothing merges without review.
-          gh label create "$LABEL" -R "$GITHUB_REPOSITORY" --color BFD4F2 \
-            --description "A Claude Code CI autofix has been attempted on this PR" 2>/dev/null || true
-          gh pr edit "$num" -R "$GITHUB_REPOSITORY" --add-label "$LABEL"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/labels" \
+            -f name="$LABEL" -f color=BFD4F2 \
+            -f description="A Claude Code CI autofix has been attempted on this PR" >/dev/null 2>&1 || true
+          gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$num/labels" -f "labels[]=$LABEL" >/dev/null
           gh pr merge "$num" -R "$GITHUB_REPOSITORY" --disable-auto || true
           echo "num=$num" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
