@@ -222,3 +222,82 @@ import { type Tuple } from './tuple.mjs';
     readonly [readonly [1, 4], readonly [2, 5]]
   >('=');
 }
+
+// ── union and non-literal length/index arguments ─────────────────────────
+/* A union argument marks several candidates, of which a call picks exactly
+ * one. `Take` and friends used to stop the counter at the smallest member and
+ * `SetAt` used to replace every candidate at once, each describing a result no
+ * single call produces. */
+{
+  // set-at widens the candidate positions rather than replacing them
+  expectType<
+    Tuple.SetAt<0 | 2, 'x', readonly [1, 2, 3]>,
+    readonly [1 | 'x', 2, 3 | 'x']
+  >('=');
+
+  expectType<
+    Tuple.SetAt<number, 'x', readonly [1, 2, 3]>,
+    readonly [1 | 'x', 2 | 'x', 3 | 'x']
+  >('=');
+
+  // a single literal index stays exact
+  expectType<Tuple.SetAt<1, 'x', readonly [1, 2, 3]>, readonly [1, 'x', 3]>(
+    '=',
+  );
+
+  // the counting members cannot widen in place — the candidates differ in
+  // length — so a union answers exactly as `number` does
+  expectType<Tuple.Take<1 | 2, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>(
+    '=',
+  );
+
+  expectType<Tuple.TakeLast<1 | 2, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>(
+    '=',
+  );
+
+  expectType<Tuple.Skip<1 | 2, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>(
+    '=',
+  );
+
+  expectType<Tuple.SkipLast<1 | 2, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>(
+    '=',
+  );
+
+  expectType<
+    Tuple.Partition<1 | 2, readonly [1, 2, 3, 4]>,
+    readonly (readonly (1 | 2 | 3 | 4)[])[]
+  >('=');
+
+  // `number` pins no length at all, so no tuple result is safe to claim
+  expectType<Tuple.Take<number, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>(
+    '=',
+  );
+
+  expectType<
+    Tuple.TakeLast<number, readonly [1, 2, 3]>,
+    readonly (1 | 2 | 3)[]
+  >('=');
+
+  expectType<Tuple.Skip<number, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>(
+    '=',
+  );
+
+  expectType<
+    Tuple.SkipLast<number, readonly [1, 2, 3]>,
+    readonly (1 | 2 | 3)[]
+  >('=');
+
+  expectType<
+    Tuple.Partition<number, readonly [1, 2]>,
+    readonly (readonly (1 | 2)[])[]
+  >('=');
+
+  // A chunk size of 0 consumes nothing, so it has no answer rather than a
+  // non-terminating one. Reachable from a union that merely contains 0.
+  expectType<Tuple.Partition<0, readonly [1, 2]>, never>('=');
+
+  expectType<
+    Tuple.Partition<0 | 2, readonly [1, 2]>,
+    readonly (readonly (1 | 2)[])[]
+  >('=');
+}

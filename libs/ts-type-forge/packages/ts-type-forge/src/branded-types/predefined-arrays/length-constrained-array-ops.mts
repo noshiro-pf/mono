@@ -4,7 +4,11 @@ import {
   type TypeExtends,
 } from '../../condition/index.mjs';
 import { type BoolAnd } from '../../others/index.mjs';
-import { type List, type MakeTuple } from '../../tuple-and-list/index.mjs';
+import {
+  type List,
+  type MakeTuple,
+  type TSTypeForgeInternals_PinsOneNumber as PinsOneNumber,
+} from '../../tuple-and-list/index.mjs';
 import { type UintRangeInclusive } from '../../type-level-integer/index.mjs';
 import { type SupportedLength } from '../supported-length.mjs';
 import {
@@ -147,7 +151,9 @@ export namespace ConstrainedList {
    */
   export type Take<N extends SupportedLength, Ar extends readonly unknown[]> =
     HasLengthConstraint<Ar> extends true
-      ? CappedAt<Ar, N> & TakeStructure<N, Ar>
+      ? PinsOneNumber<N> extends true // see the note below
+        ? CappedAt<Ar, N> & TakeStructure<N, Ar>
+        : readonly Ar[number][]
       : List.Take<N, Ar>;
 
   /**
@@ -162,7 +168,9 @@ export namespace ConstrainedList {
     Ar extends readonly unknown[],
   > =
     HasLengthConstraint<Ar> extends true
-      ? CappedAt<Ar, N> & TakeLastStructure<N, Ar>
+      ? PinsOneNumber<N> extends true // see the note below
+        ? CappedAt<Ar, N> & TakeLastStructure<N, Ar>
+        : readonly Ar[number][]
       : List.TakeLast<N, Ar>;
 
   /**
@@ -174,7 +182,9 @@ export namespace ConstrainedList {
    */
   export type Skip<N extends SupportedLength, Ar extends readonly unknown[]> =
     HasLengthConstraint<Ar> extends true
-      ? ShrunkBy<Ar, N> & SkipStructure<N, Ar>
+      ? PinsOneNumber<N> extends true // see the note below
+        ? ShrunkBy<Ar, N> & SkipStructure<N, Ar>
+        : readonly Ar[number][]
       : List.Skip<N, Ar>;
 
   /**
@@ -189,7 +199,9 @@ export namespace ConstrainedList {
     Ar extends readonly unknown[],
   > =
     HasLengthConstraint<Ar> extends true
-      ? ShrunkBy<Ar, N> & SkipLastStructure<N, Ar>
+      ? PinsOneNumber<N> extends true // see the note below
+        ? ShrunkBy<Ar, N> & SkipLastStructure<N, Ar>
+        : readonly Ar[number][]
       : List.SkipLast<N, Ar>;
 
   /**
@@ -280,9 +292,38 @@ export namespace ConstrainedList {
     Ar extends readonly unknown[],
   > =
     HasLengthConstraint<Ar> extends true
-      ? readonly BoundedLengthArray<1, N, Ar[number]>[] &
-          PartitionStructure<N, Ar>
+      ? PinsOneNumber<N> extends true // see the note below
+        ? [N] extends [0]
+          ? never // no partition into chunks of nothing; see Tuple.Partition
+          : readonly BoundedLengthArray<1, N, Ar[number]>[] &
+              PartitionStructure<N, Ar>
+        : readonly (readonly Ar[number][])[]
       : List.Partition<N, Ar>;
+
+  /*
+   * Why the counting members insist on a single literal `N`.
+   *
+   * Each of them uses `N` in two independent places — the bound arithmetic and
+   * the structural rebuild — and both distribute over a union on their own. Let
+   * them, and the result is the *cross product* of the two:
+   *
+   *   ConstrainedList.Take<1 | 2, MinLengthArray<3, number>>
+   *   // FixedLengthArray<1, number>
+   *   // | BoundedLengthArray<2, 1, number>   <- min above max, uninhabited
+   *   // | BoundedLengthArray<1, 2, number>
+   *   // | FixedLengthArray<2, number>
+   *
+   * Distributing once at the top would fix that, and would be exact. But `N` is
+   * bounded here by `SupportedLength`, which is `0..2048` — so the union handed
+   * to these is potentially enormous, and the per-member cost is the whole
+   * bound-recovery-and-rebuild machinery rather than a tuple splice.
+   *
+   * They take the same way out as `Tuple` does: a union of literals, like
+   * `number`, does not pin a length, so the answer is the unconstrained
+   * `readonly Elm[]` that every possible result satisfies. Dropping the brand
+   * loses a bound the caller might have wanted, but recovering it would mean
+   * folding min and max across the union, which is the cost this avoids.
+   */
 
   /*
    * `Flatten` has deliberately no counterpart here. Unlike the members above it

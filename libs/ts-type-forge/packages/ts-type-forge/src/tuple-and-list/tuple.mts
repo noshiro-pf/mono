@@ -1,3 +1,4 @@
+import { type IsUnion } from '../condition/index.mjs';
 import { type NonEmptyTuple } from './array.mjs';
 
 export namespace Tuple {
@@ -96,81 +97,105 @@ export namespace Tuple {
 
   /**
    * Takes the first `N` elements from a readonly tuple `T`.
-   * @template N - The number of elements to take (must be a non-negative integer literal).
+   * @template N - The number of elements to take. Only a single numeric literal pins a
+   * length; a union of literals and `number` alike answer an unsized array,
+   * which every possible result satisfies.
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type containing the first `N` elements. If `N` is larger than the length of `T`, returns `T`.
    * @example
    * type TK1 = Tuple.Take<2, [1, 2, 3]>; // readonly [1, 2]
    * type TK2 = Tuple.Take<5, [1, 2, 3]>; // readonly [1, 2, 3]
    * type TK3 = Tuple.Take<0, [1, 2, 3]>; // readonly []
+   * type TK4 = Tuple.Take<1 | 2, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
+   * type TK5 = Tuple.Take<number, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
    */
-  export type Take<N extends number, T extends readonly unknown[]> = TakeImpl<
-    N,
-    T,
-    readonly []
-  >;
+  export type Take<N extends number, T extends readonly unknown[]> =
+    TSTypeForgeInternals_PinsOneNumber<N> extends true
+      ? TakeImpl<N, T, readonly []>
+      : readonly T[number][];
 
   /**
    * Skips the first `N` elements from a readonly tuple `T`.
-   * @template N - The number of elements to skip (must be a non-negative integer literal).
+   * @template N - The number of elements to skip. Only a single numeric literal pins a
+   * length; a union of literals and `number` alike answer an unsized array,
+   * which every possible result satisfies.
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type containing the elements after the first `N`. If `N` is larger than the length of `T`, returns `readonly []`.
    * @example
    * type SK1 = Tuple.Skip<1, [1, 2, 3]>; // readonly [2, 3]
    * type SK2 = Tuple.Skip<3, [1, 2, 3]>; // readonly []
    * type SK3 = Tuple.Skip<0, [1, 2, 3]>; // readonly [1, 2, 3]
+   * type SK4 = Tuple.Skip<1 | 2, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
+   * type SK5 = Tuple.Skip<number, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
    */
-  export type Skip<N extends number, T extends readonly unknown[]> = SkipImpl<
-    N,
-    T,
-    readonly []
-  >;
+  export type Skip<N extends number, T extends readonly unknown[]> =
+    TSTypeForgeInternals_PinsOneNumber<N> extends true
+      ? SkipImpl<N, T, readonly []>
+      : readonly T[number][];
 
   /**
    * Takes the last `N` elements from a readonly tuple `T`.
-   * @template N - The number of elements to take (must be a non-negative integer literal).
+   * @template N - The number of elements to take. Only a single numeric literal pins a
+   * length; a union of literals and `number` alike answer an unsized array,
+   * which every possible result satisfies.
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type containing the last `N` elements. If `N` is larger than the length of `T`, returns `T`.
    * @example
    * type TL1 = Tuple.TakeLast<2, [1, 2, 3]>; // readonly [2, 3]
    * type TL2 = Tuple.TakeLast<5, [1, 2, 3]>; // readonly [1, 2, 3]
    * type TL3 = Tuple.TakeLast<0, [1, 2, 3]>; // readonly []
+   * type TL4 = Tuple.TakeLast<1 | 2, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
+   * type TL5 = Tuple.TakeLast<number, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
    */
-  export type TakeLast<
-    N extends number,
-    T extends readonly unknown[],
-  > = TakeLastImpl<N, T, readonly []>;
+  export type TakeLast<N extends number, T extends readonly unknown[]> =
+    TSTypeForgeInternals_PinsOneNumber<N> extends true
+      ? TakeLastImpl<N, T, readonly []>
+      : readonly T[number][];
 
   /**
    * Skips the last `N` elements from a readonly tuple `T`.
-   * @template N - The number of elements to skip (must be a non-negative integer literal).
+   * @template N - The number of elements to skip. Only a single numeric literal pins a
+   * length; a union of literals and `number` alike answer an unsized array,
+   * which every possible result satisfies.
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type containing the elements before the last `N`. If `N` is larger than the length of `T`, returns `readonly []`.
    * @example
    * type SL1 = Tuple.SkipLast<1, [1, 2, 3]>; // readonly [1, 2]
    * type SL2 = Tuple.SkipLast<3, [1, 2, 3]>; // readonly []
    * type SL3 = Tuple.SkipLast<0, [1, 2, 3]>; // readonly [1, 2, 3]
+   * type SL4 = Tuple.SkipLast<1 | 2, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
+   * type SL5 = Tuple.SkipLast<number, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
    */
-  export type SkipLast<
-    N extends number,
-    T extends readonly unknown[],
-  > = SkipLastImpl<N, T, readonly []>;
+  export type SkipLast<N extends number, T extends readonly unknown[]> =
+    TSTypeForgeInternals_PinsOneNumber<N> extends true
+      ? SkipLastImpl<N, T, readonly []>
+      : readonly T[number][];
 
   /**
    * Creates a new readonly tuple type where the element at index `I` in `T` is replaced with type `V`.
-   * @template I - The index to update (must be a valid index literal for `T`).
+   *
+   * When `I` is a single numeric literal it names one position, and only that
+   * position changes. When `I` is a union — or `number`, which names no
+   * position in particular — the call replaces *one* of the candidate positions
+   * and never all of them, so each candidate is widened to `T[I] | V` rather
+   * than set to `V` outright.
+   * @template I - The index to update. A single literal names one position
+   * exactly; a union of literals, or `number`, widens every candidate position
+   * instead. An index beyond the end of `T` leaves it unchanged.
    * @template V - The new type for the element at index `I`.
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type with the element at index `I` updated.
    * @example
    * type SA1 = Tuple.SetAt<1, 'x', [1, 2, 3]>; // readonly [1, 'x', 3]
-   * // type SA2 = Tuple.SetAt<2, 'x', [1, 2]>; // Error: Index '2' is out of bounds.
+   * type SA2 = Tuple.SetAt<0 | 2, 'x', [1, 2, 3]>; // readonly [1 | 'x', 2, 3 | 'x']
+   * type SA3 = Tuple.SetAt<number, 'x', [1, 2, 3]>; // readonly [1 | 'x', 2 | 'x', 3 | 'x']
+   * type SA4 = Tuple.SetAt<2, 'x', [1, 2]>; // readonly [1, 2] (index out of bounds: unchanged)
    */
   export type SetAt<
     I extends number,
     V,
     T extends readonly unknown[],
-  > = SetAtImpl<T, I, V, readonly []>;
+  > = SetAtImpl<T, I, V, readonly [], TSTypeForgeInternals_PinsOneNumber<I>>;
 
   /**
    * Flattens a nested readonly tuple `T` by one level.
@@ -237,7 +262,10 @@ export namespace Tuple {
   /**
    * Partitions a readonly tuple `T` into sub-tuples of length `N`.
    * The last sub-tuple may have fewer than `N` elements if the length of `T` is not divisible by `N`.
-   * @template N - The desired size of each partition (must be a positive integer literal).
+   * @template N - The desired size of each partition. Only a single numeric
+   * literal pins a size; a union of literals and `number` alike answer an
+   * unsized array of unsized chunks. `0` is not a partition size and answers
+   * `never`.
    * @template T - The readonly tuple type to partition.
    * @returns A readonly tuple where each element is a sub-tuple of length up to `N`.
    * @example
@@ -245,12 +273,66 @@ export namespace Tuple {
    * type P2 = Tuple.Partition<3, [1, 2, 3, 4, 5, 6]>; // readonly [readonly [1, 2, 3], readonly [4, 5, 6]]
    * type P3 = Tuple.Partition<1, [1, 2]>; // readonly [readonly [1], readonly [2]]
    * type P4 = Tuple.Partition<5, [1, 2]>; // readonly [readonly [1, 2]]
+   * type P5 = Tuple.Partition<number, [1, 2]>; // readonly (readonly (1 | 2)[])[]
    */
-  export type Partition<
-    N extends number,
-    T extends readonly unknown[],
-  > = PartitionImpl<N, T, readonly [], readonly []>;
+  export type Partition<N extends number, T extends readonly unknown[]> =
+    TSTypeForgeInternals_PinsOneNumber<N> extends true
+      ? [N] extends [0]
+        ? never // a chunk size of 0 consumes nothing; see the note below
+        : PartitionImpl<N, T, readonly [], readonly []>
+      : readonly (readonly T[number][])[];
 }
+
+/*
+ * A union-valued length or index argument.
+ *
+ * Every operation here takes a length or an index that is meant to name one
+ * value. A union names several, of which a call uses exactly one, and `number`
+ * names all of them — so neither pins the single value the result depends on.
+ *
+ * Each of these used to answer as though it had been given that one value, and
+ * was wrong for it. The counting members — `Take`, `Skip`, `TakeLast`,
+ * `SkipLast`, `Partition` — walk a counter up to `N` and stop at the first
+ * match, so a union stopped at its smallest member and `Take<1 | 2, [1, 2, 3]>`
+ * came out as `readonly [1]`, which the equally possible `[1, 2]` does not
+ * satisfy. `number` matched at length zero, so `Take<number, T>` came out as
+ * `readonly []`. `SetAt` asks `Position extends I`, which every member of a
+ * union answers at once, so `SetAt<0 | 2, 'x', [1, 2, 3]>` came out as
+ * `['x', 2, 'x']` — satisfied by neither `['x', 2, 3]` nor `[1, 2, 'x']`.
+ *
+ * None of them distributes over the argument. Distribution would be exact — a
+ * union answer, one member per candidate — but it multiplies the result by the
+ * size of the union, and these are the types most likely to be handed a wide
+ * one: an index union is simply what indexing a tuple by a non-literal
+ * produces, and `ConstrainedList` bounds its length argument by
+ * `SupportedLength`, which is `0..2048`. Paying that on every such call is not
+ * worth the precision.
+ *
+ * So each of them answers, for anything but a single literal, the widest result
+ * that every possible call satisfies:
+ *
+ *   - the counting members answer an unsized `readonly Elm[]` (`Partition`, an
+ *     unsized array of unsized chunks), there being no one tuple to name when
+ *     the candidates differ in length;
+ *   - `SetAt` widens each candidate position to `T[I] | V` in place. It can
+ *     keep the tuple, because its result has the same length whichever index is
+ *     chosen — and indexed access into `readonly [1 | 'x', 2, 3 | 'x']` answers
+ *     exactly what the distributed union would.
+ *
+ * A single numeric literal takes the precise path in every one of them, which
+ * is the overwhelmingly common case.
+ *
+ * `MakeTuple` needs no equivalent: it walks the decimal digits of `${N}`, and
+ * that walk distributes over a union on its own, which is already exact.
+ *
+ * `Partition` additionally rejects a chunk size of `0`. `PartitionImpl` closes
+ * the current chunk whenever it reaches `N` elements, so at `N = 0` it closes
+ * an empty chunk without ever consuming from `T` and recurses until the
+ * instantiation limit — `Tuple.Partition<0, [1, 2]>` was TS2589 rather than a
+ * type. There is no sensible answer to "split this into chunks of nothing", so
+ * it answers `never`. A union containing `0` no longer reaches it — it takes
+ * the widened branch above — but a literal `0` still does.
+ */
 
 /**
  * @internal Recursive implementation for `Tuple.Reverse`.
@@ -336,25 +418,58 @@ type SkipLastImpl<
   : SkipLastImpl<N, T, readonly [unknown, ...R]>;
 
 /**
+ * @internal Whether `N` names exactly one number — one length, or one position.
+ *
+ * A union does not: `0 | 2` marks two *candidates*, of which a call uses one
+ * and never both. Nor does `number` (or `any`, which absorbs the check), which
+ * marks every candidate at once. Only for a single literal is the length or
+ * position that a call actually uses statically known.
+ *
+ * Every operation that takes a length or an index branches on this, and none of
+ * them distributes over the argument; see the note above.
+ */
+export type TSTypeForgeInternals_PinsOneNumber<N extends number> =
+  IsUnion<N> extends true ? false : number extends N ? false : true;
+
+/**
  * @internal Recursive implementation for `Tuple.SetAt`.
+ *
+ * `ACC['length'] extends I` asks whether the current position is *a* candidate,
+ * which for a union `I` is true at every member of it at once. Replacing each
+ * of them with `V` would describe a result no single call can produce —
+ * `SetAt<0 | 2, 'x', [1, 2, 3]>` as `['x', 2, 'x']` is satisfied by neither
+ * `['x', 2, 3]` nor `[1, 2, 'x']`. So a candidate position is only *set* when
+ * `I` pins it alone, and otherwise *widened* to `T[I] | V`, which every
+ * possible result does satisfy.
  * @template T - The remaining part of the input tuple.
  * @template I - The target index.
  * @template V - The value to set.
  * @template ACC - The accumulator tuple (reversed processed elements).
+ * @template Exact - Whether `I` names exactly one position; see {@link TSTypeForgeInternals_PinsOneNumber}.
  */
 type SetAtImpl<
   T extends readonly unknown[],
   I extends number,
   V,
   ACC extends readonly unknown[],
+  Exact extends boolean,
 > = {
   end: Tuple.Reverse<ACC>; // Base case: T is empty, return reversed accumulator
-  next: SetAtImpl<Tuple.Tail<T>, I, V, readonly [Tuple.Head<T>, ...ACC]>; // Recursive step: index not reached, add Head<T> to accumulator
-  setValue: SetAtImpl<Tuple.Tail<T>, I, V, readonly [V, ...ACC]>; // Recursive step: index reached, add V to accumulator
+  next: SetAtImpl<Tuple.Tail<T>, I, V, readonly [Tuple.Head<T>, ...ACC], Exact>; // Recursive step: not a candidate, add Head<T> to accumulator
+  setValue: SetAtImpl<Tuple.Tail<T>, I, V, readonly [V, ...ACC], Exact>; // Recursive step: the one index, add V to accumulator
+  widen: SetAtImpl<
+    Tuple.Tail<T>,
+    I,
+    V,
+    readonly [Tuple.Head<T> | V, ...ACC],
+    Exact
+  >; // Recursive step: one candidate of several, add Head<T> | V to accumulator
 }[T extends readonly []
   ? 'end'
   : ACC['length'] extends I
-    ? 'setValue'
+    ? Exact extends true
+      ? 'setValue'
+      : 'widen'
     : 'next'];
 
 /**

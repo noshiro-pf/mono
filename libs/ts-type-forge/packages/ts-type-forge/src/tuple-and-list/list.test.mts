@@ -359,3 +359,34 @@ import { type List } from './list.mjs';
     ]
   >('=');
 }
+
+// ── union and non-literal length/index arguments ─────────────────────────
+/* `List` delegates to `Tuple` for a fixed-length input, so it inherits the
+ * union handling; for a general array it already answered without consulting
+ * the argument. */
+{
+  expectType<
+    List.SetAt<0 | 2, 'x', readonly [1, 2, 3]>,
+    readonly [1 | 'x', 2, 3 | 'x']
+  >('=');
+
+  expectType<
+    List.SetAt<number, 'x', readonly [1, 2, 3]>,
+    readonly [1 | 'x', 2 | 'x', 3 | 'x']
+  >('=');
+
+  expectType<
+    List.SetAt<0 | 2, 'x', readonly number[]>,
+    readonly (number | 'x')[]
+  >('=');
+
+  expectType<List.Take<1 | 2, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>('=');
+
+  expectType<List.Skip<1 | 2, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>('=');
+
+  expectType<List.Take<1 | 2, readonly number[]>, readonly number[]>('=');
+
+  expectType<List.Take<number, readonly [1, 2, 3]>, readonly (1 | 2 | 3)[]>(
+    '=',
+  );
+}

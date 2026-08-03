@@ -587,3 +587,55 @@ export type ListPartitionOfBranded = List.Partition<2, BrandedFiveTuple>;
 
 // @ts-expect-error TS2589: Type instantiation is excessively deep.
 export type TupleReverseOfBranded = Tuple.Reverse<BrandedFiveTuple>;
+
+/* Union and non-literal length / index arguments.
+ *
+ * A union names several candidate lengths (or indices), of which a call takes
+ * exactly one. `SetAt` widens the candidate positions in place; the counting
+ * members distribute, once, so that the bound arithmetic and the structural
+ * rebuild agree on which length they are describing. */
+
+expectType<
+  ConstrainedList.SetAt<0 | 2, 'x', MinLengthArray<3, number>>,
+  MinLengthArray<3, number | 'x'>
+>('~=');
+
+expectType<
+  ConstrainedList.SetAt<0 | 2, 'x', readonly [1, 2, 3]>,
+  readonly [1 | 'x', 2, 3 | 'x']
+>('=');
+
+expectType<
+  ConstrainedList.SetAt<0 | 2, 'x', BrandedFiveTuple>,
+  MinLengthArray<3, Elm5 | 'x'> & readonly [1 | 'x', 2, 3 | 'x', 4, 5]
+>('~=');
+
+expectType<
+  ConstrainedList.SetAt<number, 'x', BrandedFiveTuple>,
+  MinLengthArray<3, Elm5 | 'x'> &
+    readonly [1 | 'x', 2 | 'x', 3 | 'x', 4 | 'x', 5 | 'x']
+>('~=');
+
+// A union of lengths pins none of them, so the brand is dropped rather than
+// folded across the union — the same answer `number` would give.
+expectType<
+  ConstrainedList.Take<1 | 2, MinLengthArray<3, number>>,
+  readonly number[]
+>('=');
+
+expectType<
+  ConstrainedList.Skip<1 | 2, MinLengthArray<3, number>>,
+  readonly number[]
+>('=');
+
+expectType<ConstrainedList.Take<1 | 2, BrandedFiveTuple>, readonly Elm5[]>('=');
+
+// A chunk size of 0 has no answer. The brand-only path needs its own guard:
+// there is no exact tuple to rebuild, so `Tuple.Partition`'s `never` never
+// reaches it and the brand half would stand alone as an array of uninhabited
+// chunks.
+expectType<ConstrainedList.Partition<0, MinLengthArray<3, number>>, never>('=');
+
+expectType<ConstrainedList.Partition<0, BrandedFiveTuple>, never>('=');
+
+expectType<ConstrainedList.Partition<0, readonly [1, 2]>, never>('=');
