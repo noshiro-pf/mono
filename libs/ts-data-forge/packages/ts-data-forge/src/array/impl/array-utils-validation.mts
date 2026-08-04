@@ -1,13 +1,4 @@
-import {
-  type BoolOr,
-  type BoundedLengthTuple,
-  type FixedLengthArray,
-  type FixedLengthTuple,
-  type MaxLengthTuple,
-  type MinLengthArray,
-  type MinLengthTuple,
-  type TypeEq,
-} from 'ts-type-forge';
+import { type BoolOr, type IsAny, type IsUnknown } from 'ts-type-forge';
 import { asUint32, Num } from '../../number/index.mjs';
 import { type ArrayIndex, type SizeType } from '../../types.mjs';
 
@@ -34,8 +25,7 @@ export const isArray = <E,>(value: E): value is FilterArray<E> =>
   Array.isArray(value);
 
 type FilterArray<T> = T extends T
-  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    BoolOr<TypeEq<T, unknown>, TypeEq<T, any>> extends true
+  ? BoolOr<IsUnknown<T>, IsAny<T>> extends true
     ? Cast<readonly unknown[], T>
     : T extends readonly unknown[]
       ? T
@@ -45,156 +35,6 @@ type FilterArray<T> = T extends T
 type Cast<A, B> = A extends B ? A : never;
 
 // validation
-
-/**
- * Type guard that checks if an array is empty.
- *
- * @example
- *
- * ```ts
- * const emptyNumbers: readonly number[] = [] as const;
- *
- * const words = ['Ada', 'Lovelace'] as const;
- *
- * assert.isTrue(Arr.isEmpty(emptyNumbers));
- *
- * assert.isFalse(Arr.isEmpty(words));
- *
- * if (Arr.isEmpty(emptyNumbers)) {
- *   // `isEmpty` narrows to the branded `FixedLengthArray<0, number>`, so the
- *   // expected value is annotated with the unbranded type.
- *   assert.deepStrictEqual<readonly number[]>(emptyNumbers, []);
- * }
- * ```
- */
-export const isEmpty = <Xs extends readonly unknown[]>(
-  array: Xs,
-): array is FixedLengthArray<0, Xs[number]> & Xs => array.length === 0;
-
-/**
- * Type guard that checks if an array is non-empty.
- *
- * @example
- *
- * ```ts
- * const users: readonly Readonly<{ id: number }>[] = [{ id: 1 }] as const;
- *
- * const emptyUsers: readonly Readonly<{ id: number }>[] = [] as const;
- *
- * assert.isTrue(Arr.isNonEmpty(users));
- *
- * assert.isFalse(Arr.isNonEmpty(emptyUsers));
- *
- * if (Arr.isNonEmpty(users)) {
- *   assert.deepStrictEqual(users[0], { id: 1 });
- * }
- * ```
- */
-export const isNonEmpty = <Xs extends readonly unknown[]>(
-  array: Xs,
-): array is MinLengthArray<1, Xs[number]> & Xs => array.length > 0;
-
-/**
- * Checks if an array has a specific length.
- *
- * @example
- *
- * ```ts
- * const pair: readonly number[] = [1, 2] as const;
- *
- * const triple: readonly number[] = [1, 2, 3] as const;
- *
- * assert.isTrue(Arr.isFixedLengthTuple(pair, 2));
- *
- * assert.isFalse(Arr.isFixedLengthTuple(triple, 2));
- *
- * if (Arr.isFixedLengthTuple(pair, 2)) {
- *   assert.deepStrictEqual(pair, [1, 2]);
- * }
- * ```
- */
-export const isFixedLengthTuple = <E, N extends SizeType.ArgArr>(
-  array: readonly E[],
-  len: N,
-): array is FixedLengthTuple<N, E> => array.length === len;
-
-/**
- * Checks if an array has at least a specific length.
- *
- * @example
- *
- * ```ts
- * const queue: readonly string[] = ['task-1', 'task-2'] as const;
- *
- * const emptyQueue: readonly string[] = [] as const;
- *
- * assert.isTrue(Arr.isMinLengthTuple(queue, 1));
- *
- * assert.isFalse(Arr.isMinLengthTuple(emptyQueue, 1));
- *
- * if (Arr.isMinLengthTuple(queue, 1)) {
- *   assert.isTrue(queue[0] === 'task-1');
- * }
- * ```
- */
-export const isMinLengthTuple = <E, N extends SizeType.ArgArr>(
-  array: readonly E[],
-  len: N,
-): array is MinLengthTuple<N, E> => array.length >= len;
-
-/**
- * Checks if an array has at most a specific length.
- *
- * @example
- *
- * ```ts
- * const pair: readonly number[] = [1, 2] as const;
- *
- * const triple: readonly number[] = [1, 2, 3] as const;
- *
- * assert.isTrue(Arr.isMaxLengthTuple(pair, 2));
- *
- * assert.isFalse(Arr.isMaxLengthTuple(triple, 2));
- *
- * if (Arr.isMaxLengthTuple(pair, 2)) {
- *   assert.isTrue(pair.length <= 2);
- * }
- * ```
- */
-export const isMaxLengthTuple = <E, N extends SizeType.ArgArr>(
-  array: readonly E[],
-  len: N,
-): array is MaxLengthTuple<N, E> => array.length <= len;
-
-/**
- * Checks if an array's length is within a specific inclusive range.
- *
- * @example
- *
- * ```ts
- * const pair: readonly number[] = [1, 2] as const;
- *
- * const quad: readonly number[] = [1, 2, 3, 4] as const;
- *
- * assert.isTrue(Arr.isBoundedLengthTuple(pair, 1, 3));
- *
- * assert.isFalse(Arr.isBoundedLengthTuple(quad, 1, 3));
- *
- * if (Arr.isBoundedLengthTuple(pair, 1, 3)) {
- *   assert.isTrue(pair.length >= 1 && pair.length <= 3);
- * }
- * ```
- */
-export const isBoundedLengthTuple = <
-  E,
-  Min extends SizeType.ArgArr,
-  Max extends SizeType.ArgArr,
->(
-  array: readonly E[],
-  min: Min,
-  max: Max,
-): array is BoundedLengthTuple<Min, Max, E> =>
-  array.length >= min && array.length <= max;
 
 /**
  * Tests whether all elements in an array pass a test implemented by a predicate.

@@ -122,7 +122,7 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
               length: lengthText,
             },
             fix: (fixer) => {
-              const baseCall = `Arr.isFixedLengthArray(${arrayText}, ${lengthText})`;
+              const baseCall = `Arr.isFixedLengthArray(${lengthText}, ${arrayText})`;
 
               const replacement = isNegated ? `!${baseCall}` : baseCall;
 

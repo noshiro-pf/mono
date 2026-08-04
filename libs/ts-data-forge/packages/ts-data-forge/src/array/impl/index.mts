@@ -3,6 +3,8 @@ export * from './array-utils-element-access.mjs';
 export * from './array-utils-iterators.mjs';
 export * from './array-utils-length-bounded-array-cast.mjs';
 export * from './array-utils-length-bounded-array-guard.mjs';
+export * from './array-utils-length-bounded-tuple-cast.mjs';
+export * from './array-utils-length-bounded-tuple-guard.mjs';
 export * from './array-utils-modification.mjs';
 export * from './array-utils-reducing-value.mjs';
 export * from './array-utils-search.mjs';

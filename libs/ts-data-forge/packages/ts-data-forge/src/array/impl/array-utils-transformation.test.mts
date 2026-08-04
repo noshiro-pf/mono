@@ -1,4 +1,9 @@
-import { type FixedLengthTuple, type NonEmptyArray } from 'ts-type-forge';
+import {
+  type BoundedLengthArray,
+  type FixedLengthTuple,
+  type MinLengthArray,
+  type NonEmptyArray,
+} from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';
@@ -644,13 +649,15 @@ describe('Arr transformations', () => {
 
       expectType<
         typeof result,
-        readonly (readonly (
+        readonly BoundedLengthArray<
+          1,
+          4,
           1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-        )[])[]
-      >('=');
+        >[]
+      >('~=');
 
       test('case 1', () => {
-        assert.deepStrictEqual(result, [
+        assert.deepStrictEqual<readonly (readonly number[])[]>(result, [
           [1, 2, 3, 4],
           [5, 6, 7, 8],
           [9, 10, 11, 12],
@@ -663,13 +670,15 @@ describe('Arr transformations', () => {
 
       expectType<
         typeof result,
-        readonly (readonly (
+        readonly BoundedLengthArray<
+          1,
+          3,
           1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-        )[])[]
-      >('=');
+        >[]
+      >('~=');
 
       test('case 2', () => {
-        assert.deepStrictEqual(result, [
+        assert.deepStrictEqual<readonly (readonly number[])[]>(result, [
           [1, 2, 3],
           [4, 5, 6],
           [7, 8, 9],
@@ -683,13 +692,15 @@ describe('Arr transformations', () => {
 
       expectType<
         typeof result,
-        readonly (readonly (
+        readonly BoundedLengthArray<
+          1,
+          5,
           1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-        )[])[]
-      >('=');
+        >[]
+      >('~=');
 
       test('case 3', () => {
-        assert.deepStrictEqual(result, [
+        assert.deepStrictEqual<readonly (readonly number[])[]>(result, [
           [1, 2, 3, 4, 5],
           [6, 7, 8, 9, 10],
           [11, 12],
@@ -702,7 +713,7 @@ describe('Arr transformations', () => {
 
       const result = partition(numbers, 2);
 
-      assert.deepStrictEqual(result, [
+      assert.deepStrictEqual<readonly (readonly number[])[]>(result, [
         [1, 2],
         [3, 4],
         [5, 6],
@@ -714,7 +725,11 @@ describe('Arr transformations', () => {
 
       const result = partition(numbers, 2);
 
-      assert.deepStrictEqual(result, [[1, 2], [3, 4], [5]]);
+      assert.deepStrictEqual<readonly (readonly number[])[]>(result, [
+        [1, 2],
+        [3, 4],
+        [5],
+      ]);
     });
 
     test('should work with chunk size < 2 (returns empty)', () => {
@@ -731,7 +746,7 @@ describe('Arr transformations', () => {
 
       const result = partition(numbers, 5);
 
-      assert.deepStrictEqual(result, [[1, 2]]);
+      assert.deepStrictEqual<readonly (readonly number[])[]>(result, [[1, 2]]);
     });
 
     test('partition should work with empty array', () => {
@@ -1162,3 +1177,34 @@ describe('Arr transformations', () => {
     });
   });
 });
+
+/* `toReversed` is a known permutation, so the tuple half can be reversed
+   alongside the brand. It used to fall back to `ChangeArrayElement`, which kept
+   the length but collapsed the positions to their union. Never called; see the
+   note in `array-utils-modification.test.mts`. */
+export const reversedTypeChecks = (
+  brandedFive: MinLengthArray<5, string>,
+  brandedAndTuple: MinLengthArray<3, number> & readonly [1, 2, 3, 4, 5],
+): void => {
+  const _reversedBranded = toReversed(brandedFive);
+
+  expectType<typeof _reversedBranded, MinLengthArray<5, string>>('~=');
+
+  // Brand and positions both survive, and the positions really are reversed.
+  const _reversedBoth = toReversed(brandedAndTuple);
+
+  expectType<(typeof _reversedBoth)[0], 5>('=');
+
+  expectType<(typeof _reversedBoth)[4], 1>('=');
+
+  const _reversedTuple = toReversed([1, 2, 3] as const);
+
+  expectType<typeof _reversedTuple, readonly [3, 2, 1]>('=');
+
+  /* `toSorted` deliberately does NOT take this path: an arbitrary permutation
+     cannot keep positions, so the honest answer stays "same length, element
+     type widened to the union". */
+  const _sortedTuple = toSorted([1, 2, 3] as const);
+
+  expectType<typeof _sortedTuple, FixedLengthTuple<3, 1 | 2 | 3>>('~=');
+};

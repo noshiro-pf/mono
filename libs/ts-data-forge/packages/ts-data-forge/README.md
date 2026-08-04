@@ -381,7 +381,7 @@ const sum = Arr.sum(numbers);
 assert.isTrue(sum === 20);
 
 // Type-safe length checking
-if (Arr.isMinLengthTuple(numbers, 2)) {
+if (Arr.isMinLengthTuple(2, numbers)) {
     // numbers is now guaranteed to have at least 2 elements
     expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
 

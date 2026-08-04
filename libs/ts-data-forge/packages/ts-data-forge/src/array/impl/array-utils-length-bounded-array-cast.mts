@@ -23,13 +23,14 @@ import {
  * structural tuple prefix (in-range indexed access without `undefined` under
  * `noUncheckedIndexedAccess`).
  *
- * Supports a curried overload: calling it with only `length` returns a
- * function that casts an array, which is convenient for `pipe`/`map`.
+ * The length argument comes first, matching the type-parameter order of
+ * `FixedLengthArray<Length, Elm>`. Omitting the array returns a function that
+ * casts one, which is convenient for `pipe`/`map`.
  *
  * @example
  *
  * ```ts
- * const rgb = Arr.asFixedLengthArray([255, 128, 0], 3);
+ * const rgb = Arr.asFixedLengthArray(3, [255, 128, 0]);
  *
  * const atMost5: MaxLengthArray<5, number> = rgb; // OK (3 <= 5)
  * const red: number = rgb[0]; // OK — no `undefined`
@@ -38,20 +39,20 @@ import {
  * const asRgb = Arr.asFixedLengthArray(3);
  * const green = asRgb([0, 255, 0]);
  *
- * // Arr.asFixedLengthArray([255, 128], 3); // throws TypeError
+ * // Arr.asFixedLengthArray(3, [255, 128]); // throws TypeError
  * ```
  *
- * @template Xs - The input array type (tuple types are preserved).
  * @template Length - The exact number of elements.
- * @param xs - The array to cast.
+ * @template Xs - The input array type (tuple types are preserved).
  * @param length - The exact number of elements.
+ * @param xs - The array to cast.
  * @returns `xs` typed as `FixedLengthArray<Length, Xs[number]> & Xs`.
  * @throws {TypeError} If `xs.length !== length`.
  */
 export function asFixedLengthArray<
-  Xs extends readonly unknown[],
   Length extends SupportedLength,
->(xs: Xs, length: Length): FixedLengthArray<Length, Xs[number]> & Xs;
+  Xs extends readonly unknown[],
+>(length: Length, xs: Xs): FixedLengthArray<Length, Xs[number]> & Xs;
 
 // Curried version
 export function asFixedLengthArray<Length extends SupportedLength>(
@@ -62,7 +63,7 @@ export function asFixedLengthArray<Length extends SupportedLength>(
 
 export function asFixedLengthArray<E>(
   ...args:
-    | readonly [xs: readonly E[], length: SupportedLength]
+    | readonly [length: SupportedLength, xs: readonly E[]]
     | readonly [length: SupportedLength]
 ): readonly E[] | ((xs: readonly E[]) => readonly E[]) {
   switch (args.length) {
@@ -70,17 +71,17 @@ export function asFixedLengthArray<E>(
       return asFixedLengthArrayImpl(...args);
 
     case 1:
-      return (xs) => asFixedLengthArrayImpl(xs, ...args);
+      return (xs) => asFixedLengthArrayImpl(args[0], xs);
   }
 }
 
 const asFixedLengthArrayImpl = <E,>(
-  xs: readonly E[],
   length: SupportedLength,
+  xs: readonly E[],
 ): readonly E[] => {
   const actualLength = xs.length;
 
-  if (!isFixedLengthArray(xs, length)) {
+  if (!isFixedLengthArray(length, xs)) {
     throw new TypeError(
       `Expected an array of length ${length}, got an array of length ${actualLength}`,
     );
@@ -99,13 +100,14 @@ const asFixedLengthArrayImpl = <E,>(
  * structural tuple prefix (indexed access below `min(N, 10)` without
  * `undefined` under `noUncheckedIndexedAccess`).
  *
- * Supports a curried overload: calling it with only `minLength` returns a
- * function that casts an array, which is convenient for `pipe`/`map`.
+ * The length argument comes first, matching the type-parameter order of
+ * `MinLengthArray<MinLength, Elm>`. Omitting the array returns a function that
+ * casts one, which is convenient for `pipe`/`map`.
  *
  * @example
  *
  * ```ts
- * const history = Arr.asMinLengthArray([0, 1, 2, 3], 3);
+ * const history = Arr.asMinLengthArray(3, [0, 1, 2, 3]);
  *
  * const nonEmpty: MinLengthArray<1, number> = history; // OK (3 >= 1)
  * const first: number = history[0]; // OK — no `undefined`
@@ -114,20 +116,20 @@ const asFixedLengthArrayImpl = <E,>(
  * const asHistory = Arr.asMinLengthArray(3);
  * const next = asHistory([4, 5, 6, 7]);
  *
- * // Arr.asMinLengthArray([0], 3); // throws TypeError
+ * // Arr.asMinLengthArray(3, [0]); // throws TypeError
  * ```
  *
- * @template Xs - The input array type (tuple types are preserved).
  * @template MinLength - The minimum number of elements (inclusive).
- * @param xs - The array to cast.
+ * @template Xs - The input array type (tuple types are preserved).
  * @param minLength - The minimum number of elements (inclusive).
+ * @param xs - The array to cast.
  * @returns `xs` typed as `MinLengthArray<MinLength, Xs[number]> & Xs`.
  * @throws {TypeError} If `xs.length < minLength`.
  */
 export function asMinLengthArray<
-  Xs extends readonly unknown[],
   MinLength extends SupportedLength,
->(xs: Xs, minLength: MinLength): MinLengthArray<MinLength, Xs[number]> & Xs;
+  Xs extends readonly unknown[],
+>(minLength: MinLength, xs: Xs): MinLengthArray<MinLength, Xs[number]> & Xs;
 
 // Curried version
 export function asMinLengthArray<MinLength extends SupportedLength>(
@@ -138,7 +140,7 @@ export function asMinLengthArray<MinLength extends SupportedLength>(
 
 export function asMinLengthArray<E>(
   ...args:
-    | readonly [xs: readonly E[], minLength: SupportedLength]
+    | readonly [minLength: SupportedLength, xs: readonly E[]]
     | readonly [minLength: SupportedLength]
 ): readonly E[] | ((xs: readonly E[]) => readonly E[]) {
   switch (args.length) {
@@ -146,17 +148,17 @@ export function asMinLengthArray<E>(
       return asMinLengthArrayImpl(...args);
 
     case 1:
-      return (xs) => asMinLengthArrayImpl(xs, ...args);
+      return (xs) => asMinLengthArrayImpl(args[0], xs);
   }
 }
 
 const asMinLengthArrayImpl = <E,>(
-  xs: readonly E[],
   minLength: SupportedLength,
+  xs: readonly E[],
 ): readonly E[] => {
   const actualLength = xs.length;
 
-  if (!isMinLengthArray(xs, minLength)) {
+  if (!isMinLengthArray(minLength, xs)) {
     throw new TypeError(
       `Expected an array of length >= ${minLength}, got an array of length ${actualLength}`,
     );
@@ -173,13 +175,14 @@ const asMinLengthArrayImpl = <E,>(
  * length is verified at runtime, and the original array type (e.g. tuple
  * types) is preserved via intersection.
  *
- * Supports a curried overload: calling it with only `maxLength` returns a
- * function that casts an array, which is convenient for `pipe`/`map`.
+ * The length argument comes first, matching the type-parameter order of
+ * `MaxLengthArray<MaxLength, Elm>`. Omitting the array returns a function that
+ * casts one, which is convenient for `pipe`/`map`.
  *
  * @example
  *
  * ```ts
- * const tags = Arr.asMaxLengthArray(['a', 'b', 'c'], 8);
+ * const tags = Arr.asMaxLengthArray(8, ['a', 'b', 'c']);
  *
  * const relaxed: MaxLengthArray<16, string> = tags; // OK (8 <= 16)
  *
@@ -187,20 +190,20 @@ const asMinLengthArrayImpl = <E,>(
  * const asTags = Arr.asMaxLengthArray(8);
  * const more = asTags(['d', 'e']);
  *
- * // Arr.asMaxLengthArray(['a', 'b', 'c'], 2); // throws TypeError
+ * // Arr.asMaxLengthArray(2, ['a', 'b', 'c']); // throws TypeError
  * ```
  *
- * @template Xs - The input array type (tuple types are preserved).
  * @template MaxLength - The maximum number of elements (inclusive).
- * @param xs - The array to cast.
+ * @template Xs - The input array type (tuple types are preserved).
  * @param maxLength - The maximum number of elements (inclusive).
+ * @param xs - The array to cast.
  * @returns `xs` typed as `MaxLengthArray<MaxLength, Xs[number]> & Xs`.
  * @throws {TypeError} If `xs.length > maxLength`.
  */
 export function asMaxLengthArray<
-  Xs extends readonly unknown[],
   MaxLength extends SupportedLength,
->(xs: Xs, maxLength: MaxLength): MaxLengthArray<MaxLength, Xs[number]> & Xs;
+  Xs extends readonly unknown[],
+>(maxLength: MaxLength, xs: Xs): MaxLengthArray<MaxLength, Xs[number]> & Xs;
 
 // Curried version
 export function asMaxLengthArray<MaxLength extends SupportedLength>(
@@ -211,7 +214,7 @@ export function asMaxLengthArray<MaxLength extends SupportedLength>(
 
 export function asMaxLengthArray<E>(
   ...args:
-    | readonly [xs: readonly E[], maxLength: SupportedLength]
+    | readonly [maxLength: SupportedLength, xs: readonly E[]]
     | readonly [maxLength: SupportedLength]
 ): readonly E[] | ((xs: readonly E[]) => readonly E[]) {
   switch (args.length) {
@@ -219,17 +222,17 @@ export function asMaxLengthArray<E>(
       return asMaxLengthArrayImpl(...args);
 
     case 1:
-      return (xs) => asMaxLengthArrayImpl(xs, ...args);
+      return (xs) => asMaxLengthArrayImpl(args[0], xs);
   }
 }
 
 const asMaxLengthArrayImpl = <E,>(
-  xs: readonly E[],
   maxLength: SupportedLength,
+  xs: readonly E[],
 ): readonly E[] => {
   const actualLength = xs.length;
 
-  if (!isMaxLengthArray(xs, maxLength)) {
+  if (!isMaxLengthArray(maxLength, xs)) {
     throw new TypeError(
       `Expected an array of length <= ${maxLength}, got an array of length ${actualLength}`,
     );
@@ -248,14 +251,14 @@ const asMaxLengthArrayImpl = <E,>(
  * at runtime, and the original array type (e.g. tuple types) is preserved via
  * intersection.
  *
- * Supports a curried overload: calling it with only `minLength` and
- * `maxLength` returns a function that casts an array, which is convenient for
- * `pipe`/`map`.
+ * The length arguments come first, matching the type-parameter order of
+ * `BoundedLengthArray<MinLength, MaxLength, Elm>`. Omitting the array returns a
+ * function that casts one, which is convenient for `pipe`/`map`.
  *
  * @example
  *
  * ```ts
- * const selection = Arr.asBoundedLengthArray([1, 2, 3], 1, 5);
+ * const selection = Arr.asBoundedLengthArray(1, 5, [1, 2, 3]);
  *
  * const relaxed: BoundedLengthArray<0, 100, number> = selection; // OK
  *
@@ -263,27 +266,27 @@ const asMaxLengthArrayImpl = <E,>(
  * const asSelection = Arr.asBoundedLengthArray(1, 5);
  * const next = asSelection([4, 5]);
  *
- * // Arr.asBoundedLengthArray([], 1, 5); // throws TypeError
+ * // Arr.asBoundedLengthArray(1, 5, []); // throws TypeError
  * ```
  *
- * @template Xs - The input array type (tuple types are preserved).
  * @template MinLength - The minimum number of elements (inclusive).
  * @template MaxLength - The maximum number of elements (inclusive).
- * @param xs - The array to cast.
+ * @template Xs - The input array type (tuple types are preserved).
  * @param minLength - The minimum number of elements (inclusive).
  * @param maxLength - The maximum number of elements (inclusive).
+ * @param xs - The array to cast.
  * @returns `xs` typed as
  *   `BoundedLengthArray<MinLength, MaxLength, Xs[number]> & Xs`.
  * @throws {TypeError} If `xs.length < minLength || xs.length > maxLength`.
  */
 export function asBoundedLengthArray<
-  Xs extends readonly unknown[],
   MinLength extends SupportedLength,
   MaxLength extends SupportedLength,
+  Xs extends readonly unknown[],
 >(
-  xs: Xs,
   minLength: MinLength,
   maxLength: MaxLength,
+  xs: Xs,
 ): BoundedLengthArray<MinLength, MaxLength, Xs[number]> & Xs;
 
 // Curried version
@@ -300,9 +303,9 @@ export function asBoundedLengthArray<
 export function asBoundedLengthArray<E>(
   ...args:
     | readonly [
-        xs: readonly E[],
         minLength: SupportedLength,
         maxLength: SupportedLength,
+        xs: readonly E[],
       ]
     | readonly [minLength: SupportedLength, maxLength: SupportedLength]
 ): readonly E[] | ((xs: readonly E[]) => readonly E[]) {
@@ -311,20 +314,55 @@ export function asBoundedLengthArray<E>(
       return asBoundedLengthArrayImpl(...args);
 
     case 2:
-      return (xs) => asBoundedLengthArrayImpl(xs, ...args);
+      return (xs) => asBoundedLengthArrayImpl(args[0], args[1], xs);
   }
 }
 
 const asBoundedLengthArrayImpl = <E,>(
-  xs: readonly E[],
   minLength: SupportedLength,
   maxLength: SupportedLength,
+  xs: readonly E[],
 ): readonly E[] => {
   const actualLength = xs.length;
 
-  if (!isBoundedLengthArray(xs, minLength, maxLength)) {
+  if (!isBoundedLengthArray(minLength, maxLength, xs)) {
     throw new TypeError(
       `Expected an array of length in [${minLength}, ${maxLength}], got an array of length ${actualLength}`,
+    );
+  }
+
+  return xs;
+};
+
+/**
+ * Casts an array to `FixedLengthArray<0, E>` after checking that it is empty.
+ *
+ * `Arr.isEmpty` narrows to that same type, so this is its cast counterpart —
+ * the length-0 specialization of {@link asFixedLengthArray}. Use this instead
+ * of writing `xs as unknown as FixedLengthArray<0, E>`: the length is verified
+ * at runtime, and the original array type is preserved via intersection.
+ *
+ * @example
+ *
+ * ```ts
+ * const nothing = Arr.asEmptyArray([]);
+ *
+ * const atMost5: MaxLengthArray<5, never> = nothing; // OK (0 <= 5)
+ *
+ * // Arr.asEmptyArray([1]); // throws TypeError
+ * ```
+ *
+ * @template Xs - The input array type (tuple types are preserved).
+ * @param xs - The array to cast.
+ * @returns `xs` typed as `FixedLengthArray<0, Xs[number]> & Xs`.
+ * @throws {TypeError} If `xs` is not empty.
+ */
+export const asEmptyArray = <Xs extends readonly unknown[]>(
+  xs: Xs,
+): FixedLengthArray<0, Xs[number]> & Xs => {
+  if (!isFixedLengthArray(0, xs)) {
+    throw new TypeError(
+      `Expected an empty array, got an array of length ${xs.length}`,
     );
   }
 
@@ -360,7 +398,7 @@ const asBoundedLengthArrayImpl = <E,>(
 export const asNonEmptyArray = <Xs extends readonly unknown[]>(
   xs: Xs,
 ): NonEmptyArray<Xs[number]> & Xs => {
-  if (!isMinLengthArray(xs, 1)) {
+  if (!isMinLengthArray(1, xs)) {
     throw new TypeError('Expected a non-empty array, got an empty array');
   }
 

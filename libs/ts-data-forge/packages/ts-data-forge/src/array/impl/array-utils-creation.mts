@@ -1,5 +1,6 @@
 import {
   type BoolOr,
+  type FixedLengthArray,
   type FixedLengthTuple,
   type Index,
   type IsUnion,
@@ -16,6 +17,7 @@ import {
   type Seq,
   type SmallUint,
   type StructuralPrefixLength,
+  type SupportedLength,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range as rangeIterator } from '../../iterator/index.mjs';
@@ -91,9 +93,11 @@ export const create = <N extends SizeType.ArgArr, const V>(
   init: V,
 ): N extends StructuralPrefixLength
   ? FixedLengthTuple<N, V>
-  : N extends SizeType.ArgArrPositive
-    ? NonEmptyArray<V>
-    : readonly V[] =>
+  : N extends SupportedLength
+    ? FixedLengthArray<N, V>
+    : N extends SizeType.ArgArrPositive
+      ? NonEmptyArray<V>
+      : readonly V[] =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Array.from({ length: Math.max(0, len) }, () => init) as never;
 

@@ -123,7 +123,7 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
               length: lengthText,
             },
             fix: (fixer) => {
-              const replacement = `Arr.isMaxLengthArray(${arrayText}, ${lengthText})`;
+              const replacement = `Arr.isMaxLengthArray(${lengthText}, ${arrayText})`;
 
               const importFixes =
                 index === 0 && !hasArrImport

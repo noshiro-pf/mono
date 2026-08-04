@@ -5,7 +5,7 @@ import { type MaxLengthString } from 'ts-type-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const countryCode = Str.asFixedLengthString('JP', 2);
+    const countryCode = Str.asFixedLengthString(2, 'JP');
 
     const atMost5: MaxLengthString<5> = countryCode; // OK (2 <= 5)
 
@@ -16,7 +16,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(asCountryCode('US'), 'US');
 
-    assert.throws(() => Str.asFixedLengthString('JP', 3)); // length 2 !== 3
+    assert.throws(() => Str.asFixedLengthString(3, 'JP')); // length 2 !== 3
 
     // embed-sample-code-ignore-below
   });

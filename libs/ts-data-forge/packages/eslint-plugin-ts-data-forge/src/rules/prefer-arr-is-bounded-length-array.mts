@@ -125,7 +125,7 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
               max: maxText,
             },
             fix: (fixer) => {
-              const replacement = `Arr.isBoundedLengthArray(${arrayText}, ${minText}, ${maxText})`;
+              const replacement = `Arr.isBoundedLengthArray(${minText}, ${maxText}, ${arrayText})`;
 
               const importFixes =
                 index === 0 && !hasArrImport

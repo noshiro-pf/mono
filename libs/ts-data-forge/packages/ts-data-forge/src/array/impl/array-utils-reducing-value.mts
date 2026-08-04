@@ -11,7 +11,7 @@ import {
   type SizeType,
   type Some,
 } from '../../types.mjs';
-import { isNonEmpty } from './array-utils-validation.mjs';
+import { isNonEmpty } from './array-utils-length-bounded-array-guard.mjs';
 
 /**
  * Finds the minimum value in an array.
@@ -543,22 +543,22 @@ export function sum(array: readonly number[]): number {
  */
 export function sumBy(array: readonly [], mapFn: (item: unknown) => number): 0;
 
-export function sumBy<N extends Uint, E>(
+export function sumBy<E, N extends Uint>(
   array: readonly E[],
   mapFn: (item: E) => N,
 ): Uint;
 
-export function sumBy<N extends Int, E>(
+export function sumBy<E, N extends Int>(
   array: readonly E[],
   mapFn: (item: E) => N,
 ): Int;
 
-export function sumBy<N extends number, E>(
+export function sumBy<E, N extends number>(
   array: readonly E[],
   mapFn: (item: E) => N,
 ): number;
 
-export function sumBy<N extends number, E>(
+export function sumBy<E, N extends number>(
   array: readonly E[],
   mapFn: (item: E) => N,
 ): number {

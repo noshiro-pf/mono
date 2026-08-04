@@ -1,13 +1,17 @@
 import {
+  type BoundedLengthArray,
+  type ChangeArrayElement,
+  type ConstrainedList,
   type FixedLengthTuple,
+  type HasLengthConstraint,
   type IsFixedLengthList,
-  type List,
   type NonEmptyArray,
   type NonEmptyTuple,
   type PositiveInt,
   type PositiveUint32,
   type Primitive,
   type SafeUintWithSmallInt,
+  type SupportedLength,
   type WithSmallInt,
 } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
@@ -20,8 +24,8 @@ import {
   type SizeType,
 } from '../../types.mjs';
 import { newArray, seq } from './array-utils-creation.mjs';
+import { isNonEmpty } from './array-utils-length-bounded-array-guard.mjs';
 import { size } from './array-utils-size.mjs';
-import { isNonEmpty } from './array-utils-validation.mjs';
 
 /**
  * Creates a new array by transforming each element with a mapping function.
@@ -45,14 +49,12 @@ import { isNonEmpty } from './array-utils-validation.mjs';
 export function map<const Ar extends readonly unknown[], B>(
   array: Ar,
   mapFn: (a: Ar[number], index: ArrayIndex<Ar>) => B,
-): Readonly<{ [K in keyof Ar]: B }>;
+): ChangeArrayElement<Ar, B>;
 
 // curried version
 export function map<A, B>(
   mapFn: (a: A, index: SizeType.Arr) => B,
-): <const Ar extends readonly A[]>(
-  array: Ar,
-) => Readonly<{ [K in keyof Ar]: B }>;
+): <const Ar extends readonly A[]>(array: Ar) => ChangeArrayElement<Ar, B>;
 
 export function map<A, B>(
   ...args:
@@ -187,7 +189,7 @@ const scanImpl = <E, S>(
  */
 export const toReversed = <const Ar extends readonly unknown[]>(
   array: Ar,
-): List.Reverse<Ar> =>
+): ConstrainedList.Reverse<Ar> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   array.toReversed() as never;
 
@@ -224,11 +226,13 @@ export const toSorted = <const Ar extends readonly unknown[]>(
         comparator?: (x: Ar[number], y: Ar[number]) => number,
       ]
     : readonly [array: Ar, comparator: (x: Ar[number], y: Ar[number]) => number]
-): IsFixedLengthList<Ar> extends true
-  ? FixedLengthTuple<Ar['length'], Ar[number]>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<Ar[number]>
-    : readonly Ar[number][] =>
+): HasLengthConstraint<Ar> extends true
+  ? ChangeArrayElement<Ar, Ar[number]>
+  : IsFixedLengthList<Ar> extends true
+    ? FixedLengthTuple<Ar['length'], Ar[number]>
+    : Ar extends NonEmptyTuple<unknown>
+      ? NonEmptyArray<Ar[number]>
+      : readonly Ar[number][] =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   array.toSorted(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -282,21 +286,25 @@ export function toSortedBy<const Ar extends readonly unknown[]>(
   comparatorValueMapper: (value: Ar[number]) => number,
   // If the array elements are mapped to numbers, comparator is optional.
   comparator?: (x: number, y: number) => number,
-): IsFixedLengthList<Ar> extends true
-  ? FixedLengthTuple<Ar['length'], Ar[number]>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<Ar[number]>
-    : readonly Ar[number][];
+): HasLengthConstraint<Ar> extends true
+  ? ChangeArrayElement<Ar, Ar[number]>
+  : IsFixedLengthList<Ar> extends true
+    ? FixedLengthTuple<Ar['length'], Ar[number]>
+    : Ar extends NonEmptyTuple<unknown>
+      ? NonEmptyArray<Ar[number]>
+      : readonly Ar[number][];
 
 export function toSortedBy<const Ar extends readonly unknown[], const V>(
   array: Ar,
   comparatorValueMapper: (value: Ar[number]) => V,
   comparator: (x: V, y: V) => number,
-): IsFixedLengthList<Ar> extends true
-  ? FixedLengthTuple<Ar['length'], Ar[number]>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<Ar[number]>
-    : readonly Ar[number][];
+): HasLengthConstraint<Ar> extends true
+  ? ChangeArrayElement<Ar, Ar[number]>
+  : IsFixedLengthList<Ar> extends true
+    ? FixedLengthTuple<Ar['length'], Ar[number]>
+    : Ar extends NonEmptyTuple<unknown>
+      ? NonEmptyArray<Ar[number]>
+      : readonly Ar[number][];
 
 export function toSortedBy<E, const V>(
   array: readonly E[],
@@ -627,18 +635,24 @@ export function flatMap<A, B>(
  *
  * const triples = Arr.partition(3)(values);
  *
+ * // Every chunk is branded `BoundedLengthArray<1, N, …>` — `partition` never
+ * // emits an empty chunk — so the expected values are annotated with the
+ * // unbranded type.
  * const expectedPairs = [[1, 2], [3, 4], [5]] as const;
  *
- * assert.deepStrictEqual(pairs, expectedPairs);
+ * assert.deepStrictEqual<readonly (readonly number[])[]>(
+ *   pairs,
+ *   expectedPairs,
+ * );
  *
- * assert.deepStrictEqual(triples, [
+ * assert.deepStrictEqual<readonly (readonly number[])[]>(triples, [
  *   [1, 2, 3],
  *   [4, 5],
  * ]);
  *
  * const pairs2 = Arr.chunk([1, 2, 3, 4, 5, 6], 2);
  *
- * assert.deepStrictEqual(pairs2, [
+ * assert.deepStrictEqual<readonly (readonly number[])[]>(pairs2, [
  *   [1, 2],
  *   [3, 4],
  *   [5, 6],
@@ -646,17 +660,17 @@ export function flatMap<A, B>(
  * ```
  */
 export function partition<
-  N extends WithSmallInt<PositiveInt & SizeType.Arr>,
   E,
->(array: readonly E[], chunkSize: N): readonly (readonly E[])[];
+  N extends WithSmallInt<PositiveInt & SizeType.Arr>,
+>(array: readonly E[], chunkSize: N): readonly PartitionChunk<N, E>[];
 
 export function partition<N extends WithSmallInt<PositiveInt & SizeType.Arr>>(
   chunkSize: N,
-): <E>(array: readonly E[]) => readonly (readonly E[])[];
+): <E>(array: readonly E[]) => readonly PartitionChunk<N, E>[];
 
 export function partition<
-  N extends WithSmallInt<PositiveInt & SizeType.Arr>,
   E,
+  N extends WithSmallInt<PositiveInt & SizeType.Arr>,
 >(
   ...args:
     readonly [array: readonly E[], chunkSize: N] | readonly [chunkSize: N]
@@ -672,7 +686,20 @@ export function partition<
   }
 }
 
-const partitionImpl = <N extends WithSmallInt<PositiveInt & SizeType.Arr>, E>(
+/**
+ * Element type of {@link partition}'s result: a chunk holds between 1 and `N`
+ * elements. The lower bound is what makes this worth spelling out — `partition`
+ * never emits an empty chunk, so indexed access into a chunk is not
+ * `undefined` at position `0`, unlike with a plain `readonly E[]`.
+ *
+ * Falls back to {@link NonEmptyArray} when `N` is not a bound the brand can
+ * express, which keeps that lower bound in every case.
+ */
+type PartitionChunk<N, E> = N extends SupportedLength
+  ? BoundedLengthArray<1, N, E>
+  : NonEmptyArray<E>;
+
+const partitionImpl = <E, N extends WithSmallInt<PositiveInt & SizeType.Arr>>(
   array: readonly E[],
   chunkSize: N,
 ): readonly (readonly E[])[] =>
@@ -682,6 +709,13 @@ const partitionImpl = <N extends WithSmallInt<PositiveInt & SizeType.Arr>, E>(
       seq(asUint32(Math.ceil(array.length / chunkSize))).map((i: Uint32) =>
         array.slice(chunkSize * i, chunkSize * (i + 1)),
       );
+
+/**
+ * Alias for `partition`.
+ *
+ * @see {@link partition}
+ */
+export const chunk = partition;
 
 /**
  * Concatenates two arrays.
@@ -853,20 +887,13 @@ export const zip = <
 >(
   array1: Ar1,
   array2: Ar2,
-): List.Zip<Ar1, Ar2> =>
+): ConstrainedList.Zip<Ar1, Ar2> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   seq(Uint32.min(size(array1), size(array2))).map((i: Uint32) =>
     // Non-null assertion is safe here because `i` is always within bounds of both arrays up to the length of the shorter one.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     tp(array1[i]!, array2[i]!),
-  ) as unknown as List.Zip<Ar1, Ar2>;
-
-/**
- * Alias for `partition`.
- *
- * @see {@link partition}
- */
-export const chunk = partition;
+  ) as unknown as ConstrainedList.Zip<Ar1, Ar2>;
 
 /**
  * Computes the cartesian product of arrays.

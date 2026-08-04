@@ -7,11 +7,11 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const input: string = 'user-12345678';
 
-    assert.isTrue(Str.isBoundedLengthString(input, 8, 16));
+    assert.isTrue(Str.isBoundedLengthString(8, 16, input));
 
-    assert.isFalse(Str.isBoundedLengthString('user', 8, 16));
+    assert.isFalse(Str.isBoundedLengthString(8, 16, 'user'));
 
-    if (Str.isBoundedLengthString(input, 8, 16)) {
+    if (Str.isBoundedLengthString(8, 16, input)) {
       const userId: BoundedLengthString<1, 255> = input; // OK ([8, 16] ⊆ [1, 255])
 
       assert.isTrue(userId.length >= 8 && userId.length <= 16);

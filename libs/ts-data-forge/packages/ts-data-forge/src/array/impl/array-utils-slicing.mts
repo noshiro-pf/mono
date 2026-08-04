@@ -1,4 +1,6 @@
 import {
+  type ConstrainedList,
+  type HasLengthConstraint,
   type List,
   type NonEmptyArray,
   type NonEmptyTuple,
@@ -6,9 +8,9 @@ import {
 } from 'ts-type-forge';
 import { Uint32 } from '../../number/index.mjs';
 import { type SizeType } from '../../types.mjs';
+import { isEmpty } from './array-utils-length-bounded-array-guard.mjs';
 import { size } from './array-utils-size.mjs';
 import { sliceClamped } from './array-utils-slice-clamped.mjs';
-import { isEmpty } from './array-utils-validation.mjs';
 
 /**
  * Returns all elements of an array except the first one.
@@ -41,9 +43,9 @@ import { isEmpty } from './array-utils-validation.mjs';
  */
 export const tail = <const Ar extends readonly unknown[]>(
   array: Ar,
-): List.Tail<Ar> =>
+): ConstrainedList.Tail<Ar> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  array.slice(1) as unknown as List.Tail<Ar>;
+  array.slice(1) as unknown as ConstrainedList.Tail<Ar>;
 
 /**
  * Returns all elements of an array except the last one.
@@ -62,9 +64,11 @@ export const tail = <const Ar extends readonly unknown[]>(
  */
 export const butLast = <const Ar extends readonly unknown[]>(
   array: Ar,
-): List.ButLast<Ar> =>
+): ConstrainedList.ButLast<Ar> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  (isEmpty(array) ? [] : array.slice(0, -1)) as unknown as List.ButLast<Ar>;
+  (isEmpty(array)
+    ? []
+    : array.slice(0, -1)) as unknown as ConstrainedList.ButLast<Ar>;
 
 /**
  * Takes the first N elements from an array.
@@ -89,25 +93,29 @@ export function take<
 >(
   array: Ar,
   num: N,
-): N extends StructuralPrefixLength
-  ? List.Take<N, Ar>
-  : N extends SizeType.ArgArrPositive
-    ? Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<Ar[number]>
-      : readonly Ar[number][]
-    : readonly Ar[number][];
+): HasLengthConstraint<Ar> extends true
+  ? readonly Ar[number][]
+  : N extends StructuralPrefixLength
+    ? List.Take<N, Ar>
+    : N extends SizeType.ArgArrPositive
+      ? Ar extends NonEmptyTuple<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][]
+      : readonly Ar[number][];
 
 export function take<N extends SizeType.ArgArr>(
   num: N,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => N extends StructuralPrefixLength
-  ? List.Take<N, Ar>
-  : N extends SizeType.ArgArrPositive
-    ? Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<Ar[number]>
-      : readonly Ar[number][]
-    : readonly Ar[number][];
+) => HasLengthConstraint<Ar> extends true
+  ? readonly Ar[number][]
+  : N extends StructuralPrefixLength
+    ? List.Take<N, Ar>
+    : N extends SizeType.ArgArrPositive
+      ? Ar extends NonEmptyTuple<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][]
+      : readonly Ar[number][];
 
 export function take<E>(
   ...args:
@@ -151,25 +159,29 @@ export function takeLast<
 >(
   array: Ar,
   num: N,
-): N extends StructuralPrefixLength
-  ? List.TakeLast<N, Ar>
-  : N extends SizeType.ArgArrPositive
-    ? Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<Ar[number]>
-      : readonly Ar[number][]
-    : readonly Ar[number][];
+): HasLengthConstraint<Ar> extends true
+  ? readonly Ar[number][]
+  : N extends StructuralPrefixLength
+    ? List.TakeLast<N, Ar>
+    : N extends SizeType.ArgArrPositive
+      ? Ar extends NonEmptyTuple<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][]
+      : readonly Ar[number][];
 
 export function takeLast<N extends SizeType.ArgArr>(
   num: N,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => N extends StructuralPrefixLength
-  ? List.TakeLast<N, Ar>
-  : N extends SizeType.ArgArrPositive
-    ? Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<Ar[number]>
-      : readonly Ar[number][]
-    : readonly Ar[number][];
+) => HasLengthConstraint<Ar> extends true
+  ? readonly Ar[number][]
+  : N extends StructuralPrefixLength
+    ? List.TakeLast<N, Ar>
+    : N extends SizeType.ArgArrPositive
+      ? Ar extends NonEmptyTuple<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][]
+      : readonly Ar[number][];
 
 export function takeLast<E>(
   ...args:
@@ -214,16 +226,22 @@ export function skip<
 >(
   array: Ar,
   num: N,
-): N extends StructuralPrefixLength ? List.Skip<N, Ar> : readonly Ar[number][];
+): HasLengthConstraint<Ar> extends true
+  ? readonly Ar[number][]
+  : N extends StructuralPrefixLength
+    ? List.Skip<N, Ar>
+    : readonly Ar[number][];
 
 // curried version
 export function skip<N extends SizeType.ArgArr>(
   num: N,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => N extends StructuralPrefixLength
-  ? List.Skip<N, Ar>
-  : readonly Ar[number][];
+) => HasLengthConstraint<Ar> extends true
+  ? readonly Ar[number][]
+  : N extends StructuralPrefixLength
+    ? List.Skip<N, Ar>
+    : readonly Ar[number][];
 
 export function skip<E>(
   ...args: readonly [readonly E[], SizeType.ArgArr] | readonly [SizeType.ArgArr]
@@ -265,18 +283,22 @@ export function skipLast<
 >(
   array: Ar,
   num: N,
-): N extends StructuralPrefixLength
-  ? List.SkipLast<N, Ar>
-  : readonly Ar[number][];
+): HasLengthConstraint<Ar> extends true
+  ? readonly Ar[number][]
+  : N extends StructuralPrefixLength
+    ? List.SkipLast<N, Ar>
+    : readonly Ar[number][];
 
 // curried version
 export function skipLast<N extends SizeType.ArgArr>(
   num: N,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => N extends StructuralPrefixLength
-  ? List.SkipLast<N, Ar>
-  : readonly Ar[number][];
+) => HasLengthConstraint<Ar> extends true
+  ? readonly Ar[number][]
+  : N extends StructuralPrefixLength
+    ? List.SkipLast<N, Ar>
+    : readonly Ar[number][];
 
 export function skipLast<E>(
   ...args:

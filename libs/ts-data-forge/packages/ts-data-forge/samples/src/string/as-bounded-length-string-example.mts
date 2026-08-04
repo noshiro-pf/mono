@@ -5,7 +5,7 @@ import { type BoundedLengthString } from 'ts-type-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const userId = Str.asBoundedLengthString('user-12345678', 8, 16);
+    const userId = Str.asBoundedLengthString(8, 16, 'user-12345678');
 
     const relaxed: BoundedLengthString<1, 255> = userId; // OK ([8, 16] ⊆ [1, 255])
 
@@ -16,7 +16,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(asUserId('user-87654321'), 'user-87654321');
 
-    assert.throws(() => Str.asBoundedLengthString('user', 8, 16)); // length 4 < 8
+    assert.throws(() => Str.asBoundedLengthString(8, 16, 'user')); // length 4 < 8
 
     // embed-sample-code-ignore-below
   });

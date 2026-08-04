@@ -8,6 +8,7 @@ import {
 import { expectType } from '../../expect-type.mjs';
 import {
   asBoundedLengthArray,
+  asEmptyArray,
   asFixedLengthArray,
   asMaxLengthArray,
   asMinLengthArray,
@@ -18,7 +19,7 @@ describe(asFixedLengthArray, () => {
   test('should return the input when the length matches exactly', () => {
     const xs: readonly number[] = [0, 1, 2, 3] as const;
 
-    const casted = asFixedLengthArray(xs, 4);
+    const casted = asFixedLengthArray(4, xs);
 
     expect(casted).toBe(xs);
 
@@ -31,9 +32,9 @@ describe(asFixedLengthArray, () => {
   });
 
   test('should throw when the length does not match', () => {
-    expect(() => asFixedLengthArray([0, 1, 2], 4)).toThrow(TypeError);
+    expect(() => asFixedLengthArray(4, [0, 1, 2])).toThrow(TypeError);
 
-    expect(() => asFixedLengthArray([0, 1, 2], 4)).toThrow(
+    expect(() => asFixedLengthArray(4, [0, 1, 2])).toThrow(
       'Expected an array of length 4, got an array of length 3',
     );
   });
@@ -41,7 +42,7 @@ describe(asFixedLengthArray, () => {
   test('should preserve the original array type', () => {
     const tuple = [1, 2, 3] as const;
 
-    const casted = asFixedLengthArray(tuple, 3);
+    const casted = asFixedLengthArray(3, tuple);
 
     expect(casted).toBe(tuple);
 
@@ -78,7 +79,7 @@ describe(asMinLengthArray, () => {
   test('should return the input when the array is long enough', () => {
     const xs: readonly number[] = [0, 1, 2, 3] as const;
 
-    const casted = asMinLengthArray(xs, 3);
+    const casted = asMinLengthArray(3, xs);
 
     expect(casted).toBe(xs);
 
@@ -88,9 +89,9 @@ describe(asMinLengthArray, () => {
   });
 
   test('should throw when the array is too short', () => {
-    expect(() => asMinLengthArray([0], 3)).toThrow(TypeError);
+    expect(() => asMinLengthArray(3, [0])).toThrow(TypeError);
 
-    expect(() => asMinLengthArray([0], 3)).toThrow(
+    expect(() => asMinLengthArray(3, [0])).toThrow(
       'Expected an array of length >= 3, got an array of length 1',
     );
   });
@@ -120,7 +121,7 @@ describe(asMaxLengthArray, () => {
   test('should return the input when the array is short enough', () => {
     const xs: readonly number[] = [0, 1, 2] as const;
 
-    const casted = asMaxLengthArray(xs, 8);
+    const casted = asMaxLengthArray(8, xs);
 
     expect(casted).toBe(xs);
 
@@ -130,9 +131,9 @@ describe(asMaxLengthArray, () => {
   });
 
   test('should throw when the array is too long', () => {
-    expect(() => asMaxLengthArray([0, 1, 2], 2)).toThrow(TypeError);
+    expect(() => asMaxLengthArray(2, [0, 1, 2])).toThrow(TypeError);
 
-    expect(() => asMaxLengthArray([0, 1, 2], 2)).toThrow(
+    expect(() => asMaxLengthArray(2, [0, 1, 2])).toThrow(
       'Expected an array of length <= 2, got an array of length 3',
     );
   });
@@ -162,7 +163,7 @@ describe(asBoundedLengthArray, () => {
   test('should return the input when the length is within the range', () => {
     const xs: readonly number[] = [1, 2, 3] as const;
 
-    const casted = asBoundedLengthArray(xs, 1, 5);
+    const casted = asBoundedLengthArray(1, 5, xs);
 
     expect(casted).toBe(xs);
 
@@ -174,9 +175,9 @@ describe(asBoundedLengthArray, () => {
   });
 
   test('should throw when the length is out of the range', () => {
-    expect(() => asBoundedLengthArray([], 1, 5)).toThrow(TypeError);
+    expect(() => asBoundedLengthArray(1, 5, [])).toThrow(TypeError);
 
-    expect(() => asBoundedLengthArray([1, 2, 3, 4, 5, 6], 1, 5)).toThrow(
+    expect(() => asBoundedLengthArray(1, 5, [1, 2, 3, 4, 5, 6])).toThrow(
       'Expected an array of length in [1, 5], got an array of length 6',
     );
   });
@@ -240,5 +241,31 @@ describe(asNonEmptyArray, () => {
     expectType<typeof casted, readonly [1, 2, 3]>('<=');
 
     expectType<typeof casted, NonEmptyArray<1 | 2 | 3>>('<=');
+  });
+});
+
+describe(asEmptyArray, () => {
+  test('casts an empty array to the branded empty type', () => {
+    const values: readonly number[] = [] as const;
+
+    const casted = asEmptyArray(values);
+
+    expectType<typeof casted, FixedLengthArray<0, number>>('<=');
+
+    assert.deepStrictEqual<readonly number[]>(casted, []);
+  });
+
+  test('is the same value it was handed', () => {
+    const values: readonly number[] = [] as const;
+
+    expect(asEmptyArray(values)).toBe(values);
+  });
+
+  test('throws when the array is not empty', () => {
+    expect(() => asEmptyArray([1])).toThrow(TypeError);
+
+    expect(() => asEmptyArray([1])).toThrow(
+      'Expected an empty array, got an array of length 1',
+    );
   });
 });

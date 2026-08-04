@@ -8,11 +8,11 @@ if (import.meta.vitest !== undefined) {
 
     const triple: readonly number[] = [1, 2, 3] as const;
 
-    assert.isTrue(Arr.isMaxLengthTuple(pair, 2));
+    assert.isTrue(Arr.isMaxLengthTuple(2, pair));
 
-    assert.isFalse(Arr.isMaxLengthTuple(triple, 2));
+    assert.isFalse(Arr.isMaxLengthTuple(2, triple));
 
-    if (Arr.isMaxLengthTuple(pair, 2)) {
+    if (Arr.isMaxLengthTuple(2, pair)) {
       assert.isTrue(pair.length <= 2);
     }
 

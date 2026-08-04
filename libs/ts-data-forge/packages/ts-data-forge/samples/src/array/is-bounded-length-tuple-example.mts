@@ -8,11 +8,11 @@ if (import.meta.vitest !== undefined) {
 
     const quad: readonly number[] = [1, 2, 3, 4] as const;
 
-    assert.isTrue(Arr.isBoundedLengthTuple(pair, 1, 3));
+    assert.isTrue(Arr.isBoundedLengthTuple(1, 3, pair));
 
-    assert.isFalse(Arr.isBoundedLengthTuple(quad, 1, 3));
+    assert.isFalse(Arr.isBoundedLengthTuple(1, 3, quad));
 
-    if (Arr.isBoundedLengthTuple(pair, 1, 3)) {
+    if (Arr.isBoundedLengthTuple(1, 3, pair)) {
       assert.isTrue(pair.length >= 1 && pair.length <= 3);
     }
 

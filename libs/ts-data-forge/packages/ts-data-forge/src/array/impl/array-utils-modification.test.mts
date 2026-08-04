@@ -1,6 +1,13 @@
-import { type FixedLengthTuple, type NonEmptyArray } from 'ts-type-forge';
+import {
+  type BoundedLengthArray,
+  type FixedLengthArray,
+  type FixedLengthTuple,
+  type MinLengthArray,
+  type NonEmptyArray,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { asUint32 } from '../../number/index.mjs';
+import { type SizeType } from '../../types.mjs';
 import {
   set,
   toFilled,
@@ -18,7 +25,7 @@ describe('Arr modifications', () => {
 
     const result = toUpdated(xs, 1, (x) => x + 2);
 
-    expectType<typeof result, FixedLengthTuple<3, number>>('=');
+    expectType<typeof result, readonly [1, number, 3]>('=');
 
     test('case 1', () => {
       assert.deepStrictEqual(result, [1, 4, 3]);
@@ -305,7 +312,7 @@ describe('Arr modifications', () => {
   describe(set, () => {
     const result = set([1, 2, 3], 1, 4);
 
-    expectType<typeof result, readonly [1 | 4, 2 | 4, 3 | 4]>('=');
+    expectType<typeof result, readonly [1, 4, 3]>('=');
 
     test('case 1', () => {
       assert.deepStrictEqual(result, [1, 4, 3]);
@@ -316,9 +323,7 @@ describe('Arr modifications', () => {
 
       const withString = set(nums, 1, 'two');
 
-      expectType<typeof withString, readonly [1 | 'two', 2 | 'two', 3 | 'two']>(
-        '=',
-      );
+      expectType<typeof withString, readonly [1, 'two', 3]>('=');
 
       assert.deepStrictEqual(withString, [1, 'two', 3]);
     });
@@ -348,3 +353,85 @@ describe('Arr modifications', () => {
     });
   });
 });
+
+/* `Arr.set` / `Arr.toUpdated` across the input shapes the positional
+   `ConstrainedList.SetAt` annotation has to cope with; the suite previously
+   covered only the plain-tuple case. Written as an unexported-by-value function
+   so the assertions get real overload resolution — it is never called, and the
+   branded shapes have no runtime representation to build. */
+export const setTypeChecks = (
+  shapeTuple: readonly [1, 2, 3],
+  shapeArray: readonly number[],
+  shapeMutableArray: readonly number[],
+  shapeBranded: MinLengthArray<3, string>,
+  shapeBounded: BoundedLengthArray<2, 5, string>,
+  shapeFixed: FixedLengthArray<3, string>,
+  shapeBrandedTuple: MinLengthArray<3, number> & readonly [1, 2, 3, 4, 5],
+  unionIndex: 0 | 2,
+  widenedIndex: SizeType.ArgArr,
+): void => {
+  /* Plain tuple — the point of the positional form: only the touched position
+     changes, the rest keep their literal types. */
+  const _onTuple = set(shapeTuple, 1, 'x');
+
+  expectType<typeof _onTuple, readonly [1, 'x', 3]>('=');
+
+  // Plain array: no positions to pin, so the element type widens.
+  const _onArray = set(shapeArray, widenedIndex, 'x');
+
+  expectType<typeof _onArray, readonly (number | 'x')[]>('=');
+
+  // A mutable array is not brand-carrying, and behaves like the readonly one.
+  const _onMutable = set(shapeMutableArray, widenedIndex, 'x');
+
+  expectType<typeof _onMutable, readonly (number | 'x')[]>('=');
+
+  /* Branded with no exact tuple: the length constraint survives, and with no
+     positions to pin the element type absorbs the new value. */
+  const _onBranded = set(shapeBranded, 1, 'x');
+
+  expectType<typeof _onBranded, MinLengthArray<3, string>>('<=');
+
+  const _onBounded = set(shapeBounded, 1, 'x');
+
+  expectType<typeof _onBounded, BoundedLengthArray<2, 5, string>>('<=');
+
+  // Fixed length: brand *and* exact positions both survive.
+  const _onFixed = set(shapeFixed, 1, 'x');
+
+  expectType<
+    typeof _onFixed,
+    FixedLengthArray<3, string> & readonly [string, 'x', string]
+  >('~=');
+
+  /* Brand intersected with an exact tuple — the shape `Arr.isMinLengthArray`
+     produces. All three survive: the brand, the exact length, and the
+     positions, the last as a structural conjunct beside the widened one. */
+  const _onBrandedTuple = set(shapeBrandedTuple, 1, 'x');
+
+  expectType<(typeof _onBrandedTuple)[0], 1>('=');
+
+  expectType<(typeof _onBrandedTuple)[1], 'x'>('=');
+
+  expectType<(typeof _onBrandedTuple)[4], 5>('=');
+
+  expectType<(typeof _onBrandedTuple)['length'], 5>('=');
+
+  /* A union index must NOT be replaced positionally. The call sets one of the
+     positions and never both, so `readonly ['x', 2, 'x']` — what the upstream
+     `List.SetAt` used to answer for a union index — is a type that no possible
+     result satisfies. ts-type-forge 9.1.1 widens the candidate positions
+     instead, and only those: index 1 is not among `0 | 2`, so it stays `2`. */
+  const _onUnionIndex = set(shapeTuple, unionIndex, 'x');
+
+  expectType<typeof _onUnionIndex, readonly [1 | 'x', 2, 3 | 'x']>('=');
+
+  // `toUpdated` follows `set`, with the updater's return as the value.
+  const _updatedTuple = toUpdated(shapeTuple, 1, (x) => x + 1);
+
+  expectType<typeof _updatedTuple, readonly [1, number, 3]>('=');
+
+  const _updatedUnion = toUpdated(shapeTuple, unionIndex, (x) => x + 1);
+
+  expectType<typeof _updatedUnion, readonly [number, 2, number]>('=');
+};

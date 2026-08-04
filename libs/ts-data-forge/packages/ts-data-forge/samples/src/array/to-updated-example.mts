@@ -8,7 +8,7 @@ if (import.meta.vitest !== undefined) {
 
     const increased = Arr.toUpdated(temperatures, 1, (value) => value + 5);
 
-    const incrementLast = Arr.toUpdated<number>(
+    const incrementLast = Arr.toUpdated<2, number>(
       2,
       (value) => value + 1,
     )(temperatures);

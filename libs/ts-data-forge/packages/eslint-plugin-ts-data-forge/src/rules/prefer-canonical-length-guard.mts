@@ -52,28 +52,44 @@ const MESSAGES = {
 } as const satisfies Record<MessageIds, string>;
 
 /**
- * Length guards whose bound makes them redundant with `Arr.isEmpty` /
- * `Arr.isNonEmpty`, keyed by guard name.
+ * Length guards whose bound makes them redundant with a named degenerate
+ * guard, keyed by guard name.
  *
- * `isEmpty` narrows to `FixedLengthArray<0, E> & Xs` and `isNonEmpty` to
- * `MinLengthArray<1, E> & Xs`, so:
+ * Every entry stays inside its own family rather than crossing the
+ * branded/structural divide:
  *
- * - The `*Array` entries are **type-identical** — `isFixedLengthArray(xs, 0)`
- *   and `isMinLengthArray(xs, 1)` produce exactly those types.
- * - The `*Tuple` entries **narrow**: they resolve to the structural
- *   `readonly []` / `readonly [E, ...E[]]`, and the canonical guards add the
- *   brand on top. The result stays assignable everywhere the old type was, so
- *   the rewrite is safe, but it is a strengthening rather than a pure rename.
+ * - the branded `*Array` guards go to `isEmpty` / `isNonEmpty`, which narrow to
+ *   `FixedLengthArray<0, E> & Xs` / `MinLengthArray<1, E> & Xs`;
+ * - the structural `*Tuple` guards go to `isEmptyTuple` / `isNonEmptyTuple`,
+ *   which narrow to `readonly []` / `MinLengthTuple<1, E>`.
+ *
+ * Most entries are then **type-identical** — `isFixedLengthArray(0, xs)` and
+ * `isMinLengthArray(1, xs)` produce exactly what `isEmpty` / `isNonEmpty`
+ * narrow to, and `FixedLengthTuple<0, E>`, `MaxLengthTuple<0, E>` and
+ * `BoundedLengthTuple<0, 0, E>` are all `readonly []`. Two *strengthen*:
+ * `MaxLengthArray<0, E>` and `BoundedLengthArray<0, 0, E>` do not include the
+ * `readonly []` structural part that `FixedLengthArray<0, E>` intersects on, so
+ * rewriting them to `isEmpty` adds it. That is sound for a guard — the narrowed
+ * type only flows outwards, and the stronger type is assignable everywhere the
+ * old one was — and it stays within the branded family.
+ *
+ * Sending a `*Tuple` guard to the branded `isEmpty` would also be sound, but it
+ * would silently change which family the value belongs to, which is why each
+ * family keeps its own lane.
  */
 const GUARD_REWRITES = [
   { guard: 'isFixedLengthArray', bounds: [0], replacement: 'isEmpty' },
-  { guard: 'isFixedLengthTuple', bounds: [0], replacement: 'isEmpty' },
-  { guard: 'isMaxLengthTuple', bounds: [0], replacement: 'isEmpty' },
   { guard: 'isMaxLengthArray', bounds: [0], replacement: 'isEmpty' },
-  { guard: 'isBoundedLengthTuple', bounds: [0, 0], replacement: 'isEmpty' },
   { guard: 'isBoundedLengthArray', bounds: [0, 0], replacement: 'isEmpty' },
   { guard: 'isMinLengthArray', bounds: [1], replacement: 'isNonEmpty' },
-  { guard: 'isMinLengthTuple', bounds: [1], replacement: 'isNonEmpty' },
+  { guard: 'isFixedLengthTuple', bounds: [0], replacement: 'isEmptyTuple' },
+  { guard: 'isMaxLengthTuple', bounds: [0], replacement: 'isEmptyTuple' },
+  {
+    guard: 'isBoundedLengthTuple',
+    bounds: [0, 0],
+    replacement: 'isEmptyTuple',
+  },
+  { guard: 'isMinLengthTuple', bounds: [1], replacement: 'isNonEmptyTuple' },
 ] as const satisfies readonly Readonly<{
   guard: string;
   bounds: readonly number[];
@@ -88,7 +104,7 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Normalize array-length checks to their canonical `Arr` guard: `xs.length <op> n` becomes the matching `Arr.is*` guard, and degenerate guards (e.g. `Arr.isFixedLengthTuple(xs, 0)`) become `Arr.isEmpty` / `Arr.isNonEmpty`.',
+        'Normalize array-length checks to their canonical `Arr` guard: `xs.length <op> n` becomes the matching `Arr.is*` guard, and a degenerate guard becomes the named one for its family (`Arr.isFixedLengthArray(0, xs)` → `Arr.isEmpty`, `Arr.isFixedLengthTuple(0, xs)` → `Arr.isEmptyTuple`).',
     },
     fixable: 'code',
     schema: [],
@@ -125,7 +141,8 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
             return;
           }
 
-          const [array] = node.arguments;
+          // The array is the last argument; the bounds precede it.
+          const array = node.arguments[rewrite.bounds.length];
 
           if (array === undefined) return;
 
@@ -137,7 +154,7 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
             data: {
               arrName: arrLocalName,
               guard: guardName,
-              boundsText: ['…', ...rewrite.bounds.map(String)].join(', '),
+              boundsText: [...rewrite.bounds.map(String), '…'].join(', '),
               replacement: rewrite.replacement,
             },
             fix: (fixer) =>
@@ -207,8 +224,11 @@ const getGuardName = (
 };
 
 /**
- * Whether the call is `guard(array, ...bounds)` with every bound written as the
+ * Whether the call is `guard(...bounds, array)` with every bound written as the
  * exact numeric literal the rewrite requires.
+ *
+ * The arity check also excludes the curried form (`guard(...bounds)`): the
+ * degenerate guards take only the array, so there is nothing to rewrite it to.
  */
 const matchesBounds = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -224,8 +244,7 @@ const matchesBounds = (
   return args.every(
     (arg, index) =>
       arg.type !== AST_NODE_TYPES.SpreadElement &&
-      (index === 0 ||
-        (arg.type === AST_NODE_TYPES.Literal &&
-          arg.value === bounds[index - 1])),
+      (index === bounds.length ||
+        (arg.type === AST_NODE_TYPES.Literal && arg.value === bounds[index])),
   );
 };

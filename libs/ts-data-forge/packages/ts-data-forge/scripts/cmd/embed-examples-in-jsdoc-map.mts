@@ -51,15 +51,31 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sourcePath: 'src/array/impl/array-utils-validation.mts',
     sampleFiles: [
       'samples/src/array/is-array-example.mts',
+      'samples/src/array/every-example.mts',
+      'samples/src/array/some-example.mts',
+      'samples/src/array/index-is-in-range-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/array/impl/array-utils-length-bounded-array-guard.mts',
+    sampleFiles: [
+      'samples/src/array/is-min-length-array-example.mts',
+      'samples/src/array/is-max-length-array-example.mts',
+      'samples/src/array/is-bounded-length-array-example.mts',
+      'samples/src/array/is-fixed-length-array-example.mts',
       'samples/src/array/is-empty-example.mts',
       'samples/src/array/is-non-empty-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/array/impl/array-utils-length-bounded-tuple-guard.mts',
+    sampleFiles: [
+      'samples/src/array/is-empty-tuple-example.mts',
+      'samples/src/array/is-non-empty-tuple-example.mts',
       'samples/src/array/is-fixed-length-tuple-example.mts',
       'samples/src/array/is-min-length-tuple-example.mts',
       'samples/src/array/is-max-length-tuple-example.mts',
       'samples/src/array/is-bounded-length-tuple-example.mts',
-      'samples/src/array/every-example.mts',
-      'samples/src/array/some-example.mts',
-      'samples/src/array/index-is-in-range-example.mts',
     ],
   },
   {

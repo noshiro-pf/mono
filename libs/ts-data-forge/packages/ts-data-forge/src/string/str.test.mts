@@ -10,31 +10,31 @@ import { Str } from './str.mjs';
 
 describe(Str.isMinLengthString, () => {
   test('should return true when the string is long enough', () => {
-    assert.isTrue(Str.isMinLengthString('hello', 3));
+    assert.isTrue(Str.isMinLengthString(3, 'hello'));
 
-    assert.isTrue(Str.isMinLengthString('hello', 5));
+    assert.isTrue(Str.isMinLengthString(5, 'hello'));
 
-    assert.isTrue(Str.isMinLengthString('', 0));
+    assert.isTrue(Str.isMinLengthString(0, ''));
 
-    assert.isTrue(Str.isMinLengthString(' ', 1)); // Space counts
+    assert.isTrue(Str.isMinLengthString(1, ' ')); // Space counts
   });
 
   test('should return false when the string is too short', () => {
-    assert.isFalse(Str.isMinLengthString('hi', 3));
+    assert.isFalse(Str.isMinLengthString(3, 'hi'));
 
-    assert.isFalse(Str.isMinLengthString('', 1));
+    assert.isFalse(Str.isMinLengthString(1, ''));
   });
 
   test('should measure length in UTF-16 code units', () => {
-    assert.isTrue(Str.isMinLengthString('🎉', 2)); // Surrogate pair
+    assert.isTrue(Str.isMinLengthString(2, '🎉')); // Surrogate pair
 
-    assert.isFalse(Str.isMinLengthString('🎉', 3));
+    assert.isFalse(Str.isMinLengthString(3, '🎉'));
   });
 
   test('should act as a type guard', () => {
     const value: string = 'very-secret-password';
 
-    if (Str.isMinLengthString(value, 12)) {
+    if (Str.isMinLengthString(12, value)) {
       expectType<typeof value, MinLengthString<12>>('<=');
 
       expectType<typeof value, NonEmptyString>('<='); // 12 >= 1
@@ -48,7 +48,7 @@ describe(Str.isMinLengthString, () => {
   test('should preserve literal string types', () => {
     const literal = 'hello';
 
-    if (Str.isMinLengthString(literal, 3)) {
+    if (Str.isMinLengthString(3, literal)) {
       expectType<typeof literal, 'hello'>('<=');
 
       expectType<typeof literal, MinLengthString<3>>('<=');
@@ -58,29 +58,29 @@ describe(Str.isMinLengthString, () => {
 
 describe(Str.isMaxLengthString, () => {
   test('should return true when the string is short enough', () => {
-    assert.isTrue(Str.isMaxLengthString('hello', 10));
+    assert.isTrue(Str.isMaxLengthString(10, 'hello'));
 
-    assert.isTrue(Str.isMaxLengthString('hello', 5));
+    assert.isTrue(Str.isMaxLengthString(5, 'hello'));
 
-    assert.isTrue(Str.isMaxLengthString('', 0));
+    assert.isTrue(Str.isMaxLengthString(0, ''));
   });
 
   test('should return false when the string is too long', () => {
-    assert.isFalse(Str.isMaxLengthString('hello', 3));
+    assert.isFalse(Str.isMaxLengthString(3, 'hello'));
 
-    assert.isFalse(Str.isMaxLengthString(' ', 0));
+    assert.isFalse(Str.isMaxLengthString(0, ' '));
   });
 
   test('should measure length in UTF-16 code units', () => {
-    assert.isFalse(Str.isMaxLengthString('🎉', 1)); // Surrogate pair
+    assert.isFalse(Str.isMaxLengthString(1, '🎉')); // Surrogate pair
 
-    assert.isTrue(Str.isMaxLengthString('🎉', 2));
+    assert.isTrue(Str.isMaxLengthString(2, '🎉'));
   });
 
   test('should act as a type guard', () => {
     const value: string = 'noshiro';
 
-    if (Str.isMaxLengthString(value, 32)) {
+    if (Str.isMaxLengthString(32, value)) {
       expectType<typeof value, MaxLengthString<32>>('<=');
 
       expectType<typeof value, MaxLengthString<64>>('<='); // 32 <= 64
@@ -94,25 +94,25 @@ describe(Str.isMaxLengthString, () => {
 
 describe(Str.isBoundedLengthString, () => {
   test('should return true when the length is within the range', () => {
-    assert.isTrue(Str.isBoundedLengthString('user-12345678', 8, 16));
+    assert.isTrue(Str.isBoundedLengthString(8, 16, 'user-12345678'));
 
-    assert.isTrue(Str.isBoundedLengthString('12345678', 8, 16)); // Lower bound (inclusive)
+    assert.isTrue(Str.isBoundedLengthString(8, 16, '12345678')); // Lower bound (inclusive)
 
-    assert.isTrue(Str.isBoundedLengthString('1234567890123456', 8, 16)); // Upper bound (inclusive)
+    assert.isTrue(Str.isBoundedLengthString(8, 16, '1234567890123456')); // Upper bound (inclusive)
 
-    assert.isTrue(Str.isBoundedLengthString('', 0, 0));
+    assert.isTrue(Str.isBoundedLengthString(0, 0, ''));
   });
 
   test('should return false when the length is out of range', () => {
-    assert.isFalse(Str.isBoundedLengthString('user', 8, 16));
+    assert.isFalse(Str.isBoundedLengthString(8, 16, 'user'));
 
-    assert.isFalse(Str.isBoundedLengthString('12345678901234567', 8, 16));
+    assert.isFalse(Str.isBoundedLengthString(8, 16, '12345678901234567'));
   });
 
   test('should act as a type guard', () => {
     const value: string = 'user-12345678';
 
-    if (Str.isBoundedLengthString(value, 8, 16)) {
+    if (Str.isBoundedLengthString(8, 16, value)) {
       expectType<typeof value, BoundedLengthString<8, 16>>('<=');
 
       expectType<typeof value, BoundedLengthString<1, 255>>('<='); // [8, 16] ⊆ [1, 255]
@@ -130,25 +130,25 @@ describe(Str.isBoundedLengthString, () => {
 
 describe(Str.isFixedLengthString, () => {
   test('should return true only for the exact length', () => {
-    assert.isTrue(Str.isFixedLengthString('JP', 2));
+    assert.isTrue(Str.isFixedLengthString(2, 'JP'));
 
-    assert.isTrue(Str.isFixedLengthString('', 0));
+    assert.isTrue(Str.isFixedLengthString(0, ''));
 
-    assert.isFalse(Str.isFixedLengthString('JPN', 2));
+    assert.isFalse(Str.isFixedLengthString(2, 'JPN'));
 
-    assert.isFalse(Str.isFixedLengthString('J', 2));
+    assert.isFalse(Str.isFixedLengthString(2, 'J'));
   });
 
   test('should measure length in UTF-16 code units', () => {
-    assert.isTrue(Str.isFixedLengthString('🎉', 2)); // Surrogate pair
+    assert.isTrue(Str.isFixedLengthString(2, '🎉')); // Surrogate pair
 
-    assert.isFalse(Str.isFixedLengthString('🎉', 1));
+    assert.isFalse(Str.isFixedLengthString(1, '🎉'));
   });
 
   test('should act as a type guard', () => {
     const value: string = 'JP';
 
-    if (Str.isFixedLengthString(value, 2)) {
+    if (Str.isFixedLengthString(2, value)) {
       expectType<typeof value, FixedLengthString<2>>('<=');
 
       expectType<typeof value, BoundedLengthString<2, 2>>('<=');
@@ -166,7 +166,7 @@ describe(Str.isFixedLengthString, () => {
 
 describe('Str length-bounded casts', () => {
   test('asMinLengthString returns the value and narrows its type', () => {
-    const result = Str.asMinLengthString('very-secret', 3);
+    const result = Str.asMinLengthString(3, 'very-secret');
 
     expectType<typeof result, MinLengthString<3>>('<=');
 
@@ -174,11 +174,11 @@ describe('Str length-bounded casts', () => {
   });
 
   test('asMinLengthString throws when too short', () => {
-    assert.throws(() => Str.asMinLengthString('hi', 3), TypeError);
+    assert.throws(() => Str.asMinLengthString(3, 'hi'), TypeError);
   });
 
   test('asMaxLengthString returns the value and narrows its type', () => {
-    const result = Str.asMaxLengthString('noshiro', 32);
+    const result = Str.asMaxLengthString(32, 'noshiro');
 
     expectType<typeof result, MaxLengthString<32>>('<=');
 
@@ -186,11 +186,11 @@ describe('Str length-bounded casts', () => {
   });
 
   test('asMaxLengthString throws when too long', () => {
-    assert.throws(() => Str.asMaxLengthString('noshiro', 3), TypeError);
+    assert.throws(() => Str.asMaxLengthString(3, 'noshiro'), TypeError);
   });
 
   test('asBoundedLengthString returns the value and narrows its type', () => {
-    const result = Str.asBoundedLengthString('user-12345678', 8, 16);
+    const result = Str.asBoundedLengthString(8, 16, 'user-12345678');
 
     expectType<typeof result, BoundedLengthString<8, 16>>('<=');
 
@@ -198,11 +198,11 @@ describe('Str length-bounded casts', () => {
   });
 
   test('asBoundedLengthString throws when out of range', () => {
-    assert.throws(() => Str.asBoundedLengthString('user', 8, 16), TypeError);
+    assert.throws(() => Str.asBoundedLengthString(8, 16, 'user'), TypeError);
   });
 
   test('asFixedLengthString returns the value and narrows its type', () => {
-    const result = Str.asFixedLengthString('JP', 2);
+    const result = Str.asFixedLengthString(2, 'JP');
 
     expectType<typeof result, FixedLengthString<2>>('<=');
 
@@ -210,7 +210,7 @@ describe('Str length-bounded casts', () => {
   });
 
   test('asFixedLengthString throws when the length differs', () => {
-    assert.throws(() => Str.asFixedLengthString('JP', 3), TypeError);
+    assert.throws(() => Str.asFixedLengthString(3, 'JP'), TypeError);
   });
 });
 

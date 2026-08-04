@@ -8,11 +8,11 @@ if (import.meta.vitest !== undefined) {
 
     const emptyQueue: readonly string[] = [] as const;
 
-    assert.isTrue(Arr.isMinLengthTuple(queue, 1));
+    assert.isTrue(Arr.isMinLengthTuple(1, queue));
 
-    assert.isFalse(Arr.isMinLengthTuple(emptyQueue, 1));
+    assert.isFalse(Arr.isMinLengthTuple(1, emptyQueue));
 
-    if (Arr.isMinLengthTuple(queue, 1)) {
+    if (Arr.isMinLengthTuple(1, queue)) {
       assert.isTrue(queue[0] === 'task-1');
     }
 

@@ -76,7 +76,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs: readonly number[] = [1, 2, 3];
-          const ok = Arr.isFixedLengthArray(xs, 3);
+          const ok = Arr.isFixedLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },
@@ -89,7 +89,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs: readonly number[] = [1, 2, 3];
-          const ok = Arr.isFixedLengthArray(xs, 3);
+          const ok = Arr.isFixedLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },
@@ -102,7 +102,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
-          const ok = Arr.isFixedLengthArray(xs, 3);
+          const ok = Arr.isFixedLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },
@@ -115,7 +115,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3] as const;
-          const ok = Arr.isFixedLengthArray(xs, 3);
+          const ok = Arr.isFixedLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },
@@ -130,7 +130,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
           const n = 3;
-          const ok = Arr.isFixedLengthArray(xs, n);
+          const ok = Arr.isFixedLengthArray(n, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },
@@ -146,7 +146,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
           import { Arr } from 'ts-data-forge';
 
           const xs = [1, 2, 3];
-          const ok = Arr.isFixedLengthArray(xs, 3);
+          const ok = Arr.isFixedLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },
@@ -162,8 +162,8 @@ describe('prefer-arr-is-fixed-length-array', () => {
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
           const ys = [4, 5];
-          const ok1 = Arr.isFixedLengthArray(xs, 3);
-          const ok2 = Arr.isFixedLengthArray(ys, 2);
+          const ok1 = Arr.isFixedLengthArray(3, xs);
+          const ok2 = Arr.isFixedLengthArray(2, ys);
         `,
         errors: [
           { messageId: 'useIsFixedLengthArray' },
@@ -179,7 +179,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs: readonly number[] = [1, 2, 3];
-          const ok = !Arr.isFixedLengthArray(xs, 3);
+          const ok = !Arr.isFixedLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },
@@ -192,7 +192,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs: readonly number[] = [1, 2, 3];
-          const ok = !Arr.isFixedLengthArray(xs, 3);
+          const ok = !Arr.isFixedLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },
@@ -205,7 +205,7 @@ describe('prefer-arr-is-fixed-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
-          const ok = !Arr.isFixedLengthArray(xs, 5);
+          const ok = !Arr.isFixedLengthArray(5, xs);
         `,
         errors: [{ messageId: 'useIsFixedLengthArray' }],
       },

@@ -90,7 +90,7 @@ describe('prefer-arr-is-min-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs: readonly number[] = [1, 2, 3];
-          const ok = Arr.isMinLengthArray(xs, 3);
+          const ok = Arr.isMinLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsMinLengthArray' }],
       },
@@ -103,7 +103,7 @@ describe('prefer-arr-is-min-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs: readonly number[] = [1, 2, 3];
-          const ok = Arr.isMinLengthArray(xs, 3);
+          const ok = Arr.isMinLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsMinLengthArray' }],
       },
@@ -116,7 +116,7 @@ describe('prefer-arr-is-min-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
-          const ok = Arr.isMinLengthArray(xs, 1);
+          const ok = Arr.isMinLengthArray(1, xs);
         `,
         errors: [{ messageId: 'useIsMinLengthArray' }],
       },
@@ -129,7 +129,7 @@ describe('prefer-arr-is-min-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3] as const;
-          const ok = Arr.isMinLengthArray(xs, 2);
+          const ok = Arr.isMinLengthArray(2, xs);
         `,
         errors: [{ messageId: 'useIsMinLengthArray' }],
       },
@@ -144,7 +144,7 @@ describe('prefer-arr-is-min-length-array', () => {
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
           const n = 2;
-          const ok = Arr.isMinLengthArray(xs, n);
+          const ok = Arr.isMinLengthArray(n, xs);
         `,
         errors: [{ messageId: 'useIsMinLengthArray' }],
       },
@@ -160,7 +160,7 @@ describe('prefer-arr-is-min-length-array', () => {
           import { Arr } from 'ts-data-forge';
 
           const xs = [1, 2, 3];
-          const ok = Arr.isMinLengthArray(xs, 1);
+          const ok = Arr.isMinLengthArray(1, xs);
         `,
         errors: [{ messageId: 'useIsMinLengthArray' }],
       },
@@ -176,8 +176,8 @@ describe('prefer-arr-is-min-length-array', () => {
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
           const ys = [4, 5];
-          const ok1 = Arr.isMinLengthArray(xs, 2);
-          const ok2 = Arr.isMinLengthArray(ys, 1);
+          const ok1 = Arr.isMinLengthArray(2, xs);
+          const ok2 = Arr.isMinLengthArray(1, ys);
         `,
         errors: [
           { messageId: 'useIsMinLengthArray' },
@@ -193,7 +193,7 @@ describe('prefer-arr-is-min-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
-          const ok = Arr.isMinLengthArray(xs, 1);
+          const ok = Arr.isMinLengthArray(1, xs);
         `,
         errors: [{ messageId: 'useIsMinLengthArray' }],
       },

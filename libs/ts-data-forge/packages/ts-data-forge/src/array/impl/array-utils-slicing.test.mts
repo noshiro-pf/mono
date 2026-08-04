@@ -1,3 +1,4 @@
+import { type MinLengthArray } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import {
   butLast,
@@ -219,3 +220,57 @@ describe('Arr slicing', () => {
     });
   });
 });
+
+/* Length-constrained inputs. `List.*` reports what it can see from a
+   fixed-length tuple, and a branded array's `length` is `number`, so it handed
+   the input type straight back — `tail` of an "at least 5" array claimed the
+   four-element result was still at least five. Never called; see the note in
+   `array-utils-modification.test.mts`. */
+export const slicingTypeChecks = (
+  brandedFive: MinLengthArray<5, string>,
+  brandedAndTuple: MinLengthArray<3, number> & readonly [1, 2, 3, 4, 5],
+): void => {
+  // The bound is recomputed rather than passed through.
+  const _tailed = tail(brandedFive);
+
+  expectType<typeof _tailed, MinLengthArray<4, string>>('~=');
+
+  const _butLasted = butLast(brandedFive);
+
+  expectType<typeof _butLasted, MinLengthArray<4, string>>('~=');
+
+  /* A brand intersected with an exact tuple keeps the positions too, so the
+     result is exact on both counts. */
+  const _tailedBoth = tail(brandedAndTuple);
+
+  expectType<(typeof _tailedBoth)[0], 2>('=');
+
+  expectType<(typeof _tailedBoth)['length'], 4>('=');
+
+  /* `take` / `takeLast` / `skip` / `skipLast` stay on the `List.*` path and give
+     a branded input the sound unconstrained answer instead of its stale brand.
+     They cannot use `ConstrainedList.Take` and friends: those rebuild the bounds
+     from `N` and cannot be instantiated against a still-generic `Ar` at all —
+     even with a literal `N` the deferred result is a union too complex to
+     represent. */
+  const _taken = take(brandedFive, 2);
+
+  expectType<typeof _taken, readonly string[]>('=');
+
+  const _skipped = skip(brandedFive, 2);
+
+  expectType<typeof _skipped, readonly string[]>('=');
+
+  // Plain tuples keep mapping exactly as before.
+  const _tailedTuple = tail([1, 2, 3] as const);
+
+  expectType<typeof _tailedTuple, readonly [2, 3]>('=');
+
+  const _butLastedTuple = butLast([1, 2, 3] as const);
+
+  expectType<typeof _butLastedTuple, readonly [1, 2]>('=');
+
+  const _takenTuple = take([1, 2, 3] as const, 2);
+
+  expectType<typeof _takenTuple, readonly [1, 2]>('=');
+};

@@ -85,7 +85,7 @@ describe('prefer-arr-is-bounded-length-array', () => {
           output: dedent`
             import { Arr } from 'ts-data-forge';
             const xs: readonly number[] = [1, 2, 3];
-            const ok = Arr.isBoundedLengthArray(xs, 1, 5);
+            const ok = Arr.isBoundedLengthArray(1, 5, xs);
           `,
           errors: [{ messageId: 'useIsBoundedLengthArray' }],
         },
@@ -98,7 +98,7 @@ describe('prefer-arr-is-bounded-length-array', () => {
           output: dedent`
             import { Arr } from 'ts-data-forge';
             const xs: readonly number[] = [1, 2, 3];
-            const ok = Arr.isBoundedLengthArray(xs, 1, 5);
+            const ok = Arr.isBoundedLengthArray(1, 5, xs);
           `,
           errors: [{ messageId: 'useIsBoundedLengthArray' }],
         },
@@ -111,7 +111,7 @@ describe('prefer-arr-is-bounded-length-array', () => {
           output: dedent`
             import { Arr } from 'ts-data-forge';
             const xs: readonly number[] = [1, 2, 3];
-            const ok = Arr.isBoundedLengthArray(xs, 1, 5);
+            const ok = Arr.isBoundedLengthArray(1, 5, xs);
           `,
           errors: [{ messageId: 'useIsBoundedLengthArray' }],
         },
@@ -128,7 +128,7 @@ describe('prefer-arr-is-bounded-length-array', () => {
             const xs = [1, 2, 3];
             const lo = 1;
             const hi = 5;
-            const ok = Arr.isBoundedLengthArray(xs, lo, hi);
+            const ok = Arr.isBoundedLengthArray(lo, hi, xs);
           `,
           errors: [{ messageId: 'useIsBoundedLengthArray' }],
         },
@@ -144,7 +144,7 @@ describe('prefer-arr-is-bounded-length-array', () => {
             import { Arr } from 'ts-data-forge';
 
             const xs = [1, 2, 3];
-            const ok = Arr.isBoundedLengthArray(xs, 1, 5);
+            const ok = Arr.isBoundedLengthArray(1, 5, xs);
           `,
           errors: [{ messageId: 'useIsBoundedLengthArray' }],
         },

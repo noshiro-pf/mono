@@ -1,5 +1,8 @@
 import {
+  type ChangeArrayElement,
+  type ConstrainedList,
   type FixedLengthTuple,
+  type HasLengthConstraint,
   type Increment,
   type IsFixedLengthList,
   type NonEmptyArray,
@@ -27,27 +30,17 @@ import { copy, create } from './array-utils-creation.mjs';
  * assert.deepStrictEqual(updated, [10, 25, 30]);
  * ```
  */
-export function set<const Ar extends readonly unknown[], const V = Ar[number]>(
-  array: Ar,
-  index: ArgArrayIndex<Ar>,
-  newValue: V,
-): IsFixedLengthList<Ar> extends true
-  ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<Ar[number] | V>
-    : readonly (Ar[number] | V)[];
+export function set<
+  const Ar extends readonly unknown[],
+  const I extends ArgArrayIndex<Ar>,
+  const V = Ar[number],
+>(array: Ar, index: I, newValue: V): ReplacedAt<Ar, I, V>;
 
 // curried version
-export function set<const V>(
-  index: SizeType.ArgArr,
+export function set<const I extends SizeType.ArgArr, const V>(
+  index: I,
   newValue: V,
-): <const Ar extends readonly unknown[]>(
-  array: Ar,
-) => IsFixedLengthList<Ar> extends true
-  ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<Ar[number] | V>
-    : readonly (Ar[number] | V)[];
+): <const Ar extends readonly unknown[]>(array: Ar) => ReplacedAt<Ar, I, V>;
 
 export function set<E, const V = E>(
   ...args:
@@ -79,7 +72,7 @@ const setImpl = <E, const V = E>(
  *
  * const increased = Arr.toUpdated(temperatures, 1, (value) => value + 5);
  *
- * const incrementLast = Arr.toUpdated<number>(
+ * const incrementLast = Arr.toUpdated<2, number>(
  *   2,
  *   (value) => value + 1,
  * )(temperatures);
@@ -91,28 +84,15 @@ const setImpl = <E, const V = E>(
  */
 export function toUpdated<
   const Ar extends readonly unknown[],
+  const I extends ArgArrayIndex<Ar>,
   const V = Ar[number],
->(
-  array: Ar,
-  index: ArgArrayIndex<Ar>,
-  updater: (prev: Ar[number]) => V,
-): IsFixedLengthList<Ar> extends true
-  ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<Ar[number] | V>
-    : readonly (Ar[number] | V)[];
+>(array: Ar, index: I, updater: (prev: Ar[number]) => V): ReplacedAt<Ar, I, V>;
 
 // curried version
-export function toUpdated<E, const V = E>(
-  index: SizeType.ArgArr,
+export function toUpdated<const I extends SizeType.ArgArr, E, const V = E>(
+  index: I,
   updater: (prev: E) => V,
-): <const Ar extends readonly E[]>(
-  array: Ar,
-) => IsFixedLengthList<Ar> extends true
-  ? Readonly<{ [K in keyof Ar]: Ar[K] | V }>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<Ar[number] | V>
-    : readonly (Ar[number] | V)[];
+): <const Ar extends readonly E[]>(array: Ar) => ReplacedAt<Ar, I, V>;
 
 export function toUpdated<E, V = E>(
   ...args:
@@ -379,22 +359,26 @@ const toUnshiftedImpl = <Ar extends readonly unknown[], const V>(
 export function toFilled<const Ar extends readonly unknown[], const V>(
   array: Ar,
   value: V,
-): IsFixedLengthList<Ar> extends true
-  ? FixedLengthTuple<Ar['length'], V>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<V>
-    : readonly V[];
+): HasLengthConstraint<Ar> extends true
+  ? ChangeArrayElement<Ar, V>
+  : IsFixedLengthList<Ar> extends true
+    ? FixedLengthTuple<Ar['length'], V>
+    : Ar extends NonEmptyTuple<unknown>
+      ? NonEmptyArray<V>
+      : readonly V[];
 
 // curried version
 export function toFilled<const V>(
   value: V,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => IsFixedLengthList<Ar> extends true
-  ? FixedLengthTuple<Ar['length'], V>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<V>
-    : readonly V[];
+) => HasLengthConstraint<Ar> extends true
+  ? ChangeArrayElement<Ar, V>
+  : IsFixedLengthList<Ar> extends true
+    ? FixedLengthTuple<Ar['length'], V>
+    : Ar extends NonEmptyTuple<unknown>
+      ? NonEmptyArray<V>
+      : readonly V[];
 
 export function toFilled<E>(
   ...args: readonly [array: readonly E[], value: E] | readonly [value: E]
@@ -435,11 +419,13 @@ export function toRangeFilled<const Ar extends readonly unknown[], const V>(
     start: ArgArrayIndexWithNegative<Ar>,
     end: ArgArrayIndexWithNegative<Ar>,
   ],
-): IsFixedLengthList<Ar> extends true
-  ? FixedLengthTuple<Ar['length'], V | Ar[number]>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<V | Ar[number]>
-    : readonly (V | Ar[number])[];
+): HasLengthConstraint<Ar> extends true
+  ? ChangeArrayElement<Ar, V | Ar[number]>
+  : IsFixedLengthList<Ar> extends true
+    ? FixedLengthTuple<Ar['length'], V | Ar[number]>
+    : Ar extends NonEmptyTuple<unknown>
+      ? NonEmptyArray<V | Ar[number]>
+      : readonly (V | Ar[number])[];
 
 // curried version
 export function toRangeFilled<const V>(
@@ -450,11 +436,13 @@ export function toRangeFilled<const V>(
   ],
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
-) => IsFixedLengthList<Ar> extends true
-  ? FixedLengthTuple<Ar['length'], V | Ar[number]>
-  : Ar extends NonEmptyTuple<unknown>
-    ? NonEmptyArray<V | Ar[number]>
-    : readonly (V | Ar[number])[];
+) => HasLengthConstraint<Ar> extends true
+  ? ChangeArrayElement<Ar, V | Ar[number]>
+  : IsFixedLengthList<Ar> extends true
+    ? FixedLengthTuple<Ar['length'], V | Ar[number]>
+    : Ar extends NonEmptyTuple<unknown>
+      ? NonEmptyArray<V | Ar[number]>
+      : readonly (V | Ar[number])[];
 
 export function toRangeFilled<E, const V>(
   ...args:
@@ -499,3 +487,30 @@ const toRangeFilledImpl = <E, const V>(
 
   return mut_cp;
 };
+
+/**
+ * The result of replacing the element at `I` of `Ar` with a `V`.
+ *
+ * `ConstrainedList.SetAt` replaces exactly one position when the index pins
+ * one, which is what makes `Arr.set(xs, 1, v)` report `readonly [a, V, c]`
+ * instead of widening every position to `a | V`.
+ *
+ * A union index needs the weaker answer, and this used to guard for it here:
+ * `ArgArrayIndex<Ar>` for a tuple is the union of its indices, so
+ * `Arr.set(tuple, someIndex, v)` with `someIndex: 0 | 2` binds `I = 0 | 2`, and
+ * the upstream `List.SetAt` used to answer `readonly [V, b, V]` — a type that
+ * *neither* possible runtime result satisfies, since the call replaces one
+ * position or the other and never both.
+ *
+ * ts-type-forge 9.1.1 fixes that at the source and widens the candidate
+ * positions itself, so the guard is gone. Upstream is the more precise of the
+ * two: it widens only the positions the index can name, where the guard here
+ * widened all of them — `Arr.set(t, i, 'x')` with `i: 0 | 2` on
+ * `readonly [1, 2, 3]` now keeps the middle element at `2` rather than
+ * reporting `2 | 'x'`.
+ */
+type ReplacedAt<
+  Ar extends readonly unknown[],
+  I extends number,
+  V,
+> = ConstrainedList.SetAt<I, V, Ar>;

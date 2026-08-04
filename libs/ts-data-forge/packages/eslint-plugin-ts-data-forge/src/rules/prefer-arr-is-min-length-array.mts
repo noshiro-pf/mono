@@ -123,7 +123,7 @@ export const preferArrIsMinLengthArray: TSESLint.RuleModule<
               length: lengthText,
             },
             fix: (fixer) => {
-              const replacement = `Arr.isMinLengthArray(${arrayText}, ${lengthText})`;
+              const replacement = `Arr.isMinLengthArray(${lengthText}, ${arrayText})`;
 
               const importFixes =
                 index === 0 && !hasArrImport

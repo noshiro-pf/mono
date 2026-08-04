@@ -7,11 +7,11 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const input: string = 'very-secret-password';
 
-    assert.isTrue(Str.isMinLengthString(input, 12));
+    assert.isTrue(Str.isMinLengthString(12, input));
 
-    assert.isFalse(Str.isMinLengthString('short', 12));
+    assert.isFalse(Str.isMinLengthString(12, 'short'));
 
-    if (Str.isMinLengthString(input, 12)) {
+    if (Str.isMinLengthString(12, input)) {
       const nonEmpty: NonEmptyString = input; // OK (12 >= 1)
 
       assert.isTrue(nonEmpty.length >= 12);

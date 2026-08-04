@@ -8,11 +8,11 @@ if (import.meta.vitest !== undefined) {
 
     const triple: readonly number[] = [1, 2, 3] as const;
 
-    assert.isTrue(Arr.isFixedLengthTuple(pair, 2));
+    assert.isTrue(Arr.isFixedLengthTuple(2, pair));
 
-    assert.isFalse(Arr.isFixedLengthTuple(triple, 2));
+    assert.isFalse(Arr.isFixedLengthTuple(2, triple));
 
-    if (Arr.isFixedLengthTuple(pair, 2)) {
+    if (Arr.isFixedLengthTuple(2, pair)) {
       assert.deepStrictEqual(pair, [1, 2]);
     }
 

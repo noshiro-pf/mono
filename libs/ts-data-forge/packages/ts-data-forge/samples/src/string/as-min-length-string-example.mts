@@ -5,7 +5,7 @@ import { type NonEmptyString } from 'ts-type-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const password = Str.asMinLengthString('very-secret-password', 12);
+    const password = Str.asMinLengthString(12, 'very-secret-password');
 
     const nonEmpty: NonEmptyString = password; // OK (>= 1)
 
@@ -16,7 +16,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(asPassword('another-secret'), 'another-secret');
 
-    assert.throws(() => Str.asMinLengthString('short', 12)); // length 5 < 12
+    assert.throws(() => Str.asMinLengthString(12, 'short')); // length 5 < 12
 
     // embed-sample-code-ignore-below
   });

@@ -43,7 +43,7 @@ namespace PreferCanonicalArraySlicing {
 }
 
 /**
- * @description Normalize array-length checks to their canonical `Arr` guard: `xs.length <op> n` becomes the matching `Arr.is*` guard, and degenerate guards (e.g. `Arr.isFixedLengthTuple(xs, 0)`) become `Arr.isEmpty` / `Arr.isNonEmpty`.
+ * @description Normalize array-length checks to their canonical `Arr` guard: `xs.length <op> n` becomes the matching `Arr.is*` guard, and a degenerate guard becomes the named one for its family (`Arr.isFixedLengthArray(0, xs)` → `Arr.isEmpty`, `Arr.isFixedLengthTuple(0, xs)` → `Arr.isEmptyTuple`).
  *
  *  ```md
  *  | key        | value      |
@@ -54,6 +54,21 @@ namespace PreferCanonicalArraySlicing {
  *  ```
  */
 namespace PreferCanonicalLengthGuard {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Normalize an `Arr` length cast whose bounds are degenerate (e.g. `Arr.asMinLengthArray(1, xs)`, `Arr.asFixedLengthTuple(0, xs)`) to the cast that names that constraint directly, staying within the branded `*Array` or structural `*Tuple` family.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferCanonicalLengthCast {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -238,6 +253,7 @@ namespace PreferComparisonOverNullishGuard {
 export type EslintTsDataForgeRules = Readonly<{
   'ts-data-forge/prefer-canonical-array-slicing': PreferCanonicalArraySlicing.RuleEntry;
   'ts-data-forge/prefer-canonical-length-guard': PreferCanonicalLengthGuard.RuleEntry;
+  'ts-data-forge/prefer-canonical-length-cast': PreferCanonicalLengthCast.RuleEntry;
   'ts-data-forge/prefer-arr-is-array': PreferArrIsArray.RuleEntry;
   'ts-data-forge/prefer-arr-sum': PreferArrSum.RuleEntry;
   'ts-data-forge/prefer-as-int': PreferAsInt.RuleEntry;

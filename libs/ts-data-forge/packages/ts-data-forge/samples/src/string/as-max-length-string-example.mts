@@ -5,7 +5,7 @@ import { type MaxLengthString } from 'ts-type-forge';
 if (import.meta.vitest !== undefined) {
   test('main', () => {
     // embed-sample-code-ignore-above
-    const userName = Str.asMaxLengthString('noshiro', 32);
+    const userName = Str.asMaxLengthString(32, 'noshiro');
 
     const relaxed: MaxLengthString<64> = userName; // OK (32 <= 64)
 
@@ -16,7 +16,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(asUserName('another-user'), 'another-user');
 
-    assert.throws(() => Str.asMaxLengthString('noshiro', 3)); // length 7 > 3
+    assert.throws(() => Str.asMaxLengthString(3, 'noshiro')); // length 7 > 3
 
     // embed-sample-code-ignore-below
   });

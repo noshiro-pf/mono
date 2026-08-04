@@ -7,30 +7,32 @@ import {
 import { expectType } from '../../expect-type.mjs';
 import {
   isBoundedLengthArray,
+  isEmpty,
   isFixedLengthArray,
   isMaxLengthArray,
   isMinLengthArray,
+  isNonEmpty,
 } from './array-utils-length-bounded-array-guard.mjs';
 
 describe(isMinLengthArray, () => {
   test('should return true when the array is long enough', () => {
-    assert.isTrue(isMinLengthArray([1, 2, 3], 3));
+    assert.isTrue(isMinLengthArray(3, [1, 2, 3]));
 
-    assert.isTrue(isMinLengthArray([1, 2, 3], 2));
+    assert.isTrue(isMinLengthArray(2, [1, 2, 3]));
 
-    assert.isTrue(isMinLengthArray([], 0));
+    assert.isTrue(isMinLengthArray(0, []));
   });
 
   test('should return false when the array is too short', () => {
-    assert.isFalse(isMinLengthArray([1, 2], 3));
+    assert.isFalse(isMinLengthArray(3, [1, 2]));
 
-    assert.isFalse(isMinLengthArray([], 1));
+    assert.isFalse(isMinLengthArray(1, []));
   });
 
   test('should act as a type guard', () => {
     const value: readonly number[] = [0, 1, 2, 3] as const;
 
-    if (isMinLengthArray(value, 3)) {
+    if (isMinLengthArray(3, value)) {
       expectType<typeof value, MinLengthArray<3, number>>('<=');
 
       expectType<typeof value, MinLengthArray<1, number>>('<='); // 3 >= 1
@@ -58,7 +60,7 @@ describe(isMinLengthArray, () => {
   test('should preserve the original array type', () => {
     const tuple = [1, 2, 3] as const;
 
-    if (isMinLengthArray(tuple, 2)) {
+    if (isMinLengthArray(2, tuple)) {
       expectType<typeof tuple, readonly [1, 2, 3]>('<=');
 
       expectType<typeof tuple, MinLengthArray<2, 1 | 2 | 3>>('<=');
@@ -68,23 +70,23 @@ describe(isMinLengthArray, () => {
 
 describe(isMaxLengthArray, () => {
   test('should return true when the array is short enough', () => {
-    assert.isTrue(isMaxLengthArray([1, 2, 3], 3));
+    assert.isTrue(isMaxLengthArray(3, [1, 2, 3]));
 
-    assert.isTrue(isMaxLengthArray([1, 2, 3], 4));
+    assert.isTrue(isMaxLengthArray(4, [1, 2, 3]));
 
-    assert.isTrue(isMaxLengthArray([], 0));
+    assert.isTrue(isMaxLengthArray(0, []));
   });
 
   test('should return false when the array is too long', () => {
-    assert.isFalse(isMaxLengthArray([1, 2, 3], 2));
+    assert.isFalse(isMaxLengthArray(2, [1, 2, 3]));
 
-    assert.isFalse(isMaxLengthArray([1], 0));
+    assert.isFalse(isMaxLengthArray(0, [1]));
   });
 
   test('should act as a type guard', () => {
     const value: readonly number[] = [0, 1, 2] as const;
 
-    if (isMaxLengthArray(value, 8)) {
+    if (isMaxLengthArray(8, value)) {
       expectType<typeof value, MaxLengthArray<8, number>>('<=');
 
       expectType<typeof value, MaxLengthArray<16, number>>('<='); // 8 <= 16
@@ -98,23 +100,23 @@ describe(isMaxLengthArray, () => {
 
 describe(isBoundedLengthArray, () => {
   test('should return true when the length is within the range', () => {
-    assert.isTrue(isBoundedLengthArray([1, 2, 3], 1, 5));
+    assert.isTrue(isBoundedLengthArray(1, 5, [1, 2, 3]));
 
-    assert.isTrue(isBoundedLengthArray([1], 1, 5));
+    assert.isTrue(isBoundedLengthArray(1, 5, [1]));
 
-    assert.isTrue(isBoundedLengthArray([1, 2, 3, 4, 5], 1, 5));
+    assert.isTrue(isBoundedLengthArray(1, 5, [1, 2, 3, 4, 5]));
   });
 
   test('should return false when the length is out of the range', () => {
-    assert.isFalse(isBoundedLengthArray([], 1, 5));
+    assert.isFalse(isBoundedLengthArray(1, 5, []));
 
-    assert.isFalse(isBoundedLengthArray([1, 2, 3, 4, 5, 6], 1, 5));
+    assert.isFalse(isBoundedLengthArray(1, 5, [1, 2, 3, 4, 5, 6]));
   });
 
   test('should act as a type guard', () => {
     const value: readonly number[] = [1, 2, 3] as const;
 
-    if (isBoundedLengthArray(value, 1, 5)) {
+    if (isBoundedLengthArray(1, 5, value)) {
       expectType<typeof value, BoundedLengthArray<1, 5, number>>('<=');
 
       expectType<typeof value, BoundedLengthArray<0, 100, number>>('<=');
@@ -130,21 +132,21 @@ describe(isBoundedLengthArray, () => {
 
 describe(isFixedLengthArray, () => {
   test('should return true when the length matches exactly', () => {
-    assert.isTrue(isFixedLengthArray([1, 2, 3], 3));
+    assert.isTrue(isFixedLengthArray(3, [1, 2, 3]));
 
-    assert.isTrue(isFixedLengthArray([], 0));
+    assert.isTrue(isFixedLengthArray(0, []));
   });
 
   test('should return false when the length does not match', () => {
-    assert.isFalse(isFixedLengthArray([1, 2, 3], 2));
+    assert.isFalse(isFixedLengthArray(2, [1, 2, 3]));
 
-    assert.isFalse(isFixedLengthArray([1, 2, 3], 4));
+    assert.isFalse(isFixedLengthArray(4, [1, 2, 3]));
   });
 
   test('should act as a type guard', () => {
     const value: readonly number[] = [255, 128, 0] as const;
 
-    if (isFixedLengthArray(value, 3)) {
+    if (isFixedLengthArray(3, value)) {
       expectType<typeof value, FixedLengthArray<3, number>>('<=');
 
       expectType<typeof value, MaxLengthArray<5, number>>('<='); // 3 <= 5
@@ -165,5 +167,114 @@ describe(isFixedLengthArray, () => {
 
       expect(value).toHaveLength(3);
     }
+  });
+});
+
+describe('curried length guards', () => {
+  test('isMinLengthArray narrows when applied later', () => {
+    const hasThree = isMinLengthArray(3);
+
+    assert.isTrue(hasThree([1, 2, 3]));
+
+    assert.isFalse(hasThree([1, 2]));
+
+    const value: readonly number[] = [0, 1, 2, 3] as const;
+
+    assert.isTrue(hasThree(value));
+
+    if (hasThree(value)) {
+      expectType<typeof value, MinLengthArray<3, number>>('<=');
+
+      const _first = value[0];
+
+      expectType<typeof _first, number>('=');
+    }
+  });
+
+  test('isMaxLengthArray narrows when applied later', () => {
+    const fitsInTwo = isMaxLengthArray(2);
+
+    assert.isTrue(fitsInTwo([1, 2]));
+
+    assert.isFalse(fitsInTwo([1, 2, 3]));
+
+    const value: readonly number[] = [1, 2] as const;
+
+    if (fitsInTwo(value)) {
+      expectType<typeof value, MaxLengthArray<2, number>>('<=');
+    }
+  });
+
+  test('isFixedLengthArray narrows when applied later', () => {
+    const isRgb = isFixedLengthArray(3);
+
+    assert.isTrue(isRgb([255, 128, 0]));
+
+    assert.isFalse(isRgb([255, 128]));
+
+    const value: readonly number[] = [255, 128, 0] as const;
+
+    if (isRgb(value)) {
+      expectType<typeof value, FixedLengthArray<3, number>>('<=');
+    }
+  });
+
+  test('isBoundedLengthArray narrows when applied later', () => {
+    const isSmallSelection = isBoundedLengthArray(1, 3);
+
+    assert.isTrue(isSmallSelection([1, 2]));
+
+    assert.isFalse(isSmallSelection([]));
+
+    assert.isFalse(isSmallSelection([1, 2, 3, 4]));
+
+    const value: readonly number[] = [1, 2] as const;
+
+    if (isSmallSelection(value)) {
+      expectType<typeof value, BoundedLengthArray<1, 3, number>>('<=');
+    }
+  });
+
+  test('the returned guard is reusable across arrays', () => {
+    const isNonEmptyEnough = isMinLengthArray(2);
+
+    assert.deepStrictEqual([[1], [1, 2], [1, 2, 3]].filter(isNonEmptyEnough), [
+      [1, 2],
+      [1, 2, 3],
+    ]);
+  });
+});
+
+describe('empty / non-empty guards', () => {
+  describe(isEmpty, () => {
+    const xs = [1, 2, 3] as const;
+
+    const result = isEmpty(xs);
+
+    expectType<typeof result, boolean>('=');
+
+    test('case 1', () => {
+      assert.isFalse(result);
+    });
+
+    test('case 2', () => {
+      assert.isTrue(isEmpty([]));
+    });
+  });
+
+  describe(isNonEmpty, () => {
+    const xs = [1, 2, 3] as const;
+
+    const result = isNonEmpty(xs);
+
+    expectType<typeof result, boolean>('=');
+
+    test('case 1', () => {
+      assert.isTrue(result);
+    });
+
+    test('case 2', () => {
+      assert.isFalse(isNonEmpty([]));
+    });
   });
 });

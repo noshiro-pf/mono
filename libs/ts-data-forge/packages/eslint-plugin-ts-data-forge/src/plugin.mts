@@ -9,6 +9,7 @@ import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
  */
 const recommendedRules = {
   'ts-data-forge/prefer-canonical-array-slicing': 'error',
+  'ts-data-forge/prefer-canonical-length-cast': 'error',
   'ts-data-forge/prefer-canonical-length-guard': 'error',
   'ts-data-forge/prefer-arr-is-array': 'error',
   'ts-data-forge/prefer-arr-sum': 'error',

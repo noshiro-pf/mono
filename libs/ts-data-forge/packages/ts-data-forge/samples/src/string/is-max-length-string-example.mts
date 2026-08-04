@@ -7,11 +7,11 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const input: string = 'noshiro';
 
-    assert.isTrue(Str.isMaxLengthString(input, 32));
+    assert.isTrue(Str.isMaxLengthString(32, input));
 
-    assert.isFalse(Str.isMaxLengthString(input, 3));
+    assert.isFalse(Str.isMaxLengthString(3, input));
 
-    if (Str.isMaxLengthString(input, 32)) {
+    if (Str.isMaxLengthString(32, input)) {
       const relaxed: MaxLengthString<64> = input; // OK (32 <= 64)
 
       assert.isTrue(relaxed.length <= 32);

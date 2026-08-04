@@ -89,7 +89,7 @@ describe('prefer-arr-is-max-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs: readonly number[] = [1, 2, 3];
-          const ok = Arr.isMaxLengthArray(xs, 3);
+          const ok = Arr.isMaxLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsMaxLengthArray' }],
       },
@@ -102,7 +102,7 @@ describe('prefer-arr-is-max-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs: readonly number[] = [1, 2, 3];
-          const ok = Arr.isMaxLengthArray(xs, 3);
+          const ok = Arr.isMaxLengthArray(3, xs);
         `,
         errors: [{ messageId: 'useIsMaxLengthArray' }],
       },
@@ -115,7 +115,7 @@ describe('prefer-arr-is-max-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
-          const ok = Arr.isMaxLengthArray(xs, 1);
+          const ok = Arr.isMaxLengthArray(1, xs);
         `,
         errors: [{ messageId: 'useIsMaxLengthArray' }],
       },
@@ -128,7 +128,7 @@ describe('prefer-arr-is-max-length-array', () => {
         output: dedent`
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3] as const;
-          const ok = Arr.isMaxLengthArray(xs, 2);
+          const ok = Arr.isMaxLengthArray(2, xs);
         `,
         errors: [{ messageId: 'useIsMaxLengthArray' }],
       },
@@ -143,7 +143,7 @@ describe('prefer-arr-is-max-length-array', () => {
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
           const n = 2;
-          const ok = Arr.isMaxLengthArray(xs, n);
+          const ok = Arr.isMaxLengthArray(n, xs);
         `,
         errors: [{ messageId: 'useIsMaxLengthArray' }],
       },
@@ -159,7 +159,7 @@ describe('prefer-arr-is-max-length-array', () => {
           import { Arr } from 'ts-data-forge';
 
           const xs = [1, 2, 3];
-          const ok = Arr.isMaxLengthArray(xs, 1);
+          const ok = Arr.isMaxLengthArray(1, xs);
         `,
         errors: [{ messageId: 'useIsMaxLengthArray' }],
       },
@@ -175,8 +175,8 @@ describe('prefer-arr-is-max-length-array', () => {
           import { Arr } from 'ts-data-forge';
           const xs = [1, 2, 3];
           const ys = [4, 5];
-          const ok1 = Arr.isMaxLengthArray(xs, 2);
-          const ok2 = Arr.isMaxLengthArray(ys, 1);
+          const ok1 = Arr.isMaxLengthArray(2, xs);
+          const ok2 = Arr.isMaxLengthArray(1, ys);
         `,
         errors: [
           { messageId: 'useIsMaxLengthArray' },

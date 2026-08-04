@@ -7,11 +7,11 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const input: string = 'JP';
 
-    assert.isTrue(Str.isFixedLengthString(input, 2));
+    assert.isTrue(Str.isFixedLengthString(2, input));
 
-    assert.isFalse(Str.isFixedLengthString(input, 3));
+    assert.isFalse(Str.isFixedLengthString(3, input));
 
-    if (Str.isFixedLengthString(input, 2)) {
+    if (Str.isFixedLengthString(2, input)) {
       const atMost5: MaxLengthString<5> = input; // OK (2 <= 5)
 
       assert.isTrue(atMost5.length === 2);
