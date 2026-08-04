@@ -41,10 +41,21 @@ jobs:
       group: pnpm-update-autofix-${{ github.event.workflow_run.head_branch }}
       cancel-in-progress: false
     steps:
+      # ラベル操作（ REST の issues/{n}/labels ）があるため issues: write も要求する。
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.REPO_AUTOMATION_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
+
       - name: Resolve PR, guard one attempt, disable auto-merge
         id: pr
         env:
-          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           BRANCH: ${{ github.event.workflow_run.head_branch }}
           LABEL: pnpm-update-autofix-attempted
         run: |
@@ -78,7 +89,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           fetch-depth: 0
 
       - name: Install pnpm
@@ -107,7 +118,7 @@ jobs:
         uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b # v1.0.183
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
           prompt: |
             The pull request on branch `${{ github.event.workflow_run.head_branch }}`
             in `${{ github.repository }}` is an automated weekly dependency update, and
