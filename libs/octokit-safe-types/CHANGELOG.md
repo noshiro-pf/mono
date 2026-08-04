@@ -1,3 +1,9 @@
+## [1.2.20](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.19...v1.2.20) (2026-08-04)
+
+### Bug Fixes
+
+- align ts-fortress to v11 so consumers work without pnpm overrides ([#245](https://github.com/noshiro-pf/octokit-safe-types/issues/245)) ([2cceaea](https://github.com/noshiro-pf/octokit-safe-types/commit/2cceaea9b5eeefba3fffe6713bbaeffc49c033c2))
+
 ## [1.2.19](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.18...v1.2.19) (2026-07-27)
 
 ### Bug Fixes
