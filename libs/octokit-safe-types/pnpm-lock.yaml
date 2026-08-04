@@ -15,14 +15,14 @@ importers:
         specifier: ^16.0.0
         version: 16.0.0
       ts-data-forge:
-        specifier: ^6.9.6
-        version: 6.9.6(typescript@6.0.3)
+        specifier: ^12.2.2
+        version: 12.2.2(typescript@6.0.3)
       ts-fortress:
-        specifier: ^7.0.7
-        version: 7.0.7(typescript@6.0.3)
+        specifier: ^11.2.0
+        version: 11.2.0(typescript@6.0.3)
       ts-type-forge:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^8.1.0
+        version: 8.1.0
     devDependencies:
       '@rollup/plugin-replace':
         specifier: 6.0.3
@@ -1179,6 +1179,10 @@ packages:
 
   '@sindresorhus/is@8.0.0':
     resolution: {integrity: sha512-YvOsokBE5NsyHuXMnwEVB7lgFk6lX8F4OXCruYVgFII0hUHof0RGUvhMoabVt9hRqbg+qVzayzEG24RCcxcYeA==}
+    engines: {node: '>=22'}
+
+  '@sindresorhus/is@8.1.0':
+    resolution: {integrity: sha512-2SX/1jW6CIMAiebvVv5ZInoCEuWQmMyBoJXXGC6Vjakjp/fpxP5eHs7/V6WKuPEIbuK06+VpjH+vjLQhr98rDQ==}
     engines: {node: '>=22'}
 
   '@sindresorhus/merge-streams@4.0.0':
@@ -4126,6 +4130,12 @@ packages:
       ts-repo-utils:
         optional: true
 
+  ts-data-forge@12.2.2:
+    resolution: {integrity: sha512-tduT/cDy602eGErC6wGgxyYxsjXcaYYFYT+cEotzSQNdhsb0eyBKsT+IfYnQUBkroj30d7sV2u2oKJ28Ai6q8A==}
+    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
+    peerDependencies:
+      typescript: '>=4.8'
+
   ts-data-forge@6.9.6:
     resolution: {integrity: sha512-+FmX9f3GJc22nidNw0FCnCZqcl54c2uRnhbUa+KP9KB8prCSeZ6fyi+89QJ0bniR/J0X1KDoIOwWxS88a+TRLQ==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
@@ -4136,6 +4146,10 @@ packages:
     resolution: {integrity: sha512-EDyGAwH1gO0Ausm9gV6T2nUvBgXT5kGoCMJPllOaooZ+4VvJiKBdZE7wK18N1deEowhcUptS+5GXZK8U/fvpwA==}
     peerDependencies:
       typescript: '>=4.0.0'
+
+  ts-fortress@11.2.0:
+    resolution: {integrity: sha512-FdoDiERXiRTsFP29QFCTYt0SDA55aELAmwaF5IN4lBlP/DMXUuIqO4Sx3WYZJnI7UlVwMoqvF8OVG5JWzmWxUw==}
+    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   ts-fortress@7.0.7:
     resolution: {integrity: sha512-eRmokAhBY4dvUarI9lK7VlRFS4e1Ld60yl1PRDYKttzIa1LjsYL4bOqMtiAx5qgK/zra0z1lqGWXvH0mpTkSmA==}
@@ -4154,6 +4168,14 @@ packages:
   ts-type-forge@3.0.1:
     resolution: {integrity: sha512-nld+c93luAnZI5HYydZZl2eWWOe19Pv7NiniXdyDoemGviplah1HUN4pFNoa0PJw3SBDIfewExuZU9Eqsv7oSQ==}
     engines: {node: '>=22.18.0', pnpm: '>=9.0.0'}
+
+  ts-type-forge@7.2.1:
+    resolution: {integrity: sha512-XfF2CYB/2YoKNKfbTQNDAyXRNc7qpLZqNWL8FIZYlOPiODfn9B0oAIh4ogduRoXJAg5hunj473rZJ0IAolIslw==}
+    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
+
+  ts-type-forge@8.1.0:
+    resolution: {integrity: sha512-yJI4qPNvSoEyJYinH/K9s2MnGXXVDln5G9dC4cUN9DAj5ELOXN6xd+Ge2gsCCVhKRHtx5iQzYjxkmpCxX8tl8Q==}
+    engines: {node: '>=22.22.2', pnpm: '>=9.0.0'}
 
   tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
@@ -5427,6 +5449,8 @@ snapshots:
   '@sindresorhus/is@4.6.0': {}
 
   '@sindresorhus/is@8.0.0': {}
+
+  '@sindresorhus/is@8.1.0': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
@@ -8713,6 +8737,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
+  ts-data-forge@12.2.2(typescript@6.0.3):
+    dependencies:
+      '@sindresorhus/is': 8.1.0
+      ts-type-forge: 7.2.1
+      typescript: 6.0.3
+
   ts-data-forge@6.9.6(typescript@6.0.3):
     dependencies:
       '@sindresorhus/is': 8.0.0
@@ -8723,6 +8753,14 @@ snapshots:
     dependencies:
       picomatch: 4.0.4
       typescript: 6.0.3
+
+  ts-fortress@11.2.0(typescript@6.0.3):
+    dependencies:
+      '@sindresorhus/is': 8.1.0
+      ts-data-forge: 12.2.2(typescript@6.0.3)
+      ts-type-forge: 8.1.0
+    transitivePeerDependencies:
+      - typescript
 
   ts-fortress@7.0.7(typescript@6.0.3):
     dependencies:
@@ -8754,6 +8792,10 @@ snapshots:
       - typescript
 
   ts-type-forge@3.0.1: {}
+
+  ts-type-forge@7.2.1: {}
+
+  ts-type-forge@8.1.0: {}
 
   tslib@1.14.1: {}
 

@@ -82,9 +82,9 @@
   "dependencies": {
     "@octokit/openapi-types": "^27.0.0",
     "@octokit/types": "^16.0.0",
-    "ts-data-forge": "^6.9.6",
-    "ts-fortress": "^7.0.7",
-    "ts-type-forge": "^3.0.1"
+    "ts-data-forge": "^12.2.2",
+    "ts-fortress": "^11.2.0",
+    "ts-type-forge": "^8.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",
