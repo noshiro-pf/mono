@@ -1,3 +1,9 @@
+## [10.1.7](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.6...v10.1.7) (2026-08-04)
+
+### Bug Fixes
+
+- update pnpm-workspace.yaml and run pnpm update ([#438](https://github.com/noshiro-pf/ts-repo-utils/issues/438)) ([638df85](https://github.com/noshiro-pf/ts-repo-utils/commit/638df85839b0414112d59a90120982fb37c3a587))
+
 ## [10.1.6](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.5...v10.1.6) (2026-08-03)
 
 ### Bug Fixes
