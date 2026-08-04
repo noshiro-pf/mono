@@ -22,6 +22,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # GITHUB_TOKEN の permissions に administration は存在せず、リポジトリ設定や
+      # ruleset を読めないため GitHub App の installation token を使う。
+      # read では merge 関連設定と ruleset の bypass_actors が API から返らない。
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.REPO_SETTINGS_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.REPO_SETTINGS_BOT_PRIVATE_KEY }}
+          permission-administration: write
+          permission-contents: write
+          permission-pages: read
+
       - name: Install pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
 
@@ -38,7 +51,7 @@ jobs:
       - name: Back up
         run: pnpm exec repo-settings backup
         env:
-          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           OWNER: noshiro-pf
           # github-settings-as-code falls back to the root package.json `name`,
           # which is the private workspace root (`ts-fortress-monorepo`), so the

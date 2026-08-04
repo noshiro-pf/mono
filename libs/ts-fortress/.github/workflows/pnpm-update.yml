@@ -12,7 +12,7 @@ name: Weekly pnpm update
 # the classification that dependabot-changeset.yml used, so the Changesets
 # release flow publishes those packages once the PR merges.
 #
-# Authenticates with PERSONAL_ACCESS_TOKEN (the same Actions secret used by
+# Authenticates with a GitHub App installation token (the same App used by
 # sync-agent-config.yml) so that the push triggers the push-based CI workflows
 # and the repository owner (a ruleset bypass actor) can auto-merge.
 
@@ -58,9 +58,20 @@ jobs:
           pnpm run update-packages
           pnpm install --no-frozen-lockfile
 
+      # 依存更新が終わってからトークンを発行する。許可済みビルドスクリプトが
+      # 動く前に鍵を job へ持ち込まないため。
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.REPO_AUTOMATION_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
+          permission-contents: write # ブランチの push
+          permission-pull-requests: write # PR の作成と auto-merge の有効化
+
       - name: Open auto-merge PR if anything changed
         env:
-          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           # `git status --porcelain` (not `git diff --quiet`) so untracked files
           # created by the update are detected too.
