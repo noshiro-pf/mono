@@ -6,7 +6,7 @@ import { projectRootPath } from '../project-root-path.mjs';
 
 /** Synchronizes CLI command versions with package.json version. */
 const syncCliVersions = async (): Promise<void> => {
-  console.log('Synchronizing CLI command versions...\n');
+  console.info('Synchronizing CLI command versions...\n');
 
   // Step 1: Read package.json version
   const packageJsonPath = path.resolve(projectRootPath, './package.json');
@@ -21,7 +21,7 @@ const syncCliVersions = async (): Promise<void> => {
 
   const targetVersion = packageJson.version;
 
-  console.log(`Target version: ${targetVersion}`);
+  console.info(`Target version: ${targetVersion}`);
 
   // Step 2: Find all CLI command files
   const cmdDir = path.resolve(projectRootPath, './src/cmd');
@@ -29,20 +29,22 @@ const syncCliVersions = async (): Promise<void> => {
   const cliFilesResult = await glob('*.mts', { cwd: cmdDir, absolute: true });
 
   if (Result.isErr(cliFilesResult)) {
-    console.log(`❌ Failed to find CLI files: ${String(cliFilesResult.value)}`);
+    console.info(
+      `❌ Failed to find CLI files: ${String(cliFilesResult.value)}`,
+    );
 
     process.exit(1);
   }
 
   const cliFiles = cliFilesResult.value;
 
-  console.log(`Found ${cliFiles.length} CLI files to update:`);
+  console.info(`Found ${cliFiles.length} CLI files to update:`);
 
   for (const file of cliFiles) {
-    console.log(`  - ${path.relative(projectRootPath, file)}`);
+    console.info(`  - ${path.relative(projectRootPath, file)}`);
   }
 
-  console.log('');
+  console.info('');
 
   // Step 3: Update version in each CLI file
   let mut_updatedCount = 0;
@@ -65,7 +67,7 @@ const syncCliVersions = async (): Promise<void> => {
           if (currentVersion !== targetVersion) {
             mut_hasUpdates = true;
 
-            console.log(
+            console.info(
               `  ${relativePath}: ${currentVersion} → ${targetVersion}`,
             );
 
@@ -82,23 +84,25 @@ const syncCliVersions = async (): Promise<void> => {
 
         mut_updatedCount += 1;
       } else {
-        console.log(`  ${relativePath}: already up to date (${targetVersion})`);
+        console.info(
+          `  ${relativePath}: already up to date (${targetVersion})`,
+        );
       }
     } catch (error) {
-      console.log(`  ❌ Failed to update ${relativePath}: ${String(error)}`);
+      console.info(`  ❌ Failed to update ${relativePath}: ${String(error)}`);
 
       process.exit(1);
     }
   }
 
-  console.log('');
+  console.info('');
 
   if (mut_updatedCount > 0) {
-    console.log(
+    console.info(
       `✅ Updated ${mut_updatedCount} CLI command${mut_updatedCount === 1 ? '' : 's'}\n`,
     );
   } else {
-    console.log('✅ All CLI commands are already up to date\n');
+    console.info('✅ All CLI commands are already up to date\n');
   }
 };
 

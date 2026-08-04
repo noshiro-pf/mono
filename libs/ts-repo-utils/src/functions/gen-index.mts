@@ -85,7 +85,7 @@ export const genIndex = async (
   // Merge config with defaults
   const filledConfig: GenIndexConfigInternal = fillConfig(config);
 
-  const conditionalEcho = filledConfig.silent ? () => {} : console.log;
+  const conditionalEcho = filledConfig.silent ? () => {} : console.info;
 
   conditionalEcho('Starting index file generation...\n');
 
@@ -161,7 +161,7 @@ const fillConfig = (config: GenIndexConfig): GenIndexConfigInternal => {
         : pipe(
             ISet.create<string>(
               Arr.generate(function* () {
-                if (exclude !== undefined && Array.isArray(exclude)) {
+                if (exclude !== undefined && Arr.isArray(exclude)) {
                   yield* exclude;
                 }
 
@@ -217,7 +217,7 @@ const generateIndexFileForDir = async (
   baseDir?: string,
   currentDepth: number = 0,
 ): Promise<void> => {
-  const conditionalEcho = config.silent ? () => {} : console.log;
+  const conditionalEcho = config.silent ? () => {} : console.info;
 
   try {
     const actualBaseDir = baseDir ?? dirPath;
@@ -392,7 +392,7 @@ const generateIndexContent = (
     }),
   ] as const;
 
-  return exportStatements.length === 0
+  return Arr.isEmpty(exportStatements)
     ? 'export {};'
     : exportStatements.join('\n');
 };

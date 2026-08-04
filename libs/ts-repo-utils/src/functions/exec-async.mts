@@ -43,9 +43,8 @@ export function $(
 
 export function $<
   TOptions extends
-    | ExecOptionsWithBufferEncoding
-    | ExecOptionsWithStringEncoding
-    | undefined = undefined,
+    ExecOptionsWithBufferEncoding | ExecOptionsWithStringEncoding | undefined =
+    undefined,
 >(
   command: string,
   options?: TOptions,
@@ -63,7 +62,7 @@ export function $(
   const normalizedOptions: NormalizedExecOptions = restOptions;
 
   if (!silent) {
-    console.log(`$ ${command}`);
+    console.info(`$ ${command}`);
   }
 
   return new Promise((resolve) => {
@@ -75,7 +74,7 @@ export function $(
     ): void => {
       if (!silent) {
         if (!isEmpty(stdout)) {
-          console.log(stdout);
+          console.info(stdout);
         }
 
         if (!isEmpty(stderr)) {

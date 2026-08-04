@@ -1,7 +1,12 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { rollup } from 'rollup';
-import { Result, type UnknownResult, unknownToString } from 'ts-data-forge';
+import {
+  Arr,
+  Result,
+  type UnknownResult,
+  unknownToString,
+} from 'ts-data-forge';
 import { $ } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 import { genAgentsMd } from './gen-agents-md.mjs';
@@ -26,7 +31,7 @@ const nativeTsc = path.resolve(
  * Builds the entire project.
  */
 const build = async (skipCheck: boolean): Promise<void> => {
-  console.log('Starting build process...\n');
+  console.info('Starting build process...\n');
 
   if (!skipCheck) {
     await logStep({
@@ -91,7 +96,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
             const outputs =
               rollupConfig.output === undefined
                 ? ([] as const)
-                : Array.isArray(rollupConfig.output)
+                : Arr.isArray(rollupConfig.output)
                   ? rollupConfig.output
                   : ([rollupConfig.output] as const);
 
@@ -172,7 +177,7 @@ const build = async (skipCheck: boolean): Promise<void> => {
     });
   }
 
-  console.log('✅ Build completed successfully!\n');
+  console.info('✅ Build completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -186,11 +191,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  console.log(`${mut_step.current}. ${startMessage}...`);
+  console.info(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  console.log(`✓ ${successMessage}.\n`);
+  console.info(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as cmd from 'cmd-ts';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import { formatDiffFrom } from '../functions/index.mjs';
 
 const cmdDef = cmd.command({
@@ -90,4 +90,4 @@ const main = async (
   }
 };
 
-await cmd.run(cmdDef, process.argv.slice(2));
+await cmd.run(cmdDef, Arr.skip(process.argv, 2));

@@ -28,7 +28,7 @@ export const assertRepoIsClean = async (
 ): Promise<void> => {
   const silent = options?.silent ?? false;
 
-  const conditionalEcho = silent ? () => {} : console.log;
+  const conditionalEcho = silent ? () => {} : console.info;
 
   const gitStatusResult = await getGitStatus({ silent });
 

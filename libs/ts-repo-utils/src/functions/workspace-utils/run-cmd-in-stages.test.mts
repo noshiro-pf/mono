@@ -16,7 +16,7 @@ vi.mock(import('./get-workspace-packages.mjs'), () => ({
 
 describe(runCmdInStagesAcrossWorkspaces, () => {
   type MockedSpies = Readonly<{
-    consoleLogSpy: MockInstance<typeof console.log>;
+    consoleInfoSpy: MockInstance<typeof console.info>;
     consoleErrorSpy: MockInstance<typeof console.error>;
     processExitSpy: MockInstance<typeof process.exit>;
   }>;
@@ -24,8 +24,8 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
   const setupSpies = (): MockedSpies => {
     vi.clearAllMocks();
 
-    const consoleLogSpy = vi
-      .spyOn(console, 'log')
+    const consoleInfoSpy = vi
+      .spyOn(console, 'info')
       .mockImplementation((): void => {});
 
     const consoleErrorSpy = vi
@@ -37,12 +37,12 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       .mockReturnValue(undefined as never);
 
-    return { consoleLogSpy, consoleErrorSpy, processExitSpy };
+    return { consoleInfoSpy, consoleErrorSpy, processExitSpy };
   };
 
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   const cleanupSpies = (spies: MockedSpies): void => {
-    spies.consoleLogSpy.mockRestore();
+    spies.consoleInfoSpy.mockRestore();
 
     spies.consoleErrorSpy.mockRestore();
 
@@ -117,7 +117,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       expect(spies.processExitSpy).toHaveBeenCalledWith(1);
 
       // Verify success message was NOT called
-      expect(spies.consoleLogSpy).not.toHaveBeenCalledWith(
+      expect(spies.consoleInfoSpy).not.toHaveBeenCalledWith(
         expect.stringContaining('✅ test completed successfully'),
       );
     } finally {
@@ -160,11 +160,11 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       expect(executeStages).toHaveBeenCalledWith(mockPackages, 'test', 2);
 
       // Verify success messages were called
-      expect(spies.consoleLogSpy).toHaveBeenCalledWith(
+      expect(spies.consoleInfoSpy).toHaveBeenCalledWith(
         '\nStarting test across 2 packages (fail-fast mode)...',
       );
 
-      expect(spies.consoleLogSpy).toHaveBeenCalledWith(
+      expect(spies.consoleInfoSpy).toHaveBeenCalledWith(
         '\n✅ test completed successfully (all stages)',
       );
 
@@ -234,7 +234,7 @@ describe(runCmdInStagesAcrossWorkspaces, () => {
       );
 
       // Verify log shows correct package count
-      expect(spies.consoleLogSpy).toHaveBeenCalledWith(
+      expect(spies.consoleInfoSpy).toHaveBeenCalledWith(
         '\nStarting test across 2 packages (fail-fast mode)...',
       );
     } finally {

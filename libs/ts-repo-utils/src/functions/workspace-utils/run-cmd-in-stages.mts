@@ -1,5 +1,3 @@
-#!/usr/bin/env tsx
-
 import { isError } from '@sindresorhus/is';
 import { executeStages } from './execute-parallel.mjs';
 import { getWorkspacePackages } from './get-workspace-packages.mjs';
@@ -40,13 +38,13 @@ export const runCmdInStagesAcrossWorkspaces = async ({
         ? packages
         : packages.filter((pkg) => filterWorkspacePattern(pkg.name));
 
-    console.log(
+    console.info(
       `\nStarting ${cmd} across ${filteredPackages.length} packages (fail-fast mode)...`,
     );
 
     await executeStages(filteredPackages, cmd, concurrency);
 
-    console.log(`\n✅ ${cmd} completed successfully (all stages)`);
+    console.info(`\n✅ ${cmd} completed successfully (all stages)`);
   } catch (error) {
     const errorMessage = isError(error)
       ? error.message

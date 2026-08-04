@@ -2,7 +2,7 @@
 import * as fs from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import * as path from 'node:path';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import {
   getDiffFrom,
   getModifiedFiles,
@@ -107,7 +107,7 @@ describe('diff', () => {
         assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          assert.isTrue(Array.isArray(result.value));
+          assert.isTrue(Arr.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -346,7 +346,7 @@ describe('diff', () => {
         assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          assert.isTrue(Array.isArray(result.value));
+          assert.isTrue(Arr.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -366,7 +366,7 @@ describe('diff', () => {
         assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          assert.isTrue(Array.isArray(result.value));
+          assert.isTrue(Arr.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -559,7 +559,7 @@ describe('diff', () => {
         assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          assert.isTrue(Array.isArray(result.value));
+          assert.isTrue(Arr.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -594,7 +594,7 @@ describe('diff', () => {
         assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          assert.isTrue(Array.isArray(result.value));
+          assert.isTrue(Arr.isArray(result.value));
         }
       } finally {
         await cleanup();
@@ -786,7 +786,7 @@ describe('diff', () => {
         assert.isTrue(Result.isOk(result));
 
         if (Result.isOk(result)) {
-          assert.isTrue(Array.isArray(result.value));
+          assert.isTrue(Arr.isArray(result.value));
         }
       } finally {
         await cleanup();

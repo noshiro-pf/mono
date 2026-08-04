@@ -31,7 +31,7 @@ export const createResultAssert = <Config, Ok, Err>({
       hasKey(error, 'message') &&
       isString(error.message)
     ) {
-      console.log(error.message);
+      console.info(error.message);
     } else {
       console.error(error);
     }

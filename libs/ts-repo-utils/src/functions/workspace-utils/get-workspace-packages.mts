@@ -1,8 +1,7 @@
-#!/usr/bin/env tsx
-
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
+  Arr,
   hasKey,
   isNotUndefined,
   isRecord,
@@ -10,7 +9,11 @@ import {
   Json,
   Result,
 } from 'ts-data-forge';
-import { type JsonValue, type ReadonlyRecord } from 'ts-type-forge';
+import {
+  type JsonValue,
+  type MutableFixedLengthTuple,
+  type ReadonlyRecord,
+} from 'ts-type-forge';
 import { glob } from '../glob.mjs';
 import { type Package } from './types.mjs';
 
@@ -53,8 +56,7 @@ export const getWorkspacePackages = async (
     const matches = globResult.value;
 
     const packageJsonList: readonly (
-      | readonly [string, JsonValue]
-      | undefined
+      readonly [string, JsonValue] | undefined
     )[] = await Promise.all(
       matches.map(async (match) => {
         const maybePackagePath = path.join(match, 'package.json');
@@ -108,7 +110,7 @@ const getStrArrayFromJsonValue = (
 ): readonly string[] =>
   isRecord(value) &&
   hasKey(value, key) &&
-  Array.isArray(value[key]) &&
+  Arr.isArray(value[key]) &&
   value[key].every(isString)
     ? value[key]
     : ([] as const);
@@ -128,8 +130,7 @@ const getKeyValueRecordFromJsonValue = (
   }
 
   const entries = Object.entries(obj).filter(
-    // transformer-ignore-next-line convert-to-readonly
-    (entry): entry is [string, string] => isString(entry[1]),
+    (entry): entry is MutableFixedLengthTuple<2, string> => isString(entry[1]),
   );
 
   return Object.fromEntries(entries);

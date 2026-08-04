@@ -2,6 +2,7 @@
 import { isError } from '@sindresorhus/is';
 import { spawn } from 'node:child_process';
 import {
+  Arr,
   createPromise,
   hasKey,
   isNotUndefined,
@@ -126,38 +127,32 @@ export const executeStages = async (
   const mut_completed = new Set<string>();
 
   while (mut_completed.size < sorted.length) {
-    const mut_stage: Package[] = [];
+    const stage = sorted.filter(
+      (pkg) =>
+        !mut_completed.has(pkg.name) &&
+        (dependencyGraph.get(pkg.name) ?? []).every((dep) =>
+          mut_completed.has(dep),
+        ),
+    );
 
-    for (const pkg of sorted) {
-      if (mut_completed.has(pkg.name)) continue;
-
-      const deps = dependencyGraph.get(pkg.name) ?? [];
-
-      const depsCompleted = deps.every((dep) => mut_completed.has(dep));
-
-      if (depsCompleted) {
-        mut_stage.push(pkg);
-      }
-    }
-
-    if (mut_stage.length === 0) {
+    if (Arr.isEmpty(stage)) {
       throw new Error('Circular dependency detected');
     }
 
-    mut_stages.push(mut_stage);
+    mut_stages.push(stage);
 
-    for (const pkg of mut_stage) {
+    for (const pkg of stage) {
       mut_completed.add(pkg.name);
     }
   }
 
-  console.log(
+  console.info(
     `\nExecuting ${scriptName} in ${mut_stages.length} stages (fail-fast mode)...\n`,
   );
 
   for (const [i, stage] of mut_stages.entries()) {
-    if (stage.length > 0) {
-      console.log(`Stage ${i + 1}: ${stage.map((p) => p.name).join(', ')}`);
+    if (Arr.isNonEmpty(stage)) {
+      console.info(`Stage ${i + 1}: ${stage.map((p) => p.name).join(', ')}`);
 
       try {
         // eslint-disable-next-line no-await-in-loop
@@ -165,7 +160,7 @@ export const executeStages = async (
 
         // Log successful completion of the stage
         // All results are successful because executeParallel throws on any failure
-        console.log(
+        console.info(
           `✅ Stage ${i + 1} completed successfully (${results.length}/${stage.length} packages)`,
         );
       } catch (error) {

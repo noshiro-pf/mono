@@ -30,9 +30,9 @@ export const formatFiles = async (
 
   const noIgnore = options?.ignore === false;
 
-  const conditionalEcho = silent ? () => {} : console.log;
+  const conditionalEcho = silent ? () => {} : console.info;
 
-  if (files.length === 0) {
+  if (Arr.isEmpty(files)) {
     conditionalEcho('No files to format');
 
     return Result.ok(undefined);
@@ -147,20 +147,16 @@ export const formatFiles = async (
 
     if (fulfilled.every(Result.isOk)) {
       return Result.ok(undefined);
-    } else {
-      const errors: readonly unknown[] = fulfilled
-        .filter(Result.isErr)
-        .map((r) => r.value);
-
-      return Result.err(errors);
     }
-  } else {
-    const errors: readonly unknown[] = results
-      .filter((r) => r.status === 'rejected')
-      .map((r): unknown => r.reason);
 
-    return Result.err(errors);
+    return Result.err(fulfilled.filter(Result.isErr).map((r) => r.value));
   }
+
+  return Result.err(
+    results
+      .filter((r) => r.status === 'rejected')
+      .map((r): unknown => r.reason),
+  );
 };
 
 const defaultIgnoreFn = (filePath: string): boolean => {
@@ -243,7 +239,7 @@ export const formatFilesGlob = async (
 
   const ignore = options?.ignore;
 
-  const conditionalEcho = silent ? () => {} : console.log;
+  const conditionalEcho = silent ? () => {} : console.info;
 
   // Find all files matching the glob
   const globResult = await glob(pathGlob, {
@@ -264,7 +260,7 @@ export const formatFilesGlob = async (
 
   const files = globResult.value;
 
-  if (files.length === 0) {
+  if (Arr.isEmpty(files)) {
     conditionalEcho('No files found matching pattern:', pathGlob);
 
     return Result.ok(undefined);
@@ -439,7 +435,7 @@ export const formatDiffFrom = async (
     cwd,
   } = options ?? {};
 
-  const conditionalEcho = silent ? () => {} : console.log;
+  const conditionalEcho = silent ? () => {} : console.info;
 
   // Get files that differ from base branch/commit (excluding deleted files)
   const diffFromBaseResult = await getDiffFrom(base, {
@@ -504,7 +500,7 @@ export const formatDiffFrom = async (
     conditionalEcho(`${message}:`, allFiles);
   }
 
-  if (allFiles.length === 0) {
+  if (Arr.isEmpty(allFiles)) {
     conditionalEcho('No files to format');
 
     return Result.ok(undefined);

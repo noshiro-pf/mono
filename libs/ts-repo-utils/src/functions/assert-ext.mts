@@ -60,7 +60,7 @@ export const checkExt = async (
   // Collect all incorrect files
   const allIncorrectFiles: readonly string[] = results.flat();
 
-  if (allIncorrectFiles.length === 0) {
+  if (Arr.isEmpty(allIncorrectFiles)) {
     return Result.ok(undefined);
   }
 
@@ -90,10 +90,10 @@ export const assertExt = createResultAssert<
 >({
   run: checkExt,
   onError: (error) => {
-    console.log(error.message);
+    console.info(error.message);
   },
   onSuccess: () => {
-    console.log('✓ All files have correct extensions');
+    console.info('✓ All files have correct extensions');
   },
 });
 
@@ -133,8 +133,8 @@ const getFilesWithIncorrectExtension = async (
 
   const files = filesResult.value;
 
-  return files.filter(
-    (file) => !expectedExtensions.some((ext) => file.endsWith(ext)),
+  return files.filter((file) =>
+    expectedExtensions.every((ext) => !file.endsWith(ext)),
   );
 };
 
@@ -162,10 +162,9 @@ const describeExpectedExtensions = (config: CheckExtConfig): string => {
 
   // Generate message parts for each extension
   const messageParts = Array.from(extensionGroups.entries(), ([ext, dirs]) => {
-    const dirList =
-      dirs.length === 1
-        ? dirs[0]?.relativePath
-        : dirs.map((d) => d.relativePath).join(', ');
+    const dirList = Arr.isFixedLengthArray(1, dirs)
+      ? dirs[0].relativePath
+      : dirs.map((d) => d.relativePath).join(', ');
 
     return `${dirList} should have ${ext} extension`;
   });

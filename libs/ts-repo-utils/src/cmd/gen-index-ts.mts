@@ -3,9 +3,9 @@
 /* transformer-ignore convert-to-readonly */
 
 import * as cmd from 'cmd-ts';
-// eslint-disable-next-line import-x/no-internal-modules
+import { Arr, expectType } from 'ts-data-forge';
+// eslint-disable-next-line import-x/no-internal-modules, import-x/extensions
 import { type InputOf, type OutputOf } from 'cmd-ts/dist/esm/from.js';
-import { expectType } from 'ts-data-forge';
 import { type NonEmptyArray } from 'ts-type-forge';
 import { genIndex } from '../functions/index.mjs';
 
@@ -32,7 +32,7 @@ const nonEmptyArray = <T extends cmd.Type<any, any>>(
     cmd.array(t) as cmd.Type<readonly InputOf<T>[], OutputOf<T>[]>,
     {
       from: (arr) => {
-        if (arr.length === 0) {
+        if (Arr.isEmpty(arr)) {
           throw new Error(
             `No value provided for --${commandName}. At least one value is required.`,
           );
@@ -167,4 +167,4 @@ const main = async ({
   });
 };
 
-await cmd.run(cmdDef, process.argv.slice(2));
+await cmd.run(cmdDef, Arr.skip(process.argv, 2));

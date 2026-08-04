@@ -26,9 +26,11 @@ export const assertPathExists = async (
   filePath: string,
   description = 'Path',
 ): Promise<void> => {
-  if (!(await pathExists(filePath))) {
-    console.log(`${description} does not exist: ${filePath}`);
-
-    process.exit(1);
+  if (await pathExists(filePath)) {
+    return;
   }
+
+  console.info(`${description} does not exist: ${filePath}`);
+
+  process.exit(1);
 };

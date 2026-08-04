@@ -94,7 +94,7 @@ jobs:
 
       - name: Install pnpm
         if: steps.pr.outputs.skip == 'false'
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
       - name: Set up Node.js
         if: steps.pr.outputs.skip == 'false'
@@ -115,7 +115,7 @@ jobs:
 
       - name: Run Claude Code to fix the failing CI
         if: steps.pr.outputs.skip == 'false'
-        uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b # v1.0.183
+        uses: anthropics/claude-code-action@86180fa9e4d311eed10c9cc49854c53dab5d517a # v1.0.184
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ steps.app-token.outputs.token }}
