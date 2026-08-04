@@ -1,3 +1,9 @@
+## [1.2.21](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.20...v1.2.21) (2026-08-04)
+
+### Bug Fixes
+
+- sync actions settings with the applied state ([#248](https://github.com/noshiro-pf/octokit-safe-types/issues/248)) ([c9390fa](https://github.com/noshiro-pf/octokit-safe-types/commit/c9390fa4ba56db6de49f8498c392c4f6eae4e932))
+
 ## [1.2.20](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.19...v1.2.20) (2026-08-04)
 
 ### Bug Fixes
