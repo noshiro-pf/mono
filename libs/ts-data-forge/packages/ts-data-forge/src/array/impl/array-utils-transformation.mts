@@ -12,6 +12,7 @@ import {
   type Primitive,
   type SafeUintWithSmallInt,
   type SupportedLength,
+  type UnknownBrand,
   type WithSmallInt,
 } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
@@ -46,15 +47,41 @@ import { size } from './array-utils-size.mjs';
  * assert.deepStrictEqual(indexed, ['0:1', '1:2', '2:3']);
  * ```
  */
-export function map<const Ar extends readonly unknown[], B>(
+export function map<const Ar extends readonly unknown[] & UnknownBrand, B>(
   array: Ar,
   mapFn: (a: Ar[number], index: ArrayIndex<Ar>) => B,
 ): ChangeArrayElement<Ar, B>;
 
+// A plain array or tuple carries no length brand, so the homomorphic mapping
+// is the whole answer. Stating it directly — rather than going through
+// `ChangeArrayElement`, whose `HasLengthConstraint` test a *generic* `Ar`
+// cannot decide — is what keeps `map` usable inside a function that is itself
+// generic over the tuple: a deferred conditional is not assignable to the
+// caller's own `{ [K in keyof Ar]: B }`, while this is.
+export function map<const Ar extends readonly unknown[], B>(
+  array: Ar,
+  mapFn: (a: Ar[number], index: ArrayIndex<Ar>) => B,
+): Readonly<{ [K in keyof Ar]: B }>;
+
 // curried version
+//
+// The two cases have to be overloads *of the returned function*, not two
+// overloads of `map` itself: both curried signatures take the same single
+// argument, so overload resolution would always pick the first and the second
+// would be dead.
+//
+// Spelled as an intersection of two function types rather than one object type
+// carrying two call signatures — the `convert-to-readonly` codemod wraps an
+// inline object type in `Readonly<…>`, and a mapped type drops call
+// signatures, which would leave the curried form with none at all.
 export function map<A, B>(
   mapFn: (a: A, index: SizeType.Arr) => B,
-): <const Ar extends readonly A[]>(array: Ar) => ChangeArrayElement<Ar, B>;
+): (<const Ar extends readonly A[] & UnknownBrand>(
+  array: Ar,
+) => ChangeArrayElement<Ar, B>) &
+  (<const Ar extends readonly A[]>(
+    array: Ar,
+  ) => Readonly<{ [K in keyof Ar]: B }>);
 
 export function map<A, B>(
   ...args:

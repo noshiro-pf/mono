@@ -8,6 +8,7 @@ import {
 import { expectType } from '../../expect-type.mjs';
 import { asUint32 } from '../../number/index.mjs';
 import { type SizeType } from '../../types.mjs';
+import { asMinLengthArray } from './array-utils-length-bounded-array-cast.mjs';
 import {
   set,
   toFilled,
@@ -243,6 +244,45 @@ describe('Arr modifications', () => {
 
       assert.deepStrictEqual(result, [0, 0, 0]);
     });
+
+    test('should preserve the tuple shape under a generic parameter', () => {
+      // A caller that is itself generic over the tuple cannot resolve a
+      // conditional return type, so the unbranded overload has to state the
+      // homomorphic mapping directly.
+      const blank = <const T extends readonly number[]>(
+        xs: T,
+      ): Readonly<{ [K in keyof T]: 0 }> => toFilled(xs, 0);
+
+      const result = blank([1, 2, 3] as const);
+
+      expectType<typeof result, FixedLengthTuple<3, 0>>('=');
+
+      assert.deepStrictEqual<FixedLengthTuple<3, 0>>(result, [0, 0, 0]);
+    });
+
+    test('should preserve the tuple shape under a generic parameter when curried', () => {
+      const blank = <const T extends readonly number[]>(
+        xs: T,
+      ): Readonly<{ [K in keyof T]: 0 }> => toFilled(0)(xs);
+
+      const result = blank([1, 2] as const);
+
+      expectType<typeof result, FixedLengthTuple<2, 0>>('=');
+
+      assert.deepStrictEqual<FixedLengthTuple<2, 0>>(result, [0, 0]);
+    });
+
+    test('should keep the length brand of a branded array', () => {
+      const lower: MinLengthArray<2, number> = asMinLengthArray(2, [1, 2, 3]);
+
+      const filled = toFilled(lower, 0);
+
+      expectType<typeof filled, MinLengthArray<2, 0>>('~=');
+
+      // The brand is not part of the runtime value, so compare structurally —
+      // the type argument is what widens it, no intermediate binding needed.
+      assert.deepStrictEqual<readonly number[]>(filled, [0, 0, 0]);
+    });
   });
 
   describe(toRangeFilled, () => {
@@ -268,6 +308,18 @@ describe('Arr modifications', () => {
       const result = toRangeFilled(arr, 0, [2, 2]);
 
       assert.deepStrictEqual(result, [1, 2, 3]);
+    });
+
+    test('should preserve the tuple shape under a generic parameter', () => {
+      const blankMiddle = <const T extends readonly number[]>(
+        xs: T,
+      ): Readonly<{ [K in keyof T]: number }> => toRangeFilled(xs, 0, [1, 2]);
+
+      const result = blankMiddle([1, 2, 3] as const);
+
+      expectType<typeof result, FixedLengthTuple<3, number>>('=');
+
+      assert.deepStrictEqual<FixedLengthTuple<3, number>>(result, [1, 0, 3]);
     });
 
     test('should clamp range to array bounds', () => {

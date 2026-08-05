@@ -2,11 +2,10 @@ import {
   type ChangeArrayElement,
   type ConstrainedList,
   type FixedLengthTuple,
-  type HasLengthConstraint,
   type Increment,
   type IsFixedLengthList,
   type NonEmptyArray,
-  type NonEmptyTuple,
+  type UnknownBrand,
 } from 'ts-type-forge';
 import { asPositiveUint32 } from '../../number/index.mjs';
 import { castMutable } from '../../others/index.mjs';
@@ -356,29 +355,33 @@ const toUnshiftedImpl = <Ar extends readonly unknown[], const V>(
  * assert.deepStrictEqual(filledCurried, ['x', 'x', 'x']);
  * ```
  */
+export function toFilled<
+  const Ar extends readonly unknown[] & UnknownBrand,
+  const V,
+>(array: Ar, value: V): ChangeArrayElement<Ar, V>;
+
+// For an array or tuple that carries no length brand the homomorphic mapping
+// already covers every case the conditional spelled out — a fixed-length tuple
+// keeps its length, `readonly [A, ...A[]]` stays non-empty, and `readonly A[]`
+// stays unbounded. Stating it directly is what keeps this usable from a
+// caller that is itself generic over the array: a conditional a *generic* `Ar`
+// cannot decide stays deferred, and its branded branch is then not assignable
+// to the caller's own mapping.
 export function toFilled<const Ar extends readonly unknown[], const V>(
   array: Ar,
   value: V,
-): HasLengthConstraint<Ar> extends true
-  ? ChangeArrayElement<Ar, V>
-  : IsFixedLengthList<Ar> extends true
-    ? FixedLengthTuple<Ar['length'], V>
-    : Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<V>
-      : readonly V[];
+): Readonly<{ [K in keyof Ar]: V }>;
 
-// curried version
+// curried version — the two cases have to be overloads of the *returned*
+// function, spelled as an intersection of function types (see `Arr.map`).
 export function toFilled<const V>(
   value: V,
-): <const Ar extends readonly unknown[]>(
+): (<const Ar extends readonly unknown[] & UnknownBrand>(
   array: Ar,
-) => HasLengthConstraint<Ar> extends true
-  ? ChangeArrayElement<Ar, V>
-  : IsFixedLengthList<Ar> extends true
-    ? FixedLengthTuple<Ar['length'], V>
-    : Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<V>
-      : readonly V[];
+) => ChangeArrayElement<Ar, V>) &
+  (<const Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => Readonly<{ [K in keyof Ar]: V }>);
 
 export function toFilled<E>(
   ...args: readonly [array: readonly E[], value: E] | readonly [value: E]
@@ -412,6 +415,20 @@ const toFilledImpl = <E,>(array: readonly E[], value: E): readonly E[] =>
  * assert.deepStrictEqual(filledPrefix, [8, 8, 2, 3, 4]);
  * ```
  */
+export function toRangeFilled<
+  const Ar extends readonly unknown[] & UnknownBrand,
+  const V,
+>(
+  array: Ar,
+  value: V,
+  fillRange: readonly [
+    start: ArgArrayIndexWithNegative<Ar>,
+    end: ArgArrayIndexWithNegative<Ar>,
+  ],
+): ChangeArrayElement<Ar, V | Ar[number]>;
+
+// See `toFilled` for why the unbranded case states the homomorphic mapping
+// directly instead of going through a conditional.
 export function toRangeFilled<const Ar extends readonly unknown[], const V>(
   array: Ar,
   value: V,
@@ -419,13 +436,7 @@ export function toRangeFilled<const Ar extends readonly unknown[], const V>(
     start: ArgArrayIndexWithNegative<Ar>,
     end: ArgArrayIndexWithNegative<Ar>,
   ],
-): HasLengthConstraint<Ar> extends true
-  ? ChangeArrayElement<Ar, V | Ar[number]>
-  : IsFixedLengthList<Ar> extends true
-    ? FixedLengthTuple<Ar['length'], V | Ar[number]>
-    : Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<V | Ar[number]>
-      : readonly (V | Ar[number])[];
+): Readonly<{ [K in keyof Ar]: V | Ar[number] }>;
 
 // curried version
 export function toRangeFilled<const V>(
@@ -434,15 +445,12 @@ export function toRangeFilled<const V>(
     start: SizeType.ArgArrWithNegative,
     end: SizeType.ArgArrWithNegative,
   ],
-): <const Ar extends readonly unknown[]>(
+): (<const Ar extends readonly unknown[] & UnknownBrand>(
   array: Ar,
-) => HasLengthConstraint<Ar> extends true
-  ? ChangeArrayElement<Ar, V | Ar[number]>
-  : IsFixedLengthList<Ar> extends true
-    ? FixedLengthTuple<Ar['length'], V | Ar[number]>
-    : Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<V | Ar[number]>
-      : readonly (V | Ar[number])[];
+) => ChangeArrayElement<Ar, V | Ar[number]>) &
+  (<const Ar extends readonly unknown[]>(
+    array: Ar,
+  ) => Readonly<{ [K in keyof Ar]: V | Ar[number] }>);
 
 export function toRangeFilled<E, const V>(
   ...args:

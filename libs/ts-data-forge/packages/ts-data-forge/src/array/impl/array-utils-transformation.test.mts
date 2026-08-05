@@ -9,6 +9,7 @@ import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
 import { Optional } from '../../functional/index.mjs';
 import { SafeUint } from '../../number/index.mjs';
+import { asMinLengthArray } from './array-utils-length-bounded-array-cast.mjs';
 import {
   cartesianProduct,
   concat,
@@ -66,6 +67,33 @@ describe('Arr transformations', () => {
       expectType<typeof mappedWithIndex, FixedLengthTuple<3, string>>('<=');
 
       assert.deepStrictEqual(mappedWithIndex, ['0:a', '1:b', '2:c']);
+    });
+
+    test('should preserve the tuple shape under a generic parameter', () => {
+      // A caller that is itself generic over the tuple cannot resolve a
+      // conditional return type, so `map` has to report the homomorphic
+      // mapping directly for a parameter that carries no length brand.
+      const mapValues = <const T extends readonly Readonly<{ v: unknown }>[]>(
+        boxes: T,
+      ): Readonly<{ [K in keyof T]: unknown }> => map(boxes, (b) => b.v);
+
+      const result = mapValues([{ v: 1 }, { v: 'a' }] as const);
+
+      expectType<typeof result, FixedLengthTuple<2, unknown>>('=');
+
+      assert.deepStrictEqual<FixedLengthTuple<2, unknown>>(result, [1, 'a']);
+    });
+
+    test('should keep the length brand of a branded array', () => {
+      const lower: MinLengthArray<2, number> = asMinLengthArray(2, [1, 2, 3]);
+
+      const mappedLower = map(lower, String);
+
+      expectType<typeof mappedLower, MinLengthArray<2, string>>('~=');
+
+      // The brand is not part of the runtime value, so compare structurally —
+      // the type argument is what widens it, no intermediate binding needed.
+      assert.deepStrictEqual<readonly string[]>(mappedLower, ['1', '2', '3']);
     });
   });
 
