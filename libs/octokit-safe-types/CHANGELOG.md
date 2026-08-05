@@ -1,3 +1,9 @@
+## [1.2.22](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.21...v1.2.22) (2026-08-05)
+
+### Bug Fixes
+
+- update pnpm-workspace.yaml and run pnpm update ([#249](https://github.com/noshiro-pf/octokit-safe-types/issues/249)) ([66e99b2](https://github.com/noshiro-pf/octokit-safe-types/commit/66e99b2bae4ca9c84f466eb3ef68fe91408ddc7c))
+
 ## [1.2.21](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.20...v1.2.21) (2026-08-04)
 
 ### Bug Fixes
