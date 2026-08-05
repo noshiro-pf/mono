@@ -18,18 +18,18 @@ type JsonSchema = Exclude<
 
 export type ImportStyle = 'global' | 'named';
 
-export const DEFAULT_IMPORT_STYLE: ImportStyle = 'global';
+export const DEFAULT_IMPORT_STYLE: ImportStyle = 'named';
 
 export const IMPORT_STYLE_SCHEMA_PROPERTY: JsonSchema = {
   type: 'string',
   enum: ['global', 'named'],
   description: [
     'How the ts-type-forge type is brought into scope.',
-    "'global' (default) assumes the ambient globals of",
-    '`ts-type-forge/global` and never touches imports;',
-    "'named' makes the autofix add the corresponding",
+    "'named' (default) makes the autofix add the corresponding",
     `\`import { type … } from '${TS_TYPE_FORGE_MODULE}';\``,
-    'when the name is not imported yet.',
+    "when the name is not imported yet; 'global' assumes the",
+    'ambient globals of `ts-type-forge/global` and never touches',
+    'imports.',
   ].join(' '),
 };
 

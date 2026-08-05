@@ -79,72 +79,104 @@ describe('prefer-canonical-length-constrained-tuple', () => {
         {
           name: 'readonly non-empty tuple',
           code: 'type T = readonly [string, ...string[]];',
-          output: 'type T = NonEmptyTuple<string>;',
+          output: dedent`
+            import { type NonEmptyTuple } from 'ts-type-forge';
+            type T = NonEmptyTuple<string>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'mutable non-empty tuple',
           code: 'type T = [string, ...string[]];',
-          output: 'type T = MutableNonEmptyTuple<string>;',
+          output: dedent`
+            import { type MutableNonEmptyTuple } from 'ts-type-forge';
+            type T = MutableNonEmptyTuple<string>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'readonly non-empty tuple with a readonly rest spelling',
           code: 'type T = readonly [string, ...(readonly string[])];',
-          output: 'type T = NonEmptyTuple<string>;',
+          output: dedent`
+            import { type NonEmptyTuple } from 'ts-type-forge';
+            type T = NonEmptyTuple<string>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'readonly fixed-length tuple',
           code: 'type T = readonly [string, string, string];',
-          output: 'type T = FixedLengthTuple<3, string>;',
+          output: dedent`
+            import { type FixedLengthTuple } from 'ts-type-forge';
+            type T = FixedLengthTuple<3, string>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'mutable fixed-length tuple',
           code: 'type T = [string, string, string];',
-          output: 'type T = MutableFixedLengthTuple<3, string>;',
+          output: dedent`
+            import { type MutableFixedLengthTuple } from 'ts-type-forge';
+            type T = MutableFixedLengthTuple<3, string>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'readonly min-length tuple',
           code: 'type T = readonly [number, number, ...number[]];',
-          output: 'type T = MinLengthTuple<2, number>;',
+          output: dedent`
+            import { type MinLengthTuple } from 'ts-type-forge';
+            type T = MinLengthTuple<2, number>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'mutable min-length tuple',
           code: 'type T = [number, number, ...number[]];',
-          output: 'type T = MutableMinLengthTuple<2, number>;',
+          output: dedent`
+            import { type MutableMinLengthTuple } from 'ts-type-forge';
+            type T = MutableMinLengthTuple<2, number>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'readonly rest spelling inside a readonly tuple',
           code: 'type T = readonly [number, number, ...(readonly number[])];',
-          output: 'type T = MinLengthTuple<2, number>;',
+          output: dedent`
+            import { type MinLengthTuple } from 'ts-type-forge';
+            type T = MinLengthTuple<2, number>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'handles the default maximum length of 10',
           code: 'type T = readonly [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];',
-          output: 'type T = FixedLengthTuple<10, 1>;',
+          output: dedent`
+            import { type FixedLengthTuple } from 'ts-type-forge';
+            type T = FixedLengthTuple<10, 1>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'keeps a composite element type intact',
           code: 'type T = readonly [string | number, string | number];',
-          output: 'type T = FixedLengthTuple<2, string | number>;',
+          output: dedent`
+            import { type FixedLengthTuple } from 'ts-type-forge';
+            type T = FixedLengthTuple<2, string | number>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'handles generic element types',
           code: 'type T<V> = [V, V, ...V[]];',
-          output: 'type T<V> = MutableMinLengthTuple<2, V>;',
+          output: dedent`
+            import { type MutableMinLengthTuple } from 'ts-type-forge';
+            type T<V> = MutableMinLengthTuple<2, V>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
           name: 'adds named imports once per target type',
-          options: [{ importStyle: 'named' }],
           code: dedent`
             type A = readonly [string, string];
             type B = readonly [number, number, number];
@@ -164,6 +196,13 @@ describe('prefer-canonical-length-constrained-tuple', () => {
           ],
         },
         {
+          name: 'adds no import under importStyle: global',
+          options: [{ importStyle: 'global' }],
+          code: 'type T = readonly [string, string];',
+          output: 'type T = FixedLengthTuple<2, string>;',
+          errors: [{ messageId: 'useCanonicalTuple' }],
+        },
+        {
           name: 'reuses an aliased import',
           code: dedent`
             import { type FixedLengthTuple as FLT } from 'ts-type-forge';
@@ -180,8 +219,11 @@ describe('prefer-canonical-length-constrained-tuple', () => {
         {
           name: 'rewrites parameter and return type positions',
           code: 'declare const f: (xs: readonly [number, number]) => [string, string];',
-          output:
-            'declare const f: (xs: FixedLengthTuple<2, number>) => MutableFixedLengthTuple<2, string>;',
+          output: dedent`
+            import { type FixedLengthTuple } from 'ts-type-forge';
+            import { type MutableFixedLengthTuple } from 'ts-type-forge';
+            declare const f: (xs: FixedLengthTuple<2, number>) => MutableFixedLengthTuple<2, string>;
+          `,
           errors: [
             { messageId: 'useCanonicalTuple' },
             { messageId: 'useCanonicalTuple' },
@@ -191,7 +233,10 @@ describe('prefer-canonical-length-constrained-tuple', () => {
           name: 'respects a raised maxLength',
           options: [{ maxLength: 12 }],
           code: 'type T = readonly [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];',
-          output: 'type T = FixedLengthTuple<12, 0>;',
+          output: dedent`
+            import { type FixedLengthTuple } from 'ts-type-forge';
+            type T = FixedLengthTuple<12, 0>;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
       ],
