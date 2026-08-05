@@ -72,8 +72,10 @@ describe('prefer-canonical-length-constrained-tuple', () => {
         {
           name: 'still rewrites the branches of a conditional type',
           code: 'type T<A> = A extends 1 ? [true, true] : 2;',
-          output:
-            'type T<A> = A extends 1 ? MutableFixedLengthTuple<2, true> : 2;',
+          output: dedent`
+            import { type MutableFixedLengthTuple } from 'ts-type-forge';
+            type T<A> = A extends 1 ? MutableFixedLengthTuple<2, true> : 2;
+          `,
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
