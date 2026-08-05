@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Arr } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
 import { tsTypeForgeRules } from '../../src/rules/rules.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
@@ -42,8 +43,8 @@ const main = async (): Promise<void> => {
       deprecated: meta.deprecated !== undefined && meta.deprecated !== false,
       fixable: meta.fixable ?? 'false',
       schema,
-      hasOptions: Array.isArray(schema)
-        ? schema.length > 0
+      hasOptions: Arr.isArray(schema)
+        ? Arr.isNonEmpty(schema)
         : schema !== undefined && schema !== false,
     } as const satisfies RuleInfo;
   });
@@ -108,7 +109,7 @@ const generateFileContent = (rules: readonly RuleInfo[]): string => {
           '',
         ]
       : []),
-    ...rules.flatMap((rule) => [...generateRuleNamespace(rule), '']),
+    ...rules.flatMap((rule) => Arr.toPushed(generateRuleNamespace(rule), '')),
     'export type EslintTsTypeForgeRules = Readonly<{',
     ...rules.map(
       (rule) =>
@@ -118,7 +119,7 @@ const generateFileContent = (rules: readonly RuleInfo[]): string => {
     '',
     // `Readonly<{}>` would be an "empty object" type (any non-nullish value),
     // so the no-option case gets an explicitly empty record instead.
-    ...(optionRules.length === 0
+    ...(Arr.isEmpty(optionRules)
       ? [
           'export type EslintTsTypeForgeRulesOption = Readonly<',
           '  Record<never, never>',

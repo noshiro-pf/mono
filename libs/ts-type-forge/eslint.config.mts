@@ -4,6 +4,8 @@ import {
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
+import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
+import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { repositoryRootPath } from './scripts/repository-root-path.mjs';
 
 export default [
@@ -17,6 +19,9 @@ export default [
     tsconfigFileName: 'tsconfig.json',
     packageDirs: [repositoryRootPath],
   }),
+
+  eslintPluginTsDataForge.configs.recommended,
+  eslintPluginTsFortress.configs.recommended,
 
   {
     rules: defineKnownRules({

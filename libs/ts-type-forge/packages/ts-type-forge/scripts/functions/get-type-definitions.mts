@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Arr } from 'ts-data-forge';
 import { glob, Result } from 'ts-repo-utils';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { extractTypeExports } from './extract-type-exports.mjs';
@@ -84,12 +85,14 @@ export const genTypeDefinitions = async (): Promise<void> => {
   );
 
   const result = fileEntries
-    .flatMap(({ relativePath, types }) => [
-      `- ${relativePath}`,
-      ...types.map(
-        ({ line, typeName }) => `  - [${typeName}](./${relativePath}#L${line})`,
+    .flatMap(({ relativePath, types }) =>
+      Arr.toUnshifted(`- ${relativePath}`)(
+        types.map(
+          ({ line, typeName }) =>
+            `  - [${typeName}](./${relativePath}#L${line})`,
+        ),
       ),
-    ])
+    )
     .join('\n');
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename

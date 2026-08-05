@@ -1,4 +1,5 @@
 import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
 import {
   buildTypeImportFix,
@@ -109,14 +110,15 @@ export const reportTupleRewrites = <MessageIds extends string>(
       node: rewrite.node,
       messageId,
       data: { original: sourceCode.getText(rewrite.node), replacement },
-      fix: (fixer) => [
-        ...(index === 0
-          ? importNames.flatMap((name) =>
-              buildTypeImportFix(fixer, program, name),
-            )
-          : []),
-        fixer.replaceText(rewrite.node, replacement),
-      ],
+      fix: (fixer) =>
+        Arr.toPushed(
+          index === 0
+            ? importNames.flatMap((name) =>
+                buildTypeImportFix(fixer, program, name),
+              )
+            : [],
+          fixer.replaceText(rewrite.node, replacement),
+        ),
     });
   }
 };

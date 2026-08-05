@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { rollup } from 'rollup';
+import { Arr } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
@@ -89,7 +90,7 @@ const runRollup = async (): Promise<void> => {
   const outputs =
     rollupConfig.output === undefined
       ? ([] as const)
-      : Array.isArray(rollupConfig.output)
+      : Arr.isArray(rollupConfig.output)
         ? rollupConfig.output
         : ([rollupConfig.output] as const);
 

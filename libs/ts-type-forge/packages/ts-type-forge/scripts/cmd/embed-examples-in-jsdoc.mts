@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { unknownToString } from 'ts-data-forge';
+import { Arr, unknownToString } from 'ts-data-forge';
 import { formatFiles, glob, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 import { sourceFileMappings } from './embed-examples-in-jsdoc-map.mjs';
@@ -123,7 +123,7 @@ export const embedExamplesInJsDoc = async (): Promise<
       }
     }
 
-    if (mut_modifiedFiles.length > 0) {
+    if (Arr.isNonEmpty(mut_modifiedFiles)) {
       console.log(`\nFormatting ${mut_modifiedFiles.length} modified files...`);
 
       await formatFiles(mut_modifiedFiles);
@@ -183,7 +183,7 @@ const assertAllCodeBlocksAreMapped = async (): Promise<
     }
   }
 
-  if (mut_unmappedFiles.length > 0) {
+  if (Arr.isNonEmpty(mut_unmappedFiles)) {
     return Result.err(
       [
         `❌ Found ${mut_unmappedFiles.length} src file(s) containing \`\`\`ts code blocks`,

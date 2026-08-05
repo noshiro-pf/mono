@@ -16,6 +16,7 @@ words:
   - tscw
   - tses
   - unshift
+  - unshifted
   - xnor
 ignorePaths:
   - pnpm-lock.yaml

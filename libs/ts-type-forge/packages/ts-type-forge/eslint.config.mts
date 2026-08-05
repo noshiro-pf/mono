@@ -4,6 +4,11 @@ import {
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
+import {
+  eslintPluginTsDataForge,
+  type EslintTsDataForgeRules,
+} from 'eslint-plugin-ts-data-forge';
+import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { repositoryRootPath } from '../../scripts/repository-root-path.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
@@ -32,6 +37,9 @@ export default [
     tsconfigFileName: './tsconfig.json',
     packageDirs: [workspaceRootPath, repositoryRootPath],
   }),
+
+  eslintPluginTsDataForge.configs.recommended,
+  eslintPluginTsFortress.configs.recommended,
 
   {
     files: ['**/*.test.mts'],
@@ -105,5 +113,25 @@ export default [
       // them is exactly what those samples demonstrate.
       '@typescript-eslint/prefer-readonly-parameter-types': 'off',
     }),
+  },
+  {
+    files: ['samples/**'],
+    // These samples document ts-type-forge's own types, so they are written
+    // against plain TypeScript / the standard library. Rewriting them into
+    // ts-data-forge's equivalents documents ts-data-forge instead, obscures
+    // what the snippet is about, and makes a types-only package's examples
+    // depend on a runtime library.
+    rules: {
+      // `n as Uint` is the point of every branded-number sample: it shows how
+      // that type is constructed.
+      'ts-data-forge/prefer-as-int': 'off',
+      // `Array.isArray` / the `typeof x === 'object' && x !== null` shape are
+      // what the JsonValue samples spell out on purpose.
+      'ts-data-forge/prefer-arr-is-array': 'off',
+      'ts-data-forge/prefer-is-non-null-object': 'off',
+      // `parseFloat('invalid')` is the very API the NaNType sample exists to
+      // illustrate.
+      'ts-data-forge/prefer-num-safe-parse-float': 'off',
+    } satisfies Partial<EslintTsDataForgeRules>,
   },
 ] satisfies readonly FlatConfig[];

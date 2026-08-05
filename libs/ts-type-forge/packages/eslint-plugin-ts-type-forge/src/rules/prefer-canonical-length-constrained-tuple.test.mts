@@ -46,6 +46,21 @@ describe('prefer-canonical-length-constrained-tuple', () => {
           code: 'type T = readonly string[];',
         },
         {
+          name: 'ignores tuple patterns in a conditional type `extends` clause',
+          code: dedent`
+            type And<A extends boolean, B extends boolean> = [A, B] extends [
+              true,
+              true,
+            ]
+              ? true
+              : false;
+          `,
+        },
+        {
+          name: 'ignores tuple patterns nested in an `extends` clause',
+          code: 'type T<A> = A extends readonly (readonly [string, string])[] ? 1 : 2;',
+        },
+        {
           name: 'stays silent when the target name is bound locally',
           code: dedent`
             type FixedLengthTuple<N, V> = readonly [N, V];
@@ -54,6 +69,13 @@ describe('prefer-canonical-length-constrained-tuple', () => {
         },
       ],
       invalid: [
+        {
+          name: 'still rewrites the branches of a conditional type',
+          code: 'type T<A> = A extends 1 ? [true, true] : 2;',
+          output:
+            'type T<A> = A extends 1 ? MutableFixedLengthTuple<2, true> : 2;',
+          errors: [{ messageId: 'useCanonicalTuple' }],
+        },
         {
           name: 'readonly non-empty tuple',
           code: 'type T = readonly [string, ...string[]];',

@@ -1,3 +1,4 @@
+import { hasKey } from 'ts-data-forge';
 import { type UnknownRecord } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
@@ -5,8 +6,8 @@ import { type UnknownRecord } from 'ts-type-forge';
 // Safe handling of unknown objects
 const processData = (data: UnknownRecord) => {
   // Must use type guards to access properties safely
-  if (Object.hasOwn(data, 'name') && typeof data['name'] === 'string') {
-    console.log(data['name']);
+  if (hasKey(data, 'name') && typeof data.name === 'string') {
+    console.log(data.name);
   }
 };
 

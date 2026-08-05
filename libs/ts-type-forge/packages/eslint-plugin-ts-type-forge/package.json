@@ -54,7 +54,8 @@
     "z:vitest": "vitest --config ./configs/vitest.config.mts"
   },
   "dependencies": {
-    "@typescript-eslint/utils": "8.65.0",
+    "@typescript-eslint/utils": "~8.65.0",
+    "ts-data-forge": "~14.0.0",
     "ts-type-forge": "workspace:*"
   },
   "devDependencies": {

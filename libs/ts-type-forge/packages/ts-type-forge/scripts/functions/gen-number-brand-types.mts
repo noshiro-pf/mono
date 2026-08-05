@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { unknownToString } from 'ts-data-forge';
+import { hasKey, unknownToString } from 'ts-data-forge';
 import { formatFiles, isDirectlyExecuted, Result } from 'ts-repo-utils';
 import { extractSampleCode } from '../cmd/embed-examples-utils.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
@@ -638,8 +638,7 @@ const buildImports = (members: readonly Member[]): string => {
     new Set(
       members.flatMap((m) =>
         (m.def.match(/[A-Za-z_][A-Za-z0-9_]*/gu) ?? []).filter(
-          (token) =>
-            !localNames.has(token) && Object.hasOwn(symbolModules, token),
+          (token) => !localNames.has(token) && hasKey(symbolModules, token),
         ),
       ),
     ),

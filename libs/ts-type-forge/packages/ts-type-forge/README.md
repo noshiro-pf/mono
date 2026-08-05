@@ -864,7 +864,7 @@ import {
 const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3];
 
 // Type-safe length checking
-if (Arr.isArrayAtLeastLength(numbers, 2)) {
+if (Arr.isMinLengthArray(2, numbers)) {
     // numbers is now guaranteed to have at least 3 elements
     expectType<typeof numbers, MinLengthTuple<2, number>>('=');
     console.log(numbers[1]); // Array access to index 0, 1 is now safe even with noUncheckedIndexedAccess enabled

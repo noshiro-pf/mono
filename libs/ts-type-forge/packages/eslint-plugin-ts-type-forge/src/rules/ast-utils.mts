@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 
@@ -35,11 +36,15 @@ export type UniformTupleShape = Readonly<{
  *   rewriting them would drop information.
  * - A tuple that is only a rest element (`[...V[]]`) is not a length
  *   constraint at all.
+ * - A tuple inside the `extends` clause of a conditional type is a match
+ *   pattern, not a type (see {@link isInConditionalTypeExtendsClause}).
  */
 export const analyzeUniformTuple = (
   tuple: TSESTree.TSTupleType,
   sourceCode: TSESLint.SourceCode,
 ): UniformTupleShape | undefined => {
+  if (isInConditionalTypeExtendsClause(tuple)) return undefined;
+
   const { parent } = tuple;
 
   const isReadonly =
@@ -52,10 +57,10 @@ export const analyzeUniformTuple = (
 
   const hasRest = last?.type === AST_NODE_TYPES.TSRestType;
 
-  const leading = hasRest ? elements.slice(0, -1) : elements;
+  const leading = hasRest ? Arr.butLast(elements) : elements;
 
   if (
-    leading.length === 0 ||
+    Arr.isEmpty(leading) ||
     leading.some(
       (element) =>
         element.type === AST_NODE_TYPES.TSRestType ||
@@ -82,7 +87,7 @@ export const analyzeUniformTuple = (
   const expected = normalizeWhitespace(elementText);
 
   const others = [
-    ...leading.slice(1),
+    ...Arr.tail(leading),
     ...(restElementType === undefined ? [] : [restElementType]),
   ];
 
@@ -97,6 +102,30 @@ export const analyzeUniformTuple = (
         hasRest,
       }
     : undefined;
+};
+
+/**
+ * Whether `node` sits inside the `extends` clause of a conditional type, where
+ * a tuple is a *match pattern* rather than a type.
+ *
+ * `[A, B] extends [true, true]` matches element-wise even while `A` and `B` are
+ * still generic. The canonical spellings resolve through a mapped type
+ * (`MutableFixedLengthTuple<N, V>` is `Mutable<FixedLengthTuple<N, V>>`), and
+ * against one of those the checker defers the whole conditional instead —
+ * yielding `boolean` where the tuple pattern yielded `true` or `false`, which
+ * silently widens everything downstream. So those positions are left alone.
+ */
+const isInConditionalTypeExtendsClause = (node: TSESTree.Node): boolean => {
+  // The root has no parent, so it terminates the walk.
+  if (node.type === AST_NODE_TYPES.Program) return false;
+
+  const { parent } = node;
+
+  return (
+    (parent.type === AST_NODE_TYPES.TSConditionalType &&
+      parent.extendsType === node) ||
+    isInConditionalTypeExtendsClause(parent)
+  );
 };
 
 /** Unwraps `V[]` and `readonly V[]` to `V`. */
