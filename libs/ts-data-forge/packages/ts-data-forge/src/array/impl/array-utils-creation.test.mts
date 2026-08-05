@@ -1,4 +1,9 @@
-import { type SafeInt, type SafeUint, type SmallUint } from 'ts-type-forge';
+import {
+  type FixedLengthTuple,
+  type SafeInt,
+  type SafeUint,
+  type SmallUint,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { range as rangeIterator } from '../../iterator/index.mjs';
 import {
@@ -24,7 +29,7 @@ describe('Arr creations', () => {
     test('fixed length', () => {
       const result = zeros(3);
 
-      expectType<typeof result, readonly [0, 0, 0]>('=');
+      expectType<typeof result, FixedLengthTuple<3, 0>>('=');
 
       assert.deepStrictEqual(result, [0, 0, 0]);
     });
@@ -125,7 +130,7 @@ describe('Arr creations', () => {
     test('fixed length with primitive value', () => {
       const result = create(3, 'a');
 
-      expectType<typeof result, readonly ['a', 'a', 'a']>('=');
+      expectType<typeof result, FixedLengthTuple<3, 'a'>>('=');
 
       assert.deepStrictEqual(result, ['a', 'a', 'a']);
     });
@@ -133,7 +138,7 @@ describe('Arr creations', () => {
     test('fixed length with null', () => {
       const result = create(2, null);
 
-      expectType<typeof result, readonly [null, null]>('=');
+      expectType<typeof result, FixedLengthTuple<2, null>>('=');
 
       assert.deepStrictEqual(result, [null, null]);
     });
@@ -144,10 +149,7 @@ describe('Arr creations', () => {
       const result = create(2, obj);
 
       // transformer-ignore-next-line
-      expectType<
-        typeof result,
-        readonly [Readonly<{ id: 1 }>, Readonly<{ id: 1 }>]
-      >('~=');
+      expectType<typeof result, FixedLengthTuple<2, Readonly<{ id: 1 }>>>('~=');
 
       assert.deepStrictEqual(result, [obj, obj]);
 

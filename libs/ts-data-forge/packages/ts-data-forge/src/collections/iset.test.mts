@@ -1,4 +1,9 @@
-import { type DeepReadonly, type Primitive } from 'ts-type-forge';
+import {
+  type DeepReadonly,
+  type FixedLengthTuple,
+  type MutableFixedLengthTuple,
+  type Primitive,
+} from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { isString } from '../guard/index.mjs';
 import { type MapSetKeyType } from '../types.mjs';
@@ -974,13 +979,11 @@ describe('ISet.entries', () => {
 
     expectType<
       typeof s0.entries,
-      () => IterableIterator<readonly [1 | 2 | 3, 1 | 2 | 3]>
+      () => IterableIterator<FixedLengthTuple<2, 1 | 2 | 3>>
     >('<=');
 
-    const result: DeepReadonly<[1 | 2 | 3, 1 | 2 | 3][]> = Array.from(
-      s0.entries(),
-      (x) => [x[0], x[1]],
-    );
+    const result: DeepReadonly<MutableFixedLengthTuple<2, 1 | 2 | 3>[]> =
+      Array.from(s0.entries(), (x) => [x[0], x[1]]);
 
     assert.deepStrictEqual(
       result.toSorted((a, b) => a[0] - b[0]),

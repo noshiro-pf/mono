@@ -1,3 +1,4 @@
+import { type FixedLengthTuple } from 'ts-type-forge';
 import { Num } from '../../number/index.mjs';
 import { type ArgArrayIndexWithNegative, type SizeType } from '../../types.mjs';
 
@@ -36,7 +37,7 @@ export function sliceClamped<E>(
         SizeType.ArgArrWithNegative,
         SizeType.ArgArrWithNegative,
       ]
-    | readonly [SizeType.ArgArrWithNegative, SizeType.ArgArrWithNegative]
+    | FixedLengthTuple<2, SizeType.ArgArrWithNegative>
 ): readonly E[] | ((array: readonly E[]) => readonly E[]) {
   switch (args.length) {
     case 3:

@@ -17,7 +17,6 @@ The following packages are planned and not yet part of the repository:
 
 ```sh
 pnpm install
-git submodule update --init --recursive
 
 # Build every package (in dependency order)
 pnpm run ws:build

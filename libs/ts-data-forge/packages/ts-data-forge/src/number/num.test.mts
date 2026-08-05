@@ -1,11 +1,11 @@
-import { type NonZeroNumber } from 'ts-type-forge';
+import { type FixedLengthTuple, type NonZeroNumber } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { pipe, Result } from '../functional/index.mjs';
 import { asNonZeroFiniteNumber } from './branded-types/index.mjs';
 import { Num } from './num.mjs';
 
 const testClamp = (
-  [a, b]: readonly [number, number],
+  [a, b]: FixedLengthTuple<2, number>,
   target: number,
   expected: number,
 ): void => {

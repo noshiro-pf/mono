@@ -88,7 +88,7 @@ describe('map preserves length constraints', () => {
   test('a plain tuple still maps element-wise', () => {
     const result = map([1, 2, 3] as const, String);
 
-    expectType<typeof result, readonly [string, string, string]>('=');
+    expectType<typeof result, FixedLengthTuple<3, string>>('=');
 
     assert.deepStrictEqual(result, ['1', '2', '3']);
   });
@@ -268,7 +268,7 @@ describe('creation utilities report an exact length past their tuple range', () 
   test('a length still inside the tuple range keeps its exact tuple type', () => {
     const result = create(3, 'x');
 
-    expectType<typeof result, readonly ['x', 'x', 'x']>('=');
+    expectType<typeof result, FixedLengthTuple<3, 'x'>>('=');
 
     assert.deepStrictEqual(result, ['x', 'x', 'x']);
   });

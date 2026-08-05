@@ -5,6 +5,8 @@ import {
   eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
+import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
+import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import { repositoryRootPath } from '../../scripts/repository-root-path.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
 
@@ -17,6 +19,9 @@ export default [
     tsconfigFileName: './tsconfig.json',
     packageDirs: [workspaceRootPath, repositoryRootPath],
   }),
+
+  eslintPluginTsTypeForge.configs.recommended,
+  eslintPluginTsFortress.configs.recommended,
 
   eslintConfigForVitest(),
 

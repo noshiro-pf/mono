@@ -75,8 +75,10 @@ export type LevelOf<N> = [N] extends [SafeInt]
 
 // --- boolean fact algebra over a sign ----------------------------------------
 
-type And<A extends boolean, B extends boolean> = [A, B] extends [true, true]
-  ? true
+type And<A extends boolean, B extends boolean> = [A] extends [true]
+  ? [B] extends [true]
+    ? true
+    : false
   : false;
 
 type Or<A extends boolean, B extends boolean> = true extends A | B
@@ -170,8 +172,10 @@ type DivLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
 /** Floor division yields an integer; the safe range is preserved. */
 type DivIntLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
   ? 'number'
-  : [LA, LB] extends ['safeint', 'safeint']
-    ? 'safeint'
+  : [LA] extends ['safeint']
+    ? [LB] extends ['safeint']
+      ? 'safeint'
+      : 'int'
     : 'int';
 
 // --- reconstruction (sign, level) -> canonical brand -------------------------

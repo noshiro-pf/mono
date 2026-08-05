@@ -372,6 +372,7 @@ The `Arr` object provides a rich set of functions for array manipulation.
 
 ```tsx
 import { Arr, expectType, Optional } from 'ts-data-forge';
+import { type FixedLengthTuple, type MinLengthTuple } from 'ts-type-forge';
 
 const numbers: readonly number[] = [1, 2, 3, 4, 5, 2, 3] as const;
 
@@ -383,7 +384,7 @@ assert.isTrue(sum === 20);
 // Type-safe length checking
 if (Arr.isMinLengthTuple(2, numbers)) {
     // numbers is now guaranteed to have at least 2 elements
-    expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
+    expectType<typeof numbers, MinLengthTuple<2, number>>('=');
 
     assert.isTrue(numbers[1] === 2); // Safe access to index 1
 }
@@ -399,7 +400,7 @@ const unique = Arr.uniq(numbers);
 assert.deepStrictEqual(unique, [1, 2, 3, 4, 5]);
 
 // Array creation
-const zeros: readonly [0, 0, 0, 0, 0] = Arr.zeros(5);
+const zeros: FixedLengthTuple<5, 0> = Arr.zeros(5);
 
 assert.deepStrictEqual(zeros, [0, 0, 0, 0, 0]);
 

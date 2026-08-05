@@ -3,6 +3,7 @@ import {
   type FixedLengthTuple,
   type MinLengthArray,
   type NonEmptyArray,
+  type NonEmptyTuple,
 } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
@@ -52,7 +53,7 @@ describe('Arr transformations', () => {
 
       const mappedMixed = map(mixed, (x) => typeof x);
 
-      expectType<typeof mappedMixed, readonly [string, string, string]>('<=');
+      expectType<typeof mappedMixed, FixedLengthTuple<3, string>>('<=');
 
       assert.deepStrictEqual(mappedMixed, ['number', 'string', 'boolean']);
     });
@@ -62,9 +63,7 @@ describe('Arr transformations', () => {
 
       const mappedWithIndex = map(tuple, (x, i) => `${i}:${x}`);
 
-      expectType<typeof mappedWithIndex, readonly [string, string, string]>(
-        '<=',
-      );
+      expectType<typeof mappedWithIndex, FixedLengthTuple<3, string>>('<=');
 
       assert.deepStrictEqual(mappedWithIndex, ['0:a', '1:b', '2:c']);
     });
@@ -76,7 +75,7 @@ describe('Arr transformations', () => {
 
       const runningSum = scan(numbers, (acc, curr) => acc + curr, 0);
 
-      expectType<typeof runningSum, readonly [number, ...number[]]>('<=');
+      expectType<typeof runningSum, NonEmptyTuple<number>>('<=');
 
       assert.deepStrictEqual<readonly number[]>(runningSum, [0, 1, 3, 6, 10]);
     });
@@ -134,7 +133,7 @@ describe('Arr transformations', () => {
 
       const result = scan(strings, (acc, curr) => acc + curr.length, 0);
 
-      expectType<typeof result, readonly [number, ...number[]]>('<=');
+      expectType<typeof result, NonEmptyTuple<number>>('<=');
 
       assert.deepStrictEqual<readonly number[]>(result, [0, 1, 2, 3]);
     });
@@ -1015,7 +1014,7 @@ describe('Arr transformations', () => {
 
       const zipped = zip(xs, ys);
 
-      expectType<typeof zipped, readonly (readonly [number, number])[]>('=');
+      expectType<typeof zipped, readonly FixedLengthTuple<2, number>[]>('=');
 
       test('case 2', () => {
         assert.deepStrictEqual(zipped, [[1, 4]]);

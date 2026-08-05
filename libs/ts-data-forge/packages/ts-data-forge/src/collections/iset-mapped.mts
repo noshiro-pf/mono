@@ -1,5 +1,9 @@
 /* eslint-disable unicorn/prefer-iterator-to-array-at-end */
-import { type ReadonlyRecord, type WidenLiteral } from 'ts-type-forge';
+import {
+  type FixedLengthTuple,
+  type ReadonlyRecord,
+  type WidenLiteral,
+} from 'ts-type-forge';
 import { asUint32 } from '../number/index.mjs';
 import { type MapSetKeyType, type SizeType } from '../types.mjs';
 
@@ -788,7 +792,7 @@ type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
    *
    * @returns An iterable iterator of entries.
    */
-  entries: () => IterableIterator<readonly [K, K]>;
+  entries: () => IterableIterator<FixedLengthTuple<2, K>>;
 
   // Conversion
 
@@ -1444,7 +1448,7 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
   }
 
   /** @inheritdoc */
-  *entries(): IterableIterator<readonly [K, K]> {
+  *entries(): IterableIterator<FixedLengthTuple<2, K>> {
     for (const km of this.#set) {
       // JavaScript Set's entries() yields [value, value]
       const a = this.#fromKey(km);

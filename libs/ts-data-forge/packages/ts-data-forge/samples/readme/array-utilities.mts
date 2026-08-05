@@ -1,4 +1,5 @@
 import { Arr, expectType, Optional } from 'ts-data-forge';
+import { type FixedLengthTuple, type MinLengthTuple } from 'ts-type-forge';
 
 /* embed-sample-code-ignore-this-line */ if (import.meta.vitest !== undefined) {
   /* embed-sample-code-ignore-this-line */ test('main', () => {
@@ -12,7 +13,7 @@ import { Arr, expectType, Optional } from 'ts-data-forge';
     // Type-safe length checking
     if (Arr.isMinLengthTuple(2, numbers)) {
       // numbers is now guaranteed to have at least 2 elements
-      expectType<typeof numbers, readonly [number, number, ...number[]]>('=');
+      expectType<typeof numbers, MinLengthTuple<2, number>>('=');
 
       assert.isTrue(numbers[1] === 2); // Safe access to index 1
     }
@@ -28,7 +29,7 @@ import { Arr, expectType, Optional } from 'ts-data-forge';
     assert.deepStrictEqual(unique, [1, 2, 3, 4, 5]);
 
     // Array creation
-    const zeros: readonly [0, 0, 0, 0, 0] = Arr.zeros(5);
+    const zeros: FixedLengthTuple<5, 0> = Arr.zeros(5);
 
     assert.deepStrictEqual(zeros, [0, 0, 0, 0, 0]);
 
