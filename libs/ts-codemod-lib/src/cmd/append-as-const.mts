@@ -9,7 +9,7 @@ const transformer = appendAsConstTransformer();
 
 const cmdDef = cmd.command({
   name: transformer.name,
-  version: '2.2.3',
+  version: '2.2.4',
   args: {
     baseDir: cmd.positional({
       type: cmd.string,

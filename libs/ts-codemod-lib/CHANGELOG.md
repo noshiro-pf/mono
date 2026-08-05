@@ -1,3 +1,9 @@
+## [2.2.4](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.3...v2.2.4) (2026-08-05)
+
+### Bug Fixes
+
+- update pnpm-workspace.yaml and run pnpm update ([#189](https://github.com/noshiro-pf/ts-codemod-lib/issues/189)) ([5853a1f](https://github.com/noshiro-pf/ts-codemod-lib/commit/5853a1fe70a09138fb59c574c39d275d86d365fb))
+
 ## [2.2.3](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.2...v2.2.3) (2026-07-27)
 
 ### Bug Fixes
