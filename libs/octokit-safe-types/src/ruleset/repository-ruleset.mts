@@ -138,18 +138,15 @@ expectType<
       enforcement: components['schemas']['repository-rule-enforcement'];
       bypass_actors?: components['schemas']['repository-ruleset-bypass-actor'][];
       current_user_can_bypass?:
-        | 'always'
-        | 'pull_requests_only'
-        | 'never'
-        | 'exempt';
+        'always' | 'pull_requests_only' | 'never' | 'exempt';
       node_id?: string;
       _links?: {
         self?: {
           href?: string;
         };
-        html?: {
+        html?: null | {
           href?: string;
-        } | null;
+        };
       };
       conditions?:
         | (

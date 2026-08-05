@@ -1,4 +1,4 @@
-import { pipe } from 'ts-data-forge';
+import { Arr, pipe } from 'ts-data-forge';
 
 const ignoreAboveKeyword = '// embed-sample-code-ignore-above';
 
@@ -41,7 +41,7 @@ const normalizeIndent = (source: string): string => {
 
   // NOTE: ts-data-forge v12 で Arr.isArrayOfLength は削除されたため長さで判定する。
   // 空配列だと Math.min(...[]) が Infinity になり slice が壊れるので早期 return する。
-  if (indents.length === 0) {
+  if (Arr.isEmpty(indents)) {
     return source;
   }
 
