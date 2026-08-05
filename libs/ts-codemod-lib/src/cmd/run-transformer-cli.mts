@@ -51,7 +51,7 @@ export const runTransformerCLI = async (
 
   const files = filesResult.value;
 
-  if (Arr.isArrayOfLength(files, 0)) {
+  if (Arr.isEmpty(files)) {
     echoIfNotSilent(
       options.diffFrom !== undefined
         ? `No files found in diff from "${options.diffFrom}" matching pattern: ${options.baseDir}`

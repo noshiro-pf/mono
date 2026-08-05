@@ -24,9 +24,7 @@ export const replaceRecordWithUnknownRecordTransformer =
       name: TRANSFORMER_NAME,
       transform: (sourceAst) => {
         const containerModifications = Arr.toUnshifted(
-          sourceAst
-            .getModules()
-            .map((namespace) => processDeclarations(namespace)),
+          sourceAst.getModules().map(processDeclarations),
           processDeclarations(sourceAst),
         );
 
@@ -53,7 +51,7 @@ const processDeclarations = (
 
   const interfaceModifications = container
     .getInterfaces()
-    .map((interfaceDecl) => processInterfaceDeclaration(interfaceDecl));
+    .map(processInterfaceDeclaration);
 
   return [...typeAliasModifications, ...interfaceModifications].includes(true);
 };
@@ -81,10 +79,10 @@ const processInterfaceDeclaration = (
   // (type parameters, extends clauses, declare modifier, default export).
   if (
     hasStringUnknownSignature &&
-    Arr.isArrayOfLength(interfaceDecl.getProperties(), 0) &&
-    Arr.isArrayOfLength(indexSignatures, 1) &&
-    Arr.isArrayOfLength(interfaceDecl.getTypeParameters(), 0) &&
-    Arr.isArrayOfLength(interfaceDecl.getExtends(), 0) &&
+    Arr.isEmpty(interfaceDecl.getProperties()) &&
+    Arr.isFixedLengthArray(1, indexSignatures) &&
+    Arr.isEmpty(interfaceDecl.getTypeParameters()) &&
+    Arr.isEmpty(interfaceDecl.getExtends()) &&
     !interfaceDecl.hasDeclareKeyword() &&
     !interfaceDecl.hasDefaultKeyword()
   ) {
@@ -118,7 +116,7 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
     if (node.getTypeName().getText() === 'Readonly') {
       const typeArgs = node.getTypeArguments();
 
-      if (Arr.isArrayOfLength(typeArgs, 1)) {
+      if (Arr.isFixedLengthArray(1, typeArgs)) {
         const typeArg = typeArgs[0];
 
         if (tsm.Node.isTypeLiteral(typeArg)) {
@@ -130,8 +128,8 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
 
           // Check if it has only one index signature [k: string]: unknown
           if (
-            Arr.isArrayOfLength(members, 1) &&
-            Arr.isArrayOfLength(indexSigs, 1) &&
+            Arr.isFixedLengthArray(1, members) &&
+            Arr.isFixedLengthArray(1, indexSigs) &&
             isStringUnknownIndexSignature(indexSigs[0])
           ) {
             node.replaceWithText('UnknownRecord');
@@ -158,8 +156,8 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
 
     // Check if it has only one index signature [k: string]: unknown
     if (
-      Arr.isArrayOfLength(members, 1) &&
-      Arr.isArrayOfLength(indexSigs, 1) &&
+      Arr.isFixedLengthArray(1, members) &&
+      Arr.isFixedLengthArray(1, indexSigs) &&
       isStringUnknownIndexSignature(indexSigs[0])
     ) {
       node.replaceWithText('UnknownRecord');
@@ -188,10 +186,7 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
 
   // Recursively visit child type nodes
   if (tsm.Node.isUnionTypeNode(node) || tsm.Node.isIntersectionTypeNode(node)) {
-    return node
-      .getTypeNodes()
-      .map((typeNode) => visitTypeNode(typeNode))
-      .includes(true);
+    return node.getTypeNodes().map(visitTypeNode).includes(true);
   }
 
   if (tsm.Node.isArrayTypeNode(node)) {
@@ -199,10 +194,7 @@ const visitTypeNode = (node: tsm.TypeNode): boolean => {
   }
 
   if (tsm.Node.isTupleTypeNode(node)) {
-    return node
-      .getElements()
-      .map((element) => visitTypeNode(element))
-      .includes(true);
+    return node.getElements().map(visitTypeNode).includes(true);
   }
 
   if (tsm.Node.isParenthesizedTypeNode(node)) {
@@ -244,7 +236,7 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {
       const typeArgs = node.getTypeArguments();
 
       if (
-        Arr.isArrayOfLength(typeArgs, 2) &&
+        Arr.isFixedLengthArray(2, typeArgs) &&
         typeArgs[0].getText() === 'string' &&
         typeArgs[1].getText() === 'unknown'
       ) {
@@ -254,13 +246,13 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {
       }
 
       // Recurse into type arguments (e.g. Record<string, Record<string, unknown>>)
-      return typeArgs.map((typeArg) => visitTypeNode(typeArg)).includes(true);
+      return typeArgs.map(visitTypeNode).includes(true);
     }
     case 'Readonly': {
       // Check if it's Readonly<Record<string, unknown>>
       const typeArgs = node.getTypeArguments();
 
-      if (Arr.isArrayOfLength(typeArgs, 1)) {
+      if (Arr.isFixedLengthArray(1, typeArgs)) {
         const innerType = typeArgs[0];
 
         if (tsm.Node.isTypeReference(innerType)) {
@@ -270,7 +262,7 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {
             const innerTypeArgs = innerType.getTypeArguments();
 
             if (
-              Arr.isArrayOfLength(innerTypeArgs, 2) &&
+              Arr.isFixedLengthArray(2, innerTypeArgs) &&
               innerTypeArgs[0].getText() === 'string' &&
               innerTypeArgs[1].getText() === 'unknown'
             ) {
@@ -290,10 +282,7 @@ const replaceIfRecordUnknown = (node: tsm.TypeReferenceNode): boolean => {
 
     default: {
       // Recurse into type arguments for any other generic type
-      return node
-        .getTypeArguments()
-        .map((typeArg) => visitTypeNode(typeArg))
-        .includes(true);
+      return node.getTypeArguments().map(visitTypeNode).includes(true);
     }
   }
 };

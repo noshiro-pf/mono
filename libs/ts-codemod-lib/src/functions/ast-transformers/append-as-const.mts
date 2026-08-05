@@ -150,7 +150,7 @@ const transformNode = (
 
     if (
       declarationKindKeywords !== undefined &&
-      Arr.isArrayOfLength(declarationKindKeywords, 1)
+      Arr.isFixedLengthArray(1, declarationKindKeywords)
     ) {
       transformNode(
         initializer,

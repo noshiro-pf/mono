@@ -176,7 +176,7 @@ export const isReadonlyTypeReferenceNode = (
   return (
     typeName.isKind(tsm.SyntaxKind.Identifier) &&
     typeName.getText() === 'Readonly' &&
-    Arr.isArrayOfLength(typeArguments, 1)
+    Arr.isFixedLengthArray(1, typeArguments)
   );
 };
 

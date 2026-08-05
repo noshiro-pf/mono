@@ -58,12 +58,12 @@ const shouldSkipFile = (
 
   const hasFileIgnoreComment = patterns.some((regex) => regex.test(code));
 
-  if (Arr.isArrayOfLength(ignoredTransformers, 0) && !hasFileIgnoreComment) {
+  if (Arr.isEmpty(ignoredTransformers) && !hasFileIgnoreComment) {
     return false;
   }
 
   // Empty array means ignore all transformers (file-level ignore without specific transformers)
-  if (Arr.isArrayOfLength(ignoredTransformers, 0)) {
+  if (Arr.isEmpty(ignoredTransformers)) {
     return true;
   }
 

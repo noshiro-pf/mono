@@ -409,7 +409,7 @@ const transformTypeReferenceNode = (
 
   // Array<T> / ReadonlyArray<T> to readonly T[]
   if (typeNameStr === 'Array' || typeNameStr === 'ReadonlyArray') {
-    if (!Arr.isArrayOfLength(typeArguments, 1)) {
+    if (!Arr.isFixedLengthArray(1, typeArguments)) {
       throw new Error(
         `Unexpected number of type arguments "${typeArguments.length}" for ${typeNameStr}.`,
       );
@@ -442,7 +442,7 @@ const transformTypeReferenceNode = (
 
   // Set<T> to ReadonlySet<T>
   if (typeNameStr === 'Set') {
-    if (!Arr.isArrayOfLength(typeArguments, 1)) {
+    if (!Arr.isFixedLengthArray(1, typeArguments)) {
       throw new Error(
         `Unexpected number of type arguments "${typeArguments.length}" for Set.`,
       );
@@ -468,7 +468,7 @@ const transformTypeReferenceNode = (
 
   // Map<T> to ReadonlyMap<T>
   if (typeNameStr === 'Map') {
-    if (!Arr.isArrayOfLength(typeArguments, 2)) {
+    if (!Arr.isFixedLengthArray(2, typeArguments)) {
       throw new Error(
         `Unexpected number of type arguments "${typeArguments.length}" for Map.`,
       );
@@ -498,7 +498,7 @@ const transformTypeReferenceNode = (
 
   // remove unnecessary `Readonly` wrapper or convert to readonly operator
   if (typeNameStr === 'Readonly') {
-    if (!Arr.isArrayOfLength(typeArguments, 1)) {
+    if (!Arr.isFixedLengthArray(1, typeArguments)) {
       throw new Error(
         `Unexpected number of type arguments "${typeArguments.length}" for Readonly.`,
       );
@@ -592,7 +592,7 @@ const transformTypeReferenceNode = (
 
   // DeepReadonly
   if (typeNameStr === options.DeepReadonly.typeName) {
-    if (!Arr.isArrayOfLength(typeArguments, 1)) {
+    if (!Arr.isFixedLengthArray(1, typeArguments)) {
       throw new Error(
         `Unexpected number of type arguments "${typeArguments.length}" for Readonly.`,
       );
@@ -858,10 +858,7 @@ const transformTypeLiteralNode = (
   >,
   options: ReadonlyTransformerOptionsInternal,
 ): void => {
-  if (
-    options.ignoreEmptyObjectTypes &&
-    Arr.isArrayOfLength(node.getMembers(), 0)
-  ) {
+  if (options.ignoreEmptyObjectTypes && Arr.isEmpty(node.getMembers())) {
     return;
   }
 
@@ -1170,8 +1167,7 @@ const transformUnionOrIntersectionTypeNodeImpl = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     n: tsm.TypeLiteralNode | ReadonlyTypeReferenceNode,
   ): boolean =>
-    n.isKind(tsm.SyntaxKind.TypeLiteral) &&
-    Arr.isArrayOfLength(n.getMembers(), 0);
+    n.isKind(tsm.SyntaxKind.TypeLiteral) && Arr.isEmpty(n.getMembers());
 
   const nonEmptyTypeLiterals =
     typeLiterals === undefined
@@ -1183,11 +1179,10 @@ const transformUnionOrIntersectionTypeNodeImpl = (
   const emptyTypeLiterals =
     typeLiterals === undefined || !options.ignoreEmptyObjectTypes
       ? undefined
-      : typeLiterals.nodes.filter((n) => isEmptyTypeLiteral(n));
+      : typeLiterals.nodes.filter(isEmptyTypeLiteral);
 
   const typeLiteralsWrappedWithReadonly: readonly [] | readonly [string] =
-    nonEmptyTypeLiterals === undefined ||
-    Arr.isArrayOfLength(nonEmptyTypeLiterals, 0)
+    nonEmptyTypeLiterals === undefined || Arr.isEmpty(nonEmptyTypeLiterals)
       ? ([] as const)
       : ([
           unionToString({
@@ -1282,9 +1277,9 @@ const unionToString = ({
   op: '&' | '|';
   wrapWithReadonly: boolean | string;
 }>): string =>
-  Arr.isArrayOfLength(types, 0)
+  Arr.isEmpty(types)
     ? 'never'
-    : Arr.isArrayOfLength(types, 1)
+    : Arr.isFixedLengthArray(1, types)
       ? wrapWithReadonly === false
         ? wrapWithParentheses(types[0])
         : (`${isString(wrapWithReadonly) ? wrapWithReadonly : 'Readonly'}<${types[0]}>` as const)

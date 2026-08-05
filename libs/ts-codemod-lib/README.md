@@ -448,19 +448,7 @@ node codemod.mjs
 
 ```sh
 git clone https://github.com/noshiro-pf/ts-codemod-lib.git
-git submodule update --init --recursive
 pnpm i
-```
-
-### Syncing AGENTS.md Updates
-
-1. Update `AGENTS.md` in the common repository (`common-agent-config`)
-2. Update the submodule in each project
-
-```bash
-git submodule update --remote --merge
-git add agents/common
-git commit -m "Update AGENTS.md"
 ```
 
 ### Resources

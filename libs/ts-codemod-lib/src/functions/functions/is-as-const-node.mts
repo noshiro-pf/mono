@@ -43,6 +43,6 @@ export const isAsConstNode = (
   //    and that there are no type arguments (as const doesn't have them)
   return (
     typeNameNode.getText() === 'const' &&
-    Arr.isArrayOfLength(typeNode.getTypeArguments(), 0)
+    Arr.isEmpty(typeNode.getTypeArguments())
   );
 };
