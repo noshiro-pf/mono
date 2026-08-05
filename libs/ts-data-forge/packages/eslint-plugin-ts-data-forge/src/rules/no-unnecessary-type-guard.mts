@@ -44,6 +44,7 @@ type GuardSpec = DeepReadonly<
       replacements?: Record<string, string>;
     }
   | { kind: 'nonEmptyString' }
+  | { kind: 'record' }
 >;
 
 /**
@@ -98,6 +99,7 @@ const GUARD_SPECS: DeepReadonly<Record<string, GuardSpec>> = {
     replacements: NULLISH_REPLACEMENTS_EXCLUDE,
   },
   isNonEmptyString: { kind: 'nonEmptyString' },
+  isRecord: { kind: 'record' },
 } as const;
 
 const DEFERRED_OR_OPAQUE_FLAGS =
@@ -341,6 +343,20 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
               break;
             }
 
+            case 'record': {
+              if (parts.every((p) => isGuaranteedRecord(p, checker))) {
+                // Every member already satisfies `UnknownRecord`.
+                reportConstant(node, canonicalName, true, argument);
+              } else if (
+                parts.every((p) => isGuaranteedNotRecord(p, checker))
+              ) {
+                // No member can ever be a non-null, non-array object.
+                reportConstant(node, canonicalName, false, argument);
+              }
+
+              break;
+            }
+
             case 'nonEmptyString': {
               const hasNullish =
                 inputAtoms.has('undefined') || inputAtoms.has('null');
@@ -402,6 +418,55 @@ const collectUnionParts = (type: ts.Type): readonly ts.Type[] | undefined => {
 
   return parts;
 };
+
+/**
+ * Whether `isRecord` is guaranteed to accept this (non-union) type.
+ *
+ * `isRecord` narrows to `UnknownRecord` (`ReadonlyRecord<string, unknown>`), so
+ * a string index signature is exactly what it asks for and its value type is
+ * `unknown`, which anything satisfies. Arrays and callables are excluded even
+ * when they carry one, because `isRecord` rejects them at runtime
+ * (`Array.isArray` is true; `typeof fn === 'object'` is false).
+ *
+ * Deliberately conservative: an object type without an index signature of its
+ * own is reported as neither guaranteed-accepted nor guaranteed-rejected, even
+ * where TypeScript would accept it through an implicit index signature.
+ */
+const isGuaranteedRecord = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  checker.getIndexInfoOfType(type, ts.IndexKind.String) !== undefined &&
+  !isCallableType(type, checker) &&
+  !checker.isArrayType(type) &&
+  !checker.isTupleType(type);
+
+/**
+ * Whether `isRecord` is guaranteed to reject this (non-union) type: every
+ * primitive (`null` included), every array or tuple, and every callable fails
+ * its `typeof x === 'object' && x !== null && !Array.isArray(x)` check.
+ */
+const isGuaranteedNotRecord = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  classifyAtom(type) !== 'other' ||
+  checker.isArrayType(type) ||
+  checker.isTupleType(type) ||
+  isCallableType(type, checker);
+
+const isCallableType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  checker.getSignaturesOfType(type, ts.SignatureKind.Call).length > 0 ||
+  checker.getSignaturesOfType(type, ts.SignatureKind.Construct).length > 0;
 
 /** Classifies a single (non-union) type into a primitive {@link Atom}. */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

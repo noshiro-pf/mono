@@ -37,6 +37,80 @@ describe('prefer-is-record-and-has-key', () => {
     ],
     invalid: [
       {
+        name: 'drops isRecord when the object already has a string index signature',
+        code: dedent`
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = Object.hasOwn(obj, 'a');
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-data-forge';
+          declare const obj: Readonly<Record<string, unknown>>;
+          const ok = hasKey(obj, 'a');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'drops isRecord for `key in obj` on a record-typed object',
+        code: dedent`
+          declare const obj: Record<string, number>;
+          const ok = 'a' in obj;
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-data-forge';
+          declare const obj: Record<string, number>;
+          const ok = hasKey(obj, 'a');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'keeps isRecord when only part of a union is a record',
+        code: dedent`
+          declare const obj: Record<string, unknown> | readonly unknown[];
+          const ok = Object.hasOwn(obj, 'a');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-data-forge';
+          declare const obj: Record<string, unknown> | readonly unknown[];
+          const ok = (isRecord(obj) && hasKey(obj, 'a'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'keeps isRecord for an index-signature-carrying callable',
+        code: dedent`
+          type Callable = { (): void; [key: string]: unknown };
+          declare const obj: Callable;
+          const ok = Object.hasOwn(obj, 'a');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-data-forge';
+          type Callable = { (): void; [key: string]: unknown };
+          declare const obj: Callable;
+          const ok = (isRecord(obj) && hasKey(obj, 'a'));
+        `,
+        errors: [{ messageId: 'useIsRecordAndHasKey' }],
+      },
+      {
+        name: 'imports isRecord once when both forms appear in a file',
+        code: dedent`
+          declare const rec: Record<string, unknown>;
+          declare const unk: unknown;
+          const a = Object.hasOwn(rec, 'a');
+          const b = Object.hasOwn(unk, 'b');
+        `,
+        output: dedent`
+          import { isRecord, hasKey } from 'ts-data-forge';
+          declare const rec: Record<string, unknown>;
+          declare const unk: unknown;
+          const a = hasKey(rec, 'a');
+          const b = (isRecord(unk) && hasKey(unk, 'b'));
+        `,
+        errors: [
+          { messageId: 'useHasKey' },
+          { messageId: 'useIsRecordAndHasKey' },
+        ],
+      },
+      {
         name: 'replaces Object.hasOwn(obj, key) with isRecord && hasKey',
         code: dedent`
           const obj = { a: 1 };

@@ -21,6 +21,30 @@ describe('no-unnecessary-type-guard', () => {
   tester.run('no-unnecessary-type-guard', noUnnecessaryTypeGuard, {
     valid: [
       {
+        name: 'isRecord that actually narrows a union',
+        code: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: Record<string, unknown> | string;
+          const y = isRecord(x);
+        `,
+      },
+      {
+        name: 'isRecord on an object type without an index signature of its own',
+        code: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: Readonly<{ a: number }>;
+          const y = isRecord(x);
+        `,
+      },
+      {
+        name: 'isRecord on unknown',
+        code: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: unknown;
+          const y = isRecord(x);
+        `,
+      },
+      {
         name: 'isNotUndefined on a type that includes undefined',
         code: dedent`
           import { isNotUndefined } from 'ts-data-forge';
@@ -110,6 +134,76 @@ describe('no-unnecessary-type-guard', () => {
       },
     ],
     invalid: [
+      {
+        name: 'isRecord on a record type (always true)',
+        code: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: Readonly<Record<string, unknown>>;
+          const y = isRecord(x);
+        `,
+        output: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: Readonly<Record<string, unknown>>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'isRecord on a union of record types (always true)',
+        code: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: Record<string, number> | Record<string, string>;
+          const y = isRecord(x);
+        `,
+        output: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: Record<string, number> | Record<string, string>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'isRecord on a primitive (always false)',
+        code: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: string | null;
+          const y = isRecord(x);
+        `,
+        output: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: string | null;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'isRecord on an array (always false)',
+        code: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: readonly number[];
+          const y = isRecord(x);
+        `,
+        output: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: readonly number[];
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'isRecord on a function (always false)',
+        code: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: () => void;
+          const y = isRecord(x);
+        `,
+        output: dedent`
+          import { isRecord } from 'ts-data-forge';
+          declare const x: () => void;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
       {
         name: 'isNotUndefined on a type that cannot be undefined (always true)',
         code: dedent`
