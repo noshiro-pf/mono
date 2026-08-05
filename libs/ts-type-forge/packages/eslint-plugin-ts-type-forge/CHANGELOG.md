@@ -1,5 +1,30 @@
 # eslint-plugin-ts-type-forge
 
+## 0.5.0
+
+### Minor Changes
+
+- 2dfecb5: `prefer-canonical-length-constrained-tuple` now adds the import its rewrite
+  needs by default: `importStyle` defaults to `'named'`, so an autofix that
+  introduces `FixedLengthTuple` also inserts
+  `import { type FixedLengthTuple } from 'ts-type-forge';` when the name is not
+  in scope yet. This matches how eslint-plugin-ts-data-forge's rules behave, and
+  the inserted specifier is a `type` import, so it erases at compile time.
+
+    Set `importStyle: 'global'` to restore the previous behavior in a project that
+    loads the ambient globals of `ts-type-forge/global`.
+
+### Patch Changes
+
+- 38c6c36: Depend on `ts-data-forge` for array helpers and relax the
+  `@typescript-eslint/utils` dependency to a `~` range.
+- 38c6c36: `prefer-canonical-length-constrained-tuple` no longer rewrites tuples that
+  appear in the `extends` clause of a conditional type. There a tuple is a match
+  pattern: `[A, B] extends [true, true]` matches element-wise while `A` and `B`
+  are still generic, whereas the canonical spellings resolve through a mapped
+  type and make the checker defer the whole conditional, silently widening the
+  result.
+
 ## 0.4.3
 
 ### Patch Changes
