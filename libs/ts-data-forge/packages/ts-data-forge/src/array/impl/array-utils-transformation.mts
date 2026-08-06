@@ -245,28 +245,51 @@ export const toReversed = <const Ar extends readonly unknown[]>(
  * assert.deepStrictEqual(alphabetical, expectedWords);
  * ```
  */
-export const toSorted = <const Ar extends readonly unknown[]>(
-  ...[array, comparator]: Ar extends readonly number[]
-    ? readonly [
-        array: Ar,
-        // If the array elements are mapped to numbers, comparator is optional.
-        comparator?: (x: Ar[number], y: Ar[number]) => number,
-      ]
-    : readonly [array: Ar, comparator: (x: Ar[number], y: Ar[number]) => number]
-): HasLengthConstraint<Ar> extends true
-  ? ChangeArrayElement<Ar, Ar[number]>
-  : IsFixedLengthList<Ar> extends true
-    ? FixedLengthTuple<Ar['length'], Ar[number]>
-    : Ar extends NonEmptyTuple<unknown>
-      ? NonEmptyArray<Ar[number]>
-      : readonly Ar[number][] =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  array.toSorted(
+// Numbers sort without a comparator, so it is optional for them and required
+// for everything else.
+//
+// Stated as two overloads rather than one conditional rest-parameter tuple.
+// The conditional form reads well, but a *generic* `Ar` cannot decide it, so
+// the parameter list stayed unresolved and `Arr.toSorted(xs, cmp)` inside a
+// function that is itself generic over the array was rejected outright:
+//
+//     Argument of type '[T, (a: number, b: number) => number]' is not
+//     assignable to parameter of type 'T extends readonly number[] ? ... : ...'
+//
+// Overload resolution picks a branch per call instead, so both concrete and
+// generic callers work. The *return* type stays conditional — that one a
+// generic caller handles, as `toSortedBy` (same shape) already showed.
+export function toSorted<const Ar extends readonly number[]>(
+  array: Ar,
+  comparator?: (x: Ar[number], y: Ar[number]) => number,
+): SortedResult<Ar>;
+
+export function toSorted<const Ar extends readonly unknown[]>(
+  array: Ar,
+  comparator: (x: Ar[number], y: Ar[number]) => number,
+): SortedResult<Ar>;
+
+export function toSorted(
+  array: readonly unknown[],
+  comparator?: (x: never, y: never) => number,
+): readonly unknown[] {
+  return array.toSorted(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     (comparator as ((x: unknown, y: unknown) => number) | undefined) ??
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       ((x, y) => (x as number) - (y as number)),
-  ) as never;
+  );
+}
+
+/** The result of sorting `Ar`: same elements, same length, same bounds. */
+type SortedResult<Ar extends readonly unknown[]> =
+  HasLengthConstraint<Ar> extends true
+    ? ChangeArrayElement<Ar, Ar[number]>
+    : IsFixedLengthList<Ar> extends true
+      ? FixedLengthTuple<Ar['length'], Ar[number]>
+      : Ar extends NonEmptyTuple<unknown>
+        ? NonEmptyArray<Ar[number]>
+        : readonly Ar[number][];
 
 /**
  * Sorts an array by a mapped value.

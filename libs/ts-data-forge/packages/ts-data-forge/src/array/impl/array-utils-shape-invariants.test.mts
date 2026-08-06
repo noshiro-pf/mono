@@ -14,8 +14,26 @@ import {
   asMaxLengthArray,
   asMinLengthArray,
 } from './array-utils-length-bounded-array-cast.mjs';
-import { toFilled, toRangeFilled } from './array-utils-modification.mjs';
-import { map, toReversed, toSorted } from './array-utils-transformation.mjs';
+import {
+  toFilled,
+  toInserted,
+  toPushed,
+  toRangeFilled,
+  toRemoved,
+  toUnshifted,
+} from './array-utils-modification.mjs';
+import { skip, skipLast, take, takeLast } from './array-utils-slicing.mjs';
+import {
+  concat,
+  filter,
+  filterNot,
+  map,
+  toReversed,
+  toSorted,
+  toSortedBy,
+  uniq,
+  uniqBy,
+} from './array-utils-transformation.mjs';
 
 /**
  * Invariant-based coverage for the array -> array transforms.
@@ -31,12 +49,14 @@ import { map, toReversed, toSorted } from './array-utils-transformation.mjs';
  * 1. **Length** — the result reports the same `length` as the input.
  * 2. **Bounds** — a length brand on the input survives onto the result.
  * 3. **Generic context** — from a caller that is itself generic over the
- *    array, the result is assignable to the caller's own homomorphic mapping.
+ *    array, the result is assignable to the caller's own annotation.
  *
- * Property 3 is the one with no coverage before this file, and is what the
- * `Arr.map` regression fixed in this PR violated: a conditional return type a
- * generic `Ar` cannot decide stays deferred, and its brand-carrying branch is
- * then not assignable to the caller's mapping.
+ * Property 3 is the one that keeps regressing, and the one a per-combination
+ * table cannot express: a conditional a generic `Ar` cannot decide stays
+ * deferred, and a deferred conditional carrying a brand-intersection branch is
+ * not an array type at all — so the result has no `entries()`, is not
+ * assignable to the caller's annotation, and in the worst case the bound
+ * arithmetic behind the brand exceeds the instantiation limit.
  */
 
 // The sample inputs. Between them they cover the axes: empty / singleton /
@@ -71,15 +91,15 @@ const exactLength: FixedLengthArray<3, number> = asFixedLengthArray(
  * Property 3 — generic context.
  *
  * Each of these is an assertion by construction: the annotated return type is
- * the caller's own homomorphic mapping, so the declaration only compiles while
+ * what the caller is entitled to expect, so the declaration only compiles while
  * the transform reports something assignable to it. There is nothing to run.
  *
- * Only the transforms that satisfy this today are listed. `toSorted`,
- * `toSortedBy`, `toReversed`, `toUpdated`, `tail`, `butLast` and `zip` do not
- * yet — see the PR description for why each one resists the same fix. Add them
- * here as they are fixed; that is what makes this list the coverage record.
+ * This list is the coverage record. Every array -> array transform that
+ * resolves under a generic array parameter appears here; the ones that do not
+ * are listed at the bottom of this file, with the reason.
  */
 
+// Element-replacing transforms report the caller's own homomorphic mapping.
 const mapInGenericContext = <const T extends readonly number[]>(
   xs: T,
 ): Readonly<{ [K in keyof T]: string }> => map(xs, String);
@@ -100,6 +120,85 @@ const toRangeFilledInGenericContext = <const T extends readonly number[]>(
   xs: T,
 ): Readonly<{ [K in keyof T]: number }> => toRangeFilled(xs, 0, [0, 1]);
 
+// Reordering transforms keep the elements, so the caller is entitled to an
+// array of them.
+const toReversedInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => toReversed(xs);
+
+const toSortedInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => toSorted(xs, (a, b) => a - b);
+
+// Numbers sort without a comparator. This is the overload that makes it
+// optional, which a generic caller could not reach at all while the parameter
+// list was itself a conditional type.
+const toSortedDefaultInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => toSorted(xs);
+
+const toSortedNonNumberInGenericContext = <const T extends readonly string[]>(
+  xs: T,
+): readonly T[number][] => toSorted(xs, (a, b) => a.localeCompare(b));
+
+const toSortedByInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => toSortedBy(xs, (n) => n);
+
+// Shortening transforms lose the length but keep the element type.
+const takeInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => take(xs, 2);
+
+const takeLastInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => takeLast(xs, 2);
+
+const skipInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => skip(xs, 2);
+
+const skipLastInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => skipLast(xs, 2);
+
+const toRemovedInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => toRemoved(xs, 0);
+
+const filterInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => filter(xs, (n) => n > 0);
+
+const filterNotInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => filterNot(xs, (n) => n > 0);
+
+const uniqInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => uniq(xs);
+
+const uniqByInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => uniqBy(xs, (n) => n);
+
+// Lengthening transforms widen the element type by whatever was added.
+const toPushedInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly (T[number] | 'x')[] => toPushed(xs, 'x');
+
+const toUnshiftedInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly (T[number] | 'x')[] => toUnshifted(xs, 'x');
+
+const toInsertedInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly (T[number] | 'x')[] => toInserted(xs, 0, 'x');
+
+const concatInGenericContext = <const T extends readonly number[]>(
+  xs: T,
+): readonly T[number][] => concat(xs, xs);
+
 describe('Arr shape invariants', () => {
   // The type-level assertions below are checked by `tsc`; this pins the same
   // property at runtime, so a transform that silently drops or adds an element
@@ -107,19 +206,20 @@ describe('Arr shape invariants', () => {
   test('every shape-preserving transform keeps the length at runtime', () => {
     const input = [3, 1, 2] as const;
 
-    assert.deepStrictEqual<FixedLengthTuple<5, 3>>(
+    assert.deepStrictEqual<FixedLengthTuple<6, 3>>(
       [
         map(input, String).length,
         toFilled(input, 0).length,
         toRangeFilled(input, 0, [1, 2]).length,
         toSorted(input).length,
+        toSortedBy(input, (n) => n).length,
         toReversed(input).length,
       ] as const,
-      [3, 3, 3, 3, 3] as const,
+      [3, 3, 3, 3, 3, 3] as const,
     );
   });
 
-  test('the generic-context callers agree with their annotations', () => {
+  test('the element-replacing callers agree with their annotations', () => {
     const input = [3, 1, 2] as const;
 
     assert.deepStrictEqual<FixedLengthTuple<3, string>>(
@@ -145,6 +245,105 @@ describe('Arr shape invariants', () => {
     assert.deepStrictEqual<FixedLengthTuple<3, number>>(
       toRangeFilledInGenericContext(input),
       [0, 1, 2],
+    );
+  });
+
+  test('the reordering callers agree with their annotations', () => {
+    const input = [3, 1, 2] as const;
+
+    assert.deepStrictEqual<readonly number[]>(
+      toReversedInGenericContext(input),
+      [2, 1, 3],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      toSortedInGenericContext(input),
+      [1, 2, 3],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      toSortedDefaultInGenericContext(input),
+      [1, 2, 3],
+    );
+
+    assert.deepStrictEqual<readonly string[]>(
+      toSortedNonNumberInGenericContext(['c', 'a', 'b'] as const),
+      ['a', 'b', 'c'],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      toSortedByInGenericContext(input),
+      [1, 2, 3],
+    );
+  });
+
+  test('the shortening callers agree with their annotations', () => {
+    const input = [3, 1, 2] as const;
+
+    assert.deepStrictEqual<readonly number[]>(
+      takeInGenericContext(input),
+      [3, 1],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      takeLastInGenericContext(input),
+      [1, 2],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(skipInGenericContext(input), [2]);
+
+    assert.deepStrictEqual<readonly number[]>(
+      skipLastInGenericContext(input),
+      [3],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      toRemovedInGenericContext(input),
+      [1, 2],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      filterInGenericContext(input),
+      [3, 1, 2],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      filterNotInGenericContext(input),
+      [],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      uniqInGenericContext([1, 1, 2] as const),
+      [1, 2],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      uniqByInGenericContext([1, 1, 2] as const),
+      [1, 2],
+    );
+  });
+
+  test('the lengthening callers agree with their annotations', () => {
+    const input = [3, 1, 2] as const;
+
+    assert.deepStrictEqual<readonly (number | string)[]>(
+      toPushedInGenericContext(input),
+      [3, 1, 2, 'x'],
+    );
+
+    assert.deepStrictEqual<readonly (number | string)[]>(
+      toUnshiftedInGenericContext(input),
+      ['x', 3, 1, 2],
+    );
+
+    assert.deepStrictEqual<readonly (number | string)[]>(
+      toInsertedInGenericContext(input),
+      ['x', 3, 1, 2],
+    );
+
+    assert.deepStrictEqual<readonly number[]>(
+      concatInGenericContext(input),
+      [3, 1, 2, 3, 1, 2],
     );
   });
 });
@@ -235,8 +434,7 @@ describe('Arr shape invariants', () => {
   expectType<MinLengthOf<typeof _c>, MinLengthOf<typeof lowerBounded>>('=');
 }
 
-// `toSorted` — properties 1 and 2. Sorting neither adds nor drops elements, so
-// it is held to the same contract even though it is not fixed for property 3.
+// `toSorted` — properties 1 and 2. Sorting neither adds nor drops elements.
 {
   const _a = toSorted(fixedTuple);
 
@@ -261,6 +459,27 @@ describe('Arr shape invariants', () => {
   expectType<MaxLengthOf<typeof _e>, MaxLengthOf<typeof bounded>>('=');
 }
 
+// `toSortedBy` — properties 1 and 2.
+{
+  const _a = toSortedBy(fixedTuple, (n) => n);
+
+  const _b = toSortedBy(plainArray, (n) => n);
+
+  const _c = toSortedBy(lowerBounded, (n) => n);
+
+  const _d = toSortedBy(bounded, (n) => n);
+
+  expectType<(typeof _a)['length'], (typeof fixedTuple)['length']>('=');
+
+  expectType<(typeof _b)['length'], (typeof plainArray)['length']>('=');
+
+  expectType<MinLengthOf<typeof _c>, MinLengthOf<typeof lowerBounded>>('=');
+
+  expectType<MinLengthOf<typeof _d>, MinLengthOf<typeof bounded>>('=');
+
+  expectType<MaxLengthOf<typeof _d>, MaxLengthOf<typeof bounded>>('=');
+}
+
 // `toReversed` — properties 1 and 2. Reversal permutes, so the length and the
 // bounds are exactly what must not move.
 {
@@ -282,3 +501,26 @@ describe('Arr shape invariants', () => {
 
   expectType<MaxLengthOf<typeof _d>, MaxLengthOf<typeof bounded>>('=');
 }
+
+/**
+ * The transforms that do **not** resolve under a generic array parameter, and
+ * therefore have no property-3 entry above:
+ *
+ * | transform           | reports                 | symptom under a generic `Ar` |
+ * | :------------------ | :---------------------- | :--------------------------- |
+ * | `tail` / `butLast`  | `ConstrainedList.Tail`  | TS2590                       |
+ * | `zip`               | `ConstrainedList.Zip`   | TS2589, and no `entries()`   |
+ * | `set` / `toUpdated` | `ConstrainedList.SetAt` | TS2589                       |
+ *
+ * The cause is the same in all three, and it is upstream. Their brand branch
+ * does arithmetic on the input's own bounds (`SubLength`, `SmallerLength`), and
+ * that arithmetic goes through `MakeTuple`. For a concrete branded array the
+ * bound is a single number and the expansion is cheap; for a type parameter it
+ * is the whole `SupportedLength` union, which `MakeTuple` distributes over.
+ *
+ * `map`, `toFilled` and `toRangeFilled` were fixable in 14.0.1 precisely
+ * because `ChangeArrayElement`'s brand branch does no such arithmetic. The
+ * `UnknownBrand`-keyed overload split that fixed them does not transfer: the
+ * constrained overload makes the checker attempt that arithmetic at every call
+ * site, generic or not.
+ */
