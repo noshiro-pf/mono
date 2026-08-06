@@ -47,6 +47,9 @@ jobs:
         with:
           client-id: ${{ vars.CHANGESETS_RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.CHANGESETS_RELEASE_BOT_PRIVATE_KEY }}
+          # App が持つ全権限をそのまま受け取らないよう、release に必要な範囲へ明示的に絞る。
+          permission-contents: write # version ブランチの push / タグ / GitHub Release の作成
+          permission-pull-requests: write # version PR の作成と更新
 
       - name: Create Release Pull Request or Publish
         id: changesets
