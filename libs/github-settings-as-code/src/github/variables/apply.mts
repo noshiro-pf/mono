@@ -10,16 +10,6 @@ import {
 export const applyVariables = async (): Promise<void> => {
   const variables = [
     {
-      // noshiro-semantic-release-bot (App ID: 1442563)
-      name: 'SEMANTIC_RELEASE_BOT_CLIENT_ID',
-      value: 'Iv23liAmv2bgTYTkv2pt',
-    },
-    {
-      // noshiro-changesets-release-bot (App ID: 1576218)
-      name: 'CHANGESETS_RELEASE_BOT_CLIENT_ID',
-      value: 'Iv23limuZKrTEcXmN0lp',
-    },
-    {
       // noshiro-repo-settings-bot (App ID: 4476573)
       // Administration を含む強い権限を持つ。設定の backup / apply 専用。
       name: 'REPO_SETTINGS_BOT_CLIENT_ID',
@@ -27,8 +17,9 @@ export const applyVariables = async (): Promise<void> => {
     },
     {
       // noshiro-repo-automation-bot (App ID: 4478721)
-      // Contents / Pull requests 権限のみ。PR を作る自動化（ pnpm-update /
-      // sync-agent-config ）用。
+      // Contents / Pull requests / Issues 権限。PR を作る自動化（ pnpm-update /
+      // sync-agent-config ）と release で共用する。実際に使う権限は各
+      // ワークフローの permission-* 入力で絞る。
       name: 'REPO_AUTOMATION_BOT_CLIENT_ID',
       value: 'Iv23lilpiDh0twq2PErv',
     },
