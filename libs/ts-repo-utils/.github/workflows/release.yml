@@ -23,6 +23,9 @@ jobs:
         with:
           client-id: ${{ vars.SEMANTIC_RELEASE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.SEMANTIC_RELEASE_BOT_PRIVATE_KEY }}
+          # App が持つ全権限をそのまま受け取らないよう、release に必要な範囲へ明示的に絞る。
+          permission-contents: write # コミット / タグ / GitHub Release の作成
+          permission-pull-requests: write # リリース時の PR へのコメント
 
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
