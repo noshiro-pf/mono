@@ -105,7 +105,7 @@ export const eslintConfigForTypeScript = ({
         // - jest.config.js
         // - cypress.config.ts
         // - playwright.config.ts
-        // - rollup.config.ts
+        // - rollup.config.mts
 
         '**/*.config.{js,mjs,cjs,ts,mts,cts}',
 
@@ -116,7 +116,7 @@ export const eslintConfigForTypeScript = ({
         '.prettierrc.{js,cjs,ts,cts,mjs,mts}',
       ],
       rules: defineKnownRules({
-        '@typescript-eslint/no-restricted-imports': 'off',
+        'no-restricted-imports': 'off',
         'import-x/no-default-export': 'off',
         'import-x/no-anonymous-default-export': 'off',
         'import-x/no-internal-modules': 'off',

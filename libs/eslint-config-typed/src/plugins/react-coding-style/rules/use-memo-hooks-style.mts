@@ -3,9 +3,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { castDeepMutable, hasKey } from 'ts-data-forge';
+import { hasKey } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
-import { isReactApiCall } from './shared.mjs';
+import { castNode, isReactApiCall } from './shared.mjs';
 
 type MessageIds = 'disallowUseMemoTypeAnnotation';
 
@@ -36,14 +36,14 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
         !isConstAssertion(parent.typeAnnotation)
       ) {
         context.report({
-          node: castDeepMutable(parent),
+          node: castNode(parent),
           messageId: 'disallowUseMemoTypeAnnotation',
         });
       }
 
       if (parent.type === AST_NODE_TYPES.TSTypeAnnotation) {
         context.report({
-          node: castDeepMutable(parent),
+          node: castNode(parent),
           messageId: 'disallowUseMemoTypeAnnotation',
         });
       }
@@ -55,7 +55,7 @@ export const useMemoHooksStyleRule: TSESLint.RuleModule<MessageIds> = {
 
         if (returnType !== undefined) {
           context.report({
-            node: castDeepMutable(returnType),
+            node: castNode(returnType),
             messageId: 'disallowUseMemoTypeAnnotation',
           });
         }
@@ -77,7 +77,7 @@ const checkNodeForTypeAnnotations = (
   ) {
     if (!isConstAssertion(node.typeAnnotation)) {
       context.report({
-        node: castDeepMutable(node),
+        node: castNode(node),
         messageId: 'disallowUseMemoTypeAnnotation',
       });
     }

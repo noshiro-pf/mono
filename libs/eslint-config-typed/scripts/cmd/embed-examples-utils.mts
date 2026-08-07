@@ -39,7 +39,7 @@ const normalizeIndent = (source: string): string => {
       return match !== null ? match[0].length : 0;
     });
 
-  if (Arr.isFixedLengthTuple(indents, 0)) {
+  if (Arr.isEmpty(indents)) {
     return source;
   }
 

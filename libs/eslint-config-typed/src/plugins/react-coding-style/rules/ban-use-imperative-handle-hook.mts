@@ -1,7 +1,6 @@
 import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
-import { castDeepMutable } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
-import { isReactApiCall } from './shared.mjs';
+import { castNode, isReactApiCall } from './shared.mjs';
 
 type MessageIds = 'disallowUseImperativeHandle';
 
@@ -22,7 +21,7 @@ export const banUseImperativeHandleHook: TSESLint.RuleModule<MessageIds> = {
     CallExpression: (node: DeepReadonly<TSESTree.CallExpression>) => {
       if (isReactApiCall(context, node, 'useImperativeHandle')) {
         context.report({
-          node: castDeepMutable(node.callee),
+          node: castNode(node.callee),
           messageId: 'disallowUseImperativeHandle',
         });
       }

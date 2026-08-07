@@ -22,22 +22,18 @@ export const normalizeArrayItemsProperties = (
       propertyNames.includes(key) &&
       property.items !== undefined &&
       Arr.isArray(property.items) &&
-      property.items.length === 1
+      Arr.isFixedLengthArray(1, property.items)
     ) {
       const [firstItem] = property.items;
 
-      if (firstItem !== undefined) {
-        mut_hasChanges = true;
+      mut_hasChanges = true;
 
-        const { items, ...restProperty } = property;
+      mut_properties[key] = {
+        ...property,
+        items: firstItem,
+      };
 
-        mut_properties[key] = {
-          ...restProperty,
-          items: firstItem,
-        };
-
-        continue;
-      }
+      continue;
     }
 
     mut_properties[key] = property;

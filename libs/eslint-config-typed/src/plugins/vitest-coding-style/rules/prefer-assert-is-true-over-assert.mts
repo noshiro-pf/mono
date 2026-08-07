@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 
 type MessageIds = 'preferAssertIsTrueOverAssert';
 
@@ -29,7 +30,7 @@ export const preferAssertIsTrueOverAssertRule: TSESLint.RuleModule<
         node.callee.type === AST_NODE_TYPES.Identifier &&
         node.callee.name === 'assert'
       ) {
-        if (node.arguments.length === 0) {
+        if (Arr.isEmpty(node.arguments)) {
           return;
         }
 

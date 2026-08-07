@@ -90,5 +90,5 @@ export const eslintJestRules = {
   'jest/valid-mock-module-path': withDefaultOption('error'),
   'jest/no-error-equal': 'error',
   'jest/no-unnecessary-assertion': 'error',
-  'jest/valid-expect-with-promise': 'error',
+  'jest/valid-expect-with-promise': withDefaultOption('error'),
 } as const satisfies EslintJestRules;

@@ -2,7 +2,7 @@ import { type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import isGlob from 'is-glob';
 import mm from 'micromatch';
 import * as path from 'node:path';
-import { Arr, castDeepMutable, hasKey, isNotUndefined } from 'ts-data-forge';
+import { Arr, hasKey, isNotUndefined } from 'ts-data-forge';
 import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
 import { resolveImportPath } from './resolve-import-path.mjs';
 
@@ -96,7 +96,7 @@ export const strictDependenciesRule: TSESLint.RuleModule<
 
     const dependencies: Dependencies = ruleOptions[0];
 
-    const options: Options = Arr.isMinLengthTuple(ruleOptions, 2)
+    const options: Options = Arr.isMinLengthTuple(2, ruleOptions)
       ? ruleOptions[1]
       : {};
 
@@ -162,9 +162,9 @@ export const strictDependenciesRule: TSESLint.RuleModule<
               importedModules,
             );
 
-            if (commonImportedList.length > 0) {
+            if (Arr.isNonEmpty(commonImportedList)) {
               context.report({
-                node: castDeepMutable(node),
+                node: castNode(node),
                 messageId: 'forbidden-import-specifier',
                 data: {
                   specifiers: commonImportedList.join(', '),
@@ -177,7 +177,7 @@ export const strictDependenciesRule: TSESLint.RuleModule<
           }
 
           context.report({
-            node: castDeepMutable(node),
+            node: castNode(node),
             messageId: 'forbidden-import',
             data: {
               importPath,
@@ -190,6 +190,19 @@ export const strictDependenciesRule: TSESLint.RuleModule<
   },
   defaultOptions: [[]],
 } as const;
+
+/**
+ * Converts a `DeepReadonly` AST node back to the plain node type expected by
+ * `context.report`.
+ *
+ * `castDeepMutable` maps `DeepReadonly<TSESTree.Node>` structurally, which
+ * produces a type that no longer matches the nominal `TSESTree.Node` union and
+ * makes the compiler bail out with "excessive stack depth" on large node
+ * unions. Casting back to the original node type keeps the comparison cheap.
+ */
+const castNode = <N extends TSESTree.Node>(node: DeepReadonly<N>): N =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  node as N;
 
 /**
  * pathのmatcher。

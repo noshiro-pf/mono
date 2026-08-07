@@ -3,8 +3,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { castDeepMutable } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
+import { castNode } from './shared.mjs';
 
 type MessageIds = 'disallowReactFunctionalComponentTypes';
 
@@ -28,7 +28,7 @@ export const componentVarTypeAnnotationRule: TSESLint.RuleModule<MessageIds> = {
     TSTypeReference: (node: DeepReadonly<TSESTree.TSTypeReference>) => {
       if (isReactFunctionalComponentReference(node.typeName)) {
         context.report({
-          node: castDeepMutable(node),
+          node: castNode(node),
           messageId: 'disallowReactFunctionalComponentTypes',
         });
       }

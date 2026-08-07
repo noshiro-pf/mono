@@ -4,6 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import {
   createIsArrayOrTupleType,
   matchArrayFromCall,
@@ -57,7 +58,7 @@ const isSafeToReEvaluate = (
   }
 
   if (node.type === AST_NODE_TYPES.TemplateLiteral) {
-    return node.expressions.length === 0;
+    return Arr.isEmpty(node.expressions);
   }
 
   if (node.type === AST_NODE_TYPES.UnaryExpression) {
@@ -116,7 +117,7 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
         // are targeted (e.g. `fill(v, start, end)` has no direct equivalent).
         switch (methodName) {
           case 'reverse':
-            if (node.arguments.length !== 0) return;
+            if (!Arr.isEmpty(node.arguments)) return;
 
             break;
 
@@ -126,12 +127,12 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
             break;
 
           case 'splice':
-            if (node.arguments.length === 0) return;
+            if (Arr.isEmpty(node.arguments)) return;
 
             break;
 
           case 'fill':
-            if (node.arguments.length !== 1) return;
+            if (!Arr.isFixedLengthArray(1, node.arguments)) return;
 
             break;
 
@@ -140,10 +141,10 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
         }
 
         if (
+          methodName !== 'splice' &&
           node.arguments.some(
             (argument) => argument.type === AST_NODE_TYPES.SpreadElement,
-          ) &&
-          methodName !== 'splice'
+          )
         ) {
           // `toSpliced(...args)` keeps spread arguments as-is; the other
           // rewrites need to inspect / count the arguments.

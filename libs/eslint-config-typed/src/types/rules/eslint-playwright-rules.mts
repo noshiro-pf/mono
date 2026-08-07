@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type FixedLengthTuple } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -46,16 +47,16 @@ namespace ExpectExpect {
    *     "additionalProperties": false,
    *     "properties": {
    *       "assertFunctionNames": {
-   *         "type": "array",
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "type": "array"
    *       },
    *       "assertFunctionPatterns": {
-   *         "type": "array",
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "type": "array"
    *       }
    *     },
    *     "type": "object"
@@ -789,6 +790,23 @@ namespace NoSlowedTest {
  *  ```
  */
 namespace NoStandaloneExpect {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow assertions on a Locator that can never fail
+ * @link https://github.com/mskelton/eslint-plugin-playwright/tree/main/docs/rules/no-unnecessary-assertions.md
+ *
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
+ */
+namespace NoUnnecessaryAssertions {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -1622,9 +1640,7 @@ namespace ValidTitle {
       }>;
 
   export type PatternOrPatternArray =
-    | string
-    | readonly [string]
-    | readonly [string, string];
+    string | readonly [string] | FixedLengthTuple<2, string>;
 
   export type Options = Readonly<{
     disallowedWords?: readonly string[];
@@ -1682,6 +1698,7 @@ export type EslintPlaywrightRules = Readonly<{
   'playwright/no-skipped-test': NoSkippedTest.RuleEntry;
   'playwright/no-slowed-test': NoSlowedTest.RuleEntry;
   'playwright/no-standalone-expect': NoStandaloneExpect.RuleEntry;
+  'playwright/no-unnecessary-assertions': NoUnnecessaryAssertions.RuleEntry;
   'playwright/no-unsafe-references': NoUnsafeReferences.RuleEntry;
   'playwright/no-unused-locators': NoUnusedLocators.RuleEntry;
   'playwright/no-useless-await': NoUselessAwait.RuleEntry;

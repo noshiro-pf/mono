@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
 
 /**
@@ -98,11 +99,11 @@ export const matchArrayFromCall = (
     return undefined;
   }
 
-  if (node.arguments.length !== 1) return undefined;
+  if (!Arr.isFixedLengthArray(1, node.arguments)) return undefined;
 
   const arg = node.arguments[0];
 
-  if (arg === undefined || arg.type === AST_NODE_TYPES.SpreadElement) {
+  if (arg.type === AST_NODE_TYPES.SpreadElement) {
     return undefined;
   }
 

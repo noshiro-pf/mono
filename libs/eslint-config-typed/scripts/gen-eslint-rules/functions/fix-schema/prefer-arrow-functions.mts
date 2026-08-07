@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -16,7 +17,7 @@ export const convertPatternToEnum = (schema: JSONSchema4): JSONSchema4 => {
       ) {
         const enumValues = extractEnumFromPattern(value.pattern);
 
-        if (enumValues.length > 0) {
+        if (Arr.isNonEmpty(enumValues)) {
           const { pattern, ...rest } = value;
 
           mut_newProperties[key] = {

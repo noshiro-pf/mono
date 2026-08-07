@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { castDeepMutable, hasKey, isRecord } from 'ts-data-forge';
+import { Arr, castDeepMutable, hasKey, isRecord } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
 
 type MessageIds = 'useCurriedProduce';
@@ -34,14 +34,14 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
       ArrowFunctionExpression: (
         node: DeepReadonly<TSESTree.ArrowFunctionExpression>,
       ) => {
-        if (node.params.length !== 1) {
+        if (!Arr.isFixedLengthArray(1, node.params)) {
           return;
         }
 
         const param = node.params[0];
 
         if (
-          param?.type !== AST_NODE_TYPES.Identifier ||
+          param.type !== AST_NODE_TYPES.Identifier ||
           param.name.length === 0
         ) {
           return;
@@ -59,7 +59,7 @@ export const preferCurriedProduceRule: TSESLint.RuleModule<MessageIds> = {
 
         if (
           baseArgument === undefined ||
-          restArguments.length === 0 ||
+          Arr.isEmpty(restArguments) ||
           !isSameIdentifier(baseArgument, parameterName)
         ) {
           return;
@@ -268,16 +268,15 @@ const getArrowFunctionReturnType = ({
 const normalizeMultilineText = (text: string): string => {
   const lines = text.split('\n');
 
-  if (lines.length <= 1) {
+  if (Arr.isMaxLengthArray(1, lines)) {
     return text;
   }
 
-  const indents = lines
-    .slice(1)
+  const indents = Arr.tail(lines)
     .filter((line) => line.trim().length > 0)
     .map((line) => /^[\t ]*/u.exec(line)?.[0].length ?? 0);
 
-  if (indents.length === 0) {
+  if (Arr.isEmpty(indents)) {
     return text;
   }
 

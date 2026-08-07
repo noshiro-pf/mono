@@ -1,3 +1,5 @@
+import { Arr } from 'ts-data-forge';
+import { allExtensionsRegexUnionStr } from '../constants/index.mjs';
 import {
   withDefaultOption,
   type EslintRules,
@@ -181,10 +183,8 @@ export const eslintRules = {
   'no-empty-function': 'off',
   'no-implied-eval': 'off',
   'no-invalid-this': 'off',
-  'no-loop-func': 'off',
   'no-loss-of-precision': 'off',
   'no-magic-numbers': 'off',
-  'no-restricted-imports': 'off',
   'no-shadow': 'off',
   'no-throw-literal': 'off',
   'no-unused-expressions': 'off',
@@ -195,6 +195,22 @@ export const eslintRules = {
   'class-methods-use-this': 'off',
   'prefer-promise-reject-errors': 'off',
   'consistent-return': 'off',
+
+  'no-loop-func': 'error',
+
+  // Note: If paths with the same name are defined multiple times, later definitions may overwrite earlier ones
+  'no-restricted-imports': [
+    'error',
+    {
+      patterns: [
+        {
+          regex: String.raw`^(\.\/|\.\.\/)+index\.(${allExtensionsRegexUnionStr})$`,
+          message:
+            'Do not specify index.mjs directly by relative path, but import it by module name (e.g. ./X/index.mjs).',
+        },
+      ],
+    },
+  ],
 
   'accessor-pairs': withDefaultOption('error'),
 
@@ -250,7 +266,10 @@ export const eslintRules = {
   'no-compare-neg-zero': 'error',
   'no-cond-assign': withDefaultOption('error'),
   'no-console': 'off', // disabled
-  'no-constant-binary-expression': 'error',
+  'no-constant-binary-expression': [
+    'error',
+    { checkRelationalComparisons: true },
+  ],
   'no-constant-condition': withDefaultOption('error'),
   'no-constructor-return': 'error',
   'no-continue': 'off', // disabled
@@ -328,7 +347,7 @@ export const eslintRules = {
   'no-prototype-builtins': 'error',
   'no-regex-spaces': 'error',
   'no-restricted-exports': ['error', { restrictedNamedExports: ['default'] }],
-  'no-restricted-globals': ['error', ...restrictedGlobals],
+  'no-restricted-globals': Arr.toUnshifted('error')(restrictedGlobals),
   'no-restricted-properties': withDefaultOption('error'),
 
   /**
@@ -337,7 +356,7 @@ export const eslintRules = {
    *
    * AST checker: https://typescript-eslint.io/play/#ts=5.9.3&showAST=es&fileType=.ts&code=LAKCA&eslintrc=N4KABGBEBOCuA2BTAzpAXGYBfEWg&tsconfig=N4KABGBEDGD2C2AHAlgGwKYCcDyiAuysAdgM6QBcYoEEkJemy0eAcgK6qoDCAFutAGsylBm3TgwAXxCSgA&tokens=false
    */
-  'no-restricted-syntax': ['error', ...restrictedSyntax],
+  'no-restricted-syntax': Arr.toUnshifted('error')(restrictedSyntax),
 
   'no-return-assign': withDefaultOption('error'),
   'no-self-assign': withDefaultOption('error'),

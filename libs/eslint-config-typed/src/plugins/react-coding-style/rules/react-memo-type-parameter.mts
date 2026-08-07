@@ -3,13 +3,16 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { castDeepMutable } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
-import { getReactMemoArrowFunction, isReactApiCall } from './shared.mjs';
+import {
+  castNode,
+  getReactMemoArrowFunction,
+  isReactApiCall,
+} from './shared.mjs';
 
 type MessageIds =
-  | 'requirePropsTypeParameter'
-  | 'omitTypeParameterWhenPropsEmpty';
+  'requirePropsTypeParameter' | 'omitTypeParameterWhenPropsEmpty';
 
 // NOTE: React.memo の型引数を `Props` に限定する。
 // これは 1ファイル1コンポーネントの強制も意味する。
@@ -47,7 +50,7 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
         }
 
         context.report({
-          node: castDeepMutable(node.callee),
+          node: castNode(node.callee),
           messageId: 'requirePropsTypeParameter',
         });
 
@@ -56,16 +59,16 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
 
       if (arrowFunction?.params.length === 0) {
         context.report({
-          node: castDeepMutable(typeArguments),
+          node: castNode(typeArguments),
           messageId: 'omitTypeParameterWhenPropsEmpty',
         });
 
         return;
       }
 
-      if (typeArguments.params.length !== 1) {
+      if (!Arr.isFixedLengthArray(1, typeArguments.params)) {
         context.report({
-          node: castDeepMutable(typeArguments),
+          node: castNode(typeArguments),
           messageId: 'requirePropsTypeParameter',
         });
 
@@ -75,10 +78,10 @@ export const reactMemoTypeParameterRule: TSESLint.RuleModule<MessageIds> = {
       const [firstParameter] = typeArguments.params;
 
       if (!isPropsTypeReference(firstParameter)) {
-        const reportTarget = firstParameter ?? node.callee;
+        const reportTarget = firstParameter;
 
         context.report({
-          node: castDeepMutable(reportTarget),
+          node: castNode(reportTarget),
           messageId: 'requirePropsTypeParameter',
         });
       }

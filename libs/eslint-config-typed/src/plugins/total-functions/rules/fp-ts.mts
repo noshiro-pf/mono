@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import { type Type } from 'typescript';
 import { typeSymbolName } from './common.mjs';
 
@@ -32,7 +33,7 @@ const fpTsEffectTypeParameter = (
 
     const signature = signatures[0];
 
-    if (signatures.length !== 1 || signature === undefined) {
+    if (signature === undefined || !Arr.isFixedLengthArray(1, signatures)) {
       return undefined;
     }
 

@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
+import { Arr, isNonNullObject } from 'ts-data-forge';
 import { intersectionTypeParts, unionTypeParts } from 'tsutils';
 import {
   type BigIntLiteralType,
@@ -34,7 +35,7 @@ export const noPartialDivision = createRule({
         );
 
         return (
-          numberLiteralParts.length > 0 &&
+          Arr.isNonEmpty(numberLiteralParts) &&
           numberLiteralParts.every(isSafeDenominator)
         );
       }
@@ -94,10 +95,9 @@ export const noPartialDivision = createRule({
 // There is no equivalent of `isNumberLiteral()` for bigints.
 // `isLiteral()` returns false so isn't useful.
 const isPseudoBigInt = (val: unknown): val is PseudoBigInt => {
-  const valAsPseudoBigInt =
-    typeof val === 'object' && val !== null
-      ? (val as Partial<PseudoBigInt>)
-      : undefined;
+  const valAsPseudoBigInt = isNonNullObject(val)
+    ? (val as Partial<PseudoBigInt>)
+    : undefined;
 
   return (
     valAsPseudoBigInt !== undefined &&

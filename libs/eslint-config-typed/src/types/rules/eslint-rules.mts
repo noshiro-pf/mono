@@ -1,6 +1,10 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type UnknownRecord } from 'ts-type-forge';
+import {
+  type FixedLengthTuple,
+  type NonEmptyTuple,
+  type UnknownRecord,
+} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -1682,6 +1686,7 @@ namespace FuncNames {
    *         ]
    *       }
    *     },
+   *     "type": "array",
    *     "items": [
    *       {
    *         "$ref": "#/definitions/value"
@@ -1695,7 +1700,8 @@ namespace FuncNames {
    *         },
    *         "additionalProperties": false
    *       }
-   *     ]
+   *     ],
+   *     "additionalItems": false
    *   }
    * ]
    * ```
@@ -4808,6 +4814,9 @@ namespace MaxNestedCallbacks {
    *           "max": {
    *             "type": "integer",
    *             "minimum": 0
+   *           },
+   *           "checkConstructorCallCallbacks": {
+   *             "type": "boolean"
    *           }
    *         },
    *         "additionalProperties": false
@@ -4822,6 +4831,7 @@ namespace MaxNestedCallbacks {
     | Readonly<{
         maximum?: number;
         max?: number;
+        checkConstructorCallCallbacks?: boolean;
       }>;
 
   export type RuleEntry =
@@ -4868,9 +4878,23 @@ namespace MaxParams {
    *           "countVoidThis": {
    *             "type": "boolean",
    *             "description": "Whether to count a `this` declaration when the type is `void`."
+   *           },
+   *           "countThis": {
+   *             "enum": [
+   *               "never",
+   *               "except-void",
+   *               "always"
+   *             ],
+   *             "description": "Whether to count a `this` declaration."
    *           }
    *         },
-   *         "additionalProperties": false
+   *         "additionalProperties": false,
+   *         "not": {
+   *           "required": [
+   *             "countVoidThis",
+   *             "countThis"
+   *           ]
+   *         }
    *       }
    *     ]
    *   }
@@ -4886,6 +4910,10 @@ namespace MaxParams {
          * Whether to count a `this` declaration when the type is `void`.
          */
         countVoidThis?: boolean;
+        /**
+         * Whether to count a `this` declaration.
+         */
+        countThis?: 'never' | 'except-void' | 'always';
       }>;
 
   export type RuleEntry =
@@ -5506,11 +5534,12 @@ namespace NoClassAssign {
  * @link https://eslint.org/docs/latest/rules/no-compare-neg-zero
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | true    |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
  *  ```
  */
 namespace NoCompareNegZero {
@@ -5631,7 +5660,7 @@ namespace NoConsole {
     /**
      * @minItems 1
      */
-    allow?: readonly [string, ...string[]];
+    allow?: NonEmptyTuple<string>;
   }>;
 
   export type RuleEntry =
@@ -5669,7 +5698,31 @@ namespace NoConstAssign {
  *  ```
  */
 namespace NoConstantBinaryExpression {
-  export type RuleEntry = Linter.StringSeverity;
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "checkRelationalComparisons": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    checkRelationalComparisons?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -6872,7 +6925,8 @@ namespace NoInvalidRegexp {
    *         "type": "array",
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "uniqueItems": true
    *       }
    *     },
    *     "additionalProperties": false
@@ -7149,12 +7203,10 @@ namespace NoMagicNumbers {
    *     "type": "object",
    *     "properties": {
    *       "detectObjects": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "enforceConst": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignore": {
    *         "type": "array",
@@ -7172,32 +7224,25 @@ namespace NoMagicNumbers {
    *         "uniqueItems": true
    *       },
    *       "ignoreArrayIndexes": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreDefaultValues": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreClassFieldInitialValues": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreEnums": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreNumericLiteralTypes": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreReadonlyClassProperties": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreTypeIndexes": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -7206,42 +7251,15 @@ namespace NoMagicNumbers {
    * ```
    */
   export type Options = Readonly<{
-    /**
-     * @default false
-     */
     detectObjects?: boolean;
-    /**
-     * @default false
-     */
     enforceConst?: boolean;
     ignore?: readonly (number | string)[];
-    /**
-     * @default false
-     */
     ignoreArrayIndexes?: boolean;
-    /**
-     * @default false
-     */
     ignoreDefaultValues?: boolean;
-    /**
-     * @default false
-     */
     ignoreClassFieldInitialValues?: boolean;
-    /**
-     * @default false
-     */
     ignoreEnums?: boolean;
-    /**
-     * @default false
-     */
     ignoreNumericLiteralTypes?: boolean;
-    /**
-     * @default false
-     */
     ignoreReadonlyClassProperties?: boolean;
-    /**
-     * @default false
-     */
     ignoreTypeIndexes?: boolean;
   }>;
 
@@ -9443,7 +9461,7 @@ namespace NoTrailingSpaces {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | recommended | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUnassignedVars {
@@ -9918,11 +9936,12 @@ namespace NoUnusedLabels {
  * @link https://eslint.org/docs/latest/rules/no-unused-private-class-members
  *
  *  ```md
- *  | key         | value   |
- *  | :---------- | :------ |
- *  | type        | problem |
- *  | deprecated  | false   |
- *  | recommended | true    |
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
  *  ```
  */
 namespace NoUnusedPrivateClassMembers {
@@ -10116,7 +10135,7 @@ namespace NoUseBeforeDefine {
  *  | :---------- | :------ |
  *  | type        | problem |
  *  | deprecated  | false   |
- *  | recommended | false   |
+ *  | recommended | true    |
  *  ```
  */
 namespace NoUselessAssignment {
@@ -10467,7 +10486,7 @@ namespace NoWarningComments {
     /**
      * @minItems 1
      */
-    decoration?: readonly [string, ...string[]];
+    decoration?: NonEmptyTuple<string>;
   }>;
 
   export type RuleEntry =
@@ -11895,7 +11914,7 @@ namespace PreferTemplate {
  *  | type           | suggestion |
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
- *  | recommended    | false      |
+ *  | recommended    | true       |
  *  ```
  */
 namespace PreserveCaughtError {
@@ -11910,6 +11929,35 @@ namespace PreserveCaughtError {
    *       "requireCatchParameter": {
    *         "type": "boolean",
    *         "description": "Requires the catch blocks to always have the caught error parameter so it is not discarded."
+   *       },
+   *       "errorClassNames": {
+   *         "type": "array",
+   *         "description": "Additional error class names to check for cause preservation.",
+   *         "items": {
+   *           "oneOf": [
+   *             {
+   *               "type": "string"
+   *             },
+   *             {
+   *               "type": "object",
+   *               "required": [
+   *                 "name",
+   *                 "argumentPosition"
+   *               ],
+   *               "properties": {
+   *                 "name": {
+   *                   "type": "string"
+   *                 },
+   *                 "argumentPosition": {
+   *                   "type": "integer",
+   *                   "minimum": 1
+   *                 }
+   *               },
+   *               "additionalProperties": false
+   *             }
+   *           ]
+   *         },
+   *         "uniqueItems": true
    *       }
    *     },
    *     "additionalProperties": false
@@ -11922,6 +11970,16 @@ namespace PreserveCaughtError {
      * Requires the catch blocks to always have the caught error parameter so it is not discarded.
      */
     requireCatchParameter?: boolean;
+    /**
+     * Additional error class names to check for cause preservation.
+     */
+    errorClassNames?: readonly (
+      | string
+      | Readonly<{
+          name: string;
+          argumentPosition: number;
+        }>
+    )[];
   }>;
 
   export type RuleEntry =
@@ -12058,7 +12116,7 @@ namespace Quotes {
 }
 
 /**
- * @description Enforce the consistent use of the radix argument when using `parseInt()`
+ * @description Enforce the use of the radix argument when using `parseInt()`
  * @link https://eslint.org/docs/latest/rules/radix
  *
  *  ```md
@@ -12449,12 +12507,10 @@ namespace SortImports {
      * @minItems 4
      * @maxItems 4
      */
-    memberSyntaxSortOrder?: readonly [
-      'none' | 'all' | 'multiple' | 'single',
-      'none' | 'all' | 'multiple' | 'single',
-      'none' | 'all' | 'multiple' | 'single',
-      'none' | 'all' | 'multiple' | 'single',
-    ];
+    memberSyntaxSortOrder?: FixedLengthTuple<
+      4,
+      'none' | 'all' | 'multiple' | 'single'
+    >;
     ignoreDeclarationSort?: boolean;
     ignoreMemberSort?: boolean;
     allowSeparatedGroups?: boolean;
@@ -13708,6 +13764,7 @@ export type EslintRulesOption = Readonly<{
   'no-bitwise': NoBitwise.Options;
   'no-cond-assign': NoCondAssign.Options;
   'no-console': NoConsole.Options;
+  'no-constant-binary-expression': NoConstantBinaryExpression.Options;
   'no-constant-condition': NoConstantCondition.Options;
   'no-duplicate-imports': NoDuplicateImports.Options;
   'no-else-return': NoElseReturn.Options;

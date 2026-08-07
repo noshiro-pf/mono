@@ -1,4 +1,3 @@
-import { Arr } from 'ts-data-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -23,12 +22,11 @@ export const addDefaultValuesToDescription = (
     const prop = propSchema;
 
     if (prop.default !== undefined) {
+      // Note: `JSON.stringify` already renders an empty array as `[]`.
       const defaultValue =
         typeof prop.default === 'string'
           ? (`"${prop.default}"` as const)
-          : Arr.isArray(prop.default) && prop.default.length === 0
-            ? '[]'
-            : JSON.stringify(prop.default);
+          : JSON.stringify(prop.default);
 
       const existingDescription =
         prop.description !== undefined

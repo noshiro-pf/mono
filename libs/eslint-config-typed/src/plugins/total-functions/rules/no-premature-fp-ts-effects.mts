@@ -1,4 +1,5 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import { createRule } from './common.mjs';
 import { fpTsEffectType } from './fp-ts.mjs';
 
@@ -24,7 +25,7 @@ export const noPrematureFpTsEffects = createRule({
 
     return {
       CallExpression: (node) => {
-        if (node.arguments.length > 0) {
+        if (Arr.isNonEmpty(node.arguments)) {
           return;
         }
 

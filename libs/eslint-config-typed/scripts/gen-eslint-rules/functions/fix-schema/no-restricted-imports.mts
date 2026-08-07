@@ -1,4 +1,4 @@
-import { Arr, isBoolean } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -12,13 +12,13 @@ export const enforceMinItemsForRestrictedTuple = (
   }
 
   const updatedAnyOf = schema.anyOf.map((option, index) => {
-    if (index !== 1 || isBoolean(option) || Arr.isArray(option)) {
+    if (index !== 1 || Arr.isArray(option)) {
       return option;
     }
 
     const { items, minItems } = option;
 
-    if (!Arr.isArray(items) || items.length !== 1) {
+    if (!Arr.isArray(items) || !Arr.isFixedLengthArray(1, items)) {
       return option;
     }
 

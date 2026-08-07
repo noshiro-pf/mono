@@ -85,7 +85,7 @@ namespace MetaPropertyOrdering {
    *   {
    *     "type": "array",
    *     "description": "What order to enforce for meta properties.",
-   *     "elements": {
+   *     "items": {
    *       "type": "string"
    *     }
    *   }
@@ -95,7 +95,7 @@ namespace MetaPropertyOrdering {
   /**
    * What order to enforce for meta properties.
    */
-  export type Options = readonly unknown[];
+  export type Options = readonly string[];
 
   export type RuleEntry =
     | 'off'
@@ -152,6 +152,214 @@ namespace NoDeprecatedReportApi {
  */
 namespace NoIdenticalTests {
   export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require explicit policy choices in rule options schemas
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-incomplete-meta-schema.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoIncompleteMetaSchema {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "checks": {
+   *         "type": "object",
+   *         "description": "Which schema completeness checks to enforce.",
+   *         "properties": {
+   *           "explicitAdditionalProperties": {
+   *             "type": "boolean",
+   *             "description": "Whether object schemas must state an additionalProperties policy."
+   *           },
+   *           "explicitItems": {
+   *             "type": "boolean",
+   *             "description": "Whether array schemas must state an items policy."
+   *           },
+   *           "typedItems": {
+   *             "type": "boolean",
+   *             "description": "Whether array item schemas must constrain their type."
+   *           },
+   *           "boundedTuples": {
+   *             "type": "boolean",
+   *             "description": "Whether tuple schemas must state how additional items are handled."
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Which schema completeness checks to enforce.
+     */
+    checks?: Readonly<{
+      /**
+       * Whether object schemas must state an additionalProperties policy.
+       */
+      explicitAdditionalProperties?: boolean;
+      /**
+       * Whether array schemas must state an items policy.
+       */
+      explicitItems?: boolean;
+      /**
+       * Whether array item schemas must constrain their type.
+       */
+      typedItems?: boolean;
+      /**
+       * Whether tuple schemas must state how additional items are handled.
+       */
+      boundedTuples?: boolean;
+    }>;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow rule options schema constructs that ESLint ignores
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-incorrect-meta-schema.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoIncorrectMetaSchema {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "checks": {
+   *         "type": "object",
+   *         "description": "Which ineffective-schema checks to enforce.",
+   *         "properties": {
+   *           "emptyRoot": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject an empty object-form schema."
+   *           },
+   *           "bareArrayRoot": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject an object-form schema that only asserts an array type."
+   *           },
+   *           "nonArrayRootType": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject an object-form schema that excludes arrays."
+   *           },
+   *           "nonConstrainingRoot": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject an object-form schema with no array-applicable keyword."
+   *           },
+   *           "ignoredKeywords": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject keywords ignored by ESLint’s configured Ajv."
+   *           },
+   *           "ignoredRefSiblings": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject constraint siblings ignored beside $ref."
+   *           },
+   *           "unresolvedRefs": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject references ESLint cannot resolve."
+   *           },
+   *           "ignoredAdditionalItems": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject additionalItems when items is not tuple-form."
+   *           },
+   *           "incompatibleTypeKeywords": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject keywords incompatible with the declared type."
+   *           },
+   *           "impossibleBounds": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject contradictory minimum and maximum bounds."
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Which ineffective-schema checks to enforce.
+     */
+    checks?: Readonly<{
+      /**
+       * Whether to reject an empty object-form schema.
+       */
+      emptyRoot?: boolean;
+      /**
+       * Whether to reject an object-form schema that only asserts an array type.
+       */
+      bareArrayRoot?: boolean;
+      /**
+       * Whether to reject an object-form schema that excludes arrays.
+       */
+      nonArrayRootType?: boolean;
+      /**
+       * Whether to reject an object-form schema with no array-applicable keyword.
+       */
+      nonConstrainingRoot?: boolean;
+      /**
+       * Whether to reject keywords ignored by ESLint’s configured Ajv.
+       */
+      ignoredKeywords?: boolean;
+      /**
+       * Whether to reject constraint siblings ignored beside $ref.
+       */
+      ignoredRefSiblings?: boolean;
+      /**
+       * Whether to reject references ESLint cannot resolve.
+       */
+      unresolvedRefs?: boolean;
+      /**
+       * Whether to reject additionalItems when items is not tuple-form.
+       */
+      ignoredAdditionalItems?: boolean;
+      /**
+       * Whether to reject keywords incompatible with the declared type.
+       */
+      incompatibleTypeKeywords?: boolean;
+      /**
+       * Whether to reject contradictory minimum and maximum bounds.
+       */
+      impossibleBounds?: boolean;
+    }>;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
 /**
@@ -275,7 +483,7 @@ namespace NoPropertyInNode {
    *     "properties": {
    *       "additionalNodeTypeFiles": {
    *         "description": "Any additional regular expressions to consider source files defining AST Node types.",
-   *         "elements": {
+   *         "items": {
    *           "type": "string"
    *         },
    *         "type": "array"
@@ -290,7 +498,7 @@ namespace NoPropertyInNode {
     /**
      * Any additional regular expressions to consider source files defining AST Node types.
      */
-    additionalNodeTypeFiles?: readonly unknown[];
+    additionalNodeTypeFiles?: readonly string[];
   }>;
 
   export type RuleEntry =
@@ -679,6 +887,22 @@ namespace RequireMetaHasSuggestions {
 }
 
 /**
+ * @description require rules to implement a `meta.languages` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-languages.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace RequireMetaLanguages {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description require rules `meta.schema` properties to include descriptions
  * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-schema-description.md
  *
@@ -841,7 +1065,7 @@ namespace TestCasePropertyOrdering {
    *   {
    *     "type": "array",
    *     "description": "What order to enforce for test case properties.",
-   *     "elements": {
+   *     "items": {
    *       "type": "string"
    *     }
    *   }
@@ -851,7 +1075,7 @@ namespace TestCasePropertyOrdering {
   /**
    * What order to enforce for test case properties.
    */
-  export type Options = readonly unknown[];
+  export type Options = readonly string[];
 
   export type RuleEntry =
     | 'off'
@@ -894,10 +1118,7 @@ namespace TestCaseShorthandStrings {
    * What behavior to enforce of when shorthand strings should be banned or required.
    */
   export type Options =
-    | 'as-needed'
-    | 'never'
-    | 'consistent'
-    | 'consistent-as-needed';
+    'as-needed' | 'never' | 'consistent' | 'consistent-as-needed';
 
   export type RuleEntry =
     | 'off'
@@ -928,6 +1149,8 @@ export type EslintPluginRules = Readonly<{
   'eslint-plugin/no-deprecated-context-methods': NoDeprecatedContextMethods.RuleEntry;
   'eslint-plugin/no-deprecated-report-api': NoDeprecatedReportApi.RuleEntry;
   'eslint-plugin/no-identical-tests': NoIdenticalTests.RuleEntry;
+  'eslint-plugin/no-incomplete-meta-schema': NoIncompleteMetaSchema.RuleEntry;
+  'eslint-plugin/no-incorrect-meta-schema': NoIncorrectMetaSchema.RuleEntry;
   'eslint-plugin/no-matching-violation-suggest-message-ids': NoMatchingViolationSuggestMessageIds.RuleEntry;
   'eslint-plugin/no-meta-replaced-by': NoMetaReplacedBy.RuleEntry;
   'eslint-plugin/no-meta-schema-default': NoMetaSchemaDefault.RuleEntry;
@@ -950,6 +1173,7 @@ export type EslintPluginRules = Readonly<{
   'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.RuleEntry;
   'eslint-plugin/require-meta-fixable': RequireMetaFixable.RuleEntry;
   'eslint-plugin/require-meta-has-suggestions': RequireMetaHasSuggestions.RuleEntry;
+  'eslint-plugin/require-meta-languages': RequireMetaLanguages.RuleEntry;
   'eslint-plugin/require-meta-schema-description': RequireMetaSchemaDescription.RuleEntry;
   'eslint-plugin/require-meta-schema': RequireMetaSchema.RuleEntry;
   'eslint-plugin/require-meta-type': RequireMetaType.RuleEntry;
@@ -963,6 +1187,8 @@ export type EslintPluginRules = Readonly<{
 export type EslintPluginRulesOption = Readonly<{
   'eslint-plugin/consistent-output': ConsistentOutput.Options;
   'eslint-plugin/meta-property-ordering': MetaPropertyOrdering.Options;
+  'eslint-plugin/no-incomplete-meta-schema': NoIncompleteMetaSchema.Options;
+  'eslint-plugin/no-incorrect-meta-schema': NoIncorrectMetaSchema.Options;
   'eslint-plugin/no-property-in-node': NoPropertyInNode.Options;
   'eslint-plugin/report-message-format': ReportMessageFormat.Options;
   'eslint-plugin/require-meta-docs-description': RequireMetaDocsDescription.Options;

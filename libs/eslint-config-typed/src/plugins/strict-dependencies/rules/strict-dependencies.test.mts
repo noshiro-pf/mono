@@ -64,6 +64,7 @@ const runRule = (
         },
       },
       rules: {
+        // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
         [`${pluginName}/${ruleId}`]: ['error', ...options],
       },
     },

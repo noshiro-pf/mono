@@ -11,6 +11,7 @@ import {
   applyTypeTransformations,
 } from './apply-codemod.mjs';
 import { eslintPlugins } from './constants/eslint-plugins.mjs';
+import { tsTypeForgeImportStatement } from './constants/ts-type-forge-import.mjs';
 import { generateRulesTypeCore } from './functions/generate-rules-type-core.mjs';
 
 const thisDir = import.meta.dirname;
@@ -33,7 +34,7 @@ export const generateRulesType = async (
   }
 
   {
-    console.log('running codemod...');
+    console.info('running codemod...');
 
     await applyTypeTransformationsForTargets(targetFileNames);
 
@@ -41,22 +42,73 @@ export const generateRulesType = async (
   }
 
   {
-    console.log('running `lint --fix` ...');
+    console.info('running `lint --fix` ...');
 
+    // `eslint --fix` exits non-zero whenever any problem is left unfixed, which
+    // is not a reason to abort: the formatting below still has to run, or the
+    // generated files are left in a half-formatted state.
     const result = await lintFix(targetFileNames);
 
     if (result.type === 'error') {
-      console.error(result.error);
+      console.warn('`lint --fix` reported problems:');
 
-      return;
+      console.warn(result.error);
     }
+
+    // `eslint --fix` can introduce new usages of ts-type-forge types, so the
+    // import has to be restored before organize-imports prunes it for the last
+    // time.
+    await restoreTsTypeForgeImport(targetFileNames);
 
     await fmt(targetFileNames);
   }
 };
 
+/** 生成ファイルの ts-type-forge の import 文を、全型を含む形に戻す */
+const restoreTsTypeForgeImport = async (
+  targetFileNames?: NonEmptyArray<string>,
+): Promise<void> => {
+  const globResult = await glob(`${TYPES_RULES_DIR}/*.mts`);
+
+  if (Result.isErr(globResult)) {
+    console.error(globResult.value);
+
+    return;
+  }
+
+  const targetFiles = filterTargetFiles(globResult.value, targetFileNames);
+
+  for (const filePath of targetFiles) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const content = await fs.readFile(filePath, 'utf8');
+
+    if (content.includes(tsTypeForgeImportStatement)) {
+      continue;
+    }
+
+    const replaced = tsTypeForgeImportPattern.test(content)
+      ? content.replace(tsTypeForgeImportPattern, tsTypeForgeImportStatement)
+      : content.replace(
+          eslintImportPattern,
+          (matched) => `${matched}\n${tsTypeForgeImportStatement}`,
+        );
+
+    if (replaced !== content) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(filePath, replaced);
+    }
+  }
+};
+
+/** 既存の ts-type-forge の import 文（prettier により複数行になりうる） */
+const tsTypeForgeImportPattern =
+  /import\s*\{[^}]*\}\s*from\s*'ts-type-forge';/u;
+
+/** ts-type-forge の import 文を挿入する位置の目印 */
+const eslintImportPattern = /import\s*\{[^}]*\}\s*from\s*'eslint';/u;
+
 const fmt = async (targetFileNames?: NonEmptyArray<string>): Promise<void> => {
-  console.log('formatting code ...');
+  console.info('formatting code ...');
 
   const targetPattern =
     targetFileNames === undefined
@@ -83,7 +135,7 @@ const generate = async (
         );
 
   for (const plugin of targetPlugins) {
-    console.log(`generating ${plugin.outputFileName} ...`);
+    console.info(`generating ${plugin.outputFileName} ...`);
 
     try {
       const result = await generateRulesTypeCore(
@@ -116,16 +168,9 @@ const lintFix = async (
     return { type: 'error', error: globResult.value };
   }
 
-  const allFiles: readonly string[] = globResult.value;
+  const targetFiles = filterTargetFiles(globResult.value, targetFileNames);
 
-  const targetFiles =
-    targetFileNames === undefined
-      ? allFiles
-      : allFiles.filter((filePath) =>
-          targetFileNames.some((name) => filePath.endsWith(name)),
-        );
-
-  if (targetFiles.length === 0) {
+  if (Arr.isEmpty(targetFiles)) {
     console.warn('No files to lint');
 
     return { type: 'ok' };
@@ -147,10 +192,21 @@ const lintFix = async (
   return { type: 'ok' };
 };
 
+/** 生成対象として指定されたファイル名だけに絞り込む（未指定なら全件） */
+const filterTargetFiles = (
+  allFiles: readonly string[],
+  targetFileNames: NonEmptyArray<string> | undefined,
+): readonly string[] =>
+  targetFileNames === undefined
+    ? allFiles
+    : allFiles.filter((filePath) =>
+        targetFileNames.some((name) => filePath.endsWith(name)),
+      );
+
 const applyTypeTransformationsForTargets = async (
   targetFileNames?: readonly string[],
 ): Promise<void> => {
-  if (targetFileNames === undefined || targetFileNames.length === 0) {
+  if (targetFileNames === undefined || Arr.isEmpty(targetFileNames)) {
     await applyTypeTransformations();
   } else {
     for (const fileName of targetFileNames) {
@@ -162,14 +218,14 @@ const applyTypeTransformationsForTargets = async (
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const targetFiles = process.argv.slice(2);
+  const targetFiles = Arr.skip(process.argv, 2);
 
   if (Arr.isNonEmpty(targetFiles)) {
-    console.log(`Generating specific files: ${targetFiles.join(', ')}`);
+    console.info(`Generating specific files: ${targetFiles.join(', ')}`);
 
     await generateRulesType(targetFiles);
   } else {
-    console.log('Generating all files...');
+    console.info('Generating all files...');
 
     await generateRulesType();
   }

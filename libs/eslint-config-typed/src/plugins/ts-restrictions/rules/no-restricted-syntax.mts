@@ -44,8 +44,7 @@ export const noRestrictedSyntax: Rule.RuleModule = {
       (result: UnknownRecord, selectorOrObject: unknown) => {
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         const selectorOrObjectCasted = selectorOrObject as
-          | string
-          | Readonly<{ selector: string; message?: string }>;
+          string | Readonly<{ selector: string; message?: string }>;
 
         const isStringFormat = typeof selectorOrObjectCasted === 'string';
 

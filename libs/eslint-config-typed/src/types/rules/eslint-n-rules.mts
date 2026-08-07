@@ -1,6 +1,10 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type UnknownRecord } from 'ts-type-forge';
+import {
+  type FixedLengthTuple,
+  type NonEmptyTuple,
+  type UnknownRecord,
+} from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -624,42 +628,21 @@ namespace NoExtraneousImport {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<{
-          /**
-           * @minItems 2
-           * @maxItems 2
-           *
-           * This interface was referenced by `undefined`'s JSON-Schema definition
-           * via the `patternProperty` "^.+$".
-           */
-          [k: string]: readonly [string, string];
-        }>
-      | readonly [
+      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | NonEmptyTuple<
           Readonly<{
             /**
              * @minItems 1
              */
-            include: readonly [string, ...string[]];
+            include: NonEmptyTuple<string>;
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: readonly [string, string];
-          }>,
-          ...Readonly<{
-            /**
-             * @minItems 1
-             */
-            include: readonly [string, ...string[]];
-            exclude?: readonly string[];
-            /**
-             * @minItems 2
-             * @maxItems 2
-             */
-            replace: readonly [string, string];
-          }>[],
-        ];
+            replace: FixedLengthTuple<2, string>;
+          }>
+        >;
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
   }>;
@@ -784,42 +767,21 @@ namespace NoExtraneousRequire {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<{
-          /**
-           * @minItems 2
-           * @maxItems 2
-           *
-           * This interface was referenced by `undefined`'s JSON-Schema definition
-           * via the `patternProperty` "^.+$".
-           */
-          [k: string]: readonly [string, string];
-        }>
-      | readonly [
+      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | NonEmptyTuple<
           Readonly<{
             /**
              * @minItems 1
              */
-            include: readonly [string, ...string[]];
+            include: NonEmptyTuple<string>;
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: readonly [string, string];
-          }>,
-          ...Readonly<{
-            /**
-             * @minItems 1
-             */
-            include: readonly [string, ...string[]];
-            exclude?: readonly string[];
-            /**
-             * @minItems 2
-             * @maxItems 2
-             */
-            replace: readonly [string, string];
-          }>[],
-        ];
+            replace: FixedLengthTuple<2, string>;
+          }>
+        >;
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
@@ -1558,42 +1520,21 @@ namespace NoTopLevelAwait {
   export type Options = Readonly<{
     ignoreBin?: boolean;
     convertPath?:
-      | Readonly<{
-          /**
-           * @minItems 2
-           * @maxItems 2
-           *
-           * This interface was referenced by `undefined`'s JSON-Schema definition
-           * via the `patternProperty` "^.+$".
-           */
-          [k: string]: readonly [string, string];
-        }>
-      | readonly [
+      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | NonEmptyTuple<
           Readonly<{
             /**
              * @minItems 1
              */
-            include: readonly [string, ...string[]];
+            include: NonEmptyTuple<string>;
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: readonly [string, string];
-          }>,
-          ...Readonly<{
-            /**
-             * @minItems 1
-             */
-            include: readonly [string, ...string[]];
-            exclude?: readonly string[];
-            /**
-             * @minItems 2
-             * @maxItems 2
-             */
-            replace: readonly [string, string];
-          }>[],
-        ];
+            replace: FixedLengthTuple<2, string>;
+          }>
+        >;
   }>;
 
   export type RuleEntry =
@@ -1686,42 +1627,21 @@ namespace NoUnpublishedBin {
    */
   export type Options = Readonly<{
     convertPath?:
-      | Readonly<{
-          /**
-           * @minItems 2
-           * @maxItems 2
-           *
-           * This interface was referenced by `undefined`'s JSON-Schema definition
-           * via the `patternProperty` "^.+$".
-           */
-          [k: string]: readonly [string, string];
-        }>
-      | readonly [
+      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | NonEmptyTuple<
           Readonly<{
             /**
              * @minItems 1
              */
-            include: readonly [string, ...string[]];
+            include: NonEmptyTuple<string>;
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: readonly [string, string];
-          }>,
-          ...Readonly<{
-            /**
-             * @minItems 1
-             */
-            include: readonly [string, ...string[]];
-            exclude?: readonly string[];
-            /**
-             * @minItems 2
-             * @maxItems 2
-             */
-            replace: readonly [string, string];
-          }>[],
-        ];
+            replace: FixedLengthTuple<2, string>;
+          }>
+        >;
   }>;
 
   export type RuleEntry =
@@ -1852,42 +1772,21 @@ namespace NoUnpublishedImport {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<{
-          /**
-           * @minItems 2
-           * @maxItems 2
-           *
-           * This interface was referenced by `undefined`'s JSON-Schema definition
-           * via the `patternProperty` "^.+$".
-           */
-          [k: string]: readonly [string, string];
-        }>
-      | readonly [
+      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | NonEmptyTuple<
           Readonly<{
             /**
              * @minItems 1
              */
-            include: readonly [string, ...string[]];
+            include: NonEmptyTuple<string>;
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: readonly [string, string];
-          }>,
-          ...Readonly<{
-            /**
-             * @minItems 1
-             */
-            include: readonly [string, ...string[]];
-            exclude?: readonly string[];
-            /**
-             * @minItems 2
-             * @maxItems 2
-             */
-            replace: readonly [string, string];
-          }>[],
-        ];
+            replace: FixedLengthTuple<2, string>;
+          }>
+        >;
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
@@ -2025,42 +1924,21 @@ namespace NoUnpublishedRequire {
   export type Options = Readonly<{
     allowModules?: readonly string[];
     convertPath?:
-      | Readonly<{
-          /**
-           * @minItems 2
-           * @maxItems 2
-           *
-           * This interface was referenced by `undefined`'s JSON-Schema definition
-           * via the `patternProperty` "^.+$".
-           */
-          [k: string]: readonly [string, string];
-        }>
-      | readonly [
+      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | NonEmptyTuple<
           Readonly<{
             /**
              * @minItems 1
              */
-            include: readonly [string, ...string[]];
+            include: NonEmptyTuple<string>;
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: readonly [string, string];
-          }>,
-          ...Readonly<{
-            /**
-             * @minItems 1
-             */
-            include: readonly [string, ...string[]];
-            exclude?: readonly string[];
-            /**
-             * @minItems 2
-             * @maxItems 2
-             */
-            replace: readonly [string, string];
-          }>[],
-        ];
+            replace: FixedLengthTuple<2, string>;
+          }>
+        >;
     resolvePaths?: readonly string[];
     resolverConfig?: UnknownRecord;
     tryExtensions?: readonly string[];
@@ -7825,51 +7703,24 @@ namespace Hashbang {
    */
   export type Options = Readonly<{
     convertPath?:
-      | Readonly<{
-          /**
-           * @minItems 2
-           * @maxItems 2
-           *
-           * This interface was referenced by `undefined`'s JSON-Schema definition
-           * via the `patternProperty` "^.+$".
-           */
-          [k: string]: readonly [string, string];
-        }>
-      | readonly [
+      | Readonly<Record<string, FixedLengthTuple<2, string>>>
+      | NonEmptyTuple<
           Readonly<{
             /**
              * @minItems 1
              */
-            include: readonly [string, ...string[]];
+            include: NonEmptyTuple<string>;
             exclude?: readonly string[];
             /**
              * @minItems 2
              * @maxItems 2
              */
-            replace: readonly [string, string];
-          }>,
-          ...Readonly<{
-            /**
-             * @minItems 1
-             */
-            include: readonly [string, ...string[]];
-            exclude?: readonly string[];
-            /**
-             * @minItems 2
-             * @maxItems 2
-             */
-            replace: readonly [string, string];
-          }>[],
-        ];
+            replace: FixedLengthTuple<2, string>;
+          }>
+        >;
     ignoreUnpublished?: boolean;
     additionalExecutables?: readonly string[];
-    executableMap?: Readonly<{
-      /**
-       * This interface was referenced by `undefined`'s JSON-Schema definition
-       * via the `patternProperty` "^\.\w+$".
-       */
-      [k: string]: string;
-    }>;
+    executableMap?: Readonly<Record<string, string>>;
   }>;
 
   export type RuleEntry =

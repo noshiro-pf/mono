@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 
 type ImportStyle = 'namespace' | 'named';
 
@@ -86,7 +87,7 @@ export const importStyleRule: TSESLint.RuleModule<MessageIds, Options> = {
             if (
               firstSpecifier?.type !==
                 AST_NODE_TYPES.ImportNamespaceSpecifier ||
-              node.specifiers.length !== 1
+              !Arr.isFixedLengthArray(1, node.specifiers)
             ) {
               context.report({
                 node,

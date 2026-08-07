@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
 import type * as ts from 'typescript';
 
@@ -179,7 +180,7 @@ export const checkDestructuringCompleteness: TSESLint.RuleModule<
         (prop) => !collected.names.has(prop),
       );
 
-      if (missingProps.length > 0) {
+      if (Arr.isNonEmpty(missingProps)) {
         context.report({
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion
           node: objectPattern as never,

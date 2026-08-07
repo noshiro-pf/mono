@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type NonEmptyTuple } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -62,8 +63,7 @@ namespace AwaitAsyncEvents {
      * @default "userEvent"
      */
     eventModule?:
-      | ('fireEvent' | 'userEvent')
-      | readonly ('fireEvent' | 'userEvent')[];
+      ('fireEvent' | 'userEvent') | readonly ('fireEvent' | 'userEvent')[];
   }>;
 
   export type RuleEntry =
@@ -215,10 +215,7 @@ namespace NoAwaitSyncEvents {
      *
      * @minItems 1
      */
-    eventModules?: readonly [
-      'fire-event' | 'user-event',
-      ...('fire-event' | 'user-event')[],
-    ];
+    eventModules?: NonEmptyTuple<'fire-event' | 'user-event'>;
   }>;
 
   export type RuleEntry =
@@ -626,10 +623,7 @@ namespace PreferExplicitAssert {
    */
   export type Options = Readonly<{
     assertion?:
-      | 'toBeOnTheScreen'
-      | 'toBeInTheDocument'
-      | 'toBeTruthy'
-      | 'toBeDefined';
+      'toBeOnTheScreen' | 'toBeInTheDocument' | 'toBeTruthy' | 'toBeDefined';
     includeFindQueries?: boolean;
   }>;
 

@@ -4,6 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
 
 type Options = readonly [];
@@ -124,18 +125,19 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
       const [reference] = variable.references;
 
       return (
-        variable.references.length === 1 && reference?.identifier === argument
+        Arr.isFixedLengthArray(1, variable.references) &&
+        reference?.identifier === argument
       );
     };
 
     return {
       ArrowFunctionExpression: (node) => {
-        if (node.async || node.params.length !== 1) return;
+        if (node.async || !Arr.isFixedLengthArray(1, node.params)) return;
 
         const [param] = node.params;
 
         if (
-          param?.type !== AST_NODE_TYPES.Identifier ||
+          param.type !== AST_NODE_TYPES.Identifier ||
           param.typeAnnotation !== undefined
         ) {
           return;
@@ -167,7 +169,7 @@ export const preferCurriedCall: TSESLint.RuleModule<MessageIds, Options> = {
 
         const calleeText = sourceCode.getText(call.callee);
 
-        if (restArgs.length === 0) {
+        if (Arr.isEmpty(restArgs)) {
           // `(a) => f(a)` → `f`
           if (
             !isEtaSafeCallee(call.callee) ||
@@ -232,7 +234,7 @@ const isEffectivelyUnary = (
   const signatures = type.getCallSignatures();
 
   return (
-    signatures.length > 0 &&
+    Arr.isNonEmpty(signatures) &&
     signatures.every((signature) => signatureMaxArgs(signature) <= 1)
   );
 };

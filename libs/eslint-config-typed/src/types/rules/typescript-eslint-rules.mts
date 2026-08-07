@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type NonEmptyTuple } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -157,19 +158,19 @@ namespace BanTsComment {
    *       },
    *       "ts-check": {
    *         "$ref": "#/$defs/directiveConfigSchema",
-   *         "description": "Whether allow ts-check directives, and with which restrictions."
+   *         "description": "Whether to allow ts-check directives, and with which restrictions."
    *       },
    *       "ts-expect-error": {
    *         "$ref": "#/$defs/directiveConfigSchema",
-   *         "description": "Whether and when expect-error directives, and with which restrictions."
+   *         "description": "Whether to allow ts-expect-error directives, and with which restrictions."
    *       },
    *       "ts-ignore": {
    *         "$ref": "#/$defs/directiveConfigSchema",
-   *         "description": "Whether allow ts-ignore directives, and with which restrictions."
+   *         "description": "Whether to allow ts-ignore directives, and with which restrictions."
    *       },
    *       "ts-nocheck": {
    *         "$ref": "#/$defs/directiveConfigSchema",
-   *         "description": "Whether allow ts-nocheck directives, and with which restrictions."
+   *         "description": "Whether to allow ts-nocheck directives, and with which restrictions."
    *       }
    *     }
    *   }
@@ -182,7 +183,7 @@ namespace BanTsComment {
      */
     minimumDescriptionLength?: number;
     /**
-     * Whether allow ts-check directives, and with which restrictions.
+     * Whether to allow ts-check directives, and with which restrictions.
      */
     'ts-check'?:
       | boolean
@@ -191,7 +192,7 @@ namespace BanTsComment {
           descriptionFormat?: string;
         }>;
     /**
-     * Whether and when expect-error directives, and with which restrictions.
+     * Whether to allow ts-expect-error directives, and with which restrictions.
      */
     'ts-expect-error'?:
       | boolean
@@ -200,7 +201,7 @@ namespace BanTsComment {
           descriptionFormat?: string;
         }>;
     /**
-     * Whether allow ts-ignore directives, and with which restrictions.
+     * Whether to allow ts-ignore directives, and with which restrictions.
      */
     'ts-ignore'?:
       | boolean
@@ -209,7 +210,7 @@ namespace BanTsComment {
           descriptionFormat?: string;
         }>;
     /**
-     * Whether allow ts-nocheck directives, and with which restrictions.
+     * Whether to allow ts-nocheck directives, and with which restrictions.
      */
     'ts-nocheck'?:
       | boolean
@@ -1903,11 +1904,12 @@ namespace MemberOrdering {
  * @link https://typescript-eslint.io/rules/method-signature-style
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  */
 namespace MethodSignatureStyle {
@@ -3878,11 +3880,7 @@ namespace NamingConvention {
   export type PrefixSuffixConfig = readonly string[];
 
   export type TypeModifiers =
-    | 'boolean'
-    | 'string'
-    | 'number'
-    | 'function'
-    | 'array';
+    'boolean' | 'string' | 'number' | 'function' | 'array';
 
   export type Options = readonly Readonly<
     | {
@@ -3996,12 +3994,7 @@ namespace NamingConvention {
         filter?: string | MatchRegexConfig;
         selector: 'variable';
         modifiers?: readonly (
-          | 'const'
-          | 'destructured'
-          | 'exported'
-          | 'global'
-          | 'unused'
-          | 'async'
+          'const' | 'destructured' | 'exported' | 'global' | 'unused' | 'async'
         )[];
         types?: readonly TypeModifiers[];
       }
@@ -4113,10 +4106,7 @@ namespace NamingConvention {
         filter?: string | MatchRegexConfig;
         selector: 'parameterProperty';
         modifiers?: readonly (
-          | 'private'
-          | 'protected'
-          | 'public'
-          | 'readonly'
+          'private' | 'protected' | 'public' | 'readonly'
         )[];
         types?: readonly TypeModifiers[];
       }
@@ -4703,16 +4693,16 @@ namespace NoDeprecated {
       | Readonly<
           | {
               from: 'file';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
             }
           | {
               from: 'package';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               package: string;
             }
         >
@@ -5423,16 +5413,16 @@ namespace NoFloatingPromises {
       | Readonly<
           | {
               from: 'file';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
             }
           | {
               from: 'package';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               package: string;
             }
         >
@@ -5445,16 +5435,16 @@ namespace NoFloatingPromises {
       | Readonly<
           | {
               from: 'file';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
             }
           | {
               from: 'package';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               package: string;
             }
         >
@@ -5677,7 +5667,7 @@ namespace NoInvalidVoidType {
     /**
      * Whether `void` can be used as a valid value for generic type parameters.
      */
-    allowInGenericTypeArguments?: boolean | readonly [string, ...string[]];
+    allowInGenericTypeArguments?: boolean | NonEmptyTuple<string>;
   }>;
 
   export type RuleEntry =
@@ -5694,11 +5684,11 @@ namespace NoInvalidVoidType {
  *  | key        | value      |
  *  | :--------- | :--------- |
  *  | type       | suggestion |
- *  | deprecated | false      |
+ *  | deprecated | true       |
  *  ```
  */
 namespace NoLoopFunc {
-  export type RuleEntry = Linter.StringSeverity;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -5737,12 +5727,10 @@ namespace NoMagicNumbers {
    *     "type": "object",
    *     "properties": {
    *       "detectObjects": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "enforceConst": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignore": {
    *         "type": "array",
@@ -5760,35 +5748,28 @@ namespace NoMagicNumbers {
    *         "uniqueItems": true
    *       },
    *       "ignoreArrayIndexes": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreDefaultValues": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreClassFieldInitialValues": {
-   *         "type": "boolean",
-   *         "default": false
+   *         "type": "boolean"
    *       },
    *       "ignoreEnums": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether enums used in TypeScript are considered okay."
    *       },
    *       "ignoreNumericLiteralTypes": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether numbers used in TypeScript numeric literal types are considered okay."
    *       },
    *       "ignoreReadonlyClassProperties": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether `readonly` class properties are considered okay."
    *       },
    *       "ignoreTypeIndexes": {
    *         "type": "boolean",
-   *         "default": false,
    *         "description": "Whether numbers used to index types are okay."
    *       }
    *     },
@@ -5798,49 +5779,26 @@ namespace NoMagicNumbers {
    * ```
    */
   export type Options = Readonly<{
-    /**
-     * @default false
-     */
     detectObjects?: boolean;
-    /**
-     * @default false
-     */
     enforceConst?: boolean;
     ignore?: readonly (number | string)[];
-    /**
-     * @default false
-     */
     ignoreArrayIndexes?: boolean;
-    /**
-     * @default false
-     */
     ignoreDefaultValues?: boolean;
-    /**
-     * @default false
-     */
     ignoreClassFieldInitialValues?: boolean;
     /**
      * Whether enums used in TypeScript are considered okay.
-     *
-     * @default false
      */
     ignoreEnums?: boolean;
     /**
      * Whether numbers used in TypeScript numeric literal types are considered okay.
-     *
-     * @default false
      */
     ignoreNumericLiteralTypes?: boolean;
     /**
      * Whether `readonly` class properties are considered okay.
-     *
-     * @default false
      */
     ignoreReadonlyClassProperties?: boolean;
     /**
      * Whether numbers used to index types are okay.
-     *
-     * @default false
      */
     ignoreTypeIndexes?: boolean;
   }>;
@@ -6187,16 +6145,16 @@ namespace NoMisusedSpread {
       | Readonly<
           | {
               from: 'file';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
             }
           | {
               from: 'package';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               package: string;
             }
         >
@@ -6460,7 +6418,7 @@ namespace NoRequireImports {
  *  | key        | value      |
  *  | :--------- | :--------- |
  *  | type       | suggestion |
- *  | deprecated | false      |
+ *  | deprecated | true       |
  *  ```
  */
 namespace NoRestrictedImports {
@@ -6640,67 +6598,7 @@ namespace NoRestrictedImports {
    * ]
    * ```
    */
-  export type Options =
-    | readonly (
-        | string
-        | Readonly<{
-            name: string;
-            message?: string;
-            importNames?: readonly string[];
-            allowImportNames?: readonly string[];
-            /**
-             * Whether to allow type-only imports for a path.
-             */
-            allowTypeImports?: boolean;
-          }>
-      )[]
-    | readonly [
-        Readonly<{
-          paths?: readonly (
-            | string
-            | Readonly<{
-                name: string;
-                message?: string;
-                importNames?: readonly string[];
-                allowImportNames?: readonly string[];
-                /**
-                 * Whether to allow type-only imports for a path.
-                 */
-                allowTypeImports?: boolean;
-              }>
-          )[];
-          patterns?:
-            | readonly string[]
-            | readonly Readonly<{
-                /**
-                 * @minItems 1
-                 */
-                importNames?: readonly [string, ...string[]];
-                /**
-                 * @minItems 1
-                 */
-                allowImportNames?: readonly [string, ...string[]];
-                /**
-                 * @minItems 1
-                 */
-                group?: readonly [string, ...string[]];
-                regex?: string;
-                importNamePattern?: string;
-                allowImportNamePattern?: string;
-                message?: string;
-                caseSensitive?: boolean;
-                /**
-                 * Whether to allow type-only imports for a path.
-                 */
-                allowTypeImports?: boolean;
-              }>[];
-        }>,
-      ];
-
-  export type RuleEntry =
-    | 'off'
-    | Linter.Severity
-    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -6857,7 +6755,7 @@ namespace NoShadow {
    *       },
    *       "ignoreOnInitialization": {
    *         "type": "boolean",
-   *         "description": "Whether to ignore the variable initializers when the shadowed variable is presumably still unitialized."
+   *         "description": "Whether to ignore the variable initializers when the shadowed variable is presumably still uninitialized."
    *       },
    *       "ignoreTypeValueShadow": {
    *         "type": "boolean",
@@ -6886,7 +6784,7 @@ namespace NoShadow {
      */
     ignoreFunctionTypeParameterNameValueShadow?: boolean;
     /**
-     * Whether to ignore the variable initializers when the shadowed variable is presumably still unitialized.
+     * Whether to ignore the variable initializers when the shadowed variable is presumably still uninitialized.
      */
     ignoreOnInitialization?: boolean;
     /**
@@ -6925,7 +6823,7 @@ namespace NoThisAlias {
    *     "properties": {
    *       "allowDestructuring": {
    *         "type": "boolean",
-   *         "description": "Whether to ignore destructurings, such as `const { props, state } = this`."
+   *         "description": "Whether to ignore destructuring, such as `const { props, state } = this`."
    *       },
    *       "allowedNames": {
    *         "type": "array",
@@ -6941,7 +6839,7 @@ namespace NoThisAlias {
    */
   export type Options = Readonly<{
     /**
-     * Whether to ignore destructurings, such as `const { props, state } = this`.
+     * Whether to ignore destructuring, such as `const { props, state } = this`.
      */
     allowDestructuring?: boolean;
     /**
@@ -7158,8 +7056,7 @@ namespace NoUnnecessaryCondition {
      * Whether to ignore constant loop conditions, such as `while (true)`.
      */
     allowConstantLoopConditions?:
-      | boolean
-      | ('always' | 'never' | 'only-allowed-literals');
+      boolean | ('always' | 'never' | 'only-allowed-literals');
     /**
      * Whether to not error when running with a tsconfig that has strictNullChecks turned.
      */
@@ -7703,7 +7600,7 @@ namespace NoUnusedVars {
    *           },
    *           "ignoreRestSiblings": {
    *             "type": "boolean",
-   *             "description": "Whether to ignore sibling properties in `...` destructurings."
+   *             "description": "Whether to ignore sibling properties in `...` destructuring."
    *           },
    *           "ignoreUsingDeclarations": {
    *             "type": "boolean",
@@ -7769,7 +7666,7 @@ namespace NoUnusedVars {
          */
         ignoreClassWithStaticInitBlock?: boolean;
         /**
-         * Whether to ignore sibling properties in `...` destructurings.
+         * Whether to ignore sibling properties in `...` destructuring.
          */
         ignoreRestSiblings?: boolean;
         /**
@@ -8211,16 +8108,16 @@ namespace OnlyThrowError {
       | Readonly<
           | {
               from: 'file';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
             }
           | {
               from: 'package';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               package: string;
             }
         >
@@ -9015,16 +8912,16 @@ namespace PreferPromiseRejectErrors {
       | Readonly<
           | {
               from: 'file';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
             }
           | {
               from: 'package';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               package: string;
             }
         >
@@ -9253,16 +9150,16 @@ namespace PreferReadonlyParameterTypes {
       | Readonly<
           | {
               from: 'file';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
             }
           | {
               from: 'package';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               package: string;
             }
         >
@@ -9861,16 +9758,16 @@ namespace RestrictTemplateExpressions {
       | Readonly<
           | {
               from: 'file';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               path?: string;
             }
           | {
               from: 'lib';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
             }
           | {
               from: 'package';
-              name: string | readonly [string, ...string[]];
+              name: string | NonEmptyTuple<string>;
               package: string;
             }
         >
@@ -9939,10 +9836,7 @@ namespace ReturnAwait {
    * ```
    */
   export type Options =
-    | 'always'
-    | 'error-handling-correctness-only'
-    | 'in-try-catch'
-    | 'never';
+    'always' | 'error-handling-correctness-only' | 'in-try-catch' | 'never';
 
   export type RuleEntry =
     | 'off'
@@ -10532,7 +10426,6 @@ export type TypeScriptEslintRules = Readonly<{
   '@typescript-eslint/no-inferrable-types': NoInferrableTypes.RuleEntry;
   '@typescript-eslint/no-invalid-this': NoInvalidThis.RuleEntry;
   '@typescript-eslint/no-invalid-void-type': NoInvalidVoidType.RuleEntry;
-  '@typescript-eslint/no-loop-func': NoLoopFunc.RuleEntry;
   '@typescript-eslint/no-magic-numbers': NoMagicNumbers.RuleEntry;
   '@typescript-eslint/no-meaningless-void-operator': NoMeaninglessVoidOperator.RuleEntry;
   '@typescript-eslint/no-misused-new': NoMisusedNew.RuleEntry;
@@ -10546,7 +10439,6 @@ export type TypeScriptEslintRules = Readonly<{
   '@typescript-eslint/no-redeclare': NoRedeclare.RuleEntry;
   '@typescript-eslint/no-redundant-type-constituents': NoRedundantTypeConstituents.RuleEntry;
   '@typescript-eslint/no-require-imports': NoRequireImports.RuleEntry;
-  '@typescript-eslint/no-restricted-imports': NoRestrictedImports.RuleEntry;
   '@typescript-eslint/no-restricted-types': NoRestrictedTypes.RuleEntry;
   '@typescript-eslint/no-shadow': NoShadow.RuleEntry;
   '@typescript-eslint/no-this-alias': NoThisAlias.RuleEntry;
@@ -10616,7 +10508,9 @@ export type TypeScriptEslintRules = Readonly<{
 
   // deprecated
   '@typescript-eslint/no-empty-interface': NoEmptyInterface.RuleEntry;
+  '@typescript-eslint/no-loop-func': NoLoopFunc.RuleEntry;
   '@typescript-eslint/no-loss-of-precision': NoLossOfPrecision.RuleEntry;
+  '@typescript-eslint/no-restricted-imports': NoRestrictedImports.RuleEntry;
   '@typescript-eslint/no-type-alias': NoTypeAlias.RuleEntry;
   '@typescript-eslint/no-var-requires': NoVarRequires.RuleEntry;
   '@typescript-eslint/prefer-ts-expect-error': PreferTsExpectError.RuleEntry;
@@ -10664,7 +10558,6 @@ export type TypeScriptEslintRulesOption = Readonly<{
   '@typescript-eslint/no-namespace': NoNamespace.Options;
   '@typescript-eslint/no-redeclare': NoRedeclare.Options;
   '@typescript-eslint/no-require-imports': NoRequireImports.Options;
-  '@typescript-eslint/no-restricted-imports': NoRestrictedImports.Options;
   '@typescript-eslint/no-restricted-types': NoRestrictedTypes.Options;
   '@typescript-eslint/no-shadow': NoShadow.Options;
   '@typescript-eslint/no-this-alias': NoThisAlias.Options;

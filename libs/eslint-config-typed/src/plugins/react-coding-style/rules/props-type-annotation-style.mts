@@ -3,9 +3,12 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { castDeepMutable } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
-import { getReactMemoArrowFunction, isReactApiCall } from './shared.mjs';
+import {
+  castNode,
+  getReactMemoArrowFunction,
+  isReactApiCall,
+} from './shared.mjs';
 
 type MessageIds = 'disallowPropsTypeAnnotation';
 
@@ -44,7 +47,7 @@ export const propsTypeAnnotationStyleRule: TSESLint.RuleModule<MessageIds> = {
 
       if (firstParam.typeAnnotation !== undefined) {
         context.report({
-          node: castDeepMutable(firstParam.typeAnnotation),
+          node: castNode(firstParam.typeAnnotation),
           messageId: 'disallowPropsTypeAnnotation',
         });
       }

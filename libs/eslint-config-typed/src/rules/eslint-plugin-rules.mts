@@ -37,4 +37,7 @@ export const eslintPluginRules = {
   'eslint-plugin/unique-test-case-names': 'error',
   'eslint-plugin/no-matching-violation-suggest-message-ids': 'error',
   'eslint-plugin/require-test-error-positions': 'error',
+  'eslint-plugin/no-incomplete-meta-schema': withDefaultOption('error'),
+  'eslint-plugin/no-incorrect-meta-schema': withDefaultOption('error'),
+  'eslint-plugin/require-meta-languages': 'error',
 } as const satisfies EslintPluginRules;

@@ -1,9 +1,10 @@
 // configs/restricted-syntax-defs.mjs
 
 import { eslintRules, type EslintRulesOption } from 'eslint-config-typed';
+import { Arr } from 'ts-data-forge';
 
-export const restrictedSyntax = [
-  ...eslintRules['no-restricted-syntax'].slice(1),
+export const restrictedSyntax = Arr.toPushed(
+  eslintRules['no-restricted-syntax'].slice(1),
   {
     // Restrict type annotation style for React.useMemo
     selector:
@@ -11,4 +12,4 @@ export const restrictedSyntax = [
     message:
       'The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`.',
   },
-] as const satisfies EslintRulesOption['no-restricted-syntax'];
+) satisfies EslintRulesOption['no-restricted-syntax'];

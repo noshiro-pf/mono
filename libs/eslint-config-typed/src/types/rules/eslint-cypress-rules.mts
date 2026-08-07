@@ -24,7 +24,7 @@ namespace AssertionBeforeScreenshot {
 }
 
 /**
- * @description enforce .should() over .and() for starting assertion chains
+ * @description enforce `.should()` over `.and()` for starting assertion chains
  * @link https://github.com/cypress-io/eslint-plugin-cypress/blob/master/docs/rules/no-and.md
  *
  *  ```md

@@ -6,7 +6,7 @@ import { embedExamples } from './embed-examples.mjs';
  * Generates documentation using TypeDoc and formats the output.
  */
 export const genDocs = async (): Promise<void> => {
-  console.log('Starting documentation generation...\n');
+  console.info('Starting documentation generation...\n');
 
   await logStep({
     startMessage: 'Embedding example code into README',
@@ -26,7 +26,7 @@ export const genDocs = async (): Promise<void> => {
     successMessage: 'Formatting completed',
   });
 
-  console.log('✅ Documentation generation completed successfully!\n');
+  console.info('✅ Documentation generation completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -40,11 +40,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  console.log(`${mut_step.current}. ${startMessage}...`);
+  console.info(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  console.log(`✓ ${successMessage}.\n`);
+  console.info(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };

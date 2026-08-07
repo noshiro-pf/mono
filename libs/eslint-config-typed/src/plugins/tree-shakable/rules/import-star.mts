@@ -83,14 +83,10 @@ const isTreeShakingSafeReference = (
         return true;
       }
 
+      // id["foo"]
       const memberName = parent.property;
 
-      if (memberName.type === TSESTree.AST_NODE_TYPES.Literal) {
-        // id["foo"]
-        return true;
-      }
-
-      return false;
+      return memberName.type === TSESTree.AST_NODE_TYPES.Literal;
     }
 
     case TSESTree.AST_NODE_TYPES.JSXMemberExpression: {

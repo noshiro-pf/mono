@@ -29,7 +29,7 @@ const commonRulesPath = path.resolve(projectRootPath, 'agents/common-rules.md');
  */
 export const syncAgentConfig = async (): Promise<Result<undefined, string>> => {
   try {
-    console.log(`Fetching ${commonRulesUrl}...`);
+    console.info(`Fetching ${commonRulesUrl}...`);
 
     const response = await fetch(commonRulesUrl);
 
@@ -49,7 +49,9 @@ export const syncAgentConfig = async (): Promise<Result<undefined, string>> => {
     // `fmt:full`-stable even if the ignore rules ever change.
     await formatFiles([commonRulesPath]);
 
-    console.log(`Vendored ${path.relative(projectRootPath, commonRulesPath)}.`);
+    console.info(
+      `Vendored ${path.relative(projectRootPath, commonRulesPath)}.`,
+    );
 
     return await genAgentsMd();
   } catch (error) {

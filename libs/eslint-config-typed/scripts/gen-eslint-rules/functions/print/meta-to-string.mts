@@ -1,5 +1,5 @@
-import { isBoolean, isString } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import { hasKey, isBoolean, isRecord, isString } from 'ts-data-forge';
+import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
 import { type Rule } from '../../../../src/index.mjs';
 import { toStr } from '../../utils/index.mjs';
 import { isDeprecated } from '../is-deprecated.mjs';
@@ -27,14 +27,17 @@ export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
     ],
     [
       'requiresTypeChecking',
-      // eslint-disable-next-line no-restricted-syntax
-      'requiresTypeChecking' in docs
-        ? Boolean(docs.requiresTypeChecking)
+
+      isRecord(docs) && hasKey(docs, 'requiresTypeChecking')
+        ? Boolean(
+            (docs as Readonly<{ requiresTypeChecking: unknown }>)
+              .requiresTypeChecking,
+          )
         : undefined,
     ],
   ] as const;
 
-  const keyValuesStr: DeepReadonly<[string, string][]> = keyValue
+  const keyValuesStr: readonly FixedLengthTuple<2, string>[] = keyValue
     .filter(([_key, value]) => value != null)
     .map(([key, value]) => [
       key,
@@ -44,7 +47,7 @@ export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
   const tableHeader = ['key', 'value'] as const;
 
   const [longestKeyLength, longestValueLength] = keyValuesStr.reduce<
-    readonly [number, number]
+    FixedLengthTuple<2, number>
   >(
     ([keyMax, valueMax], [key, value]) => [
       Math.max(keyMax, key.length),

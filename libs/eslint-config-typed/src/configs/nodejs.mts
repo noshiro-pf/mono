@@ -1,4 +1,5 @@
 import globals from 'globals';
+import { Arr } from 'ts-data-forge';
 import { restrictedGlobals } from '../rules/index.mjs';
 import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
@@ -12,7 +13,7 @@ export const eslintConfigForNodeJs = (files?: readonly string[]): FlatConfig =>
       },
     },
     rules: defineKnownRules({
-      'no-restricted-globals': ['error', ...restrictedGlobals],
+      'no-restricted-globals': Arr.toUnshifted('error')(restrictedGlobals),
       'no-alert': 'off',
       'no-implicit-globals': 'off',
       'no-script-url': 'off',

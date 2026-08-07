@@ -3,9 +3,9 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { castDeepMutable } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
-import { isReactApiCall } from './shared.mjs';
+import { castNode, isReactApiCall } from './shared.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -82,7 +82,7 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
 
       if (assignment === undefined) {
         context.report({
-          node: castDeepMutable(node),
+          node: castNode(node),
           messageId: 'missingDisplayName',
         });
 
@@ -91,7 +91,7 @@ export const displayNameRule: TSESLint.RuleModule<MessageIds, Options> = {
 
       if (!isComponentDisplayNameAssignment(assignment, componentName)) {
         context.report({
-          node: castDeepMutable(node),
+          node: castNode(node),
           messageId: 'missingDisplayName',
         });
 
@@ -229,10 +229,10 @@ const extractDisplayName = (
 
   if (
     expression.type === AST_NODE_TYPES.TemplateLiteral &&
-    expression.expressions.length === 0 &&
-    expression.quasis.length === 1
+    Arr.isEmpty(expression.expressions) &&
+    Arr.isFixedLengthArray(1, expression.quasis)
   ) {
-    return expression.quasis[0]?.value.cooked ?? undefined;
+    return expression.quasis[0].value.cooked ?? undefined;
   }
 
   return undefined;

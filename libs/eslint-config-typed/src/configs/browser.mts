@@ -1,4 +1,5 @@
 import globals from 'globals';
+import { Arr } from 'ts-data-forge';
 import { restrictedGlobalsForBrowser } from '../rules/index.mjs';
 import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
 
@@ -13,7 +14,9 @@ export const eslintConfigForBrowser = (files?: readonly string[]): FlatConfig =>
       sourceType: 'module',
     },
     rules: defineKnownRules({
-      'no-restricted-globals': ['error', ...restrictedGlobalsForBrowser],
+      'no-restricted-globals': Arr.toUnshifted('error')(
+        restrictedGlobalsForBrowser,
+      ),
       '@typescript-eslint/no-require-imports': 'off',
       'unicorn/no-new-buffer': 'off',
       'unicorn/no-process-exit': 'off',

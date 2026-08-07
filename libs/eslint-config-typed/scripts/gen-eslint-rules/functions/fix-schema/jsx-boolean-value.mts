@@ -1,4 +1,4 @@
-import { Arr, isBoolean } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -12,7 +12,7 @@ export const normalizeJsxBooleanValueSchema = (
   }
 
   const updatedAnyOf = schema.anyOf.map((option, index) => {
-    if (isBoolean(option) || Arr.isArray(option)) {
+    if (Arr.isArray(option)) {
       return option;
     }
 

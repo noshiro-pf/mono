@@ -1,4 +1,3 @@
-import { allExtensionsRegexUnionStr } from '../constants/index.mjs';
 import {
   withDefaultOption,
   type TypeScriptEslintRules,
@@ -122,7 +121,6 @@ export const typescriptEslintRules = {
 
   '@typescript-eslint/no-invalid-this': withDefaultOption('error'),
   '@typescript-eslint/no-invalid-void-type': withDefaultOption('error'),
-  '@typescript-eslint/no-loop-func': 'error',
   '@typescript-eslint/no-magic-numbers': 'off', // disabled
   '@typescript-eslint/no-meaningless-void-operator': withDefaultOption('error'),
   '@typescript-eslint/no-misused-new': 'error',
@@ -140,20 +138,6 @@ export const typescriptEslintRules = {
   '@typescript-eslint/no-non-null-assertion': 'error',
   '@typescript-eslint/no-redeclare': 'off', // disabled
   '@typescript-eslint/no-redundant-type-constituents': 'error',
-
-  // Note: If paths with the same name are defined multiple times, later definitions may overwrite earlier ones
-  '@typescript-eslint/no-restricted-imports': [
-    'error',
-    {
-      patterns: [
-        {
-          regex: String.raw`^(\.\/|\.\.\/)+index\.(${allExtensionsRegexUnionStr})$`,
-          message:
-            'Do not specify index.mjs directly by relative path, but import it by module name (e.g. ./X/index.mjs).',
-        },
-      ],
-    },
-  ],
 
   '@typescript-eslint/no-shadow': [
     'error',
@@ -508,4 +492,6 @@ export const typescriptEslintRules = {
   '@typescript-eslint/no-empty-interface': 0,
   '@typescript-eslint/no-loss-of-precision': 0,
   '@typescript-eslint/typedef': 0,
+  '@typescript-eslint/no-loop-func': 0,
+  '@typescript-eslint/no-restricted-imports': 0,
 } as const satisfies TypeScriptEslintRules;

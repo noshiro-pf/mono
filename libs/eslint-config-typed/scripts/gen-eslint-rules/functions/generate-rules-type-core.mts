@@ -1,7 +1,7 @@
 import { type DeprecatedInfo } from '@eslint/core';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { compile, type Options } from 'json-schema-to-typescript';
-import { castDeepMutable } from 'ts-data-forge';
+import { Arr, castDeepMutable } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
 import { type Rule, type Rules } from '../../../src/index.mjs';
 import { immerCodingStyleRules } from '../../../src/plugins/immer-coding-style/rules/rules.mjs';
@@ -9,10 +9,10 @@ import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/r
 import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
 import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/index.mjs';
 import { treeShakableRules } from '../../../src/plugins/tree-shakable/rules/index.mjs';
-import { tsDataForgeRules } from '../../../src/plugins/ts-data-forge/rules/rules.mjs';
 import { tsRestrictionsRules } from '../../../src/plugins/ts-restrictions/rules/rules.mjs';
 import { vitestCodingStyleRules } from '../../../src/plugins/vitest-coding-style/rules/rules.mjs';
 import { eslintPlugins } from '../constants/eslint-plugins.mjs';
+import { tsTypeForgeImportStatement } from '../constants/ts-type-forge-import.mjs';
 import {
   deepReplace,
   falseToUndefined,
@@ -37,6 +37,8 @@ import {
 import { isDeprecated } from './is-deprecated.mjs';
 import { normalizeSchemaToArray } from './normalize-schema-to-array.mjs';
 import { metaToString, rawSchemaToString } from './print/index.mjs';
+import { renameShadowedDeclarations } from './rename-shadowed-declarations.mjs';
+import { stripGeneratorBoilerplateComments } from './strip-generator-boilerplate-comments.mjs';
 import { type JSONSchema4 } from './type.mjs';
 
 const generatorOption: Readonly<{
@@ -123,7 +125,7 @@ export const generateRulesTypeCore = async (
         return enforceMinItemsForRestrictedTuple(s);
       }
 
-      if (validTitlePlugins.has(pluginName) && ruleName === 'valid-title') {
+      if (ruleName === 'valid-title' && validTitlePlugins.has(pluginName)) {
         return expandMustMatchPatternProperties(s);
       }
 
@@ -219,11 +221,8 @@ const createResult = async (
   const mut_resultToWrite: string[] = [
     '/* cSpell:disable */',
     "import { type Linter } from 'eslint';",
-    // Types that the codemods (convertToReadonly, replaceRecordWithUnknownRecord)
-    // may introduce into rule type bodies. Unused ones are pruned by
-    // prettier-plugin-organize-imports during the final format step.
-    "import { type DeepReadonly, type UnknownRecord } from 'ts-type-forge';",
-    ...(schemaList.some(({ schema }) => schema.length === 1)
+    tsTypeForgeImportStatement,
+    ...(schemaList.some(({ schema }) => Arr.isFixedLengthArray(1, schema))
       ? [
           '',
           `type SpreadOptionsIfIsArray<T extends readonly [${RuleSeverityForNoOption}, unknown]> =`,
@@ -240,10 +239,12 @@ const createResult = async (
     ruleName,
     schema,
   } of schemaList) {
-    mut_resultToWrite.push(docs, `namespace ${toCapitalCase(ruleName)} {`);
+    const namespaceName = toCapitalCase(ruleName);
+
+    mut_resultToWrite.push(docs, `namespace ${namespaceName} {`);
 
     if (isDeprecated(deprecated)) {
-      if (schema.length > 0) {
+      if (Arr.isNonEmpty(schema)) {
         mut_resultToWrite.push(...rawSchemaToString(schemaToPrint));
       }
 
@@ -280,7 +281,9 @@ const createResult = async (
           });
 
           mut_resultToWrite.push(
-            optionsType,
+            ...renameShadowedDeclarations(namespaceName, [
+              stripGeneratorBoilerplateComments(optionsType),
+            ]),
             '',
             '  export type RuleEntry = ',
             generatorOption.explicitRuleDefaultOption
@@ -312,7 +315,10 @@ const createResult = async (
             optionsTypeList.map((_, index) => `Options${index}` as const);
 
           mut_resultToWrite.push(
-            ...optionsTypeList,
+            ...renameShadowedDeclarations(
+              namespaceName,
+              optionsTypeList.map(stripGeneratorBoilerplateComments),
+            ),
             '',
             '  export type RuleEntry = ',
             generatorOption.explicitRuleDefaultOption
@@ -352,7 +358,7 @@ const createResult = async (
           )}.RuleEntry;`,
       ),
 
-    ...(deprecatedSchemaList.length === 0
+    ...(Arr.isEmpty(deprecatedSchemaList)
       ? []
       : [
           '',
@@ -369,18 +375,20 @@ const createResult = async (
   );
 
   if (
-    schemaList.some((s) => !isDeprecated(s.deprecated) && s.schema.length > 0)
+    schemaList.some(
+      (s) => !isDeprecated(s.deprecated) && Arr.isNonEmpty(s.schema),
+    )
   ) {
     mut_resultToWrite.push(
       '',
       `export type ${typeName}Option = {`,
 
       ...schemaList
-        .filter((s) => !isDeprecated(s.deprecated) && s.schema.length > 0)
+        .filter((s) => !isDeprecated(s.deprecated) && Arr.isNonEmpty(s.schema))
         .map(({ ruleName, schema }) =>
           [
             `'${ruleNamePrefix}${ruleName}': `,
-            schema.length === 1
+            Arr.isFixedLengthArray(1, schema)
               ? `${toCapitalCase(ruleName)}.Options;`
               : `[${schema
                   .map(
@@ -427,10 +435,6 @@ const getRules = async (
     case eslintPlugins.EslintTsRestrictionsRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Object.entries(tsRestrictionsRules as unknown as Rules);
-
-    case eslintPlugins.EslintTsDataForgeRules.pluginName:
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      return Object.entries(tsDataForgeRules as unknown as Rules);
 
     case eslintPlugins.EslintReactCodingStyleRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion

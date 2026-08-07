@@ -3,6 +3,7 @@ import {
   ESLintUtils,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import { unionTypeParts } from 'tsutils';
 import { type Type, type TypeChecker } from 'typescript';
 
@@ -66,12 +67,12 @@ export const isLiteral = (
 
   if (sourceNode.type === AST_NODE_TYPES.ObjectExpression) {
     // empty object literal: {}
-    return sourceNode.properties.length === 0;
+    return Arr.isEmpty(sourceNode.properties);
   }
 
   if (sourceNode.type === AST_NODE_TYPES.ArrayExpression) {
     // empty object literal: []
-    return sourceNode.elements.length === 0;
+    return Arr.isEmpty(sourceNode.elements);
   }
 
   // TODO: handle recursive case for both arrays and objects and

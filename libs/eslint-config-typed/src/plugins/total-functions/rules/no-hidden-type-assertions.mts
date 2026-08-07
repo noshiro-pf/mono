@@ -3,6 +3,7 @@ import {
   isTypeUnknownType,
 } from '@typescript-eslint/type-utils';
 import { ESLintUtils } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import {
   isArrayTypeNode,
   isConditionalTypeNode,
@@ -61,10 +62,9 @@ export const noHiddenTypeAssertions = createRule({
           : isIndexedAccessTypeNode(type)
             ? ([type.objectType, type.indexType] as const)
             : isFunctionTypeNode(type)
-              ? ([
-                  type.type,
-                  ...parametersToTypeNodes(type.parameters, depth),
-                ] as const)
+              ? Arr.toUnshifted(type.type)(
+                  parametersToTypeNodes(type.parameters, depth),
+                )
               : isTupleTypeNode(type)
                 ? type.elements
                 : isNamedTupleMember(type)
@@ -81,7 +81,7 @@ export const noHiddenTypeAssertions = createRule({
                           ? type.types
                           : ([] as const);
 
-      return [type, ...next.flatMap(explodeTypeNode)] as const;
+      return Arr.toUnshifted(type)(next.flatMap(explodeTypeNode));
     };
 
     const parametersToTypeNodes = (

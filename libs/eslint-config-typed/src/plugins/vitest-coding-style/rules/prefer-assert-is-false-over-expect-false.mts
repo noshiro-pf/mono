@@ -42,7 +42,7 @@ export const preferAssertIsFalseOverExpectFalseRule: TSESLint.RuleModule<
           node.callee.object.callee.name === 'expect' &&
           node.callee.property.type === AST_NODE_TYPES.Identifier &&
           node.callee.property.name === 'toBe' &&
-          Arr.isFixedLengthTuple(node.arguments, 1) &&
+          Arr.isFixedLengthTuple(1, node.arguments) &&
           node.arguments[0].type === AST_NODE_TYPES.Literal &&
           node.arguments[0].value === false
         ) {

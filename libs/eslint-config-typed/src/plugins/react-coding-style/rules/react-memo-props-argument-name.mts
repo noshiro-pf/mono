@@ -3,9 +3,12 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { castDeepMutable } from 'ts-data-forge';
 import { type DeepReadonly } from 'ts-type-forge';
-import { getReactMemoArrowFunction, isReactApiCall } from './shared.mjs';
+import {
+  castNode,
+  getReactMemoArrowFunction,
+  isReactApiCall,
+} from './shared.mjs';
 
 type MessageIds = 'propsParamMustBeNamedProps' | 'propsParamMustBeIdentifier';
 
@@ -51,7 +54,7 @@ export const reactMemoPropsArgumentNameRule: TSESLint.RuleModule<MessageIds> = {
         // Restrict props argument name to be "props"
         if (firstParam.name !== 'props') {
           context.report({
-            node: castDeepMutable(firstParam),
+            node: castNode(firstParam),
             messageId: 'propsParamMustBeNamedProps',
           });
         }
@@ -60,7 +63,7 @@ export const reactMemoPropsArgumentNameRule: TSESLint.RuleModule<MessageIds> = {
       }
 
       context.report({
-        node: castDeepMutable(firstParam),
+        node: castNode(firstParam),
         messageId: 'propsParamMustBeIdentifier',
       });
     },

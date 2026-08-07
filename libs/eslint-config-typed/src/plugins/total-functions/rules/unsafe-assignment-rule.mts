@@ -77,10 +77,10 @@ export const createNoUnsafeAssignmentRule =
 
       const sourceIndexType = sourceType.getNumberIndexType();
 
-      return checker.isArrayType(destinationType) &&
-        checker.isArrayType(sourceType) &&
-        destinationIndexType !== undefined &&
+      return destinationIndexType !== undefined &&
         sourceIndexType !== undefined &&
+        checker.isArrayType(destinationType) &&
+        checker.isArrayType(sourceType) &&
         // and the assignment is from calling a member (obj.method(...))
         sourceExpression?.type === AST_NODE_TYPES.CallExpression &&
         sourceExpression.callee.type === AST_NODE_TYPES.MemberExpression &&

@@ -12,7 +12,8 @@ export const expandMustMatchPatternProperties = (
 ): JSONSchema4 => {
   if (
     schema.patternProperties !== undefined &&
-    Object.hasOwn(schema.patternProperties, '^must(?:Not)?Match$')
+    isRecord(schema.patternProperties) &&
+    hasKey(schema.patternProperties, '^must(?:Not)?Match$')
   ) {
     const { patternProperties, properties, definitions, ...rest } = schema;
 

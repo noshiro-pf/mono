@@ -8,6 +8,7 @@ export default [
   // ...
   {
     rules: defineKnownRules({
+      // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
       'no-restricted-syntax': [
         'warn',
         ...eslintRules['no-restricted-syntax'].slice(1),

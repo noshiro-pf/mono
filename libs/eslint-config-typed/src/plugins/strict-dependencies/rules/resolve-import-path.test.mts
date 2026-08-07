@@ -98,10 +98,8 @@ type FixtureName = keyof typeof compilerOptionsByFixture;
 
 const restoreActual = (): void => {
   if (
-    !(
-      mut_actualFunctions.findConfigFile !== undefined &&
-      mut_actualFunctions.getParsedCommandLineOfConfigFile !== undefined
-    )
+    mut_actualFunctions.findConfigFile === undefined ||
+    mut_actualFunctions.getParsedCommandLineOfConfigFile === undefined
   ) {
     return;
   }

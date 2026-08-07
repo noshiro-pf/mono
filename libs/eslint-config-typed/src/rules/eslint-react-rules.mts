@@ -47,7 +47,10 @@ export const eslintReactRules = {
   'react/jsx-curly-brace-presence': ['error', 'always'],
 
   /** Enforce consistent file naming */
-  'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }],
+  // Not compatible with ESLint v10: this rule calls `context.getFilename()`
+  // directly, which ESLint v10 removed, so it throws while loading.
+  // It is the only rule in eslint-plugin-react that still does so.
+  'react/jsx-filename-extension': 'off',
 
   'react/jsx-fragments': withDefaultOption('error'),
   'react/jsx-handler-names': 'off', // disabled
@@ -157,7 +160,9 @@ export const eslintReactRules = {
   ],
   'react/checked-requires-onchange-or-readonly': withDefaultOption('error'),
   'react/jsx-props-no-spread-multi': 'error',
-  'react/forward-ref-uses-ref': 'error',
+  // Not compatible with ESLint v10: this rule calls `context.getSourceCode()`
+  // directly, which ESLint v10 removed, so it throws while loading.
+  'react/forward-ref-uses-ref': 'off',
 
   // deprecated
   'react/jsx-sort-default-props': 0,

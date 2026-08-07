@@ -131,7 +131,7 @@ export const eslintUnicornRules = {
   'unicorn/prefer-ternary': ['error', 'only-single-line'],
   'unicorn/prefer-top-level-await': 'error',
   'unicorn/prefer-type-error': 'error',
-  'unicorn/prevent-abbreviations': 'off',
+
   'unicorn/relative-url-style': withDefaultOption('error'),
   'unicorn/require-array-join-separator': 'error',
   'unicorn/require-number-to-fixed-digits-argument': 'error',
@@ -240,7 +240,10 @@ export const eslintUnicornRules = {
   'unicorn/no-for-each': 'error',
   'unicorn/no-global-object-property-assignment': 'error',
   'unicorn/no-incorrect-template-string-interpolation': 'error',
-  'unicorn/no-invalid-argument-count': 'error',
+
+  // Unnecessary in TypeScript environments
+  'unicorn/no-invalid-argument-count': 'off',
+
   // Its autofix collapses intentionally multi-line `//` comments into one long
   // line, which hurts readability; there is no option to opt out, so disable it.
   'unicorn/no-manually-wrapped-comments': 'off',
@@ -319,7 +322,7 @@ export const eslintUnicornRules = {
   'unicorn/prefer-object-iterable-methods': 'error',
   'unicorn/prefer-private-class-fields': 'error',
   'unicorn/prefer-queue-microtask': withDefaultOption('error'),
-  'unicorn/prefer-short-arrow-method': 'error',
+  'unicorn/prefer-short-arrow-method': ['error', 'always'],
   'unicorn/prefer-simple-sort-comparator': 'error',
   'unicorn/prefer-single-array-predicate': 'error',
   'unicorn/prefer-single-object-destructuring': 'error',
@@ -341,6 +344,106 @@ export const eslintUnicornRules = {
 
   // Default `maxComplexity` of 1 is too strict for real-world try blocks
   'unicorn/try-complexity': 'off',
+
+  // Rules added in eslint-plugin-unicorn v72
+  // Requires boolean names to start with `is`/`has`/`can`/... This repo uses
+  // plain names such as `value`, `type` and `condition` in many places.
+  'unicorn/consistent-boolean-name': 'off',
+  // Wants `...(cond && { a })` instead of `...(cond ? { a } : {})`, which
+  // conflicts with this repo's ban on short-circuit evaluation for
+  // non-boolean values (`@typescript-eslint/strict-boolean-expressions`).
+  'unicorn/consistent-conditional-object-spread': 'off',
+  'unicorn/consistent-tuple-labels': 'error',
+  'unicorn/default-export-style': withDefaultOption('error'),
+  'unicorn/logical-assignment-operators': withDefaultOption('error'),
+  // Successor of `unicorn/prevent-abbreviations`, which is disabled below for
+  // the same reason: it renames established identifiers such as `i`, `fn` and
+  // `val` throughout the codebase.
+  'unicorn/name-replacements': 'off',
+  'unicorn/no-accidental-bitwise-operator': 'error',
+  'unicorn/no-array-concat-in-loop': 'error',
+  // Conflicts with the `mut_` prefix convention, which explicitly allows
+  // mutating locally-owned arrays.
+  'unicorn/no-array-front-mutation': 'off',
+  'unicorn/no-array-sort-for-min-max': 'error',
+  'unicorn/no-array-splice': 'error',
+  'unicorn/no-async-promise-finally': 'error',
+  'unicorn/no-boolean-sort-comparator': 'error',
+  'unicorn/no-chained-comparison': 'error',
+  'unicorn/no-collection-bracket-access': 'error',
+  'unicorn/no-constant-zero-expression': 'error',
+  'unicorn/no-double-comparison': 'error',
+  'unicorn/no-duplicate-if-branches': 'error',
+  'unicorn/no-duplicate-logical-operands': 'error',
+  'unicorn/no-impossible-length-comparison': 'error',
+  'unicorn/no-invalid-character-comparison': 'error',
+  'unicorn/no-invalid-well-known-symbol-methods': 'error',
+  'unicorn/no-late-event-control': 'error',
+  'unicorn/no-loop-iterable-mutation': 'error',
+  'unicorn/no-misrefactored-assignment': 'error',
+  'unicorn/no-missing-local-resource': 'error',
+  'unicorn/no-multiple-promise-resolver-calls': 'error',
+  // Reports standard API parameter names such as `deleteCount`
+  // (`Array#splice`) as if they had to be functions.
+  'unicorn/no-non-function-verb-prefix': 'off',
+  'unicorn/no-nonstandard-builtin-properties': 'error',
+  'unicorn/no-selector-as-dom-name': 'error',
+  'unicorn/no-shorthand-property-overrides': 'error',
+  'unicorn/no-top-level-assignment-in-function': 'error',
+  'unicorn/no-transition-all': 'error',
+  'unicorn/no-uncalled-method': 'error',
+  'unicorn/no-unnecessary-array-flat-map': 'error',
+  'unicorn/no-unnecessary-boolean-comparison': 'error',
+  'unicorn/no-unnecessary-fetch-options': 'error',
+  'unicorn/no-unnecessary-string-trim': 'error',
+  'unicorn/no-unreadable-for-of-expression': 'error',
+  'unicorn/no-unsafe-promise-all-settled-values': 'error',
+  'unicorn/no-useless-coercion': 'error',
+  'unicorn/no-useless-compound-assignment': 'error',
+  'unicorn/no-useless-continue': 'error',
+  'unicorn/no-useless-delete-check': 'error',
+  'unicorn/no-useless-logical-operand': 'error',
+  'unicorn/no-useless-override': 'error',
+  'unicorn/no-useless-re-export': 'error',
+  'unicorn/no-xor-as-exponentiation': 'error',
+  'unicorn/operator-assignment': withDefaultOption('error'),
+  'unicorn/prefer-abort-signal-any': 'error',
+  'unicorn/prefer-abort-signal-timeout': 'error',
+  'unicorn/prefer-aggregate-error': 'error',
+  'unicorn/prefer-array-from-async': 'error',
+  'unicorn/prefer-array-from-range': 'error',
+  'unicorn/prefer-array-iterable-methods': 'error',
+  'unicorn/prefer-array-slice': 'error',
+  'unicorn/prefer-block-statement-over-iife': 'error',
+  'unicorn/prefer-boolean-return': 'error',
+  'unicorn/prefer-continue': withDefaultOption('error'),
+  'unicorn/prefer-dom-node-replace-children': 'error',
+  'unicorn/prefer-else-if': 'error',
+  'unicorn/prefer-error-is-error': 'error',
+  // This rule only supports the `css/css` language, so enabling it in a
+  // JavaScript/TypeScript config makes ESLint fail to start.
+  'unicorn/prefer-explicit-viewport-units': 'off',
+  'unicorn/prefer-flat-math-min-max': 'error',
+  'unicorn/prefer-group-by': 'error',
+  'unicorn/prefer-has-check': 'error',
+  'unicorn/prefer-hoisting-branch-code': 'error',
+  'unicorn/prefer-iterator-helpers': 'error',
+  'unicorn/prefer-map-from-entries': 'error',
+  'unicorn/prefer-math-constants': 'error',
+  'unicorn/prefer-observer-apis': 'error',
+  'unicorn/prefer-promise-try': 'error',
+  'unicorn/prefer-promise-with-resolvers': 'error',
+  'unicorn/prefer-regexp-escape': 'error',
+  'unicorn/prefer-set-methods': 'error',
+  'unicorn/prefer-simplified-conditions': 'error',
+  'unicorn/prefer-single-replace': 'error',
+  'unicorn/prefer-then-catch': 'error',
+  'unicorn/prefer-toggle-attribute': 'error',
+  'unicorn/prefer-unary-minus': 'error',
+  'unicorn/prefer-url-can-parse': 'error',
+  'unicorn/prefer-url-search-parameters': 'error',
+  'unicorn/prefer-while-loop-condition': 'error',
+  'unicorn/require-frontmatter-fields': withDefaultOption('error'),
 
   // For browser environment only
   'unicorn/no-document-cookie': 'error',
@@ -368,7 +471,7 @@ export const eslintUnicornRules = {
   'unicorn/no-late-current-target-access': 'error',
   'unicorn/no-unsafe-dom-html': 'error',
   'unicorn/prefer-add-event-listener-options': 'error',
-  'unicorn/prefer-dom-node-html-methods': 'error',
+  'unicorn/prefer-dom-node-html-methods': withDefaultOption('error'),
   'unicorn/prefer-location-assign': 'error',
   'unicorn/prefer-path2d': 'error',
   'unicorn/prefer-scoped-selector': 'error',
@@ -393,4 +496,5 @@ export const eslintUnicornRules = {
   'unicorn/no-array-push-push': 0,
   'unicorn/no-instanceof-array': 0,
   'unicorn/no-length-as-slice-end': 0,
+  'unicorn/prevent-abbreviations': 0,
 } as const satisfies EslintUnicornRules;

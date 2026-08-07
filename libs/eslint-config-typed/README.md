@@ -162,21 +162,24 @@ import {
     defineKnownRules,
     eslintConfigForTypeScript,
 } from 'eslint-config-typed';
+import { Arr } from 'ts-data-forge';
 
 const thisDir = import.meta.dirname;
 
-export default defineConfig([
-    ...eslintConfigForTypeScript({
-        tsconfigRootDir: thisDir,
-        tsconfigFileName: './tsconfig.json',
-        packageDirs: [thisDir],
-    }),
-    {
-        rules: defineKnownRules({
-            // ...
+export default defineConfig(
+    Arr.toPushed(
+        eslintConfigForTypeScript({
+            tsconfigRootDir: thisDir,
+            tsconfigFileName: './tsconfig.json',
+            packageDirs: [thisDir],
         }),
-    },
-]);
+        {
+            rules: defineKnownRules({
+                // ...
+            }),
+        },
+    ),
+);
 ```
 
 This is equivalent to:
@@ -187,11 +190,12 @@ import {
     eslintConfigForTypeScript,
     type FlatConfig,
 } from 'eslint-config-typed';
+import { Arr } from 'ts-data-forge';
 
 const thisDir = import.meta.dirname;
 
-export default [
-    ...eslintConfigForTypeScript({
+export default Arr.toPushed(
+    eslintConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
         packageDirs: [thisDir],
@@ -201,7 +205,7 @@ export default [
             // ...
         }),
     },
-] satisfies readonly FlatConfig[];
+) satisfies readonly FlatConfig[];
 ```
 
 ### defineKnownRules utility
@@ -253,11 +257,11 @@ export default [
 
 `defineKnownRules` also reserves `0` for deprecated rules. The resulting severity matrix looks like this:
 
-| Rule type            | Allowed severity values in `defineKnownRules` |
-| :------------------- | :-------------------------------------------- | ------ | -------- | ------- | ------------------- |
-| Deprecated rule      | `0`                                           |
-| Rule without options | `"off"                                        | "warn" | "error"` |
-| Rule with options    | `"off"                                        | 1      | 2        | ["warn" | "error", <option>]` |
+| Rule type            | Allowed severity values in `defineKnownRules`            |
+| :------------------- | :------------------------------------------------------- |
+| Deprecated rule      | `0`                                                      |
+| Rule without options | `"off"` \| `"warn"` \| `"error"`                         |
+| Rule with options    | `"off"` \| `1` \| `2` \| `["warn" \| "error", <option>]` |
 
 ```tsx
 import {
@@ -266,11 +270,12 @@ import {
     withDefaultOption,
     type FlatConfig,
 } from 'eslint-config-typed';
+import { Arr } from 'ts-data-forge';
 
 const thisDir = import.meta.dirname;
 
-export default [
-    ...eslintConfigForTypeScript({
+export default Arr.toPushed(
+    eslintConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
         packageDirs: [thisDir],
@@ -293,7 +298,7 @@ export default [
             ],
         }),
     },
-] satisfies readonly FlatConfig[];
+) satisfies readonly FlatConfig[];
 ```
 
 ### TypeScript Configuration Files
@@ -306,17 +311,18 @@ import {
     eslintConfigForVitest,
     type FlatConfig,
 } from 'eslint-config-typed';
+import { Arr } from 'ts-data-forge';
 
 const thisDir = import.meta.dirname;
 
-export default [
-    ...eslintConfigForTypeScript({
+export default Arr.toPushed(
+    eslintConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
         packageDirs: [thisDir],
     }),
     eslintConfigForVitest(),
-] satisfies readonly FlatConfig[];
+) satisfies readonly FlatConfig[];
 ```
 
 For details, see <https://eslint.org/docs/latest/use/configure/configuration-files#typescript-configuration-files>.
@@ -570,6 +576,7 @@ export default [
     // ...
     {
         rules: defineKnownRules({
+            // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
             'no-restricted-syntax': [
                 'warn',
                 ...eslintRules['no-restricted-syntax'].slice(1),
@@ -735,11 +742,12 @@ import {
     typescriptEslintRules,
     withDefaultOption,
 } from 'eslint-config-typed';
+import { Arr } from 'ts-data-forge';
 
 const thisDir = import.meta.dirname;
 
-export default [
-    ...eslintConfigForTypeScript({
+export default Arr.toPushed(
+    eslintConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
         packageDirs: [thisDir],
@@ -773,7 +781,7 @@ export default [
             ],
         }),
     },
-] satisfies readonly FlatConfig[];
+) satisfies readonly FlatConfig[];
 ```
 
 ### Use RulesOptions Types
@@ -784,9 +792,10 @@ Leverage TypeScript for type-safe rule configuration:
 // configs/restricted-syntax-defs.mjs
 
 import { eslintRules, type EslintRulesOption } from 'eslint-config-typed';
+import { Arr } from 'ts-data-forge';
 
-export const restrictedSyntax = [
-    ...eslintRules['no-restricted-syntax'].slice(1),
+export const restrictedSyntax = Arr.toPushed(
+    eslintRules['no-restricted-syntax'].slice(1),
     {
         // Restrict type annotation style for React.useMemo
         selector:
@@ -794,7 +803,7 @@ export const restrictedSyntax = [
         message:
             'The variable type T should be annotated as `React.useMemo<T>` or `const v: T = React.useMemo(...)`.',
     },
-] as const satisfies EslintRulesOption['no-restricted-syntax'];
+) satisfies EslintRulesOption['no-restricted-syntax'];
 ```
 
 ```tsx
@@ -805,12 +814,13 @@ import {
     eslintConfigForTypeScript,
     type FlatConfig,
 } from 'eslint-config-typed';
+import { Arr } from 'ts-data-forge';
 import { restrictedSyntax } from './restricted-syntax-defs.mjs';
 
 const thisDir = import.meta.dirname;
 
-export default [
-    ...eslintConfigForTypeScript({
+export default Arr.toPushed(
+    eslintConfigForTypeScript({
         tsconfigRootDir: thisDir,
         tsconfigFileName: './tsconfig.json',
         packageDirs: [thisDir],
@@ -820,7 +830,7 @@ export default [
             'no-restricted-syntax': ['error', ...restrictedSyntax],
         }),
     },
-] satisfies readonly FlatConfig[];
+) satisfies readonly FlatConfig[];
 ```
 
 ### Target Specific Files

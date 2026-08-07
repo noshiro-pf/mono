@@ -1,6 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
-import { type UnknownRecord } from 'ts-type-forge';
+import { type NonEmptyTuple, type UnknownRecord } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -59,7 +59,7 @@ namespace BooleanPropNaming {
     /**
      * @minItems 1
      */
-    propTypeNames?: readonly [string, ...string[]];
+    propTypeNames?: NonEmptyTuple<string>;
     /**
      * @default "^(is|has)[A-Z]([A-Za-z0-9]?)+"
      */
@@ -836,9 +836,7 @@ namespace FunctionComponentDefinition {
     namedComponents?:
       | ('function-declaration' | 'arrow-function' | 'function-expression')
       | readonly (
-          | 'function-declaration'
-          | 'arrow-function'
-          | 'function-expression'
+          'function-declaration' | 'arrow-function' | 'function-expression'
         )[];
     unnamedComponents?:
       | ('arrow-function' | 'function-expression')
@@ -1118,10 +1116,7 @@ namespace JsxClosingBracketLocation {
     | Readonly<
         | {
             location?:
-              | 'after-props'
-              | 'props-aligned'
-              | 'tag-aligned'
-              | 'line-aligned';
+              'after-props' | 'props-aligned' | 'tag-aligned' | 'line-aligned';
           }
         | {
             nonEmpty?:
@@ -1543,11 +1538,7 @@ namespace JsxFirstPropNewLine {
    * ```
    */
   export type Options =
-    | 'always'
-    | 'never'
-    | 'multiline'
-    | 'multiline-multiprop'
-    | 'multiprop';
+    'always' | 'never' | 'multiline' | 'multiline-multiprop' | 'multiprop';
 
   export type RuleEntry =
     | 'off'
@@ -2378,20 +2369,19 @@ namespace JsxNoLiterals {
    * ```
    */
   export type Options = Readonly<{
-    elementOverrides?: Readonly<{
-      /**
-       * This interface was referenced by `undefined`'s JSON-Schema definition
-       * via the `patternProperty` "^[A-Z][\w.]*$".
-       */
-      [k: string]: Readonly<{
-        applyToNestedElements?: boolean;
-        noStrings?: boolean;
-        allowedStrings?: readonly string[];
-        ignoreProps?: boolean;
-        noAttributeStrings?: boolean;
-        [k: string]: unknown;
-      }>;
-    }>;
+    elementOverrides?: Readonly<
+      Record<
+        string,
+        Readonly<{
+          applyToNestedElements?: boolean;
+          noStrings?: boolean;
+          allowedStrings?: readonly string[];
+          ignoreProps?: boolean;
+          noAttributeStrings?: boolean;
+          [k: string]: unknown;
+        }>
+      >
+    >;
     noStrings?: boolean;
     allowedStrings?: readonly string[];
     ignoreProps?: boolean;
@@ -2811,12 +2801,12 @@ namespace JsxPascalCase {
    *         "type": "boolean"
    *       },
    *       "ignore": {
-   *         "minItems": 0,
-   *         "type": "array",
-   *         "uniqueItems": true,
    *         "items": {
    *           "type": "string"
-   *         }
+   *         },
+   *         "minItems": 0,
+   *         "type": "array",
+   *         "uniqueItems": true
    *       }
    *     },
    *     "additionalProperties": false
@@ -3352,28 +3342,13 @@ namespace JsxWrapMultilines {
    */
   export type Options = Readonly<{
     declaration?:
-      | true
-      | false
-      | 'ignore'
-      | 'parens'
-      | 'parens-new-line'
-      | 'never';
+      true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
     assignment?:
-      | true
-      | false
-      | 'ignore'
-      | 'parens'
-      | 'parens-new-line'
-      | 'never';
+      true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
     return?: true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
     arrow?: true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
     condition?:
-      | true
-      | false
-      | 'ignore'
-      | 'parens'
-      | 'parens-new-line'
-      | 'never';
+      true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
     logical?: true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
     prop?: true | false | 'ignore' | 'parens' | 'parens-new-line' | 'never';
   }>;
@@ -4618,13 +4593,7 @@ namespace SortComp {
    */
   export type Options = Readonly<{
     order?: readonly string[];
-    groups?: Readonly<{
-      /**
-       * This interface was referenced by `undefined`'s JSON-Schema definition
-       * via the `patternProperty` "^.*$".
-       */
-      [k: string]: readonly string[];
-    }>;
+    groups?: Readonly<Record<string, readonly string[]>>;
   }>;
 
   export type RuleEntry =
@@ -4842,32 +4811,20 @@ namespace StaticPropertyPlacement {
    * ```
    */
   export type Options0 =
-    | 'static public field'
-    | 'static getter'
-    | 'property assignment';
+    'static public field' | 'static getter' | 'property assignment';
 
   export type Options1 = Readonly<{
     propTypes?: 'static public field' | 'static getter' | 'property assignment';
     defaultProps?:
-      | 'static public field'
-      | 'static getter'
-      | 'property assignment';
+      'static public field' | 'static getter' | 'property assignment';
     childContextTypes?:
-      | 'static public field'
-      | 'static getter'
-      | 'property assignment';
+      'static public field' | 'static getter' | 'property assignment';
     contextTypes?:
-      | 'static public field'
-      | 'static getter'
-      | 'property assignment';
+      'static public field' | 'static getter' | 'property assignment';
     contextType?:
-      | 'static public field'
-      | 'static getter'
-      | 'property assignment';
+      'static public field' | 'static getter' | 'property assignment';
     displayName?:
-      | 'static public field'
-      | 'static getter'
-      | 'property assignment';
+      'static public field' | 'static getter' | 'property assignment';
   }>;
 
   export type RuleEntry =

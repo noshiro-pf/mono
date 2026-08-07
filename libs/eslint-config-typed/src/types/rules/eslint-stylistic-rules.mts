@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type MinLengthTuple, type NonEmptyTuple } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -521,17 +522,10 @@ namespace CommaDangle {
       ];
 
   export type Value =
-    | 'always-multiline'
-    | 'always'
-    | 'never'
-    | 'only-multiline';
+    'always-multiline' | 'always' | 'never' | 'only-multiline';
 
   export type ValueWithIgnore =
-    | 'always-multiline'
-    | 'always'
-    | 'never'
-    | 'only-multiline'
-    | 'ignore';
+    'always-multiline' | 'always' | 'never' | 'only-multiline' | 'ignore';
 
   export type RuleEntry =
     | 'off'
@@ -2503,10 +2497,7 @@ namespace JsxClosingBracketLocation {
     | Readonly<
         | {
             location?:
-              | 'after-props'
-              | 'props-aligned'
-              | 'tag-aligned'
-              | 'line-aligned';
+              'after-props' | 'props-aligned' | 'tag-aligned' | 'line-aligned';
           }
         | {
             nonEmpty?:
@@ -3019,11 +3010,7 @@ namespace JsxFirstPropNewLine {
    * ```
    */
   export type Options =
-    | 'always'
-    | 'never'
-    | 'multiline'
-    | 'multiline-multiprop'
-    | 'multiprop';
+    'always' | 'never' | 'multiline' | 'multiline-multiprop' | 'multiprop';
 
   export type RuleEntry =
     | 'off'
@@ -5775,18 +5762,13 @@ namespace LinesBetweenClassMembers {
         /**
          * @minItems 1
          */
-        enforce: readonly [
+        enforce: NonEmptyTuple<
           Readonly<{
             blankLine: 'always' | 'never';
             prev: 'method' | 'field' | '*';
             next: 'method' | 'field' | '*';
-          }>,
-          ...Readonly<{
-            blankLine: 'always' | 'never';
-            prev: 'method' | 'field' | '*';
-            next: 'method' | 'field' | '*';
-          }>[],
-        ];
+          }>
+        >;
       }>
     | ('always' | 'never');
 
@@ -6996,95 +6978,36 @@ namespace NoMixedOperators {
    * ```
    */
   export type Options = Readonly<{
-    groups?: readonly (readonly [
-      (
-        | '+'
-        | '-'
-        | '*'
-        | '/'
-        | '%'
-        | '**'
-        | '&'
-        | '|'
-        | '^'
-        | '~'
-        | '<<'
-        | '>>'
-        | '>>>'
-        | '=='
-        | '!='
-        | '==='
-        | '!=='
-        | '>'
-        | '>='
-        | '<'
-        | '<='
-        | '&&'
-        | '||'
-        | 'in'
-        | 'instanceof'
-        | '?:'
-        | '??'
-      ),
-      (
-        | '+'
-        | '-'
-        | '*'
-        | '/'
-        | '%'
-        | '**'
-        | '&'
-        | '|'
-        | '^'
-        | '~'
-        | '<<'
-        | '>>'
-        | '>>>'
-        | '=='
-        | '!='
-        | '==='
-        | '!=='
-        | '>'
-        | '>='
-        | '<'
-        | '<='
-        | '&&'
-        | '||'
-        | 'in'
-        | 'instanceof'
-        | '?:'
-        | '??'
-      ),
-      ...(
-        | '+'
-        | '-'
-        | '*'
-        | '/'
-        | '%'
-        | '**'
-        | '&'
-        | '|'
-        | '^'
-        | '~'
-        | '<<'
-        | '>>'
-        | '>>>'
-        | '=='
-        | '!='
-        | '==='
-        | '!=='
-        | '>'
-        | '>='
-        | '<'
-        | '<='
-        | '&&'
-        | '||'
-        | 'in'
-        | 'instanceof'
-        | '?:'
-        | '??'
-      )[],
-    ])[];
+    groups?: readonly MinLengthTuple<
+      2,
+      | '+'
+      | '-'
+      | '*'
+      | '/'
+      | '%'
+      | '**'
+      | '&'
+      | '|'
+      | '^'
+      | '~'
+      | '<<'
+      | '>>'
+      | '>>>'
+      | '=='
+      | '!='
+      | '==='
+      | '!=='
+      | '>'
+      | '>='
+      | '<'
+      | '<='
+      | '&&'
+      | '||'
+      | 'in'
+      | 'instanceof'
+      | '?:'
+      | '??'
+    >[];
     allowSamePrecedence?: boolean;
   }>;
 
@@ -7178,13 +7101,7 @@ namespace NoMultiSpaces {
    * ```
    */
   export type Options = Readonly<{
-    exceptions?: Readonly<{
-      /**
-       * This interface was referenced by `undefined`'s JSON-Schema definition
-       * via the `patternProperty` "^([A-Z][a-z]*)+$".
-       */
-      [k: string]: boolean;
-    }>;
+    exceptions?: Readonly<Record<string, boolean>>;
     ignoreEOLComments?: boolean;
     includeTabs?: boolean;
   }>;
@@ -8329,8 +8246,7 @@ namespace PaddingLineBetweenStatements {
   export type PaddingType = 'any' | 'never' | 'always';
 
   export type StatementOption =
-    | StatementMatcher
-    | readonly [StatementMatcher, ...StatementMatcher[]];
+    StatementMatcher | NonEmptyTuple<StatementMatcher>;
 
   export type StatementMatcher = StatementType | SelectorOption;
 

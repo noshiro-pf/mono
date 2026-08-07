@@ -72,4 +72,5 @@ export const eslintPlaywrightRules = {
   'playwright/no-restricted-roles': withDefaultOption('error'),
   'playwright/require-tags': 'error',
   'playwright/require-to-pass-timeout': 'error',
+  'playwright/no-unnecessary-assertions': 'error',
 } as const satisfies EslintPlaywrightRules;

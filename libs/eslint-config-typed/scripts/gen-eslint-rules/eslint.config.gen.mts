@@ -1,9 +1,9 @@
+import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import {
   defineKnownRules,
   eslintConfigForTypeScriptWithoutRules,
   eslintStylisticRules,
 } from '../../src/index.mjs';
-
 import type { FlatConfig } from '../../src/types/flat-config.mjs';
 
 export default [
@@ -14,6 +14,8 @@ export default [
     tsconfigFileName: 'tsconfig.gen.json',
     tsconfigRootDir: import.meta.dirname,
   }),
+
+  eslintPluginTsTypeForge.configs.recommended,
   {
     files: ['src/types/rules/!(index).mts'],
     rules: {

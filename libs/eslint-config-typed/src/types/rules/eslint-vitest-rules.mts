@@ -1,5 +1,6 @@
 /* cSpell:disable */
 import { type Linter } from 'eslint';
+import { type FixedLengthTuple } from 'ts-type-forge';
 
 type SpreadOptionsIfIsArray<
   T extends readonly [Linter.StringSeverity, unknown],
@@ -656,7 +657,9 @@ namespace NoHooks {
    *             "beforeAll",
    *             "beforeEach",
    *             "afterAll",
-   *             "afterEach"
+   *             "afterEach",
+   *             "aroundAll",
+   *             "aroundEach"
    *           ]
    *         },
    *         "additionalItems": false,
@@ -673,7 +676,14 @@ namespace NoHooks {
     /**
      * This array option controls which Vitest hooks are checked by this rule.
      */
-    allow?: readonly ('beforeAll' | 'beforeEach' | 'afterAll' | 'afterEach')[];
+    allow?: readonly (
+      | 'beforeAll'
+      | 'beforeEach'
+      | 'afterAll'
+      | 'afterEach'
+      | 'aroundAll'
+      | 'aroundEach'
+    )[];
   }>;
 
   export type RuleEntry =
@@ -1304,6 +1314,10 @@ namespace PreferExpectAssertions {
    *       "onlyFunctionsWithExpectInCallback": {
    *         "description": "Only check test functions that contain `expect` in callbacks.",
    *         "type": "boolean"
+   *       },
+   *       "disallowHasAssertions": {
+   *         "description": "Warn when `expect.hasAssertions()` is used instead of `expect.assertions()`.",
+   *         "type": "boolean"
    *       }
    *     },
    *     "additionalProperties": false
@@ -1324,6 +1338,10 @@ namespace PreferExpectAssertions {
      * Only check test functions that contain `expect` in callbacks.
      */
     onlyFunctionsWithExpectInCallback?: boolean;
+    /**
+     * Warn when `expect.hasAssertions()` is used instead of `expect.assertions()`.
+     */
+    disallowHasAssertions?: boolean;
   }>;
 
   export type RuleEntry =
@@ -2267,9 +2285,7 @@ namespace ValidTitle {
       }>;
 
   export type PatternOrPatternArray =
-    | string
-    | readonly [string]
-    | readonly [string, string];
+    string | readonly [string] | FixedLengthTuple<2, string>;
 
   export type Options = Readonly<{
     /**

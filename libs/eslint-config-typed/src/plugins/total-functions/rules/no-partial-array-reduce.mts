@@ -1,4 +1,5 @@
 import { AST_NODE_TYPES, ESLintUtils } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import { isTupleType, isTupleTypeReference, unionTypeParts } from 'tsutils';
 import { createRule } from './common.mjs';
 
@@ -42,7 +43,7 @@ export const noPartialArrayReduce = createRule({
 
         // We only care if this call has exactly one argument.
 
-        if (node.arguments.length !== 1) {
+        if (!Arr.isFixedLengthArray(1, node.arguments)) {
           return;
         }
 

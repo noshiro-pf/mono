@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { hasKey, isRecord } from 'ts-data-forge';
+import { Arr, hasKey, isRecord } from 'ts-data-forge';
 
 type MessageIds = 'useAssert';
 
@@ -43,10 +43,10 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
         }
 
         if (
-          expectCall.arguments.length !== 1 ||
-          node.arguments.length !== 1 ||
-          expectCall.arguments[0]?.type === AST_NODE_TYPES.SpreadElement ||
-          node.arguments[0]?.type === AST_NODE_TYPES.SpreadElement
+          !Arr.isFixedLengthArray(1, expectCall.arguments) ||
+          !Arr.isFixedLengthArray(1, node.arguments) ||
+          expectCall.arguments[0].type === AST_NODE_TYPES.SpreadElement ||
+          node.arguments[0].type === AST_NODE_TYPES.SpreadElement
         ) {
           return;
         }
@@ -54,10 +54,6 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
         const actualArgument = expectCall.arguments[0];
 
         const expectedArgument = node.arguments[0];
-
-        if (actualArgument === undefined || expectedArgument === undefined) {
-          return;
-        }
 
         const actualText = sourceCode.getText(actualArgument);
 

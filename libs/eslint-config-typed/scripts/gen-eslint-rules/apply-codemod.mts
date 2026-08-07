@@ -15,7 +15,9 @@ import { projectRootPath } from '../project-root-path.mjs';
 const TYPES_RULES_DIR = path.resolve(projectRootPath, 'src/types/rules');
 
 export const applyTypeTransformations = async (): Promise<void> => {
-  console.log('🔄 Applying type transformations to src/types/rules files...\n');
+  console.info(
+    '🔄 Applying type transformations to src/types/rules files...\n',
+  );
 
   // Get all .mts files in src/types/rules
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -25,7 +27,7 @@ export const applyTypeTransformations = async (): Promise<void> => {
     .filter((file) => file.endsWith('.mts'))
     .map((file) => path.join(TYPES_RULES_DIR, file));
 
-  console.log(`Found ${files.length} files to process\n`);
+  console.info(`Found ${files.length} files to process\n`);
 
   let mut_successCount = 0;
 
@@ -61,27 +63,27 @@ export const applyTypeTransformations = async (): Promise<void> => {
     }
   }
 
-  console.log(`\n${'='.repeat(50)}`);
+  console.info(`\n${'='.repeat(50)}`);
 
-  console.log('Summary:');
+  console.info('Summary:');
 
-  console.log(`  ✅ Transformed: ${mut_successCount}`);
+  console.info(`  ✅ Transformed: ${mut_successCount}`);
 
-  console.log(`  ⏭️  Unchanged:   ${mut_unchangedCount}`);
+  console.info(`  ⏭️  Unchanged:   ${mut_unchangedCount}`);
 
-  console.log(`  ❌ Errors:      ${mut_errorCount}`);
+  console.info(`  ❌ Errors:      ${mut_errorCount}`);
 
-  console.log(`  📊 Total:       ${files.length}`);
+  console.info(`  📊 Total:       ${files.length}`);
 
-  if (mut_errorFiles.length > 0) {
-    console.log('\nFiles with errors:');
+  if (Arr.isNonEmpty(mut_errorFiles)) {
+    console.info('\nFiles with errors:');
 
     for (const fileName of mut_errorFiles) {
-      console.log(`  - ${fileName}`);
+      console.info(`  - ${fileName}`);
     }
   }
 
-  console.log('='.repeat(50));
+  console.info('='.repeat(50));
 
   if (mut_errorCount > 0) {
     process.exit(1);
@@ -106,7 +108,7 @@ export const applyTransformationsToFile = async (
 
     // Check if the code was actually changed
     if (transformedCode === originalCode) {
-      console.log(`⏭️ ${fileName} - no changes needed`);
+      console.info(`⏭️ ${fileName} - no changes needed`);
 
       return Result.ok('unchanged' as const);
     }
@@ -115,11 +117,11 @@ export const applyTransformationsToFile = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(filePath, transformedCode, 'utf8');
 
-    console.log(`✅ ${fileName} - transformed`);
+    console.info(`✅ ${fileName} - transformed`);
 
     return Result.ok('transformed' as const);
   } catch (error) {
-    console.log(typeof error);
+    console.info(typeof error);
 
     const errStr = Error.isError(error) ? error.message : String(error);
 
@@ -130,7 +132,7 @@ export const applyTransformationsToFile = async (
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const args = process.argv.slice(2);
+  const args = Arr.skip(process.argv, 2);
 
   await (Arr.isNonEmpty(args)
     ? applyTransformationsToFile(args[0])

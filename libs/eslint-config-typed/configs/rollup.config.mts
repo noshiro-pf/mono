@@ -25,15 +25,15 @@ import tsconfig from './tsconfig.build.json' with { type: 'json' };
  * checks anymore. This helper unwraps `.default` chains until it reaches the
  * factory, which is correct for both views.
  */
-const interopDefault = <T>(moduleDefaultExport: T): UnwrapDefault<T> => {
+const interopDefault = <T,>(moduleDefaultExport: T): UnwrapDefault<T> => {
   const mut_ref: { current: unknown } = { current: moduleDefaultExport };
 
   for (;;) {
     const { current } = mut_ref;
 
     if (
-      (typeof current !== 'object' && typeof current !== 'function') ||
-      current === null
+      current === null ||
+      (typeof current !== 'object' && typeof current !== 'function')
     ) {
       break;
     }
