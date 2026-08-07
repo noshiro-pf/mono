@@ -5,8 +5,8 @@ type GlobalImportDefModule = Record<
 
 type ModuleImporter = (specifier: string) => Promise<GlobalImportDefModule>;
 
-// eslint-disable-next-line import/dynamic-import-chunkname
 const defaultImportModule: ModuleImporter = async (specifier) =>
+  // eslint-disable-next-line import/dynamic-import-chunkname, @typescript-eslint/no-unsafe-return
   import(specifier);
 
 /**

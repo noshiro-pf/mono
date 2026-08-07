@@ -555,11 +555,10 @@ const updatePackageJsonImpl = (
 
     const mut_ref = mut_packageJson['devDependencies'];
 
-    if (
-      packageName === 'eslint-configs' ||
-      packageName === 'goober' ||
-      packageName === 'strict-ts-lib'
-    ) {
+    // strict-ts-lib is not in this list: its eslint.config.js imports
+    // @noshiro/eslint-configs, and pnpm only links a workspace package where it
+    // is declared (Yarn's flat node_modules used to make it resolvable anyway).
+    if (packageName === 'eslint-configs' || packageName === 'goober') {
       delete mut_ref['@noshiro/eslint-configs'];
     } else {
       mut_ref['@noshiro/eslint-configs'] = '*';

@@ -10,8 +10,8 @@ type ModuleImporter = (
   specifier: string,
 ) => Promise<RestrictedImportsDefModule>;
 
-// eslint-disable-next-line import/dynamic-import-chunkname, @typescript-eslint/no-unsafe-return
 const defaultImportModule: ModuleImporter = async (specifier) =>
+  // eslint-disable-next-line import/dynamic-import-chunkname, @typescript-eslint/no-unsafe-return
   import(specifier);
 
 /**

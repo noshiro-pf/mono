@@ -39,6 +39,7 @@
     "zz:prettier": "prettier --ignore-path ../.prettierignore --write --log-level warn"
   },
   "devDependencies": {
+    "@noshiro/eslint-configs": "*",
     "@noshiro/mono-utils": "*",
     "@noshiro/ts-type-utils": "*",
     "@types/eslint": "9.6.1",

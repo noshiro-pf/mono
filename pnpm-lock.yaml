@@ -3033,6 +3033,9 @@ importers:
 
   packages/strict-ts-lib/source:
     devDependencies:
+      '@noshiro/eslint-configs':
+        specifier: '*'
+        version: link:../../eslint-configs
       '@noshiro/mono-utils':
         specifier: '*'
         version: link:../../../scripts
