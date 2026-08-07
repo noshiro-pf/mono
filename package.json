@@ -71,6 +71,7 @@
   "devDependencies": {
     "@google/clasp": "^2.4.2",
     "@mdx-js/rollup": "^3.1.0",
+    "@noshiro/eslint-configs": "*",
     "@noshiro/mono-configs": "*",
     "@noshiro/ts-type-utils": "*",
     "@playwright/test": "^1.49.1",

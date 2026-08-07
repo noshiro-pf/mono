@@ -38,15 +38,19 @@ const listWorkspaceLocations = async (): Promise<
 
   if (!Array.isArray(parsed)) return [];
 
-  const paths = parsed
+  const [firstPath, ...restPaths] = parsed
     .map((entry) => readString(entry, 'path'))
     .filter(isNotUndefined);
 
-  if (paths.length === 0) return [];
+  if (firstPath === undefined) return [];
 
   // Every workspace package lives under the workspace root, so the root is the
   // shortest of the reported paths.
-  const rootDir = paths.reduce((a, b) => (a.length <= b.length ? a : b));
+  const rootDir = restPaths.reduce(
+    (shortest, current) =>
+      current.length < shortest.length ? current : shortest,
+    firstPath,
+  );
 
   return parsed
     .map((entry) => {

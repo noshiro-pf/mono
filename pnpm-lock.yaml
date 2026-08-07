@@ -27,6 +27,9 @@ importers:
       '@mdx-js/rollup':
         specifier: ^3.1.0
         version: 3.1.0(rollup@4.40.1)
+      '@noshiro/eslint-configs':
+        specifier: '*'
+        version: link:packages/eslint-configs
       '@noshiro/mono-configs':
         specifier: '*'
         version: link:configs
