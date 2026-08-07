@@ -279,3 +279,73 @@ import {
   // @ts-expect-error BoolNot should only accept boolean
   expectType<BoolNeq<'true', 'true'>, never>('=');
 }
+
+{
+  // `any` is assignable to the `boolean` constraint, so it reaches the
+  // operators. It carries no truth value, so it answers `never` like `boolean`.
+  expectType<BoolNot<any>, never>('=');
+
+  expectType<BoolAnd<any, true>, never>('=');
+
+  expectType<BoolAnd<true, any>, never>('=');
+
+  expectType<BoolOr<any, false>, never>('=');
+
+  expectType<BoolOr<false, any>, never>('=');
+
+  expectType<BoolEq<any, any>, never>('=');
+
+  expectType<BoolNand<any, true>, never>('=');
+
+  expectType<BoolNor<any, true>, never>('=');
+
+  expectType<BoolNeq<any, true>, never>('=');
+}
+
+{
+  // Regression: an operand that reaches these operators through a generic
+  // type-alias parameter is mutually assignable to `true` / `false` but is not
+  // *identical* to it, so an identity probe answers `false` for both and the
+  // operator used to collapse to `never`.
+  type Classify<N> = [N] extends [1]
+    ? 'a'
+    : [N] extends [2]
+      ? 'b'
+      : [N] extends [3]
+        ? 'c'
+        : [N] extends [4]
+          ? 'd'
+          : 'e';
+
+  type IsD<S extends 'a' | 'b' | 'c' | 'd' | 'e'> = S extends 'd'
+    ? true
+    : false;
+
+  type NotOf<X> = BoolNot<IsD<Classify<X>>>;
+
+  expectType<NotOf<4>, false>('=');
+
+  expectType<NotOf<1>, true>('=');
+
+  type AndOf<X, Y> = BoolAnd<IsD<Classify<X>>, IsD<Classify<Y>>>;
+
+  expectType<AndOf<4, 4>, true>('=');
+
+  expectType<AndOf<4, 1>, false>('=');
+
+  expectType<AndOf<1, 1>, false>('=');
+
+  type OrOf<X, Y> = BoolOr<IsD<Classify<X>>, IsD<Classify<Y>>>;
+
+  expectType<OrOf<4, 4>, true>('=');
+
+  expectType<OrOf<1, 4>, true>('=');
+
+  expectType<OrOf<1, 1>, false>('=');
+
+  type EqOf<X, Y> = BoolEq<IsD<Classify<X>>, IsD<Classify<Y>>>;
+
+  expectType<EqOf<4, 4>, true>('=');
+
+  expectType<EqOf<4, 1>, false>('=');
+}

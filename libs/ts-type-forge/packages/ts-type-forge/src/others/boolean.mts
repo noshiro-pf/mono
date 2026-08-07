@@ -1,4 +1,41 @@
-import { type TypeEq } from '../condition/index.mjs';
+/**
+ * @internal Whether `A` is `any`.
+ *
+ * `IsAny`'s `0 extends 1 & T` spelling cannot be used here: every operator
+ * below bounds its parameters with `extends boolean`, and under that bound
+ * TypeScript reduces `1 & T` to `never` while elaborating the alias, so the
+ * guard would never fire. This spelling relies instead on `any` in a check
+ * position yielding both branches at once, which survives the bound.
+ */
+type IsAnyBool<A extends boolean> = boolean extends (
+  A extends never ? true : false
+)
+  ? true
+  : false;
+
+/**
+ * @internal Whether `A` is exactly the boolean literal `L`.
+ *
+ * Assignability-based on purpose, rather than `TypeEq`. When an operand reaches
+ * these operators through a generic type-alias parameter — `type F<X> =
+ * BoolAnd<G<X>, H<X>>` — TypeScript hands back a type that is mutually
+ * assignable to `true` / `false` but is not *identical* to it. An identity
+ * probe then answers `false` for both `true` and `false`, and the operator
+ * collapses to its `never` fallback, silently discarding the result.
+ *
+ * Mutual assignability classifies such an operand correctly while still
+ * rejecting `boolean` (assignable to neither literal) and `never` (assignable
+ * to both, but neither is assignable back to it). `any` passes both directions,
+ * so it needs the explicit {@link IsAnyBool} guard.
+ */
+type IsExactBool<A extends boolean, L extends boolean> =
+  IsAnyBool<A> extends true
+    ? false
+    : [A] extends [L]
+      ? [L] extends [A]
+        ? true
+        : false
+      : false;
 
 /**
  * Performs a logical NOT operation on a boolean literal type `A`.
@@ -24,9 +61,9 @@ import { type TypeEq } from '../condition/index.mjs';
  * ```
  */
 export type BoolNot<A extends boolean> =
-  TypeEq<A, true> extends true
+  IsExactBool<A, true> extends true
     ? false
-    : TypeEq<A, false> extends true
+    : IsExactBool<A, false> extends true
       ? true
       : never;
 
@@ -57,16 +94,16 @@ export type BoolNot<A extends boolean> =
  * ```
  */
 export type BoolAnd<A extends boolean, B extends boolean> =
-  TypeEq<A, true> extends true
-    ? TypeEq<B, true> extends true
+  IsExactBool<A, true> extends true
+    ? IsExactBool<B, true> extends true
       ? true
-      : TypeEq<B, false> extends true
+      : IsExactBool<B, false> extends true
         ? false
         : never
-    : TypeEq<A, false> extends true
-      ? TypeEq<B, true> extends true
+    : IsExactBool<A, false> extends true
+      ? IsExactBool<B, true> extends true
         ? false
-        : TypeEq<B, false> extends true
+        : IsExactBool<B, false> extends true
           ? false
           : never
       : never;
@@ -100,16 +137,16 @@ export type BoolAnd<A extends boolean, B extends boolean> =
  * ```
  */
 export type BoolOr<A extends boolean, B extends boolean> =
-  TypeEq<A, true> extends true
-    ? TypeEq<B, true> extends true
+  IsExactBool<A, true> extends true
+    ? IsExactBool<B, true> extends true
       ? true
-      : TypeEq<B, false> extends true
+      : IsExactBool<B, false> extends true
         ? true
         : never
-    : TypeEq<A, false> extends true
-      ? TypeEq<B, true> extends true
+    : IsExactBool<A, false> extends true
+      ? IsExactBool<B, true> extends true
         ? true
-        : TypeEq<B, false> extends true
+        : IsExactBool<B, false> extends true
           ? false
           : never
       : never;
@@ -126,16 +163,16 @@ export type BoolOr<A extends boolean, B extends boolean> =
  * type F_F = BoolEq<false, false>; // true
  */
 export type BoolEq<A extends boolean, B extends boolean> =
-  TypeEq<A, true> extends true
-    ? TypeEq<B, true> extends true
+  IsExactBool<A, true> extends true
+    ? IsExactBool<B, true> extends true
       ? true
-      : TypeEq<B, false> extends true
+      : IsExactBool<B, false> extends true
         ? false
         : never
-    : TypeEq<A, false> extends true
-      ? TypeEq<B, true> extends true
+    : IsExactBool<A, false> extends true
+      ? IsExactBool<B, true> extends true
         ? false
-        : TypeEq<B, false> extends true
+        : IsExactBool<B, false> extends true
           ? true
           : never
       : never;

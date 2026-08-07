@@ -682,13 +682,13 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
 - src/others/bivariant-hack.mts
     - [BivariantHack](./src/others/bivariant-hack.mts#L26)
 - src/others/boolean.mts
-    - [BoolNot](./src/others/boolean.mts#L26)
-    - [BoolAnd](./src/others/boolean.mts#L59)
-    - [BoolOr](./src/others/boolean.mts#L102)
-    - [BoolEq](./src/others/boolean.mts#L128)
-    - [BoolNand](./src/others/boolean.mts#L153)
-    - [BoolNor](./src/others/boolean.mts#L167)
-    - [BoolNeq](./src/others/boolean.mts#L182)
+    - [BoolNot](./src/others/boolean.mts#L63)
+    - [BoolAnd](./src/others/boolean.mts#L96)
+    - [BoolOr](./src/others/boolean.mts#L139)
+    - [BoolEq](./src/others/boolean.mts#L165)
+    - [BoolNand](./src/others/boolean.mts#L190)
+    - [BoolNor](./src/others/boolean.mts#L204)
+    - [BoolNeq](./src/others/boolean.mts#L219)
 - src/others/json.mts
     - [JsonPrimitive](./src/others/json.mts#L17)
     - [MutableJsonValue](./src/others/json.mts#L55)
