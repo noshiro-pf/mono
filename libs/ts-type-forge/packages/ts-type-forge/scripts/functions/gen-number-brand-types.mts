@@ -49,7 +49,7 @@ export const genNumberBrandTypes = async (
 
       mut_writtenPaths.push(filePath);
 
-      console.log(`Generated ${path.relative(workspaceRootPath, filePath)}`);
+      console.info(`Generated ${path.relative(workspaceRootPath, filePath)}`);
     }
 
     await formatFiles(mut_writtenPaths);

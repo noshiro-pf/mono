@@ -20,7 +20,7 @@ export const genEntryPoint = async (
   srcDir: string,
   entryPointFilePath: string,
 ): Promise<void> => {
-  console.log(`Searching for .mts files in ${srcDir}...`);
+  console.info(`Searching for .mts files in ${srcDir}...`);
 
   const filesResult = await glob(`${srcDir}/**/*.mts`);
 
@@ -85,7 +85,7 @@ export const genEntryPoint = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(entryPointFilePath, formatted, 'utf8');
 
-    console.log(
+    console.info(
       `Successfully generated ${entryPointFilePath} with ${publicNames.length} public type re-exports.`,
     );
   } catch (error) {

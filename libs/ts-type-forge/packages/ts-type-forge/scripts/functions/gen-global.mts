@@ -20,7 +20,7 @@ export const genGlobal = async (
   srcDir: string,
   globalFilePath: string,
 ): Promise<void> => {
-  console.log(`Searching for .mts files in ${srcDir}...`);
+  console.info(`Searching for .mts files in ${srcDir}...`);
 
   const filesResult = await glob(`${srcDir}/**/*.mts`);
 
@@ -107,7 +107,7 @@ export const genGlobal = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(globalFilePath, formatted, 'utf8');
 
-    console.log(
+    console.info(
       `Successfully generated ${globalFilePath} with ${totalAliases} global type aliases (${mut_allNamespaces.length} namespaces).`,
     );
   } catch (error) {
