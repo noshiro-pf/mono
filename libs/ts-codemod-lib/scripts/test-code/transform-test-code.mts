@@ -11,7 +11,7 @@ import {
 } from 'ts-codemod-lib';
 
 for await (const filePath of fs.glob('test-code/**/*.{mts,tsx}')) {
-  console.log(`Processing file: ${filePath}`);
+  console.info(`Processing file: ${filePath}`);
 
   const originalCode = await fs.readFile(filePath, 'utf8');
 
