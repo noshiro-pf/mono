@@ -1,3 +1,9 @@
+## [5.8.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.2...v5.8.3) (2026-08-07)
+
+### Bug Fixes
+
+- make CI pass after the pnpm update ([#404](https://github.com/noshiro-pf/eslint-config-typed/issues/404)) ([2067cae](https://github.com/noshiro-pf/eslint-config-typed/commit/2067caeb747cff5217a7b83142c0d03ec19d4675))
+
 ## [5.8.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.1...v5.8.2) (2026-08-01)
 
 ### Bug Fixes
