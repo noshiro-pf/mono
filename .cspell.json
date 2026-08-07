@@ -250,9 +250,8 @@
   ],
   "flagWords": [],
   "ignorePaths": [
-    "./yarn.lock",
+    "./pnpm-lock.yaml",
     "./experimental/**",
-    "./.yarn/**",
     "./docs/json-spec/**",
     "**/*.svg",
     "**/firebase-emulator-exports/**"

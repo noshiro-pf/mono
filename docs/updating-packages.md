@@ -4,7 +4,7 @@
 2.  Update packages
 
 ```sh
-$  yarn add --dev -W  \
+$  pnpm add -D -w  \
         sort-package-json@latest                 \
         prettier@latest                          \
         prettier-plugin-organize-imports@latest  \
@@ -17,7 +17,7 @@ $  yarn add --dev -W  \
 ## TypeScript
 
 ```sh
-$  yarn add --dev -W     \
+$  pnpm add -D -w     \
         typescript@latest  \
         tslib@latest
 ```
@@ -25,7 +25,7 @@ $  yarn add --dev -W     \
 ## Testing
 
 ```sh
-$  yarn add --dev -W     \
+$  pnpm add -D -w     \
         eslint-plugin-jest@latest     \
         jest@latest                   \
         jest-environment-jsdom@latest \
@@ -34,7 +34,7 @@ $  yarn add --dev -W     \
 ```
 
 ```sh
-$  yarn add -W  \
+$  pnpm add -w  \
         @testing-library/jest-dom@latest    \
         @testing-library/react@latest       \
         @testing-library/user-event@latest
@@ -43,7 +43,7 @@ $  yarn add -W  \
 ## Node
 
 ```sh
-$  yarn add --dev -W  \
+$  pnpm add -D -w  \
         @types/argparse@latest    \
         @types/node@latest        \
         argparse@latest  \

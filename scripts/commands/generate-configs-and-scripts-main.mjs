@@ -128,7 +128,7 @@ const main = async () => {
   }
 
   console.log('formatting...');
-  await execAsync('yarn fmt:diff');
+  await execAsync('pnpm run fmt:diff');
   console.log('done.');
 };
 

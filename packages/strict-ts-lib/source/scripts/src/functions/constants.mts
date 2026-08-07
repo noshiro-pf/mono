@@ -10,7 +10,7 @@ export const license = 'MIT';
 
 export const genLib = false as boolean;
 
-export const packageManagerName = 'yarn';
+export const packageManagerName = 'pnpm';
 
 // /packages/strict-ts-lib/source/scripts/dist/commands/functions/constants.mts
 const thisDir = import.meta.dirname;

@@ -1,12 +1,11 @@
 node_modules/
-.yarn
 dist
 build
 lib
 esm
 cjs
 packages/slides/*/plugin
-yarn.lock
+pnpm-lock.yaml
 .env*
 *.sh
 *.txt

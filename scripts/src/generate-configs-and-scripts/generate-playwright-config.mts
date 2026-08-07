@@ -27,7 +27,7 @@ export const generatePlaywrightConfig = async (
     '  webServer: [',
     '    {',
     "      url: 'http://localhost:5180',",
-    "      command: 'yarn start:dev-server',",
+    "      command: 'pnpm run start:dev-server',",
     '    },',
     '  ],',
     '});',

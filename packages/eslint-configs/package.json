@@ -19,7 +19,7 @@
     "esm"
   ],
   "scripts": {
-    "build": "yarn build:src",
+    "build": "pnpm run build:src",
     "build:full": "run-s gen-rules-type build:src",
     "build:scripts": "wireit",
     "build:src": "wireit",
@@ -29,27 +29,27 @@
     "clean:esm": "rimraf esm",
     "clean:src": "rimraf src/**/*.mjs",
     "clean:wireit": "rimraf .wireit",
-    "fmt": "yarn zz:prettier .",
+    "fmt": "pnpm run zz:prettier .",
     "gen-rules-type": "wireit",
     "gen-rules-type:command": "zx ./scripts/generate-rules-type-main.mjs",
     "gi": "bash ../../scripts/bash/index_ts_generator.sh ./src --min-depth 0 --ext .mts --ignore plugins",
     "lint": "run-p lint:scripts lint:src",
     "lint:fix": "run-p lint:fix:scripts lint:fix:src",
-    "lint:fix:scripts": "yarn zz:eslint:scripts --fix",
-    "lint:fix:src": "yarn zz:eslint:src --fix",
-    "lint:scripts": "yarn zz:eslint:scripts",
-    "lint:src": "yarn zz:eslint:src",
-    "test": "yarn zz:vitest run",
-    "testw": "yarn zz:vitest watch",
-    "tsc": "yarn type-check",
+    "lint:fix:scripts": "pnpm run zz:eslint:scripts --fix",
+    "lint:fix:src": "pnpm run zz:eslint:src --fix",
+    "lint:scripts": "pnpm run zz:eslint:scripts",
+    "lint:src": "pnpm run zz:eslint:src",
+    "test": "pnpm run zz:vitest run",
+    "testw": "pnpm run zz:vitest watch",
+    "tsc": "pnpm run type-check",
     "tscw": "tsc --noEmit --watch",
     "type-check": "tsc --noEmit",
     "update-deps": "wireit",
-    "watch": "yarn build:src --watch",
+    "watch": "pnpm run build:src --watch",
     "zz:eslint": "ESLINT_USE_FLAT_CONFIG=true TIMING=1  eslint --config eslint.config.js",
-    "zz:eslint:print-config": "yarn zz:eslint --print-config src/index.mts",
-    "zz:eslint:scripts": "yarn zz:eslint \"./scripts/**/*.mts\"",
-    "zz:eslint:src": "yarn zz:eslint './src/**/*.mts'",
+    "zz:eslint:print-config": "pnpm run zz:eslint --print-config src/index.mts",
+    "zz:eslint:scripts": "pnpm run zz:eslint \"./scripts/**/*.mts\"",
+    "zz:eslint:src": "pnpm run zz:eslint './src/**/*.mts'",
     "zz:prettier": "prettier --ignore-path ../../.prettierignore --ignore-unknown --no-error-on-unmatched-pattern --write",
     "zz:vitest": "vitest --config ./configs/vitest.config.ts"
   },
@@ -95,7 +95,7 @@
       "dependencies": [
         "build:scripts"
       ],
-      "command": "yarn gen-rules-type:command"
+      "command": "pnpm run gen-rules-type:command"
     },
     "build:scripts": {
       "dependencies": [

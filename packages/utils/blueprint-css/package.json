@@ -14,7 +14,7 @@
     "resources/icons/*"
   ],
   "scripts": {
-    "fmt": "yarn zz:prettier .",
+    "fmt": "pnpm run zz:prettier .",
     "zz:prettier": "prettier --cache --cache-strategy content --ignore-path ../../../.prettierignore --write"
   },
   "devDependencies": {

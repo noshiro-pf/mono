@@ -9,11 +9,11 @@ export default definePlaywrightConfig({
   webServer: [
     {
       url: 'http://localhost:5180',
-      command: 'yarn start:dev-server',
+      command: 'pnpm run start:dev-server',
     },
     {
       url: 'http://localhost:5002',
-      command: 'yarn firebase emulators:start --only firestore,functions',
+      command: 'pnpm exec firebase emulators:start --only firestore,functions',
     },
   ],
 });

@@ -7,21 +7,21 @@ https://event-schedule-app.web.app
 ## Setup
 
 ```
-yarn setup
+pnpm run setup
 ```
 
 ## Start
 
 ```sh
-yarn start:build-functions
+pnpm run start:build-functions
 ```
 
 ```sh
-yarn start:emulators
+pnpm run start:emulators
 ```
 
 ```sh
-yarn start:dev-server
+pnpm run start:dev-server
 ```
 
 ### env

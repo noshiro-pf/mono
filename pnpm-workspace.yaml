@@ -1,0 +1,35 @@
+packages:
+  - 'packages/**'
+  - 'configs'
+  - 'scripts'
+
+# Yarn 1 hoisted everything into a single flat node_modules at the repo root and
+# the workspace packages rely on that (they call wireit / rimraf / eslint /
+# vitest etc. that are declared only in the root package.json). Keep the same
+# layout so the migration does not require touching 269 package.json files.
+nodeLinker: hoisted
+
+# Workspace dependencies are declared as "*" (608 occurrences) rather than with
+# the workspace: protocol, so they must be resolved from the workspace instead
+# of the registry.
+linkWorkspacePackages: true
+
+# Yarn 1 only warned about unmet peer dependencies; pnpm installs them by
+# default. Auto-installing would shadow root tooling -- @noshiro/syncflow
+# declares `typescript: ^4.9.3` as a peer, which pulled TypeScript 4.9 into that
+# package and broke its build against the repo's TypeScript 5. Keep Yarn's
+# behaviour and resolve peers from what the workspace already installs.
+autoInstallPeers: false
+
+# Yarn 1 ran every dependency lifecycle script. pnpm 10 blocks them by default,
+# so the packages that genuinely need one (native builds and binary downloads)
+# are allowed explicitly here.
+onlyBuiltDependencies:
+  - '@firebase/util'
+  - '@swc/core'
+  - clasp
+  - core-js
+  - esbuild
+  - protobufjs
+  - re2
+  - unrs-resolver

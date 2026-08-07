@@ -11,8 +11,8 @@ git clone --recursive
 ## Setup
 
 ```sh
-$  yarn
-$  yarn setup
+$  pnpm install
+$  pnpm run setup
 ```
 
 ## monorepo 構成
@@ -47,7 +47,6 @@ $  yarn setup
                 -   あるコマンドの前に別のコマンドを実行する必要がある場合に使用している。
                 -   packages/utils に関しては repository 初期設定として予めビルドしておく運用を想定しており、 packages/apps 内の各コマンドで依存 utils の build を dependencies に加えることはしていない（記述が多くなるデメリットがあり、キャッシュされた結果とはいえ実行時間が伸びることによる不便さが大きいため）。
             -   コマンド実行のキャッシュ化はしない。たまに一部コマンドが上手く動かなくなったときに wireit キャッシュのせいであることがあったため。
-        -   TODO: `Wireit could not find the script name in the "npm_config_argv" environment variable. Arguments may not be interpreted correctly. See https://github.com/yarnpkg/yarn/issues/8905, and please consider upgrading to yarn 3.x or switching to npm.` という警告が出ているので対応する。
 -   configs
     -   tsconfig
         -   各 workspace で継承する共通 tsconfig 定義を置いている。
@@ -56,7 +55,7 @@ $  yarn setup
         -   eslint 共通設定を定義している。
         -   ESModule で記述するために flat config を導入（2023/11）
         -   TypeScript で記述している
-            -   `yarn workspace @noshiro/eslint-configs build` により生成（その後一部手動修正が必要）
+            -   `pnpm --filter @noshiro/eslint-configs run build` により生成（その後一部手動修正が必要）
         -   `plugin:@typescript-eslint:recommended` 等の public な config は使っておらず、 rule の設定を明示的に記述している。
             -   主に多数の config を extends に追加した際のルール設定の上書き結果が曖昧になる問題を避けるため。各ルールはちょうど 1 回ずつ定義されている状態になっている。
             -   `@typescript-eslint` のルールに対応する `eslint` のルールや `prettier` と競合するルール無効化が必要な場合があるが、これらは適宜 plugin の提供している config を参考に手動で設定している。
@@ -77,16 +76,16 @@ $  yarn setup
 ## Workspace 追加方法
 
 -   Preact app
-    -   `yarn create:preact-app <package-name> && yarn`
+    -   `pnpm run create:preact-app <package-name> && pnpm install`
 -   React app
-    -   `yarn create:react-app <package-name> && yarn`
+    -   `pnpm run create:react-app <package-name> && pnpm install`
 -   Utility
-    -   `yarn create:util <package-name> && yarn`
+    -   `pnpm run create:util <package-name> && pnpm install`
 -   Slides
-    -   `yarn create:slides <package-name> && yarn`
+    -   `pnpm run create:slides <package-name> && pnpm install`
 
-各カテゴリに対応するディレクトリに設置してある template workspace がコピーされ、 yarn workspace 名と package.json 内の name フィールドが `<package-name>` で置換される。
-workspace 作成後に yarn を実行して yarn workspace として認識させる必要がある（node_modules 内に symlink が作成される）。
+各カテゴリに対応するディレクトリに設置してある template workspace がコピーされ、 workspace 名と package.json 内の name フィールドが `<package-name>` で置換される。
+workspace 作成後に pnpm install を実行して workspace として認識させる必要がある（node_modules 内に symlink が作成される）。
 
 ## CI
 
