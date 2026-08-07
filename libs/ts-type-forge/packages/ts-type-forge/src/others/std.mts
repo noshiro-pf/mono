@@ -66,7 +66,7 @@ export type StrictPick<T, K extends keyof T> = {
  * type Empty = RelaxedPick<Person, 'nonexistent'>; // {}
  * ```
  */
-export type RelaxedPick<T, K> = Pick<T, RelaxedExtract<keyof T, K>>;
+export type RelaxedPick<T, K> = StrictPick<T, RelaxedExtract<keyof T, K>>;
 
 /**
  * Excludes from union type `T` those types that are assignable to `U`.
@@ -117,7 +117,10 @@ export type RelaxedExclude<T, U> = T extends U ? never : T;
  * // type Invalid = StrictOmit<Person, 'email' | 'invalid'>; // Error: 'invalid' is not a key of Person
  * ```
  */
-export type StrictOmit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export type StrictOmit<T, K extends keyof T> = StrictPick<
+  T,
+  StrictExclude<keyof T, K>
+>;
 
 /**
  * Creates a type with all properties of `T` except for those in union `K`.
@@ -134,7 +137,7 @@ export type StrictOmit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
  * type Same = RelaxedOmit<Person, 'nonexistent'>; // { name: string; age: number; email: string }
  * ```
  */
-export type RelaxedOmit<T, K> = Pick<T, RelaxedExclude<keyof T, K>>;
+export type RelaxedOmit<T, K> = StrictPick<T, RelaxedExclude<keyof T, K>>;
 
 /**
  * Creates a readonly record type with keys of type `K` and values of type `T`.

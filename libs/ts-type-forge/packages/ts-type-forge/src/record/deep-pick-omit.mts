@@ -1,3 +1,5 @@
+import { type ReadonlyRecord } from '../others/index.mjs';
+
 /**
  * Deeply picks a nested property from an object type along the specified key path.
  * Supports union of paths to pick multiple nested properties.
@@ -53,6 +55,26 @@ export type DeepOmit<T, Path extends readonly PropertyKey[]> = {
 };
 
 /**
+ * @internal A value `DeepPick` / `DeepOmit` recurses into rather than treating
+ * as a leaf: an object, or an array.
+ *
+ * The record arm is deliberately `ReadonlyRecord<string, any>` — the `any` is
+ * load-bearing and **must not** be tightened to `UnknownRecord` (≡
+ * `ReadonlyRecord<string, unknown>`) to avoid the lint suppression below. An
+ * index signature of type `any` accepts any object whatsoever, whereas an
+ * `unknown`-valued one only accepts types that have (or get an implicit) index
+ * signature — which interfaces, class instance types and callable types do
+ * not. Under `UnknownRecord` the recursion would stop one level early for all
+ * of those, silently collapsing `DeepPick` to `{}` and making `DeepOmit` a
+ * no-op. `deep-pick-omit.test.mts` asserts exactly that.
+ *
+ * `readonly` costs nothing here: assignability does not consider property
+ * modifiers, so this selects the same types `Record<string, any>` would.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RecursableValue = ReadonlyRecord<string, any> | readonly unknown[];
+
+/**
  * @internal Extracts the first element from each path in a union of paths.
  */
 type DeepPickOmitHead<Path extends readonly PropertyKey[]> =
@@ -85,8 +107,7 @@ type DeepPickValue<T, Tail extends readonly PropertyKey[]> = [Tail] extends [
   ? T
   : [] extends Tail
     ? T
-    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      [NonNullable<T>] extends [Record<string, any> | readonly unknown[]]
+    : [NonNullable<T>] extends [RecursableValue]
       ? DeepPick<NonNullable<T>, Tail>
       : NonNullable<unknown>;
 
@@ -113,7 +134,6 @@ type DeepOmitValue<T, Tail extends readonly PropertyKey[]> = [Tail] extends [
   ? T
   : [] extends Tail
     ? T
-    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      [NonNullable<T>] extends [Record<string, any> | readonly unknown[]]
+    : [NonNullable<T>] extends [RecursableValue]
       ? DeepOmit<NonNullable<T>, Tail>
       : T;

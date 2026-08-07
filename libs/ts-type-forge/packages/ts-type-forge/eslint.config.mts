@@ -2,6 +2,7 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
+  typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
 import {
@@ -11,6 +12,42 @@ import {
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { repositoryRootPath } from '../../scripts/repository-root-path.mjs';
 import { workspaceRootPath } from './scripts/workspace-root-path.mjs';
+
+/**
+ * A `no-restricted-types` entry that names the ts-type-forge replacements and
+ * offers each of them as an editor suggestion. Deliberately not a `fixWith`:
+ * picking between the two is a semantic decision, not a rename.
+ */
+const bannedInFavorOf = (
+  ...alternatives: readonly [string, string]
+): Readonly<{ message: string; suggest: readonly string[] }> => ({
+  message: `Use ${alternatives.map((name) => `\`${name}\``).join(' or ')} from ts-type-forge instead.`,
+  suggest: alternatives,
+});
+
+/**
+ * The standard-library types this package exists to replace, mapped to the
+ * replacements it defines.
+ *
+ * `Exclude` / `Extract` / `Omit` / `Pick` leave their second argument
+ * unconstrained, so a member or key that is not part of the first one is
+ * silently accepted and yields an empty result instead of the compile error
+ * that would have pointed at it. `Record` says nothing about whether the
+ * properties may be reassigned. Both gaps are exactly what `src/others/std.mts`
+ * fills, so the sources here should be written in the filled-in versions.
+ *
+ * `eslint-plugin-ts-type-forge` ships the same enforcement as
+ * `prefer-strict-or-relaxed-utility-type` / `prefer-readonly-or-mutable-record`,
+ * but this package must not depend on the plugin that depends on it, so it is
+ * spelled with the stock rule instead.
+ */
+const RESTRICTED_STD_TYPES = {
+  Exclude: bannedInFavorOf('StrictExclude', 'RelaxedExclude'),
+  Extract: bannedInFavorOf('StrictExtract', 'RelaxedExtract'),
+  Omit: bannedInFavorOf('StrictOmit', 'RelaxedOmit'),
+  Pick: bannedInFavorOf('StrictPick', 'RelaxedPick'),
+  Record: bannedInFavorOf('ReadonlyRecord', 'MutableRecord'),
+} as const;
 
 export default [
   {
@@ -42,6 +79,32 @@ export default [
   eslintPluginTsFortress.configs.recommended,
 
   {
+    files: ['src/**'],
+    rules: defineKnownRules({
+      '@typescript-eslint/no-restricted-types': [
+        'error',
+        {
+          types: {
+            // A flat-config rule entry replaces the inherited options
+            // wholesale, so the shared config's own bans have to be carried
+            // over explicitly rather than merged by ESLint.
+            ...typescriptEslintRules[
+              '@typescript-eslint/no-restricted-types'
+            ][1].types,
+            ...RESTRICTED_STD_TYPES,
+          },
+        },
+      ],
+    }),
+  },
+
+  {
+    // The type-level tests are exempt (this turns the rule off wholesale,
+    // matching the entry that was already here): several of them assert what
+    // the standard-library types do — `MutableRecord<string, number>` *is*
+    // `Record<string, number>`, `UnknownRecord` is safer than
+    // `Record<string, any>` — so spelling them in the replacements would make
+    // the assertion tautological.
     files: ['**/*.test.mts'],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',

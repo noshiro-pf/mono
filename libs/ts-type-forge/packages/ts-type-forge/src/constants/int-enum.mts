@@ -1,3 +1,4 @@
+import { type StrictExclude } from '../others/index.mjs';
 import {
   type Index,
   type NegativeIndex,
@@ -124,7 +125,7 @@ export type Int11 = Readonly<Index<1024> | NegativeIndex<1024>>;
  * // const invalid = 13 satisfies MonthEnum; // Error: not assignable to MonthEnum
  * ```
  */
-export type MonthEnum = Exclude<Index<13>, 0>;
+export type MonthEnum = StrictExclude<Index<13>, 0>;
 
 /**
  * Represents the zero-based index for months of the year.
@@ -152,7 +153,7 @@ export type MonthIndexEnum = Index<12>;
  * Represents the day of the month.
  * A union of integer literals from `1` to `31`.
  */
-export type DateEnum = Exclude<Index<32>, 0>;
+export type DateEnum = StrictExclude<Index<32>, 0>;
 
 /**
  * Represents the zero-based index for the day of the week.

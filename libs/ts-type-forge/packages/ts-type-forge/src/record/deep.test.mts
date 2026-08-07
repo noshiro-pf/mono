@@ -10,6 +10,7 @@ import {
   type MinLengthArray,
   type MinLengthOf,
 } from '../branded-types/index.mjs';
+import { type UnknownRecord } from '../constants/index.mjs';
 import { type MutableMap, type MutableSet } from '../others/index.mjs';
 import {
   type DeepMutable,
@@ -442,5 +443,62 @@ type RequiredBase = {
   expectType<
     DeepMutable<readonly [{ a: readonly number[] }]>,
     [{ a: number[] }]
+  >('=');
+}
+
+/*
+ * Regression guard for `AnyRecord`, the "plain object" branch guard shared by
+ * every `Deep*` (see the note on it in `deep.mts`).
+ *
+ * Tightening its `ReadonlyRecord<string, any>` to `UnknownRecord` makes every
+ * `Deep*` return any type without an implicit index signature completely
+ * untransformed. Each assertion below fails if that happens.
+ */
+{
+  // Class instance types are the fixture on purpose — they are the shape that
+  // gets no implicit index signature and survives this repo's autofixes. Do
+  // not "simplify" them into object type aliases: those do get one, and the
+  // assertions would then pass under either spelling. (`interface` works too
+  // in principle, but `consistent-type-definitions` rewrites it into an alias.)
+  class Mut {
+    x: number = 0;
+    y: readonly string[] = [];
+  }
+
+  class Frozen {
+    readonly x: number = 0;
+    readonly y: readonly number[] = [];
+  }
+
+  class Opt {
+    x?: number;
+  }
+
+  // Fixture integrity: were these to gain an index signature, every assertion
+  // below would stop testing anything.
+  expectType<Mut extends UnknownRecord ? true : false, false>('=');
+
+  expectType<Frozen extends UnknownRecord ? true : false, false>('=');
+
+  expectType<Opt extends UnknownRecord ? true : false, false>('=');
+
+  // Such a type is transformed, not returned as-is.
+  expectType<DeepReadonly<Mut>, Readonly<{ x: number; y: readonly string[] }>>(
+    '=',
+  );
+
+  expectType<DeepMutable<Frozen>, { x: number; y: number[] }>('=');
+
+  expectType<
+    DeepPartial<Mut>,
+    { x?: number | undefined; y?: readonly (string | undefined)[] | undefined }
+  >('=');
+
+  expectType<DeepRequired<Opt>, { x: number }>('=');
+
+  // The same holds when it is reached through recursion.
+  expectType<
+    DeepReadonly<{ a: Mut }>,
+    Readonly<{ a: Readonly<{ x: number; y: readonly string[] }> }>
   >('=');
 }

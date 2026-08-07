@@ -1,5 +1,10 @@
 import { type UnknownRecord } from '../constants/index.mjs';
-import { type MergeIntersection } from '../others/index.mjs';
+import {
+  type MergeIntersection,
+  type StrictExclude,
+  type StrictOmit,
+  type StrictPick,
+} from '../others/index.mjs';
 
 /**
  * Creates a type where specified keys `K` of `T` are made optional.
@@ -13,7 +18,7 @@ import { type MergeIntersection } from '../others/index.mjs';
  * // Result: { a?: number; b?: string; c: boolean }
  */
 export type PartiallyPartial<T, K extends keyof T> = MergeIntersection<
-  Omit<T, K> & Partial<Pick<T, K>>
+  StrictOmit<T, K> & Partial<StrictPick<T, K>>
 >;
 
 /**
@@ -40,7 +45,7 @@ export type PartiallyOptional<T, K extends keyof T> = PartiallyPartial<T, K>;
  * // Result: { a: number | undefined; b: string | undefined; c: boolean }
  */
 export type PartiallyNullable<T, K extends keyof T> = MergeIntersection<
-  Omit<T, K> & { [P in K]: T[P] | undefined }
+  StrictOmit<T, K> & { [P in K]: T[P] | undefined }
 >;
 
 /**
@@ -55,7 +60,7 @@ export type PartiallyNullable<T, K extends keyof T> = MergeIntersection<
  * // Result: { a: number; b: string; c?: boolean }
  */
 export type PartiallyRequired<T, K extends keyof T> = MergeIntersection<
-  Omit<T, K> & Required<Pick<T, K>>
+  StrictOmit<T, K> & Required<StrictPick<T, K>>
 >;
 
 /**
@@ -119,7 +124,7 @@ export type OptionalKeys<R extends UnknownRecord> =
  *   f: 0 | undefined; // required, value includes undefined
  * }>; // 'd' | 'e' | 'f'
  */
-export type RequiredKeys<R extends UnknownRecord> = Exclude<
+export type RequiredKeys<R extends UnknownRecord> = StrictExclude<
   keyof R,
   OptionalKeys<R>
 >;

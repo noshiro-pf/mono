@@ -1,4 +1,5 @@
 import { expectType } from 'ts-data-forge';
+import { type UnknownRecord } from '../constants/index.mjs';
 import { type RelaxedPick } from '../others/index.mjs';
 import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
 
@@ -384,4 +385,45 @@ import { type DeepOmit, type DeepPick } from './deep-pick-omit.mjs';
     >,
     { a: { c: string } }
   >('=');
+}
+
+/*
+ * Regression guard for `RecursableValue`, the "recurse or treat as a leaf"
+ * branch guard (see the note on it in `deep-pick-omit.mts`).
+ *
+ * Tightening its `ReadonlyRecord<string, any>` to `UnknownRecord` stops the
+ * recursion one level early for every type without an implicit index
+ * signature: `DeepPick` collapses the value to `{}` and `DeepOmit` becomes a
+ * no-op. Each assertion below fails if that happens.
+ */
+{
+  // Class instance types are the fixture on purpose — they are the shape that
+  // gets no implicit index signature and survives this repo's autofixes. Do
+  // not "simplify" them into object type aliases: those do get one, and the
+  // assertions would then pass under either spelling. (`interface` works too
+  // in principle, but `consistent-type-definitions` rewrites it into an alias.)
+  class Leaf {
+    x: number = 0;
+    y: string = '';
+  }
+
+  class Root {
+    a: Leaf = new Leaf();
+  }
+
+  // Fixture integrity: were these to gain an index signature, every assertion
+  // below would stop testing anything.
+  expectType<Leaf extends UnknownRecord ? true : false, false>('=');
+
+  expectType<Root extends UnknownRecord ? true : false, false>('=');
+
+  // Such a value is recursed into, not collapsed to `{}` / left untouched.
+  expectType<DeepPick<{ a: Leaf }, ['a', 'x']>, { a: { x: number } }>('=');
+
+  expectType<DeepOmit<{ a: Leaf }, ['a', 'x']>, { a: { y: string } }>('=');
+
+  // The same holds when it is reached from a root of the same shape.
+  expectType<DeepPick<Root, ['a', 'x']>, { a: { x: number } }>('=');
+
+  expectType<DeepOmit<Root, ['a', 'x']>, { a: { y: string } }>('=');
 }

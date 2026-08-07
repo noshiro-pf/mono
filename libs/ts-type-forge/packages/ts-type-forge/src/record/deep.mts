@@ -3,6 +3,9 @@ import {
   type AnyFn,
   type MutableMap,
   type MutableSet,
+  type ReadonlyRecord,
+  type RelaxedExclude,
+  type StrictPick,
 } from '../others/index.mjs';
 
 /**
@@ -39,8 +42,7 @@ export type DeepReadonly<T> = T extends Primitive
             ? ReadonlySet<DeepReadonly<V>>
             : T extends readonly unknown[]
               ? DeepReadonlyArray<T>
-              : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                T extends Record<string, any>
+              : T extends AnyRecord
                 ? {
                     readonly [K in keyof T]: DeepReadonly<T[K]>;
                   }
@@ -74,8 +76,7 @@ export type DeepMutable<T> = T extends Primitive
             ? MutableSet<DeepMutable<V>>
             : T extends readonly unknown[]
               ? DeepMutableArray<T>
-              : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                T extends Record<string, any>
+              : T extends AnyRecord
                 ? {
                     -readonly [K in keyof T]: DeepMutable<T[K]>;
                   }
@@ -116,8 +117,7 @@ export type DeepPartial<T> = T extends Primitive
             ? ReadonlySet<DeepPartial<V>>
             : T extends readonly unknown[]
               ? DeepPartialArray<T>
-              : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                T extends Record<string, any>
+              : T extends AnyRecord
                 ? {
                     [K in keyof T]?: DeepPartial<T[K]>;
                   }
@@ -152,12 +152,30 @@ export type DeepRequired<T> = T extends Primitive
             ? ReadonlySet<DeepRequired<V>>
             : T extends readonly unknown[]
               ? DeepRequiredArray<T>
-              : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                T extends Record<string, any>
+              : T extends AnyRecord
                 ? {
                     [K in keyof T]-?: DeepRequired<T[K]>;
                   }
                 : T;
+
+/**
+ * @internal The "plain object" branch guard shared by every `Deep*` above.
+ *
+ * The `any` is load-bearing and **must not** be tightened to `UnknownRecord`
+ * (≡ `ReadonlyRecord<string, unknown>`) to avoid the lint suppression below.
+ * An index signature of type `any` accepts any object whatsoever, whereas an
+ * `unknown`-valued one only accepts types that have (or get an implicit) index
+ * signature — which interfaces, class instance types and callable types do
+ * not. Under `UnknownRecord` every `Deep*` would fall through to the final
+ * `: T` for all of those and return them completely untransformed: no
+ * `readonly` added, no `?` added or removed. `deep.test.mts` asserts exactly
+ * that.
+ *
+ * `readonly` costs nothing here: assignability does not consider property
+ * modifiers, so this selects the same types `Record<string, any>` would.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyRecord = ReadonlyRecord<string, any>;
 
 /*
  * Brand-carrying arrays.
@@ -210,7 +228,7 @@ type DeepReadonlyArray<T extends readonly unknown[]> = [
   ? {
       readonly [K in keyof T]: DeepReadonly<T[K]>;
     }
-  : readonly DeepReadonly<T[number]>[] & Pick<T, ExtraKeysOf<T>>;
+  : readonly DeepReadonly<T[number]>[] & StrictPick<T, ExtraKeysOf<T>>;
 
 /** @internal The array branch of {@link DeepMutable}. */
 type DeepMutableArray<T extends readonly unknown[]> = [ExtraKeysOf<T>] extends [
@@ -219,7 +237,7 @@ type DeepMutableArray<T extends readonly unknown[]> = [ExtraKeysOf<T>] extends [
   ? {
       -readonly [K in keyof T]: DeepMutable<T[K]>;
     }
-  : readonly DeepMutable<T[number]>[] & Pick<T, ExtraKeysOf<T>>;
+  : readonly DeepMutable<T[number]>[] & StrictPick<T, ExtraKeysOf<T>>;
 
 /** @internal The array branch of {@link DeepPartial}. */
 type DeepPartialArray<T extends readonly unknown[]> = [ExtraKeysOf<T>] extends [
@@ -228,7 +246,7 @@ type DeepPartialArray<T extends readonly unknown[]> = [ExtraKeysOf<T>] extends [
   ? {
       [K in keyof T]?: DeepPartial<T[K]>;
     }
-  : readonly DeepPartial<T[number]>[] & Pick<T, ExtraKeysOf<T>>;
+  : readonly DeepPartial<T[number]>[] & StrictPick<T, ExtraKeysOf<T>>;
 
 /** @internal The array branch of {@link DeepRequired}. */
 type DeepRequiredArray<T extends readonly unknown[]> = [
@@ -237,13 +255,13 @@ type DeepRequiredArray<T extends readonly unknown[]> = [
   ? {
       [K in keyof T]-?: DeepRequired<T[K]>;
     }
-  : readonly DeepRequired<T[number]>[] & Pick<T, ExtraKeysOf<T>>;
+  : readonly DeepRequired<T[number]>[] & StrictPick<T, ExtraKeysOf<T>>;
 
 /**
  * @internal The members of `T` that are neither array members nor tuple
  * indices — for the length-constraint family, exactly its brand.
  */
-type ExtraKeysOf<T extends readonly unknown[]> = Exclude<
+type ExtraKeysOf<T extends readonly unknown[]> = RelaxedExclude<
   keyof T,
   keyof unknown[] | keyof (readonly unknown[]) | `${number}`
 >;

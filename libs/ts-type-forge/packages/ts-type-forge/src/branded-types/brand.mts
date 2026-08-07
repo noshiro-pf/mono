@@ -1,4 +1,5 @@
 import { type IsNever, type TypeEq } from '../condition/index.mjs';
+import { type StrictExclude, type StrictPick } from '../others/index.mjs';
 import { type TSTypeForgeInternals_BrandEncapsulated } from './_internals.mjs';
 
 /**
@@ -135,7 +136,7 @@ export type UnwrapBrandKeys<B extends UnknownBrand> =
  * type KeysPart = GetBrandKeysPart<MyBrand>; // { validated: true }
  * ```
  */
-export type GetBrandKeysPart<B extends UnknownBrand> = Pick<
+export type GetBrandKeysPart<B extends UnknownBrand> = StrictPick<
   B,
   UnwrapBrandKeys<B>
 >;
@@ -272,6 +273,6 @@ export type IntersectBrand<
 export type NormalizeBrandUnion<B extends UnknownBrand> = GetBrandValuePart<B> &
   TSTypeForgeInternals_BrandEncapsulated<{
     readonly [
-      key in Exclude<UnwrapBrandKeys<B>, UnwrapBrandBooleanKeys<B>>
+      key in StrictExclude<UnwrapBrandKeys<B>, UnwrapBrandBooleanKeys<B>>
     ]: B[key];
   }>;

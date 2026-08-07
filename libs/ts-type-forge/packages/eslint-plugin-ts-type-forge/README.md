@@ -3,7 +3,9 @@
 ESLint rules that steer TypeScript **type declarations** toward
 [`ts-type-forge`](https://www.npmjs.com/package/ts-type-forge) idioms — replacing
 hand-rolled uniform tuple spellings with the library's named length-constrained
-tuple types. Every rule is auto-fixable, and every rewrite is **type-preserving**.
+tuple types, and the standard library's under-specified `Exclude` / `Extract` /
+`Omit` / `Pick` / `Record` with counterparts that state what was left implicit.
+Every rewrite is **type-preserving**.
 
 ## Installation
 
@@ -70,9 +72,13 @@ export default [
 
 ## Rules
 
-| Rule                                        | Description                                                                              |
-| :------------------------------------------ | :--------------------------------------------------------------------------------------- |
-| `prefer-canonical-length-constrained-tuple` | Replace hand-rolled uniform tuple spellings with the canonical ts-type-forge tuple type. |
+| Rule                                        | Fix        | Description                                                                               |
+| :------------------------------------------ | :--------- | :---------------------------------------------------------------------------------------- |
+| `prefer-canonical-length-constrained-tuple` | autofix    | Replace hand-rolled uniform tuple spellings with the canonical ts-type-forge tuple type.  |
+| `prefer-strict-or-relaxed-utility-type`     | suggestion | Replace `Exclude` / `Extract` / `Omit` / `Pick` with the `Strict*` or `Relaxed*` variant. |
+| `prefer-readonly-or-mutable-record`         | suggestion | Replace `Record` with `ReadonlyRecord` or `MutableRecord`.                                |
+
+### `prefer-canonical-length-constrained-tuple`
 
 It covers the whole uniform-tuple family:
 
@@ -112,7 +118,7 @@ type AtLeastTwo = MutableMinLengthTuple<2, string>;
 Single-element tuples without a rest (`readonly [V]`) are left alone — they read
 better as-is than `FixedLengthTuple<1, V>`.
 
-### The rule deliberately leaves alone
+#### The rule deliberately leaves alone
 
 - heterogeneous tuples (`readonly [string, number]`);
 - labelled members (`readonly [head: V, ...tail: V[]]`), because rewriting them
@@ -121,21 +127,82 @@ better as-is than `FixedLengthTuple<1, V>`.
 - files that already bind the target name to something else (a local alias, or
   an import from another module).
 
+### `prefer-strict-or-relaxed-utility-type`
+
+`Exclude<T, U>`, `Extract<T, U>`, `Omit<T, K>` and `Pick<T, K>` do not constrain
+their second argument, so a member or key that is not part of `T` is silently
+accepted — typically producing an empty result instead of the compile error that
+would have pointed at the leftover of a rename.
+
+ts-type-forge splits each one in two, and this rule makes the choice explicit:
+
+| built-in        | checks the second argument | keeps the built-in behavior |
+| :-------------- | :------------------------- | :-------------------------- |
+| `Exclude<T, U>` | `StrictExclude<T, U>`      | `RelaxedExclude<T, U>`      |
+| `Extract<T, U>` | `StrictExtract<T, U>`      | `RelaxedExtract<T, U>`      |
+| `Omit<T, K>`    | `StrictOmit<T, K>`         | `RelaxedOmit<T, K>`         |
+| `Pick<T, K>`    | `StrictPick<T, K>`         | `RelaxedPick<T, K>`         |
+
+```ts
+// ❌
+type Remaining = Exclude<'a' | 'b' | 'c', 'a'>;
+type PublicInfo = Omit<Person, 'email'>;
+
+// ✅ — the key is checked against the union / `keyof T`
+type Remaining = StrictExclude<'a' | 'b' | 'c', 'a'>;
+type PublicInfo = StrictOmit<Person, 'email'>;
+
+// ✅ — deliberately unchecked (the subtrahend need not be part of `T`)
+type NonStrings = RelaxedExclude<string | number | boolean, string>;
+```
+
+Reach for `Relaxed*` when the second argument genuinely need not be part of the
+first — a key set computed from a still deferred type parameter, or a subtraction
+whose subtrahend is only partly present.
+
+### `prefer-readonly-or-mutable-record`
+
+`Record<K, V>` says nothing about whether the properties may be reassigned, so
+the mutability of every record spelled with it is decided by whoever reads it.
+
+```ts
+// ❌
+type Config = Record<string, string | number>;
+
+// ✅
+type Config = ReadonlyRecord<string, string | number>;
+type Counters = MutableRecord<string, number>;
+```
+
+### Both rules deliberately leave alone
+
+- qualified names (`Utils.Pick<…>`) — they never denote the standard-library
+  type;
+- files that declare or import their own `Pick` / `Record` / …, for the same
+  reason;
+- the choice itself: replacing `Exclude` with `StrictExclude` can turn working
+  code into a compile error, and `Record` maps onto two different types, so
+  these rules report **suggestions** rather than an autofix. Editors offer both
+  replacements; `--fix` changes nothing.
+
 ## Options
 
-| Option        | Type                  | Default    | Description                                               |
-| :------------ | :-------------------- | :--------- | :-------------------------------------------------------- |
-| `importStyle` | `'global' \| 'named'` | `'global'` | How the ts-type-forge type is brought into scope.         |
-| `maxLength`   | `integer`             | `10`       | Longest tuple `prefer-length-constrained-tuple` rewrites. |
+`importStyle` is accepted by every rule; `maxLength` only by
+`prefer-canonical-length-constrained-tuple`.
+
+| Option        | Type                  | Default   | Description                                                         |
+| :------------ | :-------------------- | :-------- | :------------------------------------------------------------------ |
+| `importStyle` | `'global' \| 'named'` | `'named'` | How the ts-type-forge type is brought into scope.                   |
+| `maxLength`   | `integer`             | `10`      | Longest tuple `prefer-canonical-length-constrained-tuple` rewrites. |
 
 - `'global'` — the ambient globals of `ts-type-forge/global` are in use
-  (`/// <reference types="ts-type-forge/global" />`), so the autofix only
-  rewrites the type and never touches imports.
-- `'named'` — the autofix additionally inserts
+  (`/// <reference types="ts-type-forge/global" />`), so the fix only rewrites
+  the type and never touches imports.
+- `'named'` — the fix additionally inserts
   `import { type … } from 'ts-type-forge';` when the name is not imported yet.
 
 Either way, if the file already imports the target type from `ts-type-forge`
-(possibly under an alias), the autofix reuses that binding.
+(possibly under an alias), the fix reuses that binding.
 
 ```ts
 {

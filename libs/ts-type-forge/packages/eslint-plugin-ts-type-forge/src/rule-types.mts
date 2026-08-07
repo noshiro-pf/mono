@@ -76,12 +76,104 @@ namespace PreferCanonicalLengthConstrainedTuple {
     | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
 }
 
+/**
+ * @description Replace the built-in `Record` with the ts-type-forge `ReadonlyRecord` or `MutableRecord`, so that the mutability of the record is stated rather than implied.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | false      |
+ *  ```
+ */
+namespace PreferReadonlyOrMutableRecord {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "importStyle": {
+   *         "type": "string",
+   *         "enum": [
+   *           "global",
+   *           "named"
+   *         ],
+   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix add the corresponding `import { type … } from 'ts-type-forge';` when the name is not imported yet; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = NonNullable<
+    RuleOptionsOf<'prefer-readonly-or-mutable-record'>[0]
+  >;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Replace the built-in `Exclude` / `Extract` / `Omit` / `Pick` with the ts-type-forge `Strict*` or `Relaxed*` counterpart, so that the unchecked second argument becomes an explicit choice.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | false      |
+ *  ```
+ */
+namespace PreferStrictOrRelaxedUtilityType {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "importStyle": {
+   *         "type": "string",
+   *         "enum": [
+   *           "global",
+   *           "named"
+   *         ],
+   *         "description": "How the ts-type-forge type is brought into scope. 'named' (default) makes the autofix add the corresponding `import { type … } from 'ts-type-forge';` when the name is not imported yet; 'global' assumes the ambient globals of `ts-type-forge/global` and never touches imports."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = NonNullable<
+    RuleOptionsOf<'prefer-strict-or-relaxed-utility-type'>[0]
+  >;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
 export type EslintTsTypeForgeRules = Readonly<{
   'ts-type-forge/prefer-canonical-length-constrained-tuple': PreferCanonicalLengthConstrainedTuple.RuleEntry;
+  'ts-type-forge/prefer-readonly-or-mutable-record': PreferReadonlyOrMutableRecord.RuleEntry;
+  'ts-type-forge/prefer-strict-or-relaxed-utility-type': PreferStrictOrRelaxedUtilityType.RuleEntry;
 }>;
 
 export type EslintTsTypeForgeRulesOption = Readonly<{
   'ts-type-forge/prefer-canonical-length-constrained-tuple': PreferCanonicalLengthConstrainedTuple.Options;
+  'ts-type-forge/prefer-readonly-or-mutable-record': PreferReadonlyOrMutableRecord.Options;
+  'ts-type-forge/prefer-strict-or-relaxed-utility-type': PreferStrictOrRelaxedUtilityType.Options;
 }>;
 
 // If this assertion fails to type-check, this generated file has drifted from

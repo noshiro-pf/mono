@@ -9,6 +9,8 @@ import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
  */
 const recommendedRules = {
   'ts-type-forge/prefer-canonical-length-constrained-tuple': 'error',
+  'ts-type-forge/prefer-readonly-or-mutable-record': 'error',
+  'ts-type-forge/prefer-strict-or-relaxed-utility-type': 'error',
 } as const satisfies Readonly<
   Record<`ts-type-forge/${keyof typeof tsTypeForgeRules}`, 'error'>
 >;

@@ -152,7 +152,7 @@ type SmallNegativeInt<
 > = NegativeIndex<MaxIndex>;
 
 type WithSmallIntImpl<N extends Int, MaxIndex extends number> =
-  | Exclude<
+  | RelaxedExclude<
       SmallInt<'', MaxIndex>,
       | (N extends NegativeNumber ? SmallInt<'>=0', MaxIndex> : never)
       | (N extends NonNegativeNumber ? SmallInt<'<0', MaxIndex> : never)

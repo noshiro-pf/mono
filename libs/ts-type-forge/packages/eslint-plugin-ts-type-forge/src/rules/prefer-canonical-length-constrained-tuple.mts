@@ -12,9 +12,8 @@ import {
 import {
   DEFAULT_IMPORT_STYLE,
   IMPORT_STYLE_SCHEMA_PROPERTY,
-  reportTupleRewrites,
-  type TupleRewrite,
-} from './tuple-rule-utils.mjs';
+} from './import-style.mjs';
+import { reportTupleRewrites, type TupleRewrite } from './tuple-rule-utils.mjs';
 
 type Options = readonly [
   Readonly<{

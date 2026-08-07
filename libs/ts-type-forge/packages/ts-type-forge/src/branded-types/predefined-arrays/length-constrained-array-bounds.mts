@@ -7,6 +7,8 @@ import {
   type BoolAnd,
   type BoolNot,
   type BoolOr,
+  type RelaxedExclude,
+  type StrictPick,
 } from '../../others/index.mjs';
 import {
   type FixedLengthTuple,
@@ -47,7 +49,7 @@ export type HasLengthConstraint<Ar extends readonly unknown[]> = BoolNot<
  *
  * @template Ar - The array type to take the brand from.
  */
-export type LengthConstraintBrandOf<Ar extends readonly unknown[]> = Pick<
+export type LengthConstraintBrandOf<Ar extends readonly unknown[]> = StrictPick<
   Ar,
   LengthConstraintKeysOf<Ar>
 >;
@@ -182,8 +184,16 @@ export type ChangeArrayElement<Ar extends readonly unknown[], Elm> =
  * the rest of the mutating methods, which the readonly key set does not
  * mention, so subtracting only that set leaves them behind and reports every
  * mutable array as brand-carrying.
+ *
+ * `RelaxedExclude` — not `StrictExclude` — is what makes the subtrahend
+ * writable bare here. A strict subtraction would have to show that a literal
+ * key union is a subset of a `keyof Ar` still deferred on a type parameter,
+ * which the checker cannot do (TS2344); the same is true of the standard
+ * library's `Exclude` under a lib that narrows it to `Exclude<T, U extends T>`,
+ * which is why this used to be spelled with an `Extract<keyof Ar, …>` wrapper.
+ * The wrapper was a no-op for the result and is gone with the constraint.
  */
-type LengthConstraintKeysOf<Ar extends readonly unknown[]> = Exclude<
+type LengthConstraintKeysOf<Ar extends readonly unknown[]> = RelaxedExclude<
   keyof Ar,
   keyof unknown[] | keyof (readonly unknown[]) | `${number}`
 >;
