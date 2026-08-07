@@ -1,3 +1,9 @@
+## [1.2.23](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.22...v1.2.23) (2026-08-07)
+
+### Bug Fixes
+
+- update dependencies ([#252](https://github.com/noshiro-pf/octokit-safe-types/issues/252)) ([5a39119](https://github.com/noshiro-pf/octokit-safe-types/commit/5a39119b7df90ed715eddb804038b5ce0c19e7ad))
+
 ## [1.2.22](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.21...v1.2.22) (2026-08-05)
 
 ### Bug Fixes
