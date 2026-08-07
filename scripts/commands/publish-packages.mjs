@@ -12,7 +12,7 @@ const buildPkg = async (dir) => {
 /**
  * `pnpm publish` does not bump the version the way `pnpm run publish --patch` did,
  * so the bump is a separate step. `--no-git-checks` keeps the previous
- * behaviour of publishing without requiring a clean branch.
+ * behavior of publishing without requiring a clean branch.
  *
  * @param {string} dir
  */

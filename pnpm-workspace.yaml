@@ -4,9 +4,9 @@ packages:
   - 'scripts'
 
 # Yarn 1 hoisted everything into a single flat node_modules at the repo root and
-# the workspace packages rely on that (they call wireit / rimraf / eslint /
-# vitest etc. that are declared only in the root package.json). Keep the same
-# layout so the migration does not require touching 269 package.json files.
+# the workspace packages rely on that: they invoke build tooling that is
+# declared only in the root package.json. Keep the same layout so the migration
+# does not require touching 269 package.json files.
 nodeLinker: hoisted
 
 # Workspace dependencies are declared as "*" (608 occurrences) rather than with
@@ -18,7 +18,7 @@ linkWorkspacePackages: true
 # default. Auto-installing would shadow root tooling -- @noshiro/syncflow
 # declares `typescript: ^4.9.3` as a peer, which pulled TypeScript 4.9 into that
 # package and broke its build against the repo's TypeScript 5. Keep Yarn's
-# behaviour and resolve peers from what the workspace already installs.
+# behavior and resolve peers from what the workspace already installs.
 autoInstallPeers: false
 
 # Yarn 1 ran every dependency lifecycle script. pnpm 10 blocks them by default,

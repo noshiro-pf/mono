@@ -30,6 +30,9 @@ importers:
       '@noshiro/mono-configs':
         specifier: '*'
         version: link:configs
+      '@noshiro/ts-type-utils':
+        specifier: '*'
+        version: link:packages/ts-type-utils
       '@playwright/test':
         specifier: ^1.49.1
         version: 1.49.1
@@ -250,7 +253,11 @@ importers:
         specifier: ^8.3.2
         version: 8.3.2
 
-  configs: {}
+  configs:
+    dependencies:
+      '@noshiro/mono-utils':
+        specifier: '*'
+        version: link:../scripts
 
   packages/apps/algo-app:
     dependencies:
@@ -1848,7 +1855,11 @@ importers:
         specifier: '*'
         version: link:../../ts-type-utils
 
-  packages/others/ts_playground: {}
+  packages/others/ts_playground:
+    devDependencies:
+      '@noshiro/eslint-configs':
+        specifier: '*'
+        version: link:../../eslint-configs
 
   packages/slides/chain_rule:
     dependencies:
@@ -3061,6 +3072,10 @@ importers:
       tsutils:
         specifier: ^3.21.0
         version: 3.21.0(typescript@5.7.2)
+    devDependencies:
+      '@noshiro/eslint-configs':
+        specifier: '*'
+        version: link:../../eslint-configs
 
   packages/ts-type-utils:
     devDependencies:

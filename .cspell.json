@@ -246,6 +246,8 @@
     "wsrun",
     "ymdhm",
     "ymdhms",
+    "protobufjs",
+    "unrs",
     "zenn"
   ],
   "flagWords": [],

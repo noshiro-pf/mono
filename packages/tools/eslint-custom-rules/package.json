@@ -19,5 +19,8 @@
     "@typescript-eslint/types": "8.24.1",
     "lodash": "^4.17.21",
     "tsutils": "^3.21.0"
+  },
+  "devDependencies": {
+    "@noshiro/eslint-configs": "*"
   }
 }

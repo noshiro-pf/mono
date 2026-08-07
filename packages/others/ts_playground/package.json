@@ -12,5 +12,8 @@
     "prestart": "pnpm run build",
     "start": "node src/20201016_namespaces/main.js",
     "tsc": "tsc"
+  },
+  "devDependencies": {
+    "@noshiro/eslint-configs": "*"
   }
 }
