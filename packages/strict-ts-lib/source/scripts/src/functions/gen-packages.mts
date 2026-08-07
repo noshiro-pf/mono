@@ -314,13 +314,18 @@ const constructTypeScriptLibDependencies = async (
   useBrandedNumber: boolean,
   type: 'local' | 'global',
 ): Promise<Record<`@typescript/lib-${string}`, string>> => {
+  // The local form is a workspace alias rather than `file:`: pnpm treats a
+  // `file:` directory as an external package, so the lib's own
+  // @noshiro/ts-type-utils dependency would resolve to the published copy
+  // instead of the workspace one and the lib override would lose the type
+  // definitions it deliberately leaves out.
   const prefix = {
-    local: `file:./packages/strict-ts-lib/output${useBrandedNumber ? '-branded' : ''}/packages/`,
+    local: `workspace:${libName}${useBrandedNumber ? '-branded' : ''}-`,
     global: `npm:${libName}${useBrandedNumber ? '-branded' : ''}-`,
   }[type];
 
   const suffix = {
-    local: '',
+    local: '@*',
     global: `@${libVersion}`,
   }[type];
 
