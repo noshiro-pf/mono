@@ -3,11 +3,14 @@ import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { type DeepReadonly } from 'ts-type-forge';
 
+/** Mirrors the `int64` format, which `@octokit/openapi-types` emits as `number | bigint`. */
+const Int64 = t.union([t.number(), t.bigint()]);
+
 const SimpleUser = t.record({
   name: t.optional(t.union([t.string(), t.nullType])),
   email: t.optional(t.union([t.string(), t.nullType])),
   login: t.string(),
-  id: t.number(),
+  id: Int64,
   node_id: t.string(),
   avatar_url: t.string(),
   gravatar_id: t.union([t.string(), t.nullType]),
@@ -91,7 +94,7 @@ const SecurityAndAnalysis = t.union([
 ]);
 
 const Repository = t.record({
-  id: t.number(),
+  id: Int64,
   node_id: t.string(),
   name: t.string(),
   full_name: t.string(),
@@ -211,7 +214,7 @@ const Repository = t.record({
 const NullableRepository = t.union([Repository, t.nullType]);
 
 export const FullRepository = t.record({
-  id: t.number(),
+  id: Int64,
   node_id: t.string(),
   name: t.string(),
   full_name: t.string(),

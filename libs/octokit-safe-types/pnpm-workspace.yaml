@@ -10,7 +10,7 @@ update:
 # the global types it declares are then unreachable from the emitted `.d.mts`.
 # ts-type-forge is types-only, so overriding it has no runtime effect.
 overrides:
-  ts-type-forge: ^9.1.1
+  ts-type-forge: ^9.1.3
 
 minimumReleaseAge: 10080 # = 7 days
 

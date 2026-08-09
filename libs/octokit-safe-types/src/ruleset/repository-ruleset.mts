@@ -1,7 +1,11 @@
 import { type components } from '@octokit/openapi-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { type DeepReadonly } from 'ts-type-forge';
+import {
+  type DeepReadonly,
+  type StrictExtract,
+  type StrictPick,
+} from 'ts-type-forge';
 import { RepositoryRulesetBypassActor } from './bypass-actor.mjs';
 import { RepositoryRulesetConditions } from './conditions.mjs';
 import { RepositoryRule } from './repository-rule.mjs';
@@ -103,7 +107,7 @@ export const RepositoryRuleset = t.record({
 
 export type RepositoryRuleset = t.TypeOf<typeof RepositoryRuleset>;
 
-type PickKeys = Extract<
+type PickKeys = StrictExtract<
   keyof RepositoryRuleset,
   | 'id'
   | 'name'
@@ -122,13 +126,16 @@ type PickKeys = Extract<
 >;
 
 expectType<
-  Pick<RepositoryRuleset, PickKeys>,
-  Pick<DeepReadonly<components['schemas']['repository-ruleset']>, PickKeys>
+  StrictPick<RepositoryRuleset, PickKeys>,
+  StrictPick<
+    DeepReadonly<components['schemas']['repository-ruleset']>,
+    PickKeys
+  >
 >('=');
 
 expectType<
-  Pick<RepositoryRuleset, PickKeys>,
-  Pick<
+  StrictPick<RepositoryRuleset, PickKeys>,
+  StrictPick<
     DeepReadonly<{
       id: number;
       name: string;

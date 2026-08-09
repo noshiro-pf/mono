@@ -108,6 +108,39 @@ expectType<
   DeepReadonly<components['schemas']['repository-rule-required-signatures']>
 >('=');
 
+const RepositoryRuleParamsReviewer = t.record({
+  /** @description ID of the reviewer which must review changes to matching files. */
+  id: t.number(),
+
+  /**
+   * @description The type of the reviewer
+   * @enum {string}
+   */
+  type: t.literal('Team'),
+});
+
+expectType<
+  t.TypeOf<typeof RepositoryRuleParamsReviewer>,
+  DeepReadonly<components['schemas']['repository-rule-params-reviewer']>
+>('=');
+
+const RepositoryRuleParamsRequiredReviewerConfiguration = t.record({
+  /** @description Array of file patterns. Pull requests which change matching files must be approved by the specified team. File patterns use fnmatch syntax. */
+  file_patterns: t.array(t.string()),
+
+  /** @description Minimum number of approvals required from the specified team. If set to zero, the team will be added to the pull request but approval is optional. */
+  minimum_approvals: t.number(),
+
+  reviewer: RepositoryRuleParamsReviewer,
+});
+
+expectType<
+  t.TypeOf<typeof RepositoryRuleParamsRequiredReviewerConfiguration>,
+  DeepReadonly<
+    components['schemas']['repository-rule-params-required-reviewer-configuration']
+  >
+>('=');
+
 const RepositoryRulePullRequest = t.record({
   type: t.literal('pull_request'),
   parameters: t.optional(
@@ -116,9 +149,6 @@ const RepositoryRulePullRequest = t.record({
       allowed_merge_methods: t.optional(
         t.array(t.enumType(['merge', 'squash', 'rebase'])),
       ),
-
-      /** @description Automatically request review from Copilot for new pull requests, if the author has access to Copilot code review. */
-      automatic_copilot_code_review_enabled: t.optional(t.boolean()),
 
       /** @description New, reviewable commits pushed will dismiss previous pull request review approvals. */
       dismiss_stale_reviews_on_push: t.boolean(),
@@ -134,6 +164,16 @@ const RepositoryRulePullRequest = t.record({
 
       /** @description All conversations on code must be resolved before a pull request can be merged. */
       required_review_thread_resolution: t.boolean(),
+
+      /**
+       * @description > [!NOTE]
+       * > `required_reviewers` is in beta and subject to change.
+       *
+       * A collection of reviewers and associated file patterns. Each reviewer has a list of file patterns which determine the files that reviewer is required to review.
+       */
+      required_reviewers: t.optional(
+        t.array(RepositoryRuleParamsRequiredReviewerConfiguration),
+      ),
     }),
   ),
 });
