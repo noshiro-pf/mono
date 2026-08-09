@@ -1,5 +1,6 @@
 import { isTruthy } from '@sindresorhus/is';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
+import { type MutableRecord } from 'ts-type-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -12,7 +13,6 @@ export const expandMustMatchPatternProperties = (
 ): JSONSchema4 => {
   if (
     schema.patternProperties !== undefined &&
-    isRecord(schema.patternProperties) &&
     hasKey(schema.patternProperties, '^must(?:Not)?Match$')
   ) {
     const { patternProperties, properties, definitions, ...rest } = schema;
@@ -63,7 +63,7 @@ export const expandMustMatchPatternProperties = (
         mut_objectOption !== undefined
       ) {
         // propertyNames.enum から具体的なプロパティを生成
-        const mut_properties: Record<string, JSONSchema4> = {};
+        const mut_properties: MutableRecord<string, JSONSchema4> = {};
 
         const propertyNames =
           // eslint-disable-next-line total-functions/no-unsafe-type-assertion

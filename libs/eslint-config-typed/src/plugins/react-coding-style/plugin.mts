@@ -1,6 +1,8 @@
+import { type StrictOmit } from 'ts-type-forge';
 import { type ESLintPlugin } from '../../types/index.mjs';
 import { reactCodingStyleRules } from './rules/index.mjs';
 
-export const eslintPluginReactCodingStyle: Omit<ESLintPlugin, 'configs'> = {
-  rules: reactCodingStyleRules,
-} as const;
+export const eslintPluginReactCodingStyle: StrictOmit<ESLintPlugin, 'configs'> =
+  {
+    rules: reactCodingStyleRules,
+  } as const;

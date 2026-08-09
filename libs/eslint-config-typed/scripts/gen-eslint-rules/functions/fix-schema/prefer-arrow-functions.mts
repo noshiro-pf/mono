@@ -1,4 +1,5 @@
 import { Arr } from 'ts-data-forge';
+import { type MutableRecord } from 'ts-type-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -7,7 +8,7 @@ import { type JSONSchema4 } from '../type.mjs';
  */
 export const convertPatternToEnum = (schema: JSONSchema4): JSONSchema4 => {
   if (schema.type === 'object' && schema.properties !== undefined) {
-    const mut_newProperties: Record<string, JSONSchema4> = {};
+    const mut_newProperties: MutableRecord<string, JSONSchema4> = {};
 
     for (const [key, value] of Object.entries(schema.properties)) {
       if (

@@ -1,3 +1,5 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
+
 export const eslintPlugins = {
   EslintRules: {
     typeName: 'EslintRules',
@@ -185,7 +187,7 @@ export const eslintPlugins = {
     rulePrefix: 'ts-restrictions/',
     outputFileName: 'eslint-ts-restrictions-rules.mts',
   },
-} as const satisfies Record<
+} as const satisfies ReadonlyRecord<
   string,
   Readonly<{
     typeName: `${string}Rules`;

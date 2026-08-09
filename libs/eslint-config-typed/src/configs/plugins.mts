@@ -52,6 +52,8 @@ import eslintPluginMath from 'eslint-plugin-math';
 
 import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 
+import { type ReadonlyRecord, type StrictOmit } from 'ts-type-forge';
+
 // import eslintPluginTotalFunctions from 'eslint-plugin-total-functions';
 // import eslintPluginTreeShakable from 'eslint-plugin-tree-shakable';
 import {
@@ -66,7 +68,7 @@ import {
 
 import { type ESLintPlugin, type FlatConfig } from '../types/index.mjs';
 
-export const plugins: Record<
+export const plugins: ReadonlyRecord<
   | '@typescript-eslint'
   | '@stylistic'
   | 'array-func'
@@ -97,7 +99,7 @@ export const plugins: Record<
   | 'react-coding-style'
   | 'immer-coding-style'
   | 'vitest-coding-style',
-  Omit<ESLintPlugin, 'configs'>
+  StrictOmit<ESLintPlugin, 'configs'>
 > = {
   '@typescript-eslint': typescriptEslint,
   '@stylistic': stylistic,

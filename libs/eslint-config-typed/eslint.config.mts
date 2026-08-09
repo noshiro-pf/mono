@@ -9,7 +9,10 @@ import {
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
-import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import {
+  eslintPluginTsTypeForge,
+  type EslintTsTypeForgeRules,
+} from 'eslint-plugin-ts-type-forge';
 
 const thisDir = import.meta.dirname;
 
@@ -132,6 +135,24 @@ export default [
       'unicorn/comment-content': 'off',
       '@typescript-eslint/consistent-indexed-object-style': 'off',
     }),
+  },
+  {
+    // `json-schema-to-typescript` emits the built-in `Record` for
+    // `patternProperties` / `additionalProperties`, so the generated rule-type
+    // definitions cannot use the ts-type-forge aliases.
+    files: ['src/types/rules/**'],
+    rules: {
+      'ts-type-forge/prefer-readonly-or-mutable-record': 'off',
+    } satisfies Partial<EslintTsTypeForgeRules>,
+  },
+  {
+    // Verbatim copy of vitest's own `globals.d.ts`; keeping it byte-comparable
+    // with upstream matters more than the ts-type-forge alias preference.
+    files: ['vitest-globals.d.ts'],
+    rules: {
+      'ts-type-forge/prefer-readonly-or-mutable-record': 'off',
+      'ts-type-forge/prefer-strict-or-relaxed-utility-type': 'off',
+    } satisfies Partial<EslintTsTypeForgeRules>,
   },
 
   {

@@ -1,4 +1,5 @@
 import { Arr } from 'ts-data-forge';
+import { type MutableRecord } from 'ts-type-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -15,7 +16,7 @@ export const normalizeArrayItemsProperties = (
 
   let mut_hasChanges = false;
 
-  const mut_properties: Record<string, JSONSchema4> = {};
+  const mut_properties: MutableRecord<string, JSONSchema4> = {};
 
   for (const [key, property] of Object.entries(schema.properties)) {
     if (

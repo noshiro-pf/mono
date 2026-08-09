@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 import { Arr, isNonEmptyString, mapNullable } from 'ts-data-forge';
-import { type ReadonlyRecord } from 'ts-type-forge';
+import { type MutableRecord, type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 
 // Forked from https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/v1.3.27/strict-dependencies/resolveImportPath.js
@@ -14,7 +14,7 @@ export const resolveImportPath = (
   pathIndexMap: ReadonlyRecord<string, number>,
 ): string => {
   // Maps importAlias to OriginalPath
-  const mut_importAliasMap: Record<string, string> = {};
+  const mut_importAliasMap: MutableRecord<string, string> = {};
 
   let mut_importPath = importPath;
 

@@ -1,4 +1,5 @@
 import { hasKey } from 'ts-data-forge';
+import { type MutableRecord } from 'ts-type-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -26,7 +27,7 @@ export const expandBooleanObjectProperties = (
         'unassigned',
       ] as const;
 
-      const mut_properties: Record<string, JSONSchema4> = {};
+      const mut_properties: MutableRecord<string, JSONSchema4> = {};
 
       for (const key of propertyKeys) {
         mut_properties[key] =

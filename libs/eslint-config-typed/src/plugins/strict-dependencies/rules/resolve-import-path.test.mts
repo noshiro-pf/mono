@@ -1,3 +1,4 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { resolveImportPath } from './resolve-import-path.mjs';
 
@@ -92,7 +93,7 @@ const compilerOptionsByFixture = {
       '@/components/*': ['src/components/*', 'src/alternativeComponents/*'],
     },
   },
-} as const satisfies Readonly<Record<string, ts.CompilerOptions>>;
+} as const satisfies ReadonlyRecord<string, ts.CompilerOptions>;
 
 type FixtureName = keyof typeof compilerOptionsByFixture;
 

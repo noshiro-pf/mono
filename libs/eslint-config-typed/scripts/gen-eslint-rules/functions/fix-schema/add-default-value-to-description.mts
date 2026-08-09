@@ -1,3 +1,4 @@
+import { type MutableRecord } from 'ts-type-forge';
 import { type JSONSchema4 } from '../type.mjs';
 
 /**
@@ -11,7 +12,7 @@ export const addDefaultValuesToDescription = (
     return schema;
   }
 
-  const mut_newProperties: Record<string, JSONSchema4> = {};
+  const mut_newProperties: MutableRecord<string, JSONSchema4> = {};
 
   for (const [key, propSchema] of Object.entries(schema.properties)) {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
