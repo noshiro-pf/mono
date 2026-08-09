@@ -1,3 +1,13 @@
+# [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
+
+### Bug Fixes
+
+- make CI pass after the pnpm update ([#173](https://github.com/noshiro-pf/github-settings-as-code/issues/173)) ([ea4b287](https://github.com/noshiro-pf/github-settings-as-code/commit/ea4b28730598381e35531fa5c3485422ec8d3a99))
+
+### Features
+
+- stop managing the retired release-bot client-id variables ([#172](https://github.com/noshiro-pf/github-settings-as-code/issues/172)) ([400d7f2](https://github.com/noshiro-pf/github-settings-as-code/commit/400d7f2a0e9f79dc3e129a7f0507df4c4aeb162f))
+
 ## [2.0.1](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.0...v2.0.1) (2026-08-03)
 
 ### Bug Fixes
