@@ -165,5 +165,5 @@ echo
 echo "--- prettier ---"
 
 if [ -n "${index_ts_files}" ]; then
-    node "${SCRIPT_DIR}"/../../node_modules/.bin/prettier --config "${SCRIPT_DIR}"/../../.prettierrc --ignore-unknown --no-error-on-unmatched-pattern --write ${index_ts_files}
+    "${SCRIPT_DIR}"/../../node_modules/.bin/prettier --config "${SCRIPT_DIR}"/../../.prettierrc --ignore-unknown --no-error-on-unmatched-pattern --write ${index_ts_files}
 fi

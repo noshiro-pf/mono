@@ -5,20 +5,13 @@ export const utilsDirs = [
   'packages/apps/event-schedule-app-shared',
 ];
 
-export const wsrunOptions = [
-  '--exclude-missing',
-  '--fast-exit',
-  '--prefix',
-  '--parallel --concurrency 5',
-  '--ifDependency',
-  '--report',
+export const pnpmParallelOptions = [
+  // Run packages independently of the dependency graph, capped concurrency.
+  '--no-sort',
+  '--workspace-concurrency=5',
 ].join(' ');
 
-export const wsrunStagesOptions = [
-  '--exclude-missing',
-  '--fast-exit',
-  '--prefix',
-  '--stages',
-  '--ifDependency',
-  '--report',
+export const pnpmStagesOptions = [
+  // pnpm orders recursive runs topologically by default.
+  '--workspace-concurrency=5',
 ].join(' ');

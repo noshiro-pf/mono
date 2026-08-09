@@ -37,27 +37,30 @@ jobs:
       fail-fast: true
       matrix:
         command:
-          - fmt
-          - ws:gi
-          - type-check-eslint-configs
-          - ws:type-check
-          - ws:test
-          - ws:build:non-utils
-          - ws:lint:fix
-          - workspace @noshiro/syncflow test:stream
+          - run fmt
+          - run ws:gi
+          - run type-check-eslint-configs
+          - run ws:type-check
+          - run ws:test
+          - run ws:build:non-utils
+          - run ws:lint:fix
+          - --filter @noshiro/syncflow run test:stream
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
       - name: Set up Node.js 20.x
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         id: setup_node_id
         with:
           node-version: 20
-          cache: 'yarn'
-          cache-dependency-path: yarn.lock
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
 
       # # Set up GitHub Actions caching for Wireit.
       # - uses: google/wireit@setup-github-actions-caching/v1.0.2
@@ -65,17 +68,17 @@ jobs:
       # - run: echo '${{ toJSON(steps.setup_node_id.outputs) }}'
       # - if: ${{ steps.setup_node_id.outputs.cache-hit != 'true' }}
       - name: Install dependencies
-        run: yarn
+        run: pnpm install
 
       - name: Setup
-        run: yarn setup
+        run: pnpm run setup
 
       - name: Check if there is no file diff
-        run: yarn zz:check:no-diff
+        run: pnpm run zz:check:no-diff
 
       - name: Run "${{ matrix.command }}"
-        run: yarn ${{ matrix.command }}
+        run: pnpm ${{ matrix.command }}
 
-      - if: ${{ !contains(fromJSON('["ws:type-check", "ws:test", "workspace @noshiro/syncflow test:stream"]'), matrix.command) }}
+      - if: ${{ !contains(fromJSON('["run ws:type-check", "run ws:test", "--filter @noshiro/syncflow run test:stream"]'), matrix.command) }}
         name: Check if there is no file diff
-        run: yarn zz:check:no-diff
+        run: pnpm run zz:check:no-diff

@@ -1,4 +1,4 @@
-// usage: yarn create:preact-app <new-app-name>
+// usage: pnpm run create:preact-app <new-app-name>
 
 import 'zx/globals';
 
@@ -38,5 +38,5 @@ export const createNewPackageShared = async ({
 
   echo`created ${parentDir}/${newPackageName}`;
 
-  echo`don't forget to add "${newPackageName}" to yarn workspaces!`;
+  echo`don't forget to add "${newPackageName}" to pnpm-workspace.yaml!`;
 };

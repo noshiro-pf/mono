@@ -26,5 +26,8 @@
     "build:rename1": "mv define-rollup-config-source.mjs define-rollup-config.mjs",
     "build:rename2": "mv define-rollup-config-source.d.mts define-rollup-config.d.mts",
     "build:tsc": "tsc"
+  },
+  "dependencies": {
+    "@noshiro/mono-utils": "*"
   }
 }

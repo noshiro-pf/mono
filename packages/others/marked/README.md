@@ -1,7 +1,7 @@
 ### sample
 
 ```sh
-yarn marked ./sample1.md -o sample1.html
+pnpm exec marked ./sample1.md -o sample1.html
 ```
 
 ### Links

@@ -6,7 +6,7 @@ export const formatFiles = async (
   absolutePaths: string,
 ): Promise<'ok' | 'err'> => {
   cd(paths.strictTsLib.source.$);
-  const res = await $`yarn zz:prettier ${absolutePaths}`;
+  const res = await $`pnpm run zz:prettier ${absolutePaths}`;
   if (res.exitCode !== 0) {
     console.error(res);
     return 'err';

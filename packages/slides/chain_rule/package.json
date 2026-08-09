@@ -10,7 +10,7 @@
     "build": "wireit",
     "clean": "run-p clean:**",
     "clean:build": "rimraf dist",
-    "fb:deploy": "yarn z:fb:deploy:wireit",
+    "fb:deploy": "pnpm run z:fb:deploy:wireit",
     "fb:init": "firebase init",
     "fb:login": "firebase login",
     "preview": "vite preview",
@@ -35,7 +35,7 @@
       "dependencies": [
         "build"
       ],
-      "command": "yarn z:fb:deploy:impl"
+      "command": "pnpm run z:fb:deploy:impl"
     }
   }
 }

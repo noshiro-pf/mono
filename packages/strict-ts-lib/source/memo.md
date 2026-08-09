@@ -1,7 +1,7 @@
 # memo
 
 ```sh
-yarn gen
+pnpm run gen
 ```
 
 https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-5.html#supporting-lib-from-node_modules

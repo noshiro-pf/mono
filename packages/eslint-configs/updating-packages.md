@@ -6,7 +6,7 @@
 2. Update packages
 
 ```sh
-$   yarn add  \
+$   pnpm add  \
     @types/eslint@latest                        \
     @typescript-eslint/eslint-plugin@latest     \
     @typescript-eslint/parser@latest            \
@@ -38,5 +38,5 @@ $   yarn add  \
 then
 
 ```sh
-$  yarn gen-rules-type
+$  pnpm run gen-rules-type
 ```

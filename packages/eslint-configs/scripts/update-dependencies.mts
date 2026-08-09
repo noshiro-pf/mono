@@ -83,17 +83,17 @@ const main = async (): Promise<void> => {
       'eslint',
     ] as const;
 
-    await $`yarn add ${packages.map((a) => `${a}@latest`)}`;
+    await $`pnpm add ${packages.map((a) => `${a}@latest`)}`;
 
     await rewritePackageVersion(`${eslintDir}/package.json`, 'dependencies');
 
-    await $`yarn add -D json-schema-to-typescript@latest`;
+    await $`pnpm add -D json-schema-to-typescript@latest`;
   }
 
   cd(monoRootDir);
 
-  echo`yarn install`;
-  await $`yarn install`;
+  echo`pnpm install`;
+  await $`pnpm install`;
 
   cd(eslintDir);
 
@@ -109,7 +109,7 @@ const main = async (): Promise<void> => {
       'eslint',
     ];
 
-    await $`yarn add -D ${packages.map((a) => `${a}@latest`)}`;
+    await $`pnpm add -D ${packages.map((a) => `${a}@latest`)}`;
 
     await rewritePackageVersion(
       `${strictTsLibSourceDir}/package.json`,
@@ -119,9 +119,9 @@ const main = async (): Promise<void> => {
 
   cd(monoRootDir);
 
-  await $`yarn install`;
+  await $`pnpm install`;
 
-  await $`yarn fmt:diff`;
+  await $`pnpm run fmt:diff`;
 };
 
 main().catch(console.error);

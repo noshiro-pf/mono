@@ -11,7 +11,7 @@
     "build_": "tsc --project tsconfig.json",
     "clean": "rimraf lib",
     "lint_": "eslint src/**/*.ts",
-    "prebuild": "yarn clean"
+    "prebuild": "pnpm run clean"
   },
   "dependencies": {
     "@typescript-eslint/experimental-utils": "^5.59.11",
@@ -19,5 +19,8 @@
     "@typescript-eslint/types": "8.24.1",
     "lodash": "^4.17.21",
     "tsutils": "^3.21.0"
+  },
+  "devDependencies": {
+    "@noshiro/eslint-configs": "*"
   }
 }

@@ -16,6 +16,10 @@ const defineConfig = async () => {
   const restrictedImports =
     await genEsLintRestrictedImportsDefFromDevDependencies(
       packageJson.devDependencies,
+      // Resolve the @noshiro/global-* packages from this package, which
+      // is where they are declared as dependencies.
+      // eslint-disable-next-line import/dynamic-import-chunkname
+      async (specifier) => import(specifier),
     );
 
   /** @type {readonly FlatConfig[]} */

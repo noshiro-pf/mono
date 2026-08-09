@@ -158,24 +158,24 @@ const updatePackageJsonImpl = (
         const filename = './ts-type-utils.d.mts';
 
         mut_packageJson['scripts'] = {
-          build: 'yarn zz:build:seq',
+          build: 'pnpm run zz:build:seq',
           clean: 'run-p clean:**',
           'clean:wireit': 'rimraf .wireit/**',
-          fmt: 'yarn zz:prettier .',
-          lint: 'yarn zz:eslint:src-and-test',
-          'lint:fix': 'yarn zz:eslint:src-and-test --fix',
-          pub: 'yarn zz:publish',
-          tsc: 'yarn type-check',
-          tscw: 'yarn type-check --watch',
+          fmt: 'pnpm run zz:prettier .',
+          lint: 'pnpm run zz:eslint:src-and-test',
+          'lint:fix': 'pnpm run zz:eslint:src-and-test --fix',
+          pub: 'pnpm run zz:publish',
+          tsc: 'pnpm run type-check',
+          tscw: 'pnpm run type-check --watch',
           'type-check': 'tsc --noEmit',
           'zz:build:seq': 'run-s zz:build:step1',
 
           'zz:build:step1': `ls src/*.d.mts | sed -E 's@(^.*$)@/// <reference path="./\\1" />@g' > ${filename}`,
 
           'zz:eslint': 'ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint',
-          'zz:eslint:src-and-test': 'yarn zz:eslint "./{src,test}/**"',
+          'zz:eslint:src-and-test': 'pnpm run zz:eslint "./{src,test}/**"',
           'zz:prettier': `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`,
-          'zz:publish': 'yarn publish --no-git-tag-version --access=public',
+          'zz:publish': 'pnpm publish --access public --no-git-checks',
         };
 
         break;
@@ -209,13 +209,13 @@ const updatePackageJsonImpl = (
         }
 
         {
-          mut_scripts['fmt'] = 'yarn zz:prettier .';
+          mut_scripts['fmt'] = 'pnpm run zz:prettier .';
           mut_scripts['zz:prettier'] =
             `prettier --cache --cache-strategy content --ignore-path ${pathPrefixToRoot}/.prettierignore --write`;
         }
 
         if (generateFlag.typeCheck) {
-          mut_scripts['tsc'] = 'yarn type-check';
+          mut_scripts['tsc'] = 'pnpm run type-check';
           mut_scripts['tscw'] = 'tsc --noEmit --watch';
 
           if (cfg.useVite === true) {
@@ -283,7 +283,7 @@ const updatePackageJsonImpl = (
             };
             mut_wireit['build'] = {
               dependencies: ['pre-build'],
-              command: 'yarn zz:vite build',
+              command: 'pnpm run zz:vite build',
             };
           } else {
             if (packageName.startsWith('global-')) {
@@ -320,8 +320,8 @@ const updatePackageJsonImpl = (
               ? `./${workspaceConfigsDirName}/${viteConfigName}`
               : `./${workspaceConfigsDirName}/${vitestConfigName}`;
 
-          mut_scripts['test'] = 'yarn zz:vitest run';
-          mut_scripts['testw'] = 'yarn zz:vitest watch';
+          mut_scripts['test'] = 'pnpm run zz:vitest run';
+          mut_scripts['testw'] = 'pnpm run zz:vitest watch';
 
           mut_scripts['zz:vitest'] = `vitest --config ${vitestConfigPath}`;
         }
@@ -331,32 +331,32 @@ const updatePackageJsonImpl = (
             mut_scripts['lint'] = 'run-p lint:src lint:e2e';
             mut_scripts['lint:src'] =
               packageName === 'syncflow'
-                ? 'yarn zz:eslint:src-and-test'
-                : 'yarn zz:eslint:src';
-            mut_scripts['lint:e2e'] = 'yarn zz:eslint:e2e';
+                ? 'pnpm run zz:eslint:src-and-test'
+                : 'pnpm run zz:eslint:src';
+            mut_scripts['lint:e2e'] = 'pnpm run zz:eslint:e2e';
 
             mut_scripts['lint:fix'] = 'run-p lint:fix:src lint:fix:e2e';
             mut_scripts['lint:fix:src'] =
               packageName === 'syncflow'
-                ? 'yarn zz:eslint:src-and-test --fix'
-                : 'yarn zz:eslint:src --fix';
-            mut_scripts['lint:fix:e2e'] = 'yarn zz:eslint:e2e --fix';
+                ? 'pnpm run zz:eslint:src-and-test --fix'
+                : 'pnpm run zz:eslint:src --fix';
+            mut_scripts['lint:fix:e2e'] = 'pnpm run zz:eslint:e2e --fix';
           } else {
             mut_scripts['lint'] =
               packageName === 'syncflow'
-                ? 'yarn zz:eslint:src-and-test'
-                : 'yarn zz:eslint:src';
+                ? 'pnpm run zz:eslint:src-and-test'
+                : 'pnpm run zz:eslint:src';
             mut_scripts['lint:fix'] =
               packageName === 'syncflow'
-                ? 'yarn zz:eslint:src-and-test --fix'
-                : 'yarn zz:eslint:src --fix';
+                ? 'pnpm run zz:eslint:src-and-test --fix'
+                : 'pnpm run zz:eslint:src --fix';
           }
 
           mut_scripts['zz:eslint'] =
             'ESLINT_USE_FLAT_CONFIG=true TIMING=1 eslint';
 
           mut_scripts['zz:eslint:print-config'] = [
-            'yarn zz:eslint --print-config',
+            'pnpm run zz:eslint --print-config',
             cfg.useVite === true ? 'src/main.tsx' : 'src/index.mts',
           ].join(' ');
 
@@ -370,7 +370,7 @@ const updatePackageJsonImpl = (
               ? 'zz:eslint:src-and-test'
               : 'zz:eslint:src'
           ] = [
-            `yarn zz:eslint --config ${eslintConfigName}`,
+            `pnpm run zz:eslint --config ${eslintConfigName}`,
             `'./${srcDirStr}/**/*'`,
           ].join(' ');
 
@@ -379,16 +379,16 @@ const updatePackageJsonImpl = (
             cfg.packageJson.scripts.e2e === 'playwright'
           ) {
             mut_scripts['zz:eslint:e2e'] = [
-              `yarn zz:eslint --config ${eslintConfigName}`,
+              `pnpm run zz:eslint --config ${eslintConfigName}`,
               "'./e2e/**/*.ts'",
             ].join(' ');
           }
         }
 
         if (generateFlag.publish) {
-          mut_scripts['pub'] = 'yarn zz:publish';
+          mut_scripts['pub'] = 'pnpm run zz:publish';
           mut_scripts['zz:publish'] =
-            'yarn publish --no-git-tag-version --access=public';
+            'pnpm publish --access public --no-git-checks';
         }
 
         if (
@@ -400,7 +400,7 @@ const updatePackageJsonImpl = (
 
           mut_scripts['gen:re-export'] = 'wireit';
           mut_scripts['gen:re-export:fmt'] =
-            'yarn zz:prettier src/syncflow.mts';
+            'pnpm run zz:prettier src/syncflow.mts';
           mut_scripts['gen:re-export:script'] =
             'zx ./scripts/generate-re-export-script.mjs';
 
@@ -411,13 +411,13 @@ const updatePackageJsonImpl = (
         }
 
         if (cfg.useVite === true) {
-          mut_scripts['build:no-minify'] = 'yarn build --minify false';
+          mut_scripts['build:no-minify'] = 'pnpm run build --minify false';
           mut_scripts['clean:firebase'] = 'rimraf .firebase';
 
           if (cfg.packageJson.scripts.e2e === 'playwright') {
             mut_scripts['e2e'] =
               `playwright test --config ${workspaceConfigsDirName}/${playwrightConfigName}`;
-            mut_scripts['e2e:ui'] = 'yarn e2e --ui';
+            mut_scripts['e2e:ui'] = 'pnpm run e2e --ui';
           }
 
           mut_scripts['fb'] = 'firebase';
@@ -441,10 +441,10 @@ const updatePackageJsonImpl = (
           mut_scripts['fb:login'] = 'firebase login';
           mut_scripts['fb:login:ci'] = 'firebase login:ci';
 
-          mut_scripts['preview'] = 'yarn zz:vite:preview';
+          mut_scripts['preview'] = 'pnpm run zz:vite:preview';
           mut_scripts['serve'] = 'firebase serve';
           mut_scripts['start'] = 'run-p start:**';
-          mut_scripts['start:dev-server'] = 'yarn zz:vite --port 5180';
+          mut_scripts['start:dev-server'] = 'pnpm run zz:vite --port 5180';
 
           mut_scripts['z:setup'] = 'run-p z:setup:gen-global-dts';
           mut_scripts['z:setup:gen-global-dts'] =
@@ -452,7 +452,7 @@ const updatePackageJsonImpl = (
 
           mut_scripts['zz:vite'] =
             `vite --config ${workspaceConfigsDirName}/${viteConfigName}`;
-          mut_scripts['zz:vite:preview'] = 'yarn zz:vite preview';
+          mut_scripts['zz:vite:preview'] = 'pnpm run zz:vite preview';
 
           if (
             packageName === 'event-schedule-app' ||
@@ -465,7 +465,8 @@ const updatePackageJsonImpl = (
               command: 'firebase deploy --only functions',
             };
 
-            mut_scripts['start:build-functions'] = 'cd functions && yarn watch';
+            mut_scripts['start:build-functions'] =
+              'cd functions && pnpm run watch';
             mut_scripts['start:emulators'] = 'wireit';
 
             mut_wireit['start:emulators'] = {
@@ -500,7 +501,7 @@ const updatePackageJsonImpl = (
               'zx ./scripts/export-firestore > ./scripts/firestore_backup.json && prettier --cache --cache-strategy content --write ./scripts/firestore_backup.json';
 
             mut_scripts['build:functions'] =
-              'yarn workspace @noshiro/event-schedule-app-functions build';
+              'pnpm --filter @noshiro/event-schedule-app-functions run build';
 
             mut_scripts['fb:write'] = 'zx ./scripts/write_firestore';
 
@@ -526,7 +527,7 @@ const updatePackageJsonImpl = (
         }
 
         if (packageName.startsWith('global-')) {
-          mut_scripts['zz:fmt-src'] = 'yarn zz:prettier ./src';
+          mut_scripts['zz:fmt-src'] = 'pnpm run zz:prettier ./src';
           mut_scripts['zz:gen'] = `zx ./${workspaceScriptsDirName}/gen.mjs`;
           mut_scripts['zz:setup'] =
             'run-s clean:src zz:gen zz:fmt-src type-check';
@@ -534,7 +535,7 @@ const updatePackageJsonImpl = (
 
         if (packageName === 'syncflow') {
           mut_scripts['start'] = 'node esm/test/preview-main.js';
-          mut_scripts['test:stream'] = 'yarn zz:vitest:stream run';
+          mut_scripts['test:stream'] = 'pnpm run zz:vitest:stream run';
           mut_scripts['zz:vitest:stream'] =
             `vitest --config ./${workspaceConfigsDirName}/vitest.config.stream.ts`;
         }
@@ -554,11 +555,10 @@ const updatePackageJsonImpl = (
 
     const mut_ref = mut_packageJson['devDependencies'];
 
-    if (
-      packageName === 'eslint-configs' ||
-      packageName === 'goober' ||
-      packageName === 'strict-ts-lib'
-    ) {
+    // strict-ts-lib is not in this list: its eslint.config.js imports
+    // @noshiro/eslint-configs, and pnpm only links a workspace package where it
+    // is declared (Yarn's flat node_modules used to make it resolvable anyway).
+    if (packageName === 'eslint-configs' || packageName === 'goober') {
       delete mut_ref['@noshiro/eslint-configs'];
     } else {
       mut_ref['@noshiro/eslint-configs'] = '*';

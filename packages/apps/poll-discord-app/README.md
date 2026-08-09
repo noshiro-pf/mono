@@ -69,14 +69,14 @@ result
 
 1. `cp dotenv-example .env.dev`
 1. Set environment variable `DISCORD_TOKEN` generated at [Discord Developer Portal](https://discord.com/developers/applications).
-1. `yarn build`
-1. `yarn start`
+1. `pnpm run build`
+1. `pnpm run start`
 
 ### Production Environment
 
 1. (local) `cp dotenv-example .env.prd`
 1. (local) Set environment variable `DISCORD_TOKEN` generated at [Discord Developer Portal](https://discord.com/developers/applications).
-1. (local) `yarn gcloud:scp`
+1. (local) `pnpm run gcloud:scp`
 1. (in VM) `nohup node ./index.mjs &`
 
 ## Links

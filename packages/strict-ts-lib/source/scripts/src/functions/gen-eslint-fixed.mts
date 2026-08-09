@@ -26,7 +26,7 @@ export const genEslintFixed = async (): Promise<'ok' | 'err'> => {
 
   {
     const res =
-      await $`yarn zz:eslint ${eslintFixed.$} --config ./configs/eslint.config.gen.mjs --fix || true`;
+      await $`pnpm run zz:eslint ${eslintFixed.$} --config ./configs/eslint.config.gen.mjs --fix || true`;
     if (res.exitCode !== 0) {
       console.error(res.stderr);
       return 'err';

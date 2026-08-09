@@ -1,8 +1,8 @@
 import { forEachPackages } from '../esm/index.mjs';
-import { utilsDirs, wsrunOptions } from './constants.mjs';
+import { pnpmParallelOptions, utilsDirs } from './constants.mjs';
 
 forEachPackages({
   prefixes: utilsDirs,
   command: 'lint',
-  wsrunOptions,
+  pnpmOptions: pnpmParallelOptions,
 }).catch(console.error);

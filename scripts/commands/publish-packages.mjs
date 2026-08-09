@@ -6,12 +6,20 @@ const monoRootDir = path.resolve(thisDir, '../..');
 /** @param {string} dir */
 const buildPkg = async (dir) => {
   cd(`${monoRootDir}/${dir}`);
-  await $`yarn build`;
+  await $`pnpm run build`;
 };
 
-/** @param {string} dir */
+/**
+ * `pnpm publish` does not bump the version the way `pnpm run publish --patch` did,
+ * so the bump is a separate step. `--no-git-checks` keeps the previous
+ * behavior of publishing without requiring a clean branch.
+ *
+ * @param {string} dir
+ */
 const publishPkg = async (dir) => {
-  await $`yarn publish "${monoRootDir}/${dir}" --patch --no-git-tag-version --access=public`;
+  cd(`${monoRootDir}/${dir}`);
+  await $`pnpm version patch --no-git-tag-version`;
+  await $`pnpm publish --access public --no-git-checks`;
 };
 
 /** @param {string} dir */

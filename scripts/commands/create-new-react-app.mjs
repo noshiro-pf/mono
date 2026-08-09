@@ -1,4 +1,4 @@
-// usage: yarn create:react-app <new-app-name>
+// usage: pnpm run create:react-app <new-app-name>
 
 import 'zx/globals';
 import { createNewPackageShared } from './create-new-package-shared.mjs';

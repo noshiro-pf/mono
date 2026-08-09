@@ -4,12 +4,12 @@ import { getWorkspaces } from './get-workspaces.mjs';
 export const forEachPackages = async ({
   prefixes,
   command,
-  wsrunOptions,
+  pnpmOptions,
   treatPrefixesAsExcludeList = false,
 }: Readonly<{
   prefixes: readonly string[];
   command: string;
-  wsrunOptions: string;
+  pnpmOptions: string;
   treatPrefixesAsExcludeList?: boolean;
 }>): Promise<void> => {
   const workspaces = await getWorkspaces();
@@ -31,11 +31,11 @@ export const forEachPackages = async ({
   }
 
   const fullCommand: string = [
-    'yarn',
-    'wsrun',
-    wsrunOptions,
-    `-p ${packageNameList.join(' ')}`,
-    `-c ${command}`,
+    'pnpm',
+    packageNameList.map((packageName) => `--filter ${packageName}`).join(' '),
+    pnpmOptions,
+    'run',
+    command,
   ].join(' ');
 
   console.log(fullCommand);

@@ -1,4 +1,4 @@
-// usage: yarn create:util <new-util-name>
+// usage: pnpm run create:util <new-util-name>
 
 import 'zx/globals';
 import { createNewPackageShared } from './create-new-package-shared.mjs';
