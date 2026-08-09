@@ -1,5 +1,47 @@
 ## [7.2.1](https://github.com/noshiro-pf/ts-type-forge/compare/v7.2.0...v7.2.1) (2026-07-21)
 
+## 9.2.0
+
+### Minor Changes
+
+- d0a0a3d: Add `Tuple.MapTo<E, T>`, the named homomorphic tuple mapping.
+
+    It replaces the element type of a tuple or array with `E` while keeping its
+    shape — length, rest and optional positions alike — i.e. the named spelling of
+    `Readonly<{ [K in keyof T]: E }>`. The counterpart of `ArrayElement`, which
+    reads the element type out.
+
+    `ChangeArrayElement` already covered this, but it is brand-aware, so it answers
+    with a conditional on `HasLengthConstraint<T>`. A bare type parameter cannot
+    decide that conditional, and the deferred result is not assignable to the
+    caller's own `{ [K in keyof T]: E }`, which makes it unusable as an annotation
+    inside a function that is itself generic over the tuple — exactly where a name
+    for the shape is most wanted. `Tuple.MapTo` is the plain homomorphic mapping
+    for that case. Keep using `ChangeArrayElement` whenever the input may carry a
+    length-constraint brand.
+
+### Patch Changes
+
+- ca73a82: Back every JSDoc `@example` with a type-checked sample file.
+
+    95 examples across 25 modules were written as bare JSDoc lines rather than
+    ` ```ts ` blocks sourced from `samples/src`, so they were never compiled. Six
+    had drifted:
+
+    - `RecordPaths` / `RecordPathsWithIndex` / `RecordLeafPaths` /
+      `RecordLeafPathsWithIndex` / `RecordPathAndValueTypeTuple` documented
+      themselves under names that do not exist (`Paths`, `PathsWithIndex`,
+      `LeafPaths`, `LeafPathsWithIndex`, `KeyPathAndValueTypeAtPathTuple`).
+    - `List.Partition` advertised `List.Partition<3, readonly number[]>`, which
+      does not compile: partitioning a non-fixed-length array exceeds TypeScript's
+      instantiation depth (TS2589). The example now shows the tuple cases that do
+      work.
+
+    `doc:embed:jsdoc` now keys its coverage check off the `@example` tag rather
+    than the ` ```ts ` fence, so an unfenced — and therefore unchecked — example
+    fails the build instead of passing unnoticed, both in an unregistered module
+    and in a registered one.
+
 ## 9.1.3
 
 ### Patch Changes
