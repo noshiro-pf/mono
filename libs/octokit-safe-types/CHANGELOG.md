@@ -1,3 +1,9 @@
+## [1.2.24](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.23...v1.2.24) (2026-08-09)
+
+### Bug Fixes
+
+- update dependencies and fix errors, align validators with @octokit/openapi-types v28 ([#254](https://github.com/noshiro-pf/octokit-safe-types/issues/254)) ([2e96200](https://github.com/noshiro-pf/octokit-safe-types/commit/2e96200d60c09c3da25ad8565524ca3d7e7b7b31))
+
 ## [1.2.23](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.22...v1.2.23) (2026-08-07)
 
 ### Bug Fixes
