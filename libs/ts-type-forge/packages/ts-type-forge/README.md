@@ -802,6 +802,7 @@ For detailed information on all types, see the [Full API Reference](./docs/READM
     - [Tuple.Concat](./src/tuple-and-list/tuple.mts#L262)
     - [Tuple.Zip](./src/tuple-and-list/tuple.mts#L281)
     - [Tuple.Partition](./src/tuple-and-list/tuple.mts#L306)
+    - [Tuple.MapTo](./src/tuple-and-list/tuple.mts#L353)
 - src/type-level-integer/abs.mts
     - [AbsoluteValue](./src/type-level-integer/abs.mts#L19)
     - [Abs](./src/type-level-integer/abs.mts#L38)

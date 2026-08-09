@@ -441,6 +441,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/tuple-and-list/tuple-concat-example.mts',
       'samples/src/tuple-and-list/tuple-zip-example.mts',
       'samples/src/tuple-and-list/tuple-partition-example.mts',
+      'samples/src/tuple-and-list/tuple-map-to-example.mts',
     ],
   },
   {

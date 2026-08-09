@@ -572,5 +572,9 @@ declare global {
       N extends number,
       T extends readonly unknown[],
     > = _TSTypeForge.Tuple.Partition<N, T>;
+    export type MapTo<
+      E,
+      T extends readonly unknown[],
+    > = _TSTypeForge.Tuple.MapTo<E, T>;
   }
 }

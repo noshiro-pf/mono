@@ -22,6 +22,9 @@ type _Cases = readonly [
   // transformer-ignore-next-line convert-to-readonly
   ExpectTrue<TypeEq<Mutable<Readonly<{ x: 1 }>>, { x: 1 }>>,
   ExpectTrue<TypeEq<List.Last<readonly [1, 2, 3]>, 3>>,
+  ExpectTrue<
+    TypeEq<Tuple.MapTo<boolean, readonly [1, 'a']>, readonly [boolean, boolean]>
+  >,
   ExpectTrue<TypeEq<JsonPrimitive, boolean | number | string | null>>,
 ];
 

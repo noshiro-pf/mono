@@ -1,4 +1,8 @@
 import { expectType } from 'ts-data-forge';
+import {
+  type ChangeArrayElement,
+  type MinLengthArray,
+} from '../branded-types/index.mjs';
 import { type DeepReadonly } from '../record/index.mjs';
 import { type FixedLengthTuple } from './length-constrained-tuple.mjs';
 import { type Tuple } from './tuple.mjs';
@@ -299,5 +303,119 @@ import { type Tuple } from './tuple.mjs';
   expectType<
     Tuple.Partition<0 | 2, readonly [1, 2]>,
     readonly (readonly (1 | 2)[])[]
+  >('=');
+}
+
+// Tuple.MapTo replaces the element type while keeping the shape
+
+{
+  expectType<
+    Tuple.MapTo<boolean, readonly [1, 'a']>,
+    readonly [boolean, boolean]
+  >('=');
+
+  expectType<Tuple.MapTo<string, readonly []>, readonly []>('=');
+
+  expectType<Tuple.MapTo<string, readonly [1]>, readonly [string]>('=');
+
+  expectType<Tuple.MapTo<string, readonly number[]>, readonly string[]>('=');
+
+  // A mutable input yields a readonly result.
+  expectType<Tuple.MapTo<string, [1, 'a']>, readonly [string, string]>('=');
+
+  // Rest and optional positions survive the mapping.
+  expectType<
+    Tuple.MapTo<string, readonly [1, ...(readonly 2[])]>,
+    readonly [string, ...(readonly string[])]
+  >('=');
+
+  expectType<
+    Tuple.MapTo<string, readonly [...(readonly 1[]), 2]>,
+    readonly [...(readonly string[]), string]
+  >('=');
+
+  expectType<
+    Tuple.MapTo<string, readonly [1, 2?]>,
+    readonly [string, (string | undefined)?]
+  >('=');
+
+  // `never` / `unknown` are element types like any other.
+  expectType<Tuple.MapTo<never, readonly [1, 2]>, readonly [never, never]>('=');
+
+  expectType<
+    Tuple.MapTo<unknown, readonly [1, 2]>,
+    readonly [unknown, unknown]
+  >('=');
+
+  // The result is still an array type -- which is exactly what
+  // `ReadonlyRecord<keyof T, E>` would have thrown away.
+  expectType<
+    Tuple.MapTo<string, readonly [1, 'a']> extends readonly unknown[]
+      ? true
+      : false,
+    true
+  >('=');
+}
+
+// Tuple.MapTo agrees with ChangeArrayElement on everything unbranded, and is
+// the one to use when the input is a bare type parameter.
+
+{
+  expectType<
+    Tuple.MapTo<string, readonly [1, 'a']>,
+    ChangeArrayElement<readonly [1, 'a'], string>
+  >('=');
+
+  expectType<
+    Tuple.MapTo<string, readonly number[]>,
+    ChangeArrayElement<readonly number[], string>
+  >('=');
+
+  // ...but not on a branded one: the homomorphic mapping also maps `length`,
+  // the array methods and the brand keys, so the result is not an array.
+  expectType<
+    Tuple.MapTo<string, MinLengthArray<3, number>> extends readonly unknown[]
+      ? true
+      : false,
+    false
+  >('=');
+
+  expectType<
+    ChangeArrayElement<
+      MinLengthArray<3, number>,
+      string
+    > extends readonly unknown[]
+      ? true
+      : false,
+    true
+  >('=');
+}
+
+// A generic tuple parameter keeps resolving to the plain homomorphic mapping,
+// which is what makes `Tuple.MapTo` usable as an annotation inside a function
+// that is itself generic over the tuple.
+
+export const genericMapToStaysHomomorphic = <
+  T extends readonly unknown[],
+>(): void => {
+  expectType<Tuple.MapTo<string, T>, Readonly<{ [K in keyof T]: string }>>('=');
+
+  expectType<
+    Tuple.MapTo<T[number], T>,
+    Readonly<{ [K in keyof T]: T[number] }>
+  >('=');
+};
+
+// The mapping is uniform, not positional: every slot gets the same `E`, so
+// even `MapTo<T[number], T>` is not assignable back to the tuple it came from.
+// A caller that needs to recover `T` has to spell the positional
+// `Readonly<{ [K in keyof T]: T[K] }>` itself.
+
+{
+  expectType<Tuple.MapTo<1 | 'a', readonly [1, 'a']>, readonly [1, 'a']>('!<=');
+
+  expectType<
+    Tuple.MapTo<1 | 'a', readonly [1, 'a']>,
+    readonly [1 | 'a', 1 | 'a']
   >('=');
 }

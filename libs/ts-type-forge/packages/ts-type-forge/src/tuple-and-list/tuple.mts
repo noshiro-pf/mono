@@ -309,6 +309,50 @@ export namespace Tuple {
         ? never // a chunk size of 0 consumes nothing; see the note below
         : PartitionImpl<N, T, readonly [], readonly []>
       : readonly (readonly T[number][])[];
+
+  /**
+   * Replaces every element of `T` with `E`, keeping its shape — length, rest
+   * and optional positions alike. The named spelling of
+   * `Readonly<{ [K in keyof T]: E }>`.
+   *
+   * The counterpart of `ArrayElement`, which reads the element type out; this
+   * one writes it back in. `ReadonlyRecord<keyof T, E>` is not a substitute: it
+   * keeps the keys but loses the fact that the result is an array at all, so
+   * nothing downstream can index, spread or destructure it as a tuple.
+   *
+   * Prefer `ChangeArrayElement` when `T` may carry a **length-constraint
+   * brand** (`MinLengthArray` and friends): such a type is an intersection of a
+   * tuple and a brand object, which TypeScript does not treat as an array type,
+   * so the mapping below would map `length`, every array method and the brand
+   * keys along with the elements, and yield a non-array object.
+   *
+   * Conversely, prefer this one when `T` is a **generic type parameter**:
+   * `ChangeArrayElement` answers with a conditional on `HasLengthConstraint<T>`
+   * that a bare `T` cannot decide, so the deferred result is not assignable to
+   * the caller's own `{ [K in keyof T]: E }`. This mapping is, which is what
+   * makes it usable as an annotation inside a function that is itself generic
+   * over the tuple.
+   * @template E - The element type of the result.
+   * @template T - The readonly tuple whose shape to keep.
+   * @returns A readonly tuple of the same shape with `E` at every position.
+   * @example
+   * ```ts
+   * type M1 = Tuple.MapTo<boolean, [1, 'a']>; // readonly [boolean, boolean]
+   * type M2 = Tuple.MapTo<string, readonly number[]>; // readonly string[]
+   * type M3 = Tuple.MapTo<string, readonly []>; // readonly []
+   * type M4 = Tuple.MapTo<string, readonly [1, 2?]>; // readonly [string, (string | undefined)?]
+   * type M5 = Tuple.MapTo<string, readonly [1, ...(readonly 2[])]>; // readonly [string, ...(readonly string[])]
+   *
+   * // The usual reason to reach for it: naming the shape of a mapped result
+   * // inside a function that is itself generic over the tuple.
+   * declare const wrapAll: <T extends readonly unknown[]>(
+   *   values: T,
+   * ) => Tuple.MapTo<T[number] | undefined, T>;
+   * ```
+   */
+  export type MapTo<E, T extends readonly unknown[]> = Readonly<{
+    [K in keyof T]: E;
+  }>;
 }
 
 /*

@@ -41,6 +41,9 @@ type _Cases = readonly [
   ExpectTrue<TypeEq<List.Head<readonly [1, 2]>, 1>>,
   ExpectTrue<TypeEq<Tuple.Concat<readonly [1], readonly [2]>, readonly [1, 2]>>,
   ExpectTrue<
+    TypeEq<Tuple.MapTo<boolean, readonly [1, 'a']>, readonly [boolean, boolean]>
+  >,
+  ExpectTrue<
     TypeEq<StrictOmit<Readonly<{ a: 1; b: 2 }>, 'a'>, Readonly<{ b: 2 }>>
   >,
   ExpectTrue<IsUnion<'a' | 'b'>>,
