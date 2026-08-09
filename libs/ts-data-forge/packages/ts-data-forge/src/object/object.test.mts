@@ -1,6 +1,7 @@
 import {
   type DeepReadonly,
   type FixedLengthTuple,
+  type ReadonlyRecord,
   type UnknownRecord,
 } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
@@ -180,7 +181,7 @@ describe('fromEntries', () => {
     ] as const;
 
     const result = Obj.fromEntries(dynamicEntries) satisfies Partial<
-      Readonly<Record<'name' | 'email', string>>
+      ReadonlyRecord<'name' | 'email', string>
     >;
 
     assert.deepStrictEqual(result, { name: 'Alice' });

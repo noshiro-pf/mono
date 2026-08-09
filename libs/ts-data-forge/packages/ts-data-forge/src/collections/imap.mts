@@ -877,7 +877,7 @@ class IMapClass<K extends MapSetKeyType, V>
 
           const curr = mut_result.get(key);
 
-          if (!mut_result.has(key) || curr === undefined) {
+          if (curr === undefined || !mut_result.has(key)) {
             if (this.#showNotFoundMessage) {
               const keyStr = unknownToString(key);
 

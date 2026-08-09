@@ -13,7 +13,7 @@ describe('NonNegativeFiniteNumber test', () => {
 
       expect(() => asNonNegativeFiniteNumber(1)).not.toThrow();
 
-      expect(() => asNonNegativeFiniteNumber(3.14)).not.toThrow();
+      expect(() => asNonNegativeFiniteNumber(1.23)).not.toThrow();
 
       expect(() => asNonNegativeFiniteNumber(0.5)).not.toThrow();
 
@@ -71,7 +71,7 @@ describe('NonNegativeFiniteNumber test', () => {
 
       assert.isTrue(isNonNegativeFiniteNumber(1));
 
-      assert.isTrue(isNonNegativeFiniteNumber(3.14));
+      assert.isTrue(isNonNegativeFiniteNumber(1.23));
 
       assert.isTrue(isNonNegativeFiniteNumber(0.5));
 

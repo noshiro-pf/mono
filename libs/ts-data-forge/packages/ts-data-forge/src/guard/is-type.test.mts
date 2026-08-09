@@ -157,7 +157,7 @@ describe(isNumber, () => {
 
     assert.isTrue(isNumber(42));
 
-    assert.isTrue(isNumber(-3.14));
+    assert.isTrue(isNumber(-1.23));
 
     assert.isTrue(isNumber(Number.NaN));
 
@@ -322,7 +322,7 @@ describe(isNotNumber, () => {
 
     assert.isFalse(isNotNumber(42));
 
-    assert.isFalse(isNotNumber(-3.14));
+    assert.isFalse(isNotNumber(-1.23));
 
     assert.isFalse(isNotNumber(Number.NaN));
 

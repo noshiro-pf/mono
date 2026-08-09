@@ -1,4 +1,16 @@
+import {
+  type BoundedLengthArray,
+  type FixedLengthArray,
+  type FixedLengthTuple,
+  type MinLengthArray,
+  type ReadonlyRecord,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
+import {
+  asBoundedLengthArray,
+  asFixedLengthArray,
+  asMinLengthArray,
+} from './array-utils-length-bounded-array-cast.mjs';
 import {
   every,
   indexIsInRange,
@@ -294,13 +306,12 @@ describe('Arr validations', () => {
         type ComplexUnion =
           | Readonly<
               | { type: 'array'; data: readonly string[] }
-              | { type: 'object'; data: Record<string, unknown> }
+              | { type: 'object'; data: ReadonlyRecord<string, unknown> }
             >
           | readonly number[]
           | string
           | null;
 
-        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
         const processComplex = (value: ComplexUnion): number => {
           if (isArray(value)) {
             expectType<typeof value, readonly number[]>('=');
@@ -324,7 +335,7 @@ describe('Arr validations', () => {
             typeof value,
             Readonly<
               | { type: 'array'; data: readonly string[] }
-              | { type: 'object'; data: Record<string, unknown> }
+              | { type: 'object'; data: ReadonlyRecord<string, unknown> }
             >
           >('=');
 
@@ -435,6 +446,145 @@ describe('Arr validations', () => {
       const indexMatchesValue = every(numbers, (val, idx) => val === idx);
 
       assert.isTrue(indexMatchesValue);
+    });
+
+    /* What `every` reports about the array it narrowed, across the shapes the
+       two type-guard overloads have to cope with. It used to answer a bare
+       `readonly S[]` for every one of them, dropping both the tuple length and
+       the length-constraint brand. `assert.isTrue` narrows for the rest of the
+       block, so each case checks the runtime answer and the narrowed type
+       together. */
+    describe('narrowing', () => {
+      const isString = (x: string | number): x is string =>
+        typeof x === 'string';
+
+      const values: readonly (string | number)[] = [
+        'Ada',
+        'Grace',
+        'Katherine',
+      ] as const;
+
+      test('should keep a plain array as a plain array', () => {
+        const shapeArray: readonly (string | number)[] = values;
+
+        assert.isTrue(every(shapeArray, isString));
+
+        expectType<typeof shapeArray, readonly string[]>('~=');
+      });
+
+      test('should keep the length of a tuple', () => {
+        const shapeTuple: FixedLengthTuple<2, string | number> = [
+          'Ada',
+          'Grace',
+        ] as const;
+
+        assert.isTrue(every(shapeTuple, isString));
+
+        expectType<typeof shapeTuple, FixedLengthTuple<2, string>>('~=');
+
+        expectType<(typeof shapeTuple)['length'], 2>('=');
+      });
+
+      test('should keep a MinLengthArray brand', () => {
+        const shapeBranded = asMinLengthArray(3, values);
+
+        assert.isTrue(every(shapeBranded, isString));
+
+        expectType<typeof shapeBranded, MinLengthArray<3, string>>('~=');
+
+        // The brand still rules out `undefined` below the minimum length.
+        expectType<(typeof shapeBranded)[0], string>('=');
+      });
+
+      test('should keep a BoundedLengthArray brand', () => {
+        const shapeBounded = asBoundedLengthArray(2, 5, values);
+
+        assert.isTrue(every(shapeBounded, isString));
+
+        expectType<typeof shapeBounded, BoundedLengthArray<2, 5, string>>('~=');
+      });
+
+      test('should keep a FixedLengthArray brand', () => {
+        const shapeFixed = asFixedLengthArray(3, values);
+
+        assert.isTrue(every(shapeFixed, isString));
+
+        expectType<typeof shapeFixed, FixedLengthArray<3, string>>('~=');
+
+        expectType<(typeof shapeFixed)['length'], 3>('=');
+      });
+
+      /* Brand intersected with an exact tuple — the shape the `as*` casts and
+         the `is*` guards produce. Brand, length and positions all survive. */
+      test('should keep brand, length and positions of a branded tuple', () => {
+        const tuple: readonly [string, string | number] = [
+          'Ada',
+          'Grace',
+        ] as const;
+
+        const shapeBrandedTuple = asMinLengthArray(2, tuple);
+
+        assert.isTrue(every(shapeBrandedTuple, isString));
+
+        expectType<(typeof shapeBrandedTuple)[0], string>('=');
+
+        expectType<(typeof shapeBrandedTuple)[1], string>('=');
+
+        expectType<(typeof shapeBrandedTuple)['length'], 2>('=');
+      });
+
+      /* The curried form has to reach the same conclusions. Its two cases are
+         overloads of the *returned* guard rather than of `every` itself, so a
+         single `every(predicate)` value serves branded and unbranded arrays
+         alike — spelled as two overloads of `every`, the branded one shadowed
+         the other and passing a plain array to the result was an error. */
+      describe('curried', () => {
+        const allStrings = every(isString);
+
+        test('should keep a plain array as a plain array', () => {
+          const shapeArray: readonly (string | number)[] = values;
+
+          assert.isTrue(allStrings(shapeArray));
+
+          expectType<typeof shapeArray, readonly string[]>('~=');
+        });
+
+        test('should keep the length of a tuple', () => {
+          const shapeTuple: FixedLengthTuple<2, string | number> = [
+            'Ada',
+            'Grace',
+          ] as const;
+
+          assert.isTrue(allStrings(shapeTuple));
+
+          expectType<typeof shapeTuple, FixedLengthTuple<2, string>>('~=');
+
+          expectType<(typeof shapeTuple)['length'], 2>('=');
+        });
+
+        test('should keep a MinLengthArray brand', () => {
+          const shapeBranded = asMinLengthArray(3, values);
+
+          assert.isTrue(allStrings(shapeBranded));
+
+          expectType<typeof shapeBranded, MinLengthArray<3, string>>('~=');
+        });
+
+        test('should keep brand, length and positions of a branded tuple', () => {
+          const tuple: readonly [string, string | number] = [
+            'Ada',
+            'Grace',
+          ] as const;
+
+          const shapeBrandedTuple = asMinLengthArray(2, tuple);
+
+          assert.isTrue(allStrings(shapeBrandedTuple));
+
+          expectType<(typeof shapeBrandedTuple)[0], string>('=');
+
+          expectType<(typeof shapeBrandedTuple)['length'], 2>('=');
+        });
+      });
     });
   });
 

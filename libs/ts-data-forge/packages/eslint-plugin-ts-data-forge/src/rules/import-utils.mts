@@ -111,10 +111,10 @@ export const buildCalleeResolver = (
     }
 
     if (
+      namespaceName !== undefined &&
       callee.type === AST_NODE_TYPES.MemberExpression &&
       !callee.computed &&
       callee.object.type === AST_NODE_TYPES.Identifier &&
-      namespaceName !== undefined &&
       callee.object.name === namespaceName &&
       callee.property.type === AST_NODE_TYPES.Identifier
     ) {

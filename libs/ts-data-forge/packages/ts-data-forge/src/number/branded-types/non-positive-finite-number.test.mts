@@ -13,17 +13,13 @@ describe('NonPositiveFiniteNumber test', () => {
 
       expect(() => asNonPositiveFiniteNumber(-1)).not.toThrow();
 
-      expect(() => asNonPositiveFiniteNumber(-3.14)).not.toThrow();
+      expect(() => asNonPositiveFiniteNumber(-1.23)).not.toThrow();
 
       expect(() => asNonPositiveFiniteNumber(-0.5)).not.toThrow();
 
-      expect(() =>
-        asNonPositiveFiniteNumber(Number.MIN_VALUE * -1),
-      ).not.toThrow();
+      expect(() => asNonPositiveFiniteNumber(-Number.MIN_VALUE)).not.toThrow();
 
-      expect(() =>
-        asNonPositiveFiniteNumber(Number.MAX_VALUE * -1),
-      ).not.toThrow();
+      expect(() => asNonPositiveFiniteNumber(-Number.MAX_VALUE)).not.toThrow();
     });
 
     test('rejects positive numbers', () => {
@@ -63,11 +59,11 @@ describe('NonPositiveFiniteNumber test', () => {
 
       assert.isTrue(isNonPositiveFiniteNumber(-1));
 
-      assert.isTrue(isNonPositiveFiniteNumber(-3.14));
+      assert.isTrue(isNonPositiveFiniteNumber(-1.23));
 
       assert.isTrue(isNonPositiveFiniteNumber(-0.5));
 
-      assert.isTrue(isNonPositiveFiniteNumber(Number.MIN_VALUE * -1));
+      assert.isTrue(isNonPositiveFiniteNumber(-Number.MIN_VALUE));
     });
 
     test('correctly rejects positive numbers', () => {

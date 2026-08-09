@@ -1,5 +1,6 @@
 import { type MinLengthArray } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
+import { asMinLengthArray } from './array-utils-length-bounded-array-cast.mjs';
 import {
   butLast,
   skip,
@@ -224,9 +225,9 @@ describe('Arr slicing', () => {
 /* Length-constrained inputs. `List.*` reports what it can see from a
    fixed-length tuple, and a branded array's `length` is `number`, so it handed
    the input type straight back — `tail` of an "at least 5" array claimed the
-   four-element result was still at least five. Never called; see the note in
-   `array-utils-modification.test.mts`. */
-export const slicingTypeChecks = (
+   four-element result was still at least five. Shape-per-parameter; see the
+   note in `array-utils-modification.test.mts`. */
+const slicingTypeChecks = (
   brandedFive: MinLengthArray<5, string>,
   brandedAndTuple: MinLengthArray<3, number> & readonly [1, 2, 3, 4, 5],
 ): void => {
@@ -274,3 +275,10 @@ export const slicingTypeChecks = (
 
   expectType<typeof _takenTuple, readonly [1, 2]>('=');
 };
+
+test('slicing type-level checks', () => {
+  slicingTypeChecks(
+    asMinLengthArray(5, ['a', 'b', 'c', 'd', 'e'] as const),
+    asMinLengthArray(3, [1, 2, 3, 4, 5] as const),
+  );
+});

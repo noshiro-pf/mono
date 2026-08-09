@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { type MutableRecord, type ReadonlyRecord } from 'ts-type-forge';
 import { getImportedLocalName, getTsDataForgeImport } from './import-utils.mjs';
 import { preferArrIsBoundedLengthArray } from './prefer-arr-is-bounded-length-array.mjs';
 import { preferArrIsFixedLengthArray } from './prefer-arr-is-fixed-length-array.mjs';
@@ -49,7 +50,7 @@ const MESSAGES = {
     preferArrIsBoundedLengthArray.meta.messages.useIsBoundedLengthArray,
   useIsFixedLengthArray:
     preferArrIsFixedLengthArray.meta.messages.useIsFixedLengthArray,
-} as const satisfies Record<MessageIds, string>;
+} as const satisfies ReadonlyRecord<MessageIds, string>;
 
 /**
  * Length guards whose bound makes them redundant with a named degenerate
@@ -180,7 +181,7 @@ const mergeVisitors = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   visitors: readonly TSESLint.RuleListener[],
 ): TSESLint.RuleListener => {
-  const mut_merged: Record<string, ((node: never) => void)[]> = {};
+  const mut_merged: MutableRecord<string, ((node: never) => void)[]> = {};
 
   for (const visitor of visitors) {
     for (const [selector, handler] of Object.entries(visitor)) {

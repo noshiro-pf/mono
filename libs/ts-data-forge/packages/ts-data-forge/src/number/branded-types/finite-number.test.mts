@@ -12,7 +12,7 @@ describe('FiniteNumber test', () => {
 
       expect(() => asFiniteNumber(-1)).not.toThrow();
 
-      expect(() => asFiniteNumber(3.14)).not.toThrow();
+      expect(() => asFiniteNumber(1.23)).not.toThrow();
 
       expect(() => asFiniteNumber(-2.5)).not.toThrow();
 
@@ -59,7 +59,7 @@ describe('FiniteNumber test', () => {
 
       assert.isTrue(FiniteNumber.is(-1));
 
-      assert.isTrue(FiniteNumber.is(3.14));
+      assert.isTrue(FiniteNumber.is(1.23));
 
       assert.isTrue(FiniteNumber.is(-2.5));
 

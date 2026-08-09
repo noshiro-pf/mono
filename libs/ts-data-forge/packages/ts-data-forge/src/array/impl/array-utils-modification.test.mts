@@ -8,7 +8,11 @@ import {
 import { expectType } from '../../expect-type.mjs';
 import { asUint32 } from '../../number/index.mjs';
 import { type SizeType } from '../../types.mjs';
-import { asMinLengthArray } from './array-utils-length-bounded-array-cast.mjs';
+import {
+  asBoundedLengthArray,
+  asFixedLengthArray,
+  asMinLengthArray,
+} from './array-utils-length-bounded-array-cast.mjs';
 import {
   set,
   toFilled,
@@ -408,10 +412,11 @@ describe('Arr modifications', () => {
 
 /* `Arr.set` / `Arr.toUpdated` across the input shapes the positional
    `ConstrainedList.SetAt` annotation has to cope with; the suite previously
-   covered only the plain-tuple case. Written as an unexported-by-value function
-   so the assertions get real overload resolution — it is never called, and the
-   branded shapes have no runtime representation to build. */
-export const setTypeChecks = (
+   covered only the plain-tuple case. Written as a function taking each shape as
+   a parameter so the assertions get real overload resolution against the
+   declared type rather than against whatever a literal happens to infer to; the
+   test below feeds it values built with the `as*` casts. */
+const setTypeChecks = (
   shapeTuple: readonly [1, 2, 3],
   shapeArray: readonly number[],
   shapeMutableArray: readonly number[],
@@ -487,3 +492,19 @@ export const setTypeChecks = (
 
   expectType<typeof _updatedUnion, readonly [number, 2, number]>('=');
 };
+
+test('set / toUpdated type-level checks', () => {
+  const strings = ['a', 'b', 'c'] as const;
+
+  setTypeChecks(
+    [1, 2, 3],
+    [1, 2, 3],
+    [1, 2, 3],
+    asMinLengthArray(3, strings),
+    asBoundedLengthArray(2, 5, strings),
+    asFixedLengthArray(3, strings),
+    asMinLengthArray(3, [1, 2, 3, 4, 5] as const),
+    0,
+    1,
+  );
+});

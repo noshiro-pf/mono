@@ -199,6 +199,7 @@ const renderEnumImports = (
   [
     `import { type ${config.ttfType} as TtfImported_${config.ttfType} } from 'ts-type-forge';`,
     `import { type ${enumSpec.wideBase} } from 'ts-type-forge';`,
+    `import { type StrictExclude } from 'ts-type-forge';`,
     ...(enumSpec.hasAbs
       ? [`import { type AbsoluteValue } from 'ts-type-forge';`]
       : []),
@@ -257,7 +258,7 @@ const renderEnumWrappers = (
     `const add = (x: ${t}, y: ${t}): ${t} => fromNumber(x + y);`,
     `const sub = (x: ${t}, y: ${t}): ${t} => fromNumber(x - y);`,
     `const mul = (x: ${t}, y: ${t}): ${t} => fromNumber(x * y);`,
-    `const div = (x: ${t}, y: Exclude<${t}, 0>): ${t} => fromNumber(Math.floor(x / y));`,
+    `const div = (x: ${t}, y: StrictExclude<${t}, 0>): ${t} => fromNumber(Math.floor(x / y));`,
     `const random = (min: ${t}, max: ${t}): ${t} =>\n  castType(randomImpl(castTypeImpl(min), castTypeImpl(max)));`,
   ].join('\n\n');
 };

@@ -1,4 +1,5 @@
 import * as tsDataForge from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { brandedNumberTypeNameToFunctionName } from '../../src/rules/branded-number-types.mjs';
 
 /**
@@ -86,7 +87,7 @@ const main = (): void => {
  * ts-data-forge at runtime.
  */
 const collectAsCastFunctionNames = (
-  mod: Readonly<Record<string, unknown>>,
+  mod: ReadonlyRecord<string, unknown>,
 ): ReadonlySet<string> =>
   new Set(
     Object.keys(mod).filter(

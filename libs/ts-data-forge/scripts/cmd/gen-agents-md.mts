@@ -72,7 +72,7 @@ export const genAgentsMd = async (): Promise<Result<undefined, string>> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(outputPath, output, 'utf8');
 
-    console.log(
+    console.info(
       `Successfully generated ${path.relative(repositoryRootPath, outputPath)}.`,
     );
 

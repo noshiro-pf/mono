@@ -1157,7 +1157,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
         case 'update': {
           const curr = mut_result.get(key);
 
-          if (!mut_result.has(key) || curr === undefined) {
+          if (curr === undefined || !mut_result.has(key)) {
             if (this.#showNotFoundMessage) {
               console.warn(
                 `IMapMapped.withMutations::update: key not found: ${String(key)}`,

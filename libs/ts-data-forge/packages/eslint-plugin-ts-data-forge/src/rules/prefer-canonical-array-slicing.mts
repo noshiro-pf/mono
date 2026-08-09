@@ -4,6 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import {
   buildImportFixes,
@@ -110,7 +111,7 @@ const FLIPPED_OPERATORS = {
   '<=': '>=',
   '>': '<',
   '>=': '<=',
-} as const satisfies Record<ComparisonOperator, ComparisonOperator>;
+} as const satisfies ReadonlyRecord<ComparisonOperator, ComparisonOperator>;
 
 /** Classifies `index OP N` (a comparison against an integer literal). */
 const classifyLiteralComparison = (
@@ -592,10 +593,10 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 
           if (
             isArrObject &&
-            node.arguments.length === 2 &&
             arrayArg !== undefined &&
-            arrayArg.type !== AST_NODE_TYPES.SpreadElement &&
             countArg !== undefined &&
+            node.arguments.length === 2 &&
+            arrayArg.type !== AST_NODE_TYPES.SpreadElement &&
             asNonNegativeIntegerLiteral(countArg) === 1
           ) {
             report(
@@ -618,12 +619,12 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           const [arg] = node.arguments;
 
           if (
-            receiver.elements.length === 1 &&
             element !== null &&
             element !== undefined &&
+            arg !== undefined &&
+            receiver.elements.length === 1 &&
             element.type !== AST_NODE_TYPES.SpreadElement &&
             node.arguments.length === 1 &&
-            arg !== undefined &&
             arg.type !== AST_NODE_TYPES.SpreadElement &&
             isArrayOrTupleType(getTypeOf(arg))
           ) {
@@ -691,8 +692,8 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
             const [arg] = node.arguments;
 
             if (
-              node.arguments.length !== 1 ||
               arg === undefined ||
+              node.arguments.length !== 1 ||
               arg.type === AST_NODE_TYPES.SpreadElement
             ) {
               return;
@@ -703,9 +704,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
               const [element] = arg.elements;
 
               if (
-                arg.elements.length === 1 &&
                 element !== null &&
                 element !== undefined &&
+                arg.elements.length === 1 &&
                 element.type !== AST_NODE_TYPES.SpreadElement
               ) {
                 report(

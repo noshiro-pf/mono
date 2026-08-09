@@ -23,7 +23,7 @@ const {
   number,
   0
 >({
-  MIN_VALUE: Number.MAX_VALUE * -1,
+  MIN_VALUE: -Number.MAX_VALUE,
   MAX_VALUE: 0,
   typeNameInMessage,
 } as const);

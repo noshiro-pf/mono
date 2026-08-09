@@ -13,7 +13,7 @@ describe('NonZeroFiniteNumber test', () => {
 
       expect(() => asNonZeroFiniteNumber(-1)).not.toThrow();
 
-      expect(() => asNonZeroFiniteNumber(3.14)).not.toThrow();
+      expect(() => asNonZeroFiniteNumber(1.23)).not.toThrow();
 
       expect(() => asNonZeroFiniteNumber(-2.5)).not.toThrow();
 
@@ -73,7 +73,7 @@ describe('NonZeroFiniteNumber test', () => {
 
       assert.isTrue(isNonZeroFiniteNumber(-1));
 
-      assert.isTrue(isNonZeroFiniteNumber(3.14));
+      assert.isTrue(isNonZeroFiniteNumber(1.23));
 
       assert.isTrue(isNonZeroFiniteNumber(-2.5));
 

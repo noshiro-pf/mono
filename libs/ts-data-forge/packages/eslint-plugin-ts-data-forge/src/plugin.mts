@@ -1,3 +1,4 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { tsDataForgeRules } from './rules/index.mjs';
 import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
 
@@ -21,8 +22,9 @@ const recommendedRules = {
   'ts-data-forge/prefer-num-safe-parse-float': 'error',
   'ts-data-forge/no-unnecessary-type-guard': 'error',
   'ts-data-forge/prefer-comparison-over-nullish-guard': 'error',
-} as const satisfies Readonly<
-  Record<`ts-data-forge/${keyof typeof tsDataForgeRules}`, 'error'>
+} as const satisfies ReadonlyRecord<
+  `ts-data-forge/${keyof typeof tsDataForgeRules}`,
+  'error'
 >;
 
 const recommendedConfig = {

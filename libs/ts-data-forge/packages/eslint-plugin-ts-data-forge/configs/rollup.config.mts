@@ -20,8 +20,8 @@ const interopDefault = <T,>(moduleDefaultExport: T): UnwrapDefault<T> => {
     const { current } = mut_ref;
 
     if (
-      (typeof current !== 'object' && typeof current !== 'function') ||
-      current === null
+      current === null ||
+      (typeof current !== 'object' && typeof current !== 'function')
     ) {
       break;
     }

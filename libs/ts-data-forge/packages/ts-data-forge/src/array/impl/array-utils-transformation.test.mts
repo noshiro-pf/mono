@@ -1207,9 +1207,9 @@ describe('Arr transformations', () => {
 
 /* `toReversed` is a known permutation, so the tuple half can be reversed
    alongside the brand. It used to fall back to `ChangeArrayElement`, which kept
-   the length but collapsed the positions to their union. Never called; see the
-   note in `array-utils-modification.test.mts`. */
-export const reversedTypeChecks = (
+   the length but collapsed the positions to their union. Shape-per-parameter;
+   see the note in `array-utils-modification.test.mts`. */
+const reversedTypeChecks = (
   brandedFive: MinLengthArray<5, string>,
   brandedAndTuple: MinLengthArray<3, number> & readonly [1, 2, 3, 4, 5],
 ): void => {
@@ -1235,3 +1235,10 @@ export const reversedTypeChecks = (
 
   expectType<typeof _sortedTuple, FixedLengthTuple<3, 1 | 2 | 3>>('~=');
 };
+
+test('toReversed / toSorted type-level checks', () => {
+  reversedTypeChecks(
+    asMinLengthArray(5, ['a', 'b', 'c', 'd', 'e'] as const),
+    asMinLengthArray(3, [1, 2, 3, 4, 5] as const),
+  );
+});

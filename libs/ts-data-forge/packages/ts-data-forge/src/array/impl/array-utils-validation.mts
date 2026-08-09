@@ -1,4 +1,10 @@
-import { type BoolOr, type IsAny, type IsUnknown } from 'ts-type-forge';
+import {
+  type BoolOr,
+  type ChangeArrayElement,
+  type IsAny,
+  type IsUnknown,
+  type UnknownBrand,
+} from 'ts-type-forge';
 import { asUint32, Num } from '../../number/index.mjs';
 import { type ArrayIndex, type SizeType } from '../../types.mjs';
 
@@ -55,21 +61,59 @@ type Cast<A, B> = A extends B ? A : never;
  * assert.isFalse(allStartWithA);
  * ```
  */
-// Type guard overloads - narrow the entire array type
-export function every<E, S extends E>(
-  array: readonly E[],
-  predicate: (a: E, index: SizeType.Arr) => a is S,
-): array is readonly S[];
+// Type guard overloads - narrow the entire array type.
+//
+// Both narrowed types are intersected with `Ar`: a type predicate's type has
+// to be assignable to the parameter's type, and neither the deferred
+// conditional `ChangeArrayElement<Ar, S>` nor the mapped type over a generic
+// `Ar` is (TS2677). The intersection also keeps whatever the caller already
+// knew about the array — a branded five-tuple stays a five-tuple.
+export function every<
+  const Ar extends readonly unknown[] & UnknownBrand,
+  S extends Ar[number],
+>(
+  array: Ar,
+  predicate: (a: Ar[number], index: ArrayIndex<Ar>) => a is S,
+): array is ChangeArrayElement<Ar, S> & Ar;
 
-export function every<E, S extends E>(
-  predicate: (a: E, index: SizeType.Arr) => a is S,
-): (array: readonly E[]) => array is readonly S[];
+// A plain array or tuple carries no length brand, so the homomorphic mapping
+// is the whole answer — same reasoning as in `map`.
+export function every<
+  const Ar extends readonly unknown[],
+  S extends Ar[number],
+>(
+  array: Ar,
+  predicate: (a: Ar[number], index: ArrayIndex<Ar>) => a is S,
+): array is Readonly<{ [K in keyof Ar]: S }> & Ar;
 
 // Regular boolean predicate overloads
 export function every<const Ar extends readonly unknown[]>(
   array: Ar,
   predicate: (a: Ar[number], index: ArrayIndex<Ar>) => boolean,
 ): boolean;
+
+// curried version
+//
+// As in `map`, the branded and the plain case have to be overloads *of the
+// returned function*, not two overloads of `every` itself: both curried
+// signatures take the same single predicate, so overload resolution would
+// always pick the first and the second would be dead — which is what left a
+// plain `readonly unknown[]` unable to satisfy the `UnknownBrand` constraint
+// at the call site of the returned guard.
+//
+// The intersection is also what keeps the group compatible with the
+// implementation signature. A lone `<Ar extends readonly E[] & UnknownBrand>`
+// signature is not something `(array: readonly E[]) => boolean` can implement
+// (TS2394); the unbranded member of the intersection is, and one matching
+// member is enough.
+export function every<E, S extends E>(
+  predicate: (a: E, index: SizeType.Arr) => a is S,
+): (<const Ar extends readonly E[] & UnknownBrand>(
+  array: Ar,
+) => array is ChangeArrayElement<Ar, S> & Ar) &
+  (<const Ar extends readonly E[]>(
+    array: Ar,
+  ) => array is Readonly<{ [K in keyof Ar]: S }> & Ar);
 
 export function every<E>(
   predicate: (a: E, index: SizeType.Arr) => boolean,

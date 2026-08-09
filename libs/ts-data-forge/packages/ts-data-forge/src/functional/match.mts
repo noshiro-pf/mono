@@ -121,7 +121,7 @@ expectType<AllCasesCovered<'a' | 'b', Readonly<{ a: 1; b: 2; c: 3 }>>, false>(
   '=',
 );
 
-expectType<AllCasesCovered<string, Record<string, string>>, true>('=');
+expectType<AllCasesCovered<string, ReadonlyRecord<string, string>>, true>('=');
 
 /**
  * @template Case A union of string literal types.
@@ -152,9 +152,10 @@ expectType<
   false
 >('=');
 
-expectType<IsLiteralUnionFullyCovered<string, Record<string, string>>, false>(
-  '=',
-);
+expectType<
+  IsLiteralUnionFullyCovered<string, ReadonlyRecord<string, string>>,
+  false
+>('=');
 
 expectType<
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents

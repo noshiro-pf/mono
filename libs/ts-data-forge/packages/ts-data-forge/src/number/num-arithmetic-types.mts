@@ -1,4 +1,6 @@
 import {
+  type BoolAnd,
+  type BoolOr,
   type FiniteNumber,
   type Int,
   type NegativeFiniteNumber,
@@ -6,6 +8,7 @@ import {
   type NegativeNumber,
   type NegativeSafeInt,
   type NonNegativeFiniteNumber,
+  type NonNegativeInt,
   type NonNegativeNumber,
   type NonPositiveFiniteNumber,
   type NonPositiveInt,
@@ -23,6 +26,7 @@ import {
   type SafeUint,
   type Uint,
 } from 'ts-type-forge';
+import { expectType } from '../expect-type.mjs';
 
 /**
  * Internal type-level arithmetic for {@link Num}'s `add`/`sub`/`mul`/`div`.
@@ -75,16 +79,6 @@ export type LevelOf<N> = [N] extends [SafeInt]
 
 // --- boolean fact algebra over a sign ----------------------------------------
 
-type And<A extends boolean, B extends boolean> = [A] extends [true]
-  ? [B] extends [true]
-    ? true
-    : false
-  : false;
-
-type Or<A extends boolean, B extends boolean> = true extends A | B
-  ? true
-  : false;
-
 /** Whether the value is guaranteed `>= 0`. */
 type Ge0<S extends Sign> = S extends 'pos' | 'nonneg' ? true : false;
 
@@ -95,7 +89,7 @@ type Le0<S extends Sign> = S extends 'neg' | 'nonpos' ? true : false;
 type Ne0<S extends Sign> = S extends 'pos' | 'neg' | 'nonzero' ? true : false;
 
 /** Rebuilds a {@link Sign} from the three facts. */
-type FromFacts<
+type SignFromFacts<
   ge0 extends boolean,
   le0 extends boolean,
   ne0 extends boolean,
@@ -111,16 +105,16 @@ type FromFacts<
       ? 'nonzero'
       : 'any';
 
-type NegateSign<S extends Sign> = FromFacts<Le0<S>, Ge0<S>, Ne0<S>>;
+type NegateSign<S extends Sign> = SignFromFacts<Le0<S>, Ge0<S>, Ne0<S>>;
 
 // --- sign combination per operation ------------------------------------------
 
-type AddSign<A extends Sign, B extends Sign> = FromFacts<
-  And<Ge0<A>, Ge0<B>>,
-  And<Le0<A>, Le0<B>>,
-  Or<
-    And<And<Ge0<A>, Ge0<B>>, Or<Ne0<A>, Ne0<B>>>,
-    And<And<Le0<A>, Le0<B>>, Or<Ne0<A>, Ne0<B>>>
+type AddSign<A extends Sign, B extends Sign> = SignFromFacts<
+  BoolAnd<Ge0<A>, Ge0<B>>,
+  BoolAnd<Le0<A>, Le0<B>>,
+  BoolOr<
+    BoolAnd<BoolAnd<Ge0<A>, Ge0<B>>, BoolOr<Ne0<A>, Ne0<B>>>,
+    BoolAnd<BoolAnd<Le0<A>, Le0<B>>, BoolOr<Ne0<A>, Ne0<B>>>
   >
 >;
 
@@ -131,16 +125,16 @@ type MulSignWithNe0<
   A extends Sign,
   B extends Sign,
   ne0 extends boolean,
-> = FromFacts<
-  Or<And<Ge0<A>, Ge0<B>>, And<Le0<A>, Le0<B>>>,
-  Or<And<Ge0<A>, Le0<B>>, And<Le0<A>, Ge0<B>>>,
+> = SignFromFacts<
+  BoolOr<BoolAnd<Ge0<A>, Ge0<B>>, BoolAnd<Le0<A>, Le0<B>>>,
+  BoolOr<BoolAnd<Ge0<A>, Le0<B>>, BoolAnd<Le0<A>, Ge0<B>>>,
   ne0
 >;
 
 type MulSign<A extends Sign, B extends Sign> = MulSignWithNe0<
   A,
   B,
-  And<Ne0<A>, Ne0<B>>
+  BoolAnd<Ne0<A>, Ne0<B>>
 >;
 
 /** Exact division: nonzero dividend over nonzero divisor stays nonzero. */
@@ -160,9 +154,12 @@ type LooserLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
       ? 'int'
       : 'safeint';
 
+type WidenSafeIntToInt<T> = T extends 'safeint' ? 'int' : T;
+
 /** `+`/`-`/`*`: looser level, widening `safeint -> int` (overflow may occur). */
-type AddMulLevel<LA extends Level, LB extends Level> =
-  LooserLevel<LA, LB> extends 'safeint' ? 'int' : LooserLevel<LA, LB>;
+type AddMulLevel<LA extends Level, LB extends Level> = WidenSafeIntToInt<
+  LooserLevel<LA, LB>
+>;
 
 /** Exact division yields a (possibly fractional) finite number. */
 type DivLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
@@ -267,3 +264,107 @@ export type DivIntResult<A, B> = Reconstruct<
   DivIntSign<SignOf<A>, SignOf<B>>,
   DivIntLevel<LevelOf<A>, LevelOf<B>>
 >;
+
+// #region type tests
+{
+  type A = NonPositiveInt;
+
+  type B = NonPositiveInt;
+
+  expectType<MulResult<A, B>, Uint>('=');
+
+  type SignA = SignOf<A>;
+
+  type SignB = SignOf<B>;
+
+  expectType<SignA, 'nonpos'>('=');
+
+  expectType<MulSign<SignA, SignB>, 'nonneg'>('=');
+
+  expectType<BoolAnd<Ne0<SignA>, Ne0<SignB>>, false>('=');
+
+  expectType<MulSignWithNe0<SignA, SignB, false>, 'nonneg'>('=');
+
+  expectType<
+    BoolOr<BoolAnd<Ge0<SignA>, Ge0<SignB>>, BoolAnd<Le0<SignA>, Le0<SignB>>>,
+    true
+  >('=');
+
+  expectType<Ge0<SignA>, false>('=');
+
+  expectType<Ge0<SignB>, false>('=');
+
+  expectType<Le0<SignA>, true>('=');
+
+  expectType<Le0<SignB>, true>('=');
+
+  expectType<BoolAnd<Ge0<SignA>, Ge0<SignB>>, false>('=');
+
+  expectType<BoolAnd<true, true>, true>('=');
+
+  expectType<
+    BoolOr<BoolAnd<Ge0<SignA>, Le0<SignB>>, BoolAnd<Le0<SignA>, Ge0<SignB>>>,
+    false
+  >('=');
+
+  expectType<SignFromFacts<true, false, false>, 'nonneg'>('=');
+
+  expectType<AddMulLevel<LevelOf<A>, LevelOf<B>>, 'int'>('=');
+
+  type LA = LevelOf<A>;
+
+  type LB = LevelOf<B>;
+
+  expectType<LA, 'int'>('=');
+
+  expectType<LooserLevel<LA, LB>, 'int'>('=');
+
+  {
+    type MulResult2<X, Y> = Reconstruct<
+      MulSign<SignOf<X>, SignOf<Y>>,
+      AddMulLevel<LevelOf<X>, LevelOf<Y>>
+    >;
+
+    expectType<MulResult<A, B>, MulResult2<A, B>>('=');
+
+    expectType<
+      MulResult<A, B>,
+      Reconstruct<
+        MulSign<SignOf<A>, SignOf<B>>,
+        AddMulLevel<LevelOf<A>, LevelOf<B>>
+      >
+    >('=');
+
+    expectType<
+      Reconstruct<
+        MulSign<SignOf<A>, SignOf<B>>,
+        AddMulLevel<LevelOf<A>, LevelOf<B>>
+      >,
+      NonNegativeInt
+    >('=');
+
+    expectType<
+      Reconstruct<MulSign<SignA, SignB>, AddMulLevel<LA, LB>>,
+      NonNegativeInt
+    >('=');
+
+    expectType<Reconstruct<'nonneg', 'int'>, NonNegativeInt>('=');
+
+    expectType<MulResult<A, B>, NonNegativeInt>('=');
+
+    // type Reconstruct<S extends Sign, L extends Level> = L extends 'safeint'
+    //   ? ReconstructSafeInt<S>
+    //   : L extends 'int'
+    //     ? ReconstructInt<S>
+    //     : L extends 'finite'
+    //       ? ReconstructFinite<S>
+    //       : ReconstructNumber<S>;
+  }
+
+  // FromFacts<
+  //   BoolOr<BoolAnd<Ge0<A>, Ge0<B>>, BoolAnd<Le0<A>, Le0<B>>>,
+  //   BoolOr<BoolAnd<Ge0<A>, Le0<B>>, BoolAnd<Le0<A>, Ge0<B>>>,
+  //   ne0
+  // >;
+}
+// #endregion

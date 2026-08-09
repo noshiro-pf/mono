@@ -26,9 +26,9 @@ import { Num } from 'ts-data-forge';
     // Rounding utilities
     const round2 = Num.round(2);
 
-    assert.isTrue(round2(3.141_59) === 3.14);
+    assert.isTrue(round2(1.234_56) === 1.23);
 
-    assert.isTrue(Num.roundAt(3.141_59, 3) === 3.142);
+    assert.isTrue(Num.roundAt(1.234_56, 3) === 1.235);
 
     assert.isTrue(Num.roundToInt(3.7) === 4);
 

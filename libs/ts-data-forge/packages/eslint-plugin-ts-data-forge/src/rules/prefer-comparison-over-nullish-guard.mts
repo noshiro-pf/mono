@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
 import { buildCalleeResolver, getTsDataForgeImport } from './import-utils.mjs';
 
 type Options = readonly [];
@@ -20,7 +20,7 @@ type ComparisonSpec = Readonly<{
  * `xs.filter(isNotUndefined)`). When called with an explicit argument a direct
  * comparison is clearer, so map each to its equivalent operator and literal.
  */
-const COMPARISON_GUARDS: DeepReadonly<Record<string, ComparisonSpec>> = {
+const COMPARISON_GUARDS: ReadonlyRecord<string, ComparisonSpec> = {
   isUndefined: { op: '===', literal: 'undefined' },
   isNotUndefined: { op: '!==', literal: 'undefined' },
   isNull: { op: '===', literal: 'null' },

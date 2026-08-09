@@ -1,4 +1,8 @@
-import { type Uint8 as TtfImported_Uint8, type Uint16 } from 'ts-type-forge';
+import {
+  type StrictExclude,
+  type Uint8 as TtfImported_Uint8,
+  type Uint16,
+} from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { TsDataForgeInternals } from '../refined-number-utils.mjs';
 
@@ -44,7 +48,7 @@ const sub = (x: Uint8, y: Uint8): Uint8 => fromNumber(x - y);
 
 const mul = (x: Uint8, y: Uint8): Uint8 => fromNumber(x * y);
 
-const div = (x: Uint8, y: Exclude<Uint8, 0>): Uint8 =>
+const div = (x: Uint8, y: StrictExclude<Uint8, 0>): Uint8 =>
   fromNumber(Math.floor(x / y));
 
 const random = (min: Uint8, max: Uint8): Uint8 =>

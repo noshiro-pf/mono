@@ -407,8 +407,11 @@ describe('Result test', () => {
 
   describe('fromPromise', () => {
     test('handles async functions that resolve', async () => {
-      const asyncFn = async (): Promise<number> =>
-        Promise.resolve().then(() => 42);
+      const asyncFn = async (): Promise<number> => {
+        await Promise.resolve();
+
+        return 42;
+      };
 
       const result = await Result.fromPromise(asyncFn());
 

@@ -13,7 +13,7 @@ const testElementToString = (el: Readonly<TestElement>): string =>
   `${el.type}_${el.id}` as const;
 
 const stringToTestElement = (str: string): TestElement => {
-  const [type, idStr] = str.split('_');
+  const [type, idStr] = str.split('_', 2);
 
   return {
     type: type ?? '',

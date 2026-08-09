@@ -8,6 +8,7 @@ import {
   type NonZeroNumber,
   type PositiveNumber,
   type RelaxedExclude,
+  type StrictPick,
   type TypeEq,
   type UnknownBrand,
   type UnwrapBrandFalseKeys,
@@ -167,7 +168,7 @@ export namespace TsDataForgeInternals {
             fromNumber: (a: number) => N;
           }>
         : unknown) &
-      Pick<
+      StrictPick<
         Readonly<{
           add: (x: N, y: N) => N;
           sub: (x: N, y: N) => N;

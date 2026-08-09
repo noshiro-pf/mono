@@ -1,4 +1,4 @@
-import { type UnknownRecord } from 'ts-type-forge';
+import { type ReadonlyRecord, type UnknownRecord } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { hasKey } from './has-key.mjs';
 import { isRecord } from './is-record.mjs';
@@ -31,13 +31,13 @@ describe(isRecord, () => {
   describe('arrays are not records', () => {
     test('type-level: arrays are not assignable to UnknownRecord', () => {
       // Arrays have a number index signature but no string index signature,
-      // so they are assignable to `Record<number, unknown>` but not to
+      // so they are assignable to `ReadonlyRecord<number, unknown>` but not to
       // `UnknownRecord` (= `ReadonlyRecord<string, unknown>`).
-      expectType<readonly number[], Record<number, unknown>>('<=');
+      expectType<readonly number[], ReadonlyRecord<number, unknown>>('<=');
 
       expectType<readonly number[], UnknownRecord>('!<=');
 
-      expectType<readonly string[], Record<number, unknown>>('<=');
+      expectType<readonly string[], ReadonlyRecord<number, unknown>>('<=');
 
       expectType<readonly string[], UnknownRecord>('!<=');
 

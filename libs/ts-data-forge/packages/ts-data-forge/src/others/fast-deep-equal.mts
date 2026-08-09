@@ -39,9 +39,11 @@ export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
       return (
         isMap(b) &&
         a.size === b.size &&
-        Array.from(a.entries()).every(
-          ([key, value]) => b.has(key) && fastDeepEqual(value, b.get(key)),
-        )
+        a
+          .entries()
+          .every(
+            ([key, value]) => b.has(key) && fastDeepEqual(value, b.get(key)),
+          )
       );
     }
 
@@ -49,7 +51,7 @@ export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
       return (
         isSet(b) &&
         a.size === b.size &&
-        Array.from(a.entries()).every(([value]) => b.has(value))
+        a.entries().every(([value]) => b.has(value))
       );
     }
 

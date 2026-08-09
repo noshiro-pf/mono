@@ -4,7 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { type DeepReadonly } from 'ts-type-forge';
+import { type DeepReadonly, type ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import {
   buildCalleeResolver,
@@ -36,12 +36,12 @@ type GuardSpec = DeepReadonly<
   | {
       kind: 'narrowTo';
       atoms: AtomKey[];
-      replacements?: Record<string, string>;
+      replacements?: ReadonlyRecord<string, string>;
     }
   | {
       kind: 'excludeFrom';
       atoms: AtomKey[];
-      replacements?: Record<string, string>;
+      replacements?: ReadonlyRecord<string, string>;
     }
   | { kind: 'nonEmptyString' }
   | { kind: 'record' }
@@ -63,17 +63,17 @@ const BRAND_MARKER_PROPERTY =
  */
 const MIN_LENGTH_BRAND_KEY = 'MinLength';
 
-const NULLISH_REPLACEMENTS_EXCLUDE: Readonly<Record<string, string>> = {
+const NULLISH_REPLACEMENTS_EXCLUDE: ReadonlyRecord<string, string> = {
   undefined: 'isNotUndefined',
   null: 'isNotNull',
 } as const;
 
-const NULLISH_REPLACEMENTS_NARROW: Readonly<Record<string, string>> = {
+const NULLISH_REPLACEMENTS_NARROW: ReadonlyRecord<string, string> = {
   undefined: 'isUndefined',
   null: 'isNull',
 } as const;
 
-const GUARD_SPECS: DeepReadonly<Record<string, GuardSpec>> = {
+const GUARD_SPECS: DeepReadonly<ReadonlyRecord<string, GuardSpec>> = {
   isUndefined: { kind: 'narrowTo', atoms: ['undefined'] },
   isNotUndefined: { kind: 'excludeFrom', atoms: ['undefined'] },
   isNull: { kind: 'narrowTo', atoms: ['null'] },

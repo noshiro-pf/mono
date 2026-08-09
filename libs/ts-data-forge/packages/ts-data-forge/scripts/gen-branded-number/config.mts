@@ -1,3 +1,5 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
+
 /**
  * Declarative configuration for the branded-number modules under
  * `src/number/branded-types`. The generator (`generate.mts` via `render.mts`)
@@ -93,8 +95,9 @@ export type BrandedNumberConfig = Readonly<{
    * carries design intent the templates cannot express (e.g. why `add`/`sub` are
    * absent from `NonZeroFiniteNumber`).
    */
-  proseOverrides?: Readonly<
-    Record<string, Readonly<{ description?: string; returns?: string }>>
+  proseOverrides?: ReadonlyRecord<
+    string,
+    Readonly<{ description?: string; returns?: string }>
   >;
 
   // --- enum modules (int8 / uint8) ---
@@ -912,7 +915,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     factory: 'operatorsForFloat',
     generics: ['ElementType', 'number', '0'],
     nonZero: false,
-    minValueExpr: 'Number.MAX_VALUE * -1',
+    minValueExpr: '-Number.MAX_VALUE',
     maxValueExpr: '0',
     typeNameInMessage: 'a non-positive finite number',
     customConsts: floatRounding(REMOVE_NZ_RET, REMOVE_NZ_RET, REMOVE_NZ_RET),

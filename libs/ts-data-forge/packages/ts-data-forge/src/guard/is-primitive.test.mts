@@ -23,7 +23,7 @@ describe(isPrimitive, () => {
 
     assert.isTrue(isPrimitive(0));
 
-    assert.isTrue(isPrimitive(-3.14));
+    assert.isTrue(isPrimitive(-1.23));
 
     assert.isTrue(isPrimitive(Number.NaN));
 

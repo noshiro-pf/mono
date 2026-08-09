@@ -13,7 +13,7 @@ const testKeyToString = (key: Readonly<TestKey>): string =>
   `${key.type}_${key.id}` as const;
 
 const stringToTestKey = (str: string): TestKey => {
-  const [type, idStr] = str.split('_');
+  const [type, idStr] = str.split('_', 2);
 
   return {
     type: type ?? '',
@@ -113,7 +113,7 @@ describe('IMapMapped.create', () => {
     ): string => `${key.nested.id}_${key.arr.join(',')}` as const;
 
     const stringToComplexKey = (str: string): ComplexKey => {
-      const [idStr, arrStr] = str.split('_');
+      const [idStr, arrStr] = str.split('_', 2);
 
       return {
         nested: {

@@ -1,6 +1,7 @@
 import {
   type AbsoluteValue,
   type Int16,
+  type StrictExclude,
   type Int8 as TtfImported_Int8,
 } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
@@ -54,7 +55,7 @@ const sub = (x: Int8, y: Int8): Int8 => fromNumber(x - y);
 
 const mul = (x: Int8, y: Int8): Int8 => fromNumber(x * y);
 
-const div = (x: Int8, y: Exclude<Int8, 0>): Int8 =>
+const div = (x: Int8, y: StrictExclude<Int8, 0>): Int8 =>
   fromNumber(Math.floor(x / y));
 
 const random = (min: Int8, max: Int8): Int8 =>

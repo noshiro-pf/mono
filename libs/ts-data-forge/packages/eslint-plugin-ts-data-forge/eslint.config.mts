@@ -4,6 +4,7 @@ import {
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   type FlatConfig,
+  restrictedSyntax,
 } from 'eslint-config-typed';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
@@ -63,6 +64,21 @@ export default [
       'vitest/no-conditional-expect': 'off',
       'vitest/expect-expect': 'off',
       'unicorn/consistent-function-scoping': 'off',
+
+      /* A test file is a leaf: nothing imports it, so an `export` there is
+         either dead code or a way to dodge the unused-variable check. The base
+         entries are spread back in because a flat-config override replaces the
+         whole option array. */
+      'no-restricted-syntax': [
+        'error',
+        ...restrictedSyntax,
+        {
+          selector:
+            'ExportNamedDeclaration, ExportDefaultDeclaration, ExportAllDeclaration',
+          message:
+            'Test files must not export. Keep helpers local and reference them from a test; move anything genuinely shared into a non-test module.',
+        },
+      ],
     }),
   },
 

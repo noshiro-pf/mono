@@ -11,7 +11,7 @@ describe('PositiveFiniteNumber test', () => {
     test('accepts valid positive finite numbers', () => {
       expect(() => asPositiveFiniteNumber(1)).not.toThrow();
 
-      expect(() => asPositiveFiniteNumber(3.14)).not.toThrow();
+      expect(() => asPositiveFiniteNumber(1.23)).not.toThrow();
 
       expect(() => asPositiveFiniteNumber(0.5)).not.toThrow();
 
@@ -75,7 +75,7 @@ describe('PositiveFiniteNumber test', () => {
     test('correctly identifies positive finite numbers', () => {
       assert.isTrue(isPositiveFiniteNumber(1));
 
-      assert.isTrue(isPositiveFiniteNumber(3.14));
+      assert.isTrue(isPositiveFiniteNumber(1.23));
 
       assert.isTrue(isPositiveFiniteNumber(0.5));
 

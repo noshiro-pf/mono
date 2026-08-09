@@ -1,4 +1,4 @@
-import { type TypeScriptEslintRulesOption } from 'eslint-config-typed';
+import { type EslintRulesOption } from 'eslint-config-typed';
 
 export const restrictedImports = [
   {
@@ -22,4 +22,4 @@ export const restrictedImports = [
       },
     ],
   },
-] as const satisfies TypeScriptEslintRulesOption['@typescript-eslint/no-restricted-imports'];
+] as const satisfies EslintRulesOption['no-restricted-imports'];

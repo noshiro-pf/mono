@@ -244,8 +244,8 @@ describe('Num test', () => {
     });
 
     test('composes with Result.unwrapOk + nullish fallback', () => {
-      expect(Result.unwrapOk(Num.safeParseFloat('3.14')) ?? Number.NaN).toBe(
-        3.14,
+      expect(Result.unwrapOk(Num.safeParseFloat('1.23')) ?? Number.NaN).toBe(
+        1.23,
       );
 
       expect(Result.unwrapOk(Num.safeParseFloat('')) ?? Number.NaN).toBeNaN();
@@ -360,9 +360,9 @@ describe('Num test', () => {
 
   describe('roundAt', () => {
     test('rounds to specified decimal places', () => {
-      expect(Num.roundAt(3.141_59, 2)).toBe(3.14);
+      expect(Num.roundAt(1.234_56, 2)).toBe(1.23);
 
-      expect(Num.roundAt(3.141_59, 3)).toBe(3.142);
+      expect(Num.roundAt(1.234_56, 3)).toBe(1.235);
 
       expect(Num.roundAt(2.555, 2)).toBe(2.56);
 
@@ -388,21 +388,21 @@ describe('Num test', () => {
     test('creates rounding function with specified precision', () => {
       const round2 = Num.round(2);
 
-      expect(round2(3.141_59)).toBe(3.14);
+      expect(round2(1.234_56)).toBe(1.23);
 
       expect(round2(2.556)).toBe(2.56);
 
       const round1 = Num.round(1);
 
-      expect(round1(3.141_59)).toBe(3.1);
+      expect(round1(1.234_56)).toBe(1.2);
 
       expect(round1(2.56)).toBe(2.6);
 
       const round3 = Num.round(3);
 
-      expect(round3(3.1416)).toBe(3.142);
+      expect(round3(1.2346)).toBe(1.235);
 
-      expect(round3(2.7182)).toBe(2.718);
+      expect(round3(4.5678)).toBe(4.568);
     });
   });
 
@@ -412,7 +412,7 @@ describe('Num test', () => {
 
       expect(Num.mapNaN2Undefined(0)).toBe(0);
 
-      expect(Num.mapNaN2Undefined(-3.14)).toBe(-3.14);
+      expect(Num.mapNaN2Undefined(-1.23)).toBe(-1.23);
 
       expect(Num.mapNaN2Undefined(Number.NaN)).toBeUndefined();
     });

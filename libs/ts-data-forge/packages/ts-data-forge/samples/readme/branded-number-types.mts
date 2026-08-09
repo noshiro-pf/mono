@@ -18,7 +18,7 @@ import {
 
     const unsigned = asUint(42); // Uint - non-negative integer
 
-    const finite = asFiniteNumber(3.14); // FiniteNumber - finite floating-point
+    const finite = asFiniteNumber(1.23); // FiniteNumber - finite floating-point
 
     const safeInt = asSafeInt(42); // SafeInt - integer in safe range
 
@@ -26,13 +26,13 @@ import {
 
     assert.isTrue(unsigned === 42);
 
-    assert.isTrue(finite === 3.14);
+    assert.isTrue(finite === 1.23);
 
     assert.isTrue(safeInt === 42);
 
     // This line would cause a runtime error:
     assert.throw(() => {
-      asInt(3.14);
+      asInt(1.23);
     });
 
     // Range-constrained types (16-bit, 32-bit)
