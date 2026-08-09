@@ -778,13 +778,13 @@ console.log(packages.map((pkg) => pkg.name));
 **Return Type:**
 
 ```tsx
-import { type JsonValue } from 'ts-type-forge';
+import { type JsonValue, type ReadonlyRecord } from 'ts-type-forge';
 
 type Package = Readonly<{
     name: string;
     path: string;
     packageJson: JsonValue;
-    dependencies: Readonly<Record<string, string>>;
+    dependencies: ReadonlyRecord<string, string>;
 }>;
 ```
 

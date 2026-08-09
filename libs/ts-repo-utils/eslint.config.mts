@@ -77,7 +77,7 @@ export default [
   {
     files: ['src/entry-point.mts'],
     rules: defineKnownRules({
-      '@typescript-eslint/no-restricted-imports': 'off',
+      'no-restricted-imports': 'off',
     }),
   },
 

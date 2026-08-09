@@ -460,23 +460,25 @@ export const formatDiffFrom = async (
     { type: 'modified', flag: includeModified, fn: getModifiedFiles },
     { type: 'staged', flag: includeStaged, fn: getStagedFiles },
   ]) {
-    if (flag) {
-      // eslint-disable-next-line no-await-in-loop
-      const filesResult = await fn({ silent });
+    if (!flag) {
+      continue;
+    }
 
-      if (Result.isErr(filesResult)) {
-        if (!silent) {
-          console.error(`Error getting ${type} files:`, filesResult.value);
-        }
+    // eslint-disable-next-line no-await-in-loop
+    const filesResult = await fn({ silent });
 
-        return filesResult;
+    if (Result.isErr(filesResult)) {
+      if (!silent) {
+        console.error(`Error getting ${type} files:`, filesResult.value);
       }
 
-      const files = filesResult.value;
-
-      // Combine and deduplicate files
-      mut_allFiles.push(...files);
+      return filesResult;
     }
+
+    const files = filesResult.value;
+
+    // Combine and deduplicate files
+    mut_allFiles.push(...files);
   }
 
   const allFiles = filterFilesByCwd(Arr.uniq(mut_allFiles), cwd);

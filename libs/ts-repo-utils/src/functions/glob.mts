@@ -1,7 +1,7 @@
 import type * as fsWalk from '@nodelib/fs.walk';
 import fastGlob from 'fast-glob';
 import { castDeepMutable, castMutable, Result } from 'ts-data-forge';
-import { type DeepReadonly } from 'ts-type-forge';
+import { type DeepReadonly, type StrictPick } from 'ts-type-forge';
 
 type EntryInternal = DeepReadonly<fsWalk.Entry>;
 
@@ -10,11 +10,11 @@ type PatternInternal = string;
 type OptionsInternal = DeepReadonly<fastGlob.Options>;
 
 type EntryObjectModePredicate = Readonly<{
-  [TKey in keyof Pick<OptionsInternal, 'objectMode'>]-?: true;
+  [TKey in keyof StrictPick<OptionsInternal, 'objectMode'>]-?: true;
 }>;
 
 type EntryStatsPredicate = Readonly<{
-  [TKey in keyof Pick<OptionsInternal, 'stats'>]-?: true;
+  [TKey in keyof StrictPick<OptionsInternal, 'stats'>]-?: true;
 }>;
 
 type EntryObjectPredicate = EntryObjectModePredicate | EntryStatsPredicate;

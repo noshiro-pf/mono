@@ -349,24 +349,27 @@ describe('exec-async', () => {
       // we need to check the type at runtime
       const randomEncoding = Math.random() > 0.5 ? 'utf8' : 'buffer';
 
+      // NOTE: the two branches look alike but `randomEncoding` is narrowed
+      // differently in each, so the results have different types and the
+      // declarations must stay inside their branches.
       if (randomEncoding === 'buffer') {
-        const _result = await $('echo "test"', {
+        const _resultBuffer = await $('echo "test"', {
           encoding: randomEncoding,
           silent: true,
         });
 
         expectType<
-          typeof _result,
+          typeof _resultBuffer,
           Result<Readonly<{ stdout: Buffer; stderr: Buffer }>, ExecException>
         >('=');
       } else {
-        const _result = await $('echo "test"', {
+        const _resultUtf8 = await $('echo "test"', {
           encoding: randomEncoding,
           silent: true,
         });
 
         expectType<
-          typeof _result,
+          typeof _resultUtf8,
           Result<Readonly<{ stdout: string; stderr: string }>, ExecException>
         >('=');
       }

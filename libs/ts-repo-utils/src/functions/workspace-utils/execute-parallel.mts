@@ -45,7 +45,7 @@ export const executeParallel = async (
       break;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-loop-func
+    // eslint-disable-next-line no-loop-func
     const promise = executeScript(pkg, scriptName).then((result) => {
       // Check for failure immediately
       if (Result.isErr(result)) {
@@ -60,7 +60,7 @@ export const executeParallel = async (
     mut_resultPromises.push(promise);
 
     const wrappedPromise = promise
-      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      // eslint-disable-next-line no-loop-func
       .catch((error: unknown) => {
         mut_failed = true;
 
@@ -151,30 +151,32 @@ export const executeStages = async (
   );
 
   for (const [i, stage] of mut_stages.entries()) {
-    if (Arr.isNonEmpty(stage)) {
-      console.info(`Stage ${i + 1}: ${stage.map((p) => p.name).join(', ')}`);
+    if (!Arr.isNonEmpty(stage)) {
+      continue;
+    }
 
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const results = await executeParallel(stage, scriptName, concurrency);
+    console.info(`Stage ${i + 1}: ${stage.map((p) => p.name).join(', ')}`);
 
-        // Log successful completion of the stage
-        // All results are successful because executeParallel throws on any failure
-        console.info(
-          `✅ Stage ${i + 1} completed successfully (${results.length}/${stage.length} packages)`,
-        );
-      } catch (error) {
-        // executeParallel will throw immediately on any failure (fail-fast)
-        const errorMessage = isError(error) ? error.message : String(error);
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const results = await executeParallel(stage, scriptName, concurrency);
 
-        console.error(`\n❌ Stage ${i + 1} failed (fail-fast):`);
+      // Log successful completion of the stage
+      // All results are successful because executeParallel throws on any failure
+      console.info(
+        `✅ Stage ${i + 1} completed successfully (${results.length}/${stage.length} packages)`,
+      );
+    } catch (error) {
+      // executeParallel will throw immediately on any failure (fail-fast)
+      const errorMessage = isError(error) ? error.message : String(error);
 
-        console.error(errorMessage);
+      console.error(`\n❌ Stage ${i + 1} failed (fail-fast):`);
 
-        throw new Error(`Stage ${i + 1} failed: ${errorMessage}`, {
-          cause: error,
-        });
-      }
+      console.error(errorMessage);
+
+      throw new Error(`Stage ${i + 1} failed: ${errorMessage}`, {
+        cause: error,
+      });
     }
   }
 };
