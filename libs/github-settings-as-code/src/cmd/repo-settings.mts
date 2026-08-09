@@ -2,6 +2,8 @@
 
 import 'dotenv/config';
 import * as util from 'node:util';
+import { Arr } from 'ts-data-forge';
+import { type ReadonlyRecord } from 'ts-type-forge';
 
 const HELP = `
 Usage: repo-settings <command> [target] [options]
@@ -76,7 +78,7 @@ const fail: (message: string) => never = (message) => {
 };
 
 const { values, positionals } = util.parseArgs({
-  args: process.argv.slice(2),
+  args: Arr.skip(process.argv, 2),
   options: {
     owner: { type: 'string' },
     repo: { type: 'string' },
@@ -86,10 +88,10 @@ const { values, positionals } = util.parseArgs({
   allowPositionals: true,
 });
 
-if (values.help === true || positionals.length === 0) {
-  console.log(HELP);
+if (values.help === true || Arr.isEmpty(positionals)) {
+  console.info(HELP);
 
-  process.exit(positionals.length === 0 ? 1 : 0);
+  process.exit(Arr.isEmpty(positionals) ? 1 : 0);
 }
 
 const [commandArg, targetArg = 'all'] = positionals;
@@ -106,8 +108,9 @@ if (!isTarget(targetArg)) {
 // 走るため、 --help や引数エラーの時点では評価させたくない。
 const github = await import('../github/index.mjs');
 
-const runners: Readonly<
-  Record<Command, Partial<Record<Target, () => Promise<void>>>>
+const runners: ReadonlyRecord<
+  Command,
+  Partial<ReadonlyRecord<Target, () => Promise<void>>>
 > = {
   apply: {
     all: async () => {

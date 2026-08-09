@@ -10,6 +10,7 @@ import {
   isDirectlyExecuted,
   Result,
 } from 'ts-repo-utils';
+import { type StrictPick } from 'ts-type-forge';
 import { repositorySettingsDir, settingsJsonName } from '../constants.mjs';
 import { getRepositorySettings, updateRepository } from './api/index.mjs';
 import { backupRepositorySettings } from './backup.mjs';
@@ -52,7 +53,7 @@ export const applyRepositorySettings = async (): Promise<void> => {
       // NOTE: "RequestError [HttpError]: Allow forks can only be changed on org-owned repositories"
       // allow_forking: settings.allow_forking,
       web_commit_signoff_required: settings.web_commit_signoff_required,
-    } satisfies Pick<UpdateRepositoryRequest, RepositoryKeysToPick>,
+    } satisfies StrictPick<UpdateRepositoryRequest, RepositoryKeysToPick>,
   });
 
   // update local setting file

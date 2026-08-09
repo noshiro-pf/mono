@@ -30,7 +30,7 @@ const nativeTsc = path.resolve(
  * Builds the entire project.
  */
 const build = async (skipChecks: boolean): Promise<void> => {
-  console.log('Starting build process...\n');
+  console.info('Starting build process...\n');
 
   if (!skipChecks) {
     await logStep({
@@ -84,7 +84,7 @@ const build = async (skipChecks: boolean): Promise<void> => {
     successMessage: 'Build completed',
   });
 
-  console.log('✅ Build completed successfully!\n');
+  console.info('✅ Build completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -98,11 +98,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  console.log(`${mut_step.current}. ${startMessage}...`);
+  console.info(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  console.log(`✓ ${successMessage}.\n`);
+  console.info(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };

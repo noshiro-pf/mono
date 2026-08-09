@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as util from 'node:util';
-import { hasKey, isRecord, isString, Json } from 'ts-data-forge';
+import { Arr, hasKey, isRecord, isString, Json } from 'ts-data-forge';
 import { Result } from 'ts-repo-utils';
 
 export type TargetRepo = Readonly<{
@@ -12,7 +12,7 @@ export type TargetRepo = Readonly<{
 
 /** `strict: false` の解析結果は string | boolean | 配列 になりうるため絞り込む。 */
 const pickString = (value: unknown): string | undefined =>
-  isString(value) && value !== '' ? value : undefined;
+  value !== '' && isString(value) ? value : undefined;
 
 /**
  * コマンドライン引数から `--owner` / `--repo` を読む。
@@ -21,7 +21,7 @@ const pickString = (value: unknown): string | undefined =>
  */
 const fromCliArgs = (): Partial<TargetRepo> => {
   const { values } = util.parseArgs({
-    args: process.argv.slice(2),
+    args: Arr.skip(process.argv, 2),
     options: {
       owner: { type: 'string' },
       repo: { type: 'string' },

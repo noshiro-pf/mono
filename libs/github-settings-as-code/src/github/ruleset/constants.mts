@@ -5,7 +5,6 @@ import {
 } from 'octokit-safe-types';
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { upgradeStaleCodec } from '../upgrade-stale-codec.mjs';
 
 export const rulesetKeysToPick = [
   'id',
@@ -23,9 +22,6 @@ expectType<keyof UpdateRulesetRequest | 'id', KeysToPick>('=');
 
 expectType<keyof CreateRulesetRequest, keyof UpdateRulesetRequest>('=');
 
-export const RulesetPicked = t.pick(
-  upgradeStaleCodec(RepositoryRuleset),
-  rulesetKeysToPick,
-);
+export const RulesetPicked = t.pick(RepositoryRuleset, rulesetKeysToPick);
 
 export type RulesetPicked = t.TypeOf<typeof RulesetPicked>;

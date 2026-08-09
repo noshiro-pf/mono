@@ -4,8 +4,9 @@ name: Backup Repository Settings
 on:
   # Triggers the workflow on push events (excluding develop branches) and manual runs
   push:
-    branches:
-      - main
+    branches-ignore:
+      - 'develop'
+      - 'develop*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

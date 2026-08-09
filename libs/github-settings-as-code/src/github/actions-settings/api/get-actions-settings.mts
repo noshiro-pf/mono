@@ -21,18 +21,11 @@ export const getActionsSettings = async (): Promise<ActionsSettings> => {
     { owner: OWNER, repo: REPO, headers: octokitHeaders },
   );
 
-  // sha_pinning_required は @octokit/types v16 の型に無いため、レスポンスから
-  // 直接読まずに validate 側の既定値へフォールバックさせる。
-  const shaPinningRequired: unknown = (
-    permissions.data as Readonly<Record<string, unknown>>
-  )['sha_pinning_required'];
-
   // eslint-disable-next-line unicorn/no-array-fill-with-reference-type
   return ActionsSettings.fill({
     enabled: permissions.data.enabled,
     allowed_actions: permissions.data.allowed_actions,
-    sha_pinning_required:
-      typeof shaPinningRequired === 'boolean' ? shaPinningRequired : undefined,
+    sha_pinning_required: permissions.data.sha_pinning_required,
     fork_pr_contributor_approval_policy: forkPrApproval.data.approval_policy,
   });
 };

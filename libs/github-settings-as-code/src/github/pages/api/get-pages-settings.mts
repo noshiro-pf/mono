@@ -1,4 +1,5 @@
 import { type EndpointKeys } from 'octokit-safe-types';
+import { hasKey, isRecord } from 'ts-data-forge';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 import { PagesSettings } from '../constants.mjs';
@@ -21,12 +22,7 @@ export const getPagesSettings = async (): Promise<
     // eslint-disable-next-line unicorn/no-array-fill-with-reference-type
     return PagesSettings.fill({ build_type: response.data.build_type });
   } catch (error) {
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      Object.hasOwn(error, 'status') &&
-      (error as Readonly<{ status?: unknown }>).status === 404
-    ) {
+    if (isRecord(error) && hasKey(error, 'status') && error.status === 404) {
       return undefined;
     }
 

@@ -5,7 +5,6 @@ import {
 import { expectType } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { type StrictExclude } from 'ts-type-forge';
-import { upgradeStaleCodec } from '../upgrade-stale-codec.mjs';
 
 const keysToPickBase = [
   'allow_auto_merge',
@@ -64,9 +63,6 @@ export type RepositoryKeysToPick = StrictExclude<
 
 expectType<keyof UpdateRepositoryRequest, RepositoryKeysToPick>('>=');
 
-export const RepositoryPicked = t.pick(
-  upgradeStaleCodec(FullRepository),
-  repositoryKeysToPick,
-);
+export const RepositoryPicked = t.pick(FullRepository, repositoryKeysToPick);
 
 export type RepositoryPicked = t.TypeOf<typeof RepositoryPicked>;
