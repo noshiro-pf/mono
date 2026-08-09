@@ -106,7 +106,7 @@
     "eslint-plugin-ts-fortress": "1.0.0",
     "eslint-plugin-ts-type-forge": "0.6.1",
     "fast-glob": "3.3.3",
-    "github-settings-as-code": "2.0.1",
+    "github-settings-as-code": "2.1.0",
     "jiti": "2.7.0",
     "markdownlint": "0.41.1",
     "markdownlint-cli2": "0.23.2",
