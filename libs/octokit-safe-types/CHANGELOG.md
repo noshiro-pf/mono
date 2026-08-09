@@ -1,3 +1,9 @@
+## [1.2.25](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.24...v1.2.25) (2026-08-09)
+
+### Bug Fixes
+
+- remove overrides in pnpm-workspace.yaml ([#256](https://github.com/noshiro-pf/octokit-safe-types/issues/256)) ([0220d8f](https://github.com/noshiro-pf/octokit-safe-types/commit/0220d8f07da5705931e93e37451645e56c04b3bf))
+
 ## [1.2.24](https://github.com/noshiro-pf/octokit-safe-types/compare/v1.2.23...v1.2.24) (2026-08-09)
 
 ### Bug Fixes
