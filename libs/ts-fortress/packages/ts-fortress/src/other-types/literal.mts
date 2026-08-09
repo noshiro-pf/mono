@@ -1,10 +1,10 @@
 import { isBigint, isString } from 'ts-data-forge';
-import { type Primitive } from 'ts-type-forge';
+import { type Primitive, type StrictExtract } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import { createPrimitiveType } from '../utils/index.mjs';
 
 export const literal = <
-  L extends Extract<Primitive, string | number | bigint | boolean>,
+  L extends StrictExtract<Primitive, string | number | bigint | boolean>,
 >(
   value: L,
 ): Type<L> =>

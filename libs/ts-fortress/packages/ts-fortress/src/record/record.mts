@@ -9,6 +9,7 @@ import {
 } from 'ts-data-forge';
 import {
   type MergeIntersection,
+  type StrictExclude,
   type TypeEq,
   type UnknownRecord,
 } from 'ts-type-forge';
@@ -102,7 +103,7 @@ export const record = <
             const v = a[k];
 
             // Skip validation for optional fields with undefined values
-            if (valueType.optional === true && v === undefined) {
+            if (v === undefined && valueType.optional === true) {
               continue;
             }
 
@@ -162,7 +163,7 @@ export const record = <
           const value = a[k];
 
           // For optional fields, if the value is undefined, keep it as undefined
-          if (v.optional === true && value === undefined) {
+          if (value === undefined && v.optional === true) {
             return tp(k, undefined);
           }
 
@@ -248,7 +249,9 @@ namespace TsFortressInternal {
     OptionalKeys extends keyof S,
   > =
     TypeEq<OptionalKeys, never> extends true
-      ? Readonly<{ [key in Exclude<keyof S, OptionalKeys>]: TypeOf<S[key]> }>
+      ? Readonly<{
+          [key in StrictExclude<keyof S, OptionalKeys>]: TypeOf<S[key]>;
+        }>
       : TypeEq<keyof S, OptionalKeys> extends true
         ? MergeIntersection<
             Readonly<{ [key in OptionalKeys]?: TypeOf<S[key]> }>
@@ -256,7 +259,7 @@ namespace TsFortressInternal {
         : MergeIntersection<
             Readonly<
               { [key in OptionalKeys]?: TypeOf<S[key]> } & {
-                [key in Exclude<keyof S, OptionalKeys>]: TypeOf<S[key]>;
+                [key in StrictExclude<keyof S, OptionalKeys>]: TypeOf<S[key]>;
               }
             >
           >;

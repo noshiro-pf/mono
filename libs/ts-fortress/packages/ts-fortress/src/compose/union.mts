@@ -191,7 +191,7 @@ export const union = <const Types extends NonEmptyTuple<AnyType>>(
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return {
       ...baseType,
-      shapeStructure: Arr.isFixedLengthTuple(shapeStructures, 1)
+      shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)
         ? shapeStructures[0]
         : ({ kind: 'union', variants: shapeStructures } as const),
       excessProperty,

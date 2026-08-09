@@ -13,6 +13,7 @@ import {
   type PositiveInt,
   type SafeInt,
   type SafeUint,
+  type StrictPick,
   type Uint,
 } from 'ts-type-forge';
 import { refine } from '../other-types/index.mjs';
@@ -41,10 +42,7 @@ export function number<C extends Constraints>(
     is: isNumber,
   });
 
-  if (
-    constraints === undefined ||
-    Arr.isFixedLengthTuple(Object.keys(constraints), 0)
-  ) {
+  if (constraints === undefined || Arr.isEmpty(Object.keys(constraints))) {
     return baseType;
   }
 
@@ -116,7 +114,7 @@ export type NumberTypeConstraints = Constraints;
  * brand from a plain number, use {@link number} with the predicate constraints
  * instead, or the dedicated branded constructor for the target type.
  */
-export type NumberRangeConstraints = Pick<
+export type NumberRangeConstraints = StrictPick<
   NumberTypeConstraints,
   'gt' | 'gte' | 'min' | 'lt' | 'lte' | 'max' | 'multipleOf' | 'step'
 >;

@@ -104,7 +104,7 @@ export function at(
     ? Arr.toPushed(memberTypes, undefinedType)
     : memberTypes;
 
-  if (Arr.isMinLengthTuple(collected, 2)) {
+  if (Arr.isMinLengthTuple(2, collected)) {
     return union(collected, {
       typeName: `${type.typeName}[${JSON.stringify(keyOrIndex)}]`,
     });

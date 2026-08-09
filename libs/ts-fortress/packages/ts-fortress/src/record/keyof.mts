@@ -1,5 +1,10 @@
 import { Arr, expectType, pipe } from 'ts-data-forge';
-import { type IsNever, type ToString, type UnknownRecord } from 'ts-type-forge';
+import {
+  type IsNever,
+  type ReadonlyRecord,
+  type ToString,
+  type UnknownRecord,
+} from 'ts-type-forge';
 import { enumType } from '../enum/index.mjs';
 import { undefinedType } from '../primitives/index.mjs';
 import {
@@ -74,7 +79,7 @@ type KeyofType<R extends UnknownRecord> =
   expectType<TypeOf<ReturnType<typeof keyof<Base>>>, 'a' | 'b' | 'c'>('=');
 
   // keyof of empty record yields undefined
-  type EmptyRecord = Readonly<Record<never, never>>;
+  type EmptyRecord = ReadonlyRecord<never, never>;
 
   expectType<TypeOf<ReturnType<typeof keyof<EmptyRecord>>>, undefined>('=');
 

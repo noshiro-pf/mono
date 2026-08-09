@@ -74,7 +74,7 @@ export const nonEmptyArray = <A,>(
   };
 
   const fill = (a: unknown): readonly A[] =>
-    Arr.isArray(a) && Arr.isMinLengthTuple(a, 1)
+    Arr.isArray(a) && Arr.isNonEmpty(a)
       ? Arr.map(a, (e) => elementType.fill(e) satisfies A)
       : getDefaultValue();
 

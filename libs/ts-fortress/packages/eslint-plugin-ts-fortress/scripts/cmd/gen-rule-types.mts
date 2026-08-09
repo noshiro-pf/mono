@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Arr } from 'ts-data-forge';
 import { $, Result } from 'ts-repo-utils';
 import { tsFortressRules } from '../../src/rules/rules.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
@@ -42,8 +43,8 @@ const main = async (): Promise<void> => {
       deprecated: meta.deprecated !== undefined && meta.deprecated !== false,
       fixable: meta.fixable ?? 'false',
       schema,
-      hasOptions: Array.isArray(schema)
-        ? schema.length > 0
+      hasOptions: Arr.isArray(schema)
+        ? Arr.isNonEmpty(schema)
         : schema !== undefined && schema !== false,
     } as const satisfies RuleInfo;
   });
@@ -82,7 +83,11 @@ const generateFileContent = (rules: readonly RuleInfo[]): string => {
       ? ["import { type TSESLint } from '@typescript-eslint/utils';"]
       : []),
     "import { type Linter } from 'eslint';",
-    "import { type TypeEq } from 'ts-type-forge';",
+    // `ReadonlyRecord` is only referenced by the no-option `…RulesOption` form
+    // emitted below, so it must not be imported when some rule takes options.
+    Arr.isEmpty(optionRules)
+      ? "import { type ReadonlyRecord, type TypeEq } from 'ts-type-forge';"
+      : "import { type TypeEq } from 'ts-type-forge';",
     "import { type tsFortressRules } from './rules/index.mjs';",
     '',
     ...(hasAnyOptions
@@ -108,7 +113,7 @@ const generateFileContent = (rules: readonly RuleInfo[]): string => {
           '',
         ]
       : []),
-    ...rules.flatMap((rule) => [...generateRuleNamespace(rule), '']),
+    ...rules.flatMap((rule) => Arr.toPushed(generateRuleNamespace(rule), '')),
     'export type EslintTsFortressRules = Readonly<{',
     ...rules.map(
       (rule) =>
@@ -118,11 +123,9 @@ const generateFileContent = (rules: readonly RuleInfo[]): string => {
     '',
     // `Readonly<{}>` would be an "empty object" type (any non-nullish value),
     // so the no-option case gets an explicitly empty record instead.
-    ...(optionRules.length === 0
+    ...(Arr.isEmpty(optionRules)
       ? [
-          'export type EslintTsFortressRulesOption = Readonly<',
-          '  Record<never, never>',
-          '>;',
+          'export type EslintTsFortressRulesOption = ReadonlyRecord<never, never>;',
         ]
       : [
           'export type EslintTsFortressRulesOption = Readonly<{',

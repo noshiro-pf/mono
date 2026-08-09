@@ -3,6 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { Arr } from 'ts-data-forge';
 import { TS_FORTRESS_MODULE } from './constants.mjs';
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
@@ -152,7 +153,7 @@ export const buildImportsFix = (
   program: TSESTree.Program,
   names: readonly string[],
 ): readonly TSESLint.RuleFix[] =>
-  names.length === 0
+  Arr.isEmpty(names)
     ? ([] as const)
     : ([
         fixer.insertTextBefore(

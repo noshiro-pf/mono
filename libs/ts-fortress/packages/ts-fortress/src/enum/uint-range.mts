@@ -1,5 +1,5 @@
 import { isNumber, memoizeFunction, Num, Result } from 'ts-data-forge';
-import { type Uint11, type UintRange } from 'ts-type-forge';
+import { type StrictExclude, type Uint11, type UintRange } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -12,7 +12,7 @@ export type { UintRange } from 'ts-type-forge';
 
 export const uintRange = <
   Start extends Uint11,
-  End extends Exclude<Uint11 | 2048, Start>,
+  End extends StrictExclude<Uint11 | 2048, Start>,
 >(
   ...args:
     | readonly [
@@ -49,7 +49,7 @@ export const uintRange = <
 
 const uintRangeImpl = <
   Start extends Uint11,
-  End extends Exclude<Uint11 | 2048, Start>,
+  End extends StrictExclude<Uint11 | 2048, Start>,
 >(
   start: Start,
   end: End,

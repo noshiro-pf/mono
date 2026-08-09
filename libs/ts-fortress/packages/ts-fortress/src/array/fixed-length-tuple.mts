@@ -49,7 +49,7 @@ export const fixedLengthTuple = <N extends StructuralPrefixLength, A>(
       ]);
     }
 
-    if (!Arr.isFixedLengthTuple(a, size)) {
+    if (!Arr.isFixedLengthTuple(size, a)) {
       return Result.err([
         {
           path: [],

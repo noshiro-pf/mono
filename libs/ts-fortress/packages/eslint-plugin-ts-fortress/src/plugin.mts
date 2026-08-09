@@ -1,3 +1,4 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
 import { tsFortressRules } from './rules/index.mjs';
 import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
 
@@ -9,8 +10,9 @@ import { type ESLintFlatConfig, type ESLintPlugin } from './types.mjs';
  */
 const recommendedRules = {
   'ts-fortress/prefer-canonical-length-constrained-type': 'error',
-} as const satisfies Readonly<
-  Record<`ts-fortress/${keyof typeof tsFortressRules}`, 'error'>
+} as const satisfies ReadonlyRecord<
+  `ts-fortress/${keyof typeof tsFortressRules}`,
+  'error'
 >;
 
 const recommendedConfig = {

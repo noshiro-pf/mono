@@ -30,10 +30,7 @@ export function string<C extends RawConstraints>(
     is: isString,
   });
 
-  if (
-    constraints === undefined ||
-    Arr.isFixedLengthTuple(Object.keys(constraints), 0)
-  ) {
+  if (constraints === undefined || Arr.isEmpty(Object.keys(constraints))) {
     return baseType;
   }
 

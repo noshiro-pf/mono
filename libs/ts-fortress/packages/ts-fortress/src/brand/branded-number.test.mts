@@ -31,7 +31,7 @@ describe('simpleBrandedNumber', () => {
 
         assert.isTrue(userIdType.is(0));
 
-        assert.isTrue(userIdType.is(3.14));
+        assert.isTrue(userIdType.is(1.5));
       });
 
       test('returns false for non-numbers', () => {

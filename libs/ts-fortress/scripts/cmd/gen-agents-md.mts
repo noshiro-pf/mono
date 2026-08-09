@@ -78,7 +78,7 @@ export const genAgentsMd = async (): Promise<Result<undefined, string>> => {
     // so its embedded code blocks are otherwise not normalized).
     await formatFiles([outputPath]);
 
-    console.log(
+    console.info(
       `Successfully generated ${path.relative(repositoryRootPath, outputPath)}.`,
     );
 

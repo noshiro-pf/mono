@@ -93,7 +93,7 @@ import { Arr } from 'ts-data-forge';
 
 const result = Arr.at([1, 2, 3], 1);
 
-/* embed-sample-code-ignore-this-line */ console.log(result); // This line will not be embedded
+/* embed-sample-code-ignore-this-line */ console.info(result); // This line will not be embedded
 // embed-sample-code-ignore-below
 
 // This comment will not be embedded

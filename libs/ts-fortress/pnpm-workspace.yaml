@@ -1,14 +1,21 @@
-allowBuilds:
-  esbuild: true
-  unrs-resolver: true
+packages:
+  - packages/**
+
+update:
+  githubActions: true
+  ignoreDeps:
+    - typescript
 
 minimumReleaseAge: 10080 # = 7 days
 
 minimumReleaseAgeExclude:
   - '@types/**'
   - ts-type-forge
+  - eslint-plugin-ts-type-forge
   - ts-data-forge
+  - eslint-plugin-ts-data-forge
   - ts-fortress
+  - eslint-plugin-ts-fortress
   - ts-repo-utils
   - ts-codemod-lib
   - synstate
@@ -16,7 +23,8 @@ minimumReleaseAgeExclude:
   - eslint-config-typed
   - octokit-safe-types
   - github-settings-as-code
-  - eslint-plugin-ts-data-forge
+  - 'strict-ts-lib-*'
 
-packages:
-  - packages/**
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true

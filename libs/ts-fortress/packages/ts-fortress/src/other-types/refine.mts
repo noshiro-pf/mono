@@ -1,5 +1,5 @@
 import { pipe, Result } from 'ts-data-forge';
-import { type Primitive } from 'ts-type-forge';
+import { type Primitive, type StrictExtract } from 'ts-type-forge';
 import { type Type } from '../type.mjs';
 import {
   createPrimitiveValidationError,
@@ -9,7 +9,7 @@ import {
 } from '../utils/index.mjs';
 
 export const refine = <
-  Base extends Extract<Primitive, string | boolean | bigint | number>,
+  Base extends StrictExtract<Primitive, string | boolean | bigint | number>,
   R extends Base,
 >({
   baseType,

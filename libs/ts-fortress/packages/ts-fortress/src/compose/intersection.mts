@@ -98,7 +98,7 @@ export const intersection = <const Types extends NonEmptyTuple<AnyType>>(
       prune: (a: T): T =>
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-return
         types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T,
-      shapeStructure: Arr.isFixedLengthTuple(shapeStructures, 1)
+      shapeStructure: Arr.isFixedLengthTuple(1, shapeStructures)
         ? shapeStructures[0]
         : ({ kind: 'intersection', parts: shapeStructures } as const),
       excessProperty,

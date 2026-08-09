@@ -35,7 +35,7 @@ export const valueof = <const R extends UnknownRecord>(
 
   const types = Object.values(shape);
 
-  if (Arr.isMinLengthTuple(types, 2)) {
+  if (Arr.isMinLengthTuple(2, types)) {
     return union(types, {
       typeName: options?.typeName ?? `ValueOf<${recordType.typeName}>`,
     });

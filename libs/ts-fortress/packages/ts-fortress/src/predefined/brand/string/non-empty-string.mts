@@ -1,5 +1,5 @@
 import { isNonEmptyString } from 'ts-data-forge';
-import { type NonEmptyString } from 'ts-type-forge';
+import { type NonEmptyString, type StrictOmit } from 'ts-type-forge';
 import {
   string,
   type StringConstraintsResultType,
@@ -13,7 +13,10 @@ export type { NonEmptyString } from 'ts-type-forge';
  * The constraints accepted by {@link nonEmptyString}: every {@link string}
  * constraint except `nonempty`, which is always implied.
  */
-export type NonEmptyStringConstraints = Omit<StringTypeConstraints, 'nonempty'>;
+export type NonEmptyStringConstraints = StrictOmit<
+  StringTypeConstraints,
+  'nonempty'
+>;
 
 export function nonEmptyString(defaultValue?: string): Type<NonEmptyString>;
 

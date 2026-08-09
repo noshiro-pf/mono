@@ -4,7 +4,7 @@
 // (`scripts/cmd/gen-rule-types.mts`). Do not edit it manually.
 
 import { type Linter } from 'eslint';
-import { type TypeEq } from 'ts-type-forge';
+import { type ReadonlyRecord, type TypeEq } from 'ts-type-forge';
 import { type tsFortressRules } from './rules/index.mjs';
 
 /**
@@ -26,7 +26,7 @@ export type EslintTsFortressRules = Readonly<{
   'ts-fortress/prefer-canonical-length-constrained-type': PreferCanonicalLengthConstrainedType.RuleEntry;
 }>;
 
-export type EslintTsFortressRulesOption = Readonly<Record<never, never>>;
+export type EslintTsFortressRulesOption = ReadonlyRecord<never, never>;
 
 // If this assertion fails to type-check, this generated file has drifted from
 // the actual plugin rules — re-run `pnpm run gen:rule-types`.

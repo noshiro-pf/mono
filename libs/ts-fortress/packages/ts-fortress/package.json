@@ -59,15 +59,14 @@
     "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
-    "update-packages": "pnpm update --latest",
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "@sindresorhus/is": "8.1.x",
-    "ts-data-forge": "12.x",
-    "ts-type-forge": "8.x"
+    "@sindresorhus/is": "8.1.0",
+    "ts-data-forge": "~14.1.0",
+    "ts-type-forge": "~9.1.3"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "6.0.3",

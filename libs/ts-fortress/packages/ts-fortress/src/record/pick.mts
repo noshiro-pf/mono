@@ -1,5 +1,9 @@
 import { expectType, Obj } from 'ts-data-forge';
-import { type ArrayElement, type UnknownRecord } from 'ts-type-forge';
+import {
+  type ArrayElement,
+  type StrictPick,
+  type UnknownRecord,
+} from 'ts-type-forge';
 import {
   type ExcessPropertyOption,
   flattenShapeStructure,
@@ -51,7 +55,7 @@ export const pick = <
 type PickedType<
   R extends UnknownRecord,
   KeysToPick extends readonly (keyof R & string)[],
-> = Type<Readonly<Pick<R, ArrayElement<KeysToPick>>>>;
+> = Type<Readonly<StrictPick<R, ArrayElement<KeysToPick>>>>;
 
 // --- expectType assertions ---
 

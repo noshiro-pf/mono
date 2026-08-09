@@ -270,15 +270,15 @@ describe(literal, () => {
       });
 
       test('decimal literal', () => {
-        const pi = literal(3.14);
+        const decimal = literal(1.5);
 
-        type Pi = TypeOf<typeof pi>;
+        type Decimal = TypeOf<typeof decimal>;
 
-        expectType<Pi, 3.14>('=');
+        expectType<Decimal, 1.5>('=');
 
-        assert.isTrue(pi.is(3.14));
+        assert.isTrue(decimal.is(1.5));
 
-        assert.isFalse(pi.is(3.141));
+        assert.isFalse(decimal.is(1.25));
       });
     });
 

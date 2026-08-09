@@ -30,11 +30,11 @@ export const tuple = <const A extends readonly AnyType[]>(
 
   const typeName = options?.typeName ?? 'tuple';
 
-  const getDefaultValue = memoizeFunction((): MapTuple<A> =>
+  const getDefaultValue = memoizeFunction(
     // `types` is bound by `AnyType` (payload `any`), so element accessors are
     // typed `any` inside this generic body; the outer signature keeps it precise.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    Arr.map(types, (t) => t.defaultValue),
+    (): MapTuple<A> => Arr.map(types, (t) => t.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {
@@ -66,8 +66,8 @@ export const tuple = <const A extends readonly AnyType[]>(
     }
 
     const errors: readonly ValidationError[] = Arr.generate(function* () {
-      for (const [index, [typeDef, el]] of Arr.zip(types, a).entries()) {
-        const res = typeDef.validate(el);
+      for (const [index, typeDef] of types.entries()) {
+        const res = typeDef.validate(a[index]);
 
         if (Result.isErr(res)) {
           yield* prependIndexToValidationErrors(res.value, index);

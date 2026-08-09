@@ -55,7 +55,7 @@ export const omit = <
 type OmittedType<
   R extends UnknownRecord,
   KeysToOmit extends readonly (keyof R & string)[],
-> = Type<Readonly<Omit<R, ArrayElement<KeysToOmit>>>>;
+> = Type<Readonly<StrictOmit<R, ArrayElement<KeysToOmit>>>>;
 
 // --- expectType assertions ---
 
@@ -77,7 +77,7 @@ type OmittedType<
   >('=');
 
   expectType<
-    Omit<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>,
+    StrictOmit<Readonly<{ a: Type<0>; b: Type<1>; c: Type<2> }>, 'a' | 'b'>,
     Readonly<{
       c: Type<2>;
     }>
@@ -96,9 +96,9 @@ type OmittedType<
 {
   type A = Readonly<{ a: 0; b: 0; c: 0 } | { b: 0; c: 0; d: 0 }>;
 
-  // TypeScript Omit will not distribute over unions, so we don't support unions in omit() - it will produce an error if given a union type
-  expectType<Omit<A, 'b'>, Readonly<{ c: 0 }>>('=');
-
+  // Omitting a key does not distribute over unions - `keyof A` is only the keys
+  // common to every member - so we don't support unions in omit(): it will
+  // produce an error if given a union type
   expectType<StrictOmit<A, 'b'>, Readonly<{ c: 0 }>>('=');
 
   expectType<TypeOf<OmittedType<A, readonly ['b']>>, StrictOmit<A, 'b'>>('=');

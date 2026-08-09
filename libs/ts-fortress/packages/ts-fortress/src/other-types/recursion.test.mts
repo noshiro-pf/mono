@@ -59,7 +59,7 @@ describe('recursive', () => {
 
       assert.isTrue(JsonValue.is(42));
 
-      assert.isTrue(JsonValue.is(3.14));
+      assert.isTrue(JsonValue.is(1.5));
 
       assert.isTrue(JsonValue.is('hello'));
 
