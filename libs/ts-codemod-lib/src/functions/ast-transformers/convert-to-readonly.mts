@@ -8,7 +8,12 @@ import {
   pipe,
 } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
-import { type DeepReadonly, type SafeUintWithSmallInt } from 'ts-type-forge';
+import {
+  type DeepReadonly,
+  type SafeUintWithSmallInt,
+  type StrictExclude,
+  type StrictExtract,
+} from 'ts-type-forge';
 import {
   hasDisableNextLineComment,
   isAtomicTypeNode,
@@ -397,7 +402,7 @@ const transformNode = (
 const transformTypeReferenceNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.TypeReferenceNode,
-  readonlyContext: Exclude<
+  readonlyContext: StrictExclude<
     ReadonlyContext,
     Readonly<{ type: 'readonly'; indexedAccessDepth: SafeUintWithSmallInt }>
   >,
@@ -813,7 +818,7 @@ const transformRestTypeNode = (
 const transformTypeOperatorNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.TypeOperatorTypeNode,
-  readonlyContext: Exclude<
+  readonlyContext: StrictExclude<
     ReadonlyContext,
     Readonly<{ type: 'readonly'; indexedAccessDepth: SafeUintWithSmallInt }>
   >,
@@ -852,7 +857,7 @@ const transformTypeOperatorNode = (
 const transformTypeLiteralNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.TypeLiteralNode,
-  readonlyContext: Exclude<
+  readonlyContext: StrictExclude<
     ReadonlyContext,
     Readonly<{ type: 'readonly'; indexedAccessDepth: SafeUintWithSmallInt }>
   >,
@@ -927,7 +932,7 @@ const transformIndexedAccessTypeNode = (
 const transformMappedTypeNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.MappedTypeNode,
-  readonlyContext: Exclude<
+  readonlyContext: StrictExclude<
     ReadonlyContext,
     Readonly<{ type: 'readonly'; indexedAccessDepth: SafeUintWithSmallInt }>
   >,
@@ -1109,7 +1114,7 @@ const transformConstructorParameter = (
 const transformIntersectionTypeNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.IntersectionTypeNode,
-  readonlyContext: Exclude<
+  readonlyContext: StrictExclude<
     ReadonlyContext,
     Readonly<{ type: 'readonly'; indexedAccessDepth: SafeUintWithSmallInt }>
   >,
@@ -1125,7 +1130,7 @@ const transformIntersectionTypeNode = (
 const transformUnionTypeNode = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.UnionTypeNode,
-  readonlyContext: Exclude<
+  readonlyContext: StrictExclude<
     ReadonlyContext,
     Readonly<{ type: 'readonly'; indexedAccessDepth: SafeUintWithSmallInt }>
   >,
@@ -1137,7 +1142,7 @@ const transformUnionTypeNode = (
 const transformUnionOrIntersectionTypeNodeImpl = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.IntersectionTypeNode | tsm.UnionTypeNode,
-  readonlyContext: Exclude<
+  readonlyContext: StrictExclude<
     ReadonlyContext,
     Readonly<{ type: 'readonly'; indexedAccessDepth: SafeUintWithSmallInt }>
   >,
@@ -1346,7 +1351,7 @@ const transformMembers = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   members: readonly tsm.TypeElementTypes[],
   readonlyModifier: 'add' | 'remove',
-  readonlyContext: Extract<
+  readonlyContext: StrictExtract<
     ReadonlyContext,
     Readonly<{
       type: 'DeepReadonly' | 'none';
@@ -1387,8 +1392,6 @@ const transformMembers = (
     }
 
     transformNode(mb, readonlyContext, options);
-
-    continue;
   }
 };
 
@@ -1396,7 +1399,7 @@ const transformPropertySignature = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.PropertySignature,
   readonlyModifier: 'add' | 'remove',
-  readonlyContext: Extract<
+  readonlyContext: StrictExtract<
     ReadonlyContext,
     Readonly<{
       type: 'DeepReadonly' | 'none';
@@ -1406,8 +1409,8 @@ const transformPropertySignature = (
   options: ReadonlyTransformerOptionsInternal,
 ): void => {
   if (
-    readonlyContext.type === 'DeepReadonly' ||
-    readonlyModifier === 'remove'
+    readonlyModifier === 'remove' ||
+    readonlyContext.type === 'DeepReadonly'
   ) {
     node.setIsReadonly(false);
   } else {
@@ -1427,7 +1430,7 @@ const transformIndexSignatureDeclaration = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   node: tsm.IndexSignatureDeclaration,
   readonlyModifier: 'add' | 'remove',
-  readonlyContext: Extract<
+  readonlyContext: StrictExtract<
     ReadonlyContext,
     Readonly<{
       type: 'DeepReadonly' | 'none';
@@ -1443,8 +1446,8 @@ const transformIndexSignatureDeclaration = (
   }
 
   if (
-    readonlyContext.type === 'DeepReadonly' ||
-    readonlyModifier === 'remove'
+    readonlyModifier === 'remove' ||
+    readonlyContext.type === 'DeepReadonly'
   ) {
     // node.setIsReadonly(false);
     node.toggleModifier('readonly', false);

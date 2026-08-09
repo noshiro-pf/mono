@@ -23,10 +23,6 @@ export const shouldAvoidParenthesesForReadonly = (node: tsm.Node): boolean => {
   // Check if parent is TypePredicate: x is T
   // In this case, we MUST avoid parentheses: x is readonly T (not x is (readonly T))
   // because `x is (readonly T)` is a syntax error
-  if (parent.isKind(tsm.SyntaxKind.TypePredicate)) {
-    return true;
-  }
-
   // For all other cases, keep parentheses for safety
-  return false;
+  return parent.isKind(tsm.SyntaxKind.TypePredicate);
 };

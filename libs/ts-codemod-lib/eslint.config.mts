@@ -7,7 +7,10 @@ import {
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
-import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import {
+  eslintPluginTsTypeForge,
+  type EslintTsTypeForgeRules,
+} from 'eslint-plugin-ts-type-forge';
 
 const thisDir = import.meta.dirname;
 
@@ -84,9 +87,10 @@ export default [
     }),
   },
   {
+    // The package entry point intentionally re-exports the generated `src/index.mts` barrel.
     files: ['src/entry-point.mts'],
     rules: defineKnownRules({
-      '@typescript-eslint/no-restricted-imports': 'off',
+      'no-restricted-imports': 'off',
     }),
   },
 
@@ -98,5 +102,13 @@ export default [
       '@typescript-eslint/no-unsafe-call': 'off',
       'functional/immutable-data': 'off',
     }),
+  },
+  {
+    // This sample documents the `Record<string, unknown>` -> `UnknownRecord`
+    // codemod, so it has to show the built-in `Record` in its "before" code.
+    files: ['samples/readme/replace-record-with-unknown-record-example.mts'],
+    rules: {
+      'ts-type-forge/prefer-readonly-or-mutable-record': 'off',
+    } satisfies Partial<EslintTsTypeForgeRules>,
   },
 ] satisfies readonly FlatConfig[];

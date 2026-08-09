@@ -1,6 +1,6 @@
 import { Arr, expectType } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
-import { type DeepReadonly } from 'ts-type-forge';
+import { type DeepReadonly, type StrictOmit } from 'ts-type-forge';
 import { isAtomicTypeNode } from './is-atomic-type-node.mjs';
 
 export const isShallowReadonlyTypeNode = (node: tsm.Node): boolean =>
@@ -17,7 +17,7 @@ export const isReadonlyTupleOrArrayTypeNode = (
     node.getTypeNode().isKind(tsm.SyntaxKind.TupleType));
 
 export type ReadonlyArrayTypeNode = tsm.TypeNode &
-  Omit<tsm.TypeOperatorTypeNode, 'getOperator' | 'getTypeNode'> &
+  StrictOmit<tsm.TypeOperatorTypeNode, 'getOperator' | 'getTypeNode'> &
   Readonly<{
     getOperator: () => tsm.SyntaxKind.ReadonlyKeyword;
     getTypeNode: () => tsm.ArrayTypeNode;
@@ -91,7 +91,7 @@ if (import.meta.vitest !== undefined) {
 }
 
 export type ReadonlyTupleTypeNode = tsm.TypeNode &
-  Omit<tsm.TypeOperatorTypeNode, 'getOperator' | 'getTypeNode'> &
+  StrictOmit<tsm.TypeOperatorTypeNode, 'getOperator' | 'getTypeNode'> &
   Readonly<{
     getOperator: () => tsm.SyntaxKind.ReadonlyKeyword;
     getTypeNode: () => tsm.TupleTypeNode;
@@ -153,9 +153,9 @@ if (import.meta.vitest !== undefined) {
 }
 
 export type ReadonlyTypeReferenceNode = tsm.TypeNode &
-  Omit<tsm.TypeReferenceNode, 'getTypeName' | 'getTypeArguments'> &
+  StrictOmit<tsm.TypeReferenceNode, 'getTypeName' | 'getTypeArguments'> &
   Readonly<{
-    getTypeName: () => Omit<tsm.Identifier, 'getText'> &
+    getTypeName: () => StrictOmit<tsm.Identifier, 'getText'> &
       Readonly<{
         getText: () => 'Readonly';
       }>;

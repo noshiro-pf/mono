@@ -1,5 +1,5 @@
 import { SafeUint, match } from 'ts-data-forge';
-import { type SafeUintWithSmallInt } from 'ts-type-forge';
+import { type SafeUintWithSmallInt, type StrictExtract } from 'ts-type-forge';
 
 /**
  * Controls whether to make a layer mutable during recursive transformation
@@ -37,7 +37,7 @@ export const nextReadonlyContext = <
         indexedAccessDepthChange: 'decr' | 'incr' | 'keep' | 'infinity';
       }
     | {
-        nextReadonlyContextType: Extract<
+        nextReadonlyContextType: StrictExtract<
           ReadonlyContext['type'],
           'DeepReadonly'
         >;
@@ -47,7 +47,7 @@ export const nextReadonlyContext = <
     currentReadonlyContext: Curr;
   }
 >): Readonly<{
-  type: Extract<ReadonlyContext['type'], 'DeepReadonly'> | Next;
+  type: Next | StrictExtract<ReadonlyContext['type'], 'DeepReadonly'>;
   indexedAccessDepth: SafeUintWithSmallInt;
 }> =>
   curr.type === 'DeepReadonly'

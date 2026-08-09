@@ -58,7 +58,7 @@ const shouldSkipFile = (
 
   const hasFileIgnoreComment = patterns.some((regex) => regex.test(code));
 
-  if (Arr.isEmpty(ignoredTransformers) && !hasFileIgnoreComment) {
+  if (!hasFileIgnoreComment && Arr.isEmpty(ignoredTransformers)) {
     return false;
   }
 
