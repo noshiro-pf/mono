@@ -1,5 +1,78 @@
 # ts-data-forge
 
+## 14.1.0
+
+### Minor Changes
+
+- f9f6b08: `Arr.every` used as a type guard now narrows to the element-substituted array
+  rather than to a bare `readonly S[]`, so a tuple stays a tuple of `S` and a
+  length-constrained array keeps its brand:
+
+    ```ts
+    declare const xs: MinLengthArray<3, string | number>;
+
+    if (Arr.every(xs, isString)) {
+        // now assignable to MinLengthArray<3, string>; previously it was not
+        takesNonEmptyStrings(xs);
+    }
+
+    declare const pair: FixedLengthTuple<2, string | number>;
+
+    if (Arr.every(pair, isString)) {
+        // now assignable to readonly [string, string]; previously it was not
+        takesStringPair(pair);
+    }
+    ```
+
+    The old predicate said `array is readonly S[]`. TypeScript intersected that
+    with the declared type, so indexed access happened to come out right, but the
+    narrowed type was not assignable to the same container with `S` elements —
+    callers had to reach for a type assertion to pass it on.
+
+    Brand-carrying arrays select a separate overload returning
+    `ChangeArrayElement<Ar, S> & Ar`; everything else states the homomorphic
+    mapping directly, for the same reason as in `Arr.map` — a _generic_ `Ar`
+    cannot decide `HasLengthConstraint`. Both are intersected with the input, so a
+    brand intersected with an exact tuple — the shape `Arr.isMinLengthArray` and
+    `Arr.asMinLengthArray` produce — keeps the brand, the length and the positions
+    all at once.
+
+    The curried form gets the same treatment. Its two cases are overloads of the
+    _returned_ guard rather than of `Arr.every` itself, so a single
+    `Arr.every(predicate)` value still accepts branded and unbranded arrays alike.
+
+    `Arr.every` with a plain `boolean` predicate, and `Arr.some`, are unchanged.
+
+### Patch Changes
+
+- 20c6d36: `Arr.toSorted` is usable from a function that is itself generic over the array.
+  Its parameter list was a conditional type — a tuple with an optional comparator
+  for `readonly number[]` and a required one otherwise — and a generic `Ar` cannot
+  decide it, so the whole argument list was rejected:
+
+    ```ts
+    const sortAscending = <const T extends readonly number[]>(
+        xs: T,
+    ): readonly T[number][] => Arr.toSorted(xs, (a, b) => a - b);
+    // Argument of type '[T, (a: number, b: number) => number]' is not assignable
+    // to parameter of type 'T extends readonly number[] ? ... : ...'
+    ```
+
+    The two cases are now two overloads, so resolution picks one per call. Concrete
+    callers are unaffected — the optional comparator for numbers, the required one
+    for everything else, and every reported result type are unchanged.
+
+    This is the same class of problem 14.0.1 fixed for `Arr.map`, `Arr.toFilled`
+    and `Arr.toRangeFilled`, except on the parameter side rather than the return
+    side.
+
+    `Arr.tail`, `Arr.butLast`, `Arr.zip`, `Arr.set` and `Arr.toUpdated` still do not
+    resolve under a generic array parameter. They report `ConstrainedList.Tail` /
+    `Zip` / `SetAt`, whose brand branch computes on the input's own bounds, and that
+    computation expands the whole `SupportedLength` union when the input is a type
+    parameter. Fixing those needs a change in ts-type-forge, not here; the reason is
+    recorded in `array-utils-shape-invariants.test.mts` alongside the coverage.
+
 ## 14.0.1
 
 ### Patch Changes
