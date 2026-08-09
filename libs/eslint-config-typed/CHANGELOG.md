@@ -1,3 +1,9 @@
+## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
+
+### Bug Fixes
+
+- turn off unicorn/no-unreadable-for-of-expression ([#408](https://github.com/noshiro-pf/eslint-config-typed/issues/408)) ([016ead5](https://github.com/noshiro-pf/eslint-config-typed/commit/016ead54b20ee984b5a477a1b809d4e12c78e2c3))
+
 ## [5.8.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.2...v5.8.3) (2026-08-07)
 
 ### Bug Fixes
