@@ -163,6 +163,12 @@ export default [
       // `Number.isInteger` (not `isSafeInteger`) is the correct guard for the
       // non-safe integer brands (`Int`, `Uint`, ...) these samples document.
       'unicorn/prefer-number-is-safe-integer': 'off',
+      // The `IsAny` / `IsNever` / `IsUnknown` samples exist to show what those
+      // predicates answer for degenerate operands — `IsNever<string | never>`,
+      // `IsAny<any | string>`, `IsUnknown<unknown | string>` — which is exactly
+      // the shape this rule reports. Already off for `**/*.test.mts`, where the
+      // same assertions live, for the same reason.
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
       // `x | 0` (truncate + wrap) is the idiomatic ToInt32 conversion that the
       // `Int32` sample intentionally demonstrates (`Math.trunc` does not wrap).
       'math/prefer-math-trunc': 'off',

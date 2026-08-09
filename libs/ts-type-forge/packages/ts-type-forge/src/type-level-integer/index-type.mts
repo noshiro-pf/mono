@@ -9,9 +9,11 @@ import { type IndexOfTuple, type MakeTuple } from '../tuple-and-list/index.mjs';
  * @template N - The upper bound (exclusive). Must be a non-negative integer literal.
  * @returns A union type `0 | 1 | ... | N-1`. Returns `never` if `N` is 0.
  * @example
+ * ```ts
  * type Idx3 = Index<3>; // 0 | 1 | 2
  * type Idx0 = Index<0>; // never
  * type Idx1 = Index<1>; // 0
+ * ```
  */
 export type Index<N extends number> = IndexOfTuple<MakeTuple<N, 0>>;
 
@@ -23,8 +25,10 @@ export type Index<N extends number> = IndexOfTuple<MakeTuple<N, 0>>;
  * @template N - The upper bound (inclusive). Must be a non-negative integer literal.
  * @returns A union type `0 | 1 | ... | N`.
  * @example
+ * ```ts
  * type IdxInc3 = IndexInclusive<3>; // 0 | 1 | 2 | 3
  * type IdxInc0 = IndexInclusive<0>; // 0
+ * ```
  */
 export type IndexInclusive<N extends number> = IndexOfTuple<
   [...MakeTuple<N, 0>, 0]
@@ -38,9 +42,11 @@ export type IndexInclusive<N extends number> = IndexOfTuple<
  * @template N - The absolute value of the lower bound (inclusive). Must be a non-negative integer literal.
  * @returns A union type `-1 | -2 | ... | -N`. Returns `never` if `N` is 0.
  * @example
+ * ```ts
  * type NegIdx3 = NegativeIndex<3>; // -1 | -2 | -3
  * type NegIdx0 = NegativeIndex<0>; // never
  * type NegIdx1 = NegativeIndex<1>; // -1
+ * ```
  */
 export type NegativeIndex<N extends number> = MapIdx<
   RelaxedExclude<IndexInclusive<N>, 0>

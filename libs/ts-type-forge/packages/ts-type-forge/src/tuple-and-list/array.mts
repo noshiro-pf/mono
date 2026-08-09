@@ -10,10 +10,12 @@ import {
  * element.
  * @template A - The type of elements in the array.
  * @example
+ * ```ts
  * type NA = MutableNonEmptyTuple<string>; // [string, ...string[]]
- * const valid: NA = ["hello"];
- * const alsoValid: NA = ["hello", "world"];
+ * const valid: NA = ['hello'];
+ * const alsoValid: NA = ['hello', 'world'];
  * // const invalid: NA = []; // Error
+ * ```
  */
 export type MutableNonEmptyTuple<A> = [A, ...A[]];
 
@@ -22,11 +24,13 @@ export type MutableNonEmptyTuple<A> = [A, ...A[]];
  * one element.
  * @template A - The type of elements in the array.
  * @example
+ * ```ts
  * type NA = NonEmptyTuple<number>; // readonly [number, ...number[]]
  * const valid: NA = [1];
  * const alsoValid: NA = [1, 2, 3];
  * // const invalid: NA = []; // Error
  * // valid.push(4); // Error: Property 'push' does not exist on type 'readonly [number, ...number[]]'.
+ * ```
  */
 export type NonEmptyTuple<A> = readonly [A, ...(readonly A[])];
 
@@ -40,8 +44,10 @@ export type NonEmptyTuple<A> = readonly [A, ...(readonly A[])];
  * `T extends NonEmptyTuple<unknown>`).
  * @template A - The type of elements in the array.
  * @example
+ * ```ts
  * type NA = NonEmptyArray<number>; // MinLengthArray<1, number>
  * const head = (arr: NA): number => arr[0]; // OK — no `undefined`
+ * ```
  */
 export type NonEmptyArray<A> = MinLengthArray<1, A>;
 
@@ -61,9 +67,11 @@ export type MutableNonEmptyArray<A> = MutableMinLengthArray<1, A>;
  * @template S - The array or tuple type.
  * @returns The type of the elements within the array/tuple.
  * @example
+ * ```ts
  * type StrElm = ArrayElement<string[]>; // string
  * type NumElm = ArrayElement<readonly number[]>; // number
  * type TupleElm = ArrayElement<[string, boolean]>; // string | boolean
  * type NotArray = ArrayElement<{ a: number }>; // never
+ * ```
  */
 export type ArrayElement<S> = S extends readonly (infer T)[] ? T : never;

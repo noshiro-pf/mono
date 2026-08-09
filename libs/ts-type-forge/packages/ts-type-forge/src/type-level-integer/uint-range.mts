@@ -15,9 +15,11 @@ import { type Index, type IndexInclusive } from './index-type.mjs';
  * @template End - The ending integer literal (exclusive).
  * @returns A union type `Start | Start + 1 | ... | End - 1`.
  * @example
+ * ```ts
  * type R1 = UintRange<3, 7>; // 3 | 4 | 5 | 6
  * type R2 = UintRange<0, 4>; // 0 | 1 | 2 | 3
  * type R3 = UintRange<5, 5>; // never
+ * ```
  */
 export type UintRange<
   Start extends Uint11,
@@ -41,9 +43,11 @@ export type UintRange<
  * @template MaxValue - The ending integer literal (inclusive).
  * @returns A union type `MinValue | MinValue + 1 | ... | MaxValue`.
  * @example
+ * ```ts
  * type RI1 = UintRangeInclusive<3, 7>; // 3 | 4 | 5 | 6 | 7
  * type RI2 = UintRangeInclusive<0, 4>; // 0 | 1 | 2 | 3 | 4
  * type RI3 = UintRangeInclusive<5, 5>; // 5
+ * ```
  */
 export type UintRangeInclusive<
   MinValue extends Uint11,

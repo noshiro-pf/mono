@@ -231,6 +231,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/others/bool-not-example.mts',
       'samples/src/others/bool-and-example.mts',
       'samples/src/others/bool-or-example.mts',
+      'samples/src/others/bool-eq-example.mts',
+      'samples/src/others/bool-nand-example.mts',
+      'samples/src/others/bool-nor-example.mts',
+      'samples/src/others/bool-neq-example.mts',
     ],
   },
   {
@@ -270,7 +274,15 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
   },
   {
     sourcePath: 'src/others/utils.mts',
-    sampleFiles: ['samples/src/others/length-example.mts'],
+    sampleFiles: [
+      'samples/src/others/to-string-example.mts',
+      'samples/src/others/to-number-example.mts',
+      'samples/src/others/value-of-example.mts',
+      'samples/src/others/length-example.mts',
+      'samples/src/others/union-to-intersection-example.mts',
+      'samples/src/others/merge-intersection-example.mts',
+      'samples/src/others/intersection-example.mts',
+    ],
   },
   {
     sourcePath: 'src/others/widen-literal.mts',
@@ -288,6 +300,188 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: [
       'samples/src/type-level-integer/increment-example.mts',
       'samples/src/type-level-integer/decrement-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/condition/eq.mts',
+    sampleFiles: ['samples/src/condition/type-eq-example.mts'],
+  },
+  {
+    sourcePath: 'src/condition/is-any.mts',
+    sampleFiles: [
+      'samples/src/condition/is-any-example.mts',
+      'samples/src/condition/is-not-any-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/condition/is-fixed-length-list.mts',
+    sampleFiles: [
+      'samples/src/condition/is-fixed-length-list-example.mts',
+      'samples/src/condition/is-not-fixed-length-list-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/condition/is-never.mts',
+    sampleFiles: ['samples/src/condition/is-never-example.mts'],
+  },
+  {
+    sourcePath: 'src/condition/is-union.mts',
+    sampleFiles: ['samples/src/condition/is-union-example.mts'],
+  },
+  {
+    sourcePath: 'src/condition/is-unknown.mts',
+    sampleFiles: [
+      'samples/src/condition/is-unknown-example.mts',
+      'samples/src/condition/is-not-unknown-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/others/bivariant-hack.mts',
+    sampleFiles: ['samples/src/others/bivariant-hack-example.mts'],
+  },
+  {
+    sourcePath: 'src/record/deep.mts',
+    sampleFiles: [
+      'samples/src/record/deep-readonly-example.mts',
+      'samples/src/record/deep-mutable-example.mts',
+      'samples/src/record/deep-partial-example.mts',
+      'samples/src/record/deep-required-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/record/partial.mts',
+    sampleFiles: [
+      'samples/src/record/partially-partial-example.mts',
+      'samples/src/record/partially-optional-example.mts',
+      'samples/src/record/partially-nullable-example.mts',
+      'samples/src/record/partially-required-example.mts',
+      'samples/src/record/optional-keys-example.mts',
+      'samples/src/record/required-keys-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/record/record-path.mts',
+    sampleFiles: [
+      'samples/src/record/record-paths-with-index-example.mts',
+      'samples/src/record/record-paths-example.mts',
+      'samples/src/record/record-path-and-value-type-tuple-example.mts',
+      'samples/src/record/record-leaf-paths-example.mts',
+      'samples/src/record/record-leaf-paths-with-index-example.mts',
+      'samples/src/record/record-updated-example.mts',
+      'samples/src/record/record-value-at-path-example.mts',
+      'samples/src/record/record-value-at-path-with-index-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/tuple-and-list/array.mts',
+    sampleFiles: [
+      'samples/src/tuple-and-list/mutable-non-empty-tuple-example.mts',
+      'samples/src/tuple-and-list/non-empty-tuple-example.mts',
+      'samples/src/tuple-and-list/non-empty-array-example.mts',
+      'samples/src/tuple-and-list/array-element-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/tuple-and-list/index-of-tuple.mts',
+    sampleFiles: [
+      'samples/src/tuple-and-list/index-of-tuple-example.mts',
+      'samples/src/tuple-and-list/negative-index-of-tuple-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/tuple-and-list/length-constrained-tuple.mts',
+    sampleFiles: [
+      'samples/src/tuple-and-list/fixed-length-tuple-example.mts',
+      'samples/src/tuple-and-list/mutable-fixed-length-tuple-example.mts',
+      'samples/src/tuple-and-list/mutable-min-length-tuple-example.mts',
+      'samples/src/tuple-and-list/min-length-tuple-example.mts',
+      'samples/src/tuple-and-list/bounded-length-tuple-example.mts',
+      'samples/src/tuple-and-list/mutable-bounded-length-tuple-example.mts',
+      'samples/src/tuple-and-list/max-length-tuple-example.mts',
+      'samples/src/tuple-and-list/mutable-max-length-tuple-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/tuple-and-list/list.mts',
+    sampleFiles: [
+      'samples/src/tuple-and-list/list-head-example.mts',
+      'samples/src/tuple-and-list/list-last-example.mts',
+      'samples/src/tuple-and-list/list-but-last-example.mts',
+      'samples/src/tuple-and-list/list-tail-example.mts',
+      'samples/src/tuple-and-list/list-reverse-example.mts',
+      'samples/src/tuple-and-list/list-take-example.mts',
+      'samples/src/tuple-and-list/list-skip-example.mts',
+      'samples/src/tuple-and-list/list-take-last-example.mts',
+      'samples/src/tuple-and-list/list-skip-last-example.mts',
+      'samples/src/tuple-and-list/list-set-at-example.mts',
+      'samples/src/tuple-and-list/list-flatten-example.mts',
+      'samples/src/tuple-and-list/list-concat-example.mts',
+      'samples/src/tuple-and-list/list-zip-example.mts',
+      'samples/src/tuple-and-list/list-partition-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/tuple-and-list/make-tuple.mts',
+    sampleFiles: ['samples/src/tuple-and-list/make-tuple-example.mts'],
+  },
+  {
+    sourcePath: 'src/tuple-and-list/tuple.mts',
+    sampleFiles: [
+      'samples/src/tuple-and-list/tuple-head-example.mts',
+      'samples/src/tuple-and-list/tuple-last-example.mts',
+      'samples/src/tuple-and-list/tuple-but-last-example.mts',
+      'samples/src/tuple-and-list/tuple-tail-example.mts',
+      'samples/src/tuple-and-list/tuple-reverse-example.mts',
+      'samples/src/tuple-and-list/tuple-take-example.mts',
+      'samples/src/tuple-and-list/tuple-skip-example.mts',
+      'samples/src/tuple-and-list/tuple-take-last-example.mts',
+      'samples/src/tuple-and-list/tuple-skip-last-example.mts',
+      'samples/src/tuple-and-list/tuple-set-at-example.mts',
+      'samples/src/tuple-and-list/tuple-flatten-example.mts',
+      'samples/src/tuple-and-list/tuple-concat-example.mts',
+      'samples/src/tuple-and-list/tuple-zip-example.mts',
+      'samples/src/tuple-and-list/tuple-partition-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/type-level-integer/abs.mts',
+    sampleFiles: [
+      'samples/src/type-level-integer/absolute-value-example.mts',
+      'samples/src/type-level-integer/abs-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/type-level-integer/index-type.mts',
+    sampleFiles: [
+      'samples/src/type-level-integer/index-example.mts',
+      'samples/src/type-level-integer/index-inclusive-example.mts',
+      'samples/src/type-level-integer/negative-index-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/type-level-integer/int-range.mts',
+    sampleFiles: [
+      'samples/src/type-level-integer/int-range-example.mts',
+      'samples/src/type-level-integer/int-range-inclusive-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/type-level-integer/max.mts',
+    sampleFiles: ['samples/src/type-level-integer/max-example.mts'],
+  },
+  {
+    sourcePath: 'src/type-level-integer/min.mts',
+    sampleFiles: ['samples/src/type-level-integer/min-example.mts'],
+  },
+  {
+    sourcePath: 'src/type-level-integer/seq.mts',
+    sampleFiles: ['samples/src/type-level-integer/seq-example.mts'],
+  },
+  {
+    sourcePath: 'src/type-level-integer/uint-range.mts',
+    sampleFiles: [
+      'samples/src/type-level-integer/uint-range-example.mts',
+      'samples/src/type-level-integer/uint-range-inclusive-example.mts',
     ],
   },
 ] as const;

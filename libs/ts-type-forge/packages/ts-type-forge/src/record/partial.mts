@@ -13,9 +13,11 @@ import {
  * @template K - The keys to make optional.
  * @returns A new type with keys `K` made optional.
  * @example
+ * ```ts
  * type Data = { a: number; b: string; c: boolean };
  * type PartiallyPartialData = PartiallyPartial<Data, 'a' | 'b'>;
  * // Result: { a?: number; b?: string; c: boolean }
+ * ```
  */
 export type PartiallyPartial<T, K extends keyof T> = MergeIntersection<
   StrictOmit<T, K> & Partial<StrictPick<T, K>>
@@ -27,9 +29,11 @@ export type PartiallyPartial<T, K extends keyof T> = MergeIntersection<
  * @template K - The keys to make optional.
  * @returns A new type with keys `K` made optional.
  * @example
+ * ```ts
  * type Data = { a: number; b: string; c: boolean };
  * type PartiallyOptionalData = PartiallyOptional<Data, 'a' | 'b'>;
  * // Result: { a?: number; b?: string; c: boolean }
+ * ```
  */
 export type PartiallyOptional<T, K extends keyof T> = PartiallyPartial<T, K>;
 
@@ -40,9 +44,11 @@ export type PartiallyOptional<T, K extends keyof T> = PartiallyPartial<T, K>;
  * @template K - The keys to make nullable.
  * @returns A new type with keys `K` made nullable.
  * @example
+ * ```ts
  * type Data = { a: number; b: string; c: boolean };
  * type PartiallyNullableData = PartiallyNullable<Data, 'a' | 'b'>;
  * // Result: { a: number | undefined; b: string | undefined; c: boolean }
+ * ```
  */
 export type PartiallyNullable<T, K extends keyof T> = MergeIntersection<
   StrictOmit<T, K> & { [P in K]: T[P] | undefined }
@@ -55,9 +61,11 @@ export type PartiallyNullable<T, K extends keyof T> = MergeIntersection<
  * @template K - The keys to make required.
  * @returns A new type with keys `K` made required.
  * @example
+ * ```ts
  * type Data = { a?: number; b?: string; c?: boolean };
  * type PartiallyRequiredData = PartiallyRequired<Data, 'a' | 'b'>;
  * // Result: { a: number; b: string; c?: boolean }
+ * ```
  */
 export type PartiallyRequired<T, K extends keyof T> = MergeIntersection<
   StrictOmit<T, K> & Required<StrictPick<T, K>>
@@ -96,6 +104,7 @@ export type TSTypeForgeInternals_MapToNever<R extends UnknownRecord> = {
  * @template R - The record type.
  * @returns A union of keys that are optional in `R`.
  * @example
+ * ```ts
  * type K = OptionalKeys<{
  *   a?: 0; // optional
  *   b?: 0 | undefined; // optional
@@ -104,6 +113,7 @@ export type TSTypeForgeInternals_MapToNever<R extends UnknownRecord> = {
  *   e: undefined; // required, value is undefined
  *   f: 0 | undefined; // required, value includes undefined
  * }>; // 'a' | 'b' | 'c'
+ * ```
  */
 export type OptionalKeys<R extends UnknownRecord> =
   TSTypeForgeInternals_PickUndefined<TSTypeForgeInternals_MapToNever<R>>;
@@ -115,6 +125,7 @@ export type OptionalKeys<R extends UnknownRecord> =
  * @template R - The record type.
  * @returns A union of keys that are required (not optional) in `R`.
  * @example
+ * ```ts
  * type K = RequiredKeys<{
  *   a?: 0; // optional
  *   b?: 0 | undefined; // optional
@@ -123,6 +134,7 @@ export type OptionalKeys<R extends UnknownRecord> =
  *   e: undefined; // required, value is undefined
  *   f: 0 | undefined; // required, value includes undefined
  * }>; // 'd' | 'e' | 'f'
+ * ```
  */
 export type RequiredKeys<R extends UnknownRecord> = StrictExclude<
   keyof R,

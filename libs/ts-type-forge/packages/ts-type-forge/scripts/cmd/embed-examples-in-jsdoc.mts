@@ -16,15 +16,14 @@ const codeBlockEnd = '```';
  * sourceFileMappings, so sample files must be listed in the order their
  * `@example` blocks appear in the source file.
  *
- * Fails if a src file contains a ```ts code block but is not listed in
- * sourceFileMappings, so that every example is backed by a type-checked
- * sample file in samples/src.
+ * Fails if any `@example` in src is not backed by a type-checked sample file
+ * in samples/src — see {@link assertAllExamplesAreMapped}.
  */
 export const embedExamplesInJsDoc = async (): Promise<
   Result<undefined, unknown>
 > => {
   try {
-    const coverageResult = await assertAllCodeBlocksAreMapped();
+    const coverageResult = await assertAllExamplesAreMapped();
 
     if (Result.isErr(coverageResult)) {
       return coverageResult;
@@ -43,6 +42,20 @@ export const embedExamplesInJsDoc = async (): Promise<
       if (codeBlockCount !== sampleFiles.length) {
         return Result.err(
           `❌ Code block count mismatch in ${sourcePath}: found ${codeBlockCount} \`\`\`ts blocks but expected ${sampleFiles.length} sample files`,
+        );
+      }
+
+      const exampleTagCount = countExampleTags(sourceContent);
+
+      if (exampleTagCount !== codeBlockCount) {
+        return Result.err(
+          [
+            `❌ ${sourcePath} has ${exampleTagCount} \`@example\` tag(s) but only ${codeBlockCount} \`\`\`ts block(s).`,
+            'An `@example` written as bare JSDoc lines is never type-checked and',
+            'silently drifts. Move the snippet into a sample file under',
+            'samples/src, leave a ```ts block in its place, and list the sample in',
+            'scripts/cmd/embed-examples-in-jsdoc-map.mts.',
+          ].join('\n'),
         );
       }
 
@@ -142,12 +155,37 @@ export const embedExamplesInJsDoc = async (): Promise<
 };
 
 /**
- * Verifies that every src module containing a ```ts code block is listed in
- * sourceFileMappings (i.e. its `@example` blocks are sourced from
- * type-checked sample files under samples/src). Generated files
- * (index.mts / global.mts / entry-point.mts) and tests are exempt.
+ * Number of `@example` JSDoc tags in a source file.
+ *
+ * The pattern is anchored to the ` * ` comment-line prefix rather than matching
+ * the bare word, so prose mentioning `@example` (this file's own doc comments,
+ * for instance) is not counted as a tag. It is also built per call: a `/g`
+ * regex carries mutable `lastIndex` state, which a shared literal would leak
+ * from one file to the next.
  */
-const assertAllCodeBlocksAreMapped = async (): Promise<
+const countExampleTags = (content: string): number =>
+  Array.from(content.matchAll(/^\s*\*\s*@example\b/gmu)).length;
+
+/**
+ * Verifies that every `@example` under src is backed by a type-checked sample
+ * file in samples/src, i.e. that its module is listed in sourceFileMappings.
+ * Generated files (index.mts / global.mts / entry-point.mts) and tests are
+ * exempt.
+ *
+ * The trigger is the `@example` tag, not the ```ts fence it is supposed to
+ * contain. Keying off the fence would only ever catch a file that already
+ * follows the convention: an example written as bare JSDoc lines has no fence
+ * at all, so it would pass unnoticed — never type-checked, free to drift as the
+ * API around it changes. The complementary per-file count check in
+ * {@link embedExamplesInJsDoc} covers the same mistake inside a module that is
+ * already mapped.
+ *
+ * A declaration that genuinely cannot be reached from samples/src — a
+ * module-local `@internal` helper, say, since samples import the package
+ * through its public entry point — should describe its behavior in prose
+ * instead of carrying an `@example`.
+ */
+const assertAllExamplesAreMapped = async (): Promise<
   Result<undefined, string>
 > => {
   const filesResult = await glob(
@@ -180,19 +218,25 @@ const assertAllCodeBlocksAreMapped = async (): Promise<
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const content = await fs.readFile(filePath, 'utf8');
 
-    if (content.includes(codeBlockStart)) {
-      mut_unmappedFiles.push(path.relative(workspaceRootPath, filePath));
+    const exampleTagCount = countExampleTags(content);
+
+    if (exampleTagCount > 0 || content.includes(codeBlockStart)) {
+      mut_unmappedFiles.push(
+        `${path.relative(workspaceRootPath, filePath)} (${exampleTagCount} \`@example\`)`,
+      );
     }
   }
 
   if (Arr.isNonEmpty(mut_unmappedFiles)) {
     return Result.err(
       [
-        `❌ Found ${mut_unmappedFiles.length} src file(s) containing \`\`\`ts code blocks`,
-        'that are not sourced from samples/src (missing from sourceFileMappings in',
+        `❌ Found ${mut_unmappedFiles.length} src file(s) whose \`@example\` blocks are not`,
+        'sourced from samples/src (missing from sourceFileMappings in',
         'scripts/cmd/embed-examples-in-jsdoc-map.mts):',
         ...mut_unmappedFiles.toSorted().map((p) => `  - ${p}`),
-        'Create sample files under samples/src and add mapping entries for them.',
+        'Create sample files under samples/src and add mapping entries for them,',
+        'or, for a declaration samples cannot reach, describe the behavior in prose',
+        'instead of an `@example`.',
       ].join('\n'),
     );
   }

@@ -5,11 +5,15 @@ import { type IndexOfTuple, type Tuple } from '../tuple-and-list/index.mjs';
 
 /**
  * @internal Generates a union of all prefixes of a given readonly tuple
- * `L`, including the empty tuple `[]`.
+ * `L`, including the empty tuple `[]`. For `[1, 'a', true]` that is
+ * `readonly [] | readonly [1] | readonly [1, 'a'] | readonly [1, 'a', true]`.
  *
- * @example
- * type P = RecordPathPrefixes<[1, 'a', true]>;
- * // P = readonly [] | readonly [1] | readonly [1, 'a'] | readonly [1, 'a', true]
+ * Spelled out in prose rather than as an `@example`: this helper is
+ * module-local, so no sample under `samples/src` — which reaches the package
+ * through its public entry point — could reference it, and every `@example`
+ * under `src` is required to be backed by such a sample. The behavior is
+ * asserted in `record-path.test.mts` through the
+ * {@link TSTypeForgeInternals_RecordPathPrefixes} shim.
  */
 type RecordPathPrefixes<L extends readonly unknown[]> = L extends readonly [
   infer Head,
@@ -24,9 +28,11 @@ type RecordPathPrefixes<L extends readonly unknown[]> = L extends readonly [
  * @template R - The record or array type.
  * @returns A union of readonly tuples representing all possible paths. Each tuple element is a key (string) or an index (number).
  * @example
+ * ```ts
  * type Data = { a: { b: string[]; c: number } };
- * type P = PathsWithIndex<Data>;
+ * type P = RecordPathsWithIndex<Data>;
  * // P = readonly [] | readonly ["a"] | readonly ["a", "b"] | readonly ["a", "b", number] | readonly ["a", "c"]
+ * ```
  */
 export type RecordPathsWithIndex<R> = RecordPathPrefixes<
   RecordLeafPathsWithIndex<R>
@@ -38,9 +44,11 @@ export type RecordPathsWithIndex<R> = RecordPathPrefixes<
  * @template R - The record or tuple type.
  * @returns A union of readonly tuples representing all possible paths. Each tuple element is a key (string) or a specific index (number literal).
  * @example
+ * ```ts
  * type Data = { a: { b: [string, boolean]; c: number } };
- * type P = Paths<Data>;
+ * type P = RecordPaths<Data>;
  * // P = readonly [] | readonly ["a"] | readonly ["a", "b"] | readonly ["a", "b", 0] | readonly ["a", "b", 1] | readonly ["a", "c"]
+ * ```
  */
 export type RecordPaths<R> = RecordPathPrefixes<RecordLeafPaths<R>>;
 
@@ -50,12 +58,14 @@ export type RecordPaths<R> = RecordPathPrefixes<RecordLeafPaths<R>>;
  * @template R - The record or tuple type.
  * @returns A union of `readonly [Path, ValueType]` tuples.
  * @example
+ * ```ts
  * type Data = { a: string; b: [number] };
- * type KPV = KeyPathAndValueTypeAtPathTuple<Data>;
+ * type KPV = RecordPathAndValueTypeTuple<Data>;
  * // KPV = | readonly [readonly [], { a: string; b: [number] }]
  * //       | readonly [readonly ["a"], string]
  * //       | readonly [readonly ["b"], [number]]
  * //       | readonly [readonly ["b", 0], number]
+ * ```
  */
 export type RecordPathAndValueTypeTuple<R> = AttachValueTypeAtPath<
   R,
@@ -68,9 +78,11 @@ export type RecordPathAndValueTypeTuple<R> = AttachValueTypeAtPath<
  * @template R - The record or tuple type.
  * @returns A union of readonly tuples representing paths to leaf nodes.
  * @example
+ * ```ts
  * type Data = { a: { b: [string, { d: boolean }]; c: number } };
- * type LP = LeafPaths<Data>;
+ * type LP = RecordLeafPaths<Data>;
  * // LP = readonly ["a", "b", 0] | readonly ["a", "b", 1, "d"] | readonly ["a", "c"]
+ * ```
  */
 export type RecordLeafPaths<R> = R extends readonly unknown[]
   ? LeafPathsImplListCase<R, keyof R>
@@ -84,9 +96,11 @@ export type RecordLeafPaths<R> = R extends readonly unknown[]
  * @template R - The record or array type.
  * @returns A union of readonly tuples representing paths to leaf nodes, using `number` for array indices.
  * @example
+ * ```ts
  * type Data = { a: { b: string[]; c: number } };
- * type LP = LeafPathsWithIndex<Data>;
+ * type LP = RecordLeafPathsWithIndex<Data>;
  * // LP = readonly ["a", "b", number] | readonly ["a", "c"]
+ * ```
  */
 export type RecordLeafPathsWithIndex<R> = R extends readonly unknown[]
   ? LeafPathsWithIndexImplListCase<R, keyof R>
@@ -102,10 +116,12 @@ export type RecordLeafPathsWithIndex<R> = R extends readonly unknown[]
  * @template ValueAfter - The new type for the value at the path.
  * @returns A new record or tuple type with the updated value type at the specified path.
  * @example
+ * ```ts
  * type Data = { a: { b: [string, boolean] } };
  * type Updated = RecordUpdated<Data, ['a', 'b', 1], number>;
  * // Updated = { readonly a: { readonly b: readonly [string, number]; }; }
  * type UpdatedRoot = RecordUpdated<Data, [], null>; // null
+ * ```
  */
 export type RecordUpdated<
   R,
@@ -126,10 +142,12 @@ export type RecordUpdated<
  * @template Path - The path to the value (from `Paths<R>`).
  * @returns The type of the value at the specified path. Returns `R` if `Path` is `[]`.
  * @example
+ * ```ts
  * type Data = { a: { b: [string, boolean] } };
  * type V1 = RecordValueAtPath<Data, ['a', 'b', 0]>; // string
  * type V2 = RecordValueAtPath<Data, ['a']>; // { b: [string, boolean] }
  * type V3 = RecordValueAtPath<Data, []>; // { a: { b: [string, boolean] } }
+ * ```
  */
 export type RecordValueAtPath<
   R,
@@ -150,10 +168,12 @@ export type RecordValueAtPath<
  * @template Path - The path to the value (from `PathsWithIndex<R>`).
  * @returns The type of the value at the specified path, potentially including `undefined`. Returns `R` if `Path` is `[]`.
  * @example
+ * ```ts
  * type Data = { a: { b: string[]; c: number } };
  * type V1 = RecordValueAtPathWithIndex<Data, ['a', 'b', number]>; // string | undefined
  * type V2 = RecordValueAtPathWithIndex<Data, ['a', 'c']>; // number
  * type V3 = RecordValueAtPathWithIndex<Data, []>; // { a: { b: string[]; c: number } }
+ * ```
  */
 export type RecordValueAtPathWithIndex<
   R,

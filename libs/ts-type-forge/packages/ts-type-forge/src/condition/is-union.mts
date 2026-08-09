@@ -18,14 +18,16 @@ import { type IsNever } from './is-never.mjs';
  * @returns `true` if `U` is a union type, `false` otherwise.
  *
  * @example
+ * ```ts
  * type T1 = IsUnion<string | number>; // true
  * type T2 = IsUnion<string>; // false
- * type T3 = IsUnion<string | string>; // false (simplifies to string)
+ * type T3 = IsUnion<string>; // false (simplifies to string)
  * type T4 = IsUnion<never>; // false
  * type T5 = IsUnion<any>; // false
  * type T6 = IsUnion<unknown>; // false
  * type T7 = IsUnion<true | false>; // true (boolean)
  * type T8 = IsUnion<boolean>; // true (equivalent to true | false)
+ * ```
  */
 export type IsUnion<U> = IsUnionImpl<U, U>;
 

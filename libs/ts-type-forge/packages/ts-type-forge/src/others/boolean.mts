@@ -157,10 +157,12 @@ export type BoolOr<A extends boolean, B extends boolean> =
  * @template A - The first boolean literal type (`true` or `false`).
  * @template B - The second boolean literal type (`true` or `false`).
  * @example
- * type T_T = BoolEq<true, true>;   // true
- * type T_F = BoolEq<true, false>;  // false
- * type F_T = BoolEq<false, true>;  // false
+ * ```ts
+ * type T_T = BoolEq<true, true>; // true
+ * type T_F = BoolEq<true, false>; // false
+ * type F_T = BoolEq<false, true>; // false
  * type F_F = BoolEq<false, false>; // true
+ * ```
  */
 export type BoolEq<A extends boolean, B extends boolean> =
   IsExactBool<A, true> extends true
@@ -182,10 +184,12 @@ export type BoolEq<A extends boolean, B extends boolean> =
  * @template A - The first boolean literal type (`true` or `false`).
  * @template B - The second boolean literal type (`true` or `false`).
  * @example
- * type T_T = BoolNand<true, true>;   // false
- * type T_F = BoolNand<true, false>;  // true
- * type F_T = BoolNand<false, true>;  // true
+ * ```ts
+ * type T_T = BoolNand<true, true>; // false
+ * type T_F = BoolNand<true, false>; // true
+ * type F_T = BoolNand<false, true>; // true
  * type F_F = BoolNand<false, false>; // true
+ * ```
  */
 export type BoolNand<A extends boolean, B extends boolean> = BoolNot<
   BoolAnd<A, B>
@@ -196,10 +200,12 @@ export type BoolNand<A extends boolean, B extends boolean> = BoolNot<
  * @template A - The first boolean literal type (`true` or `false`).
  * @template B - The second boolean literal type (`true` or `false`).
  * @example
- * type T_T = BoolNor<true, true>;   // false
- * type T_F = BoolNor<true, false>;  // false
- * type F_T = BoolNor<false, true>;  // false
+ * ```ts
+ * type T_T = BoolNor<true, true>; // false
+ * type T_F = BoolNor<true, false>; // false
+ * type F_T = BoolNor<false, true>; // false
  * type F_F = BoolNor<false, false>; // true
+ * ```
  */
 export type BoolNor<A extends boolean, B extends boolean> = BoolNot<
   BoolOr<A, B>
@@ -211,10 +217,12 @@ export type BoolNor<A extends boolean, B extends boolean> = BoolNot<
  * @template A - The first boolean literal type (`true` or `false`).
  * @template B - The second boolean literal type (`true` or `false`).
  * @example
- * type T_T = BoolNeq<true, true>;   // false
- * type T_F = BoolNeq<true, false>;  // true
- * type F_T = BoolNeq<false, true>;  // true
+ * ```ts
+ * type T_T = BoolNeq<true, true>; // false
+ * type T_F = BoolNeq<true, false>; // true
+ * type F_T = BoolNeq<false, true>; // true
  * type F_F = BoolNeq<false, false>; // false
+ * ```
  */
 export type BoolNeq<A extends boolean, B extends boolean> = BoolNot<
   BoolEq<A, B>

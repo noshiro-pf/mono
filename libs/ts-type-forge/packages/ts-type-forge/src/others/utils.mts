@@ -7,8 +7,10 @@ import { type RelaxedExclude } from './std.mjs';
  * Converts a type `A` to its string representation if it's a number, otherwise returns `A`.
  * @template A - The type to convert.
  * @example
+ * ```ts
  * type Str = ToString<123>; // "123"
  * type Bool = ToString<boolean>; // boolean
+ * ```
  */
 export type ToString<A> = A extends number ? `${A}` : A;
 
@@ -19,7 +21,9 @@ export type ToString<A> = A extends number ? `${A}` : A;
  * Requires TypeScript 4.8+.
  * @template S - A string literal type that extends `${number}`.
  * @example
- * type Num = ToNumber<"456">; // 456
+ * ```ts
+ * type Num = ToNumber<'456'>; // 456
+ * ```
  */
 export type ToNumber<S extends `${number}`> =
   S extends `${infer N extends number}` ? N : never;
@@ -28,7 +32,9 @@ export type ToNumber<S extends `${number}`> =
  * Extracts the union of all value types from an object type `T`.
  * @template T - The object type.
  * @example
+ * ```ts
  * type Values = ValueOf<{ a: string; b: number }>; // string | number
+ * ```
  */
 export type ValueOf<T> = T[keyof T];
 
@@ -93,7 +99,9 @@ export type AnyFn = (...args: readonly any[]) => any;
  * Converts a union type `T` into an intersection type.
  * @template T - The union type.
  * @example
+ * ```ts
  * type Inter = UnionToIntersection<{ a: string } | { b: number }>; // { a: string } & { b: number }
+ * ```
  */
 export type UnionToIntersection<T> = (
   T extends unknown ? (arg: T) => void : never
@@ -106,7 +114,9 @@ export type UnionToIntersection<T> = (
  * Useful for making intersected types more readable in tooltips.
  * @template R - An intersection of record types.
  * @example
+ * ```ts
  * type Merged = MergeIntersection<{ a: string } & { b: number }>; // { a: string; b: number }
+ * ```
  */
 export type MergeIntersection<R extends UnknownRecord> = {
   [K in keyof R]: R[K];
@@ -123,7 +133,9 @@ export type ExcludeFalsyValue<A> = RelaxedExclude<A, FalsyValue>;
  * Creates an intersection type from a tuple of types `Types`.
  * @template Types - A readonly tuple of types.
  * @example
+ * ```ts
  * type Inter = Intersection<[string, number, { a: boolean }]>; // string & number & { a: boolean }
+ * ```
  */
 export type Intersection<Types extends readonly unknown[]> =
   IntersectionImpl<Types>;

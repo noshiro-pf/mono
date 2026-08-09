@@ -7,10 +7,12 @@ import { type Uint10 } from '../constants/index.mjs';
  * @template N - A union of non-negative integer literals up to 1023 (`Uint10`).
  * @returns The smallest integer literal present in the union `N`.
  * @example
+ * ```ts
  * type U = 2 | 5 | 1;
  * type Result = Min<U>; // 1
  * type ResultSingle = Min<5>; // 5
  * type ResultZero = Min<0 | 10>; // 0
+ * ```
  */
 export type Min<N extends Uint10> = MinImpl<N, []>;
 

@@ -12,8 +12,10 @@ import { type MakeTuple } from './make-tuple.mjs';
  * @template Elm - The type of elements in the tuple.
  * @returns A readonly tuple type `readonly [Elm, Elm, ..., Elm]` of length `N`.
  * @example
+ * ```ts
  * type TupleOf3Strings = FixedLengthTuple<3, string>; // readonly [string, string, string]
  * type TupleOf0Numbers = FixedLengthTuple<0, number>; // readonly []
+ * ```
  */
 export type FixedLengthTuple<N extends number, Elm> = MakeTuple<N, Elm>;
 
@@ -23,7 +25,9 @@ export type FixedLengthTuple<N extends number, Elm> = MakeTuple<N, Elm>;
  * @template Elm - The type of elements in the tuple.
  * @returns A mutable tuple type `[Elm, Elm, ..., Elm]` of length `N`.
  * @example
+ * ```ts
  * type MutableTupleOf2Booleans = MutableFixedLengthTuple<2, boolean>; // [boolean, boolean]
+ * ```
  */
 export type MutableFixedLengthTuple<N extends number, Elm> = Mutable<
   FixedLengthTuple<N, Elm>
@@ -39,10 +43,12 @@ export type MutableFixedLengthTuple<N extends number, Elm> = Mutable<
  * @template Elm - The type of elements in the array.
  * @returns A mutable array type `[Elm, ..., Elm, ...Elm[]]` with at least `N` elements.
  * @example
+ * ```ts
  * type AtLeast2Numbers = MutableMinLengthTuple<2, number>; // [number, number, ...number[]]
  * const valid: AtLeast2Numbers = [1, 2];
  * const alsoValid: AtLeast2Numbers = [1, 2, 3, 4];
  * // const invalid: AtLeast2Numbers = [1]; // Error
+ * ```
  */
 export type MutableMinLengthTuple<N extends number, Elm> = Mutable<
   MinLengthTuple<N, Elm>
@@ -54,10 +60,12 @@ export type MutableMinLengthTuple<N extends number, Elm> = Mutable<
  * @template Elm - The type of elements in the array.
  * @returns A readonly array type `readonly [Elm, ..., Elm, ...Elm[]]` with at least `N` elements.
  * @example
+ * ```ts
  * type AtLeast3Strings = MinLengthTuple<3, string>; // readonly [string, string, string, ...string[]]
- * const valid: AtLeast3Strings = ["a", "b", "c"];
- * const alsoValid: AtLeast3Strings = ["a", "b", "c", "d"];
+ * const valid: AtLeast3Strings = ['a', 'b', 'c'];
+ * const alsoValid: AtLeast3Strings = ['a', 'b', 'c', 'd'];
  * // const invalid: AtLeast3Strings = ["a", "b"]; // Error
+ * ```
  */
 export type MinLengthTuple<N extends number, Elm> = readonly [
   ...MakeTuple<N, Elm>,
@@ -99,12 +107,14 @@ type TuplePrefixesDownTo<
  * @template Elm - The type of elements in the tuple.
  * @returns A union of readonly tuples whose lengths range from `Min` to `Max`.
  * @example
+ * ```ts
  * type T = BoundedLengthTuple<1, 3, string>;
  * // readonly [string] | readonly [string, string] | readonly [string, string, string]
- * const a: T = ["a"]; // ok
- * const b: T = ["a", "b", "c"]; // ok
+ * const a: T = ['a']; // ok
+ * const b: T = ['a', 'b', 'c']; // ok
  * // const c: T = []; // Error
  * // const d: T = ["a", "b", "c", "d"]; // Error
+ * ```
  */
 export type BoundedLengthTuple<
   Min extends number,
@@ -120,7 +130,9 @@ export type BoundedLengthTuple<
  * @template Max - The maximum length (inclusive). Must be a non-negative integer literal.
  * @template Elm - The type of elements in the tuple.
  * @example
+ * ```ts
  * type T = MutableBoundedLengthTuple<1, 2, number>; // [number] | [number, number]
+ * ```
  */
 export type MutableBoundedLengthTuple<
   Min extends number,
@@ -140,11 +152,13 @@ export type MutableBoundedLengthTuple<
  * @template Elm - The type of elements in the tuple.
  * @returns A union of readonly tuples whose lengths range from `0` to `N`.
  * @example
+ * ```ts
  * type AtMost2Numbers = MaxLengthTuple<2, number>;
  * // readonly [] | readonly [number] | readonly [number, number]
  * const valid: AtMost2Numbers = []; // ok
  * const alsoValid: AtMost2Numbers = [1, 2]; // ok
  * // const invalid: AtMost2Numbers = [1, 2, 3]; // Error
+ * ```
  */
 export type MaxLengthTuple<N extends number, Elm> = BoundedLengthTuple<
   0,
@@ -159,7 +173,9 @@ export type MaxLengthTuple<N extends number, Elm> = BoundedLengthTuple<
  * @template N - The maximum length (inclusive). Must be a non-negative integer literal.
  * @template Elm - The type of elements in the tuple.
  * @example
+ * ```ts
  * type AtMost2Numbers = MutableMaxLengthTuple<2, number>; // [] | [number] | [number, number]
+ * ```
  */
 export type MutableMaxLengthTuple<N extends number, Elm> = Mutable<
   MaxLengthTuple<N, Elm>

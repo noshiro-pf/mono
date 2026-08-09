@@ -13,15 +13,21 @@
  *
  * @template F - The function type whose parameters should be made bivariant.
  * @example
- * declare let func1: (arg: { a: string }) => void;
- * declare let func2: (arg: { a: string; b: number }) => void;
+ * ```ts
+ * type Handler = (arg: { a: string }) => void;
+ * type SpecificHandler = (arg: { a: string; b: number }) => void;
  *
- * // Normally, this assignment is invalid due to contravariance:
- * // func1 = func2; // Error: Type '(arg: { a: string; b: number; }) => void' is not assignable to type '(arg: { a: string; }) => void'.
+ * declare const specific: SpecificHandler;
  *
- * // Using BivariantHack allows the assignment:
- * declare let bivariantFunc1: BivariantHack<(arg: { a: string }) => void>;
- * bivariantFunc1 = func2; // OK
+ * // Normally this assignment is invalid, because function parameters are
+ * // contravariant:
+ * // const handler: Handler = specific;
+ * // Type '(arg: { a: string; b: number; }) => void' is not assignable to
+ * // type '(arg: { a: string; }) => void'.
+ *
+ * // BivariantHack makes the parameter bivariant, so it is accepted:
+ * const bivariantHandler: BivariantHack<Handler> = specific;
+ * ```
  */
 export type BivariantHack<F extends (...args: readonly never[]) => unknown> = {
   // eslint-disable-next-line @typescript-eslint/method-signature-style, functional/prefer-property-signatures

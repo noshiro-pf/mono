@@ -12,11 +12,13 @@ import { type BoolNot } from '../others/index.mjs';
  * @returns `true` if `T` is a tuple (fixed length), `false` otherwise.
  *
  * @example
+ * ```ts
  * type IsTuple = IsFixedLengthList<[1, 2, 3]>; // true
  * type IsArray = IsFixedLengthList<number[]>; // false
  * type IsReadonlyArray = IsFixedLengthList<readonly string[]>; // false
  * type IsEmptyTuple = IsFixedLengthList<[]>; // true
  * type IsTupleWithRest = IsFixedLengthList<[number, ...string[]]>; // false
+ * ```
  */
 export type IsFixedLengthList<T extends readonly unknown[]> =
   number extends T['length'] ? false : true;
@@ -30,11 +32,13 @@ export type IsFixedLengthList<T extends readonly unknown[]> =
  * @returns `true` if `T` is a regular array (not fixed length), `false` otherwise.
  *
  * @example
+ * ```ts
  * type IsNotTuple = IsNotFixedLengthList<[1, 2, 3]>; // false
  * type IsNotArray = IsNotFixedLengthList<number[]>; // true
  * type IsNotReadonlyArray = IsNotFixedLengthList<readonly string[]>; // true
  * type IsNotEmptyTuple = IsNotFixedLengthList<[]>; // false
  * type IsNotTupleWithRest = IsNotFixedLengthList<[number, ...string[]]>; // true
+ * ```
  */
 export type IsNotFixedLengthList<T extends readonly unknown[]> = BoolNot<
   IsFixedLengthList<T>

@@ -18,6 +18,7 @@ import {
  * @template T - The type to make deeply readonly.
  * @returns A new type with all nested properties marked as readonly.
  * @example
+ * ```ts
  * type Data = { a: number; b: { c: string[]; d: Map<number, boolean> } };
  * type ReadonlyData = DeepReadonly<Data>;
  * // Result: {
@@ -27,6 +28,7 @@ import {
  * //     readonly d: ReadonlyMap<number, boolean>;
  * //   };
  * // }
+ * ```
  */
 export type DeepReadonly<T> = T extends Primitive
   ? T
@@ -58,9 +60,11 @@ export type DeepReadonly<T> = T extends Primitive
  * @template T - The type to make deeply mutable.
  * @returns A new type with all nested `readonly` modifiers removed.
  * @example
- * type ReadonlyData = { readonly a: number; readonly b: { readonly c: readonly string[] } };
+ * ```ts
+ * type ReadonlyData = Readonly<{ a: number; b: { c: readonly string[] } }>;
  * type MutableData = DeepMutable<ReadonlyData>;
  * // Result: { a: number; b: { c: string[] } }
+ * ```
  */
 export type DeepMutable<T> = T extends Primitive
   ? T
@@ -93,6 +97,7 @@ export type DeepMutable<T> = T extends Primitive
  * @template T - The type to make deeply partial.
  * @returns A new type with all nested properties marked as optional.
  * @example
+ * ```ts
  * type Data = { a: number; b: { c: string[]; d: Map<number, boolean> } };
  * type PartialData = DeepPartial<Data>;
  * // Result: {
@@ -102,6 +107,7 @@ export type DeepMutable<T> = T extends Primitive
  * //     d?: ReadonlyMap<number | undefined, boolean | undefined> | undefined;
  * //   } | undefined;
  * // }
+ * ```
  */
 export type DeepPartial<T> = T extends Primitive
   ? T
@@ -134,9 +140,11 @@ export type DeepPartial<T> = T extends Primitive
  * @template T - The type to make deeply required.
  * @returns A new type with all nested properties marked as required.
  * @example
+ * ```ts
  * type PartialData = { a?: number; b?: { c?: string[] } };
  * type RequiredData = DeepRequired<PartialData>;
  * // Result: { a: number; b: { c: string[] } }
+ * ```
  */
 export type DeepRequired<T> = T extends Primitive
   ? T

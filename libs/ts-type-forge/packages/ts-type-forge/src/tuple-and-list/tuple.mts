@@ -10,10 +10,12 @@ export namespace Tuple {
    * @template D - The default type to return if `T` is empty. Defaults to `never`.
    * @returns The type of the first element, or `D` if `T` is empty.
    * @example
+   * ```ts
    * type H1 = Tuple.Head<[1, 2, 3]>; // 1
    * type H2 = Tuple.Head<[]>; // never
    * type H3 = Tuple.Head<[], 'default'>; // 'default'
    * type H4 = Tuple.Head<readonly string[]>; // string
+   * ```
    */
   export type Head<
     T extends readonly unknown[],
@@ -33,12 +35,14 @@ export namespace Tuple {
    * @template T - The readonly tuple type.
    * @returns The type of the last element, or `never` if `T` is empty.
    * @example
+   * ```ts
    * type L1 = Tuple.Last<[1, 2, 3]>; // 3
    * type L2 = Tuple.Last<[]>; // never
    * type L3 = Tuple.Last<[1]>; // 1
    * type L4 = Tuple.Last<readonly string[]>; // string
    * type L5 = Tuple.Last<[...string[], 1]>; // 1
    * type L6 = Tuple.Last<[1, ...string[]]>; // 1 | string
+   * ```
    */
   export type Last<T extends readonly unknown[]> = T extends readonly []
     ? never
@@ -53,10 +57,12 @@ export namespace Tuple {
    * @template A - The readonly array or tuple type.
    * @returns A new readonly tuple type with the last element removed.
    * @example
+   * ```ts
    * type BL1 = Tuple.ButLast<[1, 2, 3]>; // readonly [1, 2]
    * type BL2 = Tuple.ButLast<[1]>; // readonly []
    * type BL3 = Tuple.ButLast<[]>; // readonly []
    * type BL4 = Tuple.ButLast<readonly number[]>; // readonly number[]
+   * ```
    */
   export type ButLast<A extends readonly unknown[]> = A extends readonly []
     ? readonly []
@@ -71,10 +77,12 @@ export namespace Tuple {
    * @template A - The readonly array or tuple type.
    * @returns A new readonly tuple type with the first element removed.
    * @example
+   * ```ts
    * type T1 = Tuple.Tail<[1, 2, 3]>; // readonly [2, 3]
    * type T2 = Tuple.Tail<[1]>; // readonly []
    * type T3 = Tuple.Tail<[]>; // readonly []
    * type T4 = Tuple.Tail<readonly number[]>; // readonly number[]
+   * ```
    */
   export type Tail<A extends readonly unknown[]> = A extends readonly []
     ? readonly []
@@ -87,8 +95,10 @@ export namespace Tuple {
    * @template L - The readonly tuple type.
    * @returns A new readonly tuple type with elements reversed.
    * @example
+   * ```ts
    * type R1 = Tuple.Reverse<[1, 2, 3]>; // readonly [3, 2, 1]
    * type R2 = Tuple.Reverse<[]>; // readonly []
+   * ```
    */
   export type Reverse<L extends readonly unknown[]> = ReverseImpl<
     L,
@@ -103,11 +113,13 @@ export namespace Tuple {
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type containing the first `N` elements. If `N` is larger than the length of `T`, returns `T`.
    * @example
+   * ```ts
    * type TK1 = Tuple.Take<2, [1, 2, 3]>; // readonly [1, 2]
    * type TK2 = Tuple.Take<5, [1, 2, 3]>; // readonly [1, 2, 3]
    * type TK3 = Tuple.Take<0, [1, 2, 3]>; // readonly []
    * type TK4 = Tuple.Take<1 | 2, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
    * type TK5 = Tuple.Take<number, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
+   * ```
    */
   export type Take<N extends number, T extends readonly unknown[]> =
     TSTypeForgeInternals_PinsOneNumber<N> extends true
@@ -122,11 +134,13 @@ export namespace Tuple {
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type containing the elements after the first `N`. If `N` is larger than the length of `T`, returns `readonly []`.
    * @example
+   * ```ts
    * type SK1 = Tuple.Skip<1, [1, 2, 3]>; // readonly [2, 3]
    * type SK2 = Tuple.Skip<3, [1, 2, 3]>; // readonly []
    * type SK3 = Tuple.Skip<0, [1, 2, 3]>; // readonly [1, 2, 3]
    * type SK4 = Tuple.Skip<1 | 2, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
    * type SK5 = Tuple.Skip<number, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
+   * ```
    */
   export type Skip<N extends number, T extends readonly unknown[]> =
     TSTypeForgeInternals_PinsOneNumber<N> extends true
@@ -141,11 +155,13 @@ export namespace Tuple {
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type containing the last `N` elements. If `N` is larger than the length of `T`, returns `T`.
    * @example
+   * ```ts
    * type TL1 = Tuple.TakeLast<2, [1, 2, 3]>; // readonly [2, 3]
    * type TL2 = Tuple.TakeLast<5, [1, 2, 3]>; // readonly [1, 2, 3]
    * type TL3 = Tuple.TakeLast<0, [1, 2, 3]>; // readonly []
    * type TL4 = Tuple.TakeLast<1 | 2, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
    * type TL5 = Tuple.TakeLast<number, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
+   * ```
    */
   export type TakeLast<N extends number, T extends readonly unknown[]> =
     TSTypeForgeInternals_PinsOneNumber<N> extends true
@@ -160,11 +176,13 @@ export namespace Tuple {
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type containing the elements before the last `N`. If `N` is larger than the length of `T`, returns `readonly []`.
    * @example
+   * ```ts
    * type SL1 = Tuple.SkipLast<1, [1, 2, 3]>; // readonly [1, 2]
    * type SL2 = Tuple.SkipLast<3, [1, 2, 3]>; // readonly []
    * type SL3 = Tuple.SkipLast<0, [1, 2, 3]>; // readonly [1, 2, 3]
    * type SL4 = Tuple.SkipLast<1 | 2, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
    * type SL5 = Tuple.SkipLast<number, [1, 2, 3]>; // readonly (1 | 2 | 3)[]
+   * ```
    */
   export type SkipLast<N extends number, T extends readonly unknown[]> =
     TSTypeForgeInternals_PinsOneNumber<N> extends true
@@ -186,10 +204,12 @@ export namespace Tuple {
    * @template T - The readonly tuple type.
    * @returns A new readonly tuple type with the element at index `I` updated.
    * @example
+   * ```ts
    * type SA1 = Tuple.SetAt<1, 'x', [1, 2, 3]>; // readonly [1, 'x', 3]
    * type SA2 = Tuple.SetAt<0 | 2, 'x', [1, 2, 3]>; // readonly [1 | 'x', 2, 3 | 'x']
    * type SA3 = Tuple.SetAt<number, 'x', [1, 2, 3]>; // readonly [1 | 'x', 2 | 'x', 3 | 'x']
    * type SA4 = Tuple.SetAt<2, 'x', [1, 2]>; // readonly [1, 2] (index out of bounds: unchanged)
+   * ```
    */
   export type SetAt<
     I extends number,
@@ -205,11 +225,13 @@ export namespace Tuple {
    * @template T - A readonly tuple where elements are themselves readonly arrays/tuples.
    * @returns A new readonly tuple type flattened by one level.
    * @example
+   * ```ts
    * type F1 = Tuple.Flatten<[[1, 2], [3, 4]]>; // readonly [1, 2, 3, 4]
    * type F2 = Tuple.Flatten<[[1], readonly [2, 3]]>; // readonly [1, 2, 3]
    * type F3 = Tuple.Flatten<[[1], [2, [3]]]>; // readonly [1, 2, [3]] (only flattens one level)
    * type F4 = Tuple.Flatten<[readonly number[], readonly string[]]>; // readonly (number | string)[]
    * type F5 = Tuple.Flatten<readonly (readonly number[])[]>; // readonly number[]
+   * ```
    */
   export type Flatten<T extends readonly (readonly unknown[])[]> =
     T extends readonly []
@@ -229,11 +251,13 @@ export namespace Tuple {
    * @template B - The second readonly tuple.
    * @returns A new readonly tuple type representing the concatenation of `A` and `B`.
    * @example
+   * ```ts
    * type C1 = Tuple.Concat<[1, 2], [3, 4]>; // readonly [1, 2, 3, 4]
    * type C2 = Tuple.Concat<[], [1]>; // readonly [1]
    * type C3 = Tuple.Concat<[1], []>; // readonly [1]
    * type C4 = Tuple.Concat<readonly number[], readonly string[]>; // readonly (number | string)[]
    * type C5 = Tuple.Concat<[1], readonly number[]>; // readonly [1, ...number[]]
+   * ```
    */
   export type Concat<
     A extends readonly unknown[],
@@ -247,10 +271,12 @@ export namespace Tuple {
    * @template B - The second readonly tuple.
    * @returns A readonly tuple of pairs `readonly [readonly [A[i], B[i]], ...]`.
    * @example
+   * ```ts
    * type Z1 = Tuple.Zip<[1, 2], ['a', 'b']>; // readonly [readonly [1, 'a'], readonly [2, 'b']]
    * type Z2 = Tuple.Zip<[1, 2, 3], ['a', 'b']>; // readonly [readonly [1, 'a'], readonly [2, 'b']]
    * type Z3 = Tuple.Zip<[1, 2], ['a', 'b', 'c']>; // readonly [readonly [1, 'a'], readonly [2, 'b']]
    * type Z4 = Tuple.Zip<[], ['a']>; // readonly []
+   * ```
    */
   export type Zip<A extends readonly unknown[], B extends readonly unknown[]> =
     A extends NonEmptyTuple<unknown>
@@ -269,11 +295,13 @@ export namespace Tuple {
    * @template T - The readonly tuple type to partition.
    * @returns A readonly tuple where each element is a sub-tuple of length up to `N`.
    * @example
+   * ```ts
    * type P1 = Tuple.Partition<2, [1, 2, 3, 4, 5]>; // readonly [readonly [1, 2], readonly [3, 4], readonly [5]]
    * type P2 = Tuple.Partition<3, [1, 2, 3, 4, 5, 6]>; // readonly [readonly [1, 2, 3], readonly [4, 5, 6]]
    * type P3 = Tuple.Partition<1, [1, 2]>; // readonly [readonly [1], readonly [2]]
    * type P4 = Tuple.Partition<5, [1, 2]>; // readonly [readonly [1, 2]]
    * type P5 = Tuple.Partition<number, [1, 2]>; // readonly (readonly (1 | 2)[])[]
+   * ```
    */
   export type Partition<N extends number, T extends readonly unknown[]> =
     TSTypeForgeInternals_PinsOneNumber<N> extends true

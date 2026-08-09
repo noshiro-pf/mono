@@ -8,10 +8,12 @@ import { type Uint10 } from '../constants/index.mjs';
  * @template N - A union of non-negative integer literals up to 1023 (`Uint10`).
  * @returns The smallest integer literal greater than all numbers in `N`.
  * @example
+ * ```ts
  * type U2 = 0 | 1 | 2;
  * type Result = Max<U2>; // 2
  * type ResultSingle = Max<5>; // 5
  * // type ResultFull = Max<Uint10>; // 1023
+ * ```
  */
 export type Max<N extends Uint10> = MaxImpl<N, []>;
 

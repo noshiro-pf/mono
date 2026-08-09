@@ -9,10 +9,12 @@ import { type RelaxedExclude, type ToNumber } from '../others/index.mjs';
  * @template T - The readonly array or tuple type.
  * @returns A union of number literals representing the indices if `T` is a tuple, otherwise `number`.
  * @example
+ * ```ts
  * type TupleIndices = IndexOfTuple<[string, boolean, number]>; // 0 | 1 | 2
  * type ArrayIndices = IndexOfTuple<string[]>; // number
  * type EmptyTupleIndices = IndexOfTuple<[]>; // never
  * type ReadonlyArrayIndices = IndexOfTuple<readonly number[]>; // number
+ * ```
  */
 export type IndexOfTuple<T extends readonly unknown[]> = IndexOfTupleImpl<
   T,
@@ -44,10 +46,12 @@ type IndexOfTupleImpl<T extends readonly unknown[], K> =
  * @template T - The readonly array or tuple type.
  * @returns A union of negative number literals representing the indices if `T` is a tuple, otherwise `number`.
  * @example
+ * ```ts
  * type TupleNegativeIndices = NegativeIndexOfTuple<[string, boolean, number]>; // -1 | -2 | -3
  * type ArrayNegativeIndices = NegativeIndexOfTuple<string[]>; // number
  * type EmptyTupleNegativeIndices = NegativeIndexOfTuple<[]>; // never
  * type ReadonlyArrayNegativeIndices = NegativeIndexOfTuple<readonly number[]>; // number
+ * ```
  */
 export type NegativeIndexOfTuple<T extends readonly unknown[]> = MapIdx<
   RelaxedExclude<IndexOfTuple<[...T, 0]>, 0>

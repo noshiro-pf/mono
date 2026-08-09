@@ -772,8 +772,8 @@ rather than assuming the tuple form.
 
 ### JSDoc `@example` Blocks and samples/
 
-Every ` ```ts ` code block in `packages/ts-type-forge/src/**/*.mts` JSDoc MUST
-be sourced from a type-checked sample file:
+Every `@example` in `packages/ts-type-forge/src/**/*.mts` JSDoc MUST be
+sourced from a type-checked sample file:
 
 1. Write the example as `samples/src/**/<type-name>-example.mts` (these are
    type-checked by that package's `pnpm run test`)
@@ -782,8 +782,22 @@ be sourced from a type-checked sample file:
    source file)
 3. Run `pnpm run doc:embed:jsdoc` to embed it
 
-`doc:embed:jsdoc` FAILS if a src file contains a ` ```ts ` block that is not
-registered in the mapping. Do not hand-edit the embedded blocks in `src/`.
+`doc:embed:jsdoc` FAILS in either of two cases, and CI runs it through
+`ws:doc`:
+
+- a src file carries an `@example` but is not registered in the mapping, or
+- a registered file has more `@example` tags than ` ```ts ` blocks.
+
+The second case is the one worth remembering: **an `@example` written as bare
+JSDoc lines, with no ` ```ts ` fence, is never type-checked.** A check keyed off
+the fence alone would only ever police examples that already follow the
+convention, which is why it keys off the `@example` tag instead. Do not
+hand-edit the embedded blocks in `src/`.
+
+A declaration samples cannot reach — a module-local `@internal` helper, say,
+since samples import the package through its public entry point — must describe
+its behavior in prose instead of carrying an `@example`. See
+`RecordPathPrefixes` in `src/record/record-path.mts`.
 
 The mapping is **count-exact and order-sensitive per source file**: the
 samples listed for a file must match its ` ```ts ` blocks one-for-one, in

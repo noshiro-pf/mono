@@ -11,10 +11,12 @@ export namespace List {
    * @template D - The default type to return if `T` is empty. Defaults to `never`.
    * @returns The type of the first element, or `D` if `T` is empty.
    * @example
+   * ```ts
    * type H1 = List.Head<[1, 2, 3]>; // 1
    * type H2 = List.Head<readonly string[]>; // string
    * type H3 = List.Head<[]>; // never
    * type H4 = List.Head<[], 'default'>; // 'default'
+   * ```
    */
   export type Head<T extends readonly unknown[], D = never> = Tuple.Head<T, D>;
 
@@ -24,10 +26,12 @@ export namespace List {
    * @template T - The readonly array or tuple type.
    * @returns The type of the last element, or `never` if `T` is empty.
    * @example
+   * ```ts
    * type L1 = List.Last<[1, 2, 3]>; // 3
    * type L2 = List.Last<readonly string[]>; // string
    * type L3 = List.Last<[]>; // never
    * type L4 = List.Last<[1]>; // 1
+   * ```
    */
   export type Last<T extends readonly unknown[]> = Tuple.Last<T>;
 
@@ -37,10 +41,12 @@ export namespace List {
    * @template A - The readonly array or tuple type.
    * @returns A new type with the last element removed.
    * @example
+   * ```ts
    * type BL1 = List.ButLast<[1, 2, 3]>; // readonly [1, 2]
    * type BL2 = List.ButLast<readonly string[]>; // readonly string[] (unchanged for general arrays)
    * type BL3 = List.ButLast<[1]>; // readonly []
    * type BL4 = List.ButLast<[]>; // readonly []
+   * ```
    */
   export type ButLast<A extends readonly unknown[]> = Tuple.ButLast<A>;
 
@@ -50,10 +56,12 @@ export namespace List {
    * @template A - The readonly array or tuple type.
    * @returns A new type with the first element removed.
    * @example
+   * ```ts
    * type T1 = List.Tail<[1, 2, 3]>; // readonly [2, 3]
    * type T2 = List.Tail<readonly string[]>; // readonly string[] (unchanged for general arrays)
    * type T3 = List.Tail<[1]>; // readonly []
    * type T4 = List.Tail<[]>; // readonly []
+   * ```
    */
   export type Tail<A extends readonly unknown[]> = Tuple.Tail<A>;
 
@@ -64,9 +72,11 @@ export namespace List {
    * @template L - The readonly array or tuple type.
    * @returns A new type with elements reversed.
    * @example
+   * ```ts
    * type R1 = List.Reverse<[1, 2, 3]>; // readonly [3, 2, 1]
    * type R2 = List.Reverse<readonly string[]>; // readonly string[]
    * type R3 = List.Reverse<[]>; // readonly []
+   * ```
    */
   export type Reverse<L extends readonly unknown[]> = L extends readonly []
     ? readonly []
@@ -84,9 +94,11 @@ export namespace List {
    * @template T - The readonly array or tuple type.
    * @returns A new type containing the first `N` elements (for tuples) or `T` (for arrays).
    * @example
+   * ```ts
    * type TK1 = List.Take<2, [1, 2, 3]>; // readonly [1, 2]
    * type TK2 = List.Take<5, [1, 2, 3]>; // readonly [1, 2, 3]
    * type TK3 = List.Take<2, readonly string[]>; // readonly string[]
+   * ```
    */
   export type Take<N extends number, T extends readonly unknown[]> =
     IsFixedLengthList<T> extends true ? Tuple.Take<N, T> : T;
@@ -99,9 +111,11 @@ export namespace List {
    * @template T - The readonly array or tuple type.
    * @returns A new type containing elements after the first `N` (for tuples) or `T` (for arrays).
    * @example
+   * ```ts
    * type SK1 = List.Skip<1, [1, 2, 3]>; // readonly [2, 3]
    * type SK2 = List.Skip<3, [1, 2, 3]>; // readonly []
    * type SK3 = List.Skip<1, readonly string[]>; // readonly string[]
+   * ```
    */
   export type Skip<N extends number, T extends readonly unknown[]> =
     IsFixedLengthList<T> extends true ? Tuple.Skip<N, T> : T;
@@ -114,9 +128,11 @@ export namespace List {
    * @template T - The readonly array or tuple type.
    * @returns A new type containing the last `N` elements (for tuples) or `T` (for arrays).
    * @example
+   * ```ts
    * type TL1 = List.TakeLast<2, [1, 2, 3]>; // readonly [2, 3]
    * type TL2 = List.TakeLast<5, [1, 2, 3]>; // readonly [1, 2, 3]
    * type TL3 = List.TakeLast<2, readonly string[]>; // readonly string[]
+   * ```
    */
   export type TakeLast<N extends number, T extends readonly unknown[]> =
     IsFixedLengthList<T> extends true ? Tuple.TakeLast<N, T> : T;
@@ -129,9 +145,11 @@ export namespace List {
    * @template T - The readonly array or tuple type.
    * @returns A new type containing elements before the last `N` (for tuples) or `T` (for arrays).
    * @example
+   * ```ts
    * type SL1 = List.SkipLast<1, [1, 2, 3]>; // readonly [1, 2]
    * type SL2 = List.SkipLast<3, [1, 2, 3]>; // readonly []
    * type SL3 = List.SkipLast<1, readonly string[]>; // readonly string[]
+   * ```
    */
   export type SkipLast<N extends number, T extends readonly unknown[]> =
     IsFixedLengthList<T> extends true ? Tuple.SkipLast<N, T> : T;
@@ -145,9 +163,11 @@ export namespace List {
    * @template T - The readonly array or tuple type.
    * @returns A new array/tuple type with the element at index `I` updated.
    * @example
+   * ```ts
    * type SA1 = List.SetAt<1, 'x', [1, 2, 3]>; // readonly [1, 'x', 3]
    * type SA2 = List.SetAt<1, 'x', readonly number[]>; // readonly (string | number)[]
    * // type SA3 = List.SetAt<2, 'x', [1, 2]>; // Error if I is out of bounds for tuple
+   * ```
    */
   export type SetAt<I extends number, V, T extends readonly unknown[]> =
     IsFixedLengthList<T> extends true
@@ -160,9 +180,11 @@ export namespace List {
    * @template T - A readonly array/tuple where elements are themselves readonly arrays/tuples.
    * @returns A new flattened array/tuple type.
    * @example
+   * ```ts
    * type F1 = List.Flatten<[[1, 2], [3, 4]]>; // readonly [1, 2, 3, 4]
    * type F2 = List.Flatten<[readonly number[], readonly string[]]>; // readonly (string | number)[]
    * type F3 = List.Flatten<[[1], [2, [3]]]>; // readonly [1, 2, [3]] (only flattens one level)
+   * ```
    */
   export type Flatten<T extends readonly (readonly unknown[])[]> =
     Tuple.Flatten<T>;
@@ -174,9 +196,11 @@ export namespace List {
    * @template B - The second readonly array or tuple.
    * @returns A new type representing the concatenation of `A` and `B`.
    * @example
+   * ```ts
    * type C1 = List.Concat<[1, 2], [3, 4]>; // readonly [1, 2, 3, 4]
    * type C2 = List.Concat<readonly number[], readonly string[]>; // readonly (string | number)[]
    * type C3 = List.Concat<[1], readonly number[]>; // readonly [1, ...number[]]
+   * ```
    */
   export type Concat<
     A extends readonly unknown[],
@@ -191,11 +215,13 @@ export namespace List {
    * @template B - The second readonly array or tuple.
    * @returns A readonly array/tuple of pairs `readonly [A[i], B[i]]`.
    * @example
+   * ```ts
    * type Z1 = List.Zip<[1, 2], ['a', 'b']>; // readonly [[1, 'a'], [2, 'b']]
    * type Z2 = List.Zip<[1, 2, 3], ['a', 'b']>; // readonly [[1, 'a'], [2, 'b']]
    * type Z3 = List.Zip<readonly number[], readonly string[]>; // readonly (readonly [number, string])[]
    * type Z4 = List.Zip<[1, 2], readonly string[]>; // readonly [[1, string], [2, string]]
    * type Z5 = List.Zip<readonly number[], ['a', 'b']>; // readonly [[number, 'a'], [number, 'b']]
+   * ```
    */
   export type Zip<
     A extends readonly unknown[],
@@ -219,9 +245,12 @@ export namespace List {
    * @template T - The readonly array or tuple type to partition.
    * @returns A readonly array/tuple where each element is a sub-array/tuple of length `N`.
    * @example
+   * ```ts
    * type P1 = List.Partition<2, [1, 2, 3, 4, 5]>; // readonly [[1, 2], [3, 4], [5]]
-   * type P2 = List.Partition<3, readonly number[]>; // readonly (readonly number[])[]
+   * type P2 = List.Partition<3, [1, 2, 3, 4, 5, 6]>; // readonly [[1, 2, 3], [4, 5, 6]]
+   * type P4 = List.Partition<number, [1, 2]>; // readonly (readonly (1 | 2)[])[]
    * type P3 = List.Partition<1, [1, 2]>; // readonly [[1], [2]]
+   * ```
    */
   export type Partition<
     N extends number,

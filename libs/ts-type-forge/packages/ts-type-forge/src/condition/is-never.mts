@@ -10,11 +10,13 @@ import { type TypeExtends } from './extends.mjs';
  * @returns `true` if `T` is `never`, `false` otherwise.
  *
  * @example
+ * ```ts
  * type T1 = IsNever<never>; // true
  * type T2 = IsNever<string>; // false
  * type T3 = IsNever<any>; // false
  * type T4 = IsNever<unknown>; // false
  * type T5 = IsNever<string | never>; // false (evaluates to string)
  * type T6 = IsNever<string & never>; // true (evaluates to never)
+ * ```
  */
 export type IsNever<T> = TypeExtends<T, never>;

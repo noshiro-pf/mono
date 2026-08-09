@@ -5,10 +5,12 @@
  * @template Elm - The type of elements in the tuple.
  * @returns A readonly tuple type `readonly [Elm, Elm, ..., Elm]` of length `N`.
  * @example
+ * ```ts
  * type TupleOf3Strings = MakeTuple<3, string>; // readonly [string, string, string]
  * type TupleOf0Numbers = MakeTuple<0, number>; // readonly []
  * // type InvalidLength = MakeTuple<-1, boolean>; // Error or unexpected result
  * // type InvalidLength2 = MakeTuple<1.5, boolean>; // Error or unexpected result
+ * ```
  */
 export type MakeTuple<N extends number, Elm> = MakeTupleImpl<Elm, `${N}`, []>;
 
