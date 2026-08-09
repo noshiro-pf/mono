@@ -396,7 +396,15 @@ export const eslintUnicornRules = {
   'unicorn/no-unnecessary-boolean-comparison': 'error',
   'unicorn/no-unnecessary-fetch-options': 'error',
   'unicorn/no-unnecessary-string-trim': 'error',
-  'unicorn/no-unreadable-for-of-expression': 'error',
+  // Treats an argument as "complex" unless it is an identifier, a literal, a
+  // simple member expression or a *zero-argument* call, so
+  // `for (const i of range(asUint32(n), -1, -1))` is reported twice over: for
+  // the wrapped cast, and for `-1` (a `UnaryExpression`, not a `Literal`).
+  // Neither is unreadable, and branded-number APIs make wrapped casts the norm,
+  // so the rule mostly buys throwaway variables. Note also the inconsistency:
+  // unicorn's own `prefer-simple-condition-first` does accept signed numeric
+  // literals as simple.
+  'unicorn/no-unreadable-for-of-expression': 'off',
   'unicorn/no-unsafe-promise-all-settled-values': 'error',
   'unicorn/no-useless-coercion': 'error',
   'unicorn/no-useless-compound-assignment': 'error',
