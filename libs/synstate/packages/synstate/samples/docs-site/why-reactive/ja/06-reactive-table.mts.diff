@@ -1,0 +1,86 @@
+--- en/06-reactive-table.mts
++++ ja/06-reactive-table.mts
+@@ -19,15 +19,15 @@
+ /* embed-sample-code-ignore-this-line */ // prettier-ignore
+ /* embed-sample-code-ignore-this-line */ const renderError = (_error: unknown): void => {};
+ 
+-// Source state — each input is an independent Observable
++// ソース状態 — 各入力は独立した Observable
+ const [filterName, setFilterName] = createState('');
+ const [filterEmail, setFilterEmail] = createState('');
+ const [filterGender, setFilterGender] = createState('');
+ const [itemsPerPage, setItemsPerPage] = createState(10);
+ const [pageInput, setPageInput] = createState(1);
+ 
+-// Fetch table data from server
+-// fromPromise emits Result.Ok(rows) on success, Result.Err(error) on failure
++// サーバーからテーブルデータを取得
++// fromPromise は成功時に Result.Ok(rows)、失敗時に Result.Err(error) を発行
+ const tableDataResult = fromPromise(
+   fetch('/api/rows').then((r) => {
+     if (!r.ok) throw new Error(`HTTP ${r.status}`);
+@@ -35,7 +35,7 @@
+   }),
+ );
+ 
+-// Derived: debounced filters → filtered rows (only when data loaded successfully)
++// 派生： デバウンスされたフィルター → フィルタ結果（データ取得成功時のみ）
+ const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
+   debounce(300),
+ );
+@@ -43,7 +43,7 @@
+ const filteredRows = combine([headerValues, tableDataResult]).pipe(
+   map(([filters, result]) =>
+     Result.isErr(result)
+-      ? [] // show empty table on error
++      ? [] // エラー時は空テーブルを表示
+       : result.value.filter(
+           (row) =>
+             row.name.includes(filters[0]) &&
+@@ -53,20 +53,20 @@
+   ),
+ );
+ 
+-// Error state is also a derived value — no separate error variable needed
++// エラー状態も派生値 — 別のミュータブル変数は不要
+ const fetchError = tableDataResult.pipe(
+   map((result) => (Result.isErr(result) ? result.value : undefined)),
+ );
+ 
+-// Derived: page count
++// 派生： ページ数
+ const pageLength = combine([filteredRows, itemsPerPage]).pipe(
+   map(([rows, perPage]) => Math.ceil(rows.length / perPage)),
+ );
+ 
+-// Reset page to 1 whenever pageLength changes (filters or itemsPerPage changed)
++// pageLength が変わったらページを1にリセット
+ const pageReset = pageLength.pipe(mapTo(1));
+ 
+-// Derived: current page — merge user input and auto-reset, then clamp
++// 派生： 現在のページ — ユーザー入力と自動リセットを merge し、クランプ
+ const currentPage = merge([
+   pageReset,
+   combine([pageInput, pageLength]).pipe(
+@@ -74,7 +74,7 @@
+   ),
+ ]);
+ 
+-// Output: visible table rows
++// 出力： 表示するテーブル行
+ const tableSliced = combine([filteredRows, currentPage, itemsPerPage]).pipe(
+   map(([rows, page, perPage]) => {
+     const start = (page - 1) * perPage;
+@@ -82,10 +82,10 @@
+   }),
+ );
+ 
+-// Subscribe to render — called automatically when any dependency changes
++// subscribe で描画 — 依存が変化すると自動的に呼ばれる
+ tableSliced.subscribe(renderTable);
+ 
+-// Subscribe to errors — renderError is called only when the error state changes
++// エラーを subscribe — エラー状態が変化したときのみ renderError が呼ばれる
+ fetchError.subscribe((err) => {
+   renderError(err);
+ });

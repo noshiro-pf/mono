@@ -1,0 +1,122 @@
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
+import {
+  counter,
+  pairwise,
+  take,
+  withInitialValue,
+  type Observable,
+} from '../../src/index.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
+import { testStream } from '../test-stream.mjs';
+import { type StreamTestCase } from '../typedef.mjs';
+
+const createStreams = (
+  tick: number,
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<SafeUint>;
+  pairwise$: Observable<FixedLengthTuple<2, number>>;
+}> => {
+  const counter$ = counter(tick, { startManually: true });
+
+  const counter6$ = counter$.pipe(take(6));
+
+  const pairwise$ = counter6$.pipe(pairwise());
+
+  return {
+    startSource: () => {
+      counter$.start();
+    },
+    counter$: counter6$,
+    pairwise$,
+  };
+};
+
+const createStreams2 = (
+  tick: number,
+): Readonly<{
+  startSource: () => void;
+  counter$: Observable<SafeUint | -1>;
+  pairwise$: Observable<FixedLengthTuple<2, number>>;
+}> => {
+  const counter$ = counter(tick, { startManually: true });
+
+  const counter6$ = counter$.pipe(take(6)).pipe(withInitialValue(-1 as const));
+
+  const pairwise$ = counter6$.pipe(pairwise());
+
+  return {
+    startSource: () => {
+      counter$.start();
+    },
+    counter$: counter6$,
+    pairwise$,
+  };
+};
+
+export const pairwiseTestCases: FixedLengthTuple<
+  2,
+  StreamTestCase<FixedLengthTuple<2, number>>
+> = [
+  {
+    name: 'pairwise case 1',
+    expectedOutput: [
+      [0, 1],
+      [1, 2],
+      [2, 3],
+      [3, 4],
+      [4, 5],
+    ],
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
+      const { startSource, pairwise$ } = createStreams(tick);
+
+      return getStreamHistoryAsPromise(pairwise$, startSource);
+    },
+    preview: (tick: number): void => {
+      const { startSource, counter$, pairwise$ } = createStreams(tick);
+
+      counter$.subscribe((a) => {
+        console.log('counter ', a);
+      });
+
+      pairwise$.subscribe((a) => {
+        console.log('pairwise', a);
+      });
+
+      startSource();
+    },
+  },
+  {
+    name: 'pairwise case 2',
+    expectedOutput: [
+      [-1, 0],
+      [0, 1],
+      [1, 2],
+      [2, 3],
+      [3, 4],
+      [4, 5],
+    ],
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
+      const { startSource, pairwise$ } = createStreams2(tick);
+
+      return getStreamHistoryAsPromise(pairwise$, startSource);
+    },
+    preview: (tick: number): void => {
+      const { startSource, counter$, pairwise$ } = createStreams2(tick);
+
+      counter$.subscribe((a) => {
+        console.log('counter ', a);
+      });
+
+      pairwise$.subscribe((a) => {
+        console.log('pairwise', a);
+      });
+
+      startSource();
+    },
+  },
+] as const;
+
+for (const c of pairwiseTestCases) {
+  testStream(c);
+}

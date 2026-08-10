@@ -1,0 +1,79 @@
+{
+  "name": "synstate",
+  "version": "2.0.0",
+  "description": "Type-safe State Management Library for TypeScript/JavaScript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/synstate.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "assets",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "benchmark": "tsx ./scripts/cmd/run-benchmark.mts",
+    "benchmark:cascaded-diamond": "tsx ./scripts/cmd/run-benchmark-cascaded-diamond.mts",
+    "benchmark:deep-chain": "tsx ./scripts/cmd/run-benchmark-deep-chain.mts",
+    "build": "tsx ./scripts/cmd/build.mts",
+    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "doc": "run-s doc:embed doc:embed:jsdoc doc:gen-sample-diffs fmt",
+    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
+    "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
+    "doc:gen-sample-diffs": "tsx ./scripts/cmd/generate-sample-diffs.mts",
+    "fmt": "format-uncommitted --cwd .",
+    "fmt:diff": "format-diff-from origin/main --cwd .",
+    "fmt:full": "pnpm run z:prettier .",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude \"core/utils/**\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest:node run",
+    "test:browser": "pnpm run z:vitest --project='Browser' run",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "test:cov:ui": "vite preview --outDir ./coverage",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'",
+    "z:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
+  },
+  "dependencies": {
+    "ts-data-forge": "^14.2.0",
+    "ts-type-forge": "^9.2.0"
+  },
+  "devDependencies": {
+    "@reduxjs/toolkit": "2.12.0",
+    "@types/argparse": "2.0.17",
+    "@types/react": "19.2.18",
+    "argparse": "3.0.0",
+    "jotai": "2.20.2",
+    "mobx": "7.0.0",
+    "react": "19.2.8",
+    "rxjs": "7.8.2",
+    "valtio": "2.3.2",
+    "zustand": "5.0.14"
+  }
+}

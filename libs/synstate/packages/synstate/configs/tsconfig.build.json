@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "../../../configs/tsconfig/tsconfig.build.json",
+    "../../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "../dist",
+    "declarationDir": "../dist",
+    "rootDir": "../src"
+  },
+  "include": ["../src"],
+  "exclude": ["../src/**/*.test.mts"]
+}

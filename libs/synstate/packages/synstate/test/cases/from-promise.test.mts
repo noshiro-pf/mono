@@ -1,0 +1,42 @@
+import { Result } from 'ts-data-forge';
+import { fromPromise, type Observable } from '../../src/index.mjs';
+import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
+import { testStream } from '../test-stream.mjs';
+import { type StreamTestCase } from '../typedef.mjs';
+
+const valueToEmit = 1;
+
+const createStream = (tick: number): Observable<Result<number, unknown>> => {
+  const promise = new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(valueToEmit);
+    }, tick);
+  });
+
+  return fromPromise(promise);
+};
+
+export const fromPromiseTestCases: readonly [
+  StreamTestCase<Result<number, unknown>>,
+] = [
+  {
+    name: 'fromPromise case 1',
+    expectedOutput: [Result.ok(valueToEmit)],
+    run: (tick: number): Promise<readonly Result<number, unknown>[]> => {
+      const source$ = createStream(tick);
+
+      return getStreamHistoryAsPromise(source$, () => {});
+    },
+    preview: (tick: number): void => {
+      const source$ = createStream(tick);
+
+      source$.subscribe((a) => {
+        console.log('fromPromise', a);
+      });
+    },
+  },
+] as const;
+
+for (const c of fromPromiseTestCases) {
+  testStream(c);
+}

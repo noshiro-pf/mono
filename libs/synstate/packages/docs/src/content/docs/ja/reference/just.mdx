@@ -1,0 +1,32 @@
+---
+prev: false
+next: false
+title: just
+---
+
+単一の静的な値を保持し、即座に完了する Observable を作成します。`switchMap` 内で非同期処理が不要な場合のフォールバック値として有用です。
+
+## 使用例
+
+```ts
+import { just, switchMap, fromAbortablePromise, source } from 'synstate';
+import { Result } from 'ts-data-forge';
+
+const auth$ = source<{ id: string } | null>({ id: '1' });
+
+const userData$ = auth$.pipe(
+    switchMap((auth) =>
+        auth
+            ? fromAbortablePromise((signal) =>
+                  fetch(`/api/user/${auth.id}`, { signal }).then((r) =>
+                      r.json(),
+                  ),
+              )
+            : just(Result.ok({ name: 'Guest' })),
+    ),
+);
+```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/just.mts)
+{/* /source-link */}

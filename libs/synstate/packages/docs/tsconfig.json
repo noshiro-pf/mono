@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "synstate": ["../synstate/src/entry-point.mts"],
+      "synstate-react-hooks": ["../synstate-react-hooks/src/index.mts"],
+      "synstate-preact-hooks": ["../synstate-preact-hooks/src/index.mts"],
+      "synstate-preact-signals": ["../synstate-preact-signals/src/index.mts"]
+    }
+  },
+  "include": ["./samples", "./src", "./test", "./scripts", "./configs"],
+  "exclude": ["./src/content.config.ts"]
+}

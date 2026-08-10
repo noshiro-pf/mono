@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "paths": {
+      "synstate-preact-signals": ["./src/entry-point.mts"]
+    }
+  },
+  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
+}

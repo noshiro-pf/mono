@@ -1,0 +1,36 @@
+---
+prev: false
+next: false
+title: just
+---
+
+{/* jsdoc-description */}
+Creates an Observable that holds a single static value and immediately
+completes. Useful inside `switchMap` to emit a fallback value when no
+asynchronous work is needed.
+{/* /jsdoc-description */}
+
+## Example
+
+```ts
+import { just, switchMap, fromAbortablePromise, source } from 'synstate';
+import { Result } from 'ts-data-forge';
+
+const auth$ = source<{ id: string } | null>({ id: '1' });
+
+const userData$ = auth$.pipe(
+    switchMap((auth) =>
+        auth
+            ? fromAbortablePromise((signal) =>
+                  fetch(`/api/user/${auth.id}`, { signal }).then((r) =>
+                      r.json(),
+                  ),
+              )
+            : just(Result.ok({ name: 'Guest' })),
+    ),
+);
+```
+
+{/* source-link */}
+[View source on GitHub](https://github.com/noshiro-pf/synstate/blob/main/packages/synstate/src/core/create/just.mts)
+{/* /source-link */}

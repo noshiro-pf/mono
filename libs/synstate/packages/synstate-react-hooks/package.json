@@ -1,0 +1,74 @@
+{
+  "name": "synstate-react-hooks",
+  "version": "2.0.0",
+  "description": "Type-safe State Management Library for TypeScript/JavaScript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/synstate.git"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx ./scripts/cmd/build.mts",
+    "build:min": "tsx ./scripts/cmd/build.mts --skip-check",
+    "check:ext": "tsx ./scripts/cmd/check-ext.mts",
+    "check-all": "tsx ./scripts/cmd/check-all.mts",
+    "codemod": "convert-to-readonly '{src,samples,test}/**/*.{mts,tsx}'",
+    "doc": "run-s doc:embed doc:embed:jsdoc fmt",
+    "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
+    "doc:embed:jsdoc": "tsx ./scripts/cmd/embed-examples-in-jsdoc.mts",
+    "fmt": "format-uncommitted --cwd .",
+    "fmt:diff": "format-diff-from origin/main --cwd .",
+    "fmt:full": "pnpm run z:prettier .",
+    "gen:re-export": "run-s gen:re-export:script fmt",
+    "gen:re-export:script": "tsx ./scripts/cmd/generate-re-export-script.mts",
+    "gi": "run-s gi:src fmt",
+    "gi:src": "gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "pnpm run z:vitest:node run",
+    "test:browser": "pnpm run z:vitest --project='Browser' run",
+    "test:cov": "pnpm run z:vitest:node run --coverage",
+    "test:cov:ui": "vite preview --outDir ./coverage",
+    "test:ui": "pnpm run z:vitest:node --ui",
+    "testw": "pnpm run z:vitest:node watch",
+    "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
+    "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts",
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
+  },
+  "dependencies": {
+    "synstate": "workspace:*",
+    "ts-data-forge": "^14.2.0",
+    "ts-type-forge": "^9.2.0"
+  },
+  "devDependencies": {
+    "@types/argparse": "2.0.17",
+    "@types/react": "19.2.18",
+    "argparse": "3.0.0",
+    "react": "19.2.8"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}
