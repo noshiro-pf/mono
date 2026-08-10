@@ -1,0 +1,162 @@
+import {
+  AST_NODE_TYPES,
+  type TSESLint,
+  type TSESTree,
+} from '@typescript-eslint/utils';
+import { Arr, hasKey, isRecord } from 'ts-data-forge';
+
+type MessageIds = 'useAssert';
+
+type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
+  Readonly<{
+    typeParameters?: TSESTree.TSTypeParameterInstantiation;
+  }>;
+
+export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description:
+        'Disallow `expect(X).toStrictEqual(Y)` in favor of `assert.deepStrictEqual(X, Y)`, as the former also checks type equality between X and Y.',
+    },
+    fixable: 'code',
+    schema: [],
+    messages: {
+      useAssert:
+        'Use `assert.deepStrictEqual(X, Y)` instead of `expect(X).toStrictEqual(Y)`.',
+    },
+  },
+  defaultOptions: [],
+  create: (context) => {
+    const sourceCode = context.sourceCode;
+
+    return {
+      CallExpression: (node) => {
+        if (!isToStrictEqualInvocation(node)) {
+          return;
+        }
+
+        const expectCall = node.callee.object;
+
+        if (!isExpectCall(expectCall)) {
+          return;
+        }
+
+        if (
+          !Arr.isFixedLengthArray(1, expectCall.arguments) ||
+          !Arr.isFixedLengthArray(1, node.arguments) ||
+          expectCall.arguments[0].type === AST_NODE_TYPES.SpreadElement ||
+          node.arguments[0].type === AST_NODE_TYPES.SpreadElement
+        ) {
+          return;
+        }
+
+        const actualArgument = expectCall.arguments[0];
+
+        const expectedArgument = node.arguments[0];
+
+        const actualText = sourceCode.getText(actualArgument);
+
+        const expectedText = sourceCode.getText(expectedArgument);
+
+        const typeArgumentText = getTypeArgumentText(node, sourceCode);
+
+        const expectedWithCast =
+          typeArgumentText === undefined
+            ? expectedText
+            : `(${expectedText}) as ${typeArgumentText}`;
+
+        context.report({
+          node,
+          messageId: 'useAssert',
+          fix: (fixer) =>
+            fixer.replaceText(
+              node,
+              `assert.deepStrictEqual(${actualText}, ${expectedWithCast})`,
+            ),
+        });
+      },
+    };
+  },
+} as const;
+
+const isToStrictEqualInvocation = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
+): node is TSESTree.CallExpression &
+  Readonly<{
+    callee: TSESTree.MemberExpression &
+      Readonly<{
+        object: TSESTree.CallExpression;
+        property: TSESTree.Identifier;
+      }>;
+  }> => {
+  if (
+    node.callee.type !== AST_NODE_TYPES.MemberExpression ||
+    node.optional ||
+    node.callee.optional ||
+    node.callee.computed
+  ) {
+    return false;
+  }
+
+  return (
+    node.callee.property.type === AST_NODE_TYPES.Identifier &&
+    node.callee.property.name === 'toStrictEqual' &&
+    node.callee.object.type === AST_NODE_TYPES.CallExpression
+  );
+};
+
+const isExpectCall = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
+): node is TSESTree.CallExpression &
+  Readonly<{
+    callee: TSESTree.Identifier;
+  }> =>
+  node.callee.type === AST_NODE_TYPES.Identifier &&
+  node.callee.name === 'expect';
+
+const getTypeArgumentText = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+): string | undefined => {
+  const typeArguments =
+    getModernTypeArguments(node) ?? getLegacyTypeParameters(node);
+
+  if (typeArguments === undefined) {
+    return undefined;
+  }
+
+  const rawText = sourceCode.getText(typeArguments).trim();
+
+  if (rawText.length < 2) {
+    return undefined;
+  }
+
+  const withoutAngles = rawText
+    .replace(/^\s*</u, '')
+    .replace(/>\s*$/u, '')
+    .trim();
+
+  return withoutAngles.length === 0 ? undefined : withoutAngles;
+};
+
+const getModernTypeArguments = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
+): TSESTree.TSTypeParameterInstantiation | undefined =>
+  isRecord(node) && hasKey(node, 'typeArguments')
+    ? node.typeArguments
+    : undefined;
+
+const getLegacyTypeParameters = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.CallExpression,
+): TSESTree.TSTypeParameterInstantiation | undefined =>
+  isRecord(node) && hasKey(node, 'typeParameters')
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      (node as CallExpressionWithLegacyTypeParameters).typeParameters
+    : undefined;

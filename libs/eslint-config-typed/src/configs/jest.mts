@@ -1,0 +1,21 @@
+import globals from 'globals';
+import { eslintJestRules } from '../rules/index.mjs';
+import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
+
+export const eslintConfigForJest = (files?: readonly string[]): FlatConfig =>
+  ({
+    ...(files === undefined ? {} : { files }),
+    languageOptions: {
+      // https://github.com/sindresorhus/globals/blob/main/globals.json
+      globals: {
+        ...globals.es2021,
+        ...globals.browser,
+        ...globals.node,
+        // using jest/prefer-importing-jest-globals
+        // ...globals.jest,
+      },
+    },
+    rules: defineKnownRules({
+      ...eslintJestRules,
+    }),
+  }) as const;

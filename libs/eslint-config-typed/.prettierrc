@@ -1,0 +1,26 @@
+{
+  "plugins": [
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-packagejson"
+  ],
+  "semi": true,
+  "endOfLine": "lf",
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": ["**/*.md", "**/*.mdx"],
+      "options": {
+        "tabWidth": 4
+      }
+    },
+    {
+      "files": ["src/types/rules/*.mts"],
+      "options": {
+        "plugins": [
+          "prettier-plugin-organize-imports",
+          "prettier-plugin-packagejson"
+        ]
+      }
+    }
+  ]
+}

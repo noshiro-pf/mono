@@ -1,0 +1,832 @@
+## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
+
+### Bug Fixes
+
+- turn off unicorn/no-unreadable-for-of-expression ([#408](https://github.com/noshiro-pf/eslint-config-typed/issues/408)) ([016ead5](https://github.com/noshiro-pf/eslint-config-typed/commit/016ead54b20ee984b5a477a1b809d4e12c78e2c3))
+
+## [5.8.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.2...v5.8.3) (2026-08-07)
+
+### Bug Fixes
+
+- make CI pass after the pnpm update ([#404](https://github.com/noshiro-pf/eslint-config-typed/issues/404)) ([2067cae](https://github.com/noshiro-pf/eslint-config-typed/commit/2067caeb747cff5217a7b83142c0d03ec19d4675))
+
+## [5.8.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.1...v5.8.2) (2026-08-01)
+
+### Bug Fixes
+
+- bump typescript-eslint from 8.62.0 to 8.65.0 ([#393](https://github.com/noshiro-pf/eslint-config-typed/issues/393)) ([2829d4c](https://github.com/noshiro-pf/eslint-config-typed/commit/2829d4c4916825909212b3254e61be8daa1852e5))
+
+## [5.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.0...v5.8.1) (2026-07-27)
+
+### Bug Fixes
+
+- remove trailing space from CODEOWNERS filename ([#389](https://github.com/noshiro-pf/eslint-config-typed/issues/389)) ([c5cf5e6](https://github.com/noshiro-pf/eslint-config-typed/commit/c5cf5e621f26a25a64a8c2114e94a4e003f0e22d))
+
+# [5.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.7.0...v5.8.0) (2026-07-23)
+
+### Features
+
+- **ts-restrictions:** add prefer-curried-call rule ([#387](https://github.com/noshiro-pf/eslint-config-typed/issues/387)) ([263212b](https://github.com/noshiro-pf/eslint-config-typed/commit/263212b9faf54796d7251675876c874894ee5e89))
+
+# [5.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.2...v5.7.0) (2026-07-22)
+
+### Features
+
+- add ts-restrictions/no-string-spread rule ([#386](https://github.com/noshiro-pf/eslint-config-typed/issues/386)) ([2f86ad9](https://github.com/noshiro-pf/eslint-config-typed/commit/2f86ad9d5a7c092f5530de1cb703d357dea3aa9d))
+
+## [5.6.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.1...v5.6.2) (2026-07-21)
+
+### Performance Improvements
+
+- disable import-x resolution rules that are redundant with TypeScript ([#384](https://github.com/noshiro-pf/eslint-config-typed/issues/384)) ([d78e4ae](https://github.com/noshiro-pf/eslint-config-typed/commit/d78e4ae0f1b5957e9bb0472bac63f7a4fcb70205))
+
+## [5.6.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.6.0...v5.6.1) (2026-07-20)
+
+### Bug Fixes
+
+- remove deprecated eslintConfigForTsDataForge from plugins defini… ([#383](https://github.com/noshiro-pf/eslint-config-typed/issues/383)) ([5de9552](https://github.com/noshiro-pf/eslint-config-typed/commit/5de9552cf61370bbb68d7634285d5a9154b42a86))
+
+# [5.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.5.1...v5.6.0) (2026-07-20)
+
+### Features
+
+- deprecate eslintConfigForTsDataForge ([#374](https://github.com/noshiro-pf/eslint-config-typed/issues/374)) ([fbead79](https://github.com/noshiro-pf/eslint-config-typed/commit/fbead794d687ca12958074505014b6f020141f4c))
+
+## [5.5.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.5.0...v5.5.1) (2026-07-20)
+
+### Bug Fixes
+
+- bump eslint-plugin-n from 18.2.1 to 18.2.2 ([#378](https://github.com/noshiro-pf/eslint-config-typed/issues/378)) ([6f378be](https://github.com/noshiro-pf/eslint-config-typed/commit/6f378bee3e49dd19076fd678486217bb5d70c637))
+
+# [5.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.4.2...v5.5.0) (2026-07-20)
+
+### Features
+
+- **ts-data-forge:** update custom plugin for ts-data-forge v10 ([#373](https://github.com/noshiro-pf/eslint-config-typed/issues/373)) ([3689d25](https://github.com/noshiro-pf/eslint-config-typed/commit/3689d2517dfec3910658144ccbd0a505e120e485))
+
+## [5.4.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.4.1...v5.4.2) (2026-07-13)
+
+### Bug Fixes
+
+- bump eslint-plugin-cypress from 6.4.1 to 6.4.2 ([#372](https://github.com/noshiro-pf/eslint-config-typed/issues/372)) ([052e837](https://github.com/noshiro-pf/eslint-config-typed/commit/052e83708fffcb6da459ac9e5565cc9b31e6485d))
+
+## [5.4.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.4.0...v5.4.1) (2026-07-13)
+
+### Bug Fixes
+
+- bump eslint-plugin-eslint-plugin from 7.4.0 to 7.4.1 ([#370](https://github.com/noshiro-pf/eslint-config-typed/issues/370)) ([c5914b7](https://github.com/noshiro-pf/eslint-config-typed/commit/c5914b7f6b05404e2b1295e8861621c1ce8507c5))
+
+# [5.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.3.3...v5.4.0) (2026-07-06)
+
+### Features
+
+- create canonical array methods rules ([#365](https://github.com/noshiro-pf/eslint-config-typed/issues/365)) ([a8f864b](https://github.com/noshiro-pf/eslint-config-typed/commit/a8f864ba1f32910c8e5990cd3c0406b642a985da))
+
+## [5.3.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.3.2...v5.3.3) (2026-07-06)
+
+### Bug Fixes
+
+- bump typescript-eslint from 8.61.1 to 8.62.0 ([#364](https://github.com/noshiro-pf/eslint-config-typed/issues/364)) ([f5699b9](https://github.com/noshiro-pf/eslint-config-typed/commit/f5699b9ba946e853302fcdc92013ab0343a00a8e))
+
+## [5.3.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.3.1...v5.3.2) (2026-07-06)
+
+### Bug Fixes
+
+- bump eslint-plugin-n from 18.1.0 to 18.2.1 ([#362](https://github.com/noshiro-pf/eslint-config-typed/issues/362)) ([d8a6c76](https://github.com/noshiro-pf/eslint-config-typed/commit/d8a6c76bf635fb050409167dd2e462d12e970d11))
+
+## [5.3.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.3.0...v5.3.1) (2026-07-06)
+
+### Bug Fixes
+
+- bump @typescript-eslint/parser from 8.61.1 to 8.62.0 ([#360](https://github.com/noshiro-pf/eslint-config-typed/issues/360)) ([a33a7b9](https://github.com/noshiro-pf/eslint-config-typed/commit/a33a7b9cc26010576cb63cde8a0db6d5e29822d8))
+
+# [5.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.2.0...v5.3.0) (2026-06-25)
+
+### Features
+
+- create ts-data-forge/prefer-num-safe-parse-float rule ([#356](https://github.com/noshiro-pf/eslint-config-typed/issues/356)) ([32bac9f](https://github.com/noshiro-pf/eslint-config-typed/commit/32bac9fc5c8f4360f435057e892c5a5161d529da))
+
+# [5.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.3...v5.2.0) (2026-06-25)
+
+### Features
+
+- create ts-data-forge/prefer-num-safe-parse-int rule ([#355](https://github.com/noshiro-pf/eslint-config-typed/issues/355)) ([3de79b2](https://github.com/noshiro-pf/eslint-config-typed/commit/3de79b29762e5ed75cc4df3502b9924a0e87a531))
+
+## [5.1.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.2...v5.1.3) (2026-06-25)
+
+### Bug Fixes
+
+- disable unicorn/no-top-level-side-effects ([#354](https://github.com/noshiro-pf/eslint-config-typed/issues/354)) ([f00a180](https://github.com/noshiro-pf/eslint-config-typed/commit/f00a1809cdf213ebbdb6354aa2f0d5e9be0ea1c8))
+
+## [5.1.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.1...v5.1.2) (2026-06-24)
+
+### Bug Fixes
+
+- disable unicorn/no-unsafe-property-key ([#353](https://github.com/noshiro-pf/eslint-config-typed/issues/353)) ([b635e85](https://github.com/noshiro-pf/eslint-config-typed/commit/b635e85515adb66f08daeddc9720632a73fb7d1f))
+
+## [5.1.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.1.0...v5.1.1) (2026-06-23)
+
+### Bug Fixes
+
+- fix new eslint-unicorn-rules ([#352](https://github.com/noshiro-pf/eslint-config-typed/issues/352)) ([72ed6ca](https://github.com/noshiro-pf/eslint-config-typed/commit/72ed6ca9e4971d40c2d5dbb6c3fee2841a4a33d0))
+
+# [5.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.0.0...v5.1.0) (2026-06-23)
+
+### Features
+
+- create ts-data-forge/no-unnecessary-type-guard, prefer-comparison-over-nullish-guard rule ([#351](https://github.com/noshiro-pf/eslint-config-typed/issues/351)) ([7f79af8](https://github.com/noshiro-pf/eslint-config-typed/commit/7f79af8704efcd79fdeb2b0f69a67b8175788af9))
+
+# [5.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.10.0...v5.0.0) (2026-06-22)
+
+### Features
+
+- **breaking:** update dependencies, enabling many rules ([#350](https://github.com/noshiro-pf/eslint-config-typed/issues/350)) ([4d93f28](https://github.com/noshiro-pf/eslint-config-typed/commit/4d93f28e18ca1e37af695396afa67ac754d47f19))
+
+# [4.10.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.11...v4.10.0) (2026-06-22)
+
+### Features
+
+- add ts-restrictions/no-unnecessary-coalesce-undefined rule ([#349](https://github.com/noshiro-pf/eslint-config-typed/issues/349)) ([3264eb9](https://github.com/noshiro-pf/eslint-config-typed/commit/3264eb98d6d662d842b1654da957aae0e3f1410a))
+
+## [4.9.11](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.10...v4.9.11) (2026-05-26)
+
+### Bug Fixes
+
+- bump eslint-plugin-cypress from 6.3.1 to 6.4.1 ([#332](https://github.com/noshiro-pf/eslint-config-typed/issues/332)) ([334a863](https://github.com/noshiro-pf/eslint-config-typed/commit/334a863f6764d7ada81a81dc5ce9b2cfb96e24c2))
+
+## [4.9.10](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.9...v4.9.10) (2026-05-26)
+
+### Bug Fixes
+
+- bump @typescript-eslint/type-utils from 8.59.0 to 8.59.4 ([#331](https://github.com/noshiro-pf/eslint-config-typed/issues/331)) ([4422a67](https://github.com/noshiro-pf/eslint-config-typed/commit/4422a675d559cf2298f758845aa5f93cf4fd4410))
+
+## [4.9.9](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.8...v4.9.9) (2026-05-17)
+
+### Bug Fixes
+
+- bump eslint-plugin-promise from 7.2.1 to 7.3.0 ([#324](https://github.com/noshiro-pf/eslint-config-typed/issues/324)) ([a266dc2](https://github.com/noshiro-pf/eslint-config-typed/commit/a266dc2218265cba05bb7ba0ccc822462c2b7db6))
+
+## [4.9.8](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.7...v4.9.8) (2026-05-12)
+
+### Bug Fixes
+
+- fix dependencies ([#327](https://github.com/noshiro-pf/eslint-config-typed/issues/327)) ([184d843](https://github.com/noshiro-pf/eslint-config-typed/commit/184d84380059889624f6878952eb6ecd2229c380))
+
+## [4.9.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.6...v4.9.7) (2026-05-11)
+
+### Bug Fixes
+
+- update dependencies and import ts-type-forge explicitly ([#325](https://github.com/noshiro-pf/eslint-config-typed/issues/325)) ([7390bbd](https://github.com/noshiro-pf/eslint-config-typed/commit/7390bbd570af3c90a4b7edcc8d2d0c58b9198849))
+
+## [4.9.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.5...v4.9.6) (2026-04-30)
+
+### Bug Fixes
+
+- fix dependencies ([#321](https://github.com/noshiro-pf/eslint-config-typed/issues/321)) ([2ef258a](https://github.com/noshiro-pf/eslint-config-typed/commit/2ef258a6d6b3ce1c39bce0b341eeb3d386ccfbde))
+
+## [4.9.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.4...v4.9.5) (2026-04-30)
+
+### Bug Fixes
+
+- remove src/globals.d.mts and update dependencies ([#320](https://github.com/noshiro-pf/eslint-config-typed/issues/320)) ([e563695](https://github.com/noshiro-pf/eslint-config-typed/commit/e563695be3273933326d31757894f45ddb94715d))
+
+## [4.9.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.3...v4.9.4) (2026-04-23)
+
+### Bug Fixes
+
+- update deps ([#309](https://github.com/noshiro-pf/eslint-config-typed/issues/309)) ([a378c0e](https://github.com/noshiro-pf/eslint-config-typed/commit/a378c0e94e9f1837a090e9c296441c1c7ccf0d9f))
+
+## [4.9.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.2...v4.9.3) (2026-04-23)
+
+### Bug Fixes
+
+- bump @vitest/eslint-plugin from 1.6.14 to 1.6.15 ([#306](https://github.com/noshiro-pf/eslint-config-typed/issues/306)) ([7cde944](https://github.com/noshiro-pf/eslint-config-typed/commit/7cde9441be9c910402028d06f000c5e832879381))
+
+## [4.9.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.1...v4.9.2) (2026-04-14)
+
+### Bug Fixes
+
+- Modified to also recognize destructuring using string/number literal keys ([#303](https://github.com/noshiro-pf/eslint-config-typed/issues/303)) ([9b26c2f](https://github.com/noshiro-pf/eslint-config-typed/commit/9b26c2fcf62ad2d3b5bff55399797a538d528dfc))
+
+## [4.9.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.9.0...v4.9.1) (2026-04-12)
+
+### Bug Fixes
+
+- Make it irrelevant whether there are blank lines around the default case ([#299](https://github.com/noshiro-pf/eslint-config-typed/issues/299)) ([183c5be](https://github.com/noshiro-pf/eslint-config-typed/commit/183c5bebaf7667fc918900948f12256c07c365de))
+
+# [4.9.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.8.0...v4.9.0) (2026-04-03)
+
+### Features
+
+- turn off strict-void-return ([#291](https://github.com/noshiro-pf/eslint-config-typed/issues/291)) ([0d4216d](https://github.com/noshiro-pf/eslint-config-typed/commit/0d4216d53f0e1f1aaa816861bd8e760fd4ddab4c))
+
+# [4.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.7...v4.8.0) (2026-03-27)
+
+### Features
+
+- Update rule configs ([#286](https://github.com/noshiro-pf/eslint-config-typed/issues/286)) ([7ad046a](https://github.com/noshiro-pf/eslint-config-typed/commit/7ad046ad63dcac07b42bd9360ecdf81318daaa11))
+
+## [4.7.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.6...v4.7.7) (2026-03-25)
+
+### Bug Fixes
+
+- bump ts-data-forge from 6.5.0 to 6.6.0 ([#282](https://github.com/noshiro-pf/eslint-config-typed/issues/282)) ([8dc2ade](https://github.com/noshiro-pf/eslint-config-typed/commit/8dc2ade1f4fc444a46065b06d3465846976795b4))
+
+## [4.7.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.5...v4.7.6) (2026-03-25)
+
+### Bug Fixes
+
+- bump typescript-eslint from 8.56.0 to 8.57.0 ([#281](https://github.com/noshiro-pf/eslint-config-typed/issues/281)) ([78253be](https://github.com/noshiro-pf/eslint-config-typed/commit/78253beb1d0fc8c77e54933d8234a9cfa285705a))
+
+## [4.7.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.4...v4.7.5) (2026-03-16)
+
+### Bug Fixes
+
+- bump eslint-plugin-eslint-plugin from 7.3.1 to 7.3.2 ([#272](https://github.com/noshiro-pf/eslint-config-typed/issues/272)) ([90e1336](https://github.com/noshiro-pf/eslint-config-typed/commit/90e133612b2b2401364fb280f8e7fd2cc90620cc))
+
+## [4.7.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.3...v4.7.4) (2026-03-09)
+
+### Bug Fixes
+
+- bump globals from 17.3.0 to 17.4.0 ([#267](https://github.com/noshiro-pf/eslint-config-typed/issues/267)) ([253660f](https://github.com/noshiro-pf/eslint-config-typed/commit/253660f312c78aa2db59cae570d7b9fc43ec038f))
+
+## [4.7.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.2...v4.7.3) (2026-03-09)
+
+### Bug Fixes
+
+- bump eslint-plugin-react-refresh from 0.5.1 to 0.5.2 ([#263](https://github.com/noshiro-pf/eslint-config-typed/issues/263)) ([6ffda54](https://github.com/noshiro-pf/eslint-config-typed/commit/6ffda541ae0ef4edcf44389681d4ef7e56d94780))
+
+## [4.7.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.1...v4.7.2) (2026-03-02)
+
+### Bug Fixes
+
+- bump eslint from 9.39.2 to 9.39.3 ([#262](https://github.com/noshiro-pf/eslint-config-typed/issues/262)) ([2862935](https://github.com/noshiro-pf/eslint-config-typed/commit/28629359c2aea4b73c3b2bb5a837492ddeb9b605))
+
+## [4.7.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.7.0...v4.7.1) (2026-03-02)
+
+### Bug Fixes
+
+- bump @eslint/js from 9.39.2 to 9.39.3 ([#261](https://github.com/noshiro-pf/eslint-config-typed/issues/261)) ([f2e9095](https://github.com/noshiro-pf/eslint-config-typed/commit/f2e9095558835f68cd5d09a3e394668328baa074))
+
+# [4.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.4...v4.7.0) (2026-03-02)
+
+### Features
+
+- update eslint plugins and repo rulesets ([#259](https://github.com/noshiro-pf/eslint-config-typed/issues/259)) ([6955506](https://github.com/noshiro-pf/eslint-config-typed/commit/6955506b9db06bb5df522918fd191d90eac0c67f))
+
+## [4.6.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.3...v4.6.4) (2026-02-23)
+
+### Bug Fixes
+
+- bump typescript-eslint from 8.54.0 to 8.55.0 ([#252](https://github.com/noshiro-pf/eslint-config-typed/issues/252)) ([1571432](https://github.com/noshiro-pf/eslint-config-typed/commit/157143227dbd7887b99567c8c54405f0ee255f82))
+
+## [4.6.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.2...v4.6.3) (2026-02-23)
+
+### Bug Fixes
+
+- bump @typescript-eslint/type-utils from 8.54.0 to 8.55.0 ([#253](https://github.com/noshiro-pf/eslint-config-typed/issues/253)) ([532eb1b](https://github.com/noshiro-pf/eslint-config-typed/commit/532eb1b0759444b79464f79ec496f368182ad8c6))
+
+## [4.6.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.1...v4.6.2) (2026-02-11)
+
+### Bug Fixes
+
+- fix preferIsRecordAndHasKey fixer ([#245](https://github.com/noshiro-pf/eslint-config-typed/issues/245)) ([8122fc8](https://github.com/noshiro-pf/eslint-config-typed/commit/8122fc8b1077aee8b7cdc81c5501ad0abb879de6))
+
+## [4.6.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.6.0...v4.6.1) (2026-02-02)
+
+### Bug Fixes
+
+- bump globals from 17.0.0 to 17.1.0 ([#239](https://github.com/noshiro-pf/eslint-config-typed/issues/239)) ([665412b](https://github.com/noshiro-pf/eslint-config-typed/commit/665412b101d75ddbaf3c39926b122eb0dfab92ee))
+
+# [4.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.5.0...v4.6.0) (2026-01-22)
+
+### Features
+
+- add new Playwright rules and update existing ones ([#224](https://github.com/noshiro-pf/eslint-config-typed/issues/224)) ([5c88361](https://github.com/noshiro-pf/eslint-config-typed/commit/5c88361c046117c9acd304ec4fee525ba16e7653))
+
+# [4.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.4.1...v4.5.0) (2026-01-15)
+
+### Features
+
+- update ESLint rules and types ([#218](https://github.com/noshiro-pf/eslint-config-typed/issues/218)) ([7b9000e](https://github.com/noshiro-pf/eslint-config-typed/commit/7b9000ea8622f306c26ed74d60e758b50b2d4112))
+
+## [4.4.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.4.0...v4.4.1) (2026-01-08)
+
+### Bug Fixes
+
+- support rest parameters in check-destructuring-completeness ([#211](https://github.com/noshiro-pf/eslint-config-typed/issues/211)) ([7f2a032](https://github.com/noshiro-pf/eslint-config-typed/commit/7f2a032ca70ed8c6421346342102d7fb49e3a3d3))
+
+# [4.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.3.1...v4.4.0) (2026-01-06)
+
+### Features
+
+- improve error handling in lintFix function and update ESLint rules ([#210](https://github.com/noshiro-pf/eslint-config-typed/issues/210)) ([ddf5721](https://github.com/noshiro-pf/eslint-config-typed/commit/ddf57213a42fad1fff56720eab1cf8409b02ca23))
+
+## [4.3.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.3.0...v4.3.1) (2026-01-05)
+
+### Bug Fixes
+
+- bump @sindresorhus/is from 7.1.1 to 7.2.0 ([#206](https://github.com/noshiro-pf/eslint-config-typed/issues/206)) ([1669d03](https://github.com/noshiro-pf/eslint-config-typed/commit/1669d0338d96a6118340c202eac74da2f16927f0))
+
+# [4.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.2.1...v4.3.0) (2025-12-30)
+
+### Features
+
+- ts-data-forge rules ([#205](https://github.com/noshiro-pf/eslint-config-typed/issues/205)) ([a519183](https://github.com/noshiro-pf/eslint-config-typed/commit/a519183a179149e605214fcb4800c0e734e5e46d))
+
+## [4.2.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.2.0...v4.2.1) (2025-12-29)
+
+### Bug Fixes
+
+- bump eslint-plugin-testing-library from 7.15.1 to 7.15.2 ([#202](https://github.com/noshiro-pf/eslint-config-typed/issues/202)) ([fcd492d](https://github.com/noshiro-pf/eslint-config-typed/commit/fcd492d8fbd6c89730e2a233c6ebb2fe3ea4a083))
+
+# [4.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.1.0...v4.2.0) (2025-12-27)
+
+### Features
+
+- add new ESLint rules for Jest, Testing Library, Vitest, and TypeScript ([#199](https://github.com/noshiro-pf/eslint-config-typed/issues/199)) ([e98eede](https://github.com/noshiro-pf/eslint-config-typed/commit/e98eede7b1ab93439b42b7937780a36ced4f3cee))
+
+# [4.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.9...v4.1.0) (2025-12-21)
+
+### Features
+
+- add eslint-plugin-immer-coding-style ([#192](https://github.com/noshiro-pf/eslint-config-typed/issues/192)) ([97ccdbc](https://github.com/noshiro-pf/eslint-config-typed/commit/97ccdbc2a8d1a7340e45aef2e9174491525e39b0))
+
+## [4.0.9](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.8...v4.0.9) (2025-12-15)
+
+### Bug Fixes
+
+- bump @vitest/eslint-plugin from 1.5.1 to 1.5.2 ([#189](https://github.com/noshiro-pf/eslint-config-typed/issues/189)) ([546c63a](https://github.com/noshiro-pf/eslint-config-typed/commit/546c63ac45c1051a18544870930ed8a775e31ab3))
+
+## [4.0.8](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.7...v4.0.8) (2025-12-14)
+
+### Bug Fixes
+
+- fix useMemoHooksStyleRule to handle const assertion correctly ([#188](https://github.com/noshiro-pf/eslint-config-typed/issues/188)) ([8e17804](https://github.com/noshiro-pf/eslint-config-typed/commit/8e178046d469238c0facb6a9724e685683a1f879))
+
+## [4.0.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.6...v4.0.7) (2025-12-12)
+
+### Bug Fixes
+
+- fix react-coding-style/display-name behavior ([#185](https://github.com/noshiro-pf/eslint-config-typed/issues/185)) ([f09be91](https://github.com/noshiro-pf/eslint-config-typed/commit/f09be9189a2774c2662e01e28cdb3d1ee03dd9fd))
+
+## [4.0.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.5...v4.0.6) (2025-12-11)
+
+### Bug Fixes
+
+- fix releases ([#184](https://github.com/noshiro-pf/eslint-config-typed/issues/184)) ([db8aa6e](https://github.com/noshiro-pf/eslint-config-typed/commit/db8aa6ef21d9ec7a0edcd42f59fa8b6ce95fa85a))
+- fix some schemas ([#182](https://github.com/noshiro-pf/eslint-config-typed/issues/182)) ([8d455fe](https://github.com/noshiro-pf/eslint-config-typed/commit/8d455fed997b33af0c20b846645377580df163fd))
+- set minimumReleaseAge ([#181](https://github.com/noshiro-pf/eslint-config-typed/issues/181)) ([f0d5737](https://github.com/noshiro-pf/eslint-config-typed/commit/f0d5737dc34e76e5ebf3b8a18cc4b5daa91e6b79))
+
+## [4.0.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.4...v4.0.5) (2025-12-01)
+
+### Bug Fixes
+
+- rename vitest-globals to allow writing tsconfig types field without extensions ([#165](https://github.com/noshiro-pf/eslint-config-typed/issues/165)) ([930f22f](https://github.com/noshiro-pf/eslint-config-typed/commit/930f22fbae5dd07f3531888759f98fafad1b192d))
+
+## [4.0.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.3...v4.0.4) (2025-12-01)
+
+### Bug Fixes
+
+- rename vitest-globals to allow writing tsconfig types field without extensions ([#164](https://github.com/noshiro-pf/eslint-config-typed/issues/164)) ([6527665](https://github.com/noshiro-pf/eslint-config-typed/commit/6527665d2a4d5307e01969c2b917825a985952f4))
+
+## [4.0.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.2...v4.0.3) (2025-11-29)
+
+### Bug Fixes
+
+- fix package.json files field ([#163](https://github.com/noshiro-pf/eslint-config-typed/issues/163)) ([5eaac51](https://github.com/noshiro-pf/eslint-config-typed/commit/5eaac519f67f3653d353d58da8f0edccd8feae8a))
+
+## [4.0.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.1...v4.0.2) (2025-11-28)
+
+### Bug Fixes
+
+- fix vitest globals path ([#162](https://github.com/noshiro-pf/eslint-config-typed/issues/162)) ([49baadb](https://github.com/noshiro-pf/eslint-config-typed/commit/49baadb5c460fc53c3c18cb64ee468e314a0645e))
+
+## [4.0.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v4.0.0...v4.0.1) (2025-11-28)
+
+### Bug Fixes
+
+- fix vitest global type export ([#161](https://github.com/noshiro-pf/eslint-config-typed/issues/161)) ([0a3819a](https://github.com/noshiro-pf/eslint-config-typed/commit/0a3819a2da4d5a2d8379462a2b821cc5522595ae))
+
+# [4.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.14.1...v4.0.0) (2025-11-27)
+
+### Features
+
+- **breaking:** update vitest-coding-style ([#160](https://github.com/noshiro-pf/eslint-config-typed/issues/160)) ([c18af08](https://github.com/noshiro-pf/eslint-config-typed/commit/c18af089a1866bae8b5798af26079a36adc93431))
+
+## [3.14.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.14.0...v3.14.1) (2025-11-26)
+
+### Bug Fixes
+
+- update dependencies and refactor scripts ([#159](https://github.com/noshiro-pf/eslint-config-typed/issues/159)) ([a9ba53b](https://github.com/noshiro-pf/eslint-config-typed/commit/a9ba53b007ac96fb5998552aaab23651dfc044ba))
+
+# [3.14.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.7...v3.14.0) (2025-11-26)
+
+### Features
+
+- add vitest-coding-style rules ([#158](https://github.com/noshiro-pf/eslint-config-typed/issues/158)) ([864bae3](https://github.com/noshiro-pf/eslint-config-typed/commit/864bae3ecea9a022956315367e997374197954ce))
+
+## [3.13.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.6...v3.13.7) (2025-11-24)
+
+### Bug Fixes
+
+- bump eslint-plugin-math from 0.13.0 to 0.13.1 ([#151](https://github.com/noshiro-pf/eslint-config-typed/issues/151)) ([d0e8e52](https://github.com/noshiro-pf/eslint-config-typed/commit/d0e8e52ebd77655aaa94be76ab8a7299e991065e))
+
+## [3.13.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.5...v3.13.6) (2025-11-21)
+
+### Bug Fixes
+
+- update rule settings ([#150](https://github.com/noshiro-pf/eslint-config-typed/issues/150)) ([747331c](https://github.com/noshiro-pf/eslint-config-typed/commit/747331c4c24448a03e7687960d4d246c5a58e1d0))
+
+## [3.13.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.4...v3.13.5) (2025-11-20)
+
+### Bug Fixes
+
+- update rule options of @typescript-eslint/consistent-type-assertions ([#148](https://github.com/noshiro-pf/eslint-config-typed/issues/148)) ([2dbd3f0](https://github.com/noshiro-pf/eslint-config-typed/commit/2dbd3f05e6994d0b8e50ec8ece8246b039e024d2))
+
+## [3.13.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.3...v3.13.4) (2025-11-19)
+
+### Bug Fixes
+
+- update dependencies to fix vulnerabilities ([#147](https://github.com/noshiro-pf/eslint-config-typed/issues/147)) ([0e14279](https://github.com/noshiro-pf/eslint-config-typed/commit/0e142791d996b250ba72d48d3fe0a3efaeff2162))
+
+## [3.13.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.2...v3.13.3) (2025-11-15)
+
+### Bug Fixes
+
+- fix import-x/newline-after-import rule setting ([#145](https://github.com/noshiro-pf/eslint-config-typed/issues/145)) ([2482012](https://github.com/noshiro-pf/eslint-config-typed/commit/2482012812dfa6f38762ff474a2115fec36118b1))
+
+## [3.13.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.1...v3.13.2) (2025-11-15)
+
+### Bug Fixes
+
+- fix exports ([#143](https://github.com/noshiro-pf/eslint-config-typed/issues/143)) ([cf02ab3](https://github.com/noshiro-pf/eslint-config-typed/commit/cf02ab35a227f396348f735a63ba82650eaf3bbd))
+
+## [3.13.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.13.0...v3.13.1) (2025-11-15)
+
+### Bug Fixes
+
+- fix dependencies ([#142](https://github.com/noshiro-pf/eslint-config-typed/issues/142)) ([145e2cf](https://github.com/noshiro-pf/eslint-config-typed/commit/145e2cf041e7288f87032552311d1839f26d3ef1))
+
+# [3.13.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.12.0...v3.13.0) (2025-11-15)
+
+### Features
+
+- update padding-line-between-statements config ([#141](https://github.com/noshiro-pf/eslint-config-typed/issues/141)) ([217dd57](https://github.com/noshiro-pf/eslint-config-typed/commit/217dd57feb02d556e8b645582d4171d4f0585d9e))
+
+# [3.12.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.11.0...v3.12.0) (2025-11-15)
+
+### Features
+
+- add eslint-plugin-math ([#140](https://github.com/noshiro-pf/eslint-config-typed/issues/140)) ([a3a70de](https://github.com/noshiro-pf/eslint-config-typed/commit/a3a70de8b5fa7a5fa9462ba1988e19e0ffec3eba))
+
+# [3.11.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.10.0...v3.11.0) (2025-11-15)
+
+### Features
+
+- add eslint-plugin-n ([#138](https://github.com/noshiro-pf/eslint-config-typed/issues/138)) ([bcc05b4](https://github.com/noshiro-pf/eslint-config-typed/commit/bcc05b414204d802b7fdb752a1ecf5a44d37b94d))
+
+# [3.10.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.9.0...v3.10.0) (2025-11-15)
+
+### Features
+
+- add react-coding-style/display-name rule ([#137](https://github.com/noshiro-pf/eslint-config-typed/issues/137)) ([754cee8](https://github.com/noshiro-pf/eslint-config-typed/commit/754cee8f32a9a242c099b982dac469a402d3f1ad))
+
+# [3.9.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.8.1...v3.9.0) (2025-11-15)
+
+### Features
+
+- support named imports from react in react-coding-style plugin rules ([#136](https://github.com/noshiro-pf/eslint-config-typed/issues/136)) ([eaed96d](https://github.com/noshiro-pf/eslint-config-typed/commit/eaed96de15f7de18233f0d800dfbc9e8b3ebbd19))
+
+## [3.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.8.0...v3.8.1) (2025-11-15)
+
+### Bug Fixes
+
+- fix ts-restrictions/no-restricted-cast-name rule ([#135](https://github.com/noshiro-pf/eslint-config-typed/issues/135)) ([a7d2cf0](https://github.com/noshiro-pf/eslint-config-typed/commit/a7d2cf059bc2c12de7d96c5ab9dfc6d7081f284f))
+
+# [3.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.7.1...v3.8.0) (2025-11-14)
+
+### Features
+
+- add ts-restrictions/check-destructuring-completeness rule ([#134](https://github.com/noshiro-pf/eslint-config-typed/issues/134)) ([3ca2e7a](https://github.com/noshiro-pf/eslint-config-typed/commit/3ca2e7a0fddc47bed3e94e78d2eb16305739634b))
+
+## [3.7.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.7.0...v3.7.1) (2025-11-14)
+
+### Bug Fixes
+
+- fix exports ([#133](https://github.com/noshiro-pf/eslint-config-typed/issues/133)) ([ccdcc8c](https://github.com/noshiro-pf/eslint-config-typed/commit/ccdcc8c85cb3c6b19c492cd7d315ddf39c43b5cb))
+
+# [3.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.6.0...v3.7.0) (2025-11-14)
+
+### Features
+
+- create eslint-plugin-ts-restrictions ([#132](https://github.com/noshiro-pf/eslint-config-typed/issues/132)) ([62715c8](https://github.com/noshiro-pf/eslint-config-typed/commit/62715c8fc27c58e1a66997c45982c3630f947361))
+
+# [3.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.5.2...v3.6.0) (2025-11-14)
+
+### Features
+
+- enable @stylistic/padding-line-between-statements rule ([#130](https://github.com/noshiro-pf/eslint-config-typed/issues/130)) ([0ca76ed](https://github.com/noshiro-pf/eslint-config-typed/commit/0ca76eda8c2e166a1aa88612554d9769638f725d))
+
+## [3.5.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.5.1...v3.5.2) (2025-11-13)
+
+### Bug Fixes
+
+- update dependencies ([#128](https://github.com/noshiro-pf/eslint-config-typed/issues/128)) ([9b70bf9](https://github.com/noshiro-pf/eslint-config-typed/commit/9b70bf99d066e0c217426f473585827fa5ce597a))
+
+## [3.5.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.5.0...v3.5.1) (2025-11-10)
+
+### Bug Fixes
+
+- turn off conflicting rule ([#127](https://github.com/noshiro-pf/eslint-config-typed/issues/127)) ([c8db657](https://github.com/noshiro-pf/eslint-config-typed/commit/c8db657f402a5f7a4bb4a1f1083841e56de00957))
+
+# [3.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.4.0...v3.5.0) (2025-11-10)
+
+### Features
+
+- add custom lint rule vitest-coding-style/no-expect-to-strict-equal ([#126](https://github.com/noshiro-pf/eslint-config-typed/issues/126)) ([12bb6e5](https://github.com/noshiro-pf/eslint-config-typed/commit/12bb6e5bcfdfee5ef03093506138facd0d810fea))
+
+# [3.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.3.0...v3.4.0) (2025-11-08)
+
+### Features
+
+- add @stylistic/eslint-plugin ([#121](https://github.com/noshiro-pf/eslint-config-typed/issues/121)) ([b28952a](https://github.com/noshiro-pf/eslint-config-typed/commit/b28952a6dd0ad7448f9106897ff16e29aac8e959))
+
+# [3.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.2.1...v3.3.0) (2025-11-08)
+
+### Features
+
+- replace eslint-plugin-vitest with @vitest/eslint-plugin ([#120](https://github.com/noshiro-pf/eslint-config-typed/issues/120)) ([be92479](https://github.com/noshiro-pf/eslint-config-typed/commit/be924797e19e94e0ae3c45b286cdb00e183b4745))
+
+## [3.2.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.2.0...v3.2.1) (2025-11-05)
+
+### Bug Fixes
+
+- fix dependencies ([#119](https://github.com/noshiro-pf/eslint-config-typed/issues/119)) ([8ec65c3](https://github.com/noshiro-pf/eslint-config-typed/commit/8ec65c3b09a53fc0c94523b309b4925871f36a8e))
+
+# [3.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.1.4...v3.2.0) (2025-11-05)
+
+### Features
+
+- update rules ([#118](https://github.com/noshiro-pf/eslint-config-typed/issues/118)) ([82aa70b](https://github.com/noshiro-pf/eslint-config-typed/commit/82aa70b1350f6cfdeca4e37b09255576ada9939c))
+
+## [3.1.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.1.3...v3.1.4) (2025-11-05)
+
+### Bug Fixes
+
+- bump eslint from 9.38.0 to 9.39.0 ([#116](https://github.com/noshiro-pf/eslint-config-typed/issues/116)) ([d2742f1](https://github.com/noshiro-pf/eslint-config-typed/commit/d2742f129e4de8110a64658848f6ffdd9d8bec85))
+
+## [3.1.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.1.2...v3.1.3) (2025-11-05)
+
+### Bug Fixes
+
+- fix import-x settings ([#117](https://github.com/noshiro-pf/eslint-config-typed/issues/117)) ([342ab1c](https://github.com/noshiro-pf/eslint-config-typed/commit/342ab1c4fa4cb5f4ec0351ab2dd72cfd8e2bbf27))
+
+## [3.1.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.1.1...v3.1.2) (2025-11-03)
+
+### Bug Fixes
+
+- bump @eslint/js from 9.38.0 to 9.39.0 ([#115](https://github.com/noshiro-pf/eslint-config-typed/issues/115)) ([a1a775d](https://github.com/noshiro-pf/eslint-config-typed/commit/a1a775df8c538aecd523042fb9338e0ac4f9d476))
+
+## [3.1.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.1.0...v3.1.1) (2025-11-02)
+
+### Bug Fixes
+
+- update dependencies ([#110](https://github.com/noshiro-pf/eslint-config-typed/issues/110)) ([a68cf95](https://github.com/noshiro-pf/eslint-config-typed/commit/a68cf9537b98dcfffb94112d1f0b7c57903a8a91))
+
+# [3.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v3.0.0...v3.1.0) (2025-11-02)
+
+### Features
+
+- eslint-plugin-import-x ([#109](https://github.com/noshiro-pf/eslint-config-typed/issues/109)) ([336ec61](https://github.com/noshiro-pf/eslint-config-typed/commit/336ec616effb52e452598859263bb7a81b22383d))
+
+# [3.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.2...v3.0.0) (2025-10-31)
+
+### Features
+
+- **breaking:** create react-coding-style-rules ([#107](https://github.com/noshiro-pf/eslint-config-typed/issues/107)) ([3c59507](https://github.com/noshiro-pf/eslint-config-typed/commit/3c595079306f02edca5e1c978271669bbdf0b1c9))
+
+### BREAKING CHANGES
+
+- **breaking:** - Removed `restrictedSyntaxForReact` (Replaced by `eslintPluginReactCodingStyle`)
+
+## [2.3.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.1...v2.3.2) (2025-10-30)
+
+### Bug Fixes
+
+- update ignore list ([#104](https://github.com/noshiro-pf/eslint-config-typed/issues/104)) ([df100dc](https://github.com/noshiro-pf/eslint-config-typed/commit/df100dc398daca9f7036cca2adeb2bb3c29d486e))
+
+## [2.3.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.3.0...v2.3.1) (2025-10-30)
+
+### Bug Fixes
+
+- update config list and remove duplicate rules ([#103](https://github.com/noshiro-pf/eslint-config-typed/issues/103)) ([f9a440f](https://github.com/noshiro-pf/eslint-config-typed/commit/f9a440f0320ef45905f2cbaa8fd2af487d62a3ab))
+
+# [2.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.2.1...v2.3.0) (2025-10-29)
+
+### Features
+
+- fork eslint-plugin-strict-dependencies as a local plugin ([#102](https://github.com/noshiro-pf/eslint-config-typed/issues/102)) ([f093067](https://github.com/noshiro-pf/eslint-config-typed/commit/f093067011bc9d34029b45dc4514e6cb8ccaf93b))
+
+## [2.2.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.2.0...v2.2.1) (2025-10-29)
+
+### Bug Fixes
+
+- treat RegExp as readonly in @typescript-eslint/prefer-readonly-parameter-types ([#101](https://github.com/noshiro-pf/eslint-config-typed/issues/101)) ([63b1ebf](https://github.com/noshiro-pf/eslint-config-typed/commit/63b1ebf03ef6964f2b820cc10de5f56d8d82d420))
+
+# [2.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.1.0...v2.2.0) (2025-10-28)
+
+### Features
+
+- export restrictedSyntax and restrictedSyntaxForReact; update ignore list ([#99](https://github.com/noshiro-pf/eslint-config-typed/issues/99)) ([1ec3225](https://github.com/noshiro-pf/eslint-config-typed/commit/1ec3225865ba4bd07d7d5eba9cc5e75063c7f7d0))
+
+# [2.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v2.0.0...v2.1.0) (2025-10-27)
+
+### Features
+
+- update plugins and ignore list ([#97](https://github.com/noshiro-pf/eslint-config-typed/issues/97)) ([2ca61c8](https://github.com/noshiro-pf/eslint-config-typed/commit/2ca61c800379090a6cce21585e5b36d2cdcc9ea4))
+
+# [2.0.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.8.1...v2.0.0) (2025-10-26)
+
+### Features
+
+- **breaking:** update rule settings and configs ([#87](https://github.com/noshiro-pf/eslint-config-typed/issues/87)) ([48ccb65](https://github.com/noshiro-pf/eslint-config-typed/commit/48ccb6503b4976d4f98d2e48960eda490a38b69c))
+
+### BREAKING CHANGES
+
+- **breaking:** - Renamed all `eslintFlatConfigFor<Something>` to `eslintConfigFor<Something>`
+
+* Added `eslintConfigForBrowser` and `eslintConfigForNodeJs`
+* Updated rule settings in various configs for stricter linting
+* Added `defineConfig` utility
+* Removed unintentionally exported `RestrictedImportsOption` type
+* Removed unintentionally exported internal implementations of `eslint-plugin-total-functions` and `eslint-plugin-tree-shakable` from exports
+* Updated README
+
+## [1.8.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.8.0...v1.8.1) (2025-10-23)
+
+### Bug Fixes
+
+- disable sort-destructure-keys rule ([#86](https://github.com/noshiro-pf/eslint-config-typed/issues/86)) ([ac64198](https://github.com/noshiro-pf/eslint-config-typed/commit/ac64198f33699ec47a7ae174c1f4ec97f8d21a22))
+
+# [1.8.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.7.1...v1.8.0) (2025-10-23)
+
+### Features
+
+- add eslint-plugin-sort-destructure-keys ([#84](https://github.com/noshiro-pf/eslint-config-typed/issues/84)) ([05cc71d](https://github.com/noshiro-pf/eslint-config-typed/commit/05cc71d8c633b76871e097ffc08aee471a6305c0))
+
+## [1.7.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.7.0...v1.7.1) (2025-10-16)
+
+### Bug Fixes
+
+- update packages ([#77](https://github.com/noshiro-pf/eslint-config-typed/issues/77)) ([7c6690c](https://github.com/noshiro-pf/eslint-config-typed/commit/7c6690c101235cf5244ac26d87a79b2b2caac9dd))
+
+# [1.7.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.6.0...v1.7.0) (2025-10-11)
+
+### Features
+
+- update eslint plugins ([#68](https://github.com/noshiro-pf/eslint-config-typed/issues/68)) ([646c7f0](https://github.com/noshiro-pf/eslint-config-typed/commit/646c7f0eeeb91c33d772187b3c1aff9fe91eef18))
+
+# [1.6.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.5.0...v1.6.0) (2025-10-11)
+
+### Features
+
+- update rules ([#66](https://github.com/noshiro-pf/eslint-config-typed/issues/66)) ([9cc8f28](https://github.com/noshiro-pf/eslint-config-typed/commit/9cc8f289f8e570a192a8e0fde17b0ffbb61f5eb6))
+
+# [1.5.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.4.0...v1.5.0) (2025-10-11)
+
+### Features
+
+- add withDefaultOption utility ([#64](https://github.com/noshiro-pf/eslint-config-typed/issues/64)) ([db82ba8](https://github.com/noshiro-pf/eslint-config-typed/commit/db82ba8ab7a250bbcde707a2e5c1e9f141a24a68))
+
+# [1.4.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.3.0...v1.4.0) (2025-10-11)
+
+### Features
+
+- fix gen-rule-type scripts and fix rules ([#65](https://github.com/noshiro-pf/eslint-config-typed/issues/65)) ([5f20ce9](https://github.com/noshiro-pf/eslint-config-typed/commit/5f20ce9703e69e240bed9f03156aeac5b119f51c))
+
+# [1.3.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.12...v1.3.0) (2025-10-11)
+
+### Features
+
+- export defineKnownRules utility ([#63](https://github.com/noshiro-pf/eslint-config-typed/issues/63)) ([b977b05](https://github.com/noshiro-pf/eslint-config-typed/commit/b977b05553624c22d834539bbba205a56036808f))
+
+## [1.2.12](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.11...v1.2.12) (2025-10-04)
+
+### Bug Fixes
+
+- bump eslint-plugin-testing-library from 7.8.0 to 7.11.0 ([#53](https://github.com/noshiro-pf/eslint-config-typed/issues/53)) ([f6426a2](https://github.com/noshiro-pf/eslint-config-typed/commit/f6426a2e2b658bfc84ab52d0cfca6582faea765d))
+
+## [1.2.11](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.10...v1.2.11) (2025-10-04)
+
+### Bug Fixes
+
+- bump eslint-plugin-react-refresh from 0.4.18 to 0.4.23 ([#55](https://github.com/noshiro-pf/eslint-config-typed/issues/55)) ([9dcebb1](https://github.com/noshiro-pf/eslint-config-typed/commit/9dcebb1857593f8a3fbf81c1f624e3671b52568e))
+
+## [1.2.10](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.9...v1.2.10) (2025-10-04)
+
+### Bug Fixes
+
+- bump eslint-plugin-react from 7.37.4 to 7.37.5 ([#54](https://github.com/noshiro-pf/eslint-config-typed/issues/54)) ([e9c5661](https://github.com/noshiro-pf/eslint-config-typed/commit/e9c5661c14213c23dba29e9a9fa542063ce75a73))
+
+## [1.2.9](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.8...v1.2.9) (2025-10-04)
+
+### Bug Fixes
+
+- bump eslint-plugin-prefer-arrow-functions from 3.8.1 to 3.9.1 ([#52](https://github.com/noshiro-pf/eslint-config-typed/issues/52)) ([6472c99](https://github.com/noshiro-pf/eslint-config-typed/commit/6472c99ce0cf770eb53ac5deadd0d337c4c232da))
+
+## [1.2.8](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.7...v1.2.8) (2025-09-27)
+
+### Bug Fixes
+
+- bump eslint-plugin-prefer-arrow-functions from 3.6.2 to 3.8.1 ([#51](https://github.com/noshiro-pf/eslint-config-typed/issues/51)) ([ed68b18](https://github.com/noshiro-pf/eslint-config-typed/commit/ed68b18b6f699ba8c2bd511cd352c36a4ee22be7))
+
+## [1.2.7](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.6...v1.2.7) (2025-09-27)
+
+### Bug Fixes
+
+- bump @typescript-eslint/type-utils from 8.43.0 to 8.44.1 ([#48](https://github.com/noshiro-pf/eslint-config-typed/issues/48)) ([048308f](https://github.com/noshiro-pf/eslint-config-typed/commit/048308fa8cc5febc4adadc2dbd28d3cd8bdac2de))
+
+## [1.2.6](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.5...v1.2.6) (2025-09-21)
+
+### Bug Fixes
+
+- bump eslint-plugin-testing-library from 7.1.1 to 7.8.0 ([#45](https://github.com/noshiro-pf/eslint-config-typed/issues/45)) ([be6ff02](https://github.com/noshiro-pf/eslint-config-typed/commit/be6ff02132e703218aefa75bd583d5e7f78e2d17))
+
+## [1.2.5](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.4...v1.2.5) (2025-09-21)
+
+### Bug Fixes
+
+- bump eslint-plugin-playwright from 2.2.0 to 2.2.2 ([#43](https://github.com/noshiro-pf/eslint-config-typed/issues/43)) ([b278663](https://github.com/noshiro-pf/eslint-config-typed/commit/b27866326915c7c079c4f894d771936de0556613))
+
+## [1.2.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.3...v1.2.4) (2025-09-21)
+
+### Bug Fixes
+
+- bump eslint-plugin-eslint-plugin from 6.4.0 to 7.0.0 ([#44](https://github.com/noshiro-pf/eslint-config-typed/issues/44)) ([6cd51bc](https://github.com/noshiro-pf/eslint-config-typed/commit/6cd51bcd69d5f153452f0ad1556cdc91eefb99cf))
+
+## [1.2.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.2...v1.2.3) (2025-09-20)
+
+### Bug Fixes
+
+- bump eslint from 9.35.0 to 9.36.0 ([#42](https://github.com/noshiro-pf/eslint-config-typed/issues/42)) ([1a508d0](https://github.com/noshiro-pf/eslint-config-typed/commit/1a508d038dbd1e5b96b1b57c6330966301a3de27))
+
+## [1.2.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.1...v1.2.2) (2025-09-16)
+
+### Bug Fixes
+
+- bump eslint from 9.33.0 to 9.35.0 ([#35](https://github.com/noshiro-pf/eslint-config-typed/issues/35)) ([19dd857](https://github.com/noshiro-pf/eslint-config-typed/commit/19dd85792823f2f11bfd657b0958a9cc3e7e5e1e))
+
+## [1.2.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.2.0...v1.2.1) (2025-09-16)
+
+### Bug Fixes
+
+- update config ([#37](https://github.com/noshiro-pf/eslint-config-typed/issues/37)) ([90e28ea](https://github.com/noshiro-pf/eslint-config-typed/commit/90e28eaabb60b0768047f03eb45931a1b38dfbf7))
+
+# [1.2.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.1.2...v1.2.0) (2025-09-10)
+
+### Features
+
+- update rule setting of unicorn/no-instanceof-builtins ([#32](https://github.com/noshiro-pf/eslint-config-typed/issues/32)) ([f8df2d0](https://github.com/noshiro-pf/eslint-config-typed/commit/f8df2d092d3eb11a0a64d9e204e4e8d22fa91552))
+
+## [1.1.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.1.1...v1.1.2) (2025-09-10)
+
+### Bug Fixes
+
+- bump eslint-plugin-cypress from 4.1.0 to 5.1.1 ([#24](https://github.com/noshiro-pf/eslint-config-typed/issues/24)) ([ee84e82](https://github.com/noshiro-pf/eslint-config-typed/commit/ee84e82214c24627f8c8880d9dd4df376e257b52))
+
+## [1.1.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.1.0...v1.1.1) (2025-09-10)
+
+### Bug Fixes
+
+- bump eslint-plugin-unicorn from 56.0.1 to 61.0.1 ([#29](https://github.com/noshiro-pf/eslint-config-typed/issues/29)) ([606f9a7](https://github.com/noshiro-pf/eslint-config-typed/commit/606f9a71ed2525a9fe614db932d1a75b099f7770))
+
+# [1.1.0](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.0.3...v1.1.0) (2025-09-10)
+
+### Features
+
+- fix rule settings and enable @typescript-eslint/dot-notation ([#31](https://github.com/noshiro-pf/eslint-config-typed/issues/31)) ([324481a](https://github.com/noshiro-pf/eslint-config-typed/commit/324481a55c9fa6ab4d0f7de6a919b6ec44a98eee))
+
+## [1.0.3](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.0.2...v1.0.3) (2025-08-24)
+
+### Bug Fixes
+
+- bump eslint-plugin-import from 2.31.0 to 2.32.0 ([#23](https://github.com/noshiro-pf/eslint-config-typed/issues/23)) ([cd3c1eb](https://github.com/noshiro-pf/eslint-config-typed/commit/cd3c1eb9e5ab3d33f4d43b263650a5d0ae994e19))
+
+## [1.0.2](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.0.1...v1.0.2) (2025-08-20)
+
+### Bug Fixes
+
+- remove eslintDeprecationRules type ([#17](https://github.com/noshiro-pf/eslint-config-typed/issues/17)) ([7530b22](https://github.com/noshiro-pf/eslint-config-typed/commit/7530b2213beba7cfa63b3e308e3cdef4833a8d7d))
+
+## [1.0.1](https://github.com/noshiro-pf/eslint-config-typed/compare/v1.0.0...v1.0.1) (2025-08-19)
+
+### Bug Fixes
+
+- fix custom plugin name ([#15](https://github.com/noshiro-pf/eslint-config-typed/issues/15)) ([8210900](https://github.com/noshiro-pf/eslint-config-typed/commit/82109009c03191e96901a901fd06d3414b747f65))
+
+# 1.0.0 (2025-08-19)
+
+### Features
+
+- initialize eslint-config-typed ([#2](https://github.com/noshiro-pf/eslint-config-typed/issues/2)) ([c703354](https://github.com/noshiro-pf/eslint-config-typed/commit/c703354e93a1c2579d55ec4ab30ab844f9c6485e))

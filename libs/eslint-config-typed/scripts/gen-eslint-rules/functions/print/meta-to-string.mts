@@ -1,0 +1,93 @@
+import { hasKey, isBoolean, isRecord, isString } from 'ts-data-forge';
+import { type DeepReadonly, type FixedLengthTuple } from 'ts-type-forge';
+import { type Rule } from '../../../../src/index.mjs';
+import { toStr } from '../../utils/index.mjs';
+import { isDeprecated } from '../is-deprecated.mjs';
+
+/**
+ * ルールのメタ情報から JSDoc コメント形式の文字列を生成する
+ */
+export const metaToString = (meta: DeepReadonly<Rule['meta']>): string => {
+  if (meta === undefined) return '';
+
+  const { deprecated, docs, fixable, hasSuggestions, type } = meta;
+
+  if (docs === undefined) return '';
+
+  const { description, recommended, url } = docs;
+
+  const keyValue: DeepReadonly<[string, boolean | string | undefined][]> = [
+    ['type', type],
+    ['deprecated', isDeprecated(deprecated)],
+    ['fixable', fixable],
+    ['hasSuggestions', hasSuggestions],
+    [
+      'recommended',
+      isString(recommended) || isBoolean(recommended) ? recommended : undefined,
+    ],
+    [
+      'requiresTypeChecking',
+
+      isRecord(docs) && hasKey(docs, 'requiresTypeChecking')
+        ? Boolean(
+            (docs as Readonly<{ requiresTypeChecking: unknown }>)
+              .requiresTypeChecking,
+          )
+        : undefined,
+    ],
+  ] as const;
+
+  const keyValuesStr: readonly FixedLengthTuple<2, string>[] = keyValue
+    .filter(([_key, value]) => value != null)
+    .map(([key, value]) => [
+      key,
+      removeMultiLineCommentCharacter(toStr(value ?? '')),
+    ]);
+
+  const tableHeader = ['key', 'value'] as const;
+
+  const [longestKeyLength, longestValueLength] = keyValuesStr.reduce<
+    FixedLengthTuple<2, number>
+  >(
+    ([keyMax, valueMax], [key, value]) => [
+      Math.max(keyMax, key.length),
+      Math.max(valueMax, value.length),
+    ],
+    [tableHeader[0].length, tableHeader[1].length],
+  );
+
+  const result = [
+    '/**',
+    description == null
+      ? undefined
+      : (` * @description ${removeMultiLineCommentCharacter(description)}` as const),
+    url == null ? undefined : (` * @link ${url}` as const),
+    ' *',
+    ' *  ```md',
+    ` *  | ${tableHeader[0].padEnd(
+      longestKeyLength,
+      ' ',
+    )} | ${tableHeader[1].padEnd(longestValueLength, ' ')} |`,
+    ` *  | ${':'.padEnd(longestKeyLength, '-')} | ${':'.padEnd(
+      longestValueLength,
+      '-',
+    )} |`,
+    ...keyValuesStr.map(
+      ([key, value]) =>
+        ` *  | ${key.padEnd(longestKeyLength, ' ')} | ${value.padEnd(
+          longestValueLength,
+          ' ',
+        )} |`,
+    ),
+    ' *  ```',
+    ' */',
+  ] as const;
+
+  return result.filter((line) => line !== undefined).join('\n');
+};
+
+/**
+ * JSDoc 内で使用できない文字列を削除する
+ */
+const removeMultiLineCommentCharacter = (str: string): string =>
+  str.replace('/*', ' ').replace('*/', ' ');

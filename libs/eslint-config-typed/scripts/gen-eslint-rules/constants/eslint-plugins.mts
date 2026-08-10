@@ -1,0 +1,203 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
+
+export const eslintPlugins = {
+  EslintRules: {
+    typeName: 'EslintRules',
+    pluginName: 'eslint',
+    rulePrefix: 'xxx/',
+    outputFileName: 'eslint-rules.mts',
+  },
+  EslintStylisticRules: {
+    typeName: 'EslintStylisticRules',
+    pluginName: '@stylistic/eslint-plugin',
+    rulePrefix: '@stylistic/',
+    outputFileName: 'eslint-stylistic-rules.mts',
+  },
+  EslintArrayFuncRules: {
+    typeName: 'EslintArrayFuncRules',
+    pluginName: 'eslint-plugin-array-func',
+    rulePrefix: 'array-func/',
+    outputFileName: 'eslint-array-func-rules.mts',
+  },
+  EslintPreferArrowFunctionRules: {
+    typeName: 'EslintPreferArrowFunctionRules',
+    pluginName: 'eslint-plugin-prefer-arrow-functions',
+    rulePrefix: 'prefer-arrow-functions/',
+    outputFileName: 'eslint-prefer-arrow-functions-rules.mts',
+  },
+  EslintTotalFunctions: {
+    typeName: 'EslintTotalFunctionsRules',
+    pluginName: 'eslint-plugin-total-functions',
+    rulePrefix: 'total-functions/',
+    outputFileName: 'eslint-total-functions-rules.mts',
+  },
+  EslintCypressRules: {
+    typeName: 'EslintCypressRules',
+    pluginName: 'eslint-plugin-cypress',
+    rulePrefix: 'cypress/',
+    outputFileName: 'eslint-cypress-rules.mts',
+  },
+  EslintPlaywrightRules: {
+    typeName: 'EslintPlaywrightRules',
+    pluginName: 'eslint-plugin-playwright',
+    rulePrefix: 'playwright/',
+    outputFileName: 'eslint-playwright-rules.mts',
+  },
+  EslintFunctionalRules: {
+    typeName: 'EslintFunctionalRules',
+    pluginName: 'eslint-plugin-functional',
+    rulePrefix: 'functional/',
+    outputFileName: 'eslint-functional-rules.mts',
+  },
+  EslintImportsRules: {
+    typeName: 'EslintImportsRules',
+    pluginName: 'eslint-plugin-import-x',
+    rulePrefix: 'import-x/',
+    outputFileName: 'eslint-import-rules.mts',
+  },
+  EslintStrictDependencies: {
+    typeName: 'EslintStrictDependenciesRules',
+    pluginName: 'eslint-plugin-strict-dependencies',
+    rulePrefix: 'strict-dependencies/',
+    outputFileName: 'eslint-strict-dependencies-rules.mts',
+  },
+  EslintTreeShakable: {
+    typeName: 'EslintTreeShakableRules',
+    pluginName: 'eslint-plugin-tree-shakable',
+    rulePrefix: 'tree-shakable/',
+    outputFileName: 'eslint-tree-shakable-rules.mts',
+  },
+  EslintPromiseRules: {
+    typeName: 'EslintPromiseRules',
+    pluginName: 'eslint-plugin-promise',
+    rulePrefix: 'promise/',
+    outputFileName: 'eslint-promise-rules.mts',
+  },
+  EslintSecurityRules: {
+    typeName: 'EslintSecurityRules',
+    pluginName: 'eslint-plugin-security',
+    rulePrefix: 'security/',
+    outputFileName: 'eslint-security-rules.mts',
+  },
+  EslintUnicornRules: {
+    typeName: 'EslintUnicornRules',
+    pluginName: 'eslint-plugin-unicorn',
+    rulePrefix: 'unicorn/',
+    outputFileName: 'eslint-unicorn-rules.mts',
+  },
+  EslintPluginSortDestructureKeys: {
+    typeName: 'EslintPluginSortDestructureKeysRules',
+    pluginName: 'eslint-plugin-sort-destructure-keys',
+    rulePrefix: 'sort-destructure-keys/',
+    outputFileName: 'eslint-plugin-sort-destructure-keys-rules.mts',
+  },
+  EslintReactRules: {
+    typeName: 'EslintReactRules',
+    pluginName: 'eslint-plugin-react',
+    rulePrefix: 'react/',
+    outputFileName: 'eslint-react-rules.mts',
+  },
+  EslintReactHooksRules: {
+    typeName: 'EslintReactHooksRules',
+    pluginName: 'eslint-plugin-react-hooks',
+    rulePrefix: 'react-hooks/',
+    outputFileName: 'eslint-react-hooks-rules.mts',
+  },
+  EslintReactRefresh: {
+    typeName: 'EslintReactRefreshRules',
+    pluginName: 'eslint-plugin-react-refresh',
+    rulePrefix: 'react-refresh/',
+    outputFileName: 'eslint-react-refresh-rules.mts',
+  },
+  EslintReactPerf: {
+    typeName: 'EslintReactPerfRules',
+    pluginName: 'eslint-plugin-react-perf',
+    rulePrefix: 'react-perf/',
+    outputFileName: 'eslint-react-perf-rules.mts',
+  },
+  EslintJsxA11y: {
+    typeName: 'EslintJsxA11yRules',
+    pluginName: 'eslint-plugin-jsx-a11y',
+    rulePrefix: 'jsx-a11y/',
+    outputFileName: 'eslint-jsx-a11y-rules.mts',
+  },
+  EslintJestRules: {
+    typeName: 'EslintJestRules',
+    pluginName: 'eslint-plugin-jest',
+    rulePrefix: 'jest/',
+    outputFileName: 'eslint-jest-rules.mts',
+  },
+  EslintVitestRules: {
+    typeName: 'EslintVitestRules',
+    pluginName: '@vitest/eslint-plugin',
+    rulePrefix: 'vitest/',
+    outputFileName: 'eslint-vitest-rules.mts',
+  },
+  EslintTestingLibrary: {
+    typeName: 'EslintTestingLibraryRules',
+    pluginName: 'eslint-plugin-testing-library',
+    rulePrefix: 'testing-library/',
+    outputFileName: 'eslint-testing-library-rules.mts',
+  },
+  TypeScriptEslintRules: {
+    typeName: 'TypeScriptEslintRules',
+    pluginName: '@typescript-eslint/eslint-plugin',
+    rulePrefix: '@typescript-eslint/',
+    outputFileName: 'typescript-eslint-rules.mts',
+  },
+  EslintPluginN: {
+    typeName: 'EslintNRules',
+    pluginName: 'eslint-plugin-n',
+    rulePrefix: 'n/',
+    outputFileName: 'eslint-n-rules.mts',
+  },
+  EslintPluginMath: {
+    typeName: 'EslintMathRules',
+    pluginName: 'eslint-plugin-math',
+    rulePrefix: 'math/',
+    outputFileName: 'eslint-math-rules.mts',
+  },
+  EslintPluginRules: {
+    typeName: 'EslintPluginRules',
+    pluginName: 'eslint-plugin-eslint-plugin',
+    rulePrefix: 'eslint-plugin/',
+    outputFileName: 'eslint-plugin-rules.mts',
+  },
+  EslintReactCodingStyleRules: {
+    typeName: 'EslintReactCodingStyleRules',
+    pluginName: 'eslint-plugin-react-coding-style',
+    rulePrefix: 'react-coding-style/',
+    outputFileName: 'eslint-react-coding-style-rules.mts',
+  },
+  EslintVitestCodingStyleRules: {
+    typeName: 'EslintVitestCodingStyleRules',
+    pluginName: 'eslint-plugin-vitest-coding-style',
+    rulePrefix: 'vitest-coding-style/',
+    outputFileName: 'eslint-vitest-coding-style-rules.mts',
+  },
+  EslintImmerCodingStyleRules: {
+    typeName: 'EslintImmerCodingStyleRules',
+    pluginName: 'eslint-plugin-immer-coding-style',
+    rulePrefix: 'immer-coding-style/',
+    outputFileName: 'eslint-immer-coding-style-rules.mts',
+  },
+  EslintTsRestrictionsRules: {
+    typeName: 'EslintTsRestrictionsRules',
+    pluginName: 'eslint-plugin-ts-restrictions',
+    rulePrefix: 'ts-restrictions/',
+    outputFileName: 'eslint-ts-restrictions-rules.mts',
+  },
+} as const satisfies ReadonlyRecord<
+  string,
+  Readonly<{
+    typeName: `${string}Rules`;
+    pluginName:
+      | '@typescript-eslint/eslint-plugin'
+      | '@vitest/eslint-plugin'
+      | '@stylistic/eslint-plugin'
+      | 'eslint'
+      | `eslint-plugin-${string}`;
+    rulePrefix: `${string}/`;
+    outputFileName: `${string}.mts`;
+  }>
+>;

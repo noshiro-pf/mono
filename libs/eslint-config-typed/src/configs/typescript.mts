@@ -1,0 +1,127 @@
+import { allExtensionsStr } from '../constants/index.mjs';
+import {
+  eslintArrayFuncRules,
+  eslintFunctionalRules,
+  eslintImportsRules,
+  eslintMathRules,
+  eslintPluginSortDestructureKeysRules,
+  eslintPreferArrowFunctionRules,
+  eslintPromiseRules,
+  eslintRules,
+  eslintSecurityRules,
+  eslintStylisticRules,
+  eslintTotalFunctionsRules,
+  eslintTreeShakableRules,
+  eslintTsRestrictionsRules,
+  eslintUnicornRules,
+  typescriptEslintRules,
+} from '../rules/index.mjs';
+import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
+import { eslintConfigForTypeScriptWithoutRules } from './typescript-without-rules.mjs';
+
+export const eslintConfigForTypeScript = ({
+  files,
+  packageDirs,
+  tsconfigFileName,
+  tsconfigRootDir,
+  usingStrictTsLib,
+}: Readonly<{
+  tsconfigFileName: string;
+  tsconfigRootDir: string;
+  packageDirs: readonly string[];
+  files?: readonly string[];
+  usingStrictTsLib?: boolean;
+}>): readonly FlatConfig[] =>
+  [
+    ...eslintConfigForTypeScriptWithoutRules({
+      tsconfigFileName,
+      tsconfigRootDir,
+    }),
+    {
+      files: files ?? ['**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}'],
+      rules: defineKnownRules({
+        ...eslintArrayFuncRules,
+        ...eslintPreferArrowFunctionRules,
+        ...eslintFunctionalRules,
+        ...eslintTotalFunctionsRules,
+        ...eslintImportsRules,
+        ...eslintMathRules,
+        ...eslintPromiseRules,
+        ...eslintRules,
+        ...eslintStylisticRules,
+        ...eslintSecurityRules,
+        ...eslintUnicornRules,
+        ...typescriptEslintRules,
+        ...eslintTreeShakableRules,
+        ...eslintPluginSortDestructureKeysRules,
+        ...eslintTsRestrictionsRules,
+
+        'strict-dependencies/strict-dependencies': ['error', []],
+
+        'import-x/no-extraneous-dependencies': [
+          'error',
+          {
+            packageDir: packageDirs,
+          },
+        ],
+        ...(usingStrictTsLib === true
+          ? {
+              '@typescript-eslint/prefer-promise-reject-errors': 'off',
+              '@typescript-eslint/use-unknown-in-catch-callback-variable':
+                'off',
+            }
+          : {}),
+      }),
+    },
+    {
+      files: ['**/*.{js,jsx,mjs,cjs}'],
+      rules: defineKnownRules({
+        '@typescript-eslint/explicit-function-return-type': 'off',
+        'import-x/no-internal-modules': 'off',
+      }),
+    },
+    {
+      files: ['**/*.d.{ts,mts,cts}'],
+      rules: defineKnownRules({
+        '@typescript-eslint/triple-slash-reference': 'off',
+
+        // Because interface is often used
+        '@typescript-eslint/consistent-type-definitions': 'off',
+
+        'import-x/unambiguous': 'off',
+      }),
+    },
+    {
+      files: [`**/index.{${allExtensionsStr}}`],
+      rules: defineKnownRules({
+        '@stylistic/padding-line-between-statements': 'off',
+      }),
+    },
+    {
+      files: [
+        // e.g.
+        // - eslint.config.ts
+        // - vitest.config.ts
+        // - jest.config.js
+        // - cypress.config.ts
+        // - playwright.config.ts
+        // - rollup.config.mts
+
+        '**/*.config.{js,mjs,cjs,ts,mts,cts}',
+
+        '**/*.config.*.{js,mjs,cjs,ts,mts,cts}',
+
+        '**/.markdownlint-cli2.{jsonc,yaml,cjs,mjs}',
+        '**/.markdownlint.{jsonc,json,yaml,yml,cjs,mjs}',
+        '.prettierrc.{js,cjs,ts,cts,mjs,mts}',
+      ],
+      rules: defineKnownRules({
+        'no-restricted-imports': 'off',
+        'import-x/no-default-export': 'off',
+        'import-x/no-anonymous-default-export': 'off',
+        'import-x/no-internal-modules': 'off',
+        'import-x/no-named-as-default': 'off',
+        'import-x/namespace': 'off',
+      }),
+    },
+  ] as const;

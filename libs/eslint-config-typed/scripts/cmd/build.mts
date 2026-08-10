@@ -1,0 +1,175 @@
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { unknownToString, type UnknownResult } from 'ts-data-forge';
+import { $, assertPathExists, Result } from 'ts-repo-utils';
+import { projectRootPath } from '../project-root-path.mjs';
+import { genAgentsMd } from './gen-agents-md.mjs';
+
+const distDir = path.resolve(projectRootPath, './dist');
+
+/**
+ * Builds the entire project.
+ */
+const build = async (skipCheck: boolean): Promise<void> => {
+  console.info('Starting build process...\n');
+
+  if (!skipCheck) {
+    await logStep({
+      startMessage: 'Checking file extensions',
+      action: () =>
+        runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+      successMessage: 'File extensions validated',
+    });
+
+    await logStep({
+      startMessage: 'Cleaning dist directory',
+      action: () =>
+        runStep(
+          Result.fromPromise(
+            fs.rm(distDir, {
+              recursive: true,
+              force: true,
+            }),
+          ),
+          'Failed to clean dist directory',
+        ),
+      successMessage: 'Cleaned dist directory',
+    });
+
+    await logStep({
+      startMessage: 'Generating rules types',
+      action: () =>
+        runCmdStep('pnpm run gen-rule-type', 'Generating rules types failed'),
+      successMessage: 'Generated rules types',
+    });
+
+    await logStep({
+      startMessage: 'Generating index files',
+      action: () => runCmdStep('pnpm run gi', 'Generating index files failed'),
+      successMessage: 'Index files generated',
+    });
+
+    await logStep({
+      startMessage: 'Generating AGENTS.md',
+      action: () => runStep(genAgentsMd(), 'Failed to generate AGENTS.md'),
+      successMessage: 'Generated AGENTS.md',
+    });
+
+    await logStep({
+      startMessage: 'Running type checking',
+      action: () => runCmdStep('tsc --noEmit', 'Type checking failed'),
+      successMessage: 'Type checking passed',
+    });
+  }
+
+  await logStep({
+    startMessage: 'Building with Rollup',
+    action: async () => {
+      const rollupConfig = path.resolve(
+        projectRootPath,
+        './configs/rollup.config.mts',
+      );
+
+      await assertPathExists(rollupConfig, 'Rollup config');
+
+      await runCmdStep(
+        [
+          'rollup',
+          `--config ${rollupConfig}`,
+          // Rollup bundles the config file as ESM, so compile it with
+          // bundler-style module settings. Without this override, the root
+          // tsconfig's "moduleResolution": "NodeNext" conflicts with the
+          // "module" override Rollup applies when loading the config
+          // (TS5110).
+          `--configPlugin 'typescript={compilerOptions:{module:"esnext",moduleResolution:"bundler"}}'`,
+          '--configImportAttributesKey with',
+        ].join(' '),
+        'Rollup build failed',
+      );
+    },
+    successMessage: 'Rollup build completed',
+  });
+
+  await logStep({
+    startMessage: 'Generating dist/types.d.mts',
+    action: async () => {
+      const content = "export * from './entry-point.mjs';\n";
+
+      const typesFile = path.resolve(distDir, 'types.d.mts');
+
+      await runStep(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        Result.fromPromise(fs.writeFile(typesFile, content)),
+        'Failed to generate dist/types.d.mts',
+      );
+    },
+    successMessage: 'Generated dist/types.d.mts',
+  });
+
+  await logStep({
+    startMessage: 'Generating dist TypeScript config',
+    action: async () => {
+      const configContent = JSON.stringify({ include: ['.'] });
+
+      const configFile = path.resolve(distDir, 'tsconfig.json');
+
+      await runStep(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        Result.fromPromise(fs.writeFile(configFile, configContent)),
+        'Failed to generate tsconfig',
+      );
+    },
+    successMessage: 'Generated dist/tsconfig.json',
+  });
+
+  console.info('✅ Build completed successfully!\n');
+};
+
+const mut_step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  console.info(`${mut_step.current}. ${startMessage}...`);
+
+  await action();
+
+  console.info(`✓ ${successMessage}.\n`);
+
+  mut_step.current += 1;
+};
+
+const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
+  const result = await $(cmd);
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${result.value.message}`);
+
+    console.error('❌ Build failed');
+
+    process.exit(1);
+  }
+};
+
+const runStep = async (
+  promise: Promise<UnknownResult>,
+  errorMsg: string,
+): Promise<void> => {
+  const result = await promise;
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
+
+    console.error('❌ Build failed');
+
+    process.exit(1);
+  }
+};
+
+await build(process.argv.includes('--skip-check'));

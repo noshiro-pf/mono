@@ -1,0 +1,913 @@
+/* cSpell:disable */
+import { type Linter } from 'eslint';
+import { type NonEmptyTuple } from 'ts-type-forge';
+
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
+
+/**
+ * @description Enforce promises from async event methods are handled
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-events.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace AwaitAsyncEvents {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "default": {},
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "eventModule": {
+   *         "default": "userEvent",
+   *         "oneOf": [
+   *           {
+   *             "enum": [
+   *               "fireEvent",
+   *               "userEvent"
+   *             ],
+   *             "type": "string"
+   *           },
+   *           {
+   *             "items": {
+   *               "type": "string",
+   *               "enum": [
+   *                 "fireEvent",
+   *                 "userEvent"
+   *               ]
+   *             },
+   *             "type": "array"
+   *           }
+   *         ]
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * @default "userEvent"
+     */
+    eventModule?:
+      ('fireEvent' | 'userEvent') | readonly ('fireEvent' | 'userEvent')[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Enforce promises from async queries to be handled
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-queries.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace AwaitAsyncQueries {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce promises from async utils to be awaited properly
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/await-async-utils.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace AwaitAsyncUtils {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Ensures consistent usage of `data-testid`
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/consistent-data-testid.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace ConsistentDataTestid {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "default": {},
+   *     "additionalProperties": false,
+   *     "required": [
+   *       "testIdPattern"
+   *     ],
+   *     "properties": {
+   *       "testIdPattern": {
+   *         "type": "string"
+   *       },
+   *       "testIdAttribute": {
+   *         "default": "data-testid",
+   *         "oneOf": [
+   *           {
+   *             "type": "string"
+   *           },
+   *           {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string"
+   *             }
+   *           }
+   *         ]
+   *       },
+   *       "customMessage": {
+   *         "type": "string"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    testIdPattern: string;
+    /**
+     * @default "data-testid"
+     */
+    testIdAttribute?: string | readonly string[];
+    customMessage?: string;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Disallow unnecessary `await` for sync events
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-await-sync-events.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoAwaitSyncEvents {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "eventModules": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string",
+   *           "enum": [
+   *             "fire-event",
+   *             "user-event"
+   *           ]
+   *         },
+   *         "minItems": 1,
+   *         "default": [
+   *           "fire-event"
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * @default ["fire-event"]
+     *
+     * @minItems 1
+     */
+    eventModules?: NonEmptyTuple<'fire-event' | 'user-event'>;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Disallow unnecessary `await` for sync queries
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-await-sync-queries.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace NoAwaitSyncQueries {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow the use of `container` methods
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-container.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoContainer {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow the use of debugging utilities like `debug`
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-debugging-utils.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoDebuggingUtils {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "utilsToCheckFor": {
+   *         "type": "object",
+   *         "properties": {
+   *           "prettyFormat": {
+   *             "type": "boolean"
+   *           },
+   *           "logDOM": {
+   *             "type": "boolean"
+   *           },
+   *           "logRoles": {
+   *             "type": "boolean"
+   *           },
+   *           "prettyDOM": {
+   *             "type": "boolean"
+   *           },
+   *           "logTestingPlaygroundURL": {
+   *             "type": "boolean"
+   *           },
+   *           "debug": {
+   *             "type": "boolean"
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    utilsToCheckFor?: Readonly<{
+      prettyFormat?: boolean;
+      logDOM?: boolean;
+      logRoles?: boolean;
+      prettyDOM?: boolean;
+      logTestingPlaygroundURL?: boolean;
+      debug?: boolean;
+    }>;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Disallow importing from DOM Testing Library
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-dom-import.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | code    |
+ *  ```
+ */
+namespace NoDomImport {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "string"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = string;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Disallow the use of the global RegExp flag (/g) in queries
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-global-regexp-flag-in-query.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoGlobalRegexpFlagInQuery {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow the use of `cleanup`
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-manual-cleanup.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoManualCleanup {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow direct Node access
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-node-access.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoNodeAccess {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowContainerFirstChild": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    allowContainerFirstChild?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Disallow the use of promises passed to a `fireEvent` method
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-promise-in-fire-event.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoPromiseInFireEvent {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow the use of `render` in testing frameworks setup functions
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-render-in-lifecycle.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoRenderInLifecycle {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowTestingFrameworkSetupHook": {
+   *         "enum": [
+   *           "beforeEach",
+   *           "beforeAll"
+   *         ],
+   *         "type": "string"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    allowTestingFrameworkSetupHook?: 'beforeEach' | 'beforeAll';
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Ensure no `data-testid` queries are used
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-test-id-queries.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoTestIdQueries {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow wrapping Testing Library utils or empty callbacks in `act`
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-unnecessary-act.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoUnnecessaryAct {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "isStrict": {
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    isStrict?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Disallow the use of multiple `expect` calls inside `waitFor`
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-multiple-assertions.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoWaitForMultipleAssertions {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow the use of side effects in `waitFor`
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-side-effects.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoWaitForSideEffects {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Ensures no snapshot is generated inside of a `waitFor` call
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/no-wait-for-snapshot.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoWaitForSnapshot {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Suggest using explicit assertions rather than standalone queries
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-explicit-assert.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace PreferExplicitAssert {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "assertion": {
+   *         "type": "string",
+   *         "enum": [
+   *           "toBeOnTheScreen",
+   *           "toBeInTheDocument",
+   *           "toBeTruthy",
+   *           "toBeDefined"
+   *         ]
+   *       },
+   *       "includeFindQueries": {
+   *         "type": "boolean"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    assertion?:
+      'toBeOnTheScreen' | 'toBeInTheDocument' | 'toBeTruthy' | 'toBeDefined';
+    includeFindQueries?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Suggest using `find(All)By*` query instead of `waitFor` + `get(All)By*` to wait for elements
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-find-by.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferFindBy {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Suggest using implicit assertions for getBy* & findBy* queries
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-implicit-assert.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace PreferImplicitAssert {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Ensure appropriate `get*`/`query*` queries are used with their respective matchers
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-presence-queries.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferPresenceQueries {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "presence": {
+   *         "type": "boolean"
+   *       },
+   *       "absence": {
+   *         "type": "boolean"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    presence?: boolean;
+    absence?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Suggest using `queryBy*` queries when waiting for disappearance
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-query-by-disappearance.md
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace PreferQueryByDisappearance {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Ensure the configured `get*`/`query*` query is used with the corresponding matchers
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-query-matchers.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace PreferQueryMatchers {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "validEntries": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "object",
+   *           "properties": {
+   *             "query": {
+   *               "type": "string",
+   *               "enum": [
+   *                 "get",
+   *                 "query"
+   *               ]
+   *             },
+   *             "matcher": {
+   *               "type": "string"
+   *             }
+   *           },
+   *           "additionalProperties": false
+   *         }
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    validEntries?: readonly Readonly<{
+      query?: 'get' | 'query';
+      matcher?: string;
+    }>[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Suggest using `screen` while querying
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-screen-queries.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace PreferScreenQueries {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Suggest using `userEvent` over `fireEvent` for simulating user interactions
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-user-event.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace PreferUserEvent {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowedMethods": {
+   *         "type": "array"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    allowedMethods?: readonly unknown[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description Suggest using userEvent with setup() instead of direct methods
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/prefer-user-event-setup.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace PreferUserEventSetup {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce a valid naming for return value from `render`
+ * @link https://github.com/testing-library/eslint-plugin-testing-library/tree/main/docs/rules/render-result-naming-convention.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace RenderResultNamingConvention {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+export type EslintTestingLibraryRules = Readonly<{
+  'testing-library/await-async-events': AwaitAsyncEvents.RuleEntry;
+  'testing-library/await-async-queries': AwaitAsyncQueries.RuleEntry;
+  'testing-library/await-async-utils': AwaitAsyncUtils.RuleEntry;
+  'testing-library/consistent-data-testid': ConsistentDataTestid.RuleEntry;
+  'testing-library/no-await-sync-events': NoAwaitSyncEvents.RuleEntry;
+  'testing-library/no-await-sync-queries': NoAwaitSyncQueries.RuleEntry;
+  'testing-library/no-container': NoContainer.RuleEntry;
+  'testing-library/no-debugging-utils': NoDebuggingUtils.RuleEntry;
+  'testing-library/no-dom-import': NoDomImport.RuleEntry;
+  'testing-library/no-global-regexp-flag-in-query': NoGlobalRegexpFlagInQuery.RuleEntry;
+  'testing-library/no-manual-cleanup': NoManualCleanup.RuleEntry;
+  'testing-library/no-node-access': NoNodeAccess.RuleEntry;
+  'testing-library/no-promise-in-fire-event': NoPromiseInFireEvent.RuleEntry;
+  'testing-library/no-render-in-lifecycle': NoRenderInLifecycle.RuleEntry;
+  'testing-library/no-test-id-queries': NoTestIdQueries.RuleEntry;
+  'testing-library/no-unnecessary-act': NoUnnecessaryAct.RuleEntry;
+  'testing-library/no-wait-for-multiple-assertions': NoWaitForMultipleAssertions.RuleEntry;
+  'testing-library/no-wait-for-side-effects': NoWaitForSideEffects.RuleEntry;
+  'testing-library/no-wait-for-snapshot': NoWaitForSnapshot.RuleEntry;
+  'testing-library/prefer-explicit-assert': PreferExplicitAssert.RuleEntry;
+  'testing-library/prefer-find-by': PreferFindBy.RuleEntry;
+  'testing-library/prefer-implicit-assert': PreferImplicitAssert.RuleEntry;
+  'testing-library/prefer-presence-queries': PreferPresenceQueries.RuleEntry;
+  'testing-library/prefer-query-by-disappearance': PreferQueryByDisappearance.RuleEntry;
+  'testing-library/prefer-query-matchers': PreferQueryMatchers.RuleEntry;
+  'testing-library/prefer-screen-queries': PreferScreenQueries.RuleEntry;
+  'testing-library/prefer-user-event': PreferUserEvent.RuleEntry;
+  'testing-library/prefer-user-event-setup': PreferUserEventSetup.RuleEntry;
+  'testing-library/render-result-naming-convention': RenderResultNamingConvention.RuleEntry;
+}>;
+
+export type EslintTestingLibraryRulesOption = Readonly<{
+  'testing-library/await-async-events': AwaitAsyncEvents.Options;
+  'testing-library/consistent-data-testid': ConsistentDataTestid.Options;
+  'testing-library/no-await-sync-events': NoAwaitSyncEvents.Options;
+  'testing-library/no-debugging-utils': NoDebuggingUtils.Options;
+  'testing-library/no-dom-import': NoDomImport.Options;
+  'testing-library/no-node-access': NoNodeAccess.Options;
+  'testing-library/no-render-in-lifecycle': NoRenderInLifecycle.Options;
+  'testing-library/no-unnecessary-act': NoUnnecessaryAct.Options;
+  'testing-library/prefer-explicit-assert': PreferExplicitAssert.Options;
+  'testing-library/prefer-presence-queries': PreferPresenceQueries.Options;
+  'testing-library/prefer-query-matchers': PreferQueryMatchers.Options;
+  'testing-library/prefer-user-event': PreferUserEvent.Options;
+}>;

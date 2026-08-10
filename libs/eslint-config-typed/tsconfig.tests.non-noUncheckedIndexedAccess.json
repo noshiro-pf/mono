@@ -1,0 +1,7 @@
+{
+  "extends": "./configs/tsconfig.test.json",
+  "files": ["file.ts"],
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": false
+  }
+}

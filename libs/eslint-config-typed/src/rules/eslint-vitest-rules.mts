@@ -1,0 +1,129 @@
+import { withDefaultOption, type EslintVitestRules } from '../types/index.mjs';
+
+export const eslintVitestRules = {
+  /* Rules common with jest and playwright (keep settings aligned) */
+  'vitest/expect-expect': withDefaultOption('error'),
+  'vitest/max-expects': 'off',
+  'vitest/max-nested-describe': withDefaultOption('error'),
+  'vitest/no-commented-out-tests': 'off',
+  'vitest/no-conditional-expect': withDefaultOption('error'),
+  'vitest/no-conditional-in-test': 'off',
+  'vitest/no-duplicate-hooks': 'error',
+  'vitest/no-hooks': withDefaultOption('error'),
+  'vitest/no-restricted-matchers': [
+    'error',
+    {
+      toBeTruthy: 'Use `.toBe(true)` instead.',
+      toBeFalsy: 'Use `.toBe(false)` instead.',
+    },
+  ],
+  'vitest/no-standalone-expect': withDefaultOption('error'),
+  'vitest/prefer-comparison-matcher': 'error',
+  'vitest/prefer-equality-matcher': 'error',
+  'vitest/prefer-hooks-in-order': 'error',
+  'vitest/prefer-hooks-on-top': 'error',
+  'vitest/prefer-strict-equal': 'error',
+  'vitest/prefer-to-be': 'error',
+  'vitest/prefer-to-contain': 'error',
+  'vitest/prefer-to-have-length': 'error',
+  'vitest/require-hook': 'off',
+  'vitest/require-to-throw-message': 'error',
+  'vitest/require-top-level-describe': 'off',
+  'vitest/valid-describe-callback': 'error',
+  'vitest/valid-expect': withDefaultOption('error'),
+  'vitest/valid-title': 'off',
+
+  /* Rules common with jest (keep settings aligned) */
+
+  'vitest/consistent-test-it': ['error', { fn: 'test' }],
+  'vitest/no-alias-methods': 'error',
+  'vitest/no-disabled-tests': 'error',
+  'vitest/no-focused-tests': withDefaultOption('error'),
+  'vitest/no-identical-title': 'error',
+  'vitest/no-interpolation-in-snapshots': 'error',
+  'vitest/no-large-snapshots': withDefaultOption('error'),
+  'vitest/no-mocks-import': 'error',
+  'vitest/no-restricted-vi-methods': [
+    'error',
+    {
+      advanceTimersByTime: null,
+      spyOn: null,
+    },
+  ],
+  'vitest/no-test-prefixes': 'error',
+  'vitest/no-test-return-statement': 'error',
+  'vitest/prefer-called-with': 'error',
+  'vitest/prefer-each': 'error',
+  'vitest/prefer-expect-assertions': 'off',
+  'vitest/prefer-expect-resolves': 'error',
+  'vitest/prefer-lowercase-title': 'off',
+  'vitest/prefer-mock-promise-shorthand': 'error',
+  'vitest/prefer-snapshot-hint': withDefaultOption('error'),
+  'vitest/prefer-spy-on': 'error',
+  'vitest/prefer-todo': 'error',
+  'vitest/prefer-mock-return-shorthand': 'error',
+
+  /* eslint-plugin-vitest specific rules */
+
+  // Off to allow writing inline tests
+  'vitest/no-conditional-tests': 'off',
+
+  'vitest/consistent-test-filename': withDefaultOption('error'),
+  'vitest/no-import-node-test': 'error',
+
+  // Reject these rules because toBeFalsy() is looser than toBe(false)
+  'vitest/prefer-to-be-falsy': 'off',
+  'vitest/prefer-to-be-truthy': 'off',
+
+  'vitest/prefer-to-be-object': 'error',
+  'vitest/require-local-test-context-for-concurrent-snapshots': 'error',
+
+  'vitest/no-importing-vitest-globals': 'error',
+  'vitest/prefer-importing-vitest-globals': 'off',
+
+  'vitest/consistent-vitest-vi': withDefaultOption('error'),
+  'vitest/hoisted-apis-on-top': 'error',
+  'vitest/padding-around-after-all-blocks': 'error',
+  'vitest/padding-around-after-each-blocks': 'error',
+  'vitest/padding-around-all': 'error',
+  'vitest/padding-around-before-all-blocks': 'error',
+  'vitest/padding-around-before-each-blocks': 'error',
+  'vitest/padding-around-describe-blocks': 'error',
+  'vitest/padding-around-expect-groups': 'error',
+  'vitest/padding-around-test-blocks': 'error',
+  'vitest/prefer-called-exactly-once-with': 'error',
+  'vitest/prefer-called-once': 'error',
+  'vitest/prefer-called-times': 'off',
+  'vitest/prefer-describe-function-title': 'error',
+  'vitest/prefer-expect-type-of': 'error',
+  'vitest/prefer-import-in-mock': withDefaultOption('error'),
+  'vitest/prefer-strict-boolean-matchers': 'error',
+  'vitest/prefer-vi-mocked': 'error',
+  'vitest/require-mock-type-parameters': 'off',
+  // 'vitest/require-mock-type-parameters': [
+  //   'error',
+  //   { checkImportFunctions: true },
+  // ],
+  'vitest/valid-expect-in-promise': 'error',
+  'vitest/warn-todo': 'error',
+  'vitest/require-awaited-expect-poll': 'error',
+
+  'vitest/consistent-each-for': [
+    'error',
+    {
+      test: 'each',
+      it: 'each',
+      describe: 'each',
+      suite: 'each',
+    },
+  ],
+  'vitest/no-unneeded-async-expect-function': 'error',
+  'vitest/prefer-to-have-been-called-times': 'error',
+  'vitest/unbound-method': ['error', { ignoreStatic: false }],
+
+  // This rule is enabled on an as-needed basis on a per-project basis, not by default.
+  'vitest/require-test-timeout': 'off',
+
+  // deprecated
+  'vitest/no-done-callback': 0,
+} as const satisfies EslintVitestRules;

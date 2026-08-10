@@ -1,0 +1,29 @@
+import globals from 'globals';
+import { Arr } from 'ts-data-forge';
+import { restrictedGlobalsForBrowser } from '../rules/index.mjs';
+import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
+
+export const eslintConfigForBrowser = (files?: readonly string[]): FlatConfig =>
+  ({
+    ...(files === undefined ? {} : { files }),
+    languageOptions: {
+      // https://github.com/sindresorhus/globals/blob/main/globals.json
+      globals: {
+        ...globals.browser,
+      },
+      sourceType: 'module',
+    },
+    rules: defineKnownRules({
+      'no-restricted-globals': Arr.toUnshifted('error')(
+        restrictedGlobalsForBrowser,
+      ),
+      '@typescript-eslint/no-require-imports': 'off',
+      'unicorn/no-new-buffer': 'off',
+      'unicorn/no-process-exit': 'off',
+      'unicorn/prefer-module': 'off',
+      'unicorn/prefer-node-protocol': 'off',
+      'unicorn/no-unsafe-buffer-conversion': 'off',
+      'unicorn/consistent-json-file-read': 'off',
+      'unicorn/no-exports-in-scripts': 'off',
+    }),
+  }) as const;

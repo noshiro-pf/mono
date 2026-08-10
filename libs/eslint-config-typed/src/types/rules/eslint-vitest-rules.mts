@@ -1,0 +1,2441 @@
+/* cSpell:disable */
+import { type Linter } from 'eslint';
+import { type FixedLengthTuple } from 'ts-type-forge';
+
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
+
+/**
+ * @description enforce using `.each` or `.for` consistently
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-each-for.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ConsistentEachFor {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "test": {
+   *         "description": "Preferred method for `test`.",
+   *         "type": "string",
+   *         "enum": [
+   *           "each",
+   *           "for"
+   *         ]
+   *       },
+   *       "it": {
+   *         "description": "Preferred method for `it`.",
+   *         "type": "string",
+   *         "enum": [
+   *           "each",
+   *           "for"
+   *         ]
+   *       },
+   *       "describe": {
+   *         "description": "Preferred method for `describe`.",
+   *         "type": "string",
+   *         "enum": [
+   *           "each",
+   *           "for"
+   *         ]
+   *       },
+   *       "suite": {
+   *         "description": "Preferred method for `suite`.",
+   *         "type": "string",
+   *         "enum": [
+   *           "each",
+   *           "for"
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Preferred method for `test`.
+     */
+    test?: 'each' | 'for';
+    /**
+     * Preferred method for `it`.
+     */
+    it?: 'each' | 'for';
+    /**
+     * Preferred method for `describe`.
+     */
+    describe?: 'each' | 'for';
+    /**
+     * Preferred method for `suite`.
+     */
+    suite?: 'each' | 'for';
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require test file pattern
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-test-filename.md
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | false   |
+ *  | requiresTypeChecking | false   |
+ *  ```
+ */
+namespace ConsistentTestFilename {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "pattern": {
+   *         "description": "Regex pattern for files that should be treated as tests.",
+   *         "type": "string",
+   *         "format": "regex"
+   *       },
+   *       "allTestPattern": {
+   *         "description": "Regex pattern used to identify all possible test files.",
+   *         "type": "string",
+   *         "format": "regex"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Regex pattern for files that should be treated as tests.
+     */
+    pattern?: string;
+    /**
+     * Regex pattern used to identify all possible test files.
+     */
+    allTestPattern?: string;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce using test or it but not both
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-test-it.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ConsistentTestIt {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "fn": {
+   *         "description": "Preferred global test function keyword.",
+   *         "type": "string",
+   *         "enum": [
+   *           "test",
+   *           "it"
+   *         ]
+   *       },
+   *       "withinDescribe": {
+   *         "description": "Preferred test function keyword inside `describe`.",
+   *         "type": "string",
+   *         "enum": [
+   *           "test",
+   *           "it"
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Preferred global test function keyword.
+     */
+    fn?: 'test' | 'it';
+    /**
+     * Preferred test function keyword inside `describe`.
+     */
+    withinDescribe?: 'test' | 'it';
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce using vitest or vi but not both
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/consistent-vitest-vi.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ConsistentVitestVi {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "fn": {
+   *         "description": "Preferred utility keyword to enforce.",
+   *         "type": "string",
+   *         "enum": [
+   *           "vi",
+   *           "vitest"
+   *         ]
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Preferred utility keyword to enforce.
+     */
+    fn?: 'vi' | 'vitest';
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce having expectation in test body
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/expect-expect.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ExpectExpect {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "assertFunctionNames": {
+   *         "description": "List of function names treated as assertions.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "additionalTestBlockFunctions": {
+   *         "description": "Additional functions that should be treated as test blocks.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * List of function names treated as assertions.
+     */
+    assertFunctionNames?: readonly string[];
+    /**
+     * Additional functions that should be treated as test blocks.
+     */
+    additionalTestBlockFunctions?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce hoisted APIs to be on top of the file
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/hoisted-apis-on-top.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  ```
+ */
+namespace HoistedApisOnTop {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce a maximum number of expect per test
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/max-expects.md
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | false      |
+ *  ```
+ */
+namespace MaxExpects {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "max": {
+   *         "description": "Maximum number of `expect` calls allowed in a test.",
+   *         "type": "number"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Maximum number of `expect` calls allowed in a test.
+     */
+    max?: number;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require describe block to be less than set max value or default value
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/max-nested-describe.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace MaxNestedDescribe {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "max": {
+   *         "description": "Maximum allowed nesting depth for `describe` blocks.",
+   *         "type": "number"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Maximum allowed nesting depth for `describe` blocks.
+     */
+    max?: number;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow alias methods
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-alias-methods.md
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | fixable              | code       |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | false      |
+ *  ```
+ */
+namespace NoAliasMethods {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow commented out tests
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-commented-out-tests.md
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | false      |
+ *  ```
+ */
+namespace NoCommentedOutTests {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow conditional expects
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-conditional-expect.md
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | false   |
+ *  | requiresTypeChecking | false   |
+ *  ```
+ */
+namespace NoConditionalExpect {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "expectAssertions": {
+   *         "description": "Enable/disable whether expect.assertions() is taken into account",
+   *         "type": "boolean"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Enable/disable whether expect.assertions() is taken into account
+     */
+    expectAssertions?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow conditional tests
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-conditional-in-test.md
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | false   |
+ *  | requiresTypeChecking | false   |
+ *  ```
+ */
+namespace NoConditionalInTest {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow conditional tests
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-conditional-tests.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoConditionalTests {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow disabled tests
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-disabled-tests.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoDisabledTests {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow using a callback in asynchronous tests and hooks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-done-callback.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | true       |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ *  ```
+ */
+namespace NoDoneCallback {
+  export type RuleEntry = 0;
+}
+
+/**
+ * @description disallow duplicate hooks and teardown hooks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-duplicate-hooks.md
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | false      |
+ *  ```
+ */
+namespace NoDuplicateHooks {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow focused tests
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-focused-tests.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoFocusedTests {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "fixable": {
+   *         "description": "Whether the rule should provide an autofix.",
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether the rule should provide an autofix.
+     */
+    fixable?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow setup and teardown hooks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-hooks.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoHooks {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allow": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string",
+   *           "enum": [
+   *             "beforeAll",
+   *             "beforeEach",
+   *             "afterAll",
+   *             "afterEach",
+   *             "aroundAll",
+   *             "aroundEach"
+   *           ]
+   *         },
+   *         "additionalItems": false,
+   *         "uniqueItems": true,
+   *         "description": "This array option controls which Vitest hooks are checked by this rule."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * This array option controls which Vitest hooks are checked by this rule.
+     */
+    allow?: readonly (
+      | 'beforeAll'
+      | 'beforeEach'
+      | 'afterAll'
+      | 'afterEach'
+      | 'aroundAll'
+      | 'aroundEach'
+    )[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow identical titles
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-identical-title.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoIdenticalTitle {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow importing `node:test`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-import-node-test.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoImportNodeTest {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow importing Vitest globals
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-importing-vitest-globals.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoImportingVitestGlobals {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow string interpolation in snapshots
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-interpolation-in-snapshots.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoInterpolationInSnapshots {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow large snapshots
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-large-snapshots.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoLargeSnapshots {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "maxSize": {
+   *         "description": "Maximum number of lines allowed in external snapshots.",
+   *         "type": "number"
+   *       },
+   *       "inlineMaxSize": {
+   *         "description": "Maximum number of lines allowed in inline snapshots.",
+   *         "type": "number"
+   *       },
+   *       "allowedSnapshots": {
+   *         "description": "A map of snapshot absolute file paths to arrays of snapshot names that are allowed to exceed the size limit. Snapshot names can be specified as regular expressions.",
+   *         "type": "object",
+   *         "additionalProperties": {
+   *           "type": "array"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Maximum number of lines allowed in external snapshots.
+     */
+    maxSize?: number;
+    /**
+     * Maximum number of lines allowed in inline snapshots.
+     */
+    inlineMaxSize?: number;
+    /**
+     * A map of snapshot absolute file paths to arrays of snapshot names that are allowed to exceed the size limit. Snapshot names can be specified as regular expressions.
+     */
+    allowedSnapshots?: Readonly<Record<string, readonly unknown[]>>;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow importing from __mocks__ directory
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-mocks-import.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoMocksImport {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow the use of certain matchers
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-restricted-matchers.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoRestrictedMatchers {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "description": "Restricted matcher chains mapped to optional custom messages.",
+   *     "type": "object",
+   *     "additionalProperties": {
+   *       "type": [
+   *         "string",
+   *         "null"
+   *       ]
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * Restricted matcher chains mapped to optional custom messages.
+   */
+  export type Options = Readonly<Record<string, string | null>>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow specific `vi.` methods
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-restricted-vi-methods.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoRestrictedViMethods {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "description": "Restricted `vi` methods mapped to optional custom messages.",
+   *     "type": "object",
+   *     "additionalProperties": {
+   *       "type": [
+   *         "string",
+   *         "null"
+   *       ]
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * Restricted `vi` methods mapped to optional custom messages.
+   */
+  export type Options = Readonly<Record<string, string | null>>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow using `expect` outside of `it` or `test` blocks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-standalone-expect.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoStandaloneExpect {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "additionalTestBlockFunctions": {
+   *         "description": "Additional functions that should be treated as test blocks.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Additional functions that should be treated as test blocks.
+     */
+    additionalTestBlockFunctions?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow using the `f` and `x` prefixes in favour of `.only` and `.skip`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-test-prefixes.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoTestPrefixes {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow return statements in tests
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-test-return-statement.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoTestReturnStatement {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Disallow unnecessary async function wrapper for expected promises
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-unneeded-async-expect-function.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace NoUnneededAsyncExpectFunction {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce padding around `afterAll` blocks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-after-all-blocks.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace PaddingAroundAfterAllBlocks {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce padding around `afterEach` blocks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-after-each-blocks.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace PaddingAroundAfterEachBlocks {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce padding around vitest functions
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-all.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace PaddingAroundAll {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce padding around `beforeAll` blocks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-before-all-blocks.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace PaddingAroundBeforeAllBlocks {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce padding around `beforeEach` blocks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-before-each-blocks.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace PaddingAroundBeforeEachBlocks {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce padding around `describe` blocks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-describe-blocks.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace PaddingAroundDescribeBlocks {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce padding around `expect` groups
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-expect-groups.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace PaddingAroundExpectGroups {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Enforce padding around `test` blocks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/padding-around-test-blocks.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | whitespace |
+ *  ```
+ */
+namespace PaddingAroundTestBlocks {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Prefer `toHaveBeenCalledExactlyOnceWith` over `toHaveBeenCalledOnce` and `toHaveBeenCalledWith`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-called-exactly-once-with.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferCalledExactlyOnceWith {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using `toBeCalledOnce()` or `toHaveBeenCalledOnce()`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-called-once.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferCalledOnce {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using `toBeCalledTimes(1)` or `toHaveBeenCalledTimes(1)`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-called-times.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferCalledTimes {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using `toBeCalledWith()` or `toHaveBeenCalledWith()`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-called-with.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferCalledWith {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using the built-in comparison matchers
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-comparison-matcher.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferComparisonMatcher {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using a function as a describe title over an equivalent string
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-describe-function-title.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace PreferDescribeFunctionTitle {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using `each` rather than manual loops
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-each.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferEach {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using the built-in equality matchers
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-equality-matcher.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ *  ```
+ */
+namespace PreferEqualityMatcher {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using expect assertions instead of callbacks
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-expect-assertions.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ *  ```
+ */
+namespace PreferExpectAssertions {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "onlyFunctionsWithAsyncKeyword": {
+   *         "description": "Only check test functions declared with the async keyword.",
+   *         "type": "boolean"
+   *       },
+   *       "onlyFunctionsWithExpectInLoop": {
+   *         "description": "Only check test functions that contain `expect` inside loops.",
+   *         "type": "boolean"
+   *       },
+   *       "onlyFunctionsWithExpectInCallback": {
+   *         "description": "Only check test functions that contain `expect` in callbacks.",
+   *         "type": "boolean"
+   *       },
+   *       "disallowHasAssertions": {
+   *         "description": "Warn when `expect.hasAssertions()` is used instead of `expect.assertions()`.",
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Only check test functions declared with the async keyword.
+     */
+    onlyFunctionsWithAsyncKeyword?: boolean;
+    /**
+     * Only check test functions that contain `expect` inside loops.
+     */
+    onlyFunctionsWithExpectInLoop?: boolean;
+    /**
+     * Only check test functions that contain `expect` in callbacks.
+     */
+    onlyFunctionsWithExpectInCallback?: boolean;
+    /**
+     * Warn when `expect.hasAssertions()` is used instead of `expect.assertions()`.
+     */
+    disallowHasAssertions?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce using `expect().resolves` over `expect(await ...)` syntax
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-expect-resolves.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferExpectResolves {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using `expect(...).toBeTypeOf(...)` instead of `expect(typeof ...).toBe(...)`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-expect-type-of.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferExpectTypeOf {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce having hooks in consistent order
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-hooks-in-order.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferHooksInOrder {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce having hooks before any test cases
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-hooks-on-top.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferHooksOnTop {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description prefer dynamic import in mock
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-import-in-mock.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferImportInMock {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "fixable": {
+   *         "description": "Whether the rule should provide an autofix.",
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether the rule should provide an autofix.
+     */
+    fixable?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce importing Vitest globals
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-importing-vitest-globals.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferImportingVitestGlobals {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce lowercase titles
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-lowercase-title.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace PreferLowercaseTitle {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "ignore": {
+   *         "description": "Functions whose titles should be ignored when checking case.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string",
+   *           "enum": [
+   *             "describe",
+   *             "test",
+   *             "it"
+   *           ]
+   *         }
+   *       },
+   *       "allowedPrefixes": {
+   *         "description": "Title prefixes that are exempt from this rule.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "additionalItems": false
+   *       },
+   *       "ignoreTopLevelDescribe": {
+   *         "description": "Ignore the first top-level `describe` title.",
+   *         "type": "boolean"
+   *       },
+   *       "lowercaseFirstCharacterOnly": {
+   *         "description": "Only require the first character to be lowercase.",
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Functions whose titles should be ignored when checking case.
+     */
+    ignore?: readonly ('describe' | 'test' | 'it')[];
+    /**
+     * Title prefixes that are exempt from this rule.
+     */
+    allowedPrefixes?: readonly string[];
+    /**
+     * Ignore the first top-level `describe` title.
+     */
+    ignoreTopLevelDescribe?: boolean;
+    /**
+     * Only require the first character to be lowercase.
+     */
+    lowercaseFirstCharacterOnly?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce mock resolved/rejected shorthands for promises
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-mock-promise-shorthand.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferMockPromiseShorthand {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Prefer mock return shorthands
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-mock-return-shorthand.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferMockReturnShorthand {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce including a hint with external snapshots
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-snapshot-hint.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferSnapshotHint {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "description": "When to require snapshot hints.",
+   *     "type": "string",
+   *     "enum": [
+   *       "always",
+   *       "multi"
+   *     ]
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * When to require snapshot hints.
+   */
+  export type Options = 'always' | 'multi';
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce using `vi.spyOn`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-spy-on.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferSpyOn {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using `toBe(true)` and `toBe(false)` over matchers that coerce types to boolean
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-strict-boolean-matchers.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferStrictBooleanMatchers {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce strict equal over equal
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-strict-equal.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ *  ```
+ */
+namespace PreferStrictEqual {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using toBeFalsy()
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-be-falsy.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferToBeFalsy {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using toBeObject()
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-be-object.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferToBeObject {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using `toBeTruthy`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-be-truthy.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferToBeTruthy {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using toBe()
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-be.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferToBe {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using toContain()
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-contain.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferToContain {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Suggest using `toHaveBeenCalledTimes()`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-have-been-called-times.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ */
+namespace PreferToHaveBeenCalledTimes {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using toHaveLength()
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-to-have-length.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferToHaveLength {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using `test.todo`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-todo.md
+ *
+ *  ```md
+ *  | key         | value  |
+ *  | :---------- | :----- |
+ *  | type        | layout |
+ *  | deprecated  | false  |
+ *  | fixable     | code   |
+ *  | recommended | false  |
+ *  ```
+ */
+namespace PreferTodo {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require `vi.mocked()` over `fn as Mock`
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/prefer-vi-mocked.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferViMocked {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description ensure that every `expect.poll` call is awaited
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-awaited-expect-poll.md
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | false   |
+ *  | requiresTypeChecking | false   |
+ *  ```
+ */
+namespace RequireAwaitedExpectPoll {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require setup and teardown to be within a hook
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-hook.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireHook {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowedFunctionCalls": {
+   *         "description": "Function calls that are allowed outside of hooks.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Function calls that are allowed outside of hooks.
+     */
+    allowedFunctionCalls?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require local Test Context for concurrent snapshot tests
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-local-test-context-for-concurrent-snapshots.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace RequireLocalTestContextForConcurrentSnapshots {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce using type parameters with vitest mock functions
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-mock-type-parameters.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireMockTypeParameters {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "checkImportFunctions": {
+   *         "description": "Also require type parameters for `importActual` and `importMock`.",
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Also require type parameters for `importActual` and `importMock`.
+     */
+    checkImportFunctions?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require tests to declare a timeout
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-test-timeout.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTestTimeout {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require toThrow() to be called with an error message
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-to-throw-message.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireToThrowMessage {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce that all tests are in a top-level describe
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/require-top-level-describe.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTopLevelDescribe {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "maxNumberOfTopLevelDescribes": {
+   *         "description": "Maximum number of `describe` blocks allowed at the top level.",
+   *         "type": "number",
+   *         "minimum": 1
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Maximum number of `describe` blocks allowed at the top level.
+     */
+    maxNumberOfTopLevelDescribes?: number;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce unbound methods are called with their expected scope
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/unbound-method.md
+ *
+ *  ```md
+ *  | key                  | value   |
+ *  | :------------------- | :------ |
+ *  | type                 | problem |
+ *  | deprecated           | false   |
+ *  | recommended          | false   |
+ *  | requiresTypeChecking | true    |
+ *  ```
+ */
+namespace UnboundMethod {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "ignoreStatic": {
+   *         "type": "boolean",
+   *         "description": "Whether to skip checking whether `static` methods are correctly bound."
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether to skip checking whether `static` methods are correctly bound.
+     */
+    ignoreStatic?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce valid describe callback
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/valid-describe-callback.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace ValidDescribeCallback {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require promises that have expectations in their chain to be valid
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/valid-expect-in-promise.md
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ */
+namespace ValidExpectInPromise {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce valid `expect()` usage
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/valid-expect.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ValidExpect {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "alwaysAwait": {
+   *         "description": "Require awaiting every async assertion.",
+   *         "type": "boolean"
+   *       },
+   *       "asyncMatchers": {
+   *         "description": "Matchers that should be considered async assertions.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "minArgs": {
+   *         "description": "Minimum number of arguments allowed for `expect`.",
+   *         "type": "number",
+   *         "minimum": 1
+   *       },
+   *       "maxArgs": {
+   *         "description": "Maximum number of arguments allowed for `expect`.",
+   *         "type": "number",
+   *         "minimum": 1
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Require awaiting every async assertion.
+     */
+    alwaysAwait?: boolean;
+    /**
+     * Matchers that should be considered async assertions.
+     */
+    asyncMatchers?: readonly string[];
+    /**
+     * Minimum number of arguments allowed for `expect`.
+     */
+    minArgs?: number;
+    /**
+     * Maximum number of arguments allowed for `expect`.
+     */
+    maxArgs?: number;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce valid titles
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/valid-title.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ValidTitle {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "additionalProperties": false,
+   *     "definitions": {
+   *       "PatternOrPatternArray": {
+   *         "oneOf": [
+   *           {
+   *             "type": "string"
+   *           },
+   *           {
+   *             "type": "array",
+   *             "items": {
+   *               "type": "string"
+   *             },
+   *             "minItems": 1,
+   *             "maxItems": 2,
+   *             "additionalItems": false
+   *           }
+   *         ]
+   *       },
+   *       "MustMatchType": {
+   *         "oneOf": [
+   *           {
+   *             "$ref": "#/definitions/PatternOrPatternArray"
+   *           },
+   *           {
+   *             "type": "object",
+   *             "properties": {
+   *               "describe": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               },
+   *               "test": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               },
+   *               "it": {
+   *                 "$ref": "#/definitions/PatternOrPatternArray"
+   *               }
+   *             },
+   *             "additionalProperties": false
+   *           }
+   *         ]
+   *       }
+   *     },
+   *     "properties": {
+   *       "ignoreTypeOfDescribeName": {
+   *         "description": "Skip validating `describe` titles that come from `typeof`.",
+   *         "type": "boolean"
+   *       },
+   *       "allowArguments": {
+   *         "description": "Allow dynamic arguments as titles.",
+   *         "type": "boolean"
+   *       },
+   *       "disallowedWords": {
+   *         "description": "Words that are not allowed in test titles.",
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "mustMatch": {
+   *         "$ref": "#/definitions/MustMatchType"
+   *       },
+   *       "mustNotMatch": {
+   *         "$ref": "#/definitions/MustMatchType"
+   *       }
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  export type MustMatchType =
+    | PatternOrPatternArray
+    | Readonly<{
+        describe?: PatternOrPatternArray;
+        test?: PatternOrPatternArray;
+        it?: PatternOrPatternArray;
+      }>;
+
+  export type PatternOrPatternArray =
+    string | readonly [string] | FixedLengthTuple<2, string>;
+
+  export type Options = Readonly<{
+    /**
+     * Skip validating `describe` titles that come from `typeof`.
+     */
+    ignoreTypeOfDescribeName?: boolean;
+    /**
+     * Allow dynamic arguments as titles.
+     */
+    allowArguments?: boolean;
+    /**
+     * Words that are not allowed in test titles.
+     */
+    disallowedWords?: readonly string[];
+    mustMatch?: MustMatchType;
+    mustNotMatch?: MustMatchType;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow `.todo` usage
+ * @link https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/warn-todo.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace WarnTodo {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+export type EslintVitestRules = Readonly<{
+  'vitest/consistent-each-for': ConsistentEachFor.RuleEntry;
+  'vitest/consistent-test-filename': ConsistentTestFilename.RuleEntry;
+  'vitest/consistent-test-it': ConsistentTestIt.RuleEntry;
+  'vitest/consistent-vitest-vi': ConsistentVitestVi.RuleEntry;
+  'vitest/expect-expect': ExpectExpect.RuleEntry;
+  'vitest/hoisted-apis-on-top': HoistedApisOnTop.RuleEntry;
+  'vitest/max-expects': MaxExpects.RuleEntry;
+  'vitest/max-nested-describe': MaxNestedDescribe.RuleEntry;
+  'vitest/no-alias-methods': NoAliasMethods.RuleEntry;
+  'vitest/no-commented-out-tests': NoCommentedOutTests.RuleEntry;
+  'vitest/no-conditional-expect': NoConditionalExpect.RuleEntry;
+  'vitest/no-conditional-in-test': NoConditionalInTest.RuleEntry;
+  'vitest/no-conditional-tests': NoConditionalTests.RuleEntry;
+  'vitest/no-disabled-tests': NoDisabledTests.RuleEntry;
+  'vitest/no-duplicate-hooks': NoDuplicateHooks.RuleEntry;
+  'vitest/no-focused-tests': NoFocusedTests.RuleEntry;
+  'vitest/no-hooks': NoHooks.RuleEntry;
+  'vitest/no-identical-title': NoIdenticalTitle.RuleEntry;
+  'vitest/no-import-node-test': NoImportNodeTest.RuleEntry;
+  'vitest/no-importing-vitest-globals': NoImportingVitestGlobals.RuleEntry;
+  'vitest/no-interpolation-in-snapshots': NoInterpolationInSnapshots.RuleEntry;
+  'vitest/no-large-snapshots': NoLargeSnapshots.RuleEntry;
+  'vitest/no-mocks-import': NoMocksImport.RuleEntry;
+  'vitest/no-restricted-matchers': NoRestrictedMatchers.RuleEntry;
+  'vitest/no-restricted-vi-methods': NoRestrictedViMethods.RuleEntry;
+  'vitest/no-standalone-expect': NoStandaloneExpect.RuleEntry;
+  'vitest/no-test-prefixes': NoTestPrefixes.RuleEntry;
+  'vitest/no-test-return-statement': NoTestReturnStatement.RuleEntry;
+  'vitest/no-unneeded-async-expect-function': NoUnneededAsyncExpectFunction.RuleEntry;
+  'vitest/padding-around-after-all-blocks': PaddingAroundAfterAllBlocks.RuleEntry;
+  'vitest/padding-around-after-each-blocks': PaddingAroundAfterEachBlocks.RuleEntry;
+  'vitest/padding-around-all': PaddingAroundAll.RuleEntry;
+  'vitest/padding-around-before-all-blocks': PaddingAroundBeforeAllBlocks.RuleEntry;
+  'vitest/padding-around-before-each-blocks': PaddingAroundBeforeEachBlocks.RuleEntry;
+  'vitest/padding-around-describe-blocks': PaddingAroundDescribeBlocks.RuleEntry;
+  'vitest/padding-around-expect-groups': PaddingAroundExpectGroups.RuleEntry;
+  'vitest/padding-around-test-blocks': PaddingAroundTestBlocks.RuleEntry;
+  'vitest/prefer-called-exactly-once-with': PreferCalledExactlyOnceWith.RuleEntry;
+  'vitest/prefer-called-once': PreferCalledOnce.RuleEntry;
+  'vitest/prefer-called-times': PreferCalledTimes.RuleEntry;
+  'vitest/prefer-called-with': PreferCalledWith.RuleEntry;
+  'vitest/prefer-comparison-matcher': PreferComparisonMatcher.RuleEntry;
+  'vitest/prefer-describe-function-title': PreferDescribeFunctionTitle.RuleEntry;
+  'vitest/prefer-each': PreferEach.RuleEntry;
+  'vitest/prefer-equality-matcher': PreferEqualityMatcher.RuleEntry;
+  'vitest/prefer-expect-assertions': PreferExpectAssertions.RuleEntry;
+  'vitest/prefer-expect-resolves': PreferExpectResolves.RuleEntry;
+  'vitest/prefer-expect-type-of': PreferExpectTypeOf.RuleEntry;
+  'vitest/prefer-hooks-in-order': PreferHooksInOrder.RuleEntry;
+  'vitest/prefer-hooks-on-top': PreferHooksOnTop.RuleEntry;
+  'vitest/prefer-import-in-mock': PreferImportInMock.RuleEntry;
+  'vitest/prefer-importing-vitest-globals': PreferImportingVitestGlobals.RuleEntry;
+  'vitest/prefer-lowercase-title': PreferLowercaseTitle.RuleEntry;
+  'vitest/prefer-mock-promise-shorthand': PreferMockPromiseShorthand.RuleEntry;
+  'vitest/prefer-mock-return-shorthand': PreferMockReturnShorthand.RuleEntry;
+  'vitest/prefer-snapshot-hint': PreferSnapshotHint.RuleEntry;
+  'vitest/prefer-spy-on': PreferSpyOn.RuleEntry;
+  'vitest/prefer-strict-boolean-matchers': PreferStrictBooleanMatchers.RuleEntry;
+  'vitest/prefer-strict-equal': PreferStrictEqual.RuleEntry;
+  'vitest/prefer-to-be-falsy': PreferToBeFalsy.RuleEntry;
+  'vitest/prefer-to-be-object': PreferToBeObject.RuleEntry;
+  'vitest/prefer-to-be-truthy': PreferToBeTruthy.RuleEntry;
+  'vitest/prefer-to-be': PreferToBe.RuleEntry;
+  'vitest/prefer-to-contain': PreferToContain.RuleEntry;
+  'vitest/prefer-to-have-been-called-times': PreferToHaveBeenCalledTimes.RuleEntry;
+  'vitest/prefer-to-have-length': PreferToHaveLength.RuleEntry;
+  'vitest/prefer-todo': PreferTodo.RuleEntry;
+  'vitest/prefer-vi-mocked': PreferViMocked.RuleEntry;
+  'vitest/require-awaited-expect-poll': RequireAwaitedExpectPoll.RuleEntry;
+  'vitest/require-hook': RequireHook.RuleEntry;
+  'vitest/require-local-test-context-for-concurrent-snapshots': RequireLocalTestContextForConcurrentSnapshots.RuleEntry;
+  'vitest/require-mock-type-parameters': RequireMockTypeParameters.RuleEntry;
+  'vitest/require-test-timeout': RequireTestTimeout.RuleEntry;
+  'vitest/require-to-throw-message': RequireToThrowMessage.RuleEntry;
+  'vitest/require-top-level-describe': RequireTopLevelDescribe.RuleEntry;
+  'vitest/unbound-method': UnboundMethod.RuleEntry;
+  'vitest/valid-describe-callback': ValidDescribeCallback.RuleEntry;
+  'vitest/valid-expect-in-promise': ValidExpectInPromise.RuleEntry;
+  'vitest/valid-expect': ValidExpect.RuleEntry;
+  'vitest/valid-title': ValidTitle.RuleEntry;
+  'vitest/warn-todo': WarnTodo.RuleEntry;
+
+  // deprecated
+  'vitest/no-done-callback': NoDoneCallback.RuleEntry;
+}>;
+
+export type EslintVitestRulesOption = Readonly<{
+  'vitest/consistent-each-for': ConsistentEachFor.Options;
+  'vitest/consistent-test-filename': ConsistentTestFilename.Options;
+  'vitest/consistent-test-it': ConsistentTestIt.Options;
+  'vitest/consistent-vitest-vi': ConsistentVitestVi.Options;
+  'vitest/expect-expect': ExpectExpect.Options;
+  'vitest/max-expects': MaxExpects.Options;
+  'vitest/max-nested-describe': MaxNestedDescribe.Options;
+  'vitest/no-conditional-expect': NoConditionalExpect.Options;
+  'vitest/no-focused-tests': NoFocusedTests.Options;
+  'vitest/no-hooks': NoHooks.Options;
+  'vitest/no-large-snapshots': NoLargeSnapshots.Options;
+  'vitest/no-restricted-matchers': NoRestrictedMatchers.Options;
+  'vitest/no-restricted-vi-methods': NoRestrictedViMethods.Options;
+  'vitest/no-standalone-expect': NoStandaloneExpect.Options;
+  'vitest/prefer-expect-assertions': PreferExpectAssertions.Options;
+  'vitest/prefer-import-in-mock': PreferImportInMock.Options;
+  'vitest/prefer-lowercase-title': PreferLowercaseTitle.Options;
+  'vitest/prefer-snapshot-hint': PreferSnapshotHint.Options;
+  'vitest/require-hook': RequireHook.Options;
+  'vitest/require-mock-type-parameters': RequireMockTypeParameters.Options;
+  'vitest/require-top-level-describe': RequireTopLevelDescribe.Options;
+  'vitest/unbound-method': UnboundMethod.Options;
+  'vitest/valid-expect': ValidExpect.Options;
+  'vitest/valid-title': ValidTitle.Options;
+}>;

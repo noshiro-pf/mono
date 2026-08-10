@@ -1,0 +1,37 @@
+import {
+  withDefaultOption,
+  type EslintReactHooksRules,
+} from '../types/index.mjs';
+
+export const eslintReactHooksRules = {
+  'react-hooks/rules-of-hooks': withDefaultOption('error'),
+  'react-hooks/exhaustive-deps': withDefaultOption('error'),
+  'react-hooks/hooks': withDefaultOption('error'),
+  'react-hooks/capitalized-calls': withDefaultOption('error'),
+  'react-hooks/static-components': withDefaultOption('error'),
+  'react-hooks/use-memo': withDefaultOption('error'),
+  'react-hooks/void-use-memo': withDefaultOption('error'),
+  'react-hooks/preserve-manual-memoization': withDefaultOption('error'),
+  'react-hooks/memo-dependencies': withDefaultOption('error'),
+  'react-hooks/incompatible-library': withDefaultOption('error'),
+  'react-hooks/immutability': withDefaultOption('error'),
+  'react-hooks/globals': withDefaultOption('error'),
+  'react-hooks/refs': withDefaultOption('error'),
+  'react-hooks/memoized-effect-dependencies': withDefaultOption('error'),
+  'react-hooks/exhaustive-effect-dependencies': withDefaultOption('error'),
+  'react-hooks/set-state-in-effect': withDefaultOption('error'),
+  'react-hooks/no-deriving-state-in-effects': withDefaultOption('error'),
+  'react-hooks/error-boundaries': withDefaultOption('error'),
+  'react-hooks/purity': withDefaultOption('error'),
+  'react-hooks/set-state-in-render': withDefaultOption('error'),
+  'react-hooks/invariant': withDefaultOption('error'),
+  'react-hooks/todo': withDefaultOption('error'),
+  'react-hooks/syntax': withDefaultOption('error'),
+  'react-hooks/unsupported-syntax': withDefaultOption('error'),
+  'react-hooks/config': withDefaultOption('error'),
+  'react-hooks/gating': withDefaultOption('error'),
+  'react-hooks/rule-suppression': withDefaultOption('error'),
+  'react-hooks/fbt': withDefaultOption('error'),
+  // deprecated
+  'react-hooks/component-hook-factories': 0,
+} as const satisfies EslintReactHooksRules;

@@ -1,0 +1,35 @@
+import { type RelaxedExclude } from 'ts-type-forge';
+
+export const toCapitalCase = (str: string): string =>
+  str
+    .replaceAll(/[-/]./gu, (x) => x.at(1)?.toUpperCase() ?? str) // "aaa-bbb" ->
+    .replace(/^./u, (x) => x.at(0)?.toUpperCase() ?? str);
+
+if (import.meta.vitest !== undefined) {
+  test(toCapitalCase, () => {
+    expect(toCapitalCase('aaa-bbb')).toBe('AaaBbb');
+
+    expect(toCapitalCase('aaa/bbb')).toBe('AaaBbb');
+  });
+}
+
+export const deepReplace = <T,>(obj: T, from: string, to: string): T => {
+  const s = JSON.stringify(obj);
+
+  const r = s.replaceAll(from, to);
+
+  const parsed: unknown = JSON.parse(r);
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  return parsed as T;
+};
+
+export const falseToUndefined = <T,>(
+  a: T,
+): RelaxedExclude<T, false> | undefined =>
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  (a === false ? undefined : a) as RelaxedExclude<T, false>;
+
+export const toStr: (v: unknown) => string = String;
+
+export const closeBraceRegexp = /\n\}\n/gu;

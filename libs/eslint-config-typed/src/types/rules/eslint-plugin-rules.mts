@@ -1,0 +1,1202 @@
+/* cSpell:disable */
+import { type Linter } from 'eslint';
+
+type SpreadOptionsIfIsArray<
+  T extends readonly [Linter.StringSeverity, unknown],
+> = T[1] extends readonly unknown[]
+  ? readonly [Linter.StringSeverity, ...T[1]]
+  : T;
+
+/**
+ * @description enforce consistent use of `output` assertions in rule tests
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/consistent-output.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ConsistentOutput {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "string",
+   *     "description": "Whether to enforce having output assertions 'always' or to be 'consistent' when some cases have them.",
+   *     "enum": [
+   *       "always",
+   *       "consistent"
+   *     ]
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * Whether to enforce having output assertions 'always' or to be 'consistent' when some cases have them.
+   */
+  export type Options = 'always' | 'consistent';
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require fixer functions to return a fix
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/fixer-return.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace FixerReturn {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce the order of meta properties
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/meta-property-ordering.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace MetaPropertyOrdering {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "array",
+   *     "description": "What order to enforce for meta properties.",
+   *     "items": {
+   *       "type": "string"
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * What order to enforce for meta properties.
+   */
+  export type Options = readonly string[];
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow usage of deprecated methods on rule context objects
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-deprecated-context-methods.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace NoDeprecatedContextMethods {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow the version of `context.report()` with multiple arguments
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-deprecated-report-api.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace NoDeprecatedReportApi {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow identical tests
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-identical-tests.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoIdenticalTests {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require explicit policy choices in rule options schemas
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-incomplete-meta-schema.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoIncompleteMetaSchema {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "checks": {
+   *         "type": "object",
+   *         "description": "Which schema completeness checks to enforce.",
+   *         "properties": {
+   *           "explicitAdditionalProperties": {
+   *             "type": "boolean",
+   *             "description": "Whether object schemas must state an additionalProperties policy."
+   *           },
+   *           "explicitItems": {
+   *             "type": "boolean",
+   *             "description": "Whether array schemas must state an items policy."
+   *           },
+   *           "typedItems": {
+   *             "type": "boolean",
+   *             "description": "Whether array item schemas must constrain their type."
+   *           },
+   *           "boundedTuples": {
+   *             "type": "boolean",
+   *             "description": "Whether tuple schemas must state how additional items are handled."
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Which schema completeness checks to enforce.
+     */
+    checks?: Readonly<{
+      /**
+       * Whether object schemas must state an additionalProperties policy.
+       */
+      explicitAdditionalProperties?: boolean;
+      /**
+       * Whether array schemas must state an items policy.
+       */
+      explicitItems?: boolean;
+      /**
+       * Whether array item schemas must constrain their type.
+       */
+      typedItems?: boolean;
+      /**
+       * Whether tuple schemas must state how additional items are handled.
+       */
+      boundedTuples?: boolean;
+    }>;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow rule options schema constructs that ESLint ignores
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-incorrect-meta-schema.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace NoIncorrectMetaSchema {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "checks": {
+   *         "type": "object",
+   *         "description": "Which ineffective-schema checks to enforce.",
+   *         "properties": {
+   *           "emptyRoot": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject an empty object-form schema."
+   *           },
+   *           "bareArrayRoot": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject an object-form schema that only asserts an array type."
+   *           },
+   *           "nonArrayRootType": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject an object-form schema that excludes arrays."
+   *           },
+   *           "nonConstrainingRoot": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject an object-form schema with no array-applicable keyword."
+   *           },
+   *           "ignoredKeywords": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject keywords ignored by ESLint’s configured Ajv."
+   *           },
+   *           "ignoredRefSiblings": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject constraint siblings ignored beside $ref."
+   *           },
+   *           "unresolvedRefs": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject references ESLint cannot resolve."
+   *           },
+   *           "ignoredAdditionalItems": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject additionalItems when items is not tuple-form."
+   *           },
+   *           "incompatibleTypeKeywords": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject keywords incompatible with the declared type."
+   *           },
+   *           "impossibleBounds": {
+   *             "type": "boolean",
+   *             "description": "Whether to reject contradictory minimum and maximum bounds."
+   *           }
+   *         },
+   *         "additionalProperties": false
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Which ineffective-schema checks to enforce.
+     */
+    checks?: Readonly<{
+      /**
+       * Whether to reject an empty object-form schema.
+       */
+      emptyRoot?: boolean;
+      /**
+       * Whether to reject an object-form schema that only asserts an array type.
+       */
+      bareArrayRoot?: boolean;
+      /**
+       * Whether to reject an object-form schema that excludes arrays.
+       */
+      nonArrayRootType?: boolean;
+      /**
+       * Whether to reject an object-form schema with no array-applicable keyword.
+       */
+      nonConstrainingRoot?: boolean;
+      /**
+       * Whether to reject keywords ignored by ESLint’s configured Ajv.
+       */
+      ignoredKeywords?: boolean;
+      /**
+       * Whether to reject constraint siblings ignored beside $ref.
+       */
+      ignoredRefSiblings?: boolean;
+      /**
+       * Whether to reject references ESLint cannot resolve.
+       */
+      unresolvedRefs?: boolean;
+      /**
+       * Whether to reject additionalItems when items is not tuple-form.
+       */
+      ignoredAdditionalItems?: boolean;
+      /**
+       * Whether to reject keywords incompatible with the declared type.
+       */
+      incompatibleTypeKeywords?: boolean;
+      /**
+       * Whether to reject contradictory minimum and maximum bounds.
+       */
+      impossibleBounds?: boolean;
+    }>;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require suggestions to have different `messageId` than their parent report
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-matching-violation-suggest-message-ids.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace NoMatchingViolationSuggestMessageIds {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow using the `meta.replacedBy` rule property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-meta-replaced-by.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoMetaReplacedBy {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow rules `meta.schema` properties to include defaults
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-meta-schema-default.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace NoMetaSchemaDefault {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow `messageId`s that are missing from `meta.messages`
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-missing-message-ids.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoMissingMessageIds {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow missing placeholders in rule report messages
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-missing-placeholders.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoMissingPlaceholders {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow the test case property `only`
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-only-tests.md
+ *
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | hasSuggestions | true    |
+ *  | recommended    | true    |
+ *  ```
+ */
+namespace NoOnlyTests {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow using `in` to narrow node types instead of looking at properties
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-property-in-node.md
+ *
+ *  ```md
+ *  | key                  | value      |
+ *  | :------------------- | :--------- |
+ *  | type                 | suggestion |
+ *  | deprecated           | false      |
+ *  | recommended          | false      |
+ *  | requiresTypeChecking | true       |
+ *  ```
+ */
+namespace NoPropertyInNode {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "additionalNodeTypeFiles": {
+   *         "description": "Any additional regular expressions to consider source files defining AST Node types.",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "type": "array"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Any additional regular expressions to consider source files defining AST Node types.
+     */
+    additionalNodeTypeFiles?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description disallow unused `messageId`s in `meta.messages`
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-unused-message-ids.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoUnusedMessageIds {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow unused placeholders in rule report messages
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-unused-placeholders.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace NoUnusedPlaceholders {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow unnecessary calls to `sourceCode.getFirstToken()` and `sourceCode.getLastToken()`
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/no-useless-token-range.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace NoUselessTokenRange {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require using `messageId` instead of `message` or `desc` to report rule violations
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-message-ids.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace PreferMessageIds {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow function-style rules
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-object-rule.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace PreferObjectRule {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description disallow invalid RuleTester test cases where the `output` matches the `code`
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-output-null.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace PreferOutputNull {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require using placeholders for dynamic report messages
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-placeholders.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferPlaceholders {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require using `replaceText()` instead of `replaceTextRange()`
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/prefer-replace-text.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace PreferReplaceText {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description enforce a consistent format for rule report messages
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/report-message-format.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace ReportMessageFormat {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "description": "Format that all report messages must match.",
+   *     "type": "string"
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * Format that all report messages must match.
+   */
+  export type Options = string;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require only rules with options to implement a `meta.defaultOptions` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-default-options.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace RequireMetaDefaultOptions {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require rules to implement a `meta.docs.description` property with the correct format
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-docs-description.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireMetaDocsDescription {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "pattern": {
+   *         "type": "string",
+   *         "description": "A regular expression that the description must match. Use `'.+'` to allow anything."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * A regular expression that the description must match. Use `'.+'` to allow anything.
+     */
+    pattern?: string;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require rules to implement a `meta.docs.recommended` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-docs-recommended.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | false      |
+ *  ```
+ */
+namespace RequireMetaDocsRecommended {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowNonBoolean": {
+   *         "description": "Whether to allow values of types other than boolean.",
+   *         "type": "boolean"
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether to allow values of types other than boolean.
+     */
+    allowNonBoolean?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require rules to implement a `meta.docs.url` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-docs-url.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireMetaDocsUrl {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "pattern": {
+   *         "type": "string",
+   *         "description": "A pattern to enforce rule's document URL. It replaces `{{name}}` placeholder by each rule name. The rule name is the basename of each rule file. Omitting this allows any URL."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * A pattern to enforce rule's document URL. It replaces `{{name}}` placeholder by each rule name. The rule name is the basename of each rule file. Omitting this allows any URL.
+     */
+    pattern?: string;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require rules to implement a `meta.fixable` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-fixable.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace RequireMetaFixable {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "catchNoFixerButFixableProperty": {
+   *         "type": "boolean",
+   *         "description": "Whether the rule should attempt to detect rules that do not have a fixer but enable the `meta.fixable` property. This option is off by default because it increases the chance of false positives since fixers can't always be detected when helper functions are used."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether the rule should attempt to detect rules that do not have a fixer but enable the `meta.fixable` property. This option is off by default because it increases the chance of false positives since fixers can't always be detected when helper functions are used.
+     */
+    catchNoFixerButFixableProperty?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require suggestable rules to implement a `meta.hasSuggestions` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-has-suggestions.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | fixable     | code    |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace RequireMetaHasSuggestions {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require rules to implement a `meta.languages` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-languages.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | false   |
+ *  ```
+ */
+namespace RequireMetaLanguages {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require rules `meta.schema` properties to include descriptions
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-schema-description.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
+ *  ```
+ */
+namespace RequireMetaSchemaDescription {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require rules to implement a `meta.schema` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-schema.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  | recommended    | true       |
+ *  ```
+ */
+namespace RequireMetaSchema {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "requireSchemaPropertyWhenOptionless": {
+   *         "type": "boolean",
+   *         "description": "Whether the rule should require the `meta.schema` property to be specified (with `schema: []`) for rules that have no options."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Whether the rule should require the `meta.schema` property to be specified (with `schema: []`) for rules that have no options.
+     */
+    requireSchemaPropertyWhenOptionless?: boolean;
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description require rules to implement a `meta.type` property
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-meta-type.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ */
+namespace RequireMetaType {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require test cases to have a `name` property under certain conditions
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-test-case-name.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTestCaseName {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "additionalProperties": false,
+   *     "properties": {
+   *       "require": {
+   *         "description": "When should the name property be required on a test case object.",
+   *         "enum": [
+   *           "always",
+   *           "objects",
+   *           "objects-with-config"
+   *         ]
+   *       }
+   *     },
+   *     "type": "object"
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * When should the name property be required on a test case object.
+     */
+    require?: 'always' | 'objects' | 'objects-with-config';
+  }>;
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description requires the position of errors to be explicitly stated for all expected errors
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/require-test-error-positions.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace RequireTestErrorPositions {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description require the properties of a test case to be placed in a consistent order
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/test-case-property-ordering.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace TestCasePropertyOrdering {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "array",
+   *     "description": "What order to enforce for test case properties.",
+   *     "items": {
+   *       "type": "string"
+   *     }
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * What order to enforce for test case properties.
+   */
+  export type Options = readonly string[];
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce consistent usage of shorthand strings for test cases with no options
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/test-case-shorthand-strings.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | fixable     | code       |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace TestCaseShorthandStrings {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "description": "What behavior to enforce of when shorthand strings should be banned or required.",
+   *     "enum": [
+   *       "as-needed",
+   *       "never",
+   *       "consistent",
+   *       "consistent-as-needed"
+   *     ]
+   *   }
+   * ]
+   * ```
+   */
+  /**
+   * What behavior to enforce of when shorthand strings should be banned or required.
+   */
+  export type Options =
+    'as-needed' | 'never' | 'consistent' | 'consistent-as-needed';
+
+  export type RuleEntry =
+    | 'off'
+    | Linter.Severity
+    | SpreadOptionsIfIsArray<readonly [Linter.StringSeverity, Options]>;
+}
+
+/**
+ * @description enforce that all test cases with names have unique names
+ * @link https://github.com/eslint-community/eslint-plugin-eslint-plugin/tree/HEAD/docs/rules/unique-test-case-names.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | false      |
+ *  ```
+ */
+namespace UniqueTestCaseNames {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+export type EslintPluginRules = Readonly<{
+  'eslint-plugin/consistent-output': ConsistentOutput.RuleEntry;
+  'eslint-plugin/fixer-return': FixerReturn.RuleEntry;
+  'eslint-plugin/meta-property-ordering': MetaPropertyOrdering.RuleEntry;
+  'eslint-plugin/no-deprecated-context-methods': NoDeprecatedContextMethods.RuleEntry;
+  'eslint-plugin/no-deprecated-report-api': NoDeprecatedReportApi.RuleEntry;
+  'eslint-plugin/no-identical-tests': NoIdenticalTests.RuleEntry;
+  'eslint-plugin/no-incomplete-meta-schema': NoIncompleteMetaSchema.RuleEntry;
+  'eslint-plugin/no-incorrect-meta-schema': NoIncorrectMetaSchema.RuleEntry;
+  'eslint-plugin/no-matching-violation-suggest-message-ids': NoMatchingViolationSuggestMessageIds.RuleEntry;
+  'eslint-plugin/no-meta-replaced-by': NoMetaReplacedBy.RuleEntry;
+  'eslint-plugin/no-meta-schema-default': NoMetaSchemaDefault.RuleEntry;
+  'eslint-plugin/no-missing-message-ids': NoMissingMessageIds.RuleEntry;
+  'eslint-plugin/no-missing-placeholders': NoMissingPlaceholders.RuleEntry;
+  'eslint-plugin/no-only-tests': NoOnlyTests.RuleEntry;
+  'eslint-plugin/no-property-in-node': NoPropertyInNode.RuleEntry;
+  'eslint-plugin/no-unused-message-ids': NoUnusedMessageIds.RuleEntry;
+  'eslint-plugin/no-unused-placeholders': NoUnusedPlaceholders.RuleEntry;
+  'eslint-plugin/no-useless-token-range': NoUselessTokenRange.RuleEntry;
+  'eslint-plugin/prefer-message-ids': PreferMessageIds.RuleEntry;
+  'eslint-plugin/prefer-object-rule': PreferObjectRule.RuleEntry;
+  'eslint-plugin/prefer-output-null': PreferOutputNull.RuleEntry;
+  'eslint-plugin/prefer-placeholders': PreferPlaceholders.RuleEntry;
+  'eslint-plugin/prefer-replace-text': PreferReplaceText.RuleEntry;
+  'eslint-plugin/report-message-format': ReportMessageFormat.RuleEntry;
+  'eslint-plugin/require-meta-default-options': RequireMetaDefaultOptions.RuleEntry;
+  'eslint-plugin/require-meta-docs-description': RequireMetaDocsDescription.RuleEntry;
+  'eslint-plugin/require-meta-docs-recommended': RequireMetaDocsRecommended.RuleEntry;
+  'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.RuleEntry;
+  'eslint-plugin/require-meta-fixable': RequireMetaFixable.RuleEntry;
+  'eslint-plugin/require-meta-has-suggestions': RequireMetaHasSuggestions.RuleEntry;
+  'eslint-plugin/require-meta-languages': RequireMetaLanguages.RuleEntry;
+  'eslint-plugin/require-meta-schema-description': RequireMetaSchemaDescription.RuleEntry;
+  'eslint-plugin/require-meta-schema': RequireMetaSchema.RuleEntry;
+  'eslint-plugin/require-meta-type': RequireMetaType.RuleEntry;
+  'eslint-plugin/require-test-case-name': RequireTestCaseName.RuleEntry;
+  'eslint-plugin/require-test-error-positions': RequireTestErrorPositions.RuleEntry;
+  'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.RuleEntry;
+  'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.RuleEntry;
+  'eslint-plugin/unique-test-case-names': UniqueTestCaseNames.RuleEntry;
+}>;
+
+export type EslintPluginRulesOption = Readonly<{
+  'eslint-plugin/consistent-output': ConsistentOutput.Options;
+  'eslint-plugin/meta-property-ordering': MetaPropertyOrdering.Options;
+  'eslint-plugin/no-incomplete-meta-schema': NoIncompleteMetaSchema.Options;
+  'eslint-plugin/no-incorrect-meta-schema': NoIncorrectMetaSchema.Options;
+  'eslint-plugin/no-property-in-node': NoPropertyInNode.Options;
+  'eslint-plugin/report-message-format': ReportMessageFormat.Options;
+  'eslint-plugin/require-meta-docs-description': RequireMetaDocsDescription.Options;
+  'eslint-plugin/require-meta-docs-recommended': RequireMetaDocsRecommended.Options;
+  'eslint-plugin/require-meta-docs-url': RequireMetaDocsUrl.Options;
+  'eslint-plugin/require-meta-fixable': RequireMetaFixable.Options;
+  'eslint-plugin/require-meta-schema': RequireMetaSchema.Options;
+  'eslint-plugin/require-test-case-name': RequireTestCaseName.Options;
+  'eslint-plugin/test-case-property-ordering': TestCasePropertyOrdering.Options;
+  'eslint-plugin/test-case-shorthand-strings': TestCaseShorthandStrings.Options;
+}>;
