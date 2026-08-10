@@ -282,4 +282,7 @@ describe('check-destructuring-completeness', () => {
       ],
     },
   );
-}, 20000);
+  // Typed RuleTester cases build a TypeScript program per case. On its own
+  // this file finishes in ~6s with coverage, but it is scheduled alongside
+  // the package's other 37 coverage-instrumented files and can starve.
+}, 60000);

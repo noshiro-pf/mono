@@ -34,6 +34,12 @@ const config = () =>
             name: 'Browser',
             alias: aliasMap,
             ...projectConfig({ additionalExcludes: ['samples/**/*'] }),
+            // Browser mode fetches each test file over the Vite dev server.
+            // Requesting them concurrently intermittently fails with "Failed to
+            // fetch dynamically imported module" for an arbitrary file, and
+            // vitest's `retry` cannot help: the file never loads, so there is no
+            // test to retry. Requesting them one at a time removes the race.
+            fileParallelism: false,
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,

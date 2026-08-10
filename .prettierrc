@@ -12,6 +12,15 @@
       "options": {
         "tabWidth": 4
       }
+    },
+    {
+      "files": ["libs/eslint-config-typed/src/types/rules/*.mts"],
+      "options": {
+        "plugins": [
+          "prettier-plugin-organize-imports",
+          "prettier-plugin-packagejson"
+        ]
+      }
     }
   ]
 }

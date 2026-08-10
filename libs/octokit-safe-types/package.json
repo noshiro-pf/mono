@@ -52,6 +52,7 @@
     "codemod:full:readonly": "convert-to-readonly '{src,scripts,samples}/**/*.mts'",
     "codemod:uncommitted:as-const": "append-as-const --uncommitted '{src,scripts,samples}/**/*.mts'",
     "codemod:uncommitted:readonly": "convert-to-readonly --uncommitted '{src,scripts,samples}/**/*.mts'",
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "fmt": "format-uncommitted",
     "fmt:diff": "format-diff-from origin/main",
