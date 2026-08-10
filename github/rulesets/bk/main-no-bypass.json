@@ -1,13 +1,13 @@
 {
-  "id": 10248894,
-  "name": "Copilot review for default branch",
+  "id": 20654736,
+  "name": "main-no-bypass",
   "target": "branch",
   "enforcement": "active",
   "bypass_actors": [],
   "conditions": {
     "ref_name": {
       "exclude": [],
-      "include": ["~DEFAULT_BRANCH"]
+      "include": ["~DEFAULT_BRANCH", "refs/heads/main"]
     }
   },
   "rules": [
@@ -18,11 +18,10 @@
       "type": "non_fast_forward"
     },
     {
-      "type": "copilot_code_review",
-      "parameters": {
-        "review_on_push": false,
-        "review_draft_pull_requests": false
-      }
+      "type": "required_linear_history"
+    },
+    {
+      "type": "creation"
     }
   ]
 }
