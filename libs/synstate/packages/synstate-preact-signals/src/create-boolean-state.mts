@@ -34,7 +34,7 @@ export const createBooleanState = (
   initialState: boolean,
 ): readonly [
   signal: ReadonlySignal<boolean>,
-  Readonly<{
+  utils: Readonly<{
     state: InitializedObservable<boolean>;
     setTrue: () => void;
     setFalse: () => void;

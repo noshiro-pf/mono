@@ -36,7 +36,7 @@ import { type CounterObservable, type TimerId } from '../types/index.mjs';
  *
  * subscription.unsubscribe();
  *
- * assert.isTrue(Arr.isArrayAtLeastLength(valueHistory, 3));
+ * assert.isTrue(Arr.isMinLengthArray(3, valueHistory));
  *
  * assert.deepStrictEqual(valueHistory[0], 0);
  *
@@ -84,6 +84,16 @@ class CounterObservableClass
     }
   }
 
+  #resetTimer(): void {
+    if (this.#mut_timerId0 === undefined || this.#mut_timerId === undefined) {
+      return;
+    }
+
+    clearInterval(this.#mut_timerId0);
+
+    clearInterval(this.#mut_timerId);
+  }
+
   start(): void {
     if (this.#mut_isStarted) {
       console.warn('cannot start twice');
@@ -108,14 +118,6 @@ class CounterObservableClass
 
       this.startUpdate(this.#mut_counter);
     }, this.#intervalMilliSeconds);
-  }
-
-  #resetTimer(): void {
-    if (this.#mut_timerId0 !== undefined && this.#mut_timerId !== undefined) {
-      clearInterval(this.#mut_timerId0);
-
-      clearInterval(this.#mut_timerId);
-    }
   }
 
   override complete(): void {

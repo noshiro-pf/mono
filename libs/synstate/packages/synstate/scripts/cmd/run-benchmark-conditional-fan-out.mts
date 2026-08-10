@@ -23,6 +23,7 @@
  */
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { range } from 'ts-data-forge';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
@@ -68,24 +69,51 @@ const median = (sorted: readonly number[]): number => {
     : (sorted[mid] ?? 0);
 };
 
-console.log(
+console.info(
   `\n## Conditional Fan-Out (K=${String(K)} inactive-branch updates, ${String(WARMUP_ROUNDS)} warmup + ${String(MEASURE_ROUNDS)} measured, timeout=${String(TIMEOUT_MS)} ms)\n`,
 );
 
-// Column headers
-const colHeaders = BRANCH_COUNTS.map((b) => `B=${String(b)}`);
+/**
+ * Runs the measured rounds for a single branch count, bailing out as soon as a
+ * round exceeds the timeout. Extracted into its own function so that the round
+ * loop is not nested inside the entry/branch-count loops.
+ */
+const measureRounds = (
+  mod: BenchmarkModule,
+  branchCount: number,
+): Readonly<{ times: readonly number[]; timedOut: boolean }> => {
+  const mut_times: number[] = [];
 
-const mut_tableLines: string[] = [
-  `| Library | ${colHeaders.join(' | ')} |`,
-  `| ------- | ${BRANCH_COUNTS.map(() => '----------:').join(' | ')} |`,
-];
+  let mut_timedOut = false;
 
-for (const entry of entries) {
-  const filePath = path.resolve(benchmarkDir, entry.file);
+  for (const _r of range(0, MEASURE_ROUNDS)) {
+    const t0 = performance.now();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const mod: BenchmarkModule = await import(filePath);
+    mod.runBenchmark(K, branchCount);
 
+    const elapsed = performance.now() - t0;
+
+    mut_times.push(elapsed);
+
+    if (elapsed > TIMEOUT_MS) {
+      mut_timedOut = true;
+
+      break;
+    }
+  }
+
+  return { times: mut_times, timedOut: mut_timedOut };
+};
+
+/**
+ * Measures every branch count for a single benchmark entry. Extracted into its
+ * own function so that the branch-count loop is not nested inside the entry
+ * loop.
+ */
+const measureEntry = (
+  entry: BenchmarkEntry,
+  mod: BenchmarkModule,
+): readonly string[] => {
   const mut_cells: string[] = [];
 
   let mut_skippingRest = false;
@@ -110,60 +138,59 @@ for (const entry of entries) {
     }
 
     // Warmup
-    // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
-    for (let mut_w = 0; mut_w < WARMUP_ROUNDS; mut_w++) {
+    for (const _w of range(0, WARMUP_ROUNDS)) {
       mod.runBenchmark(K, branchCount);
     }
 
     // Measure
-    const mut_times: number[] = [];
+    const { times, timedOut } = measureRounds(mod, branchCount);
 
-    let mut_timedOut = false;
-
-    // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
-    for (let mut_r = 0; mut_r < MEASURE_ROUNDS; mut_r++) {
-      const t0 = performance.now();
-
-      mod.runBenchmark(K, branchCount);
-
-      const elapsed = performance.now() - t0;
-
-      mut_times.push(elapsed);
-
-      if (elapsed > TIMEOUT_MS) {
-        mut_timedOut = true;
-
-        break;
-      }
-    }
-
-    if (mut_timedOut) {
+    if (timedOut) {
       mut_cells.push(`> ${String(TIMEOUT_MS)} ms`);
 
       mut_skippingRest = true;
 
-      console.log(
+      console.info(
         `  ⏱ ${entry.label} B=${String(branchCount)}: TIMEOUT (> ${String(TIMEOUT_MS)} ms)`,
       );
     } else {
-      const sorted = mut_times.toSorted((a, b) => a - b);
+      const sorted = times.toSorted((a, b) => a - b);
 
       const med = median(sorted);
 
       mut_cells.push(`${med.toFixed(1)} ms`);
 
-      console.log(
+      console.info(
         `  ✓ ${entry.label} B=${String(branchCount)}: ${med.toFixed(1)} ms`,
       );
     }
   }
 
-  mut_tableLines.push(`| ${entry.label} | ${mut_cells.join(' | ')} |`);
+  return mut_cells;
+};
+
+// Column headers
+const colHeaders = BRANCH_COUNTS.map((b) => `B=${String(b)}`);
+
+const mut_tableLines: string[] = [
+  `| Library | ${colHeaders.join(' | ')} |`,
+  `| ------- | ${BRANCH_COUNTS.map(() => '----------:').join(' | ')} |`,
+];
+
+for (const entry of entries) {
+  const filePath = path.resolve(benchmarkDir, entry.file);
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const mod: BenchmarkModule = await import(filePath);
+
+  const cells = measureEntry(entry, mod);
+
+  mut_tableLines.push(`| ${entry.label} | ${cells.join(' | ')} |`);
 }
 
 const tableContent = mut_tableLines.join('\n');
 
-console.log(`\n${tableContent}`);
+console.info(`\n${tableContent}`);
 
 const resultsPath = path.resolve(
   benchmarkDir,
@@ -173,4 +200,4 @@ const resultsPath = path.resolve(
 // eslint-disable-next-line security/detect-non-literal-fs-filename
 await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
 
-console.log(`\n✓ Results written to ${resultsPath}`);
+console.info(`\n✓ Results written to ${resultsPath}`);

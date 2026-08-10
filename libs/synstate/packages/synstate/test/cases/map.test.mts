@@ -1,5 +1,5 @@
 import { tp } from 'ts-data-forge';
-import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import { counter, map, take, type Observable } from '../../src/index.mjs';
 import { getStreamHistoryAsPromise } from '../get-stream-history-as-promise.mjs';
 import { testStream } from '../test-stream.mjs';
@@ -10,7 +10,7 @@ const createStreams = (
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
-  doubleWithIndex$: Observable<readonly [number, number]>;
+  doubleWithIndex$: Observable<FixedLengthTuple<2, number>>;
   quad1$: Observable<number>;
   quad2$: Observable<number>;
 }> => {
@@ -36,7 +36,7 @@ const createStreams = (
 };
 
 export const mapTestCases: readonly StreamTestCase<
-  readonly [number, number] | number
+  FixedLengthTuple<2, number> | number
 >[] = [
   {
     name: 'mapWithIndex case 1',
@@ -53,7 +53,7 @@ export const mapTestCases: readonly StreamTestCase<
       [9, 18],
       [10, 20],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
       const { startSource, doubleWithIndex$ } = createStreams(tick);
 
       return getStreamHistoryAsPromise(doubleWithIndex$, startSource);

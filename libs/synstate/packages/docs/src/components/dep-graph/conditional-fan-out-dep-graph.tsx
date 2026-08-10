@@ -33,7 +33,7 @@ const nodes: readonly NodeDef[] = [
   {
     id: 'branch0',
     label: 'branch[0]',
-    sublabel: '(source: 0) \u2190 active',
+    sublabel: '(source: 0) \u{2190} active',
     color: '#3b82f6',
     col: 0,
     row: 1,
@@ -48,7 +48,7 @@ const nodes: readonly NodeDef[] = [
   },
   {
     id: 'branchN',
-    label: 'branch[B\u22121]',
+    label: 'branch[B\u{2212}1]',
     sublabel: '(source: 0)',
     color: '#94a3b8',
     col: 0,
@@ -57,7 +57,7 @@ const nodes: readonly NodeDef[] = [
   {
     id: 'result',
     label: 'result',
-    sublabel: 'combine \u2192 map',
+    sublabel: 'combine \u{2192} map',
     color: '#818cf8',
     col: 1,
     row: 2,

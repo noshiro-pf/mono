@@ -1,5 +1,5 @@
 import { Arr, Optional, createQueue, expectType } from 'ts-data-forge';
-import { type NonEmptyArray } from 'ts-type-forge';
+import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
@@ -65,7 +65,7 @@ import {
  * ]);
  * ```
  */
-export const zip = <const OS extends NonEmptyArray<Observable<unknown>>>(
+export const zip = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): ZipObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -78,21 +78,30 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
   readonly #queues: TupleToQueueTuple<A>;
 
   constructor(parents: Wrap<A>) {
-    const parentsValues = parents.map((p) => p.getSnapshot());
+    const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
+      parents,
+      (p) => p.getSnapshot(),
+    );
+
+    // The annotation on `initialValue` is what replaces the type assertion.
+    // `Arr.map` carries a single result element type, so it reports `A[number]`
+    // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
+    // — is *not* assignable back to `A`. The positional
+    // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
+    // uniform result into it because the two mapped types share `keyof A`. So
+    // it is the annotation, not an assertion, that records the position-wise
+    // fact the checker cannot derive on its own.
+    const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> =
+      Arr.every(parentsValues, Optional.isSome)
+        ? Optional.some(Arr.map(parentsValues, (c) => c.value))
+        : Optional.none;
 
     super({
       parents,
-      initialValue: parentsValues.every(Optional.isSome)
-        ? Optional.some(
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            Arr.map(parentsValues, (c) => c.value) as A,
-          )
-        : Optional.none,
+      initialValue,
     });
 
-    this.#queues = Arr.map(parents, () =>
-      createQueue(),
-    ) satisfies TupleToQueueTuple<A>;
+    this.#queues = Arr.map(parents, () => createQueue());
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
@@ -108,6 +117,8 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
 
     if (queues.every((list) => !list.isEmpty)) {
       const nextValue =
+        // `Arr.map` has a single result element type, so it reports
+        // `A[number] | undefined` per position rather than `A[P]`.
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
         Arr.map(queues, (q) => Optional.unwrap(q.dequeue())) as A;
 
@@ -160,7 +171,7 @@ if (import.meta.vitest !== undefined) {
 
   const r2 = source('a');
 
-  const _z = zip([r1, r2] as const);
+  const _z = zip([r1, r2]);
 
   const _zi = zip([
     r1.pipe(withInitialValue(0)),

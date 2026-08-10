@@ -43,7 +43,7 @@ export const createReducer = <S, A>(
 ): readonly [
   signal: ReadonlySignal<S>,
   dispatch: (action: A) => S,
-  Readonly<{
+  utils: Readonly<{
     state: InitializedObservable<S>;
     getSnapshot: () => S;
     initialState: S;

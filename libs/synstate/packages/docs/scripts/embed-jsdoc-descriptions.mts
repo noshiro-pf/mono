@@ -251,7 +251,7 @@ const processRefDir = async (
     }
 
     if (replaced.result === markdown) {
-      console.log(`· [${label}] Already up to date: ${mdFileName}`);
+      console.info(`· [${label}] Already up to date: ${mdFileName}`);
 
       continue;
     }
@@ -259,7 +259,7 @@ const processRefDir = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(mdPath, replaced.result, 'utf8');
 
-    console.log(
+    console.info(
       `✓ [${label}] Embedded JSDoc description for ${funcName} → ${mdFileName}`,
     );
   }
@@ -339,7 +339,7 @@ const embedSourceLinks = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(mdPath, replaced.result, 'utf8');
 
-    console.log(`✓ [${label}] Embedded source link → ${mdFileName}`);
+    console.info(`✓ [${label}] Embedded source link → ${mdFileName}`);
   }
 };
 

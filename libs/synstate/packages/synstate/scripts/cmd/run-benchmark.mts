@@ -76,7 +76,7 @@ const formatNumber = (n: number): string =>
   n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
 const runScenario = async (scenario: Scenario): Promise<void> => {
-  console.log(
+  console.info(
     `\n## ${scenario.title} (N=${formatNumber(N)}, ${WARMUP_ROUNDS} warmup + ${MEASURE_ROUNDS} measured rounds)\n`,
   );
 
@@ -121,10 +121,10 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
 
     mut_results.push({ name: entry.name, times: mut_times });
 
-    console.log(`  ✓ ${entry.name} done`);
+    console.info(`  ✓ ${entry.name} done`);
   }
 
-  console.log('');
+  console.info('');
 
   // Build Markdown table
   const mut_tableLines: string[] = [
@@ -155,7 +155,7 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
   const tableContent = mut_tableLines.join('\n');
 
   // Print to console
-  console.log(tableContent);
+  console.info(tableContent);
 
   // Write to file for docs embedding
   const resultsPath = path.resolve(benchmarkDir, scenario.resultsFile);
@@ -163,7 +163,7 @@ const runScenario = async (scenario: Scenario): Promise<void> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
 
-  console.log(`\n✓ Results written to ${resultsPath}`);
+  console.info(`\n✓ Results written to ${resultsPath}`);
 };
 
 for (const scenario of scenarios) {

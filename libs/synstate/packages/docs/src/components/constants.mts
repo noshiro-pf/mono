@@ -1,3 +1,5 @@
+import { type ReadonlyRecord } from 'ts-type-forge';
+
 /**
  * Marble color definitions with optimal text color (black or white) */
 export const colors = {
@@ -9,7 +11,7 @@ export const colors = {
   red: { fill: 'rgb(231, 76, 60)', text: '#fff' },
   gray: { fill: 'rgb(136, 136, 136)', text: '#fff' },
   teal: { fill: 'rgb(26, 188, 156)', text: '#fff' },
-} as const satisfies Readonly<Record<string, MarbleColor>>;
+} as const satisfies ReadonlyRecord<string, MarbleColor>;
 
 export type MarbleColor = Readonly<{
   fill: string;

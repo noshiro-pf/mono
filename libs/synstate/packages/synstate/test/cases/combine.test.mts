@@ -1,4 +1,4 @@
-import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   combine,
   counter,
@@ -32,7 +32,7 @@ const createStreams = (
   quad$: Observable<number>;
   square$: Observable<number>;
   squareEven$: Observable<number>;
-  combined$: Observable<readonly [number, number, number, number, number]>;
+  combined$: Observable<FixedLengthTuple<5, number>>;
 }> => {
   const counter$ = counter(tick, { startManually: true });
 
@@ -88,7 +88,7 @@ const createStreams2 = (
 };
 
 export const combineTestCases: readonly [
-  StreamTestCase<readonly [number, number, number, number, number]>,
+  StreamTestCase<FixedLengthTuple<5, number>>,
   StreamTestCase<number>,
 ] = [
   {
@@ -105,9 +105,7 @@ export const combineTestCases: readonly [
       [8, 16, 32, 64, 64],
       [9, 18, 36, 81, 64],
     ],
-    run: (
-      tick: number,
-    ): Promise<DeepReadonly<[number, number, number, number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<5, number>[]> => {
       const { startSource, combined$ } = createStreams(tick);
 
       return getStreamHistoryAsPromise(combined$, startSource);

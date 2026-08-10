@@ -119,7 +119,7 @@ export const DepGraph = React.memo<Props>((props) => {
               stroke={'var(--sl-color-gray-3, #6b7280)'}
               strokeWidth={1.5}
             />
-            {e.label !== undefined && labelPos !== undefined ? (
+            {labelPos !== undefined && e.label !== undefined ? (
               <>
                 <rect
                   fill={'var(--sl-color-bg, #fff)'}

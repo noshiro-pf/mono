@@ -1,8 +1,4 @@
-import {
-  type ArrayOfLength,
-  type DeepReadonly,
-  type SafeUint,
-} from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   counter,
   pairwise,
@@ -19,7 +15,7 @@ const createStreams = (
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
-  pairwise$: Observable<readonly [number, number]>;
+  pairwise$: Observable<FixedLengthTuple<2, number>>;
 }> => {
   const counter$ = counter(tick, { startManually: true });
 
@@ -41,7 +37,7 @@ const createStreams2 = (
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint | -1>;
-  pairwise$: Observable<readonly [number, number]>;
+  pairwise$: Observable<FixedLengthTuple<2, number>>;
 }> => {
   const counter$ = counter(tick, { startManually: true });
 
@@ -58,9 +54,9 @@ const createStreams2 = (
   };
 };
 
-export const pairwiseTestCases: ArrayOfLength<
+export const pairwiseTestCases: FixedLengthTuple<
   2,
-  StreamTestCase<readonly [number, number]>
+  StreamTestCase<FixedLengthTuple<2, number>>
 > = [
   {
     name: 'pairwise case 1',
@@ -71,7 +67,7 @@ export const pairwiseTestCases: ArrayOfLength<
       [3, 4],
       [4, 5],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
       const { startSource, pairwise$ } = createStreams(tick);
 
       return getStreamHistoryAsPromise(pairwise$, startSource);
@@ -100,7 +96,7 @@ export const pairwiseTestCases: ArrayOfLength<
       [3, 4],
       [4, 5],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
       const { startSource, pairwise$ } = createStreams2(tick);
 
       return getStreamHistoryAsPromise(pairwise$, startSource);

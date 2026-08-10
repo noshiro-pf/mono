@@ -77,29 +77,33 @@ const replacePlaceholder = (
     'gsu',
   );
 
+  // Replacer functions are used so that `$&`, `$1`, ... inside `replacement`
+  // are treated as literal text rather than substitution patterns.
   return content
     .replace(
       htmlPattern,
-      `<!-- bundle-size:${name} -->${replacement}<!-- /bundle-size:${name} -->`,
+      () =>
+        `<!-- bundle-size:${name} -->${replacement}<!-- /bundle-size:${name} -->`,
     )
     .replace(
       jsxPattern,
-      `{/* bundle-size:${name} */}${replacement}{/* /bundle-size:${name} */}`,
+      () =>
+        `{/* bundle-size:${name} */}${replacement}{/* /bundle-size:${name} */}`,
     );
 };
 
 const embedBundleSize = async (): Promise<void> => {
   // Measure synstate
-  console.log('Measuring bundle size for synstate...');
+  console.info('Measuring bundle size for synstate...');
 
   const synstate = await measureBundleSize(synstateDistPath, ['ts-data-forge']);
 
-  console.log(
+  console.info(
     `  synstate: ${formatKB(synstate.minifiedBytes)} kB minified, ${formatKB(synstate.gzippedBytes)} kB gzipped`,
   );
 
   // Measure synstate-react-hooks
-  console.log('Measuring bundle size for synstate-react-hooks...');
+  console.info('Measuring bundle size for synstate-react-hooks...');
 
   const reactHooks = await measureBundleSize(reactHooksDistPath, [
     'ts-data-forge',
@@ -107,7 +111,7 @@ const embedBundleSize = async (): Promise<void> => {
     'react',
   ]);
 
-  console.log(
+  console.info(
     `  synstate-react-hooks: ${formatKB(reactHooks.minifiedBytes)} kB minified, ${formatKB(reactHooks.gzippedBytes)} kB gzipped`,
   );
 
@@ -131,7 +135,7 @@ const embedBundleSize = async (): Promise<void> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(mdPath, mut_content, 'utf8');
 
-    console.log(`✓ Updated bundle size in ${path.basename(mdPath)}`);
+    console.info(`✓ Updated bundle size in ${path.basename(mdPath)}`);
   }
 };
 

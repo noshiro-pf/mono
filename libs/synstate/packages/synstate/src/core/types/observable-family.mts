@@ -1,7 +1,8 @@
 import { expectType, type Result } from 'ts-data-forge';
 import {
   type ArrayElement,
-  type NonEmptyArray,
+  type FixedLengthTuple,
+  type NonEmptyTuple,
   type SafeUint,
 } from 'ts-type-forge';
 import {
@@ -63,8 +64,8 @@ export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
 namespace SynStateInternals {
   type Cast<A> = A extends NonEmptyUnknownList ? A : never;
 
-  type EveryInitialized<OS extends NonEmptyArray<Observable<unknown>>> =
-    OS extends NonEmptyArray<InitializedObservable<unknown>> ? true : false;
+  type EveryInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
+    OS extends NonEmptyTuple<InitializedObservable<unknown>> ? true : false;
 
   type IsInitialized<O> = readonly [O] extends readonly [
     InitializedObservable<unknown>,
@@ -83,7 +84,7 @@ namespace SynStateInternals {
     // union distribution
     LogicalValue<OS extends OS ? IsInitialized<OS> : never>;
 
-  type SomeInitialized<OS extends NonEmptyArray<Observable<unknown>>> =
+  type SomeInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
     SomeInitializedImpl<OS[number]>;
 
   expectType<EveryInitialized<readonly [Observable<1>]>, false>('=');
@@ -125,7 +126,7 @@ namespace SynStateInternals {
     SyncChildObservable<A, A>;
 
   export type CombineObservableRefinedImpl<
-    OS extends NonEmptyArray<Observable<unknown>>,
+    OS extends NonEmptyTuple<Observable<unknown>>,
   > =
     EveryInitialized<OS> extends true
       ? InitializedCombineObservableImpl<Cast<Unwrap<OS>>>
@@ -138,7 +139,7 @@ namespace SynStateInternals {
     SyncChildObservable<A, A>;
 
   export type ZipObservableRefinedImpl<
-    OS extends NonEmptyArray<Observable<unknown>>,
+    OS extends NonEmptyTuple<Observable<unknown>>,
   > =
     EveryInitialized<OS> extends true
       ? InitializedZipObservableImpl<Cast<Unwrap<OS>>>
@@ -151,7 +152,7 @@ namespace SynStateInternals {
     SyncChildObservable<ArrayElement<P>, P>;
 
   export type MergeObservableRefinedImpl<
-    OS extends NonEmptyArray<Observable<unknown>>,
+    OS extends NonEmptyTuple<Observable<unknown>>,
   > =
     SomeInitialized<OS> extends true
       ? InitializedMergeObservableImpl<Cast<Unwrap<OS>>>
@@ -162,27 +163,27 @@ export type CombineObservable<A extends NonEmptyUnknownList> =
   SynStateInternals.CombineObservableImpl<A>;
 
 export type CombineObservableRefined<
-  OS extends NonEmptyArray<Observable<unknown>>,
+  OS extends NonEmptyTuple<Observable<unknown>>,
 > = SynStateInternals.CombineObservableRefinedImpl<OS>;
 
 export type ZipObservable<A extends NonEmptyUnknownList> =
   SynStateInternals.ZipObservableImpl<A>;
 
 export type ZipObservableRefined<
-  OS extends NonEmptyArray<Observable<unknown>>,
+  OS extends NonEmptyTuple<Observable<unknown>>,
 > = SynStateInternals.ZipObservableRefinedImpl<OS>;
 
 export type MergeObservable<A extends NonEmptyUnknownList> =
   SynStateInternals.MergeObservableImpl<A>;
 
 export type MergeObservableRefined<
-  OS extends NonEmptyArray<Observable<unknown>>,
+  OS extends NonEmptyTuple<Observable<unknown>>,
 > = SynStateInternals.MergeObservableRefinedImpl<OS>;
 
 export type MapOperatorObservable<A, B> = SyncChildObservable<B, readonly [A]>;
 
 export type PairwiseOperatorObservable<A> = SyncChildObservable<
-  readonly [A, A],
+  FixedLengthTuple<2, A>,
   readonly [A]
 >;
 

@@ -58,7 +58,8 @@ const temperatureAtom = atom((get) => {
     const mode = get(modeAtom);
 
     if (mode === 'celsius') return get(celsiusAtom);
-    else return get(fahrenheitAtom);
+
+    return get(fahrenheitAtom);
 });
 ```
 
@@ -105,6 +106,9 @@ const TodoList = (): React.JSX.Element => {
     const [todos, setTodos] = useAtom(todosAtom);
 
     const addTodo = (): void => {
+        // jotai's `SetStateAction` wants a mutable array, which the readonly
+        // result of `Arr.toPushed` does not satisfy.
+        // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
         setTodos((prev) => [...prev, atom('')]);
     };
 
@@ -125,6 +129,7 @@ SynState では、コレクション全体を1つの Observable とし、各ア�
 import * as React from 'react';
 import { createState, map } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
+import { Arr } from 'ts-data-forge';
 
 const [todos$, , { updateState: updateTodos }] = createState<readonly string[]>(
     ['Todo 1', 'Todo 2'],
@@ -155,7 +160,7 @@ const TodoList = (): React.JSX.Element => {
     );
 
     const addTodo = (): void => {
-        updateTodos((prev) => [...prev, '']);
+        updateTodos(Arr.toPushed(''));
     };
 
     return (

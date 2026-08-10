@@ -117,6 +117,12 @@ class ThrottleObservableClass<A>
     this.#milliSeconds = milliSeconds;
   }
 
+  #resetTimer(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
+  }
+
   override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
@@ -138,12 +144,6 @@ class ThrottleObservableClass<A>
     this.#mut_timerId = setTimeout(() => {
       this.#mut_isSkipping = false;
     }, this.#milliSeconds);
-  }
-
-  #resetTimer(): void {
-    if (this.#mut_timerId !== undefined) {
-      clearTimeout(this.#mut_timerId);
-    }
   }
 
   override complete(): void {

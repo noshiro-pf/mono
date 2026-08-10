@@ -54,7 +54,7 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
     s.values.filter((v): v is number => v !== undefined),
   );
 
-  if (Arr.isArrayOfLength(allValues, 0)) return undefined;
+  if (Arr.isEmpty(allValues)) return undefined;
 
   const yMin = logScale ? Math.max(0.1, Math.min(...allValues)) : 0;
 
@@ -65,13 +65,16 @@ export const BenchmarkLineChart = React.memo<Props>((props) => {
   const toY = createToY(PLOT_H, yMin, yMax, logScale);
 
   const toX = (i: number): number =>
-    // eslint-disable-next-line total-functions/no-partial-division
-    xLabels.length <= 1 ? PLOT_W / 2 : (i / (xLabels.length - 1)) * PLOT_W;
+    Arr.isMaxLengthArray(1, xLabels)
+      ? PLOT_W / 2
+      : // the guard above rules out a zero denominator
+        // eslint-disable-next-line total-functions/no-partial-division
+        (i / (xLabels.length - 1)) * PLOT_W;
 
   // Y-axis tick values
   const yTicks = logScale
     ? generateLogTicks(yMin, yMax)
-    : generateLinearTicks(PositiveSafeInt.clamp(yMax));
+    : generateLinearTicks(PositiveSafeInt.fromNumber(yMax));
 
   return (
     <svg

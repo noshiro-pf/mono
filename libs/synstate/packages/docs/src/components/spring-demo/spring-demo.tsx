@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { asSafeUint } from 'ts-data-forge';
+import { Num, Result, asSafeUint } from 'ts-data-forge';
 import { type SafeUint } from 'ts-type-forge';
 import {
   createJotaiSpringAdapter,
@@ -17,7 +17,11 @@ export const SpringDemo = React.memo(() => {
   const handleDepthChange = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setChainDepth(asSafeUint(Number(e.target.value)));
+      setChainDepth(
+        asSafeUint(
+          Result.unwrapOkOr(Num.safeParseFloat(e.target.value), Number.NaN),
+        ),
+      );
     },
     [],
   );

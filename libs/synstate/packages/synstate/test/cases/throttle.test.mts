@@ -1,5 +1,5 @@
 import { ISet } from 'ts-data-forge';
-import { type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   counter,
   filter,
@@ -52,10 +52,7 @@ const createStreams = (
   };
 };
 
-export const throttleTestCases: readonly [
-  StreamTestCase<number>,
-  StreamTestCase<number>,
-] = [
+export const throttleTestCases: FixedLengthTuple<2, StreamTestCase<number>> = [
   {
     name: 'throttle case 1',
     expectedOutput: [0, 3, 9, 12],

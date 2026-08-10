@@ -23,11 +23,11 @@ export const extractSampleCode = (content: string): string => {
     .map((s) =>
       s
         .split('\n')
-        .filter(
-          (line) =>
-            !ignoreLineKeywords.some((ignoreLineKeyword) =>
-              line.trimStart().startsWith(ignoreLineKeyword),
-            ),
+        .filter((line) =>
+          ignoreLineKeywords.every(
+            (ignoreLineKeyword) =>
+              !line.trimStart().startsWith(ignoreLineKeyword),
+          ),
         )
         .join('\n'),
     )
@@ -47,7 +47,7 @@ const normalizeIndent = (source: string): string => {
       return match !== null ? match[0].length : 0;
     });
 
-  if (Arr.isArrayOfLength(indents, 0)) {
+  if (Arr.isEmpty(indents)) {
     return source;
   }
 

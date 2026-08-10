@@ -5,6 +5,7 @@ import {
   runInAction,
   type IObservableValue,
 } from 'mobx';
+import { Arr } from 'ts-data-forge';
 import { type Point, type SpringAdapter } from '../../spring-demo/index.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SPRING_FACTOR, lerp } from './shared.mjs';
 
@@ -58,7 +59,7 @@ export const createMobXThroughputAdapter = (): SpringAdapter => {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const head = mut_head!.get();
 
-          onEmit([head, ...mut_stages.map((s) => s.get())]);
+          onEmit(Arr.toUnshifted(head)(mut_stages.map((s) => s.get())));
         }),
       );
     },

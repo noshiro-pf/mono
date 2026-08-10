@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { createReducer } from 'synstate-react-hooks';
+import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{
   id: number;
@@ -20,14 +21,11 @@ const initialTodos: readonly Todo[] = [] as const;
 const reducer = (todos: readonly Todo[], action: Action): readonly Todo[] => {
   switch (action.type) {
     case 'add':
-      return [
-        ...todos,
-        {
-          id: Date.now(),
-          text: action.text,
-          done: false,
-        },
-      ];
+      return Arr.toPushed(todos, {
+        id: Date.now(),
+        text: action.text,
+        done: false,
+      });
 
     case 'toggle':
       return todos.map((t) =>

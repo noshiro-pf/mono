@@ -2,12 +2,14 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForReact,
-  eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
   type FlatConfig,
 } from 'eslint-config-typed';
+import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
+import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
+import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import { projectRootPath } from '../../scripts/project-root-path.mjs';
 
 export default [
@@ -17,11 +19,13 @@ export default [
     packageDirs: [import.meta.dirname, projectRootPath],
   }),
 
+  eslintPluginTsTypeForge.configs.recommended,
+  eslintPluginTsDataForge.configs.recommended,
+  eslintPluginTsFortress.configs.recommended,
+
   {
     ignores: ['.astro/**', 'src/content.config.ts', 'astro.config.mjs'],
   },
-
-  eslintConfigForTsDataForge(),
 
   eslintConfigForVitest(),
 

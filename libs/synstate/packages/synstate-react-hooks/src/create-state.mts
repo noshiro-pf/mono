@@ -9,7 +9,7 @@ export const createState = <S,>(
 ): readonly [
   useCurrentValue: () => S,
   setState: (v: S) => S,
-  Readonly<{
+  utils: Readonly<{
     state: InitializedObservable<S>;
     updateState: (updateFn: (prev: S) => S) => S;
     resetState: () => S;

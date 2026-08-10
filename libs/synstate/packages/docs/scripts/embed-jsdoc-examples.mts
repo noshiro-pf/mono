@@ -224,7 +224,7 @@ const embedJsdocExamples = async (): Promise<void> => {
     }
 
     if (updated === sourceContent) {
-      console.log(`· Already up to date: ${funcName} in ${srcPath}`);
+      console.info(`· Already up to date: ${funcName} in ${srcPath}`);
 
       continue;
     }
@@ -232,7 +232,7 @@ const embedJsdocExamples = async (): Promise<void> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(sourceFilePath, updated, 'utf8');
 
-    console.log(`✓ Embedded example for ${funcName} → ${srcPath}`);
+    console.info(`✓ Embedded example for ${funcName} → ${srcPath}`);
   }
 };
 

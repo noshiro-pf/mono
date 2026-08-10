@@ -77,7 +77,7 @@ export const ThroughputCanvas = React.memo<Props>((props) => {
 
       // Run K ticks per frame — this is the hot loop that amplifies
       // per-update overhead differences between libraries
-      for (const k of range(asSafeUint(0), asSafeUint(ticksPerFrame))) {
+      for (const k of range(0, asSafeUint(ticksPerFrame))) {
         // eslint-disable-next-line total-functions/no-partial-division
         const angle = prevAngle + (k / ticksPerFrame) * ORBIT_SPEED;
 
@@ -213,12 +213,12 @@ const drawSnake = (
 ): void => {
   mut_ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  if (Arr.isArrayOfLength(points, 0)) return;
+  if (Arr.isEmpty(points)) return;
 
   const segmentCount = asSafeUint(points.length);
 
   // Draw tail segments (lines connecting dots)
-  if (Arr.isArrayAtLeastLength(points, 2)) {
+  if (Arr.isMinLengthArray(2, points)) {
     mut_ctx.beginPath();
 
     mut_ctx.moveTo(points[0].x, points[0].y);

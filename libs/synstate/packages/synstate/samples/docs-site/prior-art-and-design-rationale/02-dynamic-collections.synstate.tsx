@@ -4,6 +4,7 @@
 import * as React from 'react';
 import { createState, map } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
+import { Arr } from 'ts-data-forge';
 
 const [todos$, , { updateState: updateTodos }] = createState<readonly string[]>(
   ['Todo 1', 'Todo 2'],
@@ -34,7 +35,7 @@ const TodoList = (): React.JSX.Element => {
   );
 
   const addTodo = (): void => {
-    updateTodos((prev) => [...prev, '']);
+    updateTodos(Arr.toPushed(''));
   };
 
   return (

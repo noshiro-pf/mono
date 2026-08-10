@@ -1,4 +1,4 @@
-import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   counter,
   map,
@@ -23,7 +23,7 @@ const createStreams = (
   startSource: () => void;
   counter$: Observable<SafeUint>;
   skipIfNoChange$: Observable<number>;
-  withCurrentValueFrom$: Observable<readonly [number, number]>;
+  withCurrentValueFrom$: Observable<FixedLengthTuple<2, number>>;
 }> => {
   const counter$ = counter(tick, { startManually: true });
 
@@ -48,7 +48,7 @@ const createStreams = (
 };
 
 export const skipIfNoChangeTestCases: readonly [
-  StreamTestCase<readonly [number, number]>,
+  StreamTestCase<FixedLengthTuple<2, number>>,
 ] = [
   {
     name: 'skipIfNoChange case 1',
@@ -58,7 +58,7 @@ export const skipIfNoChangeTestCases: readonly [
       [2, 6],
       [3, 9],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
       const { startSource, withCurrentValueFrom$ } = createStreams(tick);
 
       return getStreamHistoryAsPromise(withCurrentValueFrom$, startSource);

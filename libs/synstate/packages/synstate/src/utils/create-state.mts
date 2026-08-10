@@ -60,7 +60,7 @@ export const createState = <S,>(
 ): readonly [
   state: InitializedObservable<S>,
   setState: (v: S) => S,
-  Readonly<{
+  utils: Readonly<{
     updateState: (updateFn: (prev: S) => S) => S;
     resetState: () => S;
     getSnapshot: () => S;

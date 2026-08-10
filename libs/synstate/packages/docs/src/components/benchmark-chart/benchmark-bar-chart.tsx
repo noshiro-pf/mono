@@ -52,7 +52,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
   // Collect all values to determine Y range
   const allValues = groups.flatMap((g) => g.values);
 
-  if (Arr.isArrayOfLength(allValues, 0)) return undefined;
+  if (Arr.isEmpty(allValues)) return undefined;
 
   const yMin = logScale ? 0.1 : 0;
 
@@ -87,7 +87,7 @@ export const BenchmarkBarChart = React.memo<Props>((props) => {
 
   const yTicks = logScale
     ? generateLogTicks(yMin, yMax)
-    : generateLinearTicks(PositiveSafeInt.clamp(yMax));
+    : generateLinearTicks(PositiveSafeInt.fromNumber(yMax));
 
   return (
     <svg

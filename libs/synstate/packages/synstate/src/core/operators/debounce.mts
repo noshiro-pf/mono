@@ -121,6 +121,12 @@ class DebounceObservableClass<A>
     this.#milliSeconds = milliSeconds;
   }
 
+  #resetTimer(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
+  }
+
   override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
@@ -138,12 +144,6 @@ class DebounceObservableClass<A>
 
       this.startUpdate(sn.value);
     }, this.#milliSeconds);
-  }
-
-  #resetTimer(): void {
-    if (this.#mut_timerId !== undefined) {
-      clearTimeout(this.#mut_timerId);
-    }
   }
 
   override complete(): void {

@@ -53,21 +53,20 @@
     "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
-    "update-packages": "pnpm update --latest",
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
     "synstate": "workspace:*",
-    "ts-data-forge": "^9.0.1",
-    "ts-type-forge": "^5.0.0"
+    "ts-data-forge": "^14.2.0",
+    "ts-type-forge": "^9.2.0"
   },
   "devDependencies": {
-    "@preact/signals": "2.9.1",
+    "@preact/signals": "2.10.1",
     "@types/argparse": "2.0.17",
-    "argparse": "2.0.1",
-    "preact": "10.29.4"
+    "argparse": "3.0.0",
+    "preact": "10.29.8"
   },
   "peerDependencies": {
     "@preact/signals": ">=1.0.0",

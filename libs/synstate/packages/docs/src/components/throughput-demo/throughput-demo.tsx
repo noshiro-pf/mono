@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { asSafeUint } from 'ts-data-forge';
-import { type SafeUint } from 'ts-type-forge';
+import { Num, Result, asSafeUint } from 'ts-data-forge';
+import { type ReadonlyRecord, type SafeUint } from 'ts-type-forge';
 import {
   createJotaiThroughputAdapter,
   createMobXThroughputAdapter,
@@ -16,13 +16,17 @@ export const ThroughputDemo = React.memo(() => {
   const [ticksPerFrame, setTicksPerFrame] = React.useState(DEFAULT_TICKS);
 
   const [runningMap, setRunningMap] = React.useState<
-    Readonly<Record<string, boolean>>
+    ReadonlyRecord<string, boolean>
   >({});
 
   const handleDepthChange = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setChainDepth(asSafeUint(Number(e.target.value)));
+      setChainDepth(
+        asSafeUint(
+          Result.unwrapOkOr(Num.safeParseFloat(e.target.value), Number.NaN),
+        ),
+      );
     },
     [],
   );
@@ -30,7 +34,9 @@ export const ThroughputDemo = React.memo(() => {
   const handleTicksChange = React.useCallback(
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setTicksPerFrame(Number(e.target.value));
+      setTicksPerFrame(
+        Result.unwrapOkOr(Num.safeParseFloat(e.target.value), Number.NaN),
+      );
     },
     [],
   );

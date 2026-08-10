@@ -8,4 +8,4 @@ export const maxDepth = (parents: readonly Observable<unknown>[]): number =>
     // `unknown` without them, even though TypeScript <= 6.0's checker
     // resolves this fine.
     .mapOptional((o): number => o.depth)
-    .map((o) => Optional.unwrapOr(o, 0)).value;
+    .map(Optional.unwrapOr(0)).value;

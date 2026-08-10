@@ -51,5 +51,4 @@ import { type KeepInitialValueOperator } from '../../types/index.mjs';
  */
 export const mapOptional = <O extends UnknownOptional, B>(
   mapFn: (x: Optional.Unwrap<O>) => B,
-): KeepInitialValueOperator<O, Optional<B>> =>
-  map((a) => Optional.map(a, mapFn));
+): KeepInitialValueOperator<O, Optional<B>> => map(Optional.map(mapFn));

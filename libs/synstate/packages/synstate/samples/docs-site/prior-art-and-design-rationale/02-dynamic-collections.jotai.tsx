@@ -26,6 +26,9 @@ const TodoList = (): React.JSX.Element => {
   const [todos, setTodos] = useAtom(todosAtom);
 
   const addTodo = (): void => {
+    // jotai's `SetStateAction` wants a mutable array, which the readonly
+    // result of `Arr.toPushed` does not satisfy.
+    // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
     setTodos((prev) => [...prev, atom('')]);
   };
 

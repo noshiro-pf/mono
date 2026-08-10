@@ -9,6 +9,8 @@ export const runBenchmark = (k: number, branchCount: number): number => {
     asUint32(branchCount),
   ).map(() => new BehaviorSubject(0));
 
+  // `combineLatest` only infers the element types from an array literal.
+  // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
   const result = combineLatest([selector, ...branches]).pipe(
     map((values) => {
       const sel = values[0];

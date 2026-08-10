@@ -51,12 +51,15 @@ export const createSynStateSpringAdapter = (): SpringAdapter => {
         mut_prev = stage;
       }
 
-      if (Arr.isArrayOfLength(mut_stages, 0)) {
+      if (Arr.isEmpty(mut_stages)) {
         // No chain depth — just emit the head
         mut_subscription = head.pipe(map((pos) => [pos])).subscribe(onEmit);
       } else {
         // Combine head + all stages into a single Point[]
-        const allPoints = combine([head, ...mut_stages] as const).pipe(
+        // `as const` needs a literal, and `combine` needs the tuple type only
+        // the literal produces.
+        // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
+        const allPoints = combine([head, ...mut_stages]).pipe(
           map((points) => points),
         );
 

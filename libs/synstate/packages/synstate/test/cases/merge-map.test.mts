@@ -1,5 +1,5 @@
 import { ISet } from 'ts-data-forge';
-import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   counter,
   filter,
@@ -28,7 +28,7 @@ const createStreams = (
   startSource: () => void;
   counter$: Observable<SafeUint>;
   source$: Observable<number>;
-  mergeMap$: Observable<readonly [number, number]>;
+  mergeMap$: Observable<FixedLengthTuple<2, number>>;
 }> => {
   const sourceValues = ISet.create([0, 4, 5]);
 
@@ -57,7 +57,7 @@ const createStreams = (
 };
 
 export const mergeMapTestCases: readonly [
-  StreamTestCase<readonly [number, number]>,
+  StreamTestCase<FixedLengthTuple<2, number>>,
 ] = [
   {
     name: 'mergeMap case 1',
@@ -72,7 +72,7 @@ export const mergeMapTestCases: readonly [
       [5, 1],
       [5, 2],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
       const { startSource, mergeMap$ } = createStreams(tick);
 
       return getStreamHistoryAsPromise(mergeMap$, startSource);

@@ -15,7 +15,7 @@ export const binarySearch = <N extends number>(
 ): NegativeInt32 | Uint32 => {
   const uint32Result = asUint32(0);
 
-  if (Arr.isArrayOfLength(sortedArray, 0)) {
+  if (Arr.isEmpty(sortedArray)) {
     return uint32Result;
   }
 

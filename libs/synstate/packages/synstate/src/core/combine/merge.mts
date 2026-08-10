@@ -1,5 +1,5 @@
 import { Optional, expectType } from 'ts-data-forge';
-import { type ArrayElement, type NonEmptyArray } from 'ts-type-forge';
+import { type ArrayElement, type NonEmptyTuple } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import {
@@ -63,7 +63,7 @@ import {
  * @note To improve code readability, consider using `createState` instead of `merge`,
  * subscribing to `parents` and calling `setState` within it.
  */
-export const merge = <const OS extends NonEmptyArray<Observable<unknown>>>(
+export const merge = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): MergeObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -104,7 +104,7 @@ if (import.meta.vitest !== undefined) {
 
   const r2 = source('a');
 
-  const _m = merge([r1, r2] as const);
+  const _m = merge([r1, r2]);
 
   expectType<typeof _m, SyncChildObservable<number | string>>('<=');
 }

@@ -11,7 +11,7 @@ export const createReducer = <S, A>(
 ): readonly [
   useCurrentValue: () => S,
   dispatch: (action: A) => S,
-  Readonly<{
+  utils: Readonly<{
     state: InitializedObservable<S>;
     getSnapshot: () => S;
     initialState: S;

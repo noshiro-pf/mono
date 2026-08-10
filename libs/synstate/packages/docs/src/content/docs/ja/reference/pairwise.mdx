@@ -52,7 +52,7 @@ const num$ = source<number>();
 
 const pairs$ = num$.pipe(pairwise());
 
-const valueHistory: (readonly [number, number])[] = [];
+const valueHistory: FixedLengthTuple<2, number>[] = [];
 
 pairs$.subscribe(([prev, curr]) => {
     valueHistory.push([prev, curr]);

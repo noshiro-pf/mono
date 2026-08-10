@@ -1,5 +1,7 @@
 /** Sample CSV data for the data table demo (1000 rows from assets/sample.csv). */
-export const sampleCsvRows: readonly (readonly [string, string, string])[] = [
+import { type FixedLengthTuple } from 'ts-type-forge';
+
+export const sampleCsvRows: readonly FixedLengthTuple<3, string>[] = [
   ['Helaina Cunnell', 'hcunnell0@va.gov', 'Female'],
   ['Wenda Teacy', 'wteacy1@4shared.com', 'Female'],
   ['Fidelia Clayworth', 'fclayworth2@biblegateway.com', 'Female'],

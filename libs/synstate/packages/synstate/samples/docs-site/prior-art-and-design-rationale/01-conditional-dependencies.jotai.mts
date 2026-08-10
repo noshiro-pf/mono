@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-ternary */
 import { atom, createStore } from 'jotai';
 
 const modeAtom = atom<'celsius' | 'fahrenheit'>('celsius');
@@ -13,7 +12,8 @@ const temperatureAtom = atom((get) => {
   const mode = get(modeAtom);
 
   if (mode === 'celsius') return get(celsiusAtom);
-  else return get(fahrenheitAtom);
+
+  return get(fahrenheitAtom);
 });
 
 // embed-sample-code-ignore-below

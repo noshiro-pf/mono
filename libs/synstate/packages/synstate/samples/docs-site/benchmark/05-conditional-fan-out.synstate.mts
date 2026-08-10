@@ -1,6 +1,6 @@
 import { combine, createState, map, type Observable } from 'synstate';
 import { Arr, asUint32 } from 'ts-data-forge';
-import { type DeepReadonly, type NonEmptyArray } from 'ts-type-forge';
+import { type DeepReadonly, type NonEmptyTuple } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 export const runBenchmark = (k: number, branchCount: number): number => {
@@ -17,10 +17,13 @@ export const runBenchmark = (k: number, branchCount: number): number => {
     return { source, set: setSource };
   });
 
+  // `as const` needs a literal, and `combine` needs the tuple type only the
+  // literal produces.
+  // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
   const allSources = [
     selector,
     ...branches.map((b) => b.source),
-  ] as const satisfies NonEmptyArray<Observable<number>>;
+  ] as const satisfies NonEmptyTuple<Observable<number>>;
 
   const result = combine(allSources).pipe(
     map(

@@ -7,8 +7,8 @@ import {
   map,
 } from 'synstate';
 import { useObservableValue } from 'synstate-react-hooks';
-import { Arr, asPositiveInt16, Num } from 'ts-data-forge';
-import { type PositiveInt16 } from 'ts-type-forge';
+import { Arr, asPositiveInt16, Num, Result } from 'ts-data-forge';
+import { type PositiveInt16, type ReadonlyRecord } from 'ts-type-forge';
 import { sampleCsvRows } from './sample-data.mjs';
 
 // ---------------------------------------------------------------------------
@@ -109,7 +109,7 @@ export const DataTableDemo = React.memo(() => {
             </tr>
           </thead>
           <tbody>
-            {Arr.isArrayOfLength(tableView.slicedRows, 0) ? (
+            {Arr.isEmpty(tableView.slicedRows) ? (
               <tr>
                 <td colSpan={4} style={emptyCellStyle}>
                   {'No matching rows'}
@@ -140,7 +140,7 @@ DataTableDemo.displayName = 'DataTableDemo';
 
 const columnKeys = ['fullName', 'email', 'gender'] as const;
 
-const columnLabels: Readonly<Record<(typeof columnKeys)[number], string>> = {
+const columnLabels: ReadonlyRecord<(typeof columnKeys)[number], string> = {
   fullName: 'FullName',
   email: 'Email Address',
   gender: 'Gender',
@@ -234,7 +234,7 @@ namespace State {
       return {
         slicedRows: rows.slice(startIdx, startIdx + perPage),
         startIdx,
-        rangeStart: Arr.isArrayOfLength(rows, 0) ? 0 : startIdx + 1,
+        rangeStart: Arr.isEmpty(rows) ? 0 : startIdx + 1,
         rangeEnd: Math.min(startIdx + perPage, rows.length),
         totalFiltered: rows.length,
       };
@@ -263,9 +263,12 @@ namespace State {
   export const handleItemsPerPageChange = (
     e: Readonly<React.ChangeEvent<HTMLInputElement>>,
   ): void => {
-    const numValue = Number(e.target.value);
+    const numValue = Num.safeParseFloat(e.target.value);
 
-    const v = Math.max(1, Math.min(50, Number.isNaN(numValue) ? 1 : numValue));
+    const v = Math.max(
+      1,
+      Math.min(50, Result.isErr(numValue) ? 1 : numValue.value),
+    );
 
     setItemsPerPageInput(v);
 
@@ -275,9 +278,9 @@ namespace State {
   export const handleCurrentPageChange = (
     e: Readonly<React.ChangeEvent<HTMLInputElement>>,
   ): void => {
-    const numValue = Number(e.target.value);
+    const numValue = Num.safeParseFloat(e.target.value);
 
-    const v = Math.max(1, Number.isNaN(numValue) ? 1 : numValue);
+    const v = Math.max(1, Result.isErr(numValue) ? 1 : numValue.value);
 
     setPageInput(v);
   };

@@ -1,5 +1,5 @@
 import { ISet } from 'ts-data-forge';
-import { type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   counter,
   debounce,
@@ -52,10 +52,7 @@ const createStreams = (
   };
 };
 
-export const debounceTestCases: readonly [
-  StreamTestCase<number>,
-  StreamTestCase<number>,
-] = [
+export const debounceTestCases: FixedLengthTuple<2, StreamTestCase<number>> = [
   {
     name: 'debounce case 1',
     expectedOutput: [3, 13],

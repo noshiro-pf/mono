@@ -2,13 +2,15 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForReact,
-  eslintConfigForTsDataForge,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
   typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
+import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
+import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
+import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import { projectRootPath } from '../../scripts/project-root-path.mjs';
 
 export default [
@@ -18,7 +20,9 @@ export default [
     packageDirs: [import.meta.dirname, projectRootPath],
   }),
 
-  eslintConfigForTsDataForge(),
+  eslintPluginTsTypeForge.configs.recommended,
+  eslintPluginTsDataForge.configs.recommended,
+  eslintPluginTsFortress.configs.recommended,
 
   eslintConfigForVitest(),
 
@@ -83,7 +87,7 @@ export default [
   {
     files: ['src/entry-point.mts'],
     rules: defineKnownRules({
-      '@typescript-eslint/no-restricted-imports': 'off',
+      'no-restricted-imports': 'off',
       'import-x/export': 'off',
     }),
   },

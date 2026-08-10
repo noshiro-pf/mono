@@ -1,4 +1,4 @@
-import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   counter,
   map,
@@ -15,7 +15,7 @@ const createStreams = (
 ): Readonly<{
   startSource: () => void;
   counter$: Observable<SafeUint>;
-  doubleWithIndex$: Observable<readonly [number, number]>;
+  doubleWithIndex$: Observable<FixedLengthTuple<2, number>>;
 }> => {
   const counter$ = counter(tick, { startManually: true });
 
@@ -33,7 +33,7 @@ const createStreams = (
 };
 
 export const withIndexTestCases: readonly [
-  StreamTestCase<readonly [number, number]>,
+  StreamTestCase<FixedLengthTuple<2, number>>,
 ] = [
   {
     name: 'withIndex case 1',
@@ -50,7 +50,7 @@ export const withIndexTestCases: readonly [
       [9, 18],
       [10, 20],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
       const { startSource, doubleWithIndex$ } = createStreams(tick);
 
       return getStreamHistoryAsPromise(doubleWithIndex$, startSource);

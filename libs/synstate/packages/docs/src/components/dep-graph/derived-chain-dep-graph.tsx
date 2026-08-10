@@ -19,7 +19,7 @@ const nodes: readonly NodeDef[] = [
   {
     id: 'doubled',
     label: 'doubled',
-    sublabel: '= counter \u00D7 2',
+    sublabel: '= counter \u{D7} 2',
     color: '#60a5fa',
     col: 1,
     row: 0,
@@ -27,7 +27,7 @@ const nodes: readonly NodeDef[] = [
   {
     id: 'quadrupled',
     label: 'quadrupled',
-    sublabel: '= doubled \u00D7 2',
+    sublabel: '= doubled \u{D7} 2',
     color: '#60a5fa',
     col: 2,
     row: 0,

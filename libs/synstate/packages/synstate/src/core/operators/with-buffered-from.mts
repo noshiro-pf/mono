@@ -105,6 +105,10 @@ class WithBufferedFromObservableClass<A, B>
     });
   }
 
+  #clearBuffer(): void {
+    this.#mut_bufferedValues = [];
+  }
+
   override tryUpdate(updateToken: UpdateToken): void {
     const par = this.parents[0];
 
@@ -117,9 +121,5 @@ class WithBufferedFromObservableClass<A, B>
     this.setNext([sn.value, this.#mut_bufferedValues], updateToken);
 
     this.#clearBuffer();
-  }
-
-  #clearBuffer(): void {
-    this.#mut_bufferedValues = [];
   }
 }

@@ -128,8 +128,8 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   extends ObservableBaseClass<A, 'async child', number>
   implements AsyncChildObservable<A, P>
 {
-  readonly parents;
   #mut_propagationOrder: readonly ChildObservable<unknown>[];
+  readonly parents;
   protected readonly descendantsIdSet: MutableSet<ObservableId>;
 
   constructor({

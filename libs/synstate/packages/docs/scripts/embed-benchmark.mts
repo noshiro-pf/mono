@@ -53,12 +53,64 @@ const targets: readonly EmbedTarget[] = [
   },
 ] as const;
 
+/**
+ * Embeds one benchmark result into `markdown` and returns the updated markdown,
+ * or the input unchanged when the results file does not exist yet. Extracted
+ * from the enclosing loops so that the early exit is a plain `return` rather
+ * than a `continue` in a nested loop.
+ */
+const embedOneTarget = async (
+  markdown: string,
+  targetMarkdownFile: string,
+  { resultsFile, startMarker, endMarker }: EmbedTarget,
+): Promise<string> => {
+  const resultsPath = path.resolve(benchmarkSamplesDir, resultsFile);
+
+  const exists = await pathExists(resultsPath);
+
+  if (!exists) {
+    console.info(
+      `⚠ ${resultsFile} not found. Run \`pnpm --filter synstate run benchmark\` first. Skipping.`,
+    );
+
+    return markdown;
+  }
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const results = await fs.readFile(resultsPath, 'utf8');
+
+  const startIndex = markdown.indexOf(startMarker);
+
+  if (startIndex === -1) {
+    throw new Error(`❌ ${startMarker} not found in ${targetMarkdownFile}`);
+  }
+
+  const endIndex = markdown.indexOf(endMarker, startIndex);
+
+  if (endIndex === -1) {
+    throw new Error(`❌ ${endMarker} not found in ${targetMarkdownFile}`);
+  }
+
+  const before = markdown.slice(
+    0,
+    Math.max(0, startIndex + startMarker.length),
+  );
+
+  const after = markdown.slice(Math.max(0, endIndex));
+
+  console.info(
+    `✓ Embedded ${resultsFile} into ${path.relative(workspaceRootPath, targetMarkdownFile)}`,
+  );
+
+  return `${before}\n${results.trim()}\n${after}`;
+};
+
 const embedBenchmark = async (): Promise<void> => {
   for (const targetMarkdownFile of targetMarkdownFiles) {
     const fileExists = await pathExists(targetMarkdownFile);
 
     if (!fileExists) {
-      console.log(`⚠ ${targetMarkdownFile} not found. Skipping.`);
+      console.info(`⚠ ${targetMarkdownFile} not found. Skipping.`);
 
       continue;
     }
@@ -66,45 +118,11 @@ const embedBenchmark = async (): Promise<void> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     let mut_markdown = await fs.readFile(targetMarkdownFile, 'utf8');
 
-    for (const { resultsFile, startMarker, endMarker } of targets) {
-      const resultsPath = path.resolve(benchmarkSamplesDir, resultsFile);
-
-      const exists = await pathExists(resultsPath);
-
-      if (!exists) {
-        console.log(
-          `⚠ ${resultsFile} not found. Run \`pnpm --filter synstate run benchmark\` first. Skipping.`,
-        );
-
-        continue;
-      }
-
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      const results = await fs.readFile(resultsPath, 'utf8');
-
-      const startIndex = mut_markdown.indexOf(startMarker);
-
-      if (startIndex === -1) {
-        throw new Error(`❌ ${startMarker} not found in ${targetMarkdownFile}`);
-      }
-
-      const endIndex = mut_markdown.indexOf(endMarker, startIndex);
-
-      if (endIndex === -1) {
-        throw new Error(`❌ ${endMarker} not found in ${targetMarkdownFile}`);
-      }
-
-      const before = mut_markdown.slice(
-        0,
-        Math.max(0, startIndex + startMarker.length),
-      );
-
-      const after = mut_markdown.slice(Math.max(0, endIndex));
-
-      mut_markdown = `${before}\n${results.trim()}\n${after}`;
-
-      console.log(
-        `✓ Embedded ${resultsFile} into ${path.relative(workspaceRootPath, targetMarkdownFile)}`,
+    for (const target of targets) {
+      mut_markdown = await embedOneTarget(
+        mut_markdown,
+        targetMarkdownFile,
+        target,
       );
     }
 

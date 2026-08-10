@@ -1,6 +1,6 @@
 import { atom, createStore } from 'jotai';
 import { selectAtom } from 'jotai/utils';
-import { range } from 'ts-data-forge';
+import { Arr, range } from 'ts-data-forge';
 import { type Point, type SpringAdapter } from '../types.mjs';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, LERP_FACTOR, lerp } from './shared.mjs';
 
@@ -57,7 +57,7 @@ export const createJotaiSpringAdapter = (): SpringAdapter => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const head = get(mut_mousePosAtom!);
 
-        return [head, ...mut_stageAtoms.map((a) => get(a))];
+        return Arr.toUnshifted(head)(mut_stageAtoms.map(get));
       });
 
       // Initial read to establish subscription

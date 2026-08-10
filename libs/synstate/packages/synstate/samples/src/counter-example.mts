@@ -30,7 +30,7 @@ if (import.meta.vitest !== undefined) {
 
     subscription.unsubscribe();
 
-    assert.isTrue(Arr.isArrayAtLeastLength(valueHistory, 3));
+    assert.isTrue(Arr.isMinLengthArray(3, valueHistory));
 
     assert.deepStrictEqual(valueHistory[0], 0);
 

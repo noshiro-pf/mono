@@ -5,6 +5,7 @@ import {
   reaction,
   runInAction,
 } from 'mobx';
+import { asSafeUint, range } from 'ts-data-forge';
 
 // embed-sample-code-ignore-above
 export const runBenchmark = (k: number, depth: number): number => {
@@ -12,8 +13,7 @@ export const runBenchmark = (k: number, depth: number): number => {
 
   let mut_current: IComputedValue<number> = computed(() => state.source);
 
-  // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
-  for (let mut_i = 0; mut_i < depth; mut_i++) {
+  for (const _i of range(0, asSafeUint(depth))) {
     const prev = mut_current;
 
     const left = computed(() => prev.get() + 1);

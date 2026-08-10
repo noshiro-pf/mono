@@ -68,6 +68,12 @@ class TimerObservableClass
     }
   }
 
+  #resetTimer(): void {
+    if (this.#mut_timerId !== undefined) {
+      clearTimeout(this.#mut_timerId);
+    }
+  }
+
   start(): void {
     if (this.#mut_isStarted) {
       console.warn('cannot start twice');
@@ -88,12 +94,6 @@ class TimerObservableClass
 
       this.complete();
     }, this.#milliSeconds);
-  }
-
-  #resetTimer(): void {
-    if (this.#mut_timerId !== undefined) {
-      clearTimeout(this.#mut_timerId);
-    }
   }
 
   override complete(): void {

@@ -1,5 +1,5 @@
-import { Arr, Optional, expectType } from 'ts-data-forge';
-import { type NonEmptyArray } from 'ts-type-forge';
+import { Arr, expectType, Optional } from 'ts-data-forge';
+import { type NonEmptyTuple, type Tuple } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
 import { withInitialValue } from '../operators/index.mjs';
@@ -72,7 +72,7 @@ import {
  * ]);
  * ```
  */
-export const combine = <const OS extends NonEmptyArray<Observable<unknown>>>(
+export const combine = <const OS extends NonEmptyTuple<Observable<unknown>>>(
   parents: OS,
 ): CombineObservableRefined<OS> =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
@@ -91,35 +91,57 @@ class CombineObservableClass<const A extends NonEmptyUnknownList>
   implements CombineObservable<A>
 {
   constructor(parents: Wrap<A>) {
-    const parentsValues = parents.map((p) => p.getSnapshot());
+    const parentsValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
+      parents,
+      (p) => p.getSnapshot(),
+    );
+
+    // The annotation on `initialValue` is what replaces the type assertion.
+    // `Arr.map` carries a single result element type, so it reports `A[number]`
+    // at every position, and `Tuple.MapTo<A[number], A>` — the uniform mapping
+    // — is *not* assignable back to `A`. The positional
+    // `Readonly<{ [K in keyof A]: A[K] }>` is, and TypeScript accepts the
+    // uniform result into it because the two mapped types share `keyof A`. So
+    // it is the annotation, not an assertion, that records the position-wise
+    // fact the checker cannot derive on its own.
+    const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> =
+      Arr.every(parentsValues, Optional.isSome)
+        ? Optional.some(Arr.map(parentsValues, (c) => c.value))
+        : Optional.none;
 
     super({
       parents,
-      initialValue: parentsValues.every(Optional.isSome)
-        ? Optional.some(
-            // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-            Arr.map(parentsValues, (c) => c.value) as A,
-          )
-        : Optional.none,
+      initialValue,
     });
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
     if (this.parents.every((o) => o.updateToken !== updateToken)) return; // all parents are skipped
 
-    const parentValues = this.parents.map((a) => a.getSnapshot());
+    // Same shape-preserving chain as the constructor: `Arr.map` (not the
+    // native one, which drops the tuple shape) into the uniform
+    // `Tuple.MapTo`, then a positional annotation to get back to `A`.
+    const parentValues: Tuple.MapTo<Optional<A[number]>, A> = Arr.map(
+      this.parents,
+      (a) => a.getSnapshot(),
+    );
 
-    if (parentValues.every(Optional.isSome)) {
-      const nextValue =
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        Arr.map(parentValues, (a) => a.value) as A;
+    if (Arr.every(parentValues, Optional.isSome)) {
+      const nextValue: Readonly<{ [K in keyof A]: A[K] }> = Arr.map(
+        parentValues,
+        (a) => a.value,
+      );
 
       this.setNext(nextValue, updateToken);
     }
   }
 }
 
-{
+if (import.meta.vitest !== undefined) {
+  test('type test', () => {
+    expect(1).toBe(1); // dummy
+  });
+
   {
     const s1: Observable<1> = source<1>();
 

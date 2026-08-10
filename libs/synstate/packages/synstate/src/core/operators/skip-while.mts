@@ -89,11 +89,7 @@ class SkipWhileObservableClass<A>
     super({
       parents: [parentObservable],
       initialValue: pipe(parentObservable.getSnapshot()).map((sn) =>
-        Optional.isNone(sn)
-          ? Optional.none
-          : predicate(sn.value, -1)
-            ? Optional.none
-            : sn,
+        Optional.isNone(sn) || predicate(sn.value, -1) ? Optional.none : sn,
       ).value,
     });
 

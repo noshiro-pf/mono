@@ -611,10 +611,13 @@ export const runBenchmark = (k: number, branchCount: number): number => {
         return { source, set: setSource };
     });
 
+    // `as const` needs a literal, and `combine` needs the tuple type only the
+    // literal produces.
+    // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
     const allSources = [
         selector,
         ...branches.map((b) => b.source),
-    ] as const satisfies NonEmptyArray<Observable<number>>;
+    ] as const satisfies NonEmptyTuple<Observable<number>>;
 
     const result = combine(allSources).pipe(
         map(
@@ -656,6 +659,8 @@ export const runBenchmark = (k: number, branchCount: number): number => {
         asUint32(branchCount),
     ).map(() => new BehaviorSubject(0));
 
+    // `combineLatest` only infers the element types from an array literal.
+    // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
     const result = combineLatest([selector, ...branches]).pipe(
         map((values) => {
             const sel = values[0];

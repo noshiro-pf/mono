@@ -158,12 +158,12 @@ const drawSnake = (
 ): void => {
   mut_ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  if (Arr.isArrayOfLength(points, 0)) return;
+  if (Arr.isEmpty(points)) return;
 
   const segmentCount = asSafeUint(points.length);
 
   // Draw tail segments (lines connecting dots)
-  if (Arr.isArrayAtLeastLength(points, 2)) {
+  if (Arr.isMinLengthArray(2, points)) {
     mut_ctx.beginPath();
 
     mut_ctx.moveTo(points[0].x, points[0].y);

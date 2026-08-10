@@ -1,6 +1,6 @@
 --- en/05-imperative-table.mts
 +++ ja/05-imperative-table.mts
-@@ -17,12 +17,12 @@
+@@ -22,12 +22,12 @@
  let currentPageInput = 1;
  let allRows: readonly Row[] = [];
  
@@ -15,7 +15,7 @@
  const fetchData = async (): Promise<void> => {
    try {
      allRows = await fetch('/api/rows').then((r) => {
-@@ -52,10 +52,10 @@
+@@ -57,10 +57,10 @@
    renderTable(filteredRows.slice(start, start + itemsPerPage));
  };
  

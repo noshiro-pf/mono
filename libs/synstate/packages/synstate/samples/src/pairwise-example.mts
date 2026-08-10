@@ -1,4 +1,5 @@
 import { pairwise, source } from 'synstate';
+import { type FixedLengthTuple } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
   test(pairwise, () => {
@@ -19,7 +20,7 @@ if (import.meta.vitest !== undefined) {
     const pairs$ = num$.pipe(pairwise());
 
     // transformer-ignore-next-line convert-to-readonly, append-as-const
-    const valueHistory: (readonly [number, number])[] = [];
+    const valueHistory: FixedLengthTuple<2, number>[] = [];
 
     pairs$.subscribe(([prev, curr]) => {
       valueHistory.push([prev, curr]);

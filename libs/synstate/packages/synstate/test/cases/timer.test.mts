@@ -1,4 +1,4 @@
-import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   combine,
   counter,
@@ -26,7 +26,7 @@ const createStreams = (
   timer1$: Observable<number>;
   timer2$: Observable<number>;
   counter$: Observable<SafeUint>;
-  combined$: Observable<readonly [number, number, number]>;
+  combined$: Observable<FixedLengthTuple<3, number>>;
 }> => {
   const timer1$ = timer(tick * 3, { startManually: true });
 
@@ -55,7 +55,7 @@ const createStreams = (
 
 export const timerTestCases: readonly [
   StreamTestCase<number>,
-  StreamTestCase<readonly [number, number, number]>,
+  StreamTestCase<FixedLengthTuple<3, number>>,
 ] = [
   {
     name: 'timer case 1',
@@ -84,7 +84,7 @@ export const timerTestCases: readonly [
       [0, 0, 5],
       [0, 0, 6],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<3, number>[]> => {
       const { combined$, startSource } = createStreams(tick);
 
       return getStreamHistoryAsPromise(combined$, startSource);

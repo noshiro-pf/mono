@@ -17,11 +17,19 @@ export default defineConfig({
     }),
   },
   integrations: [
+    // Note: restrict the globs to JSX files. Vite forwards these globs to
+    // `oxc.jsxRefreshInclude`, and any matched file whose extension is not in
+    // Vite's `JS_TYPES_RE` (`/\.(?:j|t)sx?$|\.mjs$/`) is transformed as plain
+    // JS — which makes `.mts` modules under `src/components/` fail to parse
+    // ("Type assertion expressions can only be used in TypeScript files").
     react({
-      include: ['**/components/**', '!**/components/preact-signals-demo/**'],
+      include: [
+        '**/components/**/*.{jsx,tsx}',
+        '!**/components/preact-signals-demo/**',
+      ],
     }),
     preact({
-      include: ['**/components/preact-signals-demo/**'],
+      include: ['**/components/preact-signals-demo/**/*.{jsx,tsx}'],
     }),
     starlight({
       title: 'SynState',

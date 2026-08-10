@@ -51,9 +51,11 @@ export const createRxJSThroughputAdapter = (): SpringAdapter => {
         mut_prev = stage;
       }
 
-      if (Arr.isArrayOfLength(mut_stages, 0)) {
+      if (Arr.isEmpty(mut_stages)) {
         mut_subscription = head.pipe(map((pos) => [pos])).subscribe(onEmit);
       } else {
+        // `combineLatest` only infers the element types from an array literal.
+        // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
         const allPoints = combineLatest([head, ...mut_stages]).pipe(
           map((points) => points),
         );

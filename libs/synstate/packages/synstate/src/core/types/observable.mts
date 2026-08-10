@@ -1,5 +1,5 @@
 import { expectType, type Optional, type Some } from 'ts-data-forge';
-import { type StrictOmit } from 'ts-type-forge';
+import { type FixedLengthTuple, type StrictOmit } from 'ts-type-forge';
 import { type ObservableId, type UpdateToken } from './id.mjs';
 import { type ObservableKind } from './observable-kind.mjs';
 import { type NonEmptyUnknownList, type Subscription } from './types.mjs';
@@ -128,9 +128,7 @@ export type InitializedRootObservable<A> =
   ObservableTypeConverter.ToInitialized<A, RootObservable<A>>;
 
 export type Observable<A> =
-  | AsyncChildObservable<A>
-  | RootObservable<A>
-  | SyncChildObservable<A>;
+  AsyncChildObservable<A> | RootObservable<A> | SyncChildObservable<A>;
 
 export type InitializedObservable<A> =
   | InitializedAsyncChildObservable<A>
@@ -209,11 +207,11 @@ expectType<
 expectType<number, ObservableValue<Observable<string>>>('!<=');
 
 expectType<
-  readonly [Observable<number>, Observable<number>],
-  Wrap<readonly [number, number]>
+  FixedLengthTuple<2, Observable<number>>,
+  Wrap<FixedLengthTuple<2, number>>
 >('<=');
 
 expectType<
   readonly [Observable<number>, Observable<string>],
-  Wrap<readonly [number, number]>
+  Wrap<FixedLengthTuple<2, number>>
 >('!<=');

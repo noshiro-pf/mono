@@ -1,4 +1,5 @@
 import { Optional } from 'ts-data-forge';
+import { type FixedLengthTuple } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import {
   type DropInitialValueOperator,
@@ -30,7 +31,7 @@ import {
  *
  * const pairs$ = num$.pipe(pairwise());
  *
- * const valueHistory: (readonly [number, number])[] = [];
+ * const valueHistory: FixedLengthTuple<2, number>[] = [];
  *
  * pairs$.subscribe(([prev, curr]) => {
  *   valueHistory.push([prev, curr]);
@@ -60,14 +61,18 @@ import {
  * ]);
  * ```
  */
-export const pairwise = <A,>(): DropInitialValueOperator<A, readonly [A, A]> =>
-  f;
+export const pairwise = <A,>(): DropInitialValueOperator<
+  A,
+  FixedLengthTuple<2, A>
+> => f;
 
-const f = <A,>(parentObservable: Observable<A>): Observable<readonly [A, A]> =>
+const f = <A,>(
+  parentObservable: Observable<A>,
+): Observable<FixedLengthTuple<2, A>> =>
   new PairwiseObservableClass(parentObservable);
 
 class PairwiseObservableClass<A>
-  extends SyncChildObservableClass<readonly [A, A], readonly [A]>
+  extends SyncChildObservableClass<FixedLengthTuple<2, A>, readonly [A]>
   implements PairwiseOperatorObservable<A>
 {
   #mut_previousValue: Optional<A>;

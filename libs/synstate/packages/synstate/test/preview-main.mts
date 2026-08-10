@@ -155,14 +155,7 @@ const getArgs = (): Readonly<{
     required: false,
   });
 
-  return convertArgs(
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    (parser.parse_args() ?? undefined) as DeepReadonly<{
-      example_no: string[];
-      preview: string[] | undefined;
-      case_no: string[];
-    }>,
-  );
+  return convertArgs(parser.parse_args());
 };
 
 const main = (): void => {

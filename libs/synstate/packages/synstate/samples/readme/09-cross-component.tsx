@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { createState } from 'synstate-react-hooks';
+import { Arr } from 'ts-data-forge';
 
 // State
 const [useItemsState, _, { updateState, resetState: resetItemsState }] =
@@ -9,7 +10,7 @@ const [useItemsState, _, { updateState, resetState: resetItemsState }] =
 
 // Setup event handlers
 const addItem = (item: string): void => {
-  updateState((items: readonly string[]) => [...items, item]);
+  updateState((items: readonly string[]) => Arr.toPushed(items, item));
 };
 
 // Component 1: Add items

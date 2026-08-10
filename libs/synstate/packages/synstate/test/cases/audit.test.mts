@@ -1,5 +1,5 @@
 import { ISet } from 'ts-data-forge';
-import { type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   audit,
   counter,
@@ -52,10 +52,7 @@ const createStreams = (
   };
 };
 
-export const auditTestCases: readonly [
-  StreamTestCase<number>,
-  StreamTestCase<number>,
-] = [
+export const auditTestCases: FixedLengthTuple<2, StreamTestCase<number>> = [
   {
     name: 'audit case 1',
     expectedOutput: [2, 3, 11, 13],

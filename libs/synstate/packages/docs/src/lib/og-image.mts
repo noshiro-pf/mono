@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { inflateSync } from 'node:zlib';
 import type * as React from 'react';
 import satori from 'satori';
-import { asSafeUint, range } from 'ts-data-forge';
+import { Arr, asSafeUint, range } from 'ts-data-forge';
 
 const OG_WIDTH = 1200;
 
@@ -246,22 +246,21 @@ export const generateOgImage = async (
                 flex: 1,
                 justifyContent: 'center',
               },
-              children: [
-                {
-                  type: 'div',
-                  props: {
-                    style: {
-                      fontSize: title.length > 30 ? '48px' : '56px',
-                      fontWeight: 700,
-                      lineHeight: 1.2,
-                      color: '#f8fafc',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    },
-                    children: title,
+              children: Arr.toUnshifted({
+                type: 'div',
+                props: {
+                  style: {
+                    fontSize: title.length > 30 ? '48px' : '56px',
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    color: '#f8fafc',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   },
+                  children: title,
                 },
-                ...(description !== undefined && description !== ''
+              })(
+                description !== undefined && description !== ''
                   ? [
                       {
                         type: 'div',
@@ -280,8 +279,8 @@ export const generateOgImage = async (
                         },
                       },
                     ]
-                  : []),
-              ],
+                  : [],
+              ),
             },
           },
           // Footer: site URL

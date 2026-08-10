@@ -55,24 +55,23 @@
     "tsc": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "tscw": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
     "type-check": "node ../../node_modules/typescript-native/bin/tsc --noEmit",
-    "update-packages": "pnpm update --latest",
     "z:prettier": "prettier --config ../../.prettierrc --ignore-path ../../.prettierignore --ignore-path ../../.gitignore --ignore-unknown --no-error-on-unmatched-pattern --write",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'",
     "z:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
   },
   "dependencies": {
-    "ts-data-forge": "^9.0.1",
-    "ts-type-forge": "^5.0.0"
+    "ts-data-forge": "^14.2.0",
+    "ts-type-forge": "^9.2.0"
   },
   "devDependencies": {
     "@reduxjs/toolkit": "2.12.0",
     "@types/argparse": "2.0.17",
-    "@types/react": "19.2.17",
-    "argparse": "2.0.1",
-    "jotai": "2.20.1",
-    "mobx": "6.16.1",
-    "react": "19.2.7",
+    "@types/react": "19.2.18",
+    "argparse": "3.0.0",
+    "jotai": "2.20.2",
+    "mobx": "7.0.0",
+    "react": "19.2.8",
     "rxjs": "7.8.2",
     "valtio": "2.3.2",
     "zustand": "5.0.14"

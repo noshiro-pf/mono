@@ -24,7 +24,7 @@
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React useState/useReducer for global state
 - ⚡ **High Performance**: Optimized for fast state updates and minimal re-renders
 - 🎨 **Type-Safe**: Full TypeScript support with precise type inference
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~4.5 kB min+gzip<!-- /bundle-size:synstate --> with only one external runtime dependency ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge))
+- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~4.4 kB min+gzip<!-- /bundle-size:synstate --> with only one external runtime dependency ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge))
 - 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
 - 🔄 **Reactive Updates**: Automatic propagation of state changes to all subscribers
 - 📡 **Event System**: Built-in `createValueEmitter`, `createEventEmitter` for event-driven architecture
@@ -316,6 +316,7 @@ const ResetButton = (): React.JSX.Element => (
 ```tsx
 import * as React from 'react';
 import { createReducer } from 'synstate-react-hooks';
+import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{
     id: number;
@@ -334,14 +335,11 @@ const initialTodos: readonly Todo[] = [] as const;
 const reducer = (todos: readonly Todo[], action: Action): readonly Todo[] => {
     switch (action.type) {
         case 'add':
-            return [
-                ...todos,
-                {
-                    id: Date.now(),
-                    text: action.text,
-                    done: false,
-                },
-            ];
+            return Arr.toPushed(todos, {
+                id: Date.now(),
+                text: action.text,
+                done: false,
+            });
 
         case 'toggle':
             return todos.map((t) =>
@@ -432,6 +430,7 @@ const ThemeToggle = (): React.JSX.Element => {
 ```tsx
 import * as React from 'react';
 import { createState } from 'synstate-react-hooks';
+import { Arr } from 'ts-data-forge';
 
 // State
 const [useItemsState, _, { updateState, resetState: resetItemsState }] =
@@ -439,7 +438,7 @@ const [useItemsState, _, { updateState, resetState: resetItemsState }] =
 
 // Setup event handlers
 const addItem = (item: string): void => {
-    updateState((items: readonly string[]) => [...items, item]);
+    updateState((items: readonly string[]) => Arr.toPushed(items, item));
 };
 
 // Component 1: Add items

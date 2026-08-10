@@ -111,7 +111,7 @@ const runOnce = (adapter: Adapter, k: number, depth: number): number => {
 
   const t0 = performance.now();
 
-  for (const mut_i of range(asSafeUint(0), asSafeUint(k))) {
+  for (const mut_i of range(0, asSafeUint(k))) {
     // eslint-disable-next-line total-functions/no-partial-division
     const angle = (mut_i / k) * ORBIT_SPEED * Math.PI * 2;
 
@@ -128,19 +128,42 @@ const runOnce = (adapter: Adapter, k: number, depth: number): number => {
   return elapsed;
 };
 
-console.log(
-  `\n## Deep Chain Throughput (${String(WARMUP_ROUNDS)} warmup + ${String(MEASURE_ROUNDS)} measured, timeout=${String(TIMEOUT_MS)} ms)\n`,
-);
+/**
+ * Runs the measured rounds for a single parameter pair, bailing out as soon as a
+ * round exceeds the timeout. Extracted into its own function so that the round
+ * loop is not nested inside the entry/parameter loops.
+ */
+const measureRounds = (
+  adapter: Adapter,
+  k: number,
+  depth: number,
+): Readonly<{ times: readonly number[]; timedOut: boolean }> => {
+  const mut_times: number[] = [];
 
-// Column headers
-const colHeaders = PARAMS.map(([k, m]) => `K=${String(k)}, M=${String(m)}`);
+  let mut_timedOut = false;
 
-const mut_tableLines: string[] = [
-  `| Library | ${colHeaders.join(' | ')} |`,
-  `| ------- | ${PARAMS.map(() => '----------:').join(' | ')} |`,
-];
+  for (const _r of range(0, MEASURE_ROUNDS)) {
+    const elapsed = runOnce(adapter, k, depth);
 
-for (const { label, createAdapter } of entries) {
+    mut_times.push(elapsed);
+
+    if (elapsed > TIMEOUT_MS) {
+      mut_timedOut = true;
+
+      break;
+    }
+  }
+
+  return { times: mut_times, timedOut: mut_timedOut };
+};
+
+/**
+ * Measures every parameter pair for a single adapter. Extracted into its own
+ * function so that the parameter loop is not nested inside the entry loop.
+ */
+const measureEntry = (entry: AdapterEntry): readonly string[] => {
+  const { label, createAdapter } = entry;
+
   const mut_cells: string[] = [];
 
   let mut_skippingRest = false;
@@ -155,56 +178,58 @@ for (const { label, createAdapter } of entries) {
     const adapter = createAdapter();
 
     // Warmup
-    // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
-    for (let mut_w = 0; mut_w < WARMUP_ROUNDS; mut_w++) {
+    for (const _w of range(0, WARMUP_ROUNDS)) {
       runOnce(adapter, k, depth);
     }
 
     // Measure
-    const mut_times: number[] = [];
+    const { times, timedOut } = measureRounds(adapter, k, depth);
 
-    let mut_timedOut = false;
-
-    // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
-    for (let mut_r = 0; mut_r < MEASURE_ROUNDS; mut_r++) {
-      const elapsed = runOnce(adapter, k, depth);
-
-      mut_times.push(elapsed);
-
-      if (elapsed > TIMEOUT_MS) {
-        mut_timedOut = true;
-
-        break;
-      }
-    }
-
-    if (mut_timedOut) {
+    if (timedOut) {
       mut_cells.push(`> ${String(TIMEOUT_MS)} ms`);
 
       mut_skippingRest = true;
 
-      console.log(
+      console.info(
         `  ⏱ ${label} K=${String(k)} M=${String(depth)}: TIMEOUT (> ${String(TIMEOUT_MS)} ms)`,
       );
     } else {
-      const sorted = mut_times.toSorted((a, b) => a - b);
+      const sorted = times.toSorted((a, b) => a - b);
 
       const med = median(sorted);
 
       mut_cells.push(`${med.toFixed(1)} ms`);
 
-      console.log(
+      console.info(
         `  ✓ ${label} K=${String(k)} M=${String(depth)}: ${med.toFixed(1)} ms`,
       );
     }
   }
 
-  mut_tableLines.push(`| ${label} | ${mut_cells.join(' | ')} |`);
+  return mut_cells;
+};
+
+console.info(
+  `\n## Deep Chain Throughput (${String(WARMUP_ROUNDS)} warmup + ${String(MEASURE_ROUNDS)} measured, timeout=${String(TIMEOUT_MS)} ms)\n`,
+);
+
+// Column headers
+const colHeaders = PARAMS.map(([k, m]) => `K=${String(k)}, M=${String(m)}`);
+
+const mut_tableLines: string[] = [
+  `| Library | ${colHeaders.join(' | ')} |`,
+  `| ------- | ${PARAMS.map(() => '----------:').join(' | ')} |`,
+];
+
+for (const entry of entries) {
+  const cells = measureEntry(entry);
+
+  mut_tableLines.push(`| ${entry.label} | ${cells.join(' | ')} |`);
 }
 
 const tableContent = mut_tableLines.join('\n');
 
-console.log(`\n${tableContent}`);
+console.info(`\n${tableContent}`);
 
 const benchmarkDir = path.resolve(
   workspaceRootPath,
@@ -216,4 +241,4 @@ const resultsPath = path.resolve(benchmarkDir, 'results-deep-chain.md');
 // eslint-disable-next-line security/detect-non-literal-fs-filename
 await fs.writeFile(resultsPath, `${tableContent}\n`, 'utf8');
 
-console.log(`\n✓ Results written to ${resultsPath}`);
+console.info(`\n✓ Results written to ${resultsPath}`);

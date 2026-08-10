@@ -1,5 +1,5 @@
 import { expectType } from 'ts-data-forge';
-import { type DeepReadonly, type SafeUint } from 'ts-type-forge';
+import { type FixedLengthTuple, type SafeUint } from 'ts-type-forge';
 import {
   combine,
   counter,
@@ -32,8 +32,8 @@ const createStreams = (
   startSource: () => void;
   counter$: Observable<SafeUint>;
   timer$: TimerObservable;
-  combined1$: Observable<readonly [number, number]>;
-  combined2$: Observable<readonly [number, number]>;
+  combined1$: Observable<FixedLengthTuple<2, number>>;
+  combined2$: Observable<FixedLengthTuple<2, number>>;
 }> => {
   const counter$ = counter(tick * 2, { startManually: true });
 
@@ -58,10 +58,10 @@ const createStreams = (
   };
 };
 
-export const withInitialValueTestCases: readonly [
-  StreamTestCase<readonly [number, number]>,
-  StreamTestCase<readonly [number, number]>,
-] = [
+export const withInitialValueTestCases: FixedLengthTuple<
+  2,
+  StreamTestCase<FixedLengthTuple<2, number>>
+> = [
   {
     name: 'withInitialValue case 1',
     expectedOutput: [
@@ -69,7 +69,7 @@ export const withInitialValueTestCases: readonly [
       [4, 0],
       [5, 0],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
       const { startSource, combined1$ } = createStreams(tick);
 
       return getStreamHistoryAsPromise(combined1$, startSource);
@@ -103,7 +103,7 @@ export const withInitialValueTestCases: readonly [
       [4, 0],
       [5, 0],
     ],
-    run: (tick: number): Promise<DeepReadonly<[number, number][]>> => {
+    run: (tick: number): Promise<readonly FixedLengthTuple<2, number>[]> => {
       const { startSource, combined2$ } = createStreams(tick);
 
       return getStreamHistoryAsPromise(combined2$, startSource);

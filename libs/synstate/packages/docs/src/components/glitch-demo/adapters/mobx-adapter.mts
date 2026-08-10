@@ -2,7 +2,7 @@ import { computed, observable, reaction, runInAction } from 'mobx';
 import { type Adapter, type Point } from '../types.mjs';
 
 export const createMobXAdapter = (): Adapter => {
-  let mut_mousePos: { x: number; y: number } | undefined;
+  let mut_mousePos: undefined | { x: number; y: number };
 
   let mut_dispose: (() => void) | undefined;
 
@@ -17,12 +17,10 @@ export const createMobXAdapter = (): Adapter => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const derivedY = computed(() => mut_mousePos!.y);
 
-      const combinedPos = computed(
-        (): Point => ({
-          x: derivedX.get(),
-          y: derivedY.get(),
-        }),
-      );
+      const combinedPos = computed((): Point => ({
+        x: derivedX.get(),
+        y: derivedY.get(),
+      }));
 
       mut_dispose = reaction(
         () => combinedPos.get(),

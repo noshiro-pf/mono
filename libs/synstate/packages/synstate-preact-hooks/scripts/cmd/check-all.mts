@@ -5,7 +5,7 @@ import { $ } from 'ts-repo-utils';
  * Runs all validation and build steps for the project.
  */
 const checkAll = async (): Promise<void> => {
-  console.log('Starting full project validation and build...\n');
+  console.info('Starting full project validation and build...\n');
 
   await logStep({
     startMessage: 'Checking file extensions',
@@ -38,7 +38,7 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Documentation generated',
   });
 
-  console.log('✅ All checks completed successfully!\n');
+  console.info('✅ All checks completed successfully!\n');
 };
 
 const mut_step = { current: 1 };
@@ -52,11 +52,11 @@ const logStep = async ({
   action: () => Promise<void>;
   successMessage: string;
 }>): Promise<void> => {
-  console.log(`${mut_step.current}. ${startMessage}...`);
+  console.info(`${mut_step.current}. ${startMessage}...`);
 
   await action();
 
-  console.log(`✓ ${successMessage}.\n`);
+  console.info(`✓ ${successMessage}.\n`);
 
   mut_step.current += 1;
 };

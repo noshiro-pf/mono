@@ -24,14 +24,14 @@ export class ObservableBaseClass<
   Kind extends ObservableBase<A>['kind'],
   Depth extends ObservableBase<A>['depth'],
 > implements ObservableBase<A> {
-  readonly id;
-  readonly kind: Kind;
-  readonly depth: Depth;
   #mut_children: readonly ChildObservable<unknown>[];
   readonly #subscribers: MutableMap<SubscriberId, Subscriber<A>>;
   #mut_currentValue: ReturnType<ObservableBase<A>['getSnapshot']>;
   #mut_isCompleted: ObservableBase<A>['isCompleted'];
   #mut_updateToken: ObservableBase<A>['updateToken'];
+  readonly id;
+  readonly kind: Kind;
+  readonly depth: Depth;
 
   constructor({
     kind,
@@ -57,6 +57,19 @@ export class ObservableBaseClass<
     this.#mut_isCompleted = false;
 
     this.#mut_updateToken = issueUpdateToken();
+  }
+
+  #addSubscriber(s: Subscriber<A>): SubscriberId {
+    // return the id of added subscriber
+    const id = issueSubscriberId();
+
+    this.#subscribers.set(id, s);
+
+    return id;
+  }
+
+  #removeSubscriber(id: SubscriberId): void {
+    this.#subscribers.delete(id);
   }
 
   addChild<B>(child: ChildObservable<B>): void {
@@ -170,18 +183,5 @@ export class ObservableBaseClass<
         this.#removeSubscriber(id);
       },
     };
-  }
-
-  #addSubscriber(s: Subscriber<A>): SubscriberId {
-    // return the id of added subscriber
-    const id = issueSubscriberId();
-
-    this.#subscribers.set(id, s);
-
-    return id;
-  }
-
-  #removeSubscriber(id: SubscriberId): void {
-    this.#subscribers.delete(id);
   }
 }
