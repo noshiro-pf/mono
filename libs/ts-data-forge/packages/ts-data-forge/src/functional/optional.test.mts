@@ -1,7 +1,7 @@
 import { expectType } from '../expect-type.mjs';
 import { Num } from '../number/index.mjs';
 import { type None, type Some } from '../types.mjs';
-import { Optional } from './optional/index.mjs';
+import { Optional, type UnknownOptional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
 import { Result } from './result/index.mjs';
 
@@ -142,6 +142,53 @@ describe('Optional test', () => {
       if (Optional.isSome(result)) {
         expect(Optional.unwrap(result)).toBe(5);
       }
+    });
+
+    test('curried form is usable from a caller generic over the optional', () => {
+      // The motivating case: with the curried parameter fixed to
+      // `Optional<S>`, `S` binds to `Optional.Unwrap<O>` here and a bare
+      // `O extends UnknownOptional` is not assignable to
+      // `Optional<Optional.Unwrap<O>>`, so this only compiles because the
+      // returned function is generic over the whole optional.
+      const liftMap =
+        <O extends UnknownOptional, B>(mapFn: (x: Optional.Unwrap<O>) => B) =>
+        (optional: O): Optional<B> =>
+          Optional.map(mapFn)(optional);
+
+      const lengthOf = liftMap<Optional<string>, number>((s) => s.length);
+
+      const mapped = lengthOf(Optional.some('abc'));
+
+      expectType<typeof mapped, Optional<number>>('=');
+
+      assert.deepStrictEqual(mapped, Optional.some(3));
+
+      assert.deepStrictEqual(lengthOf(Optional.none), Optional.none);
+    });
+
+    test('curried form still infers the result precisely', () => {
+      const mapToLength = Optional.map((text: string) => text.length);
+
+      const mapped = mapToLength(Optional.some('abc'));
+
+      expectType<typeof mapped, Optional<number>>('=');
+
+      assert.deepStrictEqual(mapped, Optional.some(3));
+
+      const empty = mapToLength(Optional.none);
+
+      expectType<typeof empty, Optional<number>>('=');
+
+      assert.deepStrictEqual(empty, Optional.none);
+    });
+
+    test('curried form still rejects a mismatched value type', () => {
+      const mapToLength = Optional.map((text: string) => text.length);
+
+      // @ts-expect-error an Optional<number> is not an Optional<string>
+      const rejected = (): unknown => mapToLength(Optional.some(42));
+
+      expect(rejected).toBeTypeOf('function');
     });
 
     test('should preserve types correctly', () => {

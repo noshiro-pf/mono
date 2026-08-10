@@ -40,9 +40,24 @@ export function map<O extends UnknownOptional, S2>(
 ): Optional<S2>;
 
 // Curried version
+//
+// The returned function is generic over the *whole* optional, mirroring the
+// direct overload above, rather than fixing its parameter to `Optional<S>`.
+// Fixing it makes the curried form unusable from a caller that is itself
+// generic over the optional: with `S` bound to `Unwrap<O>` at currying time
+// the parameter becomes `Optional<Unwrap<O>>`, and TypeScript cannot show a
+// bare `O extends UnknownOptional` is assignable to that — although every
+// concrete instantiation of `O` is.
+//
+// The conditional is what keeps the check: `O` is inferred from the argument
+// and its value type still has to satisfy `S`, so mapping a `(s: string) =>
+// …` over an `Optional<number>` stays an error. The cost is the message it
+// produces — "not assignable to `never`" rather than naming the two optionals.
 export function map<S, S2>(
   mapFn: (value: S) => S2,
-): (optional: Optional<S>) => Optional<S2>;
+): <O extends UnknownOptional>(
+  optional: Unwrap<O> extends S ? O : never,
+) => Optional<S2>;
 
 export function map<O extends UnknownOptional, S2>(
   ...args:

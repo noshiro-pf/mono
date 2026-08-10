@@ -3,7 +3,7 @@ import { Num } from '../number/index.mjs';
 import { type Err, type Ok } from '../types.mjs';
 import { Optional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
-import { Result } from './result/index.mjs';
+import { Result, type UnknownResult } from './result/index.mjs';
 
 describe('Result test', () => {
   describe('ok', () => {
@@ -174,6 +174,49 @@ describe('Result test', () => {
 
       expect(result.value).toBe('10');
     });
+
+    test('curried form is usable from a caller generic over the result', () => {
+      // The motivating case: with the curried parameter fixed to
+      // `Result<S, E>`, `S` binds to `Result.UnwrapOk<R>` here and a bare
+      // `R extends UnknownResult` is not assignable to that, so this only
+      // compiles because the returned function is generic over the whole
+      // result.
+      const liftMap =
+        <R extends UnknownResult, S2>(mapFn: (x: Result.UnwrapOk<R>) => S2) =>
+        (result: R): Result<S2, Result.UnwrapErr<R>> =>
+          Result.map(mapFn)(result);
+
+      const lengthOf = liftMap<Result<string, 'boom'>, number>((s) => s.length);
+
+      const mapped = lengthOf(Result.ok('abc'));
+
+      expectType<typeof mapped, Result<number, 'boom'>>('=');
+
+      assert.deepStrictEqual(mapped, Result.ok(3));
+
+      assert.deepStrictEqual(lengthOf(Result.err('boom')), Result.err('boom'));
+    });
+
+    test('curried form keeps the error type and rejects a mismatch', () => {
+      const mapToLength = Result.map((text: string) => text.length);
+
+      const mapped = mapToLength(Result.ok('abc'));
+
+      expectType<typeof mapped, Result<number, never>>('=');
+
+      assert.deepStrictEqual(mapped, Result.ok(3));
+
+      const failed = mapToLength(Result.err('boom' as const));
+
+      expectType<typeof failed, Result<number, 'boom'>>('=');
+
+      assert.deepStrictEqual(failed, Result.err('boom'));
+
+      // @ts-expect-error a Result<number, …> is not a Result<string, …>
+      const rejected = (): unknown => mapToLength(Result.ok(42));
+
+      expect(rejected).toBeTypeOf('function');
+    });
   });
 
   describe('mapErr', () => {
@@ -233,6 +276,40 @@ describe('Result test', () => {
       assert.isTrue(Result.isErr(result));
 
       expect(result.value).toBe('ERROR: FAILED');
+    });
+
+    test('curried form is usable from a caller generic over the result', () => {
+      const liftMapErr =
+        <R extends UnknownResult, E2>(mapFn: (x: Result.UnwrapErr<R>) => E2) =>
+        (result: R): Result<Result.UnwrapOk<R>, E2> =>
+          Result.mapErr(mapFn)(result);
+
+      const shout = liftMapErr<Result<number, string>, string>((e) =>
+        e.toUpperCase(),
+      );
+
+      const mapped = shout(Result.err('failed'));
+
+      expectType<typeof mapped, Result<number, string>>('=');
+
+      assert.deepStrictEqual(mapped, Result.err('FAILED'));
+
+      assert.deepStrictEqual(shout(Result.ok(1)), Result.ok(1));
+    });
+
+    test('curried form keeps the ok type and rejects a mismatch', () => {
+      const shout = Result.mapErr((e: string) => e.toUpperCase());
+
+      const mapped = shout(Result.err('failed'));
+
+      expectType<typeof mapped, Result<never, string>>('=');
+
+      assert.deepStrictEqual(mapped, Result.err('FAILED'));
+
+      // @ts-expect-error a Result<…, number> is not a Result<…, string>
+      const rejected = (): unknown => shout(Result.err(42));
+
+      expect(rejected).toBeTypeOf('function');
     });
   });
 

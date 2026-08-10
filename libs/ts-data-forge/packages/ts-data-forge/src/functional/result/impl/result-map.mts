@@ -44,9 +44,24 @@ export function map<R extends UnknownResult, S2>(
 ): Result<S2, UnwrapErr<R>>;
 
 // Curried version
+//
+// The returned function is generic over the *whole* result, mirroring the
+// direct overload above, rather than fixing its parameter to `Result<S, E>`.
+// Fixing it makes the curried form unusable from a caller that is itself
+// generic over the result: with `S` bound to `UnwrapOk<R>` at currying time the
+// parameter becomes `Result<...>` in terms of `R`, and TypeScript cannot show
+// a bare `R extends UnknownResult` is assignable to that — although every
+// concrete instantiation of `R` is.
+//
+// The conditional is what keeps the check: `R` is inferred from the argument
+// and its success type still has to satisfy `S`, so the mismatched case stays an
+// error. The cost is the message it produces — "not assignable to `never`"
+// rather than naming the two results.
 export function map<S, S2>(
   mapFn: (value: S) => S2,
-): <E>(result: Result<S, E>) => Result<S2, E>;
+): <R extends UnknownResult>(
+  result: UnwrapOk<R> extends S ? R : never,
+) => Result<S2, UnwrapErr<R>>;
 
 export function map<R extends UnknownResult, S2>(
   ...args:
