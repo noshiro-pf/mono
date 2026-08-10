@@ -38,7 +38,7 @@ const config = () =>
             // Requesting them concurrently intermittently fails with "Failed to
             // fetch dynamically imported module" for an arbitrary file, and
             // vitest's `retry` cannot help: the file never loads, so there is no
-            // test to retry. Serialising the files removes the race.
+            // test to retry. Requesting them one at a time removes the race.
             fileParallelism: false,
             // https://vitest.dev/config/browser/playwright
             browser: {
