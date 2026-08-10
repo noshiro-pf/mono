@@ -1,0 +1,81 @@
+import { unknownToString, type UnknownResult } from 'ts-data-forge';
+import { $, isDirectlyExecuted, Result } from 'ts-repo-utils';
+import { embedExamples } from './embed-examples.mjs';
+
+/**
+ * Generates documentation using TypeDoc and formats the output.
+ */
+export const genDocs = async (): Promise<void> => {
+  console.info('Starting documentation generation...\n');
+
+  await logStep({
+    startMessage: 'Embedding example code into README',
+    action: () => runStep(embedExamples(), 'Example embedding failed'),
+    successMessage: 'Example code embedded into README',
+  });
+
+  await logStep({
+    startMessage: 'Linting markdown files',
+    action: () => runCmdStep('pnpm run md', 'Markdown linting failed'),
+    successMessage: 'Markdown linting completed',
+  });
+
+  await logStep({
+    startMessage: 'Formatting files',
+    action: () => runCmdStep('pnpm run fmt', 'File formatting failed'),
+    successMessage: 'Formatting completed',
+  });
+
+  console.info('✅ Documentation generation completed successfully!\n');
+};
+
+const mut_step = { current: 1 };
+
+const logStep = async ({
+  startMessage,
+  successMessage,
+  action,
+}: Readonly<{
+  startMessage: string;
+  action: () => Promise<void>;
+  successMessage: string;
+}>): Promise<void> => {
+  console.info(`${mut_step.current}. ${startMessage}...`);
+
+  await action();
+
+  console.info(`✓ ${successMessage}.\n`);
+
+  mut_step.current += 1;
+};
+
+const runCmdStep = async (cmd: string, errorMsg: string): Promise<void> => {
+  const result = await $(cmd);
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${result.value.message}`);
+
+    console.error('❌ Documentation generation failed');
+
+    process.exit(1);
+  }
+};
+
+const runStep = async (
+  promise: Promise<UnknownResult>,
+  errorMsg: string,
+): Promise<void> => {
+  const result = await promise;
+
+  if (Result.isErr(result)) {
+    console.error(`${errorMsg}: ${unknownToString(result.value)}`);
+
+    console.error('❌ Documentation generation failed');
+
+    process.exit(1);
+  }
+};
+
+if (isDirectlyExecuted(import.meta.url)) {
+  await genDocs();
+}
