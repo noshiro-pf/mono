@@ -57,12 +57,12 @@ export const defineViteConfig = ({
               testTimeout,
             }),
             alias,
-            // Browser mode fetches each test file over the Vite dev server, and
-            // that occasionally fails with "Failed to fetch dynamically imported
-            // module" for an arbitrary file. It predates this monorepo — the
-            // standalone synstate repository reproduces it too, on a different
-            // file each run — so retry rather than let it fail the suite.
-            retry: 2,
+            // Browser mode fetches each test file over the Vite dev server.
+            // Requesting them concurrently intermittently fails with "Failed to
+            // fetch dynamically imported module" for an arbitrary file, and
+            // vitest's `retry` cannot help: the file never loads, so there is no
+            // test to retry. Serialising the files removes the race.
+            fileParallelism: false,
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,
