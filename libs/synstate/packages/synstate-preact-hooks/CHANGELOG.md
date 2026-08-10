@@ -1,5 +1,22 @@
 # synstate-preact-hooks
 
+## 2.0.0
+
+### Major Changes
+
+- 6f4805e: Upgrade to `ts-data-forge` 14 and `ts-type-forge` 9.
+
+    Both are dependencies whose types appear in these packages' public
+    signatures, so consumers that also depend on them directly have to upgrade in
+    step.
+
+    BREAKING CHANGE: requires `ts-data-forge` >= 14 and `ts-type-forge` >= 9.
+
+### Patch Changes
+
+- Updated dependencies [6f4805e]
+    - synstate@2.0.0
+
 ## 1.0.2
 
 ### Patch Changes
