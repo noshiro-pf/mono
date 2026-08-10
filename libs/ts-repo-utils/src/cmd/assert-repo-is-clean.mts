@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+
+import * as cmd from 'cmd-ts';
+import { Arr } from 'ts-data-forge';
+import { assertRepoIsClean } from '../functions/index.mjs';
+
+const cmdDef = cmd.command({
+  name: 'assert-repo-is-clean-cli',
+  version: '10.1.8',
+  args: {
+    silent: cmd.flag({
+      long: 'silent',
+      type: cmd.optional(cmd.boolean),
+      description: 'If true, suppresses output messages (default: false)',
+    }),
+  },
+  handler: (args) => {
+    main(args).catch((error: unknown) => {
+      console.error('An error occurred:', error);
+
+      process.exit(1);
+    });
+  },
+});
+
+const main = async (args: Readonly<{ silent?: boolean }>): Promise<void> => {
+  await assertRepoIsClean({ silent: args.silent });
+};
+
+await cmd.run(cmdDef, Arr.skip(process.argv, 2));

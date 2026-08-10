@@ -1,0 +1,332 @@
+/* eslint-disable require-atomic-updates */
+import { isError } from '@sindresorhus/is';
+import { spawn } from 'node:child_process';
+import {
+  Arr,
+  createPromise,
+  hasKey,
+  isNotUndefined,
+  isRecord,
+  pipe,
+  Result,
+} from 'ts-data-forge';
+import { type Package } from './types.mjs';
+
+const DEBUG = false as boolean;
+
+/**
+ * Executes a npm script across multiple packages in parallel with a concurrency
+ * limit. Uses fail-fast behavior - stops execution immediately when any package
+ * fails.
+ *
+ * @param packages - Array of Package objects to execute the script in
+ * @param scriptName - The name of the npm script to execute
+ * @param concurrency - Maximum number of packages to process simultaneously
+ *   (default: 3)
+ * @returns A promise that resolves to an array of execution results, or rejects
+ *   immediately on first failure
+ */
+export const executeParallel = async (
+  packages: readonly Package[],
+  scriptName: string,
+  concurrency: number = 3,
+): Promise<readonly Readonly<{ code?: number; skipped?: boolean }>[]> => {
+  const mut_resultPromises: Promise<
+    Readonly<{ code?: number; skipped?: boolean }>
+  >[] = [];
+
+  const mut_executing = new Set<Promise<unknown>>();
+
+  let mut_failed = false as boolean;
+
+  for (const pkg of packages) {
+    // Stop starting new processes if any has failed
+    if (mut_failed) {
+      break;
+    }
+
+    // eslint-disable-next-line no-loop-func
+    const promise = executeScript(pkg, scriptName).then((result) => {
+      // Check for failure immediately
+      if (Result.isErr(result)) {
+        mut_failed = true;
+
+        throw result.value; // Throw the error to trigger fail-fast
+      }
+
+      return result.value; // Return the unwrapped value for success
+    });
+
+    mut_resultPromises.push(promise);
+
+    const wrappedPromise = promise
+      // eslint-disable-next-line no-loop-func
+      .catch((error: unknown) => {
+        mut_failed = true;
+
+        throw error; // Re-throw to ensure fail-fast propagation
+      })
+      .finally(() => {
+        mut_executing.delete(wrappedPromise);
+
+        if (DEBUG) {
+          console.debug('executing size', mut_executing.size);
+        }
+      });
+
+    mut_executing.add(wrappedPromise);
+
+    if (DEBUG) {
+      console.debug('executing size', mut_executing.size);
+    }
+
+    // If we reach concurrency limit, wait for one to finish
+    if (mut_executing.size >= concurrency) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await Promise.race(mut_executing);
+      } catch (error) {
+        // If any process fails, cancel remaining processes and throw immediately
+        // eslint-disable-next-line no-useless-assignment
+        mut_failed = true;
+
+        throw error;
+      }
+    }
+  }
+
+  // Wait for all started processes to complete
+  // This will throw immediately if any process fails (fail-fast)
+  return Promise.all(mut_resultPromises);
+};
+
+/**
+ * Executes a npm script across packages in dependency order stages. Packages
+ * are grouped into stages where each stage contains packages whose dependencies
+ * have been completed in previous stages. Uses fail-fast behavior - stops
+ * execution immediately when any package fails.
+ *
+ * @param packages - Array of Package objects to execute the script in
+ * @param scriptName - The name of the npm script to execute
+ * @param concurrency - Maximum number of packages to process simultaneously
+ *   within each stage (default: 3)
+ * @returns A promise that resolves when all stages are complete, or rejects
+ *   immediately on first failure
+ */
+export const executeStages = async (
+  packages: readonly Package[],
+  scriptName: string,
+  concurrency: number = 3,
+): Promise<void> => {
+  const dependencyGraph = buildDependencyGraph(packages);
+
+  const sorted = topologicalSortPackages(packages, dependencyGraph);
+
+  const mut_stages: (readonly Package[])[] = [];
+
+  const mut_completed = new Set<string>();
+
+  while (mut_completed.size < sorted.length) {
+    const stage = sorted.filter(
+      (pkg) =>
+        !mut_completed.has(pkg.name) &&
+        (dependencyGraph.get(pkg.name) ?? []).every((dep) =>
+          mut_completed.has(dep),
+        ),
+    );
+
+    if (Arr.isEmpty(stage)) {
+      throw new Error('Circular dependency detected');
+    }
+
+    mut_stages.push(stage);
+
+    for (const pkg of stage) {
+      mut_completed.add(pkg.name);
+    }
+  }
+
+  console.info(
+    `\nExecuting ${scriptName} in ${mut_stages.length} stages (fail-fast mode)...\n`,
+  );
+
+  for (const [i, stage] of mut_stages.entries()) {
+    if (!Arr.isNonEmpty(stage)) {
+      continue;
+    }
+
+    console.info(`Stage ${i + 1}: ${stage.map((p) => p.name).join(', ')}`);
+
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const results = await executeParallel(stage, scriptName, concurrency);
+
+      // Log successful completion of the stage
+      // All results are successful because executeParallel throws on any failure
+      console.info(
+        `✅ Stage ${i + 1} completed successfully (${results.length}/${stage.length} packages)`,
+      );
+    } catch (error) {
+      // executeParallel will throw immediately on any failure (fail-fast)
+      const errorMessage = isError(error) ? error.message : String(error);
+
+      console.error(`\n❌ Stage ${i + 1} failed (fail-fast):`);
+
+      console.error(errorMessage);
+
+      throw new Error(`Stage ${i + 1} failed: ${errorMessage}`, {
+        cause: error,
+      });
+    }
+  }
+};
+
+/**
+ * Executes a npm script in a specific package directory.
+ *
+ * @param pkg - The package object containing path and metadata
+ * @param scriptName - The name of the npm script to execute
+ * @param options - Configuration options
+ * @param options.prefix - Whether to prefix output with package name (default:
+ *   true)
+ * @returns A promise that resolves to execution result with exit code or
+ *   skipped flag
+ */
+const executeScript = (
+  pkg: Package,
+  scriptName: string,
+  { prefix = true }: Readonly<{ prefix?: boolean }> = {},
+): Promise<Result<Readonly<{ code?: number; skipped?: boolean }>, Error>> =>
+  pipe(
+    createPromise(
+      (
+        resolve: (
+          value: Readonly<{ code?: number; skipped?: boolean }>,
+        ) => void,
+        reject: (reason: unknown) => void,
+      ) => {
+        const packageJsonScripts =
+          isRecord(pkg.packageJson) && isRecord(pkg.packageJson['scripts'])
+            ? pkg.packageJson['scripts']
+            : ({} as const);
+
+        const hasScript = hasKey(packageJsonScripts, scriptName);
+
+        if (!hasScript) {
+          resolve({ skipped: true });
+
+          return;
+        }
+
+        const prefixStr = prefix ? (`[${pkg.name}] ` as const) : '';
+
+        const proc = spawn('npm', ['run', scriptName], {
+          cwd: pkg.path,
+          shell: true,
+          stdio: 'pipe',
+        });
+
+        proc.stdout.on('data', (data: Readonly<Buffer>) => {
+          process.stdout.write(prefixStr + data.toString());
+        });
+
+        proc.stderr.on('data', (data: Readonly<Buffer>) => {
+          process.stderr.write(prefixStr + data.toString());
+        });
+
+        proc.on('close', (code: number | null) => {
+          if (DEBUG) {
+            console.debug(`${pkg.name} process closed with code: ${code}`);
+          }
+
+          if (code === 0 || code === null) {
+            resolve({ code: code ?? 0 });
+          } else {
+            reject(new Error(`${pkg.name} exited with code ${code}`));
+          }
+        });
+
+        proc.on('error', reject);
+      },
+    ),
+  ).map((result) =>
+    result.then(
+      Result.mapErr((err) => {
+        const errorMessage: string = isError(err)
+          ? err.message
+          : isRecord(err) && hasKey(err, 'message')
+            ? (err.message?.toString() ?? 'Unknown error message')
+            : 'Unknown error';
+
+        console.error(`\nError in ${pkg.name}:`, errorMessage);
+
+        return isError(err) ? err : new Error(errorMessage);
+      }),
+    ),
+  ).value;
+
+/**
+ * Performs a topological sort on packages based on their dependencies, ensuring
+ * dependencies are ordered before their dependents.
+ *
+ * @param packages - Array of Package objects to sort
+ * @returns An array of packages in dependency order (dependencies first)
+ */
+const topologicalSortPackages = (
+  packages: readonly Package[],
+  dependencyGraph: ReadonlyMap<string, readonly string[]>,
+): readonly Package[] => {
+  const mut_visited = new Set<string>();
+
+  const mut_result: string[] = [];
+
+  const packageMap = new Map(packages.map((p) => [p.name, p]));
+
+  const visit = (pkgName: string): void => {
+    if (mut_visited.has(pkgName)) return;
+
+    mut_visited.add(pkgName);
+
+    const deps = dependencyGraph.get(pkgName) ?? [];
+
+    for (const dep of deps) {
+      visit(dep);
+    }
+
+    mut_result.push(pkgName);
+  };
+
+  for (const pkg of packages) {
+    visit(pkg.name);
+  }
+
+  return mut_result
+    .map((pkgName) => packageMap.get(pkgName))
+    .filter(isNotUndefined);
+};
+
+/**
+ * Builds a dependency graph from the given packages, mapping each package name
+ * to its internal workspace dependencies.
+ *
+ * @param packages - Array of Package objects to analyze
+ * @returns A readonly map where keys are package names and values are arrays of
+ *   their dependency package names
+ */
+const buildDependencyGraph = (
+  packages: readonly Package[],
+): ReadonlyMap<string, readonly string[]> => {
+  const packageMap = new Map(packages.map((p) => [p.name, p]));
+
+  const mut_graph = new Map<string, readonly string[]>();
+
+  for (const pkg of packages) {
+    const deps = Object.keys(pkg.dependencies).filter((depName) =>
+      packageMap.has(depName),
+    );
+
+    mut_graph.set(pkg.name, deps);
+  }
+
+  return mut_graph;
+};
