@@ -34,6 +34,10 @@ const config = () =>
             name: 'Browser',
             alias: aliasMap,
             ...projectConfig(),
+            // Browser mode fetches each test file over the Vite dev server, and
+            // that occasionally fails with "Failed to fetch dynamically imported
+            // module" for an arbitrary file. Retry rather than fail the suite.
+            retry: 2,
             // https://vitest.dev/config/browser/playwright
             browser: {
               enabled: true,

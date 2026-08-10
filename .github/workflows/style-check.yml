@@ -18,7 +18,10 @@ jobs:
     timeout-minutes: 10
 
     strategy:
-      fail-fast: true
+      # The matrix entries are independent checks. Letting one cancel the
+      # others hides their results and, since most of them are required
+      # status checks, blocks the pull request on an unrelated failure.
+      fail-fast: false
       matrix:
         command:
           - fmt:full
