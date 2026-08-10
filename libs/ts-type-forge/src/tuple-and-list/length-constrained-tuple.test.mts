@@ -9,13 +9,13 @@ import {
   type MutableMaxLengthTuple,
 } from './length-constrained-tuple.mjs';
 
-expectType<readonly [0, 0], MutableFixedLengthTuple<2, 0>>('=');
+expectType<[0, 0], MutableFixedLengthTuple<2, 0>>('=');
 
-expectType<readonly [0, 0, 0], MutableFixedLengthTuple<3, 0>>('=');
+expectType<[0, 0, 0], MutableFixedLengthTuple<3, 0>>('=');
 
-expectType<readonly [0, 0, 0, 0], MutableFixedLengthTuple<4, 0>>('=');
+expectType<[0, 0, 0, 0], MutableFixedLengthTuple<4, 0>>('=');
 
-expectType<readonly [0, 0, 0, 0, 0], MutableFixedLengthTuple<5, 0>>('=');
+expectType<[0, 0, 0, 0, 0], MutableFixedLengthTuple<5, 0>>('=');
 
 expectType<readonly [0, 0], FixedLengthTuple<2, 0>>('=');
 
@@ -31,7 +31,7 @@ expectType<FixedLengthTuple<3, 0>, readonly [0, 0, 0]>('=');
 
 expectType<FixedLengthTuple<4, 1>, readonly [1, 1, 1, 1]>('=');
 
-expectType<MutableFixedLengthTuple<4, 1>, readonly [1, 1, 1, 1]>('=');
+expectType<MutableFixedLengthTuple<4, 1>, [1, 1, 1, 1]>('=');
 
 expectType<MinLengthTuple<0, 0>, readonly 0[]>('=');
 
@@ -52,10 +52,7 @@ expectType<
   readonly [] | readonly [1] | readonly [1, 1] | readonly [1, 1, 1]
 >('=');
 
-expectType<
-  MutableMaxLengthTuple<2, 0>,
-  readonly [] | readonly [0] | readonly [0, 0]
->('=');
+expectType<MutableMaxLengthTuple<2, 0>, [] | [0] | [0, 0]>('=');
 
 // BoundedLengthTuple
 
@@ -71,6 +68,4 @@ expectType<
   readonly [] | readonly [1] | readonly [1, 1]
 >('=');
 
-expectType<MutableBoundedLengthTuple<1, 2, 1>, readonly [1] | readonly [1, 1]>(
-  '=',
-);
+expectType<MutableBoundedLengthTuple<1, 2, 1>, [1] | [1, 1]>('=');

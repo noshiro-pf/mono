@@ -17,9 +17,7 @@ expectType<
   readonly [] | readonly [1, 2, 3] | readonly [1, 2] | readonly [1]
 >('=');
 
-expectType<TSTypeForgeInternals_RecordPathPrefixes<readonly []>, readonly []>(
-  '=',
-);
+expectType<TSTypeForgeInternals_RecordPathPrefixes<[]>, readonly []>('=');
 
 // ── key-path-and-value-pair ─────────────────────────
 {
@@ -132,7 +130,7 @@ expectType<TSTypeForgeInternals_RecordPathPrefixes<readonly []>, readonly []>(
     | readonly ['z', 2, 'f', 1]
   >('=');
 
-  type K2 = RecordLeafPathsWithIndex<readonly []>;
+  type K2 = RecordLeafPathsWithIndex<[]>;
 
   expectType<K2, readonly []>('=');
 

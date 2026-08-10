@@ -4,6 +4,7 @@
     "../../../configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "lib": ["ESNext"],
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,

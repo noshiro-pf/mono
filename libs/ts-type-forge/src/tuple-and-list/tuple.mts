@@ -22,7 +22,7 @@ export namespace Tuple {
     D = never,
   > = T extends readonly []
     ? D
-    : T extends readonly [infer X, ...unknown[]]
+    : T extends readonly [infer X, ...(readonly unknown[])]
       ? X
       : T[number];
 
@@ -46,7 +46,7 @@ export namespace Tuple {
    */
   export type Last<T extends readonly unknown[]> = T extends readonly []
     ? never
-    : T extends readonly [...unknown[], infer L]
+    : T extends readonly [...(readonly unknown[]), infer L]
       ? L
       : T[number];
 
@@ -240,7 +240,7 @@ export namespace Tuple {
             infer H extends readonly unknown[],
             ...infer R extends readonly (readonly unknown[])[],
           ]
-        ? readonly [...H, ...Flatten<R>]
+        ? Readonly<[...H, ...Flatten<R>]>
         : readonly T[number][number][];
 
   /**
@@ -262,7 +262,7 @@ export namespace Tuple {
   export type Concat<
     A extends readonly unknown[],
     B extends readonly unknown[],
-  > = readonly [...A, ...B];
+  > = Readonly<[...A, ...B]>;
 
   /**
    * Creates pairs of elements from two readonly tuples `A` and `B`.
@@ -463,7 +463,7 @@ type TakeLastImpl<
   T extends readonly unknown[],
   R extends readonly unknown[],
 > = R['length'] extends N
-  ? T extends readonly [...infer Init, ...Readonly<{ [K in keyof R]: unknown }>]
+  ? T extends readonly [...infer Init, ...{ [K in keyof R]: unknown }]
     ? T extends readonly [...Init, ...infer LastN]
       ? Readonly<LastN> // Split succeeded: return the trailing N elements
       : never // Unreachable: the split above always re-matches
@@ -484,7 +484,7 @@ type SkipLastImpl<
   T extends readonly unknown[],
   R extends readonly unknown[],
 > = R['length'] extends N
-  ? T extends readonly [...infer Init, ...Readonly<{ [K in keyof R]: unknown }>]
+  ? T extends readonly [...infer Init, ...{ [K in keyof R]: unknown }]
     ? Readonly<Init> // Split succeeded: return everything before the last N
     : readonly [] // N >= T['length']: everything is skipped
   : SkipLastImpl<N, T, readonly [unknown, ...R]>;

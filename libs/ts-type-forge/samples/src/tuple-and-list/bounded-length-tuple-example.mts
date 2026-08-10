@@ -4,8 +4,8 @@ import { type BoundedLengthTuple } from 'ts-type-forge';
 
 type T = BoundedLengthTuple<1, 3, string>;
 // readonly [string] | readonly [string, string] | readonly [string, string, string]
-const a: T = ['a'] as const; // ok
-const b: T = ['a', 'b', 'c'] as const; // ok
+const a: T = ['a']; // ok
+const b: T = ['a', 'b', 'c']; // ok
 // const c: T = []; // Error
 // const d: T = ["a", "b", "c", "d"]; // Error
 

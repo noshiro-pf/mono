@@ -14,7 +14,7 @@ import { type Uint10 } from '../constants/index.mjs';
  * type ResultZero = Min<0 | 10>; // 0
  * ```
  */
-export type Min<N extends Uint10> = MinImpl<N, readonly []>;
+export type Min<N extends Uint10> = MinImpl<N, []>;
 
 // https://zenn.dev/noshiro_piko/articles/typescript-type-level-min
 
@@ -32,4 +32,4 @@ type MinImpl<N extends Uint10, T extends readonly unknown[]> =
       T['length'] extends N
       ? T['length'] // If yes, this is the smallest number found so far, return it.
       : // Recursive step: Increment the tuple length (counter) and check again.
-        MinImpl<N, readonly [0, ...T]>;
+        MinImpl<N, [0, ...T]>;

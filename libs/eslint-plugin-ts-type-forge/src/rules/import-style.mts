@@ -10,7 +10,7 @@ import {
 
 /** `JSONSchema4`, reached through the public rule-module types. */
 type JsonSchema = Exclude<
-  TSESLint.RuleModule<string, unknown[]>['meta']['schema'],
+  TSESLint.RuleModule<string, readonly unknown[]>['meta']['schema'],
   readonly unknown[]
 >;
 
@@ -29,7 +29,7 @@ export const IMPORT_STYLE_SCHEMA_PROPERTY: JsonSchema = {
     'ambient globals of `ts-type-forge/global` and never touches',
     'imports.',
   ].join(' '),
-} as const;
+};
 
 /**
  * Resolves how a ts-type-forge type name should be written in this file, and

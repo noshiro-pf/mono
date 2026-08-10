@@ -45,7 +45,9 @@ export type DeepReadonly<T> = T extends Primitive
             : T extends readonly unknown[]
               ? DeepReadonlyArray<T>
               : T extends AnyRecord
-                ? Readonly<{ [K in keyof T]: DeepReadonly<T[K]> }>
+                ? {
+                    readonly [K in keyof T]: DeepReadonly<T[K]>;
+                  }
                 : T;
 
 /**
@@ -79,7 +81,9 @@ export type DeepMutable<T> = T extends Primitive
             : T extends readonly unknown[]
               ? DeepMutableArray<T>
               : T extends AnyRecord
-                ? Readonly<{ [K in keyof T]: DeepMutable<T[K]> }>
+                ? {
+                    -readonly [K in keyof T]: DeepMutable<T[K]>;
+                  }
                 : T;
 
 /**
@@ -120,7 +124,9 @@ export type DeepPartial<T> = T extends Primitive
             : T extends readonly unknown[]
               ? DeepPartialArray<T>
               : T extends AnyRecord
-                ? Readonly<{ [K in keyof T]?: DeepPartial<T[K]> }>
+                ? {
+                    [K in keyof T]?: DeepPartial<T[K]>;
+                  }
                 : T;
 
 /**
@@ -155,7 +161,9 @@ export type DeepRequired<T> = T extends Primitive
             : T extends readonly unknown[]
               ? DeepRequiredArray<T>
               : T extends AnyRecord
-                ? Readonly<{ [K in keyof T]-?: DeepRequired<T[K]> }>
+                ? {
+                    [K in keyof T]-?: DeepRequired<T[K]>;
+                  }
                 : T;
 
 /**
@@ -225,28 +233,36 @@ type AnyRecord = ReadonlyRecord<string, any>;
 type DeepReadonlyArray<T extends readonly unknown[]> = [
   ExtraKeysOf<T>,
 ] extends [never]
-  ? Readonly<{ [K in keyof T]: DeepReadonly<T[K]> }>
+  ? {
+      readonly [K in keyof T]: DeepReadonly<T[K]>;
+    }
   : readonly DeepReadonly<T[number]>[] & StrictPick<T, ExtraKeysOf<T>>;
 
 /** @internal The array branch of {@link DeepMutable}. */
 type DeepMutableArray<T extends readonly unknown[]> = [ExtraKeysOf<T>] extends [
   never,
 ]
-  ? Readonly<{ [K in keyof T]: DeepMutable<T[K]> }>
+  ? {
+      -readonly [K in keyof T]: DeepMutable<T[K]>;
+    }
   : readonly DeepMutable<T[number]>[] & StrictPick<T, ExtraKeysOf<T>>;
 
 /** @internal The array branch of {@link DeepPartial}. */
 type DeepPartialArray<T extends readonly unknown[]> = [ExtraKeysOf<T>] extends [
   never,
 ]
-  ? Readonly<{ [K in keyof T]?: DeepPartial<T[K]> }>
+  ? {
+      [K in keyof T]?: DeepPartial<T[K]>;
+    }
   : readonly DeepPartial<T[number]>[] & StrictPick<T, ExtraKeysOf<T>>;
 
 /** @internal The array branch of {@link DeepRequired}. */
 type DeepRequiredArray<T extends readonly unknown[]> = [
   ExtraKeysOf<T>,
 ] extends [never]
-  ? Readonly<{ [K in keyof T]-?: DeepRequired<T[K]> }>
+  ? {
+      [K in keyof T]-?: DeepRequired<T[K]>;
+    }
   : readonly DeepRequired<T[number]>[] & StrictPick<T, ExtraKeysOf<T>>;
 
 /**
@@ -255,5 +271,5 @@ type DeepRequiredArray<T extends readonly unknown[]> = [
  */
 type ExtraKeysOf<T extends readonly unknown[]> = RelaxedExclude<
   keyof T,
-  keyof (readonly unknown[]) | keyof (readonly unknown[]) | `${number}`
+  keyof unknown[] | keyof (readonly unknown[]) | `${number}`
 >;

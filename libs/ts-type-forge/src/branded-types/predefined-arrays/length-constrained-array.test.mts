@@ -22,13 +22,12 @@ import {
   expectType<
     MaxLengthArray<3, number>,
     readonly number[] &
-      Readonly<
-        {
-          MaxLength: 0 | 1 | 2 | 3;
-        } & {
-          'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-        }
-      >
+      Readonly<{
+        MaxLength: 0 | 1 | 2 | 3;
+      }> &
+      Readonly<{
+        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+      }>
   >('=');
 
   // Covariance in the bound: M <= N implies MaxLengthArray<M> <= MaxLengthArray<N>
@@ -62,14 +61,13 @@ import {
 {
   expectType<
     MutableMaxLengthArray<3, number>,
-    readonly number[] &
-      Readonly<
-        {
-          MaxLength: 0 | 1 | 2 | 3;
-        } & {
-          'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-        }
-      >
+    number[] &
+      Readonly<{
+        MaxLength: 0 | 1 | 2 | 3;
+      }> &
+      Readonly<{
+        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+      }>
   >('=');
 
   // Reflexivity
@@ -98,14 +96,13 @@ import {
 {
   expectType<
     MinLengthArray<3, number>,
-    readonly [number, number, number, ...number[]] &
-      Readonly<
-        {
-          MinLength: readonly [0, 0, 0, ...0[]];
-        } & {
-          'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-        }
-      >
+    readonly [number, number, number, ...(readonly number[])] &
+      Readonly<{
+        MinLength: readonly [0, 0, 0, ...(readonly 0[])];
+      }> &
+      Readonly<{
+        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+      }>
   >('=');
 
   // M >= N implies MinLengthArray<M> <= MinLengthArray<N>
@@ -143,7 +140,7 @@ import {
   // Also a subtype of the structural at-least tuple (up to the prefix cap)
   expectType<
     MinLengthArray<3, number>,
-    readonly [number, number, number, ...number[]]
+    readonly [number, number, number, ...(readonly number[])]
   >('<=');
 }
 
@@ -152,14 +149,13 @@ import {
 {
   expectType<
     MutableMinLengthArray<3, number>,
-    readonly [number, number, number, ...number[]] &
-      Readonly<
-        {
-          MinLength: readonly [0, 0, 0, ...0[]];
-        } & {
-          'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
-        }
-      >
+    [number, number, number, ...number[]] &
+      Readonly<{
+        MinLength: readonly [0, 0, 0, ...(readonly 0[])];
+      }> &
+      Readonly<{
+        'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3': unknown;
+      }>
   >('=');
 
   // Reflexivity

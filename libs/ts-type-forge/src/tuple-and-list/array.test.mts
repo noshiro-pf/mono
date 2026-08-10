@@ -24,9 +24,11 @@ import {
 // NonEmptyTuple / MutableNonEmptyTuple are the purely structural counterparts
 
 {
-  expectType<NonEmptyTuple<number>, readonly [number, ...number[]]>('=');
+  expectType<NonEmptyTuple<number>, readonly [number, ...(readonly number[])]>(
+    '=',
+  );
 
-  expectType<MutableNonEmptyTuple<number>, readonly [number, ...number[]]>('=');
+  expectType<MutableNonEmptyTuple<number>, [number, ...number[]]>('=');
 }
 
 // The branded array is a subtype of the structural tuple (via the clamped

@@ -88,10 +88,8 @@ export const analyzeUniformTuple = (
 
   const others = [
     ...Arr.tail(leading),
-    ...(restElementType === undefined
-      ? ([] as const)
-      : ([restElementType] as const)),
-  ] as const;
+    ...(restElementType === undefined ? [] : [restElementType]),
+  ];
 
   return others.every(
     (element) => normalizeWhitespace(sourceCode.getText(element)) === expected,

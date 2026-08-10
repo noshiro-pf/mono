@@ -49,13 +49,11 @@ import {
   expectType<RelaxedExtract<string, 'a' | 'b'>, never>('='); // Standard Extract behavior
 }
 
-type Base = Readonly<{ a: number; b: string; c: boolean }>;
+type Base = { a: number; b: string; c: boolean };
 
 // --- StrictPick ---
 {
-  expectType<StrictPick<Base, 'a' | 'b'>, Readonly<{ a: number; b: string }>>(
-    '=',
-  );
+  expectType<StrictPick<Base, 'a' | 'b'>, { a: number; b: string }>('=');
 
   // @ts-expect-error 'x' is not in keyof Base
   expectType<StrictPick<Base, 'a' | 'x'>, never>('=');
@@ -63,11 +61,9 @@ type Base = Readonly<{ a: number; b: string; c: boolean }>;
 
 // --- RelaxedPick ---
 {
-  expectType<RelaxedPick<Base, 'a' | 'b'>, Readonly<{ a: number; b: string }>>(
-    '=',
-  );
+  expectType<RelaxedPick<Base, 'a' | 'b'>, { a: number; b: string }>('=');
 
-  expectType<RelaxedPick<Base, 'a' | 'x'>, Readonly<{ a: number }>>('='); // Ignores 'x'
+  expectType<RelaxedPick<Base, 'a' | 'x'>, { a: number }>('='); // Ignores 'x'
 
   expectType<RelaxedPick<Base, string>, Base>('='); // Picks all string keys ('a', 'b', 'c')
 
@@ -104,7 +100,7 @@ type Base = Readonly<{ a: number; b: string; c: boolean }>;
 
 // --- StrictOmit ---
 {
-  expectType<StrictOmit<Base, 'c'>, Readonly<{ a: number; b: string }>>('=');
+  expectType<StrictOmit<Base, 'c'>, { a: number; b: string }>('=');
 
   // @ts-expect-error 'x' is not in keyof Base
   expectType<StrictOmit<Base, 'a' | 'x'>, never>('=');
@@ -112,11 +108,9 @@ type Base = Readonly<{ a: number; b: string; c: boolean }>;
 
 // --- RelaxedOmit ---
 {
-  expectType<RelaxedOmit<Base, 'c'>, Readonly<{ a: number; b: string }>>('=');
+  expectType<RelaxedOmit<Base, 'c'>, { a: number; b: string }>('=');
 
-  expectType<RelaxedOmit<Base, 'a' | 'x'>, Readonly<{ b: string; c: boolean }>>(
-    '=',
-  ); // Ignores 'x'
+  expectType<RelaxedOmit<Base, 'a' | 'x'>, { b: string; c: boolean }>('='); // Ignores 'x'
 
   expectType<RelaxedOmit<Base, string>, {}>('='); // Omits all string keys ('a', 'b', 'c')
 
@@ -127,10 +121,9 @@ type Base = Readonly<{ a: number; b: string; c: boolean }>;
 {
   expectType<MutableRecord<string, number>, Record<string, number>>('=');
 
-  expectType<
-    MutableRecord<'a' | 'b', boolean>,
-    Readonly<{ a: boolean; b: boolean }>
-  >('=');
+  expectType<MutableRecord<'a' | 'b', boolean>, { a: boolean; b: boolean }>(
+    '=',
+  );
 }
 
 // --- ReadonlyRecord ---

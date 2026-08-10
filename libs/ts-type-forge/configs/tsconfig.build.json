@@ -1,6 +1,11 @@
 {
   "extends": "../../../configs/tsconfig/tsconfig.build.json",
   "compilerOptions": {
+    // ts-type-forge asserts exact type equality against Node globals; the DOM
+    // lib resolves them to the DOM shapes instead. Needed here as well as in
+    // ../tsconfig.json: tsconfig.build.json extends the shared type-check
+    // config, so the build path never sees that override.
+    "lib": ["ESNext"],
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,

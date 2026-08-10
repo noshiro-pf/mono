@@ -20,9 +20,12 @@ import { type ReadonlyRecord } from '../others/index.mjs';
  * // Result: { a: { b: { c: number } }; e: boolean }
  * ```
  */
-export type DeepPick<T, Path extends readonly PropertyKey[]> = Readonly<{
-  [K in keyof T]: DeepPickValue<T[K], DeepPickOmitTail<Path, K>>;
-}>;
+export type DeepPick<T, Path extends readonly PropertyKey[]> = {
+  [K in keyof T as K extends DeepPickOmitHead<Path> ? K : never]: DeepPickValue<
+    T[K],
+    DeepPickOmitTail<Path, K>
+  >;
+};
 
 /**
  * Deeply omits a nested property from an object type along the specified key path.
@@ -44,9 +47,12 @@ export type DeepPick<T, Path extends readonly PropertyKey[]> = Readonly<{
  * // Result: { a: { d: boolean } }
  * ```
  */
-export type DeepOmit<T, Path extends readonly PropertyKey[]> = Readonly<{
-  [K in keyof T]: DeepOmitValue<T[K], DeepPickOmitTail<Path, K>>;
-}>;
+export type DeepOmit<T, Path extends readonly PropertyKey[]> = {
+  [K in keyof T as K extends DeepOmitLeafKeys<Path> ? never : K]: DeepOmitValue<
+    T[K],
+    DeepPickOmitTail<Path, K>
+  >;
+};
 
 /**
  * @internal A value `DeepPick` / `DeepOmit` recurses into rather than treating
@@ -72,7 +78,7 @@ type RecursableValue = ReadonlyRecord<string, any> | readonly unknown[];
  * @internal Extracts the first element from each path in a union of paths.
  */
 type DeepPickOmitHead<Path extends readonly PropertyKey[]> =
-  Path extends readonly [infer H, ...PropertyKey[]] ? H : never;
+  Path extends readonly [infer H, ...(readonly PropertyKey[])] ? H : never;
 
 /**
  * @internal Extracts the tail (remaining elements) of paths that start with key K.

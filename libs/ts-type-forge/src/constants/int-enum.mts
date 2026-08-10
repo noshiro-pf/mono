@@ -70,19 +70,19 @@ export type Uint11 = Index<2048>;
  * Represents a signed 8-bit integer.
  * A union of integer literals from `-128` to `127`.
  */
-export type Int8 = Index<128> | NegativeIndex<128>;
+export type Int8 = Readonly<Index<128> | NegativeIndex<128>>;
 
 /**
  * Represents a signed 9-bit integer.
  * A union of integer literals from `-256` to `255`.
  */
-export type Int9 = Index<256> | NegativeIndex<256>;
+export type Int9 = Readonly<Index<256> | NegativeIndex<256>>;
 
 /**
  * Represents a signed 10-bit integer.
  * A union of integer literals from `-512` to `511`.
  */
-export type Int10 = Index<512> | NegativeIndex<512>;
+export type Int10 = Readonly<Index<512> | NegativeIndex<512>>;
 
 /**
  * Represents a signed 11-bit integer.
@@ -91,7 +91,7 @@ export type Int10 = Index<512> | NegativeIndex<512>;
  * The widest signed enum in this family, and the bound of the signed
  * integer-range utilities (`IntRange` / `IntRangeInclusive`).
  */
-export type Int11 = Index<1024> | NegativeIndex<1024>;
+export type Int11 = Readonly<Index<1024> | NegativeIndex<1024>>;
 
 /**
  * Represents the months of the year using 1-based indexing.

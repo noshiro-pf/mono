@@ -9,7 +9,7 @@ expectType<TypeExtends<'a', string>, true>('=');
 
 expectType<TypeExtends<string, 'a'>, false>('=');
 
-expectType<TypeExtends<Readonly<{ a: number }>, object>, true>('=');
+expectType<TypeExtends<{ a: number }, object>, true>('=');
 
 expectType<TypeExtends<never, string>, true>('=');
 

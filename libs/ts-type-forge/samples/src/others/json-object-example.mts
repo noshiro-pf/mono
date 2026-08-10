@@ -9,7 +9,7 @@ const config: JsonObject = {
     ssl: true,
   },
   features: ['auth', 'logging'],
-} as const;
+};
 
 // config.database.port = 3306; // ✗ Error: readonly property
 

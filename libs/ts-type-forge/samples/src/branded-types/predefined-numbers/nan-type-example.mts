@@ -4,7 +4,7 @@ import { type NaNType } from 'ts-type-forge';
 
 const checkNaN = (x: number): x is NaNType => Number.isNaN(x);
 
-const value: number = Number.parseFloat('invalid');
+const value: number = parseFloat('invalid');
 if (checkNaN(value)) {
   const nan: NaNType = value;
   console.log(nan); // Handle NaN case specifically

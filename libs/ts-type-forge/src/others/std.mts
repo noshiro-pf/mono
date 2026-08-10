@@ -47,7 +47,9 @@ export type RelaxedExtract<T, U> = T extends U ? T : never;
  * // type Invalid = StrictPick<Person, 'name' | 'invalid'>; // Error: 'invalid' is not a key of Person
  * ```
  */
-export type StrictPick<T, K extends keyof T> = Readonly<{ [P in K]: T[P] }>;
+export type StrictPick<T, K extends keyof T> = {
+  [P in K]: T[P];
+};
 
 /**
  * Creates a type by picking a set of properties from `T` whose keys are in union `K`.
@@ -153,9 +155,9 @@ export type RelaxedOmit<T, K> = StrictPick<T, RelaxedExclude<keyof T, K>>;
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-export type ReadonlyRecord<K extends PropertyKey, T> = Readonly<{
-  [P in K]: T;
-}>;
+export type ReadonlyRecord<K extends PropertyKey, T> = {
+  readonly [P in K]: T;
+};
 
 /**
  * Creates a mutable record type with keys of type `K` and values of type `T`.
@@ -174,4 +176,6 @@ export type ReadonlyRecord<K extends PropertyKey, T> = Readonly<{
  * ```
  */
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-export type MutableRecord<K extends PropertyKey, T> = Readonly<{ [P in K]: T }>;
+export type MutableRecord<K extends PropertyKey, T> = {
+  [P in K]: T;
+};

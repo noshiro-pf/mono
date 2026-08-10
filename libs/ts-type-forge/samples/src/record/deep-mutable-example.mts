@@ -2,10 +2,7 @@ import { type DeepMutable } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 
-type ReadonlyData = Readonly<{
-  a: number;
-  b: Readonly<{ c: readonly string[] }>;
-}>;
+type ReadonlyData = Readonly<{ a: number; b: { c: readonly string[] } }>;
 type MutableData = DeepMutable<ReadonlyData>;
 // Result: { a: number; b: { c: string[] } }
 

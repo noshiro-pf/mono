@@ -7,4 +7,4 @@ expectType<IsNever<string>, false>('=');
 
 expectType<IsNever<number | string>, false>('=');
 
-expectType<IsNever<readonly [number | string]>, false>('=');
+expectType<IsNever<[number | string]>, false>('=');

@@ -54,7 +54,7 @@ type IndexOfTupleImpl<T extends readonly unknown[], K> =
  * ```
  */
 export type NegativeIndexOfTuple<T extends readonly unknown[]> = MapIdx<
-  RelaxedExclude<IndexOfTuple<readonly [...T, 0]>, 0>
+  RelaxedExclude<IndexOfTuple<[...T, 0]>, 0>
 >;
 
 /**

@@ -20,20 +20,20 @@ import {
 } from './deep.mjs';
 
 // Base types for testing
-type Base = Readonly<{
+type Base = {
   a: number;
   b: string | undefined;
-  c: Readonly<{
+  c: {
     d: boolean;
-    e: readonly number[];
+    e: number[];
     f?: string;
-    g: ReadonlyMap<string, number>;
-    h: ReadonlySet<boolean>;
-  }>;
-  i: readonly [number, string, Readonly<{ j: bigint }>];
+    g: Map<string, number>;
+    h: Set<boolean>;
+  };
+  i: [number, string, { j: bigint }];
   k: (x: number) => string;
   l: null;
-}>;
+};
 
 type ReadonlyBase = Readonly<{
   a: number;
@@ -50,54 +50,54 @@ type ReadonlyBase = Readonly<{
   l: null;
 }>;
 
-type PartialBase = Readonly<{
+type PartialBase = {
   a?: number;
   b?: string | undefined;
   c?:
     | undefined
-    | Readonly<{
+    | {
         d?: boolean;
-        e?: readonly (number | undefined)[];
+        e?: (number | undefined)[];
         f?: string;
-        g?: ReadonlyMap<string, number>;
-        h?: ReadonlySet<boolean>;
-      }>;
-  i?: readonly [number?, string?, Readonly<{ j?: bigint }>?];
+        g?: Map<string, number>;
+        h?: Set<boolean>;
+      };
+  i?: [number?, string?, { j?: bigint }?];
   k?: (x: number) => string;
   l?: null;
-}>;
+};
 
-type RequiredBase = Readonly<{
+type RequiredBase = {
   a: number;
   b: string | undefined;
-  c: Readonly<{
+  c: {
     d: boolean;
-    e: readonly number[];
+    e: number[];
     f: string; // optional removed
-    g: ReadonlyMap<string, number>; // undefined removed from value
-    h: ReadonlySet<boolean>; // undefined removed from value
-  }>;
-  i: readonly [number, string, Readonly<{ j: bigint }>]; // undefined removed from elements/objects
+    g: Map<string, number>; // undefined removed from value
+    h: Set<boolean>; // undefined removed from value
+  };
+  i: [number, string, { j: bigint }]; // undefined removed from elements/objects
   k: (x: number) => string;
   l: null;
-}>;
+};
 
 // --- DeepReadonly ---
 {
   // Primitives
-  expectType<string, string>('=');
+  expectType<DeepReadonly<string>, string>('=');
 
-  expectType<number, number>('=');
+  expectType<DeepReadonly<number>, number>('=');
 
-  expectType<boolean, boolean>('=');
+  expectType<DeepReadonly<boolean>, boolean>('=');
 
-  expectType<null, null>('=');
+  expectType<DeepReadonly<null>, null>('=');
 
-  expectType<undefined, undefined>('=');
+  expectType<DeepReadonly<undefined>, undefined>('=');
 
-  expectType<symbol, symbol>('=');
+  expectType<DeepReadonly<symbol>, symbol>('=');
 
-  expectType<bigint, bigint>('=');
+  expectType<DeepReadonly<bigint>, bigint>('=');
 
   // Function
   expectType<DeepReadonly<(a: number) => string>, (a: number) => string>('=');
@@ -106,19 +106,18 @@ type RequiredBase = Readonly<{
   expectType<DeepReadonly<{ a: number }>, Readonly<{ a: number }>>('=');
 
   // Simple Array
-  expectType<readonly string[], readonly string[]>('=');
+  expectType<DeepReadonly<string[]>, readonly string[]>('=');
 
   // Simple Tuple
-  expectType<readonly [number, string], readonly [number, string]>('=');
+  expectType<DeepReadonly<[number, string]>, readonly [number, string]>('=');
 
   // Simple Map
-  expectType<
-    DeepReadonly<ReadonlyMap<string, number>>,
-    ReadonlyMap<string, number>
-  >('=');
+  expectType<DeepReadonly<Map<string, number>>, ReadonlyMap<string, number>>(
+    '=',
+  );
 
   // Simple Set
-  expectType<DeepReadonly<ReadonlySet<string>>, ReadonlySet<string>>('=');
+  expectType<DeepReadonly<Set<string>>, ReadonlySet<string>>('=');
 
   // Complex Type
   expectType<DeepReadonly<Base>, ReadonlyBase>('=');
@@ -154,7 +153,7 @@ type RequiredBase = Readonly<{
       // ProcessEnvOptions
       uid?: number | undefined;
       gid?: number | undefined;
-      cwd?: string | undefined | DeepReadonly<URL>;
+      cwd?: string | DeepReadonly<URL> | undefined;
       env?: DeepReadonly<NodeJS.ProcessEnv> | undefined;
 
       silent?: boolean;
@@ -183,26 +182,21 @@ type RequiredBase = Readonly<{
   expectType<DeepMutable<(a: number) => string>, (a: number) => string>('=');
 
   // Simple Readonly Object
-  expectType<DeepMutable<Readonly<{ a: number }>>, Readonly<{ a: number }>>(
-    '=',
-  );
+  expectType<DeepMutable<Readonly<{ a: number }>>, { a: number }>('=');
 
   // Simple Readonly Array
-  expectType<DeepMutable<readonly string[]>, readonly string[]>('=');
+  expectType<DeepMutable<readonly string[]>, string[]>('=');
 
   // Simple Readonly Tuple
-  expectType<DeepMutable<readonly [number, string]>, readonly [number, string]>(
+  expectType<DeepMutable<readonly [number, string]>, [number, string]>('=');
+
+  // Simple Readonly Map
+  expectType<DeepMutable<ReadonlyMap<string, number>>, Map<string, number>>(
     '=',
   );
 
-  // Simple Readonly Map
-  expectType<
-    DeepMutable<ReadonlyMap<string, number>>,
-    ReadonlyMap<string, number>
-  >('=');
-
   // Simple Readonly Set
-  expectType<DeepMutable<ReadonlySet<string>>, ReadonlySet<string>>('=');
+  expectType<DeepMutable<ReadonlySet<string>>, Set<string>>('=');
 
   // Complex Readonly Type
   expectType<DeepMutable<ReadonlyBase>, Base>('=');
@@ -232,31 +226,26 @@ type RequiredBase = Readonly<{
   expectType<DeepPartial<(a: number) => string>, (a: number) => string>('=');
 
   // Simple Object
-  expectType<
-    DeepPartial<Readonly<{ a: number }>>,
-    Readonly<{ a?: number | undefined }>
-  >('=');
+  expectType<DeepPartial<{ a: number }>, { a?: number | undefined }>('=');
 
   // Simple Array
-  expectType<DeepPartial<readonly string[]>, readonly (string | undefined)[]>(
-    '=',
-  ); // Note: Array itself can become undefined
+  expectType<DeepPartial<string[]>, (string | undefined)[]>('='); // Note: Array itself can become undefined
 
   // Simple Tuple
   expectType<
-    DeepPartial<readonly [number, string]>,
-    readonly [(number | undefined)?, (string | undefined)?] // Note: Tuple itself can become undefined
+    DeepPartial<[number, string]>,
+    [(number | undefined)?, (string | undefined)?] // Note: Tuple itself can become undefined
   >('=');
 
   // Simple Map
   expectType<
-    DeepPartial<ReadonlyMap<string, number>>,
+    DeepPartial<Map<string, number>>,
     MutableMap<string, number> // Note: Map itself can become undefined
   >('=');
 
   // Simple Set
   expectType<
-    DeepPartial<ReadonlySet<string>>,
+    DeepPartial<Set<string>>,
     MutableSet<string> // Note: Set itself can become undefined
   >('=');
 
@@ -290,51 +279,44 @@ type RequiredBase = Readonly<{
   expectType<DeepRequired<(a: number) => string>, (a: number) => string>('=');
 
   // Simple Object with optional
-  expectType<DeepRequired<Readonly<{ a?: number }>>, Readonly<{ a: number }>>(
-    '=',
-  );
+  expectType<DeepRequired<{ a?: number }>, { a: number }>('=');
 
-  expectType<DeepRequired<Readonly<{ a?: number }>>, Readonly<{ a: number }>>(
-    '=',
-  );
+  expectType<DeepRequired<{ a?: number }>, { a: number }>('=');
 
   expectType<
-    DeepRequired<Readonly<{ a: number | undefined }>>,
-    Readonly<{ a: number | undefined }>
+    DeepRequired<{ a: number | undefined }>,
+    { a: number | undefined }
   >('=');
 
   // Simple Array with optional elements (not directly possible, but via object)
   expectType<
-    DeepRequired<Readonly<{ a?: readonly (string | undefined)[] }>>,
-    Readonly<{ a: readonly string[] }> // Array elements become required, array itself becomes required
+    DeepRequired<{ a?: (string | undefined)[] }>,
+    { a: string[] } // Array elements become required, array itself becomes required
   >('=');
 
   // Simple Tuple with optional elements
   expectType<
-    DeepRequired<readonly [number?, string?]>,
-    readonly [number, string] // Tuple elements become required
+    DeepRequired<[number?, string?]>,
+    [number, string] // Tuple elements become required
   >('=');
 
   expectType<
-    DeepRequired<readonly [number | undefined, string | undefined]>,
-    readonly [number | undefined, string | undefined]
+    DeepRequired<[number | undefined, string | undefined]>,
+    [number | undefined, string | undefined]
   >('=');
 
-  expectType<
-    DeepRequired<readonly [number?, string?]>,
-    readonly [number, string]
-  >('=');
+  expectType<DeepRequired<[number?, string?]>, [number, string]>('=');
 
   // Simple Map with optional values (not directly possible, but via object)
   expectType<
-    DeepRequired<Readonly<{ a?: ReadonlyMap<string, number | undefined> }>>,
-    Readonly<{ a: ReadonlyMap<string, number | undefined> }> // Map value becomes required, Map itself becomes required
+    DeepRequired<{ a?: Map<string, number | undefined> }>,
+    { a: Map<string, number | undefined> } // Map value becomes required, Map itself becomes required
   >('=');
 
   // Simple Set with optional values (not directly possible, but via object)
   expectType<
-    DeepRequired<Readonly<{ a?: ReadonlySet<string | undefined> }>>,
-    Readonly<{ a: ReadonlySet<string | undefined> }> // Set value becomes required, Set itself becomes required
+    DeepRequired<{ a?: Set<string | undefined> }>,
+    { a: Set<string | undefined> } // Set value becomes required, Set itself becomes required
   >('=');
 
   // Complex Type with optional/undefined
@@ -407,7 +389,7 @@ type RequiredBase = Readonly<{
      array carrying a length-constraint brand is not expressible at all. */
   expectType<
     DeepMutable<MinLengthArray<3, { a: readonly number[] }>>[number],
-    Readonly<{ a: readonly number[] }>
+    { a: number[] }
   >('=');
 
   expectType<HasLengthConstraint<DeepMutable<MinLengthArray<3, number>>>, true>(
@@ -416,18 +398,18 @@ type RequiredBase = Readonly<{
 
   expectType<
     DeepPartial<MinLengthArray<2, { a: number }>>[number],
-    Readonly<{ a?: number }>
+    { a?: number }
   >('=');
 
   expectType<
     DeepRequired<MinLengthArray<2, { a?: number }>>[number],
-    Readonly<{ a: number }>
+    { a: number }
   >('=');
 
   // An array intersected with a hand-written brand fails the same way, and is
   // covered by the same path.
   expectType<
-    DeepReadonly<{ a: number[] }[] & Brand<unknown, 'Tag'>>,
+    DeepReadonly<readonly { a: number[] }[] & Brand<unknown, 'Tag'>>,
     readonly Readonly<{ a: readonly number[] }>[] & Brand<unknown, 'Tag'>
   >('~=');
 }
@@ -437,7 +419,7 @@ type RequiredBase = Readonly<{
    mistaken for a brand-carrying one. */
 {
   expectType<
-    DeepReadonly<[{ a: number[] }, { b: string[] }]>,
+    DeepReadonly<readonly [{ a: number[] }, { b: string[] }]>,
     readonly [
       Readonly<{ a: readonly number[] }>,
       Readonly<{ b: readonly string[] }>,
@@ -450,17 +432,17 @@ type RequiredBase = Readonly<{
   >('=');
 
   expectType<
-    DeepReadonly<{ a: number[] }[]>,
+    DeepReadonly<readonly { a: number[] }[]>,
     readonly Readonly<{ a: readonly number[] }>[]
   >('=');
 
-  expectType<readonly [], readonly []>('=');
+  expectType<DeepReadonly<readonly []>, readonly []>('=');
 
-  expectType<readonly [], readonly []>('=');
+  expectType<DeepReadonly<[]>, readonly []>('=');
 
   expectType<
-    DeepMutable<readonly [Readonly<{ a: readonly number[] }>]>,
-    readonly [Readonly<{ a: readonly number[] }>]
+    DeepMutable<readonly [{ a: readonly number[] }]>,
+    [{ a: number[] }]
   >('=');
 }
 
@@ -479,8 +461,8 @@ type RequiredBase = Readonly<{
   // assertions would then pass under either spelling. (`interface` works too
   // in principle, but `consistent-type-definitions` rewrites it into an alias.)
   class Mut {
-    readonly x: number = 0;
-    readonly y: readonly string[] = [];
+    x: number = 0;
+    y: readonly string[] = [];
   }
 
   class Frozen {
@@ -489,7 +471,7 @@ type RequiredBase = Readonly<{
   }
 
   class Opt {
-    readonly x?: number;
+    x?: number;
   }
 
   // Fixture integrity: were these to gain an index signature, every assertion
@@ -505,20 +487,14 @@ type RequiredBase = Readonly<{
     '=',
   );
 
-  expectType<
-    DeepMutable<Frozen>,
-    Readonly<{ x: number; y: readonly number[] }>
-  >('=');
+  expectType<DeepMutable<Frozen>, { x: number; y: number[] }>('=');
 
   expectType<
     DeepPartial<Mut>,
-    Readonly<{
-      x?: number | undefined;
-      y?: readonly (string | undefined)[] | undefined;
-    }>
+    { x?: number | undefined; y?: readonly (string | undefined)[] | undefined }
   >('=');
 
-  expectType<DeepRequired<Opt>, Readonly<{ x: number }>>('=');
+  expectType<DeepRequired<Opt>, { x: number }>('=');
 
   // The same holds when it is reached through recursion.
   expectType<

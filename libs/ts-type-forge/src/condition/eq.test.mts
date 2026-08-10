@@ -89,148 +89,91 @@ expectType<TypeEq<1 | 'a', 'a' | 1>, true>('=');
 expectType<TypeEq<1 | never, 1>, true>('='); // never is ignored in union
 
 // Intersection types
-expectType<
-  TypeEq<Readonly<{ a: 1 } & { b: 2 }>, Readonly<{ a: 1 } & { b: 2 }>>,
-  true
->('=');
+expectType<TypeEq<{ a: 1 } & { b: 2 }, { a: 1 } & { b: 2 }>, true>('=');
 
-expectType<
-  TypeEq<Readonly<{ a: 1 } & { b: 2 }>, Readonly<{ b: 2 } & { a: 1 }>>,
-  true
->('='); // Order doesn't matter
+expectType<TypeEq<{ a: 1 } & { b: 2 }, { b: 2 } & { a: 1 }>, true>('='); // Order doesn't matter
 
-expectType<
-  TypeEq<Readonly<{ a: 1 } & { a: number }>, Readonly<{ a: 1 }>>,
-  false
->('='); // Intersection simplifies
+expectType<TypeEq<{ a: 1 } & { a: number }, { a: 1 }>, false>('='); // Intersection simplifies
 
-expectType<
-  TypeEq<Readonly<{ a: 1 } & { b: 2 }>, Readonly<{ a: 1; b: 2 }>>,
-  false
->('='); // Intersection vs object literal
+expectType<TypeEq<{ a: 1 } & { b: 2 }, { a: 1; b: 2 }>, false>('='); // Intersection vs object literal
 
-expectType<
-  TypeEq<Readonly<{ a: 1; b: 2 }>, Readonly<{ a: 1 } & { b: 2 }>>,
-  false
->('='); // Object literal vs intersection
+expectType<TypeEq<{ a: 1; b: 2 }, { a: 1 } & { b: 2 }>, false>('='); // Object literal vs intersection
 
 // Object types
-expectType<TypeEq<Readonly<{ a: number }>, Readonly<{ a: number }>>, true>('=');
+expectType<TypeEq<{ a: number }, { a: number }>, true>('=');
 
-expectType<TypeEq<Readonly<{ a: number }>, Readonly<{ b: number }>>, false>(
+expectType<TypeEq<{ a: number }, { b: number }>, false>('='); // Different key
+
+expectType<TypeEq<{ a: number }, { a: string }>, false>('='); // Different value type
+
+expectType<TypeEq<{ a: number; b: string }, { b: string; a: number }>, true>(
   '=',
-); // Different key
+); // Order doesn't matter
 
-expectType<TypeEq<Readonly<{ a: number }>, Readonly<{ a: string }>>, false>(
-  '=',
-); // Different value type
+expectType<TypeEq<{ a: number }, { a: number; b: string }>, false>('='); // Extra property
 
-expectType<
-  TypeEq<
-    Readonly<{ a: number; b: string }>,
-    Readonly<{ b: string; a: number }>
-  >,
-  true
->('='); // Order doesn't matter
+expectType<TypeEq<{ a: number; b: string }, { a: number }>, false>('='); // Missing property
 
-expectType<
-  TypeEq<Readonly<{ a: number }>, Readonly<{ a: number; b: string }>>,
-  false
->('='); // Extra property
+expectType<TypeEq<{ a: 1 }, { a: number }>, false>('=');
 
-expectType<
-  TypeEq<Readonly<{ a: number; b: string }>, Readonly<{ a: number }>>,
-  false
->('='); // Missing property
+expectType<TypeEq<{ a: number }, { a: 1 }>, false>('=');
 
-expectType<TypeEq<Readonly<{ a: 1 }>, Readonly<{ a: number }>>, false>('=');
+expectType<TypeEq<{ a: number }, Readonly<{ a: number }>>, false>('='); // Mutability difference
 
-expectType<TypeEq<Readonly<{ a: number }>, Readonly<{ a: 1 }>>, false>('=');
+expectType<TypeEq<Readonly<{ a: number }>, { a: number }>, false>('='); // Mutability difference
 
-expectType<TypeEq<Readonly<{ a: number }>, Readonly<{ a: number }>>, false>(
-  '=',
-); // Mutability difference
+expectType<TypeEq<{ a?: number }, { a?: number }>, true>('=');
 
-expectType<TypeEq<Readonly<{ a: number }>, Readonly<{ a: number }>>, false>(
-  '=',
-); // Mutability difference
+expectType<TypeEq<{ a?: number }, { a: number | undefined }>, false>('='); // Optional vs union with undefined
 
-expectType<TypeEq<Readonly<{ a?: number }>, Readonly<{ a?: number }>>, true>(
-  '=',
-);
+expectType<TypeEq<{ a: number | undefined }, { a?: number }>, false>('='); // Union with undefined vs optional
 
-expectType<
-  TypeEq<Readonly<{ a?: number }>, Readonly<{ a: number | undefined }>>,
-  false
->('='); // Optional vs union with undefined
+expectType<TypeEq<{ a?: number }, { a: number }>, false>('='); // Optional vs required
 
-expectType<
-  TypeEq<Readonly<{ a: number | undefined }>, Readonly<{ a?: number }>>,
-  false
->('='); // Union with undefined vs optional
+expectType<TypeEq<{ a: number }, { a?: number }>, false>('='); // Required vs optional
 
-expectType<TypeEq<Readonly<{ a?: number }>, Readonly<{ a: number }>>, false>(
-  '=',
-); // Optional vs required
+expectType<TypeEq<{ x: any }, { x: number }>, false>('=');
 
-expectType<TypeEq<Readonly<{ a: number }>, Readonly<{ a?: number }>>, false>(
-  '=',
-); // Required vs optional
+expectType<TypeEq<{ x: number }, { x: any }>, false>('=');
 
-expectType<TypeEq<Readonly<{ x: any }>, Readonly<{ x: number }>>, false>('=');
+expectType<TypeEq<{ x: unknown }, { x: number }>, false>('=');
 
-expectType<TypeEq<Readonly<{ x: number }>, Readonly<{ x: any }>>, false>('=');
-
-expectType<TypeEq<Readonly<{ x: unknown }>, Readonly<{ x: number }>>, false>(
-  '=',
-);
-
-expectType<TypeEq<Readonly<{ x: number }>, Readonly<{ x: unknown }>>, false>(
-  '=',
-);
+expectType<TypeEq<{ x: number }, { x: unknown }>, false>('=');
 
 // Array/Tuple types
-expectType<TypeEq<readonly number[], readonly number[]>, true>('=');
+expectType<TypeEq<number[], number[]>, true>('=');
 
-expectType<TypeEq<readonly string[], readonly number[]>, false>('=');
+expectType<TypeEq<string[], number[]>, false>('=');
 
-expectType<TypeEq<readonly number[], readonly number[]>, false>('='); // Mutability difference
+expectType<TypeEq<number[], readonly number[]>, false>('='); // Mutability difference
 
-expectType<TypeEq<readonly number[], readonly number[]>, false>('='); // Mutability difference
+expectType<TypeEq<readonly number[], number[]>, false>('='); // Mutability difference
 
-expectType<TypeEq<readonly [1, 2], readonly [1, 2]>, true>('=');
+expectType<TypeEq<[1, 2], [1, 2]>, true>('=');
 
-expectType<TypeEq<readonly [1, 2], readonly [1, 3]>, false>('=');
+expectType<TypeEq<[1, 2], [1, 3]>, false>('=');
 
-expectType<TypeEq<readonly [1, 2], readonly [1, 2, 3]>, false>('='); // Different length
+expectType<TypeEq<[1, 2], [1, 2, 3]>, false>('='); // Different length
 
-expectType<TypeEq<readonly [1, 2, 3], readonly [1, 2]>, false>('='); // Different length
+expectType<TypeEq<[1, 2, 3], [1, 2]>, false>('='); // Different length
 
-expectType<TypeEq<readonly [1, 2], readonly [1, 2]>, false>('='); // Mutability difference
+expectType<TypeEq<[1, 2], readonly [1, 2]>, false>('='); // Mutability difference
 
-expectType<TypeEq<readonly [1, 2], readonly [1, 2]>, false>('='); // Mutability difference
+expectType<TypeEq<readonly [1, 2], [1, 2]>, false>('='); // Mutability difference
 
-expectType<TypeEq<readonly [any], readonly [number]>, false>('=');
+expectType<TypeEq<[any], [number]>, false>('=');
 
-expectType<TypeEq<readonly [number], readonly [any]>, false>('=');
+expectType<TypeEq<[number], [any]>, false>('=');
 
-expectType<TypeEq<readonly [unknown], readonly [number]>, false>('=');
+expectType<TypeEq<[unknown], [number]>, false>('=');
 
-expectType<TypeEq<readonly [number], readonly [unknown]>, false>('=');
+expectType<TypeEq<[number], [unknown]>, false>('=');
 
-expectType<
-  TypeEq<readonly [number, ...string[]], readonly [number, ...string[]]>,
-  true
->('=');
+expectType<TypeEq<[number, ...string[]], [number, ...string[]]>, true>('=');
 
-expectType<TypeEq<readonly [number, ...string[]], readonly [number]>, false>(
-  '=',
-);
+expectType<TypeEq<[number, ...string[]], [number]>, false>('=');
 
-expectType<
-  TypeEq<readonly [number, ...string[]], readonly [number, string]>,
-  false
->('=');
+expectType<TypeEq<[number, ...string[]], [number, string]>, false>('=');
 
 // Function types
 expectType<TypeEq<() => void, () => void>, true>('=');

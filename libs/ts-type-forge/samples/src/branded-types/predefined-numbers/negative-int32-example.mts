@@ -5,7 +5,7 @@ import { type NegativeInt32 } from 'ts-type-forge';
 const isNegativeInt32 = (x: number): x is NegativeInt32 =>
   Number.isSafeInteger(x) && x < 0 && x >= -(2 ** 31);
 
-const offset = (value: NegativeInt32) => ({ offset: value }) as const;
+const offset = (value: NegativeInt32) => ({ offset: value });
 
 // embed-sample-code-ignore-below
 export { isNegativeInt32, offset };

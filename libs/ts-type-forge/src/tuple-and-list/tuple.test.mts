@@ -32,7 +32,7 @@ import { type Tuple } from './tuple.mjs';
 
 // ── flatten ─────────────────────────
 {
-  expectType<Tuple.Flatten<readonly []>, readonly []>('=');
+  expectType<Tuple.Flatten<DeepReadonly<[]>>, readonly []>('=');
 
   expectType<Tuple.Flatten<DeepReadonly<[[]]>>, readonly []>('=');
 
@@ -58,13 +58,13 @@ import { type Tuple } from './tuple.mjs';
 
 // ── head ─────────────────────────
 {
-  expectType<Tuple.Head<readonly []>, never>('=');
+  expectType<Tuple.Head<[]>, never>('=');
 
-  expectType<Tuple.Head<readonly [1]>, 1>('=');
+  expectType<Tuple.Head<[1]>, 1>('=');
 
-  expectType<Tuple.Head<readonly [1, 2], 0>, 1>('=');
+  expectType<Tuple.Head<[1, 2], 0>, 1>('=');
 
-  expectType<Tuple.Head<readonly [], 1>, 1>('=');
+  expectType<Tuple.Head<[], 1>, 1>('=');
 
   expectType<Tuple.Head<readonly []>, never>('=');
 
@@ -75,24 +75,24 @@ import { type Tuple } from './tuple.mjs';
   expectType<Tuple.Head<readonly [], 1>, 1>('=');
 
   // Additional tests
-  expectType<Tuple.Head<readonly [1, 2, 3]>, 1>('=');
+  expectType<Tuple.Head<[1, 2, 3]>, 1>('=');
 
-  expectType<Tuple.Head<readonly [], 'default'>, 'default'>('=');
+  expectType<Tuple.Head<[], 'default'>, 'default'>('=');
 
-  expectType<Tuple.Head<readonly [boolean, string, number]>, boolean>('=');
+  expectType<Tuple.Head<[boolean, string, number]>, boolean>('=');
 
-  expectType<Tuple.Head<readonly [42]>, 42>('=');
+  expectType<Tuple.Head<[42]>, 42>('=');
 
-  expectType<Tuple.Head<readonly [string, number, boolean]>, string>('=');
+  expectType<Tuple.Head<[string, number, boolean]>, string>('=');
 }
 
 // ── last ─────────────────────────
 {
-  expectType<Tuple.Last<readonly []>, never>('=');
+  expectType<Tuple.Last<[]>, never>('=');
 
-  expectType<Tuple.Last<readonly [1]>, 1>('=');
+  expectType<Tuple.Last<[1]>, 1>('=');
 
-  expectType<Tuple.Last<readonly [1, 2, 3]>, 3>('=');
+  expectType<Tuple.Last<[1, 2, 3]>, 3>('=');
 
   expectType<Tuple.Last<readonly []>, never>('=');
 
@@ -321,19 +321,17 @@ import { type Tuple } from './tuple.mjs';
   expectType<Tuple.MapTo<string, readonly number[]>, readonly string[]>('=');
 
   // A mutable input yields a readonly result.
-  expectType<Tuple.MapTo<string, readonly [1, 'a']>, readonly [string, string]>(
-    '=',
-  );
+  expectType<Tuple.MapTo<string, [1, 'a']>, readonly [string, string]>('=');
 
   // Rest and optional positions survive the mapping.
   expectType<
-    Tuple.MapTo<string, readonly [1, ...2[]]>,
-    readonly [string, ...string[]]
+    Tuple.MapTo<string, readonly [1, ...(readonly 2[])]>,
+    readonly [string, ...(readonly string[])]
   >('=');
 
   expectType<
-    Tuple.MapTo<string, readonly [...1[], 2]>,
-    readonly [...string[], string]
+    Tuple.MapTo<string, readonly [...(readonly 1[]), 2]>,
+    readonly [...(readonly string[]), string]
   >('=');
 
   expectType<

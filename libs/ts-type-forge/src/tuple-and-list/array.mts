@@ -17,7 +17,7 @@ import {
  * // const invalid: NA = []; // Error
  * ```
  */
-export type MutableNonEmptyTuple<A> = readonly [A, ...A[]];
+export type MutableNonEmptyTuple<A> = [A, ...A[]];
 
 /**
  * Represents a readonly structural tuple that is guaranteed to have at least
@@ -32,7 +32,7 @@ export type MutableNonEmptyTuple<A> = readonly [A, ...A[]];
  * // valid.push(4); // Error: Property 'push' does not exist on type 'readonly [number, ...number[]]'.
  * ```
  */
-export type NonEmptyTuple<A> = readonly [A, ...A[]];
+export type NonEmptyTuple<A> = readonly [A, ...(readonly A[])];
 
 /**
  * Represents a readonly array that is guaranteed to have at least one element.

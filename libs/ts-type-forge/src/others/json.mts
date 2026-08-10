@@ -54,10 +54,10 @@ export type JsonPrimitive = boolean | number | string | null;
  */
 export type MutableJsonValue =
   | JsonPrimitive
-  | readonly MutableJsonValue[]
-  | Readonly<{
+  | MutableJsonValue[]
+  | {
       [k: string]: MutableJsonValue;
-    }>;
+    };
 
 /**
  * Represents any valid JSON value in its immutable form.

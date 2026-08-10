@@ -11,7 +11,7 @@ const apiResponse: JsonValue = {
     ],
   },
   meta: { total: 2, page: 1 },
-} as const;
+};
 
 // Type-safe JSON parsing
 const parseConfig = (jsonString: string): JsonValue =>

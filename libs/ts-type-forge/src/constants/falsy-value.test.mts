@@ -25,7 +25,7 @@ expectType<'hello', FalsyValue>('!<=');
 
 expectType<{}, FalsyValue>('!<=');
 
-expectType<readonly [], FalsyValue>('!<=');
+expectType<[], FalsyValue>('!<=');
 
 expectType<42, FalsyValue>('!<=');
 
@@ -59,7 +59,7 @@ expectType<IsFalsy<'hello'>, false>('=');
 
 expectType<IsFalsy<{}>, false>('=');
 
-expectType<IsFalsy<readonly []>, false>('=');
+expectType<IsFalsy<[]>, false>('=');
 
 // Test exclusion from union types
 type TruthyOnly<T> = Exclude<T, FalsyValue>;

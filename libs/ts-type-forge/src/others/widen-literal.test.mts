@@ -36,9 +36,9 @@ expectType<WidenLiteral<typeof _sym>, symbol>('=');
 expectType<WidenLiteral<typeof Symbol.iterator>, symbol>('=');
 
 // Test that non-primitives remain unchanged
-expectType<WidenLiteral<Readonly<{ a: number }>>, Readonly<{ a: number }>>('=');
+expectType<WidenLiteral<{ a: number }>, { a: number }>('=');
 
-expectType<WidenLiteral<readonly [1, 2, 3]>, readonly [1, 2, 3]>('=');
+expectType<WidenLiteral<[1, 2, 3]>, [1, 2, 3]>('=');
 
 expectType<WidenLiteral<readonly [1, 2, 3]>, readonly [1, 2, 3]>('=');
 
@@ -79,19 +79,19 @@ expectType<WidenLiteral<bigint>, bigint>('=');
 expectType<WidenLiteral<symbol>, symbol>('=');
 
 // Test practical use case: API compatibility
-type LiteralConfig = Readonly<{
+type LiteralConfig = {
   method: 'GET' | 'POST';
   timeout: 5000;
   enabled: true;
-}>;
+};
 
-type WidenedConfig = Readonly<{
+type WidenedConfig = {
   [K in keyof LiteralConfig]: WidenLiteral<LiteralConfig[K]>;
-}>;
+};
 
 expectType<
   WidenedConfig,
-  Readonly<{ method: string; timeout: number; enabled: boolean }>
+  { method: string; timeout: number; enabled: boolean }
 >('=');
 
 // Test with const assertions
@@ -118,9 +118,7 @@ expectType<WidenLiteral<1 | number>, number>('=');
 
 expectType<WidenLiteral<true | boolean>, boolean>('=');
 
-expectType<WidenLiteral<'a' | Readonly<{ x: 1 }>>, string | Readonly<{ x: 1 }>>(
-  '=',
-);
+expectType<WidenLiteral<'a' | { x: 1 }>, string | { x: 1 }>('=');
 
 // Test with intersection types
 expectType<WidenLiteral<'hello' & string>, string>('=');
@@ -140,22 +138,24 @@ type Status = 0 | 1 | 2;
 expectType<WidenLiteral<Status>, number>('=');
 
 // Test that it preserves structure for complex types
-type ComplexType = Readonly<{
+type ComplexType = {
   literal: 'hello';
-  nested: Readonly<{
+  nested: {
     value: 42;
     flag: true;
-  }>;
+  };
   array: readonly [1, 2, 3];
-}>;
+};
 
 expectType<WidenLiteral<ComplexType>, ComplexType>('=');
 
 // Test with mapped types over literals
-type MappedLiterals = Readonly<{ [K in 'a' | 'b' | 'c']: K }>;
+type MappedLiterals = {
+  [K in 'a' | 'b' | 'c']: K;
+};
 
-type WidenedMapped = Readonly<{
+type WidenedMapped = {
   [K in keyof MappedLiterals]: WidenLiteral<MappedLiterals[K]>;
-}>;
+};
 
-expectType<WidenedMapped, Readonly<{ a: string; b: string; c: string }>>('=');
+expectType<WidenedMapped, { a: string; b: string; c: string }>('=');

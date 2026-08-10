@@ -2,7 +2,7 @@ import { type MutableJsonObject } from 'ts-type-forge';
 
 // embed-sample-code-ignore-above
 
-const builder: MutableJsonObject = {} as const;
+const builder: MutableJsonObject = {};
 builder['timestamp'] = Date.now();
 builder['data'] = { message: 'Hello' };
 builder['tags'] = ['info', 'user-action'];

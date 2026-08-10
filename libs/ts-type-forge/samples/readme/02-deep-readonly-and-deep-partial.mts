@@ -1,18 +1,18 @@
 import { type DeepPartial, type DeepReadonly } from 'ts-type-forge';
 // embed-sample-code-ignore-above
 
-type Config = Readonly<{
+type Config = {
   port: number;
-  database: Readonly<{
+  database: {
     host: string;
     port: number;
-    credentials?: Readonly<{
+    credentials?: {
       user: string;
       pass: string;
-    }>;
-  }>;
-  features: readonly string[];
-}>;
+    };
+  };
+  features: string[];
+};
 
 // Create a type where all properties, nested or not, are readonly
 type ReadonlyConfig = DeepReadonly<Config>;
@@ -28,7 +28,7 @@ const config: ReadonlyConfig = {
     },
   },
   features: ['featureA', 'featureB'],
-} as const;
+};
 
 // @ts-expect-error Cannot assign to 'port' because it is a read-only property
 config.port = 8081;
@@ -48,7 +48,7 @@ const partialUpdate: PartialConfig = {
     // port and credentials are optional
   },
   // port and features are optional
-} as const;
+};
 
 // embed-sample-code-ignore-below
 export { config, partialUpdate };

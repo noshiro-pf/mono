@@ -31,7 +31,7 @@ export type Index<N extends number> = IndexOfTuple<MakeTuple<N, 0>>;
  * ```
  */
 export type IndexInclusive<N extends number> = IndexOfTuple<
-  readonly [...MakeTuple<N, 0>, 0]
+  [...MakeTuple<N, 0>, 0]
 >;
 
 /**

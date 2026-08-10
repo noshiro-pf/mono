@@ -34,7 +34,10 @@ import { type List, type MakeTuple } from '../tuple-and-list/index.mjs';
  * type OneToFive = Range<1, 5>; // 1 | 2 | 3 | 4 | 5
  * ```
  */
-export type Increment<N extends number> = [0, ...MakeTuple<N, 0>]['length'];
+export type Increment<N extends number> = (readonly [
+  0,
+  ...MakeTuple<N, 0>,
+])['length'];
 
 /**
  * Decrements a positive integer literal type `N` by 1.

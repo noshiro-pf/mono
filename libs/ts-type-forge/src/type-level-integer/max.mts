@@ -15,7 +15,7 @@ import { type Uint10 } from '../constants/index.mjs';
  * // type ResultFull = Max<Uint10>; // 1023
  * ```
  */
-export type Max<N extends Uint10> = MaxImpl<N, readonly []>;
+export type Max<N extends Uint10> = MaxImpl<N, []>;
 
 // https://zenn.dev/noshiro_piko/articles/typescript-type-level-min
 
@@ -35,4 +35,4 @@ type MaxImpl<N extends Uint10, T extends readonly unknown[]> =
       [N] extends [Partial<T>['length']]
       ? T['length'] // If yes, T['length'] is the smallest number greater than all in N.
       : // Recursive step: Increment the tuple length and check again.
-        MaxImpl<N, readonly [0, ...T]>;
+        MaxImpl<N, [0, ...T]>;

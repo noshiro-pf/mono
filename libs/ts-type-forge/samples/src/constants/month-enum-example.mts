@@ -16,7 +16,7 @@ const getMonthName = (month: MonthEnum): string => {
     'Oct',
     'Nov',
     'Dec',
-  ] as const;
+  ];
   return names[month - 1] ?? ''; // Convert to 0-based for array access
 };
 

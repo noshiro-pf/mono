@@ -70,23 +70,23 @@ expectType<Float32IsBranded, true>('=');
 expectType<Float64IsBranded, true>('=');
 
 // Test practical usage with arrays
-type Float16Array_elements = readonly Float16[];
+type Float16Array_elements = Float16[];
 
-type Float32Array_elements = readonly Float32[];
+type Float32Array_elements = Float32[];
 
-type Float64Array_elements = readonly Float64[];
+type Float64Array_elements = Float64[];
 
-expectType<Float16Array_elements, readonly number[]>('<=');
+expectType<Float16Array_elements, number[]>('<=');
 
-expectType<Float32Array_elements, readonly number[]>('<=');
+expectType<Float32Array_elements, number[]>('<=');
 
-expectType<Float64Array_elements, readonly number[]>('<=');
+expectType<Float64Array_elements, number[]>('<=');
 
-expectType<readonly number[], Float16Array_elements>('!<=');
+expectType<number[], Float16Array_elements>('!<=');
 
-expectType<readonly number[], Float32Array_elements>('!<=');
+expectType<number[], Float32Array_elements>('!<=');
 
-expectType<readonly number[], Float64Array_elements>('!<=');
+expectType<number[], Float64Array_elements>('!<=');
 
 // Test that Float16, Float32 and Float64 can't be assigned to each other
 expectType<Float16, Float32>('!=');

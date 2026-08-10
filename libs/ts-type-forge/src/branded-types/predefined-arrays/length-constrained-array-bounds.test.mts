@@ -38,13 +38,13 @@ expectType<HasLengthConstraint<readonly [string, ...string[]]>, false>('=');
    so a key-subtraction that only mentions the readonly key set leaves them
    behind and reports every mutable array as branded. */
 
-expectType<HasLengthConstraint<readonly string[]>, false>('=');
+expectType<HasLengthConstraint<string[]>, false>('=');
 
-expectType<HasLengthConstraint<readonly [string, string]>, false>('=');
+expectType<HasLengthConstraint<[string, string]>, false>('=');
 
-expectType<HasLengthConstraint<readonly []>, false>('=');
+expectType<HasLengthConstraint<[]>, false>('=');
 
-expectType<HasLengthConstraint<readonly [string, ...string[]]>, false>('=');
+expectType<HasLengthConstraint<[string, ...string[]]>, false>('=');
 
 /* MinLengthOf */
 
@@ -123,12 +123,10 @@ expectType<ChangeArrayElement<readonly [], string>, readonly []>('=');
 
 // A mutable input maps homomorphically too, rather than picking up a brand
 // made out of its own mutating methods.
-expectType<ChangeArrayElement<readonly number[], string>, readonly string[]>(
-  '=',
-);
+expectType<ChangeArrayElement<number[], string>, readonly string[]>('=');
 
 expectType<
-  ChangeArrayElement<readonly [number, number], string>,
+  ChangeArrayElement<[number, number], string>,
   readonly [string, string]
 >('=');
 
