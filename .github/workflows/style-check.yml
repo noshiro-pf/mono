@@ -51,12 +51,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ws:doc and ws:check:ext load each package's sources, which import their
-      # workspace siblings' dist/. Nothing has been built yet on a clean
-      # checkout, so those two need the packages emitted first. See the same
-      # note in type-check.yml for why the build runs in two passes.
+      # workspace siblings' dist/. Nothing is built yet on a clean checkout, so
+      # these two need the packages emitted first. The other matrix entries do
+      # not touch dist/, so they skip the build.
       - name: Build all packages
         if: matrix.command == 'ws:doc' || matrix.command == 'ws:check:ext'
-        run: pnpm run ws:build:min && pnpm run ws:build
+        run: pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"
         run: pnpm run ${{ matrix.command }}

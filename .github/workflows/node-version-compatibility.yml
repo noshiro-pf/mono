@@ -13,7 +13,10 @@ on:
 jobs:
   test-node-versions:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # install + ws:build + ws:test across 17 packages, per Node version.
+    # The 10 minutes this was set to when the repository held two packages
+    # cut two of the three matrix entries off mid-test.
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
