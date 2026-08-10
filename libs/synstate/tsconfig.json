@@ -1,15 +1,16 @@
 {
   "extends": [
-    "./configs/tsconfig/tsconfig.type-check.json",
-    "./configs/tsconfig/tsconfig.vite.json"
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
   ],
-  "include": [
-    "./scripts/**/*",
-    "./configs/**/*",
-    "./**/eslint.config.mts",
-    "./**/configs/**/*.mts",
-    "./**/configs/**/*.ts",
-    "./**/vite.config.mts",
-    "./.markdownlint-cli2.mjs"
-  ]
+  "compilerOptions": {
+    "paths": {
+      "synstate": ["./src/entry-point.mts"],
+      "synstate-react-hooks": ["../synstate-react-hooks/src/index.mts"],
+      "synstate-react-hooks-compat": [
+        "../synstate-react-hooks-compat/src/index.mts"
+      ]
+    }
+  },
+  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
 }

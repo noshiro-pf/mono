@@ -1,24 +1,68 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
+  eslintConfigForReact,
   eslintConfigForTypeScript,
+  eslintConfigForVitest,
+  eslintImportsRules,
+  typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
-import { projectRootPath } from './scripts/project-root-path.mjs';
+import { projectRootPath } from '../../scripts/project-root-path.mjs';
 
 export default [
   ...eslintConfigForTypeScript({
-    tsconfigRootDir: projectRootPath,
+    tsconfigRootDir: import.meta.dirname,
     tsconfigFileName: 'tsconfig.json',
-    packageDirs: [projectRootPath],
+    packageDirs: [import.meta.dirname, projectRootPath],
   }),
 
   eslintPluginTsTypeForge.configs.recommended,
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
+
+  eslintConfigForVitest(),
+
+  {
+    rules: defineKnownRules({
+      '@typescript-eslint/no-shadow': [
+        'error',
+        {
+          ...typescriptEslintRules['@typescript-eslint/no-shadow'][1],
+          allow: ['Observable'],
+        },
+      ],
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            'zustand/vanilla',
+            'jotai/vanilla',
+            'valtio/vanilla',
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    files: ['test/**/*.mts', '**/*.test.mts'],
+    rules: defineKnownRules({
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-duplicate-type-constituents': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/consistent-indexed-object-style': 'off',
+      '@typescript-eslint/no-restricted-types': 'off',
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
+      // Tests often assert conditionally and may omit explicit expectations in helper-driven flows
+      'vitest/no-conditional-expect': 'off',
+      'vitest/expect-expect': 'off',
+      'unicorn/consistent-function-scoping': 'off',
+    }),
+  },
 
   eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
@@ -30,6 +74,41 @@ export default [
       'import-x/no-internal-modules': 'off',
       'import-x/no-default-export': 'off',
       'import-x/no-extraneous-dependencies': 'off',
+    }),
+  },
+
+  {
+    files: ['src/**'],
+    rules: defineKnownRules({
+      'functional/no-class-inheritance': 'off',
+    }),
+  },
+
+  {
+    files: ['src/entry-point.mts'],
+    rules: defineKnownRules({
+      'no-restricted-imports': 'off',
+      'import-x/export': 'off',
+    }),
+  },
+
+  ...eslintConfigForReact(['samples/**']),
+  {
+    files: ['samples/**'],
+    rules: defineKnownRules({
+      'react-refresh/only-export-components': 'off',
+      'react/button-has-type': 'off',
+      'react/jsx-no-bind': 'off',
+      'react-perf/jsx-no-new-function-as-prop': 'off',
+      'react/no-array-index-key': 'off',
+      'functional/immutable-data': 'off',
+      'functional/no-let': 'off',
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          whitelist: ['synstate-react-hooks', 'synstate-react-hooks-compat'],
+        },
+      ],
     }),
   },
 ] satisfies readonly FlatConfig[];

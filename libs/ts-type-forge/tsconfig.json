@@ -1,9 +1,17 @@
 {
-  "extends": ["./configs/tsconfig/tsconfig.type-check.json"],
+  "extends": ["../../configs/tsconfig/tsconfig.type-check.json"],
+  "compilerOptions": {
+    "paths": {
+      "ts-type-forge": ["./src/entry-point.mts"],
+      "ts-type-forge/global": ["./src/global.mts"]
+    }
+  },
   "include": [
-    "./scripts/**/*",
-    "./configs/**/*",
-    "./eslint.config.mts",
-    "./.markdownlint-cli2.mjs"
-  ]
+    "./src",
+    "./samples",
+    "./scripts",
+    "./configs",
+    "./eslint.config.mts"
+  ],
+  "exclude": ["src/global.mts"]
 }

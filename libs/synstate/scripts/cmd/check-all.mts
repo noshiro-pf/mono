@@ -8,65 +8,27 @@ const checkAll = async (): Promise<void> => {
   console.info('Starting full project validation and build...\n');
 
   await logStep({
-    startMessage: 'Installing dependencies',
-    action: () => runCmdStep('pnpm i', 'Failed to install dependencies'),
-    successMessage: 'Dependencies installed',
-  });
-
-  await logStep({
-    startMessage: 'Running spell check',
-    action: () => runCmdStep('pnpm run cspell', 'Spell check failed'),
-    successMessage: 'Spell check passed',
-  });
-
-  await logStep({
-    startMessage: 'Running Markdown check',
-    action: () => runCmdStep('pnpm run md', 'Markdown check failed'),
-    successMessage: 'Markdown check passed',
-  });
-
-  await logStep({
-    startMessage: 'Checking file extensions',
-    action: () =>
-      runCmdStep('pnpm run ws:check:ext', 'Checking file extensions failed'),
-    successMessage: 'File extensions validated',
-  });
-
-  await logStep({
-    startMessage: 'Checking scripts and configs',
-    action: () =>
-      runCmdStep('pnpm run check:root', 'Checking scripts and configs failed'),
-    successMessage: 'Scripts and configs validated',
-  });
-
-  await logStep({
-    startMessage: 'Building project',
-    action: () => runCmdStep('pnpm run ws:build', 'Build failed'),
-    successMessage: 'Build succeeded',
-  });
-
-  await logStep({
     startMessage: 'Running tests',
-    action: () => runCmdStep('pnpm run ws:test:cov', 'Tests failed'),
+    action: () => runCmdStep('pnpm run test', 'Tests failed'),
     successMessage: 'Tests passed',
   });
 
   await logStep({
     startMessage: 'Running lint fixes',
-    action: () => runCmdStep('pnpm run ws:lint:fix', 'Linting failed'),
+    action: () => runCmdStep('pnpm run lint:fix', 'Linting failed'),
     successMessage: 'Lint fixes applied',
   });
 
   await logStep({
-    startMessage: 'Running codemod',
-    action: () => runCmdStep('pnpm run codemod:full', 'Codemod failed'),
-    successMessage: 'Codemod applied',
+    startMessage: 'Building project',
+    action: () => runCmdStep('pnpm run build', 'Build failed'),
+    successMessage: 'Build succeeded',
   });
 
   await logStep({
-    startMessage: 'Formatting code',
-    action: () => runCmdStep('pnpm run fmt:diff', 'File formatting failed'),
-    successMessage: 'Code formatted',
+    startMessage: 'Generating documentation',
+    action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
+    successMessage: 'Documentation generated',
   });
 
   console.info('✅ All checks completed successfully!\n');
