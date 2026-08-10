@@ -1,0 +1,110 @@
+import { expectType, Result } from 'ts-data-forge';
+import { type TypeOf } from '../type.mjs';
+import {
+  type ValidationError,
+  validationErrorsToMessages,
+} from '../utils/index.mjs';
+import { uintRange } from './uint-range.mjs';
+
+describe(uintRange, () => {
+  const month = uintRange(1, 13, {
+    defaultValue: 1,
+    typeName: 'month',
+  });
+
+  type Month = TypeOf<typeof month>;
+
+  expectType<Month, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>('=');
+
+  expectType<typeof month.defaultValue, Month>('=');
+
+  describe('is', () => {
+    test('truthy case', () => {
+      const x: number = Math.random() >= 0 ? 1 : 0; // the value is always 1
+
+      if (month.is(x)) {
+        expectType<typeof x, Month>('=');
+      } else {
+        expectType<typeof x, number>('=');
+      }
+
+      assert.isTrue(month.is(x));
+    });
+
+    test('falsy case', () => {
+      const x: number = Math.random() >= 0 ? 13 : 0; // the value is always 13
+
+      if (month.is(x)) {
+        expectType<typeof x, Month>('=');
+      } else {
+        expectType<typeof x, number>('=');
+      }
+
+      assert.isFalse(month.is(x));
+    });
+  });
+
+  describe('validate', () => {
+    test('truthy case', () => {
+      const result = month.validate(5);
+
+      expectType<typeof result, Result<Month, readonly ValidationError[]>>('=');
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue = Result.unwrapThrow(result);
+
+      expect(resultValue).toBe(5);
+    });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 5;
+
+      const result = month.validate(input);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue1 = Result.unwrapThrow(result);
+
+      expect(resultValue1).toBe(input); // ✅ same reference
+    });
+
+    test('falsy case', () => {
+      const result = month.validate(13);
+
+      assert.isTrue(Result.isErr(result));
+
+      const resultError = Result.unwrapErrThrow(result);
+
+      assert.deepStrictEqual(resultError[0], {
+        path: [],
+        actualValue: 13,
+        expectedType: 'month',
+        typeName: 'month',
+        details: {
+          kind: 'integer-range',
+          start: 1,
+          endExclusive: 13,
+        },
+      });
+
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
+        'Error: expected an integer between 1 and 12 but `13` was passed.',
+      ]);
+    });
+  });
+
+  describe('fill', () => {
+    test('noop', () => {
+      const x: number = (() => 5)();
+
+      expect(month.fill(x)).toBe(5);
+    });
+
+    test('fill with the default value', () => {
+      const x: number = (() => 123)();
+
+      expect(month.fill(x)).toBe(1);
+    });
+  });
+});

@@ -1,0 +1,30 @@
+import { type Brand } from 'ts-type-forge';
+import { string } from '../primitives/index.mjs';
+import { type Type } from '../type.mjs';
+import { brand } from './brand.mjs';
+
+export const brandedString = <K extends string>({
+  defaultValue,
+  is = (_u): _u is Brand<string, K> => true,
+  typeName,
+}: Readonly<{
+  typeName: K;
+  defaultValue: string;
+  is?: (u: string) => u is Brand<string, K>;
+}>): Type<Brand<string, K>> =>
+  brand({
+    baseType: string(defaultValue),
+
+    defaultValue,
+
+    is,
+    brandKeys: [typeName],
+    typeName,
+  });
+
+/**
+ * Same as brandedString
+ *
+ * @deprecated use `brandedString`
+ */
+export const simpleBrandedString = brandedString;

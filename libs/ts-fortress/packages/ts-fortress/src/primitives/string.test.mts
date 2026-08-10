@@ -1,0 +1,850 @@
+/* cSpell:disable */
+
+import { expectType, Result } from 'ts-data-forge';
+import {
+  type BoundedLengthString,
+  type MaxLengthString,
+  type MinLengthString,
+  type NonEmptyString,
+} from 'ts-type-forge';
+import { type Type, type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
+import { string } from './string.mjs';
+
+const messageOf = (type: Type<string>, value: unknown): string => {
+  const result = type.validate(value);
+
+  assert.isTrue(Result.isErr(result));
+
+  return validationErrorsToMessages(Result.unwrapErrThrow(result)).join('\n');
+};
+
+describe(string, () => {
+  describe('default value', () => {
+    test('without explicit default value', () => {
+      const strDefault = string();
+
+      expect(strDefault.defaultValue).toBe('');
+    });
+
+    test('with explicit default value', () => {
+      const strCustom = string('hello');
+
+      expect(strCustom.defaultValue).toBe('hello');
+    });
+  });
+
+  const str = string();
+
+  type Str = TypeOf<typeof str>;
+
+  expectType<Str, string>('=');
+
+  expectType<typeof str.defaultValue, Str>('=');
+
+  describe('is', () => {
+    test.each([
+      '',
+      'hello',
+      'world',
+      '123',
+      'true',
+      'false',
+      ' '.repeat(3),
+      '\n',
+      '\t',
+      '🎉',
+    ])('str.is($0) should be true', (v: unknown) => {
+      if (str.is(v)) {
+        expectType<typeof v, Str>('=');
+      } else {
+        expectType<typeof v, unknown>('=');
+      }
+
+      assert.isTrue(str.is(v));
+    });
+
+    test.each([
+      42,
+      0,
+      true,
+      false,
+      null,
+      undefined,
+      {},
+      [],
+      Symbol('test'),
+      Number.NaN,
+    ])('str.is($0) should be false', (v: unknown) => {
+      if (str.is(v)) {
+        expectType<typeof v, Str>('=');
+      } else {
+        expectType<typeof v, unknown>('=');
+      }
+
+      assert.isFalse(str.is(v));
+    });
+  });
+
+  describe('assertIs', () => {
+    const assertIs: (a: unknown) => asserts a is string = str.assertIs;
+
+    test('valid string', () => {
+      const value: unknown = 'hello';
+
+      expect(() => {
+        assertIs(value);
+      }).not.toThrow();
+    });
+
+    test('invalid value throws', () => {
+      const value: unknown = 42;
+
+      expect(() => {
+        assertIs(value);
+      }).toThrow(/Error: expected <string> type/u);
+    });
+  });
+
+  describe('cast', () => {
+    test('valid string returns as is', () => {
+      const value: unknown = 'hello';
+
+      const result = str.cast(value);
+
+      expect(result).toBe('hello');
+    });
+
+    test('invalid value throws error', () => {
+      const value: unknown = 42;
+
+      expect(() => str.cast(value)).toThrow(
+        /^Error: expected <string> type but <number> type value `42` was passed\.$/u,
+      );
+    });
+
+    test('throws error with type mismatch', () => {
+      const strWithDefault = string('default');
+
+      const value: unknown = 42;
+
+      expect(() => strWithDefault.cast(value)).toThrow(
+        /^Error: expected <string> type but <number> type value `42` was passed\.$/u,
+      );
+    });
+  });
+
+  describe('fill', () => {
+    test('valid string returns as is', () => {
+      const value: unknown = 'hello';
+
+      const result = str.fill(value);
+
+      expect(result).toBe('hello');
+    });
+
+    test('undefined returns default', () => {
+      const value: unknown = undefined;
+
+      const result = str.fill(value);
+
+      expect(result).toBe('');
+    });
+
+    test('null returns default', () => {
+      const value: unknown = null;
+
+      const result = str.fill(value);
+
+      expect(result).toBe('');
+    });
+
+    test('invalid value returns default', () => {
+      const value: unknown = 42;
+
+      const result = str.fill(value);
+
+      expect(result).toBe('');
+    });
+
+    test('uses custom default value for invalid', () => {
+      const strWithDefault = string('default');
+
+      const value: unknown = 42;
+
+      const result = strWithDefault.fill(value);
+
+      expect(result).toBe('default');
+    });
+  });
+
+  describe('validate', () => {
+    test('valid string', () => {
+      const value: unknown = 'hello';
+
+      const result = str.validate(value);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue = Result.unwrapThrow(result);
+
+      expect(resultValue).toBe('hello');
+    });
+
+    test('empty string is valid', () => {
+      const value: unknown = '';
+
+      const result = str.validate(value);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue1 = Result.unwrapThrow(result);
+
+      expect(resultValue1).toBe('');
+    });
+
+    test('invalid value', () => {
+      const value: unknown = 42;
+
+      const result = str.validate(value);
+
+      assert.isTrue(Result.isErr(result));
+
+      const resultError = Result.unwrapErrThrow(result);
+
+      assert.deepStrictEqual(resultError, [
+        {
+          path: [],
+          actualValue: 42,
+          expectedType: 'string',
+          typeName: 'string',
+          details: undefined,
+        },
+      ]);
+    });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 'hello world';
+
+      const result = str.validate(input);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue2 = Result.unwrapThrow(result);
+
+      expect(resultValue2).toBe(input); // ✅ same reference
+    });
+  });
+});
+
+describe('string with constraints', () => {
+  test('string without constraints', () => {
+    const type = string();
+
+    expectType<typeof type, Type<string>>('=');
+
+    assert.isTrue(type.is(''));
+  });
+
+  describe('string constrained by startsWith', () => {
+    test('accepts valid default value', () => {
+      const type = string('abcdefghi', { startsWith: 'ab' });
+
+      expectType<typeof type, Type<`ab${string}`>>('=');
+
+      assert.isTrue(type.is('ab'));
+
+      assert.isTrue(type.is('abcde__'));
+
+      assert.isFalse(type.is('cab'));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error "cab" does not start with "ab"
+        string('cab', { startsWith: 'ab' }),
+      ).toThrow(
+        /^defaultValue "cab" for string does not satisfy the constraint startsWith = ab$/u,
+      );
+    });
+
+    test('empty startsWith', () => {
+      assert.isTrue(string('abc', { startsWith: '' }).is('abc'));
+    });
+  });
+
+  describe('string constrained by endsWith', () => {
+    test('accepts valid default value', () => {
+      const type = string('abcdefghi', { endsWith: 'ghi' });
+
+      expectType<TypeOf<typeof type>, `${string}ghi`>('=');
+
+      assert.isTrue(type.is('ghi'));
+
+      assert.isTrue(type.is('xyz_ghi'));
+
+      assert.isFalse(type.is('xyz'));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error "abc" does not end with "ba"
+        string('abc', { endsWith: 'ba' }),
+      ).toThrow(
+        /^defaultValue "abc" for string does not satisfy the constraint endsWith = ba$/u,
+      );
+    });
+
+    test('empty endsWith', () => {
+      assert.isTrue(string('abc', { endsWith: '' }).is('abc'));
+    });
+  });
+
+  describe('string constrained by includes', () => {
+    test('accepts valid default value', () => {
+      const type = string('abcdefghi', { includes: 'def' });
+
+      expectType<TypeOf<typeof type>, `${string}def${string}`>('=');
+
+      assert.isTrue(type.is('def'));
+
+      assert.isTrue(type.is('xyz_def_uvw'));
+
+      assert.isFalse(type.is('xyz_uvw'));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error "abc" does not include "def"
+        string('abc', { includes: 'def' }),
+      ).toThrow(
+        /^defaultValue "abc" for string does not satisfy the constraint includes = def$/u,
+      );
+    });
+
+    test('empty includes', () => {
+      assert.isTrue(string('abc', { includes: '' }).is('abc'));
+    });
+  });
+
+  describe('string constrained by lowercase', () => {
+    test('accepts valid default value', () => {
+      const type = string('abcdefghi', { lowercase: true });
+
+      expectType<typeof type, Type<string>>('=');
+
+      assert.isTrue(type.is('abcde__'));
+
+      assert.isFalse(type.is('ABC'));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error "ABCDEFGHI" is not assignable if lowercase is true
+        string('ABCDEFGHI', { lowercase: true }),
+      ).toThrow(
+        /^defaultValue "ABCDEFGHI" for string does not satisfy the constraint lowercase = true$/u,
+      );
+    });
+  });
+
+  describe('string constrained by uppercase', () => {
+    test('accepts valid default value', () => {
+      const type = string('ABCDEFGHI', { uppercase: true });
+
+      expectType<typeof type, Type<string>>('=');
+
+      assert.isTrue(type.is('ABC'));
+
+      assert.isFalse(type.is('abc'));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error "abcdefghi" is not assignable if uppercase is true
+        string('abcdefghi', { uppercase: true }),
+      ).toThrow(
+        /^defaultValue "abcdefghi" for string does not satisfy the constraint uppercase = true$/u,
+      );
+    });
+  });
+
+  describe('string constrained by nonempty', () => {
+    test('accepts valid default value', () => {
+      const type = string('nonempty', { nonempty: true });
+
+      expectType<typeof type, Type<NonEmptyString>>('=');
+
+      assert.isTrue(type.is('value'));
+
+      assert.isFalse(type.is(''));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error "" is not assignable if nonempty is true
+        string('', { nonempty: true }),
+      ).toThrow(
+        /^defaultValue "" for string does not satisfy the constraint nonempty = true$/u,
+      );
+    });
+  });
+
+  describe('string constrained by minLength', () => {
+    test('accepts valid default value', () => {
+      const type = string('minimum', { minLength: 3 });
+
+      expectType<typeof type, Type<MinLengthString<3>>>('=');
+
+      assert.isTrue(type.is('hello'));
+
+      assert.isFalse(type.is('hi'));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error "hi" is not assignable if minLength is 3
+        string('hi', { minLength: 3 }),
+      ).toThrow(
+        /^defaultValue "hi" for string does not satisfy the constraint minLength = 3$/u,
+      );
+    });
+
+    test('throws for a minLength less than 1', () => {
+      expect(() => string('minimum', { minLength: -1 })).toThrow(
+        /^minLength constraint for string must be a positive integer, but -1 was passed\.$/u,
+      );
+
+      expect(() => string('minimum', { minLength: 0 })).toThrow(
+        /^minLength constraint for string must be a positive integer, but 0 was passed\.$/u,
+      );
+    });
+
+    test('throws for a non-integer minLength', () => {
+      expect(() => string('minimum', { minLength: 1.5 })).toThrow(
+        /^minLength constraint for string must be a positive integer, but 1\.5 was passed\.$/u,
+      );
+    });
+  });
+
+  describe('string constrained by maxLength', () => {
+    test('accepts valid default value', () => {
+      const type = string('short', { maxLength: 5 });
+
+      expectType<typeof type, Type<MaxLengthString<5>>>('=');
+
+      assert.isTrue(type.is('tiny'));
+
+      assert.isFalse(type.is('excessive'));
+    });
+
+    test('rejects invalid default value', () => {
+      expect(() =>
+        // @ts-expect-error "too-long" is not assignable if maxLength is 5
+        string('too-long', { maxLength: 5 }),
+      ).toThrow(
+        /^defaultValue "too-long" for string does not satisfy the constraint maxLength = 5$/u,
+      );
+    });
+  });
+
+  describe('minLength/maxLength outside the supported literal range', () => {
+    // Only the number literals `1..2048` (the shared `SupportedLength` cap of
+    // the branded length-constrained types) are encoded in the result brand.
+    // A larger literal or a non-literal `number` collapses the result type to
+    // plain `string` to keep the type-level computation cheap, while the
+    // runtime constraint applies regardless. Non-integer bounds and bounds
+    // less than 1 throw at construction time.
+
+    test('the largest supported literal (2048) is encoded in the brand', () => {
+      const longDefault: string = 'x'.repeat(2048);
+
+      const type = string(longDefault, { minLength: 2048 });
+
+      expectType<typeof type, Type<MinLengthString<2048>>>('=');
+
+      assert.isTrue(type.is('x'.repeat(2048)));
+
+      assert.isFalse(type.is('x'.repeat(2047)));
+    });
+
+    test('a minLength literal outside the range (>= 2049) falls back to plain string', () => {
+      const longDefault: string = 'x'.repeat(2049);
+
+      const type = string(longDefault, { minLength: 2049 });
+
+      expectType<typeof type, Type<string>>('=');
+
+      // The runtime constraint still applies.
+      assert.isTrue(type.is('x'.repeat(2049)));
+
+      assert.isFalse(type.is('x'.repeat(2048)));
+    });
+
+    test('a maxLength literal outside the range (>= 2049) falls back to plain string', () => {
+      const type = string('', { maxLength: 2049 });
+
+      expectType<typeof type, Type<string>>('=');
+
+      assert.isTrue(type.is('x'.repeat(2049)));
+
+      assert.isFalse(type.is('x'.repeat(2050)));
+    });
+
+    test('throws for a maxLength less than 1 or a non-integer maxLength', () => {
+      expect(() => string('', { maxLength: 0 })).toThrow(
+        /^maxLength constraint for string must be a positive integer, but 0 was passed\.$/u,
+      );
+
+      expect(() => string('', { maxLength: 2.5 })).toThrow(
+        /^maxLength constraint for string must be a positive integer, but 2\.5 was passed\.$/u,
+      );
+    });
+
+    test('a non-literal bound falls back to plain string', () => {
+      const getBound = (): number => 5;
+
+      const type = string('', { maxLength: getBound() });
+
+      expectType<typeof type, Type<string>>('=');
+
+      assert.isTrue(type.is('12345'));
+
+      assert.isFalse(type.is('123456'));
+    });
+
+    test('the default value is only length-checked at runtime for an out-of-range bound', () => {
+      // With an in-range literal bound, a too-short default is already a
+      // compile error; with an out-of-range bound it compiles and the check
+      // is deferred to runtime.
+      const shortDefault: string = 'hi';
+
+      expect(() => string(shortDefault, { minLength: 2049 })).toThrow(
+        /^defaultValue "hi" for string does not satisfy the constraint minLength = 2049$/u,
+      );
+    });
+  });
+
+  describe('string constrained by regex', () => {
+    test('accepts valid default value', () => {
+      const numeric = /^\d+$/u;
+
+      const type = string('12345', { regex: numeric });
+
+      expectType<typeof type, Type<string>>('=');
+
+      assert.isTrue(type.is('67890'));
+
+      assert.isFalse(type.is('abc123'));
+    });
+
+    test('rejects invalid default value', () => {
+      const numeric = /^\d+$/u;
+
+      expect(() => string('abc', { regex: numeric })).toThrow(
+        /^defaultValue "abc" for string does not satisfy the constraint regex = \^\\d\+\$$/u,
+      );
+    });
+  });
+
+  describe('complex constraints', () => {
+    describe('string constrained by startsWith and endsWith', () => {
+      test('accepts valid default value', () => {
+        const type = string('abba', { startsWith: 'ab', endsWith: 'ba' });
+
+        expectType<TypeOf<typeof type>, `ab${string}` & `${string}ba`>('=');
+
+        assert.isTrue(type.is('aba'));
+
+        assert.isTrue(type.is('abba'));
+
+        assert.isFalse(type.is('abca'));
+
+        assert.isFalse(type.is('caba'));
+      });
+
+      test('rejects invalid default value', () => {
+        expect(() =>
+          // @ts-expect-error "abba" does not end with "zz"
+          string('abba', { startsWith: 'ab', endsWith: 'zz' }),
+        ).toThrow(
+          /^defaultValue "abba" for string does not satisfy the constraint endsWith = zz$/u,
+        );
+      });
+    });
+
+    describe('string constrained by startsWith, includes, and endsWith', () => {
+      test('accepts valid default value', () => {
+        const type = string('abcdef', {
+          startsWith: 'ab',
+          includes: 'cd',
+          endsWith: 'ef',
+        });
+
+        expectType<
+          TypeOf<typeof type>,
+          `ab${string}` & `${string}cd${string}` & `${string}ef`
+        >('=');
+
+        assert.isTrue(type.is('abcdef'));
+
+        assert.isTrue(type.is('abXXcdef'));
+
+        assert.isFalse(type.is('ab__ef'));
+
+        assert.isFalse(type.is('zzcdef'));
+
+        assert.isFalse(type.is('abcdefx'));
+      });
+
+      test('rejects invalid default value', () => {
+        expect(() =>
+          // @ts-expect-error "abcdbye" does not end with "hi"
+          string('abcdbye', {
+            startsWith: 'ab',
+            includes: 'cd',
+            endsWith: 'hi',
+          }),
+        ).toThrow(
+          /^defaultValue "abcdbye" for string does not satisfy the constraint endsWith = hi$/u,
+        );
+
+        expect(() =>
+          // @ts-expect-error "abcdhi" does not includes "cd"
+          string('abxxhi', {
+            startsWith: 'ab',
+            includes: 'cd',
+            endsWith: 'hi',
+          }),
+        ).toThrow(
+          /^defaultValue "abxxhi" for string does not satisfy the constraint includes = cd$/u,
+        );
+      });
+    });
+
+    describe('string constrained by uppercase and lowercase', () => {
+      test('accepts valid default value', () => {
+        const type = string('1234', { uppercase: true, lowercase: true });
+
+        expectType<typeof type, Type<string>>('=');
+
+        assert.isTrue(type.is('1234'));
+
+        assert.isFalse(type.is('ABCD'));
+
+        assert.isFalse(type.is('abcd'));
+      });
+
+      test('rejects invalid default value', () => {
+        expect(() =>
+          // @ts-expect-error "Ab" is neither strictly uppercase nor lowercase
+          string('Ab', { uppercase: true, lowercase: true }),
+        ).toThrow(
+          /^defaultValue "Ab" for string does not satisfy the constraint uppercase = true$/u,
+        );
+      });
+    });
+
+    describe('string constrained by nonempty, minLength, and maxLength', () => {
+      test('accepts valid default value', () => {
+        const type = string('token', {
+          nonempty: true,
+          minLength: 3,
+          maxLength: 8,
+        });
+
+        expectType<
+          typeof type,
+          Type<NonEmptyString & BoundedLengthString<3, 8>>
+        >('=');
+
+        assert.isTrue(type.is('value'));
+
+        assert.isFalse(type.is(''));
+
+        assert.isFalse(type.is('hi'));
+
+        assert.isFalse(type.is('extra-long-token'));
+      });
+
+      test('rejects invalid default value', () => {
+        expect(() =>
+          // @ts-expect-error "extra-long-token" violates maxLength = 8
+          string('extra-long-token', {
+            nonempty: true,
+            minLength: 3,
+            maxLength: 8,
+          }),
+        ).toThrow(
+          /^defaultValue "extra-long-token" for string does not satisfy the constraint maxLength = 8$/u,
+        );
+      });
+
+      test('rejects invalid default value 2', () => {
+        expect(() =>
+          // @ts-expect-error "extra-long-token" violates maxLength = 8
+          string('1234', {
+            nonempty: true,
+            minLength: 8,
+            maxLength: 3,
+          }),
+        ).toThrow(
+          /^defaultValue "1234" for string does not satisfy the constraint minLength = 8$/u,
+        );
+      });
+    });
+
+    describe('string constrained by regex and includes', () => {
+      test('accepts valid default value', () => {
+        const slug = /^[a-z-]+$/u;
+
+        const type = string('feature-flag', {
+          includes: 'feature',
+          regex: slug,
+        });
+
+        expectType<typeof type, Type<`${string}feature${string}`>>('=');
+
+        assert.isTrue(type.is('feature-toggle'));
+
+        assert.isTrue(type.is('featureflag'));
+
+        assert.isFalse(type.is('feature_flag'));
+
+        assert.isFalse(type.is('flag'));
+      });
+
+      test('rejects invalid default value', () => {
+        const slug = /^[a-z-]+$/u;
+
+        expect(() =>
+          string('featureFLAG', { includes: 'feature', regex: slug }),
+        ).toThrow(
+          /^defaultValue "featureFLAG" for string does not satisfy the constraint regex = \^\[a-z-\]\+\$$/u,
+        );
+      });
+    });
+
+    describe('string constrained by minLength, maxLength, and regex', () => {
+      test('accepts valid default value', () => {
+        const digits = /^[0-9]+$/u;
+
+        const type = string('12345', {
+          minLength: 4,
+          maxLength: 6,
+          regex: digits,
+        });
+
+        expectType<typeof type, Type<BoundedLengthString<4, 6>>>('=');
+
+        assert.isTrue(type.is('6789'));
+
+        assert.isFalse(type.is('6789012'));
+
+        assert.isFalse(type.is('678'));
+
+        assert.isFalse(type.is('67a9'));
+      });
+
+      test('rejects invalid default value', () => {
+        const digits = /^[0-9]+$/u;
+
+        expect(() =>
+          // @ts-expect-error "1234567" violates maxLength = 6
+          string('1234567', {
+            minLength: 4,
+            maxLength: 6,
+            regex: digits,
+          }),
+        ).toThrow(
+          /^defaultValue "1234567" for string does not satisfy the constraint maxLength = 6$/u,
+        );
+      });
+    });
+  });
+});
+
+describe('string constraint validation messages', () => {
+  test('nonempty reports the violated constraint', () => {
+    expect(messageOf(string('x', { nonempty: true }), '')).toBe(
+      'Error: expected a non-empty string but an empty string was passed.',
+    );
+  });
+
+  test('minLength reports the expected and actual length', () => {
+    expect(messageOf(string('xxx', { minLength: 3 }), 'ab')).toBe(
+      'Error: expected a string of length 3 or more but a string of length 2 "ab" was passed.',
+    );
+  });
+
+  test('maxLength reports the expected and actual length', () => {
+    expect(messageOf(string('x', { maxLength: 5 }), 'excessive')).toBe(
+      'Error: expected a string of length 5 or less but a string of length 9 "excessive" was passed.',
+    );
+  });
+
+  test('startsWith reports the required prefix', () => {
+    expect(messageOf(string('ab', { startsWith: 'ab' }), 'cab')).toBe(
+      'Error: expected a string starting with "ab" but "cab" was passed.',
+    );
+  });
+
+  test('endsWith reports the required suffix', () => {
+    expect(messageOf(string('xba', { endsWith: 'ba' }), 'abc')).toBe(
+      'Error: expected a string ending with "ba" but "abc" was passed.',
+    );
+  });
+
+  test('includes reports the required substring', () => {
+    expect(messageOf(string('def', { includes: 'def' }), 'xyz')).toBe(
+      'Error: expected a string containing "def" but "xyz" was passed.',
+    );
+  });
+
+  test('uppercase reports the casing constraint', () => {
+    expect(messageOf(string('ABC', { uppercase: true }), 'abc')).toBe(
+      'Error: expected an uppercase string but "abc" was passed.',
+    );
+  });
+
+  test('lowercase reports the casing constraint', () => {
+    expect(messageOf(string('abc', { lowercase: true }), 'ABC')).toBe(
+      'Error: expected a lowercase string but "ABC" was passed.',
+    );
+  });
+
+  test('regex reports the pattern source', () => {
+    expect(messageOf(string('12', { regex: /^\d+$/u }), 'abc')).toBe(
+      String.raw`Error: expected a string matching /^\d+$/ but "abc" was passed.`,
+    );
+  });
+
+  test('reports the first failing constraint when several are set', () => {
+    const type = string('token', {
+      nonempty: true,
+      minLength: 3,
+      maxLength: 8,
+    });
+
+    expect(messageOf(type, 'hi')).toBe(
+      'Error: expected a string of length 3 or more but a string of length 2 "hi" was passed.',
+    );
+  });
+
+  test('keeps the field path prefix for nested constraint failures', () => {
+    const type = string('token', { minLength: 3 });
+
+    const result = type.validate('ab');
+
+    assert.isTrue(Result.isErr(result));
+
+    const errors = Result.unwrapErrThrow(result).map((e) => ({
+      ...e,
+      path: ['field'] as const,
+    }));
+
+    assert.deepStrictEqual(validationErrorsToMessages(errors), [
+      'Error at field: expected a string of length 3 or more but a string of length 2 "ab" was passed.',
+    ]);
+  });
+});

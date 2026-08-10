@@ -1,0 +1,149 @@
+import { expectType, Result } from 'ts-data-forge';
+import { number } from '../primitives/index.mjs';
+import { type Type, type TypeOf } from '../type.mjs';
+import { validationErrorsToMessages } from '../utils/index.mjs';
+import { keyof } from './keyof.mjs';
+import { record } from './record.mjs';
+
+describe(keyof, () => {
+  const ymdKey = keyof(
+    record({
+      year: number(1900),
+      month: number(1),
+      date: number(1),
+    }),
+  );
+
+  expectType<typeof ymdKey, Type<'year' | 'month' | 'date'>>('=');
+
+  type Ymd = TypeOf<typeof ymdKey>;
+
+  expectType<Ymd, 'year' | 'month' | 'date'>('=');
+
+  expectType<typeof ymdKey.defaultValue, Ymd>('=');
+
+  describe('is', () => {
+    test('truthy case', () => {
+      const x: unknown = 'year';
+
+      if (ymdKey.is(x)) {
+        expectType<typeof x, 'year' | 'month' | 'date'>('=');
+      } else {
+        expectType<typeof x, unknown>('=');
+      }
+
+      assert.isTrue(ymdKey.is(x));
+    });
+
+    test('falsy case', () => {
+      const x: unknown = 'minutes';
+
+      if (ymdKey.is(x)) {
+        expectType<typeof x, 'year' | 'month' | 'date'>('=');
+      } else {
+        expectType<typeof x, unknown>('=');
+      }
+
+      assert.isFalse(ymdKey.is(x));
+    });
+  });
+
+  describe('validate', () => {
+    test('truthy case', () => {
+      const x: unknown = 'year';
+
+      const result = ymdKey.validate(x);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue = Result.unwrapThrow(result);
+
+      expectType<typeof resultValue, Ymd>('=');
+
+      expect(resultValue).toBe('year');
+    });
+
+    test('validate returns input as-is for OK cases', () => {
+      const input = 'year';
+
+      const result = ymdKey.validate(input);
+
+      assert.isTrue(Result.isOk(result));
+
+      const resultValue1 = Result.unwrapThrow(result);
+
+      expect(resultValue1).toBe(input); // ✅ same reference
+    });
+
+    test('falsy case', () => {
+      const x: unknown = 'minutes';
+
+      const result = ymdKey.validate(x);
+
+      assert.isTrue(Result.isErr(result));
+
+      const resultError = Result.unwrapErrThrow(result);
+
+      assert.deepStrictEqual(resultError, [
+        {
+          path: [],
+          actualValue: 'minutes',
+          expectedType: 'keyof { year: number, month: number, date: number }',
+          typeName: 'keyof { year: number, month: number, date: number }',
+          details: {
+            kind: 'enum',
+            values: ['year', 'month', 'date'],
+          },
+        },
+      ]);
+
+      assert.deepStrictEqual(validationErrorsToMessages(resultError), [
+        'Error: expected one of { year, month, date } but "minutes" was passed.',
+      ]);
+    });
+  });
+
+  describe('fill', () => {
+    test('from external value', () => {
+      const x: unknown = 'minutes';
+
+      expect(ymdKey.fill(x)).toBe('year');
+    });
+
+    test('from key', () => {
+      const x = 'month';
+
+      expect(ymdKey.fill(x)).toBe('month');
+    });
+  });
+
+  describe('additional negative cases', () => {
+    test('rejects non-string values', () => {
+      assert.isFalse(ymdKey.is(123));
+
+      assert.isFalse(ymdKey.is(true));
+
+      assert.isFalse(ymdKey.is(null));
+
+      assert.isFalse(ymdKey.is(undefined));
+
+      assert.isFalse(ymdKey.is({}));
+
+      assert.isFalse(ymdKey.is([]));
+    });
+
+    test('rejects empty string', () => {
+      assert.isFalse(ymdKey.is(''));
+    });
+
+    test('rejects similar but incorrect keys', () => {
+      assert.isFalse(ymdKey.is('Year'));
+
+      assert.isFalse(ymdKey.is('YEAR'));
+
+      assert.isFalse(ymdKey.is('year '));
+
+      assert.isFalse(ymdKey.is(' year'));
+    });
+  });
+});
