@@ -74,4 +74,7 @@ install・ビルド・lint・型チェックのいずれの対象にもならず
 
 ## License
 
-MIT
+Apache-2.0（`libs/` 配下の各パッケージも同じ）。
+
+統合前の mono は MIT だったため、`experimental/` に退避したコードは MIT のもとで
+公開されていた。その時点のライセンスは git 履歴に残っている。

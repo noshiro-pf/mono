@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "sideEffects": false,
   "type": "module",
