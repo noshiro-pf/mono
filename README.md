@@ -1,106 +1,77 @@
 # mono
 
-A monorepo for nodejs projects. This repository contains multiple applications and utility libraries.
-
-## Clone
-
-```sh
-git clone --recursive
-```
+A monorepo for TypeScript projects: published libraries, applications, internal
+tooling, and the Zenn articles published at <https://zenn.dev/noshiro_piko>.
 
 ## Setup
 
 ```sh
-$  pnpm install
-$  pnpm run setup
+pnpm install
 ```
 
-## monorepo 構成
+## Structure
 
--   ディレクトリ
-    -   `/packages` ： メンテしているコード置き場。 package.json の存在するディレクトリはすべて workspace として扱われる。
-        -   `/apps` ： React などで作成されたアプリ
-        -   `/utils` ： TypeScript や React などで使うライブラリ
-        -   `/slides` ： reveal.js 製のスライド
-        -   `/others` ・ `/tools` ： その他ツール群（一部はメンテできていないものもあるのでそれらは `/experimental` に移動すべきかも…）
-    -   `/experimental` ： メンテナンス対象外のコード置き場
--   package.json の内容について
-    -   パッケージ名は原則 `@noshiro/` 始まりにしてある。
-    -   `prettier-plugin-packagejson` を入れており、（エディタの onSaveFormat あるいは CLI で） prettier 実行時に package.json のソートが走るようにしている。
-    -   dependencies に記述されていないパッケージがソースコード中で使われている場合には eslint ルール（https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-extraneous-dependencies.md ）でエラーが出るようになっており、 dependencies 記述漏れはここでチェックされる。
-    -   各 workspace の devDependencies は基本的に使用せず、ルートディレクトリの package.json にまとめて記述している。型定義を共有している都合で TypeScript のバージョンも monorepo 全体で統一している（ `/experimental` 配下は除く）。
-    -   npm scripts 定義
-        -   直接手動実行しない想定の内部コマンドには `z:` または `zz:` プレフィックスをつけて後ろにソートされるようにしている。
-    -   commit 時の待ち時間削減のために husky hooks はあえて導入していない。代わりに GitHub Actions でチェックするようにしている。
--   コマンド実行ツール
-    -   npm-run-all
-        -   用途
-            -   複数コマンドの並列 (run-s) or 直列実行 (run-p) を行う。
-            -   主に単独 workspace 内のコマンド実行で使用している。
-    -   wsrun
-        -   用途
-            -   複数 workspace をまたいで同名コマンドを一括実行する。
-        -   `--stages` または `--serial` オプションで実行する場合、各 package.json の dependencies の依存グラフにしたがって順番に実行することができる。
-    -   wireit
-        -   用途
-            -   コマンド間の依存関係を記述する。
-                -   あるコマンドの前に別のコマンドを実行する必要がある場合に使用している。
-                -   packages/utils に関しては repository 初期設定として予めビルドしておく運用を想定しており、 packages/apps 内の各コマンドで依存 utils の build を dependencies に加えることはしていない（記述が多くなるデメリットがあり、キャッシュされた結果とはいえ実行時間が伸びることによる不便さが大きいため）。
-            -   コマンド実行のキャッシュ化はしない。たまに一部コマンドが上手く動かなくなったときに wireit キャッシュのせいであることがあったため。
--   configs
-    -   tsconfig
-        -   各 workspace で継承する共通 tsconfig 定義を置いている。
--   特殊 utility の説明
-    -   `packages/eslint-configs`
-        -   eslint 共通設定を定義している。
-        -   ESModule で記述するために flat config を導入（2023/11）
-        -   TypeScript で記述している
-            -   `pnpm --filter @noshiro/eslint-configs run build` により生成（その後一部手動修正が必要）
-        -   `plugin:@typescript-eslint:recommended` 等の public な config は使っておらず、 rule の設定を明示的に記述している。
-            -   主に多数の config を extends に追加した際のルール設定の上書き結果が曖昧になる問題を避けるため。各ルールはちょうど 1 回ずつ定義されている状態になっている。
-            -   `@typescript-eslint` のルールに対応する `eslint` のルールや `prettier` と競合するルール無効化が必要な場合があるが、これらは適宜 plugin の提供している config を参考に手動で設定している。
-            -   `prettier` と競合する eslint のスタイリング関係のルールを off にする設定は、 `eslint --fix` 結果と `prettier --write` 結果が競合していないことにより正しさを確認しているがそれ以上のことはしていない。
-        -   config には rule に option まで型が付き補完が効くようになっている。
-        -   この型定義は各 eslint plugin の schema から `scripts` 内のスクリプトで自動生成（その後一部手動修正）している。
-        -   この仕組みにより、 plugin アップデート時には上のコマンドを実行し git 差分を確認することで、追加・削除されたルールを発見できるようになっている。
-            -   schema に deprecated フラグが設定されているルールの severity は `"off"` しか選べないような型を生成しているため、 deprecated になったルールが有効のままにはならないことを保証している。
-        -   一部のルールは false positive が多いなどの理由で workspace ごとに個別に無効化していることがある。
-    -   `packages/strict-typescript-lib`
-        -   TypeScript の標準ライブラリの型を一部厳格化した型を提供するパッケージ。
-        -   TypeScript 型ユーティリティ集。workspace 内で `DeepReadonly` などの型を使用できるようにする。
-    -   `packages/utils/global-*`
-        -   `packages/apps` 内の各パッケージで使用。
-        -   `global-X` は、 (P)React プロジェクトで頻繁に使うユーティリティを import 無しで使用できるようにするためのツール。 workspace に適切に設定すると `React.useMemo`　などのユーティリティを import 無しで使えるようになる。
-        -   Vite の bundle 時に import 文を自動挿入するための inject plugin の共通設定や、型定義などを提供している。
+- `libs/*` — 公開している npm パッケージ。1 ディレクトリ 1 パッケージ。
+- `apps/*` — アプリケーション。
+- `tools/*` — リポジトリ内部向けのツール。
+- `configs/` — root と各パッケージが共有する TypeScript / Vite / Rollup 設定。
+- `scripts/cmd/` — リポジトリ全体のコマンド (`check-all`, `ws-build-stages` など)。
+- `agents/` — `AGENTS.md` の生成元 (`common-rules.md` + `local-rules.md`)。
+- `github/` — [github-settings-as-code](https://github.com/noshiro-pf/github-settings-as-code) で適用する GitHub リポジトリ設定。
+- `articles/`, `books/` — Zenn のコンテンツ。[Zenn](#zenn) を参照。
+- `docs/` — 雑多なメモ。lint 対象外。
+- `experimental/` — 旧 monorepo のコード。[experimental/](#experimental) を参照。
 
-## Workspace 追加方法
+pnpm workspace のメンバーは `libs/*`, `apps/*`, `tools/*` のみ
+（`pnpm-workspace.yaml`）。
 
--   Preact app
-    -   `pnpm run create:preact-app <package-name> && pnpm install`
--   React app
-    -   `pnpm run create:react-app <package-name> && pnpm install`
--   Utility
-    -   `pnpm run create:util <package-name> && pnpm install`
--   Slides
-    -   `pnpm run create:slides <package-name> && pnpm install`
+## Commands
 
-各カテゴリに対応するディレクトリに設置してある template workspace がコピーされ、 workspace 名と package.json 内の name フィールドが `<package-name>` で置換される。
-workspace 作成後に pnpm install を実行して workspace として認識させる必要がある（node_modules 内に symlink が作成される）。
+```sh
+pnpm run check-all      # 全チェック（install, spell, markdown, type, build, test, lint, format）
+pnpm run ws:build       # 依存関係の順にビルド
+pnpm run ws:test        # 全パッケージのテスト
+pnpm run fmt            # 未コミットのファイルを整形
+pnpm changeset          # リリース用の changeset を追加
+```
 
-## CI
+## Zenn
 
-Github Actions で実行される。
+`articles/` と `books/` は、zenn.dev 側で設定された Zenn の GitHub 連携によって
+公開されている。**このリポジトリのワークフローは一切関与していない。**
+Zenn の仕様上、この 2 ディレクトリはリポジトリ直下になければならない。
 
-workflow は .github ディレクトリに定義されている。
+そのため:
 
-現状は `"ci"` コマンドをそのまま実行するようになっている。
+- **`articles/` と `books/` を移動・リネーム・ネストさせないこと。** CI は何も
+  失敗しないまま公開だけが壊れる。
+- 両ディレクトリは Prettier / ESLint / cspell / markdownlint の対象外。
+  formatter のバージョンが上がるたびに公開済み記事が書き換わるのを防ぐため。
+- ローカルプレビューは `pnpm exec zenn preview`。
 
-`ci:clean-*` コマンドは、package.json 等が正しく依存関係を記述しているかをローカルで確認するために、ビルド済み utils 等のキャッシュを削除して `"ci"` コマンドを実行するために用意している。
+## experimental/
 
-### branch
+`experimental/` には 2026 年以前の monorepo の内容（旧 `packages/`, `configs/`,
+`scripts/`）が入っている。pnpm workspace の glob から意図的に外してあるため、
+install・ビルド・lint・型チェックのいずれの対象にもならず、依存アップデートの
+影響を受けない。
 
--   `main` ： デフォルトブランチ
--   `develop` ： 開発用のブランチ
--   `archive/*` ： 作業中のコード置き場
+復活させる場合は、対象のパッケージだけを `libs/` または `apps/` へ移し、依存を
+現行のライブラリへ移行する（`@noshiro/ts-utils` → `ts-data-forge`、
+`@noshiro/ts-type-utils` → `ts-type-forge`、`@noshiro/io-ts` → `ts-fortress`）。
 
-### dependencies memo
+## Releases
+
+リリースは [changesets](https://github.com/changesets/changesets) で管理している。
+`libs/` 配下のパッケージに利用者から見える変更を加えたら `pnpm changeset` を実行する。
+`main` へマージされると Release workflow が version PR を作成し、マージ時に npm へ
+公開して GitHub Release を作成する。
+
+タグの形式は `<package-name>@<version>`。
+`eslint-config-typed/v5.8.4` や `ts-data-forge/ts-data-forge@14.1.0` のように
+リポジトリ名が前置されたタグは、統合前の各リポジトリから取り込んだ履歴に対応する
+ものであり、新規に作成することはない。
+
+## License
+
+MIT

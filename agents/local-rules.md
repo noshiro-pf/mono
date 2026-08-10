@@ -4,18 +4,16 @@ In addition to the common instructions above (vendored into `agents/common-rules
 
 ## Repository Layout
 
-| Path             | Contents                                                                                |
-| :--------------- | :-------------------------------------------------------------------------------------- |
-| `libs/*`         | Published npm packages. One directory per package.                                       |
-| `apps/*`         | Applications.                                                                            |
-| `tools/*`        | Internal tooling packages.                                                               |
-| `configs/`       | Shared TypeScript / Vite / Rollup config used by the root and by packages.               |
-| `scripts/cmd/`   | Repository-level `tsx` commands (`check-all`, `ws-build-stages`, agent config sync, …).  |
-| `github/`        | Declarative GitHub repository settings, applied via `github-settings-as-code`.           |
-| `articles/`      | Zenn articles. **See "Zenn" below.**                                                     |
-| `books/`         | Zenn books. **See "Zenn" below.**                                                        |
-| `docs/`          | Loose prose notes. Not linted, not part of the build.                                    |
-| `experimental/`  | Legacy code. **See "experimental/" below.**                                              |
+- `libs/*` — published npm packages, one directory per package.
+- `apps/*` — applications.
+- `tools/*` — internal tooling packages.
+- `configs/` — shared TypeScript / Vite / Rollup config used by the root and by packages.
+- `scripts/cmd/` — repository-level `tsx` commands (`check-all`, `ws-build-stages`, agent config sync, …).
+- `github/` — declarative GitHub repository settings, applied via `github-settings-as-code`.
+- `articles/` — Zenn articles. **See "Zenn" below.**
+- `books/` — Zenn books. **See "Zenn" below.**
+- `docs/` — loose prose notes. Not linted, not part of the build.
+- `experimental/` — legacy code. **See "experimental/" below.**
 
 Only `libs/*`, `apps/*` and `tools/*` are pnpm workspace members (`pnpm-workspace.yaml`).
 

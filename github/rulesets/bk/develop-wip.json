@@ -1,0 +1,18 @@
+{
+  "id": 4856136,
+  "name": "develop-wip",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "conditions": {
+    "ref_name": {
+      "exclude": ["refs/heads/develop-delete*"],
+      "include": ["refs/heads/develop-**"]
+    }
+  },
+  "rules": [
+    {
+      "type": "deletion"
+    }
+  ]
+}

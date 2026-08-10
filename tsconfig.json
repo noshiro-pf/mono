@@ -11,5 +11,14 @@
     "./**/configs/**/*.ts",
     "./**/vite.config.mts",
     "./.markdownlint-cli2.mjs"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules",
+    "**/dist",
+    // Legacy monorepo contents, outside the pnpm workspace. Its dependencies
+    // are never installed, so the `./**/configs/**/*.ts` include above would
+    // otherwise surface hundreds of unresolvable-import errors.
+    "experimental"
   ]
 }
