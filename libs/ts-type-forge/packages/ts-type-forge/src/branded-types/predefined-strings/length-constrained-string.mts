@@ -1,0 +1,139 @@
+import { type IsUnion } from '../../condition/index.mjs';
+import { type MinLengthTuple } from '../../tuple-and-list/index.mjs';
+import { type IndexInclusive } from '../../type-level-integer/index.mjs';
+import { type TSTypeForgeInternals_BrandEncapsulated } from '../_internals.mjs';
+import { type SupportedLength } from '../supported-length.mjs';
+
+/**
+ * Branded string type for strings with at most `MaxLength` characters.
+ *
+ * The brand is encoded so that the natural subtyping relation between length
+ * constraints is preserved: if `M <= N`, then `MaxLengthString<M>` is
+ * assignable to `MaxLengthString<N>` (a string of at most `M` characters is
+ * also a string of at most `N` characters). This is achieved by branding with
+ * the union of allowed lengths (`0 | 1 | ... | MaxLength`), which shrinks as
+ * the constraint gets stricter.
+ *
+ * @template MaxLength - The maximum number of characters (inclusive). Must be
+ *   a non-negative integer literal.
+ *
+ * @example
+ * ```ts
+ * const isMaxLengthString = <N extends SupportedLength>(
+ *   s: string,
+ *   maxLength: N,
+ * ): s is MaxLengthString<N> => s.length <= maxLength;
+ *
+ * const userName = 'noshiro' as MaxLengthString<32>;
+ *
+ * const short: MaxLengthString<64> = userName; // OK (32 <= 64)
+ * // const tooLong: MaxLengthString<16> = userName; // Error! (32 > 16)
+ * ```
+ */
+// The `IsUnion<MaxLength>` guard is a type-checker performance safeguard. The
+// brand value `IndexInclusive<MaxLength>` distributes over a union
+// `MaxLength`, materializing `0 | 1 | ... | k` once per member. In real usage
+// `MaxLength` is a single literal, so this never happens — except when a
+// consumer's deferred conditional forces this type's *constraint*, where
+// `MaxLength` widens to its bound `SupportedLength` (the whole `0 | ... | 2048`
+// union). That single instantiation expands the brand across all 2049 lengths
+// and generates millions of types. Collapsing the union case to plain `string`
+// (a sound supertype of the branded type) keeps that constraint cheap while
+// leaving every concrete single-literal result identical.
+export type MaxLengthString<MaxLength extends SupportedLength> =
+  IsUnion<MaxLength> extends true
+    ? string
+    : string &
+        TSTypeForgeInternals_BrandEncapsulated<
+          Readonly<{
+            MaxLength: IndexInclusive<MaxLength>;
+          }>
+        >;
+
+/**
+ * Branded string type for strings with at least `MinLength` characters.
+ *
+ * The brand is encoded so that the natural subtyping relation between length
+ * constraints is preserved: if `M >= N`, then `MinLengthString<M>` is
+ * assignable to `MinLengthString<N>` (a string of at least `M` characters is
+ * also a string of at least `N` characters). This is achieved by branding with
+ * a readonly tuple type that requires at least `MinLength` elements, which
+ * becomes a narrower type as the constraint gets stricter.
+ *
+ * @template MinLength - The minimum number of characters (inclusive). Must be
+ *   a non-negative integer literal.
+ *
+ * @example
+ * ```ts
+ * const isMinLengthString = <N extends SupportedLength>(
+ *   s: string,
+ *   minLength: N,
+ * ): s is MinLengthString<N> => s.length >= minLength;
+ *
+ * const password = 'very-secret-password' as MinLengthString<12>;
+ *
+ * const nonEmpty: MinLengthString<1> = password; // OK (12 >= 1)
+ * // const longer: MinLengthString<16> = password; // Error! (12 < 16)
+ * ```
+ */
+// See the note on {@link MaxLengthString}: the `IsUnion<MinLength>` guard keeps
+// the brand value `MinLengthTuple<MinLength, 0>` (a tuple whose size follows
+// `MinLength`) from being built once per member when `MinLength` widens to the
+// `SupportedLength` union during constraint computation. `readonly string`
+// (i.e. plain `string`) is a sound supertype for that collapsed case.
+export type MinLengthString<MinLength extends SupportedLength> =
+  IsUnion<MinLength> extends true
+    ? string
+    : string &
+        TSTypeForgeInternals_BrandEncapsulated<
+          Readonly<{
+            MinLength: MinLengthTuple<MinLength, 0>;
+          }>
+        >;
+
+/**
+ * Branded string type for strings whose length is between `MinLength` and
+ * `MaxLength` characters (both inclusive).
+ * Defined as the intersection of {@link MinLengthString} and
+ * {@link MaxLengthString}, so both bounds can be weakened independently:
+ * `BoundedLengthString<M1, M2>` is assignable to `BoundedLengthString<N1, N2>`
+ * if `M1 >= N1` and `M2 <= N2`.
+ *
+ * @template MinLength - The minimum number of characters (inclusive). Must be
+ *   a non-negative integer literal.
+ * @template MaxLength - The maximum number of characters (inclusive). Must be
+ *   a non-negative integer literal.
+ *
+ * @example
+ * ```ts
+ * const userId = 'user-12345678' as BoundedLengthString<8, 16>;
+ *
+ * const relaxed: BoundedLengthString<1, 255> = userId; // OK ([8, 16] ⊆ [1, 255])
+ * const atLeast8: MinLengthString<8> = userId; // OK
+ * const atMost16: MaxLengthString<16> = userId; // OK
+ * // const strict: BoundedLengthString<10, 16> = userId; // Error! (8 < 10)
+ * ```
+ */
+export type BoundedLengthString<
+  MinLength extends SupportedLength,
+  MaxLength extends SupportedLength,
+> = MaxLengthString<MaxLength> & MinLengthString<MinLength>;
+
+/**
+ * Branded string type for strings with exactly `Length` characters.
+ * Alias for `BoundedLengthString<Length, Length>`.
+ *
+ * @template Length - The exact number of characters. Must be a non-negative
+ *   integer literal.
+ *
+ * @example
+ * ```ts
+ * const countryCode = 'JP' as FixedLengthString<2>;
+ *
+ * const atMost5: MaxLengthString<5> = countryCode; // OK (2 <= 5)
+ * const nonEmpty: MinLengthString<1> = countryCode; // OK (2 >= 1)
+ * // const threeChars: FixedLengthString<3> = countryCode; // Error!
+ * ```
+ */
+export type FixedLengthString<Length extends SupportedLength> =
+  BoundedLengthString<Length, Length>;

@@ -1,0 +1,63 @@
+name: TypeScript Version Compatibility
+
+# Verifies that the built `dist/*.d.mts` declarations (resolved through the
+# real package.json `exports` map, see test/dist_/) type-check on the range of
+# TypeScript versions consumers may be using — not just the repository's own
+# compiler.
+
+on:
+  push:
+    branches-ignore:
+      - 'develop'
+      - 'develop*'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - 'agents/**'
+      - 'docs/**'
+      - 'documents/**'
+      - '.gitignore'
+      - '.cspell.config.yaml'
+      - '.editorconfig'
+      - '.markdownlint-cli2.mjs'
+      - 'LICENSE'
+
+  workflow_dispatch:
+
+jobs:
+  test-typescript-versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ts-version: ['5.1', '5.4', '5.7', '5.9', 'latest']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # build:min emits dist/ and links the package into
+      # packages/ts-type-forge/test/dist_/node_modules without running the
+      # repository's own checks (those are covered by the lint workflow).
+      - name: Build
+        run: pnpm --filter ts-type-forge run build:min
+
+      - name: Type-check dist output (named imports) with TypeScript ${{ matrix.ts-version }}
+        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./packages/ts-type-forge/test/dist_/named/tsconfig.json
+
+      - name: Type-check dist output (ambient global) with TypeScript ${{ matrix.ts-version }}
+        run: npx -y -p typescript@${{ matrix.ts-version }} tsc -p ./packages/ts-type-forge/test/dist_/ambient/tsconfig.json

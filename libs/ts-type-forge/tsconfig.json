@@ -1,0 +1,9 @@
+{
+  "extends": ["./configs/tsconfig/tsconfig.type-check.json"],
+  "include": [
+    "./scripts/**/*",
+    "./configs/**/*",
+    "./eslint.config.mts",
+    "./.markdownlint-cli2.mjs"
+  ]
+}

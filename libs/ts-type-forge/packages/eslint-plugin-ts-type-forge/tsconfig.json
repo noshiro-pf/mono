@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "../../configs/tsconfig/tsconfig.type-check.json",
+    "../../configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "ts-type-forge": ["../ts-type-forge/src/entry-point.mts"]
+    }
+  },
+  "include": ["./src", "./scripts", "./configs", "./eslint.config.mts"]
+}
