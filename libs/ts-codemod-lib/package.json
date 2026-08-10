@@ -72,6 +72,7 @@
     "codemod:uncommitted:interface-to-type": "tsx ./src/cmd/convert-interface-to-type.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
     "codemod:uncommitted:readonly": "tsx ./src/cmd/convert-to-readonly.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
     "codemod:uncommitted:unknown-record": "tsx ./src/cmd/replace-record-with-unknown-record.mts --uncommitted '{src,scripts,samples,test}/**/*.{mts,tsx}'",
+    "cspell": "cspell \"**\" --gitignore --gitignore-root ../../ --no-progress",
     "doc": "tsx ./scripts/cmd/gen-docs.mts",
     "doc:embed": "tsx ./scripts/cmd/embed-examples.mts",
     "doc:preview": "vite preview --config ./configs/vite.doc.config.mts",

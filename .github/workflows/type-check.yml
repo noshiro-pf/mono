@@ -62,8 +62,13 @@ jobs:
         if: matrix.command == 'ws:test:browser'
         run: pnpm exec playwright install chromium
 
+      # ws:build type-checks each package as it builds, and a package's own
+      # eslint.config.mts is part of that. Those configs import the eslint
+      # plugins, whose dependencies resolve back into the workspace, so on a
+      # clean checkout there is no dist/ for them to point at. ws:build:min
+      # emits dist/ without checking, which breaks the cycle.
       - name: Build all packages
-        run: pnpm run ws:build
+        run: pnpm run ws:build:min && pnpm run ws:build
 
       - name: Run "${{ matrix.command }}"
         if: matrix.command != 'ws:test:browser'
